@@ -24,7 +24,6 @@ const material_modules: Imports = [MatSortModule, MatTableModule];
     selector: 'mho-scrutateur',
     templateUrl: './scrutateur.component.html',
     styleUrls: ['./scrutateur.component.scss'],
-    standalone: true,
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class ScrutateurComponent implements OnInit {
@@ -37,10 +36,10 @@ export class ScrutateurComponent implements OnInit {
     public datasource: MatTableDataSource<Regen> = new MatTableDataSource();
     /** La liste des colonnes */
     public columns: StandardColumn[] = [
-        { id: 'day', header: $localize`Jour`, sticky: true },
-        { id: 'direction_regen', header: $localize`Direction`, class: '' },
-        { id: 'level_regen', header: $localize`Niveau`, class: '' },
-        { id: 'taux_regen', header: $localize`Taux`, class: '' }
+        {id: 'day', header: $localize`Jour`, sticky: true},
+        {id: 'direction_regen', header: $localize`Direction`, class: ''},
+        {id: 'level_regen', header: $localize`Niveau`, class: ''},
+        {id: 'taux_regen', header: $localize`Taux`, class: ''}
     ];
 
     public polar_chart!: Chart<'polarArea'>;

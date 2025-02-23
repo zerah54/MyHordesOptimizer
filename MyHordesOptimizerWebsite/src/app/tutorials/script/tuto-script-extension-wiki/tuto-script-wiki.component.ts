@@ -18,7 +18,6 @@ const material_modules: Imports = [MatButtonModule, MatCardModule, MatIconModule
     selector: 'mho-tuto-script-wiki',
     templateUrl: './tuto-script-wiki.component.html',
     styleUrls: ['./tuto-script-wiki.component.scss'],
-    standalone: true,
     imports: [...angular_common, ...components, ...material_modules, ...pipes],
 })
 export class TutoScriptWikiComponent {

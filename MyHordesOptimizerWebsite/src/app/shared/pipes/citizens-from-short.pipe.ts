@@ -3,8 +3,7 @@ import { Citizen } from '../../_abstract_model/types/citizen.class';
 
 
 @Pipe({
-    name: 'citizensFromShort',
-    standalone: true,
+    name: 'citizensFromShort'
 })
 export class CitizensFromShortPipe implements PipeTransform {
     transform(citizens: Citizen[], all_citizens: Citizen[]): Citizen[] {

@@ -37,7 +37,6 @@ const material_modules: Imports = [MatCheckboxModule, MatSlideToggleModule, MatS
     templateUrl: './citizens-watch.component.html',
     styleUrls: ['./citizens-watch.component.scss'],
     encapsulation: ViewEncapsulation.None,
-    standalone: true,
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class CitizensWatchComponent implements OnInit {

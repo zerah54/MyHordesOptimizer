@@ -33,7 +33,6 @@ const material_modules: Imports = [MatButtonModule, MatDividerModule, MatFormFie
     selector: 'mho-header',
     templateUrl: './header.component.html',
     styleUrls: ['./header.component.scss'],
-    standalone: true,
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class HeaderComponent implements OnInit {

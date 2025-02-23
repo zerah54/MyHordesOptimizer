@@ -4,8 +4,7 @@ import { Item } from '../../../_abstract_model/types/item.class';
 
 
 @Pipe({
-    name: 'isItems',
-    standalone: true
+    name: 'isItems'
 })
 export class IsItemsPipe implements PipeTransform {
     transform(list: (Item | StatusEnum)[]): boolean {

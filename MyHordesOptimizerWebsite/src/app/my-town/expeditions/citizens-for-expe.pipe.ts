@@ -8,8 +8,7 @@ import { getPreRegistered } from './expeditions.utils';
 
 @Pipe({
     name: 'citizensForExpe',
-    pure: false,
-    standalone: true
+    pure: false
 })
 export class CitizensForExpePipe implements PipeTransform {
     transform(all_citizens: Citizen[], expedition_citizen: CitizenExpedition/*, current_expedition: Expedition, all_expeditions: Expedition[]*/): Citizen[] {
@@ -46,8 +45,7 @@ export class CitizensForExpePipe implements PipeTransform {
 
 @Pipe({
     name: 'someHeroicActionNeeded',
-    pure: false,
-    standalone: true
+    pure: false
 })
 export class SomeHeroicActionNeededPipe implements PipeTransform {
     transform(expedition_citizen: CitizenExpedition[]): boolean {
@@ -58,8 +56,7 @@ export class SomeHeroicActionNeededPipe implements PipeTransform {
 
 @Pipe({
     name: 'formatPreRegistered',
-    pure: false,
-    standalone: true
+    pure: false
 })
 export class FormatPreRegisteredPipe implements PipeTransform {
     transform(expeditions: Expedition[], all_citizen: Citizen[]): string {

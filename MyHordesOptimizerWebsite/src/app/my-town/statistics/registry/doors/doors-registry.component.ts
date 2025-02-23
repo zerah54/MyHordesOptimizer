@@ -10,18 +10,17 @@ import { Citizen } from '../../../../_abstract_model/types/citizen.class';
     selector: 'mho-registry-doors',
     templateUrl: './doors-registry.component.html',
     styleUrls: ['./doors-registry.component.scss'],
-    encapsulation: ViewEncapsulation.None,
-    standalone: true
+    encapsulation: ViewEncapsulation.None
 })
 export class DoorsRegistryComponent {
     @HostBinding('style.display') display: string = 'contents';
 
     @ViewChild('doorsCanvas') doors_canvas!: ElementRef;
 
-    @Input({ required: true }) completeCitizenList!: CitizenInfo;
-    @Input({ required: true }) displayPseudo!: DisplayPseudoMode;
+    @Input({required: true}) completeCitizenList!: CitizenInfo;
+    @Input({required: true}) displayPseudo!: DisplayPseudoMode;
 
-    @Input({ required: true }) set registry(registry: Entry[] | undefined) {
+    @Input({required: true}) set registry(registry: Entry[] | undefined) {
         if (registry) {
             this.entries = registry.filter((entry: Entry) => {
                 return this.doors_entering_keywords.some((doors_entering: string): boolean => entry.entry?.indexOf(' ' + doors_entering) > -1)
@@ -84,7 +83,7 @@ export class DoorsRegistryComponent {
                         afterBuildTicks: (axis: Scale): { value: number; }[] => {
                             const ticks: string[] = ['0:00', '2:00', '4:00', '6:00', '8:00', '10:00', '12:00', '14:00', '16:00', '18:00', '20:00', '22:00', '23:59'];
 
-                            return axis.ticks = ticks.map((v: string): { value: number } => ({ value: +moment(v, 'k:m').format('x') }));
+                            return axis.ticks = ticks.map((v: string): { value: number } => ({value: +moment(v, 'k:m').format('x')}));
                         },
                         stacked: false,
                         min: +moment('0:00', 'k:mm').format('x'),

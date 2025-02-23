@@ -24,17 +24,16 @@ const material_modules: Imports = [MatButtonModule, MatDividerModule, MatTooltip
     selector: 'mho-dig',
     templateUrl: './dig.component.html',
     styleUrls: ['./dig.component.scss'],
-    standalone: true,
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class DigComponent {
     @HostBinding('style.display') display: string = 'contents';
 
-    @Input({ required: true }) citizen!: Citizen;
-    @Input({ required: true }) day!: number;
-    @Input({ required: true }) digsMode!: 'creation' | 'update' | 'registry';
+    @Input({required: true}) citizen!: Citizen;
+    @Input({required: true}) day!: number;
+    @Input({required: true}) digsMode!: 'creation' | 'update' | 'registry';
 
-    @Input({ required: true }) set dig(dig: Dig | undefined) {
+    @Input({required: true}) set dig(dig: Dig | undefined) {
         setTimeout(() => {
             if (this.digsMode === 'registry') {
                 this.updated_dig = dig;

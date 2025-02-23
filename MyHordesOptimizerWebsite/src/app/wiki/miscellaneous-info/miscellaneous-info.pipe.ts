@@ -4,8 +4,7 @@ import { TownDetails } from '../../_abstract_model/types/town-details.class';
 
 
 @Pipe({
-    name: 'despairDeaths',
-    standalone: true,
+    name: 'despairDeaths'
 })
 export class DespairDeathsPipe implements PipeTransform {
     transform(nb_killed_zombies: number): number {
@@ -14,8 +13,7 @@ export class DespairDeathsPipe implements PipeTransform {
 }
 
 @Pipe({
-    name: 'isTodayMiscRow',
-    standalone: true,
+    name: 'isTodayMiscRow'
 })
 export class IsTodayMiscRowPipe implements PipeTransform {
     transform(row: Record<string, string>, table: Misc, town: TownDetails | null): boolean {

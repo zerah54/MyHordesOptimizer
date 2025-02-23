@@ -17,7 +17,6 @@ const material_modules: Imports = [MatDividerModule];
     templateUrl: './well-registry.component.html',
     styleUrls: ['./well-registry.component.scss'],
     encapsulation: ViewEncapsulation.None,
-    standalone: true,
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class WellRegistryComponent {

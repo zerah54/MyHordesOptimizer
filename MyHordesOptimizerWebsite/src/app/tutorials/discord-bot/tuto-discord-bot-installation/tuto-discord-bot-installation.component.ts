@@ -17,7 +17,6 @@ const material_modules: Imports = [MatButtonModule, MatCardModule, MatIconModule
     selector: 'mho-tuto-discord-bot-installation',
     templateUrl: './tuto-discord-bot-installation.component.html',
     styleUrls: ['./tuto-discord-bot-installation.component.scss'],
-    standalone: true,
     imports: [...angular_common, ...components, ...material_modules, ...pipes],
 })
 export class TutoDiscordBotInstallationComponent {

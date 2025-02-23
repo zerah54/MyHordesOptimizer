@@ -36,7 +36,6 @@ const material_modules: Imports = [MatButtonModule, MatCardModule, MatIconModule
     selector: 'mho-ruins',
     templateUrl: './ruins.component.html',
     styleUrls: ['./ruins.component.scss'],
-    standalone: true,
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class RuinsComponent implements OnInit {
@@ -61,13 +60,13 @@ export class RuinsComponent implements OnInit {
     public datasource: MatTableDataSource<Ruin> = new MatTableDataSource();
     /** La liste des colonnes */
     public readonly columns: RuinColumns[] = [
-        { id: 'label', header: $localize`Nom du bâtiment`, sortable: true, sticky: true },
-        { id: 'description', header: $localize`Description`, sortable: false },
-        { id: 'min_dist', header: $localize`Distance minimum`, sortable: true },
-        { id: 'max_dist', header: $localize`Distance maximum`, sortable: true },
-        { id: 'camping', header: $localize`Bonus en camping`, sortable: true },
-        { id: 'capacity', header: $localize`Capacité`, sortable: true },
-        { id: 'drops', header: $localize`Objets`, sortable: false }
+        {id: 'label', header: $localize`Nom du bâtiment`, sortable: true, sticky: true},
+        {id: 'description', header: $localize`Description`, sortable: false},
+        {id: 'min_dist', header: $localize`Distance minimum`, sortable: true},
+        {id: 'max_dist', header: $localize`Distance maximum`, sortable: true},
+        {id: 'camping', header: $localize`Bonus en camping`, sortable: true},
+        {id: 'capacity', header: $localize`Capacité`, sortable: true},
+        {id: 'drops', header: $localize`Objets`, sortable: false}
     ];
 
     public ruins_filters: RuinFilters = {

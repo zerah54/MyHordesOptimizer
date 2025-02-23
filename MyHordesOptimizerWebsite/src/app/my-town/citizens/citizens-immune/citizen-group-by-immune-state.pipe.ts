@@ -4,8 +4,7 @@ import { groupBy } from '../../../shared/utilities/array.util';
 
 
 @Pipe({
-    name: 'citizenGroupByImmuneState',
-    standalone: true,
+    name: 'citizenGroupByImmuneState'
 })
 export class CitizenGroupByImmuneStatePipe implements PipeTransform {
 

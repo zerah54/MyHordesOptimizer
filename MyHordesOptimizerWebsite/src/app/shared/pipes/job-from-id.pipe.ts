@@ -3,8 +3,7 @@ import { JobEnum } from '../../_abstract_model/enum/job.enum';
 
 
 @Pipe({
-    name: 'jobFromId',
-    standalone: true,
+    name: 'jobFromId'
 })
 export class JobFromIdPipe implements PipeTransform {
     transform(job_id?: string): JobEnum | undefined {

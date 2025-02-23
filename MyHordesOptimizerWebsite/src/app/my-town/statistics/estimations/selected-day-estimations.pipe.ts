@@ -3,8 +3,7 @@ import { Estimations } from '../../../_abstract_model/types/estimations.class';
 
 
 @Pipe({
-    name: 'selectedDayEstimation',
-    standalone: true,
+    name: 'selectedDayEstimation'
 })
 export class SelectedDayEstimationPipe implements PipeTransform {
     transform(estimations: Estimations[], selected_day: number): Estimations {

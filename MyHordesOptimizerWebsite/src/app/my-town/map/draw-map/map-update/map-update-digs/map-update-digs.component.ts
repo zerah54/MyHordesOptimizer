@@ -30,7 +30,6 @@ const material_modules: Imports = [MatButtonModule, MatFormFieldModule, MatIconM
     selector: 'mho-map-update-digs',
     templateUrl: './map-update-digs.component.html',
     styleUrls: ['./map-update-digs.component.scss'],
-    standalone: true,
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class MapUpdateDigsComponent {

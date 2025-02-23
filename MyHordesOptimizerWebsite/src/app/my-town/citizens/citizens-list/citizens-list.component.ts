@@ -46,7 +46,6 @@ const material_modules: Imports = [CdkVirtualScrollViewport, MatCheckboxModule, 
     templateUrl: './citizens-list.component.html',
     styleUrls: ['./citizens-list.component.scss'],
     encapsulation: ViewEncapsulation.None,
-    standalone: true,
     imports: [...angular_common, ...components, ...material_modules, ...pipes, TableVirtualScrollModule]
 })
 export class CitizensListComponent implements OnInit {
@@ -80,15 +79,15 @@ export class CitizensListComponent implements OnInit {
     public citizen_filter_change: EventEmitter<void> = new EventEmitter<void>();
     /** La liste des colonnes */
     public readonly citizen_list_columns: StandardColumn[] = [
-        { id: 'avatar_name', header: $localize`Citoyen`, class: 'center', sticky: true },
-        { id: 'more_status', header: $localize`États`, class: '' },
-        { id: 'heroic_actions', header: $localize`Actions héroïques`, class: '' },
-        { id: 'home', header: $localize`Améliorations`, class: '' },
+        {id: 'avatar_name', header: $localize`Citoyen`, class: 'center', sticky: true},
+        {id: 'more_status', header: $localize`États`, class: ''},
+        {id: 'heroic_actions', header: $localize`Actions héroïques`, class: ''},
+        {id: 'home', header: $localize`Améliorations`, class: ''},
         // { id: 'chest', header: $localize`Coffre` },
     ];
     /** La liste des colonnes pour les citoyens morts */
     public readonly dead_citizen_list_columns: StandardColumn[] = [
-        { id: 'avatar_name', header: $localize`Citoyen`, class: 'center', sticky: true },
+        {id: 'avatar_name', header: $localize`Citoyen`, class: 'center', sticky: true},
     ];
 
     public readonly all_status: StatusEnum[] = StatusEnum.getAllValues();
@@ -97,7 +96,7 @@ export class CitizensListComponent implements OnInit {
     public bag_lists: ListForAddRemove[] = [];
     /** La liste des listes disponibles dans les status */
     public readonly status_lists: ListForAddRemove[] = [
-        { label: $localize`Tous`, list: this.all_status }
+        {label: $localize`Tous`, list: this.all_status}
     ];
 
     private api_service: ApiService = inject(ApiService);
@@ -127,7 +126,7 @@ export class CitizensListComponent implements OnInit {
                 next: (items: Item[]) => {
                     this.all_items = items;
                     this.bag_lists = [
-                        { label: $localize`Tous`, list: this.all_items }
+                        {label: $localize`Tous`, list: this.all_items}
                     ];
                 }
             });

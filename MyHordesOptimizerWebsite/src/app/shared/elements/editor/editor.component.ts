@@ -40,7 +40,6 @@ const material_modules: Imports = [MatFormFieldModule];
     ],
     changeDetection: ChangeDetectionStrategy.OnPush,
     encapsulation: ViewEncapsulation.None,
-    standalone: true,
     imports: [...angular_common, ...components, ...material_modules, ...pipes, AngularEditorModule]
 })
 export class EditorComponent implements ControlValueAccessor, OnChanges, OnDestroy, MatFormFieldControl<string> {

@@ -24,7 +24,6 @@ const material_modules: Imports = [MatCheckboxModule, MatDividerModule, MatFormF
     selector: 'mho-map-update-ruin',
     templateUrl: './map-update-ruin.component.html',
     styleUrls: ['./map-update-ruin.component.scss'],
-    standalone: true,
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class MapUpdateRuinComponent implements OnInit {

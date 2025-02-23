@@ -4,8 +4,7 @@ import { HeroicActions, HeroicActionsWithValue } from '../../../../../_abstract_
 
 
 @Pipe({
-    name: 'remainingHeroicAction',
-    standalone: true,
+    name: 'remainingHeroicAction'
 })
 export class HasStillHeroicPipe implements PipeTransform {
     transform(heroics: HeroicActions | undefined, cell_action: HeroicActionEnum): number {

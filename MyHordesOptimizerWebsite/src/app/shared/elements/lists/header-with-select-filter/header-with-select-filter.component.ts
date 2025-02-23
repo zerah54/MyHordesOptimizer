@@ -15,7 +15,6 @@ const material_modules: Imports = [MatFormFieldModule, MatIconModule];
     selector: 'mho-header-with-select-filter',
     templateUrl: './header-with-select-filter.component.html',
     styleUrls: ['./header-with-select-filter.component.scss'],
-    standalone: true,
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class HeaderWithSelectFilterComponent<T> {

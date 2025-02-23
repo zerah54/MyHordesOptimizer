@@ -14,7 +14,6 @@ const material_modules: Imports = [MatCardModule, MatTabsModule];
     selector: 'mho-statistics',
     templateUrl: './statistics.component.html',
     styleUrls: ['./statistics.component.scss'],
-    standalone: true,
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class StatisticsComponent {

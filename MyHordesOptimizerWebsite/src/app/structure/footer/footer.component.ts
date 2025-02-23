@@ -16,7 +16,6 @@ const material_modules: Imports = [MatToolbarModule];
     templateUrl: './footer.component.html',
     styleUrls: ['./footer.component.scss'],
     encapsulation: ViewEncapsulation.None,
-    standalone: true,
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class FooterComponent {

@@ -27,7 +27,6 @@ const material_modules: Imports = [MatCardModule, MatProgressSpinnerModule, MatS
     templateUrl: './app.component.html',
     styleUrls: ['./app.component.scss'],
     encapsulation: ViewEncapsulation.None,
-    standalone: true,
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class AppComponent implements OnInit {

@@ -7,8 +7,7 @@ import { groupBy } from '../../../../shared/utilities/array.util';
 
 
 @Pipe({
-    name: 'bankCleanEntries',
-    standalone: true,
+    name: 'bankCleanEntries'
 })
 export class BankCleanEntriesPipe implements PipeTransform {
     transform(entries: Entry[], give_keywords: string[], complete_citizen_list: CitizenInfo, complete_item_list: Item[], strict: boolean): BankEntry[] {
@@ -73,8 +72,7 @@ export class BankCleanEntriesPipe implements PipeTransform {
 }
 
 @Pipe({
-    name: 'bankDiff',
-    standalone: true,
+    name: 'bankDiff'
 })
 export class BankDiffPipe implements PipeTransform {
     transform(entries: BankEntry[], mode: 'gift' | 'take'): BankEntry[] {

@@ -5,8 +5,7 @@ import { Dig } from '../../../../_abstract_model/types/dig.class';
 
 
 @Pipe({
-    name: 'citizenForDig',
-    standalone: true,
+    name: 'citizenForDig'
 })
 export class CitizenForDigPipe implements PipeTransform {
     transform(dig: Dig, complete_citizen_list: CitizenInfo): Citizen {
@@ -15,8 +14,7 @@ export class CitizenForDigPipe implements PipeTransform {
 }
 
 @Pipe({
-    name: 'citizenNotInDigList',
-    standalone: true,
+    name: 'citizenNotInDigList'
 })
 export class CitizenNotInDigListPipe implements PipeTransform {
     transform(complete_citizen_list: CitizenInfo, digs_list: Dig[]): Citizen[] {

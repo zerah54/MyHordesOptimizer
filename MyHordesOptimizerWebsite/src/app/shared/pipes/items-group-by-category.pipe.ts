@@ -7,8 +7,7 @@ import { normalizeString } from '../utilities/string.utils';
 
 
 @Pipe({
-    name: 'itemsGroupByCategory',
-    standalone: true,
+    name: 'itemsGroupByCategory'
 })
 export class ItemsGroupByCategoryPipe implements PipeTransform {
 

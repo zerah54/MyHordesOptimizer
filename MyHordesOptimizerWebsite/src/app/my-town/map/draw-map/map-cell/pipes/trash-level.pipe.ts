@@ -2,8 +2,7 @@ import { Pipe, PipeTransform } from '@angular/core';
 
 
 @Pipe({
-    name: 'trashLevel',
-    standalone: true,
+    name: 'trashLevel'
 })
 export class TrashLevelPipe implements PipeTransform {
     transform(trash_number: number): number {

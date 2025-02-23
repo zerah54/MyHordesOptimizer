@@ -7,13 +7,12 @@ import { MatTabsModule } from '@angular/material/tabs';
 import moment from 'moment';
 import { HORDES_IMG_REPO } from '../../../../_abstract_model/const';
 import { Imports } from '../../../../_abstract_model/types/_types';
-import { DebugLogPipe } from '../../../pipes/debug-log.pipe';
 import { ItemsGroupByCategoryPipe } from '../../../pipes/items-group-by-category.pipe';
 import { IsItemsPipe } from '../is-item.pipe';
 
 const angular_common: Imports = [CommonModule, NgOptimizedImage];
 const components: Imports = [];
-const pipes: Imports = [DebugLogPipe, IsItemsPipe, ItemsGroupByCategoryPipe];
+const pipes: Imports = [IsItemsPipe, ItemsGroupByCategoryPipe];
 const material_modules: Imports = [MatFormFieldModule, MatInputModule, MatMenuModule, MatTabsModule];
 
 @Component({
@@ -22,13 +21,12 @@ const material_modules: Imports = [MatFormFieldModule, MatInputModule, MatMenuMo
     styleUrls: ['./menu-add.component.scss'],
     encapsulation: ViewEncapsulation.None,
     exportAs: 'menuAdd',
-    standalone: true,
     imports: [...angular_common, ...components, ...material_modules, ...pipes],
 })
 export class MenuAddComponent {
     @HostBinding('style.display') display: string = 'contents';
 
-    @ViewChild(MatMenu, { static: true }) menu!: MatMenu;
+    @ViewChild(MatMenu, {static: true}) menu!: MatMenu;
 
     @Input() class: string = '';
 

@@ -13,7 +13,6 @@ const material_modules: Imports = [MatFormFieldModule, MatInputModule];
     selector: 'mho-filter',
     templateUrl: './filter-field.component.html',
     styleUrls: ['./filter-field.component.scss'],
-    standalone: true,
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class FilterFieldComponent {

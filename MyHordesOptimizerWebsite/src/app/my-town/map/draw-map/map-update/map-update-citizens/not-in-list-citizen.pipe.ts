@@ -3,8 +3,7 @@ import { Citizen } from '../../../../../_abstract_model/types/citizen.class';
 
 
 @Pipe({
-    name: 'notInListCitizen',
-    standalone: true,
+    name: 'notInListCitizen'
 })
 export class NotInListCitizenPipe implements PipeTransform {
     transform(all_citizens: Citizen[], in_list_citizens: Citizen[]): Citizen[] {

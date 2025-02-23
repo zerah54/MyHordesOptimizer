@@ -18,7 +18,6 @@ const material_modules: Imports = [MatFormFieldModule, MatInputModule, MatMenuMo
     styleUrls: ['./menu-remove.component.scss'],
     encapsulation: ViewEncapsulation.None,
     exportAs: 'menuRemove',
-    standalone: true,
     imports: [...angular_common, ...components, ...material_modules, ...pipes],
 })
 export class MenuRemoveComponent {

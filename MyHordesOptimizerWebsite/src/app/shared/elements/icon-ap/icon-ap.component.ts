@@ -13,7 +13,6 @@ const material_modules: Imports = [];
     selector: 'mho-icon-ap',
     templateUrl: './icon-ap.component.html',
     styleUrls: ['./icon-ap.component.scss'],
-    standalone: true,
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class IconApComponent {

@@ -2,8 +2,7 @@ import { formatNumber } from '@angular/common';
 import { Pipe, PipeTransform } from '@angular/core';
 
 @Pipe({
-    name: 'campingDisplayBonus',
-    standalone: true,
+    name: 'campingDisplayBonus'
 })
 export class CampingDisplayBonusPipe implements PipeTransform {
 

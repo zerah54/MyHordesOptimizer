@@ -20,17 +20,16 @@ const material_modules: Imports = [MatSlideToggleModule];
     templateUrl: './bank-diff-registry.component.html',
     styleUrls: ['./bank-diff-registry.component.scss'],
     encapsulation: ViewEncapsulation.None,
-    standalone: true,
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class BankDiffRegistryComponent {
     @HostBinding('style.display') display: string = 'contents';
 
-    @Input({ required: true }) completeCitizenList!: CitizenInfo;
-    @Input({ required: true }) displayPseudo!: DisplayPseudoMode;
-    @Input({ required: true }) completeItemsList!: Item[];
+    @Input({required: true}) completeCitizenList!: CitizenInfo;
+    @Input({required: true}) displayPseudo!: DisplayPseudoMode;
+    @Input({required: true}) completeItemsList!: Item[];
 
-    @Input({ required: true }) set registry(registry: Entry[] | undefined) {
+    @Input({required: true}) set registry(registry: Entry[] | undefined) {
         if (registry) {
             this.entries = registry.filter((entry: Entry) => {
                 return this.give_keywords.some((give_keyword: string): boolean => entry.entry?.indexOf(' ' + give_keyword + ' ') > -1 || entry.entry?.indexOf(' ' + give_keyword + ':') > -1)

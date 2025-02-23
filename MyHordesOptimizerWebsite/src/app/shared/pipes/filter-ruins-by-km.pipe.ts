@@ -3,8 +3,7 @@ import { Ruin } from '../../_abstract_model/types/ruin.class';
 import { getTown } from '../utilities/localstorage.util';
 
 @Pipe({
-    name: 'filterRuinsByKm',
-    standalone: true
+    name: 'filterRuinsByKm'
 })
 export class FilterRuinsByKmPipe implements PipeTransform {
 

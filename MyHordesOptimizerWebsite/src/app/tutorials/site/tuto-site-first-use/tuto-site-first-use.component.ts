@@ -18,7 +18,6 @@ const material_modules: Imports = [MatButtonModule, MatCardModule, MatIconModule
     templateUrl: './tuto-site-first-use.component.html',
     styleUrls: ['./tuto-site-first-use.component.scss'],
     encapsulation: ViewEncapsulation.None,
-    standalone: true,
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class TutoSiteFirstUseComponent {

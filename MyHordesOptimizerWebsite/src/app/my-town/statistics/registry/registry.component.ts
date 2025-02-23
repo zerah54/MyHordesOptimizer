@@ -34,7 +34,6 @@ const material_modules: Imports = [MatButtonModule, MatButtonToggleModule, MatFo
     templateUrl: './registry.component.html',
     styleUrls: ['./registry.component.scss'],
     encapsulation: ViewEncapsulation.None,
-    standalone: true,
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class RegistryComponent implements OnInit {

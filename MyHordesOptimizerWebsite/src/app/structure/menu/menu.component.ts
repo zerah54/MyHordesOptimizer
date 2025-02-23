@@ -26,30 +26,29 @@ const material_modules: Imports = [MatButtonModule, MatDividerModule, MatIconMod
     templateUrl: './menu.component.html',
     styleUrls: ['./menu.component.scss'],
     encapsulation: ViewEncapsulation.None,
-    standalone: true,
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class MenuComponent implements OnInit {
     @HostBinding('style.display') display: string = 'contents';
 
-    @Input({ required: true }) sidenavContainer!: MatSidenavContainer;
+    @Input({required: true}) sidenavContainer!: MatSidenavContainer;
 
     public charts_theming_service: ChartsThemingService = inject(ChartsThemingService);
 
     public themes: Theme[] = [
-        { label: $localize`Par défaut`, class: '' },
-        { label: $localize`Rose`, class: 'pink' },
-        { label: $localize`Brun`, class: 'brown' },
+        {label: $localize`Par défaut`, class: ''},
+        {label: $localize`Rose`, class: 'pink'},
+        {label: $localize`Brun`, class: 'brown'},
     ];
 
     public selected_theme: Theme | undefined = this.themes.find((theme: Theme) => theme.class === localStorage.getItem('theme'));
 
     /** La liste des langues disponibles */
     public language_list: Language[] = [
-        { code: 'en', label: 'English' },
-        { code: 'fr', label: 'Français', default: true },
-        { code: 'es', label: 'Spanish' },
-        { code: 'de', label: 'Deutsch' }
+        {code: 'en', label: 'English'},
+        {code: 'fr', label: 'Français', default: true},
+        {code: 'es', label: 'Spanish'},
+        {code: 'de', label: 'Deutsch'}
     ];
 
     /** La langue sélectionnée pour l'affichage de l'application */
@@ -59,9 +58,9 @@ export class MenuComponent implements OnInit {
     public routes: SidenavLinks[] = [
         {
             label: $localize`Ma ville`, lvl: 0, displayed: true, authorized: (): boolean => this.isInTown(), expanded: true, children: [
-                { label: $localize`Carte des fouilles`, path: 'my-town/map', displayed: true, lvl: 1, authorized: (): boolean => this.isInTown(), spoil: false },
-                { label: $localize`Banque`, path: 'my-town/bank', displayed: true, lvl: 1, authorized: (): boolean => this.isInTown(), spoil: false },
-                { label: $localize`Citoyens`, path: 'my-town/citizens', displayed: true, lvl: 1, authorized: (): boolean => this.isInTown(), spoil: false },
+                {label: $localize`Carte des fouilles`, path: 'my-town/map', displayed: true, lvl: 1, authorized: (): boolean => this.isInTown(), spoil: false},
+                {label: $localize`Banque`, path: 'my-town/bank', displayed: true, lvl: 1, authorized: (): boolean => this.isInTown(), spoil: false},
+                {label: $localize`Citoyens`, path: 'my-town/citizens', displayed: true, lvl: 1, authorized: (): boolean => this.isInTown(), spoil: false},
                 {
                     label: $localize`Liste de courses`,
                     path: 'my-town/wishlist',
@@ -70,8 +69,8 @@ export class MenuComponent implements OnInit {
                     authorized: (): boolean => this.isInTown(),
                     spoil: false
                 },
-                { label: $localize`Statistiques`, path: 'my-town/stats', displayed: true, lvl: 1, authorized: (): boolean => this.isInTown(), spoil: false },
-                { label: $localize`Expéditions`, path: 'my-town/expeditions', displayed: true, lvl: 1, authorized: (): boolean => this.isInTown(), spoil: false },
+                {label: $localize`Statistiques`, path: 'my-town/stats', displayed: true, lvl: 1, authorized: (): boolean => this.isInTown(), spoil: false},
+                {label: $localize`Expéditions`, path: 'my-town/expeditions', displayed: true, lvl: 1, authorized: (): boolean => this.isInTown(), spoil: false},
                 {
                     label: $localize`Chantiers`,
                     path: 'my-town/buildings',
@@ -100,16 +99,16 @@ export class MenuComponent implements OnInit {
         },
         {
             label: $localize`Outils`, lvl: 0, displayed: true, authorized: (): boolean => true, expanded: true, children: [
-                { label: $localize`Camping`, path: 'tools/camping', displayed: true, lvl: 1, authorized: (): boolean => true, spoil: true },
-                { label: $localize`Chances de survie`, path: 'tools/probabilities', displayed: true, lvl: 1, authorized: (): boolean => true, spoil: false },
+                {label: $localize`Camping`, path: 'tools/camping', displayed: true, lvl: 1, authorized: (): boolean => true, spoil: true},
+                {label: $localize`Chances de survie`, path: 'tools/probabilities', displayed: true, lvl: 1, authorized: (): boolean => true, spoil: false},
             ], spoil: false
         },
         {
             label: $localize`Wiki`, lvl: 0, displayed: true, authorized: (): boolean => true, expanded: true, children: [
-                { label: $localize`Objets`, path: 'wiki/items', displayed: true, lvl: 1, authorized: (): boolean => true, spoil: false },
-                { label: $localize`Recettes`, path: 'wiki/recipes', displayed: true, lvl: 1, authorized: (): boolean => true, spoil: false },
-                { label: $localize`Pouvoirs`, path: 'wiki/hero-skills', displayed: true, lvl: 1, authorized: (): boolean => true, spoil: true },
-                { label: $localize`Bâtiments`, path: 'wiki/ruins', displayed: true, lvl: 1, authorized: (): boolean => true, spoil: true },
+                {label: $localize`Objets`, path: 'wiki/items', displayed: true, lvl: 1, authorized: (): boolean => true, spoil: false},
+                {label: $localize`Recettes`, path: 'wiki/recipes', displayed: true, lvl: 1, authorized: (): boolean => true, spoil: false},
+                {label: $localize`Pouvoirs`, path: 'wiki/hero-skills', displayed: true, lvl: 1, authorized: (): boolean => true, spoil: true},
+                {label: $localize`Bâtiments`, path: 'wiki/ruins', displayed: true, lvl: 1, authorized: (): boolean => true, spoil: true},
                 {
                     label: $localize`Informations diverses`,
                     path: 'wiki/miscellaneous-info',
@@ -280,7 +279,7 @@ export class MenuComponent implements OnInit {
     private defineThemes(): void {
         /** Noël */
         if (this.isNoel()) {
-            this.themes.push({ label: $localize`Noël`, class: 'noel' });
+            this.themes.push({label: $localize`Noël`, class: 'noel'});
             this.themes.splice(0, 1);
             this.useEventTheme();
         } else if (this.isNothing() && (this.selected_theme?.class === 'noel' || !this.selected_theme)) {
@@ -291,7 +290,7 @@ export class MenuComponent implements OnInit {
 
         /** Halloween */
         if (this.isHalloween()) {
-            this.themes.push({ label: $localize`Halloween`, class: 'halloween' });
+            this.themes.push({label: $localize`Halloween`, class: 'halloween'});
             this.themes.splice(0, 1);
             this.useEventTheme();
         } else if (this.isNothing() && (this.selected_theme?.class === 'halloween' || !this.selected_theme)) {

@@ -26,25 +26,24 @@
                             "zone.js"
                         ],
                         "tsConfig": "tsconfig.app.json",
-                        "inlineStyleLanguage": "scss",
                         "assets": [
-                            "src/favicon.ico",
-                            "src/assets",
-                            "src/assets/img",
-                            "src/robots.txt"
+                            {
+                                "glob": "**/*",
+                                "input": "public"
+                            }
                         ],
                         "styles": [
                             "node_modules/material-icons/iconfont/material-icons.css",
                             "node_modules/@fortawesome/fontawesome-free/css/all.css",
                             "src/styles.scss",
-                            "src/assets/scss/material-theme/theming.scss"
+                            "public/scss/material-theme/theming.scss"
                         ],
                         "stylePreprocessorOptions": {
                             "includePaths": [
-                                "src/assets/scss",
-                                "src/assets/scss/material-theme",
-                                "src/assets/scss/noel",
-                                "src/assets/scss/halloween"
+                                "public/scss",
+                                "public/scss/material-theme",
+                                "public/scss/noel",
+                                "public/scss/halloween"
                             ]
                         },
                         "scripts": []
@@ -135,11 +134,11 @@
                             "zone.js.testing"
                         ],
                         "tsConfig": "tsconfig.spec.json",
-                        "inlineStyleLanguage": "scss",
                         "assets": [
-                            "src/favicon.ico",
-                            "src/assets",
-                            "src/assets/img"
+                            {
+                                "glob": "**/*",
+                                "input": "public"
+                            }
                         ],
                         "styles": [
                             "node_modules/material-icons/iconfont/material-icons.css",
@@ -148,10 +147,10 @@
                         ],
                         "stylePreprocessorOptions": {
                             "includePaths": [
-                                "src/assets/scss",
-                                "src/assets/scss/material-theme",
-                                "src/assets/scss/noel",
-                                "src/assets/scss/halloween"
+                                "public/scss",
+                                "public/scss/material-theme",
+                                "public/scss/noel",
+                                "public/scss/halloween"
                             ]
                         },
                         "scripts": []
@@ -165,12 +164,11 @@
                         "tsConfig": "tsconfig.server.json",
                         "stylePreprocessorOptions": {
                             "includePaths": [
-                                "src/assets/scss",
-                                "src/assets/scss/**/"
+                                "public/scss",
+                                "public/scss/**/"
                             ]
                         },
-                        "preserveSymlinks": true,
-                        "inlineStyleLanguage": "scss"
+                        "preserveSymlinks": true
                     },
                     "configurations": {
                         "production": {
@@ -246,9 +244,9 @@
             "i18n": {
                 "sourceLocale": "fr",
                 "locales": {
-                    "de": "src/assets/i18n/xlf-files/messages.de.xlf",
-                    "en": "src/assets/i18n/xlf-files/messages.en.xlf",
-                    "es": "src/assets/i18n/xlf-files/messages.es.xlf"
+                    "de": "public/i18n/xlf-files/messages.de.xlf",
+                    "en": "public/i18n/xlf-files/messages.en.xlf",
+                    "es": "public/i18n/xlf-files/messages.es.xlf"
                 }
             }
         }

@@ -22,7 +22,6 @@ const material_modules: Imports = [MatButtonModule, MatDividerModule];
     selector: 'mho-item',
     templateUrl: './item.component.html',
     styleUrls: ['./item.component.scss'],
-    standalone: true,
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class ItemComponent implements OnInit {
@@ -31,7 +30,7 @@ export class ItemComponent implements OnInit {
     /** L'élément à afficher si c'est un objet standard */
     @Input() item!: Item;
     /** Force l'ouverture de l'élément */
-    @Input({ transform: booleanAttribute }) forceOpen: boolean = false;
+    @Input({transform: booleanAttribute}) forceOpen: boolean = false;
 
     /** Le dossier dans lequel sont stockées les images */
     public HORDES_IMG_REPO: string = HORDES_IMG_REPO;

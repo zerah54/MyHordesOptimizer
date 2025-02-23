@@ -26,7 +26,6 @@ const material_modules: Imports = [MatButtonModule, MatCardModule, MatIconModule
     templateUrl: './miscellaneous-info.component.html',
     styleUrls: ['./miscellaneous-info.component.scss'],
     encapsulation: ViewEncapsulation.None,
-    standalone: true,
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class MiscellaneousInfoComponent {

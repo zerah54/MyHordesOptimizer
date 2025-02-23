@@ -16,7 +16,6 @@ const material_modules: Imports = [MatButtonModule, MatFormFieldModule, MatIconM
     selector: 'mho-header-with-number-previous-next-filter',
     templateUrl: './header-with-number-previous-next-filter.component.html',
     styleUrls: ['./header-with-number-previous-next-filter.component.scss'],
-    standalone: true,
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class HeaderWithNumberPreviousNextFilterComponent implements OnInit {

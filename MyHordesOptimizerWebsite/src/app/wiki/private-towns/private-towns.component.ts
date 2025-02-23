@@ -8,21 +8,18 @@ import moment from 'moment';
 import { HORDES_IMG_REPO } from '../../_abstract_model/const';
 import { StandardColumn } from '../../_abstract_model/interfaces';
 import { I18nLabels, Imports } from '../../_abstract_model/types/_types';
-import { ColumnIdPipe } from '../../shared/pipes/column-id.pipe';
-import { DebugLogPipe } from '../../shared/pipes/debug-log.pipe';
 import { private_town_params, PrivateTownParamOptions, PrivateTownParams } from './private-towns-params.const';
 
 const angular_common: Imports = [CommonModule, NgOptimizedImage];
 const components: Imports = [];
-const pipes: Imports = [ColumnIdPipe];
+const pipes: Imports = [];
 const material_modules: Imports = [MatCardModule, MatTableModule, MatIconModule, MatTooltipModule];
 
 @Component({
     selector: 'mho-private-towns',
     templateUrl: './private-towns.component.html',
     styleUrls: ['./private-towns.component.scss'],
-    standalone: true,
-    imports: [...angular_common, ...components, ...material_modules, ...pipes, DebugLogPipe]
+    imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class PrivateTownsComponent implements OnInit {
     @HostBinding('style.display') display: string = 'contents';
@@ -39,10 +36,10 @@ export class PrivateTownsComponent implements OnInit {
 
     /** La liste des colonnes */
     public readonly columns: StandardColumn[] = [
-        { id: 'icon', header: '' },
-        { id: 'label', header: $localize`Pouvoir`, sticky: true },
-        { id: 'days_needed', header: $localize`Jours héros nécessaires` },
-        { id: 'description', header: $localize`Description` }
+        {id: 'icon', header: ''},
+        {id: 'label', header: $localize`Pouvoir`, sticky: true},
+        {id: 'days_needed', header: $localize`Jours héros nécessaires`},
+        {id: 'description', header: $localize`Description`}
     ];
 
     public ngOnInit(): void {

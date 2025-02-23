@@ -1,8 +1,7 @@
 import { Pipe, PipeTransform } from '@angular/core';
 
 @Pipe({
-    name: 'label',
-    standalone: true,
+    name: 'label'
 })
 export class LabelPipe<T> implements PipeTransform {
     transform(object: string | T, bind_label: string): string {
@@ -18,8 +17,7 @@ export class LabelPipe<T> implements PipeTransform {
 }
 
 @Pipe({
-    name: 'multipleLabel',
-    standalone: true,
+    name: 'multipleLabel'
 })
 export class MultipleLabelPipe<T> implements PipeTransform {
     transform(objects: string[] | T[], bind_label: string): string[] {

@@ -31,7 +31,6 @@ const material_modules: Imports = [MatSortModule, MatTableModule];
     templateUrl: './citizens-dispo.component.html',
     styleUrls: ['./citizens-dispo.component.scss'],
     encapsulation: ViewEncapsulation.None,
-    standalone: true,
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class CitizensDispoComponent implements OnInit {
@@ -52,8 +51,8 @@ export class CitizensDispoComponent implements OnInit {
     public citizen_filter_change: EventEmitter<void> = new EventEmitter<void>();
     /** La liste des colonnes */
     public readonly columns: StandardColumn[] = [
-        { id: 'avatar_name', header: $localize`Citoyen`, class: 'center' },
-        { id: 'today_dispo', header: $localize`Disponibilités du jour`, class: '' },
+        {id: 'avatar_name', header: $localize`Citoyen`, class: 'center'},
+        {id: 'today_dispo', header: $localize`Disponibilités du jour`, class: ''},
     ];
     public readonly current_day: number = getTown()?.day || 1;
     public filters: DispoFilter = {

@@ -33,7 +33,6 @@ const material_modules: Imports = [MatSortModule, MatTableModule];
     templateUrl: './citizens-digs.component.html',
     styleUrls: ['./citizens-digs.component.scss'],
     encapsulation: ViewEncapsulation.None,
-    standalone: true,
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class CitizensDigsComponent implements OnInit {
@@ -56,8 +55,8 @@ export class CitizensDigsComponent implements OnInit {
     public citizen_filter_change: EventEmitter<void> = new EventEmitter<void>();
     /** La liste des colonnes */
     public readonly columns: StandardColumn[] = [
-        { id: 'avatar_name', header: $localize`Citoyen`, class: 'center', sticky: true },
-        { id: 'today_digs', header: $localize`Fouilles du jour`, class: '' },
+        {id: 'avatar_name', header: $localize`Citoyen`, class: 'center', sticky: true},
+        {id: 'today_digs', header: $localize`Fouilles du jour`, class: ''},
     ];
     public readonly current_day: number = getTown()?.day || 1;
     public filters: DigFilter = {

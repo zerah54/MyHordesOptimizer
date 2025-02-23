@@ -3,8 +3,7 @@ import { Dig } from '../../../../../_abstract_model/types/dig.class';
 
 
 @Pipe({
-    name: 'digsPerDay',
-    standalone: true,
+    name: 'digsPerDay'
 })
 export class DigsPerDayPipe implements PipeTransform {
     transform(digs: Dig[], day: number): Dig[] {

@@ -14,11 +14,11 @@ import 'moment/dist/locale/de';
 import 'moment/dist/locale/en-gb';
 import 'moment/dist/locale/es';
 import 'moment/dist/locale/fr';
-
-import * as Sentry from "@sentry/angular";
 import { enableProdMode } from '@angular/core';
 import { loadTranslations } from '@angular/localize';
 import { bootstrapApplication } from '@angular/platform-browser';
+
+import * as Sentry from '@sentry/angular';
 
 import { AppComponent } from './app/app.component';
 import { appConfig } from './app/app.config';
@@ -26,9 +26,8 @@ import { environment } from './environments/environment';
 import { xliffToJson } from './xliff-to-json';
 
 Sentry.init({
-    dsn: "https://61d309773a068eb1aeaaae0e3fe39f23@o4506962035539968.ingest.us.sentry.io/4506962042224640",
-    integrations: [
-    ],
+    dsn: 'https://61d309773a068eb1aeaaae0e3fe39f23@o4506962035539968.ingest.us.sentry.io/4506962042224640',
+    integrations: [],
 });
 
 registerLocaleData(localeDE);
@@ -52,7 +51,7 @@ async function initLanguage(locale: string): Promise<void> {
         return;
     }
 
-    const json: Record<string, string> = await fetch(`/assets/i18n/xlf-files/messages.${locale}.xlf`)
+    const json: Record<string, string> = await fetch(`/public/i18n/xlf-files/messages.${locale}.xlf`)
         .then((response: Response) => response.text())
         .then((file_content: string) => xliffToJson(file_content));
 

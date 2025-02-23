@@ -15,7 +15,6 @@ const material_modules: Imports = [MatFormFieldModule, MatIconModule, MatInputMo
     selector: 'mho-header-with-string-filter',
     templateUrl: './header-with-string-filter.component.html',
     styleUrls: ['./header-with-string-filter.component.scss'],
-    standalone: true,
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class HeaderWithStringFilterComponent {

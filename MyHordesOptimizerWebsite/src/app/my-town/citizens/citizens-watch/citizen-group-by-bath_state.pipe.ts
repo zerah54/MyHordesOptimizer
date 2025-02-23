@@ -3,8 +3,7 @@ import { Bath } from '../../../_abstract_model/types/bath.class';
 import { Citizen } from '../../../_abstract_model/types/citizen.class';
 
 @Pipe({
-    name: 'citizenGroupByBathState',
-    standalone: true,
+    name: 'citizenGroupByBathState'
 })
 export class CitizenGroupByBathStatePipe implements PipeTransform {
 
