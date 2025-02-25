@@ -20,14 +20,13 @@ const material_modules: Imports = [MatButtonModule, MatCardModule, MatFormFieldM
     templateUrl: './probabilities.component.html',
     styleUrls: ['./probabilities.component.scss'],
     encapsulation: ViewEncapsulation.None,
-    standalone: true,
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class ProbabilitiesComponent implements AfterViewInit {
     @HostBinding('style.display') display: string = 'contents';
 
     public simulations: Simulation[] = [
-        { nb_people: 1, current_chances: [0], result_probabilities: [], title: $localize`Simulation 1`, editing_title: false, show_detail: true }
+        {nb_people: 1, current_chances: [0], result_probabilities: [], title: $localize`Simulation 1`, editing_title: false, show_detail: true}
     ];
 
     public default_value: number = 0;

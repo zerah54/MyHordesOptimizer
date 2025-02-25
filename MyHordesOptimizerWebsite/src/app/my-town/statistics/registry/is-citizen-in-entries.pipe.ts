@@ -6,8 +6,7 @@ import { normalizeString } from '../../../shared/utilities/string.utils';
 
 
 @Pipe({
-    name: 'isCitizenInEntries',
-    standalone: true,
+    name: 'isCitizenInEntries'
 })
 export class IsCitizenInEntriesPipe implements PipeTransform {
     transform(entries: Entry[], complete_citizen_list: CitizenInfo, reverse?: boolean): Citizen[] {

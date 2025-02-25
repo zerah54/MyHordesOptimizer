@@ -11,7 +11,7 @@ export const ITEMS_KEY: string = 'all_items';
 export const BANK_KEY: string = 'bank_cache';
 export const RUINS_KEY: string = 'all_ruins';
 export const TOKEN_KEY: string = 'MHO_TOKEN';
-export const HORDES_IMG_REPO: string = 'assets/img/hordes_img/';
+export const HORDES_IMG_REPO: string = 'img/hordes_img/';
 
 export const BREAKPOINTS: Dictionary<string> = {
     'xs': 'screen and (max-width: 599px)',

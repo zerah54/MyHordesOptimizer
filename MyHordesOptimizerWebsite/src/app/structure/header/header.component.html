@@ -2,7 +2,7 @@
     <button mat-icon-button type="button" (click)="changeSidenavStatus.next();">
         <mat-icon>menu</mat-icon>
     </button>
-    <img [ngSrc]="'assets/img/logo/logo_mho_64x64.png'" height="48" width="48" priority>
+    <img [ngSrc]="'img/logo/logo_mho_64x64.png'" height="48" width="48" priority>
     <div class="title">{{ is_gt_xs ? 'MyHordes Optimizer' : 'MHO' }}</div>
     <span class="spacer"></span>
     @if (saved_external_app_id && is_in_town) {
@@ -31,7 +31,7 @@
         </button>
     } @else {
         @if (saved_external_app_id === null || saved_external_app_id === undefined || saved_external_app_id === '') {
-            <a mat-button type="button" class="profil-button" [href]="'https://myhordes.eu/jx/disclaimer/22'">
+            <a mat-button type="button" class="profil-button" [href]="myhordes_url + 'jx/disclaimer/' + myhordes_app_id">
                 <ng-container i18n>Se connecter</ng-container>
             </a>
         } @else if (me && me.username && me.username !== '') {
@@ -44,7 +44,7 @@
             </button>
         }
     }
-    
+
     <mat-menu #userMenu="matMenu">
         @if (!saved_external_app_id) {
             <div mat-menu-item (click)="$event.stopPropagation()">

@@ -4,8 +4,7 @@ import { WishlistItem } from '../../_abstract_model/types/wishlist-item.class';
 
 
 @Pipe({
-    name: 'isItemDisplayed',
-    standalone: true,
+    name: 'isItemDisplayed'
 })
 export class IsItemDisplayedPipe implements PipeTransform {
     transform(items: Item[], items_in_zone: WishlistItem[]): Item[] {

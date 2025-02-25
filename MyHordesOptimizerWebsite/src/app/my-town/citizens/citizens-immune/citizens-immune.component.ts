@@ -1,4 +1,4 @@
-import { CommonModule, NgClass, NgOptimizedImage } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { Component, HostBinding, inject, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatCheckboxModule } from '@angular/material/checkbox';
@@ -16,19 +16,12 @@ import { CitizenInfo } from '../../../_abstract_model/types/citizen-info.class';
 import { Citizen } from '../../../_abstract_model/types/citizen.class';
 import { AutoDestroy } from '../../../shared/decorators/autodestroy.decorator';
 import { CitizenInfoComponent } from '../../../shared/elements/citizen-info/citizen-info.component';
-import { DigComponent } from '../../../shared/elements/dig/dig.component';
-import {
-    HeaderWithNumberPreviousNextFilterComponent
-} from '../../../shared/elements/lists/header-with-number-previous-next/header-with-number-previous-next-filter.component';
-import { HeaderWithSelectFilterComponent } from '../../../shared/elements/lists/header-with-select-filter/header-with-select-filter.component';
 import { SelectComponent } from '../../../shared/elements/select/select.component';
-import { ColumnIdPipe } from '../../../shared/pipes/column-id.pipe';
-import { BathForDayPipe } from '../bath-for-day.pipe';
 import { CitizenGroupByImmuneStatePipe } from './citizen-group-by-immune-state.pipe';
 
-const angular_common: Imports = [CommonModule, FormsModule, NgClass, NgOptimizedImage];
-const components: Imports = [CitizenInfoComponent, DigComponent, HeaderWithNumberPreviousNextFilterComponent, HeaderWithSelectFilterComponent, SelectComponent];
-const pipes: Imports = [BathForDayPipe, CitizenGroupByImmuneStatePipe, ColumnIdPipe];
+const angular_common: Imports = [CommonModule, FormsModule];
+const components: Imports = [CitizenInfoComponent, SelectComponent];
+const pipes: Imports = [CitizenGroupByImmuneStatePipe];
 const material_modules: Imports = [MatCheckboxModule, MatDividerModule, MatFormFieldModule, MatSortModule, MatTableModule];
 
 @Component({

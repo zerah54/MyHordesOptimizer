@@ -1,8 +1,7 @@
 import { Pipe, PipeTransform } from '@angular/core';
 
 @Pipe({
-    name: 'debugLog',
-    standalone: true,
+    name: 'debugLog'
 })
 export class DebugLogPipe implements PipeTransform {
 

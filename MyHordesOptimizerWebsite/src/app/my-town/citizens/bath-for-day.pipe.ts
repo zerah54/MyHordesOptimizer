@@ -2,8 +2,7 @@ import { Pipe, PipeTransform } from '@angular/core';
 import { Bath } from '../../_abstract_model/types/bath.class';
 
 @Pipe({
-    name: 'bathForDay',
-    standalone: true,
+    name: 'bathForDay'
 })
 export class BathForDayPipe implements PipeTransform {
     transform(baths: Bath[], day: number): Bath | undefined {

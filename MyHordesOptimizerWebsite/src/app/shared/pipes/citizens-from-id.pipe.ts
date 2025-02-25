@@ -4,8 +4,7 @@ import { getCitizenFromId } from '../utilities/citizen.util';
 
 
 @Pipe({
-    name: 'citizenFromId',
-    standalone: true,
+    name: 'citizenFromId'
 })
 export class CitizenFromIdPipe implements PipeTransform {
     transform(citizen_id: number | undefined, all_citizens: Citizen[]): Citizen | undefined {

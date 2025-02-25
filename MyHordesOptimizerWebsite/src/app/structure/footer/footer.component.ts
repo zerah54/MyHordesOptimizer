@@ -2,6 +2,7 @@ import { NgTemplateOutlet } from '@angular/common';
 import { Component, HostBinding, inject, ViewChild, ViewEncapsulation } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatToolbar, MatToolbarModule } from '@angular/material/toolbar';
+import { environment } from '../../../environments/environment';
 import { Imports } from '../../_abstract_model/types/_types';
 import { ThanksComponent } from '../../thanks/thanks.component';
 
@@ -15,13 +16,14 @@ const material_modules: Imports = [MatToolbarModule];
     templateUrl: './footer.component.html',
     styleUrls: ['./footer.component.scss'],
     encapsulation: ViewEncapsulation.None,
-    standalone: true,
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class FooterComponent {
     @HostBinding('style.display') display: string = 'contents';
 
     @ViewChild(MatToolbar) mat_toolbar!: MatToolbar;
+
+    public readonly myhordes_url: string = environment.myhordes_url;
 
     private dialog: MatDialog = inject(MatDialog);
 

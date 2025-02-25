@@ -18,7 +18,6 @@ const material_modules: Imports = [MatTabsModule];
     templateUrl: './buildings-registry.component.html',
     styleUrls: ['./buildings-registry.component.scss'],
     encapsulation: ViewEncapsulation.None,
-    standalone: true,
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class BuildingsRegistryComponent {

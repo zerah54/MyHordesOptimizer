@@ -18,7 +18,6 @@ const material_modules: Imports = [MatButtonModule, MatCardModule, MatIconModule
     selector: 'mho-tuto-script-tools',
     templateUrl: './tuto-script-tools.component.html',
     styleUrls: ['./tuto-script-tools.component.scss'],
-    standalone: true,
     imports: [...angular_common, ...components, ...material_modules, ...pipes],
 })
 export class TutoScriptToolsComponent {

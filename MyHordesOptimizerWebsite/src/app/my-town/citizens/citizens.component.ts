@@ -15,7 +15,6 @@ const material_modules: Imports = [MatCardModule, MatTabsModule];
     selector: 'mho-citizens',
     templateUrl: './citizens.component.html',
     styleUrls: ['./citizens.component.scss'],
-    standalone: true,
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class CitizensComponent {

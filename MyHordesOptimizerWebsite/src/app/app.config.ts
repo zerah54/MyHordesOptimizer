@@ -1,17 +1,18 @@
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
-import { ApplicationConfig, importProvidersFrom, LOCALE_ID } from '@angular/core';
+import { APP_INITIALIZER, ApplicationConfig, ErrorHandler, importProvidersFrom, LOCALE_ID } from '@angular/core';
 import { initializeApp, provideFirebaseApp } from '@angular/fire/app';
 import { AngularFireModule } from '@angular/fire/compat';
 import { AngularFireAnalyticsModule } from '@angular/fire/compat/analytics';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { provideRouter, withRouterConfig } from '@angular/router';
+import { provideRouter, Router, withRouterConfig } from '@angular/router';
 import { environment } from '../environments/environment';
 import { Modules } from './_abstract_model/types/_types';
 import { ROUTES, ROUTES_OPTIONS } from './routes';
 import { errorInterceptor } from './shared/services/errors-interceptor.service';
 import { headersInterceptor } from './shared/services/headers-interceptor.service';
 import { loadingInterceptor } from './shared/services/loading-interceptor.service';
+import * as Sentry from '@sentry/angular';
 
 const angular_modules: Modules = [BrowserModule, BrowserAnimationsModule];
 
@@ -33,6 +34,21 @@ export const appConfig: ApplicationConfig = {
             provide: LOCALE_ID,
             useFactory: (): string | null => localStorage.getItem('mho-locale') || 'fr'
         },
+        {
+            provide: ErrorHandler,
+            useValue: Sentry.createErrorHandler(),
+        },
+        {
+            provide: Sentry.TraceService,
+            deps: [Router],
+        },
+        {
+            provide: APP_INITIALIZER,
+            useFactory: () => () => {
+            },
+            deps: [Sentry.TraceService],
+            multi: true,
+        }
     ]
 
 };

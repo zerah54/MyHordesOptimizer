@@ -37,7 +37,6 @@ const material_modules: Imports = [MatButtonModule, MatExpansionModule, MatFormF
     templateUrl: './estimations.component.html',
     styleUrls: ['./estimations.component.scss'],
     encapsulation: ViewEncapsulation.None,
-    standalone: true,
     imports: [...angular_common, ...components, ...material_modules, ...pipes, MatSlideToggle]
 })
 export class EstimationsComponent implements OnInit {

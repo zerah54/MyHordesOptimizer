@@ -26,7 +26,6 @@ const material_modules: Imports = [MatDividerModule];
     selector: 'mho-map-cell-details',
     templateUrl: './map-cell-details.component.html',
     styleUrls: ['./map-cell-details.component.scss'],
-    standalone: true,
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class MapCellDetailsComponent {

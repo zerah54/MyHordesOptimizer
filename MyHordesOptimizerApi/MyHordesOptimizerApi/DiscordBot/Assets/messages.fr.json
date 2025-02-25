@@ -9,10 +9,10 @@
     },
     "timer": {
         "name": "minuteur",
-        "description": "Lance un compteur d'une durée personnalisable (Exemple : 1h 25m 12s)",
+        "description": "Lance un compteur d'une durée personnalisable (Exemple : 1Y 2M 7D 1h 25m 12s)",
         "time": {
             "name": "durée",
-            "description": "La durée du compteur (Exemple : 1h 25m 12s)"
+            "description": "La durée du compteur (Exemple : 1Y 2M 7D 1h 25m 12s)"
         },
         "reason": {
             "name": "raison",

@@ -4,8 +4,7 @@ import { MapOptions } from '../../../map.component';
 
 
 @Pipe({
-    name: 'scrutBorderLeft',
-    standalone: true,
+    name: 'scrutBorderLeft'
 })
 export class ScrutBorderLeft implements PipeTransform {
     transform(cell: Cell, options: MapOptions, drawed_map: Cell[][]): boolean {
@@ -14,8 +13,7 @@ export class ScrutBorderLeft implements PipeTransform {
 }
 
 @Pipe({
-    name: 'scrutBorderRight',
-    standalone: true,
+    name: 'scrutBorderRight'
 })
 export class ScrutBorderRight implements PipeTransform {
     transform(cell: Cell, options: MapOptions, drawed_map: Cell[][]): boolean {
@@ -24,8 +22,7 @@ export class ScrutBorderRight implements PipeTransform {
 }
 
 @Pipe({
-    name: 'scrutBorderTop',
-    standalone: true,
+    name: 'scrutBorderTop'
 })
 export class ScrutBorderTop implements PipeTransform {
     transform(cell: Cell, options: MapOptions, drawed_map: Cell[][]): boolean {
@@ -34,8 +31,7 @@ export class ScrutBorderTop implements PipeTransform {
 }
 
 @Pipe({
-    name: 'scrutBorderBottom',
-    standalone: true,
+    name: 'scrutBorderBottom'
 })
 export class ScrutBorderBottom implements PipeTransform {
     transform(cell: Cell, options: MapOptions, drawed_map: Cell[][]): boolean {

@@ -7,7 +7,6 @@ import { StatusEnum } from '../../../_abstract_model/enum/status.enum';
 import { Imports, ListForAddRemove } from '../../../_abstract_model/types/_types';
 import { Citizen } from '../../../_abstract_model/types/citizen.class';
 import { Item } from '../../../_abstract_model/types/item.class';
-import { DebugLogPipe } from '../../pipes/debug-log.pipe';
 import { IconApComponent } from '../icon-ap/icon-ap.component';
 import { CountAvailableApPipe } from './count-available-ap.pipe';
 import { IsItemsPipe } from './is-item.pipe';
@@ -16,7 +15,7 @@ import { MenuRemoveComponent } from './menu-remove/menu-remove.component';
 
 const angular_common: Imports = [CommonModule, NgOptimizedImage, NgTemplateOutlet];
 const components: Imports = [IconApComponent, MenuAddComponent, MenuRemoveComponent];
-const pipes: Imports = [CountAvailableApPipe, DebugLogPipe, IsItemsPipe];
+const pipes: Imports = [CountAvailableApPipe, IsItemsPipe];
 const material_modules: Imports = [MatMenuModule];
 
 @Component({
@@ -24,7 +23,6 @@ const material_modules: Imports = [MatMenuModule];
     templateUrl: './list-element-add-remove.component.html',
     styleUrls: ['./list-element-add-remove.component.scss'],
     encapsulation: ViewEncapsulation.None,
-    standalone: true,
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class ListElementAddRemoveComponent {
@@ -35,7 +33,7 @@ export class ListElementAddRemoveComponent {
 
     @Input() citizen!: Citizen;
     @Input() label!: string;
-    @Input({ transform: booleanAttribute }) readonly: boolean = false;
+    @Input({transform: booleanAttribute}) readonly: boolean = false;
     @Input() class: string = '';
 
     @Input() addLabel!: string;

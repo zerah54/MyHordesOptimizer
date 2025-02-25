@@ -5,8 +5,7 @@ import { Citizen } from '../../../../_abstract_model/types/citizen.class';
 import { normalizeString } from '../../../../shared/utilities/string.utils';
 
 @Pipe({
-    name: 'citizenTakeTelescope',
-    standalone: true,
+    name: 'citizenTakeTelescope'
 })
 export class TelescopePipe implements PipeTransform {
     transform(entries: Entry[], complete_citizen_list: CitizenInfo, mode: 'taken' | 'not-taken'): Citizen[] {

@@ -26,7 +26,6 @@ const material_modules: Imports = [MatCardModule, MatSortModule, MatTableModule]
     selector: 'mho-recipes',
     templateUrl: './recipes.component.html',
     styleUrls: ['./recipes.component.scss'],
-    standalone: true,
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class RecipesComponent implements OnInit {
@@ -43,10 +42,10 @@ export class RecipesComponent implements OnInit {
 
     /** La liste des colonnes */
     public readonly columns: StandardColumn[] = [
-        { id: 'type', header: $localize`Type de recette` },
-        { id: 'components', header: $localize`Composants` },
-        { id: 'transformation', header: '' },
-        { id: 'result', header: $localize`Résultat` },
+        {id: 'type', header: $localize`Type de recette`},
+        {id: 'components', header: $localize`Composants`},
+        {id: 'transformation', header: ''},
+        {id: 'result', header: $localize`Résultat`},
     ];
 
     @AutoDestroy private destroy_sub: Subject<void> = new Subject();

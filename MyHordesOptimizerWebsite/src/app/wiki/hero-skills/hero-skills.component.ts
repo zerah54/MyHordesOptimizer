@@ -12,19 +12,17 @@ import { ApiService } from '../../_abstract_model/services/api.service';
 import { Imports } from '../../_abstract_model/types/_types';
 import { HeroSkill } from '../../_abstract_model/types/hero-skill.class';
 import { AutoDestroy } from '../../shared/decorators/autodestroy.decorator';
-import { ColumnIdPipe } from '../../shared/pipes/column-id.pipe';
 import { NewHeroSkill, skills } from './temp-hero-skills.const';
 
 const angular_common: Imports = [CommonModule, NgOptimizedImage];
 const components: Imports = [];
-const pipes: Imports = [ColumnIdPipe];
+const pipes: Imports = [];
 const material_modules: Imports = [MatCardModule, MatSortModule, MatTableModule, MatExpansionModule];
 
 @Component({
     selector: 'mho-hero-skills',
     templateUrl: './hero-skills.component.html',
     styleUrls: ['./hero-skills.component.scss'],
-    standalone: true,
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class HeroSkillsComponent implements OnInit {
@@ -41,10 +39,10 @@ export class HeroSkillsComponent implements OnInit {
     public new_hero_skills: NewHeroSkill[] = skills;
     /** La liste des colonnes */
     public readonly columns: StandardColumn[] = [
-        { id: 'icon', header: '' },
-        { id: 'label', header: $localize`Pouvoir`, sticky: true },
-        { id: 'days_needed', header: $localize`Jours héros nécessaires` },
-        { id: 'description', header: $localize`Description` }
+        {id: 'icon', header: ''},
+        {id: 'label', header: $localize`Pouvoir`, sticky: true},
+        {id: 'days_needed', header: $localize`Jours héros nécessaires`},
+        {id: 'description', header: $localize`Description`}
     ];
 
     @AutoDestroy private destroy_sub: Subject<void> = new Subject();

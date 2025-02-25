@@ -8,8 +8,7 @@ import { Item } from '../../../_abstract_model/types/item.class';
 
 @Pipe({
     name: 'countAvailableAp',
-    pure: false,
-    standalone: true
+    pure: false
 })
 export class CountAvailableApPipe implements PipeTransform {
     transform(list: (Item | StatusEnum)[], all_lists: ListForAddRemove[]): number {

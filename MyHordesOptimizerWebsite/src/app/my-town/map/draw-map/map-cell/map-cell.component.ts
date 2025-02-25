@@ -38,16 +38,15 @@ const material_modules: Imports = [];
     animations: [
         trigger('toggleCurrentCell', [
             transition(':enter', [
-                style({ opacity: 0, display: 'inline' }),
-                animate('500ms ease-out', style({ opacity: 1 }))
+                style({opacity: 0, display: 'inline'}),
+                animate('500ms ease-out', style({opacity: 1}))
             ]),
             transition(':leave', [
-                style({ opacity: 1, display: 'inline' }),
-                animate('500ms ease-in', style({ opacity: 0 }))
+                style({opacity: 1, display: 'inline'}),
+                animate('500ms ease-in', style({opacity: 0}))
             ])
         ])
     ],
-    standalone: true,
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class MapCellComponent {

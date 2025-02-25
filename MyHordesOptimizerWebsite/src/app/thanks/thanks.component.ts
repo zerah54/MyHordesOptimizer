@@ -13,7 +13,6 @@ const material_modules: Imports = [MatButtonModule, MatDialogModule, MatIconModu
     selector: 'mho-thanks',
     templateUrl: './thanks.component.html',
     styleUrls: ['./thanks.component.scss'],
-    standalone: true,
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class ThanksComponent {

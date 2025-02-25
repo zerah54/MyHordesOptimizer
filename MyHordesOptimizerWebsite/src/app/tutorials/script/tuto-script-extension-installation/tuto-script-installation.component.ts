@@ -18,7 +18,6 @@ const material_modules: Imports = [MatButtonModule, MatCardModule, MatIconModule
     selector: 'mho-tuto-script-installation',
     templateUrl: './tuto-script-installation.component.html',
     styleUrls: ['./tuto-script-installation.component.scss'],
-    standalone: true,
     imports: [...angular_common, ...components, ...material_modules, ...pipes],
 })
 export class TutoScriptInstallationComponent {

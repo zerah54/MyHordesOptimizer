@@ -25,16 +25,15 @@ const material_modules: Imports = [MatFormFieldModule];
     templateUrl: './digs-registry.component.html',
     styleUrls: ['./digs-registry.component.scss'],
     encapsulation: ViewEncapsulation.None,
-    standalone: true,
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class DigsRegistryComponent {
     @HostBinding('style.display') display: string = 'contents';
 
-    @Input({ required: true }) completeCitizenList!: CitizenInfo;
-    @Input({ required: true }) displayPseudo!: DisplayPseudoMode;
+    @Input({required: true}) completeCitizenList!: CitizenInfo;
+    @Input({required: true}) displayPseudo!: DisplayPseudoMode;
 
-    @Input({ required: true }) set registry(registry: Entry[] | undefined) {
+    @Input({required: true}) set registry(registry: Entry[] | undefined) {
         this.current_day = getTown()?.day || 1;
 
         if (registry) {

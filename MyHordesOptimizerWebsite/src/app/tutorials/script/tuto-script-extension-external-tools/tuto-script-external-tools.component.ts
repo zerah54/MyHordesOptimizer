@@ -19,7 +19,6 @@ const material_modules: Imports = [MatButtonModule, MatCardModule, MatIconModule
     templateUrl: './tuto-script-external-tools.component.html',
     styleUrls: ['./tuto-script-external-tools.component.scss'],
     encapsulation: ViewEncapsulation.None,
-    standalone: true,
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class TutoScriptExternalToolsComponent {

@@ -33,7 +33,6 @@ const material_modules: Imports = [MatButtonModule, MatDialogModule, MatFormFiel
     templateUrl: './map-update.component.html',
     styleUrls: ['./map-update.component.scss'],
     encapsulation: ViewEncapsulation.None,
-    standalone: true,
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class MapUpdateComponent implements OnInit {
@@ -51,7 +50,7 @@ export class MapUpdateComponent implements OnInit {
     @AutoDestroy private destroy_sub: Subject<void> = new Subject();
 
     constructor(@Inject(MAT_DIALOG_DATA) public data: MapUpdateData) {
-        this.cell = new Cell({ ...this.data.cell.modelToDto() });
+        this.cell = new Cell({...this.data.cell.modelToDto()});
     }
 
     public ngOnInit(): void {
@@ -71,7 +70,7 @@ export class MapUpdateComponent implements OnInit {
             .pipe(takeUntil(this.destroy_sub))
             .subscribe({
                 next: (): void => {
-                    this.data.cell = new Cell({ ...this.cell.modelToDto() });
+                    this.data.cell = new Cell({...this.cell.modelToDto()});
                 }
             });
         this.digs_service

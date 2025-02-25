@@ -24,7 +24,6 @@ const material_modules: Imports = [MatButtonModule, MatDialogModule, MatFormFiel
     selector: 'mho-max-active-calculator',
     templateUrl: './max-active-calculator.component.html',
     styleUrls: ['./max-active-calculator.component.scss'],
-    standalone: true,
     imports: [...angular_common, ...components, ...material_modules, ...pipes, MatCheckbox],
 })
 export class MaxActiveCalculatorComponent implements OnInit {

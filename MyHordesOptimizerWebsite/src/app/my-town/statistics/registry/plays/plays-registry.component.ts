@@ -19,7 +19,6 @@ const material_modules: Imports = [MatTabsModule];
     templateUrl: './plays-registry.component.html',
     styleUrls: ['./plays-registry.component.scss'],
     encapsulation: ViewEncapsulation.None,
-    standalone: true,
     imports: [...angular_common, ...components, ...material_modules, ...pipes,]
 })
 export class PlaysRegistryComponent {

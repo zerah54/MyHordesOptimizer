@@ -39,7 +39,6 @@ const material_modules: Imports = [MatButtonModule, MatCardModule, MatCheckboxMo
     templateUrl: './map.component.html',
     styleUrls: ['./map.component.scss'],
     encapsulation: ViewEncapsulation.None,
-    standalone: true,
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class MapComponent implements OnInit {
@@ -142,7 +141,7 @@ export class MapComponent implements OnInit {
         if (already_exists && current_distances.length > 0) return;
 
         /** Sinon, on ajoute à la liste */
-        current_distances.push({ ...this.new_distance_option });
+        current_distances.push({...this.new_distance_option});
 
         this.changeOptions('distances', [...current_distances]);
     }
@@ -170,7 +169,7 @@ export class MapComponent implements OnInit {
     public changeOptions<T>(key: string, value: T): void {
         (<{ [key: string]: unknown }><unknown>this.options)[key] = value;
         setTimeout(() => {
-            this.options = { ...this.options };
+            this.options = {...this.options};
             localStorage.setItem('MAP_OPTIONS', JSON.stringify(this.options));
         });
     }

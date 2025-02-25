@@ -4,8 +4,7 @@ import { Ruin } from '../../../../../_abstract_model/types/ruin.class';
 
 
 @Pipe({
-    name: 'isRuin',
-    standalone: true,
+    name: 'isRuin'
 })
 export class IsRuinPipe implements PipeTransform {
     transform(cell: Cell, ruins: Ruin[]): boolean {

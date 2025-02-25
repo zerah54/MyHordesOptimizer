@@ -13,7 +13,6 @@ const material_modules: Imports = [MatButtonModule, MatDialogModule];
     selector: 'mho-confirm-dialog',
     templateUrl: './confirm-dialog.component.html',
     styleUrls: ['./confirm-dialog.component.scss'],
-    standalone: true,
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class ConfirmDialogComponent {

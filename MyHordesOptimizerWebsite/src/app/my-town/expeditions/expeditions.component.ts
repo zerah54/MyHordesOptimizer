@@ -42,7 +42,6 @@ import { IconApComponent } from '../../shared/elements/icon-ap/icon-ap.component
 import { ListElementAddRemoveComponent } from '../../shared/elements/list-elements-add-remove/list-element-add-remove.component';
 import { SelectComponent } from '../../shared/elements/select/select.component';
 import { CitizenFromIdPipe } from '../../shared/pipes/citizens-from-id.pipe';
-import { DebugLogPipe } from '../../shared/pipes/debug-log.pipe';
 import { JobFromIdPipe } from '../../shared/pipes/job-from-id.pipe';
 import { ClipboardService } from '../../shared/services/clipboard.service';
 import { getCitizenFromId } from '../../shared/utilities/citizen.util';
@@ -54,7 +53,7 @@ import { TotalPdcPipe } from './total-pdc.pipe';
 
 const angular_common: Imports = [CommonModule, FormsModule, NgClass, NgOptimizedImage];
 const components: Imports = [ActiveCitizensComponent, IconApComponent, ListElementAddRemoveComponent, SelectComponent];
-const pipes: Imports = [CitizensForExpePipe, CitizenFromIdPipe, CompassRoseComponent, DebugLogPipe, FormatPreRegisteredPipe, JobFromIdPipe, SomeHeroicActionNeededPipe, TotalPdcPipe];
+const pipes: Imports = [CitizensForExpePipe, CitizenFromIdPipe, CompassRoseComponent, FormatPreRegisteredPipe, JobFromIdPipe, SomeHeroicActionNeededPipe, TotalPdcPipe];
 const material_modules: Imports = [MatButtonModule, MatCardModule, MatCheckboxModule, MatExpansionModule, MatFormFieldModule, MatIconModule, MatInputModule, MatMenuModule, MatSlideToggleModule, MatTabsModule, MatTooltipModule];
 
 @Component({
@@ -62,7 +61,6 @@ const material_modules: Imports = [MatButtonModule, MatCardModule, MatCheckboxMo
     templateUrl: './expeditions.component.html',
     styleUrls: ['./expeditions.component.scss'],
     encapsulation: ViewEncapsulation.None,
-    standalone: true,
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })

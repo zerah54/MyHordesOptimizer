@@ -26,7 +26,6 @@ const material_modules: Imports = [MatButtonModule, MatDividerModule, MatIconMod
     templateUrl: './menu.component.html',
     styleUrls: ['./menu.component.scss'],
     encapsulation: ViewEncapsulation.None,
-    standalone: true,
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class MenuComponent implements OnInit {

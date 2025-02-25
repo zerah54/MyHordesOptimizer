@@ -8,8 +8,7 @@ import { MapOptions } from '../../../map.component';
 
 
 @Pipe({
-    name: 'trashValue',
-    standalone: true,
+    name: 'trashValue'
 })
 export class TrashValuePipe implements PipeTransform {
     transform(cell: Cell, option: MapOptions, items: Item[]): number {

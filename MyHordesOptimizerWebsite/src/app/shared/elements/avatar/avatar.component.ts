@@ -11,14 +11,13 @@ const material_modules: Imports = [];
     selector: 'mho-avatar',
     templateUrl: './avatar.component.html',
     styleUrls: ['./avatar.component.scss'],
-    standalone: true,
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class AvatarComponent {
     @HostBinding('style.display') display: string = 'contents';
 
     @Input() src: string | undefined;
-    @Input({ transform: booleanAttribute }) rounded: boolean = false;
+    @Input({transform: booleanAttribute}) rounded: boolean = false;
     @Input() width: string | undefined;
 
 }

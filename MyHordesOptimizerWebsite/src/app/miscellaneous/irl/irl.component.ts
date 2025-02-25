@@ -20,7 +20,6 @@ const material_modules: Imports = [MatCardModule, MatFormFieldModule];
     selector: 'mho-irl',
     templateUrl: './irl.component.html',
     styleUrls: ['./irl.component.scss'],
-    standalone: true,
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class IrlComponent implements OnInit {

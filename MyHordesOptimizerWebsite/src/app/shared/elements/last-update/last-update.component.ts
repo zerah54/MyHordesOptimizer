@@ -14,7 +14,6 @@ const material_modules: Imports = [MatTooltipModule];
     selector: 'mho-last-update',
     templateUrl: './last-update.component.html',
     styleUrls: ['./last-update.component.scss'],
-    standalone: true,
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class LastUpdateComponent {

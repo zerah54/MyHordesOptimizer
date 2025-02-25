@@ -4,8 +4,7 @@ import { Item } from '../../_abstract_model/types/item.class';
 
 
 @Pipe({
-    name: 'arrayItemDetails',
-    standalone: true,
+    name: 'arrayItemDetails'
 })
 export class ArrayItemDetailsPipe implements PipeTransform {
     transform(item: ItemCountShort[], all_items: Item[]): Item[] {

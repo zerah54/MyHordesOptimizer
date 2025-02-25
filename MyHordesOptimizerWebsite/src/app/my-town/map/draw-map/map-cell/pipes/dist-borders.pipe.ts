@@ -4,8 +4,7 @@ import { Distance, MapOptions } from '../../../map.component';
 
 
 @Pipe({
-    name: 'distBorderLeft',
-    standalone: true,
+    name: 'distBorderLeft'
 })
 export class DistBorderLeft implements PipeTransform {
     transform(cell: Cell, options: MapOptions, drawed_map: Cell[][]): boolean {
@@ -28,8 +27,7 @@ export class DistBorderLeft implements PipeTransform {
 }
 
 @Pipe({
-    name: 'distBorderRight',
-    standalone: true,
+    name: 'distBorderRight'
 })
 export class DistBorderRight implements PipeTransform {
     transform(cell: Cell, options: MapOptions, drawed_map: Cell[][]): boolean {
@@ -52,8 +50,7 @@ export class DistBorderRight implements PipeTransform {
 }
 
 @Pipe({
-    name: 'distBorderTop',
-    standalone: true,
+    name: 'distBorderTop'
 })
 export class DistBorderTop implements PipeTransform {
     transform(cell: Cell, options: MapOptions, drawed_map: Cell[][]): boolean {
@@ -76,8 +73,7 @@ export class DistBorderTop implements PipeTransform {
 }
 
 @Pipe({
-    name: 'distBorderBottom',
-    standalone: true,
+    name: 'distBorderBottom'
 })
 export class DistBorderBottom implements PipeTransform {
     transform(cell: Cell, options: MapOptions, drawed_map: Cell[][]): boolean {

@@ -18,7 +18,6 @@ const material_modules: Imports = [MatButtonModule, MatDialogModule, MatFormFiel
     selector: 'mho-despair-deaths-calculator',
     templateUrl: './despair-deaths-calculator.component.html',
     styleUrls: ['./despair-deaths-calculator.component.scss'],
-    standalone: true,
     imports: [...angular_common, ...components, ...material_modules, ...pipes],
 })
 export class DespairDeathsCalculatorComponent {

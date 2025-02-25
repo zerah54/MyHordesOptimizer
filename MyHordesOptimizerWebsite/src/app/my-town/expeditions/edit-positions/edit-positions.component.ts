@@ -8,10 +8,9 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
 import { Imports } from '../../../_abstract_model/types/_types';
 import { Expedition } from '../../../_abstract_model/types/expedition.class';
-import { EditorComponent } from '../../../shared/elements/editor/editor.component';
 
 const angular_common: Imports = [];
-const components: Imports = [EditorComponent];
+const components: Imports = [];
 const pipes: Imports = [];
 const material_modules: Imports = [DragDropModule, MatButtonModule, MatButtonToggleModule, MatCheckboxModule, MatDialogModule, MatDividerModule, MatIconModule];
 
@@ -19,7 +18,6 @@ const material_modules: Imports = [DragDropModule, MatButtonModule, MatButtonTog
     selector: 'mho-expeditions-edit-positions',
     templateUrl: './edit-positions.component.html',
     styleUrls: ['./edit-positions.component.scss'],
-    standalone: true,
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class EditPositionsComponent {

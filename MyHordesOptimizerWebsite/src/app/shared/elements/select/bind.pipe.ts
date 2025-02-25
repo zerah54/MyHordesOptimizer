@@ -2,8 +2,7 @@ import { Pipe, PipeTransform } from '@angular/core';
 import { getValueFromPropertyName } from '../../utilities/object.util';
 
 @Pipe({
-    name: 'bind',
-    standalone: true,
+    name: 'bind'
 })
 export class BindPipe implements PipeTransform {
     transform<T>(value: T | T[], bind_value: string, options: T[]): unknown | unknown[] | undefined {
@@ -19,8 +18,7 @@ export class BindPipe implements PipeTransform {
 }
 
 @Pipe({
-    name: 'bindValue',
-    standalone: true,
+    name: 'bindValue'
 })
 export class BindValuePipe implements PipeTransform {
     transform<T>(option: T, property_name: string): string | T | undefined {

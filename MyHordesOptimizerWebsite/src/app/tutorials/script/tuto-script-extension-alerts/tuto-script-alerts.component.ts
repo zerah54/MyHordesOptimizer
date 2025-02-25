@@ -17,7 +17,6 @@ const material_modules: Imports = [MatButtonModule, MatCardModule, MatIconModule
     selector: 'mho-tuto-script-alerts',
     templateUrl: './tuto-script-alerts.component.html',
     styleUrls: ['./tuto-script-alerts.component.scss'],
-    standalone: true,
     imports: [...angular_common, ...components, ...material_modules, ...pipes],
 })
 export class TutoScriptAlertsComponent {

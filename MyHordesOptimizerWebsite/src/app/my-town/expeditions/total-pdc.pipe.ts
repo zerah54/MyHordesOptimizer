@@ -5,8 +5,7 @@ import { ExpeditionPart } from '../../_abstract_model/types/expedition-part.clas
 
 @Pipe({
     name: 'totalPdc',
-    pure: false,
-    standalone: true
+    pure: false
 })
 export class TotalPdcPipe implements PipeTransform {
     transform(expedition_part: ExpeditionPart): number {

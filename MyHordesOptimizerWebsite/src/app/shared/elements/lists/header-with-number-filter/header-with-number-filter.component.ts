@@ -15,7 +15,6 @@ const material_modules: Imports = [MatFormFieldModule, MatIconModule, MatInputMo
     selector: 'mho-header-with-number-filter',
     templateUrl: './header-with-number-filter.component.html',
     styleUrls: ['./header-with-number-filter.component.scss'],
-    standalone: true,
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class HeaderWithNumberFilterComponent {

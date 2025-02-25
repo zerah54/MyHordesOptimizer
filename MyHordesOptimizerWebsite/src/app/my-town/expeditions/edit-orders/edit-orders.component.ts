@@ -19,7 +19,6 @@ const material_modules: Imports = [DragDropModule, MatButtonModule, MatButtonTog
     selector: 'mho-expeditions-edit-orders',
     templateUrl: './edit-orders.component.html',
     styleUrls: ['./edit-orders.component.scss'],
-    standalone: true,
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class EditOrdersComponent {

@@ -11,7 +11,6 @@ const material_modules: Imports = [MatCardModule];
     selector: 'mho-nightwatch',
     templateUrl: './nightwatch.component.html',
     styleUrls: ['./nightwatch.component.scss'],
-    standalone: true,
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class NightwatchComponent {

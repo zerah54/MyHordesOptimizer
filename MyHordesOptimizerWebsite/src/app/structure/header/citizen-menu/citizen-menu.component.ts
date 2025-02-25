@@ -23,14 +23,12 @@ import { Me } from '../../../_abstract_model/types/me.class';
 import { UpdateInfo } from '../../../_abstract_model/types/update-info.class';
 import { AutoDestroy } from '../../../shared/decorators/autodestroy.decorator';
 import { CitizenInfoComponent } from '../../../shared/elements/citizen-info/citizen-info.component';
-import { LastUpdateComponent } from '../../../shared/elements/last-update/last-update.component';
 import { ListElementAddRemoveComponent } from '../../../shared/elements/list-elements-add-remove/list-element-add-remove.component';
-import { CitizenFromIdPipe } from '../../../shared/pipes/citizens-from-id.pipe';
 import { getTown, getUser } from '../../../shared/utilities/localstorage.util';
 
 const angular_common: Imports = [NgOptimizedImage, FormsModule];
-const components: Imports = [CitizenInfoComponent, LastUpdateComponent, ListElementAddRemoveComponent];
-const pipes: Imports = [CitizenFromIdPipe];
+const components: Imports = [CitizenInfoComponent, ListElementAddRemoveComponent];
+const pipes: Imports = [];
 const material_modules: Imports = [MatCheckboxModule, MatDividerModule, MatFormFieldModule, MatInputModule, MatMenuModule, MatSelectModule];
 
 @Component({
@@ -38,7 +36,6 @@ const material_modules: Imports = [MatCheckboxModule, MatDividerModule, MatFormF
     templateUrl: './citizen-menu.component.html',
     styleUrls: ['./citizen-menu.component.scss'],
     encapsulation: ViewEncapsulation.None,
-    standalone: true,
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class CitizenMenuComponent implements OnInit {

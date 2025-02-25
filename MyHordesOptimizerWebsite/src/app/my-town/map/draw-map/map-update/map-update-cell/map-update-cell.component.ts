@@ -31,7 +31,6 @@ const material_modules: Imports = [MatCheckboxModule, MatDividerModule, MatFormF
     templateUrl: './map-update-cell.component.html',
     styleUrls: ['./map-update-cell.component.scss'],
     encapsulation: ViewEncapsulation.None,
-    standalone: true,
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class MapUpdateCellComponent implements OnInit {

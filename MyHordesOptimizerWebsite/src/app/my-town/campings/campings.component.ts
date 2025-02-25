@@ -11,7 +11,6 @@ const material_modules: Imports = [MatCardModule];
     selector: 'mho-campings',
     templateUrl: './campings.component.html',
     styleUrls: ['./campings.component.scss'],
-    standalone: true,
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class CampingsComponent {
