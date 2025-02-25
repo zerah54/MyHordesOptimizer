@@ -19,7 +19,6 @@ const material_modules: Imports = [MatButtonModule, MatCardModule, MatFormFieldM
     selector: 'mho-thirst-management',
     templateUrl: './thirst-management.component.html',
     styleUrls: ['./thirst-management.component.scss'],
-    standalone: true,
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class ThirstManagementComponent {
