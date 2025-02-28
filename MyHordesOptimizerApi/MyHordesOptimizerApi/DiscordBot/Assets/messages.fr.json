@@ -65,6 +65,18 @@
                 "name": "message-privé",
                 "description": "Vrai si le message ne doit pas être vu de tous"
             }
+        },
+        "camping-phrases": {
+            "name": "phrases-de-camping",
+            "description": "Les différentes phrases qu'on obtient en camping en fonction des chances de survie effectives",
+            "private-msg": {
+                "name": "message-privé",
+                "description": "Vrai si le message ne doit pas être vu de tous"
+            },
+            "language": {
+                "name": "langue",
+                "description": "La langue du texte source"
+            }
         }
     },
     "translate": {

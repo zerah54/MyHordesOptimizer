@@ -23,7 +23,14 @@ namespace MyHordesOptimizerApi.DiscordBot.Modules
             _logger = logger;
             using var scope = serviceScopeFactory.CreateScope();
             var recipesService = scope.ServiceProvider.GetRequiredService<IMyHordesFetcherService>();
-            _recipes = recipesService.GetRecipes();
+            try
+            {
+                _recipes = recipesService.GetRecipes();
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e.ToString(), e);
+            }
         }
 
         [SlashCommand(name: "recipe", description: "Find the recipe for an item and the recipes that lead to it")]
@@ -34,7 +41,7 @@ namespace MyHordesOptimizerApi.DiscordBot.Modules
             Locales locale,
             [Summary(name: "private-msg", description: "True if the message should not be seen by all")]
             bool privateMsg = false
-            )
+        )
         {
             await DeferAsync(ephemeral: privateMsg);
             try
@@ -56,6 +63,7 @@ namespace MyHordesOptimizerApi.DiscordBot.Modules
                             $"Une erreur s'est produite lors de la récupération de l'objet\n```La langue de recherche ne peut pas être vide```";
                     });
                 }
+
                 var filteredRecipes = GetRecipesFromResultItemName(searchValue, locale);
 
                 var embedBuilders = new List<Embed>();
@@ -112,7 +120,8 @@ namespace MyHordesOptimizerApi.DiscordBot.Modules
             return recipe.Result
                 .Find(result =>
                 {
-                    var itemMatchSearch = NormalizeStrings.NormalizeLower(result.Item.Label[locale.ToString().ToLower()])
+                    var itemMatchSearch = NormalizeStrings
+                        .NormalizeLower(result.Item.Label[locale.ToString().ToLower()])
                         .IndexOf(NormalizeStrings.NormalizeLower(searchValue)) > -1;
                     var recipeTypeIsManual = recipe.Type == "Recipe::ManualAnywhere";
                     return itemMatchSearch && recipeTypeIsManual;
