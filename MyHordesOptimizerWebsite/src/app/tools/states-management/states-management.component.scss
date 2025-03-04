@@ -1,21 +1,19 @@
 .mho-states-management {
+    margin-top: 1rem;
     display: flex;
-    flex-direction: row; // Assure que les éléments sont alignés en ligne (horizontalement)
-    justify-content: space-between; // Espace les éléments uniformément
-    gap: 16px; // Ajoute un espace entre les colonnes
+    gap: 32px; // Espace entre les colonnes
 
     .states-cards {
-        flex: 1; // Chaque conteneur prend une part égale de l'espace disponible
+        flex: 1;
         display: flex;
-        flex-direction: column; // Aligne le contenu verticalement à l'intérieur de chaque conteneur
+        flex-direction: column;
         border: 1px solid var(--primary);
-        border-radius: 0.25em;
+        border-radius: 0.5em;
         background-color: var(--item-color);
         padding: 1em;
-        height: 100%; // Assure que le conteneur occupe toute la hauteur disponible
 
-        h3 {
-            text-align: center; // Centre le texte du titre
+        h3, h4 {
+            text-align: center; // Centre les titres et sous-titres
         }
 
         .states-cards-current {
@@ -23,26 +21,16 @@
             flex-direction: column;
             gap: 10px; // Espace entre les éléments
 
-            h4 {
-                text-align: center; // Centre le texte du sous-titre
-            }
-
             .states-cards-current-pipboy {
                 display: flex;
-                flex-direction: row; // Aligne les enfants horizontalement
                 align-items: center; // Centre les éléments verticalement
                 gap: 16px; // Espace entre l'image et la liste
-
-                img {
-                    height: 183px;
-                    width: 125px;
-                }
+                align-self: center;
 
                 mat-list {
-                    padding: 0; // Supprime le padding par défaut de la liste
-                    mat-list-item {
-                        padding: 0; // Supprime le padding par défaut des éléments de la liste
-                    }
+                    border: 1px solid var(--primary);
+                    border-radius: 0.5em;
+                    background-color: var(--item-color);
                 }
             }
         }
@@ -50,8 +38,6 @@
         .states-cards-historique {
             display: flex;
             flex-direction: column;
-            align-items: center; // Centre le contenu horizontalement
-            height: 100%; // Assure que le h3 occupe toute la hauteur du conteneur
         }
     }
 }
