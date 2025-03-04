@@ -1,0 +1,55 @@
+<mat-card-header class="mho-states-management-header">
+    <mat-card-title>
+        <ng-container i18n>Gestion des états</ng-container>
+    </mat-card-title>
+</mat-card-header>
+<mat-card-content class="mho-states-management">
+    <div class="states-cards">
+        <ng-container i18n>
+            <h3>Sélectionner une action</h3>
+            <mat-form-field>
+                <mat-label>Action réalisée</mat-label>
+                <mat-select>
+                    @for (action of actions; track action) {
+                        <mat-option [value]="action.value">{{ action.viewValue }}</mat-option>
+                    }
+                </mat-select>
+            </mat-form-field>
+            <button (click)="addAction();">Valider</button>
+        </ng-container>
+    </div>
+    <div class="states-cards">
+        <ng-container i18n>
+            <h3> État actuel </h3>
+            <div class="states-cards-current">
+                <h4> PA Restants : 1/6 </h4>
+                <div class="states-cards-current-pipboy">
+                    <div>
+                        <img ngSrc="/img/hordes_img/professions/select/pipWelcome.png" alt="" height="183" width="125">
+                    </div>
+                    <div>
+                        <mat-list>
+                            <mat-list-item>💧</mat-list-item>
+                            <mat-list-item>🍖</mat-list-item>
+                            <mat-list-item>😴</mat-list-item>
+                        </mat-list>
+                    </div>
+                </div>
+            </div>
+        </ng-container>
+    </div>
+    <div class="states-cards">
+        <ng-container i18n>
+            <h3> Historique </h3>
+            <div class="states-cards-historique">
+                <div>
+                    <mat-list>
+                        <mat-list-item>Boire</mat-list-item>
+                        <mat-list-item>Manger</mat-list-item>
+                        <mat-list-item>Marcher 6 KM</mat-list-item>
+                    </mat-list>
+                </div>
+            </div>
+        </ng-container>
+    </div>
+</mat-card-content>

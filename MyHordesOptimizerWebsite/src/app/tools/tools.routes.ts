@@ -1,7 +1,7 @@
 import { Route } from '@angular/router';
 import { CampingComponent } from './camping/camping.component';
 import { ProbabilitiesComponent } from './probabilities/probabilities.component';
-import { ThirstManagementComponent } from './thirst-management/thirst-management.component';
+import { StatesManagementComponent } from './states-management/states-management.component';
 
 export default [
     {path: '', redirectTo: 'camping', pathMatch: 'full'},
@@ -13,7 +13,7 @@ export default [
     },
     {
         path: 'status-management',
-        component: ThirstManagementComponent,
+        component: StatesManagementComponent,
         title: 'MyHordes Optimizer' + ' - ' + $localize`Outils` + ' - ' + $localize`Gestion des états`
     },
 ] satisfies Route[];
