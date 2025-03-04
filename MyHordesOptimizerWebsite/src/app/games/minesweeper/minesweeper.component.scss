@@ -27,15 +27,15 @@
                 width: 26px;
 
                 &.lose {
-                    background-image: url('/MyHordesOptimizerWebsite/public/img/minesweeper/lose.gif');
+                    background-image: url('/img/minesweeper/lose.gif');
                 }
 
                 &.play {
-                    background-image: url('/MyHordesOptimizerWebsite/public/img/minesweeper/smile.gif');
+                    background-image: url('/img/minesweeper/smile.gif');
                 }
 
                 &.win {
-                    background-image: url('/MyHordesOptimizerWebsite/public/img/minesweeper/win.gif');
+                    background-image: url('/img/minesweeper/win.gif');
                 }
 
                 &.clicked {
@@ -67,39 +67,39 @@
             .cell {
 
                 &:not(.revealed):not(.flagged):not(.questioned):not(.highlighted) {
-                    background-image: url('/MyHordesOptimizerWebsite/public/img/minesweeper/blank.gif');
+                    background-image: url('/img/minesweeper/blank.gif');
                 }
 
                 &.revealed {
                     @for $i from 0 through 8 {
                         &.revealed-#{$i} {
-                            background-image: url('/MyHordesOptimizerWebsite/public/img/minesweeper/open#{$i}.gif');
+                            background-image: url('/img/minesweeper/open#{$i}.gif');
                         }
                     }
 
                     &.mined {
-                        background-image: url('/MyHordesOptimizerWebsite/public/img/minesweeper/bombrevealed.gif');
+                        background-image: url('/img/minesweeper/bombrevealed.gif');
 
                         &.game-over {
-                            background-image: url('/MyHordesOptimizerWebsite/public/img/minesweeper/bombdeath.gif');
+                            background-image: url('/img/minesweeper/bombdeath.gif');
                         }
                     }
                 }
 
                 &.flagged {
-                    background-image: url('/MyHordesOptimizerWebsite/public/img/minesweeper/bombflagged.gif');
+                    background-image: url('/img/minesweeper/bombflagged.gif');
                 }
 
                 &.questioned {
-                    background-image: url('/MyHordesOptimizerWebsite/public/img/minesweeper/bombquestion.gif');
+                    background-image: url('/img/minesweeper/bombquestion.gif');
                 }
 
                 &.no-bomb {
-                    background-image: url('/MyHordesOptimizerWebsite/public/img/minesweeper/nobomb.gif');
+                    background-image: url('/img/minesweeper/nobomb.gif');
                 }
 
                 &.highlighted {
-                    background-image: url('/MyHordesOptimizerWebsite/public/img/minesweeper/blank.gif');
+                    background-image: url('/img/minesweeper/blank.gif');
                 }
             }
 

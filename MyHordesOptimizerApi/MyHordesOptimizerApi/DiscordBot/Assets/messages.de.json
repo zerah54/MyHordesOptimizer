@@ -65,6 +65,18 @@
                 "name": "private-nachricht",
                 "description": "True, wenn die Nachricht nicht für alle sichtbar sein soll"
             }
+        },
+        "camping-phrases": {
+            "name": "camping-cätze",
+            "description": "Die verschiedenen Formulierungen, die man auf dem Campingplatz erhält, hängen von den Überlebenschancen ab",
+            "private-msg": {
+                "name": "private-nachricht",
+                "description": "True, wenn die Nachricht nicht für alle sichtbar sein soll"
+            },
+            "language": {
+                "name": "sprache",
+                "description": "Die Sprache des Quelltextes"
+            }
         }
     },
     "translate": {

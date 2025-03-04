@@ -295,3 +295,24 @@ Si vous cochez l'option "Me notifier à la fin de la fouille", vous recevrez une
 
 ### Notification de nouveau message
 Si vous cochez l'option "Me notifier si je reçois un nouveau message", vous recevrez une notification de votre navigateur lors d'un changement dans votre compteur de messages reçus.
+
+# Contribuer au projet 
+
+## Installer le site web en local 
+
+### Côté front 
+- Installer Node et Angular
+- Ouvrir une console à la racine du dossier MyHordesOptimizerWebsite
+  - `npm install` pour installer les dépendances
+  - `npm run start` pour lancer le projet
+
+### Côté back
+- Installer MySql et .NET
+- Créer une base de données MySql vide
+- Lancer tous les scripts qui se trouvent dans `MyHordesOptimizerApi > MyHordesOptimizerApi > Database > Scripts` pour initier la base de données
+- Créer un fichier `appsettings.Development.json` pour remplacer les valeurs "dummy" du appsettings.json
+  - `Authentication > Username` et `Authentication > Password` sont des valeurs de votre choix qui serviront pour l'authentification basique des appels
+  - `Authentication > JWT > Secret` : Générer un secret 64 caractères sur ce site https://jwtsecret.com/generate
+- Lancer le projet avec le profil Development
+- Ouvrir une console
+  - `curl --location --globoff --request POST 'https://localhost:5001/DataImport/all?userKey=••••••' --header 'Authorization: ••••••'` Pour peupler la base de données
