@@ -16,11 +16,17 @@ jobs:
       - uses: actions/setup-node@main
         with:
           node-version: '18.19.0'
+          
+      - name: Setup Sentry CLI
+        uses: matbour/setup-sentry-cli@v2
+        with:
+          token: ${{ SECRETS.SENTRY_AUTH_TOKEN }} # from GitHub secrets
+          organization: myhordes-optimizer
+          project: frontend
 
       - name: Build app
         run: |
           npm install
-          sentry-cli login --auth-token ${{secrets.SENTRY_AUTH_TOKEN}}
           npm run build
 
       - name: Install firebase tools
