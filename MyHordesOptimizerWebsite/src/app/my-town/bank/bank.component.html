@@ -8,7 +8,7 @@
             <mho-filter (filterChange)="filter_value = $event; applyFilters()"></mho-filter>
             <mat-form-field class="properties-filter">
                 <mat-label i18n>Chercher des objets par propriétés</mat-label>
-                <mho-select [multiple]="true" [options]="options" [bindLabel]="'value.label'" [(ngModel)]="select_value"
+                <mho-select multiple [options]="options" [bindLabel]="'value.label'" [(ngModel)]="select_value"
                             (filterChange)="applyFilters()">
                 </mho-select>
             </mat-form-field>

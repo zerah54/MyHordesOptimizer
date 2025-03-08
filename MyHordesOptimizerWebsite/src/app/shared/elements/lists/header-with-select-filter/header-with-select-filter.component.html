@@ -11,7 +11,7 @@
 
     @if (visible) {
         <mat-form-field (click)="$event.stopPropagation()" class="short-bottom">
-            <mho-select #filter [multiple]="true" [options]="options" [bindLabel]="bindLabel" [ngModel]="filterValue"
+            <mho-select #filter multiple [options]="options" [bindLabel]="bindLabel" [ngModel]="filterValue"
                         (ngModelChange)="filterValueChange.next($event); checkVisibility()" (closed)="checkVisibility();">
             </mho-select>
         </mat-form-field>

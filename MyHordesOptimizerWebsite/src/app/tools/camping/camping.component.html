@@ -34,7 +34,7 @@
                     <div>
                         <mat-form-field appearance="outline" class="short-bottom">
                             <mat-label i18n>Métier</mat-label>
-                            <mho-select [formControlName]="'job'" [options]="jobs" [multiple]="false" [bindLabel]="'value.label'" [bindIcon]="'value.img'">
+                            <mho-select [formControlName]="'job'" [options]="jobs" [bindLabel]="'value.label'" [bindIcon]="'value.img'">
                             </mho-select>
                         </mat-form-field>
                         @if ($any(configuration_form.get('job')?.value)?.key === JOB_SCOUT.key) {

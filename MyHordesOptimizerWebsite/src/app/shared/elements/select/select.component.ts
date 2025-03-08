@@ -6,7 +6,10 @@ import {
     ElementRef,
     EventEmitter,
     HostBinding,
+    input,
     Input,
+    InputSignal,
+    InputSignalWithTransform,
     OnDestroy,
     Optional,
     Output,
@@ -60,16 +63,17 @@ export class SelectComponent<T> implements ControlValueAccessor, Validator, MatF
     @ViewChild(MatSelect) select!: MatSelect;
     @ViewChild(MatInput) filter_input!: MatInput;
 
-    @Input({transform: booleanAttribute}) multiple: boolean = false;
-    @Input() bindLabel!: string;
-    @Input() bindValue!: string;
-    @Input({transform: booleanAttribute}) noLabel: boolean = false;
-    @Input() bindIcon!: string;
+    public multiple: InputSignalWithTransform<boolean, unknown> = input(false, {transform: booleanAttribute});
+    public noLabel: InputSignalWithTransform<boolean, unknown> = input(false, {transform: booleanAttribute});
+    public emptyOption: InputSignalWithTransform<boolean, unknown> = input(false, {transform: booleanAttribute});
+    public clearable: InputSignalWithTransform<boolean, unknown> = input(false, {transform: booleanAttribute});
+    public bindLabel: InputSignal<string | undefined> = input();
+    public bindValue: InputSignal<string | undefined> = input();
+    public bindIcon: InputSignal<string | undefined> = input();
+
     @Input() moreInfo?: (element: string | T) => string;
-    @Input({transform: booleanAttribute}) emptyOption: boolean = false;
     //current form control input. helpful in validating and accessing form control
     @Input() form_control: AbstractControl = new UntypedFormControl();
-    @Input({transform: booleanAttribute}) clearable: boolean = false;
     @Input() searchable: boolean = true;
     @Input() class: string = '';
     /** Doit-on afficher sous forme de chips les différentes valeurs ? Fonctionne uniquement si "multiple" */
@@ -219,7 +223,7 @@ export class SelectComponent<T> implements ControlValueAccessor, Validator, MatF
         const value: string = normalizeString((<HTMLInputElement>event.target)?.value);
         console.log('value', value);
         this.displayed_options = [...this.complete_options.filter((option: T | string) => {
-            const label: string = normalizeString(this.label_pipe.transform(option, this.bindLabel));
+            const label: string = normalizeString(this.label_pipe.transform(option, this.bindLabel() ?? ''));
             return label.indexOf(value) > -1;
         })];
         console.log('displayed_options', this.displayed_options);

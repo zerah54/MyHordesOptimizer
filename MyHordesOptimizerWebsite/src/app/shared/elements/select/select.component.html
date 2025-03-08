@@ -1,7 +1,7 @@
-<mat-select class="mho-select" [multiple]="multiple" [value]="value" (valueChange)="writeValue($event);"
+<mat-select class="mho-select" [multiple]="multiple()" [value]="value" (valueChange)="writeValue($event);"
             [attr.aria-labelledby]="parent_form_field.getLabelId()"
             (closed)="closed.next()" [placeholder]="placeholder" [panelClass]="class">
-    @if (multiple) {
+    @if (multiple()) {
         <mat-select-trigger>
             @if (chips) {
                 <mat-chip-listbox>
@@ -11,10 +11,10 @@
                                 <mat-icon>cancel</mat-icon>
                             </button>
                             @if (single_value) {
-                                @if (single_value | bind:bindValue:displayed_options; as display_value) {
+                                @if (single_value | bind:bindValue():displayed_options; as display_value) {
                                     <ng-container *ngTemplateOutlet="icons; context: {$implicit: display_value}"></ng-container>
-                                    @if (!noLabel) {
-                                        <span>{{ display_value | label:bindLabel }}</span>
+                                    @if (!noLabel()) {
+                                        <span>{{ display_value | label:bindLabel() }}</span>
                                     }
                                 }
                             }
@@ -24,11 +24,11 @@
             } @else {
                 <div style="display: flex; justify-content: space-between; align-items: center;">
                         <span style="overflow: hidden; text-overflow: ellipsis">
-                            @if (value | bind:bindValue:displayed_options; as display_values) {
-                                {{ $any(display_values) | multipleLabel:bindLabel }}
+                            @if (value | bind:bindValue():displayed_options; as display_values) {
+                                {{ $any(display_values) | multipleLabel:bindLabel() }}
                             }
                         </span>
-                    @if (value && clearable) {
+                    @if (value && clearable()) {
                         <i class="fal fa-close" style="margin-right: 1em"
                            (click)="$event.stopPropagation(); value = []; writeValue([])">
                         </i>
@@ -38,15 +38,15 @@
         </mat-select-trigger>
     } @else {
         <mat-select-trigger style="display: flex; justify-content: space-between;">
-            @if (value | bind:bindValue:displayed_options; as display_value) {
+            @if (value | bind:bindValue():displayed_options; as display_value) {
                 <span style="display: flex; align-items: center; gap: 0.5em;">
                     <ng-container *ngTemplateOutlet="icons; context: {$implicit: display_value}"></ng-container>
-                    @if (!noLabel) {
-                        {{ display_value | label:bindLabel }}
+                    @if (!noLabel()) {
+                        {{ display_value | label:bindLabel() }}
                     }
                 </span>
             }
-            @if (value && clearable) {
+            @if (value && clearable()) {
                 <mat-icon matSuffix style="margin-right: 0.5em; position: relative;"
                           (click)="$event.stopPropagation(); value = undefined; writeValue(undefined)">
                     close
@@ -64,15 +64,15 @@
         <mat-divider></mat-divider>
     }
     <div class="options-container">
-        @if (emptyOption) {
+        @if (emptyOption()) {
             <mat-option class="mho-option" [value]="undefined">--</mat-option>
         }
         @for (option of displayed_options; track index; let index = $index) {
-            <mat-option class="mho-option" [value]="option | bindValue:bindValue" [title]="option | label:bindLabel">
+            <mat-option class="mho-option" [value]="option | bindValue:bindValue()" [title]="option | label:bindLabel()">
             <span style="display: flex; align-items: center; gap: 0.5em;">
                 <ng-container *ngTemplateOutlet="icons; context: {$implicit: option}"></ng-container>
-                @if (!noLabel) {
-                    {{ option | label:bindLabel }}
+                @if (!noLabel()) {
+                    {{ option | label:bindLabel() }}
                 }
             </span>
                 @if (moreInfo) {
@@ -84,9 +84,9 @@
 </mat-select>
 
 <ng-template #icons let-option>
-    @if (bindIcon && option) {
-        @if ((option | icon:bindIcon) !== '') {
-            <img [ngSrc]="HORDES_IMG_REPO + (option | icon:bindIcon)" width="16" height="16">
+    @if (bindIcon() && option) {
+        @if ((option | icon:bindIcon()) !== '') {
+            <img [ngSrc]="HORDES_IMG_REPO + (option | icon:bindIcon())" width="16" height="16">
         }
     }
 </ng-template>

@@ -57,6 +57,10 @@
                     <mho-registry-telescope [completeCitizenList]="complete_citizen_list"
                                             [registry]="registry_entries" [displayPseudo]="display_pseudo"></mho-registry-telescope>
                 }
+                @case ('flag') {
+                    <mho-registry-flag [completeCitizenList]="complete_citizen_list"
+                                       [registry]="registry_entries" [displayPseudo]="display_pseudo"></mho-registry-flag>
+                }
                 @case ('buildings') {
                     <mho-registry-buildings [completeCitizenList]="complete_citizen_list"
                                             [registry]="registry_entries" [displayPseudo]="display_pseudo"></mho-registry-buildings>
