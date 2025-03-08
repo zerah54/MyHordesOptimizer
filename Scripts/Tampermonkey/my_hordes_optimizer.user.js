@@ -1,11 +1,11 @@
 // ==UserScript==
 // @name         MHO Addon
-// @version      1.0.32.0
+// @version      1.0.33.0
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/, rubrique Tutoriels
 // @author       Zerah
 //
-// @icon         https://myhordes-optimizer.web.app/assets/img/logo/logo_mho_16x16.png
-// @icon64       https://myhordes-optimizer.web.app/assets/img/logo/logo_mho_64x64.png
+// @icon         https://myhordes-optimizer.web.app/img/logo/logo_mho_16x16.png
+// @icon64       https://myhordes-optimizer.web.app/img/logo/logo_mho_64x64.png
 //
 // @downloadURL  https://github.com/zerah54/MyHordesOptimizer/raw/main/Scripts/Tampermonkey/my_hordes_optimizer.user.js
 // @updateURL    https://github.com/zerah54/MyHordesOptimizer/raw/main/Scripts/Tampermonkey/my_hordes_optimizer.user.js
@@ -31,7 +31,7 @@
 // ==/UserScript==
 
 const changelog = `${getScriptInfo().name} : Changelog pour la version ${getScriptInfo().version}\n\n`
-    + `[Correctif] Textes manquants dans certains tooltips\n`;
+    + `[Correctif] Divers correctifs d'affichage\n`;
 
 const lang = (document.querySelector('html[lang]')?.getAttribute('lang') || document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2) || 'fr';
 
@@ -86,10 +86,10 @@ const api_url = 'https://api.myhordesoptimizer.fr' + (is_mh_beta ? '/beta' : '')
 ///////////////////////////////////////////
 
 const hordes_img_url = '/build/images/';
-const repo_img_url = 'https://myhordes-optimizer.web.app/assets/img/';
+const repo_img_url = 'https://myhordes-optimizer.web.app/img/';
 const repo_img_hordes_url = repo_img_url + 'hordes_img/';
 
-const mh_optimizer_icon = 'https://myhordes-optimizer.web.app/assets/img/logo/logo_mho_64x64_outlined.png';
+const mh_optimizer_icon = 'https://myhordes-optimizer.web.app/img/logo/logo_mho_64x64_outlined.png';
 
 const mh_optimizer_window_id = 'optimizer-window';
 const mh_optimizer_map_window_id = 'optimizer-map-window';
@@ -2274,7 +2274,7 @@ function createNotification(content) {
                     title: getScriptInfo().name,
                     message: content,
                     priority: 1,
-                    iconUrl: browser.runtime.getURL('assets/img/logo/logo_mho_64x64_outlined.png')
+                    iconUrl: browser.runtime.getURL('img/logo/logo_mho_64x64_outlined.png')
                 }
             });
         } catch (error) {
@@ -2285,7 +2285,7 @@ function createNotification(content) {
                         title: getScriptInfo().name,
                         message: content,
                         priority: 1,
-                        iconUrl: chrome.runtime.getURL('assets/img/logo/logo_mho_64x64_outlined.png'),
+                        iconUrl: chrome.runtime.getURL('img/logo/logo_mho_64x64_outlined.png'),
                         requireInteraction: true
                     }
                 });
@@ -4208,8 +4208,7 @@ function saveParameters() {
 }
 
 /** Affiche le bouton de mise à jour des outils externes */
-function createUpdateExternalToolsButton() {
-
+function createUpdateExternalToolsButton(count = 0) {
     let tools_to_update = {
         isBigBrothHordes: mho_parameters && !is_mh_beta ? mho_parameters.update_bbh : false,
         isFataMorgana: mho_parameters ? mho_parameters.update_fata : false,
@@ -4227,56 +4226,70 @@ function createUpdateExternalToolsButton() {
     const chest = document.querySelector('.inventory.chest');
     const amelios = document.querySelector('#upgrade_home_level')?.parentElement?.parentElement;
 
-    /** Cette fonction ne doit s'exécuter que si on a un id d'app externe ET au moins l'une des options qui est cochée dans les paramètres ET qu'on est hors de la ville OU dans sa maison */
-    if (nb_tools_to_update > 0 && external_app_id && (external_display_zone || (chest && pageIsHouse()) || (amelios && pageIsAmelio()))) {
-        if (!update_external_tools_btn) {
-
-            if (window.innerWidth < 480 && mho_parameters.show_compact && compact_actions_zone) {
-                let el = external_display_zone || chest?.parentElement || amelios;
-                let updater_bloc = createSmallUpdateExternalToolsButton(update_external_tools_btn);
-                if (amelios) {
-                    el.parentElement.insertBefore(updater_bloc, el.nextElementSibling);
-                } else {
-                    el.appendChild(updater_bloc);
-                }
-            } else {
-                let el = external_display_zone?.parentElement.parentElement.parentElement || chest?.parentElement || amelios;
-                let updater_bloc = createLargeUpdateExternalToolsButton(update_external_tools_btn);
-                if (amelios) {
-                    el.parentElement.insertBefore(updater_bloc, el.nextElementSibling);
-                } else {
-                    el.appendChild(updater_bloc);
-                }
-            }
+    if (nb_tools_to_update <= 0 || !external_app_id) {
+        if (update_external_tools_btn) {
+            update_external_tools_btn.parentElement.remove();
         }
-
-        let warn_missing_logs = document.getElementById(mho_warn_missing_logs_id);
-
-        if (!warn_missing_logs && document.querySelector('.log-complete-link') && external_display_zone && update_external_tools_btn && mho_parameters.update_mho_digs) {
-            if (window.innerWidth < 480 && mho_parameters.show_compact && compact_actions_zone) {
-                let external_tools_btn_tooltip = document.querySelector('#external-tools-btn-tooltip');
-                warn_missing_logs = document.createElement('div');
-                warn_missing_logs.id = mho_warn_missing_logs_id;
-                warn_missing_logs.classList.add('note', 'note-important');
-                warn_missing_logs.style.fontSize = '10px';
-                warn_missing_logs.innerHTML = getI18N(texts.warn_missing_logs_title) + '<br /><br />' + getI18N(texts.warn_missing_logs_help);
-
-                external_tools_btn_tooltip.appendChild(warn_missing_logs);
-            } else {
-                warn_missing_logs = document.createElement('div');
-                warn_missing_logs.id = mho_warn_missing_logs_id;
-                warn_missing_logs.classList.add('note', 'note-important');
-                warn_missing_logs.innerText = getI18N(texts.warn_missing_logs_title);
-                let warn_help = createHelpButton(getI18N(texts.warn_missing_logs_help));
-                warn_missing_logs.appendChild(warn_help);
-
-                update_external_tools_btn.parentElement.appendChild(warn_missing_logs);
+    } else {
+        if (external_display_zone || (chest && pageIsHouse()) || (amelios && pageIsAmelio())) {
+            if (!update_external_tools_btn) {
+                if (window.innerWidth < 480 && mho_parameters.show_compact && compact_actions_zone) {
+                    let el = external_display_zone || chest?.parentElement || amelios;
+                    let updater_bloc = createSmallUpdateExternalToolsButton(update_external_tools_btn);
+                    if (amelios) {
+                        el.parentElement.insertBefore(updater_bloc, el.nextElementSibling);
+                    } else {
+                        el.appendChild(updater_bloc);
+                    }
+                } else {
+                    let el = external_display_zone?.parentElement.parentElement.parentElement || chest?.parentElement || amelios;
+                    let updater_bloc = createLargeUpdateExternalToolsButton(update_external_tools_btn);
+                    if (amelios) {
+                        el.parentElement.insertBefore(updater_bloc, el.nextElementSibling);
+                    } else {
+                        el.appendChild(updater_bloc);
+                    }
+                }
+            } else if (count < 3) {
+                let update_external_tools_btn2 = document.getElementById(mh_update_external_tools_id);
+                setTimeout(() => {
+                    createUpdateExternalToolsButton(count + 1);
+                }, 250)
+                return;
             }
-        } else if (warn_missing_logs && (!document.querySelector('.log-complete-link') || !mho_parameters.update_mho_digs)) {
-            warn_missing_logs.remove();
+
+            let warn_missing_logs = document.getElementById(mho_warn_missing_logs_id);
+
+            if (!warn_missing_logs && document.querySelector('.log-complete-link') && external_display_zone && update_external_tools_btn && mho_parameters.update_mho_digs) {
+                if (window.innerWidth < 480 && mho_parameters.show_compact && compact_actions_zone) {
+                    let external_tools_btn_tooltip = document.querySelector('#external-tools-btn-tooltip');
+                    warn_missing_logs = document.createElement('div');
+                    warn_missing_logs.id = mho_warn_missing_logs_id;
+                    warn_missing_logs.classList.add('note', 'note-important');
+                    warn_missing_logs.style.fontSize = '10px';
+                    warn_missing_logs.innerHTML = getI18N(texts.warn_missing_logs_title) + '<br /><br />' + getI18N(texts.warn_missing_logs_help);
+
+                    external_tools_btn_tooltip.appendChild(warn_missing_logs);
+                } else {
+                    warn_missing_logs = document.createElement('div');
+                    warn_missing_logs.id = mho_warn_missing_logs_id;
+                    warn_missing_logs.classList.add('note', 'note-important');
+                    warn_missing_logs.innerText = getI18N(texts.warn_missing_logs_title);
+                    let warn_help = createHelpButton(getI18N(texts.warn_missing_logs_help));
+                    warn_missing_logs.appendChild(warn_help);
+
+                    update_external_tools_btn.parentElement.appendChild(warn_missing_logs);
+                }
+            } else if (warn_missing_logs && (!document.querySelector('.log-complete-link') || !mho_parameters.update_mho_digs)) {
+                warn_missing_logs.remove();
+            }
+        } else if (update_external_tools_btn && (!(external_display_zone && pageIsHouse()) || !(amelios && pageIsAmelio()))) {
+            update_external_tools_btn.parentElement.remove();
+        } else if (!update_external_tools_btn && external_display_zone && count < 10) {
+            setTimeout(() => {
+                createUpdateExternalToolsButton(count + 1);
+            }, 250)
         }
-    } else if (update_external_tools_btn && (nb_tools_to_update === 0 || !external_app_id || !(external_display_zone && pageIsHouse()) || !(amelios && pageIsAmelio()))) {
-        update_external_tools_btn.parentElement.remove();
     }
 }
 
@@ -4880,7 +4893,7 @@ function displayMinApOnBuildings() {
 }
 
 /** Affiche la liste de courses dans le désert et l'atelier */
-function displayWishlistInApp() {
+function displayWishlistInApp(count = 0) {
     let wishlist_section = document.getElementById('wishlist-section');
 
     let is_desert = pageIsDesert();
@@ -5065,6 +5078,10 @@ function displayWishlistInApp() {
         refreshWishlist();
     } else if (wishlist_section) {
         wishlist_section.remove();
+    } else if (count < 3) {
+        setTimeout(() => {
+            displayWishlistInApp(count + 1);
+        }, 250)
     }
 }
 
@@ -6597,7 +6614,7 @@ function displayEstimationsOnWatchtower() {
         const watchtower_estim_block = document.querySelector('.block.watchtower');
         const watchtower_estim_block_prediction = watchtower_estim_block.querySelector('.x-copy-prediction')?.querySelector('[x-contain-prediction]')?.innerText;
 
-        if (watchtower_estim_block && watchtower_estim_block_prediction) {
+        if (watchtower_estim_block) {
             const current_estimation_percent_read = watchtower_estim_block.querySelector('.watchtower-prediction-text')?.innerText?.replace('%', '');
             const current_estimation_percent = current_estimation_percent_read !== undefined && current_estimation_percent_read !== null ? +current_estimation_percent_read : (watchtower_estim_block_prediction ? 100 : undefined);
 
@@ -7131,11 +7148,15 @@ function displayAntiAbuseCounter() {
     }
 }
 
-function automaticallyOpenBag() {
+function automaticallyOpenBag(count = 0) {
     if (mho_parameters.automatically_open_bag) {
         let button = document.querySelector('[x-item-action-toggle="1"]');
         if (button && (!button.getAttribute('style') || button.getAttribute('style').indexOf('display: none') < 0)) {
             button.click();
+        } else if (count < 3) {
+            setTimeout(() => {
+                automaticallyOpenBag(count + 1);
+            }, 250)
         }
     }
 }
@@ -9085,7 +9106,7 @@ function getGHRuin() {
 /** Récupère la carte de GH */
 function getBBHMap() {
     return new Promise((resolve, reject) => {
-        fetcher(`https://bbh.fred26.fr/?cid=5-${mh_user.townDetails?.townId}&pg=map`)
+        fetcher(`${big_broth_hordes_url}/?cid=5-${mh_user.townDetails?.townId}&pg=map`)
             .then((response) => {
                 if (response.status === 200) {
                     return response.text();
@@ -10123,9 +10144,12 @@ function updateExternalTools() {
                 });
         }
 
-        /** Récupération du bain */
-        let bath_taken;
+        /** Récupération des actions quotidiennes */
+        // TODO changer update_mho_status en update_mho_daily_actions quand on les aura toutes mises
         if ((mho_parameters.update_mho && mho_parameters.update_mho_status) && pageIsHouse()) {
+
+            /** Bain */
+            let bath_taken;
             let bath_row = document.querySelector('.heroic_action img[src*=pool]')?.parentElement;
             if (bath_row) {
                 if (bath_row.attributes.disabled) {
@@ -10429,7 +10453,7 @@ function calculateCamping(camping_parameters) {
             .then((camping_result) => {
                 let result = document.querySelector('#camping-result');
                 if (result) {
-                    result.innerText = result ? `${getI18N(camping_result.label)} (${camping_result.boundedProbability}%)` : '';
+                    result.innerText = result ? `${getI18N(camping_result.label)} - ${camping_result.boundedProbability}% (${camping_result.boundedProbability}%)` : '';
                 }
                 resolve(camping_result);
             })
