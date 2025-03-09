@@ -58,7 +58,8 @@
           <context context-type="sourcefile">src/app/_abstract_model/enum/action.enum.ts</context>
           <context context-type="linenumber">44</context>
         </context-group>
-        <target state="final">Gibt jedem Bürger in der Stadt einen Aktionspunkt zurück, bis zur maximalen Anzahl an Aktionspunkten, die jeder hat. Gibt
+        <target state="final">Gibt jedem Bürger in der Stadt einen Aktionspunkt zurück, bis zur maximalen Anzahl an Aktionspunkten, die jeder hat.
+                    Gibt
                     Bürgern mit dem Zustand "Betrunken" oder "Rauschzustand" zwei Aktionspunkte zurück
                 </target>
       </trans-unit>
@@ -852,14 +853,6 @@
         </context-group>
         <target state="needs-translation">Classique</target>
       </trans-unit>
-      <trans-unit id="9167746305089829427" datatype="html">
-        <source>MyHordes</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/games/minesweeper/minesweeper.component.ts</context>
-          <context context-type="linenumber">42</context>
-        </context-group>
-        <target state="needs-translation">MyHordes</target>
-      </trans-unit>
       <trans-unit id="7514759768535181311" datatype="html">
         <source>IRL</source>
         <context-group purpose="location">
@@ -1304,6 +1297,30 @@
         </context-group>
         <target state="needs-translation">Mode liste</target>
       </trans-unit>
+      <trans-unit id="3907766170797643122" datatype="html">
+        <source>Pseudo</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/my-town/citizens/citizens-watch/citizens-watch.component.html</context>
+          <context context-type="linenumber">7</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/my-town/statistics/registry/registry.component.html</context>
+          <context context-type="linenumber">4</context>
+        </context-group>
+        <target state="needs-translation">Pseudo</target>
+      </trans-unit>
+      <trans-unit id="1199075748231436486" datatype="html">
+        <source>Identifiant MyHordes</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/my-town/citizens/citizens-watch/citizens-watch.component.html</context>
+          <context context-type="linenumber">8</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/my-town/statistics/registry/registry.component.html</context>
+          <context context-type="linenumber">5</context>
+        </context-group>
+        <target state="needs-translation">Identifiant MyHordes</target>
+      </trans-unit>
       <trans-unit id="2316658858794336931" datatype="html" approved="yes">
         <source>Jour</source>
         <context-group purpose="location">
@@ -1727,6 +1744,14 @@
           <context context-type="linenumber">319</context>
         </context-group>
         <target state="needs-translation">Consignes de l'expédition</target>
+      </trans-unit>
+      <trans-unit id="8387602136843548693" datatype="html">
+        <source>Pas de consigne.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/my-town/expeditions/expeditions.component.html</context>
+          <context context-type="linenumber">355</context>
+        </context-group>
+        <target state="needs-translation">Pas de consigne.</target>
       </trans-unit>
       <trans-unit id="1734510160431147499" datatype="html">
         <source>Ajouter une partie à l&apos;expédition</source>
@@ -3087,7 +3112,8 @@
           <context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.ts</context>
           <context context-type="linenumber">262</context>
         </context-group>
-        <target state="final">Diese Liste wurde von der MyHordes Optimizer-Website generiert. Du kannst sie finden, indem du [link=<x id="PH" equiv-text="environment.website_url"/>
+        <target state="final">Diese Liste wurde von der MyHordes Optimizer-Website generiert. Du kannst sie finden, indem du [link=
+                    <x id="PH" equiv-text="environment.website_url"/>
                     my-town/wishlist]anklickst[/link]
                 </target>
       </trans-unit>
@@ -3260,7 +3286,8 @@
           <context context-type="sourcefile">src/app/shared/elements/last-update/last-update.component.html</context>
           <context context-type="linenumber">34</context>
         </context-group>
-        <target state="final">Aktualisiert von <x id="INTERPOLATION" equiv-text="{{lastUpdateInfo?.username}}"/> <x id="INTERPOLATION_1" equiv-text="{{lastUpdateInfo?.update_time?.fromNow()}}"/>
+        <target state="final">Aktualisiert von <x id="INTERPOLATION" equiv-text="{{lastUpdateInfo?.username}}"/> 
+                    <x id="INTERPOLATION_1" equiv-text="{{lastUpdateInfo?.update_time?.fromNow()}}"/>
                      (<x id="INTERPOLATION_2" equiv-text="{{lastUpdateInfo?.update_time?.toDate() | date:'medium'}}"/>)
                 </target>
       </trans-unit>
@@ -3288,7 +3315,8 @@
           <context context-type="sourcefile">src/app/structure/footer/footer.component.html</context>
           <context context-type="linenumber">4,5</context>
         </context-group>
-        <target state="final">Entwickelt von <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;https://myhordes.eu/jx/soul/6042&quot;&gt;"/>
+        <target state="final">Entwickelt von 
+                    <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;https://myhordes.eu/jx/soul/6042&quot;&gt;"/>
                     Zerah
                     <x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/> und 
                     <x id="START_LINK_1" equiv-text="&lt;a                 href=&quot;https://myhordes.eu/jx/soul/6173&quot;&gt;"/>
@@ -3980,7 +4008,8 @@
         </context-group>
         <target state="final">(
                     <x id="INTERPOLATION" equiv-text="{{ bonus_string }}"/>
-                    <x id="INTERPOLATION_1" equiv-text="{{ bonus.zombie_vest | campingDisplayBonus:display_bonus_ap:locale }}"/> pro Zombie statt <x id="INTERPOLATION_2" equiv-text="{{                                         bonus.zombie_no_vest | campingDisplayBonus:display_bonus_ap:locale                                     }}"/>
+                    <x id="INTERPOLATION_1" equiv-text="{{ bonus.zombie_vest | campingDisplayBonus:display_bonus_ap:locale }}"/> pro Zombie statt 
+                    <x id="INTERPOLATION_2" equiv-text="{{                                         bonus.zombie_no_vest | campingDisplayBonus:display_bonus_ap:locale                                     }}"/>
                     )
                 </target>
       </trans-unit>
@@ -4537,7 +4566,8 @@
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-alerts/tuto-script-alerts.component.ts</context>
           <context context-type="linenumber">38</context>
         </context-group>
-        <target state="final">Wenn Sie die Option "Mich am Ende der Grabung benachrichtigen" ankreuzen, erhalten Sie einige Sekunden vor dem Ende Ihrer
+        <target state="final">Wenn Sie die Option "Mich am Ende der Grabung benachrichtigen" ankreuzen, erhalten Sie einige Sekunden vor dem Ende
+                    Ihrer
                     Grabung eine Benachrichtigung von Ihrem Browser, vorausgesetzt, Ihr Browser ist noch auf der Wüstenseite geöffnet.
                 </target>
       </trans-unit>
@@ -4557,7 +4587,8 @@
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-alerts/tuto-script-alerts.component.ts</context>
           <context context-type="linenumber">42</context>
         </context-group>
-        <target state="final">Wenn Sie die Option "Mich benachrichtigen, wenn ich eine neue Nachricht erhalte" ankreuzen, erhalten Sie von Ihrem Browser
+        <target state="final">Wenn Sie die Option "Mich benachrichtigen, wenn ich eine neue Nachricht erhalte" ankreuzen, erhalten Sie von Ihrem
+                    Browser
                     eine Benachrichtigung, wenn sich Ihr Zähler der empfangenen Nachrichten ändert.
                 </target>
       </trans-unit>
@@ -4653,7 +4684,8 @@
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-display/tuto-script-display.component.ts</context>
           <context context-type="linenumber">39</context>
         </context-group>
-        <target state="final">Wenn du diese Option ankreuzt, kannst du Suchfelder auswählen, die in deiner Benutzeroberfläche angezeigt werden sollen.
+        <target state="final">Wenn du diese Option ankreuzt, kannst du Suchfelder auswählen, die in deiner Benutzeroberfläche angezeigt werden
+                    sollen.
                     Derzeit sind verfügbar: ein Suchfeld auf der Liste der Konstruktionen, ein Suchfeld in den Empfängern einer Nachricht in seinem Haus, ein
                     Suchfeld in den Einträgen des Registers.
                 </target>
@@ -4818,7 +4850,8 @@
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-display/tuto-script-display.component.ts</context>
           <context context-type="linenumber">81</context>
         </context-group>
-        <target state="final">Wenn diese Option aktiviert ist, erscheint auf der Seite des Wachturms ein neuer Bereich, in dem Sie die Abschätzungen
+        <target state="final">Wenn diese Option aktiviert ist, erscheint auf der Seite des Wachturms ein neuer Bereich, in dem Sie die
+                    Abschätzungen
                     einsehen, speichern und kopieren können.
                 </target>
       </trans-unit>
@@ -4879,7 +4912,8 @@
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-display/tuto-script-display.component.ts</context>
           <context context-type="linenumber">94</context>
         </context-group>
-        <target state="final">Wenn diese Option aktiviert ist, wird beim Laden einer Zone in der Außenwelt ein Klick auf die Schaltfläche zum Öffnen des
+        <target state="final">Wenn diese Option aktiviert ist, wird beim Laden einer Zone in der Außenwelt ein Klick auf die Schaltfläche zum
+                    Öffnen des
                     Rucksacks simuliert, so dass dein Rucksack standardmäßig geöffnet wird.
                 </target>
       </trans-unit>
@@ -5020,7 +5054,8 @@
                     </context>
           <context context-type="linenumber">62</context>
         </context-group>
-        <target state="final">Wenn du die Option "BigBroth'Hordes aktualisieren" ankreuzt, wird BigBroth'Hordes automatisch aktualisiert, wenn du auf
+        <target state="final">Wenn du die Option "BigBroth'Hordes aktualisieren" ankreuzt, wird BigBroth'Hordes automatisch aktualisiert, wenn du
+                    auf
                     die Schaltfläche "Externe Tools aktualisieren" klickst.
                 </target>
       </trans-unit>
@@ -5268,7 +5303,8 @@
                     </context>
           <context context-type="linenumber">77</context>
         </context-group>
-        <target state="final">Nach der Installation der Erweiterung musst du die Seite des Spiels neu laden. Du wirst dann eine neue Schaltfläche oben
+        <target state="final">Nach der Installation der Erweiterung musst du die Seite des Spiels neu laden. Du wirst dann eine neue Schaltfläche
+                    oben
                     auf Ihrer MyHordes-Seite sehen. Beim Mouseover öffnet sich ein Fenster, das Zugriff auf die Optionen des Skripts und einige seiner
                     Funktionen bietet.
                 </target>
@@ -5335,7 +5371,8 @@
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-wiki/tuto-script-wiki.component.ts</context>
           <context context-type="linenumber">43</context>
         </context-group>
-        <target state="final">Zeigt eine Liste aller im Spiel existierenden Gebäude, ihre Entfernung von der Stadt sowie eine Liste der Gegenstände, die
+        <target state="final">Zeigt eine Liste aller im Spiel existierenden Gebäude, ihre Entfernung von der Stadt sowie eine Liste der
+                    Gegenstände, die
                     man durch Durchsuchen erhalten kann, und deren Wahrscheinlichkeit, sie zu erhalten.
                 </target>
       </trans-unit>
@@ -5355,7 +5392,8 @@
           <context context-type="sourcefile">src/app/tutorials/site/tuto-site-first-use/tuto-site-first-use.component.ts</context>
           <context context-type="linenumber">28</context>
         </context-group>
-        <target state="final">Bei deiner ersten Nutzung der Website wirst du keinen Zugang zu den Seiten unter dem Menüpunkt "Meine Stadt" haben. Du
+        <target state="final">Bei deiner ersten Nutzung der Website wirst du keinen Zugang zu den Seiten unter dem Menüpunkt "Meine Stadt" haben.
+                    Du
                     musst nämlich vorher deine externe ID für die Anwendungen oben rechts auf der Seite eingeben.
                 </target>
       </trans-unit>
@@ -5367,7 +5405,8 @@
           <context context-type="sourcefile">src/app/tutorials/site/tuto-site-first-use/tuto-site-first-use.component.ts</context>
           <context context-type="linenumber">29</context>
         </context-group>
-        <target state="final">Die externe ID für Anwendungen findest du auf der MyHordes-Website, auf der Seite deiner Seele, Registerkarte "Erweitert".
+        <target state="final">Die externe ID für Anwendungen findest du auf der MyHordes-Website, auf der Seite deiner Seele, Registerkarte
+                    "Erweitert".
                     Nachdem du sie kopiert hast, füge sie einfach in das dafür vorgesehene Feld auf der MyHordes-Optimizer-Seite ein und bestätige.
                 </target>
       </trans-unit>
@@ -5501,7 +5540,8 @@
           <context context-type="sourcefile">src/app/wiki/miscellaneous-info/max-active-calculator/max-active-calculator.component.html</context>
           <context context-type="linenumber">9</context>
         </context-group>
-        <target state="final">Der Überlauf hängt vom Tag und der Anzahl der lebenden Bürger ab. Er hängt vielleicht auch davon ab, wie viele Bürger sich
+        <target state="final">Der Überlauf hängt vom Tag und der Anzahl der lebenden Bürger ab. Er hängt vielleicht auch davon ab, wie viele Bürger
+                    sich
                     in der Stadt aufhalten.
                 </target>
       </trans-unit>
