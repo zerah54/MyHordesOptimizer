@@ -752,13 +752,6 @@
                     <context context-type="linenumber">40</context>
                 </context-group>
             </trans-unit>
-            <trans-unit id="9167746305089829427" datatype="html">
-                <source>MyHordes</source>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/games/minesweeper/minesweeper.component.ts</context>
-                    <context context-type="linenumber">42</context>
-                </context-group>
-            </trans-unit>
             <trans-unit id="7514759768535181311" datatype="html">
                 <source>IRL</source>
                 <context-group purpose="location">
@@ -1167,6 +1160,20 @@
                     <context context-type="linenumber">4</context>
                 </context-group>
             </trans-unit>
+            <trans-unit id="3907766170797643122" datatype="html">
+                <source>Pseudo</source>
+                <context-group purpose="location">
+                    <context context-type="sourcefile">src/app/my-town/citizens/citizens-watch/citizens-watch.component.html</context>
+                    <context context-type="linenumber">7</context>
+                </context-group>
+            </trans-unit>
+            <trans-unit id="1199075748231436486" datatype="html">
+                <source>Identifiant MyHordes</source>
+                <context-group purpose="location">
+                    <context context-type="sourcefile">src/app/my-town/citizens/citizens-watch/citizens-watch.component.html</context>
+                    <context context-type="linenumber">8</context>
+                </context-group>
+            </trans-unit>
             <trans-unit id="2316658858794336931" datatype="html">
                 <source>Jour</source>
                 <context-group purpose="location">
@@ -1551,6 +1558,13 @@
                 <context-group purpose="location">
                     <context context-type="sourcefile">src/app/my-town/expeditions/expeditions.component.html</context>
                     <context context-type="linenumber">319</context>
+                </context-group>
+            </trans-unit>
+            <trans-unit id="8387602136843548693" datatype="html">
+                <source>Pas de consigne.</source>
+                <context-group purpose="location">
+                    <context context-type="sourcefile">src/app/my-town/expeditions/expeditions.component.html</context>
+                    <context context-type="linenumber">355</context>
                 </context-group>
             </trans-unit>
             <trans-unit id="1734510160431147499" datatype="html">

@@ -3,9 +3,9 @@
         <div class="header">
             <mat-slide-toggle i18n [(ngModel)]="list_mode">Mode liste</mat-slide-toggle>
             @if (list_mode) {
-                <mat-button-toggle-group [(ngModel)]="display_pseudo" name="fontStyle" aria-label="Font Style">
-                    <mat-button-toggle value="simple">Pseudo</mat-button-toggle>
-                    <mat-button-toggle value="mh_id">Identifiant MyHordes</mat-button-toggle>
+                <mat-button-toggle-group [(ngModel)]="display_pseudo" name="display_pseudo">
+                    <mat-button-toggle value="simple" i18n>Pseudo</mat-button-toggle>
+                    <mat-button-toggle value="mh_id" i18n>Identifiant MyHordes</mat-button-toggle>
                 </mat-button-toggle-group>
             }
         </div>
