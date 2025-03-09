@@ -204,9 +204,9 @@
                                                                                             [(ngModel)]="expedition_citizen.citizen_id"
                                                                                             (ngModelChange)="expedition_citizen.preinscrit = edition_mode; saveCitizen(expedition_part, expedition_citizen, expedition_part_index, expedition, citizen_index)"></mho-select>
                                                                             </mat-form-field>
-                                                                        } @else if (expedition.state === 'ready' && !expedition_citizen.citizen_id && (!expedition_citizen.preinscrit_job || expedition_citizen.preinscrit_job === (me.id| citizenFromId:all_citizens)?.job?.key)) {
+                                                                        } @else if (expedition.state === 'ready' && !expedition_citizen.citizen_id && (!expedition_citizen.preinscrit_job || expedition_citizen.preinscrit_job === (me?.id| citizenFromId:all_citizens)?.job?.key)) {
                                                                             <button mat-button
-                                                                                    (click)="expedition_citizen.citizen_id = me.id; saveCitizen(expedition_part, expedition_citizen, expedition_part_index, expedition, citizen_index)">
+                                                                                    (click)="expedition_citizen.citizen_id = me?.id; saveCitizen(expedition_part, expedition_citizen, expedition_part_index, expedition, citizen_index)">
                                                                                 <ng-container i18n>M'inscrire ici</ng-container>
                                                                             </button>
                                                                         } @else {

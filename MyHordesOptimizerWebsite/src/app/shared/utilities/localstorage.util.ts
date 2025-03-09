@@ -18,7 +18,7 @@ export function setUser(user: Me | null): void {
     localStorage.setItem(USER_KEY, user ? JSON.stringify(user) : '');
 }
 
-export function getUser(): Me {
+export function getUser(): Me | null {
     const user: string | null = localStorage.getItem(USER_KEY);
     return user ? JSON.parse(user) : null;
 }

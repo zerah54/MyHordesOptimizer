@@ -88,7 +88,7 @@ export class ExpeditionsComponent implements OnInit {
     protected expeditions: WritableSignal<Expedition[]> = signal([]);
     protected active_citizens_list: WritableSignal<number[]> = signal([]);
 
-    protected readonly me: Me = getUser();
+    protected readonly me: Me | null = getUser();
 
     private api_service: ApiService = inject(ApiService);
     private town_service: TownService = inject(TownService);
@@ -767,12 +767,12 @@ export class ExpeditionsComponent implements OnInit {
     public isDefaultExpanded(expedition: Expedition): boolean {
         if (this.edition_mode) return true;
         const my_expedition: boolean = expedition.parts
-            .some((part: ExpeditionPart) => part.citizens.some((citizen: CitizenExpedition) => citizen.citizen_id === this.me.id));
+            .some((part: ExpeditionPart) => part.citizens.some((citizen: CitizenExpedition) => citizen.citizen_id === this.me?.id));
         if (my_expedition) return true;
         const am_i_somewhere: boolean = this.expeditions()
             .some((some_expedition: Expedition) => some_expedition.parts
                 .some((part: ExpeditionPart) => part.citizens
-                    .some((citizen: CitizenExpedition) => citizen.citizen_id === this.me.id)
+                    .some((citizen: CitizenExpedition) => citizen.citizen_id === this.me?.id)
                 )
             );
         if (!am_i_somewhere && expedition.state === 'ready') return true;

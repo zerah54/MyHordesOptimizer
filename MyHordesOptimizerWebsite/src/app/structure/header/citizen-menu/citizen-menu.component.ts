@@ -42,7 +42,7 @@ export class CitizenMenuComponent implements OnInit {
     @HostBinding('style.display') display: string = 'contents';
 
     public citizen!: Citizen;
-    public readonly me: Me = getUser();
+    public readonly me: Me | null = getUser();
     public readonly current_day: number = getTown()?.day || 1;
     public readonly locale: string = moment.locale();
 
@@ -66,14 +66,16 @@ export class CitizenMenuComponent implements OnInit {
     @AutoDestroy private destroy_sub: Subject<void> = new Subject();
 
     public ngOnInit(): void {
-        this.town_service
-            .getCitizen(this.me.id)
-            .subscribe({
-                next: (citizen: Citizen) => {
-                    this.citizen = citizen;
-                }
-            });
-
+        if (this.me) {
+            this.town_service
+                .getCitizen(this.me.id)
+                .subscribe({
+                    next: (citizen: Citizen) => {
+                        this.citizen = citizen;
+                    }
+                });
+        }
+        
         this.api_service
             .getItems()
             .pipe(takeUntil(this.destroy_sub))
@@ -104,7 +106,7 @@ export class CitizenMenuComponent implements OnInit {
                 .subscribe({
                     next: (update_info: UpdateInfo): void => {
                         if (this.citizen.bag) {
-                            this.citizen.bag.update_info.username = getUser().username;
+                            this.citizen.bag.update_info.username = getUser()?.username;
                             this.citizen.bag.update_info.update_time = update_info.update_time;
                         }
                     }
@@ -130,7 +132,7 @@ export class CitizenMenuComponent implements OnInit {
                 .subscribe({
                     next: (update_info: UpdateInfo) => {
                         if (this.citizen.bag) {
-                            this.citizen.bag.update_info.username = getUser().username;
+                            this.citizen.bag.update_info.username = getUser()?.username;
                             this.citizen.bag.update_info.update_time = update_info.update_time;
                         }
                     }
@@ -148,7 +150,7 @@ export class CitizenMenuComponent implements OnInit {
                 .subscribe({
                     next: (update_info: UpdateInfo) => {
                         if (this.citizen.bag) {
-                            this.citizen.bag.update_info.username = getUser().username;
+                            this.citizen.bag.update_info.username = getUser()?.username;
                             this.citizen.bag.update_info.update_time = update_info.update_time;
                         }
                     }
@@ -171,7 +173,7 @@ export class CitizenMenuComponent implements OnInit {
                 .subscribe({
                     next: (update_info: UpdateInfo) => {
                         if (this.citizen.status) {
-                            this.citizen.status.update_info.username = getUser().username;
+                            this.citizen.status.update_info.username = getUser()?.username;
                             this.citizen.status.update_info.update_time = update_info.update_time;
                         }
                     }
@@ -196,7 +198,7 @@ export class CitizenMenuComponent implements OnInit {
                 .subscribe({
                     next: (update_info: UpdateInfo) => {
                         if (this.citizen.status) {
-                            this.citizen.status.update_info.username = getUser().username;
+                            this.citizen.status.update_info.username = getUser()?.username;
                             this.citizen.status.update_info.update_time = update_info.update_time;
                         }
                     }
@@ -214,7 +216,7 @@ export class CitizenMenuComponent implements OnInit {
                 .subscribe({
                     next: (update_info: UpdateInfo) => {
                         if (this.citizen.status) {
-                            this.citizen.status.update_info.username = getUser().username;
+                            this.citizen.status.update_info.username = getUser()?.username;
                             this.citizen.status.update_info.update_time = update_info.update_time;
                         }
                     }
@@ -233,7 +235,7 @@ export class CitizenMenuComponent implements OnInit {
                 .subscribe({
                     next: (update_info: UpdateInfo) => {
                         if (this.citizen.chamanic_detail) {
-                            this.citizen.chamanic_detail.update_info.username = getUser().username;
+                            this.citizen.chamanic_detail.update_info.username = getUser()?.username;
                             this.citizen.chamanic_detail.update_info.update_time = update_info.update_time;
                         }
                     }
@@ -251,7 +253,7 @@ export class CitizenMenuComponent implements OnInit {
             .subscribe({
                 next: (update_info: UpdateInfo) => {
                     if (citizen.chamanic_detail) {
-                        citizen.chamanic_detail.update_info.username = getUser().username;
+                        citizen.chamanic_detail.update_info.username = getUser()?.username;
                         citizen.chamanic_detail.update_info.update_time = update_info.update_time;
                     }
                 }
@@ -279,7 +281,7 @@ export class CitizenMenuComponent implements OnInit {
                 .subscribe({
                     next: (update_info: UpdateInfo) => {
                         if (this.citizen.heroic_actions) {
-                            this.citizen.heroic_actions.update_info.username = getUser().username;
+                            this.citizen.heroic_actions.update_info.username = getUser()?.username;
                             this.citizen.heroic_actions.update_info.update_time = update_info.update_time;
                         }
                     },
@@ -311,7 +313,7 @@ export class CitizenMenuComponent implements OnInit {
                 .subscribe({
                     next: (update_info: UpdateInfo) => {
                         if (this.citizen.home) {
-                            this.citizen.home.update_info.username = getUser().username;
+                            this.citizen.home.update_info.username = getUser()?.username;
                             this.citizen.home.update_info.update_time = update_info.update_time;
                         }
                     },

@@ -50,7 +50,7 @@ export class HeaderComponent implements OnInit {
     /** L'idendifiant d'app externe si il existe */
     public saved_external_app_id: string | null = getExternalAppId();
     /** Les informations de l'utilisateur */
-    public me: Me = getUser();
+    public me: Me | null = getUser();
     public readonly is_dev: boolean = !environment.production;
     public readonly myhordes_url: string = environment.myhordes_url;
     public readonly myhordes_app_id: number = environment.myhordes_app_id;

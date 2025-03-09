@@ -5,7 +5,7 @@ import { CommonModel } from './_common.class';
 export class UpdateInfo extends CommonModel<UpdateInfoDTO> {
     public update_time!: Moment;
     public user_id!: string;
-    public username!: string;
+    public username?: string;
     public userkey!: string;
 
     constructor(dto?: UpdateInfoDTO | null) {
