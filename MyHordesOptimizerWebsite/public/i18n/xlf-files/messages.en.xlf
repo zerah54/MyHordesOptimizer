@@ -850,14 +850,6 @@
         </context-group>
         <target state="final">Legacy</target>
       </trans-unit>
-      <trans-unit id="9167746305089829427" datatype="html">
-        <source>MyHordes</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/games/minesweeper/minesweeper.component.ts</context>
-          <context context-type="linenumber">42</context>
-        </context-group>
-        <target state="needs-translation">MyHordes</target>
-      </trans-unit>
       <trans-unit id="7514759768535181311" datatype="html" approved="yes">
         <source>IRL</source>
         <context-group purpose="location">
@@ -922,7 +914,7 @@
         </context-group>
         <target state="final">Construction sites</target>
       </trans-unit>
-      <trans-unit id="4273156925314176058" datatype="html">
+      <trans-unit id="4273156925314176058" datatype="html" approved="yes">
         <source>Campings</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/my-town/campings/campings.component.html</context>
@@ -936,7 +928,7 @@
           <context context-type="sourcefile">src/app/structure/menu/menu.component.ts</context>
           <context context-type="linenumber">91</context>
         </context-group>
-        <target state="needs-translation">Campings</target>
+        <target state="final">Campings</target>
       </trans-unit>
       <trans-unit id="8265078634979801865" datatype="html" approved="yes">
         <source>La liste est vide</source>
@@ -1302,6 +1294,30 @@
         </context-group>
         <target state="needs-translation">Mode liste</target>
       </trans-unit>
+      <trans-unit id="3907766170797643122" datatype="html">
+        <source>Pseudo</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/my-town/citizens/citizens-watch/citizens-watch.component.html</context>
+          <context context-type="linenumber">7</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/my-town/statistics/registry/registry.component.html</context>
+          <context context-type="linenumber">4</context>
+        </context-group>
+        <target state="needs-translation">Pseudo</target>
+      </trans-unit>
+      <trans-unit id="1199075748231436486" datatype="html" approved="yes">
+        <source>Identifiant MyHordes</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/my-town/citizens/citizens-watch/citizens-watch.component.html</context>
+          <context context-type="linenumber">8</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/my-town/statistics/registry/registry.component.html</context>
+          <context context-type="linenumber">5</context>
+        </context-group>
+        <target state="final">MyHordes identifier</target>
+      </trans-unit>
       <trans-unit id="2316658858794336931" datatype="html" approved="yes">
         <source>Jour</source>
         <context-group purpose="location">
@@ -1540,7 +1556,7 @@
         </context-group>
         <target state="final">Edit mode</target>
       </trans-unit>
-      <trans-unit id="3599838485448856282" datatype="html">
+      <trans-unit id="3599838485448856282" datatype="html" approved="yes">
         <source>Jour
                     <x id="INTERPOLATION" equiv-text="{{day_index + 1}}"/>
                 </source>
@@ -1548,7 +1564,7 @@
           <context context-type="sourcefile">src/app/my-town/expeditions/expeditions.component.html</context>
           <context context-type="linenumber">19,20</context>
         </context-group>
-        <target state="needs-translation">Jour
+        <target state="final">Day
                     <x id="INTERPOLATION" equiv-text="{{day_index + 1}}"/>
                 </target>
       </trans-unit>
@@ -1725,6 +1741,14 @@
           <context context-type="linenumber">319</context>
         </context-group>
         <target state="final">Route instructions</target>
+      </trans-unit>
+      <trans-unit id="8387602136843548693" datatype="html" approved="yes">
+        <source>Pas de consigne.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/my-town/expeditions/expeditions.component.html</context>
+          <context context-type="linenumber">355</context>
+        </context-group>
+        <target state="final">No instructions.</target>
       </trans-unit>
       <trans-unit id="1734510160431147499" datatype="html" approved="yes">
         <source>Ajouter une partie à l&apos;expédition</source>
@@ -2060,7 +2084,7 @@
           <context context-type="sourcefile">src/app/my-town/map/map.component.html</context>
           <context context-type="linenumber">17</context>
         </context-group>
-        <target state="final">Settings</target>
+        <target state="final">Parameters</target>
       </trans-unit>
       <trans-unit id="6829489120150883241" datatype="html" approved="yes">
         <source>Type de carte</source>
@@ -2106,13 +2130,13 @@
         </context-group>
         <target state="final">Maximum</target>
       </trans-unit>
-      <trans-unit id="392591506297072679" datatype="html">
+      <trans-unit id="392591506297072679" datatype="html" approved="yes">
         <source>Mode d&apos;affichage</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/my-town/map/map.component.html</context>
           <context context-type="linenumber">37</context>
         </context-group>
-        <target state="needs-translation">Mode d'affichage</target>
+        <target state="final">Display mode</target>
       </trans-unit>
       <trans-unit id="267923422419323222" datatype="html" approved="yes">
         <source>Nombre d&apos;objets</source>
@@ -2556,13 +2580,13 @@
                     - Max
                 </target>
       </trans-unit>
-      <trans-unit id="7546052101299540869" datatype="html">
+      <trans-unit id="7546052101299540869" datatype="html" approved="yes">
         <source>Afficher uniquement la différence</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/my-town/statistics/registry/bank-diff/bank-diff-registry.component.html</context>
           <context context-type="linenumber">2</context>
         </context-group>
-        <target state="needs-translation">Afficher uniquement la différence</target>
+        <target state="final">Display only the differences</target>
       </trans-unit>
       <trans-unit id="485694852414197759" datatype="html" approved="yes">
         <source>Ont été pris</source>
@@ -2616,29 +2640,29 @@
                     <x id="PH" equiv-text="index + 1"/>
                 </target>
       </trans-unit>
-      <trans-unit id="2365273625237440349" datatype="html">
+      <trans-unit id="2365273625237440349" datatype="html" approved="yes">
         <source>Activité</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/my-town/statistics/registry/doors/doors-registry.component.ts</context>
           <context context-type="linenumber">66</context>
         </context-group>
-        <target state="needs-translation">Activité</target>
+        <target state="final">Activity</target>
       </trans-unit>
-      <trans-unit id="2405565940041502868" datatype="html">
+      <trans-unit id="2405565940041502868" datatype="html" approved="yes">
         <source>Ont pris le drapeau</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/my-town/statistics/registry/flag/flag-registry.component.html</context>
           <context context-type="linenumber">3</context>
         </context-group>
-        <target state="needs-translation">Ont pris le drapeau</target>
+        <target state="final">Took the flag</target>
       </trans-unit>
-      <trans-unit id="8251763691533953480" datatype="html">
+      <trans-unit id="8251763691533953480" datatype="html" approved="yes">
         <source>N&apos;ont pas pris le drapeau</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/my-town/statistics/registry/flag/flag-registry.component.html</context>
           <context context-type="linenumber">12</context>
         </context-group>
-        <target state="needs-translation">N'ont pas pris le drapeau</target>
+        <target state="final">Didn't take the flag</target>
       </trans-unit>
       <trans-unit id="224561442713301160" datatype="html" approved="yes">
         <source>Ont joué</source>
@@ -2656,7 +2680,7 @@
         </context-group>
         <target state="final">Did not play</target>
       </trans-unit>
-      <trans-unit id="974287372292560425" datatype="html">
+      <trans-unit id="974287372292560425" datatype="html" approved="yes">
         <source>Dés / Cartes / Ballon</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/my-town/statistics/registry/plays/plays-registry.component.ts</context>
@@ -2666,7 +2690,7 @@
           <context context-type="sourcefile">src/app/my-town/statistics/registry/registry.component.ts</context>
           <context context-type="linenumber">54</context>
         </context-group>
-        <target state="needs-translation">Dés / Cartes / Ballon</target>
+        <target state="final">Dice / Cards / Ball</target>
       </trans-unit>
       <trans-unit id="6948592133758825600" datatype="html" approved="yes">
         <source>Dés</source>
@@ -2684,13 +2708,13 @@
         </context-group>
         <target state="final">Cards</target>
       </trans-unit>
-      <trans-unit id="9051766307631870033" datatype="html">
+      <trans-unit id="9051766307631870033" datatype="html" approved="yes">
         <source>Ballon</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/my-town/statistics/registry/plays/plays-registry.component.ts</context>
           <context context-type="linenumber">61</context>
         </context-group>
-        <target state="needs-translation">Ballon</target>
+        <target state="final">Ball</target>
       </trans-unit>
       <trans-unit id="868416859251656813" datatype="html" approved="yes">
         <source>Coller le contenu du registre à analyser</source>
@@ -2732,21 +2756,21 @@
         </context-group>
         <target state="needs-translation">Entrées / Sorties</target>
       </trans-unit>
-      <trans-unit id="1032727218264502196" datatype="html">
+      <trans-unit id="1032727218264502196" datatype="html" approved="yes">
         <source>Téléscope</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/my-town/statistics/registry/registry.component.ts</context>
           <context context-type="linenumber">59</context>
         </context-group>
-        <target state="translated">Telescope</target>
+        <target state="final">Telescope</target>
       </trans-unit>
-      <trans-unit id="9085848549175330903" datatype="html">
+      <trans-unit id="9085848549175330903" datatype="html" approved="yes">
         <source>Drapeau</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/my-town/statistics/registry/registry.component.ts</context>
           <context context-type="linenumber">60</context>
         </context-group>
-        <target state="needs-translation">Drapeau</target>
+        <target state="final">Flag</target>
       </trans-unit>
       <trans-unit id="6523739183800669938" datatype="html">
         <source>Utilisation des chantiers</source>
@@ -2756,29 +2780,29 @@
         </context-group>
         <target state="needs-translation">Utilisation des chantiers</target>
       </trans-unit>
-      <trans-unit id="1664998378502542622" datatype="html">
+      <trans-unit id="1664998378502542622" datatype="html" approved="yes">
         <source>Ont pris le télescope</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/my-town/statistics/registry/telescope/telescope-registry.component.html</context>
           <context context-type="linenumber">3</context>
         </context-group>
-        <target state="translated">Took the telescope</target>
+        <target state="final">Took the telescope</target>
       </trans-unit>
-      <trans-unit id="1528564057900299455" datatype="html">
+      <trans-unit id="1528564057900299455" datatype="html" approved="yes">
         <source>N&apos;ont pas pris le télescope</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/my-town/statistics/registry/telescope/telescope-registry.component.html</context>
           <context context-type="linenumber">11</context>
         </context-group>
-        <target state="translated">Didn't take the telescope</target>
+        <target state="final">Didn't take the telescope</target>
       </trans-unit>
-      <trans-unit id="6303237973918422932" datatype="html">
+      <trans-unit id="6303237973918422932" datatype="html" approved="yes">
         <source>{VAR_PLURAL, plural, =0 {ration prise} =1 {ration prise} other {rations prises}}</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/my-town/statistics/registry/well/well-registry.component.html</context>
           <context context-type="linenumber">3</context>
         </context-group>
-        <target state="needs-translation">{VAR_PLURAL, plural, =0 {ration prise} =1 {ration prise} other {rations prises}}</target>
+        <target state="final">{VAR_PLURAL, plural, =0 {ration taken} =1 {ration taken} other {rations taken}}</target>
       </trans-unit>
       <trans-unit id="4328738626502194147" datatype="html">
         <source>Direction</source>
@@ -3085,7 +3109,8 @@
           <context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.ts</context>
           <context context-type="linenumber">262</context>
         </context-group>
-        <target state="final">This list has been managed from the MyHordes Optimizer website. You can find it by following [link=<x id="PH" equiv-text="environment.website_url"/>
+        <target state="final">This list has been managed from the MyHordes Optimizer website. You can find it by following [link=
+                    <x id="PH" equiv-text="environment.website_url"/>
                     my-town/wishlist]this link[/link]
                 </target>
       </trans-unit>
@@ -3258,7 +3283,8 @@
           <context context-type="sourcefile">src/app/shared/elements/last-update/last-update.component.html</context>
           <context context-type="linenumber">34</context>
         </context-group>
-        <target state="final">Updated by <x id="INTERPOLATION" equiv-text="{{lastUpdateInfo?.username}}"/> <x id="INTERPOLATION_1" equiv-text="{{lastUpdateInfo?.update_time?.fromNow()}}"/>
+        <target state="final">Updated by <x id="INTERPOLATION" equiv-text="{{lastUpdateInfo?.username}}"/> 
+                    <x id="INTERPOLATION_1" equiv-text="{{lastUpdateInfo?.update_time?.fromNow()}}"/>
                      (<x id="INTERPOLATION_2" equiv-text="{{lastUpdateInfo?.update_time?.toDate() | date:'medium'}}"/>)
                 </target>
       </trans-unit>
@@ -3771,7 +3797,7 @@
         </context-group>
         <target state="final">External Tools</target>
       </trans-unit>
-      <trans-unit id="3342946597539953688" datatype="html">
+      <trans-unit id="3342946597539953688" datatype="html" approved="yes">
         <source>Affichage</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/structure/menu/menu.component.ts</context>
@@ -3785,7 +3811,7 @@
           <context context-type="sourcefile">src/app/tutorials/tutorials.routes.ts</context>
           <context context-type="linenumber">26</context>
         </context-group>
-        <target state="needs-translation">Affichage</target>
+        <target state="final">Display</target>
       </trans-unit>
       <trans-unit id="5851560788527570644" datatype="html" approved="yes">
         <source>Notifications</source>
@@ -3967,7 +3993,8 @@
         </context-group>
         <target state="translated">(
                     <x id="INTERPOLATION" equiv-text="{{ bonus_string }}"/>
-                    <x id="INTERPOLATION_1" equiv-text="{{ bonus.zombie_vest | campingDisplayBonus:display_bonus_ap:locale }}"/> par zombie au lieu de <x id="INTERPOLATION_2" equiv-text="{{                                         bonus.zombie_no_vest | campingDisplayBonus:display_bonus_ap:locale                                     }}"/>
+                    <x id="INTERPOLATION_1" equiv-text="{{ bonus.zombie_vest | campingDisplayBonus:display_bonus_ap:locale }}"/> par zombie au lieu de 
+                    <x id="INTERPOLATION_2" equiv-text="{{                                         bonus.zombie_no_vest | campingDisplayBonus:display_bonus_ap:locale                                     }}"/>
                     )
                 </target>
       </trans-unit>
@@ -4520,7 +4547,8 @@ Total
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-alerts/tuto-script-alerts.component.ts</context>
           <context context-type="linenumber">38</context>
         </context-group>
-        <target state="final">If you check the "Notify me at the end of the search", you will receive a notification from your browser a few seconds
+        <target state="final">If you check the "Notify me at the end of the search", you will receive a notification from your browser a few
+                    seconds
                     before the end of your search, provided that your browser is still open on the desert page.
                 </target>
       </trans-unit>
@@ -5152,7 +5180,7 @@ Total
                     &lt;/ul&gt;
                 </target>
       </trans-unit>
-      <trans-unit id="4825738638801021695" datatype="html">
+      <trans-unit id="4825738638801021695" datatype="html" approved="yes">
         <source>&lt;ul&gt;
                     &lt;li&gt;Télécharger l’application &quot;UserScripts&quot; ;&lt;/li&gt;
                     &lt;li&gt;Aller dans &quot;Fichiers&quot; ;&lt;/li&gt;
@@ -5178,24 +5206,24 @@ Total
                     </context>
           <context context-type="linenumber">47,63</context>
         </context-group>
-        <target state="needs-translation">&lt;ul&gt;
-                    &lt;li&gt;Télécharger l’application "UserScripts" ;&lt;/li&gt;
-                    &lt;li&gt;Aller dans "Fichiers" ;&lt;/li&gt;
-                    &lt;li&gt;Créer un dossier que l’on appellera "UserScripts" (ou autre mais c’est pour mieux s’y retrouver) ;&lt;/li&gt;
-                    &lt;li&gt;Ouvrir l’application "UserScripts" ;&lt;/li&gt;
-                    &lt;li&gt;Appuyer sur "Set Userscripts Directory" ;&lt;/li&gt;
-                    &lt;li&gt;Sélectionner le dossier précédemment créé et valider ;&lt;/li&gt;
-                    &lt;li&gt;Enregistrer le fichier disponible sur le
+        <target state="final">&lt;ul&gt;
+                    &lt;li&gt;Download the "UserScripts" application;&lt;/li&gt;
+                    &lt;li&gt;Go to "Files";&lt;/li&gt;
+                    &lt;li&gt;Create a folder that we will call "UserScripts" (or something else, but it's just to make it easier to find your way around);&lt;/li&gt;
+                    &lt;li&gt;Open the "UserScripts" application;&lt;/li&gt;
+                    &lt;li&gt;Press "Set Userscripts Directory";&lt;/li&gt;
+                    &lt;li&gt;Select the folder previously created and validate;&lt;/li&gt;
+                    &lt;li&gt;Save the file available on the
                     <x id="PH" equiv-text="this.download_link"/>
-                    (ou via un appui long sur le lien, peut être);&lt;/li&gt;
-                    &lt;li&gt;Déplacer le fichier dans le dossier créé ;&lt;/li&gt;
-                    &lt;li&gt;Aller sur Safari ;&lt;/li&gt;
-                    &lt;li&gt;Appuyer sur le "Aa" dans la barre de recherche ;&lt;/li&gt;
-                    &lt;li&gt;Cliquer sur "Gérer les extensions" ;&lt;/li&gt;
-                    &lt;li&gt;Activer "Userscripts" ;&lt;/li&gt;
-                    &lt;li&gt;Appuyer sur le "Aa" dans la barre de recherche ;&lt;/li&gt;
-                    &lt;li&gt;Cliquer sur "Userscripts" ;&lt;/li&gt;
-                    &lt;li&gt;Vérifier que "MyHordes Optimizer" est bien activé.&lt;/li&gt;
+                    (or by long-pressing the link, maybe);&lt;/li&gt;
+                    &lt;li&gt;Move the file to the created folder;&lt;/li&gt;
+                    &lt;li&gt;Go to Safari;&lt;/li&gt;
+                    &lt;li&gt;Press the "Aa" in the search bar;&lt;/li&gt;
+                    &lt;li&gt;Click on "Manage extensions";&lt;/li&gt;
+                    &lt;li&gt;Activate "Userscripts";&lt;/li&gt;
+                    &lt;li&gt;Press the "Aa" in the search bar;&lt;/li&gt;
+                    &lt;li&gt;Click on "Userscripts";&lt;/li&gt;
+                    &lt;li&gt;Check that "MyHordes Optimizer" is activated.&lt;/li&gt;
                     &lt;/ul&gt;
                 </target>
       </trans-unit>
@@ -5228,7 +5256,8 @@ Total
                     </context>
           <context context-type="linenumber">76</context>
         </context-group>
-        <target state="final">Once the script has been installed, you will need to refresh the game's page. You will see a new button at the top of your
+        <target state="final">Once the script has been installed, you will need to refresh the game's page. You will see a new button at the top of
+                    your
                     MyHordes page. On hover, a window is displayed, giving access to the script's options and some of its functionalities.
                 </target>
       </trans-unit>
@@ -5242,11 +5271,12 @@ Total
                     </context>
           <context context-type="linenumber">77</context>
         </context-group>
-        <target state="final">Once the extension has been installed, you will have to refresh the game page. You will see a new button at the top of
+        <target state="final">Once the extension has been installed, you will have to refresh the game page. You will see a new button at the top
+                    of
                     your MyHordes page. On hover, a window is displayed, giving access to the script's options and some of its functionalities.
                 </target>
       </trans-unit>
-      <trans-unit id="317837542560103324" datatype="html">
+      <trans-unit id="317837542560103324" datatype="html" approved="yes">
         <source>Affiche la liste des objets de la banque et leur quantité.&lt;br /&gt;&lt;br /&gt;
                     Si vous êtes incarnés, les objets qui ne sont pas dans la liste de courses sont suivis d&apos;un bouton présentant un caddie. Un clic sur ce
                     bouton les ajoute à la liste de courses.
@@ -5255,20 +5285,19 @@ Total
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-tools/tuto-script-tools.component.ts</context>
           <context context-type="linenumber">30,31</context>
         </context-group>
-        <target state="needs-translation">Affiche la liste des objets de la banque et leur quantité.&lt;br /&gt;&lt;br /&gt;
-                    Si vous êtes incarnés, les objets qui ne sont pas dans la liste de courses sont suivis d'un bouton présentant un caddie. Un clic sur ce
-                    bouton les ajoute à la liste de courses.
+        <target state="final">Displays a list of items in the bank and their quantity.&lt;br /&gt;&lt;br /&gt;
+                    If you are incarnated, items that are not on the shopping list are followed by a button with a shopping cart. Clicking this button adds them to the shopping list.
                 </target>
       </trans-unit>
-      <trans-unit id="3388979422666988091" datatype="html">
+      <trans-unit id="3388979422666988091" datatype="html" approved="yes">
         <source>Affiche un outil de prédiction des chances de survie en camping.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-tools/tuto-script-tools.component.ts</context>
           <context context-type="linenumber">35</context>
         </context-group>
-        <target state="needs-translation">Affiche un outil de prédiction des chances de survie en camping.</target>
+        <target state="final">Displays a camping survival prediction tool.</target>
       </trans-unit>
-      <trans-unit id="8845542294305545291" datatype="html">
+      <trans-unit id="8845542294305545291" datatype="html" approved="yes">
         <source>Affiche la liste de tous les objets existant dans MyHordes (ainsi que des informations complémentaires à leur sujet).&lt;br /&gt;&lt;br
                     /&gt;
                     Si vous êtes incarné, les objets qui ne sont pas dans la liste de courses sont suivis d&apos;un bouton présentant un caddie. Un clic sur ce
@@ -5278,10 +5307,10 @@ Total
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-wiki/tuto-script-wiki.component.ts</context>
           <context context-type="linenumber">30,31</context>
         </context-group>
-        <target state="needs-translation">Affiche la liste de tous les objets existant dans MyHordes (ainsi que des informations complémentaires à leur sujet).&lt;br /&gt;&lt;br
+        <target state="final">Displays a list of all items in MyHordes (along with additional information about them).
+&lt;br /&gt;&lt;br
                     /&gt;
-                    Si vous êtes incarné, les objets qui ne sont pas dans la liste de courses sont suivis d'un bouton présentant un caddie. Un clic sur ce
-                    bouton les ajoute à la liste de courses.
+                    If you are incarnated, items that are not in the shopping list will have a shopping cart button next to them. Clicking this button will add them to the shopping list.
                 </target>
       </trans-unit>
       <trans-unit id="6739215722471437099" datatype="html" approved="yes">
@@ -5292,15 +5321,15 @@ Total
         </context-group>
         <target state="final">Shows a list of all the recipes in the app.</target>
       </trans-unit>
-      <trans-unit id="1998145900290430095" datatype="html">
+      <trans-unit id="1998145900290430095" datatype="html" approved="yes">
         <source>Présente tout simplement la liste des pouvoirs héros, leur description et le nombre de jours avant obtention.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-wiki/tuto-script-wiki.component.ts</context>
           <context context-type="linenumber">39</context>
         </context-group>
-        <target state="needs-translation">Présente tout simplement la liste des pouvoirs héros, leur description et le nombre de jours avant obtention.</target>
+        <target state="final">Simply presents the list of skills, their description and the number of days before obtaining them.</target>
       </trans-unit>
-      <trans-unit id="6025454850778679368" datatype="html">
+      <trans-unit id="6025454850778679368" datatype="html" approved="yes">
         <source>Affiche la liste de tous les bâtiments existant dans le jeu, leur distance de la ville, ainsi que la liste des objets qu&apos;on peut
                     obtenir en les fouillant et leurs probabilités d&apos;obtention.
                 </source>
@@ -5308,9 +5337,7 @@ Total
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-wiki/tuto-script-wiki.component.ts</context>
           <context context-type="linenumber">43</context>
         </context-group>
-        <target state="needs-translation">Affiche la liste de tous les bâtiments existant dans le jeu, leur distance de la ville, ainsi que la liste des objets qu'on peut
-                    obtenir en les fouillant et leurs probabilités d'obtention.
-                </target>
+        <target state="final">Displays a list of all buildings in the game, their distance from the city, as well as a list of items that can be obtained by searching them and their drop probabilities.                </target>
       </trans-unit>
       <trans-unit id="6781675583173132570" datatype="html" approved="yes">
         <source>Première utilisation du site</source>
@@ -5328,7 +5355,8 @@ Total
           <context context-type="sourcefile">src/app/tutorials/site/tuto-site-first-use/tuto-site-first-use.component.ts</context>
           <context context-type="linenumber">28</context>
         </context-group>
-        <target state="final">When you first come to this website, you won't have access to the pages under the menu "My Town". To get access, you need
+        <target state="final">When you first come to this website, you won't have access to the pages under the menu "My Town". To get access, you
+                    need
                     to enter your external ID for apps at the top right of the page.
                 </target>
       </trans-unit>
@@ -5340,7 +5368,8 @@ Total
           <context context-type="sourcefile">src/app/tutorials/site/tuto-site-first-use/tuto-site-first-use.component.ts</context>
           <context context-type="linenumber">29</context>
         </context-group>
-        <target state="final">The external ID apps can be found on the MyHordes website. You need to go to your soul, then click on the "Settings" tab,
+        <target state="final">The external ID apps can be found on the MyHordes website. You need to go to your soul, then click on the "Settings"
+                    tab,
                     then "Advanced". Once your ID copied, simply paste it into the MyHordes Optimizer's field and save it.
                 </target>
       </trans-unit>
