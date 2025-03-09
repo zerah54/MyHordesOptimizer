@@ -58,7 +58,8 @@
           <context context-type="sourcefile">src/app/_abstract_model/enum/action.enum.ts</context>
           <context context-type="linenumber">44</context>
         </context-group>
-        <target state="final">Devuelve un punto a los puntos de acción a cualquiera en la ciudad de su límite máximo de puntos de acción. Devuelve dos
+        <target state="final">Devuelve un punto a los puntos de acción a cualquiera en la ciudad de su límite máximo de puntos de acción. Devuelve
+                    dos
                     puntos de acción a los ciudadanos que hayan estado bajo los efectos del alcohol o de droga
                 </target>
       </trans-unit>
@@ -852,14 +853,6 @@
         </context-group>
         <target state="needs-translation">Classique</target>
       </trans-unit>
-      <trans-unit id="9167746305089829427" datatype="html">
-        <source>MyHordes</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/games/minesweeper/minesweeper.component.ts</context>
-          <context context-type="linenumber">42</context>
-        </context-group>
-        <target state="needs-translation">MyHordes</target>
-      </trans-unit>
       <trans-unit id="7514759768535181311" datatype="html">
         <source>IRL</source>
         <context-group purpose="location">
@@ -1304,6 +1297,30 @@
         </context-group>
         <target state="needs-translation">Mode liste</target>
       </trans-unit>
+      <trans-unit id="3907766170797643122" datatype="html">
+        <source>Pseudo</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/my-town/citizens/citizens-watch/citizens-watch.component.html</context>
+          <context context-type="linenumber">7</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/my-town/statistics/registry/registry.component.html</context>
+          <context context-type="linenumber">4</context>
+        </context-group>
+        <target state="needs-translation">Pseudo</target>
+      </trans-unit>
+      <trans-unit id="1199075748231436486" datatype="html">
+        <source>Identifiant MyHordes</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/my-town/citizens/citizens-watch/citizens-watch.component.html</context>
+          <context context-type="linenumber">8</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/my-town/statistics/registry/registry.component.html</context>
+          <context context-type="linenumber">5</context>
+        </context-group>
+        <target state="needs-translation">Identifiant MyHordes</target>
+      </trans-unit>
       <trans-unit id="2316658858794336931" datatype="html">
         <source>Jour</source>
         <context-group purpose="location">
@@ -1727,6 +1744,14 @@
           <context context-type="linenumber">319</context>
         </context-group>
         <target state="needs-translation">Consignes de l'expédition</target>
+      </trans-unit>
+      <trans-unit id="8387602136843548693" datatype="html">
+        <source>Pas de consigne.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/my-town/expeditions/expeditions.component.html</context>
+          <context context-type="linenumber">355</context>
+        </context-group>
+        <target state="needs-translation">Pas de consigne.</target>
       </trans-unit>
       <trans-unit id="1734510160431147499" datatype="html">
         <source>Ajouter une partie à l&apos;expédition</source>
@@ -3970,7 +3995,8 @@
         </context-group>
         <target state="translated">(
                     <x id="INTERPOLATION" equiv-text="{{ bonus_string }}"/>
-                    <x id="INTERPOLATION_1" equiv-text="{{ bonus.zombie_vest | campingDisplayBonus:display_bonus_ap:locale }}"/> par zombie au lieu de <x id="INTERPOLATION_2" equiv-text="{{                                         bonus.zombie_no_vest | campingDisplayBonus:display_bonus_ap:locale                                     }}"/>
+                    <x id="INTERPOLATION_1" equiv-text="{{ bonus.zombie_vest | campingDisplayBonus:display_bonus_ap:locale }}"/> par zombie au lieu de 
+                    <x id="INTERPOLATION_2" equiv-text="{{                                         bonus.zombie_no_vest | campingDisplayBonus:display_bonus_ap:locale                                     }}"/>
                     )
                 </target>
       </trans-unit>
