@@ -51,7 +51,7 @@ async function initLanguage(locale: string): Promise<void> {
         return;
     }
 
-    const json: Record<string, string> = await fetch(`/public/i18n/xlf-files/messages.${locale}.xlf`)
+    const json: Record<string, string> = await fetch(`i18n/xlf-files/messages.${locale}.xlf`)
         .then((response: Response) => response.text())
         .then((file_content: string) => xliffToJson(file_content));
 
