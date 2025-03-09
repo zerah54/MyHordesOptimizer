@@ -1338,17 +1338,27 @@
             <trans-unit id="3907766170797643122" datatype="html">
                 <source>Pseudo</source>
                 <target state="new">Pseudo</target>
+
                 <context-group purpose="location">
                     <context context-type="sourcefile">src/app/my-town/citizens/citizens-watch/citizens-watch.component.html</context>
                     <context context-type="linenumber">7</context>
+                </context-group>
+                <context-group purpose="location">
+                    <context context-type="sourcefile">src/app/my-town/statistics/registry/registry.component.html</context>
+                    <context context-type="linenumber">4</context>
                 </context-group>
             </trans-unit>
             <trans-unit id="1199075748231436486" datatype="html">
                 <source>Identifiant MyHordes</source>
                 <target state="new">Identifiant MyHordes</target>
+
                 <context-group purpose="location">
                     <context context-type="sourcefile">src/app/my-town/citizens/citizens-watch/citizens-watch.component.html</context>
                     <context context-type="linenumber">8</context>
+                </context-group>
+                <context-group purpose="location">
+                    <context context-type="sourcefile">src/app/my-town/statistics/registry/registry.component.html</context>
+                    <context context-type="linenumber">5</context>
                 </context-group>
             </trans-unit>
             <trans-unit id="2316658858794336931" datatype="html" approved="yes">
@@ -1551,6 +1561,8 @@
 
 
                 <target state="final">Copy to forum format</target>
+
+
                 <context-group purpose="location">
                     <context context-type="sourcefile">src/app/my-town/expeditions/expeditions.component.html</context>
                     <context context-type="linenumber">4</context>
@@ -4557,6 +4569,8 @@
 
 
                 <target state="needs-translation">Choisir le mode de partage</target>
+
+
                 <context-group purpose="location">
                     <context context-type="sourcefile">
                         src/app/tutorials/discord-bot/tuto-discord-bot-installation/tuto-discord-bot-installation.component.html
@@ -4599,6 +4613,8 @@
 
 
                 <target state="translated">Copy URL</target>
+
+
                 <context-group purpose="location">
                     <context context-type="sourcefile">
                         src/app/tutorials/discord-bot/tuto-discord-bot-installation/tuto-discord-bot-installation.component.html
@@ -4615,6 +4631,8 @@
 
 
                 <target state="needs-translation">Copier au format forum</target>
+
+
                 <context-group purpose="location">
                     <context context-type="sourcefile">
                         src/app/tutorials/discord-bot/tuto-discord-bot-installation/tuto-discord-bot-installation.component.html
@@ -4631,6 +4649,7 @@
 
                 <target state="final">Installing Bot on a Discord Server</target>
 
+
                 <context-group purpose="location">
                     <context context-type="sourcefile">src/app/tutorials/discord-bot/tuto-discord-bot-installation/tuto-discord-bot-installation.component.ts
                     </context>
@@ -4646,6 +4665,7 @@
                     target="_blank">lien d'installation du bot&lt;/a>
                 </target>
 
+
                 <context-group purpose="location">
                     <context context-type="sourcefile">src/app/tutorials/discord-bot/tuto-discord-bot-installation/tuto-discord-bot-installation.component.ts
                     </context>
@@ -4656,6 +4676,7 @@
                 <source>Vous devez être propriétaire ou avoir les droits d'administration sur le serveur Discord sur lequel vous voulez inviter le Bot.</source>
 
                 <target state="final">You must own or have admin rights on the Discord server you want to invite the bot to.</target>
+
 
                 <context-group purpose="location">
                     <context context-type="sourcefile">src/app/tutorials/discord-bot/tuto-discord-bot-installation/tuto-discord-bot-installation.component.ts
@@ -4670,6 +4691,7 @@
                 <target state="needs-translation">En cliquant sur le<x id="PH" equiv-text="this.download_link"/>, vous serez redirigé vers une page
                     d'installation.
                 </target>
+
 
                 <context-group purpose="location">
                     <context context-type="sourcefile">src/app/tutorials/discord-bot/tuto-discord-bot-installation/tuto-discord-bot-installation.component.ts
@@ -4821,6 +4843,8 @@
 
 
                 <target state="final">Copy URL</target>
+
+
                 <context-group purpose="location">
                     <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-display/tuto-script-display.component.html</context>
                     <context context-type="linenumber">8</context>
@@ -5219,6 +5243,7 @@
                     sera automatiquement rafraîchi.
                 </target>
 
+
                 <context-group purpose="location">
                     <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-external-tools/tuto-script-external-tools.component.ts
                     </context>
@@ -5262,6 +5287,7 @@
                     &lt;/ul>
                 </target>
 
+
                 <context-group purpose="location">
                     <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-external-tools/tuto-script-external-tools.component.ts
                     </context>
@@ -5295,6 +5321,7 @@
                     &lt;/ul>
                 </target>
 
+
                 <context-group purpose="location">
                     <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-external-tools/tuto-script-external-tools.component.ts
                     </context>
@@ -5309,6 +5336,7 @@
                 <target state="needs-translation">En cochant l'option "Mettre à jour BigBroth'Hordes", quand vous cliquerez sur le bouton "Mettre à jour les
                     outils externes", la mise à jour de BigBroth'Hordes se fera automatiquement.
                 </target>
+
 
                 <context-group purpose="location">
                     <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-external-tools/tuto-script-external-tools.component.ts
@@ -5325,6 +5353,7 @@
                     updated automatically.
                 </target>
 
+
                 <context-group purpose="location">
                     <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-external-tools/tuto-script-external-tools.component.ts
                     </context>
@@ -5335,6 +5364,7 @@
                 <source>Affichage des cartes issues des outils externes</source>
 
                 <target state="needs-translation">Affichage des cartes issues des outils externes</target>
+
 
                 <context-group purpose="location">
                     <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-external-tools/tuto-script-external-tools.component.ts
@@ -5369,6 +5399,7 @@
                     carte.
                 </target>
 
+
                 <context-group purpose="location">
                     <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-external-tools/tuto-script-external-tools.component.ts
                     </context>
@@ -5379,6 +5410,7 @@
                 <source>Installation de l'extension de navigateur</source>
 
                 <target state="needs-translation">Installation de l'extension de navigateur</target>
+
                 <context-group purpose="location">
                     <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-installation/tuto-script-installation.component.html
                     </context>
@@ -5389,6 +5421,7 @@
                 <source>Installation du script</source>
 
                 <target state="final">Script Installation</target>
+
                 <context-group purpose="location">
                     <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-installation/tuto-script-installation.component.html
                     </context>
@@ -5404,6 +5437,7 @@
                     href="https://github.com/zerah54/MyHordesOptimizer/raw/main/Scripts/Tampermonkey/my_hordes_optimizer.user.js"
                     target="_blank">lien de téléchargement du script&lt;/a>
                 </target>
+
 
                 <context-group purpose="location">
                     <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-installation/tuto-script-installation.component.ts
@@ -5436,6 +5470,7 @@
 
                 <target state="final">Computer</target>
 
+
                 <context-group purpose="location">
                     <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-installation/tuto-script-installation.component.ts
                     </context>
@@ -5452,6 +5487,7 @@
                     par exemple Tampermonkey ou Violentmonkey. Ensuite, il suffit de cliquer sur le<x id="PH" equiv-text="this.download_link"/>, qui lancera la
                     procédure d'installation. Enfin, il faudra confirmer dans la page qui se sera ouverte.
                 </target>
+
 
                 <context-group purpose="location">
                     <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-installation/tuto-script-installation.component.ts
@@ -5484,6 +5520,7 @@
                     &lt;li>Confirmer l'installation dans la page qui se sera ouverte.&lt;/li>
                     &lt;/ul>
                 </target>
+
 
                 <context-group purpose="location">
                     <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-installation/tuto-script-installation.component.ts
@@ -5534,6 +5571,7 @@
                     &lt;/ul>
                 </target>
 
+
                 <context-group purpose="location">
                     <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-installation/tuto-script-installation.component.ts
                     </context>
@@ -5574,6 +5612,7 @@
                     MyHordes page. On hover, a window is displayed, giving access to the script's options and some of its functionalities.
                 </target>
 
+
                 <context-group purpose="location">
                     <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-installation/tuto-script-installation.component.ts
                     </context>
@@ -5589,6 +5628,7 @@
                     of
                     your MyHordes page. On hover, a window is displayed, giving access to the script's options and some of its functionalities.
                 </target>
+
 
                 <context-group purpose="location">
                     <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-installation/tuto-script-installation.component.ts
@@ -5774,6 +5814,7 @@
                 <source>Calculateur de morts par désespoir</source>
 
                 <target state="final">Death by despair calculator</target>
+
                 <context-group purpose="location">
                     <context context-type="sourcefile">src/app/wiki/miscellaneous-info/despair-deaths-calculator/despair-deaths-calculator.component.html
                     </context>
@@ -5784,6 +5825,7 @@
                 <source>Zombies sur la case</source>
 
                 <target state="final">Zombies in the square</target>
+
                 <context-group purpose="location">
                     <context context-type="sourcefile">src/app/wiki/miscellaneous-info/despair-deaths-calculator/despair-deaths-calculator.component.html
                     </context>
@@ -5794,6 +5836,7 @@
                 <source>Zombies morts dans la nuit</source>
 
                 <target state="final">Zombies dead during the night</target>
+
                 <context-group purpose="location">
                     <context context-type="sourcefile">src/app/wiki/miscellaneous-info/despair-deaths-calculator/despair-deaths-calculator.component.html
                     </context>
@@ -5804,6 +5847,7 @@
                 <source>Zombies tués</source>
 
                 <target state="final">Zombies killed</target>
+
                 <context-group purpose="location">
                     <context context-type="sourcefile">src/app/wiki/miscellaneous-info/despair-deaths-calculator/despair-deaths-calculator.component.html
                     </context>
@@ -5814,6 +5858,7 @@
                 <source>Jour J</source>
 
                 <target state="final">D-Day</target>
+
 
                 <context-group purpose="location">
                     <context context-type="sourcefile">src/app/wiki/miscellaneous-info/despair-deaths-calculator/despair-deaths-calculator.component.ts
@@ -5829,6 +5874,7 @@
                 <target state="needs-translation">Jour J +
                     <x id="PH" equiv-text="i"/>
                 </target>
+
 
                 <context-group purpose="location">
                     <context context-type="sourcefile">src/app/wiki/miscellaneous-info/despair-deaths-calculator/despair-deaths-calculator.component.ts

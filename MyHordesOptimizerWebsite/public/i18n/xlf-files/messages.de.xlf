@@ -1339,17 +1339,27 @@
             <trans-unit id="3907766170797643122" datatype="html">
                 <source>Pseudo</source>
                 <target state="new">Pseudo</target>
+
                 <context-group purpose="location">
                     <context context-type="sourcefile">src/app/my-town/citizens/citizens-watch/citizens-watch.component.html</context>
                     <context context-type="linenumber">7</context>
+                </context-group>
+                <context-group purpose="location">
+                    <context context-type="sourcefile">src/app/my-town/statistics/registry/registry.component.html</context>
+                    <context context-type="linenumber">4</context>
                 </context-group>
             </trans-unit>
             <trans-unit id="1199075748231436486" datatype="html">
                 <source>Identifiant MyHordes</source>
                 <target state="new">Identifiant MyHordes</target>
+
                 <context-group purpose="location">
                     <context context-type="sourcefile">src/app/my-town/citizens/citizens-watch/citizens-watch.component.html</context>
                     <context context-type="linenumber">8</context>
+                </context-group>
+                <context-group purpose="location">
+                    <context context-type="sourcefile">src/app/my-town/statistics/registry/registry.component.html</context>
+                    <context context-type="linenumber">5</context>
                 </context-group>
             </trans-unit>
             <trans-unit id="2316658858794336931" datatype="html" approved="yes">
@@ -1552,6 +1562,8 @@
 
 
                 <target state="final">In Forum-Format kopieren</target>
+
+
                 <context-group purpose="location">
                     <context context-type="sourcefile">src/app/my-town/expeditions/expeditions.component.html</context>
                     <context context-type="linenumber">4</context>
@@ -4562,6 +4574,8 @@
 
 
                 <target state="final">Sharing-Modus wählen</target>
+
+
                 <context-group purpose="location">
                     <context context-type="sourcefile">
                         src/app/tutorials/discord-bot/tuto-discord-bot-installation/tuto-discord-bot-installation.component.html
@@ -4604,6 +4618,8 @@
 
 
                 <target state="translated">URL kopieren</target>
+
+
                 <context-group purpose="location">
                     <context context-type="sourcefile">
                         src/app/tutorials/discord-bot/tuto-discord-bot-installation/tuto-discord-bot-installation.component.html
@@ -4620,6 +4636,8 @@
 
 
                 <target state="translated">In Forum-Format kopieren</target>
+
+
                 <context-group purpose="location">
                     <context context-type="sourcefile">
                         src/app/tutorials/discord-bot/tuto-discord-bot-installation/tuto-discord-bot-installation.component.html
@@ -4636,6 +4654,7 @@
 
                 <target state="final">Installation des Bots auf einem Discord-Server</target>
 
+
                 <context-group purpose="location">
                     <context context-type="sourcefile">src/app/tutorials/discord-bot/tuto-discord-bot-installation/tuto-discord-bot-installation.component.ts
                     </context>
@@ -4651,6 +4670,7 @@
                     target="_blank">lien d'installation du bot&lt;/a>
                 </target>
 
+
                 <context-group purpose="location">
                     <context context-type="sourcefile">src/app/tutorials/discord-bot/tuto-discord-bot-installation/tuto-discord-bot-installation.component.ts
                     </context>
@@ -4663,6 +4683,7 @@
                 <target state="final">Sie müssen Eigentümer des Discord-Servers sein, auf den Sie den Bot einladen wollen, oder über Administratorrechte
                     verfügen.
                 </target>
+
 
                 <context-group purpose="location">
                     <context context-type="sourcefile">src/app/tutorials/discord-bot/tuto-discord-bot-installation/tuto-discord-bot-installation.component.ts
@@ -4678,6 +4699,7 @@
                     <x id="PH" equiv-text="this.download_link"/>
                     werden Sie zur Installationsseite weitergeleitet.
                 </target>
+
 
                 <context-group purpose="location">
                     <context context-type="sourcefile">src/app/tutorials/discord-bot/tuto-discord-bot-installation/tuto-discord-bot-installation.component.ts
@@ -4832,6 +4854,8 @@
 
 
                 <target state="final">URL kopieren</target>
+
+
                 <context-group purpose="location">
                     <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-display/tuto-script-display.component.html</context>
                     <context context-type="linenumber">8</context>
@@ -5234,6 +5258,7 @@
                     dieser automatisch aktualisiert.
                 </target>
 
+
                 <context-group purpose="location">
                     <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-external-tools/tuto-script-external-tools.component.ts
                     </context>
@@ -5280,6 +5305,7 @@
                     speziellen Karte wiederzugeben&lt;/li>&lt;/ul>
                 </target>
 
+
                 <context-group purpose="location">
                     <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-external-tools/tuto-script-external-tools.component.ts
                     </context>
@@ -5313,6 +5339,7 @@
                     &lt;/ul>
                 </target>
 
+
                 <context-group purpose="location">
                     <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-external-tools/tuto-script-external-tools.component.ts
                     </context>
@@ -5329,6 +5356,7 @@
                     die Schaltfläche "Externe Tools aktualisieren" klickst.
                 </target>
 
+
                 <context-group purpose="location">
                     <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-external-tools/tuto-script-external-tools.component.ts
                     </context>
@@ -5344,6 +5372,7 @@
                     Schaltfläche "Externe Tools aktualisieren" klickst.
                 </target>
 
+
                 <context-group purpose="location">
                     <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-external-tools/tuto-script-external-tools.component.ts
                     </context>
@@ -5354,6 +5383,7 @@
                 <source>Affichage des cartes issues des outils externes</source>
 
                 <target state="final">Anzeige von Karten aus externen Tools</target>
+
 
                 <context-group purpose="location">
                     <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-external-tools/tuto-script-external-tools.component.ts
@@ -5387,6 +5417,7 @@
                     bewegt.
                 </target>
 
+
                 <context-group purpose="location">
                     <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-external-tools/tuto-script-external-tools.component.ts
                     </context>
@@ -5397,6 +5428,7 @@
                 <source>Installation de l'extension de navigateur</source>
 
                 <target state="final">Installation der Browser-Erweiterung</target>
+
                 <context-group purpose="location">
                     <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-installation/tuto-script-installation.component.html
                     </context>
@@ -5407,6 +5439,7 @@
                 <source>Installation du script</source>
 
                 <target state="final">Installation des Skripts</target>
+
                 <context-group purpose="location">
                     <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-installation/tuto-script-installation.component.html
                     </context>
@@ -5422,6 +5455,7 @@
                     href="https://github.com/zerah54/MyHordesOptimizer/raw/main/Scripts/Tampermonkey/my_hordes_optimizer.user.js"
                     target="_blank">lien de téléchargement du script&lt;/a>
                 </target>
+
 
                 <context-group purpose="location">
                     <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-installation/tuto-script-installation.component.ts
@@ -5454,6 +5488,7 @@
 
                 <target state="final">Computer</target>
 
+
                 <context-group purpose="location">
                     <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-installation/tuto-script-installation.component.ts
                     </context>
@@ -5470,6 +5505,7 @@
                     Violentmonkey. Dann klickst du einfach auf den<x id="PH" equiv-text="this.download_link"/>, der den Installationsvorgang startet.
                     Schließlich musst du auf der Seite, die sich geöffnet hat, die Installation bestätigen.
                 </target>
+
 
                 <context-group purpose="location">
                     <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-installation/tuto-script-installation.component.ts
@@ -5502,6 +5538,7 @@
                     &lt;li>Bestätige die Installation auf der Seite, die sich geöffnet hat.&lt;/li>
                     &lt;/ul>
                 </target>
+
 
                 <context-group purpose="location">
                     <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-installation/tuto-script-installation.component.ts
@@ -5552,6 +5589,7 @@
                     &lt;/ul>
                 </target>
 
+
                 <context-group purpose="location">
                     <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-installation/tuto-script-installation.component.ts
                     </context>
@@ -5592,6 +5630,7 @@
                     einige seiner Funktionen bietet.
                 </target>
 
+
                 <context-group purpose="location">
                     <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-installation/tuto-script-installation.component.ts
                     </context>
@@ -5608,6 +5647,7 @@
                     auf Ihrer MyHordes-Seite sehen. Beim Mouseover öffnet sich ein Fenster, das Zugriff auf die Optionen des Skripts und einige seiner
                     Funktionen bietet.
                 </target>
+
 
                 <context-group purpose="location">
                     <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-installation/tuto-script-installation.component.ts
@@ -5792,6 +5832,7 @@
                 <source>Calculateur de morts par désespoir</source>
 
                 <target state="final">Rechner für Tote Zombies durch Abwanderung</target>
+
                 <context-group purpose="location">
                     <context context-type="sourcefile">src/app/wiki/miscellaneous-info/despair-deaths-calculator/despair-deaths-calculator.component.html
                     </context>
@@ -5802,6 +5843,7 @@
                 <source>Zombies sur la case</source>
 
                 <target state="final">Zombies auf dem Feld</target>
+
                 <context-group purpose="location">
                     <context context-type="sourcefile">src/app/wiki/miscellaneous-info/despair-deaths-calculator/despair-deaths-calculator.component.html
                     </context>
@@ -5812,6 +5854,7 @@
                 <source>Zombies morts dans la nuit</source>
 
                 <target state="final">Zombies, die in der Nacht sterben</target>
+
                 <context-group purpose="location">
                     <context context-type="sourcefile">src/app/wiki/miscellaneous-info/despair-deaths-calculator/despair-deaths-calculator.component.html
                     </context>
@@ -5822,6 +5865,7 @@
                 <source>Zombies tués</source>
 
                 <target state="final">Zombies getötet</target>
+
                 <context-group purpose="location">
                     <context context-type="sourcefile">src/app/wiki/miscellaneous-info/despair-deaths-calculator/despair-deaths-calculator.component.html
                     </context>
@@ -5832,6 +5876,7 @@
                 <source>Jour J</source>
 
                 <target state="final">Tag X</target>
+
 
                 <context-group purpose="location">
                     <context context-type="sourcefile">src/app/wiki/miscellaneous-info/despair-deaths-calculator/despair-deaths-calculator.component.ts
@@ -5847,6 +5892,7 @@
                 <target state="translated">Tag X +
                     <x id="PH" equiv-text="i"/>
                 </target>
+
 
                 <context-group purpose="location">
                     <context context-type="sourcefile">src/app/wiki/miscellaneous-info/despair-deaths-calculator/despair-deaths-calculator.component.ts
