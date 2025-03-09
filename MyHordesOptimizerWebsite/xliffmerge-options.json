@@ -2,7 +2,7 @@
     "xliffmergeOptions": {
         "i18nFormat": "xlf",
         "srcDir": "src/i18n",
-        "genDir": "src/assets/i18n/xlf-files",
+        "genDir": "public/i18n/xlf-files",
         "defaultLanguage": "fr",
         "languages": [
             "en",

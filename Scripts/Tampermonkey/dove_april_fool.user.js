@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Dove April's Fool
-// @version      1.0.0
+// @version      1.0.1
 // @description  Une petite blague ?
 // @author       Zerah
 //
@@ -45,7 +45,7 @@ function pageIsConstructions() {
                         let requirements = crow_row.querySelector('.build-req-items');
                         if (requirements) {
                             let vh_img = requirements.querySelector('img[src*=item_hmeat]');
-                            vh_img.src = "https://myhordes-optimizer.web.app/assets/img/hordes_img/item/item_food_candies.gif";
+                            vh_img.src = "https://myhordes-optimizer.web.app/img/hordes_img/item/item_food_candies.gif";
                         }
                     }
                 }
