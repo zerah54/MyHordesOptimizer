@@ -1,6 +1,6 @@
 export interface UpdateInfoDTO {
     updateTime: Date;
     userId: string;
-    userName: string;
+    userName?: string;
     userKey: string;
 }

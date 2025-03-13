@@ -4,7 +4,7 @@ import { Pipe, PipeTransform } from '@angular/core';
     name: 'icon'
 })
 export class IconPipe<T> implements PipeTransform {
-    transform(object: string | T, bind_icon: string): string {
+    transform(object: string | T, bind_icon: string | undefined): string {
         if (!bind_icon || bind_icon === '') return <string>object;
         if (!object || object === '') return '';
 

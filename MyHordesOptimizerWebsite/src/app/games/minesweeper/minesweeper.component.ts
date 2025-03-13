@@ -39,7 +39,7 @@ export class MinesweeperComponent implements OnInit {
     public themes_list: MinesweeperTheme[] = [
         {id: 'legacy', label: $localize`Classique`, default: true},
         // { id: 'modern', label: $localize`Moderne` },
-        {id: 'myhordes', label: $localize`MyHordes`}
+        {id: 'myhordes', label: `MyHordes`}
     ];
     public selected_theme: MinesweeperTheme = this.themes_list.find((theme: MinesweeperTheme) => theme.default) ?? this.themes_list[0];
 

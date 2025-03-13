@@ -5,7 +5,7 @@ const user_script_file_name = 'my_hordes_optimizer.user.js'
 const target_dir = '../../Extensions/';
 const source_dir = '../Tampermonkey/';
 const source_file = source_dir + user_script_file_name;
-const icons_dir = '../../MyHordesOptimizerWebsite/src/assets/img/logo/';
+const icons_dir = '../../MyHordesOptimizerWebsite/public/img/logo/';
 
 fs.readFile(source_file, 'utf-8', (source_file_err, file_content) => {
     if (source_file_err) {

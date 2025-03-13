@@ -1,8 +1,8 @@
 <div class="mho-registry">
     <div class="display-pseudo-mode">
-        <mat-button-toggle-group [(ngModel)]="display_pseudo" name="fontStyle" aria-label="Font Style">
-            <mat-button-toggle value="simple">Pseudo</mat-button-toggle>
-            <mat-button-toggle value="mh_id">Identifiant MyHordes</mat-button-toggle>
+        <mat-button-toggle-group [(ngModel)]="display_pseudo" name="display_pseudo">
+            <mat-button-toggle value="simple" i18n>Pseudo</mat-button-toggle>
+            <mat-button-toggle value="mh_id" i18n>Identifiant MyHordes</mat-button-toggle>
         </mat-button-toggle-group>
     </div>
     <div class="form">
@@ -56,6 +56,10 @@
                 @case ('telescope') {
                     <mho-registry-telescope [completeCitizenList]="complete_citizen_list"
                                             [registry]="registry_entries" [displayPseudo]="display_pseudo"></mho-registry-telescope>
+                }
+                @case ('flag') {
+                    <mho-registry-flag [completeCitizenList]="complete_citizen_list"
+                                       [registry]="registry_entries" [displayPseudo]="display_pseudo"></mho-registry-flag>
                 }
                 @case ('buildings') {
                     <mho-registry-buildings [completeCitizenList]="complete_citizen_list"

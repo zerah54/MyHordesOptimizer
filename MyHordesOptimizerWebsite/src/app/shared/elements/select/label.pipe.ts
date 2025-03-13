@@ -4,7 +4,7 @@ import { Pipe, PipeTransform } from '@angular/core';
     name: 'label'
 })
 export class LabelPipe<T> implements PipeTransform {
-    transform(object: string | T, bind_label: string): string {
+    transform(object: string | T, bind_label: string | undefined): string {
         if (!bind_label) return <string>object;
 
         const label_levels: string[] = bind_label.split('.');
@@ -20,7 +20,7 @@ export class LabelPipe<T> implements PipeTransform {
     name: 'multipleLabel'
 })
 export class MultipleLabelPipe<T> implements PipeTransform {
-    transform(objects: string[] | T[], bind_label: string): string[] {
+    transform(objects: string[] | T[], bind_label: string | undefined): string[] {
         if (!bind_label) return <string[]>objects;
 
         const label_levels: string[] = bind_label.split('.');
