@@ -1,7 +1,7 @@
 .mho-states-management {
     margin-top: 1rem;
     display: flex;
-    gap: 32px; // Espace entre les colonnes
+    gap: 32px;
 
     .states-cards {
         flex: 1;
@@ -13,18 +13,29 @@
         padding: 1em;
 
         h3, h4 {
-            text-align: center; // Centre les titres et sous-titres
+            text-align: center;
+        }
+
+        .states-cards-origine {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+
+            mat-button-toggle-group {
+                width: fit-content;
+            }
         }
 
         .states-cards-current {
             display: flex;
             flex-direction: column;
-            gap: 10px; // Espace entre les éléments
+            gap: 10px;
+
 
             .states-cards-current-pipboy {
                 display: flex;
-                align-items: center; // Centre les éléments verticalement
-                gap: 16px; // Espace entre l'image et la liste
+                align-items: center;
+                gap: 16px;
                 align-self: center;
 
                 mat-list {
@@ -38,6 +49,22 @@
         .states-cards-historique {
             display: flex;
             flex-direction: column;
+
+            .mdc-list {
+                .ligne-historique-action {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    gap: 0.5rem;
+                }
+
+                .ligne-historique-etat {
+                    display: flex;
+                    align-items: center;
+                }
+            }
         }
+
     }
+
 }
