@@ -12,7 +12,8 @@
         background-color: var(--item-color);
         padding: 1em;
 
-        h3, h4 {
+        h3,
+        h4 {
             text-align: center;
         }
 
@@ -23,6 +24,11 @@
 
             mat-button-toggle-group {
                 width: fit-content;
+            }
+
+            .mat-mdc-form-field .mat-mdc-form-field-icon-prefix {
+                margin-left: 0.5em;
+                margin-right: 0.5em;
             }
         }
 

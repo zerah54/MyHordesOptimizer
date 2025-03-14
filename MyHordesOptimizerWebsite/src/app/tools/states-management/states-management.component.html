@@ -6,47 +6,58 @@
 <mat-card-content class="mho-states-management">
     <div class="states-cards">
         <ng-container>
-            <h3>État de départ</h3>
+            <h3 i18n>État de départ</h3>
             <div class="states-cards-origine">
                 <mat-button-toggle-group hideSingleSelectionIndicator>
-                    <mat-button-toggle><img [ngSrc]="HORDES_IMG_REPO + 'status/status_hasdrunk.gif'" alt="" height="16" width="16"></mat-button-toggle>
-                    <mat-button-toggle><img [ngSrc]="HORDES_IMG_REPO + 'status/status_thirst1.gif'" alt="" height="16" width="16"></mat-button-toggle>
-                    <mat-button-toggle><img [ngSrc]="HORDES_IMG_REPO + 'status/status_thirst2.gif'" alt="" height="16" width="16"></mat-button-toggle>
+                    <mat-button-toggle><img [ngSrc]="HORDES_IMG_REPO + 'status/status_hasdrunk.gif'" alt="" height="16"
+                            width="16"></mat-button-toggle>
+                    <mat-button-toggle><img [ngSrc]="HORDES_IMG_REPO + 'status/status_thirst1.gif'" alt="" height="16"
+                            width="16"></mat-button-toggle>
+                    <mat-button-toggle><img [ngSrc]="HORDES_IMG_REPO + 'status/status_thirst2.gif'" alt="" height="16"
+                            width="16"></mat-button-toggle>
                 </mat-button-toggle-group>
                 <mat-button-toggle-group hideMultipleSelectionIndicator multiple>
-                    <mat-button-toggle><img [ngSrc]="HORDES_IMG_REPO + 'status/status_drunk.gif'" alt="" height="16" width="16"></mat-button-toggle>
-                    <mat-button-toggle><img [ngSrc]="HORDES_IMG_REPO + 'status/status_hungover.gif'" alt="" height="16" width="16"></mat-button-toggle>
-                    <mat-button-toggle><img [ngSrc]="HORDES_IMG_REPO + 'status/status_drugged.gif'" alt="" height="16" width="16"></mat-button-toggle>
-                    <mat-button-toggle><img [ngSrc]="HORDES_IMG_REPO + 'status/status_addict.gif'" alt="" height="16" width="16"></mat-button-toggle>
+                    <mat-button-toggle><img [ngSrc]="HORDES_IMG_REPO + 'status/status_drunk.gif'" alt="" height="16"
+                            width="16"></mat-button-toggle>
+                    <mat-button-toggle><img [ngSrc]="HORDES_IMG_REPO + 'status/status_hungover.gif'" alt="" height="16"
+                            width="16"></mat-button-toggle>
+                    <mat-button-toggle><img [ngSrc]="HORDES_IMG_REPO + 'status/status_drugged.gif'" alt="" height="16"
+                            width="16"></mat-button-toggle>
+                    <mat-button-toggle><img [ngSrc]="HORDES_IMG_REPO + 'status/status_addict.gif'" alt="" height="16"
+                            width="16"></mat-button-toggle>
                 </mat-button-toggle-group>
                 <mat-button-toggle-group hideMultipleSelectionIndicator multiple>
-                    <mat-button-toggle><img [ngSrc]="HORDES_IMG_REPO + 'status/status_wound1.gif'" alt="" height="16" width="16"></mat-button-toggle>
-                    <mat-button-toggle><img [ngSrc]="HORDES_IMG_REPO + 'status/status_tired.gif'" alt="" height="16" width="16"></mat-button-toggle>
-                    <mat-button-toggle><img [ngSrc]="HORDES_IMG_REPO + 'status/status_ghoul.gif'" alt="" height="16" width="16"></mat-button-toggle>
+                    <mat-button-toggle><img [ngSrc]="HORDES_IMG_REPO + 'status/status_wound1.gif'" alt="" height="16"
+                            width="16"></mat-button-toggle>
+                    <mat-button-toggle><img [ngSrc]="HORDES_IMG_REPO + 'status/status_tired.gif'" alt="" height="16"
+                            width="16"></mat-button-toggle>
+                    <mat-button-toggle><img [ngSrc]="HORDES_IMG_REPO + 'status/status_ghoul.gif'" alt="" height="16"
+                            width="16"></mat-button-toggle>
                 </mat-button-toggle-group>
                 <mat-form-field appearance="outline">
-                    <mat-label>Points d'actions disponibles</mat-label>
-                    <span matPrefix><mho-icon-ap/></span>
-                    <input matInput min="0" max="8" type="number">
+                    <mat-label i18n>Points d'actions disponibles</mat-label>
+                    <span matPrefix><mho-icon-ap /></span>
+                    <input matInput min="0" max="8" type="number" value="6">
                 </mat-form-field>
                 <mat-form-field appearance="outline">
-                    <mat-label>Points d'exploration disponibles</mat-label>
-                    <span matPrefix><mho-icon-ep/></span>
-                    <input matInput min="0" max="12" type="number">
+                    <mat-label i18n>Points d'exploration disponibles</mat-label>
+                    <span matPrefix><mho-icon-ep /></span>
+                    <input matInput min="0" max="12" type="number" value="0">
                 </mat-form-field>
             </div>
         </ng-container>
     </div>
     <div class="states-cards">
-        <h3> État actuel </h3>
+        <h3 i18n>État actuel</h3>
         <div class="states-cards-current">
-            <h4 style="display: flex;align-items: center; justify-content: center;gap: 0.25em">
-                <mho-icon-ap/>
-                restants : 1/6
+            <h4 style="display: flex;align-items: center; justify-content: center; gap: 0.25em">
+                <mho-icon-ap />
+                <ng-container i18n>Restants&nbsp;:&nbsp;</ng-container>1/6
             </h4>
             <div class="states-cards-current-pipboy">
                 <div>
-                    <img alt="" height="183" ngSrc="/img/hordes_img/professions/select/pipWelcome.png" width="125">
+                    <img alt="" height="183" [ngSrc]="HORDES_IMG_REPO + 'professions/select/pipWelcome.gif'"
+                        width="125">
                 </div>
                 <div>
                     <mat-list>
@@ -64,50 +75,53 @@
         <div class="states-cards-historique">
             <div>
                 <mat-list>
-                    <mat-divider/>
+                    <mat-divider />
                     <mat-list-item>
                         <div class="ligne-historique-etat" matListItemLine>
                             <span><img alt="" height="16" ngSrc="/img/hordes_img/forum/new.png" width="16"></span>
                             <div style="display: flex; flex:1;align-items: center; justify-content: center;gap: 1rem">
-                                <span style="display: flex; align-items: center;">+6<mho-icon-ap/></span>
-                                <span><img alt="" height="16" ngSrc="/img/hordes_img/status/status_hasdrunk.gif" width="16"></span>
+                                <span style="display: flex; align-items: center;">+6<mho-icon-ap /></span>
+                                <span><img alt="" height="16" [ngSrc]="HORDES_IMG_REPO + 'status/status_hasdrunk.gif'"
+                                        width="16"></span>
                             </div>
                         </div>
                     </mat-list-item>
-                    <mat-divider/>
+                    <mat-divider />
                     <mat-list-item>
                         <div class="ligne-historique-action">
-                            <img alt="" height="16" ngSrc="/img/hordes_img/status/status_hasdrunk.gif" width="16">
+                            <img alt="" height="16" [ngSrc]="HORDES_IMG_REPO + 'status/status_hasdrunk.gif'" width="16">
                             <span i18n style="flex:1;">Boire</span>
                             <span class="date">12:52</span>
                         </div>
                     </mat-list-item>
-                    <mat-divider/>
+                    <mat-divider />
                     <mat-list-item>
                         <div class="ligne-historique-etat" matListItemLine>
-                            <span><img alt="" height="16" ngSrc="/img/hordes_img/forum/new.png" width="16"></span>
+                            <span><img alt="" height="16" [ngSrc]="HORDES_IMG_REPO + 'forum/new.png'" width="16"></span>
                             <div style="display: flex; flex:1;align-items: center; justify-content: center;gap: 1rem">
-                                <span style="display: flex; align-items: center;">-1<mho-icon-ap/></span>
+                                <span style="display: flex; align-items: center;">-1<mho-icon-ap /></span>
                             </div>
                         </div>
                     </mat-list-item>
-                    <mat-divider/>
+                    <mat-divider />
                     <mat-list-item>
                         <div class="ligne-historique-action">
-                            <mho-icon-ap/>
+                            <mho-icon-ap />
                             <span i18n style="flex:1;">Marcher 1 Km</span>
-                            <span class="date">11:28</span></div>
+                            <span class="date">11:28</span>
+                        </div>
                     </mat-list-item>
-                    <mat-divider/>
+                    <mat-divider />
                     <mat-list-item>
                         <div class="ligne-historique-etat" matListItemLine>
-                            <span><img alt="" height="16" ngSrc="/img/hordes_img/forum/new.png" width="16"></span>
+                            <span><img alt="" height="16" [ngSrc]="HORDES_IMG_REPO + 'forum/new.png'" width="16"></span>
                             <div style="display: flex; flex:1;align-items: center; justify-content: center;gap: 1rem">
-                                <span><img alt="" height="16" ngSrc="/img/hordes_img/status/status_clean.gif" width="16"></span>
+                                <span><img alt="" height="16" [ngSrc]="HORDES_IMG_REPO + 'status/status_clean.gif'"
+                                        width="16"></span>
                             </div>
                         </div>
                     </mat-list-item>
-                    <mat-divider/>
+                    <mat-divider />
                 </mat-list>
             </div>
         </div>

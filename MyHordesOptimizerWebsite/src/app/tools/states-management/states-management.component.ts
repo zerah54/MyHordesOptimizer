@@ -9,14 +9,12 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatList, MatListItem, MatListItemLine } from '@angular/material/list';
-import { MatOption, MatSelect } from '@angular/material/select';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import moment from 'moment';
 import { HORDES_IMG_REPO } from '../../_abstract_model/const';
 import { Imports } from '../../_abstract_model/types/_types';
 import { IconApComponent } from '../../shared/elements/icon-ap/icon-ap.component';
 import { IconEpComponent } from '../../shared/elements/icon-ep/icon-ep.component';
-import { CampingDisplayBonusPipe } from '../camping/camping-display-bonus.pipe';
 
 const angular_common: Imports = [CommonModule, FormsModule];
 const components: Imports = [];
@@ -27,8 +25,8 @@ const material_modules: Imports = [MatButtonModule, MatCardModule, MatFormFieldM
     selector: 'mho-thirst-management',
     templateUrl: './states-management.component.html',
     styleUrls: ['./states-management.component.scss'],
-    imports: [...angular_common, ...components, ...material_modules, ...pipes, MatSelect, MatOption, NgOptimizedImage, MatList, MatListItem, IconApComponent, MatDivider, MatListItemLine, MatButtonToggleGroup, MatButtonToggle, CampingDisplayBonusPipe, IconEpComponent],
-    encapsulation:ViewEncapsulation.None
+    imports: [...angular_common, ...components, ...material_modules, ...pipes, NgOptimizedImage, MatList, MatListItem, IconApComponent, MatDivider, MatListItemLine, MatButtonToggleGroup, MatButtonToggle, IconEpComponent],
+    encapsulation: ViewEncapsulation.None
 })
 export class StatesManagementComponent {
     @HostBinding('style.display') display: string = 'contents';
@@ -36,25 +34,25 @@ export class StatesManagementComponent {
     public readonly locale: string = moment.locale();
 
     public states_and_actions: (Action | State)[] = [
-        {type: 'state', thirst: 'none', ap: 0, wounded: false, ep: 0, cp: 0, shoes: false, bike: false}
+        { type: 'state', thirst: 'none', ap: 0, wounded: false, ep: 0, cp: 0, shoes: false, bike: false }
     ]
 
     actions: actions[] = [
-        {value: 'water', viewValue: 'Prise de gourde'},
-        {value: 'b6', viewValue: 'Nourriture (B6)'},
-        {value: 'move', viewValue: 'Déplacement dans l\'OM'},
+        { value: 'water', viewValue: 'Prise de gourde' },
+        { value: 'b6', viewValue: 'Nourriture (B6)' },
+        { value: 'move', viewValue: 'Déplacement dans l\'OM' },
     ];
 
     public addAction(): void {
-        this.states_and_actions.push({type: 'action'});
+        this.states_and_actions.push({ type: 'action' });
         let states = this.states_and_actions.filter((state: StateOrAction) => state.type === 'state')
-        this.states_and_actions.push({...states[states.length - 1]});
+        this.states_and_actions.push({ ...states[states.length - 1] });
     }
 
     toggleHydratedStatus($event: MouseEvent, value: string, buttonToggle: MatButtonToggle) {
         console.log(value);
         console.log(buttonToggle);
-        if(buttonToggle.checked){
+        if (buttonToggle.checked) {
             $event.stopPropagation();
             $event.preventDefault();
             //buttonToggle.value = undefined;
