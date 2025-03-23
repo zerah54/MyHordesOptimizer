@@ -4012,7 +4012,7 @@
           <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
           <context context-type="linenumber">55</context>
         </context-group>
-        <target state="needs-translation">Tombe</target>
+        <target state="translated">Tomb</target>
       </trans-unit>
       <trans-unit id="3231213779188554984" datatype="html" approved="yes">
         <source>Nombre de campings déjà effectués</source>
