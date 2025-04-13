@@ -117,6 +117,9 @@ public partial class Item
     [InverseProperty("IdItemNavigation")]
     public virtual ICollection<RecipeItemResult> RecipeItemResults { get; set; } = new List<RecipeItemResult>();
 
+    [InverseProperty("ProvokingItem")]
+    public virtual ICollection<Recipe> Recipes { get; set; } = new List<Recipe>();
+
     [InverseProperty("IdItemNavigation")]
     public virtual ICollection<RuinItemDrop> RuinItemDrops { get; set; } = new List<RuinItemDrop>();
 
