@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 namespace MyHordesOptimizerApi.Models;
 
 [Table("Recipe")]
+[Index("ProvokingItemId", Name = "provokingItemId")]
 public partial class Recipe
 {
     [Key]
@@ -53,6 +54,13 @@ public partial class Recipe
 
     [Column("stealthy")]
     public bool? Stealthy { get; set; }
+
+    [Column("provokingItemId", TypeName = "int(11)")]
+    public int? ProvokingItemId { get; set; }
+
+    [ForeignKey("ProvokingItemId")]
+    [InverseProperty("Recipes")]
+    public virtual Item? ProvokingItem { get; set; }
 
     [InverseProperty("RecipeNameNavigation")]
     public virtual ICollection<RecipeItemComponent> RecipeItemComponents { get; set; } = new List<RecipeItemComponent>();

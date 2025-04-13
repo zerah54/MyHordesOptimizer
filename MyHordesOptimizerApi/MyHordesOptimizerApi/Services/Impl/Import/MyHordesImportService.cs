@@ -283,7 +283,9 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
 
             //Récupération des recipes
             var codeItemRecipes = MyHordesCodeRepository.GetRecipes();
-            var mhoRecipes = Mapper.Map<List<Recipe>>(codeItemRecipes);
+            DbContext.ChangeTracker.Clear();
+            var mhoRecipes = Mapper.Map<List<Recipe>>(codeItemRecipes, opt => opt.SetDbContext(DbContext));
+            DbContext.ChangeTracker.Clear();
 
             // Traduction
             var translations = await TranslationService.GetTranslations();
@@ -493,7 +495,7 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
             {
                 if (ruinsFromCode.TryGetValue(ruinModel.Img, out var ruinFromCode))
                 {
-                    if(ruinFromCode.Constructions is not null)
+                    if (ruinFromCode.Constructions is not null)
                     {
                         foreach (var buildingId in ruinFromCode.Constructions)
                         {
@@ -503,7 +505,7 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
                                 IdRuin = ruinModel.IdRuin
                             });
                         }
-                    }            
+                    }
                 }
             }
             var ruinBlueprintsFromDb = DbContext.RuinBlueprints

@@ -1,10 +1,12 @@
 ﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using MyHordesOptimizerApi.Data.Camping;
 using MyHordesOptimizerApi.Data.CauseOfDeath;
 using MyHordesOptimizerApi.Data.Heroes;
 using MyHordesOptimizerApi.Data.Items;
 using MyHordesOptimizerApi.Data.Wishlist;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Camping;
+using MyHordesOptimizerApi.Extensions;
 using MyHordesOptimizerApi.Models;
 using System.Collections.Generic;
 using System.Linq;
@@ -65,7 +67,19 @@ namespace MyHordesOptimizerApi.MappingProfiles
                 .ForMember(dest => dest.PictoUid, opt => opt.MapFrom(src => src.Value.Picto))
                 .ForMember(dest => dest.ActionFr, opt => opt.Ignore())
                 .ForMember(dest => dest.ActionEs, opt => opt.Ignore())
-                .ForMember(dest => dest.ActionEn, opt => opt.Ignore());
+                .ForMember(dest => dest.ActionEn, opt => opt.Ignore())
+                .ForMember(dest => dest.ProvokingItem, opt => opt.MapFrom((codeModel, recipe, srcMember, context) =>
+                {
+                    Item provokingItem = null;
+                    var provokingUid = codeModel.Value.Provoking;
+                    if (!string.IsNullOrEmpty(provokingUid))
+                    {
+                        var dbContext = context.GetDbContext();
+                        provokingItem = dbContext.Items.AsNoTracking()
+                        .First(x => x.Uid == provokingUid);
+                    }
+                    return provokingItem;
+                }));
 
 
             CreateMap<MyHordesCampingBonusModel, CampingBonusDto>()
