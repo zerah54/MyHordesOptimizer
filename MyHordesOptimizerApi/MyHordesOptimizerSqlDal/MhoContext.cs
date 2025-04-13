@@ -473,6 +473,8 @@ public partial class MhoContext : DbContext
         modelBuilder.Entity<Recipe>(entity =>
         {
             entity.HasKey(e => e.Name).HasName("PRIMARY");
+
+            entity.HasOne(d => d.ProvokingItem).WithMany(p => p.Recipes).HasConstraintName("Recipe_ibfk_1");
         });
 
         modelBuilder.Entity<RecipeComplet>(entity =>

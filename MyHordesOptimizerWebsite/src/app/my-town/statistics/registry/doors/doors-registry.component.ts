@@ -1,4 +1,4 @@
-import { Component, ElementRef, HostBinding, Input, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, ElementRef, HostBinding, Input, ViewChild, ViewEncapsulation, input } from '@angular/core';
 import { Scale, TooltipItem } from 'chart.js';
 import Chart from 'chart.js/auto';
 import moment from 'moment';
@@ -17,9 +17,11 @@ export class DoorsRegistryComponent {
 
     @ViewChild('doorsCanvas') doors_canvas!: ElementRef;
 
-    @Input({required: true}) completeCitizenList!: CitizenInfo;
-    @Input({required: true}) displayPseudo!: DisplayPseudoMode;
+    readonly completeCitizenList = input.required<CitizenInfo>();
+    readonly displayPseudo = input.required<DisplayPseudoMode>();
 
+    // TODO: Skipped for migration because:
+    //  Accessor inputs cannot be migrated as they are too complex.
     @Input({required: true}) set registry(registry: Entry[] | undefined) {
         if (registry) {
             this.entries = registry.filter((entry: Entry) => {
@@ -45,7 +47,7 @@ export class DoorsRegistryComponent {
         this.doors_chart = new Chart<'bar'>(polar_ctx, {
             type: 'bar',
             data: {
-                labels: this.completeCitizenList.citizens.map((citizen: Citizen) => citizen.name),
+                labels: this.completeCitizenList().citizens.map((citizen: Citizen) => citizen.name),
                 datasets: this.convertDoorsAccessToDatasets(this.doorsAccessTransformation())
                     .map((doors_access_for_citizen: ([number, number] | null)[], index: number) => {
                         return {
@@ -98,7 +100,7 @@ export class DoorsRegistryComponent {
     }
 
     private doorsAccessTransformation(): DoorsAccessPerCitizen[] {
-        return this.completeCitizenList.citizens.map((citizen: Citizen): DoorsAccessPerCitizen => {
+        return this.completeCitizenList().citizens.map((citizen: Citizen): DoorsAccessPerCitizen => {
             const entries_for_citizen: Entry[] = this.entries
                 .filter((entry: Entry): boolean => entry.entry?.indexOf(citizen.name) > -1)
                 .reverse();
