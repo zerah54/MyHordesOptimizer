@@ -1,5 +1,5 @@
 import { CommonModule, DOCUMENT, NgClass, NgTemplateOutlet } from '@angular/common';
-import { Component, HostBinding, inject, Inject, Input, LOCALE_ID, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, HostBinding, inject, Inject, LOCALE_ID, OnInit, ViewEncapsulation, input } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
@@ -206,7 +206,12 @@ export class MenuComponent implements OnInit {
                     ], spoil: false
                 },
             ], spoil: false
-        }
+        },
+        {
+            label: $localize`Mini-Jeux`, lvl: 0, displayed: true, authorized: (): boolean => true, expanded: false, children: [
+                {label: $localize`368 Pictos`, path: 'games/368-pictos', displayed: false, lvl: 1, authorized: (): boolean => true, spoil: false},
+            ], spoil: false
+        },
     ];
 
     constructor(@Inject(LOCALE_ID) private locale_id: string, @Inject(DOCUMENT) private document: Document) {
