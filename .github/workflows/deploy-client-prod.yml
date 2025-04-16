@@ -15,7 +15,7 @@ jobs:
       - uses: actions/checkout@main
       - uses: actions/setup-node@main
         with:
-          node-version: '18.19.0'
+          node-version: '20.14.0'
           
       - name: Setup Sentry CLI
         uses: matbour/setup-sentry-cli@v2
