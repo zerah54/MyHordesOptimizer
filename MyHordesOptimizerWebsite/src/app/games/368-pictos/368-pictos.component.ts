@@ -6,13 +6,13 @@ import { Imports } from 'src/app/_abstract_model/types/_types';
 const angular_common: Imports = [];
 const components: Imports = [];
 const pipes: Imports = [];
-const material_modules: Imports = [MatCardModule];
+const material_modules: Imports = [ MatCardModule ];
 
 @Component({
     selector: 'mho-368-pictos',
     templateUrl: '368-pictos.component.html',
     styleUrls: [ '368-pictos.component.scss' ],
-    imports: [...angular_common, ...components, ...material_modules, ...pipes]
+    imports: [ ...angular_common, ...components, ...material_modules, ...pipes ]
 })
 export class PictosComponent {
     protected board: ({ id: number, img: string; } | undefined)[][] = [];
@@ -35,6 +35,21 @@ export class PictosComponent {
 
     public ngOnInit(): void {
         this.init();
+    }
+
+    protected init(): void {
+        this.board = Array.from({ length: 6 }, () => Array(6).fill(undefined));
+        this.pictos_rescued = 0;
+        this.attempts = 0;
+        this.current_lot = [];
+        this.time_spent = 0;
+        this.game_over = false;
+
+        this.interval = setInterval(() => {
+            this.time_spent += 1;
+        }, 1000);
+
+        this.generateNewLot();
     }
 
     protected onCellClick(row: number, col: number): void {
@@ -70,12 +85,7 @@ export class PictosComponent {
         this.is_lot_horizontal = Math.random() > 0.5; // Randomly decide if the lot is horizontal or vertical
 
         if (!this.canPlaceLot()) {
-            this.game_over = true;
-
-            // Stop the timer if no valid moves are left
-            if (this.interval) {
-                clearInterval(this.interval);
-            }
+            this.endGame();
         }
     }
 
@@ -103,25 +113,12 @@ export class PictosComponent {
         return false;
     }
 
-    protected init(): void {
-        this.board = Array.from({ length: 6 }, () => Array(6).fill(undefined));
-        this.pictos_rescued = 0;
-        this.attempts = 0;
-        this.current_lot = [];
-        this.time_spent = 0;
-        this.game_over = false;
-
-        this.interval = setInterval(() => {
-            this.time_spent += 1;
-        }, 1000);
-
-        this.generateNewLot();
-    }
-
     private checkAndRemoveGroups(): void {
-        // Check horizontal groups
+        let to_remove: { row: number, col: number, picto: number | undefined }[] = [];
+
+        // Mark horizontal groups
         for (let i = 0; i < 6; i++) {
-            let count = 1;
+            let count: number = 1;
             for (let j = 0; j < 6; j++) {
                 if (this.board[ i ][ j ] !== undefined) {
                     count = 1;
@@ -132,17 +129,16 @@ export class PictosComponent {
                     }
                     if (count >= 3) {
                         for (let k = j; k >= j - count + 1; k--) {
-                            this.board[ i ][ k ] = undefined;
+                            to_remove.push({ row: i, col: k, picto: current_picto });
                         }
-                        this.pictos_rescued += count;
                     }
                 }
             }
         }
 
-        // Check vertical groups
+        // Mark vertical groups
         for (let j = 0; j < 6; j++) {
-            let count = 1;
+            let count: number = 1;
             for (let i = 0; i < 6; i++) {
                 if (this.board[ i ][ j ] !== undefined) {
                     count = 1;
@@ -153,17 +149,32 @@ export class PictosComponent {
                     }
                     if (count >= 3) {
                         for (let k = i; k >= i - count + 1; k--) {
-                            this.board[ k ][ j ] = undefined;
+                            to_remove.push({ row: k, col: j, picto: current_picto });
                         }
-                        this.pictos_rescued += count;
                     }
                 }
             }
         }
 
+        console.log('to_remove', to_remove);
+        // Remove marked cells
+        to_remove.forEach((cell: { row: number, col: number; }) => {
+            this.board[ cell.row ][ cell.col ] = undefined;
+            this.pictos_rescued++;
+        });
+
         if (this.pictos_rescued === this.pictos_to_rescue) {
-            this.game_over = true;
+            this.endGame();
             alert(`Congratulations!`);
+        }
+    }
+
+    private endGame(): void {
+        this.game_over = true;
+
+        // Stop the timer if no valid moves are left
+        if (this.interval) {
+            clearInterval(this.interval);
         }
     }
 }
