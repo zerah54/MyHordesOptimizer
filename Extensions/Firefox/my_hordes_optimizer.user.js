@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MHO Addon
-// @version      1.0.33.0
+// @version      1.1.0.0
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/, rubrique Tutoriels
 // @author       Zerah
 //
@@ -31,7 +31,7 @@
 // ==/UserScript==
 
 const changelog = `${getScriptInfo().name} : Changelog pour la version ${getScriptInfo().version}\n\n`
-    + `[Correctif] Divers correctifs d'affichage\n`;
+    + `Mise à jour de compatibilité (ou presque) avec la S18`;
 
 const lang = (document.querySelector('html[lang]')?.getAttribute('lang') || document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2) || 'fr';
 
@@ -134,6 +134,9 @@ let map;
 let current_cell;
 let my_expeditions;
 let tooltips_observer;
+let loading_area_observer;
+let bank_observer;
+let anti_abuse_controller;
 
 ///////////////////
 // Les variables //
@@ -746,63 +749,32 @@ const jobs = [
 ];
 
 const status_list = [
-    {id: "clean", img: "status/status_clean.gif", pdc: 1}, // Jamais drogué
-    {id: "hasdrunk", img: "status/status_hasdrunk.gif"}, // A bu
-    {id: "haseaten", img: "status/status_haseaten.gif"}, // A mangé
-    {id: "camper", img: "status/status_camper.gif", searches: '+10%'}, // A campé
-    {id: "immune", img: "status/status_immune.gif", watch_death: -0.01}, // Immunisé
-    {id: "hsurvive", img: "status/status_hsurvive.gif"}, // VLM niveau 1
-    {id: "hsurvive2", img: "status/status_hsurvive2.gif"}, // VLM niveau 2
-    {id: "hsurvive3", img: "status/status_hsurvive3.gif"}, // VLM niveau 3
-    {id: "tired", img: "status/status_tired.gif"}, // Fatigué
-    {id: "terror", img: "status/status_terror.gif", watch_def: -30, watch_death: 0.05}, // Terrorisé
-    {id: "thirst1", img: "status/status_thirst1.gif", watch_def: -5}, // Soif
-    {id: "thirst2", img: "status/status_thirst2.gif", watch_def: -10, wath_death: 0.03}, // Deshy
-    {id: "drugged", img: "status/status_drugged.gif", watch_def: 10}, // Drogué
-    {id: "addict", img: "status/status_addict.gif", watch_def: 10, watch_death: 0.06}, // Dépendant
-    {id: "infection", img: "status/status_infection.gif", watch_def: -15, watch_death: 0.1}, // Infecté
-    {id: "drunk", img: "status/status_drunk.gif", watch_def: 15, watch_death: -0.02, searches: '-20%"'}, // Ivre
-    {id: "hungover", img: "status/status_hungover.gif", watch_def: -15, watch_death: 0.06}, // Gueule de bois
-    {
-        id: "wound1",
-        img: "status/status_wound1.gif",
-        watch_def: -15,
-        watch_death: 0.10,
-        properties: ['wounded', 'head_wounded']
-    }, // Blessure à la tête
-    {
-        id: "wound2",
-        img: "status/status_wound2.gif",
-        watch_def: -15,
-        watch_death: 0.10,
-        properties: ['wounded', 'hand_wounded']
-    }, // Blessure à la main
-    {
-        id: "wound3",
-        img: "status/status_wound3.gif",
-        watch_def: -15,
-        watch_death: 0.10,
-        properties: ['wounded', 'arm_wounded']
-    }, // Blessure au bras
-    {
-        id: "wound4",
-        img: "status/status_wound4.gif",
-        watch_def: -15,
-        watch_death: 0.10,
-        properties: ['wounded', 'leg_wounded']
-    }, // Blessure à la jambe
-    {
-        id: "wound5",
-        img: "status/status_wound5.gif",
-        watch_def: -15,
-        watch_death: 0.10,
-        properties: ['wounded'],
-        searches: '/2'
-    }, // Blessure à l'oeil
-    {id: "wound6", img: "status/status_wound6.gif", watch_def: -15, watch_death: 0.10, properties: ['wounded']}, // Blessure au pied
-    {id: "healed", img: "status/status_healed.gif", watch_def: -15, watch_death: 0.05}, // Convalescent
-    {id: "hydrated", img: "status/status_hydrated.gif", pdc: 1}, // Hydraté
-    {id: "sober", img: "status/status_sober.gif", pdc: 1} // Sobre
+    { id: "clean", img: "status/status_clean.gif", pdc: 1 }, // Jamais drogué
+    { id: "hasdrunk", img: "status/status_hasdrunk.gif" }, // A bu
+    { id: "haseaten", img: "status/status_haseaten.gif" }, // A mangé
+    { id: "camper", img: "status/status_camper.gif", searches: '+10%' }, // A campé
+    { id: "immune", img: "status/status_immune.gif", watch_death: -0.01 }, // Immunisé
+    { id: "hsurvive", img: "status/status_hsurvive.gif" }, // VLM niveau 1
+    { id: "hsurvive2", img: "status/status_hsurvive2.gif" }, // VLM niveau 2
+    { id: "hsurvive3", img: "status/status_hsurvive3.gif" }, // VLM niveau 3
+    { id: "tired", img: "status/status_tired.gif" }, // Fatigué
+    { id: "terror", img: "status/status_terror.gif", watch_def: -30, watch_death: 0.05 }, // Terrorisé
+    { id: "thirst1", img: "status/status_thirst1.gif", watch_def: -5 }, // Soif
+    { id: "thirst2", img: "status/status_thirst2.gif", watch_def: -10, wath_death: 0.03 }, // Deshy
+    { id: "drugged", img: "status/status_drugged.gif", watch_def: 10 }, // Drogué
+    { id: "addict", img: "status/status_addict.gif", watch_def: 10, watch_death: 0.06 }, // Dépendant
+    { id: "infection", img: "status/status_infection.gif", watch_def: -15, watch_death: 0.1 }, // Infecté
+    { id: "drunk", img: "status/status_drunk.gif", watch_def: 15, watch_death: -0.02, searches: '-20%"' }, // Ivre
+    { id: "hungover", img: "status/status_hungover.gif", watch_def: -15, watch_death: 0.06 }, // Gueule de bois
+    { id: "wound1", img: "status/status_wound1.gif", watch_def: -15, watch_death: 0.10, properties: ['wounded', 'head_wounded'] }, // Blessure à la tête
+    { id: "wound2", img: "status/status_wound2.gif", watch_def: -15, watch_death: 0.10, properties: ['wounded', 'hand_wounded'] }, // Blessure à la main
+    { id: "wound3", img: "status/status_wound3.gif", watch_def: -15, watch_death: 0.10, properties: ['wounded', 'arm_wounded'] }, // Blessure au bras
+    { id: "wound4", img: "status/status_wound4.gif", watch_def: -15, watch_death: 0.10, properties: ['wounded', 'leg_wounded'] }, // Blessure à la jambe
+    { id: "wound5", img: "status/status_wound5.gif", watch_def: -15, watch_death: 0.10, properties: ['wounded'], searches: '/2' }, // Blessure à l'oeil
+    { id: "wound6", img: "status/status_wound6.gif", watch_def: -15, watch_death: 0.10, properties: ['wounded'] }, // Blessure au pied
+    { id: "healed", img: "status/status_healed.gif", watch_def: -15, watch_death: 0.05 }, // Convalescent
+    { id: "hydrated", img: "status/status_hydrated.gif", pdc: 1 }, // Hydraté
+    { id: "sober", img: "status/status_sober.gif", pdc: 1 } // Sobre
 ];
 
 const api_texts = {
@@ -853,13 +825,13 @@ const api_texts = {
 const action_types = [
     {
         id: `Recipe::ManualAnywhere`,
-        label: {en: `Citizen actions`, fr: `Actions du citoyen`, de: `Bürgeraktionen`, es: `Acciones del habitante`},
+        label: { en: `Citizen actions`, fr: `Actions du citoyen`, de: `Bürgeraktionen`, es: `Acciones del habitante` },
         ordering: 1
     },
-    {id: `Recipe::WorkshopType`, label: {en: `Workshop`, fr: `Atelier`, de: `Werkstatt`, es: `Taller`}, ordering: 0},
+    { id: `Recipe::WorkshopType`, label: { en: `Workshop`, fr: `Atelier`, de: `Werkstatt`, es: `Taller` }, ordering: 0 },
     {
         id: `Recipe::WorkshopTypeShamanSpecific`,
-        label: {en: `Workshop - Shaman`, fr: `Atelier - Chaman`, de: `Werkstatt - Schamane`, es: `Taller - Chamán`},
+        label: { en: `Workshop - Shaman`, fr: `Atelier - Chaman`, de: `Werkstatt - Schamane`, es: `Taller - Chamán` },
         ordering: 2
     },
 ];
@@ -950,23 +922,23 @@ const wishlist_headers = [
         id: `diff`
     },
     {
-        label: {en: ``, fr: ``, es: ``, de: ``},
+        label: { en: ``, fr: ``, es: ``, de: `` },
         id: 'delete'
     },
 ];
 
 let fill_items_messages_pool = {
     en: [
-        {title: 'Hi', content: ':iloveu:'}
+        { title: 'Hi', content: ':iloveu:' }
     ],
     fr: [
-        {title: 'Coucou', content: ':iloveu:'}
+        { title: 'Coucou', content: ':iloveu:' }
     ],
     de: [
-        {title: 'Hallo', content: ':iloveu:'}
+        { title: 'Hallo', content: ':iloveu:' }
     ],
     es: [
-        {title: 'Hola', content: ':iloveu:'}
+        { title: 'Hola', content: ':iloveu:' }
     ]
 }
 
@@ -1000,17 +972,6 @@ let tabs_list = {
         },
         {
             ordering: 2,
-            id: `skills`,
-            label: {
-                en: `Hero Skills`,
-                fr: `Pouvoirs`,
-                de: `Heldentaten`,
-                es: `Poderes`
-            },
-            icon: repo_img_hordes_url + `/professions/hero.gif`
-        },
-        {
-            ordering: 3,
             id: `ruins`,
             label: {
                 en: `Ruins`,
@@ -1405,15 +1366,6 @@ let params_categories = [
                     fr: `Tooltips détaillés`,
                     de: `Detaillierte Tooltips`,
                     es: `Tooltips detallados`
-                },
-            },
-            {
-                id: `click_on_voted`,
-                label: {
-                    en: `Quick navigation to recommended construction site`,
-                    fr: `Navigation rapide vers le chantier recommandé`,
-                    de: `Schnelle Navigation zur empfohlenen Baustelle`,
-                    es: `Navegación rápida hacia la construcción recomendada`
                 },
             },
             {
@@ -1813,91 +1765,45 @@ let informations = [
     }
 ];
 
-const table_hero_skills_headers = [
-    {id: 'name', label: {en: `Name`, fr: `Nom`, de: `Name`, es: `Nombre`}, type: 'th'},
-    {
-        id: 'nombreJourHero',
-        label: {en: `Hero days`, fr: `Jours héros`, de: `Heldentage`, es: `Días de héroe`},
-        type: 'td'
-    },
-    {
-        id: 'lastSkill',
-        label: {
-            en: `Last power earned`,
-            fr: `Dernier pouvoir gagné`,
-            de: `Letzte Kraft gewonnen`,
-            es: `Último poder obtenido`
-        },
-        type: 'td'
-    },
-    {
-        id: 'uppercut',
-        label: {en: `Vicious uppercut`, fr: `Uppercut Sauvage`, de: `Wildstyle Uppercut`, es: `Puñetazo salvaje`},
-        type: 'td',
-        img: ''
-    },
-    {id: 'rescue', label: {en: `Rescue`, fr: `Sauvetage`, de: `Rettung`, es: `Rescate`}, type: 'td', img: ''}
-];
-
-const table_skills_headers = [
-    {id: 'icon', label: {en: ``, fr: ``, de: ``, es: ``}, type: 'th'},
-    {id: 'label', label: {en: `Skill`, fr: `Capacité`, de: `Fähigkeit`, es: `Poder`}, type: 'th'},
-    {
-        id: 'daysNeeded',
-        label: {
-            en: `Hero days needed`,
-            fr: `Jours héros nécessaires`,
-            de: `Benötigte Heldentage`,
-            es: `Días de héroe necesarios`
-        },
-        type: 'td'
-    },
-    {
-        id: 'description',
-        label: {en: `Description`, fr: `Description`, de: `Beschreibung`, es: `Descripción`},
-        type: 'td'
-    }
-];
-
 const table_ruins_headers = [
-    {id: 'img', label: {en: ``, fr: ``, de: ``, es: ``}, type: 'th'},
-    {id: 'label', label: {en: `Name`, fr: 'Nom', de: `Name`, es: `Nombre`}, type: 'th'},
+    { id: 'img', label: { en: ``, fr: ``, de: ``, es: `` }, type: 'th' },
+    { id: 'label', label: { en: `Name`, fr: 'Nom', de: `Name`, es: `Nombre` }, type: 'th' },
     {
         id: 'description',
-        label: {en: `Description`, fr: `Description`, de: `Beschreibung`, es: `Descripción`},
+        label: { en: `Description`, fr: `Description`, de: `Beschreibung`, es: `Descripción` },
         type: 'td'
     },
     {
         id: 'minDist',
-        label: {en: `Minimum distance`, fr: `Distance minimum`, de: `Mindestabstand`, es: `Distancia mínima`},
+        label: { en: `Minimum distance`, fr: `Distance minimum`, de: `Mindestabstand`, es: `Distancia mínima` },
         type: 'td'
     },
     {
         id: 'maxDist',
-        label: {en: `Maximum distance`, fr: `Distance maximum`, de: `Maximale Entfernung`, es: `Distancia máxima`},
+        label: { en: `Maximum distance`, fr: `Distance maximum`, de: `Maximale Entfernung`, es: `Distancia máxima` },
         type: 'td'
     },
     {
         id: 'camping',
-        label: {en: `Camping bonus`, fr: `Bonus en camping`, de: `Campingbonus`, es: `Bono de acampada`},
+        label: { en: `Camping bonus`, fr: `Bonus en camping`, de: `Campingbonus`, es: `Bono de acampada` },
         type: 'td'
     },
     {
         id: 'capacity',
-        label: {en: `Capacity`, fr: `Capacité`, de: `Kapazität`, es: `Capacidad`},
+        label: { en: `Capacity`, fr: `Capacité`, de: `Kapazität`, es: `Capacidad` },
         type: 'td'
     },
-    {id: 'drops', label: {en: `Items`, fr: 'Objets', de: `Gegenstände`, es: `Objetos`}, type: 'td'},
+    { id: 'drops', label: { en: `Items`, fr: 'Objets', de: `Gegenstände`, es: `Objetos` }, type: 'td' },
 ];
 
 const added_ruins = [
-    {id: '-1000', camping: 0, label: {en: `None`, fr: `Aucun`, de: `Kein`, es: `Ninguna`}}
+    { id: '-1000', camping: 0, label: { en: `None`, fr: `Aucun`, de: `Kein`, es: `Ninguna` } }
 ];
 
 const town_type = [
-    {id: 'rne', label: {de: 'Kleine Stadt', en: 'Small Town', es: 'Amateur', fr: 'Petite carte'}},
-    {id: 're', label: {de: 'Entfernte Regionen', en: 'Distant Region', es: 'Leyenda', fr: 'Région éloignée'}},
-    {id: 'pande', label: {de: 'Pandämonium', en: 'Pandemonium', es: 'Pandemonio', fr: 'Pandémonium'}}
+    { id: 'rne', label: { de: 'Kleine Stadt', en: 'Small Town', es: 'Amateur', fr: 'Petite carte' } },
+    { id: 're', label: { de: 'Entfernte Regionen', en: 'Distant Region', es: 'Leyenda', fr: 'Région éloignée' } },
+    { id: 'pande', label: { de: 'Pandämonium', en: 'Pandemonium', es: 'Pandemonio', fr: 'Pandémonium' } }
 ];
 
 /////////////////////////////////////////
@@ -2063,7 +1969,7 @@ function addError(error) {
         });
         setTimeout(() => {
             is_error = false;
-        }, 1000)
+        }, 5000)
         setTimeout(() => {
             notification.remove();
         }, 10000);
@@ -2338,23 +2244,23 @@ function getHoveredItem() {
     }
 
 
-//     for (let item of hovered) {
-//         let hovered_item_img;
-//         if (item.classList.contains('item-icon')) {
-//             hovered_item_img = item.firstElementChild;
-//             hovered_item_li = item.parentElement;
-//         } else if (item.tagName.toLowerCase() === 'SPAN'.toLowerCase() && item.previousElementSibling && item.previousElementSibling.classList.contains('item-icon')) {
-//             hovered_item_img = item.previousElementSibling?.firstElementChild;
-//             hovered_item_li = item.parentElement;
-//         } else if (item.tagName.toLowerCase() === 'LI'.toLowerCase()) {
-//             hovered_item_img = item.firstElementChild?.firstElementChild;
-//             hovered_item_li = item;
-//         }
-//         if (hovered_item_img && hovered_item_img.src) {
-//             hovered_item = getItemFromImg(hovered_item_img.src);
-//             broken = hovered_item_img.parentElement.parentElement.classList.contains('broken');
-//         }
-//     }
+    //     for (let item of hovered) {
+    //         let hovered_item_img;
+    //         if (item.classList.contains('item-icon')) {
+    //             hovered_item_img = item.firstElementChild;
+    //             hovered_item_li = item.parentElement;
+    //         } else if (item.tagName.toLowerCase() === 'SPAN'.toLowerCase() && item.previousElementSibling && item.previousElementSibling.classList.contains('item-icon')) {
+    //             hovered_item_img = item.previousElementSibling?.firstElementChild;
+    //             hovered_item_li = item.parentElement;
+    //         } else if (item.tagName.toLowerCase() === 'LI'.toLowerCase()) {
+    //             hovered_item_img = item.firstElementChild?.firstElementChild;
+    //             hovered_item_li = item;
+    //         }
+    //         if (hovered_item_img && hovered_item_img.src) {
+    //             hovered_item = getItemFromImg(hovered_item_img.src);
+    //             broken = hovered_item_img.parentElement.parentElement.classList.contains('broken');
+    //         }
+    //     }
     return {
         item: hovered_item,
         broken: broken,
@@ -2369,7 +2275,7 @@ function getClickedItem(target) {
     if (item_icon) {
         let hovered_item = getItemFromImg(item_icon.querySelector('img').src);
         let broken = item_icon.parentElement.classList.contains('broken');
-        return {item: hovered_item, broken: broken};
+        return { item: hovered_item, broken: broken };
     }
 }
 
@@ -2390,8 +2296,6 @@ function getStatusFromImg(img_src) {
 }
 
 function initOptionsWithLoginNeeded() {
-
-
     displayWishlistInApp();
     displayPriorityOnItems();
     createUpdateExternalToolsButton();
@@ -2413,7 +2317,6 @@ function initOptionsWithoutLoginNeeded() {
     }
     preventFromLeaving();
     alertIfInactiveAndNoEscort();
-    clickOnVotedToRedirect();
     displaySearchFields();
     displayMinApOnBuildings();
     setTimeout(() => {
@@ -2435,7 +2338,7 @@ function initOptionsWithoutLoginNeeded() {
 }
 
 function updateFetchRequestOptions(options) {
-    const update = {...options};
+    const update = { ...options };
     update.headers = {
         ...update.headers,
         'Mho-Origin': 'script',
@@ -2454,7 +2357,7 @@ function updateFetchRequestOptions(options) {
 }
 
 function updateFetchRequestOptionsWithoutBearer(options) {
-    const update = {...options};
+    const update = { ...options };
     update.headers = {
         ...update.headers,
         'Mho-Origin': 'script',
@@ -3244,20 +3147,11 @@ function dispatchWikiToolsContent(window_type, tab) {
         case 'recipes':
             displayRecipes();
             break;
-        case 'skills':
-            displaySkills();
-            break;
         case 'ruins':
             displayRuins();
             break;
-        case 'citizens':
-            displayCitizens();
-            break;
         case 'bank':
             displayBank(tab.id);
-            break;
-        case 'wishlist':
-            displayWishlist();
             break;
         case 'camping':
             displayCamping();
@@ -3282,22 +3176,6 @@ function displayBank(tab_id) {
             displayItems(bank, tab_id);
         }
     });
-}
-
-/** Affiche les éléments présents dans la liste de courses */
-function displayWishlist() {
-    let tab_content = document.getElementById(mh_optimizer_window_id + '-tab-content');
-
-    let explanation = document.createElement('div');
-    explanation.innerText = getI18N(texts.wishlist_moved);
-    tab_content.appendChild(explanation);
-
-    let go_to_website = document.createElement('a');
-    go_to_website.classList.add('button');
-    go_to_website.target = '_blank';
-    go_to_website.href = `${website}my-town/wishlist`;
-    go_to_website.innerHTML = `<img src="${repo_img_hordes_url}icons/small_world.gif" style="vertical-align: top; margin-right: 0.25em;">${getI18N(texts.go_to_website)}`;
-    tab_content.appendChild(go_to_website);
 }
 
 /**
@@ -3392,93 +3270,6 @@ function displayItems(filtered_items, tab_id) {
         });
 
         item_list.appendChild(item_container);
-    });
-}
-
-/** Affiche la liste des citoyens */
-function displayCitizens() {
-    citizens = undefined;
-    getCitizens().then(() => {
-        let tab_content = document.getElementById(mh_optimizer_window_id + '-tab-content');
-        if (citizens && hero_skills) {
-            console.log('heroskills', hero_skills);
-
-            let header_cells = [...table_hero_skills_headers];
-
-            let skills_with_uses = hero_skills
-                .filter((skill) => skill.nbUses > 0)
-                .map((skill) => {
-                    return {id: skill.name, label: skill.label, type: 'td', img: skill.icon}
-                });
-            console.log('skills_with_uses', skills_with_uses);
-            header_cells.push(...skills_with_uses);
-
-            let header_row = document.createElement('tr');
-            header_row.classList.add('mho-header');
-
-            header_cells.forEach((header_cell) => {
-                let cell = document.createElement('th');
-                if (cell.img) {
-                    cell.innerHTML = '<img src="' + repo_img_hordes_url + header_cell.img + '.gif"></img>'
-                } else {
-                    cell.innerText = getI18N(header_cell.label);
-                }
-                header_row.appendChild(cell);
-            });
-
-            let table = document.createElement('table');
-            table.classList.add('mho-table');
-            table.appendChild(header_row);
-
-            tab_content.appendChild(table);
-            for (let citizen_key in citizens.citizens) {
-                let citizen = citizens.citizens[citizen_key];
-                let citizen_row = document.createElement('tr');
-                let is_me = citizen.id === mh_user.id;
-                if (is_me) {
-                    citizen_row.setAttribute('style', 'background-color: rgba(255, 255, 255, 0.1)');
-                }
-                table.appendChild(citizen_row);
-
-                header_cells.forEach((header_cell) => {
-                    let cell = document.createElement(header_cell.type);
-                    if (is_me) {
-                        switch (header_cell.id) {
-                            case 'name':
-                                cell.innerText = citizen[header_cell.id];
-                                break;
-                            case 'nombreJourHero':
-                                var input = document.createElement('input');
-                                input.classList.add('mho-input');
-                                input.type = 'number';
-                                input.value = citizen[header_cell.id]
-                                cell.appendChild(input);
-                                break;
-                            case 'lastSkill':
-                                cell.innerText = getI18N(hero_skills.find((skill) => skill.daysNeeded >= citizen.nombreJourHero).label);
-                                break;
-                            default:
-                                console.log(header_cell);
-                                break;
-                        }
-                    } else {
-                        switch (header_cell.id) {
-                            case 'name':
-                            case 'nombreJourHero':
-                                cell.innerText = citizen[header_cell.id];
-                                break;
-                            case 'lastSkill':
-                                cell.innerText = getI18N(hero_skills.find((skill) => skill.daysNeeded >= citizen.nombreJourHero).label);
-                                break;
-                            default:
-                                cell.innerText = '';
-                                break;
-                        }
-                    }
-                    citizen_row.appendChild(cell);
-                });
-            }
-        }
     });
 }
 
@@ -3910,7 +3701,7 @@ function displayCamping() {
         devastated.type = 'checkbox';
         devastated.id = 'devastated';
         devastated.checked = conf.devastated;
-        devastaded.classList.add('mho-input');
+        devastated.classList.add('mho-input');
         devastated.addEventListener('change', ($event) => {
             conf.devastated = $event.srcElement.checked;
             calculateCamping(conf);
@@ -3940,54 +3731,6 @@ function displayCamping() {
 
 
         calculateCamping(conf);
-    });
-}
-
-/** Affiche la liste des pouvoirs */
-function displaySkills() {
-    getHeroSkills().then((hero_skills) => {
-        let tab_content = document.getElementById(mh_optimizer_window_id + '-tab-content');
-
-        let header_cells = [...table_skills_headers];
-
-        let header_row = document.createElement('tr');
-        header_row.classList.add('mho-header');
-        header_cells.forEach((header_cell) => {
-            let cell = document.createElement('th');
-            cell.innerText = getI18N(header_cell.label);
-            header_row.appendChild(cell);
-        })
-
-        let table = document.createElement('table');
-        table.classList.add('mho-table');
-        table.appendChild(header_row);
-        tab_content.appendChild(table);
-        for (let skill_key in hero_skills) {
-            let skill = hero_skills[skill_key];
-            let skill_row = document.createElement('tr');
-            table.appendChild(skill_row);
-
-            header_cells.forEach((header_cell) => {
-                let cell = document.createElement(header_cell.type);
-                let img = document.createElement('img');
-                switch (header_cell.id) {
-                    case 'icon':
-                        img.src = repo_img_hordes_url + 'heroskill/' + skill[header_cell.id] + '.gif';
-                        cell.appendChild(img);
-                        break;
-                    case 'label':
-                    case 'description':
-                        cell.setAttribute('style', 'text-align: left');
-                        cell.innerText = getI18N(skill[header_cell.id]);
-                        break;
-                    default:
-                        cell.setAttribute('style', 'text-align: center');
-                        cell.innerText = skill[header_cell.id];
-                        break;
-                }
-                skill_row.appendChild(cell);
-            })
-        }
     });
 }
 
@@ -4222,8 +3965,8 @@ function createUpdateExternalToolsButton(count = 0) {
     let compact_actions_zone = document.querySelector('.actions-box .mdg');
 
     let update_external_tools_btn = document.getElementById(mh_update_external_tools_id);
-    const external_display_zone = zone_marker ? (window.innerWidth < 480 && mho_parameters.show_compact && compact_actions_zone ? document.querySelector('.actions-box .mdg') : zone_marker) : undefined;
-    const chest = document.querySelector('.inventory.chest');
+    const external_display_zone = zone_marker ? (window.innerWidth < 480 && mho_parameters.show_compact && compact_actions_zone ? document.querySelector('hordes-inventory') : zone_marker) : undefined;
+    const chest = document.querySelector('hordes-inventory');
     const amelios = document.querySelector('#upgrade_home_level')?.parentElement?.parentElement;
 
     if (nb_tools_to_update <= 0 || !external_app_id) {
@@ -4329,13 +4072,13 @@ function createLargeUpdateExternalToolsButton(update_external_tools_btn) {
 
                 let tools_fail = [];
                 let response_items = Object.keys(response).map((key) => {
-                    return {key: key, value: response[key]}
+                    return { key: key, value: response[key] }
                 });
 
                 response_items.forEach((response_item, index) => {
 
                     let final = Object.keys(response_item.value).map((key) => {
-                        return {key: key, value: response_item.value[key]}
+                        return { key: key, value: response_item.value[key] }
                     });
                     tools_fail = [...tools_fail, ...final.filter((final_item) => !final_item.value || (final_item.value.toLowerCase() !== 'ok' && final_item.value.toLowerCase() !== 'not activated'))];
                     if (index >= response_items.length - 1) {
@@ -4411,11 +4154,11 @@ function createSmallUpdateExternalToolsButton(update_external_tools_btn) {
 
                 let tools_fail = [];
                 let response_items = Object.keys(response).map((key) => {
-                    return {key: key, value: response[key]}
+                    return { key: key, value: response[key] }
                 });
                 response_items.forEach((response_item, index) => {
                     let final = Object.keys(response_item.value).map((key) => {
-                        return {key: key, value: response_item.value[key]}
+                        return { key: key, value: response_item.value[key] }
                     });
                     tools_fail = [...tools_fail, ...final.filter((final_item) => !final_item.value || (final_item.value.toLowerCase() !== 'ok' && final_item.value.toLowerCase() !== 'not activated'))];
                     if (index >= response_items.length - 1) {
@@ -4440,21 +4183,6 @@ function createSmallUpdateExternalToolsButton(update_external_tools_btn) {
     return update_external_tools_btn;
 }
 
-/** Si l'option associée est activée, un clic sur le chantier recommandé permet de rediriger vers la ligne du chantier en question */
-function clickOnVotedToRedirect() {
-    if (mho_parameters.click_on_voted && pageIsConstructions()) {
-        let voted_building = document.getElementsByClassName('voted-building')[0];
-        if (voted_building) {
-            voted_building.setAttribute('style', 'cursor: pointer');
-            voted_building.addEventListener('click', () => {
-                let voted_row = document.getElementsByClassName('voted')[0];
-                voted_row.setAttribute('style', 'scroll-margin: 100px');
-                voted_row.scrollIntoView();
-            });
-        }
-    }
-}
-
 function displaySearchFields() {
     if (mho_parameters.display_search_fields) {
         displaySearchFieldOnBuildings();
@@ -4465,15 +4193,15 @@ function displaySearchFields() {
     }
 }
 
-/** Si l'option associée est activée, affiche un champ de recherche sur la page de chantiers */
+/** Si l'option associée est activée, masque les chantiers complétés sur la page de chantiers */
 function hideCompletedBuildings() {
-    if (mho_parameters.hide_completed_buildings_field && pageIsConstructions()) {
-        let buildings = Array.from(document.querySelectorAll('.buildings') || []);
 
+    let hideBuildings = (buildings) => {
         let building_rows = [];
         buildings.forEach((building) => {
             building_rows.push(...Array.from(building.querySelectorAll('.building')));
         });
+
         /** Masque les lignes de chantiers devant être masquées */
         building_rows.forEach((building_row) => {
             if (building_row.classList.contains('complete') && !building_row.querySelector('.to_repair')) {
@@ -4491,90 +4219,156 @@ function hideCompletedBuildings() {
                 building.classList.remove('mho-hidden');
             }
         });
-    } else if (pageIsConstructions) {
-        let buildings = Array.from(document.querySelectorAll('.buildings') || []);
+    }
+
+    let showBuildings = (buildings) => {
         buildings.forEach((building) => {
             if (building.classList.contains('mho-hidden')) {
                 building.classList.remove('mho-hidden');
             }
-            Array.from(building.querySelectorAll('.building.mho-hidden')).forEach((building) => {
-                building.classList.remove('mho-hidden');
-            })
+            Array.from(building.querySelectorAll('.building.mho-hidden')).forEach((buildingRow) => {
+                buildingRow.classList.remove('mho-hidden');
+            });
         });
+    }
+
+    let observeBuildings = () => {
+        const observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                if (mutation.addedNodes.length > 0) {
+                    let buildings = Array.from(document.querySelectorAll('.buildings') || []);
+                    if (buildings.length > 0) {
+                        hideBuildings(buildings);
+                        observer.disconnect();
+                    }
+                }
+            });
+        });
+
+        observer.observe(document.body, { childList: true, subtree: true });
+    }
+
+    if (pageIsConstructions()) {
+        let buildings = Array.from(document.querySelectorAll('.buildings') || []);
+        if (mho_parameters.hide_completed_buildings_field) {
+            if (buildings.length > 0) {
+                hideBuildings(buildings);
+            } else {
+                observeBuildings();
+            }
+        } else {
+            if (buildings.length > 0) {
+                hideBuildings(buildings);
+            } else {
+                showBuildings();
+            }
+        }
     }
 }
 
 /** Si l'option associée est activée, affiche un champ de recherche sur la page de chantiers */
 function displaySearchFieldOnBuildings() {
     let fields_container = document.getElementById(mho_search_building_field_id);
+    let searchFieldAdded = false; // Indicateur pour suivre l'ajout du champ de recherche
+
+
+    let addSearchField = (tabs) => {
+        if (searchFieldAdded) return; // Vérifie si le champ de recherche a déjà été ajouté
+
+        let tabs_block = tabs.parentElement;
+
+        fields_container = document.getElementById(mho_search_building_field_id);
+        if (fields_container) return; // Vérifie si le conteneur existe déjà
+
+        fields_container = document.createElement('div');
+        fields_container.style.display = 'flex';
+        fields_container.style.flexWrap = 'wrap';
+        fields_container.style.alignItems = 'center';
+        fields_container.style.gap = '0.5em';
+        fields_container.style.marginTop = '0.5em';
+        fields_container.id = mho_search_building_field_id;
+        tabs_block.insertBefore(fields_container, tabs);
+
+        let search_field_div = document.createElement('div');
+        search_field_div.style.display = 'flex';
+        search_field_div.style.alignItems = 'center';
+        fields_container.appendChild(search_field_div);
+        if (!mho_parameters.display_search_field_buildings) {
+            search_field_div.classList.add('hidden');
+        }
+
+        let header_mho_img = document.createElement('img');
+        header_mho_img.src = mh_optimizer_icon;
+        header_mho_img.style.height = '24px';
+        header_mho_img.style.position = 'absolute';
+        search_field_div.appendChild(header_mho_img);
+
+        let search_field = document.createElement('input');
+        search_field.type = 'text';
+        search_field.placeholder = getI18N(params_categories.find((category) => category.id === 'display').params.find((param) => param.id === 'display_search_fields').children.find((child) => child.id === 'display_search_field_buildings').label);
+        search_field.classList.add('mho-input', 'inline');
+        search_field.setAttribute('style', 'min-width: 200px; padding-left: 24px;');
+        search_field_div.appendChild(search_field);
+
+        let buildings = Array.from(document.querySelectorAll('.buildings') || []);
+
+        let filterBuildings = () => {
+            let building_rows = [];
+            buildings.forEach((building) => {
+                building_rows.push(...Array.from(building.querySelectorAll('.building')));
+            });
+            building_rows.forEach((building_row) => {
+                let force_hide = mho_parameters.hide_completed_buildings_field && building_row.classList.contains('complete');
+
+                if (force_hide) {
+                    building_row.classList.add('hidden');
+                } else if (normalizeString(building_row.querySelector('.building_name').innerText).indexOf(normalizeString(search_field.value)) > -1) {
+                    building_row.classList.remove('hidden');
+                } else {
+                    building_row.classList.add('hidden');
+                }
+            });
+
+            buildings.forEach((building) => {
+                if (Array.from(building.children).filter((child) => child.classList.contains('building')).every((child) => child.classList.contains('hidden'))) {
+                    building.classList.add('hidden');
+                } else {
+                    building.classList.remove('hidden');
+                }
+            });
+        };
+
+        search_field.addEventListener('keyup', (event) => {
+            filterBuildings();
+        });
+
+        searchFieldAdded = true; // Mettre à jour l'indicateur après l'ajout
+    }
+
+    let observeTabs = () => {
+        const observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                if (mutation.addedNodes.length > 0) {
+                    let tabs = document.querySelector('ul.buildings-tabs');
+                    if (tabs) {
+                        addSearchField(tabs);
+                        observer.disconnect();
+                    }
+                }
+            });
+        });
+
+        observer.observe(document.body, { childList: true, subtree: true });
+    }
+
     if (mho_parameters.display_search_field_buildings && pageIsConstructions()) {
         if (fields_container) return;
 
         let tabs = document.querySelector('ul.buildings-tabs');
         if (tabs) {
-            let tabs_block = tabs.parentElement;
-
-            fields_container = document.createElement('div');
-            fields_container.style.display = 'flex';
-            fields_container.style.flexWrap = 'wrap';
-            fields_container.style.alignItems = 'center';
-            fields_container.style.gap = '0.5em';
-            fields_container.style.marginTop = '0.5em';
-            fields_container.id = mho_search_building_field_id;
-            tabs_block.insertBefore(fields_container, tabs);
-
-            let search_field_div = document.createElement('div');
-            search_field_div.style.display = 'flex';
-            search_field_div.style.alignItems = 'center';
-            fields_container.appendChild(search_field_div);
-            if (!mho_parameters.display_search_field_buildings) {
-                search_field_div.classList.add('hidden');
-            }
-
-            let header_mho_img = document.createElement('img');
-            header_mho_img.src = mh_optimizer_icon;
-            header_mho_img.style.height = '24px';
-            header_mho_img.style.position = 'absolute';
-            search_field_div.appendChild(header_mho_img);
-
-            let search_field = document.createElement('input');
-            search_field.type = 'text';
-            search_field.placeholder = getI18N(params_categories.find((category) => category.id === 'display').params.find((param) => param.id === 'display_search_fields').children.find((child) => child.id === 'display_search_field_buildings').label);
-            search_field.classList.add('mho-input', 'inline');
-            search_field.setAttribute('style', 'min-width: 200px; padding-left: 24px;');
-            search_field_div.appendChild(search_field);
-
-            let buildings = Array.from(document.querySelectorAll('.buildings') || []);
-
-            let filterBuildings = () => {
-                let building_rows = [];
-                buildings.forEach((building) => {
-                    building_rows.push(...Array.from(building.querySelectorAll('.building')));
-                });
-                building_rows.forEach((building_row) => {
-                    let force_hide = mho_parameters.hide_completed_buildings_field && building_row.classList.contains('complete');
-
-                    if (force_hide) {
-                        building_row.classList.add('hidden');
-                    } else if (normalizeString(building_row.querySelector('.building_name').innerText).indexOf(normalizeString(search_field.value)) > -1) {
-                        building_row.classList.remove('hidden');
-                    } else {
-                        building_row.classList.add('hidden');
-                    }
-                });
-
-                buildings.forEach((building) => {
-                    if (Array.from(building.children).filter((child) => child.classList.contains('building')).every((child) => child.classList.contains('hidden'))) {
-                        building.classList.add('hidden');
-                    } else {
-                        building.classList.remove('hidden');
-                    }
-                });
-            };
-
-            search_field.addEventListener('keyup', (event) => {
-                filterBuildings();
-            });
+            addSearchField(tabs);
+        } else {
+            observeTabs();
         }
     } else if (fields_container) {
         fields_container.remove();
@@ -4810,7 +4604,7 @@ function displayMinApOnBuildings() {
         // Selectionne le noeud dont les mutations seront observées
         let tooltip_container = document.querySelector('#tooltip_container');
         // Options de l'observateur (quelles sont les mutations à observer)
-        let config = {childList: true, subtree: true};
+        let config = { childList: true, subtree: true };
 
         // Fonction callback à éxécuter quand une mutation est observée
         let callback = function (mutationsList) {
@@ -5207,10 +5001,10 @@ function displayAdvancedTooltips() {
                     tooltip_container.style.pointerEvents = 'all';
                     hovered.li.addEventListener('mouseleave', function (event) {
                         event.stopImmediatePropagation();
-                    }, true, {signal: controller.signal});
+                    }, true, { signal: controller.signal });
                     hovered.li.addEventListener('pointerleave', function (event) {
                         event.stopImmediatePropagation();
-                    }, true, {signal: controller.signal});
+                    }, true, { signal: controller.signal });
 
                     let cancelHover = () => {
                         hovered_tooltip_x_item_id = undefined;
@@ -5227,13 +5021,13 @@ function displayAdvancedTooltips() {
                                 cancelHover();
                             }
                         }, 1000)
-                    }, true, {signal: controller.signal});
+                    }, true, { signal: controller.signal });
                     tooltip_container.addEventListener('mouseleave', (event) => {
                         cancelHover();
-                    }, {signal: controller.signal});
+                    }, { signal: controller.signal });
                     tooltip_container.addEventListener('pointerleave', (event) => {
                         cancelHover();
-                    }, {signal: controller.signal});
+                    }, { signal: controller.signal });
                 }, 1000);
             }
 
@@ -6337,10 +6131,10 @@ function displayTranslateTool() {
         if (!mho_header_space) return;
 
         let langs = [
-            {value: 'de', img: '🇩🇪'},
-            {value: 'en', img: '🇬🇧'},
-            {value: 'es', img: '🇪🇸'},
-            {value: 'fr', img: '🇫🇷'},
+            { value: 'de', img: '🇩🇪' },
+            { value: 'en', img: '🇬🇧' },
+            { value: 'es', img: '🇪🇸' },
+            { value: 'fr', img: '🇫🇷' },
         ]
         let mho_display_translate_input_div = createSelectWithSearch();
         mho_display_translate_input_div.id = mho_display_translate_input_id;
@@ -6639,12 +6433,12 @@ function displayEstimationsOnWatchtower() {
             let updateEstimationRow = (estimations, percent, type) => {
                 if (!estimations.estimations[type][`_${percent}`]) {
                     /** Workaround pour définir sur l'extension firefox sans passer par cloneinto */
-                    let estimations_workaround_estim = {...estimations.estimations};
-                    let estimations_workaround_type = {...estimations_workaround_estim[type]};
-                    let estimations_workaround_type_percent = {min: null, max: null};
-                    estimations_workaround_type[`_${percent}`] = {...estimations_workaround_type_percent};
-                    estimations_workaround_estim[type] = {...estimations_workaround_type};
-                    estimations.estimations = {...estimations_workaround_estim};
+                    let estimations_workaround_estim = { ...estimations.estimations };
+                    let estimations_workaround_type = { ...estimations_workaround_estim[type] };
+                    let estimations_workaround_type_percent = { min: null, max: null };
+                    estimations_workaround_type[`_${percent}`] = { ...estimations_workaround_type_percent };
+                    estimations_workaround_estim[type] = { ...estimations_workaround_type };
+                    estimations.estimations = { ...estimations_workaround_estim };
                 }
 
                 let estimation = estimations.estimations[type][`_${percent}`];
@@ -6681,7 +6475,7 @@ function displayEstimationsOnWatchtower() {
             }
 
             getEstimations().then((estimations) => {
-                estimations = {...estimations};
+                estimations = { ...estimations };
                 estim_block = document.createElement('div');
                 estim_block.style.marginTop = '1em';
                 estim_block.style.padding = '0.25em';
@@ -6713,12 +6507,12 @@ function displayEstimationsOnWatchtower() {
 
                 estim_block_title_save_button.addEventListener('click', () => {
                     saveEstimations({
-                            percent: current_estimation_percent,
-                            value: {
-                                min: +watchtower_estim_block_prediction?.split(' ')[0],
-                                max: +watchtower_estim_block_prediction?.split(' ')[2]
-                            }
-                        },
+                        percent: current_estimation_percent,
+                        value: {
+                            min: +watchtower_estim_block_prediction?.split(' ')[0],
+                            max: +watchtower_estim_block_prediction?.split(' ')[2]
+                        }
+                    },
                         {
                             percent: current_planif_percent,
                             value: {
@@ -6825,13 +6619,13 @@ function displayEstimationsOnWatchtower() {
 
                     if (!estimations.estimations.estim['_' + value]) {
                         /** Workaround pour définir sur l'extension firefox sans passer par cloneinto */
-                        let new_estimations = {...estimations};
-                        let new_estimations_estimations = {...new_estimations.estimations};
-                        let new_estimations_estimations_estim = {...new_estimations_estimations.estim};
-                        new_estimations_estimations_estim['_' + value] = {min: null, max: null};
-                        new_estimations_estimations.estim = {...new_estimations_estimations_estim};
-                        new_estimations.estimations = {...new_estimations_estimations};
-                        estimations = {...new_estimations};
+                        let new_estimations = { ...estimations };
+                        let new_estimations_estimations = { ...new_estimations.estimations };
+                        let new_estimations_estimations_estim = { ...new_estimations_estimations.estim };
+                        new_estimations_estimations_estim['_' + value] = { min: null, max: null };
+                        new_estimations_estimations.estim = { ...new_estimations_estimations_estim };
+                        new_estimations.estimations = { ...new_estimations_estimations };
+                        estimations = { ...new_estimations };
                     }
                     let value_block = document.createElement('div');
                     value_block.style.display = 'flex';
@@ -6884,13 +6678,13 @@ function displayEstimationsOnWatchtower() {
 
                         if (!estimations.estimations.planif['_' + value]) {
                             /** Workaround pour définir sur l'extension firefox sans passer par cloneinto */
-                            let new_estimations = {...estimations};
-                            let new_estimations_estimations = {...new_estimations.estimations};
-                            let new_estimations_estimations_planif = {...new_estimations_estimations.planif};
-                            new_estimations_estimations_planif['_' + value] = {min: null, max: null};
-                            new_estimations_estimations.planif = {...new_estimations_estimations_planif};
-                            new_estimations.estimations = {...new_estimations_estimations};
-                            estimations = {...new_estimations};
+                            let new_estimations = { ...estimations };
+                            let new_estimations_estimations = { ...new_estimations.estimations };
+                            let new_estimations_estimations_planif = { ...new_estimations_estimations.planif };
+                            new_estimations_estimations_planif['_' + value] = { min: null, max: null };
+                            new_estimations_estimations.planif = { ...new_estimations_estimations_planif };
+                            new_estimations.estimations = { ...new_estimations_estimations };
+                            estimations = { ...new_estimations };
                         }
 
                         let value_block = document.createElement('div');
@@ -6921,7 +6715,10 @@ function displayEstimationsOnWatchtower() {
 }
 
 function displayAntiAbuseCounter() {
-    const controller = new AbortController();
+    if (anti_abuse_controller) {
+        // anti_abuse_controller.abort();
+    }
+    anti_abuse_controller = new AbortController();
     if (mho_parameters.display_anti_abuse && (pageIsBank() || pageIsWell())) {
         let mho_anti_abuse_counter = document.querySelector(`#${mho_anti_abuse_counter_id}`);
         if (mho_anti_abuse_counter) return;
@@ -6980,7 +6777,7 @@ function displayAntiAbuseCounter() {
             add_counter_btn.innerText = '+';
             second_part.appendChild(add_counter_btn);
             add_counter_btn.addEventListener('click', () => {
-                controller.abort();
+                anti_abuse_controller.abort();
                 let fictive_item = {
                     label: {
                         de: `Benutzerdefinierter Zähler`,
@@ -6993,7 +6790,7 @@ function displayAntiAbuseCounter() {
                 if (!counter_values) {
                     counter_values = [];
                 }
-                let counter_value = {item: {item: fictive_item, broken: false}, take_at: Date.now() + 5000};
+                let counter_value = { item: { item: fictive_item, broken: false }, take_at: Date.now() + 5000 };
                 counter_values.push(counter_value);
                 setStorageItem(mho_anti_abuse_key, counter_values);
                 let new_mho_anti_abuse_counter = document.querySelector(`#${mho_anti_abuse_counter_id}`);
@@ -7060,23 +6857,37 @@ function displayAntiAbuseCounter() {
             });
 
             if (pageIsBank()) {
+
+                // Selectionne le noeud dont les mutations seront observées
                 let bank = document.querySelector('#bank-inventory');
-                let bank_items = bank ? Array.from(bank.querySelectorAll('li.item') || []) : [];
-                bank_items.forEach((bank_item) => {
-                    bank_item.addEventListener('click', (event) => {
-                        let old_bag = Array.from(document.querySelectorAll("#gma ul.rucksack li.item"));
+                let old_bag;
 
-                        document.addEventListener('mh-navigation-complete', () => {
-                            controller.abort();
-                            if (!pageIsBank()) return;
-                            let new_bag = document.querySelectorAll("#gma ul.rucksack li.item");
+                bank.addEventListener('click', (event) => {
+                    if (event.srcElement.nodeName.toLowerCase() !== 'li' && event.srcElement.nodeName.toLowerCase() !== 'span' && event.srcElement.nodeName.toLowerCase() !== 'img') return;
+                    if (event.srcElement.className !== '' && event.srcElement.className !== 'item' && event.srcElement.className !== 'item-icon') return;
 
-                            if (old_bag.length < new_bag.length) {
+                    let rucksack = document.querySelector('#bank-inventory ul.rucksack');
+                    if (!old_bag) {
+                        old_bag = document.querySelectorAll('#bank-inventory ul.rucksack li.item:not(.locked)');
+                    }
+
+                    let callback = (mutationsList) => {
+
+                        // if (!pageIsBank()) {
+                        bank_observer?.disconnect();
+                        // return;
+                        // }
+
+                        setTimeout(() => {
+
+                            let new_bag = document.querySelectorAll('#bank-inventory ul.rucksack li.item:not(.locked)');
+
+                            if (old_bag?.length < new_bag?.length) {
                                 getStorageItem(mho_anti_abuse_key).then((counter_values) => {
                                     if (!counter_values) {
                                         counter_values = [];
                                     }
-                                    let old_bag_items = Array.from(old_bag).map((item_in_old_bag) => getItemFromImg(item_in_old_bag.querySelector('img').src))
+                                    let old_bag_items = Array.from(old_bag).map((item_in_old_bag) => getItemFromImg(item_in_old_bag.querySelector('img').src));
                                     let new_bag_items = Array.from(new_bag).map((item_in_new_bag) => getItemFromImg(item_in_new_bag.querySelector('img').src));
                                     new_bag_items.forEach((new_bag_item, index) => {
                                         let old_bag_item_index = old_bag_items.findIndex((old_bag_item) => old_bag_item.id === new_bag_item.id)
@@ -7105,15 +6916,27 @@ function displayAntiAbuseCounter() {
                             } else {
                                 new_bag = undefined;
                             }
-                        }, {once: true});
-                    }, {signal: controller.signal})
-                });
 
+                            setTimeout(() => {
+                                old_bag = new_bag;
+                            }, 0);
+                        }, 100);
+
+                        bank_observer?.disconnect();
+                    }
+
+                    // Options de l'observateur (quelles sont les mutations à observer)
+                    let config = { childList: true, subtree: true, attributes: false };
+                    // Créé une instance de l'observateur lié à la fonction de callback
+                    bank_observer = new MutationObserver(callback);
+                    // Commence à observer le noeud cible pour les mutations précédemment configurées
+                    bank_observer.observe(rucksack, config);
+                }, { signal: anti_abuse_controller.signal });
             } else if (pageIsWell()) {
                 let btn = document.querySelector('button[data-fetch-method="get"][data-fetch-confirm]');
                 btn?.addEventListener('click', (event) => {
                     document.addEventListener('mh-navigation-complete', () => {
-                        controller.abort();
+                        anti_abuse_controller.abort();
                         if (!pageIsWell()) return;
                         let well_item = {
                             label: {
@@ -7128,7 +6951,7 @@ function displayAntiAbuseCounter() {
                             if (!counter_values) {
                                 counter_values = [];
                             }
-                            let counter_value = {item: {item: well_item, broken: false}, take_at: Date.now() + 5000}
+                            let counter_value = { item: { item: well_item, broken: false }, take_at: Date.now() + 5000 }
                             counter_values.push(counter_value);
                             setStorageItem(mho_anti_abuse_key, counter_values);
                             let new_mho_anti_abuse_counter = document.querySelector(`#${mho_anti_abuse_counter_id}`);
@@ -7137,14 +6960,14 @@ function displayAntiAbuseCounter() {
                                 define_row(counter_value, counter_values.length - 1, new_content);
                             }
                         })
-                    }, {once: true});
-                }, {signal: controller.signal})
+                    }, { once: true });
+                }, { signal: anti_abuse_controller.signal })
             } else {
-                controller.abort();
+                anti_abuse_controller.abort();
             }
         });
     } else {
-        controller.abort();
+        anti_abuse_controller.abort();
     }
 }
 
@@ -7656,7 +7479,7 @@ function changeDefaultEscortOptions() {
                         escort_allow_rucksack.click();
                     }
                 }
-            }, {once: true});
+            }, { once: true });
         });
     }
 }
@@ -7819,12 +7642,12 @@ function fillItemsMessages() {
                         let random_filler = lang_fillers[Math.floor(Math.random() * lang_fillers.length)];
 
                         message_title.setAttribute('value', random_filler.title);
-                        message_title.dispatchEvent(new Event('input', {bubbles: true}));
+                        message_title.dispatchEvent(new Event('input', { bubbles: true }));
 
                         message_content.value = random_filler.content;
-                        message_content.dispatchEvent(new Event('input', {bubbles: true}));
+                        message_content.dispatchEvent(new Event('input', { bubbles: true }));
                     }
-                }, {once: true});
+                }, { once: true });
             });
         }, 250);
     }
@@ -8841,103 +8664,103 @@ function getGHMap() {
                 case 'fleche_0':
                 case 'fleche_0_b':
                 case 'fleche_0_n':
-                    return {direction: 'right', type: 'horizontal', source: '', length: 'semi', position: 'right'};
+                    return { direction: 'right', type: 'horizontal', source: '', length: 'semi', position: 'right' };
                 case 'fleche_1':
                 case 'fleche_1_b':
                 case 'fleche_1_n':
-                    return {direction: 'top', type: 'vertical', source: '', length: 'semi', position: 'top'};
+                    return { direction: 'top', type: 'vertical', source: '', length: 'semi', position: 'top' };
                 case 'fleche_2':
                 case 'fleche_2_b':
                 case 'fleche_2_n':
-                    return {direction: 'left', type: 'horizontal', source: '', length: 'semi', position: 'left'};
+                    return { direction: 'left', type: 'horizontal', source: '', length: 'semi', position: 'left' };
                 case 'fleche_3':
                 case 'fleche_3_b':
                 case 'fleche_3_n':
-                    return {direction: 'bottom', type: 'vertical', source: '', length: 'semi', position: 'bottom'};
+                    return { direction: 'bottom', type: 'vertical', source: '', length: 'semi', position: 'bottom' };
                 case 'fleche_4':
                 case 'fleche_4_b':
                 case 'fleche_4_n':
-                    return {direction: 'right', type: 'horizontal', source: '', length: 'semi', position: 'left'};
+                    return { direction: 'right', type: 'horizontal', source: '', length: 'semi', position: 'left' };
                 case 'fleche_5':
                 case 'fleche_5_b':
                 case 'fleche_5_n':
-                    return {direction: 'top', type: 'vertical', source: '', length: 'semi', position: 'bottom'};
+                    return { direction: 'top', type: 'vertical', source: '', length: 'semi', position: 'bottom' };
                 case 'fleche_6':
                 case 'fleche_6_b':
                 case 'fleche_6_n':
-                    return {direction: 'left', type: 'horizontal', source: '', length: 'semi', position: 'right'};
+                    return { direction: 'left', type: 'horizontal', source: '', length: 'semi', position: 'right' };
                 case 'fleche_7':
                 case 'fleche_7_b':
                 case 'fleche_7_n':
-                    return {direction: 'bottom', type: 'vertical', source: '', length: 'semi', position: 'top'};
+                    return { direction: 'bottom', type: 'vertical', source: '', length: 'semi', position: 'top' };
                 case 'fleche_8':
                 case 'fleche_8_b':
                 case 'fleche_8_n':
-                    return {direction: 'both', type: 'horizontal', source: '', length: 'semi', position: 'right'};
+                    return { direction: 'both', type: 'horizontal', source: '', length: 'semi', position: 'right' };
                 case 'fleche_9':
                 case 'fleche_9_b':
                 case 'fleche_9_n':
-                    return {direction: 'both', type: 'vertical', source: '', length: 'semi', position: 'top'};
+                    return { direction: 'both', type: 'vertical', source: '', length: 'semi', position: 'top' };
                 case 'fleche_10':
                 case 'fleche_10_b':
                 case 'fleche_10_n':
-                    return {direction: 'both', type: 'horizontal', source: '', length: 'semi', position: 'left'};
+                    return { direction: 'both', type: 'horizontal', source: '', length: 'semi', position: 'left' };
                 case 'fleche_11':
                 case 'fleche_11_b':
                 case 'fleche_11_n':
-                    return {direction: 'both', type: 'vertical', source: '', length: 'semi', position: 'bottom'};
+                    return { direction: 'both', type: 'vertical', source: '', length: 'semi', position: 'bottom' };
                 case 'fleche_12':
                 case 'fleche_12_b':
                 case 'fleche_12_n':
-                    return {direction: 'left', type: 'horizontal', source: '', length: 'plain', position: 'middle'};
+                    return { direction: 'left', type: 'horizontal', source: '', length: 'plain', position: 'middle' };
                 case 'fleche_13':
                 case 'fleche_13_b':
                 case 'fleche_13_n':
-                    return {direction: 'bottom', type: 'vertical', source: '', length: 'plain', position: 'middle'};
+                    return { direction: 'bottom', type: 'vertical', source: '', length: 'plain', position: 'middle' };
                 case 'fleche_14':
                 case 'fleche_14_b':
                 case 'fleche_14_n':
-                    return {direction: 'right', type: 'horizontal', source: '', length: 'plain', position: 'middle'};
+                    return { direction: 'right', type: 'horizontal', source: '', length: 'plain', position: 'middle' };
                 case 'fleche_15':
                 case 'fleche_15_b':
                 case 'fleche_15_n':
-                    return {direction: 'top', type: 'vertical', source: '', length: 'plain', position: 'middle'};
+                    return { direction: 'top', type: 'vertical', source: '', length: 'plain', position: 'middle' };
                 case 'fleche_16':
                 case 'fleche_16_b':
                 case 'fleche_16_n':
-                    return {direction: 'top', type: 'corner', source: 'right', length: '', position: ''};
+                    return { direction: 'top', type: 'corner', source: 'right', length: '', position: '' };
                 case 'fleche_17':
                 case 'fleche_17_b':
                 case 'fleche_17_n':
-                    return {direction: 'bottom', type: 'corner', source: 'right', length: '', position: ''};
+                    return { direction: 'bottom', type: 'corner', source: 'right', length: '', position: '' };
                 case 'fleche_18':
                 case 'fleche_18_b':
                 case 'fleche_18_n':
-                    return {direction: 'left', type: 'corner', source: 'top', length: '', position: ''};
+                    return { direction: 'left', type: 'corner', source: 'top', length: '', position: '' };
                 case 'fleche_19':
                 case 'fleche_19_b':
                 case 'fleche_19_n':
-                    return {direction: 'right', type: 'corner', source: 'top', length: '', position: ''};
+                    return { direction: 'right', type: 'corner', source: 'top', length: '', position: '' };
                 case 'fleche_20':
                 case 'fleche_20_b':
                 case 'fleche_20_n':
-                    return {direction: 'top', type: 'corner', source: 'left', length: '', position: ''};
+                    return { direction: 'top', type: 'corner', source: 'left', length: '', position: '' };
                 case 'fleche_21':
                 case 'fleche_21_b':
                 case 'fleche_21_n':
-                    return {direction: 'bottom', type: 'corner', source: 'left', length: '', position: ''};
+                    return { direction: 'bottom', type: 'corner', source: 'left', length: '', position: '' };
                 case 'fleche_22':
                 case 'fleche_22_b':
                 case 'fleche_22_n':
-                    return {direction: 'right', type: 'corner', source: 'bottom', length: '', position: ''};
+                    return { direction: 'right', type: 'corner', source: 'bottom', length: '', position: '' };
                 case 'fleche_23':
                 case 'fleche_23_b':
                 case 'fleche_23_n':
-                    return {direction: 'left', type: 'corner', source: 'bottom', length: '', position: ''};
+                    return { direction: 'left', type: 'corner', source: 'bottom', length: '', position: '' };
                 case 'fleche_24':
                 case 'fleche_24_b':
                 case 'fleche_24_n':
-                    return {direction: 'none', type: 'point', source: 'middle', length: 'none', position: 'middle'};
+                    return { direction: 'none', type: 'point', source: 'middle', length: 'none', position: 'middle' };
             }
         }
         getStorageItem(mho_map_key).then((mho_map) => {
@@ -8978,7 +8801,7 @@ function getGHMap() {
                     });
                     new_map.push(cells);
                 });
-            resolve({map: new_map, vertical_mapping: x_mapping});
+            resolve({ map: new_map, vertical_mapping: x_mapping });
         });
     });
 }
@@ -9072,6 +8895,7 @@ function getGHRuin() {
                                         break;
                                 }
 
+                                console.log('cell.firstElementChild', cell.firstElementChild);
                                 switch (cell.firstElementChild.getAttribute('data-porte')) {
                                     case 'pC':
                                         new_cell.door = 'item_lock';
@@ -9096,7 +8920,7 @@ function getGHRuin() {
                         });
                         new_map.push(new_cells);
                     });
-                resolve({map: new_map, vertical_mapping: x_mapping});
+                resolve({ map: new_map, vertical_mapping: x_mapping });
             }
         })
     });
@@ -9148,7 +8972,7 @@ function getBBHMap() {
                                 });
                                 new_map.push(cells);
                             });
-                        resolve({map: new_map, vertical_mapping: x_mapping});
+                        resolve({ map: new_map, vertical_mapping: x_mapping });
                     }
                 }
                 reject();
@@ -9282,7 +9106,7 @@ function getBBHRuin() {
                         });
                         new_map.push(new_cells);
                     });
-                resolve({map: new_map, vertical_mapping: x_mapping});
+                resolve({ map: new_map, vertical_mapping: x_mapping });
             }
         })
     });
@@ -9331,7 +9155,7 @@ function getFMMap() {
                     });
                     new_map.push(cells);
                 });
-            resolve({map: new_map, vertical_mapping: x_mapping});
+            resolve({ map: new_map, vertical_mapping: x_mapping });
         });
     });
 }
@@ -9437,7 +9261,7 @@ function getFMRuin() {
                         });
                         new_map.push(new_cells);
                     });
-                resolve({map: new_map, vertical_mapping: x_mapping});
+                resolve({ map: new_map, vertical_mapping: x_mapping });
             }
         })
     });
@@ -9595,26 +9419,23 @@ function getToken(force, stop) {
 /** Récupère les informations de la ville */
 function getCitizens() {
     return new Promise((resolve, reject) => {
-        getHeroSkills().then((hero_skills) => {
-            fetcher(api_url + `/Fetcher/citizens?userId=${mh_user.id}&townId=${mh_user.townDetails?.townId}`)
-                .then((response) => {
-                    if (response.status === 200) {
-                        return response.json();
-                    } else {
-                        return convertResponsePromiseToError(response);
-                    }
-                })
-                .then((response) => {
-                    citizens = response;
-                    citizens.citizens = Object.keys(citizens.citizens).map((key) => citizens.citizens[key])
-                    resolve(citizens);
-                })
-                .catch((error) => {
-                    addError(error);
-                    reject(error);
-                });
-
-        });
+        fetcher(api_url + `/Fetcher/citizens?userId=${mh_user.id}&townId=${mh_user.townDetails?.townId}`)
+            .then((response) => {
+                if (response.status === 200) {
+                    return response.json();
+                } else {
+                    return convertResponsePromiseToError(response);
+                }
+            })
+            .then((response) => {
+                citizens = response;
+                citizens.citizens = Object.keys(citizens.citizens).map((key) => citizens.citizens[key])
+                resolve(citizens);
+            })
+            .catch((error) => {
+                addError(error);
+                reject(error);
+            });
     });
 }
 
@@ -9666,7 +9487,7 @@ function getWishlist() {
                 }
             })
             .then((response) => {
-                let new_wishlist = {...response};
+                let new_wishlist = { ...response };
                 let new_wishlist_wishlist = {};
                 for (let key in new_wishlist.wishList) {
                     let wishlist_zone = Object.keys(new_wishlist.wishList[key])
@@ -9781,7 +9602,7 @@ function updateExternalTools() {
         });
 
         if (!citizen_list || citizen_list.length === 0) {
-            citizen_list = [{id: mh_user.id, userName: mh_user.userName, job: mh_user.jobDetails.uid}];
+            citizen_list = [{ id: mh_user.id, userName: mh_user.userName, job: mh_user.jobDetails.uid }];
         }
 
         // Mise à jour en ville chaos
@@ -9789,7 +9610,7 @@ function updateExternalTools() {
             && pageIsDesert() && mh_user.townDetails?.isChaos) {
             let objects = Array.from(document.querySelector('.inventory.desert')?.querySelectorAll('li.item') || []).map((desert_item) => {
                 let item = convertImgToItem(desert_item.querySelector('img'));
-                return {id: item?.id, isBroken: desert_item.classList.contains('broken')};
+                return { id: item?.id, isBroken: desert_item.classList.contains('broken') };
             });
 
             let content = {
@@ -9812,8 +9633,8 @@ function updateExternalTools() {
 
         // Mise à jour du nombre de zombies tués
         if (((mho_parameters.update_gh && mho_parameters.update_gh_killed_zombies)
-                || (mho_parameters.update_mho && mho_parameters.update_mho_killed_zombies)
-                || (mho_parameters.update_fata && mho_parameters.update_fata_killed_zombies))
+            || (mho_parameters.update_mho && mho_parameters.update_mho_killed_zombies)
+            || (mho_parameters.update_fata && mho_parameters.update_fata_killed_zombies))
             && pageIsDesert() && nb_dead_zombies > 0) {
             let content = {
                 x: +position[0],
@@ -9832,7 +9653,7 @@ function updateExternalTools() {
 
         // Mise à jour des marqueurs issus des métiers
         if (((mho_parameters.update_mho && mho_parameters.update_mho_job_markers)
-                || (mho_parameters.update_fata && mho_parameters.update_fata_job_markers))
+            || (mho_parameters.update_fata && mho_parameters.update_fata_job_markers))
             && pageIsDesert()) {
             if (mh_user.jobDetails.uid === 'dig') {
                 let content = {
@@ -9896,7 +9717,7 @@ function updateExternalTools() {
             let my_rusksack = Array.from(document.querySelector('.pointer.rucksack')?.querySelectorAll('li.item:not(.locked)') || []).map((rucksack_item) => {
                 let item = convertImgToItem(rucksack_item.querySelector('img'));
                 if (item) {
-                    return {id: item.id, isBroken: rucksack_item.classList.contains('broken')};
+                    return { id: item.id, isBroken: rucksack_item.classList.contains('broken') };
                 }
             });
 
@@ -9911,7 +9732,7 @@ function updateExternalTools() {
                     let escort_id = +escort.querySelector('span.username')?.getAttribute('x-user-id');
                     let escort_rucksack = Array.from(escort.querySelector('.inventory.rucksack-escort')?.querySelectorAll('li.item:not(.locked):not(.plus)') || []).map((rucksack_item) => {
                         let item = convertImgToItem(rucksack_item.querySelector('img'));
-                        return {id: item?.id, isBroken: rucksack_item.classList.contains('broken')};
+                        return { id: item?.id, isBroken: rucksack_item.classList.contains('broken') };
                     });
 
                     rucksacks.push({
@@ -9939,7 +9760,7 @@ function updateExternalTools() {
 
             let chest_elements = Array.from(document.querySelector('.inventory.chest')?.querySelectorAll('li.item:not(.locked)') || []).map((chest_item) => {
                 let item = convertImgToItem(chest_item.querySelector('img'));
-                return {id: item.id, isBroken: chest_item.classList.contains('broken')};
+                return { id: item.id, isBroken: chest_item.classList.contains('broken') };
             });
 
             data.chest.contents = convertListOfSingleObjectsIntoListOfCountedObjects(chest_elements);
@@ -10161,6 +9982,20 @@ function updateExternalTools() {
                 }
             }
             await saveBath(bath_taken);
+
+            /** Espace naturel des ermites */
+
+            /** Cuisine */
+
+            /** Labo */
+
+            /** Tour des gardiens */
+
+            /** Coin sieste */
+
+            /** Galerie des fouineurs */
+
+            /** Repaire des éclaireurs */
         }
 
         /** Envoi des informations */
@@ -10191,41 +10026,6 @@ function updateExternalTools() {
             });
     });
 }
-
-/** Récupère la liste complète des pouvoirs héros */
-function getHeroSkills() {
-    return new Promise((resolve, reject) => {
-        if (!hero_skills) {
-            fetcher(api_url + '/Fetcher/heroSkills')
-                .then((response) => {
-                    if (response.status === 200) {
-                        return response.json();
-                    } else {
-                        return convertResponsePromiseToError(response);
-                    }
-                })
-                .then((response) => {
-                    hero_skills = response.sort((a, b) => {
-                        if (a.daysNeeded > b.daysNeeded) {
-                            return 1;
-                        } else if (a.daysNeeded === b.daysNeeded) {
-                            return 0;
-                        } else {
-                            return -1;
-                        }
-                    });
-                    resolve(hero_skills);
-                })
-                .catch((error) => {
-                    addError(error);
-                    reject(error);
-                });
-        } else {
-            resolve(hero_skills);
-        }
-    });
-}
-
 
 /** Récupère les traductions de la chaine de caractères */
 function getTranslation(string_to_translate, source_language) {
@@ -10267,7 +10067,7 @@ function getRecipes() {
                 .then((response) => {
                     let new_recipes = response
                         .map((recipe) => {
-                            let new_recipe = {...recipe};
+                            let new_recipe = { ...recipe };
                             new_recipe.type = action_types.find((type) => type.id === new_recipe.type);
                             return new_recipe;
                         })
@@ -10391,18 +10191,18 @@ function getApofooAttackCalculation(day, beta) {
 function saveEstimations(estim_value, planif_value) {
     return new Promise((resolve, reject) => {
         getEstimations().then((estimations) => {
-            let new_estimations = {...estimations.estimations};
+            let new_estimations = { ...estimations.estimations };
             if (estim_value && estim_value.value && (estim_value.value.min || estim_value.value.max)) {
                 /** Workaround pour définir sur l'extension firefox sans passer par cloneinto */
-                let new_estimations_workaround_estim = {...new_estimations.estim};
-                new_estimations_workaround_estim['_' + estim_value.percent] = {...estim_value.value};
-                new_estimations.estim = {...new_estimations_workaround_estim};
+                let new_estimations_workaround_estim = { ...new_estimations.estim };
+                new_estimations_workaround_estim['_' + estim_value.percent] = { ...estim_value.value };
+                new_estimations.estim = { ...new_estimations_workaround_estim };
             }
             if (planif_value && planif_value.value && (planif_value.value.min || planif_value.value.max)) {
                 /** Workaround pour définir sur l'extension firefox sans passer par cloneinto */
-                let new_estimations_workaround_planif = {...new_estimations.planif};
-                new_estimations_workaround_planif['_' + planif_value.percent] = {...planif_value.value};
-                new_estimations.planif = {...new_estimations_workaround_planif};
+                let new_estimations_workaround_planif = { ...new_estimations.planif };
+                new_estimations_workaround_planif['_' + planif_value.percent] = { ...planif_value.value };
+                new_estimations.planif = { ...new_estimations_workaround_planif };
             }
 
             fetcher(api_url + `/AttaqueEstimation/Estimations?townId=${mh_user.townDetails?.townId}&userId=${mh_user.id}`, {
@@ -10677,9 +10477,11 @@ function getApiKey() {
                             initOptionsWithoutLoginNeeded();
                         });
 
-                        ['mh-navigation-complete', 'mho-mutation-event', /*'pop', 'load', 'popstate', 'error', 'push', , 'tab-switch', '_react', 'x-react-degenerate', 'DOMContentLoaded', 'movement-reset', 'readystatechange'*/].forEach((event_name) => {
+                        ['mh-navigation-complete', 'mh-current-log-update', 'mh-current-log-refresh', 'mho-mutation-event'/*, 'pop', 'load', 'popstate', 'error', 'push', , 'tab-switch', '_react', 'x-react-degenerate', 'DOMContentLoaded', 'movement-reset', 'readystatechange'*/].forEach((event_name) => {
                             document.addEventListener(event_name, (event) => {
                                 // console.trace('event', event_name, event);
+                                // console.table(listAllEventListeners());
+                                console.log('event', event_name);
                                 if (shouldRefreshMe()) {
                                     getToken(true).then(() => {
                                         initOptionsWithLoginNeeded();
@@ -10693,7 +10495,7 @@ function getApiKey() {
                         });
                         setInterval(() => {
                             displayAdvancedTooltips();
-                        }, 10);
+                        }, 100);
                     });
                 });
             })
