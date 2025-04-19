@@ -378,6 +378,49 @@
         ],
         "action": "Wandeln"
     },
+    "ws024": {
+        "type": "Recipe::WorkshopType",
+        "in": [
+            "noodle_prints_#00"
+        ],
+        "out": [
+            "magneticKey_#00"
+        ],
+        "action": "Wandeln"
+    },
+    "ws025": {
+        "type": "Recipe::WorkshopType",
+        "in": [
+            "noodle_prints_#01"
+        ],
+        "out": [
+            "bumpKey_#00"
+        ],
+        "action": "Wandeln"
+    },
+    "ws026": {
+        "type": "Recipe::WorkshopType",
+        "in": [
+            "noodle_prints_#02"
+        ],
+        "out": [
+            "classicKey_#00"
+        ],
+        "action": "Wandeln"
+    },
+    "ws030": {
+        "type": "Recipe::WorkshopType",
+        "provoking": "wood_log_#00",
+        "in": [
+            "wood_log_#00",
+            "knife_#00",
+            "rustine_#00"
+        ],
+        "out": [
+            "saw_tool_temp_#00"
+        ],
+        "action": "Wandeln"
+    },
     "ws022": {
         "type": "Recipe::WorkshopTypeShamanSpecific",
         "in": [
@@ -388,6 +431,48 @@
         ],
         "action": "Wandeln",
         "picto": "r_mystic2_#00"
+    },
+    "ws027": {
+        "type": "Recipe::WorkshopTypeTechSpecific",
+        "provoking": "meca_parts_#00",
+        "in": [
+            "meca_parts_#00",
+            "plate_#00",
+            "plate_#00"
+        ],
+        "out": [
+            "car_door_#00"
+        ],
+        "action": "Wandeln"
+    },
+    "ws028": {
+        "type": "Recipe::WorkshopTypeTechSpecific",
+        "provoking": "cutter_#00",
+        "in": [
+            "pet_snake2_#00",
+            "pet_snake2_#00",
+            "cutter_#00",
+            "wood2_#00",
+            "wire_#00"
+        ],
+        "out": [
+            "sheet_#00"
+        ],
+        "action": "Wandeln"
+    },
+    "ws029": {
+        "type": "Recipe::WorkshopTypeTechSpecific",
+        "provoking": "bone_meat_#00",
+        "in": [
+            "bone_meat_#00",
+            "poison_part_#00"
+        ],
+        "out": [
+            "bone_#00",
+            "smelly_meat_#00"
+        ],
+        "multi_out": true,
+        "action": "Wandeln"
     },
     "com001": {
         "type": "Recipe::ManualAnywhere",
@@ -495,7 +580,7 @@
         "out": [
             "food_noodles_hot_#00"
         ],
-        "provoking": "spices_#00",
+        "provoking": "food_noodles_#00",
         "in": [
             "food_noodles_#00",
             "spices_#00",
@@ -566,7 +651,8 @@
             "jerrygun_part_#00",
             "jerrycan_#00",
             "rustine_#00"
-        ]
+        ],
+        "picto": "r_watgun_#00"
     },
     "com015": {
         "type": "Recipe::ManualAnywhere",
@@ -1071,12 +1157,56 @@
         "out": [
             "bike_#00"
         ],
-        "provoking": "bike_#00",
+        "provoking": "bike_part_#00",
         "in": [
-            "bike_#00",
+            "bike_part_#00",
             "rustine_#00",
             "metal_#00",
             "chain_#00"
+        ]
+    },
+    "com053": {
+        "type": "Recipe::ManualAnywhere",
+        "out": [
+            "soccer_#00"
+        ],
+        "provoking": "soccer_part_#00",
+        "in": [
+            "soccer_part_#00",
+            "rustine_#00"
+        ]
+    },
+    "com054": {
+        "type": "Recipe::ManualAnywhere",
+        "out": [
+            "moldy_food_part_#00"
+        ],
+        "provoking": "moldy_food_subpart_#00",
+        "in": [
+            "moldy_food_subpart_#00",
+            "moldy_food_subpart_#00"
+        ]
+    },
+    "com055": {
+        "type": "Recipe::ManualAnywhere",
+        "out": [
+            "moldy_food_#00"
+        ],
+        "provoking": "moldy_food_part_#00",
+        "in": [
+            "moldy_food_part_#00",
+            "moldy_food_subpart_#00"
+        ]
+    },
+    "com056": {
+        "type": "Recipe::ManualAnywhere",
+        "out": [
+            "moldy_food_spicy_#00"
+        ],
+        "provoking": "spices_#00",
+        "in": [
+            "moldy_food_subpart_#00",
+            "spices_#00"
         ]
     }
 }

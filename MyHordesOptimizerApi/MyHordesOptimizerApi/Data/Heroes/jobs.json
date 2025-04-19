@@ -64,8 +64,8 @@
             "basic_suit_dirt_#00"
         ],
         "picto": "r_jguard_#00",
-        "nightwatch_def_bonus": 30,
-        "nightwatch_surv_bonus": 0.04,
+        "nightwatch_def_bonus": 15,
+        "nightwatch_surv_bonus": 0.05,
         "dig_bonus": 0
     },
     "hunter": {
@@ -100,10 +100,11 @@
         "items_alt": [
             "basic_suit_dirt_#00",
             "tamed_pet_drug_#00",
-            "tamed_pet_off_#00"
+            "tamed_pet_off_#00",
+            "tamed_pet_gone_#00"
         ],
         "picto": "r_jtamer_#00",
-        "nightwatch_def_bonus": 20,
+        "nightwatch_def_bonus": 5,
         "nightwatch_surv_bonus": 0,
         "dig_bonus": 0
     },

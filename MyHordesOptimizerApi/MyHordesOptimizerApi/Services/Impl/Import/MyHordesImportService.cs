@@ -13,6 +13,7 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Action = MyHordesOptimizerApi.Models.Action;
 
@@ -106,23 +107,27 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
             var translations = await TranslationService.GetTranslations();
             foreach (var capacitie in capacities)
             {
-                capacitie.LabelFr = translations["fr"].Where(ymlFileModel => ymlFileModel.Translations.ContainsKey(capacitie.LabelDe))
-                    .Select(ymlFileModel => ymlFileModel.Translations[capacitie.LabelDe])
+
+                string labelDe = this.cleanChar(capacitie.LabelDe);
+                capacitie.LabelFr = translations["fr"].Where(ymlFileModel => ymlFileModel.Translations.ContainsKey(labelDe))
+                    .Select(ymlFileModel => ymlFileModel.Translations[labelDe])
                     .First();
-                capacitie.LabelEn = translations["en"].Where(ymlFileModel => ymlFileModel.Translations.ContainsKey(capacitie.LabelDe))
-                    .Select(ymlFileModel => ymlFileModel.Translations[capacitie.LabelDe])
+                capacitie.LabelEn = translations["en"].Where(ymlFileModel => ymlFileModel.Translations.ContainsKey(labelDe))
+                    .Select(ymlFileModel => ymlFileModel.Translations[labelDe])
                     .First();
-                capacitie.LabelEs = translations["es"].Where(ymlFileModel => ymlFileModel.Translations.ContainsKey(capacitie.LabelDe))
-                    .Select(ymlFileModel => ymlFileModel.Translations[capacitie.LabelDe])
+                capacitie.LabelEs = translations["es"].Where(ymlFileModel => ymlFileModel.Translations.ContainsKey(labelDe))
+                    .Select(ymlFileModel => ymlFileModel.Translations[labelDe])
                     .First();
-                capacitie.DescriptionFr = translations["fr"].Where(ymlFileModel => ymlFileModel.Translations.ContainsKey(capacitie.DescriptionDe))
-                    .Select(ymlFileModel => ymlFileModel.Translations[capacitie.DescriptionDe])
+
+                string descriptionDe = this.cleanChar(capacitie.DescriptionDe);
+                capacitie.DescriptionFr = translations["fr"].Where(ymlFileModel => ymlFileModel.Translations.ContainsKey(descriptionDe))
+                    .Select(ymlFileModel => ymlFileModel.Translations[descriptionDe])
                     .First();
-                capacitie.DescriptionEn = translations["en"].Where(ymlFileModel => ymlFileModel.Translations.ContainsKey(capacitie.DescriptionDe))
-                    .Select(ymlFileModel => ymlFileModel.Translations[capacitie.DescriptionDe])
+                capacitie.DescriptionEn = translations["en"].Where(ymlFileModel => ymlFileModel.Translations.ContainsKey(descriptionDe))
+                    .Select(ymlFileModel => ymlFileModel.Translations[descriptionDe])
                     .First();
-                capacitie.DescriptionEs = translations["es"].Where(ymlFileModel => ymlFileModel.Translations.ContainsKey(capacitie.DescriptionDe))
-                    .Select(ymlFileModel => ymlFileModel.Translations[capacitie.DescriptionDe])
+                capacitie.DescriptionEs = translations["es"].Where(ymlFileModel => ymlFileModel.Translations.ContainsKey(descriptionDe))
+                    .Select(ymlFileModel => ymlFileModel.Translations[descriptionDe])
                     .First();
             }
 
@@ -614,6 +619,13 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
             DbContext.Patch(modelsFromDb, modeles, defaultWishlistItemComparer);
         }
 
+        #endregion
+
+        #region Utils
+        private string cleanChar(string to_clean)
+        {
+            return to_clean.Replace("\\", "");
+        }
         #endregion
     }
 }
