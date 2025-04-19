@@ -46,13 +46,23 @@ export class TutoScriptInstallationComponent {
         {
             title: 'iOS', content: $localize`<ul>
                 <li>Télécharger l’application "UserScripts" ;</li>
-                <li>Aller dans "Fichiers" ;</li>
-                <li>Créer un dossier que l’on appellera "UserScripts" (ou autre mais c’est pour mieux s’y retrouver) ;</li>
-                <li>Ouvrir l’application "UserScripts" ;</li>
-                <li>Appuyer sur "Set Userscripts Directory" ;</li>
-                <li>Sélectionner le dossier précédemment créé et valider ;</li>
-                <li>Enregistrer le fichier disponible sur le ${this.download_link} (ou via un appui long sur le lien, peut être);</li>
-                <li>Déplacer le fichier dans le dossier créé ;</li>
+                <li>Ouvrir l'application "Raccourcis" ;</li>
+                <li>Appuyer sur le bouton "+" en haut à droite pour créer un nouveau raccourci ;</li>
+                <li>Rechercher l'action "Obtenir le contenu de l'URL" et l'ajouter ;</li>
+                <li>Rechercher l'action "Enregister le fichier" et l'ajouter ;</li>
+                <li>Configurer l'action "Obtenir le contenu de l'URL" en modifiant la valeur du paramètre "URL" par la valeur "Entrée de raccourci" ;</li>
+                <li>Configurer l'action "Recevoir l'entrée" en modifiant la valeur du premier paramètre "Images et 18 de plus" par la valeur "URL" uniquement ;</li>
+                <li>Configurer l'action "Recevoir l'entrée" en modifiant la valeur du second paramètre "Nulle part" par la valeur "Dans la feuille de partage" ;</li>
+                <li>Terminer la création du raccourci en appuyant sur le bouton "OK" en haut à droite ;</li>
+                <li>Enregistrer le fichier disponible sur le ${this.download_link} via un appui long sur le lien, en sélectionnant "Partager..." puis l'action "Enregister le fichier" ;</li>
+                <li>Autoriser l'action "Enregistrer le fichier" à l'envoyer 1 élement de l'app Safari vers "github.com" ;</li>
+                <li>Sélectionner l'onglet "Explorer", choisir l'emplacement "Sur mon iPhone", sélectionner le dossier "Userscripts" puis valider appuyant sur le bouton "Ouvrir" en haut à droite ;</li>
+                <li>Ouvrir l'application "Fichiers" ;</li>
+                <li>Retourner dans le dossier "Userscripts" ("Explorer" > "Sur mon iPhone" > "Userscripts") ;</li>
+                <li>Appuyer sur le bouton "..." en haut à droite et sélectionner "Options de présentation" ;</li>
+                <li>Activer l'option avancée "Afficher toutes les extensions de fichiers" ;</li>
+                <li>Renommer le fichier "my_hordes_optimizer.user.txt" en "my_hoydes_optimizer.user.js" ;</li>
+                <li>Confirmer le remplacement de l'extension via le choix "Utiliser ".js ;</li>
                 <li>Aller sur Safari ;</li>
                 <li>Appuyer sur le "Aa" dans la barre de recherche ;</li>
                 <li>Cliquer sur "Gérer les extensions" ;</li>

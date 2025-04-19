@@ -158,13 +158,23 @@ Il faut d'abord installer l'application de gestion des scripts de votre choix. I
 #### iOS
 
   - Télécharger l’application "UserScripts" ;
-  - Aller dans "Fichiers" ;
-  - Créer un dossier que l’on appellera "UserScripts" (ou autre mais c’est pour mieux s’y retrouver) ;
-  - Ouvrir l’application "UserScripts" ;
-  - Appuyer sur "Set Userscripts Directory" ;
-  - Sélectionner le dossier précédemment créé et valider ;
-  - Enregistrer le fichier disponible sur le [lien de téléchargement](https://github.com/zerah54/MyHordesOptimizer/raw/main/Scripts/Tampermonkey/my_hordes_optimizer.user.js) du script (ou via un appui long sur le lien, peut être);
-  - Déplacer le fichier dans le dossier créé ;
+  - Ouvrir l'application "Raccourcis" ;
+  - Appuyer sur le bouton "+" en haut à droite pour créer un nouveau raccourci ;
+  - Rechercher l'action "Obtenir le contenu de l'URL" et l'ajouter ;
+  - Rechercher l'action "Enregister le fichier" et l'ajouter ;
+  - Configurer l'action "Obtenir le contenu de l'URL" en modifiant la valeur du paramètre "URL" par la valeur "Entrée de raccourci" ;
+  - Configurer l'action "Recevoir l'entrée" en modifiant la valeur du premier paramètre "Images et 18 de plus" par la valeur "URL" uniquement ;
+  - Configurer l'action "Recevoir l'entrée" en modifiant la valeur du second paramètre "Nulle part" par la valeur "Dans la feuille de partage" ;
+  - Terminer la création du raccourci en appuyant sur le bouton "OK" en haut à droite ;
+  - Enregistrer le fichier disponible sur le [lien de téléchargement](https://github.com/zerah54/MyHordesOptimizer/raw/main/Scripts/Tampermonkey/my_hordes_optimizer.user.js) via un appui long sur le lien, en sélectionnant "Partager..." puis l'action "Enregister le fichier" ;
+  - Autoriser l'action "Enregistrer le fichier" à l'envoyer 1 élement de l'app Safari vers "github.com" ;
+  - Sélectionner l'onglet "Explorer", choisir l'emplacement "Sur mon iPhone", sélectionner le dossier "Userscripts" puis valider appuyant sur le bouton "Ouvrir" en haut à droite ;
+  - Ouvrir l'application "Fichiers" ;
+  - Retourner dans le dossier "Userscripts" ("Explorer" > "Sur mon iPhone" > "Userscripts") ;
+  - Appuyer sur le bouton "..." en haut à droite et sélectionner "Options de présentation" ;
+  - Activer l'option avancée "Afficher toutes les extensions de fichiers" ;
+  - Renommer le fichier "my_hordes_optimizer.user.txt" en "my_hoydes_optimizer.user.js" ;
+  - Confirmer le remplacement de l'extension via le choix "Utiliser ".js ;
   - Aller sur Safari ;
   - Appuyer sur le "Aa" dans la barre de recherche ;
   - Cliquer sur "Gérer les extensions" ;
