@@ -157,7 +157,7 @@ export const skills: NewHeroSkill[] = [
                     es: 'Elite',
                     de: 'Meister'
                 },
-                pointsNeeded: 75,
+                pointsNeeded: 80,
                 skills: [
                     {
                         fr: '2% de chances supplémentaires de survie pendant la Veille',
@@ -293,7 +293,7 @@ export const skills: NewHeroSkill[] = [
                     es: 'Elite',
                     de: 'Meister'
                 },
-                pointsNeeded: 75,
+                pointsNeeded: 80,
                 skills: [
                     {
                         fr: 'Vaincre la mort (soigne la terreur, gueule de bois et convalescence)',
@@ -423,7 +423,7 @@ export const skills: NewHeroSkill[] = [
                     es: 'Elite',
                     de: 'Meister'
                 },
-                pointsNeeded: 75,
+                pointsNeeded: 80,
                 skills: [
                     {
                         fr: '1 point de contrôle supplémentaire si pas "ivre" ou "gueule de bois"',
@@ -565,7 +565,7 @@ export const skills: NewHeroSkill[] = [
                     es: 'Elite',
                     de: 'Meister'
                 },
-                pointsNeeded: 75,
+                pointsNeeded: 80,
                 skills: [
                     {
                         fr: 'Une autre place supplémentaire dans votre sac à dos',
@@ -707,7 +707,7 @@ export const skills: NewHeroSkill[] = [
                     es: 'Elite',
                     de: 'Meister'
                 },
-                pointsNeeded: 75,
+                pointsNeeded: 80,
                 skills: [
                     {
                         fr: 'Retour du Héros (15 km)',
