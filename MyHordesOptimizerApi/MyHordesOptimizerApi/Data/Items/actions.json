@@ -5081,7 +5081,7 @@
     },
     "hero_generic_return": {
         "label": "Die Rückkehr des Helden",
-        "tooltip": "Wenn du {CitizenProperties::HeroReturnRange} km oder weniger von der Stadt entfernt bist, kehrst du sofort in die Stadt zurück!",
+        "tooltip": "Wenn du {cfg_ctp_props_actions_hero_return_range} km oder weniger von der Stadt entfernt bist, kehrst du sofort in die Stadt zurück!",
         "cover": true,
         "at00": true,
         "meta": [
@@ -5169,7 +5169,7 @@
     },
     "hero_generic_punch": {
         "label": "Wildstyle Uppercut",
-        "tooltip": "Damit kannst du mit einem Schlag {CitizenProperties::HeroPunchKills} Zombies umbringen!",
+        "tooltip": "Damit kannst du mit einem Schlag {cfg_ctp_props_actions_hero_punch_kills} Zombies umbringen!",
         "meta": [
             "must_be_outside_or_exploring",
             "must_have_zombies",
@@ -5183,7 +5183,7 @@
     },
     "hero_generic_ap": {
         "label": "Zweite Lunge",
-        "tooltip": "<nc-HeroSecondWindBonusAP op=\"gt\" val=\"0\">Verschafft dir {CitizenProperties::HeroSecondWindBaseSP} frische Erkundungspunkte.</nc-HeroSecondWindBonusAP><c-HeroSecondWindBonusAP op=\"gt\" val=\"0\">Verschafft dir {CitizenProperties::HeroSecondWindBaseSP} frische Erkundungspunkte, stellt {CitizenProperties::HeroSecondWindBonusAP} AP wieder her und beseitigt deine Müdigkeit.</c-HeroSecondWindBonusAP>",
+        "tooltip": "<nc-HeroSecondWindBonusAP op=\"gt\" val=\"0\">Verschafft dir {cfg_ctp_props_actions_hero_sw_sp} frische Erkundungspunkte.</nc-HeroSecondWindBonusAP><c-HeroSecondWindBonusAP op=\"gt\" val=\"0\">Verschafft dir {cfg_ctp_props_actions_hero_sw_sp} frische Erkundungspunkte, stellt {cfg_ctp_props_actions_hero_sw_ap} AP wieder her und beseitigt deine Müdigkeit.</c-HeroSecondWindBonusAP>",
         "cover": true,
         "at00": true,
         "meta": [
@@ -5228,7 +5228,7 @@
     },
     "hero_generic_rescue": {
         "label": "Rettung",
-        "tooltip": "Du bringst einen anderen Spieler nach Hause (dieser darf max. {CitizenProperties::HeroRescueRange} Felder von der Stadt entfernt sein).",
+        "tooltip": "Du bringst einen anderen Spieler nach Hause (dieser darf max. {cfg_ctp_props_actions_hero_rescue_range} Felder von der Stadt entfernt sein).",
         "confirm": true,
         "confirmMsg": "Möchtest du {target} heimbringen?",
         "target": {

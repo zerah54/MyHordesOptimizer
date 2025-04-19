@@ -2,7 +2,7 @@
     "hero_generic_return": {
         "name": "hero_generic_return",
         "title": "Die Rückkehr des Helden",
-        "description": "Wenn du {CitizenProperties::HeroReturnRange} km oder weniger von der Stadt entfernt bist, kehrst du sofort in die Stadt zurück!",
+        "description": "Wenn du {cfg_ctp_props_actions_hero_return_range} km oder weniger von der Stadt entfernt bist, kehrst du sofort in die Stadt zurück!",
         "daysNeeded": 0,
         "unlockable": true,
         "nbUses": 1
@@ -18,7 +18,7 @@
     "hero_generic_punch": {
         "name": "hero_generic_punch",
         "title": "Wildstyle Uppercut",
-        "description": "Damit kannst du mit einem Schlag {CitizenProperties::HeroPunchKills} Zombies umbringen!",
+        "description": "Damit kannst du mit einem Schlag {cfg_ctp_props_actions_hero_punch_kills} Zombies umbringen!",
         "daysNeeded": 0,
         "unlockable": true,
         "nbUses": 1
@@ -26,7 +26,7 @@
     "hero_generic_ap": {
         "name": "hero_generic_ap",
         "title": "Zweite Lunge",
-        "description": "<nc-HeroSecondWindBonusAP op=\"gt\" val=\"0\">Verschafft dir {CitizenProperties::HeroSecondWindBaseSP} frische Erkundungspunkte.</nc-HeroSecondWindBonusAP><c-HeroSecondWindBonusAP op=\"gt\" val=\"0\">Verschafft dir {CitizenProperties::HeroSecondWindBaseSP} frische Erkundungspunkte, stellt {CitizenProperties::HeroSecondWindBonusAP} AP wieder her und beseitigt deine Müdigkeit.</c-HeroSecondWindBonusAP>",
+        "description": "<nc-HeroSecondWindBonusAP op=\"gt\" val=\"0\">Verschafft dir {cfg_ctp_props_actions_hero_sw_sp} frische Erkundungspunkte.</nc-HeroSecondWindBonusAP><c-HeroSecondWindBonusAP op=\"gt\" val=\"0\">Verschafft dir {cfg_ctp_props_actions_hero_sw_sp} frische Erkundungspunkte, stellt {cfg_ctp_props_actions_hero_sw_ap} AP wieder her und beseitigt deine Müdigkeit.</c-HeroSecondWindBonusAP>",
         "daysNeeded": 0,
         "unlockable": true,
         "nbUses": 1
@@ -74,7 +74,7 @@
     "hero_generic_rescue": {
         "name": "hero_generic_rescue",
         "title": "Rettung",
-        "description": "Du bringst einen anderen Spieler nach Hause (dieser darf max. {CitizenProperties::HeroRescueRange} Felder von der Stadt entfernt sein).",
+        "description": "Du bringst einen anderen Spieler nach Hause (dieser darf max. {cfg_ctp_props_actions_hero_rescue_range} Felder von der Stadt entfernt sein).",
         "daysNeeded": 0,
         "unlockable": true,
         "nbUses": 1

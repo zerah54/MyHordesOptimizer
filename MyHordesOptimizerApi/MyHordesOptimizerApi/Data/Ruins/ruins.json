@@ -1961,17 +1961,7 @@
             "postal_box_#01": [
                 3,
                 "DropMod::EventChristmas"
-            ],
-            "postal_box_#01_xmas_alt_1": {
-                "item": "postal_box_#01",
-                "count": 3,
-                "mod": "DropMod::EventChristmasAlt1"
-            },
-            "postal_box_xl_#00_xmas_alt_2": {
-                "item": "postal_box_xl_#00",
-                "count": 3,
-                "mod": "DropMod::EventChristmasAlt2"
-            }
+            ]
         },
         "desc": "Dieses Gebäude scheint von den turbulenten Ereignissen der Vergangenheit verschont worden zu sein. Es ist noch vollkommen intakt und erinnert an ein klassisches Postbüro mit doppelten Schalterfenstern und durchsiebtem Sprechfenster. Hier wirst du kaum etwas Nützliches finden außer etwas zum Lesen..."
     },

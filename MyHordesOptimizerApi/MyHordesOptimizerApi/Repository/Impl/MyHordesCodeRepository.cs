@@ -23,15 +23,7 @@ namespace MyHordesOptimizerApi.Repository.Impl
             var text = File.ReadAllText(path);
             var json = JObject.Parse(text);
 
-            var path2 = "Data/Ruins/ruins_additional_info.json";
-            var text2 = File.ReadAllText(path2);
-            var json2 = JObject.Parse(text2);
-
-            var jsonFinal = new JObject();
-            jsonFinal.Merge(json);
-            jsonFinal.Merge(json2);
-
-            var dico = jsonFinal.ToJson().FromJson<Dictionary<string, MyHordesRuinCodeModel>>();
+            var dico = json.ToJson().FromJson<Dictionary<string, MyHordesRuinCodeModel>>();
             return dico;
         }
 
