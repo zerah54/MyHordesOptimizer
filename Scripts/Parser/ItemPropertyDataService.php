@@ -252,7 +252,24 @@ $properties = [
     'moldy_food_#00'             => [ 'food', 'can_cook', 'single_use', 'lure' ],
 ];
 
-$new_properties = json_encode($properties, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+$fragile = [ "angryc_#00", "pet_cat_#00", "pet_dog_#00", "grenade_#00", "bgrenade_#00", "iphone_#00", "boomfruit_#00", "pharma_#00", "coffee_#00", "hmbrew_#00", "vodka_de_#00", "vodka_#00", "rhum_#00", "fest_#00", "poison_#00", "pet_snake2_#00", "pet_chick_#00", "pet_pig_#00", "pet_rat_#00", "pet_snake_#00", "quantum_#00" ];
+
+function mergePropertiesAndFragile($properties, $fragile) {
+    foreach ($fragile as $item) {
+        if (isset($properties[$item])) {
+            // Si l'élément existe dans $properties, ajouter "fragile" à ses propriétés
+            $properties[$item][] = 'fragile';
+        } else {
+            // Si l'élément n'existe pas dans $properties, l'ajouter avec la propriété "fragile"
+            $properties[$item] = ['fragile'];
+        }
+    }
+    return $properties;
+}
+
+$mergedProperties = mergePropertiesAndFragile($properties, $fragile);
+
+$new_properties = json_encode($mergedProperties, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
 $filename_target = '../../MyHordesOptimizerApi/MyHordesOptimizerApi/Data/Items/item-properties.json';
 file_put_contents($filename_target, $new_properties);
 

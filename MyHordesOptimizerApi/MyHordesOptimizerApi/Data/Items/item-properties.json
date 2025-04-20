@@ -129,7 +129,8 @@
         "pet",
         "esc_fixed",
         "lock",
-        "nw_trebuchet"
+        "nw_trebuchet",
+        "fragile"
     ],
     "plate_#00": [
         "impoundable",
@@ -255,14 +256,17 @@
         "hero_find_lucky",
         "nw_shooting",
         "hero_find_lucky2",
-        "hero_find_lucky3"
+        "hero_find_lucky3",
+        "fragile"
     ],
     "bgrenade_#00": [
         "weapon",
-        "nw_shooting"
+        "nw_shooting",
+        "fragile"
     ],
     "boomfruit_#00": [
-        "weapon"
+        "weapon",
+        "fragile"
     ],
     "pilegun_#00": [
         "weapon"
@@ -418,7 +422,8 @@
         "weapon"
     ],
     "iphone_#00": [
-        "weapon"
+        "weapon",
+        "fragile"
     ],
     "machine_1_#00": [
         "esc_fixed",
@@ -476,7 +481,8 @@
     ],
     "pharma_#00": [
         "impoundable",
-        "drug"
+        "drug",
+        "fragile"
     ],
     "pharma_part_#00": [
         "drug"
@@ -752,31 +758,38 @@
     "angryc_#00": [
         "pet",
         "weapon",
-        "nw_trebuchet"
+        "nw_trebuchet",
+        "fragile"
     ],
     "pet_cat_#00": [
         "pet",
-        "nw_trebuchet"
+        "nw_trebuchet",
+        "fragile"
     ],
     "pet_chick_#00": [
         "pet",
-        "nw_trebuchet"
+        "nw_trebuchet",
+        "fragile"
     ],
     "pet_pig_#00": [
         "pet",
-        "nw_trebuchet"
+        "nw_trebuchet",
+        "fragile"
     ],
     "pet_rat_#00": [
         "pet",
-        "nw_trebuchet"
+        "nw_trebuchet",
+        "fragile"
     ],
     "pet_snake_#00": [
         "pet",
-        "nw_trebuchet"
+        "nw_trebuchet",
+        "fragile"
     ],
     "pet_snake2_#00": [
         "pet",
-        "nw_trebuchet"
+        "nw_trebuchet",
+        "fragile"
     ],
     "renne_#00": [
         "impoundable",
@@ -1075,7 +1088,8 @@
         "single_use"
     ],
     "quantum_#00": [
-        "hero_find_lucky3"
+        "hero_find_lucky3",
+        "fragile"
     ],
     "lens_#00": [
         "hero_find_lucky2",
@@ -1090,7 +1104,8 @@
         "nw_impact_cumul",
         "hero_find_lucky2",
         "hero_find_lucky3",
-        "lure"
+        "lure",
+        "fragile"
     ],
     "pumpkin_tasty_#00": [
         "impoundable",
@@ -1113,5 +1128,23 @@
         "can_cook",
         "single_use",
         "lure"
+    ],
+    "hmbrew_#00": [
+        "fragile"
+    ],
+    "vodka_de_#00": [
+        "fragile"
+    ],
+    "vodka_#00": [
+        "fragile"
+    ],
+    "rhum_#00": [
+        "fragile"
+    ],
+    "fest_#00": [
+        "fragile"
+    ],
+    "poison_#00": [
+        "fragile"
     ]
 }
