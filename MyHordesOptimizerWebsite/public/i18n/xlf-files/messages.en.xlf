@@ -2810,7 +2810,7 @@
           <context context-type="sourcefile">src/app/my-town/statistics/scrutateur/scrutateur.component.ts</context>
           <context context-type="linenumber">40</context>
         </context-group>
-        <target state="needs-translation">Direction</target>
+        <target state="translated">Direction</target>
       </trans-unit>
       <trans-unit id="1163439985107240214" datatype="html" approved="yes">
         <source>Niveau</source>
