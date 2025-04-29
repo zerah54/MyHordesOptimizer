@@ -20,10 +20,14 @@
         .states-cards-origine {
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 2rem;
+            align-content: center;
 
-            mat-button-toggle-group {
-                width: fit-content;
+            .states-cards-origine-content{
+                display: flex;
+                justify-content: space-between;
+                flex-wrap: wrap;
+                gap: 2rem;
             }
 
             .mat-mdc-form-field .mat-mdc-form-field-icon-prefix {
@@ -40,9 +44,10 @@
 
             .states-cards-current-pipboy {
                 display: flex;
+                align-self: center;
                 align-items: center;
                 gap: 16px;
-                align-self: center;
+
 
                 mat-list {
                     border: 1px solid var(--primary);

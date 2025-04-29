@@ -8,42 +8,46 @@
         <ng-container>
             <h3 i18n>État de départ</h3>
             <div class="states-cards-origine">
-                <mat-button-toggle-group hideSingleSelectionIndicator>
-                    <mat-button-toggle><img [ngSrc]="HORDES_IMG_REPO + 'status/status_hasdrunk.gif'" alt="" height="16"
+                <div class="states-cards-origine-content">
+                    <mat-button-toggle-group hideSingleSelectionIndicator>
+                        <mat-button-toggle><img [ngSrc]="HORDES_IMG_REPO + 'status/status_hasdrunk.gif'" alt="" height="16"
                             width="16"></mat-button-toggle>
-                    <mat-button-toggle><img [ngSrc]="HORDES_IMG_REPO + 'status/status_thirst1.gif'" alt="" height="16"
+                        <mat-button-toggle><img [ngSrc]="HORDES_IMG_REPO + 'status/status_thirst1.gif'" alt="" height="16"
                             width="16"></mat-button-toggle>
-                    <mat-button-toggle><img [ngSrc]="HORDES_IMG_REPO + 'status/status_thirst2.gif'" alt="" height="16"
+                        <mat-button-toggle><img [ngSrc]="HORDES_IMG_REPO + 'status/status_thirst2.gif'" alt="" height="16"
                             width="16"></mat-button-toggle>
-                </mat-button-toggle-group>
-                <mat-button-toggle-group hideMultipleSelectionIndicator multiple>
-                    <mat-button-toggle><img [ngSrc]="HORDES_IMG_REPO + 'status/status_drunk.gif'" alt="" height="16"
+                    </mat-button-toggle-group>
+                    <mat-button-toggle-group hideMultipleSelectionIndicator multiple>
+                        <mat-button-toggle><img [ngSrc]="HORDES_IMG_REPO + 'status/status_drunk.gif'" alt="" height="16"
                             width="16"></mat-button-toggle>
-                    <mat-button-toggle><img [ngSrc]="HORDES_IMG_REPO + 'status/status_hungover.gif'" alt="" height="16"
+                        <mat-button-toggle><img [ngSrc]="HORDES_IMG_REPO + 'status/status_hungover.gif'" alt="" height="16"
                             width="16"></mat-button-toggle>
-                    <mat-button-toggle><img [ngSrc]="HORDES_IMG_REPO + 'status/status_drugged.gif'" alt="" height="16"
+                        <mat-button-toggle><img [ngSrc]="HORDES_IMG_REPO + 'status/status_drugged.gif'" alt="" height="16"
                             width="16"></mat-button-toggle>
-                    <mat-button-toggle><img [ngSrc]="HORDES_IMG_REPO + 'status/status_addict.gif'" alt="" height="16"
+                        <mat-button-toggle><img [ngSrc]="HORDES_IMG_REPO + 'status/status_addict.gif'" alt="" height="16"
                             width="16"></mat-button-toggle>
-                </mat-button-toggle-group>
-                <mat-button-toggle-group hideMultipleSelectionIndicator multiple>
-                    <mat-button-toggle><img [ngSrc]="HORDES_IMG_REPO + 'status/status_wound1.gif'" alt="" height="16"
+                    </mat-button-toggle-group>
+                    <mat-button-toggle-group hideMultipleSelectionIndicator multiple>
+                        <mat-button-toggle><img [ngSrc]="HORDES_IMG_REPO + 'status/status_wound1.gif'" alt="" height="16"
                             width="16"></mat-button-toggle>
-                    <mat-button-toggle><img [ngSrc]="HORDES_IMG_REPO + 'status/status_tired.gif'" alt="" height="16"
+                        <mat-button-toggle><img [ngSrc]="HORDES_IMG_REPO + 'status/status_tired.gif'" alt="" height="16"
                             width="16"></mat-button-toggle>
-                    <mat-button-toggle><img [ngSrc]="HORDES_IMG_REPO + 'status/status_ghoul.gif'" alt="" height="16"
+                        <mat-button-toggle><img [ngSrc]="HORDES_IMG_REPO + 'status/status_ghoul.gif'" alt="" height="16"
                             width="16"></mat-button-toggle>
-                </mat-button-toggle-group>
-                <mat-form-field appearance="outline">
-                    <mat-label i18n>Points d'actions disponibles</mat-label>
-                    <span matPrefix><mho-icon-ap /></span>
-                    <input matInput min="0" max="8" type="number" value="6">
-                </mat-form-field>
-                <mat-form-field appearance="outline">
-                    <mat-label i18n>Points d'exploration disponibles</mat-label>
-                    <span matPrefix><mho-icon-ep /></span>
-                    <input matInput min="0" max="12" type="number" value="0">
-                </mat-form-field>
+                    </mat-button-toggle-group>
+                </div>
+                <div class="states-cards-origine-content">
+                    <mat-form-field appearance="outline">
+                        <mat-label i18n>Points d'actions disponibles</mat-label>
+                        <span matPrefix><mho-icon-ap /></span>
+                        <input matInput max="8" min="0" type="number" value="6">
+                    </mat-form-field>
+                    <mat-form-field appearance="outline">
+                        <mat-label i18n>Points d'exploration disponibles</mat-label>
+                        <span matPrefix><mho-icon-ep /></span>
+                        <input matInput max="12" min="0" type="number" value="0">
+                    </mat-form-field>
+                </div>
             </div>
         </ng-container>
     </div>
