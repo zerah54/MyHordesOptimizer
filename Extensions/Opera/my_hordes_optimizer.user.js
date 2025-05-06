@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MHO Addon
-// @version      1.1.0.0
+// @version      1.1.1.0
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/, rubrique Tutoriels
 // @author       Zerah
 //
@@ -31,7 +31,8 @@
 // ==/UserScript==
 
 const changelog = `${getScriptInfo().name} : Changelog pour la version ${getScriptInfo().version}\n\n`
-    + `Mise à jour de compatibilité (ou presque) avec la S18`;
+    + `[Correction] Ajout de diverses propriétés manquantes sur les objets \n`
+    + `[Correction] Corrige l'envoi du sac à dos à MHO \n`;
 
 const lang = (document.querySelector('html[lang]')?.getAttribute('lang') || document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2) || 'fr';
 
@@ -1145,6 +1146,15 @@ let params_categories = [
                             es: `Grabar excavaciones exitosas`
                         },
                     },
+                    // {
+                    //     id: `update_mho_souls`,
+                    //     label: {
+                    //         en: `Record souls' positions as a chaman`,
+                    //         fr: `Enregistrer les positions des âmes en tant que chaman`,
+                    //         de: `Die Position der Seelen als Schamane aufzeichnen`,
+                    //         es: `Registrando las posiciones de las almas como chamán`
+                    //     },
+                    // },
                     {
                         id: `refresh_mho_after_update`,
                         label: {
@@ -1846,6 +1856,11 @@ function pageIsAmelio() {
     return document.URL.indexOf('town/house/build') > -1;
 }
 
+/** @return {boolean}    true si la page de l'utilisateur est la page de la porte */
+function pageIsDoors() {
+    return document.URL.endsWith('town/door');
+}
+
 /** @return {boolean}    true si la page de l'utilisateur est la page de la tour de guet */
 function pageIsWatchtower() {
     return document.URL.indexOf('town/watchtower') > -1;
@@ -2261,13 +2276,7 @@ function getHoveredItem() {
     //             broken = hovered_item_img.parentElement.parentElement.classList.contains('broken');
     //         }
     //     }
-    return {
-        item: hovered_item,
-        broken: broken,
-        li: hovered_item_li,
-        status: hovered_status,
-        alt: hovered_item_img?.alt
-    };
+    return { item: hovered_item, broken: broken, li: hovered_item_li, status: hovered_status, alt: hovered_item_img?.alt };
 }
 
 function getClickedItem(target) {
@@ -3968,16 +3977,17 @@ function createUpdateExternalToolsButton(count = 0) {
     const external_display_zone = zone_marker ? (window.innerWidth < 480 && mho_parameters.show_compact && compact_actions_zone ? document.querySelector('hordes-inventory') : zone_marker) : undefined;
     const chest = document.querySelector('hordes-inventory');
     const amelios = document.querySelector('#upgrade_home_level')?.parentElement?.parentElement;
+    const map_actions = document.querySelector('#door_opener')?.parentElement ?? document.querySelector('#door_exit')?.parentElement;
 
     if (nb_tools_to_update <= 0 || !external_app_id) {
         if (update_external_tools_btn) {
             update_external_tools_btn.parentElement.remove();
         }
     } else {
-        if (external_display_zone || (chest && pageIsHouse()) || (amelios && pageIsAmelio())) {
+        if (external_display_zone || (chest && pageIsHouse()) || (amelios && pageIsAmelio()) || (map_actions && pageIsDoors() && mho_parameters.update_mho && mho_parameters.update_mho_souls)) {
             if (!update_external_tools_btn) {
                 if (window.innerWidth < 480 && mho_parameters.show_compact && compact_actions_zone) {
-                    let el = external_display_zone || chest?.parentElement || amelios;
+                    let el = external_display_zone ?? chest?.parentElement ?? amelios ?? map_actions;
                     let updater_bloc = createSmallUpdateExternalToolsButton(update_external_tools_btn);
                     if (amelios) {
                         el.parentElement.insertBefore(updater_bloc, el.nextElementSibling);
@@ -3985,7 +3995,7 @@ function createUpdateExternalToolsButton(count = 0) {
                         el.appendChild(updater_bloc);
                     }
                 } else {
-                    let el = external_display_zone?.parentElement.parentElement.parentElement || chest?.parentElement || amelios;
+                    let el = external_display_zone?.parentElement.parentElement.parentElement ?? chest?.parentElement ?? amelios ?? map_actions;
                     let updater_bloc = createLargeUpdateExternalToolsButton(update_external_tools_btn);
                     if (amelios) {
                         el.parentElement.insertBefore(updater_bloc, el.nextElementSibling);
@@ -3994,7 +4004,6 @@ function createUpdateExternalToolsButton(count = 0) {
                     }
                 }
             } else if (count < 3) {
-                let update_external_tools_btn2 = document.getElementById(mh_update_external_tools_id);
                 setTimeout(() => {
                     createUpdateExternalToolsButton(count + 1);
                 }, 250)
@@ -4222,7 +4231,7 @@ function hideCompletedBuildings() {
     }
 
     let showBuildings = (buildings) => {
-        buildings.forEach((building) => {
+        buildings?.forEach((building) => {
             if (building.classList.contains('mho-hidden')) {
                 building.classList.remove('mho-hidden');
             }
@@ -5163,6 +5172,7 @@ function displayPropertiesOrActions(property_or_action, hovered_item) {
     switch (property_or_action) {
         case 'eat_6ap':
         case 'eat_7ap':
+        case 'eat_4ap':
             item_action.classList.add(`item-tag-food`);
             item_action.innerHTML = `+${property_or_action.slice(4, 5)}<img src="${repo_img_hordes_url}emotes/ap.${lang}.gif">`;
             break;
@@ -5180,6 +5190,7 @@ function displayPropertiesOrActions(property_or_action, hovered_item) {
             item_action.innerHTML = `+6<img src="${repo_img_hordes_url}emotes/ap.${lang}.gif">`;
             break;
         case 'cyanide':
+            item_action.classList.add(`no-img`);
             item_action.innerHTML = `<img src="${repo_img_hordes_url}emotes/death.gif">`;
             break;
         case 'hero_find':
@@ -5192,7 +5203,15 @@ function displayPropertiesOrActions(property_or_action, hovered_item) {
             break;
         case 'hero_find_lucky':
             item_action.classList.add(`item-tag-hero`);
-            item_action.innerText = `Trouvaille améliorée`;
+            item_action.innerText = `Jolie trouvaille`
+            break;
+        case 'hero_find_lucky2':
+            item_action.classList.add(`item-tag-hero`);
+            item_action.innerText = `Impressionnante trouvaille`;
+            break;
+        case 'hero_find_lucky3':
+            item_action.classList.add(`item-tag-hero`);
+            item_action.innerText = `Incroyable trouvaille`;
             break;
         case 'ressource':
             item_action.innerText = `Ressource`;
@@ -5202,23 +5221,34 @@ function displayPropertiesOrActions(property_or_action, hovered_item) {
             var fail_1 = Math.round(60 / 90 * 100);
             item_action.innerText = `${100 - fail_1}% de chances de pouvoir fuir pendant 30 secondes`;
             break;
-        case 'flash_photo_2':
+        case 'flash_photo_2': {
             item_action.classList.add(`mho-item-tag-large`);
-            var fail_2 = Math.round(30 / 90 * 100);
+            let fail_2 = Math.round(30 / 90 * 100);
             item_action.innerText = `${100 - fail_2}% de chances de pouvoir fuir pendant 60 secondes`;
             break;
-        case 'flash_photo_3':
+        }
+        case 'flash_photo_3': {
             item_action.classList.add(`mho-item-tag-large`);
-            var fail_3 = 1;
+            let fail_3 = 1;
             item_action.innerText = `Succès : ${100 - fail_3}% de chances de pouvoir fuir pendant 120 secondes`;
             break;
+        }
+        case 'flash_photo_4': {
+            item_action.classList.add(`mho-item-tag-large`);
+            let fail_4 = 1;
+            item_action.innerText = `Succès : ${100 - fail_4}% de chances de pouvoir fuir pendant 120 secondes`;
+            break;
+        }
         case 'can_cook':
+            item_action.classList.add(`no-img`);
             item_action.innerText = `Peut être cuisiné`;
             break;
         case 'pet':
+            item_action.classList.add(`no-img`);
             item_action.innerText = `Animal`;
             break;
         case 'can_poison':
+            item_action.classList.add(`no-img`);
             item_action.innerText = `Peut être empoisonné`;
             break;
         case 'load_maglite':
@@ -5239,10 +5269,12 @@ function displayPropertiesOrActions(property_or_action, hovered_item) {
             break;
         case 'smokebomb':
             item_action.classList.add(`item-tag-smokebomb`);
-            item_action.innerHTML = `Efface les entrées du registre (-3 minutes)<br />Dissimule votre prochaine entrée (+1 minute)`
+            item_action.classList.add(`no-img`);
+            item_action.innerHTML = `Efface les entrées du registre (-3 minutes)<br />Dissimule votre prochaine entrée (+1 minute)`;
             break;
         case 'improve':
-            item_action.innerText = `Permet d'aménager un campement`
+            item_action.classList.add(`no-img`);
+            item_action.innerText = `Permet d'aménager un campement`;
             break;
         case 'defence':
             // déjà affichés par le jeu
@@ -5271,6 +5303,7 @@ function displayPropertiesOrActions(property_or_action, hovered_item) {
                 }
                 if (devastated) chances = Math.max(0.1, chances - 0.2);
                 var success = chances * 100;
+                item_action.classList.add(`no-img`);
                 item_action.innerText = `${success}% de chances de réussir son manuel`;
             } else {
                 item_action.classList.remove('item-tag');
@@ -5281,7 +5314,20 @@ function displayPropertiesOrActions(property_or_action, hovered_item) {
             item_action.classList.remove('item-tag');
             break;
         case 'prevent_night':
+            item_action.classList.add(`no-img`);
             item_action.innerText = `Malus de nuit divisé par 4`;
+            break;
+        case 'no_post':
+            item_action.classList.add(`no-img`);
+            item_action.innerText = `Ne peut pas être envoyé par message`;
+            break;
+        case 'wagging_flag':
+            item_action.classList.add(`no-img`);
+            item_action.innerText = `Attire 2.5% des zombies du débordement`;
+            break;
+        case 'fragile':
+            item_action.classList.add(`no-img`);
+            item_action.innerText = `Se casse en cas d'envoi par catapulte`;
             break;
         case 'box_opener':
         case 'can_opener':
@@ -5296,7 +5342,11 @@ function displayPropertiesOrActions(property_or_action, hovered_item) {
         case 'esc_fixed':
         case 'slaughter_2xs':
         case 'throw_animal_cat':
+        case 'throw_animal_cat_t1':
+        case 'throw_animal_cat_t2':
         case 'throw_animal_tekel':
+        case 'throw_animal_tekel_t1':
+        case 'throw_animal_tekel_t2':
         case 'parcel_opener_h':
         case 'hero_tamer_3':
         case 'throw_b_chair_basic':
@@ -5337,6 +5387,8 @@ function displayPropertiesOrActions(property_or_action, hovered_item) {
         case 'throw_b_torch_off':
         case 'throw_boomfruit':
         case 'throw_animal_dog':
+        case 'throw_animal_dog_t1':
+        case 'throw_animal_dog_t2':
         case 'throw_b_concrete_wall':
         case 'drug_xana1':
         case 'drug_xana2':
@@ -5372,6 +5424,8 @@ function displayPropertiesOrActions(property_or_action, hovered_item) {
         case 'special_dice':
         case 'slaughter_2x':
         case 'throw_animal':
+        case 'throw_animal_t1':
+        case 'throw_animal_t2':
         case 'slaughter_4xs':
         case 'repair_2':
         case 'zonemarker_1':
@@ -5429,6 +5483,7 @@ function displayPropertiesOrActions(property_or_action, hovered_item) {
         case 'open_h_chest':
         case 'open_postbox':
         case 'open_lunchbag':
+        case 'open_drugkit':
         case 'open_safe':
         case 'open_abox':
         case 'open_asafe':
@@ -5537,6 +5592,40 @@ function displayPropertiesOrActions(property_or_action, hovered_item) {
         case 'hero_tamer_2b':
         case 'alarm_clock':
         case 'inedible':
+        case 'lure':
+        case 'equip_shoe_first':
+        case 'hero_dog_fetch':
+        case 'nw_impact_cumul':
+        case 'eat_apple':
+        case 'drink_quantum_1':
+        case 'drink_quantum_2':
+        case 'drink_quantum_3':
+        case 'play_soccer_1':
+        case 'play_soccer_2':
+        case 'nosteal':
+        case 'install_garland':
+        case 'uninstall_garland':
+        case 'open_cellobox':
+        case 'flash_photo_4_ruin_bp':
+        case 'flash_photo_4_ruin_bp_free':
+        case 'flash_photo_4_ruin_no_bp':
+        case 'repair_hero':
+        case 'equip_bike_first':
+        case 'unequip_bike_first':
+        case 'pet_doggo':
+        case 'jerrycan_4':
+        case 'jerrycan_4b':
+        case 'hero_tamer_4':
+        case 'hero_tamer_4b':
+        case 'hero_tamer_5':
+        case 'hero_tamer_5b':
+        case 'hero_tamer_6':
+        case 'hero_tamer_6b':
+        case 'hero_tamer_7':
+        case 'hero_tamer_7b':
+        case 'hero_tamer_8':
+        case 'hero_tamer_8b':
+        case 'hero_tamer_9':
             item_action.classList.remove('item-tag');
             break;
         case 'deco':
@@ -5548,7 +5637,8 @@ function displayPropertiesOrActions(property_or_action, hovered_item) {
             item_action.classList.remove('item-tag');
             break;
         default:
-            console.log(property_or_action);
+            console.warn('missing property or action', property_or_action);
+            item_action.classList.remove('item-tag');
             break;
     }
     return item_action;
@@ -8483,6 +8573,10 @@ function createStyles() {
         + `background: url(${repo_img_hordes_url}status/status_drugged.gif) 50%/contain no-repeat;`
         + '}';
 
+    const item_tag_no_img = 'div.item-tag.no-img::after {'
+        + `content: '' !important;`
+        + '}';
+
     const item_tag_smokebomb = 'div.item-tag-smokebomb {'
         + `height: 36px;`
         + '}';
@@ -9714,7 +9808,7 @@ function updateExternalTools() {
             };
 
             let rucksacks = [];
-            let my_rusksack = Array.from(document.querySelector('.pointer.rucksack')?.querySelectorAll('li.item:not(.locked)') || []).map((rucksack_item) => {
+            let my_rusksack = Array.from(document.querySelector('.inventory.rucksack')?.querySelectorAll('li.item:not(.locked)') || []).map((rucksack_item) => {
                 let item = convertImgToItem(rucksack_item.querySelector('img'));
                 if (item) {
                     return { id: item.id, isBroken: rucksack_item.classList.contains('broken') };
@@ -9764,6 +9858,17 @@ function updateExternalTools() {
             });
 
             data.chest.contents = convertListOfSingleObjectsIntoListOfCountedObjects(chest_elements);
+        }
+
+        // Mise à jour des positions des âmes en tant que chaman
+        // TODO récupérer l'info "isChaman" et n'envoyer ces informations que si on l'est
+        if (mho_parameters.update_mho && mho_parameters.update_mho_souls && pageIsDoors()) {
+            const soul_areas = Array.from(document.querySelectorAll('.soul-area') ?? []).map((soul_area) => {
+                return { x: soul_area.parentElement?.style?.gridRowStart, y: soul_area.parentElement?.style?.gridColumnStart };
+            })
+            data.souls = soul_areas;
+            console.log("data.souls", data.souls);
+            console.log("user", mh_user);
         }
 
 
