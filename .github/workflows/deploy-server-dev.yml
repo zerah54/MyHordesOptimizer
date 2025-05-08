@@ -24,12 +24,10 @@ jobs:
             -   name: Build with dotnet
                 run: dotnet build --configuration Release
 
-            -   name: Publish all projects
+            -   name: Publish projects
                 run: |
-                    dotnet publish MyHordesOptimizerApi/MyHordesOptimizerApi.csproj -c Release -o ./publish/MyHordesOptimizerApi
-                    dotnet publish MyHordesOptimizerApiIntegrationTests/MyHordesOptimizerApiIntegrationTests.csproj -c Release -o ./publish/MyHordesOptimizerApiIntegrationTests
-                    dotnet publish MyHordesOptimizerSqlDal/MyHordesOptimizerSqlDal.csproj -c Release -o ./publish/MyHordesOptimizerSqlDal
-                    dotnet publish Serilog.Sinks.Discord/Serilog.Sinks.Discord.csproj -c Release -o ./publish/Serilog.Sinks.Discord
+                    dotnet publish MyHordesOptimizerApi/MyHordesOptimizerApi.csproj -c Release -o ./publish
+                    dotnet publish Serilog.Sinks.Discord/Serilog.Sinks.Discord.csproj -c Release -o ./publish
 
             -   name: Upload artifact for deployment job
                 uses: actions/upload-artifact@v4
@@ -66,7 +64,7 @@ jobs:
                     username: ${{ secrets.SSH_USERNAME }}
                     key: ${{ secrets.SSH_PRIVATE_KEY }}
                     port: ${{ secrets.SSH_PORT }}
-                    source: './publish/MyHordesOptimizerApi/*'
+                    source: './publish/'
                     target: "/home/renack/livraison_mho"
                     strip_components: 1
 
