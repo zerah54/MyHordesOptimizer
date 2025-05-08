@@ -36,13 +36,18 @@ jobs:
                 run: ls -R ./publish
 
             -   name: Verify workspace
-                run: echo ${{ github.workspace }}/publish
+                run: | 
+                    pwd 
+                    echo ${{ github.workspace }}\MyHordesOptimizerApi\publish
+                    cd ${{ github.workspace }}\MyHordesOptimizerApi\publish
+                    pwd
+                    ls -R
 
             -   name: Upload artifact for deployment job
                 uses: actions/upload-artifact@v4
                 with:
                     name: .net-app
-                    path: ${{ github.workspace }}/publish
+                    path: ${{ github.workspace }}\MyHordesOptimizerApi\publish
                     if-no-files-found: error
 
     deploy:
