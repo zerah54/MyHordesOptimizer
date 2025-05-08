@@ -35,11 +35,15 @@ jobs:
             -   name: Verify publish directory
                 run: ls -R ./publish
 
+            -   name: Verify workspace
+                run: echo ${{ github.workspace }}/publish
+
             -   name: Upload artifact for deployment job
                 uses: actions/upload-artifact@v4
                 with:
                     name: .net-app
-                    path: ./publish
+                    path: ${{ github.workspace }}/publish
+                    if-no-files-found: error
 
     deploy:
         runs-on: ubuntu-latest
