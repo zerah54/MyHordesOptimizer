@@ -32,17 +32,14 @@ jobs:
                     dotnet publish MyHordesOptimizerSqlDal/MyHordesOptimizerSqlDal.csproj -c Release -o ./publish/MyHordesOptimizerSqlDal
                     dotnet publish Serilog.Sinks.Discord/Serilog.Sinks.Discord.csproj -c Release -o ./publish/Serilog.Sinks.Discord
 
-            -   name: Echo
-                run: |
-                    cd publish
-                    pwd
-                    ls
+            -   name: Verify publish directory
+                run: ls -R ./publish
 
             -   name: Upload artifact for deployment job
                 uses: actions/upload-artifact@v4
                 with:
                     name: .net-app
-                    path: /publish
+                    path: ./publish
 
     deploy:
         runs-on: ubuntu-latest
