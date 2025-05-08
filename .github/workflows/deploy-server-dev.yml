@@ -72,6 +72,11 @@ jobs:
                     pwd
                     echo 'ls ===>'
                     ls
+                    cd publish
+                    echo 'pwd ===>'
+                    pwd
+                    echo 'ls ===>'
+                    ls
 
             -   name: Send to Server
                 uses: appleboy/scp-action@v0.1.7
