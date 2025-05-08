@@ -32,17 +32,6 @@ jobs:
                     dotnet publish MyHordesOptimizerSqlDal/MyHordesOptimizerSqlDal.csproj -c Release -o ./publish/MyHordesOptimizerSqlDal
                     dotnet publish Serilog.Sinks.Discord/Serilog.Sinks.Discord.csproj -c Release -o ./publish/Serilog.Sinks.Discord
 
-            -   name: Verify publish directory
-                run: ls -R ./publish
-
-            -   name: Verify workspace
-                run: | 
-                    pwd 
-                    echo ${{ github.workspace }}\MyHordesOptimizerApi\publish
-                    cd ${{ github.workspace }}\MyHordesOptimizerApi\publish
-                    pwd
-                    ls -R
-
             -   name: Upload artifact for deployment job
                 uses: actions/upload-artifact@v4
                 with:
@@ -65,6 +54,11 @@ jobs:
                 with:
                     name: .net-app
 
+            -   name: Verify publish directory
+                run: | 
+                    pwd
+                    ls -R ./publish
+    
             -   name: Send to Server
                 uses: appleboy/scp-action@v0.1.7
                 with:
