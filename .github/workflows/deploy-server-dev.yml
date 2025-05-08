@@ -34,9 +34,6 @@ jobs:
 
             -   name: Echo
                 run: |
-                    echo "=========================="
-                    pwd
-                    ls
                     cd publish
                     pwd
                     ls
@@ -45,7 +42,7 @@ jobs:
                 uses: actions/upload-artifact@v4
                 with:
                     name: .net-app
-                    path: ./publish
+                    path: /publish
 
     deploy:
         runs-on: ubuntu-latest
