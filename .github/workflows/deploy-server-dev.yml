@@ -9,9 +9,6 @@ env:
 jobs:
     build:
         runs-on: windows-latest
-        defaults:
-            run:
-                working-directory: ./MyHordesOptimizerApi
 
         steps:
             -   uses: actions/checkout@main
@@ -25,25 +22,18 @@ jobs:
             -   name: Build with dotnet
                 run: dotnet build --configuration Release
 
-            -   name: echo
+            -   name: Publish all projects
                 run: |
-                    pwd
-                    ls
-                    cd ./MyHordesOptimizerApi
-                    pwd
-                    ls
-
-            -   name: dotnet publish sinks
-                run: dotnet publish -c Release -o /publish/Serilog.Sinks.Discord
-
-            -   name: dotnet publish api
-                run: dotnet publish -c Release -o /publish/MyHordesOptimizerApi
+                    dotnet publish MyHordesOptimizerApi/MyHordesOptimizerApi.csproj -c Release -o ./publish/MyHordesOptimizerApi
+                    dotnet publish MyHordesOptimizerApiIntegrationTests/MyHordesOptimizerApiIntegrationTests.csproj -c Release -o ./publish/MyHordesOptimizerApiIntegrationTests
+                    dotnet publish MyHordesOptimizerSqlDal/MyHordesOptimizerSqlDal.csproj -c Release -o ./publish/MyHordesOptimizerSqlDal
+                    dotnet publish Serilog.Sinks.Discord/Serilog.Sinks.Discord.csproj -c Release -o ./publish/Serilog.Sinks.Discord
 
             -   name: Upload artifact for deployment job
                 uses: actions/upload-artifact@v4
                 with:
                     name: .net-app
-                    path: /publish
+                    path: ./publish
 
     deploy:
         runs-on: ubuntu-latest
@@ -59,20 +49,7 @@ jobs:
                 uses: actions/download-artifact@v4
                 with:
                     name: .net-app
-
-            -   name: echo
-                run: |
-                    echo '===> find publish directory <==='
-                    echo 'pwd ===>'
-                    pwd
-                    echo 'ls ===>'
-                    ls
-                    echo 'cd ===>'
-                    cd ..
-                    echo 'pwd ===>'
-                    pwd
-                    echo 'ls ===>'
-                    ls
+                    path: ./publish
 
             -   name: Send to Server
                 uses: appleboy/scp-action@v0.1.7
@@ -81,7 +58,7 @@ jobs:
                     username: ${{ secrets.SSH_USERNAME }}
                     key: ${{ secrets.SSH_PRIVATE_KEY }}
                     port: ${{ secrets.SSH_PORT }}
-                    source: './publish/*'
+                    source: './publish/'
                     target: "/home/renack/livraison_mho"
                     strip_components: 1
 
