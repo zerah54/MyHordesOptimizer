@@ -34,16 +34,16 @@ jobs:
                     ls
 
             -   name: dotnet publish sinks
-                run: dotnet publish -c Release -o /Serilog.Sinks.Discord/publish
+                run: dotnet publish -c Release -o /publish/Serilog.Sinks.Discord
 
             -   name: dotnet publish api
-                run: dotnet publish -c Release -o /MyHordesOptimizerApi/publish
+                run: dotnet publish -c Release -o /publish/MyHordesOptimizerApi
 
             -   name: Upload artifact for deployment job
                 uses: actions/upload-artifact@v4
                 with:
                     name: .net-app
-                    path: /MyHordesOptimizerApi
+                    path: /publish
 
     deploy:
         runs-on: ubuntu-latest
