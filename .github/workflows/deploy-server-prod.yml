@@ -20,22 +20,23 @@ jobs:
                 uses: actions/setup-dotnet@v4
                 with:
                     dotnet-version: '8.0'
-                    include-prerelease: true
 
             -   name: Build with dotnet
                 run: dotnet build --configuration Release
 
-            -   name: dotnet publish sinks
-                run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/Serilog.Sinks.Discord
-
-            -   name: dotnet publish api
-                run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/MyHordesOptimizerApi
+            -   name: Publish projects
+                run: |
+                    dotnet publish MyHordesOptimizerApi/MyHordesOptimizerApi.csproj -c Release -o ./publish/MyHordesOptimizerApi
+                    dotnet publish MyHordesOptimizerApiIntegrationTests/MyHordesOptimizerApiIntegrationTests.csproj -c Release -o ./publish/MyHordesOptimizerApiIntegrationTests
+                    dotnet publish MyHordesOptimizerSqlDal/MyHordesOptimizerSqlDal.csproj -c Release -o ./publish/MyHordesOptimizerSqlDal
+                    dotnet publish Serilog.Sinks.Discord/Serilog.Sinks.Discord.csproj -c Release -o ./publish/Serilog.Sinks.Discord
 
             -   name: Upload artifact for deployment job
                 uses: actions/upload-artifact@v4
                 with:
                     name: .net-app
-                    path: ${{env.DOTNET_ROOT}}/MyHordesOptimizerApi
+                    path: ${{ github.workspace }}\MyHordesOptimizerApi\publish
+                    if-no-files-found: error
 
     deploy:
         runs-on: ubuntu-latest
@@ -51,7 +52,8 @@ jobs:
                 uses: actions/download-artifact@v4
                 with:
                     name: .net-app
-
+                    path: ./publish
+    
             -   name: Send to Server
                 uses: appleboy/scp-action@v0.1.7
                 with:
@@ -59,9 +61,9 @@ jobs:
                     username: ${{ secrets.SSH_USERNAME }}
                     key: ${{ secrets.SSH_PRIVATE_KEY }}
                     port: ${{ secrets.SSH_PORT }}
-                    source: './publish/*'
+                    source: './publish/MyHordesOptimizerApi/*'
                     target: "/home/renack/livraison_mho"
-                    strip_components: 1
+                    strip_components: 2
 
             -   name: Restart Server
                 uses: appleboy/ssh-action@v1.0.3
