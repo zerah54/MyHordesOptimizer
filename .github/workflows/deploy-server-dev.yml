@@ -53,11 +53,12 @@ jobs:
                 uses: actions/download-artifact@v4
                 with:
                     name: .net-app
+                    path: ./publish
 
             -   name: Verify publish directory
                 run: | 
                     pwd
-                    ls -R ./publish
+                    ls -R
     
             -   name: Send to Server
                 uses: appleboy/scp-action@v0.1.7
