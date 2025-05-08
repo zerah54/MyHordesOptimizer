@@ -66,7 +66,7 @@ jobs:
                     port: ${{ secrets.SSH_PORT }}
                     source: './publish/MyHordesOptimizerApi'
                     target: "/home/renack/livraison_mho"
-                    strip_components: 1
+                    strip_components: 2
 
             -   name: Restart Server
                 uses: appleboy/ssh-action@v1.0.3
