@@ -67,7 +67,7 @@ jobs:
                     username: ${{ secrets.SSH_USERNAME }}
                     key: ${{ secrets.SSH_PRIVATE_KEY }}
                     port: ${{ secrets.SSH_PORT }}
-                    source: './publish/*'
+                    source: './publish/MyHordesOptimizerApi'
                     target: "/home/renack/livraison_mho"
                     strip_components: 1
 
