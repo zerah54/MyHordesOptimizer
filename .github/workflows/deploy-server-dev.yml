@@ -62,12 +62,13 @@ jobs:
 
             -   name: echo
                 run: |
+                    echo '===> find publish directory <==='
                     echo 'pwd ===>'
                     pwd
                     echo 'ls ===>'
                     ls
                     echo 'cd ===>'
-                    cd ./MyHordesOptimizerApi
+                    cd ..
                     echo 'pwd ===>'
                     pwd
                     echo 'ls ===>'
