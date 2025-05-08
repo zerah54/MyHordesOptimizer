@@ -58,7 +58,7 @@ jobs:
             -   name: Verify publish directory
                 run: | 
                     pwd
-                    ls -R
+                    ls ./publish
     
             -   name: Send to Server
                 uses: appleboy/scp-action@v0.1.7
@@ -67,7 +67,7 @@ jobs:
                     username: ${{ secrets.SSH_USERNAME }}
                     key: ${{ secrets.SSH_PRIVATE_KEY }}
                     port: ${{ secrets.SSH_PORT }}
-                    source: './publish/'
+                    source: './publish/*'
                     target: "/home/renack/livraison_mho"
                     strip_components: 1
 
