@@ -67,12 +67,7 @@ jobs:
                     echo 'ls ===>'
                     ls
                     echo 'cd ===>'
-                    cd ./
-                    echo 'pwd ===>'
-                    pwd
-                    echo 'ls ===>'
-                    ls
-                    cd publish
+                    cd ./MyHordesOptimizerApi
                     echo 'pwd ===>'
                     pwd
                     echo 'ls ===>'
