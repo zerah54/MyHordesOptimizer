@@ -37,7 +37,7 @@ jobs:
                     echo "=========================="
                     pwd
                     ls
-                    cd..
+                    cd publish
                     pwd
                     ls
 
