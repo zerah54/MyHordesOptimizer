@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MHO Addon
-// @version      1.1.1.0
+// @version      1.1.2.0
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/, rubrique Tutoriels
 // @author       Zerah
 //
@@ -31,8 +31,7 @@
 // ==/UserScript==
 
 const changelog = `${getScriptInfo().name} : Changelog pour la version ${getScriptInfo().version}\n\n`
-    + `[Correction] Ajout de diverses propriétés manquantes sur les objets \n`
-    + `[Correction] Corrige l'envoi du sac à dos à MHO \n`;
+    + `[Correction] Affiche correctement les doublons d'éléments dans les recettes sur les objets \n`;
 
 const lang = (document.querySelector('html[lang]')?.getAttribute('lang') || document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2) || 'fr';
 
@@ -834,6 +833,11 @@ const action_types = [
         id: `Recipe::WorkshopTypeShamanSpecific`,
         label: { en: `Workshop - Shaman`, fr: `Atelier - Chaman`, de: `Werkstatt - Schamane`, es: `Taller - Chamán` },
         ordering: 2
+    },
+    {
+        id: `Recipe::WorkshopTypeTechSpecific`,
+        label: { en: `Technicians Workbench`, fr: `Établi des Techniciens`, de: `Techniker-Werkstatte`, es: `Mesa de Trabajo de Técnicos` },
+        ordering: 3
     },
 ];
 
@@ -3200,7 +3204,7 @@ function displayItems(filtered_items, tab_id) {
 
     tab_content.appendChild(item_list);
 
-    filtered_items.forEach((item, index) => {
+    filtered_items?.forEach((item, index) => {
         if (index === 0 || filtered_items[index - 1].category.idCategory !== item.category.idCategory) {
             let category_text = document.createElement('span');
             category_text.innerText = item.category.label[lang];
@@ -7721,8 +7725,8 @@ function fillItemsMessages() {
             let editor = editor_block.querySelector('hordes-twino-editor');
             if (!editor) return;
 
-            let items = sendable_items.querySelectorAll('li.item');
-            Array.from(items).forEach((item) => {
+            let sendable_items_item = sendable_items.querySelectorAll('li.item');
+            Array.from(sendable_items_item).forEach((item) => {
                 item.addEventListener('click', () => {
                     let message_title = editor.querySelector('input');
                     let message_content = editor.querySelector('textarea');
@@ -10173,13 +10177,23 @@ function getRecipes() {
                     let new_recipes = response
                         .map((recipe) => {
                             let new_recipe = { ...recipe };
+                            let new_recipe_components = [];
+                            new_recipe.components.forEach((component) => {
+                                for (let i = 0; i < component.count; i++) {
+                                    new_recipe_components.push(component.item);
+                                }
+                            })
+                            new_recipe.components = new_recipe_components;
                             new_recipe.type = action_types.find((type) => type.id === new_recipe.type);
+                            if (!new_recipe.type) {
+                                console.warn('missing recipe type', recipe.type);
+                            }
                             return new_recipe;
                         })
                         .sort((a, b) => {
-                            if (a.type.ordering > b.type.ordering) {
+                            if (a.type?.ordering > b.type?.ordering) {
                                 return 1;
-                            } else if (a.type.ordering === b.type.ordering) {
+                            } else if (a.type?.ordering === b.type?.ordering) {
                                 return 0;
                             } else {
                                 return -1;
