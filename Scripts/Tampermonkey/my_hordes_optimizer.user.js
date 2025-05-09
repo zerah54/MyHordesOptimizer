@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MHO Addon
-// @version      1.1.2.0
+// @version      1.1.3.0
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/, rubrique Tutoriels
 // @author       Zerah
 //
@@ -9380,7 +9380,8 @@ function getItems() {
                 }
             })
             .then((response) => {
-                items = response
+                let new_items = { ...response }
+                new_items = response
                     .sort((item_a, item_b) => {
                         if (item_a.category.ordering > item_b.category.ordering) {
                             return 1;
@@ -9391,10 +9392,28 @@ function getItems() {
                         }
                     })
                     .filter((item) => is_mh_beta ? true : +item.id !== 302);
+                new_items?.forEach((new_item) => {
+                    new_item.recipes = new_item?.recipes?.map((recipe) => {
+                        let new_recipe = { ...recipe };
+                        let new_recipe_components = [];
+                        new_recipe.components.forEach((component) => {
+                            for (let i = 0; i < component.count; i++) {
+                                new_recipe_components.push(component.item);
+                            }
+                        })
+                        new_recipe.components = new_recipe_components;
+                        new_recipe.type = action_types.find((type) => type.id === new_recipe.type);
+                        if (!new_recipe.type) {
+                            console.warn('missing recipe type', recipe.type);
+                        }
+                        return new_recipe;
+                    })
+                })
                 let wiki_btn = document.getElementById(wiki_btn_id);
                 if (wiki_btn) {
                     wiki_btn.setAttribute('style', 'display: inherit');
                 }
+                items = new_items;
                 resolve(items);
             })
             .catch((error) => {
@@ -9456,16 +9475,21 @@ function getToken(force, stop) {
             let tokenReceived = async () => {
                 console.log('MHO - I am...', mh_user);
 
-                if (mh_user !== '' && mh_user.townDetails?.townId) {
-                    let get_items_promise = getItems();
-                    let get_wishlist_promise = getWishlist();
-                    if (pageIsDesert()) {
-                        let get_ruins_promise = getRuins();
-                        let get_map_promise = getMap();
-                        await Promise.all([get_items_promise, get_ruins_promise, get_wishlist_promise, get_map_promise]);
+                if (mh_user !== '' && mh_user !== undefined && mh_user !== null) {
+                    if (mh_user.townDetails?.townId) {
+                        let get_items_promise = getItems();
+                        let get_wishlist_promise = getWishlist();
+                        if (pageIsDesert()) {
+                            let get_ruins_promise = getRuins();
+                            let get_map_promise = getMap();
+                            await Promise.all([get_items_promise, get_ruins_promise, get_wishlist_promise, get_map_promise]);
+                        } else {
+                            let get_wishlist_promise = getWishlist()
+                            await Promise.all([get_items_promise, get_wishlist_promise]);
+                        }
                     } else {
-                        let get_wishlist_promise = getWishlist()
-                        await Promise.all([get_items_promise, get_wishlist_promise]);
+                        let get_items_promise = getItems();
+                        await Promise.all([get_items_promise]);
                     }
                 }
             }
