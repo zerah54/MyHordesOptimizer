@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MHO Addon
-// @version      1.1.3.0
+// @version      1.1.4.0
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/, rubrique Tutoriels
 // @author       Zerah
 //
@@ -31,7 +31,7 @@
 // ==/UserScript==
 
 const changelog = `${getScriptInfo().name} : Changelog pour la version ${getScriptInfo().version}\n\n`
-    + `[Correction] Affiche correctement les doublons d'éléments dans les recettes sur les objets \n`;
+    + `[Correction] Réparations diverses sur les recettes des objets \n`;
 
 const lang = (document.querySelector('html[lang]')?.getAttribute('lang') || document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2) || 'fr';
 
@@ -3872,6 +3872,29 @@ function displayRecipes() {
 function getRecipeElement(recipe) {
     let recipe_container = document.createElement('li');
 
+    let recipe_type_container = document.createElement('div');
+    recipe_container.appendChild(recipe_type_container);
+
+    let recipe_type_img = document.createElement('img');
+    recipe_type_img.title = getI18N(recipe.type.label);
+    recipe_type_img.setAttribute('style', 'margin-left: 0.5em; margin-right: 0.5em');
+    switch (recipe.type.id) {
+        case 'Recipe::ManualAnywhere':
+            recipe_type_img.src = repo_img_hordes_url + 'log/citizen.gif';
+            break;
+        case 'Recipe::WorkshopTypeTechSpecific':
+            recipe_type_img.src = repo_img_hordes_url + 'building/small_techtable.gif';
+            break;
+        case 'Recipe::WorkshopType':
+        case 'Recipe::WorkshopTypeShamanSpecific':
+            recipe_type_img.src = repo_img_hordes_url + 'log/workshop.gif';
+            break;
+        default:
+            recipe_type_img.src = repo_img_hordes_url + 'icons/small_move.gif';
+            break;
+    }
+    recipe_type_container.appendChild(recipe_type_img);
+
     let compos_container = document.createElement('ul');
     compos_container.setAttribute('style', 'padding: 0; min-width: 200px; width: 25%;');
     recipe.components.forEach((compo) => {
@@ -3893,7 +3916,6 @@ function getRecipeElement(recipe) {
 
     let transform_img_container = document.createElement('div');
     recipe_container.appendChild(transform_img_container);
-
 
     let transform_img = document.createElement('img');
     transform_img.alt = '=>';

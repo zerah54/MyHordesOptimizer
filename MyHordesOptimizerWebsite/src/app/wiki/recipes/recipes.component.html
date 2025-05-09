@@ -17,38 +17,35 @@
                             @switch (column.id) {
                                 @case ('type') {
                                     <div>
-                                        @if (row[column.id] === 'Recipe::ManualAnywhere') {
-                                            <ng-container>
-                                                <img [ngSrc]="HORDES_IMG_REPO + 'log/citizen.gif'" width="16" height="16">
+                                        @switch (row[column.id]) {
+                                            @case ('Recipe::ManualAnywhere'){
+                                                <img [ngSrc]="HORDES_IMG_REPO + 'log/citizen.gif'" width="16" height="16" />
                                                 <ng-container i18n>Action de citoyen</ng-container>
-                                            </ng-container>
-                                        } @else {
-                                            <img [ngSrc]="HORDES_IMG_REPO + 'log/workshop.gif'" width="16" height="16">
-                                            @if (row[column.id] === 'Recipe::WorkshopType') {
-                                                <ng-container i18n>Atelier</ng-container>
-                                            } @else if (row[column.id] === 'Recipe::WorkshopTypeShamanSpecific') {
-                                                <ng-container i18n>Atelier, Chaman uniquement</ng-container>
-                                            } @else if (row[column.id] === 'Recipe::WorkshopTypeTechSpecific') {
+                                            } @case ('Recipe::WorkshopTypeTechSpecific'){
+                                                <img [ngSrc]="HORDES_IMG_REPO + 'building/small_techtable.gif'" width="16" height="16" />
                                                 <ng-container i18n>Établi des Techniciens</ng-container>
+                                            } @case ('Recipe::WorkshopType'){
+                                                <img [ngSrc]="HORDES_IMG_REPO + 'log/workshop.gif'" width="16" height="16" />
+                                                <ng-container i18n>Atelier</ng-container>
+                                            } @case ('Recipe::WorkshopTypeShamanSpecific'){
+                                                <img [ngSrc]="HORDES_IMG_REPO + 'log/workshop.gif'" width="16" height="16" />
+                                                <ng-container i18n>Atelier, Chaman uniquement</ng-container>
                                             }
                                         }
                                     </div>
-                                }
-                                @case ('components') {
+                                } @case ('components') {
                                     @for (component of row[column.id]; track component) {
-                                        <div><img [ngSrc]="HORDES_IMG_REPO + component.img" width="16" height="16">{{ component.label[locale] }}</div>
+                                        <div><img [ngSrc]="HORDES_IMG_REPO + component.img" width="16" height="16" />{{ component.label[locale] }}</div>
                                     }
-                                }
-                                @case ('transformation') {
-                                    <img [ngSrc]="HORDES_IMG_REPO + 'icons/small_move.gif'" width="16" height="16">
-                                }
-                                @case ('result') {
+                                } @case ('transformation') {
+                                    <img [ngSrc]="HORDES_IMG_REPO + 'icons/small_move.gif'" width="16" height="16" />
+                                } @case ('result') {
                                     @for (result of row[column.id]; track result) {
                                         <div>
-                                            <img [ngSrc]="HORDES_IMG_REPO + result.item.img" width="16" height="16">
+                                            <img [ngSrc]="HORDES_IMG_REPO + result.item.img" width="16" height="16" />
                                             {{ result.item.label[locale] }}
                                             @if (result.probability !== 1) {
-                                                <small>({{ result.probability * 100 | number:'1.0-2':locale }}%)</small>
+                                                <small>({{ result.probability * 100 | number : '1.0-2' : locale }}%)</small>
                                             }
                                         </div>
                                     }
@@ -59,7 +56,7 @@
                 }
                 <!-- Footer -->
                 <tr mat-header-row *matHeaderRowDef="columns | ids; sticky: true"></tr>
-                <tr mat-row *matRowDef="let row; columns: columns | ids;"></tr>
+                <tr mat-row *matRowDef="let row; columns: columns | ids"></tr>
             </table>
         </div>
     }
