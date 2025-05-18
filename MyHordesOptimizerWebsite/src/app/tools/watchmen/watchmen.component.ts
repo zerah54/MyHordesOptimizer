@@ -1,4 +1,4 @@
-﻿import { CommonModule } from '@angular/common';
+﻿import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { Component, DestroyRef, inject, OnInit, signal, ViewEncapsulation, WritableSignal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
@@ -24,6 +24,7 @@ import { Watchman } from '../../_abstract_model/types/watchman.class';
 import { CitizenInfoComponent } from '../../shared/elements/citizen-info/citizen-info.component';
 import { ListElementAddRemoveComponent } from '../../shared/elements/list-elements-add-remove/list-element-add-remove.component';
 import { SelectComponent } from '../../shared/elements/select/select.component';
+import { JobFromIdPipe } from '../../shared/pipes/job-from-id.pipe';
 import { getTown, getUser } from '../../shared/utilities/localstorage.util';
 import { CitizensForWatchPipe } from './citizens-for-watch.pipe';
 
@@ -36,7 +37,7 @@ const material_modules: Imports = [MatButtonModule, MatCardModule, MatFormFieldM
     templateUrl: './watchmen.component.html',
     styleUrls: ['./watchmen.component.scss'],
     encapsulation: ViewEncapsulation.None,
-    imports: [...angular_common, ...components, ...material_modules, MatTabGroup, MatAccordion, MatTab, MatTabContent, MatExpansionPanel, MatExpansionPanelHeader, SelectComponent, CitizensForWatchPipe, CitizenInfoComponent, ListElementAddRemoveComponent]
+    imports: [...angular_common, ...components, ...material_modules, MatTabGroup, MatAccordion, MatTab, MatTabContent, MatExpansionPanel, MatExpansionPanelHeader, SelectComponent, CitizensForWatchPipe, CitizenInfoComponent, ListElementAddRemoveComponent, JobFromIdPipe, NgOptimizedImage]
 })
 
 export class WatchmenComponent implements OnInit {
@@ -171,7 +172,7 @@ export class WatchmenComponent implements OnInit {
     /**
      * On ajoute un état
      *
-     * @param {number} citizen_id
+     * @param citizen
      * @param {number} status_key
      */
     public addStatus(citizen: Citizen, status_key: string): void {
@@ -195,7 +196,7 @@ export class WatchmenComponent implements OnInit {
     /**
      * On retire un état
      *
-     * @param {number} citizen_id
+     * @param citizen
      * @param {number} status_key
      */
     public removeStatus(citizen: Citizen, status_key: string): void {
@@ -221,7 +222,7 @@ export class WatchmenComponent implements OnInit {
     /**
      * On vide complètement les statuts
      *
-     * @param {number} citizen_id
+     * @param citizen
      */
     public emptyStatus(citizen: Citizen): void {
         if (citizen && citizen.status) {

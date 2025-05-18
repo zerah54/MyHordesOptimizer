@@ -1,42 +1,56 @@
-﻿<mat-card-header class="mho-probabilities-header">
+﻿<mat-card-header class="mho-watchmen-header">
     <mat-card-title>
         <ng-container i18n>Veilles</ng-container>
     </mat-card-title>
 </mat-card-header>
-<mat-card-content>
+<mat-card-content class="mho-watchmen">
     @if (all_citizens && all_items) {
-        <div class="mho-watchmen">
-            <mat-tab-group [(selectedIndex)]="selected_tab_index" mat-align-tabs="start" mat-stretch-tabs="false">
-                @for (day of [].constructor(current_day + 1); track day_index; let day_index = $index) {
-                    <mat-tab label="Jour {{day_index + 1}}" i18n-label>
-                        <ng-template matTabContent>
-                            <div class="container">
-                                <div class="actions">
-                                    <button mat-button type="button" (click)="addNewWatchman()">
-                                        <mat-icon>add</mat-icon>
-                                        <ng-container i18n>Ajouter un veilleur</ng-container>
-                                    </button>
-                                </div>
-                                <mat-accordion class="content" [multi]="true">
-                                    @for (watchman of watchmen(); track watchman.id; let index = $index) {
-                                        <mat-expansion-panel>
-                                            <mat-expansion-panel-header class="header">
-                                                @if (watchman.citizen?.id) {
-                                                    <mho-citizen-info [displayJob]="true" [displayShunStatus]="true" [displayPseudoMode]="'simple'"
-                                                                      [citizen]="watchman.citizen"></mho-citizen-info> &nbsp; - Def - %Survie
-                                                } @else {
-                                                    Veilleur n° {{ index + 1 }}
-                                                }
-                                            </mat-expansion-panel-header>
-                                            <div class="content">
-                                                <mat-form-field [appearance]="'outline'" class="no-bottom compact-field">
-                                                    <mat-label i18n>Citoyen</mat-label>
-                                                    <mho-select [options]="all_citizens | citizensForWatch:watchmen()"
-                                                                [bindLabel]="'name'"
-                                                                [bindIcon]="'job.value.img'"
-                                                                [(ngModel)]="watchman.citizen">
-                                                    </mho-select>
-                                                </mat-form-field>
+        <mat-tab-group [(selectedIndex)]="selected_tab_index" mat-align-tabs="start" mat-stretch-tabs="false">
+            @for (day of [].constructor(current_day + 1); track day_index; let day_index = $index) {
+                <mat-tab label="Jour {{day_index + 1}}" i18n-label>
+                    <ng-template matTabContent>
+                        <div class="container">
+                            <div class="actions">
+                                <button mat-button type="button" (click)="addNewWatchman()">
+                                    <mat-icon>add</mat-icon>
+                                    <ng-container i18n>Ajouter un veilleur</ng-container>
+                                </button>
+                            </div>
+                            <mat-accordion class="content" [multi]="true">
+                                @for (watchman of watchmen(); track watchman.id; let index = $index) {
+                                    <mat-expansion-panel [ngClass]="['watchman']">
+                                        <mat-expansion-panel-header class="header">
+                                            @if (watchman.citizen?.id) {
+                                                <div class="pseudo">
+                                                    <mho-citizen-info [displayJob]="true" [displayShunStatus]="true"
+                                                                      [displayPseudoMode]="'simple'"
+                                                                      [citizen]="watchman.citizen"></mho-citizen-info>
+                                                </div>
+                                                <div class="defense">104&nbsp;<img [ngSrc]="HORDES_IMG_REPO + 'icons/def.gif'" width="16"
+                                                                                   height="16"></div>
+                                                <div class="survival">97% de survie</div>
+                                                <div class="deleteWatchman">
+                                                    <button mat-icon-button type="button" matTooltip="Supprimer le veilleur" i18n-matTooltip
+                                                            (click)="deleteWatchmen(index)" style="margin-right: 2rem">
+                                                        <mat-icon>delete</mat-icon>
+                                                    </button>
+                                                </div>
+                                            } @else {
+                                                Veilleur n°{{ index + 1 }}
+                                            }
+                                        </mat-expansion-panel-header>
+                                        <div class="watchman-content">
+                                            <div class="firstLine">
+                                                <div>
+                                                    <mat-form-field [appearance]="'outline'" class="no-bottom compact-field">
+                                                        <mat-label i18n>Citoyen</mat-label>
+                                                        <mho-select [options]="all_citizens | citizensForWatch:watchmen()"
+                                                                    [bindLabel]="'name'"
+                                                                    [bindIcon]="'job.value.img'"
+                                                                    [(ngModel)]="watchman.citizen">
+                                                        </mho-select>
+                                                    </mat-form-field>
+                                                </div>
                                                 @if (watchman.citizen?.id) {
                                                     <div class="bag">
                                                         <mho-list-element-add-remove [currentList]="watchman.citizen.bag?.items ||[]"
@@ -62,26 +76,28 @@
                                                                                      i18n-emptyLabel (empty)="emptyStatus(watchman.citizen)">
                                                         </mho-list-element-add-remove>
                                                     </div>
-                                                    <td class="instructions">
-                                                        <mat-form-field>
-                                                            <mat-label>Instructions</mat-label>
-                                                            <textarea matInput
-                                                                      cdkTextareaAutosize
-                                                                      #autosize="cdkTextareaAutosize"
-                                                                      cdkAutosizeMinRows="2"
-                                                                      cdkAutosizeMaxRows="5"></textarea>
-                                                        </mat-form-field>
-                                                    </td>
                                                 }
                                             </div>
-                                        </mat-expansion-panel>
-                                    }
-                                </mat-accordion>
-                            </div>
-                        </ng-template>
-                    </mat-tab>
-                }
-            </mat-tab-group>
-        </div>
+                                            @if (watchman.citizen?.id) {
+                                                <div class="instructions">
+                                                    <mat-form-field [appearance]="'outline'" class="no-bottom compact-field">
+                                                        <mat-label>Instructions</mat-label>
+                                                        <textarea matInput
+                                                                  cdkTextareaAutosize
+                                                                  #autosize="cdkTextareaAutosize"
+                                                                  cdkAutosizeMinRows="2"
+                                                                  cdkAutosizeMaxRows="5"></textarea>
+                                                    </mat-form-field>
+                                                </div>
+                                            }
+                                        </div>
+                                    </mat-expansion-panel>
+                                }
+                            </mat-accordion>
+                        </div>
+                    </ng-template>
+                </mat-tab>
+            }
+        </mat-tab-group>
     }
 </mat-card-content>
