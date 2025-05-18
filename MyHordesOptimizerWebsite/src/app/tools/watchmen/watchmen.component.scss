@@ -1,4 +1,15 @@
-﻿
+﻿@use 'variables';
+
+.mho-watchmen-header {
+    justify-content: space-between;
+
+    .actions {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+    }
+}
+
 .mho-bag-selector {
     width: 325px;
     max-width: 325px;
@@ -9,5 +20,97 @@
 
     .mat-mdc-tab-body-wrapper {
         max-height: 300px;
+    }
+}
+
+
+.mho-watchmen {
+    .container {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5em;
+        height: 100%;
+
+        > .header {
+            h2 {
+                margin-bottom: 0;
+            }
+
+        }
+
+        .actions {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+
+            .left-actions {
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+                gap: 0.5em;
+            }
+        }
+
+        > .content {
+            flex: 1;
+            overflow: auto;
+
+            .watchman {
+                background-color: variables.$accented-background-color;
+
+                &:not(.mat-expansion-panel-spacing) {
+                    margin-bottom: 0.5em;
+                }
+
+
+                .header > .mat-content {
+                    justify-content: space-between;
+                    flex-wrap: wrap;
+                    align-items: center;
+
+                    .defense, .survival {
+                        width: 10%;
+                        min-width: 100px;
+                    }
+
+                    .pseudo {
+                        flex: 1;
+                    }
+
+                    .deleteWatchman {
+                        flex: 1;
+                        text-align: right;
+                    }
+                }
+
+                .watchman-content {
+                    padding-top: 1em;
+                    display: flex;
+                    flex-direction: column;
+                    gap: 0.5em;
+
+                    .firstLine {
+                        display: flex;
+                        flex-direction: row;
+                        flex: 1;
+                        gap: 0.5em;
+                        align-items: center;
+
+                        .bag, .status {
+                            flex: 1;
+                        }
+                    }
+
+                    .instructions {
+                        flex: 1;
+
+                        > * {
+                            width: 100%;
+                        }
+                    }
+                }
+            }
+        }
     }
 }
