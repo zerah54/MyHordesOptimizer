@@ -16,84 +16,122 @@
                                     <ng-container i18n>Ajouter un veilleur</ng-container>
                                 </button>
                             </div>
-                            <mat-accordion class="content" [multi]="true">
-                                @for (watchman of watchmen(); track watchman.id; let index = $index) {
-                                    <mat-expansion-panel [ngClass]="['watchman']">
-                                        <mat-expansion-panel-header class="header">
-                                            @if (watchman.citizen?.id) {
-                                                <div class="pseudo">
-                                                    <mho-citizen-info [displayJob]="true" [displayShunStatus]="true"
-                                                                      [displayPseudoMode]="'simple'"
-                                                                      [citizen]="watchman.citizen"></mho-citizen-info>
-                                                </div>
-                                                <div class="defense">104&nbsp;<img [ngSrc]="HORDES_IMG_REPO + 'icons/def.gif'" width="16"
-                                                                                   height="16"></div>
-                                                <div class="survival">97% de survie</div>
+                            <div class="globalContent">
+                                <div class="recap ">
+                                    <mat-card class="">
+                                        <mat-card-header>
+                                            <h2>
+                                                <img [ngSrc]="HORDES_IMG_REPO + 'emotes/watch.gif'" width="16"
+                                                     height="16" alt="">
+                                                &nbsp;Résumé
+                                            </h2>
+                                        </mat-card-header>
+                                        <mat-divider/>
+                                        <mat-card-content>
+                                            <div class="recap-row"><span>Attaque : 1007</span>&nbsp;<img [ngSrc]="HORDES_IMG_REPO + 'emotes/zombie.gif'"
+                                                                                                         width="16"
+                                                                                                         height="16" alt=""></div>
+                                            <div class="recap-row"><span>Défense actuelle : 586</span>&nbsp;<img [ngSrc]="HORDES_IMG_REPO + 'icons/def.gif'"
+                                                                                                                 width="16"
+                                                                                                                 height="16" alt=""></div>
+                                            <div class="recap-row"><span>Objectif de défense : 421</span>&nbsp;<img [ngSrc]="HORDES_IMG_REPO + 'icons/def.gif'"
+                                                                                                                    width="16"
+                                                                                                                    height="16" alt=""></div>
+                                            <div class="recap-row"><span>Total veilleurs : 125</span>&nbsp;<img
+                                                [ngSrc]="HORDES_IMG_REPO + 'actions/watchmen.gif'"
+                                                width="16"
+                                                height="16" alt=""></div>
+                                            <div class="recap-row"><span>% de survie des veilleurs : 95%</span>&nbsp;<img
+                                                [ngSrc]="HORDES_IMG_REPO + 'heroskill/status_clean.gif'" width="16"
+                                                height="16" alt=""></div>
+                                            <div class="recap-row"><span>% de chance d'un mort : 0.85</span>&nbsp;<img
+                                                [ngSrc]="HORDES_IMG_REPO + 'emotes/death.gif'"
+                                                width="16"
+                                                height="16" alt=""></div>
+                                        </mat-card-content>
+                                    </mat-card>
+                                </div>
+                                <mat-accordion class="content" [multi]="true">
+                                    @for (watchman of watchmen(); track watchman.id; let index = $index) {
+                                        <mat-expansion-panel [ngClass]="['watchman']">
+                                            <mat-expansion-panel-header class="header">
+                                                @if (watchman.citizen?.id) {
+                                                    <div class="pseudo">
+                                                        <mho-citizen-info [displayJob]="true" [displayShunStatus]="true"
+                                                                          [displayPseudoMode]="'simple'"
+                                                                          [citizen]="watchman.citizen"></mho-citizen-info>
+                                                    </div>
+                                                    <div class="defense">104&nbsp;<img [ngSrc]="HORDES_IMG_REPO + 'icons/def.gif'" width="16"
+                                                                                       height="16" alt=""></div>
+                                                    <div class="survival">97% de survie</div>
+
+                                                } @else {
+                                                    Veilleur n°{{ index + 1 }}
+                                                }
                                                 <div class="deleteWatchman">
                                                     <button mat-icon-button type="button" matTooltip="Supprimer le veilleur" i18n-matTooltip
                                                             (click)="deleteWatchmen(index)" style="margin-right: 2rem">
                                                         <mat-icon>delete</mat-icon>
                                                     </button>
                                                 </div>
-                                            } @else {
-                                                Veilleur n°{{ index + 1 }}
-                                            }
-                                        </mat-expansion-panel-header>
-                                        <div class="watchman-content">
-                                            <div class="firstLine">
-                                                <div>
-                                                    <mat-form-field [appearance]="'outline'" class="no-bottom compact-field">
-                                                        <mat-label i18n>Citoyen</mat-label>
-                                                        <mho-select [options]="all_citizens | citizensForWatch:watchmen()"
-                                                                    [bindLabel]="'name'"
-                                                                    [bindIcon]="'job.value.img'"
-                                                                    [(ngModel)]="watchman.citizen">
-                                                        </mho-select>
-                                                    </mat-form-field>
+                                            </mat-expansion-panel-header>
+                                            <div class="watchman-content">
+                                                <div class="firstLine">
+                                                    <div>
+                                                        <mat-form-field [appearance]="'outline'" class="no-bottom compact-field">
+                                                            <mat-label i18n>Citoyen</mat-label>
+                                                            <mho-select [options]="all_citizens | citizensForWatch:watchmen()"
+                                                                        [bindLabel]="'name'"
+                                                                        [bindIcon]="'job.value.img'"
+                                                                        [(ngModel)]="watchman.citizen">
+                                                            </mho-select>
+                                                        </mat-form-field>
+                                                    </div>
+                                                    @if (watchman.citizen?.id) {
+                                                        <div class="bag">
+                                                            <mho-list-element-add-remove [currentList]="watchman.citizen.bag?.items ||[]"
+                                                                                         label="Sac" i18n-label
+                                                                                         [lists]="objectsList"
+                                                                                         addLabel="Ajouter au sac" i18n-addLabel
+                                                                                         (add)="addItem(watchman.citizen, +$event)"
+                                                                                         removeLabel="Retirer du sac" i18n-removeLabel
+                                                                                         (remove)="removeItem(watchman.citizen, +$event)"
+                                                                                         emptyLabel="Vider le sac" i18n-emptyLabel
+                                                                                         (empty)="emptyBag(watchman.citizen)"
+                                                                                         [class]="'mho-bag-selector'">
+                                                            </mho-list-element-add-remove>
+                                                        </div>
+                                                        <div class="status">
+                                                            <mho-list-element-add-remove [currentList]="watchman.citizen.status?.icons || []"
+                                                                                         [lists]="status_lists"
+                                                                                         label="États" i18n-label
+                                                                                         addLabel="Ajouter aux états" i18n-addLabel
+                                                                                         (add)="addStatus(watchman.citizen, $event + '')"
+                                                                                         removeLabel="Retirer des états" i18n-removeLabel
+                                                                                         (remove)="removeStatus(watchman.citizen, $event + '')"
+                                                                                         emptyLabel="Vider les états"
+                                                                                         i18n-emptyLabel (empty)="emptyStatus(watchman.citizen)">
+                                                            </mho-list-element-add-remove>
+                                                        </div>
+                                                    }
                                                 </div>
                                                 @if (watchman.citizen?.id) {
-                                                    <div class="bag">
-                                                        <mho-list-element-add-remove [currentList]="watchman.citizen.bag?.items ||[]"
-                                                                                     label="Sac" i18n-label
-                                                                                     [lists]="objectsList"
-                                                                                     addLabel="Ajouter au sac" i18n-addLabel
-                                                                                     (add)="addItem(watchman.citizen, +$event)"
-                                                                                     removeLabel="Retirer du sac" i18n-removeLabel
-                                                                                     (remove)="removeItem(watchman.citizen, +$event)"
-                                                                                     emptyLabel="Vider le sac" i18n-emptyLabel
-                                                                                     (empty)="emptyBag(watchman.citizen)"
-                                                                                     [class]="'mho-bag-selector'">
-                                                        </mho-list-element-add-remove>
-                                                    </div>
-                                                    <div class="status">
-                                                        <mho-list-element-add-remove [currentList]="watchman.citizen.status?.icons || []" [lists]="status_lists"
-                                                                                     label="États" i18n-label
-                                                                                     addLabel="Ajouter aux états" i18n-addLabel
-                                                                                     (add)="addStatus(watchman.citizen, $event + '')"
-                                                                                     removeLabel="Retirer des états" i18n-removeLabel
-                                                                                     (remove)="removeStatus(watchman.citizen, $event + '')"
-                                                                                     emptyLabel="Vider les états"
-                                                                                     i18n-emptyLabel (empty)="emptyStatus(watchman.citizen)">
-                                                        </mho-list-element-add-remove>
+                                                    <div class="instructions">
+                                                        <mat-form-field [appearance]="'outline'" class="no-bottom compact-field">
+                                                            <mat-label>Instructions</mat-label>
+                                                            <textarea matInput
+                                                                      cdkTextareaAutosize
+                                                                      #autosize="cdkTextareaAutosize"
+                                                                      cdkAutosizeMinRows="2"
+                                                                      cdkAutosizeMaxRows="5"></textarea>
+                                                        </mat-form-field>
                                                     </div>
                                                 }
                                             </div>
-                                            @if (watchman.citizen?.id) {
-                                                <div class="instructions">
-                                                    <mat-form-field [appearance]="'outline'" class="no-bottom compact-field">
-                                                        <mat-label>Instructions</mat-label>
-                                                        <textarea matInput
-                                                                  cdkTextareaAutosize
-                                                                  #autosize="cdkTextareaAutosize"
-                                                                  cdkAutosizeMinRows="2"
-                                                                  cdkAutosizeMaxRows="5"></textarea>
-                                                    </mat-form-field>
-                                                </div>
-                                            }
-                                        </div>
-                                    </mat-expansion-panel>
-                                }
-                            </mat-accordion>
+                                        </mat-expansion-panel>
+                                    }
+                                </mat-accordion>
+                            </div>
                         </div>
                     </ng-template>
                 </mat-tab>

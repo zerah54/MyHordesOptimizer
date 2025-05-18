@@ -4,6 +4,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
+import { MatDivider } from '@angular/material/divider';
 import { MatAccordion, MatExpansionPanel, MatExpansionPanelHeader } from '@angular/material/expansion';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
@@ -37,7 +38,7 @@ const material_modules: Imports = [MatButtonModule, MatCardModule, MatFormFieldM
     templateUrl: './watchmen.component.html',
     styleUrls: ['./watchmen.component.scss'],
     encapsulation: ViewEncapsulation.None,
-    imports: [...angular_common, ...components, ...material_modules, MatTabGroup, MatAccordion, MatTab, MatTabContent, MatExpansionPanel, MatExpansionPanelHeader, SelectComponent, CitizensForWatchPipe, CitizenInfoComponent, ListElementAddRemoveComponent, JobFromIdPipe, NgOptimizedImage]
+    imports: [...angular_common, ...components, ...material_modules, MatTabGroup, MatAccordion, MatTab, MatTabContent, MatExpansionPanel, MatExpansionPanelHeader, SelectComponent, CitizensForWatchPipe, CitizenInfoComponent, ListElementAddRemoveComponent, JobFromIdPipe, NgOptimizedImage, MatDivider]
 })
 
 export class WatchmenComponent implements OnInit {
