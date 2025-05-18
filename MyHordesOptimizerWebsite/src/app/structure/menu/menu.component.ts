@@ -80,14 +80,6 @@ export class MenuComponent implements OnInit {
                     spoil: false
                 },
                 {
-                    label: $localize`Veilles`,
-                    path: 'my-town/nightwatch',
-                    displayed: true,
-                    lvl: 1,
-                    authorized: (): boolean => this.isInTown() && !environment.production,
-                    spoil: false
-                },
-                {
                     label: $localize`Campings`,
                     path: 'my-town/campings',
                     displayed: true,
@@ -101,6 +93,7 @@ export class MenuComponent implements OnInit {
             label: $localize`Outils`, lvl: 0, displayed: true, authorized: (): boolean => true, expanded: true, children: [
                 { label: $localize`Camping`, path: 'tools/camping', displayed: true, lvl: 1, authorized: (): boolean => true, spoil: false },
                 { label: $localize`Chances de survie`, path: 'tools/probabilities', displayed: true, lvl: 1, authorized: (): boolean => true, spoil: false },
+                { label: $localize`Veilles`, path: 'tools/watchmen', displayed: true, lvl: 1, authorized: (): boolean => true, spoil: false },
             ], spoil: false
         },
         {
