@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MHO Addon
-// @version      1.1.4.0
+// @version      1.1.5.0
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/, rubrique Tutoriels
 // @author       Zerah
 //
@@ -31,7 +31,10 @@
 // ==/UserScript==
 
 const changelog = `${getScriptInfo().name} : Changelog pour la version ${getScriptInfo().version}\n\n`
-    + `[Correction] Réparations diverses sur les recettes des objets \n`;
+    + `[Amélioration] Performances globales & stabilité \n\n`
+    + `[Correctif] Affichage des PA manquants sur les chantiers en pandé \n\n`
+    + `[Nouveauté] Il est possible d'afficher un compteur de caractères sur le chatcase \n`
+    + `[Nouveauté] Il est possible de relire les anciennes notifications (tant qu'on n'a pas refresh sa page) \n`;
 
 const lang = (document.querySelector('html[lang]')?.getAttribute('lang') || document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2) || 'fr';
 
@@ -94,9 +97,9 @@ const mh_optimizer_icon = 'https://myhordes-optimizer.web.app/img/logo/logo_mho_
 const mh_optimizer_window_id = 'optimizer-window';
 const mh_optimizer_map_window_id = 'optimizer-map-window';
 const mho_expeditions_window_id = 'mho-expeditions-window';
+const mho_store_notifications_window_id = 'mho-store-notifications-window'
 const btn_id = 'optimizer-btn';
 const content_btn_id = 'optimizer-content-btn';
-const mh_header_id = 'header-reload-area';
 const mh_content_id = 'content';
 const mh_update_external_tools_id = 'mh-update-external-tools';
 const mho_warn_missing_logs_id = 'mho-warn-missing-logs';
@@ -117,6 +120,7 @@ const mho_search_registry_field_id = 'mho-search-registry-field';
 const mho_display_translate_input_id = 'mho-display-translate-input';
 const mho_watchtower_estim_id = 'mho-watchtower-estim';
 const mho_anti_abuse_counter_id = 'mho-anti-abuse-counter';
+const mho_town_external_links_id = 'mho-town-external-links';
 const mho_copy_logs_id = 'mho-copy-logs';
 
 //////////////////////////////////////
@@ -147,7 +151,10 @@ let is_refresh_wishlist;
 let has_new_changelog = false;
 /** True quand une erreur vient d'être affichée. Repasse à false au bout d'une seconde, pour éviter le spam d'erreurs */
 let is_error = false;
-
+/** La liste des notifications récupérées depuis le dernier chargement de l'application */
+let mh_notifications = [];
+/** Le mutation observer pour les tooltips */
+let advanced_tooltips_observer;
 ////////////////
 // Les textes //
 ////////////////
@@ -1605,22 +1612,31 @@ let params_categories = [
                     es: `Muestra enlaces a perfiles externos`
                 },
             },
-            // {
-            //     id: `store_notifications`,
-            //     label: {
-            //         en: `Stores notifications until cleared`,
-            //         fr: `Stocke les notifications jusqu'à effacement`,
-            //         de: `Speichert Benachrichtigungen, bis sie gelöscht werden`,
-            //         es: `Almacena notificaciones hasta que se borran`
-            //     },
-            // },
+            {
+                id: `store_notifications`,
+                label: {
+                    en: `Stores notifications until cleared or page refreshed`,
+                    fr: `Stocke les notifications jusqu'à effacement ou rafraichissement de la page`,
+                    de: `Speichert Benachrichtigungen, bis sie gelöscht oder die Seite aktualisiert wird`,
+                    es: `Almacena notificaciones hasta que se borran o se actualiza la página`
+                },
+            },
+            {
+                id: `display_counter_on_input_registry`,
+                label: {
+                    en: `Displays a character counter on the chatcase.`,
+                    fr: `Affiche un compteur de caractères sur le chatcase`,
+                    de: `Zeigt einen Zeichenzähler im Chatcase an`,
+                    es: `Muestra un contador de caracteres en el caso de chat`
+                },
+            },
             {
                 id: `display_my_expeditions`,
                 label: {
                     en: `Shows details of expeditions I am registered for`,
                     fr: `Affiche les détails des expéditions auxquelles je suis inscrit`,
                     de: `Zeigt Details zu Expeditionen an, für die ich registriert bin`,
-                    es: `Muestra detalles de las expediciones para las que estoy registrado.`
+                    es: `Muestra detalles de las expediciones para las que estoy registrado`
                 },
             },
             {
@@ -1910,16 +1926,29 @@ function pageIsSoul() {
     return document.URL.indexOf('soul') > -1;
 }
 
+/** @return {boolean}    true si la page est un historique de ville */
+function pageIsTownHistory() {
+    return document.URL.indexOf('town') > -1 && (document.URL.indexOf('me') > -1 || document.URL.indexOf('soul') > -1);
+}
+
+
 /** @return {boolean}    on doit refresh le user actuel si le jour de la ville est différent du jour précédent */
 function shouldRefreshMe() {
-    let current_town_name = document.querySelector('.town-name');
+    // si on change de ville on force le refresh
+    const current_town_id_element = document.querySelector('[data-town-id]');
+    if (!current_town_id_element) return false;
+    const current_town_id = current_town_id_element?.getAttribute('data-town-id');
+    if (+current_town_id !== +mh_user.townDetails?.townId) return true;
+
+    // si on change de jour, on force le refresh
+    const current_town_name = document.querySelector('.town-name');
     if (!current_town_name) return false;
     return +current_town_name.nextElementSibling.innerText.replace(/(\D)*/, '') !== +mh_user.townDetails?.day;
 }
 
 function getI18N(item) {
     if (!item) return;
-    return item[lang] !== 'TODO' ? item[lang] : (item['en'] === 'TODO' ? item['fr'] : item['en']);
+    return item[lang] !== 'TODO' ? item[lang] : (item.en === 'TODO' ? item.fr : item.en);
 }
 
 function getCurrentPosition() {
@@ -2321,13 +2350,7 @@ function initOptionsWithLoginNeeded() {
 
 
 function initOptionsWithoutLoginNeeded() {
-    /** Gère le bouton de mise à jour des outils externes) */
-    if (!buttonOptimizerElement()) {
-        setTimeout(() => {
-            createOptimizerBtn();
-        }, 100)
-        createWikiToolsWindow();
-    }
+    createWikiToolsWindow();
     preventFromLeaving();
     alertIfInactiveAndNoEscort();
     displaySearchFields();
@@ -2335,6 +2358,8 @@ function initOptionsWithoutLoginNeeded() {
     setTimeout(() => {
         displayNbDeadZombies();
     }, 250)
+
+    displayAdvancedTooltips();
     displayTranslateTool();
     displayCampingPredict();
     displayAntiAbuseCounter();
@@ -2345,8 +2370,9 @@ function initOptionsWithoutLoginNeeded() {
     addExternalLinksToProfiles();
     createDisplayMapButton();
     fillItemsMessages();
-    // createStoreNotificationsBtn();
-    // addExternalLinksToTowns();
+    displayCountCharacters();
+    createStoreNotificationsBtn();
+    addExternalLinksToTowns();
     // blockUsersPosts();
 }
 
@@ -2447,91 +2473,103 @@ function createSelectWithSearch() {
 
 /** Create Optimize button */
 function createOptimizerBtn() {
-    let optimizer_btn = buttonOptimizerElement();
-    if (!optimizer_btn) {
-        let content_zone = document.getElementById(mh_content_id);
-        let header_zone = document.getElementById(mh_header_id);
-        let last_header_child = header_zone?.lastChild;
-        let mhe_button = document.querySelector('#mhe_button')
-        let left_position = last_header_child ? last_header_child.offsetLeft + last_header_child.offsetWidth + 5 : (mhe_button ? mhe_button.offsetLeft + mhe_button.offsetWidth + 5 : document.querySelector('#apps')?.getBoundingClientRect().width + 16);
+    const apps_exists_callback = function (appsExistsMutationsList, observer) {
+        for (const appsExistsMutation of appsExistsMutationsList) {
+            let apps_block = Array.from(appsExistsMutation.addedNodes ?? []).find((node) => node.id === 'apps');
+            if (appsExistsMutation.type === 'childList' && apps_block) {
 
-        let img = document.createElement('img');
-        let annuary = document.querySelector('#apps img');
-        img.src = mh_optimizer_icon;
-        img.setAttribute('height', annuary && annuary.height ? annuary.height + 'px' : '16px');
-        img.setAttribute('width', annuary && annuary.width ? annuary.width + 'px' : '16px');
-        img.style.margin = '1px 0 2px';
+                let optimizer_btn = buttonOptimizerElement();
+                if (!optimizer_btn) {
+                    let content_zone = document.getElementById(mh_content_id);
+                    let img = document.createElement('img');
+                    let annuary = apps_block.querySelector('img');
+                    img.src = mh_optimizer_icon;
+                    img.setAttribute('height', annuary && annuary.height ? annuary.height + 'px' : '16px');
+                    img.setAttribute('width', annuary && annuary.width ? annuary.width + 'px' : '16px');
+                    img.style.margin = '1px 0 2px';
 
-        let title_hidden = document.createElement('span');
-        title_hidden.classList.add('label_text');
-        title_hidden.innerText = getScriptInfo().name;
+                    let title_hidden = document.createElement('span');
+                    title_hidden.classList.add('label_text');
+                    title_hidden.innerText = getScriptInfo().name;
 
-        let title = document.createElement('h1');
+                    let title = document.createElement('h1');
 
-        let title_first_part = document.createElement('div');
-        title_first_part.style.display = 'flex';
-        title_first_part.style.alignItems = 'center';
-        title.appendChild(title_first_part);
+                    let title_first_part = document.createElement('div');
+                    title_first_part.style.display = 'flex';
+                    title_first_part.style.alignItems = 'center';
+                    title.appendChild(title_first_part);
 
-        let title_second_part = document.createElement('div');
-        title_second_part.style.display = 'flex';
-        title_second_part.style.alignItems = 'center';
-        title_second_part.style.gap = '0.5em';
-        title.appendChild(title_second_part);
+                    let title_second_part = document.createElement('div');
+                    title_second_part.style.display = 'flex';
+                    title_second_part.style.alignItems = 'center';
+                    title_second_part.style.gap = '0.5em';
+                    title.appendChild(title_second_part);
 
-        let website_link = document.createElement('a');
-        website_link.innerHTML = `<img src="${repo_img_hordes_url}icons/small_world.gif" style="vertical-align: top; margin-right: 0.25em;">${getI18N(texts.website)}`;
-        website_link.href = website;
-        website_link.target = '_blank';
-        website_link.style.cursor = 'pointer';
+                    let website_link = document.createElement('a');
+                    website_link.innerHTML = `<img src="${repo_img_hordes_url}icons/small_world.gif" style="vertical-align: top; margin-right: 0.25em;">${getI18N(texts.website)}`;
+                    website_link.href = website;
+                    website_link.target = '_blank';
+                    website_link.style.cursor = 'pointer';
 
-        title_second_part.appendChild(website_link);
+                    title_second_part.appendChild(website_link);
 
-        title_first_part.appendChild(img);
-        title_first_part.appendChild(title_hidden);
+                    title_first_part.appendChild(img);
+                    title_first_part.appendChild(title_hidden);
 
-        optimizer_btn = document.createElement('div');
-        optimizer_btn.appendChild(title);
-        optimizer_btn.id = btn_id;
-        optimizer_btn.setAttribute('style', 'left: ' + left_position + 'px');
-        optimizer_btn.addEventListener('click', (event) => {
-            event.stopPropagation();
-        });
+                    let mhe_button = document.querySelector('#mhe_button');
+                    let left_position = mhe_button ? (mhe_button.offsetLeft + mhe_button.offsetWidth + 5) : apps_block?.getBoundingClientRect().width + (annuary && annuary.height ? annuary.height : 34);
 
-        if (isTouchScreen()) {
-            let close_link = document.createElement('img');
-            close_link.src = `${repo_img_hordes_url}icons/b_close.png`;
-            close_link.classList.add('close');
-            title_second_part.appendChild(close_link);
+                    optimizer_btn = document.createElement('div');
+                    optimizer_btn.id = btn_id;
+                    optimizer_btn.setAttribute('style', 'left: ' + left_position + 'px');
+                    optimizer_btn.appendChild(title);
+                    optimizer_btn.addEventListener('click', (event) => {
+                        event.stopPropagation();
+                    });
 
-            close_link.addEventListener('click', () => {
-                optimizer_btn.classList.remove('mho-btn-opened');
-            });
+                    if (isTouchScreen()) {
+                        let close_link = document.createElement('img');
+                        close_link.src = `${repo_img_hordes_url}icons/b_close.png`;
+                        close_link.classList.add('close');
+                        title_second_part.appendChild(close_link);
 
-            optimizer_btn.addEventListener('mouseover', () => {
-                optimizer_btn.classList.add('mho-btn-opened');
-            });
+                        close_link.addEventListener('click', () => {
+                            optimizer_btn.classList.remove('mho-btn-opened');
+                        });
 
-            optimizer_btn.addEventListener('mouseout', () => {
-                optimizer_btn.classList.remove('mho-btn-opened');
-            });
-        } else {
-            optimizer_btn.addEventListener('mouseenter', () => {
-                optimizer_btn.classList.add('mho-btn-opened');
-            });
+                        optimizer_btn.addEventListener('mouseover', () => {
+                            optimizer_btn.classList.add('mho-btn-opened');
+                        });
 
-            optimizer_btn.addEventListener('mouseleave', () => {
-                optimizer_btn.classList.remove('mho-btn-opened');
-            });
+                        optimizer_btn.addEventListener('mouseout', () => {
+                            optimizer_btn.classList.remove('mho-btn-opened');
+                        });
+                    } else {
+                        optimizer_btn.addEventListener('mouseenter', () => {
+                            optimizer_btn.classList.add('mho-btn-opened');
+                        });
+
+                        optimizer_btn.addEventListener('mouseleave', () => {
+                            optimizer_btn.classList.remove('mho-btn-opened');
+                        });
+                    }
+                    content_zone.appendChild(optimizer_btn);
+
+                    let mho_content_zone = document.createElement('div');
+                    mho_content_zone.id = content_btn_id;
+                    content_zone.appendChild(mho_content_zone);
+
+                    createOptimizerButtonContent();
+                }
+            }
         }
-        content_zone.appendChild(optimizer_btn);
+    };
 
-        let mho_content_zone = document.createElement('div');
-        mho_content_zone.id = content_btn_id;
-        content_zone.appendChild(mho_content_zone);
+    const apps_exists_observer = new MutationObserver(apps_exists_callback);
 
-        createOptimizerButtonContent();
-    }
+    const mh_content = document.querySelector('#content'); // ou un autre élément parent approprié
+    const apps_exists_config = { childList: true, subtree: false, attributes: false };
+    apps_exists_observer.observe(mh_content, apps_exists_config);
 }
 
 /** Crée le contenu du bouton de l'optimizer (bouton de wiki, bouton de configuration, etc) */
@@ -2856,34 +2894,39 @@ function createParams(content) {
 }
 
 function createMhoHeaderSpace() {
-    let interval = setInterval(() => {
-        let header_space = document.querySelector(`#${mho_header_space_id}`);
-        if (!header_space) {
-            let postbox = document.getElementById('postbox');
-            if (postbox && postbox.clientWidth && postbox.clientWidth > 0) {
-                let header_space = document.querySelector(`#${mho_header_space_id}`);
-                let mh_header = document.querySelector('#header');
+    let mh_header = document.querySelector('#header');
+    if (!mh_header) return;
 
-                header_space = document.createElement('div');
-                header_space.id = mho_header_space_id;
+    let postbox = document.querySelector('#postbox');
+    if (!postbox) return;
 
-                header_space.style.position = 'absolute';
-                header_space.style.right = `calc(${postbox.clientWidth}px + 10px + 0.5em)`;
-                header_space.style.top = postbox.getBoundingClientRect().y + 'px';
-                header_space.style.display = 'flex';
-                header_space.style.gap = '0.5em';
-                header_space.style.alignItems = 'flex-start';
-                header_space.style.zIndex = '996';
+    let header_space = document.querySelector(`#${mho_header_space_id}`);
+    if (!header_space) {
 
-                mh_header.appendChild(header_space);
-            } else {
-                clearInterval(interval);
-                createMhoHeaderSpace();
-            }
-        } else {
-            clearInterval(interval);
+        header_space = document.createElement('div');
+        header_space.id = mho_header_space_id;
+        mh_header.appendChild(header_space);
+
+        header_space.style.position = 'absolute';
+        header_space.style.display = 'none';
+        header_space.style.gap = '0.5em';
+        header_space.style.alignItems = 'flex-start';
+        header_space.style.zIndex = '996';
+    }
+
+    const callback = function (mutationsList, observer) {
+        if (postbox.clientWidth && postbox.clientWidth > 0) {
+            header_space.style.display = 'flex';
+            header_space.style.right = `calc(${postbox.clientWidth}px + 10px + 0.5em)`;
+            header_space.style.top = postbox.getBoundingClientRect().y + 'px';
+            observer.disconnect();
         }
-    }, 100);
+    };
+
+    const observer = new MutationObserver(callback);
+    const config = { attributes: true, subtree: false, childList: false };
+
+    observer.observe(postbox, config);
 }
 
 function createWindow(id, full_size) {
@@ -3054,7 +3097,7 @@ function createMapWindow() {
     let window_overlay_li = document.createElement('li');
     window_overlay_li.appendChild(window_overlay_img);
     let window_overlay_ul = document.createElement('ul');
-    window_overlay_ul.style.margin = '8px -6px 0 0';
+    window_overlay_ul.style.margin = '-2px -2px 0 0';
     window_overlay_ul.appendChild(window_overlay_li);
 
     let window_overlay = document.createElement('div');
@@ -4628,12 +4671,16 @@ function displaySearchFieldOnRegistry() {
 }
 
 /** Si l'option associée est activée, affiche le nombre de pa nécessaires pour réparer un bâtiment suffisemment pour qu'il ne soit pas détruit lors de l'attaque */
-function displayMinApOnBuildings() {
-
+function displayMinApOnBuildings(count = 0) {
     tooltips_observer?.disconnect();
     if (mho_parameters.display_missing_ap_for_buildings_to_be_safe && pageIsConstructions()) {
         let complete_buildings = document.querySelectorAll('.building.complete');
-        if (!complete_buildings || complete_buildings.length === 0) return;
+        if ((!complete_buildings || complete_buildings.length === 0) && count < 10) {
+            setTimeout(() => {
+                displayMinApOnBuildings(count + 1);
+            }, 100);
+            return;
+        }
 
         ///////////////////////// Observe les modifications sur les tooltips pour mieux alimenter les barres /////////////////////////
         // Selectionne le noeud dont les mutations seront observées
@@ -4650,23 +4697,22 @@ function displayMinApOnBuildings() {
 
                 broken_buildings.forEach((broken_building) => {
                     let bar_element = broken_building.querySelector('.ap-bar');
+                    let to_repair_element = broken_building.querySelector('.to_repair');
                     let nb_ap_element = broken_building.querySelector('.build-req');
 
-                    bar_element.dispatchEvent(new Event('mouseenter'));
+                    to_repair_element.dispatchEvent(new Event('mouseenter'));
                     let tooltip = new Object(document.querySelector('.tooltip:not(.mho)[style*="display: block"]'));
-                    bar_element.dispatchEvent(new Event('mouseleave'));
-
+                    to_repair_element.dispatchEvent(new Event('mouseleave'));
                     if (!tooltip || !tooltip.innerHTML) return;
-
 
                     let tooltip_status_match = tooltip.innerText.match(/[0-9]+\/[0-9]+/);
                     if (!tooltip_status_match || tooltip_status_match.length <= 0) return;
                     let building_status = tooltip_status_match[0]?.split('/');
 
-                    let tooltip_match = tooltip.innerHTML.match(/<b>[0-9]+<\/b>/);
+                    let tooltip_match = tooltip.innerHTML.match(/[0-9]+/g);
                     if (!tooltip_match || tooltip_match.length <= 0) return;
 
-                    let nb_pts_per_ap = parseInt(tooltip_match[0].match(/[0-9]+/)[0], 10);
+                    let nb_pts_per_ap = parseInt(tooltip_match[tooltip_match.length - 1].match(/[0-9]+/)[0], 10);
                     let current_pv = parseInt(building_status[0], 10);
                     let total_pv = parseInt(building_status[1], 10);
 
@@ -4982,124 +5028,139 @@ function getWishlistForZone() {
     return used_wishlist;
 }
 
-let hovered_tooltip_x_item_id;
-
 /** Affiche les tooltips avancés */
-function displayAdvancedTooltips() {
+function displayAdvancedTooltips(count = 0) {
+    advanced_tooltips_observer?.disconnect();
     if (mho_parameters.enhanced_tooltips && items) {
 
-        let tooltip_containers = document.querySelectorAll(`.tooltip.item[style*="display: block"]`);
-        if (!tooltip_containers || tooltip_containers.length === 0) return;
+        let hovered_tooltip_x_item_id;
+        const tooltips_container = document.querySelector('#tooltip_container');
+        if (!tooltips_container && count < 10) {
+            displayAdvancedTooltips(count + 1);
+            return;
+        };
 
-        let hovered = getHoveredItem();
-        let hovered_item = hovered.item;
-        let hovered_status = hovered.status;
+        advanced_tooltips_observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                let tooltip_container = mutation.target;
+                if (!tooltip_container) return;
 
-        if (!hovered_item && !hovered_status) return;
+                if (mutation.type === 'attributes' && tooltip_container.classList.contains('tooltip') && tooltip_container.classList.contains('item') && !mutation.oldValue?.indexOf('block') > -1 && window.getComputedStyle(tooltip_container).display === 'block') {
 
-        let tooltip_container = Array.from(tooltip_containers).find((container) => hovered_item ? getItemFromImg(container.querySelector('h1 img')?.src)?.id === hovered_item.id : container.querySelector('h1')?.innerText === hovered.alt);
+                    let hovered = getHoveredItem();
+                    let hovered_item = hovered.item;
+                    let hovered_status = hovered.status;
 
-        if (!tooltip_container) return;
+                    if (!hovered_item && !hovered_status) return;
 
-        let advanced_tooltip_container = tooltip_container.querySelector('#mho-advanced-tooltip');
+                    let advanced_tooltip_container = tooltip_container.querySelector('#mho-advanced-tooltip');
 
-        if (hovered_item) {
+                    if (hovered_item) {
 
-            let hovered_item_x_item_id = hovered.li.getAttribute('x-item-id');
-            if (!hovered_tooltip_x_item_id && hovered_item?.recipes?.length > 0) {
-                let tooltip_loading = tooltip_container.querySelector('.mho-tooltip-loading');
-                if (!tooltip_loading) {
-                    tooltip_loading = document.createElement('img');
-                    tooltip_loading.classList.add('mho-tooltip-loading');
-                    tooltip_loading.style.position = 'absolute';
-                    tooltip_loading.style.left = '8px';
-                    tooltip_loading.style.top = '0';
-                    tooltip_container.querySelector('h1').appendChild(tooltip_loading);
-                    tooltip_loading.src = `${repo_img_hordes_url}anims/loading_wheel.gif`;
-                } else {
-                    tooltip_loading.style.display = 'inline';
-                }
-                let timeout = setTimeout(() => {
-                    if (hovered_tooltip_x_item_id && hovered_tooltip_x_item_id === hovered_item_x_item_id) return;
-                    tooltip_loading.style.display = 'none';
-
-                    // Remove opened tooltips
-                    let current_tooltips_containers = document.querySelectorAll('.tooltip.item[style*="display: block"]');
-                    Array.from(tooltip_containers).forEach((container) => {
-                        if (getItemFromImg(container.querySelector('h1 img')?.src)?.id !== hovered_item.id) {
-                            container.style.display = 'none';
-                        }
-                    });
-
-                    const controller = new AbortController();
-                    hovered_tooltip_x_item_id = hovered_item_x_item_id;
-                    tooltip_container.style.pointerEvents = 'all';
-                    hovered.li.addEventListener('mouseleave', function (event) {
-                        event.stopImmediatePropagation();
-                    }, true, { signal: controller.signal });
-                    hovered.li.addEventListener('pointerleave', function (event) {
-                        event.stopImmediatePropagation();
-                    }, true, { signal: controller.signal });
-
-                    let cancelHover = () => {
-                        hovered_tooltip_x_item_id = undefined;
-                        controller.abort();
-                        tooltip_container.style.display = 'none';
-                        tooltip_container.style.pointerEvents = 'none';
-                        clearTimeout(timeout);
-                    }
-                    hovered.li.addEventListener('mouseout', (event) => {
-                        setTimeout(() => {
-                            if (!hovered_tooltip_x_item_id) return;
-                            let all_hovered = document.querySelectorAll(':hover');
-                            if (!Array.from(all_hovered).some((hovered_element) => hovered_element.classList.contains('tooltip') || hovered_element.getAttribute('x-item-id') === hovered_tooltip_x_item_id)) {
-                                cancelHover();
+                        let hovered_item_x_item_id = hovered.li.getAttribute('x-item-id');
+                        if (!hovered_tooltip_x_item_id && hovered_item?.recipes?.length > 0) {
+                            let tooltip_loading = tooltip_container.querySelector('.mho-tooltip-loading');
+                            if (!tooltip_loading) {
+                                tooltip_loading = document.createElement('img');
+                                tooltip_loading.classList.add('mho-tooltip-loading');
+                                tooltip_loading.style.position = 'absolute';
+                                tooltip_loading.style.left = '8px';
+                                tooltip_loading.style.top = '0';
+                                tooltip_container.querySelector('h1').appendChild(tooltip_loading);
+                                tooltip_loading.src = `${repo_img_hordes_url}anims/loading_wheel.gif`;
+                            } else {
+                                tooltip_loading.style.display = 'inline';
                             }
-                        }, 1000)
-                    }, true, { signal: controller.signal });
-                    tooltip_container.addEventListener('mouseleave', (event) => {
-                        cancelHover();
-                    }, { signal: controller.signal });
-                    tooltip_container.addEventListener('pointerleave', (event) => {
-                        cancelHover();
-                    }, { signal: controller.signal });
-                }, 1000);
-            }
+                            let timeout = setTimeout(() => {
+                                if (hovered_tooltip_x_item_id && hovered_tooltip_x_item_id === hovered_item_x_item_id) return;
+                                tooltip_loading.style.display = 'none';
 
-            let item_deco = tooltip_container.getElementsByClassName('item-tag-deco')[0];
-            let should_display_advanced_tooltip = hovered_item.recipes.length > 0 || hovered_item.actions || hovered_item.properties || (item_deco && hovered_item.deco > 0);
+                                // Remove opened tooltips
+                                let current_tooltips_containers = document.querySelectorAll('.tooltip.item[style*="display: block"]');
+                                Array.from(current_tooltips_containers).forEach((container) => {
+                                    if (getItemFromImg(container.querySelector('h1 img')?.src)?.id !== hovered_item.id) {
+                                        container.style.display = 'none';
+                                    }
+                                });
 
-            if (should_display_advanced_tooltip) {
+                                const controller = new AbortController();
+                                hovered_tooltip_x_item_id = hovered_item_x_item_id;
+                                tooltip_container.style.pointerEvents = 'all';
+                                hovered.li.addEventListener('mouseleave', function (event) {
+                                    event.stopImmediatePropagation();
+                                }, true, { signal: controller.signal });
+                                hovered.li.addEventListener('pointerleave', function (event) {
+                                    event.stopImmediatePropagation();
+                                }, true, { signal: controller.signal });
 
-                if (!advanced_tooltip_container) {
-                    advanced_tooltip_container = document.createElement('div');
-                    advanced_tooltip_container.id = 'mho-advanced-tooltip';
-                    advanced_tooltip_container.setAttribute('style', 'margin-top: 0.5em; border-top: 1px solid;');
+                                let cancelHover = () => {
+                                    hovered_tooltip_x_item_id = undefined;
+                                    controller.abort();
+                                    tooltip_container.style.display = 'none';
+                                    tooltip_container.style.pointerEvents = 'none';
+                                    clearTimeout(timeout);
+                                }
+                                hovered.li.addEventListener('mouseout', (event) => {
+                                    setTimeout(() => {
+                                        if (!hovered_tooltip_x_item_id) return;
+                                        let all_hovered = document.querySelectorAll(':hover');
+                                        if (!Array.from(all_hovered).some((hovered_element) => hovered_element.classList.contains('tooltip') || hovered_element.getAttribute('x-item-id') === hovered_tooltip_x_item_id)) {
+                                            cancelHover();
+                                        }
+                                    }, 1000)
+                                }, true, { signal: controller.signal });
+                                tooltip_container.addEventListener('mouseleave', (event) => {
+                                    cancelHover();
+                                }, { signal: controller.signal });
+                                tooltip_container.addEventListener('pointerleave', (event) => {
+                                    cancelHover();
+                                }, { signal: controller.signal });
+                            }, 1000);
+                        }
 
-                    tooltip_container.appendChild(advanced_tooltip_container);
-                } else if (!advanced_tooltip_container.innerHTML) {
-                    createAdvancedProperties(advanced_tooltip_container, hovered_item, tooltip_container);
+                        let item_deco = tooltip_container.getElementsByClassName('item-tag-deco')[0];
+                        let should_display_advanced_tooltip = hovered_item.recipes.length > 0 || hovered_item.actions || hovered_item.properties || (item_deco && hovered_item.deco > 0);
+
+                        if (should_display_advanced_tooltip) {
+
+                            if (!advanced_tooltip_container) {
+                                advanced_tooltip_container = document.createElement('div');
+                                advanced_tooltip_container.id = 'mho-advanced-tooltip';
+                                advanced_tooltip_container.setAttribute('style', 'margin-top: 0.5em; border-top: 1px solid;');
+
+                                tooltip_container.appendChild(advanced_tooltip_container);
+                            } else if (!advanced_tooltip_container.innerHTML) {
+                                createAdvancedProperties(advanced_tooltip_container, hovered_item, tooltip_container);
+                            }
+                        }
+                    } else {
+                        let item_deco = tooltip_container.getElementsByClassName('item-tag-deco')[0];
+                        let should_display_advanced_tooltip = hovered_status.watch_def !== undefined || hovered_status.watch_kills !== undefined;
+
+                        if (should_display_advanced_tooltip) {
+
+                            if (!advanced_tooltip_container) {
+                                advanced_tooltip_container = document.createElement('div');
+                                advanced_tooltip_container.id = 'mho-advanced-tooltip';
+                                advanced_tooltip_container.setAttribute('style', 'margin-top: 0.5em; border-top: 1px solid;');
+
+                                tooltip_container.appendChild(advanced_tooltip_container);
+                            } else if (!advanced_tooltip_container.innerHTML) {
+                                createAdvancedPropertiesStatus(advanced_tooltip_container, hovered_status, tooltip_container);
+                            }
+                        }
+
+
+                    }
+
                 }
-            }
-        } else {
-            let item_deco = tooltip_container.getElementsByClassName('item-tag-deco')[0];
-            let should_display_advanced_tooltip = hovered_status.watch_def !== undefined || hovered_status.watch_kills !== undefined;
+            });
+        });
 
-            if (should_display_advanced_tooltip) {
+        const config = { attributes: true, subtree: true, childList: false, attributeFilter: ['style'], attributeOldValue: true };
 
-                if (!advanced_tooltip_container) {
-                    advanced_tooltip_container = document.createElement('div');
-                    advanced_tooltip_container.id = 'mho-advanced-tooltip';
-                    advanced_tooltip_container.setAttribute('style', 'margin-top: 0.5em; border-top: 1px solid;');
-
-                    tooltip_container.appendChild(advanced_tooltip_container);
-                } else if (!advanced_tooltip_container.innerHTML) {
-                    createAdvancedPropertiesStatus(advanced_tooltip_container, hovered_status, tooltip_container);
-                }
-            }
-
-
-        }
+        // Observer chaque enfant direct de tooltipsBlock
+        advanced_tooltips_observer.observe(tooltips_container, config);
     }
 
 }
@@ -7680,54 +7741,96 @@ function addExternalLinksToProfiles() {
 }
 
 function addExternalLinksToTowns() {
-    if (mho_parameters.display_external_links && pageIsSoul()) {
-        let town_history = document.querySelector('.town-history');
+    if (mho_parameters.display_external_links && pageIsTownHistory()) {
+        let mho_block = document.querySelector('#' + mho_town_external_links_id);
+        if (mho_block) return;
 
-        if (!town_history) return;
+        let view_town = document.querySelector('.view-town');
+        if (!view_town) return;
 
-        let table_header = town_history.querySelector('.row-flex.header');
+        let btns_row = view_town.querySelector('button')?.parentElement;
+        if (!btns_row) return;
 
-        if (!table_header) return;
+        let town_id = view_town.getAttribute('data-town-id');
 
-        let new_cell_header = document.createElement('div');
-        new_cell_header.classList.add('cell', 'padded', 'rw-2', 'center');
-        new_cell_header.innerHTML = `<img src="${mh_optimizer_icon}" style="width: 16px; margin-right: 0.25em;">${getI18N(texts.external_links)}`;
-        table_header.appendChild(new_cell_header);
+        mho_block = document.createElement('div');
+        mho_block.id = mho_town_external_links_id;
+        mho_block.style.marginTop = '0.5em';
+        mho_block.style.padding = '0.25em';
+        mho_block.style.border = '1px solid #ddab76';
+        btns_row.appendChild(mho_block);
 
-        let table_rows_container = town_history.querySelector('.town-container');
+        let updater_title = document.createElement('h5');
+        updater_title.style.margin = '0 0 0.5em'
 
-        let table_rows = table_rows_container.querySelectorAll('.row-flex.stretch');
-        if (table_rows && table_rows.length > 0) {
-            Array.from(table_rows).forEach((table_row) => {
-                let town_id = table_row.querySelector('[data-town-id]').getAttribute('data-town-id');
+        let btns_title_mho_img = document.createElement('img');
+        btns_title_mho_img.src = mh_optimizer_icon;
+        btns_title_mho_img.style.height = '24px';
+        btns_title_mho_img.style.marginRight = '0.5em';
+        updater_title.appendChild(btns_title_mho_img);
 
-                let new_cell = document.createElement('div');
-                new_cell.classList.add('cell', 'padded', 'rw-2', 'center');
-                new_cell.style.borderBottom = '1px solid #7e4d2a';
-                new_cell.style.borderLeft = '1px solid #7e4d2a';
-                new_cell.style.display = 'flex';
-                new_cell.style.gap = '0.25em';
-                new_cell.style.alignItems = 'flex-start';
-                new_cell.style.justifyContent = 'space-around';
-                table_row.appendChild(new_cell);
+        let btns_title_text = document.createElement('text');
+        btns_title_text.innerText = getScriptInfo().name;
+        updater_title.appendChild(btns_title_text);
 
-                let bbh_link = document.createElement('a');
-                bbh_link.href = `${big_broth_hordes_url}/?cid=5-${town_id}`;
-                new_cell.appendChild(bbh_link);
+        mho_block.appendChild(updater_title);
 
-                let bbh_img = document.createElement('img');
-                bbh_img.src = `${repo_img_url}external-tools/bbh.gif`;
-                bbh_link.appendChild(bbh_img);
+        let mho_btns_block = document.createElement('div');
+        mho_block.appendChild(mho_btns_block);
+        mho_btns_block.style.display = 'flex';
+        mho_btns_block.style.gap = '0.5em';
+        mho_btns_block.style.justifyContent = 'space-between';
+        mho_btns_block.style.alignItems = 'center';
 
-                let gh_link = document.createElement('a');
-                gh_link.href = `${gest_hordes_url}/carte/${town_id}`;
-                new_cell.appendChild(gh_link);
 
-                let gh_img = document.createElement('img');
-                gh_img.src = `${repo_img_url}external-tools/gh.gif`
-                gh_link.appendChild(gh_img);
-            });
-        }
+        let bbh_link = document.createElement('button');
+        bbh_link.classList.add('small');
+        bbh_link.style.display = 'flex';
+        bbh_link.style.alignItems = 'center';
+        bbh_link.style.gap = '0.5em';
+        bbh_link.onclick = () => window.open(`${big_broth_hordes_url}/?cid=5-${town_id}`, '_blank');
+        mho_btns_block.appendChild(bbh_link);
+
+        let bbh_img = document.createElement('img');
+        bbh_img.src = `${repo_img_url}external-tools/bbh.gif`;
+        bbh_link.appendChild(bbh_img);
+
+        let bbh_title = document.createElement('text');
+        bbh_title.innerText = `BigBroth'\nHordes`;
+        bbh_link.appendChild(bbh_title);
+
+        let gh_link = document.createElement('button');
+        gh_link.classList.add('small');
+        gh_link.style.display = 'flex';
+        gh_link.style.alignItems = 'center';
+        gh_link.style.gap = '0.5em';
+        gh_link.onclick = () => window.open(`${gest_hordes_url}/carte/${town_id}`, '_blank');
+        mho_btns_block.appendChild(gh_link);
+
+        let gh_img = document.createElement('img');
+        gh_img.src = `${repo_img_url}external-tools/gh.gif`;
+        gh_link.appendChild(gh_img);
+
+        let gh_title = document.createElement('text');
+        gh_title.innerText = `Gest'\nHordes`;
+        gh_link.appendChild(gh_title);
+
+        let fata_link = document.createElement('button');
+        fata_link.classList.add('small');
+        fata_link.style.display = 'flex';
+        fata_link.style.alignItems = 'center';
+        fata_link.style.gap = '0.5em';
+        fata_link.onclick = () => window.open(`${fata_morgana_url}/spy/town/${town_id}`, '_blank');
+        mho_btns_block.appendChild(fata_link);
+
+        let fata_img = document.createElement('img');
+        fata_img.src = `${repo_img_url}external-tools/fata.gif`;
+        fata_link.appendChild(fata_img);
+
+        let fata_title = document.createElement('text');
+        fata_title.innerText = `Fata\nMorgana`;
+        fata_link.appendChild(fata_title);
+
     }
 }
 
@@ -7772,8 +7875,28 @@ function fillItemsMessages() {
 function createStoreNotificationsBtn() {
     let stored_notifications_btn = document.getElementById(mho_store_notifications_id);
     if (mho_parameters.store_notifications) {
+
+        createWindow(mho_store_notifications_window_id, false);
+        const notifications_space = document.querySelector('#notifications');
         const mho_header_space = document.getElementById(mho_header_space_id);
-        if (stored_notifications_btn || !mho_header_space) return;
+        if (stored_notifications_btn || !mho_header_space || !notifications_space) return;
+
+        // Créez une instance de MutationObserver
+        const observer = new MutationObserver(function (mutations) {
+            mutations.forEach(function (mutation) {
+                // Vérifiez si des nœuds enfants ont été ajoutés ou supprimés
+                if (mutation.addedNodes.length) {
+                    mh_notifications.push(...(Array.from(mutation.addedNodes).map((node) => node.cloneNode(true))));
+                    createNotificationsWindowContent();
+                }
+            });
+        });
+
+        // Configuration de l'observateur pour surveiller les modifications des enfants
+        const config = { childList: true };
+
+        // Commencez à observer l'élément cible pour les modifications configurées
+        observer.observe(notifications_space, config);
 
         let btn_container = document.createElement('div');
         btn_container.id = mho_store_notifications_id;
@@ -7793,18 +7916,73 @@ function createStoreNotificationsBtn() {
         btn_container.addEventListener('click', (event) => {
             event.stopPropagation();
             event.preventDefault();
-        });
-
-        console.log('rdy');
-
-        document.querySelector('#modal-backdrop').addEventListener('pop', (event) => {
-            console.log('pop', event);
+            document.getElementById(mho_store_notifications_window_id).classList.add('visible');
+            createNotificationsWindowContent();
         });
 
         mho_header_space.appendChild(btn_container);
     } else if (stored_notifications_btn) {
         stored_notifications_btn.remove();
     }
+}
+
+function createNotificationsWindowContent() {
+
+    let window_content = document.querySelector(`#${mho_store_notifications_window_id}-content`);
+    window_content.innerHTML = '';
+
+    let window = window_content.parentElement;
+    window.style.minWidth = '500px';
+    window.style.maxWidth = '100dvw';
+
+    let tabs_div = document.createElement('div');
+    tabs_div.id = 'tabs';
+    window_content.appendChild(tabs_div);
+
+    let tabs_ul = document.createElement('ul');
+    tabs_div.appendChild(tabs_ul)
+
+    dispatchNotificationsContent();
+}
+
+function dispatchNotificationsContent() {
+    let window_content = document.getElementById(mho_store_notifications_window_id + '-content');
+
+    let tab_content = document.getElementById(mho_store_notifications_window_id + '-tab-content');
+    if (tab_content) {
+        tab_content.remove();
+    }
+    tab_content = document.createElement('div');
+    tab_content.id = mho_expeditions_window_id + '-tab-content';
+    tab_content.classList.add('tab-content');
+    window_content.appendChild(tab_content);
+
+    let notifications_list = document.createElement('ul');
+    notifications_list.id = 'notifications-list';
+    tab_content.appendChild(notifications_list);
+
+    mh_notifications.forEach((notification, index) => {
+        let notification_container = document.createElement('li');
+        notification_container.style.display = 'flex';
+        notification_container.style.gap = '0.5em';
+        notification_container.style.alignItems = 'center';
+        notifications_list.appendChild(notification_container);
+
+        let notification_content = document.createElement('div');
+        notification_content.style.flex = 1;
+        notification_content.innerHTML = notification.innerHTML;
+        notification_container.appendChild(notification_content);
+
+        let remove_notification = document.createElement('img');
+        remove_notification.src = repo_img_hordes_url + '/icons/small_trash_red.png';
+        remove_notification.style.cursor = 'pointer';
+        notification_container.appendChild(remove_notification);
+
+        remove_notification.addEventListener('click', (event) => {
+            mh_notifications.splice(index, 1);
+            createNotificationsWindowContent();
+        });
+    });
 }
 
 function createExpeditionsBtn() {
@@ -7903,9 +8081,7 @@ function dispatchExpeditionContent(expedition, citizens) {
 
     window_content.appendChild(tab_content);
 
-    console.log('expedition', expedition);
     expedition.parts.forEach((part, index) => {
-        console.log('part', part);
         let part_content = document.createElement('div');
         tab_content.appendChild(part_content);
 
@@ -8150,6 +8326,38 @@ function blockUsersPosts() {
                 });
             });
         }
+    }
+}
+
+function displayCountCharacters() {
+
+    let counter = document.querySelector('#mho_registry_counter_id');
+
+    if (!counter && mho_parameters.display_counter_on_input_registry && pageIsDesert()) {
+        let log_block = document.querySelector('#beyond-log');
+        if (!log_block) return;
+
+        let log_input = log_block.querySelector('.overlay-central input');
+        if (!log_input) return
+
+        counter = document.createElement('div');
+        counter.id = 'mho_registry_counter_id';
+        counter.classList.add('cell', 'grow-0', 'small');
+        counter.style.margin = 'auto';
+        counter.innerText = `${log_input.value.length}/256`;
+
+        log_input.parentElement?.parentElement?.parentElement?.parentElement?.parentNode.insertBefore(counter, log_input.parentElement.parentElement.parentElement.parentElement.nextSibling);
+        log_input.addEventListener('input', (event) => {
+            counter.innerText = `${event.srcElement.value?.trim().length ?? 0}/256`;
+        });
+
+        log_input.addEventListener('change', (event) => {
+            let log_block_new = document.querySelector('#beyond-log');
+            let log_input_new = log_block_new.querySelector('.overlay-central input');
+            counter.innerText = `${log_block_new.value?.trim().length ?? 0}/256`;
+        });
+    } else if (counter) {
+        counter.remove();
     }
 }
 
@@ -8475,7 +8683,7 @@ function createStyles() {
         + 'font-size: 9pt;'
         + '}';
 
-    const recipe_style = '.tab-content #recipes-list > li, #wishlist > li {'
+    const recipe_style = '.tab-content #recipes-list > li, .tab-content #notifications-list > li, #wishlist > li {'
         + 'min-width: 100% !important;'
         + 'display: flex;'
         + '}';
@@ -8510,7 +8718,7 @@ function createStyles() {
         + 'width: 100%;'
         + '}';
 
-    const wishlist_even = '.tab-content #recipes-list > li:nth-child(even), #wishlist > li:nth-child(even) {'
+    const wishlist_even = '.tab-content #recipes-list > li:nth-child(even), .tab-content #notifications-list > li:nth-child(even), #wishlist > li:nth-child(even) {'
         + 'background-color: #5c2b20;'
         + '}';
 
@@ -10629,6 +10837,7 @@ function getApiKey() {
             toggleNewChangelog(isNewVersion(version))
 
             createStyles();
+            createOptimizerBtn();
             createMhoHeaderSpace();
             notifyOnSearchEnd();
 
@@ -10658,10 +10867,10 @@ function getApiKey() {
                                 }
                             });
                         });
-                        setInterval(() => {
-                            displayAdvancedTooltips();
-                        }, 100);
-                    });
+                    })
+                        .catch(() => {
+                            initOptionsWithoutLoginNeeded();
+                        });
                 });
             })
                 .catch(() => {
