@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MHO Addon
-// @version      1.1.5.0
+// @version      1.1.6.0
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/, rubrique Tutoriels
 // @author       Zerah
 //
@@ -1606,10 +1606,10 @@ let params_categories = [
             {
                 id: `display_external_links`,
                 label: {
-                    en: `Shows links to external profiles`,
-                    fr: `Affiche des liens vers les profils externes`,
-                    de: `Zeigt Links zu externen Profilen an`,
-                    es: `Muestra enlaces a perfiles externos`
+                    en: `Shows links to external profiles and towns`,
+                    fr: `Affiche des liens vers les profils et villes externes`,
+                    de: `Zeigt Links zu externen Profilen und Städten an`,
+                    es: `Muestra enlaces a perfiles y ciudades externos`
                 },
             },
             {
