@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MHO Addon
-// @version      1.1.6.0
+// @version      1.1.7.0
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/, rubrique Tutoriels
 // @author       Zerah
 //
@@ -31,10 +31,7 @@
 // ==/UserScript==
 
 const changelog = `${getScriptInfo().name} : Changelog pour la version ${getScriptInfo().version}\n\n`
-    + `[Amélioration] Performances globales & stabilité \n\n`
-    + `[Correctif] Affichage des PA manquants sur les chantiers en pandé \n\n`
-    + `[Nouveauté] Il est possible d'afficher un compteur de caractères sur le chatcase \n`
-    + `[Nouveauté] Il est possible de relire les anciennes notifications (tant qu'on n'a pas refresh sa page) \n`;
+    + `[Correctif] Corrige l'appel en boucle sur la page de l'âme quand on n'est pas incarné \n\n`;
 
 const lang = (document.querySelector('html[lang]')?.getAttribute('lang') || document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2) || 'fr';
 
@@ -1935,15 +1932,14 @@ function pageIsTownHistory() {
 /** @return {boolean}    on doit refresh le user actuel si le jour de la ville est différent du jour précédent */
 function shouldRefreshMe() {
     // si on change de ville on force le refresh
-    const current_town_id_element = document.querySelector('[data-town-id]');
-    if (!current_town_id_element) return false;
-    const current_town_id = current_town_id_element?.getAttribute('data-town-id');
+    const current_town_id_name = document.querySelector('.town-name[data-town-id]');
+    if (!current_town_id_name) return false;
+
+    const current_town_id = current_town_id_name?.getAttribute('data-town-id');
     if (+current_town_id !== +mh_user.townDetails?.townId) return true;
 
     // si on change de jour, on force le refresh
-    const current_town_name = document.querySelector('.town-name');
-    if (!current_town_name) return false;
-    return +current_town_name.nextElementSibling.innerText.replace(/(\D)*/, '') !== +mh_user.townDetails?.day;
+    return +current_town_id_name.nextElementSibling.innerText.replace(/(\D)*/, '') !== +mh_user.townDetails?.day;
 }
 
 function getI18N(item) {
