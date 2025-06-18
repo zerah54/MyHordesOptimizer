@@ -1,5 +1,5 @@
-import { CommonModule, DecimalPipe, DOCUMENT, formatNumber, Location, NgOptimizedImage, NgTemplateOutlet } from '@angular/common';
-import { Component, HostBinding, inject, Inject, OnInit, ViewEncapsulation } from '@angular/core';
+import { CommonModule, DecimalPipe, formatNumber, Location, NgOptimizedImage, NgTemplateOutlet } from '@angular/common';
+import { Component, HostBinding, inject, Inject, OnInit, ViewEncapsulation, DOCUMENT } from '@angular/core';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';

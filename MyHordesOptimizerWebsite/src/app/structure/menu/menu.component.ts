@@ -1,5 +1,5 @@
-import { CommonModule, DOCUMENT, NgClass, NgTemplateOutlet } from '@angular/common';
-import { Component, HostBinding, inject, Inject, Input, LOCALE_ID, OnInit, ViewEncapsulation } from '@angular/core';
+import { CommonModule, NgClass, NgTemplateOutlet } from '@angular/common';
+import { Component, HostBinding, inject, Inject, Input, LOCALE_ID, OnInit, ViewEncapsulation, DOCUMENT } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
