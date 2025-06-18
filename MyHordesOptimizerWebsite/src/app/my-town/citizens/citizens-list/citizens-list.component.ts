@@ -1,6 +1,5 @@
-import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
 import { CommonModule, NgClass, NgOptimizedImage } from '@angular/common';
-import { Component, EventEmitter, HostBinding, inject, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, EventEmitter, HostBinding, inject, OnInit, Signal, viewChild, ViewEncapsulation } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatCheckboxChange, MatCheckboxModule } from '@angular/material/checkbox';
 import { MatOptionModule } from '@angular/material/core';
@@ -8,9 +7,8 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSort, MatSortModule } from '@angular/material/sort';
-import { MatTable, MatTableModule } from '@angular/material/table';
+import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import moment from 'moment';
-import { TableVirtualScrollDataSource, TableVirtualScrollModule } from 'ng-table-virtual-scroll';
 import { Subject, takeUntil } from 'rxjs';
 import { HORDES_IMG_REPO } from '../../../_abstract_model/const';
 import { StatusEnum } from '../../../_abstract_model/enum/status.enum';
@@ -39,14 +37,14 @@ import { TypeRowPipe } from './type-row.pipe';
 const angular_common: Imports = [CommonModule, FormsModule, NgClass, NgOptimizedImage];
 const components: Imports = [AvatarComponent, CitizenInfoComponent, HeaderWithSelectFilterComponent, LastUpdateComponent, ListElementAddRemoveComponent];
 const pipes: Imports = [BathForDayPipe, ColumnIdPipe, TypeRowPipe];
-const material_modules: Imports = [CdkVirtualScrollViewport, MatCheckboxModule, MatFormFieldModule, MatInputModule, MatOptionModule, MatSelectModule, MatSortModule, MatTableModule];
+const material_modules: Imports = [MatCheckboxModule, MatFormFieldModule, MatInputModule, MatOptionModule, MatSelectModule, MatSortModule, MatTableModule];
 
 @Component({
     selector: 'mho-citizens-list',
     templateUrl: './citizens-list.component.html',
     styleUrls: ['./citizens-list.component.scss'],
     encapsulation: ViewEncapsulation.None,
-    imports: [...angular_common, ...components, ...material_modules, ...pipes, TableVirtualScrollModule]
+    imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class CitizensListComponent implements OnInit {
     @HostBinding('style.display') display: string = 'contents';
@@ -54,18 +52,16 @@ export class CitizensListComponent implements OnInit {
     // @ViewChild(MenuAddComponent) menuAdd!: MenuAddComponent;
     // @ViewChild(MenuRemoveComponent) menuRemove!: MenuRemoveComponent;
 
-    @ViewChild(MatSort) sort!: MatSort;
-    @ViewChild(MatTable) table!: MatTable<Citizen>;
+    public sort: Signal<MatSort | undefined> = viewChild(MatSort);
 
     /** La liste des citoyens en vie */
     public alive_citizen_info!: CitizenInfo;
     /** La liste des citoyens morts */
     public dead_citizen_info!: CitizenInfo;
     /** La datasource pour le tableau */
-        // public datasource: TableVirtualScrollDataSource<Citizen> = new TableVirtualScrollDataSource();
-    public citizen_list: TableVirtualScrollDataSource<Citizen> = new TableVirtualScrollDataSource();
+    public citizen_list: MatTableDataSource<Citizen> = new MatTableDataSource();
     /** La datasource des citoyens morts */
-    public dead_citizen_list: TableVirtualScrollDataSource<Cadaver> = new TableVirtualScrollDataSource();
+    public dead_citizen_list: MatTableDataSource<Cadaver> = new MatTableDataSource();
     /** La liste complète des items */
     public all_items: Item[] = [];
     /** Le dossier dans lequel sont stockées les images */
@@ -105,11 +101,11 @@ export class CitizensListComponent implements OnInit {
     @AutoDestroy private destroy_sub: Subject<void> = new Subject();
 
     public ngOnInit(): void {
-        this.citizen_list = new TableVirtualScrollDataSource();
-        this.citizen_list.sort = this.sort;
+        this.citizen_list = new MatTableDataSource();
+        this.citizen_list.sort = this.sort() as MatSort;
 
-        this.dead_citizen_list = new TableVirtualScrollDataSource();
-        this.dead_citizen_list.sort = this.sort;
+        this.dead_citizen_list = new MatTableDataSource();
+        this.dead_citizen_list.sort = this.sort() as MatSort;
 
         this.citizen_filter_change
             .pipe(takeUntil(this.destroy_sub))
