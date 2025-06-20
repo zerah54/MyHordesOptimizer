@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, HostBinding, inject, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, inject, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatDividerModule } from '@angular/material/divider';
@@ -29,11 +29,10 @@ const material_modules: Imports = [MatCheckboxModule, MatDividerModule, MatFormF
     templateUrl: './citizens-immune.component.html',
     styleUrls: ['./citizens-immune.component.scss'],
     encapsulation: ViewEncapsulation.None,
-    standalone: true,
+    host: { style: 'display: contents' },
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class CitizensImmuneComponent implements OnInit {
-    @HostBinding('style.display') display: string = 'contents';
 
     @ViewChild(MatSort) sort!: MatSort;
     @ViewChild(MatTable) table!: MatTable<Citizen>;
@@ -45,7 +44,7 @@ export class CitizensImmuneComponent implements OnInit {
     /** La liste des métiers des citoyens */
     public all_citizens_job!: JobEnum[];
     /** Le dossier dans lequel sont stockées les images */
-    public HORDES_IMG_REPO: string = HORDES_IMG_REPO;
+    public readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
     /** La locale */
     public readonly locale: string = moment.locale();
 

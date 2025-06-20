@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, HostBinding, Input, ViewEncapsulation } from '@angular/core';
+import { Component, Input, ViewEncapsulation } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import moment, { Moment } from 'moment';
@@ -25,10 +25,10 @@ const material_modules: Imports = [MatFormFieldModule];
     templateUrl: './digs-registry.component.html',
     styleUrls: ['./digs-registry.component.scss'],
     encapsulation: ViewEncapsulation.None,
+    host: {style: 'display: contents'},
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class DigsRegistryComponent {
-    @HostBinding('style.display') display: string = 'contents';
 
     @Input({required: true}) completeCitizenList!: CitizenInfo;
     @Input({required: true}) displayPseudo!: DisplayPseudoMode;

@@ -1,6 +1,6 @@
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { CommonModule, NgOptimizedImage } from '@angular/common';
-import { Component, EventEmitter, HostBinding, HostListener, inject, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, EventEmitter, HostListener, inject, OnInit, Output, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDividerModule } from '@angular/material/divider';
@@ -33,10 +33,10 @@ const material_modules: Imports = [MatButtonModule, MatDividerModule, MatFormFie
     selector: 'mho-header',
     templateUrl: './header.component.html',
     styleUrls: ['./header.component.scss'],
+    host: {style: 'display: contents'},
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class HeaderComponent implements OnInit {
-    @HostBinding('style.display') display: string = 'contents';
 
     @ViewChild(MatToolbar) mat_toolbar!: MatToolbar;
 

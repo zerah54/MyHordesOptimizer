@@ -1,5 +1,5 @@
 import { CommonModule, NgClass, NgOptimizedImage } from '@angular/common';
-import { ChangeDetectionStrategy, Component, HostBinding, inject, OnInit, signal, ViewEncapsulation, WritableSignal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, OnInit, signal, ViewEncapsulation, WritableSignal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -62,10 +62,10 @@ const material_modules: Imports = [MatButtonModule, MatCardModule, MatCheckboxMo
     styleUrls: ['./expeditions.component.scss'],
     encapsulation: ViewEncapsulation.None,
     changeDetection: ChangeDetectionStrategy.OnPush,
+    host: {style: 'display: contents'},
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class ExpeditionsComponent implements OnInit {
-    @HostBinding('style.display') display: string = 'contents';
 
     /** La langue du site */
     public readonly locale: string = moment.locale();

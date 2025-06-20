@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, HostBinding, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -26,10 +26,10 @@ const material_modules: Imports = [MatCardModule, MatFormFieldModule];
     selector: 'mho-items',
     templateUrl: './items.component.html',
     styleUrls: ['./items.component.scss'],
+    host: {style: 'display: contents'},
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class ItemsComponent implements OnInit {
-    @HostBinding('style.display') display: string = 'contents';
 
     /** La liste des objets du jeu */
     public items!: Item[];

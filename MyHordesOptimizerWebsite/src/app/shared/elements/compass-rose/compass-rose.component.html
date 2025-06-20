@@ -1,7 +1,7 @@
 <div class="mho-compass-rose">
     <div class="compass">
         <div class="compass-main">
-            @if (withLegend) {
+            @if (withLegend()) {
                 <span class="north-label" i18n>N</span>
                 <span class="east-label" i18n>E</span>
                 <span class="west-label" i18n>O</span>
@@ -20,13 +20,13 @@
                 </div>
                 <div class="ordinal-points">
                     <div class="northeast-pointer pointer sub" [class.selected]="selectedScrutZone | isDirectionSelected:'Nordosten'"
-                         (click)="withDiags ? addToSelection('Nordosten') : undefined"></div>
+                         (click)="withDiags() ? addToSelection('Nordosten') : undefined"></div>
                     <div class="northwest-pointer pointer sub" [class.selected]="selectedScrutZone | isDirectionSelected:'Nordwesten'"
-                         (click)="withDiags ? addToSelection('Nordwesten') : undefined"></div>
+                         (click)="withDiags() ? addToSelection('Nordwesten') : undefined"></div>
                     <div class="southeast-pointer pointer sub" [class.selected]="selectedScrutZone | isDirectionSelected:'Südosten'"
-                         (click)="withDiags ? addToSelection('Südosten') : undefined"></div>
+                         (click)="withDiags() ? addToSelection('Südosten') : undefined"></div>
                     <div class="southwest-pointer pointer sub" [class.selected]="selectedScrutZone | isDirectionSelected:'Südwesten'"
-                         (click)="withDiags ? addToSelection('Südwesten') : undefined"></div>
+                         (click)="withDiags() ? addToSelection('Südwesten') : undefined"></div>
                 </div>
             </div>
 

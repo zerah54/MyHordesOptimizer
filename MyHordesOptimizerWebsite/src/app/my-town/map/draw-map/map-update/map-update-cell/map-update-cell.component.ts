@@ -1,5 +1,5 @@
 import { CommonModule, NgOptimizedImage } from '@angular/common';
-import { Component, EventEmitter, HostBinding, Input, OnInit, Output, ViewEncapsulation } from '@angular/core';
+import { Component, input, InputSignal, OnInit, output, OutputEmitterRef, ViewEncapsulation } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatDividerModule } from '@angular/material/divider';
@@ -31,15 +31,15 @@ const material_modules: Imports = [MatCheckboxModule, MatDividerModule, MatFormF
     templateUrl: './map-update-cell.component.html',
     styleUrls: ['./map-update-cell.component.scss'],
     encapsulation: ViewEncapsulation.None,
+    host: {style: 'display: contents'},
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class MapUpdateCellComponent implements OnInit {
-    @HostBinding('style.display') display: string = 'contents';
 
-    @Input() cell!: Cell;
-    @Input() citizens!: Citizen[];
+    public citizens: InputSignal<Citizen[]> = input.required();
 
-    @Output() cellChange: EventEmitter<Cell> = new EventEmitter();
+    public cell: InputSignal<Cell> = input.required();
+    public cellChange: OutputEmitterRef<Cell> = output();
 
     public all_items: Item[] = [];
 
@@ -62,20 +62,21 @@ export class MapUpdateCellComponent implements OnInit {
             });
 
         this.cell_form = this.fb.group({
-            nb_zombies: [this.cell.nb_zombie],
-            nb_killed_zombies: [this.cell.nb_zombie_killed],
-            is_dryed: [this.cell.is_dryed],
-            items: [this.cell.items],
+            nb_zombies: [this.cell().nb_zombie],
+            nb_killed_zombies: [this.cell().nb_zombie_killed],
+            is_dryed: [this.cell().is_dryed],
+            items: [this.cell().items],
         });
 
         this.cell_form.valueChanges
             .pipe(takeUntil(this.destroy_sub))
             .subscribe((values: CellInfoUpdate) => {
-                this.cell.is_dryed = values.is_dryed;
-                this.cell.nb_zombie = +values.nb_zombies;
-                this.cell.nb_zombie_killed = +values.nb_killed_zombies;
-                this.cell.items = [...values.items];
-                this.cellChange.next(this.cell);
+                let new_cell: Cell = this.cell();
+                new_cell.is_dryed = values.is_dryed;
+                new_cell.nb_zombie = +values.nb_zombies;
+                new_cell.nb_zombie_killed = +values.nb_killed_zombies;
+                new_cell.items = [...values.items];
+                this.cellChange.emit(new_cell);
             });
     }
 

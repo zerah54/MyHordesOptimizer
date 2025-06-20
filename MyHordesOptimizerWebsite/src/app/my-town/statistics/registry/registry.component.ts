@@ -1,5 +1,5 @@
 import { CommonModule, NgOptimizedImage } from '@angular/common';
-import { Component, HostBinding, inject, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, inject, OnInit, ViewEncapsulation } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
@@ -35,10 +35,10 @@ const material_modules: Imports = [MatButtonModule, MatButtonToggleModule, MatFo
     templateUrl: './registry.component.html',
     styleUrls: ['./registry.component.scss'],
     encapsulation: ViewEncapsulation.None,
+    host: {style: 'display: contents'},
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class RegistryComponent implements OnInit {
-    @HostBinding('style.display') display: string = 'contents';
 
     public dev_mode: boolean = !environment.production;
 

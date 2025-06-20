@@ -1,5 +1,5 @@
 import { CommonModule, NgClass } from '@angular/common';
-import { Component, EventEmitter, HostBinding, inject, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, EventEmitter, inject, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatCheckboxChange, MatCheckboxModule } from '@angular/material/checkbox';
@@ -37,10 +37,10 @@ const material_modules: Imports = [MatCheckboxModule, MatSlideToggleModule, MatS
     templateUrl: './citizens-watch.component.html',
     styleUrls: ['./citizens-watch.component.scss'],
     encapsulation: ViewEncapsulation.None,
+    host: { style: 'display: contents' },
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class CitizensWatchComponent implements OnInit {
-    @HostBinding('style.display') display: string = 'contents';
 
     @ViewChild(MatSort) sort!: MatSort;
     @ViewChild(MatTable) table!: MatTable<Citizen>;
@@ -50,7 +50,7 @@ export class CitizensWatchComponent implements OnInit {
     /** La datasource pour le tableau */
     public datasource: MatTableDataSource<Citizen> = new MatTableDataSource();
     /** Le dossier dans lequel sont stockées les images */
-    public HORDES_IMG_REPO: string = HORDES_IMG_REPO;
+    public readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
     /** La locale */
     public readonly locale: string = moment.locale();
     /** La liste des citoyens a été mise à jour */

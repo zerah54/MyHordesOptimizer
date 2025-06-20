@@ -1,5 +1,5 @@
 import { CommonModule, NgClass, NgOptimizedImage } from '@angular/common';
-import { Component, EventEmitter, HostBinding, inject, OnInit, Signal, viewChild, ViewEncapsulation } from '@angular/core';
+import { Component, EventEmitter, inject, OnInit, Signal, viewChild, ViewEncapsulation } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatCheckboxChange, MatCheckboxModule } from '@angular/material/checkbox';
 import { MatOptionModule } from '@angular/material/core';
@@ -44,10 +44,10 @@ const material_modules: Imports = [MatCheckboxModule, MatFormFieldModule, MatInp
     templateUrl: './citizens-list.component.html',
     styleUrls: ['./citizens-list.component.scss'],
     encapsulation: ViewEncapsulation.None,
+    host: { style: 'display: contents' },
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class CitizensListComponent implements OnInit {
-    @HostBinding('style.display') display: string = 'contents';
 
     // @ViewChild(MenuAddComponent) menuAdd!: MenuAddComponent;
     // @ViewChild(MenuRemoveComponent) menuRemove!: MenuRemoveComponent;
@@ -65,7 +65,7 @@ export class CitizensListComponent implements OnInit {
     /** La liste complète des items */
     public all_items: Item[] = [];
     /** Le dossier dans lequel sont stockées les images */
-    public HORDES_IMG_REPO: string = HORDES_IMG_REPO;
+    public readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
     public readonly current_day: number = getTown()?.day || 1;
     /** La locale */
     public readonly locale: string = moment.locale();

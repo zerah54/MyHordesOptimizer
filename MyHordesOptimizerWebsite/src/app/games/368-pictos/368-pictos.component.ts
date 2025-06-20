@@ -1,5 +1,5 @@
 import { CdkDragRelease, DragDropModule } from '@angular/cdk/drag-drop';
-import { Component, ElementRef, HostBinding, Signal, viewChildren } from '@angular/core';
+import { Component, ElementRef, Signal, viewChildren } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { HORDES_IMG_REPO } from 'src/app/_abstract_model/const';
 import { Imports } from 'src/app/_abstract_model/types/_types';
@@ -15,10 +15,10 @@ const material_modules: Imports = [ MatCardModule, DragDropModule ];
     selector: 'mho-368-pictos',
     templateUrl: '368-pictos.component.html',
     styleUrls: [ '368-pictos.component.scss' ],
+    host: {style: 'display: contents'},
     imports: [ ...angular_common, ...components, ...material_modules, ...pipes ]
 })
 export class PictosGameComponent {
-    @HostBinding('style.display') display: string = 'contents';
 
     protected cells: Signal<readonly ElementRef<HTMLDivElement>[]> = viewChildren('cellDiv', { read: ElementRef });
     protected cells_lot: Signal<readonly ElementRef<HTMLDivElement>[]> = viewChildren('cellLotDiv', { read: ElementRef });

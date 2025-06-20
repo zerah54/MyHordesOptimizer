@@ -1,6 +1,6 @@
 import { animate, style, transition, trigger } from '@angular/animations';
 import { CommonModule, DecimalPipe, NgClass, NgOptimizedImage } from '@angular/common';
-import { Component, EventEmitter, HostBinding, Input, Output, ViewEncapsulation } from '@angular/core';
+import { Component, EventEmitter, Output, ViewEncapsulation, InputSignal, input } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import moment from 'moment';
 import { Subject, takeUntil } from 'rxjs';
@@ -35,6 +35,7 @@ const material_modules: Imports = [];
     templateUrl: './map-cell.component.html',
     styleUrls: ['./map-cell.component.scss', '../draw-map.component.scss'],
     encapsulation: ViewEncapsulation.None,
+    host: {style: 'display: contents'},
     animations: [
         trigger('toggleCurrentCell', [
             transition(':enter', [
@@ -50,14 +51,13 @@ const material_modules: Imports = [];
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class MapCellComponent {
-    @HostBinding('style.display') display: string = 'contents';
 
-    @Input() cell!: Cell;
-    @Input() drawedMap!: Cell[][];
-    @Input() allRuins!: Ruin[];
-    @Input() allCitizens!: Citizen[];
-    @Input() allItems!: Item[];
-    @Input() options!: MapOptions;
+    public cell: InputSignal<Cell> = input.required();
+    public drawedMap: InputSignal<Cell[][]> = input.required();
+    public allRuins: InputSignal<Ruin[]> = input.required();
+    public allCitizens: InputSignal<Citizen[]> = input.required();
+    public allItems: InputSignal<Item[]> = input.required();
+    public options: InputSignal<MapOptions> = input.required();
 
     @Output() cellChange: EventEmitter<Cell> = new EventEmitter();
     @Output() currentHoveredCellChange: EventEmitter<Cell | undefined> = new EventEmitter();
@@ -74,21 +74,19 @@ export class MapCellComponent {
     }
 
     public openCellUpdate(): void {
-        console.log('this.cell', this.cell);
         this.dialog
             .open(MapUpdateComponent, {
                 data: <MapUpdateData>{
-                    cell: this.cell,
-                    ruin: this.cell.ruin_id ? this.allRuins.find((ruin: Ruin) => ruin.id === this.cell.ruin_id) : undefined,
-                    all_ruins: this.allRuins,
-                    all_citizens: this.allCitizens
+                    cell: this.cell(),
+                    ruin: this.cell().ruin_id ? this.allRuins().find((ruin: Ruin) => ruin.id === this.cell().ruin_id) : undefined,
+                    all_ruins: this.allRuins(),
+                    all_citizens: this.allCitizens()
                 }
             })
             .afterClosed()
             .pipe(takeUntil(this.destroy_sub))
             .subscribe((new_cell: Cell) => {
                 if (new_cell) {
-                    this.cell = new_cell;
                     this.cellChange.next(new_cell);
                 }
             });

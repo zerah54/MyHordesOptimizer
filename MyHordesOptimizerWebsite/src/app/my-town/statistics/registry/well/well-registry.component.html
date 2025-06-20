@@ -2,7 +2,7 @@
     <div class="well">
         <h4 class="rations">{{ rations.rations }} {rations.rations, plural, =0 {ration prise} =1 {ration prise} other {rations prises}}</h4>
         @for (citizen of rations.citizen; track citizen; let index = $index) {
-            <mho-citizen-info [displayJob]="false" [displayShunStatus]="true" [displayPseudoMode]="displayPseudo" [citizen]="citizen"></mho-citizen-info>
+            <mho-citizen-info displayShunStatus [displayPseudoMode]="displayPseudo" [citizen]="citizen"></mho-citizen-info>
             @if (index < rations.citizen.length - 1) {
                 <span>,&nbsp;</span>
             }

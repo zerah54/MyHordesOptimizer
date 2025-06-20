@@ -1,10 +1,10 @@
-@if (ruin) {
+@if (ruin()) {
     <div class="mho-map-update-ruin">
         <ng-container>
-            <div [innerHTML]="ruin.description[locale]"></div>
+            <div [innerHTML]="ruin().description[locale]"></div>
             <br/>
             <div>
-                <ng-container i18n>Bonus en camping</ng-container>&nbsp;:&nbsp;{{ ruin.camping }}
+                <ng-container i18n>Bonus en camping</ng-container>&nbsp;:&nbsp;{{ ruin().camping }}
             </div>
         </ng-container>
 
@@ -12,8 +12,8 @@
             <mat-divider></mat-divider>
             <form [formGroup]="cell_form">
                 <div class="ruin-info">
-                    @if (!ruin.explorable) {
-                        @if (+cell.ruin_id < 0) {
+                    @if (!ruin().explorable) {
+                        @if (+cell().ruin_id < 0) {
                             <mat-form-field class="nb-digs">
                                 <img matPrefix [ngSrc]="HORDES_IMG_REPO + 'building/small_dig.gif'" width="16" height="16">
                                 <input matInput formControlName="nb_ruin_dig">
@@ -44,10 +44,10 @@
                 </div>
             </form>
         </ng-container>
-        @if (ruin.drops && ruin.drops.length > 0) {
+        @if (ruin().drops && ruin().drops.length > 0) {
             <mat-divider></mat-divider>
             <div class="drops">
-                @for (drop of ruin.drops; track drop.item.id) {
+                @for (drop of ruin().drops; track drop.item.id) {
                     <div>
                         <img [ngSrc]="HORDES_IMG_REPO + drop.item.img" width="16" height="16">
                         {{ drop.item.label[locale] }}
@@ -56,11 +56,11 @@
                 }
             </div>
         }
-        @if (ruin.id === -1) {
+        @if (ruin().id === -1) {
             <mat-divider></mat-divider>
             <h4 i18n>Liste des bâtiments possibles</h4>
             <mat-list>
-                @for (ruin of (allRuins | filterRuinsByKm:cell.nb_km); track ruin.id) {
+                @for (ruin of (allRuins() | filterRuinsByKm:cell().nb_km); track ruin.id) {
                     @if (ruin.id > -1) {
                         <mat-list-item>
                             <span matListItemTitle>{{ ruin.label[locale] }}</span>

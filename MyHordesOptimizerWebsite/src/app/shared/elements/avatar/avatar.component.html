@@ -1,7 +1,7 @@
-@if (src && src !== '' && src !== 'False') {
-    <picture class="mho-avatar" [class.rounded]="rounded">
-        <source [srcset]="src" type="image/avif"/>
-        <source [srcset]="src" type="image/webp"/>
-        <img [src]="src">
+@if (src() && src() !== '' && src() !== 'False') {
+    <picture class="mho-avatar" [class.rounded]="rounded()">
+        <source [srcset]="src()" type="image/avif"/>
+        <source [srcset]="src()" type="image/webp"/>
+        <img [src]="src()">
     </picture>
 }

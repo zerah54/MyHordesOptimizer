@@ -1,5 +1,5 @@
 import { CommonModule, NgOptimizedImage } from '@angular/common';
-import { Component, HostBinding, Input } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import moment from 'moment';
 import { HORDES_IMG_REPO } from '../../../_abstract_model/const';
 import { Imports } from '../../../_abstract_model/types/_types';
@@ -13,10 +13,10 @@ const material_modules: Imports = [];
     selector: 'mho-icon-ap',
     templateUrl: './icon-ap.component.html',
     styleUrls: ['./icon-ap.component.scss'],
+    host: {style: 'display: contents'},
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class IconApComponent {
-    @HostBinding('style.display') display: string = 'contents';
 
     @Input() src: string | undefined;
 

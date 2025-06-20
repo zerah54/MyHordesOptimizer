@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { booleanAttribute, Component, HostBinding, Input } from '@angular/core';
+import { booleanAttribute, Component, input, InputSignal, InputSignalWithTransform } from '@angular/core';
 import { Imports } from '../../../_abstract_model/types/_types';
 
 const angular_common: Imports = [CommonModule];
@@ -11,13 +11,11 @@ const material_modules: Imports = [];
     selector: 'mho-avatar',
     templateUrl: './avatar.component.html',
     styleUrls: ['./avatar.component.scss'],
+    host: {style: 'display: contents'},
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class AvatarComponent {
-    @HostBinding('style.display') display: string = 'contents';
 
-    @Input() src: string | undefined;
-    @Input({transform: booleanAttribute}) rounded: boolean = false;
-    @Input() width: string | undefined;
-
+    public src: InputSignal<string | undefined> = input();
+    public rounded: InputSignalWithTransform<boolean, unknown> = input(false, {transform: booleanAttribute});
 }

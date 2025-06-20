@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, HostBinding } from '@angular/core';
+import { Component } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatTabsModule } from '@angular/material/tabs';
 import { Router, RouterLink, RouterOutlet } from '@angular/router';
@@ -14,10 +14,10 @@ const material_modules: Imports = [MatCardModule, MatTabsModule];
     selector: 'mho-statistics',
     templateUrl: './statistics.component.html',
     styleUrls: ['./statistics.component.scss'],
+    host: {style: 'display: contents'},
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class StatisticsComponent {
-    @HostBinding('style.display') display: string = 'contents';
 
     public links: Link[] = [
         {

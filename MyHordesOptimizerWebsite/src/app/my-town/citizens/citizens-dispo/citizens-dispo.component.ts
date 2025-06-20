@@ -1,5 +1,5 @@
 import { CommonModule, NgClass } from '@angular/common';
-import { Component, EventEmitter, HostBinding, inject, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, EventEmitter, inject, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatTable, MatTableDataSource, MatTableModule } from '@angular/material/table';
 import moment from 'moment';
@@ -31,10 +31,10 @@ const material_modules: Imports = [MatSortModule, MatTableModule];
     templateUrl: './citizens-dispo.component.html',
     styleUrls: ['./citizens-dispo.component.scss'],
     encapsulation: ViewEncapsulation.None,
+    host: { style: 'display: contents' },
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class CitizensDispoComponent implements OnInit {
-    @HostBinding('style.display') display: string = 'contents';
 
     @ViewChild(MatSort) sort!: MatSort;
     @ViewChild(MatTable) table!: MatTable<Citizen>;
@@ -44,7 +44,7 @@ export class CitizensDispoComponent implements OnInit {
     /** La datasource pour le tableau */
     public datasource: MatTableDataSource<DispoByCitizen> = new MatTableDataSource();
     /** Le dossier dans lequel sont stockées les images */
-    public HORDES_IMG_REPO: string = HORDES_IMG_REPO;
+    public readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
     /** La locale */
     public readonly locale: string = moment.locale();
     /** La liste des citoyens a été mise à jour */

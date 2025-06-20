@@ -15,7 +15,7 @@
             <h4 i18n>Ont contribué</h4>
             @for (citizen of entries_by_type | isCitizenInEntries:completeCitizenList; track citizen) {
                 <div>
-                    <mho-citizen-info [displayJob]="false" [displayShunStatus]="true" [displayPseudoMode]="displayPseudo"
+                    <mho-citizen-info displayShunStatus [displayPseudoMode]="displayPseudo"
                                       [citizen]="citizen"></mho-citizen-info>
                 </div>
             }
@@ -24,7 +24,7 @@
             <h4 i18n>N'ont pas contribué</h4>
             @for (citizen of entries_by_type | isCitizenInEntries:completeCitizenList:true; track citizen) {
                 <div>
-                    <mho-citizen-info [displayJob]="false" [displayShunStatus]="true" [displayPseudoMode]="displayPseudo"
+                    <mho-citizen-info displayShunStatus [displayPseudoMode]="displayPseudo"
                                       [citizen]="citizen"></mho-citizen-info>
                 </div>
             }

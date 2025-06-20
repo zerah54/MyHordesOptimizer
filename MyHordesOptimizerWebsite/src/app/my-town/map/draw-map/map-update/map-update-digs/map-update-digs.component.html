@@ -1,13 +1,13 @@
 @if (digs) {
     <div class="mho-map-update-digs">
         <mho-header-with-number-previous-next-filter class="previous-next" [(filterValue)]="selected_day" [min]="1" [max]="current_day"
-                                                     [displayFirstLast]="true">
+                                                     displayFirstLast>
         </mho-header-with-number-previous-next-filter>
 
         <table>
             <thead>
             <th>
-                @if ((allCitizens | notInListCitizenDig:digs).length > 0) {
+                @if ((allCitizens() | notInListCitizenDig:digs).length > 0) {
                     <button mat-button type="button" [matMenuTriggerFor]="addCitizenMenu">
                         <ng-container i18n>Ajouter un citoyen</ng-container>
                     </button>
@@ -18,7 +18,7 @@
             <th></th>
             </thead>
             <tbody>
-                @for (displayed_dig of digs|digsPerDay:selected_day; track displayed_dig) {
+                @for (displayed_dig of digs | digsPerDay:selected_day; track displayed_dig) {
                     <tr>
                         <th class="name">
                             {{ displayed_dig.digger_name }}
@@ -45,9 +45,9 @@
 
         <mat-menu #addCitizenMenu="matMenu">
             <mat-list class="mho-add-citizen-list">
-                @for (citizen of (allCitizens | notInListCitizenDig:digs); track citizen.id) {
+                @for (citizen of (allCitizens() | notInListCitizenDig:digs); track citizen.id) {
                     <mat-list-item (click)="addCitizen(citizen)">
-                        <mho-citizen-info [displayJob]="true" [displayShunStatus]="false" [displayPseudoMode]="'simple'"
+                        <mho-citizen-info displayJob [displayPseudoMode]="'simple'"
                                           [citizen]="citizen"></mho-citizen-info>
                     </mat-list-item>
                 }

@@ -3,7 +3,7 @@
         <h2>Jour {{ current_day }}</h2>
         <mat-form-field (click)="$event.stopPropagation()" class="no-bottom">
             <mho-select [options]="completeCitizenList | citizenNotInDigList:digs" [bindLabel]="'name'" [ngModel]="''"
-                        (ngModelChange)="addCitizen($event)">
+                        (ngModelChange)="addCitizen($event)" searchable>
             </mho-select>
         </mat-form-field>
     </div>

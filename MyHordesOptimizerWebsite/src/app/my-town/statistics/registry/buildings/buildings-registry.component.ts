@@ -1,5 +1,5 @@
 import { CommonModule, NgOptimizedImage, NgTemplateOutlet } from '@angular/common';
-import { Component, HostBinding, Input, ViewEncapsulation } from '@angular/core';
+import { Component, Input, ViewEncapsulation } from '@angular/core';
 import { MatTabChangeEvent, MatTabsModule } from '@angular/material/tabs';
 import { HORDES_IMG_REPO } from '../../../../_abstract_model/const';
 import { DisplayPseudoMode, Entry } from '../../../../_abstract_model/interfaces';
@@ -18,10 +18,10 @@ const material_modules: Imports = [MatTabsModule];
     templateUrl: './buildings-registry.component.html',
     styleUrls: ['./buildings-registry.component.scss'],
     encapsulation: ViewEncapsulation.None,
+    host: {style: 'display: contents'},
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class BuildingsRegistryComponent {
-    @HostBinding('style.display') display: string = 'contents';
 
     @Input({required: true}) completeCitizenList!: CitizenInfo;
     @Input({required: true}) displayPseudo!: DisplayPseudoMode;

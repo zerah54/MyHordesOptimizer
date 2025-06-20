@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, HostBinding, Inject } from '@angular/core';
+import { Component, Inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
 import { Imports } from '../../../_abstract_model/types/_types';
@@ -13,10 +13,10 @@ const material_modules: Imports = [MatButtonModule, MatDialogModule];
     selector: 'mho-confirm-dialog',
     templateUrl: './confirm-dialog.component.html',
     styleUrls: ['./confirm-dialog.component.scss'],
+    host: {style: 'display: contents'},
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class ConfirmDialogComponent {
-    @HostBinding('style.display') display: string = 'contents';
 
     constructor(@Inject(MAT_DIALOG_DATA) public data: ConfirmDialogData) {
 

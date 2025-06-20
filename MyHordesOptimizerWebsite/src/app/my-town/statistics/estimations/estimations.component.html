@@ -1,7 +1,7 @@
 <div class="mho-estimations">
     <div class="header">
         <mho-header-with-number-previous-next-filter class="previous-next" [(filterValue)]="selected_day" (filterValueChange)="getEstimations()"
-                                                     [min]="1" [max]="current_day" [displayFirstLast]="false">
+                                                     [min]="1" [max]="current_day">
         </mho-header-with-number-previous-next-filter>
         <div class="actions">
             <button mat-icon-button type="button" matTooltip="Copier au format forum" i18n-matTooltip (click)="shareEstimsForum()">

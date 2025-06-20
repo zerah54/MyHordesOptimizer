@@ -1,5 +1,5 @@
 import { CommonModule, NgOptimizedImage } from '@angular/common';
-import { Component, HostBinding, Input } from '@angular/core';
+import { Component, input, InputSignal } from '@angular/core';
 import { MatDividerModule } from '@angular/material/divider';
 import moment from 'moment';
 import { HORDES_IMG_REPO } from '../../../../_abstract_model/const';
@@ -13,7 +13,6 @@ import { IconApComponent } from '../../../../shared/elements/icon-ap/icon-ap.com
 import { LastUpdateComponent } from '../../../../shared/elements/last-update/last-update.component';
 import { CitizensFromShortPipe } from '../../../../shared/pipes/citizens-from-short.pipe';
 import { ItemDetailsPipe } from '../../../../shared/pipes/item-details.pipe';
-import { MapOptions } from '../../map.component';
 import { CellDetailsBottomPipe, CellDetailsLeftPipe, CellDetailsRightPipe, CellDetailsTopPipe } from './cell-details-position.pipe';
 import { RuinInCell } from './ruin-in-cell.pipe';
 
@@ -26,17 +25,16 @@ const material_modules: Imports = [MatDividerModule];
     selector: 'mho-map-cell-details',
     templateUrl: './map-cell-details.component.html',
     styleUrls: ['./map-cell-details.component.scss'],
+    host: {style: 'display: contents'},
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class MapCellDetailsComponent {
-    @HostBinding('style.display') display: string = 'contents';
 
-    @Input() cell!: Cell;
-    @Input() cellHtml!: HTMLTableCellElement;
-    @Input() allRuins!: Ruin[];
-    @Input() allCitizens!: Citizen[];
-    @Input() allItems!: Item[];
-    @Input() options!: MapOptions;
+    public cell: InputSignal<Cell> = input.required();
+    public cellHtml: InputSignal<HTMLTableCellElement> = input.required();
+    public allRuins: InputSignal<Ruin[]> = input.required();
+    public allCitizens: InputSignal<Citizen[]> = input.required();
+    public allItems: InputSignal<Item[]> = input.required();
 
     public readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
     public readonly locale: string = moment.locale();

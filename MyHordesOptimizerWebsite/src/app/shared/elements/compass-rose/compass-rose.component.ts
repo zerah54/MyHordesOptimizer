@@ -1,4 +1,4 @@
-import { booleanAttribute, Component, EventEmitter, HostBinding, Input, Output } from '@angular/core';
+import { booleanAttribute, Component, EventEmitter, input, Input, InputSignalWithTransform, Output } from '@angular/core';
 import { Dictionary, Imports } from '../../../_abstract_model/types/_types';
 import { areAllDirectionsSelected, AreAllDirectionsSelectedPipe, IsDirectionSelectedPipe } from './is-scrut-direction-selected.pipe';
 
@@ -11,22 +11,23 @@ const material_modules: Imports = [];
     selector: 'mho-compass-rose',
     templateUrl: './compass-rose.component.html',
     styleUrls: ['./compass-rose.component.scss'],
+    host: {style: 'display: contents'},
     imports: [...angular_common, ...components, ...material_modules, ...pipes],
 })
 export class CompassRoseComponent {
-    @HostBinding('style.display') display: string = 'contents';
 
-    @Input({transform: booleanAttribute}) public readonly: boolean = false;
-    @Input({transform: booleanAttribute}) public withDiags: boolean = false;
-    @Input({transform: booleanAttribute}) public multiple: boolean = false;
-    @Input({transform: booleanAttribute}) public withLegend: boolean = false;
+
+    public readonly: InputSignalWithTransform<boolean, unknown> = input(false, {transform: booleanAttribute});
+    public withDiags: InputSignalWithTransform<boolean, unknown> = input(false, {transform: booleanAttribute});
+    public multiple: InputSignalWithTransform<boolean, unknown> = input(false, {transform: booleanAttribute});
+    public withLegend: InputSignalWithTransform<boolean, unknown> = input(false, {transform: booleanAttribute});
+
     @Input() public selectedScrutZone!: Dictionary<boolean>;
-
     @Output() public selectedScrutZoneChange: EventEmitter<Dictionary<boolean>> = new EventEmitter();
 
     public addToSelection(direction: string): void {
-        if (!this.readonly) {
-            if (this.multiple) {
+        if (!this.readonly()) {
+            if (this.multiple()) {
                 const selected_scrut: Dictionary<boolean> = {...this.selectedScrutZone};
                 selected_scrut[direction] = !selected_scrut[direction];
                 this.selectedScrutZoneChange.next(selected_scrut);
@@ -39,7 +40,7 @@ export class CompassRoseComponent {
     }
 
     public addAllToSelection(): void {
-        if (!this.readonly && this.multiple && this.withDiags) {
+        if (!this.readonly() && this.multiple() && this.withDiags()) {
             const is_all_selected: boolean = areAllDirectionsSelected(this.selectedScrutZone);
 
             const selected_scrut: Dictionary<boolean> = {...this.selectedScrutZone};

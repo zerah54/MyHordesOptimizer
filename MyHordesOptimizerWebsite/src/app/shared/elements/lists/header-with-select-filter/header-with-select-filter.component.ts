@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, HostBinding, Input, Output, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Input, Output, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
@@ -15,10 +15,10 @@ const material_modules: Imports = [MatFormFieldModule, MatIconModule];
     selector: 'mho-header-with-select-filter',
     templateUrl: './header-with-select-filter.component.html',
     styleUrls: ['./header-with-select-filter.component.scss'],
+    host: {style: 'display: contents'},
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class HeaderWithSelectFilterComponent<T> {
-    @HostBinding('style.display') display: string = 'contents';
 
     @ViewChild('filter') filter!: SelectComponent<T>;
 

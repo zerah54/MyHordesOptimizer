@@ -1,5 +1,5 @@
 import { CommonModule, NgClass } from '@angular/common';
-import { Component, ElementRef, HostBinding, inject, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, inject, OnInit, ViewChild } from '@angular/core';
 import { MatSortModule } from '@angular/material/sort';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import Chart from 'chart.js/auto';
@@ -24,10 +24,10 @@ const material_modules: Imports = [MatSortModule, MatTableModule];
     selector: 'mho-scrutateur',
     templateUrl: './scrutateur.component.html',
     styleUrls: ['./scrutateur.component.scss'],
+    host: {style: 'display: contents'},
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class ScrutateurComponent implements OnInit {
-    @HostBinding('style.display') display: string = 'contents';
 
     @ViewChild('pieCanvas') pie_canvas!: ElementRef;
     @ViewChild('polarCanvas') polar_canvas!: ElementRef;

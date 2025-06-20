@@ -1,5 +1,5 @@
 import { CommonModule, DecimalPipe, NgClass, NgOptimizedImage } from '@angular/common';
-import { booleanAttribute, Component, HostBinding, Input, OnInit } from '@angular/core';
+import { booleanAttribute, Component, input, Input, InputSignalWithTransform, OnInit } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDividerModule } from '@angular/material/divider';
 import moment from 'moment';
@@ -22,18 +22,18 @@ const material_modules: Imports = [MatButtonModule, MatDividerModule];
     selector: 'mho-item',
     templateUrl: './item.component.html',
     styleUrls: ['./item.component.scss'],
+    host: { style: 'display: contents' },
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class ItemComponent implements OnInit {
-    @HostBinding('style.display') display: string = 'contents';
 
     /** L'élément à afficher si c'est un objet standard */
     @Input() item!: Item;
     /** Force l'ouverture de l'élément */
-    @Input({transform: booleanAttribute}) forceOpen: boolean = false;
+    public forceOpen: InputSignalWithTransform<boolean, unknown> = input(false, { transform: booleanAttribute });
 
     /** Le dossier dans lequel sont stockées les images */
-    public HORDES_IMG_REPO: string = HORDES_IMG_REPO;
+    public readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
     /** La locale */
     public readonly locale: string = moment.locale();
 
@@ -46,7 +46,7 @@ export class ItemComponent implements OnInit {
     }
 
     public ngOnInit(): void {
-        if (this.forceOpen) {
+        if (this.forceOpen()) {
             this.display_mode = 'advanced';
         }
     }
@@ -65,7 +65,7 @@ export class ItemComponent implements OnInit {
     }
 
     public toggleAdvancedMode(): void {
-        if (this.forceOpen) {
+        if (this.forceOpen()) {
             this.display_mode = 'advanced';
         } else {
             this.display_mode = this.display_mode === 'simple' ? 'advanced' : 'simple';

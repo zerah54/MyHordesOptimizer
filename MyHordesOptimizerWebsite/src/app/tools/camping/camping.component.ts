@@ -1,5 +1,5 @@
 import { CommonModule, DecimalPipe, formatNumber, Location, NgOptimizedImage, NgTemplateOutlet } from '@angular/common';
-import { Component, HostBinding, inject, Inject, OnInit, ViewEncapsulation, DOCUMENT } from '@angular/core';
+import { Component, inject, Inject, OnInit, ViewEncapsulation, DOCUMENT } from '@angular/core';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
@@ -42,10 +42,10 @@ const material_modules: Imports = [MatButtonModule, MatButtonToggleModule, MatCa
     templateUrl: './camping.component.html',
     styleUrls: ['./camping.component.scss'],
     encapsulation: ViewEncapsulation.None,
+    host: {style: 'display: contents'},
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class CampingComponent implements OnInit {
-    @HostBinding('style.display') display: string = 'contents';
 
     public ruins: Ruin[] = [];
     public town_ruins: Ruin[] = [];

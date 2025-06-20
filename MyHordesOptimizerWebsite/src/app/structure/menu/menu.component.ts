@@ -1,5 +1,5 @@
 import { CommonModule, NgClass, NgTemplateOutlet } from '@angular/common';
-import { Component, HostBinding, inject, Inject, Input, LOCALE_ID, OnInit, ViewEncapsulation, DOCUMENT } from '@angular/core';
+import { Component, inject, Inject, Input, LOCALE_ID, OnInit, ViewEncapsulation, DOCUMENT } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
@@ -26,11 +26,10 @@ const material_modules: Imports = [ MatButtonModule, MatDividerModule, MatIconMo
     templateUrl: './menu.component.html',
     styleUrls: [ './menu.component.scss' ],
     encapsulation: ViewEncapsulation.None,
+    host: {style: 'display: contents'},
     imports: [ ...angular_common, ...components, ...material_modules, ...pipes ]
 })
 export class MenuComponent implements OnInit {
-    @HostBinding('style.display') display: string = 'contents';
-
     @Input({ required: true }) sidenavContainer!: MatSidenavContainer;
 
     public charts_theming_service: ChartsThemingService = inject(ChartsThemingService);

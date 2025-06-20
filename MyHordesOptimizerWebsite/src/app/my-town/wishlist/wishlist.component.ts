@@ -1,6 +1,6 @@
 import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
 import { CommonModule, NgOptimizedImage } from '@angular/common';
-import { Component, EventEmitter, HostBinding, Inject, OnInit, ViewChild, ViewEncapsulation, DOCUMENT } from '@angular/core';
+import { Component, EventEmitter, Inject, OnInit, ViewChild, ViewEncapsulation, DOCUMENT } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -50,10 +50,10 @@ const material_modules: Imports = [DragDropModule, MatButtonModule, MatCardModul
     templateUrl: './wishlist.component.html',
     styleUrls: ['./wishlist.component.scss'],
     encapsulation: ViewEncapsulation.None,
+    host: { style: 'display: contents' },
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class WishlistComponent implements OnInit {
-    @HostBinding('style.display') display: string = 'contents';
 
     @ViewChild(MatSort) sort!: MatSort;
     @ViewChild(MatTable) table!: MatTable<WishlistItem>;
@@ -65,7 +65,7 @@ export class WishlistComponent implements OnInit {
     /** La datasource pour le tableau */
     public datasource: MatTableDataSource<WishlistItem> = new MatTableDataSource();
     /** Le dossier dans lequel sont stockées les images */
-    public HORDES_IMG_REPO: string = HORDES_IMG_REPO;
+    public readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
     /** La locale */
     public readonly locale: string = moment.locale();
     /** La liste des colonnes */

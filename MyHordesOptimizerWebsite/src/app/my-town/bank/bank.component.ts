@@ -1,5 +1,5 @@
 import { CommonModule, NgOptimizedImage } from '@angular/common';
-import { Component, HostBinding, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -30,10 +30,10 @@ const material_modules: Imports = [MatCardModule, MatFormFieldModule, MatSlideTo
     selector: 'mho-bank',
     templateUrl: './bank.component.html',
     styleUrls: ['./bank.component.scss'],
+    host: {style: 'display: contents'},
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class BankComponent implements OnInit {
-    @HostBinding('style.display') display: string = 'contents';
 
     /** La banque remontée par l'appel */
     public bank!: BankInfo;

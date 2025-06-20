@@ -50,13 +50,13 @@ const material_modules: Imports = [MatChipsModule, MatDividerModule, MatFormFiel
             useExisting: SelectComponent
         }
     ],
+    host: {style: 'display: contents'},
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class SelectComponent<T> implements ControlValueAccessor, Validator, MatFormFieldControl<T | string | T[] | string[] | undefined>, OnDestroy {
 
     private static nextId: number = 0;
 
-    @HostBinding('style.display') display: string = 'contents';
     @HostBinding('class.floating') floating: boolean = this.shouldLabelFloat;
 
     // get reference to the input element
@@ -74,7 +74,7 @@ export class SelectComponent<T> implements ControlValueAccessor, Validator, MatF
     @Input() moreInfo?: (element: string | T) => string;
     //current form control input. helpful in validating and accessing form control
     @Input() form_control: AbstractControl = new UntypedFormControl();
-    @Input() searchable: boolean = true;
+    public searchable: InputSignalWithTransform<boolean, unknown> = input(false, {transform: booleanAttribute});
     @Input() class: string = '';
     /** Doit-on afficher sous forme de chips les différentes valeurs ? Fonctionne uniquement si "multiple" */
     @Input() chips: boolean = true;

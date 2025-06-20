@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, HostBinding, inject, Inject, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, inject, Inject, OnInit, ViewEncapsulation } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
@@ -33,10 +33,10 @@ const material_modules: Imports = [MatButtonModule, MatDialogModule, MatFormFiel
     templateUrl: './map-update.component.html',
     styleUrls: ['./map-update.component.scss'],
     encapsulation: ViewEncapsulation.None,
+    host: {style: 'display: contents'},
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class MapUpdateComponent implements OnInit {
-    @HostBinding('style.display') display: string = 'contents';
 
     /** La cellule potentiellement modifiée */
     public cell: Cell;

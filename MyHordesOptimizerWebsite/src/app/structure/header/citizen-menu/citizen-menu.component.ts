@@ -1,5 +1,5 @@
 import { NgOptimizedImage } from '@angular/common';
-import { Component, HostBinding, inject, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, inject, OnInit, ViewEncapsulation } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatCheckboxChange, MatCheckboxModule } from '@angular/material/checkbox';
 import { MatDividerModule } from '@angular/material/divider';
@@ -36,10 +36,10 @@ const material_modules: Imports = [MatCheckboxModule, MatDividerModule, MatFormF
     templateUrl: './citizen-menu.component.html',
     styleUrls: ['./citizen-menu.component.scss'],
     encapsulation: ViewEncapsulation.None,
+    host: {style: 'display: contents'},
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class CitizenMenuComponent implements OnInit {
-    @HostBinding('style.display') display: string = 'contents';
 
     public citizen!: Citizen;
     public readonly me: Me | null = getUser();
@@ -75,7 +75,7 @@ export class CitizenMenuComponent implements OnInit {
                     }
                 });
         }
-        
+
         this.api_service
             .getItems()
             .pipe(takeUntil(this.destroy_sub))

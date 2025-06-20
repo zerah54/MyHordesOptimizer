@@ -1,5 +1,5 @@
 import { CommonModule, NgOptimizedImage } from '@angular/common';
-import { Component, EventEmitter, HostBinding, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
@@ -24,10 +24,10 @@ const material_modules: Imports = [MatButtonModule, MatDividerModule, MatTooltip
     selector: 'mho-dig',
     templateUrl: './dig.component.html',
     styleUrls: ['./dig.component.scss'],
+    host: {style: 'display: contents'},
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class DigComponent {
-    @HostBinding('style.display') display: string = 'contents';
 
     @Input({required: true}) citizen!: Citizen;
     @Input({required: true}) day!: number;

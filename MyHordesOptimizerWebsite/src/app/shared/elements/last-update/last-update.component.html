@@ -16,20 +16,20 @@
                     }
                 }
             }
-            @if (!hideDetails) {
+            @if (!hideDetails()) {
                 <span i18n>Mis à jour par&nbsp;{{ lastUpdateInfo.username }}&nbsp;{{ lastUpdateInfo.update_time.fromNow() }}</span>
             }
         </small>
     } @else {
         <small>
             <img [ngSrc]="'img/time-ago/no_update.svg'" matTooltip="Jamais mis à jour" i18n-matTooltip width="24" height="24">
-            @if (!hideDetails) {
+            @if (!hideDetails()) {
                 <span i18n>Jamais mis à jour</span>
             }
         </small>
     }
     <ng-template #img let-img_to_use>
-        @if (hideDetails) {
+        @if (hideDetails()) {
             <img [ngSrc]="'img/time-ago/time_ago_' + img_to_use + '.svg'"
                  matTooltip="Mis à jour par&nbsp;{{lastUpdateInfo?.username}}&nbsp;{{lastUpdateInfo?.update_time?.fromNow()}}&nbsp;({{lastUpdateInfo?.update_time?.toDate() | date:'medium'}})"
                  i18n-matTooltip width="24" height="24">

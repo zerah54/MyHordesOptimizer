@@ -1,5 +1,5 @@
 @if (item) {
-    <li [ngClass]="['mho-item', display_mode, forceOpen ? 'force-open' : '']">
+    <li [ngClass]="['mho-item', display_mode, forceOpen() ? 'force-open' : '']">
         <div [class.broken]="item.is_broken">
             <div class="title-part" (click)="toggleAdvancedMode()">
                 <div class="item_title">

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, HostBinding, HostListener, inject, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, ElementRef, HostListener, inject, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatExpansionModule } from '@angular/material/expansion';
@@ -36,10 +36,10 @@ const material_modules: Imports = [MatButtonModule, MatExpansionModule, MatFormF
     templateUrl: './estimations.component.html',
     styleUrls: ['./estimations.component.scss'],
     encapsulation: ViewEncapsulation.None,
+    host: {style: 'display: contents'},
     imports: [...angular_common, ...components, ...material_modules, ...pipes, MatSlideToggle]
 })
 export class EstimationsComponent implements OnInit {
-    @HostBinding('style.display') display: string = 'contents';
 
     @HostListener('window:resize', ['$event'])
     onResize(): void {

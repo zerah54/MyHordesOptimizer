@@ -2,7 +2,7 @@
     <div class="header-menu-citizen-part">
         <div mat-menu-item class="pseudo" disabled>
             <div>
-                <mho-citizen-info [displayJob]="true" [displayShunStatus]="true" [displayPseudoMode]="'simple'" [citizen]="citizen"></mho-citizen-info>
+                <mho-citizen-info displayJob displayShunStatus [displayPseudoMode]="'simple'" [citizen]="citizen"></mho-citizen-info>
             </div>
         </div>
         <div mat-menu-item #statusItem [matMenuTriggerFor]="status" [role]="'menuitem'" i18n>États</div>

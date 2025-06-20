@@ -33,13 +33,13 @@ export class CountAvailableApPipe implements PipeTransform {
             .map((list_item: Item) => <Item>(all_items.find((complete_item: Item) => complete_item.id === list_item.id)));
 
         list_with_complete_items.forEach((item: Item) => {
-            const is_water: boolean = item.properties?.some((property: Property) => property?.key === Property.IS_WATER.key);
+            const is_water: boolean = item?.properties?.some((property: Property) => property?.key === Property.IS_WATER.key);
             if (is_water && !water_counted) {
                 ap += max_ap;
                 water_counted = true;
             }
 
-            const is_food: boolean = item.properties?.some((property: Property) => property?.key === Property.FOOD.key);
+            const is_food: boolean = item?.properties?.some((property: Property) => property?.key === Property.FOOD.key);
             const max_plus_one_ap_food: boolean = item.actions.some((action: Action) => action?.key === Action.EAT_7AP.key);
             const max_ap_food: boolean = item.actions.some((action: Action) => action?.key === Action.EAT_6AP.key);
             if (is_food && ap_from_eat < max_ap + 1 && (max_plus_one_ap_food || max_ap_food)) {

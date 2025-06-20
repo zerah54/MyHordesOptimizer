@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MHO Addon
-// @version      1.1.7.0
+// @version      1.1.8.0
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/, rubrique Tutoriels
 // @author       Zerah
 //
@@ -18,7 +18,6 @@
 // @match        *://myhordes.de/*
 // @match        *://myhordes.eu/*
 // @match        *://myhord.es/*
-// @match        *://myhordes.fr/*
 //
 // @match        https://bbh.fred26.fr/*
 // @match        https://gest-hordes2.eragaming.fr/*
@@ -31,7 +30,7 @@
 // ==/UserScript==
 
 const changelog = `${getScriptInfo().name} : Changelog pour la version ${getScriptInfo().version}\n\n`
-    + `[Correctif] Corrige l'appel en boucle sur la page de l'âme quand on n'est pas incarné \n\n`;
+    + `[Correctif] Corrige la liste de courses`;
 
 const lang = (document.querySelector('html[lang]')?.getAttribute('lang') || document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2) || 'fr';
 
@@ -846,6 +845,15 @@ const action_types = [
 ];
 
 const wishlist_depot = [
+    {
+        value: -1000,
+        label: {
+            en: `Do not bring back`,
+            fr: `Ne pas ramener`,
+            de: `Nicht zurückbringen`,
+            es: `No traer de vuelta`
+        }
+    },
     {
         value: -1,
         label: {
@@ -4853,7 +4861,7 @@ function displayWishlistInApp(count = 0) {
 
                     let title = document.createElement('div');
                     title.classList.add('padded', 'cell', 'rw-5');
-                    title.innerHTML = `<img src="${repo_img_hordes_url + item.item.img}" class="priority_${item.priority_main}"  style="margin-right: 5px" /><span class="small">${getI18N(item.item.label)}</span>`;
+                    title.innerHTML = `<img src="${repo_img_hordes_url + item.item.img}" style="margin-right: 5px" /><span class="small">${getI18N(item.item.label)}</span>`;
                     list_item.appendChild(title);
 
                     let item_depot = document.createElement('span');
@@ -4970,6 +4978,7 @@ function displayPriorityOnItems() {
                 present_items.push(...inventory?.querySelectorAll('li.item:not(.locked):not(.plus)') || []);
             }
         }
+
         if (rucksacks) {
             for (let rucksack of rucksacks) {
                 empty_spaces.push(...rucksack?.querySelectorAll('li.free') || []);
@@ -4982,22 +4991,36 @@ function displayPriorityOnItems() {
 
         if (used_wishlist) {
             let count = 0;
+            let heavy_count = 0;
             used_wishlist
                 .filter((wishlist_item) => wishlist_item.priority !== 0)
                 .forEach((wishlist_item) => {
                     present_items
                         .filter((present_item) => fixMhCompiledImg(present_item.querySelector('img').src).indexOf(wishlist_item.item.img) > 0)
                         .forEach((present_item) => {
-                            if (wishlist_item.priority_main > 0) {
+                            if (wishlist_item.depot >= -1) {
+                                let priority_in = false;
+
                                 if (count < item_count) {
+                                    if (wishlist_item.item.isHeaver) {
+                                        if (heavy_count < rucksacks.length) {
+                                            priority_in = true;
+                                        }
+                                        heavy_count++;
+                                    } else {
+                                        priority_in = true;
+                                    }
+                                }
+
+                                if (priority_in) {
                                     present_item.classList.add('priority_in');
+                                    count++;
                                 } else {
                                     present_item.classList.add('priority_out');
                                 }
-                            } else {
+                            } else if (wishlist_item.depot < -1) {
                                 present_item.classList.add('priority_trash');
                             }
-                            count += 1;
                         });
                 });
         }
@@ -9840,20 +9863,6 @@ function getWishlist() {
                 for (let key in new_wishlist.wishList) {
                     let wishlist_zone = Object.keys(new_wishlist.wishList[key])
                         .map((item_key) => new_wishlist.wishList[key][item_key])
-                        .map((item) => {
-                            if (item.priority < 0) {
-                                item.priority_main = -1;
-                            } else if (item.priority < 1000) {
-                                item.priority_main = 0;
-                            } else if (item.priority < 2000) {
-                                item.priority_main = 1;
-                            } else if (item.priority < 3000) {
-                                item.priority_main = 2;
-                            } else {
-                                item.priority_main = 3;
-                            }
-                            return item;
-                        })
                         .sort((item_a, item_b) => item_b.priority > item_a.priority);
                     wishlist_zone.forEach((item) => {
                         item.item.img = fixMhCompiledImg(item.item.img);

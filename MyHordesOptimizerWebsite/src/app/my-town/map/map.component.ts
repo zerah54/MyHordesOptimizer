@@ -1,6 +1,6 @@
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { CommonModule } from '@angular/common';
-import { Component, HostBinding, HostListener, inject, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, HostListener, inject, OnInit, ViewEncapsulation } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -39,10 +39,10 @@ const material_modules: Imports = [MatButtonModule, MatCardModule, MatCheckboxMo
     templateUrl: './map.component.html',
     styleUrls: ['./map.component.scss'],
     encapsulation: ViewEncapsulation.None,
+    host: {style: 'display: contents'},
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class MapComponent implements OnInit {
-    @HostBinding('style.display') display: string = 'contents';
 
     /** La carte de la ville */
     public map!: Town;

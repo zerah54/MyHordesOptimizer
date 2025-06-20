@@ -1,7 +1,7 @@
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { OverlayContainer } from '@angular/cdk/overlay';
 import { CommonModule, NgClass, NgOptimizedImage } from '@angular/common';
-import { Component, HostBinding, HostListener, inject, Inject, LOCALE_ID, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, HostListener, inject, Inject, LOCALE_ID, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSidenavContainer, MatSidenavModule } from '@angular/material/sidenav';
@@ -27,10 +27,10 @@ const material_modules: Imports = [MatCardModule, MatProgressSpinnerModule, MatS
     templateUrl: './app.component.html',
     styleUrls: ['./app.component.scss'],
     encapsulation: ViewEncapsulation.None,
+    host: {style: 'display: contents'},
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class AppComponent implements OnInit {
-    @HostBinding('style.display') display: string = 'contents';
 
     @ViewChild('sidenavContainer') sidenav_container!: MatSidenavContainer;
 

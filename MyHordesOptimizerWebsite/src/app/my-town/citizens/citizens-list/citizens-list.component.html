@@ -29,7 +29,7 @@
                                     @case ('avatar_name') {
                                         <mho-avatar [src]="row.avatar"></mho-avatar>
                                         <div>
-                                            <mho-citizen-info [displayJob]="true" [displayShunStatus]="true" [displayPseudoMode]="'simple'" [citizen]="row"></mho-citizen-info>
+                                            <mho-citizen-info displayJob displayShunStatus [displayPseudoMode]="'simple'" [citizen]="row"></mho-citizen-info>
                                         </div>
                                     } @case ('more_status') {
                                         <div>
@@ -49,7 +49,7 @@
                                                     i18n-emptyLabel
                                                     (empty)="emptyStatus(row.id)">
                                                 </mho-list-element-add-remove>
-                                                <mho-last-update [lastUpdateInfo]="row.status?.update_info" [thresholds]="[30, 120, 120 * 2, 120 * 3]" [hideDetails]="true">
+                                                <mho-last-update [lastUpdateInfo]="row.status?.update_info" [thresholds]="[30, 120, 120 * 2, 120 * 3]" hideDetails>
                                                 </mho-last-update>
                                             </div>
                                             <div class="bag">
@@ -68,7 +68,7 @@
                                                     i18n-emptyLabel
                                                     (empty)="emptyBag(row.id)">
                                                 </mho-list-element-add-remove>
-                                                <mho-last-update [lastUpdateInfo]="row.bag?.update_info" [thresholds]="[30, 120, 120 * 2, 120 * 3]" [hideDetails]="true">
+                                                <mho-last-update [lastUpdateInfo]="row.bag?.update_info" [thresholds]="[30, 120, 120 * 2, 120 * 3]" hideDetails>
                                                 </mho-last-update>
                                             </div>
                                             <div class="bath">
@@ -78,7 +78,7 @@
                                                 <mho-last-update
                                                     [lastUpdateInfo]="(row.baths | bathForDay : current_day)?.update_info"
                                                     [thresholds]="[30, 120, 120 * 2, 120 * 3]"
-                                                    [hideDetails]="true">
+                                                    hideDetails>
                                                 </mho-last-update>
                                             </div>
                                             <div class="chamanic">
@@ -96,7 +96,7 @@
                                                         <ng-container i18n>Immunisé</ng-container>
                                                     </mat-checkbox>
                                                 </div>
-                                                <mho-last-update [lastUpdateInfo]="row.chamanic_detail.update_info" [thresholds]="[30, 120, 120 * 2, 120 * 3]" [hideDetails]="true">
+                                                <mho-last-update [lastUpdateInfo]="row.chamanic_detail.update_info" [thresholds]="[30, 120, 120 * 2, 120 * 3]" hideDetails>
                                                 </mho-last-update>
                                             </div>
                                         </div>

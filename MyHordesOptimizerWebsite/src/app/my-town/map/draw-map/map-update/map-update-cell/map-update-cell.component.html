@@ -14,7 +14,7 @@
             <div class="zone">
                 <div class="pdc">
                     <img [ngSrc]="HORDES_IMG_REPO + 'emotes/human.gif'" width="16" height="16">
-                    {{ cell.nb_hero }}&nbsp;<span i18n>points</span>
+                    {{ cell().nb_hero }}&nbsp;<span i18n>points</span>
                 </div>
                 <div class="empty">
                     <mat-checkbox formControlName="is_dryed" i18n>Zone épuisée</mat-checkbox>
@@ -26,7 +26,7 @@
             <div class="items-header">
                 <h4 i18n>Liste des objets</h4>
                 <div class="add-remove">
-                    @if (cell.items && cell.items.length > 0) {
+                    @if (cell().items && cell().items.length > 0) {
                         <img [ngSrc]="HORDES_IMG_REPO + 'icons/small_less.gif'" [matMenuTriggerFor]="menuRemove" width="16" height="16">
                     }
                     <img [ngSrc]="HORDES_IMG_REPO + 'icons/small_more.gif'" [matMenuTriggerFor]="menuAdd" width="16" height="16">
@@ -35,7 +35,7 @@
 
 
             <div class="items">
-                @for (item of cell.items; track item.item_id) {
+                @for (item of cell().items; track item.item_id) {
                     <div>
                         @if (item | itemDetails:all_items; as complete_item) {
                             <img [ngSrc]="HORDES_IMG_REPO + complete_item.img" [class.broken]="item.is_broken" width="16" height="16">
@@ -47,14 +47,14 @@
 
             <mat-divider></mat-divider>
         </div>
-        @if (cell.citizens && cell.citizens.length > 0) {
+        @if (cell().citizens && cell().citizens.length > 0) {
             <div>
                 <div class="bags-header">
                     <h4 i18n>Liste des objets en sacs</h4>
                 </div>
 
                 <div class="items">
-                    @for (item of (cell.citizens | itemsInBags:citizens); track item.item.id) {
+                    @for (item of (cell().citizens | itemsInBags:citizens()); track item.item.id) {
                         <div>
                             @if (item) {
                                 <img [ngSrc]="HORDES_IMG_REPO + item.item.img" [class.broken]="item.is_broken"
@@ -69,7 +69,7 @@
             </div>
         }
         <div class="last-update">
-            <mho-last-update [lastUpdateInfo]="cell.update_info"></mho-last-update>
+            <mho-last-update [lastUpdateInfo]="cell().update_info"></mho-last-update>
         </div>
     </form>
 </div>
@@ -84,7 +84,7 @@
     <div class="items">
         @for (item of all_items; track item) {
             @if (searchItem.value === '' || $any(item.label[$any(locale)] ? item.label[$any(locale)] : item.label).toLowerCase().indexOf(searchItem.value.toLowerCase()) > -1) {
-                <img [ngSrc]="HORDES_IMG_REPO + item.img" (click)="addItem(cell, item.id)"
+                <img [ngSrc]="HORDES_IMG_REPO + item.img" (click)="addItem(cell(), item.id)"
                      [title]="$any(item.label[$any(locale)] ? item.label[$any(locale)] : item.label)" width="16" height="16">
             }
         }
@@ -98,14 +98,14 @@
         </mat-form-field>
     </div>
     <div class="items">
-        @for (item of (cell.items | arrayItemDetails:all_items); track item) {
+        @for (item of (cell().items | arrayItemDetails:all_items); track item) {
             @if (searchItem.value === '' || $any(item.label[$any(locale)] ? item.label[$any(locale)] : item.label).toLowerCase().indexOf(searchItem.value.toLowerCase()) > -1) {
-                <img [ngSrc]="HORDES_IMG_REPO + item.img" (click)="removeItem(cell, item.id)"
+                <img [ngSrc]="HORDES_IMG_REPO + item.img" (click)="removeItem(cell(), item.id)"
                      [title]="$any(item.label[$any(locale)] ? item.label[$any(locale)] : item.label)" width="16" height="16">
             }
         }
     </div>
-    <div mat-menu-item class="empty-bag" (click)="emptyItems(cell)">
+    <div mat-menu-item class="empty-bag" (click)="emptyItems(cell())">
         <img [ngSrc]="HORDES_IMG_REPO + 'icons/b_close.png'" style="margin-right: 0.5em" width="16" height="16">
         <span i18n>Retirer tous les objets</span>
     </div>

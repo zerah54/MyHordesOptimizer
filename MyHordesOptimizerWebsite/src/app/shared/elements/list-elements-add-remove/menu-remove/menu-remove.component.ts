@@ -1,5 +1,5 @@
 import { CommonModule, NgOptimizedImage } from '@angular/common';
-import { Component, EventEmitter, HostBinding, Input, Output, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, EventEmitter, Input, Output, ViewChild, ViewEncapsulation } from '@angular/core';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatMenu, MatMenuModule } from '@angular/material/menu';
@@ -18,10 +18,10 @@ const material_modules: Imports = [MatFormFieldModule, MatInputModule, MatMenuMo
     styleUrls: ['./menu-remove.component.scss'],
     encapsulation: ViewEncapsulation.None,
     exportAs: 'menuRemove',
+    host: { style: 'display: contents' },
     imports: [...angular_common, ...components, ...material_modules, ...pipes],
 })
 export class MenuRemoveComponent {
-    @HostBinding('style.display') display: string = 'contents';
 
     @ViewChild(MatMenu) menu!: MatMenu;
 
@@ -31,7 +31,7 @@ export class MenuRemoveComponent {
     @Output() empty: EventEmitter<void> = new EventEmitter();
 
     /** Le dossier dans lequel sont stockées les images */
-    public HORDES_IMG_REPO: string = HORDES_IMG_REPO;
+    public readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
     /** La langue du site */
     public readonly locale: string = moment.locale();
 }
