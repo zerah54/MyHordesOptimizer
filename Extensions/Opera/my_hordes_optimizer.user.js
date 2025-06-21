@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MHO Addon
-// @version      1.1.8.0
+// @version      1.1.9.0
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/, rubrique Tutoriels
 // @author       Zerah
 //
@@ -18,6 +18,7 @@
 // @match        *://myhordes.de/*
 // @match        *://myhordes.eu/*
 // @match        *://myhord.es/*
+// @match        *://myhordes.fr/*
 //
 // @match        https://bbh.fred26.fr/*
 // @match        https://gest-hordes2.eragaming.fr/*
