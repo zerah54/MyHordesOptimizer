@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, Input, ViewEncapsulation } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input, InputSignal, ViewEncapsulation } from '@angular/core';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { Imports } from '../../../_abstract_model/types/_types';
 import { Citizen } from '../../../_abstract_model/types/citizen.class';
@@ -22,7 +22,7 @@ const material_modules: Imports = [MatTooltipModule];
 })
 export class ActiveCitizensComponent {
 
-    @Input({required: true}) citizenList: number[] = [];
-    @Input({required: true}) completeCitizenList: Citizen[] = [];
+    public citizenList: InputSignal<number[]> = input.required();
+    public completeCitizenList: InputSignal<Citizen[]> = input.required();
 
 }

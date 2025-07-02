@@ -1,15 +1,17 @@
 <div class="mho-last-update">
-    @if (lastUpdateInfo && lastUpdateInfo.update_time) {
+    @let _lastUpdateInfo = lastUpdateInfo();
+    @if (_lastUpdateInfo && _lastUpdateInfo.update_time) {
         <small>
-            @if (thresholds) {
-                @for (diff of [moment.diff(lastUpdateInfo.update_time, 'minutes')]; track diff) {
-                    @if (diff <= thresholds[0]) {
+            @let _thresholds = thresholds();
+            @if (_thresholds) {
+                @for (diff of [moment.diff(_lastUpdateInfo.update_time, 'minutes')]; track diff) {
+                    @if (diff <= _thresholds[0]) {
                         <ng-container *ngTemplateOutlet="img; context: {$implicit: 1}"></ng-container>
-                    } @else if (diff <= thresholds[1]) {
+                    } @else if (diff <= _thresholds[1]) {
                         <ng-container *ngTemplateOutlet="img; context: {$implicit: 2}"></ng-container>
-                    } @else if (diff <= thresholds[2]) {
+                    } @else if (diff <= _thresholds[2]) {
                         <ng-container *ngTemplateOutlet="img; context: {$implicit: 3}"></ng-container>
-                    } @else if (diff <= thresholds[3]) {
+                    } @else if (diff <= _thresholds[3]) {
                         <ng-container *ngTemplateOutlet="img; context: {$implicit: 4}"></ng-container>
                     } @else {
                         <ng-container *ngTemplateOutlet="img; context: {$implicit: 5}"></ng-container>
@@ -17,7 +19,7 @@
                 }
             }
             @if (!hideDetails()) {
-                <span i18n>Mis à jour par&nbsp;{{ lastUpdateInfo.username }}&nbsp;{{ lastUpdateInfo.update_time.fromNow() }}</span>
+                <span i18n>Mis à jour par&nbsp;{{ _lastUpdateInfo.username }}&nbsp;{{ _lastUpdateInfo.update_time.fromNow() }}</span>
             }
         </small>
     } @else {
@@ -31,11 +33,11 @@
     <ng-template #img let-img_to_use>
         @if (hideDetails()) {
             <img [ngSrc]="'img/time-ago/time_ago_' + img_to_use + '.svg'"
-                 matTooltip="Mis à jour par&nbsp;{{lastUpdateInfo?.username}}&nbsp;{{lastUpdateInfo?.update_time?.fromNow()}}&nbsp;({{lastUpdateInfo?.update_time?.toDate() | date:'medium'}})"
+                 matTooltip="Mis à jour par&nbsp;{{_lastUpdateInfo?.username}}&nbsp;{{_lastUpdateInfo?.update_time?.fromNow()}}&nbsp;({{_lastUpdateInfo?.update_time?.toDate() | date:'medium'}})"
                  i18n-matTooltip width="24" height="24">
         } @else {
             <img [ngSrc]="'img/time-ago/time_ago_' + img_to_use + '.svg'"
-                 [matTooltip]="(lastUpdateInfo?.update_time?.toDate() | date:'medium') || ''" width="24" height="24">
+                 [matTooltip]="(_lastUpdateInfo?.update_time?.toDate() | date:'medium') || ''" width="24" height="24">
         }
     </ng-template>
 </div>

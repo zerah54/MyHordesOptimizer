@@ -1,5 +1,5 @@
 import { CommonModule, NgClass, NgOptimizedImage } from '@angular/common';
-import { ChangeDetectionStrategy, Component, inject, OnInit, signal, ViewEncapsulation, WritableSignal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, OnInit, signal, ViewEncapsulation, WritableSignal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -14,7 +14,7 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatTabChangeEvent, MatTabsModule } from '@angular/material/tabs';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import moment from 'moment';
-import { firstValueFrom, Subject, takeUntil } from 'rxjs';
+import { firstValueFrom } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { EXPEDITIONS_EDITION_MODE_KEY, FAVORITE_EXPEDITION_ITEMS_UID, HORDES_IMG_REPO } from '../../_abstract_model/const';
 import { HeroicActionEnum } from '../../_abstract_model/enum/heroic-action.enum';
@@ -34,7 +34,6 @@ import { ExpeditionPart } from '../../_abstract_model/types/expedition-part.clas
 import { Expedition } from '../../_abstract_model/types/expedition.class';
 import { Item } from '../../_abstract_model/types/item.class';
 import { Me } from '../../_abstract_model/types/me.class';
-import { AutoDestroy } from '../../shared/decorators/autodestroy.decorator';
 import { ActiveCitizensComponent } from '../../shared/elements/active-citizens/active-citizens.component';
 import { CompassRoseComponent } from '../../shared/elements/compass-rose/compass-rose.component';
 import { ConfirmDialogComponent, ConfirmDialogData } from '../../shared/elements/confirm-dialog/confirm-dialog.component';
@@ -50,6 +49,7 @@ import { CitizensForExpePipe, FormatPreRegisteredPipe, SomeHeroicActionNeededPip
 import { EditOrdersComponent, EditOrdersData } from './edit-orders/edit-orders.component';
 import { EditPositionsComponent, EditPositionsData } from './edit-positions/edit-positions.component';
 import { TotalPdcPipe } from './total-pdc.pipe';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 const angular_common: Imports = [CommonModule, FormsModule, NgClass, NgOptimizedImage];
 const components: Imports = [ActiveCitizensComponent, IconApComponent, ListElementAddRemoveComponent, SelectComponent];
@@ -90,12 +90,11 @@ export class ExpeditionsComponent implements OnInit {
 
     protected readonly me: Me | null = getUser();
 
-    private api_service: ApiService = inject(ApiService);
-    private town_service: TownService = inject(TownService);
-    private expedition_service: ExpeditionService = inject(ExpeditionService);
-    private realtime_expeditions_service: RealtimeExpeditionsService = inject(RealtimeExpeditionsService);
-
-    @AutoDestroy private destroy_sub: Subject<void> = new Subject();
+    private readonly api_service: ApiService = inject(ApiService);
+    private readonly town_service: TownService = inject(TownService);
+    private readonly expedition_service: ExpeditionService = inject(ExpeditionService);
+    private readonly realtime_expeditions_service: RealtimeExpeditionsService = inject(RealtimeExpeditionsService);
+    private readonly destroy_ref: DestroyRef = inject(DestroyRef);
 
     public constructor(private clipboard: ClipboardService, private dialog: MatDialog) {
     }
@@ -103,7 +102,7 @@ export class ExpeditionsComponent implements OnInit {
     public async ngOnInit(): Promise<void> {
         this.town_service
             .getCitizens()
-            .pipe(takeUntil(this.destroy_sub))
+            .pipe(takeUntilDestroyed(this.destroy_ref))
             .subscribe({
                 next: (citizens: CitizenInfo): void => {
                     this.all_citizens = [...citizens.citizens];
@@ -113,7 +112,7 @@ export class ExpeditionsComponent implements OnInit {
             });
         this.api_service
             .getItems()
-            .pipe(takeUntil(this.destroy_sub))
+            .pipe(takeUntilDestroyed(this.destroy_ref))
             .subscribe({
                 next: (items: Item[]) => {
                     this.all_items = [...items];
@@ -122,7 +121,7 @@ export class ExpeditionsComponent implements OnInit {
 
         this.town_service
             .getBank()
-            .pipe(takeUntil(this.destroy_sub))
+            .pipe(takeUntilDestroyed(this.destroy_ref))
             .subscribe({
                 next: (bank: BankInfo) => {
                     this.bank_items = [...bank.items];
@@ -133,7 +132,7 @@ export class ExpeditionsComponent implements OnInit {
         this.expeditions.set([...existing_expeditions]);
 
         this.realtime_expeditions_service.expedition_updated$
-            .pipe(takeUntil(this.destroy_sub))
+            .pipe(takeUntilDestroyed(this.destroy_ref))
             .subscribe((expedition: Expedition) => {
                 this.expeditions.update((current_expeditions: Expedition[]) => {
                     const expedition_to_update: number = current_expeditions
@@ -154,13 +153,13 @@ export class ExpeditionsComponent implements OnInit {
             });
 
         this.realtime_expeditions_service.expeditions_updated$
-            .pipe(takeUntil(this.destroy_sub))
+            .pipe(takeUntilDestroyed(this.destroy_ref))
             .subscribe((expeditions: Expedition[]) => {
                 this.expeditions.set([...expeditions]);
             });
 
         this.realtime_expeditions_service.expedition_deleted$
-            .pipe(takeUntil(this.destroy_sub))
+            .pipe(takeUntilDestroyed(this.destroy_ref))
             .subscribe((expedition_id: number) => {
                 this.expeditions.update((current_expeditions: Expedition[]) => {
                     const expedition_to_delete: number = current_expeditions
@@ -174,7 +173,7 @@ export class ExpeditionsComponent implements OnInit {
             });
 
         this.realtime_expeditions_service.expedition_part_updated$
-            .pipe(takeUntil(this.destroy_sub))
+            .pipe(takeUntilDestroyed(this.destroy_ref))
             .subscribe((expedition_part: ExpeditionPart) => {
                 this.expeditions.update((current_expeditions: Expedition[]) => {
                     const current_expedition: Expedition | undefined = current_expeditions.find((_current_expedition: Expedition) => {
@@ -207,7 +206,7 @@ export class ExpeditionsComponent implements OnInit {
             });
 
         this.realtime_expeditions_service.expedition_part_deleted$
-            .pipe(takeUntil(this.destroy_sub))
+            .pipe(takeUntilDestroyed(this.destroy_ref))
             .subscribe((expedition_part_id: number) => {
                 this.expeditions.update((current_expeditions: Expedition[]) => {
                     current_expeditions.forEach((current_expedition: Expedition) => {
@@ -222,7 +221,7 @@ export class ExpeditionsComponent implements OnInit {
             });
 
         this.realtime_expeditions_service.expedition_citizen_updated$
-            .pipe(takeUntil(this.destroy_sub))
+            .pipe(takeUntilDestroyed(this.destroy_ref))
             .subscribe((expedition_citizen: CitizenExpedition) => {
                 this.expeditions.update((current_expeditions: Expedition[]) => {
                     const current_expedition: Expedition | undefined = current_expeditions.find((_current_expedition: Expedition) => {
@@ -248,7 +247,7 @@ export class ExpeditionsComponent implements OnInit {
             });
 
         this.realtime_expeditions_service.expedition_citizen_deleted$
-            .pipe(takeUntil(this.destroy_sub))
+            .pipe(takeUntilDestroyed(this.destroy_ref))
             .subscribe((expedition_citizen_id: number) => {
                 this.expeditions.update((current_expeditions: Expedition[]) => {
                     current_expeditions.forEach((current_expedition: Expedition) => {
@@ -265,7 +264,7 @@ export class ExpeditionsComponent implements OnInit {
             });
 
         this.realtime_expeditions_service.expedition_part_orders_updated$
-            .pipe(takeUntil(this.destroy_sub))
+            .pipe(takeUntilDestroyed(this.destroy_ref))
             .subscribe((expedition_orders: ExpeditionOrder[]) => {
                 this.expeditions.update((current_expeditions: Expedition[]) => {
                     for (const expedition_order of expedition_orders) {
@@ -297,7 +296,7 @@ export class ExpeditionsComponent implements OnInit {
             });
 
         this.realtime_expeditions_service.expedition_citizen_orders_updated$
-            .pipe(takeUntil(this.destroy_sub))
+            .pipe(takeUntilDestroyed(this.destroy_ref))
             .subscribe((expedition_orders: ExpeditionOrder[]) => {
                 this.expeditions.update((current_expeditions: Expedition[]) => {
                     for (const expedition_order of expedition_orders) {
@@ -336,18 +335,18 @@ export class ExpeditionsComponent implements OnInit {
 
         // // TODO
         // this.realtime_expeditions_service.expeditionOrderDeleted$
-        //     .pipe(takeUntil(this.destroy_sub))
+        //     .pipe(takeUntilDestroyed(this.destroy_ref))
         //     .subscribe(() => {
         //     });
 
         // // TODO
         // this.realtime_expeditions_service.expeditionOrdersUpdated$
-        //     .pipe(takeUntil(this.destroy_sub))
+        //     .pipe(takeUntilDestroyed(this.destroy_ref))
         //     .subscribe(() => {
         //     });
 
         this.realtime_expeditions_service.expedition_order_updated$
-            .pipe(takeUntil(this.destroy_sub))
+            .pipe(takeUntilDestroyed(this.destroy_ref))
             .subscribe((expedition_order: ExpeditionOrder) => {
                 this.expeditions.update((current_expeditions: Expedition[]) => {
                     const current_expedition: Expedition | undefined = current_expeditions.find((_current_expedition: Expedition) => {
@@ -396,7 +395,7 @@ export class ExpeditionsComponent implements OnInit {
             });
 
         this.realtime_expeditions_service.expedition_bag_updated$
-            .pipe(takeUntil(this.destroy_sub))
+            .pipe(takeUntilDestroyed(this.destroy_ref))
             .subscribe((expedition_bag: CitizenExpeditionBag) => {
                 this.expeditions.update((current_expeditions: Expedition[]) => {
                     const current_expedition: Expedition | undefined = current_expeditions.find((_current_expedition: Expedition) => {
@@ -422,7 +421,7 @@ export class ExpeditionsComponent implements OnInit {
             });
 
         this.realtime_expeditions_service.expedition_bag_deleted$
-            .pipe(takeUntil(this.destroy_sub))
+            .pipe(takeUntilDestroyed(this.destroy_ref))
             .subscribe((bag_id: number) => {
                 this.expeditions.update((current_expeditions: Expedition[]) => {
                     current_expeditions.forEach((current_expedition: Expedition) => {
@@ -440,13 +439,13 @@ export class ExpeditionsComponent implements OnInit {
             });
 
         this.realtime_expeditions_service.user_joined$
-            .pipe(takeUntil(this.destroy_sub))
+            .pipe(takeUntilDestroyed(this.destroy_ref))
             .subscribe((user_ids: number[]) => {
                 this.active_citizens_list.set([...user_ids]);
             });
 
         this.realtime_expeditions_service.user_left$
-            .pipe(takeUntil(this.destroy_sub))
+            .pipe(takeUntilDestroyed(this.destroy_ref))
             .subscribe((user_ids: number[]) => {
                 this.active_citizens_list.set([...user_ids]);
             });
@@ -507,7 +506,7 @@ export class ExpeditionsComponent implements OnInit {
                 }
             })
             .afterClosed()
-            .pipe(takeUntil(this.destroy_sub))
+            .pipe(takeUntilDestroyed(this.destroy_ref))
             .subscribe(async (confirm: boolean): Promise<void> => {
                 if (confirm) {
                     await this.realtime_expeditions_service.deleteExpedition(expedition);
@@ -524,7 +523,7 @@ export class ExpeditionsComponent implements OnInit {
                 }
             })
             .afterClosed()
-            .pipe(takeUntil(this.destroy_sub))
+            .pipe(takeUntilDestroyed(this.destroy_ref))
             .subscribe(async (confirm: boolean): Promise<void> => {
                 if (confirm) {
                     await this.realtime_expeditions_service.deleteExpeditionPart(expedition_part);

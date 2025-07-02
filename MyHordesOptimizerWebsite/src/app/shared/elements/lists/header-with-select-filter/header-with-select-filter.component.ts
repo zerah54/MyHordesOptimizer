@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, Output, ViewChild } from '@angular/core';
+import { Component, input, InputSignal, output, OutputEmitterRef, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
@@ -22,14 +22,14 @@ export class HeaderWithSelectFilterComponent<T> {
 
     @ViewChild('filter') filter!: SelectComponent<T>;
 
-    @Input() header!: string;
-    @Input() textAlign?: string = 'left';
+    public header: InputSignal<string> = input.required();
+    public textAlign: InputSignal<string> = input('left');
 
-    @Input() options: T[] = [];
-    @Input() bindLabel: string = 'label';
+    public options: InputSignal<T[]> = input<T[]>([]);
+    public bindLabel: InputSignal<string> = input('label');
 
-    @Input() filterValue!: T[];
-    @Output() filterValueChange: EventEmitter<T[]> = new EventEmitter<T[]>();
+    public filterValue: InputSignal<T[]> = input.required();
+    public filterValueChange: OutputEmitterRef<T[]> = output();
 
 
     public visible: boolean = false;
@@ -48,7 +48,7 @@ export class HeaderWithSelectFilterComponent<T> {
             if (this.filter.select.panelOpen) {
                 this.visible = true;
             } else {
-                this.visible = this.filterValue !== null && this.filterValue !== undefined && this.filterValue.length > 0;
+                this.visible = this.filterValue() !== null && this.filterValue() !== undefined && this.filterValue().length > 0;
             }
         });
     }

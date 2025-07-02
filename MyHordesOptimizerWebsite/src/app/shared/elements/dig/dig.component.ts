@@ -1,19 +1,18 @@
 import { CommonModule, NgOptimizedImage } from '@angular/common';
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, Input, output, OutputEmitterRef, InputSignal, input, inject, DestroyRef } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { Subject, takeUntil } from 'rxjs';
 import { HORDES_IMG_REPO } from '../../../_abstract_model/const';
 import { DigsService } from '../../../_abstract_model/services/digs.service';
 import { Imports } from '../../../_abstract_model/types/_types';
 import { Citizen } from '../../../_abstract_model/types/citizen.class';
 import { Dig } from '../../../_abstract_model/types/dig.class';
-import { AutoDestroy } from '../../decorators/autodestroy.decorator';
 import { getTown } from '../../utilities/localstorage.util';
 import { ConfirmDialogComponent, ConfirmDialogData } from '../confirm-dialog/confirm-dialog.component';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 const angular_common: Imports = [CommonModule, NgOptimizedImage, FormsModule];
 const components: Imports = [];
@@ -29,13 +28,13 @@ const material_modules: Imports = [MatButtonModule, MatDividerModule, MatTooltip
 })
 export class DigComponent {
 
-    @Input({required: true}) citizen!: Citizen;
-    @Input({required: true}) day!: number;
-    @Input({required: true}) digsMode!: 'creation' | 'update' | 'registry';
+    public citizen: InputSignal<Citizen> = input.required();
+    public day: InputSignal<number> = input.required();
+    public digsMode: InputSignal<'creation' | 'update' | 'registry'> = input.required();
 
     @Input({required: true}) set dig(dig: Dig | undefined) {
         setTimeout(() => {
-            if (this.digsMode === 'registry') {
+            if (this.digsMode() === 'registry') {
                 this.updated_dig = dig;
             } else {
                 this.updated_dig = undefined;
@@ -50,18 +49,19 @@ export class DigComponent {
 
     }
 
-    @Output() deletedDig: EventEmitter<Dig> = new EventEmitter<Dig>();
-    @Output() updatedDig: EventEmitter<Dig[]> = new EventEmitter<Dig[]>();
+    public deletedDig: OutputEmitterRef<Dig> = output();
+    public updatedDig: OutputEmitterRef<Dig[]> = output();
 
     protected current_dig!: Dig;
     protected updated_dig?: Dig;
 
+    private readonly digs_api: DigsService = inject(DigsService);
+    private readonly destroy_ref: DestroyRef = inject(DestroyRef);
+
     /** Le dossier dans lequel sont stockées les images */
     protected HORDES_IMG_REPO: string = HORDES_IMG_REPO;
 
-    @AutoDestroy private destroy_sub: Subject<void> = new Subject();
-
-    constructor(private digs_api: DigsService, private dialog: MatDialog) {
+    constructor(private dialog: MatDialog) {
     }
 
     protected deleteDig(dig_to_delete: Dig): void {
@@ -73,13 +73,13 @@ export class DigComponent {
                 }
             })
             .afterClosed()
-            .pipe(takeUntil(this.destroy_sub))
+            .pipe(takeUntilDestroyed(this.destroy_ref))
             .subscribe((confirm: boolean) => {
                 if (confirm) {
                     this.digs_api.deleteDig(dig_to_delete)
-                        .pipe(takeUntil(this.destroy_sub))
+                        .pipe(takeUntilDestroyed(this.destroy_ref))
                         .subscribe(() => {
-                            this.deletedDig.next(dig_to_delete);
+                            this.deletedDig.emit(dig_to_delete);
                         });
                 }
             });
@@ -93,7 +93,7 @@ export class DigComponent {
         } else {
             this.updated_dig = new Dig({
                 cellId: undefined,
-                day: this.day,
+                day: this.day(),
                 diggerId: citizen.id,
                 diggerName: citizen.name,
                 nbSucces: 0,
@@ -107,10 +107,10 @@ export class DigComponent {
     protected updateDig(): void {
         if (this.updated_dig) {
             this.digs_api.updateDig([this.updated_dig])
-                .pipe(takeUntil(this.destroy_sub))
+                .pipe(takeUntilDestroyed(this.destroy_ref))
                 .subscribe((new_digs: Dig[]) => {
-                    this.updatedDig.next(new_digs);
-                    if (this.digsMode !== 'registry') {
+                    this.updatedDig.emit(new_digs);
+                    if (this.digsMode() !== 'registry') {
                         this.updated_dig = undefined;
                     }
                 });

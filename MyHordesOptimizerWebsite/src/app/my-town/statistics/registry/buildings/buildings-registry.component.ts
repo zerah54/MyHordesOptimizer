@@ -1,5 +1,5 @@
 import { CommonModule, NgOptimizedImage, NgTemplateOutlet } from '@angular/common';
-import { Component, Input, ViewEncapsulation } from '@angular/core';
+import { Component, input, Input, ViewEncapsulation, InputSignal } from '@angular/core';
 import { MatTabChangeEvent, MatTabsModule } from '@angular/material/tabs';
 import { HORDES_IMG_REPO } from '../../../../_abstract_model/const';
 import { DisplayPseudoMode, Entry } from '../../../../_abstract_model/interfaces';
@@ -23,8 +23,8 @@ const material_modules: Imports = [MatTabsModule];
 })
 export class BuildingsRegistryComponent {
 
-    @Input({required: true}) completeCitizenList!: CitizenInfo;
-    @Input({required: true}) displayPseudo!: DisplayPseudoMode;
+    public completeCitizenList: InputSignal<CitizenInfo> = input.required();
+    public displayPseudo: InputSignal<DisplayPseudoMode> = input.required();
 
     @Input({required: true}) set registry(registry: Entry[] | undefined) {
         if (registry) {
@@ -56,7 +56,7 @@ export class BuildingsRegistryComponent {
     private entries: Entry[] = [];
 
     private readonly dump_keywords: string[] = ['la décharge', 'in der Müllhalde', 'at the dump', 'el vertedero'];
-    private readonly vet_keywords: string[] = ['a attiré', 'in die Stadt gelockt', 'has lured', 'atrajo a'];
+    private readonly vet_keywords: string[] = ['a attiré', 'in die Stadt gelockt', 'has lured', 'atrajo a', 'a réussi à attirer', 'has tried in vain to lure', 'logró atraer a'];
 
 
     public entryHasPlayKeyword(entry: Entry, keyword: string): boolean {

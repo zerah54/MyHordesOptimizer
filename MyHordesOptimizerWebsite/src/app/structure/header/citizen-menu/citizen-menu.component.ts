@@ -1,5 +1,5 @@
 import { NgOptimizedImage } from '@angular/common';
-import { Component, inject, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit, ViewEncapsulation } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatCheckboxChange, MatCheckboxModule } from '@angular/material/checkbox';
 import { MatDividerModule } from '@angular/material/divider';
@@ -8,7 +8,6 @@ import { MatInputModule } from '@angular/material/input';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatSelectModule } from '@angular/material/select';
 import moment from 'moment';
-import { Subject, takeUntil } from 'rxjs';
 import { HORDES_IMG_REPO } from '../../../_abstract_model/const';
 import { StatusEnum } from '../../../_abstract_model/enum/status.enum';
 import { ApiService } from '../../../_abstract_model/services/api.service';
@@ -21,10 +20,10 @@ import { HomeWithValue } from '../../../_abstract_model/types/home.class';
 import { Item } from '../../../_abstract_model/types/item.class';
 import { Me } from '../../../_abstract_model/types/me.class';
 import { UpdateInfo } from '../../../_abstract_model/types/update-info.class';
-import { AutoDestroy } from '../../../shared/decorators/autodestroy.decorator';
 import { CitizenInfoComponent } from '../../../shared/elements/citizen-info/citizen-info.component';
 import { ListElementAddRemoveComponent } from '../../../shared/elements/list-elements-add-remove/list-element-add-remove.component';
 import { getTown, getUser } from '../../../shared/utilities/localstorage.util';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 const angular_common: Imports = [NgOptimizedImage, FormsModule];
 const components: Imports = [CitizenInfoComponent, ListElementAddRemoveComponent];
@@ -60,10 +59,9 @@ export class CitizenMenuComponent implements OnInit {
 
     protected readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
 
-    private api_service: ApiService = inject(ApiService);
-    private town_service: TownService = inject(TownService);
-
-    @AutoDestroy private destroy_sub: Subject<void> = new Subject();
+    private readonly api: ApiService = inject(ApiService);
+    private readonly destroy_ref: DestroyRef = inject(DestroyRef);
+    private readonly town_service: TownService = inject(TownService);
 
     public ngOnInit(): void {
         if (this.me) {
@@ -76,9 +74,9 @@ export class CitizenMenuComponent implements OnInit {
                 });
         }
 
-        this.api_service
+        this.api
             .getItems()
-            .pipe(takeUntil(this.destroy_sub))
+            .pipe(takeUntilDestroyed(this.destroy_ref))
             .subscribe({
                 next: (items: Item[]) => {
                     this.all_items = items;
@@ -102,7 +100,7 @@ export class CitizenMenuComponent implements OnInit {
 
             this.town_service
                 .updateBag(this.citizen)
-                .pipe(takeUntil(this.destroy_sub))
+                .pipe(takeUntilDestroyed(this.destroy_ref))
                 .subscribe({
                     next: (update_info: UpdateInfo): void => {
                         if (this.citizen.bag) {
@@ -128,7 +126,7 @@ export class CitizenMenuComponent implements OnInit {
             }
             this.town_service
                 .updateBag(this.citizen)
-                .pipe(takeUntil(this.destroy_sub))
+                .pipe(takeUntilDestroyed(this.destroy_ref))
                 .subscribe({
                     next: (update_info: UpdateInfo) => {
                         if (this.citizen.bag) {
@@ -146,7 +144,7 @@ export class CitizenMenuComponent implements OnInit {
             this.citizen.bag.items = [];
             this.town_service
                 .updateBag(this.citizen)
-                .pipe(takeUntil(this.destroy_sub))
+                .pipe(takeUntilDestroyed(this.destroy_ref))
                 .subscribe({
                     next: (update_info: UpdateInfo) => {
                         if (this.citizen.bag) {
@@ -169,7 +167,7 @@ export class CitizenMenuComponent implements OnInit {
 
             this.town_service
                 .updateStatus(this.citizen)
-                .pipe(takeUntil(this.destroy_sub))
+                .pipe(takeUntilDestroyed(this.destroy_ref))
                 .subscribe({
                     next: (update_info: UpdateInfo) => {
                         if (this.citizen.status) {
@@ -194,7 +192,7 @@ export class CitizenMenuComponent implements OnInit {
             }
             this.town_service
                 .updateStatus(this.citizen)
-                .pipe(takeUntil(this.destroy_sub))
+                .pipe(takeUntilDestroyed(this.destroy_ref))
                 .subscribe({
                     next: (update_info: UpdateInfo) => {
                         if (this.citizen.status) {
@@ -212,7 +210,7 @@ export class CitizenMenuComponent implements OnInit {
             this.citizen.status.icons = [];
             this.town_service
                 .updateBag(this.citizen)
-                .pipe(takeUntil(this.destroy_sub))
+                .pipe(takeUntilDestroyed(this.destroy_ref))
                 .subscribe({
                     next: (update_info: UpdateInfo) => {
                         if (this.citizen.status) {
@@ -277,7 +275,7 @@ export class CitizenMenuComponent implements OnInit {
         if (this.citizen && this.citizen.heroic_actions) {
             this.town_service
                 .updateHeroicActions(this.citizen)
-                .pipe(takeUntil(this.destroy_sub))
+                .pipe(takeUntilDestroyed(this.destroy_ref))
                 .subscribe({
                     next: (update_info: UpdateInfo) => {
                         if (this.citizen.heroic_actions) {
@@ -309,7 +307,7 @@ export class CitizenMenuComponent implements OnInit {
         if (this.citizen && this.citizen.home !== undefined) {
             this.town_service
                 .updateHome(this.citizen)
-                .pipe(takeUntil(this.destroy_sub))
+                .pipe(takeUntilDestroyed(this.destroy_ref))
                 .subscribe({
                     next: (update_info: UpdateInfo) => {
                         if (this.citizen.home) {

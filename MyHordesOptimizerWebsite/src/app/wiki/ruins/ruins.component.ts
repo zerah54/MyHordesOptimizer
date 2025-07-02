@@ -1,5 +1,5 @@
 import { CommonModule, DecimalPipe, NgClass, NgOptimizedImage } from '@angular/common';
-import { Component, EventEmitter, inject, OnInit, ViewChild } from '@angular/core';
+import { Component, DestroyRef, EventEmitter, inject, OnInit, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -10,7 +10,6 @@ import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import moment from 'moment';
-import { Subject, takeUntil } from 'rxjs';
 import { HORDES_IMG_REPO } from '../../_abstract_model/const';
 import { StandardColumn } from '../../_abstract_model/interfaces';
 import { ApiService } from '../../_abstract_model/services/api.service';
@@ -19,13 +18,13 @@ import { Imports } from '../../_abstract_model/types/_types';
 import { RuinItem } from '../../_abstract_model/types/ruin-item.class';
 import { Ruin } from '../../_abstract_model/types/ruin.class';
 import { TownDetails } from '../../_abstract_model/types/town-details.class';
-import { AutoDestroy } from '../../shared/decorators/autodestroy.decorator';
 import { HeaderWithNumberFilterComponent } from '../../shared/elements/lists/header-with-number-filter/header-with-number-filter.component';
 import { HeaderWithSelectFilterComponent } from '../../shared/elements/lists/header-with-select-filter/header-with-select-filter.component';
 import { HeaderWithStringFilterComponent } from '../../shared/elements/lists/header-with-string-filter/header-with-string-filter.component';
 import { ColumnIdPipe } from '../../shared/pipes/column-id.pipe';
 import { getTown } from '../../shared/utilities/localstorage.util';
 import { normalizeString } from '../../shared/utilities/string.utils';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 const angular_common: Imports = [CommonModule, FormsModule, NgClass, NgOptimizedImage];
 const components: Imports = [HeaderWithStringFilterComponent, HeaderWithNumberFilterComponent, HeaderWithSelectFilterComponent];
@@ -81,19 +80,18 @@ export class RuinsComponent implements OnInit {
 
     private town_service: TownService = inject(TownService);
     private api_service: ApiService = inject(ApiService);
-
-    @AutoDestroy private destroy_sub: Subject<void> = new Subject();
+    private readonly destroy_ref: DestroyRef = inject(DestroyRef);
 
     public ngOnInit(): void {
         this.api_service
             .getRuins()
-            .pipe(takeUntil(this.destroy_sub))
+            .pipe(takeUntilDestroyed(this.destroy_ref))
             .subscribe({
                 next: (ruins: Ruin[]) => {
                     this.ruins = ruins;
                     getTown();
                     this.ruins_filters_change
-                        .pipe(takeUntil(this.destroy_sub))
+                        .pipe(takeUntilDestroyed(this.destroy_ref))
                         .subscribe(() => {
                             this.datasource.filter = JSON.stringify(this.ruins_filters);
                         });
@@ -125,7 +123,7 @@ export class RuinsComponent implements OnInit {
 
         if (this.town) {
             this.town_service.getTownRuins()
-                .pipe(takeUntil(this.destroy_sub))
+                .pipe(takeUntilDestroyed(this.destroy_ref))
                 .subscribe({
                     next: (town_ruins: Ruin[]) => {
                         this.town_ruins = town_ruins;

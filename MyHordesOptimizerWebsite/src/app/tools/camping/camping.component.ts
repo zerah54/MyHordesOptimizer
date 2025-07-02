@@ -1,5 +1,5 @@
 import { CommonModule, DecimalPipe, formatNumber, Location, NgOptimizedImage, NgTemplateOutlet } from '@angular/common';
-import { Component, inject, Inject, OnInit, ViewEncapsulation, DOCUMENT } from '@angular/core';
+import { Component, inject, Inject, OnInit, ViewEncapsulation, DOCUMENT, DestroyRef } from '@angular/core';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
@@ -13,7 +13,6 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { ActivatedRoute, Router } from '@angular/router';
 import moment from 'moment';
-import { Subject, takeUntil } from 'rxjs';
 import { HORDES_IMG_REPO, NO_RUIN } from '../../_abstract_model/const';
 import { JobEnum } from '../../_abstract_model/enum/job.enum';
 import { ApiService } from '../../_abstract_model/services/api.service';
@@ -25,12 +24,12 @@ import { CampingOdds } from '../../_abstract_model/types/camping-odds.class';
 import { CampingParameters } from '../../_abstract_model/types/camping-parameters.class';
 import { Ruin } from '../../_abstract_model/types/ruin.class';
 import { TownDetails } from '../../_abstract_model/types/town-details.class';
-import { AutoDestroy } from '../../shared/decorators/autodestroy.decorator';
 import { SelectComponent } from '../../shared/elements/select/select.component';
 import { FilterRuinsByKmPipe } from '../../shared/pipes/filter-ruins-by-km.pipe';
 import { ClipboardService } from '../../shared/services/clipboard.service';
 import { getTown } from '../../shared/utilities/localstorage.util';
 import { CampingDisplayBonusPipe } from './camping-display-bonus.pipe';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 const angular_common: Imports = [CommonModule, FormsModule, NgOptimizedImage, NgTemplateOutlet, ReactiveFormsModule];
 const components: Imports = [SelectComponent];
@@ -82,14 +81,11 @@ export class CampingComponent implements OnInit {
 
     public in_town_camping: boolean = !!this.town;
 
-    private camping_service: CampingService = inject(CampingService);
-    private api: ApiService = inject(ApiService);
+    private readonly camping_service: CampingService = inject(CampingService);
+    private readonly api: ApiService = inject(ApiService);
+    private readonly destroy_ref: DestroyRef = inject(DestroyRef);
+    private readonly town_service: TownService = inject(TownService);
     private readonly no_ruin: Ruin = new Ruin(NO_RUIN);
-
-    private town_service: TownService = inject(TownService);
-
-    @AutoDestroy private destroy_sub: Subject<void> = new Subject();
-
 
     constructor(private fb: UntypedFormBuilder, private route: ActivatedRoute, private clipboard: ClipboardService,
                 private router: Router, private activated_route: ActivatedRoute, private location: Location,
@@ -99,22 +95,22 @@ export class CampingComponent implements OnInit {
     public ngOnInit(): void {
 
         this.route.queryParams
-            .pipe(takeUntil(this.destroy_sub))
+            .pipe(takeUntilDestroyed(this.destroy_ref))
             .subscribe((params: Record<string, string>) => {
                 this.api.getRuins()
-                    .pipe(takeUntil(this.destroy_sub))
+                    .pipe(takeUntilDestroyed(this.destroy_ref))
                     .subscribe((ruins: Ruin[]) => {
                         ruins = ruins.sort((ruin_a: Ruin, ruin_b: Ruin) => ruin_a.label[this.locale].toLocaleLowerCase().localeCompare(ruin_b.label[this.locale].toLocaleLowerCase()));
 
                         this.camping_service.getBonus()
-                            .pipe(takeUntil(this.destroy_sub))
+                            .pipe(takeUntilDestroyed(this.destroy_ref))
                             .subscribe((bonus: CampingBonus) => {
                                 this.bonus = bonus;
 
                                 if (this.town) {
                                     this.town_service
                                         .getTownRuins()
-                                        .pipe(takeUntil(this.destroy_sub))
+                                        .pipe(takeUntilDestroyed(this.destroy_ref))
                                         .subscribe((town_ruins: Ruin[]) => {
                                             this.town_ruins = [this.no_ruin].concat([...town_ruins]);
                                         });
@@ -157,7 +153,7 @@ export class CampingComponent implements OnInit {
                                 this.calculateCamping();
 
                                 this.configuration_form.valueChanges
-                                    .pipe(takeUntil(this.destroy_sub))
+                                    .pipe(takeUntilDestroyed(this.destroy_ref))
                                     .subscribe(() => {
                                         this.calculateCamping();
                                     });

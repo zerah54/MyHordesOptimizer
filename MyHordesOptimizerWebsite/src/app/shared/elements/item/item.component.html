@@ -1,25 +1,25 @@
-@if (item) {
+@if (item()) {
     <li [ngClass]="['mho-item', display_mode, forceOpen() ? 'force-open' : '']">
-        <div [class.broken]="item.is_broken">
+        <div [class.broken]="item().is_broken">
             <div class="title-part" (click)="toggleAdvancedMode()">
                 <div class="item_title">
                     <div class="item_img">
-                        <img [src]="HORDES_IMG_REPO + item.img">
-                        @if (item.bank_count && item.bank_count > 1) {
-                            <span class="item_count">{{ item.bank_count }}</span>
+                        <img [src]="HORDES_IMG_REPO + item().img">
+                        @if (item().bank_count && item().bank_count > 1) {
+                            <span class="item_count">{{ item().bank_count }}</span>
                         }
                     </div>
-                    <span class="item_label">{{ item.label[locale] }}
-                        @if (item.is_broken) {
+                    <span class="item_label">{{ item().label[locale] }}
+                        @if (item().is_broken) {
                             &nbsp;(
                             <ng-container i18n>Cassé</ng-container>
                             )
                         }
                     </span>
                 </div>
-                @if (town && town.town_id && item.wishlist_count === 0) {
+                @if (town && town.town_id && item().wishlist_count === 0) {
                     <div class="add_to_wishlist">
-                        <button mat-icon-button type="button" (click)="$event.stopPropagation(); addItemToWishlist(item)">
+                        <button mat-icon-button type="button" (click)="$event.stopPropagation(); addItemToWishlist(item())">
                             <img [ngSrc]="HORDES_IMG_REPO + 'item/item_cart.gif'" width="16" height="16">
                         </button>
                     </div>
@@ -27,48 +27,48 @@
             </div>
             @if (display_mode === 'advanced') {
                 <div class="advanced-part">
-                    <div>{{ item.description[locale] }}</div>
+                    <div>{{ item().description[locale] }}</div>
 
-                    @if (item.drop_rate_praf > 0 || item.drop_rate_not_praf > 0) {
+                    @if (item().drop_rate_praf > 0 || item().drop_rate_not_praf > 0) {
                         <mat-divider></mat-divider>
-                        @if (item.drop_rate_praf > 0) {
+                        @if (item().drop_rate_praf > 0) {
                             <div>
                                 <ng-container i18n>Taux d'obtention en cas de fouille réussie sur une zone praf</ng-container>
-                                {{ item.drop_rate_praf * 100 | number:'1.0-2':locale }}%
+                                {{ item().drop_rate_praf * 100 | number:'1.0-2':locale }}%
                             </div>
                         }
-                        @if (item.drop_rate_not_praf > 0) {
+                        @if (item().drop_rate_not_praf > 0) {
                             <div>
                                 <ng-container i18n>Taux d'obtention en cas de fouille réussie sur une zone non-praf</ng-container>
-                                {{ item.drop_rate_not_praf * 100 | number:'1.0-2':locale }}%
+                                {{ item().drop_rate_not_praf * 100 | number:'1.0-2':locale }}%
                             </div>
                         }
                     }
 
-                    @if (item.recipes.length > 0) {
+                    @if (item().recipes.length > 0) {
                         <mat-divider></mat-divider>
-                        @for (recipe of item.recipes; track recipe.name) {
+                        @for (recipe of item().recipes; track recipe.name) {
                             <div>
                                 <mho-recipe [recipe]="recipe"></mho-recipe>
                             </div>
                         }
                     }
 
-                    @if (item.deco || item.guard || item.is_heaver) {
+                    @if (item().deco || item().guard || item().is_heaver) {
                         <mat-divider></mat-divider>
-                        @if (item.deco) {
+                        @if (item().deco) {
                             <div>
                                 <!--                    <img [ngSrc]="HORDES_IMG_REPO + property.value.img" width="16" height="16">-->
-                                <ng-container i18n>Objet de décoration</ng-container>&nbsp;(+{{ item.deco }})
+                                <ng-container i18n>Objet de décoration</ng-container>&nbsp;(+{{ item().deco }})
                             </div>
                         }
-                        @if (item.guard) {
+                        @if (item().guard) {
                             <div>
                                 <!--                    <img [ngSrc]="HORDES_IMG_REPO + property.value.img" width="16" height="16">-->
-                                <ng-container i18n>Arme de veille</ng-container>&nbsp;(+{{ item.guard }})
+                                <ng-container i18n>Arme de veille</ng-container>&nbsp;(+{{ item().guard }})
                             </div>
                         }
-                        @if (item.is_heaver) {
+                        @if (item().is_heaver) {
                             <div>
                                 <!--                    <img [ngSrc]="HORDES_IMG_REPO + property.value.img" width="16" height="16">-->
                                 <ng-container i18n>Objet encombrant</ng-container>
@@ -76,9 +76,9 @@
                         }
                     }
 
-                    @if (item.properties && item.properties.length > 0) {
+                    @if (item().properties && item().properties.length > 0) {
                         <mat-divider></mat-divider>
-                        @for (property of item.properties; track $index) {
+                        @for (property of item().properties; track $index) {
                             <div>
                                 @if (property?.value?.img && property?.value?.img !== '') {
                                     <img [ngSrc]="HORDES_IMG_REPO + property?.value?.img" width="16" height="16">{{ property?.value?.label }}
@@ -87,9 +87,9 @@
                         }
                     }
 
-                    @if (item.actions && item.actions.length > 0) {
+                    @if (item().actions && item().actions.length > 0) {
                         <mat-divider></mat-divider>
-                        @for (action of item.actions; track $index) {
+                        @for (action of item().actions; track $index) {
                             <div>
                                 @if (action?.value?.img && action?.value?.img !== '') {
                                     <img [ngSrc]="HORDES_IMG_REPO + action?.value?.img" width="16" height="16">{{ action?.value?.label }}

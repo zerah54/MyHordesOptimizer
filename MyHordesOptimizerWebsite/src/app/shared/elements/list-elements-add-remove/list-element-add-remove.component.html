@@ -35,52 +35,14 @@
 
 <ng-template #buttonAdd>
     <img [ngSrc]="HORDES_IMG_REPO + 'icons/small_more.gif'" [matMenuTriggerFor]="menuAdd.menu"
-         [matMenuTriggerData]="{menuLabel: addLabel, lists: lists()}" width="16" height="16">
+         [matMenuTriggerData]="{menuLabel: addLabel(), lists: lists()}" width="16" height="16">
 </ng-template>
 <ng-template #buttonRemove>
     @if (currentList().length > 0) {
         <img [ngSrc]="HORDES_IMG_REPO + 'icons/small_less.gif'" [matMenuTriggerFor]="menuRemove.menu"
-             [matMenuTriggerData]="{menuLabel: removeLabel, list: currentList(), emptyLabel: emptyLabel}" width="16" height="16">
+             [matMenuTriggerData]="{menuLabel: removeLabel(), list: currentList(), emptyLabel: emptyLabel()}" width="16" height="16">
     }
 </ng-template>
 
-<mho-menu-add #menuAdd="menuAdd" (add)="add.next($event);" [class]="class()"></mho-menu-add>
-<mho-menu-remove #menuRemove="menuRemove" (remove)="remove.next($event)" (empty)="empty.next($event)" [class]="class()"></mho-menu-remove>
-
-<!--<mat-menu #menuAdd="matMenu" class="menu-add">
-    <div class="search" (click)="$event.stopPropagation()">
-        <mat-form-field>
-            <mat-label>{{addLabel}}</mat-label>
-            <input matInput #searchItem>
-        </mat-form-field>
-    </div>
-    <div class="items">
-        @for (item of completeList; track item) {
-            @if (searchItem.value === '' || $any(item.label[$any(locale)] ? item.label[$any(locale)] : item.label).toLowerCase().indexOf(searchItem.value.toLowerCase()) > -1) {
-                <img [ngSrc]="HORDES_IMG_REPO + item.img" (click)="add.next(item.id)"
-                     [title]="$any(item.label[$any(locale)] ? item.label[$any(locale)] : item.label)" width="16" height="16">
-            }
-        }
-    </div>
-</mat-menu>
-<mat-menu #menuRemove="matMenu" class="menu-remove">
-    <div class="search" (click)="$event.stopPropagation()">
-        <mat-form-field>
-            <mat-label>{{removeLabel}}</mat-label>
-            <input matInput #searchItem>
-        </mat-form-field>
-    </div>
-    <div class="items">
-        @for (item of currentList; track item) {
-            @if (searchItem.value === '' || $any(item.label[$any(locale)] ? item.label[$any(locale)] : item.label).toLowerCase().indexOf(searchItem.value.toLowerCase()) > -1) {
-                <img [ngSrc]="HORDES_IMG_REPO + item.img" (click)="remove.next(item.id)"
-                    [title]="$any(item.label[$any(locale)] ? item.label[$any(locale)] : item.label)" width="16" height="16">
-            }
-        }
-    </div>
-    <div mat-menu-item class="empty-bag" (click)="empty.next()">
-        <img [ngSrc]="HORDES_IMG_REPO + 'icons/b_close.png'" style="margin-right: 0.5em" width="16" height="16">
-        <span>{{emptyLabel}}</span>
-    </div>
-</mat-menu>
--->
+<mho-menu-add #menuAdd="menuAdd" (add)="add.emit($event);" [class]="class()"></mho-menu-add>
+<mho-menu-remove #menuRemove="menuRemove" (remove)="remove.emit($event)" (empty)="empty.emit($event)" [class]="class()"></mho-menu-remove>

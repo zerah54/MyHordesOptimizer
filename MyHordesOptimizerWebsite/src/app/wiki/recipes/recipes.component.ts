@@ -1,10 +1,9 @@
 import { CommonModule, DecimalPipe, NgOptimizedImage } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatSortModule } from '@angular/material/sort';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import moment from 'moment';
-import { Subject, takeUntil } from 'rxjs';
 import { HORDES_IMG_REPO } from '../../_abstract_model/const';
 import { StandardColumn } from '../../_abstract_model/interfaces';
 import { ApiService } from '../../_abstract_model/services/api.service';
@@ -12,10 +11,10 @@ import { Imports } from '../../_abstract_model/types/_types';
 import { Item } from '../../_abstract_model/types/item.class';
 import { RecipeResultItem } from '../../_abstract_model/types/recipe-result-item.class';
 import { Recipe } from '../../_abstract_model/types/recipe.class';
-import { AutoDestroy } from '../../shared/decorators/autodestroy.decorator';
 import { FilterFieldComponent } from '../../shared/elements/filter-field/filter-field.component';
 import { ColumnIdPipe } from '../../shared/pipes/column-id.pipe';
 import { normalizeString } from '../../shared/utilities/string.utils';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 const angular_common: Imports = [CommonModule, NgOptimizedImage];
 const components: Imports = [FilterFieldComponent];
@@ -48,14 +47,12 @@ export class RecipesComponent implements OnInit {
         {id: 'result', header: $localize`Résultat`},
     ];
 
-    @AutoDestroy private destroy_sub: Subject<void> = new Subject();
-
-    constructor(private api: ApiService) {
-    }
+    private readonly api: ApiService = inject(ApiService);
+    private readonly destroy_ref: DestroyRef = inject(DestroyRef);
 
     ngOnInit(): void {
         this.api.getRecipes()
-            .pipe(takeUntil(this.destroy_sub))
+            .pipe(takeUntilDestroyed(this.destroy_ref))
             .subscribe((recipes: Recipe[]): void => {
                 this.recipes = recipes;
                 this.datasource.data = [...recipes];

@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, output, OutputEmitterRef } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -18,12 +18,12 @@ const material_modules: Imports = [MatFormFieldModule, MatInputModule];
 })
 export class FilterFieldComponent {
 
-    @Output() filterChange: EventEmitter<string> = new EventEmitter<string>();
+    public filterChange: OutputEmitterRef<string> = output();
 
     public filter_value: string = '';
 
     public applyFilter(value: string): void {
-        this.filterChange.next(value);
+        this.filterChange.emit(value);
     }
 }
 

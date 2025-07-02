@@ -1,5 +1,5 @@
 import { CommonModule, NgOptimizedImage } from '@angular/common';
-import { booleanAttribute, Component, input, Input, InputSignalWithTransform } from '@angular/core';
+import { booleanAttribute, Component, input, InputSignal, InputSignalWithTransform } from '@angular/core';
 import moment from 'moment';
 import { HORDES_IMG_REPO } from '../../../_abstract_model/const';
 import { DisplayPseudoMode } from '../../../_abstract_model/interfaces';
@@ -20,8 +20,8 @@ const material_modules: Imports = [];
 })
 export class CitizenInfoComponent {
 
-    @Input() citizen!: Citizen;
-    @Input() displayPseudoMode: DisplayPseudoMode = 'simple';
+    public citizen: InputSignal<Citizen> = input.required();
+    public displayPseudoMode: InputSignal<DisplayPseudoMode> = input<DisplayPseudoMode>('simple');
     public displayShunStatus: InputSignalWithTransform<boolean, unknown> = input(false, {transform: booleanAttribute});
     public displayJob: InputSignalWithTransform<boolean, unknown> = input(false, {transform: booleanAttribute});
 

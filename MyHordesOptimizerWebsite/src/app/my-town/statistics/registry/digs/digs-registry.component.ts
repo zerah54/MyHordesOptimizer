@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, ViewEncapsulation } from '@angular/core';
+import { Component, Input, ViewEncapsulation, InputSignal, input } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import moment, { Moment } from 'moment';
@@ -30,8 +30,8 @@ const material_modules: Imports = [MatFormFieldModule];
 })
 export class DigsRegistryComponent {
 
-    @Input({required: true}) completeCitizenList!: CitizenInfo;
-    @Input({required: true}) displayPseudo!: DisplayPseudoMode;
+    public completeCitizenList: InputSignal<CitizenInfo> = input.required();
+    public displayPseudo: InputSignal<DisplayPseudoMode> = input.required();
 
     @Input({required: true}) set registry(registry: Entry[] | undefined) {
         this.current_day = getTown()?.day || 1;
@@ -42,7 +42,7 @@ export class DigsRegistryComponent {
                 .filter((entry: Entry) => this.arrival_keywords.some((arrival: string): boolean => entry.entry.indexOf(' ' + arrival) > -1));
 
             /** On ne garde que les citoyens qui ont au moins un log sur la case */
-            const citizen_list: Citizen[] = this.completeCitizenList.citizens.filter((citizen: Citizen) => {
+            const citizen_list: Citizen[] = this.completeCitizenList().citizens.filter((citizen: Citizen) => {
                 return registry.some((entry: Entry): boolean => entry.entry.indexOf(citizen.name) > -1);
             });
 

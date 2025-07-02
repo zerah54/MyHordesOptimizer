@@ -4,7 +4,7 @@
         <mat-form-field class="towns-filter">
             <mat-label i18n>Villes</mat-label>
             <mho-select multiple searchable [options]="towns" [bindLabel]="'label'" [(ngModel)]="selected_towns"
-                        (filterChange)="nodes_view.refresh()" [chips]="false">
+                        (filterChange)="nodes_view.refresh()">
             </mho-select>
         </mat-form-field>
     </div>

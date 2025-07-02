@@ -1,6 +1,6 @@
 import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
 import { CommonModule, NgOptimizedImage } from '@angular/common';
-import { Component, EventEmitter, Inject, OnInit, ViewChild, ViewEncapsulation, DOCUMENT } from '@angular/core';
+import { Component, EventEmitter, Inject, OnInit, ViewChild, ViewEncapsulation, DOCUMENT, inject, DestroyRef } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -18,7 +18,6 @@ import { MatTable, MatTableDataSource, MatTableModule } from '@angular/material/
 import { MatTabChangeEvent, MatTabGroup, MatTabsModule } from '@angular/material/tabs';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import moment from 'moment';
-import { Subject, takeUntil } from 'rxjs';
 import { read, utils, WorkBook, WorkSheet, write } from 'xlsx';
 import { environment } from '../../../environments/environment';
 import { HORDES_IMG_REPO, WISHLIST_EDITION_MODE_KEY } from '../../_abstract_model/const';
@@ -30,7 +29,6 @@ import { Imports } from '../../_abstract_model/types/_types';
 import { Item } from '../../_abstract_model/types/item.class';
 import { WishlistInfo } from '../../_abstract_model/types/wishlist-info.class';
 import { WishlistItem } from '../../_abstract_model/types/wishlist-item.class';
-import { AutoDestroy } from '../../shared/decorators/autodestroy.decorator';
 import { ConfirmDialogComponent, ConfirmDialogData } from '../../shared/elements/confirm-dialog/confirm-dialog.component';
 import { LastUpdateComponent } from '../../shared/elements/last-update/last-update.component';
 import { HeaderWithStringFilterComponent } from '../../shared/elements/lists/header-with-string-filter/header-with-string-filter.component';
@@ -39,6 +37,7 @@ import { ColumnIdPipe } from '../../shared/pipes/column-id.pipe';
 import { CustomKeyValuePipe } from '../../shared/pipes/key-value.pipe';
 import { ClipboardService } from '../../shared/services/clipboard.service';
 import { IsItemDisplayedPipe } from './is-item-displayed.pipe';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 const angular_common: Imports = [CommonModule, FormsModule, NgOptimizedImage];
 const components: Imports = [HeaderWithStringFilterComponent, LastUpdateComponent, SelectComponent];
@@ -125,10 +124,12 @@ export class WishlistComponent implements OnInit {
     /** La liste des dépôts */
     public readonly depots: WishlistDepot[] = WishlistDepot.getAllValues();
 
-    @AutoDestroy private destroy_sub: Subject<void> = new Subject();
 
-    constructor(private api: ApiService, private wishlist_sercices: WishlistService, private clipboard: ClipboardService, private dialog: MatDialog,
-                @Inject(DOCUMENT) private document: Document) {
+    private readonly api: ApiService = inject(ApiService);
+    private readonly wishlist_services: WishlistService = inject(WishlistService);
+    private readonly destroy_ref: DestroyRef = inject(DestroyRef);
+
+    constructor(private clipboard: ClipboardService, private dialog: MatDialog, @Inject(DOCUMENT) private document: Document) {
 
     }
 
@@ -137,7 +138,7 @@ export class WishlistComponent implements OnInit {
         this.datasource.sort = this.sort;
 
         this.wishlist_filters_change
-            .pipe(takeUntil(this.destroy_sub))
+            .pipe(takeUntilDestroyed(this.destroy_ref))
             .subscribe((): void => {
                 this.datasource.filter = JSON.stringify(this.wishlist_filters);
             });
@@ -146,7 +147,7 @@ export class WishlistComponent implements OnInit {
 
         this.getWishlist();
         this.api.getItems(true)
-            .pipe(takeUntil(this.destroy_sub))
+            .pipe(takeUntilDestroyed(this.destroy_ref))
             .subscribe((items: Item[]): void => {
                 this.items = items;
             });
@@ -154,8 +155,8 @@ export class WishlistComponent implements OnInit {
 
     /** Met à jour la liste de courses */
     public updateWishlist(): void {
-        this.wishlist_sercices.updateWishlist(this.wishlist_info)
-            .pipe(takeUntil(this.destroy_sub))
+        this.wishlist_services.updateWishlist(this.wishlist_info)
+            .pipe(takeUntilDestroyed(this.destroy_ref))
             .subscribe((wishlist_info: WishlistInfo): void => {
                 this.wishlist_info = wishlist_info;
                 this.wishlist_info.wishlist_items.forEach((zone: WishlistItem[]) => {
@@ -182,8 +183,8 @@ export class WishlistComponent implements OnInit {
 
     public addItemToWishlist(item: Item): void {
         if (item) {
-            this.wishlist_sercices.addItemToWishlist(item, this.selected_tab_key)
-                .pipe(takeUntil(this.destroy_sub))
+            this.wishlist_services.addItemToWishlist(item, this.selected_tab_key)
+                .pipe(takeUntilDestroyed(this.destroy_ref))
                 .subscribe(() => {
                     this.add_item_select.value = undefined;
                     this.add_item_select.filter_input.value = '';
@@ -307,7 +308,7 @@ export class WishlistComponent implements OnInit {
                 }
             })
             .afterClosed()
-            .pipe(takeUntil(this.destroy_sub))
+            .pipe(takeUntilDestroyed(this.destroy_ref))
             .subscribe((confirm: boolean): void => {
                 if (confirm) {
 
@@ -411,8 +412,8 @@ export class WishlistComponent implements OnInit {
     }
 
     private getWishlist(): void {
-        this.wishlist_sercices.getWishlist()
-            .pipe(takeUntil(this.destroy_sub))
+        this.wishlist_services.getWishlist()
+            .pipe(takeUntilDestroyed(this.destroy_ref))
             .subscribe((wishlist_info: WishlistInfo) => {
                 this.wishlist_info = wishlist_info;
                 this.datasource.data = [...<WishlistItem[]>wishlist_info.wishlist_items.get(this.selected_tab_key) || this.wishlist_info.wishlist_items.get('0') || []];

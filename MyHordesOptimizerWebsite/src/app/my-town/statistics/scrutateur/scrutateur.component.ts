@@ -1,17 +1,16 @@
 import { CommonModule, NgClass } from '@angular/common';
-import { Component, ElementRef, inject, OnInit, ViewChild } from '@angular/core';
+import { Component, DestroyRef, ElementRef, inject, OnInit, ViewChild } from '@angular/core';
 import { MatSortModule } from '@angular/material/sort';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import Chart from 'chart.js/auto';
-import { Subject, takeUntil } from 'rxjs';
 import { Direction } from '../../../_abstract_model/enum/direction.enum';
 import { StandardColumn } from '../../../_abstract_model/interfaces';
 import { TownStatisticsService } from '../../../_abstract_model/services/town-statistics.service';
 import { Imports } from '../../../_abstract_model/types/_types';
 import { Regen } from '../../../_abstract_model/types/regen.class';
-import { AutoDestroy } from '../../../shared/decorators/autodestroy.decorator';
 import { ColumnIdPipe } from '../../../shared/pipes/column-id.pipe';
 import { groupBy } from '../../../shared/utilities/array.util';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 // import ChartDataLabels, { Context } from 'chartjs-plugin-datalabels';
 
@@ -50,13 +49,12 @@ export class ScrutateurComponent implements OnInit {
     });
 
     private town_statistics_service: TownStatisticsService = inject(TownStatisticsService);
-
-    @AutoDestroy private destroy_sub: Subject<void> = new Subject();
+    private readonly destroy_ref: DestroyRef = inject(DestroyRef);
 
     ngOnInit(): void {
         this.town_statistics_service
             .getScrutList()
-            .pipe(takeUntil(this.destroy_sub))
+            .pipe(takeUntilDestroyed(this.destroy_ref))
             .subscribe((regens: Regen[]): void => {
                 this.datasource.data = [...regens];
 

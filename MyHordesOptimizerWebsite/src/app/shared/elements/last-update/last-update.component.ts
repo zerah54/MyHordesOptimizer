@@ -1,5 +1,5 @@
 import { CommonModule, DatePipe, NgOptimizedImage, NgTemplateOutlet } from '@angular/common';
-import { booleanAttribute, Component, input, Input, InputSignalWithTransform } from '@angular/core';
+import { booleanAttribute, Component, input, InputSignal, InputSignalWithTransform } from '@angular/core';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import moment, { Moment } from 'moment';
 import { Imports } from '../../../_abstract_model/types/_types';
@@ -19,8 +19,8 @@ const material_modules: Imports = [MatTooltipModule];
 })
 export class LastUpdateComponent {
 
-    @Input() lastUpdateInfo: UpdateInfo | undefined;
-    @Input() thresholds!: [number, number, number, number];
+    public lastUpdateInfo: InputSignal<UpdateInfo | undefined> = input.required();
+    public thresholds: InputSignal<[number, number, number, number] | undefined> = input<[number, number, number, number] | undefined>(undefined);
     public hideDetails: InputSignalWithTransform<boolean, unknown> = input(false, {transform: booleanAttribute});
 
     public moment: Moment = moment();

@@ -1,6 +1,6 @@
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { CommonModule } from '@angular/common';
-import { Component, HostListener, inject, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, DestroyRef, HostListener, inject, OnInit, ViewEncapsulation } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -14,7 +14,6 @@ import { MatListModule } from '@angular/material/list';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSidenavModule } from '@angular/material/sidenav';
-import { Subject, takeUntil } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { BREAKPOINTS } from '../../_abstract_model/const';
 import { ApiService } from '../../_abstract_model/services/api.service';
@@ -25,9 +24,9 @@ import { Citizen } from '../../_abstract_model/types/citizen.class';
 import { Item } from '../../_abstract_model/types/item.class';
 import { Ruin } from '../../_abstract_model/types/ruin.class';
 import { Town } from '../../_abstract_model/types/town.class';
-import { AutoDestroy } from '../../shared/decorators/autodestroy.decorator';
 import { CompassRoseComponent } from '../../shared/elements/compass-rose/compass-rose.component';
 import { DrawMapComponent } from './draw-map/draw-map.component';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 const angular_common: Imports = [CommonModule, FormsModule];
 const components: Imports = [CompassRoseComponent, DrawMapComponent];
@@ -68,10 +67,9 @@ export class MapComponent implements OnInit {
         distances: []
     };
 
-    private api_service: ApiService = inject(ApiService);
-    private town_service: TownService = inject(TownService);
-
-    @AutoDestroy private destroy_sub: Subject<void> = new Subject();
+    private readonly api_service: ApiService = inject(ApiService);
+    private readonly town_service: TownService = inject(TownService);
+    private readonly destroy_ref: DestroyRef = inject(DestroyRef);
 
     @HostListener('window:resize', ['$event'])
     onResize(): void {
@@ -86,7 +84,7 @@ export class MapComponent implements OnInit {
     ngOnInit(): void {
         this.town_service
             .getMap()
-            .pipe(takeUntil(this.destroy_sub))
+            .pipe(takeUntilDestroyed(this.destroy_ref))
             .subscribe({
                 next: (map: Town) => {
                     this.map = map;
@@ -94,7 +92,7 @@ export class MapComponent implements OnInit {
             });
         this.api_service
             .getRuins()
-            .pipe(takeUntil(this.destroy_sub))
+            .pipe(takeUntilDestroyed(this.destroy_ref))
             .subscribe({
                 next: (ruins: Ruin[]) => {
                     this.all_ruins = ruins;
@@ -102,7 +100,7 @@ export class MapComponent implements OnInit {
             });
         this.api_service
             .getItems()
-            .pipe(takeUntil(this.destroy_sub))
+            .pipe(takeUntilDestroyed(this.destroy_ref))
             .subscribe({
                 next: (items: Item[]) => {
                     this.all_items = items;
@@ -110,7 +108,7 @@ export class MapComponent implements OnInit {
             });
         this.town_service
             .getCitizens()
-            .pipe(takeUntil(this.destroy_sub))
+            .pipe(takeUntilDestroyed(this.destroy_ref))
             .subscribe({
                 next: (citizens: CitizenInfo): void => {
                     this.all_citizens = citizens.citizens;

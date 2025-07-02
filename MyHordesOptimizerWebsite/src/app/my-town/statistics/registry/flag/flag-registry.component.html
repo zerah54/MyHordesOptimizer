@@ -1,18 +1,18 @@
 <div class="flag">
     <div class="taken">
         <h4 i18n>Ont pris le drapeau</h4>
-        @for (citizen of entries | citizenTakeFlag:completeCitizenList:'taken'; track citizen) {
+        @for (citizen of entries | citizenTakeFlag:completeCitizenList():'taken'; track citizen) {
             <div>
-                <mho-citizen-info displayShunStatus [displayPseudoMode]="displayPseudo"
+                <mho-citizen-info displayShunStatus [displayPseudoMode]="displayPseudo()"
                                   [citizen]="citizen"></mho-citizen-info>
             </div>
         }
     </div>
     <div class="not-taken">
         <h4 i18n>N'ont pas pris le drapeau</h4>
-        @for (citizen of entries | citizenTakeFlag:completeCitizenList:'not-taken'; track citizen) {
+        @for (citizen of entries | citizenTakeFlag:completeCitizenList():'not-taken'; track citizen) {
             <div>
-                <mho-citizen-info displayShunStatus [displayPseudoMode]="displayPseudo"
+                <mho-citizen-info displayShunStatus [displayPseudoMode]="displayPseudo()"
                                   [citizen]="citizen"></mho-citizen-info>
             </div>
         }

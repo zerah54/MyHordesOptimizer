@@ -1,9 +1,8 @@
 import { CommonModule, NgClass } from '@angular/common';
-import { Component, EventEmitter, inject, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, DestroyRef, EventEmitter, inject, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatTable, MatTableDataSource, MatTableModule } from '@angular/material/table';
 import moment from 'moment';
-import { Subject, takeUntil } from 'rxjs';
 import { HORDES_IMG_REPO } from '../../../_abstract_model/const';
 import { StandardColumn } from '../../../_abstract_model/interfaces';
 import { DigsService } from '../../../_abstract_model/services/digs.service';
@@ -12,7 +11,6 @@ import { Imports } from '../../../_abstract_model/types/_types';
 import { CitizenInfo } from '../../../_abstract_model/types/citizen-info.class';
 import { Citizen } from '../../../_abstract_model/types/citizen.class';
 import { Dig } from '../../../_abstract_model/types/dig.class';
-import { AutoDestroy } from '../../../shared/decorators/autodestroy.decorator';
 import { CitizenInfoComponent } from '../../../shared/elements/citizen-info/citizen-info.component';
 import { DigComponent } from '../../../shared/elements/dig/dig.component';
 import {
@@ -21,6 +19,7 @@ import {
 import { HeaderWithSelectFilterComponent } from '../../../shared/elements/lists/header-with-select-filter/header-with-select-filter.component';
 import { ColumnIdPipe } from '../../../shared/pipes/column-id.pipe';
 import { getTown } from '../../../shared/utilities/localstorage.util';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 const angular_common: Imports = [CommonModule, NgClass];
 const components: Imports = [DigComponent, HeaderWithNumberPreviousNextFilterComponent, HeaderWithSelectFilterComponent, CitizenInfoComponent];
@@ -66,10 +65,10 @@ export class CitizensDigsComponent implements OnInit {
     /** La fouille qu'on est en train de modifier */
     public dig_to_update!: Dig | undefined;
 
-    private digs_service: DigsService = inject(DigsService);
-    private town_service: TownService = inject(TownService);
+    private readonly digs_service: DigsService = inject(DigsService);
+    private readonly town_service: TownService = inject(TownService);
+    private readonly destroy_ref: DestroyRef = inject(DestroyRef);
 
-    @AutoDestroy private destroy_sub: Subject<void> = new Subject();
 
     public ngOnInit(): void {
         this.datasource = new MatTableDataSource();
@@ -77,7 +76,7 @@ export class CitizensDigsComponent implements OnInit {
 
         this.createDigsByCitizenAndDay();
         this.citizen_filter_change
-            .pipe(takeUntil(this.destroy_sub))
+            .pipe(takeUntilDestroyed(this.destroy_ref))
             .subscribe(() => {
                 this.datasource.filter = JSON.stringify(this.filters);
                 this.createDigsByCitizenAndDay();
@@ -127,7 +126,7 @@ export class CitizensDigsComponent implements OnInit {
     private getDigs(): void {
         this.digs_service
             .getDigs()
-            .pipe(takeUntil(this.destroy_sub))
+            .pipe(takeUntilDestroyed(this.destroy_ref))
             .subscribe({
                 next: (digs: Dig[]) => {
                     this.digs = digs;
@@ -151,7 +150,7 @@ export class CitizensDigsComponent implements OnInit {
     private getCitizens(): void {
         this.town_service
             .getCitizens()
-            .pipe(takeUntil(this.destroy_sub))
+            .pipe(takeUntilDestroyed(this.destroy_ref))
             .subscribe({
                 next: (citizen_info: CitizenInfo) => {
                     citizen_info.citizens = citizen_info.citizens.filter((citizen: Citizen) => !citizen.is_dead);

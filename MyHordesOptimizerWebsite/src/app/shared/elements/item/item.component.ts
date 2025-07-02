@@ -1,17 +1,16 @@
 import { CommonModule, DecimalPipe, NgClass, NgOptimizedImage } from '@angular/common';
-import { booleanAttribute, Component, input, Input, InputSignalWithTransform, OnInit } from '@angular/core';
+import { booleanAttribute, Component, DestroyRef, inject, input, InputSignalWithTransform, model, ModelSignal, OnInit } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDividerModule } from '@angular/material/divider';
 import moment from 'moment';
-import { Subject, takeUntil } from 'rxjs';
 import { HORDES_IMG_REPO } from '../../../_abstract_model/const';
 import { WishlistService } from '../../../_abstract_model/services/wishlist.service';
 import { Imports } from '../../../_abstract_model/types/_types';
 import { Item } from '../../../_abstract_model/types/item.class';
 import { TownDetails } from '../../../_abstract_model/types/town-details.class';
-import { AutoDestroy } from '../../decorators/autodestroy.decorator';
 import { getTown } from '../../utilities/localstorage.util';
 import { RecipeComponent } from '../recipe/recipe.component';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 const angular_common: Imports = [CommonModule, NgClass, NgOptimizedImage];
 const components: Imports = [RecipeComponent];
@@ -28,7 +27,7 @@ const material_modules: Imports = [MatButtonModule, MatDividerModule];
 export class ItemComponent implements OnInit {
 
     /** L'élément à afficher si c'est un objet standard */
-    @Input() item!: Item;
+    public item: ModelSignal<Item> = model.required();
     /** Force l'ouverture de l'élément */
     public forceOpen: InputSignalWithTransform<boolean, unknown> = input(false, { transform: booleanAttribute });
 
@@ -40,7 +39,7 @@ export class ItemComponent implements OnInit {
     public display_mode: 'simple' | 'advanced' = 'simple';
     public town: TownDetails | null = getTown();
 
-    @AutoDestroy private destroy_sub: Subject<void> = new Subject();
+    private readonly destroy_ref: DestroyRef = inject(DestroyRef);
 
     constructor(private wishlist_services: WishlistService) {
     }
@@ -58,9 +57,11 @@ export class ItemComponent implements OnInit {
      */
     public addItemToWishlist(item: Item): void {
         this.wishlist_services.addItemToWishlist(item, '0')
-            .pipe(takeUntil(this.destroy_sub))
+            .pipe(takeUntilDestroyed(this.destroy_ref))
             .subscribe(() => {
-                this.item.wishlist_count = 1;
+                let new_item: Item = this.item()
+                new_item.wishlist_count = 1;
+                this.item.set(new_item);
             });
     }
 

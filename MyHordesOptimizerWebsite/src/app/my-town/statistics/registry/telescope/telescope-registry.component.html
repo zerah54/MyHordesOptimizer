@@ -1,17 +1,17 @@
 <div class="telescope">
     <div class="taken">
         <h4 i18n>Ont pris le télescope</h4>
-        @for (citizen of entries | citizenTakeTelescope:completeCitizenList:'taken'; track citizen) {
+        @for (citizen of entries | citizenTakeTelescope:completeCitizenList():'taken'; track citizen) {
             <div>
-                <mho-citizen-info displayShunStatus [displayPseudoMode]="displayPseudo" [citizen]="citizen"></mho-citizen-info>
+                <mho-citizen-info displayShunStatus [displayPseudoMode]="displayPseudo()" [citizen]="citizen"></mho-citizen-info>
             </div>
         }
     </div>
     <div class="not-taken">
         <h4 i18n>N'ont pas pris le télescope</h4>
-        @for (citizen of entries | citizenTakeTelescope:completeCitizenList:'not-taken'; track citizen) {
+        @for (citizen of entries | citizenTakeTelescope:completeCitizenList():'not-taken'; track citizen) {
             <div>
-                <mho-citizen-info displayShunStatus [displayPseudoMode]="displayPseudo" [citizen]="citizen"></mho-citizen-info>
+                <mho-citizen-info displayShunStatus [displayPseudoMode]="displayPseudo()" [citizen]="citizen"></mho-citizen-info>
             </div>
         }
     </div>

@@ -1,9 +1,9 @@
 <mat-select class="mho-select" [multiple]="multiple()" [value]="value" (valueChange)="writeValue($event);"
             [attr.aria-labelledby]="parent_form_field.getLabelId()"
-            (closed)="closed.next()" [placeholder]="placeholder" [panelClass]="class">
+            (closed)="closed.emit()" [placeholder]="placeholder" [panelClass]="class()">
     @if (multiple()) {
         <mat-select-trigger>
-            @if (chips) {
+            @if (chips()) {
                 <mat-chip-listbox>
                     @for (single_value of $any(value); track single_value; let i = $index) {
                         <mat-chip (removed)="remove(single_value)" class="mho-select-chip">
@@ -75,8 +75,9 @@
                     {{ option | label:bindLabel() }}
                 }
             </span>
-                @if (moreInfo) {
-                    <span [innerHTML]="moreInfo(option)" class="more-info"></span>
+                @let moreInfoFn = moreInfo();
+                @if (moreInfoFn) {
+                    <span [innerHTML]="moreInfoFn(option)" class="more-info"></span>
                 }
             </mat-option>
         }

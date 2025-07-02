@@ -1,5 +1,5 @@
 import { CommonModule, NgOptimizedImage } from '@angular/common';
-import { Component, Input, ViewEncapsulation } from '@angular/core';
+import { Component, input, Input, ViewEncapsulation, InputSignal } from '@angular/core';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import moment from 'moment';
 import { HORDES_IMG_REPO } from '../../../../_abstract_model/const';
@@ -25,9 +25,9 @@ const material_modules: Imports = [MatSlideToggleModule];
 })
 export class BankDiffRegistryComponent {
 
-    @Input({required: true}) completeCitizenList!: CitizenInfo;
-    @Input({required: true}) displayPseudo!: DisplayPseudoMode;
-    @Input({required: true}) completeItemsList!: Item[];
+    public completeCitizenList: InputSignal<CitizenInfo> = input.required();
+    public displayPseudo: InputSignal<DisplayPseudoMode> = input.required();
+    public completeItemsList: InputSignal<Item[]> = input.required();
 
     @Input({required: true}) set registry(registry: Entry[] | undefined) {
         if (registry) {

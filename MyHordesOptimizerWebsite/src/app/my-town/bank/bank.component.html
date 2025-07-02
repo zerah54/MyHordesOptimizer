@@ -9,7 +9,7 @@
             <mat-form-field class="properties-filter">
                 <mat-label i18n>Chercher des objets par propriétés</mat-label>
                 <mho-select multiple [options]="options" [bindLabel]="'value.label'" [(ngModel)]="select_value"
-                            (filterChange)="applyFilters()" searchable>
+                            (filterChange)="applyFilters()" searchable chips>
                 </mho-select>
             </mat-form-field>
         </div>

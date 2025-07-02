@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, Output, InputSignal, input } from '@angular/core';
+import { Component, InputSignal, input, output, OutputEmitterRef } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -38,8 +38,8 @@ export class MapUpdateDigsComponent {
     public cell: InputSignal<Cell> = input.required();
     public allCitizens: InputSignal<Citizen[]> = input.required();
 
-    @Input() digs!: Dig[];
-    @Output() digsChange: EventEmitter<Dig[]> = new EventEmitter();
+    public digs: InputSignal<Dig[]> = input.required();
+    public digsChange: OutputEmitterRef<Dig[]> = output();
 
     public readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
     public readonly locale: string = moment.locale();
@@ -55,17 +55,18 @@ export class MapUpdateDigsComponent {
         new_dig.day = this.selected_day;
         new_dig.nb_success = 0;
         new_dig.nb_total_dig = 0;
-        this.digs.push(new_dig);
-        this.digs = [...this.digs];
-        this.digsChange.emit(this.digs);
+
+        const digs = [...this.digs()];
+        digs.push(new_dig);
+        this.digsChange.emit(digs);
     }
 
     public removeCitizen(citizen_id: number): void {
-        const citizen_digs_index: number = this.digs.findIndex((dig: Dig) => dig.digger_id === citizen_id);
+        const citizen_digs_index: number = this.digs().findIndex((dig: Dig) => dig.digger_id === citizen_id);
         if (citizen_digs_index > -1) {
-            this.digs.splice(citizen_digs_index, 1);
-            this.digs = [...this.digs];
-            this.digsChange.emit(this.digs);
+            const digs = [...this.digs()];
+            digs.splice(citizen_digs_index, 1);
+            this.digsChange.emit(digs);
         }
     }
 }

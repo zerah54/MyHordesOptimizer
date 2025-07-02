@@ -1,5 +1,5 @@
 import { CommonModule, DecimalPipe, NgOptimizedImage } from '@angular/common';
-import { Component, input, InputSignal, OnInit, output, OutputEmitterRef } from '@angular/core';
+import { Component, DestroyRef, inject, input, InputSignal, OnInit, output, OutputEmitterRef } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatDividerModule } from '@angular/material/divider';
@@ -7,13 +7,12 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatListModule } from '@angular/material/list';
 import moment from 'moment';
-import { Subject, takeUntil } from 'rxjs';
 import { HORDES_IMG_REPO } from '../../../../../_abstract_model/const';
 import { Imports } from '../../../../../_abstract_model/types/_types';
 import { Cell } from '../../../../../_abstract_model/types/cell.class';
 import { Ruin } from '../../../../../_abstract_model/types/ruin.class';
-import { AutoDestroy } from '../../../../../shared/decorators/autodestroy.decorator';
 import { FilterRuinsByKmPipe } from '../../../../../shared/pipes/filter-ruins-by-km.pipe';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 const angular_common: Imports = [CommonModule, FormsModule, NgOptimizedImage, ReactiveFormsModule];
 const components: Imports = [];
@@ -40,7 +39,7 @@ export class MapUpdateRuinComponent implements OnInit {
 
     public cell_form!: FormGroup;
 
-    @AutoDestroy private destroy_sub: Subject<void> = new Subject();
+    private readonly destroy_ref: DestroyRef = inject(DestroyRef);
 
     constructor(private fb: FormBuilder) {
 
@@ -58,7 +57,7 @@ export class MapUpdateRuinComponent implements OnInit {
         });
 
         this.cell_form.valueChanges
-            .pipe(takeUntil(this.destroy_sub))
+            .pipe(takeUntilDestroyed(this.destroy_ref))
             .subscribe((values: RuinInfoUpdate) => {
                 // this.cell.nb_ruin_success = values.nb_ruin_success;
                 let new_cell: Cell = this.cell();

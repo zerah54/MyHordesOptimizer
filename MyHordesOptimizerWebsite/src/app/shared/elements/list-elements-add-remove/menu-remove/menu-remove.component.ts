@@ -1,5 +1,5 @@
 import { CommonModule, NgOptimizedImage } from '@angular/common';
-import { Component, EventEmitter, Input, Output, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, input, InputSignal, output, OutputEmitterRef, ViewChild, ViewEncapsulation } from '@angular/core';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatMenu, MatMenuModule } from '@angular/material/menu';
@@ -25,10 +25,10 @@ export class MenuRemoveComponent {
 
     @ViewChild(MatMenu) menu!: MatMenu;
 
-    @Input() class: string = '';
+    public class: InputSignal<string> = input('');
 
-    @Output() remove: EventEmitter<number | string> = new EventEmitter();
-    @Output() empty: EventEmitter<void> = new EventEmitter();
+    public remove: OutputEmitterRef<number | string> = output();
+    public empty: OutputEmitterRef<void> = output();
 
     /** Le dossier dans lequel sont stockées les images */
     public readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;

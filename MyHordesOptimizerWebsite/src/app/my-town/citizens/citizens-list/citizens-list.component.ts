@@ -1,5 +1,5 @@
 import { CommonModule, NgClass, NgOptimizedImage } from '@angular/common';
-import { Component, EventEmitter, inject, OnInit, Signal, viewChild, ViewEncapsulation } from '@angular/core';
+import { Component, DestroyRef, EventEmitter, inject, OnInit, Signal, viewChild, ViewEncapsulation } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatCheckboxChange, MatCheckboxModule } from '@angular/material/checkbox';
 import { MatOptionModule } from '@angular/material/core';
@@ -9,7 +9,6 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import moment from 'moment';
-import { Subject, takeUntil } from 'rxjs';
 import { HORDES_IMG_REPO } from '../../../_abstract_model/const';
 import { StatusEnum } from '../../../_abstract_model/enum/status.enum';
 import { StandardColumn } from '../../../_abstract_model/interfaces';
@@ -23,7 +22,6 @@ import { HeroicActionsWithValue } from '../../../_abstract_model/types/heroic-ac
 import { HomeWithValue } from '../../../_abstract_model/types/home.class';
 import { Item } from '../../../_abstract_model/types/item.class';
 import { UpdateInfo } from '../../../_abstract_model/types/update-info.class';
-import { AutoDestroy } from '../../../shared/decorators/autodestroy.decorator';
 import { AvatarComponent } from '../../../shared/elements/avatar/avatar.component';
 import { CitizenInfoComponent } from '../../../shared/elements/citizen-info/citizen-info.component';
 import { LastUpdateComponent } from '../../../shared/elements/last-update/last-update.component';
@@ -33,6 +31,7 @@ import { ColumnIdPipe } from '../../../shared/pipes/column-id.pipe';
 import { getTown, getUser } from '../../../shared/utilities/localstorage.util';
 import { BathForDayPipe } from '../bath-for-day.pipe';
 import { TypeRowPipe } from './type-row.pipe';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 const angular_common: Imports = [CommonModule, FormsModule, NgClass, NgOptimizedImage];
 const components: Imports = [AvatarComponent, CitizenInfoComponent, HeaderWithSelectFilterComponent, LastUpdateComponent, ListElementAddRemoveComponent];
@@ -95,10 +94,9 @@ export class CitizensListComponent implements OnInit {
         {label: $localize`Tous`, list: this.all_status}
     ];
 
-    private api_service: ApiService = inject(ApiService);
-    private town_service: TownService = inject(TownService);
-
-    @AutoDestroy private destroy_sub: Subject<void> = new Subject();
+    private readonly api_service: ApiService = inject(ApiService);
+    private readonly town_service: TownService = inject(TownService);
+    private readonly destroy_ref: DestroyRef = inject(DestroyRef);
 
     public ngOnInit(): void {
         this.citizen_list = new MatTableDataSource();
@@ -108,7 +106,7 @@ export class CitizensListComponent implements OnInit {
         this.dead_citizen_list.sort = this.sort() as MatSort;
 
         this.citizen_filter_change
-            .pipe(takeUntil(this.destroy_sub))
+            .pipe(takeUntilDestroyed(this.destroy_ref))
             .subscribe(() => {
                 this.citizen_list.filter = JSON.stringify(this.citizen_filters);
             });
@@ -117,7 +115,7 @@ export class CitizensListComponent implements OnInit {
 
         this.api_service
             .getItems()
-            .pipe(takeUntil(this.destroy_sub))
+            .pipe(takeUntilDestroyed(this.destroy_ref))
             .subscribe({
                 next: (items: Item[]) => {
                     this.all_items = items;
@@ -144,7 +142,7 @@ export class CitizensListComponent implements OnInit {
 
             this.town_service
                 .updateBag(citizen)
-                .pipe(takeUntil(this.destroy_sub))
+                .pipe(takeUntilDestroyed(this.destroy_ref))
                 .subscribe({
                     next: (update_info: UpdateInfo): void => {
                         if (citizen.bag) {
@@ -172,7 +170,7 @@ export class CitizensListComponent implements OnInit {
             }
             this.town_service
                 .updateBag(citizen)
-                .pipe(takeUntil(this.destroy_sub))
+                .pipe(takeUntilDestroyed(this.destroy_ref))
                 .subscribe({
                     next: (update_info: UpdateInfo) => {
                         if (citizen.bag) {
@@ -195,7 +193,7 @@ export class CitizensListComponent implements OnInit {
             citizen.bag.items = [];
             this.town_service
                 .updateBag(citizen)
-                .pipe(takeUntil(this.destroy_sub))
+                .pipe(takeUntilDestroyed(this.destroy_ref))
                 .subscribe({
                     next: (update_info: UpdateInfo) => {
                         if (citizen.bag) {
@@ -220,7 +218,7 @@ export class CitizensListComponent implements OnInit {
 
             this.town_service
                 .updateStatus(citizen)
-                .pipe(takeUntil(this.destroy_sub))
+                .pipe(takeUntilDestroyed(this.destroy_ref))
                 .subscribe({
                     next: (update_info: UpdateInfo) => {
                         if (citizen.status) {
@@ -247,7 +245,7 @@ export class CitizensListComponent implements OnInit {
             }
             this.town_service
                 .updateStatus(citizen)
-                .pipe(takeUntil(this.destroy_sub))
+                .pipe(takeUntilDestroyed(this.destroy_ref))
                 .subscribe({
                     next: (update_info: UpdateInfo) => {
                         if (citizen.status) {
@@ -270,7 +268,7 @@ export class CitizensListComponent implements OnInit {
             citizen.status.icons = [];
             this.town_service
                 .updateBag(citizen)
-                .pipe(takeUntil(this.destroy_sub))
+                .pipe(takeUntilDestroyed(this.destroy_ref))
                 .subscribe({
                     next: (update_info: UpdateInfo) => {
                         if (citizen.status) {
@@ -301,7 +299,7 @@ export class CitizensListComponent implements OnInit {
         if (citizen && citizen.home !== undefined) {
             this.town_service
                 .updateHome(citizen)
-                .pipe(takeUntil(this.destroy_sub))
+                .pipe(takeUntilDestroyed(this.destroy_ref))
                 .subscribe({
                     next: (update_info: UpdateInfo) => {
                         if (citizen.home) {
@@ -335,7 +333,7 @@ export class CitizensListComponent implements OnInit {
         if (citizen && citizen.heroic_actions) {
             this.town_service
                 .updateHeroicActions(citizen)
-                .pipe(takeUntil(this.destroy_sub))
+                .pipe(takeUntilDestroyed(this.destroy_ref))
                 .subscribe({
                     next: (update_info: UpdateInfo) => {
                         if (citizen.heroic_actions) {
@@ -398,7 +396,7 @@ export class CitizensListComponent implements OnInit {
     public getCitizens(): void {
         this.town_service
             .getCitizens()
-            .pipe(takeUntil(this.destroy_sub))
+            .pipe(takeUntilDestroyed(this.destroy_ref))
             .subscribe({
                 next: (citizen_info: CitizenInfo) => {
                     const alive_citizen_info: CitizenInfo = Object.assign({}, citizen_info);
