@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, HostBinding, Input, ViewEncapsulation } from '@angular/core';
+import { Component, input, Input, InputSignal, ViewEncapsulation } from '@angular/core';
 import { MatDividerModule } from '@angular/material/divider';
 import { DisplayPseudoMode, Entry } from '../../../../_abstract_model/interfaces';
 import { Imports } from '../../../../_abstract_model/types/_types';
@@ -17,13 +17,13 @@ const material_modules: Imports = [MatDividerModule];
     templateUrl: './telescope-registry.component.html',
     styleUrls: ['./telescope-registry.component.scss'],
     encapsulation: ViewEncapsulation.None,
+    host: {style: 'display: contents'},
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class TelescopeRegistryComponent {
-    @HostBinding('style.display') display: string = 'contents';
 
-    @Input({required: true}) completeCitizenList!: CitizenInfo;
-    @Input({required: true}) displayPseudo!: DisplayPseudoMode;
+    public completeCitizenList: InputSignal<CitizenInfo> = input.required();
+    public displayPseudo: InputSignal<DisplayPseudoMode> = input.required();
 
     @Input({required: true}) set registry(registry: Entry[] | undefined) {
         if (registry) {

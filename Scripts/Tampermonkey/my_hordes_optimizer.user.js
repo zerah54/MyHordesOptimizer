@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MHO Addon
-// @version      1.0.33.0
+// @version      1.1.9.0
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/, rubrique Tutoriels
 // @author       Zerah
 //
@@ -31,7 +31,7 @@
 // ==/UserScript==
 
 const changelog = `${getScriptInfo().name} : Changelog pour la version ${getScriptInfo().version}\n\n`
-    + `[Correctif] Divers correctifs d'affichage\n`;
+    + `[Correctif] Corrige la liste de courses`;
 
 const lang = (document.querySelector('html[lang]')?.getAttribute('lang') || document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2) || 'fr';
 
@@ -94,9 +94,9 @@ const mh_optimizer_icon = 'https://myhordes-optimizer.web.app/img/logo/logo_mho_
 const mh_optimizer_window_id = 'optimizer-window';
 const mh_optimizer_map_window_id = 'optimizer-map-window';
 const mho_expeditions_window_id = 'mho-expeditions-window';
+const mho_store_notifications_window_id = 'mho-store-notifications-window'
 const btn_id = 'optimizer-btn';
 const content_btn_id = 'optimizer-content-btn';
-const mh_header_id = 'header-reload-area';
 const mh_content_id = 'content';
 const mh_update_external_tools_id = 'mh-update-external-tools';
 const mho_warn_missing_logs_id = 'mho-warn-missing-logs';
@@ -117,6 +117,7 @@ const mho_search_registry_field_id = 'mho-search-registry-field';
 const mho_display_translate_input_id = 'mho-display-translate-input';
 const mho_watchtower_estim_id = 'mho-watchtower-estim';
 const mho_anti_abuse_counter_id = 'mho-anti-abuse-counter';
+const mho_town_external_links_id = 'mho-town-external-links';
 const mho_copy_logs_id = 'mho-copy-logs';
 
 //////////////////////////////////////
@@ -134,6 +135,9 @@ let map;
 let current_cell;
 let my_expeditions;
 let tooltips_observer;
+let loading_area_observer;
+let bank_observer;
+let anti_abuse_controller;
 
 ///////////////////
 // Les variables //
@@ -144,7 +148,10 @@ let is_refresh_wishlist;
 let has_new_changelog = false;
 /** True quand une erreur vient d'être affichée. Repasse à false au bout d'une seconde, pour éviter le spam d'erreurs */
 let is_error = false;
-
+/** La liste des notifications récupérées depuis le dernier chargement de l'application */
+let mh_notifications = [];
+/** Le mutation observer pour les tooltips */
+let advanced_tooltips_observer;
 ////////////////
 // Les textes //
 ////////////////
@@ -746,63 +753,32 @@ const jobs = [
 ];
 
 const status_list = [
-    {id: "clean", img: "status/status_clean.gif", pdc: 1}, // Jamais drogué
-    {id: "hasdrunk", img: "status/status_hasdrunk.gif"}, // A bu
-    {id: "haseaten", img: "status/status_haseaten.gif"}, // A mangé
-    {id: "camper", img: "status/status_camper.gif", searches: '+10%'}, // A campé
-    {id: "immune", img: "status/status_immune.gif", watch_death: -0.01}, // Immunisé
-    {id: "hsurvive", img: "status/status_hsurvive.gif"}, // VLM niveau 1
-    {id: "hsurvive2", img: "status/status_hsurvive2.gif"}, // VLM niveau 2
-    {id: "hsurvive3", img: "status/status_hsurvive3.gif"}, // VLM niveau 3
-    {id: "tired", img: "status/status_tired.gif"}, // Fatigué
-    {id: "terror", img: "status/status_terror.gif", watch_def: -30, watch_death: 0.05}, // Terrorisé
-    {id: "thirst1", img: "status/status_thirst1.gif", watch_def: -5}, // Soif
-    {id: "thirst2", img: "status/status_thirst2.gif", watch_def: -10, wath_death: 0.03}, // Deshy
-    {id: "drugged", img: "status/status_drugged.gif", watch_def: 10}, // Drogué
-    {id: "addict", img: "status/status_addict.gif", watch_def: 10, watch_death: 0.06}, // Dépendant
-    {id: "infection", img: "status/status_infection.gif", watch_def: -15, watch_death: 0.1}, // Infecté
-    {id: "drunk", img: "status/status_drunk.gif", watch_def: 15, watch_death: -0.02, searches: '-20%"'}, // Ivre
-    {id: "hungover", img: "status/status_hungover.gif", watch_def: -15, watch_death: 0.06}, // Gueule de bois
-    {
-        id: "wound1",
-        img: "status/status_wound1.gif",
-        watch_def: -15,
-        watch_death: 0.10,
-        properties: ['wounded', 'head_wounded']
-    }, // Blessure à la tête
-    {
-        id: "wound2",
-        img: "status/status_wound2.gif",
-        watch_def: -15,
-        watch_death: 0.10,
-        properties: ['wounded', 'hand_wounded']
-    }, // Blessure à la main
-    {
-        id: "wound3",
-        img: "status/status_wound3.gif",
-        watch_def: -15,
-        watch_death: 0.10,
-        properties: ['wounded', 'arm_wounded']
-    }, // Blessure au bras
-    {
-        id: "wound4",
-        img: "status/status_wound4.gif",
-        watch_def: -15,
-        watch_death: 0.10,
-        properties: ['wounded', 'leg_wounded']
-    }, // Blessure à la jambe
-    {
-        id: "wound5",
-        img: "status/status_wound5.gif",
-        watch_def: -15,
-        watch_death: 0.10,
-        properties: ['wounded'],
-        searches: '/2'
-    }, // Blessure à l'oeil
-    {id: "wound6", img: "status/status_wound6.gif", watch_def: -15, watch_death: 0.10, properties: ['wounded']}, // Blessure au pied
-    {id: "healed", img: "status/status_healed.gif", watch_def: -15, watch_death: 0.05}, // Convalescent
-    {id: "hydrated", img: "status/status_hydrated.gif", pdc: 1}, // Hydraté
-    {id: "sober", img: "status/status_sober.gif", pdc: 1} // Sobre
+    { id: "clean", img: "status/status_clean.gif", pdc: 1 }, // Jamais drogué
+    { id: "hasdrunk", img: "status/status_hasdrunk.gif" }, // A bu
+    { id: "haseaten", img: "status/status_haseaten.gif" }, // A mangé
+    { id: "camper", img: "status/status_camper.gif", searches: '+10%' }, // A campé
+    { id: "immune", img: "status/status_immune.gif", watch_death: -0.01 }, // Immunisé
+    { id: "hsurvive", img: "status/status_hsurvive.gif" }, // VLM niveau 1
+    { id: "hsurvive2", img: "status/status_hsurvive2.gif" }, // VLM niveau 2
+    { id: "hsurvive3", img: "status/status_hsurvive3.gif" }, // VLM niveau 3
+    { id: "tired", img: "status/status_tired.gif" }, // Fatigué
+    { id: "terror", img: "status/status_terror.gif", watch_def: -30, watch_death: 0.05 }, // Terrorisé
+    { id: "thirst1", img: "status/status_thirst1.gif", watch_def: -5 }, // Soif
+    { id: "thirst2", img: "status/status_thirst2.gif", watch_def: -10, wath_death: 0.03 }, // Deshy
+    { id: "drugged", img: "status/status_drugged.gif", watch_def: 10 }, // Drogué
+    { id: "addict", img: "status/status_addict.gif", watch_def: 10, watch_death: 0.06 }, // Dépendant
+    { id: "infection", img: "status/status_infection.gif", watch_def: -15, watch_death: 0.1 }, // Infecté
+    { id: "drunk", img: "status/status_drunk.gif", watch_def: 15, watch_death: -0.02, searches: '-20%"' }, // Ivre
+    { id: "hungover", img: "status/status_hungover.gif", watch_def: -15, watch_death: 0.06 }, // Gueule de bois
+    { id: "wound1", img: "status/status_wound1.gif", watch_def: -15, watch_death: 0.10, properties: ['wounded', 'head_wounded'] }, // Blessure à la tête
+    { id: "wound2", img: "status/status_wound2.gif", watch_def: -15, watch_death: 0.10, properties: ['wounded', 'hand_wounded'] }, // Blessure à la main
+    { id: "wound3", img: "status/status_wound3.gif", watch_def: -15, watch_death: 0.10, properties: ['wounded', 'arm_wounded'] }, // Blessure au bras
+    { id: "wound4", img: "status/status_wound4.gif", watch_def: -15, watch_death: 0.10, properties: ['wounded', 'leg_wounded'] }, // Blessure à la jambe
+    { id: "wound5", img: "status/status_wound5.gif", watch_def: -15, watch_death: 0.10, properties: ['wounded'], searches: '/2' }, // Blessure à l'oeil
+    { id: "wound6", img: "status/status_wound6.gif", watch_def: -15, watch_death: 0.10, properties: ['wounded'] }, // Blessure au pied
+    { id: "healed", img: "status/status_healed.gif", watch_def: -15, watch_death: 0.05 }, // Convalescent
+    { id: "hydrated", img: "status/status_hydrated.gif", pdc: 1 }, // Hydraté
+    { id: "sober", img: "status/status_sober.gif", pdc: 1 } // Sobre
 ];
 
 const api_texts = {
@@ -853,18 +829,32 @@ const api_texts = {
 const action_types = [
     {
         id: `Recipe::ManualAnywhere`,
-        label: {en: `Citizen actions`, fr: `Actions du citoyen`, de: `Bürgeraktionen`, es: `Acciones del habitante`},
+        label: { en: `Citizen actions`, fr: `Actions du citoyen`, de: `Bürgeraktionen`, es: `Acciones del habitante` },
         ordering: 1
     },
-    {id: `Recipe::WorkshopType`, label: {en: `Workshop`, fr: `Atelier`, de: `Werkstatt`, es: `Taller`}, ordering: 0},
+    { id: `Recipe::WorkshopType`, label: { en: `Workshop`, fr: `Atelier`, de: `Werkstatt`, es: `Taller` }, ordering: 0 },
     {
         id: `Recipe::WorkshopTypeShamanSpecific`,
-        label: {en: `Workshop - Shaman`, fr: `Atelier - Chaman`, de: `Werkstatt - Schamane`, es: `Taller - Chamán`},
+        label: { en: `Workshop - Shaman`, fr: `Atelier - Chaman`, de: `Werkstatt - Schamane`, es: `Taller - Chamán` },
         ordering: 2
+    },
+    {
+        id: `Recipe::WorkshopTypeTechSpecific`,
+        label: { en: `Technicians Workbench`, fr: `Établi des Techniciens`, de: `Techniker-Werkstatte`, es: `Mesa de Trabajo de Técnicos` },
+        ordering: 3
     },
 ];
 
 const wishlist_depot = [
+    {
+        value: -1000,
+        label: {
+            en: `Do not bring back`,
+            fr: `Ne pas ramener`,
+            de: `Nicht zurückbringen`,
+            es: `No traer de vuelta`
+        }
+    },
     {
         value: -1,
         label: {
@@ -950,23 +940,23 @@ const wishlist_headers = [
         id: `diff`
     },
     {
-        label: {en: ``, fr: ``, es: ``, de: ``},
+        label: { en: ``, fr: ``, es: ``, de: `` },
         id: 'delete'
     },
 ];
 
 let fill_items_messages_pool = {
     en: [
-        {title: 'Hi', content: ':iloveu:'}
+        { title: 'Hi', content: ':iloveu:' }
     ],
     fr: [
-        {title: 'Coucou', content: ':iloveu:'}
+        { title: 'Coucou', content: ':iloveu:' }
     ],
     de: [
-        {title: 'Hallo', content: ':iloveu:'}
+        { title: 'Hallo', content: ':iloveu:' }
     ],
     es: [
-        {title: 'Hola', content: ':iloveu:'}
+        { title: 'Hola', content: ':iloveu:' }
     ]
 }
 
@@ -1000,17 +990,6 @@ let tabs_list = {
         },
         {
             ordering: 2,
-            id: `skills`,
-            label: {
-                en: `Hero Skills`,
-                fr: `Pouvoirs`,
-                de: `Heldentaten`,
-                es: `Poderes`
-            },
-            icon: repo_img_hordes_url + `/professions/hero.gif`
-        },
-        {
-            ordering: 3,
             id: `ruins`,
             label: {
                 en: `Ruins`,
@@ -1184,6 +1163,15 @@ let params_categories = [
                             es: `Grabar excavaciones exitosas`
                         },
                     },
+                    // {
+                    //     id: `update_mho_souls`,
+                    //     label: {
+                    //         en: `Record souls' positions as a chaman`,
+                    //         fr: `Enregistrer les positions des âmes en tant que chaman`,
+                    //         de: `Die Position der Seelen als Schamane aufzeichnen`,
+                    //         es: `Registrando las posiciones de las almas como chamán`
+                    //     },
+                    // },
                     {
                         id: `refresh_mho_after_update`,
                         label: {
@@ -1408,15 +1396,6 @@ let params_categories = [
                 },
             },
             {
-                id: `click_on_voted`,
-                label: {
-                    en: `Quick navigation to recommended construction site`,
-                    fr: `Navigation rapide vers le chantier recommandé`,
-                    de: `Schnelle Navigation zur empfohlenen Baustelle`,
-                    es: `Navegación rápida hacia la construcción recomendada`
-                },
-            },
-            {
                 id: `display_search_fields`,
                 label: {
                     en: `Additional filters`,
@@ -1633,28 +1612,37 @@ let params_categories = [
             {
                 id: `display_external_links`,
                 label: {
-                    en: `Shows links to external profiles`,
-                    fr: `Affiche des liens vers les profils externes`,
-                    de: `Zeigt Links zu externen Profilen an`,
-                    es: `Muestra enlaces a perfiles externos`
+                    en: `Shows links to external profiles and towns`,
+                    fr: `Affiche des liens vers les profils et villes externes`,
+                    de: `Zeigt Links zu externen Profilen und Städten an`,
+                    es: `Muestra enlaces a perfiles y ciudades externos`
                 },
             },
-            // {
-            //     id: `store_notifications`,
-            //     label: {
-            //         en: `Stores notifications until cleared`,
-            //         fr: `Stocke les notifications jusqu'à effacement`,
-            //         de: `Speichert Benachrichtigungen, bis sie gelöscht werden`,
-            //         es: `Almacena notificaciones hasta que se borran`
-            //     },
-            // },
+            {
+                id: `store_notifications`,
+                label: {
+                    en: `Stores notifications until cleared or page refreshed`,
+                    fr: `Stocke les notifications jusqu'à effacement ou rafraichissement de la page`,
+                    de: `Speichert Benachrichtigungen, bis sie gelöscht oder die Seite aktualisiert wird`,
+                    es: `Almacena notificaciones hasta que se borran o se actualiza la página`
+                },
+            },
+            {
+                id: `display_counter_on_input_registry`,
+                label: {
+                    en: `Displays a character counter on the chatcase.`,
+                    fr: `Affiche un compteur de caractères sur le chatcase`,
+                    de: `Zeigt einen Zeichenzähler im Chatcase an`,
+                    es: `Muestra un contador de caracteres en el caso de chat`
+                },
+            },
             {
                 id: `display_my_expeditions`,
                 label: {
                     en: `Shows details of expeditions I am registered for`,
                     fr: `Affiche les détails des expéditions auxquelles je suis inscrit`,
                     de: `Zeigt Details zu Expeditionen an, für die ich registriert bin`,
-                    es: `Muestra detalles de las expediciones para las que estoy registrado.`
+                    es: `Muestra detalles de las expediciones para las que estoy registrado`
                 },
             },
             {
@@ -1813,91 +1801,45 @@ let informations = [
     }
 ];
 
-const table_hero_skills_headers = [
-    {id: 'name', label: {en: `Name`, fr: `Nom`, de: `Name`, es: `Nombre`}, type: 'th'},
-    {
-        id: 'nombreJourHero',
-        label: {en: `Hero days`, fr: `Jours héros`, de: `Heldentage`, es: `Días de héroe`},
-        type: 'td'
-    },
-    {
-        id: 'lastSkill',
-        label: {
-            en: `Last power earned`,
-            fr: `Dernier pouvoir gagné`,
-            de: `Letzte Kraft gewonnen`,
-            es: `Último poder obtenido`
-        },
-        type: 'td'
-    },
-    {
-        id: 'uppercut',
-        label: {en: `Vicious uppercut`, fr: `Uppercut Sauvage`, de: `Wildstyle Uppercut`, es: `Puñetazo salvaje`},
-        type: 'td',
-        img: ''
-    },
-    {id: 'rescue', label: {en: `Rescue`, fr: `Sauvetage`, de: `Rettung`, es: `Rescate`}, type: 'td', img: ''}
-];
-
-const table_skills_headers = [
-    {id: 'icon', label: {en: ``, fr: ``, de: ``, es: ``}, type: 'th'},
-    {id: 'label', label: {en: `Skill`, fr: `Capacité`, de: `Fähigkeit`, es: `Poder`}, type: 'th'},
-    {
-        id: 'daysNeeded',
-        label: {
-            en: `Hero days needed`,
-            fr: `Jours héros nécessaires`,
-            de: `Benötigte Heldentage`,
-            es: `Días de héroe necesarios`
-        },
-        type: 'td'
-    },
-    {
-        id: 'description',
-        label: {en: `Description`, fr: `Description`, de: `Beschreibung`, es: `Descripción`},
-        type: 'td'
-    }
-];
-
 const table_ruins_headers = [
-    {id: 'img', label: {en: ``, fr: ``, de: ``, es: ``}, type: 'th'},
-    {id: 'label', label: {en: `Name`, fr: 'Nom', de: `Name`, es: `Nombre`}, type: 'th'},
+    { id: 'img', label: { en: ``, fr: ``, de: ``, es: `` }, type: 'th' },
+    { id: 'label', label: { en: `Name`, fr: 'Nom', de: `Name`, es: `Nombre` }, type: 'th' },
     {
         id: 'description',
-        label: {en: `Description`, fr: `Description`, de: `Beschreibung`, es: `Descripción`},
+        label: { en: `Description`, fr: `Description`, de: `Beschreibung`, es: `Descripción` },
         type: 'td'
     },
     {
         id: 'minDist',
-        label: {en: `Minimum distance`, fr: `Distance minimum`, de: `Mindestabstand`, es: `Distancia mínima`},
+        label: { en: `Minimum distance`, fr: `Distance minimum`, de: `Mindestabstand`, es: `Distancia mínima` },
         type: 'td'
     },
     {
         id: 'maxDist',
-        label: {en: `Maximum distance`, fr: `Distance maximum`, de: `Maximale Entfernung`, es: `Distancia máxima`},
+        label: { en: `Maximum distance`, fr: `Distance maximum`, de: `Maximale Entfernung`, es: `Distancia máxima` },
         type: 'td'
     },
     {
         id: 'camping',
-        label: {en: `Camping bonus`, fr: `Bonus en camping`, de: `Campingbonus`, es: `Bono de acampada`},
+        label: { en: `Camping bonus`, fr: `Bonus en camping`, de: `Campingbonus`, es: `Bono de acampada` },
         type: 'td'
     },
     {
         id: 'capacity',
-        label: {en: `Capacity`, fr: `Capacité`, de: `Kapazität`, es: `Capacidad`},
+        label: { en: `Capacity`, fr: `Capacité`, de: `Kapazität`, es: `Capacidad` },
         type: 'td'
     },
-    {id: 'drops', label: {en: `Items`, fr: 'Objets', de: `Gegenstände`, es: `Objetos`}, type: 'td'},
+    { id: 'drops', label: { en: `Items`, fr: 'Objets', de: `Gegenstände`, es: `Objetos` }, type: 'td' },
 ];
 
 const added_ruins = [
-    {id: '-1000', camping: 0, label: {en: `None`, fr: `Aucun`, de: `Kein`, es: `Ninguna`}}
+    { id: '-1000', camping: 0, label: { en: `None`, fr: `Aucun`, de: `Kein`, es: `Ninguna` } }
 ];
 
 const town_type = [
-    {id: 'rne', label: {de: 'Kleine Stadt', en: 'Small Town', es: 'Amateur', fr: 'Petite carte'}},
-    {id: 're', label: {de: 'Entfernte Regionen', en: 'Distant Region', es: 'Leyenda', fr: 'Région éloignée'}},
-    {id: 'pande', label: {de: 'Pandämonium', en: 'Pandemonium', es: 'Pandemonio', fr: 'Pandémonium'}}
+    { id: 'rne', label: { de: 'Kleine Stadt', en: 'Small Town', es: 'Amateur', fr: 'Petite carte' } },
+    { id: 're', label: { de: 'Entfernte Regionen', en: 'Distant Region', es: 'Leyenda', fr: 'Région éloignée' } },
+    { id: 'pande', label: { de: 'Pandämonium', en: 'Pandemonium', es: 'Pandemonio', fr: 'Pandémonium' } }
 ];
 
 /////////////////////////////////////////
@@ -1938,6 +1880,11 @@ function pageIsMsgReceived() {
 /** @return {boolean}    true si la page de l'utilisateur est la page des améliorations de sa maison */
 function pageIsAmelio() {
     return document.URL.indexOf('town/house/build') > -1;
+}
+
+/** @return {boolean}    true si la page de l'utilisateur est la page de la porte */
+function pageIsDoors() {
+    return document.URL.endsWith('town/door');
 }
 
 /** @return {boolean}    true si la page de l'utilisateur est la page de la tour de guet */
@@ -1985,16 +1932,28 @@ function pageIsSoul() {
     return document.URL.indexOf('soul') > -1;
 }
 
+/** @return {boolean}    true si la page est un historique de ville */
+function pageIsTownHistory() {
+    return document.URL.indexOf('town') > -1 && (document.URL.indexOf('me') > -1 || document.URL.indexOf('soul') > -1);
+}
+
+
 /** @return {boolean}    on doit refresh le user actuel si le jour de la ville est différent du jour précédent */
 function shouldRefreshMe() {
-    let current_town_name = document.querySelector('.town-name');
-    if (!current_town_name) return false;
-    return +current_town_name.nextElementSibling.innerText.replace(/(\D)*/, '') !== +mh_user.townDetails?.day;
+    // si on change de ville on force le refresh
+    const current_town_id_name = document.querySelector('.town-name[data-town-id]');
+    if (!current_town_id_name) return false;
+
+    const current_town_id = current_town_id_name?.getAttribute('data-town-id');
+    if (+current_town_id !== +mh_user.townDetails?.townId) return true;
+
+    // si on change de jour, on force le refresh
+    return +current_town_id_name.nextElementSibling.innerText.replace(/(\D)*/, '') !== +mh_user.townDetails?.day;
 }
 
 function getI18N(item) {
     if (!item) return;
-    return item[lang] !== 'TODO' ? item[lang] : (item['en'] === 'TODO' ? item['fr'] : item['en']);
+    return item[lang] !== 'TODO' ? item[lang] : (item.en === 'TODO' ? item.fr : item.en);
 }
 
 function getCurrentPosition() {
@@ -2063,7 +2022,7 @@ function addError(error) {
         });
         setTimeout(() => {
             is_error = false;
-        }, 1000)
+        }, 5000)
         setTimeout(() => {
             notification.remove();
         }, 10000);
@@ -2338,30 +2297,24 @@ function getHoveredItem() {
     }
 
 
-//     for (let item of hovered) {
-//         let hovered_item_img;
-//         if (item.classList.contains('item-icon')) {
-//             hovered_item_img = item.firstElementChild;
-//             hovered_item_li = item.parentElement;
-//         } else if (item.tagName.toLowerCase() === 'SPAN'.toLowerCase() && item.previousElementSibling && item.previousElementSibling.classList.contains('item-icon')) {
-//             hovered_item_img = item.previousElementSibling?.firstElementChild;
-//             hovered_item_li = item.parentElement;
-//         } else if (item.tagName.toLowerCase() === 'LI'.toLowerCase()) {
-//             hovered_item_img = item.firstElementChild?.firstElementChild;
-//             hovered_item_li = item;
-//         }
-//         if (hovered_item_img && hovered_item_img.src) {
-//             hovered_item = getItemFromImg(hovered_item_img.src);
-//             broken = hovered_item_img.parentElement.parentElement.classList.contains('broken');
-//         }
-//     }
-    return {
-        item: hovered_item,
-        broken: broken,
-        li: hovered_item_li,
-        status: hovered_status,
-        alt: hovered_item_img?.alt
-    };
+    //     for (let item of hovered) {
+    //         let hovered_item_img;
+    //         if (item.classList.contains('item-icon')) {
+    //             hovered_item_img = item.firstElementChild;
+    //             hovered_item_li = item.parentElement;
+    //         } else if (item.tagName.toLowerCase() === 'SPAN'.toLowerCase() && item.previousElementSibling && item.previousElementSibling.classList.contains('item-icon')) {
+    //             hovered_item_img = item.previousElementSibling?.firstElementChild;
+    //             hovered_item_li = item.parentElement;
+    //         } else if (item.tagName.toLowerCase() === 'LI'.toLowerCase()) {
+    //             hovered_item_img = item.firstElementChild?.firstElementChild;
+    //             hovered_item_li = item;
+    //         }
+    //         if (hovered_item_img && hovered_item_img.src) {
+    //             hovered_item = getItemFromImg(hovered_item_img.src);
+    //             broken = hovered_item_img.parentElement.parentElement.classList.contains('broken');
+    //         }
+    //     }
+    return { item: hovered_item, broken: broken, li: hovered_item_li, status: hovered_status, alt: hovered_item_img?.alt };
 }
 
 function getClickedItem(target) {
@@ -2369,7 +2322,7 @@ function getClickedItem(target) {
     if (item_icon) {
         let hovered_item = getItemFromImg(item_icon.querySelector('img').src);
         let broken = item_icon.parentElement.classList.contains('broken');
-        return {item: hovered_item, broken: broken};
+        return { item: hovered_item, broken: broken };
     }
 }
 
@@ -2390,8 +2343,6 @@ function getStatusFromImg(img_src) {
 }
 
 function initOptionsWithLoginNeeded() {
-
-
     displayWishlistInApp();
     displayPriorityOnItems();
     createUpdateExternalToolsButton();
@@ -2404,21 +2355,16 @@ function initOptionsWithLoginNeeded() {
 
 
 function initOptionsWithoutLoginNeeded() {
-    /** Gère le bouton de mise à jour des outils externes) */
-    if (!buttonOptimizerElement()) {
-        setTimeout(() => {
-            createOptimizerBtn();
-        }, 100)
-        createWikiToolsWindow();
-    }
+    createWikiToolsWindow();
     preventFromLeaving();
     alertIfInactiveAndNoEscort();
-    clickOnVotedToRedirect();
     displaySearchFields();
     displayMinApOnBuildings();
     setTimeout(() => {
         displayNbDeadZombies();
     }, 250)
+
+    displayAdvancedTooltips();
     displayTranslateTool();
     displayCampingPredict();
     displayAntiAbuseCounter();
@@ -2429,13 +2375,14 @@ function initOptionsWithoutLoginNeeded() {
     addExternalLinksToProfiles();
     createDisplayMapButton();
     fillItemsMessages();
-    // createStoreNotificationsBtn();
-    // addExternalLinksToTowns();
+    displayCountCharacters();
+    createStoreNotificationsBtn();
+    addExternalLinksToTowns();
     // blockUsersPosts();
 }
 
 function updateFetchRequestOptions(options) {
-    const update = {...options};
+    const update = { ...options };
     update.headers = {
         ...update.headers,
         'Mho-Origin': 'script',
@@ -2454,7 +2401,7 @@ function updateFetchRequestOptions(options) {
 }
 
 function updateFetchRequestOptionsWithoutBearer(options) {
-    const update = {...options};
+    const update = { ...options };
     update.headers = {
         ...update.headers,
         'Mho-Origin': 'script',
@@ -2531,91 +2478,103 @@ function createSelectWithSearch() {
 
 /** Create Optimize button */
 function createOptimizerBtn() {
-    let optimizer_btn = buttonOptimizerElement();
-    if (!optimizer_btn) {
-        let content_zone = document.getElementById(mh_content_id);
-        let header_zone = document.getElementById(mh_header_id);
-        let last_header_child = header_zone?.lastChild;
-        let mhe_button = document.querySelector('#mhe_button')
-        let left_position = last_header_child ? last_header_child.offsetLeft + last_header_child.offsetWidth + 5 : (mhe_button ? mhe_button.offsetLeft + mhe_button.offsetWidth + 5 : document.querySelector('#apps')?.getBoundingClientRect().width + 16);
+    const apps_exists_callback = function (appsExistsMutationsList, observer) {
+        for (const appsExistsMutation of appsExistsMutationsList) {
+            let apps_block = Array.from(appsExistsMutation.addedNodes ?? []).find((node) => node.id === 'apps');
+            if (appsExistsMutation.type === 'childList' && apps_block) {
 
-        let img = document.createElement('img');
-        let annuary = document.querySelector('#apps img');
-        img.src = mh_optimizer_icon;
-        img.setAttribute('height', annuary && annuary.height ? annuary.height + 'px' : '16px');
-        img.setAttribute('width', annuary && annuary.width ? annuary.width + 'px' : '16px');
-        img.style.margin = '1px 0 2px';
+                let optimizer_btn = buttonOptimizerElement();
+                if (!optimizer_btn) {
+                    let content_zone = document.getElementById(mh_content_id);
+                    let img = document.createElement('img');
+                    let annuary = apps_block.querySelector('img');
+                    img.src = mh_optimizer_icon;
+                    img.setAttribute('height', annuary && annuary.height ? annuary.height + 'px' : '16px');
+                    img.setAttribute('width', annuary && annuary.width ? annuary.width + 'px' : '16px');
+                    img.style.margin = '1px 0 2px';
 
-        let title_hidden = document.createElement('span');
-        title_hidden.classList.add('label_text');
-        title_hidden.innerText = getScriptInfo().name;
+                    let title_hidden = document.createElement('span');
+                    title_hidden.classList.add('label_text');
+                    title_hidden.innerText = getScriptInfo().name;
 
-        let title = document.createElement('h1');
+                    let title = document.createElement('h1');
 
-        let title_first_part = document.createElement('div');
-        title_first_part.style.display = 'flex';
-        title_first_part.style.alignItems = 'center';
-        title.appendChild(title_first_part);
+                    let title_first_part = document.createElement('div');
+                    title_first_part.style.display = 'flex';
+                    title_first_part.style.alignItems = 'center';
+                    title.appendChild(title_first_part);
 
-        let title_second_part = document.createElement('div');
-        title_second_part.style.display = 'flex';
-        title_second_part.style.alignItems = 'center';
-        title_second_part.style.gap = '0.5em';
-        title.appendChild(title_second_part);
+                    let title_second_part = document.createElement('div');
+                    title_second_part.style.display = 'flex';
+                    title_second_part.style.alignItems = 'center';
+                    title_second_part.style.gap = '0.5em';
+                    title.appendChild(title_second_part);
 
-        let website_link = document.createElement('a');
-        website_link.innerHTML = `<img src="${repo_img_hordes_url}icons/small_world.gif" style="vertical-align: top; margin-right: 0.25em;">${getI18N(texts.website)}`;
-        website_link.href = website;
-        website_link.target = '_blank';
-        website_link.style.cursor = 'pointer';
+                    let website_link = document.createElement('a');
+                    website_link.innerHTML = `<img src="${repo_img_hordes_url}icons/small_world.gif" style="vertical-align: top; margin-right: 0.25em;">${getI18N(texts.website)}`;
+                    website_link.href = website;
+                    website_link.target = '_blank';
+                    website_link.style.cursor = 'pointer';
 
-        title_second_part.appendChild(website_link);
+                    title_second_part.appendChild(website_link);
 
-        title_first_part.appendChild(img);
-        title_first_part.appendChild(title_hidden);
+                    title_first_part.appendChild(img);
+                    title_first_part.appendChild(title_hidden);
 
-        optimizer_btn = document.createElement('div');
-        optimizer_btn.appendChild(title);
-        optimizer_btn.id = btn_id;
-        optimizer_btn.setAttribute('style', 'left: ' + left_position + 'px');
-        optimizer_btn.addEventListener('click', (event) => {
-            event.stopPropagation();
-        });
+                    let mhe_button = document.querySelector('#mhe_button');
+                    let left_position = mhe_button ? (mhe_button.offsetLeft + mhe_button.offsetWidth + 5) : apps_block?.getBoundingClientRect().width + (annuary && annuary.height ? annuary.height : 34);
 
-        if (isTouchScreen()) {
-            let close_link = document.createElement('img');
-            close_link.src = `${repo_img_hordes_url}icons/b_close.png`;
-            close_link.classList.add('close');
-            title_second_part.appendChild(close_link);
+                    optimizer_btn = document.createElement('div');
+                    optimizer_btn.id = btn_id;
+                    optimizer_btn.setAttribute('style', 'left: ' + left_position + 'px');
+                    optimizer_btn.appendChild(title);
+                    optimizer_btn.addEventListener('click', (event) => {
+                        event.stopPropagation();
+                    });
 
-            close_link.addEventListener('click', () => {
-                optimizer_btn.classList.remove('mho-btn-opened');
-            });
+                    if (isTouchScreen()) {
+                        let close_link = document.createElement('img');
+                        close_link.src = `${repo_img_hordes_url}icons/b_close.png`;
+                        close_link.classList.add('close');
+                        title_second_part.appendChild(close_link);
 
-            optimizer_btn.addEventListener('mouseover', () => {
-                optimizer_btn.classList.add('mho-btn-opened');
-            });
+                        close_link.addEventListener('click', () => {
+                            optimizer_btn.classList.remove('mho-btn-opened');
+                        });
 
-            optimizer_btn.addEventListener('mouseout', () => {
-                optimizer_btn.classList.remove('mho-btn-opened');
-            });
-        } else {
-            optimizer_btn.addEventListener('mouseenter', () => {
-                optimizer_btn.classList.add('mho-btn-opened');
-            });
+                        optimizer_btn.addEventListener('mouseover', () => {
+                            optimizer_btn.classList.add('mho-btn-opened');
+                        });
 
-            optimizer_btn.addEventListener('mouseleave', () => {
-                optimizer_btn.classList.remove('mho-btn-opened');
-            });
+                        optimizer_btn.addEventListener('mouseout', () => {
+                            optimizer_btn.classList.remove('mho-btn-opened');
+                        });
+                    } else {
+                        optimizer_btn.addEventListener('mouseenter', () => {
+                            optimizer_btn.classList.add('mho-btn-opened');
+                        });
+
+                        optimizer_btn.addEventListener('mouseleave', () => {
+                            optimizer_btn.classList.remove('mho-btn-opened');
+                        });
+                    }
+                    content_zone.appendChild(optimizer_btn);
+
+                    let mho_content_zone = document.createElement('div');
+                    mho_content_zone.id = content_btn_id;
+                    content_zone.appendChild(mho_content_zone);
+
+                    createOptimizerButtonContent();
+                }
+            }
         }
-        content_zone.appendChild(optimizer_btn);
+    };
 
-        let mho_content_zone = document.createElement('div');
-        mho_content_zone.id = content_btn_id;
-        content_zone.appendChild(mho_content_zone);
+    const apps_exists_observer = new MutationObserver(apps_exists_callback);
 
-        createOptimizerButtonContent();
-    }
+    const mh_content = document.querySelector('#content'); // ou un autre élément parent approprié
+    const apps_exists_config = { childList: true, subtree: false, attributes: false };
+    apps_exists_observer.observe(mh_content, apps_exists_config);
 }
 
 /** Crée le contenu du bouton de l'optimizer (bouton de wiki, bouton de configuration, etc) */
@@ -2940,34 +2899,39 @@ function createParams(content) {
 }
 
 function createMhoHeaderSpace() {
-    let interval = setInterval(() => {
-        let header_space = document.querySelector(`#${mho_header_space_id}`);
-        if (!header_space) {
-            let postbox = document.getElementById('postbox');
-            if (postbox && postbox.clientWidth && postbox.clientWidth > 0) {
-                let header_space = document.querySelector(`#${mho_header_space_id}`);
-                let mh_header = document.querySelector('#header');
+    let mh_header = document.querySelector('#header');
+    if (!mh_header) return;
 
-                header_space = document.createElement('div');
-                header_space.id = mho_header_space_id;
+    let postbox = document.querySelector('#postbox');
+    if (!postbox) return;
 
-                header_space.style.position = 'absolute';
-                header_space.style.right = `calc(${postbox.clientWidth}px + 10px + 0.5em)`;
-                header_space.style.top = postbox.getBoundingClientRect().y + 'px';
-                header_space.style.display = 'flex';
-                header_space.style.gap = '0.5em';
-                header_space.style.alignItems = 'flex-start';
-                header_space.style.zIndex = '996';
+    let header_space = document.querySelector(`#${mho_header_space_id}`);
+    if (!header_space) {
 
-                mh_header.appendChild(header_space);
-            } else {
-                clearInterval(interval);
-                createMhoHeaderSpace();
-            }
-        } else {
-            clearInterval(interval);
+        header_space = document.createElement('div');
+        header_space.id = mho_header_space_id;
+        mh_header.appendChild(header_space);
+
+        header_space.style.position = 'absolute';
+        header_space.style.display = 'none';
+        header_space.style.gap = '0.5em';
+        header_space.style.alignItems = 'flex-start';
+        header_space.style.zIndex = '996';
+    }
+
+    const callback = function (mutationsList, observer) {
+        if (postbox.clientWidth && postbox.clientWidth > 0) {
+            header_space.style.display = 'flex';
+            header_space.style.right = `calc(${postbox.clientWidth}px + 10px + 0.5em)`;
+            header_space.style.top = postbox.getBoundingClientRect().y + 'px';
+            observer.disconnect();
         }
-    }, 100);
+    };
+
+    const observer = new MutationObserver(callback);
+    const config = { attributes: true, subtree: false, childList: false };
+
+    observer.observe(postbox, config);
 }
 
 function createWindow(id, full_size) {
@@ -3138,7 +3102,7 @@ function createMapWindow() {
     let window_overlay_li = document.createElement('li');
     window_overlay_li.appendChild(window_overlay_img);
     let window_overlay_ul = document.createElement('ul');
-    window_overlay_ul.style.margin = '8px -6px 0 0';
+    window_overlay_ul.style.margin = '-2px -2px 0 0';
     window_overlay_ul.appendChild(window_overlay_li);
 
     let window_overlay = document.createElement('div');
@@ -3244,20 +3208,11 @@ function dispatchWikiToolsContent(window_type, tab) {
         case 'recipes':
             displayRecipes();
             break;
-        case 'skills':
-            displaySkills();
-            break;
         case 'ruins':
             displayRuins();
             break;
-        case 'citizens':
-            displayCitizens();
-            break;
         case 'bank':
             displayBank(tab.id);
-            break;
-        case 'wishlist':
-            displayWishlist();
             break;
         case 'camping':
             displayCamping();
@@ -3284,22 +3239,6 @@ function displayBank(tab_id) {
     });
 }
 
-/** Affiche les éléments présents dans la liste de courses */
-function displayWishlist() {
-    let tab_content = document.getElementById(mh_optimizer_window_id + '-tab-content');
-
-    let explanation = document.createElement('div');
-    explanation.innerText = getI18N(texts.wishlist_moved);
-    tab_content.appendChild(explanation);
-
-    let go_to_website = document.createElement('a');
-    go_to_website.classList.add('button');
-    go_to_website.target = '_blank';
-    go_to_website.href = `${website}my-town/wishlist`;
-    go_to_website.innerHTML = `<img src="${repo_img_hordes_url}icons/small_world.gif" style="vertical-align: top; margin-right: 0.25em;">${getI18N(texts.go_to_website)}`;
-    tab_content.appendChild(go_to_website);
-}
-
 /**
  * Affiche la liste des objets
  * @param filtered_items
@@ -3313,7 +3252,7 @@ function displayItems(filtered_items, tab_id) {
 
     tab_content.appendChild(item_list);
 
-    filtered_items.forEach((item, index) => {
+    filtered_items?.forEach((item, index) => {
         if (index === 0 || filtered_items[index - 1].category.idCategory !== item.category.idCategory) {
             let category_text = document.createElement('span');
             category_text.innerText = item.category.label[lang];
@@ -3392,93 +3331,6 @@ function displayItems(filtered_items, tab_id) {
         });
 
         item_list.appendChild(item_container);
-    });
-}
-
-/** Affiche la liste des citoyens */
-function displayCitizens() {
-    citizens = undefined;
-    getCitizens().then(() => {
-        let tab_content = document.getElementById(mh_optimizer_window_id + '-tab-content');
-        if (citizens && hero_skills) {
-            console.log('heroskills', hero_skills);
-
-            let header_cells = [...table_hero_skills_headers];
-
-            let skills_with_uses = hero_skills
-                .filter((skill) => skill.nbUses > 0)
-                .map((skill) => {
-                    return {id: skill.name, label: skill.label, type: 'td', img: skill.icon}
-                });
-            console.log('skills_with_uses', skills_with_uses);
-            header_cells.push(...skills_with_uses);
-
-            let header_row = document.createElement('tr');
-            header_row.classList.add('mho-header');
-
-            header_cells.forEach((header_cell) => {
-                let cell = document.createElement('th');
-                if (cell.img) {
-                    cell.innerHTML = '<img src="' + repo_img_hordes_url + header_cell.img + '.gif"></img>'
-                } else {
-                    cell.innerText = getI18N(header_cell.label);
-                }
-                header_row.appendChild(cell);
-            });
-
-            let table = document.createElement('table');
-            table.classList.add('mho-table');
-            table.appendChild(header_row);
-
-            tab_content.appendChild(table);
-            for (let citizen_key in citizens.citizens) {
-                let citizen = citizens.citizens[citizen_key];
-                let citizen_row = document.createElement('tr');
-                let is_me = citizen.id === mh_user.id;
-                if (is_me) {
-                    citizen_row.setAttribute('style', 'background-color: rgba(255, 255, 255, 0.1)');
-                }
-                table.appendChild(citizen_row);
-
-                header_cells.forEach((header_cell) => {
-                    let cell = document.createElement(header_cell.type);
-                    if (is_me) {
-                        switch (header_cell.id) {
-                            case 'name':
-                                cell.innerText = citizen[header_cell.id];
-                                break;
-                            case 'nombreJourHero':
-                                var input = document.createElement('input');
-                                input.classList.add('mho-input');
-                                input.type = 'number';
-                                input.value = citizen[header_cell.id]
-                                cell.appendChild(input);
-                                break;
-                            case 'lastSkill':
-                                cell.innerText = getI18N(hero_skills.find((skill) => skill.daysNeeded >= citizen.nombreJourHero).label);
-                                break;
-                            default:
-                                console.log(header_cell);
-                                break;
-                        }
-                    } else {
-                        switch (header_cell.id) {
-                            case 'name':
-                            case 'nombreJourHero':
-                                cell.innerText = citizen[header_cell.id];
-                                break;
-                            case 'lastSkill':
-                                cell.innerText = getI18N(hero_skills.find((skill) => skill.daysNeeded >= citizen.nombreJourHero).label);
-                                break;
-                            default:
-                                cell.innerText = '';
-                                break;
-                        }
-                    }
-                    citizen_row.appendChild(cell);
-                });
-            }
-        }
     });
 }
 
@@ -3910,7 +3762,7 @@ function displayCamping() {
         devastated.type = 'checkbox';
         devastated.id = 'devastated';
         devastated.checked = conf.devastated;
-        devastaded.classList.add('mho-input');
+        devastated.classList.add('mho-input');
         devastated.addEventListener('change', ($event) => {
             conf.devastated = $event.srcElement.checked;
             calculateCamping(conf);
@@ -3940,54 +3792,6 @@ function displayCamping() {
 
 
         calculateCamping(conf);
-    });
-}
-
-/** Affiche la liste des pouvoirs */
-function displaySkills() {
-    getHeroSkills().then((hero_skills) => {
-        let tab_content = document.getElementById(mh_optimizer_window_id + '-tab-content');
-
-        let header_cells = [...table_skills_headers];
-
-        let header_row = document.createElement('tr');
-        header_row.classList.add('mho-header');
-        header_cells.forEach((header_cell) => {
-            let cell = document.createElement('th');
-            cell.innerText = getI18N(header_cell.label);
-            header_row.appendChild(cell);
-        })
-
-        let table = document.createElement('table');
-        table.classList.add('mho-table');
-        table.appendChild(header_row);
-        tab_content.appendChild(table);
-        for (let skill_key in hero_skills) {
-            let skill = hero_skills[skill_key];
-            let skill_row = document.createElement('tr');
-            table.appendChild(skill_row);
-
-            header_cells.forEach((header_cell) => {
-                let cell = document.createElement(header_cell.type);
-                let img = document.createElement('img');
-                switch (header_cell.id) {
-                    case 'icon':
-                        img.src = repo_img_hordes_url + 'heroskill/' + skill[header_cell.id] + '.gif';
-                        cell.appendChild(img);
-                        break;
-                    case 'label':
-                    case 'description':
-                        cell.setAttribute('style', 'text-align: left');
-                        cell.innerText = getI18N(skill[header_cell.id]);
-                        break;
-                    default:
-                        cell.setAttribute('style', 'text-align: center');
-                        cell.innerText = skill[header_cell.id];
-                        break;
-                }
-                skill_row.appendChild(cell);
-            })
-        }
     });
 }
 
@@ -4116,6 +3920,29 @@ function displayRecipes() {
 function getRecipeElement(recipe) {
     let recipe_container = document.createElement('li');
 
+    let recipe_type_container = document.createElement('div');
+    recipe_container.appendChild(recipe_type_container);
+
+    let recipe_type_img = document.createElement('img');
+    recipe_type_img.title = getI18N(recipe.type.label);
+    recipe_type_img.setAttribute('style', 'margin-left: 0.5em; margin-right: 0.5em');
+    switch (recipe.type.id) {
+        case 'Recipe::ManualAnywhere':
+            recipe_type_img.src = repo_img_hordes_url + 'log/citizen.gif';
+            break;
+        case 'Recipe::WorkshopTypeTechSpecific':
+            recipe_type_img.src = repo_img_hordes_url + 'building/small_techtable.gif';
+            break;
+        case 'Recipe::WorkshopType':
+        case 'Recipe::WorkshopTypeShamanSpecific':
+            recipe_type_img.src = repo_img_hordes_url + 'log/workshop.gif';
+            break;
+        default:
+            recipe_type_img.src = repo_img_hordes_url + 'icons/small_move.gif';
+            break;
+    }
+    recipe_type_container.appendChild(recipe_type_img);
+
     let compos_container = document.createElement('ul');
     compos_container.setAttribute('style', 'padding: 0; min-width: 200px; width: 25%;');
     recipe.components.forEach((compo) => {
@@ -4137,7 +3964,6 @@ function getRecipeElement(recipe) {
 
     let transform_img_container = document.createElement('div');
     recipe_container.appendChild(transform_img_container);
-
 
     let transform_img = document.createElement('img');
     transform_img.alt = '=>';
@@ -4222,19 +4048,20 @@ function createUpdateExternalToolsButton(count = 0) {
     let compact_actions_zone = document.querySelector('.actions-box .mdg');
 
     let update_external_tools_btn = document.getElementById(mh_update_external_tools_id);
-    const external_display_zone = zone_marker ? (window.innerWidth < 480 && mho_parameters.show_compact && compact_actions_zone ? document.querySelector('.actions-box .mdg') : zone_marker) : undefined;
-    const chest = document.querySelector('.inventory.chest');
+    const external_display_zone = zone_marker ? (window.innerWidth < 480 && mho_parameters.show_compact && compact_actions_zone ? document.querySelector('hordes-inventory') : zone_marker) : undefined;
+    const chest = document.querySelector('hordes-inventory');
     const amelios = document.querySelector('#upgrade_home_level')?.parentElement?.parentElement;
+    const map_actions = document.querySelector('#door_opener')?.parentElement ?? document.querySelector('#door_exit')?.parentElement;
 
     if (nb_tools_to_update <= 0 || !external_app_id) {
         if (update_external_tools_btn) {
             update_external_tools_btn.parentElement.remove();
         }
     } else {
-        if (external_display_zone || (chest && pageIsHouse()) || (amelios && pageIsAmelio())) {
+        if (external_display_zone || (chest && pageIsHouse()) || (amelios && pageIsAmelio()) || (map_actions && pageIsDoors() && mho_parameters.update_mho && mho_parameters.update_mho_souls)) {
             if (!update_external_tools_btn) {
                 if (window.innerWidth < 480 && mho_parameters.show_compact && compact_actions_zone) {
-                    let el = external_display_zone || chest?.parentElement || amelios;
+                    let el = external_display_zone ?? chest?.parentElement ?? amelios ?? map_actions;
                     let updater_bloc = createSmallUpdateExternalToolsButton(update_external_tools_btn);
                     if (amelios) {
                         el.parentElement.insertBefore(updater_bloc, el.nextElementSibling);
@@ -4242,7 +4069,7 @@ function createUpdateExternalToolsButton(count = 0) {
                         el.appendChild(updater_bloc);
                     }
                 } else {
-                    let el = external_display_zone?.parentElement.parentElement.parentElement || chest?.parentElement || amelios;
+                    let el = external_display_zone?.parentElement.parentElement.parentElement ?? chest?.parentElement ?? amelios ?? map_actions;
                     let updater_bloc = createLargeUpdateExternalToolsButton(update_external_tools_btn);
                     if (amelios) {
                         el.parentElement.insertBefore(updater_bloc, el.nextElementSibling);
@@ -4251,7 +4078,6 @@ function createUpdateExternalToolsButton(count = 0) {
                     }
                 }
             } else if (count < 3) {
-                let update_external_tools_btn2 = document.getElementById(mh_update_external_tools_id);
                 setTimeout(() => {
                     createUpdateExternalToolsButton(count + 1);
                 }, 250)
@@ -4329,13 +4155,13 @@ function createLargeUpdateExternalToolsButton(update_external_tools_btn) {
 
                 let tools_fail = [];
                 let response_items = Object.keys(response).map((key) => {
-                    return {key: key, value: response[key]}
+                    return { key: key, value: response[key] }
                 });
 
                 response_items.forEach((response_item, index) => {
 
                     let final = Object.keys(response_item.value).map((key) => {
-                        return {key: key, value: response_item.value[key]}
+                        return { key: key, value: response_item.value[key] }
                     });
                     tools_fail = [...tools_fail, ...final.filter((final_item) => !final_item.value || (final_item.value.toLowerCase() !== 'ok' && final_item.value.toLowerCase() !== 'not activated'))];
                     if (index >= response_items.length - 1) {
@@ -4411,11 +4237,11 @@ function createSmallUpdateExternalToolsButton(update_external_tools_btn) {
 
                 let tools_fail = [];
                 let response_items = Object.keys(response).map((key) => {
-                    return {key: key, value: response[key]}
+                    return { key: key, value: response[key] }
                 });
                 response_items.forEach((response_item, index) => {
                     let final = Object.keys(response_item.value).map((key) => {
-                        return {key: key, value: response_item.value[key]}
+                        return { key: key, value: response_item.value[key] }
                     });
                     tools_fail = [...tools_fail, ...final.filter((final_item) => !final_item.value || (final_item.value.toLowerCase() !== 'ok' && final_item.value.toLowerCase() !== 'not activated'))];
                     if (index >= response_items.length - 1) {
@@ -4440,21 +4266,6 @@ function createSmallUpdateExternalToolsButton(update_external_tools_btn) {
     return update_external_tools_btn;
 }
 
-/** Si l'option associée est activée, un clic sur le chantier recommandé permet de rediriger vers la ligne du chantier en question */
-function clickOnVotedToRedirect() {
-    if (mho_parameters.click_on_voted && pageIsConstructions()) {
-        let voted_building = document.getElementsByClassName('voted-building')[0];
-        if (voted_building) {
-            voted_building.setAttribute('style', 'cursor: pointer');
-            voted_building.addEventListener('click', () => {
-                let voted_row = document.getElementsByClassName('voted')[0];
-                voted_row.setAttribute('style', 'scroll-margin: 100px');
-                voted_row.scrollIntoView();
-            });
-        }
-    }
-}
-
 function displaySearchFields() {
     if (mho_parameters.display_search_fields) {
         displaySearchFieldOnBuildings();
@@ -4465,15 +4276,15 @@ function displaySearchFields() {
     }
 }
 
-/** Si l'option associée est activée, affiche un champ de recherche sur la page de chantiers */
+/** Si l'option associée est activée, masque les chantiers complétés sur la page de chantiers */
 function hideCompletedBuildings() {
-    if (mho_parameters.hide_completed_buildings_field && pageIsConstructions()) {
-        let buildings = Array.from(document.querySelectorAll('.buildings') || []);
 
+    let hideBuildings = (buildings) => {
         let building_rows = [];
         buildings.forEach((building) => {
             building_rows.push(...Array.from(building.querySelectorAll('.building')));
         });
+
         /** Masque les lignes de chantiers devant être masquées */
         building_rows.forEach((building_row) => {
             if (building_row.classList.contains('complete') && !building_row.querySelector('.to_repair')) {
@@ -4491,90 +4302,156 @@ function hideCompletedBuildings() {
                 building.classList.remove('mho-hidden');
             }
         });
-    } else if (pageIsConstructions) {
-        let buildings = Array.from(document.querySelectorAll('.buildings') || []);
-        buildings.forEach((building) => {
+    }
+
+    let showBuildings = (buildings) => {
+        buildings?.forEach((building) => {
             if (building.classList.contains('mho-hidden')) {
                 building.classList.remove('mho-hidden');
             }
-            Array.from(building.querySelectorAll('.building.mho-hidden')).forEach((building) => {
-                building.classList.remove('mho-hidden');
-            })
+            Array.from(building.querySelectorAll('.building.mho-hidden')).forEach((buildingRow) => {
+                buildingRow.classList.remove('mho-hidden');
+            });
         });
+    }
+
+    let observeBuildings = () => {
+        const observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                if (mutation.addedNodes.length > 0) {
+                    let buildings = Array.from(document.querySelectorAll('.buildings') || []);
+                    if (buildings.length > 0) {
+                        hideBuildings(buildings);
+                        observer.disconnect();
+                    }
+                }
+            });
+        });
+
+        observer.observe(document.body, { childList: true, subtree: true });
+    }
+
+    if (pageIsConstructions()) {
+        let buildings = Array.from(document.querySelectorAll('.buildings') || []);
+        if (mho_parameters.hide_completed_buildings_field) {
+            if (buildings.length > 0) {
+                hideBuildings(buildings);
+            } else {
+                observeBuildings();
+            }
+        } else {
+            if (buildings.length > 0) {
+                hideBuildings(buildings);
+            } else {
+                showBuildings();
+            }
+        }
     }
 }
 
 /** Si l'option associée est activée, affiche un champ de recherche sur la page de chantiers */
 function displaySearchFieldOnBuildings() {
     let fields_container = document.getElementById(mho_search_building_field_id);
+    let searchFieldAdded = false; // Indicateur pour suivre l'ajout du champ de recherche
+
+
+    let addSearchField = (tabs) => {
+        if (searchFieldAdded) return; // Vérifie si le champ de recherche a déjà été ajouté
+
+        let tabs_block = tabs.parentElement;
+
+        fields_container = document.getElementById(mho_search_building_field_id);
+        if (fields_container) return; // Vérifie si le conteneur existe déjà
+
+        fields_container = document.createElement('div');
+        fields_container.style.display = 'flex';
+        fields_container.style.flexWrap = 'wrap';
+        fields_container.style.alignItems = 'center';
+        fields_container.style.gap = '0.5em';
+        fields_container.style.marginTop = '0.5em';
+        fields_container.id = mho_search_building_field_id;
+        tabs_block.insertBefore(fields_container, tabs);
+
+        let search_field_div = document.createElement('div');
+        search_field_div.style.display = 'flex';
+        search_field_div.style.alignItems = 'center';
+        fields_container.appendChild(search_field_div);
+        if (!mho_parameters.display_search_field_buildings) {
+            search_field_div.classList.add('hidden');
+        }
+
+        let header_mho_img = document.createElement('img');
+        header_mho_img.src = mh_optimizer_icon;
+        header_mho_img.style.height = '24px';
+        header_mho_img.style.position = 'absolute';
+        search_field_div.appendChild(header_mho_img);
+
+        let search_field = document.createElement('input');
+        search_field.type = 'text';
+        search_field.placeholder = getI18N(params_categories.find((category) => category.id === 'display').params.find((param) => param.id === 'display_search_fields').children.find((child) => child.id === 'display_search_field_buildings').label);
+        search_field.classList.add('mho-input', 'inline');
+        search_field.setAttribute('style', 'min-width: 200px; padding-left: 24px;');
+        search_field_div.appendChild(search_field);
+
+        let buildings = Array.from(document.querySelectorAll('.buildings') || []);
+
+        let filterBuildings = () => {
+            let building_rows = [];
+            buildings.forEach((building) => {
+                building_rows.push(...Array.from(building.querySelectorAll('.building')));
+            });
+            building_rows.forEach((building_row) => {
+                let force_hide = mho_parameters.hide_completed_buildings_field && building_row.classList.contains('complete');
+
+                if (force_hide) {
+                    building_row.classList.add('hidden');
+                } else if (normalizeString(building_row.querySelector('.building_name').innerText).indexOf(normalizeString(search_field.value)) > -1) {
+                    building_row.classList.remove('hidden');
+                } else {
+                    building_row.classList.add('hidden');
+                }
+            });
+
+            buildings.forEach((building) => {
+                if (Array.from(building.children).filter((child) => child.classList.contains('building')).every((child) => child.classList.contains('hidden'))) {
+                    building.classList.add('hidden');
+                } else {
+                    building.classList.remove('hidden');
+                }
+            });
+        };
+
+        search_field.addEventListener('keyup', (event) => {
+            filterBuildings();
+        });
+
+        searchFieldAdded = true; // Mettre à jour l'indicateur après l'ajout
+    }
+
+    let observeTabs = () => {
+        const observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                if (mutation.addedNodes.length > 0) {
+                    let tabs = document.querySelector('ul.buildings-tabs');
+                    if (tabs) {
+                        addSearchField(tabs);
+                        observer.disconnect();
+                    }
+                }
+            });
+        });
+
+        observer.observe(document.body, { childList: true, subtree: true });
+    }
+
     if (mho_parameters.display_search_field_buildings && pageIsConstructions()) {
         if (fields_container) return;
 
         let tabs = document.querySelector('ul.buildings-tabs');
         if (tabs) {
-            let tabs_block = tabs.parentElement;
-
-            fields_container = document.createElement('div');
-            fields_container.style.display = 'flex';
-            fields_container.style.flexWrap = 'wrap';
-            fields_container.style.alignItems = 'center';
-            fields_container.style.gap = '0.5em';
-            fields_container.style.marginTop = '0.5em';
-            fields_container.id = mho_search_building_field_id;
-            tabs_block.insertBefore(fields_container, tabs);
-
-            let search_field_div = document.createElement('div');
-            search_field_div.style.display = 'flex';
-            search_field_div.style.alignItems = 'center';
-            fields_container.appendChild(search_field_div);
-            if (!mho_parameters.display_search_field_buildings) {
-                search_field_div.classList.add('hidden');
-            }
-
-            let header_mho_img = document.createElement('img');
-            header_mho_img.src = mh_optimizer_icon;
-            header_mho_img.style.height = '24px';
-            header_mho_img.style.position = 'absolute';
-            search_field_div.appendChild(header_mho_img);
-
-            let search_field = document.createElement('input');
-            search_field.type = 'text';
-            search_field.placeholder = getI18N(params_categories.find((category) => category.id === 'display').params.find((param) => param.id === 'display_search_fields').children.find((child) => child.id === 'display_search_field_buildings').label);
-            search_field.classList.add('mho-input', 'inline');
-            search_field.setAttribute('style', 'min-width: 200px; padding-left: 24px;');
-            search_field_div.appendChild(search_field);
-
-            let buildings = Array.from(document.querySelectorAll('.buildings') || []);
-
-            let filterBuildings = () => {
-                let building_rows = [];
-                buildings.forEach((building) => {
-                    building_rows.push(...Array.from(building.querySelectorAll('.building')));
-                });
-                building_rows.forEach((building_row) => {
-                    let force_hide = mho_parameters.hide_completed_buildings_field && building_row.classList.contains('complete');
-
-                    if (force_hide) {
-                        building_row.classList.add('hidden');
-                    } else if (normalizeString(building_row.querySelector('.building_name').innerText).indexOf(normalizeString(search_field.value)) > -1) {
-                        building_row.classList.remove('hidden');
-                    } else {
-                        building_row.classList.add('hidden');
-                    }
-                });
-
-                buildings.forEach((building) => {
-                    if (Array.from(building.children).filter((child) => child.classList.contains('building')).every((child) => child.classList.contains('hidden'))) {
-                        building.classList.add('hidden');
-                    } else {
-                        building.classList.remove('hidden');
-                    }
-                });
-            };
-
-            search_field.addEventListener('keyup', (event) => {
-                filterBuildings();
-            });
+            addSearchField(tabs);
+        } else {
+            observeTabs();
         }
     } else if (fields_container) {
         fields_container.remove();
@@ -4799,18 +4676,22 @@ function displaySearchFieldOnRegistry() {
 }
 
 /** Si l'option associée est activée, affiche le nombre de pa nécessaires pour réparer un bâtiment suffisemment pour qu'il ne soit pas détruit lors de l'attaque */
-function displayMinApOnBuildings() {
-
+function displayMinApOnBuildings(count = 0) {
     tooltips_observer?.disconnect();
     if (mho_parameters.display_missing_ap_for_buildings_to_be_safe && pageIsConstructions()) {
         let complete_buildings = document.querySelectorAll('.building.complete');
-        if (!complete_buildings || complete_buildings.length === 0) return;
+        if ((!complete_buildings || complete_buildings.length === 0) && count < 10) {
+            setTimeout(() => {
+                displayMinApOnBuildings(count + 1);
+            }, 100);
+            return;
+        }
 
         ///////////////////////// Observe les modifications sur les tooltips pour mieux alimenter les barres /////////////////////////
         // Selectionne le noeud dont les mutations seront observées
         let tooltip_container = document.querySelector('#tooltip_container');
         // Options de l'observateur (quelles sont les mutations à observer)
-        let config = {childList: true, subtree: true};
+        let config = { childList: true, subtree: true };
 
         // Fonction callback à éxécuter quand une mutation est observée
         let callback = function (mutationsList) {
@@ -4821,23 +4702,22 @@ function displayMinApOnBuildings() {
 
                 broken_buildings.forEach((broken_building) => {
                     let bar_element = broken_building.querySelector('.ap-bar');
+                    let to_repair_element = broken_building.querySelector('.to_repair');
                     let nb_ap_element = broken_building.querySelector('.build-req');
 
-                    bar_element.dispatchEvent(new Event('mouseenter'));
+                    to_repair_element.dispatchEvent(new Event('mouseenter'));
                     let tooltip = new Object(document.querySelector('.tooltip:not(.mho)[style*="display: block"]'));
-                    bar_element.dispatchEvent(new Event('mouseleave'));
-
+                    to_repair_element.dispatchEvent(new Event('mouseleave'));
                     if (!tooltip || !tooltip.innerHTML) return;
-
 
                     let tooltip_status_match = tooltip.innerText.match(/[0-9]+\/[0-9]+/);
                     if (!tooltip_status_match || tooltip_status_match.length <= 0) return;
                     let building_status = tooltip_status_match[0]?.split('/');
 
-                    let tooltip_match = tooltip.innerHTML.match(/<b>[0-9]+<\/b>/);
+                    let tooltip_match = tooltip.innerHTML.match(/[0-9]+/g);
                     if (!tooltip_match || tooltip_match.length <= 0) return;
 
-                    let nb_pts_per_ap = parseInt(tooltip_match[0].match(/[0-9]+/)[0], 10);
+                    let nb_pts_per_ap = parseInt(tooltip_match[tooltip_match.length - 1].match(/[0-9]+/)[0], 10);
                     let current_pv = parseInt(building_status[0], 10);
                     let total_pv = parseInt(building_status[1], 10);
 
@@ -4982,7 +4862,7 @@ function displayWishlistInApp(count = 0) {
 
                     let title = document.createElement('div');
                     title.classList.add('padded', 'cell', 'rw-5');
-                    title.innerHTML = `<img src="${repo_img_hordes_url + item.item.img}" class="priority_${item.priority_main}"  style="margin-right: 5px" /><span class="small">${getI18N(item.item.label)}</span>`;
+                    title.innerHTML = `<img src="${repo_img_hordes_url + item.item.img}" style="margin-right: 5px" /><span class="small">${getI18N(item.item.label)}</span>`;
                     list_item.appendChild(title);
 
                     let item_depot = document.createElement('span');
@@ -5099,6 +4979,7 @@ function displayPriorityOnItems() {
                 present_items.push(...inventory?.querySelectorAll('li.item:not(.locked):not(.plus)') || []);
             }
         }
+
         if (rucksacks) {
             for (let rucksack of rucksacks) {
                 empty_spaces.push(...rucksack?.querySelectorAll('li.free') || []);
@@ -5111,22 +4992,36 @@ function displayPriorityOnItems() {
 
         if (used_wishlist) {
             let count = 0;
+            let heavy_count = 0;
             used_wishlist
                 .filter((wishlist_item) => wishlist_item.priority !== 0)
                 .forEach((wishlist_item) => {
                     present_items
                         .filter((present_item) => fixMhCompiledImg(present_item.querySelector('img').src).indexOf(wishlist_item.item.img) > 0)
                         .forEach((present_item) => {
-                            if (wishlist_item.priority_main > 0) {
+                            if (wishlist_item.depot >= -1) {
+                                let priority_in = false;
+
                                 if (count < item_count) {
+                                    if (wishlist_item.item.isHeaver) {
+                                        if (heavy_count < rucksacks.length) {
+                                            priority_in = true;
+                                        }
+                                        heavy_count++;
+                                    } else {
+                                        priority_in = true;
+                                    }
+                                }
+
+                                if (priority_in) {
                                     present_item.classList.add('priority_in');
+                                    count++;
                                 } else {
                                     present_item.classList.add('priority_out');
                                 }
-                            } else {
+                            } else if (wishlist_item.depot < -1) {
                                 present_item.classList.add('priority_trash');
                             }
-                            count += 1;
                         });
                 });
         }
@@ -5153,124 +5048,139 @@ function getWishlistForZone() {
     return used_wishlist;
 }
 
-let hovered_tooltip_x_item_id;
-
 /** Affiche les tooltips avancés */
-function displayAdvancedTooltips() {
+function displayAdvancedTooltips(count = 0) {
+    advanced_tooltips_observer?.disconnect();
     if (mho_parameters.enhanced_tooltips && items) {
 
-        let tooltip_containers = document.querySelectorAll(`.tooltip.item[style*="display: block"]`);
-        if (!tooltip_containers || tooltip_containers.length === 0) return;
+        let hovered_tooltip_x_item_id;
+        const tooltips_container = document.querySelector('#tooltip_container');
+        if (!tooltips_container && count < 10) {
+            displayAdvancedTooltips(count + 1);
+            return;
+        };
 
-        let hovered = getHoveredItem();
-        let hovered_item = hovered.item;
-        let hovered_status = hovered.status;
+        advanced_tooltips_observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                let tooltip_container = mutation.target;
+                if (!tooltip_container) return;
 
-        if (!hovered_item && !hovered_status) return;
+                if (mutation.type === 'attributes' && tooltip_container.classList.contains('tooltip') && tooltip_container.classList.contains('item') && !mutation.oldValue?.indexOf('block') > -1 && window.getComputedStyle(tooltip_container).display === 'block') {
 
-        let tooltip_container = Array.from(tooltip_containers).find((container) => hovered_item ? getItemFromImg(container.querySelector('h1 img')?.src)?.id === hovered_item.id : container.querySelector('h1')?.innerText === hovered.alt);
+                    let hovered = getHoveredItem();
+                    let hovered_item = hovered.item;
+                    let hovered_status = hovered.status;
 
-        if (!tooltip_container) return;
+                    if (!hovered_item && !hovered_status) return;
 
-        let advanced_tooltip_container = tooltip_container.querySelector('#mho-advanced-tooltip');
+                    let advanced_tooltip_container = tooltip_container.querySelector('#mho-advanced-tooltip');
 
-        if (hovered_item) {
+                    if (hovered_item) {
 
-            let hovered_item_x_item_id = hovered.li.getAttribute('x-item-id');
-            if (!hovered_tooltip_x_item_id && hovered_item?.recipes?.length > 0) {
-                let tooltip_loading = tooltip_container.querySelector('.mho-tooltip-loading');
-                if (!tooltip_loading) {
-                    tooltip_loading = document.createElement('img');
-                    tooltip_loading.classList.add('mho-tooltip-loading');
-                    tooltip_loading.style.position = 'absolute';
-                    tooltip_loading.style.left = '8px';
-                    tooltip_loading.style.top = '0';
-                    tooltip_container.querySelector('h1').appendChild(tooltip_loading);
-                    tooltip_loading.src = `${repo_img_hordes_url}anims/loading_wheel.gif`;
-                } else {
-                    tooltip_loading.style.display = 'inline';
-                }
-                let timeout = setTimeout(() => {
-                    if (hovered_tooltip_x_item_id && hovered_tooltip_x_item_id === hovered_item_x_item_id) return;
-                    tooltip_loading.style.display = 'none';
-
-                    // Remove opened tooltips
-                    let current_tooltips_containers = document.querySelectorAll('.tooltip.item[style*="display: block"]');
-                    Array.from(tooltip_containers).forEach((container) => {
-                        if (getItemFromImg(container.querySelector('h1 img')?.src)?.id !== hovered_item.id) {
-                            container.style.display = 'none';
-                        }
-                    });
-
-                    const controller = new AbortController();
-                    hovered_tooltip_x_item_id = hovered_item_x_item_id;
-                    tooltip_container.style.pointerEvents = 'all';
-                    hovered.li.addEventListener('mouseleave', function (event) {
-                        event.stopImmediatePropagation();
-                    }, true, {signal: controller.signal});
-                    hovered.li.addEventListener('pointerleave', function (event) {
-                        event.stopImmediatePropagation();
-                    }, true, {signal: controller.signal});
-
-                    let cancelHover = () => {
-                        hovered_tooltip_x_item_id = undefined;
-                        controller.abort();
-                        tooltip_container.style.display = 'none';
-                        tooltip_container.style.pointerEvents = 'none';
-                        clearTimeout(timeout);
-                    }
-                    hovered.li.addEventListener('mouseout', (event) => {
-                        setTimeout(() => {
-                            if (!hovered_tooltip_x_item_id) return;
-                            let all_hovered = document.querySelectorAll(':hover');
-                            if (!Array.from(all_hovered).some((hovered_element) => hovered_element.classList.contains('tooltip') || hovered_element.getAttribute('x-item-id') === hovered_tooltip_x_item_id)) {
-                                cancelHover();
+                        let hovered_item_x_item_id = hovered.li.getAttribute('x-item-id');
+                        if (!hovered_tooltip_x_item_id && hovered_item?.recipes?.length > 0) {
+                            let tooltip_loading = tooltip_container.querySelector('.mho-tooltip-loading');
+                            if (!tooltip_loading) {
+                                tooltip_loading = document.createElement('img');
+                                tooltip_loading.classList.add('mho-tooltip-loading');
+                                tooltip_loading.style.position = 'absolute';
+                                tooltip_loading.style.left = '8px';
+                                tooltip_loading.style.top = '0';
+                                tooltip_container.querySelector('h1').appendChild(tooltip_loading);
+                                tooltip_loading.src = `${repo_img_hordes_url}anims/loading_wheel.gif`;
+                            } else {
+                                tooltip_loading.style.display = 'inline';
                             }
-                        }, 1000)
-                    }, true, {signal: controller.signal});
-                    tooltip_container.addEventListener('mouseleave', (event) => {
-                        cancelHover();
-                    }, {signal: controller.signal});
-                    tooltip_container.addEventListener('pointerleave', (event) => {
-                        cancelHover();
-                    }, {signal: controller.signal});
-                }, 1000);
-            }
+                            let timeout = setTimeout(() => {
+                                if (hovered_tooltip_x_item_id && hovered_tooltip_x_item_id === hovered_item_x_item_id) return;
+                                tooltip_loading.style.display = 'none';
 
-            let item_deco = tooltip_container.getElementsByClassName('item-tag-deco')[0];
-            let should_display_advanced_tooltip = hovered_item.recipes.length > 0 || hovered_item.actions || hovered_item.properties || (item_deco && hovered_item.deco > 0);
+                                // Remove opened tooltips
+                                let current_tooltips_containers = document.querySelectorAll('.tooltip.item[style*="display: block"]');
+                                Array.from(current_tooltips_containers).forEach((container) => {
+                                    if (getItemFromImg(container.querySelector('h1 img')?.src)?.id !== hovered_item.id) {
+                                        container.style.display = 'none';
+                                    }
+                                });
 
-            if (should_display_advanced_tooltip) {
+                                const controller = new AbortController();
+                                hovered_tooltip_x_item_id = hovered_item_x_item_id;
+                                tooltip_container.style.pointerEvents = 'all';
+                                hovered.li.addEventListener('mouseleave', function (event) {
+                                    event.stopImmediatePropagation();
+                                }, true, { signal: controller.signal });
+                                hovered.li.addEventListener('pointerleave', function (event) {
+                                    event.stopImmediatePropagation();
+                                }, true, { signal: controller.signal });
 
-                if (!advanced_tooltip_container) {
-                    advanced_tooltip_container = document.createElement('div');
-                    advanced_tooltip_container.id = 'mho-advanced-tooltip';
-                    advanced_tooltip_container.setAttribute('style', 'margin-top: 0.5em; border-top: 1px solid;');
+                                let cancelHover = () => {
+                                    hovered_tooltip_x_item_id = undefined;
+                                    controller.abort();
+                                    tooltip_container.style.display = 'none';
+                                    tooltip_container.style.pointerEvents = 'none';
+                                    clearTimeout(timeout);
+                                }
+                                hovered.li.addEventListener('mouseout', (event) => {
+                                    setTimeout(() => {
+                                        if (!hovered_tooltip_x_item_id) return;
+                                        let all_hovered = document.querySelectorAll(':hover');
+                                        if (!Array.from(all_hovered).some((hovered_element) => hovered_element.classList.contains('tooltip') || hovered_element.getAttribute('x-item-id') === hovered_tooltip_x_item_id)) {
+                                            cancelHover();
+                                        }
+                                    }, 1000)
+                                }, true, { signal: controller.signal });
+                                tooltip_container.addEventListener('mouseleave', (event) => {
+                                    cancelHover();
+                                }, { signal: controller.signal });
+                                tooltip_container.addEventListener('pointerleave', (event) => {
+                                    cancelHover();
+                                }, { signal: controller.signal });
+                            }, 1000);
+                        }
 
-                    tooltip_container.appendChild(advanced_tooltip_container);
-                } else if (!advanced_tooltip_container.innerHTML) {
-                    createAdvancedProperties(advanced_tooltip_container, hovered_item, tooltip_container);
+                        let item_deco = tooltip_container.getElementsByClassName('item-tag-deco')[0];
+                        let should_display_advanced_tooltip = hovered_item.recipes.length > 0 || hovered_item.actions || hovered_item.properties || (item_deco && hovered_item.deco > 0);
+
+                        if (should_display_advanced_tooltip) {
+
+                            if (!advanced_tooltip_container) {
+                                advanced_tooltip_container = document.createElement('div');
+                                advanced_tooltip_container.id = 'mho-advanced-tooltip';
+                                advanced_tooltip_container.setAttribute('style', 'margin-top: 0.5em; border-top: 1px solid;');
+
+                                tooltip_container.appendChild(advanced_tooltip_container);
+                            } else if (!advanced_tooltip_container.innerHTML) {
+                                createAdvancedProperties(advanced_tooltip_container, hovered_item, tooltip_container);
+                            }
+                        }
+                    } else {
+                        let item_deco = tooltip_container.getElementsByClassName('item-tag-deco')[0];
+                        let should_display_advanced_tooltip = hovered_status.watch_def !== undefined || hovered_status.watch_kills !== undefined;
+
+                        if (should_display_advanced_tooltip) {
+
+                            if (!advanced_tooltip_container) {
+                                advanced_tooltip_container = document.createElement('div');
+                                advanced_tooltip_container.id = 'mho-advanced-tooltip';
+                                advanced_tooltip_container.setAttribute('style', 'margin-top: 0.5em; border-top: 1px solid;');
+
+                                tooltip_container.appendChild(advanced_tooltip_container);
+                            } else if (!advanced_tooltip_container.innerHTML) {
+                                createAdvancedPropertiesStatus(advanced_tooltip_container, hovered_status, tooltip_container);
+                            }
+                        }
+
+
+                    }
+
                 }
-            }
-        } else {
-            let item_deco = tooltip_container.getElementsByClassName('item-tag-deco')[0];
-            let should_display_advanced_tooltip = hovered_status.watch_def !== undefined || hovered_status.watch_kills !== undefined;
+            });
+        });
 
-            if (should_display_advanced_tooltip) {
+        const config = { attributes: true, subtree: true, childList: false, attributeFilter: ['style'], attributeOldValue: true };
 
-                if (!advanced_tooltip_container) {
-                    advanced_tooltip_container = document.createElement('div');
-                    advanced_tooltip_container.id = 'mho-advanced-tooltip';
-                    advanced_tooltip_container.setAttribute('style', 'margin-top: 0.5em; border-top: 1px solid;');
-
-                    tooltip_container.appendChild(advanced_tooltip_container);
-                } else if (!advanced_tooltip_container.innerHTML) {
-                    createAdvancedPropertiesStatus(advanced_tooltip_container, hovered_status, tooltip_container);
-                }
-            }
-
-
-        }
+        // Observer chaque enfant direct de tooltipsBlock
+        advanced_tooltips_observer.observe(tooltips_container, config);
     }
 
 }
@@ -5369,6 +5279,7 @@ function displayPropertiesOrActions(property_or_action, hovered_item) {
     switch (property_or_action) {
         case 'eat_6ap':
         case 'eat_7ap':
+        case 'eat_4ap':
             item_action.classList.add(`item-tag-food`);
             item_action.innerHTML = `+${property_or_action.slice(4, 5)}<img src="${repo_img_hordes_url}emotes/ap.${lang}.gif">`;
             break;
@@ -5386,6 +5297,7 @@ function displayPropertiesOrActions(property_or_action, hovered_item) {
             item_action.innerHTML = `+6<img src="${repo_img_hordes_url}emotes/ap.${lang}.gif">`;
             break;
         case 'cyanide':
+            item_action.classList.add(`no-img`);
             item_action.innerHTML = `<img src="${repo_img_hordes_url}emotes/death.gif">`;
             break;
         case 'hero_find':
@@ -5398,7 +5310,15 @@ function displayPropertiesOrActions(property_or_action, hovered_item) {
             break;
         case 'hero_find_lucky':
             item_action.classList.add(`item-tag-hero`);
-            item_action.innerText = `Trouvaille améliorée`;
+            item_action.innerText = `Jolie trouvaille`
+            break;
+        case 'hero_find_lucky2':
+            item_action.classList.add(`item-tag-hero`);
+            item_action.innerText = `Impressionnante trouvaille`;
+            break;
+        case 'hero_find_lucky3':
+            item_action.classList.add(`item-tag-hero`);
+            item_action.innerText = `Incroyable trouvaille`;
             break;
         case 'ressource':
             item_action.innerText = `Ressource`;
@@ -5408,23 +5328,34 @@ function displayPropertiesOrActions(property_or_action, hovered_item) {
             var fail_1 = Math.round(60 / 90 * 100);
             item_action.innerText = `${100 - fail_1}% de chances de pouvoir fuir pendant 30 secondes`;
             break;
-        case 'flash_photo_2':
+        case 'flash_photo_2': {
             item_action.classList.add(`mho-item-tag-large`);
-            var fail_2 = Math.round(30 / 90 * 100);
+            let fail_2 = Math.round(30 / 90 * 100);
             item_action.innerText = `${100 - fail_2}% de chances de pouvoir fuir pendant 60 secondes`;
             break;
-        case 'flash_photo_3':
+        }
+        case 'flash_photo_3': {
             item_action.classList.add(`mho-item-tag-large`);
-            var fail_3 = 1;
+            let fail_3 = 1;
             item_action.innerText = `Succès : ${100 - fail_3}% de chances de pouvoir fuir pendant 120 secondes`;
             break;
+        }
+        case 'flash_photo_4': {
+            item_action.classList.add(`mho-item-tag-large`);
+            let fail_4 = 1;
+            item_action.innerText = `Succès : ${100 - fail_4}% de chances de pouvoir fuir pendant 120 secondes`;
+            break;
+        }
         case 'can_cook':
+            item_action.classList.add(`no-img`);
             item_action.innerText = `Peut être cuisiné`;
             break;
         case 'pet':
+            item_action.classList.add(`no-img`);
             item_action.innerText = `Animal`;
             break;
         case 'can_poison':
+            item_action.classList.add(`no-img`);
             item_action.innerText = `Peut être empoisonné`;
             break;
         case 'load_maglite':
@@ -5445,10 +5376,12 @@ function displayPropertiesOrActions(property_or_action, hovered_item) {
             break;
         case 'smokebomb':
             item_action.classList.add(`item-tag-smokebomb`);
-            item_action.innerHTML = `Efface les entrées du registre (-3 minutes)<br />Dissimule votre prochaine entrée (+1 minute)`
+            item_action.classList.add(`no-img`);
+            item_action.innerHTML = `Efface les entrées du registre (-3 minutes)<br />Dissimule votre prochaine entrée (+1 minute)`;
             break;
         case 'improve':
-            item_action.innerText = `Permet d'aménager un campement`
+            item_action.classList.add(`no-img`);
+            item_action.innerText = `Permet d'aménager un campement`;
             break;
         case 'defence':
             // déjà affichés par le jeu
@@ -5477,6 +5410,7 @@ function displayPropertiesOrActions(property_or_action, hovered_item) {
                 }
                 if (devastated) chances = Math.max(0.1, chances - 0.2);
                 var success = chances * 100;
+                item_action.classList.add(`no-img`);
                 item_action.innerText = `${success}% de chances de réussir son manuel`;
             } else {
                 item_action.classList.remove('item-tag');
@@ -5487,7 +5421,20 @@ function displayPropertiesOrActions(property_or_action, hovered_item) {
             item_action.classList.remove('item-tag');
             break;
         case 'prevent_night':
+            item_action.classList.add(`no-img`);
             item_action.innerText = `Malus de nuit divisé par 4`;
+            break;
+        case 'no_post':
+            item_action.classList.add(`no-img`);
+            item_action.innerText = `Ne peut pas être envoyé par message`;
+            break;
+        case 'wagging_flag':
+            item_action.classList.add(`no-img`);
+            item_action.innerText = `Attire 2.5% des zombies du débordement`;
+            break;
+        case 'fragile':
+            item_action.classList.add(`no-img`);
+            item_action.innerText = `Se casse en cas d'envoi par catapulte`;
             break;
         case 'box_opener':
         case 'can_opener':
@@ -5502,7 +5449,11 @@ function displayPropertiesOrActions(property_or_action, hovered_item) {
         case 'esc_fixed':
         case 'slaughter_2xs':
         case 'throw_animal_cat':
+        case 'throw_animal_cat_t1':
+        case 'throw_animal_cat_t2':
         case 'throw_animal_tekel':
+        case 'throw_animal_tekel_t1':
+        case 'throw_animal_tekel_t2':
         case 'parcel_opener_h':
         case 'hero_tamer_3':
         case 'throw_b_chair_basic':
@@ -5543,6 +5494,8 @@ function displayPropertiesOrActions(property_or_action, hovered_item) {
         case 'throw_b_torch_off':
         case 'throw_boomfruit':
         case 'throw_animal_dog':
+        case 'throw_animal_dog_t1':
+        case 'throw_animal_dog_t2':
         case 'throw_b_concrete_wall':
         case 'drug_xana1':
         case 'drug_xana2':
@@ -5578,6 +5531,8 @@ function displayPropertiesOrActions(property_or_action, hovered_item) {
         case 'special_dice':
         case 'slaughter_2x':
         case 'throw_animal':
+        case 'throw_animal_t1':
+        case 'throw_animal_t2':
         case 'slaughter_4xs':
         case 'repair_2':
         case 'zonemarker_1':
@@ -5635,6 +5590,7 @@ function displayPropertiesOrActions(property_or_action, hovered_item) {
         case 'open_h_chest':
         case 'open_postbox':
         case 'open_lunchbag':
+        case 'open_drugkit':
         case 'open_safe':
         case 'open_abox':
         case 'open_asafe':
@@ -5743,6 +5699,40 @@ function displayPropertiesOrActions(property_or_action, hovered_item) {
         case 'hero_tamer_2b':
         case 'alarm_clock':
         case 'inedible':
+        case 'lure':
+        case 'equip_shoe_first':
+        case 'hero_dog_fetch':
+        case 'nw_impact_cumul':
+        case 'eat_apple':
+        case 'drink_quantum_1':
+        case 'drink_quantum_2':
+        case 'drink_quantum_3':
+        case 'play_soccer_1':
+        case 'play_soccer_2':
+        case 'nosteal':
+        case 'install_garland':
+        case 'uninstall_garland':
+        case 'open_cellobox':
+        case 'flash_photo_4_ruin_bp':
+        case 'flash_photo_4_ruin_bp_free':
+        case 'flash_photo_4_ruin_no_bp':
+        case 'repair_hero':
+        case 'equip_bike_first':
+        case 'unequip_bike_first':
+        case 'pet_doggo':
+        case 'jerrycan_4':
+        case 'jerrycan_4b':
+        case 'hero_tamer_4':
+        case 'hero_tamer_4b':
+        case 'hero_tamer_5':
+        case 'hero_tamer_5b':
+        case 'hero_tamer_6':
+        case 'hero_tamer_6b':
+        case 'hero_tamer_7':
+        case 'hero_tamer_7b':
+        case 'hero_tamer_8':
+        case 'hero_tamer_8b':
+        case 'hero_tamer_9':
             item_action.classList.remove('item-tag');
             break;
         case 'deco':
@@ -5754,7 +5744,8 @@ function displayPropertiesOrActions(property_or_action, hovered_item) {
             item_action.classList.remove('item-tag');
             break;
         default:
-            console.log(property_or_action);
+            console.warn('missing property or action', property_or_action);
+            item_action.classList.remove('item-tag');
             break;
     }
     return item_action;
@@ -6337,10 +6328,10 @@ function displayTranslateTool() {
         if (!mho_header_space) return;
 
         let langs = [
-            {value: 'de', img: '🇩🇪'},
-            {value: 'en', img: '🇬🇧'},
-            {value: 'es', img: '🇪🇸'},
-            {value: 'fr', img: '🇫🇷'},
+            { value: 'de', img: '🇩🇪' },
+            { value: 'en', img: '🇬🇧' },
+            { value: 'es', img: '🇪🇸' },
+            { value: 'fr', img: '🇫🇷' },
         ]
         let mho_display_translate_input_div = createSelectWithSearch();
         mho_display_translate_input_div.id = mho_display_translate_input_id;
@@ -6639,12 +6630,12 @@ function displayEstimationsOnWatchtower() {
             let updateEstimationRow = (estimations, percent, type) => {
                 if (!estimations.estimations[type][`_${percent}`]) {
                     /** Workaround pour définir sur l'extension firefox sans passer par cloneinto */
-                    let estimations_workaround_estim = {...estimations.estimations};
-                    let estimations_workaround_type = {...estimations_workaround_estim[type]};
-                    let estimations_workaround_type_percent = {min: null, max: null};
-                    estimations_workaround_type[`_${percent}`] = {...estimations_workaround_type_percent};
-                    estimations_workaround_estim[type] = {...estimations_workaround_type};
-                    estimations.estimations = {...estimations_workaround_estim};
+                    let estimations_workaround_estim = { ...estimations.estimations };
+                    let estimations_workaround_type = { ...estimations_workaround_estim[type] };
+                    let estimations_workaround_type_percent = { min: null, max: null };
+                    estimations_workaround_type[`_${percent}`] = { ...estimations_workaround_type_percent };
+                    estimations_workaround_estim[type] = { ...estimations_workaround_type };
+                    estimations.estimations = { ...estimations_workaround_estim };
                 }
 
                 let estimation = estimations.estimations[type][`_${percent}`];
@@ -6681,7 +6672,7 @@ function displayEstimationsOnWatchtower() {
             }
 
             getEstimations().then((estimations) => {
-                estimations = {...estimations};
+                estimations = { ...estimations };
                 estim_block = document.createElement('div');
                 estim_block.style.marginTop = '1em';
                 estim_block.style.padding = '0.25em';
@@ -6713,12 +6704,12 @@ function displayEstimationsOnWatchtower() {
 
                 estim_block_title_save_button.addEventListener('click', () => {
                     saveEstimations({
-                            percent: current_estimation_percent,
-                            value: {
-                                min: +watchtower_estim_block_prediction?.split(' ')[0],
-                                max: +watchtower_estim_block_prediction?.split(' ')[2]
-                            }
-                        },
+                        percent: current_estimation_percent,
+                        value: {
+                            min: +watchtower_estim_block_prediction?.split(' ')[0],
+                            max: +watchtower_estim_block_prediction?.split(' ')[2]
+                        }
+                    },
                         {
                             percent: current_planif_percent,
                             value: {
@@ -6825,13 +6816,13 @@ function displayEstimationsOnWatchtower() {
 
                     if (!estimations.estimations.estim['_' + value]) {
                         /** Workaround pour définir sur l'extension firefox sans passer par cloneinto */
-                        let new_estimations = {...estimations};
-                        let new_estimations_estimations = {...new_estimations.estimations};
-                        let new_estimations_estimations_estim = {...new_estimations_estimations.estim};
-                        new_estimations_estimations_estim['_' + value] = {min: null, max: null};
-                        new_estimations_estimations.estim = {...new_estimations_estimations_estim};
-                        new_estimations.estimations = {...new_estimations_estimations};
-                        estimations = {...new_estimations};
+                        let new_estimations = { ...estimations };
+                        let new_estimations_estimations = { ...new_estimations.estimations };
+                        let new_estimations_estimations_estim = { ...new_estimations_estimations.estim };
+                        new_estimations_estimations_estim['_' + value] = { min: null, max: null };
+                        new_estimations_estimations.estim = { ...new_estimations_estimations_estim };
+                        new_estimations.estimations = { ...new_estimations_estimations };
+                        estimations = { ...new_estimations };
                     }
                     let value_block = document.createElement('div');
                     value_block.style.display = 'flex';
@@ -6884,13 +6875,13 @@ function displayEstimationsOnWatchtower() {
 
                         if (!estimations.estimations.planif['_' + value]) {
                             /** Workaround pour définir sur l'extension firefox sans passer par cloneinto */
-                            let new_estimations = {...estimations};
-                            let new_estimations_estimations = {...new_estimations.estimations};
-                            let new_estimations_estimations_planif = {...new_estimations_estimations.planif};
-                            new_estimations_estimations_planif['_' + value] = {min: null, max: null};
-                            new_estimations_estimations.planif = {...new_estimations_estimations_planif};
-                            new_estimations.estimations = {...new_estimations_estimations};
-                            estimations = {...new_estimations};
+                            let new_estimations = { ...estimations };
+                            let new_estimations_estimations = { ...new_estimations.estimations };
+                            let new_estimations_estimations_planif = { ...new_estimations_estimations.planif };
+                            new_estimations_estimations_planif['_' + value] = { min: null, max: null };
+                            new_estimations_estimations.planif = { ...new_estimations_estimations_planif };
+                            new_estimations.estimations = { ...new_estimations_estimations };
+                            estimations = { ...new_estimations };
                         }
 
                         let value_block = document.createElement('div');
@@ -6921,7 +6912,10 @@ function displayEstimationsOnWatchtower() {
 }
 
 function displayAntiAbuseCounter() {
-    const controller = new AbortController();
+    if (anti_abuse_controller) {
+        // anti_abuse_controller.abort();
+    }
+    anti_abuse_controller = new AbortController();
     if (mho_parameters.display_anti_abuse && (pageIsBank() || pageIsWell())) {
         let mho_anti_abuse_counter = document.querySelector(`#${mho_anti_abuse_counter_id}`);
         if (mho_anti_abuse_counter) return;
@@ -6980,7 +6974,7 @@ function displayAntiAbuseCounter() {
             add_counter_btn.innerText = '+';
             second_part.appendChild(add_counter_btn);
             add_counter_btn.addEventListener('click', () => {
-                controller.abort();
+                anti_abuse_controller.abort();
                 let fictive_item = {
                     label: {
                         de: `Benutzerdefinierter Zähler`,
@@ -6993,7 +6987,7 @@ function displayAntiAbuseCounter() {
                 if (!counter_values) {
                     counter_values = [];
                 }
-                let counter_value = {item: {item: fictive_item, broken: false}, take_at: Date.now() + 5000};
+                let counter_value = { item: { item: fictive_item, broken: false }, take_at: Date.now() + 5000 };
                 counter_values.push(counter_value);
                 setStorageItem(mho_anti_abuse_key, counter_values);
                 let new_mho_anti_abuse_counter = document.querySelector(`#${mho_anti_abuse_counter_id}`);
@@ -7060,23 +7054,37 @@ function displayAntiAbuseCounter() {
             });
 
             if (pageIsBank()) {
+
+                // Selectionne le noeud dont les mutations seront observées
                 let bank = document.querySelector('#bank-inventory');
-                let bank_items = bank ? Array.from(bank.querySelectorAll('li.item') || []) : [];
-                bank_items.forEach((bank_item) => {
-                    bank_item.addEventListener('click', (event) => {
-                        let old_bag = Array.from(document.querySelectorAll("#gma ul.rucksack li.item"));
+                let old_bag;
 
-                        document.addEventListener('mh-navigation-complete', () => {
-                            controller.abort();
-                            if (!pageIsBank()) return;
-                            let new_bag = document.querySelectorAll("#gma ul.rucksack li.item");
+                bank.addEventListener('click', (event) => {
+                    if (event.srcElement.nodeName.toLowerCase() !== 'li' && event.srcElement.nodeName.toLowerCase() !== 'span' && event.srcElement.nodeName.toLowerCase() !== 'img') return;
+                    if (event.srcElement.className !== '' && event.srcElement.className !== 'item' && event.srcElement.className !== 'item-icon') return;
 
-                            if (old_bag.length < new_bag.length) {
+                    let rucksack = document.querySelector('#bank-inventory ul.rucksack');
+                    if (!old_bag) {
+                        old_bag = document.querySelectorAll('#bank-inventory ul.rucksack li.item:not(.locked)');
+                    }
+
+                    let callback = (mutationsList) => {
+
+                        // if (!pageIsBank()) {
+                        bank_observer?.disconnect();
+                        // return;
+                        // }
+
+                        setTimeout(() => {
+
+                            let new_bag = document.querySelectorAll('#bank-inventory ul.rucksack li.item:not(.locked)');
+
+                            if (old_bag?.length < new_bag?.length) {
                                 getStorageItem(mho_anti_abuse_key).then((counter_values) => {
                                     if (!counter_values) {
                                         counter_values = [];
                                     }
-                                    let old_bag_items = Array.from(old_bag).map((item_in_old_bag) => getItemFromImg(item_in_old_bag.querySelector('img').src))
+                                    let old_bag_items = Array.from(old_bag).map((item_in_old_bag) => getItemFromImg(item_in_old_bag.querySelector('img').src));
                                     let new_bag_items = Array.from(new_bag).map((item_in_new_bag) => getItemFromImg(item_in_new_bag.querySelector('img').src));
                                     new_bag_items.forEach((new_bag_item, index) => {
                                         let old_bag_item_index = old_bag_items.findIndex((old_bag_item) => old_bag_item.id === new_bag_item.id)
@@ -7105,15 +7113,27 @@ function displayAntiAbuseCounter() {
                             } else {
                                 new_bag = undefined;
                             }
-                        }, {once: true});
-                    }, {signal: controller.signal})
-                });
 
+                            setTimeout(() => {
+                                old_bag = new_bag;
+                            }, 0);
+                        }, 100);
+
+                        bank_observer?.disconnect();
+                    }
+
+                    // Options de l'observateur (quelles sont les mutations à observer)
+                    let config = { childList: true, subtree: true, attributes: false };
+                    // Créé une instance de l'observateur lié à la fonction de callback
+                    bank_observer = new MutationObserver(callback);
+                    // Commence à observer le noeud cible pour les mutations précédemment configurées
+                    bank_observer.observe(rucksack, config);
+                }, { signal: anti_abuse_controller.signal });
             } else if (pageIsWell()) {
                 let btn = document.querySelector('button[data-fetch-method="get"][data-fetch-confirm]');
                 btn?.addEventListener('click', (event) => {
                     document.addEventListener('mh-navigation-complete', () => {
-                        controller.abort();
+                        anti_abuse_controller.abort();
                         if (!pageIsWell()) return;
                         let well_item = {
                             label: {
@@ -7128,7 +7148,7 @@ function displayAntiAbuseCounter() {
                             if (!counter_values) {
                                 counter_values = [];
                             }
-                            let counter_value = {item: {item: well_item, broken: false}, take_at: Date.now() + 5000}
+                            let counter_value = { item: { item: well_item, broken: false }, take_at: Date.now() + 5000 }
                             counter_values.push(counter_value);
                             setStorageItem(mho_anti_abuse_key, counter_values);
                             let new_mho_anti_abuse_counter = document.querySelector(`#${mho_anti_abuse_counter_id}`);
@@ -7137,14 +7157,14 @@ function displayAntiAbuseCounter() {
                                 define_row(counter_value, counter_values.length - 1, new_content);
                             }
                         })
-                    }, {once: true});
-                }, {signal: controller.signal})
+                    }, { once: true });
+                }, { signal: anti_abuse_controller.signal })
             } else {
-                controller.abort();
+                anti_abuse_controller.abort();
             }
         });
     } else {
-        controller.abort();
+        anti_abuse_controller.abort();
     }
 }
 
@@ -7656,7 +7676,7 @@ function changeDefaultEscortOptions() {
                         escort_allow_rucksack.click();
                     }
                 }
-            }, {once: true});
+            }, { once: true });
         });
     }
 }
@@ -7741,54 +7761,96 @@ function addExternalLinksToProfiles() {
 }
 
 function addExternalLinksToTowns() {
-    if (mho_parameters.display_external_links && pageIsSoul()) {
-        let town_history = document.querySelector('.town-history');
+    if (mho_parameters.display_external_links && pageIsTownHistory()) {
+        let mho_block = document.querySelector('#' + mho_town_external_links_id);
+        if (mho_block) return;
 
-        if (!town_history) return;
+        let view_town = document.querySelector('.view-town');
+        if (!view_town) return;
 
-        let table_header = town_history.querySelector('.row-flex.header');
+        let btns_row = view_town.querySelector('button')?.parentElement;
+        if (!btns_row) return;
 
-        if (!table_header) return;
+        let town_id = view_town.getAttribute('data-town-id');
 
-        let new_cell_header = document.createElement('div');
-        new_cell_header.classList.add('cell', 'padded', 'rw-2', 'center');
-        new_cell_header.innerHTML = `<img src="${mh_optimizer_icon}" style="width: 16px; margin-right: 0.25em;">${getI18N(texts.external_links)}`;
-        table_header.appendChild(new_cell_header);
+        mho_block = document.createElement('div');
+        mho_block.id = mho_town_external_links_id;
+        mho_block.style.marginTop = '0.5em';
+        mho_block.style.padding = '0.25em';
+        mho_block.style.border = '1px solid #ddab76';
+        btns_row.appendChild(mho_block);
 
-        let table_rows_container = town_history.querySelector('.town-container');
+        let updater_title = document.createElement('h5');
+        updater_title.style.margin = '0 0 0.5em'
 
-        let table_rows = table_rows_container.querySelectorAll('.row-flex.stretch');
-        if (table_rows && table_rows.length > 0) {
-            Array.from(table_rows).forEach((table_row) => {
-                let town_id = table_row.querySelector('[data-town-id]').getAttribute('data-town-id');
+        let btns_title_mho_img = document.createElement('img');
+        btns_title_mho_img.src = mh_optimizer_icon;
+        btns_title_mho_img.style.height = '24px';
+        btns_title_mho_img.style.marginRight = '0.5em';
+        updater_title.appendChild(btns_title_mho_img);
 
-                let new_cell = document.createElement('div');
-                new_cell.classList.add('cell', 'padded', 'rw-2', 'center');
-                new_cell.style.borderBottom = '1px solid #7e4d2a';
-                new_cell.style.borderLeft = '1px solid #7e4d2a';
-                new_cell.style.display = 'flex';
-                new_cell.style.gap = '0.25em';
-                new_cell.style.alignItems = 'flex-start';
-                new_cell.style.justifyContent = 'space-around';
-                table_row.appendChild(new_cell);
+        let btns_title_text = document.createElement('text');
+        btns_title_text.innerText = getScriptInfo().name;
+        updater_title.appendChild(btns_title_text);
 
-                let bbh_link = document.createElement('a');
-                bbh_link.href = `${big_broth_hordes_url}/?cid=5-${town_id}`;
-                new_cell.appendChild(bbh_link);
+        mho_block.appendChild(updater_title);
 
-                let bbh_img = document.createElement('img');
-                bbh_img.src = `${repo_img_url}external-tools/bbh.gif`;
-                bbh_link.appendChild(bbh_img);
+        let mho_btns_block = document.createElement('div');
+        mho_block.appendChild(mho_btns_block);
+        mho_btns_block.style.display = 'flex';
+        mho_btns_block.style.gap = '0.5em';
+        mho_btns_block.style.justifyContent = 'space-between';
+        mho_btns_block.style.alignItems = 'center';
 
-                let gh_link = document.createElement('a');
-                gh_link.href = `${gest_hordes_url}/carte/${town_id}`;
-                new_cell.appendChild(gh_link);
 
-                let gh_img = document.createElement('img');
-                gh_img.src = `${repo_img_url}external-tools/gh.gif`
-                gh_link.appendChild(gh_img);
-            });
-        }
+        let bbh_link = document.createElement('button');
+        bbh_link.classList.add('small');
+        bbh_link.style.display = 'flex';
+        bbh_link.style.alignItems = 'center';
+        bbh_link.style.gap = '0.5em';
+        bbh_link.onclick = () => window.open(`${big_broth_hordes_url}/?cid=5-${town_id}`, '_blank');
+        mho_btns_block.appendChild(bbh_link);
+
+        let bbh_img = document.createElement('img');
+        bbh_img.src = `${repo_img_url}external-tools/bbh.gif`;
+        bbh_link.appendChild(bbh_img);
+
+        let bbh_title = document.createElement('text');
+        bbh_title.innerText = `BigBroth'\nHordes`;
+        bbh_link.appendChild(bbh_title);
+
+        let gh_link = document.createElement('button');
+        gh_link.classList.add('small');
+        gh_link.style.display = 'flex';
+        gh_link.style.alignItems = 'center';
+        gh_link.style.gap = '0.5em';
+        gh_link.onclick = () => window.open(`${gest_hordes_url}/carte/${town_id}`, '_blank');
+        mho_btns_block.appendChild(gh_link);
+
+        let gh_img = document.createElement('img');
+        gh_img.src = `${repo_img_url}external-tools/gh.gif`;
+        gh_link.appendChild(gh_img);
+
+        let gh_title = document.createElement('text');
+        gh_title.innerText = `Gest'\nHordes`;
+        gh_link.appendChild(gh_title);
+
+        let fata_link = document.createElement('button');
+        fata_link.classList.add('small');
+        fata_link.style.display = 'flex';
+        fata_link.style.alignItems = 'center';
+        fata_link.style.gap = '0.5em';
+        fata_link.onclick = () => window.open(`${fata_morgana_url}/spy/town/${town_id}`, '_blank');
+        mho_btns_block.appendChild(fata_link);
+
+        let fata_img = document.createElement('img');
+        fata_img.src = `${repo_img_url}external-tools/fata.gif`;
+        fata_link.appendChild(fata_img);
+
+        let fata_title = document.createElement('text');
+        fata_title.innerText = `Fata\nMorgana`;
+        fata_link.appendChild(fata_title);
+
     }
 }
 
@@ -7808,8 +7870,8 @@ function fillItemsMessages() {
             let editor = editor_block.querySelector('hordes-twino-editor');
             if (!editor) return;
 
-            let items = sendable_items.querySelectorAll('li.item');
-            Array.from(items).forEach((item) => {
+            let sendable_items_item = sendable_items.querySelectorAll('li.item');
+            Array.from(sendable_items_item).forEach((item) => {
                 item.addEventListener('click', () => {
                     let message_title = editor.querySelector('input');
                     let message_content = editor.querySelector('textarea');
@@ -7819,12 +7881,12 @@ function fillItemsMessages() {
                         let random_filler = lang_fillers[Math.floor(Math.random() * lang_fillers.length)];
 
                         message_title.setAttribute('value', random_filler.title);
-                        message_title.dispatchEvent(new Event('input', {bubbles: true}));
+                        message_title.dispatchEvent(new Event('input', { bubbles: true }));
 
                         message_content.value = random_filler.content;
-                        message_content.dispatchEvent(new Event('input', {bubbles: true}));
+                        message_content.dispatchEvent(new Event('input', { bubbles: true }));
                     }
-                }, {once: true});
+                }, { once: true });
             });
         }, 250);
     }
@@ -7833,8 +7895,28 @@ function fillItemsMessages() {
 function createStoreNotificationsBtn() {
     let stored_notifications_btn = document.getElementById(mho_store_notifications_id);
     if (mho_parameters.store_notifications) {
+
+        createWindow(mho_store_notifications_window_id, false);
+        const notifications_space = document.querySelector('#notifications');
         const mho_header_space = document.getElementById(mho_header_space_id);
-        if (stored_notifications_btn || !mho_header_space) return;
+        if (stored_notifications_btn || !mho_header_space || !notifications_space) return;
+
+        // Créez une instance de MutationObserver
+        const observer = new MutationObserver(function (mutations) {
+            mutations.forEach(function (mutation) {
+                // Vérifiez si des nœuds enfants ont été ajoutés ou supprimés
+                if (mutation.addedNodes.length) {
+                    mh_notifications.push(...(Array.from(mutation.addedNodes).map((node) => node.cloneNode(true))));
+                    createNotificationsWindowContent();
+                }
+            });
+        });
+
+        // Configuration de l'observateur pour surveiller les modifications des enfants
+        const config = { childList: true };
+
+        // Commencez à observer l'élément cible pour les modifications configurées
+        observer.observe(notifications_space, config);
 
         let btn_container = document.createElement('div');
         btn_container.id = mho_store_notifications_id;
@@ -7854,18 +7936,73 @@ function createStoreNotificationsBtn() {
         btn_container.addEventListener('click', (event) => {
             event.stopPropagation();
             event.preventDefault();
-        });
-
-        console.log('rdy');
-
-        document.querySelector('#modal-backdrop').addEventListener('pop', (event) => {
-            console.log('pop', event);
+            document.getElementById(mho_store_notifications_window_id).classList.add('visible');
+            createNotificationsWindowContent();
         });
 
         mho_header_space.appendChild(btn_container);
     } else if (stored_notifications_btn) {
         stored_notifications_btn.remove();
     }
+}
+
+function createNotificationsWindowContent() {
+
+    let window_content = document.querySelector(`#${mho_store_notifications_window_id}-content`);
+    window_content.innerHTML = '';
+
+    let window = window_content.parentElement;
+    window.style.minWidth = '500px';
+    window.style.maxWidth = '100dvw';
+
+    let tabs_div = document.createElement('div');
+    tabs_div.id = 'tabs';
+    window_content.appendChild(tabs_div);
+
+    let tabs_ul = document.createElement('ul');
+    tabs_div.appendChild(tabs_ul)
+
+    dispatchNotificationsContent();
+}
+
+function dispatchNotificationsContent() {
+    let window_content = document.getElementById(mho_store_notifications_window_id + '-content');
+
+    let tab_content = document.getElementById(mho_store_notifications_window_id + '-tab-content');
+    if (tab_content) {
+        tab_content.remove();
+    }
+    tab_content = document.createElement('div');
+    tab_content.id = mho_expeditions_window_id + '-tab-content';
+    tab_content.classList.add('tab-content');
+    window_content.appendChild(tab_content);
+
+    let notifications_list = document.createElement('ul');
+    notifications_list.id = 'notifications-list';
+    tab_content.appendChild(notifications_list);
+
+    mh_notifications.forEach((notification, index) => {
+        let notification_container = document.createElement('li');
+        notification_container.style.display = 'flex';
+        notification_container.style.gap = '0.5em';
+        notification_container.style.alignItems = 'center';
+        notifications_list.appendChild(notification_container);
+
+        let notification_content = document.createElement('div');
+        notification_content.style.flex = 1;
+        notification_content.innerHTML = notification.innerHTML;
+        notification_container.appendChild(notification_content);
+
+        let remove_notification = document.createElement('img');
+        remove_notification.src = repo_img_hordes_url + '/icons/small_trash_red.png';
+        remove_notification.style.cursor = 'pointer';
+        notification_container.appendChild(remove_notification);
+
+        remove_notification.addEventListener('click', (event) => {
+            mh_notifications.splice(index, 1);
+            createNotificationsWindowContent();
+        });
+    });
 }
 
 function createExpeditionsBtn() {
@@ -7964,9 +8101,7 @@ function dispatchExpeditionContent(expedition, citizens) {
 
     window_content.appendChild(tab_content);
 
-    console.log('expedition', expedition);
     expedition.parts.forEach((part, index) => {
-        console.log('part', part);
         let part_content = document.createElement('div');
         tab_content.appendChild(part_content);
 
@@ -8211,6 +8346,38 @@ function blockUsersPosts() {
                 });
             });
         }
+    }
+}
+
+function displayCountCharacters() {
+
+    let counter = document.querySelector('#mho_registry_counter_id');
+
+    if (!counter && mho_parameters.display_counter_on_input_registry && pageIsDesert()) {
+        let log_block = document.querySelector('#beyond-log');
+        if (!log_block) return;
+
+        let log_input = log_block.querySelector('.overlay-central input');
+        if (!log_input) return
+
+        counter = document.createElement('div');
+        counter.id = 'mho_registry_counter_id';
+        counter.classList.add('cell', 'grow-0', 'small');
+        counter.style.margin = 'auto';
+        counter.innerText = `${log_input.value.length}/256`;
+
+        log_input.parentElement?.parentElement?.parentElement?.parentElement?.parentNode.insertBefore(counter, log_input.parentElement.parentElement.parentElement.parentElement.nextSibling);
+        log_input.addEventListener('input', (event) => {
+            counter.innerText = `${event.srcElement.value?.trim().length ?? 0}/256`;
+        });
+
+        log_input.addEventListener('change', (event) => {
+            let log_block_new = document.querySelector('#beyond-log');
+            let log_input_new = log_block_new.querySelector('.overlay-central input');
+            counter.innerText = `${log_block_new.value?.trim().length ?? 0}/256`;
+        });
+    } else if (counter) {
+        counter.remove();
     }
 }
 
@@ -8536,7 +8703,7 @@ function createStyles() {
         + 'font-size: 9pt;'
         + '}';
 
-    const recipe_style = '.tab-content #recipes-list > li, #wishlist > li {'
+    const recipe_style = '.tab-content #recipes-list > li, .tab-content #notifications-list > li, #wishlist > li {'
         + 'min-width: 100% !important;'
         + 'display: flex;'
         + '}';
@@ -8571,7 +8738,7 @@ function createStyles() {
         + 'width: 100%;'
         + '}';
 
-    const wishlist_even = '.tab-content #recipes-list > li:nth-child(even), #wishlist > li:nth-child(even) {'
+    const wishlist_even = '.tab-content #recipes-list > li:nth-child(even), .tab-content #notifications-list > li:nth-child(even), #wishlist > li:nth-child(even) {'
         + 'background-color: #5c2b20;'
         + '}';
 
@@ -8658,6 +8825,10 @@ function createStyles() {
 
     const item_tag_drug = 'div.item-tag-drug::after {'
         + `background: url(${repo_img_hordes_url}status/status_drugged.gif) 50%/contain no-repeat;`
+        + '}';
+
+    const item_tag_no_img = 'div.item-tag.no-img::after {'
+        + `content: '' !important;`
         + '}';
 
     const item_tag_smokebomb = 'div.item-tag-smokebomb {'
@@ -8841,103 +9012,103 @@ function getGHMap() {
                 case 'fleche_0':
                 case 'fleche_0_b':
                 case 'fleche_0_n':
-                    return {direction: 'right', type: 'horizontal', source: '', length: 'semi', position: 'right'};
+                    return { direction: 'right', type: 'horizontal', source: '', length: 'semi', position: 'right' };
                 case 'fleche_1':
                 case 'fleche_1_b':
                 case 'fleche_1_n':
-                    return {direction: 'top', type: 'vertical', source: '', length: 'semi', position: 'top'};
+                    return { direction: 'top', type: 'vertical', source: '', length: 'semi', position: 'top' };
                 case 'fleche_2':
                 case 'fleche_2_b':
                 case 'fleche_2_n':
-                    return {direction: 'left', type: 'horizontal', source: '', length: 'semi', position: 'left'};
+                    return { direction: 'left', type: 'horizontal', source: '', length: 'semi', position: 'left' };
                 case 'fleche_3':
                 case 'fleche_3_b':
                 case 'fleche_3_n':
-                    return {direction: 'bottom', type: 'vertical', source: '', length: 'semi', position: 'bottom'};
+                    return { direction: 'bottom', type: 'vertical', source: '', length: 'semi', position: 'bottom' };
                 case 'fleche_4':
                 case 'fleche_4_b':
                 case 'fleche_4_n':
-                    return {direction: 'right', type: 'horizontal', source: '', length: 'semi', position: 'left'};
+                    return { direction: 'right', type: 'horizontal', source: '', length: 'semi', position: 'left' };
                 case 'fleche_5':
                 case 'fleche_5_b':
                 case 'fleche_5_n':
-                    return {direction: 'top', type: 'vertical', source: '', length: 'semi', position: 'bottom'};
+                    return { direction: 'top', type: 'vertical', source: '', length: 'semi', position: 'bottom' };
                 case 'fleche_6':
                 case 'fleche_6_b':
                 case 'fleche_6_n':
-                    return {direction: 'left', type: 'horizontal', source: '', length: 'semi', position: 'right'};
+                    return { direction: 'left', type: 'horizontal', source: '', length: 'semi', position: 'right' };
                 case 'fleche_7':
                 case 'fleche_7_b':
                 case 'fleche_7_n':
-                    return {direction: 'bottom', type: 'vertical', source: '', length: 'semi', position: 'top'};
+                    return { direction: 'bottom', type: 'vertical', source: '', length: 'semi', position: 'top' };
                 case 'fleche_8':
                 case 'fleche_8_b':
                 case 'fleche_8_n':
-                    return {direction: 'both', type: 'horizontal', source: '', length: 'semi', position: 'right'};
+                    return { direction: 'both', type: 'horizontal', source: '', length: 'semi', position: 'right' };
                 case 'fleche_9':
                 case 'fleche_9_b':
                 case 'fleche_9_n':
-                    return {direction: 'both', type: 'vertical', source: '', length: 'semi', position: 'top'};
+                    return { direction: 'both', type: 'vertical', source: '', length: 'semi', position: 'top' };
                 case 'fleche_10':
                 case 'fleche_10_b':
                 case 'fleche_10_n':
-                    return {direction: 'both', type: 'horizontal', source: '', length: 'semi', position: 'left'};
+                    return { direction: 'both', type: 'horizontal', source: '', length: 'semi', position: 'left' };
                 case 'fleche_11':
                 case 'fleche_11_b':
                 case 'fleche_11_n':
-                    return {direction: 'both', type: 'vertical', source: '', length: 'semi', position: 'bottom'};
+                    return { direction: 'both', type: 'vertical', source: '', length: 'semi', position: 'bottom' };
                 case 'fleche_12':
                 case 'fleche_12_b':
                 case 'fleche_12_n':
-                    return {direction: 'left', type: 'horizontal', source: '', length: 'plain', position: 'middle'};
+                    return { direction: 'left', type: 'horizontal', source: '', length: 'plain', position: 'middle' };
                 case 'fleche_13':
                 case 'fleche_13_b':
                 case 'fleche_13_n':
-                    return {direction: 'bottom', type: 'vertical', source: '', length: 'plain', position: 'middle'};
+                    return { direction: 'bottom', type: 'vertical', source: '', length: 'plain', position: 'middle' };
                 case 'fleche_14':
                 case 'fleche_14_b':
                 case 'fleche_14_n':
-                    return {direction: 'right', type: 'horizontal', source: '', length: 'plain', position: 'middle'};
+                    return { direction: 'right', type: 'horizontal', source: '', length: 'plain', position: 'middle' };
                 case 'fleche_15':
                 case 'fleche_15_b':
                 case 'fleche_15_n':
-                    return {direction: 'top', type: 'vertical', source: '', length: 'plain', position: 'middle'};
+                    return { direction: 'top', type: 'vertical', source: '', length: 'plain', position: 'middle' };
                 case 'fleche_16':
                 case 'fleche_16_b':
                 case 'fleche_16_n':
-                    return {direction: 'top', type: 'corner', source: 'right', length: '', position: ''};
+                    return { direction: 'top', type: 'corner', source: 'right', length: '', position: '' };
                 case 'fleche_17':
                 case 'fleche_17_b':
                 case 'fleche_17_n':
-                    return {direction: 'bottom', type: 'corner', source: 'right', length: '', position: ''};
+                    return { direction: 'bottom', type: 'corner', source: 'right', length: '', position: '' };
                 case 'fleche_18':
                 case 'fleche_18_b':
                 case 'fleche_18_n':
-                    return {direction: 'left', type: 'corner', source: 'top', length: '', position: ''};
+                    return { direction: 'left', type: 'corner', source: 'top', length: '', position: '' };
                 case 'fleche_19':
                 case 'fleche_19_b':
                 case 'fleche_19_n':
-                    return {direction: 'right', type: 'corner', source: 'top', length: '', position: ''};
+                    return { direction: 'right', type: 'corner', source: 'top', length: '', position: '' };
                 case 'fleche_20':
                 case 'fleche_20_b':
                 case 'fleche_20_n':
-                    return {direction: 'top', type: 'corner', source: 'left', length: '', position: ''};
+                    return { direction: 'top', type: 'corner', source: 'left', length: '', position: '' };
                 case 'fleche_21':
                 case 'fleche_21_b':
                 case 'fleche_21_n':
-                    return {direction: 'bottom', type: 'corner', source: 'left', length: '', position: ''};
+                    return { direction: 'bottom', type: 'corner', source: 'left', length: '', position: '' };
                 case 'fleche_22':
                 case 'fleche_22_b':
                 case 'fleche_22_n':
-                    return {direction: 'right', type: 'corner', source: 'bottom', length: '', position: ''};
+                    return { direction: 'right', type: 'corner', source: 'bottom', length: '', position: '' };
                 case 'fleche_23':
                 case 'fleche_23_b':
                 case 'fleche_23_n':
-                    return {direction: 'left', type: 'corner', source: 'bottom', length: '', position: ''};
+                    return { direction: 'left', type: 'corner', source: 'bottom', length: '', position: '' };
                 case 'fleche_24':
                 case 'fleche_24_b':
                 case 'fleche_24_n':
-                    return {direction: 'none', type: 'point', source: 'middle', length: 'none', position: 'middle'};
+                    return { direction: 'none', type: 'point', source: 'middle', length: 'none', position: 'middle' };
             }
         }
         getStorageItem(mho_map_key).then((mho_map) => {
@@ -8978,7 +9149,7 @@ function getGHMap() {
                     });
                     new_map.push(cells);
                 });
-            resolve({map: new_map, vertical_mapping: x_mapping});
+            resolve({ map: new_map, vertical_mapping: x_mapping });
         });
     });
 }
@@ -9072,6 +9243,7 @@ function getGHRuin() {
                                         break;
                                 }
 
+                                console.log('cell.firstElementChild', cell.firstElementChild);
                                 switch (cell.firstElementChild.getAttribute('data-porte')) {
                                     case 'pC':
                                         new_cell.door = 'item_lock';
@@ -9096,7 +9268,7 @@ function getGHRuin() {
                         });
                         new_map.push(new_cells);
                     });
-                resolve({map: new_map, vertical_mapping: x_mapping});
+                resolve({ map: new_map, vertical_mapping: x_mapping });
             }
         })
     });
@@ -9148,7 +9320,7 @@ function getBBHMap() {
                                 });
                                 new_map.push(cells);
                             });
-                        resolve({map: new_map, vertical_mapping: x_mapping});
+                        resolve({ map: new_map, vertical_mapping: x_mapping });
                     }
                 }
                 reject();
@@ -9282,7 +9454,7 @@ function getBBHRuin() {
                         });
                         new_map.push(new_cells);
                     });
-                resolve({map: new_map, vertical_mapping: x_mapping});
+                resolve({ map: new_map, vertical_mapping: x_mapping });
             }
         })
     });
@@ -9331,7 +9503,7 @@ function getFMMap() {
                     });
                     new_map.push(cells);
                 });
-            resolve({map: new_map, vertical_mapping: x_mapping});
+            resolve({ map: new_map, vertical_mapping: x_mapping });
         });
     });
 }
@@ -9437,7 +9609,7 @@ function getFMRuin() {
                         });
                         new_map.push(new_cells);
                     });
-                resolve({map: new_map, vertical_mapping: x_mapping});
+                resolve({ map: new_map, vertical_mapping: x_mapping });
             }
         })
     });
@@ -9458,7 +9630,8 @@ function getItems() {
                 }
             })
             .then((response) => {
-                items = response
+                let new_items = { ...response }
+                new_items = response
                     .sort((item_a, item_b) => {
                         if (item_a.category.ordering > item_b.category.ordering) {
                             return 1;
@@ -9469,10 +9642,28 @@ function getItems() {
                         }
                     })
                     .filter((item) => is_mh_beta ? true : +item.id !== 302);
+                new_items?.forEach((new_item) => {
+                    new_item.recipes = new_item?.recipes?.map((recipe) => {
+                        let new_recipe = { ...recipe };
+                        let new_recipe_components = [];
+                        new_recipe.components.forEach((component) => {
+                            for (let i = 0; i < component.count; i++) {
+                                new_recipe_components.push(component.item);
+                            }
+                        })
+                        new_recipe.components = new_recipe_components;
+                        new_recipe.type = action_types.find((type) => type.id === new_recipe.type);
+                        if (!new_recipe.type) {
+                            console.warn('missing recipe type', recipe.type);
+                        }
+                        return new_recipe;
+                    })
+                })
                 let wiki_btn = document.getElementById(wiki_btn_id);
                 if (wiki_btn) {
                     wiki_btn.setAttribute('style', 'display: inherit');
                 }
+                items = new_items;
                 resolve(items);
             })
             .catch((error) => {
@@ -9534,16 +9725,21 @@ function getToken(force, stop) {
             let tokenReceived = async () => {
                 console.log('MHO - I am...', mh_user);
 
-                if (mh_user !== '' && mh_user.townDetails?.townId) {
-                    let get_items_promise = getItems();
-                    let get_wishlist_promise = getWishlist();
-                    if (pageIsDesert()) {
-                        let get_ruins_promise = getRuins();
-                        let get_map_promise = getMap();
-                        await Promise.all([get_items_promise, get_ruins_promise, get_wishlist_promise, get_map_promise]);
+                if (mh_user !== '' && mh_user !== undefined && mh_user !== null) {
+                    if (mh_user.townDetails?.townId) {
+                        let get_items_promise = getItems();
+                        let get_wishlist_promise = getWishlist();
+                        if (pageIsDesert()) {
+                            let get_ruins_promise = getRuins();
+                            let get_map_promise = getMap();
+                            await Promise.all([get_items_promise, get_ruins_promise, get_wishlist_promise, get_map_promise]);
+                        } else {
+                            let get_wishlist_promise = getWishlist()
+                            await Promise.all([get_items_promise, get_wishlist_promise]);
+                        }
                     } else {
-                        let get_wishlist_promise = getWishlist()
-                        await Promise.all([get_items_promise, get_wishlist_promise]);
+                        let get_items_promise = getItems();
+                        await Promise.all([get_items_promise]);
                     }
                 }
             }
@@ -9595,26 +9791,23 @@ function getToken(force, stop) {
 /** Récupère les informations de la ville */
 function getCitizens() {
     return new Promise((resolve, reject) => {
-        getHeroSkills().then((hero_skills) => {
-            fetcher(api_url + `/Fetcher/citizens?userId=${mh_user.id}&townId=${mh_user.townDetails?.townId}`)
-                .then((response) => {
-                    if (response.status === 200) {
-                        return response.json();
-                    } else {
-                        return convertResponsePromiseToError(response);
-                    }
-                })
-                .then((response) => {
-                    citizens = response;
-                    citizens.citizens = Object.keys(citizens.citizens).map((key) => citizens.citizens[key])
-                    resolve(citizens);
-                })
-                .catch((error) => {
-                    addError(error);
-                    reject(error);
-                });
-
-        });
+        fetcher(api_url + `/Fetcher/citizens?userId=${mh_user.id}&townId=${mh_user.townDetails?.townId}`)
+            .then((response) => {
+                if (response.status === 200) {
+                    return response.json();
+                } else {
+                    return convertResponsePromiseToError(response);
+                }
+            })
+            .then((response) => {
+                citizens = response;
+                citizens.citizens = Object.keys(citizens.citizens).map((key) => citizens.citizens[key])
+                resolve(citizens);
+            })
+            .catch((error) => {
+                addError(error);
+                reject(error);
+            });
     });
 }
 
@@ -9666,25 +9859,11 @@ function getWishlist() {
                 }
             })
             .then((response) => {
-                let new_wishlist = {...response};
+                let new_wishlist = { ...response };
                 let new_wishlist_wishlist = {};
                 for (let key in new_wishlist.wishList) {
                     let wishlist_zone = Object.keys(new_wishlist.wishList[key])
                         .map((item_key) => new_wishlist.wishList[key][item_key])
-                        .map((item) => {
-                            if (item.priority < 0) {
-                                item.priority_main = -1;
-                            } else if (item.priority < 1000) {
-                                item.priority_main = 0;
-                            } else if (item.priority < 2000) {
-                                item.priority_main = 1;
-                            } else if (item.priority < 3000) {
-                                item.priority_main = 2;
-                            } else {
-                                item.priority_main = 3;
-                            }
-                            return item;
-                        })
                         .sort((item_a, item_b) => item_b.priority > item_a.priority);
                     wishlist_zone.forEach((item) => {
                         item.item.img = fixMhCompiledImg(item.item.img);
@@ -9781,7 +9960,7 @@ function updateExternalTools() {
         });
 
         if (!citizen_list || citizen_list.length === 0) {
-            citizen_list = [{id: mh_user.id, userName: mh_user.userName, job: mh_user.jobDetails.uid}];
+            citizen_list = [{ id: mh_user.id, userName: mh_user.userName, job: mh_user.jobDetails.uid }];
         }
 
         // Mise à jour en ville chaos
@@ -9789,7 +9968,7 @@ function updateExternalTools() {
             && pageIsDesert() && mh_user.townDetails?.isChaos) {
             let objects = Array.from(document.querySelector('.inventory.desert')?.querySelectorAll('li.item') || []).map((desert_item) => {
                 let item = convertImgToItem(desert_item.querySelector('img'));
-                return {id: item?.id, isBroken: desert_item.classList.contains('broken')};
+                return { id: item?.id, isBroken: desert_item.classList.contains('broken') };
             });
 
             let content = {
@@ -9812,8 +9991,8 @@ function updateExternalTools() {
 
         // Mise à jour du nombre de zombies tués
         if (((mho_parameters.update_gh && mho_parameters.update_gh_killed_zombies)
-                || (mho_parameters.update_mho && mho_parameters.update_mho_killed_zombies)
-                || (mho_parameters.update_fata && mho_parameters.update_fata_killed_zombies))
+            || (mho_parameters.update_mho && mho_parameters.update_mho_killed_zombies)
+            || (mho_parameters.update_fata && mho_parameters.update_fata_killed_zombies))
             && pageIsDesert() && nb_dead_zombies > 0) {
             let content = {
                 x: +position[0],
@@ -9832,7 +10011,7 @@ function updateExternalTools() {
 
         // Mise à jour des marqueurs issus des métiers
         if (((mho_parameters.update_mho && mho_parameters.update_mho_job_markers)
-                || (mho_parameters.update_fata && mho_parameters.update_fata_job_markers))
+            || (mho_parameters.update_fata && mho_parameters.update_fata_job_markers))
             && pageIsDesert()) {
             if (mh_user.jobDetails.uid === 'dig') {
                 let content = {
@@ -9893,10 +10072,10 @@ function updateExternalTools() {
             };
 
             let rucksacks = [];
-            let my_rusksack = Array.from(document.querySelector('.pointer.rucksack')?.querySelectorAll('li.item:not(.locked)') || []).map((rucksack_item) => {
+            let my_rusksack = Array.from(document.querySelector('.inventory.rucksack')?.querySelectorAll('li.item:not(.locked)') || []).map((rucksack_item) => {
                 let item = convertImgToItem(rucksack_item.querySelector('img'));
                 if (item) {
-                    return {id: item.id, isBroken: rucksack_item.classList.contains('broken')};
+                    return { id: item.id, isBroken: rucksack_item.classList.contains('broken') };
                 }
             });
 
@@ -9911,7 +10090,7 @@ function updateExternalTools() {
                     let escort_id = +escort.querySelector('span.username')?.getAttribute('x-user-id');
                     let escort_rucksack = Array.from(escort.querySelector('.inventory.rucksack-escort')?.querySelectorAll('li.item:not(.locked):not(.plus)') || []).map((rucksack_item) => {
                         let item = convertImgToItem(rucksack_item.querySelector('img'));
-                        return {id: item?.id, isBroken: rucksack_item.classList.contains('broken')};
+                        return { id: item?.id, isBroken: rucksack_item.classList.contains('broken') };
                     });
 
                     rucksacks.push({
@@ -9939,10 +10118,21 @@ function updateExternalTools() {
 
             let chest_elements = Array.from(document.querySelector('.inventory.chest')?.querySelectorAll('li.item:not(.locked)') || []).map((chest_item) => {
                 let item = convertImgToItem(chest_item.querySelector('img'));
-                return {id: item.id, isBroken: chest_item.classList.contains('broken')};
+                return { id: item.id, isBroken: chest_item.classList.contains('broken') };
             });
 
             data.chest.contents = convertListOfSingleObjectsIntoListOfCountedObjects(chest_elements);
+        }
+
+        // Mise à jour des positions des âmes en tant que chaman
+        // TODO récupérer l'info "isChaman" et n'envoyer ces informations que si on l'est
+        if (mho_parameters.update_mho && mho_parameters.update_mho_souls && pageIsDoors()) {
+            const soul_areas = Array.from(document.querySelectorAll('.soul-area') ?? []).map((soul_area) => {
+                return { x: soul_area.parentElement?.style?.gridRowStart, y: soul_area.parentElement?.style?.gridColumnStart };
+            })
+            data.souls = soul_areas;
+            console.log("data.souls", data.souls);
+            console.log("user", mh_user);
         }
 
 
@@ -10161,6 +10351,20 @@ function updateExternalTools() {
                 }
             }
             await saveBath(bath_taken);
+
+            /** Espace naturel des ermites */
+
+            /** Cuisine */
+
+            /** Labo */
+
+            /** Tour des gardiens */
+
+            /** Coin sieste */
+
+            /** Galerie des fouineurs */
+
+            /** Repaire des éclaireurs */
         }
 
         /** Envoi des informations */
@@ -10191,41 +10395,6 @@ function updateExternalTools() {
             });
     });
 }
-
-/** Récupère la liste complète des pouvoirs héros */
-function getHeroSkills() {
-    return new Promise((resolve, reject) => {
-        if (!hero_skills) {
-            fetcher(api_url + '/Fetcher/heroSkills')
-                .then((response) => {
-                    if (response.status === 200) {
-                        return response.json();
-                    } else {
-                        return convertResponsePromiseToError(response);
-                    }
-                })
-                .then((response) => {
-                    hero_skills = response.sort((a, b) => {
-                        if (a.daysNeeded > b.daysNeeded) {
-                            return 1;
-                        } else if (a.daysNeeded === b.daysNeeded) {
-                            return 0;
-                        } else {
-                            return -1;
-                        }
-                    });
-                    resolve(hero_skills);
-                })
-                .catch((error) => {
-                    addError(error);
-                    reject(error);
-                });
-        } else {
-            resolve(hero_skills);
-        }
-    });
-}
-
 
 /** Récupère les traductions de la chaine de caractères */
 function getTranslation(string_to_translate, source_language) {
@@ -10267,14 +10436,24 @@ function getRecipes() {
                 .then((response) => {
                     let new_recipes = response
                         .map((recipe) => {
-                            let new_recipe = {...recipe};
+                            let new_recipe = { ...recipe };
+                            let new_recipe_components = [];
+                            new_recipe.components.forEach((component) => {
+                                for (let i = 0; i < component.count; i++) {
+                                    new_recipe_components.push(component.item);
+                                }
+                            })
+                            new_recipe.components = new_recipe_components;
                             new_recipe.type = action_types.find((type) => type.id === new_recipe.type);
+                            if (!new_recipe.type) {
+                                console.warn('missing recipe type', recipe.type);
+                            }
                             return new_recipe;
                         })
                         .sort((a, b) => {
-                            if (a.type.ordering > b.type.ordering) {
+                            if (a.type?.ordering > b.type?.ordering) {
                                 return 1;
-                            } else if (a.type.ordering === b.type.ordering) {
+                            } else if (a.type?.ordering === b.type?.ordering) {
                                 return 0;
                             } else {
                                 return -1;
@@ -10391,18 +10570,18 @@ function getApofooAttackCalculation(day, beta) {
 function saveEstimations(estim_value, planif_value) {
     return new Promise((resolve, reject) => {
         getEstimations().then((estimations) => {
-            let new_estimations = {...estimations.estimations};
+            let new_estimations = { ...estimations.estimations };
             if (estim_value && estim_value.value && (estim_value.value.min || estim_value.value.max)) {
                 /** Workaround pour définir sur l'extension firefox sans passer par cloneinto */
-                let new_estimations_workaround_estim = {...new_estimations.estim};
-                new_estimations_workaround_estim['_' + estim_value.percent] = {...estim_value.value};
-                new_estimations.estim = {...new_estimations_workaround_estim};
+                let new_estimations_workaround_estim = { ...new_estimations.estim };
+                new_estimations_workaround_estim['_' + estim_value.percent] = { ...estim_value.value };
+                new_estimations.estim = { ...new_estimations_workaround_estim };
             }
             if (planif_value && planif_value.value && (planif_value.value.min || planif_value.value.max)) {
                 /** Workaround pour définir sur l'extension firefox sans passer par cloneinto */
-                let new_estimations_workaround_planif = {...new_estimations.planif};
-                new_estimations_workaround_planif['_' + planif_value.percent] = {...planif_value.value};
-                new_estimations.planif = {...new_estimations_workaround_planif};
+                let new_estimations_workaround_planif = { ...new_estimations.planif };
+                new_estimations_workaround_planif['_' + planif_value.percent] = { ...planif_value.value };
+                new_estimations.planif = { ...new_estimations_workaround_planif };
             }
 
             fetcher(api_url + `/AttaqueEstimation/Estimations?townId=${mh_user.townDetails?.townId}&userId=${mh_user.id}`, {
@@ -10664,6 +10843,7 @@ function getApiKey() {
             toggleNewChangelog(isNewVersion(version))
 
             createStyles();
+            createOptimizerBtn();
             createMhoHeaderSpace();
             notifyOnSearchEnd();
 
@@ -10677,9 +10857,11 @@ function getApiKey() {
                             initOptionsWithoutLoginNeeded();
                         });
 
-                        ['mh-navigation-complete', 'mho-mutation-event', /*'pop', 'load', 'popstate', 'error', 'push', , 'tab-switch', '_react', 'x-react-degenerate', 'DOMContentLoaded', 'movement-reset', 'readystatechange'*/].forEach((event_name) => {
+                        ['mh-navigation-complete', 'mh-current-log-update', 'mh-current-log-refresh', 'mho-mutation-event'/*, 'pop', 'load', 'popstate', 'error', 'push', , 'tab-switch', '_react', 'x-react-degenerate', 'DOMContentLoaded', 'movement-reset', 'readystatechange'*/].forEach((event_name) => {
                             document.addEventListener(event_name, (event) => {
                                 // console.trace('event', event_name, event);
+                                // console.table(listAllEventListeners());
+                                console.log('event', event_name);
                                 if (shouldRefreshMe()) {
                                     getToken(true).then(() => {
                                         initOptionsWithLoginNeeded();
@@ -10691,10 +10873,10 @@ function getApiKey() {
                                 }
                             });
                         });
-                        setInterval(() => {
-                            displayAdvancedTooltips();
-                        }, 10);
-                    });
+                    })
+                        .catch(() => {
+                            initOptionsWithoutLoginNeeded();
+                        });
                 });
             })
                 .catch(() => {

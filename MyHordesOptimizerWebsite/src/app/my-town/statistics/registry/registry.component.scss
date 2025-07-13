@@ -10,7 +10,7 @@
     .form {
         display: flex;
         flex-wrap: wrap;
-        height: calc(100% - var(--mat-standard-button-toggle-height));
+        height: calc(100% - var(--mat-button-toggle-height));
 
         .form-content {
             min-width: 400px;
@@ -47,7 +47,7 @@
                 width: 50px;
 
                 .mat-mdc-icon-button {
-                    --mdc-icon-button-icon-size: 16;
+                    --mat-icon-button-icon-size: 16;
 
                     &.active {
                         background-color: variables.$item_color;

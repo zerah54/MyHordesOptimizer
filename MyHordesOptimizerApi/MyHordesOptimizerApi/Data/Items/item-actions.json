@@ -104,6 +104,21 @@
     "wood_xmas_#00": [
         "eat_6ap"
     ],
+    "moldy_food_spicy_#00": [
+        "eat_6ap"
+    ],
+    "noodle_prints_#00": [
+        "eat_4ap"
+    ],
+    "noodle_prints_#01": [
+        "eat_4ap"
+    ],
+    "noodle_prints_#02": [
+        "eat_4ap"
+    ],
+    "moldy_food_subpart_#00": [
+        "eat_4ap"
+    ],
     "fruit_#00": [
         "eat_fleshroom_1",
         "eat_fleshroom_2"
@@ -147,8 +162,14 @@
     "egg_#00": [
         "eat_7ap"
     ],
-    "apple_#00": [
+    "apple_blue_#00": [
         "eat_7ap"
+    ],
+    "moldy_food_#00": [
+        "eat_7ap"
+    ],
+    "apple_#00": [
+        "eat_apple"
     ],
     "disinfect_#00": [
         "drug_par_1",
@@ -421,31 +442,45 @@
     ],
     "pet_chick_#00": [
         "slaughter_2x",
-        "throw_animal"
+        "throw_animal",
+        "throw_animal_t1",
+        "throw_animal_t2"
     ],
     "pet_rat_#00": [
         "slaughter_2x",
-        "throw_animal"
+        "throw_animal",
+        "throw_animal_t1",
+        "throw_animal_t2"
     ],
     "pet_pig_#00": [
         "slaughter_4x",
-        "throw_animal"
+        "throw_animal",
+        "throw_animal_t1",
+        "throw_animal_t2"
     ],
     "pet_snake_#00": [
         "slaughter_4xs",
-        "throw_animal"
+        "throw_animal",
+        "throw_animal_t1",
+        "throw_animal_t2"
     ],
     "pet_cat_#00": [
         "slaughter_2xs",
-        "throw_animal_cat"
+        "throw_animal_cat",
+        "throw_animal_cat_t1",
+        "throw_animal_cat_t2"
     ],
     "tekel_#00": [
         "slaughter_2xs",
-        "throw_animal_tekel"
+        "throw_animal_tekel",
+        "throw_animal_tekel_t1",
+        "throw_animal_tekel_t2"
     ],
     "pet_dog_#00": [
         "slaughter_2xs",
-        "throw_animal_dog"
+        "throw_animal_dog",
+        "throw_animal_dog_t1",
+        "throw_animal_dog_t2"
     ],
     "angryc_#00": [
         "slaughter_bmb",
@@ -644,7 +679,9 @@
         "jerrycan_1",
         "jerrycan_1b",
         "jerrycan_2",
-        "jerrycan_3"
+        "jerrycan_3",
+        "jerrycan_4",
+        "jerrycan_4b"
     ],
     "water_cup_part_#00": [
         "watercup_1",
@@ -696,15 +733,6 @@
     ],
     "basic_suit_dirt_#00": [
         "clean_clothes"
-    ],
-    "tamed_pet_#00": [
-        "hero_tamer_1",
-        "hero_tamer_1b",
-        "hero_tamer_3"
-    ],
-    "tamed_pet_drug_#00": [
-        "hero_tamer_2",
-        "hero_tamer_2b"
     ],
     "surv_book_#00": [
         "hero_surv_1",
@@ -770,5 +798,74 @@
     ],
     "pumpkin_on_#00": [
         "pumpkin"
+    ],
+    "keymol_#00": [
+        "repair_hero"
+    ],
+    "pumpkin_tasty_#00": [
+        "eat_7ap"
+    ],
+    "medic_#00": [
+        "open_drugkit"
+    ],
+    "shoe_#00": [
+        "equip_shoe_first"
+    ],
+    "bike_#00": [
+        "equip_bike_first",
+        "unequip_bike_first"
+    ],
+    "xmas_gift_#00": [
+        "install_garland"
+    ],
+    "xmas_gift_#01": [
+        "uninstall_garland"
+    ],
+    "tamed_pet_#00": [
+        "hero_tamer_1",
+        "hero_tamer_1b",
+        "hero_tamer_3",
+        "hero_tamer_4",
+        "hero_tamer_5",
+        "hero_tamer_6",
+        "hero_tamer_7",
+        "hero_tamer_8",
+        "hero_tamer_9",
+        "pet_doggo"
+    ],
+    "tamed_pet_drug_#00": [
+        "hero_tamer_2",
+        "hero_tamer_2b",
+        "hero_tamer_4b",
+        "hero_tamer_5",
+        "hero_tamer_5b",
+        "hero_tamer_6b",
+        "hero_tamer_7b",
+        "hero_tamer_8b",
+        "hero_tamer_9"
+    ],
+    "tamed_pet_off_#00": [
+        "pet_doggo"
+    ],
+    "soccer_#00": [
+        "play_soccer_1",
+        "play_soccer_2"
+    ],
+    "quantum_#00": [
+        "drink_quantum_1",
+        "drink_quantum_2",
+        "drink_quantum_3"
+    ],
+    "photo_4_#00": [
+        "flash_photo_4",
+        "flash_photo_4_ruin_no_bp",
+        "flash_photo_4_ruin_bp",
+        "flash_photo_4_ruin_bp_free"
+    ],
+    "cello_box_#00": [
+        "open_cellobox"
+    ],
+    "flag_#00": [
+        "wagging_flag"
     ]
 }

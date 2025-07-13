@@ -1,7 +1,6 @@
 import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
-import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
-import { CommonModule, DOCUMENT, NgOptimizedImage } from '@angular/common';
-import { Component, EventEmitter, HostBinding, Inject, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import { CommonModule, NgOptimizedImage } from '@angular/common';
+import { Component, EventEmitter, Inject, OnInit, ViewChild, ViewEncapsulation, DOCUMENT, inject, DestroyRef } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -15,17 +14,14 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatSort } from '@angular/material/sort';
-import { MatTable, MatTableModule } from '@angular/material/table';
+import { MatTable, MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatTabChangeEvent, MatTabGroup, MatTabsModule } from '@angular/material/tabs';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import moment from 'moment';
-import { TableVirtualScrollDataSource, TableVirtualScrollModule } from 'ng-table-virtual-scroll';
-import { Subject, takeUntil } from 'rxjs';
 import { read, utils, WorkBook, WorkSheet, write } from 'xlsx';
 import { environment } from '../../../environments/environment';
 import { HORDES_IMG_REPO, WISHLIST_EDITION_MODE_KEY } from '../../_abstract_model/const';
 import { WishlistDepot } from '../../_abstract_model/enum/wishlist-depot.enum';
-import { WishlistPriority } from '../../_abstract_model/enum/wishlist-priority.enum';
 import { StandardColumn } from '../../_abstract_model/interfaces';
 import { ApiService } from '../../_abstract_model/services/api.service';
 import { WishlistService } from '../../_abstract_model/services/wishlist.service';
@@ -33,7 +29,6 @@ import { Imports } from '../../_abstract_model/types/_types';
 import { Item } from '../../_abstract_model/types/item.class';
 import { WishlistInfo } from '../../_abstract_model/types/wishlist-info.class';
 import { WishlistItem } from '../../_abstract_model/types/wishlist-item.class';
-import { AutoDestroy } from '../../shared/decorators/autodestroy.decorator';
 import { ConfirmDialogComponent, ConfirmDialogData } from '../../shared/elements/confirm-dialog/confirm-dialog.component';
 import { LastUpdateComponent } from '../../shared/elements/last-update/last-update.component';
 import { HeaderWithStringFilterComponent } from '../../shared/elements/lists/header-with-string-filter/header-with-string-filter.component';
@@ -42,21 +37,22 @@ import { ColumnIdPipe } from '../../shared/pipes/column-id.pipe';
 import { CustomKeyValuePipe } from '../../shared/pipes/key-value.pipe';
 import { ClipboardService } from '../../shared/services/clipboard.service';
 import { IsItemDisplayedPipe } from './is-item-displayed.pipe';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 const angular_common: Imports = [CommonModule, FormsModule, NgOptimizedImage];
 const components: Imports = [HeaderWithStringFilterComponent, LastUpdateComponent, SelectComponent];
 const pipes: Imports = [ColumnIdPipe, CustomKeyValuePipe, IsItemDisplayedPipe];
-const material_modules: Imports = [CdkVirtualScrollViewport, DragDropModule, MatButtonModule, MatCardModule, MatCheckboxModule, MatFormFieldModule, MatIconModule, MatInputModule, MatMenuModule, MatOptionModule, MatSelectModule, MatSlideToggleModule, MatTableModule, MatTabsModule, MatTooltipModule];
+const material_modules: Imports = [DragDropModule, MatButtonModule, MatCardModule, MatCheckboxModule, MatFormFieldModule, MatIconModule, MatInputModule, MatMenuModule, MatOptionModule, MatSelectModule, MatSlideToggleModule, MatTableModule, MatTabsModule, MatTooltipModule];
 
 @Component({
     selector: 'mho-wishlist',
     templateUrl: './wishlist.component.html',
     styleUrls: ['./wishlist.component.scss'],
     encapsulation: ViewEncapsulation.None,
-    imports: [...angular_common, ...components, ...material_modules, ...pipes, TableVirtualScrollModule]
+    host: { style: 'display: contents' },
+    imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class WishlistComponent implements OnInit {
-    @HostBinding('style.display') display: string = 'contents';
 
     @ViewChild(MatSort) sort!: MatSort;
     @ViewChild(MatTable) table!: MatTable<WishlistItem>;
@@ -66,9 +62,9 @@ export class WishlistComponent implements OnInit {
     /** La wishlist */
     public wishlist_info!: WishlistInfo;
     /** La datasource pour le tableau */
-    public datasource: TableVirtualScrollDataSource<WishlistItem> = new TableVirtualScrollDataSource();
+    public datasource: MatTableDataSource<WishlistItem> = new MatTableDataSource();
     /** Le dossier dans lequel sont stockées les images */
-    public HORDES_IMG_REPO: string = HORDES_IMG_REPO;
+    public readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
     /** La locale */
     public readonly locale: string = moment.locale();
     /** La liste des colonnes */
@@ -76,7 +72,6 @@ export class WishlistComponent implements OnInit {
         {id: 'sort', header: '', displayed: (): boolean => this.edition_mode},
         {id: 'name', header: $localize`Objet`, sticky: true},
         {id: 'heaver', header: ''},
-        {id: 'priority', header: $localize`Priorité`},
         {id: 'depot', header: $localize`Dépôt`},
         {id: 'bank_count', header: $localize`Banque`},
         {id: 'bag_count', header: $localize`Sacs`},
@@ -98,7 +93,6 @@ export class WishlistComponent implements OnInit {
     /** Les filtres de la liste de courses */
     public wishlist_filters: WishlistFilters = {
         items: '',
-        priority: [],
         depot: []
     };
 
@@ -127,26 +121,24 @@ export class WishlistComponent implements OnInit {
         },
     };
 
-
-    /** La liste des priorités */
-    public readonly priorities: WishlistPriority[] = WishlistPriority.getAllValues();
-
     /** La liste des dépôts */
     public readonly depots: WishlistDepot[] = WishlistDepot.getAllValues();
 
-    @AutoDestroy private destroy_sub: Subject<void> = new Subject();
 
-    constructor(private api: ApiService, private wishlist_sercices: WishlistService, private clipboard: ClipboardService, private dialog: MatDialog,
-                @Inject(DOCUMENT) private document: Document) {
+    private readonly api: ApiService = inject(ApiService);
+    private readonly wishlist_services: WishlistService = inject(WishlistService);
+    private readonly destroy_ref: DestroyRef = inject(DestroyRef);
+
+    constructor(private clipboard: ClipboardService, private dialog: MatDialog, @Inject(DOCUMENT) private document: Document) {
 
     }
 
     public ngOnInit(): void {
-        this.datasource = new TableVirtualScrollDataSource();
+        this.datasource = new MatTableDataSource();
         this.datasource.sort = this.sort;
 
         this.wishlist_filters_change
-            .pipe(takeUntil(this.destroy_sub))
+            .pipe(takeUntilDestroyed(this.destroy_ref))
             .subscribe((): void => {
                 this.datasource.filter = JSON.stringify(this.wishlist_filters);
             });
@@ -155,7 +147,7 @@ export class WishlistComponent implements OnInit {
 
         this.getWishlist();
         this.api.getItems(true)
-            .pipe(takeUntil(this.destroy_sub))
+            .pipe(takeUntilDestroyed(this.destroy_ref))
             .subscribe((items: Item[]): void => {
                 this.items = items;
             });
@@ -163,8 +155,8 @@ export class WishlistComponent implements OnInit {
 
     /** Met à jour la liste de courses */
     public updateWishlist(): void {
-        this.wishlist_sercices.updateWishlist(this.wishlist_info)
-            .pipe(takeUntil(this.destroy_sub))
+        this.wishlist_services.updateWishlist(this.wishlist_info)
+            .pipe(takeUntilDestroyed(this.destroy_ref))
             .subscribe((wishlist_info: WishlistInfo): void => {
                 this.wishlist_info = wishlist_info;
                 this.wishlist_info.wishlist_items.forEach((zone: WishlistItem[]) => {
@@ -191,10 +183,11 @@ export class WishlistComponent implements OnInit {
 
     public addItemToWishlist(item: Item): void {
         if (item) {
-            this.wishlist_sercices.addItemToWishlist(item, this.selected_tab_key)
-                .pipe(takeUntil(this.destroy_sub))
+            this.wishlist_services.addItemToWishlist(item, this.selected_tab_key)
+                .pipe(takeUntilDestroyed(this.destroy_ref))
                 .subscribe(() => {
                     this.add_item_select.value = undefined;
+                    this.add_item_select.filter_input.value = '';
                     this.getWishlist();
                 });
         }
@@ -282,7 +275,7 @@ export class WishlistComponent implements OnInit {
                 const final_item: { [key: string]: string | number } = {};
                 final_item[this.excel_headers['id'].label] = item.item.id;
                 final_item[this.excel_headers['name'].label] = item.item.label[this.locale];
-                final_item[this.excel_headers['priority'].label] = item.priority_main.value.count;
+                final_item[this.excel_headers['priority'].label] = item.priority;
                 final_item[this.excel_headers['count'].label] = item.item.wishlist_count;
                 final_item[this.excel_headers['depot'].label] = item.depot.value.count;
                 return final_item;
@@ -315,7 +308,7 @@ export class WishlistComponent implements OnInit {
                 }
             })
             .afterClosed()
-            .pipe(takeUntil(this.destroy_sub))
+            .pipe(takeUntilDestroyed(this.destroy_ref))
             .subscribe((confirm: boolean): void => {
                 if (confirm) {
 
@@ -341,9 +334,8 @@ export class WishlistComponent implements OnInit {
                                         .find((item_in_all: Item): boolean => item_in_all.id === item[this.excel_headers['id'].label]);
                                     if (complete_item) {
                                         new_item.zone_x_pa = +sheet_key;
-                                        new_item.depot = WishlistDepot.getDepotFromCount(<number>item[this.excel_headers['depot'].label]);
+                                        new_item.depot = WishlistDepot.getDepotFromCountAndPriority(<number>item[this.excel_headers['depot'].label], <number>item[this.excel_headers['priority'].label]);
                                         new_item.count = <number>item[this.excel_headers['count'].label];
-                                        new_item.priority_main = WishlistPriority.getPriorityFromCount(<number>item[this.excel_headers['priority'].label]);
                                         new_item.item = complete_item;
                                         new_item.bank_count = complete_item.bank_count;
                                     }
@@ -364,36 +356,23 @@ export class WishlistComponent implements OnInit {
             });
     }
 
-    public sortWishlist(event: CdkDragDrop<TableVirtualScrollDataSource<WishlistItem>>): void {
+    public sortWishlist(event: CdkDragDrop<MatTableDataSource<WishlistItem>>): void {
         this.drag_disabled = true;
         const current_wishlist_items: WishlistItem[] = this.wishlist_info.wishlist_items.get(this.selected_tab_key) || this.wishlist_info.wishlist_items.get('0') || [];
         const previous_index_in_real_array: number = current_wishlist_items.findIndex((item: WishlistItem) => item.item.id === event.item.data.item.id);
-        let current_index_in_real_array: number;
-        if ((<{ [key: string]: any }>this.datasource.dataOfRange$)['_buffer'][0][event.currentIndex - 1]) {
-            current_index_in_real_array = current_wishlist_items
-                .findIndex((item: WishlistItem) => item.item.id === (<{
-                    [key: string]: any
-                }>this.datasource.dataOfRange$)['_buffer'][0][event.currentIndex - 1].item.id) + 1;
-        } else if ((<{ [key: string]: any }>this.datasource.dataOfRange$)['_buffer'][0][event.currentIndex + 1]) {
-            current_index_in_real_array = current_wishlist_items
-                .findIndex((item: WishlistItem) => item.item.id === (<{
-                    [key: string]: any
-                }>this.datasource.dataOfRange$)['_buffer'][0][event.currentIndex + 1].item.id) - 1;
-        } else {
-            current_index_in_real_array = 0;
-        }
-        moveItemInArray(current_wishlist_items, previous_index_in_real_array, current_index_in_real_array);
+        moveItemInArray(current_wishlist_items, previous_index_in_real_array, event.currentIndex);
         let new_pos: number;
-        if (current_wishlist_items[current_index_in_real_array - 1]) {
-            new_pos = current_index_in_real_array - 1;
-        } else if (current_wishlist_items[current_index_in_real_array + 1]) {
-            new_pos = current_index_in_real_array + 1;
+        if (current_wishlist_items[event.currentIndex - 1]) {
+            new_pos = event.currentIndex - 1;
+        } else if (current_wishlist_items[event.currentIndex + 1]) {
+            new_pos = event.currentIndex + 1;
         } else {
-            new_pos = current_index_in_real_array;
+            new_pos = event.currentIndex;
         }
 
-        current_wishlist_items[current_index_in_real_array].priority_main = current_wishlist_items[new_pos].priority_main;
-        current_wishlist_items[current_index_in_real_array].priority = current_wishlist_items[new_pos].priority;
+        current_wishlist_items[event.currentIndex].priority = current_wishlist_items[new_pos].priority;
+        current_wishlist_items[event.currentIndex].depot = WishlistDepot.getDepotFromCountAndPriority(current_wishlist_items[new_pos].depot.value.count, current_wishlist_items[new_pos].priority);
+
 
         this.datasource.data = [...this.resetPriorities(current_wishlist_items)];
     }
@@ -402,11 +381,15 @@ export class WishlistComponent implements OnInit {
 
         let priority_factor: number = 999;
         array.forEach((item: WishlistItem) => {
-            item.priority = parseInt(item.priority_main.value.count.toString() + (item.priority_main.value.count >= 0 ? priority_factor.toString() : (1000 - priority_factor).toString()));
+            item.priority = item.depot.value.count < -1 ? 1000 - priority_factor : priority_factor;
             priority_factor--;
         });
         array = array.sort((item_a: WishlistItem, item_b: WishlistItem) => item_b.priority - item_a.priority);
         return array;
+    }
+
+    public changeDepot(): void {
+        this.datasource.data = [...this.resetPriorities(this.datasource.data)];
     }
 
     /**
@@ -416,21 +399,21 @@ export class WishlistComponent implements OnInit {
         localStorage.setItem(WISHLIST_EDITION_MODE_KEY, JSON.stringify(this.edition_mode));
     }
 
-    public compareWith(option: WishlistDepot | WishlistPriority, selected: WishlistDepot | WishlistPriority): boolean {
+    public compareWith(option: WishlistDepot, selected: WishlistDepot): boolean {
         return option.value.count === selected.value.count;
     }
 
     /** Remplace la fonction qui vérifie si un élément doit être remonté par le filtre */
     private customFilter(data: WishlistItem, filter: string): boolean {
         const filter_object: WishlistFilters = JSON.parse(filter.toLowerCase());
-        if (!filter_object || ((!filter_object.items || filter_object.items === '') && !filter_object.depot && !filter_object.priority)) return true;
+        if (!filter_object || ((!filter_object.items || filter_object.items === '') && !filter_object.depot)) return true;
         if (data.item.label[this.locale].toLocaleLowerCase().indexOf(filter_object.items.toLocaleLowerCase()) > -1) return true;
         return false;
     }
 
     private getWishlist(): void {
-        this.wishlist_sercices.getWishlist()
-            .pipe(takeUntil(this.destroy_sub))
+        this.wishlist_services.getWishlist()
+            .pipe(takeUntilDestroyed(this.destroy_ref))
             .subscribe((wishlist_info: WishlistInfo) => {
                 this.wishlist_info = wishlist_info;
                 this.datasource.data = [...<WishlistItem[]>wishlist_info.wishlist_items.get(this.selected_tab_key) || this.wishlist_info.wishlist_items.get('0') || []];
@@ -440,6 +423,5 @@ export class WishlistComponent implements OnInit {
 
 interface WishlistFilters {
     items: string;
-    priority: WishlistPriority[];
     depot: WishlistDepot[];
 }

@@ -177,7 +177,7 @@
                                                                     <td class="job">
                                                                         @if (edition_mode && editable && !expedition_citizen.citizen_id) {
                                                                             <mat-form-field [appearance]="'outline'" class="no-bottom compact-field">
-                                                                                <mho-select [options]="all_citizens_job" [searchable]="false"
+                                                                                <mho-select [options]="all_citizens_job"
                                                                                             emptyOption
                                                                                             noLabel
                                                                                             [class]="'job-select'"
@@ -202,7 +202,7 @@
                                                                                             [bindValue]="'id'"
                                                                                             [bindIcon]="'job.value.img'"
                                                                                             [(ngModel)]="expedition_citizen.citizen_id"
-                                                                                            (ngModelChange)="expedition_citizen.preinscrit = edition_mode; saveCitizen(expedition_part, expedition_citizen, expedition_part_index, expedition, citizen_index)"></mho-select>
+                                                                                            (ngModelChange)="expedition_citizen.preinscrit = edition_mode; saveCitizen(expedition_part, expedition_citizen, expedition_part_index, expedition, citizen_index)" searchable></mho-select>
                                                                             </mat-form-field>
                                                                         } @else if (expedition.state === 'ready' && !expedition_citizen.citizen_id && (!expedition_citizen.preinscrit_job || expedition_citizen.preinscrit_job === (me?.id| citizenFromId:all_citizens)?.job?.key)) {
                                                                             <button mat-button
@@ -264,7 +264,7 @@
                                                                                                 (ngModelChange)="saveCitizen(expedition_part, expedition_citizen)"
                                                                                                 [bindLabel]="'value.label'"
                                                                                                 [bindValue]="'value.action'"
-                                                                                                [bindIcon]="'value.img'"></mho-select>
+                                                                                                [bindIcon]="'value.img'" searchable></mho-select>
                                                                                 </mat-form-field>
                                                                             } @else {
                                                                                 {{ expedition_citizen.preinscrit_heroic_skill ? expedition_citizen.preinscrit_heroic_skill : '' }}

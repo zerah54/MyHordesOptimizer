@@ -1,0 +1,9 @@
+{
+    "eslint.format.enable": true,
+    "eslint.ignoreUntitled": true,
+    "eslint.workingDirectories": [
+        {"directory": "/MyHordesOptimizerWebsite"}
+    ],
+    "eslint.lintTask.enable": true,
+    "eslint.useFlatConfig": true
+}

@@ -23,5 +23,10 @@
         "name": "special_vote_guide",
         "icon": "hero",
         "consumable": false
+    },
+    {
+        "name": "special_vote_cata",
+        "icon": "hero",
+        "consumable": false
     }
 ]

@@ -4,7 +4,6 @@ import {
     booleanAttribute,
     Component,
     ElementRef,
-    EventEmitter,
     HostBinding,
     input,
     Input,
@@ -12,7 +11,7 @@ import {
     InputSignalWithTransform,
     OnDestroy,
     Optional,
-    Output,
+    OutputEmitterRef,
     Self,
     ViewChild,
     ViewEncapsulation
@@ -50,13 +49,13 @@ const material_modules: Imports = [MatChipsModule, MatDividerModule, MatFormFiel
             useExisting: SelectComponent
         }
     ],
+    host: {style: 'display: contents'},
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class SelectComponent<T> implements ControlValueAccessor, Validator, MatFormFieldControl<T | string | T[] | string[] | undefined>, OnDestroy {
 
     private static nextId: number = 0;
 
-    @HostBinding('style.display') display: string = 'contents';
     @HostBinding('class.floating') floating: boolean = this.shouldLabelFloat;
 
     // get reference to the input element
@@ -71,14 +70,13 @@ export class SelectComponent<T> implements ControlValueAccessor, Validator, MatF
     public bindValue: InputSignal<string | undefined> = input();
     public bindIcon: InputSignal<string | undefined> = input();
 
-    @Input() moreInfo?: (element: string | T) => string;
+    public moreInfo: InputSignal<((element: string | T) => string) | undefined> = input<((element: string | T) => string) | undefined>(undefined);
     //current form control input. helpful in validating and accessing form control
-    @Input() form_control: AbstractControl = new UntypedFormControl();
-    @Input() searchable: boolean = true;
-    @Input() class: string = '';
+    public form_control: InputSignal<UntypedFormControl> = input(new UntypedFormControl());
+    public searchable: InputSignalWithTransform<boolean, unknown> = input(false, {transform: booleanAttribute});
+    public class: InputSignal<string> = input('');
     /** Doit-on afficher sous forme de chips les différentes valeurs ? Fonctionne uniquement si "multiple" */
-    @Input() chips: boolean = true;
-
+    public chips: InputSignalWithTransform<boolean, unknown> = input(false, {transform: booleanAttribute});
     @Input() set options(options: (T | string)[]) {
         this.displayed_options = [...options];
         this.complete_options = [...options];
@@ -110,12 +108,12 @@ export class SelectComponent<T> implements ControlValueAccessor, Validator, MatF
 
     set disabled(value: boolean) {
         this._disabled = coerceBooleanProperty(value);
-        this._disabled ? this.form_control.disable() : this.form_control.enable();
+        this._disabled ? this.form_control().disable() : this.form_control().enable();
         this.stateChanges.next();
     }
 
-    @Output() filterChange: EventEmitter<T | string | T[] | string[] | undefined> = new EventEmitter<T | string | T[] | string[] | undefined>();
-    @Output() closed: EventEmitter<void> = new EventEmitter<void>();
+    public filterChange: OutputEmitterRef<T | string | T[] | string[] | undefined> = new OutputEmitterRef();
+    public closed: OutputEmitterRef<void> = new OutputEmitterRef();
 
 
     get shouldLabelFloat(): boolean {
@@ -172,10 +170,10 @@ export class SelectComponent<T> implements ControlValueAccessor, Validator, MatF
         //reset errors
         this.errors = [];
         //setting, resetting error messages into an array (to loop) and adding the validation messages to show below the field area
-        for (const key in this.form_control.errors) {
+        for (const key in this.form_control().errors) {
             // eslint-disable-next-line no-prototype-builtins
-            if (this.form_control.errors.hasOwnProperty(key)) {
-                this.errors.push(this.form_control.errors[key]);
+            if (this.form_control()?.errors?.hasOwnProperty(key)) {
+                this.errors.push(this.form_control()?.errors?.[key]);
             }
         }
     }
@@ -189,7 +187,7 @@ export class SelectComponent<T> implements ControlValueAccessor, Validator, MatF
     }
 
     public get errorState(): boolean {
-        return this.form_control.invalid && this.touched;
+        return this.form_control().invalid && this.touched;
     }
 
     //get accessor
@@ -234,7 +232,7 @@ export class SelectComponent<T> implements ControlValueAccessor, Validator, MatF
         // console.log('value', value)
         this.innerValue = value;
         this.onChange(value);
-        this.filterChange.next(value);
+        this.filterChange.emit(value);
     }
 
     //From ControlValueAccessor interface

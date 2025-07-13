@@ -131,7 +131,7 @@ namespace MyHordesOptimizerApi.DiscordBot.Modules
         private void CreateFieldFromRecipe(ItemRecipeDto recipe, Locales locale, EmbedBuilder embedBuilder)
         {
             var componentsLabels = recipe.Components
-                .Select(component => component.Label[locale.ToString().ToLower()]);
+                .Select(component => component.Item.Label[locale.ToString().ToLower()]);
             var completeRecipeComponents = string.Join('\n', componentsLabels);
             var componentsField = new EmbedFieldBuilder()
                 .WithName("Composants")
@@ -168,7 +168,7 @@ namespace MyHordesOptimizerApi.DiscordBot.Modules
             recipe.Components.ForEach(component =>
             {
                 var childrenRecipes =
-                    GetRecipesFromResultItemName(component.Label[locale.ToString().ToLower()], locale);
+                    GetRecipesFromResultItemName(component.Item.Label[locale.ToString().ToLower()], locale);
 
                 childrenRecipes.ForEach(child_recipe =>
                 {

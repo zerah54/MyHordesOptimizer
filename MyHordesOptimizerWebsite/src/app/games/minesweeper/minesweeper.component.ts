@@ -17,6 +17,7 @@ const material_modules: Imports = [MatButtonModule, MatButtonToggleModule, MatCa
     selector: 'mho-minesweeper',
     templateUrl: 'minesweeper.component.html',
     styleUrls: ['minesweeper.component.scss'],
+    host: {style: 'display: contents'},
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class MinesweeperComponent implements OnInit {

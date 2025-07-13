@@ -1,0 +1,52 @@
+<mat-card-header class="mho-368-chickens-header">
+    <mat-card-title i18n>368 Pictos</mat-card-title>
+</mat-card-header>
+<mat-card-content class="mho-368-chickens">
+    <div class="game-board">
+        <div class="remaining" i18n>{{ [pictos_to_rescue - pictos_rescued, 0] | max }} pictos restants</div>
+
+        <div class="grid">
+            @for (row of board; track rowIndex; let rowIndex = $index) {
+            <div class="row">
+                @for (cell of row; track colIndex; let colIndex = $index) {
+                <div
+                    #cellDiv
+                    class="cell"
+                    [class.highlighted]="highlighted_cells | pictosHighlightedCell : rowIndex : colIndex"
+                    [attr.x]="rowIndex"
+                    [attr.y]="colIndex"
+                    (click)="onCellClick(rowIndex, colIndex)">
+                    @if (cell) {
+                    <img [src]="HORDES_IMG_REPO + cell?.img" [alt]="cell?.img" [class.to-remove]="cell?.to_remove" />
+                    }
+                </div>
+                }
+            </div>
+            }
+        </div>
+        <div class="lot-position">
+            <div
+                #lot
+                class="lot"
+                [class]="{ horizontal: is_lot_horizontal, vertical: !is_lot_horizontal }"
+                cdkDrag
+                cdkDragBoundary=".game-board"
+                (cdkDragStarted)="highlighted_cells = []"
+                (cdkDragMoved)="onDragMoved()"
+                (cdkDragReleased)="onDragRelease($event)">
+                @for (picto of current_lot; track $index) {
+                <div #cellLotDiv class="lot-item">
+                    <img [src]="HORDES_IMG_REPO + picto.img" [alt]="picto.img" />
+                </div>
+                }
+            </div>
+        </div>
+        @if (game_over) {
+        <div class="score">
+            <div><ng-container i18n>Coups&nbsp;:</ng-container>&nbsp;{{ attempts }}</div>
+            <div><ng-container i18n>Temps&nbsp;:</ng-container>&nbsp;{{ time_spent }}</div>
+        </div>
+        <button (click)="init()" i18n>Nouvelle partie</button>
+        }
+    </div>
+</mat-card-content>

@@ -1,4 +1,4 @@
-import { Component, EventEmitter, HostBinding, Output } from '@angular/core';
+import { Component, output, OutputEmitterRef } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -13,17 +13,17 @@ const material_modules: Imports = [MatFormFieldModule, MatInputModule];
     selector: 'mho-filter',
     templateUrl: './filter-field.component.html',
     styleUrls: ['./filter-field.component.scss'],
+    host: {style: 'display: contents'},
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class FilterFieldComponent {
-    @HostBinding('style.display') display: string = 'contents';
 
-    @Output() filterChange: EventEmitter<string> = new EventEmitter<string>();
+    public filterChange: OutputEmitterRef<string> = output();
 
     public filter_value: string = '';
 
     public applyFilter(value: string): void {
-        this.filterChange.next(value);
+        this.filterChange.emit(value);
     }
 }
 

@@ -8,7 +8,7 @@ namespace MyHordesOptimizerApi.Extensions.Models
     {
         public static List<ItemRecipeDto> GetRecipeForItem(this List<ItemRecipeDto> recipes, int itemId)
         {
-            return recipes.Where(r => r.Components.Any(comp => comp.Id == itemId) || r.Result.Any(result => result.Item.Id == itemId)).ToList();
+            return recipes.Where(r => r.Components.Any(comp => comp.Item.Id == itemId) || r.Result.Any(result => result.Item.Id == itemId)).ToList();
         }
     }
 }

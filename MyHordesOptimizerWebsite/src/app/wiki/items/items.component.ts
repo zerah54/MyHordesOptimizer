@@ -1,21 +1,20 @@
 import { CommonModule } from '@angular/common';
-import { Component, HostBinding, OnInit } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import moment from 'moment';
-import { Subject, takeUntil } from 'rxjs';
 import { Action } from '../../_abstract_model/enum/action.enum';
 import { Property } from '../../_abstract_model/enum/property.enum';
 import { ApiService } from '../../_abstract_model/services/api.service';
 import { Imports } from '../../_abstract_model/types/_types';
 import { Item } from '../../_abstract_model/types/item.class';
-import { AutoDestroy } from '../../shared/decorators/autodestroy.decorator';
 import { FilterFieldComponent } from '../../shared/elements/filter-field/filter-field.component';
 import { ItemComponent } from '../../shared/elements/item/item.component';
 import { SelectComponent } from '../../shared/elements/select/select.component';
 import { ItemsGroupByCategoryPipe } from '../../shared/pipes/items-group-by-category.pipe';
 import { normalizeString } from '../../shared/utilities/string.utils';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 const angular_common: Imports = [CommonModule, FormsModule];
 const components: Imports = [FilterFieldComponent, ItemComponent, SelectComponent];
@@ -26,10 +25,10 @@ const material_modules: Imports = [MatCardModule, MatFormFieldModule];
     selector: 'mho-items',
     templateUrl: './items.component.html',
     styleUrls: ['./items.component.scss'],
+    host: {style: 'display: contents'},
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class ItemsComponent implements OnInit {
-    @HostBinding('style.display') display: string = 'contents';
 
     /** La liste des objets du jeu */
     public items!: Item[];
@@ -46,15 +45,12 @@ export class ItemsComponent implements OnInit {
     /** La liste des filtres */
     public options: (Property | Action)[] = [...<Property[]>Property.getAllValues(), ...<Action[]>Action.getAllValues()];
 
-    @AutoDestroy private destroy_sub: Subject<void> = new Subject();
-
-    constructor(private api: ApiService) {
-
-    }
+    private readonly api: ApiService = inject(ApiService);
+    private readonly destroy_ref: DestroyRef = inject(DestroyRef);
 
     ngOnInit(): void {
         this.api.getItems(true)
-            .pipe(takeUntil(this.destroy_sub))
+            .pipe(takeUntilDestroyed(this.destroy_ref))
             .subscribe((items: Item[]) => {
                 this.items = items;
                 if (this.items) {

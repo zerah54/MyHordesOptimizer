@@ -1,5 +1,5 @@
-import { DOCUMENT } from '@angular/common';
-import { Component, HostBinding, Inject } from '@angular/core';
+
+import { Component, Inject, DOCUMENT } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
@@ -17,10 +17,10 @@ const material_modules: Imports = [MatButtonModule, MatCardModule, MatIconModule
     selector: 'mho-tuto-discord-bot-installation',
     templateUrl: './tuto-discord-bot-installation.component.html',
     styleUrls: ['./tuto-discord-bot-installation.component.scss'],
+    host: {style: 'display: contents'},
     imports: [...angular_common, ...components, ...material_modules, ...pipes],
 })
 export class TutoDiscordBotInstallationComponent {
-    @HostBinding('style.display') display: string = 'contents';
 
     public readonly title: string = $localize`Installation du Bot sur un serveur Discord`;
     public readonly download_link: string = $localize`<a href="https://discord.com/api/oauth2/authorize?client_id=1140035117746765914&permissions=277025459200&scope=bot" target="_blank">lien d'installation du bot</a>`;

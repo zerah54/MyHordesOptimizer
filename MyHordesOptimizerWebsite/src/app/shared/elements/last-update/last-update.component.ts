@@ -1,5 +1,5 @@
 import { CommonModule, DatePipe, NgOptimizedImage, NgTemplateOutlet } from '@angular/common';
-import { Component, HostBinding, Input } from '@angular/core';
+import { booleanAttribute, Component, input, InputSignal, InputSignalWithTransform } from '@angular/core';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import moment, { Moment } from 'moment';
 import { Imports } from '../../../_abstract_model/types/_types';
@@ -14,14 +14,14 @@ const material_modules: Imports = [MatTooltipModule];
     selector: 'mho-last-update',
     templateUrl: './last-update.component.html',
     styleUrls: ['./last-update.component.scss'],
+    host: {style: 'display: contents'},
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class LastUpdateComponent {
-    @HostBinding('style.display') display: string = 'contents';
 
-    @Input() lastUpdateInfo: UpdateInfo | undefined;
-    @Input() thresholds!: [number, number, number, number];
-    @Input() hideDetails: boolean = false;
+    public lastUpdateInfo: InputSignal<UpdateInfo | undefined> = input.required();
+    public thresholds: InputSignal<[number, number, number, number] | undefined> = input<[number, number, number, number] | undefined>(undefined);
+    public hideDetails: InputSignalWithTransform<boolean, unknown> = input(false, {transform: booleanAttribute});
 
     public moment: Moment = moment();
 

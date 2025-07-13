@@ -1,64 +1,75 @@
 name: (Server) Deploy Dev
 
 on:
-  workflow_dispatch:
+    workflow_dispatch:
 
 env:
-  DOTNET_ROOT: '.'
+    DOTNET_ROOT: '.'
 
 jobs:
-  build:
-    runs-on: windows-latest
-    defaults:
-      run:
-        working-directory: ./MyHordesOptimizerApi
+    build:
+        runs-on: windows-latest
+        defaults:
+            run:
+                working-directory: ./MyHordesOptimizerApi
 
-    steps:
-      - uses: actions/checkout@main
+        steps:
+            -   uses: actions/checkout@main
 
-      - name: Set up .NET Core
-        uses: actions/setup-dotnet@v2
-        with:
-          dotnet-version: '6.0'
-          include-prerelease: true
+            -   name: Set up .NET Core
+                uses: actions/setup-dotnet@v4
+                with:
+                    dotnet-version: '8.0'
 
-      - name: Build with dotnet
-        run: dotnet build --configuration Release
+            -   name: Build with dotnet
+                run: dotnet build --configuration Release
 
-      - name: dotnet publish sinks
-        run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/Serilog.Sinks.Discord
+            -   name: Publish projects
+                run: |
+                    dotnet publish MyHordesOptimizerApi/MyHordesOptimizerApi.csproj -c Release -o ./publish/MyHordesOptimizerApi
+                    dotnet publish MyHordesOptimizerApiIntegrationTests/MyHordesOptimizerApiIntegrationTests.csproj -c Release -o ./publish/MyHordesOptimizerApiIntegrationTests
+                    dotnet publish MyHordesOptimizerSqlDal/MyHordesOptimizerSqlDal.csproj -c Release -o ./publish/MyHordesOptimizerSqlDal
+                    dotnet publish Serilog.Sinks.Discord/Serilog.Sinks.Discord.csproj -c Release -o ./publish/Serilog.Sinks.Discord
 
-      - name: dotnet publish api
-        run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/MyHordesOptimizerApi
+            -   name: Upload artifact for deployment job
+                uses: actions/upload-artifact@v4
+                with:
+                    name: .net-app
+                    path: ${{ github.workspace }}\MyHordesOptimizerApi\publish
+                    if-no-files-found: error
 
-      - name: Upload artifact for deployment job
-        uses: actions/upload-artifact@v2
-        with:
-          name: .net-app
-          path: ${{env.DOTNET_ROOT}}/MyHordesOptimizerApi
+    deploy:
+        runs-on: ubuntu-latest
+        needs: build
+        environment:
+            name: 'production'
+            url: 'https://myhordes-optimizer-dev.web.app/'
 
-  deploy:
-    runs-on: windows-latest
-    needs: build
-    environment:
-      name: 'deployment'
-      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
+        steps:
+            -   uses: actions/checkout@main
 
-    steps:
+            -   name: Download artifact from build job
+                uses: actions/download-artifact@v4
+                with:
+                    name: .net-app
+                    path: ./publish
+    
+            -   name: Send to Server
+                uses: appleboy/scp-action@v0.1.7
+                with:
+                    host: ${{ secrets.SSH_HOST }}
+                    username: ${{ secrets.SSH_USERNAME }}
+                    key: ${{ secrets.SSH_PRIVATE_KEY }}
+                    port: ${{ secrets.SSH_PORT }}
+                    source: './publish/MyHordesOptimizerApi/*'
+                    target: "/home/renack/livraison_mho"
+                    strip_components: 2
 
-      - uses: azure/login@v1
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
-
-      - name: Download artifact from build job
-        uses: actions/download-artifact@v2
-        with:
-          name: .net-app
-
-      - name: Deploy to Azure Web App
-        id: deploy-to-webapp
-        uses: azure/webapps-deploy@v3
-        with:
-          app-name: MyHordesOptimizerApi
-          publish-profile: ${{ secrets.AzureAppService_PublishProfile_46612d33e3fc456283a3700e421f4a93 }}
-          package: .
+            -   name: Restart Server
+                uses: appleboy/ssh-action@v1.0.3
+                with:
+                    host: ${{ secrets.SSH_HOST }}
+                    username: ${{ secrets.SSH_USERNAME }}
+                    key: ${{ secrets.SSH_PRIVATE_KEY }}
+                    port: ${{ secrets.SSH_PORT }}
+                    script: ./updateDev.sh

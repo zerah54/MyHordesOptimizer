@@ -1,6 +1,6 @@
 <div class="mho-header-with-filter">
-    <div [style.text-align]="textAlign">
-        {{ header }}
+    <div [style.text-align]="textAlign()">
+        {{ header() }}
 
         @if (!visible) {
             <mat-icon class="open-menu-icon" (click)="$event.preventDefault(); $event.stopPropagation(); displayFilter();">
@@ -11,7 +11,7 @@
 
     @if (visible) {
         <mat-form-field (click)="$event.stopPropagation();" class="short-bottom">
-            <input #filter matInput [ngModel]="filterValue" (ngModelChange)="filterValueChange.next($event);" (focusout)="checkVisibility()">
+            <input #filter matInput [ngModel]="filterValue()" (ngModelChange)="filterValueChange.emit($event);" (focusout)="checkVisibility()">
         </mat-form-field>
     }
 </div>

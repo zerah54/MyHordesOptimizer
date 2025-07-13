@@ -1,5 +1,5 @@
 import { CommonModule, NgTemplateOutlet } from '@angular/common';
-import { Component, HostBinding, Input } from '@angular/core';
+import { Component, input, Input, InputSignal } from '@angular/core';
 import { Imports } from '../../../_abstract_model/types/_types';
 import { Cell } from '../../../_abstract_model/types/cell.class';
 import { Citizen } from '../../../_abstract_model/types/citizen.class';
@@ -21,15 +21,15 @@ const material_modules: Imports = [];
     selector: 'mho-draw-map',
     templateUrl: './draw-map.component.html',
     styleUrls: ['./draw-map.component.scss'],
+    host: {style: 'display: contents'},
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class DrawMapComponent {
-    @HostBinding('style.display') display: string = 'contents';
 
-    @Input() allRuins!: Ruin[];
-    @Input() allItems!: Item[];
-    @Input() allCitizens!: Citizen[];
-    @Input() options!: MapOptions;
+    public allRuins: InputSignal<Ruin[]> = input.required();
+    public allItems: InputSignal<Item[]> = input.required();
+    public allCitizens: InputSignal<Citizen[]> = input.required();
+    public options: InputSignal<MapOptions> = input.required();
 
     @Input() set map(map: Town) {
         if (map) {

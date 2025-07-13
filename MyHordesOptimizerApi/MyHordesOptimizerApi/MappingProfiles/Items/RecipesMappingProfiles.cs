@@ -19,7 +19,11 @@ namespace MyHordesOptimizerApi.MappingProfiles.Items
                     { "es", src.ActionEs },
                     { "de", src.ActionDe }
                 }))
-                .ForMember(dest => dest.Components, opt => opt.MapFrom(src => src.RecipeItemComponents.Select(ric => ric.IdItemNavigation)))
+                .ForMember(dest => dest.Components, opt => opt.MapFrom((src, dest, srcMember, context) => src.RecipeItemComponents.Select(ric => new ItemComponentRecipeDto
+                {
+                    Item = context.Mapper.Map<ItemWithoutRecipeDto>(ric.IdItemNavigation),
+                    Count = ric.Count ?? 0
+                })))
                 .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
                 .ForMember(dest => dest.Result, opt => opt.MapFrom((src, dest, srcMember, context) =>
                 {

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, EventEmitter, HostBinding, Input, Output, ViewChild } from '@angular/core';
+import { Component, ElementRef, ViewChild, InputSignal, input, OutputEmitterRef, output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
@@ -15,18 +15,18 @@ const material_modules: Imports = [MatFormFieldModule, MatIconModule, MatInputMo
     selector: 'mho-header-with-string-filter',
     templateUrl: './header-with-string-filter.component.html',
     styleUrls: ['./header-with-string-filter.component.scss'],
+    host: {style: 'display: contents'},
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class HeaderWithStringFilterComponent {
-    @HostBinding('style.display') display: string = 'contents';
 
     @ViewChild('filter') filter!: ElementRef<HTMLInputElement>;
 
-    @Input() header!: string;
-    @Input() textAlign?: string = 'left';
+    public header: InputSignal<string> = input.required();
+    public textAlign: InputSignal<string> = input('left');
 
-    @Input() filterValue!: string;
-    @Output() filterValueChange: EventEmitter<string> = new EventEmitter<string>();
+    public filterValue: InputSignal<string> = input.required();
+    public filterValueChange: OutputEmitterRef<string> = output();
 
 
     public visible: boolean = false;
@@ -41,7 +41,7 @@ export class HeaderWithStringFilterComponent {
 
     /** Vérifie si le filtre doit toujours être affiché */
     public checkVisibility(): void {
-        this.visible = this.filterValue !== '' && this.filterValue !== null && this.filterValue !== undefined;
+        this.visible = this.filterValue() !== '' && this.filterValue() !== null && this.filterValue() !== undefined;
     }
 
 }

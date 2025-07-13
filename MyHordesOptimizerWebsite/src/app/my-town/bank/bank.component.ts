@@ -1,12 +1,11 @@
 import { CommonModule, NgOptimizedImage } from '@angular/common';
-import { Component, HostBinding, inject, OnInit } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import moment from 'moment';
-import { Subject, takeUntil } from 'rxjs';
 import { BANK_CONDENSED_DISPLAY_KEY, HORDES_IMG_REPO } from '../../_abstract_model/const';
 import { Action } from '../../_abstract_model/enum/action.enum';
 import { Property } from '../../_abstract_model/enum/property.enum';
@@ -14,12 +13,12 @@ import { TownService } from '../../_abstract_model/services/town.service';
 import { Imports } from '../../_abstract_model/types/_types';
 import { BankInfo } from '../../_abstract_model/types/bank-info.class';
 import { Item } from '../../_abstract_model/types/item.class';
-import { AutoDestroy } from '../../shared/decorators/autodestroy.decorator';
 import { FilterFieldComponent } from '../../shared/elements/filter-field/filter-field.component';
 import { ItemComponent } from '../../shared/elements/item/item.component';
 import { SelectComponent } from '../../shared/elements/select/select.component';
 import { ItemsGroupByCategoryPipe } from '../../shared/pipes/items-group-by-category.pipe';
 import { normalizeString } from '../../shared/utilities/string.utils';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 const angular_common: Imports = [CommonModule, FormsModule, NgOptimizedImage];
 const components: Imports = [FilterFieldComponent, ItemComponent, SelectComponent];
@@ -30,10 +29,10 @@ const material_modules: Imports = [MatCardModule, MatFormFieldModule, MatSlideTo
     selector: 'mho-bank',
     templateUrl: './bank.component.html',
     styleUrls: ['./bank.component.scss'],
+    host: {style: 'display: contents'},
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class BankComponent implements OnInit {
-    @HostBinding('style.display') display: string = 'contents';
 
     /** La banque remontée par l'appel */
     public bank!: BankInfo;
@@ -58,13 +57,12 @@ export class BankComponent implements OnInit {
     public readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
 
     private town_service: TownService = inject(TownService);
-
-    @AutoDestroy private destroy_sub: Subject<void> = new Subject();
+    private readonly destroy_ref: DestroyRef = inject(DestroyRef);
 
     ngOnInit(): void {
         this.town_service
             .getBank(true)
-            .pipe(takeUntil(this.destroy_sub))
+            .pipe(takeUntilDestroyed(this.destroy_ref))
             .subscribe({
                 next: (bank: BankInfo) => {
                     this.bank = bank;

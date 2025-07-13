@@ -1,5 +1,5 @@
-import { DOCUMENT } from '@angular/common';
-import { Component, HostBinding, Inject, ViewEncapsulation } from '@angular/core';
+
+import { Component, Inject, ViewEncapsulation, DOCUMENT } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
@@ -19,10 +19,10 @@ const material_modules: Imports = [MatButtonModule, MatCardModule, MatIconModule
     templateUrl: './tuto-script-external-tools.component.html',
     styleUrls: ['./tuto-script-external-tools.component.scss'],
     encapsulation: ViewEncapsulation.None,
+    host: {style: 'display: contents'},
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class TutoScriptExternalToolsComponent {
-    @HostBinding('style.display') display: string = 'contents';
 
     public readonly title: string = $localize`Outils externes`;
 

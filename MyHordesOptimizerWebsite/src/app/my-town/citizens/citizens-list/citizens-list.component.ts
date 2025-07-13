@@ -1,6 +1,5 @@
-import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
 import { CommonModule, NgClass, NgOptimizedImage } from '@angular/common';
-import { Component, EventEmitter, HostBinding, inject, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, DestroyRef, EventEmitter, inject, OnInit, Signal, viewChild, ViewEncapsulation } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatCheckboxChange, MatCheckboxModule } from '@angular/material/checkbox';
 import { MatOptionModule } from '@angular/material/core';
@@ -8,10 +7,8 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSort, MatSortModule } from '@angular/material/sort';
-import { MatTable, MatTableModule } from '@angular/material/table';
+import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import moment from 'moment';
-import { TableVirtualScrollDataSource, TableVirtualScrollModule } from 'ng-table-virtual-scroll';
-import { Subject, takeUntil } from 'rxjs';
 import { HORDES_IMG_REPO } from '../../../_abstract_model/const';
 import { StatusEnum } from '../../../_abstract_model/enum/status.enum';
 import { StandardColumn } from '../../../_abstract_model/interfaces';
@@ -25,7 +22,6 @@ import { HeroicActionsWithValue } from '../../../_abstract_model/types/heroic-ac
 import { HomeWithValue } from '../../../_abstract_model/types/home.class';
 import { Item } from '../../../_abstract_model/types/item.class';
 import { UpdateInfo } from '../../../_abstract_model/types/update-info.class';
-import { AutoDestroy } from '../../../shared/decorators/autodestroy.decorator';
 import { AvatarComponent } from '../../../shared/elements/avatar/avatar.component';
 import { CitizenInfoComponent } from '../../../shared/elements/citizen-info/citizen-info.component';
 import { LastUpdateComponent } from '../../../shared/elements/last-update/last-update.component';
@@ -35,41 +31,40 @@ import { ColumnIdPipe } from '../../../shared/pipes/column-id.pipe';
 import { getTown, getUser } from '../../../shared/utilities/localstorage.util';
 import { BathForDayPipe } from '../bath-for-day.pipe';
 import { TypeRowPipe } from './type-row.pipe';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 const angular_common: Imports = [CommonModule, FormsModule, NgClass, NgOptimizedImage];
 const components: Imports = [AvatarComponent, CitizenInfoComponent, HeaderWithSelectFilterComponent, LastUpdateComponent, ListElementAddRemoveComponent];
 const pipes: Imports = [BathForDayPipe, ColumnIdPipe, TypeRowPipe];
-const material_modules: Imports = [CdkVirtualScrollViewport, MatCheckboxModule, MatFormFieldModule, MatInputModule, MatOptionModule, MatSelectModule, MatSortModule, MatTableModule];
+const material_modules: Imports = [MatCheckboxModule, MatFormFieldModule, MatInputModule, MatOptionModule, MatSelectModule, MatSortModule, MatTableModule];
 
 @Component({
     selector: 'mho-citizens-list',
     templateUrl: './citizens-list.component.html',
     styleUrls: ['./citizens-list.component.scss'],
     encapsulation: ViewEncapsulation.None,
-    imports: [...angular_common, ...components, ...material_modules, ...pipes, TableVirtualScrollModule]
+    host: { style: 'display: contents' },
+    imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class CitizensListComponent implements OnInit {
-    @HostBinding('style.display') display: string = 'contents';
 
     // @ViewChild(MenuAddComponent) menuAdd!: MenuAddComponent;
     // @ViewChild(MenuRemoveComponent) menuRemove!: MenuRemoveComponent;
 
-    @ViewChild(MatSort) sort!: MatSort;
-    @ViewChild(MatTable) table!: MatTable<Citizen>;
+    public sort: Signal<MatSort | undefined> = viewChild(MatSort);
 
     /** La liste des citoyens en vie */
     public alive_citizen_info!: CitizenInfo;
     /** La liste des citoyens morts */
     public dead_citizen_info!: CitizenInfo;
     /** La datasource pour le tableau */
-        // public datasource: TableVirtualScrollDataSource<Citizen> = new TableVirtualScrollDataSource();
-    public citizen_list: TableVirtualScrollDataSource<Citizen> = new TableVirtualScrollDataSource();
+    public citizen_list: MatTableDataSource<Citizen> = new MatTableDataSource();
     /** La datasource des citoyens morts */
-    public dead_citizen_list: TableVirtualScrollDataSource<Cadaver> = new TableVirtualScrollDataSource();
+    public dead_citizen_list: MatTableDataSource<Cadaver> = new MatTableDataSource();
     /** La liste complète des items */
     public all_items: Item[] = [];
     /** Le dossier dans lequel sont stockées les images */
-    public HORDES_IMG_REPO: string = HORDES_IMG_REPO;
+    public readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
     public readonly current_day: number = getTown()?.day || 1;
     /** La locale */
     public readonly locale: string = moment.locale();
@@ -99,20 +94,19 @@ export class CitizensListComponent implements OnInit {
         {label: $localize`Tous`, list: this.all_status}
     ];
 
-    private api_service: ApiService = inject(ApiService);
-    private town_service: TownService = inject(TownService);
-
-    @AutoDestroy private destroy_sub: Subject<void> = new Subject();
+    private readonly api_service: ApiService = inject(ApiService);
+    private readonly town_service: TownService = inject(TownService);
+    private readonly destroy_ref: DestroyRef = inject(DestroyRef);
 
     public ngOnInit(): void {
-        this.citizen_list = new TableVirtualScrollDataSource();
-        this.citizen_list.sort = this.sort;
+        this.citizen_list = new MatTableDataSource();
+        this.citizen_list.sort = this.sort() as MatSort;
 
-        this.dead_citizen_list = new TableVirtualScrollDataSource();
-        this.dead_citizen_list.sort = this.sort;
+        this.dead_citizen_list = new MatTableDataSource();
+        this.dead_citizen_list.sort = this.sort() as MatSort;
 
         this.citizen_filter_change
-            .pipe(takeUntil(this.destroy_sub))
+            .pipe(takeUntilDestroyed(this.destroy_ref))
             .subscribe(() => {
                 this.citizen_list.filter = JSON.stringify(this.citizen_filters);
             });
@@ -121,7 +115,7 @@ export class CitizensListComponent implements OnInit {
 
         this.api_service
             .getItems()
-            .pipe(takeUntil(this.destroy_sub))
+            .pipe(takeUntilDestroyed(this.destroy_ref))
             .subscribe({
                 next: (items: Item[]) => {
                     this.all_items = items;
@@ -148,7 +142,7 @@ export class CitizensListComponent implements OnInit {
 
             this.town_service
                 .updateBag(citizen)
-                .pipe(takeUntil(this.destroy_sub))
+                .pipe(takeUntilDestroyed(this.destroy_ref))
                 .subscribe({
                     next: (update_info: UpdateInfo): void => {
                         if (citizen.bag) {
@@ -176,7 +170,7 @@ export class CitizensListComponent implements OnInit {
             }
             this.town_service
                 .updateBag(citizen)
-                .pipe(takeUntil(this.destroy_sub))
+                .pipe(takeUntilDestroyed(this.destroy_ref))
                 .subscribe({
                     next: (update_info: UpdateInfo) => {
                         if (citizen.bag) {
@@ -199,7 +193,7 @@ export class CitizensListComponent implements OnInit {
             citizen.bag.items = [];
             this.town_service
                 .updateBag(citizen)
-                .pipe(takeUntil(this.destroy_sub))
+                .pipe(takeUntilDestroyed(this.destroy_ref))
                 .subscribe({
                     next: (update_info: UpdateInfo) => {
                         if (citizen.bag) {
@@ -224,7 +218,7 @@ export class CitizensListComponent implements OnInit {
 
             this.town_service
                 .updateStatus(citizen)
-                .pipe(takeUntil(this.destroy_sub))
+                .pipe(takeUntilDestroyed(this.destroy_ref))
                 .subscribe({
                     next: (update_info: UpdateInfo) => {
                         if (citizen.status) {
@@ -251,7 +245,7 @@ export class CitizensListComponent implements OnInit {
             }
             this.town_service
                 .updateStatus(citizen)
-                .pipe(takeUntil(this.destroy_sub))
+                .pipe(takeUntilDestroyed(this.destroy_ref))
                 .subscribe({
                     next: (update_info: UpdateInfo) => {
                         if (citizen.status) {
@@ -274,7 +268,7 @@ export class CitizensListComponent implements OnInit {
             citizen.status.icons = [];
             this.town_service
                 .updateBag(citizen)
-                .pipe(takeUntil(this.destroy_sub))
+                .pipe(takeUntilDestroyed(this.destroy_ref))
                 .subscribe({
                     next: (update_info: UpdateInfo) => {
                         if (citizen.status) {
@@ -305,7 +299,7 @@ export class CitizensListComponent implements OnInit {
         if (citizen && citizen.home !== undefined) {
             this.town_service
                 .updateHome(citizen)
-                .pipe(takeUntil(this.destroy_sub))
+                .pipe(takeUntilDestroyed(this.destroy_ref))
                 .subscribe({
                     next: (update_info: UpdateInfo) => {
                         if (citizen.home) {
@@ -339,7 +333,7 @@ export class CitizensListComponent implements OnInit {
         if (citizen && citizen.heroic_actions) {
             this.town_service
                 .updateHeroicActions(citizen)
-                .pipe(takeUntil(this.destroy_sub))
+                .pipe(takeUntilDestroyed(this.destroy_ref))
                 .subscribe({
                     next: (update_info: UpdateInfo) => {
                         if (citizen.heroic_actions) {
@@ -402,7 +396,7 @@ export class CitizensListComponent implements OnInit {
     public getCitizens(): void {
         this.town_service
             .getCitizens()
-            .pipe(takeUntil(this.destroy_sub))
+            .pipe(takeUntilDestroyed(this.destroy_ref))
             .subscribe({
                 next: (citizen_info: CitizenInfo) => {
                     const alive_citizen_info: CitizenInfo = Object.assign({}, citizen_info);

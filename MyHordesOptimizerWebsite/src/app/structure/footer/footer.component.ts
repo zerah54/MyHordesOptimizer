@@ -1,5 +1,5 @@
 import { NgTemplateOutlet } from '@angular/common';
-import { Component, HostBinding, inject, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, inject, ViewChild, ViewEncapsulation } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatToolbar, MatToolbarModule } from '@angular/material/toolbar';
 import { environment } from '../../../environments/environment';
@@ -16,10 +16,10 @@ const material_modules: Imports = [MatToolbarModule];
     templateUrl: './footer.component.html',
     styleUrls: ['./footer.component.scss'],
     encapsulation: ViewEncapsulation.None,
+    host: {style: 'display: contents'},
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class FooterComponent {
-    @HostBinding('style.display') display: string = 'contents';
 
     @ViewChild(MatToolbar) mat_toolbar!: MatToolbar;
 

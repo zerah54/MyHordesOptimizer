@@ -33,17 +33,17 @@
     }
 
 
-    --mdc-icon-button-icon-size: 16px !important;
-    --mdc-checkbox-state-layer-size: 32px !important;
+    --mat-icon-button-icon-size: 16px !important;
+    --mat-checkbox-state-layer-size: 32px !important;
 
     .mat-mdc-list-base {
-        --mdc-list-list-item-one-line-container-height: 40px !important;
-        --mdc-list-list-item-two-line-container-height: 56px !important;
-        --mdc-list-list-item-three-line-container-height: 80px !important;
+        --mat-list-list-item-one-line-container-height: 40px !important;
+        --mat-list-list-item-two-line-container-height: 56px !important;
+        --mat-list-list-item-three-line-container-height: 80px !important;
     }
 
     .mat-mdc-tab-header {
-        --mdc-secondary-navigation-tab-container-height: 40px !important;
+        --mat-tab-container-height: 40px !important;
     }
 
     .mat-mdc-form-field.compact-field {
@@ -60,7 +60,7 @@
     }
 
     .mat-mdc-dialog-container {
-        --mdc-dialog-container-color: #{variables.$card-background-color} !important;
+        --mat-dialog-container-color: #{variables.$card-background-color} !important;
     }
 
     .mat-mdc-menu-panel {
@@ -68,7 +68,7 @@
     }
 
     .mat-mdc-standard-chip:not(.mdc-evolution-chip--disabled):not(.mat-mdc-chip-highlighted) {
-        --mdc-chip-elevated-container-color: #{variables.$inactive-chip-base-color} !important;
+        --mat-chip-elevated-container-color: #{variables.$inactive-chip-base-color} !important;
     }
 
     .mat-toolbar.mho-footer {
@@ -80,7 +80,7 @@
     }
 
     .mat-mdc-slide-toggle.mat-accent {
-        --mdc-switch-selected-icon-color: #{variables.$switch-selected-accent-icon-color};
+        --mat-slide-toggle-selected-icon-color: #{variables.$switch-selected-accent-icon-color};
     }
 
     .mat-mdc-table {
@@ -97,7 +97,7 @@
     }
 
     .mdc-text-field {
-        --mdc-filled-text-field-disabled-container-color: variables.$card-background-color;
-        --mdc-filled-text-field-container-color: variables.$card-background-color;
+        --mat-form-field-filled-disabled-container-color: variables.$card-background-color;
+        --mat-form-field-filled-container-color: variables.$card-background-color;
     }
 }

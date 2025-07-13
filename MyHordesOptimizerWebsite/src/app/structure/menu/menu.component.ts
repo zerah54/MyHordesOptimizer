@@ -1,5 +1,5 @@
-import { CommonModule, DOCUMENT, NgClass, NgTemplateOutlet } from '@angular/common';
-import { Component, HostBinding, inject, Inject, Input, LOCALE_ID, OnInit, ViewEncapsulation } from '@angular/core';
+import { CommonModule, NgClass, NgTemplateOutlet } from '@angular/common';
+import { Component, inject, Inject, LOCALE_ID, OnInit, ViewEncapsulation, DOCUMENT, model, ModelSignal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
@@ -16,39 +16,38 @@ import { TownDetails } from '../../_abstract_model/types/town-details.class';
 import { ChartsThemingService } from '../../shared/services/charts-theming.service';
 import { getTown } from '../../shared/utilities/localstorage.util';
 
-const angular_common: Imports = [CommonModule, NgClass, NgTemplateOutlet, RouterLink, RouterLinkActive];
+const angular_common: Imports = [ CommonModule, NgClass, NgTemplateOutlet, RouterLink, RouterLinkActive ];
 const components: Imports = [];
 const pipes: Imports = [];
-const material_modules: Imports = [MatButtonModule, MatDividerModule, MatIconModule, MatListModule, MatMenuModule, MatTooltipModule];
+const material_modules: Imports = [ MatButtonModule, MatDividerModule, MatIconModule, MatListModule, MatMenuModule, MatTooltipModule ];
 
 @Component({
     selector: 'mho-menu',
     templateUrl: './menu.component.html',
-    styleUrls: ['./menu.component.scss'],
+    styleUrls: [ './menu.component.scss' ],
     encapsulation: ViewEncapsulation.None,
-    imports: [...angular_common, ...components, ...material_modules, ...pipes]
+    host: {style: 'display: contents'},
+    imports: [ ...angular_common, ...components, ...material_modules, ...pipes ]
 })
 export class MenuComponent implements OnInit {
-    @HostBinding('style.display') display: string = 'contents';
-
-    @Input({required: true}) sidenavContainer!: MatSidenavContainer;
+    public sidenavContainer: ModelSignal<MatSidenavContainer> = model.required();
 
     public charts_theming_service: ChartsThemingService = inject(ChartsThemingService);
 
     public themes: Theme[] = [
-        {label: $localize`Par défaut`, class: ''},
-        {label: $localize`Rose`, class: 'pink'},
-        {label: $localize`Brun`, class: 'brown'},
+        { label: $localize`Par défaut`, class: '' },
+        { label: $localize`Rose`, class: 'pink' },
+        { label: $localize`Brun`, class: 'brown' },
     ];
 
     public selected_theme: Theme | undefined = this.themes.find((theme: Theme) => theme.class === localStorage.getItem('theme'));
 
     /** La liste des langues disponibles */
     public language_list: Language[] = [
-        {code: 'en', label: 'English'},
-        {code: 'fr', label: 'Français', default: true},
-        {code: 'es', label: 'Spanish'},
-        {code: 'de', label: 'Deutsch'}
+        { code: 'en', label: 'English' },
+        { code: 'fr', label: 'Français', default: true },
+        { code: 'es', label: 'Spanish' },
+        { code: 'de', label: 'Deutsch' }
     ];
 
     /** La langue sélectionnée pour l'affichage de l'application */
@@ -58,9 +57,9 @@ export class MenuComponent implements OnInit {
     public routes: SidenavLinks[] = [
         {
             label: $localize`Ma ville`, lvl: 0, displayed: true, authorized: (): boolean => this.isInTown(), expanded: true, children: [
-                {label: $localize`Carte des fouilles`, path: 'my-town/map', displayed: true, lvl: 1, authorized: (): boolean => this.isInTown(), spoil: false},
-                {label: $localize`Banque`, path: 'my-town/bank', displayed: true, lvl: 1, authorized: (): boolean => this.isInTown(), spoil: false},
-                {label: $localize`Citoyens`, path: 'my-town/citizens', displayed: true, lvl: 1, authorized: (): boolean => this.isInTown(), spoil: false},
+                { label: $localize`Carte des fouilles`, path: 'my-town/map', displayed: true, lvl: 1, authorized: (): boolean => this.isInTown(), spoil: false },
+                { label: $localize`Banque`, path: 'my-town/bank', displayed: true, lvl: 1, authorized: (): boolean => this.isInTown(), spoil: false },
+                { label: $localize`Citoyens`, path: 'my-town/citizens', displayed: true, lvl: 1, authorized: (): boolean => this.isInTown(), spoil: false },
                 {
                     label: $localize`Liste de courses`,
                     path: 'my-town/wishlist',
@@ -69,8 +68,8 @@ export class MenuComponent implements OnInit {
                     authorized: (): boolean => this.isInTown(),
                     spoil: false
                 },
-                {label: $localize`Statistiques`, path: 'my-town/stats', displayed: true, lvl: 1, authorized: (): boolean => this.isInTown(), spoil: false},
-                {label: $localize`Expéditions`, path: 'my-town/expeditions', displayed: true, lvl: 1, authorized: (): boolean => this.isInTown(), spoil: false},
+                { label: $localize`Statistiques`, path: 'my-town/stats', displayed: true, lvl: 1, authorized: (): boolean => this.isInTown(), spoil: false },
+                { label: $localize`Expéditions`, path: 'my-town/expeditions', displayed: true, lvl: 1, authorized: (): boolean => this.isInTown(), spoil: false },
                 {
                     label: $localize`Chantiers`,
                     path: 'my-town/buildings',
@@ -99,6 +98,7 @@ export class MenuComponent implements OnInit {
         },
         {
             label: $localize`Outils`, lvl: 0, displayed: true, authorized: (): boolean => true, expanded: true, children: [
+<<<<<<< HEAD
                 {label: $localize`Camping`, path: 'tools/camping', displayed: true, lvl: 1, authorized: (): boolean => true, spoil: true},
                 {label: $localize`Chances de survie`, path: 'tools/probabilities', displayed: true, lvl: 1, authorized: (): boolean => true, spoil: false},
                 {
@@ -109,21 +109,25 @@ export class MenuComponent implements OnInit {
                     authorized: (): boolean => !environment.production,
                     spoil: false
                 },
+=======
+                { label: $localize`Camping`, path: 'tools/camping', displayed: true, lvl: 1, authorized: (): boolean => true, spoil: false },
+                { label: $localize`Chances de survie`, path: 'tools/probabilities', displayed: true, lvl: 1, authorized: (): boolean => true, spoil: false },
+>>>>>>> main
             ], spoil: false
         },
         {
             label: $localize`Wiki`, lvl: 0, displayed: true, authorized: (): boolean => true, expanded: true, children: [
-                {label: $localize`Objets`, path: 'wiki/items', displayed: true, lvl: 1, authorized: (): boolean => true, spoil: false},
-                {label: $localize`Recettes`, path: 'wiki/recipes', displayed: true, lvl: 1, authorized: (): boolean => true, spoil: false},
-                {label: $localize`Pouvoirs`, path: 'wiki/hero-skills', displayed: true, lvl: 1, authorized: (): boolean => true, spoil: true},
-                {label: $localize`Bâtiments`, path: 'wiki/ruins', displayed: true, lvl: 1, authorized: (): boolean => true, spoil: true},
+                { label: $localize`Objets`, path: 'wiki/items', displayed: true, lvl: 1, authorized: (): boolean => true, spoil: true },
+                { label: $localize`Recettes`, path: 'wiki/recipes', displayed: true, lvl: 1, authorized: (): boolean => true, spoil: true },
+                { label: $localize`Pouvoirs`, path: 'wiki/hero-skills', displayed: true, lvl: 1, authorized: (): boolean => true, spoil: false },
+                { label: $localize`Bâtiments`, path: 'wiki/ruins', displayed: true, lvl: 1, authorized: (): boolean => true, spoil: true },
                 {
                     label: $localize`Informations diverses`,
                     path: 'wiki/miscellaneous-info',
                     displayed: true,
                     lvl: 1,
                     authorized: (): boolean => true,
-                    spoil: true
+                    spoil: false
                 },
                 {
                     label: $localize`Villes privées`,
@@ -131,7 +135,7 @@ export class MenuComponent implements OnInit {
                     displayed: true,
                     lvl: 1,
                     authorized: (): boolean => true,
-                    spoil: true
+                    spoil: false
                 }
             ], spoil: false
         },
@@ -214,10 +218,15 @@ export class MenuComponent implements OnInit {
                     ], spoil: false
                 },
             ], spoil: false
-        }
+        },
+        {
+            label: $localize`Mini-Jeux`, lvl: 0, displayed: true, authorized: (): boolean => true, expanded: false, children: [
+                { label: $localize`368 Pictos`, path: 'games/368-pictos', displayed: false, lvl: 1, authorized: (): boolean => true, spoil: false },
+            ], spoil: false
+        },
     ];
 
-    constructor(@Inject(LOCALE_ID) private locale_id: string, @Inject(DOCUMENT) private document: Document) {
+    constructor (@Inject(LOCALE_ID) private locale_id: string, @Inject(DOCUMENT) private document: Document) {
 
     }
 
@@ -278,32 +287,34 @@ export class MenuComponent implements OnInit {
     }
 
     private resizeSidenav(): void {
-        this.sidenavContainer.autosize = true;
+        const sidenavContainer: MatSidenavContainer = this.sidenavContainer();
+        sidenavContainer.autosize = true;
+        this.sidenavContainer.set(sidenavContainer)
         setTimeout((): void => {
-            this.sidenavContainer.autosize = true;
+            this.sidenavContainer.set(sidenavContainer)
         });
     }
 
     private defineThemes(): void {
         /** Noël */
         if (this.isNoel()) {
-            this.themes.push({label: $localize`Noël`, class: 'noel'});
+            this.themes.push({ label: $localize`Noël`, class: 'noel' });
             this.themes.splice(0, 1);
             this.useEventTheme();
         } else if (this.isNothing() && (this.selected_theme?.class === 'noel' || !this.selected_theme)) {
             setTimeout(() => {
-                this.changeTheme(this.themes[0]);
+                this.changeTheme(this.themes[ 0 ]);
             });
         }
 
         /** Halloween */
         if (this.isHalloween()) {
-            this.themes.push({label: $localize`Halloween`, class: 'halloween'});
+            this.themes.push({ label: $localize`Halloween`, class: 'halloween' });
             this.themes.splice(0, 1);
             this.useEventTheme();
         } else if (this.isNothing() && (this.selected_theme?.class === 'halloween' || !this.selected_theme)) {
             setTimeout(() => {
-                this.changeTheme(this.themes[0]);
+                this.changeTheme(this.themes[ 0 ]);
             });
         }
 
@@ -333,7 +344,7 @@ export class MenuComponent implements OnInit {
         this.selected_theme = this.themes.find((theme: Theme) => theme.class === localStorage.getItem('theme'));
         if (this.selected_theme?.class === '' || !this.selected_theme) {
             setTimeout(() => {
-                this.changeTheme(this.themes[this.themes.length - 1]);
+                this.changeTheme(this.themes[ this.themes.length - 1 ]);
             });
         }
     }

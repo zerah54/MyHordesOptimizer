@@ -1,5 +1,5 @@
 import { CommonModule, NgOptimizedImage } from '@angular/common';
-import { Component, HostBinding, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
@@ -19,13 +19,13 @@ const material_modules: Imports = [MatCardModule, MatTableModule, MatIconModule,
     selector: 'mho-private-towns',
     templateUrl: './private-towns.component.html',
     styleUrls: ['./private-towns.component.scss'],
+    host: { style: 'display: contents' },
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class PrivateTownsComponent implements OnInit {
-    @HostBinding('style.display') display: string = 'contents';
 
     /** Le dossier dans lequel sont stockées les images */
-    public HORDES_IMG_REPO: string = HORDES_IMG_REPO;
+    public readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
     /** La locale */
     public readonly locale: string = moment.locale();
 

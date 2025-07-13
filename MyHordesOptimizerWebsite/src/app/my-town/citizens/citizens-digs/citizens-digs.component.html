@@ -19,7 +19,7 @@
                                                                              [(filterValue)]="filters.selected_day"
                                                                              (filterValueChange)="citizen_filter_change.next()"
                                                                              [min]="1" [max]="current_day"
-                                                                             [displayFirstLast]="true">
+                                                                             displayFirstLast>
                                 </mho-header-with-number-previous-next-filter>
                             }
                         }
@@ -32,7 +32,7 @@
                                     <img [src]="row.citizen.avatar" width="100">
                                 }
                                 <div>
-                                    <mho-citizen-info [displayJob]="true" [displayShunStatus]="true" [displayPseudoMode]="'simple'"
+                                    <mho-citizen-info displayJob displayShunStatus [displayPseudoMode]="'simple'"
                                                       [citizen]="row.citizen"></mho-citizen-info>
                                 </div>
                             }

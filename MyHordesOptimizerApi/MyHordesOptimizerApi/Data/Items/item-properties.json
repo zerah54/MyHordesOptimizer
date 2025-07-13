@@ -4,6 +4,11 @@
         "can_opener",
         "box_opener"
     ],
+    "saw_tool_temp_#00": [
+        "impoundable",
+        "can_opener",
+        "box_opener"
+    ],
     "saw_tool_part_#00": [
         "impoundable"
     ],
@@ -34,9 +39,9 @@
     "wrench_#00": [
         "weapon",
         "box_opener",
-        "nw_armory",
         "parcel_opener",
-        "parcel_opener_h"
+        "parcel_opener_h",
+        "hero_dog_fetch"
     ],
     "cutter_#00": [
         "weapon",
@@ -55,26 +60,29 @@
     "bone_#00": [
         "weapon",
         "box_opener",
-        "nw_armory",
         "parcel_opener",
-        "parcel_opener_h"
+        "parcel_opener_h",
+        "hero_dog_fetch"
     ],
     "cutcut_#00": [
         "impoundable",
         "weapon",
         "box_opener",
         "esc_fixed",
-        "nw_armory"
+        "nw_armory",
+        "parcel_opener",
+        "parcel_opener_h"
     ],
     "hurling_stick_#00": [
         "weapon",
         "box_opener",
-        "nw_armory"
+        "nw_armory",
+        "parcel_opener",
+        "parcel_opener_h"
     ],
     "chair_basic_#00": [
         "box_opener",
         "nw_ikea",
-        "nw_armory",
         "parcel_opener_h"
     ],
     "chair_#00": [
@@ -85,7 +93,8 @@
         "box_opener",
         "nw_armory",
         "parcel_opener",
-        "parcel_opener_h"
+        "parcel_opener_h",
+        "hero_dog_fetch"
     ],
     "chain_#00": [
         "impoundable",
@@ -101,12 +110,12 @@
     ],
     "pc_#00": [
         "box_opener",
-        "nw_ikea",
-        "nw_armory"
+        "nw_ikea"
     ],
     "door_#00": [
         "impoundable",
-        "defence"
+        "defence",
+        "nw_ikea"
     ],
     "car_door_#00": [
         "impoundable",
@@ -119,7 +128,9 @@
         "defence",
         "pet",
         "esc_fixed",
-        "lock"
+        "lock",
+        "nw_trebuchet",
+        "fragile"
     ],
     "plate_#00": [
         "impoundable",
@@ -134,17 +145,18 @@
         "defence",
         "weapon",
         "nw_ikea",
-        "nw_armory",
         "prevent_night"
     ],
     "tekel_#00": [
         "defence",
         "lock",
-        "pet"
+        "pet",
+        "nw_trebuchet"
     ],
     "trestle_#00": [
         "impoundable",
-        "defence"
+        "defence",
+        "nw_ikea"
     ],
     "table_#00": [
         "impoundable",
@@ -234,33 +246,35 @@
     ],
     "mecanism_#00": [
         "ressource",
-        "hero_find_lucky"
+        "hero_find_lucky",
+        "hero_find_lucky2",
+        "hero_find_lucky3"
     ],
     "grenade_#00": [
         "weapon",
         "hero_find",
-        "nw_armory",
         "hero_find_lucky",
-        "nw_shooting"
+        "nw_shooting",
+        "hero_find_lucky2",
+        "hero_find_lucky3",
+        "fragile"
     ],
     "bgrenade_#00": [
         "weapon",
-        "nw_armory",
-        "nw_shooting"
+        "nw_shooting",
+        "fragile"
     ],
     "boomfruit_#00": [
         "weapon",
-        "nw_armory"
+        "fragile"
     ],
     "pilegun_#00": [
-        "weapon",
-        "nw_armory"
+        "weapon"
     ],
     "pilegun_up_#00": [
         "impoundable",
         "weapon",
-        "esc_fixed",
-        "nw_armory"
+        "esc_fixed"
     ],
     "pilegun_up_empty_#00": [
         "impoundable"
@@ -271,8 +285,7 @@
     "big_pgun_#00": [
         "impoundable",
         "weapon",
-        "esc_fixed",
-        "nw_armory"
+        "esc_fixed"
     ],
     "big_pgun_empty_#00": [
         "impoundable"
@@ -281,8 +294,7 @@
         "impoundable"
     ],
     "mixergun_#00": [
-        "weapon",
-        "nw_armory"
+        "weapon"
     ],
     "chainsaw_#00": [
         "impoundable",
@@ -300,65 +312,56 @@
     ],
     "taser_#00": [
         "weapon",
-        "nw_armory"
+        "nw_impact_cumul"
     ],
     "lpoint4_#00": [
         "impoundable",
         "weapon",
-        "esc_fixed",
-        "nw_armory"
+        "esc_fixed"
     ],
     "lpoint3_#00": [
         "impoundable",
         "weapon",
-        "esc_fixed",
-        "nw_armory"
+        "esc_fixed"
     ],
     "lpoint2_#00": [
         "impoundable",
         "weapon",
-        "esc_fixed",
-        "nw_armory"
+        "esc_fixed"
     ],
     "lpoint1_#00": [
         "impoundable",
         "weapon",
-        "esc_fixed",
-        "nw_armory"
+        "esc_fixed"
     ],
     "watergun_opt_5_#00": [
         "impoundable",
         "weapon",
         "esc_fixed",
-        "nw_shooting",
         "nw_armory"
     ],
     "watergun_opt_4_#00": [
         "impoundable",
         "weapon",
         "esc_fixed",
-        "nw_shooting",
         "nw_armory"
     ],
     "watergun_opt_3_#00": [
         "impoundable",
         "weapon",
         "esc_fixed",
-        "nw_shooting",
         "nw_armory"
     ],
     "watergun_opt_2_#00": [
         "impoundable",
         "weapon",
         "esc_fixed",
-        "nw_shooting",
         "nw_armory"
     ],
     "watergun_opt_1_#00": [
         "impoundable",
         "weapon",
         "esc_fixed",
-        "nw_shooting",
         "nw_armory"
     ],
     "watergun_opt_part_#00": [
@@ -370,27 +373,25 @@
     "kalach_#00": [
         "impoundable",
         "nw_shooting",
-        "nw_armory"
+        "esc_fixed"
     ],
     "watergun_3_#00": [
         "weapon",
-        "nw_shooting",
-        "nw_armory"
+        "nw_shooting"
     ],
     "watergun_2_#00": [
         "weapon",
-        "nw_shooting",
-        "nw_armory"
+        "nw_shooting"
     ],
     "watergun_1_#00": [
         "weapon",
-        "nw_shooting",
-        "nw_armory"
+        "nw_shooting"
     ],
     "jerrygun_#00": [
         "impoundable",
         "weapon",
-        "esc_fixed"
+        "esc_fixed",
+        "nw_shooting"
     ],
     "jerrygun_part_#00": [
         "impoundable"
@@ -400,7 +401,9 @@
     ],
     "jerrycan_#00": [
         "impoundable",
-        "hero_find_lucky"
+        "hero_find_lucky",
+        "hero_find_lucky2",
+        "hero_find_lucky3"
     ],
     "knife_#00": [
         "impoundable",
@@ -416,29 +419,25 @@
         "nw_armory"
     ],
     "torch_off_#00": [
-        "weapon",
-        "nw_armory"
+        "weapon"
     ],
     "iphone_#00": [
         "weapon",
-        "nw_armory"
+        "fragile"
     ],
     "machine_1_#00": [
         "esc_fixed",
         "nw_ikea",
-        "nw_armory",
         "impoundable"
     ],
     "machine_2_#00": [
         "esc_fixed",
         "nw_ikea",
-        "nw_armory",
         "impoundable"
     ],
     "machine_3_#00": [
         "esc_fixed",
         "nw_ikea",
-        "nw_armory",
         "impoundable"
     ],
     "disinfect_#00": [
@@ -448,7 +447,9 @@
     "drug_#00": [
         "can_poison",
         "impoundable",
-        "drug"
+        "drug",
+        "hero_find_lucky3",
+        "hero_dog_fetch"
     ],
     "drug_hero_#00": [
         "impoundable",
@@ -467,7 +468,9 @@
     ],
     "xanax_#00": [
         "drug",
-        "hero_find_lucky"
+        "hero_find_lucky",
+        "hero_find_lucky2",
+        "hero_find_lucky3"
     ],
     "drug_water_#00": [
         "drug"
@@ -478,7 +481,8 @@
     ],
     "pharma_#00": [
         "impoundable",
-        "drug"
+        "drug",
+        "fragile"
     ],
     "pharma_part_#00": [
         "drug"
@@ -494,7 +498,8 @@
     "fungus_#00": [
         "food",
         "inedible",
-        "can_cook"
+        "can_cook",
+        "lure"
     ],
     "radio_on_#00": [
         "impoundable",
@@ -507,40 +512,51 @@
         "esc_fixed",
         "hero_find_lucky",
         "found_poisoned",
-        "is_water"
+        "is_water",
+        "hero_find_lucky2",
+        "hero_find_lucky3",
+        "hero_dog_fetch"
     ],
     "can_open_#00": [
         "can_poison",
         "food",
         "can_cook",
-        "single_use"
+        "single_use",
+        "hero_dog_fetch",
+        "lure"
     ],
     "vegetable_#00": [
         "can_poison",
         "food",
         "can_cook",
-        "single_use"
+        "single_use",
+        "hero_dog_fetch",
+        "lure"
     ],
     "fruit_#00": [
         "can_poison",
         "food",
         "can_cook",
-        "single_use"
+        "single_use",
+        "lure"
     ],
     "water_can_3_#00": [
         "impoundable",
         "esc_fixed",
-        "is_water"
+        "is_water",
+        "nw_shooting"
     ],
     "water_can_2_#00": [
         "impoundable",
         "esc_fixed",
-        "is_water"
+        "is_water",
+        "nw_shooting"
     ],
     "water_can_1_#00": [
         "impoundable",
         "esc_fixed",
-        "is_water"
+        "is_water",
+        "nw_shooting"
     ],
     "water_can_empty_#00": [
         "impoundable"
@@ -551,7 +567,8 @@
     ],
     "potion_#00": [
         "impoundable",
-        "is_water"
+        "is_water",
+        "esc_fixed"
     ],
     "lock_#00": [
         "lock"
@@ -562,14 +579,19 @@
     "pile_#00": [
         "impoundable",
         "hero_find",
-        "hero_find_lucky"
+        "hero_find_lucky",
+        "hero_find_lucky2",
+        "hero_find_lucky3"
     ],
     "food_bag_#00": [
-        "hero_find"
+        "hero_find",
+        "hero_dog_fetch"
     ],
     "rsc_pack_3_#00": [
         "impoundable",
-        "hero_find_lucky"
+        "hero_find_lucky",
+        "hero_find_lucky2",
+        "hero_find_lucky3"
     ],
     "rsc_pack_2_#00": [
         "impoundable",
@@ -581,155 +603,193 @@
     "bretz_#00": [
         "food",
         "can_cook",
-        "single_use"
+        "single_use",
+        "lure"
     ],
     "undef_#00": [
         "food",
         "can_cook",
-        "single_use"
+        "single_use",
+        "lure"
     ],
     "dish_#00": [
         "food",
-        "single_use"
+        "single_use",
+        "lure"
     ],
     "chama_#00": [
         "food",
         "can_cook",
-        "single_use"
+        "single_use",
+        "lure"
     ],
     "food_bar1_#00": [
         "food",
         "can_cook",
-        "single_use"
+        "single_use",
+        "lure"
     ],
     "food_bar2_#00": [
         "food",
         "can_cook",
-        "single_use"
+        "single_use",
+        "lure"
     ],
     "food_bar3_#00": [
         "food",
         "can_cook",
-        "single_use"
+        "single_use",
+        "lure"
     ],
     "food_biscuit_#00": [
         "food",
         "can_cook",
-        "single_use"
+        "single_use",
+        "lure"
     ],
     "food_chick_#00": [
         "food",
         "can_cook",
-        "single_use"
+        "single_use",
+        "lure"
     ],
     "food_pims_#00": [
         "food",
         "can_cook",
-        "single_use"
+        "single_use",
+        "lure"
     ],
     "food_tarte_#00": [
         "food",
         "can_cook",
-        "single_use"
+        "single_use",
+        "lure"
     ],
     "food_sandw_#00": [
         "food",
         "can_cook",
-        "single_use"
+        "single_use",
+        "lure"
     ],
     "food_noodles_#00": [
         "food",
         "can_cook",
-        "single_use"
+        "single_use",
+        "lure"
     ],
     "hmeat_#00": [
         "food",
         "can_cook",
-        "single_use"
+        "single_use",
+        "nw_trebuchet",
+        "lure"
     ],
     "bone_meat_#00": [
         "food",
         "can_cook",
-        "single_use"
+        "single_use",
+        "nw_trebuchet",
+        "lure"
     ],
     "cadaver_#00": [
         "food",
         "can_cook",
-        "single_use"
+        "single_use",
+        "lure"
     ],
     "food_noodles_hot_#00": [
         "food",
         "esc_fixed",
-        "single_use"
+        "single_use",
+        "lure"
     ],
     "meat_#00": [
         "food",
         "esc_fixed",
         "hero_find_lucky",
-        "single_use"
+        "single_use",
+        "hero_find_lucky2",
+        "hero_find_lucky3",
+        "lure"
     ],
     "vegetable_tasty_#00": [
         "food",
         "esc_fixed",
-        "single_use"
+        "single_use",
+        "lure"
     ],
     "dish_tasty_#00": [
         "impoundable",
         "food",
         "esc_fixed",
-        "single_use"
+        "single_use",
+        "lure"
     ],
     "food_candies_#00": [
         "food",
         "esc_fixed",
-        "single_use"
+        "single_use",
+        "lure"
     ],
     "chama_tasty_#00": [
         "food",
         "esc_fixed",
-        "single_use"
+        "single_use",
+        "lure"
     ],
     "woodsteak_#00": [
         "food",
         "esc_fixed",
-        "single_use"
+        "single_use",
+        "lure"
     ],
     "egg_#00": [
         "food",
         "esc_fixed",
-        "single_use"
+        "single_use",
+        "lure"
     ],
     "apple_#00": [
         "food",
         "esc_fixed",
-        "single_use"
+        "single_use",
+        "lure"
     ],
     "angryc_#00": [
         "pet",
-        "weapon"
+        "weapon",
+        "nw_trebuchet",
+        "fragile"
     ],
     "pet_cat_#00": [
         "pet",
-        "nw_trebuchet"
+        "nw_trebuchet",
+        "fragile"
     ],
     "pet_chick_#00": [
         "pet",
-        "nw_trebuchet"
+        "nw_trebuchet",
+        "fragile"
     ],
     "pet_pig_#00": [
         "pet",
-        "nw_trebuchet"
+        "nw_trebuchet",
+        "fragile"
     ],
     "pet_rat_#00": [
         "pet",
-        "nw_trebuchet"
+        "nw_trebuchet",
+        "fragile"
     ],
     "pet_snake_#00": [
         "pet",
-        "nw_trebuchet"
+        "nw_trebuchet",
+        "fragile"
     ],
     "pet_snake2_#00": [
-        "pet"
+        "pet",
+        "nw_trebuchet",
+        "fragile"
     ],
     "renne_#00": [
         "impoundable",
@@ -748,16 +808,21 @@
         "esc_fixed"
     ],
     "pocket_belt_#00": [
-        "esc_fixed"
+        "esc_fixed",
+        "no_post"
     ],
     "bag_#00": [
-        "esc_fixed"
+        "esc_fixed",
+        "no_post"
     ],
     "bagxl_#00": [
-        "esc_fixed"
+        "esc_fixed",
+        "no_post"
     ],
     "cart_#00": [
-        "esc_fixed"
+        "esc_fixed",
+        "no_post",
+        "nw_ikea"
     ],
     "radius_mk2_#00": [
         "impoundable",
@@ -801,8 +866,7 @@
         "esc_fixed"
     ],
     "home_box_#00": [
-        "impoundable",
-        "nw_ikea"
+        "impoundable"
     ],
     "home_box_xl_#00": [
         "impoundable"
@@ -812,7 +876,8 @@
     ],
     "lamp_on_#00": [
         "nw_ikea",
-        "prevent_night"
+        "prevent_night",
+        "nw_impact_cumul"
     ],
     "music_#00": [
         "nw_ikea"
@@ -830,22 +895,29 @@
     "rlaunc_#00": [
         "impoundable",
         "nw_armory",
-        "weapon"
+        "weapon",
+        "esc_fixed"
     ],
     "repair_one_#00": [
         "impoundable",
-        "hero_find_lucky"
+        "hero_find_lucky",
+        "hero_find_lucky2",
+        "hero_find_lucky3"
     ],
     "electro_box_#00": [
-        "hero_find_lucky"
+        "hero_find_lucky",
+        "hero_find_lucky2",
+        "hero_find_lucky3"
     ],
     "christmas_candy_#00": [
         "food",
         "can_cook",
-        "single_use"
+        "single_use",
+        "lure"
     ],
     "omg_this_will_kill_you_#00": [
-        "can_cook"
+        "can_cook",
+        "lure"
     ],
     "chudol_#00": [
         "prevent_terror"
@@ -858,7 +930,8 @@
     ],
     "wood_xmas_#00": [
         "food",
-        "single_use"
+        "single_use",
+        "lure"
     ],
     "fence_#00": [
         "impoundable"
@@ -891,7 +964,8 @@
         "impoundable"
     ],
     "badge_#00": [
-        "impoundable"
+        "impoundable",
+        "nw_ikea"
     ],
     "wood_log_#00": [
         "impoundable"
@@ -900,13 +974,15 @@
         "impoundable"
     ],
     "claymo_#00": [
-        "impoundable"
+        "impoundable",
+        "esc_fixed"
     ],
     "paques_#00": [
         "impoundable"
     ],
     "trapma_#00": [
-        "impoundable"
+        "impoundable",
+        "nosteal"
     ],
     "christmas_suit_full_#00": [
         "impoundable"
@@ -970,5 +1046,105 @@
     ],
     "mbplan_e_#00": [
         "impoundable"
+    ],
+    "noodle_prints_#00": [
+        "food",
+        "can_cook",
+        "single_use"
+    ],
+    "noodle_prints_#01": [
+        "food",
+        "can_cook",
+        "single_use"
+    ],
+    "noodle_prints_#02": [
+        "food",
+        "can_cook",
+        "single_use"
+    ],
+    "cinema_#00": [
+        "nw_ikea"
+    ],
+    "flash_#00": [
+        "nw_armory"
+    ],
+    "gun_#00": [
+        "nw_armory"
+    ],
+    "machine_gun_#00": [
+        "nw_armory"
+    ],
+    "kalach_#01": [
+        "esc_fixed"
+    ],
+    "xmas_gift_#01": [
+        "no_post"
+    ],
+    "shoe_#00": [
+        "single_use",
+        "hero_find_lucky3"
+    ],
+    "bike_#00": [
+        "single_use"
+    ],
+    "quantum_#00": [
+        "hero_find_lucky3",
+        "fragile"
+    ],
+    "lens_#00": [
+        "hero_find_lucky2",
+        "hero_find_lucky3"
+    ],
+    "deco_box_#00": [
+        "nw_ikea",
+        "hero_find_lucky2",
+        "hero_find_lucky3"
+    ],
+    "coffee_#00": [
+        "nw_impact_cumul",
+        "hero_find_lucky2",
+        "hero_find_lucky3",
+        "lure",
+        "fragile"
+    ],
+    "pumpkin_tasty_#00": [
+        "impoundable",
+        "food",
+        "single_use",
+        "lure"
+    ],
+    "moldy_food_subpart_#00": [
+        "single_use",
+        "lure"
+    ],
+    "moldy_food_spicy_#00": [
+        "food",
+        "can_cook",
+        "single_use",
+        "lure"
+    ],
+    "moldy_food_#00": [
+        "food",
+        "can_cook",
+        "single_use",
+        "lure"
+    ],
+    "hmbrew_#00": [
+        "fragile"
+    ],
+    "vodka_de_#00": [
+        "fragile"
+    ],
+    "vodka_#00": [
+        "fragile"
+    ],
+    "rhum_#00": [
+        "fragile"
+    ],
+    "fest_#00": [
+        "fragile"
+    ],
+    "poison_#00": [
+        "fragile"
     ]
 }

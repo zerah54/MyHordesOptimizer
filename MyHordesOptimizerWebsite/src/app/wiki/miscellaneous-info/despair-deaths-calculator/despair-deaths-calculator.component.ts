@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, HostBinding } from '@angular/core';
+import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialogModule } from '@angular/material/dialog';
@@ -18,10 +18,10 @@ const material_modules: Imports = [MatButtonModule, MatDialogModule, MatFormFiel
     selector: 'mho-despair-deaths-calculator',
     templateUrl: './despair-deaths-calculator.component.html',
     styleUrls: ['./despair-deaths-calculator.component.scss'],
+    host: {style: 'display: contents'},
     imports: [...angular_common, ...components, ...material_modules, ...pipes],
 })
 export class DespairDeathsCalculatorComponent {
-    @HostBinding('style.display') display: string = 'contents';
 
     public readonly locale: string = moment.locale();
 

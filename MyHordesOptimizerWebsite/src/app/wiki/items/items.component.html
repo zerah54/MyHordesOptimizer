@@ -7,16 +7,15 @@
             <mho-filter (filterChange)="filter_value = $event; applyFilters()"></mho-filter>
             <mat-form-field class="properties-filter">
                 <mat-label i18n>Chercher des objets par propriétés</mat-label>
-                <mho-select multiple [options]="options" [bindLabel]="'value.label'" [(ngModel)]="select_value" (filterChange)="applyFilters()">
-                </mho-select>
+                <mho-select multiple searchable [options]="options" [bindLabel]="'value.label'" [(ngModel)]="select_value" (filterChange)="applyFilters()" chips></mho-select>
             </mat-form-field>
         </div>
         <ul>
-            @for (category of (displayed_items | itemsGroupByCategory); track category.category.id_category) {
+            @for (category of (displayed_items | itemsGroupByCategory); track $index) {
                 <div class="category">
                     <h2>{{ category.category.label[locale] }}</h2>
                     <div class="items">
-                        @for (item of category.items; track item.id) {
+                        @for (item of category.items; track $index) {
                             <mho-item [item]="item"></mho-item>
                         }
                     </div>

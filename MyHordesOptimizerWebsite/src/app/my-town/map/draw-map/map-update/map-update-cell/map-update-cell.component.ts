@@ -1,5 +1,5 @@
 import { CommonModule, NgOptimizedImage } from '@angular/common';
-import { Component, EventEmitter, HostBinding, Input, OnInit, Output, ViewEncapsulation } from '@angular/core';
+import { Component, DestroyRef, inject, input, InputSignal, OnInit, output, OutputEmitterRef, ViewEncapsulation } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatDividerModule } from '@angular/material/divider';
@@ -7,7 +7,6 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatMenuModule } from '@angular/material/menu';
 import moment from 'moment';
-import { Subject, takeUntil } from 'rxjs';
 import { HORDES_IMG_REPO } from '../../../../../_abstract_model/const';
 import { ApiService } from '../../../../../_abstract_model/services/api.service';
 import { Imports } from '../../../../../_abstract_model/types/_types';
@@ -15,11 +14,11 @@ import { Cell } from '../../../../../_abstract_model/types/cell.class';
 import { Citizen } from '../../../../../_abstract_model/types/citizen.class';
 import { ItemCountShort } from '../../../../../_abstract_model/types/item-count-short.class';
 import { Item } from '../../../../../_abstract_model/types/item.class';
-import { AutoDestroy } from '../../../../../shared/decorators/autodestroy.decorator';
 import { LastUpdateComponent } from '../../../../../shared/elements/last-update/last-update.component';
 import { ArrayItemDetailsPipe } from '../../../../../shared/pipes/array-item-details.pipe';
 import { ItemDetailsPipe } from '../../../../../shared/pipes/item-details.pipe';
 import { ItemsInBagsPipe } from './items-in-bags.pipe';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 const angular_common: Imports = [CommonModule, FormsModule, NgOptimizedImage, ReactiveFormsModule];
 const components: Imports = [LastUpdateComponent];
@@ -31,15 +30,15 @@ const material_modules: Imports = [MatCheckboxModule, MatDividerModule, MatFormF
     templateUrl: './map-update-cell.component.html',
     styleUrls: ['./map-update-cell.component.scss'],
     encapsulation: ViewEncapsulation.None,
+    host: {style: 'display: contents'},
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class MapUpdateCellComponent implements OnInit {
-    @HostBinding('style.display') display: string = 'contents';
 
-    @Input() cell!: Cell;
-    @Input() citizens!: Citizen[];
+    public citizens: InputSignal<Citizen[]> = input.required();
 
-    @Output() cellChange: EventEmitter<Cell> = new EventEmitter();
+    public cell: InputSignal<Cell> = input.required();
+    public cellChange: OutputEmitterRef<Cell> = output();
 
     public all_items: Item[] = [];
 
@@ -48,34 +47,36 @@ export class MapUpdateCellComponent implements OnInit {
     public readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
     public readonly locale: string = moment.locale();
 
-    @AutoDestroy private destroy_sub: Subject<void> = new Subject();
+    private readonly api: ApiService = inject(ApiService);
+    private readonly destroy_ref: DestroyRef = inject(DestroyRef);
 
-    constructor(private api: ApiService, private fb: FormBuilder) {
+    constructor(private fb: FormBuilder) {
 
     }
 
     public ngOnInit(): void {
         this.api.getItems()
-            .pipe(takeUntil(this.destroy_sub))
+            .pipe(takeUntilDestroyed(this.destroy_ref))
             .subscribe((all_items: Item[]) => {
                 this.all_items = all_items;
             });
 
         this.cell_form = this.fb.group({
-            nb_zombies: [this.cell.nb_zombie],
-            nb_killed_zombies: [this.cell.nb_zombie_killed],
-            is_dryed: [this.cell.is_dryed],
-            items: [this.cell.items],
+            nb_zombies: [this.cell().nb_zombie],
+            nb_killed_zombies: [this.cell().nb_zombie_killed],
+            is_dryed: [this.cell().is_dryed],
+            items: [this.cell().items],
         });
 
         this.cell_form.valueChanges
-            .pipe(takeUntil(this.destroy_sub))
+            .pipe(takeUntilDestroyed(this.destroy_ref))
             .subscribe((values: CellInfoUpdate) => {
-                this.cell.is_dryed = values.is_dryed;
-                this.cell.nb_zombie = +values.nb_zombies;
-                this.cell.nb_zombie_killed = +values.nb_killed_zombies;
-                this.cell.items = [...values.items];
-                this.cellChange.next(this.cell);
+                let new_cell: Cell = this.cell();
+                new_cell.is_dryed = values.is_dryed;
+                new_cell.nb_zombie = +values.nb_zombies;
+                new_cell.nb_zombie_killed = +values.nb_killed_zombies;
+                new_cell.items = [...values.items];
+                this.cellChange.emit(new_cell);
             });
     }
 

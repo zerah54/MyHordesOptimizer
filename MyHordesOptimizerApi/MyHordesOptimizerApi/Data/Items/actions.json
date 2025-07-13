@@ -710,6 +710,58 @@
         ],
         "message": "Dir ist schwindelig und du würdest dich am liebsten übergeben... Egal was, Hauptsache <strong>du bekommst wieder einen klaren Kopf</strong>."
     },
+    "drink_quantum_1": {
+        "label": "Trinken",
+        "cover": true,
+        "at00": true,
+        "poison": "ItemAction::PoisonHandlerConsume",
+        "meta": [
+            "drink_tl0a",
+            "drink_tl0b"
+        ],
+        "result": [
+            "contaminated_zone_infect",
+            "plus_8sp_e",
+            "consume_item",
+            "get_thristy",
+            "msg_quantum_thristy"
+        ],
+        "message_key": "msg_quantum_basic"
+    },
+    "drink_quantum_2": {
+        "label": "Trinken",
+        "cover": true,
+        "at00": true,
+        "poison": "ItemAction::PoisonHandlerConsume",
+        "meta": [
+            "drink_tl1"
+        ],
+        "result": [
+            "contaminated_zone_infect",
+            "plus_8sp_e",
+            "consume_item",
+            "get_dehydrated",
+            "msg_quantum_dehydrated"
+        ],
+        "message_key": "msg_quantum_basic"
+    },
+    "drink_quantum_3": {
+        "label": "Trinken",
+        "cover": true,
+        "at00": true,
+        "poison": "ItemAction::PoisonHandlerConsume",
+        "meta": [
+            "drink_tl2"
+        ],
+        "result": [
+            "contaminated_zone_infect",
+            "plus_8sp_e",
+            "consume_item",
+            "get_dehydrated",
+            "msg_quantum_dehydrated"
+        ],
+        "message_key": "msg_quantum_basic"
+    },
     "coffee": {
         "label": "Trinken",
         "cover": true,
@@ -767,12 +819,7 @@
             "is_not_wounded_hands"
         ],
         "result": [
-            {
-                "item": {
-                    "consume": false,
-                    "morph": "can_open_#00"
-                }
-            }
+            "morph_open_can"
         ],
         "message_key": "container_open_tool"
     },
@@ -785,12 +832,7 @@
             "is_not_wounded_hands"
         ],
         "result": [
-            {
-                "item": {
-                    "consume": false,
-                    "morph": "can_open_#00"
-                }
-            }
+            "morph_open_can"
         ],
         "message_key": "container_open_tool"
     },
@@ -804,12 +846,7 @@
         ],
         "result": [
             "minus_1cp",
-            {
-                "item": {
-                    "consume": false,
-                    "morph": "can_open_#00"
-                }
-            }
+            "morph_open_can"
         ],
         "message_key": "container_open"
     },
@@ -854,6 +891,22 @@
         "result": [
             "contaminated_zone_infect",
             "eat_ap7",
+            "consume_item"
+        ],
+        "escort_message_key": "escort_food_eat"
+    },
+    "eat_4ap": {
+        "label": "Essen",
+        "cover": true,
+        "at00": true,
+        "poison": "ItemAction::PoisonHandlerConsume",
+        "meta": [
+            "eat_ap",
+            "no_full_ap_msg_food"
+        ],
+        "result": [
+            "contaminated_zone_infect",
+            "eat_ap4",
             "consume_item"
         ],
         "escort_message_key": "escort_food_eat"
@@ -939,11 +992,7 @@
             "is_not_infected_h"
         ],
         "result": [
-            {
-                "message": {
-                    "text": "Die Medizin gibt dir Kraft: Du bist jetzt immun gegen Infektionen und kannst nicht in einen Ghul verwandelt werden. Diese Wirkung lässt nach dem Angriff nach."
-                }
-            },
+            "msg_effect_para",
             "contaminated_zone_infect",
             "drug_any",
             "immune",
@@ -962,11 +1011,7 @@
             "is_not_infected_h"
         ],
         "result": [
-            {
-                "message": {
-                    "text": "Die Medizin gibt dir Kraft: Du bist jetzt immun gegen Infektionen und kannst nicht in einen Ghul verwandelt werden. Diese Wirkung lässt nach dem Angriff nach."
-                }
-            },
+            "msg_effect_para",
             "contaminated_zone_infect",
             "drug_addict",
             "immune",
@@ -985,11 +1030,7 @@
             "is_infected_h"
         ],
         "result": [
-            {
-                "message": {
-                    "text": "Die Medizin gibt dir Kraft: Du bist jetzt immun gegen Infektionen und kannst nicht in einen Ghul verwandelt werden. Diese Wirkung lässt nach dem Angriff nach."
-                }
-            },
+            "msg_effect_para",
             "contaminated_zone_infect",
             "drug_any",
             "disinfect",
@@ -1009,11 +1050,7 @@
             "is_infected_h"
         ],
         "result": [
-            {
-                "message": {
-                    "text": "Die Medizin gibt dir Kraft: Du bist jetzt immun gegen Infektionen und kannst nicht in einen Ghul verwandelt werden. Diese Wirkung lässt nach dem Angriff nach."
-                }
-            },
+            "msg_effect_para",
             "contaminated_zone_infect",
             "drug_addict",
             "disinfect",
@@ -1278,16 +1315,8 @@
             "not_yet_beta"
         ],
         "result": [
-            {
-                "ap": {
-                    "max": true,
-                    "num": 20
-                },
-                "status": {
-                    "from": null,
-                    "to": "tg_betadrug"
-                }
-            }
+            "just_ap26",
+            "status_betadrug"
         ]
     },
     "cyanide": {
@@ -1328,17 +1357,8 @@
         "result": [
             "just_ap6",
             "inflict_wound",
-            {
-                "item": {
-                    "consume": false,
-                    "morph": "sport_elec_empty_#00"
-                }
-            },
-            {
-                "picto": [
-                    "r_maso_#00"
-                ]
-            }
+            "picto_masochism",
+            "morph_elec_empty"
         ],
         "message": "Es geht doch nichts über einen schönen Stromstoß in die Wirbelsäule, um so richtig wach zu werden! Aber irgendwie riecht es jetzt hier nach verbranntem Fleisch..."
     },
@@ -1353,22 +1373,14 @@
         "result": [
             "contaminated_zone_infect",
             "consume_item",
-            {
-                "picto": [
-                    "r_cobaye_#00"
-                ]
-            },
+            "picto_drug_exp",
             {
                 "group": [
                     [
                         [
                             "drug_any",
                             "just_ap6",
-                            {
-                                "message": {
-                                    "text_key": "drug_normal_ap"
-                                }
-                            }
+                            "msg_drug_normal_ap"
                         ],
                         40
                     ],
@@ -1376,11 +1388,7 @@
                         [
                             "drug_any",
                             "terrorize",
-                            {
-                                "message": {
-                                    "text_key": "drug_terror"
-                                }
-                            }
+                            "msg_drug_terror"
                         ],
                         20
                     ],
@@ -1389,22 +1397,14 @@
                             "drug_any",
                             "drug_addict",
                             "just_ap7",
-                            {
-                                "message": {
-                                    "text_key": "drug_addict_ap"
-                                }
-                            }
+                            "msg_drug_addict_ap"
                         ],
                         20
                     ],
                     [
                         [
                             "do_nothing",
-                            {
-                                "message": {
-                                    "text_key": "drug_no_effect"
-                                }
-                            }
+                            "msg_drug_no_effect"
                         ],
                         20
                     ]
@@ -1423,22 +1423,14 @@
         "result": [
             "contaminated_zone_infect",
             "consume_item",
-            {
-                "picto": [
-                    "r_cobaye_#00"
-                ]
-            },
+            "picto_drug_exp",
             {
                 "group": [
                     [
                         [
                             "drug_addict",
                             "just_ap6",
-                            {
-                                "message": {
-                                    "text_key": "drug_normal_ap"
-                                }
-                            }
+                            "msg_drug_normal_ap"
                         ],
                         40
                     ],
@@ -1446,11 +1438,7 @@
                         [
                             "drug_addict",
                             "terrorize",
-                            {
-                                "message": {
-                                    "text_key": "drug_terror"
-                                }
-                            }
+                            "msg_drug_terror"
                         ],
                         20
                     ],
@@ -1458,22 +1446,14 @@
                         [
                             "drug_addict",
                             "just_ap7",
-                            {
-                                "message": {
-                                    "text_key": "drug_addict_ap"
-                                }
-                            }
+                            "msg_drug_addict_ap"
                         ],
                         20
                     ],
                     [
                         [
                             "do_nothing",
-                            {
-                                "message": {
-                                    "text_key": "drug_no_effect"
-                                }
-                            }
+                            "msg_drug_no_effect"
                         ],
                         20
                     ]
@@ -1492,22 +1472,14 @@
         "result": [
             "contaminated_zone_infect",
             "consume_item",
-            {
-                "picto": [
-                    "r_cobaye_#00"
-                ]
-            },
+            "picto_drug_exp",
             {
                 "group": [
                     [
                         [
                             "drug_any",
                             "just_ap6",
-                            {
-                                "message": {
-                                    "text_key": "drug_normal_ap"
-                                }
-                            }
+                            "msg_drug_normal_ap"
                         ],
                         75
                     ],
@@ -1516,11 +1488,7 @@
                             "drug_any",
                             "just_ap6",
                             "terrorize",
-                            {
-                                "message": {
-                                    "text_key": "drug_terror"
-                                }
-                            }
+                            "msg_drug_terror"
                         ],
                         25
                     ]
@@ -1539,22 +1507,14 @@
         "result": [
             "contaminated_zone_infect",
             "consume_item",
-            {
-                "picto": [
-                    "r_cobaye_#00"
-                ]
-            },
+            "picto_drug_exp",
             {
                 "group": [
                     [
                         [
                             "drug_addict",
                             "just_ap6",
-                            {
-                                "message": {
-                                    "text_key": "drug_normal_ap"
-                                }
-                            }
+                            "msg_drug_normal_ap"
                         ],
                         75
                     ],
@@ -1563,11 +1523,7 @@
                             "drug_addict",
                             "just_ap6",
                             "terrorize",
-                            {
-                                "message": {
-                                    "text_key": "drug_terror"
-                                }
-                            }
+                            "msg_drug_terror"
                         ],
                         25
                     ]
@@ -1583,67 +1539,47 @@
         "meta": [
             "drug_1"
         ],
-        "result": [
-            "contaminated_zone_infect",
-            "consume_item",
-            {
-                "picto": [
-                    "r_cobaye_#00"
-                ]
-            },
-            {
+        "result": {
+            "0": "contaminated_zone_infect",
+            "1": "consume_item",
+            "2": "picto_drug_exp",
+            "chances": {
                 "group": [
                     [
                         [
                             "drug_any",
                             "just_ap6",
-                            {
-                                "message": {
-                                    "text_key": "drug_normal_ap"
-                                }
-                            }
+                            "msg_drug_normal_ap"
                         ],
-                        4
+                        1
                     ],
                     [
                         [
                             "drug_any",
-                            "terrorize",
-                            {
-                                "message": {
-                                    "text_key": "drug_terror"
-                                }
-                            }
+                            "unterrorize",
+                            "msg_drug_relax"
                         ],
-                        2
+                        1
                     ],
                     [
                         [
                             "drug_any",
-                            "drug_addict",
-                            "just_ap7",
-                            {
-                                "message": {
-                                    "text_key": "drug_addict_ap"
-                                }
-                            }
+                            "plus_4ap",
+                            "msg_drug_normal_ap"
                         ],
-                        2
+                        1
                     ],
                     [
                         [
-                            "do_nothing",
-                            {
-                                "message": {
-                                    "text_key": "drug_no_effect"
-                                }
-                            }
+                            "drug_any",
+                            "drunk",
+                            "msg_drug_drunk"
                         ],
-                        2
+                        1
                     ]
                 ]
             }
-        ]
+        }
     },
     "drug_beta_bad_2": {
         "label": "Einnehmen",
@@ -1653,66 +1589,47 @@
         "meta": [
             "drug_2"
         ],
-        "result": [
-            "contaminated_zone_infect",
-            "consume_item",
-            {
-                "picto": [
-                    "r_cobaye_#00"
-                ]
-            },
-            {
+        "result": {
+            "0": "contaminated_zone_infect",
+            "1": "consume_item",
+            "2": "picto_drug_exp",
+            "chances": {
                 "group": [
                     [
                         [
                             "drug_addict",
                             "just_ap6",
-                            {
-                                "message": {
-                                    "text_key": "drug_normal_ap"
-                                }
-                            }
+                            "msg_drug_normal_ap"
                         ],
-                        4
+                        1
                     ],
                     [
                         [
                             "drug_addict",
-                            "terrorize",
-                            {
-                                "message": {
-                                    "text_key": "drug_terror"
-                                }
-                            }
+                            "unterrorize",
+                            "msg_drug_relax"
                         ],
-                        2
+                        1
                     ],
                     [
                         [
                             "drug_addict",
-                            "just_ap7",
-                            {
-                                "message": {
-                                    "text_key": "drug_addict_ap"
-                                }
-                            }
+                            "plus_4ap",
+                            "msg_drug_normal_ap"
                         ],
-                        2
+                        1
                     ],
                     [
                         [
-                            "do_nothing",
-                            {
-                                "message": {
-                                    "text_key": "drug_no_effect"
-                                }
-                            }
+                            "drug_addict",
+                            "drunk",
+                            "msg_drug_drunk"
                         ],
-                        2
+                        1
                     ]
                 ]
             }
-        ]
+        }
     },
     "drug_rand_xmas": {
         "label": "Essen",
@@ -1725,22 +1642,14 @@
         "result": [
             "contaminated_zone_infect",
             "consume_item",
-            {
-                "picto": [
-                    "r_cobaye_#00"
-                ]
-            },
+            "picto_drug_exp",
             {
                 "group": [
                     [
                         [
                             "plus_ap8_30",
                             "drug_addict_no_msg",
-                            {
-                                "message": {
-                                    "text": "Du schluckst das Bonbon mit einem Lächeln auf den Lippen herunter... das jedoch schnell wieder verschwindet! Die Füllung besteht aus einem <strong>starken psychoaktiven Gift!</strong><t-stat-up-addict>{hr}Du bist jetzt ein Süchtiger!</t-stat-up-addict>"
-                                }
-                            }
+                            "msg_drug_candy_addict"
                         ],
                         18
                     ],
@@ -1748,11 +1657,7 @@
                         [
                             "plus_ap8_30",
                             "terrorize",
-                            {
-                                "message": {
-                                    "text": "Du schluckst das Bonbon mit einem Lächeln auf den Lippen herunter... das jedoch schnell wieder verschwindet! Die Füllung besteht aus einem <strong>starken psychoaktiven Gift!</strong><t-stat-up-terror>{hr}Du bist vor Angst erstarrt!</t-stat-up-terror>"
-                                }
-                            }
+                            "msg_drug_candy_terror"
                         ],
                         50
                     ],
@@ -1760,11 +1665,7 @@
                         [
                             "plus_ap8_30",
                             "infect_no_msg",
-                            {
-                                "message": {
-                                    "text": "Du schluckst das Bonbon mit einem Lächeln auf den Lippen herunter... das jedoch schnell wieder verschwindet! Die Füllung besteht aus einem <strong>starken psychoaktiven Gift!</strong><t-stat-up-infection>{hr}Du bist jetzt infiziert!</t-stat-up-infection>"
-                                }
-                            }
+                            "msg_drug_candy_infect"
                         ],
                         30
                     ],
@@ -1778,6 +1679,84 @@
             }
         ]
     },
+    "play_soccer_1": {
+        "label": "Benutzen",
+        "at00": true,
+        "meta": [
+            "not_tired",
+            "not_yet_soccer",
+            "no_bonus_ap",
+            "not_drunk_hide",
+            "is_not_wounded_foot"
+        ],
+        "result": {
+            "0": "status_soccer_today",
+            "chances": {
+                "group": [
+                    [
+                        [
+                            "do_nothing",
+                            "msg_soccer_fail"
+                        ],
+                        1
+                    ],
+                    [
+                        [
+                            "just_ap1",
+                            "msg_soccer_success"
+                        ],
+                        1
+                    ],
+                    [
+                        [
+                            "morph_soccer_part",
+                            "msg_soccer_bigfail"
+                        ],
+                        1
+                    ]
+                ]
+            }
+        }
+    },
+    "play_soccer_2": {
+        "label": "Benutzen",
+        "at00": true,
+        "meta": [
+            "not_tired",
+            "not_yet_soccer",
+            "no_bonus_ap",
+            "must_be_drunk",
+            "is_not_wounded_foot"
+        ],
+        "result": {
+            "0": "status_soccer_today",
+            "chances": {
+                "group": [
+                    [
+                        [
+                            "morph_soccer_part",
+                            "msg_soccer_bigfail"
+                        ],
+                        1
+                    ],
+                    [
+                        [
+                            "do_nothing",
+                            "msg_soccer_fail"
+                        ],
+                        1
+                    ],
+                    [
+                        [
+                            "just_ap1",
+                            "msg_soccer_success"
+                        ],
+                        1
+                    ]
+                ]
+            }
+        }
+    },
     "open_doggybag": {
         "label": "Öffnen",
         "at00": true,
@@ -1786,42 +1765,7 @@
         ],
         "result": [
             "consume_item",
-            {
-                "spawn": [
-                    [
-                        "food_pims_#00",
-                        186
-                    ],
-                    [
-                        "food_tarte_#00",
-                        174
-                    ],
-                    [
-                        "food_chick_#00",
-                        194
-                    ],
-                    [
-                        "food_biscuit_#00",
-                        188
-                    ],
-                    [
-                        "food_bar3_#00",
-                        181
-                    ],
-                    [
-                        "food_bar1_#00",
-                        168
-                    ],
-                    [
-                        "food_sandw_#00",
-                        162
-                    ],
-                    [
-                        "food_bar2_#00",
-                        222
-                    ]
-                ]
-            }
+            "spawn_doggy"
         ],
         "message": "Du hast dein <span class=\"tool\">{item}</span> ausgepackt und <span class=\"tool\">{items_spawn}</span> erhalten!"
     },
@@ -1833,14 +1777,7 @@
         ],
         "result": [
             "consume_item",
-            {
-                "spawn": [
-                    "food_candies_#00",
-                    "food_noodles_hot_#00",
-                    "vegetable_tasty_#00",
-                    "meat_#00"
-                ]
-            }
+            "spawn_lunch"
         ],
         "message_key": "container_open"
     },
@@ -1852,14 +1789,7 @@
         ],
         "result": [
             "consume_item",
-            {
-                "spawn": [
-                    "pile_#00",
-                    "radio_off_#00",
-                    "pharma_#00",
-                    "lights_#00"
-                ]
-            }
+            "spawn_c_chest"
         ],
         "message_key": "container_open"
     },
@@ -1871,15 +1801,7 @@
         ],
         "result": [
             "consume_item",
-            {
-                "spawn": [
-                    "watergun_empty_#00",
-                    "pilegun_empty_#00",
-                    "flash_#00",
-                    "repair_one_#00",
-                    "smoke_bomb_#00"
-                ]
-            }
+            "spawn_h_chest"
         ],
         "message_key": "container_open"
     },
@@ -1891,14 +1813,7 @@
         ],
         "result": [
             "consume_item",
-            {
-                "spawn": [
-                    "money_#00",
-                    "rp_book_#00",
-                    "rp_book_#01",
-                    "rp_sheets_#00"
-                ]
-            }
+            "spawn_postbox"
         ],
         "message_key": "container_open"
     },
@@ -1910,14 +1825,7 @@
         ],
         "result": [
             "consume_item",
-            {
-                "spawn": [
-                    "machine_gun_#00",
-                    "rsc_pack_2_#00",
-                    "rhum_#00",
-                    "vibr_empty_#00"
-                ]
-            }
+            "spawn_postbox_xl"
         ],
         "message_key": "container_open"
     },
@@ -1929,16 +1837,7 @@
         ],
         "result": [
             "consume_item",
-            {
-                "spawn": [
-                    "rp_book2_#00",
-                    "rp_manual_#00",
-                    "rp_scroll_#00",
-                    "rp_scroll_#01",
-                    "rp_sheets_#00",
-                    "rp_letter_#00"
-                ]
-            }
+            "spawn_letterbox"
         ],
         "message_key": "container_open"
     },
@@ -1950,14 +1849,7 @@
         ],
         "result": [
             "consume_item",
-            {
-                "spawn": [
-                    "money_#00",
-                    "rp_book_#00",
-                    "rp_book_#01",
-                    "rp_sheets_#00"
-                ]
-            }
+            "spawn_justbox"
         ],
         "message_key": "container_open"
     },
@@ -1969,12 +1861,7 @@
         ],
         "result": [
             "consume_item",
-            {
-                "spawn": [
-                    "dice_#00",
-                    "cards_#00"
-                ]
-            }
+            "spawn_gamebox"
         ],
         "message_key": "container_open"
     },
@@ -1986,11 +1873,7 @@
         ],
         "result": [
             "consume_item",
-            {
-                "spawn": [
-                    "bplan_r_#00"
-                ]
-            }
+            "spawn_abox"
         ],
         "message_key": "container_open"
     },
@@ -2002,26 +1885,7 @@
         ],
         "result": [
             "consume_item",
-            {
-                "spawn": [
-                    [
-                        "bplan_c_#00",
-                        50
-                    ],
-                    [
-                        "bplan_u_#00",
-                        35
-                    ],
-                    [
-                        "bplan_r_#00",
-                        10
-                    ],
-                    [
-                        "bplan_e_#00",
-                        5
-                    ]
-                ]
-            }
+            "spawn_cbox"
         ],
         "message_key": "container_open_cbox"
     },
@@ -2033,13 +1897,8 @@
             "room_for_item"
         ],
         "result": [
-            {
-                "item": {
-                    "consume": false,
-                    "morph": "rsc_pack_2_#00"
-                },
-                "spawn": "matbox"
-            }
+            "spawn_matbox",
+            "morph_rsc_pack_2"
         ],
         "message_key": "container_open_not_empty"
     },
@@ -2051,13 +1910,8 @@
             "room_for_item"
         ],
         "result": [
-            {
-                "item": {
-                    "consume": false,
-                    "morph": "rsc_pack_1_#00"
-                },
-                "spawn": "matbox"
-            }
+            "spawn_matbox",
+            "morph_rsc_pack_1"
         ],
         "message_key": "container_open_not_empty"
     },
@@ -2069,9 +1923,7 @@
         ],
         "result": [
             "consume_item",
-            {
-                "spawn": "matbox"
-            }
+            "spawn_matbox"
         ],
         "message_key": "container_open_empty"
     },
@@ -2082,13 +1934,8 @@
             "is_not_wounded_hands"
         ],
         "result": [
-            {
-                "item": {
-                    "consume": false,
-                    "morph": "chest_christmas_2_#00"
-                },
-                "spawn": "xmas_3"
-            }
+            "spawn_xmas_3",
+            "morph_christmas_2"
         ],
         "message_key": "container_open_not_empty"
     },
@@ -2099,13 +1946,8 @@
             "is_not_wounded_hands"
         ],
         "result": [
-            {
-                "item": {
-                    "consume": false,
-                    "morph": "chest_christmas_1_#00"
-                },
-                "spawn": "xmas_2"
-            }
+            "spawn_xmas_2",
+            "morph_christmas_1"
         ],
         "message_key": "container_open_not_empty"
     },
@@ -2117,9 +1959,7 @@
         ],
         "result": [
             "consume_item",
-            {
-                "spawn": "xmas_1"
-            }
+            "spawn_xmas_1"
         ],
         "message_key": "container_open_empty"
     },
@@ -2133,9 +1973,7 @@
         ],
         "result": [
             "consume_item",
-            {
-                "spawn": "metalbox"
-            }
+            "spawn_metalbox"
         ],
         "message_key": "container_open_tool"
     },
@@ -2149,9 +1987,7 @@
         ],
         "result": [
             "consume_item",
-            {
-                "spawn": "metalbox2"
-            }
+            "spawn_metalbox2"
         ],
         "message_key": "container_open_tool"
     },
@@ -2165,9 +2001,7 @@
         ],
         "result": [
             "consume_item",
-            {
-                "spawn": "catbox"
-            }
+            "spawn_catbox"
         ],
         "message_key": "container_open_tool"
     },
@@ -2181,9 +2015,7 @@
         ],
         "result": [
             "consume_item",
-            {
-                "spawn": "toolbox"
-            }
+            "spawn_toolbox"
         ],
         "message_key": "container_open_weapon"
     },
@@ -2198,9 +2030,7 @@
         ],
         "result": [
             "consume_item",
-            {
-                "spawn": "foodbox"
-            }
+            "spawn_foodbox"
         ],
         "message_key": "container_open_weapon"
     },
@@ -2215,9 +2045,7 @@
         ],
         "result": [
             "consume_item",
-            {
-                "spawn": "foodbox"
-            }
+            "spawn_foodbox"
         ],
         "message_key": "container_open_weapon"
     },
@@ -2231,9 +2059,7 @@
         ],
         "result": [
             "consume_item",
-            {
-                "spawn": "metalbox"
-            }
+            "spawn_metalbox"
         ],
         "message_key": "container_open_tool"
     },
@@ -2247,9 +2073,7 @@
         ],
         "result": [
             "consume_item",
-            {
-                "spawn": "metalbox2"
-            }
+            "spawn_metalbox2"
         ],
         "message_key": "container_open_tool"
     },
@@ -2263,9 +2087,7 @@
         ],
         "result": [
             "consume_item",
-            {
-                "spawn": "catbox"
-            }
+            "spawn_catbox"
         ],
         "message_key": "container_open_tool"
     },
@@ -2279,9 +2101,7 @@
         ],
         "result": [
             "consume_item",
-            {
-                "spawn": "toolbox"
-            }
+            "spawn_toolbox"
         ],
         "message_key": "container_open_weapon"
     },
@@ -2296,9 +2116,7 @@
         ],
         "result": [
             "consume_item",
-            {
-                "spawn": "foodbox"
-            }
+            "spawn_foodbox"
         ],
         "message_key": "container_open_weapon"
     },
@@ -2313,9 +2131,7 @@
         ],
         "result": [
             "consume_item",
-            {
-                "spawn": "foodbox"
-            }
+            "spawn_foodbox"
         ],
         "message_key": "container_open_weapon"
     },
@@ -2330,9 +2146,7 @@
         "result": [
             "minus_1cp",
             "consume_item",
-            {
-                "spawn": "metalbox"
-            }
+            "spawn_metalbox"
         ],
         "message_key": "container_open"
     },
@@ -2347,9 +2161,7 @@
         "result": [
             "minus_1cp",
             "consume_item",
-            {
-                "spawn": "metalbox2"
-            }
+            "spawn_metalbox2"
         ],
         "message_key": "container_open"
     },
@@ -2364,9 +2176,7 @@
         "result": [
             "minus_1cp",
             "consume_item",
-            {
-                "spawn": "catbox"
-            }
+            "spawn_catbox"
         ],
         "message_key": "container_open"
     },
@@ -2381,9 +2191,7 @@
         "result": [
             "minus_1cp",
             "consume_item",
-            {
-                "spawn": "toolbox"
-            }
+            "spawn_toolbox"
         ],
         "message_key": "container_open"
     },
@@ -2399,9 +2207,7 @@
         "result": [
             "minus_1cp",
             "consume_item",
-            {
-                "spawn": "foodbox"
-            }
+            "spawn_foodbox"
         ],
         "message_key": "container_open"
     },
@@ -2417,9 +2223,7 @@
         "result": [
             "minus_1cp",
             "consume_item",
-            {
-                "spawn": "foodbox"
-            }
+            "spawn_foodbox"
         ],
         "message_key": "container_open"
     },
@@ -2444,9 +2248,7 @@
                     [
                         [
                             "consume_item",
-                            {
-                                "spawn": "safe"
-                            }
+                            "spawn_safe"
                         ],
                         5
                     ]
@@ -2476,9 +2278,7 @@
                     [
                         [
                             "consume_item",
-                            {
-                                "spawn": "asafe"
-                            }
+                            "spawn_asafe"
                         ],
                         5
                     ]
@@ -2486,6 +2286,19 @@
             }
         ],
         "message_key": "container_optional"
+    },
+    "open_cellobox": {
+        "label": "Öffnen",
+        "at00": true,
+        "meta": [
+            "is_not_wounded_hands"
+        ],
+        "result": [
+            "consume_item",
+            "spawn_cellobox",
+            "spawn_cellobox_extra"
+        ],
+        "message_key": "container_open"
     },
     "load_pilegun": {
         "label": "Laden",
@@ -2495,12 +2308,7 @@
         ],
         "result": [
             "consume_battery",
-            {
-                "item": {
-                    "consume": false,
-                    "morph": "pilegun_#00"
-                }
-            }
+            "morph_pilegun"
         ],
         "message_key": "item_load"
     },
@@ -2512,12 +2320,7 @@
         ],
         "result": [
             "consume_battery",
-            {
-                "item": {
-                    "consume": false,
-                    "morph": "pilegun_up_#00"
-                }
-            }
+            "morph_pilegun_up"
         ],
         "message_key": "item_load"
     },
@@ -2529,12 +2332,7 @@
         ],
         "result": [
             "consume_battery",
-            {
-                "item": {
-                    "consume": false,
-                    "morph": "big_pgun_#00"
-                }
-            }
+            "morph_big_pgun"
         ],
         "message_key": "item_load"
     },
@@ -2546,12 +2344,7 @@
         ],
         "result": [
             "consume_battery",
-            {
-                "item": {
-                    "consume": false,
-                    "morph": "mixergun_#00"
-                }
-            }
+            "morph_mixergun"
         ],
         "message_key": "item_load"
     },
@@ -2563,12 +2356,7 @@
         ],
         "result": [
             "consume_battery",
-            {
-                "item": {
-                    "consume": false,
-                    "morph": "chainsaw_#00"
-                }
-            }
+            "morph_chainsaw"
         ],
         "message_key": "item_load"
     },
@@ -2580,12 +2368,7 @@
         ],
         "result": [
             "consume_battery",
-            {
-                "item": {
-                    "consume": false,
-                    "morph": "taser_#00"
-                }
-            }
+            "morph_taser"
         ],
         "message_key": "item_load"
     },
@@ -2595,15 +2378,29 @@
         "meta": [
             "have_battery"
         ],
-        "result": [
-            "consume_battery",
-            {
-                "item": {
-                    "consume": false,
-                    "morph": "lpoint4_#00"
-                }
+        "result": {
+            "0": "consume_battery",
+            "chances": {
+                "group": [
+                    [
+                        "morph_lpoint4",
+                        1
+                    ],
+                    [
+                        "morph_lpoint3",
+                        1
+                    ],
+                    [
+                        "morph_lpoint2",
+                        1
+                    ],
+                    [
+                        "morph_lpoint4",
+                        1
+                    ]
+                ]
             }
-        ],
+        },
         "message_key": "item_load"
     },
     "load_lamp": {
@@ -2614,12 +2411,7 @@
         ],
         "result": [
             "consume_battery",
-            {
-                "item": {
-                    "consume": false,
-                    "morph": "lamp_on_#00"
-                }
-            }
+            "morph_lamp_on"
         ],
         "message_key": "item_load"
     },
@@ -2631,12 +2423,7 @@
         ],
         "result": [
             "consume_battery",
-            {
-                "item": {
-                    "consume": false,
-                    "morph": "vibr_#00"
-                }
-            }
+            "morph_vibr"
         ],
         "message_key": "item_load"
     },
@@ -2648,12 +2435,7 @@
         ],
         "result": [
             "consume_battery",
-            {
-                "item": {
-                    "consume": false,
-                    "morph": "radius_mk2_#00"
-                }
-            }
+            "morph_radius_mk2"
         ],
         "message_key": "item_load"
     },
@@ -2665,12 +2447,7 @@
         ],
         "result": [
             "consume_battery",
-            {
-                "item": {
-                    "consume": false,
-                    "morph": "maglite_2_#00"
-                }
-            }
+            "morph_maglite_2"
         ],
         "message_key": "item_load"
     },
@@ -2682,12 +2459,7 @@
         ],
         "result": [
             "consume_battery",
-            {
-                "item": {
-                    "consume": false,
-                    "morph": "radio_on_#00"
-                }
-            }
+            "morph_radio_on"
         ],
         "message_key": "item_load"
     },
@@ -2699,12 +2471,7 @@
         ],
         "result": [
             "consume_battery",
-            {
-                "item": {
-                    "consume": false,
-                    "morph": "sport_elec_#00"
-                }
-            }
+            "morph_sport_elec"
         ],
         "message_key": "item_load"
     },
@@ -2759,12 +2526,7 @@
         ],
         "result": [
             "consume_jerrycan",
-            {
-                "item": {
-                    "consume": false,
-                    "morph": "jerrygun_#00"
-                }
-            }
+            "morph_jerrygun"
         ],
         "message_key": "item_fill"
     },
@@ -2777,12 +2539,7 @@
         ],
         "result": [
             "consume_water",
-            {
-                "item": {
-                    "consume": false,
-                    "morph": "watergun_opt_5_#00"
-                }
-            }
+            "morph_watergun_opt_5"
         ],
         "message_key": "item_fill"
     },
@@ -2795,12 +2552,7 @@
         ],
         "result": [
             "consume_water",
-            {
-                "item": {
-                    "consume": false,
-                    "morph": "watergun_opt_5_#00"
-                }
-            }
+            "morph_watergun_opt_5"
         ],
         "message_key": "item_fill"
     },
@@ -2813,12 +2565,7 @@
         ],
         "result": [
             "consume_water",
-            {
-                "item": {
-                    "consume": false,
-                    "morph": "watergun_3_#00"
-                }
-            }
+            "morph_watergun_3"
         ],
         "message_key": "item_fill"
     },
@@ -2831,12 +2578,7 @@
         ],
         "result": [
             "consume_water",
-            {
-                "item": {
-                    "consume": false,
-                    "morph": "watergun_3_#00"
-                }
-            }
+            "morph_watergun_3"
         ],
         "message_key": "item_fill"
     },
@@ -2849,12 +2591,7 @@
         ],
         "result": [
             "consume_water",
-            {
-                "item": {
-                    "consume": false,
-                    "morph": "kalach_#00"
-                }
-            }
+            "morph_kalach"
         ],
         "message_key": "item_fill"
     },
@@ -2867,12 +2604,7 @@
         ],
         "result": [
             "consume_water",
-            {
-                "item": {
-                    "consume": false,
-                    "morph": "kalach_#00"
-                }
-            }
+            "morph_kalach"
         ],
         "message_key": "item_fill"
     },
@@ -2885,12 +2617,7 @@
         ],
         "result": [
             "consume_water",
-            {
-                "item": {
-                    "consume": false,
-                    "morph": "grenade_#00"
-                }
-            }
+            "morph_grenade"
         ],
         "message_key": "item_fill"
     },
@@ -2903,12 +2630,7 @@
         ],
         "result": [
             "consume_water",
-            {
-                "item": {
-                    "consume": false,
-                    "morph": "grenade_#00"
-                }
-            }
+            "morph_grenade"
         ],
         "message_key": "item_fill"
     },
@@ -2921,12 +2643,7 @@
         ],
         "result": [
             "consume_water",
-            {
-                "item": {
-                    "consume": false,
-                    "morph": "bgrenade_#00"
-                }
-            }
+            "morph_bgrenade"
         ],
         "message_key": "item_fill"
     },
@@ -2939,12 +2656,7 @@
         ],
         "result": [
             "consume_water",
-            {
-                "item": {
-                    "consume": false,
-                    "morph": "bgrenade_#00"
-                }
-            }
+            "morph_bgrenade"
         ],
         "message_key": "item_fill"
     },
@@ -2994,17 +2706,11 @@
             "must_have_zombies"
         ],
         "result": [
+            "msg_battery_use",
+            "spawn_empty_battery",
+            "morph_pilegun_empty",
             {
-                "spawn": "empty_battery",
-                "item": {
-                    "morph": "pilegun_empty_#00",
-                    "consume": false
-                },
-                "group": "g_kill_1z_90_msg2",
-                "message": {
-                    "text_key": "battery_use",
-                    "ordering": 1000
-                }
+                "group": "g_kill_1z_90_msg2"
             }
         ]
     },
@@ -3019,33 +2725,17 @@
                 "group": [
                     [
                         [
-                            {
-                                "spawn": "battery",
-                                "item": {
-                                    "morph": "pilegun_up_empty_#00",
-                                    "consume": false
-                                },
-                                "message": {
-                                    "text_key": "battery_dropped",
-                                    "ordering": 1000
-                                }
-                            }
+                            "msg_battery_drop",
+                            "spawn_battery",
+                            "morph_pilegun_up_empty"
                         ],
                         8
                     ],
                     [
                         [
-                            {
-                                "spawn": "empty_battery",
-                                "item": {
-                                    "morph": "pilegun_up_empty_#00",
-                                    "consume": false
-                                },
-                                "message": {
-                                    "text_key": "battery_destroyed",
-                                    "ordering": 1000
-                                }
-                            }
+                            "msg_battery_destroy",
+                            "spawn_empty_battery",
+                            "morph_pilegun_up_empty"
                         ],
                         2
                     ]
@@ -3065,33 +2755,17 @@
                 "group": [
                     [
                         [
-                            {
-                                "spawn": "empty_battery",
-                                "item": {
-                                    "morph": "big_pgun_empty_#00",
-                                    "consume": false
-                                },
-                                "message": {
-                                    "text_key": "battery_destroyed",
-                                    "ordering": 1000
-                                }
-                            }
+                            "msg_battery_destroy",
+                            "spawn_empty_battery",
+                            "morph_big_pgun_empty"
                         ],
                         50
                     ],
                     [
                         [
-                            {
-                                "spawn": "battery",
-                                "item": {
-                                    "morph": "big_pgun_empty_#00",
-                                    "consume": false
-                                },
-                                "message": {
-                                    "text_key": "battery_dropped",
-                                    "ordering": 1000
-                                }
-                            }
+                            "msg_battery_drop",
+                            "spawn_battery",
+                            "morph_big_pgun_empty"
                         ],
                         50
                     ]
@@ -3117,16 +2791,8 @@
                     ],
                     [
                         [
-                            {
-                                "item": {
-                                    "morph": "mixergun_empty_#00",
-                                    "consume": false
-                                },
-                                "message": {
-                                    "text_key": "battery_use",
-                                    "ordering": 1000
-                                }
-                            }
+                            "msg_battery_use",
+                            "morph_mixergun_empty"
                         ],
                         4
                     ]
@@ -3152,16 +2818,8 @@
                     ],
                     [
                         [
-                            {
-                                "item": {
-                                    "morph": "chainsaw_empty_#00",
-                                    "consume": false
-                                },
-                                "message": {
-                                    "text_key": "battery_use",
-                                    "ordering": 1000
-                                }
-                            }
+                            "msg_battery_use",
+                            "morph_chainsaw_empty"
                         ],
                         3
                     ]
@@ -3190,15 +2848,8 @@
                     ],
                     [
                         [
-                            {
-                                "item": {
-                                    "morph": "taser_empty_#00",
-                                    "consume": false
-                                },
-                                "message": {
-                                    "text_key": "battery_use"
-                                }
-                            }
+                            "msg_battery_use",
+                            "morph_taser_empty"
                         ],
                         7
                     ]
@@ -3213,12 +2864,7 @@
             "must_have_zombies"
         ],
         "result": [
-            {
-                "item": {
-                    "morph": "lpoint3_#00",
-                    "consume": false
-                }
-            },
+            "morph_lpoint3",
             "kill_2_zombie"
         ]
     },
@@ -3229,12 +2875,7 @@
             "must_have_zombies"
         ],
         "result": [
-            {
-                "item": {
-                    "morph": "lpoint2_#00",
-                    "consume": false
-                }
-            },
+            "morph_lpoint2",
             "kill_2_zombie"
         ]
     },
@@ -3245,12 +2886,7 @@
             "must_have_zombies"
         ],
         "result": [
-            {
-                "item": {
-                    "morph": "lpoint1_#00",
-                    "consume": false
-                }
-            },
+            "morph_lpoint1",
             "kill_2_zombie"
         ]
     },
@@ -3261,12 +2897,7 @@
             "must_have_zombies"
         ],
         "result": [
-            {
-                "item": {
-                    "morph": "lpoint_#00",
-                    "consume": false
-                }
-            },
+            "morph_lpoint",
             "kill_2_zombie"
         ]
     },
@@ -3277,12 +2908,7 @@
             "must_have_zombies"
         ],
         "result": [
-            {
-                "item": {
-                    "morph": "watergun_opt_4_#00",
-                    "consume": false
-                }
-            },
+            "morph_watergun_opt_4",
             "kill_1_zombie"
         ]
     },
@@ -3293,12 +2919,7 @@
             "must_have_zombies"
         ],
         "result": [
-            {
-                "item": {
-                    "morph": "watergun_opt_3_#00",
-                    "consume": false
-                }
-            },
+            "morph_watergun_opt_3",
             "kill_1_zombie"
         ]
     },
@@ -3309,12 +2930,7 @@
             "must_have_zombies"
         ],
         "result": [
-            {
-                "item": {
-                    "morph": "watergun_opt_2_#00",
-                    "consume": false
-                }
-            },
+            "morph_watergun_opt_2",
             "kill_1_zombie"
         ]
     },
@@ -3325,12 +2941,7 @@
             "must_have_zombies"
         ],
         "result": [
-            {
-                "item": {
-                    "morph": "watergun_opt_1_#00",
-                    "consume": false
-                }
-            },
+            "morph_watergun_opt_1",
             "kill_1_zombie"
         ]
     },
@@ -3341,12 +2952,7 @@
             "must_have_zombies"
         ],
         "result": [
-            {
-                "item": {
-                    "morph": "watergun_opt_empty_#00",
-                    "consume": false
-                }
-            },
+            "morph_watergun_opt_empty",
             "kill_1_zombie"
         ]
     },
@@ -3357,12 +2963,7 @@
             "must_have_zombies"
         ],
         "result": [
-            {
-                "item": {
-                    "morph": "watergun_2_#00",
-                    "consume": false
-                }
-            },
+            "morph_watergun_2",
             "kill_1_zombie"
         ]
     },
@@ -3373,12 +2974,7 @@
             "must_have_zombies"
         ],
         "result": [
-            {
-                "item": {
-                    "morph": "watergun_1_#00",
-                    "consume": false
-                }
-            },
+            "morph_watergun_1",
             "kill_1_zombie"
         ]
     },
@@ -3389,12 +2985,7 @@
             "must_have_zombies"
         ],
         "result": [
-            {
-                "item": {
-                    "morph": "watergun_empty_#00",
-                    "consume": false
-                }
-            },
+            "morph_watergun_empty",
             "kill_1_zombie"
         ]
     },
@@ -3405,12 +2996,7 @@
             "must_have_zombies"
         ],
         "result": [
-            {
-                "item": {
-                    "morph": "kalach_#01",
-                    "consume": false
-                }
-            },
+            "morph_kalach_empty",
             "kill_3_zombie"
         ]
     },
@@ -3418,16 +3004,13 @@
         "label": "Waffe einsetzen",
         "meta": [
             "must_be_outside_or_exploring",
-            "must_have_zombies"
+            "must_have_zombies",
+            "must_not_have_tamer_building"
         ],
         "result": [
             "consume_item",
             "kill_1_zombie_s",
-            {
-                "picto": [
-                    "r_animal_#00"
-                ]
-            }
+            "picto_animal"
         ],
         "message_key": "throw_animal"
     },
@@ -3435,7 +3018,8 @@
         "label": "Waffe einsetzen",
         "meta": [
             "must_be_outside_or_exploring",
-            "must_have_zombies"
+            "must_have_zombies",
+            "must_not_have_tamer_building"
         ],
         "result": [
             {
@@ -3449,11 +3033,7 @@
                     [
                         [
                             "consume_item",
-                            {
-                                "picto": [
-                                    "r_animal_#00"
-                                ]
-                            }
+                            "picto_animal"
                         ],
                         20
                     ]
@@ -3467,7 +3047,8 @@
         "label": "Waffe einsetzen",
         "meta": [
             "must_be_outside_or_exploring",
-            "must_have_zombies"
+            "must_have_zombies",
+            "must_not_have_tamer_building"
         ],
         "result": [
             {
@@ -3481,11 +3062,7 @@
                     [
                         [
                             "consume_item",
-                            {
-                                "picto": [
-                                    "r_animal_#00"
-                                ]
-                            }
+                            "picto_animal"
                         ],
                         10
                     ]
@@ -3499,7 +3076,8 @@
         "label": "Waffe einsetzen",
         "meta": [
             "must_be_outside_or_exploring",
-            "must_have_zombies"
+            "must_have_zombies",
+            "must_not_have_tamer_building"
         ],
         "result": [
             {
@@ -3513,11 +3091,7 @@
                     [
                         [
                             "consume_item",
-                            {
-                                "picto": [
-                                    "r_animal_#00"
-                                ]
-                            }
+                            "picto_animal"
                         ],
                         15
                     ]
@@ -3525,6 +3099,246 @@
             },
             "kill_1_zombie_s"
         ],
+        "message_key": "throw_animal"
+    },
+    "throw_animal_t1": {
+        "label": "Waffe einsetzen",
+        "meta": [
+            "must_be_outside_or_exploring",
+            "must_have_zombies",
+            "must_have_tamer_building",
+            "not_profession_tamer"
+        ],
+        "result": {
+            "chances": {
+                "group": [
+                    [
+                        [
+                            "do_nothing"
+                        ],
+                        1
+                    ],
+                    [
+                        [
+                            "consume_item",
+                            "picto_animal"
+                        ],
+                        1
+                    ]
+                ]
+            },
+            "0": "kill_1_zombie_s"
+        },
+        "message_key": "throw_animal"
+    },
+    "throw_animal_cat_t1": {
+        "label": "Waffe einsetzen",
+        "meta": [
+            "must_be_outside_or_exploring",
+            "must_have_zombies",
+            "must_have_tamer_building",
+            "not_profession_tamer"
+        ],
+        "result": {
+            "chances": {
+                "group": [
+                    [
+                        [
+                            "do_nothing"
+                        ],
+                        80
+                    ],
+                    [
+                        [
+                            "consume_item",
+                            "picto_animal"
+                        ],
+                        20
+                    ]
+                ]
+            },
+            "0": "kill_1_zombie_s"
+        },
+        "message_key": "throw_animal"
+    },
+    "throw_animal_dog_t1": {
+        "label": "Waffe einsetzen",
+        "meta": [
+            "must_be_outside_or_exploring",
+            "must_have_zombies",
+            "must_have_tamer_building",
+            "not_profession_tamer"
+        ],
+        "result": {
+            "chances": {
+                "group": [
+                    [
+                        [
+                            "do_nothing"
+                        ],
+                        90
+                    ],
+                    [
+                        [
+                            "consume_item",
+                            "picto_animal"
+                        ],
+                        10
+                    ]
+                ]
+            },
+            "0": "kill_1_zombie_s"
+        },
+        "message_key": "throw_animal"
+    },
+    "throw_animal_tekel_t1": {
+        "label": "Waffe einsetzen",
+        "meta": [
+            "must_be_outside_or_exploring",
+            "must_have_zombies",
+            "must_have_tamer_building",
+            "not_profession_tamer"
+        ],
+        "result": {
+            "chances": {
+                "group": [
+                    [
+                        [
+                            "do_nothing"
+                        ],
+                        85
+                    ],
+                    [
+                        [
+                            "consume_item",
+                            "picto_animal"
+                        ],
+                        15
+                    ]
+                ]
+            },
+            "0": "kill_1_zombie_s"
+        },
+        "message_key": "throw_animal"
+    },
+    "throw_animal_t2": {
+        "label": "Waffe einsetzen",
+        "meta": [
+            "must_be_outside_or_exploring",
+            "must_have_zombies",
+            "must_have_tamer_building",
+            "profession_tamer"
+        ],
+        "result": {
+            "chances": {
+                "group": [
+                    [
+                        [
+                            "do_nothing"
+                        ],
+                        1
+                    ],
+                    [
+                        [
+                            "consume_item",
+                            "picto_animal"
+                        ],
+                        1
+                    ]
+                ]
+            },
+            "0": "kill_1_zombie_s"
+        },
+        "message_key": "throw_animal"
+    },
+    "throw_animal_cat_t2": {
+        "label": "Waffe einsetzen",
+        "meta": [
+            "must_be_outside_or_exploring",
+            "must_have_zombies",
+            "must_have_tamer_building",
+            "profession_tamer"
+        ],
+        "result": {
+            "chances": {
+                "group": [
+                    [
+                        [
+                            "do_nothing"
+                        ],
+                        80
+                    ],
+                    [
+                        [
+                            "consume_item",
+                            "picto_animal"
+                        ],
+                        20
+                    ]
+                ]
+            },
+            "0": "kill_1_zombie_s"
+        },
+        "message_key": "throw_animal"
+    },
+    "throw_animal_dog_t2": {
+        "label": "Waffe einsetzen",
+        "meta": [
+            "must_be_outside_or_exploring",
+            "must_have_zombies",
+            "must_have_tamer_building",
+            "profession_tamer"
+        ],
+        "result": {
+            "chances": {
+                "group": [
+                    [
+                        [
+                            "do_nothing"
+                        ],
+                        90
+                    ],
+                    [
+                        [
+                            "consume_item",
+                            "picto_animal"
+                        ],
+                        10
+                    ]
+                ]
+            },
+            "0": "kill_1_zombie_s"
+        },
+        "message_key": "throw_animal"
+    },
+    "throw_animal_tekel_t2": {
+        "label": "Waffe einsetzen",
+        "meta": [
+            "must_be_outside_or_exploring",
+            "must_have_zombies",
+            "must_have_tamer_building",
+            "profession_tamer"
+        ],
+        "result": {
+            "chances": {
+                "group": [
+                    [
+                        [
+                            "do_nothing"
+                        ],
+                        85
+                    ],
+                    [
+                        [
+                            "consume_item",
+                            "picto_animal"
+                        ],
+                        15
+                    ]
+                ]
+            },
+            "0": "kill_1_zombie_s"
+        },
         "message_key": "throw_animal"
     },
     "throw_animal_angryc": {
@@ -3535,6 +3349,7 @@
         ],
         "result": [
             "consume_item",
+            "picto_animal",
             {
                 "group": [
                     [
@@ -3549,11 +3364,6 @@
                         ],
                         50
                     ]
-                ]
-            },
-            {
-                "picto": [
-                    "r_animal_#00"
                 ]
             }
         ],
@@ -3629,12 +3439,7 @@
             "not_tired"
         ],
         "result": [
-            {
-                "item": {
-                    "morph": "torch_off_#00",
-                    "consume": false
-                }
-            },
+            "morph_torch_off",
             "kill_1_zombie"
         ]
     },
@@ -3674,18 +3479,8 @@
                     ],
                     [
                         [
-                            {
-                                "item": {
-                                    "consume": false,
-                                    "morph": "staff2_#00"
-                                }
-                            },
-                            {
-                                "message": {
-                                    "text": "Deine Waffe ist durch den harten Aufschlag <strong>kaputt</strong> gegangen...",
-                                    "ordering": 99999
-                                }
-                            }
+                            "msg_break_item",
+                            "morph_staff2"
                         ],
                         60
                     ]
@@ -3930,9 +3725,7 @@
         ],
         "result": [
             "consume_item",
-            {
-                "spawn": "phone"
-            },
+            "spawn_phone",
             "kill_1_2_zombie"
         ]
     },
@@ -3946,9 +3739,7 @@
         ],
         "result": [
             "consume_item",
-            {
-                "spawn": "proj"
-            },
+            "spawn_proj",
             "kill_1_zombie"
         ]
     },
@@ -3960,12 +3751,7 @@
         ],
         "result": [
             "consume_item",
-            {
-                "zombies": {
-                    "min": 2,
-                    "max": 4
-                }
-            }
+            "zone_kill_2_4"
         ],
         "message_key": "weapon_use"
     },
@@ -3977,12 +3763,7 @@
         ],
         "result": [
             "consume_item",
-            {
-                "zombies": {
-                    "min": 6,
-                    "max": 10
-                }
-            }
+            "zone_kill_6_10"
         ],
         "message_key": "weapon_use"
     },
@@ -3994,12 +3775,7 @@
         ],
         "result": [
             "consume_item",
-            {
-                "zombies": {
-                    "min": 5,
-                    "max": 9
-                }
-            }
+            "zone_kill_5_9"
         ],
         "message_key": "weapon_use"
     },
@@ -4011,11 +3787,9 @@
         ],
         "result": [
             "kill_1_zombie",
+            "msg_throw_jerrycan",
             {
-                "group": "g_empty_jerrygun",
-                "message": {
-                    "text": "<nt-morphed>Gute Nachrichten: Es ist noch Wasser im Kanister!</nt-morphed><t-morphed><strong>Der Kanister ist LEER</strong>!</t-morphed>"
-                }
+                "group": "g_empty_jerrygun"
             }
         ]
     },
@@ -4026,11 +3800,7 @@
         ],
         "result": [
             "consume_item",
-            {
-                "bp": [
-                    1
-                ]
-            }
+            "town_bp_lv1"
         ],
         "message_key": "read_blueprint"
     },
@@ -4041,11 +3811,7 @@
         ],
         "result": [
             "consume_item",
-            {
-                "bp": [
-                    2
-                ]
-            }
+            "town_bp_lv2"
         ],
         "message_key": "read_blueprint"
     },
@@ -4056,11 +3822,7 @@
         ],
         "result": [
             "consume_item",
-            {
-                "bp": [
-                    3
-                ]
-            }
+            "town_bp_lv3"
         ],
         "message_key": "read_blueprint"
     },
@@ -4071,11 +3833,7 @@
         ],
         "result": [
             "consume_item",
-            {
-                "bp": [
-                    4
-                ]
-            }
+            "town_bp_lv4"
         ],
         "message_key": "read_blueprint"
     },
@@ -4086,18 +3844,7 @@
         ],
         "result": [
             "consume_item",
-            {
-                "bp": [
-                    "small_bamba_#00",
-                    "small_catapult3_#00",
-                    "small_howlingbait_#00",
-                    "small_trash_#01",
-                    "small_trash_#02",
-                    "small_trash_#04",
-                    "small_court_#00",
-                    "item_plate_#03"
-                ]
-            }
+            "town_bp_hotel_lv2"
         ],
         "message_key": "read_blueprint"
     },
@@ -4108,19 +3855,7 @@
         ],
         "result": [
             "consume_item",
-            {
-                "bp": [
-                    "small_sprinkler_#00",
-                    "item_digger_#00",
-                    "item_shield_#00",
-                    "small_city_up_#00",
-                    "small_falsecity_#00",
-                    "small_lastchance_#00",
-                    "small_lighthouse_#00",
-                    "small_strategy_#00",
-                    "small_valve_#00"
-                ]
-            }
+            "town_bp_hotel_lv3"
         ],
         "message_key": "read_blueprint"
     },
@@ -4131,15 +3866,7 @@
         ],
         "result": [
             "consume_item",
-            {
-                "bp": [
-                    "small_cinema_#00",
-                    "small_derrick_#01",
-                    "small_trash_#06",
-                    "small_castle_#00",
-                    "small_coffin_#00"
-                ]
-            }
+            "town_bp_hotel_lv4"
         ],
         "message_key": "read_blueprint"
     },
@@ -4150,17 +3877,7 @@
         ],
         "result": [
             "consume_item",
-            {
-                "bp": [
-                    "item_bgrenade_#00",
-                    "item_bgrenade_#01",
-                    "small_trash_#03",
-                    "small_trash_#05",
-                    "small_watercanon_#00",
-                    "small_tourello_#00",
-                    "small_armor_#00"
-                ]
-            }
+            "town_bp_bunker_lv2"
         ],
         "message_key": "read_blueprint"
     },
@@ -4171,19 +3888,7 @@
         ],
         "result": [
             "consume_item",
-            {
-                "bp": [
-                    "item_home_def_#00",
-                    "item_tube_#00",
-                    "small_labyrinth_#00",
-                    "small_eden_#00",
-                    "small_rocket_#00",
-                    "small_rocketperf_#00",
-                    "small_trashclean_#00",
-                    "small_valve_#00",
-                    "item_jerrycan_#01"
-                ]
-            }
+            "town_bp_bunker_lv3"
         ],
         "message_key": "read_blueprint"
     },
@@ -4194,15 +3899,7 @@
         ],
         "result": [
             "consume_item",
-            {
-                "bp": [
-                    "small_waterdetect_#00",
-                    "small_arma_#00",
-                    "small_slave_#00",
-                    "small_trash_#06",
-                    "small_wheel_#00"
-                ]
-            }
+            "town_bp_bunker_lv4"
         ],
         "message_key": "read_blueprint"
     },
@@ -4213,14 +3910,7 @@
         ],
         "result": [
             "consume_item",
-            {
-                "bp": [
-                    "small_ikea_#00",
-                    "item_hmeat_#00",
-                    "small_tourello_#00",
-                    "small_watchmen_#00"
-                ]
-            }
+            "town_bp_hospital_lv2"
         ],
         "message_key": "read_blueprint"
     },
@@ -4231,19 +3921,7 @@
         ],
         "result": [
             "consume_item",
-            {
-                "bp": [
-                    "item_digger_#00",
-                    "item_jerrycan_#01",
-                    "item_shield_#00",
-                    "small_appletree_#00",
-                    "small_chicken_#00",
-                    "small_infirmary_#00",
-                    "small_trashclean_#00",
-                    "small_lighthouse_#00",
-                    "small_rocketperf_#00"
-                ]
-            }
+            "town_bp_hospital_lv3"
         ],
         "message_key": "read_blueprint"
     },
@@ -4254,15 +3932,7 @@
         ],
         "result": [
             "consume_item",
-            {
-                "bp": [
-                    "small_strategy_#01",
-                    "small_balloon_#00",
-                    "small_crow_#00",
-                    "small_derrick_#01",
-                    "small_pmvbig_#00"
-                ]
-            }
+            "town_bp_hospital_lv4"
         ],
         "message_key": "read_blueprint"
     },
@@ -4307,17 +3977,8 @@
         ],
         "result": [
             "unterrorize",
-            {
-                "item": {
-                    "morph": "vibr_empty_#00",
-                    "consume": false
-                }
-            },
-            {
-                "picto": [
-                    "r_maso_#00"
-                ]
-            }
+            "picto_masochism",
+            "morph_vibr_empty"
         ],
         "message": "Du machst es dir daheim gemütlich und entspannst dich... doch dann erlebst du ein böse Überraschung: Dieses Ding ist unglaublich schmerzhaft! Du versuchst es weiter bis du Stück für Stück Gefallen daran findest. Die nach wenige Minuten einsetzende Wirkung ist berauschend! Du schwitzt und zitterst und ein wohlig-warmes Gefühl breitet sich in dir aus...Die Batterie ist komplett leer."
     },
@@ -4333,17 +3994,8 @@
         "result": [
             "consume_micropur",
             "consume_item",
-            {
-                "spawn": [
-                    [
-                        "water_cup_#00",
-                        2
-                    ]
-                ],
-                "picto": [
-                    "r_solban_#00"
-                ]
-            }
+            "picto_ban_emanc",
+            "spawn_1_watercup"
         ],
         "message_key": "item_clean_watercup"
     },
@@ -4356,17 +4008,8 @@
         "result": [
             "consume_micropur",
             "consume_item",
-            {
-                "spawn": [
-                    [
-                        "water_cup_#00",
-                        2
-                    ]
-                ],
-                "picto": [
-                    "r_solban_#00"
-                ]
-            }
+            "picto_ban_emanc",
+            "spawn_1_watercup"
         ],
         "message_key": "item_clean_watercup"
     },
@@ -4379,12 +4022,7 @@
         ],
         "result": [
             "consume_item",
-            {
-                "well": {
-                    "min": 2,
-                    "max": 2
-                }
-            }
+            "town_well_2"
         ],
         "message_key": "water_to_well"
     },
@@ -4402,36 +4040,12 @@
             {
                 "group": [
                     [
-                        [
-                            {
-                                "spawn": {
-                                    "what": [
-                                        [
-                                            "water_#00",
-                                            2
-                                        ]
-                                    ],
-                                    "where": "AffectItemSpawn::DropTargetPreferRucksack"
-                                }
-                            }
-                        ],
-                        1
+                        "spawn_2_water",
+                        75
                     ],
                     [
-                        [
-                            {
-                                "spawn": {
-                                    "what": [
-                                        [
-                                            "water_#00",
-                                            3
-                                        ]
-                                    ],
-                                    "where": "AffectItemSpawn::DropTargetPreferRucksack"
-                                }
-                            }
-                        ],
-                        1
+                        "spawn_3_water",
+                        25
                     ]
                 ]
             }
@@ -4449,10 +4063,20 @@
         "result": [
             "consume_item",
             {
-                "well": {
-                    "min": 1,
-                    "max": 3
-                }
+                "group": [
+                    [
+                        "town_well_2",
+                        40
+                    ],
+                    [
+                        "town_well_3",
+                        35
+                    ],
+                    [
+                        "town_well_4",
+                        25
+                    ]
+                ]
             }
         ],
         "message_key": "water_to_well"
@@ -4467,35 +4091,68 @@
         "result": [
             "consume_item",
             {
-                "well": {
-                    "min": 4,
-                    "max": 9
-                }
+                "group": [
+                    [
+                        "town_well_3",
+                        5
+                    ],
+                    [
+                        "town_well_4",
+                        15
+                    ],
+                    [
+                        "town_well_5",
+                        20
+                    ],
+                    [
+                        "town_well_6",
+                        20
+                    ],
+                    [
+                        "town_well_7",
+                        20
+                    ],
+                    [
+                        "town_well_8",
+                        15
+                    ],
+                    [
+                        "town_well_9",
+                        5
+                    ]
+                ]
             }
         ],
         "message_key": "water_to_well"
     },
+    "jerrycan_4": {
+        "label": "Reinigen (Wasser)",
+        "meta": [
+            "min_1_ap",
+            "must_be_outside",
+            "must_have_micropur_in",
+            "must_not_have_purifier",
+            "must_not_be_banished"
+        ],
+        "result": [
+            "consume_micropur",
+            "consume_item",
+            "spawn_1_water",
+            "minus_1ap"
+        ],
+        "message_key": "item_clean"
+    },
     "watercup_1b": {
         "label": "Reinigen (Wasser)",
         "meta": [
-            "must_be_inside",
             "must_have_micropur_in",
             "must_be_banished"
         ],
         "result": [
             "consume_micropur",
             "consume_item",
-            {
-                "spawn": [
-                    [
-                        "water_cup_#00",
-                        2
-                    ]
-                ],
-                "picto": [
-                    "r_solban_#00"
-                ]
-            }
+            "picto_ban_emanc",
+            "spawn_1_watercup"
         ],
         "message_key": "item_clean_watercup"
     },
@@ -4512,33 +4169,31 @@
             {
                 "group": [
                     [
-                        [
-                            {
-                                "spawn": [
-                                    [
-                                        "water_#00",
-                                        2
-                                    ]
-                                ]
-                            }
-                        ],
-                        1
+                        "spawn_2_water",
+                        75
                     ],
                     [
-                        [
-                            {
-                                "spawn": [
-                                    [
-                                        "water_#00",
-                                        3
-                                    ]
-                                ]
-                            }
-                        ],
-                        1
+                        "spawn_3_water",
+                        25
                     ]
                 ]
             }
+        ],
+        "message_key": "item_clean"
+    },
+    "jerrycan_4b": {
+        "label": "Reinigen (Wasser)",
+        "meta": [
+            "min_1_ap",
+            "must_be_outside",
+            "must_have_micropur_in",
+            "must_be_banished"
+        ],
+        "result": [
+            "consume_micropur",
+            "consume_item",
+            "spawn_1_water",
+            "minus_1ap"
         ],
         "message_key": "item_clean"
     },
@@ -4549,22 +4204,10 @@
         ],
         "result": [
             "consume_item",
-            {
-                "home": {
-                    "def": 1
-                }
-            },
-            {
-                "picto": [
-                    "r_hbuild_#00"
-                ]
-            },
-            {
-                "message": {
-                    "text": "Sorgfältig befestigst du bei dir daheim ein(e) {item}. So und das hält jetzt, so viel steht schon mal fest.{hr}Dieser Gegenstand gibt deinem Haus permament <strong>{home_defense} zusätzliche Verteidigungspunkt(e).</strong>"
-                }
-            }
-        ]
+            "picto_home_upgrade",
+            "home_def_1"
+        ],
+        "message": "Sorgfältig befestigst du bei dir daheim ein(e) {item}. So und das hält jetzt, so viel steht schon mal fest.{hr}Dieser Gegenstand gibt deinem Haus permament <strong>{home_defense} zusätzliche Verteidigungspunkt(e).</strong>"
     },
     "home_store_plus": {
         "label": "Aufstellen",
@@ -4573,22 +4216,10 @@
         ],
         "result": [
             "consume_item",
-            {
-                "home": {
-                    "store": 1
-                }
-            },
-            {
-                "picto": [
-                    "r_hbuild_#00"
-                ]
-            },
-            {
-                "message": {
-                    "text": "Du stellst den(die) {item} bei dir daheim auf. Zugegeben, es sieht nicht gerade ästhetisch aus, aber mal ganz ehrlich: Wen kümmert das?{hr}Dieser Gegenstand erweitert deine Truhe dauerhaft um soviele freie Plätze: <strong>{home_storage}</strong>."
-                }
-            }
-        ]
+            "picto_home_upgrade",
+            "home_store_1"
+        ],
+        "message": "Du stellst den(die) {item} bei dir daheim auf. Zugegeben, es sieht nicht gerade ästhetisch aus, aber mal ganz ehrlich: Wen kümmert das?{hr}Dieser Gegenstand erweitert deine Truhe dauerhaft um soviele freie Plätze: <strong>{home_storage}</strong>."
     },
     "home_store_plus2": {
         "label": "Aufstellen",
@@ -4597,22 +4228,10 @@
         ],
         "result": [
             "consume_item",
-            {
-                "home": {
-                    "store": 2
-                }
-            },
-            {
-                "picto": [
-                    "r_hbuild_#00"
-                ]
-            },
-            {
-                "message": {
-                    "text": "Du stellst den(die) {item} bei dir daheim auf. Zugegeben, es sieht nicht gerade ästhetisch aus, aber mal ganz ehrlich: Wen kümmert das?{hr}Dieser Gegenstand erweitert deine Truhe dauerhaft um soviele freie Plätze: <strong>{home_storage}</strong>."
-                }
-            }
-        ]
+            "picto_home_upgrade",
+            "home_store_2"
+        ],
+        "message": "Du stellst den(die) {item} bei dir daheim auf. Zugegeben, es sieht nicht gerade ästhetisch aus, aber mal ganz ehrlich: Wen kümmert das?{hr}Dieser Gegenstand erweitert deine Truhe dauerhaft um soviele freie Plätze: <strong>{home_storage}</strong>."
     },
     "repair_1": {
         "label": "Reparieren mit",
@@ -4623,17 +4242,13 @@
         "meta": [
             "min_1_ap",
             "not_tired",
-            "is_not_wounded_hands"
+            "is_not_wounded_hands_repair"
         ],
         "result": [
             "minus_1ap",
             "consume_item",
             "repair_target",
-            {
-                "picto": [
-                    "r_repair_#00"
-                ]
-            }
+            "picto_repair"
         ],
         "message": "Du hast das {item} verbraucht, um damit {target} zu reparieren. Dabei hast du {minus_ap} AP eingesetzt."
     },
@@ -4646,20 +4261,13 @@
         "meta": [
             "min_1_ap",
             "not_tired",
-            "is_not_wounded_hands"
+            "is_not_wounded_hands_repair"
         ],
         "result": [
             "minus_1ap",
-            {
-                "item": {
-                    "consume": false,
-                    "morph": "repair_kit_part_#00"
-                },
-                "picto": [
-                    "r_repair_#00"
-                ]
-            },
-            "repair_target"
+            "picto_repair",
+            "repair_target",
+            "morph_repair_kit_part"
         ],
         "message": "Du hast das {item} verbraucht, um damit {target} zu reparieren. Dabei hast du {minus_ap} AP eingesetzt."
     },
@@ -4717,14 +4325,7 @@
                         2
                     ],
                     [
-                        [
-                            {
-                                "item": {
-                                    "consume": false,
-                                    "morph": "radius_mk2_part_#00"
-                                }
-                            }
-                        ],
+                        "morph_radius_mk2_part",
                         1
                     ]
                 ]
@@ -4754,11 +4355,7 @@
         ],
         "result": [
             "consume_item",
-            {
-                "zone": {
-                    "escape": 40
-                }
-            }
+            "zone_escape_40"
         ],
         "message_key": "escape_item"
     },
@@ -4771,11 +4368,7 @@
         ],
         "result": [
             "consume_item",
-            {
-                "zone": {
-                    "escape": 300
-                }
-            }
+            "zone_escape_300"
         ],
         "message_key": "escape_item"
     },
@@ -4786,11 +4379,7 @@
         ],
         "result": [
             "consume_item",
-            {
-                "zone": {
-                    "chatSilence": 60
-                }
-            }
+            "zone_chat_60"
         ],
         "message": "Du wirfst eine Rauchbombe in diese Zone und ein Großes Durcheinander bricht aus!{hr}Deine <strong>nächste Bewegungsaktion</strong> wird night in das Register eingetragen, wenn sie <strong>innerhalb von 1 Minute</strong> erfolgt."
     },
@@ -4808,15 +4397,7 @@
             "contaminated_zone_infect",
             "eat_ap6",
             "consume_item",
-            {
-                "status": {
-                    "role": "ghoul",
-                    "enabled": true,
-                    "hunger": 25,
-                    "force": true,
-                    "probability": 4
-                }
-            }
+            "ghoul_25_4"
         ],
         "escort_message_key": "escort_food_eat"
     },
@@ -4851,18 +4432,8 @@
             "contaminated_zone_infect",
             "eat_ap6_silent",
             "consume_item",
-            {
-                "picto": [
-                    "r_cannib_#00"
-                ],
-                "status": {
-                    "role": "ghoul",
-                    "enabled": true,
-                    "hunger": 25,
-                    "force": true,
-                    "probability": 5
-                }
-            }
+            "picto_cannibal",
+            "ghoul_25_5"
         ],
         "message_key": "eat_human_meat",
         "escort_message_key": "escort_food_eat"
@@ -4880,12 +4451,8 @@
             "contaminated_zone_infect",
             "eat_ap6_silent",
             "consume_item",
-            {
-                "picto": [
-                    "r_cannib_#00"
-                ],
-                "status": "satisfy_ghoul_10"
-            }
+            "picto_cannibal",
+            "satisfy_ghoul_15"
         ],
         "message_key": "eat_human_meat_ghoul",
         "escort_message_key": "escort_food_eat"
@@ -4903,14 +4470,9 @@
         "result": [
             "contaminated_zone_infect",
             "eat_ap6_silent",
+            "picto_cannibal",
+            "morph_bone",
             {
-                "picto": [
-                    "r_cannib_#00"
-                ],
-                "item": {
-                    "consume": false,
-                    "morph": "bone_#00"
-                },
                 "group": [
                     [
                         "do_nothing",
@@ -4921,17 +4483,7 @@
                         50
                     ],
                     [
-                        [
-                            {
-                                "status": {
-                                    "role": "ghoul",
-                                    "enabled": true,
-                                    "hunger": 25,
-                                    "force": true,
-                                    "probability": 100
-                                }
-                            }
-                        ],
+                        "ghoul_25_100",
                         3
                     ]
                 ]
@@ -4951,16 +4503,9 @@
         "result": [
             "contaminated_zone_infect",
             "eat_ap6_silent",
-            {
-                "picto": [
-                    "r_cannib_#00"
-                ],
-                "item": {
-                    "consume": false,
-                    "morph": "bone_#00"
-                },
-                "status": "satisfy_ghoul_10"
-            }
+            "picto_cannibal",
+            "morph_bone",
+            "satisfy_ghoul_10"
         ],
         "message_key": "eat_human_meat_ghoul"
     },
@@ -4977,15 +4522,8 @@
         "result": [
             "contaminated_zone_infect",
             "eat_ap6",
-            {
-                "picto": [
-                    "r_cannib_#00"
-                ],
-                "item": {
-                    "consume": false,
-                    "morph": "cadaver_remains_#00"
-                }
-            },
+            "picto_cannibal",
+            "morph_cadaver_remains",
             {
                 "group": [
                     [
@@ -4993,17 +4531,7 @@
                         10
                     ],
                     [
-                        [
-                            {
-                                "status": {
-                                    "role": "ghoul",
-                                    "enabled": true,
-                                    "hunger": 5,
-                                    "force": true,
-                                    "probability": 100
-                                }
-                            }
-                        ],
+                        "ghoul_5_100",
                         90
                     ]
                 ]
@@ -5022,16 +4550,9 @@
         "result": [
             "contaminated_zone_infect",
             "eat_ap6_silent",
-            {
-                "picto": [
-                    "r_cannib_#00"
-                ],
-                "item": {
-                    "consume": false,
-                    "morph": "cadaver_remains_#00"
-                },
-                "status": "satisfy_ghoul_30"
-            }
+            "picto_cannibal",
+            "morph_cadaver_remains",
+            "satisfy_ghoul_30"
         ],
         "message_key": "eat_human_meat_ghoul"
     },
@@ -5045,9 +4566,7 @@
         ],
         "result": [
             "consume_item",
-            {
-                "status": "heal_ghoul"
-            }
+            "heal_ghoul"
         ],
         "message": "Unglaublich! Die ganze Gier, die dich innerlich aufgefressen hat, verschwindet langsam. Ist es wirklich möglich, dass du wieder ein Mensch geworden bist?"
     },
@@ -5058,11 +4577,8 @@
             "not_yet_teddy"
         ],
         "result": [
+            "status_teddy",
             {
-                "status": {
-                    "from": null,
-                    "to": "tg_teddy"
-                },
                 "group": [
                     [
                         "do_nothing",
@@ -5093,19 +4609,65 @@
             "must_be_inside"
         ],
         "result": [
-            {
-                "status": {
-                    "from": null,
-                    "to": "tg_clothes",
-                    "counter": "ActionCounter::ActionTypeClothes"
-                },
-                "item": {
-                    "consume": false,
-                    "morph": "basic_suit_#00"
-                }
-            }
+            "morph_basic_suit",
+            "status_clothes"
         ],
         "message": "Du nimmst dir ein paar Minuten, um deine {item} zu reinigen. Du schrubbst sorgfältig die Blutflecken ab und flickst ein paar kleine Löcher."
+    },
+    "flash_photo_4": {
+        "label": "Benutzen",
+        "meta": [
+            "must_be_outside_not_at_doors",
+            "must_have_zombies",
+            "must_be_blocked",
+            "must_not_have_ruin"
+        ],
+        "result": [
+            "morph_photo_3",
+            "zone_escape_120"
+        ],
+        "message_key": "escape_item_camera"
+    },
+    "flash_photo_4_ruin_no_bp": {
+        "label": "Benutzen",
+        "meta": [
+            "must_be_outside_not_at_doors",
+            "must_have_zombies",
+            "must_be_blocked",
+            "must_have_ruin_no_bp"
+        ],
+        "result": [
+            "morph_photo_3",
+            "zone_escape_120"
+        ],
+        "message_key": "escape_item_camera"
+    },
+    "flash_photo_4_ruin_bp": {
+        "label": "Benutzen",
+        "meta": [
+            "must_be_outside_not_at_doors",
+            "must_have_ruin_with_bp",
+            "must_be_blocked_hd"
+        ],
+        "result": [
+            "morph_photo_3",
+            "zone_escape_120",
+            "give_ruin_bp"
+        ],
+        "message_key": "escape_item_camera_spawn_bp"
+    },
+    "flash_photo_4_ruin_bp_free": {
+        "label": "Benutzen",
+        "meta": [
+            "must_be_outside_not_at_doors",
+            "must_have_ruin_with_bp",
+            "must_not_be_blocked_hd"
+        ],
+        "result": [
+            "morph_photo_3",
+            "give_ruin_bp"
+        ],
+        "message_key": "photo_spawn_bp"
     },
     "flash_photo_3": {
         "label": "Benutzen",
@@ -5115,11 +4677,8 @@
             "must_be_blocked"
         ],
         "result": [
+            "morph_photo_2",
             {
-                "item": {
-                    "consume": false,
-                    "morph": "photo_2_#00"
-                },
                 "group": [
                     [
                         [
@@ -5129,11 +4688,7 @@
                     ],
                     [
                         [
-                            {
-                                "zone": {
-                                    "escape": 120
-                                }
-                            }
+                            "zone_escape_120"
                         ],
                         100
                     ]
@@ -5150,11 +4705,8 @@
             "must_be_blocked"
         ],
         "result": [
+            "morph_photo_1",
             {
-                "item": {
-                    "consume": false,
-                    "morph": "photo_1_#00"
-                },
                 "group": [
                     [
                         [
@@ -5164,11 +4716,7 @@
                     ],
                     [
                         [
-                            {
-                                "zone": {
-                                    "escape": 60
-                                }
-                            }
+                            "zone_escape_60"
                         ],
                         66
                     ]
@@ -5185,11 +4733,8 @@
             "must_be_blocked"
         ],
         "result": [
+            "morph_photo_off",
             {
-                "item": {
-                    "consume": false,
-                    "morph": "photo_off_#00"
-                },
                 "group": [
                     [
                         [
@@ -5199,11 +4744,7 @@
                     ],
                     [
                         [
-                            {
-                                "zone": {
-                                    "escape": 30
-                                }
-                            }
+                            "zone_escape_30"
                         ],
                         33
                     ]
@@ -5215,14 +4756,12 @@
     "alarm_clock": {
         "label": "Benutzen",
         "at00": true,
-        "meta": [],
+        "meta": [
+            "have_battery"
+        ],
         "result": [
-            {
-                "item": {
-                    "consume": false,
-                    "morph": "alarm_on_#00"
-                }
-            }
+            "consume_battery",
+            "morph_alarm_3"
         ],
         "message": "Du hast {item_from} in {item_to} verwandelt."
     },
@@ -5230,25 +4769,34 @@
         "label": "Einsetzen",
         "meta": [],
         "result": [
-            {
-                "item": {
-                    "consume": false,
-                    "morph": "pumpkin_off_#00"
-                }
-            }
+            "morph_pumpkin_off"
         ]
     },
     "flare": {
         "label": "Benutzen",
         "meta": [],
         "result": [
-            {
-                "custom": [
-                    21
-                ]
-            }
+            "flare"
         ],
         "message": "<t-flare_ok>Die Leuchtrakete hat neue Informationen zu folgender Zone geliefert: {zone}</t-flare_ok><t-flare_ok_ruin>Mit Hilfe der Leuchrakete wurde ein neues Gebäude entdeckt: {zone_ruin}. Seine Koordinaten lauten: {zone}</t-flare_ok_ruin><t-flare_fail>Es gibt keine weitere Zone zu entdecken.</t-flare_fail>"
+    },
+    "repair_hero": {
+        "label": "Reparieren (3CP)",
+        "at00": true,
+        "target": {
+            "broken": true
+        },
+        "meta": [
+            "min_3_cp",
+            "not_tired",
+            "is_not_wounded_hands"
+        ],
+        "result": [
+            "minus_3cp",
+            "repair_target",
+            "picto_repair"
+        ],
+        "message": "Du hast dein Handwerkstalent gebraucht, um damit {target} zu reparieren. Dabei hast du {minus_cp} CP eingesetzt."
     },
     "hero_tamer_1": {
         "label": "Zur Bank schicken",
@@ -5299,18 +4847,181 @@
         "message": "<t-fail><t-no-room>Deine Truhe kann nicht <strong>{items_count} Gegenstände</strong> aufnehmen: er hat <strong>{size} Platz(e)</strong> übrig.</t-no-room><t-door-closed>Das Stadttor ist geschlossen...</t-door-closed><t-no-items>{tamer_dog} kann nichts mitnehmen, da du <strong>nichts im Rucksack hast</strong>.</t-no-items></t-fail><nt-fail>Du befiehlst {tamer_dog} deinen Rucksackinhalt in die Stadt zu bringen.{hr}Genau wie du es gewünscht hast, <strong>hat er alles zur Truhe in deinem Haus gebracht</strong>.{hr}Braver Junge!</nt-fail>"
     },
     "hero_tamer_3": {
-        "label": "Dopen",
+        "label": "Füttern",
         "at00": true,
         "renderer": "tamer_dog_popup",
         "meta": [
-            "must_be_outside_or_exploring",
-            "must_have_drug"
+            "must_be_anywhere",
+            "must_have_steak"
         ],
         "result": [
-            "consume_drug",
+            "consume_steak",
             "hero_tamer_3"
         ],
-        "message": "Du gibst deinem {tamer_dog} {items_consume}, die er gierig hinunterschlingt.{hr}Es vergeht keine Minute bis die Drogen Wirkung zeigen: Dein Fifi hat nun leuchtende Augen, ein glänzendes Fell und einen wedelnden Schwanz."
+        "message": "Du gibst deinem {tamer_dog} {items_consume}, das er gierig hinunterschlingt.{hr}Es vergeht keine Minute bis diese Belohnung Wirkung zeigt: Dein Fifi hat nun leuchtende Augen, ein glänzendes Fell und einen wedelnden Schwanz."
+    },
+    "hero_tamer_4": {
+        "label": "Schützen lassen",
+        "at00": true,
+        "renderer": "tamer_dog_popup",
+        "meta": [
+            "must_be_inside"
+        ],
+        "result": [
+            "hero_tamer_use",
+            "hero_tamer_4"
+        ],
+        "message": "{tamer_dog} macht sich bereit, dein Leben zu schützen."
+    },
+    "hero_tamer_4b": {
+        "label": "Schützen lassen",
+        "at00": true,
+        "renderer": "tamer_dog_popup",
+        "meta": [
+            "must_be_inside"
+        ],
+        "result": [
+            "hero_tamer_use",
+            "hero_tamer_4b"
+        ],
+        "message": "{tamer_dog} macht sich bereit, dein Leben zu schützen."
+    },
+    "hero_tamer_5": {
+        "label": "Eingraben lassen",
+        "renderer": "tamer_dog_popup",
+        "meta": [
+            "must_be_outside_no_door_no_ex",
+            "feature_camping",
+            "must_not_be_hidden",
+            "must_not_be_tombed"
+        ],
+        "result": [
+            "hero_tamer_use",
+            "camp_tomb",
+            "camp_activate"
+        ],
+        "message": "{tamer_dog} hat Dir ein gemütliches Grab gebuddelt."
+    },
+    "hero_tamer_5b": {
+        "label": "Eingraben und verstecken lassen",
+        "renderer": "tamer_dog_popup",
+        "meta": [
+            "must_be_outside_no_door_no_ex",
+            "feature_camping",
+            "must_not_be_hidden",
+            "must_not_be_tombed",
+            "zone_is_improvable"
+        ],
+        "result": [
+            "hero_tamer_use",
+            "zone_improve_5",
+            "camp_tomb",
+            "camp_activate"
+        ],
+        "message": "{tamer_dog} hat Dir ein gemütliches und gut verstecktes Grab gebuddelt."
+    },
+    "hero_tamer_6": {
+        "label": "Aus der Truhe",
+        "renderer": "tamer_dog_popup",
+        "at00": false,
+        "cover": true,
+        "target": {
+            "type": "ItemTargetDefinition::ItemTypeChestSelectionType",
+            "heavy": false
+        },
+        "meta": [
+            "must_be_outside_not_at_doors",
+            "room_for_item_no_container"
+        ],
+        "result": [
+            "tamer_fetch"
+        ],
+        "message": "<t-fail><t-door-closed>Das Stadttor ist geschlossen...</t-door-closed><t-impossible>{tamer_dog} kann dir diesen Gegenstand nicht bringen.</t-impossible></t-fail><nt-fail>{tamer_dog} hat dir soeben eine/n {target} aus der Stadt gebracht. Genau das, was du gebraucht hast!</nt-fail>"
+    },
+    "hero_tamer_6b": {
+        "label": "Aus der Truhe",
+        "renderer": "tamer_dog_popup",
+        "at00": false,
+        "cover": true,
+        "target": {
+            "type": "ItemTargetDefinition::ItemTypeChestSelectionType"
+        },
+        "meta": [
+            "must_be_outside_not_at_doors",
+            "room_for_item_no_container"
+        ],
+        "result": [
+            "tamer_fetch"
+        ],
+        "message": "<t-fail><t-door-closed>Das Stadttor ist geschlossen...</t-door-closed><t-impossible>{tamer_dog} kann dir diesen Gegenstand nicht bringen.</t-impossible></t-fail><nt-fail>{tamer_dog} hat dir soeben eine/n {target} aus der Stadt gebracht. Genau das, was du gebraucht hast!</nt-fail>"
+    },
+    "hero_tamer_7": {
+        "label": "Schmiere stehen",
+        "renderer": "tamer_dog_popup",
+        "meta": [
+            "must_be_inside"
+        ],
+        "result": [
+            "hero_tamer_use",
+            "hero_tamer_7"
+        ],
+        "message": "{tamer_dog} wird sich bemerkbar machen, wenn du im Begriff bist, bei einer schändlichen Tat überrascht zu werden."
+    },
+    "hero_tamer_7b": {
+        "label": "Schmiere stehen",
+        "renderer": "tamer_dog_popup",
+        "meta": [
+            "must_be_inside"
+        ],
+        "result": [
+            "hero_tamer_use",
+            "hero_tamer_7b"
+        ],
+        "message": "{tamer_dog} wird sich bemerkbar machen, wenn du im Begriff bist, bei einer schändlichen Tat überrascht zu werden."
+    },
+    "hero_tamer_8": {
+        "label": "Haus bewachen",
+        "renderer": "tamer_dog_popup",
+        "meta": [
+            "must_be_inside"
+        ],
+        "result": [
+            "hero_tamer_gone",
+            "hero_tamer_8"
+        ],
+        "message": "{tamer_dog} wird dafür sorgen, dass dir heute niemand einen ungebetenen Besuch abstattet."
+    },
+    "hero_tamer_8b": {
+        "label": "Haus bewachen",
+        "renderer": "tamer_dog_popup",
+        "meta": [
+            "must_be_inside"
+        ],
+        "result": [
+            "hero_tamer_gone",
+            "hero_tamer_8b"
+        ],
+        "message": "{tamer_dog} wird dafür sorgen, dass dir heute niemand einen ungebetenen Besuch abstattet."
+    },
+    "hero_tamer_9": {
+        "label": "Aus der Bank",
+        "renderer": "tamer_dog_popup",
+        "at00": false,
+        "cover": true,
+        "target": {
+            "type": "ItemTargetDefinition::ItemTypeSelectionType",
+            "property": "hero_dog_fetch",
+            "note": "Beachte, dass dein Hund nur dann einen Gegenstand holen kann, wenn dieser sich auch wirklich in der Bank befindet..."
+        },
+        "meta": [
+            "must_be_outside",
+            "room_for_item_no_container",
+            "must_not_be_banished"
+        ],
+        "result": [
+            "hero_tamer_9"
+        ],
+        "message": "<t-fail><t-door-closed>Das Stadttor ist geschlossen...</t-door-closed><t-impossible>{tamer_dog} ist erschöpft zu dir zurückgekehrt... aber er hat nichts in seinem Maul. Offensichtlich konnte er nicht finden, wonach du gesucht hast.</t-impossible></t-fail><nt-fail>{tamer_dog} hat dir soeben eine/n {target} aus der Bank gebracht. Genau das, was du gebraucht hast!</nt-fail>"
     },
     "hero_surv_1": {
         "label": "Wasser suchen",
@@ -5370,27 +5081,19 @@
     },
     "hero_generic_return": {
         "label": "Die Rückkehr des Helden",
-        "tooltip": "Wenn du 11 km oder weniger von der Stadt entfernt bist, kehrst du sofort in die Stadt zurück!",
+        "tooltip": "Wenn du {cfg_ctp_props_actions_hero_return_range} km oder weniger von der Stadt entfernt bist, kehrst du sofort in die Stadt zurück!",
         "cover": true,
         "at00": true,
         "meta": [
             "must_be_outside_or_exploring",
-            "must_be_outside_within_11km",
+            "must_be_outside_within_hr",
             "not_yet_hero"
         ],
         "result": [
             "hero_act",
-            {
-                "custom": [
-                    8
-                ]
-            },
-            {
-                "message": {
-                    "text": "Mit deiner letzten Kraft hast du dich *in die Stadt geschleppt*... *Ein Wunder*!"
-                }
-            }
-        ]
+            "hero_return"
+        ],
+        "message": "Mit deiner letzten Kraft hast du dich *in die Stadt geschleppt*... *Ein Wunder*!"
     },
     "hero_generic_find": {
         "label": "Fund",
@@ -5406,13 +5109,9 @@
         ],
         "result": [
             "hero_act",
-            "spawn_target",
-            {
-                "message": {
-                    "text": "So was nennt man wohl <strong>Glück</strong>! <t-inside>Du hast soeben {items_spawn} in einem Abfallberg neben deinem Haus gefunden!</t-inside><t-outside>Du hast soeben {items_spawn} im Wüstensand gefunden!</t-outside> Genau das, was du gebraucht hast!"
-                }
-            }
-        ]
+            "spawn_target"
+        ],
+        "message": "So was nennt man wohl <strong>Glück</strong>! <t-inside>Du hast soeben {items_spawn} in einem Abfallberg neben deinem Haus gefunden!</t-inside><t-outside>Du hast soeben {items_spawn} im Wüstensand gefunden!</t-outside> Genau das, was du gebraucht hast!"
     },
     "hero_generic_find_lucky": {
         "label": "Schönes Fundstück",
@@ -5428,17 +5127,49 @@
         ],
         "result": [
             "hero_act",
-            "spawn_target",
-            {
-                "message": {
-                    "text": "So was nennt man wohl <strong>Glück</strong>! <t-inside>Du hast soeben {items_spawn} in einem Abfallberg neben deinem Haus gefunden!</t-inside><t-outside>Du hast soeben {items_spawn} im Wüstensand gefunden!</t-outside> Genau das, was du gebraucht hast!"
-                }
-            }
-        ]
+            "spawn_target"
+        ],
+        "message": "So was nennt man wohl <strong>Glück</strong>! <t-inside>Du hast soeben {items_spawn} in einem Abfallberg neben deinem Haus gefunden!</t-inside><t-outside>Du hast soeben {items_spawn} im Wüstensand gefunden!</t-outside> Genau das, was du gebraucht hast!"
+    },
+    "hero_generic_find_lcky2": {
+        "label": "Beeindruckendes Fundstück",
+        "tooltip": "Wie durch ein Wunder treibst du einen nützlichen Gegenstand auf.",
+        "cover": true,
+        "at00": true,
+        "target": {
+            "type": "ItemTargetDefinition::ItemTypeSelectionType",
+            "property": "hero_find_lucky2"
+        },
+        "meta": [
+            "not_yet_hero"
+        ],
+        "result": [
+            "hero_act",
+            "spawn_target"
+        ],
+        "message": "So was nennt man wohl <strong>Glück</strong>! <t-inside>Du hast soeben {items_spawn} in einem Abfallberg neben deinem Haus gefunden!</t-inside><t-outside>Du hast soeben {items_spawn} im Wüstensand gefunden!</t-outside> Genau das, was du gebraucht hast!"
+    },
+    "hero_generic_find_lcky3": {
+        "label": "Erstaunliches Fundstück",
+        "tooltip": "Wie durch ein Wunder treibst du einen nützlichen Gegenstand auf.",
+        "cover": true,
+        "at00": true,
+        "target": {
+            "type": "ItemTargetDefinition::ItemTypeSelectionType",
+            "property": "hero_find_lucky3"
+        },
+        "meta": [
+            "not_yet_hero"
+        ],
+        "result": [
+            "hero_act",
+            "spawn_target"
+        ],
+        "message": "So was nennt man wohl <strong>Glück</strong>! <t-inside>Du hast soeben {items_spawn} in einem Abfallberg neben deinem Haus gefunden!</t-inside><t-outside>Du hast soeben {items_spawn} im Wüstensand gefunden!</t-outside> Genau das, was du gebraucht hast!"
     },
     "hero_generic_punch": {
         "label": "Wildstyle Uppercut",
-        "tooltip": "Damit kannst du mit einem Schlag 2 Zombies umbringen!",
+        "tooltip": "Damit kannst du mit einem Schlag {cfg_ctp_props_actions_hero_punch_kills} Zombies umbringen!",
         "meta": [
             "must_be_outside_or_exploring",
             "must_have_zombies",
@@ -5446,38 +5177,27 @@
         ],
         "result": [
             "hero_act",
-            {
-                "zombies": "kill_2z"
-            },
-            {
-                "message": {
-                    "text": "Mit Hilfe deiner übermenschlichen Heldenkräfte hast du <strong>{kills} Zombie(s)</strong> platt gemacht!"
-                }
-            }
-        ]
+            "zone_kill_punch"
+        ],
+        "message": "Mit Hilfe deiner übermenschlichen Heldenkräfte hast du <strong>{kills} Zombie(s)</strong> platt gemacht!"
     },
     "hero_generic_ap": {
         "label": "Zweite Lunge",
-        "tooltip": "Stellt deine AP wieder her und beseitigt deine Müdigkeit.",
+        "tooltip": "<nc-HeroSecondWindBonusAP op=\"gt\" val=\"0\">Verschafft dir {cfg_ctp_props_actions_hero_sw_sp} frische Erkundungspunkte.</nc-HeroSecondWindBonusAP><c-HeroSecondWindBonusAP op=\"gt\" val=\"0\">Verschafft dir {cfg_ctp_props_actions_hero_sw_sp} frische Erkundungspunkte, stellt {cfg_ctp_props_actions_hero_sw_ap} AP wieder her und beseitigt deine Müdigkeit.</c-HeroSecondWindBonusAP>",
         "cover": true,
         "at00": true,
         "meta": [
-            "no_full_ap_msg",
             "not_yet_hero"
         ],
         "result": [
             "hero_act",
-            "just_ap6",
-            {
-                "message": {
-                    "text": "Du atmest tief durch und drückst den Rücken durch. Auf geht's! Ich werde nicht hier sterben!{hr}Du hast soeben Kraft getankt und <strong>{ap} neue AP erhalten</strong>."
-                }
-            }
-        ]
+            "just_ap_sw"
+        ],
+        "message": "Du atmest tief durch und drückst den Rücken durch. Auf geht's! Ich werde nicht hier sterben!{hr}Du hast soeben Kraft getankt und <strong>{sp} neue EP<c-HeroSecondWindBonusAP op=\"gt\" val=\"0\"> sowie {ap} neue AP</c-HeroSecondWindBonusAP> erhalten</strong>."
     },
     "hero_generic_immune": {
         "label": "Den Tod besiegen",
-        "tooltip": "Beim nächsten Angriff wird der Durst-, Infektions- und Abhängigkeitszustand außer Kraft gesetzt.",
+        "tooltip": "Beim nächsten Angriff wird der Effekt des <c-HeroImmuneStatusList op=\"map\" thirst=\"Durst\" hunger=\"Hunger\" infection=\"Infektions\" addiction=\"Abhängigkeits\" glue=\"-, \" final_glue=\"- und \"></c-HeroImmuneStatusList>zustands außer Kraft gesetzt.<c-HeroImmuneHeals op=\"is\" val=\"true\"> Zudem wirst du mit sofortiger Wirkung von Angststarre und Kater geheilt und verlierst den \"Bandagiert\"-Status.</c-HeroImmuneHeals>",
         "cover": true,
         "at00": true,
         "meta": [
@@ -5485,17 +5205,30 @@
         ],
         "result": [
             "hero_act",
-            "hero_immune",
-            {
-                "message": {
-                    "text": "Du versucht nochmal alle deine Kräfte für heute Abend zu mobilisieren. Die Anspannung steht dir ins Gesicht geschrieben. Du schwitzt und deine Hände zittern.{hr}Beim heutigen Angriff wirst du weder weder Durst, noch Krankheitssymptome (Infektion), noch Entzugserscheinungen verspüren."
-                }
-            }
-        ]
+            "hero_immune"
+        ],
+        "message": "Du versucht nochmal alle deine Kräfte für heute Abend zu mobilisieren. Die Anspannung steht dir ins Gesicht geschrieben. Du schwitzt und deine Hände zittern.{hr}Beim heutigen Angriff wirst du weder <c-HeroImmuneStatusList op=\"map\" thirst=\"Durst\" hunger=\"Hunger\" infection=\"Krankheitssymptome (Infektion)\"  addiction=\"Entzugserscheinungen\" glue=\", noch \"></c-HeroImmuneStatusList> verspüren.<t-stat-down-terror>{hr}Du fühlst einen neuen Schub an Selbstsicherheit und verlierst deine Panik vor den Zombies.</t-stat-down-terror><t-stat-down-hungover>{hr}Dank deiner frisch geschöpften Hoffnung hast du nun wieder einen klaren Kopf.</t-stat-down-hungover><t-stat-down-healed>{hr}Du atmest einmal tief ein und spürst, wie die Wunde unter deinen Bandagen heilt.</t-stat-down-healed>"
+    },
+    "hero_generic_immune2": {
+        "label": "Rudimentäre Pflege",
+        "tooltip": "Erlaubt es einem anderen Bürger, beim nächsten Angriff sowohl Durst- als auch Infektionszustand außer Kraft zu setzen.",
+        "cover": true,
+        "at00": true,
+        "target": {
+            "type": "ItemTargetDefinition::ItemCitizenOnZoneType"
+        },
+        "meta": [
+            "not_yet_hero"
+        ],
+        "result": [
+            "hero_act",
+            "hero_immune2"
+        ],
+        "message": "Die Anspannung steht deinem Patienten ins Gesicht geschrieben. Er schwitzt und seine Hände zittern.{hr}Beim heutigen Angriff wird er weder Durst, noch Krankheitssymptome (Infektion) verspüren."
     },
     "hero_generic_rescue": {
         "label": "Rettung",
-        "tooltip": "Du bringst einen anderen Spieler nach Hause (dieser darf max. 2 Felder von der Stadt entfernt sein).",
+        "tooltip": "Du bringst einen anderen Spieler nach Hause (dieser darf max. {cfg_ctp_props_actions_hero_rescue_range} Felder von der Stadt entfernt sein).",
         "confirm": true,
         "confirmMsg": "Möchtest du {target} heimbringen?",
         "target": {
@@ -5507,11 +5240,7 @@
         ],
         "result": [
             "hero_act",
-            {
-                "custom": [
-                    9
-                ]
-            }
+            "hero_rescue"
         ],
         "message": "Du hast {citizen} auf heldenhafte Weise in die Stadt gebracht!"
     },
@@ -5529,13 +5258,49 @@
         ],
         "result": [
             "hero_act",
-            {
-                "custom": [
-                    70
-                ]
-            }
+            "hero_bia"
         ],
         "message": "Du hast deine Heldentat an {citizen} weitergegeben."
+    },
+    "hero_generic_fs_xp": {
+        "label": "Erfahrung teilen",
+        "tooltip": "Du gibst 5 Erfahrungspunkte aus, damit ein anderer Spieler 10 Erfahrungspunkte erhält.",
+        "confirm": true,
+        "confirmMsg": "Möchtest du 5 Erfahrungspunkte ausgeben, damit {target} 10 Erfahrungspunkte erhält? Hinweis: Pro Saison kannst du dem gleichen Spieler maximal 3x Erfahrung spenden.",
+        "target": {
+            "type": "ItemTargetDefinition::ItemFriendshipXPType"
+        },
+        "meta": [
+            "not_yet_hero",
+            "can_use_friendship"
+        ],
+        "result": [
+            "hero_act",
+            "hero_sxp"
+        ],
+        "message": "Du hast deine Erfahrung an {citizen} weitergegeben."
+    },
+    "wagging_flag": {
+        "label": "Wedeln",
+        "at00": true,
+        "meta": [
+            "not_yet_flag",
+            "must_be_inside"
+        ],
+        "result": [
+            "status_flag_today"
+        ],
+        "message": "Wild und unter lautem Rufen wedelst du mit der Flagge in der Luft. Überraschenderweise passiert nach mehreren Sekunden... gar nichts."
+    },
+    "pet_doggo": {
+        "label": "Streicheln",
+        "meta": [
+            "must_be_anywhere"
+        ],
+        "result": [
+            "do_nothing"
+        ],
+        "message": "Du weißt nicht, warum, aber du verspürst den Drang, mit deiner Hand durch sein Fell zu streichen. Das Gefühl bereitet dir ein wenig Freude, und {tamer_dog} wedelt mit dem Schwanz, während du ihn streichelst"
     },
     "throw_sandball": {
         "label": "Werfen",
@@ -5544,11 +5309,7 @@
             "during_christmas"
         ],
         "result": [
-            {
-                "custom": [
-                    20
-                ]
-            }
+            "sandball"
         ],
         "message": "<nt-fail>Du hast einen Sandball in {citizen}s Gesicht geworfen.</nt-fail><t-fail>Hier ist niemand, auf den du den Sandball werfen könntest...</t-fail>"
     },
@@ -5566,32 +5327,15 @@
                     [
                         [
                             "do_nothing",
-                            {
-                                "message": {
-                                    "text_key": "heroic_arma_fail"
-                                }
-                            }
+                            "msg_heroic_arma_fail"
                         ],
                         50
                     ],
                     [
                         [
-                            {
-                                "zone": {
-                                    "escape": [
-                                        "armag",
-                                        600
-                                    ]
-                                }
-                            },
-                            {
-                                "zombies": "kill_1z"
-                            },
-                            {
-                                "message": {
-                                    "text_key": "heroic_arma_success"
-                                }
-                            }
+                            "msg_heroic_arma_success",
+                            "zone_escape_600_armag",
+                            "kill_1_zombie_s"
                         ],
                         50
                     ]
@@ -5614,32 +5358,15 @@
                     [
                         [
                             "do_nothing",
-                            {
-                                "message": {
-                                    "text_key": "heroic_arma_fail"
-                                }
-                            }
+                            "msg_heroic_arma_fail"
                         ],
                         50
                     ],
                     [
                         [
-                            {
-                                "zone": {
-                                    "escape": [
-                                        "armag",
-                                        600
-                                    ]
-                                }
-                            },
-                            {
-                                "zombies": "kill_1z"
-                            },
-                            {
-                                "message": {
-                                    "text_key": "heroic_arma_success"
-                                }
-                            }
+                            "msg_heroic_arma_success",
+                            "zone_escape_600_armag",
+                            "kill_1_zombie_s"
                         ],
                         50
                     ]
@@ -5662,32 +5389,15 @@
                     [
                         [
                             "do_nothing",
-                            {
-                                "message": {
-                                    "text_key": "heroic_arma_fail"
-                                }
-                            }
+                            "msg_heroic_arma_fail"
                         ],
                         25
                     ],
                     [
                         [
-                            {
-                                "zone": {
-                                    "escape": [
-                                        "armag",
-                                        600
-                                    ]
-                                }
-                            },
-                            {
-                                "zombies": "kill_1z"
-                            },
-                            {
-                                "message": {
-                                    "text_key": "heroic_arma_success"
-                                }
-                            }
+                            "msg_heroic_arma_success",
+                            "zone_escape_600_armag",
+                            "kill_1_zombie_s"
                         ],
                         75
                     ]
@@ -5707,11 +5417,7 @@
             "vote_shaman_not_given"
         ],
         "result": [
-            {
-                "custom": [
-                    18
-                ]
-            }
+            "vote_role_shaman"
         ]
     },
     "special_vote_guide": {
@@ -5726,11 +5432,22 @@
             "vote_guide_not_given"
         ],
         "result": [
-            {
-                "custom": [
-                    19
-                ]
-            }
+            "vote_role_guide"
+        ]
+    },
+    "special_vote_cata": {
+        "label": "Den Katapultbediener wählen",
+        "target": {
+            "type": "ItemTargetDefinition::ItemCitizenVoteType"
+        },
+        "meta": [
+            "must_be_outside",
+            "profession_heroic",
+            "vote_cata_needed",
+            "vote_cata_not_given"
+        ],
+        "result": [
+            "vote_role_cata"
         ]
     },
     "improve": {
@@ -5745,11 +5462,7 @@
         "result": [
             "minus_1ap",
             "consume_item",
-            {
-                "zone": {
-                    "improve": 9
-                }
-            }
+            "zone_improve_9"
         ],
         "message": "Du befestigst den {item} und bedeckst ihn zur Tarnung mit herumliegendem Müll und vertrockneten Zweigen. Na bitte, das sollte hoffentlich deine Überlebenschancen heute Nacht verbessern. Du hast dafür 1 Aktionspunkt verbraucht."
     },
@@ -5762,11 +5475,7 @@
         ],
         "result": [
             "camp_hide",
-            {
-                "custom": [
-                    10
-                ]
-            }
+            "camp_activate"
         ],
         "message": "Du hast Dich notdürftig versteckt."
     },
@@ -5782,11 +5491,7 @@
         ],
         "result": [
             "minus_1ap",
-            {
-                "zone": {
-                    "improve": 5
-                }
-            }
+            "zone_improve_5"
         ],
         "message": "Du hast das hiesige Versteck verbessert."
     },
@@ -5802,11 +5507,7 @@
         "result": [
             "minus_1ap",
             "camp_tomb",
-            {
-                "custom": [
-                    10
-                ]
-            }
+            "camp_activate"
         ],
         "message": "Du hast Dir Dein eigenes Grab geschaufelt. Oh welche Ironie!"
     },
@@ -5818,11 +5519,7 @@
         ],
         "result": [
             "camp_unhide",
-            {
-                "custom": [
-                    11
-                ]
-            }
+            "camp_deactivate"
         ],
         "message": "Du hast Dein Versteck verlassen."
     },
@@ -5834,11 +5531,7 @@
         ],
         "result": [
             "camp_untomb",
-            {
-                "custom": [
-                    11
-                ]
-            }
+            "camp_deactivate"
         ],
         "message": "Du hast Dein Grab verlassen. Die schöne Arbeit umsonst!"
     },
@@ -5849,13 +5542,7 @@
             "not_yet_home_cleaned"
         ],
         "result": [
-            {
-                "status": {
-                    "from": null,
-                    "to": "tg_home_clean",
-                    "counter": "ActionCounter::ActionTypeHomeCleanup"
-                }
-            }
+            "status_home_clean"
         ],
         "message": "Du räumst deinen ganzen Plunder auf und machst ein wenig Ordnung, damit es hier etwas aufgeräumter aussieht. Auch wenn's ne Bruchbude ist, es ist DEIN Zuhause..."
     },
@@ -5867,13 +5554,7 @@
             "not_yet_home_showered"
         ],
         "result": [
-            {
-                "status": {
-                    "from": null,
-                    "to": "tg_home_shower",
-                    "counter": "ActionCounter::ActionTypeShower"
-                }
-            }
+            "status_home_shower"
         ],
         "message": "Du springst unter die hausgemachte Dusche ohne weiter darüber nachzudenken. Das eiskalte Wasser erschreckt dich, aber dennoch bleibst du für einige Augenblicke unter dem schwachen Wasserstrahl stehen. In Ermangelung von Seife reibst du dich mit einem glatten Stein ab und versuchst, den Schlamm und die Blutflecken abzuwaschen. Dabei versuchst du, dir einzureden, dass es sich gut anfühlt."
     },
@@ -5890,12 +5571,7 @@
         "result": [
             "minus_5ap",
             "heal_wound",
-            {
-                "status": {
-                    "from": null,
-                    "to": "tg_home_heal_1"
-                }
-            }
+            "status_home_heal_1"
         ],
         "message_key": "home_heal_wound"
     },
@@ -5912,12 +5588,7 @@
         "result": [
             "minus_5ap",
             "disinfect",
-            {
-                "status": {
-                    "from": null,
-                    "to": "tg_home_heal_2"
-                }
-            }
+            "status_home_heal_2"
         ],
         "message_key": "home_heal_infect"
     },
@@ -5934,12 +5605,7 @@
         "result": [
             "minus_5ap",
             "disinfect",
-            {
-                "status": {
-                    "from": null,
-                    "to": "tg_home_heal_2"
-                }
-            }
+            "status_home_heal_2"
         ],
         "message_key": "home_heal_infect"
     },
@@ -5955,38 +5621,42 @@
         ],
         "result": [
             "minus_1ap",
-            {
-                "custom": [
-                    13
-                ],
-                "status": {
-                    "from": null,
-                    "to": "tg_home_defbuff"
-                }
-            }
+            "status_home_defbuff",
+            "use_guard_tower"
         ],
         "message": "Du hast dir etwas Zeit genommen und zur Verteidigung der Stadt beigetragen."
     },
-    "home_crows": {
-        "label": "Nach Ruinen Ausschau halten",
+    "home_crows_any": {
+        "label": "Die Wüste kartographieren",
         "meta": [
-            "profession_hunter",
             "must_be_inside",
+            "min_1_ap",
+            "not_profession_hunter",
             "must_have_crowsnest",
-            "not_yet_home_defbuff"
+            "hunter_building_counter_below_1"
         ],
         "result": [
-            {
-                "custom": [
-                    12
-                ],
-                "status": {
-                    "from": null,
-                    "to": "tg_home_defbuff"
-                }
-            }
+            "minus_1ap",
+            "status_count_hunter",
+            "status_start_sp"
         ],
-        "message": "<t-zone>Du hast ein neues Gebäude bei den Koordinaten {zone} entdeckt!</t-zone><nt-zone>Du suchst den gesamten Horizont mit deinen Adleraugen ab. Aber es scheint keine weiteren Gebäude zu entdecken zu geben.</nt-zone>"
+        "message": "Frenetisch schreibst du alles auf was du in der Umgebung entdeckst. Dieses Wissen wird dir morgen sicherlich helfen, dich noch effektiver in der Außenwelt zu bewegen."
+    },
+    "home_crows": {
+        "label": "Die Wüste kartographieren",
+        "meta": [
+            "must_be_inside",
+            "min_1_ap",
+            "profession_hunter",
+            "must_have_crowsnest",
+            "hunter_building_counter_below_1"
+        ],
+        "result": [
+            "minus_1ap",
+            "status_count_hunter",
+            "status_start_sp"
+        ],
+        "message": "Nichts entgeht deinem geschulten Blick! All die gesammelten Informationen werden dir morgen helfen, die geschickt und mit maximaler Effizienz durch die Außenwelt zu bewegen."
     },
     "home_fillwater": {
         "label": "Wasserwaffen füllen",
@@ -5995,11 +5665,7 @@
             "must_have_valve"
         ],
         "result": [
-            {
-                "custom": [
-                    14
-                ]
-            }
+            "fill_all_water_wp"
         ],
         "message": "<t-fail>Du hast <strong>keine Wasserwaffen zum Befüllen</strong> in deinem Rucksack oder deiner Truhe.</t-fail><nt-fail>Du hast {items_spawn} dank des Wasserhahns kostenlos auffüllen können.</nt-fail>"
     },
@@ -6024,9 +5690,9 @@
             "lab_counter_below_1"
         ],
         "result": [
+            "consume_2_pharma",
+            "increase_lab_counter",
             {
-                "status": "increase_lab_counter",
-                "consume": "2_pharma",
                 "group": [
                     [
                         "home_lab_success",
@@ -6051,9 +5717,9 @@
             "lab_counter_below_1"
         ],
         "result": [
+            "consume_2_pharma",
+            "increase_lab_counter",
             {
-                "status": "increase_lab_counter",
-                "consume": "2_pharma",
                 "group": [
                     [
                         "home_lab_success",
@@ -6078,9 +5744,9 @@
             "lab_counter_below_1"
         ],
         "result": [
+            "consume_2_pharma",
+            "increase_lab_counter",
             {
-                "status": "increase_lab_counter",
-                "consume": "2_pharma",
                 "group": [
                     [
                         "home_lab_success",
@@ -6105,10 +5771,8 @@
             "lab_counter_below_4"
         ],
         "result": [
-            {
-                "status": "increase_lab_counter",
-                "consume": "2_pharma"
-            },
+            "consume_2_pharma",
+            "increase_lab_counter",
             "home_lab_success"
         ],
         "message_key": "use_lab"
@@ -6123,9 +5787,9 @@
             "lab_counter_below_6"
         ],
         "result": [
+            "consume_2_pharma",
+            "increase_lab_counter",
             {
-                "status": "increase_lab_counter",
-                "consume": "2_pharma",
                 "group": [
                     [
                         "home_lab_success",
@@ -6150,9 +5814,9 @@
             "lab_counter_below_6"
         ],
         "result": [
+            "consume_2_pharma",
+            "increase_lab_counter",
             {
-                "status": "increase_lab_counter",
-                "consume": "2_pharma",
                 "group": [
                     [
                         "home_lab_success",
@@ -6177,9 +5841,9 @@
             "lab_counter_below_6"
         ],
         "result": [
+            "consume_2_pharma",
+            "increase_lab_counter",
             {
-                "status": "increase_lab_counter",
-                "consume": "2_pharma",
                 "group": [
                     [
                         "home_lab_success",
@@ -6204,10 +5868,8 @@
             "lab_counter_below_9"
         ],
         "result": [
-            {
-                "status": "increase_lab_counter",
-                "consume": "2_pharma"
-            },
+            "consume_2_pharma",
+            "increase_lab_counter",
             "home_lab_success"
         ],
         "message_key": "use_lab"
@@ -6227,8 +5889,8 @@
         ],
         "result": [
             "consume_target",
+            "increase_kitchen_counter",
             {
-                "status": "increase_kitchen_counter",
                 "group": [
                     [
                         "home_kitchen_success",
@@ -6258,8 +5920,8 @@
         ],
         "result": [
             "consume_target",
+            "increase_kitchen_counter",
             {
-                "status": "increase_kitchen_counter",
                 "group": [
                     [
                         "home_kitchen_success",
@@ -6289,9 +5951,7 @@
         ],
         "result": [
             "consume_target",
-            {
-                "status": "increase_kitchen_counter"
-            },
+            "increase_kitchen_counter",
             "home_kitchen_success"
         ],
         "message_key": "use_kitchen"
@@ -6311,9 +5971,7 @@
         ],
         "result": [
             "consume_target",
-            {
-                "status": "increase_kitchen_counter"
-            },
+            "increase_kitchen_counter",
             "home_kitchen_success"
         ],
         "message_key": "use_kitchen"
@@ -6333,8 +5991,8 @@
         ],
         "result": [
             "consume_target",
+            "increase_kitchen_counter",
             {
-                "status": "increase_kitchen_counter",
                 "group": [
                     [
                         "home_kitchen_success",
@@ -6364,8 +6022,8 @@
         ],
         "result": [
             "consume_target",
+            "increase_kitchen_counter",
             {
-                "status": "increase_kitchen_counter",
                 "group": [
                     [
                         "home_kitchen_success",
@@ -6395,9 +6053,7 @@
         ],
         "result": [
             "consume_target",
-            {
-                "status": "increase_kitchen_counter"
-            },
+            "increase_kitchen_counter",
             "home_kitchen_success"
         ],
         "message_key": "use_kitchen"
@@ -6417,9 +6073,7 @@
         ],
         "result": [
             "consume_target",
-            {
-                "status": "increase_kitchen_counter"
-            },
+            "increase_kitchen_counter",
             "home_kitchen_success"
         ],
         "message_key": "use_kitchen"
@@ -6432,14 +6086,8 @@
         ],
         "result": [
             "consume_item",
-            {
-                "spawn": "meat_4xs"
-            },
-            {
-                "picto": [
-                    "r_animal_#00"
-                ]
-            }
+            "picto_animal",
+            "spawn_meat_4xs"
         ],
         "message_key": "use_butcher"
     },
@@ -6451,14 +6099,8 @@
         ],
         "result": [
             "consume_item",
-            {
-                "spawn": "meat_2xs"
-            },
-            {
-                "picto": [
-                    "r_animal_#00"
-                ]
-            }
+            "picto_animal",
+            "spawn_meat_2xs"
         ],
         "message_key": "use_butcher"
     },
@@ -6470,14 +6112,8 @@
         ],
         "result": [
             "consume_item",
-            {
-                "spawn": "meat_4x"
-            },
-            {
-                "picto": [
-                    "r_animal_#00"
-                ]
-            }
+            "picto_animal",
+            "spawn_meat_4x"
         ],
         "message_key": "use_butcher"
     },
@@ -6489,14 +6125,8 @@
         ],
         "result": [
             "consume_item",
-            {
-                "spawn": "meat_2x"
-            },
-            {
-                "picto": [
-                    "r_animal_#00"
-                ]
-            }
+            "picto_animal",
+            "spawn_meat_2x"
         ],
         "message_key": "use_butcher"
     },
@@ -6508,14 +6138,8 @@
         ],
         "result": [
             "consume_item",
-            {
-                "spawn": "meat_bmb"
-            },
-            {
-                "picto": [
-                    "r_animal_#00"
-                ]
-            }
+            "picto_animal",
+            "spawn_meat_bmb"
         ],
         "message_key": "use_butcher"
     },
@@ -6527,21 +6151,9 @@
         ],
         "result": [
             "consume_item",
-            {
-                "town": {
-                    "def": 5
-                }
-            },
-            {
-                "picto": [
-                    "r_collec_#00"
-                ]
-            },
-            {
-                "globalpicto": [
-                    "r_mystic_#00"
-                ]
-            }
+            "picto_soul_purify",
+            "town_sdef_5",
+            "building_shaman"
         ],
         "message": "Du hast die Seele gereinigt und sie friedlich gemacht."
     },
@@ -6558,9 +6170,7 @@
         "result": [
             "consume_water",
             "minus_1pm",
-            {
-                "spawn": "potion"
-            }
+            "spawn_potion"
         ],
         "message": "Das ist ein Musterbeispiel eines schamanischen Tranks! Nun liegt es an die, der Stadt dessen Wirksamkeit zu vermitteln und sie von deinen schamanischen Fähigkeiten zu überzeugen."
     },
@@ -6573,11 +6183,8 @@
             "no_full_ap_msg"
         ],
         "result": [
+            "status_rested",
             {
-                "status": {
-                    "from": null,
-                    "to": "tg_rested"
-                },
                 "group": [
                     [
                         "plus_2ap_7",
@@ -6601,11 +6208,8 @@
             "no_full_ap_msg"
         ],
         "result": [
+            "status_rested",
             {
-                "status": {
-                    "from": null,
-                    "to": "tg_rested"
-                },
                 "group": [
                     [
                         "plus_2ap_7",
@@ -6629,11 +6233,8 @@
             "no_full_ap_msg"
         ],
         "result": [
+            "status_rested",
             {
-                "status": {
-                    "from": null,
-                    "to": "tg_rested"
-                },
                 "group": [
                     [
                         "plus_2ap_7",
@@ -6647,6 +6248,242 @@
             }
         ],
         "message_key": "use_bed"
+    },
+    "home_pool": {
+        "label": "Ein Bad nehmen",
+        "meta": [
+            "must_be_inside",
+            "must_have_pool",
+            "not_yet_home_pooled"
+        ],
+        "result": [
+            "status_home_pool"
+        ],
+        "message": "Du springst ohne zu zögern in dieses große Bad. Das Chaos um dich herum existiert für dich nicht mehr und du spürst, dass du diese Nacht mit Gelassenheit verbringen wirst."
+    },
+    "home_scavenge_any": {
+        "label": "In den Buddelgruben graben",
+        "meta": [
+            "must_be_inside",
+            "room_for_item_scavenging",
+            "min_2_ap",
+            "not_profession_collec",
+            "must_have_scavenger_building",
+            "scav_building_counter_below_1"
+        ],
+        "result": [
+            "minus_2ap",
+            "status_count_scavenger",
+            "building_scavenger"
+        ]
+    },
+    "home_scavenge_pro": {
+        "label": "In den Buddelgruben graben",
+        "meta": [
+            "must_be_inside",
+            "room_for_item_scavenging",
+            "min_1_ap",
+            "profession_collec",
+            "must_have_scavenger_building",
+            "scav_building_counter_below_3"
+        ],
+        "result": [
+            "minus_1ap",
+            "status_count_scavenger",
+            "building_scavenger"
+        ]
+    },
+    "home_survivalist_any": {
+        "label": "Wasser finden",
+        "meta": [
+            "must_be_inside",
+            "min_3_ap",
+            "not_profession_survivalist",
+            "must_have_surv_building",
+            "surv_building_counter_below_1"
+        ],
+        "result": [
+            "minus_3ap",
+            "status_count_surv",
+            "building_survivalist_a"
+        ],
+        "message": "Du konntest es zunächst gar nicht geglaubt, aber nachdem du die halbierten Dosen überprüft hast, stellst du fest, dass sich etwas Wasser darin befindet. Wie sich herausstellt, kennen sich diese Einsiedler doch aus! Du erhälst {items_spawn}."
+    },
+    "home_survivalist_pro": {
+        "label": "Wasser finden",
+        "meta": [
+            "must_be_inside",
+            "min_3_ap",
+            "profession_survivalist",
+            "must_have_surv_building",
+            "surv_building_counter_below_1"
+        ],
+        "result": [
+            "minus_3ap",
+            "status_count_surv",
+            "building_survivalist_b",
+            "building_survivalist_c"
+        ],
+        "message": "Einige Leute haben dein Wassergewinnung-System bösartig verleumdet, aber es ist offensichtlich, dass sie jetzt schweigen. Du erhälst {items_spawn}."
+    },
+    "home_defbuff_any": {
+        "label": "Verteidigung organisieren",
+        "meta": [
+            "not_profession_guardian",
+            "min_2_ap",
+            "must_be_inside",
+            "must_have_guardtower",
+            "not_yet_home_defbuff",
+            "guard_tower_not_max"
+        ],
+        "result": [
+            "minus_2ap",
+            "status_home_defbuff",
+            "building_guard"
+        ],
+        "message": "Du suchst die Stadtmauer nach kleinen Lücken ab, die die Wächter hinterlassen haben könnten. Die Stadt hat vorübergehend +5 Verteidigungspunkte gewonnen."
+    },
+    "open_drugkit": {
+        "label": "Öffnen",
+        "at00": true,
+        "meta": [
+            "is_not_wounded_hands"
+        ],
+        "result": [
+            "consume_item",
+            "spawn_drugkit"
+        ],
+        "message_key": "container_open"
+    },
+    "install_garland": {
+        "label": "Aufhängen",
+        "meta": [
+            "not_tired",
+            "is_not_wounded_hands",
+            "must_be_inside",
+            "during_christmas",
+            "room_for_item_in_chest"
+        ],
+        "result": [
+            "consume_item",
+            "spawn_xmas_gift_1",
+            "status_count_ap_loan"
+        ],
+        "message": "Es war ganz schön anstrengend, aber nach einigem lauten Fluchen hängt die Girlande. Irgendwie hast du aber das Gefühl, dass du dich gerde überanstrengt hast..."
+    },
+    "uninstall_garland": {
+        "label": "Abhängen",
+        "meta": [
+            "not_tired",
+            "is_not_wounded_hands",
+            "must_be_inside"
+        ],
+        "result": [
+            "morph_xmas_gift"
+        ],
+        "message": "Mit einem beherzten Griff hast du die Girlande aus ihrer Verankerung gerissen."
+    },
+    "equip_shoe_first": {
+        "label": "Anlegen",
+        "at00": true,
+        "meta": [
+            "is_not_wounded_hands",
+            "not_yet_shoe_today",
+            "not_yet_shoe_now",
+            "is_not_wounded_foot",
+            "is_not_wounded_leg"
+        ],
+        "result": [
+            "equip_item",
+            "status_tag_shoe_now",
+            "status_tag_shoe_today",
+            "status_tag_shoe_first",
+            "plus_1sp_e"
+        ],
+        "message": "Du ziehst deine neuen Schuhe an und ziehst die Schnürsenkel SEHR fest! Sie passen perfekt, du würdest sie für nichts auf der Welt wieder ausziehen!"
+    },
+    "unequip_shoe_first": {
+        "label": "Ablegen",
+        "at00": true,
+        "meta": [
+            "is_not_wounded_hands",
+            "shoe_now",
+            "shoe_first"
+        ],
+        "result": [
+            "unequip_item",
+            "status_tag_no_shoe_now",
+            "status_tag_no_shoe_first",
+            "status_tag_shoe_today",
+            "minus_1sp"
+        ],
+        "message": "Mit ein wenig Trennungsschmerz im Herzen hast du deine Schuhe abgelegt."
+    },
+    "equip_bike_first": {
+        "label": "Aufsteigen",
+        "at00": true,
+        "meta": [
+            "is_not_wounded_hands",
+            "not_yet_bike_today",
+            "not_yet_bike_now",
+            "is_not_wounded_foot",
+            "is_not_wounded_leg",
+            "room_for_heavy_item"
+        ],
+        "result": [
+            "equip_item",
+            "status_tag_bike_now",
+            "status_tag_bike_today",
+            "status_tag_bike_first",
+            "plus_2sp_e"
+        ],
+        "message": "Du steigst auf dein Fahrrad und bereitest dich mental darauf vor, in Windeseile durch die Außenwelt zu fegen."
+    },
+    "unequip_bike_first": {
+        "label": "Absteigen",
+        "at00": true,
+        "meta": [
+            "is_not_wounded_hands",
+            "bike_now",
+            "bike_first"
+        ],
+        "result": [
+            "unequip_item",
+            "status_tag_no_bike_now",
+            "status_tag_no_bike_first",
+            "status_tag_bike_today",
+            "minus_2sp"
+        ],
+        "message": "Mit ein wenig Trennungsschmerz im Herzen steigst du von deinem Fahrrad ab."
+    },
+    "eat_apple": {
+        "label": "Essen",
+        "priority": 1,
+        "cover": true,
+        "at00": true,
+        "poison": "ItemAction::PoisonHandlerConsume",
+        "meta": [
+            "eat_ap",
+            "no_full_ap_msg_food"
+        ],
+        "result": [
+            "contaminated_zone_infect",
+            "eat_ap8",
+            "consume_item",
+            {
+                "group": [
+                    [
+                        "infect",
+                        15
+                    ],
+                    [
+                        "do_nothing",
+                        85
+                    ]
+                ]
+            }
+        ],
+        "escort_message_key": "escort_food_eat"
     },
     "nw_break": {
         "label": "",
@@ -6666,72 +6503,42 @@
         "label": "",
         "meta": [],
         "result": [
-            {
-                "item": {
-                    "morph": "big_pgun_empty_#00",
-                    "consume": false
-                }
-            }
+            "morph_big_pgun_empty"
         ]
     },
     "nw_empty_pilegun_up": {
         "label": "",
         "meta": [],
         "result": [
-            {
-                "item": {
-                    "morph": "pilegun_up_empty_#00",
-                    "consume": false
-                }
-            }
+            "morph_pilegun_up_empty"
         ]
     },
     "nw_empty_pilegun": {
         "label": "",
         "meta": [],
         "result": [
-            {
-                "item": {
-                    "morph": "pilegun_empty_#00",
-                    "consume": false
-                }
-            }
+            "morph_pilegun_empty"
         ]
     },
     "nw_empty_taser": {
         "label": "",
         "meta": [],
         "result": [
-            {
-                "item": {
-                    "morph": "taser_empty_#00",
-                    "consume": false
-                }
-            }
+            "morph_taser_empty"
         ]
     },
     "nw_empty_mixergun": {
         "label": "",
         "meta": [],
         "result": [
-            {
-                "item": {
-                    "morph": "mixergun_empty_#00",
-                    "consume": false
-                }
-            }
+            "morph_mixergun_empty"
         ]
     },
     "nw_empty_chainsaw": {
         "label": "",
         "meta": [],
         "result": [
-            {
-                "item": {
-                    "morph": "chainsaw_empty_#00",
-                    "consume": false
-                }
-            }
+            "morph_chainsaw_empty"
         ]
     },
     "nw_empty_phone": {
@@ -6739,127 +6546,128 @@
         "meta": [],
         "result": [
             "consume_item",
-            {
-                "spawn": "phone_nw"
-            }
+            "spawn_phone_nw"
         ]
     },
     "nw_empty_watergun": {
         "label": "",
         "meta": [],
         "result": [
-            {
-                "item": {
-                    "morph": "watergun_empty_#00",
-                    "consume": false
-                }
-            }
+            "morph_watergun_empty"
         ]
     },
     "nw_empty_watergun_opt": {
         "label": "",
         "meta": [],
         "result": [
-            {
-                "item": {
-                    "morph": "watergun_opt_empty_#00",
-                    "consume": false
-                }
-            }
+            "morph_watergun_opt_empty"
         ]
     },
     "nw_empty_torch": {
         "label": "",
         "meta": [],
         "result": [
-            {
-                "item": {
-                    "morph": "torch_off_#00",
-                    "consume": false
-                }
-            }
+            "morph_torch_off"
         ]
     },
     "nw_empty_staff": {
         "label": "",
         "meta": [],
         "result": [
-            {
-                "item": {
-                    "morph": "staff2_#00",
-                    "consume": false
-                }
-            }
+            "morph_staff2"
         ]
     },
     "nw_empty_dildo": {
         "label": "",
         "meta": [],
         "result": [
-            {
-                "item": {
-                    "morph": "vibr_empty_#00",
-                    "consume": false
-                }
-            }
+            "morph_vibr_empty"
         ]
     },
     "nw_empty_watercan": {
         "label": "",
         "meta": [],
         "result": [
-            {
-                "item": {
-                    "morph": "water_can_empty_#00",
-                    "consume": false
-                }
-            }
+            "produce_watercan0"
         ]
     },
     "nw_empty_kalach": {
         "label": "",
         "meta": [],
         "result": [
-            {
-                "item": {
-                    "morph": "kalach_#01",
-                    "consume": false
-                }
-            }
+            "morph_kalach_empty"
         ]
     },
     "nw_meat": {
         "label": "",
         "meta": [],
         "result": [
-            {
-                "item": {
-                    "morph": "undef_#00",
-                    "consume": false
-                }
-            },
-            {
-                "picto": [
-                    "r_animal_#00"
-                ]
-            }
+            "picto_animal",
+            "morph_undef"
         ]
     },
     "nw_meat_tasty": {
         "label": "",
         "meta": [],
         "result": [
-            {
-                "item": {
-                    "morph": "meat_#00",
-                    "consume": false
-                }
-            },
-            {
-                "picto": [
-                    "r_animal_#00"
-                ]
-            }
+            "picto_animal",
+            "morph_meat"
+        ]
+    },
+    "nw_empty_proj": {
+        "label": "",
+        "meta": [],
+        "result": [
+            "morph_lens"
+        ]
+    },
+    "nw_empty_lpoint": {
+        "label": "",
+        "meta": [],
+        "result": [
+            "morph_lpoint"
+        ]
+    },
+    "nw_empty_jerrygun": {
+        "label": "",
+        "meta": [],
+        "result": [
+            "empty_jerrygun"
+        ]
+    },
+    "nw_empty_lamp": {
+        "label": "",
+        "meta": [],
+        "result": [
+            "morph_lamp"
+        ]
+    },
+    "nw_empty_bone": {
+        "label": "",
+        "meta": [],
+        "result": [
+            "morph_bone"
+        ]
+    },
+    "nw_empty_music": {
+        "label": "",
+        "meta": [],
+        "result": [
+            "morph_music_part"
+        ]
+    },
+    "nw_empty_sport": {
+        "label": "",
+        "meta": [],
+        "result": [
+            "morph_elec_empty"
+        ]
+    },
+    "nw_empty_radio": {
+        "label": "",
+        "meta": [],
+        "result": [
+            "morph_radio_off"
         ]
     }
 }

@@ -1,0 +1,93 @@
+@use 'variables';
+
+.game-board
+{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1em;
+    height: 100%;
+
+    .grid
+    {
+        background-color: variables.$item_color;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 0.5em;
+        border-radius: 0.5em;
+        gap: 0.25em;
+
+
+        .row
+        {
+            display: flex;
+            gap: 0.25em;
+
+            .cell
+            {
+                width: 40px;
+                height: 40px;
+
+                background-color: variables.$item_color;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                cursor: pointer;
+
+                &.highlighted
+                {
+                    background-color: rgba(0, 0, 0, 0.5);
+                }
+
+                >img
+                {
+                    opacity: 1;
+
+                    &.to-remove
+                    {
+                        opacity: 0;
+                        transition: opacity 250ms;
+                    }
+                }
+            }
+        }
+    }
+
+    .lot-position
+    {
+        background-color: variables.$item_color;
+        border-radius: 0.5em;
+
+
+        .lot
+        {
+            display: flex;
+            padding: 0.5em;
+            gap: 0.25em;
+
+            &.horizontal
+            {
+                flex-direction: row;
+            }
+
+            &.vertical
+            {
+                flex-direction: column;
+            }
+
+            .lot-item
+            {
+                width: 40px;
+                height: 40px;
+                background-color: variables.$item_color;
+
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                gap: 2px;
+                margin: 2px;
+            }
+        }
+    }
+}

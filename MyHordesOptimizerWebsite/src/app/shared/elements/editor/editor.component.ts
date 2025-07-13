@@ -1,16 +1,19 @@
 ﻿import { coerceBooleanProperty } from '@angular/cdk/coercion';
 import {
+    booleanAttribute,
     ChangeDetectionStrategy,
     ChangeDetectorRef,
     Component,
     ElementRef,
-    EventEmitter,
     HostBinding,
+    input,
     Input,
+    InputSignalWithTransform,
     OnChanges,
     OnDestroy,
     Optional,
-    Output,
+    output,
+    OutputEmitterRef,
     SecurityContext,
     Self,
     SimpleChanges,
@@ -38,23 +41,22 @@ const material_modules: Imports = [MatFormFieldModule];
             useExisting: EditorComponent
         }
     ],
-    changeDetection: ChangeDetectionStrategy.OnPush,
     encapsulation: ViewEncapsulation.None,
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    host: {style: 'display: contents'},
     imports: [...angular_common, ...components, ...material_modules, ...pipes, AngularEditorModule]
 })
 export class EditorComponent implements ControlValueAccessor, OnChanges, OnDestroy, MatFormFieldControl<string> {
-    @HostBinding('style.display') display: string = 'contents';
 
     @HostBinding('class.floating')
     get shouldLabelFloat(): boolean {
         return true;
     }
 
-    /** Le nom du formcontrol */
-    @Input() name!: string;
+    // public name: InputSignal<string> = input('');
     /** Le libellé du champ */
-    @Input() label!: string;
-    @Input() showToolbarOnFocus!: boolean;
+    // public label: InputSignal<string> = input('');
+    public showToolbarOnFocus: InputSignalWithTransform<boolean, unknown> = input(false, {transform: booleanAttribute});
 
     @Input() set readonly(readonly: boolean) {
         this.editorConfig.editable = !readonly;
@@ -102,7 +104,7 @@ export class EditorComponent implements ControlValueAccessor, OnChanges, OnDestr
         this.stateChanges.next();
     }
 
-    @Output() contentChange: EventEmitter<string> = new EventEmitter();
+    public contentChange: OutputEmitterRef<string> = output();
 
     public onChange!: () => void;
     public onTouched!: () => void;
@@ -155,13 +157,13 @@ export class EditorComponent implements ControlValueAccessor, OnChanges, OnDestr
     }
 
     public showToolbar(): void {
-        if (this.showToolbarOnFocus) {
+        if (this.showToolbarOnFocus()) {
             this.editorConfig.showToolbar = true;
         }
     }
 
     public hideToolbar(): void {
-        if (this.showToolbarOnFocus) {
+        if (this.showToolbarOnFocus()) {
             this.editorConfig.showToolbar = false;
         }
     }

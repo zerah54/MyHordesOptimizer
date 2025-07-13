@@ -1,14 +1,14 @@
-@if (cell && cellHtml) {
-    <div class="mho-map-cell-detail" [style.top]="cellHtml | cellDetailsTop"
-         [style.bottom]="cellHtml | cellDetailsBottom" [style.left]="cellHtml | cellDetailsLeft"
-         [style.right]="cellHtml | cellDetailsRight">
+@if (cell() && cellHtml()) {
+    <div class="mho-map-cell-detail" [style.top]="cellHtml() | cellDetailsTop"
+         [style.bottom]="cellHtml() | cellDetailsBottom" [style.left]="cellHtml() | cellDetailsLeft"
+         [style.right]="cellHtml() | cellDetailsRight">
 
         <div class="details-header">
             <div class="title">
                 <h1>
-                    @if (cell | ruinInCell:allRuins; as ruin) {
+                    @if (cell() | ruinInCell:allRuins(); as ruin) {
                         {{ ruin.label[locale] }}
-                    } @else if (cell.is_town) {
+                    } @else if (cell().is_town) {
                         <ng-container i18n>Ville</ng-container>
                     } @else {
                         <ng-container i18n>Désert</ng-container>
@@ -16,37 +16,37 @@
                 </h1>
             </div>
             <div class="coords-distance">
-                <span class="cords">[{{ cell.displayed_x }}&nbsp;;&nbsp;{{ cell.displayed_y }}]</span>
-                <span class="distance-pa">{{ cell.nb_pa }}
+                <span class="cords">[{{ cell().displayed_x }}&nbsp;;&nbsp;{{ cell().displayed_y }}]</span>
+                <span class="distance-pa">{{ cell().nb_pa }}
                     <mho-icon-ap></mho-icon-ap></span>
-                <span class="distance-km">{{ cell.nb_km }}km</span>
+                <span class="distance-km">{{ cell().nb_km }}km</span>
             </div>
             <mat-divider></mat-divider>
         </div>
-        @if (!cell.is_town) {
+        @if (!cell().is_town) {
             <div class="content">
                 <div class="zombies">
                     <div class="zombies-here">
                         <img [ngSrc]="HORDES_IMG_REPO + 'icons/small_zombie.gif'" width="16" height="16">
-                        {{ cell.nb_zombie || 0 }}
+                        {{ cell().nb_zombie || 0 }}
                     </div>
                     <div class="killed-zombies">
-                        {{ cell.nb_zombie_killed || 0 }}
+                        {{ cell().nb_zombie_killed || 0 }}
                         <img [ngSrc]="HORDES_IMG_REPO + 'icons/map/map_icon_splatter.png'" width="23" height="17">
                     </div>
                 </div>
                 <div class="pdc">
                     <img [ngSrc]="HORDES_IMG_REPO + 'emotes/human.gif'" width="16" height="16">
-                    {{ cell.nb_hero || 0 }}&nbsp;<ng-container i18n>points</ng-container>
+                    {{ cell().nb_hero || 0 }}&nbsp;<ng-container i18n>points</ng-container>
                 </div>
                 <mat-divider></mat-divider>
             </div>
         }
-        @if (cell.citizens && cell.citizens.length > 0) {
+        @if (cell().citizens && cell().citizens.length > 0) {
             <div class="citizens">
-                @for (citizen of (cell.citizens | citizensFromShort:allCitizens); track citizen.id) {
+                @for (citizen of (cell().citizens | citizensFromShort:allCitizens()); track citizen.id) {
                     <div>
-                        <mho-citizen-info [displayJob]="true" [displayShunStatus]="true" [displayPseudoMode]="'simple'"
+                        <mho-citizen-info displayJob displayShunStatus [displayPseudoMode]="'simple'"
                                           [citizen]="citizen"></mho-citizen-info>
                     </div>
                 }
@@ -54,11 +54,11 @@
             <mat-divider></mat-divider>
         }
 
-        @if (cell.items && cell.items.length > 0) {
+        @if (cell().items && cell().items.length > 0) {
             <div class="items">
-                @for (item of cell.items; track item.item_id) {
+                @for (item of cell().items; track item.item_id) {
                     <div>
-                        @if (item | itemDetails:allItems; as complete_item) {
+                        @if (item | itemDetails:allItems(); as complete_item) {
                             <img [ngSrc]="HORDES_IMG_REPO + complete_item.img" [class.broken]="item.is_broken" width="16" height="16">
                         }
                         <span class="item-quantity">{{ item.count }}</span>
@@ -68,7 +68,7 @@
             <mat-divider></mat-divider>
         }
         <div class="last-update">
-            <mho-last-update [lastUpdateInfo]="cell.update_info"></mho-last-update>
+            <mho-last-update [lastUpdateInfo]="cell().update_info"></mho-last-update>
         </div>
     </div>
 }

@@ -1,92 +1,92 @@
-<td #cellHtml class="cell map-cell" [class.town]="cell.is_town" [class.visited-today]="cell.is_visited_today"
-    [class.never-visited]="cell.is_never_visited"
+<td #cellHtml class="cell map-cell" [class.town]="cell().is_town" [class.visited-today]="cell().is_visited_today"
+    [class.never-visited]="cell().is_never_visited"
     [ngClass]="[
-        options.map_type === 'danger' ? 'danger-' + cell.danger_level : '',
-        options.map_type === 'digs' ? 'dig-' + (cell|digLevel:options) : '',
-        options.map_type === 'trash' ? 'trash-' + ((cell | trashValue:options:allItems)|trashLevel) : '',
-        cell.zone_regen ? cell.zone_regen.value.class : ''
+        options().map_type === 'danger' ? 'danger-' + cell().danger_level : '',
+        options().map_type === 'digs' ? 'dig-' + (cell() | digLevel:options()) : '',
+        options().map_type === 'trash' ? 'trash-' + ((cell() | trashValue:options():allItems())|trashLevel) : '',
+        cell().zone_regen ? cell().zone_regen?.value?.class : ''
     ]"
-    [class.alert]="options.map_type === 'danger'" [class.digs]="options.map_type === 'digs'" [class.trash]="options.map_type === 'trash'"
-    [class.scrut-border-left]="cell|scrutBorderLeft:options:drawedMap"
-    [class.scrut-border-top]="cell|scrutBorderTop:options:drawedMap"
-    [class.scrut-border-right]="cell|scrutBorderRight:options:drawedMap"
-    [class.scrut-border-bottom]="cell|scrutBorderBottom:options:drawedMap"
-    (click)="openCellUpdate()" (mouseenter)="changeCurrentCell(cell)" (mouseleave)="changeCurrentCell(undefined)">
+    [class.alert]="options().map_type === 'danger'" [class.digs]="options().map_type === 'digs'" [class.trash]="options().map_type === 'trash'"
+    [class.scrut-border-left]="cell() | scrutBorderLeft:options():drawedMap()"
+    [class.scrut-border-top]="cell() | scrutBorderTop:options():drawedMap()"
+    [class.scrut-border-right]="cell() | scrutBorderRight:options():drawedMap()"
+    [class.scrut-border-bottom]="cell() | scrutBorderBottom:options():drawedMap()"
+    (click)="openCellUpdate()" (mouseenter)="changeCurrentCell(cell())" (mouseleave)="changeCurrentCell(undefined)">
 
-    @if (cell.ruin_id) {
+    @if (cell().ruin_id) {
         <div [class]="'ruin'">
-            <span [class.empty-ruin]="cell.is_ruin_dryed">
-                @if (cell | isRuin:allRuins) {
+            <span [class.empty-ruin]="cell().is_ruin_dryed">
+                @if (cell() | isRuin:allRuins()) {
                     <ng-container>R</ng-container>
                 }
-                @if (cell.nb_ruin_dig) {
+                @if (cell().nb_ruin_dig) {
                     <img [ngSrc]="HORDES_IMG_REPO + 'building/small_dig.gif'" width="16" height="16">
-                    <span class="nb-digs">{{ cell.nb_ruin_dig }}</span>
+                    <span class="nb-digs">{{ cell().nb_ruin_dig }}</span>
                 }
             </span>
         </div>
     }
 
-    @if (cell.is_town) {
+    @if (cell().is_town) {
         <div [class]="'town-draw'">
             <img [ngSrc]="HORDES_IMG_REPO + 'icons/map/map_zone_town.svg'" width="25" height="25">
         </div>
     }
 
-    @if (cell.is_dryed) {
+    @if (cell().is_dryed) {
         <div [class]="'dried'"></div>
     }
 
-    @if (cell | myCell) {
+    @if (cell() | myCell) {
         <div [class]="'my-cell'"></div>
     }
 
-    <div [class.dist-border-left]="cell|distBorderLeft:options:drawedMap"
-         [class.dist-border-top]="cell|distBorderTop:options:drawedMap"
-         [class.dist-border-right]="cell|distBorderRight:options:drawedMap"
-         [class.dist-border-bottom]="cell|distBorderBottom:options:drawedMap"></div>
+    <div [class.dist-border-left]="cell() | distBorderLeft:options():drawedMap()"
+         [class.dist-border-top]="cell() | distBorderTop:options():drawedMap()"
+         [class.dist-border-right]="cell() | distBorderRight:options():drawedMap()"
+         [class.dist-border-bottom]="cell() | distBorderBottom:options():drawedMap()"></div>
 
-    @if (!cell.is_town) {
+    @if (!cell().is_town) {
         <div class="content">
             <div class="corner-top-left corner">
-                @if (cell.note) {
+                @if (cell().note) {
                     <img [ngSrc]="HORDES_IMG_REPO + 'icons/small_talk.gif'" width="12" height="12">
                 }
             </div>
             <div class="corner-top-right corner">
-                @if ((cell.citizens && cell.citizens.length > 0) || cell.nb_hero > 0) {
+                @if ((cell().citizens && cell().citizens.length > 0) || cell().nb_hero > 0) {
                     <div>
                         <img [ngSrc]="HORDES_IMG_REPO + 'log/citizen.gif'" width="12" height="12">
-                        <span class="detail-value">{{ cell.nb_hero }}</span>
+                        <span class="detail-value">{{ cell().nb_hero }}</span>
                     </div>
                 }
             </div>
             <div class="corner-bottom-left corner">
-                @if (options.map_type === 'danger') {
+                @if (options().map_type === 'danger') {
                     <div>
                         <img [ngSrc]="HORDES_IMG_REPO + 'icons/map/map_icon_splatter.png'" width="12" height="9">
-                        <span class="detail-value">{{ cell.nb_zombie_killed || 0 }}</span>
+                        <span class="detail-value">{{ cell().nb_zombie_killed || 0 }}</span>
                     </div>
                 }
             </div>
             <div class="corner-bottom-right corner">
-                @if (options.map_type === 'danger') {
+                @if (options().map_type === 'danger') {
                     <div>
                         <img [ngSrc]="HORDES_IMG_REPO + 'icons/small_zombie.gif'" width="12" height="12">
-                        <span class="detail-value">{{ cell.nb_zombie || 0 }}</span>
+                        <span class="detail-value">{{ cell().nb_zombie || 0 }}</span>
                     </div>
                 }
-                @if (options.map_type === 'digs') {
+                @if (options().map_type === 'digs') {
                     <div>
                         {{
-                            ((options.dig_mode === 'max' ? cell.max_potential_remaining_dig :
-                                cell.average_potential_remaining_dig) - cell.total_success) | number:'1.0-0':locale
+                            ((options().dig_mode === 'max' ? cell().max_potential_remaining_dig :
+                                cell().average_potential_remaining_dig) - cell().total_success) | number:'1.0-0':locale
                         }}
                     </div>
                 }
-                @if (options.map_type === 'trash') {
+                @if (options().map_type === 'trash') {
                     <div>
-                        {{ cell | trashValue:options:allItems }}
+                        {{ cell() | trashValue:options():allItems() }}
                     </div>
                 }
             </div>
@@ -95,7 +95,7 @@
 </td>
 
 @if (current_cell) {
-    <mho-map-cell-details @toggleCurrentCell [cell]="current_cell" [allItems]="allItems" [allRuins]="allRuins"
-                          [cellHtml]="cellHtml" [allCitizens]="allCitizens">
+    <mho-map-cell-details @toggleCurrentCell [cell]="current_cell" [allItems]="allItems()" [allRuins]="allRuins()"
+                          [cellHtml]="cellHtml" [allCitizens]="allCitizens()">
     </mho-map-cell-details>
 }
