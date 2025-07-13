@@ -1,5 +1,5 @@
 import { CommonModule, NgOptimizedImage } from '@angular/common';
-import { Component, HostBinding, ViewEncapsulation } from '@angular/core';
+import { Component, ViewEncapsulation } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatButtonToggle, MatButtonToggleModule } from '@angular/material/button-toggle';
@@ -30,27 +30,28 @@ const material_modules: Imports = [ MatButtonModule, MatCardModule, MatFormField
     imports: [ ...angular_common, ...components, ...material_modules, ...pipes ],
 })
 export class StatesManagementComponent {
-    @HostBinding('style.display') display: string = 'contents';
 
     public readonly locale: string = moment.locale();
 
-    public states_and_actions: (Action | State)[] = [
+    protected states_and_actions: (Action | State)[] = [
         { type: 'state', thirst: 'none', ap: 0, wounded: false, ep: 0, cp: 0, shoes: false, bike: false }
     ];
 
-    actions: actions[] = [
+    protected actions: actions[] = [
         { value: 'water', viewValue: 'Prise de gourde' },
         { value: 'b6', viewValue: 'Nourriture (B6)' },
         { value: 'move', viewValue: 'Déplacement dans l\'OM' },
     ];
 
-    public addAction(): void {
+    protected readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
+
+    protected addAction(): void {
         this.states_and_actions.push({ type: 'action' });
         let states = this.states_and_actions.filter((state: StateOrAction) => state.type === 'state');
         this.states_and_actions.push({ ...states[ states.length - 1 ] });
     }
 
-    toggleHydratedStatus($event: MouseEvent, value: string, buttonToggle: MatButtonToggle) {
+    protected toggleHydratedStatus($event: MouseEvent, value: string, buttonToggle: MatButtonToggle) {
         console.log(value);
         console.log(buttonToggle);
         if (buttonToggle.checked) {
@@ -60,8 +61,6 @@ export class StatesManagementComponent {
             buttonToggle.checked = false;
         }
     }
-
-    protected readonly HORDES_IMG_REPO = HORDES_IMG_REPO;
 }
 
 interface actions {
