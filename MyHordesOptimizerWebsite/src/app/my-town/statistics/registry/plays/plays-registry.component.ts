@@ -1,5 +1,5 @@
 import { CommonModule, NgOptimizedImage, NgTemplateOutlet } from '@angular/common';
-import { Component, HostBinding, Input, ViewEncapsulation } from '@angular/core';
+import { Component, input, Input, InputSignal, ViewEncapsulation } from '@angular/core';
 import { MatTabChangeEvent, MatTabsModule } from '@angular/material/tabs';
 import { HORDES_IMG_REPO } from '../../../../_abstract_model/const';
 import { DisplayPseudoMode, Entry } from '../../../../_abstract_model/interfaces';
@@ -19,13 +19,13 @@ const material_modules: Imports = [MatTabsModule];
     templateUrl: './plays-registry.component.html',
     styleUrls: ['./plays-registry.component.scss'],
     encapsulation: ViewEncapsulation.None,
+    host: {style: 'display: contents'},
     imports: [...angular_common, ...components, ...material_modules, ...pipes,]
 })
 export class PlaysRegistryComponent {
-    @HostBinding('style.display') display: string = 'contents';
 
-    @Input({required: true}) completeCitizenList!: CitizenInfo;
-    @Input({required: true}) displayPseudo!: DisplayPseudoMode;
+    public completeCitizenList: InputSignal<CitizenInfo> = input.required();
+    public displayPseudo: InputSignal<DisplayPseudoMode> = input.required();
 
     @Input({required: true}) set registry(registry: Entry[] | undefined) {
         if (registry) {
@@ -112,24 +112,24 @@ export class PlaysRegistryComponent {
                     .some((dices_keyword: string): boolean => this.entryHasPlayKeyword(entry, dices_keyword));
                 const is_ball_keyword: boolean = this.ball_keywords
                     .some((ball_keyword: string): boolean => this.entryHasPlayKeyword(entry, ball_keyword));
-                const citizen: Citizen | undefined = this.completeCitizenList.citizens
+                const citizen: Citizen | undefined = this.completeCitizenList().citizens
                     .find((citizen: Citizen): boolean => entry.entry?.indexOf(citizen.name) > -1);
                 let has_pendant: boolean;
                 if (is_dice_keyword) {
                     has_pendant = card_entries.some((cards_entry: Entry): boolean => {
-                        const citizen_for_entry: Citizen | undefined = this.completeCitizenList.citizens
+                        const citizen_for_entry: Citizen | undefined = this.completeCitizenList().citizens
                             .find((citizen: Citizen): boolean => cards_entry.entry?.indexOf(citizen.name) > -1);
                         return citizen_for_entry !== undefined && citizen_for_entry === citizen;
                     });
                 } else if (is_card_keyword) {
                     has_pendant = dice_entries.some((dice_entry: Entry): boolean => {
-                        const citizen_for_entry: Citizen | undefined = this.completeCitizenList.citizens
+                        const citizen_for_entry: Citizen | undefined = this.completeCitizenList().citizens
                             .find((citizen: Citizen): boolean => dice_entry.entry?.indexOf(citizen.name) > -1);
                         return citizen_for_entry !== undefined && citizen_for_entry === citizen;
                     });
                 } else if (is_ball_keyword) {
                     has_pendant = ball_entries.some((ball_entry: Entry): boolean => {
-                        const citizen_for_entry: Citizen | undefined = this.completeCitizenList.citizens
+                        const citizen_for_entry: Citizen | undefined = this.completeCitizenList().citizens
                             .find((citizen: Citizen): boolean => ball_entry.entry?.indexOf(citizen.name) > -1);
                         return citizen_for_entry !== undefined && citizen_for_entry === citizen;
                     });

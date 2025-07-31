@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, EventEmitter, HostBinding, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild, InputSignal, input, InputSignalWithTransform, booleanAttribute, OutputEmitterRef, output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -16,23 +16,22 @@ const material_modules: Imports = [MatButtonModule, MatFormFieldModule, MatIconM
     selector: 'mho-header-with-number-previous-next-filter',
     templateUrl: './header-with-number-previous-next-filter.component.html',
     styleUrls: ['./header-with-number-previous-next-filter.component.scss'],
+    host: {style: 'display: contents'},
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class HeaderWithNumberPreviousNextFilterComponent implements OnInit {
-    @HostBinding('style.display') display: string = 'contents';
 
     @ViewChild('filter') filter!: ElementRef<HTMLInputElement>;
 
-    @Input() header!: string;
-    @Input() textAlign?: string = 'left';
-    @Input({required: true}) displayFirstLast: boolean = false;
+    public header: InputSignal<string> = input('');
+    public textAlign: InputSignal<string> = input('left');
+    public displayFirstLast: InputSignalWithTransform<boolean, unknown> = input(false, {transform: booleanAttribute});
 
-    @Input() min: number = 1;
-    @Input() max: number = 1;
+    public min: InputSignal<number> = input(1);
+    public max: InputSignal<number> = input(1);
 
-
-    @Input() filterValue!: number;
-    @Output() filterValueChange: EventEmitter<number> = new EventEmitter<number>();
+    public filterValue: InputSignal<number> = input.required();
+    public filterValueChange: OutputEmitterRef<number> = output();
 
     public visible: boolean = false;
 
@@ -50,7 +49,7 @@ export class HeaderWithNumberPreviousNextFilterComponent implements OnInit {
 
     /** Vérifie si le filtre doit toujours être affiché */
     public checkVisibility(): void {
-        this.visible = this.filterValue !== null && this.filterValue !== undefined;
+        this.visible = this.filterValue() !== null && this.filterValue() !== undefined;
     }
 }
 

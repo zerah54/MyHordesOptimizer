@@ -1,5 +1,5 @@
 import { CommonModule, formatNumber } from '@angular/common';
-import { Component, HostBinding, ViewEncapsulation } from '@angular/core';
+import { Component, ViewEncapsulation } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatDialog } from '@angular/material/dialog';
@@ -26,10 +26,10 @@ const material_modules: Imports = [MatButtonModule, MatCardModule, MatIconModule
     templateUrl: './miscellaneous-info.component.html',
     styleUrls: ['./miscellaneous-info.component.scss'],
     encapsulation: ViewEncapsulation.None,
+    host: {style: 'display: contents'},
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class MiscellaneousInfoComponent {
-    @HostBinding('style.display') display: string = 'contents';
 
     public readonly locale: string = moment.locale();
     public readonly my_town: TownDetails | null = getTown();

@@ -34,7 +34,7 @@
                     <div>
                         <mat-form-field appearance="outline" class="short-bottom">
                             <mat-label i18n>Métier</mat-label>
-                            <mho-select [formControlName]="'job'" [options]="jobs" [bindLabel]="'value.label'" [bindIcon]="'value.img'">
+                            <mho-select [formControlName]="'job'" [options]="jobs" [bindLabel]="'value.label'" [bindIcon]="'value.img'" searchable>
                             </mho-select>
                         </mat-form-field>
                         @if ($any(configuration_form.get('job')?.value)?.key === JOB_SCOUT.key) {
@@ -79,7 +79,7 @@
                         <mat-form-field appearance="outline" class="short-bottom">
                             <mat-label i18n>Type de ville</mat-label>
                             <mho-select [formControlName]="'town'" [options]="town_types" [bindLabel]="'label'" [moreInfo]="getMoreTownTypeInfoFn"
-                                        [disabled]="!!configuration_form.get('town')?.disabled || this.in_town_camping">
+                                        [disabled]="!!configuration_form.get('town')?.disabled || this.in_town_camping" searchable>
                             </mho-select>
                             <small
                                 matSuffix>{{ bonus_string }}{{ configuration_form.get('town')?.value['bonus'] | campingDisplayBonus:display_bonus_ap:locale }}</small>
@@ -118,7 +118,7 @@
                         <mat-form-field appearance="outline" class="short-bottom">
                             <mat-label i18n>Bâtiment</mat-label>
                             <mho-select [formControlName]="'ruin'" [options]="(in_town_camping ? town_ruins : ruins) | filterRuinsByKm:townDistance.value"
-                                        [bindLabel]="'label.' + locale" [bindIcon]="'formatted_img'" [moreInfo]="getMoreRuinInfoFn">
+                                        [bindLabel]="'label.' + locale" [bindIcon]="'formatted_img'" [moreInfo]="getMoreRuinInfoFn" searchable>
                             </mho-select>
                             <mat-icon matSuffix [matTooltip]="help_ruins" style="vertical-align: middle" [color]="'primary'">help_outline</mat-icon>
                             <span matSuffix [innerHTML]="getMoreRuinInfoFn(configuration_form.get('ruin')?.value)"></span>

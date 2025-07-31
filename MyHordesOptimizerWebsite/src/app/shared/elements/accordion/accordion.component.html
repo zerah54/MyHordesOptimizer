@@ -1,5 +1,5 @@
 <cdk-accordion class="mho-accordion">
-    @for (item of items; track item; let index = $index) {
+    @for (item of items(); track item; let index = $index) {
         <cdk-accordion-item class="mho-accordion-item" [class.expanded]="accordionItem.expanded"
                             #accordionItem="cdkAccordionItem" role="button" tabindex="0"
                             [attr.id]="'accordion-header-' + index" [attr.aria-expanded]="accordionItem.expanded"

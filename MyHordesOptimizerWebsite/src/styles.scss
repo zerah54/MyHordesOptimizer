@@ -41,23 +41,23 @@ a {
 
 .mat-mdc-snack-bar-container {
     &.snackbar-success {
-        --mdc-snackbar-container-color: darkseagreen !important;
-        --mdc-snackbar-supporting-text-color: black !important;
+        --mat-snackbar-container-color: darkseagreen !important;
+        --mat-snackbar-supporting-text-color: black !important;
     }
 
     &.snackbar-warning {
-        --mdc-snackbar-container-color: coral !important;
-        --mdc-snackbar-supporting-text-color: black !important;
+        --mat-snackbar-container-color: coral !important;
+        --mat-snackbar-supporting-text-color: black !important;
     }
 
     &.snackbar-error {
-        --mdc-snackbar-container-color: firebrick !important;
-        --mdc-snackbar-supporting-text-color: black !important;
+        --mat-snackbar-container-color: firebrick !important;
+        --mat-snackbar-supporting-text-color: black !important;
     }
 
     &.snackbar-information {
-        --mdc-snackbar-container-color: cadetblue !important;
-        --mdc-snackbar-supporting-text-color: black !important;
+        --mat-snackbar-container-color: cadetblue !important;
+        --mat-snackbar-supporting-text-color: black !important;
     }
 }
 
@@ -92,11 +92,17 @@ a {
 }
 
 .mat-button-toggle-group {
-    --mat-standard-button-toggle-divider-color: #{variables.$primary};
-    --mat-standard-button-toggle-background-color: variables.$card-background-color;
-    --mat-standard-button-toggle-height: 42px;
+    --mat-button-toggle-divider-color: #{variables.$primary};
+    --mat-button-toggle-background-color: variables.$card-background-color;
+    --mat-button-toggle-height: 42px;
 
     .mat-button-toggle-checked {
         background-color: variables.$item_color !important;
     }
+}
+
+.defered-cell {
+    width: 100%;
+    height: 1em;
+    background-color: rgba(0, 0, 0, 0.25);
 }

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, HostBinding, HostListener, inject, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, ElementRef, HostListener, inject, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatExpansionModule } from '@angular/material/expansion';
@@ -9,9 +9,8 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSlideToggle } from '@angular/material/slide-toggle';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { ChartConfiguration, ChartEvent, LegendElement } from 'chart.js';
+import { ChartConfiguration, ChartEvent, LegendElement, ChartDataset, LegendItem } from 'chart.js';
 import Chart from 'chart.js/auto';
-import { ChartDataset, LegendItem } from 'chart.js/dist/types';
 import { Color } from 'chartjs-plugin-datalabels/types/options';
 import { PLANIF_VALUES, TDG_VALUES } from '../../../_abstract_model/const';
 import { MinMax } from '../../../_abstract_model/interfaces';
@@ -37,10 +36,10 @@ const material_modules: Imports = [MatButtonModule, MatExpansionModule, MatFormF
     templateUrl: './estimations.component.html',
     styleUrls: ['./estimations.component.scss'],
     encapsulation: ViewEncapsulation.None,
+    host: {style: 'display: contents'},
     imports: [...angular_common, ...components, ...material_modules, ...pipes, MatSlideToggle]
 })
 export class EstimationsComponent implements OnInit {
-    @HostBinding('style.display') display: string = 'contents';
 
     @HostListener('window:resize', ['$event'])
     onResize(): void {

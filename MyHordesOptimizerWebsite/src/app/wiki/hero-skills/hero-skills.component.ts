@@ -1,18 +1,17 @@
 import { CommonModule, NgOptimizedImage } from '@angular/common';
-import { Component, HostBinding, OnInit } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatSortModule } from '@angular/material/sort';
 import { MatTableModule } from '@angular/material/table';
 import moment from 'moment';
-import { Subject, takeUntil } from 'rxjs';
 import { HORDES_IMG_REPO } from '../../_abstract_model/const';
 import { StandardColumn } from '../../_abstract_model/interfaces';
 import { ApiService } from '../../_abstract_model/services/api.service';
 import { Imports } from '../../_abstract_model/types/_types';
 import { HeroSkill } from '../../_abstract_model/types/hero-skill.class';
-import { AutoDestroy } from '../../shared/decorators/autodestroy.decorator';
 import { NewHeroSkill, skills } from './temp-hero-skills.const';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 const angular_common: Imports = [CommonModule, NgOptimizedImage];
 const components: Imports = [];
@@ -23,13 +22,13 @@ const material_modules: Imports = [MatCardModule, MatSortModule, MatTableModule,
     selector: 'mho-hero-skills',
     templateUrl: './hero-skills.component.html',
     styleUrls: ['./hero-skills.component.scss'],
+    host: { style: 'display: contents' },
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class HeroSkillsComponent implements OnInit {
-    @HostBinding('style.display') display: string = 'contents';
 
     /** Le dossier dans lequel sont stockées les images */
-    public HORDES_IMG_REPO: string = HORDES_IMG_REPO;
+    public readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
     /** La locale */
     public readonly locale: string = moment.locale();
 
@@ -45,15 +44,12 @@ export class HeroSkillsComponent implements OnInit {
         {id: 'description', header: $localize`Description`}
     ];
 
-    @AutoDestroy private destroy_sub: Subject<void> = new Subject();
-
-    constructor(private api: ApiService) {
-
-    }
+    private readonly api: ApiService = inject(ApiService);
+    private readonly destroy_ref: DestroyRef = inject(DestroyRef);
 
     ngOnInit(): void {
         this.api.getHeroSkill()
-            .pipe(takeUntil(this.destroy_sub))
+            .pipe(takeUntilDestroyed(this.destroy_ref))
             .subscribe((old_hero_skills: HeroSkill[]) => {
                 this.old_hero_skills = [...old_hero_skills];
             });

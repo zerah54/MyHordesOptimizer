@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, EventEmitter, HostBinding, Input, Output, ViewChild } from '@angular/core';
+import { Component, ElementRef, output, OutputEmitterRef, ViewChild, InputSignal, input } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
@@ -15,18 +15,18 @@ const material_modules: Imports = [MatFormFieldModule, MatIconModule, MatInputMo
     selector: 'mho-header-with-number-filter',
     templateUrl: './header-with-number-filter.component.html',
     styleUrls: ['./header-with-number-filter.component.scss'],
+    host: {style: 'display: contents'},
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class HeaderWithNumberFilterComponent {
-    @HostBinding('style.display') display: string = 'contents';
 
     @ViewChild('filter') filter!: ElementRef<HTMLInputElement>;
 
-    @Input() header!: string;
-    @Input() textAlign?: string = 'left';
+    public header: InputSignal<string> = input.required();
+    public textAlign: InputSignal<string> = input('left');
 
-    @Input() filterValue!: number | string;
-    @Output() filterValueChange: EventEmitter<number | string> = new EventEmitter<number | string>();
+    public filterValue: InputSignal<number | string> = input.required();
+    public filterValueChange: OutputEmitterRef<number | string> = output();
 
 
     public visible: boolean = false;
@@ -41,7 +41,7 @@ export class HeaderWithNumberFilterComponent {
 
     /** Vérifie si le filtre doit toujours être affiché */
     public checkVisibility(): void {
-        this.visible = this.filterValue !== '' && this.filterValue !== null && this.filterValue !== undefined;
+        this.visible = this.filterValue() !== '' && this.filterValue() !== null && this.filterValue() !== undefined;
     }
 }
 

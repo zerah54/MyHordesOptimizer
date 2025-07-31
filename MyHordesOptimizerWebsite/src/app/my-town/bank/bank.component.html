@@ -9,17 +9,17 @@
             <mat-form-field class="properties-filter">
                 <mat-label i18n>Chercher des objets par propriétés</mat-label>
                 <mho-select multiple [options]="options" [bindLabel]="'value.label'" [(ngModel)]="select_value"
-                            (filterChange)="applyFilters()">
+                            (filterChange)="applyFilters()" searchable chips>
                 </mho-select>
             </mat-form-field>
         </div>
         @if (!condensed_display) {
             <ul>
-                @for (category of (displayed_bank_items | itemsGroupByCategory); track category.category.id_category) {
+                @for (category of (displayed_bank_items | itemsGroupByCategory); track $index) {
                     <div class="category">
                         <h2>{{ category.category.label[locale] }}</h2>
                         <div class="items">
-                            @for (bank_item of category.items; track bank_item.id) {
+                            @for (bank_item of category.items; track $index) {
                                 <mho-item [item]="bank_item"></mho-item>
                             }
                         </div>
@@ -29,11 +29,11 @@
         } @else {
             <div class="condensed">
                 <div class="bank">
-                    @for (category of (displayed_bank_items | itemsGroupByCategory:'id'); track category.category.id_category) {
+                    @for (category of (displayed_bank_items | itemsGroupByCategory:'id'); track $index) {
                         <div class="category">
                             <h2>{{ category.category.label[locale] }}</h2>
                             <ul class="items">
-                                @for (bank_item of category.items; track bank_item.id) {
+                                @for (bank_item of category.items; track $index) {
                                     <li class="item" (click)="detailed_item = bank_item"
                                         [class.broken]="bank_item.is_broken" [matTooltip]="bank_item.label[locale]">
                                         <img class="item-icon" [ngSrc]="HORDES_IMG_REPO + bank_item.img" width="16" height="16">

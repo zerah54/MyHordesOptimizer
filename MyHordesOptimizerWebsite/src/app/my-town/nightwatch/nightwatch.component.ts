@@ -1,4 +1,4 @@
-import { Component, HostBinding } from '@angular/core';
+import { Component } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { Imports } from '../../_abstract_model/types/_types';
 
@@ -11,8 +11,8 @@ const material_modules: Imports = [MatCardModule];
     selector: 'mho-nightwatch',
     templateUrl: './nightwatch.component.html',
     styleUrls: ['./nightwatch.component.scss'],
+    host: {style: 'display: contents'},
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class NightwatchComponent {
-    @HostBinding('style.display') display: string = 'contents';
 }

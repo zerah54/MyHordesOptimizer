@@ -1,5 +1,5 @@
 import { CommonModule, formatNumber } from '@angular/common';
-import { Component, HostBinding, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckbox } from '@angular/material/checkbox';
@@ -24,10 +24,10 @@ const material_modules: Imports = [MatButtonModule, MatDialogModule, MatFormFiel
     selector: 'mho-max-active-calculator',
     templateUrl: './max-active-calculator.component.html',
     styleUrls: ['./max-active-calculator.component.scss'],
+    host: {style: 'display: contents'},
     imports: [...angular_common, ...components, ...material_modules, ...pipes, MatCheckbox],
 })
 export class MaxActiveCalculatorComponent implements OnInit {
-    @HostBinding('style.display') display: string = 'contents';
 
     public readonly locale: string = moment.locale();
 

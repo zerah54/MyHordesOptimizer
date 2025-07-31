@@ -2,13 +2,13 @@
     <div class="mho-citizens-immune">
         <div class="filters">
             <mat-form-field [appearance]="'outline'" class="no-bottom compact-field">
-                <mho-select [options]="all_citizens_job" [searchable]="false"
+                <mho-select [options]="all_citizens_job"
                             multiple
                             [class]="'job-select'"
                             [bindLabel]="'value.label'"
                             [bindIcon]="'value.img'"
                             [(ngModel)]="filters.jobs"
-                            (ngModelChange)="changeFilters()"></mho-select>
+                            (ngModelChange)="changeFilters()" chips></mho-select>
             </mat-form-field>
 
         </div>
@@ -18,7 +18,7 @@
                     <h3>{{ state.label }}</h3>
                     <div>
                         @for (citizen of state.citizen; track citizen.id; let i_citizen = $index) {
-                            <mho-citizen-info [displayJob]="true" [displayShunStatus]="true" [displayPseudoMode]="'simple'"
+                            <mho-citizen-info displayJob displayShunStatus [displayPseudoMode]="'simple'"
                                               [citizen]="citizen"></mho-citizen-info>
                             @if (i_citizen < state.citizen.length - 1) {
                                 <span>,&nbsp;</span>

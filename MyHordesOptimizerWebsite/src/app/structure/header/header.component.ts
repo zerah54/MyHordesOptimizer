@@ -1,6 +1,6 @@
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { CommonModule, NgOptimizedImage } from '@angular/common';
-import { Component, EventEmitter, HostBinding, HostListener, inject, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, DestroyRef, HostListener, inject, OnInit, output, OutputEmitterRef, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDividerModule } from '@angular/material/divider';
@@ -12,17 +12,17 @@ import { MatToolbar, MatToolbarModule } from '@angular/material/toolbar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { Title } from '@angular/platform-browser';
 import { Router } from '@angular/router';
-import { skip, Subject, takeUntil } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { BREAKPOINTS } from '../../_abstract_model/const';
 import { AuthenticationService } from '../../_abstract_model/services/authentication.service';
 import { TownService } from '../../_abstract_model/services/town.service';
 import { Imports } from '../../_abstract_model/types/_types';
 import { Me } from '../../_abstract_model/types/me.class';
-import { AutoDestroy } from '../../shared/decorators/autodestroy.decorator';
 import { getExternalAppId, getTown, getUser, setExternalAppId, setTokenWithMeWithExpirationDate } from '../../shared/utilities/localstorage.util';
 import { CitizenMenuComponent } from './citizen-menu/citizen-menu.component';
 import { HeaderService } from './header.service';
+import { skip } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 const angular_common: Imports = [CommonModule, NgOptimizedImage, FormsModule];
 const components: Imports = [CitizenMenuComponent];
@@ -33,14 +33,14 @@ const material_modules: Imports = [MatButtonModule, MatDividerModule, MatFormFie
     selector: 'mho-header',
     templateUrl: './header.component.html',
     styleUrls: ['./header.component.scss'],
+    host: {style: 'display: contents'},
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class HeaderComponent implements OnInit {
-    @HostBinding('style.display') display: string = 'contents';
 
     @ViewChild(MatToolbar) mat_toolbar!: MatToolbar;
 
-    @Output() changeSidenavStatus: EventEmitter<void> = new EventEmitter();
+    public changeSidenavStatus: OutputEmitterRef<void> = output();
 
     /** Le titre de l'application */
     public title: string = '';
@@ -59,12 +59,11 @@ export class HeaderComponent implements OnInit {
 
     public is_gt_xs: boolean = this.breakpoint_observer.isMatched(BREAKPOINTS['gt-xs']);
 
-    private title_service: Title = inject(Title);
-    private authentication_api: AuthenticationService = inject(AuthenticationService);
-    private town_service: TownService = inject(TownService);
-    private header_service: HeaderService = inject(HeaderService);
-
-    @AutoDestroy private destroy_sub: Subject<void> = new Subject();
+    private readonly title_service: Title = inject(Title);
+    private readonly authentication_api: AuthenticationService = inject(AuthenticationService);
+    private readonly town_service: TownService = inject(TownService);
+    private readonly header_service: HeaderService = inject(HeaderService);
+    private readonly destroy_ref: DestroyRef = inject(DestroyRef);
 
     @HostListener('window:resize', ['$event'])
     onResize(): void {
@@ -106,7 +105,7 @@ export class HeaderComponent implements OnInit {
 
     private updateMe(): void {
         this.authentication_api.getMe(true)
-            .pipe(takeUntil(this.destroy_sub))
+            .pipe(takeUntilDestroyed(this.destroy_ref))
             .subscribe(() => {
                 this.me = getUser();
                 this.external_app_id_field_value = null;

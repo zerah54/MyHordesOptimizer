@@ -1,5 +1,5 @@
-import { CommonModule, DOCUMENT, NgClass, NgTemplateOutlet } from '@angular/common';
-import { Component, HostBinding, inject, Inject, Input, LOCALE_ID, OnInit, ViewEncapsulation } from '@angular/core';
+import { CommonModule, NgClass, NgTemplateOutlet } from '@angular/common';
+import { Component, inject, Inject, LOCALE_ID, OnInit, ViewEncapsulation, DOCUMENT, model, ModelSignal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
@@ -26,12 +26,11 @@ const material_modules: Imports = [ MatButtonModule, MatDividerModule, MatIconMo
     templateUrl: './menu.component.html',
     styleUrls: [ './menu.component.scss' ],
     encapsulation: ViewEncapsulation.None,
+    host: {style: 'display: contents'},
     imports: [ ...angular_common, ...components, ...material_modules, ...pipes ]
 })
 export class MenuComponent implements OnInit {
-    @HostBinding('style.display') display: string = 'contents';
-
-    @Input({ required: true }) sidenavContainer!: MatSidenavContainer;
+    public sidenavContainer: ModelSignal<MatSidenavContainer> = model.required();
 
     public charts_theming_service: ChartsThemingService = inject(ChartsThemingService);
 
@@ -275,9 +274,11 @@ export class MenuComponent implements OnInit {
     }
 
     private resizeSidenav(): void {
-        this.sidenavContainer.autosize = true;
+        const sidenavContainer: MatSidenavContainer = this.sidenavContainer();
+        sidenavContainer.autosize = true;
+        this.sidenavContainer.set(sidenavContainer)
         setTimeout((): void => {
-            this.sidenavContainer.autosize = true;
+            this.sidenavContainer.set(sidenavContainer)
         });
     }
 

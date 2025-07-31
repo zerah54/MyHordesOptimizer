@@ -1,17 +1,17 @@
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { OverlayContainer } from '@angular/cdk/overlay';
 import { CommonModule, NgClass, NgOptimizedImage } from '@angular/common';
-import { Component, HostBinding, HostListener, inject, Inject, LOCALE_ID, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, DestroyRef, HostListener, inject, Inject, LOCALE_ID, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSidenavContainer, MatSidenavModule } from '@angular/material/sidenav';
 import { Event, NavigationCancel, NavigationEnd, NavigationSkipped, NavigationStart, Router, RouterOutlet } from '@angular/router';
 import moment from 'moment';
-import { filter, Subject, takeUntil } from 'rxjs';
+import { filter } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { BREAKPOINTS } from './_abstract_model/const';
 import { AuthenticationService } from './_abstract_model/services/authentication.service';
 import { Imports } from './_abstract_model/types/_types';
-import { AutoDestroy } from './shared/decorators/autodestroy.decorator';
 import { LoadingOverlayService } from './shared/services/loading-overlay.service';
 import { FooterComponent } from './structure/footer/footer.component';
 import { HeaderComponent } from './structure/header/header.component';
@@ -27,10 +27,10 @@ const material_modules: Imports = [MatCardModule, MatProgressSpinnerModule, MatS
     templateUrl: './app.component.html',
     styleUrls: ['./app.component.scss'],
     encapsulation: ViewEncapsulation.None,
+    host: {style: 'display: contents'},
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class AppComponent implements OnInit {
-    @HostBinding('style.display') display: string = 'contents';
 
     @ViewChild('sidenavContainer') sidenav_container!: MatSidenavContainer;
 
@@ -41,8 +41,7 @@ export class AppComponent implements OnInit {
 
     private loading_service: LoadingOverlayService = inject(LoadingOverlayService);
     private authentication_api: AuthenticationService = inject(AuthenticationService);
-
-    @AutoDestroy private destroy_sub: Subject<void> = new Subject();
+    private readonly destroy_ref: DestroyRef = inject(DestroyRef);
 
     @HostListener('window:resize', ['$event'])
     onResize(): void {
@@ -57,7 +56,7 @@ export class AppComponent implements OnInit {
     public ngOnInit(): void {
 
         this.loading_service.is_loading_obs
-            .pipe(takeUntil(this.destroy_sub))
+            .pipe(takeUntilDestroyed(this.destroy_ref))
             .subscribe({
                 next: (is_loading: boolean) => {
                     this.is_loading = is_loading;
@@ -76,7 +75,7 @@ export class AppComponent implements OnInit {
         this.loaderOnRouting();
 
         this.authentication_api.getMe()
-            .pipe(takeUntil(this.destroy_sub))
+            .pipe(takeUntilDestroyed(this.destroy_ref))
             .subscribe({
                 next: () => {
                     this.ready = true;
@@ -92,7 +91,7 @@ export class AppComponent implements OnInit {
 
     private loaderOnRouting(): void {
         this.router.events
-            .pipe(filter((event: Event) => event instanceof NavigationStart || event instanceof NavigationEnd || event instanceof NavigationCancel || event instanceof NavigationSkipped), takeUntil(this.destroy_sub))
+            .pipe(filter((event: Event) => event instanceof NavigationStart || event instanceof NavigationEnd || event instanceof NavigationCancel || event instanceof NavigationSkipped), takeUntilDestroyed(this.destroy_ref))
             .subscribe((event: Event) => {
                 this.loading_service.setLoading(event instanceof NavigationStart);
             });

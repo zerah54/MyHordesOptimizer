@@ -1,5 +1,5 @@
-import { DOCUMENT } from '@angular/common';
-import { Component, HostBinding, Inject } from '@angular/core';
+
+import { Component, Inject, DOCUMENT } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
@@ -18,10 +18,10 @@ const material_modules: Imports = [MatButtonModule, MatCardModule, MatIconModule
     selector: 'mho-tuto-script-installation',
     templateUrl: './tuto-script-installation.component.html',
     styleUrls: ['./tuto-script-installation.component.scss'],
+    host: {style: 'display: contents'},
     imports: [...angular_common, ...components, ...material_modules, ...pipes],
 })
 export class TutoScriptInstallationComponent {
-    @HostBinding('style.display') display: string = 'contents';
 
     public readonly title: string = $localize`Script / Extension`;
     public readonly download_link: string = $localize`<a href="https://github.com/zerah54/MyHordesOptimizer/raw/main/Scripts/Tampermonkey/my_hordes_optimizer.user.js" target="_blank">lien de téléchargement du script</a>`;

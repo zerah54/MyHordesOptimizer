@@ -1,6 +1,6 @@
 <div class="mho-header-with-filter">
-    <div [style.text-align]="textAlign">
-        {{ header }}
+    <div [style.text-align]="textAlign()">
+        {{ header() }}
 
         @if (!visible) {
             <mat-icon class="open-menu-icon" (click)="$event.preventDefault(); $event.stopPropagation(); displayFilter();">
@@ -11,20 +11,20 @@
 
     @if (visible) {
         <mat-form-field (click)="$event.stopPropagation();" class="short-bottom">
-            @if (displayFirstLast) {
-                <button mat-icon-button type="button" matPrefix [disabled]="filterValue === min" (click)="filterValueChange.next(min)">
+            @if (displayFirstLast()) {
+                <button mat-icon-button type="button" matPrefix [disabled]="filterValue() === min()" (click)="filterValueChange.emit(min())">
                     <mat-icon>first_page</mat-icon>
                 </button>
             }
-            <button mat-icon-button type="button" matPrefix [disabled]="filterValue === min" (click)="filterValueChange.next(+filterValue - 1)">
+            <button mat-icon-button type="button" matPrefix [disabled]="filterValue() === min()" (click)="filterValueChange.emit(+filterValue() - 1)">
                 <mat-icon>arrow_back_ios</mat-icon>
             </button>
-            <input matInput type="number" [ngModel]="filterValue" (ngModelChange)="filterValueChange.next($event)" [min]="min" [max]="max">
-            <button mat-icon-button type="button" matSuffix [disabled]="filterValue === max" (click)="filterValueChange.next(+filterValue + 1)">
+            <input matInput type="number" [ngModel]="filterValue()" (ngModelChange)="filterValueChange.emit($event)" [min]="min()" [max]="max()">
+            <button mat-icon-button type="button" matSuffix [disabled]="filterValue() === max()" (click)="filterValueChange.emit(+filterValue() + 1)">
                 <mat-icon>arrow_forward_ios</mat-icon>
             </button>
-            @if (displayFirstLast) {
-                <button mat-icon-button type="button" matSuffix [disabled]="filterValue === max" (click)="filterValueChange.next(max)">
+            @if (displayFirstLast()) {
+                <button mat-icon-button type="button" matSuffix [disabled]="filterValue() === max()" (click)="filterValueChange.emit(max())">
                     <mat-icon>last_page</mat-icon>
                 </button>
             }

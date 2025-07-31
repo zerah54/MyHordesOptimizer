@@ -1,10 +1,10 @@
-@if (citizens) {
+@if (citizens()) {
     <div class="mho-map-update-citizens">
         <table>
             <thead>
             <tr>
                 <th>
-                    @if ((allCitizens | notInListCitizen:citizens).length > 0) {
+                    @if ((allCitizens() | notInListCitizen:citizens()).length > 0) {
                         <button mat-button type="button" [matMenuTriggerFor]="addCitizenMenu" i18n>Ajouter un citoyen</button>
                     }
                 </th>
@@ -15,10 +15,10 @@
             </tr>
             </thead>
             <tbody>
-                @for (citizen of citizens; track citizen.id) {
+                @for (citizen of citizens(); track citizen.id) {
                     <tr>
                         <th class="name">
-                            <mho-citizen-info [displayJob]="true" [displayShunStatus]="true" [displayPseudoMode]="'simple'"
+                            <mho-citizen-info displayJob displayShunStatus [displayPseudoMode]="'simple'"
                                               [citizen]="citizen"></mho-citizen-info>
                         </th>
                         <td class="bag">
@@ -44,9 +44,9 @@
 
         <mat-menu #addCitizenMenu="matMenu">
             <mat-list class="mho-add-citizen-list" style="max-height: 300px">
-                @for (citizen of (allCitizens | notInListCitizen:citizens); track citizen.id) {
+                @for (citizen of (allCitizens() | notInListCitizen:citizens()); track citizen.id) {
                     <mat-list-item (click)="addCitizen(citizen)">
-                        <mho-citizen-info [displayJob]="true" [displayShunStatus]="true" [displayPseudoMode]="'simple'"
+                        <mho-citizen-info displayJob displayShunStatus [displayPseudoMode]="'simple'"
                                           [citizen]="citizen"></mho-citizen-info>
                     </mat-list-item>
                 }

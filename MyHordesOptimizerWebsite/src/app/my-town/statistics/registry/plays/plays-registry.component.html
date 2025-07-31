@@ -13,18 +13,18 @@
     <div class="plays-dices-cards">
         <div class="citizen-plays">
             <h4 i18n>Ont joué</h4>
-            @for (citizen of entries_by_type | isCitizenInEntries:completeCitizenList; track citizen) {
+            @for (citizen of entries_by_type | isCitizenInEntries:completeCitizenList(); track citizen) {
                 <div>
-                    <mho-citizen-info [displayJob]="false" [displayShunStatus]="true" [displayPseudoMode]="displayPseudo"
+                    <mho-citizen-info displayShunStatus [displayPseudoMode]="displayPseudo()"
                                       [citizen]="citizen"></mho-citizen-info>
                 </div>
             }
         </div>
         <div class="citizen-doesnt-play">
             <h4 i18n>N'ont pas joué</h4>
-            @for (citizen of entries_by_type | isCitizenInEntries:completeCitizenList:true; track citizen) {
+            @for (citizen of entries_by_type | isCitizenInEntries:completeCitizenList():true; track citizen) {
                 <div>
-                    <mho-citizen-info [displayJob]="false" [displayShunStatus]="true" [displayPseudoMode]="displayPseudo"
+                    <mho-citizen-info displayShunStatus [displayPseudoMode]="displayPseudo()"
                                       [citizen]="citizen"></mho-citizen-info>
                 </div>
             }

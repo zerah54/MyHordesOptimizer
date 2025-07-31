@@ -1,6 +1,6 @@
 <div class="mho-active-citizens">
-    @for (citizen of citizenList; track citizen; let i = $index) {
-        @if ((citizen | citizenFromId:completeCitizenList); as complete_citizen) {
+    @for (citizen of citizenList(); track citizen; let i = $index) {
+        @if ((citizen | citizenFromId:completeCitizenList()); as complete_citizen) {
             <div class="citizen-avatar" [matTooltip]="complete_citizen.name"> <!--  [style.left.px]="i * -10" -->
                 <mho-avatar [src]="complete_citizen.avatar" rounded></mho-avatar>
             </div>

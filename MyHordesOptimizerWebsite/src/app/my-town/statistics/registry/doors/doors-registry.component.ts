@@ -1,4 +1,4 @@
-import { Component, ElementRef, HostBinding, Input, ViewChild, ViewEncapsulation, input } from '@angular/core';
+import { Component, ElementRef, input, Input, ViewChild, ViewEncapsulation, InputSignal } from '@angular/core';
 import { Scale, TooltipItem } from 'chart.js';
 import Chart from 'chart.js/auto';
 import moment from 'moment';
@@ -10,15 +10,15 @@ import { Citizen } from '../../../../_abstract_model/types/citizen.class';
     selector: 'mho-registry-doors',
     templateUrl: './doors-registry.component.html',
     styleUrls: ['./doors-registry.component.scss'],
-    encapsulation: ViewEncapsulation.None
+    encapsulation: ViewEncapsulation.None,
+    host: {style: 'display: contents'},
 })
 export class DoorsRegistryComponent {
-    @HostBinding('style.display') display: string = 'contents';
 
     @ViewChild('doorsCanvas') doors_canvas!: ElementRef;
 
-    readonly completeCitizenList = input.required<CitizenInfo>();
-    readonly displayPseudo = input.required<DisplayPseudoMode>();
+    public completeCitizenList: InputSignal<CitizenInfo> = input.required();
+    public displayPseudo: InputSignal<DisplayPseudoMode> = input.required();
 
     // TODO: Skipped for migration because:
     //  Accessor inputs cannot be migrated as they are too complex.

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, HostBinding, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -20,10 +20,10 @@ const material_modules: Imports = [MatCardModule, MatFormFieldModule];
     selector: 'mho-irl',
     templateUrl: './irl.component.html',
     styleUrls: ['./irl.component.scss'],
+    host: {style: 'display: contents'},
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class IrlComponent implements OnInit {
-    @HostBinding('style.display') display: string = 'contents';
 
     @ViewChild('hordiens', {static: true}) container!: ElementRef;
 
