@@ -310,6 +310,7 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
 
             DbContext.Database.ExecuteSqlRaw("DELETE FROM RecipeItemComponent");
             DbContext.Database.ExecuteSqlRaw("DELETE FROM RecipeItemResult");
+
             foreach (var kvp in codeItemRecipes)
             {
                 var recipeName = kvp.Key;
@@ -337,7 +338,7 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
                             var uid = @object as string;
                             results.Add(new RecipeItemResult()
                             {
-                                IdItem = mhoItems.Where(i => i.Uid == uid).Select(i => i.IdItem).First(),
+                                IdItem = existingItems.Where(i => i.Uid == uid).Select(i => i.IdItem).First(),
                                 Probability = 1,
                                 Weight = 0,
                                 RecipeName = recipeName
@@ -351,7 +352,7 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
                             totalWeight += weight;
                             results.Add(new RecipeItemResult()
                             {
-                                IdItem = mhoItems.Where(i => i.Uid == uid).Select(i => i.IdItem).First(),
+                                IdItem = existingItems.Where(i => i.Uid == uid).Select(i => i.IdItem).First(),
                                 Weight = weight,
                                 RecipeName = recipeName
                             });
@@ -360,6 +361,7 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
                     results.ForEach(x => { if (x.Probability != 1) x.Probability = (float)x.Weight / totalWeight; });
                     //MyHordesOptimizerRepository.PatchRecipeResults(results);
                     DbContext.RecipeItemResults.AddRange(results);
+                    DbContext.SaveChanges();
                 }
                 catch (Exception e)
                 {

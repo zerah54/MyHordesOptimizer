@@ -4,7 +4,6 @@ using MyHordesOptimizerApi.Data.Camping;
 using MyHordesOptimizerApi.Data.CauseOfDeath;
 using MyHordesOptimizerApi.Data.Heroes;
 using MyHordesOptimizerApi.Data.Items;
-using MyHordesOptimizerApi.Data.Wishlist;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Camping;
 using MyHordesOptimizerApi.Extensions;
 using MyHordesOptimizerApi.Models;
@@ -68,7 +67,7 @@ namespace MyHordesOptimizerApi.MappingProfiles
                 .ForMember(dest => dest.ActionFr, opt => opt.Ignore())
                 .ForMember(dest => dest.ActionEs, opt => opt.Ignore())
                 .ForMember(dest => dest.ActionEn, opt => opt.Ignore())
-                .ForMember(dest => dest.ProvokingItem, opt => opt.MapFrom((codeModel, recipe, srcMember, context) =>
+                .ForMember(dest => dest.ProvokingItemId, opt => opt.MapFrom((codeModel, recipe, srcMember, context) =>
                 {
                     Item provokingItem = null;
                     var provokingUid = codeModel.Value.Provoking;
@@ -76,10 +75,11 @@ namespace MyHordesOptimizerApi.MappingProfiles
                     {
                         var dbContext = context.GetDbContext();
                         provokingItem = dbContext.Items.AsNoTracking()
-                        .First(x => x.Uid == provokingUid);
+                                                       .First(x => x.Uid == provokingUid);
                     }
-                    return provokingItem;
-                }));
+                    return provokingItem?.IdItem;
+                }))
+                .ForMember(dest => dest.ProvokingItem, opt => opt.Ignore());
 
 
             CreateMap<MyHordesCampingBonusModel, CampingBonusDto>()

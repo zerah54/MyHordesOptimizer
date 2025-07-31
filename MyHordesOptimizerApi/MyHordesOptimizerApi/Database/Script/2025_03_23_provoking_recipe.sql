@@ -20,3 +20,21 @@ SELECT r.name AS recipeName
   FROM Recipe r
   LEFT JOIN RecipeItemComponent ric ON r.name = ric.recipeName
   LEFT JOIN RecipeItemResult rir ON r.name = rir.recipeName;
+
+
+ALTER TABLE ItemProperty
+drop CONSTRAINT ItemProperty_ibfk_2;
+ALTER TABLE ItemProperty
+ADD CONSTRAINT ItemProperty_ibfk_2
+    FOREIGN KEY (propertyName)
+    REFERENCES Property(name)
+    ON DELETE CASCADE;
+
+ALTER TABLE ItemAction
+drop CONSTRAINT ItemAction_ibfk_2;
+ALTER TABLE ItemAction
+ADD CONSTRAINT ItemAction_ibfk_2
+    FOREIGN KEY (actionName)
+    REFERENCES Action(name)
+    ON DELETE CASCADE;
+    
