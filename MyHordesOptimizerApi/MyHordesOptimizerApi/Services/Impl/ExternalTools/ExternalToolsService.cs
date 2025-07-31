@@ -10,6 +10,7 @@ using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Citizens;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.Bags;
+using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.FataMorgana;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.GestHordes;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.HeroicAction;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.Map;
@@ -117,7 +118,10 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                         if(isCell)
                         {
                             var cell = updateRequestDto.Map?.Cell;
-                            await FataMorganaRepository.UpdateAsync(chaosX: cell.X, chaosY: cell.Y, deadZombie: cell.DeadZombies);
+                            var fataRequestDto = Mapper.Map<FataMorganaUpdateRequestDto>(updateRequestDto);
+                            fataRequestDto.UserId = UserInfoProvider.UserId;
+                            fataRequestDto.UserKey = UserInfoProvider.UserKey;
+                            await FataMorganaRepository.UpdateAsync(fataRequestDto);
                         }
                         else
                         {

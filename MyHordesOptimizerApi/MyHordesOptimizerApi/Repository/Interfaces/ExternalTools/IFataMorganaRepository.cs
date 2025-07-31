@@ -1,10 +1,11 @@
-﻿using System.Threading.Tasks;
+﻿using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.FataMorgana;
+using System.Threading.Tasks;
 
 namespace MyHordesOptimizerApi.Repository.Interfaces.ExternalTools
 {
     public interface IFataMorganaRepository
     {
-        Task UpdateAsync(int chaosX, int chaosY, int deadZombie);
+        Task UpdateAsync(FataMorganaUpdateRequestDto updateRequestDto);
         Task UpdateAsync();
     }
 }
