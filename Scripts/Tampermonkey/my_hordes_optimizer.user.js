@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MHO Addon
-// @version      1.1.10.1
+// @version      1.1.11.0
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/, rubrique Tutoriels
 // @author       Zerah
 //
@@ -5102,7 +5102,6 @@ function displayAdvancedTooltips(count = 0) {
             return;
         }
 
-
         advanced_tooltips_observer = new MutationObserver((mutations) => {
             mutations.forEach((mutation) => {
                 let tooltip_container = mutation.target;
@@ -9993,9 +9992,9 @@ function updateExternalTools() {
         data.map = {}
         data.map.toolsToUpdate = {
             isBigBrothHordes: mho_parameters && mho_parameters.update_bbh && !is_mh_beta ? 'api' : 'none',
-            isFataMorgana: mho_parameters && mho_parameters.update_fata ? (pageIsDesert() && ((mho_parameters.update_fata_killed_zombies && nb_dead_zombies > 0) || (mho_parameters.update_fata_devastated && mh_user.townDetails?.isChaos)) ? 'cell' : 'api') : 'none',
-            isGestHordes: mho_parameters && mho_parameters.update_gh ? (pageIsDesert() && ((mho_parameters.update_gh_killed_zombies && nb_dead_zombies > 0) || (mho_parameters.update_gh_devastated && mh_user.townDetails?.isChaos)) ? 'cell' : 'api') : 'none',
-            isMyHordesOptimizer: mho_parameters && mho_parameters.update_mho ? (pageIsDesert() && ((mho_parameters.update_mho_killed_zombies && nb_dead_zombies > 0) || (mho_parameters.update_mho_devastated && mh_user.townDetails?.isChaos)) ? 'cell' : 'api') : 'none'
+            isFataMorgana: mho_parameters && mho_parameters.update_fata ? 'api' : 'none',
+            isGestHordes: mho_parameters && mho_parameters.update_gh ? 'api' : 'none',
+            isMyHordesOptimizer: mho_parameters && mho_parameters.update_mho ? 'api' : 'none'
         };
 
         let position = getCurrentPosition();
@@ -10015,6 +10014,17 @@ function updateExternalTools() {
         // Mise à jour en ville chaos
         if (((mho_parameters.update_gh && mho_parameters.update_gh_devastated) || (mho_parameters.update_mho && mho_parameters.update_mho_devastated) || (mho_parameters.update_fata && mho_parameters.update_fata_devastated))
             && pageIsDesert() && mh_user.townDetails?.isChaos) {
+
+            if (mho_parameters.update_gh && mho_parameters.update_gh_devastated) {
+                data.map.toolsToUpdate.isGestHordes = 'cell';
+            }
+            if (mho_parameters.update_mho && mho_parameters.update_mho_devastated) {
+                data.map.toolsToUpdate.isMyHordesOptimizer = 'cell';
+            }
+            if (mho_parameters.update_fata && mho_parameters.update_fata_devastated) {
+                data.map.toolsToUpdate.isFataMorgana = 'cell';
+            }
+
             let objects = Array.from(document.querySelector('.inventory.desert')?.querySelectorAll('li.item') || []).map((desert_item) => {
                 let item = convertImgToItem(desert_item.querySelector('img'));
                 return {id: item?.id, isBroken: desert_item.classList.contains('broken')};
@@ -10043,6 +10053,17 @@ function updateExternalTools() {
                 || (mho_parameters.update_mho && mho_parameters.update_mho_killed_zombies)
                 || (mho_parameters.update_fata && mho_parameters.update_fata_killed_zombies))
             && pageIsDesert() && nb_dead_zombies > 0) {
+
+            if (mho_parameters.update_gh && mho_parameters.update_gh_killed_zombies) {
+                data.map.toolsToUpdate.isGestHordes = 'cell';
+            }
+            if (mho_parameters.update_mho && mho_parameters.update_mho_killed_zombies) {
+                data.map.toolsToUpdate.isMyHordesOptimizer = 'cell';
+            }
+            if (mho_parameters.update_fata && mho_parameters.update_fata_killed_zombies) {
+                data.map.toolsToUpdate.isFataMorgana = 'cell';
+            }
+
             let content = {
                 x: +position[0],
                 y: +position[1],
@@ -10061,7 +10082,15 @@ function updateExternalTools() {
         // Mise à jour des marqueurs issus des métiers
         if (((mho_parameters.update_mho && mho_parameters.update_mho_job_markers)
                 || (mho_parameters.update_fata && mho_parameters.update_fata_job_markers))
-            && pageIsDesert()) {
+            && pageIsDesert() && (mh_user.jobDetails.uid === 'dig' || mh_user.jobDetails.uid === 'vest')) {
+
+            if (mho_parameters.update_mho && mho_parameters.update_mho_job_markers) {
+                data.map.toolsToUpdate.isMyHordesOptimizer = 'cell';
+            }
+            if (mho_parameters.update_fata && mho_parameters.update_fata_job_markers) {
+                data.map.toolsToUpdate.isFataMorgana = 'cell';
+            }
+
             if (mh_user.jobDetails.uid === 'dig') {
                 let content = {
                     x: +position[0],
