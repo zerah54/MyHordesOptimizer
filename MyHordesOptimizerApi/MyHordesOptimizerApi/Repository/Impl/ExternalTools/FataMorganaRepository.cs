@@ -16,13 +16,6 @@ namespace MyHordesOptimizerApi.Repository.Impl.ExternalTools
         protected IUserInfoProvider UserKeyProvider { get; private set; }
         protected IFataMorganaConfiguration FataMorganaConfiguration { get; private set; }
 
-        private string _parameterUserKey = "key";
-        private string _parameterChaosX = "chaosx";
-        private string _parameterChaosY = "chaosy";
-        private string _parameterDeadZombies = "deadzombies";
-
-        private string _endpointMap = "map";
-        private string _endpointUpdateMyZone = "update";
         private string _endpointMho = "mho";
 
         public FataMorganaRepository(ILogger<FataMorganaRepository> logger,
@@ -35,25 +28,10 @@ namespace MyHordesOptimizerApi.Repository.Impl.ExternalTools
             FataMorganaConfiguration = fataMorganaConfiguration;
         }
 
-        public async Task UpdateAsync()
-        {
-            try
-            {
-                var url = AddParameterToQuery($"{FataMorganaConfiguration.Url}/{_endpointUpdateMyZone}", _parameterUserKey, UserKeyProvider.UserKey);
-                var response = base.Post(url: url, body: null);
-            }
-            catch (Exception e)
-            {
-                Logger.LogWarning(e, e.Message);
-                throw;
-            }
-        }
-
         public async Task UpdateAsync(FataMorganaUpdateRequestDto updateRequest)
         {
             try
             {
-                await UpdateAsync();
                 updateRequest.AccessKey = FataMorganaConfiguration.ApiKey;
                 var url = $"{FataMorganaConfiguration.Url}/{_endpointMho}";
                 var response = base.Post(url: url, body: updateRequest);
