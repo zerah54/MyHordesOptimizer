@@ -1,6 +1,7 @@
 ﻿using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.Bags;
 using Newtonsoft.Json;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.Map
 {
@@ -22,5 +23,15 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.Map
         public List<UpdateObjectDto>? Objects { get; set; }
         [JsonProperty("citizenId")]
         public List<int> CitizenId { get; set; }
+
+        [JsonProperty("scavNextCells")]
+        public ScavNextCellsDto? ScavNextCells { get; set; }
+
+        [JsonProperty("scoutNextCells")]
+        public ScoutNextCellsDto? ScoutNextCells { get; set; }
+
+        [JsonProperty("scoutZoneLvl")]
+        [JsonPropertyName("scoutZoneLvl")]
+        public int ScoutZoneLvl { get; set; }
     }
 }

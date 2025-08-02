@@ -3,6 +3,7 @@
     public interface IFataMorganaConfiguration
     {
         public string Url { get; }
+        public string ApiKey { get; }
 
     }
 }

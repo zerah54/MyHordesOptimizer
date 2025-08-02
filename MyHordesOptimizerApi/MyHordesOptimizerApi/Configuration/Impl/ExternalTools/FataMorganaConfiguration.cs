@@ -6,6 +6,7 @@ namespace MyHordesOptimizerApi.Configuration.Impl.ExternalTools
     public class FataMorganaConfiguration : IFataMorganaConfiguration
     {
         public string Url => _configuration.GetValue<string>("Url");
+        public string ApiKey => _configuration.GetValue<string>("ApiKey");
 
         private IConfigurationSection _configuration;
 
