@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MHO Addon
-// @version      1.1.9.0
+// @version      1.1.10.1
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/, rubrique Tutoriels
 // @author       Zerah
 //
@@ -31,7 +31,7 @@
 // ==/UserScript==
 
 const changelog = `${getScriptInfo().name} : Changelog pour la version ${getScriptInfo().version}\n\n`
-    + `[Correctif] Corrige la liste de courses`;
+    + `[Nouveauté] Ajout d'une option pour envoyer les informations issues des métiers (éclaireur, fouineur) à Fata Morgana`;
 
 const lang = (document.querySelector('html[lang]')?.getAttribute('lang') || document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2) || 'fr';
 
@@ -753,32 +753,63 @@ const jobs = [
 ];
 
 const status_list = [
-    { id: "clean", img: "status/status_clean.gif", pdc: 1 }, // Jamais drogué
-    { id: "hasdrunk", img: "status/status_hasdrunk.gif" }, // A bu
-    { id: "haseaten", img: "status/status_haseaten.gif" }, // A mangé
-    { id: "camper", img: "status/status_camper.gif", searches: '+10%' }, // A campé
-    { id: "immune", img: "status/status_immune.gif", watch_death: -0.01 }, // Immunisé
-    { id: "hsurvive", img: "status/status_hsurvive.gif" }, // VLM niveau 1
-    { id: "hsurvive2", img: "status/status_hsurvive2.gif" }, // VLM niveau 2
-    { id: "hsurvive3", img: "status/status_hsurvive3.gif" }, // VLM niveau 3
-    { id: "tired", img: "status/status_tired.gif" }, // Fatigué
-    { id: "terror", img: "status/status_terror.gif", watch_def: -30, watch_death: 0.05 }, // Terrorisé
-    { id: "thirst1", img: "status/status_thirst1.gif", watch_def: -5 }, // Soif
-    { id: "thirst2", img: "status/status_thirst2.gif", watch_def: -10, wath_death: 0.03 }, // Deshy
-    { id: "drugged", img: "status/status_drugged.gif", watch_def: 10 }, // Drogué
-    { id: "addict", img: "status/status_addict.gif", watch_def: 10, watch_death: 0.06 }, // Dépendant
-    { id: "infection", img: "status/status_infection.gif", watch_def: -15, watch_death: 0.1 }, // Infecté
-    { id: "drunk", img: "status/status_drunk.gif", watch_def: 15, watch_death: -0.02, searches: '-20%"' }, // Ivre
-    { id: "hungover", img: "status/status_hungover.gif", watch_def: -15, watch_death: 0.06 }, // Gueule de bois
-    { id: "wound1", img: "status/status_wound1.gif", watch_def: -15, watch_death: 0.10, properties: ['wounded', 'head_wounded'] }, // Blessure à la tête
-    { id: "wound2", img: "status/status_wound2.gif", watch_def: -15, watch_death: 0.10, properties: ['wounded', 'hand_wounded'] }, // Blessure à la main
-    { id: "wound3", img: "status/status_wound3.gif", watch_def: -15, watch_death: 0.10, properties: ['wounded', 'arm_wounded'] }, // Blessure au bras
-    { id: "wound4", img: "status/status_wound4.gif", watch_def: -15, watch_death: 0.10, properties: ['wounded', 'leg_wounded'] }, // Blessure à la jambe
-    { id: "wound5", img: "status/status_wound5.gif", watch_def: -15, watch_death: 0.10, properties: ['wounded'], searches: '/2' }, // Blessure à l'oeil
-    { id: "wound6", img: "status/status_wound6.gif", watch_def: -15, watch_death: 0.10, properties: ['wounded'] }, // Blessure au pied
-    { id: "healed", img: "status/status_healed.gif", watch_def: -15, watch_death: 0.05 }, // Convalescent
-    { id: "hydrated", img: "status/status_hydrated.gif", pdc: 1 }, // Hydraté
-    { id: "sober", img: "status/status_sober.gif", pdc: 1 } // Sobre
+    {id: "clean", img: "status/status_clean.gif", pdc: 1}, // Jamais drogué
+    {id: "hasdrunk", img: "status/status_hasdrunk.gif"}, // A bu
+    {id: "haseaten", img: "status/status_haseaten.gif"}, // A mangé
+    {id: "camper", img: "status/status_camper.gif", searches: '+10%'}, // A campé
+    {id: "immune", img: "status/status_immune.gif", watch_death: -0.01}, // Immunisé
+    {id: "hsurvive", img: "status/status_hsurvive.gif"}, // VLM niveau 1
+    {id: "hsurvive2", img: "status/status_hsurvive2.gif"}, // VLM niveau 2
+    {id: "hsurvive3", img: "status/status_hsurvive3.gif"}, // VLM niveau 3
+    {id: "tired", img: "status/status_tired.gif"}, // Fatigué
+    {id: "terror", img: "status/status_terror.gif", watch_def: -30, watch_death: 0.05}, // Terrorisé
+    {id: "thirst1", img: "status/status_thirst1.gif", watch_def: -5}, // Soif
+    {id: "thirst2", img: "status/status_thirst2.gif", watch_def: -10, wath_death: 0.03}, // Deshy
+    {id: "drugged", img: "status/status_drugged.gif", watch_def: 10}, // Drogué
+    {id: "addict", img: "status/status_addict.gif", watch_def: 10, watch_death: 0.06}, // Dépendant
+    {id: "infection", img: "status/status_infection.gif", watch_def: -15, watch_death: 0.1}, // Infecté
+    {id: "drunk", img: "status/status_drunk.gif", watch_def: 15, watch_death: -0.02, searches: '-20%"'}, // Ivre
+    {id: "hungover", img: "status/status_hungover.gif", watch_def: -15, watch_death: 0.06}, // Gueule de bois
+    {
+        id: "wound1",
+        img: "status/status_wound1.gif",
+        watch_def: -15,
+        watch_death: 0.10,
+        properties: ['wounded', 'head_wounded']
+    }, // Blessure à la tête
+    {
+        id: "wound2",
+        img: "status/status_wound2.gif",
+        watch_def: -15,
+        watch_death: 0.10,
+        properties: ['wounded', 'hand_wounded']
+    }, // Blessure à la main
+    {
+        id: "wound3",
+        img: "status/status_wound3.gif",
+        watch_def: -15,
+        watch_death: 0.10,
+        properties: ['wounded', 'arm_wounded']
+    }, // Blessure au bras
+    {
+        id: "wound4",
+        img: "status/status_wound4.gif",
+        watch_def: -15,
+        watch_death: 0.10,
+        properties: ['wounded', 'leg_wounded']
+    }, // Blessure à la jambe
+    {
+        id: "wound5",
+        img: "status/status_wound5.gif",
+        watch_def: -15,
+        watch_death: 0.10,
+        properties: ['wounded'],
+        searches: '/2'
+    }, // Blessure à l'oeil
+    {id: "wound6", img: "status/status_wound6.gif", watch_def: -15, watch_death: 0.10, properties: ['wounded']}, // Blessure au pied
+    {id: "healed", img: "status/status_healed.gif", watch_def: -15, watch_death: 0.05}, // Convalescent
+    {id: "hydrated", img: "status/status_hydrated.gif", pdc: 1}, // Hydraté
+    {id: "sober", img: "status/status_sober.gif", pdc: 1} // Sobre
 ];
 
 const api_texts = {
@@ -829,18 +860,23 @@ const api_texts = {
 const action_types = [
     {
         id: `Recipe::ManualAnywhere`,
-        label: { en: `Citizen actions`, fr: `Actions du citoyen`, de: `Bürgeraktionen`, es: `Acciones del habitante` },
+        label: {en: `Citizen actions`, fr: `Actions du citoyen`, de: `Bürgeraktionen`, es: `Acciones del habitante`},
         ordering: 1
     },
-    { id: `Recipe::WorkshopType`, label: { en: `Workshop`, fr: `Atelier`, de: `Werkstatt`, es: `Taller` }, ordering: 0 },
+    {id: `Recipe::WorkshopType`, label: {en: `Workshop`, fr: `Atelier`, de: `Werkstatt`, es: `Taller`}, ordering: 0},
     {
         id: `Recipe::WorkshopTypeShamanSpecific`,
-        label: { en: `Workshop - Shaman`, fr: `Atelier - Chaman`, de: `Werkstatt - Schamane`, es: `Taller - Chamán` },
+        label: {en: `Workshop - Shaman`, fr: `Atelier - Chaman`, de: `Werkstatt - Schamane`, es: `Taller - Chamán`},
         ordering: 2
     },
     {
         id: `Recipe::WorkshopTypeTechSpecific`,
-        label: { en: `Technicians Workbench`, fr: `Établi des Techniciens`, de: `Techniker-Werkstatte`, es: `Mesa de Trabajo de Técnicos` },
+        label: {
+            en: `Technicians Workbench`,
+            fr: `Établi des Techniciens`,
+            de: `Techniker-Werkstatte`,
+            es: `Mesa de Trabajo de Técnicos`
+        },
         ordering: 3
     },
 ];
@@ -940,23 +976,23 @@ const wishlist_headers = [
         id: `diff`
     },
     {
-        label: { en: ``, fr: ``, es: ``, de: `` },
+        label: {en: ``, fr: ``, es: ``, de: ``},
         id: 'delete'
     },
 ];
 
 let fill_items_messages_pool = {
     en: [
-        { title: 'Hi', content: ':iloveu:' }
+        {title: 'Hi', content: ':iloveu:'}
     ],
     fr: [
-        { title: 'Coucou', content: ':iloveu:' }
+        {title: 'Coucou', content: ':iloveu:'}
     ],
     de: [
-        { title: 'Hallo', content: ':iloveu:' }
+        {title: 'Hallo', content: ':iloveu:'}
     ],
     es: [
-        { title: 'Hola', content: ':iloveu:' }
+        {title: 'Hola', content: ':iloveu:'}
     ]
 }
 
@@ -1310,15 +1346,15 @@ let params_categories = [
                             es: `Registrar el número de zombis asesinados`
                         },
                     },
-                    // {
-                    //     id: `update_fata_job_markers`,
-                    //     label: {
-                    //         en: `Updates information from job markers`,
-                    //         fr: `Met à jour les informations issues des marqueurs de métiers`,
-                    //         de: `Aktualisiert Informationen von Jobmarkierungen`,
-                    //         es: `Actualiza la información de los marcadores de trabajo.`
-                    //     },
-                    // },
+                    {
+                        id: `update_fata_job_markers`,
+                        label: {
+                            en: `Updates information from job markers`,
+                            fr: `Met à jour les informations issues des marqueurs de métiers`,
+                            de: `Aktualisiert Informationen von Jobmarkierungen`,
+                            es: `Actualiza la información de los marcadores de trabajo.`
+                        },
+                    },
                     {
                         id: `update_fata_devastated`,
                         label: {
@@ -1802,44 +1838,44 @@ let informations = [
 ];
 
 const table_ruins_headers = [
-    { id: 'img', label: { en: ``, fr: ``, de: ``, es: `` }, type: 'th' },
-    { id: 'label', label: { en: `Name`, fr: 'Nom', de: `Name`, es: `Nombre` }, type: 'th' },
+    {id: 'img', label: {en: ``, fr: ``, de: ``, es: ``}, type: 'th'},
+    {id: 'label', label: {en: `Name`, fr: 'Nom', de: `Name`, es: `Nombre`}, type: 'th'},
     {
         id: 'description',
-        label: { en: `Description`, fr: `Description`, de: `Beschreibung`, es: `Descripción` },
+        label: {en: `Description`, fr: `Description`, de: `Beschreibung`, es: `Descripción`},
         type: 'td'
     },
     {
         id: 'minDist',
-        label: { en: `Minimum distance`, fr: `Distance minimum`, de: `Mindestabstand`, es: `Distancia mínima` },
+        label: {en: `Minimum distance`, fr: `Distance minimum`, de: `Mindestabstand`, es: `Distancia mínima`},
         type: 'td'
     },
     {
         id: 'maxDist',
-        label: { en: `Maximum distance`, fr: `Distance maximum`, de: `Maximale Entfernung`, es: `Distancia máxima` },
+        label: {en: `Maximum distance`, fr: `Distance maximum`, de: `Maximale Entfernung`, es: `Distancia máxima`},
         type: 'td'
     },
     {
         id: 'camping',
-        label: { en: `Camping bonus`, fr: `Bonus en camping`, de: `Campingbonus`, es: `Bono de acampada` },
+        label: {en: `Camping bonus`, fr: `Bonus en camping`, de: `Campingbonus`, es: `Bono de acampada`},
         type: 'td'
     },
     {
         id: 'capacity',
-        label: { en: `Capacity`, fr: `Capacité`, de: `Kapazität`, es: `Capacidad` },
+        label: {en: `Capacity`, fr: `Capacité`, de: `Kapazität`, es: `Capacidad`},
         type: 'td'
     },
-    { id: 'drops', label: { en: `Items`, fr: 'Objets', de: `Gegenstände`, es: `Objetos` }, type: 'td' },
+    {id: 'drops', label: {en: `Items`, fr: 'Objets', de: `Gegenstände`, es: `Objetos`}, type: 'td'},
 ];
 
 const added_ruins = [
-    { id: '-1000', camping: 0, label: { en: `None`, fr: `Aucun`, de: `Kein`, es: `Ninguna` } }
+    {id: '-1000', camping: 0, label: {en: `None`, fr: `Aucun`, de: `Kein`, es: `Ninguna`}}
 ];
 
 const town_type = [
-    { id: 'rne', label: { de: 'Kleine Stadt', en: 'Small Town', es: 'Amateur', fr: 'Petite carte' } },
-    { id: 're', label: { de: 'Entfernte Regionen', en: 'Distant Region', es: 'Leyenda', fr: 'Région éloignée' } },
-    { id: 'pande', label: { de: 'Pandämonium', en: 'Pandemonium', es: 'Pandemonio', fr: 'Pandémonium' } }
+    {id: 'rne', label: {de: 'Kleine Stadt', en: 'Small Town', es: 'Amateur', fr: 'Petite carte'}},
+    {id: 're', label: {de: 'Entfernte Regionen', en: 'Distant Region', es: 'Leyenda', fr: 'Région éloignée'}},
+    {id: 'pande', label: {de: 'Pandämonium', en: 'Pandemonium', es: 'Pandemonio', fr: 'Pandémonium'}}
 ];
 
 /////////////////////////////////////////
@@ -2314,7 +2350,13 @@ function getHoveredItem() {
     //             broken = hovered_item_img.parentElement.parentElement.classList.contains('broken');
     //         }
     //     }
-    return { item: hovered_item, broken: broken, li: hovered_item_li, status: hovered_status, alt: hovered_item_img?.alt };
+    return {
+        item: hovered_item,
+        broken: broken,
+        li: hovered_item_li,
+        status: hovered_status,
+        alt: hovered_item_img?.alt
+    };
 }
 
 function getClickedItem(target) {
@@ -2322,7 +2364,7 @@ function getClickedItem(target) {
     if (item_icon) {
         let hovered_item = getItemFromImg(item_icon.querySelector('img').src);
         let broken = item_icon.parentElement.classList.contains('broken');
-        return { item: hovered_item, broken: broken };
+        return {item: hovered_item, broken: broken};
     }
 }
 
@@ -2382,7 +2424,7 @@ function initOptionsWithoutLoginNeeded() {
 }
 
 function updateFetchRequestOptions(options) {
-    const update = { ...options };
+    const update = {...options};
     update.headers = {
         ...update.headers,
         'Mho-Origin': 'script',
@@ -2401,7 +2443,7 @@ function updateFetchRequestOptions(options) {
 }
 
 function updateFetchRequestOptionsWithoutBearer(options) {
-    const update = { ...options };
+    const update = {...options};
     update.headers = {
         ...update.headers,
         'Mho-Origin': 'script',
@@ -2573,7 +2615,7 @@ function createOptimizerBtn() {
     const apps_exists_observer = new MutationObserver(apps_exists_callback);
 
     const mh_content = document.querySelector('#content'); // ou un autre élément parent approprié
-    const apps_exists_config = { childList: true, subtree: false, attributes: false };
+    const apps_exists_config = {childList: true, subtree: false, attributes: false};
     apps_exists_observer.observe(mh_content, apps_exists_config);
 }
 
@@ -2929,7 +2971,7 @@ function createMhoHeaderSpace() {
     };
 
     const observer = new MutationObserver(callback);
-    const config = { attributes: true, subtree: false, childList: false };
+    const config = {attributes: true, subtree: false, childList: false};
 
     observer.observe(postbox, config);
 }
@@ -4155,13 +4197,13 @@ function createLargeUpdateExternalToolsButton(update_external_tools_btn) {
 
                 let tools_fail = [];
                 let response_items = Object.keys(response).map((key) => {
-                    return { key: key, value: response[key] }
+                    return {key: key, value: response[key]}
                 });
 
                 response_items.forEach((response_item, index) => {
 
                     let final = Object.keys(response_item.value).map((key) => {
-                        return { key: key, value: response_item.value[key] }
+                        return {key: key, value: response_item.value[key]}
                     });
                     tools_fail = [...tools_fail, ...final.filter((final_item) => !final_item.value || (final_item.value.toLowerCase() !== 'ok' && final_item.value.toLowerCase() !== 'not activated'))];
                     if (index >= response_items.length - 1) {
@@ -4237,11 +4279,11 @@ function createSmallUpdateExternalToolsButton(update_external_tools_btn) {
 
                 let tools_fail = [];
                 let response_items = Object.keys(response).map((key) => {
-                    return { key: key, value: response[key] }
+                    return {key: key, value: response[key]}
                 });
                 response_items.forEach((response_item, index) => {
                     let final = Object.keys(response_item.value).map((key) => {
-                        return { key: key, value: response_item.value[key] }
+                        return {key: key, value: response_item.value[key]}
                     });
                     tools_fail = [...tools_fail, ...final.filter((final_item) => !final_item.value || (final_item.value.toLowerCase() !== 'ok' && final_item.value.toLowerCase() !== 'not activated'))];
                     if (index >= response_items.length - 1) {
@@ -4328,7 +4370,7 @@ function hideCompletedBuildings() {
             });
         });
 
-        observer.observe(document.body, { childList: true, subtree: true });
+        observer.observe(document.body, {childList: true, subtree: true});
     }
 
     if (pageIsConstructions()) {
@@ -4441,7 +4483,7 @@ function displaySearchFieldOnBuildings() {
             });
         });
 
-        observer.observe(document.body, { childList: true, subtree: true });
+        observer.observe(document.body, {childList: true, subtree: true});
     }
 
     if (mho_parameters.display_search_field_buildings && pageIsConstructions()) {
@@ -4691,7 +4733,7 @@ function displayMinApOnBuildings(count = 0) {
         // Selectionne le noeud dont les mutations seront observées
         let tooltip_container = document.querySelector('#tooltip_container');
         // Options de l'observateur (quelles sont les mutations à observer)
-        let config = { childList: true, subtree: true };
+        let config = {childList: true, subtree: true};
 
         // Fonction callback à éxécuter quand une mutation est observée
         let callback = function (mutationsList) {
@@ -5058,7 +5100,8 @@ function displayAdvancedTooltips(count = 0) {
         if (!tooltips_container && count < 10) {
             displayAdvancedTooltips(count + 1);
             return;
-        };
+        }
+
 
         advanced_tooltips_observer = new MutationObserver((mutations) => {
             mutations.forEach((mutation) => {
@@ -5108,10 +5151,10 @@ function displayAdvancedTooltips(count = 0) {
                                 tooltip_container.style.pointerEvents = 'all';
                                 hovered.li.addEventListener('mouseleave', function (event) {
                                     event.stopImmediatePropagation();
-                                }, true, { signal: controller.signal });
+                                }, true, {signal: controller.signal});
                                 hovered.li.addEventListener('pointerleave', function (event) {
                                     event.stopImmediatePropagation();
-                                }, true, { signal: controller.signal });
+                                }, true, {signal: controller.signal});
 
                                 let cancelHover = () => {
                                     hovered_tooltip_x_item_id = undefined;
@@ -5128,13 +5171,13 @@ function displayAdvancedTooltips(count = 0) {
                                             cancelHover();
                                         }
                                     }, 1000)
-                                }, true, { signal: controller.signal });
+                                }, true, {signal: controller.signal});
                                 tooltip_container.addEventListener('mouseleave', (event) => {
                                     cancelHover();
-                                }, { signal: controller.signal });
+                                }, {signal: controller.signal});
                                 tooltip_container.addEventListener('pointerleave', (event) => {
                                     cancelHover();
-                                }, { signal: controller.signal });
+                                }, {signal: controller.signal});
                             }, 1000);
                         }
 
@@ -5177,7 +5220,13 @@ function displayAdvancedTooltips(count = 0) {
             });
         });
 
-        const config = { attributes: true, subtree: true, childList: false, attributeFilter: ['style'], attributeOldValue: true };
+        const config = {
+            attributes: true,
+            subtree: true,
+            childList: false,
+            attributeFilter: ['style'],
+            attributeOldValue: true
+        };
 
         // Observer chaque enfant direct de tooltipsBlock
         advanced_tooltips_observer.observe(tooltips_container, config);
@@ -6328,10 +6377,10 @@ function displayTranslateTool() {
         if (!mho_header_space) return;
 
         let langs = [
-            { value: 'de', img: '🇩🇪' },
-            { value: 'en', img: '🇬🇧' },
-            { value: 'es', img: '🇪🇸' },
-            { value: 'fr', img: '🇫🇷' },
+            {value: 'de', img: '🇩🇪'},
+            {value: 'en', img: '🇬🇧'},
+            {value: 'es', img: '🇪🇸'},
+            {value: 'fr', img: '🇫🇷'},
         ]
         let mho_display_translate_input_div = createSelectWithSearch();
         mho_display_translate_input_div.id = mho_display_translate_input_id;
@@ -6630,12 +6679,12 @@ function displayEstimationsOnWatchtower() {
             let updateEstimationRow = (estimations, percent, type) => {
                 if (!estimations.estimations[type][`_${percent}`]) {
                     /** Workaround pour définir sur l'extension firefox sans passer par cloneinto */
-                    let estimations_workaround_estim = { ...estimations.estimations };
-                    let estimations_workaround_type = { ...estimations_workaround_estim[type] };
-                    let estimations_workaround_type_percent = { min: null, max: null };
-                    estimations_workaround_type[`_${percent}`] = { ...estimations_workaround_type_percent };
-                    estimations_workaround_estim[type] = { ...estimations_workaround_type };
-                    estimations.estimations = { ...estimations_workaround_estim };
+                    let estimations_workaround_estim = {...estimations.estimations};
+                    let estimations_workaround_type = {...estimations_workaround_estim[type]};
+                    let estimations_workaround_type_percent = {min: null, max: null};
+                    estimations_workaround_type[`_${percent}`] = {...estimations_workaround_type_percent};
+                    estimations_workaround_estim[type] = {...estimations_workaround_type};
+                    estimations.estimations = {...estimations_workaround_estim};
                 }
 
                 let estimation = estimations.estimations[type][`_${percent}`];
@@ -6672,7 +6721,7 @@ function displayEstimationsOnWatchtower() {
             }
 
             getEstimations().then((estimations) => {
-                estimations = { ...estimations };
+                estimations = {...estimations};
                 estim_block = document.createElement('div');
                 estim_block.style.marginTop = '1em';
                 estim_block.style.padding = '0.25em';
@@ -6704,12 +6753,12 @@ function displayEstimationsOnWatchtower() {
 
                 estim_block_title_save_button.addEventListener('click', () => {
                     saveEstimations({
-                        percent: current_estimation_percent,
-                        value: {
-                            min: +watchtower_estim_block_prediction?.split(' ')[0],
-                            max: +watchtower_estim_block_prediction?.split(' ')[2]
-                        }
-                    },
+                            percent: current_estimation_percent,
+                            value: {
+                                min: +watchtower_estim_block_prediction?.split(' ')[0],
+                                max: +watchtower_estim_block_prediction?.split(' ')[2]
+                            }
+                        },
                         {
                             percent: current_planif_percent,
                             value: {
@@ -6816,13 +6865,13 @@ function displayEstimationsOnWatchtower() {
 
                     if (!estimations.estimations.estim['_' + value]) {
                         /** Workaround pour définir sur l'extension firefox sans passer par cloneinto */
-                        let new_estimations = { ...estimations };
-                        let new_estimations_estimations = { ...new_estimations.estimations };
-                        let new_estimations_estimations_estim = { ...new_estimations_estimations.estim };
-                        new_estimations_estimations_estim['_' + value] = { min: null, max: null };
-                        new_estimations_estimations.estim = { ...new_estimations_estimations_estim };
-                        new_estimations.estimations = { ...new_estimations_estimations };
-                        estimations = { ...new_estimations };
+                        let new_estimations = {...estimations};
+                        let new_estimations_estimations = {...new_estimations.estimations};
+                        let new_estimations_estimations_estim = {...new_estimations_estimations.estim};
+                        new_estimations_estimations_estim['_' + value] = {min: null, max: null};
+                        new_estimations_estimations.estim = {...new_estimations_estimations_estim};
+                        new_estimations.estimations = {...new_estimations_estimations};
+                        estimations = {...new_estimations};
                     }
                     let value_block = document.createElement('div');
                     value_block.style.display = 'flex';
@@ -6875,13 +6924,13 @@ function displayEstimationsOnWatchtower() {
 
                         if (!estimations.estimations.planif['_' + value]) {
                             /** Workaround pour définir sur l'extension firefox sans passer par cloneinto */
-                            let new_estimations = { ...estimations };
-                            let new_estimations_estimations = { ...new_estimations.estimations };
-                            let new_estimations_estimations_planif = { ...new_estimations_estimations.planif };
-                            new_estimations_estimations_planif['_' + value] = { min: null, max: null };
-                            new_estimations_estimations.planif = { ...new_estimations_estimations_planif };
-                            new_estimations.estimations = { ...new_estimations_estimations };
-                            estimations = { ...new_estimations };
+                            let new_estimations = {...estimations};
+                            let new_estimations_estimations = {...new_estimations.estimations};
+                            let new_estimations_estimations_planif = {...new_estimations_estimations.planif};
+                            new_estimations_estimations_planif['_' + value] = {min: null, max: null};
+                            new_estimations_estimations.planif = {...new_estimations_estimations_planif};
+                            new_estimations.estimations = {...new_estimations_estimations};
+                            estimations = {...new_estimations};
                         }
 
                         let value_block = document.createElement('div');
@@ -6987,7 +7036,7 @@ function displayAntiAbuseCounter() {
                 if (!counter_values) {
                     counter_values = [];
                 }
-                let counter_value = { item: { item: fictive_item, broken: false }, take_at: Date.now() + 5000 };
+                let counter_value = {item: {item: fictive_item, broken: false}, take_at: Date.now() + 5000};
                 counter_values.push(counter_value);
                 setStorageItem(mho_anti_abuse_key, counter_values);
                 let new_mho_anti_abuse_counter = document.querySelector(`#${mho_anti_abuse_counter_id}`);
@@ -7123,12 +7172,12 @@ function displayAntiAbuseCounter() {
                     }
 
                     // Options de l'observateur (quelles sont les mutations à observer)
-                    let config = { childList: true, subtree: true, attributes: false };
+                    let config = {childList: true, subtree: true, attributes: false};
                     // Créé une instance de l'observateur lié à la fonction de callback
                     bank_observer = new MutationObserver(callback);
                     // Commence à observer le noeud cible pour les mutations précédemment configurées
                     bank_observer.observe(rucksack, config);
-                }, { signal: anti_abuse_controller.signal });
+                }, {signal: anti_abuse_controller.signal});
             } else if (pageIsWell()) {
                 let btn = document.querySelector('button[data-fetch-method="get"][data-fetch-confirm]');
                 btn?.addEventListener('click', (event) => {
@@ -7148,7 +7197,7 @@ function displayAntiAbuseCounter() {
                             if (!counter_values) {
                                 counter_values = [];
                             }
-                            let counter_value = { item: { item: well_item, broken: false }, take_at: Date.now() + 5000 }
+                            let counter_value = {item: {item: well_item, broken: false}, take_at: Date.now() + 5000}
                             counter_values.push(counter_value);
                             setStorageItem(mho_anti_abuse_key, counter_values);
                             let new_mho_anti_abuse_counter = document.querySelector(`#${mho_anti_abuse_counter_id}`);
@@ -7157,8 +7206,8 @@ function displayAntiAbuseCounter() {
                                 define_row(counter_value, counter_values.length - 1, new_content);
                             }
                         })
-                    }, { once: true });
-                }, { signal: anti_abuse_controller.signal })
+                    }, {once: true});
+                }, {signal: anti_abuse_controller.signal})
             } else {
                 anti_abuse_controller.abort();
             }
@@ -7676,7 +7725,7 @@ function changeDefaultEscortOptions() {
                         escort_allow_rucksack.click();
                     }
                 }
-            }, { once: true });
+            }, {once: true});
         });
     }
 }
@@ -7881,12 +7930,12 @@ function fillItemsMessages() {
                         let random_filler = lang_fillers[Math.floor(Math.random() * lang_fillers.length)];
 
                         message_title.setAttribute('value', random_filler.title);
-                        message_title.dispatchEvent(new Event('input', { bubbles: true }));
+                        message_title.dispatchEvent(new Event('input', {bubbles: true}));
 
                         message_content.value = random_filler.content;
-                        message_content.dispatchEvent(new Event('input', { bubbles: true }));
+                        message_content.dispatchEvent(new Event('input', {bubbles: true}));
                     }
-                }, { once: true });
+                }, {once: true});
             });
         }, 250);
     }
@@ -7913,7 +7962,7 @@ function createStoreNotificationsBtn() {
         });
 
         // Configuration de l'observateur pour surveiller les modifications des enfants
-        const config = { childList: true };
+        const config = {childList: true};
 
         // Commencez à observer l'élément cible pour les modifications configurées
         observer.observe(notifications_space, config);
@@ -9012,103 +9061,103 @@ function getGHMap() {
                 case 'fleche_0':
                 case 'fleche_0_b':
                 case 'fleche_0_n':
-                    return { direction: 'right', type: 'horizontal', source: '', length: 'semi', position: 'right' };
+                    return {direction: 'right', type: 'horizontal', source: '', length: 'semi', position: 'right'};
                 case 'fleche_1':
                 case 'fleche_1_b':
                 case 'fleche_1_n':
-                    return { direction: 'top', type: 'vertical', source: '', length: 'semi', position: 'top' };
+                    return {direction: 'top', type: 'vertical', source: '', length: 'semi', position: 'top'};
                 case 'fleche_2':
                 case 'fleche_2_b':
                 case 'fleche_2_n':
-                    return { direction: 'left', type: 'horizontal', source: '', length: 'semi', position: 'left' };
+                    return {direction: 'left', type: 'horizontal', source: '', length: 'semi', position: 'left'};
                 case 'fleche_3':
                 case 'fleche_3_b':
                 case 'fleche_3_n':
-                    return { direction: 'bottom', type: 'vertical', source: '', length: 'semi', position: 'bottom' };
+                    return {direction: 'bottom', type: 'vertical', source: '', length: 'semi', position: 'bottom'};
                 case 'fleche_4':
                 case 'fleche_4_b':
                 case 'fleche_4_n':
-                    return { direction: 'right', type: 'horizontal', source: '', length: 'semi', position: 'left' };
+                    return {direction: 'right', type: 'horizontal', source: '', length: 'semi', position: 'left'};
                 case 'fleche_5':
                 case 'fleche_5_b':
                 case 'fleche_5_n':
-                    return { direction: 'top', type: 'vertical', source: '', length: 'semi', position: 'bottom' };
+                    return {direction: 'top', type: 'vertical', source: '', length: 'semi', position: 'bottom'};
                 case 'fleche_6':
                 case 'fleche_6_b':
                 case 'fleche_6_n':
-                    return { direction: 'left', type: 'horizontal', source: '', length: 'semi', position: 'right' };
+                    return {direction: 'left', type: 'horizontal', source: '', length: 'semi', position: 'right'};
                 case 'fleche_7':
                 case 'fleche_7_b':
                 case 'fleche_7_n':
-                    return { direction: 'bottom', type: 'vertical', source: '', length: 'semi', position: 'top' };
+                    return {direction: 'bottom', type: 'vertical', source: '', length: 'semi', position: 'top'};
                 case 'fleche_8':
                 case 'fleche_8_b':
                 case 'fleche_8_n':
-                    return { direction: 'both', type: 'horizontal', source: '', length: 'semi', position: 'right' };
+                    return {direction: 'both', type: 'horizontal', source: '', length: 'semi', position: 'right'};
                 case 'fleche_9':
                 case 'fleche_9_b':
                 case 'fleche_9_n':
-                    return { direction: 'both', type: 'vertical', source: '', length: 'semi', position: 'top' };
+                    return {direction: 'both', type: 'vertical', source: '', length: 'semi', position: 'top'};
                 case 'fleche_10':
                 case 'fleche_10_b':
                 case 'fleche_10_n':
-                    return { direction: 'both', type: 'horizontal', source: '', length: 'semi', position: 'left' };
+                    return {direction: 'both', type: 'horizontal', source: '', length: 'semi', position: 'left'};
                 case 'fleche_11':
                 case 'fleche_11_b':
                 case 'fleche_11_n':
-                    return { direction: 'both', type: 'vertical', source: '', length: 'semi', position: 'bottom' };
+                    return {direction: 'both', type: 'vertical', source: '', length: 'semi', position: 'bottom'};
                 case 'fleche_12':
                 case 'fleche_12_b':
                 case 'fleche_12_n':
-                    return { direction: 'left', type: 'horizontal', source: '', length: 'plain', position: 'middle' };
+                    return {direction: 'left', type: 'horizontal', source: '', length: 'plain', position: 'middle'};
                 case 'fleche_13':
                 case 'fleche_13_b':
                 case 'fleche_13_n':
-                    return { direction: 'bottom', type: 'vertical', source: '', length: 'plain', position: 'middle' };
+                    return {direction: 'bottom', type: 'vertical', source: '', length: 'plain', position: 'middle'};
                 case 'fleche_14':
                 case 'fleche_14_b':
                 case 'fleche_14_n':
-                    return { direction: 'right', type: 'horizontal', source: '', length: 'plain', position: 'middle' };
+                    return {direction: 'right', type: 'horizontal', source: '', length: 'plain', position: 'middle'};
                 case 'fleche_15':
                 case 'fleche_15_b':
                 case 'fleche_15_n':
-                    return { direction: 'top', type: 'vertical', source: '', length: 'plain', position: 'middle' };
+                    return {direction: 'top', type: 'vertical', source: '', length: 'plain', position: 'middle'};
                 case 'fleche_16':
                 case 'fleche_16_b':
                 case 'fleche_16_n':
-                    return { direction: 'top', type: 'corner', source: 'right', length: '', position: '' };
+                    return {direction: 'top', type: 'corner', source: 'right', length: '', position: ''};
                 case 'fleche_17':
                 case 'fleche_17_b':
                 case 'fleche_17_n':
-                    return { direction: 'bottom', type: 'corner', source: 'right', length: '', position: '' };
+                    return {direction: 'bottom', type: 'corner', source: 'right', length: '', position: ''};
                 case 'fleche_18':
                 case 'fleche_18_b':
                 case 'fleche_18_n':
-                    return { direction: 'left', type: 'corner', source: 'top', length: '', position: '' };
+                    return {direction: 'left', type: 'corner', source: 'top', length: '', position: ''};
                 case 'fleche_19':
                 case 'fleche_19_b':
                 case 'fleche_19_n':
-                    return { direction: 'right', type: 'corner', source: 'top', length: '', position: '' };
+                    return {direction: 'right', type: 'corner', source: 'top', length: '', position: ''};
                 case 'fleche_20':
                 case 'fleche_20_b':
                 case 'fleche_20_n':
-                    return { direction: 'top', type: 'corner', source: 'left', length: '', position: '' };
+                    return {direction: 'top', type: 'corner', source: 'left', length: '', position: ''};
                 case 'fleche_21':
                 case 'fleche_21_b':
                 case 'fleche_21_n':
-                    return { direction: 'bottom', type: 'corner', source: 'left', length: '', position: '' };
+                    return {direction: 'bottom', type: 'corner', source: 'left', length: '', position: ''};
                 case 'fleche_22':
                 case 'fleche_22_b':
                 case 'fleche_22_n':
-                    return { direction: 'right', type: 'corner', source: 'bottom', length: '', position: '' };
+                    return {direction: 'right', type: 'corner', source: 'bottom', length: '', position: ''};
                 case 'fleche_23':
                 case 'fleche_23_b':
                 case 'fleche_23_n':
-                    return { direction: 'left', type: 'corner', source: 'bottom', length: '', position: '' };
+                    return {direction: 'left', type: 'corner', source: 'bottom', length: '', position: ''};
                 case 'fleche_24':
                 case 'fleche_24_b':
                 case 'fleche_24_n':
-                    return { direction: 'none', type: 'point', source: 'middle', length: 'none', position: 'middle' };
+                    return {direction: 'none', type: 'point', source: 'middle', length: 'none', position: 'middle'};
             }
         }
         getStorageItem(mho_map_key).then((mho_map) => {
@@ -9149,7 +9198,7 @@ function getGHMap() {
                     });
                     new_map.push(cells);
                 });
-            resolve({ map: new_map, vertical_mapping: x_mapping });
+            resolve({map: new_map, vertical_mapping: x_mapping});
         });
     });
 }
@@ -9268,7 +9317,7 @@ function getGHRuin() {
                         });
                         new_map.push(new_cells);
                     });
-                resolve({ map: new_map, vertical_mapping: x_mapping });
+                resolve({map: new_map, vertical_mapping: x_mapping});
             }
         })
     });
@@ -9320,7 +9369,7 @@ function getBBHMap() {
                                 });
                                 new_map.push(cells);
                             });
-                        resolve({ map: new_map, vertical_mapping: x_mapping });
+                        resolve({map: new_map, vertical_mapping: x_mapping});
                     }
                 }
                 reject();
@@ -9454,7 +9503,7 @@ function getBBHRuin() {
                         });
                         new_map.push(new_cells);
                     });
-                resolve({ map: new_map, vertical_mapping: x_mapping });
+                resolve({map: new_map, vertical_mapping: x_mapping});
             }
         })
     });
@@ -9503,7 +9552,7 @@ function getFMMap() {
                     });
                     new_map.push(cells);
                 });
-            resolve({ map: new_map, vertical_mapping: x_mapping });
+            resolve({map: new_map, vertical_mapping: x_mapping});
         });
     });
 }
@@ -9609,7 +9658,7 @@ function getFMRuin() {
                         });
                         new_map.push(new_cells);
                     });
-                resolve({ map: new_map, vertical_mapping: x_mapping });
+                resolve({map: new_map, vertical_mapping: x_mapping});
             }
         })
     });
@@ -9630,7 +9679,7 @@ function getItems() {
                 }
             })
             .then((response) => {
-                let new_items = { ...response }
+                let new_items = {...response}
                 new_items = response
                     .sort((item_a, item_b) => {
                         if (item_a.category.ordering > item_b.category.ordering) {
@@ -9644,7 +9693,7 @@ function getItems() {
                     .filter((item) => is_mh_beta ? true : +item.id !== 302);
                 new_items?.forEach((new_item) => {
                     new_item.recipes = new_item?.recipes?.map((recipe) => {
-                        let new_recipe = { ...recipe };
+                        let new_recipe = {...recipe};
                         let new_recipe_components = [];
                         new_recipe.components.forEach((component) => {
                             for (let i = 0; i < component.count; i++) {
@@ -9859,7 +9908,7 @@ function getWishlist() {
                 }
             })
             .then((response) => {
-                let new_wishlist = { ...response };
+                let new_wishlist = {...response};
                 let new_wishlist_wishlist = {};
                 for (let key in new_wishlist.wishList) {
                     let wishlist_zone = Object.keys(new_wishlist.wishList[key])
@@ -9960,7 +10009,7 @@ function updateExternalTools() {
         });
 
         if (!citizen_list || citizen_list.length === 0) {
-            citizen_list = [{ id: mh_user.id, userName: mh_user.userName, job: mh_user.jobDetails.uid }];
+            citizen_list = [{id: mh_user.id, userName: mh_user.userName, job: mh_user.jobDetails.uid}];
         }
 
         // Mise à jour en ville chaos
@@ -9968,7 +10017,7 @@ function updateExternalTools() {
             && pageIsDesert() && mh_user.townDetails?.isChaos) {
             let objects = Array.from(document.querySelector('.inventory.desert')?.querySelectorAll('li.item') || []).map((desert_item) => {
                 let item = convertImgToItem(desert_item.querySelector('img'));
-                return { id: item?.id, isBroken: desert_item.classList.contains('broken') };
+                return {id: item?.id, isBroken: desert_item.classList.contains('broken')};
             });
 
             let content = {
@@ -9991,8 +10040,8 @@ function updateExternalTools() {
 
         // Mise à jour du nombre de zombies tués
         if (((mho_parameters.update_gh && mho_parameters.update_gh_killed_zombies)
-            || (mho_parameters.update_mho && mho_parameters.update_mho_killed_zombies)
-            || (mho_parameters.update_fata && mho_parameters.update_fata_killed_zombies))
+                || (mho_parameters.update_mho && mho_parameters.update_mho_killed_zombies)
+                || (mho_parameters.update_fata && mho_parameters.update_fata_killed_zombies))
             && pageIsDesert() && nb_dead_zombies > 0) {
             let content = {
                 x: +position[0],
@@ -10011,7 +10060,7 @@ function updateExternalTools() {
 
         // Mise à jour des marqueurs issus des métiers
         if (((mho_parameters.update_mho && mho_parameters.update_mho_job_markers)
-            || (mho_parameters.update_fata && mho_parameters.update_fata_job_markers))
+                || (mho_parameters.update_fata && mho_parameters.update_fata_job_markers))
             && pageIsDesert()) {
             if (mh_user.jobDetails.uid === 'dig') {
                 let content = {
@@ -10075,7 +10124,7 @@ function updateExternalTools() {
             let my_rusksack = Array.from(document.querySelector('.inventory.rucksack')?.querySelectorAll('li.item:not(.locked)') || []).map((rucksack_item) => {
                 let item = convertImgToItem(rucksack_item.querySelector('img'));
                 if (item) {
-                    return { id: item.id, isBroken: rucksack_item.classList.contains('broken') };
+                    return {id: item.id, isBroken: rucksack_item.classList.contains('broken')};
                 }
             });
 
@@ -10090,7 +10139,7 @@ function updateExternalTools() {
                     let escort_id = +escort.querySelector('span.username')?.getAttribute('x-user-id');
                     let escort_rucksack = Array.from(escort.querySelector('.inventory.rucksack-escort')?.querySelectorAll('li.item:not(.locked):not(.plus)') || []).map((rucksack_item) => {
                         let item = convertImgToItem(rucksack_item.querySelector('img'));
-                        return { id: item?.id, isBroken: rucksack_item.classList.contains('broken') };
+                        return {id: item?.id, isBroken: rucksack_item.classList.contains('broken')};
                     });
 
                     rucksacks.push({
@@ -10118,7 +10167,7 @@ function updateExternalTools() {
 
             let chest_elements = Array.from(document.querySelector('.inventory.chest')?.querySelectorAll('li.item:not(.locked)') || []).map((chest_item) => {
                 let item = convertImgToItem(chest_item.querySelector('img'));
-                return { id: item.id, isBroken: chest_item.classList.contains('broken') };
+                return {id: item.id, isBroken: chest_item.classList.contains('broken')};
             });
 
             data.chest.contents = convertListOfSingleObjectsIntoListOfCountedObjects(chest_elements);
@@ -10128,7 +10177,10 @@ function updateExternalTools() {
         // TODO récupérer l'info "isChaman" et n'envoyer ces informations que si on l'est
         if (mho_parameters.update_mho && mho_parameters.update_mho_souls && pageIsDoors()) {
             const soul_areas = Array.from(document.querySelectorAll('.soul-area') ?? []).map((soul_area) => {
-                return { x: soul_area.parentElement?.style?.gridRowStart, y: soul_area.parentElement?.style?.gridColumnStart };
+                return {
+                    x: soul_area.parentElement?.style?.gridRowStart,
+                    y: soul_area.parentElement?.style?.gridColumnStart
+                };
             })
             data.souls = soul_areas;
             console.log("data.souls", data.souls);
@@ -10436,7 +10488,7 @@ function getRecipes() {
                 .then((response) => {
                     let new_recipes = response
                         .map((recipe) => {
-                            let new_recipe = { ...recipe };
+                            let new_recipe = {...recipe};
                             let new_recipe_components = [];
                             new_recipe.components.forEach((component) => {
                                 for (let i = 0; i < component.count; i++) {
@@ -10570,18 +10622,18 @@ function getApofooAttackCalculation(day, beta) {
 function saveEstimations(estim_value, planif_value) {
     return new Promise((resolve, reject) => {
         getEstimations().then((estimations) => {
-            let new_estimations = { ...estimations.estimations };
+            let new_estimations = {...estimations.estimations};
             if (estim_value && estim_value.value && (estim_value.value.min || estim_value.value.max)) {
                 /** Workaround pour définir sur l'extension firefox sans passer par cloneinto */
-                let new_estimations_workaround_estim = { ...new_estimations.estim };
-                new_estimations_workaround_estim['_' + estim_value.percent] = { ...estim_value.value };
-                new_estimations.estim = { ...new_estimations_workaround_estim };
+                let new_estimations_workaround_estim = {...new_estimations.estim};
+                new_estimations_workaround_estim['_' + estim_value.percent] = {...estim_value.value};
+                new_estimations.estim = {...new_estimations_workaround_estim};
             }
             if (planif_value && planif_value.value && (planif_value.value.min || planif_value.value.max)) {
                 /** Workaround pour définir sur l'extension firefox sans passer par cloneinto */
-                let new_estimations_workaround_planif = { ...new_estimations.planif };
-                new_estimations_workaround_planif['_' + planif_value.percent] = { ...planif_value.value };
-                new_estimations.planif = { ...new_estimations_workaround_planif };
+                let new_estimations_workaround_planif = {...new_estimations.planif};
+                new_estimations_workaround_planif['_' + planif_value.percent] = {...planif_value.value};
+                new_estimations.planif = {...new_estimations_workaround_planif};
             }
 
             fetcher(api_url + `/AttaqueEstimation/Estimations?townId=${mh_user.townDetails?.townId}&userId=${mh_user.id}`, {
