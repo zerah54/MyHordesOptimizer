@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MHO Addon
-// @version      1.1.12.0
+// @version      1.1.13.0
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/, rubrique Tutoriels
 // @author       Zerah
 //
@@ -7112,7 +7112,8 @@ function displayAntiAbuseCounter() {
                     if (event.srcElement.className !== '' && event.srcElement.className !== 'item' && event.srcElement.className !== 'item-icon') return;
 
                     let rucksack = document.querySelector('#bank-inventory ul.rucksack');
-                    if (!old_bag) {
+
+                    if (!old_bag || old_bag === {}) {
                         old_bag = document.querySelectorAll('#bank-inventory ul.rucksack li.item:not(.locked)');
                     }
 
@@ -10096,10 +10097,10 @@ function updateExternalTools() {
                     x: +position[0],
                     y: +position[1],
                     scavNextCells: {
-                        north: !document.querySelector('.scavenger-sense-north.scavenger-sense-1'),
-                        east: !document.querySelector('.scavenger-sense-east.scavenger-sense-1'),
-                        south: !document.querySelector('.scavenger-sense-south.scavenger-sense-1'),
-                        west: !document.querySelector('.scavenger-sense-west.scavenger-sense-1')
+                        north: document.querySelector('.scavenger-sense-north.scavenger-sense-1') ? !document.querySelector('.scavenger-sense-north.scavenger-sense-1') : undefined,
+                        east: document.querySelector('.scavenger-sense-east.scavenger-sense-1') ? !document.querySelector('.scavenger-sense-east.scavenger-sense-1') : undefined,
+                        south: document.querySelector('.scavenger-sense-south.scavenger-sense-1') ? !document.querySelector('.scavenger-sense-south.scavenger-sense-1') : undefined,
+                        west: document.querySelector('.scavenger-sense-west.scavenger-sense-1') ? !document.querySelector('.scavenger-sense-west.scavenger-sense-1') : undefined
                     },
                     citizenId: citizen_list.map((citizen) => citizen.id)
                 }
@@ -10118,10 +10119,10 @@ function updateExternalTools() {
                     x: +position[0],
                     y: +position[1],
                     scoutNextCells: {
-                        north: +document.querySelector('.scout-sense-north')?.querySelector('text')?.innerHTML ?? undefined,
-                        east: +document.querySelector('.scout-sense-east')?.querySelector('text')?.innerHTML ?? undefined,
-                        south: +document.querySelector('.scout-sense-south')?.querySelector('text')?.innerHTML ?? undefined,
-                        west: +document.querySelector('.scout-sense-west')?.querySelector('text')?.innerHTML ?? undefined
+                        north: document.querySelector('.scout-sense-north') ? +document.querySelector('.scout-sense-north').querySelector('text')?.innerHTML : undefined,
+                        east: document.querySelector('.scout-sense-east') ? +document.querySelector('.scout-sense-east').querySelector('text')?.innerHTML : undefined,
+                        south: document.querySelector('.scout-sense-south') ? +document.querySelector('.scout-sense-south').querySelector('text')?.innerHTML : undefined,
+                        west: document.querySelector('.scout-sense-west') ? +document.querySelector('.scout-sense-west').querySelector('text')?.innerHTML : undefined
                     },
                     scoutZoneLvl: +fixMhCompiledImg(zone_scout_level_src).replace(/\D/g, '') ?? undefined,
                     citizenId: citizen_list.map((citizen) => citizen.id)
