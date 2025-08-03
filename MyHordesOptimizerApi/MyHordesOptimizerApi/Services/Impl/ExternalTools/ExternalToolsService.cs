@@ -114,19 +114,10 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                 {
                     try
                     {
-                        var isCell = UpdateRequestMapToolsToUpdateDetailsDto.IsCell(fata);
-                        if(isCell)
-                        {
-                            var cell = updateRequestDto.Map?.Cell;
-                            var fataRequestDto = Mapper.Map<FataMorganaUpdateRequestDto>(updateRequestDto);
-                            fataRequestDto.UserId = UserInfoProvider.UserId;
-                            fataRequestDto.UserKey = UserInfoProvider.UserKey;
-                            await FataMorganaRepository.UpdateAsync(fataRequestDto);
-                        }
-                        else
-                        {
-                            await FataMorganaRepository.UpdateAsync();
-                        }
+                        var fataRequestDto = Mapper.Map<FataMorganaUpdateRequestDto>(updateRequestDto);
+                        fataRequestDto.UserId = UserInfoProvider.UserId;
+                        fataRequestDto.UserKey = UserInfoProvider.UserKey;
+                        await FataMorganaRepository.UpdateAsync(fataRequestDto);
                     }
                     catch (WebApiException e)
                     {

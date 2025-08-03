@@ -6,6 +6,5 @@ namespace MyHordesOptimizerApi.Repository.Interfaces.ExternalTools
     public interface IFataMorganaRepository
     {
         Task UpdateAsync(FataMorganaUpdateRequestDto updateRequestDto);
-        Task UpdateAsync();
     }
 }

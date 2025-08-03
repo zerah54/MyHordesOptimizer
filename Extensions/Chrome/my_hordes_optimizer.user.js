@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MHO Addon
-// @version      1.1.11.0
+// @version      1.1.12.0
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/, rubrique Tutoriels
 // @author       Zerah
 //
@@ -10096,10 +10096,10 @@ function updateExternalTools() {
                     x: +position[0],
                     y: +position[1],
                     scavNextCells: {
-                        north: !!document.querySelector('.scavenger-sense-north.scavenger-sense-1'),
-                        east: !!document.querySelector('.scavenger-sense-east.scavenger-sense-1'),
-                        south: !!document.querySelector('.scavenger-sense-south.scavenger-sense-1'),
-                        west: !!document.querySelector('.scavenger-sense-west.scavenger-sense-1')
+                        north: !document.querySelector('.scavenger-sense-north.scavenger-sense-1'),
+                        east: !document.querySelector('.scavenger-sense-east.scavenger-sense-1'),
+                        south: !document.querySelector('.scavenger-sense-south.scavenger-sense-1'),
+                        west: !document.querySelector('.scavenger-sense-west.scavenger-sense-1')
                     },
                     citizenId: citizen_list.map((citizen) => citizen.id)
                 }
