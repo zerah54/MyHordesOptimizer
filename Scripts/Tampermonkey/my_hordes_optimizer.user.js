@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MHO Addon
-// @version      1.1.13.0
+// @version      1.1.14.0
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/, rubrique Tutoriels
 // @author       Zerah
 //
@@ -31,8 +31,7 @@
 // ==/UserScript==
 
 const changelog = `${getScriptInfo().name} : Changelog pour la version ${getScriptInfo().version}\n\n`
-    + `[Fix] Envoi des données d'éclaireur et de fouineur\n`
-    + `[Fix] Anti-abus\n`;
+    + `[Fix] Correctif de l'envoi des données de fouineur à Fata Morgana`;
 
 const lang = (document.querySelector('html[lang]')?.getAttribute('lang') || document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2) || 'fr';
 
@@ -10098,10 +10097,10 @@ function updateExternalTools() {
                     x: +position[0],
                     y: +position[1],
                     scavNextCells: {
-                        north: document.querySelector('.scavenger-sense-north.scavenger-sense-1') ? !document.querySelector('.scavenger-sense-north.scavenger-sense-1') : undefined,
-                        east: document.querySelector('.scavenger-sense-east.scavenger-sense-1') ? !document.querySelector('.scavenger-sense-east.scavenger-sense-1') : undefined,
-                        south: document.querySelector('.scavenger-sense-south.scavenger-sense-1') ? !document.querySelector('.scavenger-sense-south.scavenger-sense-1') : undefined,
-                        west: document.querySelector('.scavenger-sense-west.scavenger-sense-1') ? !document.querySelector('.scavenger-sense-west.scavenger-sense-1') : undefined
+                        north: document.querySelector('.scavenger-sense-north') ? !document.querySelector('.scavenger-sense-north.scavenger-sense-1') : undefined,
+                        east: document.querySelector('.scavenger-sense-east') ? !document.querySelector('.scavenger-sense-east.scavenger-sense-1') : undefined,
+                        south: document.querySelector('.scavenger-sense-south') ? !document.querySelector('.scavenger-sense-south.scavenger-sense-1') : undefined,
+                        west: document.querySelector('.scavenger-sense-west') ? !document.querySelector('.scavenger-sense-west.scavenger-sense-1') : undefined
                     },
                     citizenId: citizen_list.map((citizen) => citizen.id)
                 }
