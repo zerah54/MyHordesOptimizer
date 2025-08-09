@@ -1,6 +1,10 @@
 ﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
+using MyHordesOptimizerApi.Models;
 using MyHordesOptimizerApi.Providers.Interfaces;
 using System;
+using System.Collections;
+using System.Collections.Generic;
 
 namespace MyHordesOptimizerApi.Extensions
 {
@@ -8,6 +12,7 @@ namespace MyHordesOptimizerApi.Extensions
     {
         // Key used to acccess time offset parameter within context.
         static readonly string DbContextKey = "DbContext";
+        static readonly string AllItemsKey = "AllItems";
         static readonly string UserInfoProviderKey = "UserInfoProviderKey";
         static readonly string LastUpdateInfoIdKey = "LastUpdateInfoIdKey";
         static readonly string TownIdKey = "TownIdKey";
@@ -20,7 +25,7 @@ namespace MyHordesOptimizerApi.Extensions
                 return (MhoContext)dbContext;
             }
 
-            throw new InvalidOperationException("lastUpdateInfoId not set.");
+            throw new InvalidOperationException("dbContext not set.");
         }
 
         public static IMappingOperationOptions SetDbContext(this IMappingOperationOptions options, MhoContext dbContext)
@@ -28,6 +33,23 @@ namespace MyHordesOptimizerApi.Extensions
             options.Items[DbContextKey] = dbContext;
             // return options to support fluent chaining.
             return options;
+        }
+
+        public static IMappingOperationOptions SetAllItems(this IMappingOperationOptions options, IEnumerable<Item> items)
+        {
+            options.Items[AllItemsKey] = items;
+            // return options to support fluent chaining.
+            return options;
+        }
+
+        public static IEnumerable<Item> GetAllItems(this ResolutionContext context)
+        {
+            if (context.Items.TryGetValue(AllItemsKey, out var allItems))
+            {
+                return (IEnumerable<Item>)allItems;
+            }
+
+            throw new InvalidOperationException("allItems not set.");
         }
         #endregion
 
