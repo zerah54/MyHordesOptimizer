@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using MyHordesOptimizerApi.Dtos.MyHordes;
 using MyHordesOptimizerApi.Dtos.MyHordes.Me;
 using MyHordesOptimizerApi.Extensions;
@@ -75,7 +76,12 @@ namespace MyHordesOptimizerApi.MappingProfiles.Towns
             CreateMap<MyHordesBank, TownBankItem>()
                 .ForMember(dest => dest.Count, opt => opt.MapFrom(src => src.Count))
                 .ForMember(dest => dest.IdItem, opt => opt.MapFrom(src => src.Id))
-                .ForMember(dest => dest.IdItemNavigation, opt => opt.Ignore())
+                .ForMember(dest => dest.IdItemNavigation, opt => opt.MapFrom((src, dest, srcMember, context) =>
+                {
+                    var allItems = context.GetAllItems();
+                    var item = allItems.FirstOrDefault(x => x.IdItem == src.Id);
+                    return item;
+                }))
                 .ForMember(dest => dest.IdLastUpdateInfo, opt => opt.Ignore())
                 .ForMember(dest => dest.IdLastUpdateInfoNavigation, opt => opt.Ignore())
                 .ForMember(dest => dest.IdTown, opt => opt.Ignore())
