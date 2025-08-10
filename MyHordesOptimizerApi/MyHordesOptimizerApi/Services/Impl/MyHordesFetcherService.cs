@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Discord;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -395,9 +396,22 @@ namespace MyHordesOptimizerApi.Services.Impl
                 using var transaction = DbContext.Database.BeginTransaction();
                 var newLastUpdate = DbContext.LastUpdateInfos.Update(Mapper.Map<LastUpdateInfo>(UserInfoProvider.GenerateLastUpdateInfo())).Entity;
                 DbContext.SaveChanges();
+                var allItems = DbContext.Items
+                    .Include(item => item.IdCategoryNavigation)
+                    .AsSplitQuery()
+                    .Include(item => item.PropertyNames)
+                    .AsSplitQuery()
+                    .Include(item => item.ActionNames)
+                    .AsSplitQuery()
+                    .Include(item => item.RecipeItemComponents)
+                        .ThenInclude(recipe => recipe.RecipeNameNavigation)
+                        .ThenInclude(recipe => recipe.RecipeItemResults)
+                        .AsSplitQuery()
+                    .Include(item => item.RecipeItemResults)
+                    .ToList();
                 var newTownlastUpdate = DbContext.LastUpdateInfos.First(x => x.IdLastUpdateInfo == newLastUpdate.IdLastUpdateInfo);
                 myHordeMeResponse.Map.LastUpdateInfo = newTownlastUpdate;
-                var town = Mapper.Map<Town>(myHordeMeResponse, opts => opts.SetDbContext(DbContext));
+                var town = Mapper.Map<Town>(myHordeMeResponse, opts => { opts.SetDbContext(DbContext); opts.SetAllItems(allItems); });
                 DbContext.AddRange(town.TownBankItems);
                 DbContext.SaveChanges();
                 transaction.Commit();
