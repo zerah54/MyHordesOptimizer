@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MHO Addon
-// @version      1.1.14.0
+// @version      1.1.15.0
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/, rubrique Tutoriels
 // @author       Zerah
 //
@@ -31,7 +31,8 @@
 // ==/UserScript==
 
 const changelog = `${getScriptInfo().name} : Changelog pour la version ${getScriptInfo().version}\n\n`
-    + `[Fix] Correctif de l'envoi des données de fouineur à Fata Morgana`;
+    + `[Fix] Affichage de la banque dans la fenêtre "Outils" \n`
+    + `[Fix] Retrait de l'onglet "Liste de courses" de la fenêtre "Outils" devenu obsolète (à retrouver sur le site)`;
 
 const lang = (document.querySelector('html[lang]')?.getAttribute('lang') || document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2) || 'fr';
 
@@ -1049,18 +1050,6 @@ let tabs_list = {
             icon: repo_img_hordes_url + `icons/home.gif`,
             needs_town: true,
         },
-        {
-            ordering: 1,
-            id: `wishlist`,
-            label: {
-                en: `Wishlist`,
-                fr: `Liste de courses`,
-                de: `Wunschzettel`,
-                es: `Lista de deseos`
-            },
-            icon: repo_img_hordes_url + `item/item_cart.gif`,
-            needs_town: true,
-        },
         // {
         //     ordering: 2,
         //     id: `citizens`,
@@ -1074,7 +1063,7 @@ let tabs_list = {
         //     needs_town: true,
         // },
         {
-            ordering: 3,
+            ordering: 2,
             id: `camping`,
             label: {
                 en: `Camping`,
@@ -3968,7 +3957,7 @@ function getRecipeElement(recipe) {
     let recipe_type_img = document.createElement('img');
     recipe_type_img.title = getI18N(recipe.type.label);
     recipe_type_img.setAttribute('style', 'margin-left: 0.5em; margin-right: 0.5em');
-    switch (recipe.type.id) {
+    switch (recipe.type.id ?? recipe.type) {
         case 'Recipe::ManualAnywhere':
             recipe_type_img.src = repo_img_hordes_url + 'log/citizen.gif';
             break;
@@ -3992,12 +3981,12 @@ function getRecipeElement(recipe) {
 
         let component_img = document.createElement('img');
         component_img.setAttribute('style', 'margin-right: 0.5em');
-        component_img.src = repo_img_hordes_url + fixMhCompiledImg(compo.img);
+        component_img.src = repo_img_hordes_url + fixMhCompiledImg(compo?.item?.img ?? compo?.img);
         compo_container.appendChild(component_img);
 
         let component_label = document.createElement('span');
         component_label.classList.add('label_text');
-        component_label.innerText = getI18N(compo.label);
+        component_label.innerText = getI18N(compo?.item?.label ?? compo?.label);
         compo_container.appendChild(component_label);
 
         compos_container.appendChild(compo_container);
