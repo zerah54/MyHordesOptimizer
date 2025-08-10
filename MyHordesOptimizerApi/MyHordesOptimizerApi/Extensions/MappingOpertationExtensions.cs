@@ -48,8 +48,7 @@ namespace MyHordesOptimizerApi.Extensions
             {
                 return (IEnumerable<Item>)allItems;
             }
-
-            throw new InvalidOperationException("allItems not set.");
+            return new List<Item>();
         }
         #endregion
 
