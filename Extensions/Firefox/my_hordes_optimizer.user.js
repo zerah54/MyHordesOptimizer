@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MHO Addon
-// @version      1.1.15.0
+// @version      1.1.16.0
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/, rubrique Tutoriels
 // @author       Zerah
 //
@@ -31,8 +31,7 @@
 // ==/UserScript==
 
 const changelog = `${getScriptInfo().name} : Changelog pour la version ${getScriptInfo().version}\n\n`
-    + `[Fix] Affichage de la banque dans la fenêtre "Outils" \n`
-    + `[Fix] Retrait de l'onglet "Liste de courses" de la fenêtre "Outils" devenu obsolète (à retrouver sur le site)`;
+    + `[Fix] Le script ne s'affichait plus en cas de wishlist \n`;
 
 const lang = (document.querySelector('html[lang]')?.getAttribute('lang') || document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2) || 'fr';
 
@@ -920,6 +919,13 @@ const wishlist_depot = [
         }
     }
 ];
+
+const wishlist_title = {
+    en: `Wishlist`,
+    fr: `Liste de courses`,
+    de: `Wunschzettel`,
+    es: `Lista de deseos`
+}
 
 const wishlist_headers = [
     {
@@ -1978,7 +1984,7 @@ function shouldRefreshMe() {
 
 function getI18N(item) {
     if (!item) return;
-    return item[lang] !== 'TODO' ? item[lang] : (item.en === 'TODO' ? item.fr : item.en);
+    return item?.[lang] !== 'TODO' ? item?.[lang] : (item?.en === 'TODO' ? item?.fr : item?.en);
 }
 
 function getCurrentPosition() {
@@ -4980,7 +4986,7 @@ function displayWishlistInApp(count = 0) {
         header_title.appendChild(header_mho_img);
 
         let header_label = document.createElement('span');
-        header_label.innerText = getI18N(tabs_list.tools.find((tool) => tool.id === 'wishlist').label);
+        header_label.innerText = getI18N(wishlist_title);
         header_title.appendChild(header_label);
 
         let content = document.createElement('div');
