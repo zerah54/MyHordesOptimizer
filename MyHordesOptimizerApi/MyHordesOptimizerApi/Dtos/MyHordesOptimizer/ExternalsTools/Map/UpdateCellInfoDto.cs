@@ -12,17 +12,17 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.Map
         [JsonProperty("y")]
         public int Y { get; set; }
         [JsonProperty("zombies")]
-        public int Zombies { get; set; }
+        public int? Zombies { get; set; }
         [JsonProperty("deadZombies")]
-        public int DeadZombies { get; set; }
+        public int? DeadZombies { get; set; }
         [JsonProperty("zoneEmpty")]
-        public bool ZoneEmpty { get; set; }
+        public bool? ZoneEmpty { get; set; }
 
 
         [JsonProperty("objects")]
         public List<UpdateObjectDto>? Objects { get; set; }
         [JsonProperty("citizenId")]
-        public List<int> CitizenId { get; set; }
+        public List<int>? CitizenId { get; set; }
 
         [JsonProperty("scavNextCells")]
         public ScavNextCellsDto? ScavNextCells { get; set; }
@@ -32,6 +32,6 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.Map
 
         [JsonProperty("scoutZoneLvl")]
         [JsonPropertyName("scoutZoneLvl")]
-        public int ScoutZoneLvl { get; set; }
+        public int? ScoutZoneLvl { get; set; }
     }
 }

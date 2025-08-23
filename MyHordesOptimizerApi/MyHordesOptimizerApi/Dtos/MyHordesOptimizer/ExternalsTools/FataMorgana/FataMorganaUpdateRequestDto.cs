@@ -34,30 +34,30 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.FataMorgana
 
         [JsonProperty("nbrKill")]
         [JsonPropertyName("nbrKill")]
-        public int NbrKill { get; set; }
+        public int? NbrKill { get; set; }
 
         [JsonProperty("nbrZombie")]
         [JsonPropertyName("nbrZombie")]
-        public int NbrZombie { get; set; }
+        public int? NbrZombie { get; set; }
 
         [JsonProperty("zoneDepleted")]
         [JsonPropertyName("zoneDepleted")]
-        public bool ZoneDepleted { get; set; }
+        public bool? ZoneDepleted { get; set; }
 
         [JsonProperty("scoutRadar")]
         [JsonPropertyName("scoutRadar")]
-        public FataMorganaScoutRadarDto ScoutRadar { get; set; }
+        public FataMorganaScoutRadarDto? ScoutRadar { get; set; }
 
         [JsonProperty("scavRadar")]
         [JsonPropertyName("scavRadar")]
-        public FataMorganaScavRadarDto ScavRadar { get; set; }
+        public FataMorganaScavRadarDto? ScavRadar { get; set; }
 
         [JsonProperty("playerList")]
         [JsonPropertyName("playerList")]
-        public List<int> PlayerList { get; set; }
+        public List<int>? PlayerList { get; set; }
 
         [JsonProperty("items")]
         [JsonPropertyName("items")]
-        public List<UpdateObjectDto> Items { get; set; }
+        public List<UpdateObjectDto>? Items { get; set; }
     }
 }
