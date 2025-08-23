@@ -7,18 +7,18 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.FataMorgana
     {
         [JsonProperty("north")]
         [JsonPropertyName("north")]
-        public bool North { get; set; }
+        public bool? North { get; set; }
 
         [JsonProperty("west")]
         [JsonPropertyName("west")]
-        public bool West { get; set; }
+        public bool? West { get; set; }
 
         [JsonProperty("south")]
         [JsonPropertyName("south")]
-        public bool South { get; set; }
+        public bool? South { get; set; }
 
         [JsonProperty("east")]
         [JsonPropertyName("east")]
-        public bool East { get; set; }
+        public bool? East { get; set; }
     }
 }
