@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MHO Addon
-// @version      1.1.16.0
+// @version      1.1.17.0
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/, rubrique Tutoriels
 // @author       Zerah
 //
@@ -31,7 +31,7 @@
 // ==/UserScript==
 
 const changelog = `${getScriptInfo().name} : Changelog pour la version ${getScriptInfo().version}\n\n`
-    + `[Fix] Le script ne s'affichait plus en cas de wishlist \n`;
+    + `[Nouveauté] Le script envoie les informations de la page à FataMorgana y compris hors mode chaos \n`;
 
 const lang = (document.querySelector('html[lang]')?.getAttribute('lang') || document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2) || 'fr';
 
@@ -1129,7 +1129,7 @@ let params_categories = [
                         id: `update_mho_devastated`,
                         label: {
                             en: `Zone update even after the town is in Chaos`,
-                            fr: `Mise à jour quand la ville est en Chaos`,
+                            fr: `Mise à jour même quand la ville est en Chaos`,
                             de: `Zonen-Update, nachdem die Stadt bereits zerstört wurde`,
                             es: `Actualización de zona cuando los pueblo está sumida en el caos`
                         },
@@ -1353,10 +1353,10 @@ let params_categories = [
                     {
                         id: `update_fata_devastated`,
                         label: {
-                            en: `Zone update even after the town is in Chaos`,
-                            fr: `Mise à jour quand la ville est en Chaos`,
-                            de: `Zonen-Update, nachdem die Stadt bereits zerstört wurde`,
-                            es: `Actualización de zona cuando los pueblo está sumida en el caos`
+                            en: `Update even when the town is in Chaos or when the quota is exceeded`,
+                            fr: `Mise à jour même quand la ville est en Chaos ou quand le quota est dépassé`,
+                            de: `Aktualisierung auch dann, wenn in der Stadt Chaos herrscht oder das Kontingent überschritten wird`,
+                            es: `Actualizar incluso cuando la ciudad esté en Caos o cuando se exceda la cuota`
                         },
                     },
                     {
@@ -10008,8 +10008,8 @@ function updateExternalTools() {
         }
 
         // Mise à jour en ville chaos
-        if (((mho_parameters.update_gh && mho_parameters.update_gh_devastated) || (mho_parameters.update_mho && mho_parameters.update_mho_devastated) || (mho_parameters.update_fata && mho_parameters.update_fata_devastated))
-            && pageIsDesert() && mh_user.townDetails?.isChaos) {
+        if (((mho_parameters.update_gh && mho_parameters.update_gh_devastated && mh_user.townDetails?.isChaos) || (mho_parameters.update_mho && mho_parameters.update_mho_devastated && mh_user.townDetails?.isChaos) || (mho_parameters.update_fata && mho_parameters.update_fata_devastated))
+            && pageIsDesert()) {
 
             if (mho_parameters.update_gh && mho_parameters.update_gh_devastated) {
                 data.map.toolsToUpdate.isGestHordes = 'cell';
@@ -10069,7 +10069,6 @@ function updateExternalTools() {
 
             if (data.map.cell) {
                 data.map.cell.deadZombies = nb_dead_zombies;
-                data.map.cell.citizenId = content.citizenId;
             } else {
                 data.map.cell = content;
             }
@@ -10102,7 +10101,6 @@ function updateExternalTools() {
 
                 if (data.map.cell) {
                     data.map.cell.scavNextCells = content.scavNextCells;
-                    data.map.cell.citizenId = content.citizenId;
                 } else {
                     data.map.cell = content;
                 }
@@ -10119,14 +10117,12 @@ function updateExternalTools() {
                         south: document.querySelector('.scout-sense-south') ? +document.querySelector('.scout-sense-south').querySelector('text')?.innerHTML : undefined,
                         west: document.querySelector('.scout-sense-west') ? +document.querySelector('.scout-sense-west').querySelector('text')?.innerHTML : undefined
                     },
-                    scoutZoneLvl: +fixMhCompiledImg(zone_scout_level_src).replace(/\D/g, '') ?? undefined,
-                    citizenId: citizen_list.map((citizen) => citizen.id)
+                    scoutZoneLvl: +fixMhCompiledImg(zone_scout_level_src).replace(/\D/g, '') ?? undefined
                 }
 
                 if (data.map.cell) {
                     data.map.cell.scoutNextCells = content.scoutNextCells;
                     data.map.cell.scoutZoneLvl = content.scoutZoneLvl;
-                    data.map.cell.citizenId = content.citizenId;
                 } else {
                     data.map.cell = content;
                 }
