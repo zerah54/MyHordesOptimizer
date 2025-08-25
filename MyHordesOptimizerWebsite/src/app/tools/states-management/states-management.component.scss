@@ -1,0 +1,81 @@
+.mho-states-management {
+    margin-top: 1rem;
+    display: flex;
+    gap: 32px;
+
+    .states-cards {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        border: 1px solid var(--primary);
+        border-radius: 0.5em;
+        background-color: var(--item-color);
+        padding: 1em;
+
+        h3,
+        h4 {
+            text-align: center;
+        }
+
+        .states-cards-origine {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            align-content: center;
+
+            .states-cards-origine-content{
+                display: flex;
+                justify-content: space-between;
+                flex-wrap: wrap;
+                gap: 2rem;
+            }
+
+            .mat-mdc-form-field .mat-mdc-form-field-icon-prefix {
+                margin-left: 0.5em;
+                margin-right: 0.5em;
+            }
+        }
+
+        .states-cards-current {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+
+
+            .states-cards-current-pipboy {
+                display: flex;
+                align-self: center;
+                align-items: center;
+                gap: 16px;
+
+
+                mat-list {
+                    border: 1px solid var(--primary);
+                    border-radius: 0.5em;
+                    background-color: var(--item-color);
+                }
+            }
+        }
+
+        .states-cards-historique {
+            display: flex;
+            flex-direction: column;
+
+            .mdc-list {
+                .ligne-historique-action {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    gap: 0.5rem;
+                }
+
+                .ligne-historique-etat {
+                    display: flex;
+                    align-items: center;
+                }
+            }
+        }
+
+    }
+
+}
