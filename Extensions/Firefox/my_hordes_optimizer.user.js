@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MHO Addon
-// @version      1.1.17.0
+// @version      1.1.18.0
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/, rubrique Tutoriels
 // @author       Zerah
 //
@@ -31,7 +31,7 @@
 // ==/UserScript==
 
 const changelog = `${getScriptInfo().name} : Changelog pour la version ${getScriptInfo().version}\n\n`
-    + `[Nouveauté] Le script envoie les informations de la page à FataMorgana y compris hors mode chaos \n`;
+    + `[Correctif] Affichage des chantiers`;
 
 const lang = (document.querySelector('html[lang]')?.getAttribute('lang') || document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2) || 'fr';
 
@@ -4377,11 +4377,7 @@ function hideCompletedBuildings() {
                 observeBuildings();
             }
         } else {
-            if (buildings.length > 0) {
-                hideBuildings(buildings);
-            } else {
-                showBuildings();
-            }
+            showBuildings();
         }
     }
 }
