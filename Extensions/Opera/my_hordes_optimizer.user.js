@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MHO Addon
-// @version      1.1.18.0
+// @version      1.1.19.0
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/, rubrique Tutoriels
 // @author       Zerah
 //
@@ -31,7 +31,9 @@
 // ==/UserScript==
 
 const changelog = `${getScriptInfo().name} : Changelog pour la version ${getScriptInfo().version}\n\n`
-    + `[Correctif] Affichage des chantiers`;
+    + `[Correctif] Affichage des chantiers\n`
+    + `[Correctif] Compteur anti-abus\n`
+    + `[Correctif] Affichage en cas d'erreur des outils externes avec CSS`;
 
 const lang = (document.querySelector('html[lang]')?.getAttribute('lang') || document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2) || 'fr';
 
@@ -4202,9 +4204,30 @@ function createLargeUpdateExternalToolsButton(update_external_tools_btn) {
                     });
                     tools_fail = [...tools_fail, ...final.filter((final_item) => !final_item.value || (final_item.value.toLowerCase() !== 'ok' && final_item.value.toLowerCase() !== 'not activated'))];
                     if (index >= response_items.length - 1) {
-                        update_external_tools_btn.innerHTML = tools_fail.length === 0
-                            ? `<img src="${repo_img_hordes_url}icons/done.png">` + getI18N(texts.update_external_tools_success_btn_label)
-                            : `<img src="${repo_img_hordes_url}emotes/warning.gif">${getI18N(texts.update_external_tools_errors_btn_label)}<br>${tools_fail.map((item) => item.key.replace('Status', ` : ${item.value}`)).join('<br>')}`;
+
+                        update_external_tools_btn.innerText = '';
+                        if (tools_fail.length === 0) {
+                            let icon = document.createElement('img');
+                            icon.src = `${repo_img_hordes_url}icons/done.png`;
+                            update_external_tools_btn.appendChild(icon);
+
+                            let text = document.createElement('text');
+                            text.innerText = getI18N(texts.update_external_tools_success_btn_label);
+                            update_external_tools_btn.appendChild(text);
+                        } else {
+                            let icon = document.createElement('img');
+                            icon.src = `${repo_img_hordes_url}emotes/warning.gif`;
+                            update_external_tools_btn.appendChild(icon);
+
+                            let text = document.createElement('div');
+                            update_external_tools_btn.appendChild(text);
+
+                            tools_fail.forEach((tool_fail) => {
+                                let tool_text = document.createElement('div');
+                                tool_text.innerText = tool_text.key.replace('Status', tool_text.value);
+                                text.appendChild(tool_fail);
+                            })
+                        }
                     }
                 });
 
@@ -4213,7 +4236,15 @@ function createLargeUpdateExternalToolsButton(update_external_tools_btn) {
                 }
             })
             .catch((e) => {
-                update_external_tools_btn.innerHTML = `<img src="${repo_img_hordes_url}professions/death.gif">` + getI18N(texts.update_external_tools_fail_btn_label);
+                update_external_tools_btn.innerText = '';
+
+                let icon = document.createElement('img');
+                icon.src = `${repo_img_hordes_url}professions/death.gif`;
+                update_external_tools_btn.appendChild(icon);
+
+                let text = document.createElement('text');
+                text.innerText = getI18N(texts.update_external_tools_fail_btn_label);
+                update_external_tools_btn.appendChild(text);
             });
     });
 
@@ -4377,7 +4408,7 @@ function hideCompletedBuildings() {
                 observeBuildings();
             }
         } else {
-            showBuildings();
+            showBuildings(buildings);
         }
     }
 }
@@ -7008,7 +7039,6 @@ function displayAntiAbuseCounter() {
         /** Fin */
 
         getStorageItem(mho_anti_abuse_key).then((counter_values) => {
-            console.log('counter_values on loading (avant que la prise soit prise en compte)', counter_values);
             let add_counter_btn = document.createElement('button');
             add_counter_btn.innerText = '+';
             second_part.appendChild(add_counter_btn);
@@ -7041,14 +7071,7 @@ function displayAntiAbuseCounter() {
                     let since = (Date.now() - parseInt(_counter_value.take_at))
                     let time_left = new Date(((15) * 60000) - since);
                     if (time_left < 0) {
-                        console.log('_counter_value', _counter_value);
-                        console.log('_index', _index);
-                        console.log('time_left', time_left);
-                        console.log('counter_values', [...counter_values]);
-                        console.log('index', index);
-                        console.log('counter_value_before', [...counter_values]);
                         counter_values.splice(index, 1);
-                        console.log('counter_value_after', [...counter_values]);
                         setStorageItem(mho_anti_abuse_key, [...counter_values]);
                     }
                     return time_left < 0;
@@ -7072,7 +7095,6 @@ function displayAntiAbuseCounter() {
                         if (is_time_invalid(counter_value, index)) {
                             clearInterval(interval);
                             if (value_in_list) {
-                                console.log('remove_value_in_list', value_in_list);
                                 value_in_list.remove();
                             }
                         } else {
@@ -7099,14 +7121,13 @@ function displayAntiAbuseCounter() {
                 let old_bag;
 
                 bank.addEventListener('click', (event) => {
+                    event.stopPropagation();
                     if (event.srcElement.nodeName.toLowerCase() !== 'li' && event.srcElement.nodeName.toLowerCase() !== 'span' && event.srcElement.nodeName.toLowerCase() !== 'img') return;
                     if (event.srcElement.className !== '' && event.srcElement.className !== 'item' && event.srcElement.className !== 'item-icon') return;
 
                     let rucksack = document.querySelector('#bank-inventory ul.rucksack');
 
-                    if (!old_bag || old_bag === {}) {
-                        old_bag = document.querySelectorAll('#bank-inventory ul.rucksack li.item:not(.locked)');
-                    }
+                    old_bag = document.querySelectorAll('#bank-inventory ul.rucksack li.item');
 
                     let callback = (mutationsList) => {
 
@@ -7117,7 +7138,7 @@ function displayAntiAbuseCounter() {
 
                         setTimeout(() => {
 
-                            let new_bag = document.querySelectorAll('#bank-inventory ul.rucksack li.item:not(.locked)');
+                            let new_bag = document.querySelectorAll('#bank-inventory ul.rucksack li.item');
 
                             if (old_bag?.length < new_bag?.length) {
                                 getStorageItem(mho_anti_abuse_key).then((counter_values) => {
