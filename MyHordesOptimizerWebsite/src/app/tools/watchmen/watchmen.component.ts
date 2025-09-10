@@ -241,10 +241,8 @@ export class WatchmenComponent implements OnInit {
         }
     }
 
-    public changeCitizen(selectedCitizenId: number, watchman: Watchman) {
-        console.log("J'entre")
-        watchman.citizen = this.all_citizens.find((citizen: Citizen) => selectedCitizenId === citizen.id) as Citizen;
-        console.log(watchman.citizen, selectedCitizenId, this.all_citizens)
+    public compareWithCitizen(element: Watchman, option: Watchman): boolean {
+        return element.id === option.id;
     }
 
     public async addNewWatchman(): Promise<void> {
