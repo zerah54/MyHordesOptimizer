@@ -82,8 +82,9 @@
                                                             <mat-label i18n>Citoyen</mat-label>
                                                             <mho-select [options]="all_citizens | citizensForWatch:watchmen()"
                                                                         [bindLabel]="'name'"
+                                                                        [bindValue]="'id'"
                                                                         [bindIcon]="'job.value.img'"
-                                                                        [(ngModel)]="watchman.citizen">
+                                                                        [ngModel]="watchman.citizen" (ngModelChange)="changeCitizen($event, watchman)">
                                                             </mho-select>
                                                         </mat-form-field>
                                                     </div>

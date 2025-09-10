@@ -25,7 +25,6 @@ import { Watchman } from '../../_abstract_model/types/watchman.class';
 import { CitizenInfoComponent } from '../../shared/elements/citizen-info/citizen-info.component';
 import { ListElementAddRemoveComponent } from '../../shared/elements/list-elements-add-remove/list-element-add-remove.component';
 import { SelectComponent } from '../../shared/elements/select/select.component';
-import { JobFromIdPipe } from '../../shared/pipes/job-from-id.pipe';
 import { getTown, getUser } from '../../shared/utilities/localstorage.util';
 import { CitizensForWatchPipe } from './citizens-for-watch.pipe';
 
@@ -38,7 +37,7 @@ const material_modules: Imports = [MatButtonModule, MatCardModule, MatFormFieldM
     templateUrl: './watchmen.component.html',
     styleUrls: ['./watchmen.component.scss'],
     encapsulation: ViewEncapsulation.None,
-    imports: [...angular_common, ...components, ...material_modules, MatTabGroup, MatAccordion, MatTab, MatTabContent, MatExpansionPanel, MatExpansionPanelHeader, SelectComponent, CitizensForWatchPipe, CitizenInfoComponent, ListElementAddRemoveComponent, JobFromIdPipe, NgOptimizedImage, MatDivider]
+    imports: [...angular_common, ...components, ...material_modules, MatTabGroup, MatAccordion, MatTab, MatTabContent, MatExpansionPanel, MatExpansionPanelHeader, SelectComponent, CitizensForWatchPipe, CitizenInfoComponent, ListElementAddRemoveComponent, NgOptimizedImage, MatDivider]
 })
 
 export class WatchmenComponent implements OnInit {
@@ -242,6 +241,11 @@ export class WatchmenComponent implements OnInit {
         }
     }
 
+    public changeCitizen(selectedCitizenId: number, watchman: Watchman) {
+        console.log("J'entre")
+        watchman.citizen = this.all_citizens.find((citizen: Citizen) => selectedCitizenId === citizen.id) as Citizen;
+        console.log(watchman.citizen, selectedCitizenId, this.all_citizens)
+    }
 
     public async addNewWatchman(): Promise<void> {
         // TODO quand on aura un back : await this.realtime_watchmen_service.updateWatchman(this.selected_tab_index + 1, new Watchman());

@@ -9,7 +9,7 @@ import { Watchman } from '../../_abstract_model/types/watchman.class';
 export class CitizensForWatchPipe implements PipeTransform {
     transform(all_citizens: Citizen[], watchmen: Watchman[]): Citizen[] {
         return all_citizens.filter((citizen: Citizen): boolean => {
-            return !(citizen.is_dead || watchmen.some((watchman: Watchman) => watchman.citizen.id === citizen.id));
+            return !(citizen.is_dead || watchmen.some((watchman: Watchman) => watchman.citizen?.id === citizen?.id));
         });
     }
 }
