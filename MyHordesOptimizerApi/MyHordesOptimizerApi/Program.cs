@@ -214,15 +214,15 @@ app.Use((context, next) =>
 });
 
 // Middleware Swagger
+
+if (app.Environment.EnvironmentName == "Preprod")
+{
+    app.UsePathBase("/dev");
+}
 app.UseSwagger();
 app.UseSwaggerUI(c =>
 {
-    var swaggerJsonPath = (app.Urls.Count > 0 ? app.Urls.ElementAt(0) : "").TrimEnd('/') + "/swagger/v1/swagger.json";
-    
-    c.SwaggerEndpoint(
-        swaggerJsonPath,
-        "MHO API"
-    );
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "MHO API");
     c.RoutePrefix = "docs";
 });
 
