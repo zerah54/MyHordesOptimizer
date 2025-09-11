@@ -216,8 +216,12 @@ app.Use((context, next) =>
 app.UseSwagger();
 app.UseSwaggerUI(c =>
 {
-    c.SwaggerEndpoint("/swagger/v1/swagger.json", "MHO API");
-    c.RoutePrefix =  "docs";
+    var swaggerJsonPath = app.Environment.EnvironmentName == "Preprod"
+        ? "/dev/swagger/v1/swagger.json" // PREPROD
+        : "/swagger/v1/swagger.json";    // PROD OR LOCAL
+
+    c.SwaggerEndpoint(swaggerJsonPath, "MHO API");
+    c.RoutePrefix = "docs";
 });
 
 app.UseHttpsRedirection();
