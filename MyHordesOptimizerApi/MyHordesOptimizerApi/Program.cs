@@ -42,6 +42,7 @@ using Sentry;
 using Serilog;
 using System;
 using System.IO;
+using System.Linq;
 using System.Net.Http;
 using System.Reflection;
 using System.Text.Json.Serialization;
@@ -216,11 +217,12 @@ app.Use((context, next) =>
 app.UseSwagger();
 app.UseSwaggerUI(c =>
 {
-    var swaggerJsonPath = app.Environment.EnvironmentName == "Preprod"
-        ? "/dev/swagger/v1/swagger.json" // PREPROD
-        : "/swagger/v1/swagger.json";    // PROD OR LOCAL
-
-    c.SwaggerEndpoint(swaggerJsonPath, "MHO API");
+    var swaggerJsonPath = (app.Urls.Count > 0 ? app.Urls.ElementAt(0) : "").TrimEnd('/') + "/swagger/v1/swagger.json";
+    
+    c.SwaggerEndpoint(
+        swaggerJsonPath,
+        "MHO API"
+    );
     c.RoutePrefix = "docs";
 });
 
