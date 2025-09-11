@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.OpenApi.Models;
 using MyHordesOptimizerApi;
 using MyHordesOptimizerApi.Configuration.Impl;
 using MyHordesOptimizerApi.Configuration.Impl.ExternalTools;
@@ -54,6 +55,18 @@ SentrySdk.Init(options =>
 });
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Swagger
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "MHO API",
+        Version = "v1",
+        Description = "API MyHordesOptimizer Swagger"
+    });
+});
 
 builder.Services.AddCors();
 builder.Host.UseSerilog((_, services, configuration) =>
@@ -197,6 +210,16 @@ app.Use((context, next) =>
 {
     context.Request.EnableBuffering();
     return next();
+});
+
+// Middleware Swagger
+app.UseSwagger();
+app.UseSwaggerUI(c =>
+{
+    var swaggerJsonPath = "../swagger/v1/swagger.json";
+
+    c.SwaggerEndpoint(swaggerJsonPath, "MHO API");
+    c.RoutePrefix = "docs";
 });
 
 app.UseHttpsRedirection();
