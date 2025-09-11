@@ -75,8 +75,10 @@ export class SelectComponent<T> implements ControlValueAccessor, Validator, MatF
     public form_control: InputSignal<UntypedFormControl> = input(new UntypedFormControl());
     public searchable: InputSignalWithTransform<boolean, unknown> = input(false, {transform: booleanAttribute});
     public class: InputSignal<string> = input('');
+    public compareWith: InputSignal<((element: any, option: any) => boolean) | undefined> = input<((element: any, option: any) => boolean) | undefined>(undefined);
     /** Doit-on afficher sous forme de chips les différentes valeurs ? Fonctionne uniquement si "multiple" */
     public chips: InputSignalWithTransform<boolean, unknown> = input(false, {transform: booleanAttribute});
+
     @Input() set options(options: (T | string)[]) {
         this.displayed_options = [...options];
         this.complete_options = [...options];
