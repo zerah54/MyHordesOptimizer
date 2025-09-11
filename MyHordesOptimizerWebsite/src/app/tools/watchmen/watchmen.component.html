@@ -3,6 +3,7 @@
         <ng-container i18n>Veilles</ng-container>
     </mat-card-title>
 </mat-card-header>
+
 <mat-card-content class="mho-watchmen">
     @if (all_citizens && all_items) {
         <mat-tab-group [(selectedIndex)]="selected_tab_index" mat-align-tabs="start" mat-stretch-tabs="false">
@@ -28,26 +29,27 @@
                                         </mat-card-header>
                                         <mat-divider/>
                                         <mat-card-content>
-                                            <div class="recap-row"><span>Attaque : 1007</span>&nbsp;<img [ngSrc]="HORDES_IMG_REPO + 'emotes/zombie.gif'"
-                                                                                                         width="16"
-                                                                                                         height="16" alt=""></div>
-                                            <div class="recap-row"><span>Défense actuelle : 586</span>&nbsp;<img [ngSrc]="HORDES_IMG_REPO + 'icons/def.gif'"
-                                                                                                                 width="16"
-                                                                                                                 height="16" alt=""></div>
-                                            <div class="recap-row"><span>Objectif de défense : 421</span>&nbsp;<img [ngSrc]="HORDES_IMG_REPO + 'icons/def.gif'"
-                                                                                                                    width="16"
-                                                                                                                    height="16" alt=""></div>
-                                            <div class="recap-row"><span>Total veilleurs : 125</span>&nbsp;<img
-                                                [ngSrc]="HORDES_IMG_REPO + 'actions/watchmen.gif'"
-                                                width="16"
-                                                height="16" alt=""></div>
-                                            <div class="recap-row"><span>% de survie des veilleurs : 95%</span>&nbsp;<img
-                                                [ngSrc]="HORDES_IMG_REPO + 'heroskill/status_clean.gif'" width="16"
-                                                height="16" alt=""></div>
-                                            <div class="recap-row"><span>% de chance d'un mort : 0.85</span>&nbsp;<img
-                                                [ngSrc]="HORDES_IMG_REPO + 'emotes/death.gif'"
-                                                width="16"
-                                                height="16" alt=""></div>
+                                            <div class="recap-row">
+                                                <mat-form-field appearance="outline" class="short-bottom">
+                                                    <mat-label i18n>Défense des veilleurs</mat-label>
+                                                    <img matPrefix [ngSrc]="HORDES_IMG_REPO + 'actions/watchmen.gif'" width="16" height="16">
+                                                    <input matInput [value]="getDefenceFromWatchmen()" readonly>
+                                                </mat-form-field>
+                                            </div>
+                                            <div class="recap-row">
+                                                <mat-form-field appearance="outline" class="short-bottom">
+                                                    <mat-label i18n>% de survie des veilleurs :</mat-label>
+                                                    <img matPrefix [ngSrc]="HORDES_IMG_REPO + 'heroskill/status_clean.gif'" width="16" height="16">
+                                                    <input matInput [value]="getSurvivalOfWatchmen()" readonly>
+                                                </mat-form-field>
+                                            </div>
+                                            <div class="recap-row">
+                                                <mat-form-field appearance="outline" class="short-bottom">
+                                                    <mat-label i18n>% de chance d'un mort :</mat-label>
+                                                    <img matPrefix [ngSrc]="HORDES_IMG_REPO + 'emotes/death.gif'" width="16" height="16">
+                                                    <input matInput [value]="getChanceOfDeath()" readonly>
+                                                </mat-form-field>
+                                            </div>
                                         </mat-card-content>
                                     </mat-card>
                                 </div>
@@ -61,9 +63,10 @@
                                                                           [displayPseudoMode]="'simple'"
                                                                           [citizen]="watchman.citizen"></mho-citizen-info>
                                                     </div>
-                                                    <div class="defense">104&nbsp;<img [ngSrc]="HORDES_IMG_REPO + 'icons/def.gif'" width="16"
-                                                                                       height="16" alt=""></div>
-                                                    <div class="survival">97% de survie</div>
+                                                    <div class="defense">{{ getDefenceFromCitizen(watchman.citizen) }}&nbsp;<img
+                                                        [ngSrc]="HORDES_IMG_REPO + 'icons/def.gif'" width="16"
+                                                        height="16" alt=""></div>
+                                                    <div class="survival">{{ getSurvivalFromCitizen(watchman.citizen) }}% de survie</div>
 
                                                 } @else {
                                                     Veilleur n°{{ index + 1 }}
@@ -113,6 +116,13 @@
                                                                                          emptyLabel="Vider les états"
                                                                                          i18n-emptyLabel (empty)="emptyStatus(watchman.citizen)">
                                                             </mho-list-element-add-remove>
+                                                        </div>
+                                                        <div class="previousWatches">
+                                                            <mat-form-field appearance="outline" class="short-bottom">
+                                                                <mat-label i18n>Nombre de veilles effectuées</mat-label>
+                                                                <img matPrefix [ngSrc]="HORDES_IMG_REPO + 'actions/watchmen.gif'" width="16" height="16">
+                                                                <input matInput type="number" value="0">
+                                                            </mat-form-field>
                                                         </div>
                                                     }
                                                 </div>

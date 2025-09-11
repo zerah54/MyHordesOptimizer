@@ -52,10 +52,17 @@ export class WatchmenComponent implements OnInit {
     protected all_citizens!: Citizen[];
     protected all_items: Item[] = [];
     protected bank_items: Item[] = [];
+
     protected readonly HORDES_IMG_REPO = HORDES_IMG_REPO;
+    protected is_ikea_built: boolean = true;
+    protected is_pet_shop_built: boolean = true;
+    protected is_grinder_built: boolean = true;
     private api_service: ApiService = inject(ApiService);
     private town_service: TownService = inject(TownService);
     private destroy_ref: DestroyRef = inject(DestroyRef);
+    private isSprinklerSystemBuilt: boolean = false;
+    private isBattlementsLevel3: boolean = false;
+    private isGuardroomBuilt: boolean = false;
 
     public get objectsList(): ListForAddRemove[] {
         return [{label: $localize`Banque`, list: this.bank_items}, {label: $localize`Tous`, list: this.all_items},];
@@ -120,6 +127,179 @@ export class WatchmenComponent implements OnInit {
         }
     }
 
+    public getDefenceFromWatchmen(): number {
+        return this.watchmen().reduce((total: number, watchman: Watchman) => total + this.getDefenceFromCitizen(watchman.citizen), 0);
+    }
+
+    public getSurvivalFromCitizen(citizen: Citizen) {
+        let survival = 92;
+
+
+        // Jobs
+        if (citizen.job?.getLabel() === 'Guardian') {
+            survival += 5;
+        }
+
+        // Status
+        citizen.status?.icons.forEach((status: StatusEnum) => {
+            switch (status) {
+                case StatusEnum.THIRST1:
+                case StatusEnum.THIRST2:
+                    survival -= 3;
+                    break;
+
+                case StatusEnum.DRUGGED:
+                    survival += 3;
+                    break;
+
+                case StatusEnum.DRUNK:
+                    survival += 2;
+                    break;
+
+                case StatusEnum.HEALED:
+                    survival -= 5;
+                    break;
+
+                case StatusEnum.ADDICT: // hooked
+                    survival -= 6;
+                    break;
+
+                case StatusEnum.IMMUNE:
+                    survival += 1;
+                    break;
+
+                case StatusEnum.INFECTION:
+                    survival -= 10;
+                    break;
+
+                case StatusEnum.TERROR:
+                    survival -= 5;
+                    break;
+
+                case StatusEnum.WOUND1:
+                case StatusEnum.WOUND2:
+                case StatusEnum.WOUND3:
+                case StatusEnum.WOUND4:
+                case StatusEnum.WOUND5:
+                case StatusEnum.WOUND6:
+                    survival -= 10;
+                    break;
+
+                default:
+                    break;
+            }
+        });
+
+        // Buildings
+        if (this.isSprinklerSystemBuilt) {
+            survival -= 3;
+        }
+        if (this.isGuardroomBuilt) {
+            survival += 5;
+        }
+        if (this.isBattlementsLevel3) {
+            survival += 1;
+        }
+
+        // Weapons
+        citizen.bag?.items.forEach(item => {
+            switch (item.uid) {
+                case 'car_door_#00':
+                    survival += 3;
+                    break;
+                case 'pumpkin_tasty_#00':
+                    survival += 1;
+                    break;
+                case 'taser_#00':
+                    survival += 1;
+                    break;
+                case 'music_#00':
+                    survival -= 2;
+                    break;
+                default:
+                    break;
+            }
+        });
+
+        // TODO : Previous Watches
+        if (citizen.previousWatches) {
+            switch (citizen.previousWatches) {
+                case 2:
+                    survival -= 1;
+                    break;
+                case 3:
+                    survival -= 4;
+                    break;
+                case 4:
+                    survival -= 9;
+                    break;
+                case 5:
+                    survival -= this.hasS3 ? 15 : 20;
+                    break;
+                case 6:
+                    survival -= this.hasS3 ? 20 : 30;
+                    break;
+                case 7:
+                    survival -= this.hasS3 ? 30 : 42;
+                    break;
+                case 8:
+                    survival -= this.hasS3 ? 40 : 56;
+                    break;
+                case 9:
+                    survival -= this.hasS3 ? 50 : 72;
+                    break;
+                case 10:
+                    survival -= this.hasS3 ? 60 : 90;
+                    break;
+                case 11:
+                    survival -= this.hasS3 ? 75 : 90;
+                    break;
+                case 12:
+                    survival -= this.hasS3 ? 90 : 90;
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        return survival
+    }
+
+    public getDefenceFromCitizen(citizen: Citizen): number {
+        return citizen.bag?.items
+            .map(item => {
+                let item_def: number = item.guard;
+                console.log('1.', item_def)
+                console.log(item)
+                item.properties.forEach(property => {
+                    console.log(item_def)
+                    switch (property.key) {
+                        case 'nw_ikea':
+                            item_def = this.is_ikea_built ? item_def * 1.30 : item_def;
+                            console.log('2.', item_def)
+                            break;
+                        case 'nw_trebuchet':
+                            item_def = this.is_pet_shop_built ? item_def * 1.30 : item_def;
+                            console.log('2.', item_def)
+                            break;
+                        case 'nw_armory':
+                            item_def = this.is_grinder_built ? item_def * 1.20 : item_def;
+                            console.log('2.', item_def)
+                            break;
+                        default:
+                            break;
+                    }
+                    item_def = Math.floor(item_def)
+                    console.log('3.', item_def)
+                });
+                return item_def;
+            })
+            .reduce((previousValue: number, currentValue: number): number => {
+                return previousValue + currentValue;
+            }, 0) ?? 0;
+    }
+
+
     /**
      * On retire 1 au compteur de l'item
      * Si l'item tombe à 0, on le retire de la liste
@@ -177,7 +357,8 @@ export class WatchmenComponent implements OnInit {
      */
     public addStatus(citizen: Citizen, status_key: string): void {
         if (citizen && citizen.status) {
-            citizen.status.icons.push(<StatusEnum>this.all_status.find((status: StatusEnum) => status?.key === status_key));
+            citizen.status.icons.push(<StatusEnum>this.all_status.find((status: StatusEnum) => status?.key === status_key))
+
 
             this.town_service
                 .updateStatus(citizen)
@@ -201,7 +382,8 @@ export class WatchmenComponent implements OnInit {
      */
     public removeStatus(citizen: Citizen, status_key: string): void {
         if (citizen && citizen.status) {
-            const existing_status_index: number | undefined = citizen.status.icons.findIndex((status: StatusEnum) => status?.key === status_key);
+            const existing_status_index: number | undefined = citizen.status.icons.findIndex((status: StatusEnum) => status?.key === status_key)
+
             if (existing_status_index !== undefined && existing_status_index !== null && existing_status_index > -1) {
                 citizen.status.icons.splice(existing_status_index, 1);
             }
@@ -248,6 +430,14 @@ export class WatchmenComponent implements OnInit {
     public async addNewWatchman(): Promise<void> {
         // TODO quand on aura un back : await this.realtime_watchmen_service.updateWatchman(this.selected_tab_index + 1, new Watchman());
         this.watchmen().push(new Watchman({id: this.watchmen().length}));
+    }
+
+    getSurvivalOfWatchmen() {
+        return 10
+    }
+
+    getChanceOfDeath() {
+        return 1
     }
 }
 

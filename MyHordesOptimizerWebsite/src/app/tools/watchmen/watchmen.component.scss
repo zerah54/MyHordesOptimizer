@@ -85,6 +85,21 @@
                         > .recap-row {
                             display: flex;
                             align-items: center;
+
+                            > .mat-mdc-form-field {
+                                display: block;
+
+                                .mat-mdc-form-field-icon-prefix {
+                                    margin-left: 0.5em;
+                                    margin-right: 0.5em;
+                                }
+
+                                .mat-mdc-form-field-icon-suffix {
+                                    small {
+                                        margin-right: 0.5em;
+                                    }
+                                }
+                            }
                         }
                     }
 
@@ -139,6 +154,21 @@
 
                             .bag, .status {
                                 flex: 1;
+                            }
+
+                            > .mat-mdc-form-field {
+                                display: block;
+
+                                .mat-mdc-form-field-icon-prefix {
+                                    margin-left: 0.5em;
+                                    margin-right: 0.5em;
+                                }
+
+                                .mat-mdc-form-field-icon-suffix {
+                                    small {
+                                        margin-right: 0.5em;
+                                    }
+                                }
                             }
                         }
 
