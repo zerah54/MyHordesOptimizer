@@ -42,7 +42,6 @@ using Sentry;
 using Serilog;
 using System;
 using System.IO;
-using System.Linq;
 using System.Net.Http;
 using System.Reflection;
 using System.Text.Json.Serialization;
@@ -214,15 +213,12 @@ app.Use((context, next) =>
 });
 
 // Middleware Swagger
-
-if (app.Environment.EnvironmentName == "Preprod")
-{
-    app.UsePathBase("/dev");
-}
 app.UseSwagger();
 app.UseSwaggerUI(c =>
 {
-    c.SwaggerEndpoint("/swagger/v1/swagger.json", "MHO API");
+    var swaggerJsonPath = "../swagger/v1/swagger.json";
+
+    c.SwaggerEndpoint(swaggerJsonPath, "MHO API");
     c.RoutePrefix = "docs";
 });
 
