@@ -15,7 +15,7 @@
         <mat-menu #shareMenu="matMenu">
             <div mat-menu-item (click)="shareExcel()" i18n>Enregistrer dans un fichier Excel</div>
             <div mat-menu-item (click)="importFileInput.click()" i18n>Importer depuis un fichier Excel</div>
-            <input #importFileInput type="file" style="display: none;" (change)="importExcel($event)"
+            <input #importFileInput type="file" style="display: none;" (change)="importExcel(importFileInput)"
                    accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">
         </mat-menu>
     </div>
@@ -43,11 +43,11 @@
                             </div>
                             <div class="mat-elevation-z8" style="flex: 1">
                                 <table mat-table [dataSource]="datasource"
-                                        cdkDropList
-                                        cdkDropListLockAxis="y"
-                                        [cdkDropListData]="datasource"
-                                        (cdkDropListDropped)="sortWishlist($event)"
-                                        [cdkDropListDisabled]="drag_disabled">
+                                       cdkDropList
+                                       cdkDropListLockAxis="y"
+                                       [cdkDropListData]="datasource"
+                                       (cdkDropListDropped)="sortWishlist($event)"
+                                       [cdkDropListDisabled]="drag_disabled">
 
                                     @for (column of columns; track column.id) {
                                         <ng-container [matColumnDef]="column.id" [sticky]="column.sticky || false">
@@ -57,7 +57,7 @@
                                                     }
                                                     @case ('name') {
                                                         <mho-header-with-string-filter [header]="column.header" [(filterValue)]="wishlist_filters.items"
-                                                                                        (filterValueChange)="wishlist_filters_change.next()">
+                                                                                       (filterValueChange)="wishlist_filters_change.next()">
                                                         </mho-header-with-string-filter>
                                                     }
                                                     @default {
@@ -71,9 +71,9 @@
                                                     @switch (column.id) {
                                                         @case ('sort') {
                                                             <div cdkDragHandle
-                                                                    (mousedown)="drag_disabled = false"
-                                                                    (mouseup)="drag_disabled = true"
-                                                                    class="dragdrop-indicator">
+                                                                 (mousedown)="drag_disabled = false"
+                                                                 (mouseup)="drag_disabled = true"
+                                                                 class="dragdrop-indicator">
                                                                 <mat-icon>drag_indicator</mat-icon>
                                                             </div>
                                                         }
@@ -86,13 +86,14 @@
                                                         @case ('heaver') {
                                                             @if (row.item.is_heaver) {
                                                                 <img [ngSrc]="HORDES_IMG_REPO + 'item/cat_heavy.gif'"
-                                                                        matTooltip="Objet encombrant" i18n-matTooltip width="16" height="16">
+                                                                     matTooltip="Objet encombrant" i18n-matTooltip width="16" height="16">
                                                             }
                                                         }
                                                         @case ('depot') {
                                                             @if (edition_mode) {
                                                                 <mat-form-field class="no-bottom" appearance="outline">
-                                                                    <mat-select [(ngModel)]="row.depot" (ngModelChange)="changeDepot()" [compareWith]="compareWith">
+                                                                    <mat-select [(ngModel)]="row.depot" (ngModelChange)="changeDepot()"
+                                                                                [compareWith]="compareWith">
                                                                         @for (depot of depots; track depot.key) {
                                                                             <mat-option [value]="depot">{{ depot.value.label }}</mat-option>
                                                                         }
@@ -118,7 +119,7 @@
                                                                         </mat-form-field>
                                                                     } @else {
                                                                         <mat-checkbox [checked]="row.count < 0 || row.count === null || row.count === undefined"
-                                                                                        (change)="$event.checked ? row.count = -1 : row.count = 0">
+                                                                                      (change)="$event.checked ? row.count = -1 : row.count = 0">
                                                                             ∞
                                                                         </mat-checkbox>
                                                                     }
@@ -136,8 +137,8 @@
                                                                 @if (edition_mode && row.count >= 0) {
                                                                     <mat-form-field class="no-bottom count" appearance="outline">
                                                                         <input matInput type="number"
-                                                                                [ngModel]="row.count - row.bank_count - row.bag_count"
-                                                                                (ngModelChange)="row.count = row.bank_count + row.bag_count + $event">
+                                                                               [ngModel]="row.count - row.bank_count - row.bag_count"
+                                                                               (ngModelChange)="row.count = row.bank_count + row.bag_count + $event">
                                                                     </mat-form-field>
                                                                 } @else {
                                                                     @if (row.count >= 0) {

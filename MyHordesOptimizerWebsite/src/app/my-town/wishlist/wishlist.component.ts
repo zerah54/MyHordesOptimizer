@@ -1,6 +1,7 @@
 import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
 import { CommonModule, NgOptimizedImage } from '@angular/common';
-import { Component, EventEmitter, Inject, OnInit, ViewChild, ViewEncapsulation, DOCUMENT, inject, DestroyRef } from '@angular/core';
+import { Component, DestroyRef, DOCUMENT, EventEmitter, inject, Inject, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -37,7 +38,6 @@ import { ColumnIdPipe } from '../../shared/pipes/column-id.pipe';
 import { CustomKeyValuePipe } from '../../shared/pipes/key-value.pipe';
 import { ClipboardService } from '../../shared/services/clipboard.service';
 import { IsItemDisplayedPipe } from './is-item-displayed.pipe';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 const angular_common: Imports = [CommonModule, FormsModule, NgOptimizedImage];
 const components: Imports = [HeaderWithStringFilterComponent, LastUpdateComponent, SelectComponent];
@@ -49,7 +49,7 @@ const material_modules: Imports = [DragDropModule, MatButtonModule, MatCardModul
     templateUrl: './wishlist.component.html',
     styleUrls: ['./wishlist.component.scss'],
     encapsulation: ViewEncapsulation.None,
-    host: { style: 'display: contents' },
+    host: {style: 'display: contents'},
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class WishlistComponent implements OnInit {
@@ -299,7 +299,7 @@ export class WishlistComponent implements OnInit {
         URL.revokeObjectURL(url);
     }
 
-    public importExcel(event: Event): void {
+    public importExcel(element: HTMLInputElement): void {
         this.dialog
             .open<ConfirmDialogComponent, ConfirmDialogData>(ConfirmDialogComponent, {
                 data: {
@@ -312,12 +312,11 @@ export class WishlistComponent implements OnInit {
             .subscribe((confirm: boolean): void => {
                 if (confirm) {
 
-                    const target: HTMLInputElement = <HTMLInputElement>event.target;
-                    if (!target || !target.files || target.files.length === 0) {
+                    if (!element || !element.files || element.files.length === 0) {
                         return;
                     }
 
-                    const file: File = target.files[0];
+                    const file: File = element.files[0];
 
                     file.arrayBuffer().then((data: ArrayBuffer): void => {
                         const workbook: WorkBook = read(data);
