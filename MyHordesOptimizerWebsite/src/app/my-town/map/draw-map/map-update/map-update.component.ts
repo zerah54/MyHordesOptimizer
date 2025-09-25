@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, DestroyRef, inject, Inject, OnInit, ViewEncapsulation } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
@@ -20,7 +21,6 @@ import { MapUpdateCellComponent } from './map-update-cell/map-update-cell.compon
 import { MapUpdateCitizensComponent } from './map-update-citizens/map-update-citizens.component';
 import { MapUpdateDigsComponent } from './map-update-digs/map-update-digs.component';
 import { MapUpdateRuinComponent } from './map-update-ruin/map-update-ruin.component';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 const angular_common: Imports = [CommonModule, FormsModule];
 const components: Imports = [MapUpdateCellComponent, MapUpdateCitizensComponent, MapUpdateDigsComponent, MapUpdateRuinComponent];
@@ -71,10 +71,12 @@ export class MapUpdateComponent implements OnInit {
                     this.data.cell = new Cell({...this.cell.modelToDto()});
                 }
             });
-        this.digs_service
-            .updateDig(this.digs)
-            .pipe(takeUntilDestroyed(this.destroy_ref))
-            .subscribe();
+        if (this.digs?.length > 0) {
+            this.digs_service
+                .updateDig(this.digs)
+                .pipe(takeUntilDestroyed(this.destroy_ref))
+                .subscribe();
+        }
     }
 }
 

@@ -25,7 +25,7 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Map
         public List<int> Citizens { get; set; }
 
         [JsonProperty("note")]
-        public string Note { get; set; }
+        public string? Note { get; set; }
         [JsonProperty("x")]
         public int X { get; set; }
         [JsonProperty("y")]

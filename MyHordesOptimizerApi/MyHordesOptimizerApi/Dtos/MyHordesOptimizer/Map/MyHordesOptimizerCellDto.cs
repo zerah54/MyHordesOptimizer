@@ -28,7 +28,7 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Map
         public int NbKm { get; set; }
         public int NbPa { get; set; }
         public string ZoneRegen { get; set; }
-        public string Note { get; set; }
+        public string? Note { get; set; }
 
         public LastUpdateInfoDto? LastUpdateInfo { get; set; }
 

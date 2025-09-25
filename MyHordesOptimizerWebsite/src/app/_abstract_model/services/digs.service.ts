@@ -9,7 +9,7 @@ import { Dig } from '../types/dig.class';
 import { GlobalService } from './_global.service';
 
 
-@Injectable({ providedIn: 'root' })
+@Injectable({providedIn: 'root'})
 export class DigsService extends GlobalService {
 
     constructor(_http: HttpClient, private snackbar: SnackbarService) {
@@ -23,8 +23,8 @@ export class DigsService extends GlobalService {
                     next: (response: HttpResponse<DigDTO[]>) => {
                         let digs: Dig[] = dtoToModelArray(Dig, response.body);
                         digs = digs.sort((dig_a: Dig, dig_b: Dig) => {
-                            if (dig_a.update_info.update_time.isBefore(dig_b.update_info.update_time)) return -1;
-                            if (dig_a.update_info.update_time.isAfter(dig_b.update_info.update_time)) return 1;
+                            if (dig_a.update_info?.update_time?.isBefore(dig_b.update_info.update_time)) return -1;
+                            if (dig_a.update_info?.update_time?.isAfter(dig_b.update_info.update_time)) return 1;
                             return 0;
                         });
                         sub.next(digs);
