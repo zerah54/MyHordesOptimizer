@@ -56,6 +56,10 @@ export const links: IrlLink[] = [
     {from: 'Eragony', to: 'Kraky'},
     {from: 'Cessouu', to: 'Kraky'},
     {from: 'Cessouu', to: 'Davf'},
+    {from: 'Cessouu', to: 'Zerah'},
+    {from: 'Cessouu', to: 'Renack'},
+    {from: 'Cessouu', to: 'Emy'},
+    {from: 'Cessouu', to: 'Bigonoud'},
 ];
 
 export interface IrlLink {
