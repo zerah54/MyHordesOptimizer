@@ -251,6 +251,9 @@
             }
         }
     },
+    "cli": {
+      "analytics": false
+    },
     "schematics": {
       "@schematics/angular:component": {
         "type": "component"
