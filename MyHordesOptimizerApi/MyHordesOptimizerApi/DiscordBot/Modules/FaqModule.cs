@@ -116,8 +116,8 @@ namespace MyHordesOptimizerApi.DiscordBot.Modules
             descriptions.Add(new KeyValuePair<string, string>("## \\#\\# Moyen titre", "\n\n"));
             descriptions.Add(new KeyValuePair<string, string>("### \\#\\#\\# Petit titre", "\n\n"));
             descriptions.Add(new KeyValuePair<string, string>("-# \\-\\# Petit texte", "\n\n"));
-            descriptions.Add(new KeyValuePair<string, string>("\\* Liste à puce (les \a représentent les espaces)\n\a\a\\* Niveau 2\n\a\a\a\a\\* Niveau 3", "* Liste à puce\n * Niveau 2\n    * Niveau 3\n\n"));
-            descriptions.Add(new KeyValuePair<string, string>("\u200a1. Liste ordonnée (les \a représentent les espaces)\n\a\a1. niveau 2\n\a\a2. Niveau 2\n\a\a\a\a1. Niveau 3", "1. Liste ordonnée\n 1.  Niveau 2\n  2. Niveau 2\n    1. Niveau 3\n\n"));
+            descriptions.Add(new KeyValuePair<string, string>("\\* Liste à puce (les ⋅ représentent les espaces)\n⋅⋅\\* Niveau 2\n⋅⋅⋅⋅\\* Niveau 3", "* Liste à puce\n  * Niveau 2\n    * Niveau 3\n\n"));
+            descriptions.Add(new KeyValuePair<string, string>("\u200a1. Liste ordonnée (les ⋅ représentent les espaces)\n⋅⋅1. niveau 2\n⋅⋅2. Niveau 2\n⋅⋅⋅⋅⋅⋅1. Niveau 3", "1. Liste ordonnée\n  1. Niveau 2\n  2. Niveau 2\n      1. Niveau 3\n\n"));
             
             var completeDescription = "";
             
