@@ -1,5 +1,5 @@
 import { CommonModule, NgOptimizedImage, NgTemplateOutlet } from '@angular/common';
-import { Component, input, Input, ViewEncapsulation, InputSignal } from '@angular/core';
+import { Component, input, Input, InputSignal, ViewEncapsulation } from '@angular/core';
 import { MatTabChangeEvent, MatTabsModule } from '@angular/material/tabs';
 import { HORDES_IMG_REPO } from '../../../../_abstract_model/const';
 import { DisplayPseudoMode, Entry } from '../../../../_abstract_model/interfaces';
@@ -56,7 +56,7 @@ export class BuildingsRegistryComponent {
     private entries: Entry[] = [];
 
     private readonly dump_keywords: string[] = ['la décharge', 'in der Müllhalde', 'at the dump', 'el vertedero'];
-    private readonly vet_keywords: string[] = ['a attiré', 'in die Stadt gelockt', 'has lured', 'atrajo a', 'a réussi à attirer', 'has tried in vain to lure', 'logró atraer a'];
+    private readonly vet_keywords: string[] = ['a attiré', 'a réussi à attirer', 'in die Stadt gelockt', 'has successfully lured', 'has lured', 'atrajo a', 'logró atraer a', 'hat vergeblich', 'a essayé en vain', 'has tried in vain to lure', 'intentó sin éxito'];
 
 
     public entryHasPlayKeyword(entry: Entry, keyword: string): boolean {
