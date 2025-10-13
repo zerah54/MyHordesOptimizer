@@ -615,7 +615,7 @@ export class ExpeditionsComponent implements OnInit {
             })
             .afterClosed()
             .subscribe((new_expeditions: Expedition[]) => {
-                new_expeditions.forEach((new_expedition: Expedition, expedition_index: number) => {
+                (new_expeditions ?? []).forEach((new_expedition: Expedition, expedition_index: number) => {
                     new_expedition.position = expedition_index;
 
                     new_expedition.parts.forEach((new_expedition_part: ExpeditionPart, part_index: number) => {
@@ -634,7 +634,7 @@ export class ExpeditionsComponent implements OnInit {
                     return 0;
                 });
 
-                new_expeditions.forEach((new_expedition: Expedition) => {
+                (new_expeditions ?? []).forEach((new_expedition: Expedition) => {
                     this.saveExpedition(new_expedition);
                 });
             });
