@@ -12,6 +12,7 @@ import {
     InputSignalWithTransform,
     OnDestroy,
     Optional,
+    output,
     OutputEmitterRef,
     Self,
     Signal,
@@ -118,8 +119,8 @@ export class SelectComponent<T> implements ControlValueAccessor, Validator, MatF
         this.stateChanges.next();
     }
 
-    public filterChange: OutputEmitterRef<T | string | T[] | string[] | undefined> = new OutputEmitterRef();
-    public closed: OutputEmitterRef<void> = new OutputEmitterRef();
+    public filterChange: OutputEmitterRef<T | string | T[] | string[] | undefined> = output();
+    public closed: OutputEmitterRef<void> = output();
 
 
     get shouldLabelFloat(): boolean {
