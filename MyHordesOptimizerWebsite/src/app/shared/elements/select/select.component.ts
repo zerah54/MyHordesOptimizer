@@ -2,6 +2,7 @@ import { coerceBooleanProperty } from '@angular/cdk/coercion';
 import { CommonModule, NgOptimizedImage, NgTemplateOutlet } from '@angular/common';
 import {
     booleanAttribute,
+    ChangeDetectionStrategy,
     Component,
     ElementRef,
     HostBinding,
@@ -13,8 +14,11 @@ import {
     Optional,
     OutputEmitterRef,
     Self,
-    ViewChild,
-    ViewEncapsulation
+    Signal,
+    signal,
+    viewChild,
+    ViewEncapsulation,
+    WritableSignal
 } from '@angular/core';
 import { AbstractControl, ControlValueAccessor, NgControl, UntypedFormControl, ValidationErrors, Validator, Validators } from '@angular/forms';
 import { MatChipsModule } from '@angular/material/chips';
@@ -49,6 +53,7 @@ const material_modules: Imports = [MatChipsModule, MatDividerModule, MatFormFiel
             useExisting: SelectComponent
         }
     ],
+    changeDetection: ChangeDetectionStrategy.OnPush,
     host: {style: 'display: contents'},
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
@@ -59,8 +64,8 @@ export class SelectComponent<T> implements ControlValueAccessor, Validator, MatF
     @HostBinding('class.floating') floating: boolean = this.shouldLabelFloat;
 
     // get reference to the input element
-    @ViewChild(MatSelect) select!: MatSelect;
-    @ViewChild(MatInput) filter_input!: MatInput;
+    public select: Signal<MatSelect | undefined> = viewChild(MatSelect);
+    public filter_input: Signal<MatInput | undefined> = viewChild(MatInput);
 
     public multiple: InputSignalWithTransform<boolean, unknown> = input(false, {transform: booleanAttribute});
     public noLabel: InputSignalWithTransform<boolean, unknown> = input(false, {transform: booleanAttribute});
@@ -77,9 +82,10 @@ export class SelectComponent<T> implements ControlValueAccessor, Validator, MatF
     public class: InputSignal<string> = input('');
     /** Doit-on afficher sous forme de chips les différentes valeurs ? Fonctionne uniquement si "multiple" */
     public chips: InputSignalWithTransform<boolean, unknown> = input(false, {transform: booleanAttribute});
+
     @Input() set options(options: (T | string)[]) {
-        this.displayed_options = [...options];
-        this.complete_options = [...options];
+        this.displayed_options.set(options);
+        this.complete_options.set(options);
     }
 
     @Input() userAriaDescribedBy!: string;
@@ -122,7 +128,7 @@ export class SelectComponent<T> implements ControlValueAccessor, Validator, MatF
 
     public id: string = `mho-select-${SelectComponent.nextId++}`;
 
-    public displayed_options: (T | string)[] = [];
+    public displayed_options: WritableSignal<(T | string)[]> = signal([]);
 
     public stateChanges: Subject<void> = new Subject<void>();
     public controlType?: string | undefined;
@@ -132,7 +138,7 @@ export class SelectComponent<T> implements ControlValueAccessor, Validator, MatF
 
     protected readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
 
-    protected complete_options: (T | string)[] = [];
+    protected complete_options: WritableSignal<(T | string)[]> = signal([]);
     //The internal data model for form control value access
     private innerValue: T | string | T[] | string[] | undefined = undefined;
     /** errors for the form control will be stored in this array */
@@ -179,11 +185,11 @@ export class SelectComponent<T> implements ControlValueAccessor, Validator, MatF
     }
 
     public remove(value: unknown): void {
-        Array.from(this.select.options)
+        Array.from(this.select()?.options ?? [])
             .filter((option: MatOption<unknown>) => value === option.value)
             .forEach((option: MatOption<unknown>) => option.deselect());
         // this.updateValue(<TYPE>this.value);
-        this.select.options.notifyOnChanges();
+        this.select()?.options.notifyOnChanges();
     }
 
     public get errorState(): boolean {
@@ -211,20 +217,17 @@ export class SelectComponent<T> implements ControlValueAccessor, Validator, MatF
     }
 
     public onContainerClick(): void {
-        if (this.filter_input) {
-            this.filter_input.focus();
+        if (this.filter_input()) {
+            (<MatInput>this.filter_input()).focus();
         }
     }
 
     public filter(event: Event): void {
-        console.log('filter', event);
         const value: string = normalizeString((<HTMLInputElement>event.target)?.value);
-        console.log('value', value);
-        this.displayed_options = [...this.complete_options.filter((option: T | string) => {
+        this.displayed_options.set([...this.complete_options().filter((option: T | string) => {
             const label: string = normalizeString(this.label_pipe.transform(option, this.bindLabel() ?? ''));
             return label.indexOf(value) > -1;
-        })];
-        console.log('displayed_options', this.displayed_options);
+        })]);
     }
 
     //From ControlValueAccessor interface

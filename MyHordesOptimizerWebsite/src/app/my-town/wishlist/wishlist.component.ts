@@ -10,7 +10,7 @@ import { MatOptionModule } from '@angular/material/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
-import { MatInputModule } from '@angular/material/input';
+import { MatInput, MatInputModule } from '@angular/material/input';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
@@ -187,7 +187,9 @@ export class WishlistComponent implements OnInit {
                 .pipe(takeUntilDestroyed(this.destroy_ref))
                 .subscribe(() => {
                     this.add_item_select.value = undefined;
-                    this.add_item_select.filter_input.value = '';
+                    if (this.add_item_select.filter_input()) {
+                        (<MatInput>this.add_item_select.filter_input()).value = '';
+                    }
                     this.getWishlist();
                 });
         }

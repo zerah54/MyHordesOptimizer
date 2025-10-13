@@ -7,8 +7,7 @@ import { getPreRegistered } from './expeditions.utils';
 
 
 @Pipe({
-    name: 'citizensForExpe',
-    pure: false
+    name: 'citizensForExpe'
 })
 export class CitizensForExpePipe implements PipeTransform {
     transform(all_citizens: Citizen[], expedition_citizen: CitizenExpedition/*, current_expedition: Expedition, all_expeditions: Expedition[]*/): Citizen[] {

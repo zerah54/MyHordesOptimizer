@@ -38,14 +38,14 @@ export class HeaderWithSelectFilterComponent<T> {
     public displayFilter(): void {
         this.visible = true;
         setTimeout(() => {
-            this.filter.select.open();
+            this.filter.select()?.open();
         });
     }
 
     /** Vérifie si le filtre doit toujours être affiché */
     public checkVisibility(): void {
         setTimeout(() => {
-            if (this.filter.select.panelOpen) {
+            if (this.filter.select()?.panelOpen) {
                 this.visible = true;
             } else {
                 this.visible = this.filterValue() !== null && this.filterValue() !== undefined && this.filterValue().length > 0;

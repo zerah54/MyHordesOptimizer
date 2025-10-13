@@ -5,13 +5,13 @@
         <mat-select-trigger>
             @if (chips()) {
                 <mat-chip-listbox>
-                    @for (single_value of $any(value); track single_value; let i = $index) {
+                    @for (single_value of $any(value); track single_value; ) {
                         <mat-chip (removed)="remove(single_value)" class="mho-select-chip">
                             <button type="reset" matChipRemove>
                                 <mat-icon>cancel</mat-icon>
                             </button>
                             @if (single_value) {
-                                @if (single_value | bind:bindValue():displayed_options; as display_value) {
+                                @if (single_value | bind:bindValue():displayed_options(); as display_value) {
                                     <ng-container *ngTemplateOutlet="icons; context: {$implicit: display_value}"></ng-container>
                                     @if (!noLabel()) {
                                         <span>{{ display_value | label:bindLabel() }}</span>
@@ -24,7 +24,7 @@
             } @else {
                 <div style="display: flex; justify-content: space-between; align-items: center;">
                         <span style="overflow: hidden; text-overflow: ellipsis">
-                            @if (value | bind:bindValue():displayed_options; as display_values) {
+                            @if (value | bind:bindValue():displayed_options(); as display_values) {
                                 {{ $any(display_values) | multipleLabel:bindLabel() }}
                             }
                         </span>
@@ -38,7 +38,7 @@
         </mat-select-trigger>
     } @else {
         <mat-select-trigger style="display: flex; justify-content: space-between;">
-            @if (value | bind:bindValue():displayed_options; as display_value) {
+            @if (value | bind:bindValue():displayed_options(); as display_value) {
                 <span style="display: flex; align-items: center; gap: 0.5em;">
                     <ng-container *ngTemplateOutlet="icons; context: {$implicit: display_value}"></ng-container>
                     @if (!noLabel()) {
@@ -54,7 +54,7 @@
             }
         </mat-select-trigger>
     }
-    @if (complete_options && complete_options.length > 0 && searchable()) {
+    @if (complete_options() && complete_options().length > 0 && searchable()) {
         <form [autocomplete]="'off'">
             <mat-form-field class="no-bottom" style="width: 100%">
                 <input matInput placeholder="Rechercher" class="mho-search" (input)="filter($event)" (keydown.space)="$event.stopPropagation()"
@@ -67,7 +67,7 @@
         @if (emptyOption()) {
             <mat-option class="mho-option" [value]="undefined">--</mat-option>
         }
-        @for (option of displayed_options; track index; let index = $index) {
+        @for (option of displayed_options(); track index; let index = $index) {
             <mat-option class="mho-option" [value]="option | bindValue:bindValue()" [title]="option | label:bindLabel()">
             <span style="display: flex; align-items: center; gap: 0.5em;">
                 <ng-container *ngTemplateOutlet="icons; context: {$implicit: option}"></ng-container>
