@@ -1,98 +1,98 @@
 {
-    "hero_generic_return": {
-        "name": "hero_generic_return",
-        "title": "Die Rückkehr des Helden",
-        "description": "Wenn du {cfg_ctp_props_actions_hero_return_range} km oder weniger von der Stadt entfernt bist, kehrst du sofort in die Stadt zurück!",
-        "daysNeeded": 0,
-        "unlockable": true,
-        "nbUses": 1
-    },
-    "hero_generic_find": {
-        "name": "hero_generic_find",
-        "title": "Fund",
-        "description": "Wie durch ein Wunder treibst du einen nützlichen Gegenstand auf.",
-        "daysNeeded": 0,
-        "unlockable": true,
-        "nbUses": 1
-    },
-    "hero_generic_punch": {
-        "name": "hero_generic_punch",
-        "title": "Wildstyle Uppercut",
-        "description": "Damit kannst du mit einem Schlag {cfg_ctp_props_actions_hero_punch_kills} Zombies umbringen!",
-        "daysNeeded": 0,
-        "unlockable": true,
-        "nbUses": 1
-    },
-    "hero_generic_ap": {
-        "name": "hero_generic_ap",
-        "title": "Zweite Lunge",
-        "description": "<nc-HeroSecondWindBonusAP op=\"gt\" val=\"0\">Verschafft dir {cfg_ctp_props_actions_hero_sw_sp} frische Erkundungspunkte.</nc-HeroSecondWindBonusAP><c-HeroSecondWindBonusAP op=\"gt\" val=\"0\">Verschafft dir {cfg_ctp_props_actions_hero_sw_sp} frische Erkundungspunkte, stellt {cfg_ctp_props_actions_hero_sw_ap} AP wieder her und beseitigt deine Müdigkeit.</c-HeroSecondWindBonusAP>",
-        "daysNeeded": 0,
-        "unlockable": true,
-        "nbUses": 1
-    },
-    "hero_generic_immune": {
-        "name": "hero_generic_immune",
-        "title": "Den Tod besiegen",
-        "description": "Beim nächsten Angriff wird der Effekt des <c-HeroImmuneStatusList op=\"map\" thirst=\"Durst\" hunger=\"Hunger\" infection=\"Infektions\" addiction=\"Abhängigkeits\" glue=\"-, \" final_glue=\"- und \"></c-HeroImmuneStatusList>zustands außer Kraft gesetzt.<c-HeroImmuneHeals op=\"is\" val=\"true\"> Zudem wirst du mit sofortiger Wirkung von Angststarre und Kater geheilt und verlierst den \"Bandagiert\"-Status.</c-HeroImmuneHeals>",
-        "daysNeeded": 0,
-        "unlockable": true,
-        "nbUses": 1
-    },
-    "hero_generic_immune2": {
-        "name": "hero_generic_immune2",
-        "title": "Rudimentäre Pflege",
-        "description": "Erlaubt es einem anderen Bürger, beim nächsten Angriff sowohl Durst- als auch Infektionszustand außer Kraft zu setzen.",
-        "daysNeeded": 0,
-        "unlockable": true,
-        "nbUses": 1
-    },
-    "hero_generic_find_lucky": {
-        "name": "hero_generic_find_lucky",
-        "title": "Schönes Fundstück",
-        "description": "Wie durch ein Wunder treibst du einen nützlichen Gegenstand auf.",
-        "daysNeeded": 0,
-        "unlockable": true,
-        "nbUses": 1
-    },
-    "hero_generic_find_lcky2": {
-        "name": "hero_generic_find_lcky2",
-        "title": "Beeindruckendes Fundstück",
-        "description": "Wie durch ein Wunder treibst du einen nützlichen Gegenstand auf.",
-        "daysNeeded": 0,
-        "unlockable": true,
-        "nbUses": 1
-    },
-    "hero_generic_find_lcky3": {
-        "name": "hero_generic_find_lcky3",
-        "title": "Erstaunliches Fundstück",
-        "description": "Wie durch ein Wunder treibst du einen nützlichen Gegenstand auf.",
-        "daysNeeded": 0,
-        "unlockable": true,
-        "nbUses": 1
-    },
-    "hero_generic_rescue": {
-        "name": "hero_generic_rescue",
-        "title": "Rettung",
-        "description": "Du bringst einen anderen Spieler nach Hause (dieser darf max. {cfg_ctp_props_actions_hero_rescue_range} Felder von der Stadt entfernt sein).",
-        "daysNeeded": 0,
-        "unlockable": true,
-        "nbUses": 1
-    },
-    "hero_generic_friendship": {
-        "name": "hero_generic_friendship",
-        "title": "Freundschaft",
-        "description": "Du spendest eine deiner noch nicht verwendeten Heldentaten an einen anderen Spieler.",
-        "daysNeeded": 0,
-        "unlockable": false,
-        "nbUses": 1
-    },
-    "hero_generic_fs_xp": {
-        "name": "hero_generic_fs_xp",
-        "title": "Erfahrung teilen",
-        "description": "Du gibst 5 Erfahrungspunkte aus, damit ein anderer Spieler 10 Erfahrungspunkte erhält.",
-        "daysNeeded": 0,
-        "unlockable": false,
-        "nbUses": 1
-    }
+  "hero_generic_return": {
+    "name": "hero_generic_return",
+    "title": "Die Rückkehr des Helden",
+    "description": "Wenn du {CitizenProperties::HeroReturnRange->translationKey()} km oder weniger von der Stadt entfernt bist, kehrst du sofort in die Stadt zurück!",
+    "daysNeeded": 0,
+    "unlockable": true,
+    "nbUses": 1
+  },
+  "hero_generic_find": {
+    "name": "hero_generic_find",
+    "title": "Fund",
+    "description": "Wie durch ein Wunder treibst du einen nützlichen Gegenstand auf.",
+    "daysNeeded": 0,
+    "unlockable": true,
+    "nbUses": 1
+  },
+  "hero_generic_punch": {
+    "name": "hero_generic_punch",
+    "title": "Wildstyle Uppercut",
+    "description": "Damit kannst du mit einem Schlag {CitizenProperties::HeroPunchKills->translationKey()} Zombies umbringen!",
+    "daysNeeded": 0,
+    "unlockable": true,
+    "nbUses": 1
+  },
+  "hero_generic_ap": {
+    "name": "hero_generic_ap",
+    "title": "Zweite Lunge",
+    "description": "<nc-HeroSecondWindBonusAP op=\"gt\" val=\"0\">Verschafft dir {CitizenProperties::HeroSecondWindBaseSP->translationKey()} frische Erkundungspunkte.</nc-HeroSecondWindBonusAP><c-HeroSecondWindBonusAP op=\"gt\" val=\"0\">Verschafft dir {CitizenProperties::HeroSecondWindBaseSP->translationKey()} frische Erkundungspunkte, stellt {CitizenProperties::HeroSecondWindBonusAP->translationKey()} AP wieder her und beseitigt deine Müdigkeit.</c-HeroSecondWindBonusAP>",
+    "daysNeeded": 0,
+    "unlockable": true,
+    "nbUses": 1
+  },
+  "hero_generic_immune": {
+    "name": "hero_generic_immune",
+    "title": "Den Tod besiegen",
+    "description": "Beim nächsten Angriff wird der Effekt des <c-HeroImmuneStatusList op=\"map\" thirst=\"Durst\" hunger=\"Hunger\" infection=\"Infektions\" addiction=\"Abhängigkeits\" glue=\"-, \" final_glue=\"- und \"></c-HeroImmuneStatusList>zustands außer Kraft gesetzt.<c-HeroImmuneHeals op=\"is\" val=\"true\"> Zudem wirst du mit sofortiger Wirkung von Angststarre und Kater geheilt und verlierst den \"Bandagiert\"-Status.</c-HeroImmuneHeals>",
+    "daysNeeded": 0,
+    "unlockable": true,
+    "nbUses": 1
+  },
+  "hero_generic_immune2": {
+    "name": "hero_generic_immune2",
+    "title": "Rudimentäre Pflege",
+    "description": "Erlaubt es einem anderen Bürger, beim nächsten Angriff sowohl Durst- als auch Infektionszustand außer Kraft zu setzen.",
+    "daysNeeded": 0,
+    "unlockable": true,
+    "nbUses": 1
+  },
+  "hero_generic_find_lucky": {
+    "name": "hero_generic_find_lucky",
+    "title": "Schönes Fundstück",
+    "description": "Wie durch ein Wunder treibst du einen nützlichen Gegenstand auf.",
+    "daysNeeded": 0,
+    "unlockable": true,
+    "nbUses": 1
+  },
+  "hero_generic_find_lcky2": {
+    "name": "hero_generic_find_lcky2",
+    "title": "Beeindruckendes Fundstück",
+    "description": "Wie durch ein Wunder treibst du einen nützlichen Gegenstand auf.",
+    "daysNeeded": 0,
+    "unlockable": true,
+    "nbUses": 1
+  },
+  "hero_generic_find_lcky3": {
+    "name": "hero_generic_find_lcky3",
+    "title": "Erstaunliches Fundstück",
+    "description": "Wie durch ein Wunder treibst du einen nützlichen Gegenstand auf.",
+    "daysNeeded": 0,
+    "unlockable": true,
+    "nbUses": 1
+  },
+  "hero_generic_rescue": {
+    "name": "hero_generic_rescue",
+    "title": "Rettung",
+    "description": "Du bringst einen anderen Spieler nach Hause (dieser darf max. {CitizenProperties::HeroRescueRange->translationKey()} Felder von der Stadt entfernt sein).",
+    "daysNeeded": 0,
+    "unlockable": true,
+    "nbUses": 1
+  },
+  "hero_generic_friendship": {
+    "name": "hero_generic_friendship",
+    "title": "Freundschaft",
+    "description": "Du spendest eine deiner noch nicht verwendeten Heldentaten an einen anderen Spieler.",
+    "daysNeeded": 0,
+    "unlockable": false,
+    "nbUses": 1
+  },
+  "hero_generic_fs_xp": {
+    "name": "hero_generic_fs_xp",
+    "title": "Erfahrung teilen",
+    "description": "Du gibst 5 Erfahrungspunkte aus, damit ein anderer Spieler 10 Erfahrungspunkte erhält.",
+    "daysNeeded": 0,
+    "unlockable": false,
+    "nbUses": 1
+  }
 }

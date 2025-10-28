@@ -490,7 +490,7 @@ $ruins = [
         'food_candies_#00' => 5,
         'soccer_#00' => 5,
         'chudol_#00' => 2,
-        'hurling_stick_#00'  => [2, 'DropMod::EventStPatrick'],
+        'hurling_stick_#00' => [2, 'DropMod::EventStPatrick'],
     ], 'desc' => 'Orte wie dieser sind heutzutage ein Geschenk des Himmels... Hier gibt es garantiert alles an Plastikspielzeug, was man sich wünschen kann... und vielleicht noch ein paar andere nützliche Gadgets.'],
 
     // id 12
@@ -942,18 +942,8 @@ $ruins = [
 
     // Explorable Ruins.
     // id 100
-    'deserted_bunker' => [
-        "label" => "Verlassener Bunker",
-        'icon' => 'deserted_bunker',
-        "camping" => 10,
-        "min_dist" => 5,
-        "max_dist" => 100,
-        "chance" => 0,
-        "explorable" => true,
-        "explorable_skin" => 'bunker',
-        "explorable_desc" => null,
-        "empty" => 1,
-        "capacity" => 4,
+    'deserted_bunker' => ["label" => "Verlassener Bunker", 'icon' => 'deserted_bunker', "camping" => 10, "min_dist" => 5, "max_dist" => 100, "chance" => 0, "explorable" => true,
+        "explorable_skin" => 'bunker', "explorable_desc" => null, "empty" => 1, "capacity" => 4,
         "drops" => [
             'bbplan_u_#00' => 14,
             'bbplan_r_#00' => 8,
@@ -993,23 +983,11 @@ $ruins = [
             'classicKey_#00' => 3,
             'alarm_off_#00' => 3,
             'infect_poison_part_#00' => [10, 'DropMod::Infective']
-        ],
-        'desc' => 'Diese heruntergekommene Gebäude scheint einmal ein Bunker gewesen zu sein. Du entdeckst einen Einstieg ins Gebäude, modriger Gestank schlägt dir entgegen. Du verziehst das Gesicht, aber hier könntest du mit ziemlicher Sicherheit etwas Nützliches finden...'
-    ],
+        ], 'desc' => 'Diese heruntergekommene Gebäude scheint einmal ein Bunker gewesen zu sein. Du entdeckst einen Einstieg ins Gebäude, modriger Gestank schlägt dir entgegen. Du verziehst das Gesicht, aber hier könntest du mit ziemlicher Sicherheit etwas Nützliches finden...'],
 
     // id 101
-    'deserted_hotel' => [
-        "label" => "Verlassenes Hotel",
-        'icon' => 'deserted_hotel',
-        "camping" => 10,
-        "min_dist" => 5,
-        "max_dist" => 100,
-        "chance" => 0,
-        "explorable" => true,
-        "explorable_skin" => 'hotel',
-        "explorable_desc" => null,
-        "empty" => 1,
-        "capacity" => 4,
+    'deserted_hotel' => ["label" => "Verlassenes Hotel", 'icon' => 'deserted_hotel', "camping" => 10, "min_dist" => 5, "max_dist" => 100, "chance" => 0, "explorable" => true,
+        "explorable_skin" => 'hotel', "explorable_desc" => null, "empty" => 1, "capacity" => 4,
         "drops" => [
             'hbplan_u_#00' => 6900,
             'hbplan_r_#00' => 4600,
@@ -1044,23 +1022,11 @@ $ruins = [
             'carpet_#00' => 2000,
             'game_box_#00' => 2000,
             'infect_poison_part_#00' => [5000, 'DropMod::Infective']
-        ],
-        'desc' => 'Diese heruntergekommene Gebäude scheint einmal ein Hotel gewesen zu sein. Du entdeckst einen Einstieg ins Gebäude, modriger Gestank schlägt dir entgegen. Du verziehst das Gesicht, aber hier könntest du mit ziemlicher Sicherheit etwas Nützliches finden...'
-    ],
+        ], 'desc' => 'Diese heruntergekommene Gebäude scheint einmal ein Hotel gewesen zu sein. Du entdeckst einen Einstieg ins Gebäude, modriger Gestank schlägt dir entgegen. Du verziehst das Gesicht, aber hier könntest du mit ziemlicher Sicherheit etwas Nützliches finden...'],
 
     // id 102
-    'deserted_hospital' => [
-        "label" => "Verlassenes Hospital",
-        'icon' => 'deserted_hospital',
-        "camping" => 10,
-        "min_dist" => 5,
-        "max_dist" => 100,
-        "chance" => 0,
-        "explorable" => true,
-        "explorable_skin" => 'hospital',
-        "explorable_desc" => null,
-        "empty" => 1,
-        "capacity" => 4,
+    'deserted_hospital' => ["label" => "Verlassenes Hospital", 'icon' => 'deserted_hospital', "camping" => 10, "min_dist" => 5, "max_dist" => 100, "chance" => 0, "explorable" => true,
+        "explorable_skin" => 'hospital', "explorable_desc" => null, "empty" => 1, "capacity" => 4,
         "drops" => [
             'mbplan_u_#00' => 20,
             'mbplan_r_#00' => 12,
@@ -1088,9 +1054,7 @@ $ruins = [
             'bumpKey_#00' => 3,
             'vagoul_#00' => 1,
             'infect_poison_part_#00' => [15, 'DropMod::Infective']
-        ],
-        'desc' => 'Diese heruntergekommene Gebäude scheint einmal ein Hospital gewesen zu sein. Du entdeckst einen Einstieg ins Gebäude, modriger Gestank schlägt dir entgegen. Du verziehst das Gesicht, aber hier könntest du mit ziemlicher Sicherheit etwas Nützliches finden...'
-    ],
+        ], 'desc' => 'Diese heruntergekommene Gebäude scheint einmal ein Hospital gewesen zu sein. Du entdeckst einen Einstieg ins Gebäude, modriger Gestank schlägt dir entgegen. Du verziehst das Gesicht, aber hier könntest du mit ziemlicher Sicherheit etwas Nützliches finden...'],
 ];
 
 foreach ($ruins as &$ruin) {
