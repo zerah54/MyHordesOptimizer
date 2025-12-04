@@ -12,6 +12,7 @@
 // @match        *://myhordes.de/*
 // @match        *://myhordes.eu/*
 // @match        *://myhord.es/*
+// @match        *://myhordes.fr/*
 //
 // ==/UserScript==
 
@@ -26,7 +27,7 @@ function pageIsConstructions() {
 
     ['mh-navigation-complete'/*, 'tab-switch', '_react', 'x-react-degenerate', 'DOMContentLoaded', 'movement-reset', 'readystatechange'*/].forEach((event_name) => {
         document.addEventListener(event_name, (event) => {
-            if (pageIsConstructions) {
+            if (pageIsConstructions()) {
                 let crow_img = document.querySelector('img[src*=small_crow]');
                 if (crow_img) {
                     crow_img.src = 'https://cdn.discordapp.com/attachments/1050938086722371666/1224130931493965984/image.png?ex=661c5fc5&is=6609eac5&hm=4165fd42edaa88cf9e4795e5eebbfe04e2c0d292d44c3e64136a14d48c086c95&';
