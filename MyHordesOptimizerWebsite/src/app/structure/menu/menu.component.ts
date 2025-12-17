@@ -1,5 +1,5 @@
 import { CommonModule, NgClass, NgTemplateOutlet } from '@angular/common';
-import { Component, inject, Inject, LOCALE_ID, OnInit, ViewEncapsulation, DOCUMENT, model, ModelSignal } from '@angular/core';
+import { Component, DOCUMENT, Inject, inject, LOCALE_ID, model, ModelSignal, OnInit, ViewEncapsulation } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
@@ -46,7 +46,7 @@ export class MenuComponent implements OnInit {
     public language_list: Language[] = [
         { code: 'en', label: 'English' },
         { code: 'fr', label: 'Français', default: true },
-        { code: 'es', label: 'Spanish' },
+        {code: 'es', label: 'Español'},
         { code: 'de', label: 'Deutsch' }
     ];
 
