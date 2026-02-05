@@ -306,9 +306,71 @@ Si vous cochez l'option "Me notifier à la fin de la fouille", vous recevrez une
 ### Notification de nouveau message
 Si vous cochez l'option "Me notifier si je reçois un nouveau message", vous recevrez une notification de votre navigateur lors d'un changement dans votre compteur de messages reçus.
 
-# Contribuer au projet 
+# Contribuer au projet
 
-## Installer le site web en local 
+<details>
+
+<summary> 🐳 Configuration de la base de données avec Docker (Recommandé)</summary>
+
+Le projet utilise maintenant PostgreSQL avec Docker pour simplifier la configuration de l'environnement de développement.
+
+### Prérequis
+- [Docker](https://www.docker.com/get-started) installé sur votre machine
+- [Docker Compose](https://docs.docker.com/compose/install/) (inclus avec Docker Desktop)
+
+### Installation rapide
+
+1. **Créer le fichier de configuration**
+   - `cp .env.example .env`
+
+2. **Modifier les mots de passe** dans `.env` (⚠️ Changez tous les mots de passe par défaut !)
+
+3. **Démarrer les services en développement**
+   - `docker-compose --profile dev up -d`
+
+   Cela démarre :
+   - PostgreSQL Production (port 5432)
+   - PostgreSQL Développement (port 5433)
+   - PgAdmin (http://localhost:5050)
+   
+5. **Configurer les serveurs dans PgAdmin**
+   - Clic droit sur "Servers" → "Register" → "Server"
+   - **Pour Production** :
+     - Host : `postgres-prod`
+     - Port : `5432`
+     - Database : `mho_prod`
+     - Username : `mho_user_prod`
+     - Password : celui défini dans `.env`
+   - **Pour Développement** :
+     - Host : `postgres-dev`
+     - Port : `5432`
+     - Database : `mho_dev`
+     - Username : `mho_user_dev`
+     - Password : celui défini dans `.env`
+
+### Commandes utiles
+
+#### Démarrer en développement (avec PgAdmin)
+`docker-compose --profile dev up -d`
+
+#### Démarrer en production (sans PgAdmin)
+`docker-compose up -d`
+
+#### Voir les logs
+`docker-compose logs -f`
+
+#### Arrêter les services
+`docker-compose --profile dev down`
+
+#### Réinitialiser la base de dev (⚠️ supprime toutes les données !)
+```
+docker-compose stop postgres-dev
+docker volume rm myhordesoptimizer_postgres-dev-data
+docker-compose --profile dev up -d postgres-dev
+```
+</details>
+
+## Installer le site web en local
 
 ### Côté front 
 - Installer Node et Angular
@@ -316,11 +378,16 @@ Si vous cochez l'option "Me notifier si je reçois un nouveau message", vous rec
   - `npm install` pour installer les dépendances
   - `npm run start` pour lancer le projet
 
-### Côté back
-- Installer MySql et .NET
-- Créer une base de données MySql vide
-- Lancer tous les scripts qui se trouvent dans `MyHordesOptimizerApi > MyHordesOptimizerApi > Database > Scripts` pour initier la base de données
+### Côté back (sans Docker)
+
+⚠️ **Note** : Le projet utilise maintenant PostgreSQL. La section ci-dessous est conservée pour référence, mais il est recommandé d'utiliser Docker (voir section précédente).
+
+- Installer PostgreSQL (ou MySQL legacy) et .NET
+- Créer une base de données vide
+- **Si PostgreSQL** : Lancer les migrations Entity Framework
+- **Si MySQL** : Lancer tous les scripts qui se trouvent dans `MyHordesOptimizerApi > MyHordesOptimizerApi > Database > Scripts` pour initier la base de données
 - Créer un fichier `appsettings.Development.json` pour remplacer les valeurs "dummy" du appsettings.json
+  - `ConnectionStrings > DefaultConnection` : Chaîne de connexion à votre base de données
   - `Authentication > Username` et `Authentication > Password` sont des valeurs de votre choix qui serviront pour l'authentification basique des appels
   - `Authentication > JWT > Secret` : Générer un secret 64 caractères sur ce site https://jwtsecret.com/generate
 - Lancer le projet avec le profil Development
