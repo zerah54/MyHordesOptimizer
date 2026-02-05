@@ -383,7 +383,6 @@ docker-compose --profile dev up -d postgres-dev
 - Créer une base de données MySql vide
 - Lancer tous les scripts qui se trouvent dans `MyHordesOptimizerApi > MyHordesOptimizerApi > Database > Scripts` pour initier la base de données
 - Créer un fichier `appsettings.Development.json` pour remplacer les valeurs "dummy" du appsettings.json
-  - `ConnectionStrings > DefaultConnection` : Chaîne de connexion à votre base de données
   - `Authentication > Username` et `Authentication > Password` sont des valeurs de votre choix qui serviront pour l'authentification basique des appels
   - `Authentication > JWT > Secret` : Générer un secret 64 caractères sur ce site https://jwtsecret.com/generate
 - Lancer le projet avec le profil Development
