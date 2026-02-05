@@ -20,17 +20,19 @@ services:
 
   postgres-dev:
     image: postgres:18-alpine
+    profiles: ["dev"]
     environment:
       POSTGRES_DB: ${POSTGRES_DEV_DB}
       POSTGRES_USER: ${POSTGRES_DEV_USER}
       POSTGRES_PASSWORD: ${POSTGRES_DEV_PASSWORD}
     ports:
-      - "5432:5432"
+      - "5433:5433"
     volumes:
       - postgres-dev-data:/var/lib/postgresql/data
 
   pgadmin:
     image: dpage/pgadmin4:9
+    profiles: ["dev"]
     environment:
       PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL}
       PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD}
