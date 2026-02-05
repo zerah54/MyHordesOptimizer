@@ -378,14 +378,10 @@ docker-compose --profile dev up -d postgres-dev
   - `npm install` pour installer les dépendances
   - `npm run start` pour lancer le projet
 
-### Côté back (sans Docker)
-
-⚠️ **Note** : Le projet utilise maintenant PostgreSQL. La section ci-dessous est conservée pour référence, mais il est recommandé d'utiliser Docker (voir section précédente).
-
-- Installer PostgreSQL (ou MySQL legacy) et .NET
-- Créer une base de données vide
-- **Si PostgreSQL** : Lancer les migrations Entity Framework
-- **Si MySQL** : Lancer tous les scripts qui se trouvent dans `MyHordesOptimizerApi > MyHordesOptimizerApi > Database > Scripts` pour initier la base de données
+### Côté back
+- Installer MySql et .NET
+- Créer une base de données MySql vide
+- Lancer tous les scripts qui se trouvent dans `MyHordesOptimizerApi > MyHordesOptimizerApi > Database > Scripts` pour initier la base de données
 - Créer un fichier `appsettings.Development.json` pour remplacer les valeurs "dummy" du appsettings.json
   - `ConnectionStrings > DefaultConnection` : Chaîne de connexion à votre base de données
   - `Authentication > Username` et `Authentication > Password` sont des valeurs de votre choix qui serviront pour l'authentification basique des appels
