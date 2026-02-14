@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MHO Addon
-// @version      1.1.19.0
+// @version      1.1.20.0
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/, rubrique Tutoriels
 // @author       Zerah
 //
@@ -31,9 +31,8 @@
 // ==/UserScript==
 
 const changelog = `${getScriptInfo().name} : Changelog pour la version ${getScriptInfo().version}\n\n`
-    + `[Correctif] Affichage des chantiers\n`
-    + `[Correctif] Compteur anti-abus\n`
-    + `[Correctif] Affichage en cas d'erreur des outils externes avec CSS`;
+    + `[Correctif] Affichage de MHO suite au changement de saison\n`;
+
 
 const lang = (document.querySelector('html[lang]')?.getAttribute('lang') || document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2) || 'fr';
 
@@ -2519,7 +2518,7 @@ function createSelectWithSearch() {
 function createOptimizerBtn() {
     const apps_exists_callback = function (appsExistsMutationsList, observer) {
         for (const appsExistsMutation of appsExistsMutationsList) {
-            let apps_block = Array.from(appsExistsMutation.addedNodes ?? []).find((node) => node.id === 'apps');
+            let apps_block = document.querySelector('.app-directory');
             if (appsExistsMutation.type === 'childList' && apps_block) {
 
                 let optimizer_btn = buttonOptimizerElement();
