@@ -144,7 +144,6 @@
     "impoundable",
     "defence",
     "weapon",
-    "nw_ikea",
     "prevent_night"
   ],
   "tekel_#00": [
@@ -256,7 +255,6 @@
     "hero_find_lucky",
     "nw_shooting",
     "hero_find_lucky2",
-    "hero_find_lucky3",
     "fragile"
   ],
   "bgrenade_#00": [
@@ -266,6 +264,7 @@
   ],
   "boomfruit_#00": [
     "weapon",
+    "hero_find_lucky3",
     "fragile"
   ],
   "pilegun_#00": [
@@ -338,31 +337,31 @@
     "impoundable",
     "weapon",
     "esc_fixed",
-    "nw_armory"
+    "nw_shooting"
   ],
   "watergun_opt_4_#00": [
     "impoundable",
     "weapon",
     "esc_fixed",
-    "nw_armory"
+    "nw_shooting"
   ],
   "watergun_opt_3_#00": [
     "impoundable",
     "weapon",
     "esc_fixed",
-    "nw_armory"
+    "nw_shooting"
   ],
   "watergun_opt_2_#00": [
     "impoundable",
     "weapon",
     "esc_fixed",
-    "nw_armory"
+    "nw_shooting"
   ],
   "watergun_opt_1_#00": [
     "impoundable",
     "weapon",
     "esc_fixed",
-    "nw_armory"
+    "nw_shooting"
   ],
   "watergun_opt_part_#00": [
     "impoundable"
@@ -442,7 +441,8 @@
   ],
   "disinfect_#00": [
     "impoundable",
-    "drug"
+    "drug",
+    "hero_find_lucky3"
   ],
   "drug_#00": [
     "can_poison",
@@ -906,8 +906,7 @@
   "repair_one_#00": [
     "impoundable",
     "hero_find_lucky",
-    "hero_find_lucky2",
-    "hero_find_lucky3"
+    "hero_find_lucky2"
   ],
   "electro_box_#00": [
     "hero_find_lucky",
@@ -948,7 +947,8 @@
     "impoundable"
   ],
   "repair_kit_#00": [
-    "impoundable"
+    "impoundable",
+    "hero_find_lucky3"
   ],
   "repair_kit_part_#00": [
     "impoundable"
@@ -1095,8 +1095,7 @@
     "no_post"
   ],
   "shoe_#00": [
-    "single_use",
-    "hero_find_lucky3"
+    "single_use"
   ],
   "bike_#00": [
     "single_use"
@@ -1139,7 +1138,6 @@
   ],
   "moldy_food_#00": [
     "food",
-    "can_cook",
     "single_use",
     "lure"
   ],

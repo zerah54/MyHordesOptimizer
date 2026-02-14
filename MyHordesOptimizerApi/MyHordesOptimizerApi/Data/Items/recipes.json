@@ -655,7 +655,7 @@
     "picto": "r_watgun_#00"
   },
   "com015": {
-    "type": "Recipe::ManualAnywhere",
+    "type": "Recipe::ManualInside",
     "out": [
       "chainsaw_empty_#00"
     ],
@@ -668,6 +668,21 @@
       "rustine_#00"
     ],
     "picto": "r_tronco_#00"
+  },
+  "com015b": {
+    "type": "Recipe::ManualOutside",
+    "out": [
+      "chainsaw_empty_#00"
+    ],
+    "provoking": "chainsaw_part_#00",
+    "in": [
+      "chainsaw_part_#00",
+      "engine_#00",
+      "meca_parts_#00",
+      "courroie_#00",
+      "rustine_#00"
+    ],
+    "error": "Es ist hier einfach zu staubig, um diesen Gegenstand zusammenbauen zu können..."
   },
   "com016": {
     "type": "Recipe::ManualAnywhere",
@@ -1172,9 +1187,10 @@
     ],
     "provoking": "soccer_part_#00",
     "in": [
-      "soccer_part_#00",
-      "rustine_#00"
-    ]
+      "soccer_part_#00"
+    ],
+    "ap": 1,
+    "tooltip": "Du hast die/den {item} repariert."
   },
   "com054": {
     "type": "Recipe::ManualAnywhere",
@@ -1207,6 +1223,19 @@
     "in": [
       "moldy_food_subpart_#00",
       "spices_#00"
+    ]
+  },
+  "com057": {
+    "type": "Recipe::ManualAnywhere",
+    "out": [
+      "broken_ball_#00"
+    ],
+    "provoking": "broken_#00",
+    "in": [
+      "broken_#00",
+      "broken_#00",
+      "broken_#00",
+      "rustine_#00"
     ]
   }
 }

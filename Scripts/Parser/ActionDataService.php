@@ -110,6 +110,7 @@ $actions = [
         'can_t2' => ['label' => 'Öffnen (1 BP)', 'at00' => true, 'meta' => ['profession_tech', 'not_have_can_opener_hd', 'min_1_cp_hd'], 'result' => ['minus_1cp', 'morph_open_can'], 'message_key' => 'container_open'],
         'can_t3' => ['label' => 'Öffnen', 'at00' => true, 'meta' => ['profession_tech', 'not_have_can_opener_hd', 'have_can_opener', 'no_cp', 'is_not_wounded_hands'], 'result' => []],
 
+        'eat_5ap' => ['label' => 'Essen', 'cover' => true, 'at00' => true, 'poison' => 'ItemAction::PoisonHandlerConsume', 'meta' => ['eat_ap', 'no_full_ap_msg_food'], 'result' => ['contaminated_zone_infect', 'eat_ap5', 'consume_item'], 'escort_message_key' => 'escort_food_eat'],
         'eat_6ap' => ['label' => 'Essen', 'cover' => true, 'at00' => true, 'poison' => 'ItemAction::PoisonHandlerConsume', 'meta' => ['eat_ap', 'no_full_ap_msg_food'], 'result' => ['contaminated_zone_infect', 'eat_ap6', 'consume_item'], 'escort_message_key' => 'escort_food_eat'],
         'eat_7ap' => ['label' => 'Essen', 'priority' => 2, 'cover' => true, 'at00' => true, 'poison' => 'ItemAction::PoisonHandlerConsume', 'meta' => ['eat_ap', 'no_full_ap_msg_food'], 'result' => ['contaminated_zone_infect', 'eat_ap7', 'consume_item'], 'escort_message_key' => 'escort_food_eat'],
         'eat_7ap_hw_1' => ['label' => 'Essen', 'priority' => 1, 'cover' => true, 'at00' => true, 'poison' => 'ItemAction::PoisonHandlerConsume', 'meta' => ['eat_ap', 'no_full_ap_msg_food', 'h_not_during_halloween'], 'result' => ['contaminated_zone_infect', 'eat_ap7', 'consume_item'], 'escort_message_key' => 'escort_food_eat'],
@@ -191,14 +192,14 @@ $actions = [
 
         'play_soccer_1' => ['label' => 'Benutzen', 'at00' => true, 'meta' => ['not_tired', 'not_yet_soccer', 'no_bonus_ap', 'not_drunk_hide', 'is_not_wounded_foot'], 'result' => ['status_soccer_today', 'chances' => ['group' => [
             [['do_nothing', 'msg_soccer_fail'], 80],
-            [['just_ap1', 'msg_soccer_success'], 15],
+            [['plus_1sp_e', 'msg_soccer_success'], 15],
             [['morph_soccer_part', 'msg_soccer_bigfail'], 5],
 
         ]]]],
         'play_soccer_2' => ['label' => 'Benutzen', 'at00' => true, 'meta' => ['not_tired', 'not_yet_soccer', 'no_bonus_ap', 'must_be_drunk', 'is_not_wounded_foot'], 'result' => ['status_soccer_today', 'chances' => ['group' => [
             [['morph_soccer_part', 'msg_soccer_bigfail'], 80],
             [['do_nothing', 'msg_soccer_fail'], 15],
-            [['just_ap1', 'msg_soccer_success'], 5],
+            [['plus_1sp_e', 'msg_soccer_success'], 5],
         ]]]],
 
         'open_doggybag' => ['label' => 'Öffnen', 'at00' => true, 'meta' => ['is_not_wounded_hands'], 'result' => ['consume_item', 'spawn_doggy'], 'message' => 'Du hast dein <span class="tool">{item}</span> ausgepackt und <span class="tool">{items_spawn}</span> erhalten!'],
@@ -472,9 +473,12 @@ $actions = [
         'hero_tamer_8' => ['label' => 'Haus bewachen', 'renderer' => 'tamer_dog_popup', 'meta' => ['must_be_inside'], 'result' => ['hero_tamer_gone', 'hero_tamer_8'], 'message' => '{tamer_dog} wird dafür sorgen, dass dir heute niemand einen ungebetenen Besuch abstattet.'],
         'hero_tamer_8b' => ['label' => 'Haus bewachen', 'renderer' => 'tamer_dog_popup', 'meta' => ['must_be_inside'], 'result' => ['hero_tamer_gone', 'hero_tamer_8b'], 'message' => '{tamer_dog} wird dafür sorgen, dass dir heute niemand einen ungebetenen Besuch abstattet.'],
         'hero_tamer_9' => ['label' => 'Aus der Bank', 'renderer' => 'tamer_dog_popup', 'at00' => false, 'cover' => true, 'target' => ['type' => 'ItemTargetDefinition::ItemTypeSelectionType', 'property' => 'hero_dog_fetch', 'note' => 'Beachte, dass dein Hund nur dann einen Gegenstand holen kann, wenn dieser sich auch wirklich in der Bank befindet...'], 'meta' => ['must_be_outside', 'room_for_item_no_container', 'must_not_be_banished'], 'result' => ['hero_tamer_9'], 'message' => '<t-fail><t-door-closed>Das Stadttor ist geschlossen...</t-door-closed><t-impossible>{tamer_dog} ist erschöpft zu dir zurückgekehrt... aber er hat nichts in seinem Maul. Offensichtlich konnte er nicht finden, wonach du gesucht hast.</t-impossible></t-fail><nt-fail>{tamer_dog} hat dir soeben eine/n {target} aus der Bank gebracht. Genau das, was du gebraucht hast!</nt-fail>'],
+        'hero_guard' => ['label' => 'Senken', 'at00' => true, 'cover' => true, 'meta' => [], 'result' => ['hero_guard_gone'], 'message' => 'Du senkst deinen Schild. Zwar kannst du dich jetzt nicht mehr so gut verteidigen, dafür kannst du aber einen weiteren, schweren Gegenstand mit dir führen.'],
 
         'hero_surv_1' => ['label' => 'Wasser suchen', 'renderer' => 'survivalist_popup', 'meta' => ['must_be_outside', 'must_be_outside_3km', 'not_yet_sbook'], 'result' => ['contaminated_zone_infect', 'hero_surv_0', 'hero_surv_1'], 'message' => '{casino}'],
         'hero_surv_2' => ['label' => 'Essen suchen', 'renderer' => 'survivalist_popup', 'meta' => ['must_be_outside', 'no_full_ap', 'must_be_outside_3km', 'not_yet_sbook', 'eat_ap'], 'result' => ['contaminated_zone_infect', 'hero_surv_0', 'hero_surv_2'], 'message' => '{casino}'],
+
+        'hero_scavenger' => ['label' => 'Zone ausheben', 'tooltip' => 'Es sieht so aus, als könntest du mit deiner Schaufel an dieser Stelle tiefer graben als sonst... Möglicherweise kannst du dieser Zone neues Leben einhauchen, sodass du und andere Bürger hier wieder wertvolle Gegenstände finden können? Du kannst diese Aktion nur einmal pro Tag verwenden. Außerdem kann jede Zone nur einmalig durch diese Aktion erneuert werden.', 'meta' => ['must_be_outside', 'profession_collec', 'scav_counter_below_1', 'zone_not_force_regenerated', 'zone_must_be_empty'], 'result' => ['hero_scavenger', 'increase_scavenger_counter', 'stop_digging'], 'message' => 'Du hast diese Zone erfolgreich ausgehoben und zahlreiche neue Buddelmöglichkeiten entdeckt.'],
 
         'hero_hunter_1' => ['label' => 'Tarnen', 'at00' => true, 'meta' => ['must_be_outside', 'hunter_no_followers', 'must_have_control_hunter'], 'result' => ['hero_hunter'], 'message' => 'Du bist ab sofort getarnt.'],
         'hero_hunter_2' => ['label' => 'Tarnen', 'at00' => true, 'meta' => ['must_be_inside'], 'result' => ['hero_hunter'], 'message' => 'Du bist nun getarnt.'],
@@ -482,8 +486,8 @@ $actions = [
         'hero_generic_return' => ['label' => 'Die Rückkehr des Helden', 'tooltip' => 'Wenn du {CitizenProperties::HeroReturnRange->translationKey()} km oder weniger von der Stadt entfernt bist, kehrst du sofort in die Stadt zurück!', 'cover' => true, 'at00' => true, 'meta' => ['must_be_outside_or_exploring', 'must_be_outside_within_hr', 'not_yet_hero'], 'result' => ['hero_act', 'hero_return'], 'message' => 'Mit deiner letzten Kraft hast du dich *in die Stadt geschleppt*... *Ein Wunder*!'],
         'hero_generic_find' => ['label' => 'Fund', 'tooltip' => 'Wie durch ein Wunder treibst du einen nützlichen Gegenstand auf.', 'cover' => true, 'at00' => true, 'target' => ['type' => 'ItemTargetDefinition::ItemTypeSelectionType', 'property' => 'hero_find'], 'meta' => ['not_yet_hero'], 'result' => ['hero_act', 'spawn_target'], 'message' => 'So was nennt man wohl <strong>Glück</strong>! <t-inside>Du hast soeben {items_spawn} in einem Abfallberg neben deinem Haus gefunden!</t-inside><t-outside>Du hast soeben {items_spawn} im Wüstensand gefunden!</t-outside> Genau das, was du gebraucht hast!'],
         'hero_generic_find_lucky' => ['label' => 'Schönes Fundstück', 'tooltip' => 'Wie durch ein Wunder treibst du einen nützlichen Gegenstand auf.', 'cover' => true, 'at00' => true, 'target' => ['type' => 'ItemTargetDefinition::ItemTypeSelectionType', 'property' => 'hero_find_lucky'], 'meta' => ['not_yet_hero'], 'result' => ['hero_act', 'spawn_target'], 'message' => 'So was nennt man wohl <strong>Glück</strong>! <t-inside>Du hast soeben {items_spawn} in einem Abfallberg neben deinem Haus gefunden!</t-inside><t-outside>Du hast soeben {items_spawn} im Wüstensand gefunden!</t-outside> Genau das, was du gebraucht hast!'],
-        'hero_generic_find_lcky2' => ['label' => 'Beeindruckendes Fundstück', 'tooltip' => 'Wie durch ein Wunder treibst du einen nützlichen Gegenstand auf.', 'cover' => true, 'at00' => true, 'target' => ['type' => 'ItemTargetDefinition::ItemTypeSelectionType', 'property' => 'hero_find_lucky2'], 'meta' => ['not_yet_hero'], 'result' => ['hero_act', 'spawn_target'], 'message' => 'So was nennt man wohl <strong>Glück</strong>! <t-inside>Du hast soeben {items_spawn} in einem Abfallberg neben deinem Haus gefunden!</t-inside><t-outside>Du hast soeben {items_spawn} im Wüstensand gefunden!</t-outside> Genau das, was du gebraucht hast!'],
-        'hero_generic_find_lcky3' => ['label' => 'Erstaunliches Fundstück', 'tooltip' => 'Wie durch ein Wunder treibst du einen nützlichen Gegenstand auf.', 'cover' => true, 'at00' => true, 'target' => ['type' => 'ItemTargetDefinition::ItemTypeSelectionType', 'property' => 'hero_find_lucky3'], 'meta' => ['not_yet_hero'], 'result' => ['hero_act', 'spawn_target'], 'message' => 'So was nennt man wohl <strong>Glück</strong>! <t-inside>Du hast soeben {items_spawn} in einem Abfallberg neben deinem Haus gefunden!</t-inside><t-outside>Du hast soeben {items_spawn} im Wüstensand gefunden!</t-outside> Genau das, was du gebraucht hast!'],
+        'hero_generic_find_lucky2' => ['label' => 'Beeindruckendes Fundstück', 'tooltip' => 'Wie durch ein Wunder treibst du einen nützlichen Gegenstand auf.', 'cover' => true, 'at00' => true, 'target' => ['type' => 'ItemTargetDefinition::ItemTypeSelectionType', 'property' => 'hero_find_lucky2'], 'meta' => ['not_yet_hero'], 'result' => ['hero_act', 'spawn_target'], 'message' => 'So was nennt man wohl <strong>Glück</strong>! <t-inside>Du hast soeben {items_spawn} in einem Abfallberg neben deinem Haus gefunden!</t-inside><t-outside>Du hast soeben {items_spawn} im Wüstensand gefunden!</t-outside> Genau das, was du gebraucht hast!'],
+        'hero_generic_find_lucky3' => ['label' => 'Erstaunliches Fundstück', 'tooltip' => 'Wie durch ein Wunder treibst du einen nützlichen Gegenstand auf.', 'cover' => true, 'at00' => true, 'target' => ['type' => 'ItemTargetDefinition::ItemTypeSelectionType', 'property' => 'hero_find_lucky3'], 'meta' => ['not_yet_hero'], 'result' => ['hero_act', 'spawn_target'], 'message' => 'So was nennt man wohl <strong>Glück</strong>! <t-inside>Du hast soeben {items_spawn} in einem Abfallberg neben deinem Haus gefunden!</t-inside><t-outside>Du hast soeben {items_spawn} im Wüstensand gefunden!</t-outside> Genau das, was du gebraucht hast!'],
         'hero_generic_punch' => ['label' => 'Wildstyle Uppercut', 'tooltip' => 'Damit kannst du mit einem Schlag {CitizenProperties::HeroPunchKills->translationKey()} Zombies umbringen!', 'meta' => ['must_be_outside_or_exploring', 'must_have_zombies', 'not_yet_hero'], 'result' => ['hero_act', 'zone_kill_punch'], 'message' => 'Mit Hilfe deiner übermenschlichen Heldenkräfte hast du <strong>{kills} Zombie(s)</strong> platt gemacht!'],
         'hero_generic_ap' => ['label' => 'Zweite Lunge', 'tooltip' => '<nc-HeroSecondWindBonusAP op="gt" val="0">Verschafft dir {CitizenProperties::HeroSecondWindBaseSP->translationKey()} frische Erkundungspunkte.</nc-HeroSecondWindBonusAP><c-HeroSecondWindBonusAP op="gt" val="0">Verschafft dir {CitizenProperties::HeroSecondWindBaseSP->translationKey()} frische Erkundungspunkte, stellt {CitizenProperties::HeroSecondWindBonusAP->translationKey()} AP wieder her und beseitigt deine Müdigkeit.</c-HeroSecondWindBonusAP>', 'cover' => true, 'at00' => true, 'meta' => ['not_yet_hero'], 'result' => ['hero_act', 'just_ap_sw'], 'message' => 'Du atmest tief durch und drückst den Rücken durch. Auf geht\'s! Ich werde nicht hier sterben!{hr}Du hast soeben Kraft getankt und <strong>{sp} neue EP<c-HeroSecondWindBonusAP op="gt" val="0"> sowie {ap} neue AP</c-HeroSecondWindBonusAP> erhalten</strong>.'],
         'hero_generic_immune' => ['label' => 'Den Tod besiegen',
@@ -503,7 +507,7 @@ $actions = [
             'meta' => ['must_be_outside', 'during_christmas'], 'result' => ['sandball'], 'message' => '<nt-fail>Du hast einen Sandball in {citizen}s Gesicht geworfen.</nt-fail><t-fail>Hier ist niemand, auf den du den Sandball werfen könntest...</t-fail>'],
         'scare' => ['label' => 'Erschrecken', 'target' => ['type' => 'ItemTargetDefinition::ItemCitizenOnZoneSMType'], 'meta' => ['during_halloween', 'not_yet_scary'], 'result' => ['scary_mask']],
 
-        'special_armag' => ['label' => 'Durchgang in Kraft', 'tooltip_key' => 'heroic_arma_tooltip', 'allow_when_terrorized' => true, 'meta' => ['must_be_outside', 'must_be_blocked'], 'result' => [['group' => [[['do_nothing', 'msg_heroic_arma_fail'], 50], [['msg_heroic_arma_success', 'zone_escape_600_armag', 'kill_1_zombie_s'], 50]]]]],
+        'hero_armag' => ['label' => 'Durchgang in Kraft', 'tooltip_key' => 'heroic_arma_tooltip_h', 'allow_when_terrorized' => true, 'meta' => ['not_yet_hero', 'must_be_outside', 'must_be_blocked'], 'result' => ['hero_act', 'msg_heroic_arma_success', 'zone_escape_300_armag', 'kill_1_zombie_s']],
         'special_armag_d' => ['label' => 'Durchgang in Kraft', 'tooltip_key' => 'heroic_arma_tooltip', 'allow_when_terrorized' => true, 'meta' => ['must_be_outside', 'must_be_blocked', 'must_be_day'], 'result' => [['group' => [[['do_nothing', 'msg_heroic_arma_fail'], 50], [['msg_heroic_arma_success', 'zone_escape_600_armag', 'kill_1_zombie_s'], 50]]]]],
         'special_armag_n' => ['label' => 'Durchgang in Kraft', 'tooltip_key' => 'heroic_arma_tooltip', 'allow_when_terrorized' => true, 'meta' => ['must_be_outside', 'must_be_blocked', 'must_be_night'], 'result' => [['group' => [[['do_nothing', 'msg_heroic_arma_fail'], 25], [['msg_heroic_arma_success', 'zone_escape_600_armag', 'kill_1_zombie_s'], 75]]]]],
         'special_vote_shaman' => ['label' => 'Den Shamane wählen', 'target' => ['type' => 'ItemTargetDefinition::ItemCitizenVoteType'], 'meta' => ['must_be_outside', 'profession_heroic', 'vote_shaman_needed', 'vote_shaman_not_given'], 'result' => ['vote_role_shaman']],
@@ -560,13 +564,15 @@ $actions = [
         'home_rest_2' => ['label' => 'Nickerchen machen', 'meta' => ['must_be_inside', 'must_have_home_rest_v2', 'not_yet_rested', 'no_full_ap_msg'], 'result' => ['status_rested', ['group' => [['plus_2ap_7', 66], ['do_nothing', 33]]]], 'message_key' => 'use_bed'],
         'home_rest_3' => ['label' => 'Nickerchen machen', 'meta' => ['must_be_inside', 'must_have_home_rest_v3', 'not_yet_rested', 'no_full_ap_msg'], 'result' => ['status_rested', ['group' => [['plus_2ap_7', 100], ['do_nothing', 0]]]], 'message_key' => 'use_bed'],
 
-        'home_pool' => ['label' => 'Ein Bad nehmen', 'meta' => ['must_be_inside', 'must_have_pool', 'not_yet_home_pooled'], 'result' => ['status_home_pool'], 'message' => 'Du springst ohne zu zögern in dieses große Bad. Das Chaos um dich herum existiert für dich nicht mehr und du spürst, dass du diese Nacht mit Gelassenheit verbringen wirst.'],
+        'home_pool' => ['label' => 'Ein Bad nehmen', 'meta' => ['must_be_inside', 'must_have_pool', 'pool_has_water', 'not_yet_home_pooled'], 'result' => ['status_home_pool', 'status_good_smell'], 'message' => 'Du springst ohne zu zögern in dieses große Bad. Das Chaos um dich herum existiert für dich nicht mehr und du spürst, dass du diese Nacht mit Gelassenheit verbringen wirst.'],
 
         'home_scavenge_any' => ['label' => 'In den Buddelgruben graben', 'meta' => ['must_be_inside', 'room_for_item_scavenging', 'min_2_ap', 'not_profession_collec', 'must_have_scavenger_building', 'scav_building_counter_below_1'], 'result' => ['minus_2ap', 'status_count_scavenger', 'building_scavenger']],
         'home_scavenge_pro' => ['label' => 'In den Buddelgruben graben', 'meta' => ['must_be_inside', 'room_for_item_scavenging', 'min_1_ap', 'profession_collec', 'must_have_scavenger_building', 'scav_building_counter_below_3'], 'result' => ['minus_1ap', 'status_count_scavenger', 'building_scavenger']],
 
         'home_survivalist_any' => ['label' => 'Wasser finden', 'meta' => ['must_be_inside', 'min_3_ap', 'not_profession_survivalist', 'must_have_surv_building', 'surv_building_counter_below_1'], 'result' => ['minus_3ap', 'status_count_surv', 'building_survivalist_a'], 'message' => 'Du konntest es zunächst gar nicht geglaubt, aber nachdem du die halbierten Dosen überprüft hast, stellst du fest, dass sich etwas Wasser darin befindet. Wie sich herausstellt, kennen sich diese Einsiedler doch aus! Du erhälst {items_spawn}.'],
         'home_survivalist_pro' => ['label' => 'Wasser finden', 'meta' => ['must_be_inside', 'min_3_ap', 'profession_survivalist', 'must_have_surv_building', 'surv_building_counter_below_1'], 'result' => ['minus_3ap', 'status_count_surv', 'building_survivalist_b', 'building_survivalist_c'], 'message' => 'Einige Leute haben dein Wassergewinnung-System bösartig verleumdet, aber es ist offensichtlich, dass sie jetzt schweigen. Du erhälst {items_spawn}.'],
+
+        'home_contemplate' => ['label' => 'Besinnen', 'meta' => ['must_be_inside', 'min_2_ap', 'must_have_sanctuary', 'not_contemplated'], 'result' => ['minus_2ap', 'status_contemplated', 'discover_random_soul'], 'message' => 'Du nimmst dir einen Moment Zeit, um zur Ruhe zu kommen und dich auf das wesentliche zu besinnen.'],
 
         'home_defbuff_any' => ['label' => 'Verteidigung organisieren', 'meta' => ['not_profession_guardian', 'min_2_ap', 'must_be_inside', 'must_have_guardtower', 'not_yet_home_defbuff', 'guard_tower_not_max'], 'result' => ['minus_2ap', 'status_home_defbuff', 'building_guard'], 'message' => 'Du suchst die Stadtmauer nach kleinen Lücken ab, die die Wächter hinterlassen haben könnten. Die Stadt hat vorübergehend +5 Verteidigungspunkte gewonnen.'],
 
@@ -582,6 +588,7 @@ $actions = [
 
         'eat_apple' => ['label' => 'Essen', 'priority' => 1, 'cover' => true, 'at00' => true, 'poison' => 'ItemAction::PoisonHandlerConsume', 'meta' => ['eat_ap', 'no_full_ap_msg_food'], 'result' => ['contaminated_zone_infect', 'eat_ap8', 'consume_item', ['group' => [['infect', 15], ['do_nothing', 85]]]], 'escort_message_key' => 'escort_food_eat'],
 
+        'nw_void' => ['label' => '', 'meta' => [], 'result' => []],
         'nw_break' => ['label' => '', 'meta' => [], 'result' => ['break_item']],
         'nw_destroy' => ['label' => '', 'meta' => [], 'result' => ['consume_item']],
         'nw_empty_big_pgun' => ['label' => '', 'meta' => [], 'result' => ['morph_big_pgun_empty']],
@@ -608,6 +615,48 @@ $actions = [
         'nw_empty_music' => ['label' => '', 'meta' => [], 'result' => ['morph_music_part']],
         'nw_empty_sport' => ['label' => '', 'meta' => [], 'result' => ['morph_elec_empty']],
         'nw_empty_radio' => ['label' => '', 'meta' => [], 'result' => ['morph_radio_off']],
+
+        'cata_rsc_undef' => ['label' => '', 'meta' => [], 'result' => ['morph_cata_undef']],
+        'cata_rsc_remains' => ['label' => '', 'meta' => [], 'result' => ['morph_cata_remains']],
+        'cata_rsc_moldy' => ['label' => '', 'meta' => [], 'result' => ['morph_cata_moldy']],
+        'cata_rsc_scrap' => ['label' => '', 'meta' => [], 'result' => ['morph_cata_scrap']],
+        'cata_rsc_break' => ['label' => '', 'meta' => [], 'result' => ['morph_cata_break']],
+        'cata_rsc_break_staff' => ['label' => '', 'meta' => [], 'result' => ['morph_cata_break_staff']],
+        'cata_rsc_fine' => ['label' => '', 'meta' => [], 'result' => ['morph_cata_fine']],
+        'cata_rsc_destroy' => ['label' => '', 'meta' => [], 'result' => ['consume_item']],
+
+        'cata_wpn_scrap_1_rid' => ['label' => '', 'meta' => [], 'result' => ['morph_cata_scrap', 'cata_kill_1_rid']],
+        'cata_wpn_remains_1_rid' => ['label' => '', 'meta' => [], 'result' => ['morph_cata_remains', 'cata_kill_1_rid']],
+        'cata_wpn_destroy_1_rid' => ['label' => '', 'meta' => [], 'result' => ['consume_item', 'cata_kill_1_rid']],
+        'cata_wpn_break_1_rid' => ['label' => '', 'meta' => [], 'result' => ['morph_cata_break', 'cata_kill_1_rid']],
+
+        'cata_wpn_remains_1_low' => ['label' => '', 'meta' => [], 'result' => ['morph_cata_remains', 'cata_kill_1_low']],
+        'cata_wpn_destroy_1_low' => ['label' => '', 'meta' => [], 'result' => ['consume_item', 'cata_kill_1_low']],
+        'cata_wpn_break_1_low' => ['label' => '', 'meta' => [], 'result' => ['morph_cata_break', 'cata_kill_1_low']],
+
+        'cata_wpn_destroy_1_high' => ['label' => '', 'meta' => [], 'result' => ['consume_item', 'cata_kill_1_high']],
+
+        'cata_wpn_destroy_1_imp' => ['label' => '', 'meta' => [], 'result' => ['consume_item', 'cata_kill_1_imp']],
+        'cata_wpn_break_1_imp' => ['label' => '', 'meta' => [], 'result' => ['morph_cata_break', 'cata_kill_1_imp']],
+
+        'cata_wpn_scrap_c_low' => ['label' => '', 'meta' => [], 'result' => ['morph_cata_scrap', 'cata_kill_c_low']],
+        'cata_wpn_remains_c_low' => ['label' => '', 'meta' => [], 'result' => ['morph_cata_remains', 'cata_kill_c_low']],
+        'cata_wpn_destroy_c_low' => ['label' => '', 'meta' => [], 'result' => ['consume_item', 'cata_kill_c_low']],
+        'cata_wpn_break_c_low' => ['label' => '', 'meta' => [], 'result' => ['morph_cata_break', 'cata_kill_c_low']],
+
+        'cata_wpn_destroy_c_high' => ['label' => '', 'meta' => [], 'result' => ['consume_item', 'cata_kill_c_high']],
+        'cata_wpn_break_c_high' => ['label' => '', 'meta' => [], 'result' => ['morph_cata_break', 'cata_kill_c_high']],
+
+        'cata_wpn_scrap_c_imp' => ['label' => '', 'meta' => [], 'result' => ['morph_cata_scrap', 'cata_kill_c_imp']],
+
+        'cata_wpn_destroy_c_ctrl' => ['label' => '', 'meta' => [], 'result' => ['consume_item', 'cata_kill_c_ctrl']],
+
+        'cata_wpn_destroy_s_low' => ['label' => '', 'meta' => [], 'result' => ['consume_item', 'cata_kill_s_low']],
+
+        'cata_wpn_destroy_s_high' => ['label' => '', 'meta' => [], 'result' => ['consume_item', 'cata_kill_s_high']],
+
+        'cata_wpn_remains_s_imp' => ['label' => '', 'meta' => [], 'result' => ['morph_cata_remains', 'cata_kill_s_imp']],
+        'cata_wpn_destroy_s_imp' => ['label' => '', 'meta' => [], 'result' => ['consume_item', 'cata_kill_s_imp']],
     ],
 
     'heroics' => [
@@ -618,15 +667,15 @@ $actions = [
         'hero_generic_immune' => ['name' => 'hero_generic_immune', 'unlockable' => true],
         'hero_generic_immune2' => ['name' => 'hero_generic_immune2', 'unlockable' => true, 'used' => 'Ein solches medizinisches Wunder kannst du erst in deinem nächsten Leben wieder vollbringen...'],
         'hero_generic_find_lucky' => ['name' => 'hero_generic_find_lucky', 'unlockable' => true, 'used' => 'Du hast heute schon verdammt viel Schwein gehabt. So viel Glück kannst du erst in deinem nächsten Leben wieder haben...', 'replace' => 'hero_generic_find'],
-        'hero_generic_find_lcky2' => ['name' => 'hero_generic_find_lcky2', 'unlockable' => true, 'used' => 'Du hast heute schon verdammt viel Schwein gehabt. So viel Glück kannst du erst in deinem nächsten Leben wieder haben...', 'replace' => 'hero_generic_find_lucky'],
-        'hero_generic_find_lcky3' => ['name' => 'hero_generic_find_lcky3', 'unlockable' => true, 'used' => 'Du hast heute schon verdammt viel Schwein gehabt. So viel Glück kannst du erst in deinem nächsten Leben wieder haben...', 'replace' => 'hero_generic_find_lcky2'],
+        'hero_generic_find_lucky2' => ['name' => 'hero_generic_find_lucky2', 'unlockable' => true, 'used' => 'Du hast heute schon verdammt viel Schwein gehabt. So viel Glück kannst du erst in deinem nächsten Leben wieder haben...', 'replace' => 'hero_generic_find_lucky'],
+        'hero_generic_find_lucky3' => ['name' => 'hero_generic_find_lucky3', 'unlockable' => true, 'used' => 'Du hast heute schon verdammt viel Schwein gehabt. So viel Glück kannst du erst in deinem nächsten Leben wieder haben...', 'replace' => 'hero_generic_find_lucky2'],
         'hero_generic_rescue' => ['name' => 'hero_generic_rescue', 'unlockable' => true, 'used' => 'Du hast bereits versucht, einen deiner Mitbürger zu retten! Für deine nächste Rettungsaktion musst du bis zu deinem nächsten Leben warten!'],
         'hero_generic_friendship' => ['name' => 'hero_generic_friendship', 'unlockable' => false, 'used' => 'Du hast deine Großzügigkeit in diesem Leben bereits unter Beweis gestellt!'],
         'hero_generic_fs_xp' => ['name' => 'hero_generic_fs_xp', 'unlockable' => false, 'used' => 'Du hast deine Großzügigkeit in diesem Leben bereits unter Beweis gestellt!'],
+        'hero_armag' => ['name' => 'hero_armag', 'unlockable' => true],
     ],
 
     'specials' => [
-        ['name' => 'special_armag', 'icon' => 'armag', 'consumable' => true],
         ['name' => 'special_armag_d', 'icon' => 'armag', 'consumable' => true],
         ['name' => 'special_armag_n', 'icon' => 'armag', 'consumable' => true],
         ['name' => 'special_vote_shaman', 'icon' => 'hero', 'consumable' => false],
@@ -677,7 +726,9 @@ $actions = [
         'p3a' => ['home_survivalist_any', 'survarea'],
         'p3b' => ['home_survivalist_pro', 'survarea'],
         'p4b' => ['home_crows_any', 'lair'],
-        'p3' => ['home_defbuff_any', 'watchmen']
+        'p3' => ['home_defbuff_any', 'watchmen'],
+
+        'hs01' => ['home_contemplate', 'home_contemplate']
     ],
 
     'escort' => [
@@ -721,6 +772,7 @@ $actions = [
         'food_sandw_#00' => ['eat_6ap'],
         'food_noodles_#00' => ['eat_6ap'],
         'wood_xmas_#00' => ['eat_6ap'],
+        'moldy_food_part_#00' => ['eat_5ap'],
         'moldy_food_spicy_#00' => ['eat_6ap'],
         'noodle_prints_#00' => ['eat_4ap'],
         'noodle_prints_#01' => ['eat_4ap'],
@@ -942,6 +994,8 @@ $actions = [
 
         'surv_book_#00' => ['hero_surv_1', 'hero_surv_2'],
 
+        'pelle_#00' => ['hero_scavenger'],
+
         'vest_off_#00' => ['hero_hunter_1', 'hero_hunter_2'],
 
         'door_#00' => ['improve'],
@@ -982,17 +1036,19 @@ $actions = [
         'tamed_pet_#00' => ['hero_tamer_1', 'hero_tamer_1b', 'hero_tamer_3', 'hero_tamer_4', 'hero_tamer_5', 'hero_tamer_6', 'hero_tamer_7', 'hero_tamer_8', 'hero_tamer_9', 'pet_doggo'],
         'tamed_pet_drug_#00' => ['hero_tamer_2', 'hero_tamer_2b', 'hero_tamer_4b', 'hero_tamer_5', 'hero_tamer_5b', 'hero_tamer_6b', 'hero_tamer_7b', 'hero_tamer_8b', 'hero_tamer_9'],
         'tamed_pet_off_#00' => ['pet_doggo'],
+        'shield_#00' => ['hero_guard'],
         'soccer_#00' => ['play_soccer_1', 'play_soccer_2'],
         'quantum_#00' => ['drink_quantum_1', 'drink_quantum_2', 'drink_quantum_3'],
 
         'photo_4_#00' => ['flash_photo_4', 'flash_photo_4_ruin_no_bp', 'flash_photo_4_ruin_bp', 'flash_photo_4_ruin_bp_free'],
         'cello_box_#00' => ['open_cellobox'],
-        'flag_#00' => ['wagging_flag'],
+        //'flag_#00' => [ 'wagging_flag' ],
 
         'scary_mask_#00' => ['scare']
     ],
 
     'items_nw' => [
+        'shield_#00' => 'nw_void',
         'can_open_#00' => 'nw_destroy',
         'pilegun_#00' => 'nw_empty_pilegun',
         'taser_#00' => 'nw_empty_taser',
@@ -1100,6 +1156,8 @@ $actions = [
         'pumpkin_tasty_#00' => 'nw_destroy',
     ],
 
+    'items_cata' => 'ActionCatapultProvider::create()',
+
     'message_keys' => [
         'water_drink' => 'Du trinkst deine Wasserration in einem Zug aus. Ah! Das tut gut!',
         'escort_water_drink' => 'Der Bürger hat das Wasser in einem Zug ausgetrunken. Das tut gut!',
@@ -1153,6 +1211,7 @@ $actions = [
         'escape_item' => '<t-escape>Mithilfe der {item} hast du dir etwas Zeit erkauft ... du solltest diesen Ort schnell verlassen!</t-escape><t-reverse-escape>Du setzt {item} in Gang. Ein gewaltiger Blitz schießt heraus, mitten in die Reihen der Zombies! Geblendet ergreifen {zombies} Zombies die Flucht.</t-reverse-escape>',
         'escape_item_camera' => '<nt-any-escape>Ein stumpfes Klicken ertönt und ein wenig grünlicher Rauch entschwebt der {item_initial} ...</nt-any-escape><t-escape>Du setzt {item_initial} in Gang. Ein gewaltiger Blitz schießt heraus, mitten in die Reihen der Zombies! Geblendet stolpern sie umher und sind nicht länger in der Lage, dich zu finden.</t-escape><t-reverse-escape>Du setzt {item_initial} in Gang. Ein gewaltiger Blitz schießt heraus, mitten in die Reihen der Zombies! Geblendet ergreifen {zombies} Zombies die Flucht.</t-reverse-escape>',
 
+        'heroic_arma_tooltip_h' => 'Du tötest 1 Zombie in der Zone und erhältst du die Kontrolle über die Zone für 5 Minuten.',
         'heroic_arma_tooltip' => 'Du hast die Chance, 1 Zombie in der Zone zu töten; wenn du erfolgreich bist, erhältst du die Kontrolle über die Zone für 10 Minuten.<br /><em>Angesichts des <strong>Armageddon</strong> kannst du diese Spezialaktion <strong>einmal pro Spiel</strong> durchführen.</em>',
         'heroic_arma_fail' => 'Du versuchst dich einem Zombie zu nähern, aber <strong>der Zombie reißt dir fast das Gesicht mit seinen Zähnen ab</strong>! Unmöglich zu bestehen...',
         'heroic_arma_success' => 'Du rennst schreiend in den ersten Zombie in Reichweite! Mit einem kraftvollen, gut angepassten Schulterschlag <strong>schickst du ihn ein paar Meter weiter in den Staub</strong>...{hr}Du kannst diese Gelegenheit zur Flucht nutzen!',
@@ -1176,7 +1235,7 @@ $actions = [
         'drug_drunk' => 'Du schluckst die {item} hinunter. Nach ein paar Minuten schmerzt deine Leber und deine Sicht wird verschwommen. Du bist jetzt <strong>betrunken</strong>!',
         'drug_relax' => 'Du schluckst die {item} hinunter. Nach ein paar Minuten entspannt sich dein Körper und du fühlst dich ein wenig besser... Nur ein bisschen.',
         'msg_soccer_fail' => 'Du jonglierst mit dem Ball, aber leider fliegt er immer wieder in alle Richtungen. Das frustriert dich, daher gibst du den Gedanken auf, weiter mit dem Ball zu spielen.',
-        'msg_soccer_success' => 'Du jonglierst mit dem Ball und schaffst es sehr gut, den Ball in der Luft zu halten. Man könnte dich fast für einen professionellen Fußballspieler halten!<hr />Du hattest viel Spaß und erhältst <strong>1 Aktionspunkt</strong>.',
+        'msg_soccer_success' => 'Du jonglierst mit dem Ball und schaffst es sehr gut, den Ball in der Luft zu halten. Man könnte dich fast für einen professionellen Fußballspieler halten!<hr />Du hattest viel Spaß und erhältst <strong>1 Erkundungspunkt</strong>.',
         'msg_soccer_bigfail' => 'Du jonglieren mit dem Ball, aber beim ersten Aufprall fliegt er direkt auf einen spitzen Gegenstand. Als du dich dem Ball näherst, hörst du ein Pfeifen der Luft und stellst mit Enttäuschung fest, <strong>dass er nun durchstochen ist</strong>!',
         'msg_quantum_basic' => 'Du trinkst die Flasche aus; es schmeckt sehr süß und hat ein leichtes Granatapfel-Armoa. Du fühlst dich für den Moment erfrischt.<br />Du erhälst <strong>Erkundungspunkte</strong> !',
         'msg_quantum_thristy' => 'Nach wenigen Sekunden bereust du, aus dieser Flasche getrunken zu haben. Das Zeug ist viel zu süß, du bist jetzt <strong>durstig</strong>!',

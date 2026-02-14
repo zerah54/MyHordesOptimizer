@@ -58,7 +58,8 @@ $recipes = [
     'com012' => ['type' => 'Recipe::ManualAnywhere', 'out' => 'pilegun_up_empty_#00',   'provoking' => 'pilegun_upkit_#00',      'in' => ['pilegun_upkit_#00', 'pilegun_empty_#00', 'meca_parts_#00', 'electro_#00', 'rustine_#00' ] ],
     'com013' => ['type' => 'Recipe::ManualAnywhere', 'out' => 'mixergun_empty_#00',     'provoking' => 'mixergun_part_#00',      'in' => ['mixergun_part_#00', 'meca_parts_#00', 'electro_#00', 'rustine_#00' ] ],
     'com014' => ['type' => 'Recipe::ManualAnywhere', 'out' => 'jerrygun_#00',           'provoking' => 'jerrygun_part_#00',      'in' => ['jerrygun_part_#00', 'jerrycan_#00', 'rustine_#00' ], "picto"=> "r_watgun_#00"],
-    'com015' => ['type' => 'Recipe::ManualAnywhere', 'out' => 'chainsaw_empty_#00',     'provoking' => 'chainsaw_part_#00',      'in' => ['chainsaw_part_#00', 'engine_#00', 'meca_parts_#00', 'courroie_#00', 'rustine_#00' ], 'picto' => 'r_tronco_#00' ],
+    'com015' => ['type' => 'Recipe::ManualInside', 'out' => 'chainsaw_empty_#00', 'provoking' => 'chainsaw_part_#00', 'in' => ['chainsaw_part_#00', 'engine_#00', 'meca_parts_#00', 'courroie_#00', 'rustine_#00'], 'picto' => 'r_tronco_#00'],
+    'com015b' => ['type' => 'Recipe::ManualOutside', 'out' => 'chainsaw_empty_#00', 'provoking' => 'chainsaw_part_#00', 'in' => ['chainsaw_part_#00', 'engine_#00', 'meca_parts_#00', 'courroie_#00', 'rustine_#00'], 'error' => 'Es ist hier einfach zu staubig, um diesen Gegenstand zusammenbauen zu können...'],
     'com016' => ['type' => 'Recipe::ManualAnywhere', 'out' => 'bgrenade_empty_#00',     'provoking' => 'deto_#00',               'in' => ['explo_#00', 'grenade_empty_#00', 'deto_#00', 'rustine_#00' ] ],
     'com017' => ['type' => 'Recipe::ManualAnywhere', 'out' => 'lawn_#00',               'provoking' => 'lawn_part_#00',          'in' => ['lawn_part_#00', 'meca_parts_#00', 'metal_#00', 'rustine_#00' ] ],
     'com018' => ['type' => 'Recipe::ManualAnywhere', 'out' => 'flash_#00',              'provoking' => 'powder_#00',             'in' => ['powder_#00', 'grenade_empty_#00', 'rustine_#00' ] ],
@@ -100,11 +101,12 @@ $recipes = [
     'com050' => ['type' => 'Recipe::ManualAnywhere', 'out' => 'pumpkin_off_#00',          'provoking' => 'pumpkin_raw_#00',       'in' => ['pumpkin_raw_#00', 'small_knife_#00'], 'keep' => ['small_knife_#00'] ],
     'com051' => ['type' => 'Recipe::ManualAnywhere', 'out' => 'infect_poison_#00',        'provoking' => 'infect_poison_part_#00','in' => ['infect_poison_part_#00', 'drug_#00', 'pharma_#00', 'water_#00', 'drug_water_#00' ] ],
     'com052' => ['type' => 'Recipe::ManualAnywhere', 'out' => 'bike_#00',                 'provoking' => 'bike_part_#00',         'in' => ['bike_part_#00', 'rustine_#00', 'metal_#00', 'chain_#00' ] ],
-    'com053' => ['type' => 'Recipe::ManualAnywhere', 'out' => 'soccer_#00',               'provoking' => 'soccer_part_#00',       'in' => ['soccer_part_#00', 'rustine_#00' ] ],
+    'com053' => ['type' => 'Recipe::ManualAnywhere', 'out' => 'soccer_#00', 'provoking' => 'soccer_part_#00', 'in' => ['soccer_part_#00'], 'ap' => 1, 'tooltip' => 'Du hast die/den {item} repariert.'],
 
     'com054' => ['type' => 'Recipe::ManualAnywhere', 'out' => 'moldy_food_part_#00',      'provoking' => 'moldy_food_subpart_#00',  'in' => ['moldy_food_subpart_#00', 'moldy_food_subpart_#00' ] ],
     'com055' => ['type' => 'Recipe::ManualAnywhere', 'out' => 'moldy_food_#00',           'provoking' => 'moldy_food_part_#00',     'in' => ['moldy_food_part_#00', 'moldy_food_subpart_#00' ] ],
     'com056' => ['type' => 'Recipe::ManualAnywhere', 'out' => 'moldy_food_spicy_#00',     'provoking' => 'spices_#00',              'in' => ['moldy_food_subpart_#00', 'spices_#00' ] ],
+    'com057' => ['type' => 'Recipe::ManualAnywhere', 'out' => 'broken_ball_#00', 'provoking' => 'broken_#00', 'in' => ['broken_#00', 'broken_#00', 'broken_#00', 'rustine_#00']],
 ];
 
 foreach ($recipes as &$recipe) {

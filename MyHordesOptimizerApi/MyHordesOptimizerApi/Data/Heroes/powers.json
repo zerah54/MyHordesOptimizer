@@ -55,16 +55,16 @@
     "unlockable": true,
     "nbUses": 1
   },
-  "hero_generic_find_lcky2": {
-    "name": "hero_generic_find_lcky2",
+  "hero_generic_find_lucky2": {
+    "name": "hero_generic_find_lucky2",
     "title": "Beeindruckendes Fundstück",
     "description": "Wie durch ein Wunder treibst du einen nützlichen Gegenstand auf.",
     "daysNeeded": 0,
     "unlockable": true,
     "nbUses": 1
   },
-  "hero_generic_find_lcky3": {
-    "name": "hero_generic_find_lcky3",
+  "hero_generic_find_lucky3": {
+    "name": "hero_generic_find_lucky3",
     "title": "Erstaunliches Fundstück",
     "description": "Wie durch ein Wunder treibst du einen nützlichen Gegenstand auf.",
     "daysNeeded": 0,
@@ -93,6 +93,14 @@
     "description": "Du gibst 5 Erfahrungspunkte aus, damit ein anderer Spieler 10 Erfahrungspunkte erhält.",
     "daysNeeded": 0,
     "unlockable": false,
+    "nbUses": 1
+  },
+  "hero_armag": {
+    "name": "hero_armag",
+    "title": "Durchgang in Kraft",
+    "description": null,
+    "daysNeeded": 0,
+    "unlockable": true,
     "nbUses": 1
   }
 }

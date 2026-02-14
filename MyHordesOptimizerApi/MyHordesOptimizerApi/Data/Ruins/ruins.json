@@ -47,31 +47,34 @@
     "capacity": 3,
     "drops": {
       "drug_hero_#00": [
-        20
+        16
       ],
       "meat_#00": [
-        20
+        16
       ],
       "food_noodles_hot_#00": [
-        20
+        16
       ],
       "vegetable_tasty_#00": [
-        20
+        16
       ],
       "electro_box_#00": [
-        5
+        4
       ],
       "powder_#00": [
-        5
+        3
       ],
       "food_bag_#00": [
-        5
+        3
       ],
       "door_carpet_#00": [
-        5
+        3
       ],
       "lights_#00": [
-        5
+        3
+      ],
+      "shoe_#00": [
+        25
       ]
     },
     "desc": "Einer der vielen Albi Supermarkt, die um das Jahr 2010 herum aus dem Boden schossen und später dann verschwanden... spezialisiert darauf, Dinge so billig wie möglich zu verscherbeln. Hier findest du alles finden, was du brauchst - egal ob du einfach pleite bist oder eisern auf ein neues Stück Seife sparst, kaufe bei ALBI ein!"
@@ -85,6 +88,7 @@
     "chance": 184,
     "empty": 0.1,
     "capacity": 2,
+    "air_reveal": true,
     "drops": {
       "money_#00": [
         48
@@ -140,6 +144,7 @@
     "chance": 401,
     "empty": 0.1,
     "capacity": 1,
+    "air_reveal": true,
     "drops": {
       "jerrycan_#00": [
         60
@@ -327,9 +332,6 @@
       ],
       "oilcan_#00": [
         4
-      ],
-      "flag_#00": [
-        2
       ]
     },
     "desc": "Das Einzige, was auf diesem bröckelnden Flugplatz startet oder landet, sind die Fliegen. Vielleicht finden Sie etwas Nützliches, wenn Sie in den Lagerhallen herumstöbern. Zum Beispiel einen A380 in funktionstüchtigem Zustand."
@@ -416,6 +418,7 @@
     "chance": 499,
     "empty": 0.1,
     "capacity": 5,
+    "air_reveal": true,
     "drops": {
       "plate_raw_#00": [
         5
@@ -525,25 +528,25 @@
     "capacity": 2,
     "drops": {
       "food_bar1_#00": [
-        10
+        8
       ],
       "food_bar2_#00": [
-        10
+        8
       ],
       "food_bar3_#00": [
-        10
+        8
       ],
       "food_biscuit_#00": [
-        10
+        8
       ],
       "food_chick_#00": [
-        10
+        8
       ],
       "food_pims_#00": [
-        10
+        8
       ],
       "food_tarte_#00": [
-        10
+        8
       ],
       "rhum_#00": [
         7
@@ -555,13 +558,16 @@
         3
       ],
       "pet_rat_#00": [
-        20
+        18
       ],
       "table_#00": [
         1
       ],
       "oilcan_#00": [
         1
+      ],
+      "shoe_#00": [
+        16
       ]
     },
     "desc": "Früher wäre dies sicherlich einer der trendigsten Joints auf der M25 gewesen, mit verwässerten Getränken, dem Aroma von abgestandener Pisse und toten Ratten auf der Bar. Sie müssen seit Jahren der erste Mensch sein, der hier einen Fuß hinein gesetzt hat."
@@ -575,9 +581,10 @@
     "chance": 304,
     "empty": 0.1,
     "capacity": 2,
+    "air_reveal": true,
     "drops": {
       "metal_#00": [
-        50
+        31
       ],
       "meca_parts_#00": [
         5
@@ -611,6 +618,9 @@
       ],
       "oilcan_#00": [
         6
+      ],
+      "shoe_#00": [
+        19
       ]
     },
     "desc": "Ein Kombi, der sich in einen Kleintransporter verkeilt hat. Der großen Anzahl an verkohlten Leichen nach zu urteilen, hat hier ein Unfall eine richtig große Karambolage verursacht."
@@ -908,9 +918,10 @@
     "chance": 70,
     "empty": 0,
     "capacity": 2,
+    "air_reveal": true,
     "drops": {
       "wood_bad_#00": [
-        100
+        62
       ],
       "hmeat_#00": [
         10
@@ -938,6 +949,9 @@
       ],
       "pet_snake2_#00": [
         4
+      ],
+      "shoe_#00": [
+        38
       ]
     },
     "desc": "Die verbrannten Überreste eines kleinen Waldes. Es war wahrscheinlich vorher eine schöne Gegend... Jetzt hoffen Sie nur noch, dass Sie hier nicht übernachten müssen."
@@ -982,6 +996,7 @@
     "chance": 71,
     "empty": 0.3,
     "capacity": 2,
+    "air_reveal": true,
     "drops": {
       "concrete_#00": [
         35
@@ -1019,6 +1034,7 @@
     "chance": 15,
     "empty": 0.1,
     "capacity": 1,
+    "air_reveal": true,
     "drops": {
       "metal_bad_#00": [
         40
@@ -1096,6 +1112,7 @@
     "chance": 68,
     "empty": 0.1,
     "capacity": 1,
+    "air_reveal": true,
     "drops": {
       "hmeat_#00": [
         40
@@ -1167,6 +1184,7 @@
     "chance": 155,
     "empty": 0.1,
     "capacity": 2,
+    "air_reveal": true,
     "drops": {
       "electro_box_#00": [
         10
@@ -1246,9 +1264,10 @@
     "chance": 624,
     "empty": 0.05,
     "capacity": 1,
+    "air_reveal": true,
     "drops": {
       "digger_#00": [
-        30
+        16
       ],
       "lawn_part_#00": [
         5
@@ -1294,6 +1313,9 @@
       ],
       "soccer_#00": [
         4
+      ],
+      "shoe_#00": [
+        14
       ]
     },
     "desc": "Mitten auf einem völlig verfallenen Platz befindet sich ein großer Gartenschuppen. Die Tür gibt leicht nach und gibt den Blick frei auf einen riesigen Raum voller Regale und allerlei Werkzeug."
@@ -1392,6 +1414,7 @@
     "chance": 73,
     "empty": 0.1,
     "capacity": 1,
+    "air_reveal": true,
     "drops": {
       "hmeat_#00": [
         20
@@ -1426,6 +1449,7 @@
     "chance": 181,
     "empty": 0.2,
     "capacity": -1,
+    "air_reveal": true,
     "drops": {
       "bone_#00": [
         100
@@ -1577,6 +1601,7 @@
     "chance": 472,
     "empty": 0.1,
     "capacity": 2,
+    "air_reveal": true,
     "drops": {
       "jerrycan_#00": [
         85
@@ -1663,6 +1688,7 @@
     "chance": 183,
     "empty": 0.1,
     "capacity": 1,
+    "air_reveal": true,
     "drops": {
       "drug_random_#00": [
         50
@@ -1737,6 +1763,7 @@
     "chance": 335,
     "empty": 0.1,
     "capacity": 3,
+    "air_reveal": true,
     "drops": {
       "metal_beam_#00": [
         40
@@ -1786,6 +1813,7 @@
     "chance": 83,
     "empty": 0.1,
     "capacity": 1,
+    "air_reveal": true,
     "drops": {
       "gun_#00": [
         5
@@ -1828,9 +1856,6 @@
       ],
       "pilegun_upkit_#00": [
         1
-      ],
-      "flag_#00": [
-        2
       ]
     },
     "desc": "Dieses militärische Vehikel ist wie die metaphorische Konservendose. Der Soldat ist drinnen und spielt die Rolle einer Sardine, und hundert Zombies draußen spielen den hungrigen Bürger. Der Bürger gewinnt..."
@@ -1879,7 +1904,7 @@
         2
       ]
     },
-    "desc": "Beim Anblick des Gebäudes stellst du dir die Frage, wer in diesem schäbigen Motel früher übernachtet hat. Bilder und Szenen verschiedener Roadmovies schießen dir durch den Kopf: Thelma&Louise, Natural Born Killers... Du denkst dir: 'Vielleicht sollte ich als Erstes Zimmer 215 kontrollieren. Man weiß ja nie...'."
+    "desc": "Beim Anblick des Gebäudes stellst du dir die Frage, wer in diesem schäbigen Motel früher übernachtet hat. Bilder und Szenen verschiedener Roadmovies schießen dir durch den Kopf: Thelma&Louise, Natural Born Killers... Du denkst dir: 'Vielleicht sollte ich als Erstes Zimmer 215 kontrollieren . Man weiß ja nie...'."
   },
   "army": {
     "label": "Militärischer Wachposten",
@@ -1911,9 +1936,6 @@
       ],
       "wire_#00": [
         4
-      ],
-      "flag_#00": [
-        3
       ],
       "shoe_#00": [
         5
@@ -1974,6 +1996,7 @@
     "chance": 196,
     "empty": 0.25,
     "capacity": 2,
+    "air_reveal": true,
     "drops": {
       "chest_#00": [
         10
@@ -2008,9 +2031,10 @@
     "chance": 216,
     "empty": 0.1,
     "capacity": 2,
+    "air_reveal": true,
     "drops": {
       "concrete_#00": [
-        40
+        29
       ],
       "bgrenade_empty_#00": [
         10
@@ -2020,6 +2044,9 @@
       ],
       "machine_gun_#00": [
         3
+      ],
+      "shoe_#00": [
+        11
       ]
     },
     "desc": "Dieser von Einschusskratern und schwarzen getrockneten Blutlachen übersäte Schützengraben lässt erahnen, was sich hier abgespielt hat. Der größte Teil des Grabens ist in sich zusammengestürzt, doch hier und dort erblickst du noch ein paar begehbare Stellen, die sich nach nutzbaren Gegenständen absuchen lassen."
@@ -2081,34 +2108,34 @@
     "capacity": 1,
     "drops": {
       "can_#00": [
-        10
+        8
       ],
       "lights_#00": [
-        10
+        8
       ],
       "cigs_#00": [
-        10
+        8
       ],
       "door_carpet_#00": [
         3
       ],
       "drug_#00": [
-        10
+        8
       ],
       "jerrycan_#00": [
-        10
+        8
       ],
       "food_bar1_#00": [
-        10
+        8
       ],
       "food_noodles_#00": [
-        10
+        8
       ],
       "spices_#00": [
         5
       ],
       "money_#00": [
-        10
+        8
       ],
       "poison_part_#00": [
         1
@@ -2121,6 +2148,9 @@
       ],
       "diode_#00": [
         5
+      ],
+      "shoe_#00": [
+        16
       ]
     },
     "desc": "In diesem Geschäft konnte man früher allerlei Produkte des täglichen Bedarfs kaufen: Lebensmittel, Getränke, Reinigungsmittel... An der Tür steht: Rund um die Uhr geöffnet (auch am Wochenende). In der Tat, das klaffenden Loch in der Mauer bestätigt dies."
@@ -2134,6 +2164,7 @@
     "chance": 81,
     "empty": 0.1,
     "capacity": 1,
+    "air_reveal": true,
     "drops": {
       "book_gen_letter_#00": [
         10
@@ -2165,9 +2196,10 @@
     "chance": 177,
     "empty": 0,
     "capacity": 1,
+    "air_reveal": true,
     "drops": {
       "chest_food_#00": [
-        60
+        35
       ],
       "chest_tools_#00": [
         20
@@ -2201,6 +2233,9 @@
       ],
       "wire_#00": [
         3
+      ],
+      "shoe_#00": [
+        25
       ]
     },
     "desc": "Es handelt sich um einen Transportlaster der sowjetischen Firma Transtwinï. Die Fahrerkabine hat sich komplett in einem Baum verkeilt. Der aufgeschlitzte Fahrersitz, sowie die großflächigen Blutspuren an den Wänden, lassen darauf schließen, dass der Unfall nicht die Todesursache war..."
@@ -2216,13 +2251,13 @@
     "capacity": 3,
     "drops": {
       "hmeat_#00": [
-        80
+        65
       ],
       "bandage_#00": [
         5
       ],
       "pile_#00": [
-        20
+        12
       ],
       "pet_rat_#00": [
         5
@@ -2241,6 +2276,9 @@
       ],
       "lens_#00": [
         4
+      ],
+      "shoe_#00": [
+        23
       ]
     },
     "desc": "Die fröhlichen Kinderzeichnungen an den Wänden stehen im starken Kontrast zu den nicht identifizierbaren menschlichen Überresten am Boden. Du hast das Gefühl, ein dunkles Kichern aus dem Bauschutt zu hören."
@@ -2458,6 +2496,7 @@
     "chance": 221,
     "empty": 0.33,
     "capacity": 1,
+    "air_reveal": true,
     "drops": {
       "jerrycan_#00": [
         2
@@ -2656,6 +2695,7 @@
     "chance": 202,
     "empty": 0.05,
     "capacity": 1,
+    "air_reveal": true,
     "drops": {
       "chest_citizen_#00": [
         3
@@ -2819,9 +2859,6 @@
     "empty": 0.2,
     "capacity": 2,
     "drops": {
-      "flag_#00": [
-        6
-      ],
       "shoe_#00": [
         9
       ],
@@ -2870,6 +2907,56 @@
     },
     "desc": "Das Grab der ehemaligen Sportler..."
   },
+  "crop_circles": {
+    "label": "Verdächtige Scheune",
+    "icon": "crop_circles",
+    "camping": 15,
+    "min_dist": 21,
+    "max_dist": 27,
+    "chance": 0,
+    "empty": 0.2,
+    "capacity": 3,
+    "air_only": true,
+    "drops": {
+      "vagoul_#00": [
+        5
+      ],
+      "chest_xl_#00": [
+        15
+      ],
+      "chainsaw_part_#00": [
+        15
+      ],
+      "lpoint_#00": [
+        25
+      ],
+      "pocket_belt_#00": [
+        50
+      ],
+      "bagxl_#00": [
+        50
+      ],
+      "ryebag_#00": [
+        100
+      ],
+      "cadaver_#00": [
+        100
+      ],
+      "lawn_part_#00": [
+        150
+      ],
+      "quantum_#00": [
+        150
+      ],
+      "hmbrew_#00": [
+        160
+      ],
+      "vegetable_#00": [
+        185
+      ]
+    },
+    "desc": "Diese Scheune ist dir bisher völlig entgangen, weil sie mitten in der Wüste so uninteressant wirkte; aber die seltsamen, halb verwischten Zeichnungen in der Umgebung, die die Bürger vom Heißluftballon aus entdeckt hatten, überzeugten dich von ihrer Bedeutung... Bei näherer Betrachtung stellt sich heraus, dass die Scheune einer Gruppe von Überlebenden als Unterschlupf diente. Ihre verbliebenen Vorräte befinden sich noch immer darin – und wenn eines sicher ist: Sie werden sie nicht mehr brauchen."
+  },
   "deserted_bunker": {
     "label": "Verlassener Bunker",
     "icon": "deserted_bunker",
@@ -2884,118 +2971,112 @@
     "capacity": 4,
     "drops": {
       "bbplan_u_#00": [
-        14
+        800
       ],
       "bbplan_r_#00": [
-        8
+        400
       ],
       "bbplan_e_#00": [
-        7
-      ],
-      "water_#00": [
-        4
-      ],
-      "concrete_wall_#00": [
-        21
-      ],
-      "wood_bad_#00": [
-        4
-      ],
-      "kalach_#01": [
-        2
-      ],
-      "meca_parts_#00": [
-        11
+        200
       ],
       "wood2_#00": [
-        6
+        429
       ],
       "metal_#00": [
-        8
+        429
       ],
-      "deto_#00": [
-        1
+      "meca_parts_#00": [
+        429
       ],
-      "magneticKey_#00": [
-        9
+      "concrete_wall_#00": [
+        429
       ],
-      "money_#00": [
-        1
+      "wood_bad_#00": [
+        429
       ],
-      "pile_#00": [
-        2
-      ],
-      "big_pgun_empty_#00": [
-        3
-      ],
-      "gun_#00": [
-        5
-      ],
-      "wood_log_#00": [
-        8
+      "water_#00": [
+        429
       ],
       "water_cup_part_#00": [
-        3
-      ],
-      "metal_bad_#00": [
-        2
-      ],
-      "metal_beam_#00": [
-        3
-      ],
-      "electro_box_#00": [
-        1
-      ],
-      "machine_gun_#00": [
-        1
-      ],
-      "flare_#00": [
-        1
-      ],
-      "wood_plate_#00": [
-        1
-      ],
-      "concrete_#00": [
-        4
-      ],
-      "rsc_pack_1_#00": [
-        4
-      ],
-      "rsc_pack_2_#00": [
-        2
-      ],
-      "rsc_pack_3_#00": [
-        1
+        429
       ],
       "wood_beam_#00": [
-        1
+        188
       ],
-      "rlaunc_#00": [
-        1
+      "metal_beam_#00": [
+        188
       ],
-      "tagger_#00": [
-        1
+      "gun_#00": [
+        188
+      ],
+      "metal_bad_#00": [
+        188
+      ],
+      "wood_log_#00": [
+        188
+      ],
+      "wood_plate_#00": [
+        188
+      ],
+      "money_#00": [
+        188
+      ],
+      "pile_#00": [
+        188
+      ],
+      "big_pgun_empty_#00": [
+        36
       ],
       "big_pgun_#00": [
-        1
+        36
       ],
       "big_pgun_part_#00": [
-        4
+        36
       ],
-      "bumpKey_#00": [
-        3
+      "tagger_#00": [
+        36
+      ],
+      "flare_#00": [
+        36
+      ],
+      "machine_gun_#00": [
+        36
+      ],
+      "deto_#00": [
+        36
+      ],
+      "electro_box_#00": [
+        36
       ],
       "repair_kit_part_raw_#00": [
-        2
+        36
+      ],
+      "rsc_pack_3_#00": [
+        36
+      ],
+      "rsc_pack_2_#00": [
+        36
+      ],
+      "rsc_pack_1_#00": [
+        36
+      ],
+      "rlaunc_#00": [
+        36
+      ],
+      "kalach_#01": [
+        36
+      ],
+      "magneticKey_#00": [
+        167
+      ],
+      "bumpKey_#00": [
+        167
       ],
       "classicKey_#00": [
-        3
-      ],
-      "alarm_off_#00": [
-        3
+        167
       ],
       "infect_poison_part_#00": [
-        10,
+        429,
         "DropMod::Infective"
       ]
     },
@@ -3015,103 +3096,115 @@
     "capacity": 4,
     "drops": {
       "hbplan_u_#00": [
-        6900
+        800
       ],
       "hbplan_r_#00": [
-        4600
+        400
       ],
       "hbplan_e_#00": [
-        2300
+        200
       ],
       "water_#00": [
-        9000
-      ],
-      "bumpKey_#00": [
-        3000
-      ],
-      "classicKey_#00": [
-        3000
-      ],
-      "can_#00": [
-        6000
-      ],
-      "food_bag_#00": [
-        6000
+        554
       ],
       "chair_basic_#00": [
-        3000
-      ],
-      "table_#00": [
-        2000
-      ],
-      "food_bar2_#00": [
-        4000
-      ],
-      "spices_#00": [
-        3000
-      ],
-      "bed_#00": [
-        2000
+        429
       ],
       "chest_food_#00": [
-        3000
+        429
       ],
-      "concrete_wall_#00": [
-        3000
-      ],
-      "bag_#00": [
-        3000
-      ],
-      "food_noodles_#00": [
-        4000
-      ],
-      "food_pims_#00": [
-        3000
+      "food_bag_#00": [
+        429
       ],
       "food_bar1_#00": [
-        3000
+        429
+      ],
+      "food_bar2_#00": [
+        429
       ],
       "food_bar3_#00": [
-        3000
+        429
       ],
-      "food_chick_#00": [
-        3000
+      "bed_#00": [
+        125
       ],
-      "distri_#00": [
-        2000
+      "spices_#00": [
+        125
       ],
-      "rlaunc_#00": [
-        2000
-      ],
-      "dish_#00": [
-        3000
+      "food_noodles_#00": [
+        125
       ],
       "food_sandw_#00": [
-        3000
+        125
       ],
-      "bureau_#00": [
-        2000
+      "food_pims_#00": [
+        125
       ],
-      "deco_box_#00": [
-        4000
+      "food_chick_#00": [
+        125
+      ],
+      "food_biscuit_#00": [
+        125
+      ],
+      "dish_#00": [
+        125
+      ],
+      "can_#00": [
+        125
       ],
       "lamp_#00": [
-        4000
+        125
       ],
-      "teddy_#01": [
-        2
+      "table_#00": [
+        125
       ],
-      "teddy_#00": [
-        2000
-      ],
-      "carpet_#00": [
-        2000
+      "food_noodles_hot_#00": [
+        42
       ],
       "game_box_#00": [
-        2000
+        42
+      ],
+      "deco_box_#00": [
+        42
+      ],
+      "teddy_#00": [
+        42
+      ],
+      "teddy_#01": [
+        42
+      ],
+      "dish_tasty_#00": [
+        42
+      ],
+      "bag_#00": [
+        42
+      ],
+      "lights_#00": [
+        42
+      ],
+      "carpet_#00": [
+        42
+      ],
+      "bureau_#00": [
+        42
+      ],
+      "distri_#00": [
+        42
+      ],
+      "rlaunc_#00": [
+        42
+      ],
+      "magneticKey_#00": [
+        167
+      ],
+      "bumpKey_#00": [
+        167
+      ],
+      "classicKey_#00": [
+        167
       ],
       "infect_poison_part_#00": [
-        5000,
+        429,
         "DropMod::Infective"
       ]
     },
@@ -3131,82 +3224,82 @@
     "capacity": 4,
     "drops": {
       "mbplan_u_#00": [
-        20
+        800
       ],
       "mbplan_r_#00": [
-        12
+        400
       ],
       "mbplan_e_#00": [
-        5
+        200
       ],
       "water_#00": [
-        9
+        964
       ],
       "drug_random_#00": [
-        10
-      ],
-      "out_def_#00": [
-        14
-      ],
-      "drug_#00": [
-        3
+        750
       ],
       "xanax_#00": [
-        16
+        750
       ],
-      "water_can_empty_#00": [
-        4
-      ],
-      "magneticKey_#00": [
-        9
-      ],
-      "pc_#00": [
-        2
-      ],
-      "drug_water_#00": [
-        3
-      ],
-      "distri_#00": [
-        2
-      ],
-      "disinfect_#00": [
-        6
+      "out_def_#00": [
+        750
       ],
       "pharma_#00": [
-        3
+        214
       ],
-      "chainsaw_empty_#00": [
-        2
-      ],
-      "bureau_#00": [
-        1
+      "drug_water_#00": [
+        214
       ],
       "cyanure_#00": [
-        4
+        214
       ],
-      "classicKey_#00": [
-        3
+      "disinfect_#00": [
+        214
       ],
-      "water_can_3_#00": [
-        2
+      "pc_#00": [
+        214
       ],
-      "water_can_2_#00": [
-        2
+      "water_can_empty_#00": [
+        214
+      ],
+      "chainsaw_empty_#00": [
+        63
+      ],
+      "drug_#00": [
+        63
       ],
       "water_can_1_#00": [
-        3
+        63
       ],
-      "bed_#00": [
-        2
+      "water_can_2_#00": [
+        63
+      ],
+      "water_can_3_#00": [
+        63
+      ],
+      "rlaunc_#00": [
+        63
+      ],
+      "bureau_#00": [
+        63
+      ],
+      "distri_#00": [
+        63
+      ],
+      "magneticKey_#00": [
+        167
       ],
       "bumpKey_#00": [
-        3
+        167
+      ],
+      "classicKey_#00": [
+        167
       ],
       "vagoul_#00": [
-        1
+        63
       ],
       "infect_poison_part_#00": [
-        15,
+        750,
         "DropMod::Infective"
       ]
     },

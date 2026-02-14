@@ -862,6 +862,22 @@
     ],
     "result": []
   },
+  "eat_5ap": {
+    "label": "Essen",
+    "cover": true,
+    "at00": true,
+    "poison": "ItemAction::PoisonHandlerConsume",
+    "meta": [
+      "eat_ap",
+      "no_full_ap_msg_food"
+    ],
+    "result": [
+      "contaminated_zone_infect",
+      "eat_ap5",
+      "consume_item"
+    ],
+    "escort_message_key": "escort_food_eat"
+  },
   "eat_6ap": {
     "label": "Essen",
     "cover": true,
@@ -1754,7 +1770,7 @@
           ],
           [
             [
-              "just_ap1",
+              "plus_1sp_e",
               "msg_soccer_success"
             ],
             15
@@ -1800,7 +1816,7 @@
           ],
           [
             [
-              "just_ap1",
+              "plus_1sp_e",
               "msg_soccer_success"
             ],
             5
@@ -5058,6 +5074,16 @@
     ],
     "message": "<t-fail><t-door-closed>Das Stadttor ist geschlossen...</t-door-closed><t-impossible>{tamer_dog} ist erschöpft zu dir zurückgekehrt... aber er hat nichts in seinem Maul. Offensichtlich konnte er nicht finden, wonach du gesucht hast.</t-impossible></t-fail><nt-fail>{tamer_dog} hat dir soeben eine/n {target} aus der Bank gebracht. Genau das, was du gebraucht hast!</nt-fail>"
   },
+  "hero_guard": {
+    "label": "Senken",
+    "at00": true,
+    "cover": true,
+    "meta": [],
+    "result": [
+      "hero_guard_gone"
+    ],
+    "message": "Du senkst deinen Schild. Zwar kannst du dich jetzt nicht mehr so gut verteidigen, dafür kannst du aber einen weiteren, schweren Gegenstand mit dir führen."
+  },
   "hero_surv_1": {
     "label": "Wasser suchen",
     "renderer": "survivalist_popup",
@@ -5089,6 +5115,23 @@
       "hero_surv_2"
     ],
     "message": "{casino}"
+  },
+  "hero_scavenger": {
+    "label": "Zone ausheben",
+    "tooltip": "Es sieht so aus, als könntest du mit deiner Schaufel an dieser Stelle tiefer graben als sonst... Möglicherweise kannst du dieser Zone neues Leben einhauchen, sodass du und andere Bürger hier wieder wertvolle Gegenstände finden können? Du kannst diese Aktion nur einmal pro Tag verwenden. Außerdem kann jede Zone nur einmalig durch diese Aktion erneuert werden.",
+    "meta": [
+      "must_be_outside",
+      "profession_collec",
+      "scav_counter_below_1",
+      "zone_not_force_regenerated",
+      "zone_must_be_empty"
+    ],
+    "result": [
+      "hero_scavenger",
+      "increase_scavenger_counter",
+      "stop_digging"
+    ],
+    "message": "Du hast diese Zone erfolgreich ausgehoben und zahlreiche neue Buddelmöglichkeiten entdeckt."
   },
   "hero_hunter_1": {
     "label": "Tarnen",
@@ -5166,7 +5209,7 @@
     ],
     "message": "So was nennt man wohl <strong>Glück</strong>! <t-inside>Du hast soeben {items_spawn} in einem Abfallberg neben deinem Haus gefunden!</t-inside><t-outside>Du hast soeben {items_spawn} im Wüstensand gefunden!</t-outside> Genau das, was du gebraucht hast!"
   },
-  "hero_generic_find_lcky2": {
+  "hero_generic_find_lucky2": {
     "label": "Beeindruckendes Fundstück",
     "tooltip": "Wie durch ein Wunder treibst du einen nützlichen Gegenstand auf.",
     "cover": true,
@@ -5184,7 +5227,7 @@
     ],
     "message": "So was nennt man wohl <strong>Glück</strong>! <t-inside>Du hast soeben {items_spawn} in einem Abfallberg neben deinem Haus gefunden!</t-inside><t-outside>Du hast soeben {items_spawn} im Wüstensand gefunden!</t-outside> Genau das, was du gebraucht hast!"
   },
-  "hero_generic_find_lcky3": {
+  "hero_generic_find_lucky3": {
     "label": "Erstaunliches Fundstück",
     "tooltip": "Wie durch ein Wunder treibst du einen nützlichen Gegenstand auf.",
     "cover": true,
@@ -5361,34 +5404,20 @@
       "scary_mask"
     ]
   },
-  "special_armag": {
+  "hero_armag": {
     "label": "Durchgang in Kraft",
-    "tooltip_key": "heroic_arma_tooltip",
+    "tooltip_key": "heroic_arma_tooltip_h",
     "allow_when_terrorized": true,
     "meta": [
+      "not_yet_hero",
       "must_be_outside",
       "must_be_blocked"
     ],
     "result": [
-      {
-        "group": [
-          [
-            [
-              "do_nothing",
-              "msg_heroic_arma_fail"
-            ],
-            50
-          ],
-          [
-            [
-              "msg_heroic_arma_success",
-              "zone_escape_600_armag",
-              "kill_1_zombie_s"
-            ],
-            50
-          ]
-        ]
-      }
+      "hero_act",
+      "msg_heroic_arma_success",
+      "zone_escape_300_armag",
+      "kill_1_zombie_s"
     ]
   },
   "special_armag_d": {
@@ -6302,10 +6331,12 @@
     "meta": [
       "must_be_inside",
       "must_have_pool",
+      "pool_has_water",
       "not_yet_home_pooled"
     ],
     "result": [
-      "status_home_pool"
+      "status_home_pool",
+      "status_good_smell"
     ],
     "message": "Du springst ohne zu zögern in dieses große Bad. Das Chaos um dich herum existiert für dich nicht mehr und du spürst, dass du diese Nacht mit Gelassenheit verbringen wirst."
   },
@@ -6373,6 +6404,21 @@
       "building_survivalist_c"
     ],
     "message": "Einige Leute haben dein Wassergewinnung-System bösartig verleumdet, aber es ist offensichtlich, dass sie jetzt schweigen. Du erhälst {items_spawn}."
+  },
+  "home_contemplate": {
+    "label": "Besinnen",
+    "meta": [
+      "must_be_inside",
+      "min_2_ap",
+      "must_have_sanctuary",
+      "not_contemplated"
+    ],
+    "result": [
+      "minus_2ap",
+      "status_contemplated",
+      "discover_random_soul"
+    ],
+    "message": "Du nimmst dir einen Moment Zeit, um zur Ruhe zu kommen und dich auf das wesentliche zu besinnen."
   },
   "home_defbuff_any": {
     "label": "Verteidigung organisieren",
@@ -6530,6 +6576,11 @@
       }
     ],
     "escort_message_key": "escort_food_eat"
+  },
+  "nw_void": {
+    "label": "",
+    "meta": [],
+    "result": []
   },
   "nw_break": {
     "label": "",
@@ -6714,6 +6765,238 @@
     "meta": [],
     "result": [
       "morph_radio_off"
+    ]
+  },
+  "cata_rsc_undef": {
+    "label": "",
+    "meta": [],
+    "result": [
+      "morph_cata_undef"
+    ]
+  },
+  "cata_rsc_remains": {
+    "label": "",
+    "meta": [],
+    "result": [
+      "morph_cata_remains"
+    ]
+  },
+  "cata_rsc_moldy": {
+    "label": "",
+    "meta": [],
+    "result": [
+      "morph_cata_moldy"
+    ]
+  },
+  "cata_rsc_scrap": {
+    "label": "",
+    "meta": [],
+    "result": [
+      "morph_cata_scrap"
+    ]
+  },
+  "cata_rsc_break": {
+    "label": "",
+    "meta": [],
+    "result": [
+      "morph_cata_break"
+    ]
+  },
+  "cata_rsc_break_staff": {
+    "label": "",
+    "meta": [],
+    "result": [
+      "morph_cata_break_staff"
+    ]
+  },
+  "cata_rsc_fine": {
+    "label": "",
+    "meta": [],
+    "result": [
+      "morph_cata_fine"
+    ]
+  },
+  "cata_rsc_destroy": {
+    "label": "",
+    "meta": [],
+    "result": [
+      "consume_item"
+    ]
+  },
+  "cata_wpn_scrap_1_rid": {
+    "label": "",
+    "meta": [],
+    "result": [
+      "morph_cata_scrap",
+      "cata_kill_1_rid"
+    ]
+  },
+  "cata_wpn_remains_1_rid": {
+    "label": "",
+    "meta": [],
+    "result": [
+      "morph_cata_remains",
+      "cata_kill_1_rid"
+    ]
+  },
+  "cata_wpn_destroy_1_rid": {
+    "label": "",
+    "meta": [],
+    "result": [
+      "consume_item",
+      "cata_kill_1_rid"
+    ]
+  },
+  "cata_wpn_break_1_rid": {
+    "label": "",
+    "meta": [],
+    "result": [
+      "morph_cata_break",
+      "cata_kill_1_rid"
+    ]
+  },
+  "cata_wpn_remains_1_low": {
+    "label": "",
+    "meta": [],
+    "result": [
+      "morph_cata_remains",
+      "cata_kill_1_low"
+    ]
+  },
+  "cata_wpn_destroy_1_low": {
+    "label": "",
+    "meta": [],
+    "result": [
+      "consume_item",
+      "cata_kill_1_low"
+    ]
+  },
+  "cata_wpn_break_1_low": {
+    "label": "",
+    "meta": [],
+    "result": [
+      "morph_cata_break",
+      "cata_kill_1_low"
+    ]
+  },
+  "cata_wpn_destroy_1_high": {
+    "label": "",
+    "meta": [],
+    "result": [
+      "consume_item",
+      "cata_kill_1_high"
+    ]
+  },
+  "cata_wpn_destroy_1_imp": {
+    "label": "",
+    "meta": [],
+    "result": [
+      "consume_item",
+      "cata_kill_1_imp"
+    ]
+  },
+  "cata_wpn_break_1_imp": {
+    "label": "",
+    "meta": [],
+    "result": [
+      "morph_cata_break",
+      "cata_kill_1_imp"
+    ]
+  },
+  "cata_wpn_scrap_c_low": {
+    "label": "",
+    "meta": [],
+    "result": [
+      "morph_cata_scrap",
+      "cata_kill_c_low"
+    ]
+  },
+  "cata_wpn_remains_c_low": {
+    "label": "",
+    "meta": [],
+    "result": [
+      "morph_cata_remains",
+      "cata_kill_c_low"
+    ]
+  },
+  "cata_wpn_destroy_c_low": {
+    "label": "",
+    "meta": [],
+    "result": [
+      "consume_item",
+      "cata_kill_c_low"
+    ]
+  },
+  "cata_wpn_break_c_low": {
+    "label": "",
+    "meta": [],
+    "result": [
+      "morph_cata_break",
+      "cata_kill_c_low"
+    ]
+  },
+  "cata_wpn_destroy_c_high": {
+    "label": "",
+    "meta": [],
+    "result": [
+      "consume_item",
+      "cata_kill_c_high"
+    ]
+  },
+  "cata_wpn_break_c_high": {
+    "label": "",
+    "meta": [],
+    "result": [
+      "morph_cata_break",
+      "cata_kill_c_high"
+    ]
+  },
+  "cata_wpn_scrap_c_imp": {
+    "label": "",
+    "meta": [],
+    "result": [
+      "morph_cata_scrap",
+      "cata_kill_c_imp"
+    ]
+  },
+  "cata_wpn_destroy_c_ctrl": {
+    "label": "",
+    "meta": [],
+    "result": [
+      "consume_item",
+      "cata_kill_c_ctrl"
+    ]
+  },
+  "cata_wpn_destroy_s_low": {
+    "label": "",
+    "meta": [],
+    "result": [
+      "consume_item",
+      "cata_kill_s_low"
+    ]
+  },
+  "cata_wpn_destroy_s_high": {
+    "label": "",
+    "meta": [],
+    "result": [
+      "consume_item",
+      "cata_kill_s_high"
+    ]
+  },
+  "cata_wpn_remains_s_imp": {
+    "label": "",
+    "meta": [],
+    "result": [
+      "morph_cata_remains",
+      "cata_kill_s_imp"
+    ]
+  },
+  "cata_wpn_destroy_s_imp": {
+    "label": "",
+    "meta": [],
+    "result": [
+      "consume_item",
+      "cata_kill_s_imp"
     ]
   }
 }

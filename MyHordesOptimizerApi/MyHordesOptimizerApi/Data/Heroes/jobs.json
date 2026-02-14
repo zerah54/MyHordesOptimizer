@@ -11,8 +11,6 @@
         "items_alt": [
             "basic_suit_dirt_#00"
         ],
-        "nightwatch_def_bonus": 0,
-        "nightwatch_surv_bonus": 0,
         "dig_bonus": 0
     },
     "basic": {
@@ -28,8 +26,6 @@
             "basic_suit_dirt_#00"
         ],
         "picto": "r_jbasic_#00",
-        "nightwatch_def_bonus": 0,
-        "nightwatch_surv_bonus": 0,
         "dig_bonus": 0
     },
     "collec": {
@@ -46,8 +42,6 @@
             "basic_suit_dirt_#00"
         ],
         "picto": "r_jcolle_#00",
-        "nightwatch_def_bonus": 0,
-        "nightwatch_surv_bonus": 0,
         "dig_bonus": 0.2
     },
     "guardian": {
@@ -61,11 +55,10 @@
             "shield_#00"
         ],
         "items_alt": [
-            "basic_suit_dirt_#00"
+            "basic_suit_dirt_#00",
+            "shield_off_#00"
         ],
         "picto": "r_jguard_#00",
-        "nightwatch_def_bonus": 15,
-        "nightwatch_surv_bonus": 0.05,
         "dig_bonus": 0
     },
     "hunter": {
@@ -83,8 +76,6 @@
             "vest_off_#00"
         ],
         "picto": "r_jrangr_#00",
-        "nightwatch_def_bonus": 0,
-        "nightwatch_surv_bonus": 0,
         "dig_bonus": 0
     },
     "tamer": {
@@ -104,8 +95,6 @@
             "tamed_pet_gone_#00"
         ],
         "picto": "r_jtamer_#00",
-        "nightwatch_def_bonus": 5,
-        "nightwatch_surv_bonus": 0,
         "dig_bonus": 0
     },
     "tech": {
@@ -122,8 +111,6 @@
             "basic_suit_dirt_#00"
         ],
         "picto": "r_jtech_#00",
-        "nightwatch_def_bonus": 0,
-        "nightwatch_surv_bonus": 0,
         "dig_bonus": 0
     },
     "shaman": {
@@ -140,8 +127,6 @@
             "basic_suit_dirt_#00"
         ],
         "picto": "r_jsham_#00",
-        "nightwatch_def_bonus": 0,
-        "nightwatch_surv_bonus": 0,
         "dig_bonus": 0
     },
     "survivalist": {
@@ -158,8 +143,6 @@
             "basic_suit_dirt_#00"
         ],
         "picto": "r_jermit_#00",
-        "nightwatch_def_bonus": 0,
-        "nightwatch_surv_bonus": 0,
         "dig_bonus": 0
     }
 }

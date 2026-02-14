@@ -1,4 +1,5 @@
 {
+  "shield_#00": "nw_void",
     "can_open_#00": "nw_destroy",
     "pilegun_#00": "nw_empty_pilegun",
     "taser_#00": "nw_empty_taser",

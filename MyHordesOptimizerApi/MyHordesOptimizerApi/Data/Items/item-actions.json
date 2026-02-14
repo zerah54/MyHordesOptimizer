@@ -104,6 +104,9 @@
   "wood_xmas_#00": [
     "eat_6ap"
   ],
+  "moldy_food_part_#00": [
+    "eat_5ap"
+  ],
   "moldy_food_spicy_#00": [
     "eat_6ap"
   ],
@@ -738,6 +741,9 @@
     "hero_surv_1",
     "hero_surv_2"
   ],
+  "pelle_#00": [
+    "hero_scavenger"
+  ],
   "vest_off_#00": [
     "hero_hunter_1",
     "hero_hunter_2"
@@ -847,6 +853,9 @@
   "tamed_pet_off_#00": [
     "pet_doggo"
   ],
+  "shield_#00": [
+    "hero_guard"
+  ],
   "soccer_#00": [
     "play_soccer_1",
     "play_soccer_2"
@@ -864,9 +873,6 @@
   ],
   "cello_box_#00": [
     "open_cellobox"
-  ],
-  "flag_#00": [
-    "wagging_flag"
   ],
   "scary_mask_#00": [
     "scare"
