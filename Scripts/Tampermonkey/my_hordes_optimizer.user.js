@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MHO Addon
-// @version      1.1.21.0
+// @version      1.1.22.0
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/, rubrique Tutoriels
 // @author       Zerah
 //
@@ -31,7 +31,7 @@
 // ==/UserScript==
 
 const changelog = `${getScriptInfo().name} : Changelog pour la version ${getScriptInfo().version}\n\n`
-    + `[Correctif] Fix l'erreur 400 au début d'une ville\n`;
+    + `[Correctif] Mise à jour infinie\n`;
 
 const lang = (document.querySelector('html[lang]')?.getAttribute('lang') || document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2) || 'fr';
 
@@ -10369,7 +10369,7 @@ function updateExternalTools() {
                 };
             });
 
-            let now = document.querySelector('.clock [x-current-time]').innerText;
+            let now = document.querySelector('.game-clock .town-time').innerText;
 
             citizen_list
                 .filter((citizen) => { // On ne garde que les citoyens actuellement en train de fouiller
