@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MHO Addon
-// @version      1.1.20.0
+// @version      1.1.21.0
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/, rubrique Tutoriels
 // @author       Zerah
 //
@@ -31,8 +31,7 @@
 // ==/UserScript==
 
 const changelog = `${getScriptInfo().name} : Changelog pour la version ${getScriptInfo().version}\n\n`
-    + `[Correctif] Affichage de MHO suite au changement de saison\n`;
-
+    + `[Correctif] Fix l'erreur 400 au début d'une ville\n`;
 
 const lang = (document.querySelector('html[lang]')?.getAttribute('lang') || document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2) || 'fr';
 
@@ -1969,18 +1968,20 @@ function pageIsTownHistory() {
     return document.URL.indexOf('town') > -1 && (document.URL.indexOf('me') > -1 || document.URL.indexOf('soul') > -1);
 }
 
-
 /** @return {boolean}    on doit refresh le user actuel si le jour de la ville est différent du jour précédent */
 function shouldRefreshMe() {
     // si on change de ville on force le refresh
-    const current_town_id_name = document.querySelector('.town-name[data-town-id]');
-    if (!current_town_id_name) return false;
+    const game_clock = document.querySelector('.game-clock[data-town-id]');
+    if (!game_clock) return false;
 
-    const current_town_id = current_town_id_name?.getAttribute('data-town-id');
+    const current_town_id = game_clock?.getAttribute('data-town-id');
     if (+current_town_id !== +mh_user.townDetails?.townId) return true;
 
+    const current_town_day = game_clock?.querySelector('.day-number');
+    if (!current_town_day) return true;
+
     // si on change de jour, on force le refresh
-    return +current_town_id_name.nextElementSibling.innerText.replace(/(\D)*/, '') !== +mh_user.townDetails?.day;
+    return +current_town_day.innerText.replace(/(\D)*/, '') !== +mh_user.townDetails?.day;
 }
 
 function getI18N(item) {
