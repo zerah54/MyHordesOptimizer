@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MHO Addon
-// @version      1.1.22.0
+// @version      1.1.23.0
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/, rubrique Tutoriels
 // @author       Zerah
 //
@@ -31,7 +31,8 @@
 // ==/UserScript==
 
 const changelog = `${getScriptInfo().name} : Changelog pour la version ${getScriptInfo().version}\n\n`
-    + `[Correctif] Mise à jour infinie\n`;
+    + `[Correctif] Affichage du wiki dans le script\n`
+    + `[Correctif] Affichage d'erreurs 503 lors de l'attaque\n`;
 
 const lang = (document.querySelector('html[lang]')?.getAttribute('lang') || document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2) || 'fr';
 
@@ -863,11 +864,31 @@ const action_types = [
         label: {en: `Citizen actions`, fr: `Actions du citoyen`, de: `Bürgeraktionen`, es: `Acciones del habitante`},
         ordering: 1
     },
+    {
+        id: `Recipe::ManualInside`,
+        label: {
+            en: `Citizen actions inside`,
+            fr: `Actions du citoyen à l'intérieur`,
+            de: `Bürgeraktionen im Inneren`,
+            es: `Acciones del habitante en el interior`
+        },
+        ordering: 2
+    },
+    {
+        id: `Recipe::ManualOutside`,
+        label: {
+            en: `Citizen actions outside`,
+            fr: `Actions du citoyen à l'extérieur`,
+            de: `Bürgeraktionen draußen`,
+            es: `Acciones del habitanteen el exterior`
+        },
+        ordering: 3
+    },
     {id: `Recipe::WorkshopType`, label: {en: `Workshop`, fr: `Atelier`, de: `Werkstatt`, es: `Taller`}, ordering: 0},
     {
         id: `Recipe::WorkshopTypeShamanSpecific`,
         label: {en: `Workshop - Shaman`, fr: `Atelier - Chaman`, de: `Werkstatt - Schamane`, es: `Taller - Chamán`},
-        ordering: 2
+        ordering: 4
     },
     {
         id: `Recipe::WorkshopTypeTechSpecific`,
@@ -877,7 +898,7 @@ const action_types = [
             de: `Techniker-Werkstatte`,
             es: `Mesa de Trabajo de Técnicos`
         },
-        ordering: 3
+        ordering: 5
     },
 ];
 
@@ -2040,6 +2061,8 @@ function addWarning(message) {
 /** Affiche une notification d'erreur */
 function addError(error) {
     if (typeof error === 'string' || (error.name !== 'AbortError' && error.name !== 'TypeError') && !is_error) {
+        if (error?.status === 503) return;
+
         let notifications = document.getElementById('notifications');
         let notification = document.createElement('div');
         notification.classList.add('error', 'show');
