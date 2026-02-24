@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "MHO Addon",
   "short_name": "MHOA",
-  "version": "1.1.23.0",
+  "version": "1.1.24.0",
   "description": "Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/, rubrique Tutoriels",
   "author": "Zerah",
   "homepage_url": "https://myhordes-optimizer.web.app/tutorials/script/installation",
@@ -25,6 +25,7 @@
         "*://myhordes.fr/*",
         "https://bbh.fred26.fr/*",
         "https://gest-hordes2.eragaming.fr/*",
+        "https://gesthordes.fr/*",
         "https://fatamorgana.md26.eu/*"
       ],
       "js": [

@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MHO Addon
-// @version      1.1.23.0
+// @version      1.1.24.0
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/, rubrique Tutoriels
 // @author       Zerah
 //
@@ -22,6 +22,7 @@
 //
 // @match        https://bbh.fred26.fr/*
 // @match        https://gest-hordes2.eragaming.fr/*
+// @match        https://gesthordes.fr/*
 // @match        https://fatamorgana.md26.eu/*
 //
 // @grant        GM.setValue
@@ -31,8 +32,10 @@
 // ==/UserScript==
 
 const changelog = `${getScriptInfo().name} : Changelog pour la version ${getScriptInfo().version}\n\n`
-    + `[Correctif] Affichage du wiki dans le script\n`
-    + `[Correctif] Affichage d'erreurs 503 lors de l'attaque\n`;
+    + `[Correctif] Le script fonctionne avec la nouvelle URL de gh\n`
+    + `[Correctif] 429 quand on n'est pas en ville\n`
+    + `[Correctif] Certains cas pour lesquels le sac ne s'ouvrait pas automatiquement avec l'option cochée\n\n`
+    + `[Divers] Retrait de la mise à jour BBH (BBH ne fonctionne plus)\n`;
 
 const lang = (document.querySelector('html[lang]')?.getAttribute('lang') || document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2) || 'fr';
 
@@ -40,7 +43,8 @@ const lang = (document.querySelector('html[lang]')?.getAttribute('lang') || docu
 const is_mh_beta = false;
 const website = is_mh_beta ? `https://myhordes-optimizer-beta.web.app/` : `https://myhordes-optimizer.web.app/`;
 
-const gest_hordes_url = 'https://gest-hordes2.eragaming.fr';
+const gest_hordes_old_url = 'https://gest-hordes2.eragaming.fr';
+const gest_hordes_url = 'https://gesthordes.fr';
 const big_broth_hordes_url = 'https://bbh.fred26.fr';
 const fata_morgana_url = 'https://fatamorgana.md26.eu';
 
@@ -1241,32 +1245,32 @@ let params_categories = [
                     }
                 ]
             },
-            {
-                id: `update_bbh`,
-                label: {
-                    en: `Update BigBroth’Hordes`,
-                    fr: `Mettre à jour BigBroth'Hordes`,
-                    de: `BigBroth’Hordes Aktualisieren`,
-                    es: `Actualizar BigBroth'Hordes`
-                },
-                children: [
-                    {
-                        id: `refresh_bbh_after_update`,
-                        label: {
-                            en: `Refresh tab after update`,
-                            fr: `Rafraîchir l'onglet après la mise à jour`,
-                            de: `Registerkarte „Aktualisieren“ nach dem Update`,
-                            es: `Actualizar pestaña después de la actualización`
-                        },
-                        help: {
-                            en: `Will only work if the page is opened in a tab in the same browser window`,
-                            fr: `Ne fonctionnera que si la page est ouverte dans un onglet dans la même fenêtre du navigateur`,
-                            de: `Funktioniert nur, wenn die Seite in einem Tab im selben Browserfenster geöffnet wird`,
-                            es: `Solo funcionará si la página se abre en una pestaña en la misma ventana del navegador.`
-                        }
-                    }
-                ]
-            },
+            // {
+            //     id: `update_bbh`,
+            //     label: {
+            //         en: `Update BigBroth’Hordes`,
+            //         fr: `Mettre à jour BigBroth'Hordes`,
+            //         de: `BigBroth’Hordes Aktualisieren`,
+            //         es: `Actualizar BigBroth'Hordes`
+            //     },
+            //     children: [
+            //         {
+            //             id: `refresh_bbh_after_update`,
+            //             label: {
+            //                 en: `Refresh tab after update`,
+            //                 fr: `Rafraîchir l'onglet après la mise à jour`,
+            //                 de: `Registerkarte „Aktualisieren“ nach dem Update`,
+            //                 es: `Actualizar pestaña después de la actualización`
+            //             },
+            //             help: {
+            //                 en: `Will only work if the page is opened in a tab in the same browser window`,
+            //                 fr: `Ne fonctionnera que si la page est ouverte dans un onglet dans la même fenêtre du navigateur`,
+            //                 de: `Funktioniert nur, wenn die Seite in einem Tab im selben Browserfenster geöffnet wird`,
+            //                 es: `Solo funcionará si la página se abre en una pestaña en la misma ventana del navegador.`
+            //             }
+            //         }
+            //     ]
+            // },
             {
                 id: `update_gh`,
                 label: {
@@ -1996,6 +2000,7 @@ function shouldRefreshMe() {
     if (!game_clock) return false;
 
     const current_town_id = game_clock?.getAttribute('data-town-id');
+    if (isNaN(current_town_id) && +mh_user.townDetails?.townId === 0) return false;
     if (+current_town_id !== +mh_user.townDetails?.townId) return true;
 
     const current_town_day = game_clock?.querySelector('.day-number');
@@ -4098,7 +4103,7 @@ function saveParameters() {
 /** Affiche le bouton de mise à jour des outils externes */
 function createUpdateExternalToolsButton(count = 0) {
     let tools_to_update = {
-        isBigBrothHordes: mho_parameters && !is_mh_beta ? mho_parameters.update_bbh : false,
+        isBigBrothHordes: /* mho_parameters && !is_mh_beta ? mho_parameters.update_bbh : */ false,
         isFataMorgana: mho_parameters ? mho_parameters.update_fata : false,
         isGestHordes: mho_parameters ? mho_parameters.update_gh : false,
         isMyHordesOptimizer: mho_parameters ? mho_parameters.update_mho : false
@@ -7255,8 +7260,27 @@ function displayAntiAbuseCounter() {
 function automaticallyOpenBag(count = 0) {
     if (mho_parameters.automatically_open_bag) {
         let button = document.querySelector('[x-item-action-toggle="1"]');
-        if (button && (!button.getAttribute('style') || button.getAttribute('style').indexOf('display: none') < 0)) {
+        let inventories = document.querySelectorAll('hordes-inventory .inventory li.item:not(.locked)');
+        if (button && inventories?.length > 0 && (!button.getAttribute('style') || button.getAttribute('style').indexOf('display: none') < 0)) {
             button.click();
+
+            // Créez une instance de MutationObserver
+            const observer = new MutationObserver(function (mutations) {
+                mutations.forEach(function (mutation) {
+                    // Vérifiez si des nœuds enfants ont été ajoutés ou supprimés
+                    if (button && (!button.getAttribute('style') || button.getAttribute('style').indexOf('display: none') < 0)) {
+                        button.click()
+                    }
+                });
+            });
+
+            // Configuration de l'observateur pour surveiller les modifications des enfants
+            const config = {attributes: true};
+
+            // Commencez à observer l'élément cible pour les modifications configurées
+            inventories.forEach((inventory_item) => {
+                observer.observe(inventory_item, config);
+            });
         } else if (count < 3) {
             setTimeout(() => {
                 automaticallyOpenBag(count + 1);
@@ -10027,7 +10051,7 @@ function updateExternalTools() {
 
         data.map = {}
         data.map.toolsToUpdate = {
-            isBigBrothHordes: mho_parameters && mho_parameters.update_bbh && !is_mh_beta ? 'api' : 'none',
+            isBigBrothHordes: /* mho_parameters && mho_parameters.update_bbh && !is_mh_beta ? 'api' : */ 'none',
             isFataMorgana: mho_parameters && mho_parameters.update_fata ? 'api' : 'none',
             isGestHordes: mho_parameters && mho_parameters.update_gh ? 'api' : 'none',
             isMyHordesOptimizer: mho_parameters && mho_parameters.update_mho ? 'api' : 'none'
@@ -10070,7 +10094,7 @@ function updateExternalTools() {
                 x: +position[0],
                 y: +position[1],
                 zombies: +document.querySelectorAll('.actor.zombie').length,
-                zoneEmpty: !!document.querySelector('#mgd-empty-zone-note'),
+                zoneEmpty: !!document.querySelector('#mgd-zone-note'),
                 objects: convertListOfSingleObjectsIntoListOfCountedObjects(objects),
                 citizenId: citizen_list.map((citizen) => citizen.id)
             }
@@ -10127,6 +10151,11 @@ function updateExternalTools() {
             }
 
             if (mh_user.jobDetails.uid === 'dig') {
+
+                let zone_scav_level_img = fixMhCompiledImg(document.querySelector('.zone-scavenger img')?.src);
+                let index = zone_scav_level_img.indexOf(hordes_img_url);
+                zone_scav_level_img = zone_scav_level_img.slice(index).replace(hordes_img_url, '').replace('icons/', '');
+
                 let content = {
                     x: +position[0],
                     y: +position[1],
@@ -10136,11 +10165,13 @@ function updateExternalTools() {
                         south: document.querySelector('.scavenger-sense-south') ? !document.querySelector('.scavenger-sense-south.scavenger-sense-1') : undefined,
                         west: document.querySelector('.scavenger-sense-west') ? !document.querySelector('.scavenger-sense-west.scavenger-sense-1') : undefined
                     },
-                    citizenId: citizen_list.map((citizen) => citizen.id)
+                    scavZoneLevel: zone_scav_level_img.match(/\d/)?.length > 0 ? +zone_scav_level_img.match(/\d/)[0] : 0,
+                    citizenId: citizen_list.map((citizen) => citizen.id),
                 }
 
                 if (data.map.cell) {
                     data.map.cell.scavNextCells = content.scavNextCells;
+                    data.map.cell.scavZoneLevel = content.scavZoneLevel;
                 } else {
                     data.map.cell = content;
                 }
@@ -10873,7 +10904,7 @@ function getApiKey() {
 //     MAIN FUNCTION     //
 ///////////////////////////
 (function () {
-    if (document.URL.startsWith(big_broth_hordes_url) || document.URL.startsWith(gest_hordes_url) || document.URL.startsWith(fata_morgana_url) || document.URL.startsWith(website)) {
+    if (document.URL.startsWith(big_broth_hordes_url) || document.URL.startsWith(gest_hordes_url) || document.URL.startsWith(gest_hordes_old_url) || document.URL.startsWith(fata_morgana_url) || document.URL.startsWith(website)) {
         let current_key;
         let map_block_id;
         let ruin_block_id;
@@ -10888,7 +10919,7 @@ function getApiKey() {
             block_copy_map_button = 'ul_infos_1';
             block_copy_ruin_button = 'cl1';
             source = 'bbh';
-        } else if (document.URL.startsWith(gest_hordes_url)) {
+        } else if (document.URL.startsWith(gest_hordes_url) || document.URL.startsWith(gest_hordes_old_url)) {
             current_key = gm_gh_updated_key;
             map_block_id = 'zoneCarte';
             ruin_block_id = 'carteRuine';
@@ -10970,10 +11001,8 @@ function getApiKey() {
                             initOptionsWithoutLoginNeeded();
                         });
 
-                        ['mh-navigation-complete', 'mh-current-log-update', 'mh-current-log-refresh', 'mho-mutation-event'/*, 'pop', 'load', 'popstate', 'error', 'push', , 'tab-switch', '_react', 'x-react-degenerate', 'DOMContentLoaded', 'movement-reset', 'readystatechange'*/].forEach((event_name) => {
+                        ['mh-navigation-begin', 'mh-navigation-complete', 'mh-current-log-update', 'mh-current-log-refresh', 'mho-mutation-event', 'tokenExchangeCompleted', 'load', 'tooltipAppear', 'tooltipDisappear'/*, 'pop', 'load', 'popstate', 'error', 'push', , 'tab-switch', '_react', 'x-react-degenerate', 'DOMContentLoaded', 'movement-reset', 'readystatechange'*/].forEach((event_name) => {
                             document.addEventListener(event_name, (event) => {
-                                // console.trace('event', event_name, event);
-                                // console.table(listAllEventListeners());
                                 console.log('event', event_name);
                                 if (shouldRefreshMe()) {
                                     getToken(true).then(() => {
