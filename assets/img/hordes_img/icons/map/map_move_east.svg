@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="16" height="48" viewBox="0 0 4.233 12.7" xmlns:v="https://vecta.io/nano">
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="48" viewBox="0 0 4.233 12.7">
     <defs>
         <filter id="A" x="-.031" width="1.061" y="-.112" height="1.224" color-interpolation-filters="sRGB">
             <feGaussianBlur stdDeviation=".148"/>
