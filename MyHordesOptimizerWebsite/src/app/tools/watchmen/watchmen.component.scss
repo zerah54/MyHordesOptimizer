@@ -1,0 +1,187 @@
+﻿@use 'variables';
+
+.mho-watchmen-header {
+    justify-content: space-between;
+
+    .actions {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+    }
+}
+
+.mho-bag-selector {
+    width: 325px;
+    max-width: 325px;
+
+    .mat-mdc-tab-group {
+        width: 100%;
+    }
+
+    .mat-mdc-tab-body-wrapper {
+        max-height: 300px;
+    }
+}
+
+
+.mho-watchmen {
+    .container {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5em;
+        height: 100%;
+
+        > .header {
+            h2 {
+                margin-bottom: 0;
+            }
+
+        }
+
+        .actions {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+
+            .left-actions {
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+                gap: 0.5em;
+            }
+        }
+
+        .globalContent {
+            display: flex;
+            flex-direction: row;
+            flex: 1;
+            overflow: auto;
+            gap: 0.5em;
+            height: 100%;
+
+            > .recap {
+                flex: 1;
+                overflow: auto;
+                height: 100%;
+                padding-bottom: 0.5em;
+
+                > .mat-mdc-card {
+                    margin: 0;
+                    height: calc(100% - 0.5em);
+                    background-color: variables.$accented-background-color !important;
+
+                    > .mat-mdc-card-header {
+                        align-self: center;
+
+                    }
+
+                    > .mat-mdc-card-content {
+                        padding-top: 1em;
+                        display: flex;
+                        flex-direction: column;
+                        gap: 0.5em;
+
+                        > .recap-row {
+                            display: flex;
+                            align-items: center;
+
+                            > .mat-mdc-form-field {
+                                display: block;
+
+                                .mat-mdc-form-field-icon-prefix {
+                                    margin-left: 0.5em;
+                                    margin-right: 0.5em;
+                                }
+
+                                .mat-mdc-form-field-icon-suffix {
+                                    small {
+                                        margin-right: 0.5em;
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                }
+            }
+
+            > .content {
+                flex: 3;
+                overflow: auto;
+                height: 100%;
+
+                .watchman {
+                    background-color: variables.$accented-background-color;
+
+                    &:not(.mat-expansion-panel-spacing) {
+                        margin-bottom: 0.5em;
+                    }
+
+
+                    .header > .mat-content {
+                        justify-content: space-between;
+                        flex-wrap: wrap;
+                        align-items: center;
+
+                        .defense, .survival {
+                            width: 10%;
+                            min-width: 100px;
+                        }
+
+                        .pseudo {
+                            flex: 1;
+                        }
+
+                        .deleteWatchman {
+                            flex: 1;
+                            text-align: right;
+                        }
+                    }
+
+                    .watchman-content {
+                        padding-top: 1em;
+                        display: flex;
+                        flex-direction: column;
+                        gap: 0.5em;
+
+                        .firstLine {
+                            display: flex;
+                            flex-direction: row;
+                            flex: 1;
+                            gap: 0.5em;
+                            align-items: center;
+
+                            .bag, .status {
+                                flex: 1;
+                            }
+
+                            > .mat-mdc-form-field {
+                                display: block;
+
+                                .mat-mdc-form-field-icon-prefix {
+                                    margin-left: 0.5em;
+                                    margin-right: 0.5em;
+                                }
+
+                                .mat-mdc-form-field-icon-suffix {
+                                    small {
+                                        margin-right: 0.5em;
+                                    }
+                                }
+                            }
+                        }
+
+                        .instructions {
+                            flex: 1;
+
+                            > * {
+                                width: 100%;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

@@ -12,7 +12,6 @@ import { CitizensWatchComponent } from './citizens/citizens-watch/citizens-watch
 import { CitizensComponent } from './citizens/citizens.component';
 import { ExpeditionsComponent } from './expeditions/expeditions.component';
 import { MapComponent } from './map/map.component';
-import { NightwatchComponent } from './nightwatch/nightwatch.component';
 import { EstimationsComponent } from './statistics/estimations/estimations.component';
 import { RegistryComponent } from './statistics/registry/registry.component';
 import { ScrutateurComponent } from './statistics/scrutateur/scrutateur.component';
@@ -80,12 +79,6 @@ export default [
         path: 'map',
         component: MapComponent,
         title: 'MyHordes Optimizer' + ' - ' + $localize`Ma ville` + ' - ' + $localize`Carte des fouilles`,
-    },
-    {
-        path: 'nightwatch',
-        component: NightwatchComponent,
-        title: 'MyHordes Optimizer' + ' - ' + $localize`Ma ville` + ' - ' + $localize`Veilles`,
-        canActivate: [(): boolean => inject(InDevModeGuard).canActivate()]
     },
     {
         path: 'stats',
