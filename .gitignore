@@ -2,3 +2,6 @@
 .vscode/tasks.json
 .idea
 /MyHordesOptimizerWebsite/package-lock.json
+
+# Docker environment
+.env
