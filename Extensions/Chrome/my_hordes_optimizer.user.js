@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MHO Addon
-// @version      1.1.24.0
+// @version      1.1.25.0
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/, rubrique Tutoriels
 // @author       Zerah
 //
@@ -32,10 +32,7 @@
 // ==/UserScript==
 
 const changelog = `${getScriptInfo().name} : Changelog pour la version ${getScriptInfo().version}\n\n`
-    + `[Correctif] Le script fonctionne avec la nouvelle URL de gh\n`
-    + `[Correctif] 429 quand on n'est pas en ville\n`
-    + `[Correctif] Certains cas pour lesquels le sac ne s'ouvrait pas automatiquement avec l'option cochée\n\n`
-    + `[Divers] Retrait de la mise à jour BBH (BBH ne fonctionne plus)\n`;
+    + `[Correctif] Tentative de fix des 429 en ville\n`;
 
 const lang = (document.querySelector('html[lang]')?.getAttribute('lang') || document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2) || 'fr';
 
@@ -1995,6 +1992,10 @@ function pageIsTownHistory() {
 
 /** @return {boolean}    on doit refresh le user actuel si le jour de la ville est différent du jour précédent */
 function shouldRefreshMe() {
+    // Si on est pendant l'attaque, on ne fait rien
+    const during_attack = document.querySelector('.during-attack');
+    if (during_attack) return false;
+
     // si on change de ville on force le refresh
     const game_clock = document.querySelector('.game-clock[data-town-id]');
     if (!game_clock) return false;
@@ -5059,6 +5060,7 @@ function displayWishlistInApp(count = 0) {
 
 /** Affiche la priorité directement sur les éléments si l'option associée est cochée */
 function displayPriorityOnItems() {
+
     if (mho_parameters.display_wishlist && pageIsDesert() && wishlist) {
         let present_items = [];
         let empty_spaces = [];
@@ -11001,7 +11003,7 @@ function getApiKey() {
                             initOptionsWithoutLoginNeeded();
                         });
 
-                        ['mh-navigation-begin', 'mh-navigation-complete', 'mh-current-log-update', 'mh-current-log-refresh', 'mho-mutation-event', 'tokenExchangeCompleted', 'load', 'tooltipAppear', 'tooltipDisappear'/*, 'pop', 'load', 'popstate', 'error', 'push', , 'tab-switch', '_react', 'x-react-degenerate', 'DOMContentLoaded', 'movement-reset', 'readystatechange'*/].forEach((event_name) => {
+                        [/*'mh-navigation-begin', */ 'mh-navigation-complete', 'mh-current-log-update', 'mh-current-log-refresh', 'mho-mutation-event', 'tokenExchangeCompleted', 'load', 'tooltipAppear', 'tooltipDisappear'/*, 'pop', 'load', 'popstate', 'error', 'push', , 'tab-switch', '_react', 'x-react-degenerate', 'DOMContentLoaded', 'movement-reset', 'readystatechange'*/].forEach((event_name) => {
                             document.addEventListener(event_name, (event) => {
                                 console.log('event', event_name);
                                 if (shouldRefreshMe()) {
