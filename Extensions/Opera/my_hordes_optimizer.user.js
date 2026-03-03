@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MHO Addon
-// @version      1.1.25.0
+// @version      1.1.26.0
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/, rubrique Tutoriels
 // @author       Zerah
 //
@@ -2008,7 +2008,7 @@ function shouldRefreshMe() {
     if (!current_town_day) return true;
 
     // si on change de jour, on force le refresh
-    return +current_town_day.innerText.replace(/(\D)*/, '') !== +mh_user.townDetails?.day;
+    return +current_town_day.innerText.replace(/(\D)*/, '') > +mh_user.townDetails?.day;
 }
 
 function getI18N(item) {
