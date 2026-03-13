@@ -41,7 +41,9 @@ namespace MyHordesOptimizerApi.Services.Impl
 
         public WishListLastUpdateDto GetWishList(int townId)
         {
-            var townBankItemLastUpdateId = DbContext.TownBankItems.Where(tbi => tbi.IdTown == townId).Max(tbi => tbi.IdLastUpdateInfo);
+            var townBankItemLastUpdateId = DbContext.TownBankItems
+                .Where(tbi => tbi.IdTown == townId)
+                .Max(tbi => (int?)tbi.IdLastUpdateInfo);
 
             var wishListItems = DbContext.TownWishListItems
                 .Where(wishList => wishList.IdTown == townId)
@@ -63,7 +65,7 @@ namespace MyHordesOptimizerApi.Services.Impl
                     .ThenInclude(item => item.RecipeItemResults)
                     .AsSplitQuery()
                 .Include(wishlist => wishlist.IdItemNavigation)
-                    .ThenInclude(item => item.TownBankItems.Where(bankItem => bankItem.IdTown == townId && bankItem.IdLastUpdateInfo == townBankItemLastUpdateId))
+                    .ThenInclude(item => item.TownBankItems.Where(bankItem => bankItem.IdTown == townId && townBankItemLastUpdateId != null && bankItem.IdLastUpdateInfo == townBankItemLastUpdateId))
                     .AsSplitQuery()
                 .Include(wishlist => wishlist.IdTownNavigation)
                     .ThenInclude(town => town.TownCitizens.Where(townCitizen => townCitizen.IdTown == townId))
