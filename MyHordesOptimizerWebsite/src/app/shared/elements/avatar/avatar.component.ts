@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { booleanAttribute, Component, input, InputSignal, InputSignalWithTransform } from '@angular/core';
+import { environment } from '../../../../environments/environment';
 import { Imports } from '../../../_abstract_model/types/_types';
 
 const angular_common: Imports = [CommonModule];
@@ -18,4 +19,5 @@ export class AvatarComponent {
 
     public src: InputSignal<string | undefined> = input();
     public rounded: InputSignalWithTransform<boolean, unknown> = input(false, {transform: booleanAttribute});
+    protected readonly MYHORDES_URL: string = environment.myhordes_url;
 }
