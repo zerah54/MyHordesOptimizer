@@ -62,7 +62,7 @@ namespace MyHordesOptimizerApi.Services.Impl
             if (townId.HasValue)
             {
                 sw.Start();
-                var townBankItemLastUpdateId = DbContext.TownBankItems.Where(tbi => tbi.IdTown == townId).Max(tbi => (int?)tbi.IdLastUpdateInfo));
+                var townBankItemLastUpdateId = DbContext.TownBankItems.Where(tbi => tbi.IdTown == townId).Max(tbi => (int?)tbi.IdLastUpdateInfo);
                 var items = DbContext.Items
                     .Include(item => item.IdCategoryNavigation)
                     .AsSplitQuery()
