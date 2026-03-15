@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MHO Addon
-// @version      1.1.26.0
+// @version      1.1.27.0
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/, rubrique Tutoriels
 // @author       Zerah
 //
@@ -32,13 +32,33 @@
 // ==/UserScript==
 
 const changelog = `${getScriptInfo().name} : Changelog pour la version ${getScriptInfo().version}\n\n`
-    + `[Correctif] Tentative de fix des 429 en ville\n`;
+    + `[Correctif] Meilleure stabilité à l'ouverture d'un sac\n`;
 
 const lang = (document.querySelector('html[lang]')?.getAttribute('lang') || document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2) || 'fr';
 
-/* const is_mh_beta = document.URL.indexOf('staging') >= 0; */
-const is_mh_beta = false;
-const website = is_mh_beta ? `https://myhordes-optimizer-beta.web.app/` : `https://myhordes-optimizer.web.app/`;
+/////////////////
+// Les URL MHO //
+/////////////////
+const is_mh_beta = document.URL.indexOf('staging') >= 0;
+const is_mh_local = document.URL.indexOf('localhost') >= 0;
+
+let website;
+let api_url;
+
+if (is_mh_beta) {
+    website = `https://myhordes-optimizer-beta.web.app/`;
+    api_url = `https://api.myhordesoptimizer.fr/beta`;
+} else if (is_mh_local) {
+    website = `http://localhost:4200/`;
+    api_url = `http://localhost:5001`;
+} else {
+    website = `https://myhordes-optimizer.web.app/`
+    api_url = `https://api.myhordesoptimizer.fr`;
+}
+
+////////////////////
+// Les constantes //
+////////////////////
 
 const gest_hordes_old_url = 'https://gest-hordes2.eragaming.fr';
 const gest_hordes_url = 'https://gesthordes.fr';
@@ -49,7 +69,6 @@ const gm_bbh_updated_key = 'MHO_bbh_updated';
 const gm_gh_updated_key = 'MHO_gh_updated';
 const gm_fata_updated_key = 'MHO_fata_updated';
 const gm_mho_updated_key = 'MHO_mho_updated';
-const gm_mh_external_app_id_key = is_mh_beta ? 'MHO_mh_beta_external_app_id' : 'MHO_mh_external_app_id';
 const mho_parameters_key = 'MHO_parameters';
 const mh_user_key = 'MHO_mh_user';
 const mho_map_key = 'MHO_map';
@@ -57,6 +76,7 @@ const mho_token_key = 'MHO_token';
 const mho_blacklist_key = 'MHO_blacklist';
 const mho_anti_abuse_key = 'MHO_anti_abuse';
 const mho_version_key = 'MHO_version';
+const gm_mh_external_app_id_key = is_mh_beta ? 'MHO_mh_beta_external_app_id' : 'MHO_mh_external_app_id';
 
 let mho_parameters;
 getStorageItem(mho_parameters_key).then((params) => {
@@ -74,14 +94,6 @@ let token;
 getStorageItem(mho_token_key).then((saved_token) => {
     token = saved_token;
 });
-
-
-////////////////////
-// L'URL de L'API //
-////////////////////
-
-const api_url = 'https://api.myhordesoptimizer.fr' + (is_mh_beta ? '/beta' : '');
-// const api_url = 'https://api.myhordesoptimizer.fr/dev';
 
 ///////////////////////////////////////////
 // Listes de constantes / Constants list //
@@ -2398,7 +2410,7 @@ function getItemFromImg(img_src) {
     if (img_src) {
         let index = img_src.indexOf(hordes_img_url);
         img_src = img_src.slice(index).replace(hordes_img_url, '');
-        return items.find((item) => item.img === fixMhCompiledImg(img_src));
+        return items?.find((item) => item.img === fixMhCompiledImg(img_src));
     }
 }
 
@@ -10807,7 +10819,6 @@ function getMyExpeditions() {
             })
             .then((expeditions) => {
                 my_expeditions = expeditions;
-                console.log('expeditions', expeditions);
                 resolve(expeditions);
             })
             .catch((error) => {
@@ -10983,7 +10994,6 @@ function getApiKey() {
             }
         }, 1000);
     } else {
-
         /** Vérifie si la version est nouvelle ou non */
         getStorageItem(mho_version_key).then((version) => {
             toggleNewChangelog(isNewVersion(version))
@@ -11003,18 +11013,28 @@ function getApiKey() {
                             initOptionsWithoutLoginNeeded();
                         });
 
-                        [/*'mh-navigation-begin', */ 'mh-navigation-complete', 'mh-current-log-update', 'mh-current-log-refresh', 'mho-mutation-event', 'tokenExchangeCompleted', 'load', 'tooltipAppear', 'tooltipDisappear'/*, 'pop', 'load', 'popstate', 'error', 'push', , 'tab-switch', '_react', 'x-react-degenerate', 'DOMContentLoaded', 'movement-reset', 'readystatechange'*/].forEach((event_name) => {
-                            document.addEventListener(event_name, (event) => {
-                                console.log('event', event_name);
-                                if (shouldRefreshMe()) {
-                                    getToken(true).then(() => {
-                                        initOptionsWithLoginNeeded();
-                                        initOptionsWithoutLoginNeeded();
-                                    });
-                                } else {
+                        const handleEvent = (event_name) => (event) => {
+                            console.log('MHO - handled event', event_name);
+                            if (shouldRefreshMe()) {
+                                getToken(true).then(() => {
                                     initOptionsWithLoginNeeded();
                                     initOptionsWithoutLoginNeeded();
-                                }
+                                });
+                            } else {
+                                initOptionsWithLoginNeeded();
+                                initOptionsWithoutLoginNeeded();
+                            }
+                        };
+
+                        [
+                            {
+                                target: document,
+                                events: [/*'mh-navigation-begin', */ 'mh-navigation-complete', 'mh-current-log-update', 'mh-current-log-refresh', 'mho-mutation-event', 'tokenExchangeCompleted', 'load', 'tooltipAppear', 'tooltipDisappear'/*, 'pop', 'load', 'popstate', 'error', 'push', 'tab-switch', '_react', 'x-react-degenerate', 'DOMContentLoaded', 'movement-reset', 'readystatechange'*/]
+                            },
+                            {target: document.documentElement, events: ['sig-inventory-bag-loaded']},
+                        ].forEach(({target, events}) => {
+                            events.forEach((event_name) => {
+                                target.addEventListener(event_name, handleEvent(event_name));
                             });
                         });
                     })
