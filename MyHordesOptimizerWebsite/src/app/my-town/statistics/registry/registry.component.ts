@@ -57,7 +57,7 @@ export class RegistryComponent implements OnInit {
         {mode: 'digs', label: $localize`Fouilles`, img: 'building/small_dig.gif'},
         {mode: 'doors', label: $localize`Entrées / Sorties`, img: 'log/door_open.gif'},
         {mode: 'telescope', label: $localize`Téléscope`, img: 'item/item_scope.gif'},
-        {mode: 'flag', label: $localize`Drapeau`, img: 'item/item_flag.gif'},
+        // {mode: 'flag', label: $localize`Drapeau`, img: 'item/item_flag.gif'},
         {mode: 'buildings', label: $localize`Utilisation des chantiers`, img: 'icons/home.gif'}
     ];
 
