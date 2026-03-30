@@ -1,5 +1,5 @@
 import { CommonModule, NgOptimizedImage, NgTemplateOutlet } from '@angular/common';
-import { Component, input, Input, InputSignal, ViewEncapsulation } from '@angular/core';
+import { Component, computed, input, Input, InputSignal, Signal, ViewEncapsulation } from '@angular/core';
 import { MatTabChangeEvent, MatTabsModule } from '@angular/material/tabs';
 import { HORDES_IMG_REPO } from '../../../../_abstract_model/const';
 import { DisplayPseudoMode, Entry } from '../../../../_abstract_model/interfaces';
@@ -7,6 +7,7 @@ import { Imports } from '../../../../_abstract_model/types/_types';
 import { CitizenInfo } from '../../../../_abstract_model/types/citizen-info.class';
 import { Citizen } from '../../../../_abstract_model/types/citizen.class';
 import { Item } from '../../../../_abstract_model/types/item.class';
+import { entryHasKeyword } from '../../../../_core/utilities/registry.util';
 import { CitizenInfoComponent } from '../../../../_shared/citizen-info/citizen-info.component';
 import { IsCitizenInEntriesPipe } from '../is-citizen-in-entries.pipe';
 
@@ -68,9 +69,9 @@ export class PlaysRegistryComponent {
 
     private entries: Entry[] = [];
 
-    private readonly dices_item: Item = this.completeItemsList().find((item) => item.img.indexOf('item_dice') > -1) as Item;
-    private readonly cards_item: Item = this.completeItemsList().find((item) => item.img.indexOf('item_cards') > -1) as Item;
-    private readonly soccer_item: Item = this.completeItemsList().find((item) => item.img.indexOf('item_soccer') > -1) as Item;
+    private readonly dices_item: Signal<Item> = computed(() => this.completeItemsList()?.find((item: Item) => item.img.indexOf('item_dice') > -1) as Item);
+    private readonly cards_item: Signal<Item> = computed(() => this.completeItemsList()?.find((item: Item) => item.img.indexOf('item_cards') > -1) as Item);
+    private readonly soccer_item: Signal<Item> = computed(() => this.completeItemsList()?.find((item: Item) => item.img.indexOf('item_soccer') > -1) as Item);
 
 
     protected changePlaysTab(event: MatTabChangeEvent): void {
@@ -80,37 +81,33 @@ export class PlaysRegistryComponent {
         });
     }
 
-    private entryHasPlayKeyword(entry: Entry, keyword: string): boolean {
-        return entry.entry?.indexOf(' ' + keyword + ' ') > -1 || entry.entry?.indexOf(' ' + keyword + '.') > -1;
-    }
-
     private filterEntriesByType(entries: Entry[]): void {
         if (this.play_type === 'card') {
             this.entries_by_type = entries.filter((entry: Entry) => {
-                return Object.values(this.cards_item.label).some((label: string): boolean => this.entryHasPlayKeyword(entry, label));
+                return Object.values(this.cards_item()?.label).some((label: string): boolean => entryHasKeyword(entry, label));
             });
         } else if (this.play_type === 'dice') {
             this.entries_by_type = entries.filter((entry: Entry) => {
-                return Object.values(this.dices_item.label).some((label: string): boolean => this.entryHasPlayKeyword(entry, label));
+                return Object.values(this.dices_item()?.label).some((label: string): boolean => entryHasKeyword(entry, label));
             });
         } else if (this.play_type === 'soccer') {
             this.entries_by_type = entries.filter((entry: Entry) => {
-                return Object.values(this.soccer_item.label).some((label: string): boolean => this.entryHasPlayKeyword(entry, label));
+                return Object.values(this.soccer_item()?.label).some((label: string): boolean => entryHasKeyword(entry, label));
             });
         } else {
             const card_entries: Entry[] = entries.filter((entry: Entry) => {
-                return Object.values(this.cards_item.label).some((label: string): boolean => this.entryHasPlayKeyword(entry, label));
+                return Object.values(this.cards_item()?.label).some((label: string): boolean => entryHasKeyword(entry, label));
             });
             const dice_entries: Entry[] = entries.filter((entry: Entry) => {
-                return Object.values(this.dices_item.label).some((label: string): boolean => this.entryHasPlayKeyword(entry, label));
+                return Object.values(this.dices_item()?.label).some((label: string): boolean => entryHasKeyword(entry, label));
             });
             const soccer_entries: Entry[] = entries.filter((entry: Entry) => {
-                return Object.values(this.soccer_item.label).some((label: string): boolean => this.entryHasPlayKeyword(entry, label));
+                return Object.values(this.soccer_item()?.label).some((label: string): boolean => entryHasKeyword(entry, label));
             });
             this.entries_by_type = entries.filter((entry: Entry) => {
-                const is_card_keyword: boolean = Object.values(this.cards_item.label).some((label: string): boolean => this.entryHasPlayKeyword(entry, label));
-                const is_dice_keyword: boolean = Object.values(this.dices_item.label).some((label: string): boolean => this.entryHasPlayKeyword(entry, label));
-                const is_soccer_keyword: boolean = Object.values(this.soccer_item.label).some((label: string): boolean => this.entryHasPlayKeyword(entry, label));
+                const is_card_keyword: boolean = Object.values(this.cards_item()?.label).some((label: string): boolean => entryHasKeyword(entry, label));
+                const is_dice_keyword: boolean = Object.values(this.dices_item()?.label).some((label: string): boolean => entryHasKeyword(entry, label));
+                const is_soccer_keyword: boolean = Object.values(this.soccer_item()?.label).some((label: string): boolean => entryHasKeyword(entry, label));
                 const citizen: Citizen | undefined = this.completeCitizenList().citizens
                     .find((citizen: Citizen): boolean => entry.entry?.indexOf(citizen.name) > -1);
                 let has_pendant: boolean;

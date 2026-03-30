@@ -1,10 +1,11 @@
 import { CommonModule } from '@angular/common';
-import { Component, input, Input, InputSignal, ViewEncapsulation } from '@angular/core';
+import { Component, computed, input, Input, InputSignal, Signal, ViewEncapsulation } from '@angular/core';
 import { MatDividerModule } from '@angular/material/divider';
 import { DisplayPseudoMode, Entry } from '../../../../_abstract_model/interfaces';
 import { Imports } from '../../../../_abstract_model/types/_types';
 import { CitizenInfo } from '../../../../_abstract_model/types/citizen-info.class';
 import { Item } from '../../../../_abstract_model/types/item.class';
+import { entryHasKeyword } from '../../../../_core/utilities/registry.util';
 import { CitizenInfoComponent } from '../../../../_shared/citizen-info/citizen-info.component';
 import { FlagPipe } from './flag.pipe';
 
@@ -38,11 +39,11 @@ export class FlagRegistryComponent {
 
     protected entries: Entry[] = [];
 
-    private readonly flag_item: Item = this.completeItemsList().find((item) => item.img.indexOf('item_flag') > -1) as Item;
+    private readonly flag_item: Signal<Item> = computed(() => this.completeItemsList()?.find((item: Item) => item.img.indexOf('item_flag') > -1) as Item);
 
     private filterEntries(entries: Entry[]): void {
         this.entries = entries.filter((entry: Entry) => {
-            return Object.values(this.flag_item.label).some((label: string): boolean => entry.entry?.indexOf(' ' + label + ' ') > -1 || entry.entry?.indexOf(' ' + label + '.') > -1);
+            return Object.values(this.flag_item()?.label).some((label: string): boolean => entryHasKeyword(entry, label));
         });
     }
 }

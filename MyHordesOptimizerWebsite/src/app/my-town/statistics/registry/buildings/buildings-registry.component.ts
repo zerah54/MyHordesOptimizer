@@ -5,6 +5,7 @@ import { HORDES_IMG_REPO } from '../../../../_abstract_model/const';
 import { DisplayPseudoMode, Entry } from '../../../../_abstract_model/interfaces';
 import { Imports } from '../../../../_abstract_model/types/_types';
 import { CitizenInfo } from '../../../../_abstract_model/types/citizen-info.class';
+import { entryHasKeyword } from '../../../../_core/utilities/registry.util';
 import { CitizenInfoComponent } from '../../../../_shared/citizen-info/citizen-info.component';
 import { IsCitizenInEntriesPipe } from '../is-citizen-in-entries.pipe';
 
@@ -59,10 +60,6 @@ export class BuildingsRegistryComponent {
     private readonly vet_keywords: string[] = ['a attiré', 'in die Stadt gelockt', 'lured', 'atrajo a', 'hat vergeblich', 'a tenté d\'attirer', 'tried to lure', 'pero sin éxito'];
 
 
-    public entryHasPlayKeyword(entry: Entry, keyword: string): boolean {
-        return entry.entry?.indexOf(' ' + keyword + ' ') > -1 || entry.entry?.indexOf(' ' + keyword + '.') > -1;
-    }
-
     public changeBuildingTab(event: MatTabChangeEvent): void {
         this.building_type = <BuildingType>event.tab.labelClass;
         setTimeout(() => {
@@ -73,11 +70,11 @@ export class BuildingsRegistryComponent {
     private filterEntriesByType(entries: Entry[]): void {
         if (this.building_type === 'dump') {
             this.entries_by_type = entries.filter((entry: Entry) => {
-                return this.dump_keywords.some((dump_keyword: string): boolean => this.entryHasPlayKeyword(entry, dump_keyword));
+                return this.dump_keywords.some((dump_keyword: string): boolean => entryHasKeyword(entry, dump_keyword));
             });
         } else {
             this.entries_by_type = entries.filter((entry: Entry) => {
-                return this.vet_keywords.some((vet_keyword: string): boolean => this.entryHasPlayKeyword(entry, vet_keyword));
+                return this.vet_keywords.some((vet_keyword: string): boolean => entryHasKeyword(entry, vet_keyword));
             });
         }
     }
