@@ -2,7 +2,7 @@ import { CitizenExpedition } from '../../_abstract_model/types/citizen-expeditio
 import { Citizen } from '../../_abstract_model/types/citizen.class';
 import { ExpeditionPart } from '../../_abstract_model/types/expedition-part.class';
 import { Expedition } from '../../_abstract_model/types/expedition.class';
-import { getCitizenFromId } from '../../shared/utilities/citizen.util';
+import { getCitizenFromId } from '../../_core/utilities/citizen.util';
 
 export function getPreRegistered(expeditions: Expedition[], all_citizen: Citizen[]): Citizen[] {
     const pre_registered: Citizen[] = [];

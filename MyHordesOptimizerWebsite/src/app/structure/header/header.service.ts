@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { getExternalAppId } from '../../shared/utilities/localstorage.util';
+import { getExternalAppId } from '../../_core/utilities/localstorage.util';
 
 @Injectable({providedIn: 'root'})
 export class HeaderService {

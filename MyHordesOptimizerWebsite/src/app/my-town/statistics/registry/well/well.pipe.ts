@@ -2,8 +2,7 @@ import { Pipe, PipeTransform } from '@angular/core';
 import { Entry } from '../../../../_abstract_model/interfaces';
 import { CitizenInfo } from '../../../../_abstract_model/types/citizen-info.class';
 import { Citizen } from '../../../../_abstract_model/types/citizen.class';
-import { groupBy } from '../../../../shared/utilities/array.util';
-
+import { groupBy } from '../../../../_core/utilities/array.util';
 
 @Pipe({
     name: 'well'

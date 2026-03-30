@@ -8,7 +8,7 @@ import {
     getTown,
     setItemsWithExpirationDate,
     setRuinsWithExpirationDate,
-} from '../../shared/utilities/localstorage.util';
+} from '../../_core/utilities/localstorage.util';
 import { HeroSkillDTO } from '../dto/hero-skill.dto';
 import { ItemDTO } from '../dto/item.dto';
 import { RecipeDTO } from '../dto/recipe.dto';

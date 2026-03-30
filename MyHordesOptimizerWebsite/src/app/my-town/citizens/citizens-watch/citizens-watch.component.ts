@@ -1,5 +1,6 @@
 import { CommonModule, NgClass } from '@angular/common';
 import { Component, DestroyRef, EventEmitter, inject, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatCheckboxChange, MatCheckboxModule } from '@angular/material/checkbox';
@@ -15,16 +16,15 @@ import { Bath } from '../../../_abstract_model/types/bath.class';
 import { CitizenInfo } from '../../../_abstract_model/types/citizen-info.class';
 import { Citizen } from '../../../_abstract_model/types/citizen.class';
 import { UpdateInfo } from '../../../_abstract_model/types/update-info.class';
-import { CitizenInfoComponent } from '../../../shared/elements/citizen-info/citizen-info.component';
+import { ColumnIdPipe } from '../../../_core/pipes/column-id.pipe';
+import { getTown } from '../../../_core/utilities/localstorage.util';
+import { CitizenInfoComponent } from '../../../_shared/citizen-info/citizen-info.component';
 import {
     HeaderWithNumberPreviousNextFilterComponent
-} from '../../../shared/elements/lists/header-with-number-previous-next/header-with-number-previous-next-filter.component';
-import { HeaderWithSelectFilterComponent } from '../../../shared/elements/lists/header-with-select-filter/header-with-select-filter.component';
-import { ColumnIdPipe } from '../../../shared/pipes/column-id.pipe';
-import { getTown } from '../../../shared/utilities/localstorage.util';
+} from '../../../_shared/lists/header-with-number-previous-next/header-with-number-previous-next-filter.component';
+import { HeaderWithSelectFilterComponent } from '../../../_shared/lists/header-with-select-filter/header-with-select-filter.component';
 import { BathForDayPipe } from '../bath-for-day.pipe';
 import { CitizenGroupByBathStatePipe } from './citizen-group-by-bath_state.pipe';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 const angular_common: Imports = [CommonModule, FormsModule, NgClass];
 const components: Imports = [HeaderWithNumberPreviousNextFilterComponent, HeaderWithSelectFilterComponent, CitizenInfoComponent];

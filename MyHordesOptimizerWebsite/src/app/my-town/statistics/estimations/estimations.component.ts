@@ -9,7 +9,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSlideToggle } from '@angular/material/slide-toggle';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { ChartConfiguration, ChartEvent, LegendElement, ChartDataset, LegendItem } from 'chart.js';
+import { ChartConfiguration, ChartDataset, ChartEvent, LegendElement, LegendItem } from 'chart.js';
 import Chart from 'chart.js/auto';
 import { Color } from 'chartjs-plugin-datalabels/types/options';
 import { PLANIF_VALUES, TDG_VALUES } from '../../../_abstract_model/const';
@@ -19,12 +19,12 @@ import { Dictionary, Imports } from '../../../_abstract_model/types/_types';
 import { EstimationGraphValues, EstimationsResult } from '../../../_abstract_model/types/estimations-result.class';
 import { Estimations } from '../../../_abstract_model/types/estimations.class';
 import { Regen } from '../../../_abstract_model/types/regen.class';
+import { ClipboardService } from '../../../_core/services/clipboard.service';
+import { getMaxAttack, getMinAttack } from '../../../_core/utilities/estimations.util';
+import { getTown } from '../../../_core/utilities/localstorage.util';
 import {
     HeaderWithNumberPreviousNextFilterComponent
-} from '../../../shared/elements/lists/header-with-number-previous-next/header-with-number-previous-next-filter.component';
-import { ClipboardService } from '../../../shared/services/clipboard.service';
-import { getMaxAttack, getMinAttack } from '../../../shared/utilities/estimations.util';
-import { getTown } from '../../../shared/utilities/localstorage.util';
+} from '../../../_shared/lists/header-with-number-previous-next/header-with-number-previous-next-filter.component';
 
 const angular_common: Imports = [CommonModule, FormsModule];
 const components: Imports = [HeaderWithNumberPreviousNextFilterComponent];

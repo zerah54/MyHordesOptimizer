@@ -1,5 +1,6 @@
 import { CommonModule, NgClass, NgOptimizedImage } from '@angular/common';
 import { Component, DestroyRef, EventEmitter, inject, OnInit, Signal, viewChild, ViewEncapsulation } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { MatCheckboxChange, MatCheckboxModule } from '@angular/material/checkbox';
 import { MatOptionModule } from '@angular/material/core';
@@ -22,16 +23,15 @@ import { HeroicActionsWithValue } from '../../../_abstract_model/types/heroic-ac
 import { HomeWithValue } from '../../../_abstract_model/types/home.class';
 import { Item } from '../../../_abstract_model/types/item.class';
 import { UpdateInfo } from '../../../_abstract_model/types/update-info.class';
-import { AvatarComponent } from '../../../shared/elements/avatar/avatar.component';
-import { CitizenInfoComponent } from '../../../shared/elements/citizen-info/citizen-info.component';
-import { LastUpdateComponent } from '../../../shared/elements/last-update/last-update.component';
-import { ListElementAddRemoveComponent } from '../../../shared/elements/list-elements-add-remove/list-element-add-remove.component';
-import { HeaderWithSelectFilterComponent } from '../../../shared/elements/lists/header-with-select-filter/header-with-select-filter.component';
-import { ColumnIdPipe } from '../../../shared/pipes/column-id.pipe';
-import { getTown, getUser } from '../../../shared/utilities/localstorage.util';
+import { ColumnIdPipe } from '../../../_core/pipes/column-id.pipe';
+import { getTown, getUser } from '../../../_core/utilities/localstorage.util';
+import { AvatarComponent } from '../../../_shared/avatar/avatar.component';
+import { CitizenInfoComponent } from '../../../_shared/citizen-info/citizen-info.component';
+import { LastUpdateComponent } from '../../../_shared/last-update/last-update.component';
+import { ListElementAddRemoveComponent } from '../../../_shared/list-elements-add-remove/list-element-add-remove.component';
+import { HeaderWithSelectFilterComponent } from '../../../_shared/lists/header-with-select-filter/header-with-select-filter.component';
 import { BathForDayPipe } from '../bath-for-day.pipe';
 import { TypeRowPipe } from './type-row.pipe';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 const angular_common: Imports = [CommonModule, FormsModule, NgClass, NgOptimizedImage];
 const components: Imports = [AvatarComponent, CitizenInfoComponent, HeaderWithSelectFilterComponent, LastUpdateComponent, ListElementAddRemoveComponent];

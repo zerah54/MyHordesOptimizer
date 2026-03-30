@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, DestroyRef, inject, Inject, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, DestroyRef, inject, Inject, OnInit } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -16,7 +16,7 @@ import { Cell } from '../../../../_abstract_model/types/cell.class';
 import { Citizen } from '../../../../_abstract_model/types/citizen.class';
 import { Dig } from '../../../../_abstract_model/types/dig.class';
 import { Ruin } from '../../../../_abstract_model/types/ruin.class';
-import { CitizensFromShortPipe } from '../../../../shared/pipes/citizens-from-short.pipe';
+import { CitizensFromShortPipe } from '../../../../_core/pipes/citizens-from-short.pipe';
 import { MapUpdateCellComponent } from './map-update-cell/map-update-cell.component';
 import { MapUpdateCitizensComponent } from './map-update-citizens/map-update-citizens.component';
 import { MapUpdateDigsComponent } from './map-update-digs/map-update-digs.component';
@@ -31,8 +31,6 @@ const material_modules: Imports = [MatButtonModule, MatDialogModule, MatFormFiel
     selector: 'mho-map-update',
     templateUrl: './map-update.component.html',
     styleUrls: ['./map-update.component.scss'],
-    encapsulation: ViewEncapsulation.None,
-    host: {style: 'display: contents'},
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class MapUpdateComponent implements OnInit {

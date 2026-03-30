@@ -1,7 +1,7 @@
 import { HttpClient, HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, Subscriber } from 'rxjs';
-import { getTown } from '../../shared/utilities/localstorage.util';
+import { getTown } from '../../_core/utilities/localstorage.util';
 import { ExpeditionDTO } from '../dto/expedition.dto';
 import { dtoToModelArray } from '../types/_common.class';
 import { Expedition } from '../types/expedition.class';

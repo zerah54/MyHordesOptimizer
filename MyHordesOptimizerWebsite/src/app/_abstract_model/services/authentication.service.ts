@@ -7,7 +7,7 @@ import {
     setTokenWithMeWithExpirationDate,
     setTown,
     setUser
-} from '../../shared/utilities/localstorage.util';
+} from '../../_core/utilities/localstorage.util';
 import { TokenWithMeDTO } from '../dto/token-with-me.dto';
 import { Me } from '../types/me.class';
 import { TokenWithMe } from '../types/token-with-me.class';

@@ -7,7 +7,8 @@ import { Ruin } from '../../../../_abstract_model/types/ruin.class';
     name: 'ruinInCell'
 })
 export class RuinInCell implements PipeTransform {
-    transform(cell: Cell, all_ruins: Ruin[]): Ruin | undefined {
+    transform(cell: Cell | undefined, all_ruins: Ruin[]): Ruin | undefined {
+        if (!cell) return undefined;
         return all_ruins.find((ruin: Ruin): boolean => ruin.id === cell.ruin_id);
     }
 }

@@ -12,8 +12,8 @@ import moment from 'moment';
 import { Misc } from '../../../_abstract_model/interfaces';
 import { Imports } from '../../../_abstract_model/types/_types';
 import { TownDetails } from '../../../_abstract_model/types/town-details.class';
-import { ColumnIdPipe } from '../../../shared/pipes/column-id.pipe';
-import { getTown } from '../../../shared/utilities/localstorage.util';
+import { ColumnIdPipe } from '../../../_core/pipes/column-id.pipe';
+import { getTown } from '../../../_core/utilities/localstorage.util';
 
 const angular_common: Imports = [CommonModule, FormsModule];
 const components: Imports = [];

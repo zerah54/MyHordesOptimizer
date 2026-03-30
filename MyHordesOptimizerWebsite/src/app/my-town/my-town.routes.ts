@@ -1,6 +1,6 @@
 import { inject } from '@angular/core';
 import { Route } from '@angular/router';
-import { InDevModeGuard } from '../shared/guards/in-dev-mode.guard';
+import { InDevModeGuard } from '../_core/guards/in-dev-mode.guard';
 import { BankComponent } from './bank/bank.component';
 import { BuildingsComponent } from './buildings/buildings.component';
 import { CampingsComponent } from './campings/campings.component';

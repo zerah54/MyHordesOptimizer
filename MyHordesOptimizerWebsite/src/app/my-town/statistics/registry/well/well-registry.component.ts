@@ -4,7 +4,7 @@ import { MatDividerModule } from '@angular/material/divider';
 import { DisplayPseudoMode, Entry } from '../../../../_abstract_model/interfaces';
 import { Imports } from '../../../../_abstract_model/types/_types';
 import { CitizenInfo } from '../../../../_abstract_model/types/citizen-info.class';
-import { CitizenInfoComponent } from '../../../../shared/elements/citizen-info/citizen-info.component';
+import { CitizenInfoComponent } from '../../../../_shared/citizen-info/citizen-info.component';
 import { WellPipe } from './well.pipe';
 
 const angular_common: Imports = [CommonModule];

@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, DestroyRef, inject, OnInit } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -9,12 +10,11 @@ import { Property } from '../../_abstract_model/enum/property.enum';
 import { ApiService } from '../../_abstract_model/services/api.service';
 import { Imports } from '../../_abstract_model/types/_types';
 import { Item } from '../../_abstract_model/types/item.class';
-import { FilterFieldComponent } from '../../shared/elements/filter-field/filter-field.component';
-import { ItemComponent } from '../../shared/elements/item/item.component';
-import { SelectComponent } from '../../shared/elements/select/select.component';
-import { ItemsGroupByCategoryPipe } from '../../shared/pipes/items-group-by-category.pipe';
-import { normalizeString } from '../../shared/utilities/string.utils';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { ItemsGroupByCategoryPipe } from '../../_core/pipes/items-group-by-category.pipe';
+import { normalizeString } from '../../_core/utilities/string.utils';
+import { FilterFieldComponent } from '../../_shared/filter-field/filter-field.component';
+import { ItemComponent } from '../../_shared/item/item.component';
+import { SelectComponent } from '../../_shared/select/select.component';
 
 const angular_common: Imports = [CommonModule, FormsModule];
 const components: Imports = [FilterFieldComponent, ItemComponent, SelectComponent];

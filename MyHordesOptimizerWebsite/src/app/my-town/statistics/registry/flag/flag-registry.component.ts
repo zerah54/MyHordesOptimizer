@@ -1,10 +1,11 @@
 import { CommonModule } from '@angular/common';
-import { Component, input, Input, ViewEncapsulation, InputSignal } from '@angular/core';
+import { Component, input, Input, InputSignal, ViewEncapsulation } from '@angular/core';
 import { MatDividerModule } from '@angular/material/divider';
 import { DisplayPseudoMode, Entry } from '../../../../_abstract_model/interfaces';
 import { Imports } from '../../../../_abstract_model/types/_types';
 import { CitizenInfo } from '../../../../_abstract_model/types/citizen-info.class';
-import { CitizenInfoComponent } from '../../../../shared/elements/citizen-info/citizen-info.component';
+import { Item } from '../../../../_abstract_model/types/item.class';
+import { CitizenInfoComponent } from '../../../../_shared/citizen-info/citizen-info.component';
 import { FlagPipe } from './flag.pipe';
 
 const angular_common: Imports = [CommonModule];
@@ -23,13 +24,13 @@ const material_modules: Imports = [MatDividerModule];
 export class FlagRegistryComponent {
 
     public completeCitizenList: InputSignal<CitizenInfo> = input.required();
+    public completeItemsList: InputSignal<Item[]> = input.required();
     public displayPseudo: InputSignal<DisplayPseudoMode> = input.required();
 
     @Input({required: true}) set registry(registry: Entry[] | undefined) {
         if (registry) {
-            this.entries = registry.filter((entry: Entry) => {
-                return this.flag_keywords.some((flag_keyword: string): boolean => entry.entry?.indexOf(flag_keyword) > -1);
-            });
+            this.entries = registry;
+            this.filterEntries(registry);
         } else {
             this.entries = [];
         }
@@ -37,10 +38,13 @@ export class FlagRegistryComponent {
 
     protected entries: Entry[] = [];
 
-    private readonly flag_keywords: string[] = [
-        'Drapeau', 'Flagge', 'Flag', 'Bandera',
-    ];
+    private readonly flag_item: Item = this.completeItemsList().find((item) => item.img.indexOf('item_flag') > -1) as Item;
 
+    private filterEntries(entries: Entry[]): void {
+        this.entries = entries.filter((entry: Entry) => {
+            return Object.values(this.flag_item.label).some((label: string): boolean => entry.entry?.indexOf(' ' + label + ' ') > -1 || entry.entry?.indexOf(' ' + label + '.') > -1);
+        });
+    }
 }
 
 

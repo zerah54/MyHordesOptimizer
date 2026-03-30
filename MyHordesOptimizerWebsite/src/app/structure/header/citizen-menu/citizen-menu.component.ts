@@ -1,5 +1,6 @@
 import { NgOptimizedImage } from '@angular/common';
 import { Component, DestroyRef, inject, OnInit, ViewEncapsulation } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { MatCheckboxChange, MatCheckboxModule } from '@angular/material/checkbox';
 import { MatDividerModule } from '@angular/material/divider';
@@ -20,10 +21,9 @@ import { HomeWithValue } from '../../../_abstract_model/types/home.class';
 import { Item } from '../../../_abstract_model/types/item.class';
 import { Me } from '../../../_abstract_model/types/me.class';
 import { UpdateInfo } from '../../../_abstract_model/types/update-info.class';
-import { CitizenInfoComponent } from '../../../shared/elements/citizen-info/citizen-info.component';
-import { ListElementAddRemoveComponent } from '../../../shared/elements/list-elements-add-remove/list-element-add-remove.component';
-import { getTown, getUser } from '../../../shared/utilities/localstorage.util';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { getTown, getUser } from '../../../_core/utilities/localstorage.util';
+import { CitizenInfoComponent } from '../../../_shared/citizen-info/citizen-info.component';
+import { ListElementAddRemoveComponent } from '../../../_shared/list-elements-add-remove/list-element-add-remove.component';
 
 const angular_common: Imports = [NgOptimizedImage, FormsModule];
 const components: Imports = [CitizenInfoComponent, ListElementAddRemoveComponent];

@@ -5,7 +5,7 @@ import { HORDES_IMG_REPO } from '../../../../_abstract_model/const';
 import { DisplayPseudoMode, Entry } from '../../../../_abstract_model/interfaces';
 import { Imports } from '../../../../_abstract_model/types/_types';
 import { CitizenInfo } from '../../../../_abstract_model/types/citizen-info.class';
-import { CitizenInfoComponent } from '../../../../shared/elements/citizen-info/citizen-info.component';
+import { CitizenInfoComponent } from '../../../../_shared/citizen-info/citizen-info.component';
 import { IsCitizenInEntriesPipe } from '../is-citizen-in-entries.pipe';
 
 const angular_common: Imports = [CommonModule, NgOptimizedImage, NgTemplateOutlet];
@@ -56,7 +56,7 @@ export class BuildingsRegistryComponent {
     private entries: Entry[] = [];
 
     private readonly dump_keywords: string[] = ['la décharge', 'in der Müllhalde', 'at the dump', 'el vertedero'];
-    private readonly vet_keywords: string[] = ['a attiré', 'a réussi à attirer', 'in die Stadt gelockt', 'has successfully lured', 'has lured', 'atrajo a', 'logró atraer a', 'hat vergeblich', 'a essayé en vain', 'has tried in vain to lure', 'intentó sin éxito'];
+    private readonly vet_keywords: string[] = ['a attiré', 'in die Stadt gelockt', 'lured', 'atrajo a', 'hat vergeblich', 'a tenté d\'attirer', 'tried to lure', 'pero sin éxito'];
 
 
     public entryHasPlayKeyword(entry: Entry, keyword: string): boolean {

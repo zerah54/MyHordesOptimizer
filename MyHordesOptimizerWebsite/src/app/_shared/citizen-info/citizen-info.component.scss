@@ -1,0 +1,9 @@
+@use '../../../../public/scss/variables';
+
+.mho-citizen-info {
+    display: inline-flex;
+    flex-direction: row;
+    gap: 0.25em;
+    align-items: center;
+    vertical-align: text-bottom;
+}

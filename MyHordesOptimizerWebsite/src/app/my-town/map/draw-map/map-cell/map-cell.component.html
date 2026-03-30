@@ -6,6 +6,10 @@
         options().map_type === 'trash' ? 'trash-' + ((cell() | trashValue:options():allItems())|trashLevel) : '',
         cell().zone_regen ? cell().zone_regen?.value?.class : ''
     ]"
+    [mapCellTooltip]="cell()"
+    [mapCellTooltipAllItems]="allItems()"
+    [mapCellTooltipAllCitizens]="allCitizens()"
+    [mapCellTooltipAllRuins]="allRuins()"
     [class.alert]="options().map_type === 'danger'" [class.digs]="options().map_type === 'digs'" [class.trash]="options().map_type === 'trash'"
     [class.scrut-border-left]="cell() | scrutBorderLeft:options():drawedMap()"
     [class.scrut-border-top]="cell() | scrutBorderTop:options():drawedMap()"
@@ -94,8 +98,3 @@
     }
 </td>
 
-@if (current_cell) {
-    <mho-map-cell-details @toggleCurrentCell [cell]="current_cell" [allItems]="allItems()" [allRuins]="allRuins()"
-                          [cellHtml]="cellHtml" [allCitizens]="allCitizens()">
-    </mho-map-cell-details>
-}

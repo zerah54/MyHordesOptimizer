@@ -1,6 +1,6 @@
 import { Pipe, PipeTransform } from '@angular/core';
 import { Citizen } from '../../../_abstract_model/types/citizen.class';
-import { groupBy } from '../../../shared/utilities/array.util';
+import { groupBy } from '../../../_core/utilities/array.util';
 
 
 @Pipe({

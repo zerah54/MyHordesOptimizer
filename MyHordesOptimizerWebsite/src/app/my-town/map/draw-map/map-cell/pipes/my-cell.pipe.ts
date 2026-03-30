@@ -1,7 +1,7 @@
 import { Pipe, PipeTransform } from '@angular/core';
 import { Cell } from '../../../../../_abstract_model/types/cell.class';
 import { Citizen } from '../../../../../_abstract_model/types/citizen.class';
-import { getUserId } from '../../../../../shared/utilities/localstorage.util';
+import { getUserId } from '../../../../../_core/utilities/localstorage.util';
 
 
 @Pipe({

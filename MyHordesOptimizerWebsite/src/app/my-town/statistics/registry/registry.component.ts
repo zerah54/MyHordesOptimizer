@@ -1,5 +1,5 @@
 import { CommonModule, NgOptimizedImage } from '@angular/common';
-import { Component, inject, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, inject, ViewEncapsulation } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
@@ -7,6 +7,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import moment from 'moment';
+import { Observable } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 import { HORDES_IMG_REPO } from '../../../_abstract_model/const';
 import { DisplayPseudoMode, Entry } from '../../../_abstract_model/interfaces';
@@ -38,7 +39,10 @@ const material_modules: Imports = [MatButtonModule, MatButtonToggleModule, MatFo
     host: {style: 'display: contents'},
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
-export class RegistryComponent implements OnInit {
+export class RegistryComponent {
+
+    private readonly api_service: ApiService = inject(ApiService);
+    private readonly town_service: TownService = inject(TownService);
 
     public dev_mode: boolean = !environment.production;
 
@@ -46,8 +50,8 @@ export class RegistryComponent implements OnInit {
     public registry_entries: Entry[] | undefined;
     public display_mode: RegistryMode;
 
-    public complete_citizen_list!: CitizenInfo;
-    public complete_items_list!: Item[];
+    public complete_citizen_list$: Observable<CitizenInfo> = this.town_service.getCitizens();
+    public complete_items_list$: Observable<Item[]> = this.api_service.getItems();
     public display_pseudo: DisplayPseudoMode = 'simple';
 
     public tabs: Tab[] = [
@@ -64,20 +68,6 @@ export class RegistryComponent implements OnInit {
     public readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
     /** La locale */
     public readonly locale: string = moment.locale();
-
-    private api_service: ApiService = inject(ApiService);
-    private town_service: TownService = inject(TownService);
-
-    public ngOnInit(): void {
-        this.town_service
-            .getCitizens().subscribe((citizen: CitizenInfo): void => {
-            this.complete_citizen_list = citizen;
-        });
-        this.api_service
-            .getItems().subscribe((items: Item[]): void => {
-            this.complete_items_list = items;
-        });
-    }
 
     public readLogs(display_mode: RegistryMode): void {
         if (this.registry) {

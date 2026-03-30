@@ -1,5 +1,6 @@
 import { CommonModule, DecimalPipe, NgClass, NgOptimizedImage } from '@angular/common';
 import { Component, DestroyRef, EventEmitter, inject, OnInit, ViewChild } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -18,13 +19,12 @@ import { Imports } from '../../_abstract_model/types/_types';
 import { RuinItem } from '../../_abstract_model/types/ruin-item.class';
 import { Ruin } from '../../_abstract_model/types/ruin.class';
 import { TownDetails } from '../../_abstract_model/types/town-details.class';
-import { HeaderWithNumberFilterComponent } from '../../shared/elements/lists/header-with-number-filter/header-with-number-filter.component';
-import { HeaderWithSelectFilterComponent } from '../../shared/elements/lists/header-with-select-filter/header-with-select-filter.component';
-import { HeaderWithStringFilterComponent } from '../../shared/elements/lists/header-with-string-filter/header-with-string-filter.component';
-import { ColumnIdPipe } from '../../shared/pipes/column-id.pipe';
-import { getTown } from '../../shared/utilities/localstorage.util';
-import { normalizeString } from '../../shared/utilities/string.utils';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { ColumnIdPipe } from '../../_core/pipes/column-id.pipe';
+import { getTown } from '../../_core/utilities/localstorage.util';
+import { normalizeString } from '../../_core/utilities/string.utils';
+import { HeaderWithNumberFilterComponent } from '../../_shared/lists/header-with-number-filter/header-with-number-filter.component';
+import { HeaderWithSelectFilterComponent } from '../../_shared/lists/header-with-select-filter/header-with-select-filter.component';
+import { HeaderWithStringFilterComponent } from '../../_shared/lists/header-with-string-filter/header-with-string-filter.component';
 
 const angular_common: Imports = [CommonModule, FormsModule, NgClass, NgOptimizedImage];
 const components: Imports = [HeaderWithStringFilterComponent, HeaderWithNumberFilterComponent, HeaderWithSelectFilterComponent];

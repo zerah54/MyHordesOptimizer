@@ -1,5 +1,6 @@
 import { CommonModule, DecimalPipe, NgOptimizedImage } from '@angular/common';
 import { Component, DestroyRef, inject, OnInit } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatCardModule } from '@angular/material/card';
 import { MatSortModule } from '@angular/material/sort';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
@@ -11,10 +12,9 @@ import { Imports } from '../../_abstract_model/types/_types';
 import { Item } from '../../_abstract_model/types/item.class';
 import { RecipeResultItem } from '../../_abstract_model/types/recipe-result-item.class';
 import { Recipe } from '../../_abstract_model/types/recipe.class';
-import { FilterFieldComponent } from '../../shared/elements/filter-field/filter-field.component';
-import { ColumnIdPipe } from '../../shared/pipes/column-id.pipe';
-import { normalizeString } from '../../shared/utilities/string.utils';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { ColumnIdPipe } from '../../_core/pipes/column-id.pipe';
+import { normalizeString } from '../../_core/utilities/string.utils';
+import { FilterFieldComponent } from '../../_shared/filter-field/filter-field.component';
 
 const angular_common: Imports = [CommonModule, NgOptimizedImage];
 const components: Imports = [FilterFieldComponent];

@@ -1,5 +1,6 @@
 import { CommonModule, DecimalPipe, formatNumber, Location, NgOptimizedImage, NgTemplateOutlet } from '@angular/common';
-import { Component, inject, Inject, OnInit, ViewEncapsulation, DOCUMENT, DestroyRef } from '@angular/core';
+import { Component, DestroyRef, DOCUMENT, inject, Inject, OnInit, ViewEncapsulation } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
@@ -24,12 +25,11 @@ import { CampingOdds } from '../../_abstract_model/types/camping-odds.class';
 import { CampingParameters } from '../../_abstract_model/types/camping-parameters.class';
 import { Ruin } from '../../_abstract_model/types/ruin.class';
 import { TownDetails } from '../../_abstract_model/types/town-details.class';
-import { SelectComponent } from '../../shared/elements/select/select.component';
-import { FilterRuinsByKmPipe } from '../../shared/pipes/filter-ruins-by-km.pipe';
-import { ClipboardService } from '../../shared/services/clipboard.service';
-import { getTown } from '../../shared/utilities/localstorage.util';
+import { FilterRuinsByKmPipe } from '../../_core/pipes/filter-ruins-by-km.pipe';
+import { ClipboardService } from '../../_core/services/clipboard.service';
+import { getTown } from '../../_core/utilities/localstorage.util';
+import { SelectComponent } from '../../_shared/select/select.component';
 import { CampingDisplayBonusPipe } from './camping-display-bonus.pipe';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 const angular_common: Imports = [CommonModule, FormsModule, NgOptimizedImage, NgTemplateOutlet, ReactiveFormsModule];
 const components: Imports = [SelectComponent];

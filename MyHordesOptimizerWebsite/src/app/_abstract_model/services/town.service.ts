@@ -2,8 +2,8 @@ import { HttpClient, HttpErrorResponse, HttpResponse } from '@angular/common/htt
 import { Injectable } from '@angular/core';
 import moment from 'moment';
 import { Observable, Subscriber } from 'rxjs';
-import { SnackbarService } from '../../shared/services/snackbar.service';
-import { getBankWithExpirationDate, getExternalAppId, getTown, getUserId, setBankWithExpirationDate, } from '../../shared/utilities/localstorage.util';
+import { SnackbarService } from '../../_core/services/snackbar.service';
+import { getBankWithExpirationDate, getExternalAppId, getTown, getUserId, setBankWithExpirationDate, } from '../../_core/utilities/localstorage.util';
 import { BankInfoDTO } from '../dto/bank-info.dto';
 import { CellDTO } from '../dto/cell.dto';
 import { CitizenInfoDTO } from '../dto/citizen-info.dto';

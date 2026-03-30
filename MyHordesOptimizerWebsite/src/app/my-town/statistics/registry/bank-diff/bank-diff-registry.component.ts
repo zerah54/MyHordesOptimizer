@@ -1,5 +1,5 @@
 import { CommonModule, NgOptimizedImage } from '@angular/common';
-import { Component, input, Input, ViewEncapsulation, InputSignal } from '@angular/core';
+import { Component, input, Input, InputSignal, ViewEncapsulation } from '@angular/core';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import moment from 'moment';
 import { HORDES_IMG_REPO } from '../../../../_abstract_model/const';
@@ -7,7 +7,7 @@ import { DisplayPseudoMode, Entry } from '../../../../_abstract_model/interfaces
 import { Imports } from '../../../../_abstract_model/types/_types';
 import { CitizenInfo } from '../../../../_abstract_model/types/citizen-info.class';
 import { Item } from '../../../../_abstract_model/types/item.class';
-import { CitizenInfoComponent } from '../../../../shared/elements/citizen-info/citizen-info.component';
+import { CitizenInfoComponent } from '../../../../_shared/citizen-info/citizen-info.component';
 import { BankCleanEntriesPipe, BankDiffPipe } from './bank-gift.pipe';
 
 const angular_common: Imports = [CommonModule, NgOptimizedImage];

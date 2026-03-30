@@ -1,5 +1,5 @@
 import { CommonModule, NgOptimizedImage } from '@angular/common';
-import { Component, InputSignal, input, OutputEmitterRef, output } from '@angular/core';
+import { Component, input, InputSignal, output, OutputEmitterRef } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
@@ -9,7 +9,7 @@ import { HORDES_IMG_REPO } from '../../../../../_abstract_model/const';
 import { HeroicActionEnum } from '../../../../../_abstract_model/enum/heroic-action.enum';
 import { Imports } from '../../../../../_abstract_model/types/_types';
 import { Citizen } from '../../../../../_abstract_model/types/citizen.class';
-import { CitizenInfoComponent } from '../../../../../shared/elements/citizen-info/citizen-info.component';
+import { CitizenInfoComponent } from '../../../../../_shared/citizen-info/citizen-info.component';
 import { HasStillHeroicPipe } from './has-still-heroic.pipe';
 import { NotInListCitizenPipe } from './not-in-list-citizen.pipe';
 

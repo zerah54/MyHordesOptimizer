@@ -1,13 +1,12 @@
-
-import { Component, Inject, ViewEncapsulation, DOCUMENT } from '@angular/core';
+import { Component, DOCUMENT, Inject, ViewEncapsulation } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { Imports } from '../../../_abstract_model/types/_types';
-import { AccordionComponent, AccordionItem } from '../../../shared/elements/accordion/accordion.component';
-import { ClipboardService } from '../../../shared/services/clipboard.service';
+import { ClipboardService } from '../../../_core/services/clipboard.service';
+import { AccordionComponent, AccordionItem } from '../../../_shared/accordion/accordion.component';
 
 const angular_common: Imports = [];
 const components: Imports = [AccordionComponent];

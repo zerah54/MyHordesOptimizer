@@ -6,7 +6,8 @@ import { DisplayPseudoMode, Entry } from '../../../../_abstract_model/interfaces
 import { Imports } from '../../../../_abstract_model/types/_types';
 import { CitizenInfo } from '../../../../_abstract_model/types/citizen-info.class';
 import { Citizen } from '../../../../_abstract_model/types/citizen.class';
-import { CitizenInfoComponent } from '../../../../shared/elements/citizen-info/citizen-info.component';
+import { Item } from '../../../../_abstract_model/types/item.class';
+import { CitizenInfoComponent } from '../../../../_shared/citizen-info/citizen-info.component';
 import { IsCitizenInEntriesPipe } from '../is-citizen-in-entries.pipe';
 
 const angular_common: Imports = [CommonModule, NgOptimizedImage, NgTemplateOutlet];
@@ -25,6 +26,7 @@ const material_modules: Imports = [MatTabsModule];
 export class PlaysRegistryComponent {
 
     public completeCitizenList: InputSignal<CitizenInfo> = input.required();
+    public completeItemsList: InputSignal<Item[]> = input.required();
     public displayPseudo: InputSignal<DisplayPseudoMode> = input.required();
 
     @Input({required: true}) set registry(registry: Entry[] | undefined) {
@@ -43,7 +45,7 @@ export class PlaysRegistryComponent {
         {
             id: 'plays',
             img: 'item/item_game_box.gif',
-            label: $localize`Dés / Cartes / Ballon`
+            label: $localize`Dés / Cartes / socceron`
         },
         {
             id: 'dice',
@@ -56,9 +58,9 @@ export class PlaysRegistryComponent {
             label: $localize`Cartes`
         },
         {
-            id: 'ball',
+            id: 'soccer',
             img: 'item/item_soccer.gif',
-            label: $localize`Ballon`
+            label: $localize`socceron`
         }
     ];
 
@@ -66,52 +68,49 @@ export class PlaysRegistryComponent {
 
     private entries: Entry[] = [];
 
-    private readonly dices_keywords: string[] = ['Dés', 'Ein paar Würfel', 'Dice', 'Dados'];
-    private readonly cards_keywords: string[] = ['Jeu de cartes incomplet', 'Unvollständiges Kartenspiel', 'Incomplete Deck of Cards', 'Juego de cartas incompleto'];
-    private readonly ball_keywords: string[] = ['Ballon de foot', 'Fußball', 'Soccer ball', 'Balón de fútbol'];
+    private readonly dices_item: Item = this.completeItemsList().find((item) => item.img.indexOf('item_dice') > -1) as Item;
+    private readonly cards_item: Item = this.completeItemsList().find((item) => item.img.indexOf('item_cards') > -1) as Item;
+    private readonly soccer_item: Item = this.completeItemsList().find((item) => item.img.indexOf('item_soccer') > -1) as Item;
 
 
-    public entryHasPlayKeyword(entry: Entry, keyword: string): boolean {
-        return entry.entry?.indexOf(' ' + keyword + ' ') > -1 || entry.entry?.indexOf(' ' + keyword + '.') > -1;
-    }
-
-    public changePlaysTab(event: MatTabChangeEvent): void {
+    protected changePlaysTab(event: MatTabChangeEvent): void {
         this.play_type = <PlayType>event.tab.labelClass;
         setTimeout(() => {
             this.filterEntriesByType(this.entries);
         });
     }
 
+    private entryHasPlayKeyword(entry: Entry, keyword: string): boolean {
+        return entry.entry?.indexOf(' ' + keyword + ' ') > -1 || entry.entry?.indexOf(' ' + keyword + '.') > -1;
+    }
+
     private filterEntriesByType(entries: Entry[]): void {
         if (this.play_type === 'card') {
             this.entries_by_type = entries.filter((entry: Entry) => {
-                return this.cards_keywords.some((cards_keyword: string): boolean => this.entryHasPlayKeyword(entry, cards_keyword));
+                return Object.values(this.cards_item.label).some((label: string): boolean => this.entryHasPlayKeyword(entry, label));
             });
         } else if (this.play_type === 'dice') {
             this.entries_by_type = entries.filter((entry: Entry) => {
-                return this.dices_keywords.some((dices_keyword: string): boolean => this.entryHasPlayKeyword(entry, dices_keyword));
+                return Object.values(this.dices_item.label).some((label: string): boolean => this.entryHasPlayKeyword(entry, label));
             });
-        } else if (this.play_type === 'ball') {
+        } else if (this.play_type === 'soccer') {
             this.entries_by_type = entries.filter((entry: Entry) => {
-                return this.ball_keywords.some((ball_keyword: string): boolean => this.entryHasPlayKeyword(entry, ball_keyword));
+                return Object.values(this.soccer_item.label).some((label: string): boolean => this.entryHasPlayKeyword(entry, label));
             });
         } else {
             const card_entries: Entry[] = entries.filter((entry: Entry) => {
-                return this.cards_keywords.some((cards_keyword: string): boolean => this.entryHasPlayKeyword(entry, cards_keyword));
+                return Object.values(this.cards_item.label).some((label: string): boolean => this.entryHasPlayKeyword(entry, label));
             });
             const dice_entries: Entry[] = entries.filter((entry: Entry) => {
-                return this.dices_keywords.some((dices_keyword: string): boolean => this.entryHasPlayKeyword(entry, dices_keyword));
+                return Object.values(this.dices_item.label).some((label: string): boolean => this.entryHasPlayKeyword(entry, label));
             });
-            const ball_entries: Entry[] = entries.filter((entry: Entry) => {
-                return this.ball_keywords.some((ball_keyword: string): boolean => this.entryHasPlayKeyword(entry, ball_keyword));
+            const soccer_entries: Entry[] = entries.filter((entry: Entry) => {
+                return Object.values(this.soccer_item.label).some((label: string): boolean => this.entryHasPlayKeyword(entry, label));
             });
             this.entries_by_type = entries.filter((entry: Entry) => {
-                const is_card_keyword: boolean = this.cards_keywords
-                    .some((cards_keyword: string): boolean => this.entryHasPlayKeyword(entry, cards_keyword));
-                const is_dice_keyword: boolean = this.dices_keywords
-                    .some((dices_keyword: string): boolean => this.entryHasPlayKeyword(entry, dices_keyword));
-                const is_ball_keyword: boolean = this.ball_keywords
-                    .some((ball_keyword: string): boolean => this.entryHasPlayKeyword(entry, ball_keyword));
+                const is_card_keyword: boolean = Object.values(this.cards_item.label).some((label: string): boolean => this.entryHasPlayKeyword(entry, label));
+                const is_dice_keyword: boolean = Object.values(this.dices_item.label).some((label: string): boolean => this.entryHasPlayKeyword(entry, label));
+                const is_soccer_keyword: boolean = Object.values(this.soccer_item.label).some((label: string): boolean => this.entryHasPlayKeyword(entry, label));
                 const citizen: Citizen | undefined = this.completeCitizenList().citizens
                     .find((citizen: Citizen): boolean => entry.entry?.indexOf(citizen.name) > -1);
                 let has_pendant: boolean;
@@ -127,23 +126,23 @@ export class PlaysRegistryComponent {
                             .find((citizen: Citizen): boolean => dice_entry.entry?.indexOf(citizen.name) > -1);
                         return citizen_for_entry !== undefined && citizen_for_entry === citizen;
                     });
-                } else if (is_ball_keyword) {
-                    has_pendant = ball_entries.some((ball_entry: Entry): boolean => {
+                } else if (is_soccer_keyword) {
+                    has_pendant = soccer_entries.some((soccer_entry: Entry): boolean => {
                         const citizen_for_entry: Citizen | undefined = this.completeCitizenList().citizens
-                            .find((citizen: Citizen): boolean => ball_entry.entry?.indexOf(citizen.name) > -1);
+                            .find((citizen: Citizen): boolean => soccer_entry.entry?.indexOf(citizen.name) > -1);
                         return citizen_for_entry !== undefined && citizen_for_entry === citizen;
                     });
                 } else {
                     has_pendant = false;
                 }
-                return (is_dice_keyword || is_card_keyword || is_ball_keyword) && has_pendant;
+                return (is_dice_keyword || is_card_keyword || is_soccer_keyword) && has_pendant;
             });
         }
     }
 
 }
 
-type PlayType = 'dice' | 'card' | 'ball' | 'plays';
+type PlayType = 'dice' | 'card' | 'soccer' | 'plays';
 
 interface GameTab {
     id: PlayType;

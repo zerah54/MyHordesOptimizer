@@ -1,5 +1,6 @@
 import { CommonModule, DecimalPipe, NgOptimizedImage } from '@angular/common';
 import { Component, DestroyRef, inject, input, InputSignal, OnInit, output, OutputEmitterRef } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatDividerModule } from '@angular/material/divider';
@@ -11,8 +12,7 @@ import { HORDES_IMG_REPO } from '../../../../../_abstract_model/const';
 import { Imports } from '../../../../../_abstract_model/types/_types';
 import { Cell } from '../../../../../_abstract_model/types/cell.class';
 import { Ruin } from '../../../../../_abstract_model/types/ruin.class';
-import { FilterRuinsByKmPipe } from '../../../../../shared/pipes/filter-ruins-by-km.pipe';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { FilterRuinsByKmPipe } from '../../../../../_core/pipes/filter-ruins-by-km.pipe';
 
 const angular_common: Imports = [CommonModule, FormsModule, NgOptimizedImage, ReactiveFormsModule];
 const components: Imports = [];

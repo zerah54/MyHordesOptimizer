@@ -1,5 +1,6 @@
 import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { Component, DestroyRef, inject, input, InputSignal, OnInit, output, OutputEmitterRef, ViewEncapsulation } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatDividerModule } from '@angular/material/divider';
@@ -14,11 +15,10 @@ import { Cell } from '../../../../../_abstract_model/types/cell.class';
 import { Citizen } from '../../../../../_abstract_model/types/citizen.class';
 import { ItemCountShort } from '../../../../../_abstract_model/types/item-count-short.class';
 import { Item } from '../../../../../_abstract_model/types/item.class';
-import { LastUpdateComponent } from '../../../../../shared/elements/last-update/last-update.component';
-import { ArrayItemDetailsPipe } from '../../../../../shared/pipes/array-item-details.pipe';
-import { ItemDetailsPipe } from '../../../../../shared/pipes/item-details.pipe';
+import { ArrayItemDetailsPipe } from '../../../../../_core/pipes/array-item-details.pipe';
+import { ItemDetailsPipe } from '../../../../../_core/pipes/item-details.pipe';
+import { LastUpdateComponent } from '../../../../../_shared/last-update/last-update.component';
 import { ItemsInBagsPipe } from './items-in-bags.pipe';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 const angular_common: Imports = [CommonModule, FormsModule, NgOptimizedImage, ReactiveFormsModule];
 const components: Imports = [LastUpdateComponent];

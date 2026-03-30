@@ -13,8 +13,8 @@ import { environment } from '../../../environments/environment';
 import { Theme } from '../../_abstract_model/interfaces';
 import { Imports } from '../../_abstract_model/types/_types';
 import { TownDetails } from '../../_abstract_model/types/town-details.class';
-import { ChartsThemingService } from '../../shared/services/charts-theming.service';
-import { getTown } from '../../shared/utilities/localstorage.util';
+import { ChartsThemingService } from '../../_core/services/charts-theming.service';
+import { getTown } from '../../_core/utilities/localstorage.util';
 
 const angular_common: Imports = [ CommonModule, NgClass, NgTemplateOutlet, RouterLink, RouterLinkActive ];
 const components: Imports = [];

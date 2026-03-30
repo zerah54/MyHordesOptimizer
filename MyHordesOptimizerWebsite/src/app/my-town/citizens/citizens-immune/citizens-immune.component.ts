@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, DestroyRef, inject, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatDividerModule } from '@angular/material/divider';
@@ -13,10 +14,9 @@ import { TownService } from '../../../_abstract_model/services/town.service';
 import { Imports } from '../../../_abstract_model/types/_types';
 import { CitizenInfo } from '../../../_abstract_model/types/citizen-info.class';
 import { Citizen } from '../../../_abstract_model/types/citizen.class';
-import { CitizenInfoComponent } from '../../../shared/elements/citizen-info/citizen-info.component';
-import { SelectComponent } from '../../../shared/elements/select/select.component';
+import { CitizenInfoComponent } from '../../../_shared/citizen-info/citizen-info.component';
+import { SelectComponent } from '../../../_shared/select/select.component';
 import { CitizenGroupByImmuneStatePipe } from './citizen-group-by-immune-state.pipe';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 const angular_common: Imports = [CommonModule, FormsModule];
 const components: Imports = [CitizenInfoComponent, SelectComponent];

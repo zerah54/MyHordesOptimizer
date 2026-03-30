@@ -1,4 +1,4 @@
-import { Component, ElementRef, input, Input, ViewChild, ViewEncapsulation, InputSignal } from '@angular/core';
+import { Component, ElementRef, input, Input, InputSignal, ViewChild, ViewEncapsulation } from '@angular/core';
 import { Scale, TooltipItem } from 'chart.js';
 import Chart from 'chart.js/auto';
 import moment from 'moment';

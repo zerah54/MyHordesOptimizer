@@ -1,4 +1,4 @@
-import { DictionaryUtils } from '../../shared/utilities/dictionary.util';
+import { DictionaryUtils } from '../../_core/utilities/dictionary.util';
 import { CitizenInfoDTO } from '../dto/citizen-info.dto';
 import { CitizenDTO } from '../dto/citizen.dto';
 import { CommonModel, dtoToModelArray, modelArrayToDictionnary } from './_common.class';

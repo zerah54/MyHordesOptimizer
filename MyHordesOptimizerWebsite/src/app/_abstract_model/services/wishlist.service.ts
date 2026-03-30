@@ -2,8 +2,8 @@ import { HttpClient, HttpErrorResponse, HttpResponse } from '@angular/common/htt
 import { Injectable } from '@angular/core';
 import moment from 'moment';
 import { Observable, Subscriber } from 'rxjs';
-import { SnackbarService } from '../../shared/services/snackbar.service';
-import { getTown, getUserId } from '../../shared/utilities/localstorage.util';
+import { SnackbarService } from '../../_core/services/snackbar.service';
+import { getTown, getUserId } from '../../_core/utilities/localstorage.util';
 import { WishlistInfoDTO } from '../dto/wishlist-info.dto';
 import { Item } from '../types/item.class';
 import { WishlistInfo } from '../types/wishlist-info.class';

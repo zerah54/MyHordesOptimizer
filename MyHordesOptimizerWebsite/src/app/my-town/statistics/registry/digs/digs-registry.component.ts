@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, ViewEncapsulation, InputSignal, input } from '@angular/core';
+import { Component, Input, input, InputSignal, ViewEncapsulation } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import moment, { Moment } from 'moment';
@@ -10,9 +10,9 @@ import { Imports } from '../../../../_abstract_model/types/_types';
 import { CitizenInfo } from '../../../../_abstract_model/types/citizen-info.class';
 import { Citizen } from '../../../../_abstract_model/types/citizen.class';
 import { Dig } from '../../../../_abstract_model/types/dig.class';
-import { DigComponent } from '../../../../shared/elements/dig/dig.component';
-import { SelectComponent } from '../../../../shared/elements/select/select.component';
-import { getTown } from '../../../../shared/utilities/localstorage.util';
+import { getTown } from '../../../../_core/utilities/localstorage.util';
+import { DigComponent } from '../../../../_shared/dig/dig.component';
+import { SelectComponent } from '../../../../_shared/select/select.component';
 import { CitizenForDigPipe, CitizenNotInDigListPipe } from './citizen-for-dig.pipe';
 
 const angular_common: Imports = [CommonModule, FormsModule];

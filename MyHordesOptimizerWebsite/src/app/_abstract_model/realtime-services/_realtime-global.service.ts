@@ -2,9 +2,9 @@ import { inject, Injectable } from '@angular/core';
 import * as signalR from '@microsoft/signalr';
 import { IHttpConnectionOptions } from '@microsoft/signalr';
 import { environment } from '../../../environments/environment';
-import { SnackbarService } from '../../shared/services/snackbar.service';
-import { getTokenWithMeWithExpirationDate } from '../../shared/utilities/localstorage.util';
-import { isValidToken } from '../../shared/utilities/token.util';
+import { SnackbarService } from '../../_core/services/snackbar.service';
+import { getTokenWithMeWithExpirationDate } from '../../_core/utilities/localstorage.util';
+import { isValidToken } from '../../_core/utilities/token.util';
 import { TokenWithMe } from '../types/token-with-me.class';
 
 @Injectable({

@@ -3,7 +3,7 @@ import { Component, ElementRef, Signal, viewChildren } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { HORDES_IMG_REPO } from 'src/app/_abstract_model/const';
 import { Imports } from 'src/app/_abstract_model/types/_types';
-import { MaxPipe } from 'src/app/shared/pipes/number.pipe';
+import { MaxPipe } from 'src/app/_core/pipes/number.pipe';
 import { PictosHighlightedCell } from './368-pictos-highlighted-cell.pipe';
 
 const angular_common: Imports = [];

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, InputSignal, input, output, OutputEmitterRef } from '@angular/core';
+import { Component, input, InputSignal, output, OutputEmitterRef } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -13,11 +13,11 @@ import { Imports } from '../../../../../_abstract_model/types/_types';
 import { Cell } from '../../../../../_abstract_model/types/cell.class';
 import { Citizen } from '../../../../../_abstract_model/types/citizen.class';
 import { Dig } from '../../../../../_abstract_model/types/dig.class';
-import { CitizenInfoComponent } from '../../../../../shared/elements/citizen-info/citizen-info.component';
+import { getTown } from '../../../../../_core/utilities/localstorage.util';
+import { CitizenInfoComponent } from '../../../../../_shared/citizen-info/citizen-info.component';
 import {
     HeaderWithNumberPreviousNextFilterComponent
-} from '../../../../../shared/elements/lists/header-with-number-previous-next/header-with-number-previous-next-filter.component';
-import { getTown } from '../../../../../shared/utilities/localstorage.util';
+} from '../../../../../_shared/lists/header-with-number-previous-next/header-with-number-previous-next-filter.component';
 import { DigsPerDayPipe } from './digs-per-day.pipe';
 import { NotInListCitizenDigPipe } from './not-in-list-citizen.pipe';
 

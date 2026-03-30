@@ -6,13 +6,13 @@ import { AngularFireAnalyticsModule } from '@angular/fire/compat/analytics';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { provideRouter, Router, withRouterConfig } from '@angular/router';
+import * as Sentry from '@sentry/angular';
 import { environment } from '../environments/environment';
 import { Modules } from './_abstract_model/types/_types';
+import { errorInterceptor } from './_core/services/errors-interceptor.service';
+import { headersInterceptor } from './_core/services/headers-interceptor.service';
+import { loadingInterceptor } from './_core/services/loading-interceptor.service';
 import { ROUTES, ROUTES_OPTIONS } from './routes';
-import { errorInterceptor } from './shared/services/errors-interceptor.service';
-import { headersInterceptor } from './shared/services/headers-interceptor.service';
-import { loadingInterceptor } from './shared/services/loading-interceptor.service';
-import * as Sentry from '@sentry/angular';
 
 const angular_modules: Modules = [BrowserModule, BrowserAnimationsModule];
 

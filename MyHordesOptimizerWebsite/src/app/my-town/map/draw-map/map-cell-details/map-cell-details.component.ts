@@ -8,11 +8,11 @@ import { Cell } from '../../../../_abstract_model/types/cell.class';
 import { Citizen } from '../../../../_abstract_model/types/citizen.class';
 import { Item } from '../../../../_abstract_model/types/item.class';
 import { Ruin } from '../../../../_abstract_model/types/ruin.class';
-import { CitizenInfoComponent } from '../../../../shared/elements/citizen-info/citizen-info.component';
-import { IconApComponent } from '../../../../shared/elements/icon-ap/icon-ap.component';
-import { LastUpdateComponent } from '../../../../shared/elements/last-update/last-update.component';
-import { CitizensFromShortPipe } from '../../../../shared/pipes/citizens-from-short.pipe';
-import { ItemDetailsPipe } from '../../../../shared/pipes/item-details.pipe';
+import { CitizensFromShortPipe } from '../../../../_core/pipes/citizens-from-short.pipe';
+import { ItemDetailsPipe } from '../../../../_core/pipes/item-details.pipe';
+import { CitizenInfoComponent } from '../../../../_shared/citizen-info/citizen-info.component';
+import { IconApComponent } from '../../../../_shared/icon-ap/icon-ap.component';
+import { LastUpdateComponent } from '../../../../_shared/last-update/last-update.component';
 import { CellDetailsBottomPipe, CellDetailsLeftPipe, CellDetailsRightPipe, CellDetailsTopPipe } from './cell-details-position.pipe';
 import { RuinInCell } from './ruin-in-cell.pipe';
 

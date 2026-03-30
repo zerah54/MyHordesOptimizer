@@ -1,7 +1,7 @@
 import { HttpClient, HttpContext, HttpHeaders, HttpResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { BYPASS_LOADING } from '../../shared/services/loading-interceptor.service';
+import { BYPASS_LOADING } from '../../_core/services/loading-interceptor.service';
 
 export class GlobalService {
     protected readonly API_URL: string = environment.api_url;

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable, Subject } from 'rxjs';
-import { getTown } from '../../shared/utilities/localstorage.util';
+import { getTown } from '../../_core/utilities/localstorage.util';
 import { CitizenExpeditionBagDTO } from '../dto/citizen-expedition-bag.dto';
 import { CitizenExpeditionDTO } from '../dto/citizen-expedition.dto';
 import { ExpeditionOrderDTO } from '../dto/expedition-order.dto';

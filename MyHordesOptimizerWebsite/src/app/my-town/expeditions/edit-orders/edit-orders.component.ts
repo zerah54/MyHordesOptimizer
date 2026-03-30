@@ -8,7 +8,7 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
 import { Imports } from '../../../_abstract_model/types/_types';
 import { ExpeditionOrder } from '../../../_abstract_model/types/expedition-order.class';
-import { EditorComponent } from '../../../shared/elements/editor/editor.component';
+import { EditorComponent } from '../../../_shared/editor/editor.component';
 
 const angular_common: Imports = [];
 const components: Imports = [EditorComponent];

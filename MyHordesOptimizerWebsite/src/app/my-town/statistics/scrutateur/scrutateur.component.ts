@@ -1,5 +1,6 @@
 import { CommonModule, NgClass } from '@angular/common';
 import { Component, DestroyRef, ElementRef, inject, OnInit, ViewChild } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatSortModule } from '@angular/material/sort';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import Chart from 'chart.js/auto';
@@ -8,9 +9,8 @@ import { StandardColumn } from '../../../_abstract_model/interfaces';
 import { TownStatisticsService } from '../../../_abstract_model/services/town-statistics.service';
 import { Imports } from '../../../_abstract_model/types/_types';
 import { Regen } from '../../../_abstract_model/types/regen.class';
-import { ColumnIdPipe } from '../../../shared/pipes/column-id.pipe';
-import { groupBy } from '../../../shared/utilities/array.util';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { ColumnIdPipe } from '../../../_core/pipes/column-id.pipe';
+import { groupBy } from '../../../_core/utilities/array.util';
 
 // import ChartDataLabels, { Context } from 'chartjs-plugin-datalabels';
 

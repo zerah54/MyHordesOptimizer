@@ -1,7 +1,7 @@
 import { HttpClient, HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, Subscriber } from 'rxjs';
-import { getTown, getUserId, } from '../../shared/utilities/localstorage.util';
+import { getTown, getUserId, } from '../../_core/utilities/localstorage.util';
 import { EstimationsResultDTO } from '../dto/estimations-result.dto';
 import { EstimationsDTO } from '../dto/estimations.dto';
 import { RegenDTO } from '../dto/regen.dto';

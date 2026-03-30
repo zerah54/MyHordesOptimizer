@@ -6,7 +6,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { DataSet, DataView } from 'vis-data/peer';
 import { Data, Network, Options } from 'vis-network/peer';
 import { Imports } from '../../_abstract_model/types/_types';
-import { SelectComponent } from '../../shared/elements/select/select.component';
+import { SelectComponent } from '../../_shared/select/select.component';
 import { IrlLink, links } from './irl-links.const';
 import { IrlPeople, people } from './irl-people.const';
 import { IrlTowns, TownId, towns } from './irl-towns.const';

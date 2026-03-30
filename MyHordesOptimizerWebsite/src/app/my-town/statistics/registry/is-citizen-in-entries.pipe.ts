@@ -2,8 +2,7 @@ import { Pipe, PipeTransform } from '@angular/core';
 import { Entry } from '../../../_abstract_model/interfaces';
 import { CitizenInfo } from '../../../_abstract_model/types/citizen-info.class';
 import { Citizen } from '../../../_abstract_model/types/citizen.class';
-import { normalizeString } from '../../../shared/utilities/string.utils';
-
+import { normalizeString } from '../../../_core/utilities/string.utils';
 
 @Pipe({
     name: 'isCitizenInEntries'

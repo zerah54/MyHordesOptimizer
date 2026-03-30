@@ -1,8 +1,8 @@
 import { HttpClient, HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, Subscriber } from 'rxjs';
-import { SnackbarService } from '../../shared/services/snackbar.service';
-import { getTown, getUserId } from '../../shared/utilities/localstorage.util';
+import { SnackbarService } from '../../_core/services/snackbar.service';
+import { getTown, getUserId } from '../../_core/utilities/localstorage.util';
 import { DigDTO } from '../dto/dig.dto';
 import { dtoToModelArray, modelToDtoArray } from '../types/_common.class';
 import { Dig } from '../types/dig.class';
