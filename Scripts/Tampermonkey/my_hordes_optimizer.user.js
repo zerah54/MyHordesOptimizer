@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MHO Addon
-// @version      1.1.27.0
+// @version      1.1.28.0
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/, rubrique Tutoriels
 // @author       Zerah
 //
@@ -32,7 +32,7 @@
 // ==/UserScript==
 
 const changelog = `${getScriptInfo().name} : Changelog pour la version ${getScriptInfo().version}\n\n`
-    + `[Correctif] Meilleure stabilité à l'ouverture d'un sac\n`;
+    + `[Correctif] Le filtre sur les noms d'objets dans la page de la décharge ne fonctionnait plus\n`;
 
 const lang = (document.querySelector('html[lang]')?.getAttribute('lang') || document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2) || 'fr';
 
@@ -4607,7 +4607,6 @@ function displaySearchFieldOnRecipientList() {
     }
 }
 
-
 /** Si l'option associée est activée, affiche un champ de recherche sur la page de la décharge */
 function displaySearchFieldOnDump() {
     let search_field = document.getElementById(mho_search_dump_field_id);
@@ -4619,12 +4618,12 @@ function displaySearchFieldOnDump() {
             let table = main_content.querySelector('.row-table');
             if (table) {
                 let filterFunction = (name_search_field, can_be_dump_field, can_be_recovered_field) => {
-                    let items_list = Array.from(table.querySelectorAll('.row:not(.header)') || []);
+                    let items_list = Array.from(table.querySelectorAll('div.row-flex') || []);
                     items_list.forEach((item) => {
-                        let item_label = item.querySelector('span.icon img');
-                        let item_counts = item_label.parentElement.parentElement.nextElementSibling.querySelector('span')?.innerHTML.split('<br>');
-                        let item_bank_count = +item_counts[0].replace(/\D*/, '');
-                        let item_dump_count = +item_counts[1].replace(/\D*/, '');
+                        let item_label = item.querySelector('div.item-line img');
+                        let item_counts = item.children.item(1).querySelectorAll('div');
+                        let item_bank_count = +item_counts[0].innerText.replace(/\D*/, '');
+                        let item_dump_count = +item_counts[1].innerText.replace(/\D*/, '');
 
                         let is_search_in_string = normalizeString(item_label.getAttribute('alt')).indexOf(normalizeString(name_search_field.value)) > -1;
                         let can_be_recovered = can_be_recovered_field.checked && item_dump_count > 0;
