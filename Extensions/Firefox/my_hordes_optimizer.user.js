@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MHO Addon
-// @version      1.1.28.0
+// @version      1.1.29.0
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/, rubrique Tutoriels
 // @author       Zerah
 //
@@ -32,7 +32,7 @@
 // ==/UserScript==
 
 const changelog = `${getScriptInfo().name} : Changelog pour la version ${getScriptInfo().version}\n\n`
-    + `[Correctif] Le filtre sur les noms d'objets dans la page de la décharge ne fonctionnait plus\n`;
+    + `[Correctif] Changement de comportement complet pour le tooltip amélioré pour en fluidifier et corriger l'usage. Merci Emmet pour le coup de main\n`;
 
 const lang = (document.querySelector('html[lang]')?.getAttribute('lang') || document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2) || 'fr';
 
@@ -166,6 +166,7 @@ let is_error = false;
 let mh_notifications = [];
 /** Le mutation observer pour les tooltips */
 let advanced_tooltips_observer;
+
 ////////////////
 // Les textes //
 ////////////////
@@ -2351,49 +2352,22 @@ function isValidToken() {
     return !shouldRefreshMe() && current_date < expiration_date;
 }
 
-function getHoveredItem() {
-    let hovered = document.querySelectorAll(':hover');
-    let hovered_item_icon = Array.from(hovered).find((hovered_element) => hovered_element.classList.contains('item-icon') || (hovered_element.classList.contains('status') && hovered_element.tagName.toLowerCase() === 'LI'.toLowerCase()));
-
-    let hovered_item_img = hovered_item_icon?.firstElementChild;
-    let hovered_item_li = hovered_item_icon?.tagName.toLowerCase() === 'LI'.toLowerCase() ? hovered_item_icon : hovered_item_icon?.parentElement;
-
+function getTooltipItem(img, isStatus) {
     let hovered_item;
-    let broken;
     let hovered_status;
 
-    if (hovered_item_img && hovered_item_img.src) {
-        hovered_item = getItemFromImg(hovered_item_img.src);
-        if (!hovered_item) {
-            hovered_status = getStatusFromImg(hovered_item_img.src);
+    if (img && img.src) {
+        if (!isStatus) {
+            hovered_item = getItemFromImg(img.src);
+        } else {
+            hovered_status = getStatusFromImg(img.src);
         }
-        broken = hovered_item_img.parentElement.parentElement.classList.contains('broken');
     }
 
-
-    //     for (let item of hovered) {
-    //         let hovered_item_img;
-    //         if (item.classList.contains('item-icon')) {
-    //             hovered_item_img = item.firstElementChild;
-    //             hovered_item_li = item.parentElement;
-    //         } else if (item.tagName.toLowerCase() === 'SPAN'.toLowerCase() && item.previousElementSibling && item.previousElementSibling.classList.contains('item-icon')) {
-    //             hovered_item_img = item.previousElementSibling?.firstElementChild;
-    //             hovered_item_li = item.parentElement;
-    //         } else if (item.tagName.toLowerCase() === 'LI'.toLowerCase()) {
-    //             hovered_item_img = item.firstElementChild?.firstElementChild;
-    //             hovered_item_li = item;
-    //         }
-    //         if (hovered_item_img && hovered_item_img.src) {
-    //             hovered_item = getItemFromImg(hovered_item_img.src);
-    //             broken = hovered_item_img.parentElement.parentElement.classList.contains('broken');
-    //         }
-    //     }
     return {
         item: hovered_item,
-        broken: broken,
-        li: hovered_item_li,
         status: hovered_status,
-        alt: hovered_item_img?.alt
+        alt: img?.alt
     };
 }
 
@@ -2406,19 +2380,28 @@ function getClickedItem(target) {
     }
 }
 
+function getFixedImagePath(img_src) {
+    const index = img_src.indexOf(hordes_img_url);
+    if (index === -1) {
+        console.warn(`Image source "${img_src}" does'nt include '${hordes_img_url}' as expected.`);
+        return;
+    }
+    return img_src
+        .slice(index + hordes_img_url.length)
+        .replace(/\/(.+)\.(\w+?)\.(\w+?)$/, '/$1.$3');
+}
+
 function getItemFromImg(img_src) {
     if (img_src) {
-        let index = img_src.indexOf(hordes_img_url);
-        img_src = img_src.slice(index).replace(hordes_img_url, '');
-        return items?.find((item) => item.img === fixMhCompiledImg(img_src));
+        const img_path = getFixedImagePath(img_src);
+        return items?.find((item) => item.img === img_path);
     }
 }
 
 function getStatusFromImg(img_src) {
     if (img_src) {
-        let index = img_src.indexOf(hordes_img_url);
-        img_src = img_src.slice(index).replace(hordes_img_url, '');
-        return status_list.find((status) => status.img === fixMhCompiledImg(img_src));
+        const img_path = getFixedImagePath(img_src);
+        return status_list.find((status) => status.img === img_path);
     }
 }
 
@@ -4024,7 +4007,6 @@ function getRecipeElement(recipe) {
     recipe_type_container.appendChild(recipe_type_img);
 
     let compos_container = document.createElement('ul');
-    compos_container.setAttribute('style', 'padding: 0; min-width: 200px; width: 25%;');
     recipe.components.forEach((compo) => {
         let compo_container = document.createElement('li');
 
@@ -5153,147 +5135,198 @@ function getWishlistForZone() {
     return used_wishlist;
 }
 
-/** Affiche les tooltips avancés */
-function displayAdvancedTooltips(count = 0) {
-    advanced_tooltips_observer?.disconnect();
-    if (mho_parameters.enhanced_tooltips && items) {
+/** @param {HTMLElement} tooltip_container */
+function enhanceTooltip(tooltip_container) {
+    if (!tooltip_container || tooltip_container.querySelector('.mho-advanced-tooltip')) return;
 
-        let hovered_tooltip_x_item_id;
-        const tooltips_container = document.querySelector('#tooltip_container');
-        if (!tooltips_container && count < 10) {
-            displayAdvancedTooltips(count + 1);
-            return;
+    let img = tooltip_container.querySelector('h1 > img');
+    const isStatus = !img;
+    if (isStatus) {
+        // on commence par essayer (*) de trouver l'icone pour éviter un observer
+        const label = tooltip_container.querySelector('h1').textContent.trim();
+        img = document.querySelector(`li.status > img[alt="${label}"]`);
+        if (!img) {
+            console.warn(`Icon not found for tooltip ${label}.`);
         }
+    }
+    if (img) {
+        const imgPath = getFixedImagePath(img.src);
+        if (!imgPath) return;
+        const eSameTooltip = document.querySelector(`.mho-advanced-tooltip[x-icon-path="${imgPath}"]`);
+        const isCloned = !!eSameTooltip;
+        let advanced_tooltip_container;
+        if (isCloned) {
+            advanced_tooltip_container = eSameTooltip.cloneNode(true);
+        } else {
+            let item_or_status = getTooltipItem(img, isStatus);
+            let item = item_or_status.item;
+            let status = item_or_status.status;
 
-        advanced_tooltips_observer = new MutationObserver((mutations) => {
-            mutations.forEach((mutation) => {
-                let tooltip_container = mutation.target;
-                if (!tooltip_container) return;
+            if (!item && !status) return;
 
-                if (mutation.type === 'attributes' && tooltip_container.classList.contains('tooltip') && tooltip_container.classList.contains('item') && !mutation.oldValue?.indexOf('block') > -1 && window.getComputedStyle(tooltip_container).display === 'block') {
+            const buildAdvancedTooltipContainer = () => {
+                const c = document.createElement('div');
+                c.classList.add('mho-advanced-tooltip');
+                c.setAttribute('x-icon-path', imgPath);
+                return c;
+            };
 
-                    let hovered = getHoveredItem();
-                    let hovered_item = hovered.item;
-                    let hovered_status = hovered.status;
+            if (item) {
+                let item_deco = tooltip_container.getElementsByClassName('item-tag-deco')[0];
+                let should_display_advanced_tooltip = item.recipes.length > 0 || item.actions || item.properties || (item_deco && item.deco > 0);
 
-                    if (!hovered_item && !hovered_status) return;
-
-                    let advanced_tooltip_container = tooltip_container.querySelector('#mho-advanced-tooltip');
-
-                    if (hovered_item) {
-
-                        let hovered_item_x_item_id = hovered.li.getAttribute('x-item-id');
-                        if (!hovered_tooltip_x_item_id && hovered_item?.recipes?.length > 0) {
-                            let tooltip_loading = tooltip_container.querySelector('.mho-tooltip-loading');
-                            if (!tooltip_loading) {
-                                tooltip_loading = document.createElement('img');
-                                tooltip_loading.classList.add('mho-tooltip-loading');
-                                tooltip_loading.style.position = 'absolute';
-                                tooltip_loading.style.left = '8px';
-                                tooltip_loading.style.top = '0';
-                                tooltip_container.querySelector('h1').appendChild(tooltip_loading);
-                                tooltip_loading.src = `${repo_img_hordes_url}anims/loading_wheel.gif`;
-                            } else {
-                                tooltip_loading.style.display = 'inline';
-                            }
-                            let timeout = setTimeout(() => {
-                                if (hovered_tooltip_x_item_id && hovered_tooltip_x_item_id === hovered_item_x_item_id) return;
-                                tooltip_loading.style.display = 'none';
-
-                                // Remove opened tooltips
-                                let current_tooltips_containers = document.querySelectorAll('.tooltip.item[style*="display: block"]');
-                                Array.from(current_tooltips_containers).forEach((container) => {
-                                    if (getItemFromImg(container.querySelector('h1 img')?.src)?.id !== hovered_item.id) {
-                                        container.style.display = 'none';
-                                    }
-                                });
-
-                                const controller = new AbortController();
-                                hovered_tooltip_x_item_id = hovered_item_x_item_id;
-                                tooltip_container.style.pointerEvents = 'all';
-                                hovered.li.addEventListener('mouseleave', function (event) {
-                                    event.stopImmediatePropagation();
-                                }, true, {signal: controller.signal});
-                                hovered.li.addEventListener('pointerleave', function (event) {
-                                    event.stopImmediatePropagation();
-                                }, true, {signal: controller.signal});
-
-                                let cancelHover = () => {
-                                    hovered_tooltip_x_item_id = undefined;
-                                    controller.abort();
-                                    tooltip_container.style.display = 'none';
-                                    tooltip_container.style.pointerEvents = 'none';
-                                    clearTimeout(timeout);
-                                }
-                                hovered.li.addEventListener('mouseout', (event) => {
-                                    setTimeout(() => {
-                                        if (!hovered_tooltip_x_item_id) return;
-                                        let all_hovered = document.querySelectorAll(':hover');
-                                        if (!Array.from(all_hovered).some((hovered_element) => hovered_element.classList.contains('tooltip') || hovered_element.getAttribute('x-item-id') === hovered_tooltip_x_item_id)) {
-                                            cancelHover();
-                                        }
-                                    }, 1000)
-                                }, true, {signal: controller.signal});
-                                tooltip_container.addEventListener('mouseleave', (event) => {
-                                    cancelHover();
-                                }, {signal: controller.signal});
-                                tooltip_container.addEventListener('pointerleave', (event) => {
-                                    cancelHover();
-                                }, {signal: controller.signal});
-                            }, 1000);
-                        }
-
-                        let item_deco = tooltip_container.getElementsByClassName('item-tag-deco')[0];
-                        let should_display_advanced_tooltip = hovered_item.recipes.length > 0 || hovered_item.actions || hovered_item.properties || (item_deco && hovered_item.deco > 0);
-
-                        if (should_display_advanced_tooltip) {
-
-                            if (!advanced_tooltip_container) {
-                                advanced_tooltip_container = document.createElement('div');
-                                advanced_tooltip_container.id = 'mho-advanced-tooltip';
-                                advanced_tooltip_container.setAttribute('style', 'margin-top: 0.5em; border-top: 1px solid;');
-
-                                tooltip_container.appendChild(advanced_tooltip_container);
-                            } else if (!advanced_tooltip_container.innerHTML) {
-                                createAdvancedProperties(advanced_tooltip_container, hovered_item, tooltip_container);
-                            }
-                        }
-                    } else {
-                        let item_deco = tooltip_container.getElementsByClassName('item-tag-deco')[0];
-                        let should_display_advanced_tooltip = hovered_status.watch_def !== undefined || hovered_status.watch_kills !== undefined;
-
-                        if (should_display_advanced_tooltip) {
-
-                            if (!advanced_tooltip_container) {
-                                advanced_tooltip_container = document.createElement('div');
-                                advanced_tooltip_container.id = 'mho-advanced-tooltip';
-                                advanced_tooltip_container.setAttribute('style', 'margin-top: 0.5em; border-top: 1px solid;');
-
-                                tooltip_container.appendChild(advanced_tooltip_container);
-                            } else if (!advanced_tooltip_container.innerHTML) {
-                                createAdvancedPropertiesStatus(advanced_tooltip_container, hovered_status, tooltip_container);
-                            }
-                        }
-
-
+                if (should_display_advanced_tooltip) {
+                    if (!advanced_tooltip_container) {
+                        advanced_tooltip_container = buildAdvancedTooltipContainer();
                     }
-
+                    if (!advanced_tooltip_container.innerHTML) {
+                        createAdvancedProperties(advanced_tooltip_container, item, tooltip_container);
+                    }
+                    addShiftHintToTooltip(tooltip_container, item);
                 }
-            });
+            } else {
+                let should_display_advanced_tooltip = status.watch_def !== undefined || status.watch_kills !== undefined;
+
+                if (should_display_advanced_tooltip) {
+
+                    if (!advanced_tooltip_container) {
+                        advanced_tooltip_container = buildAdvancedTooltipContainer();
+                    }
+                    if (!advanced_tooltip_container.innerHTML) {
+                        createAdvancedPropertiesStatus(advanced_tooltip_container, status, tooltip_container);
+                    }
+                }
+            }
+        }
+        if (advanced_tooltip_container) {
+            tooltip_container.appendChild(advanced_tooltip_container);
+        }
+        // console[isCloned ? 'debug' : 'warn'](`${isStatus ? 'STATUS a' : 'A'}jouté ${isCloned ? '(cloné) ' : ''}pour ${imgPath}`);
+    } else {
+        // (*) : Là il faudrait un observer sur le tooltip pour trouver l'icône liée au moment où il s'affiche
+        // mais en pratique la correspondance entre img.alt et h1.textContent fonctionne très bien donc pas besoin.
+    }
+}
+
+function addShiftHintToTooltip(tooltip_container, item) {
+    if (!item) return;
+    if (tooltip_container.querySelector('.mho-shift-hint')) return;
+
+    const h1 = tooltip_container.querySelector('h1');
+    if (!h1) return;
+
+    const hint = document.createElement('span');
+    hint.classList.add('mho-shift-hint');
+    hint.innerHTML = `<kbd>⇧</kbd>`;
+
+    const separator = document.createElement('div');
+    separator.style.flex = '1';
+
+    h1.prepend(hint, separator);
+}
+
+function observeNewTooltips(tries = 10) {
+    if (advanced_tooltips_observer) return;
+    const tooltip_container = document.querySelector('#tooltip_container');
+    if (!tooltip_container) {
+        if (tries > 0) {
+            setTimeout(observeNewTooltips, 100, tries - 1);
+        } else {
+            console.warn('tooltip_container not found');
+        }
+        return;
+    }
+    advanced_tooltips_observer = new MutationObserver((records, observer) => {
+        for (const record of records) {
+            for (const node of record.addedNodes) {
+                if (node instanceof HTMLElement && node.classList.contains('item')) {
+                    enhanceTooltip(node);
+                }
+            }
+        }
+    });
+    advanced_tooltips_observer.observe(tooltip_container, {childList: true});
+}
+
+/** Affiche les tooltips avancés */
+function displayAdvancedTooltips() {
+    if (mho_parameters.enhanced_tooltips && items) {
+        initTooltipFreezeOnShift()
+        // observation des bulles qui apparaîtront plus tard
+        observeNewTooltips();
+        // traitement des bulles déjà présentes
+        document.querySelectorAll('#tooltip_container > .item').forEach(function (element) {
+            enhanceTooltip(element);
         });
+    }
+}
 
-        const config = {
-            attributes: true,
-            subtree: true,
-            childList: false,
-            attributeFilter: ['style'],
-            attributeOldValue: true
-        };
+function initTooltipFreezeOnShift() {
+    if (initTooltipFreezeOnShift._initialized) return;
+    initTooltipFreezeOnShift._initialized = true;
 
-        // Observer chaque enfant direct de tooltipsBlock
-        advanced_tooltips_observer.observe(tooltips_container, config);
+    let frozenTooltip = null;
+    let freezeObserver = null;
+    let frozenStyle = null;
+
+    function setHintFrozen(tooltip_container, frozen) {
+        const hint = tooltip_container?.querySelector('.mho-shift-hint');
+        if (!hint) return;
+        hint.innerHTML = frozen
+            ? `<img src="${repo_img_hordes_url}icons/b_close.png" alt="close">`
+            : `<kbd>⇧</kbd>`;
+
+        if (hint) {
+            hint.addEventListener('click', (e) => {
+                e.stopPropagation();
+                unfreeze();
+            }, {once: true});
+        }
     }
 
+    function unfreeze() {
+        if (!frozenTooltip) return;
+        setHintFrozen(frozenTooltip, false);
+        freezeObserver?.disconnect();
+        freezeObserver = null;
+        const tooltip = frozenTooltip;
+        frozenTooltip = null;
+        frozenStyle = null;
+        tooltip.setAttribute('style', '');
+        tooltip.classList.remove('mho-frozen');
+    }
+
+    function freezeCurrentTooltip() {
+        const container = document.getElementById('tooltip_container');
+        if (!container) return;
+
+        const visibleTooltip = [...container.querySelectorAll('.item')].find(el => el.style.display === 'block');
+        if (!visibleTooltip) return;
+
+        if (visibleTooltip === frozenTooltip) return;
+
+        unfreeze();
+
+        visibleTooltip.classList.add('mho-frozen');
+        frozenTooltip = visibleTooltip;
+        frozenStyle = frozenTooltip.getAttribute('style');
+
+        setHintFrozen(frozenTooltip, true);
+
+        freezeObserver = new MutationObserver(() => {
+            if (frozenTooltip && frozenTooltip.style.display !== 'block') {
+                frozenTooltip.setAttribute('style', frozenStyle);
+            }
+        });
+
+        freezeObserver.observe(frozenTooltip, {attributes: true, attributeFilter: ['style']});
+    }
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Shift') {
+            freezeCurrentTooltip();
+        }
+    });
 }
 
 function createAdvancedProperties(content, item, tooltip) {
@@ -5366,9 +5399,6 @@ function createAdvancedProperties(content, item, tooltip) {
     if (item.recipes.length === 0) return;
 
     if (item.recipes.length > 0) {
-        if (tooltip) {
-            tooltip.classList.add('large-tooltip');
-        }
         let item_recipes = document.createElement('div');
         item_recipes.classList.add('recipe');
         item_recipes.style.maxHeight = '250px';
@@ -8630,7 +8660,7 @@ function createStyles() {
     .mho-window:not(.visible), #${mh_optimizer_map_window_id}:not(.visible) {
         opacity: 0;
         pointer-events: none;
-        }
+    }
     .mho-window:not(.visible) .mho-window-box, .mho-window:not(.visible) #${mh_optimizer_map_window_id}-box {
         transform: scale(0) translateY(1000px);
     }
@@ -8898,24 +8928,55 @@ function createStyles() {
         + 'justify-content: space-between;'
         + '}';
 
-    const advanced_tooltip_recipe_li = '#mho-advanced-tooltip > div.recipe > li, #item-list > li.selected > .properties > .recipe > li {'
-        + 'display: flex;'
-        + 'padding: 0.25em 0;'
-        + '}';
+    const advanced_tooltip = `
+        .mho-advanced-tooltip {
+            margin-top: 0.5em;
+            border-top: 1px solid
+        }
 
-    const item_recipe_li = '#item-list > li.selected > .properties > .recipe > li:not(:last-child) {'
-        + 'border-bottom: 1px dotted white;'
-        + '}';
+        .mho-advanced-tooltip > div.recipe > li > ul {
+            padding: 0;
+            flex: 1;
+        }
 
-    const advanced_tooltip_recipe_li_ul = '#mho-advanced-tooltip > div.recipe > li > ul {'
-        + 'min-width: 0 !important;'
-        + 'width: calc(100% - 15px) !important;'
-        + '}';
+        .mho-advanced-tooltip > div.recipe > li, #item-list > li.selected > .properties > .recipe > li {
+            display: flex;
+            padding: 0.25em 0;
+        }
 
-    const large_tooltip = 'div.large-tooltip {'
-        + 'width: 400px !important;'
-        + 'max-width: 400px !important'
-        + '}';
+        #item-list > li.selected > .properties > .recipe > li:not(:last-child) {
+            border-bottom: 1px dotted white;
+        }
+
+        div.tooltip.item:has(.recipe) {
+            width: 400px !important;
+            max-width: 400px !important;
+        }
+        .mho-frozen {
+            pointer-events: all !important;
+        }
+        .mho-shift-hint {
+            display: inline-flex;
+            align-items: center;
+            gap: 2px;
+            margin-right: 6px;
+            opacity: 0.6;
+            font-size: 0.75em;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+        .mho-shift-hint kbd {
+            border: 1px solid #f0d79e;
+            border-radius: 3px;
+            padding: 0 3px;
+            font-family: inherit;
+            line-height: 1.4;
+            background: rgba(240,215,158,0.15);
+        }
+        .mho-shift-hint:has(img) {
+            margin-top: -6px;
+        }
+    `;
 
     const item_priority = `
         li.item[class^='priority_in'], li.item[class*=' priority_in'], img[class^='priority_in'], img[class*=' priority_in'] {
@@ -9103,7 +9164,7 @@ function createStyles() {
         + mho_window_style_tabs + tab_content_style + tab_content_item_list_style + tab_content_item_list_item_style + tab_content_item_list_item_selected_style + tab_content_item_list_item_not_selected_properties_style + item_category
         + parameters_informations_ul_style + li_style + recipe_style + input_number_webkit_style + input_number_firefox_style
         + mho_table_style + mho_table_header_style + mho_table_row_style + mho_table_cells_style + mho_table_cells_td_style + label_text
-        + item_title_style + add_to_wishlist_button_img_style + advanced_tooltip_recipe_li + item_recipe_li + advanced_tooltip_recipe_li_ul + large_tooltip + item_list_element_style
+        + item_title_style + add_to_wishlist_button_img_style + advanced_tooltip + item_list_element_style
         + wishlist_label + wishlist_header + wishlist_header_cell + wishlist_cols + wishlist_delete + wishlist_in_app + wishlist_in_app_item + wishlist_even
         + item_priority + item_tag_food + item_tag_load + item_tag_hero + item_tag_smokebomb + item_tag_alcohol + item_tag_drug
         + display_map_btn + mho_map_td + mho_ruin_td + dotted_background + empty_bat_before_after + empty_bat_after + camping_spaced_label + citizen_list_more_info_content
