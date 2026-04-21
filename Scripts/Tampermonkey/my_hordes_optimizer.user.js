@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MHO Addon
-// @version      1.1.29.0
+// @version      1.1.30.0
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/, rubrique Tutoriels
 // @author       Zerah
 //
@@ -32,7 +32,10 @@
 // ==/UserScript==
 
 const changelog = `${getScriptInfo().name} : Changelog pour la version ${getScriptInfo().version}\n\n`
-    + `[Correctif] Changement de comportement complet pour le tooltip amélioré pour en fluidifier et corriger l'usage. Merci Emmet pour le coup de main\n`;
+    + `[Correctif] Changement de comportement complet pour le tooltip amélioré pour en fluidifier et corriger l'usage. Merci Emmet pour le coup de main\n`
+    + `[Correctif] Meilleur affichage des boutons "Wiki" et "Outils" du tooltip\n\n`
+    + `[Nouveauté] Personnalisation des informations affichées dans le tooltip via des options distinctes\n`
+    + `[Nouveauté] Ajout de la traduction sur les tooltips des objets\n`;
 
 const lang = (document.querySelector('html[lang]')?.getAttribute('lang') || document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2) || 'fr';
 
@@ -64,6 +67,13 @@ const gest_hordes_old_url = 'https://gest-hordes2.eragaming.fr';
 const gest_hordes_url = 'https://gesthordes.fr';
 const big_broth_hordes_url = 'https://bbh.fred26.fr';
 const fata_morgana_url = 'https://fatamorgana.md26.eu';
+
+const supported_languages = [
+    {value: 'de', img: '🇩🇪'},
+    {value: 'en', img: '🇬🇧'},
+    {value: 'es', img: '🇪🇸'},
+    {value: 'fr', img: '🇫🇷'},
+];
 
 const gm_bbh_updated_key = 'MHO_bbh_updated';
 const gm_gh_updated_key = 'MHO_gh_updated';
@@ -115,7 +125,6 @@ const mh_content_id = 'content';
 const mh_update_external_tools_id = 'mh-update-external-tools';
 const mho_warn_missing_logs_id = 'mho-warn-missing-logs';
 const mho_camping_predict_id = 'mho-camping-predict';
-const wiki_btn_id = 'wiki-btn-id';
 const zone_info_zombies_id = 'zone-info-zombies';
 const nb_dead_zombies_id = 'nb-dead-zombies';
 const despair_deaths_id = 'despair-deaths';
@@ -1460,6 +1469,102 @@ let params_categories = [
                     de: `Detaillierte Tooltips`,
                     es: `Tooltips detallados`
                 },
+                children: [
+                    {
+                        id: `enhanced_tooltips_items`,
+                        label: {
+                            en: `Items`,
+                            fr: `Objets`,
+                            de: `Gegenstände`,
+                            es: `Objetos`
+                        },
+                        children: [
+                            {
+                                id: `enhanced_tooltips_item_quantities`,
+                                label: {
+                                    en: `Bank quantity & wishlist`,
+                                    fr: `Quantité en banque & liste de courses`,
+                                    de: `Bankbestand & Wunschzettel`,
+                                    es: `Cantidad en banco & lista de deseos`
+                                },
+                            },
+                            {
+                                id: `enhanced_tooltips_item_properties`,
+                                label: {
+                                    en: `Properties`,
+                                    fr: `Propriétés`,
+                                    de: `Eigenschaften`,
+                                    es: `Propiedades`
+                                },
+                            },
+                            {
+                                id: `enhanced_tooltips_item_actions`,
+                                label: {
+                                    en: `Actions`,
+                                    fr: `Actions`,
+                                    de: `Aktionen`,
+                                    es: `Acciones`
+                                },
+                            },
+                            {
+                                id: `enhanced_tooltips_item_recipes`,
+                                label: {
+                                    en: `Recipes`,
+                                    fr: `Recettes`,
+                                    de: `Rezepte`,
+                                    es: `Transformaciones`
+                                },
+                            },
+                            {
+                                id: `enhanced_tooltips_item_translations`,
+                                label: {
+                                    en: `Translations`,
+                                    fr: `Traductions`,
+                                    de: `Übersetzungen`,
+                                    es: `Traducciones`
+                                },
+                            },
+                        ]
+                    },
+                    {
+                        id: `enhanced_tooltips_statuses`,
+                        label: {
+                            en: `Statuses`,
+                            fr: `États`,
+                            de: `Status`,
+                            es: `Estatus`
+                        },
+                        children: [
+                            {
+                                id: `enhanced_tooltips_status_watch`,
+                                label: {
+                                    en: `Informations about night watch`,
+                                    fr: `Informations à propos de la veille`,
+                                    de: `Informationen zur Wache`,
+                                    es: `Información sobre la guardia`
+                                },
+                            },
+                            {
+                                id: `enhanced_tooltips_status_searches`,
+                                label: {
+                                    en: `Search success modifier`,
+                                    fr: `Modificateur de réussite des fouilles`,
+                                    de: `Modifikator für Grabungserfolg`,
+                                    es: `Modificador de éxito en excavaciones`
+                                },
+                            },
+                            {
+                                id: `enhanced_tooltips_status_properties`,
+                                label: {
+                                    en: `Status properties`,
+                                    fr: `Propriétés de l'état`,
+                                    de: `Status-Eigenschaften`,
+                                    es: `Propiedades del estado`
+                                },
+                            }
+                        ]
+                    },
+                ]
             },
             {
                 id: `display_search_fields`,
@@ -2659,12 +2764,8 @@ function createOptimizerButtonContent() {
         content.appendChild(btn_content);
 
         let wiki_btn = document.createElement('a');
-        wiki_btn.classList.add('button');
-        wiki_btn.style.marginTop = 0;
-        wiki_btn.style.textAlign = 'center';
+        wiki_btn.classList.add('button', 'mho-parameters-btn');
         wiki_btn.innerText = 'Wiki';
-        wiki_btn.id = wiki_btn_id;
-
         wiki_btn.addEventListener('click', () => {
             displayWindow('wiki');
         });
@@ -2672,9 +2773,7 @@ function createOptimizerButtonContent() {
         btn_content.appendChild(wiki_btn);
 
         let tools_btn = document.createElement('a');
-        tools_btn.classList.add('button');
-        tools_btn.style.marginTop = 0;
-        tools_btn.style.textAlign = 'center';
+        tools_btn.classList.add('button', 'mho-parameters-btn');
         tools_btn.innerText = getI18N(texts.tools_btn_label);
         tools_btn.addEventListener('click', () => {
             displayWindow('tools');
@@ -2759,16 +2858,8 @@ function createParams(content) {
     params_title.appendChild(params_title_select_all);
 
     params_title_select_all.addEventListener('click', () => {
-        let first_level_checkboxes = Array.from(categories_container.querySelectorAll('input.mho-first-level-param[type=checkbox]:not(:checked)'));
-        first_level_checkboxes.forEach((checkbox) => {
-            checkbox.click();
-        })
-        setTimeout(() => {
-            let second_level_checkboxes = Array.from(categories_container.querySelectorAll('input.mho-second-level-param[type=checkbox]:not(:checked)'));
-            second_level_checkboxes.forEach((checkbox) => {
-                checkbox.click();
-            })
-        })
+        let unchecked = Array.from(categories_container.querySelectorAll('input.mho-param[type=checkbox]:not(:checked)'));
+        unchecked.forEach((checkbox) => checkbox.click());
     });
 
     let categories_list = document.createElement('ul');
@@ -2787,177 +2878,277 @@ function createParams(content) {
         category_container.appendChild(category_content);
 
         category.params.forEach((param) => {
-            let param_children = param.children;
-
-            let param_container = document.createElement('li');
-            param_container.id = param.id;
-            category_content.appendChild(param_container);
-
-            let param_with_help = document.createElement('div');
-            param_with_help.style.display = 'flex';
-            param_with_help.style.alignItems = 'center';
-            param_with_help.style.justifyContent = 'space-between';
-            param_container.appendChild(param_with_help);
-
-            let param_input_div = document.createElement('div');
-            param_input_div.style.display = 'flex';
-            param_input_div.style.alignItems = 'center';
-            param_with_help.appendChild(param_input_div);
-
-            let param_input = document.createElement('input');
-            param_input.type = 'checkbox';
-            param_input.id = param.id + '_input';
-            param_input.classList.add('mho-input', 'mho-first-level-param');
-            param_input.checked = mho_parameters && mho_parameters[param.id] ? mho_parameters[param.id] : false;
-            param_input_div.appendChild(param_input);
-
-            let param_label = document.createElement('label');
-            param_label.classList.add('small');
-            param_label.htmlFor = window.innerWidth > 1000 ? param.id + '_input' : '';
-            param_label.innerText = getI18N(param.label);
-            param_input_div.appendChild(param_label);
+            createParamItem(param, category_content, 0);
+        });
+    });
+}
 
 
-            if (param.help) {
-                let param_help = createHelpButton(getI18N(param.help));
-                param_with_help.appendChild(param_help);
+/**
+ * Crée récursivement un élément de paramètre et ses enfants
+ * @param {object} param        Le paramètre à afficher
+ * @param {HTMLElement} parent  Le conteneur parent (ul)
+ * @param {number} depth        La profondeur actuelle (0 = premier niveau)
+ */
+function createParamItem(param, parent, depth) {
+    const has_children = param.children && param.children.length > 0;
+    const is_touch = isTouchScreen();
+
+    let param_container = document.createElement('li');
+    param_container.id = param.id;
+    parent.appendChild(param_container);
+
+    // Ligne principale : checkbox + label + help
+    let param_row = document.createElement('div');
+    param_row.style.display = 'flex';
+    param_row.style.alignItems = 'center';
+    param_row.style.justifyContent = 'space-between';
+    param_container.appendChild(param_row);
+
+    let param_input_div = document.createElement('div');
+    param_input_div.style.display = 'flex';
+    param_input_div.style.alignItems = 'center';
+    param_input_div.style.flex = '1';
+    param_row.appendChild(param_input_div);
+
+    let param_input = document.createElement('input');
+    param_input.type = 'checkbox';
+    param_input.id = param.id + '_input';
+    param_input.classList.add('mho-input', 'mho-param');
+    param_input.checked = mho_parameters?.[param.id] ?? false;
+    param_input_div.appendChild(param_input);
+
+    let param_label = document.createElement('label');
+    param_label.classList.add('small');
+    // Sur mobile on ne lie pas le label à l'input (le clic label = toggle expand, pas check)
+    param_label.htmlFor = (!is_touch && window.innerWidth > 1000) ? param.id + '_input' : '';
+    param_label.innerText = getI18N(param.label);
+    param_label.style.flex = '1';
+    param_input_div.appendChild(param_label);
+
+    // Flèche indicateur enfants (mobile uniquement)
+    let arrow_indicator = null;
+    if (has_children && is_touch) {
+        arrow_indicator = document.createElement('span');
+        arrow_indicator.classList.add('mho-param-arrow');
+        arrow_indicator.style.marginLeft = '0.5em';
+        arrow_indicator.style.transition = 'transform 0.2s';
+        arrow_indicator.style.display = param_input.checked ? 'inline' : 'none';
+        arrow_indicator.innerText = '▶';
+        param_input_div.appendChild(arrow_indicator);
+    }
+
+    if (param.help) {
+        param_row.appendChild(createHelpButton(getI18N(param.help)));
+    }
+
+    if (!has_children) {
+        param_input.addEventListener('change', (event) => {
+            updateParam(param.id, event.target.checked);
+            initOptionsWithLoginNeeded();
+            initOptionsWithoutLoginNeeded();
+        });
+        return;
+    }
+
+    // Conteneur enfants
+    let children_container = document.createElement('ul');
+    children_container.style.listStyle = 'none';
+    children_container.style.display = 'none';
+    param_container.appendChild(children_container);
+
+    param.children.forEach((child) => {
+        createParamItem(child, children_container, depth + 1);
+    });
+
+    // ── MOBILE ──────────────────────────────────────────────────────────────
+    if (is_touch) {
+        children_container.style.paddingLeft = '1em';
+        children_container.style.paddingRight = '0';
+
+        let is_expanded = false;
+
+        const expand = () => {
+            is_expanded = true;
+            children_container.style.display = 'block';
+            if (arrow_indicator) {
+                arrow_indicator.style.transform = 'rotate(90deg)';
             }
+        };
 
-            if (param_children && param_children.length > 0) {
-
-                if (param_input.checked) {
-                    param_container.classList.add('param-has-children');
-                }
-                let children_container = document.createElement('ul');
-                children_container.style.listStyle = 'none';
-                children_container.style.display = 'none';
-                param_container.appendChild(children_container);
-
-                if (window.innerWidth > 1000) {
-                    children_container.style.width = '300px';
-                    children_container.style.padding = '0.25em';
-                    children_container.style.position = 'absolute';
-                    children_container.style.backgroundColor = '#5c2b20';
-                    children_container.style.border = '1px solid #f0d79e';
-                    children_container.style.outline = '1px solid #000';
-
-                    param_container.addEventListener('mouseenter', () => {
-                        children_container.style.left = buttonOptimizerElement().getBoundingClientRect().width - 7 + 'px';
-                        children_container.style.top = param_container.getBoundingClientRect().top - 10 + 'px';
-                    });
-                } else {
-                    children_container.style.paddingLeft = '1em';
-                }
-
-                let mousein = false;
-
-                param_container.addEventListener('mouseenter', () => {
-                    mousein = true;
-                    if (param_input.checked) {
-                        children_container.style.display = 'block';
-                    }
-                });
-
-                param_container.addEventListener('mouseleave', () => {
-                    mousein = false;
-                    setTimeout(() => {
-                        if (!mousein) {
-                            children_container.style.display = 'none';
-                        }
-                    }, 250);
-                });
-
-                param_children.forEach((param_child) => {
-                    let child_container = document.createElement('li');
-                    child_container.id = param_child.id;
-                    children_container.appendChild(child_container);
-
-                    let child_with_help = document.createElement('div');
-                    child_with_help.style.display = 'flex';
-                    child_with_help.style.alignItems = 'center';
-                    child_with_help.style.justifyContent = 'space-between';
-                    child_container.appendChild(child_with_help);
-
-                    let child_input_div = document.createElement('div');
-                    child_input_div.style.display = 'flex';
-                    child_input_div.style.alignItems = 'center';
-                    child_with_help.appendChild(child_input_div);
-
-                    let child_param_input = document.createElement('input');
-                    child_param_input.type = 'checkbox';
-                    child_param_input.id = param_child.id + '_input';
-                    child_param_input.classList.add('mho-input', 'mho-second-level-param');
-                    child_param_input.checked = mho_parameters && mho_parameters[param_child.id] ? mho_parameters[param_child.id] : false;
-                    child_input_div.appendChild(child_param_input);
-
-                    let child_param_label = document.createElement('label');
-                    child_param_label.classList.add('small');
-                    child_param_label.htmlFor = param_child.id + '_input';
-                    child_param_label.innerText = getI18N(param_child.label);
-                    child_input_div.appendChild(child_param_label);
-
-                    if (param_child.help) {
-                        let child_param_help = createHelpButton(getI18N(param_child.help));
-                        child_with_help.appendChild(child_param_help);
-                    }
-
-                    child_param_input.addEventListener('change', (event) => {
-                        let new_params;
-                        if (!mho_parameters) {
-                            new_params = {};
-                        } else {
-                            new_params = mho_parameters;
-                        }
-                        new_params[param_child.id] = event.target.checked;
-                        setStorageItem(mho_parameters_key, new_params);
-                        getStorageItem(mho_parameters_key).then((saved_params) => {
-                            mho_parameters = saved_params;
-                        });
-                        // Quand on change une option, trigger à nouveau certaines vérifications pour ne pas avoir à les vérifier tout le temps (=> perf !)
-                        initOptionsWithLoginNeeded();
-                        initOptionsWithoutLoginNeeded();
-
-                    });
-                })
-
+        const collapse = () => {
+            is_expanded = false;
+            children_container.style.display = 'none';
+            if (arrow_indicator) {
+                arrow_indicator.style.transform = 'rotate(0deg)';
             }
-            param_input.addEventListener('change', (event) => {
-                let new_params;
-                if (!mho_parameters) {
-                    new_params = {};
-                } else {
-                    new_params = mho_parameters;
-                }
-                new_params[param.id] = event.target.checked;
+        };
 
-                /** Si l'option a des "enfants" alors on les affiche uniquement si elle est cochée et on coche / décoche les enfants en fonction de la coche du parent */
-                if (param_children && param_children.length > 0) {
-                    let children_container = param_container.querySelector('ul');
-                    param_children.forEach((param_child) => {
-                        new_params[param_child.id] = event.target.checked;
-                        let child_input = document.querySelector(`#${param_child.id}_input`);
-                        child_input.checked = event.target.checked;
-                    });
-                    if (event.target.checked) {
-                        param_container.classList.add('param-has-children');
-                        children_container.style.display = 'block';
-                    } else {
-                        param_container.classList.remove('param-has-children');
-                        children_container.style.display = 'none';
-                    }
-                }
-
-                setStorageItem(mho_parameters_key, new_params);
-                getStorageItem(mho_parameters_key).then((saved_params) => {
-                    mho_parameters = saved_params;
-                });
-
-                // Quand on change une option, trigger à nouveau certaines vérifications pour ne pas avoir à les vérifier tout le temps (=> perf !)
+        // Clic sur le label : toggle expand (seulement si coché)
+        param_label.style.cursor = 'pointer';
+        param_label.addEventListener('click', (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            if (!param_input.checked) {
+                // Cocher l'input
+                param_input.checked = true;
+                updateParam(param.id, true);
+                setParamChildrenChecked(param, true);
+                syncChildInputs(param, true);
+                if (arrow_indicator) arrow_indicator.style.display = 'inline';
+                // Ne pas expand ici, juste cocher
                 initOptionsWithLoginNeeded();
                 initOptionsWithoutLoginNeeded();
-            });
+            } else {
+                // Toggle expand/collapse
+                if (is_expanded) {
+                    collapse();
+                } else {
+                    expand();
+                }
+            }
         });
 
+        // Changement direct de l'input (clic sur la checkbox elle-même)
+        param_input.addEventListener('change', (event) => {
+            const checked = event.target.checked;
+            updateParam(param.id, checked);
+            setParamChildrenChecked(param, checked);
+            syncChildInputs(param, checked);
+
+            if (!checked) {
+                collapse();
+                if (arrow_indicator) arrow_indicator.style.display = 'none';
+            } else {
+                if (arrow_indicator) arrow_indicator.style.display = 'inline';
+            }
+
+            initOptionsWithLoginNeeded();
+            initOptionsWithoutLoginNeeded();
+        });
+
+        // ── DESKTOP ─────────────────────────────────────────────────────────────
+    } else {
+        children_container.style.zIndex = String(10 + depth);
+        children_container.style.width = '300px';
+        children_container.style.padding = '0.25em';
+        children_container.style.backgroundColor = '#5c2b20';
+        children_container.style.border = '1px solid #f0d79e';
+        children_container.style.outline = '1px solid #000';
+
+        if (param_input.checked) {
+            param_container.classList.add('param-has-children');
+        }
+
+        const showTooltip = () => {
+            positionTooltip();
+            children_container.style.display = 'block';
+        };
+
+        const hideTooltip = () => {
+            children_container.style.display = 'none';
+        };
+
+        const positionTooltip = () => {
+            const rect = param_container.getBoundingClientRect();
+            const children_width = 300;
+            const space_right = window.innerWidth - rect.right;
+
+            children_container.style.position = 'fixed';
+
+            if (space_right >= children_width) {
+                // Assez de place à droite → tooltip flottant
+                children_container.style.position = 'fixed';
+                children_container.style.left = rect.right + 'px';
+                children_container.style.top = rect.top - 5 + 'px';
+                children_container.style.paddingLeft = '0.25em';
+                children_container.style.width = '300px';
+            } else {
+                // Pas assez de place → comportement mobile inline
+                children_container.style.position = 'relative';
+                children_container.style.left = '';
+                children_container.style.top = '';
+                children_container.style.paddingLeft = '1em';
+                children_container.style.width = '100%';
+            }
+        };
+
+        let mousein = false;
+
+        const onMouseEnter = () => {
+            mousein = true;
+            if (param_input.checked) {
+                showTooltip();
+            }
+        };
+
+        const onMouseLeave = () => {
+            mousein = false;
+            setTimeout(() => {
+                if (!mousein) hideTooltip();
+            }, 250); // délai augmenté
+        };
+
+        param_container.addEventListener('mouseenter', onMouseEnter);
+        param_container.addEventListener('mouseleave', onMouseLeave);
+        children_container.addEventListener('mouseenter', onMouseEnter);
+        children_container.addEventListener('mouseleave', onMouseLeave);
+
+        param_input.addEventListener('change', (event) => {
+            const checked = event.target.checked;
+            updateParam(param.id, checked);
+            setParamChildrenChecked(param, checked);
+            syncChildInputs(param, checked);
+
+            if (checked) {
+                param_container.classList.add('param-has-children');
+            } else {
+                param_container.classList.remove('param-has-children');
+                hideTooltip();
+            }
+
+            initOptionsWithLoginNeeded();
+            initOptionsWithoutLoginNeeded();
+        });
+    }
+}
+
+/** Synchronise visuellement les checkboxes enfants dans le DOM */
+function syncChildInputs(param, checked) {
+    if (!param.children) return;
+    param.children.forEach((child) => {
+        const input = document.querySelector(`#${child.id}_input`);
+        if (input) input.checked = checked;
+        syncChildInputs(child, checked);
+    });
+}
+
+/**
+ * Met à jour un paramètre en storage
+ * @param {string} id
+ * @param {boolean} value
+ */
+function updateParam(id, value) {
+    if (!mho_parameters) mho_parameters = {};
+    mho_parameters[id] = value;
+    setStorageItem(mho_parameters_key, mho_parameters);
+    getStorageItem(mho_parameters_key).then((saved) => {
+        mho_parameters = saved;
+    });
+}
+
+/**
+ * Coche/décoche récursivement tous les descendants d'un paramètre
+ * @param {object} param
+ * @param {boolean} checked
+ */
+function setParamChildrenChecked(param, checked) {
+    if (!param.children) return;
+    param.children.forEach((child) => {
+        updateParam(child.id, checked);
+        let child_input = document.querySelector(`#${child.id}_input`);
+        if (child_input) child_input.checked = checked;
+        setParamChildrenChecked(child, checked);
     });
 }
 
@@ -5173,7 +5364,13 @@ function enhanceTooltip(tooltip_container) {
 
             if (item) {
                 let item_deco = tooltip_container.getElementsByClassName('item-tag-deco')[0];
-                let should_display_advanced_tooltip = item.recipes.length > 0 || item.actions || item.properties || (item_deco && item.deco > 0);
+                let should_display_advanced_tooltip =
+                    (mho_parameters.enhanced_tooltips_item_quantities && tooltip_container) ||
+                    (mho_parameters.enhanced_tooltips_item_properties && item.properties) ||
+                    (mho_parameters.enhanced_tooltips_item_actions && item.actions) ||
+                    (mho_parameters.enhanced_tooltips_item_recipes && item.recipes.length > 0) ||
+                    (mho_parameters.enhanced_tooltips_item_translations)
+                    (item_deco && item.deco > 0);
 
                 if (should_display_advanced_tooltip) {
                     if (!advanced_tooltip_container) {
@@ -5182,18 +5379,21 @@ function enhanceTooltip(tooltip_container) {
                     if (!advanced_tooltip_container.innerHTML) {
                         createAdvancedProperties(advanced_tooltip_container, item, tooltip_container);
                     }
-                    addShiftHintToTooltip(tooltip_container, item);
+                    addFreezeHintsToTooltip(tooltip_container, item);
                 }
             } else {
-                let should_display_advanced_tooltip = status.watch_def !== undefined || status.watch_kills !== undefined;
+                let should_display_advanced_tooltip =
+                    (mho_parameters.enhanced_tooltips_status_watch && (status.watch_def !== undefined || status.watch_kills !== undefined)) ||
+                    (mho_parameters.enhanced_tooltips_status_searches && status.searches !== undefined) ||
+                    (mho_parameters.enhanced_tooltips_status_properties && status.properties?.length > 0) ||
+                    (mho_parameters.enhanced_tooltips_status_translations);
 
                 if (should_display_advanced_tooltip) {
-
                     if (!advanced_tooltip_container) {
                         advanced_tooltip_container = buildAdvancedTooltipContainer();
                     }
                     if (!advanced_tooltip_container.innerHTML) {
-                        createAdvancedPropertiesStatus(advanced_tooltip_container, status, tooltip_container);
+                        createAdvancedStatus(advanced_tooltip_container, status, tooltip_container);
                     }
                 }
             }
@@ -5208,21 +5408,26 @@ function enhanceTooltip(tooltip_container) {
     }
 }
 
-function addShiftHintToTooltip(tooltip_container, item) {
+function addFreezeHintsToTooltip(tooltip_container, item) {
     if (!item) return;
     if (tooltip_container.querySelector('.mho-shift-hint')) return;
 
     const h1 = tooltip_container.querySelector('h1');
     if (!h1) return;
 
-    const hint = document.createElement('span');
-    hint.classList.add('mho-shift-hint');
-    hint.innerHTML = `<kbd>⇧</kbd>`;
+    const shift = document.createElement('kbd');
+    shift.classList.add('mho-shift-hint');
+    shift.innerText = `⇧`;
+
+    const close = document.createElement('img');
+    close.classList.add('mho-close-hint');
+    close.src = `${repo_img_hordes_url}icons/b_close.png"`;
+    close.alt = `close`;
 
     const separator = document.createElement('div');
     separator.style.flex = '1';
 
-    h1.prepend(hint, separator);
+    h1.prepend(shift, close, separator);
 }
 
 function observeNewTooltips(tries = 10) {
@@ -5270,18 +5475,13 @@ function initTooltipFreezeOnShift() {
     let frozenStyle = null;
 
     function setHintFrozen(tooltip_container, frozen) {
-        const hint = tooltip_container?.querySelector('.mho-shift-hint');
-        if (!hint) return;
-        hint.innerHTML = frozen
-            ? `<img src="${repo_img_hordes_url}icons/b_close.png" alt="close">`
-            : `<kbd>⇧</kbd>`;
+        const close = tooltip_container?.querySelector('.mho-close-hint');
+        if (!close) return;
 
-        if (hint) {
-            hint.addEventListener('click', (e) => {
-                e.stopPropagation();
-                unfreeze();
-            }, {once: true});
-        }
+        close.addEventListener('click', (e) => {
+            e.stopPropagation();
+            unfreeze();
+        }, {once: true});
     }
 
     function unfreeze() {
@@ -5292,7 +5492,7 @@ function initTooltipFreezeOnShift() {
         const tooltip = frozenTooltip;
         frozenTooltip = null;
         frozenStyle = null;
-        tooltip.setAttribute('style', '');
+        tooltip.removeAttribute('style');
         tooltip.classList.remove('mho-frozen');
     }
 
@@ -5335,7 +5535,8 @@ function createAdvancedProperties(content, item, tooltip) {
         item_deco = tooltip.getElementsByClassName('item-tag-deco')[0];
     }
     content.innerHtml = '';
-    if (tooltip) {
+
+    if (tooltip && mho_parameters.enhanced_tooltips_items_quantities) {
         let stock_div = document.createElement('div');
         content.appendChild(stock_div);
         stock_div.style.display = 'flex';
@@ -5350,25 +5551,34 @@ function createAdvancedProperties(content, item, tooltip) {
         stock_div.appendChild(bank_div);
 
         let wishlist_for_zone = getWishlistForZone();
-        let item_in_wishlist = wishlist_for_zone?.find((item_in_wishlist_for_zone) => item.id === item_in_wishlist_for_zone.item.id);
+        let item_in_wishlist = wishlist_for_zone?.find((iwfz) => item.id === iwfz.item.id);
 
-        if (item_in_wishlist && item_in_wishlist.item.wishListCount && item_in_wishlist.item.wishListCount > 0) {
+        if (item_in_wishlist?.item.wishListCount > 0) {
             let wishlist_wanted_div = document.createElement('div');
             wishlist_wanted_div.style.width = 'calc(50% - 0.5em)';
-            stock_div.appendChild(wishlist_wanted_div);
             wishlist_wanted_div.innerText = getI18N(wishlist_headers[5].label) + ' : ' + item_in_wishlist.item.wishListCount;
+            stock_div.appendChild(wishlist_wanted_div);
 
             let wishlist_depot_div = document.createElement('div');
             wishlist_depot_div.style.width = 'calc(50% - 0.5em)';
-            stock_div.appendChild(wishlist_depot_div);
             wishlist_depot_div.innerText = getI18N(wishlist_headers[2].label) + ' : ' + getI18N(wishlist_depot.find((depot) => item_in_wishlist.depot === depot.value).label);
+            stock_div.appendChild(wishlist_depot_div);
         }
     }
+
+    if (mho_parameters.enhanced_tooltips_item_translations) {
+        let translations = '';
+        supported_languages.forEach((language) => {
+            translations += `<div class="tooltip-translation"><span class="tooltip-translation-flag">${language.img}</span><span class="tooltip-translation-value">${item.label[language.value]}</span></div>`
+        });
+        let item_translations = document.createElement('div');
+        item_translations.classList.add('mho-tooltip-translations');
+        item_translations.innerHTML = translations;
+        content.appendChild(item_translations);
+    }
+
     if ((!item_deco || item.deco === 0) && !item.properties && !item.actions && item.recipes.length === 0) return;
 
-    if (tooltip) {
-        // console.log('hovered_item', item);
-    }
     if (item_deco && item.deco > 0) {
         let text = item_deco.innerText.replace(/ \(.*\)*/, '');
         item_deco.innerHTML = `<span>${text} <em>( +${item.deco} )</em></span>`;
@@ -5376,38 +5586,78 @@ function createAdvancedProperties(content, item, tooltip) {
 
     if (!item.properties && !item.actions && item.recipes.length === 0) return;
 
-    if (item.properties) {
+    if (mho_parameters.enhanced_tooltips_item_properties && item.properties) {
         let item_properties = document.createElement('div');
         content.appendChild(item_properties);
         item.properties.forEach((property) => {
-            let item_action = displayPropertiesOrActions(property, item);
-            item_properties.appendChild(item_action);
+            item_properties.appendChild(displayPropertiesOrActions(property, item));
         });
     }
 
-    if (!item.actions && item.recipes.length === 0) return;
-
-    if (item.actions) {
+    if (mho_parameters.enhanced_tooltips_item_actions && item.actions) {
         let item_actions = document.createElement('div');
         content.appendChild(item_actions);
         item.actions.forEach((action) => {
-            let item_action = displayPropertiesOrActions(action, item);
-            item_actions.appendChild(item_action);
+            item_actions.appendChild(displayPropertiesOrActions(action, item));
         });
     }
 
-    if (item.recipes.length === 0) return;
-
-    if (item.recipes.length > 0) {
+    if (mho_parameters.enhanced_tooltips_item_recipes && item.recipes.length > 0) {
         let item_recipes = document.createElement('div');
         item_recipes.classList.add('recipe');
         item_recipes.style.maxHeight = '250px';
         item_recipes.style.overflowY = 'auto';
         item_recipes.style.pointerEvents = 'all';
         content.appendChild(item_recipes);
-
         item.recipes.forEach((recipe) => {
             item_recipes.appendChild(getRecipeElement(recipe));
+        });
+    }
+}
+
+function createAdvancedStatus(content, status, tooltip) {
+    content.innerHtml = '';
+    let status_details = document.createElement('div');
+    content.appendChild(status_details);
+
+    const have_properties = status.properties?.length > 0;
+
+    if (status.pdc === undefined && status.watch_def === undefined
+        && status.watch_kills === undefined && status.searches === undefined
+        && !have_properties) return;
+
+    if (status.pdc !== undefined) {
+        let status_detail = document.createElement('div');
+        status_detail.classList.add('item-tag');
+        status_detail.innerHTML = `${status.pdc} ${Math.abs(status.pdc) > 1 ? 'points' : 'point'} de contrôle supplémentaire${Math.abs(status.pdc) > 1 ? 's' : ''}`;
+        status_details.appendChild(status_detail);
+    }
+
+    if (mho_parameters.enhanced_tooltips_status_watch && (status.watch_def !== undefined || status.watch_kills !== undefined)) {
+        if (status.watch_def !== undefined) {
+            let status_detail = document.createElement('div');
+            status_detail.classList.add('item-tag');
+            status_detail.innerHTML = `${getI18N(status_texts.zombies_killed)} : ${status.watch_def}`;
+            status_details.appendChild(status_detail);
+        }
+        if (status.watch_kills !== undefined) {
+            let status_detail = document.createElement('div');
+            status_detail.classList.add('item-tag');
+            status_detail.innerHTML = `${getI18N(status_texts.watch_survival_chances)} : ${status.watch_kills < 0 ? status.watch_kills * 100 : '+' + status.watch_kills * 100}%`;
+            status_details.appendChild(status_detail);
+        }
+    }
+
+    if (mho_parameters.enhanced_tooltips_status_searches && status.searches !== undefined) {
+        let status_detail = document.createElement('div');
+        status_detail.classList.add('item-tag');
+        status_detail.innerHTML = `${getI18N(status_texts.success_digs_changes)} : ${status.searches}`;
+        status_details.appendChild(status_detail);
+    }
+
+    if (mho_parameters.enhanced_tooltips_status_properties && have_properties) {
+        status.properties.forEach((property) => {
+            status_details.appendChild(displayStatusProperties(property, status));
         });
     }
 }
@@ -5890,58 +6140,6 @@ function displayPropertiesOrActions(property_or_action, hovered_item) {
             break;
     }
     return item_action;
-}
-
-function createAdvancedPropertiesStatus(content, status, tooltip) {
-    content.innerHtml = '';
-    let status_details = document.createElement('div');
-    content.appendChild(status_details);
-
-    let have_properties = status.properties && status.properties.length > 0;
-
-    if (status.pdc === undefined && status.watch_def === undefined && status.watch_kills === undefined && status.searches === undefined && !have_properties) return;
-
-    if (status.pdc !== undefined) {
-        let status_detail = document.createElement('div');
-        status_detail.classList.add('item-tag');
-        status_detail.innerHTML = `${status.pdc} ${status.pdc > 1 || status.pdc < -1 ? 'points' : 'point'} de contrôle ${status.pdc > 1 || status.pdc < -1 ? 'supplémentaires' : 'supplémentaire'}`;
-        status_details.appendChild(status_detail);
-    }
-
-    if (status.watch_def === undefined && status.watch_kills === undefined && status.searches === undefined && !have_properties) return;
-
-    if (status.watch_def !== undefined) {
-        let status_detail = document.createElement('div');
-        status_detail.classList.add('item-tag');
-        status_detail.innerHTML = `${getI18N(status_texts.zombies_killed)} : ${status.watch_def}`;
-        status_details.appendChild(status_detail);
-    }
-
-    if (status.watch_kills === undefined && status.searches === undefined && !have_properties) return;
-
-    if (status.watch_kills !== undefined) {
-        let status_detail = document.createElement('div');
-        status_detail.classList.add('item-tag');
-        status_detail.innerHTML = `${getI18N(status_texts.watch_survival_chances)} : ${status.watch_kills < 0 ? status.watch_kills * 100 : '+' + status.watch_kills * 100}%`;
-        status_details.appendChild(status_detail);
-    }
-
-    if (status.searches === undefined && !have_properties) return;
-
-    if (status.searches !== undefined) {
-        let status_detail = document.createElement('div');
-        status_detail.classList.add('item-tag');
-        status_detail.innerHTML = `${getI18N(status_texts.success_digs_changes)} : ${status.searches}`;
-        status_details.appendChild(status_detail);
-    }
-    if (!have_properties) return;
-
-    if (have_properties) {
-        status.properties.forEach((property) => {
-            let status_property = displayStatusProperties(property, status);
-            status_details.appendChild(status_property);
-        });
-    }
 }
 
 function displayStatusProperties(status_properties, hovered_item) {
@@ -6468,12 +6666,6 @@ function displayTranslateTool() {
         const mho_header_space = document.getElementById(mho_header_space_id);
         if (!mho_header_space) return;
 
-        let langs = [
-            {value: 'de', img: '🇩🇪'},
-            {value: 'en', img: '🇬🇧'},
-            {value: 'es', img: '🇪🇸'},
-            {value: 'fr', img: '🇫🇷'},
-        ]
         let mho_display_translate_input_div = createSelectWithSearch();
         mho_display_translate_input_div.id = mho_display_translate_input_id;
         mho_display_translate_input_div.setAttribute('style', 'margin: 0; width: 200px; height: 22px;');
@@ -6495,12 +6687,12 @@ function displayTranslateTool() {
         select.setAttribute('style', 'height: 22px; width: 35px; font-size: 12px; outline: unset');
         select.value = lang;
 
-        langs.forEach((lang_option) => {
+        supported_languages.forEach((language) => {
             let option = document.createElement('option');
-            option.value = lang_option.value;
+            option.value = language.value;
             option.setAttribute('style', 'font-size: 16px');
-            option.innerText = lang_option.img;
-            option.selected = lang_option.value === lang;
+            option.innerText = language.img;
+            option.selected = language.value === lang;
             select.appendChild(option);
         })
 
@@ -8635,6 +8827,11 @@ function createStyles() {
         font-size: 0.9em;
         width: 350px;
     }
+    #${btn_id} .mho-parameters-btn {
+        margin-top: 0;
+        text-align: center;
+        display: block;
+    }
     `;
 
     const mho_window_style = `
@@ -8965,7 +9162,7 @@ function createStyles() {
             white-space: nowrap;
             flex-shrink: 0;
         }
-        .mho-shift-hint kbd {
+        kbd.mho-shift-hint {
             border: 1px solid #f0d79e;
             border-radius: 3px;
             padding: 0 3px;
@@ -8973,8 +9170,40 @@ function createStyles() {
             line-height: 1.4;
             background: rgba(240,215,158,0.15);
         }
-        .mho-shift-hint:has(img) {
+        img.mho-close-hint {
             margin-top: -6px;
+        }
+        .mho-close-hint {
+            display: none;
+        }
+        .mho-frozen .mho-shift-hint {
+            display: none;
+        }
+        .mho-frozen .mho-close-hint {
+            display: initial;
+        }
+        .mho-tooltip-translations {
+            display: flex;
+            flex-direction: row;
+            gap: 0.5em;
+            flex-wrap: wrap;
+            align-items: start;
+            justify-content: start;
+            border-bottom: 1px solid;
+            margin: 0.25em 0;
+            padding: 0.25em 0;
+        }
+        .mho-tooltip-translations .tooltip-translation {
+            display: flex;
+            flex-direction: row;
+            gap: 0.5em;
+            flex-wrap: nowrap;
+            align-items: center;
+            justify-content: center;
+
+            background-color: #5c2b20;
+            border-radius: 0.25em;
+            padding: 0.25em 0.5em;
         }
     `;
 
@@ -9841,10 +10070,6 @@ function getItems() {
                         return new_recipe;
                     })
                 })
-                let wiki_btn = document.getElementById(wiki_btn_id);
-                if (wiki_btn) {
-                    wiki_btn.setAttribute('style', 'display: inherit');
-                }
                 items = new_items;
                 resolve(items);
             })
@@ -10497,59 +10722,60 @@ function updateExternalTools() {
                 };
             });
 
-            let now = document.querySelector('.game-clock .town-time').innerText;
-
-            citizen_list
-                .filter((citizen) => { // On ne garde que les citoyens actuellement en train de fouiller
-                    let is_digging = false;
-                    if (citizen.id === mh_user.id) { // Il s'agit de l'utilisateur qui a cliqué sur le bouton
-                        is_digging = document.querySelector('#mgd-digging-note [x-countdown-to]') ? true : false
-                    } else { // Les autres
-                        is_digging = citizen.row.parentElement.parentElement.parentElement.querySelector('li.status img[src*=small_gather]') ? true : false;
-                    }
-                    return is_digging;
-                })
-                .forEach((citizen) => {
-
-                    let failed_texts = {
-                        de: `durch Graben nichts gefunden...`,
-                        en: `found nothing during their last search...`,
-                        es: `no encontró nada...`,
-                        fr: `rien trouvé...`
-                    };
-                    let failed_digs = Array.from(logs.filter((log) => normalizeString(log.innerText).indexOf(normalizeString(getI18N(failed_texts))) > -1) || []).filter((log) => log.innerText.indexOf(citizen.userName) > -1) || [];
-                    let nb_failed_digs = failed_digs.length;
-
-                    let nb_minutes_for_dig = citizen.job === 'dig' ? 90 : 120; // Une fouille = 2h = 120 minutes pour un tous les métiers, ou 1h30 = 90 minutes pour une pelle
-
-                    let citizen_arrivals = arrivals.filter((arrival) => arrival.citizen === citizen.userName); // Les heures d'arrivées du citoyen sur la case
-
-                    let citizen_last_arrival = citizen_arrivals[0]?.time;
-                    let start_date;
-
-                    if (citizen_last_arrival) { // Si le citoyen a une heure d'arrivée alors on se base sur cette heure comme heure de début de fouilles
-                        start_date = citizen_last_arrival;
-                    } else { // Sinon, on se base sur le cooldown
-                        start_date = nb_failed_digs === 0 ? null : failed_digs[failed_digs.length - 1].querySelector('.log-part-time').innerText;
-                    }
-
-                    let nb_digs;
-                    if (start_date) {
-                        let now_minutes = (+now.split(':')[0] * 60) + (+now.split(':')[1]);
-                        let start_date_minutes = (+start_date.split(':')[0] * 60) + (+start_date.split(':')[1]);
-
-                        let nb_minutes_digging = now_minutes - start_date_minutes; // Le nombre total de minutes passées à fouiller
-                        nb_digs = Math.floor(nb_minutes_digging / nb_minutes_for_dig) + 1;
-
-                    } else {
-                        nb_digs = 1;
-                    }
-                    data.successedDig.values.push({
-                        citizenId: citizen.id,
-                        successDigs: nb_digs - nb_failed_digs,
-                        totalDigs: nb_digs
+            let now = document.querySelector('.game-clock .town-time')?.innerText;
+            if (now) {
+                citizen_list
+                    .filter((citizen) => { // On ne garde que les citoyens actuellement en train de fouiller
+                        let is_digging = false;
+                        if (citizen.id === mh_user.id) { // Il s'agit de l'utilisateur qui a cliqué sur le bouton
+                            is_digging = document.querySelector('#mgd-digging-note [x-countdown-to]') ? true : false
+                        } else { // Les autres
+                            is_digging = citizen.row.parentElement.parentElement.parentElement.querySelector('li.status img[src*=small_gather]') ? true : false;
+                        }
+                        return is_digging;
                     })
-                });
+                    .forEach((citizen) => {
+
+                        let failed_texts = {
+                            de: `durch Graben nichts gefunden...`,
+                            en: `found nothing during their last search...`,
+                            es: `no encontró nada...`,
+                            fr: `rien trouvé...`
+                        };
+                        let failed_digs = Array.from(logs.filter((log) => normalizeString(log.innerText).indexOf(normalizeString(getI18N(failed_texts))) > -1) || []).filter((log) => log.innerText.indexOf(citizen.userName) > -1) || [];
+                        let nb_failed_digs = failed_digs.length;
+
+                        let nb_minutes_for_dig = citizen.job === 'dig' ? 90 : 120; // Une fouille = 2h = 120 minutes pour un tous les métiers, ou 1h30 = 90 minutes pour une pelle
+
+                        let citizen_arrivals = arrivals.filter((arrival) => arrival.citizen === citizen.userName); // Les heures d'arrivées du citoyen sur la case
+
+                        let citizen_last_arrival = citizen_arrivals[0]?.time;
+                        let start_date;
+
+                        if (citizen_last_arrival) { // Si le citoyen a une heure d'arrivée alors on se base sur cette heure comme heure de début de fouilles
+                            start_date = citizen_last_arrival;
+                        } else { // Sinon, on se base sur le cooldown
+                            start_date = nb_failed_digs === 0 ? null : failed_digs[failed_digs.length - 1].querySelector('.log-part-time').innerText;
+                        }
+
+                        let nb_digs;
+                        if (start_date) {
+                            let now_minutes = (+now.split(':')[0] * 60) + (+now.split(':')[1]);
+                            let start_date_minutes = (+start_date.split(':')[0] * 60) + (+start_date.split(':')[1]);
+
+                            let nb_minutes_digging = now_minutes - start_date_minutes; // Le nombre total de minutes passées à fouiller
+                            nb_digs = Math.floor(nb_minutes_digging / nb_minutes_for_dig) + 1;
+
+                        } else {
+                            nb_digs = 1;
+                        }
+                        data.successedDig.values.push({
+                            citizenId: citizen.id,
+                            successDigs: nb_digs - nb_failed_digs,
+                            totalDigs: nb_digs
+                        })
+                    });
+            }
         }
 
         /** Récupération des actions quotidiennes */
