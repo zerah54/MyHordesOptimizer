@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MHO Addon
-// @version      1.1.32.0
+// @version      1.1.33.0
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/, rubrique Tutoriels
 // @author       Zerah
 //
@@ -5426,7 +5426,7 @@ function addFreezeHintsToTooltip(tooltip_container) {
 
     const close = document.createElement('img');
     close.classList.add('mho-close-hint');
-    close.src = `${repo_img_hordes_url}icons/b_close.png"`;
+    close.src = `${repo_img_hordes_url}icons/b_close.png`;
     close.alt = `close`;
 
     const separator = document.createElement('div');
