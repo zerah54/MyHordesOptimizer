@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MHO Addon
-// @version      1.1.30.0
+// @version      1.1.31.0
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/, rubrique Tutoriels
 // @author       Zerah
 //
@@ -5536,7 +5536,7 @@ function createAdvancedProperties(content, item, tooltip) {
     }
     content.innerHtml = '';
 
-    if (tooltip && mho_parameters.enhanced_tooltips_items_quantities) {
+    if (tooltip && mho_parameters.enhanced_tooltips_item_quantities) {
         let stock_div = document.createElement('div');
         content.appendChild(stock_div);
         stock_div.style.display = 'flex';
