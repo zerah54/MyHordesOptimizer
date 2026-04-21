@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MHO Addon
-// @version      1.1.31.0
+// @version      1.1.32.0
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/, rubrique Tutoriels
 // @author       Zerah
 //
@@ -32,7 +32,9 @@
 // ==/UserScript==
 
 const changelog = `${getScriptInfo().name} : Changelog pour la version ${getScriptInfo().version}\n\n`
-    + `[Correctif] Changement de comportement complet pour le tooltip amélioré pour en fluidifier et corriger l'usage. Merci Emmet pour le coup de main\n`
+    + `[Correctif] Changement de comportement complet pour le tooltip amélioré pour en fluidifier et corriger l'usage. Merci Emmet pour le coup de main\n\n`
+    + `[Correctif] Correction des cas où le tooltip n'avait pas le conseil "shift" ou le bouton pour fermer une fois figé\n`
+    + `[Correctif] Empêche de figer un tooltip qui n'a pas le conseil "shift" affiché\n`
     + `[Correctif] Meilleur affichage des boutons "Wiki" et "Outils" du tooltip\n\n`
     + `[Nouveauté] Personnalisation des informations affichées dans le tooltip via des options distinctes\n`
     + `[Nouveauté] Ajout de la traduction sur les tooltips des objets\n`;
@@ -5379,7 +5381,6 @@ function enhanceTooltip(tooltip_container) {
                     if (!advanced_tooltip_container.innerHTML) {
                         createAdvancedProperties(advanced_tooltip_container, item, tooltip_container);
                     }
-                    addFreezeHintsToTooltip(tooltip_container, item);
                 }
             } else {
                 let should_display_advanced_tooltip =
@@ -5400,6 +5401,7 @@ function enhanceTooltip(tooltip_container) {
         }
         if (advanced_tooltip_container) {
             tooltip_container.appendChild(advanced_tooltip_container);
+            addFreezeHintsToTooltip(tooltip_container);
         }
         // console[isCloned ? 'debug' : 'warn'](`${isStatus ? 'STATUS a' : 'A'}jouté ${isCloned ? '(cloné) ' : ''}pour ${imgPath}`);
     } else {
@@ -5408,12 +5410,15 @@ function enhanceTooltip(tooltip_container) {
     }
 }
 
-function addFreezeHintsToTooltip(tooltip_container, item) {
-    if (!item) return;
+function addFreezeHintsToTooltip(tooltip_container) {
     if (tooltip_container.querySelector('.mho-shift-hint')) return;
 
     const h1 = tooltip_container.querySelector('h1');
     if (!h1) return;
+
+    if (!h1.classList.contains('flex')) {
+        h1.classList.add('flex');
+    }
 
     const shift = document.createElement('kbd');
     shift.classList.add('mho-shift-hint');
@@ -5499,6 +5504,9 @@ function initTooltipFreezeOnShift() {
     function freezeCurrentTooltip() {
         const container = document.getElementById('tooltip_container');
         if (!container) return;
+
+        let hint = container.querySelector('.mho-shift-hint');
+        if (!hint) return;
 
         const visibleTooltip = [...container.querySelectorAll('.item')].find(el => el.style.display === 'block');
         if (!visibleTooltip) return;
