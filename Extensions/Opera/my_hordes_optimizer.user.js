@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MHO Addon
-// @version      1.1.34.0
+// @version      1.1.35.0
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/, rubrique Tutoriels
 // @author       Zerah
 //
@@ -33,7 +33,8 @@
 
 const changelog = `${getScriptInfo().name} : Changelog pour la version ${getScriptInfo().version}\n\n`
     + `[Correctif] Changement de comportement complet pour le tooltip amélioré pour en fluidifier et corriger l'usage. Merci Emmet pour le coup de main\n\n`
-    + `[Amélioration] Affichage compact des recettes dans le tooltip amélioré\n\n`
+    + `[Amélioration] Affichage compact des recettes dans le tooltip amélioré\n`
+    + `[Amélioration] Ajout d'informations sur les propriétés des statuts et objets\n\n`
     + `[Nouveauté] Personnalisation des informations affichées dans le tooltip via des options distinctes (attention, ça désactive les options en question il faut les réactiver)\n`
     + `[Nouveauté] Ajout de la traduction sur les tooltips des objets\n`;
 
@@ -689,10 +690,28 @@ const status_texts = {
         es: `Probabilidades de supervivencia mientras estás de guardia`,
     },
     success_digs_changes: {
-        en: `Modification of success chances for digging`,
-        fr: `Modification des chances de réussite des fouilles`,
-        de: `Änderung der Erfolgschancen beim Graben`,
-        es: `Modificación de las probabilidades de éxito en las excavaciones`,
+        en: `Success chances for digging`,
+        fr: `Chances de réussite des fouilles`,
+        de: `Erfolgsaussichten der Ausgrabungen`,
+        es: `Probabilidades de éxito de las excavaciones`,
+    },
+    terror: {
+        en: `Chances of being terrorized in case of an overflow`,
+        fr: `Chances d'être terrorisé en cas de débordement`,
+        de: `Wahrscheinlichkeit, im Falle eines Überlaufs terrorisiert zu werden`,
+        es: `Posibilidades de ser aterrorizado en caso de desbordamiento`,
+    },
+    prevent_infection: {
+        en: `Chances of not becoming infected following an injury`,
+        fr: `Chances de ne pas être infecté des suites d'une blessure`,
+        de: `Chancen, sich nach einer Verletzung nicht zu infizieren`,
+        es: `Probabilidades de no infectarse tras una lesión`,
+    },
+    fatal_infection: {
+        en: `Chances of dying from an infection`,
+        fr: `Chances de mourir d'une infection`,
+        de: `Sterblichkeitsrisiko durch eine Infektion`,
+        es: `Probabilidades de morir por una infección`,
     }
 }
 
@@ -777,7 +796,7 @@ const jobs = [
 ];
 
 const status_list = [
-    {id: "clean", img: "status/status_clean.gif", pdc: 1}, // Jamais drogué
+    {id: "clean", img: "status/status_clean.gif", pdc: 1, terror: -3}, // Jamais drogué
     {id: "hasdrunk", img: "status/status_hasdrunk.gif"}, // A bu
     {id: "haseaten", img: "status/status_haseaten.gif"}, // A mangé
     {id: "camper", img: "status/status_camper.gif", searches: '+10%'}, // A campé
@@ -833,7 +852,14 @@ const status_list = [
     {id: "wound6", img: "status/status_wound6.gif", watch_def: -15, watch_death: 0.10, properties: ['wounded']}, // Blessure au pied
     {id: "healed", img: "status/status_healed.gif", watch_def: -15, watch_death: 0.05}, // Convalescent
     {id: "hydrated", img: "status/status_hydrated.gif", pdc: 1}, // Hydraté
-    {id: "sober", img: "status/status_sober.gif", pdc: 1} // Sobre
+    {id: "sober", img: "status/status_sober.gif", pdc: 1}, // Sobre
+    {
+        id: "good_smell",
+        img: "status/status_good_smell.gif",
+        terror: -25,
+        fatal_infection: -0.25,
+        prevent_infection: 0.25
+    } // Bonne odeur
 ];
 
 const api_texts = {
@@ -1534,35 +1560,6 @@ let params_categories = [
                             de: `Status`,
                             es: `Estatus`
                         },
-                        children: [
-                            {
-                                id: `enhanced_tooltips_status_watch`,
-                                label: {
-                                    en: `Informations about night watch`,
-                                    fr: `Informations à propos de la veille`,
-                                    de: `Informationen zur Wache`,
-                                    es: `Información sobre la guardia`
-                                },
-                            },
-                            {
-                                id: `enhanced_tooltips_status_searches`,
-                                label: {
-                                    en: `Search success modifier`,
-                                    fr: `Modificateur de réussite des fouilles`,
-                                    de: `Modifikator für Grabungserfolg`,
-                                    es: `Modificador de éxito en excavaciones`
-                                },
-                            },
-                            {
-                                id: `enhanced_tooltips_status_properties`,
-                                label: {
-                                    en: `Status properties`,
-                                    fr: `Propriétés de l'état`,
-                                    de: `Status-Eigenschaften`,
-                                    es: `Propiedades del estado`
-                                },
-                            }
-                        ]
                     },
                 ]
             },
@@ -2488,7 +2485,7 @@ function getClickedItem(target) {
 function getFixedImagePath(img_src) {
     const index = img_src.indexOf(hordes_img_url);
     if (index === -1) {
-        console.warn(`Image source "${img_src}" does'nt include '${hordes_img_url}' as expected.`);
+        console.warn(`Image source "${img_src}" does not include '${hordes_img_url}' as expected.`, img_src);
         return;
     }
     return img_src
@@ -5328,85 +5325,82 @@ function getWishlistForZone() {
 
 /** @param {HTMLElement} tooltip_container */
 function enhanceTooltip(tooltip_container) {
-    if (!tooltip_container || tooltip_container.querySelector('.mho-advanced-tooltip')) return;
+    if (!tooltip_container) return;
+
+    // Identifier l'objet actuellement dans le tooltip natif
+    let img = tooltip_container.querySelector('h1 > img:last-child');
+    const isStatus = !img;
+
+    if (isStatus) {
+        const label = tooltip_container.querySelector('h1')?.textContent.trim();
+        img = document.querySelector(`li.status > img[alt="${label}"]`);
+    }
+
+    if (!img) return;
+
+    const imgPath = getFixedImagePath(img.src);
+    if (!imgPath) return;
+
+    // Vérifier si le tooltip amélioré existant correspond déjà au bon objet
+    const existing = tooltip_container.querySelector('.mho-advanced-tooltip');
+    if (existing) {
+        if (existing.getAttribute('x-icon-path') === imgPath) {
+            // Déjà enrichi avec le bon objet, rien à faire
+            return;
+        }
+        // Le tooltip a été réutilisé par MH pour un autre objet : on nettoie
+        existing.remove();
+        const existingHints = tooltip_container.querySelectorAll('.mho-shift-hint, .mho-close-hint');
+        existingHints.forEach(el => el.remove());
+    }
 
     tooltip_container.addEventListener('click', (e) => e.stopImmediatePropagation());
 
-    let img = tooltip_container.querySelector('h1 > img');
-    const isStatus = !img;
-    if (isStatus) {
-        // on commence par essayer (*) de trouver l'icone pour éviter un observer
-        const label = tooltip_container.querySelector('h1').textContent.trim();
-        img = document.querySelector(`li.status > img[alt="${label}"]`);
-        if (!img) {
-            console.warn(`Icon not found for tooltip ${label}.`);
+    let item_or_status = getTooltipItem(img, isStatus);
+    let item = item_or_status.item;
+    let status = item_or_status.status;
+
+    if (!item && !status) return;
+
+    const buildAdvancedTooltipContainer = () => {
+        const c = document.createElement('div');
+        c.classList.add('mho-advanced-tooltip');
+        c.setAttribute('x-icon-path', imgPath);
+        return c;
+    };
+
+    let advanced_tooltip_container;
+
+    if (item) {
+        let item_deco = tooltip_container.getElementsByClassName('item-tag-deco')[0];
+        let should_display = mho_parameters.enhanced_tooltips && mho_parameters.enhanced_tooltips_items && (
+            (mho_parameters.enhanced_tooltips_item_quantities && tooltip_container) ||
+            (mho_parameters.enhanced_tooltips_item_properties && item.properties) ||
+            (mho_parameters.enhanced_tooltips_item_actions && item.actions) ||
+            (mho_parameters.enhanced_tooltips_item_recipes && item.recipes.length > 0) ||
+            mho_parameters.enhanced_tooltips_item_translations ||
+            (item_deco && item.deco > 0));
+
+        if (should_display) {
+            advanced_tooltip_container = buildAdvancedTooltipContainer();
+            createAdvancedProperties(advanced_tooltip_container, item, tooltip_container);
+        }
+    } else {
+        let should_display = mho_parameters.enhanced_tooltips && mho_parameters.enhanced_tooltips_statuses && (
+            status.watch_def !== undefined || status.watch_kills !== undefined ||
+            status.searches !== undefined || status.terror !== undefined ||
+            status.fatal_infection !== undefined || status.prevent_infection !== undefined ||
+            status.properties?.length > 0);
+
+        if (should_display) {
+            advanced_tooltip_container = buildAdvancedTooltipContainer();
+            createAdvancedStatus(advanced_tooltip_container, status, tooltip_container);
         }
     }
-    if (img) {
-        const imgPath = getFixedImagePath(img.src);
-        if (!imgPath) return;
-        const eSameTooltip = document.querySelector(`.mho-advanced-tooltip[x-icon-path="${imgPath}"]`);
-        const isCloned = !!eSameTooltip;
-        let advanced_tooltip_container;
-        if (isCloned) {
-            advanced_tooltip_container = eSameTooltip.cloneNode(true);
-        } else {
-            let item_or_status = getTooltipItem(img, isStatus);
-            let item = item_or_status.item;
-            let status = item_or_status.status;
 
-            if (!item && !status) return;
-
-            const buildAdvancedTooltipContainer = () => {
-                const c = document.createElement('div');
-                c.classList.add('mho-advanced-tooltip');
-                c.setAttribute('x-icon-path', imgPath);
-                return c;
-            };
-
-            if (item) {
-                let item_deco = tooltip_container.getElementsByClassName('item-tag-deco')[0];
-                let should_display_advanced_tooltip =
-                    (mho_parameters.enhanced_tooltips_item_quantities && tooltip_container) ||
-                    (mho_parameters.enhanced_tooltips_item_properties && item.properties) ||
-                    (mho_parameters.enhanced_tooltips_item_actions && item.actions) ||
-                    (mho_parameters.enhanced_tooltips_item_recipes && item.recipes.length > 0) ||
-                    (mho_parameters.enhanced_tooltips_item_translations)
-                    (item_deco && item.deco > 0);
-
-                if (should_display_advanced_tooltip) {
-                    if (!advanced_tooltip_container) {
-                        advanced_tooltip_container = buildAdvancedTooltipContainer();
-                    }
-                    if (!advanced_tooltip_container.innerHTML) {
-                        createAdvancedProperties(advanced_tooltip_container, item, tooltip_container);
-                    }
-                }
-            } else {
-                let should_display_advanced_tooltip =
-                    (mho_parameters.enhanced_tooltips_status_watch && (status.watch_def !== undefined || status.watch_kills !== undefined)) ||
-                    (mho_parameters.enhanced_tooltips_status_searches && status.searches !== undefined) ||
-                    (mho_parameters.enhanced_tooltips_status_properties && status.properties?.length > 0) ||
-                    (mho_parameters.enhanced_tooltips_status_translations);
-
-                if (should_display_advanced_tooltip) {
-                    if (!advanced_tooltip_container) {
-                        advanced_tooltip_container = buildAdvancedTooltipContainer();
-                    }
-                    if (!advanced_tooltip_container.innerHTML) {
-                        createAdvancedStatus(advanced_tooltip_container, status, tooltip_container);
-                    }
-                }
-            }
-        }
-        if (advanced_tooltip_container) {
-            tooltip_container.appendChild(advanced_tooltip_container);
-            addFreezeHintsToTooltip(tooltip_container);
-        }
-        // console[isCloned ? 'debug' : 'warn'](`${isStatus ? 'STATUS a' : 'A'}jouté ${isCloned ? '(cloné) ' : ''}pour ${imgPath}`);
-    } else {
-        // (*) : Là il faudrait un observer sur le tooltip pour trouver l'icône liée au moment où il s'affiche
-        // mais en pratique la correspondance entre img.alt et h1.textContent fonctionne très bien donc pas besoin.
+    if (advanced_tooltip_container) {
+        tooltip_container.appendChild(advanced_tooltip_container);
+        addFreezeHintsToTooltip(tooltip_container);
     }
 }
 
@@ -5453,9 +5447,18 @@ function observeNewTooltips(tries = 10) {
                     enhanceTooltip(node);
                 }
             }
+            const tooltipItem = record.target.closest?.('.item');
+            if (tooltipItem && !record.addedNodes.length) {
+                enhanceTooltip(tooltipItem);
+            }
         }
     });
-    advanced_tooltips_observer.observe(tooltip_container, {childList: true});
+    advanced_tooltips_observer.observe(tooltip_container, {
+        childList: true,
+        subtree: true,
+        attributes: true,
+        attributeFilter: ['style']
+    });
 }
 
 /** Affiche les tooltips avancés */
@@ -5633,34 +5636,52 @@ function createAdvancedStatus(content, status, tooltip) {
 
     if (status.pdc !== undefined) {
         let status_detail = document.createElement('div');
-        status_detail.classList.add('item-tag', 'mho-item-tag', 'no-img');
+        status_detail.classList.add('item-tag', 'mho-item-tag', 'mho-item-tag-no-img');
         status_detail.innerHTML = `${status.pdc} ${Math.abs(status.pdc) > 1 ? 'points' : 'point'} de contrôle supplémentaire${Math.abs(status.pdc) > 1 ? 's' : ''}`;
         status_details.appendChild(status_detail);
     }
+    if (status.terror !== undefined) {
+        let status_detail = document.createElement('div');
+        status_detail.classList.add('item-tag', 'mho-item-tag', 'mho-item-tag-no-img');
+        status_detail.innerHTML = `${getI18N(status_texts.terror)} : ${status.terror}%`;
+        status_details.appendChild(status_detail);
+    }
+    if (status.prevent_infection !== undefined) {
+        let status_detail = document.createElement('div');
+        status_detail.classList.add('item-tag', 'mho-item-tag', 'mho-item-tag-no-img');
+        status_detail.innerHTML = `${getI18N(status_texts.prevent_infection)} : ${status.prevent_infection * 100}%`;
+        status_details.appendChild(status_detail);
+    }
+    if (status.fatal_infection !== undefined) {
+        let status_detail = document.createElement('div');
+        status_detail.classList.add('item-tag', 'mho-item-tag', 'mho-item-tag-no-img');
+        status_detail.innerHTML = `${getI18N(status_texts.fatal_infection)} : ${status.fatal_infection < 0 ? status.fatal_infection * 100 : '+' + status.fatal_infection * 100}%`;
+        status_details.appendChild(status_detail);
+    }
 
-    if (mho_parameters.enhanced_tooltips_status_watch && (status.watch_def !== undefined || status.watch_kills !== undefined)) {
+    if (status.watch_def !== undefined || status.watch_kills !== undefined) {
         if (status.watch_def !== undefined) {
             let status_detail = document.createElement('div');
-            status_detail.classList.add('item-tag', 'mho-item-tag', 'no-img');
+            status_detail.classList.add('item-tag', 'mho-item-tag', 'mho-item-tag-no-img');
             status_detail.innerHTML = `${getI18N(status_texts.zombies_killed)} : ${status.watch_def}`;
             status_details.appendChild(status_detail);
         }
         if (status.watch_kills !== undefined) {
             let status_detail = document.createElement('div');
-            status_detail.classList.add('item-tag', 'mho-item-tag', 'no-img');
+            status_detail.classList.add('item-tag', 'mho-item-tag', 'mho-item-tag-no-img');
             status_detail.innerHTML = `${getI18N(status_texts.watch_survival_chances)} : ${status.watch_kills < 0 ? status.watch_kills * 100 : '+' + status.watch_kills * 100}%`;
             status_details.appendChild(status_detail);
         }
     }
 
-    if (mho_parameters.enhanced_tooltips_status_searches && status.searches !== undefined) {
+    if (status.searches !== undefined) {
         let status_detail = document.createElement('div');
-        status_detail.classList.add('item-tag', 'mho-item-tag', 'no-img');
+        status_detail.classList.add('item-tag', 'mho-item-tag', 'mho-item-tag-no-img');
         status_detail.innerHTML = `${getI18N(status_texts.success_digs_changes)} : ${status.searches}`;
         status_details.appendChild(status_detail);
     }
 
-    if (mho_parameters.enhanced_tooltips_status_properties && have_properties) {
+    if (have_properties) {
         status.properties.forEach((property) => {
             status_details.appendChild(displayStatusProperties(property, status));
         });
@@ -5723,10 +5744,6 @@ function displayPropertiesOrActions(property_or_action, hovered_item) {
             } else {
                 item_action.classList.remove('item-tag', 'mho-item-tag');
             }
-            break;
-        case 'ressource':
-            item_action.classList.add(`mho-item-tag-no-img`);
-            item_action.innerText = `Ressource`;
             break;
         case 'flash_photo_1':
             item_action.classList.add(`mho-item-tag-large`);
@@ -5841,17 +5858,24 @@ function displayPropertiesOrActions(property_or_action, hovered_item) {
             item_action.classList.add(`mho-item-tag-no-img`);
             item_action.innerText = `Se casse en cas d'envoi par catapulte`;
             break;
+        case 'esc_fixed':
+            item_action.classList.add(`mho-item-tag-no-img`);
+            item_action.innerText = `Ne peut pas être déposé par le chef d'escorte`;
+            break;
+        case 'impoundable':
+            item_action.classList.add(`mho-item-tag-no-img`);
+            item_action.innerText = `Perdu en cas de bannissement`;
+            break;
         case 'box_opener':
         case 'can_opener':
         case 'parcel_opener':
-        case 'impoundable':
         case 'nw_ikea':
         case 'nw_armory':
+        case 'ressource':
         case 'food':
         case 'weapon':
         case 'drug':
         case 'nw_trebuchet':
-        case 'esc_fixed':
         case 'slaughter_2xs':
         case 'throw_animal_cat':
         case 'throw_animal_cat_t1':
@@ -6161,15 +6185,19 @@ function displayStatusProperties(status_properties, hovered_item) {
     item_action.classList.add('item-tag', 'mho-item-tag');
     switch (status_properties) {
         case 'head_wounded':
+            item_action.classList.add('mho-item-tag-no-img');
             item_action.innerText = getI18N(status_texts.head_wounded);
             break;
         case 'hand_wounded':
+            item_action.classList.add('mho-item-tag-no-img');
             item_action.innerText = getI18N(status_texts.hand_wounded);
             break;
         case 'arm_wounded':
+            item_action.classList.add('mho-item-tag-no-img');
             item_action.innerText = getI18N(status_texts.arm_wounded);
             break;
         case 'leg_wounded':
+            item_action.classList.add('mho-item-tag-no-img');
             item_action.innerText = getI18N(status_texts.leg_wounded);
             break;
         case null:
