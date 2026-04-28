@@ -683,45 +683,37 @@ namespace MyHordesOptimizerApi.Services.Impl
         }
         private DirectionEnum GetCellZone(int x, int y)
         {
-            if (Math.Abs(Math.Abs(x) - Math.Abs(y)) < Math.Min(Math.Abs(x), Math.Abs(y)))
+            /** Non implémenté ici
+            // Cas centre
+            if (x == 0 && y == 0)
+                return DirectionEnum.Center;
+            */
+
+            if (x == 0 && y > 0) return DirectionEnum.North;
+            if (x == 0 && y < 0) return DirectionEnum.South;
+            if (x > 0 && y == 0) return DirectionEnum.Est;
+            if (x < 0 && y == 0) return DirectionEnum.West;
+
+            double deg = x != 0 || y != 0
+                ? (180.0 / Math.PI) * Math.Asin(x / Math.Sqrt((double)(x * x + y * y)))
+                : 0.0;
+
+            if (y > 0)
             {
-                if (x < 0 && y < 0)
-                {
-                    return DirectionEnum.SouthWest;
-                }
-                if (x < 0 && y > 0)
-                {
-                    return DirectionEnum.NorthWest;
-                }
-                if (x > 0 && y < 0)
-                {
-                    return DirectionEnum.SouthEst;
-                }
-                if (x > 0 && y > 0)
-                {
-                    return DirectionEnum.NorthEst;
-                }
+                if (deg >= 67.5) return DirectionEnum.Est;
+                if (deg >= 22.5) return DirectionEnum.NorthEst;
+                if (deg >= -22.5) return DirectionEnum.North;
+                if (deg >= -67.5) return DirectionEnum.NorthWest;
+                return DirectionEnum.West;
             }
             else
             {
-                if (x < 0 && Math.Abs(x) > Math.Abs(y))
-                {
-                    return DirectionEnum.West;
-                }
-                if (x > 0 && Math.Abs(x) > Math.Abs(y))
-                {
-                    return DirectionEnum.Est;
-                }
-                if (y < 0 && Math.Abs(x) < Math.Abs(y))
-                {
-                    return DirectionEnum.South;
-                }
-                if (y > 0 && Math.Abs(x) < Math.Abs(y))
-                {
-                    return DirectionEnum.North;
-                }
+                if (deg >= 67.5) return DirectionEnum.Est;
+                if (deg >= 22.5) return DirectionEnum.SouthEst;
+                if (deg >= -22.5) return DirectionEnum.South;
+                if (deg >= -67.5) return DirectionEnum.SouthWest;
+                return DirectionEnum.West;
             }
-            throw new Exception();
         }
 
         private int GetCellDistanceInKm(int xRelativeToTown, int yRelativetoTown)
