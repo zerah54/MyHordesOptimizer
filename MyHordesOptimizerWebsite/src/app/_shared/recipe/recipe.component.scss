@@ -18,6 +18,12 @@
         padding: 0;
 
         li {
+
+            &.provoking {
+                border: 1px dashed;
+                padding: 0 0.5em 0 0;
+            }
+
             img {
                 margin-right: 0.5em;
             }

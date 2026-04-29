@@ -25,6 +25,7 @@ namespace MyHordesOptimizerApi.MappingProfiles.Items
                     Count = ric.Count ?? 0
                 })))
                 .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
+                .ForMember(dest => dest.Stealthy, opt => opt.MapFrom(src => src.Stealthy))
                 .ForMember(dest => dest.Result, opt => opt.MapFrom((src, dest, srcMember, context) =>
                 {
                     var results = new List<ItemResultDto>();
@@ -40,7 +41,12 @@ namespace MyHordesOptimizerApi.MappingProfiles.Items
                     }
                     return results;
                 }))
-                .ForMember(dest => dest.Type, opt => opt.MapFrom<string>(src => src.Type));
+                .ForMember(dest => dest.Type, opt => opt.MapFrom<string>(src => src.Type))
+                .ForMember(dest => dest.Provoking, opt => opt.MapFrom((src, dest, srcMember, context) =>
+                    src.ProvokingItemNavigation != null
+                        ? context.Mapper.Map<ItemWithoutRecipeDto>(src.ProvokingItemNavigation)
+                        : null
+                    ));
         }
     }
 }

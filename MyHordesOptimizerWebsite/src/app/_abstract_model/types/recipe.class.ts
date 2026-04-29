@@ -1,19 +1,20 @@
+import { ItemCountDTO } from '../dto/item-count.dto';
+import { ItemDTO } from '../dto/item.dto';
+import { RecipeDTO } from '../dto/recipe.dto';
+import { CommonModel, dtoToModelArray, modelToDtoArray } from './_common.class';
+import { I18nLabels } from './_types';
+import { ItemCount } from './item-count.class';
 import { Item } from './item.class';
 import { RecipeResultItem } from './recipe-result-item.class';
-import { I18nLabels } from './_types';
-import { CommonModel, dtoToModelArray, modelToDtoArray } from './_common.class';
-import { RecipeDTO } from '../dto/recipe.dto';
-import { ItemDTO } from '../dto/item.dto';
-import { ItemCountDTO } from '../dto/item-count.dto';
-import { ItemCount } from './item-count.class';
 
 export class Recipe extends CommonModel<RecipeDTO> {
     public actions!: I18nLabels;
     public components!: Item[];
-    public is_shaman_only!: boolean;
     public name!: string;
     public result!: RecipeResultItem[];
     public type!: 'WORKSHOP' | 'MANUAL_ANYWHERE' | 'WORKSHOP_SHAMAN';
+    public stealthy?: boolean;
+    public provoking?: Item;
 
     constructor(dto?: RecipeDTO) {
         super();
@@ -28,7 +29,9 @@ export class Recipe extends CommonModel<RecipeDTO> {
             })),
             name: this.name,
             result: modelToDtoArray(this.result),
-            type: this.type
+            type: this.type,
+            stealthy: this.stealthy,
+            provoking: this.provoking?.modelToDto()
         };
     }
 
@@ -47,6 +50,8 @@ export class Recipe extends CommonModel<RecipeDTO> {
             this.name = dto.name;
             this.result = dtoToModelArray(RecipeResultItem, dto.result);
             this.type = dto.type;
+            this.stealthy = dto.stealthy;
+            this.provoking = dto.provoking ? new Item(dto.provoking) : undefined;
         }
     }
 

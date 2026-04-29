@@ -1,7 +1,7 @@
 <div class="mho-recipe">
     <ul class="components">
         @for (component of recipe().components; track index; let index = $index) {
-            <li>
+            <li [class.provoking]="component.id === recipe().provoking?.id">
                 <img [ngSrc]="HORDES_IMG_REPO + component.img" width="16" height="16">{{ component.label[locale] }}
             </li>
         }

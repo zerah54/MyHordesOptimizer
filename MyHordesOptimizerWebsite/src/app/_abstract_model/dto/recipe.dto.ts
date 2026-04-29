@@ -1,6 +1,7 @@
 import { I18nLabels } from '../types/_types';
-import { RecipeResultItemDTO } from './recipe-result-item.dto';
 import { ItemCountDTO } from './item-count.dto';
+import { ItemDTO } from './item.dto';
+import { RecipeResultItemDTO } from './recipe-result-item.dto';
 
 export interface RecipeDTO {
     name: string;
@@ -8,4 +9,6 @@ export interface RecipeDTO {
     components: ItemCountDTO[];
     result: RecipeResultItemDTO[];
     actions: I18nLabels;
+    stealthy?: boolean;
+    provoking?: ItemDTO;
 }

@@ -10,6 +10,8 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer
         public List<ItemResultDto> Result { get; set; }
         public List<ItemComponentRecipeDto> Components { get; set; }
         public IDictionary<string, string> Actions { get; set; }
+        public bool? Stealthy { get; set; }
+        public ItemWithoutRecipeDto? Provoking { get; set; }
 
         public ItemRecipeDto()
         {

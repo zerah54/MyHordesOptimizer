@@ -54,6 +54,12 @@ public partial class Recipe
     [Column("stealthy")]
     public bool? Stealthy { get; set; }
 
+    [Column("provokingItemId", TypeName = "int(11)")]
+    public int? ProvokingItemId { get; set; }
+
+    [ForeignKey("ProvokingItemId")]
+    public virtual Item? ProvokingItemNavigation { get; set; }
+
     [InverseProperty("RecipeNameNavigation")]
     public virtual ICollection<RecipeItemComponent> RecipeItemComponents { get; set; } = new List<RecipeItemComponent>();
 

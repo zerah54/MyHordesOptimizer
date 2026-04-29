@@ -20,5 +20,8 @@ namespace MyHordesOptimizerApi.Data.Items
         public string Picto { get; set; }
         [JsonProperty("stealthy")]
         public string Stealthy { get; set; }
+
+        [JsonProperty("provoking")]
+        public string Provoking { get; set; }
     }
 }

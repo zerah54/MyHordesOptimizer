@@ -74,6 +74,10 @@ namespace MyHordesOptimizerApi.Services.Impl
                         .ThenInclude(recipe => recipe.RecipeNameNavigation)
                         .ThenInclude(recipe => recipe.RecipeItemResults)
                         .AsSplitQuery()
+                    .Include(item => item.RecipeItemComponents)
+                        .ThenInclude(recipe => recipe.RecipeNameNavigation)
+                        .ThenInclude(recipe => recipe.ProvokingItemNavigation)
+                        .AsSplitQuery()
                     .Include(item => item.RecipeItemResults)
                     .AsSplitQuery()
                     .Include(item => item.TownBankItems.Where(bankItem => bankItem.IdTown == townId && bankItem.IdLastUpdateInfo == townBankItemLastUpdateId))
@@ -102,6 +106,10 @@ namespace MyHordesOptimizerApi.Services.Impl
                        .ThenInclude(recipe => recipe.RecipeNameNavigation)
                        .ThenInclude(recipe => recipe.RecipeItemResults)
                        .AsSplitQuery()
+                   .Include(item => item.RecipeItemComponents)
+                       .ThenInclude(recipe => recipe.RecipeNameNavigation)
+                       .ThenInclude(recipe => recipe.ProvokingItemNavigation)
+                       .AsSplitQuery()
                    .Include(item => item.RecipeItemResults)
                    .AsSplitQuery()
                    .ToList();
@@ -112,7 +120,6 @@ namespace MyHordesOptimizerApi.Services.Impl
                 sw.Stop();
                 return itemsDto;
             }
-
         }
 
         public async Task<SimpleMeDto> GetSimpleMeAsync()
@@ -381,6 +388,7 @@ namespace MyHordesOptimizerApi.Services.Impl
                     .ThenInclude(item => item.IdItemNavigation)
                 .Include(recipe => recipe.RecipeItemResults)
                     .ThenInclude(item => item.IdItemNavigation)
+                .Include(recipe => recipe.ProvokingItemNavigation)
                 .ToList();
             var dtos = Mapper.Map<List<ItemRecipeDto>>(models);
             return dtos;
@@ -406,6 +414,10 @@ namespace MyHordesOptimizerApi.Services.Impl
                     .Include(item => item.RecipeItemComponents)
                         .ThenInclude(recipe => recipe.RecipeNameNavigation)
                         .ThenInclude(recipe => recipe.RecipeItemResults)
+                        .AsSplitQuery()
+                    .Include(item => item.RecipeItemComponents)
+                        .ThenInclude(recipe => recipe.RecipeNameNavigation)
+                        .ThenInclude(recipe => recipe.ProvokingItemNavigation)
                         .AsSplitQuery()
                     .Include(item => item.RecipeItemResults)
                     .ToList();
@@ -446,6 +458,12 @@ namespace MyHordesOptimizerApi.Services.Impl
                       .ThenInclude(item => item.RecipeItemComponents)
                          .ThenInclude(recipe => recipe.RecipeNameNavigation)
                          .ThenInclude(recipe => recipe.RecipeItemResults)
+                         .AsSplitQuery()
+                .Include(town => town.TownBankItems.Where(tbi => tbi.IdLastUpdateInfo == lastUpdateId))
+                  .ThenInclude(townBankItem => townBankItem.IdItemNavigation)
+                      .ThenInclude(item => item.RecipeItemComponents)
+                         .ThenInclude(recipe => recipe.RecipeNameNavigation)
+                         .ThenInclude(recipe => recipe.ProvokingItemNavigation)
                          .AsSplitQuery()
                 .Include(town => town.TownBankItems.Where(tbi => tbi.IdLastUpdateInfo == lastUpdateId))
                     .ThenInclude(townBankItem => townBankItem.IdItemNavigation)

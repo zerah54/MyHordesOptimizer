@@ -232,7 +232,15 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
                 {
                     item.DropRateNotPraf = 0;
                 }
-            });
+            }); 
+            
+            DbContext.Database.ExecuteSqlRaw("DELETE FROM MapCellItem");
+            DbContext.Database.ExecuteSqlRaw("DELETE FROM ItemProperty");
+            DbContext.Database.ExecuteSqlRaw("DELETE FROM BuildingRessources");
+            DbContext.Database.ExecuteSqlRaw("DELETE FROM RecipeItemComponent");
+            DbContext.Database.ExecuteSqlRaw("DELETE FROM ItemAction");
+            DbContext.Database.ExecuteSqlRaw("DELETE FROM RecipeItemResult");
+            DbContext.Database.ExecuteSqlRaw("DELETE FROM RuinItemDrop");
 
             var itemComparer = EqualityComparerFactory.Create<Item>(item => item.IdItem.GetHashCode(), (a, b) => a.IdItem == b.IdItem);
             var existingItems = DbContext.Items.ToList();
@@ -304,10 +312,16 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
             }
             var recipesFromDb = DbContext.Recipes.ToList();
             var recipeComparer = EqualityComparerFactory.Create<Recipe>(recipe => recipe.Name.GetHashCode(), (a, b) => a.Name == b.Name);
+
+            foreach (var recipe in mhoRecipes)
+            {
+                var source = codeItemRecipes.FirstOrDefault(kvp => kvp.Key == recipe.Name);
+                recipe.ProvokingItemId = existingItems.SingleOrDefault(i => i.Uid == source.Value?.Provoking)?.IdItem;
+            }
+
+
             DbContext.Patch(recipesFromDb, mhoRecipes, recipeComparer);
 
-            DbContext.Database.ExecuteSqlRaw("DELETE FROM RecipeItemComponent");
-            DbContext.Database.ExecuteSqlRaw("DELETE FROM RecipeItemResult");
             foreach (var kvp in codeItemRecipes)
             {
                 var recipeName = kvp.Key;
