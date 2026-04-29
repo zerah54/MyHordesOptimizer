@@ -62,13 +62,15 @@ export class MiscellaneousInfoComponent {
             columns: [
                 {id: 'day', header: $localize`Jour`},
                 {id: 're_min', header: $localize`Minimum théorique`},
-                {id: 're_max', header: $localize`Maximum théorique`}
+                {id: 're_max', header: $localize`Maximum théorique`},
+                {id: 're_moy', header: $localize`Moyenne théorique`}
             ],
             table: new MatTableDataSource(Array.from({length: 50}, (_: unknown, i: number): { [key: string]: number | string | null } => {
                 return {
                     day: i + 1,
                     re_min: formatNumber(getMinAttack(i + 1, 'RE'), this.locale, '1.0-0'),
-                    re_max: formatNumber(getMaxAttack(i + 1, 'RE'), this.locale, '1.0-0')
+                    re_max: formatNumber(getMaxAttack(i + 1, 'RE'), this.locale, '1.0-0'),
+                    re_moy: formatNumber((getMinAttack(i + 1, 'RE') + getMaxAttack(i + 1, 'RE')) / 2, this.locale, '1.0-0')
                 };
             }))
         },
