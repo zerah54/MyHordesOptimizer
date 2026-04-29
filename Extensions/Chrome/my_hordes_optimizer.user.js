@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MHO Addon
-// @version      1.1.35.0
+// @version      1.1.36.0
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/, rubrique Tutoriels
 // @author       Zerah
 //
@@ -32,11 +32,7 @@
 // ==/UserScript==
 
 const changelog = `${getScriptInfo().name} : Changelog pour la version ${getScriptInfo().version}\n\n`
-    + `[Correctif] Changement de comportement complet pour le tooltip amélioré pour en fluidifier et corriger l'usage. Merci Emmet pour le coup de main\n\n`
-    + `[Amélioration] Affichage compact des recettes dans le tooltip amélioré\n`
-    + `[Amélioration] Ajout d'informations sur les propriétés des statuts et objets\n\n`
-    + `[Nouveauté] Personnalisation des informations affichées dans le tooltip via des options distinctes (attention, ça désactive les options en question il faut les réactiver)\n`
-    + `[Nouveauté] Ajout de la traduction sur les tooltips des objets\n`;
+    + `[Amélioration] Les tooltips améliorés indiquent désormais sur quel élément de la recette cliquer \n\n`;
 
 const lang = (document.querySelector('html[lang]')?.getAttribute('lang') || document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2) || 'fr';
 
@@ -811,7 +807,7 @@ const status_list = [
     {id: "drugged", img: "status/status_drugged.gif", watch_def: 10}, // Drogué
     {id: "addict", img: "status/status_addict.gif", watch_def: 10, watch_death: 0.06}, // Dépendant
     {id: "infection", img: "status/status_infection.gif", watch_def: -15, watch_death: 0.1}, // Infecté
-    {id: "drunk", img: "status/status_drunk.gif", watch_def: 15, watch_death: -0.02, searches: '-20%"'}, // Ivre
+    {id: "drunk", img: "status/status_drunk.gif", watch_def: 15, watch_death: -0.02, searches: '-20%'}, // Ivre
     {id: "hungover", img: "status/status_hungover.gif", watch_def: -15, watch_death: 0.06}, // Gueule de bois
     {
         id: "wound1",
@@ -4202,6 +4198,9 @@ function getRecipeElement(recipe) {
     recipe.components.forEach((compo) => {
         let compo_container = document.createElement('span');
         compo_container.classList.add('item');
+        if (compo.id === recipe.provoking?.id) {
+            compo_container.classList.add('mho-recipe-provoking');
+        }
 
         let component_img = document.createElement('img');
         component_img.src = repo_img_hordes_url + fixMhCompiledImg(compo?.item?.img ?? compo?.img);
@@ -5745,11 +5744,12 @@ function displayPropertiesOrActions(property_or_action, hovered_item) {
                 item_action.classList.remove('item-tag', 'mho-item-tag');
             }
             break;
-        case 'flash_photo_1':
+        case 'flash_photo_1': {
             item_action.classList.add(`mho-item-tag-large`);
-            var fail_1 = Math.round(60 / 90 * 100);
+            let fail_1 = Math.round(60 / 90 * 100);
             item_action.innerText = `${100 - fail_1}% de chances de pouvoir fuir pendant 30 secondes`;
             break;
+        }
         case 'flash_photo_2': {
             item_action.classList.add(`mho-item-tag-large`);
             let fail_2 = Math.round(30 / 90 * 100);
@@ -5779,6 +5779,10 @@ function displayPropertiesOrActions(property_or_action, hovered_item) {
         case 'can_poison':
             item_action.classList.add(`mho-item-tag-no-img`);
             item_action.innerText = `Peut être empoisonné`;
+            break;
+        case 'camp_bonus':
+            item_action.classList.add(`mho-item-tag-no-img`);
+            item_action.innerText = `Dans le sac, augmente de 5% les chances de survie en camping`;
             break;
         case 'load_maglite':
         case 'load_lamp':
@@ -6200,6 +6204,7 @@ function displayStatusProperties(status_properties, hovered_item) {
             item_action.classList.add('mho-item-tag-no-img');
             item_action.innerText = getI18N(status_texts.leg_wounded);
             break;
+        case 'wounded':
         case null:
             item_action.classList.remove('item-tag', 'mho-item-tag');
             break;
@@ -6207,6 +6212,7 @@ function displayStatusProperties(status_properties, hovered_item) {
             console.log(status_properties);
             break;
     }
+    return item_action;
 }
 
 function createDisplayMapButton() {
@@ -9209,6 +9215,9 @@ function createStyles() {
             display: flex;
             align-items: center;
             gap: 0.25em;
+        }
+        .mho-advanced-tooltip > table.recipes > tr > td.items > div > .item.mho-recipe-provoking, #item-list > li.selected > .properties > table.recipes > tr > td.items > div > .item.mho-recipe-provoking {
+            border: 1px dashed #ddab76;
         }
         div.tooltip.item:has(table.recipes) {
             min-width: 250px !important;
