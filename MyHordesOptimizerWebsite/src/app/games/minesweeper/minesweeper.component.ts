@@ -26,6 +26,7 @@ export class MinesweeperComponent implements OnInit {
     public game_over: boolean = false;
     public custom_size_form: FormGroup;
     public timer: number = 0;
+    public board_initialized: boolean = false;
 
     public sizes_list: MinesweeperSize[] = [
         {id: 'small', label: $localize`Facile`, height: 9, width: 9, mines: 10},
@@ -63,12 +64,13 @@ export class MinesweeperComponent implements OnInit {
             this.selected_size.mines = Math.min(Math.max(1, this.selected_size.height), this.selected_size.width * this.selected_size.height);
         }
         this.initializeBoard(this.selected_size.width, this.selected_size.height, this.selected_size.mines);
+        this.board_initialized = false;
         this.game_over = false;
         this.remaining_mines = this.selected_size.mines;
         this.timer = 0;
     }
 
-    private initializeBoard(width: number, height: number, mines: number): void {
+    private initializeBoard(width: number, height: number, mines: number, exclude_x?: number, exclude_y?: number): void {
         this.board = Array(height).fill(null).map(() =>
             Array(width).fill(null).map(() => ({
                 is_mine: false,
@@ -81,11 +83,20 @@ export class MinesweeperComponent implements OnInit {
             }))
         );
 
-        let placedMines: number = 0;
+        const excluded: Set<string> = new Set<string>();
+        if (exclude_x !== undefined && exclude_y !== undefined) {
+            for (let dx = -1; dx <= 1; dx++) {
+                for (let dy = -1; dy <= 1; dy++) {
+                    excluded.add(`${exclude_y + dy},${exclude_x + dx}`);
+                }
+            }
+        }
+
+        let placedMines = 0;
         while (placedMines < mines) {
-            const x: number = Math.floor(Math.random() * width);
-            const y: number = Math.floor(Math.random() * height);
-            if (!this.board[y][x].is_mine) {
+            const x = Math.floor(Math.random() * width);
+            const y = Math.floor(Math.random() * height);
+            if (!this.board[y][x].is_mine && !excluded.has(`${y},${x}`)) {
                 this.board[y][x].is_mine = true;
                 placedMines++;
                 this.incrementAdjacentCells(x, y);
@@ -108,6 +119,11 @@ export class MinesweeperComponent implements OnInit {
 
     public revealCell(i: number, j: number): void {
         if (this.game_over || this.board[i][j].is_flagged || this.board[i][j].is_questioned) return;
+
+        if (!this.board_initialized) {
+            this.initializeBoard(this.selected_size.width, this.selected_size.height, this.selected_size.mines, j, i);
+            this.board_initialized = true;
+        }
 
         if (this.board[i][j].is_revealed) {
             this.revealAdjacentIfSafe(i, j);
@@ -133,7 +149,7 @@ export class MinesweeperComponent implements OnInit {
             for (let y: number = -1; y <= 1; y++) {
                 const new_i: number = i + x;
                 const new_j: number = j + y;
-                if (this.isValidCell(new_i, new_j) && (this.board[new_i][new_j].is_flagged || this.board[new_i][new_j].is_questioned)) {
+                if (this.isValidCell(new_i, new_j) && (this.board[new_i][new_j].is_flagged)) {
                     flagged_count++;
                 }
             }
