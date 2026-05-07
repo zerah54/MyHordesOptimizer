@@ -24,18 +24,18 @@
                             {{ displayed_dig.digger_name }}
                         </th>
                         <td class="success">
-                            <mat-form-field class="no-bottom">
+                            <mat-form-field subscriptSizing="dynamic">
                                 <input matInput type="number" [(ngModel)]="displayed_dig.nb_success">
                             </mat-form-field>
                         </td>
                         <td class="total">
-                            <mat-form-field class="no-bottom">
+                            <mat-form-field subscriptSizing="dynamic">
                                 <input matInput type="number" [(ngModel)]="displayed_dig.nb_total_dig">
                             </mat-form-field>
                         </td>
                         <td class="remove">
                             <button mat-icon-button type="button" (click)="removeCitizen(displayed_dig.digger_id)">
-                                <mat-icon>close</mat-icon>
+                                <mat-icon fontSet="material-symbols-outlined">close</mat-icon>
                             </button>
                         </td>
                     </tr>

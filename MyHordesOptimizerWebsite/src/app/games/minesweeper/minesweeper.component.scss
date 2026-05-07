@@ -1,122 +1,173 @@
 @use 'variables';
 
-.mho-minesweeper-header {
-    justify-content: space-between;
+:host {
 
-    .actions {
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-    }
-}
+    .mho-minesweeper-header {
+        justify-content: space-between;
 
-.mho-minesweeper {
-    .game-container {
-
-        width: fit-content;
-
-        .game-header {
+        .actions {
             display: flex;
             flex-direction: row;
-            justify-content: space-between;
             align-items: center;
-            gap: 1em;
-
-            .state {
-                height: 26px;
-                width: 26px;
-
-                &.lose {
-                    background-image: url('/img/minesweeper/lose.gif');
-                }
-
-                &.play {
-                    background-image: url('/img/minesweeper/smile.gif');
-                }
-
-                &.win {
-                    background-image: url('/img/minesweeper/win.gif');
-                }
-
-                &.clicked {
-
-                }
-            }
-
+            gap: 0.5em;
         }
+    }
 
-        .game-board {
-            display: inline-block;
-            cursor: default;
-        }
+    .mho-minesweeper {
+        .game-container {
 
-        .row {
-            display: flex;
-        }
-
-        .cell {
-            width: 16px;
-            height: 16px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        /* Styles pour le thème legacy */
-        &.legacy {
-            .cell {
-
-                &:not(.revealed):not(.flagged):not(.questioned):not(.highlighted) {
-                    background-image: url('/img/minesweeper/blank.gif');
-                }
-
-                &.revealed {
-                    @for $i from 0 through 8 {
-                        &.revealed-#{$i} {
-                            background-image: url('/img/minesweeper/open#{$i}.gif');
-                        }
-                    }
-
-                    &.mined {
-                        background-image: url('/img/minesweeper/bombrevealed.gif');
-
-                        &.game-over {
-                            background-image: url('/img/minesweeper/bombdeath.gif');
-                        }
-                    }
-                }
-
-                &.flagged {
-                    background-image: url('/img/minesweeper/bombflagged.gif');
-                }
-
-                &.questioned {
-                    background-image: url('/img/minesweeper/bombquestion.gif');
-                }
-
-                &.no-bomb {
-                    background-image: url('/img/minesweeper/nobomb.gif');
-                }
-
-                &.highlighted {
-                    background-image: url('/img/minesweeper/open0.gif');
-                }
-            }
+            width: fit-content;
 
             .game-header {
-                .remain-mines {
+                display: flex;
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+                gap: 1em;
 
+                .state {
+                    height: 26px;
+                    width: 26px;
+                }
+
+            }
+
+            .game-board {
+                display: inline-block;
+                cursor: default;
+            }
+
+            .row {
+                display: flex;
+            }
+
+            .cell {
+                width: 16px;
+                height: 16px;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+
+            /* Styles pour le thème legacy */
+            &.legacy {
+                --ms-bg: #bdbdbd;
+                --ms-light: #ffffff;
+                --ms-shadow-dark: #7b7b7b;
+                --ms-digit-bg: #000000;
+
+                background-color: var(--ms-bg);
+                padding: 10px;
+                border-top: 3px solid var(--ms-light);
+                border-left: 3px solid var(--ms-light);
+                border-right: 3px solid var(--ms-shadow-dark);
+                border-bottom: 3px solid var(--ms-shadow-dark);
+
+                .cell {
+
+                    &:not(.revealed):not(.flagged):not(.questioned):not(.highlighted) {
+                        background-image: url(/img/minesweeper/blank.gif);
+                    }
+
+                    &.revealed {
+                        @for $i from 0 through 8 {
+                            &.revealed-#{$i} {
+                                $value: '/img/minesweeper/open#{$i}.gif';
+                                background-image: url($value);
+                            }
+                        }
+
+                        &.mined {
+                            background-image: url(/img/minesweeper/bombrevealed.gif);
+
+                            &.game-over {
+                                background-image: url(/img/minesweeper/bombdeath.gif);
+                            }
+                        }
+                    }
+
+                    &.flagged {
+                        background-image: url(/img/minesweeper/bombflagged.gif);
+                    }
+
+                    &.questioned {
+                        background-image: url(/img/minesweeper/bombquestion.gif);
+                    }
+
+                    &.no-bomb {
+                        background-image: url(/img/minesweeper/nobomb.gif);
+                    }
+
+                    &.highlighted {
+                        background-image: url('/img/minesweeper/open0.gif');
+                    }
+                }
+
+                .game-header {
+                    padding: 6px;
+                    margin-bottom: 10px;
+
+                    .state {
+                        height: 26px;
+                        width: 26px;
+
+                        &.lose {
+                            background-image: url(/img/minesweeper/lose.gif);
+                        }
+
+                        &.play {
+                            background-image: url(/img/minesweeper/smile.gif);
+                        }
+
+                        &.win {
+                            background-image: url(/img/minesweeper/win.gif);
+                        }
+
+                        &.clicked {
+
+                        }
+                    }
+
+                    .remain-mines, .timer {
+                        flex: 1;
+                        display: flex;
+
+                        > div {
+                            background-color: var(--ms-digit-bg);
+                            border: 1px solid var(--ms-shadow-dark);
+                            display: flex;
+                        }
+                    }
+
+                    .remain-mines {
+                        justify-content: flex-start;
+                    }
+
+                    .timer {
+                        justify-content: flex-end;
+                    }
+                }
+
+                .game-board, .game-header {
+                    border-top: 3px solid var(--ms-shadow-dark);
+                    border-left: 3px solid var(--ms-shadow-dark);
+                    border-right: 3px solid var(--ms-light);
+                    border-bottom: 3px solid var(--ms-light);
                 }
             }
+
+            /* Styles pour le thème myhordes */
+            &.myhordes {
+
+            }
         }
+    }
 
-        /* Styles pour le thème moderne */
-        //&.modern {
-        //}
 
-        /* Styles pour le thème myhordes */
-        &.myhordes {
-
-        }
+    .custom-grid-size {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.5em;
     }
 }

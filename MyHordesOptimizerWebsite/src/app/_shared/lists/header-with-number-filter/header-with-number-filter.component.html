@@ -3,7 +3,7 @@
         {{ header() }}
 
         @if (!visible) {
-            <mat-icon class="open-menu-icon" (click)="$event.preventDefault(); $event.stopPropagation(); displayFilter();">
+            <mat-icon fontSet="material-symbols-outlined" class="open-menu-icon" (click)="$event.preventDefault(); $event.stopPropagation(); displayFilter();">
                 filter_alt
             </mat-icon>
         }

@@ -1,7 +1,7 @@
 @if (citizen_info) {
     <div class="mho-citizens-immune">
         <div class="filters">
-            <mat-form-field [appearance]="'outline'" class="no-bottom compact-field">
+            <mat-form-field subscriptSizing="dynamic" [appearance]="'outline'" class="compact-field">
                 <mho-select [options]="all_citizens_job"
                             multiple
                             [class]="'job-select'"

@@ -2,7 +2,7 @@
     <mat-card-title>
         <ng-container i18n>Camping</ng-container>
         <button mat-icon-button type="button" (click)="shareCamping()" matTooltip="Copier le lien de la simulation" i18n-matTooltip>
-            <mat-icon>share</mat-icon>
+            <mat-icon fontSet="material-symbols-outlined">share</mat-icon>
         </button>
     </mat-card-title>
     <div class="actions">
@@ -120,7 +120,9 @@
                             <mho-select [formControlName]="'ruin'" [options]="(in_town_camping ? town_ruins : ruins) | filterRuinsByKm:townDistance.value"
                                         [bindLabel]="'label.' + locale" [bindIcon]="'formatted_img'" [moreInfo]="getMoreRuinInfoFn" searchable>
                             </mho-select>
-                            <mat-icon matSuffix [matTooltip]="help_ruins" style="vertical-align: middle" [color]="'primary'">help_outline</mat-icon>
+                            <mat-icon fontSet="material-symbols-outlined" matSuffix [matTooltip]="help_ruins" style="vertical-align: middle"
+                                      [color]="'primary'">help_outline
+                            </mat-icon>
                             <span matSuffix [innerHTML]="getMoreRuinInfoFn(configuration_form.get('ruin')?.value)"></span>
                         </mat-form-field>
 
@@ -151,7 +153,8 @@
 
                         <h3>
                             <ng-container i18n>Améliorations</ng-container>
-                            <mat-icon matSuffix [matTooltip]="help_amelio" style="vertical-align: middle; margin-left: 0.25em;" [color]="'primary'">
+                            <mat-icon fontSet="material-symbols-outlined" matSuffix [matTooltip]="help_amelio"
+                                      style="vertical-align: middle; margin-left: 0.25em;" [color]="'primary'">
                                 help_outline
                             </mat-icon>
                         </h3>

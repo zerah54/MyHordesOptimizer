@@ -8,7 +8,7 @@
                     @for (single_value of $any(value); track single_value; ) {
                         <mat-chip (removed)="remove(single_value)" class="mho-select-chip">
                             <button type="reset" matChipRemove>
-                                <mat-icon>cancel</mat-icon>
+                                <mat-icon fontSet="material-symbols-outlined">cancel</mat-icon>
                             </button>
                             @if (single_value) {
                                 @if (single_value | bind:bindValue():displayed_options(); as display_value) {
@@ -47,7 +47,7 @@
                 </span>
             }
             @if (value && clearable()) {
-                <mat-icon matSuffix style="margin-right: 0.5em; position: relative;"
+                <mat-icon fontSet="material-symbols-outlined" matSuffix style="margin-right: 0.5em; position: relative;"
                           (click)="$event.stopPropagation(); value = undefined; writeValue(undefined)">
                     close
                 </mat-icon>
@@ -56,7 +56,7 @@
     }
     @if (complete_options() && complete_options().length > 0 && searchable()) {
         <form [autocomplete]="'off'">
-            <mat-form-field class="no-bottom" style="width: 100%">
+            <mat-form-field subscriptSizing="dynamic" style="width: 100%">
                 <input matInput placeholder="Rechercher" class="mho-search" (input)="filter($event)" (keydown.space)="$event.stopPropagation()"
                        i18n-placeholder>
             </mat-form-field>

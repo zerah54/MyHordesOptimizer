@@ -64,7 +64,7 @@
         @for (action of (citizen.heroic_actions?.content || []); track $index) {
             <div mat-menu-item [role]="action.element.value.max_lvl > 1 ? 'menuitem': 'menuitemcheckbox'" (click)="$event.stopPropagation();">
                 @if (action.element.value.max_lvl > 1) {
-                    <mat-form-field [appearance]="'outline'" class="no-bottom compact-field">
+                    <mat-form-field subscriptSizing="dynamic" [appearance]="'outline'" class="compact-field">
                         <mat-label>{{ action.element.value.label }}</mat-label>
                         <mat-select [(ngModel)]="action.value" (ngModelChange)="updateActions(action, $event)">
                             @for (option of action.element.value.options; track option) {
@@ -87,7 +87,7 @@
         @for (home of (citizen.home?.content || []); track $index) {
             <div mat-menu-item [role]="home.element.value.max_lvl > 1 ? 'menuitem': 'menuitemcheckbox'" (click)="$event.stopPropagation();">
                 @if (home.element.value.max_lvl > 1) {
-                    <mat-form-field [appearance]="'outline'" class="no-bottom compact-field">
+                    <mat-form-field subscriptSizing="dynamic" [appearance]="'outline'" class="compact-field">
                         <mat-label>{{ home.element.value.label }}</mat-label>
                         @if (home.element.value.img && home.element.value.img !== '') {
                             <img style="vertical-align: super; margin-right: 0.5em;"

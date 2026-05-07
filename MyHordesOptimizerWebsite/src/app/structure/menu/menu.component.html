@@ -23,9 +23,9 @@
         }
         @if (site_language) {
             <button mat-button type="button" [matMenuTriggerFor]="languageMenu">
-                <mat-icon>language</mat-icon>
+                <mat-icon fontSet="material-symbols-outlined">language</mat-icon>
                 {{ site_language.label }}
-                <mat-icon>arrow_drop_down</mat-icon>
+                <mat-icon fontSet="material-symbols-outlined">arrow_drop_down</mat-icon>
             </button>
             <mat-menu #languageMenu="matMenu">
                 @for (language of language_list; track language.code) {
@@ -37,9 +37,9 @@
             </mat-menu>
         }
         <button mat-button type="button" [matMenuTriggerFor]="themeMenu">
-            <mat-icon>palette</mat-icon>
+            <mat-icon fontSet="material-symbols-outlined">palette</mat-icon>
             {{ selected_theme?.label }}
-            <mat-icon>arrow_drop_down</mat-icon>
+            <mat-icon fontSet="material-symbols-outlined">arrow_drop_down</mat-icon>
         </button>
         <mat-menu #themeMenu="matMenu">
             @for (theme of themes; track theme.class) {
@@ -67,7 +67,7 @@
            [routerLinkActiveOptions]="{exact : true}" [routerLink]="route.path"
            (click)="route.expanded = !route.expanded; toggleDisplayChildren(route)" [ngClass]="['lvl-' + route.lvl]">
             @if (route.children && route.children.length > 0) {
-                <mat-icon>{{ route.expanded ? 'expand_more' : 'chevron_right' }}</mat-icon>
+                <mat-icon fontSet="material-symbols-outlined">{{ route.expanded ? 'expand_more' : 'chevron_right' }}</mat-icon>
             }
             {{ route.label }}
             @if (route.spoil) {

@@ -2,7 +2,7 @@
     <mat-card-title>
         <ng-container i18n>Expéditions</ng-container>
         <button mat-icon-button type="button" (click)="shareExpeditionForum()" matTooltip="Copier au format forum" i18n-matTooltip>
-            <mat-icon>share</mat-icon>
+            <mat-icon fontSet="material-symbols-outlined">share</mat-icon>
         </button>
         <mho-active-citizens [citizenList]="active_citizens_list()" [completeCitizenList]="all_citizens()"></mho-active-citizens>
     </mat-card-title>
@@ -27,7 +27,7 @@
                                 <div class="actions">
                                     <div class="left-actions">
                                         <button mat-button type="button" (click)="addNewExpedition()">
-                                            <mat-icon>add</mat-icon>
+                                            <mat-icon fontSet="material-symbols-outlined">add</mat-icon>
                                             <ng-container i18n>Créer une expédition</ng-container>
                                         </button>
                                         <div><span i18n>Places&nbsp;:&nbsp;</span>{{ spots }}/{{ all_citizens().length }}</div>
@@ -48,7 +48,7 @@
                                     <div class="right-actions">
                                         @if (day_index + 1 >= this.current_day()) {
                                             <button mat-icon-button type="button" [matMenuTriggerFor]="manageExpeditions">
-                                                <mat-icon>more_vert</mat-icon>
+                                                <mat-icon fontSet="material-symbols-outlined">more_vert</mat-icon>
                                             </button>
                                             <mat-menu #manageExpeditions="matMenu">
                                                 <div mat-menu-item (click)="$event.preventDefault(); $event.stopPropagation()"
@@ -59,7 +59,7 @@
                                                         <div matSuffix>
                                                             <button mat-icon-button type="button"
                                                                     (click)="+dayInput.value > 1 && +dayInput.value < day ? importExpeditions(+dayInput.value) : undefined">
-                                                                <mat-icon>save</mat-icon>
+                                                                <mat-icon fontSet="material-symbols-outlined">save</mat-icon>
                                                             </button>
                                                         </div>
                                                     </mat-form-field>
@@ -77,12 +77,12 @@
                                         <mat-expansion-panel-header class="header">
                                             <div class="label">
                                                 @if (edition_mode() && editable()) {
-                                                    <mat-form-field [appearance]="'outline'" class="no-bottom compact-field"
+                                                    <mat-form-field subscriptSizing="dynamic" [appearance]="'outline'" class="compact-field"
                                                                     (click)="$event.stopPropagation()" (keydown.space)="$event.stopPropagation()">
                                                         <mat-label i18n>Nom de l'expédition</mat-label>
                                                         <input matInput [(ngModel)]="expedition.label" (change)="saveExpedition(expedition)">
                                                     </mat-form-field>
-                                                    <mat-form-field [appearance]="'outline'" class="no-bottom compact-field"
+                                                    <mat-form-field subscriptSizing="dynamic" [appearance]="'outline'" class="compact-field"
                                                                     (click)="$event.stopPropagation()" (keydown.space)="$event.stopPropagation()">
                                                         <mat-label i18n>Points de contrôles requis</mat-label>
                                                         <input matInput type="number" [(ngModel)]="expedition.min_pdc" (change)="saveExpedition(expedition)">
@@ -99,7 +99,7 @@
                                                     </mat-slide-toggle>
                                                     <button mat-icon-button type="button" matTooltip="Supprimer l'expédition" i18n-matTooltip
                                                             (click)="removeExpedition(expedition)">
-                                                        <mat-icon>delete</mat-icon>
+                                                        <mat-icon fontSet="material-symbols-outlined">delete</mat-icon>
                                                     </button>
                                                 </div>
                                             }
@@ -112,7 +112,7 @@
                                                             <span i18n>Partie {{ expedition_part_index + 1 }}&nbsp;:&nbsp;</span>
                                                         }
                                                         @if (edition_mode() && editable()) {
-                                                            <mat-form-field [appearance]="'outline'" class="no-bottom compact-field">
+                                                            <mat-form-field subscriptSizing="dynamic" [appearance]="'outline'" class="compact-field">
                                                                 <mat-label i18n>Nom du tracé</mat-label>
                                                                 <input matInput type="text" [(ngModel)]="expedition_part.path"
                                                                        (change)="saveExpeditionPart(expedition, expedition_part)">
@@ -132,7 +132,7 @@
                                                             @if (edition_mode() && editable()) {
                                                                 <button mat-icon-button type="button" matTooltip="Supprimer la partie" i18n-matTooltip
                                                                         (click)="removeExpeditionPart(expedition_part)">
-                                                                    <mat-icon>delete</mat-icon>
+                                                                    <mat-icon fontSet="material-symbols-outlined">delete</mat-icon>
                                                                 </button>
                                                             }
                                                             <td class="job" i18n>Métier</td>
@@ -172,13 +172,14 @@
                                                                             <button mat-icon-button type="button" matTooltip="Supprimer la place"
                                                                                     i18n-matTooltip
                                                                                     (click)="removeCitizenFromPart(expedition_citizen)">
-                                                                                <mat-icon>delete</mat-icon>
+                                                                                <mat-icon fontSet="material-symbols-outlined">delete</mat-icon>
                                                                             </button>
                                                                         </td>
                                                                     }
                                                                     <td class="job">
                                                                         @if (edition_mode() && editable() && !expedition_citizen.citizen_id) {
-                                                                            <mat-form-field [appearance]="'outline'" class="no-bottom compact-field">
+                                                                            <mat-form-field subscriptSizing="dynamic" [appearance]="'outline'"
+                                                                                            class="compact-field">
                                                                                 <mho-select [options]="all_citizens_job()"
                                                                                             emptyOption
                                                                                             noLabel
@@ -197,7 +198,8 @@
                                                                     </td>
                                                                     <td class="pseudo">
                                                                         @if (edition_mode() && editable()) {
-                                                                            <mat-form-field [appearance]="'outline'" class="no-bottom compact-field">
+                                                                            <mat-form-field subscriptSizing="dynamic" [appearance]="'outline'"
+                                                                                            class="compact-field">
                                                                                 <mho-select [options]="all_citizens() | citizensForExpe:expedition_citizen"
                                                                                             emptyOption
                                                                                             [bindLabel]="'name'"
@@ -249,7 +251,8 @@
                                                                     </td>
                                                                     <td class="pdc">
                                                                         @if ((edition_mode() || expedition.state === 'ready') && editable()) {
-                                                                            <mat-form-field [appearance]="'outline'" class="no-bottom compact-field">
+                                                                            <mat-form-field subscriptSizing="dynamic" [appearance]="'outline'"
+                                                                                            class="compact-field">
                                                                                 <input matInput [(ngModel)]="expedition_citizen.pdc"
                                                                                        (change)="saveCitizen(expedition_part, expedition_citizen)">
                                                                             </mat-form-field>
@@ -260,7 +263,8 @@
                                                                     @if ((edition_mode() || (expedition_part.citizens | someHeroicActionNeeded)) && editable()) {
                                                                         <td class="heroic">
                                                                             @if (edition_mode() && editable()) {
-                                                                                <mat-form-field [appearance]="'outline'" class="no-bottom compact-field">
+                                                                                <mat-form-field subscriptSizing="dynamic" [appearance]="'outline'"
+                                                                                                class="compact-field">
                                                                                     <mho-select [options]="all_heroics()"
                                                                                                 emptyOption
                                                                                                 [(ngModel)]="expedition_citizen.preinscrit_heroic_skill"
@@ -280,7 +284,7 @@
                                                                                 *ngTemplateOutlet="displayOrder; context: {$implicit: expedition_citizen.orders}"></ng-container>
                                                                             <button mat-icon-button type="button"
                                                                                     (click)="openExpeditionOrders(expedition_citizen.orders, expedition_citizen)">
-                                                                                <mat-icon>edit</mat-icon>
+                                                                                <mat-icon fontSet="material-symbols-outlined">edit</mat-icon>
                                                                             </button>
                                                                         } @else {
                                                                             <ng-container
@@ -309,7 +313,7 @@
                                                             <tr>
                                                                 <td [attr.colspan]="'100%'">
                                                                     <button mat-button (click)="addNewMemberToPart(expedition_part)">
-                                                                        <mat-icon>add</mat-icon>
+                                                                        <mat-icon fontSet="material-symbols-outlined">add</mat-icon>
                                                                         <ng-container i18n>Ajouter une place</ng-container>
                                                                     </button>
                                                                 </td>
@@ -323,7 +327,7 @@
                                                             @if (edition_mode() && editable()) {
                                                                 <button mat-icon-button type="button"
                                                                         (click)="openExpeditionOrders(expedition_part.orders, expedition_part)">
-                                                                    <mat-icon>edit</mat-icon>
+                                                                    <mat-icon fontSet="material-symbols-outlined">edit</mat-icon>
                                                                 </button>
                                                             }
                                                         </h3>
@@ -362,12 +366,12 @@
                                         @if (edition_mode() && editable()) {
                                             <div class="footer">
                                                 <button mat-button type="button" (click)="addNewExpeditionPart(expedition)">
-                                                    <mat-icon>add</mat-icon>
+                                                    <mat-icon fontSet="material-symbols-outlined">add</mat-icon>
                                                     <ng-container i18n>Ajouter une partie à l'expédition</ng-container>
                                                 </button>
                                                 @if (expedition.parts.length > 1) {
                                                     <button mat-button type="button" (click)="addNewMemberToExpedition(expedition)">
-                                                        <mat-icon>add</mat-icon>
+                                                        <mat-icon fontSet="material-symbols-outlined">add</mat-icon>
                                                         <ng-container i18n>Ajouter un membre à l'expédition</ng-container>
                                                     </button>
                                                 }

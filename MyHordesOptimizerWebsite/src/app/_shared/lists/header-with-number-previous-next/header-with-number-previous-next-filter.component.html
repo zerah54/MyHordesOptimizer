@@ -3,7 +3,7 @@
         {{ header() }}
 
         @if (!visible) {
-            <mat-icon class="open-menu-icon" (click)="$event.preventDefault(); $event.stopPropagation(); displayFilter();">
+            <mat-icon fontSet="material-symbols-outlined" class="open-menu-icon" (click)="$event.preventDefault(); $event.stopPropagation(); displayFilter();">
                 filter_alt
             </mat-icon>
         }
@@ -13,19 +13,19 @@
         <mat-form-field (click)="$event.stopPropagation();" class="short-bottom">
             @if (displayFirstLast()) {
                 <button mat-icon-button type="button" matPrefix [disabled]="filterValue() === min()" (click)="filterValueChange.emit(min())">
-                    <mat-icon>first_page</mat-icon>
+                    <mat-icon fontSet="material-symbols-outlined">first_page</mat-icon>
                 </button>
             }
             <button mat-icon-button type="button" matPrefix [disabled]="filterValue() === min()" (click)="filterValueChange.emit(+filterValue() - 1)">
-                <mat-icon>arrow_back_ios</mat-icon>
+                <mat-icon fontSet="material-symbols-outlined">arrow_back_ios</mat-icon>
             </button>
             <input matInput type="number" [ngModel]="filterValue()" (ngModelChange)="filterValueChange.emit($event)" [min]="min()" [max]="max()">
             <button mat-icon-button type="button" matSuffix [disabled]="filterValue() === max()" (click)="filterValueChange.emit(+filterValue() + 1)">
-                <mat-icon>arrow_forward_ios</mat-icon>
+                <mat-icon fontSet="material-symbols-outlined">arrow_forward_ios</mat-icon>
             </button>
             @if (displayFirstLast()) {
                 <button mat-icon-button type="button" matSuffix [disabled]="filterValue() === max()" (click)="filterValueChange.emit(max())">
-                    <mat-icon>last_page</mat-icon>
+                    <mat-icon fontSet="material-symbols-outlined">last_page</mat-icon>
                 </button>
             }
         </mat-form-field>

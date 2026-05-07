@@ -7,7 +7,7 @@
     </div>
     <div class="form">
         <div class="form-content">
-            <mat-form-field appearance="outline" class="registry-paste no-bottom">
+            <mat-form-field subscriptSizing="dynamic" appearance="outline" class="registry-paste">
                 <mat-label i18n>Coller le contenu du registre à analyser</mat-label>
                 <textarea matInput [(ngModel)]="registry" (ngModelChange)="readLogs(this.display_mode)"></textarea>
             </mat-form-field>

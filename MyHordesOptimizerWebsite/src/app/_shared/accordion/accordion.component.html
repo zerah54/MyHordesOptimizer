@@ -6,7 +6,7 @@
                             [attr.aria-controls]="'accordion-body-' + index">
             <div class="mho-accordion-item-header" (click)="accordionItem.toggle()">
                 {{ item.title }}
-                <mat-icon class="mho-accordion-item-toggler">{{ accordionItem.expanded ? 'expand_more' : 'chevron_right' }}
+                <mat-icon fontSet="material-symbols-outlined" class="mho-accordion-item-toggler">{{ accordionItem.expanded ? 'expand_more' : 'chevron_right' }}
                 </mat-icon>
             </div>
             <div class="mho-accordion-item-content" role="region" [style.display]="accordionItem.expanded ? '' : 'none'"

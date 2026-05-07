@@ -1,6 +1,6 @@
 <mat-toolbar class="mho-navbar" color="primary">
     <button mat-icon-button type="button" (click)="changeSidenavStatus.emit();">
-        <mat-icon>menu</mat-icon>
+        <mat-icon fontSet="material-symbols-outlined">menu</mat-icon>
     </button>
     <img [ngSrc]="'img/logo/logo_mho_64x64.png'" height="48" width="48" priority>
     <div class="title">{{ is_gt_xs ? 'MyHordes Optimizer' : 'MHO' }}</div>
@@ -8,13 +8,13 @@
     @if (saved_external_app_id && is_in_town) {
         @if (is_gt_xs) {
             <button mat-button type="button" [color]="'accent'" (click)="updateExternalTools()">
-                <mat-icon>send</mat-icon>
+                <mat-icon fontSet="material-symbols-outlined">send</mat-icon>
                 <ng-container i18n>Mettre à jour les outils externes</ng-container>
             </button>
         } @else {
             <button mat-icon-button type="button" [color]="'accent'" (click)="updateExternalTools()"
                     matTooltip="Mettre à jour les outils externes" i18n-matTooltip>
-                <mat-icon>send</mat-icon>
+                <mat-icon fontSet="material-symbols-outlined">send</mat-icon>
             </button>
         }
     }
@@ -48,11 +48,11 @@
     <mat-menu #userMenu="matMenu">
         @if (!saved_external_app_id) {
             <div mat-menu-item (click)="$event.stopPropagation()">
-                <mat-form-field class="external-app-id-input no-bottom">
+                <mat-form-field subscriptSizing="dynamic" class="external-app-id-input">
                     <mat-label i18n>Identifiant d'app externe</mat-label>
                     <input matInput type="text" placeholder="Identifiant externe pour les app" i18n-placeholder [(ngModel)]="external_app_id_field_value">
                     <button matSuffix mat-icon-button type="button" (click)="saveExternalAppId();" [disabled]="!external_app_id_field_value">
-                        <mat-icon>check</mat-icon>
+                        <mat-icon fontSet="material-symbols-outlined">check</mat-icon>
                     </button>
                 </mat-form-field>
             </div>

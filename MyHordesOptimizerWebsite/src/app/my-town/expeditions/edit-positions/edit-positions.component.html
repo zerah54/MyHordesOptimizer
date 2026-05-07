@@ -12,7 +12,7 @@
                 <div class="expedition-row" cdkDrag cdkDragBoundary=".expedition-rows" cdkDragLockAxis="y">
                     <div class="expedition-row-main">
                         <div class="expedition-row-reorder" cdkDragHandle>
-                            <mat-icon>drag_indicator</mat-icon>
+                            <mat-icon fontSet="material-symbols-outlined">drag_indicator</mat-icon>
                         </div>
                         <div class="expedition-row-title">
                             {{ expedition.label }}
@@ -24,7 +24,7 @@
                             @for (part of expedition.parts; track part.id) {
                                 <div class="part-row" cdkDrag cdkDragBoundary=".part-rows" cdkDragLockAxis="y">
                                     <div class="part-row-reorder" cdkDragHandle>
-                                        <mat-icon>drag_indicator</mat-icon>
+                                        <mat-icon fontSet="material-symbols-outlined">drag_indicator</mat-icon>
                                     </div>
                                     <div class="part-row-main">
                                         {{ part.path }}

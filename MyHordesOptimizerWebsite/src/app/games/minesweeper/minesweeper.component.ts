@@ -1,77 +1,98 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { ChangeDetectionStrategy, Component, OnInit, signal, Signal, WritableSignal } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
-import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatCardModule } from '@angular/material/card';
+import { MatCheckbox } from '@angular/material/checkbox';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import moment, { Moment } from 'moment';
 import { Imports } from '../../_abstract_model/types/_types';
+import { CounterFromDatePipe, DiffBetweenDatesPipe } from '../../_core/utilities/date.util';
+import { GeneratedBoard, generateSolvableBoard } from './minesweeper-generator.util';
 
-const angular_common: Imports = [CommonModule, FormsModule, ReactiveFormsModule];
+
+const angular_common: Imports = [CommonModule, FormsModule];
 const components: Imports = [];
 const pipes: Imports = [];
-const material_modules: Imports = [MatButtonModule, MatButtonToggleModule, MatCardModule, MatFormFieldModule, MatInputModule];
+const material_modules: Imports = [MatButtonModule, MatCardModule, MatFormFieldModule, MatInputModule, MatSlideToggleModule, MatMenuModule, MatIconModule];
 
 @Component({
     selector: 'mho-minesweeper',
     templateUrl: 'minesweeper.component.html',
     styleUrls: ['minesweeper.component.scss'],
     host: {style: 'display: contents'},
-    imports: [...angular_common, ...components, ...material_modules, ...pipes]
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    imports: [...angular_common, ...components, ...material_modules, ...pipes, CounterFromDatePipe, DiffBetweenDatesPipe, MatCheckbox]
 })
 export class MinesweeperComponent implements OnInit {
-    public board: Cell[][] = [];
-    public remaining_mines: number = 0;
-    public game_over: boolean = false;
-    public custom_size_form: FormGroup;
-    public timer: number = 0;
-    public board_initialized: boolean = false;
+    protected board: WritableSignal<Cell[][]> = signal([]);
+    protected remaining_mines: WritableSignal<number> = signal(0);
+    protected game_over: WritableSignal<boolean> = signal(false);
+    protected start_time: WritableSignal<Moment | undefined> = signal(undefined);
+    protected end_time: WritableSignal<Moment | undefined> = signal(undefined);
+    protected board_initialized: WritableSignal<boolean> = signal(false);
+    protected seed: WritableSignal<number | undefined> = signal(Math.floor(Math.random() * 0xFFFFFFFF));
+    protected random_seed: WritableSignal<boolean> = signal(true);
 
-    public sizes_list: MinesweeperSize[] = [
+    protected sizes_list: Signal<MinesweeperSize[]> = signal([
         {id: 'small', label: $localize`Facile`, height: 9, width: 9, mines: 10},
         {id: 'medium', label: $localize`Moyen`, height: 16, width: 16, mines: 40, default: true},
         {id: 'large', label: $localize`Difficile`, height: 16, width: 30, mines: 99},
         {id: 'expert', label: $localize`Expert`, height: 50, width: 50, mines: 500},
         {id: 'impossible', label: $localize`Impossible`, height: 100, width: 100, mines: 2000},
         {id: 'custom', label: $localize`Personnalisé`, height: 16, width: 30, mines: 120}
-    ];
-    public selected_size: MinesweeperSize = this.sizes_list.find((size: MinesweeperSize) => size.default) ?? this.sizes_list[0];
+    ]);
+    protected selected_size: WritableSignal<MinesweeperSize> = signal(this.sizes_list().find((size: MinesweeperSize) => size.default) ?? this.sizes_list()[0]);
 
-    public themes_list: MinesweeperTheme[] = [
+    protected themes_list: Signal<MinesweeperTheme[]> = signal([
         {id: 'legacy', label: $localize`Classique`, default: true},
-        // { id: 'modern', label: $localize`Moderne` },
         {id: 'myhordes', label: `MyHordes`}
-    ];
-    public selected_theme: MinesweeperTheme = this.themes_list.find((theme: MinesweeperTheme) => theme.default) ?? this.themes_list[0];
-
-    constructor(private fb: FormBuilder) {
-        this.custom_size_form = this.fb.group({
-            width: [10, [Validators.required, Validators.min(10)]],
-            height: [10, [Validators.required, Validators.min(10)]],
-            mines: [10, [Validators.required, Validators.min(1)]]
-        });
-    }
+    ]);
+    protected selected_theme: WritableSignal<MinesweeperTheme> = signal(this.themes_list().find((theme: MinesweeperTheme) => theme.default) ?? this.themes_list()[0]);
 
     public ngOnInit(): void {
         this.resetGame();
     }
 
-    public resetGame(): void {
-        if (this.selected_size.id === 'custom') {
-            this.selected_size.width = Math.max(1, this.selected_size.width);
-            this.selected_size.height = Math.max(1, this.selected_size.height);
-            this.selected_size.mines = Math.min(Math.max(1, this.selected_size.height), this.selected_size.width * this.selected_size.height);
+    protected changeTheme(new_selected_theme: MinesweeperTheme): void {
+        this.selected_theme.set(new_selected_theme);
+    }
+
+    protected resetGame(new_selected_size?: Partial<MinesweeperSize>): void {
+        if (new_selected_size) {
+            this.selected_size.update((selected_size: MinesweeperSize) => {
+                if (new_selected_size.id) {
+                    selected_size = new_selected_size as MinesweeperSize;
+                } else {
+                    if (new_selected_size.width) selected_size.width = new_selected_size.width;
+                    if (new_selected_size.height) selected_size.height = new_selected_size.height;
+                    if (new_selected_size.mines) selected_size.mines = new_selected_size.mines;
+                }
+                return selected_size;
+            });
         }
-        this.initializeBoard(this.selected_size.width, this.selected_size.height, this.selected_size.mines);
-        this.board_initialized = false;
-        this.game_over = false;
-        this.remaining_mines = this.selected_size.mines;
-        this.timer = 0;
+        if (this.selected_size().id === 'custom') {
+            this.selected_size.update((selected_size: MinesweeperSize) => {
+                selected_size.width = Math.max(1, selected_size.width);
+                selected_size.height = Math.max(1, selected_size.height);
+                selected_size.mines = Math.min(Math.max(1, selected_size.height), selected_size.width * selected_size.height);
+                return selected_size;
+            })
+        }
+        this.initializeBoard(this.selected_size().width, this.selected_size().height, this.selected_size().mines);
+        this.board_initialized.set(false);
+        this.game_over.set(false);
+        this.remaining_mines.set(this.selected_size().mines);
+        this.start_time.set(undefined);
+        this.end_time.set(undefined);
     }
 
     private initializeBoard(width: number, height: number, mines: number, exclude_x?: number, exclude_y?: number): void {
-        this.board = Array(height).fill(null).map(() =>
+        this.board.set(Array(height).fill(null).map(() =>
             Array(width).fill(null).map(() => ({
                 is_mine: false,
                 is_revealed: false,
@@ -81,62 +102,53 @@ export class MinesweeperComponent implements OnInit {
                 is_game_over: false,
                 adjacent_mines: 0
             }))
-        );
+        ));
 
-        const excluded: Set<string> = new Set<string>();
-        if (exclude_x !== undefined && exclude_y !== undefined) {
-            for (let dx = -1; dx <= 1; dx++) {
-                for (let dy = -1; dy <= 1; dy++) {
-                    excluded.add(`${exclude_y + dy},${exclude_x + dx}`);
-                }
-            }
-        }
+        if (exclude_x === undefined || exclude_y === undefined) return;
 
-        let placedMines = 0;
-        while (placedMines < mines) {
-            const x = Math.floor(Math.random() * width);
-            const y = Math.floor(Math.random() * height);
-            if (!this.board[y][x].is_mine && !excluded.has(`${y},${x}`)) {
-                this.board[y][x].is_mine = true;
-                placedMines++;
-                this.incrementAdjacentCells(x, y);
-            }
-        }
-    }
+        const result: GeneratedBoard = generateSolvableBoard(width, height, mines, exclude_x, exclude_y, this.getSeed());
 
-    private incrementAdjacentCells(x: number, y: number): void {
-        for (let i: number = -1; i <= 1; i++) {
-            for (let j: number = -1; j <= 1; j++) {
-                if (i === 0 && j === 0) continue;
-                const new_x: number = x + i;
-                const new_y: number = y + j;
-                if (new_x >= 0 && new_x < this.board[0].length && new_y >= 0 && new_y < this.board.length) {
-                    this.board[new_y][new_x].adjacent_mines++;
-                }
+        for (let y = 0; y < height; y++) {
+            for (let x = 0; x < width; x++) {
+                const idx = y * width + x;
+                this.board.update((board: Cell[][]) => {
+                    board[y][x].is_mine = result.mines[idx] === 1;
+                    board[y][x].adjacent_mines = result.adjacent_counts[idx];
+                    return board;
+                })
             }
         }
     }
 
     public revealCell(i: number, j: number): void {
-        if (this.game_over || this.board[i][j].is_flagged || this.board[i][j].is_questioned) return;
+        if (this.game_over() || this.board()[i][j].is_flagged || this.board()[i][j].is_questioned) return;
 
-        if (!this.board_initialized) {
-            this.initializeBoard(this.selected_size.width, this.selected_size.height, this.selected_size.mines, j, i);
-            this.board_initialized = true;
+        if (!this.board_initialized()) {
+            this.initializeBoard(this.selected_size().width, this.selected_size().height, this.selected_size().mines, j, i);
+            this.board_initialized.set(true);
+            this.start_time.set(moment());
+            this.end_time.set(undefined);
         }
 
-        if (this.board[i][j].is_revealed) {
+        if (this.board()[i][j].is_revealed) {
             this.revealAdjacentIfSafe(i, j);
             return;
         }
 
-        this.board[i][j].is_revealed = true;
+        this.board.update((board: Cell[][]) => {
+            board[i][j].is_revealed = true;
+            return board;
+        });
 
-        if (this.board[i][j].is_mine) {
-            this.board[i][j].is_game_over = true;
-            this.game_over = true;
+        if (this.board()[i][j].is_mine) {
+            this.board.update((board: Cell[][]) => {
+                board[i][j].is_game_over = true;
+                return board;
+            });
+            this.game_over.set(true);
+            this.end_time.set(moment());
             this.revealAllMines();
-        } else if (this.board[i][j].adjacent_mines === 0) {
+        } else if (this.board()[i][j].adjacent_mines === 0) {
             this.revealAdjacentCells(i, j);
         }
 
@@ -149,18 +161,18 @@ export class MinesweeperComponent implements OnInit {
             for (let y: number = -1; y <= 1; y++) {
                 const new_i: number = i + x;
                 const new_j: number = j + y;
-                if (this.isValidCell(new_i, new_j) && (this.board[new_i][new_j].is_flagged)) {
+                if (this.isValidCell(new_i, new_j) && (this.board()[new_i][new_j].is_flagged)) {
                     flagged_count++;
                 }
             }
         }
 
-        if (flagged_count === this.board[i][j].adjacent_mines) {
+        if (flagged_count === this.board()[i][j].adjacent_mines) {
             for (let x: number = -1; x <= 1; x++) {
                 for (let y: number = -1; y <= 1; y++) {
                     const new_i: number = i + x;
                     const new_j: number = j + y;
-                    if (this.isValidCell(new_i, new_j) && !this.board[new_i][new_j].is_revealed && !this.board[new_i][new_j].is_flagged && !this.board[new_i][new_j].is_questioned) {
+                    if (this.isValidCell(new_i, new_j) && !this.board()[new_i][new_j].is_revealed && !this.board()[new_i][new_j].is_flagged && !this.board()[new_i][new_j].is_questioned) {
                         this.revealCell(new_i, new_j);
                     }
                 }
@@ -173,8 +185,8 @@ export class MinesweeperComponent implements OnInit {
             for (let y: number = -1; y <= 1; y++) {
                 const new_i: number = i + x;
                 const new_j: number = j + y;
-                if (new_i >= 0 && new_i < this.board.length && new_j >= 0 && new_j < this.board[0].length) {
-                    if (!this.board[new_i][new_j].is_revealed && !this.board[new_i][new_j].is_flagged && !this.board[new_i][new_j].is_questioned) {
+                if (new_i >= 0 && new_i < this.board().length && new_j >= 0 && new_j < this.board()[0].length) {
+                    if (!this.board()[new_i][new_j].is_revealed && !this.board()[new_i][new_j].is_flagged && !this.board()[new_i][new_j].is_questioned) {
                         this.revealCell(new_i, new_j);
                     }
                 }
@@ -182,70 +194,101 @@ export class MinesweeperComponent implements OnInit {
         }
     }
 
-    public cycleMarker(i: number, j: number, event: Event): void {
+    protected cycleMarker(i: number, j: number, event: Event): void {
         event.preventDefault();
-        if (this.game_over || this.board[i][j].is_revealed) return;
+        if (this.game_over() || this.board()[i][j].is_revealed) return;
 
-        const cell: Cell = this.board[i][j];
+        this.board.update((board: Cell[][]) => {
+            const cell: Cell = board[i][j];
+            if (!cell.is_flagged && !cell.is_questioned) {
+                cell.is_flagged = true;
+                this.remaining_mines.update((remaining_mines: number) => {
+                    remaining_mines--;
+                    return remaining_mines;
+                });
+            } else if (cell.is_flagged) {
+                cell.is_flagged = false;
+                cell.is_questioned = true;
+                this.remaining_mines.update((remaining_mines: number) => {
+                    remaining_mines++;
+                    return remaining_mines;
+                });
+            } else {
+                cell.is_questioned = false;
+            }
+            return board;
+        })
 
-        if (!cell.is_flagged && !cell.is_questioned) {
-            cell.is_flagged = true;
-            this.remaining_mines--;
-        } else if (cell.is_flagged) {
-            cell.is_flagged = false;
-            cell.is_questioned = true;
-            this.remaining_mines++;
-        } else {
-            cell.is_questioned = false;
-        }
+        this.checkWinCondition();
     }
 
     private revealAllMines(): void {
-        this.board.forEach((row: Cell[]) => {
-            row.forEach((cell: Cell) => {
-                if (cell.is_mine) cell.is_revealed = true;
+        this.board.update((board: Cell[][]) => {
+            board.forEach((row: Cell[]) => {
+                row.forEach((cell: Cell) => {
+                    if (cell.is_mine) cell.is_revealed = true;
+                });
             });
+            return board;
         });
     }
 
     private checkWinCondition(): void {
-        const all_non_mines_revealed: boolean = this.board.every((row: Cell[]) =>
+        const all_non_mines_revealed: boolean = this.board().every((row: Cell[]) =>
             row.every((cell: Cell) => cell.is_revealed || cell.is_mine)
         );
 
-        if (all_non_mines_revealed && this.remaining_mines === 0) {
-            this.game_over = true;
+        if (all_non_mines_revealed && this.remaining_mines() === 0) {
+            this.game_over.set(true);
+            this.end_time.set(moment());
         }
     }
 
-    public highlightAdjacentCells(i: number, j: number, event: MouseEvent): void {
-        if (event.button !== 0 || !this.board[i][j].is_revealed || this.board[i][j].adjacent_mines === 0) return;
+    protected highlightAdjacentCells(i: number, j: number, event: MouseEvent): void {
+        if (event.button !== 0 || !this.board()[i][j].is_revealed || this.board()[i][j].adjacent_mines === 0) return;
 
-        this.board[i][j].is_highlighted = true;
+        this.board.update((board: Cell[][]) => {
+            board[i][j].is_highlighted = true;
+            return board;
+        });
 
         for (let x: number = -1; x <= 1; x++) {
             for (let y: number = -1; y <= 1; y++) {
                 const new_i: number = i + x;
                 const new_j: number = j + y;
-                if (this.isValidCell(new_i, new_j) && !this.board[new_i][new_j].is_revealed && !this.board[new_i][new_j].is_flagged && !this.board[new_i][new_j].is_questioned) {
-                    this.board[new_i][new_j].is_highlighted = true;
+                if (this.isValidCell(new_i, new_j) && !this.board()[new_i][new_j].is_revealed && !this.board()[new_i][new_j].is_flagged && !this.board()[new_i][new_j].is_questioned) {
+                    this.board.update((board: Cell[][]) => {
+                        board[new_i][new_j].is_highlighted = true;
+                        return board;
+                    });
                 }
             }
         }
     }
 
-    public unhighlightCells(): void {
-        this.board.forEach((row: Cell[]) => {
-            row.forEach((cell: Cell) => {
-                cell.is_highlighted = false;
+    protected unhighlightCells(): void {
+        this.board.update((board: Cell[][]) => {
+            board.forEach((row: Cell[]) => {
+                row.forEach((cell: Cell) => {
+                    cell.is_highlighted = false;
+                });
             });
+            return board;
         });
     }
 
     private isValidCell(i: number, j: number): boolean {
-        return i >= 0 && i < this.board.length && j >= 0 && j < this.board[0].length;
+        return i >= 0 && i < this.board().length && j >= 0 && j < this.board()[0].length;
     }
 
+    private getSeed(): number {
+        if (!this.seed() || this.random_seed()) {
+            this.seed.set(Math.floor(Math.random() * 0xFFFFFFFF))
+        }
+        return this.seed() as number;
+    }
+
+    protected readonly Math = Math;
 }
 
 interface Cell {
@@ -272,3 +315,4 @@ interface MinesweeperSize {
     mines: number;
     default?: boolean;
 }
+

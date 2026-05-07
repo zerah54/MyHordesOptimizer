@@ -72,12 +72,6 @@ a {
 }
 
 .mat-mdc-form-field {
-    &.no-bottom {
-        .mat-mdc-form-field-bottom-align {
-            display: none;
-        }
-    }
-
     &.short-bottom {
         .mat-mdc-form-field-bottom-align {
             height: 1em;

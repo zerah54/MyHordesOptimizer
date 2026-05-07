@@ -2,13 +2,13 @@
     <mat-card-title>
         <ng-container i18n>Liste de courses</ng-container>
         <button mat-icon-button type="button" matTooltip="Copier au format forum" i18n-matTooltip (click)="shareWishlistForum()">
-            <mat-icon>share</mat-icon>
+            <mat-icon fontSet="material-symbols-outlined">share</mat-icon>
         </button>
     </mat-card-title>
 
     <div class="actions">
         <button mat-icon-button type="button" [matMenuTriggerFor]="shareMenu" matTooltip="Import / Export" i18n-matTooltip>
-            <mat-icon>import_export</mat-icon>
+            <mat-icon fontSet="material-symbols-outlined">import_export</mat-icon>
         </button>
         <mat-slide-toggle [(ngModel)]="edition_mode" (ngModelChange)="changeEditionMode()" i18n>Mode édition</mat-slide-toggle>
 
@@ -30,7 +30,7 @@
                         <div class="table-container">
                             <div class="table-headers">
                                 @if (edition_mode) {
-                                    <mat-form-field class="no-bottom">
+                                    <mat-form-field subscriptSizing="dynamic">
                                         <mat-label i18n>Ajouter un objet</mat-label>
                                         <mho-select #addItemSelect emptyOption
                                                     placeholder="Ajouter un objet" i18n-placeholder [ngModel]="''"
@@ -74,7 +74,7 @@
                                                                  (mousedown)="drag_disabled = false"
                                                                  (mouseup)="drag_disabled = true"
                                                                  class="dragdrop-indicator">
-                                                                <mat-icon>drag_indicator</mat-icon>
+                                                                <mat-icon fontSet="material-symbols-outlined">drag_indicator</mat-icon>
                                                             </div>
                                                         }
                                                         @case ('name') {
@@ -91,7 +91,7 @@
                                                         }
                                                         @case ('depot') {
                                                             @if (edition_mode) {
-                                                                <mat-form-field class="no-bottom" appearance="outline">
+                                                                <mat-form-field subscriptSizing="dynamic" appearance="outline">
                                                                     <mat-select [(ngModel)]="row.depot" (ngModelChange)="changeDepot()"
                                                                                 [compareWith]="compareWith">
                                                                         @for (depot of depots; track depot.key) {
@@ -113,7 +113,7 @@
                                                             @if (row.depot.value.count >= -1) {
                                                                 @if (edition_mode) {
                                                                     @if (row.count >= 0) {
-                                                                        <mat-form-field class="no-bottom count" appearance="outline">
+                                                                        <mat-form-field subscriptSizing="dynamic" class="count" appearance="outline">
                                                                             <input matInput type="number" [(ngModel)]="row.count">
                                                                             <span matSuffix (click)="row.count = -1">∞</span>
                                                                         </mat-form-field>
@@ -135,7 +135,7 @@
                                                         @case ('needed') {
                                                             @if (row.depot.value.count >= -1) {
                                                                 @if (edition_mode && row.count >= 0) {
-                                                                    <mat-form-field class="no-bottom count" appearance="outline">
+                                                                    <mat-form-field subscriptSizing="dynamic" class="count" appearance="outline">
                                                                         <input matInput type="number"
                                                                                [ngModel]="row.count - row.bank_count - row.bag_count"
                                                                                (ngModelChange)="row.count = row.bank_count + row.bag_count + $event">
@@ -154,13 +154,15 @@
                                                                 @if (edition_mode) {
                                                                     <mat-checkbox [(ngModel)]="row.should_signal"></mat-checkbox>
                                                                 } @else if (row.should_signal) {
-                                                                    <mat-icon matTooltip="Objet à signaler" i18n-matTooltip>speaker_notes</mat-icon>
+                                                                    <mat-icon fontSet="material-symbols-outlined" matTooltip="Objet à signaler" i18n-matTooltip>
+                                                                        speaker_notes
+                                                                    </mat-icon>
                                                                 }
                                                             }
                                                         }
                                                         @case ('delete') {
                                                             <button mat-icon-button type="button" (click)="remove(row)">
-                                                                <mat-icon>close</mat-icon>
+                                                                <mat-icon fontSet="material-symbols-outlined">close</mat-icon>
                                                             </button>
                                                         }
                                                     }
@@ -207,7 +209,7 @@
                 <mat-tab (click)="$event.preventDefault(); $event.stopPropagation()" labelClass="add-tab">
                     <ng-template mat-tab-label>
                         <button mat-icon-button type="button" (click)="$event.preventDefault(); $event.stopPropagation()" [matMenuTriggerFor]="addItem">
-                            <mat-icon>add</mat-icon>
+                            <mat-icon fontSet="material-symbols-outlined">add</mat-icon>
                         </button>
                     </ng-template>
                     <mat-menu #addItem="matMenu">
@@ -216,7 +218,7 @@
                                 <mat-label i18n>Zone de ramassage</mat-label>
                                 <input #zone matInput type="number">
                                 <button matSuffix mat-icon-button type="submit">
-                                    <mat-icon>check</mat-icon>
+                                    <mat-icon fontSet="material-symbols-outlined">check</mat-icon>
                                 </button>
                             </mat-form-field>
                         </form>

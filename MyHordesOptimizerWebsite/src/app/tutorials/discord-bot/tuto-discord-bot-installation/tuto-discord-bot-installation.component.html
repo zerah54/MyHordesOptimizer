@@ -2,7 +2,7 @@
     <mat-card-title>
         {{ title }}
         <button mat-icon-button type="button" [matMenuTriggerFor]="shareMenu" matTooltip="Choisir le mode de partage" i18n-matTooltip>
-            <mat-icon>share</mat-icon>
+            <mat-icon fontSet="material-symbols-outlined">share</mat-icon>
         </button>
         <mat-menu #shareMenu>
             <div mat-menu-item i18n (click)="copyUrl()">Copier l'URL</div>
