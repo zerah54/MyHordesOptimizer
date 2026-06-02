@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MHO Addon
-// @version      1.1.36.0
+// @version      1.1.37.0
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/, rubrique Tutoriels
 // @author       Zerah
 //
@@ -32,7 +32,7 @@
 // ==/UserScript==
 
 const changelog = `${getScriptInfo().name} : Changelog pour la version ${getScriptInfo().version}\n\n`
-    + `[Amélioration] Les tooltips améliorés indiquent désormais sur quel élément de la recette cliquer \n\n`;
+    + `[Correctif] Corrige l'affichage des auras sur les objets de la liste de courses \n\n`;
 
 const lang = (document.querySelector('html[lang]')?.getAttribute('lang') || document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2) || 'fr';
 
@@ -5240,10 +5240,9 @@ function displayWishlistInApp(count = 0) {
 
 /** Affiche la priorité directement sur les éléments si l'option associée est cochée */
 function displayPriorityOnItems() {
-
     if (mho_parameters.display_wishlist && pageIsDesert() && wishlist) {
         let present_items = [];
-        let empty_spaces = [];
+        let avalaible_slots = [];
         let used_spaces = [];
         let inventories = document.querySelectorAll('.inventory');
         let rucksacks = document.querySelectorAll('.inventory.rucksack, .inventory.rucksack-escort');
@@ -5256,19 +5255,18 @@ function displayPriorityOnItems() {
 
         if (rucksacks) {
             for (let rucksack of rucksacks) {
-                empty_spaces.push(...rucksack?.querySelectorAll('li.free') || []);
-                used_spaces.push(...rucksack?.querySelectorAll('li.item:not(.locked):not(.plus)') || []);
+                avalaible_slots.push(...rucksack?.querySelectorAll('li.free, li.item:not(.locked):not(.plus)') || []);
             }
         }
 
         let used_wishlist = getWishlistForZone();
-        let item_count = used_spaces.length + empty_spaces.length;
+        let item_count = avalaible_slots.length;
+        let heavy_slots = avalaible_slots.filter((slot) => slot.classList.contains('bg-heavy')).length;
 
         if (used_wishlist) {
             let count = 0;
             let heavy_count = 0;
             used_wishlist
-                .filter((wishlist_item) => wishlist_item.priority !== 0)
                 .forEach((wishlist_item) => {
                     present_items
                         .filter((present_item) => fixMhCompiledImg(present_item.querySelector('img').src).indexOf(wishlist_item.item.img) > 0)
@@ -5278,7 +5276,7 @@ function displayPriorityOnItems() {
 
                                 if (count < item_count) {
                                     if (wishlist_item.item.isHeaver) {
-                                        if (heavy_count < rucksacks.length) {
+                                        if (heavy_count < heavy_slots) {
                                             priority_in = true;
                                         }
                                         heavy_count++;
