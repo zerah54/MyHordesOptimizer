@@ -38,7 +38,7 @@ export class WishlistInfo extends CommonModel<WishlistInfoDTO> {
 
     protected dtoToModel(dto?: WishlistInfoDTO | null): void {
         if (dto) {
-            this.wishlist_items = dto.wishList.map((item: WishlistItemDTO) => new WishlistItem(item));
+            this.wishlist_items = dto.wishList.map((item: WishlistItemDTO) => new WishlistItem(item)) ?? [];
             this.wishlist_items.sort((item_a: WishlistItem, item_b: WishlistItem) => item_b.priority - item_a.priority);
             this.update_info = new UpdateInfo(dto.lastUpdateInfo);
         }
