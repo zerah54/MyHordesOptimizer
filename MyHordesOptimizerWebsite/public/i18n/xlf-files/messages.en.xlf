@@ -5099,7 +5099,7 @@ Total
         <target state="final">Script Installation</target>
       </trans-unit>
       <trans-unit id="760824966279091093" datatype="html">
-        <source>&lt;a href=&quot;https://github.com/zerah54/MyHordesOptimizer/raw/main/Scripts/Tampermonkey/my_hordes_optimizer.user.js&quot; target=&quot;_blank&quot;&gt;lien
+        <source>&lt;a href=&quot;https://github.com/zerah54/MyHordesOptimizer/raw/main/Scripts/Tampermonkey/userscript-header.js&quot; target=&quot;_blank&quot;&gt;lien
                     de téléchargement du script&lt;/a&gt;
                 </source>
         <context-group purpose="location">
@@ -5107,7 +5107,7 @@ Total
                     </context>
           <context context-type="linenumber">27</context>
         </context-group>
-        <target state="needs-translation">&lt;a href="https://github.com/zerah54/MyHordesOptimizer/raw/main/Scripts/Tampermonkey/my_hordes_optimizer.user.js" target="_blank"&gt;lien
+        <target state="needs-translation">&lt;a href="https://github.com/zerah54/MyHordesOptimizer/raw/main/Scripts/Tampermonkey/userscript-header.js" target="_blank"&gt;lien
                     de téléchargement du script&lt;/a&gt;
                 </target>
       </trans-unit>
@@ -5170,7 +5170,7 @@ Total
         </context-group>
         <target state="final">&lt;ul&gt;
                     &lt;li&gt;Install a browser that accepts extensions, such as Kiwi Browser or Firefox;&lt;/li&gt;
-                    &lt;li&gt;Search for the script management extension of your choice in the search bar of the chosen browser. 
+                    &lt;li&gt;Search for the script management extension of your choice in the search bar of the chosen browser.
                     There are several options, such as Tampermonkey or Violentmonkey;&lt;/li&gt;
                     &lt;li&gt;Install the extension for Chrome;&lt;/li&gt;
                     &lt;li&gt;Click on the
