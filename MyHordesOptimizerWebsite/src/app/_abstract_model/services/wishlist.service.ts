@@ -1,4 +1,4 @@
-import { HttpClient, HttpErrorResponse, HttpResponse } from '@angular/common/http';
+import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import moment from 'moment';
 import { Observable, Subscriber } from 'rxjs';
@@ -11,13 +11,10 @@ import { GlobalService } from './_global.service';
 
 @Injectable({ providedIn: 'root' })
 export class WishlistService extends GlobalService {
+    private snackbar: SnackbarService = inject(SnackbarService);
 
     /** La locale */
     private readonly locale: string = moment.locale();
-
-    constructor(_http: HttpClient, private snackbar: SnackbarService) {
-        super(_http);
-    }
 
     /**
      * Récupère les informations de liste de course

@@ -1,4 +1,4 @@
-import { HttpClient, HttpErrorResponse, HttpResponse } from '@angular/common/http';
+import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import moment from 'moment';
 import { Observable, Subscriber } from 'rxjs';
@@ -25,10 +25,6 @@ export class ApiService extends GlobalService {
 
     /** La locale */
     private readonly locale: string = moment.locale();
-
-    constructor(_http: HttpClient) {
-        super(_http);
-    }
 
     /**
      * Récupère la liste des objets existants

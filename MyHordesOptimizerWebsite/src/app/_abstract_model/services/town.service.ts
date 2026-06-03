@@ -1,5 +1,5 @@
-import { HttpClient, HttpErrorResponse, HttpResponse } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
+import { inject, Injectable } from '@angular/core';
 import moment from 'moment';
 import { Observable, Subscriber } from 'rxjs';
 import { SnackbarService } from '../../_core/services/snackbar.service';
@@ -24,13 +24,10 @@ import { GlobalService } from './_global.service';
 
 @Injectable({providedIn: 'root'})
 export class TownService extends GlobalService {
+    private snackbar: SnackbarService = inject(SnackbarService);
 
     /** La locale */
     private readonly locale: string = moment.locale();
-
-    constructor(_http: HttpClient, private snackbar: SnackbarService) {
-        super(_http);
-    }
 
     /**
      * Récupère les informations de la banque

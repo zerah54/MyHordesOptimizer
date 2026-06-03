@@ -1,4 +1,4 @@
-import { HttpClient, HttpErrorResponse, HttpResponse } from '@angular/common/http';
+import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, Subscriber } from 'rxjs';
 import {
@@ -16,10 +16,6 @@ import { GlobalService } from './_global.service';
 
 @Injectable({ providedIn: 'root' })
 export class AuthenticationService extends GlobalService {
-
-    constructor(_http: HttpClient) {
-        super(_http);
-    }
 
     public getMe(force?: boolean): Observable<Me | null> {
         return new Observable((sub: Subscriber<Me | null>) => {

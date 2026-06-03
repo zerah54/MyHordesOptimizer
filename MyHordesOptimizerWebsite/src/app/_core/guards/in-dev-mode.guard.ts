@@ -1,17 +1,11 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { environment } from '../../../environments/environment';
 
 @Injectable({providedIn: 'root'})
 export class InDevModeGuard {
+    private router = inject(Router);
 
-    /**
-     * Le constructeur de la classe
-     *
-     * @param {Router} router
-     */
-    constructor(private router: Router) {
-    }
 
     /**
      * Si l'utilisateur essaie d'accéder à une page qui nécessite d'être en ville, alors il sera redirigé

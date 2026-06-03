@@ -1,4 +1,4 @@
-import { HttpClient, HttpErrorResponse, HttpResponse } from '@angular/common/http';
+import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, Subscriber } from 'rxjs';
 import { getTown } from '../../_core/utilities/localstorage.util';
@@ -9,10 +9,6 @@ import { GlobalService } from './_global.service';
 
 @Injectable({ providedIn: 'root' })
 export class ExpeditionService extends GlobalService {
-
-    constructor(_http: HttpClient) {
-        super(_http);
-    }
 
     /**
      * Récupère les expéditions du jour

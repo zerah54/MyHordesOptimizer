@@ -4,11 +4,10 @@ import { SnackbarService } from './snackbar.service';
 
 @Injectable({ providedIn: 'root' })
 export class ClipboardService {
+    private clipboard: Clipboard = inject(Clipboard);
+
 
     private snackbar_service: SnackbarService = inject(SnackbarService);
-
-    constructor(private clipboard: Clipboard) {
-    }
 
     public copy(text: string, success: string): void {
         this.clipboard.copy(text);
