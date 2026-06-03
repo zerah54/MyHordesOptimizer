@@ -7,7 +7,7 @@ import { WishlistItem } from '../../_abstract_model/types/wishlist-item.class';
     name: 'isItemDisplayed'
 })
 export class IsItemDisplayedPipe implements PipeTransform {
-    transform(items: Item[], items_in_zone: WishlistItem[]): Item[] {
-        return items.filter((item: Item) => !items_in_zone.some((item_in_zone: WishlistItem) => item_in_zone.item.id === item.id));
+    transform(items: Item[], items_in_list: WishlistItem[], current_zone_xp_pa_add_item: number): Item[] {
+        return items.filter((item: Item) => !items_in_list.some((item_in_list: WishlistItem) => item_in_list.item.id === item.id && item_in_list.zone_x_pa === current_zone_xp_pa_add_item));
     }
 }

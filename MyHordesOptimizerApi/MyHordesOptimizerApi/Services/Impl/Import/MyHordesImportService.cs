@@ -193,6 +193,14 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
         public async Task ImportItemsAsync()
         {
             using var transaction = DbContext.Database.BeginTransaction();
+
+            DbContext.Database.ExecuteSqlRaw("DELETE FROM ItemProperty");
+            DbContext.Database.ExecuteSqlRaw("DELETE FROM BuildingRessources");
+            DbContext.Database.ExecuteSqlRaw("DELETE FROM RecipeItemComponent");
+            DbContext.Database.ExecuteSqlRaw("DELETE FROM ItemAction");
+            DbContext.Database.ExecuteSqlRaw("DELETE FROM RecipeItemResult");
+            DbContext.Database.ExecuteSqlRaw("DELETE FROM RuinItemDrop");
+
             // Récupération des items
             var myHordesItems = MyHordesApiRepository.GetItems();
 
@@ -233,14 +241,6 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
                     item.DropRateNotPraf = 0;
                 }
             }); 
-            
-            DbContext.Database.ExecuteSqlRaw("DELETE FROM MapCellItem");
-            DbContext.Database.ExecuteSqlRaw("DELETE FROM ItemProperty");
-            DbContext.Database.ExecuteSqlRaw("DELETE FROM BuildingRessources");
-            DbContext.Database.ExecuteSqlRaw("DELETE FROM RecipeItemComponent");
-            DbContext.Database.ExecuteSqlRaw("DELETE FROM ItemAction");
-            DbContext.Database.ExecuteSqlRaw("DELETE FROM RecipeItemResult");
-            DbContext.Database.ExecuteSqlRaw("DELETE FROM RuinItemDrop");
 
             var itemComparer = EqualityComparerFactory.Create<Item>(item => item.IdItem.GetHashCode(), (a, b) => a.IdItem == b.IdItem);
             var existingItems = DbContext.Items.ToList();
@@ -249,10 +249,9 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
 
             // Récupération des properties
             var codeItemsProperty = MyHordesCodeRepository.GetItemsProperties();
-            var allProperties = codeItemsProperty.Values.ToList().SelectMany(list => list).Distinct().ToList();
 
             var itemByProperty = new Dictionary<string, List<Item>>();
-            foreach (var kvp in codeItemsProperty) // On reverse la map pour pouvoir patch les properties
+            foreach (var kvp in codeItemsProperty)
             {
                 var itemUid = kvp.Key;
                 var properties = kvp.Value;
@@ -263,17 +262,15 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
                 }
             }
             var propertiesFromDb = DbContext.Properties.ToList();
-            var updatedProperties = itemByProperty.Select(kvp => propertiesFromDb.FirstOrDefault(prop => prop.Name == kvp.Key, new Property() { Name = kvp.Key, IdItems = kvp.Value }))
-                .ToList();
+            var updatedProperties = itemByProperty.Select(kvp => new Property() { Name = kvp.Key, IdItems = kvp.Value }).ToList();
             var propertyComparer = EqualityComparerFactory.Create<Property>(prop => prop.Name.GetHashCode(), (a, b) => a.Name == b.Name);
             DbContext.Patch(propertiesFromDb, updatedProperties, propertyComparer);
 
             // Récupération des actions
             var codeItemsActions = MyHordesCodeRepository.GetItemsActions();
-            var allActions = codeItemsActions.Values.ToList().SelectMany(list => list).Distinct().ToList();
 
             var itemByAction = new Dictionary<string, List<Item>>();
-            foreach (var kvp in codeItemsActions) // On reverse la map pour pouvoir patch les actions
+            foreach (var kvp in codeItemsActions)
             {
                 var itemUid = kvp.Key;
                 var actions = kvp.Value;
@@ -284,8 +281,7 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
                 }
             }
             var actionsFromDb = DbContext.Actions.ToList();
-            var updatedActions = itemByAction.Select(kvp => actionsFromDb.FirstOrDefault(action => action.Name == kvp.Key, new Action() { Name = kvp.Key, IdItems = kvp.Value }))
-                .ToList();
+            var updatedActions = itemByAction.Select(kvp => new Action() { Name = kvp.Key, IdItems = kvp.Value }).ToList();
             var actionComparer = EqualityComparerFactory.Create<Action>(action => action.Name.GetHashCode(), (a, b) => a.Name == b.Name);
             DbContext.Patch(actionsFromDb, updatedActions, actionComparer);
 

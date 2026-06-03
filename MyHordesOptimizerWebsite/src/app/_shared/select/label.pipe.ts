@@ -31,7 +31,6 @@ export class MultipleLabelPipe<T> implements PipeTransform {
             });
             return final_label;
         });
-        console.log('final', final_objects);
         return final_objects;
     }
 }

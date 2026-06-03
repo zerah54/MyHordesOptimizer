@@ -1,13 +1,13 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 
-namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer
+namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.WishList
 {
-    public class WishListLastUpdateDto
+    public class FlatWishListDto
     {
         public List<WishListItemDto> WishList { get; set; }
         public LastUpdateInfoDto LastUpdateInfo { get; set; }
 
-        public WishListLastUpdateDto()
+        public FlatWishListDto()
         {
             WishList = new List<WishListItemDto>();
         }

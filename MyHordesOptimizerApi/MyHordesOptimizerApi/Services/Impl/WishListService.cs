@@ -88,7 +88,7 @@ namespace MyHordesOptimizerApi.Services.Impl
                         UserName = wishListItems.First().IdTownNavigation.IdUserWishListUpdaterNavigation.Name,
                         UpdateTime = wishListItems.First().IdTownNavigation.WishlistDateUpdate.Value
                     },
-                    WishList = itemsDto.GroupBy(item => item.ZoneXPa, item => item).ToDictionary(group => group.Key, group => group.ToList())
+                    WishList = itemsDto
                 };
                 return dto;
             }

@@ -13,7 +13,6 @@ export const ROUTES: Route[] = [
         path: 'login',
         pathMatch: 'full',
         redirectTo: (redirect_data: Pick<ActivatedRouteSnapshot, 'routeConfig' | 'url' | 'params' | 'queryParams' | 'fragment' | 'data' | 'outlet' | 'title'>): string => {
-            console.log('redirectData', redirect_data.queryParams);
             inject(HeaderService).setToken(redirect_data.queryParams['token']);
             return 'wiki/items';
         }

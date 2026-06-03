@@ -22,209 +22,214 @@
 
 </mat-card-header>
 <mat-card-content class="mho-wishlist">
-    @if (wishlist_info) {
-        <mat-tab-group [mat-stretch-tabs]="false" mat-align-tabs="start" [(selectedIndex)]="selected_tab_index" (selectedTabChange)="changeTab($event)">
-            @for (item of (wishlist_info.wishlist_items | customKeyValue); track item.key) {
-                <mat-tab [label]="!item.key || item.key === '0' ? basic_list_label : 'Z' + item.key">
-                    <ng-template matTabContent>
-                        <div class="table-container">
-                            <div class="table-headers">
-                                @if (edition_mode) {
-                                    <mat-form-field subscriptSizing="dynamic">
-                                        <mat-label i18n>Ajouter un objet</mat-label>
-                                        <mho-select #addItemSelect emptyOption
-                                                    placeholder="Ajouter un objet" i18n-placeholder [ngModel]="''"
-                                                    (ngModelChange)="addItemToWishlist($any($event))"
-                                                    [options]="items | isItemDisplayed:datasource.data"
-                                                    [bindIcon]="'img'"
-                                                    [bindLabel]="'label.' + locale" searchable></mho-select>
-                                    </mat-form-field>
+    @if (wishlist_info()) {
+        <div class="table-container">
+            <div class="table-headers">
+                @if (edition_mode()) {
+                    <mat-form-field subscriptSizing="dynamic">
+                        <mat-label i18n>Ajouter un objet</mat-label>
+                        <mho-select #addItemSelect emptyOption
+                                    placeholder="Ajouter un objet" i18n-placeholder [ngModel]="''"
+                                    (ngModelChange)="addItemToWishlist($any($event))"
+                                    [options]="items() | isItemDisplayed:datasource.data:current_zone_xp_pa_add_item()"
+                                    [bindIcon]="'img'"
+                                    [bindLabel]="'label.' + locale" searchable></mho-select>
+                    </mat-form-field>
+                    @if (current_zone_xp_pa_add_item() > 0) {
+                        <mat-form-field subscriptSizing="dynamic" appearance="outline">
+                            <mat-label i18n>Zone à appliquer pour l'ajout</mat-label>
+                            <input matInput type="number" [ngModel]="current_zone_xp_pa_add_item()" (ngModelChange)="current_zone_xp_pa_add_item.set($event)">
+                            <span matSuffix (click)="current_zone_xp_pa_add_item.set(0)">∞</span>
+                        </mat-form-field>
+                    } @else {
+                        <mat-checkbox
+                            [checked]="current_zone_xp_pa_add_item() <= 0 || current_zone_xp_pa_add_item() === null || current_zone_xp_pa_add_item() === undefined"
+                            (change)="$event.checked ? current_zone_xp_pa_add_item.set(0) : current_zone_xp_pa_add_item.set(1)">
+                            <ng-container i18n>Zone à appliquer pour l'ajout</ng-container>&nbsp;:&nbsp;∞
+                        </mat-checkbox>
+                    }
+                }
+            </div>
+            <div class="mat-elevation-z8" style="flex: 1">
+                <table mat-table [dataSource]="datasource"
+                       cdkDropList
+                       cdkDropListLockAxis="y"
+                       [cdkDropListData]="datasource"
+                       (cdkDropListDropped)="sortWishlist($event)"
+                       [cdkDropListDisabled]="drag_disabled()">
+                    @for (column of columns; track column.id) {
+                        <ng-container [matColumnDef]="column.id" [sticky]="column.sticky || false">
+                            <th mat-header-cell *matHeaderCellDef>
+                                @switch (column.id) {
+                                    @case ('sort') {
+                                    }
+                                    @case ('name') {
+                                        <mho-header-with-string-filter [header]="column.header" [(filterValue)]="wishlist_filters().items"
+                                                                       (filterValueChange)="wishlist_filters_change.next()">
+                                        </mho-header-with-string-filter>
+                                    }
+                                    @default {
+                                        {{ column.header }}
+                                    }
                                 }
-                            </div>
-                            <div class="mat-elevation-z8" style="flex: 1">
-                                <table mat-table [dataSource]="datasource"
-                                       cdkDropList
-                                       cdkDropListLockAxis="y"
-                                       [cdkDropListData]="datasource"
-                                       (cdkDropListDropped)="sortWishlist($event)"
-                                       [cdkDropListDisabled]="drag_disabled">
+                            </th>
 
-                                    @for (column of columns; track column.id) {
-                                        <ng-container [matColumnDef]="column.id" [sticky]="column.sticky || false">
-                                            <th mat-header-cell *matHeaderCellDef>
-                                                @switch (column.id) {
-                                                    @case ('sort') {
-                                                    }
-                                                    @case ('name') {
-                                                        <mho-header-with-string-filter [header]="column.header" [(filterValue)]="wishlist_filters.items"
-                                                                                       (filterValueChange)="wishlist_filters_change.next()">
-                                                        </mho-header-with-string-filter>
-                                                    }
-                                                    @default {
-                                                        {{ column.header }}
-                                                    }
+                            <td mat-cell *matCellDef="let row">
+                                @defer (on viewport) {
+                                    @switch (column.id) {
+                                        @case ('sort') {
+                                            <div cdkDragHandle
+                                                 (mousedown)="drag_disabled.set(false)"
+                                                 (mouseup)="drag_disabled.set(true)"
+                                                 class="dragdrop-indicator">
+                                                <mat-icon fontSet="material-symbols-outlined">drag_indicator</mat-icon>
+                                            </div>
+                                        }
+                                        @case ('name') {
+                                            <div>
+                                                @if (row | itemAlreadyInList:wishlist_info()?.wishlist_items) {
+                                                    <img [ngSrc]="HORDES_IMG_REPO + 'emotes/warning.gif'" width="16" height="16">
                                                 }
-                                            </th>
-
-                                            <td mat-cell *matCellDef="let row">
-                                                @defer (on viewport) {
-                                                    @switch (column.id) {
-                                                        @case ('sort') {
-                                                            <div cdkDragHandle
-                                                                 (mousedown)="drag_disabled = false"
-                                                                 (mouseup)="drag_disabled = true"
-                                                                 class="dragdrop-indicator">
-                                                                <mat-icon fontSet="material-symbols-outlined">drag_indicator</mat-icon>
-                                                            </div>
-                                                        }
-                                                        @case ('name') {
-                                                            <div>
-                                                                <img [ngSrc]="HORDES_IMG_REPO + row.item.img" width="16" height="16">
-                                                                <span>{{ row.item.label[locale] }}</span>
-                                                            </div>
-                                                        }
-                                                        @case ('heaver') {
-                                                            @if (row.item.is_heaver) {
-                                                                <img [ngSrc]="HORDES_IMG_REPO + 'item/cat_heavy.gif'"
-                                                                     matTooltip="Objet encombrant" i18n-matTooltip width="16" height="16">
-                                                            }
-                                                        }
-                                                        @case ('depot') {
-                                                            @if (edition_mode) {
-                                                                <mat-form-field subscriptSizing="dynamic" appearance="outline">
-                                                                    <mat-select [(ngModel)]="row.depot" (ngModelChange)="changeDepot()"
-                                                                                [compareWith]="compareWith">
-                                                                        @for (depot of depots; track depot.key) {
-                                                                            <mat-option [value]="depot">{{ depot.value.label }}</mat-option>
-                                                                        }
-                                                                    </mat-select>
-                                                                </mat-form-field>
-                                                            } @else {
-                                                                {{ row.depot.value.label }}
-                                                            }
-                                                        }
-                                                        @case ('bank_count') {
-                                                            {{ row.bank_count }}
-                                                        }
-                                                        @case ('bag_count') {
-                                                            {{ row.bag_count }}
-                                                        }
-                                                        @case ('count') {
-                                                            @if (row.depot.value.count >= -1) {
-                                                                @if (edition_mode) {
-                                                                    @if (row.count >= 0) {
-                                                                        <mat-form-field subscriptSizing="dynamic" class="count" appearance="outline">
-                                                                            <input matInput type="number" [(ngModel)]="row.count">
-                                                                            <span matSuffix (click)="row.count = -1">∞</span>
-                                                                        </mat-form-field>
-                                                                    } @else {
-                                                                        <mat-checkbox [checked]="row.count < 0 || row.count === null || row.count === undefined"
-                                                                                      (change)="$event.checked ? row.count = -1 : row.count = 0">
-                                                                            ∞
-                                                                        </mat-checkbox>
-                                                                    }
-                                                                } @else {
-                                                                    @if (row.count >= 0) {
-                                                                        {{ row.count }}
-                                                                    } @else {
-                                                                        ∞
-                                                                    }
-                                                                }
-                                                            }
-                                                        }
-                                                        @case ('needed') {
-                                                            @if (row.depot.value.count >= -1) {
-                                                                @if (edition_mode && row.count >= 0) {
-                                                                    <mat-form-field subscriptSizing="dynamic" class="count" appearance="outline">
-                                                                        <input matInput type="number"
-                                                                               [ngModel]="row.count - row.bank_count - row.bag_count"
-                                                                               (ngModelChange)="row.count = row.bank_count + row.bag_count + $event">
-                                                                    </mat-form-field>
-                                                                } @else {
-                                                                    @if (row.count >= 0) {
-                                                                        {{ row.count - row.bank_count - row.bag_count }}
-                                                                    } @else {
-                                                                        ∞
-                                                                    }
-                                                                }
-                                                            }
-                                                        }
-                                                        @case ('should_signal') {
-                                                            @if (row.depot.value.count >= -1) {
-                                                                @if (edition_mode) {
-                                                                    <mat-checkbox [(ngModel)]="row.should_signal"></mat-checkbox>
-                                                                } @else if (row.should_signal) {
-                                                                    <mat-icon fontSet="material-symbols-outlined" matTooltip="Objet à signaler" i18n-matTooltip>
-                                                                        speaker_notes
-                                                                    </mat-icon>
-                                                                }
-                                                            }
-                                                        }
-                                                        @case ('delete') {
-                                                            <button mat-icon-button type="button" (click)="remove(row)">
-                                                                <mat-icon fontSet="material-symbols-outlined">close</mat-icon>
-                                                            </button>
-                                                        }
-                                                    }
-                                                } @placeholder {
-                                                    <div class="defered-cell"></div>
-                                                }
-                                            </td>
-                                        </ng-container>
-                                    }
-                                    <tr mat-header-row *matHeaderRowDef="columns | ids; sticky: true"></tr>
-                                    <tr mat-row *matRowDef="let row; columns: columns | ids;"
-                                        cdkDrag [cdkDragData]="row"></tr>
-
-                                    <!-- Row shown when there is no matching data. -->
-                                    <tr class="mat-row" *matNoDataRow>
-                                        <td class="mat-cell" [attr.colspan]="'100%'">
-                                            @if (wishlist_filters
-                                            && wishlist_filters.items !== '' && wishlist_filters.items !== null && wishlist_filters.items !== undefined
-                                            && wishlist_filters.depot.length > 0) {
-                                                <ng-container i18n>Aucun objet ne correspond au filtre actuel</ng-container>
-                                            } @else {
-                                                <ng-container i18n>La liste est vide</ng-container>
+                                                <img [ngSrc]="HORDES_IMG_REPO + row.item.img" width="16" height="16">
+                                                <span>{{ row.item.label[locale] }}</span>
+                                            </div>
+                                        }
+                                        @case ('heaver') {
+                                            @if (row.item.is_heaver) {
+                                                <img [ngSrc]="HORDES_IMG_REPO + 'item/cat_heavy.gif'"
+                                                     matTooltip="Objet encombrant" i18n-matTooltip width="16" height="16">
                                             }
-                                        </td>
-                                    </tr>
-                                </table>
-                            </div>
-                            <!-- Footer -->
-                            <div #cell style="width: 100%; height: 48px; display: flex; justify-content: right; align-items: center;">
-                                <div
-                                    style="display: flex; flex-direction: row; justify-content: end; align-content: center; align-items: center; padding-right: 1em">
-                                    <mho-last-update [lastUpdateInfo]="wishlist_info.update_info"
-                                                     [thresholds]="[24*60, 24*2*60, 24*3*60, 24*4]"></mho-last-update>
-                                    @if (edition_mode) {
-                                        <button mat-button type="button" [color]="'accent'" (click)="updateWishlist()" i18n>Enregistrer</button>
+                                        }
+                                        @case ('depot') {
+                                            @if (edition_mode()) {
+                                                <mat-form-field subscriptSizing="dynamic" appearance="outline">
+                                                    <mat-select [(ngModel)]="row.depot"
+                                                                (ngModelChange)="changeDepot()"
+                                                                [compareWith]="compareWith">
+                                                        @for (depot of depots; track depot.key) {
+                                                            <mat-option [value]="depot">{{ depot.value.label }}</mat-option>
+                                                        }
+                                                    </mat-select>
+                                                </mat-form-field>
+                                            } @else {
+                                                {{ row.depot.value.label }}
+                                            }
+                                        }
+                                        @case ('bank_count') {
+                                            {{ row.bank_count }}
+                                        }
+                                        @case ('bag_count') {
+                                            {{ row.bag_count }}
+                                        }
+                                        @case ('count') {
+                                            @if (row.depot.value.count >= -1) {
+                                                @if (edition_mode()) {
+                                                    @if (row.count >= 0) {
+                                                        <mat-form-field subscriptSizing="dynamic" class="count" appearance="outline">
+                                                            <input matInput type="number" [(ngModel)]="row.count" (ngModelChange)="triggerSave()">
+                                                            <span matSuffix (click)="row.count = -1; triggerSave()">∞</span>
+                                                        </mat-form-field>
+                                                    } @else {
+                                                        <mat-checkbox [checked]="row.count < 0 || row.count === null || row.count === undefined"
+                                                                      (change)="$event.checked ? row.count = -1 : row.count = 0; triggerSave()">
+                                                            ∞
+                                                        </mat-checkbox>
+                                                    }
+                                                } @else {
+                                                    @if (row.count >= 0) {
+                                                        {{ row.count }}
+                                                    } @else {
+                                                        ∞
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        @case ('needed') {
+                                            @if (row.depot.value.count >= -1) {
+                                                @if (edition_mode() && row.count >= 0) {
+                                                    <mat-form-field subscriptSizing="dynamic" class="count" appearance="outline">
+                                                        <input matInput type="number"
+                                                               [ngModel]="row.count - row.bank_count - row.bag_count"
+                                                               (ngModelChange)="row.count = row.bank_count + row.bag_count + $event; triggerSave()">
+                                                    </mat-form-field>
+                                                } @else {
+                                                    @if (row.count >= 0) {
+                                                        {{ row.count - row.bank_count - row.bag_count }}
+                                                    } @else {
+                                                        ∞
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        @case ('should_signal') {
+                                            @if (row.depot.value.count >= -1) {
+                                                @if (edition_mode()) {
+                                                    <mat-checkbox [(ngModel)]="row.should_signal" (ngModelChange)="triggerSave()"></mat-checkbox>
+                                                } @else if (row.should_signal) {
+                                                    <mat-icon fontSet="material-symbols-outlined" matTooltip="Objet à signaler" i18n-matTooltip>
+                                                        speaker_notes
+                                                    </mat-icon>
+                                                }
+                                            }
+                                        }
+                                        @case ('zone_x_pa') {
+                                            @if (edition_mode()) {
+                                                @if (row.zone_x_pa > 0) {
+                                                    <mat-form-field subscriptSizing="dynamic" class="zone_x_pa" appearance="outline">
+                                                        <input matInput type="number" [ngModel]="row.zone_x_pa" (ngModelChange)="changeZoneXPa(row, $event)"
+                                                               min="0">
+                                                        <span matSuffix (click)="changeZoneXPa(row, 0)">∞</span>
+                                                    </mat-form-field>
+                                                } @else {
+                                                    <mat-checkbox [checked]="row.zone_x_pa <= 0 || row.zone_x_pa === null || row.zone_x_pa === undefined"
+                                                                  (change)="$event.checked ? changeZoneXPa(row, 0) : changeZoneXPa(row, 1); triggerSave()">
+                                                        ∞
+                                                    </mat-checkbox>
+                                                }
+                                            } @else {
+                                                @if (row.zone_x_pa >= 0) {
+                                                    {{ row.zone_x_pa }}
+                                                } @else {
+                                                    ∞
+                                                }
+                                            }
+                                        }
+                                        @case ('delete') {
+                                            <button mat-icon-button type="button" (click)="remove(row)">
+                                                <mat-icon fontSet="material-symbols-outlined">close</mat-icon>
+                                            </button>
+                                        }
                                     }
-                                </div>
-                            </div>
-                        </div>
-                    </ng-template>
-                </mat-tab>
-            }
-            @if (edition_mode) {
-                <mat-tab (click)="$event.preventDefault(); $event.stopPropagation()" labelClass="add-tab">
-                    <ng-template mat-tab-label>
-                        <button mat-icon-button type="button" (click)="$event.preventDefault(); $event.stopPropagation()" [matMenuTriggerFor]="addItem">
-                            <mat-icon fontSet="material-symbols-outlined">add</mat-icon>
-                        </button>
-                    </ng-template>
-                    <mat-menu #addItem="matMenu">
-                        <form (submit)="addZone(+zone.value)" (click)="$event.stopPropagation()">
-                            <mat-form-field appearance="outline">
-                                <mat-label i18n>Zone de ramassage</mat-label>
-                                <input #zone matInput type="number">
-                                <button matSuffix mat-icon-button type="submit">
-                                    <mat-icon fontSet="material-symbols-outlined">check</mat-icon>
-                                </button>
-                            </mat-form-field>
-                        </form>
-                    </mat-menu>
-                </mat-tab>
-            }
-        </mat-tab-group>
+                                } @placeholder {
+                                    <div class="defered-cell"></div>
+                                }
+                            </td>
+                        </ng-container>
+                    }
+                    <tr mat-header-row *matHeaderRowDef="columns | ids; sticky: true"></tr>
+                    <tr mat-row *matRowDef="let row; columns: columns | ids;"
+                        cdkDrag [cdkDragData]="row"></tr>
+
+                    <tr class="mat-row" *matNoDataRow>
+                        <td class="mat-cell" [attr.colspan]="'100%'">
+                            @if (wishlist_filters()
+                            && wishlist_filters().items !== '' && wishlist_filters().items !== null && wishlist_filters().items !== undefined
+                            && wishlist_filters().depot.length > 0) {
+                                <ng-container i18n>Aucun objet ne correspond au filtre actuel</ng-container>
+                            } @else {
+                                <ng-container i18n>La liste est vide</ng-container>
+                            }
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <!-- Footer -->
+            <div #cell style="width: 100%; height: 48px; display: flex; justify-content: right; align-items: center;">
+                <div style="display: flex; flex-direction: row; justify-content: end; align-content: center; align-items: center; padding-right: 1em">
+                    <mho-last-update [lastUpdateInfo]="wishlist_info()!.update_info"
+                                     [thresholds]="[24*60, 24*2*60, 24*3*60, 24*4]"></mho-last-update>
+                </div>
+            </div>
+        </div>
     }
 </mat-card-content>

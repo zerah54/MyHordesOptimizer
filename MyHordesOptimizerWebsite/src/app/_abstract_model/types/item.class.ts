@@ -34,7 +34,7 @@ export class Item extends CommonModel<ItemDTO> {
         return {
             actions: this.actions ? this.actions.filter((action: Action) => action).map((action: Action) => action?.key) : [],
             bankCount: this.bank_count,
-            category: this.category.modelToDto(),
+            category: this.category?.modelToDto(),
             deco: this.deco,
             description: this.description,
             guard: this.guard,

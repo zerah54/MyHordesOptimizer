@@ -56,7 +56,7 @@ export class ItemComponent implements OnInit {
      * @param {Item} item
      */
     public addItemToWishlist(item: Item): void {
-        this.wishlist_services.addItemToWishlist(item, '0')
+        this.wishlist_services.addItemToWishlist(item, 0)
             .pipe(takeUntilDestroyed(this.destroy_ref))
             .subscribe(() => {
                 let new_item: Item = this.item()

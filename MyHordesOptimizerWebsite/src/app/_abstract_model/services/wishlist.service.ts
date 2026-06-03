@@ -1,5 +1,5 @@
 import { HttpClient, HttpErrorResponse, HttpResponse } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import moment from 'moment';
 import { Observable, Subscriber } from 'rxjs';
 import { SnackbarService } from '../../_core/services/snackbar.service';
@@ -30,9 +30,6 @@ export class WishlistService extends GlobalService {
                 .subscribe({
                     next: (response: HttpResponse<WishlistInfoDTO>) => {
                         const wishlist: WishlistInfo = new WishlistInfo(response.body);
-                        if (!wishlist.wishlist_items.has('0')) {
-                            wishlist.wishlist_items.set('0', []);
-                        }
                         sub.next(wishlist);
                     },
                     error: (error: HttpErrorResponse) => {
@@ -67,9 +64,8 @@ export class WishlistService extends GlobalService {
     /**
      * Ajoute un élément à la wishlist
      * @param {Item} item l'élément à ajouter à la wishlist
-     * @param {string} zone
      */
-    public addItemToWishlist(item: Item, zone: string): Observable<void> {
+    public addItemToWishlist(item: Item, zone: number): Observable<void> {
         return new Observable((sub: Subscriber<void>) => {
             super.post(this.API_URL + `/wishlist/add/${item.id}?townId=${getTown()?.town_id}&userId=${getUserId()}&zoneXPa=${zone}`, undefined)
                 .subscribe({
