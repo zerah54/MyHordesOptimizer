@@ -5130,7 +5130,7 @@
         <target state="final">Installation des Skripts</target>
       </trans-unit>
       <trans-unit id="760824966279091093" datatype="html">
-        <source>&lt;a href=&quot;https://github.com/zerah54/MyHordesOptimizer/raw/main/Scripts/Tampermonkey/my_hordes_optimizer.user.js&quot; target=&quot;_blank&quot;&gt;lien
+        <source>&lt;a href=&quot;https://github.com/zerah54/MyHordesOptimizer/raw/main/Scripts/Tampermonkey/userscript-header.js&quot; target=&quot;_blank&quot;&gt;lien
                     de téléchargement du script&lt;/a&gt;
                 </source>
         <context-group purpose="location">
@@ -5138,7 +5138,7 @@
                     </context>
           <context context-type="linenumber">27</context>
         </context-group>
-        <target state="needs-translation">&lt;a href="https://github.com/zerah54/MyHordesOptimizer/raw/main/Scripts/Tampermonkey/my_hordes_optimizer.user.js" target="_blank"&gt;lien
+        <target state="needs-translation">&lt;a href="https://github.com/zerah54/MyHordesOptimizer/raw/main/Scripts/Tampermonkey/userscript-header.js" target="_blank"&gt;lien
                     de téléchargement du script&lt;/a&gt;
                 </target>
       </trans-unit>
