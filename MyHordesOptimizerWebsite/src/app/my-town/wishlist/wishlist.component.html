@@ -126,17 +126,17 @@
                                                 @if (edition_mode()) {
                                                     @if (row.count >= 0) {
                                                         <mat-form-field subscriptSizing="dynamic" class="count" appearance="outline">
-                                                            <input matInput type="number" [(ngModel)]="row.count" (ngModelChange)="triggerSave()">
+                                                            <input matInput type="number" [(ngModel)]="row.count" (ngModelChange)="triggerSave()" min="0">
                                                             <span matSuffix (click)="row.count = -1; triggerSave()">∞</span>
                                                         </mat-form-field>
                                                     } @else {
                                                         <mat-checkbox [checked]="row.count < 0 || row.count === null || row.count === undefined"
-                                                                      (change)="$event.checked ? row.count = -1 : row.count = 0; triggerSave()">
+                                                                      (change)="$event.checked ? row.count = -1 : row.count = 1; triggerSave()">
                                                             ∞
                                                         </mat-checkbox>
                                                     }
                                                 } @else {
-                                                    @if (row.count >= 0) {
+                                                    @if (row.count > 0) {
                                                         {{ row.count }}
                                                     } @else {
                                                         ∞
