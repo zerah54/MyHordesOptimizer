@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MHO Addon
-// @version      1.1.37.0
+// @version      1.1.38.0
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/, rubrique Tutoriels
 // @author       Zerah
 //
@@ -32,7 +32,7 @@
 // ==/UserScript==
 
 const changelog = `${getScriptInfo().name} : Changelog pour la version ${getScriptInfo().version}\n\n`
-    + `[Correctif] Corrige l'affichage des auras sur les objets de la liste de courses \n\n`;
+    + `[Correctif] Modifications dans la gestion de la wishlist \n\n`;
 
 const lang = (document.querySelector('html[lang]')?.getAttribute('lang') || document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2) || 'fr';
 
@@ -5301,19 +5301,13 @@ function displayPriorityOnItems() {
 }
 
 function getWishlistForZone() {
-
     if (!wishlist || !wishlist.wishList) return undefined;
-    if (!pageIsDesert()) return wishlist.wishList[0];
+    if (!pageIsDesert()) return wishlist.wishList.find((wishlist_item) => wishlist_item.zone_x_pa === 0);
 
     let position = getCurrentPosition() || 0;
     let current_zone = (Math.abs(position[0]) + Math.abs(position[1])) * 2 - 3;
-    let zones = Object.keys(wishlist.wishList)
-        .map((zone) => +zone)
-        .filter((zone) => zone > current_zone && zone !== 0);
-    zones = zones
-        .sort((zone_a, zone_b) => zone_a - zone_b);
 
-    let used_wishlist = zones.length === 0 ? wishlist.wishList[0] : wishlist.wishList[zones[0]];
+    let used_wishlist = [...wishlist.wishList.filter((wishlist_item) => wishlist_item.zone_x_pa === 0 || wishlist_item.zone_x_pa >= current_zone)];
     used_wishlist?.sort((item_a, item_b) => {
         return item_b.priority - item_a.priority;
     });
@@ -10330,19 +10324,7 @@ function getWishlist() {
                 }
             })
             .then((response) => {
-                let new_wishlist = {...response};
-                let new_wishlist_wishlist = {};
-                for (let key in new_wishlist.wishList) {
-                    let wishlist_zone = Object.keys(new_wishlist.wishList[key])
-                        .map((item_key) => new_wishlist.wishList[key][item_key])
-                        .sort((item_a, item_b) => item_b.priority > item_a.priority);
-                    wishlist_zone.forEach((item) => {
-                        item.item.img = fixMhCompiledImg(item.item.img);
-                    });
-                    new_wishlist_wishlist[key] = [...wishlist_zone];
-                }
-                new_wishlist.wishList = new_wishlist_wishlist;
-                wishlist = new_wishlist;
+                wishlist = {...response};
                 resolve(wishlist);
             })
             .catch((error) => {
