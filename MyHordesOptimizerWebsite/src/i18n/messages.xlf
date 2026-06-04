@@ -4472,7 +4472,7 @@
                 </context-group>
             </trans-unit>
             <trans-unit id="760824966279091093" datatype="html">
-                <source>&lt;a href=&quot;https://github.com/zerah54/MyHordesOptimizer/raw/main/Scripts/Tampermonkey/my_hordes_optimizer.user.js&quot; target=&quot;_blank&quot;&gt;lien
+                <source>&lt;a href=&quot;https://github.com/zerah54/MyHordesOptimizer/raw/main/Scripts/Tampermonkey/userscript-header.js&quot; target=&quot;_blank&quot;&gt;lien
                     de téléchargement du script&lt;/a&gt;
                 </source>
                 <context-group purpose="location">
