@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MHO Addon
-// @version      1.1.38.0
+// @version      1.1.39.0
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/, rubrique Tutoriels
 // @author       Zerah
 //
@@ -32,7 +32,7 @@
 // ==/UserScript==
 
 const changelog = `${getScriptInfo().name} : Changelog pour la version ${getScriptInfo().version}\n\n`
-    + `[Correctif] Modifications dans la gestion de la wishlist \n\n`;
+    + `[Correctif] Fix de l'update des outils externes suite à la mise à jour de mi-saison\n\n`;
 
 const lang = (document.querySelector('html[lang]')?.getAttribute('lang') || document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2) || 'fr';
 
@@ -2484,9 +2484,11 @@ function getFixedImagePath(img_src) {
         console.warn(`Image source "${img_src}" does not include '${hordes_img_url}' as expected.`, img_src);
         return;
     }
+
     return img_src
         .slice(index + hordes_img_url.length)
-        .replace(/\/(.+)\.(\w+?)\.(\w+?)$/, '/$1.$3');
+        .replace(/\/(.+)\.(\w+?)\.(\w+?)$/, '/$1.$3')
+        .replace('.b.', '.');
 }
 
 function getItemFromImg(img_src) {
@@ -5262,7 +5264,6 @@ function displayPriorityOnItems() {
         let used_wishlist = getWishlistForZone();
         let item_count = avalaible_slots.length;
         let heavy_slots = avalaible_slots.filter((slot) => slot.classList.contains('bg-heavy')).length;
-
 
         if (used_wishlist) {
             let count = 0;
@@ -10367,9 +10368,6 @@ function addItemToWishlist(item) {
 /** Met à jour les outils externes (BBH, GH et Fata) en fonction des paramètres sélectionnés */
 function updateExternalTools() {
     return new Promise(async (resolve, reject) => {
-        let convertImgToItem = (img) => {
-            return items?.find((item) => img.src.replace(/(.*)\/(\w+)\.(\w+)\.(\w+)/, '$1/$2.$4').indexOf(item.img) >= 0);
-        }
 
         let convertListOfSingleObjectsIntoListOfCountedObjects = (objects) => {
             let object_map = [];
@@ -10418,13 +10416,12 @@ function updateExternalTools() {
         }
 
         // Mise à jour en ville chaos
-        if (((mho_parameters.update_gh && mho_parameters.update_gh_devastated && mh_user.townDetails?.isChaos) || (mho_parameters.update_mho && mho_parameters.update_mho_devastated && mh_user.townDetails?.isChaos) || (mho_parameters.update_fata && mho_parameters.update_fata_devastated))
-            && pageIsDesert()) {
+        if (pageIsDesert() && (mh_user.townDetails?.isChaos && (mho_parameters.update_gh && mho_parameters.update_gh_devastated) || (mho_parameters.update_mho && mho_parameters.update_mho_devastated)) || (mho_parameters.update_fata && mho_parameters.update_fata_devastated)) {
 
-            if (mho_parameters.update_gh && mho_parameters.update_gh_devastated) {
+            if (mho_parameters.update_gh && mho_parameters.update_gh_devastated && mh_user.townDetails?.isChaos) {
                 data.map.toolsToUpdate.isGestHordes = 'cell';
             }
-            if (mho_parameters.update_mho && mho_parameters.update_mho_devastated) {
+            if (mho_parameters.update_mho && mho_parameters.update_mho_devastated && mh_user.townDetails?.isChaos) {
                 data.map.toolsToUpdate.isMyHordesOptimizer = 'cell';
             }
             if (mho_parameters.update_fata && mho_parameters.update_fata_devastated) {
@@ -10432,7 +10429,7 @@ function updateExternalTools() {
             }
 
             let objects = Array.from(document.querySelector('.inventory.desert')?.querySelectorAll('li.item') || []).map((desert_item) => {
-                let item = convertImgToItem(desert_item.querySelector('img'));
+                let item = getItemFromImg(desert_item.querySelector('img')?.src);
                 return {id: item?.id, isBroken: desert_item.classList.contains('broken')};
             });
 
@@ -10560,7 +10557,7 @@ function updateExternalTools() {
 
             let rucksacks = [];
             let my_rusksack = Array.from(document.querySelector('.inventory.rucksack')?.querySelectorAll('li.item:not(.locked)') || []).map((rucksack_item) => {
-                let item = convertImgToItem(rucksack_item.querySelector('img'));
+                let item = getItemFromImg(rucksack_item.querySelector('img')?.src);
                 if (item) {
                     return {id: item.id, isBroken: rucksack_item.classList.contains('broken')};
                 }
@@ -10576,7 +10573,7 @@ function updateExternalTools() {
                 escorts.forEach((escort) => {
                     let escort_id = +escort.querySelector('span.username')?.getAttribute('x-user-id');
                     let escort_rucksack = Array.from(escort.querySelector('.inventory.rucksack-escort')?.querySelectorAll('li.item:not(.locked):not(.plus)') || []).map((rucksack_item) => {
-                        let item = convertImgToItem(rucksack_item.querySelector('img'));
+                        let item = getItemFromImg(rucksack_item.querySelector('img')?.src);
                         return {id: item?.id, isBroken: rucksack_item.classList.contains('broken')};
                     });
 
@@ -10604,7 +10601,7 @@ function updateExternalTools() {
             };
 
             let chest_elements = Array.from(document.querySelector('.inventory.chest')?.querySelectorAll('li.item:not(.locked)') || []).map((chest_item) => {
-                let item = convertImgToItem(chest_item.querySelector('img'));
+                let item = getItemFromImg(chest_item.querySelector('img')?.src);
                 return {id: item.id, isBroken: chest_item.classList.contains('broken')};
             });
 
