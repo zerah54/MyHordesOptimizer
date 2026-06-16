@@ -45,19 +45,28 @@ namespace MyHordesOptimizerApi.Controllers.ActionFillters
                 {
                     var incomingVersionMatch = Regex.Matches(version, @"\d+");
                     var expectedVersionMatch = Regex.Matches(expectedVersion, @"\d+");
-                    if(incomingVersionMatch.Count != 4)
-                    {
-                        context.Result = new BadRequestObjectResult($"Mho-Script-Version should contains 4 digits. Found {version} for Controller {controllerName} and method {methodName}");
 
+                    if (incomingVersionMatch.Count < 3 || incomingVersionMatch.Count > 4)
+                    {
+                        context.Result = new BadRequestObjectResult($"Mho-Script-Version should contains 3 or 4 digits. Found {version} for Controller {controllerName} and method {methodName}");
+                        return;
                     }
 
-                    var incomingVersionVersion = new Version(version);
-                    var expectedVersionVersion = new Version(expectedVersion);
-                        
-                    var result = expectedVersionVersion.CompareTo(incomingVersionVersion);    
-                    if (result > 0) 
-                    {                            
-                        context.Result = new BadRequestObjectResult($"Incoming version {version} is too low. Expected {expectedVersion} for Controller {controllerName} and method {methodName}");
+                    // On convertit explicitement le StringValues en string
+                    var versionStr = version.ToString();
+
+                    // Normalisation de la version entrante
+                    var normalizedVersion = incomingVersionMatch.Count == 3 ? $"{versionStr}.0" : versionStr;
+                    var incomingVersionVersion = new Version(normalizedVersion);
+
+                    // Normalisation de la version attendue
+                    var normalizedExpectedVersion = expectedVersionMatch.Count == 3 ? $"{expectedVersion}.0" : expectedVersion;
+                    var expectedVersionVersion = new Version(normalizedExpectedVersion);
+
+                    var result = expectedVersionVersion.CompareTo(incomingVersionVersion);
+                    if (result > 0)
+                    {
+                        context.Result = new BadRequestObjectResult($"Incoming version {versionStr} is too low. Expected {expectedVersion} for Controller {controllerName} and method {methodName}");
                         return;
                     }
                 }
