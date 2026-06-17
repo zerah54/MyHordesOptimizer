@@ -32,12 +32,14 @@ namespace MyHordesOptimizerApi.Controllers.ActionFillters
             var expectedVersion = Configuration.GetValue<string>($"MhoVersionControl:{controllerName}:{methodName}");
             if (expectedVersion != null)
             {
-                if (MhoHeaderProvider.MhoOrigin == null || (MhoHeaderProvider.MhoOrigin == IMhoHeadersProvider.Mho_Script_Origin && MhoHeaderProvider.MhoScriptVersion == null))
+                if (/* MhoHeaderProvider.MhoOrigin == null || */ (MhoHeaderProvider.MhoOrigin == IMhoHeadersProvider.Mho_Script_Origin && MhoHeaderProvider.MhoScriptVersion == null) || (MhoHeaderProvider.MhoOrigin == IMhoHeadersProvider.Mho_MhoAddon_Origin && MhoHeaderProvider.MhoScriptVersion == null))
                 {
-                    context.Result = new BadRequestObjectResult("No MhoOrigin Or MhoScripOrigin without version");
+                    context.Result = new BadRequestObjectResult("No Mho-Origin or Mho-Origin is 'script' without Mho-Script-Version");
                     return;
-                }                
-                if (MhoHeaderProvider.MhoOrigin == IMhoHeadersProvider.Mho_Site_Origin)
+                }
+                if (MhoHeaderProvider.MhoOrigin == null /* TODO Retirer ça quand la propagation de ZenHordes sera complète */
+                    || MhoHeaderProvider.MhoOrigin == IMhoHeadersProvider.Mho_Site_Origin
+                    || MhoHeaderProvider.MhoOrigin == IMhoHeadersProvider.Mho_ZenHordes_Origin)
                 {
                     return;
                 }
