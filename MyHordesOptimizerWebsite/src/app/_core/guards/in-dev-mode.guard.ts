@@ -4,8 +4,7 @@ import { environment } from '../../../environments/environment';
 
 @Injectable({providedIn: 'root'})
 export class InDevModeGuard {
-    private router = inject(Router);
-
+    private router: Router = inject(Router);
 
     /**
      * Si l'utilisateur essaie d'accéder à une page qui nécessite d'être en ville, alors il sera redirigé

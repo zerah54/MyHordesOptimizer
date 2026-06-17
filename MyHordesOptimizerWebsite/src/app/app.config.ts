@@ -3,6 +3,7 @@ import { APP_INITIALIZER, ApplicationConfig, ErrorHandler, importProvidersFrom, 
 import { initializeApp, provideFirebaseApp } from '@angular/fire/app';
 import { AngularFireModule } from '@angular/fire/compat';
 import { AngularFireAnalyticsModule } from '@angular/fire/compat/analytics';
+import { provideMomentDateAdapter } from '@angular/material-moment-adapter';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { provideRouter, Router, withRouterConfig } from '@angular/router';
@@ -30,6 +31,7 @@ export const appConfig: ApplicationConfig = {
         ),
         provideFirebaseApp(() => initializeApp(environment.firebase_config)),
         provideHttpClient(withInterceptors([headersInterceptor, loadingInterceptor, errorInterceptor])),
+        provideMomentDateAdapter(),
         {
             provide: LOCALE_ID,
             useFactory: (): string | null => localStorage.getItem('mho-locale') || 'fr'

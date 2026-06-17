@@ -1,5 +1,5 @@
-import { CommonModule, NgClass, NgTemplateOutlet } from '@angular/common';
-import { Component, DOCUMENT, Inject, inject, LOCALE_ID, model, ModelSignal, OnInit, ViewEncapsulation } from '@angular/core';
+import { CommonModule, NgTemplateOutlet } from '@angular/common';
+import { Component, DOCUMENT, inject, LOCALE_ID, model, ModelSignal, OnInit } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
@@ -11,12 +11,13 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
 import moment from 'moment';
 import { environment } from '../../../environments/environment';
 import { Theme } from '../../_abstract_model/interfaces';
+import { AdminService } from '../../_abstract_model/services/admin.service';
 import { Imports } from '../../_abstract_model/types/_types';
 import { TownDetails } from '../../_abstract_model/types/town-details.class';
 import { ChartsThemingService } from '../../_core/services/charts-theming.service';
 import { getTown } from '../../_core/utilities/localstorage.util';
 
-const angular_common: Imports = [CommonModule, NgClass, NgTemplateOutlet, RouterLink, RouterLinkActive];
+const angular_common: Imports = [CommonModule, NgTemplateOutlet, RouterLink, RouterLinkActive];
 const components: Imports = [];
 const pipes: Imports = [];
 const material_modules: Imports = [MatButtonModule, MatDividerModule, MatIconModule, MatListModule, MatMenuModule, MatTooltipModule];
@@ -25,11 +26,13 @@ const material_modules: Imports = [MatButtonModule, MatDividerModule, MatIconMod
     selector: 'mho-menu',
     templateUrl: './menu.component.html',
     styleUrls: ['./menu.component.scss'],
-    encapsulation: ViewEncapsulation.None,
-    host: {style: 'display: contents'},
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class MenuComponent implements OnInit {
+    private readonly locale_id: string = inject(LOCALE_ID);
+    private readonly document: Document = inject<Document>(DOCUMENT);
+    protected readonly adminService: AdminService = inject(AdminService);
+
     public sidenavContainer: ModelSignal<MatSidenavContainer> = model.required();
 
     public charts_theming_service: ChartsThemingService = inject(ChartsThemingService);
@@ -214,10 +217,6 @@ export class MenuComponent implements OnInit {
         },
     ];
 
-    constructor(@Inject(LOCALE_ID) private locale_id: string, @Inject(DOCUMENT) private document: Document) {
-
-    }
-
     public ngOnInit(): void {
         /** Si il y a une langue enregistrée, on l'utilise, sinon on utilise le français */
         const used_locale: string = this.locale_id;
@@ -227,6 +226,7 @@ export class MenuComponent implements OnInit {
             : this.language_list.find((language: Language) => language.default);
 
         this.defineThemes();
+        this.adminService.checkIsAdmin().subscribe();
 
         setTimeout(() => {
             this.resizeSidenav();

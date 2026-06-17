@@ -1,0 +1,180 @@
+:host {
+    display: contents;
+
+    .log-viewer {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        gap: 0.5em;
+        font-family: monospace;
+
+        &__toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5em;
+            align-items: flex-start;
+            padding-top: 0.5em;
+        }
+
+        &__table-wrapper {
+            flex: 1;
+            overflow: auto;
+            border: 1px solid var(--mat-sys-outline-variant);
+            border-radius: 0.25em;
+        }
+
+        &__empty {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5em;
+            padding: 48px;
+            color: var(--mat-sys-on-surface-variant);
+
+            mat-icon {
+                font-size: 48px;
+                width: 48px;
+                height: 48px;
+            }
+        }
+    }
+
+    .field--date {
+        width: 160px;
+    }
+
+    .field--search {
+        flex: 1;
+    }
+
+    .log-table {
+        width: 100%;
+        font-family: 'JetBrains Mono', 'Fira Code', monospace;
+        font-size: 12px;
+
+
+        .field--level .trigger {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 0.25em;
+            padding-right: 0.5em;
+        }
+
+        .field--level, .field--correlation {
+            padding-top: 0.5em;
+        }
+    }
+
+    .log-row {
+        cursor: default;
+        transition: background-color 0.15s;
+
+        &--clickable {
+            cursor: pointer;
+        }
+
+        &--warning {
+            background-color: rgba(255, 152, 0, 0.06);
+        }
+
+        &--error {
+            background-color: rgba(244, 67, 54, 0.08);
+        }
+
+        &--expanded {
+            background-color: var(--mat-sys-surface-variant) !important;
+        }
+
+        &:hover {
+            background-color: var(--mat-sys-surface-variant);
+        }
+    }
+
+    .detail-row {
+        height: 0;
+
+        td {
+            border: none;
+            padding: 0;
+        }
+    }
+
+    .cell--stacktrace {
+        width: 42px;
+        padding: 0;
+    }
+
+    .cell--timestamp {
+        white-space: nowrap;
+        width: 110px;
+        color: var(--mat-sys-on-surface-variant);
+    }
+
+    .cell--level {
+        white-space: nowrap;
+        width: 110px;
+    }
+
+    .cell--correlation {
+        white-space: nowrap;
+    }
+
+    .cell--source {
+        width: 200px;
+        max-width: 200px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        color: var(--mat-sys-on-surface-variant);
+    }
+
+    .cell--message div {
+        display: flex;
+        gap: 0.25em;
+        justify-content: flex-start;
+        align-items: center;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .message-text {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        flex: 1;
+    }
+
+    .mat-mdc-chip {
+        cursor: pointer;
+        text-transform: uppercase;
+    }
+
+    .correlation-link {
+        cursor: pointer;
+        text-decoration: underline dotted;
+        color: var(--mat-sys-primary);
+
+        &:hover {
+            text-decoration: underline;
+        }
+    }
+
+    .stacktrace {
+        background: var(--mat-sys-surface-container-low);
+        border-top: 1px solid var(--mat-sys-outline-variant);
+        padding: 12px 16px;
+        overflow: auto;
+
+        pre {
+            margin: 0;
+            font-family: 'JetBrains Mono', 'Fira Code', monospace;
+            font-size: 11px;
+            line-height: 1.5;
+            white-space: pre-wrap;
+            word-break: break-all;
+            color: var(--mat-sys-error);
+        }
+    }
+}

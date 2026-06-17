@@ -1,43 +1,47 @@
 @use 'variables';
 
-.mho-footer {
-    overflow-x: auto;
-    overflow-y: hidden;
+:host {
+    display: contents;
 
-    min-height: 52px !important;
+    .mho-footer {
+        overflow-x: auto;
+        overflow-y: hidden;
 
-    .mat-toolbar-row {
-        height: 24px !important;
-        font-size: 12px !important;
-        font-weight: normal !important;
+        min-height: 52px !important;
 
-        > div {
-            width: 100%;
-            text-align: center;
-        }
+        .mat-toolbar-row {
+            height: 24px !important;
+            font-size: 12px !important;
+            font-weight: normal !important;
 
-        &:first-child {
-            margin-top: auto;
-        }
-
-        &:last-child {
-            margin-bottom: auto;
-        }
-
-        a {
-            text-transform: capitalize;
-            text-decoration: none;
-            color: inherit;
-            cursor: pointer;
-
-            &:hover {
-                color: variables.$accent;
+            > div {
+                width: 100%;
+                text-align: center;
             }
-        }
 
-        > * {
-            margin-left: auto;
-            margin-right: auto;
+            &:first-child {
+                margin-top: auto;
+            }
+
+            &:last-child {
+                margin-bottom: auto;
+            }
+
+            a {
+                text-transform: capitalize;
+                text-decoration: none;
+                color: inherit;
+                cursor: pointer;
+
+                &:hover {
+                    color: variables.$secondary;
+                }
+            }
+
+            > * {
+                margin-left: auto;
+                margin-right: auto;
+            }
         }
     }
 }

@@ -37,7 +37,7 @@ export class ApiService extends GlobalService {
             if (saved_items && saved_items.length > 0 && !force) {
                 sub.next(saved_items);
             } else {
-                super.get<ItemDTO[]>(this.API_URL + `/Fetcher/items?${getTown()?.town_id ? 'townId=' + getTown()?.town_id : ''}`)
+                super.get<ItemDTO[]>(`${this.API_URL}/Fetcher/items?${getTown()?.town_id ? 'townId=' + getTown()?.town_id : ''}`)
                     .subscribe({
                         next: (response: HttpResponse<ItemDTO[]>) => {
                             const items: Item[] = dtoToModelArray(Item, response.body).filter((item: Item) => item.id !== 302);
@@ -63,7 +63,7 @@ export class ApiService extends GlobalService {
             if (saved_ruins && saved_ruins.length > 0 && !force) {
                 sub.next(saved_ruins);
             } else {
-                super.get<RuinDTO[]>(this.API_URL + '/Fetcher/ruins')
+                super.get<RuinDTO[]>(`${this.API_URL}/Fetcher/ruins`)
                     .subscribe({
                         next: (response: HttpResponse<RuinDTO[]>) => {
                             const ruins: Ruin[] = dtoToModelArray(Ruin, response.body).sort((a: Ruin, b: Ruin) => {
@@ -94,7 +94,7 @@ export class ApiService extends GlobalService {
      */
     public getHeroSkill(): Observable<HeroSkill[]> {
         return new Observable((sub: Subscriber<HeroSkill[]>) => {
-            super.get<HeroSkillDTO[]>(this.API_URL + '/Fetcher/heroSkills')
+            super.get<HeroSkillDTO[]>(`${this.API_URL}/Fetcher/heroSkills`)
                 .subscribe({
                     next: (response: HttpResponse<HeroSkillDTO[]>) => {
                         const skills: HeroSkill[] = dtoToModelArray(HeroSkill, response.body).sort((a: HeroSkill, b: HeroSkill) => {
@@ -122,7 +122,7 @@ export class ApiService extends GlobalService {
      */
     public getRecipes(): Observable<Recipe[]> {
         return new Observable((sub: Subscriber<Recipe[]>) => {
-            super.get<RecipeDTO[]>(this.API_URL + '/Fetcher/recipes')
+            super.get<RecipeDTO[]>(`${this.API_URL}/Fetcher/recipes`)
                 .subscribe({
                     next: (response: HttpResponse<RecipeDTO[]>) => {
                         sub.next(dtoToModelArray(Recipe, response.body));

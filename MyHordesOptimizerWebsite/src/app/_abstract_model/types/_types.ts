@@ -28,3 +28,5 @@ export interface ListForAddRemove {
     label: string;
     list: (Item | StatusEnum)[];
 }
+
+export type LogLevel = 'Verbose' | 'Debug' | 'Information' | 'Warning' | 'Error' | 'Fatal';

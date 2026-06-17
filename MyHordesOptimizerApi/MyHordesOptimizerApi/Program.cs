@@ -110,6 +110,9 @@ builder.Services.AddScoped<IMhoHeadersProvider, MhoHeadersProvider>();
 // Action filters
 builder.Services.AddScoped<MhoHeaderActionFilter>();
 
+// Admin
+builder.Services.AddScoped<AdminService>();
+
 // Configuration
 builder.Services.AddSingleton<IMyHordesApiConfiguration, MyHordesApiConfiguration>();
 builder.Services.AddSingleton<IGestHordesConfiguration, GestHordesConfiguration>();

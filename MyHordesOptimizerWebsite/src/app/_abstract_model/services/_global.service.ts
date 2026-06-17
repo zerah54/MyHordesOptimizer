@@ -1,4 +1,4 @@
-import { HttpClient, HttpContext, HttpHeaders, HttpResponse } from '@angular/common/http';
+import { HttpClient, HttpContext, HttpHeaders, HttpParams, HttpResponse } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
@@ -8,12 +8,13 @@ export class GlobalService {
     protected readonly API_URL: string = environment.api_url;
     protected readonly http: HttpClient = inject(HttpClient);
 
-    protected get<T>(url: string, bypass_loading?: boolean): Observable<HttpResponse<T>> {
+    protected get<T>(url: string, bypass_loading?: boolean, params?: HttpParams): Observable<HttpResponse<T>> {
         const context: HttpContext = new HttpContext().set(BYPASS_LOADING, bypass_loading);
         return this.http.get<T>(url, {
             responseType: 'json',
             context: context,
-            observe: 'response'
+            observe: 'response',
+            params
         });
     }
 

@@ -1,63 +1,75 @@
 @use 'variables';
 
-.app-menu {
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    min-width: 200px;
-    overflow: hidden;
+:host {
+    display: contents;
 
-    .mdc-list {
-        overflow-y: auto;
+    .app-menu {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        min-width: 200px;
+        overflow: hidden;
 
-        .mat-mdc-list-item:hover {
-            background-color: rgba(0, 0, 0, 0.2);
-            cursor: pointer;
-        }
+        .mdc-list {
+            overflow-y: auto;
 
-        .mat-mdc-list-item {
-            text-decoration: none;
-
-            &.link-selected {
-                color: variables.$primary !important;
+            .mat-mdc-list-item:hover {
+                background-color: rgba(0, 0, 0, 0.2);
+                cursor: pointer;
             }
 
-            @for $i from 1 through 10 {
-                &.lvl-#{$i} {
-                    $padding: $i * 2+em;
-                    padding-left: $padding;
-                    // width: calc(100% - $padding);
+            .mat-mdc-list-item {
+                text-decoration: none;
+
+                div {
+                    display: flex;
+                    flex-direction: row;
+                    justify-content: flex-start;
+                    align-items: center;
+                    gap: 0.25em;
+                }
+
+                &.link-selected {
+                    color: variables.$primary !important;
+                }
+
+                @for $i from 1 through 10 {
+                    &.lvl-#{$i} {
+                        $padding: $i * 2+em;
+                        padding-left: $padding;
+                        // width: calc(100% - $padding);
+                    }
+                }
+
+                .mat-mdc-list-item-unscoped-content {
+                    vertical-align: middle;
+                }
+
+                .mat-icon {
+                    vertical-align: middle;
                 }
             }
 
-            .mat-mdc-list-item-unscoped-content {
-                vertical-align: middle;
-            }
+        }
 
-            .mat-icon {
-                vertical-align: middle;
+        .actions {
+            display: flex;
+            flex-direction: column;
+
+            button {
+                text-align: left;
+                justify-content: left;
+                align-items: center;
             }
         }
 
-    }
-
-    .actions {
-        display: flex;
-        flex-direction: column;
-
-        button {
-            text-align: left;
-            justify-content: left;
-            align-items: center;
+        .spoil {
+            font-size: 0.5em;
+            padding: 0.5em;
+            border-radius: 1em;
+            background-color: variables.$primary;
+            vertical-align: middle;
         }
-    }
-
-    .spoil {
-        font-size: 0.5em;
-        padding: 0.5em;
-        border-radius: 1em;
-        background-color: variables.$primary;
-        vertical-align: middle;
     }
 }

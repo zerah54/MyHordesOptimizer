@@ -1,0 +1,162 @@
+<div class="log-viewer" [formGroup]="filtersForm">
+
+    <div class="log-viewer__toolbar">
+
+        <mat-form-field appearance="outline" class="field--date" subscriptSizing="dynamic">
+            <mat-label i18n>Date</mat-label>
+            <input matInput [matDatepicker]="picker" formControlName="date" [matDatepickerFilter]="dateFilter"/>
+            <mat-datepicker-toggle matIconSuffix [for]="picker"/>
+            <mat-datepicker #picker/>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="field--search" subscriptSizing="dynamic">
+            <mat-label i18n>Rechercher</mat-label>
+            <mat-icon fontSet="material-symbols-outlined" matPrefix>search</mat-icon>
+            <input matInput formControlName="search"/>
+            @if (filtersForm.controls.search.value) {
+                <button matIconSuffix mat-icon-button (click)="filtersForm.controls.search.setValue('')">
+                    <mat-icon fontSet="material-symbols-outlined">close</mat-icon>
+                </button>
+            }
+        </mat-form-field>
+    </div>
+
+    <div class="log-viewer__table-wrapper">
+        <table mat-table [dataSource]="entries()" class="log-table" multiTemplateDataRows>
+            <ng-container matColumnDef="stacktrace">
+                <th mat-header-cell *matHeaderCellDef></th>
+                <td mat-cell *matCellDef="let row" class="cell--stacktrace">
+                    @if (row.stackTrace) {
+                        <button mat-icon-button>
+                            <mat-icon fontSet="material-symbols-outlined" [style.color]="getLevelBgColor(row.level)">
+                                {{ expandedRow() === row ? 'expand_less' : 'expand_more' }}
+                            </mat-icon>
+                        </button>
+                    }
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="timestamp">
+                <th mat-header-cell *matHeaderCellDef i18n>Timestamp</th>
+                <td mat-cell *matCellDef="let row" class="cell--timestamp">
+                    <small>{{ row.timestamp | date:'HH:mm:ss.SSS' }}</small>
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="level">
+                <th mat-header-cell *matHeaderCellDef>
+                    @let value = filtersForm.controls.level.value;
+                    <mat-form-field appearance="outline" class="field--level" subscriptSizing="dynamic">
+                        <mat-label i18n>Niveau</mat-label>
+                        <mat-select formControlName="level">
+                            @if (value) {
+                                <mat-select-trigger>
+                                    <div class="trigger">
+                                        <mat-chip [style.background-color]="getLevelBgColor(value)">
+                                            <small>{{ value }}</small>
+                                        </mat-chip>
+
+                                        <mat-icon (click)="$event.stopPropagation(); filtersForm.controls.level.setValue(null);"
+                                                  fontSet="material-symbols-outlined">close
+                                        </mat-icon>
+                                    </div>
+                                </mat-select-trigger>
+                            }
+                            <mat-option i18n>Tous</mat-option>
+                            @for (lvl of logLevels; track lvl) {
+                                <mat-option [value]="lvl">
+                                    <mat-chip
+                                        [style.background-color]="getLevelBgColor(lvl)"
+                                        (click)="filterByLevel(lvl); $event.stopPropagation()">
+                                        <small>{{ lvl }}</small>
+                                    </mat-chip>
+                                </mat-option>
+                            }
+                        </mat-select>
+                    </mat-form-field>
+                </th>
+                <td mat-cell *matCellDef="let row" class="cell--level">
+                    <mat-chip
+                        [style.background-color]="getLevelBgColor(row.level)"
+                        (click)="filterByLevel(row.level); $event.stopPropagation()">
+                        <small>{{ row.level }}</small>
+                    </mat-chip>
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="correlationId">
+                <th mat-header-cell *matHeaderCellDef>
+                    <mat-form-field appearance="outline" class="field--correlation" subscriptSizing="dynamic">
+                        <mat-label i18n>Correlation ID</mat-label>
+                        <input matInput formControlName="correlationId"/>
+                        @if (filtersForm.controls.correlationId.value) {
+                            <button matIconSuffix mat-icon-button (click)="filtersForm.controls.correlationId.setValue('')">
+                                <mat-icon fontSet="material-symbols-outlined">close</mat-icon>
+                            </button>
+                        }
+                    </mat-form-field>
+                </th>
+                <td mat-cell *matCellDef="let row" class="cell--correlation">
+                    <small
+                        class="correlation-link"
+                        [matTooltip]="row.correlationId"
+                        (click)="filterByCorrelationId(row.correlationId); $event.stopPropagation()">
+                        {{ row.correlationId }}
+                    </small>
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="sourceContext">
+                <th mat-header-cell *matHeaderCellDef i18n>Source</th>
+                <td mat-cell *matCellDef="let row" class="cell--source" [matTooltip]="row.sourceContext">
+                    <small>{{ row.sourceContext | slice:(row.sourceContext.lastIndexOf('.') + 1) }}</small>
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="message">
+                <th mat-header-cell *matHeaderCellDef i18n>Message</th>
+                <td mat-cell *matCellDef="let row" class="cell--message">
+                    <span class="message-text">{{ row.message }}</span>
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="expandedDetail">
+                <td mat-cell *matCellDef="let row" [attr.colspan]="displayedColumns.length">
+                    @if (row.stackTrace && expandedRow() === row) {
+                        <div class="stacktrace">
+                            <pre>{{ row.stackTrace }}</pre>
+                        </div>
+                    }
+                </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns"
+                class="log-row"
+                [class.log-row--expanded]="expandedRow() === row"
+                [class.log-row--warning]="row.level === 'Warning'"
+                [class.log-row--error]="row.level === 'Error' || row.level === 'Fatal'"
+                [class.log-row--clickable]="!!row.stackTrace"
+                (click)="row.stackTrace ? toggleRow(row) : null">
+            </tr>
+            <tr mat-row *matRowDef="let row; columns: ['expandedDetail']" class="detail-row"></tr>
+
+        </table>
+
+        @if (!loading() && entries().length === 0) {
+            <div class="log-viewer__empty">
+                <mat-icon fontSet="material-symbols-outlined">inbox</mat-icon>
+                <span i18n>Aucune entrée trouvée</span>
+            </div>
+        }
+    </div>
+
+    <mat-paginator
+        [length]="totalCount()"
+        [pageSize]="pageSize"
+        [pageSizeOptions]="[100, 200, 500]"
+        [pageIndex]="page - 1"
+        (page)="onPageChange($event)"
+        showFirstLastButtons/>
+
+</div>

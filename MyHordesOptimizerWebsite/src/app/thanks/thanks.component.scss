@@ -1,21 +1,25 @@
-.mho-thanks {
-    .mat-mdc-dialog-title {
-        display: flex;
+:host {
+    display: contents;
 
-        > div {
+    .mho-thanks {
+        .mat-mdc-dialog-title {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            position: relative;
-            width: 100%;
 
-            h2 {
-                display: inline-block;
-                margin: 0;
-            }
+            > div {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                position: relative;
+                width: 100%;
 
-            .close-button {
-                right: -24px;
+                h2 {
+                    display: inline-block;
+                    margin: 0;
+                }
+
+                .close-button {
+                    right: -24px;
+                }
             }
         }
     }

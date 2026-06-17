@@ -1,58 +1,61 @@
-.mho-navbar {
+:host {
+    display: contents;
 
-    z-index: 3;
-    height: 52px !important;
-    overflow-x: auto;
-    overflow-y: hidden;
+    .mho-navbar {
 
-    .title {
-        margin-right: 1em;
-    }
+        z-index: 3;
+        overflow-x: auto;
+        overflow-y: hidden;
 
-    .spacer {
-        flex: 1 1 auto;
-    }
+        .title {
+            margin-right: 1em;
+        }
 
-    .external-app-id-input {
-        width: 250px;
-        font-size: 12px;
-        margin-top: 8px;
+        .spacer {
+            flex: 1 1 auto;
+        }
 
-        button {
-            font-size: 24px;
+        .external-app-id-input {
+            width: 250px;
+            font-size: 12px;
+            margin-top: 8px;
+
+            button {
+                font-size: 24px;
+            }
+        }
+
+        .mat-button {
+            cursor: pointer;
+            box-sizing: border-box;
+            position: relative;
+            outline: none;
+            border: none;
+            -webkit-tap-highlight-color: transparent;
+            display: inline-block;
+            white-space: nowrap;
+            text-decoration: none;
+            vertical-align: baseline;
+            text-align: center;
+            margin: 0;
+            min-width: 64px;
+            line-height: 36px;
+            padding: 0 16px;
+            border-radius: 4px;
+            overflow: visible;
+
+            /** Désactive la sélection par l'utilisateur */
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            user-select: none;
+
+            &.is-active {
+                background: rgba(0, 0, 0, 0.2);
+            }
         }
     }
 
-    .mat-button {
-        cursor: pointer;
-        box-sizing: border-box;
-        position: relative;
-        outline: none;
-        border: none;
-        -webkit-tap-highlight-color: transparent;
-        display: inline-block;
-        white-space: nowrap;
-        text-decoration: none;
-        vertical-align: baseline;
-        text-align: center;
-        margin: 0;
-        min-width: 64px;
-        line-height: 36px;
-        padding: 0 16px;
-        border-radius: 4px;
-        overflow: visible;
+    .me-in-town {
 
-        /** Désactive la sélection par l'utilisateur */
-        -webkit-user-select: none;
-        -moz-user-select: none;
-        user-select: none;
-
-        &.is-active {
-            background: rgba(0, 0, 0, 0.2);
-        }
     }
-}
-
-.me-in-town {
-
 }

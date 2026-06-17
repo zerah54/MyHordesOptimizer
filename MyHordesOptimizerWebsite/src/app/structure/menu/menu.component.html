@@ -21,6 +21,13 @@
                 <div class="shadow"></div>
             </div>
         }
+
+        @if (adminService.isAdmin()) {
+            <button mat-button type="button" routerLinkActive="link-selected" [routerLinkActiveOptions]="{exact : true}" [routerLink]="['/admin']">
+                <mat-icon fontSet="material-symbols-outlined">lock</mat-icon>
+                <ng-container i18n>Administration</ng-container>
+            </button>
+        }
         @if (site_language) {
             <button mat-button type="button" [matMenuTriggerFor]="languageMenu">
                 <mat-icon fontSet="material-symbols-outlined">language</mat-icon>
@@ -65,14 +72,16 @@
     @if (route.displayed && route.authorized()) {
         <a mat-list-item routerLinkActive="link-selected"
            [routerLinkActiveOptions]="{exact : true}" [routerLink]="route.path"
-           (click)="route.expanded = !route.expanded; toggleDisplayChildren(route)" [ngClass]="['lvl-' + route.lvl]">
-            @if (route.children && route.children.length > 0) {
-                <mat-icon fontSet="material-symbols-outlined">{{ route.expanded ? 'expand_more' : 'chevron_right' }}</mat-icon>
-            }
-            {{ route.label }}
-            @if (route.spoil) {
-                <span class="spoil" matTooltip="Cette page peut contenir des spoils de la saison 18" i18n-matTooltip>Spoil S19</span>
-            }
+           (click)="route.expanded = !route.expanded; toggleDisplayChildren(route)" [class]="`lvl-${route.lvl}`">
+            <div>
+                @if (route.children && route.children.length > 0) {
+                    <mat-icon fontSet="material-symbols-outlined">{{ route.expanded ? 'expand_more' : 'chevron_right' }}</mat-icon>
+                }
+                {{ route.label }}
+                @if (route.spoil) {
+                    <span class="spoil" matTooltip="Cette page peut contenir des spoils de la saison 18" i18n-matTooltip>Spoil S19</span>
+                }
+            </div>
         </a>
     }
 </ng-template>
