@@ -3424,12 +3424,12 @@
         <target state="needs-translation">Déconnexion</target>
       </trans-unit>
       <trans-unit id="8092922417891540912" datatype="html">
-        <source>Cette page peut contenir des spoils de la saison 17</source>
+          <source>Cette page peut contenir des spoils de la saison 19</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/structure/menu/menu.component.html</context>
           <context context-type="linenumber">74</context>
         </context-group>
-        <target state="needs-translation">Cette page peut contenir des spoils de la saison 17</target>
+          <target state="needs-translation">Cette page peut contenir des spoils de la saison 19</target>
       </trans-unit>
       <trans-unit id="1687689412386216543" datatype="html">
         <source>Par défaut</source>
