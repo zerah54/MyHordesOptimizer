@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MHO Addon
-// @version      1.1.39.0
+// @version      1.1.40
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/, rubrique Tutoriels
 // @author       Zerah
 //
@@ -32,7 +32,10 @@
 // ==/UserScript==
 
 const changelog = `${getScriptInfo().name} : Changelog pour la version ${getScriptInfo().version}\n\n`
-    + `[Correctif] Fix de l'update des outils externes suite à la mise à jour de mi-saison\n\n`;
+    + `[Correctif] Fix de l'update des outils externes suite à la mise à jour de mi-saison\n`
+    + `[Correctif] Affichage de la liste de courses dans la page\n\n`
+    + `[Amélioration] Remaniement des options du script pour plus de clarté\n\n`
+    + `[Nouveauté] Option pour trier la liste des citoyens et l'omniscience`;
 
 const lang = (document.querySelector('html[lang]')?.getAttribute('lang') || document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2) || 'fr';
 
@@ -1165,322 +1168,351 @@ let params_categories = [
         },
         params: [
             {
-                id: `update_mho`,
+                id: `synchronize_external_tools`,
                 label: {
-                    en: `Update MyHordes Optimiser`,
-                    fr: `Mettre à jour MyHordes Optimiser`,
-                    de: `MyHordes Optimiser Aktualisieren`,
-                    es: `Actualizar MyHordes Optimiser`
+                    en: `External tools update`,
+                    fr: `Mise à jour des outils externes`,
+                    de: `Aktualisierung externer Tools`,
+                    es: `Actualización de herramientas externas`
                 },
                 children: [
                     {
-                        id: `update_mho_killed_zombies`,
+                        id: `update_mho`,
                         label: {
-                            en: `Record the number of zombies killed`,
-                            fr: `Enregistrer le nombre de zombies tués`,
-                            de: `Notieren Sie die Anzahl der getöteten Zombies`,
-                            es: `Registrar el número de zombis asesinados`
+                            en: `Update MyHordes Optimiser`,
+                            fr: `Mettre à jour MyHordes Optimiser`,
+                            de: `MyHordes Optimiser Aktualisieren`,
+                            es: `Actualizar MyHordes Optimiser`
                         },
+                        children: [
+                            {
+                                id: `update_mho_killed_zombies`,
+                                label: {
+                                    en: `Record the number of zombies killed`,
+                                    fr: `Enregistrer le nombre de zombies tués`,
+                                    de: `Notieren Sie die Anzahl der getöteten Zombies`,
+                                    es: `Registrar el número de zombis asesinados`
+                                },
+                            },
+                            // {
+                            //     id: `update_mho_job_markers`,
+                            //     label: {
+                            //         en: `Updates information from job markers`,
+                            //         fr: `Met à jour les informations issues des marqueurs de métiers`,
+                            //         de: `Aktualisiert Informationen von Jobmarkierungen`,
+                            //         es: `Actualiza la información de los marcadores de trabajo.`
+                            //     },
+                            // },
+                            {
+                                id: `update_mho_devastated`,
+                                label: {
+                                    en: `Zone update even after the town is in Chaos`,
+                                    fr: `Mise à jour même quand la ville est en Chaos`,
+                                    de: `Zonen-Update, nachdem die Stadt bereits zerstört wurde`,
+                                    es: `Actualización de zona cuando los pueblo está sumida en el caos`
+                                },
+                            },
+                            {
+                                id: `update_mho_actions`,
+                                label: {
+                                    en: `Heroic Actions`,
+                                    fr: `Actions héroïques`,
+                                    de: `Heldentaten`,
+                                    es: `Acciones heroicas`
+                                },
+                            },
+                            {
+                                id: `update_mho_house`,
+                                label: {
+                                    en: `Home upgrades`,
+                                    fr: `Améliorations de la maison`,
+                                    de: `Hausverbesserungen`,
+                                    es: `Mejoras de la casa`
+                                },
+                                help: {
+                                    en: `A new button will be placed on the improvements page`,
+                                    fr: `Un nouveau bouton sera placé sur la page des améliorations`,
+                                    de: `Auf der Verbesserungsseite wird eine neue Schaltfläche platziert`,
+                                    es: `Se colocará un nuevo botón en la página de mejoras.`
+                                },
+                            },
+                            {
+                                id: `update_mho_bags`,
+                                label: {
+                                    en: `Details of my rucksack and those of my escort`,
+                                    fr: `Détail de mon sac et de ceux de mon escorte`,
+                                    de: `Details meines Inventars und des Inventars meiner Eskorte`,
+                                    es: `Detalles de mi mochila y las de mi escolta`
+                                },
+                            },
+                            // {
+                            //     id: `update_mho_chest`,
+                            //     label: {
+                            //         en: `Items in my chest`,
+                            //         fr: `Contenu de mon coffre`,
+                            //         de: `Gegenstände in meiner Truhe`,
+                            //         es: `Contenido de mi baúl`
+                            //     },
+                            // },
+                            {
+                                id: `update_mho_status`,
+                                label: {
+                                    en: `Status`,
+                                    fr: `États`,
+                                    de: `Status`,
+                                    es: `Estatus`
+                                },
+                            },
+                            {
+                                id: `update_mho_digs`,
+                                label: {
+                                    en: `Record successful searches`,
+                                    fr: `Enregistrer les fouilles réussies`,
+                                    de: `Zeichnen Sie erfolgreiche Ausgrabungen auf`,
+                                    es: `Grabar excavaciones exitosas`
+                                },
+                            },
+                            // {
+                            //     id: `update_mho_souls`,
+                            //     label: {
+                            //         en: `Record souls' positions as a chaman`,
+                            //         fr: `Enregistrer les positions des âmes en tant que chaman`,
+                            //         de: `Die Position der Seelen als Schamane aufzeichnen`,
+                            //         es: `Registrando las posiciones de las almas como chamán`
+                            //     },
+                            // },
+                            {
+                                id: `refresh_mho_after_update`,
+                                label: {
+                                    en: `Refresh tab after update`,
+                                    fr: `Rafraîchir l'onglet après la mise à jour`,
+                                    de: `Registerkarte „Aktualisieren“ nach dem Update`,
+                                    es: `Actualizar pestaña después de la actualización`
+                                },
+                                help: {
+                                    en: `Will only work if the page is opened in a tab in the same browser window`,
+                                    fr: `Ne fonctionnera que si la page est ouverte dans un onglet dans la même fenêtre du navigateur`,
+                                    de: `Funktioniert nur, wenn die Seite in einem Tab im selben Browserfenster geöffnet wird`,
+                                    es: `Solo funcionará si la página se abre en una pestaña en la misma ventana del navegador.`
+                                }
+                            }
+                        ]
                     },
                     // {
-                    //     id: `update_mho_job_markers`,
+                    //     id: `update_bbh`,
                     //     label: {
-                    //         en: `Updates information from job markers`,
-                    //         fr: `Met à jour les informations issues des marqueurs de métiers`,
-                    //         de: `Aktualisiert Informationen von Jobmarkierungen`,
-                    //         es: `Actualiza la información de los marcadores de trabajo.`
+                    //         en: `Update BigBroth’Hordes`,
+                    //         fr: `Mettre à jour BigBroth'Hordes`,
+                    //         de: `BigBroth’Hordes Aktualisieren`,
+                    //         es: `Actualizar BigBroth'Hordes`
                     //     },
+                    //     children: [
+                    //         {
+                    //             id: `refresh_bbh_after_update`,
+                    //             label: {
+                    //                 en: `Refresh tab after update`,
+                    //                 fr: `Rafraîchir l'onglet après la mise à jour`,
+                    //                 de: `Registerkarte „Aktualisieren“ nach dem Update`,
+                    //                 es: `Actualizar pestaña después de la actualización`
+                    //             },
+                    //             help: {
+                    //                 en: `Will only work if the page is opened in a tab in the same browser window`,
+                    //                 fr: `Ne fonctionnera que si la page est ouverte dans un onglet dans la même fenêtre du navigateur`,
+                    //                 de: `Funktioniert nur, wenn die Seite in einem Tab im selben Browserfenster geöffnet wird`,
+                    //                 es: `Solo funcionará si la página se abre en una pestaña en la misma ventana del navegador.`
+                    //             }
+                    //         }
+                    //     ]
                     // },
                     {
-                        id: `update_mho_devastated`,
+                        id: `update_gh`,
                         label: {
-                            en: `Zone update even after the town is in Chaos`,
-                            fr: `Mise à jour même quand la ville est en Chaos`,
-                            de: `Zonen-Update, nachdem die Stadt bereits zerstört wurde`,
-                            es: `Actualización de zona cuando los pueblo está sumida en el caos`
+                            en: `Update Gest’Hordes`,
+                            fr: `Mettre à jour Gest'Hordes`,
+                            de: `Gest’Hordes aktualisieren`,
+                            es: `Actualizar Gest'Hordes`
                         },
+                        children: [
+                            {
+                                id: `update_gh_killed_zombies`,
+                                label: {
+                                    en: `Record the number of zombies killed`,
+                                    fr: `Enregistrer le nombre de zombies tués`,
+                                    de: `Notieren Sie die Anzahl der getöteten Zombies`,
+                                    es: `Registrar el número de zombis asesinados`
+                                },
+                            },
+                            {
+                                id: `update_gh_devastated`,
+                                label: {
+                                    en: `Zone update even after the town is in Chaos`,
+                                    fr: `Mise à jour quand la ville est en Chaos`,
+                                    de: `Zonen-Update, nachdem die Stadt bereits zerstört wurde`,
+                                    es: `Actualización de zona cuando los pueblo está sumida en el caos`
+                                },
+                            },
+                            {
+                                id: `update_gh_ah`,
+                                label: {
+                                    en: `Heroic Actions`,
+                                    fr: `Actions héroïques`,
+                                    de: `Heldentaten`,
+                                    es: `Acciones heroicas`
+                                },
+                            },
+                            {
+                                id: `update_gh_amelios`,
+                                label: {
+                                    en: `Home upgrades`,
+                                    fr: `Améliorations de la maison`,
+                                    de: `Hausverbesserungen`,
+                                    es: `Mejoras de la casa`
+                                },
+                                help: {
+                                    en: `A new button will be placed on the improvements page`,
+                                    fr: `Un nouveau bouton sera placé sur la page des améliorations`,
+                                    de: `Auf der Verbesserungsseite wird eine neue Schaltfläche platziert`,
+                                    es: `Se colocará un nuevo botón en la página de mejoras.`
+                                },
+                            },
+                            {
+                                id: `update_gh_status`,
+                                label: {
+                                    en: `Status`,
+                                    fr: `États`,
+                                    de: `Status`,
+                                    es: `Estatus`
+                                },
+                            },
+                            {
+                                id: `refresh_gh_after_update`,
+                                label: {
+                                    en: `Refresh tab after update`,
+                                    fr: `Rafraîchir l'onglet après la mise à jour`,
+                                    de: `Registerkarte „Aktualisieren“ nach dem Update`,
+                                    es: `Actualizar pestaña después de la actualización`
+                                },
+                                help: {
+                                    en: `Will only work if the page is opened in a tab in the same browser window`,
+                                    fr: `Ne fonctionnera que si la page est ouverte dans un onglet dans la même fenêtre du navigateur`,
+                                    de: `Funktioniert nur, wenn die Seite in einem Tab im selben Browserfenster geöffnet wird`,
+                                    es: `Solo funcionará si la página se abre en una pestaña en la misma ventana del navegador.`
+                                }
+                            }
+                        ]
                     },
                     {
-                        id: `update_mho_actions`,
+                        id: `update_fata`,
                         label: {
-                            en: `Heroic Actions`,
-                            fr: `Actions héroïques`,
-                            de: `Heldentaten`,
-                            es: `Acciones heroicas`
+                            en: `Update Fata Morgana`,
+                            fr: `Mettre à jour Fata Morgana`,
+                            de: `Fata Morgana aktualisieren`,
+                            es: `Actualizar Fata Morgana`
                         },
+                        children: [
+                            {
+                                id: `update_fata_killed_zombies`,
+                                label: {
+                                    en: `Record the number of zombies killed`,
+                                    fr: `Enregistrer le nombre de zombies tués`,
+                                    de: `Notieren Sie die Anzahl der getöteten Zombies`,
+                                    es: `Registrar el número de zombis asesinados`
+                                },
+                            },
+                            {
+                                id: `update_fata_job_markers`,
+                                label: {
+                                    en: `Updates information from job markers`,
+                                    fr: `Met à jour les informations issues des marqueurs de métiers`,
+                                    de: `Aktualisiert Informationen von Jobmarkierungen`,
+                                    es: `Actualiza la información de los marcadores de trabajo.`
+                                },
+                            },
+                            {
+                                id: `update_fata_devastated`,
+                                label: {
+                                    en: `Update even when the town is in Chaos or when the quota is exceeded`,
+                                    fr: `Mise à jour même quand la ville est en Chaos ou quand le quota est dépassé`,
+                                    de: `Aktualisierung auch dann, wenn in der Stadt Chaos herrscht oder das Kontingent überschritten wird`,
+                                    es: `Actualizar incluso cuando la ciudad esté en Caos o cuando se exceda la cuota`
+                                },
+                            },
+                            {
+                                id: `refresh_fm_after_update`,
+                                label: {
+                                    en: `Refresh tab after update`,
+                                    fr: `Rafraîchir l'onglet après la mise à jour`,
+                                    de: `Registerkarte „Aktualisieren“ nach dem Update`,
+                                    es: `Actualizar pestaña después de la actualización`
+                                },
+                                help: {
+                                    en: `Will only work if the page is opened in a tab in the same browser window`,
+                                    fr: `Ne fonctionnera que si la page est ouverte dans un onglet dans la même fenêtre du navigateur`,
+                                    de: `Funktioniert nur, wenn die Seite in einem Tab im selben Browserfenster geöffnet wird`,
+                                    es: `Solo funcionará si la página se abre en una pestaña en la misma ventana del navegador.`
+                                }
+                            }
+                        ]
                     },
-                    {
-                        id: `update_mho_house`,
-                        label: {
-                            en: `Home upgrades`,
-                            fr: `Améliorations de la maison`,
-                            de: `Hausverbesserungen`,
-                            es: `Mejoras de la casa`
-                        },
-                        help: {
-                            en: `A new button will be placed on the improvements page`,
-                            fr: `Un nouveau bouton sera placé sur la page des améliorations`,
-                            de: `Auf der Verbesserungsseite wird eine neue Schaltfläche platziert`,
-                            es: `Se colocará un nuevo botón en la página de mejoras.`
-                        },
-                    },
-                    {
-                        id: `update_mho_bags`,
-                        label: {
-                            en: `Details of my rucksack and those of my escort`,
-                            fr: `Détail de mon sac et de ceux de mon escorte`,
-                            de: `Details meines Inventars und des Inventars meiner Eskorte`,
-                            es: `Detalles de mi mochila y las de mi escolta`
-                        },
-                    },
-                    // {
-                    //     id: `update_mho_chest`,
-                    //     label: {
-                    //         en: `Items in my chest`,
-                    //         fr: `Contenu de mon coffre`,
-                    //         de: `Gegenstände in meiner Truhe`,
-                    //         es: `Contenido de mi baúl`
-                    //     },
-                    // },
-                    {
-                        id: `update_mho_status`,
-                        label: {
-                            en: `Status`,
-                            fr: `États`,
-                            de: `Status`,
-                            es: `Estatus`
-                        },
-                    },
-                    {
-                        id: `update_mho_digs`,
-                        label: {
-                            en: `Record successful searches`,
-                            fr: `Enregistrer les fouilles réussies`,
-                            de: `Zeichnen Sie erfolgreiche Ausgrabungen auf`,
-                            es: `Grabar excavaciones exitosas`
-                        },
-                    },
-                    // {
-                    //     id: `update_mho_souls`,
-                    //     label: {
-                    //         en: `Record souls' positions as a chaman`,
-                    //         fr: `Enregistrer les positions des âmes en tant que chaman`,
-                    //         de: `Die Position der Seelen als Schamane aufzeichnen`,
-                    //         es: `Registrando las posiciones de las almas como chamán`
-                    //     },
-                    // },
-                    {
-                        id: `refresh_mho_after_update`,
-                        label: {
-                            en: `Refresh tab after update`,
-                            fr: `Rafraîchir l'onglet après la mise à jour`,
-                            de: `Registerkarte „Aktualisieren“ nach dem Update`,
-                            es: `Actualizar pestaña después de la actualización`
-                        },
-                        help: {
-                            en: `Will only work if the page is opened in a tab in the same browser window`,
-                            fr: `Ne fonctionnera que si la page est ouverte dans un onglet dans la même fenêtre du navigateur`,
-                            de: `Funktioniert nur, wenn die Seite in einem Tab im selben Browserfenster geöffnet wird`,
-                            es: `Solo funcionará si la página se abre en una pestaña en la misma ventana del navegador.`
-                        }
-                    }
                 ]
             },
             // {
-            //     id: `update_bbh`,
+            //     id: `display_map`,
             //     label: {
-            //         en: `Update BigBroth’Hordes`,
-            //         fr: `Mettre à jour BigBroth'Hordes`,
-            //         de: `BigBroth’Hordes Aktualisieren`,
-            //         es: `Actualizar BigBroth'Hordes`
+            //         en: `Allow to show a map from external tools`,
+            //         fr: `Permettre d'afficher une carte issue des outils externes`,
+            //         de: `Anzeigen einer Karte von externen Tools ermöglichen`,
+            //         es: `Permitir que se muestre un mapa proveniente de las aplicaciones externas`
             //     },
-            //     children: [
-            //         {
-            //             id: `refresh_bbh_after_update`,
-            //             label: {
-            //                 en: `Refresh tab after update`,
-            //                 fr: `Rafraîchir l'onglet après la mise à jour`,
-            //                 de: `Registerkarte „Aktualisieren“ nach dem Update`,
-            //                 es: `Actualizar pestaña después de la actualización`
-            //             },
-            //             help: {
-            //                 en: `Will only work if the page is opened in a tab in the same browser window`,
-            //                 fr: `Ne fonctionnera que si la page est ouverte dans un onglet dans la même fenêtre du navigateur`,
-            //                 de: `Funktioniert nur, wenn die Seite in einem Tab im selben Browserfenster geöffnet wird`,
-            //                 es: `Solo funcionará si la página se abre en una pestaña en la misma ventana del navegador.`
-            //             }
-            //         }
-            //     ]
+            //     help: {
+            //         en: `In any external tool, it will be possible to copy the town or ruin map and to paste it into MyHordes`,
+            //         fr: `Dans les outils externes, il sera possible de copier la carte de la ville ou de la ruine, et une fois copiée de l'afficher dans MyHordes`,
+            //         de: `In jedem externen Tool wird es möglich sein, die Stadt- oder Ruinenkarte zu kopieren und in MyHordes einzufügen`,
+            //         es: `En toda aplicación externa, es posible copiar el mapa del pueblo o de la ruina y pegarlo en MyHordes`
+            //     },
             // },
             {
-                id: `update_gh`,
+                id: `display_more_informations_from_mho`,
                 label: {
-                    en: `Update Gest’Hordes`,
-                    fr: `Mettre à jour Gest'Hordes`,
-                    de: `Gest’Hordes aktualisieren`,
-                    es: `Actualizar Gest'Hordes`
-                },
-                children: [
-                    {
-                        id: `update_gh_killed_zombies`,
-                        label: {
-                            en: `Record the number of zombies killed`,
-                            fr: `Enregistrer le nombre de zombies tués`,
-                            de: `Notieren Sie die Anzahl der getöteten Zombies`,
-                            es: `Registrar el número de zombis asesinados`
-                        },
-                    },
-                    {
-                        id: `update_gh_devastated`,
-                        label: {
-                            en: `Zone update even after the town is in Chaos`,
-                            fr: `Mise à jour quand la ville est en Chaos`,
-                            de: `Zonen-Update, nachdem die Stadt bereits zerstört wurde`,
-                            es: `Actualización de zona cuando los pueblo está sumida en el caos`
-                        },
-                    },
-                    {
-                        id: `update_gh_ah`,
-                        label: {
-                            en: `Heroic Actions`,
-                            fr: `Actions héroïques`,
-                            de: `Heldentaten`,
-                            es: `Acciones heroicas`
-                        },
-                    },
-                    {
-                        id: `update_gh_amelios`,
-                        label: {
-                            en: `Home upgrades`,
-                            fr: `Améliorations de la maison`,
-                            de: `Hausverbesserungen`,
-                            es: `Mejoras de la casa`
-                        },
-                        help: {
-                            en: `A new button will be placed on the improvements page`,
-                            fr: `Un nouveau bouton sera placé sur la page des améliorations`,
-                            de: `Auf der Verbesserungsseite wird eine neue Schaltfläche platziert`,
-                            es: `Se colocará un nuevo botón en la página de mejoras.`
-                        },
-                    },
-                    {
-                        id: `update_gh_status`,
-                        label: {
-                            en: `Status`,
-                            fr: `États`,
-                            de: `Status`,
-                            es: `Estatus`
-                        },
-                    },
-                    {
-                        id: `refresh_gh_after_update`,
-                        label: {
-                            en: `Refresh tab after update`,
-                            fr: `Rafraîchir l'onglet après la mise à jour`,
-                            de: `Registerkarte „Aktualisieren“ nach dem Update`,
-                            es: `Actualizar pestaña después de la actualización`
-                        },
-                        help: {
-                            en: `Will only work if the page is opened in a tab in the same browser window`,
-                            fr: `Ne fonctionnera que si la page est ouverte dans un onglet dans la même fenêtre du navigateur`,
-                            de: `Funktioniert nur, wenn die Seite in einem Tab im selben Browserfenster geöffnet wird`,
-                            es: `Solo funcionará si la página se abre en una pestaña en la misma ventana del navegador.`
-                        }
-                    }
-                ]
-            },
-            {
-                id: `update_fata`,
-                label: {
-                    en: `Update Fata Morgana`,
-                    fr: `Mettre à jour Fata Morgana`,
-                    de: `Fata Morgana aktualisieren`,
-                    es: `Actualizar Fata Morgana`
-                },
-                children: [
-                    {
-                        id: `update_fata_killed_zombies`,
-                        label: {
-                            en: `Record the number of zombies killed`,
-                            fr: `Enregistrer le nombre de zombies tués`,
-                            de: `Notieren Sie die Anzahl der getöteten Zombies`,
-                            es: `Registrar el número de zombis asesinados`
-                        },
-                    },
-                    {
-                        id: `update_fata_job_markers`,
-                        label: {
-                            en: `Updates information from job markers`,
-                            fr: `Met à jour les informations issues des marqueurs de métiers`,
-                            de: `Aktualisiert Informationen von Jobmarkierungen`,
-                            es: `Actualiza la información de los marcadores de trabajo.`
-                        },
-                    },
-                    {
-                        id: `update_fata_devastated`,
-                        label: {
-                            en: `Update even when the town is in Chaos or when the quota is exceeded`,
-                            fr: `Mise à jour même quand la ville est en Chaos ou quand le quota est dépassé`,
-                            de: `Aktualisierung auch dann, wenn in der Stadt Chaos herrscht oder das Kontingent überschritten wird`,
-                            es: `Actualizar incluso cuando la ciudad esté en Caos o cuando se exceda la cuota`
-                        },
-                    },
-                    {
-                        id: `refresh_fm_after_update`,
-                        label: {
-                            en: `Refresh tab after update`,
-                            fr: `Rafraîchir l'onglet après la mise à jour`,
-                            de: `Registerkarte „Aktualisieren“ nach dem Update`,
-                            es: `Actualizar pestaña después de la actualización`
-                        },
-                        help: {
-                            en: `Will only work if the page is opened in a tab in the same browser window`,
-                            fr: `Ne fonctionnera que si la page est ouverte dans un onglet dans la même fenêtre du navigateur`,
-                            de: `Funktioniert nur, wenn die Seite in einem Tab im selben Browserfenster geöffnet wird`,
-                            es: `Solo funcionará si la página se abre en una pestaña en la misma ventana del navegador.`
-                        }
-                    }
-                ]
-            },
-            {
-                id: `show_compact`,
-                label: {
-                    en: `Enable compact mode out of town`,
-                    fr: `Activer le mode compact hors de la ville`,
-                    de: `Aktivieren Sie den Kompaktmodus außerhalb der Stadt`,
-                    es: `Habilitar el modo compacto fuera de la ciudad`
+                    en: `Shows miscellaneous information from MyHordes Optimizer`,
+                    fr: `Affiche des informations diverses issues de MyHordes Optimizer`,
+                    de: `Zeigt Verschiedene Informationen von MyHordes Optimizer`,
+                    es: `Muestra Información miscelánea de MyHordes Optimizer`
                 },
                 help: {
-                    en: `On small screen only, external tools update button will be displayed with compressed buttons`,
-                    fr: `Sur petit écran uniquement, le bouton de mise à jour des outils externes sera affiché avec les boutons compressés`,
-                    de: `Nur auf kleinen Bildschirmen wird die Aktualisierungsschaltfläche für externe Tools mit komprimierten Schaltflächen angezeigt`,
-                    es: `Solo en pantalla pequeña, el botón de actualización de herramientas externas se mostrará con botones comprimidos`
+                    en: `Displays the note of the box, if it exists.`,
+                    fr: `Affiche la note de la case, si elle existe.`,
+                    de: `Zeigt die Notiz der Box an, falls vorhanden.`,
+                    es: `Muestra la nota de la caja, si existe.`
                 },
             },
             {
-                id: `display_map`,
+                id: `display_my_expeditions`,
                 label: {
-                    en: `Allow to show a map from external tools`,
-                    fr: `Permettre d'afficher une carte issue des outils externes`,
-                    de: `Anzeigen einer Karte von externen Tools ermöglichen`,
-                    es: `Permitir que se muestre un mapa proveniente de las aplicaciones externas`
+                    en: `Shows details of the MyHordes Optimizer expeditions I am registered for`,
+                    fr: `Affiche les détails des expéditions de MyHordes Optimizer auxquelles je suis inscrit`,
+                    de: `Zeigt Details zu MyHordes Optimizer-Expeditionen an, für die ich registriert bin`,
+                    es: `Muestra los detalles de las expediciones de MyHordes Optimizer a las que estoy registrado`
                 },
-                help: {
-                    en: `In any external tool, it will be possible to copy the town or ruin map and to paste it into MyHordes`,
-                    fr: `Dans les outils externes, il sera possible de copier la carte de la ville ou de la ruine, et une fois copiée de l'afficher dans MyHordes`,
-                    de: `In jedem externen Tool wird es möglich sein, die Stadt- oder Ruinenkarte zu kopieren und in MyHordes einzufügen`,
-                    es: `En toda aplicación externa, es posible copiar el mapa del pueblo o de la ruina y pegarlo en MyHordes`
+            },
+            {
+                id: `display_external_links`,
+                label: {
+                    en: `Shows links to external profiles and towns`,
+                    fr: `Affiche des liens vers les profils et villes externes`,
+                    de: `Zeigt Links zu externen Profilen und Städten an`,
+                    es: `Muestra enlaces a perfiles y ciudades externos`
                 },
             }
         ]
     },
     {
-        id: `display`,
+        id: `additionnal_info`,
         label: {
-            en: `Interface improvements`,
-            fr: `Améliorations de l'interface`,
-            de: `Benutzeroberfläche Verbesserungen`,
-            es: `Mejoras de la interfaz`
+            en: `Additional information`,
+            fr: `Informations complémentaires`,
+            de: `Weitere Informationen`,
+            es: `Información adicional`
         },
         params: [
             {
@@ -1560,68 +1592,6 @@ let params_categories = [
                 ]
             },
             {
-                id: `display_search_fields`,
-                label: {
-                    en: `Additional filters`,
-                    fr: `Filtres supplémentaires`,
-                    de: `Zusätzliche Filter`,
-                    es: `Filtros adicionales`
-                },
-                children: [
-                    {
-                        id: `hide_completed_buildings_field`,
-                        label: {
-                            en: `Hide completed projects`,
-                            fr: `Masquer les chantiers terminés`,
-                            de: `Abgeschlossene Bauprojekte ausblenden`,
-                            es: `Ocultar obras completados`
-                        },
-                    },
-                    {
-                        id: `display_search_field_buildings`,
-                        label: {
-                            en: `Search for a construction site`,
-                            fr: `Rechercher un chantier`,
-                            de: `Baustelle suchen`,
-                            es: `Buscar una construcción`
-                        },
-                    },
-                    {
-                        id: `display_search_field_recipients`,
-                        label: {
-                            en: `Find a recipient`,
-                            fr: `Rechercher un destinataire`,
-                            de: `Finden Sie einen Empfänger`,
-                            es: `Encuentra un destinatario`
-                        }
-                    },
-                    {
-                        id: `display_search_field_dump`,
-                        label: {
-                            en: `Search for an object in the landfill`,
-                            fr: `Rechercher un objet de la décharge`,
-                            de: `Suchen Sie nach einem Objekt auf der Mülldeponie`,
-                            es: `Buscar un objeto en el vertedero`
-                        }
-                    },
-                    {
-                        id: `display_search_field_registry`,
-                        label: {
-                            en: `Search the registry`,
-                            fr: `Rechercher dans le registre`,
-                            de: `Durchsuchen Sie die Registrierung`,
-                            es: `Buscar en el registro`
-                        },
-                        help: {
-                            en: `The search will only be done in the displayed lines of the registry`,
-                            fr: `La recherche ne se fera que dans les lignes affichées du registre`,
-                            de: `Die Suche erfolgt nur in den angezeigten Zeilen des Registers`,
-                            es: `La búsqueda sólo se realizará en las líneas desplegadas del registro`
-                        }
-                    },
-                ]
-            },
-            {
                 id: `display_wishlist`,
                 label: {
                     en: `Wishlist in interface`,
@@ -1631,48 +1601,12 @@ let params_categories = [
                 },
             },
             {
-                id: `display_nb_dead_zombies`,
+                id: `display_estimations_on_watchtower`,
                 label: {
-                    en: `Number of zombie that died today`,
-                    fr: `Nombre de zombies morts aujourd'hui`,
-                    de: `Anzahl der Zombies die heute hier gestorben sind`,
-                    es: `Cantidad de zombis que murieron hoy`
-                },
-                help: {
-                    en: `Allows to display the number of blood splatters on the map`,
-                    fr: `Permet d'afficher le nombre de taches de sang sur la carte`,
-                    de: `Ermöglicht die Anzeige der Anzahl der Blutfleck auf der Karte`,
-                    es: `Permite mostrar la cantidad de manchas de sangre en el mapa`
-                },
-            },
-            {
-                id: `display_translate_tool`,
-                label: {
-                    en: `MyHordes' item translation bar`,
-                    fr: `Barre de traduction des éléments de MyHordes`,
-                    de: `Übersetzungsleiste für MyHordes Elemente`,
-                    es: `Barra de traducción de elementos de MyHordes`
-                },
-                help: {
-                    en: `Shows a translation bar. You must choose the initial language, then type the searched element to get the other translations.`,
-                    fr: `Affiche une barre de traduction. Vous devez choisir la langue initiale, puis saisir l'élément recherché pour en récupérer les différentes traductions.`,
-                    de: `Zeigt eine Übersetzungsleiste an. Sie müssen die Ausgangssprache auswählen, und dann die Zielelemente eingeben um die Übersetzungen zu generieren.`,
-                    es: `Muestra una barra de traducción. Primero se debe escoger el idioma inicial, y luego ingresar el elemento buscado en la barra para obtener las distintas traducciones.`
-                },
-            },
-            {
-                id: `display_missing_ap_for_buildings_to_be_safe`,
-                label: {
-                    en: `Missing AP to repair construction sites`,
-                    fr: `PA manquants pour réparer les chantiers`,
-                    de: `Fehlende AP, um Konstruktionen zu reparieren`,
-                    es: `PA faltantes para reparar las construcciones`
-                },
-                help: {
-                    en: `In Pandemonium (Hardcore towns), the construction sites are damaged during the attack. The damages can amount to 70% max of the construction's life points (rounded up to the nearest whole number). This option displays over the constructions the number of AP needed to keep them safe.`,
-                    fr: `En Pandémonium, les bâtiments prennent des dégâts lors de l'attaque. Ces dégâts équivalent à un maximum de 70% des points de vie du bâtiment (arrondi à l'entier supérieur). Cette option affiche sur les bâtiments les PA à investir pour que le bâtiment soit en sécurité.`,
-                    de: `In Pandämonium-Städten nehmen Gebäude während des nächtlichen Angriffs Schaden. Diese Schäden können bis zu 70% eines Gebäudes ausmachen (aufgerundet zur nächsten ganzen Zahl). Diese Einstellung zeigt oberhalb der Bau-AP an, wieviele AP benötigt werden, um das Gebäude für die Nacht zu schützen.`,
-                    es: `En Pandemonio, las construcciones sufren daños durante el ataque. Estos daños equivalen a un máximo de 70% de los puntos de vida de la construcción (redondeados al entero superior). Esta opción muestra sobre las construcciones la cantidad de PA a invertir para evitar que puedan ser destruidas.`
+                    en: `Estimates saved on the watchtower page`,
+                    fr: `Estimations enregistrées sur la page de la tour de guet`,
+                    de: `Schätzungen, die auf der Wachturm aufgezeichnet wurden`,
+                    es: `Estimaciones registradas en la página de la torre de vigilancia`
                 },
             },
             {
@@ -1684,56 +1618,118 @@ let params_categories = [
                     es: `Predicciones para acampar en la información del área`
                 },
             },
+        ]
+    },
+    {
+        id: `display`,
+        label: {
+            en: `Interface improvements`,
+            fr: `Améliorations de l'interface`,
+            de: `Benutzeroberfläche Verbesserungen`,
+            es: `Mejoras de la interfaz`
+        },
+        params: [
             {
-                id: `display_more_informations_from_mho`,
+                id: `sort_and_filter`,
                 label: {
-                    en: `Miscellaneous information from MyHordes Optimizer`,
-                    fr: `Informations diverses issues de MyHordes Optimizer`,
-                    de: `Verschiedene Informationen von MyHordes Optimizer`,
-                    es: `Información miscelánea de MyHordes Optimizer`
+                    en: `Sorts and filters`,
+                    fr: `Tris et filtres`,
+                    de: `Sortierungen und Filter`,
+                    es: `Ordena y filtra`
                 },
-                help: {
-                    en: `Displays the note of the box, if it exists.`,
-                    fr: `Affiche la note de la case, si elle existe.`,
-                    de: `Zeigt die Notiz der Box an, falls vorhanden.`,
-                    es: `Muestra la nota de la caja, si existe.`
-                },
-            },
-            {
-                id: `display_estimations_on_watchtower`,
-                label: {
-                    en: `Shows estimates saved on the watchtower page`,
-                    fr: `Affiche les estimations enregistrées sur la page de la tour de guet`,
-                    de: `Zeigt auf der Watchtower-Seite gespeicherte Schätzungen an`,
-                    es: `Muestra estimaciones guardadas en la página de la torre de vigilancia`
-                },
-            },
-            {
-                id: `copy_registry`,
-                label: {
-                    en: `Adds a button to copy registry contents`,
-                    fr: `Ajoute un bouton permettant de copier le contenu du registre`,
-                    de: `Fügt eine Schaltfläche zum Kopieren von Registrierungsinhalten hinzu`,
-                    es: `Agrega un botón para copiar el contenido del registro`
-                },
-            },
-            {
-                id: `display_anti_abuse`,
-                label: {
-                    en: `Displays a counter to manage anti-abuse`,
-                    fr: `Affiche un compteur pour gérer l'anti-abus`,
-                    de: `Zeigt einen Zähler zur Verwaltung der Missbrauchsbekämpfung an`,
-                    es: `Muestra un contador para gestionar anti-abuso`
-                },
-            },
-            {
-                id: `automatically_open_bag`,
-                label: {
-                    en: `Automatically opens the "Use an object from my rucksack" menu`,
-                    fr: `Ouvre automatiquement le menu "Utiliser un objet de mon sac"`,
-                    de: `Öffnet automatisch das Menü "Gegenstand verwenden"`,
-                    es: `Abre automáticamente el menú "Usar un objeto de mi mochila"`
-                },
+                children: [
+                    {
+                        id: `display_search_fields`,
+                        label: {
+                            en: `Additional filters`,
+                            fr: `Filtres supplémentaires`,
+                            de: `Zusätzliche Filter`,
+                            es: `Filtros adicionales`
+                        },
+                        children: [
+                            {
+                                id: `hide_completed_buildings_field`,
+                                label: {
+                                    en: `Hide completed projects`,
+                                    fr: `Masquer les chantiers terminés`,
+                                    de: `Abgeschlossene Bauprojekte ausblenden`,
+                                    es: `Ocultar obras completados`
+                                },
+                            },
+                            {
+                                id: `display_search_field_buildings`,
+                                label: {
+                                    en: `Search for a construction site`,
+                                    fr: `Rechercher un chantier`,
+                                    de: `Baustelle suchen`,
+                                    es: `Buscar una construcción`
+                                },
+                            },
+                            {
+                                id: `display_search_field_recipients`,
+                                label: {
+                                    en: `Find a recipient`,
+                                    fr: `Rechercher un destinataire`,
+                                    de: `Finden Sie einen Empfänger`,
+                                    es: `Encuentra un destinatario`
+                                }
+                            },
+                            {
+                                id: `display_search_field_dump`,
+                                label: {
+                                    en: `Search for an object in the landfill`,
+                                    fr: `Rechercher un objet de la décharge`,
+                                    de: `Suchen Sie nach einem Objekt auf der Mülldeponie`,
+                                    es: `Buscar un objeto en el vertedero`
+                                }
+                            },
+                            {
+                                id: `display_search_field_registry`,
+                                label: {
+                                    en: `Search the registry`,
+                                    fr: `Rechercher dans le registre`,
+                                    de: `Durchsuchen Sie die Registrierung`,
+                                    es: `Buscar en el registro`
+                                },
+                                help: {
+                                    en: `The search will only be done in the displayed lines of the registry`,
+                                    fr: `La recherche ne se fera que dans les lignes affichées du registre`,
+                                    de: `Die Suche erfolgt nur in den angezeigten Zeilen des Registers`,
+                                    es: `La búsqueda sólo se realizará en las líneas desplegadas del registro`
+                                }
+                            },
+                        ]
+                    },
+                    {
+                        id: `sort_lists`,
+                        label: {
+                            en: `Additional sorts`,
+                            fr: `Tris supplémentaires`,
+                            de: `Zusätzliche Sorten`,
+                            es: `Tipos adicionales`
+                        },
+                        children: [
+                            {
+                                id: `sort_citizen_list`,
+                                label: {
+                                    en: `List of citizens`,
+                                    fr: `Liste des citoyens`,
+                                    de: `Liste der Bürger`,
+                                    es: `Lista de ciudadanos`,
+                                }
+                            },
+                            {
+                                id: `sort_omniscience_list`,
+                                label: {
+                                    en: `Omniscience`,
+                                    fr: `Omniscience`,
+                                    de: `Allwissenheit`,
+                                    es: `Omnisciencia`,
+                                }
+                            }
+                        ]
+                    },
+                ]
             },
             {
                 id: `default_escort_options`,
@@ -1765,21 +1761,84 @@ let params_categories = [
                 ]
             },
             {
-                id: `display_ghoul_voracity_percent`,
+                id: `automatically_open_bag`,
                 label: {
-                    en: `Shows the percentage on the voracity gauge`,
-                    fr: `Affiche le pourcentage sur la jauge de voracité`,
-                    de: `Zeigt den Prozentsatz der Unersättlichkeitsanzeige an`,
-                    es: `Muestra el porcentaje en el indicador de voracidad`
+                    en: `Automatically opens the "Use an object from my rucksack" menu`,
+                    fr: `Ouvre automatiquement le menu "Utiliser un objet de mon sac"`,
+                    de: `Öffnet automatisch das Menü "Gegenstand verwenden"`,
+                    es: `Abre automáticamente el menú "Usar un objeto de mi mochila"`
                 },
             },
             {
-                id: `display_external_links`,
+                id: `display_nb_dead_zombies`,
                 label: {
-                    en: `Shows links to external profiles and towns`,
-                    fr: `Affiche des liens vers les profils et villes externes`,
-                    de: `Zeigt Links zu externen Profilen und Städten an`,
-                    es: `Muestra enlaces a perfiles y ciudades externos`
+                    en: `Number of zombie that died today`,
+                    fr: `Nombre de zombies morts aujourd'hui`,
+                    de: `Anzahl der Zombies die heute hier gestorben sind`,
+                    es: `Cantidad de zombis que murieron hoy`
+                },
+                help: {
+                    en: `Allows to display the number of blood splatters on the map`,
+                    fr: `Permet d'afficher le nombre de taches de sang sur la carte`,
+                    de: `Ermöglicht die Anzeige der Anzahl der Blutfleck auf der Karte`,
+                    es: `Permite mostrar la cantidad de manchas de sangre en el mapa`
+                },
+            },
+            {
+                id: `display_missing_ap_for_buildings_to_be_safe`,
+                label: {
+                    en: `Missing AP to repair construction sites`,
+                    fr: `PA manquants pour réparer les chantiers`,
+                    de: `Fehlende AP, um Konstruktionen zu reparieren`,
+                    es: `PA faltantes para reparar las construcciones`
+                },
+                help: {
+                    en: `In Pandemonium (Hardcore towns), the construction sites are damaged during the attack. The damages can amount to 70% max of the construction's life points (rounded up to the nearest whole number). This option displays over the constructions the number of AP needed to keep them safe.`,
+                    fr: `En Pandémonium, les bâtiments prennent des dégâts lors de l'attaque. Ces dégâts équivalent à un maximum de 70% des points de vie du bâtiment (arrondi à l'entier supérieur). Cette option affiche sur les bâtiments les PA à investir pour que le bâtiment soit en sécurité.`,
+                    de: `In Pandämonium-Städten nehmen Gebäude während des nächtlichen Angriffs Schaden. Diese Schäden können bis zu 70% eines Gebäudes ausmachen (aufgerundet zur nächsten ganzen Zahl). Diese Einstellung zeigt oberhalb der Bau-AP an, wieviele AP benötigt werden, um das Gebäude für die Nacht zu schützen.`,
+                    es: `En Pandemonio, las construcciones sufren daños durante el ataque. Estos daños equivalen a un máximo de 70% de los puntos de vida de la construcción (redondeados al entero superior). Esta opción muestra sobre las construcciones la cantidad de PA a invertir para evitar que puedan ser destruidas.`
+                },
+            },
+            {
+                id: `display_translate_tool`,
+                label: {
+                    en: `MyHordes' item translation bar`,
+                    fr: `Barre de traduction des éléments de MyHordes`,
+                    de: `Übersetzungsleiste für MyHordes Elemente`,
+                    es: `Barra de traducción de elementos de MyHordes`
+                },
+                help: {
+                    en: `Shows a translation bar. You must choose the initial language, then type the searched element to get the other translations.`,
+                    fr: `Affiche une barre de traduction. Vous devez choisir la langue initiale, puis saisir l'élément recherché pour en récupérer les différentes traductions.`,
+                    de: `Zeigt eine Übersetzungsleiste an. Sie müssen die Ausgangssprache auswählen, und dann die Zielelemente eingeben um die Übersetzungen zu generieren.`,
+                    es: `Muestra una barra de traducción. Primero se debe escoger el idioma inicial, y luego ingresar el elemento buscado en la barra para obtener las distintas traducciones.`
+                },
+            },
+            {
+                id: `copy_registry`,
+                label: {
+                    en: `Button to copy registry contents`,
+                    fr: `Bouton permettant de copier le contenu du registre`,
+                    de: `Schaltfläche zum Kopieren von Registrierungsinhalten hinzu`,
+                    es: `Botón para copiar el contenido del registro`
+                },
+            },
+            {
+                id: `display_anti_abuse`,
+                label: {
+                    en: `Counter to manage anti-abuse`,
+                    fr: `Compteur pour gérer l'anti-abus`,
+                    de: `Zähler zur Verwaltung der Missbrauchsbekämpfung an`,
+                    es: `Contador para gestionar anti-abuso`
+                },
+            },
+            {
+                id: `display_ghoul_voracity_percent`,
+                label: {
+                    en: `Percentage on the voracity gauge`,
+                    fr: `Pourcentage sur la jauge de voracité`,
+                    de: `Prozentsatz der Unersättlichkeitsanzeige an`,
+                    es: `Porcentaje en el indicador de voracidad`
                 },
             },
             {
@@ -1794,19 +1853,10 @@ let params_categories = [
             {
                 id: `display_counter_on_input_registry`,
                 label: {
-                    en: `Displays a character counter on the chatcase.`,
-                    fr: `Affiche un compteur de caractères sur le chatcase`,
-                    de: `Zeigt einen Zeichenzähler im Chatcase an`,
-                    es: `Muestra un contador de caracteres en el caso de chat`
-                },
-            },
-            {
-                id: `display_my_expeditions`,
-                label: {
-                    en: `Shows details of expeditions I am registered for`,
-                    fr: `Affiche les détails des expéditions auxquelles je suis inscrit`,
-                    de: `Zeigt Details zu Expeditionen an, für die ich registriert bin`,
-                    es: `Muestra detalles de las expediciones para las que estoy registrado`
+                    en: `Character counter on the chatcase.`,
+                    fr: `Compteur de caractères sur le chatcase`,
+                    de: `Zeichenzähler im Chatcase an`,
+                    es: `Contador de caracteres en el caso de chat`
                 },
             },
             {
@@ -2071,9 +2121,14 @@ function pageIsDump() {
     return document.URL.indexOf('town/dump') > -1;
 }
 
+/** @return {boolean}    true si la page de l'utilisateur est liste omniscience */
+function pageIsOmniscience() {
+    return document.URL.endsWith('omniscience') > -1;
+}
+
 /** @return {boolean}    true si la page de l'utilisateur est la liste des citoyens */
 function pageIsCitizens() {
-    return document.URL.indexOf('citizens') > -1;
+    return document.URL.endsWith('citizens') > -1;
 }
 
 /** @return {boolean}    true si la page de l'utilisateur est la page des chantiers */
@@ -2536,11 +2591,13 @@ function initOptionsWithoutLoginNeeded() {
     changeDefaultEscortOptions();
     displayGhoulVoracityPercent();
     addExternalLinksToProfiles();
-    createDisplayMapButton();
+    // createDisplayMapButton();
     fillItemsMessages();
     displayCountCharacters();
     createStoreNotificationsBtn();
     addExternalLinksToTowns();
+    sortCitizenList();
+    sortOmniscienceList();
     // blockUsersPosts();
 }
 
@@ -2548,7 +2605,7 @@ function updateFetchRequestOptions(options) {
     const update = {...options};
     update.headers = {
         ...update.headers,
-        'Mho-Origin': 'script',
+        'Mho-Origin': 'mho-addon',
         'Mho-Script-Version': getScriptInfo().version,
     };
     if (isValidToken()) {
@@ -4299,7 +4356,7 @@ function createUpdateExternalToolsButton(count = 0) {
     let compact_actions_zone = document.querySelector('.actions-box .mdg');
 
     let update_external_tools_btn = document.getElementById(mh_update_external_tools_id);
-    const external_display_zone = zone_marker ? (window.innerWidth < 480 && mho_parameters.show_compact && compact_actions_zone ? document.querySelector('hordes-inventory') : zone_marker) : undefined;
+    const external_display_zone = zone_marker ? (window.innerWidth < 480 && compact_actions_zone ? compact_actions_zone : zone_marker) : undefined;
     const chest = document.querySelector('hordes-inventory');
     const amelios = document.querySelector('#upgrade_home_level')?.parentElement?.parentElement;
     const map_actions = document.querySelector('#door_opener')?.parentElement ?? document.querySelector('#door_exit')?.parentElement;
@@ -4311,7 +4368,7 @@ function createUpdateExternalToolsButton(count = 0) {
     } else {
         if (external_display_zone || (chest && pageIsHouse()) || (amelios && pageIsAmelio()) || (map_actions && pageIsDoors() && mho_parameters.update_mho && mho_parameters.update_mho_souls)) {
             if (!update_external_tools_btn) {
-                if (window.innerWidth < 480 && mho_parameters.show_compact && compact_actions_zone) {
+                if (window.innerWidth < 480 && compact_actions_zone) {
                     let el = external_display_zone ?? chest?.parentElement ?? amelios ?? map_actions;
                     let updater_bloc = createSmallUpdateExternalToolsButton(update_external_tools_btn);
                     if (amelios) {
@@ -4338,7 +4395,7 @@ function createUpdateExternalToolsButton(count = 0) {
             let warn_missing_logs = document.getElementById(mho_warn_missing_logs_id);
 
             if (!warn_missing_logs && document.querySelector('.log-complete-link') && external_display_zone && update_external_tools_btn && mho_parameters.update_mho_digs) {
-                if (window.innerWidth < 480 && mho_parameters.show_compact && compact_actions_zone) {
+                if (window.innerWidth < 480 && compact_actions_zone) {
                     let external_tools_btn_tooltip = document.querySelector('#external-tools-btn-tooltip');
                     warn_missing_logs = document.createElement('div');
                     warn_missing_logs.id = mho_warn_missing_logs_id;
@@ -4894,7 +4951,7 @@ function displaySearchFieldOnRegistry() {
             search_field.type = 'text';
             search_field.id = mho_search_registry_field_id;
             search_field.classList.add('mho-input');
-            search_field.placeholder = getI18N(params_categories.find((category) => category.id === 'display').params.find((param) => param.id === 'display_search_fields').children.find((child) => child.id === 'display_search_field_registry').label);
+            search_field.placeholder = getI18N(params_categories.find((category) => category.id === 'display').params.find((param) => param.id === 'sort_and_filter').children.find((param) => param.id === 'display_search_fields').children.find((child) => child.id === 'display_search_field_registry').label);
             search_field.setAttribute('style', 'padding-left: 24px; margin-bottom: 0.25em;');
 
             search_field_container.appendChild(search_field);
@@ -5304,12 +5361,12 @@ function displayPriorityOnItems() {
 
 function getWishlistForZone() {
     if (!wishlist || !wishlist.wishList) return undefined;
-    if (!pageIsDesert()) return wishlist.wishList.find((wishlist_item) => wishlist_item.zone_x_pa === 0);
+    if (!pageIsDesert()) return wishlist.wishList.filter((wishlist_item) => wishlist_item.zoneXPa === 0);
 
     let position = getCurrentPosition() || 0;
     let current_zone = (Math.abs(position[0]) + Math.abs(position[1])) * 2 - 3;
 
-    let used_wishlist = [...wishlist.wishList.filter((wishlist_item) => wishlist_item.zone_x_pa === 0 || wishlist_item.zone_x_pa >= current_zone)];
+    let used_wishlist = [...wishlist.wishList.filter((wishlist_item) => wishlist_item.zoneXPa === 0 || wishlist_item.zoneXPa >= current_zone)];
     used_wishlist?.sort((item_a, item_b) => {
         return item_b.priority - item_a.priority;
     });
@@ -8734,7 +8791,6 @@ function blockUsersPosts() {
 }
 
 function displayCountCharacters() {
-
     let counter = document.querySelector('#mho_registry_counter_id');
 
     if (!counter && mho_parameters.display_counter_on_input_registry && pageIsDesert()) {
@@ -8762,6 +8818,173 @@ function displayCountCharacters() {
         });
     } else if (counter) {
         counter.remove();
+    }
+}
+
+////////////////////////
+// TRI SUR LES LISTES //
+////////////////////////
+function mhoInitSortableTable(table, columns, rowSelector) {
+    if (!table || table.dataset.sortEnabled) return;
+    table.dataset.sortEnabled = 'true';
+
+    Array.from(table.querySelectorAll(rowSelector))
+        .forEach((row, i) => {
+            row.dataset.origIdx = i;
+        });
+
+    const header = table.querySelector('.row-flex.header');
+    if (!header) return;
+
+    const cells = Array.from(header.children).filter((el) => el.classList.contains('cell'));
+    let activeCol = -1;
+    let direction = 0;
+
+    const doSort = (colIndex, dir) => {
+        const rows = Array.from(table.querySelectorAll(rowSelector));
+        if (dir === 0) {
+            rows.sort((a, b) => Number(a.dataset.origIdx) - Number(b.dataset.origIdx));
+        } else {
+            const {extract, compare} = columns[colIndex];
+            rows.sort((a, b) => dir * compare(extract(a), extract(b)));
+        }
+        rows.forEach((row) => table.appendChild(row));
+    };
+
+    const arrows = cells.map((cell, colIdx) => {
+        cell.querySelector('.help-button')
+            ?.addEventListener('click', (e) => e.stopPropagation());
+
+        const arrow = document.createElement('span');
+        arrow.className = 'mho-sort-arrow';
+        arrow.textContent = ' ⇅';
+        cell.classList.add('mho-sortable-cell');
+        cell.appendChild(arrow);
+
+        cell.addEventListener('click', () => {
+            if (activeCol !== colIdx) {
+                activeCol = colIdx;
+                direction = 1;
+            } else {
+                if (direction === 1) direction = -1;
+                else if (direction === -1) {
+                    direction = 0;
+                    activeCol = -1;
+                } else {
+                    direction = 1;
+                    activeCol = colIdx;
+                }
+            }
+
+            arrows.forEach((a, j) => {
+                const on = (j === activeCol && direction !== 0);
+                a.textContent = on ? (direction === 1 ? ' ↑' : ' ↓') : ' ⇅';
+                a.style.opacity = on ? '1' : '0.4';
+            });
+
+            doSort(activeCol < 0 ? 0 : activeCol, direction);
+        });
+
+        return arrow;
+    });
+}
+
+function mhoCleanupSortableTable(table, rowSelector) {
+    if (!table?.dataset.sortEnabled) return;
+
+    table.querySelectorAll('.mho-sort-arrow').forEach(a => a.remove());
+
+    const header = table.querySelector('.row-flex.header');
+    if (header) {
+        Array.from(header.children)
+            .filter((el) => el.classList.contains('cell'))
+            .forEach((cell) => cell.classList.remove('mho-sortable-cell'));
+    }
+
+    const rows = Array.from(table.querySelectorAll(rowSelector));
+    rows.sort((a, b) => Number(a.dataset.origIdx) - Number(b.dataset.origIdx));
+    rows.forEach((row) => {
+        table.appendChild(row);
+        delete row.dataset.origIdx;
+    });
+
+    delete table.dataset.sortEnabled;
+}
+
+function sortCitizenList() {
+
+    const COLUMNS = [
+        { // Citoyens : tri alphabétique
+            extract: row => (row.querySelector('.username')?.textContent ?? '').trim().toLowerCase(),
+            compare: (a, b) => a.localeCompare(b, 'fr', {sensitivity: 'base'}),
+        },
+        { // Déf. : tri numérique
+            extract: row => {
+                const m = (row.querySelector('.citizen-defense')?.textContent ?? '').match(/(\d+)/);
+                return m ? parseInt(m[1], 10) : 0;
+            },
+            compare: (a, b) => a - b,
+        },
+        { // Dehors ? — ↑ : en ville d'abord, puis plus proche → plus loin
+            extract: row => {
+                const text = (row.querySelector('.location')?.textContent ?? '').trim();
+                const m = text.match(/\[(-?\d+),(-?\d+)\]/);
+                if (!m) return {inTown: true, dist: 0};
+                const x = parseInt(m[1], 10), y = parseInt(m[2], 10);
+                return {inTown: false, dist: Math.abs(x) + Math.abs(y)};
+            },
+            compare: (a, b) => {
+                if (a.inTown && b.inTown) return 0;
+                if (a.inTown) return -1;
+                if (b.inTown) return 1;
+                return a.dist - b.dist;
+            },
+        },
+    ];
+
+    const table = [...document.querySelectorAll('.row-table.citizens-list')]
+        .find((t) => t.querySelectorAll('.row-flex.header .cell').length === 3);
+
+    if (mho_parameters.sort_citizen_list && pageIsCitizens()) {
+        mhoInitSortableTable(table, COLUMNS, '.row-flex.stretch.pointer');
+    } else if (!mho_parameters.sort_citizen_list && pageIsCitizens()) {
+        mhoCleanupSortableTable(table, '.row-flex.stretch.pointer');
+    }
+}
+
+function sortOmniscienceList() {
+
+    const COLUMNS = [
+        { // Citoyens : tri alphabétique
+            extract: row => (row.querySelector('.username')?.textContent ?? '').trim().toLowerCase(),
+            compare: (a, b) => a.localeCompare(b, 'fr', {sensitivity: 'base'}),
+        },
+        { // Coffre : nombre d'objets dans l'inventaire
+            extract: row => row.querySelectorAll('li.item').length,
+            compare: (a, b) => a - b,
+        },
+        { // Âme : points (ex: "18 754 pts" ou "18754 pts")
+            extract: row => {
+                const cell = [...row.querySelectorAll('.citizen-box')]
+                    .find((c) => c.textContent.includes('pts'));
+                const m = cell?.textContent.replace(/\s+/g, '').match(/(\d+)pts/);
+                return m ? parseInt(m[1], 10) : 0;
+            },
+            compare: (a, b) => a - b,
+        },
+        { // Activité : nombre d'étoiles
+            extract: row => row.querySelectorAll('img[alt="*"]').length,
+            compare: (a, b) => a - b,
+        },
+    ];
+
+    const table = [...document.querySelectorAll('.row-table.citizens-list')]
+        .find((t) => t.querySelectorAll('.row-flex.header .cell').length === 4);
+
+    if (mho_parameters.sort_omniscience_list && pageIsOmniscience()) {
+        mhoInitSortableTable(table, COLUMNS, '.row-flex.stretch');
+    } else if (!mho_parameters.sort_omniscience_list && pageIsOmniscience()) {
+        mhoCleanupSortableTable(table, '.row-flex.stretch');
     }
 }
 
@@ -9402,20 +9625,11 @@ function createStyles() {
         + `content: '\\00a0:\\00a0'`
         + '}';
 
-    let citizen_list_more_info_content = '.content-center-vertical.center {'
-        + `justify-content: center;`
-        + `min-width: 18px;`
-        + `}`;
-
-    let citizen_list_more_info_header_content = '.header-center-vertical {'
-        + `text-align: center;`
-        + `padding-bottom: 4px;`
-        + `min-width: 18px;`
-        + `}`;
-
-    let hidden = '.mho-hidden {'
-        + 'display: none !important;'
-        + '}';
+    let hidden = `
+        .mho-hidden {
+            'display: none !important;
+        }
+    `;
 
     let new_changelog = `
         div.mho-new-changelog::before {
@@ -9456,6 +9670,23 @@ function createStyles() {
         }
         `;
 
+    let sort_arrow = `
+        .mho-sort-arrow {
+            display: inline-block;
+            margin-left: 2px;
+            opacity: 0.4;
+            font-size: 10px;
+            cursor: pointer;
+            user-select: none;
+            transition: opacity .15s;
+        }
+
+        .mho-sortable-cell {
+            cursor: pointer;
+            white-space: nowrap;
+        }
+    `;
+
     let css = params_style + btn_style + mho_window_style + new_changelog + new_version
         + mho_window_style_tabs + tab_content_style + tab_content_item_list_style + tab_content_item_list_item_style + tab_content_item_list_item_selected_style + tab_content_item_list_item_not_selected_properties_style + item_category
         + parameters_informations_ul_style + li_style + recipe_style + input_number_webkit_style + input_number_firefox_style
@@ -9463,8 +9694,7 @@ function createStyles() {
         + item_title_style + add_to_wishlist_button_img_style + advanced_tooltip + item_list_element_style
         + wishlist_label + wishlist_header + wishlist_header_cell + wishlist_cols + wishlist_delete + wishlist_in_app + wishlist_in_app_item + wishlist_even
         + item_priority + item_tags
-        + display_map_btn + mho_map_td + mho_ruin_td + dotted_background + empty_bat_before_after + empty_bat_after + camping_spaced_label + citizen_list_more_info_content
-        + citizen_list_more_info_header_content + hidden;
+        + display_map_btn + mho_map_td + mho_ruin_td + dotted_background + empty_bat_before_after + empty_bat_after + camping_spaced_label + hidden + sort_arrow;
 
     let style = document.createElement('style');
 
@@ -11305,7 +11535,6 @@ function getApiKey() {
 
         let interval = setInterval(() => {
             let copy_button = document.getElementById(mho_copy_map_id);
-            // console.log(copy_button);
             if (mho_parameters.display_map && !copy_button) {
                 let map_block = document.getElementById(map_block_id);
                 let ruin_block = document.getElementById(ruin_block_id);
