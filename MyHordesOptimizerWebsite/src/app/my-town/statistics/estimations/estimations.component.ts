@@ -108,12 +108,12 @@ export class EstimationsComponent implements OnInit {
                 next: (estimations: Estimations) => {
                     this.estimations = estimations;
                     this.town_statistics_service
-                        .getAttackCalculation(this.selected_day, false)
+                        .getApofooAttackCalculation(this.selected_day, false)
                         .subscribe({
                             next: (result: EstimationsResult) => {
                                 this.today_calculated_attack = result;
                                 this.town_statistics_service
-                                    .getAttackCalculation(this.selected_day, true)
+                                    .getApofooAttackCalculation(this.selected_day, true)
                                     .subscribe({
                                         next: (result: EstimationsResult) => {
                                             this.today_calculated_attack_beta = result;
@@ -123,12 +123,12 @@ export class EstimationsComponent implements OnInit {
                             }
                         });
                     this.town_statistics_service
-                        .getAttackCalculation(this.selected_day + 1, false)
+                        .getApofooAttackCalculation(this.selected_day + 1, false)
                         .subscribe({
                             next: (result: EstimationsResult) => {
                                 this.tomorrow_calculated_attack = result;
                                 this.town_statistics_service
-                                    .getAttackCalculation(this.selected_day + 1, true)
+                                    .getApofooAttackCalculation(this.selected_day + 1, true)
                                     .subscribe({
                                         next: (result: EstimationsResult) => {
                                             this.tomorrow_calculated_attack_beta = result;
