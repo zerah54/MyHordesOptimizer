@@ -1,22 +1,26 @@
 @use 'variables';
 
-.mho-menu-remove {
-    padding: 0 8px !important;
+:host {
+    display: contents;
 
-    .mat-mdc-menu-content {
+    .mho-menu-remove {
+        padding: 0 8px !important;
 
-        .empty-bag {
-            display: flex;
-            align-items: center;
-        }
+        .mat-mdc-menu-content {
 
-        .items {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.25em;
+            .empty-bag {
+                display: flex;
+                align-items: center;
+            }
 
-            > img {
-                cursor: pointer;
+            .items {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 0.25em;
+
+                > img {
+                    cursor: pointer;
+                }
             }
         }
     }

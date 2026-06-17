@@ -1,7 +1,11 @@
-.well {
-    padding: 0.5em;
+:host {
+    display: contents;
 
-    .mat-divider {
-        margin-top: 0.5em;
+    .well {
+        padding: 0.5em;
+
+        .mat-divider {
+            margin-top: 0.5em;
+        }
     }
 }

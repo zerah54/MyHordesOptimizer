@@ -25,7 +25,6 @@ const material_modules: Imports = [MatCardModule, MatFormFieldModule];
     selector: 'mho-items',
     templateUrl: './items.component.html',
     styleUrls: ['./items.component.scss'],
-    host: {style: 'display: contents'},
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class ItemsComponent implements OnInit {

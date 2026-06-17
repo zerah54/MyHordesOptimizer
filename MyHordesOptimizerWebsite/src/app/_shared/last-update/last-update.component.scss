@@ -1,11 +1,15 @@
 @use '../../../../public/scss/variables';
 
-.mho-last-update {
-    white-space: nowrap;
+:host {
+    display: contents;
 
-    img {
-        cursor: pointer;
-        vertical-align: bottom;
-        margin: 0 0.5em;
+    .mho-last-update {
+        white-space: nowrap;
+
+        img {
+            cursor: pointer;
+            vertical-align: bottom;
+            margin: 0 0.5em;
+        }
     }
 }

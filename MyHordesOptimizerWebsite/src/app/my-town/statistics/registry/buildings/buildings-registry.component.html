@@ -10,8 +10,8 @@
     }
 </mat-tab-group>
 <ng-template #template let-tab>
-    <div class="plays-dices-cards">
-        <div class="citizen-plays">
+    <div class="contributions">
+        <div class="citizen-contribute">
             <h4 i18n>Ont contribué</h4>
             @for (citizen of entries_by_type | isCitizenInEntries:completeCitizenList(); track citizen) {
                 <div>
@@ -20,7 +20,7 @@
                 </div>
             }
         </div>
-        <div class="citizen-doesnt-play">
+        <div class="citizen-didnt-contribute">
             <h4 i18n>N'ont pas contribué</h4>
             @for (citizen of entries_by_type | isCitizenInEntries:completeCitizenList():true; track citizen) {
                 <div>

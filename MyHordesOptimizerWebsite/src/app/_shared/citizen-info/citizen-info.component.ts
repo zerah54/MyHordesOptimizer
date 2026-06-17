@@ -15,7 +15,6 @@ const material_modules: Imports = [];
     selector: 'mho-citizen-info',
     templateUrl: './citizen-info.component.html',
     styleUrls: ['./citizen-info.component.scss'],
-    host: {style: 'display: contents'},
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class CitizenInfoComponent {

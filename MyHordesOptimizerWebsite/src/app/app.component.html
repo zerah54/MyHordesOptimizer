@@ -1,4 +1,4 @@
-<div [ngClass]="['mho-main', theme ? theme : '']">
+<div class="mho-main" [class]="theme ? theme : ''">
     <mho-header #header (changeSidenavStatus)="sidenav.toggle()"></mho-header>
 
     @if (theme === 'noel') {

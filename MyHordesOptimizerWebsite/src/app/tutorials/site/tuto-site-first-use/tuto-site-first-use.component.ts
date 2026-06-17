@@ -1,4 +1,4 @@
-import { Component, DOCUMENT, Inject, ViewEncapsulation } from '@angular/core';
+import { Component, DOCUMENT, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
@@ -16,20 +16,16 @@ const material_modules: Imports = [MatButtonModule, MatCardModule, MatIconModule
     selector: 'mho-tuto-site-first-use',
     templateUrl: './tuto-site-first-use.component.html',
     styleUrls: ['./tuto-site-first-use.component.scss'],
-    encapsulation: ViewEncapsulation.None,
-    host: {style: 'display: contents'},
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class TutoSiteFirstUseComponent {
+    private readonly clipboard: ClipboardService = inject(ClipboardService);
+    private readonly document: Document = inject<Document>(DOCUMENT);
 
     public readonly title: string = $localize`Première utilisation du site`;
 
     public readonly text_1: string = $localize`Lors de votre première utilisation du site vous n'aurez pas accès aux pages sous le menu "Ma ville". En effet, il faut au préalable renseigner son identifiant externe pour les applications, en haut à droite de la page.`;
     public readonly text_2: string = $localize`L'identifiant externe pour les applications se trouve sur le site de MyHordes, dans la page de votre âme, onglet "Avancé". Une fois copié, il suffit de le coller dans le champ dédié sur le site de MyHordes Optimizer et de valider.`;
-
-    public constructor(private clipboard: ClipboardService, @Inject(DOCUMENT) private document: Document) {
-
-    }
 
     public copyUrl(): void {
         const url: string = this.document.location.href;

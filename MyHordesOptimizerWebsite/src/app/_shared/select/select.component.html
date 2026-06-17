@@ -1,5 +1,5 @@
 <mat-select class="mho-select" [multiple]="multiple()" [value]="value" (valueChange)="writeValue($event);"
-            [attr.aria-labelledby]="parent_form_field.getLabelId()"
+            [attr.aria-labelledby]="parent_form_field?.getLabelId()"
             (closed)="closed.emit()" [placeholder]="placeholder" [panelClass]="class()">
     @if (multiple()) {
         <mat-select-trigger>

@@ -1,92 +1,84 @@
 @use 'variables';
 
-.game-board
-{
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 1em;
-    height: 100%;
+:host {
+    display: contents;
 
-    .grid
-    {
-        background-color: variables.$item_color;
+    .game-board {
         display: flex;
         flex-direction: column;
         align-items: center;
-        padding: 0.5em;
-        border-radius: 0.5em;
-        gap: 0.25em;
+        gap: 1em;
+        height: 100%;
 
-
-        .row
-        {
+        .grid {
+            background-color: variables.$item_color;
             display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 0.5em;
+            border-radius: 0.5em;
             gap: 0.25em;
 
-            .cell
-            {
-                width: 40px;
-                height: 40px;
 
-                background-color: variables.$item_color;
+            .row {
                 display: flex;
-                justify-content: center;
-                align-items: center;
-                cursor: pointer;
+                gap: 0.25em;
 
-                &.highlighted
-                {
-                    background-color: rgba(0, 0, 0, 0.5);
-                }
+                .cell {
+                    width: 40px;
+                    height: 40px;
 
-                >img
-                {
-                    opacity: 1;
+                    background-color: variables.$item_color;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    cursor: pointer;
 
-                    &.to-remove
-                    {
-                        opacity: 0;
-                        transition: opacity 250ms;
+                    &.highlighted {
+                        background-color: rgba(0, 0, 0, 0.5);
+                    }
+
+                    > img {
+                        opacity: 1;
+
+                        &.to-remove {
+                            opacity: 0;
+                            transition: opacity 250ms;
+                        }
                     }
                 }
             }
         }
-    }
 
-    .lot-position
-    {
-        background-color: variables.$item_color;
-        border-radius: 0.5em;
+        .lot-position {
+            background-color: variables.$item_color;
+            border-radius: 0.5em;
 
 
-        .lot
-        {
-            display: flex;
-            padding: 0.5em;
-            gap: 0.25em;
-
-            &.horizontal
-            {
-                flex-direction: row;
-            }
-
-            &.vertical
-            {
-                flex-direction: column;
-            }
-
-            .lot-item
-            {
-                width: 40px;
-                height: 40px;
-                background-color: variables.$item_color;
-
+            .lot {
                 display: flex;
-                justify-content: center;
-                align-items: center;
-                gap: 2px;
-                margin: 2px;
+                padding: 0.5em;
+                gap: 0.25em;
+
+                &.horizontal {
+                    flex-direction: row;
+                }
+
+                &.vertical {
+                    flex-direction: column;
+                }
+
+                .lot-item {
+                    width: 40px;
+                    height: 40px;
+                    background-color: variables.$item_color;
+
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    gap: 2px;
+                    margin: 2px;
+                }
             }
         }
     }

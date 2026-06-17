@@ -1,5 +1,5 @@
-import { CommonModule, NgClass } from '@angular/common';
-import { Component, DestroyRef, EventEmitter, inject, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { Component, DestroyRef, EventEmitter, inject, OnInit, Signal, viewChild } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
@@ -26,7 +26,7 @@ import { HeaderWithSelectFilterComponent } from '../../../_shared/lists/header-w
 import { BathForDayPipe } from '../bath-for-day.pipe';
 import { CitizenGroupByBathStatePipe } from './citizen-group-by-bath_state.pipe';
 
-const angular_common: Imports = [CommonModule, FormsModule, NgClass];
+const angular_common: Imports = [CommonModule, FormsModule];
 const components: Imports = [HeaderWithNumberPreviousNextFilterComponent, HeaderWithSelectFilterComponent, CitizenInfoComponent];
 const pipes: Imports = [BathForDayPipe, CitizenGroupByBathStatePipe, ColumnIdPipe];
 const material_modules: Imports = [MatCheckboxModule, MatSlideToggleModule, MatSortModule, MatTableModule, MatButtonToggleModule];
@@ -35,14 +35,12 @@ const material_modules: Imports = [MatCheckboxModule, MatSlideToggleModule, MatS
     selector: 'mho-citizens-watch',
     templateUrl: './citizens-watch.component.html',
     styleUrls: ['./citizens-watch.component.scss'],
-    encapsulation: ViewEncapsulation.None,
-    host: { style: 'display: contents' },
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class CitizensWatchComponent implements OnInit {
 
-    @ViewChild(MatSort) sort!: MatSort;
-    @ViewChild(MatTable) table!: MatTable<Citizen>;
+    protected readonly sort: Signal<MatSort> = viewChild.required(MatSort);
+    protected readonly table: Signal<MatTable<Citizen>> = viewChild.required(MatTable);
 
     /** La liste des citoyens */
     public citizen_info!: CitizenInfo;
@@ -79,7 +77,7 @@ export class CitizensWatchComponent implements OnInit {
 
     public ngOnInit(): void {
         this.datasource = new MatTableDataSource();
-        this.datasource.sort = this.sort;
+        this.datasource.sort = this.sort();
 
         this.createBathsByCitizenAndDay();
         this.citizen_filter_change

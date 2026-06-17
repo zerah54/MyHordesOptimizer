@@ -21,7 +21,6 @@ const material_modules: Imports = [];
     selector: 'mho-draw-map',
     templateUrl: './draw-map.component.html',
     styleUrls: ['./draw-map.component.scss'],
-    host: {style: 'display: contents'},
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class DrawMapComponent {
@@ -31,12 +30,12 @@ export class DrawMapComponent {
     public allCitizens: InputSignal<Citizen[]> = input.required();
     public options: InputSignal<MapOptions> = input.required();
 
+    // TODO: Skipped for migration because:
+    //  Accessor inputs cannot be migrated as they are too complex.
     @Input() set map(map: Town) {
         if (map) {
-            console.log('map', map);
             this.complete_map = map;
             this.x_row = Array.from({length: map?.map_width}, (_: unknown, i: number) => i - +map.town_x);
-            console.log('x-row', this.x_row);
             const rows: Cell[][] = groupBy(map?.cells || [], (cell: Cell) => cell.y);
 
             rows.forEach((row: Cell[]) => {

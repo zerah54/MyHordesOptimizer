@@ -1,31 +1,35 @@
-.digs {
-    .header, .row, .rows {
-        display: flex;
-        align-items: center;
-        gap: 1em;
-    }
+:host {
+    display: contents;
 
-    .header {
-        justify-content: space-between;
-
-        h2 {
-            margin: 0;
+    .digs {
+        .header, .row, .rows {
+            display: flex;
+            align-items: center;
+            gap: 1em;
         }
 
-        margin-bottom: 1em;
-    }
+        .header {
+            justify-content: space-between;
 
-    .rows {
-        flex-wrap: wrap;
+            h2 {
+                margin: 0;
+            }
 
-        .row {
-            flex-wrap: nowrap;
+            margin-bottom: 1em;
+        }
 
-            .citizen {
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                text-align: center;
+        .rows {
+            flex-wrap: wrap;
+
+            .row {
+                flex-wrap: nowrap;
+
+                .citizen {
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    text-align: center;
+                }
             }
         }
     }

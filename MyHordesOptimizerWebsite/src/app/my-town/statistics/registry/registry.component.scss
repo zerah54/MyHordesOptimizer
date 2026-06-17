@@ -1,66 +1,70 @@
 @use 'variables';
 
-.mho-registry {
-    height: 100%;
+:host {
+    display: contents;
 
-    .display-pseudo-mode {
-        text-align: right;
-    }
+    .mho-registry {
+        height: 100%;
 
-    .form {
-        display: flex;
-        flex-wrap: wrap;
-        height: calc(100% - var(--mat-button-toggle-height));
+        .display-pseudo-mode {
+            text-align: right;
+        }
 
-        .form-content {
-            min-width: 400px;
-            max-width: 500px;
-            height: 100%;
-
+        .form {
             display: flex;
-            flex-direction: row;
-            flex-wrap: nowrap;
+            flex-wrap: wrap;
+            height: calc(100% - var(--mat-button-toggle-height));
 
-            .registry-paste {
-                font-size: 12px;
+            .form-content {
+                min-width: 400px;
+                max-width: 500px;
                 height: 100%;
-                width: calc(100% - 50px);
 
-                .mat-mdc-form-field-flex {
+                display: flex;
+                flex-direction: row;
+                flex-wrap: nowrap;
+
+                .registry-paste {
+                    font-size: 12px;
                     height: 100%;
+                    width: calc(100% - 50px);
 
-                    .mat-mdc-form-field-infix {
+                    .mat-mdc-form-field-flex {
                         height: 100%;
 
-                        textarea {
+                        .mat-mdc-form-field-infix {
                             height: 100%;
-                            resize: none;
+
+                            textarea {
+                                height: 100%;
+                                resize: none;
+                            }
+                        }
+                    }
+                }
+
+                .actions {
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: space-between;
+                    width: 50px;
+
+                    .mat-mdc-icon-button {
+                        --mat-icon-button-icon-size: 16;
+
+                        &.active {
+                            background-color: variables.$item_color;
                         }
                     }
                 }
             }
 
-            .actions {
-                display: flex;
-                flex-direction: column;
-                justify-content: space-between;
-                width: 50px;
-
-                .mat-mdc-icon-button {
-                    --mat-icon-button-icon-size: 16;
-
-                    &.active {
-                        background-color: variables.$item_color;
-                    }
-                }
+            .result {
+                flex: 1;
+                height: 100%;
+                overflow: auto;
+                min-width: 400px;
             }
-        }
-
-        .result {
-            flex: 1;
-            height: 100%;
-            overflow: auto;
-            min-width: 400px;
         }
     }
 }

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, input, Input, InputSignal, Signal, ViewEncapsulation } from '@angular/core';
+import { Component, computed, input, Input, InputSignal, Signal } from '@angular/core';
 import { MatDividerModule } from '@angular/material/divider';
 import { DisplayPseudoMode, Entry } from '../../../../_abstract_model/interfaces';
 import { Imports } from '../../../../_abstract_model/types/_types';
@@ -18,8 +18,6 @@ const material_modules: Imports = [MatDividerModule];
     selector: 'mho-registry-telescope',
     templateUrl: './telescope-registry.component.html',
     styleUrls: ['./telescope-registry.component.scss'],
-    encapsulation: ViewEncapsulation.None,
-    host: {style: 'display: contents'},
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class TelescopeRegistryComponent {
@@ -28,6 +26,8 @@ export class TelescopeRegistryComponent {
     public completeItemsList: InputSignal<Item[]> = input.required();
     public displayPseudo: InputSignal<DisplayPseudoMode> = input.required();
 
+    // TODO: Skipped for migration because:
+    //  Accessor inputs cannot be migrated as they are too complex.
     @Input({required: true}) set registry(registry: Entry[] | undefined) {
         if (registry) {
             this.entries = registry.filter((entry: Entry) => {

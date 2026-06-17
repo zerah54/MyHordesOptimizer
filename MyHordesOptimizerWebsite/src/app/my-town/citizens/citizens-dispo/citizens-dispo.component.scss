@@ -1,61 +1,65 @@
-.mho-citizens-dispo {
-    height: 100%;
+:host {
+    display: contents;
 
-    table {
-        width: 100%;
+    .mho-citizens-dispo {
+        height: 100%;
 
-        .avatar_name {
-            width: 200px;
-        }
+        table {
+            width: 100%;
 
-        tr {
+            .avatar_name {
+                width: 200px;
+            }
 
-            > td {
-                padding: 0 0.5em;
+            tr {
 
-                &.center {
-                    text-align: center;
-                }
+                > td {
+                    padding: 0 0.5em;
 
-                &.avatar_name {
-                    > div {
+                    &.center {
                         text-align: center;
-                        margin: auto;
+                    }
+
+                    &.avatar_name {
+                        > div {
+                            text-align: center;
+                            margin: auto;
+                        }
+                    }
+
+                    .digs {
+                        display: flex;
+                        gap: 0.5em;
+                        flex-wrap: wrap;
                     }
                 }
 
-                .digs {
+                th,
+                td {
+                    &:not(.avatar_name) {
+                        padding: 0.5em;
+                    }
+
+                }
+            }
+
+            .table-filters {
+                display: flex;
+                justify-content: space-between;
+            }
+
+            .previous-next {
+                .mho-header-with-filter {
                     display: flex;
                     gap: 0.5em;
-                    flex-wrap: wrap;
+                    white-space: nowrap;
+
+                    > div {
+                        flex-wrap: nowrap;
+                    }
                 }
             }
 
-            th,
-            td {
-                &:not(.avatar_name) {
-                    padding: 0.5em;
-                }
-
-            }
         }
-
-        .table-filters {
-            display: flex;
-            justify-content: space-between;
-        }
-
-        .previous-next {
-            .mho-header-with-filter {
-                display: flex;
-                gap: 0.5em;
-                white-space: nowrap;
-
-                > div {
-                    flex-wrap: nowrap;
-                }
-            }
-        }
-
     }
 }

@@ -19,7 +19,6 @@ const material_modules: Imports = [MatCardModule, MatTableModule, MatIconModule,
     selector: 'mho-private-towns',
     templateUrl: './private-towns.component.html',
     styleUrls: ['./private-towns.component.scss'],
-    host: { style: 'display: contents' },
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class PrivateTownsComponent implements OnInit {

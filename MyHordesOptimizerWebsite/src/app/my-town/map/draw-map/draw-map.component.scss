@@ -1,29 +1,33 @@
-table.mho-draw-map {
-    .cell {
-        display: inline-block;
-        vertical-align: middle;
-        text-align: center;
-    }
+:host {
+    display: contents;
 
-    border-spacing: 0;
-    margin: auto;
-
-    tr {
-
-        white-space: nowrap;
-
-        &.first,
-        &.last {
-            position: sticky;
-            z-index: 10;
+    table.mho-draw-map {
+        .cell {
+            display: inline-block;
+            vertical-align: middle;
+            text-align: center;
         }
 
-        &.first {
-            top: 0;
-        }
+        border-spacing: 0;
+        margin: auto;
 
-        &.last {
-            bottom: 0;
+        tr {
+
+            white-space: nowrap;
+
+            &.first,
+            &.last {
+                position: sticky;
+                z-index: 10;
+            }
+
+            &.first {
+                top: 0;
+            }
+
+            &.last {
+                bottom: 0;
+            }
         }
     }
 }

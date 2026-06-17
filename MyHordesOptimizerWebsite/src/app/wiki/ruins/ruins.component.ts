@@ -1,5 +1,5 @@
-import { CommonModule, DecimalPipe, NgClass, NgOptimizedImage } from '@angular/common';
-import { Component, DestroyRef, EventEmitter, inject, OnInit, ViewChild } from '@angular/core';
+import { CommonModule, DecimalPipe, NgOptimizedImage } from '@angular/common';
+import { Component, DestroyRef, EventEmitter, inject, OnInit, Signal, viewChild } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -26,7 +26,7 @@ import { HeaderWithNumberFilterComponent } from '../../_shared/lists/header-with
 import { HeaderWithSelectFilterComponent } from '../../_shared/lists/header-with-select-filter/header-with-select-filter.component';
 import { HeaderWithStringFilterComponent } from '../../_shared/lists/header-with-string-filter/header-with-string-filter.component';
 
-const angular_common: Imports = [CommonModule, FormsModule, NgClass, NgOptimizedImage];
+const angular_common: Imports = [CommonModule, FormsModule, NgOptimizedImage];
 const components: Imports = [HeaderWithStringFilterComponent, HeaderWithNumberFilterComponent, HeaderWithSelectFilterComponent];
 const pipes: Imports = [DecimalPipe, ColumnIdPipe];
 const material_modules: Imports = [MatButtonModule, MatCardModule, MatIconModule, MatMenuModule, MatSlideToggleModule, MatSortModule, MatTableModule, MatTooltipModule];
@@ -35,12 +35,11 @@ const material_modules: Imports = [MatButtonModule, MatCardModule, MatIconModule
     selector: 'mho-ruins',
     templateUrl: './ruins.component.html',
     styleUrls: ['./ruins.component.scss'],
-    host: { style: 'display: contents' },
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class RuinsComponent implements OnInit {
 
-    @ViewChild(MatSort) sort!: MatSort;
+    protected readonly sort: Signal<MatSort> = viewChild.required(MatSort);
 
     /** Le dossier dans lequel sont stockées les images */
     public readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
@@ -116,7 +115,7 @@ export class RuinsComponent implements OnInit {
                         }
                     };
                     setTimeout(() => {
-                        this.datasource.sort = this.sort;
+                        this.datasource.sort = this.sort();
                     });
                 }
             });

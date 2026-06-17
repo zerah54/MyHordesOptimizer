@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, input, Input, InputSignal, ViewEncapsulation } from '@angular/core';
+import { Component, input, Input, InputSignal } from '@angular/core';
 import { MatDividerModule } from '@angular/material/divider';
 import { DisplayPseudoMode, Entry } from '../../../../_abstract_model/interfaces';
 import { Imports } from '../../../../_abstract_model/types/_types';
@@ -16,8 +16,6 @@ const material_modules: Imports = [MatDividerModule];
     selector: 'mho-registry-well',
     templateUrl: './well-registry.component.html',
     styleUrls: ['./well-registry.component.scss'],
-    encapsulation: ViewEncapsulation.None,
-    host: {style: 'display: contents'},
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class WellRegistryComponent {
@@ -25,6 +23,8 @@ export class WellRegistryComponent {
     public completeCitizenList: InputSignal<CitizenInfo> = input.required();
     public displayPseudo: InputSignal<DisplayPseudoMode> = input.required();
 
+    // TODO: Skipped for migration because:
+    //  Accessor inputs cannot be migrated as they are too complex.
     @Input({required: true}) set registry(registry: Entry[] | undefined) {
         if (registry) {
             this.entries = registry.filter((entry: Entry) => {

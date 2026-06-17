@@ -29,7 +29,6 @@ const material_modules: Imports = [MatCardModule, MatFormFieldModule, MatSlideTo
     selector: 'mho-bank',
     templateUrl: './bank.component.html',
     styleUrls: ['./bank.component.scss'],
-    host: {style: 'display: contents'},
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class BankComponent implements OnInit {

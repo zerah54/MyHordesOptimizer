@@ -1,4 +1,4 @@
-import { Component, DOCUMENT, Inject } from '@angular/core';
+import { Component, DOCUMENT, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
@@ -17,10 +17,11 @@ const material_modules: Imports = [MatButtonModule, MatCardModule, MatIconModule
     selector: 'mho-tuto-script-tools',
     templateUrl: './tuto-script-tools.component.html',
     styleUrls: ['./tuto-script-tools.component.scss'],
-    host: {style: 'display: contents'},
     imports: [...angular_common, ...components, ...material_modules, ...pipes],
 })
 export class TutoScriptToolsComponent {
+    private readonly clipboard: ClipboardService = inject(ClipboardService);
+    private readonly document: Document = inject<Document>(DOCUMENT);
 
     public readonly title: string = $localize`Outils`;
     public readonly tuto_script_items: AccordionItem[] = [
@@ -34,10 +35,6 @@ export class TutoScriptToolsComponent {
             content: $localize`Affiche un outil de prédiction des chances de survie en camping.`
         }
     ];
-
-    public constructor(private clipboard: ClipboardService, @Inject(DOCUMENT) private document: Document) {
-
-    }
 
     public copyUrl(): void {
         const url: string = this.document.location.href;

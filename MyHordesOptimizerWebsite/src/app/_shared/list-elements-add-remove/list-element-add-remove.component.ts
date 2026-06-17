@@ -1,5 +1,5 @@
 import { CommonModule, NgOptimizedImage, NgTemplateOutlet } from '@angular/common';
-import { booleanAttribute, Component, input, InputSignal, InputSignalWithTransform, output, OutputEmitterRef, ViewEncapsulation } from '@angular/core';
+import { booleanAttribute, Component, input, InputSignal, InputSignalWithTransform, output, OutputEmitterRef } from '@angular/core';
 import { MatMenuModule } from '@angular/material/menu';
 import moment from 'moment';
 import { HORDES_IMG_REPO } from '../../_abstract_model/const';
@@ -21,8 +21,6 @@ const material_modules: Imports = [MatMenuModule];
     selector: 'mho-list-element-add-remove',
     templateUrl: './list-element-add-remove.component.html',
     styleUrls: ['./list-element-add-remove.component.scss'],
-    encapsulation: ViewEncapsulation.None,
-    host: {style: 'display: contents'},
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class ListElementAddRemoveComponent {

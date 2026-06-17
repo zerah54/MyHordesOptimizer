@@ -7,272 +7,276 @@ $red: lightcoral;
 
 $empty-color: gray;
 
-td.map-cell {
-    height: 30px;
-    width: 30px;
-    border: 1px solid variables.$item_color;
-    padding: 0;
-    position: relative;
-    z-index: 0;
-    cursor: pointer;
+:host {
+    display: contents;
 
-    &.scrut-border-left {
-        border-left: 1px solid variables.$primary;
-    }
+    td.map-cell {
+        height: 30px;
+        width: 30px;
+        border: 1px solid variables.$item_color;
+        padding: 0;
+        position: relative;
+        z-index: 0;
+        cursor: pointer;
 
-    &.scrut-border-right {
-        border-right: 1px solid variables.$primary;
-    }
+        &.scrut-border-left {
+            border-left: 1px solid variables.$primary;
+        }
 
-    &.scrut-border-top {
-        border-top: 1px solid variables.$primary;
-    }
+        &.scrut-border-right {
+            border-right: 1px solid variables.$primary;
+        }
 
-    &.scrut-border-bottom {
-        border-bottom: 1px solid variables.$primary;
-    }
+        &.scrut-border-top {
+            border-top: 1px solid variables.$primary;
+        }
 
-    > .dist-border-left {
-        border-left: 2px solid white;
-    }
+        &.scrut-border-bottom {
+            border-bottom: 1px solid variables.$primary;
+        }
 
-    > .dist-border-right {
-        border-right: 2px solid white;
-    }
+        > .dist-border-left {
+            border-left: 2px solid white;
+        }
 
-    > .dist-border-top {
-        border-top: 2px solid white;
-    }
+        > .dist-border-right {
+            border-right: 2px solid white;
+        }
 
-    > .dist-border-bottom {
-        border-bottom: 2px solid white;
-    }
+        > .dist-border-top {
+            border-top: 2px solid white;
+        }
 
-    > .my-cell {
-        box-shadow: inset 0 0 0.25em 2px white;
-    }
+        > .dist-border-bottom {
+            border-bottom: 2px solid white;
+        }
 
-    > div {
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-    }
+        > .my-cell {
+            box-shadow: inset 0 0 0.25em 2px white;
+        }
 
-    &:not(.town) {
+        > div {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+        }
 
-        &.alert {
+        &:not(.town) {
 
-            &.never-visited {
-                background-color: darkslategray;
-            }
+            &.alert {
 
-            &:not(.never-visited) {
-                &.visited-today {
-                    &.danger-0 {
-                        background-color: $green;
-                    }
-
-                    &.danger-1 {
-                        background-color: $yellow;
-                    }
-
-                    &.danger-2 {
-                        background-color: $orange;
-                    }
-
-                    &.danger-3 {
-                        background-color: $red;
-                    }
+                &.never-visited {
+                    background-color: darkslategray;
                 }
 
-                &:not(.visited-today) {
-                    background-color: gray;
+                &:not(.never-visited) {
+                    &.visited-today {
+                        &.danger-0 {
+                            background-color: $green;
+                        }
+
+                        &.danger-1 {
+                            background-color: $yellow;
+                        }
+
+                        &.danger-2 {
+                            background-color: $orange;
+                        }
+
+                        &.danger-3 {
+                            background-color: $red;
+                        }
+                    }
+
+                    &:not(.visited-today) {
+                        background-color: gray;
+                    }
+                }
+            }
+
+            &.digs {
+                &.dig-0 {
+                    background-color: $red;
+                }
+
+                &.dig-1 {
+                    background-color: $orange;
+                }
+
+                &.dig-2 {
+                    background-color: $yellow;
+                }
+
+                &.dig-3 {
+                    background-color: $green;
+                }
+            }
+
+            &.trash {
+                &.trash-0 {
+                    background-color: $green;
+                }
+
+                &.trash-1 {
+                    background-color: $yellow;
+                }
+
+                &.trash-2 {
+                    background-color: $orange;
+                }
+
+                &.trash-3 {
+                    background-color: $red;
+                }
+            }
+
+            .content {
+                width: 100%;
+                height: 100%;
+                z-index: 2;
+
+                > div {
+                    position: absolute;
+                    line-height: 10px;
+                    font-size: 10px;
+
+                    &.corner {
+                        display: inline;
+
+                        img {
+                            width: 12px;
+                        }
+
+                        .detail-value {
+                            color: white;
+                            position: absolute;
+                            bottom: -1px;
+                            text-shadow: #000000 1px 1px, #000000 -1px 1px, #000000 -1px -1px, #000000 1px -1px;
+                            font-size: 8px;
+                            right: 6px;
+                        }
+                    }
+
+                    &.corner-top-left {
+                        top: 0;
+                        left: 0;
+                    }
+
+                    &.corner-top-right {
+                        top: 0;
+                        right: 0;
+                    }
+
+                    &.corner-bottom-left {
+                        bottom: 0;
+                        left: 0;
+                    }
+
+                    &.corner-bottom-right {
+                        bottom: 0;
+                        right: 0;
+                    }
                 }
             }
         }
 
-        &.digs {
-            &.dig-0 {
-                background-color: $red;
-            }
+        &.town {
+            background-color: variables.$primary;
 
-            &.dig-1 {
-                background-color: $orange;
-            }
-
-            &.dig-2 {
-                background-color: $yellow;
-            }
-
-            &.dig-3 {
-                background-color: $green;
+            > .town-draw {
+                display: flex;
+                align-items: center;
+                justify-content: center;
             }
         }
 
-        &.trash {
-            &.trash-0 {
-                background-color: $green;
-            }
-
-            &.trash-1 {
-                background-color: $yellow;
-            }
-
-            &.trash-2 {
-                background-color: $orange;
-            }
-
-            &.trash-3 {
-                background-color: $red;
-            }
-        }
-
-        .content {
+        .dried {
+            position: relative;
             width: 100%;
             height: 100%;
-            z-index: 2;
+            z-index: 0;
 
-            > div {
-                position: absolute;
-                line-height: 10px;
-                font-size: 10px;
+            background-image: -moz-linear-gradient(45deg, $empty-color 25%, transparent 25%),
+            -moz-linear-gradient(-45deg, $empty-color 25%, transparent 25%),
+            -moz-linear-gradient(45deg, transparent 75%, $empty-color 75%),
+            -moz-linear-gradient(-45deg, transparent 75%, $empty-color 75%);
+            background-image: -webkit-gradient(linear, 0 100%, 100% 0, color-stop(.25, $empty-color), color-stop(.25, transparent)),
+            -webkit-gradient(linear, 0 0, 100% 100%, color-stop(.25, $empty-color), color-stop(.25, transparent)),
+            -webkit-gradient(linear, 0 100%, 100% 0, color-stop(.75, transparent), color-stop(.75, $empty-color)),
+            -webkit-gradient(linear, 0 0, 100% 100%, color-stop(.75, transparent), color-stop(.75, $empty-color));
+            background-image: -webkit-linear-gradient(45deg, $empty-color 25%, transparent 25%),
+            -webkit-linear-gradient(-45deg, $empty-color 25%, transparent 25%),
+            -webkit-linear-gradient(45deg, transparent 75%, $empty-color 75%),
+            -webkit-linear-gradient(-45deg, transparent 75%, $empty-color 75%);
+            background-image: -o-linear-gradient(45deg, $empty-color 25%, transparent 25%),
+            -o-linear-gradient(-45deg, $empty-color 25%, transparent 25%),
+            -o-linear-gradient(45deg, transparent 75%, $empty-color 75%),
+            -o-linear-gradient(-45deg, transparent 75%, $empty-color 75%);
+            background-image: linear-gradient(45deg, $empty-color 25%, transparent 25%),
+            linear-gradient(-45deg, $empty-color 25%, transparent 25%),
+            linear-gradient(45deg, transparent 75%, $empty-color 75%),
+            linear-gradient(-45deg, transparent 75%, $empty-color 75%);
+            -moz-background-size: 2px 2px;
+            background-size: 2px 2px;
+            /* override value for webkit */
+            -webkit-background-size: 2px 2px;
+            background-position: 0 0, 2px 1px, 1px -1px, 0 0;
+        }
 
-                &.corner {
-                    display: inline;
+        .ruin {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1;
 
-                    img {
-                        width: 12px;
-                    }
+            > span {
+                width: 65%;
+                height: 65%;
+                background-color: variables.$primary;
+                color: white;
+                display: flex;
+                justify-content: center;
+                align-items: center;
 
-                    .detail-value {
-                        color: white;
+                &.empty-ruin {
+
+                    &::before,
+                    &::after {
                         position: absolute;
-                        bottom: -1px;
-                        text-shadow: #000000 1px 1px, #000000 -1px 1px, #000000 -1px -1px, #000000 1px -1px;
-                        font-size: 8px;
-                        right: 6px;
+                        content: "";
+                        background: white;
+                        display: block;
+                        width: 2px;
+                        height: 26px;
+                        left: 0;
+                        right: 0;
+                        top: 0;
+                        bottom: 0;
+                        margin: auto;
+                    }
+
+                    &::before {
+                        -webkit-transform: rotate(-45deg);
+                        transform: rotate(-45deg);
+                    }
+
+                    &::after {
+                        -webkit-transform: rotate(45deg);
+                        transform: rotate(45deg);
                     }
                 }
 
-                &.corner-top-left {
-                    top: 0;
-                    left: 0;
-                }
-
-                &.corner-top-right {
-                    top: 0;
-                    right: 0;
-                }
-
-                &.corner-bottom-left {
-                    bottom: 0;
-                    left: 0;
-                }
-
-                &.corner-bottom-right {
-                    bottom: 0;
-                    right: 0;
-                }
-            }
-        }
-    }
-
-    &.town {
-        background-color: variables.$primary;
-
-        > .town-draw {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-    }
-
-    .dried {
-        position: relative;
-        width: 100%;
-        height: 100%;
-        z-index: 0;
-
-        background-image: -moz-linear-gradient(45deg, $empty-color 25%, transparent 25%),
-        -moz-linear-gradient(-45deg, $empty-color 25%, transparent 25%),
-        -moz-linear-gradient(45deg, transparent 75%, $empty-color 75%),
-        -moz-linear-gradient(-45deg, transparent 75%, $empty-color 75%);
-        background-image: -webkit-gradient(linear, 0 100%, 100% 0, color-stop(.25, $empty-color), color-stop(.25, transparent)),
-        -webkit-gradient(linear, 0 0, 100% 100%, color-stop(.25, $empty-color), color-stop(.25, transparent)),
-        -webkit-gradient(linear, 0 100%, 100% 0, color-stop(.75, transparent), color-stop(.75, $empty-color)),
-        -webkit-gradient(linear, 0 0, 100% 100%, color-stop(.75, transparent), color-stop(.75, $empty-color));
-        background-image: -webkit-linear-gradient(45deg, $empty-color 25%, transparent 25%),
-        -webkit-linear-gradient(-45deg, $empty-color 25%, transparent 25%),
-        -webkit-linear-gradient(45deg, transparent 75%, $empty-color 75%),
-        -webkit-linear-gradient(-45deg, transparent 75%, $empty-color 75%);
-        background-image: -o-linear-gradient(45deg, $empty-color 25%, transparent 25%),
-        -o-linear-gradient(-45deg, $empty-color 25%, transparent 25%),
-        -o-linear-gradient(45deg, transparent 75%, $empty-color 75%),
-        -o-linear-gradient(-45deg, transparent 75%, $empty-color 75%);
-        background-image: linear-gradient(45deg, $empty-color 25%, transparent 25%),
-        linear-gradient(-45deg, $empty-color 25%, transparent 25%),
-        linear-gradient(45deg, transparent 75%, $empty-color 75%),
-        linear-gradient(-45deg, transparent 75%, $empty-color 75%);
-        -moz-background-size: 2px 2px;
-        background-size: 2px 2px;
-        /* override value for webkit */
-        -webkit-background-size: 2px 2px;
-        background-position: 0 0, 2px 1px, 1px -1px, 0 0;
-    }
-
-    .ruin {
-        width: 100%;
-        height: 100%;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        z-index: 1;
-
-        > span {
-            width: 65%;
-            height: 65%;
-            background-color: variables.$primary;
-            color: white;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-
-            &.empty-ruin {
-
-                &::before,
-                &::after {
+                .nb-digs {
                     position: absolute;
-                    content: "";
-                    background: white;
-                    display: block;
-                    width: 2px;
-                    height: 26px;
-                    left: 0;
-                    right: 0;
-                    top: 0;
                     bottom: 0;
-                    margin: auto;
+                    right: 6px;
+                    text-shadow: #000000 1px 1px, #000000 -1px 1px, #000000 -1px -1px, #000000 1px -1px;
+                    font-size: 10px;
                 }
-
-                &::before {
-                    -webkit-transform: rotate(-45deg);
-                    transform: rotate(-45deg);
-                }
-
-                &::after {
-                    -webkit-transform: rotate(45deg);
-                    transform: rotate(45deg);
-                }
-            }
-
-            .nb-digs {
-                position: absolute;
-                bottom: 0;
-                right: 6px;
-                text-shadow: #000000 1px 1px, #000000 -1px 1px, #000000 -1px -1px, #000000 1px -1px;
-                font-size: 10px;
             }
         }
     }

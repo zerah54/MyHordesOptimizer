@@ -1,4 +1,8 @@
 @use '../../../../public/scss/variables';
 
-.mho-confirm-dialog {
+:host {
+    display: contents;
+
+    .mho-confirm-dialog {
+    }
 }

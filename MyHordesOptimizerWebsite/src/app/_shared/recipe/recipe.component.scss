@@ -1,36 +1,40 @@
-.mho-recipe {
-    display: flex;
+:host {
+    display: contents;
 
-    margin-top: 1em;
-    margin-bottom: 1em;
-    align-items: baseline;
+    .mho-recipe {
+        display: flex;
 
-    small {
-        font-style: italic;
-    }
+        margin-top: 1em;
+        margin-bottom: 1em;
+        align-items: baseline;
 
-    img {
-        vertical-align: middle;
-    }
+        small {
+            font-style: italic;
+        }
 
-    > ul {
-        list-style: none;
-        padding: 0;
+        img {
+            vertical-align: middle;
+        }
 
-        li {
+        > ul {
+            list-style: none;
+            padding: 0;
 
-            &.provoking {
-                border: 1px dashed;
-                padding: 0 0.5em 0 0;
-            }
+            li {
 
-            img {
-                margin-right: 0.5em;
+                &.provoking {
+                    border: 1px dashed;
+                    padding: 0 0.5em 0 0;
+                }
+
+                img {
+                    margin-right: 0.5em;
+                }
             }
         }
-    }
 
-    > div.transformation {
-        margin: 0 1em;
+        > div.transformation {
+            margin: 0 1em;
+        }
     }
 }

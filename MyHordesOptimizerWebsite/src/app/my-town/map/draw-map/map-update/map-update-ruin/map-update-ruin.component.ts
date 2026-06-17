@@ -23,10 +23,11 @@ const material_modules: Imports = [MatCheckboxModule, MatDividerModule, MatFormF
     selector: 'mho-map-update-ruin',
     templateUrl: './map-update-ruin.component.html',
     styleUrls: ['./map-update-ruin.component.scss'],
-    host: {style: 'display: contents'},
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class MapUpdateRuinComponent implements OnInit {
+    private readonly fb: FormBuilder = inject(FormBuilder);
+
 
     public ruin: InputSignal<Ruin> = input.required();
     public allRuins: InputSignal<Ruin[]> = input.required();
@@ -40,10 +41,6 @@ export class MapUpdateRuinComponent implements OnInit {
     public cell_form!: FormGroup;
 
     private readonly destroy_ref: DestroyRef = inject(DestroyRef);
-
-    constructor(private fb: FormBuilder) {
-
-    }
 
     public ngOnInit(): void {
 

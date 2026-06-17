@@ -11,7 +11,6 @@ const material_modules: Imports = [];
     selector: 'mho-compass-rose',
     templateUrl: './compass-rose.component.html',
     styleUrls: ['./compass-rose.component.scss'],
-    host: {style: 'display: contents'},
     imports: [...angular_common, ...components, ...material_modules, ...pipes],
 })
 export class CompassRoseComponent {

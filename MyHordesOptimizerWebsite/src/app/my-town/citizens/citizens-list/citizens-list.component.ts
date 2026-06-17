@@ -1,5 +1,5 @@
-import { CommonModule, NgClass, NgOptimizedImage } from '@angular/common';
-import { Component, DestroyRef, EventEmitter, inject, OnInit, Signal, viewChild, ViewEncapsulation } from '@angular/core';
+import { CommonModule, NgOptimizedImage } from '@angular/common';
+import { Component, DestroyRef, EventEmitter, inject, OnInit, Signal, viewChild } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { MatCheckboxChange, MatCheckboxModule } from '@angular/material/checkbox';
@@ -33,7 +33,7 @@ import { HeaderWithSelectFilterComponent } from '../../../_shared/lists/header-w
 import { BathForDayPipe } from '../bath-for-day.pipe';
 import { TypeRowPipe } from './type-row.pipe';
 
-const angular_common: Imports = [CommonModule, FormsModule, NgClass, NgOptimizedImage];
+const angular_common: Imports = [CommonModule, FormsModule, NgOptimizedImage];
 const components: Imports = [AvatarComponent, CitizenInfoComponent, HeaderWithSelectFilterComponent, LastUpdateComponent, ListElementAddRemoveComponent];
 const pipes: Imports = [BathForDayPipe, ColumnIdPipe, TypeRowPipe];
 const material_modules: Imports = [MatCheckboxModule, MatFormFieldModule, MatInputModule, MatOptionModule, MatSelectModule, MatSortModule, MatTableModule];
@@ -42,8 +42,6 @@ const material_modules: Imports = [MatCheckboxModule, MatFormFieldModule, MatInp
     selector: 'mho-citizens-list',
     templateUrl: './citizens-list.component.html',
     styleUrls: ['./citizens-list.component.scss'],
-    encapsulation: ViewEncapsulation.None,
-    host: { style: 'display: contents' },
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class CitizensListComponent implements OnInit {

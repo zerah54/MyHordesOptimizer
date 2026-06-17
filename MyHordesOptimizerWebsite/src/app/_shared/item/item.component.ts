@@ -1,4 +1,4 @@
-import { CommonModule, DecimalPipe, NgClass, NgOptimizedImage } from '@angular/common';
+import { CommonModule, DecimalPipe, NgOptimizedImage } from '@angular/common';
 import { booleanAttribute, Component, DestroyRef, inject, input, InputSignalWithTransform, model, ModelSignal, OnInit } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
@@ -10,9 +10,9 @@ import { Imports } from '../../_abstract_model/types/_types';
 import { Item } from '../../_abstract_model/types/item.class';
 import { TownDetails } from '../../_abstract_model/types/town-details.class';
 import { getTown } from '../../_core/utilities/localstorage.util';
-import { RecipeComponent } from '../../_shared/recipe/recipe.component';
+import { RecipeComponent } from '../recipe/recipe.component';
 
-const angular_common: Imports = [CommonModule, NgClass, NgOptimizedImage];
+const angular_common: Imports = [CommonModule, NgOptimizedImage];
 const components: Imports = [RecipeComponent];
 const pipes: Imports = [DecimalPipe];
 const material_modules: Imports = [MatButtonModule, MatDividerModule];
@@ -21,10 +21,11 @@ const material_modules: Imports = [MatButtonModule, MatDividerModule];
     selector: 'mho-item',
     templateUrl: './item.component.html',
     styleUrls: ['./item.component.scss'],
-    host: { style: 'display: contents' },
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class ItemComponent implements OnInit {
+    private wishlist_services: WishlistService = inject(WishlistService);
+
 
     /** L'élément à afficher si c'est un objet standard */
     public item: ModelSignal<Item> = model.required();
@@ -40,9 +41,6 @@ export class ItemComponent implements OnInit {
     public town: TownDetails | null = getTown();
 
     private readonly destroy_ref: DestroyRef = inject(DestroyRef);
-
-    constructor(private wishlist_services: WishlistService) {
-    }
 
     public ngOnInit(): void {
         if (this.forceOpen()) {

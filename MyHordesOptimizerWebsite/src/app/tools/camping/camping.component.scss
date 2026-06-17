@@ -1,58 +1,62 @@
 @use 'variables';
 
-.mho-camping-header {
-    justify-content: space-between;
+:host {
+    display: contents;
 
-    .actions {
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-        gap: 1em;
+    .mho-camping-header {
+        justify-content: space-between;
+
+        .actions {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 1em;
+        }
     }
-}
 
-.mho-camping {
-    .camping-params {
-        display: flex;
-        flex-wrap: wrap;
-        column-gap: 1em;
+    .mho-camping {
+        .camping-params {
+            display: flex;
+            flex-wrap: wrap;
+            column-gap: 1em;
 
-        > div {
-            flex: 1;
-            min-width: 300px;
+            > div {
+                flex: 1;
+                min-width: 300px;
 
-            h3 {
-                margin-bottom: 0.5em;
-            }
-
-            .mat-mdc-checkbox {
-                display: block;
-
-                img {
-                    margin-right: 0.5em;
-                    vertical-align: sub;
-                }
-            }
-
-
-            .mat-mdc-form-field {
-                display: block;
-
-                .mat-mdc-form-field-icon-prefix {
-                    margin-left: 0.5em;
-                    margin-right: 0.5em;
+                h3 {
+                    margin-bottom: 0.5em;
                 }
 
-                .mat-mdc-form-field-icon-suffix {
-                    small {
+                .mat-mdc-checkbox {
+                    display: block;
+
+                    img {
                         margin-right: 0.5em;
+                        vertical-align: sub;
                     }
                 }
-            }
 
-            .or {
-                text-align: center;
-                margin-bottom: 1em;
+
+                .mat-mdc-form-field {
+                    display: block;
+
+                    .mat-mdc-form-field-icon-prefix {
+                        margin-left: 0.5em;
+                        margin-right: 0.5em;
+                    }
+
+                    .mat-mdc-form-field-icon-suffix {
+                        small {
+                            margin-right: 0.5em;
+                        }
+                    }
+                }
+
+                .or {
+                    text-align: center;
+                    margin-bottom: 1em;
+                }
             }
         }
     }

@@ -11,7 +11,6 @@ const material_modules: Imports = [MatCardModule];
     selector: 'mho-buildings',
     templateUrl: './buildings.component.html',
     styleUrls: ['./buildings.component.scss'],
-    host: {style: 'display: contents'},
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class BuildingsComponent {

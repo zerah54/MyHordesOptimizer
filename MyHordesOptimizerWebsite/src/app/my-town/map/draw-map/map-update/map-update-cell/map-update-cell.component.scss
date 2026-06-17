@@ -1,57 +1,60 @@
-.mho-map-update-cell {
-    .content {
-        .zombies, .zone {
-            display: flex;
-            gap: 0.5em;
-            justify-content: space-between;
-            align-items: center;
-        }
-    }
+:host {
+    display: contents;
 
-    .items {
-        display: flex;
-        align-items: center;
-        gap: 0.5em;
-        flex-wrap: wrap;
-
-        .broken {
-            .item_img {
-                img {
-                    border: 1px dashed red;
-                }
+    .mho-map-update-cell {
+        .content {
+            .zombies, .zone {
+                display: flex;
+                gap: 0.5em;
+                justify-content: space-between;
+                align-items: center;
             }
         }
 
-        .item-quantity {
-            font-size: 0.75em;
-            vertical-align: baseline;
-        }
-    }
-
-    .items-header {
-        display: flex;
-        gap: 0.5em;
-        align-items: center;
-        margin-bottom: 0.5em;
-
-        h4 {
-            margin: 0;
-        }
-
-        .add-remove {
+        .items {
             display: flex;
             align-items: center;
+            gap: 0.5em;
+            flex-wrap: wrap;
+
+            .broken {
+                .item_img {
+                    img {
+                        border: 1px dashed red;
+                    }
+                }
+            }
+
+            .item-quantity {
+                font-size: 0.75em;
+                vertical-align: baseline;
+            }
+        }
+
+        .items-header {
+            display: flex;
+            gap: 0.5em;
+            align-items: center;
+            margin-bottom: 0.5em;
+
+            h4 {
+                margin: 0;
+            }
+
+            .add-remove {
+                display: flex;
+                align-items: center;
+            }
         }
     }
-}
 
 
+    .menu-add,
+    .menu-remove {
+        padding: 0.5em;
 
-.menu-add,
-.menu-remove {
-    padding: 0.5em;
-
-    .mat-form-field {
-        width: 100%;
+        .mat-form-field {
+            width: 100%;
+        }
     }
 }

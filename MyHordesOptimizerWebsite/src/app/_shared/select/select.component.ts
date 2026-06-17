@@ -6,19 +6,17 @@ import {
     Component,
     ElementRef,
     HostBinding,
+    inject,
     input,
     Input,
     InputSignal,
     InputSignalWithTransform,
     OnDestroy,
-    Optional,
     output,
     OutputEmitterRef,
-    Self,
     Signal,
     signal,
     viewChild,
-    ViewEncapsulation,
     WritableSignal
 } from '@angular/core';
 import { AbstractControl, ControlValueAccessor, NgControl, UntypedFormControl, ValidationErrors, Validator, Validators } from '@angular/forms';
@@ -46,7 +44,6 @@ const material_modules: Imports = [MatChipsModule, MatDividerModule, MatFormFiel
     selector: 'mho-select',
     templateUrl: './select.component.html',
     styleUrls: ['./select.component.scss'],
-    encapsulation: ViewEncapsulation.None,
     providers: [
         {
             provide: MatFormFieldControl,
@@ -55,10 +52,13 @@ const material_modules: Imports = [MatChipsModule, MatDividerModule, MatFormFiel
         }
     ],
     changeDetection: ChangeDetectionStrategy.OnPush,
-    host: {style: 'display: contents'},
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class SelectComponent<T> implements ControlValueAccessor, Validator, MatFormFieldControl<T | string | T[] | string[] | undefined>, OnDestroy {
+    public ngControl: NgControl | null = inject(NgControl, {optional: true, self: true});
+    public validator: Validators | null = inject(Validators, {optional: true, self: true});
+    protected readonly parent_form_field: MatFormField | null = inject(MatFormField, {optional: true});
+    private readonly _elementRef: ElementRef = inject(ElementRef);
 
     private static nextId: number = 0;
 
@@ -84,13 +84,20 @@ export class SelectComponent<T> implements ControlValueAccessor, Validator, MatF
     /** Doit-on afficher sous forme de chips les différentes valeurs ? Fonctionne uniquement si "multiple" */
     public chips: InputSignalWithTransform<boolean, unknown> = input(false, {transform: booleanAttribute});
 
+    // TODO: Skipped for migration because:
+    //  Accessor inputs cannot be migrated as they are too complex.
     @Input() set options(options: (T | string)[]) {
         this.displayed_options.set(options);
         this.complete_options.set(options);
     }
 
+    // TODO: Skipped for migration because:
+    //  This input overrides a field from a superclass, while the superclass field
+    //  is not migrated.
     @Input() userAriaDescribedBy!: string;
 
+    // TODO: Skipped for migration because:
+    //  Accessor inputs cannot be migrated as they are too complex.
     @Input() get placeholder(): string {
         return this._placeholder;
     }
@@ -100,6 +107,8 @@ export class SelectComponent<T> implements ControlValueAccessor, Validator, MatF
         this.stateChanges.next();
     }
 
+    // TODO: Skipped for migration because:
+    //  Accessor inputs cannot be migrated as they are too complex.
     @Input() get required(): boolean {
         return this._required;
     }
@@ -109,6 +118,8 @@ export class SelectComponent<T> implements ControlValueAccessor, Validator, MatF
         this.stateChanges.next();
     }
 
+    // TODO: Skipped for migration because:
+    //  Accessor inputs cannot be migrated as they are too complex.
     @Input() get disabled(): boolean {
         return this._disabled;
     }
@@ -160,8 +171,7 @@ export class SelectComponent<T> implements ControlValueAccessor, Validator, MatF
         //no-empty
     };
 
-    public constructor(@Optional() @Self() public ngControl: NgControl, @Optional() @Self() public validator: Validators,
-                       @Optional() public parent_form_field: MatFormField, private _elementRef: ElementRef) {
+    public constructor() {
         if (this.ngControl !== null) {
             this.ngControl.valueAccessor = this;
         }

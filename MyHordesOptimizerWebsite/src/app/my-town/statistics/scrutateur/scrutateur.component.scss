@@ -1,27 +1,31 @@
-.mho-scrut {
-    height: 100%;
+:host {
+    display: contents;
 
-    .info {
-        display: flex;
-        flex-wrap: wrap;
+    .mho-scrut {
+        height: 100%;
 
-        .list {
-            flex: 1;
-            min-width: 400px;
+        .info {
+            display: flex;
+            flex-wrap: wrap;
 
-            table {
-                width: 100%;
+            .list {
+                flex: 1;
+                min-width: 400px;
+
+                table {
+                    width: 100%;
+                }
             }
-        }
 
-        .charts {
-            flex: 1;
+            .charts {
+                flex: 1;
 
-            > div {
-                canvas {
-                    margin: auto;
-                    min-width: 400px;
-                    aspect-ratio: 1;
+                > div {
+                    canvas {
+                        margin: auto;
+                        min-width: 400px;
+                        aspect-ratio: 1;
+                    }
                 }
             }
         }

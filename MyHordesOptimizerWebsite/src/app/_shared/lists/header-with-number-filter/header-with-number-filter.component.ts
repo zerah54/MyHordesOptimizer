@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, input, InputSignal, output, OutputEmitterRef, ViewChild } from '@angular/core';
+import { Component, ElementRef, input, InputSignal, output, OutputEmitterRef, Signal, viewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
@@ -15,12 +15,11 @@ const material_modules: Imports = [MatFormFieldModule, MatIconModule, MatInputMo
     selector: 'mho-header-with-number-filter',
     templateUrl: './header-with-number-filter.component.html',
     styleUrls: ['./header-with-number-filter.component.scss'],
-    host: {style: 'display: contents'},
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class HeaderWithNumberFilterComponent {
 
-    @ViewChild('filter') filter!: ElementRef<HTMLInputElement>;
+    readonly filter: Signal<ElementRef<HTMLInputElement>> = viewChild.required<ElementRef<HTMLInputElement>>('filter');
 
     public header: InputSignal<string> = input.required();
     public textAlign: InputSignal<string> = input('left');
@@ -35,7 +34,7 @@ export class HeaderWithNumberFilterComponent {
     public displayFilter(): void {
         this.visible = true;
         setTimeout(() => {
-            this.filter.nativeElement.focus();
+            this.filter().nativeElement.focus();
         });
     }
 

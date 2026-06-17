@@ -25,7 +25,6 @@ const material_modules: Imports = [MatCardModule, MatSortModule, MatTableModule]
     selector: 'mho-recipes',
     templateUrl: './recipes.component.html',
     styleUrls: ['./recipes.component.scss'],
-    host: { style: 'display: contents' },
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class RecipesComponent implements OnInit {

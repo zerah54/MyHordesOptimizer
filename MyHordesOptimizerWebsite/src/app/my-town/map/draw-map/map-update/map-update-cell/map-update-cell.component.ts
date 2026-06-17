@@ -1,5 +1,5 @@
 import { CommonModule, NgOptimizedImage } from '@angular/common';
-import { Component, DestroyRef, inject, input, InputSignal, OnInit, output, OutputEmitterRef, ViewEncapsulation } from '@angular/core';
+import { Component, DestroyRef, inject, input, InputSignal, OnInit, output, OutputEmitterRef } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatCheckboxModule } from '@angular/material/checkbox';
@@ -29,11 +29,11 @@ const material_modules: Imports = [MatCheckboxModule, MatDividerModule, MatFormF
     selector: 'mho-map-update-cell',
     templateUrl: './map-update-cell.component.html',
     styleUrls: ['./map-update-cell.component.scss'],
-    encapsulation: ViewEncapsulation.None,
-    host: {style: 'display: contents'},
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class MapUpdateCellComponent implements OnInit {
+    private readonly fb: FormBuilder = inject(FormBuilder);
+
 
     public citizens: InputSignal<Citizen[]> = input.required();
 
@@ -49,10 +49,6 @@ export class MapUpdateCellComponent implements OnInit {
 
     private readonly api: ApiService = inject(ApiService);
     private readonly destroy_ref: DestroyRef = inject(DestroyRef);
-
-    constructor(private fb: FormBuilder) {
-
-    }
 
     public ngOnInit(): void {
         this.api.getItems()

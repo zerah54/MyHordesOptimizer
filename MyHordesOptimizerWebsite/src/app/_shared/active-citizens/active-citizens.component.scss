@@ -1,21 +1,25 @@
 @use '../../../../public/scss/variables';
 
-.mho-active-citizens {
-    display: flex;
-    flex: 1;
-    flex-wrap: wrap;
-    max-height: 25px;
-    overflow: hidden;
+:host {
+    display: contents;
 
-    &:hover {
-        overflow: visible;
-    }
-
-    .citizen-avatar {
-        position: relative;
-        width: 25px;
-        height: 25px;
+    .mho-active-citizens {
+        display: flex;
+        flex: 1;
+        flex-wrap: wrap;
+        max-height: 25px;
         overflow: hidden;
-        border-radius: 50%;
+
+        &:hover {
+            overflow: visible;
+        }
+
+        .citizen-avatar {
+            position: relative;
+            width: 25px;
+            height: 25px;
+            overflow: hidden;
+            border-radius: 50%;
+        }
     }
 }

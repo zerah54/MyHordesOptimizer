@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, input, InputSignal, output, OutputEmitterRef, ViewChild } from '@angular/core';
+import { Component, input, InputSignal, output, OutputEmitterRef, Signal, viewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
@@ -15,12 +15,11 @@ const material_modules: Imports = [MatFormFieldModule, MatIconModule];
     selector: 'mho-header-with-select-filter',
     templateUrl: './header-with-select-filter.component.html',
     styleUrls: ['./header-with-select-filter.component.scss'],
-    host: {style: 'display: contents'},
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class HeaderWithSelectFilterComponent<T> {
 
-    @ViewChild('filter') filter!: SelectComponent<T>;
+    readonly filter: Signal<SelectComponent<T>> = viewChild.required<SelectComponent<T>>('filter');
 
     public header: InputSignal<string> = input.required();
     public textAlign: InputSignal<string> = input('left');
@@ -38,14 +37,14 @@ export class HeaderWithSelectFilterComponent<T> {
     public displayFilter(): void {
         this.visible = true;
         setTimeout(() => {
-            this.filter.select()?.open();
+            this.filter().select()?.open();
         });
     }
 
     /** Vérifie si le filtre doit toujours être affiché */
     public checkVisibility(): void {
         setTimeout(() => {
-            if (this.filter.select()?.panelOpen) {
+            if (this.filter().select()?.panelOpen) {
                 this.visible = true;
             } else {
                 this.visible = this.filterValue() !== null && this.filterValue() !== undefined && this.filterValue().length > 0;

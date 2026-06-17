@@ -12,7 +12,6 @@ const material_modules: Imports = [];
     selector: 'mho-avatar',
     templateUrl: './avatar.component.html',
     styleUrls: ['./avatar.component.scss'],
-    host: {style: 'display: contents'},
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class AvatarComponent {

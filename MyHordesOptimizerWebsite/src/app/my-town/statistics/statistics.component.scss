@@ -1,10 +1,14 @@
-.mho-stats {
+:host {
+    display: contents;
 
-    display: flex;
-    flex-direction: column;
+    .mho-stats {
 
-    .mat-mdc-tab-nav-panel {
-        flex: 1;
-        overflow: auto;
+        display: flex;
+        flex-direction: column;
+
+        .mat-mdc-tab-nav-panel {
+            flex: 1;
+            overflow: auto;
+        }
     }
 }

@@ -23,15 +23,18 @@ const material_modules: Imports = [MatButtonModule, MatDividerModule, MatTooltip
     selector: 'mho-dig',
     templateUrl: './dig.component.html',
     styleUrls: ['./dig.component.scss'],
-    host: {style: 'display: contents'},
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class DigComponent {
+    private dialog: MatDialog = inject(MatDialog);
+
 
     public citizen: InputSignal<Citizen> = input.required();
     public day: InputSignal<number> = input.required();
     public digsMode: InputSignal<'creation' | 'update' | 'registry'> = input.required();
 
+    // TODO: Skipped for migration because:
+    //  Accessor inputs cannot be migrated as they are too complex.
     @Input({required: true}) set dig(dig: Dig | undefined) {
         setTimeout(() => {
             if (this.digsMode() === 'registry') {
@@ -60,9 +63,6 @@ export class DigComponent {
 
     /** Le dossier dans lequel sont stockées les images */
     protected HORDES_IMG_REPO: string = HORDES_IMG_REPO;
-
-    constructor(private dialog: MatDialog) {
-    }
 
     protected deleteDig(dig_to_delete: Dig): void {
         this.dialog

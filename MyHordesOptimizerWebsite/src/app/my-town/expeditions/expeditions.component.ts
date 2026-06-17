@@ -1,17 +1,5 @@
-import { CommonModule, NgClass, NgOptimizedImage } from '@angular/common';
-import {
-    ChangeDetectionStrategy,
-    Component,
-    DestroyRef,
-    inject,
-    model,
-    ModelSignal,
-    OnInit,
-    Signal,
-    signal,
-    ViewEncapsulation,
-    WritableSignal
-} from '@angular/core';
+import { CommonModule, NgOptimizedImage } from '@angular/common';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, model, ModelSignal, OnInit, Signal, signal, WritableSignal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -62,7 +50,7 @@ import { EditOrdersComponent, EditOrdersData } from './edit-orders/edit-orders.c
 import { EditPositionsComponent, EditPositionsData } from './edit-positions/edit-positions.component';
 import { TotalPdcPipe } from './total-pdc.pipe';
 
-const angular_common: Imports = [CommonModule, FormsModule, NgClass, NgOptimizedImage];
+const angular_common: Imports = [CommonModule, FormsModule, NgOptimizedImage];
 const components: Imports = [ActiveCitizensComponent, IconApComponent, ListElementAddRemoveComponent, SelectComponent];
 const pipes: Imports = [CitizensForExpePipe, CitizenFromIdPipe, CompassRoseComponent, FormatPreRegisteredPipe, JobFromIdPipe, SomeHeroicActionNeededPipe, TotalPdcPipe];
 const material_modules: Imports = [MatButtonModule, MatCardModule, MatCheckboxModule, MatExpansionModule, MatFormFieldModule, MatIconModule, MatInputModule, MatMenuModule, MatSlideToggleModule, MatTabsModule, MatTooltipModule];
@@ -71,9 +59,7 @@ const material_modules: Imports = [MatButtonModule, MatCardModule, MatCheckboxMo
     selector: 'mho-expeditions',
     templateUrl: './expeditions.component.html',
     styleUrls: ['./expeditions.component.scss'],
-    encapsulation: ViewEncapsulation.None,
     changeDetection: ChangeDetectionStrategy.OnPush,
-    host: {style: 'display: contents'},
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class ExpeditionsComponent implements OnInit {

@@ -13,7 +13,6 @@ const material_modules: Imports = [CdkAccordionModule, MatIconModule];
     selector: 'mho-accordion',
     templateUrl: './accordion.component.html',
     styleUrls: ['./accordion.component.scss'],
-    host: {style: 'display: contents'},
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class AccordionComponent {

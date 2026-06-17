@@ -1,4 +1,4 @@
-import { Component, DOCUMENT, Inject } from '@angular/core';
+import { Component, DOCUMENT, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
@@ -17,10 +17,12 @@ const material_modules: Imports = [MatButtonModule, MatCardModule, MatIconModule
     selector: 'mho-tuto-script-wiki',
     templateUrl: './tuto-script-wiki.component.html',
     styleUrls: ['./tuto-script-wiki.component.scss'],
-    host: {style: 'display: contents'},
     imports: [...angular_common, ...components, ...material_modules, ...pipes],
 })
 export class TutoScriptWikiComponent {
+    private readonly clipboard: ClipboardService = inject(ClipboardService);
+    private readonly document: Document = inject<Document>(DOCUMENT);
+
 
     public readonly title: string = $localize`Wiki`;
     public readonly tuto_script_items: AccordionItem[] = [
@@ -42,10 +44,6 @@ export class TutoScriptWikiComponent {
             content: $localize`Affiche la liste de tous les bâtiments existant dans le jeu, leur distance de la ville, ainsi que la liste des objets qu'on peut obtenir en les fouillant et leurs probabilités d'obtention.`
         }
     ];
-
-    public constructor(private clipboard: ClipboardService, @Inject(DOCUMENT) private document: Document) {
-
-    }
 
     public copyUrl(): void {
         const url: string = this.document.location.href;

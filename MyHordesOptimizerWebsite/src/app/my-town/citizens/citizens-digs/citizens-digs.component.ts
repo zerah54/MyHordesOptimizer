@@ -1,5 +1,5 @@
-import { CommonModule, NgClass } from '@angular/common';
-import { Component, DestroyRef, EventEmitter, inject, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { Component, DestroyRef, EventEmitter, inject, OnInit, Signal, viewChild } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatTable, MatTableDataSource, MatTableModule } from '@angular/material/table';
@@ -21,7 +21,7 @@ import {
 } from '../../../_shared/lists/header-with-number-previous-next/header-with-number-previous-next-filter.component';
 import { HeaderWithSelectFilterComponent } from '../../../_shared/lists/header-with-select-filter/header-with-select-filter.component';
 
-const angular_common: Imports = [CommonModule, NgClass];
+const angular_common: Imports = [CommonModule];
 const components: Imports = [DigComponent, HeaderWithNumberPreviousNextFilterComponent, HeaderWithSelectFilterComponent, CitizenInfoComponent];
 const pipes: Imports = [ColumnIdPipe];
 const material_modules: Imports = [MatSortModule, MatTableModule];
@@ -31,14 +31,12 @@ const material_modules: Imports = [MatSortModule, MatTableModule];
     selector: 'mho-citizens-digs',
     templateUrl: './citizens-digs.component.html',
     styleUrls: ['./citizens-digs.component.scss'],
-    encapsulation: ViewEncapsulation.None,
-    host: { style: 'display: contents' },
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class CitizensDigsComponent implements OnInit {
 
-    @ViewChild(MatSort) sort!: MatSort;
-    @ViewChild(MatTable) table!: MatTable<Citizen>;
+    protected readonly sort: Signal<MatSort> = viewChild.required(MatSort);
+    protected readonly table: Signal<MatTable<DigsByCitizen>> = viewChild.required(MatTable);
 
     /** La liste des citoyens */
     public citizen_info!: CitizenInfo;
@@ -72,7 +70,7 @@ export class CitizensDigsComponent implements OnInit {
 
     public ngOnInit(): void {
         this.datasource = new MatTableDataSource();
-        this.datasource.sort = this.sort;
+        this.datasource.sort = this.sort();
 
         this.createDigsByCitizenAndDay();
         this.citizen_filter_change

@@ -1,47 +1,52 @@
 @use 'variables';
 
-.mho-map-header {
-    &.mat-mdc-card-header {
-        justify-content: space-between;
-        align-items: baseline;
+:host {
+    display: contents;
+
+    .mho-map-header {
+        &.mat-mdc-card-header {
+            justify-content: space-between;
+            align-items: baseline;
+        }
     }
-}
 
-.mho-map-sidenav-container {
+    .mho-map-sidenav-container {
 
-    height: 100%;
-    background-color: variables.$card-background-color;
-
-    .mat-sidenav {
-        max-width: 250px;
-        padding: 0.5em;
+        height: 100%;
         background-color: variables.$card-background-color;
 
-        h1 {
+        .map-settings {
+            max-width: 250px;
+            padding: 0 1em;
+            background-color: variables.$card-background-color;
+
+            h1 {
+                margin-top: 0;
+            }
+
+            h2 {
+                margin-top: 0.75em;
+                margin-bottom: 0.5em;
+            }
+
+            .scrut-zones {
+                display: flex;
+                flex-direction: column;
+            }
+
+            .dist-zones {
+                display: flex;
+                flex-direction: column;
+            }
         }
 
-        h2 {
-            margin-top: 0.75em;
-            margin-bottom: 0.5em;
+        .map-container {
+            --mat-sidenav-content-background-color: transparent;
         }
 
-        .scrut-zones {
-            display: flex;
-            flex-direction: column;
+        .mat-drawer-inner-container {
+            overflow-x: hidden;
+            overflow-y: auto;
         }
-
-        .dist-zones {
-            display: flex;
-            flex-direction: column;
-        }
-    }
-
-    .map-container {
-        --mat-sidenav-content-background-color: transparent;
-    }
-
-    .mat-drawer-inner-container {
-        overflow-x: hidden;
-        overflow-y: auto;
     }
 }

@@ -14,7 +14,6 @@ const material_modules: Imports = [];
     selector: 'mho-recipe',
     templateUrl: './recipe.component.html',
     styleUrls: ['./recipe.component.scss'],
-    host: {style: 'display: contents'},
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class RecipeComponent {

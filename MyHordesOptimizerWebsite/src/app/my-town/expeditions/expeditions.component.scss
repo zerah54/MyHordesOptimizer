@@ -1,237 +1,241 @@
 @use 'variables';
 
-.mho-expeditions-header {
-    justify-content: space-between;
+:host {
+    display: contents;
 
-    .actions {
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-    }
-}
-
-
-.mho-expeditions {
-
-    .container {
-        display: flex;
-        flex-direction: column;
-        gap: 0.5em;
-        height: 100%;
-
-        > .header {
-            h2 {
-                margin-bottom: 0;
-            }
-        }
+    .mho-expeditions-header {
+        justify-content: space-between;
 
         .actions {
             display: flex;
             flex-direction: row;
-            justify-content: space-between;
             align-items: center;
+        }
+    }
 
-            .left-actions {
+
+    .mho-expeditions {
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5em;
+            height: 100%;
+
+            > .header {
+                h2 {
+                    margin-bottom: 0;
+                }
+            }
+
+            .actions {
                 display: flex;
                 flex-direction: row;
+                justify-content: space-between;
                 align-items: center;
-                gap: 0.5em;
-            }
 
-            .right-actions {
-
-            }
-        }
-
-        > .content {
-            flex: 1;
-            overflow: auto;
-
-            .expedition {
-                background-color: variables.$accented-background-color;
-
-                &:not(.mat-expansion-panel-spacing) {
-                    margin-bottom: 0.5em;
-                }
-
-                .mat-expansion-panel-header {
-                    height: unset !important;
-                    min-height: var(--mat-expansion-header-expanded-state-height);
-                }
-
-                border-left-style: solid;
-
-                &.ready {
-                    border-left-color: green;
-                }
-
-                &.stop {
-                    border-left-color: red;
-                }
-
-                .header > .mat-content {
-                    justify-content: space-between;
-                    flex-wrap: wrap;
+                .left-actions {
+                    display: flex;
+                    flex-direction: row;
+                    align-items: center;
                     gap: 0.5em;
+                }
 
-                    .label {
-                        display: flex;
-                        align-items: center;
-                        flex-direction: row;
+                .right-actions {
+
+                }
+            }
+
+            > .content {
+                flex: 1;
+                overflow: auto;
+
+                .expedition {
+                    background-color: variables.$accented-background-color;
+
+                    &:not(.mat-expansion-panel-spacing) {
+                        margin-bottom: 0.5em;
+                    }
+
+                    .mat-expansion-panel-header {
+                        height: unset !important;
+                        min-height: var(--mat-expansion-header-expanded-state-height);
+                    }
+
+                    border-left-style: solid;
+
+                    &.ready {
+                        border-left-color: green;
+                    }
+
+                    &.stop {
+                        border-left-color: red;
+                    }
+
+                    .header > .mat-content {
+                        justify-content: space-between;
                         flex-wrap: wrap;
                         gap: 0.5em;
-                    }
 
-                    .actions {
-                    }
-                }
-
-                .content {
-
-                    display: flex;
-                    flex-direction: column;
-                    gap: 0.5em;
-
-                    .expedition-part {
-                        border: 1px solid variables.$primary;
-                        border-radius: 0.25em;
-                        overflow: auto;
-                        padding: 0 0.5em;
-
-                        .expedition-part-header {
-                            padding: 0.5em 0.5em 0.25em;
+                        .label {
                             display: flex;
-                            flex-direction: row;
                             align-items: center;
+                            flex-direction: row;
+                            flex-wrap: wrap;
                             gap: 0.5em;
-
-                            > .expedition-compass {
-                                width: 40px;
-                                height: 40px;
-                                transform: scale(0.4) translateY(-80px);;
-                            }
                         }
 
-                        table.expedition-table {
+                        .actions {
+                        }
+                    }
 
-                            width: 100%;
-                            border-spacing: 0;
-                            border-collapse: collapse;
+                    .content {
 
+                        display: flex;
+                        flex-direction: column;
+                        gap: 0.5em;
 
-                            .mat-mdc-icon-button {
-                                --mat-icon-button-state-layer-size: 36px;
-                                padding: 6px;
+                        .expedition-part {
+                            border: 1px solid variables.$primary;
+                            border-radius: 0.25em;
+                            overflow: auto;
+                            padding: 0 0.5em;
 
-                                .mat-mdc-button-touch-target {
-                                    width: 100%;
-                                    height: 100%;
+                            .expedition-part-header {
+                                padding: 0.5em 0.5em 0.25em;
+                                display: flex;
+                                flex-direction: row;
+                                align-items: center;
+                                gap: 0.5em;
+
+                                > .expedition-compass {
+                                    width: 40px;
+                                    height: 40px;
+                                    transform: scale(0.4) translateY(-80px);;
                                 }
                             }
 
-                            tr {
-                                border-bottom: 1px solid var(--primary);
+                            table.expedition-table {
 
-                                &.citizen, &.table-header {
+                                width: 100%;
+                                border-spacing: 0;
+                                border-collapse: collapse;
 
-                                    td > div.flex {
-                                        display: flex;
-                                        flex-direction: row;
-                                        align-items: center;
-                                        gap: 0.5em;
-                                    }
 
-                                    .action {
-                                        width: 36px;
-                                    }
+                                .mat-mdc-icon-button {
+                                    --mat-icon-button-state-layer-size: 36px;
+                                    padding: 6px;
 
-                                    .job {
-                                        width: 60px;
-
-                                        .mat-mdc-form-field {
-                                            width: 60px;
-                                        }
-                                    }
-
-                                    .pseudo {
-                                        width: 100px;
-                                    }
-
-                                    .is-thirsty, .starts-7-ap {
-                                        width: 40px;
-                                        text-align: center;
-
-                                        > div {
-                                            align-items: center;
-                                            justify-content: center;
-                                        }
-                                    }
-
-                                    .starts-7-ap {
-                                        .flex {
-                                            gap: 0;
-                                        }
-                                    }
-
-                                    .pdc {
-                                        width: 50px;
-
-                                        > div {
-                                            gap: 0;
-                                        }
-
-                                        .mat-mdc-form-field {
-                                            width: 60px;
-                                        }
-                                    }
-
-                                    .citizen-orders {
-                                        padding: 0 0.5em;
-
-                                        .no-order {
-                                            display: none;
-                                        }
-
-                                        .checked {
-                                            text-decoration: line-through !important;
-                                        }
-                                    }
-
-                                    .bag {
-
+                                    .mat-mdc-button-touch-target {
+                                        width: 100%;
+                                        height: 100%;
                                     }
                                 }
 
-                                &.citizen {
-                                    .job {
-                                        text-align: center;
-                                    }
-                                }
+                                tr {
+                                    border-bottom: 1px solid var(--primary);
 
-                                &.table-header {
-                                    .pseudo {
-                                        > div {
+                                    &.citizen, &.table-header {
+
+                                        td > div.flex {
                                             display: flex;
                                             flex-direction: row;
-                                            justify-content: space-between;
                                             align-items: center;
+                                            gap: 0.5em;
+                                        }
+
+                                        .action {
+                                            width: 36px;
+                                        }
+
+                                        .job {
+                                            width: 60px;
+
+                                            .mat-mdc-form-field {
+                                                width: 60px;
+                                            }
+                                        }
+
+                                        .pseudo {
+                                            width: 100px;
+                                        }
+
+                                        .is-thirsty, .starts-7-ap {
+                                            width: 40px;
+                                            text-align: center;
+
+                                            > div {
+                                                align-items: center;
+                                                justify-content: center;
+                                            }
+                                        }
+
+                                        .starts-7-ap {
+                                            .flex {
+                                                gap: 0;
+                                            }
+                                        }
+
+                                        .pdc {
+                                            width: 50px;
+
+                                            > div {
+                                                gap: 0;
+                                            }
+
+                                            .mat-mdc-form-field {
+                                                width: 60px;
+                                            }
+                                        }
+
+                                        .citizen-orders {
+                                            padding: 0 0.5em;
+
+                                            .no-order {
+                                                display: none;
+                                            }
+
+                                            .checked {
+                                                text-decoration: line-through !important;
+                                            }
+                                        }
+
+                                        .bag {
+
+                                        }
+                                    }
+
+                                    &.citizen {
+                                        .job {
+                                            text-align: center;
+                                        }
+                                    }
+
+                                    &.table-header {
+                                        .pseudo {
+                                            > div {
+                                                display: flex;
+                                                flex-direction: row;
+                                                justify-content: space-between;
+                                                align-items: center;
+                                            }
                                         }
                                     }
                                 }
                             }
-                        }
 
-                        .orders {
-                            padding: 0.25em 0.5em 0.5em;
+                            .orders {
+                                padding: 0.25em 0.5em 0.5em;
 
-                            .no-order {
-                                color: rgba(0, 0, 0, 0.75);
-                                font-weight: bold;
-                                font-style: italic;
-                            }
+                                .no-order {
+                                    color: rgba(0, 0, 0, 0.75);
+                                    font-weight: bold;
+                                    font-style: italic;
+                                }
 
-                            .checked {
-                                text-decoration: line-through !important;
+                                .checked {
+                                    text-decoration: line-through !important;
+                                }
                             }
                         }
                     }
@@ -239,22 +243,22 @@
             }
         }
     }
-}
 
-.mho-expedition-bag-selector {
-    width: 325px;
-    max-width: 325px;
+    .mho-expedition-bag-selector {
+        width: 325px;
+        max-width: 325px;
 
-    .mat-mdc-tab-group {
-        width: 100%;
+        .mat-mdc-tab-group {
+            width: 100%;
+        }
+
+        .mat-mdc-tab-body-wrapper {
+            max-height: 300px;
+        }
     }
 
-    .mat-mdc-tab-body-wrapper {
-        max-height: 300px;
+    .job-select {
+        width: 100px;
+        min-width: 100px;
     }
-}
-
-.job-select {
-    width: 100px;
-    min-width: 100px;
 }

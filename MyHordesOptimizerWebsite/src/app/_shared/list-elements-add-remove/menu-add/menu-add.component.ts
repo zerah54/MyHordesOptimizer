@@ -1,5 +1,5 @@
 import { CommonModule, NgOptimizedImage } from '@angular/common';
-import { Component, input, InputSignal, output, OutputEmitterRef, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, input, InputSignal, output, OutputEmitterRef, viewChild } from '@angular/core';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatMenu, MatMenuModule } from '@angular/material/menu';
@@ -19,14 +19,12 @@ const material_modules: Imports = [MatFormFieldModule, MatInputModule, MatMenuMo
     selector: 'mho-menu-add',
     templateUrl: './menu-add.component.html',
     styleUrls: ['./menu-add.component.scss'],
-    encapsulation: ViewEncapsulation.None,
     exportAs: 'menuAdd',
-    host: {style: 'display: contents'},
     imports: [...angular_common, ...components, ...material_modules, ...pipes],
 })
 export class MenuAddComponent {
 
-    @ViewChild(MatMenu, {static: true}) menu!: MatMenu;
+    readonly menu = viewChild.required(MatMenu);
 
     public class: InputSignal<string> = input('');
 

@@ -1,78 +1,82 @@
 @use 'variables';
 
-.list-element-add-remove {
-    background-color: variables.$item_color;
-    border-radius: 0.25em;
-    padding: 0.5em;
+:host {
+    display: contents;
 
-    .count-ap-in-bag {
-        display: flex;
-        flex-wrap: nowrap;
-        align-items: center;
-    }
+    .list-element-add-remove {
+        background-color: variables.$item_color;
+        border-radius: 0.25em;
+        padding: 0.5em;
 
-    .label {
-        border-bottom: 1px dotted;
-        margin-bottom: 0.5em;
-        display: flex;
-        justify-content: space-between;
-        gap: 0.5em;
-
-        .add-remove {
-            white-space: nowrap;
+        .count-ap-in-bag {
+            display: flex;
+            flex-wrap: nowrap;
+            align-items: center;
         }
-    }
 
-    .editable-container {
-        display: flex;
-        justify-content: space-between;
-        gap: 0.5em;
+        .label {
+            border-bottom: 1px dotted;
+            margin-bottom: 0.5em;
+            display: flex;
+            justify-content: space-between;
+            gap: 0.5em;
 
-        .list {
-            margin: auto 0;
-
-            > img {
-                vertical-align: middle;
+            .add-remove {
+                white-space: nowrap;
             }
         }
 
-        .bag {
+        .editable-container {
             display: flex;
-            gap: 0.25em;
-            align-items: center;
-        }
-
-        .add-remove {
-            display: flex;
-            flex-direction: column;
+            justify-content: space-between;
             gap: 0.5em;
 
+            .list {
+                margin: auto 0;
+
+                > img {
+                    vertical-align: middle;
+                }
+            }
+
+            .bag {
+                display: flex;
+                gap: 0.25em;
+                align-items: center;
+            }
+
+            .add-remove {
+                display: flex;
+                flex-direction: column;
+                gap: 0.5em;
+
+            }
+        }
+
+        img {
+            cursor: pointer;
         }
     }
 
-    img {
-        cursor: pointer;
-    }
-}
+    .menu-add,
+    .menu-remove {
+        padding: 8px;
 
-.menu-add,
-.menu-remove {
-    padding: 8px;
+        .mat-mdc-menu-content {
 
-    .mat-mdc-menu-content {
+            .empty-bag {
+                display: flex;
+                align-items: center;
+            }
 
-        .empty-bag {
-            display: flex;
-            align-items: center;
-        }
+            .items {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 0.25em;
 
-        .items {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.25em;
-
-            > img {
-                cursor: pointer;
+                > img {
+                    cursor: pointer;
+                }
             }
         }
     }

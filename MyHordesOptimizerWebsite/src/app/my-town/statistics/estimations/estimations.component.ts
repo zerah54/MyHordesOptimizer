@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, HostListener, inject, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, ElementRef, HostListener, inject, OnInit, Signal, viewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatExpansionModule } from '@angular/material/expansion';
@@ -35,11 +35,10 @@ const material_modules: Imports = [MatButtonModule, MatExpansionModule, MatFormF
     selector: 'mho-estimations',
     templateUrl: './estimations.component.html',
     styleUrls: ['./estimations.component.scss'],
-    encapsulation: ViewEncapsulation.None,
-    host: {style: 'display: contents'},
     imports: [...angular_common, ...components, ...material_modules, ...pipes, MatSlideToggle]
 })
 export class EstimationsComponent implements OnInit {
+    private readonly clipboard: ClipboardService = inject(ClipboardService);
 
     @HostListener('window:resize', ['$event'])
     onResize(): void {
@@ -57,47 +56,44 @@ export class EstimationsComponent implements OnInit {
         }
     }
 
-    @ViewChild('todayEstimCanvas') today_estim_canvas!: ElementRef;
-    @ViewChild('todayOffsetCanvas') today_offset_canvas!: ElementRef;
-    @ViewChild('tomorrowEstimCanvas') tomorrow_estim_canvas!: ElementRef;
-    @ViewChild('tomorrowOffsetCanvas') tomorrow_offset_canvas!: ElementRef;
+    protected readonly today_estim_canvas: Signal<ElementRef> = viewChild.required<ElementRef>('todayEstimCanvas');
+    protected readonly today_offset_canvas: Signal<ElementRef> = viewChild.required<ElementRef>('todayOffsetCanvas');
+    protected readonly tomorrow_estim_canvas: Signal<ElementRef> = viewChild.required<ElementRef>('tomorrowEstimCanvas');
+    protected readonly tomorrow_offset_canvas: Signal<ElementRef> = viewChild.required<ElementRef>('tomorrowOffsetCanvas');
 
-    public readonly tdg_values: number[] = TDG_VALUES;
-    public readonly planif_values: number[] = PLANIF_VALUES;
-    public readonly current_day: number = getTown()?.day || 1;
+    protected readonly tdg_values: number[] = TDG_VALUES;
+    protected readonly planif_values: number[] = PLANIF_VALUES;
+    protected readonly current_day: number = getTown()?.day || 1;
 
-    public selected_day: number = this.current_day;
-    public estimations!: Estimations;
+    protected selected_day: number = this.current_day;
+    protected estimations!: Estimations;
     /** La datasource pour le tableau */
-    public datasource: MatTableDataSource<Regen> = new MatTableDataSource();
+    protected datasource: MatTableDataSource<Regen> = new MatTableDataSource();
 
-    public today_estim_chart!: Chart<'line'>;
-    public today_offset_chart!: Chart<'bar'>;
-    public today_offset_mode!: boolean;
-    public tomorrow_estim_chart!: Chart<'line'>;
-    public tomorrow_offset_chart!: Chart<'bar'>;
-    public tomorrow_offset_mode!: boolean;
+    protected today_estim_chart!: Chart<'line'>;
+    protected today_offset_chart!: Chart<'bar'>;
+    protected today_offset_mode!: boolean;
+    protected tomorrow_estim_chart!: Chart<'line'>;
+    protected tomorrow_offset_chart!: Chart<'bar'>;
+    protected tomorrow_offset_mode!: boolean;
 
-    public today_calculated_attack!: EstimationsResult | null;
-    public today_calculated_attack_beta!: EstimationsResult | null;
-    public tomorrow_calculated_attack!: EstimationsResult | null;
-    public tomorrow_calculated_attack_beta!: EstimationsResult | null;
+    protected today_calculated_attack!: EstimationsResult | null;
+    protected today_calculated_attack_beta!: EstimationsResult | null;
+    protected tomorrow_calculated_attack!: EstimationsResult | null;
+    protected tomorrow_calculated_attack_beta!: EstimationsResult | null;
 
-    public step?: number = 0;
+    protected step?: number = 0;
 
-    public separators: string[] = [' à ', ' - '];
+    protected separators: string[] = [' à ', ' - '];
 
     private town_statistics_service: TownStatisticsService = inject(TownStatisticsService);
-
-    constructor(private clipboard: ClipboardService) {
-    }
 
     public ngOnInit(): void {
         this.getEstimations();
     }
 
     /** Enregistre les estimations saisies */
-    public saveEstimations(): void {
+    protected saveEstimations(): void {
         this.town_statistics_service
             .saveEstimations(this.estimations)
             .subscribe(() => {
@@ -105,19 +101,19 @@ export class EstimationsComponent implements OnInit {
             });
     }
 
-    public getEstimations(): void {
+    protected getEstimations(): void {
         this.town_statistics_service
             .getEstimations(this.selected_day)
             .subscribe({
                 next: (estimations: Estimations) => {
                     this.estimations = estimations;
                     this.town_statistics_service
-                        .getApofooAttackCalculation(this.selected_day, false)
+                        .getAttackCalculation(this.selected_day, false)
                         .subscribe({
                             next: (result: EstimationsResult) => {
                                 this.today_calculated_attack = result;
                                 this.town_statistics_service
-                                    .getApofooAttackCalculation(this.selected_day, true)
+                                    .getAttackCalculation(this.selected_day, true)
                                     .subscribe({
                                         next: (result: EstimationsResult) => {
                                             this.today_calculated_attack_beta = result;
@@ -127,12 +123,12 @@ export class EstimationsComponent implements OnInit {
                             }
                         });
                     this.town_statistics_service
-                        .getApofooAttackCalculation(this.selected_day + 1, false)
+                        .getAttackCalculation(this.selected_day + 1, false)
                         .subscribe({
                             next: (result: EstimationsResult) => {
                                 this.tomorrow_calculated_attack = result;
                                 this.town_statistics_service
-                                    .getApofooAttackCalculation(this.selected_day + 1, true)
+                                    .getAttackCalculation(this.selected_day + 1, true)
                                     .subscribe({
                                         next: (result: EstimationsResult) => {
                                             this.tomorrow_calculated_attack_beta = result;
@@ -145,47 +141,51 @@ export class EstimationsComponent implements OnInit {
             });
     }
 
-    public setStep(step: number): void {
+    protected setStep(step: number): void {
         this.step = step;
     }
 
-    public defineTodayCanvas(): void {
-        if (this.today_estim_canvas) {
+    protected defineTodayCanvas(): void {
+        const today_estim_canvas = this.today_estim_canvas();
+        if (today_estim_canvas) {
             if (this.today_estim_chart) {
                 this.today_estim_chart.destroy();
             }
-            const today_estim_ctx: CanvasRenderingContext2D = this.today_estim_canvas.nativeElement.getContext('2d');
+            const today_estim_ctx: CanvasRenderingContext2D = today_estim_canvas.nativeElement.getContext('2d');
             this.today_estim_chart = new Chart<'line'>(today_estim_ctx, this.getEstimConfig(this.selected_day, TDG_VALUES, this.estimations.estim, this.today_calculated_attack?.result, this.today_calculated_attack_beta?.result));
         }
 
-        if (this.today_offset_canvas) {
+        const today_offset_canvas = this.today_offset_canvas();
+        if (today_offset_canvas) {
             if (this.today_offset_chart) {
                 this.today_offset_chart.destroy();
             }
-            const today_offset_ctx: CanvasRenderingContext2D = this.today_offset_canvas.nativeElement.getContext('2d');
+            const today_offset_ctx: CanvasRenderingContext2D = today_offset_canvas.nativeElement.getContext('2d');
             this.today_offset_chart = new Chart<'bar'>(today_offset_ctx, this.getOffsetConfig(this.selected_day, this.today_calculated_attack?.min_list, this.today_calculated_attack?.max_list));
         }
     }
 
-    public defineTomorrowCanvas(): void {
-        if (this.tomorrow_estim_canvas) {
+    protected defineTomorrowCanvas(): void {
+        const tomorrow_estim_canvas = this.tomorrow_estim_canvas();
+        if (tomorrow_estim_canvas) {
             if (this.tomorrow_estim_chart) {
                 this.tomorrow_estim_chart.destroy();
             }
-            const tomorrow_estim_ctx: CanvasRenderingContext2D = this.tomorrow_estim_canvas.nativeElement.getContext('2d');
+            const tomorrow_estim_ctx: CanvasRenderingContext2D = tomorrow_estim_canvas.nativeElement.getContext('2d');
             this.tomorrow_estim_chart = new Chart<'line'>(tomorrow_estim_ctx, this.getEstimConfig(this.selected_day + 1, PLANIF_VALUES, this.estimations.planif, this.tomorrow_calculated_attack?.result, this.tomorrow_calculated_attack_beta?.result));
         }
 
-        if (this.tomorrow_offset_canvas) {
+        const tomorrow_offset_canvas = this.tomorrow_offset_canvas();
+        if (tomorrow_offset_canvas) {
             if (this.tomorrow_offset_chart) {
                 this.tomorrow_offset_chart.destroy();
             }
-            const tomorrow_offset_ctx: CanvasRenderingContext2D = this.tomorrow_offset_canvas.nativeElement.getContext('2d');
+            const tomorrow_offset_ctx: CanvasRenderingContext2D = tomorrow_offset_canvas.nativeElement.getContext('2d');
             this.tomorrow_offset_chart = new Chart<'bar'>(tomorrow_offset_ctx, this.getOffsetConfig(this.selected_day + 1, this.tomorrow_calculated_attack?.min_list, this.tomorrow_calculated_attack_beta?.max_list));
         }
     }
 
-    public pasteFromMH(paste_event: ClipboardEvent, min_max: MinMax, min: boolean): void {
+    protected pasteFromMH(paste_event: ClipboardEvent, min_max: MinMax, min: boolean): void {
         paste_event.preventDefault();
         const value: string | undefined = paste_event.clipboardData?.getData('Text');
         let split: string[] | undefined;
@@ -206,7 +206,7 @@ export class EstimationsComponent implements OnInit {
         }
     }
 
-    public shareEstimsForum(): void {
+    protected shareEstimsForum(): void {
         const today_attack_title: string = $localize`Attaque du jour`;
         const tomorrow_attack_title: string = $localize`Attaque du lendemain`;
         let text: string = '';

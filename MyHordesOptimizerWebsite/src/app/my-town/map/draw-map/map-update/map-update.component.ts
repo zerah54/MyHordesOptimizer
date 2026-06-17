@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, DestroyRef, inject, Inject, OnInit } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -34,6 +34,7 @@ const material_modules: Imports = [MatButtonModule, MatDialogModule, MatFormFiel
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class MapUpdateComponent implements OnInit {
+    protected readonly data: MapUpdateData = inject<MapUpdateData>(MAT_DIALOG_DATA);
 
     /** La cellule potentiellement modifiée */
     public cell: Cell;
@@ -45,7 +46,7 @@ export class MapUpdateComponent implements OnInit {
     private readonly town_service: TownService = inject(TownService);
     private readonly destroy_ref: DestroyRef = inject(DestroyRef);
 
-    constructor(@Inject(MAT_DIALOG_DATA) public data: MapUpdateData) {
+    constructor() {
         this.cell = new Cell({...this.data.cell.modelToDto()});
     }
 

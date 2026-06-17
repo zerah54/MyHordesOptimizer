@@ -1,44 +1,48 @@
-.mho-select {
-    .mho-select-chip {
-        display: flex;
-        gap: 0.5em;
-        padding: 7px 12px !important;
+:host {
+    display: contents;
 
-        button.mat-chip-remove {
-            margin-left: 0;
-        }
+    .mho-select {
+        .mho-select-chip {
+            display: flex;
+            gap: 0.5em;
+            padding: 7px 12px !important;
 
-        > span {
-            margin-right: 0;
-        }
-    }
-}
-
-.mat-mdc-select-panel {
-    height: 100%;
-
-    .mho-search {
-        width: calc(100% - 2em);
-    }
-
-    .options-container {
-        max-height: 202px;
-        overflow: auto;
-
-        .cdk-overlay-pane {
-            height: 100%;
-        }
-
-        .mho-option {
-
-            > span {
-                display: flex;
-                justify-content: space-between;
-                width: 100%;
+            button.mat-chip-remove {
+                margin-left: 0;
             }
 
-            i {
-                margin-right: 0.5em;
+            > span {
+                margin-right: 0;
+            }
+        }
+    }
+
+    .mat-mdc-select-panel {
+        height: 100%;
+
+        .mho-search {
+            width: calc(100% - 2em);
+        }
+
+        .options-container {
+            max-height: 202px;
+            overflow: auto;
+
+            .cdk-overlay-pane {
+                height: 100%;
+            }
+
+            .mho-option {
+
+                > span {
+                    display: flex;
+                    justify-content: space-between;
+                    width: 100%;
+                }
+
+                i {
+                    margin-right: 0.5em;
+                }
             }
         }
     }

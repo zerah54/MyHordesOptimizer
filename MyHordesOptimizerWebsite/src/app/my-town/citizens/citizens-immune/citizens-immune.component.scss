@@ -1,8 +1,12 @@
-.mho-citizens-immune {
-    height: 100%;
-    overflow: auto;
+:host {
+    display: contents;
 
-    > div {
-        padding: 1em 0;
+    .mho-citizens-immune {
+        height: 100%;
+        overflow: auto;
+
+        > div {
+            padding: 1em 0;
+        }
     }
 }

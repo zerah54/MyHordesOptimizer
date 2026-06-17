@@ -5,23 +5,28 @@ import { Cell } from '../../../../_abstract_model/types/cell.class';
     selector: 'mho-map-border',
     templateUrl: './map-border.component.html',
     styleUrls: ['./map-border.component.scss', '../draw-map.component.scss'],
-    host: {style: 'display: contents'},
 })
 export class MapBorderComponent {
 
     public horizontal: InputSignalWithTransform<boolean, unknown> = input(false, {transform: booleanAttribute});
     public vertical: InputSignalWithTransform<boolean, unknown> = input(false, {transform: booleanAttribute});
 
+    // TODO: Skipped for migration because:
+    //  Accessor inputs cannot be migrated as they are too complex.
     @Input() set index(index: null | number) {
         this.cell_index = index;
         this.isMyPos();
     }
 
+    // TODO: Skipped for migration because:
+    //  Accessor inputs cannot be migrated as they are too complex.
     @Input() set myCell(cell: Cell | undefined) {
         this.my_cell = cell;
         this.isMyPos();
     }
 
+    // TODO: Skipped for migration because:
+    //  Accessor inputs cannot be migrated as they are too complex.
     @Input() set hoveredCell(cell: Cell | undefined) {
         this.hovered_cell = cell;
         this.isHoveredPos();

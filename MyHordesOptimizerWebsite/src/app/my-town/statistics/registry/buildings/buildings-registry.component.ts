@@ -1,5 +1,5 @@
 import { CommonModule, NgOptimizedImage, NgTemplateOutlet } from '@angular/common';
-import { Component, input, Input, InputSignal, ViewEncapsulation } from '@angular/core';
+import { Component, input, Input, InputSignal } from '@angular/core';
 import { MatTabChangeEvent, MatTabsModule } from '@angular/material/tabs';
 import { HORDES_IMG_REPO } from '../../../../_abstract_model/const';
 import { DisplayPseudoMode, Entry } from '../../../../_abstract_model/interfaces';
@@ -18,8 +18,6 @@ const material_modules: Imports = [MatTabsModule];
     selector: 'mho-registry-buildings',
     templateUrl: './buildings-registry.component.html',
     styleUrls: ['./buildings-registry.component.scss'],
-    encapsulation: ViewEncapsulation.None,
-    host: {style: 'display: contents'},
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class BuildingsRegistryComponent {
@@ -27,6 +25,8 @@ export class BuildingsRegistryComponent {
     public completeCitizenList: InputSignal<CitizenInfo> = input.required();
     public displayPseudo: InputSignal<DisplayPseudoMode> = input.required();
 
+    // TODO: Skipped for migration because:
+    //  Accessor inputs cannot be migrated as they are too complex.
     @Input({required: true}) set registry(registry: Entry[] | undefined) {
         if (registry) {
             this.entries = registry;

@@ -6,18 +6,16 @@ import {
     Component,
     ElementRef,
     HostBinding,
+    inject,
     input,
     Input,
     InputSignalWithTransform,
     OnChanges,
     OnDestroy,
-    Optional,
     output,
     OutputEmitterRef,
     SecurityContext,
-    Self,
-    SimpleChanges,
-    ViewEncapsulation
+    SimpleChanges
 } from '@angular/core';
 import { ControlValueAccessor, FormsModule, NgControl } from '@angular/forms';
 import { MatFormFieldControl, MatFormFieldModule } from '@angular/material/form-field';
@@ -41,12 +39,15 @@ const material_modules: Imports = [MatFormFieldModule];
             useExisting: EditorComponent
         }
     ],
-    encapsulation: ViewEncapsulation.None,
     changeDetection: ChangeDetectionStrategy.OnPush,
-    host: {style: 'display: contents'},
     imports: [...angular_common, ...components, ...material_modules, ...pipes, AngularEditorModule]
 })
 export class EditorComponent implements ControlValueAccessor, OnChanges, OnDestroy, MatFormFieldControl<string> {
+    public ngControl: NgControl | null = inject(NgControl, {optional: true, self: true});
+    protected sanitizer: DomSanitizer = inject(DomSanitizer);
+    private cdr: ChangeDetectorRef = inject(ChangeDetectorRef);
+    private element_ref: ElementRef = inject(ElementRef);
+
 
     @HostBinding('class.floating')
     get shouldLabelFloat(): boolean {
@@ -58,11 +59,15 @@ export class EditorComponent implements ControlValueAccessor, OnChanges, OnDestr
     // public label: InputSignal<string> = input('');
     public showToolbarOnFocus: InputSignalWithTransform<boolean, unknown> = input(false, {transform: booleanAttribute});
 
+    // TODO: Skipped for migration because:
+    //  Accessor inputs cannot be migrated as they are too complex.
     @Input() set readonly(readonly: boolean) {
         this.editorConfig.editable = !readonly;
         this.cdr.detectChanges();
     }
 
+    // TODO: Skipped for migration because:
+    //  Accessor inputs cannot be migrated as they are too complex.
     @Input() set content(content: string) {
         if (content !== undefined && content !== null) {
             this.sanitized_content = this.sanitizer.sanitize(SecurityContext.HTML, content) ?? '';
@@ -73,6 +78,8 @@ export class EditorComponent implements ControlValueAccessor, OnChanges, OnDestr
         this.stateChanges.next();
     }
 
+    // TODO: Skipped for migration because:
+    //  Accessor inputs cannot be migrated as they are too complex.
     @Input() set spellcheck(spellcheck: boolean) {
         if (spellcheck !== undefined && spellcheck !== null) {
             this.editorConfig.spellcheck = spellcheck;
@@ -81,8 +88,13 @@ export class EditorComponent implements ControlValueAccessor, OnChanges, OnDestr
     }
 
     // eslint-disable-next-line @angular-eslint/no-input-rename
+    // TODO: Skipped for migration because:
+    //  This input overrides a field from a superclass, while the superclass field
+    //  is not migrated.
     @Input('aria-describedby') userAriaDescribedBy!: string;
 
+    // TODO: Skipped for migration because:
+    //  Accessor inputs cannot be migrated as they are too complex.
     @Input()
     get required(): boolean {
         return this._required;
@@ -93,6 +105,8 @@ export class EditorComponent implements ControlValueAccessor, OnChanges, OnDestr
         this.stateChanges.next();
     }
 
+    // TODO: Skipped for migration because:
+    //  Accessor inputs cannot be migrated as they are too complex.
     @Input()
     get disabled(): boolean {
         return this._disabled;
@@ -130,8 +144,7 @@ export class EditorComponent implements ControlValueAccessor, OnChanges, OnDestr
     private _required: boolean = false;
     private _disabled: boolean = false;
 
-    constructor(public sanitizer: DomSanitizer, private cdr: ChangeDetectorRef, @Optional() @Self() public ngControl: NgControl,
-                private element_ref: ElementRef) {
+    constructor() {
         // Replace the provider from above with this.
         if (this.ngControl !== null) {
             // Setting the value accessor directly (instead of using

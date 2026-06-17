@@ -1,4 +1,4 @@
-import { Component, ElementRef, input, Input, InputSignal, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, ElementRef, input, Input, InputSignal, Signal, viewChild } from '@angular/core';
 import { Scale, TooltipItem } from 'chart.js';
 import Chart from 'chart.js/auto';
 import moment from 'moment';
@@ -10,16 +10,16 @@ import { Citizen } from '../../../../_abstract_model/types/citizen.class';
     selector: 'mho-registry-doors',
     templateUrl: './doors-registry.component.html',
     styleUrls: ['./doors-registry.component.scss'],
-    encapsulation: ViewEncapsulation.None,
-    host: {style: 'display: contents'},
 })
 export class DoorsRegistryComponent {
 
-    @ViewChild('doorsCanvas') doors_canvas!: ElementRef;
+    protected readonly doors_canvas: Signal<ElementRef> = viewChild.required<ElementRef>('doorsCanvas');
 
     public completeCitizenList: InputSignal<CitizenInfo> = input.required();
     public displayPseudo: InputSignal<DisplayPseudoMode> = input.required();
 
+    // TODO: Skipped for migration because:
+    //  Accessor inputs cannot be migrated as they are too complex.
     @Input({required: true}) set registry(registry: Entry[] | undefined) {
         if (registry) {
             this.entries = registry.filter((entry: Entry) => {
@@ -41,7 +41,7 @@ export class DoorsRegistryComponent {
     private readonly doors_entering_keywords: string[] = ['est de retour en ville', 'entered', 'betreten', 'está de vuelta en el'];
 
     private createDoorsCanvas(): void {
-        const polar_ctx: CanvasRenderingContext2D = this.doors_canvas.nativeElement.getContext('2d');
+        const polar_ctx: CanvasRenderingContext2D = this.doors_canvas().nativeElement.getContext('2d');
         this.doors_chart = new Chart<'bar'>(polar_ctx, {
             type: 'bar',
             data: {

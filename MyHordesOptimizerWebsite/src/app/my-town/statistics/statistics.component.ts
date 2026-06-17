@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatTabsModule } from '@angular/material/tabs';
 import { Router, RouterLink, RouterOutlet } from '@angular/router';
@@ -14,10 +14,11 @@ const material_modules: Imports = [MatCardModule, MatTabsModule];
     selector: 'mho-statistics',
     templateUrl: './statistics.component.html',
     styleUrls: ['./statistics.component.scss'],
-    host: {style: 'display: contents'},
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class StatisticsComponent {
+    protected readonly router: Router = inject(Router);
+
 
     public links: Link[] = [
         {
@@ -33,9 +34,6 @@ export class StatisticsComponent {
             link: '/my-town/stats/registry'
         }
     ];
-
-    constructor(protected router: Router) {
-    }
 
 }
 

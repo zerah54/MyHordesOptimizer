@@ -63,7 +63,7 @@
                                 }
                             </th>
                         }
-                        <td mat-cell *matCellDef="let row" [ngClass]="column.id">
+                        <td mat-cell *matCellDef="let row" [class]="column.id">
                             @switch (column.id) {
                                 @case ('label') {
                                     <img [src]="HORDES_IMG_REPO + 'ruin/' + row.img + '.gif'">

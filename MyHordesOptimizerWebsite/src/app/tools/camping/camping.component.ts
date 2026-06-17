@@ -1,5 +1,5 @@
 import { CommonModule, DecimalPipe, formatNumber, Location, NgOptimizedImage, NgTemplateOutlet } from '@angular/common';
-import { Component, DestroyRef, DOCUMENT, inject, Inject, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, DestroyRef, DOCUMENT, inject, OnInit } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -40,11 +40,16 @@ const material_modules: Imports = [MatButtonModule, MatButtonToggleModule, MatCa
     selector: 'mho-camping',
     templateUrl: './camping.component.html',
     styleUrls: ['./camping.component.scss'],
-    encapsulation: ViewEncapsulation.None,
-    host: {style: 'display: contents'},
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class CampingComponent implements OnInit {
+    private readonly fb: UntypedFormBuilder = inject(UntypedFormBuilder);
+    private readonly route: ActivatedRoute = inject(ActivatedRoute);
+    private readonly clipboard: ClipboardService = inject(ClipboardService);
+    private readonly router: Router = inject(Router);
+    private readonly activated_route: ActivatedRoute = inject(ActivatedRoute);
+    private readonly location: Location = inject(Location);
+    private readonly document: Document = inject<Document>(DOCUMENT);
 
     public ruins: Ruin[] = [];
     public town_ruins: Ruin[] = [];
@@ -86,11 +91,6 @@ export class CampingComponent implements OnInit {
     private readonly destroy_ref: DestroyRef = inject(DestroyRef);
     private readonly town_service: TownService = inject(TownService);
     private readonly no_ruin: Ruin = new Ruin(NO_RUIN);
-
-    constructor(private fb: UntypedFormBuilder, private route: ActivatedRoute, private clipboard: ClipboardService,
-                private router: Router, private activated_route: ActivatedRoute, private location: Location,
-                @Inject(DOCUMENT) private document: Document) {
-    }
 
     public ngOnInit(): void {
 

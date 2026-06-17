@@ -1,7 +1,7 @@
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { OverlayContainer } from '@angular/cdk/overlay';
-import { CommonModule, NgClass, NgOptimizedImage } from '@angular/common';
-import { Component, DestroyRef, HostListener, inject, Inject, LOCALE_ID, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import { CommonModule, NgOptimizedImage } from '@angular/common';
+import { Component, DestroyRef, HostListener, inject, LOCALE_ID, OnInit, Signal, viewChild } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatCardModule } from '@angular/material/card';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
@@ -17,7 +17,7 @@ import { FooterComponent } from './structure/footer/footer.component';
 import { HeaderComponent } from './structure/header/header.component';
 import { MenuComponent } from './structure/menu/menu.component';
 
-const angular_common: Imports = [CommonModule, NgClass, NgOptimizedImage, RouterOutlet];
+const angular_common: Imports = [CommonModule, NgOptimizedImage, RouterOutlet];
 const components: Imports = [FooterComponent, HeaderComponent, MenuComponent];
 const pipes: Imports = [];
 const material_modules: Imports = [MatCardModule, MatProgressSpinnerModule, MatSidenavModule];
@@ -31,13 +31,18 @@ const material_modules: Imports = [MatCardModule, MatProgressSpinnerModule, MatS
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class AppComponent implements OnInit {
+    private router: Router = inject(Router);
+    private overlay_container: OverlayContainer = inject(OverlayContainer);
+    private breakpoint_observer: BreakpointObserver = inject(BreakpointObserver);
+    private locale_id: string = inject(LOCALE_ID);
 
-    @ViewChild('sidenavContainer') sidenav_container!: MatSidenavContainer;
 
-    public is_gt_xs: boolean = this.breakpoint_observer.isMatched(BREAKPOINTS['gt-xs']);
-    public is_loading: boolean = false;
-    public ready: boolean = false;
-    public readonly theme: string | null = localStorage.getItem('theme');
+    protected readonly sidenav_container: Signal<MatSidenavContainer> = viewChild.required<MatSidenavContainer>('sidenavContainer');
+
+    protected is_gt_xs: boolean = this.breakpoint_observer.isMatched(BREAKPOINTS['gt-xs']);
+    protected is_loading: boolean = false;
+    protected ready: boolean = false;
+    protected readonly theme: string | null = localStorage.getItem('theme');
 
     private loading_service: LoadingOverlayService = inject(LoadingOverlayService);
     private authentication_api: AuthenticationService = inject(AuthenticationService);
@@ -48,8 +53,7 @@ export class AppComponent implements OnInit {
         this.is_gt_xs = this.breakpoint_observer.isMatched(BREAKPOINTS['gt-xs']);
     }
 
-    constructor(private router: Router, private overlay_container: OverlayContainer, private breakpoint_observer: BreakpointObserver,
-                @Inject(LOCALE_ID) private locale_id: string) {
+    constructor() {
         moment.locale(this.locale_id);
     }
 
@@ -65,7 +69,7 @@ export class AppComponent implements OnInit {
 
         this.router.events.subscribe(() => {
             if (!this.is_gt_xs) {
-                this.sidenav_container.close();
+                this.sidenav_container().close();
             }
         });
 

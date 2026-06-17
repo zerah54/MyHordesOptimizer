@@ -1,4 +1,4 @@
-import { Component, DOCUMENT, Inject } from '@angular/core';
+import { Component, DOCUMENT, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
@@ -17,10 +17,12 @@ const material_modules: Imports = [MatButtonModule, MatCardModule, MatIconModule
     selector: 'mho-tuto-script-installation',
     templateUrl: './tuto-script-installation.component.html',
     styleUrls: ['./tuto-script-installation.component.scss'],
-    host: {style: 'display: contents'},
     imports: [...angular_common, ...components, ...material_modules, ...pipes],
 })
 export class TutoScriptInstallationComponent {
+    private readonly clipboard: ClipboardService = inject(ClipboardService);
+    private readonly document: Document = inject<Document>(DOCUMENT);
+
 
     public readonly title: string = $localize`Script / Extension`;
     public readonly download_link: string = $localize`<a href="https://github.com/zerah54/MyHordesOptimizer/raw/main/Scripts/Tampermonkey/my_hordes_optimizer.user.js" target="_blank">lien de téléchargement du script</a>`;
@@ -84,10 +86,6 @@ export class TutoScriptInstallationComponent {
     ];
     public readonly script_final_text: string = '\n' + $localize`Une fois le script installé, il faudra rafraîchir la page du jeu. Vous verrez alors apparaitre un nouveau bouton en haut de votre page MyHordes. Au survol, une fenêtre s'affiche, donnant accès aux options du script ainsi qu'à certaines de ses fonctionnalités.`;
     public readonly extension_final_text: string = '\n' + $localize`Une fois l'extension installée, il faudra rafraîchir la page du jeu. Vous verrez alors apparaitre un nouveau bouton en haut de votre page MyHordes. Au survol, une fenêtre s'affiche, donnant accès aux options du script ainsi qu'à certaines de ses fonctionnalités.`;
-
-    public constructor(private clipboard: ClipboardService, @Inject(DOCUMENT) private document: Document) {
-
-    }
 
     public copyUrl(): void {
         const url: string = this.document.location.href;

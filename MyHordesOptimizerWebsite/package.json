@@ -2,8 +2,8 @@
     "name": "my-hordes-optimizer-website",
     "version": "0.0.0",
     "engines": {
-        "node": ">=20.14.0",
-        "npm": ">=10.7.0"
+        "node": ">=24.15.0",
+        "npm": ">=11.12.1"
     },
     "scripts": {
         "ng": "ng",

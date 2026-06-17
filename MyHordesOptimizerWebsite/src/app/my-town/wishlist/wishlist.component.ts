@@ -9,8 +9,9 @@ import {
     EventEmitter,
     inject,
     OnInit,
+    Signal,
     signal,
-    ViewChild,
+    viewChild,
     WritableSignal
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -72,13 +73,13 @@ export class WishlistComponent implements OnInit {
     private readonly wishlist_services: WishlistService = inject(WishlistService);
     private readonly destroy_ref: DestroyRef = inject(DestroyRef);
 
-    @ViewChild(MatSort) sort!: MatSort;
-    @ViewChild(MatTable) table!: MatTable<WishlistItem>;
-    @ViewChild('addItemSelect') add_item_select!: SelectComponent<Item>;
+    protected readonly sort: Signal<MatSort | undefined> = viewChild(MatSort);
+    protected readonly table: Signal<MatTable<WishlistItem> | undefined> = viewChild(MatTable);
+    protected readonly add_item_select: Signal<SelectComponent<Item> | undefined> = viewChild<SelectComponent<Item>>('addItemSelect');
 
-    public readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
-    public readonly locale: string = moment.locale();
-    public readonly columns: StandardColumn[] = [
+    protected readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
+    protected readonly locale: string = moment.locale();
+    protected readonly columns: StandardColumn[] = [
         {id: 'sort', header: '', displayed: (): boolean => this.edition_mode()},
         {id: 'name', header: $localize`Objet`, sticky: true},
         {id: 'heaver', header: ''},
@@ -91,18 +92,18 @@ export class WishlistComponent implements OnInit {
         {id: 'should_signal', header: $localize`Signaler`},
         {id: 'delete', header: '', displayed: (): boolean => this.edition_mode()},
     ];
-    public readonly depots: WishlistDepot[] = WishlistDepot.getAllValues();
+    protected readonly depots: WishlistDepot[] = WishlistDepot.getAllValues();
 
-    public wishlist_info: WritableSignal<WishlistInfo | null> = signal(null);
-    public items: WritableSignal<Item[]> = signal([]);
-    public edition_mode: WritableSignal<boolean> = signal(JSON.parse(localStorage.getItem(WISHLIST_EDITION_MODE_KEY) || 'false'));
-    public drag_disabled: WritableSignal<boolean> = signal(true);
-    public wishlist_filters: WritableSignal<WishlistFilters> = signal({items: '', depot: []});
-    public current_zone_xp_pa_add_item: WritableSignal<number> = signal(0);
+    protected wishlist_info: WritableSignal<WishlistInfo | null> = signal(null);
+    protected items: WritableSignal<Item[]> = signal([]);
+    protected edition_mode: WritableSignal<boolean> = signal(JSON.parse(localStorage.getItem(WISHLIST_EDITION_MODE_KEY) || 'false'));
+    protected drag_disabled: WritableSignal<boolean> = signal(true);
+    protected wishlist_filters: WritableSignal<WishlistFilters> = signal({items: '', depot: []});
+    protected current_zone_xp_pa_add_item: WritableSignal<number> = signal(0);
 
-    public datasource: MatTableDataSource<WishlistItem> = new MatTableDataSource();
+    protected datasource: MatTableDataSource<WishlistItem> = new MatTableDataSource();
 
-    public wishlist_filters_change: EventEmitter<void> = new EventEmitter();
+    protected wishlist_filters_change: EventEmitter<void> = new EventEmitter();
 
     private readonly auto_save$: Subject<WishlistInfo> = new Subject();
 
@@ -125,10 +126,15 @@ export class WishlistComponent implements OnInit {
             const info: WishlistInfo | null = this.wishlist_info();
             this.datasource.data = info ? [...info.wishlist_items] : [];
         });
+        effect(() => {
+            const sortInstance: MatSort | undefined = this.sort();
+            if (sortInstance) {
+                this.datasource.sort = sortInstance;
+            }
+        });
     }
 
     public ngOnInit(): void {
-        this.datasource.sort = this.sort;
 
         this.auto_save$
             .pipe(
@@ -210,11 +216,14 @@ export class WishlistComponent implements OnInit {
         this.wishlist_services.addItemToWishlist(item, this.current_zone_xp_pa_add_item())
             .pipe(takeUntilDestroyed(this.destroy_ref))
             .subscribe((): void => {
-                this.add_item_select.value = undefined;
-                if (this.add_item_select.filter_input()) {
-                    (<MatInput>this.add_item_select.filter_input()).value = '';
+                if (this.add_item_select()) {
+                    const add_item_select: SelectComponent<Item> = this.add_item_select() as SelectComponent<Item>;
+                    add_item_select.value = undefined;
+                    if (add_item_select.filter_input()) {
+                        (<MatInput>add_item_select.filter_input()).value = '';
+                    }
+                    this.getWishlist();
                 }
-                this.getWishlist();
             });
     }
 

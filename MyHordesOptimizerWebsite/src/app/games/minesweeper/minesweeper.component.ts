@@ -24,7 +24,6 @@ const material_modules: Imports = [MatButtonModule, MatCardModule, MatFormFieldM
     selector: 'mho-minesweeper',
     templateUrl: 'minesweeper.component.html',
     styleUrls: ['minesweeper.component.scss'],
-    host: {style: 'display: contents'},
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [...angular_common, ...components, ...material_modules, ...pipes, CounterFromDatePipe, DiffBetweenDatesPipe, MatCheckbox]
 })
@@ -38,6 +37,8 @@ export class MinesweeperComponent implements OnInit {
     protected seed: WritableSignal<number | undefined> = signal(Math.floor(Math.random() * 0xFFFFFFFF));
     protected random_seed: WritableSignal<boolean> = signal(true);
 
+    protected readonly Math: Math = Math;
+
     protected sizes_list: Signal<MinesweeperSize[]> = signal([
         {id: 'small', label: $localize`Facile`, height: 9, width: 9, mines: 10},
         {id: 'medium', label: $localize`Moyen`, height: 16, width: 16, mines: 40, default: true},
@@ -48,18 +49,34 @@ export class MinesweeperComponent implements OnInit {
     ]);
     protected selected_size: WritableSignal<MinesweeperSize> = signal(this.sizes_list().find((size: MinesweeperSize) => size.default) ?? this.sizes_list()[0]);
 
-    protected themes_list: Signal<MinesweeperTheme[]> = signal([
-        {id: 'legacy', label: $localize`Classique`, default: true},
-        {id: 'myhordes', label: `MyHordes`}
-    ]);
-    protected selected_theme: WritableSignal<MinesweeperTheme> = signal(this.themes_list().find((theme: MinesweeperTheme) => theme.default) ?? this.themes_list()[0]);
+    protected selected_theme: WritableSignal<'legacy' | 'myhordes'> = signal('legacy');
+    private preloadLinks: WritableSignal<HTMLLinkElement[]> = signal([]);
 
     public ngOnInit(): void {
         this.resetGame();
+
+        const images: string[] = [
+            'img/minesweeper/bomb.png', 'img/minesweeper/bombflagged.png', 'img/minesweeper/bombquestion.png', 'img/minesweeper/nobomb.png',
+            'img/minesweeper/smile.png', 'img/minesweeper/lose.png', 'img/minesweeper/win.png',
+            ...Array.from({length: 8}, (_, i) => `img/minesweeper/adjacent_${i + 1}.png`),
+            ...Array.from({length: 10}, (_, i) => `img/minesweeper/timer_${i}.png`),
+        ];
+
+        this.preloadLinks.set(images.map((name: string) => {
+            const link: HTMLLinkElement = document.createElement('link');
+            link.rel = 'preload';
+            link.as = 'image';
+            link.href = name;
+            document.head.appendChild(link);
+            return link;
+        }));
     }
 
-    protected changeTheme(new_selected_theme: MinesweeperTheme): void {
-        this.selected_theme.set(new_selected_theme);
+    public ngOnDestroy(): void {
+        this.preloadLinks.update((links: HTMLLinkElement[]) => {
+            links.forEach((link: HTMLLinkElement) => link.remove());
+            return links;
+        })
     }
 
     protected resetGame(new_selected_size?: Partial<MinesweeperSize>): void {
@@ -245,7 +262,7 @@ export class MinesweeperComponent implements OnInit {
     }
 
     protected highlightAdjacentCells(i: number, j: number, event: MouseEvent): void {
-        if (event.button !== 0 || !this.board()[i][j].is_revealed || this.board()[i][j].adjacent_mines === 0) return;
+        if (event.button !== 0 || !this.board()[i][j].is_revealed || this.board()[i][j].adjacent_mines === 0 || this.game_over()) return;
 
         this.board.update((board: Cell[][]) => {
             board[i][j].is_highlighted = true;
@@ -288,7 +305,6 @@ export class MinesweeperComponent implements OnInit {
         return this.seed() as number;
     }
 
-    protected readonly Math = Math;
 }
 
 interface Cell {
@@ -299,12 +315,6 @@ interface Cell {
     is_questioned: boolean;
     is_highlighted: boolean;
     is_game_over: boolean;
-}
-
-interface MinesweeperTheme {
-    id: string;
-    label: string;
-    default?: boolean;
 }
 
 interface MinesweeperSize {

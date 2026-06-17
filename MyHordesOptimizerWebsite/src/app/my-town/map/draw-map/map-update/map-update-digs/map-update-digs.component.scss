@@ -1,16 +1,20 @@
-.mho-map-update-digs {
+:host {
+    display: contents;
 
-}
+    .mho-map-update-digs {
+
+    }
 
 
-.mho-add-citizen-list {
-    max-height: 300px;
+    .mho-add-citizen-list {
+        max-height: 300px;
 
-    > * {
-        cursor: pointer;
+        > * {
+            cursor: pointer;
 
-        img {
-            margin-right: 0.5em;
+            img {
+                margin-right: 0.5em;
+            }
         }
     }
 }

@@ -1,5 +1,5 @@
 import { CommonModule, NgOptimizedImage } from '@angular/common';
-import { Component, input, Input, InputSignal, ViewEncapsulation } from '@angular/core';
+import { Component, input, Input, InputSignal } from '@angular/core';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import moment from 'moment';
 import { HORDES_IMG_REPO } from '../../../../_abstract_model/const';
@@ -19,8 +19,6 @@ const material_modules: Imports = [MatSlideToggleModule];
     selector: 'mho-registry-bank-diff',
     templateUrl: './bank-diff-registry.component.html',
     styleUrls: ['./bank-diff-registry.component.scss'],
-    encapsulation: ViewEncapsulation.None,
-    host: {style: 'display: contents'},
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class BankDiffRegistryComponent {
@@ -29,6 +27,8 @@ export class BankDiffRegistryComponent {
     public displayPseudo: InputSignal<DisplayPseudoMode> = input.required();
     public completeItemsList: InputSignal<Item[]> = input.required();
 
+    // TODO: Skipped for migration because:
+    //  Accessor inputs cannot be migrated as they are too complex.
     @Input({required: true}) set registry(registry: Entry[] | undefined) {
         if (registry) {
             this.entries = registry.filter((entry: Entry) => {

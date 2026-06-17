@@ -9,7 +9,8 @@ import {
     OnInit,
     output,
     OutputEmitterRef,
-    ViewChild
+    Signal,
+    viewChild
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -27,12 +28,11 @@ const material_modules: Imports = [MatButtonModule, MatFormFieldModule, MatIconM
     selector: 'mho-header-with-number-previous-next-filter',
     templateUrl: './header-with-number-previous-next-filter.component.html',
     styleUrls: ['./header-with-number-previous-next-filter.component.scss'],
-    host: {style: 'display: contents'},
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class HeaderWithNumberPreviousNextFilterComponent implements OnInit {
 
-    @ViewChild('filter') filter!: ElementRef<HTMLInputElement>;
+    readonly filter: Signal<ElementRef<HTMLInputElement>> = viewChild.required<ElementRef<HTMLInputElement>>('filter');
 
     public header: InputSignal<string> = input('');
     public textAlign: InputSignal<string> = input('left');
@@ -54,7 +54,7 @@ export class HeaderWithNumberPreviousNextFilterComponent implements OnInit {
     public displayFilter(): void {
         this.visible = true;
         setTimeout(() => {
-            this.filter.nativeElement.focus();
+            this.filter().nativeElement.focus();
         });
     }
 

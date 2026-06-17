@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatTabsModule } from '@angular/material/tabs';
 import { Router, RouterLink, RouterOutlet } from '@angular/router';
@@ -15,10 +15,11 @@ const material_modules: Imports = [MatCardModule, MatTabsModule];
     selector: 'mho-citizens',
     templateUrl: './citizens.component.html',
     styleUrls: ['./citizens.component.scss'],
-    host: {style: 'display: contents'},
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class CitizensComponent {
+    protected router: Router = inject(Router);
+
 
     protected links: Link[] = [
         {
@@ -47,10 +48,6 @@ export class CitizensComponent {
             displayed: !environment.production
         }
     ];
-
-    constructor(protected router: Router) {
-
-    }
 }
 
 interface Link {

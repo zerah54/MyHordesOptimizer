@@ -1,6 +1,6 @@
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { CommonModule } from '@angular/common';
-import { Component, DestroyRef, HostListener, inject, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, DestroyRef, HostListener, inject, OnInit } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -37,11 +37,10 @@ const material_modules: Imports = [MatButtonModule, MatCardModule, MatCheckboxMo
     selector: 'mho-map',
     templateUrl: './map.component.html',
     styleUrls: ['./map.component.scss'],
-    encapsulation: ViewEncapsulation.None,
-    host: {style: 'display: contents'},
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class MapComponent implements OnInit {
+    private readonly breakpoint_observer: BreakpointObserver = inject(BreakpointObserver);
 
     /** La carte de la ville */
     public map!: Town;
@@ -74,11 +73,6 @@ export class MapComponent implements OnInit {
     @HostListener('window:resize', ['$event'])
     onResize(): void {
         this.is_gt_xs = this.breakpoint_observer.isMatched(BREAKPOINTS['gt-xs']);
-    }
-
-
-    constructor(private breakpoint_observer: BreakpointObserver) {
-
     }
 
     ngOnInit(): void {

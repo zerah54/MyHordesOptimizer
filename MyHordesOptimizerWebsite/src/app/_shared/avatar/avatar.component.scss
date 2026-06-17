@@ -1,15 +1,19 @@
 @use '../../../../public/scss/variables';
 
-.mho-avatar {
+:host {
     display: contents;
 
-    > * {
-        width: 100px;
-    }
+    .mho-avatar {
+        display: contents;
 
-    &.rounded {
         > * {
-            transform: scale(0.35) translateX(-110%) translateY(-95%);
+            width: 100px;
+        }
+
+        &.rounded {
+            > * {
+                transform: scale(0.35) translateX(-110%) translateY(-95%);
+            }
         }
     }
 }

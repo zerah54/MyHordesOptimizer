@@ -1,6 +1,6 @@
 import { animate, style, transition, trigger } from '@angular/animations';
-import { CommonModule, DecimalPipe, NgClass, NgOptimizedImage } from '@angular/common';
-import { Component, DestroyRef, inject, input, InputSignal, output, OutputEmitterRef, ViewEncapsulation } from '@angular/core';
+import { CommonModule, DecimalPipe, NgOptimizedImage } from '@angular/common';
+import { Component, DestroyRef, inject, input, InputSignal, output, OutputEmitterRef } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatDialog } from '@angular/material/dialog';
 import moment from 'moment';
@@ -21,7 +21,7 @@ import { ScrutBorderBottom, ScrutBorderLeft, ScrutBorderRight, ScrutBorderTop } 
 import { TrashLevelPipe } from './pipes/trash-level.pipe';
 import { TrashValuePipe } from './pipes/trash-value.pipe';
 
-const angular_common: Imports = [CommonModule, NgClass, NgOptimizedImage];
+const angular_common: Imports = [CommonModule, NgOptimizedImage];
 const components: Imports = [
     DistBorderBottom, DistBorderLeft, DistBorderRight, DistBorderTop,
     ScrutBorderBottom, ScrutBorderLeft, ScrutBorderRight, ScrutBorderTop];
@@ -32,8 +32,6 @@ const material_modules: Imports = [];
     selector: 'mho-map-cell',
     templateUrl: './map-cell.component.html',
     styleUrls: ['./map-cell.component.scss', '../draw-map.component.scss'],
-    encapsulation: ViewEncapsulation.None,
-    host: {style: 'display: contents'},
     animations: [
         trigger('toggleCurrentCell', [
             transition(':enter', [
@@ -49,6 +47,8 @@ const material_modules: Imports = [];
     imports: [...angular_common, ...components, ...material_modules, ...pipes, MapCellTooltipDirective]
 })
 export class MapCellComponent {
+    private readonly dialog: MatDialog = inject(MatDialog);
+
 
     public cell: InputSignal<Cell> = input.required();
     public drawedMap: InputSignal<Cell[][]> = input.required();
@@ -64,10 +64,6 @@ export class MapCellComponent {
     public readonly locale: string = moment.locale();
 
     private readonly destroy_ref: DestroyRef = inject(DestroyRef);
-
-    constructor(private dialog: MatDialog) {
-
-    }
 
     public openCellUpdate(): void {
         this.dialog

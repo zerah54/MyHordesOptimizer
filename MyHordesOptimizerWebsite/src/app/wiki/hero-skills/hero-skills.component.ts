@@ -1,5 +1,6 @@
 import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { Component, DestroyRef, inject, OnInit } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatCardModule } from '@angular/material/card';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatSortModule } from '@angular/material/sort';
@@ -11,7 +12,6 @@ import { ApiService } from '../../_abstract_model/services/api.service';
 import { Imports } from '../../_abstract_model/types/_types';
 import { HeroSkill } from '../../_abstract_model/types/hero-skill.class';
 import { NewHeroSkill, skills } from './temp-hero-skills.const';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 const angular_common: Imports = [CommonModule, NgOptimizedImage];
 const components: Imports = [];
@@ -22,7 +22,6 @@ const material_modules: Imports = [MatCardModule, MatSortModule, MatTableModule,
     selector: 'mho-hero-skills',
     templateUrl: './hero-skills.component.html',
     styleUrls: ['./hero-skills.component.scss'],
-    host: { style: 'display: contents' },
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class HeroSkillsComponent implements OnInit {

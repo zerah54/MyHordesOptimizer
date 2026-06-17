@@ -1,5 +1,5 @@
-import { CommonModule, NgClass } from '@angular/common';
-import { Component, DestroyRef, ElementRef, inject, OnInit, ViewChild } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { Component, DestroyRef, ElementRef, inject, OnInit, Signal, viewChild } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatSortModule } from '@angular/material/sort';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
@@ -14,7 +14,7 @@ import { groupBy } from '../../../_core/utilities/array.util';
 
 // import ChartDataLabels, { Context } from 'chartjs-plugin-datalabels';
 
-const angular_common: Imports = [CommonModule, NgClass];
+const angular_common: Imports = [CommonModule];
 const components: Imports = [];
 const pipes: Imports = [ColumnIdPipe];
 const material_modules: Imports = [MatSortModule, MatTableModule];
@@ -23,26 +23,25 @@ const material_modules: Imports = [MatSortModule, MatTableModule];
     selector: 'mho-scrutateur',
     templateUrl: './scrutateur.component.html',
     styleUrls: ['./scrutateur.component.scss'],
-    host: {style: 'display: contents'},
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class ScrutateurComponent implements OnInit {
 
-    @ViewChild('pieCanvas') pie_canvas!: ElementRef;
-    @ViewChild('polarCanvas') polar_canvas!: ElementRef;
+    protected readonly pie_canvas: Signal<ElementRef> = viewChild.required<ElementRef>('pieCanvas');
+    protected readonly polar_canvas: Signal<ElementRef> = viewChild.required<ElementRef>('polarCanvas');
 
     /** La datasource pour le tableau */
-    public datasource: MatTableDataSource<Regen> = new MatTableDataSource();
+    protected datasource: MatTableDataSource<Regen> = new MatTableDataSource();
     /** La liste des colonnes */
-    public columns: StandardColumn[] = [
+    protected columns: StandardColumn[] = [
         {id: 'day', header: $localize`Jour`, sticky: true},
         {id: 'direction_regen', header: $localize`Direction`, class: ''},
         {id: 'level_regen', header: $localize`Niveau`, class: ''},
         {id: 'taux_regen', header: $localize`Taux`, class: ''}
     ];
 
-    public polar_chart!: Chart<'polarArea'>;
-    public pie_chart!: Chart<'pie'>;
+    protected polar_chart!: Chart<'polarArea'>;
+    protected pie_chart!: Chart<'pie'>;
 
     private all_zones_regen: Direction[] = (<Direction[]>Direction.getAllValues()).sort((zone_a: Direction, zone_b: Direction) => {
         return zone_a.value.order_by - zone_b.value.order_by;
@@ -51,7 +50,7 @@ export class ScrutateurComponent implements OnInit {
     private town_statistics_service: TownStatisticsService = inject(TownStatisticsService);
     private readonly destroy_ref: DestroyRef = inject(DestroyRef);
 
-    ngOnInit(): void {
+    public ngOnInit(): void {
         this.town_statistics_service
             .getScrutList()
             .pipe(takeUntilDestroyed(this.destroy_ref))
@@ -67,7 +66,7 @@ export class ScrutateurComponent implements OnInit {
                 polar_data = polar_data.map((_data: number, index: number) => {
                     return regens_for_polar.filter((regen: Regen): boolean => regen.direction_regen?.value.order_by === index + 1).length;
                 });
-                const polar_ctx: CanvasRenderingContext2D = this.polar_canvas.nativeElement.getContext('2d');
+                const polar_ctx: CanvasRenderingContext2D = this.polar_canvas().nativeElement.getContext('2d');
                 this.polar_chart = new Chart<'polarArea'>(polar_ctx, {
                     type: 'polarArea',
                     data: {
@@ -112,7 +111,7 @@ export class ScrutateurComponent implements OnInit {
                     pie_data.push(regen.length);
                 });
 
-                const pie_ctx: CanvasRenderingContext2D = this.pie_canvas.nativeElement.getContext('2d');
+                const pie_ctx: CanvasRenderingContext2D = this.pie_canvas().nativeElement.getContext('2d');
                 this.pie_chart = new Chart<'pie'>(pie_ctx, {
                     type: 'pie',
                     data: {
@@ -145,7 +144,7 @@ export class ScrutateurComponent implements OnInit {
             });
     }
 
-    public groupByDiago(item: Regen): string {
+    protected groupByDiago(item: Regen): string {
         return (<Direction>item.direction_regen).value.diag + '';
     }
 }

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
@@ -17,10 +17,10 @@ const material_modules: Imports = [MatButtonModule, MatCardModule, MatIconModule
     selector: 'mho-tuto-script-alerts',
     templateUrl: './tuto-script-alerts.component.html',
     styleUrls: ['./tuto-script-alerts.component.scss'],
-    host: {style: 'display: contents'},
     imports: [...angular_common, ...components, ...material_modules, ...pipes],
 })
 export class TutoScriptAlertsComponent {
+    private readonly clipboard: ClipboardService = inject(ClipboardService);
 
     public readonly title: string = $localize`Notifications`;
 
@@ -42,10 +42,6 @@ export class TutoScriptAlertsComponent {
             content: $localize`Si vous cochez l'option "Me notifier si je reçois un nouveau message", vous recevrez une notification de votre navigateur lors d'un changement dans votre compteur de messages reçus.`
         },
     ];
-
-    public constructor(private clipboard: ClipboardService) {
-
-    }
 
     public copyUrl(): void {
         const url: string = window.location.href;

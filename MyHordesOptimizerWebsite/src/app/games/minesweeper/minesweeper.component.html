@@ -4,8 +4,8 @@
 
         @if (false) {
             <mat-slide-toggle
-                [checked]="selected_theme().id === 'legacy'"
-                (change)="changeTheme($event.checked ? themes_list()[0] : themes_list()[1])">
+                [checked]="selected_theme() === 'legacy'"
+                (change)="selected_theme.set($event.checked ? 'legacy' : 'myhordes')">
                 <ng-container i18n>Thème Windows</ng-container>
             </mat-slide-toggle>
         }
@@ -65,37 +65,27 @@
 </mat-card-header>
 
 <mat-card-content class="mho-minesweeper">
-    <div class="game-container" [ngClass]="selected_theme().id">
+    <div class="game-container" [class]="selected_theme()">
         <div class="game-header">
             <div class="remain-mines">
                 <div>
                     @for (digit of Math.max(remaining_mines(), 0).toString().split(''); track $index) {
-                        <img [src]="`img/minesweeper/${digit}-minesweeper.png`">
+                        <img [src]="`img/minesweeper/timer_${digit}.png`">
                     }
                 </div>
             </div>
             <div class="state"
-                 [ngClass]="{
-                    'lose': game_over() && remaining_mines() > 0,
-                    'play': !game_over(),
-                    'win': game_over() && remaining_mines() === 0,
-                    'clicked': ''
-                 }"
+                 [class.lose]="game_over() && remaining_mines() > 0"
+                 [class.play]="!game_over()"
+                 [class.win]="game_over() && remaining_mines() === 0"
                  (click)="resetGame()"
             >
             </div>
             <div class="timer">
                 <div>
-                    @if (!end_time()) {
-                        @let timer = start_time() | counterFromDate | async;
-                        @for (digit of timer?.toString()?.split('') ?? [0]; track $index) {
-                            <img [src]="`img/minesweeper/${digit}-minesweeper.png`">
-                        }
-                    } @else {
-                        @let timer = start_time() | diffBetweenDates:end_time();
-                        @for (digit of timer?.toString()?.split('') ?? [0]; track $index) {
-                            <img [src]="`img/minesweeper/${digit}-minesweeper.png`">
-                        }
+                    @let timer = end_time() ? (start_time() | diffBetweenDates:end_time()) : (start_time() | counterFromDate | async);
+                    @for (digit of timer?.toString()?.split('') ?? [0]; track $index) {
+                        <img [src]="`img/minesweeper/timer_${digit}.png`">
                     }
                 </div>
             </div>
@@ -104,22 +94,39 @@
             @for (row of board(); track i; let i = $index) {
                 <div class="row">
                     @for (cell of row; track j; let j = $index) {
-                        <div [ngClass]="{
-                                'cell': true,
-                                'revealed': cell.is_revealed,
-                                'flagged': cell.is_flagged,
-                                'questioned': cell.is_questioned,
-                                'highlighted': cell.is_highlighted,
-                                'mined': cell.is_mine && !cell.is_flagged && game_over(),
-                                'game-over': cell.is_mine && cell.is_game_over && game_over(),
-                                'no-bomb': !cell.is_mine && cell.is_flagged && game_over()
-                             }"
-                             [class]="cell.is_revealed && !cell.is_flagged && !cell.is_mine ? 'revealed-' + cell.adjacent_mines : ''"
+                        <div [class]="'cell' + (cell.is_revealed && !cell.is_flagged && !cell.is_mine ? ' revealed-' + cell.adjacent_mines : '')"
+                             [class.revealed]="cell.is_revealed"
+                             [class.flagged]="cell.is_flagged"
+                             [class.questioned]="cell.is_questioned"
+                             [class.highlighted]="cell.is_highlighted"
+                             [class.mined]="cell.is_mine && !cell.is_flagged && game_over()"
+                             [class.game-over]="cell.is_mine && cell.is_game_over && game_over()"
+                             [class.no-bomb]="!cell.is_mine && cell.is_flagged && game_over()"
                              (click)="revealCell(i, j)"
                              (contextmenu)="cycleMarker(i, j, $event)"
                              (mousedown)="highlightAdjacentCells(i, j, $event)"
                              (mouseup)="unhighlightCells()"
                              (mouseleave)="unhighlightCells()">
+                            @if (cell.is_revealed && cell.adjacent_mines > 0) {
+                                <img [src]="`img/minesweeper/adjacent_${cell.adjacent_mines}.png`">
+                            }
+                            @if (game_over()) {
+                                @if (cell.is_mine) {
+                                    @if (cell.is_flagged) {
+                                        <img src="img/minesweeper/bombflagged.png">
+                                    } @else {
+                                        <img src="img/minesweeper/bomb.png">
+                                    }
+                                } @else if (cell.is_flagged) {
+                                    <img src="img/minesweeper/nobomb.png">
+                                }
+                            } @else {
+                                @if (cell.is_flagged) {
+                                    <img src="img/minesweeper/bombflagged.png">
+                                } @else if (cell.is_questioned) {
+                                    <img src="img/minesweeper/bombquestion.png">
+                                }
+                            }
                         </div>
                     }
                 </div>

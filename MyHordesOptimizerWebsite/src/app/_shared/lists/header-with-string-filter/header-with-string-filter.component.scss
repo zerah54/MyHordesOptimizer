@@ -1,23 +1,27 @@
-.mho-header-with-filter {
+:host {
+    display: contents;
 
-    > div {
-        display: flex;
-        align-items: center;
-    }
+    .mho-header-with-filter {
 
-    .open-menu-icon {
-        width: unset !important;
-        height: unset !important;
-        overflow: visible !important;
-        font-size: 16px !important;
-        cursor: pointer;
-
-        &.hidden {
-            display: none;
+        > div {
+            display: flex;
+            align-items: center;
         }
-    }
 
-    .mat-mdc-form-field {
-        width: 100%;
+        .open-menu-icon {
+            width: unset !important;
+            height: unset !important;
+            overflow: visible !important;
+            font-size: 16px !important;
+            cursor: pointer;
+
+            &.hidden {
+                display: none;
+            }
+        }
+
+        .mat-mdc-form-field {
+            width: 100%;
+        }
     }
 }

@@ -1,10 +1,14 @@
-.mho-citizens {
+:host {
+    display: contents;
 
-    display: flex;
-    flex-direction: column;
+    .mho-citizens {
 
-    .mat-mdc-tab-nav-panel {
-        flex: 1;
-        overflow: auto;
+        display: flex;
+        flex-direction: column;
+
+        .mat-mdc-tab-nav-panel {
+            flex: 1;
+            overflow: auto;
+        }
     }
 }

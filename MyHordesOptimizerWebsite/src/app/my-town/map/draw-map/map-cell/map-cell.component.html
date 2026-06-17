@@ -1,11 +1,11 @@
 <td #cellHtml class="cell map-cell" [class.town]="cell().is_town" [class.visited-today]="cell().is_visited_today"
     [class.never-visited]="cell().is_never_visited"
-    [ngClass]="[
-        options().map_type === 'danger' ? 'danger-' + cell().danger_level : '',
-        options().map_type === 'digs' ? 'dig-' + (cell() | digLevel:options()) : '',
-        options().map_type === 'trash' ? 'trash-' + ((cell() | trashValue:options():allItems())|trashLevel) : '',
-        cell().zone_regen ? cell().zone_regen?.value?.class : ''
-    ]"
+    [class]="`
+        ${options().map_type === 'danger' ? 'danger-' + cell().danger_level : ''}
+        ${options().map_type === 'digs' ? 'dig-' + (cell() | digLevel:options()) : ''}
+        ${options().map_type === 'trash' ? 'trash-' + ((cell() | trashValue:options():allItems())|trashLevel) : ''}
+        ${cell().zone_regen ? cell().zone_regen?.value?.class : ''}
+    `"
     [mapCellTooltip]="cell()"
     [mapCellTooltipAllItems]="allItems()"
     [mapCellTooltipAllCitizens]="allCitizens()"

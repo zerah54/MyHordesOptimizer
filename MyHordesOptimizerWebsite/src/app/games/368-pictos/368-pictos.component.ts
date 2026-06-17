@@ -15,7 +15,6 @@ const material_modules: Imports = [ MatCardModule, DragDropModule ];
     selector: 'mho-368-pictos',
     templateUrl: '368-pictos.component.html',
     styleUrls: [ '368-pictos.component.scss' ],
-    host: {style: 'display: contents'},
     imports: [ ...angular_common, ...components, ...material_modules, ...pipes ]
 })
 export class PictosGameComponent {

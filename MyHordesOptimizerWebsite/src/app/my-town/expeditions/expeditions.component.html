@@ -72,7 +72,7 @@
                             }
                             <mat-accordion class="content" [multi]="true">
                                 @for (expedition of expeditions(); track expedition.id) {
-                                    <mat-expansion-panel [ngClass]="['expedition', expedition.state]"
+                                    <mat-expansion-panel class="expedition" [class]="expedition.state"
                                                          [expanded]="isDefaultExpanded(expedition)">
                                         <mat-expansion-panel-header class="header">
                                             <div class="label">

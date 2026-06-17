@@ -1,4 +1,4 @@
-import { Component, DOCUMENT, Inject } from '@angular/core';
+import { Component, DOCUMENT, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
@@ -17,10 +17,11 @@ const material_modules: Imports = [MatButtonModule, MatCardModule, MatIconModule
     selector: 'mho-tuto-script-display',
     templateUrl: './tuto-script-display.component.html',
     styleUrls: ['./tuto-script-display.component.scss'],
-    host: {style: 'display: contents'},
     imports: [...angular_common, ...components, ...material_modules, ...pipes],
 })
 export class TutoScriptDisplayComponent {
+    private readonly clipboard: ClipboardService = inject(ClipboardService);
+    private readonly document: Document = inject<Document>(DOCUMENT);
 
     public readonly title: string = $localize`Affichage`;
 
@@ -98,10 +99,6 @@ export class TutoScriptDisplayComponent {
                 Vous pourrez ainsi choisir quelles options vous voulez voir cochées ou non par défaut quand vous activez votre escorte.`
         },
     ];
-
-    public constructor(private clipboard: ClipboardService, @Inject(DOCUMENT) private document: Document) {
-
-    }
 
     public copyUrl(): void {
         const url: string = this.document.location.href;

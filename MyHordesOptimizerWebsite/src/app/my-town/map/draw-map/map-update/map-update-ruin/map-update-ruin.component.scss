@@ -1,16 +1,20 @@
-.mho-map-update-ruin {
-    .drops {
-        display: flex;
-        flex-wrap: wrap;
+:host {
+    display: contents;
 
-        >div {
-            width: 50%;
-            white-space: nowrap;
+    .mho-map-update-ruin {
+        .drops {
+            display: flex;
+            flex-wrap: wrap;
+
+            > div {
+                width: 50%;
+                white-space: nowrap;
+            }
         }
-    }
 
-    .ruin-info {
-        display: flex;
-        justify-content: space-between;
+        .ruin-info {
+            display: flex;
+            justify-content: space-between;
+        }
     }
 }

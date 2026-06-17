@@ -1,12 +1,12 @@
 import { CommonModule } from '@angular/common';
-import { Component, DestroyRef, inject, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit, Signal, viewChild } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSort, MatSortModule } from '@angular/material/sort';
-import { MatTable, MatTableModule } from '@angular/material/table';
+import { MatTableModule } from '@angular/material/table';
 import moment from 'moment';
 import { HORDES_IMG_REPO } from '../../../_abstract_model/const';
 import { JobEnum } from '../../../_abstract_model/enum/job.enum';
@@ -27,14 +27,11 @@ const material_modules: Imports = [MatCheckboxModule, MatDividerModule, MatFormF
     selector: 'mho-citizens-immune',
     templateUrl: './citizens-immune.component.html',
     styleUrls: ['./citizens-immune.component.scss'],
-    encapsulation: ViewEncapsulation.None,
-    host: { style: 'display: contents' },
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class CitizensImmuneComponent implements OnInit {
 
-    @ViewChild(MatSort) sort!: MatSort;
-    @ViewChild(MatTable) table!: MatTable<Citizen>;
+    protected readonly sort: Signal<MatSort> = viewChild.required(MatSort);
 
     /** La liste des citoyens */
     public citizen_info!: CitizenInfo;

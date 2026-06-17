@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, input, InputSignal, ViewEncapsulation } from '@angular/core';
+import { Component, Input, input, InputSignal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import moment, { Moment } from 'moment';
@@ -24,8 +24,6 @@ const material_modules: Imports = [MatFormFieldModule];
     selector: 'mho-registry-digs',
     templateUrl: './digs-registry.component.html',
     styleUrls: ['./digs-registry.component.scss'],
-    encapsulation: ViewEncapsulation.None,
-    host: {style: 'display: contents'},
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class DigsRegistryComponent {
@@ -33,6 +31,8 @@ export class DigsRegistryComponent {
     public completeCitizenList: InputSignal<CitizenInfo> = input.required();
     public displayPseudo: InputSignal<DisplayPseudoMode> = input.required();
 
+    // TODO: Skipped for migration because:
+    //  Accessor inputs cannot be migrated as they are too complex.
     @Input({required: true}) set registry(registry: Entry[] | undefined) {
         this.current_day = getTown()?.day || 1;
 
