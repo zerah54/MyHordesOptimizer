@@ -1252,7 +1252,7 @@
           <context context-type="linenumber">11</context>
         </context-group>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
+          <context context-type="sourcefile">src/app/tools/camping/admin.component.html</context>
           <context context-type="linenumber">153</context>
         </context-group>
         <target state="final">Ausbauten</target>
@@ -1668,7 +1668,7 @@
           <context context-type="linenumber">137</context>
         </context-group>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
+          <context context-type="sourcefile">src/app/tools/camping/admin.component.html</context>
           <context context-type="linenumber">36</context>
         </context-group>
         <target state="final">Beruf</target>
@@ -2052,7 +2052,7 @@
           <context context-type="linenumber">26</context>
         </context-group>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
+          <context context-type="sourcefile">src/app/tools/camping/admin.component.html</context>
           <context context-type="linenumber">119</context>
         </context-group>
         <target state="final">Gebäude</target>
@@ -3433,12 +3433,12 @@
         <target state="final">Abmelden</target>
       </trans-unit>
       <trans-unit id="8092922417891540912" datatype="html">
-        <source>Cette page peut contenir des spoils de la saison 17</source>
+        <source>Cette page peut contenir des spoils de la saison 19</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/structure/menu/menu.component.html</context>
           <context context-type="linenumber">74</context>
         </context-group>
-        <target state="needs-translation">Cette page peut contenir des spoils de la saison 17</target>
+        <target state="needs-translation">Cette page peut contenir des spoils de la saison 19</target>
       </trans-unit>
       <trans-unit id="1687689412386216543" datatype="html" approved="yes">
         <source>Par défaut</source>
@@ -3487,11 +3487,11 @@
           <context context-type="linenumber">143</context>
         </context-group>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/tools/tools.routes.ts</context>
+          <context context-type="sourcefile">src/app/tools/admin.routes.ts</context>
           <context context-type="linenumber">7</context>
         </context-group>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/tools/tools.routes.ts</context>
+          <context context-type="sourcefile">src/app/tools/admin.routes.ts</context>
           <context context-type="linenumber">11</context>
         </context-group>
         <context-group purpose="location">
@@ -3511,11 +3511,11 @@
           <context context-type="linenumber">102</context>
         </context-group>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
+          <context context-type="sourcefile">src/app/tools/camping/admin.component.html</context>
           <context context-type="linenumber">3</context>
         </context-group>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/tools/tools.routes.ts</context>
+          <context context-type="sourcefile">src/app/tools/admin.routes.ts</context>
           <context context-type="linenumber">7</context>
         </context-group>
         <context-group purpose="location">
@@ -3539,7 +3539,7 @@
           <context context-type="linenumber">85</context>
         </context-group>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/tools/tools.routes.ts</context>
+          <context context-type="sourcefile">src/app/tools/admin.routes.ts</context>
           <context context-type="linenumber">11</context>
         </context-group>
         <target state="final">Überlebenschancen</target>
@@ -3956,7 +3956,7 @@
       <trans-unit id="611594206241884293" datatype="html" approved="yes">
         <source>Copier le lien de la simulation</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
+          <context context-type="sourcefile">src/app/tools/camping/admin.component.html</context>
           <context context-type="linenumber">4</context>
         </context-group>
         <target state="final">Link zur Simulation kopieren</target>
@@ -3964,7 +3964,7 @@
       <trans-unit id="826911519411311233" datatype="html" approved="yes">
         <source>Dans ma ville</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
+          <context context-type="sourcefile">src/app/tools/camping/admin.component.html</context>
           <context context-type="linenumber">11</context>
         </context-group>
         <context-group purpose="location">
@@ -3976,7 +3976,7 @@
       <trans-unit id="6487260431971357562" datatype="html" approved="yes">
         <source>Bonus en équivalent PA</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
+          <context context-type="sourcefile">src/app/tools/camping/admin.component.html</context>
           <context context-type="linenumber">15</context>
         </context-group>
         <target state="final">Bonus in AP-Äquivalent</target>
@@ -3984,7 +3984,7 @@
       <trans-unit id="4328907410933636413" datatype="html" approved="yes">
         <source>Le citoyen</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
+          <context context-type="sourcefile">src/app/tools/camping/admin.component.html</context>
           <context context-type="linenumber">33</context>
         </context-group>
         <target state="final">Der Bürger</target>
@@ -3992,7 +3992,7 @@
       <trans-unit id="452066521029087062" datatype="html" approved="yes">
         <source>Tenue de camouflage</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
+          <context context-type="sourcefile">src/app/tools/camping/admin.component.html</context>
           <context context-type="linenumber">43</context>
         </context-group>
         <target state="final">Tarnanzug</target>
@@ -4003,7 +4003,7 @@
                     <x id="INTERPOLATION_1" equiv-text="{{ bonus.zombie_vest | campingDisplayBonus:display_bonus_ap:locale }}"/> par zombie au lieu de <x id="INTERPOLATION_2" equiv-text="{{                                         bonus.zombie_no_vest | campingDisplayBonus:display_bonus_ap:locale                                     }}"/>)
                 </source>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
+          <context context-type="sourcefile">src/app/tools/camping/admin.component.html</context>
           <context context-type="linenumber">44,46</context>
         </context-group>
         <target state="final">(
@@ -4016,7 +4016,7 @@
       <trans-unit id="7954001980226848388" datatype="html" approved="yes">
         <source>Campeur professionnel</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
+          <context context-type="sourcefile">src/app/tools/camping/admin.component.html</context>
           <context context-type="linenumber">51</context>
         </context-group>
         <target state="final">Proficamper</target>
@@ -4024,7 +4024,7 @@
       <trans-unit id="8079361333376398985" datatype="html" approved="yes">
         <source>Tombe</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
+          <context context-type="sourcefile">src/app/tools/camping/admin.component.html</context>
           <context context-type="linenumber">55</context>
         </context-group>
         <target state="final">Grab</target>
@@ -4032,7 +4032,7 @@
       <trans-unit id="3231213779188554984" datatype="html" approved="yes">
         <source>Nombre de campings déjà effectués</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
+          <context context-type="sourcefile">src/app/tools/camping/admin.component.html</context>
           <context context-type="linenumber">59</context>
         </context-group>
         <target state="final">Anzahl der bereits durchgeführten Campings</target>
@@ -4040,7 +4040,7 @@
       <trans-unit id="3915433859665099927" datatype="html" approved="yes">
         <source>Nombre de pelures de peau et de toiles de tentes dans le sac</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
+          <context context-type="sourcefile">src/app/tools/camping/admin.component.html</context>
           <context context-type="linenumber">66</context>
         </context-group>
         <target state="final">Anzahl der Hautfetzen und Zeltplanen im Rucksack</target>
@@ -4048,7 +4048,7 @@
       <trans-unit id="560884417072143682" datatype="html" approved="yes">
         <source>La ville</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
+          <context context-type="sourcefile">src/app/tools/camping/admin.component.html</context>
           <context context-type="linenumber">77</context>
         </context-group>
         <target state="final">Die Stadt</target>
@@ -4056,7 +4056,7 @@
       <trans-unit id="2205198219410592279" datatype="html" approved="yes">
         <source>Type de ville</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
+          <context context-type="sourcefile">src/app/tools/camping/admin.component.html</context>
           <context context-type="linenumber">80</context>
         </context-group>
         <target state="final">Stadttyp</target>
@@ -4064,7 +4064,7 @@
       <trans-unit id="5596519199501316309" datatype="html" approved="yes">
         <source>Nuit</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
+          <context context-type="sourcefile">src/app/tools/camping/admin.component.html</context>
           <context context-type="linenumber">89</context>
         </context-group>
         <target state="final">Nacht</target>
@@ -4072,7 +4072,7 @@
       <trans-unit id="5745500004130467995" datatype="html" approved="yes">
         <source>Ville dévastée</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
+          <context context-type="sourcefile">src/app/tools/camping/admin.component.html</context>
           <context context-type="linenumber">94</context>
         </context-group>
         <target state="final">Zerstörte Stadt</target>
@@ -4080,7 +4080,7 @@
       <trans-unit id="3246864206079397926" datatype="html" approved="yes">
         <source>Phare</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
+          <context context-type="sourcefile">src/app/tools/camping/admin.component.html</context>
           <context context-type="linenumber">99</context>
         </context-group>
         <target state="final">Leuchtturm</target>
@@ -4088,7 +4088,7 @@
       <trans-unit id="4122043223946991758" datatype="html" approved="yes">
         <source>Le bâtiment</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
+          <context context-type="sourcefile">src/app/tools/camping/admin.component.html</context>
           <context context-type="linenumber">108</context>
         </context-group>
         <target state="final">Das Gebäude</target>
@@ -4096,7 +4096,7 @@
       <trans-unit id="7523060874803429510" datatype="html" approved="yes">
         <source>Distance de la ville (en km)</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
+          <context context-type="sourcefile">src/app/tools/camping/admin.component.html</context>
           <context context-type="linenumber">111</context>
         </context-group>
         <target state="final">Entfernung von der Stadt (in km)</target>
@@ -4104,7 +4104,7 @@
       <trans-unit id="1342160137926124174" datatype="html" approved="yes">
         <source>Nombre de tas</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
+          <context context-type="sourcefile">src/app/tools/camping/admin.component.html</context>
           <context context-type="linenumber">129</context>
         </context-group>
         <target state="final">Anzahl der Haufen</target>
@@ -4112,7 +4112,7 @@
       <trans-unit id="2420553302076927639" datatype="html" approved="yes">
         <source>Nombre de zombies sur la case</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
+          <context context-type="sourcefile">src/app/tools/camping/admin.component.html</context>
           <context context-type="linenumber">135</context>
         </context-group>
         <target state="final">Anzahl der Zombies auf dem Feld</target>
@@ -4120,7 +4120,7 @@
       <trans-unit id="7014743875484323339" datatype="html" approved="yes">
         <source>Nombre de campeurs déjà cachés sur la case</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
+          <context context-type="sourcefile">src/app/tools/camping/admin.component.html</context>
           <context context-type="linenumber">143</context>
         </context-group>
         <target state="final">Anzahl der bereits versteckten Camper auf dem Feld</target>
@@ -4128,7 +4128,7 @@
       <trans-unit id="1759876158817324985" datatype="html" approved="yes">
         <source>Nombre d&apos;améliorations simples faites sur la case</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
+          <context context-type="sourcefile">src/app/tools/camping/admin.component.html</context>
           <context context-type="linenumber">159</context>
         </context-group>
         <target state="final">Anzahl der normalen Ausbauten, die an dem Feld vorgenommen wurden</target>
@@ -4136,7 +4136,7 @@
       <trans-unit id="1569331568164081073" datatype="html" approved="yes">
         <source>Nombre d&apos;objets de défense installés sur la case</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
+          <context context-type="sourcefile">src/app/tools/camping/admin.component.html</context>
           <context context-type="linenumber">166</context>
         </context-group>
         <target state="final">Anzahl der auf dem Feld installierten Verteidigungsgegenstände</target>
@@ -4144,7 +4144,7 @@
       <trans-unit id="4837777735310918701" datatype="html" approved="yes">
         <source>Et</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
+          <context context-type="sourcefile">src/app/tools/camping/admin.component.html</context>
           <context context-type="linenumber">173</context>
         </context-group>
         <target state="final">Und</target>
@@ -4152,7 +4152,7 @@
       <trans-unit id="8497259045466557566" datatype="html" approved="yes">
         <source>Ou</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
+          <context context-type="sourcefile">src/app/tools/camping/admin.component.html</context>
           <context context-type="linenumber">174</context>
         </context-group>
         <target state="final">Oder</target>
@@ -4162,7 +4162,7 @@
                     total d&apos;améliotations sur la case
                 </source>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
+          <context context-type="sourcefile">src/app/tools/camping/admin.component.html</context>
           <context context-type="linenumber">178</context>
         </context-group>
         <target state="final">
@@ -4173,7 +4173,7 @@
       <trans-unit id="2902261471051690112" datatype="html" approved="yes">
         <source>Résultat</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
+          <context context-type="sourcefile">src/app/tools/camping/admin.component.html</context>
           <context context-type="linenumber">193</context>
         </context-group>
         <context-group purpose="location">
@@ -4185,7 +4185,7 @@
       <trans-unit id="3441654073279757119" datatype="html" approved="yes">
         <source>Chances de survie : </source>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
+          <context context-type="sourcefile">src/app/tools/camping/admin.component.html</context>
           <context context-type="linenumber">196</context>
         </context-group>
         <target state="final">Überlebenschancen : </target>
@@ -4193,7 +4193,7 @@
       <trans-unit id="6003110979058162782" datatype="html" approved="yes">
         <source>Petite carte</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/tools/camping/camping.component.ts</context>
+          <context context-type="sourcefile">src/app/tools/camping/admin.component.ts</context>
           <context context-type="linenumber">57</context>
         </context-group>
         <target state="final">Kleine Karte</target>
@@ -4201,7 +4201,7 @@
       <trans-unit id="3774627028364286981" datatype="html" approved="yes">
         <source>Région éloignée</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/tools/camping/camping.component.ts</context>
+          <context context-type="sourcefile">src/app/tools/camping/admin.component.ts</context>
           <context context-type="linenumber">58</context>
         </context-group>
         <target state="final">Entfernte Region</target>
@@ -4209,7 +4209,7 @@
       <trans-unit id="3131499204058979166" datatype="html" approved="yes">
         <source>Pandémonium</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/tools/camping/camping.component.ts</context>
+          <context context-type="sourcefile">src/app/tools/camping/admin.component.ts</context>
           <context context-type="linenumber">59</context>
         </context-group>
         <target state="final">Pandämonium</target>
@@ -4217,7 +4217,7 @@
       <trans-unit id="4068382494466269539" datatype="html" approved="yes">
         <source>La liste est impactée par la distance choisie</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/tools/camping/camping.component.ts</context>
+          <context context-type="sourcefile">src/app/tools/camping/admin.component.ts</context>
           <context context-type="linenumber">70</context>
         </context-group>
         <target state="final">Die Liste wird von der gewählten Entfernung beeinflusst</target>
@@ -4225,7 +4225,7 @@
       <trans-unit id="5726959518724330123" datatype="html" approved="yes">
         <source>Il faut en soustraire 3 après chaque attaque</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/tools/camping/camping.component.ts</context>
+          <context context-type="sourcefile">src/app/tools/camping/admin.component.ts</context>
           <context context-type="linenumber">71</context>
         </context-group>
         <target state="final">Nach jedem Angriff werden 3 abgezogen</target>
@@ -4233,7 +4233,7 @@
       <trans-unit id="4379616016375089599" datatype="html" approved="yes">
         <source>Bonus : </source>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/tools/camping/camping.component.ts</context>
+          <context context-type="sourcefile">src/app/tools/camping/admin.component.ts</context>
           <context context-type="linenumber">73</context>
         </context-group>
         <target state="final">Bonus : </target>
@@ -4241,7 +4241,7 @@
       <trans-unit id="200672681652977109" datatype="html" approved="yes">
         <source>Capacité : </source>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/tools/camping/camping.component.ts</context>
+          <context context-type="sourcefile">src/app/tools/camping/admin.component.ts</context>
           <context context-type="linenumber">75</context>
         </context-group>
         <target state="final">Kapazität : </target>
@@ -4249,7 +4249,7 @@
       <trans-unit id="61672744151027488" datatype="html" approved="yes">
         <source>Le lien a bien été copié</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/tools/camping/camping.component.ts</context>
+          <context context-type="sourcefile">src/app/tools/camping/admin.component.ts</context>
           <context context-type="linenumber">175</context>
         </context-group>
         <context-group purpose="location">
