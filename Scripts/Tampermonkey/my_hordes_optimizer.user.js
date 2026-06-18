@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MHO Addon
-// @version      1.1.41
+// @version      1.1.42
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/, rubrique Tutoriels
 // @author       Zerah
 //
@@ -32,8 +32,7 @@
 // ==/UserScript==
 
 const changelog = `${getScriptInfo().name} : Changelog pour la version ${getScriptInfo().version}\n\n`
-    + `[Correctif] Typo\n`
-    + `[Correctif] Les appels ne fonctionnent plus`;
+    + `[Correctif] La mise à jour depuis la maison ne fonctionnait plus`;
 
 const lang = (document.querySelector('html[lang]')?.getAttribute('lang') || document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2) || 'fr';
 
@@ -2181,7 +2180,7 @@ function getI18N(item) {
 }
 
 function getCurrentPosition() {
-    return document.querySelector('.current-location')?.innerText.replace(/.*: ?/, '').split('/');
+    return document.querySelector('.current-location')?.innerText.replace(/.*: ?/, '').split('/') || [0, 0];
 }
 
 function getCellDetailsByPosition() {
@@ -2292,7 +2291,7 @@ function isScriptVersionLastVersion() {
     const splitted_base = base_script_version.match(comparison_regex);
 
     return splitted_base.every((part, index) => {
-        const is_ok = !splitted_current[index] || splitted_current[index] >= part;
+        const is_ok = splitted_current[index] === undefined || splitted_current[index] === null || splitted_current[index] >= part;
         if (!is_ok) {
             toggleNewVersion(true);
         }
@@ -5361,7 +5360,7 @@ function getWishlistForZone() {
     if (!wishlist || !wishlist.wishList) return undefined;
     if (!pageIsDesert()) return wishlist.wishList.filter((wishlist_item) => wishlist_item.zoneXPa === 0);
 
-    let position = getCurrentPosition() || 0;
+    let position = getCurrentPosition();
     let current_zone = (Math.abs(position[0]) + Math.abs(position[1])) * 2 - 3;
 
     let used_wishlist = [...wishlist.wishList.filter((wishlist_item) => wishlist_item.zoneXPa === 0 || wishlist_item.zoneXPa >= current_zone)];
@@ -9625,7 +9624,7 @@ function createStyles() {
 
     let hidden = `
         .mho-hidden {
-            'display: none !important;
+            display: none !important;
         }
     `;
 
