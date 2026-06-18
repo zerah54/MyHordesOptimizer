@@ -27,26 +27,43 @@ namespace MyHordesOptimizerApi.DiscordBot.Modules
             await RespondAsync(components: components.Build(), ephemeral: privateMsg);
         }
 
-        [SlashCommand(name: "script", description: "The script address")]
-        public async Task ScriptAsync(
+        [SlashCommand(name: "addon", description: "Displays the links for the extension and script MyHordes Optimizer")]
+        public async Task AddonAsync(
             [Summary(name: "private-msg", description: "True if the message should not be seen by all")]
             bool privateMsg = false
         )
         {
+            // 1. Le tutoriel
             var scriptTutorial = new ButtonBuilder()
                 .WithLabel("Aller au tutoriel")
                 .WithUrl("https://myhordes-optimizer.web.app/tutorials/script/installation")
                 .WithStyle(ButtonStyle.Link);
-            
+
+            // 2. L'extension Chrome
+            var chromeAddon = new ButtonBuilder()
+                .WithLabel("Extension Chrome")
+                .WithUrl("https://chromewebstore.google.com/detail/mho-addon/jolghobcgphmgaiachbipnpiimmgknno")
+                .WithStyle(ButtonStyle.Link);
+
+            // 3. L'extension Firefox
+            var firefoxAddon = new ButtonBuilder()
+                .WithLabel("Extension Firefox")
+                .WithUrl("https://addons.mozilla.org/fr/firefox/addon/mho-addon/")
+                .WithStyle(ButtonStyle.Link);
+
+            // 4. Le script
             var scriptInstall = new ButtonBuilder()
                 .WithLabel("Installer le script")
                 .WithUrl("https://github.com/zerah54/MyHordesOptimizer/raw/main/Scripts/Tampermonkey/my_hordes_optimizer.user.js")
                 .WithStyle(ButtonStyle.Link);
-            
+
+            // Ajout des composants dans l'ordre d'affichage souhaité
             var components = new ComponentBuilder()
                 .WithButton(scriptTutorial)
+                .WithButton(chromeAddon)
+                .WithButton(firefoxAddon)
                 .WithButton(scriptInstall);
-            
+
             await RespondAsync(components: components.Build(), ephemeral: privateMsg);
         }
 
