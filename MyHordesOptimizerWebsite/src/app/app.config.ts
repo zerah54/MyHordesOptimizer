@@ -1,15 +1,17 @@
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
-import { APP_INITIALIZER, ApplicationConfig, ErrorHandler, importProvidersFrom, LOCALE_ID } from '@angular/core';
+import { ApplicationConfig, ErrorHandler, importProvidersFrom, inject, LOCALE_ID, provideAppInitializer } from '@angular/core';
 import { initializeApp, provideFirebaseApp } from '@angular/fire/app';
 import { AngularFireModule } from '@angular/fire/compat';
 import { AngularFireAnalyticsModule } from '@angular/fire/compat/analytics';
 import { provideMomentDateAdapter } from '@angular/material-moment-adapter';
+import { MatPaginatorIntl } from '@angular/material/paginator';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { provideRouter, Router, withRouterConfig } from '@angular/router';
 import * as Sentry from '@sentry/angular';
 import { environment } from '../environments/environment';
 import { Modules } from './_abstract_model/types/_types';
+import { MhoPaginatorIntl } from './_core/intl/mho-paginator.intl';
 import { errorInterceptor } from './_core/services/errors-interceptor.service';
 import { headersInterceptor } from './_core/services/headers-interceptor.service';
 import { loadingInterceptor } from './_core/services/loading-interceptor.service';
@@ -36,6 +38,7 @@ export const appConfig: ApplicationConfig = {
             provide: LOCALE_ID,
             useFactory: (): string | null => localStorage.getItem('mho-locale') || 'fr'
         },
+        provideAppInitializer(() => {inject(Sentry.TraceService)}),
         {
             provide: ErrorHandler,
             useValue: Sentry.createErrorHandler(),
@@ -44,13 +47,8 @@ export const appConfig: ApplicationConfig = {
             provide: Sentry.TraceService,
             deps: [Router],
         },
-        {
-            provide: APP_INITIALIZER,
-            useFactory: () => () => {
-            },
-            deps: [Sentry.TraceService],
-            multi: true,
-        }
+        { provide: MatPaginatorIntl, useClass: MhoPaginatorIntl },
+
     ]
 
 };
