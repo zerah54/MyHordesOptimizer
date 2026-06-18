@@ -14,10 +14,10 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import moment, { Moment } from 'moment';
-import { debounceTime } from 'rxjs';
+import { catchError, debounceTime, EMPTY, Observable, Subject, switchMap } from 'rxjs';
 import { LogViewerService } from '../../_abstract_model/services/log-viewer.service';
 import { Imports, LogLevel } from '../../_abstract_model/types/_types';
-import { LogEntry, LogFilters, LogPageResult } from '../../_abstract_model/types/log-viewer.model';
+import { LogEntry, LogPageResult } from '../../_abstract_model/types/log-viewer.model';
 
 const LOG_LEVELS: LogLevel[] = ['Verbose', 'Debug', 'Information', 'Warning', 'Error', 'Fatal'];
 
@@ -67,15 +67,40 @@ export class LogViewerComponent implements OnInit {
         Fatal: '#9c27b0',
     };
 
-    protected dateFilter = (date: Moment | null): boolean => {
+    private readonly loadTrigger$: Subject<void> = new Subject<void>();
+
+    protected dateFilter: (date: Moment | null) => boolean = (date: Moment | null): boolean => {
         if (!date) return false;
         return this.availableDates().has(date.format('YYYY-MM-DD'));
     };
 
     public ngOnInit(): void {
-        this.service.getAvailableDates().pipe(takeUntilDestroyed(this.destroy_ref)).subscribe(dates => {
-            this.availableDates.set(new Set(dates));
+        this.loadTrigger$.pipe(
+            switchMap(() => {
+                const {date, level, correlationId, search} = this.filtersForm.value;
+                if (!date) return EMPTY;
+                this.loading.set(true);
+                return this.service.getLogs(date, this.page, this.pageSize, {
+                    level: level || undefined,
+                    correlationId: correlationId || undefined,
+                    search: search || undefined,
+                }).pipe(
+                    catchError(() => {
+                        this.loading.set(false);
+                        return EMPTY;
+                    })
+                );
+            }),
+            takeUntilDestroyed(this.destroy_ref)
+        ).subscribe((result: LogPageResult | null) => {
+            this.entries.set(result?.items ?? []);
+            this.totalCount.set(result?.totalCount ?? 0);
+            this.loading.set(false);
         });
+
+        this.service.getAvailableDates()
+            .pipe(takeUntilDestroyed(this.destroy_ref))
+            .subscribe((dates: string[]) => this.availableDates.set(new Set(dates)));
 
         this.loadLogs();
 
@@ -83,11 +108,13 @@ export class LogViewerComponent implements OnInit {
             .pipe(takeUntilDestroyed(this.destroy_ref))
             .subscribe(() => {
                 this.page = 1;
-                this.loadLogs();
+                setTimeout(() => {
+                    this.loadLogs();
+                })
             });
 
         const {level, correlationId, search} = this.filtersForm.controls;
-        [level.valueChanges, correlationId.valueChanges, search.valueChanges].forEach((obs) =>
+        [level.valueChanges, correlationId.valueChanges, search.valueChanges].forEach((obs: Observable<string | null>) =>
             obs.pipe(debounceTime(400), takeUntilDestroyed(this.destroy_ref))
                 .subscribe(() => {
                     this.page = 1;
@@ -121,28 +148,6 @@ export class LogViewerComponent implements OnInit {
     }
 
     private loadLogs(): void {
-        const {date, level, correlationId, search} = this.filtersForm.value;
-        if (!date) return;
-
-        this.loading.set(true);
-
-        const filters: LogFilters = {
-            level: level || undefined,
-            correlationId: correlationId || undefined,
-            search: search || undefined,
-        };
-
-        this.service.getLogs(date, this.page, this.pageSize, filters)
-            .pipe(takeUntilDestroyed(this.destroy_ref))
-            .subscribe({
-                next: (result: LogPageResult | null) => {
-                    if (result) {
-                        this.entries.set(result.items);
-                        this.totalCount.set(result.totalCount);
-                        this.loading.set(false);
-                    }
-                },
-                error: () => this.loading.set(false),
-            });
+        this.loadTrigger$.next();
     }
 }

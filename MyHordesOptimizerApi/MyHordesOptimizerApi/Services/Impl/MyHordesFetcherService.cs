@@ -88,7 +88,7 @@ namespace MyHordesOptimizerApi.Services.Impl
                 Logger.LogDebug("GetItem({@townId}) FetchInDb in {@ElapsedMilliseconds} ms", townId, sw.ElapsedMilliseconds);
                 sw.Restart();
                 var itemsDto = Mapper.Map<List<ItemDto>>(items);
-                Logger.LogDebug("GetItem({@townId}) MApper in {@ElapsedMilliseconds} ms", townId, sw.ElapsedMilliseconds);
+                Logger.LogDebug("GetItem({@townId}) Mapper in {@ElapsedMilliseconds} ms", townId, sw.ElapsedMilliseconds);
                 sw.Stop();
                 return itemsDto;
             }
@@ -116,7 +116,7 @@ namespace MyHordesOptimizerApi.Services.Impl
                 Logger.LogDebug("GetItem() FetchInDb in {@ElapsedMilliseconds} ms", sw.ElapsedMilliseconds);
                 sw.Restart();
                 var itemsDto = Mapper.Map<List<ItemDto>>(items);
-                Logger.LogDebug("GetItem() MApper in {@ElapsedMilliseconds} ms", sw.ElapsedMilliseconds);
+                Logger.LogDebug("GetItem() Mapper in {@ElapsedMilliseconds} ms", sw.ElapsedMilliseconds);
                 sw.Stop();
                 return itemsDto;
             }

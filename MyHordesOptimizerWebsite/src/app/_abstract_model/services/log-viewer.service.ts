@@ -20,8 +20,6 @@ export class LogViewerService extends GlobalService {
         if (filters.correlationId?.trim()) params = params.set('correlationId', filters.correlationId.trim());
         if (filters.search?.trim()) params = params.set('search', filters.search.trim());
 
-        console.log('params', params)
-
         return super.get<LogPageResultDTO>(`${this.API_URL}/admin/logs`, false, params)
             .pipe(map((response: HttpResponse<LogPageResultDTO>) => {
                 return LogViewerMapper.dtoToModel(response.body);
