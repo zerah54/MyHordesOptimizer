@@ -1,6 +1,6 @@
 export const links: IrlLink[] = [
     {from: 'Emy', to: 'Bigonoud', type: 'couple'},
-    {from: 'Renack', to: 'Zerah', type: 'couple'},
+    {from: 'Renack', to: 'Zerah'},
     {from: 'Emy', to: 'Zerah'},
     {from: 'Emy', to: 'Renack'},
     {from: 'Bigonoud', to: 'Zerah'},
@@ -15,6 +15,8 @@ export const links: IrlLink[] = [
     {from: 'Renack', to: 'Daïlan'},
     {from: 'Themis', to: 'Emy'},
     {from: 'Themis', to: 'Bigonoud'},
+    {from: 'Themis', to: 'Zerah'},
+    {from: 'Themis', to: 'Renack'},
     {from: 'Kraky', to: 'Emy'},
     {from: 'Kraky', to: 'Davf'},
     {from: 'Kraky', to: 'Helline'},
