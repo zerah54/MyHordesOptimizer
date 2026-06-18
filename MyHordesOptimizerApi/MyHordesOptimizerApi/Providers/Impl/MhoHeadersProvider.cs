@@ -6,5 +6,6 @@ namespace MyHordesOptimizerApi.Providers.Impl
     {
         public string MhoOrigin { get; set; }
         public string MhoScriptVersion { get; set; }
+        public string MhoAddonVersion { get; set; }
     }
 }

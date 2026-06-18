@@ -23,25 +23,36 @@ namespace MyHordesOptimizerApi.Controllers.ActionFillters
         {
             // our code before action executes
             context.HttpContext.Request.Headers.TryGetValue(IMhoHeadersProvider.Mho_Origin_Header_Name, out var origin);
-            context.HttpContext.Request.Headers.TryGetValue(IMhoHeadersProvider.Mho_Version_Header_Name, out var version);
+            context.HttpContext.Request.Headers.TryGetValue(IMhoHeadersProvider.Mho_Version_Header_Name, out var script_version);
+            context.HttpContext.Request.Headers.TryGetValue(IMhoHeadersProvider.Mho_Addon_Version_Header_Name, out var addon_version);
             MhoHeaderProvider.MhoOrigin = origin;
-            MhoHeaderProvider.MhoScriptVersion = version;
+            MhoHeaderProvider.MhoScriptVersion = script_version;
+            MhoHeaderProvider.MhoAddonVersion = addon_version;
             var controllerName = context.Controller.GetType().Name;
             var controllerActionDescription = context.ActionDescriptor as ControllerActionDescriptor;
             var methodName = controllerActionDescription?.ActionName;
             var expectedVersion = Configuration.GetValue<string>($"MhoVersionControl:{controllerName}:{methodName}");
             if (expectedVersion != null)
             {
-                if (/* MhoHeaderProvider.MhoOrigin == null || */ (MhoHeaderProvider.MhoOrigin == IMhoHeadersProvider.Mho_Script_Origin && MhoHeaderProvider.MhoScriptVersion == null) || (MhoHeaderProvider.MhoOrigin == IMhoHeadersProvider.Mho_MhoAddon_Origin && MhoHeaderProvider.MhoScriptVersion == null))
+                if (MhoHeaderProvider.MhoOrigin == null || (MhoHeaderProvider.MhoOrigin == IMhoHeadersProvider.Mho_Script_Origin && MhoHeaderProvider.MhoScriptVersion == null) || (MhoHeaderProvider.MhoOrigin == IMhoHeadersProvider.Mho_MhoAddon_Origin && MhoHeaderProvider.MhoAddonVersion == null))
                 {
-                    context.Result = new BadRequestObjectResult("No Mho-Origin or Mho-Origin is 'script' without Mho-Script-Version");
+                    context.Result = new BadRequestObjectResult("No Mho-Origin or Mho-Origin is 'addon' without Mho-Addon-Version");
                     return;
                 }
-                if (MhoHeaderProvider.MhoOrigin == null /* TODO Retirer ça quand la propagation de ZenHordes sera complète */
-                    || MhoHeaderProvider.MhoOrigin == IMhoHeadersProvider.Mho_Site_Origin
+                if (MhoHeaderProvider.MhoOrigin == IMhoHeadersProvider.Mho_Site_Origin
                     || MhoHeaderProvider.MhoOrigin == IMhoHeadersProvider.Mho_ZenHordes_Origin)
                 {
                     return;
+                }
+
+                var version = "";
+                if (MhoHeaderProvider.MhoScriptVersion != null)
+                {
+                    version = script_version;
+                }
+                else
+                {
+                    version = addon_version;
                 }
                 try
                 {
