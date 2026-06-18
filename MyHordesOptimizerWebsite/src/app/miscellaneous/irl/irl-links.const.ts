@@ -5,6 +5,7 @@ export const links: IrlLink[] = [
     {from: 'Emy', to: 'Renack'},
     {from: 'Bigonoud', to: 'Zerah'},
     {from: 'Bigonoud', to: 'Renack'},
+    {from: 'Bigonoud', to: 'Katoptris'},
     {from: 'Emy', to: 'Netto'},
     {from: 'Emy', to: 'Dolcounette'},
     {from: 'Dolcounette', to: 'Psykokwak'},
