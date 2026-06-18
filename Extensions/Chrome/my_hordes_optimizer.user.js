@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MHO Addon
-// @version      1.1.40
+// @version      1.1.41
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/, rubrique Tutoriels
 // @author       Zerah
 //
@@ -32,10 +32,8 @@
 // ==/UserScript==
 
 const changelog = `${getScriptInfo().name} : Changelog pour la version ${getScriptInfo().version}\n\n`
-    + `[Correctif] Fix de l'update des outils externes suite à la mise à jour de mi-saison\n`
-    + `[Correctif] Affichage de la liste de courses dans la page\n\n`
-    + `[Amélioration] Remaniement des options du script pour plus de clarté\n\n`
-    + `[Nouveauté] Option pour trier la liste des citoyens et l'omniscience`;
+    + `[Correctif] Typo\n`
+    + `[Correctif] Les appels ne fonctionnent plus`;
 
 const lang = (document.querySelector('html[lang]')?.getAttribute('lang') || document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2) || 'fr';
 
@@ -1509,10 +1507,10 @@ let params_categories = [
     {
         id: `additionnal_info`,
         label: {
-            en: `Additional information`,
+            en: `Further information`,
             fr: `Informations complémentaires`,
             de: `Weitere Informationen`,
-            es: `Información adicional`
+            es: `Informaciones complementarias`
         },
         params: [
             {
@@ -2606,7 +2604,7 @@ function updateFetchRequestOptions(options) {
     update.headers = {
         ...update.headers,
         'Mho-Origin': 'mho-addon',
-        'Mho-Script-Version': getScriptInfo().version,
+        'Mho-Addon-Version': getScriptInfo().version,
     };
     if (isValidToken()) {
         update.headers.Authorization = `Bearer ${token.token.accessToken?.toString()}`;
@@ -2624,8 +2622,8 @@ function updateFetchRequestOptionsWithoutBearer(options) {
     const update = {...options};
     update.headers = {
         ...update.headers,
-        'Mho-Origin': 'script',
-        'Mho-Script-Version': getScriptInfo().version,
+        'Mho-Origin': 'mho-addon',
+        'Mho-Addon-Version': getScriptInfo().version,
     };
     return update;
 }
