@@ -21,11 +21,11 @@ namespace MyHordesOptimizerApi.Serilog
         {
             if (HttpContextAccessor.HttpContext != null)
             {
-                var mhoScriptVersion = HttpContextAccessor.HttpContext.Request.Headers[IMhoHeadersProvider.Mho_Version_Header_Name];
-                var mhoOrigin = HttpContextAccessor.HttpContext.Request.Headers[IMhoHeadersProvider.Mho_Origin_Header_Name];
-                var mhoScriptVersionProperty = factory.CreateProperty("MhoScriptVersion", mhoScriptVersion);
+                var mhoAddonVersion = HttpContextAccessor.HttpContext.Request.Headers[IMhoHeadersProvider.Mho_Addon_Version_Header_Name].ToString();
+                var mhoOrigin = HttpContextAccessor.HttpContext.Request.Headers[IMhoHeadersProvider.Mho_Origin_Header_Name].ToString();
+                var mhoAddonVersionProperty = factory.CreateProperty("MhoAddonVersion", mhoAddonVersion);
                 var mhoOriginProperty = factory.CreateProperty("MhoOrigin", mhoOrigin);
-                logEvent.AddPropertyIfAbsent(mhoScriptVersionProperty);
+                logEvent.AddPropertyIfAbsent(mhoAddonVersionProperty);
                 logEvent.AddPropertyIfAbsent(mhoOriginProperty);
 
                 var query = HttpContextAccessor.HttpContext.Request.QueryString;

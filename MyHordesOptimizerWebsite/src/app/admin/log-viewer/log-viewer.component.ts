@@ -5,6 +5,7 @@ import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatDividerModule } from '@angular/material/divider';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
@@ -18,15 +19,16 @@ import { catchError, debounceTime, EMPTY, Observable, Subject, switchMap } from 
 import { LogViewerService } from '../../_abstract_model/services/log-viewer.service';
 import { Imports, LogLevel } from '../../_abstract_model/types/_types';
 import { LogEntry, LogPageResult } from '../../_abstract_model/types/log-viewer.model';
+import { HighlightJsonPipe } from '../../_core/pipes/highlight-json.pipe';
 
 const LOG_LEVELS: LogLevel[] = ['Verbose', 'Debug', 'Information', 'Warning', 'Error', 'Fatal'];
 
 const angular_common: Imports = [CommonModule,
     ReactiveFormsModule,];
 const components: Imports = [];
-const pipes: Imports = [];
+const pipes: Imports = [HighlightJsonPipe];
 const material_modules: Imports = [MatTableModule, MatPaginatorModule, MatFormFieldModule, MatInputModule, MatSelectModule, MatDatepickerModule,
-    MatIconModule, MatButtonModule, MatProgressSpinnerModule, MatTooltipModule, MatChipsModule];
+    MatIconModule, MatButtonModule, MatProgressSpinnerModule, MatTooltipModule, MatChipsModule, MatDividerModule];
 
 @Component({
     selector: 'mho-log-viewer',
@@ -40,7 +42,7 @@ export class LogViewerComponent implements OnInit {
     private readonly destroy_ref: DestroyRef = inject(DestroyRef);
 
     protected readonly logLevels: LogLevel[] = LOG_LEVELS;
-    protected readonly displayedColumns: string[] = ['stacktrace', 'timestamp', 'level', 'correlationId', 'sourceContext', 'message'];
+    protected readonly displayedColumns: string[] = ['stacktrace', 'timestamp', 'level', 'mhoOrigin', 'mhoAddonVersion', 'request', 'correlationId', 'sourceContext', 'message' ];
 
     protected entries: WritableSignal<LogEntry[]> = signal<LogEntry[]>([]);
     protected totalCount: WritableSignal<number> = signal(0);

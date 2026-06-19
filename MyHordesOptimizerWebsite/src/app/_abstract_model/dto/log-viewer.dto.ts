@@ -10,6 +10,11 @@ export interface LogEntryDTO {
     eventId: string;
     message: string;
     stackTrace?: string;
+    mhoOrigin: string;
+    mhoAddonVersion: string;
+    requestPath: string;
+    query: string;
+    body?: string;
 }
 
 export interface LogPageResultDTO {

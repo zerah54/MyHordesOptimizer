@@ -10,6 +10,11 @@ export interface LogEntry {
     eventId: string;
     message: string;
     stackTrace?: string;
+    mhoOrigin: string;
+    mhoAddonVersion?: string;
+    requestPath: string;
+    query: string;
+    body?: string;
 }
 
 export interface LogPageResult {

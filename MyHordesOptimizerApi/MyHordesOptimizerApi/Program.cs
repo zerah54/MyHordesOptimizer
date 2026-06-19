@@ -107,9 +107,6 @@ builder.Services.AddSignalR(options =>
 builder.Services.AddScoped<IUserInfoProvider, UserInfoProvider>();
 builder.Services.AddScoped<IMhoHeadersProvider, MhoHeadersProvider>();
 
-// Action filters
-builder.Services.AddScoped<MhoHeaderActionFilter>();
-
 // Admin
 builder.Services.AddScoped<AdminService>();
 

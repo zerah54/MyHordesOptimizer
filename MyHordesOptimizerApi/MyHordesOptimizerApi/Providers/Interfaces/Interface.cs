@@ -3,15 +3,12 @@
     public interface IMhoHeadersProvider
     {
         string MhoOrigin { get; set; }
-        string MhoScriptVersion { get; set; } // TODO retirer ça quand la maj sera propagée avec mho-addon
         string MhoAddonVersion { get; set; }
 
         public const string Mho_Site_Origin = "website";
-        public const string Mho_Script_Origin = "script"; // TODO retirer ça quand la maj sera propagée avec mho-addon
-        public const string Mho_MhoAddon_Origin = "mho-addon";
+        public const string Mho_Addon_Origin = "mho-addon";
         public const string Mho_ZenHordes_Origin = "zen-hordes";
         public const string Mho_Origin_Header_Name = "Mho-Origin";
-        public const string Mho_Version_Header_Name = "Mho-Script-Version"; // TODO retirer ça quand la maj sera propagée avec Mho-Addon-Version
         public const string Mho_Addon_Version_Header_Name = "Mho-Addon-Version";
     }
 }

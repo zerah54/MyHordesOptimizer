@@ -13,7 +13,12 @@ namespace MyHordesOptimizerApi.Models.Logs
         public string SourceContext { get; set; } = string.Empty;
         public string EventId { get; set; } = string.Empty;
         public string Message { get; set; } = string.Empty;
-        public string? StackTrace { get; set; }
+        public string StackTrace { get; set; }
+        public string MhoOrigin { get; set; }
+        public string MhoAddonVersion { get; set; }
+        public string RequestPath { get; set; }
+        public string Query { get; set; }
+        public string? Body { get; set; }
     }
 
     public class LogPageResult

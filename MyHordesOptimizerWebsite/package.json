@@ -43,6 +43,7 @@
         "chartjs-plugin-datalabels": "2.2.0",
         "compass-mixins": "0.12.12",
         "express": "5.1.0",
+        "highlight.js": "11.11.1",
         "localstorage-polyfill": "1.0.1",
         "material-symbols": "0.44.5",
         "moment": "2.30.1",

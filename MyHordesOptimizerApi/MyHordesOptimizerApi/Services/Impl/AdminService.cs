@@ -10,9 +10,8 @@ namespace MyHordesOptimizerApi.Services.Impl
 {
     public class AdminService
     {
-        // Format: {Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} <{ProcessId} - {ThreadId}> {CorrelationId} [{Level}] [{SourceContext}] [{EventId}] {Message}{NewLine}{Exception}
         private static readonly Regex LogLineRegex = new(
-            @"^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{3} [+-]\d{2}:\d{2}) <(\d+) - (\d+)> (\S+) \[(\w+)\] \[([^\]]*)\] \[([^\]]*)\] (.*)",
+            @"^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{3} [+-]\d{2}:\d{2}) <(\d+) - (\d+)>\s+(\S*)\s+\[(\w+)\] ==([^=]*) - ([^=]*)== \[([^\]]*)\] \[([^\]]*)\] \[([^\]]*)\] (.*)$",
             RegexOptions.Compiled
         );
 
@@ -65,6 +64,8 @@ namespace MyHordesOptimizerApi.Services.Impl
                 all = all.FindAll(e =>
                     e.Message.Contains(search, StringComparison.OrdinalIgnoreCase) ||
                     e.SourceContext.Contains(search, StringComparison.OrdinalIgnoreCase) ||
+                    (e.RequestPath != null && e.RequestPath.Contains(search, StringComparison.OrdinalIgnoreCase)) ||
+                    (e.Body != null && e.Body.Contains(search, StringComparison.OrdinalIgnoreCase)) ||
                     (e.StackTrace != null && e.StackTrace.Contains(search, StringComparison.OrdinalIgnoreCase)));
 
             var total = all.Count;
@@ -73,13 +74,7 @@ namespace MyHordesOptimizerApi.Services.Impl
                 ? []
                 : all.GetRange(skip, Math.Min(pageSize, total - skip));
 
-            return new LogPageResult
-            {
-                Items = items,
-                TotalCount = total,
-                Page = page,
-                PageSize = pageSize
-            };
+            return new LogPageResult { Items = items, TotalCount = total, Page = page, PageSize = pageSize };
         }
 
         private List<LogEntry> ParseLogsForDate(DateOnly date)
@@ -104,22 +99,11 @@ namespace MyHordesOptimizerApi.Services.Impl
 
                 while ((line = reader.ReadLine()) != null)
                 {
-                    var match = LogLineRegex.Match(line);
-                    if (match.Success)
+                    var parsed = TryParseLine(line);
+                    if (parsed != null)
                     {
                         FlushEntry(ref current, stackBuilder, entries);
-
-                        current = new LogEntry
-                        {
-                            Timestamp = DateTimeOffset.Parse(match.Groups[1].Value),
-                            ProcessId = int.TryParse(match.Groups[2].Value, out var pid) ? pid : 0,
-                            ThreadId = int.TryParse(match.Groups[3].Value, out var tid) ? tid : 0,
-                            CorrelationId = match.Groups[4].Value,
-                            Level = match.Groups[5].Value,
-                            SourceContext = match.Groups[6].Value,
-                            EventId = match.Groups[7].Value,
-                            Message = match.Groups[8].Value
-                        };
+                        current = parsed;
                     }
                     else if (current != null)
                     {
@@ -133,6 +117,56 @@ namespace MyHordesOptimizerApi.Services.Impl
             return entries;
         }
 
+        private static LogEntry? TryParseLine(string line)
+        {
+            var match = LogLineRegex.Match(line);
+            if (!match.Success) return null;
+
+            var entry = new LogEntry
+            {
+                Timestamp = DateTimeOffset.Parse(match.Groups[1].Value),
+                ProcessId = int.TryParse(match.Groups[2].Value, out var pid) ? pid : 0,
+                ThreadId = int.TryParse(match.Groups[3].Value, out var tid) ? tid : 0,
+                CorrelationId = match.Groups[4].Value,
+                Level = match.Groups[5].Value,
+                MhoOrigin = NullIfEmpty(CleanHeaderValue(match.Groups[6].Value.Trim())),
+                MhoAddonVersion = NullIfEmpty(CleanHeaderValue(match.Groups[7].Value.Trim())),
+                SourceContext = match.Groups[9].Value,
+                EventId = match.Groups[10].Value,
+                Message = match.Groups[11].Value
+            };
+            ParseRequestSection(match.Groups[8].Value, entry);
+            return entry;
+        }
+
+        private static void ParseRequestSection(string section, LogEntry entry)
+        {
+            var dashIdx = section.IndexOf(" - ", StringComparison.Ordinal);
+            if (dashIdx < 0) return;
+
+            var pathAndQuery = section[..dashIdx];
+            var body = section[(dashIdx + 3)..];
+
+            if (!string.IsNullOrWhiteSpace(pathAndQuery))
+            {
+                var qIdx = pathAndQuery.IndexOf('?');
+                if (qIdx >= 0)
+                {
+                    entry.RequestPath = pathAndQuery[..qIdx];
+                    entry.Query = pathAndQuery[qIdx..];
+                }
+                else
+                {
+                    entry.RequestPath = pathAndQuery;
+                }
+            }
+
+            entry.Body = NullIfEmpty(body);
+        }
+
+        private static string? NullIfEmpty(string? value) =>
+            string.IsNullOrWhiteSpace(value) ? null : value;
+
         private static void FlushEntry(ref LogEntry? entry, StringBuilder stackBuilder, List<LogEntry> entries)
         {
             if (entry == null) return;
@@ -144,5 +178,7 @@ namespace MyHordesOptimizerApi.Services.Impl
             entries.Add(entry);
             entry = null;
         }
+
+        private static string CleanHeaderValue(string value) => value.StartsWith("[\"") && value.EndsWith("\"]") ? value[2..^2] : value;
     }
 }

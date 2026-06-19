@@ -21,71 +21,59 @@ namespace MyHordesOptimizerApi.Controllers.ActionFillters
 
         public void OnActionExecuting(ActionExecutingContext context)
         {
-            // our code before action executes
+            // 1. Récupération et stockage des en-têtes
             context.HttpContext.Request.Headers.TryGetValue(IMhoHeadersProvider.Mho_Origin_Header_Name, out var origin);
-            context.HttpContext.Request.Headers.TryGetValue(IMhoHeadersProvider.Mho_Version_Header_Name, out var script_version);
             context.HttpContext.Request.Headers.TryGetValue(IMhoHeadersProvider.Mho_Addon_Version_Header_Name, out var addon_version);
+
             MhoHeaderProvider.MhoOrigin = origin;
-            MhoHeaderProvider.MhoScriptVersion = script_version;
             MhoHeaderProvider.MhoAddonVersion = addon_version;
+
+            // 2. VÉRIFICATION GLOBALE
+            // Bloque si l'origine est manquante, ou si c'est l'addon mais sans sa version
+            if (MhoHeaderProvider.MhoOrigin == null || (MhoHeaderProvider.MhoOrigin == IMhoHeadersProvider.Mho_Addon_Origin && MhoHeaderProvider.MhoAddonVersion == null))
+            {
+                context.Result = new BadRequestObjectResult("No Mho-Origin or Mho-Origin is 'addon' without Mho-Addon-Version");
+                return;
+            }
+
+            // 3. PASSE-DROIT
+            // Si l'origine est de confiance, on valide la requête immédiatement sans checker la suite
+            if (MhoHeaderProvider.MhoOrigin == IMhoHeadersProvider.Mho_Site_Origin
+                || MhoHeaderProvider.MhoOrigin == IMhoHeadersProvider.Mho_ZenHordes_Origin)
+            {
+                return;
+            }
+
+            // 4. VÉRIFICATION DE LA VERSION MINIMALE (Uniquement si configurée)
             var controllerName = context.Controller.GetType().Name;
             var controllerActionDescription = context.ActionDescriptor as ControllerActionDescriptor;
             var methodName = controllerActionDescription?.ActionName;
-            var expectedVersion = Configuration.GetValue<string>($"MhoVersionControl:{controllerName}:{methodName}");
-            if (expectedVersion != null)
-            {
-                if (MhoHeaderProvider.MhoOrigin == null || (MhoHeaderProvider.MhoOrigin == IMhoHeadersProvider.Mho_Script_Origin && MhoHeaderProvider.MhoScriptVersion == null) || (MhoHeaderProvider.MhoOrigin == IMhoHeadersProvider.Mho_MhoAddon_Origin && MhoHeaderProvider.MhoAddonVersion == null))
-                {
-                    context.Result = new BadRequestObjectResult("No Mho-Origin or Mho-Origin is 'addon' without Mho-Addon-Version");
-                    return;
-                }
-                if (MhoHeaderProvider.MhoOrigin == IMhoHeadersProvider.Mho_Site_Origin
-                    || MhoHeaderProvider.MhoOrigin == IMhoHeadersProvider.Mho_ZenHordes_Origin)
-                {
-                    return;
-                }
+            var expectedAddonVersion = Configuration.GetValue<string>($"MhoVersionControl:{controllerName}:{methodName}");
 
-                var version = "";
-                if (MhoHeaderProvider.MhoScriptVersion != null)
-                {
-                    version = script_version;
-                }
-                else
-                {
-                    version = addon_version;
-                }
+            if (expectedAddonVersion != null)
+            {
                 try
                 {
-                    var incomingVersionMatch = Regex.Matches(version, @"\d+");
-                    var expectedVersionMatch = Regex.Matches(expectedVersion, @"\d+");
-
-                    if (incomingVersionMatch.Count < 3 || incomingVersionMatch.Count > 4)
+                    var incomingAddonVersionMatch = Regex.Matches(addon_version, @"\d+");
+                    if (incomingAddonVersionMatch.Count != 3)
                     {
-                        context.Result = new BadRequestObjectResult($"Mho-Script-Version should contains 3 or 4 digits. Found {version} for Controller {controllerName} and method {methodName}");
+                        context.Result = new BadRequestObjectResult($"Mho-Addon-Version should contains 3 digits. Found {addon_version} for Controller {controllerName} and method {methodName}");
                         return;
                     }
 
-                    // On convertit explicitement le StringValues en string
-                    var versionStr = version.ToString();
-
-                    // Normalisation de la version entrante
-                    var normalizedVersion = incomingVersionMatch.Count == 3 ? $"{versionStr}.0" : versionStr;
-                    var incomingVersionVersion = new Version(normalizedVersion);
-
-                    // Normalisation de la version attendue
-                    var normalizedExpectedVersion = expectedVersionMatch.Count == 3 ? $"{expectedVersion}.0" : expectedVersion;
-                    var expectedVersionVersion = new Version(normalizedExpectedVersion);
+                    var incomingVersionVersion = new Version(addon_version);
+                    var expectedVersionVersion = new Version(expectedAddonVersion);
 
                     var result = expectedVersionVersion.CompareTo(incomingVersionVersion);
                     if (result > 0)
                     {
-                        context.Result = new BadRequestObjectResult($"Incoming version {versionStr} is too low. Expected {expectedVersion} for Controller {controllerName} and method {methodName}");
+                        context.Result = new BadRequestObjectResult($"Incoming version {addon_version} is too low. Expected {expectedAddonVersion} for Controller {controllerName} and method {methodName}");
                         return;
                     }
                 }
                 catch (Exception e)
                 {
-                    context.Result = new BadRequestObjectResult($"Error while verifying version (incoming : {version}, expected {expectedVersion}) for Controller {controllerName} and method {methodName} : {e.ToString()}");
+                    context.Result = new BadRequestObjectResult($"Error while verifying version (incoming : {addon_version}, expected {expectedAddonVersion}) for Controller {controllerName} and method {methodName} : {e.ToString()}");
                 }
             }
         }

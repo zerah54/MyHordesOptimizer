@@ -177,4 +177,67 @@
             color: var(--mat-sys-error);
         }
     }
+
+    .cell--mho {
+        width: 90px;
+        max-width: 90px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        font-size: 11px;
+        color: var(--mat-sys-on-surface-variant);
+    }
+
+    .cell--request {
+        max-width: 220px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        cursor: default;
+    }
+
+    .request-path {
+        font-size: 11px;
+    }
+
+    .request-query {
+        font-size: 10px;
+        color: var(--mat-sys-on-surface-variant);
+        margin-left: 1px;
+    }
+
+    .cell--empty {
+        color: var(--mat-sys-outline);
+    }
+
+    .expanded-content {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .request-body {
+        background: var(--mat-sys-surface-container);
+        border-top: 1px solid var(--mat-sys-outline-variant);
+        padding: 8px 16px 12px;
+
+        .section-label {
+            display: block;
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--mat-sys-on-surface-variant);
+            margin-bottom: 6px;
+        }
+
+        pre {
+            margin: 0;
+            font-family: 'JetBrains Mono', 'Fira Code', monospace;
+            font-size: 11px;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            word-break: break-all;
+            background: transparent;
+        }
+    }
 }
