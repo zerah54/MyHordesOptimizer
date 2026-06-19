@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using MyHordesOptimizerApi.Attributes;
 using MyHordesOptimizerApi.Controllers.Abstract;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Authentication;
 using MyHordesOptimizerApi.Providers.Interfaces;
@@ -46,6 +47,7 @@ namespace MyHordesOptimizerApi.Controllers
 
         [HttpPost]
         [Route("ExternalLogin")]
+        [AllowExternalAccess]
         public async Task<ActionResult<AuthenticationResponseDto>> PostExternalLogin([FromForm] string key)
         {
             if (string.IsNullOrWhiteSpace(key))
