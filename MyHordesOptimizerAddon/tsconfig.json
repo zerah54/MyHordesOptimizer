@@ -1,0 +1,27 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "strict": false,
+    "noImplicitAny": false,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "lib": [
+      "ES2022",
+      "DOM",
+      "DOM.Iterable"
+    ],
+    "rootDir": "./src",
+    "declaration": false,
+    // Without this, tsc silently removes import statements it judges
+    // "unused" (e.g. a function only referenced inside a // comment,
+    // like createDisplayMapButton). That breaks the module graph
+    // before Rollup ever sees it, no matter what treeshake is set to.
+    // verbatimModuleSyntax keeps every import exactly as written.
+    "verbatimModuleSyntax": true
+  },
+  "include": [
+    "src/**/*"
+  ]
+}

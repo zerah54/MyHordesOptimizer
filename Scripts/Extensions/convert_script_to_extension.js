@@ -1,11 +1,13 @@
 const fs = require('fs');
 const util = require('util');
+const path = require('path');
 
-const user_script_file_name = 'my_hordes_optimizer.user.js'
-const target_dir = '../../Extensions/';
-const source_dir = '../Tampermonkey/';
-const source_file = source_dir + user_script_file_name;
-const icons_dir = '../../MyHordesOptimizerWebsite/public/img/logo/';
+const user_script_file_name = 'my_hordes_optimizer.user.js';
+
+const target_dir = path.join(__dirname, '../../Extensions') + '/';
+const source_dir = path.join(__dirname, '../Tampermonkey') + '/';
+const source_file = path.join(source_dir, user_script_file_name);
+const icons_dir = path.join(__dirname, '../../MyHordesOptimizerWebsite/public/img/logo') + '/';
 
 fs.readFile(source_file, 'utf-8', (source_file_err, file_content) => {
     if (source_file_err) {
@@ -22,26 +24,30 @@ fs.readFile(source_file, 'utf-8', (source_file_err, file_content) => {
 });
 
 function splitFile(file_content) {
-    const split = file_content.split('\r\n');
-    const start_header_index = split.findIndex((row) => row.indexOf('==UserScript==') > -1)
-    const end_header_index = split.findIndex((row) => row.indexOf('==/UserScript==') > -1)
+    const normalized_content = file_content.replace(/\r\n/g, '\n');
+
+    const split = normalized_content.split('\n');
+    const start_header_index = split.findIndex((row) => row.indexOf('==UserScript==') > -1);
+    const end_header_index = split.findIndex((row) => row.indexOf('==/UserScript==') > -1);
 
     return {
-        header: split.slice(start_header_index, end_header_index + 1).join('\r\n'),
-        content: split.slice(end_header_index, split.length).join('\r\n')
+        header: split.slice(start_header_index, end_header_index + 1).join('\n'),
+        content: split.slice(end_header_index, split.length).join('\n')
     };
 }
 
 function extractHeaderData(header) {
     let data = {};
-    data.name = '' + header.match(/\/\/ @name *(.*)\r\n/gm)[0].replace(/\/\/ @name *(.*)\r\n/gm, '$1');
-    data.short_name = '' + header.match(/\/\/ @name *(.*)\r\n/gm)[0].replace(/\/\/ @name *(.*)\r\n/gm, '$1').replace(/[^A-Z]*/gm, '');
-    data.version = header.match(/\/\/ @version *(.*)\r\n/gm)[0].replace(/\/\/ @version *(.*)\r\n/gm, '$1');
-    data.description = header.match(/\/\/ @description *(.*)\r\n/gm)[0].replace(/\/\/ @description *(.*)\r\n/gm, '$1');
-    data.author = header.match(/\/\/ @author *(.*)\r\n/gm)[0].replace(/\/\/ @author *(.*)\r\n/gm, '$1');
-    data.homepage_url = header.match(/\/\/ @homepageURL *(.*)\r\n/gm)[0].replace(/\/\/ @homepageURL *(.*)\r\n/gm, '$1');
-    data.matches = header.match(/\/\/ @match *(.*)\r\n/gm).map((row) => row.replace(/\/\/ @match *(.*)\r\n/gm, '$1'));
-    data.connects = header.match(/\/\/ @connect *(.*)\r\n/gm).map((row) => row.replace(/\/\/ @connect *(.*)\r\n/gm, '$1'));
+
+    data.name = '' + header.match(/\/\/ @name *(.*)\n/gm)[0].replace(/\/\/ @name *(.*)\n/gm, '$1');
+    data.short_name = '' + header.match(/\/\/ @name *(.*)\n/gm)[0].replace(/\/\/ @name *(.*)\n/gm, '$1').replace(/[^A-Z]*/gm, '');
+    data.version = header.match(/\/\/ @version *(.*)\n/gm)[0].replace(/\/\/ @version *(.*)\n/gm, '$1');
+    data.description = header.match(/\/\/ @description *(.*)\n/gm)[0].replace(/\/\/ @description *(.*)\n/gm, '$1');
+    data.author = header.match(/\/\/ @author *(.*)\n/gm)[0].replace(/\/\/ @author *(.*)\n/gm, '$1');
+    data.homepage_url = header.match(/\/\/ @homepageURL *(.*)\n/gm)[0].replace(/\/\/ @homepageURL *(.*)\n/gm, '$1');
+    data.matches = header.match(/\/\/ @match *(.*)\n/gm).map((row) => row.replace(/\/\/ @match *(.*)\n/gm, '$1'));
+    data.connects = header.match(/\/\/ @connect *(.*)\n/gm).map((row) => row.replace(/\/\/ @connect *(.*)\n/gm, '$1'));
+
     return data;
 }
 
