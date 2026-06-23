@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MHO Addon
-// @version      1.1.43
+// @version      1.1.44
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/, rubrique Tutoriels
 // @author       Zerah
 //
@@ -47,10 +47,10 @@
     const big_broth_hordes_url = 'https://bbh.fred26.fr';
     const fata_morgana_url = 'https://fatamorgana.md26.eu';
     const supported_languages = [
-        {value: 'de', img: '🇩🇪'},
-        {value: 'en', img: '🇬🇧'},
-        {value: 'es', img: '🇪🇸'},
-        {value: 'fr', img: '🇫🇷'},
+        { value: 'de', img: '🇩🇪' },
+        { value: 'en', img: '🇬🇧' },
+        { value: 'es', img: '🇪🇸' },
+        { value: 'fr', img: '🇫🇷' },
     ];
     const gm_bbh_updated_key = 'MHO_bbh_updated';
     const gm_gh_updated_key = 'MHO_gh_updated';
@@ -145,100 +145,85 @@
         return item?.[lang] !== 'TODO' ? item?.[lang] : (item?.en === 'TODO' ? item?.fr : item?.en);
     }
 
+    /////////////////////////////////////////
+    // Fonctions utiles / Useful functions //
+    /////////////////////////////////////////
+    /** @return {string}     website language */
     function getWebsiteLanguage() {
         return document.getElementsByTagName('html')[0].attributes.lang.value;
     }
-
     /** @return {boolean}     true if button exists */
     function buttonOptimizerElement() {
         return document.getElementById(btn_id);
     }
-
     /** @return {boolean}    true si la page de l'utilisateur est la page de la ville */
     function pageIsTown() {
         return document.URL.indexOf('town') > -1;
     }
-
     /** @return {boolean}    true si la page de l'utilisateur est la page de l'atelier */
     function pageIsWorkshop() {
         return document.URL.endsWith('workshop');
     }
-
     /** @return {boolean}    true si la page de l'utilisateur est la page principale de sa maison */
     function pageIsHouse() {
         return document.URL.indexOf('town/house/dash') > -1;
     }
-
     /** @return {boolean}    true si la page de l'utilisateur est la page d'envoi de messages */
     function pageIsMsgReceived() {
         return document.URL.indexOf('town/house/messages') > -1;
     }
-
     /** @return {boolean}    true si la page de l'utilisateur est la page des améliorations de sa maison */
     function pageIsAmelio() {
         return document.URL.indexOf('town/house/build') > -1;
     }
-
     /** @return {boolean}    true si la page de l'utilisateur est la page de la porte */
     function pageIsDoors() {
         return document.URL.endsWith('town/door');
     }
-
     /** @return {boolean}    true si la page de l'utilisateur est la page de la tour de guet */
     function pageIsWatchtower() {
         return document.URL.indexOf('town/watchtower') > -1;
     }
-
     /** @return {boolean}    true si la page de l'utilisateur est la page du puit */
     function pageIsWell() {
         return document.URL.indexOf('town/well') > -1;
     }
-
     /** @return {boolean}    true si la page de l'utilisateur est la page de la banque */
     function pageIsBank() {
         return document.URL.indexOf('town/bank') > -1;
     }
-
     /** @return {boolean}    true si la page de l'utilisateur est la page de la décharge */
     function pageIsDump() {
         return document.URL.indexOf('town/dump') > -1;
     }
-
     /** @return {boolean}    true si la page de l'utilisateur est la liste des citoyens */
     function pageIsCitizens() {
         return document.URL.endsWith('citizens');
     }
-
     /** @return {boolean}    true si la page de l'utilisateur est la page des chantiers */
     function pageIsConstructions() {
         return document.URL.endsWith('constructions');
     }
-
     /** @return {boolean}    true si la page de l'utilisateur est la page du désert */
     function pageIsDesert() {
         return document.URL.indexOf('desert') > -1;
     }
-
     /** @return {boolean}    true si la page de l'utilisateur est la page du forum */
     function pageIsForum() {
         return document.URL.indexOf('forum') > -1;
     }
-
     /** @return {boolean}    true si la page de l'utilisateur est une âme */
     function pageIsSoul() {
         return document.URL.indexOf('soul') > -1;
     }
-
     /** @return {boolean}    true si la page est un historique de ville */
     function pageIsTownHistory() {
         return document.URL.indexOf('town') > -1 && (document.URL.indexOf('me') > -1 || document.URL.indexOf('soul') > -1);
     }
-
     /** @return {boolean}    true si la page de l'utilisateur est liste omniscience */
     function pageIsOmniscience() {
         return document.URL.endsWith('omniscience');
     }
-
     /** @return {boolean}    on doit refresh le user actuel si le jour de la ville est différent du jour précédent */
     function shouldRefreshMe() {
         // Si on est pendant l'attaque, on ne fait rien
@@ -267,43 +252,994 @@
                 GM.getValue(key).then((result) => {
                     resolve(result);
                 });
-            } catch (error) {
+            }
+            catch (error) {
                 try {
                     browser.storage.local.get(key).then((result) => {
                         resolve(result[key]);
                     });
-                } catch (error) {
+                }
+                catch (error) {
                     try {
                         chrome.storage.local.get(key).then((result) => {
                             resolve(result[key]);
                         });
-                    } catch (error) {
+                    }
+                    catch (error) {
                         console.error(error);
                     }
                 }
             }
         });
     }
-
     function setStorageItem(key, value) {
         try {
             return GM.setValue(key, value);
-        } catch (error) {
+        }
+        catch (error) {
             try {
                 const key_value = {};
                 key_value[key] = value;
                 return browser.storage.local.set(key_value);
-            } catch (error) {
+            }
+            catch (error) {
                 try {
                     const key_value = {};
                     key_value[key] = value;
                     return chrome.storage.local.set(key_value);
-                } catch (error) {
+                }
+                catch (error) {
                     console.error(error);
                 }
             }
         }
     }
+
+    const changelogs = {
+        '1.1.44': `
+        [Correction] Les champs de recherche de la page de chantiers, de la page de veille et de la liste des destinataires ne fonctionnaient pas 
+        [Correction] Le compteur anti-abus ne fonctionnait pas correctement (on croise les doigts pour que ce soit la bonne)
+        
+        [Amélioration] L'affichage du changelog permet également de consulter les anciens changelogs
+    `,
+        '1.1.43': `
+        [Correction] La mise à jour de la carte de GH après une mise à jour des outils externes fonctionne de nouveau correctement sans recharger toute la page
+        
+        [Nouveauté] Deux nouvelles options permettent d'afficher des filtres sur les pages de liste des citoyens et d'omniscience
+    `,
+        '1.1.42': `
+        [Correction] La mise à jour depuis la maison ne fonctionnait plus
+    `,
+        '1.1.41': `
+        [Correction] Typo
+        [Correction] Les appels ne fonctionnent plus
+    `,
+        '1.1.40': `
+        [Correction] Fix de l'update des outils externes suite à la mise à jour de mi-saison
+        [Correction] Affichage de la liste de courses dans la page
+        
+        [Amélioration] Remaniement des options du script pour plus de clarté
+        
+        [Nouveauté] Option pour trier la liste des citoyens et l'omniscience
+    `,
+        '1.1.39.0': `
+        [Correction] Fix de l'update des outils externes suite à la mise à jour de mi-saison
+    `,
+        '1.1.38.0': `
+        [Correction] Modifications dans la gestion de la wishlist
+    `,
+        '1.1.37.0': `
+        [Correction] Corrige l'affichage des auras sur les objets de la liste de courses
+    `,
+        '1.1.36.0': `
+        [Amélioration] Les tooltips améliorés indiquent désormais sur quel élément de la recette cliquer
+    `,
+        '1.1.35.0': `
+        [Correction] Changement de comportement complet pour le tooltip amélioré pour en fluidifier et corriger l'usage. Merci Emmet pour le coup de main
+        
+        [Amélioration] Affichage compact des recettes dans le tooltip amélioré
+        [Amélioration] Ajout d'informations sur les propriétés des statuts et objets
+        
+        [Nouveauté] Personnalisation des informations affichées dans le tooltip via des options distinctes (attention, ça désactive les options en question il faut les réactiver)
+        [Nouveauté] Ajout de la traduction sur les tooltips des objets
+    `,
+        '1.1.34.0': `
+        [Correction] Changement de comportement complet pour le tooltip amélioré pour en fluidifier et corriger l'usage. Merci Emmet pour le coup de main
+        
+        [Amélioration] Affichage compact des recettes dans le tooltip amélioré
+        
+        [Nouveauté] Personnalisation des informations affichées dans le tooltip via des options distinctes (attention, ça désactive les options en question il faut les réactiver)
+        [Nouveauté] Ajout de la traduction sur les tooltips des objets
+    `,
+        '1.1.33.0': `
+        [Correction] Changement de comportement complet pour le tooltip amélioré pour en fluidifier et corriger l'usage. Merci Emmet pour le coup de main
+        [Correction] Correction des cas où le tooltip n'avait pas le conseil "shift" ou le bouton pour fermer une fois figé
+        [Correction] Empêche de figer un tooltip qui n'a pas le conseil "shift" affiché
+        [Correction] Meilleur affichage des boutons "Wiki" et "Outils" du tooltip
+        
+        [Nouveauté] Personnalisation des informations affichées dans le tooltip via des options distinctes
+        [Nouveauté] Ajout de la traduction sur les tooltips des objets
+    `,
+        '1.1.32.0': `
+        [Correction] Changement de comportement complet pour le tooltip amélioré pour en fluidifier et corriger l'usage. Merci Emmet pour le coup de main
+        [Correction] Correction des cas où le tooltip n'avait pas le conseil "shift" ou le bouton pour fermer une fois figé
+        [Correction] Empêche de figer un tooltip qui n'a pas le conseil "shift" affiché
+        [Correction] Meilleur affichage des boutons "Wiki" et "Outils" du tooltip
+        
+        [Nouveauté] Personnalisation des informations affichées dans le tooltip via des options distinctes
+        [Nouveauté] Ajout de la traduction sur les tooltips des objets
+    `,
+        '1.1.31.0': `
+        [Correction] Changement de comportement complet pour le tooltip amélioré pour en fluidifier et corriger l'usage. Merci Emmet pour le coup de main
+        [Correction] Meilleur affichage des boutons "Wiki" et "Outils" du tooltip
+        
+        [Nouveauté] Personnalisation des informations affichées dans le tooltip via des options distinctes
+        [Nouveauté] Ajout de la traduction sur les tooltips des objets
+    `,
+        '1.1.30.0': `
+        [Correction] Changement de comportement complet pour le tooltip amélioré pour en fluidifier et corriger l'usage. Merci Emmet pour le coup de main
+        [Correction] Meilleur affichage des boutons "Wiki" et "Outils" du tooltip
+        
+        [Nouveauté] Personnalisation des informations affichées dans le tooltip via des options distinctes
+        [Nouveauté] Ajout de la traduction sur les tooltips des objets
+    `,
+        '1.1.29.0': `
+        [Correction] Changement de comportement complet pour le tooltip amélioré pour en fluidifier et corriger l'usage. Merci Emmet pour le coup de main
+    `,
+        '1.1.28.0': `
+        [Correction] Le filtre sur les noms d'objets dans la page de la décharge ne fonctionnait plus
+    `,
+        '1.1.27.0': `
+        [Correction] Meilleure stabilité à l'ouverture d'un sac
+    `,
+        '1.1.26.0': `
+        [Correction] Tentative de fix des 429 en ville
+    `,
+        '1.1.25.0': `
+        [Correction] Tentative de fix des 429 en ville
+    `,
+        '1.1.24.0': `
+        [Correction] Le script fonctionne avec la nouvelle URL de gh
+        [Correction] 429 quand on n'est pas en ville
+        [Correction] Certains cas pour lesquels le sac ne s'ouvrait pas automatiquement avec l'option cochée
+        
+        [Divers] Retrait de la mise à jour BBH (BBH ne fonctionne plus)
+    `,
+        '1.1.23.0': `
+        [Correction] Affichage du wiki dans le script
+        [Correction] Affichage d'erreurs 503 lors de l'attaque
+    `,
+        '1.1.22.0': `
+        [Correction] Mise à jour infinie
+    `,
+        '1.1.21.0': `
+        [Correction] Fix l'erreur 400 au début d'une ville
+    `,
+        '1.1.20.0': `
+        [Correction] Affichage de MHO suite au changement de saison
+    `,
+        '1.1.19.0': `
+        [Correction] Affichage des chantiers
+        [Correction] Compteur anti-abus
+        [Correction] Affichage en cas d'erreur des outils externes avec CSS
+    `,
+        '1.1.18.0': `
+        [Correction] Affichage des chantiers
+    `,
+        '1.1.17.0': `
+        [Nouveauté] Le script envoie les informations de la page à FataMorgana y compris hors mode chaos
+    `,
+        '1.1.16.0': `
+        [Correction] Le script ne s'affichait plus en cas de wishlist
+    `,
+        '1.1.15.0': `
+        [Correction] Affichage de la banque dans la fenêtre "Outils"
+        [Correction] Retrait de l'onglet "Liste de courses" de la fenêtre "Outils" devenu obsolète (à retrouver sur le site)
+    `,
+        '1.1.14.0': `
+        [Correction] Correctif de l'envoi des données de fouineur à Fata Morgana
+    `,
+        '1.1.13.0': `
+        [Correction] Envoi des données d'éclaireur et de fouineur
+        [Correction] Anti-abus
+    `,
+        '1.1.12.0': `
+        [Nouveauté] Ajout d'une option pour envoyer les informations issues des métiers (éclaireur, fouineur) à Fata Morgana
+    `,
+        '1.1.11.0': `
+        [Nouveauté] Ajout d'une option pour envoyer les informations issues des métiers (éclaireur, fouineur) à Fata Morgana
+    `,
+        '1.1.10.1': `
+        [Nouveauté] Ajout d'une option pour envoyer les informations issues des métiers (éclaireur, fouineur) à Fata Morgana
+    `,
+        '1.1.10.0': `
+        [Nouveauté] Ajout d'une option pour envoyer les informations issues des métiers (éclaireur, fouineur) à Fata Morgana
+    `,
+        '1.1.9.0': `
+        [Correction] Corrige la liste de courses
+    `,
+        '1.1.8.0': `
+        [Correction] Corrige la liste de courses
+    `,
+        '1.1.7.0': `
+        [Correction] Corrige l'appel en boucle sur la page de l'âme quand on n'est pas incarné
+    `,
+        '1.1.6.0': `
+        [Correction] Affichage des PA manquants sur les chantiers en pandé
+        
+        [Amélioration] Performances globales & stabilité
+        
+        [Nouveauté] Il est possible d'afficher un compteur de caractères sur le chatcase
+        [Nouveauté] Il est possible de relire les anciennes notifications (tant qu'on n'a pas refresh sa page)
+    `,
+        '1.1.5.0': `
+        [Correction] Affichage des PA manquants sur les chantiers en pandé
+        
+        [Amélioration] Performances globales & stabilité
+        
+        [Nouveauté] Il est possible d'afficher un compteur de caractères sur le chatcase
+        [Nouveauté] Il est possible de relire les anciennes notifications (tant qu'on n'a pas refresh sa page)
+    `,
+        '1.1.4.0': `
+        [Correction] Réparations diverses sur les recettes des objets
+    `,
+        '1.1.3.0': `
+        [Correction] Affiche correctement les doublons d'éléments dans les recettes sur les objets
+    `,
+        '1.1.2.0': `
+        [Correction] Affiche correctement les doublons d'éléments dans les recettes sur les objets
+    `,
+        '1.1.1.0': `
+        [Correction] Ajout de diverses propriétés manquantes sur les objets
+        [Correction] Corrige l'envoi du sac à dos à MHO
+    `,
+        '1.1.0.0': `
+        Mise à jour de compatibilité (ou presque) avec la S18
+    `,
+        '1.0.33.0': `
+        [Correction] Divers correctifs d'affichage
+    `,
+        '1.0.32.0': `
+        [Correction] Textes manquants dans certains tooltips
+    `,
+        '1.0.31.0': `
+        [Nouveauté] Ajout d'informations sur les tooltips améliorés des statuts
+    `,
+        '1.0.30.0': `
+        [Correction] Libellé dans le tooltip des objets (l'info "en sac" était affichée au lieu de "en banque")
+        [Correction] La mise à jour en chaos ne fonctionnait pas
+    `,
+        '1.0.29.0': `
+        [Correction] Les boutons pour incrémenter les valeurs des chantiers avaient disparu
+    `,
+        '1.0.28.0': `
+        [Correction] Correctif du calcul du camping sur la case
+        
+        
+        html[lang]
+        lang
+        fr
+    `,
+        '1.0.27.0': `
+        [Correction] Correctif du calcul du camping sur la case
+        
+        
+        html[lang]
+        lang
+        fr
+    `,
+        '1.0.26.0': `
+        [Correction] La copie du registre ne copie plus les lignes masquées par le filtre
+        
+        [Modification] Retrait de la notion de "priorité" dans la liste de courses et affichage des couleurs en fonction de la position
+    `,
+        '1.0.25.0': `
+        [Correction] L'enregistrement à la tour de guet ne fait plus planter l'affichange de l'attaque estimée
+    `,
+        '1.0.24.0': `
+        [Correction] On essaye de faire en sorte que les barres de réparation en pandé ne débordent plus
+        [Correction] Retrait du localhost dans la liste des matchs
+    `,
+        '1.0.23.0': `
+        [Correction] On essaye de faire en sorte que les barres de réparation en pandé s'affichent tout le temps, et pas juste quand elles ont envie
+    `,
+        '1.0.22.0': `
+        [Correction] Divers bugs d'affichage
+    `,
+        '1.0.21.0': `
+        [Nouveauté] La mise à jour des outils externes avec l'option statut activé met également à jour l'information indiquant si le bain a été pris ou non
+    `,
+        '1.0.20.0': `
+        [Mise à jour du nom du script] Le script s'appellera désormais MHO Addon
+    `,
+        '1.0.19.0': `
+        [Correction] Le compteur personnalisé de l'anti-abus ne comptait qu'une minute
+    `,
+        '1.0.18.0': `
+        [Correction] Problèmes d'affichage
+        [Correction] Erreur lors de l'ajout d'un objet à la liste de courses
+    `,
+        '1.0.17.0': `
+        [Correction] La récupération automatique de l'identifiant externe est de nouveau disponible
+        
+        [Amélioration] Diverses améliorations de performance (en tout cas on espère :D)
+        
+        [Nouveauté] Ajout d'une option permettant de pré-remplir un message dans la maison quand vous souhaitez envoyer un objet et que le message est vide. Le message est pré-rempli avec des valeurs prises au hasard parmi celles dispo pour votre langue. Actuellement, il n'y a qu'un seul message par langue mais vous pouvez me faire vos suggestions pour que j'en ajoute ;)
+        [Nouveauté] Ajout d'une option pour afficher en jeu les expéditions issues de MHO sur lesquelles vous êtes inscrit
+    `,
+        '1.0.16.0': `
+        [Correction] Déploiement d'un hotfix suite à l'introduction d'un bug. La récupération automatique de votre identifiant externe pour les apps n'est pour l'instant plus disponible.
+    `,
+        '1.0.15.0': `
+        [Amélioration] Les mises à jour disponibles sont désormais signalées par un indicateur visuel et un nouveau lien fait son apparition dans le menu en cas de mise à jour disponible
+        [Amélioration] Les changelogs ne sont plus affichés au chargement de l'application mais signalés par un indicateur visuel sur le menu
+        
+        [Nouveauté] Une nouvelle option fait son apparition pour Fata Morgana : l'envoi du nombre de zombies tués
+    `,
+        '1.0.14.0': `
+        [Correction] Traductions manquantes
+        [Correction] Notification de fin de fouille
+        [Correction] Divers bugs depuis la version 1.0.8.0
+        
+        [Amélioration] Une nouvelle option est disponible pour mettre à jour Fata Morgana en ville dévastée
+    `,
+        '1.0.13.0': `
+        [Correction] Traductions manquantes
+        [Correction] Notification de fin de fouille
+        [Correction] Divers bugs depuis la version 1.0.8.0
+        
+        [Amélioration] Une nouvelle option est disponible pour mettre à jour Fata Morgana en ville dévastée
+    `,
+        '1.0.12.0': `
+        [Correction] Traductions manquantes
+        [Correction] Notification de fin de fouille
+        
+        [Amélioration] Une nouvelle option est disponible pour mettre à jour Fata Morgana en ville dévastée
+    `,
+        '1.0.11.0': `
+        [Correction] Traductions manquantes
+        [Correction] Notification de fin de fouille
+        
+        [Amélioration] Une nouvelle option est disponible pour mettre à jour Fata Morgana en ville dévastée
+    `,
+        '1.0.10.0': `
+        [Correction] Traductions manquantes
+        [Correction] Notification de fin de fouille
+        
+        [Amélioration] Une nouvelle option est disponible pour mettre à jour Fata Morgana en ville dévastée
+    `,
+        '1.0.9.0': `
+        [Correction] Lors de l'enregistrement des fouilles, les fouilles de celui qui enregistre n'étaient jamais prises en compte
+        [Correction] Correction d'un bug d'affichage des liens vers les profils externes des utilisateurs
+        [Correction] Quelques corrections sur l'Anti-Abus (c'est pas fini, et j'ai l'impression de pas en voir le bout 🥲)
+        [Correction] Correction d'un bug d'intégration avec Fata Morgana
+        
+        [Suppression] Retrait de la fonctionnalité de notification lors d'un nouveau message, puisqu'elle existe maintenant nativement dans MyHordes
+    `,
+        '1.0.8.0': `
+        [Amélioration] Une nouvelle option est disponible pour mettre à jour Fata Morgana en ville dévastée
+    `,
+        '1.0.7.0': `
+        [Correction] Lors de l'enregistrement des fouilles, les fouilles de celui qui enregistre n'étaient jamais prises en compte
+        [Correction] Correction d'un bug d'affichage des liens vers les profils externes des utilisateurs
+        [Correction] Quelques corrections sur l'Anti-Abus (c'est pas fini, et j'ai l'impression de pas en voir le bout 🥲)
+        [Correction] Correction d'un bug d'intégration avec Fata Morgana
+        
+        [Suppression] Retrait de la fonctionnalité de notification lors d'un nouveau message, puisqu'elle existe maintenant nativement dans MyHordes
+    `,
+        '1.0.6.0': `
+        [Correction] Affichage et enregistrement des estimations de la tour de guet dans l'extension Firefox
+        
+        [Amélioration] Plus besoin d'appuyer sur Entrée pour démarrer une traduction, elle se lancera automatiquement à chaque recherche de plus de 2 lettres
+        [Amélioration] Indicateur visuel sur le bouton de copie du registre quand la copie est effectuée
+        
+        [Nouveauté] Ajout de liens vers les profils externes dans la popup d'un utilisateur
+    `,
+        '1.0.5.0': `
+        [Correction] La première prise en banque ne compte de nouveau plus dans l'anti-abus
+        [Correction] Traductions
+        
+        [Nouveauté] Champs de recherche sur la page de décharge
+        [Nouveauté] Affichage du % de voracité sur la jauge
+    `,
+        '1.0.4.0': `
+        [Correction] Le bouton pour ajouter un objet à la liste de courses n'apparait désormais plus sur les objets de l'outil Banque
+        [Correction] L'erreur de "CloneInto" devrait être (enfin) corrigée
+        [Correction] Le wiki des recettes est de nouveau accessible dans l'extension
+    `,
+        '1.0.3.0': `
+        [Correction] Corrige l'affichage du bouton de mise à jour des outils externes sous chrome
+        [Correction] Corrige la récupération de la liste de courses quand elle existe
+    `,
+        '1.0.2.0': `
+        [Correction] Corrige l'affichage de l'icône de succès après une mise à jour des outils externes sur petit écran en mode compact
+        [Correction] Corrige l'affichage du loader sur les tooltips qui était en allemand alors qu'il ne devait pas avoir de texte
+        [Correction] L'affichage du tooltip d'APAG est désormais plus propre
+        [Correction] Corrige le calcul du camping qui prenait en compte la mauvaise valeur pour le bâtiment
+        
+        [Nouveauté] Ajout d'un bouton pour cocher tous les paramètres
+    `,
+        '1.0.1.0': `
+        Cette version contient des changements techniques importants. Pour cette raison, il faudra peut être remettre en place toutes vos options.
+        
+        [Correction] Corrige le problème de chargement intempestif bloquant MyHordes.
+        
+        [Amélioration] Ajout d'une option sur chaque outil externe pour choisir si on souhaite qu'il soit rafraîchi au changement d'onglet ou non. Si vous comptiez sur cette fonctionnalité qui était déjà en place, n'oubliez pas d'aller l'activer dans les options.
+    `,
+        '1.0.0.0': `
+        Cette version contient des changements techniques importants. Pour cette raison, il faudra peut être remettre en place toutes vos options.
+        
+        [Correction] Corrige le problème de chargement intempestif bloquant MyHordes.
+        
+        [Amélioration] Ajout d'une option sur chaque outil externe pour choisir si on souhaite qu'il soit rafraîchi au changement d'onglet ou non. Si vous comptiez sur cette fonctionnalité qui était déjà en place, n'oubliez pas d'aller l'activer dans les options.
+    `,
+        '1.0.0': `
+        Cette version contient des changements techniques importants. Pour cette raison, il faudra peut être remettre en place toutes vos options.
+        
+        [Correction] Corrige le problème de chargement intempestif bloquant MyHordes.
+        
+        [Amélioration] Ajout d'une option sur chaque outil externe pour choisir si on souhaite qu'il soit rafraîchi au changement d'onglet ou non. Si vous comptiez sur cette fonctionnalité qui était déjà en place, n'oubliez pas d'aller l'activer dans les options.
+    `,
+        '1.0.0-beta.73': `
+        [Correction] Affichage des calculs de camping
+    `,
+        '1.0.0-beta.72': `
+        [Correction] Lien de mise à jour du script en cas de script pas à jour
+        [Correction] Mise à jour du calculateur de camping en S16
+        [Correction] Correction de l'affichage des réparations en pandemonium
+        [Correction] Corrige la prise de ration dans l'anti-abus
+        
+        [Amélioration] Le script ne devrait plus afficher plusieurs erreurs simultanées en cas de multiples appels en erreur en même temps
+        [Amélioration] Les objets trouvables dans un bâtiment sont triés par probabilité
+    `,
+        '1.0.0-beta.71': `
+        [Correction] Correction de l'affichage des informations complémentaires sur un bâtiment
+        
+        [Amélioration] Mise en place de méthodes pour limiter le nombre d'appels à l'API MyHordes
+    `,
+        '1.0.0-beta.70': `
+        [Correction] Correctifs de l'affichage des chantiers à réparer en pandé
+        
+        [Amélioration] Les erreurs issues de MH sont désormais mieux gérées et affichées
+        [Amélioration] Le bloc des informations complémentaires indique désormais les objets trouvables dans le bâtiment
+    `,
+        '1.0.0-beta.69': `
+        [Amélioration] Le filtre pour masquer les chantiers terminés ne masque plus les chantiers ayant pris des dégâts
+        [Amélioration] Correctifs sur les estimations
+        [Amélioration] Le bloc des informations complémentaires indique désormais si le bâtiment est vide
+    `,
+        '1.0.0-beta.68': `
+        [Correction] La copie du registre retire désormais les espaces en trop en début de ligne
+        
+        [Amélioration] Les différents filtres ne tiennent désormais plus compte des accents
+        [Amélioration] Amélioration visuelle du bloc d'informations complémentaires
+        
+        [Nouveauté] Ajout d'un filtre pour masquer les chantiers terminés
+    `,
+        '1.0.0-beta.67': `
+        [Correction] Correction d'un bug l'enregistrement de la valeur du 0 de la tdg
+        
+        [Nouveauté] Un message sera désormais affiché au chargement du script si celui-ci n'est pas à sa version la plus récentes.
+    `,
+        '1.0.0-beta.66': `
+        [Correction] Correction d'un bug l'enregistrement de la valeur du 0 de la tdg
+        
+        [Nouveauté] Un message sera désormais affiché au chargement du script si celui-ci n'est pas à sa version la plus récentes.
+    `,
+        '1.0.0-beta.65': `
+        [Correction] Correction d'un bug l'enregistrement de la valeur du 0 de la tdg
+        
+        [Nouveauté] Un message sera désormais affiché au chargement du script si celui-ci n'est pas à sa version la plus récentes.
+    `,
+        '1.0.0-beta.64': `
+        [Correction] Correction d'un bug l'enregistrement des valeurs de la tdg
+        
+        [Amélioration] Tentative d'amélioration des tooltips pour afficher un scroll en cas de recettes
+        [Amélioration] Le tooltip amélioré affiche désormais le lieu de dépose d'un objet de la liste de courses
+        [Amélioration] La liste de course embarquée dans la page est désormais triée par priorité et n'affiche que les objets présents sur la case
+    `,
+        '1.0.0-beta.63': `
+        [Correction] Correction d'un bug sur les options d'escorte qui n'étaient pas forcément les bonnes après une actualisation
+    `,
+        '1.0.0-beta.62': `
+        [Correction] Bug de recherche dans le nom d'un chantier
+    `,
+        '1.0.0-beta.61': `
+        [Correction] Divers correctifs d'affichage des paramètres en particulier sur mobile ou sur petit écran
+    `,
+        '1.0.0-beta.60': `
+        [Amélioration] Déplacement de la barre de traduction qui pouvait chevaucher des éléments du jeu
+        [Amélioration] Amélioration de l'affichage des paramètres en particulier sur mobile ou sur un écran assez petit pour provoquer un défilement dans les paramètres
+    `,
+        '1.0.0-beta.59': `
+        Attention certains changements peuvent avoir impacté vos options sélectionnées, assurez-vous que tout est en ordre !
+        
+        [Correction] Corrige l'affichage de certaines images qui ne s'affichaient pas toujours
+        [Correction] Corrige la prise en compte du métier dans l'outil intégré de calcul de camping
+        
+        [Amélioration] Réorganisation du menu dans lequel les options commençaient à prendre trop de place
+        [Amélioration] Séparation de certaines options (mise à jour en ville dévastée et envoi du nombre de zombies tués / champs de recherches)
+        
+        [Nouveauté] Ajout d'une option pour enregistrer les estimations de la TDG dans MHO, consulter les valeurs enregistrées et les copier pour le forum
+        [Nouveauté] Ajout d'une option pour afficher un champ de recherche sur le registre
+        [Nouveauté] Ajout d'une option pour choisir ses options d'escorte à appliquer à l'activation de l'attente d'escorte
+        [Nouveauté] Ajout d'une option pour notifier l'utilisateur en cas d'inactivité de plus de 5 minutes si il n'a pas relâché l'escorte ou qu'il ne s'est pas mis en attente d'escorte
+    `,
+        '1.0.0-beta.58': `
+        [Correction] Corrige certains comportements du compteur anti-abus
+        
+        [Nouveauté] Ajoute un bouton de copie du registre
+        
+        [Remise en place] Réintègre l'option d'envoi des améliorations de maison. Un nouveau bouton sera créé sur la page des améliorations
+    `,
+        '1.0.0-beta.57': `
+        [Correction] Corrige l'affichage du bouton de mise à jour sur petit écran si le mode compact n'est pas activé dans les options
+        [Correction] Corrige certains comportements du compteur anti-abus
+        [Correction] Devrait corriger l'affichage des images qui était parfois cassé
+        
+        [Amélioration] Le bouton d'accès aux options du script est désormais aggrandi sur les petits écrans
+    `,
+        '1.0.0-beta.56': `
+        [Correction] Corrige l'affichage du nombre de zombies morts sur la case
+    `,
+        '1.0.0-beta.55': `
+        [Correction] Le nombre de charges d'APAG restantes était mal enregistré
+    `,
+        '1.0.0-beta.54': `
+        [Nouveauté] Ajout d'une option permettant d'activer un mode compact sur mobile pour le bouton de mise à jour des outils externes
+    `,
+        '1.0.0-beta.53': `
+        [Nouveauté] Ajout d'une option permettant d'activer un mode compact sur mobile pour le bouton de mise à jour des outils externes
+    `,
+        '1.0.0-beta.52': `
+        [Correction] Correction de l'affichage des tooltips améliorés suite à la mise à jour de MyHordes
+        [Correction] Correction d'un bug de duplication des lignes des prises en banque dans l'outil de suivi de l'anti-abus
+        
+        [Attention] Les améliorations de la maison ne sont plus envoyées à MHO et à GH suite à là mise à jour de MyHordes. J'essaierai de trouver une solution pour rétablir cette fonctionnalité mais sans certitudes.
+    `,
+        '1.0.0-beta.51': `
+        [Correction] Correction de divers comportements
+        
+        [Nouveauté] Ajout d'une option pour afficher un compteur de prises en banque
+    `,
+        '1.0.0-beta.50': `
+        [Correction] Correction de divers comportements
+        
+        [Amélioration] Devrait désormais fonctionner avec Greasemonkey
+        
+        [Nouveauté] Ajout d'une option pour ouvrir automatiquement le menu "Utiliser un objet de son sac"
+    `,
+        '1.0.0-beta.49': `
+        [Correction] Typo
+        [Correction] Affichage du warning en cas de registre incomplet
+    `,
+        '1.0.0-beta.48': `
+        [Correction] La valeur de la clôture est envoyée correctement à GH
+    `,
+        '1.0.0-beta.47': `
+        [Correction] Boucle infinie quand on était pris en escorte (oups)
+        [Correction] Affichage des pa manquants pour que le chantier ne soit pas détruit dans la nuit
+    `,
+        '1.0.0-beta.46': `
+        [Correction] La copie de la carte de BBH fonctionne à nouveau
+        [Correction] La taille des tooltips d'aide est de nouveau convenable
+    `,
+        '1.0.0-beta.45': `
+        [Correction] Suppression d'erreurs en console
+        [Correction] La carte ne s'ouvrait plus
+    `,
+        '1.0.0-beta.44': `
+        [Amélioration] Visuel de la note qui est affichée si l'option de fouilles est activée mais que les données de fouilles ne sont pas complètes
+    `,
+        '1.0.0-beta.43': `
+        [Correction] Ajout de traductions manquantes
+        
+        [Amélioration] Une note est affichée sur la carte si l'option de fouilles est activée mais que les données de fouilles ne sont pas complètes (lignes du registre non chargées)
+    `,
+        '1.0.0-beta.42': `
+        [Correction] Position de l'icône MHO
+        
+        [Amélioration] Lors d'une mise à jour de GH, la page n'est plus intégralement rechargée, seulement sa carte
+        
+        [Suppression] Suite à une discussion avec l'équipe de MyHordes (qui fait elle-même suite à une discussion intense sur le forum monde), la fonctionnalité d'informations complémentaires sur les citoyens - appelée par certains "Omniscience++" ou "O++" pour les plus flemmards - a été supprimée.
+    `,
+        '1.0.0-beta.41': `
+        [Correction] Réparation du menu qui passait sous les éléments d'interface de MH suite à des modifications de leur côté
+    `,
+        '1.0.0-beta.40': `
+        [Amélioration] Traductions et wording divers
+        [Amélioration] Regroupement des options de champs de recherches en une seule option
+        
+        [Nouveauté] Ajout d'un simulateur de camping directement disponible sur la case
+        [Nouveauté] Ajout d'une option permettant d'afficher des notes sur une case, issues de la carte de MHO
+    `,
+        '1.0.0-beta.39': `
+        [MH][Amélioration] Le rafraichissement de la liste de courses devrait fonctionner correctement
+    `,
+        '1.0.0-beta.38': `
+        [MH][Correction] Le lien vers le site était invalide
+        
+        [MH][Amélioration] Traductions espagnoles (merci Bacchus)
+        [MH][Amélioration] La mise à jour de la liste de courses depuis la fenêtre "Outils" a été retirée et confiée explusivement au site
+    `,
+        '1.0.0-beta.37': `
+        [MH][Amélioration] Traductions espagnoles (merci Bacchus)
+        [MH][Amélioration] La mise à jour de la liste de courses depuis la fenêtre "Outils" a été retirée et confiée exclusivement au site
+    `,
+        '1.0.0-beta.36': `
+        [MH][Amélioration] Ajout des chances de réussite du manuel dans le tooltip associé
+    `,
+        '1.0.0-beta.35': `
+        [MH][Nouveauté] Ajout d'une option pour filtrer les destinataires des messages
+    `,
+        '1.0.0-beta.34': `
+        [MH][Nouveauté] Ajout d'une option pour recevoir des notifications navigateur en cas de changement dans le nombre de notifications MH
+    `,
+        '1.0.0-beta.33': `
+        [MH][Correction] Correction du lien vers la doc utilisé dans tampermonkey
+        
+        [MH][Amélioration] Déplacement du lien du site tout en haut de la liste des options (j'espère que cette fois tout le monde sera au courant qu'il existe 😊)
+    `,
+        '1.0.0-beta.32': `
+        [MH][Correction] Correction des styles qui écrasaient les puces de MH dans les forums (désolée :( )
+        
+        [MH][Amélioration] Ajout de traductions (anglaises et allemandes) - merci Xochi, Crazy Unicorn, Nekomine !
+    `,
+        '1.0.0-beta.31': `
+        [MH][Correction] Digs => searches
+        
+        [MH][Amélioration] Prise en compte de la quantité d'objets dans les sacs dans la liste de courses
+    `,
+        '1.0.0-beta.30': `
+        [MH][Correction] La liste des citoyens présents sur la case envoyée à MHO était vide si il n'y avait qu'une personne sur la case
+    `,
+        '1.0.0-beta.29': `
+        [MH][Amélioration] Replacement du bouton de suppression de l'id externe pour les apps par un bouton de modification
+        [MH][Amélioration] Correctifs visuels sur la page d'informations complémentaires sur les citoyens
+        
+        [MH][Nouveauté] Ajout d'une option pour remonter à MHO le résultat de vos fouilles. Des outils de lectures et de modification sont à votre disposition sur le site
+    `,
+        '1.0.0-beta.28': `
+        [MH][Correction] Correction de la mise à jour des outils externes si 0 charges d'APAG
+    `,
+        '1.0.0-beta.27': `
+        [MH-beta][Correction] Réparation de la liste des objets : le Serpent Agonisant n'existait pas dedans, ce qui provoquait des erreurs en cas de mise à jour avec un serpent agonisant
+        [MH][Correction]La carte intégrée de GH est réparée (mais non, elle n'intègre toujours pas les expéditions)
+        
+        [MH][Amélioration] La liste des citoyens améliorée, en ville, est désormais mieux organisée, et toujours rangée par ordre alphabétique. Contrepartie : elle est légèrement plus longue à charger
+        [MH][Amélioration] Le Passage en Force fait désormais partie des AH enregistrées
+    `,
+        '1.0.0-beta.26': `
+        [MH-beta][Amélioration] MHO supporte maintenant la mise à jour de FataMorgana en beta
+    `,
+        '1.0.0-beta.25': `
+        [MH-beta][Correction] Correctif de l'envoi d'informations dans GH
+    `,
+        '1.0.0-beta.24': `
+        [Correction] Remise en place de l'URL d'appels API qui avait disparue (magic everywhere)
+        
+        [MH-beta] désactivation des appels vers BBH & Fata. Ils seront réactivés en cas d'existance d'une version compatible beta. Les options restent toujours visibles mais n'auront pas d'effet
+    `,
+        '1.0.0-beta.23': `
+        Ajout du script sur le site de la bêta de MH - aucune nouveauté
+    `,
+        '1.0.0-beta.22': `
+        Ajout du script sur le site de la bêta de MH - aucune nouveauté
+    `,
+        '1.0.0-beta.21': `
+        Ajout du script sur le site de la bêta de MH - aucune nouveauté
+    `,
+        '1.0.0-beta.20': `
+        [Correction] Divers correctifs pour anticiper des plantages
+    `,
+        '1.0.0-beta.19': `
+        [Correction] Le script plante si l'utilisateur n'a pas d'actions héroïques
+    `,
+        '1.0.0-beta.18': `
+        [Correction] L'état "Corps Sain" n'était jamais envoyé à GH
+    `,
+        '1.0.0-beta.17': `
+        [Correction] Il était impossible d'enregistrer le sac à dos dans MHO si vous aviez deux fois le même objet dedans (oups)
+    `,
+        '1.0.0-beta.16': `
+        [Nouveauté] Deux nouvelles options sont disponibles pour mettre à jour GH : la mise à jour automatique des pouvoirs héroïques et la mise à jour des améliorations de maison ! Pensez à les activer dans vos options !
+    `,
+        '1.0.0-beta.15': `
+        [Correction] Envoi des bonnes informations à GH
+    `,
+        '1.0.0-beta.14': `
+        [Nouveauté] Possibilité d'enregistrer des informations complémentaires dans MHO. Pensez à cocher les options associées !
+    `,
+        '1.0.0-beta.13': `
+        [Correction] Correctif du comportement à la mise à jour de GH
+    `,
+        '1.0.0-beta.12': `
+        [Correction] Correctif des erreurs liées à la mise à jour du contenu des sacs
+    `,
+        '1.0.0-beta.11': `
+        [Correction] L'affichage du bouton suite à des mises à jour devrait être corrigé !
+    `,
+        '1.0.0-beta.10': `
+        [Nouveauté] Il est désormais possible d'enregistrer le contenu de son sac via le bouton de mise à jour des outils externes. Les sacs sont consultables et modifiables depuis la liste des citoyens du site web de MHO.
+        N'oubliez pas d'activer l'option associée depuis vos paramètres pour rendre cette mise à jour possible !
+        
+        [Traductions] Merci à isaaclw qui nous a fourni quelques traductions en anglais ! Si vous voulez contribuer à la traduction, n'hésitez pas à rejoindre le discord, ou à me contacter en MP
+    `,
+        '1.0.0-beta.09': `
+        [Nouveauté] Il est désormais possible d'enregistrer le contenu de son sac via le bouton de mise à jour des outils externes. Les sacs sont consultables et modifiables depuis la liste des citoyens du site web de MHO.
+        N'oubliez pas d'activer l'option associée depuis vos paramètres pour rendre cette mise à jour possible !
+        
+        [Traductions] Merci à isaaclw qui nous a fourni quelques traductions en anglais ! Si vous voulez contribuer à la traduction, n'hésitez pas à rejoindre le discord, ou à me contacter en MP
+    `,
+        '1.0.0-beta.08': `
+        [Correction] Correctifs divers pour essayer de faire fonctionner le script pour les utilisateurs ios.
+        [Correction] Retrait d'un objet remonté par l'API MH mais qui n'existe plus
+        [Correction] Affichage d'une erreur lorsqu'on met à jour les app externes sans les avoir toutes cochées (alors que la mise à jour se passe bien)
+    `,
+        '1.0.0-beta.07': `
+        [Correction] Correctif de l'enregistrement de l'état de case épuisée sur GH
+    `,
+        '1.0.0-beta.06': `
+        [Correction] Correctif de l'enregistrement du nombre de zombies tués sur GH
+        
+        [Important] Nous avons changé la structure de la base de données. Nous n'avons pas récupéré les listes de courses existantes. Si vous avez besoin de conserver votre liste de course, merci de nous contacter sur le discord de MHO pour qu'on vous la récupère.
+    `,
+        '1.0.0-beta.05': `
+        [Nouveauté] Interface permettant de récupérer les évolutions de chaque citoyen (dans la page de citoyens)
+        [Nouveauté] Nouvelle option permettant d'envoyer à GH le nombre de zombies tués sur la case afin de mettre des marqueurs zombies
+        
+        [Important] Nous avons changé la structure de la base de données. Nous n'avons pas récupéré les listes de courses existantes. Si vous avez besoin de conserver votre liste de course, merci de nous contacter sur le discord de MHO pour qu'on vous la récupère.
+    `,
+        '1.0.0-beta.04': `
+        [Important] Nous avons changé la structure de la base de données. Nous n'avons pas récupéré les listes de courses existantes. Si vous avez besoin de conserver votre liste de course, merci de nous contacter sur le discord de MHO pour qu'on vous la récupère.
+    `,
+        '1.0.0-beta.03': `
+        [Important] Nous avons changé la structure de la base de données. Nous n'avons pas récupéré les listes de courses existantes. Si vous avez besoin de conserver votre liste de course, merci de nous contacter sur le discord de MHO pour qu'on vous la récupère.
+    `,
+        '1.0.0-beta.02': `
+        [Important] Nous avons changé la structure de la base de données. Nous n'avons pas récupéré les listes de courses existantes. Si vous avez besoin de conserver votre liste de course, merci de nous contacter sur le discord de MHO pour qu'on vous la récupère.
+    `,
+        '1.0.0-beta.01': `
+        [Important] Nous avons changé la structure de la base de données. Nous n'avons pas récupéré les listes de courses existantes. Si vous avez besoin de conserver votre liste de course, merci de nous contacter sur le discord de MHO pour qu'on vous la récupère.
+    `,
+        '1.0.0-alpha.73': `
+        [Correction] Réparation de la recherche de chantiers
+    `,
+        '1.0.0-alpha.72': `
+        [Suppression] Retrait de la fonctionnalité expérimentale de prévention des actions dangereuses (cyanure / dépendance)
+    `,
+        '1.0.0-alpha.71': `
+        [Correction] Réparation du filtre sur les chantiers
+    `,
+        '1.0.0-alpha.70': `
+        [Nouveauté] Ajout du calcul du nombre de zombies qui vont mourir par désespoir sur une case
+        [Nouveauté] Il n'est plus nécessaire de renseigner son id d'app externe
+    `,
+        '1.0.0-alpha.69': `
+        [Nouveauté] Ajout du calcul du nombre de zombies qui vont mourir par désespoir sur une case
+        [Nouveauté] Il n'est plus nécessaire de renseigner son id d'app externe
+    `,
+        '1.0.0-alpha.68': `
+        [Nouveauté] Ajout du calcul du nombre de zombies qui vont mourir par désespoir sur une case
+        [Nouveauté] Il n'est plus nécessaire de renseigner son id d'app externe soi-même
+    `,
+        '1.0.0-alpha.67': `
+        [Correction] On essaie d'améliorer les performances
+    `,
+        '1.0.0-alpha.66': `
+        [Nouveauté] Ajout d'un certificat de sécurité
+    `,
+        '1.0.0-alpha.65': `
+        [Correction] Ajout d'une phrase explicative sur le champ d'ajout d'un objet à la liste de courses
+        
+        [Nouveauté] Dans la liste de courses, ajout de la possibilité de sélectionner un endroit où rapporter l'objet (banque ou zone de rapatriement)
+    `,
+        '1.0.0-alpha.64': `
+        [Correction] Ajout d'une phrase explicative sur le champ d'ajout d'un objet à la liste de courses
+        
+        [Nouveauté] Dans la liste de courses, ajout de la possibilité de sélectionner un endroit où rapporter l'objet (banque ou zone de rapatriement)
+    `,
+        '1.0.0-alpha.63': `
+        [Correction] Ajout d'une phrase explicative sur le champ d'ajout d'un objet à la liste de courses
+        
+        [Nouveauté] Dans la liste de courses, ajout de la possibilité de sélectionner un endroit où rapporter l'objet (banque ou zone de rapatriement)
+    `,
+        '1.0.0-alpha.62': `
+        [Amélioration] Après avoir copié une carte, le texte du bouton informe explicitement l'utilisateur
+    `,
+        '1.0.0-alpha.61': `
+        [Correction] Correction du lien discord qui n'a marché qu'une seule fois avant de décider de manière unilatérale de devenir inutilisable
+    `,
+        '1.0.0-alpha.60': `
+        [Nouveauté] Remplacement du lien mail par un lien discord
+        [Nouveauté] Les ajouts d'interface en jeu sont distinctement identifiés comme venant de MHO
+    `,
+        '1.0.0-alpha.59': `
+        [Correction] L'affichage de "l'aura" de priorité ne fonctionnait plus
+    `,
+        '1.0.0-alpha.58': `
+        [Correction] Affichage de la liste de courses dans la page
+        [Correction] Affichage de certaines icônes dans les recettes
+    `,
+        '1.0.0-alpha.57': `
+        [Correction] Affichage de la liste de courses dans la page
+    `,
+        '1.0.0-alpha.56': `
+        [Nouveauté] Traduction espagnole (Merci Nekomine !)
+    `,
+        '1.0.0-alpha.55': `
+        [Nouveauté] Traduction espagnole (Merci Nekomine !)
+    `,
+        '1.0.0-alpha.54': `
+        [Correction] En cas d'absence de wishlist enregistrée, l'écran de wishlist ne fonctionnait pas
+    `,
+        '1.0.0-alpha.53': `
+        [Correction] Le positionnement du champ de traduction ne bloque plus le bouton de sondage
+    `,
+        '1.0.0-alpha.52': `
+        [Correction] Images des objets
+        
+        [Nouveauté] Ajout d'un bouton pour retirer son ID d'app externes de MHO sans avoir à passer par les paramètres de l'extension
+        [Nouveauté] Ajout de la date de dernière mise à jour de la liste des courses dans la page de liste de courses
+    `,
+        '1.0.0-alpha.51': `
+        [Correction] Migration de serveur pour tenter de ne plus avoir de problèmes de quota (on croise les doigts pour que ça marche toujours après ça...). La migration ne concerne malheureusement pas encore le camping et la liste des bâtiments
+    `,
+        '1.0.0-alpha.50': `
+        [Correction] Migration de serveur pour tenter de ne plus avoir de problèmes de quota (on croise les doigts pour que ça marche toujours après ça...). La migration ne concerne malheureusement pas encore le camping et la liste des bâtiments
+    `,
+        '1.0.0-alpha.49': `
+        [Nouveauté] Liste des bâtiments et probabilités sur les objets qu'on peut trouver dedans, tout ça dans "Wiki" > "Bâtiments"
+        
+        [Expérimental] Estimnation des chances de survie en camping. Ca se passe dans "Outils" > "Camping"
+    `,
+        '1.0.0-alpha.48': `
+        [Suppression] Suppression de la fonctionnalité d'estimation. Le mode de calcul a comme prévu été changé, rendant la fonctionnalité inefficace
+    `,
+        '1.0.0-alpha.47': `
+        [Amélioration] Ajout du stock en banque et du stock souhaité dans le tooltip avancé
+    `,
+        '1.0.0-alpha.46': `
+        [Amélioration] Traductions pour la fonctionnalité d'estimation de l'attaque (plus que quelques jours pour l'utiliser avant qu'elle ne disparaisse)
+    `,
+        '1.0.0-alpha.45': `
+        [Nouveauté] Nouvelle option, permettant d'afficher le seuil (70% + 1pa) auquel réparer les chantiers pour qu'ils ne soient pas détruits en Pandé
+    `,
+        '1.0.0-alpha.44': `
+        [Expérimental] Fonctionnalité (temporaire) d'estimation de l'attaque
+    `,
+        '1.0.0-alpha.43': `
+        [Expérimental] Fonctionnalité (temporaire) d'estimation de l'attaque
+    `,
+        '1.0.0-alpha.42': `
+        [Correction] Oups, j'avais oublié de réactiver l'option pour la carte, elle était bien implémentée mais impossible de l'activer ^^'
+        [Correction] Je tente d'améliorer la fonctionnalité de notification à la fin de la fouille depuis quelques temps, ça semble être plus stable
+        
+        [Amélioration] Ajout des PA du café dans le tooltip amélioré
+    `,
+        '1.0.0-alpha.41': `
+        [Nouveauté] Réimplémentation de la fonctionnalité de consultation de carte, qui avait été supprimée.
+        Désormais, les cartes sont reconstruites à partir des données récupérées en cliquant sur le bouton "copier".
+        Il est donc normal que le design de votre carte ne soit pas identique à celui de votre outil préféré !
+    `,
+        '1.0.0-alpha.40': `
+        [Nouveauté] Réimplémentation de la fonctionnalité de consultation de carte, qui avait été supprimée.
+        Désormais, les cartes sont reconstruites à partir des données récupérées en cliquant sur le bouton "copier".
+        Il est donc normal que le design de votre carte ne soit pas identique à celui de votre outil préféré !
+    `,
+        '1.0.0-alpha.39': `
+        [Temporaire] Utilisation de l'anglais à la place de l'espagnol tant qu'on n'a pas les traductions espagnoles
+    `,
+        '1.0.0-alpha.38': `
+        [Correction] L'ajout d'une élément de liste de courses à cette liste depuis la page de liste de courses devrait désormais fonctionner correctement
+    `,
+        '1.0.0-alpha.37': `
+        [Correction] Retrait de l'option pour copier les cartes des outils externes suite à un bug Tampermonkey
+        [Correction] L'ajout d'une élément de liste de courses à cette liste depuis la page de liste de courses devrait désormais fonctionner correctement
+    `,
+        '1.0.0-alpha.36': `
+        [Correction] L'activation du script provoquait la disparition d'un élément d'arrière-plan du site
+    `,
+        '1.0.0-alpha.35': `
+        [Correction] Quand on refusait une autorisation, on ne pouvait pas accéder au site
+        
+        [Amélioration] Ajout du lien vers la documentation dans la description du script, afin que celui-ci soit accessible avant toute installation
+    `,
+        '1.0.0-alpha.34': `
+        [Correction] Tris pas toujours fonctionnels
+        [Correction] Affichage du libellé du bouton sur Fata Morgana / Chrome
+    `,
+        '1.0.0-alpha.33': `
+        [Amélioration] Si un des outils externes ne se met pas bien à jour, on affiche le détail des succès et échecs
+        
+        [Nouveauté] Prise en chage de Violentmonkey
+    `,
+        '1.0.0-alpha.32': `
+        [Correction] Récupération de la carte depuis GH suite à la nouvelle version (mais la carte est toujours incomplète :'( )
+        
+        [Attention] Suite à la mise à jour en V2 de Gest'Hordes, la mise à jour via le script et le site de MHO n'est plus fonctionnelle. Nous travaillons activement à une résolution du problème.
+    `,
+        '1.0.0-alpha.31': `
+        [Nouveauté] Ajout d'un champ de sélection d'objets avec recherche dans la liste de courses
+        [Nouveauté] Ajout d'une fonctionnélité permettant de copier une carte d'outil externe (carte complète ou carte de ruine), puis de l'afficher dans MyHordes
+    `,
+        '1.0.0-alpha.30': `
+        [Correction] Corrige de gros ralentissements dans toute l'interface de l'application
+    `,
+        '1.0.0-alpha.29': `
+        [Correction] Corrige de gros ralentissements dans toute l'interface de l'application
+    `,
+        '1.0.0-alpha.28': `
+        [Correction] Résout le problème d'affichage de la barre de menu du jeu quand l'option de traduction est activée
+        
+        [Amélioration] Ajout des traductions allemandes pour l'affichage de l'outil de traduction
+    `,
+        '1.0.0-alpha.27': `
+        [Amélioration] Amélioration de la fonctionnalité de traduction (copie d'un libellé, afficher les résultats inexacts)
+    `,
+        '1.0.0-alpha.26': `
+        [Amélioration] Amélioration de la fonctionnalité de traduction (copie d'un libellé, afficher les résultats inexacts)
+    `,
+        '1.0.0-alpha.25': `
+        [Amélioration] Ajout d'une fonctionnalité de traduction des éléments de MyHordes
+    `,
+        '1.0.0-alpha.24': `
+        [Amélioration] Ajout d'une fonctionnalité de traduction des éléments de MyHordes
+    `,
+        '1.0.0-alpha.23': `
+        [Amélioration] Ajout d'une fonctionnalité de traduction des éléments de MyHordes
+    `,
+        '1.0.0-alpha.22': `
+        [Amélioration] Ajout d'une fonctionnalité de traduction des éléments de MyHordes
+    `,
+        '1.0.0-alpha.21': `
+        [Amélioration] Ajout d'une fonctionnalité de traduction des éléments de MyHordes
+    `,
+        '1.0.0-alpha.20': `
+        [Amélioration] Ajout des traductions anglaises et allemandes, merci Katt et Shokolaw
+    `,
+        '1.0.0-alpha.19': `
+        [Amélioration] Refonte des paramètres pour plus de lisibilité
+        
+        [Nouveauté] Ajout d'un champ de recherche dans la liste des chantiers
+    `,
+        '1.0.0-alpha.18': `
+        [Correction] Typo
+        
+        [Amélioration] Ajout de l'info "Objet de camping" dans le tooltip amélioré
+    `,
+        '1.0.0-alpha.17': `
+        [Nouveauté] Affichage du nombre de zombies morts sur la case aujourd'hui
+    `,
+        '1.0.0-alpha.16': `
+        [Correction] Erreur 500 au chargement du script quand on n'est pas en ville
+        [Correction] Comportement de la notification de fouille terminée
+    `,
+        '1.0.0-alpha.15': `
+        [Amélioration] Ajout de certaines propriétés d'objets dans les tooltips améliorés
+        
+        [Nouveauté] Ajout d'une option pour être prévenu à la fin de la fouille
+    `,
+        '1.0.0-alpha.14': `
+        [Amélioration] Ajout d'un niveau "trashlist" à la liste de courses, qui s'affiche en gris
+        [Amélioration] Changement dans les couleurs des éléments de la liste de courses
+        [Amélioration] Les couleurs des priorités d'affichent également sur l'image de l'objet dans la liste de courses intégrée
+        [Amélioration] Affichage de certaines propriétés sur les tooltips des objets si l'option "afficher les tooltips détaillés" est activée
+        
+        [Nouveauté] [expérimental] Ajout d'une option pour demander une confirmation avant de faire des actions "dangereuses" (consomation de cyanure, consomation de drogue si déjà drogué)
+    `,
+        '1.0.0-alpha.13': `
+        [Correction] Correctif affichage nom du script
+    `,
+        '1.0.0-alpha.12': `
+        [Correction] Ajout à la liste de courses depuis la liste d'objets
+        
+        [Amélioration] Affichage des paramètre
+        
+        [Nouveauté] Affichage de la version
+        [Nouveauté] Affichage du changelog après une mise à jour
+    `,
+    };
 
     function convertResponsePromiseToError(response) {
         return response.text().then((text) => {
@@ -313,7 +1249,6 @@
             throw error;
         });
     }
-
     function getErrorFromApi(error) {
         if (error.name !== 'AbortError' && error.name !== 'TypeError') {
             let error_text = '';
@@ -328,7 +1263,6 @@
             return error_text;
         }
     }
-
     function isScriptVersionLastVersion() {
         if (!isScript())
             return true;
@@ -347,7 +1281,6 @@
             return is_ok;
         });
     }
-
     function isNewVersion(version) {
         if (!version || typeof version !== "object") {
             version = {};
@@ -355,94 +1288,100 @@
         }
         return !version || !version[getScriptInfo().version];
     }
-
     function toggleNewChangelog(new_changelog) {
         state.has_new_changelog = new_changelog;
         let optimizer_btn = buttonOptimizerElement();
         if (optimizer_btn) {
             if (new_changelog && !optimizer_btn.classList.contains('mho-new-changelog')) {
                 optimizer_btn.classList.add('mho-new-changelog');
-            } else if (optimizer_btn.classList.contains('mho-new-changelog')) {
+            }
+            else if (optimizer_btn.classList.contains('mho-new-changelog')) {
                 optimizer_btn.classList.remove('mho-new-changelog');
             }
             let changelog_item = optimizer_btn.querySelector('#version');
             if (changelog_item) {
                 if (new_changelog && !changelog_item.classList.contains('mho-new-changelog')) {
                     changelog_item.classList.add('mho-new-changelog');
-                } else if (!new_changelog && changelog_item.classList.contains('mho-new-changelog')) {
+                }
+                else if (!new_changelog && changelog_item.classList.contains('mho-new-changelog')) {
                     changelog_item.classList.remove('mho-new-changelog');
                 }
             }
         }
     }
-
     function toggleNewVersion(new_version) {
         let optimizer_btn = buttonOptimizerElement();
         if (optimizer_btn) {
             if (new_version && !optimizer_btn.classList.contains('mho-new-version')) {
                 optimizer_btn.classList.add('mho-new-version');
-            } else if (!new_version && optimizer_btn.classList.contains('mho-new-version')) {
+            }
+            else if (!new_version && optimizer_btn.classList.contains('mho-new-version')) {
                 optimizer_btn.classList.remove('mho-new-version');
             }
             let update_item = optimizer_btn.querySelector('#update');
             if (update_item) {
                 if (new_version && !update_item.classList.contains('mho-new-version')) {
                     update_item.classList.add('mho-new-version');
-                } else if (!new_version && update_item.classList.contains('mho-new-version')) {
+                }
+                else if (!new_version && update_item.classList.contains('mho-new-version')) {
                     update_item.classList.remove('mho-new-version');
                 }
                 if (new_version && update_item.parentElement.classList.contains('mho-hidden')) {
                     update_item.parentElement.classList.remove('mho-hidden');
-                } else if (!new_version && !update_item.parentElement.classList.contains('mho-hidden')) {
+                }
+                else if (!new_version && !update_item.parentElement.classList.contains('mho-hidden')) {
                     update_item.parentElement.classList.add('mho-hidden');
                 }
             }
         }
     }
-
     function getOrigin() {
         try {
             GM_info.script;
             return 'script';
-        } catch (error) {
+        }
+        catch (error) {
             try {
                 browser.runtime;
-                return 'firerox';
-            } catch (error) {
+                return 'firefox';
+            }
+            catch (error) {
                 try {
                     chrome.runtime;
                     return 'chrome';
-                } catch (error) {
+                }
+                catch (error) {
                     console.error(error);
                 }
             }
         }
     }
-
     function isScript() {
         return getOrigin() === 'script';
     }
-
     function getScriptInfo() {
         try {
             return GM_info.script;
-        } catch (error) {
+        }
+        catch (error) {
             try {
                 return browser.runtime.getManifest();
-            } catch (error) {
+            }
+            catch (error) {
                 try {
                     return chrome.runtime.getManifest();
-                } catch (error) {
+                }
+                catch (error) {
                     console.error(error);
                 }
             }
         }
     }
-
     function getChangelog() {
-        return `${getScriptInfo().name} : Changelog pour la version ${getScriptInfo().version}\n\n`
-            + `[Correctif] La mise à jour de la carte de GH après une mise à jour des outils externes fonctionne de nouveau correctement sans recharger toute la page \n\n`
-            + `[Nouveauté] Deux nouvelles options permettent d'afficher des filtres sur les pages de liste des citoyens et d'omniscience`;
+        const version = getScriptInfo().version;
+        const content = changelogs[version] ?? `Aucune note de version disponible pour cette mise à jour.`;
+        return `${getScriptInfo().name} : Changelog pour la version ${version}
+        ${content}`;
     }
 
     ////////////////
@@ -1132,23 +2071,23 @@
         },
     ];
     const status_list = [
-        {id: "clean", img: "status/status_clean.gif", pdc: 1, terror: -3}, // Jamais drogué
-        {id: "hasdrunk", img: "status/status_hasdrunk.gif"}, // A bu
-        {id: "haseaten", img: "status/status_haseaten.gif"}, // A mangé
-        {id: "camper", img: "status/status_camper.gif", searches: '+10%'}, // A campé
-        {id: "immune", img: "status/status_immune.gif", watch_death: -0.01}, // Immunisé
-        {id: "hsurvive", img: "status/status_hsurvive.gif"}, // VLM niveau 1
-        {id: "hsurvive2", img: "status/status_hsurvive2.gif"}, // VLM niveau 2
-        {id: "hsurvive3", img: "status/status_hsurvive3.gif"}, // VLM niveau 3
-        {id: "tired", img: "status/status_tired.gif"}, // Fatigué
-        {id: "terror", img: "status/status_terror.gif", watch_def: -30, watch_death: 0.05}, // Terrorisé
-        {id: "thirst1", img: "status/status_thirst1.gif", watch_def: -5}, // Soif
-        {id: "thirst2", img: "status/status_thirst2.gif", watch_def: -10, wath_death: 0.03}, // Deshy
-        {id: "drugged", img: "status/status_drugged.gif", watch_def: 10}, // Drogué
-        {id: "addict", img: "status/status_addict.gif", watch_def: 10, watch_death: 0.06}, // Dépendant
-        {id: "infection", img: "status/status_infection.gif", watch_def: -15, watch_death: 0.1}, // Infecté
-        {id: "drunk", img: "status/status_drunk.gif", watch_def: 15, watch_death: -0.02, searches: '-20%'}, // Ivre
-        {id: "hungover", img: "status/status_hungover.gif", watch_def: -15, watch_death: 0.06}, // Gueule de bois
+        { id: "clean", img: "status/status_clean.gif", pdc: 1, terror: -3 }, // Jamais drogué
+        { id: "hasdrunk", img: "status/status_hasdrunk.gif" }, // A bu
+        { id: "haseaten", img: "status/status_haseaten.gif" }, // A mangé
+        { id: "camper", img: "status/status_camper.gif", searches: '+10%' }, // A campé
+        { id: "immune", img: "status/status_immune.gif", watch_death: -0.01 }, // Immunisé
+        { id: "hsurvive", img: "status/status_hsurvive.gif" }, // VLM niveau 1
+        { id: "hsurvive2", img: "status/status_hsurvive2.gif" }, // VLM niveau 2
+        { id: "hsurvive3", img: "status/status_hsurvive3.gif" }, // VLM niveau 3
+        { id: "tired", img: "status/status_tired.gif" }, // Fatigué
+        { id: "terror", img: "status/status_terror.gif", watch_def: -30, watch_death: 0.05 }, // Terrorisé
+        { id: "thirst1", img: "status/status_thirst1.gif", watch_def: -5 }, // Soif
+        { id: "thirst2", img: "status/status_thirst2.gif", watch_def: -10, wath_death: 0.03 }, // Deshy
+        { id: "drugged", img: "status/status_drugged.gif", watch_def: 10 }, // Drogué
+        { id: "addict", img: "status/status_addict.gif", watch_def: 10, watch_death: 0.06 }, // Dépendant
+        { id: "infection", img: "status/status_infection.gif", watch_def: -15, watch_death: 0.1 }, // Infecté
+        { id: "drunk", img: "status/status_drunk.gif", watch_def: 15, watch_death: -0.02, searches: '-20%' }, // Ivre
+        { id: "hungover", img: "status/status_hungover.gif", watch_def: -15, watch_death: 0.06 }, // Gueule de bois
         {
             id: "wound1",
             img: "status/status_wound1.gif",
@@ -1185,10 +2124,10 @@
             properties: ['wounded'],
             searches: '/2'
         }, // Blessure à l'oeil
-        {id: "wound6", img: "status/status_wound6.gif", watch_def: -15, watch_death: 0.10, properties: ['wounded']}, // Blessure au pied
-        {id: "healed", img: "status/status_healed.gif", watch_def: -15, watch_death: 0.05}, // Convalescent
-        {id: "hydrated", img: "status/status_hydrated.gif", pdc: 1}, // Hydraté
-        {id: "sober", img: "status/status_sober.gif", pdc: 1}, // Sobre
+        { id: "wound6", img: "status/status_wound6.gif", watch_def: -15, watch_death: 0.10, properties: ['wounded'] }, // Blessure au pied
+        { id: "healed", img: "status/status_healed.gif", watch_def: -15, watch_death: 0.05 }, // Convalescent
+        { id: "hydrated", img: "status/status_hydrated.gif", pdc: 1 }, // Hydraté
+        { id: "sober", img: "status/status_sober.gif", pdc: 1 }, // Sobre
         {
             id: "good_smell",
             img: "status/status_good_smell.gif",
@@ -1244,12 +2183,7 @@
     const action_types = [
         {
             id: `Recipe::ManualAnywhere`,
-            label: {
-                en: `Citizen actions`,
-                fr: `Actions du citoyen`,
-                de: `Bürgeraktionen`,
-                es: `Acciones del habitante`
-            },
+            label: { en: `Citizen actions`, fr: `Actions du citoyen`, de: `Bürgeraktionen`, es: `Acciones del habitante` },
             ordering: 1
         },
         {
@@ -1272,14 +2206,10 @@
             },
             ordering: 3
         },
-        {
-            id: `Recipe::WorkshopType`,
-            label: {en: `Workshop`, fr: `Atelier`, de: `Werkstatt`, es: `Taller`},
-            ordering: 0
-        },
+        { id: `Recipe::WorkshopType`, label: { en: `Workshop`, fr: `Atelier`, de: `Werkstatt`, es: `Taller` }, ordering: 0 },
         {
             id: `Recipe::WorkshopTypeShamanSpecific`,
-            label: {en: `Workshop - Shaman`, fr: `Atelier - Chaman`, de: `Werkstatt - Schamane`, es: `Taller - Chamán`},
+            label: { en: `Workshop - Shaman`, fr: `Atelier - Chaman`, de: `Werkstatt - Schamane`, es: `Taller - Chamán` },
             ordering: 4
         },
         {
@@ -1393,7 +2323,7 @@
             id: `diff`
         },
         {
-            label: {en: ``, fr: ``, es: ``, de: ``},
+            label: { en: ``, fr: ``, es: ``, de: `` },
             id: 'delete'
         },
     ];
@@ -1401,7 +2331,6 @@
     function normalizeString(str) {
         return str.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
     }
-
     /** Affiche une notification de réussite */
     function addSuccess(message) {
         let notifications = document.getElementById('notifications');
@@ -1416,7 +2345,6 @@
             notification.remove();
         }, 5000);
     }
-
     /** Affiche une notification de warning */
     function addWarning(message) {
         let notifications = document.getElementById('notifications');
@@ -1433,7 +2361,6 @@
             notification.remove();
         }, 5000);
     }
-
     /** Affiche une notification d'erreur */
     function addError(error) {
         if (typeof error === 'string' || (error.name !== 'AbortError' && error.name !== 'TypeError') && !state.is_error) {
@@ -1461,7 +2388,6 @@
         }
         console.error(`${getScriptInfo().name} : Une erreur s'est produite : \n`, error);
     }
-
     function createNotification(content) {
         try {
             GM_notification({
@@ -1470,7 +2396,8 @@
                 highlight: true,
                 timeout: 0
             });
-        } catch (error) {
+        }
+        catch (error) {
             try {
                 browser.runtime.sendMessage({
                     type: 'notifications', content: {
@@ -1481,7 +2408,8 @@
                         iconUrl: browser.runtime.getURL('img/logo/logo_mho_64x64_outlined.png')
                     }
                 });
-            } catch (error) {
+            }
+            catch (error) {
                 try {
                     chrome.runtime.sendMessage({
                         type: 'notifications', content: {
@@ -1493,7 +2421,8 @@
                             requireInteraction: true
                         }
                     });
-                } catch (error) {
+                }
+                catch (error) {
                     console.error(error);
                 }
             }
@@ -1504,42 +2433,43 @@
         return new Promise((resolve, reject) => {
             fetcher(state.api_url + '/Fetcher/items' + (state.mh_user && state.mh_user.townDetails && state.mh_user.townDetails?.townId > 0 ? ('?townId=' + state.mh_user.townDetails?.townId) : ''))
                 .then((response) => {
-                    if (response.status === 200) {
-                        return response.json();
-                    } else {
-                        return convertResponsePromiseToError(response);
-                    }
-                })
+                if (response.status === 200) {
+                    return response.json();
+                }
+                else {
+                    return convertResponsePromiseToError(response);
+                }
+            })
                 .then((response) => {
-                    let new_items = {...response};
-                    new_items = response
-                        .sort((a, b) => a.category.ordering - b.category.ordering)
-                        .filter((item) => is_mh_beta ? true : +item.id !== 302);
-                    new_items?.forEach((new_item) => {
-                        new_item.recipes = new_item?.recipes?.map((recipe) => {
-                            let new_recipe = {...recipe};
-                            let new_recipe_components = [];
-                            new_recipe.components.forEach((component) => {
-                                for (let i = 0; i < component.count; i++) {
-                                    new_recipe_components.push(component.item);
+                let new_items = { ...response };
+                new_items = response
+                    .sort((a, b) => a.category.ordering - b.category.ordering)
+                    .filter((item) => is_mh_beta ? true : +item.id !== 302);
+                new_items?.forEach((new_item) => {
+                    new_item.recipes = new_item?.recipes?.map((recipe) => {
+                        let new_recipe = { ...recipe };
+                        let new_recipe_components = [];
+                        new_recipe.components.forEach((component) => {
+                            for (let i = 0; i < component.count; i++) {
+                                new_recipe_components.push(component.item);
                             }
-                            });
-                            new_recipe.components = new_recipe_components;
-                            new_recipe.type = action_types.find((type) => type.id === new_recipe.type);
-                            if (!new_recipe.type) {
-                                console.warn('missing recipe type', recipe.type);
-                            }
-                            new_recipe.result = new_recipe.result.sort((a, b) => b.probability - a.probability);
-                            return new_recipe;
                         });
+                        new_recipe.components = new_recipe_components;
+                        new_recipe.type = action_types.find((type) => type.id === new_recipe.type);
+                        if (!new_recipe.type) {
+                            console.warn('missing recipe type', recipe.type);
+                        }
+                        new_recipe.result = new_recipe.result.sort((a, b) => b.probability - a.probability);
+                        return new_recipe;
                     });
-                    state.items = new_items;
-                    resolve(state.items);
-                })
-                .catch((error) => {
-                    addError(error);
-                    reject(error);
                 });
+                state.items = new_items;
+                resolve(state.items);
+            })
+                .catch((error) => {
+                addError(error);
+                reject(error);
+            });
         });
     }
 
@@ -1547,204 +2477,95 @@
         return new Promise((resolve, reject) => {
             fetcher(state.api_url + '/Fetcher/map?townId=' + state.mh_user.townDetails?.townId)
                 .then((response) => {
-                    if (response.status === 200) {
-                        return response.json();
-                    } else {
-                        return convertResponsePromiseToError(response);
-                    }
-                })
+                if (response.status === 200) {
+                    return response.json();
+                }
+                else {
+                    return convertResponsePromiseToError(response);
+                }
+            })
                 .then((response) => {
-                    state.map = response;
-                    resolve(state.map);
-                })
+                state.map = response;
+                resolve(state.map);
+            })
                 .catch((error) => {
-                    addError(error);
-                    reject(error);
-                });
+                addError(error);
+                reject(error);
+            });
         });
     }
-
-    let informations = [
-        {
-            id: `version`,
-            label: {
-                en: `Changelog ${getScriptInfo().version}`,
-                fr: `Notes de version ${getScriptInfo().version}`,
-                de: `Changelog ${getScriptInfo().version}`,
-                es: `Notas de la versión ${getScriptInfo().version}`
-            },
-            src: undefined,
-            action: () => {
-                getStorageItem(mho_version_key).then((version) => {
-                    if (isNewVersion(version)) {
-                        version[getScriptInfo().version] = confirm(getChangelog());
-                        toggleNewChangelog(!!version[getScriptInfo().version]);
-                        setStorageItem(mho_version_key, version);
-                    } else {
-                        alert(getChangelog());
-                    }
-                });
-            },
-            img: `emotes/rptext.gif`
-        },
-        {
-            id: `update`,
-            label: {
-                en: `Update available`,
-                fr: `Mise à jour disponible`,
-                de: `Update verfügbar`,
-                es: `Actualización disponible`
-            },
-            src: isScript() ? getScriptInfo().updateURL : undefined,
-            action: undefined,
-            img: `icons/small_news.gif`,
-            display: () => isScript() && !isScriptVersionLastVersion()
-        },
-        {
-            id: `discord-url-id`,
-            label: {
-                en: `Bugs? Ideas?`,
-                fr: `Des bugs ? Des idées ?`,
-                de: `Fehler ? Ideen ?`,
-                es: `¿Bugs? ¿Ideas?`
-            },
-            src: `https://discord.gg/ZQH7ZPWcCm`,
-            action: undefined,
-            img: `${repo_img_url}discord.ico`
-        },
-        {
-            id: `edit-app-id`,
-            label: {
-                en: `Change my external ID for apps`,
-                fr: `Modifier mon ID externe pour les apps`,
-                de: `Meine externe ID für externe Programme ändern`,
-                es: `Cambiar mi ID externo para las aplicaciones`
-            },
-            src: undefined,
-            action: () => {
-                let manual_app_id_key = prompt(getI18N(texts.edit_add_app_id_key), state.external_app_id);
-                if (manual_app_id_key !== null && manual_app_id_key !== undefined && manual_app_id_key !== '') {
-                    state.external_app_id = manual_app_id_key;
-                    setStorageItem(gm_mh_external_app_id_key, state.external_app_id);
-                } else if (manual_app_id_key === '') {
-                    state.external_app_id = undefined;
-                    setStorageItem(gm_mh_external_app_id_key, undefined);
-                }
-            },
-            img: `icons/small_remove.gif`
-        }
-    ];
-    const table_ruins_headers = [
-        {id: 'img', label: {en: ``, fr: ``, de: ``, es: ``}, type: 'th'},
-        {id: 'label', label: {en: `Name`, fr: 'Nom', de: `Name`, es: `Nombre`}, type: 'th'},
-        {
-            id: 'description',
-            label: {en: `Description`, fr: `Description`, de: `Beschreibung`, es: `Descripción`},
-            type: 'td'
-        },
-        {
-            id: 'minDist',
-            label: {en: `Minimum distance`, fr: `Distance minimum`, de: `Mindestabstand`, es: `Distancia mínima`},
-            type: 'td'
-        },
-        {
-            id: 'maxDist',
-            label: {en: `Maximum distance`, fr: `Distance maximum`, de: `Maximale Entfernung`, es: `Distancia máxima`},
-            type: 'td'
-        },
-        {
-            id: 'camping',
-            label: {en: `Camping bonus`, fr: `Bonus en camping`, de: `Campingbonus`, es: `Bono de acampada`},
-            type: 'td'
-        },
-        {
-            id: 'capacity',
-            label: {en: `Capacity`, fr: `Capacité`, de: `Kapazität`, es: `Capacidad`},
-            type: 'td'
-        },
-        {id: 'drops', label: {en: `Items`, fr: 'Objets', de: `Gegenstände`, es: `Objetos`}, type: 'td'},
-    ];
-    const added_ruins = [
-        {id: '-1000', camping: 0, label: {en: `None`, fr: `Aucun`, de: `Kein`, es: `Ninguna`}}
-    ];
-    const town_type = [
-        {id: 'rne', label: {de: 'Kleine Stadt', en: 'Small Town', es: 'Amateur', fr: 'Petite carte'}},
-        {id: 're', label: {de: 'Entfernte Regionen', en: 'Distant Region', es: 'Leyenda', fr: 'Région éloignée'}},
-        {id: 'pande', label: {de: 'Pandämonium', en: 'Pandemonium', es: 'Pandemonio', fr: 'Pandémonium'}}
-    ];
-    /////////////////////////////////////////
-    // Fonctions utiles / Useful functions //
-    /////////////////////////////////////////
-    /** @return {string}     website language */
 
     function getRuins() {
         return new Promise((resolve, reject) => {
             if (!state.ruins) {
                 fetcher(state.api_url + '/Fetcher/ruins?userKey=' + state.external_app_id)
                     .then((response) => {
-                        if (response.status === 200) {
-                            return response.json();
-                        } else {
-                            return convertResponsePromiseToError(response);
-                        }
-                    })
+                    if (response.status === 200) {
+                        return response.json();
+                    }
+                    else {
+                        return convertResponsePromiseToError(response);
+                    }
+                })
                     .then((response) => {
-                        state.ruins = response.sort((a, b) => {
-                            if (getI18N(a.label) < getI18N(b.label)) {
-                                return -1;
-                            }
-                            if (getI18N(a.label) > getI18N(b.label)) {
+                    state.ruins = response.sort((a, b) => {
+                        if (getI18N(a.label) < getI18N(b.label)) {
+                            return -1;
+                        }
+                        if (getI18N(a.label) > getI18N(b.label)) {
+                            return 1;
+                        }
+                        return 0;
+                    });
+                    state.ruins.forEach((ruin) => {
+                        ruin.drops.sort((drop_a, drop_b) => {
+                            if (drop_a.probability < drop_b.probability) {
                                 return 1;
                             }
-                            return 0;
+                            else if (drop_b.probability < drop_a.probability) {
+                                return -1;
+                            }
+                            else {
+                                return 0;
+                            }
                         });
-                        state.ruins.forEach((ruin) => {
-                            ruin.drops.sort((drop_a, drop_b) => {
-                                if (drop_a.probability < drop_b.probability) {
-                                    return 1;
-                                } else if (drop_b.probability < drop_a.probability) {
-                                    return -1;
-                                } else {
-                                    return 0;
-                                }
-                            });
-                        });
-                        resolve(state.ruins);
-                    })
-                    .catch((error) => {
-                        addError(error);
-                        reject(error);
                     });
-            } else {
+                    resolve(state.ruins);
+                })
+                    .catch((error) => {
+                    addError(error);
+                    reject(error);
+                });
+            }
+            else {
                 resolve(state.ruins);
             }
         });
     }
-
     /** Récupère les informations de la ville */
 
     function getWishlist() {
         return new Promise((resolve, reject) => {
             fetcher(state.api_url + '/wishlist?townId=' + state.mh_user.townDetails?.townId)
                 .then((response) => {
-                    if (response.status === 200) {
-                        return response.json();
-                    } else {
-                        return convertResponsePromiseToError(response);
-                    }
-                })
+                if (response.status === 200) {
+                    return response.json();
+                }
+                else {
+                    return convertResponsePromiseToError(response);
+                }
+            })
                 .then((response) => {
-                    state.wishlist = {...response};
-                    resolve(state.wishlist);
-                })
+                state.wishlist = { ...response };
+                resolve(state.wishlist);
+            })
                 .catch((error) => {
-                    state.wishlist = undefined;
-                    addError(error);
-                    reject(error);
+                state.wishlist = undefined;
+                addError(error);
+                reject(error);
             });
         });
     }
-
     /**
      * Ajoute un élément à la wishlist
      * @param item l'élément à ajouter à la wishlist
@@ -1755,41 +2576,38 @@
                 method: 'POST'
             })
                 .then((response) => {
-                    if (response.status === 200) {
-                        return response.text();
-                    } else {
-                        return convertResponsePromiseToError(response);
-                    }
-                })
+                if (response.status === 200) {
+                    return response.text();
+                }
+                else {
+                    return convertResponsePromiseToError(response);
+                }
+            })
                 .then((response) => {
-                    item.wishListCount = 1;
-                    resolve(item);
-                    addSuccess(getI18N(api_texts.add_to_wishlist_success));
-                })
+                item.wishListCount = 1;
+                resolve(item);
+                addSuccess(getI18N(api_texts.add_to_wishlist_success));
+            })
                 .catch((error) => {
-                    addError(error);
-                    reject(error);
+                addError(error);
+                reject(error);
             });
         });
     }
-
     /** Met à jour les outils externes (BBH, GH et Fata) en fonction des paramètres sélectionnés */
 
     function isTouchScreen() {
         return 'ontouchstart' in window || navigator.msMaxTouchPoints;
     }
-
     /** Calcule le nombre de zombies qui vont mourir par désespoir */
     function calculateDespairDeaths(nb_killed_zombies) {
         return Math.floor(Math.max(0, (nb_killed_zombies - 1) / 2));
     }
-
     function fixMhCompiledImg(img) {
         if (!img)
             return;
         return img.replace(/\/(\w+)\.(\w+)\.(\w+)/, '/$1.$3');
     }
-
     function isValidToken() {
         if (!state.token || !state.token.token || !state.token.token.accessToken)
             return false;
@@ -1797,7 +2615,6 @@
         let current_date = new Date().getTime();
         return !shouldRefreshMe() && current_date < expiration_date;
     }
-
     function copyToClipboard(text) {
         let input = document.createElement('textarea');
         input.value = text;
@@ -1820,11 +2637,13 @@
                                 let get_ruins_promise = getRuins();
                                 let get_map_promise = getMap();
                                 await Promise.all([get_items_promise, get_ruins_promise, get_wishlist_promise, get_map_promise]);
-                            } else {
+                            }
+                            else {
                                 let get_wishlist_promise = getWishlist();
                                 await Promise.all([get_items_promise, get_wishlist_promise]);
                             }
-                        } else {
+                        }
+                        else {
                             let get_items_promise = getItems();
                             await Promise.all([get_items_promise]);
                         }
@@ -1833,46 +2652,49 @@
                 if (!isValidToken() || force) {
                     fetcherWithoutBearer(state.api_url + '/Authentication/Token?userKey=' + state.external_app_id)
                         .then((response) => {
-                            if (response.status === 200) {
-                                return response.json();
-                            } else {
-                                return convertResponsePromiseToError(response);
-                            }
-                        })
+                        if (response.status === 200) {
+                            return response.json();
+                        }
+                        else {
+                            return convertResponsePromiseToError(response);
+                        }
+                    })
                         .then((response) => {
-                            state.token = response;
-                            state.mh_user = state.token.simpleMe;
-                            if (!state.mh_user || state.mh_user.id === 0 && state.mh_user.townDetails?.townId === 0) {
-                                state.mh_user = '';
-                            }
-                            setStorageItem(mh_user_key, state.mh_user);
-                            setStorageItem(mho_token_key, state.token);
-                            tokenReceived().then(() => resolve());
-                        })
+                        state.token = response;
+                        state.mh_user = state.token.simpleMe;
+                        if (!state.mh_user || state.mh_user.id === 0 && state.mh_user.townDetails?.townId === 0) {
+                            state.mh_user = '';
+                        }
+                        setStorageItem(mh_user_key, state.mh_user);
+                        setStorageItem(mho_token_key, state.token);
+                        tokenReceived().then(() => resolve());
+                    })
                         .catch((error) => {
-                            if (error.status === 400 && !stop) {
-                                /** Si on a une erreur 400 ça peut être parce que la clé d'app n'est pas bonne : on tente de récupérer la clé d'app une seule et unique fois pour essayer de rendre ça transparent pour l'utilisateur */
-                                state.external_app_id = undefined;
-                                getApiKey().then(() => {
-                                    getToken(false, true).then(() => {
-                                        resolve();
-                                    });
+                        if (error.status === 400 && !stop) {
+                            /** Si on a une erreur 400 ça peut être parce que la clé d'app n'est pas bonne : on tente de récupérer la clé d'app une seule et unique fois pour essayer de rendre ça transparent pour l'utilisateur */
+                            state.external_app_id = undefined;
+                            getApiKey().then(() => {
+                                getToken(false, true).then(() => {
+                                    resolve();
                                 });
-                            } else {
-                                addError(error);
-                                resolve();
-                            }
-                        });
-                } else {
+                            });
+                        }
+                        else {
+                            addError(error);
+                            resolve();
+                        }
+                    });
+                }
+                else {
                     state.mh_user = state.token.simpleMe;
                     tokenReceived().then(() => resolve());
                 }
-            } else {
+            }
+            else {
                 resolve();
             }
         });
     }
-
     /** Récupère les informations de la ville */
 
     function getTooltipItem(img, isStatus) {
@@ -1881,7 +2703,8 @@
         if (img && img.src) {
             if (!isStatus) {
                 hovered_item = getItemFromImg(img.src);
-            } else {
+            }
+            else {
                 hovered_status = getStatusFromImg(img.src);
             }
         }
@@ -1891,16 +2714,14 @@
             alt: img?.alt
         };
     }
-
     function getClickedItem(target) {
         let item_icon = event.target.closest('span.item-icon') || event.target.previousElementSibling?.closest('span.item-icon') || event.target.previousElementSibling?.querySelector('span.item-icon');
         if (item_icon) {
             let hovered_item = getItemFromImg(item_icon.querySelector('img').src);
             let broken = item_icon.parentElement.classList.contains('broken');
-            return {item: hovered_item, broken: broken};
+            return { item: hovered_item, broken: broken };
         }
     }
-
     function getFixedImagePath(img_src) {
         const index = img_src.indexOf(hordes_img_url);
         if (index === -1) {
@@ -1909,16 +2730,15 @@
         }
         return img_src
             .slice(index + hordes_img_url.length)
-            .replace(/\/(.+)\.(\w+?)\.(\w+?)$/, '/$1.$3');
+            .replace(/\/(.+)\.(\w+?)\.(\w+?)$/, '/$1.$3')
+            .replace('.b.', '.');
     }
-
     function getItemFromImg(img_src) {
         if (img_src) {
             const img_path = getFixedImagePath(img_src);
             return state.items?.find((item) => item.img === img_path);
         }
     }
-
     function getStatusFromImg(img_src) {
         if (img_src) {
             const img_path = getFixedImagePath(img_src);
@@ -1930,236 +2750,229 @@
     // 'unknown' rather than 'any' when the source isn't a statically-typed
     // iterable. This explicit-any wrapper avoids that, matching the original
     // untyped JS behaviour (no behaviour change, pure typing aid).
-    const arrFrom$5 = (x) => Array.from(x);
-
+    const arrFrom$2 = (x) => Array.from(x);
     function displayAntiAbuseCounter() {
         if (state.anti_abuse_controller) {
             // anti_abuse_controller.abort();
         }
         state.anti_abuse_controller = new AbortController();
-        if (state.mho_parameters.display_anti_abuse && (pageIsBank() || pageIsWell())) {
-            let mho_anti_abuse_counter = document.querySelector(`#${mho_anti_abuse_counter_id}`);
-            if (mho_anti_abuse_counter)
+        if (!state.mho_parameters.display_anti_abuse || (!pageIsBank() && !pageIsWell())) {
+            state.anti_abuse_controller.abort();
+            return;
+        }
+        let mho_anti_abuse_counter = document.querySelector(`#${mho_anti_abuse_counter_id}`);
+        if (mho_anti_abuse_counter)
+            return;
+        mho_anti_abuse_counter = document.createElement('div');
+        mho_anti_abuse_counter.id = mho_anti_abuse_counter_id;
+        if (pageIsBank()) {
+            const forum_preview = document.querySelector('.forum-preview-wrapper-bank');
+            if (!forum_preview)
                 return;
-            mho_anti_abuse_counter = document.createElement('div');
-            mho_anti_abuse_counter.id = mho_anti_abuse_counter_id;
-            mho_anti_abuse_counter.style.marginBottom = '0.5em';
-            if (pageIsBank()) {
-                let forum_preview = document.querySelector('.forum-preview-wrapper-bank');
-                if (!forum_preview)
-                    return;
-                forum_preview.parentElement.insertBefore(mho_anti_abuse_counter, forum_preview.parentElement.firstElementChild);
-            } else {
-                let actions_box = document.querySelector('.actions-box');
-                if (!actions_box)
-                    return;
-                actions_box.parentElement.insertBefore(mho_anti_abuse_counter, actions_box);
-            }
-            let header = document.createElement('h5');
-            header.style.display = 'flex';
-            header.style.alignItems = 'center';
-            header.style.justifyContent = 'space-between';
-            mho_anti_abuse_counter.appendChild(header);
-            let first_part = document.createElement('div');
-            first_part.innerHTML = `<img src="${mh_optimizer_icon}" style="width: 24px !important; vertical-align: middle; margin-right: 0.5em;">${getI18N(texts.anti_abuse_title)}`;
-            header.appendChild(first_part);
-            let second_part = document.createElement('div');
-            header.appendChild(second_part);
-            let content = document.createElement('div');
-            content.classList.add('content');
-            content.style.borderBottom = '1px solid #ddab76';
-            mho_anti_abuse_counter.appendChild(content);
-            /** Modifie le style du forum pour pouvoir l'afficher proprement malgré la présence du compteur */
-            let forum_preview_wrapper_bank = document.querySelector('.forum-preview-wrapper-bank');
-            if (forum_preview_wrapper_bank) {
-                forum_preview_wrapper_bank.style.minHeight = 'unset';
-                let forum_preview_container = forum_preview_wrapper_bank.querySelector('.forum-preview-container');
-                if (forum_preview_container) {
-                    forum_preview_container.style.position = 'initial';
-                    forum_preview_container.style.padding = '3px';
-                    let forum_content = forum_preview_container.querySelector('#forum-content');
-                    if (forum_content) {
-                        forum_content.style.position = 'initial';
-                    }
+            forum_preview.parentElement.insertBefore(mho_anti_abuse_counter, forum_preview.parentElement.firstElementChild);
+        }
+        else {
+            const actions_box = document.querySelector('.actions-box');
+            if (!actions_box)
+                return;
+            actions_box.parentElement.insertBefore(mho_anti_abuse_counter, actions_box);
+        }
+        const header = document.createElement('h5');
+        header.style.display = 'flex';
+        header.style.alignItems = 'center';
+        header.style.justifyContent = 'space-between';
+        mho_anti_abuse_counter.appendChild(header);
+        const first_part = document.createElement('div');
+        first_part.innerHTML = `<img src="${mh_optimizer_icon}" style="width: 24px !important; vertical-align: middle; margin-right: 0.5em;">${getI18N(texts.anti_abuse_title)}`;
+        header.appendChild(first_part);
+        const second_part = document.createElement('div');
+        header.appendChild(second_part);
+        const content = document.createElement('div');
+        content.classList.add('mho-anti-abuse-counter-content');
+        mho_anti_abuse_counter.appendChild(content);
+        /** Modifie le style du forum pour pouvoir l'afficher proprement malgré la présence du compteur */
+        const forum_preview_wrapper_bank = document.querySelector('.forum-preview-wrapper-bank');
+        if (forum_preview_wrapper_bank) {
+            forum_preview_wrapper_bank.style.minHeight = 'unset';
+            const forum_preview_container = forum_preview_wrapper_bank.querySelector('.forum-preview-container');
+            if (forum_preview_container) {
+                forum_preview_container.style.position = 'initial';
+                forum_preview_container.style.padding = '3px';
+                const forum_content = forum_preview_container.querySelector('#forum-content');
+                if (forum_content) {
+                    forum_content.style.position = 'initial';
                 }
             }
-            /** Fin */
-            getStorageItem(mho_anti_abuse_key).then((counter_values) => {
-                let add_counter_btn = document.createElement('button');
-                add_counter_btn.innerText = '+';
-                second_part.appendChild(add_counter_btn);
-                add_counter_btn.addEventListener('click', () => {
-                    state.anti_abuse_controller.abort();
-                    let fictive_item = {
-                        label: {
-                            de: `Benutzerdefinierter Zähler`,
-                            en: `Custom counter`,
-                            es: `Contador personalizado`,
-                            fr: `Compteur personnalisé`,
-                        },
-                        img: 'icons/small_warning.gif'
-                    };
-                    if (!counter_values) {
-                        counter_values = [];
-                    }
-                    let counter_value = {item: {item: fictive_item, broken: false}, take_at: Date.now() + 5000};
-                    counter_values.push(counter_value);
-                    setStorageItem(mho_anti_abuse_key, counter_values);
-                    let new_mho_anti_abuse_counter = document.querySelector(`#${mho_anti_abuse_counter_id}`);
-                    if (new_mho_anti_abuse_counter) {
-                        let new_content = new_mho_anti_abuse_counter.querySelector('.content');
-                        define_row(counter_value, counter_values.length - 1, new_content, true);
-                    }
-                });
-                let define_row = (counter_value, index, new_content, fictive = false) => {
-                    let is_time_invalid = (_counter_value, _index) => {
-                        let since = (Date.now() - parseInt(_counter_value.take_at));
-                        let time_left = new Date(((15) * 60000) - since);
-                        if (time_left < 0) {
-                            counter_values.splice(index, 1);
+        }
+        /** Fin */
+        getStorageItem(mho_anti_abuse_key).then((counter_values) => {
+            if (!counter_values) {
+                counter_values = [];
+            }
+            const define_row = (counter_value, new_content, fictive = false) => {
+                const is_time_invalid = (_counter_value) => {
+                    const since = Date.now() - parseInt(_counter_value.take_at);
+                    const time_left = (15 * 60000) - since;
+                    if (time_left < 0) {
+                        const current_index = counter_values.indexOf(_counter_value);
+                        if (current_index > -1) {
+                            counter_values.splice(current_index, 1);
                             setStorageItem(mho_anti_abuse_key, [...counter_values]);
                         }
-                        return time_left < 0;
-                    };
-                    if (!is_time_invalid(counter_value, index)) {
-                        let value_in_list = document.createElement('div');
-                        value_in_list.style.display = 'flex';
-                        value_in_list.style.gap = '0.5em';
-                        new_content.appendChild(value_in_list);
-                        let item_name = document.createElement('div');
-                        item_name.style.flex = (1);
-                        item_name.innerHTML = `<img src="${repo_img_hordes_url + counter_value.item?.item?.img}" style="margin-right: 0.5em; ${counter_value.item?.broken ? 'border: 1px dotted red' : ''}">${counter_value.item?.item?.label[lang]}`;
-                        value_in_list.appendChild(item_name);
-                        let item_counter = document.createElement('div');
-                        item_counter.style.width = '50px';
-                        let interval = setInterval(() => {
-                            let since = (Date.now() - parseInt(counter_value.take_at));
-                            let time_left = new Date(((15) * 60000) - since);
-                            if (is_time_invalid(counter_value, index)) {
-                                clearInterval(interval);
-                                if (value_in_list) {
-                                    value_in_list.remove();
-                                }
-                            } else {
-                                let minute = time_left.getMinutes();
-                                let seconds = time_left.getSeconds();
-                                item_counter.innerText = minute + ':' + (seconds < 10 ? ('0' + seconds) : seconds);
-                            }
-                        }, 250);
-                        value_in_list.appendChild(item_counter);
                     }
+                    return time_left < 0;
                 };
-                if (!counter_values) {
-                    counter_values = [];
+                if (!is_time_invalid(counter_value)) {
+                    const value_in_list = document.createElement('div');
+                    value_in_list.title = counter_value.item?.item?.label[lang];
+                    value_in_list.classList.add('brown-tag');
+                    value_in_list.style.width = '85px';
+                    new_content.appendChild(value_in_list);
+                    const item_name = document.createElement('div');
+                    item_name.innerHTML = `<img src="${repo_img_hordes_url + counter_value.item?.item?.img}" style="${counter_value.item?.broken ? 'border: 1px dotted red' : ''}">`;
+                    value_in_list.appendChild(item_name);
+                    const item_counter = document.createElement('div');
+                    const interval = setInterval(() => {
+                        if (is_time_invalid(counter_value)) {
+                            clearInterval(interval);
+                            value_in_list.remove();
+                        }
+                        else {
+                            const since = Date.now() - parseInt(counter_value.take_at);
+                            const time_left = (15 * 60000) - since;
+                            const minutes = Math.floor(time_left / 60000);
+                            const seconds = Math.floor((time_left % 60000) / 1000);
+                            item_counter.innerText = `${minutes}:${seconds < 10 ? '0' + seconds : seconds}`;
+                        }
+                    }, 250);
+                    value_in_list.appendChild(item_counter);
                 }
-                counter_values.forEach((counter_value, index) => {
-                    define_row(counter_value, index, content);
-                });
-                if (pageIsBank()) {
-                    // Selectionne le noeud dont les mutations seront observées
-                    let bank = document.querySelector('#bank-inventory');
-                    let old_bag;
-                    bank.addEventListener('click', (event) => {
-                        event.stopPropagation();
-                        if (event.srcElement.nodeName.toLowerCase() !== 'li' && event.srcElement.nodeName.toLowerCase() !== 'span' && event.srcElement.nodeName.toLowerCase() !== 'img')
-                            return;
-                        if (event.srcElement.className !== '' && event.srcElement.className !== 'item' && event.srcElement.className !== 'item-icon')
-                            return;
-                        let rucksack = document.querySelector('#bank-inventory ul.rucksack');
-                        old_bag = document.querySelectorAll('#bank-inventory ul.rucksack li.item');
-                        let callback = (mutationsList) => {
-                            // if (!pageIsBank()) {
-                            state.bank_observer?.disconnect();
-                            // return;
-                            // }
-                            setTimeout(() => {
-                                let new_bag = document.querySelectorAll('#bank-inventory ul.rucksack li.item');
-                                if (old_bag?.length < new_bag?.length) {
-                                    getStorageItem(mho_anti_abuse_key).then((counter_values) => {
-                                        if (!counter_values) {
-                                            counter_values = [];
-                                        }
-                                        let old_bag_items = arrFrom$5(old_bag).map((item_in_old_bag) => getItemFromImg(item_in_old_bag.querySelector('img').src));
-                                        let new_bag_items = arrFrom$5(new_bag).map((item_in_new_bag) => getItemFromImg(item_in_new_bag.querySelector('img').src));
-                                        new_bag_items.forEach((new_bag_item, index) => {
-                                            let old_bag_item_index = old_bag_items.findIndex((old_bag_item) => old_bag_item.id === new_bag_item.id);
-                                            if (old_bag_item_index > -1) {
-                                                old_bag_items.splice(old_bag_item_index, 1);
-                                            } else {
-                                                let counter_value = {
-                                                    item: {
-                                                        item: new_bag_item,
-                                                        broken: new_bag[index].classList.contains('broken')
-                                                    },
-                                                    take_at: Date.now() + 2500
-                                                };
-                                                counter_values.push(counter_value);
-                                                let new_mho_anti_abuse_counter = document.querySelector(`#${mho_anti_abuse_counter_id}`);
-                                                if (new_mho_anti_abuse_counter) {
-                                                    let new_content = new_mho_anti_abuse_counter.querySelector('.content');
-                                                    define_row(counter_value, counter_values.length - 1, new_content);
-                                                }
-                                            }
-                                        });
-                                        setStorageItem(mho_anti_abuse_key, counter_values);
-                                    });
-                                } else {
-                                    new_bag = undefined;
-                                }
-                                setTimeout(() => {
-                                    old_bag = new_bag;
-                                }, 0);
-                            }, 100);
-                            state.bank_observer?.disconnect();
-                        };
-                        // Options de l'observateur (quelles sont les mutations à observer)
-                        let config = {childList: true, subtree: true, attributes: false};
-                        // Créé une instance de l'observateur lié à la fonction de callback
-                        state.bank_observer = new MutationObserver(callback);
-                        // Commence à observer le noeud cible pour les mutations précédemment configurées
-                        state.bank_observer.observe(rucksack, config);
-                    }, {signal: state.anti_abuse_controller.signal});
-                } else if (pageIsWell()) {
-                    let btn = document.querySelector('button[data-fetch-method="get"][data-fetch-confirm]');
-                    btn?.addEventListener('click', (event) => {
-                        document.addEventListener('mh-navigation-complete', () => {
-                            state.anti_abuse_controller.abort();
-                            if (!pageIsWell())
-                                return;
-                            let well_item = {
-                                label: {
-                                    de: `Eine weitere Ration erhalten`,
-                                    en: `Extra ration`,
-                                    es: `Ración adicional`,
-                                    fr: `Ration supplémentaire`,
-                                },
-                                img: 'log/well.gif'
-                            };
-                            getStorageItem(mho_anti_abuse_key).then((counter_values) => {
-                                if (!counter_values) {
-                                    counter_values = [];
-                                }
-                                let counter_value = {
-                                    item: {item: well_item, broken: false},
-                                    take_at: Date.now() + 5000
-                                };
-                                counter_values.push(counter_value);
-                                setStorageItem(mho_anti_abuse_key, counter_values);
-                                let new_mho_anti_abuse_counter = document.querySelector(`#${mho_anti_abuse_counter_id}`);
-                                if (new_mho_anti_abuse_counter) {
-                                    let new_content = new_mho_anti_abuse_counter.querySelector('.content');
-                                    define_row(counter_value, counter_values.length - 1, new_content);
-                                }
-                            });
-                        }, {once: true});
-                    }, {signal: state.anti_abuse_controller.signal});
-                } else {
-                    state.anti_abuse_controller.abort();
+            };
+            const add_counter_btn = document.createElement('button');
+            add_counter_btn.innerText = '+';
+            second_part.appendChild(add_counter_btn);
+            add_counter_btn.addEventListener('click', () => {
+                state.anti_abuse_controller.abort();
+                const fictive_item = {
+                    label: {
+                        de: `Benutzerdefinierter Zähler`,
+                        en: `Custom counter`,
+                        es: `Contador personalizado`,
+                        fr: `Compteur personnalisé`,
+                    },
+                    img: 'icons/small_warning.gif'
+                };
+                const counter_value = { item: { item: fictive_item, broken: false }, take_at: Date.now() + 5000 };
+                counter_values.push(counter_value);
+                setStorageItem(mho_anti_abuse_key, counter_values);
+                const new_mho_anti_abuse_counter = document.querySelector(`#${mho_anti_abuse_counter_id}`);
+                if (new_mho_anti_abuse_counter) {
+                    define_row(counter_value, new_mho_anti_abuse_counter.querySelector('.mho-anti-abuse-counter-content'), true);
                 }
             });
-        } else {
-            state.anti_abuse_controller.abort();
-        }
+            counter_values.forEach((counter_value) => {
+                define_row(counter_value, content);
+            });
+            if (pageIsBank()) {
+                const bank = document.querySelector('#bank-inventory');
+                let old_bag;
+                bank.addEventListener('click', (event) => {
+                    event.stopPropagation();
+                    const target = event.target;
+                    const valid_tags = ['li', 'span', 'img'];
+                    if (!valid_tags.includes(target.nodeName.toLowerCase()))
+                        return;
+                    if (target.classList.length > 0 && !target.classList.contains('item') && !target.classList.contains('item-icon'))
+                        return;
+                    const rucksack = document.querySelector('#bank-inventory ul.rucksack');
+                    if (!rucksack)
+                        return;
+                    old_bag = document.querySelectorAll('#bank-inventory ul.rucksack li.item');
+                    state.bank_observer?.disconnect();
+                    let observer;
+                    const callback = (_mutationsList) => {
+                        observer.disconnect();
+                        state.bank_observer = undefined;
+                        setTimeout(() => {
+                            const new_bag = document.querySelectorAll('#bank-inventory ul.rucksack li.item');
+                            if ((old_bag?.length ?? 0) < new_bag.length) {
+                                getStorageItem(mho_anti_abuse_key).then((stored_values) => {
+                                    if (!stored_values) {
+                                        stored_values = [];
+                                    }
+                                    const old_bag_items = arrFrom$2(old_bag).map((item_in_old_bag) => getItemFromImg(item_in_old_bag.querySelector('img').src));
+                                    const new_bag_items = arrFrom$2(new_bag).map((item_in_new_bag) => getItemFromImg(item_in_new_bag.querySelector('img').src));
+                                    new_bag_items.forEach((new_bag_item, index) => {
+                                        const old_item_index = old_bag_items.findIndex((old_bag_item) => old_bag_item.id === new_bag_item.id);
+                                        if (old_item_index > -1) {
+                                            old_bag_items.splice(old_item_index, 1);
+                                        }
+                                        else {
+                                            const counter_value = {
+                                                item: {
+                                                    item: new_bag_item,
+                                                    broken: new_bag[index].classList.contains('broken')
+                                                },
+                                                take_at: Date.now() + 2500
+                                            };
+                                            stored_values.push(counter_value);
+                                            counter_values.push(counter_value);
+                                            const new_mho_anti_abuse_counter = document.querySelector(`#${mho_anti_abuse_counter_id}`);
+                                            if (new_mho_anti_abuse_counter) {
+                                                define_row(counter_value, new_mho_anti_abuse_counter.querySelector('.mho-anti-abuse-counter-content'));
+                                            }
+                                        }
+                                    });
+                                    setStorageItem(mho_anti_abuse_key, stored_values);
+                                    old_bag = new_bag;
+                                });
+                            }
+                            else {
+                                old_bag = undefined;
+                            }
+                        }, 100);
+                    };
+                    observer = new MutationObserver(callback);
+                    state.bank_observer = observer;
+                    observer.observe(rucksack, { childList: true, subtree: true, attributes: false });
+                }, { signal: state.anti_abuse_controller.signal });
+            }
+            else if (pageIsWell()) {
+                const btn = document.querySelector('button[data-fetch-method="get"][data-fetch-confirm]');
+                btn?.addEventListener('click', (_event) => {
+                    document.addEventListener('mh-navigation-complete', () => {
+                        state.anti_abuse_controller.abort();
+                        if (!pageIsWell())
+                            return;
+                        const well_item = {
+                            label: {
+                                de: `Eine weitere Ration erhalten`,
+                                en: `Extra ration`,
+                                es: `Ración adicional`,
+                                fr: `Ration supplémentaire`,
+                            },
+                            img: 'log/well.gif'
+                        };
+                        getStorageItem(mho_anti_abuse_key).then((stored_values) => {
+                            if (!stored_values) {
+                                stored_values = [];
+                            }
+                            const counter_value = { item: { item: well_item, broken: false }, take_at: Date.now() + 5000 };
+                            stored_values.push(counter_value);
+                            counter_values.push(counter_value);
+                            setStorageItem(mho_anti_abuse_key, stored_values);
+                            const new_mho_anti_abuse_counter = document.querySelector(`#${mho_anti_abuse_counter_id}`);
+                            if (new_mho_anti_abuse_counter) {
+                                define_row(counter_value, new_mho_anti_abuse_counter.querySelector('.mho-anti-abuse-counter-content'));
+                            }
+                        });
+                    }, { once: true });
+                }, { signal: state.anti_abuse_controller.signal });
+            }
+            else {
+                state.anti_abuse_controller.abort();
+            }
+        });
     }
 
     function automaticallyOpenBag(count = 0) {
@@ -2185,7 +2998,7 @@
                         btn.click();
                     }
                 });
-                inventories.forEach(item => observer.observe(item, {attributes: true}));
+                inventories.forEach(item => observer.observe(item, { attributes: true }));
             });
         });
     }
@@ -2203,653 +3016,30 @@
                 }
             })
                 .then((response) => {
-                    if (response.status === 200) {
-                        return response.json();
-                    } else {
-                        return convertResponsePromiseToError(response);
-                    }
-                })
-                .then((camping_result) => {
-                    let result = document.querySelector('#camping-result');
-                    if (result) {
-                        result.innerText = result ? `${getI18N(camping_result.label)} - ${camping_result.boundedProbability}% (${camping_result.boundedProbability}%)` : '';
-                    }
-                    resolve(camping_result);
-                })
-                .catch((error) => {
-                    addError(error);
-                    reject(error);
-                });
-        });
-    }
-
-    function displayCampingPredict() {
-        setTimeout(() => {
-            let camping_predict_container = document.getElementById(mho_camping_predict_id);
-            let zone_camp = document.querySelector('.zone-camp');
-            if (state.mho_parameters.display_camping_predict && pageIsDesert() && zone_camp) {
-                if (camping_predict_container)
-                    return;
-                getRuins().then((ruins) => {
-                    let all_ruins = [...added_ruins];
-                    all_ruins = all_ruins.concat(ruins);
-                    let zone_camp_info = zone_camp.querySelector('.zone-camp-info');
-                    let zone_camp_label = zone_camp.querySelector('label');
-                    zone_camp_label.addEventListener('click', () => {
-                        camping_predict_container.style.display = camping_predict_container.style.display === 'none' ? 'block' : 'none';
-                        if (camping_predict_container.style.display !== 'none') {
-                            calculateCamping(conf);
-                        }
-                    });
-                    camping_predict_container = document.createElement('div');
-                    camping_predict_container.id = mho_camping_predict_id;
-                    camping_predict_container.style.border = '1px solid';
-                    camping_predict_container.style.padding = '0.5em';
-                    camping_predict_container.style.margin = '0.5em 0';
-                    camping_predict_container.style.display = window.getComputedStyle(zone_camp_info).getPropertyValue('max-height') === '0px' ? 'none' : 'block';
-                    zone_camp.appendChild(camping_predict_container);
-                    let updater_title = document.createElement('h5');
-                    updater_title.style.marginTop = '0.5em';
-                    let updater_title_mho_img = document.createElement('img');
-                    updater_title_mho_img.src = mh_optimizer_icon;
-                    updater_title_mho_img.style.height = '24px';
-                    updater_title_mho_img.style.marginRight = '0.5em';
-                    updater_title.appendChild(updater_title_mho_img);
-                    let updater_title_text = document.createElement('text');
-                    updater_title_text.innerText = getScriptInfo().name;
-                    updater_title_text.style.fontSize = '1.5em';
-                    updater_title.appendChild(updater_title_text);
-                    camping_predict_container.appendChild(updater_title);
-                    let zone_ruin = document.querySelector('.ruin-info b');
-                    let ruin = '-1000';
-                    if (zone_ruin) {
-                        ruin = all_ruins.find((one_ruin) => getI18N(one_ruin.label).toLowerCase() === zone_ruin.innerText.toLowerCase()).id;
-                    }
-                    let conf = {
-                        townType: state.mh_user.townDetails?.townType.toUpperCase(),
-                        job: jobs.find((job) => state.mh_user.jobDetails.uid === job.img)?.id,
-                        distance: document.querySelector('.zone-dist > div > b')?.innerText.replace('km', ''), // OK
-                        campings: 0,
-                        proCamper: false,
-                        hiddenCampers: 0,
-                        objects: 0,
-                        vest: false,
-                        tomb: false,
-                        zombies: document.querySelectorAll('.actor.zombie')?.length || 0,
-                        night: !!document.querySelector('.map.night'),
-                        devastated: state.mh_user.townDetails?.isDevaste,
-                        phare: false,
-                        improve: 0,
-                        objectImprove: 0,
-                        ruinBonus: 0,
-                        ruinBuryCount: 0,
-                        ruinCapacity: 0,
-                        ruin: '-1000'
-                    };
-                    let my_info = document.createElement('div');
-                    camping_predict_container.appendChild(my_info);
-                    let my_info_title = document.createElement('h3');
-                    my_info_title.innerText = getI18N(texts.camping_citizen);
-                    my_info.appendChild(my_info_title);
-                    let my_info_content = document.createElement('div');
-                    my_info.appendChild(my_info_content);
-                    let town_info = document.createElement('div');
-                    camping_predict_container.appendChild(town_info);
-                    let town_info_title = document.createElement('h3');
-                    town_info_title.innerText = getI18N(texts.camping_town);
-                    town_info.appendChild(town_info_title);
-                    let town_info_content = document.createElement('div');
-                    town_info.appendChild(town_info_content);
-                    let cell_info = document.createElement('div');
-                    camping_predict_container.appendChild(cell_info);
-                    let cell_info_title = document.createElement('h3');
-                    cell_info_title.innerText = getI18N(texts.camping_ruin);
-                    cell_info.appendChild(cell_info_title);
-                    let cell_info_content = document.createElement('div');
-                    cell_info.appendChild(cell_info_content);
-                    let result = document.createElement('div');
-                    camping_predict_container.appendChild(result);
-                    let result_title = document.createElement('h3');
-                    result_title.innerText = getI18N(texts.result);
-                    result.appendChild(result_title);
-                    let result_content = document.createElement('div');
-                    result_content.id = 'camping-result';
-                    result.appendChild(result_content);
-                    /** Capuche ? */
-                    let vest_div = document.createElement('div');
-                    vest_div.id = 'vest-field';
-                    vest_div.style.display = 'none';
-                    my_info_content.appendChild(vest_div);
-                    let vest_label = document.createElement('label');
-                    vest_label.htmlFor = 'vest';
-                    vest_label.innerHTML = `<img src="${repo_img_hordes_url}emotes/proscout.gif"> ${getI18N(texts.vest)}`;
-                    let vest = document.createElement('input');
-                    vest.type = 'checkbox';
-                    vest.id = 'vest';
-                    vest.checked = conf.vest;
-                    vest.classList.add('mho-input');
-                    vest.addEventListener('change', ($event) => {
-                        conf.vest = $event.srcElement.checked;
-                        calculateCamping(conf);
-                    });
-                    vest_div.appendChild(vest);
-                    vest_div.appendChild(vest_label);
-                    /** Campeur pro ? */
-                    let pro_camper_div = document.createElement('div');
-                    my_info_content.appendChild(pro_camper_div);
-                    let pro_camper_label = document.createElement('label');
-                    pro_camper_label.htmlFor = 'pro';
-                    pro_camper_label.innerHTML = `<img src="${repo_img_hordes_url}status/status_camper.gif"> ${getI18N(texts.pro_camper)}`;
-                    let pro_camper = document.createElement('input');
-                    pro_camper.type = 'checkbox';
-                    pro_camper.id = 'pro';
-                    pro_camper.checked = conf.pro;
-                    pro_camper.classList.add('mho-input');
-                    pro_camper.addEventListener('change', ($event) => {
-                        conf.proCamper = $event.srcElement.checked;
-                        calculateCamping(conf);
-                    });
-                    pro_camper_div.appendChild(pro_camper);
-                    pro_camper_div.appendChild(pro_camper_label);
-                    /** Tombe ? */
-                    let tomb_div = document.createElement('div');
-                    my_info_content.appendChild(tomb_div);
-                    let tomb_label = document.createElement('label');
-                    tomb_label.htmlFor = 'tomb';
-                    tomb_label.innerHTML = `<img src="${repo_img_hordes_url}building/small_cemetery.gif"> ${getI18N(texts.tomb)}`;
-                    let tomb = document.createElement('input');
-                    tomb.type = 'checkbox';
-                    tomb.id = 'tomb';
-                    tomb.checked = conf.tomb;
-                    tomb.classList.add('mho-input');
-                    tomb.addEventListener('change', ($event) => {
-                        conf.tomb = $event.srcElement.checked;
-                        calculateCamping(conf);
-                    });
-                    tomb_div.appendChild(tomb);
-                    tomb_div.appendChild(tomb_label);
-                    /** Nombre de nuits déjà campées */
-                    let nb_campings_div = document.createElement('div');
-                    my_info_content.appendChild(nb_campings_div);
-                    let nb_campings_label = document.createElement('label');
-                    nb_campings_label.htmlFor = 'nb-campings';
-                    nb_campings_label.innerHTML = `<img src="${repo_img_hordes_url}emotes/sleep.gif"> ${getI18N(texts.nb_campings)}`;
-                    nb_campings_label.classList.add('spaced-label');
-                    let nb_campings = document.createElement('input');
-                    nb_campings.type = 'number';
-                    nb_campings.id = 'nb-campings';
-                    nb_campings.value = (conf.campings);
-                    nb_campings.classList.add('mho-input', 'inline');
-                    nb_campings.addEventListener('change', ($event) => {
-                        conf.campings = +$event.srcElement.value;
-                        calculateCamping(conf);
-                    });
-                    nb_campings_div.appendChild(nb_campings_label);
-                    nb_campings_div.appendChild(nb_campings);
-                    /** Nombre de toiles de tente ou pelure de peau */
-                    let objects_in_bag_div = document.createElement('div');
-                    my_info_content.appendChild(objects_in_bag_div);
-                    let objects_in_bag_label = document.createElement('label');
-                    objects_in_bag_label.htmlFor = 'nb-objects';
-                    objects_in_bag_label.innerText = getI18N(texts.objects_in_bag);
-                    objects_in_bag_label.innerHTML = `<img src="${repo_img_hordes_url}emotes/bag.gif"> ${getI18N(texts.objects_in_bag)}`;
-                    objects_in_bag_label.classList.add('spaced-label');
-                    let objects_in_bag = document.createElement('input');
-                    objects_in_bag.type = 'number';
-                    objects_in_bag.id = 'nb-objects';
-                    objects_in_bag.value = (conf.objects);
-                    objects_in_bag.classList.add('mho-input', 'inline');
-                    objects_in_bag.addEventListener('change', ($event) => {
-                        conf.objects = +$event.srcElement.value;
-                        calculateCamping(conf);
-                    });
-                    objects_in_bag_div.appendChild(objects_in_bag_label);
-                    objects_in_bag_div.appendChild(objects_in_bag);
-                    /** Type de bâtiment */
-                    let ruin_type_div = document.createElement('div');
-                    cell_info_content.appendChild(ruin_type_div);
-                    let select_ruin_label = document.createElement('label');
-                    select_ruin_label.htmlFor = 'select-ruin';
-                    select_ruin_label.innerText = getI18N(texts.ruin);
-                    select_ruin_label.classList.add('spaced-label');
-                    let select_ruin = document.createElement('select');
-                    select_ruin.id = 'select-ruin';
-                    select_ruin.value = conf.ruin;
-                    select_ruin.classList.add('small');
-                    all_ruins.forEach((ruin) => {
-                        let ruin_option = document.createElement('option');
-                        ruin_option.value = ruin.id;
-                        ruin_option.label = getI18N(ruin.label);
-                        if (ruin.id === conf.ruin) {
-                            ruin_option.setAttribute('selected', 'selected');
-                        }
-                        select_ruin.appendChild(ruin_option);
-                    });
-                    select_ruin.addEventListener('change', ($event) => {
-                        conf.ruin = $event.srcElement.value;
-                        let current_ruin = all_ruins.find((_current_ruin) => +_current_ruin.id === +conf.ruin);
-                        conf.ruinBonus = current_ruin.camping;
-                        conf.ruinCapacity = current_ruin.capacity;
-                        let digs_field = document.querySelector('#digs-field');
-                        if (+current_ruin.id === -1) {
-                            digs_field.style.display = 'block';
-                        } else {
-                            digs_field.style.display = 'none';
-                            digs_field.querySelector('input').value = (0);
-                        }
-                        calculateCamping(conf);
-                    });
-                    ruin_type_div.appendChild(select_ruin_label);
-                    ruin_type_div.appendChild(select_ruin);
-                    /** Nombre de tas sur le bat ? */
-                    let digs_div = document.createElement('div');
-                    digs_div.id = 'digs-field';
-                    digs_div.style.display = 'none';
-                    cell_info_content.appendChild(digs_div);
-                    let digs_label = document.createElement('label');
-                    digs_label.htmlFor = 'digs';
-                    digs_label.innerText = getI18N(texts.digs);
-                    digs_label.innerHTML = `<img src="${repo_img_hordes_url}icons/uncover.gif"> ${getI18N(texts.digs)}`;
-                    digs_label.classList.add('spaced-label');
-                    let digs = document.createElement('input');
-                    digs.type = 'number';
-                    digs.id = 'digs';
-                    digs.value = (conf.ruinBuryCount);
-                    digs.classList.add('mho-input', 'inline');
-                    digs.addEventListener('change', ($event) => {
-                        conf.ruinBuryCount = +$event.srcElement.value;
-                        calculateCamping(conf);
-                    });
-                    digs_div.appendChild(digs_label);
-                    digs_div.appendChild(digs);
-                    /** Nombre de zombies sur la case */
-                    let zombies_div = document.createElement('div');
-                    cell_info_content.appendChild(zombies_div);
-                    let zombies_label = document.createElement('label');
-                    zombies_label.htmlFor = 'nb-zombies';
-                    zombies_label.innerHTML = `<img src="${repo_img_hordes_url}emotes/zombie.gif"> ${getI18N(texts.zombies_on_cell)}`;
-                    zombies_label.classList.add('spaced-label');
-                    let zombies = document.createElement('input');
-                    zombies.type = 'number';
-                    zombies.id = 'nb-zombies';
-                    zombies.value = (conf.zombies);
-                    zombies.classList.add('mho-input', 'inline');
-                    zombies.addEventListener('change', ($event) => {
-                        conf.zombies = +$event.srcElement.value;
-                        calculateCamping(conf);
-                    });
-                    zombies_div.appendChild(zombies_label);
-                    zombies_div.appendChild(zombies);
-                    /** Nombre d'améliorations simples sur la case */
-                    let improve_div = document.createElement('div');
-                    cell_info_content.appendChild(improve_div);
-                    let improve_label = document.createElement('label');
-                    improve_label.htmlFor = 'nb-improve';
-                    improve_label.innerHTML = `<img src="${repo_img_hordes_url}icons/home_recycled.gif"> ${getI18N(texts.improve)}`;
-                    improve_label.classList.add('spaced-label');
-                    let improve = document.createElement('input');
-                    improve.type = 'number';
-                    improve.id = 'nb-improve';
-                    improve.value = (conf.improve);
-                    improve.classList.add('mho-input', 'inline');
-                    improve.addEventListener('change', ($event) => {
-                        conf.improve = +$event.srcElement.value;
-                        calculateCamping(conf);
-                    });
-                    improve_div.appendChild(improve_label);
-                    improve_div.appendChild(improve);
-                    /** Nombre d'objets de campement installés sur la case */
-                    let object_improve_div = document.createElement('div');
-                    cell_info_content.appendChild(object_improve_div);
-                    let object_improve_label = document.createElement('label');
-                    object_improve_label.htmlFor = 'nb-object-improve';
-                    object_improve_label.innerHTML = `<img src="${repo_img_hordes_url}icons/home.gif"> ${getI18N(texts.object_improve)}`;
-                    object_improve_label.classList.add('spaced-label');
-                    let object_improve = document.createElement('input');
-                    object_improve.type = 'number';
-                    object_improve.id = 'nb-object-improve';
-                    object_improve.value = (conf.objectImprove);
-                    object_improve.classList.add('mho-input', 'inline');
-                    object_improve.addEventListener('change', ($event) => {
-                        conf.objectImprove = +$event.srcElement.value;
-                        calculateCamping(conf);
-                    });
-                    object_improve_div.appendChild(object_improve_label);
-                    object_improve_div.appendChild(object_improve);
-                    /** Nombre de personnes déjà cachées */
-                    let hidden_campers_div = document.createElement('div');
-                    cell_info_content.appendChild(hidden_campers_div);
-                    let hidden_campers_label = document.createElement('label');
-                    hidden_campers_label.htmlFor = 'hidden-campers';
-                    hidden_campers_label.innerHTML = `<img src="${repo_img_hordes_url}emotes/human.gif"> ${getI18N(texts.hidden_campers)}`;
-                    hidden_campers_label.classList.add('spaced-label');
-                    let hidden_campers = document.createElement('input');
-                    hidden_campers.type = 'number';
-                    hidden_campers.id = 'hidden-campers';
-                    hidden_campers.value = (conf.hiddenCampers);
-                    hidden_campers.classList.add('mho-input', 'inline');
-                    hidden_campers.addEventListener('change', ($event) => {
-                        conf.hiddenCampers = +$event.srcElement.value;
-                        calculateCamping(conf);
-                    });
-                    hidden_campers_div.appendChild(hidden_campers_label);
-                    hidden_campers_div.appendChild(hidden_campers);
-                    /** Nuit ? */
-                    let night_div = document.createElement('div');
-                    town_info_content.appendChild(night_div);
-                    let night_label = document.createElement('label');
-                    night_label.htmlFor = 'night';
-                    night_label.innerHTML = `<img src="${repo_img_hordes_url}pictos/r_doutsd.gif"> ${getI18N(texts.night)}`;
-                    let night = document.createElement('input');
-                    night.type = 'checkbox';
-                    night.id = 'night';
-                    night.checked = conf.night;
-                    night.classList.add('mho-input');
-                    night.addEventListener('change', ($event) => {
-                        conf.night = $event.srcElement.checked;
-                        calculateCamping(conf);
-                    });
-                    night_div.appendChild(night);
-                    night_div.appendChild(night_label);
-                    /** Phare construit ? */
-                    let phare_div = document.createElement('div');
-                    town_info_content.appendChild(phare_div);
-                    let phare_label = document.createElement('label');
-                    phare_label.htmlFor = 'phare';
-                    phare_label.innerText = getI18N(texts.phare);
-                    phare_label.innerHTML = `<img src="${repo_img_hordes_url}building/small_lighthouse.gif"> ${getI18N(texts.phare)}`;
-                    let phare = document.createElement('input');
-                    phare.type = 'checkbox';
-                    phare.id = 'phare';
-                    phare.checked = conf.phare;
-                    phare.classList.add('mho-input');
-                    phare.addEventListener('change', ($event) => {
-                        conf.phare = $event.srcElement.checked;
-                        calculateCamping(conf);
-                    });
-                    phare_div.appendChild(phare);
-                    phare_div.appendChild(phare_label);
-                    if (camping_predict_container.style.display !== 'none') {
-                        calculateCamping(conf);
-                    }
-                });
-            } else if (camping_predict_container) {
-                camping_predict_container.remove();
-            }
-        }, 500);
-    }
-
-    function getCurrentPosition() {
-        return document.querySelector('.current-location')?.innerText.replace(/.*: ?/, '').split('/') ?? [0, 0];
-    }
-
-    function getCellDetailsByPosition() {
-        let position = getCurrentPosition();
-        if (position && state.map && state.map.cells) {
-            return state.map.cells.find((cell) => +cell.displayX === +position[0] && +cell.displayY === +position[1]);
-        }
-    }
-
-    function displayCellDetailsOnPage() {
-        if (state.mho_parameters.display_more_informations_from_mho && pageIsDesert()) {
-            let cell = getCellDetailsByPosition();
-            let cell_informations = document.querySelector('#cell-informations');
-            if (cell) {
-                state.current_cell = cell;
-                if (!cell_informations) {
-                    cell_informations = document.createElement('div');
-                    cell_informations.id = 'cell-informations';
-                    cell_informations.classList.add('row');
-                    let cell_informations_div = document.createElement('div');
-                    cell_informations_div.style.width = '100%';
-                    cell_informations_div.classList.add('background', 'cell');
-                    cell_informations.appendChild(cell_informations_div);
-                    let cell_informations_header = document.createElement('h5');
-                    cell_informations_header.style.marginTop = '0';
-                    cell_informations_header.style.display = 'flex';
-                    cell_informations_header.style.justifyContent = 'space-between';
-                    cell_informations_header.style.alignItems = 'center';
-                    cell_informations_div.appendChild(cell_informations_header);
-                    let cell_informations_header_left = document.createElement('div');
-                    cell_informations_header_left.innerHTML = `<img src="${mh_optimizer_icon}" style="width: 24px; height: 24px; margin-right: 0.5em">${getI18N(texts.additional_informations)}`;
-                    cell_informations_header.appendChild(cell_informations_header_left);
-                    let cell_informations_header_right = document.createElement('div');
-                    cell_informations_header_right.innerText = `🗘`;
-                    cell_informations_header_right.style.fontSize = '16px';
-                    cell_informations_header_right.style.cursor = 'pointer';
-                    cell_informations_header.appendChild(cell_informations_header_right);
-                    cell_informations_header_right.addEventListener('click', () => {
-                        if (cell_informations.querySelector('#cell-note-content')) {
-                            cell_informations.querySelector('#cell-note-content').innerText = '🗘';
-                        }
-                        if (cell_informations.querySelector('#cell-digs-content')) {
-                            cell_informations.querySelector('#cell-digs-content').innerText = '🗘';
-                        }
-                        if (cell_informations.querySelector('#cell-ruin-content')) {
-                            cell_informations.querySelector('#cell-ruin-content').innerText = '🗘';
-                        }
-                        getMap().then(() => {
-                            cell = getCellDetailsByPosition();
-                            updateInformations(cell);
-                        });
-                    });
-                    let cell_informations_content = document.createElement('div');
-                    cell_informations_content.style.display = 'flex';
-                    cell_informations_content.style.flexDirection = 'column';
-                    cell_informations_content.style.gap = '0.5em';
-                    cell_informations_div.appendChild(cell_informations_content);
-                    let createSubBlock = (id, title) => {
-                        let sub_block = document.createElement('div');
-                        sub_block.id = id;
-                        cell_informations_content.appendChild(sub_block);
-                        let sub_block_header = document.createElement('h5');
-                        sub_block_header.id = id + '-header';
-                        sub_block_header.style.marginTop = '0';
-                        sub_block_header.style.borderBottomWidth = '1px';
-                        sub_block_header.style.fontWeight = 'normal';
-                        sub_block_header.innerText = title;
-                        sub_block.appendChild(sub_block_header);
-                        let sub_block_content = document.createElement('div');
-                        sub_block_content.id = id + '-content';
-                        sub_block.appendChild(sub_block_content);
-                    };
-                    let map_box = document.querySelector('.map-box');
-                    map_box.parentElement.parentElement.appendChild(cell_informations);
-                    let cell_note = createSubBlock('cell-note', getI18N(texts.note));
-                    let cell_digs = createSubBlock('cell-digs', getI18N(texts.digs_state_header));
-                    if (state.current_cell.idRuin !== null && state.current_cell.idRuin !== undefined) {
-                        let cell_ruin = createSubBlock('cell-ruin', getI18N(texts.ruin_state_header));
-                    }
+                if (response.status === 200) {
+                    return response.json();
                 }
-                let insertCellNote = (cell) => {
-                    if (cell_informations.querySelector('#cell-note-content')) {
-                        cell_informations.querySelector('#cell-note-content').innerHTML = cell.note && cell.note !== ''
-                            ? `<div>${cell.note}</div>`
-                            : `<div style="opacity: 0.5; font-style: italic; font-size: 12px;">${getI18N(texts.no_note)}</div>`;
-                    }
-                };
-                let insertCellDigs = (cell) => {
-                    if (cell_informations.querySelector('#cell-digs-content')) {
-                        cell_informations.querySelector('#cell-digs-content').innerHTML = `
-                    <div>${getI18N(texts.digs_max)} : ${Math.round(cell.maxPotentialRemainingDig - cell.totalSucces)}</div>
-                    <div>${getI18N(texts.digs_average)} : ${Math.round(cell.averagePotentialRemainingDig - cell.totalSucces)}</div>
-                `;
-                    }
-                };
-                let insertRuinDigs = (cell) => {
-                    if (state.current_cell.idRuin !== null && state.current_cell.idRuin !== undefined && state.current_cell.idRuin > 0) {
-                        let current_ruin = state.ruins.find((ruin) => ruin.id === state.current_cell.idRuin);
-                        let empty_text = `<div style="opacity: 0.5; font-style: italic; font-size: 12px;">${getI18N(texts.ruin_dried)}</div>`;
-                        let complete_text = `<div>${getI18N(texts.ruin_not_dried)}</div>`;
-                        let ruin_drops = ``;
-                        if (current_ruin && (current_ruin.explorable || !state.current_cell.isRuinDryed)) {
-                            ruin_drops += `<div style="display: flex; flex-direction: row; gap: 0.5em; flex-wrap: wrap; font-size: 12px;">`;
-                            if (current_ruin?.drops) {
-                                current_ruin.drops.forEach((drop) => {
-                                    ruin_drops += `<span style="display: flex; flex-direction: column; align-items: center;"><img src="${repo_img_hordes_url}/${drop.item.img}">${Math.round(drop.probability * 100 * 10) / 10}%</span>`;
-                                });
-                            }
-                        }
-                        ruin_drops += `</div>`;
-                        if (cell_informations.querySelector('#cell-ruin-content')) {
-                            cell_informations.querySelector('#cell-ruin-content').innerHTML = (!current_ruin?.explorable ? (state.current_cell.isRuinDryed ? empty_text : complete_text) : '') + ruin_drops;
-                        }
-                    }
-                };
-                let updateInformations = (cell) => {
-                    insertCellNote(cell);
-                    insertCellDigs(cell);
-                    insertRuinDigs(cell);
-                };
-                updateInformations(cell);
-            }
-        } else {
-            state.current_cell = undefined;
-        }
-    }
-
-    function preventFromLeaving() {
-        if (state.mho_parameters.alert_if_no_escort && state.mho_parameters.prevent_from_leaving && pageIsDesert()) {
-            let prevent_function = (event) => {
-                let e = event || window.event;
-                let ae_button = document.querySelector('button[x-toggle-escort="1"]:not([x-escort-control-endpoint])');
-                if (ae_button) {
-                    let mho_leaving_info = document.getElementById('mho-leaving-info');
-                    if (!mho_leaving_info) {
-                        mho_leaving_info = document.createElement('div');
-                        mho_leaving_info.id = 'mho-leaving-info';
-                        mho_leaving_info.setAttribute('style', 'background-color: red; padding: 0.5em; margin-top: 0.5em; border: 1px solid;');
-                        mho_leaving_info.innerText = getI18N(texts.prevent_from_leaving_information) + getI18N(texts.prevent_not_in_ae);
-                        ae_button.parentNode.insertBefore(mho_leaving_info, ae_button.nextSibling);
-                    }
-                }
-                let is_escorting = document.getElementsByClassName('beyond-escort-on')[0];
-                if (is_escorting) {
-                    let mho_leaving_info = document.getElementById('mho-leaving-info');
-                    if (!mho_leaving_info) {
-                        mho_leaving_info = document.createElement('div');
-                        mho_leaving_info.id = 'mho-leaving-info';
-                        mho_leaving_info.setAttribute('style', 'background-color: red; padding: 0.5em; margin-top: 0.5em; border: 1px solid;');
-                        mho_leaving_info.innerText = getI18N(texts.prevent_from_leaving_information) + getI18N(texts.escort_not_released);
-                        is_escorting.parentNode.insertBefore(mho_leaving_info, is_escorting.nextSibling);
-                    }
-                }
-                /** Si est en AE ou qu'on n'a pas reposé l'escorte */
-                if (ae_button || is_escorting) {
-                    if (e) {
-                        e.returnValue = '';
-                        e.preventDefault();
-                    }
-                    return '';
-                }
-            };
-            window.addEventListener('beforeunload', prevent_function, false);
-        }
-    }
-
-    /** Si l'option associée est activée, demande confirmation avant de quitter si les options d'escorte ne sont pas bonnes */
-    function alertIfInactiveAndNoEscort() {
-        if (state.mho_parameters.alert_if_no_escort && state.mho_parameters.alert_if_inactive && pageIsDesert()) {
-            let ae_button = document.querySelector('button[x-toggle-escort="1"]:not([x-escort-control-endpoint])');
-            let is_escorting = document.getElementsByClassName('beyond-escort-on')[0];
-            let notify = () => {
-                createNotification(getI18N(ae_button ? texts.prevent_not_in_ae : texts.escort_not_released));
-            };
-            if (ae_button || is_escorting) {
-                const timer = 300000;
-                let timeout = setTimeout(notify, timer);
-                document.addEventListener('click', () => {
-                    clearTimeout(timeout);
-                    timeout = setTimeout(timeout, timer);
-                });
-                document.addEventListener('mousemove', () => {
-                    clearTimeout(timeout);
-                    timeout = setTimeout(timeout, timer);
-                });
-            }
-        }
-    }
-
-    /** Affiche une notification 5 secondes avant la fin de la fouille en cours */
-    function changeDefaultEscortOptions() {
-        if (state.mho_parameters.default_escort_options && pageIsDesert()) {
-            const btn_activate_escort = document.querySelector('button[x-toggle-escort="1"]:not([x-escort-control-endpoint])');
-            if (!btn_activate_escort)
-                return;
-            btn_activate_escort.addEventListener('click', () => {
-                document.addEventListener('mh-navigation-complete', () => {
-                    const escort_force_return = document.querySelector('#escort_force_return');
-                    const escort_allow_rucksack = document.querySelector('#escort_allow_rucksack');
-                    if (!escort_force_return || !escort_allow_rucksack)
-                        return;
-                    const escort_force_return_correct = escort_force_return.checked === state.mho_parameters.default_escort_force_return;
-                    const escort_allow_rucksack_correct = escort_allow_rucksack.checked === state.mho_parameters.default_escort_allow_rucksack;
-                    if (!escort_force_return_correct && !escort_allow_rucksack_correct) {
-                        escort_force_return.checked = !escort_force_return.checked;
-                        escort_allow_rucksack.click();
-                    } else if (!escort_force_return_correct || !escort_allow_rucksack_correct) {
-                        if (!escort_force_return_correct) {
-                            escort_force_return.click();
-                        }
-                        if (!escort_allow_rucksack_correct) {
-                            escort_allow_rucksack.click();
-                        }
-                    }
-                }, {once: true});
-            });
-        }
-    }
-
-    function getCitizens() {
-        return new Promise((resolve, reject) => {
-            fetcher(state.api_url + `/Fetcher/citizens?userId=${state.mh_user.id}&townId=${state.mh_user.townDetails?.townId}`)
-                .then((response) => {
-                    if (response.status === 200) {
-                        return response.json();
-                    } else {
-                        return convertResponsePromiseToError(response);
-                    }
-                })
-                .then((response) => {
-                    state.citizens = response;
-                    state.citizens.citizens = Object.keys(state.citizens.citizens).map((key) => state.citizens.citizens[key]);
-                    resolve(state.citizens);
-                })
-                .catch((error) => {
-                    addError(error);
-                    reject(error);
-                });
-        });
-    }
-
-    /** Récupère les informations de la banque */
-
-    function getMyExpeditions() {
-        return new Promise((resolve, reject) => {
-            fetcher(state.api_url + `/expeditions/me/${state.mh_user.townDetails?.day}`, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json'
+                else {
+                    return convertResponsePromiseToError(response);
                 }
             })
-                .then((response) => {
-                    if (response.status === 200) {
-                        return response.json();
-                    } else {
-                        return convertResponsePromiseToError(response);
-                    }
-                })
-                .then((expeditions) => {
-                    state.my_expeditions = expeditions;
-                    resolve(expeditions);
-                })
+                .then((camping_result) => {
+                let result = document.querySelector('#camping-result');
+                if (result) {
+                    result.innerText = result ? `${getI18N(camping_result.label)} - ${camping_result.boundedProbability}% (${camping_result.boundedProbability}%)` : '';
+                }
+                resolve(camping_result);
+            })
                 .catch((error) => {
-                    addError(error);
-                    reject(error);
-                });
+                addError(error);
+                reject(error);
+            });
         });
     }
 
+    //////////////////////////////////
+    // La liste des onglets du wiki //
+    //////////////////////////////////
     let tabs_list = {
         wiki: [
             {
@@ -2925,45 +3115,44 @@
             }
         ]
     };
-    //////////////////////////////////////////////
-    // La liste des paramètres de l'application //
-    //////////////////////////////////////////////
 
     function getBank() {
         return new Promise((resolve, reject) => {
             fetcher(state.api_url + '/Fetcher/bank')
                 .then((response) => {
-                    if (response.status === 200) {
-                        return response.json();
-                    } else {
-                        return convertResponsePromiseToError(response);
-                    }
-                })
+                if (response.status === 200) {
+                    return response.json();
+                }
+                else {
+                    return convertResponsePromiseToError(response);
+                }
+            })
                 .then((response) => {
-                    let bank = [];
-                    response.bank.forEach((bank_item) => {
-                        bank_item.item.broken = bank_item.isBroken;
-                        bank_item.item.wishListCount = bank_item.wishListCount;
-                        bank.push(bank_item.item);
-                    });
-                    bank = bank.sort((item_a, item_b) => {
-                        if (item_a.category.ordering > item_b.category.ordering) {
-                            return 1;
-                        } else if (item_a.category.ordering === item_b.category.ordering) {
-                            return 0;
-                        } else {
-                            return -1;
-                        }
-                    });
-                    resolve(bank);
-                })
-                .catch((error) => {
-                    addError(error);
-                    reject(error);
+                let bank = [];
+                response.bank.forEach((bank_item) => {
+                    bank_item.item.broken = bank_item.isBroken;
+                    bank_item.item.wishListCount = bank_item.wishListCount;
+                    bank.push(bank_item.item);
                 });
+                bank = bank.sort((item_a, item_b) => {
+                    if (item_a.category.ordering > item_b.category.ordering) {
+                        return 1;
+                    }
+                    else if (item_a.category.ordering === item_b.category.ordering) {
+                        return 0;
+                    }
+                    else {
+                        return -1;
+                    }
+                });
+                resolve(bank);
+            })
+                .catch((error) => {
+                addError(error);
+                reject(error);
+            });
         });
     }
-
     /** Récupère les informations de liste de course */
 
     function getRecipes() {
@@ -2971,51 +3160,54 @@
             if (!state.recipes) {
                 fetcher(state.api_url + '/Fetcher/recipes')
                     .then((response) => {
-                        if (response.status === 200) {
-                            return response.json();
-                        } else {
-                            return convertResponsePromiseToError(response);
-                        }
-                    })
+                    if (response.status === 200) {
+                        return response.json();
+                    }
+                    else {
+                        return convertResponsePromiseToError(response);
+                    }
+                })
                     .then((response) => {
-                        let new_recipes = response
-                            .map((recipe) => {
-                                let new_recipe = {...recipe};
-                                let new_recipe_components = [];
-                                new_recipe.components.forEach((component) => {
-                                    for (let i = 0; i < component.count; i++) {
-                                        new_recipe_components.push(component.item);
-                                    }
-                                });
-                                new_recipe.components = new_recipe_components;
-                                new_recipe.type = action_types.find((type) => type.id === new_recipe.type);
-                                if (!new_recipe.type) {
-                                    console.warn('missing recipe type', recipe.type);
-                                }
-                                return new_recipe;
-                            })
-                            .sort((a, b) => {
-                                if (a.type?.ordering > b.type?.ordering) {
-                                    return 1;
-                                } else if (a.type?.ordering === b.type?.ordering) {
-                                    return 0;
-                                } else {
-                                    return -1;
-                                }
-                            });
-                        state.recipes = new_recipes;
-                        resolve(state.recipes);
+                    let new_recipes = response
+                        .map((recipe) => {
+                        let new_recipe = { ...recipe };
+                        let new_recipe_components = [];
+                        new_recipe.components.forEach((component) => {
+                            for (let i = 0; i < component.count; i++) {
+                                new_recipe_components.push(component.item);
+                            }
+                        });
+                        new_recipe.components = new_recipe_components;
+                        new_recipe.type = action_types.find((type) => type.id === new_recipe.type);
+                        if (!new_recipe.type) {
+                            console.warn('missing recipe type', recipe.type);
+                        }
+                        return new_recipe;
+                    })
+                        .sort((a, b) => {
+                        if (a.type?.ordering > b.type?.ordering) {
+                            return 1;
+                        }
+                        else if (a.type?.ordering === b.type?.ordering) {
+                            return 0;
+                        }
+                        else {
+                            return -1;
+                        }
+                    });
+                    state.recipes = new_recipes;
+                    resolve(state.recipes);
                 })
                     .catch((error) => {
-                        addError(error);
-                        reject(error);
-                    });
-            } else {
+                    addError(error);
+                    reject(error);
+                });
+            }
+            else {
                 resolve(state.recipes);
             }
         });
     }
-
     /** Récupère la liste complète des paramètres en base */
 
     function displayRecipes() {
@@ -3040,7 +3232,6 @@
             }
         });
     }
-
     /** Affiche une recette */
     function getRecipeElement(recipe) {
         let recipe_container = document.createElement('tr');
@@ -3113,11 +3304,20 @@
         recipe_container.appendChild(results_cell);
         return recipe_container;
     }
-
     /**
      * Crée un bouton d'aide
      * @param {string} text_to_display    Le contenu de la popup d'aide
      */
+
+    function getCurrentPosition() {
+        return document.querySelector('.current-location')?.innerText.replace(/.*: ?/, '').split('/') ?? [0, 0];
+    }
+    function getCellDetailsByPosition() {
+        let position = getCurrentPosition();
+        if (position && state.map && state.map.cells) {
+            return state.map.cells.find((cell) => +cell.displayX === +position[0] && +cell.displayY === +position[1]);
+        }
+    }
 
     /** Affiche la liste de courses dans le désert et l'atelier */
     function displayWishlistInApp(count = 0) {
@@ -3130,7 +3330,8 @@
             let zone_to_insert;
             if (is_workshop) {
                 zone_to_insert = document.getElementsByClassName('row-table')[0];
-            } else {
+            }
+            else {
                 zone_to_insert = document.getElementsByClassName('actions-box')[0];
             }
             if (!zone_to_insert)
@@ -3141,7 +3342,8 @@
             let list_to_display = used_wishlist.filter((item) => {
                 if (is_workshop) {
                     return item.isWorkshop;
-                } else {
+                }
+                else {
                     let items_in_cell = Array.from(document.querySelectorAll('.inventory li.item img')).map((item_element) => getItemFromImg(item_element.src));
                     return items_in_cell.some((item_in_cell) => item_in_cell?.id === item.item.id);
                 }
@@ -3226,14 +3428,16 @@
                     header_title.show = false;
                     list.classList.add('hidden');
                     update_section.classList.add('hidden');
-                } else {
+                }
+                else {
                     hide_state.innerText = '˅';
                     header_title.show = true;
                 }
                 header_title.addEventListener('click', () => {
                     if (header_title.show) {
                         hide_state.innerText = '>';
-                    } else {
+                    }
+                    else {
                         hide_state.innerText = '˅';
                     }
                     list.classList.toggle('hidden');
@@ -3248,7 +3452,8 @@
             wishlist_section.classList.add('row');
             if (pageIsWorkshop()) {
                 zone_to_insert.parentNode.insertBefore(wishlist_section, zone_to_insert.nextSibling);
-            } else {
+            }
+            else {
                 let main_actions = zone_to_insert.parentNode;
                 main_actions.parentNode.insertBefore(wishlist_section, main_actions.nextSibling);
             }
@@ -3274,15 +3479,16 @@
             let content = document.createElement('div');
             cell.appendChild(content);
             refreshWishlist();
-        } else if (wishlist_section) {
+        }
+        else if (wishlist_section) {
             wishlist_section.remove();
-        } else if (count < 3) {
+        }
+        else if (count < 3) {
             setTimeout(() => {
                 displayWishlistInApp(count + 1);
             }, 250);
         }
     }
-
     /** Affiche la priorité directement sur les éléments si l'option associée est cochée */
     function displayPriorityOnItems() {
         if (state.mho_parameters.display_wishlist && pageIsDesert() && state.wishlist) {
@@ -3312,33 +3518,35 @@
                     present_items
                         .filter((present_item) => fixMhCompiledImg(present_item.querySelector('img').src).indexOf(wishlist_item.item.img) > 0)
                         .forEach((present_item) => {
-                            if (wishlist_item.depot >= -1) {
-                                let priority_in = false;
-                                if (count < item_count) {
-                                    if (wishlist_item.item.isHeaver) {
-                                        if (heavy_count < heavy_slots) {
-                                            priority_in = true;
-                                        }
-                                        heavy_count++;
-                                    } else {
+                        if (wishlist_item.depot >= -1) {
+                            let priority_in = false;
+                            if (count < item_count) {
+                                if (wishlist_item.item.isHeaver) {
+                                    if (heavy_count < heavy_slots) {
                                         priority_in = true;
                                     }
+                                    heavy_count++;
                                 }
-                                if (priority_in) {
-                                    present_item.classList.add('priority_in');
-                                    count++;
-                                } else {
-                                    present_item.classList.add('priority_out');
+                                else {
+                                    priority_in = true;
                                 }
-                            } else if (wishlist_item.depot < -1) {
-                                present_item.classList.add('priority_trash');
                             }
-                        });
+                            if (priority_in) {
+                                present_item.classList.add('priority_in');
+                                count++;
+                            }
+                            else {
+                                present_item.classList.add('priority_out');
+                            }
+                        }
+                        else if (wishlist_item.depot < -1) {
+                            present_item.classList.add('priority_trash');
+                        }
+                    });
                 });
             }
         }
     }
-
     function getWishlistForZone() {
         if (!state.wishlist || !state.wishlist.wishList)
             return undefined;
@@ -3352,7 +3560,6 @@
         });
         return used_wishlist;
     }
-
     /** @param {HTMLElement} tooltip_container */
 
     function enhanceTooltip(tooltip_container) {
@@ -3407,7 +3614,8 @@
                 advanced_tooltip_container = buildAdvancedTooltipContainer();
                 createAdvancedProperties(advanced_tooltip_container, item, tooltip_container);
             }
-        } else {
+        }
+        else {
             let should_display = state.mho_parameters.enhanced_tooltips && state.mho_parameters.enhanced_tooltips_statuses && (status.watch_def !== undefined || status.watch_kills !== undefined ||
                 status.searches !== undefined || status.terror !== undefined ||
                 status.fatal_infection !== undefined || status.prevent_infection !== undefined ||
@@ -3422,7 +3630,6 @@
             addFreezeHintsToTooltip(tooltip_container);
         }
     }
-
     function addFreezeHintsToTooltip(tooltip_container) {
         if (tooltip_container.querySelector('.mho-shift-hint'))
             return;
@@ -3443,7 +3650,6 @@
         separator.style.flex = '1';
         h1.prepend(shift, close, separator);
     }
-
     function observeNewTooltips(tries = 10) {
         if (state.advanced_tooltips_observer)
             return;
@@ -3451,7 +3657,8 @@
         if (!tooltip_container) {
             if (tries > 0) {
                 setTimeout(observeNewTooltips, 100, tries - 1);
-            } else {
+            }
+            else {
                 console.warn('tooltip_container not found');
             }
             return;
@@ -3476,7 +3683,6 @@
             attributeFilter: ['style']
         });
     }
-
     /** Affiche les tooltips avancés */
     function displayAdvancedTooltips() {
         if (state.mho_parameters.enhanced_tooltips && state.items) {
@@ -3489,7 +3695,6 @@
             });
         }
     }
-
     function initTooltipFreezeOnShift() {
         if (initTooltipFreezeOnShift._initialized)
             return;
@@ -3497,7 +3702,6 @@
         let frozenTooltip = null;
         let freezeObserver = null;
         let frozenStyle = null;
-
         function setHintFrozen(tooltip_container, frozen) {
             const close = tooltip_container?.querySelector('.mho-close-hint');
             if (!close)
@@ -3505,9 +3709,8 @@
             close.addEventListener('click', (e) => {
                 e.stopPropagation();
                 unfreeze();
-            }, {once: true});
+            }, { once: true });
         }
-
         function unfreeze() {
             if (!frozenTooltip)
                 return;
@@ -3520,7 +3723,6 @@
             tooltip.removeAttribute('style');
             tooltip.classList.remove('mho-frozen');
         }
-
         function freezeCurrentTooltip() {
             const container = document.getElementById('tooltip_container');
             if (!container)
@@ -3543,16 +3745,14 @@
                     frozenTooltip.setAttribute('style', frozenStyle);
                 }
             });
-            freezeObserver.observe(frozenTooltip, {attributes: true, attributeFilter: ['style']});
+            freezeObserver.observe(frozenTooltip, { attributes: true, attributeFilter: ['style'] });
         }
-
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Shift') {
                 freezeCurrentTooltip();
             }
         });
     }
-
     function createAdvancedProperties(content, item, tooltip) {
         let item_deco;
         if (tooltip) {
@@ -3587,7 +3787,7 @@
         if (state.mho_parameters.enhanced_tooltips_item_translations) {
             let translations = '';
             supported_languages.filter((language) => language.value !== lang).forEach((language) => {
-                translations += `<div class="tooltip-translation"><span class="tooltip-translation-flag">${language.img}</span><span class="tooltip-translation-value">${item.label[language.value]}</span></div>`;
+                translations += `<div class="brown-tag"><span class="tooltip-translation-flag">${language.img}</span><span class="tooltip-translation-value">${item.label[language.value]}</span></div>`;
             });
             let item_translations = document.createElement('div');
             item_translations.classList.add('mho-tooltip-translations');
@@ -3625,7 +3825,6 @@
             });
         }
     }
-
     function createAdvancedStatus(content, status, tooltip) {
         content.innerHtml = '';
         let status_details = document.createElement('div');
@@ -3685,7 +3884,6 @@
             });
         }
     }
-
     /** Affiche les propriétés ou les actions associées à l'objet survolé */
     function displayPropertiesOrActions(property_or_action, hovered_item) {
         let item_action = document.createElement('div');
@@ -3723,7 +3921,8 @@
                 if (!(hovered_item.properties && hovered_item.properties.some((property) => property === 'hero_find')) && !(hovered_item.actions && hovered_item.actions.some((property) => property === 'hero_find'))) {
                     item_action.classList.add(`item-tag-hero`);
                     item_action.innerText = `Jolie trouvaille`;
-                } else {
+                }
+                else {
                     item_action.classList.remove('item-tag', 'mho-item-tag');
                 }
                 break;
@@ -3731,7 +3930,8 @@
                 if (!(hovered_item.properties && hovered_item.properties.some((property) => property === 'hero_find_lucky')) && !(hovered_item.actions && hovered_item.actions.some((property) => property === 'hero_find_lucky'))) {
                     item_action.classList.add(`item-tag-hero`);
                     item_action.innerText = `Impressionnante trouvaille`;
-                } else {
+                }
+                else {
                     item_action.classList.remove('item-tag', 'mho-item-tag');
                 }
                 break;
@@ -3739,7 +3939,8 @@
                 if (!(hovered_item.properties && hovered_item.properties.some((property) => property === 'hero_find_lucky2')) && !(hovered_item.actions && hovered_item.actions.some((property) => property === 'hero_find_lucky2'))) {
                     item_action.classList.add(`item-tag-hero`);
                     item_action.innerText = `Incroyable trouvaille`;
-                } else {
+                }
+                else {
                     item_action.classList.remove('item-tag', 'mho-item-tag');
                 }
                 break;
@@ -3824,13 +4025,17 @@
                     var chances = 1;
                     if (days >= 20) {
                         chances = 0.50;
-                    } else if (days >= 15) {
+                    }
+                    else if (days >= 15) {
                         chances = 0.60;
-                    } else if (days >= 13) {
+                    }
+                    else if (days >= 13) {
                         chances = 0.70;
-                    } else if (days >= 10) {
+                    }
+                    else if (days >= 10) {
                         chances = 0.80;
-                    } else if (days >= 5) {
+                    }
+                    else if (days >= 5) {
                         chances = 0.85;
                     }
                     if (devastated)
@@ -3838,7 +4043,8 @@
                     var success = chances * 100;
                     item_action.classList.add(`mho-item-tag-no-img`);
                     item_action.innerText = `${success}% de chances de réussir son manuel`;
-                } else {
+                }
+                else {
                     item_action.classList.remove('item-tag', 'mho-item-tag');
                 }
                 break;
@@ -4183,7 +4389,6 @@
         }
         return item_action;
     }
-
     function displayStatusProperties(status_properties, hovered_item) {
         let item_action = document.createElement('div');
         item_action.classList.add('item-tag', 'mho-item-tag');
@@ -4222,7 +4427,6 @@
             }
         });
     }
-
     /**
      * Affiche la liste des objets
      * @param filtered_items
@@ -4297,7 +4501,6 @@
             item_list.appendChild(item_container);
         });
     }
-
     /** Affiche le calcul des probabilités en camping */
 
     function displayCamping() {
@@ -4405,7 +4608,8 @@
                 if (conf.job !== 'scout') {
                     conf.vest = false;
                     vest_field.style.display = 'none';
-                } else {
+                }
+                else {
                     vest_field.style.display = 'initial';
                 }
                 calculateCamping(conf);
@@ -4527,7 +4731,8 @@
                 let digs_field = document.querySelector('#digs-field');
                 if (+current_ruin.id === -1) {
                     digs_field.style.display = 'block';
-                } else {
+                }
+                else {
                     digs_field.style.display = 'none';
                     digs_field.querySelector('input').value = (0);
                 }
@@ -4702,7 +4907,6 @@
             calculateCamping(conf);
         });
     }
-
     /** Affiche la liste des bâtiments trouvables dans le désert */
 
     function displayRuins() {
@@ -4786,7 +4990,6 @@
             }
         });
     }
-
     /** Affiche la liste des recettes */
 
     function createWindow(id, full_size) {
@@ -4863,12 +5066,10 @@
             };
         }
     }
-
     /** Crée la fenêtre de wiki */
     function createWikiToolsWindow() {
         createWindow(mh_optimizer_window_id, true);
     }
-
     /**
      * Crée la liste des onglets de la page de wiki
      * @param {string} window_type
@@ -4883,14 +5084,16 @@
         let current_tabs_list = tabs_list[window_type]
             .filter((tab) => state.mh_user.townDetails?.townId || !tab.needs_town)
             .sort((a, b) => {
-                if (a.ordering > b.ordering) {
-                    return 1;
-                } else if (a.ordering === b.ordering) {
-                    return 0;
-                } else {
-                    return -1;
-                }
-            });
+            if (a.ordering > b.ordering) {
+                return 1;
+            }
+            else if (a.ordering === b.ordering) {
+                return 0;
+            }
+            else {
+                return -1;
+            }
+        });
         current_tabs_list.forEach((tab, index) => {
             let tab_link = document.createElement('div');
             if (tab.icon) {
@@ -4920,7 +5123,6 @@
         });
         tabs_div.appendChild(tabs_ul);
     }
-
     /** Crée la fenêtre de wiki */
     function createMapWindow() {
         let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
@@ -4981,7 +5183,6 @@
             window.classList.remove('visible');
         });
     }
-
     /**
      * Affiche la fenêtre de wiki et charge la liste d'objets si elle n'a jamais été chargée
      * @param {string} window_type
@@ -4992,7 +5193,6 @@
         body.setAttribute('style', 'overflow: hidden');
         createWikiToolsTabs(window_type);
     }
-
     /**
      * Crée le bloc de contenu de la page
      * @param {string} window_tyme     Le type de fenêtre à afficher, correspondant au nom utilisé dans la liste des onglets
@@ -5008,7 +5208,6 @@
         tab_content.id = mh_optimizer_window_id + '-tab-content';
         window_content.appendChild(tab_content);
     }
-
     /**
      * Détermine quelle fonction appeler en fonction de l'onglet sélectionné
      * @param {string} window_type     Le type de l'onglet
@@ -5040,16 +5239,825 @@
                 break;
         }
     }
-
     /** Filtre la liste des objets */
     function filterItems(source_items) {
         return source_items;
     }
-
+    /**
+     * Affiche une modale personnalisée avec le contenu du changelog et un bouton OK.
+     * Utilise une modale HTML/CSS au lieu de alert() pour éviter le blocage silencieux du navigateur.
+     * @param {string} content      Le texte du changelog à afficher
+     * @param {() => void} onConfirm  Callback appelé uniquement quand l'utilisateur clique OK
+     */
+    function showChangelogModal(content, onConfirm) {
+        const modal_id = 'mho-changelog-modal';
+        // Supprimer une éventuelle modale existante
+        document.getElementById(modal_id)?.remove();
+        const overlay = document.createElement('div');
+        overlay.id = modal_id;
+        overlay.classList.add('mho-changelog-modal-overlay');
+        const box = document.createElement('div');
+        box.classList.add('mho-changelog-modal-box');
+        const title = document.createElement('h3');
+        title.classList.add('mho-changelog-modal-title');
+        title.textContent = content.split('\n')[0].trim();
+        const body = document.createElement('pre');
+        body.classList.add('mho-changelog-modal-body');
+        body.textContent = content.split('\n').slice(1).map((line) => line.trim()).join('\n').trim();
+        // Lien pour afficher l'historique complet des versions passées
+        const current_version = getScriptInfo().version;
+        const older_versions = Object.entries(changelogs).filter(([v]) => v !== current_version);
+        if (older_versions.length > 0) {
+            const history_toggle = document.createElement('span');
+            history_toggle.classList.add('mho-changelog-history-toggle');
+            history_toggle.textContent = '▶ Voir les notes de versions plus anciennes';
+            const history_section = document.createElement('div');
+            history_section.classList.add('mho-changelog-history-section');
+            history_section.style.display = 'none';
+            older_versions.forEach(([version, notes]) => {
+                const version_block = document.createElement('div');
+                version_block.classList.add('mho-changelog-history-block');
+                const version_title = document.createElement('h4');
+                version_title.classList.add('mho-changelog-history-version');
+                version_title.textContent = `${getScriptInfo().name} ${version}`;
+                const version_body = document.createElement('pre');
+                version_body.classList.add('mho-changelog-history-body');
+                version_body.textContent = notes.split('\n').map((line) => line.trim()).join('\n').trim();
+                version_block.appendChild(version_title);
+                version_block.appendChild(version_body);
+                history_section.appendChild(version_block);
+            });
+            history_toggle.addEventListener('click', () => {
+                const is_open = history_section.style.display !== 'none';
+                history_section.style.display = is_open ? 'none' : 'block';
+                history_toggle.textContent = (is_open ? '▶' : '▼') + ' Voir les notes de versions plus anciennes';
+            });
+            box.appendChild(title);
+            box.appendChild(body);
+            box.appendChild(history_toggle);
+            box.appendChild(history_section);
+        }
+        else {
+            box.appendChild(title);
+            box.appendChild(body);
+        }
+        const footer = document.createElement('div');
+        footer.classList.add('mho-changelog-modal-footer');
+        const ok_btn = document.createElement('button');
+        ok_btn.textContent = 'OK';
+        ok_btn.classList.add('mho-changelog-modal-btn');
+        ok_btn.addEventListener('click', () => {
+            overlay.remove();
+            if (onConfirm)
+                onConfirm();
+        });
+        footer.appendChild(ok_btn);
+        box.appendChild(footer);
+        overlay.appendChild(box);
+        const post_office = document.getElementById('post-office');
+        if (post_office) {
+            post_office.parentNode.insertBefore(overlay, post_office.nextSibling);
+        }
+        else {
+            document.body.appendChild(overlay);
+        }
+    }
     /**
      * Affiche les éléments présents dans la banque
      * @param {string} tab_id
      */
+
+    let informations = [
+        {
+            id: `version`,
+            label: {
+                en: `Changelog ${getScriptInfo().version}`,
+                fr: `Notes de version ${getScriptInfo().version}`,
+                de: `Changelog ${getScriptInfo().version}`,
+                es: `Notas de la versión ${getScriptInfo().version}`
+            },
+            src: undefined,
+            action: () => {
+                getStorageItem(mho_version_key).then((version) => {
+                    if (isNewVersion(version)) {
+                        showChangelogModal(getChangelog(), () => {
+                            version[getScriptInfo().version] = true;
+                            toggleNewChangelog(false);
+                            setStorageItem(mho_version_key, version);
+                        });
+                    }
+                    else {
+                        showChangelogModal(getChangelog());
+                    }
+                });
+            },
+            img: `emotes/rptext.gif`
+        },
+        {
+            id: `update`,
+            label: {
+                en: `Update available`,
+                fr: `Mise à jour disponible`,
+                de: `Update verfügbar`,
+                es: `Actualización disponible`
+            },
+            src: isScript() ? getScriptInfo().updateURL : undefined,
+            action: undefined,
+            img: `icons/small_news.gif`,
+            display: () => isScript() && !isScriptVersionLastVersion()
+        },
+        {
+            id: `discord-url-id`,
+            label: {
+                en: `Bugs? Ideas?`,
+                fr: `Des bugs ? Des idées ?`,
+                de: `Fehler ? Ideen ?`,
+                es: `¿Bugs? ¿Ideas?`
+            },
+            src: `https://discord.gg/ZQH7ZPWcCm`,
+            action: undefined,
+            img: `${repo_img_url}discord.ico`
+        },
+        {
+            id: `edit-app-id`,
+            label: {
+                en: `Change my external ID for apps`,
+                fr: `Modifier mon ID externe pour les apps`,
+                de: `Meine externe ID für externe Programme ändern`,
+                es: `Cambiar mi ID externo para las aplicaciones`
+            },
+            src: undefined,
+            action: () => {
+                let manual_app_id_key = prompt(getI18N(texts.edit_add_app_id_key), state.external_app_id);
+                if (manual_app_id_key !== null && manual_app_id_key !== undefined && manual_app_id_key !== '') {
+                    state.external_app_id = manual_app_id_key;
+                    setStorageItem(gm_mh_external_app_id_key, state.external_app_id);
+                }
+                else if (manual_app_id_key === '') {
+                    state.external_app_id = undefined;
+                    setStorageItem(gm_mh_external_app_id_key, undefined);
+                }
+            },
+            img: `icons/small_remove.gif`
+        }
+    ];
+    const table_ruins_headers = [
+        { id: 'img', label: { en: ``, fr: ``, de: ``, es: `` }, type: 'th' },
+        { id: 'label', label: { en: `Name`, fr: 'Nom', de: `Name`, es: `Nombre` }, type: 'th' },
+        {
+            id: 'description',
+            label: { en: `Description`, fr: `Description`, de: `Beschreibung`, es: `Descripción` },
+            type: 'td'
+        },
+        {
+            id: 'minDist',
+            label: { en: `Minimum distance`, fr: `Distance minimum`, de: `Mindestabstand`, es: `Distancia mínima` },
+            type: 'td'
+        },
+        {
+            id: 'maxDist',
+            label: { en: `Maximum distance`, fr: `Distance maximum`, de: `Maximale Entfernung`, es: `Distancia máxima` },
+            type: 'td'
+        },
+        {
+            id: 'camping',
+            label: { en: `Camping bonus`, fr: `Bonus en camping`, de: `Campingbonus`, es: `Bono de acampada` },
+            type: 'td'
+        },
+        {
+            id: 'capacity',
+            label: { en: `Capacity`, fr: `Capacité`, de: `Kapazität`, es: `Capacidad` },
+            type: 'td'
+        },
+        { id: 'drops', label: { en: `Items`, fr: 'Objets', de: `Gegenstände`, es: `Objetos` }, type: 'td' },
+    ];
+    const added_ruins = [
+        { id: '-1000', camping: 0, label: { en: `None`, fr: `Aucun`, de: `Kein`, es: `Ninguna` } }
+    ];
+    const town_type = [
+        { id: 'rne', label: { de: 'Kleine Stadt', en: 'Small Town', es: 'Amateur', fr: 'Petite carte' } },
+        { id: 're', label: { de: 'Entfernte Regionen', en: 'Distant Region', es: 'Leyenda', fr: 'Région éloignée' } },
+        { id: 'pande', label: { de: 'Pandämonium', en: 'Pandemonium', es: 'Pandemonio', fr: 'Pandémonium' } }
+    ];
+
+    function displayCampingPredict() {
+        setTimeout(() => {
+            let camping_predict_container = document.getElementById(mho_camping_predict_id);
+            let zone_camp = document.querySelector('.zone-camp');
+            if (state.mho_parameters.display_camping_predict && pageIsDesert() && zone_camp) {
+                if (camping_predict_container)
+                    return;
+                getRuins().then((ruins) => {
+                    let all_ruins = [...added_ruins];
+                    all_ruins = all_ruins.concat(ruins);
+                    let zone_camp_info = zone_camp.querySelector('.zone-camp-info');
+                    let zone_camp_label = zone_camp.querySelector('label');
+                    zone_camp_label.addEventListener('click', () => {
+                        camping_predict_container.style.display = camping_predict_container.style.display === 'none' ? 'block' : 'none';
+                        if (camping_predict_container.style.display !== 'none') {
+                            calculateCamping(conf);
+                        }
+                    });
+                    camping_predict_container = document.createElement('div');
+                    camping_predict_container.id = mho_camping_predict_id;
+                    camping_predict_container.style.border = '1px solid';
+                    camping_predict_container.style.padding = '0.5em';
+                    camping_predict_container.style.margin = '0.5em 0';
+                    camping_predict_container.style.display = window.getComputedStyle(zone_camp_info).getPropertyValue('max-height') === '0px' ? 'none' : 'block';
+                    zone_camp.appendChild(camping_predict_container);
+                    let updater_title = document.createElement('h5');
+                    updater_title.style.marginTop = '0.5em';
+                    let updater_title_mho_img = document.createElement('img');
+                    updater_title_mho_img.src = mh_optimizer_icon;
+                    updater_title_mho_img.style.height = '24px';
+                    updater_title_mho_img.style.marginRight = '0.5em';
+                    updater_title.appendChild(updater_title_mho_img);
+                    let updater_title_text = document.createElement('text');
+                    updater_title_text.innerText = getScriptInfo().name;
+                    updater_title_text.style.fontSize = '1.5em';
+                    updater_title.appendChild(updater_title_text);
+                    camping_predict_container.appendChild(updater_title);
+                    let zone_ruin = document.querySelector('.ruin-info b');
+                    let ruin = '-1000';
+                    if (zone_ruin) {
+                        ruin = all_ruins.find((one_ruin) => getI18N(one_ruin.label).toLowerCase() === zone_ruin.innerText.toLowerCase()).id;
+                    }
+                    let conf = {
+                        townType: state.mh_user.townDetails?.townType.toUpperCase(),
+                        job: jobs.find((job) => state.mh_user.jobDetails.uid === job.img)?.id,
+                        distance: document.querySelector('.zone-dist > div > b')?.innerText.replace('km', ''), // OK
+                        campings: 0,
+                        proCamper: false,
+                        hiddenCampers: 0,
+                        objects: 0,
+                        vest: false,
+                        tomb: false,
+                        zombies: document.querySelectorAll('.actor.zombie')?.length || 0,
+                        night: !!document.querySelector('.map.night'),
+                        devastated: state.mh_user.townDetails?.isDevaste,
+                        phare: false,
+                        improve: 0,
+                        objectImprove: 0,
+                        ruinBonus: 0,
+                        ruinBuryCount: 0,
+                        ruinCapacity: 0,
+                        ruin: '-1000'
+                    };
+                    let my_info = document.createElement('div');
+                    camping_predict_container.appendChild(my_info);
+                    let my_info_title = document.createElement('h3');
+                    my_info_title.innerText = getI18N(texts.camping_citizen);
+                    my_info.appendChild(my_info_title);
+                    let my_info_content = document.createElement('div');
+                    my_info.appendChild(my_info_content);
+                    let town_info = document.createElement('div');
+                    camping_predict_container.appendChild(town_info);
+                    let town_info_title = document.createElement('h3');
+                    town_info_title.innerText = getI18N(texts.camping_town);
+                    town_info.appendChild(town_info_title);
+                    let town_info_content = document.createElement('div');
+                    town_info.appendChild(town_info_content);
+                    let cell_info = document.createElement('div');
+                    camping_predict_container.appendChild(cell_info);
+                    let cell_info_title = document.createElement('h3');
+                    cell_info_title.innerText = getI18N(texts.camping_ruin);
+                    cell_info.appendChild(cell_info_title);
+                    let cell_info_content = document.createElement('div');
+                    cell_info.appendChild(cell_info_content);
+                    let result = document.createElement('div');
+                    camping_predict_container.appendChild(result);
+                    let result_title = document.createElement('h3');
+                    result_title.innerText = getI18N(texts.result);
+                    result.appendChild(result_title);
+                    let result_content = document.createElement('div');
+                    result_content.id = 'camping-result';
+                    result.appendChild(result_content);
+                    /** Capuche ? */
+                    let vest_div = document.createElement('div');
+                    vest_div.id = 'vest-field';
+                    vest_div.style.display = 'none';
+                    my_info_content.appendChild(vest_div);
+                    let vest_label = document.createElement('label');
+                    vest_label.htmlFor = 'vest';
+                    vest_label.innerHTML = `<img src="${repo_img_hordes_url}emotes/proscout.gif"> ${getI18N(texts.vest)}`;
+                    let vest = document.createElement('input');
+                    vest.type = 'checkbox';
+                    vest.id = 'vest';
+                    vest.checked = conf.vest;
+                    vest.classList.add('mho-input');
+                    vest.addEventListener('change', ($event) => {
+                        conf.vest = $event.srcElement.checked;
+                        calculateCamping(conf);
+                    });
+                    vest_div.appendChild(vest);
+                    vest_div.appendChild(vest_label);
+                    /** Campeur pro ? */
+                    let pro_camper_div = document.createElement('div');
+                    my_info_content.appendChild(pro_camper_div);
+                    let pro_camper_label = document.createElement('label');
+                    pro_camper_label.htmlFor = 'pro';
+                    pro_camper_label.innerHTML = `<img src="${repo_img_hordes_url}status/status_camper.gif"> ${getI18N(texts.pro_camper)}`;
+                    let pro_camper = document.createElement('input');
+                    pro_camper.type = 'checkbox';
+                    pro_camper.id = 'pro';
+                    pro_camper.checked = conf.pro;
+                    pro_camper.classList.add('mho-input');
+                    pro_camper.addEventListener('change', ($event) => {
+                        conf.proCamper = $event.srcElement.checked;
+                        calculateCamping(conf);
+                    });
+                    pro_camper_div.appendChild(pro_camper);
+                    pro_camper_div.appendChild(pro_camper_label);
+                    /** Tombe ? */
+                    let tomb_div = document.createElement('div');
+                    my_info_content.appendChild(tomb_div);
+                    let tomb_label = document.createElement('label');
+                    tomb_label.htmlFor = 'tomb';
+                    tomb_label.innerHTML = `<img src="${repo_img_hordes_url}building/small_cemetery.gif"> ${getI18N(texts.tomb)}`;
+                    let tomb = document.createElement('input');
+                    tomb.type = 'checkbox';
+                    tomb.id = 'tomb';
+                    tomb.checked = conf.tomb;
+                    tomb.classList.add('mho-input');
+                    tomb.addEventListener('change', ($event) => {
+                        conf.tomb = $event.srcElement.checked;
+                        calculateCamping(conf);
+                    });
+                    tomb_div.appendChild(tomb);
+                    tomb_div.appendChild(tomb_label);
+                    /** Nombre de nuits déjà campées */
+                    let nb_campings_div = document.createElement('div');
+                    my_info_content.appendChild(nb_campings_div);
+                    let nb_campings_label = document.createElement('label');
+                    nb_campings_label.htmlFor = 'nb-campings';
+                    nb_campings_label.innerHTML = `<img src="${repo_img_hordes_url}emotes/sleep.gif"> ${getI18N(texts.nb_campings)}`;
+                    nb_campings_label.classList.add('spaced-label');
+                    let nb_campings = document.createElement('input');
+                    nb_campings.type = 'number';
+                    nb_campings.id = 'nb-campings';
+                    nb_campings.value = (conf.campings);
+                    nb_campings.classList.add('mho-input', 'inline');
+                    nb_campings.addEventListener('change', ($event) => {
+                        conf.campings = +$event.srcElement.value;
+                        calculateCamping(conf);
+                    });
+                    nb_campings_div.appendChild(nb_campings_label);
+                    nb_campings_div.appendChild(nb_campings);
+                    /** Nombre de toiles de tente ou pelure de peau */
+                    let objects_in_bag_div = document.createElement('div');
+                    my_info_content.appendChild(objects_in_bag_div);
+                    let objects_in_bag_label = document.createElement('label');
+                    objects_in_bag_label.htmlFor = 'nb-objects';
+                    objects_in_bag_label.innerText = getI18N(texts.objects_in_bag);
+                    objects_in_bag_label.innerHTML = `<img src="${repo_img_hordes_url}emotes/bag.gif"> ${getI18N(texts.objects_in_bag)}`;
+                    objects_in_bag_label.classList.add('spaced-label');
+                    let objects_in_bag = document.createElement('input');
+                    objects_in_bag.type = 'number';
+                    objects_in_bag.id = 'nb-objects';
+                    objects_in_bag.value = (conf.objects);
+                    objects_in_bag.classList.add('mho-input', 'inline');
+                    objects_in_bag.addEventListener('change', ($event) => {
+                        conf.objects = +$event.srcElement.value;
+                        calculateCamping(conf);
+                    });
+                    objects_in_bag_div.appendChild(objects_in_bag_label);
+                    objects_in_bag_div.appendChild(objects_in_bag);
+                    /** Type de bâtiment */
+                    let ruin_type_div = document.createElement('div');
+                    cell_info_content.appendChild(ruin_type_div);
+                    let select_ruin_label = document.createElement('label');
+                    select_ruin_label.htmlFor = 'select-ruin';
+                    select_ruin_label.innerText = getI18N(texts.ruin);
+                    select_ruin_label.classList.add('spaced-label');
+                    let select_ruin = document.createElement('select');
+                    select_ruin.id = 'select-ruin';
+                    select_ruin.value = conf.ruin;
+                    select_ruin.classList.add('small');
+                    all_ruins.forEach((ruin) => {
+                        let ruin_option = document.createElement('option');
+                        ruin_option.value = ruin.id;
+                        ruin_option.label = getI18N(ruin.label);
+                        if (ruin.id === conf.ruin) {
+                            ruin_option.setAttribute('selected', 'selected');
+                        }
+                        select_ruin.appendChild(ruin_option);
+                    });
+                    select_ruin.addEventListener('change', ($event) => {
+                        conf.ruin = $event.srcElement.value;
+                        let current_ruin = all_ruins.find((_current_ruin) => +_current_ruin.id === +conf.ruin);
+                        conf.ruinBonus = current_ruin.camping;
+                        conf.ruinCapacity = current_ruin.capacity;
+                        let digs_field = document.querySelector('#digs-field');
+                        if (+current_ruin.id === -1) {
+                            digs_field.style.display = 'block';
+                        }
+                        else {
+                            digs_field.style.display = 'none';
+                            digs_field.querySelector('input').value = (0);
+                        }
+                        calculateCamping(conf);
+                    });
+                    ruin_type_div.appendChild(select_ruin_label);
+                    ruin_type_div.appendChild(select_ruin);
+                    /** Nombre de tas sur le bat ? */
+                    let digs_div = document.createElement('div');
+                    digs_div.id = 'digs-field';
+                    digs_div.style.display = 'none';
+                    cell_info_content.appendChild(digs_div);
+                    let digs_label = document.createElement('label');
+                    digs_label.htmlFor = 'digs';
+                    digs_label.innerText = getI18N(texts.digs);
+                    digs_label.innerHTML = `<img src="${repo_img_hordes_url}icons/uncover.gif"> ${getI18N(texts.digs)}`;
+                    digs_label.classList.add('spaced-label');
+                    let digs = document.createElement('input');
+                    digs.type = 'number';
+                    digs.id = 'digs';
+                    digs.value = (conf.ruinBuryCount);
+                    digs.classList.add('mho-input', 'inline');
+                    digs.addEventListener('change', ($event) => {
+                        conf.ruinBuryCount = +$event.srcElement.value;
+                        calculateCamping(conf);
+                    });
+                    digs_div.appendChild(digs_label);
+                    digs_div.appendChild(digs);
+                    /** Nombre de zombies sur la case */
+                    let zombies_div = document.createElement('div');
+                    cell_info_content.appendChild(zombies_div);
+                    let zombies_label = document.createElement('label');
+                    zombies_label.htmlFor = 'nb-zombies';
+                    zombies_label.innerHTML = `<img src="${repo_img_hordes_url}emotes/zombie.gif"> ${getI18N(texts.zombies_on_cell)}`;
+                    zombies_label.classList.add('spaced-label');
+                    let zombies = document.createElement('input');
+                    zombies.type = 'number';
+                    zombies.id = 'nb-zombies';
+                    zombies.value = (conf.zombies);
+                    zombies.classList.add('mho-input', 'inline');
+                    zombies.addEventListener('change', ($event) => {
+                        conf.zombies = +$event.srcElement.value;
+                        calculateCamping(conf);
+                    });
+                    zombies_div.appendChild(zombies_label);
+                    zombies_div.appendChild(zombies);
+                    /** Nombre d'améliorations simples sur la case */
+                    let improve_div = document.createElement('div');
+                    cell_info_content.appendChild(improve_div);
+                    let improve_label = document.createElement('label');
+                    improve_label.htmlFor = 'nb-improve';
+                    improve_label.innerHTML = `<img src="${repo_img_hordes_url}icons/home_recycled.gif"> ${getI18N(texts.improve)}`;
+                    improve_label.classList.add('spaced-label');
+                    let improve = document.createElement('input');
+                    improve.type = 'number';
+                    improve.id = 'nb-improve';
+                    improve.value = (conf.improve);
+                    improve.classList.add('mho-input', 'inline');
+                    improve.addEventListener('change', ($event) => {
+                        conf.improve = +$event.srcElement.value;
+                        calculateCamping(conf);
+                    });
+                    improve_div.appendChild(improve_label);
+                    improve_div.appendChild(improve);
+                    /** Nombre d'objets de campement installés sur la case */
+                    let object_improve_div = document.createElement('div');
+                    cell_info_content.appendChild(object_improve_div);
+                    let object_improve_label = document.createElement('label');
+                    object_improve_label.htmlFor = 'nb-object-improve';
+                    object_improve_label.innerHTML = `<img src="${repo_img_hordes_url}icons/home.gif"> ${getI18N(texts.object_improve)}`;
+                    object_improve_label.classList.add('spaced-label');
+                    let object_improve = document.createElement('input');
+                    object_improve.type = 'number';
+                    object_improve.id = 'nb-object-improve';
+                    object_improve.value = (conf.objectImprove);
+                    object_improve.classList.add('mho-input', 'inline');
+                    object_improve.addEventListener('change', ($event) => {
+                        conf.objectImprove = +$event.srcElement.value;
+                        calculateCamping(conf);
+                    });
+                    object_improve_div.appendChild(object_improve_label);
+                    object_improve_div.appendChild(object_improve);
+                    /** Nombre de personnes déjà cachées */
+                    let hidden_campers_div = document.createElement('div');
+                    cell_info_content.appendChild(hidden_campers_div);
+                    let hidden_campers_label = document.createElement('label');
+                    hidden_campers_label.htmlFor = 'hidden-campers';
+                    hidden_campers_label.innerHTML = `<img src="${repo_img_hordes_url}emotes/human.gif"> ${getI18N(texts.hidden_campers)}`;
+                    hidden_campers_label.classList.add('spaced-label');
+                    let hidden_campers = document.createElement('input');
+                    hidden_campers.type = 'number';
+                    hidden_campers.id = 'hidden-campers';
+                    hidden_campers.value = (conf.hiddenCampers);
+                    hidden_campers.classList.add('mho-input', 'inline');
+                    hidden_campers.addEventListener('change', ($event) => {
+                        conf.hiddenCampers = +$event.srcElement.value;
+                        calculateCamping(conf);
+                    });
+                    hidden_campers_div.appendChild(hidden_campers_label);
+                    hidden_campers_div.appendChild(hidden_campers);
+                    /** Nuit ? */
+                    let night_div = document.createElement('div');
+                    town_info_content.appendChild(night_div);
+                    let night_label = document.createElement('label');
+                    night_label.htmlFor = 'night';
+                    night_label.innerHTML = `<img src="${repo_img_hordes_url}pictos/r_doutsd.gif"> ${getI18N(texts.night)}`;
+                    let night = document.createElement('input');
+                    night.type = 'checkbox';
+                    night.id = 'night';
+                    night.checked = conf.night;
+                    night.classList.add('mho-input');
+                    night.addEventListener('change', ($event) => {
+                        conf.night = $event.srcElement.checked;
+                        calculateCamping(conf);
+                    });
+                    night_div.appendChild(night);
+                    night_div.appendChild(night_label);
+                    /** Phare construit ? */
+                    let phare_div = document.createElement('div');
+                    town_info_content.appendChild(phare_div);
+                    let phare_label = document.createElement('label');
+                    phare_label.htmlFor = 'phare';
+                    phare_label.innerText = getI18N(texts.phare);
+                    phare_label.innerHTML = `<img src="${repo_img_hordes_url}building/small_lighthouse.gif"> ${getI18N(texts.phare)}`;
+                    let phare = document.createElement('input');
+                    phare.type = 'checkbox';
+                    phare.id = 'phare';
+                    phare.checked = conf.phare;
+                    phare.classList.add('mho-input');
+                    phare.addEventListener('change', ($event) => {
+                        conf.phare = $event.srcElement.checked;
+                        calculateCamping(conf);
+                    });
+                    phare_div.appendChild(phare);
+                    phare_div.appendChild(phare_label);
+                    if (camping_predict_container.style.display !== 'none') {
+                        calculateCamping(conf);
+                    }
+                });
+            }
+            else if (camping_predict_container) {
+                camping_predict_container.remove();
+            }
+        }, 500);
+    }
+
+    function displayCellDetailsOnPage() {
+        if (state.mho_parameters.display_more_informations_from_mho && pageIsDesert()) {
+            let cell = getCellDetailsByPosition();
+            let cell_informations = document.querySelector('#cell-informations');
+            if (cell) {
+                state.current_cell = cell;
+                if (!cell_informations) {
+                    cell_informations = document.createElement('div');
+                    cell_informations.id = 'cell-informations';
+                    cell_informations.classList.add('row');
+                    let cell_informations_div = document.createElement('div');
+                    cell_informations_div.style.width = '100%';
+                    cell_informations_div.classList.add('background', 'cell');
+                    cell_informations.appendChild(cell_informations_div);
+                    let cell_informations_header = document.createElement('h5');
+                    cell_informations_header.style.marginTop = '0';
+                    cell_informations_header.style.display = 'flex';
+                    cell_informations_header.style.justifyContent = 'space-between';
+                    cell_informations_header.style.alignItems = 'center';
+                    cell_informations_div.appendChild(cell_informations_header);
+                    let cell_informations_header_left = document.createElement('div');
+                    cell_informations_header_left.innerHTML = `<img src="${mh_optimizer_icon}" style="width: 24px; height: 24px; margin-right: 0.5em">${getI18N(texts.additional_informations)}`;
+                    cell_informations_header.appendChild(cell_informations_header_left);
+                    let cell_informations_header_right = document.createElement('div');
+                    cell_informations_header_right.innerText = `🗘`;
+                    cell_informations_header_right.style.fontSize = '16px';
+                    cell_informations_header_right.style.cursor = 'pointer';
+                    cell_informations_header.appendChild(cell_informations_header_right);
+                    cell_informations_header_right.addEventListener('click', () => {
+                        if (cell_informations.querySelector('#cell-note-content')) {
+                            cell_informations.querySelector('#cell-note-content').innerText = '🗘';
+                        }
+                        if (cell_informations.querySelector('#cell-digs-content')) {
+                            cell_informations.querySelector('#cell-digs-content').innerText = '🗘';
+                        }
+                        if (cell_informations.querySelector('#cell-ruin-content')) {
+                            cell_informations.querySelector('#cell-ruin-content').innerText = '🗘';
+                        }
+                        getMap().then(() => {
+                            cell = getCellDetailsByPosition();
+                            updateInformations(cell);
+                        });
+                    });
+                    let cell_informations_content = document.createElement('div');
+                    cell_informations_content.style.display = 'flex';
+                    cell_informations_content.style.flexDirection = 'column';
+                    cell_informations_content.style.gap = '0.5em';
+                    cell_informations_div.appendChild(cell_informations_content);
+                    let createSubBlock = (id, title) => {
+                        let sub_block = document.createElement('div');
+                        sub_block.id = id;
+                        cell_informations_content.appendChild(sub_block);
+                        let sub_block_header = document.createElement('h5');
+                        sub_block_header.id = id + '-header';
+                        sub_block_header.style.marginTop = '0';
+                        sub_block_header.style.borderBottomWidth = '1px';
+                        sub_block_header.style.fontWeight = 'normal';
+                        sub_block_header.innerText = title;
+                        sub_block.appendChild(sub_block_header);
+                        let sub_block_content = document.createElement('div');
+                        sub_block_content.id = id + '-content';
+                        sub_block.appendChild(sub_block_content);
+                    };
+                    let map_box = document.querySelector('.map-box');
+                    map_box.parentElement.parentElement.appendChild(cell_informations);
+                    let cell_note = createSubBlock('cell-note', getI18N(texts.note));
+                    let cell_digs = createSubBlock('cell-digs', getI18N(texts.digs_state_header));
+                    if (state.current_cell.idRuin !== null && state.current_cell.idRuin !== undefined) {
+                        let cell_ruin = createSubBlock('cell-ruin', getI18N(texts.ruin_state_header));
+                    }
+                }
+                let insertCellNote = (cell) => {
+                    if (cell_informations.querySelector('#cell-note-content')) {
+                        cell_informations.querySelector('#cell-note-content').innerHTML = cell.note && cell.note !== ''
+                            ? `<div>${cell.note}</div>`
+                            : `<div style="opacity: 0.5; font-style: italic; font-size: 12px;">${getI18N(texts.no_note)}</div>`;
+                    }
+                };
+                let insertCellDigs = (cell) => {
+                    if (cell_informations.querySelector('#cell-digs-content')) {
+                        cell_informations.querySelector('#cell-digs-content').innerHTML = `
+                    <div>${getI18N(texts.digs_max)} : ${Math.round(cell.maxPotentialRemainingDig - cell.totalSucces)}</div>
+                    <div>${getI18N(texts.digs_average)} : ${Math.round(cell.averagePotentialRemainingDig - cell.totalSucces)}</div>
+                `;
+                    }
+                };
+                let insertRuinDigs = (cell) => {
+                    if (state.current_cell.idRuin !== null && state.current_cell.idRuin !== undefined && state.current_cell.idRuin > 0) {
+                        let current_ruin = state.ruins.find((ruin) => ruin.id === state.current_cell.idRuin);
+                        let empty_text = `<div style="opacity: 0.5; font-style: italic; font-size: 12px;">${getI18N(texts.ruin_dried)}</div>`;
+                        let complete_text = `<div>${getI18N(texts.ruin_not_dried)}</div>`;
+                        let ruin_drops = ``;
+                        if (current_ruin && (current_ruin.explorable || !state.current_cell.isRuinDryed)) {
+                            ruin_drops += `<div style="display: flex; flex-direction: row; gap: 0.5em; flex-wrap: wrap; font-size: 12px;">`;
+                            if (current_ruin?.drops) {
+                                current_ruin.drops.forEach((drop) => {
+                                    ruin_drops += `<span style="display: flex; flex-direction: column; align-items: center;"><img src="${repo_img_hordes_url}/${drop.item.img}">${Math.round(drop.probability * 100 * 10) / 10}%</span>`;
+                                });
+                            }
+                        }
+                        ruin_drops += `</div>`;
+                        if (cell_informations.querySelector('#cell-ruin-content')) {
+                            cell_informations.querySelector('#cell-ruin-content').innerHTML = (!current_ruin?.explorable ? (state.current_cell.isRuinDryed ? empty_text : complete_text) : '') + ruin_drops;
+                        }
+                    }
+                };
+                let updateInformations = (cell) => {
+                    insertCellNote(cell);
+                    insertCellDigs(cell);
+                    insertRuinDigs(cell);
+                };
+                updateInformations(cell);
+            }
+        }
+        else {
+            state.current_cell = undefined;
+        }
+    }
+
+    function preventFromLeaving() {
+        if (state.mho_parameters.alert_if_no_escort && state.mho_parameters.prevent_from_leaving && pageIsDesert()) {
+            let prevent_function = (event) => {
+                let e = event || window.event;
+                let ae_button = document.querySelector('button[x-toggle-escort="1"]:not([x-escort-control-endpoint])');
+                if (ae_button) {
+                    let mho_leaving_info = document.getElementById('mho-leaving-info');
+                    if (!mho_leaving_info) {
+                        mho_leaving_info = document.createElement('div');
+                        mho_leaving_info.id = 'mho-leaving-info';
+                        mho_leaving_info.setAttribute('style', 'background-color: red; padding: 0.5em; margin-top: 0.5em; border: 1px solid;');
+                        mho_leaving_info.innerText = getI18N(texts.prevent_from_leaving_information) + getI18N(texts.prevent_not_in_ae);
+                        ae_button.parentNode.insertBefore(mho_leaving_info, ae_button.nextSibling);
+                    }
+                }
+                let is_escorting = document.getElementsByClassName('beyond-escort-on')[0];
+                if (is_escorting) {
+                    let mho_leaving_info = document.getElementById('mho-leaving-info');
+                    if (!mho_leaving_info) {
+                        mho_leaving_info = document.createElement('div');
+                        mho_leaving_info.id = 'mho-leaving-info';
+                        mho_leaving_info.setAttribute('style', 'background-color: red; padding: 0.5em; margin-top: 0.5em; border: 1px solid;');
+                        mho_leaving_info.innerText = getI18N(texts.prevent_from_leaving_information) + getI18N(texts.escort_not_released);
+                        is_escorting.parentNode.insertBefore(mho_leaving_info, is_escorting.nextSibling);
+                    }
+                }
+                /** Si est en AE ou qu'on n'a pas reposé l'escorte */
+                if (ae_button || is_escorting) {
+                    if (e) {
+                        e.returnValue = '';
+                        e.preventDefault();
+                    }
+                    return '';
+                }
+            };
+            window.addEventListener('beforeunload', prevent_function, false);
+        }
+    }
+    /** Si l'option associée est activée, demande confirmation avant de quitter si les options d'escorte ne sont pas bonnes */
+    function alertIfInactiveAndNoEscort() {
+        if (state.mho_parameters.alert_if_no_escort && state.mho_parameters.alert_if_inactive && pageIsDesert()) {
+            let ae_button = document.querySelector('button[x-toggle-escort="1"]:not([x-escort-control-endpoint])');
+            let is_escorting = document.getElementsByClassName('beyond-escort-on')[0];
+            let notify = () => {
+                createNotification(getI18N(ae_button ? texts.prevent_not_in_ae : texts.escort_not_released));
+            };
+            if (ae_button || is_escorting) {
+                const timer = 300000;
+                let timeout = setTimeout(notify, timer);
+                document.addEventListener('click', () => {
+                    clearTimeout(timeout);
+                    timeout = setTimeout(timeout, timer);
+                });
+                document.addEventListener('mousemove', () => {
+                    clearTimeout(timeout);
+                    timeout = setTimeout(timeout, timer);
+                });
+            }
+        }
+    }
+    /** Affiche une notification 5 secondes avant la fin de la fouille en cours */
+    function changeDefaultEscortOptions() {
+        if (state.mho_parameters.default_escort_options && pageIsDesert()) {
+            const btn_activate_escort = document.querySelector('button[x-toggle-escort="1"]:not([x-escort-control-endpoint])');
+            if (!btn_activate_escort)
+                return;
+            btn_activate_escort.addEventListener('click', () => {
+                document.addEventListener('mh-navigation-complete', () => {
+                    const escort_force_return = document.querySelector('#escort_force_return');
+                    const escort_allow_rucksack = document.querySelector('#escort_allow_rucksack');
+                    if (!escort_force_return || !escort_allow_rucksack)
+                        return;
+                    const escort_force_return_correct = escort_force_return.checked === state.mho_parameters.default_escort_force_return;
+                    const escort_allow_rucksack_correct = escort_allow_rucksack.checked === state.mho_parameters.default_escort_allow_rucksack;
+                    if (!escort_force_return_correct && !escort_allow_rucksack_correct) {
+                        escort_force_return.checked = !escort_force_return.checked;
+                        escort_allow_rucksack.click();
+                    }
+                    else if (!escort_force_return_correct || !escort_allow_rucksack_correct) {
+                        if (!escort_force_return_correct) {
+                            escort_force_return.click();
+                        }
+                        if (!escort_allow_rucksack_correct) {
+                            escort_allow_rucksack.click();
+                        }
+                    }
+                }, { once: true });
+            });
+        }
+    }
+
+    function getCitizens() {
+        return new Promise((resolve, reject) => {
+            fetcher(state.api_url + `/Fetcher/citizens?userId=${state.mh_user.id}&townId=${state.mh_user.townDetails?.townId}`)
+                .then((response) => {
+                if (response.status === 200) {
+                    return response.json();
+                }
+                else {
+                    return convertResponsePromiseToError(response);
+                }
+            })
+                .then((response) => {
+                state.citizens = response;
+                state.citizens.citizens = Object.keys(state.citizens.citizens).map((key) => state.citizens.citizens[key]);
+                resolve(state.citizens);
+            })
+                .catch((error) => {
+                addError(error);
+                reject(error);
+            });
+        });
+    }
+    /** Récupère les informations de la banque */
+
+    function getMyExpeditions() {
+        return new Promise((resolve, reject) => {
+            fetcher(state.api_url + `/expeditions/me/${state.mh_user.townDetails?.day}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+                .then((response) => {
+                if (response.status === 200) {
+                    return response.json();
+                }
+                else {
+                    return convertResponsePromiseToError(response);
+                }
+            })
+                .then((expeditions) => {
+                state.my_expeditions = expeditions;
+                resolve(expeditions);
+            })
+                .catch((error) => {
+                addError(error);
+                reject(error);
+            });
+        });
+    }
 
     function createExpeditionsBtn() {
         let expeditions_btn = document.getElementById(mho_display_expeditions_id);
@@ -5076,11 +6084,11 @@
                 document.getElementById(mho_expeditions_window_id).classList.add('visible');
                 createExpeditionsWindowContent();
             });
-        } else if (expeditions_btn) {
+        }
+        else if (expeditions_btn) {
             expeditions_btn.remove();
         }
     }
-
     function createExpeditionsWindowContent() {
         let get_my_expeditions_promise = getMyExpeditions();
         let get_citizens_promize = getCitizens();
@@ -5116,7 +6124,6 @@
             window_content.appendChild(tabs_div);
         });
     }
-
     function dispatchExpeditionContent(expedition, citizens) {
         let window_content = document.getElementById(mho_expeditions_window_id + '-content');
         let tab_content = document.getElementById(mho_expeditions_window_id + '-tab-content');
@@ -5268,26 +6275,22 @@
             }
         });
     }
-
     /** Permet de bloquer / débloquer des utilisateurs et de masquer les posts des utilisateurs bloqués */
 
     let fill_items_messages_pool = {
         en: [
-            {title: 'Hi', content: ':iloveu:'}
+            { title: 'Hi', content: ':iloveu:' }
         ],
         fr: [
-            {title: 'Coucou', content: ':iloveu:'}
+            { title: 'Coucou', content: ':iloveu:' }
         ],
         de: [
-            {title: 'Hallo', content: ':iloveu:'}
+            { title: 'Hallo', content: ':iloveu:' }
         ],
         es: [
-            {title: 'Hola', content: ':iloveu:'}
+            { title: 'Hola', content: ':iloveu:' }
         ]
     };
-    //////////////////////////////////
-    // La liste des onglets du wiki //
-    //////////////////////////////////
 
     function fillItemsMessages() {
         if (state.mho_parameters.fill_items_messages && pageIsMsgReceived()) {
@@ -5314,16 +6317,15 @@
                             let lang_fillers = fill_items_messages_pool[lang];
                             let random_filler = lang_fillers[Math.floor(Math.random() * lang_fillers.length)];
                             message_title.setAttribute('value', random_filler.title);
-                            message_title.dispatchEvent(new Event('input', {bubbles: true}));
+                            message_title.dispatchEvent(new Event('input', { bubbles: true }));
                             message_content.value = random_filler.content;
-                            message_content.dispatchEvent(new Event('input', {bubbles: true}));
+                            message_content.dispatchEvent(new Event('input', { bubbles: true }));
                         }
-                    }, {once: true});
+                    }, { once: true });
                 });
             }, 250);
         }
     }
-
     function blockUsersPosts() {
         if (state.mho_parameters.block_users && pageIsForum()) {
             let posts = document.querySelectorAll('.forum-post');
@@ -5355,7 +6357,8 @@
                                         blacklisted_user.setAttribute('blacklisted', 'true');
                                         let user_posts = Array.from(document.querySelectorAll(`.username[x-user-id="${user_id}"]`) || []).map((user_tag) => user_tag.parentElement.parentElement.querySelector('.original'));
                                         user_posts.forEach((user_post) => user_post.classList.remove('force-display'));
-                                    } else {
+                                    }
+                                    else {
                                         let index = temp_blacklist.findIndex((blacklisted_user_id) => blacklisted_user_id === user_id);
                                         if (index > -1) {
                                             temp_blacklist.splice(index, 1);
@@ -5391,12 +6394,14 @@
                                 new_post_content.innerHTML = `<img src="${mh_optimizer_icon}" style="width: 30px !important; vertical-align: middle; margin-right: 0.5em;"><i>L'utilisateur a été bloqué.</i><br />`;
                                 new_post_content.appendChild(link);
                                 original_post_content.parentNode.insertBefore(new_post_content, original_post_content);
-                            } else {
+                            }
+                            else {
                                 if (!original_post_content.classList.contains('force-display')) {
                                     new_post_content.style.display = 'block';
                                 }
                             }
-                        } else {
+                        }
+                        else {
                             blacklisted_user.innerHTML = '&#10003;';
                             blacklisted_user.removeAttribute('blacklisted');
                             if (new_post_content) {
@@ -5409,7 +6414,6 @@
             }
         }
     }
-
     function displayCountCharacters() {
         let counter = document.querySelector('#mho_registry_counter_id');
         if (!counter && state.mho_parameters.display_counter_on_input_registry && pageIsDesert()) {
@@ -5433,11 +6437,11 @@
                 let log_input_new = log_block_new.querySelector('.overlay-central input');
                 counter.innerText = `${log_block_new.value?.trim().length ?? 0}/256`;
             });
-        } else if (counter) {
+        }
+        else if (counter) {
             counter.remove();
         }
     }
-
     /////////////////////////////////////
     // BOUTONS SUR LES OUTILS EXTERNES //
     /////////////////////////////////////
@@ -5451,913 +6455,6 @@
             ghoul_voracity_node.firstChild.textContent = ghoul_voracity_node.firstChild.textContent.replace(':\n', `: ${voracite}\n`);
         }
     }
-
-    // Local helper: TypeScript's arrFrom(any) sometimes infers element type
-    // 'unknown' rather than 'any' when the source isn't a statically-typed
-    // iterable. This explicit-any wrapper avoids that, matching the original
-    // untyped JS behaviour (no behaviour change, pure typing aid).
-    const arrFrom$4 = (x) => Array.from(x);
-
-    function getBBHMap() {
-        return new Promise((resolve, reject) => {
-            fetcher(`${big_broth_hordes_url}/?cid=5-${state.mh_user.townDetails?.townId}&pg=map`)
-                .then((response) => {
-                if (response.status === 200) {
-                    return response.text();
-                } else {
-                    return convertResponsePromiseToError(response);
-                }
-            })
-                .then((response) => {
-                let new_map = [];
-                let map = response.querySelector('#carte');
-                if (map) {
-                    let x_mapping = arrFrom$4(arrFrom$4(map.children)[0].querySelectorAll('td')).map((x) => x.innerText);
-                    x_mapping.push('');
-                    x_mapping.splice(0, 0, '');
-                    if (map.querySelector('#cases')) {
-                        arrFrom$4(map.querySelector('#cases')?.querySelectorAll('tr') || [])
-                            .forEach((row, row_index) => {
-                                let cells = [];
-                                let y;
-                                arrFrom$4(row.children).forEach((cell, cell_index) => {
-                                    let cell_parts = arrFrom$4(cell.querySelector('.divs')?.children);
-                                    let new_cell = {
-                                        horizontal: map.querySelector('.lgd_l')?.firstElementChild.children[row_index].firstElementChild.innerText,
-                                        vertical: x_mapping[cell_index],
-                                        town: cell.querySelector('.door'),
-                                        bat: cell.querySelector('.bat'),
-                                        my_pos: cell.querySelector('.me'),
-                                        expedition_here: cell_parts.some((cell_part) => cell_part.classList.contains('expeditionVille') && cell_part.children.length > 0 /*&& arrFrom(cell_part.children).some((expedition_arrow) => expedition_arrow.classList.contains('selected_expe'))*/),
-                                        expedition_arrows: [],
-                                        not_yet_visited: cell.querySelector('.nv'),
-                                        not_visited_today: cell.querySelector('.nvt'),
-                                        zombies: cell.querySelector('.zombies') ? arrFrom$4(cell.querySelector('.zombies').classList).find((class_name) => class_name.startsWith('z_')).replace('z_', '') : undefined,
-                                        empty: cell.querySelector('.praf'),
-                                        empty_bat: cell.querySelector('.mark1'),
-                                        ruin: cell.querySelector('.tag_11')
-                                    };
-                                    cells.push(new_cell);
-                                });
-                                new_map.push(cells);
-                            });
-                        resolve({map: new_map, vertical_mapping: x_mapping});
-                    }
-                }
-                reject();
-            })
-                .catch((error) => {
-                addError(error);
-                reject(error);
-            });
-        });
-    }
-
-    /** Récupère la carte de BBH */
-    function getBBHRuin() {
-        return new Promise((resolve, reject) => {
-            getStorageItem(mho_map_key).then((mho_map) => {
-                if (mho_map.ruin) {
-                    let map_html = document.createElement('div');
-                    map_html.innerHTML = mho_map.ruin;
-                    let new_map = [];
-                    let rows = arrFrom$4(map_html.querySelector('#plan').firstElementChild.children);
-                    let x_mapping = arrFrom$4(rows[0].children).map((x) => x.innerText);
-                    rows
-                        .filter((row) => arrFrom$4(row.children).some((cell) => cell.querySelector('.divs')))
-                        .forEach((row, row_index, rows_array) => {
-                        let new_cells = [];
-                            let cells = arrFrom$4(row.children);
-                        let y;
-                        cells.forEach((cell, cell_index, cell_array) => {
-                            if (!cell.querySelector('.divs')) {
-                                y = cell.innerText;
-                            } else {
-                                let cell_parts = arrFrom$4(cell.firstElementChild.children);
-                                let div_zombies = cell_parts.find((cell_part) => arrFrom$4(cell_part.classList).some((class_name) => class_name.startsWith('z')));
-                                let zombies = div_zombies ? arrFrom$4(div_zombies.classList).find(() => (class_name) => class_name.startsWith('z')) : undefined;
-                                let new_cell = {
-                                    horizontal: y,
-                                    vertical: x_mapping[cell_index],
-                                    borders: '0000',
-                                    zombies: zombies ? zombies[1] : ''
-                                };
-                                let div_path = cell_parts.find((cell_part) => arrFrom$4(cell_part.classList).some((class_name) => class_name.startsWith('m')));
-                                let img_path = div_path ? arrFrom$4(div_path.classList).find(() => (class_name) => class_name.startsWith('m')) : undefined;
-                                switch (img_path) {
-                                    case 'm1':
-                                        new_cell.borders = 'exit';
-                                        break;
-                                    case 'm2':
-                                        new_cell.borders = '0000';
-                                        break;
-                                    case 'm11':
-                                        new_cell.borders = '0101';
-                                        break;
-                                    case 'm12':
-                                        new_cell.borders = '1010';
-                                        break;
-                                    case 'm13':
-                                        new_cell.borders = '1111';
-                                        break;
-                                    case 'm21':
-                                        new_cell.borders = '0111';
-                                        break;
-                                    case 'm22':
-                                        new_cell.borders = '1110';
-                                        break;
-                                    case 'm23':
-                                        new_cell.borders = '1101';
-                                        break;
-                                    case 'm24':
-                                        new_cell.borders = '1011';
-                                        break;
-                                    case 'm31':
-                                        new_cell.borders = '0110';
-                                        break;
-                                    case 'm32':
-                                        new_cell.borders = '1100';
-                                        break;
-                                    case 'm33':
-                                        new_cell.borders = '0011';
-                                        break;
-                                    case 'm34':
-                                        new_cell.borders = '1001';
-                                        break;
-                                    case 'm41':
-                                        new_cell.borders = '0100';
-                                        break;
-                                    case 'm42':
-                                        new_cell.borders = '1000';
-                                        break;
-                                    case 'm43':
-                                        new_cell.borders = '0001';
-                                        break;
-                                    case 'm44':
-                                        new_cell.borders = '0010';
-                                        break;
-                                    default:
-                                        new_cell.borders = '0000';
-                                        break;
-                                }
-                                let div_door = cell_parts.find((cell_part) => arrFrom$4(cell_part.classList).some((class_name) => class_name.startsWith('p')));
-                                let img_door = div_door ? arrFrom$4(div_door.classList).find(() => (class_name) => class_name.startsWith('p')) : undefined;
-                                if (img_door) {
-                                    switch (img_door) {
-                                        case 'p2':
-                                            new_cell.door = 'item_lock';
-                                            break;
-                                        case 'p1':
-                                            new_cell.door = 'item_door';
-                                            break;
-                                        case 'p5':
-                                            new_cell.door = 'item_classicKey';
-                                            break;
-                                        case 'p4':
-                                            new_cell.door = 'item_bumpKey';
-                                            break;
-                                        case 'p3':
-                                            new_cell.door = 'item_magneticKey';
-                                            break;
-                                        default:
-                                            break;
-                                    }
-                                }
-                                new_cells.push(new_cell);
-                            }
-                        });
-                        new_map.push(new_cells);
-                    });
-                    resolve({map: new_map, vertical_mapping: x_mapping});
-                }
-            });
-        });
-    }
-
-    /** Récupère la carte de FataMorgana */
-
-        // Local helper: TypeScript's arrFrom(any) sometimes infers element type
-        // 'unknown' rather than 'any' when the source isn't a statically-typed
-        // iterable. This explicit-any wrapper avoids that, matching the original
-        // untyped JS behaviour (no behaviour change, pure typing aid).
-    const arrFrom$3 = (x) => Array.from(x);
-
-    function getFMMap() {
-        return new Promise((resolve, reject) => {
-            let map_html = document.createElement('div');
-            getStorageItem(mho_map_key).then((mho_map) => {
-                map_html.innerHTML = mho_map.block;
-                let new_map = [];
-                let map = arrFrom$3(map_html.querySelector('#map')?.children);
-                let x_mapping = arrFrom$3(map[0].children).map((x) => x.innerText);
-                map
-                    .filter((row) => arrFrom$3(row.children).some((cell) => cell.classList.contains('mapzone')))
-                    .forEach((row) => {
-                    let cells = [];
-                    let y;
-                        arrFrom$3(row.children).forEach((cell, index) => {
-                        if (cell.classList.contains('mapruler')) {
-                            y = cell.innerText;
-                        } else {
-                            let cell_parts = arrFrom$3(cell.children);
-                            let new_cell = {
-                                horizontal: y,
-                                vertical: x_mapping[index],
-                                town: cell.classList.contains('city'),
-                                bat: cell_parts.some((cell_part) => cell_part.classList.contains('building')),
-                                my_pos: cell_parts.some((cell_part) => cell_part.classList.contains('posJoueur')),
-                                expedition_here: cell_parts.some((cell_part) => cell_part.classList.contains('route-counter')),
-                                expedition_arrows: [],
-                                not_yet_visited: cell.classList.contains('nyv'),
-                                not_visited_today: cell.classList.contains('nvt'),
-                                zombies: arrFrom$3(cell.classList).filter((class_name) => class_name.startsWith('danger')).map((class_name) => class_name.replace('danger', ''))[0],
-                                empty: !cell.querySelector('.zone-status-full'),
-                                empty_bat: cell.querySelector('.depleted-building'),
-                                ruin: cell.querySelector('.explorable-building'),
-                            };
-                            cells.push(new_cell);
-                        }
-                    });
-                    new_map.push(cells);
-                });
-                resolve({map: new_map, vertical_mapping: x_mapping});
-            });
-        });
-    }
-
-    /** Récupère la carte de FataMorgana */
-    function getFMRuin() {
-        return new Promise((resolve, reject) => {
-            getStorageItem(mho_map_key).then((mho_map) => {
-                if (mho_map.ruin) {
-                    let map_html = document.createElement('div');
-                    map_html.innerHTML = mho_map.ruin;
-                    let new_map = [];
-                    let rows = arrFrom$3(map_html.querySelector('#ruinmap')?.children);
-                    let x_mapping = arrFrom$3(rows[0].children).map((x) => x.innerText);
-                    rows
-                        .filter((row) => arrFrom$3(row.children).some((cell) => cell.classList.contains('mapzone')))
-                        .forEach((row, row_index, rows_array) => {
-                        let new_cells = [];
-                            let cells = arrFrom$3(row.children);
-                        let y;
-                        cells.forEach((cell, cell_index, cell_array) => {
-                            if (cell.classList.contains('mapruler')) {
-                                y = cell.innerText;
-                            } else {
-                                let new_cell = {
-                                    horizontal: y,
-                                    vertical: x_mapping[cell_index],
-                                    borders: '0000',
-                                    zombies: cell.getAttribute('z')
-                                };
-                                let img = arrFrom$3(cell.classList).find((class_name) => class_name.startsWith('tile-'));
-                                switch (img) {
-                                    case 'tile-1':
-                                        new_cell.borders = '0100';
-                                        break;
-                                    case 'tile-2':
-                                        new_cell.borders = '0010';
-                                        break;
-                                    case 'tile-3':
-                                        new_cell.borders = '0001';
-                                        break;
-                                    case 'tile-4':
-                                        new_cell.borders = '1000';
-                                        break;
-                                    case 'tile-5':
-                                        if (cell.classList.contains('ruinEntry')) {
-                                            new_cell.borders = 'exit';
-                                        } else {
-                                            new_cell.borders = '0101';
-                                        }
-                                        break;
-                                    case 'tile-6':
-                                        new_cell.borders = '1010';
-                                        break;
-                                    case 'tile-7':
-                                        new_cell.borders = '1111';
-                                        break;
-                                    case 'tile-8':
-                                        new_cell.borders = '0110';
-                                        break;
-                                    case 'tile-9':
-                                        new_cell.borders = '0011';
-                                        break;
-                                    case 'tile-10':
-                                        new_cell.borders = '1001';
-                                        break;
-                                    case 'tile-11':
-                                        new_cell.borders = '1100';
-                                        break;
-                                    case 'tile-12':
-                                        new_cell.borders = '1110';
-                                        break;
-                                    case 'tile-13':
-                                        new_cell.borders = '0111';
-                                        break;
-                                    case 'tile-14':
-                                        new_cell.borders = '1011';
-                                        break;
-                                    case 'tile-15':
-                                        new_cell.borders = '1101';
-                                        break;
-                                    case 'tile-0':
-                                    default:
-                                        new_cell.borders = '0000';
-                                        break;
-                                }
-                                if (cell.classList.contains('doorlock-1')) {
-                                    new_cell.door = 'item_lock';
-                                } else if (cell.classList.contains('doorlock-2')) {
-                                    new_cell.door = 'item_door';
-                                } else if (cell.classList.contains('doorlock-3')) {
-                                    new_cell.door = 'item_classicKey';
-                                } else if (cell.classList.contains('doorlock-4')) {
-                                    new_cell.door = 'item_bumpKey';
-                                } else if (cell.classList.contains('doorlock-5')) {
-                                    new_cell.door = 'item_magneticKey';
-                                }
-                                new_cells.push(new_cell);
-                            }
-                        });
-                        new_map.push(new_cells);
-                    });
-                    resolve({map: new_map, vertical_mapping: x_mapping});
-                }
-            });
-        });
-    }
-
-    ////////////////
-    // Appels API //
-    ////////////////
-
-    // Local helper: TypeScript's arrFrom(any) sometimes infers element type
-    // 'unknown' rather than 'any' when the source isn't a statically-typed
-    // iterable. This explicit-any wrapper avoids that, matching the original
-    // untyped JS behaviour (no behaviour change, pure typing aid).
-    const arrFrom$2 = (x) => Array.from(x);
-
-    function getGHMap() {
-        return new Promise((resolve, reject) => {
-            let getArrow = (arrow) => {
-                let arrow_sprite = arrow.firstChild.href.baseVal.replace(/^(.*)#/, '');
-                switch (arrow_sprite) {
-                    case 'fleche_0':
-                    case 'fleche_0_b':
-                    case 'fleche_0_n':
-                        return {direction: 'right', type: 'horizontal', source: '', length: 'semi', position: 'right'};
-                    case 'fleche_1':
-                    case 'fleche_1_b':
-                    case 'fleche_1_n':
-                        return {direction: 'top', type: 'vertical', source: '', length: 'semi', position: 'top'};
-                    case 'fleche_2':
-                    case 'fleche_2_b':
-                    case 'fleche_2_n':
-                        return {direction: 'left', type: 'horizontal', source: '', length: 'semi', position: 'left'};
-                    case 'fleche_3':
-                    case 'fleche_3_b':
-                    case 'fleche_3_n':
-                        return {direction: 'bottom', type: 'vertical', source: '', length: 'semi', position: 'bottom'};
-                    case 'fleche_4':
-                    case 'fleche_4_b':
-                    case 'fleche_4_n':
-                        return {direction: 'right', type: 'horizontal', source: '', length: 'semi', position: 'left'};
-                    case 'fleche_5':
-                    case 'fleche_5_b':
-                    case 'fleche_5_n':
-                        return {direction: 'top', type: 'vertical', source: '', length: 'semi', position: 'bottom'};
-                    case 'fleche_6':
-                    case 'fleche_6_b':
-                    case 'fleche_6_n':
-                        return {direction: 'left', type: 'horizontal', source: '', length: 'semi', position: 'right'};
-                    case 'fleche_7':
-                    case 'fleche_7_b':
-                    case 'fleche_7_n':
-                        return {direction: 'bottom', type: 'vertical', source: '', length: 'semi', position: 'top'};
-                    case 'fleche_8':
-                    case 'fleche_8_b':
-                    case 'fleche_8_n':
-                        return {direction: 'both', type: 'horizontal', source: '', length: 'semi', position: 'right'};
-                    case 'fleche_9':
-                    case 'fleche_9_b':
-                    case 'fleche_9_n':
-                        return {direction: 'both', type: 'vertical', source: '', length: 'semi', position: 'top'};
-                    case 'fleche_10':
-                    case 'fleche_10_b':
-                    case 'fleche_10_n':
-                        return {direction: 'both', type: 'horizontal', source: '', length: 'semi', position: 'left'};
-                    case 'fleche_11':
-                    case 'fleche_11_b':
-                    case 'fleche_11_n':
-                        return {direction: 'both', type: 'vertical', source: '', length: 'semi', position: 'bottom'};
-                    case 'fleche_12':
-                    case 'fleche_12_b':
-                    case 'fleche_12_n':
-                        return {direction: 'left', type: 'horizontal', source: '', length: 'plain', position: 'middle'};
-                    case 'fleche_13':
-                    case 'fleche_13_b':
-                    case 'fleche_13_n':
-                        return {direction: 'bottom', type: 'vertical', source: '', length: 'plain', position: 'middle'};
-                    case 'fleche_14':
-                    case 'fleche_14_b':
-                    case 'fleche_14_n':
-                        return {
-                            direction: 'right',
-                            type: 'horizontal',
-                            source: '',
-                            length: 'plain',
-                            position: 'middle'
-                        };
-                    case 'fleche_15':
-                    case 'fleche_15_b':
-                    case 'fleche_15_n':
-                        return {direction: 'top', type: 'vertical', source: '', length: 'plain', position: 'middle'};
-                    case 'fleche_16':
-                    case 'fleche_16_b':
-                    case 'fleche_16_n':
-                        return {direction: 'top', type: 'corner', source: 'right', length: '', position: ''};
-                    case 'fleche_17':
-                    case 'fleche_17_b':
-                    case 'fleche_17_n':
-                        return {direction: 'bottom', type: 'corner', source: 'right', length: '', position: ''};
-                    case 'fleche_18':
-                    case 'fleche_18_b':
-                    case 'fleche_18_n':
-                        return {direction: 'left', type: 'corner', source: 'top', length: '', position: ''};
-                    case 'fleche_19':
-                    case 'fleche_19_b':
-                    case 'fleche_19_n':
-                        return {direction: 'right', type: 'corner', source: 'top', length: '', position: ''};
-                    case 'fleche_20':
-                    case 'fleche_20_b':
-                    case 'fleche_20_n':
-                        return {direction: 'top', type: 'corner', source: 'left', length: '', position: ''};
-                    case 'fleche_21':
-                    case 'fleche_21_b':
-                    case 'fleche_21_n':
-                        return {direction: 'bottom', type: 'corner', source: 'left', length: '', position: ''};
-                    case 'fleche_22':
-                    case 'fleche_22_b':
-                    case 'fleche_22_n':
-                        return {direction: 'right', type: 'corner', source: 'bottom', length: '', position: ''};
-                    case 'fleche_23':
-                    case 'fleche_23_b':
-                    case 'fleche_23_n':
-                        return {direction: 'left', type: 'corner', source: 'bottom', length: '', position: ''};
-                    case 'fleche_24':
-                    case 'fleche_24_b':
-                    case 'fleche_24_n':
-                        return {direction: 'none', type: 'point', source: 'middle', length: 'none', position: 'middle'};
-                }
-            };
-            getStorageItem(mho_map_key).then((mho_map) => {
-                let map_html = document.createElement('div');
-                map_html.innerHTML = mho_map.block;
-                let new_map = [];
-                let map = arrFrom$2(map_html.querySelectorAll('.ligneCarte'));
-                let x_mapping = arrFrom$2(map[0].children).map((x) => x.innerText);
-                map
-                    .filter((row) => arrFrom$2(row.children).some((cell) => cell.classList.contains('caseCarte')))
-                    .forEach((row) => {
-                        let cells = [];
-                        let y;
-                        arrFrom$2(row.children).forEach((cell, index) => {
-                            if (cell.classList.contains('fondNoir')) {
-                                y = cell.innerText;
-                            } else {
-                                let cell_parts = arrFrom$2(cell.children);
-                                let new_cell = {
-                                    horizontal: y,
-                                    vertical: x_mapping[index],
-                                    town: cell.querySelector('.caseVille'),
-                                    bat: cell.querySelector('.bat'),
-                                    my_pos: cell.querySelector('.posJoueur'),
-                                    expedition_here: cell_parts.some((cell_part) => cell_part.classList.contains('expeditionVille') && cell_part.children.length > 0 /*&& arrFrom(cell_part.children).some((expedition_arrow) => expedition_arrow.classList.contains('selected_expe'))*/),
-                                    expedition_arrows: [], /*arrFrom(cell_parts.find((cell_part) => cell_part.classList.contains('expeditionVille')).children).map((arrow) => getArrow(arrow)), */
-                                    not_yet_visited: cell.querySelector('.zone-NonExplo'),
-                                    not_visited_today: !cell.querySelector('.danger') && !cell.querySelector('.caseVille'),
-                                    zombies: cell.querySelector('.danger') ? arrFrom$2(cell.querySelector('.danger').classList).filter((class_name) => class_name.startsWith('zone-danger')).map((class_name) => class_name.replace('zone-danger', ''))[0] : undefined,
-                                    empty: cell.querySelector('.epuise'),
-                                    empty_bat: cell.querySelector('.bat') && cell.querySelector('.bat').firstChild.href.baseVal.replace(/^(.*)#/, '') === 'bat-e',
-                                    ruin: cell.querySelector('.bat') && cell.querySelector('.bat').firstChild.href.baseVal.replace(/^(.*)#/, '') === 'bat-r',
-                                };
-                                cells.push(new_cell);
-                        }
-                        });
-                        new_map.push(cells);
-                    });
-                resolve({map: new_map, vertical_mapping: x_mapping});
-            });
-        });
-    }
-
-    /** Récupère la carte de Gest'Hordes */
-    function getGHRuin() {
-        return new Promise((resolve, reject) => {
-            getStorageItem(mho_map_key).then((mho_map) => {
-                if (mho_map.ruin) {
-                    let map_html = document.createElement('div');
-                    map_html.innerHTML = mho_map.ruin;
-                    let new_map = [];
-                    let rows = arrFrom$2(map_html.querySelector('#carteRuine')?.querySelector('tbody')?.children);
-                    let x_mapping = arrFrom$2(rows[0].children).map((x) => x.innerText);
-                    rows
-                        .filter((row) => arrFrom$2(row.children).some((cell) => cell.classList.contains('caseCarteRuine')))
-                        .forEach((row, row_index, rows_array) => {
-                            let new_cells = [];
-                            let cells = arrFrom$2(row.children);
-                            let y;
-                            cells.forEach((cell, cell_index, cell_array) => {
-                                if (cell.classList.contains('bordCarteRuine')) {
-                                    y = cell.innerText;
-                                } else {
-                                    let cell_parts = arrFrom$2(cell.children);
-                                    let new_cell = {
-                                        horizontal: y,
-                                        vertical: x_mapping[cell_index],
-                                        borders: '0000',
-                                        zombies: cell.firstElementChild.getAttribute('data-z')
-                                    };
-                                    let img_path = cell.querySelector('.ruineCarte')?.firstElementChild.href.baseVal.replace(/^(.*)#/, '');
-                                    switch (img_path) {
-                                        case 'ruineCarte_16':
-                                            new_cell.borders = 'exit';
-                                            break;
-                                        case 'ruineCarte_15':
-                                            new_cell.borders = '1111';
-                                            break;
-                                        case 'ruineCarte_7':
-                                            new_cell.borders = '1110';
-                                            break;
-                                        case 'ruineCarte_11':
-                                            new_cell.borders = '1101';
-                                            break;
-                                        case 'ruineCarte_3':
-                                            new_cell.borders = '1100';
-                                            break;
-                                        case 'ruineCarte_13':
-                                            new_cell.borders = '1011';
-                                            break;
-                                        case 'ruineCarte_5':
-                                            new_cell.borders = '1010'; // ?
-                                            break;
-                                        case 'ruineCarte_18':
-                                            new_cell.borders = '1010'; // ?
-                                            break;
-                                        case 'ruineCarte_9':
-                                            new_cell.borders = '1001';
-                                            break;
-                                        case 'ruineCarte_1':
-                                            new_cell.borders = '1000';
-                                            break;
-                                        case 'ruineCarte_14':
-                                            new_cell.borders = '0111';
-                                            break;
-                                        case 'ruineCarte_6':
-                                            new_cell.borders = '0110';
-                                            break;
-                                        case 'ruineCarte_10':
-                                            new_cell.borders = '0101';
-                                            break;
-                                        case 'ruineCarte_2':
-                                            new_cell.borders = '0100';
-                                            break;
-                                        case 'ruineCarte_12':
-                                            new_cell.borders = '0011';
-                                            break;
-                                        case 'ruineCarte_4':
-                                            new_cell.borders = '0010';
-                                            break;
-                                        case 'ruineCarte_8':
-                                            new_cell.borders = '0001';
-                                            break;
-                                        default:
-                                            new_cell.borders = '0000';
-                                            break;
-                                    }
-                                    console.log('cell.firstElementChild', cell.firstElementChild);
-                                    switch (cell.firstElementChild.getAttribute('data-porte')) {
-                                        case 'pC':
-                                            new_cell.door = 'item_lock';
-                                            break;
-                                        case 'p':
-                                            new_cell.door = 'item_door';
-                                            break;
-                                        case 'pD':
-                                            new_cell.door = 'item_classicKey';
-                                            break;
-                                        case 'pP':
-                                            new_cell.door = 'item_bumpKey';
-                                            break;
-                                        case 'pM':
-                                            new_cell.door = 'item_magneticKey';
-                                            break;
-                                        default:
-                                            break;
-                                    }
-                                    new_cells.push(new_cell);
-                                }
-                            });
-                            new_map.push(new_cells);
-                        });
-                    resolve({map: new_map, vertical_mapping: x_mapping});
-                }
-            });
-        });
-    }
-
-    /** Récupère la carte de GH */
-
-    function createDisplayMapButton() {
-        let display_map_btn = document.getElementById(mho_display_map_id);
-        if (state.mho_parameters.display_map) {
-            const mho_header_space = document.getElementById(mho_header_space_id);
-            if (display_map_btn || !mho_header_space)
-                return;
-            let btn_container = document.createElement('div');
-            btn_container.id = mho_display_map_id;
-            let postbox_img = document.querySelector('#postbox img');
-            let btn_mho_img = document.createElement('img');
-            btn_mho_img.src = mh_optimizer_icon;
-            btn_mho_img.style.height = postbox_img && postbox_img.height ? postbox_img.height + 'px' : '16px';
-            btn_container.appendChild(btn_mho_img);
-            let btn_img = document.createElement('img');
-            btn_img.src = repo_img_hordes_url + 'emotes/explo.gif';
-            btn_img.style.height = postbox_img && postbox_img.height ? postbox_img.height + 'px' : '16px';
-            btn_container.appendChild(btn_img);
-            btn_container.addEventListener('click', (event) => {
-                event.stopPropagation();
-                event.preventDefault();
-                displayMapContent();
-            });
-            mho_header_space.appendChild(btn_container);
-            createMapWindow();
-        } else if (display_map_btn) {
-            display_map_btn.remove();
-        }
-    }
-
-    function displayMapContent() {
-        let map_window = document.getElementById(mh_optimizer_map_window_id);
-        map_window.classList.add('visible');
-        displayMap();
-    }
-
-    function displayMap() {
-        let content = document.getElementById(mh_optimizer_map_window_id + '-content');
-        let table = content.querySelector('table');
-        if (table) {
-            table.outerHTML = '';
-        }
-        let transformMapping = (map) => {
-            table = document.createElement('table');
-            table.setAttribute('style', 'border-collapse: collapse;');
-            table.classList.add('mho-map');
-            let init_col_tr = document.createElement('tr');
-            table.appendChild(init_col_tr);
-            map.vertical_mapping.forEach((cell) => {
-                let td = document.createElement('td');
-                td.innerText = cell;
-                td.classList.add('around-map');
-                init_col_tr.appendChild(td);
-            });
-            map.map.forEach((row) => {
-                let tr = document.createElement('tr');
-                row.forEach((cell, cell_index) => {
-                    if (cell_index === 0) {
-                        let init_row_td = document.createElement('td');
-                        init_row_td.innerText = cell.horizontal;
-                        init_row_td.classList.add('around-map');
-                        tr.appendChild(init_row_td);
-                    }
-                    let td = document.createElement('td');
-                    tr.appendChild(td);
-                    let td_content = document.createElement('div');
-                    td_content.style.position = 'relative';
-                    td_content.style.height = '100%';
-                    td_content.style.width = '100%';
-                    td.appendChild(td_content);
-                    if (cell.not_yet_visited) {
-                        td.style.backgroundColor = '#0f1717';
-                    } else if (cell.not_visited_today) {
-                        td.style.backgroundColor = 'darkslategray';
-                    } else {
-                        if (+cell.zombies === 1) {
-                            td.style.backgroundColor = 'goldenrod';
-                        } else if (+cell.zombies === 2) {
-                            td.style.backgroundColor = 'chocolate';
-                        } else if (+cell.zombies >= 3) {
-                            td.style.backgroundColor = 'firebrick';
-                        } else {
-                            td.style.backgroundColor = 'green';
-                        }
-                    }
-                    if (cell.town) {
-                        let town_here = document.createElement('div');
-                        town_here.innerText = '🏠';
-                        town_here.style.position = 'absolute';
-                        town_here.style.inset = 'calc(50% - 11px)';
-                        td_content.appendChild(town_here);
-                    }
-                    if (cell.bat) {
-                        let bat_here = document.createElement('div');
-                        bat_here.style.backgroundColor = 'grey';
-                        bat_here.style.position = 'absolute';
-                        bat_here.style.inset = '4px';
-                        if (cell.ruin) {
-                            bat_here.innerText = 'R';
-                            bat_here.style.color = 'black';
-                        } else if (cell.empty_bat) {
-                            bat_here.classList.add('empty-bat');
-                        }
-                        td_content.appendChild(bat_here);
-                    }
-                    if (cell.empty && !cell.town && !cell.not_yet_visited) {
-                        let empty_here = document.createElement('div');
-                        empty_here.classList.add('dotted-background');
-                        empty_here.style.position = 'absolute';
-                        empty_here.style.inset = '-1px';
-                        td_content.appendChild(empty_here);
-                    }
-                    if (cell.my_pos) {
-                        let player_here = document.createElement('div');
-                        player_here.style.backgroundColor = 'white';
-                        player_here.style.margin = 'auto';
-                        player_here.style.width = '6px';
-                        player_here.style.height = '6px';
-                        player_here.style.position = 'absolute';
-                        player_here.style.inset = 'calc(50% - 3px)';
-                        td_content.appendChild(player_here);
-                    }
-                    // if (cell.expedition_here) {
-                    //     let expedition_here = document.createElement('div');
-                    //     expedition_here.style.backgroundColor = 'black';
-                    //     expedition_here.style.margin = 'auto';
-                    //     expedition_here.textAlign = 'center';
-                    //     expedition_here.style.width = '10px';
-                    //     expedition_here.style.height = '10px';
-                    //     td_content.appendChild(expedition_here);
-                    // }
-                    if (cell_index === row.length - 1) {
-                        let final_row_td = document.createElement('td');
-                        final_row_td.innerText = cell.horizontal;
-                        final_row_td.classList.add('around-map');
-                        tr.appendChild(final_row_td);
-                    }
-                });
-                table.appendChild(tr);
-            });
-            let final_col_tr = document.createElement('tr');
-            map.vertical_mapping.forEach((cell) => {
-                let td = document.createElement('td');
-                td.innerText = cell;
-                td.classList.add('around-map');
-                final_col_tr.appendChild(td);
-            });
-            table.appendChild(final_col_tr);
-            table.firstElementChild.firstElementChild.innerText = '🗘';
-            table.firstElementChild.firstElementChild.style.cursor = 'pointer';
-            table.firstElementChild.firstElementChild.addEventListener('click', () => displayMap());
-            content.appendChild(table);
-        };
-        let transformRuinMapping = (map) => {
-            table = document.createElement('table');
-            table.setAttribute('style', 'border-collapse: collapse;');
-            table.classList.add('mho-ruin');
-            let init_col_tr = document.createElement('tr');
-            table.appendChild(init_col_tr);
-            map.vertical_mapping.forEach((cell) => {
-                let td = document.createElement('td');
-                td.innerText = cell;
-                td.classList.add('around-map');
-                init_col_tr.appendChild(td);
-            });
-            map.map.forEach((row) => {
-                let tr = document.createElement('tr');
-                row.forEach((cell, cell_index) => {
-                    if (cell_index === 0) {
-                        let init_row_td = document.createElement('td');
-                        init_row_td.innerText = cell.horizontal;
-                        init_row_td.classList.add('around-map');
-                        tr.appendChild(init_row_td);
-                    }
-                    let td = document.createElement('td');
-                    td.style.padding = (0);
-                    tr.appendChild(td);
-                    let td_content = document.createElement('div');
-                    td.style.position = 'relative';
-                    td.appendChild(td_content);
-                    if (cell.borders !== '0000') {
-                        // let border = document.createElement('div');
-                        td_content.style.backgroundColor = 'black';
-                        td_content.style.position = 'absolute';
-                        td_content.style.top = '0';
-                        td_content.style.left = '0';
-                        td_content.style.bottom = '0';
-                        td_content.style.right = '0';
-                        let path = document.createElement('div');
-                        path.style.position = 'absolute';
-                        path.style.backgroundColor = 'grey';
-                        if (cell.borders === 'exit') {
-                            path.style.boxShadow = 'inset 0px 5px 6px lightyellow';
-                            path.style.left = '4px';
-                            path.style.top = '4px';
-                            path.style.right = '4px';
-                            path.style.bottom = '0';
-                            td.classList.add('exit');
-                        } else {
-                            path.style.left = cell.borders[0] === '0' ? '4px' : '0';
-                            path.style.top = cell.borders[1] === '0' ? '4px' : '0';
-                            path.style.right = cell.borders[2] === '0' ? '4px' : '0';
-                            path.style.bottom = cell.borders[3] === '0' ? '4px' : '0';
-                        }
-                        td_content.appendChild(path);
-                    } else {
-                        td.classList.add('empty');
-                    }
-                    if (cell.zombies && cell.zombies !== '' && cell.zombies > 0) {
-                        let zombies = document.createElement('div');
-                        zombies.innerText = cell.zombies;
-                        zombies.style.position = 'absolute';
-                        zombies.style.bottom = '4px';
-                        zombies.style.right = '4px';
-                        zombies.style.fontSize = '10px';
-                        zombies.style.lineHeight = '10px';
-                        td_content.appendChild(zombies);
-                    }
-                    if (cell.door) {
-                        let img = document.createElement('img');
-                        img.src = `${repo_img_hordes_url}item/${cell.door}.gif`;
-                        img.style.position = 'absolute';
-                        img.style.left = 'calc(50% - 8px)';
-                        img.style.top = 'calc(50% - 8px)';
-                        img.style.zIndex = '100';
-                        td_content.appendChild(img);
-                        td.classList.add('door');
-                    }
-                    if (cell_index === row.length - 1) {
-                        let final_row_td = document.createElement('td');
-                        final_row_td.innerText = cell.horizontal;
-                        final_row_td.classList.add('around-map');
-                        tr.appendChild(final_row_td);
-                    }
-                    td.addEventListener('click', () => {
-                        let my_pos = table.querySelector('.my-pos');
-                        if (my_pos) {
-                            my_pos.remove();
-                        }
-                        let new_pos = document.createElement('div');
-                        new_pos.classList.add('my-pos');
-                        new_pos.style.position = 'absolute';
-                        new_pos.style.backgroundColor = 'white';
-                        new_pos.style.zIndex = '300';
-                        new_pos.style.inset = 'calc(50% - 3px)';
-                        td_content.appendChild(new_pos);
-                    });
-                });
-                table.appendChild(tr);
-            });
-            let final_col_tr = document.createElement('tr');
-            map.vertical_mapping.forEach((cell) => {
-                let td = document.createElement('td');
-                td.innerText = cell;
-                td.classList.add('around-map');
-                final_col_tr.appendChild(td);
-            });
-            table.appendChild(final_col_tr);
-            table.firstElementChild.firstElementChild.innerText = '🗘';
-            table.firstElementChild.firstElementChild.style.cursor = 'pointer';
-            table.firstElementChild.firstElementChild.addEventListener('click', () => displayMap());
-            content.appendChild(table);
-        };
-        getStorageItem(mho_map_key).then((mho_map) => {
-            if (mho_map) {
-                if (mho_map.source === 'gh') {
-                    if (mho_map.map === 'ruin') {
-                        getGHRuin().then((map) => transformRuinMapping(map));
-                    } else {
-                        getGHMap().then((map) => transformMapping(map));
-                    }
-                } else if (mho_map.source === 'bbh') {
-                    if (mho_map.map === 'ruin') {
-                        getBBHRuin().then((map) => transformRuinMapping(map));
-                    } else {
-                        getBBHMap().then((map) => transformMapping(map));
-                    }
-                } else if (mho_map.source === 'fm') {
-                    if (mho_map.map === 'ruin') {
-                        getFMRuin().then((map) => transformRuinMapping(map));
-                    } else {
-                        getFMMap().then((map) => transformMapping(map));
-                    }
-                }
-            }
-        });
-    }
-
-    /** Si l'option associée est activée, demande confirmation avant de quitter si les options d'escorte ne sont pas bonnes */
 
     function addExternalLinksToProfiles() {
         if (state.mho_parameters.display_external_links) {
@@ -6413,7 +6510,6 @@
             }
         }
     }
-
     function addExternalLinksToTowns() {
         if (state.mho_parameters.display_external_links && pageIsTownHistory()) {
             let mho_block = document.querySelector('#' + mho_town_external_links_id);
@@ -6535,7 +6631,8 @@
                         if (first_link) {
                             first_link.style.marginLeft = 'auto';
                         }
-                    } else {
+                    }
+                    else {
                         copy_button.style.display = 'flex';
                         copy_button.style.justifyContent = 'center';
                     }
@@ -6544,6 +6641,9 @@
         }
     }
 
+    //////////////////////////////////////////////
+    // La liste des paramètres de l'application //
+    //////////////////////////////////////////////
     let params_categories = [
         {
             id: `external_tools`,
@@ -7368,7 +7468,8 @@
             let temp_input = input.value.replace(/\W*/gm, '');
             if (temp_input.length > 2) {
                 options.classList.remove('hidden');
-            } else if (!options.classList.contains('hidden')) {
+            }
+            else if (!options.classList.contains('hidden')) {
                 options.classList.add('hidden');
             }
         });
@@ -7381,12 +7482,10 @@
         select_complete.appendChild(options);
         return select_complete;
     }
-
     // Module-level flag: ensures the global "close any open filter dropdown on
     // outside click" listener is only ever registered once, regardless of how
     // many times filters get (re)created across page navigations.
     let mho_checkbox_dropdown_listener_attached = false;
-
     /**
      * Enregistre une seule fois un listener global qui ferme tout volet de filtre ouvert
      * lors d'un clic en dehors de celui-ci. Évite l'accumulation de listeners à chaque
@@ -7402,7 +7501,6 @@
         });
         mho_checkbox_dropdown_listener_attached = true;
     }
-
     /**
      * Crée un filtre multi-valeurs sous forme de volet déroulant avec cases à cocher.
      * Le trigger est un véritable <select> (avec une seule option dynamique) afin de
@@ -7438,7 +7536,7 @@
                 ? getI18N(texts.filter_all)
                 : `${selectedCount} ${getI18N(texts.filter_selected_count)}`;
         };
-        options.forEach(({value, text, icon}) => {
+        options.forEach(({ value, text, icon }) => {
             let optionLine = document.createElement('div');
             let checkbox = document.createElement('input');
             checkbox.type = 'checkbox';
@@ -7454,7 +7552,8 @@
                 optionIcon.alt = text;
                 optionIcon.classList.add('mho-dropdown-option-icon');
                 optionLabel.appendChild(optionIcon);
-            } else {
+            }
+            else {
                 optionLabel.innerText = text;
             }
             checkbox.addEventListener('change', () => {
@@ -7488,7 +7587,8 @@
             if (['Enter', ' ', 'ArrowDown', 'ArrowUp'].includes(event.key)) {
                 event.preventDefault();
                 togglePanel();
-            } else if (event.key === 'Escape') {
+            }
+            else if (event.key === 'Escape') {
                 panel.style.display = 'none';
             }
         });
@@ -7514,7 +7614,6 @@
             destroy: () => toggleResizeObserver.disconnect()
         };
     }
-
     /**
      * Crée un <select> simple avec son label dans un conteneur flex-column.
      * @param {string} labelText
@@ -7533,14 +7632,14 @@
         let select = document.createElement('select');
         select.id = id;
         select.classList.add('mho-input');
-        options.forEach(({value, text}) => {
+        options.forEach(({ value, text }) => {
             let opt = document.createElement('option');
             opt.value = value;
             opt.innerText = text;
             select.appendChild(opt);
         });
         container.appendChild(select);
-        return {container, select};
+        return { container, select };
     }
 
     // Local helper: TypeScript's arrFrom(any) sometimes infers element type
@@ -7548,7 +7647,6 @@
     // iterable. This explicit-any wrapper avoids that, matching the original
     // untyped JS behaviour (no behaviour change, pure typing aid).
     const arrFrom$1 = (x) => Array.from(x);
-
     function displaySearchFields() {
         if (state.mho_parameters.display_search_fields) {
             displaySearchFieldOnBuildings();
@@ -7560,7 +7658,6 @@
             displayFiltersOnCitizenList();
         }
     }
-
     /** Si l'option associée est activée, masque les chantiers complétés sur la page de chantiers */
     function hideCompletedBuildings() {
         let hideBuildings = (buildings) => {
@@ -7572,7 +7669,8 @@
             building_rows.forEach((building_row) => {
                 if (building_row.classList.contains('complete') && !building_row.querySelector('.to_repair')) {
                     building_row.classList.add('mho-hidden');
-                } else {
+                }
+                else {
                     building_row.classList.remove('mho-hidden');
                 }
             });
@@ -7580,7 +7678,8 @@
             buildings.forEach((building) => {
                 if (arrFrom$1(building.children).filter((child) => child.classList.contains('building')).every((child) => child.classList.contains('mho-hidden'))) {
                     building.classList.add('mho-hidden');
-                } else {
+                }
+                else {
                     building.classList.remove('mho-hidden');
                 }
             });
@@ -7607,22 +7706,23 @@
                     }
                 });
             });
-            observer.observe(document.body, {childList: true, subtree: true});
+            observer.observe(document.body, { childList: true, subtree: true });
         };
         if (pageIsConstructions()) {
             let buildings = arrFrom$1(document.querySelectorAll('.buildings') || []);
             if (state.mho_parameters.hide_completed_buildings_field) {
                 if (buildings.length > 0) {
                     hideBuildings(buildings);
-                } else {
+                }
+                else {
                     observeBuildings();
                 }
-            } else {
+            }
+            else {
                 showBuildings(buildings);
             }
         }
     }
-
     /** Si l'option associée est activée, affiche un champ de recherche sur la page de chantiers */
     function displaySearchFieldOnBuildings() {
         let fields_container = document.getElementById(mho_search_building_field_id);
@@ -7656,7 +7756,7 @@
             search_field_div.appendChild(header_mho_img);
             let search_field = document.createElement('input');
             search_field.type = 'text';
-            search_field.placeholder = getI18N(params_categories.find((category) => category.id === 'display').params.find((param) => param.id === 'display_search_fields').children.find((child) => child.id === 'display_search_field_buildings').label);
+            search_field.placeholder = getI18N(params_categories.find((category) => category.id === 'display').params.find((param) => param.id === 'sort_and_filter').children.find((param) => param.id === 'display_search_fields').children.find((child) => child.id === 'display_search_field_buildings').label);
             search_field.classList.add('mho-input', 'inline');
             search_field.setAttribute('style', 'min-width: 200px; padding-left: 24px;');
             search_field_div.appendChild(search_field);
@@ -7670,16 +7770,19 @@
                     let force_hide = state.mho_parameters.hide_completed_buildings_field && building_row.classList.contains('complete');
                     if (force_hide) {
                         building_row.classList.add('hidden');
-                    } else if (normalizeString(building_row.querySelector('.building_name').innerText).indexOf(normalizeString(search_field.value)) > -1) {
+                    }
+                    else if (normalizeString(building_row.querySelector('.building_name').innerText).indexOf(normalizeString(search_field.value)) > -1) {
                         building_row.classList.remove('hidden');
-                    } else {
+                    }
+                    else {
                         building_row.classList.add('hidden');
                     }
                 });
                 buildings.forEach((building) => {
                     if (arrFrom$1(building.children).filter((child) => child.classList.contains('building')).every((child) => child.classList.contains('hidden'))) {
                         building.classList.add('hidden');
-                    } else {
+                    }
+                    else {
                         building.classList.remove('hidden');
                     }
                 });
@@ -7701,7 +7804,7 @@
                     }
                 });
             });
-            observer.observe(document.body, {childList: true, subtree: true});
+            observer.observe(document.body, { childList: true, subtree: true });
         };
         if (state.mho_parameters.display_search_field_buildings && pageIsConstructions()) {
             if (fields_container)
@@ -7709,14 +7812,15 @@
             let tabs = document.querySelector('ul.buildings-tabs');
             if (tabs) {
                 addSearchField(tabs);
-            } else {
+            }
+            else {
                 observeTabs();
             }
-        } else if (fields_container) {
+        }
+        else if (fields_container) {
             fields_container.remove();
         }
     }
-
     /** Si l'option associée est activée, affiche un champ de recherche sur la liste des destinataires d'un message */
     function displaySearchFieldOnRecipientList() {
         let search_field = document.getElementById(mho_search_recipient_field_id);
@@ -7729,7 +7833,7 @@
                 search_field = document.createElement('input');
                 search_field.type = 'text';
                 search_field.id = mho_search_recipient_field_id;
-                search_field.placeholder = getI18N(params_categories.find((category) => category.id === 'display').params.find((param) => param.id === 'display_search_fields').children.find((child) => child.id === 'display_search_field_recipients').label);
+                search_field.placeholder = getI18N(params_categories.find((category) => category.id === 'display').params.find((param) => param.id === 'sort_and_filter').children.find((param) => param.id === 'display_search_fields').children.find((child) => child.id === 'display_search_field_recipients').label);
                 search_field.classList.add('mho-input', 'inline');
                 search_field.setAttribute('style', 'padding-left: 24px; margin-bottom: 0.25em;');
                 search_field.addEventListener('keyup', (event) => {
@@ -7737,7 +7841,8 @@
                     recipients_list.forEach((recipient) => {
                         if (normalizeString(recipient.innerText).indexOf(normalizeString(search_field.value)) > -1) {
                             recipient.classList.remove('hidden');
-                        } else {
+                        }
+                        else {
                             recipient.classList.add('hidden');
                         }
                     });
@@ -7751,11 +7856,11 @@
                 search_field_container.appendChild(header_mho_img);
                 recipients.insertBefore(search_field_container, recipients.firstElementChild);
             }
-        } else if (search_field) {
+        }
+        else if (search_field) {
             search_field.parentElement.remove();
         }
     }
-
     /** Si l'option associée est activée, affiche un champ de recherche sur la page de la décharge */
     function displaySearchFieldOnDump() {
         let search_field = document.getElementById(mho_search_dump_field_id);
@@ -7778,7 +7883,8 @@
                             let can_be_dump = can_be_dump_field.checked && item_bank_count > 0;
                             if (is_search_in_string && (can_be_dump || can_be_recovered)) {
                                 item.classList.remove('hidden');
-                            } else {
+                            }
+                            else {
                                 item.classList.add('hidden');
                             }
                         });
@@ -7788,7 +7894,7 @@
                     search_field_container.id = mho_search_dump_field_id;
                     search_field = document.createElement('input');
                     search_field.type = 'text';
-                    search_field.placeholder = getI18N(params_categories.find((category) => category.id === 'display').params.find((param) => param.id === 'display_search_fields').children.find((child) => child.id === 'display_search_field_dump').label);
+                    search_field.placeholder = getI18N(params_categories.find((category) => category.id === 'display').params.find((param) => param.id === 'sort_and_filter').children.find((param) => param.id === 'display_search_fields').children.find((child) => child.id === 'display_search_field_dump').label);
                     search_field.classList.add('mho-input', 'inline');
                     search_field.setAttribute('style', 'padding-left: 24px; margin-bottom: 0.25em;');
                     search_field_container.appendChild(search_field);
@@ -7834,11 +7940,11 @@
                     main_content.insertBefore(search_field_container, table);
                 }
             }
-        } else if (search_field) {
+        }
+        else if (search_field) {
             search_field.parentElement.remove();
         }
     }
-
     /** Si l'option associée est activée, affiche un champ de recherche sur le registre */
     function displaySearchFieldOnRegistry() {
         let search_field = document.getElementById(mho_search_registry_field_id);
@@ -7873,7 +7979,8 @@
                             first_link.style.marginLeft = 'auto';
                         }
                         header_mho_img.style.left = (0);
-                    } else {
+                    }
+                    else {
                         search_field_container.style.display = 'flex';
                         search_field_container.style.justifyContent = 'center';
                         header_mho_img.style.left = '4px';
@@ -7884,18 +7991,19 @@
                         logs_list.forEach((log) => {
                             if (normalizeString(log.innerText).indexOf(normalizeString(search_field.value)) > -1) {
                                 log.parentElement.classList.remove('hidden');
-                            } else {
+                            }
+                            else {
                                 log.parentElement.classList.add('hidden');
                             }
                         });
                     });
                 }
             }
-        } else if (search_field) {
+        }
+        else if (search_field) {
             search_field.parentElement.remove();
         }
     }
-
     /** Si l'option associée est activée, affiche le nombre de pa nécessaires pour réparer un bâtiment suffisemment pour qu'il ne soit pas détruit lors de l'attaque */
     function displayMinApOnBuildings(count = 0) {
         state.tooltips_observer?.disconnect();
@@ -7911,7 +8019,7 @@
             // Selectionne le noeud dont les mutations seront observées
             let tooltip_container = document.querySelector('#tooltip_container');
             // Options de l'observateur (quelles sont les mutations à observer)
-            let config = {childList: true, subtree: true};
+            let config = { childList: true, subtree: true };
             // Fonction callback à éxécuter quand une mutation est observée
             let callback = function (mutationsList) {
                 if (state.mho_parameters.display_missing_ap_for_buildings_to_be_safe && pageIsConstructions()) {
@@ -7962,7 +8070,8 @@
                         missing_ap_info.innerText = getI18N(texts.missing_ap_explanation).replace('%VAR%', Math.ceil(missing_pts / nb_pts_per_ap));
                         nb_ap_element.appendChild(missing_ap_info);
                     });
-                } else {
+                }
+                else {
                     state.tooltips_observer?.disconnect();
                 }
             };
@@ -7971,7 +8080,8 @@
             // Commence à observer le noeud cible pour les mutations précédemment configurées
             state.tooltips_observer.observe(tooltip_container, config);
             ////////////////////////////////////////////////////////
-        } else if (pageIsConstructions()) {
+        }
+        else if (pageIsConstructions()) {
             let missing_ap_infos = document.querySelectorAll('.mho-missing-ap');
             if (!missing_ap_infos)
                 return;
@@ -7982,7 +8092,6 @@
             arrFrom$1(mho_safe_aps).forEach((mho_safe_ap) => mho_safe_ap.remove());
         }
     }
-
     /** Si l'option associée est activée, affiche des filtres sur la liste des citoyens */
     function displayFiltersOnCitizenList() {
         let filter_container = document.getElementById(mho_filter_citizen_list_id);
@@ -8029,34 +8138,19 @@
             filter_container.appendChild(nameWrapper);
             nameInput.addEventListener('keyup', triggerFilters);
             // Select : statut de connexion
-            let {
-                container: onlineCtnr,
-                select: onlineSelect
-            } = createSingleFilterSelect(getI18N(texts.filter_online_label), `${mho_filter_citizen_list_id}-online`, [
-                {value: 'all', text: getI18N(texts.filter_all)},
-                {value: 'online', text: getI18N(texts.filter_online_online)},
-                {value: 'offline', text: getI18N(texts.filter_online_offline)}
+            let { container: onlineCtnr, select: onlineSelect } = createSingleFilterSelect(getI18N(texts.filter_online_label), `${mho_filter_citizen_list_id}-online`, [
+                { value: 'all', text: getI18N(texts.filter_all) },
+                { value: 'online', text: getI18N(texts.filter_online_online) },
+                { value: 'offline', text: getI18N(texts.filter_online_offline) }
             ]);
             filter_container.appendChild(onlineCtnr);
             onlineSelect.addEventListener('change', triggerFilters);
             // Volet : profession
-            let {
-                container: profCtnr,
-                getSelectedValues: getSelectedProfessions,
-                destroy: destroyProfDropdown
-            } = createCheckboxDropdown(getI18N(texts.job), `${mho_filter_citizen_list_id}-profession`, Array.from(professions.entries()).map(([alt, src]) => ({
-                value: alt,
-                text: alt,
-                icon: src
-            })), triggerFilters);
+            let { container: profCtnr, getSelectedValues: getSelectedProfessions, destroy: destroyProfDropdown } = createCheckboxDropdown(getI18N(texts.job), `${mho_filter_citizen_list_id}-profession`, Array.from(professions.entries()).map(([alt, src]) => ({ value: alt, text: alt, icon: src })), triggerFilters);
             filter_container.appendChild(profCtnr);
             dropdownDestroyers.push(destroyProfDropdown);
             // Volet : niveau de maison
-            let {
-                container: houseCtnr,
-                getSelectedValues: getSelectedHouseLevels,
-                destroy: destroyHouseDropdown
-            } = createCheckboxDropdown(getI18N(texts.filter_house_level_label), `${mho_filter_citizen_list_id}-house-level`, Array.from(houseLevels.entries()).sort((a, b) => a[0].localeCompare(b[0])).map(([level, src]) => ({
+            let { container: houseCtnr, getSelectedValues: getSelectedHouseLevels, destroy: destroyHouseDropdown } = createCheckboxDropdown(getI18N(texts.filter_house_level_label), `${mho_filter_citizen_list_id}-house-level`, Array.from(houseLevels.entries()).sort((a, b) => a[0].localeCompare(b[0])).map(([level, src]) => ({
                 value: level,
                 text: level,
                 icon: src
@@ -8064,13 +8158,10 @@
             filter_container.appendChild(houseCtnr);
             dropdownDestroyers.push(destroyHouseDropdown);
             // Select : emplacement
-            let {
-                container: locationCtnr,
-                select: locationSelect
-            } = createSingleFilterSelect(getI18N(texts.filter_location_label), `${mho_filter_citizen_list_id}-location`, [
-                {value: 'all', text: getI18N(texts.filter_all)},
-                {value: 'outside', text: getI18N(texts.filter_location_outside)},
-                {value: 'inside', text: getI18N(texts.filter_location_inside)}
+            let { container: locationCtnr, select: locationSelect } = createSingleFilterSelect(getI18N(texts.filter_location_label), `${mho_filter_citizen_list_id}-location`, [
+                { value: 'all', text: getI18N(texts.filter_all) },
+                { value: 'outside', text: getI18N(texts.filter_location_outside) },
+                { value: 'inside', text: getI18N(texts.filter_location_inside) }
             ]);
             filter_container.appendChild(locationCtnr);
             locationSelect.addEventListener('change', triggerFilters);
@@ -8104,12 +8195,12 @@
             };
             filter_container._mhoDestroyDropdowns = dropdownDestroyers;
             main_content.insertBefore(filter_container, table);
-        } else if (filter_container) {
+        }
+        else if (filter_container) {
             filter_container._mhoDestroyDropdowns?.forEach((destroy) => destroy());
             filter_container.remove();
         }
     }
-
     /** Si l'option associée est activée, affiche des filtres sur la page Omniscience */
     function displayFiltersOnOmniscience() {
         let filter_container = document.getElementById(mho_filter_omniscience_id);
@@ -8143,7 +8234,8 @@
                 let itemImgs = Array.from(row.querySelectorAll('.inventory .item-icon img[alt]:not([alt=""])'));
                 if (itemImgs.length === 0) {
                     hasEmptyChest = true;
-                } else {
+                }
+                else {
                     itemImgs.forEach((img) => {
                         let alt = img.getAttribute('alt');
                         if (!chestItems.has(alt))
@@ -8173,22 +8265,15 @@
             filter_container.appendChild(nameWrapper);
             nameInput.addEventListener('keyup', triggerFilters);
             // Select : statut de connexion
-            let {
-                container: onlineCtnr,
-                select: onlineSelect
-            } = createSingleFilterSelect(getI18N(texts.filter_online_label), `${mho_filter_omniscience_id}-online`, [
-                {value: 'all', text: getI18N(texts.filter_all)},
-                {value: 'online', text: getI18N(texts.filter_online_online)},
-                {value: 'offline', text: getI18N(texts.filter_online_offline)}
+            let { container: onlineCtnr, select: onlineSelect } = createSingleFilterSelect(getI18N(texts.filter_online_label), `${mho_filter_omniscience_id}-online`, [
+                { value: 'all', text: getI18N(texts.filter_all) },
+                { value: 'online', text: getI18N(texts.filter_online_online) },
+                { value: 'offline', text: getI18N(texts.filter_online_offline) }
             ]);
             filter_container.appendChild(onlineCtnr);
             onlineSelect.addEventListener('change', triggerFilters);
             // Volet : niveau de maison
-            let {
-                container: houseCtnr,
-                getSelectedValues: getSelectedHouseLevels,
-                destroy: destroyHouseDropdown
-            } = createCheckboxDropdown(getI18N(texts.filter_house_level_label), `${mho_filter_omniscience_id}-house-level`, Array.from(houseLevels.entries()).sort((a, b) => a[0].localeCompare(b[0])).map(([level, src]) => ({
+            let { container: houseCtnr, getSelectedValues: getSelectedHouseLevels, destroy: destroyHouseDropdown } = createCheckboxDropdown(getI18N(texts.filter_house_level_label), `${mho_filter_omniscience_id}-house-level`, Array.from(houseLevels.entries()).sort((a, b) => a[0].localeCompare(b[0])).map(([level, src]) => ({
                 value: level,
                 text: level,
                 icon: src
@@ -8196,36 +8281,20 @@
             filter_container.appendChild(houseCtnr);
             dropdownDestroyers.push(destroyHouseDropdown);
             // Volet : profession
-            let {
-                container: profCtnr,
-                getSelectedValues: getSelectedProfessions,
-                destroy: destroyProfDropdown
-            } = createCheckboxDropdown(getI18N(texts.job), `${mho_filter_omniscience_id}-profession`, Array.from(professions.entries()).map(([alt, src]) => ({
-                value: alt,
-                text: alt,
-                icon: src
-            })), triggerFilters);
+            let { container: profCtnr, getSelectedValues: getSelectedProfessions, destroy: destroyProfDropdown } = createCheckboxDropdown(getI18N(texts.job), `${mho_filter_omniscience_id}-profession`, Array.from(professions.entries()).map(([alt, src]) => ({ value: alt, text: alt, icon: src })), triggerFilters);
             filter_container.appendChild(profCtnr);
             dropdownDestroyers.push(destroyProfDropdown);
             // Volet : objets en coffre
             let itemOptions = [];
             if (hasEmptyChest)
-                itemOptions.push({value: '__empty__', text: '—'});
-            chestItems.forEach((src, alt) => itemOptions.push({value: alt, text: alt, icon: src}));
-            let {
-                container: itemsCtnr,
-                getSelectedValues: getSelectedItems,
-                destroy: destroyItemsDropdown
-            } = createCheckboxDropdown(getI18N(texts.filter_chest_items_label), `${mho_filter_omniscience_id}-items`, itemOptions, triggerFilters);
+                itemOptions.push({ value: '__empty__', text: '—' });
+            chestItems.forEach((src, alt) => itemOptions.push({ value: alt, text: alt, icon: src }));
+            let { container: itemsCtnr, getSelectedValues: getSelectedItems, destroy: destroyItemsDropdown } = createCheckboxDropdown(getI18N(texts.filter_chest_items_label), `${mho_filter_omniscience_id}-items`, itemOptions, triggerFilters);
             filter_container.appendChild(itemsCtnr);
             dropdownDestroyers.push(destroyItemsDropdown);
             // Volet : étoiles d'activité (les morts n'ont aucune case correspondante ;
             // ils ne remontent que lorsqu'aucune case n'est cochée)
-            let {
-                container: starsCtnr,
-                getSelectedValues: getSelectedStars,
-                destroy: destroyStarsDropdown
-            } = createCheckboxDropdown(getI18N(texts.filter_stars_label), `${mho_filter_omniscience_id}-stars`, Array.from(starCounts).sort((a, b) => a - b).map((count) => ({
+            let { container: starsCtnr, getSelectedValues: getSelectedStars, destroy: destroyStarsDropdown } = createCheckboxDropdown(getI18N(texts.filter_stars_label), `${mho_filter_omniscience_id}-stars`, Array.from(starCounts).sort((a, b) => a - b).map((count) => ({
                 value: String(count),
                 text: count > 0 ? '★'.repeat(count) : '—'
             })), triggerFilters);
@@ -8270,7 +8339,8 @@
             };
             filter_container._mhoDestroyDropdowns = dropdownDestroyers;
             main_content.insertBefore(filter_container, table);
-        } else if (filter_container) {
+        }
+        else if (filter_container) {
             filter_container._mhoDestroyDropdowns?.forEach((destroy) => destroy());
             filter_container.remove();
         }
@@ -8288,8 +8358,8 @@
         table.dataset.sortEnabled = 'true';
         arrFrom(table.querySelectorAll(rowSelector))
             .forEach((row, i) => {
-                row.dataset.origIdx = i;
-            });
+            row.dataset.origIdx = i;
+        });
         const header = table.querySelector('.row-flex.header');
         if (!header)
             return;
@@ -8300,8 +8370,9 @@
             const rows = arrFrom(table.querySelectorAll(rowSelector));
             if (dir === 0) {
                 rows.sort((a, b) => Number(a.dataset.origIdx) - Number(b.dataset.origIdx));
-            } else {
-                const {extract, compare} = columns[colIndex];
+            }
+            else {
+                const { extract, compare } = columns[colIndex];
                 rows.sort((a, b) => dir * compare(extract(a), extract(b)));
             }
             rows.forEach((row) => table.appendChild(row));
@@ -8318,13 +8389,15 @@
                 if (activeCol !== colIdx) {
                     activeCol = colIdx;
                     direction = 1;
-                } else {
+                }
+                else {
                     if (direction === 1)
                         direction = -1;
                     else if (direction === -1) {
                         direction = 0;
                         activeCol = -1;
-                    } else {
+                    }
+                    else {
                         direction = 1;
                         activeCol = colIdx;
                     }
@@ -8339,7 +8412,6 @@
             return arrow;
         });
     }
-
     function mhoCleanupSortableTable(table, rowSelector) {
         if (!table?.dataset.sortEnabled)
             return;
@@ -8358,12 +8430,11 @@
         });
         delete table.dataset.sortEnabled;
     }
-
     function sortCitizenList() {
         const COLUMNS = [
             {
                 extract: row => (row.querySelector('.username')?.textContent ?? '').trim().toLowerCase(),
-                compare: (a, b) => a.localeCompare(b, 'fr', {sensitivity: 'base'}),
+                compare: (a, b) => a.localeCompare(b, 'fr', { sensitivity: 'base' }),
             },
             {
                 extract: row => {
@@ -8377,9 +8448,9 @@
                     const text = (row.querySelector('.location')?.textContent ?? '').trim();
                     const m = text.match(/\[(-?\d+),(-?\d+)\]/);
                     if (!m)
-                        return {inTown: true, dist: 0};
+                        return { inTown: true, dist: 0 };
                     const x = parseInt(m[1], 10), y = parseInt(m[2], 10);
-                    return {inTown: false, dist: Math.abs(x) + Math.abs(y)};
+                    return { inTown: false, dist: Math.abs(x) + Math.abs(y) };
                 },
                 compare: (a, b) => {
                     if (a.inTown && b.inTown)
@@ -8396,16 +8467,16 @@
             .find((t) => t.querySelectorAll('.row-flex.header .cell').length === 3);
         if (state.mho_parameters.sort_citizen_list && pageIsCitizens()) {
             mhoInitSortableTable(table, COLUMNS, '.row-flex.stretch.pointer');
-        } else if (!state.mho_parameters.sort_citizen_list && pageIsCitizens()) {
+        }
+        else if (!state.mho_parameters.sort_citizen_list && pageIsCitizens()) {
             mhoCleanupSortableTable(table, '.row-flex.stretch.pointer');
         }
     }
-
     function sortOmniscienceList() {
         const COLUMNS = [
             {
                 extract: row => (row.querySelector('.username')?.textContent ?? '').trim().toLowerCase(),
-                compare: (a, b) => a.localeCompare(b, 'fr', {sensitivity: 'base'}),
+                compare: (a, b) => a.localeCompare(b, 'fr', { sensitivity: 'base' }),
             },
             {
                 extract: row => row.querySelectorAll('li.item').length,
@@ -8429,7 +8500,8 @@
             .find((t) => t.querySelectorAll('.row-flex.header .cell').length === 4);
         if (state.mho_parameters.sort_omniscience_list && pageIsOmniscience()) {
             mhoInitSortableTable(table, COLUMNS, '.row-flex.stretch');
-        } else if (!state.mho_parameters.sort_omniscience_list && pageIsOmniscience()) {
+        }
+        else if (!state.mho_parameters.sort_omniscience_list && pageIsOmniscience()) {
             mhoCleanupSortableTable(table, '.row-flex.stretch');
         }
     }
@@ -8453,7 +8525,7 @@
                 });
             });
             // Configuration de l'observateur pour surveiller les modifications des enfants
-            const config = {childList: true};
+            const config = { childList: true };
             // Commencez à observer l'élément cible pour les modifications configurées
             observer.observe(notifications_space, config);
             let btn_container = document.createElement('div');
@@ -8474,11 +8546,11 @@
                 createNotificationsWindowContent();
             });
             mho_header_space.appendChild(btn_container);
-        } else if (stored_notifications_btn) {
+        }
+        else if (stored_notifications_btn) {
             stored_notifications_btn.remove();
         }
     }
-
     function createNotificationsWindowContent() {
         let window_content = document.querySelector(`#${mho_store_notifications_window_id}-content`);
         window_content.innerHTML = '';
@@ -8492,7 +8564,6 @@
         tabs_div.appendChild(tabs_ul);
         dispatchNotificationsContent();
     }
-
     function dispatchNotificationsContent() {
         let window_content = document.getElementById(mho_store_notifications_window_id + '-content');
         let tab_content = document.getElementById(mho_store_notifications_window_id + '-tab-content');
@@ -8534,23 +8605,23 @@
                 let sourceString = 'sourceString=' + string_to_translate;
                 fetcher(state.api_url + '/Translation?' + locale + '&' + sourceString)
                     .then((response) => {
-                        if (response.status === 200) {
-                            return response.json();
-                        } else {
-                            return convertResponsePromiseToError(response);
-                        }
-                    })
+                    if (response.status === 200) {
+                        return response.json();
+                    }
+                    else {
+                        return convertResponsePromiseToError(response);
+                    }
+                })
                     .then((response) => {
-                        resolve(response);
-                    })
+                    resolve(response);
+                })
                     .catch((error) => {
-                        addError(error);
-                        reject(error);
-                    });
+                    addError(error);
+                    reject(error);
+                });
             }
         });
     }
-
     /** Récupère la liste complète des recettes */
 
     function displayTranslateTool() {
@@ -8612,7 +8683,8 @@
                                 if (show_exact_match) {
                                     display_all_img.src = `${repo_img_hordes_url}/icons/small_more.gif`;
                                     display_all_text.innerText = getI18N(texts.display_all_search_result);
-                                } else {
+                                }
+                                else {
                                     display_all_img.src = `${repo_img_hordes_url}/icons/small_less.gif`;
                                     display_all_text.innerText = getI18N(texts.display_exact_search_result);
                                 }
@@ -8624,50 +8696,51 @@
                         }
                         response.translations
                             .forEach((translation) => {
-                                if (response.translations.length > 1) {
-                                    let context_div = document.createElement('div');
-                                    context_div.setAttribute('style', 'text-align: center; padding: 4px; font-variant: small-caps; font-size: 14px;');
-                                    context_div.innerHTML = getI18N(texts.translation_file_context) + ` <img src="${repo_img_hordes_url}/emotes/arrowright.gif"> ` + translation.key.context;
-                                    if (!translation.key.isExactMatch && show_exact_match) {
-                                        context_div.classList.add('not-exact', 'hidden');
-                                    }
-                                    block_to_display.appendChild(context_div);
+                            if (response.translations.length > 1) {
+                                let context_div = document.createElement('div');
+                                context_div.setAttribute('style', 'text-align: center; padding: 4px; font-variant: small-caps; font-size: 14px;');
+                                context_div.innerHTML = getI18N(texts.translation_file_context) + ` <img src="${repo_img_hordes_url}/emotes/arrowright.gif"> ` + translation.key.context;
+                                if (!translation.key.isExactMatch && show_exact_match) {
+                                    context_div.classList.add('not-exact', 'hidden');
                                 }
-                                let key_index = 0;
-                                for (let lang_key in translation.value) {
-                                    let lang = translation.value[lang_key];
-                                    lang.forEach((result) => {
-                                        let content_div = document.createElement('div');
-                                        let img = document.createElement('img');
-                                        img.src = `${repo_img_hordes_url}/lang/${lang_key}.png`;
-                                        img.setAttribute('style', 'margin-right: 8px');
-                                        let button_div = document.createElement('div');
-                                        let button = document.createElement('button');
-                                        button_div.appendChild(button);
-                                        button.innerHTML = '&#10697';
-                                        button.setAttribute('style', 'font-size: 16px');
-                                        button.addEventListener('click', () => {
-                                            copyToClipboard(result);
-                                        });
-                                        content_div.setAttribute('style', 'display: flex; justify-content: space-between; padding: 6px;');
-                                        if (key_index === Object.keys(translation.value).length - 1) {
-                                            content_div.setAttribute('style', 'display: flex; justify-content: space-between; padding: 6px; border-bottom: 1px solid;');
-                                        }
-                                        content_div.innerHTML = `<div>${img.outerHTML}${result}</div>`;
-                                        content_div.appendChild(button_div);
-                                        if (!translation.key.isExactMatch && show_exact_match) {
-                                            content_div.classList.add('not-exact', 'hidden');
-                                        }
-                                        block_to_display.appendChild(content_div);
+                                block_to_display.appendChild(context_div);
+                            }
+                            let key_index = 0;
+                            for (let lang_key in translation.value) {
+                                let lang = translation.value[lang_key];
+                                lang.forEach((result) => {
+                                    let content_div = document.createElement('div');
+                                    let img = document.createElement('img');
+                                    img.src = `${repo_img_hordes_url}/lang/${lang_key}.png`;
+                                    img.setAttribute('style', 'margin-right: 8px');
+                                    let button_div = document.createElement('div');
+                                    let button = document.createElement('button');
+                                    button_div.appendChild(button);
+                                    button.innerHTML = '&#10697';
+                                    button.setAttribute('style', 'font-size: 16px');
+                                    button.addEventListener('click', () => {
+                                        copyToClipboard(result);
                                     });
-                                    key_index++;
-                                }
-                            });
+                                    content_div.setAttribute('style', 'display: flex; justify-content: space-between; padding: 6px;');
+                                    if (key_index === Object.keys(translation.value).length - 1) {
+                                        content_div.setAttribute('style', 'display: flex; justify-content: space-between; padding: 6px; border-bottom: 1px solid;');
+                                    }
+                                    content_div.innerHTML = `<div>${img.outerHTML}${result}</div>`;
+                                    content_div.appendChild(button_div);
+                                    if (!translation.key.isExactMatch && show_exact_match) {
+                                        content_div.classList.add('not-exact', 'hidden');
+                                    }
+                                    block_to_display.appendChild(content_div);
+                                });
+                                key_index++;
+                            }
+                        });
                     });
                 }
             });
             mho_header_space.insertBefore(mho_display_translate_input_div, mho_header_space.firstChild);
-        } else if (display_translate_input) {
+        }
+        else if (display_translate_input) {
             display_translate_input.remove();
         }
     }
@@ -8682,12 +8755,13 @@
                 .then((response) => {
                 if (response.status === 200) {
                     return response.json();
-                } else {
+                }
+                else {
                     return convertResponsePromiseToError(response);
                 }
             })
                 .then(() => {
-                    resolve();
+                resolve();
             })
                 .catch((error) => {
                 addError(error);
@@ -8697,7 +8771,7 @@
     }
 
     function updateExternalTools() {
-        const {mh_user, mho_parameters, api_url, external_app_id} = state;
+        const { mh_user, mho_parameters, api_url, external_app_id } = state;
         return new Promise(async (resolve, reject) => {
             let convertListOfSingleObjectsIntoListOfCountedObjects = (objects) => {
                 let object_map = [];
@@ -8705,7 +8779,8 @@
                     let object_in_map = object_map.find((_object_in_map) => _object_in_map.id === object.id && _object_in_map.isBroken === object.isBroken);
                     if (object_in_map) {
                         object_in_map.count += 1;
-                    } else if (object) {
+                    }
+                    else if (object) {
                         object.count = 1;
                         object_map.push(object);
                     }
@@ -8737,7 +8812,7 @@
                 };
             });
             if (!citizen_list || citizen_list.length === 0) {
-                citizen_list = [{id: mh_user.id, userName: mh_user.userName, job: mh_user.jobDetails.uid}];
+                citizen_list = [{ id: mh_user.id, userName: mh_user.userName, job: mh_user.jobDetails.uid }];
             }
             // Mise à jour en ville chaos
             if (pageIsDesert() && (mh_user.townDetails?.isChaos && (mho_parameters.update_gh && mho_parameters.update_gh_devastated) || (mho_parameters.update_mho && mho_parameters.update_mho_devastated)) || (mho_parameters.update_fata && mho_parameters.update_fata_devastated)) {
@@ -8752,7 +8827,7 @@
                 }
                 let objects = Array.from(document.querySelector('.inventory.desert')?.querySelectorAll('li.item') || []).map((desert_item) => {
                     let item = getItemFromImg(desert_item.querySelector('img')?.src);
-                    return {id: item?.id, isBroken: desert_item.classList.contains('broken')};
+                    return { id: item?.id, isBroken: desert_item.classList.contains('broken') };
                 });
                 let content = {
                     x: +position[0],
@@ -8767,7 +8842,8 @@
                     data.map.cell.zoneEmpty = content.zoneEmpty;
                     data.map.cell.objects = content.objects || [];
                     data.map.cell.citizenId = content.citizenId;
-                } else {
+                }
+                else {
                     data.map.cell = content;
                 }
             }
@@ -8793,7 +8869,8 @@
                 };
                 if (data.map.cell) {
                     data.map.cell.deadZombies = nb_dead_zombies;
-                } else {
+                }
+                else {
                     data.map.cell = content;
                 }
             }
@@ -8826,10 +8903,12 @@
                     if (data.map.cell) {
                         data.map.cell.scavNextCells = content.scavNextCells;
                         data.map.cell.scavZoneLevel = content.scavZoneLevel;
-                    } else {
+                    }
+                    else {
                         data.map.cell = content;
                     }
-                } else if (mh_user.jobDetails.uid === 'vest') {
+                }
+                else if (mh_user.jobDetails.uid === 'vest') {
                     let zone_scout_level_src = document.querySelector('.zone-scout')?.querySelector('img').src;
                     let index = zone_scout_level_src.indexOf(hordes_img_url);
                     zone_scout_level_src = zone_scout_level_src.slice(index).replace(hordes_img_url, '');
@@ -8847,7 +8926,8 @@
                     if (data.map.cell) {
                         data.map.cell.scoutNextCells = content.scoutNextCells;
                         data.map.cell.scoutZoneLvl = content.scoutZoneLvl;
-                    } else {
+                    }
+                    else {
                         data.map.cell = content;
                     }
                 }
@@ -8866,7 +8946,7 @@
                 let my_rusksack = Array.from(document.querySelector('.inventory.rucksack')?.querySelectorAll('li.item:not(.locked)') || []).map((rucksack_item) => {
                     let item = getItemFromImg(rucksack_item.querySelector('img')?.src);
                     if (item) {
-                        return {id: item.id, isBroken: rucksack_item.classList.contains('broken')};
+                        return { id: item.id, isBroken: rucksack_item.classList.contains('broken') };
                     }
                 });
                 rucksacks.push({
@@ -8879,7 +8959,7 @@
                         let escort_id = +escort.querySelector('span.username')?.getAttribute('x-user-id');
                         let escort_rucksack = Array.from(escort.querySelector('.inventory.rucksack-escort')?.querySelectorAll('li.item:not(.locked):not(.plus)') || []).map((rucksack_item) => {
                             let item = getItemFromImg(rucksack_item.querySelector('img')?.src);
-                            return {id: item?.id, isBroken: rucksack_item.classList.contains('broken')};
+                            return { id: item?.id, isBroken: rucksack_item.classList.contains('broken') };
                         });
                         rucksacks.push({
                             userId: escort_id,
@@ -8901,7 +8981,7 @@
                 };
                 let chest_elements = Array.from(document.querySelector('.inventory.chest')?.querySelectorAll('li.item:not(.locked)') || []).map((chest_item) => {
                     let item = getItemFromImg(chest_item.querySelector('img')?.src);
-                    return {id: item.id, isBroken: chest_item.classList.contains('broken')};
+                    return { id: item.id, isBroken: chest_item.classList.contains('broken') };
                 });
                 data.chest.contents = convertListOfSingleObjectsIntoListOfCountedObjects(chest_elements);
             }
@@ -8939,7 +9019,8 @@
                         };
                         data.heroicActions.actions.push(action);
                     }
-                } else if (!no_interaction) {
+                }
+                else if (!no_interaction) {
                     let action = {
                         locale: lang,
                         label: 'Empty',
@@ -8965,7 +9046,8 @@
                             value: 1
                         };
                         data.heroicActions.actions.push(action);
-                    } else if (!no_interaction) {
+                    }
+                    else if (!no_interaction) {
                         let action = {
                             locale: lang,
                             label: 'PEF',
@@ -8993,7 +9075,8 @@
                         if (name !== 'fence') {
                             let amelio_value = amelio_img?.nextElementSibling.innerText.match(/\d+/);
                             data.amelios.values[name] = amelio_value ? +amelio_value[0] : 0;
-                        } else {
+                        }
+                        else {
                             data.amelios.values[name] = !amelio.querySelector('button[x-upgrade-id]') ? 1 : 0;
                         }
                     });
@@ -9058,7 +9141,8 @@
                         let is_digging = false;
                         if (citizen.id === mh_user.id) { // Il s'agit de l'utilisateur qui a cliqué sur le bouton
                             is_digging = document.querySelector('#mgd-digging-note [x-countdown-to]') ? true : false;
-                        } else { // Les autres
+                        }
+                        else { // Les autres
                             is_digging = citizen.row.parentElement.parentElement.parentElement.querySelector('li.status img[src*=small_gather]') ? true : false;
                         }
                         return is_digging;
@@ -9078,7 +9162,8 @@
                         let start_date;
                         if (citizen_last_arrival) { // Si le citoyen a une heure d'arrivée alors on se base sur cette heure comme heure de début de fouilles
                             start_date = citizen_last_arrival;
-                        } else { // Sinon, on se base sur le cooldown
+                        }
+                        else { // Sinon, on se base sur le cooldown
                             start_date = nb_failed_digs === 0 ? null : failed_digs[failed_digs.length - 1].querySelector('.log-part-time').innerText;
                         }
                         let nb_digs;
@@ -9087,7 +9172,8 @@
                             let start_date_minutes = (+start_date.split(':')[0] * 60) + (+start_date.split(':')[1]);
                             let nb_minutes_digging = now_minutes - start_date_minutes; // Le nombre total de minutes passées à fouiller
                             nb_digs = Math.floor(nb_minutes_digging / nb_minutes_for_dig) + 1;
-                        } else {
+                        }
+                        else {
                             nb_digs = 1;
                         }
                         data.successedDig.values.push({
@@ -9108,7 +9194,8 @@
                     if (bath_row.attributes.disabled) {
                         // si barré = le chantier est construit et le bain a été pris
                         bath_taken = true;
-                    } else {
+                    }
+                    else {
                         bath_taken = false;
                         // si pas barré = le chantier est construit et le bain n'a pas été pris
                     }
@@ -9134,7 +9221,8 @@
                 .then((response) => {
                 if (response.status === 200) {
                     return response.json();
-                } else {
+                }
+                else {
                     return convertResponsePromiseToError(response);
                 }
             })
@@ -9149,7 +9237,6 @@
             });
         });
     }
-
     /** Récupère les traductions de la chaine de caractères */
 
     function createParams(content) {
@@ -9189,7 +9276,6 @@
             });
         });
     }
-
     /**
      * Crée récursivement un élément de paramètre et ses enfants
      * @param {object} param        Le paramètre à afficher
@@ -9291,11 +9377,13 @@
                     // Ne pas expand ici, juste cocher
                     initOptionsWithLoginNeeded();
                     initOptionsWithoutLoginNeeded();
-                } else {
+                }
+                else {
                     // Toggle expand/collapse
                     if (is_expanded) {
                         collapse();
-                    } else {
+                    }
+                    else {
                         expand();
                     }
                 }
@@ -9310,7 +9398,8 @@
                     collapse();
                     if (arrow_indicator)
                         arrow_indicator.style.display = 'none';
-                } else {
+                }
+                else {
                     if (arrow_indicator)
                         arrow_indicator.style.display = 'inline';
                 }
@@ -9318,7 +9407,8 @@
                 initOptionsWithoutLoginNeeded();
             });
             // ── DESKTOP ─────────────────────────────────────────────────────────────
-        } else {
+        }
+        else {
             children_container.style.zIndex = String(10 + depth);
             children_container.style.width = '300px';
             children_container.style.padding = '0.25em';
@@ -9347,7 +9437,8 @@
                     children_container.style.top = rect.top - 5 + 'px';
                     children_container.style.paddingLeft = '0.25em';
                     children_container.style.width = '300px';
-                } else {
+                }
+                else {
                     // Pas assez de place → comportement mobile inline
                     children_container.style.position = 'relative';
                     children_container.style.left = '';
@@ -9381,7 +9472,8 @@
                 syncChildInputs(param, checked);
                 if (checked) {
                     param_container.classList.add('param-has-children');
-                } else {
+                }
+                else {
                     param_container.classList.remove('param-has-children');
                     hideTooltip();
                 }
@@ -9390,7 +9482,6 @@
             });
         }
     }
-
     /** Synchronise visuellement les checkboxes enfants dans le DOM */
     function syncChildInputs(param, checked) {
         if (!param.children)
@@ -9402,7 +9493,6 @@
             syncChildInputs(child, checked);
         });
     }
-
     /**
      * Met à jour un paramètre en storage
      * @param {string} id
@@ -9417,7 +9507,6 @@
             state.mho_parameters = saved;
         });
     }
-
     /**
      * Coche/décoche récursivement tous les descendants d'un paramètre
      * @param {object} param
@@ -9434,7 +9523,6 @@
             setParamChildrenChecked(child, checked);
         });
     }
-
     function createHelpButton(text_to_display) {
         let help_button = document.createElement('a');
         help_button.innerText = getI18N(texts.external_app_id_help_label);
@@ -9454,12 +9542,10 @@
         });
         return help_button;
     }
-
     /** Enregistre les paramètres de l'extension */
     function saveParameters() {
         let parameters = document.getElementsByClassName('parameter');
     }
-
     /** Affiche le bouton de mise à jour des outils externes */
 
     function createUpdateExternalToolsButton(count = 0) {
@@ -9481,7 +9567,8 @@
             if (update_external_tools_btn) {
                 update_external_tools_btn.parentElement.remove();
             }
-        } else {
+        }
+        else {
             if (external_display_zone || (chest && pageIsHouse()) || (amelios && pageIsAmelio()) || (map_actions && pageIsDoors() && state.mho_parameters.update_mho && state.mho_parameters.update_mho_souls)) {
                 if (!update_external_tools_btn) {
                     if (window.innerWidth < 480 && compact_actions_zone) {
@@ -9489,19 +9576,23 @@
                         let updater_bloc = createSmallUpdateExternalToolsButton(update_external_tools_btn);
                         if (amelios) {
                             el.parentElement.insertBefore(updater_bloc, el.nextElementSibling);
-                        } else {
+                        }
+                        else {
                             el.appendChild(updater_bloc);
                         }
-                    } else {
+                    }
+                    else {
                         let el = external_display_zone?.parentElement.parentElement.parentElement ?? chest?.parentElement ?? amelios ?? map_actions;
                         let updater_bloc = createLargeUpdateExternalToolsButton(update_external_tools_btn);
                         if (amelios) {
                             el.parentElement.insertBefore(updater_bloc, el.nextElementSibling);
-                        } else {
+                        }
+                        else {
                             el.appendChild(updater_bloc);
                         }
                     }
-                } else if (count < 3) {
+                }
+                else if (count < 3) {
                     setTimeout(() => {
                         createUpdateExternalToolsButton(count + 1);
                     }, 250);
@@ -9517,7 +9608,8 @@
                         warn_missing_logs.style.fontSize = '10px';
                         warn_missing_logs.innerHTML = getI18N(texts.warn_missing_logs_title) + '<br /><br />' + getI18N(texts.warn_missing_logs_help);
                         external_tools_btn_tooltip.appendChild(warn_missing_logs);
-                    } else {
+                    }
+                    else {
                         warn_missing_logs = document.createElement('div');
                         warn_missing_logs.id = mho_warn_missing_logs_id;
                         warn_missing_logs.classList.add('note', 'note-important');
@@ -9526,19 +9618,21 @@
                         warn_missing_logs.appendChild(warn_help);
                         update_external_tools_btn.parentElement.appendChild(warn_missing_logs);
                     }
-                } else if (warn_missing_logs && (!document.querySelector('.log-complete-link') || !state.mho_parameters.update_mho_digs)) {
+                }
+                else if (warn_missing_logs && (!document.querySelector('.log-complete-link') || !state.mho_parameters.update_mho_digs)) {
                     warn_missing_logs.remove();
                 }
-            } else if (update_external_tools_btn && (!(external_display_zone && pageIsHouse()) || !(amelios && pageIsAmelio()))) {
+            }
+            else if (update_external_tools_btn && (!(external_display_zone && pageIsHouse()) || !(amelios && pageIsAmelio()))) {
                 update_external_tools_btn.parentElement.remove();
-            } else if (!update_external_tools_btn && external_display_zone && count < 10) {
+            }
+            else if (!update_external_tools_btn && external_display_zone && count < 10) {
                 setTimeout(() => {
                     createUpdateExternalToolsButton(count + 1);
                 }, 250);
             }
         }
     }
-
     function createLargeUpdateExternalToolsButton(update_external_tools_btn) {
         let updater_bloc = document.createElement('div');
         updater_bloc.style.marginTop = '1em';
@@ -9563,64 +9657,64 @@
             update_external_tools_btn.innerHTML = `<img src="${repo_img_hordes_url}emotes/middot.gif">` + getI18N(texts.update_external_tools_pending_btn_label);
             updateExternalTools()
                 .then((response) => {
-                    if (response.mapResponseDto.bigBrothHordesStatus.toLowerCase() === 'ok')
-                        setStorageItem(gm_bbh_updated_key, true);
-                    if (response.mapResponseDto.gestHordesApiStatus.toLowerCase() === 'ok' || response.mapResponseDto.gestHordesCellsStatus.toLowerCase() === 'ok')
-                        setStorageItem(gm_gh_updated_key, true);
-                    if (response.mapResponseDto.fataMorganaStatus.toLowerCase() === 'ok')
-                        setStorageItem(gm_fata_updated_key, true);
-                    if (response.mapResponseDto.mhoApiStatus.toLowerCase() === 'ok')
-                        setStorageItem(gm_mho_updated_key, true);
-                    let tools_fail = [];
-                    let response_items = Object.keys(response).map((key) => {
-                        return {key: key, value: response[key]};
+                if (response.mapResponseDto.bigBrothHordesStatus.toLowerCase() === 'ok')
+                    setStorageItem(gm_bbh_updated_key, true);
+                if (response.mapResponseDto.gestHordesApiStatus.toLowerCase() === 'ok' || response.mapResponseDto.gestHordesCellsStatus.toLowerCase() === 'ok')
+                    setStorageItem(gm_gh_updated_key, true);
+                if (response.mapResponseDto.fataMorganaStatus.toLowerCase() === 'ok')
+                    setStorageItem(gm_fata_updated_key, true);
+                if (response.mapResponseDto.mhoApiStatus.toLowerCase() === 'ok')
+                    setStorageItem(gm_mho_updated_key, true);
+                let tools_fail = [];
+                let response_items = Object.keys(response).map((key) => {
+                    return { key: key, value: response[key] };
+                });
+                response_items.forEach((response_item, index) => {
+                    let final = Object.keys(response_item.value).map((key) => {
+                        return { key: key, value: response_item.value[key] };
                     });
-                    response_items.forEach((response_item, index) => {
-                        let final = Object.keys(response_item.value).map((key) => {
-                            return {key: key, value: response_item.value[key]};
-                        });
-                        tools_fail = [...tools_fail, ...final.filter((final_item) => !final_item.value || (final_item.value.toLowerCase() !== 'ok' && final_item.value.toLowerCase() !== 'not activated'))];
-                        if (index >= response_items.length - 1) {
-                            update_external_tools_btn.innerText = '';
-                            if (tools_fail.length === 0) {
-                                let icon = document.createElement('img');
-                                icon.src = `${repo_img_hordes_url}icons/done.png`;
-                                update_external_tools_btn.appendChild(icon);
-                                let text = document.createElement('text');
-                                text.innerText = getI18N(texts.update_external_tools_success_btn_label);
-                                update_external_tools_btn.appendChild(text);
-                            } else {
-                                let icon = document.createElement('img');
-                                icon.src = `${repo_img_hordes_url}emotes/warning.gif`;
-                                update_external_tools_btn.appendChild(icon);
-                                let text = document.createElement('div');
-                                update_external_tools_btn.appendChild(text);
-                                tools_fail.forEach((tool_fail) => {
-                                    let tool_text = document.createElement('div');
-                                    tool_text.innerText = tool_text.key.replace('Status', tool_text.value);
-                                    text.appendChild(tool_fail);
-                                });
-                            }
+                    tools_fail = [...tools_fail, ...final.filter((final_item) => !final_item.value || (final_item.value.toLowerCase() !== 'ok' && final_item.value.toLowerCase() !== 'not activated'))];
+                    if (index >= response_items.length - 1) {
+                        update_external_tools_btn.innerText = '';
+                        if (tools_fail.length === 0) {
+                            let icon = document.createElement('img');
+                            icon.src = `${repo_img_hordes_url}icons/done.png`;
+                            update_external_tools_btn.appendChild(icon);
+                            let text = document.createElement('text');
+                            text.innerText = getI18N(texts.update_external_tools_success_btn_label);
+                            update_external_tools_btn.appendChild(text);
                         }
-                    });
-                    if (tools_fail.length > 0) {
-                        console.error(`Erreur lors de la mise à jour de l'un des outils`, response);
+                        else {
+                            let icon = document.createElement('img');
+                            icon.src = `${repo_img_hordes_url}emotes/warning.gif`;
+                            update_external_tools_btn.appendChild(icon);
+                            let text = document.createElement('div');
+                            update_external_tools_btn.appendChild(text);
+                            tools_fail.forEach((tool_fail) => {
+                                let tool_text = document.createElement('div');
+                                tool_text.innerText = tool_text.key.replace('Status', tool_text.value);
+                                text.appendChild(tool_fail);
+                            });
+                        }
+                    }
+                });
+                if (tools_fail.length > 0) {
+                    console.error(`Erreur lors de la mise à jour de l'un des outils`, response);
                 }
             })
                 .catch((e) => {
-                    update_external_tools_btn.innerText = '';
-                    let icon = document.createElement('img');
-                    icon.src = `${repo_img_hordes_url}professions/death.gif`;
-                    update_external_tools_btn.appendChild(icon);
-                    let text = document.createElement('text');
-                    text.innerText = getI18N(texts.update_external_tools_fail_btn_label);
-                    update_external_tools_btn.appendChild(text);
-                });
+                update_external_tools_btn.innerText = '';
+                let icon = document.createElement('img');
+                icon.src = `${repo_img_hordes_url}professions/death.gif`;
+                update_external_tools_btn.appendChild(icon);
+                let text = document.createElement('text');
+                text.innerText = getI18N(texts.update_external_tools_fail_btn_label);
+                update_external_tools_btn.appendChild(text);
+            });
         });
         updater_bloc.appendChild(update_external_tools_btn);
         return updater_bloc;
     }
-
     function createSmallUpdateExternalToolsButton(update_external_tools_btn) {
         update_external_tools_btn = document.createElement('button');
         update_external_tools_btn.innerHTML = `<img src="${mh_optimizer_icon}" height="16" width="16"><img src="${repo_img_hordes_url}emotes/arrowright.gif" height="16">`;
@@ -9632,7 +9726,8 @@
             external_tools_btn_tooltip.id = 'external-tools-btn-tooltip';
             external_tools_btn_tooltip.classList.add('tooltip', 'help', 'mho');
             tooltips_container.appendChild(external_tools_btn_tooltip);
-        } else {
+        }
+        else {
             external_tools_btn_tooltip.innerHTML = undefined;
         }
         let title = document.createElement('div');
@@ -9657,39 +9752,39 @@
             status_div.innerText = getI18N(texts.update_external_tools_pending_btn_label);
             updateExternalTools()
                 .then((response) => {
-                    if (response.mapResponseDto.bigBrothHordesStatus.toLowerCase() === 'ok')
-                        setStorageItem(gm_bbh_updated_key, true);
-                    if (response.mapResponseDto.gestHordesApiStatus.toLowerCase() === 'ok' || response.mapResponseDto.gestHordesCellsStatus.toLowerCase() === 'ok')
-                        setStorageItem(gm_gh_updated_key, true);
-                    if (response.mapResponseDto.fataMorganaStatus.toLowerCase() === 'ok')
-                        setStorageItem(gm_fata_updated_key, true);
-                    if (response.mapResponseDto.mhoApiStatus.toLowerCase() === 'ok')
-                        setStorageItem(gm_mho_updated_key, true);
-                    let tools_fail = [];
-                    let response_items = Object.keys(response).map((key) => {
-                        return {key: key, value: response[key]};
+                if (response.mapResponseDto.bigBrothHordesStatus.toLowerCase() === 'ok')
+                    setStorageItem(gm_bbh_updated_key, true);
+                if (response.mapResponseDto.gestHordesApiStatus.toLowerCase() === 'ok' || response.mapResponseDto.gestHordesCellsStatus.toLowerCase() === 'ok')
+                    setStorageItem(gm_gh_updated_key, true);
+                if (response.mapResponseDto.fataMorganaStatus.toLowerCase() === 'ok')
+                    setStorageItem(gm_fata_updated_key, true);
+                if (response.mapResponseDto.mhoApiStatus.toLowerCase() === 'ok')
+                    setStorageItem(gm_mho_updated_key, true);
+                let tools_fail = [];
+                let response_items = Object.keys(response).map((key) => {
+                    return { key: key, value: response[key] };
+                });
+                response_items.forEach((response_item, index) => {
+                    let final = Object.keys(response_item.value).map((key) => {
+                        return { key: key, value: response_item.value[key] };
                     });
-                    response_items.forEach((response_item, index) => {
-                        let final = Object.keys(response_item.value).map((key) => {
-                            return {key: key, value: response_item.value[key]};
-                        });
-                        tools_fail = [...tools_fail, ...final.filter((final_item) => !final_item.value || (final_item.value.toLowerCase() !== 'ok' && final_item.value.toLowerCase() !== 'not activated'))];
-                        if (index >= response_items.length - 1) {
-                            update_external_tools_btn.innerHTML = tools_fail.length === 0
-                                ? `<img src="${mh_optimizer_icon}" height="16" width="16"><img src="${repo_img_hordes_url}icons/done.png" height="16">`
-                                : `<img src="${mh_optimizer_icon}" height="16" width="16"><img src="${repo_img_hordes_url}emotes/warning.gif" height="16">`;
-                            status_div.innerHTML = tools_fail.length === 0 ? getI18N(texts.update_external_tools_success_btn_label)
-                                : `${getI18N(texts.update_external_tools_errors_btn_label)}<br>${tools_fail.map((item) => item.key.replace('Status', ` : ${item.value}`)).join('<br>')}`;
-                        }
-                    });
-                    if (tools_fail.length > 0) {
-                        console.error(`Erreur lors de la mise à jour de l'un des outils`, response);
+                    tools_fail = [...tools_fail, ...final.filter((final_item) => !final_item.value || (final_item.value.toLowerCase() !== 'ok' && final_item.value.toLowerCase() !== 'not activated'))];
+                    if (index >= response_items.length - 1) {
+                        update_external_tools_btn.innerHTML = tools_fail.length === 0
+                            ? `<img src="${mh_optimizer_icon}" height="16" width="16"><img src="${repo_img_hordes_url}icons/done.png" height="16">`
+                            : `<img src="${mh_optimizer_icon}" height="16" width="16"><img src="${repo_img_hordes_url}emotes/warning.gif" height="16">`;
+                        status_div.innerHTML = tools_fail.length === 0 ? getI18N(texts.update_external_tools_success_btn_label)
+                            : `${getI18N(texts.update_external_tools_errors_btn_label)}<br>${tools_fail.map((item) => item.key.replace('Status', ` : ${item.value}`)).join('<br>')}`;
                     }
+                });
+                if (tools_fail.length > 0) {
+                    console.error(`Erreur lors de la mise à jour de l'un des outils`, response);
+                }
             })
                 .catch((error) => {
-                    console.error(`Erreur lors de la mise à jour de l'un des outils`, error);
-                    update_external_tools_btn.innerHTML = `<img src="${mh_optimizer_icon}" height="16" width="16"><img src="${repo_img_hordes_url}professions/death.gif" height="16">`;
-                    status_div.innerText = getI18N(texts.update_external_tools_fail_btn_label);
+                console.error(`Erreur lors de la mise à jour de l'un des outils`, error);
+                update_external_tools_btn.innerHTML = `<img src="${mh_optimizer_icon}" height="16" width="16"><img src="${repo_img_hordes_url}professions/death.gif" height="16">`;
+                status_div.innerText = getI18N(texts.update_external_tools_fail_btn_label);
             });
         });
         return update_external_tools_btn;
@@ -9701,7 +9796,8 @@
                 .then((response) => {
                 if (response.status === 200) {
                     return response.json();
-                } else {
+                }
+                else {
                     return convertResponsePromiseToError(response);
                 }
             })
@@ -9711,9 +9807,9 @@
                     today_attack: undefined,
                     tomorrow_attack: undefined
                 };
-                    getApofooAttackCalculation(state.mh_user.townDetails?.day, false).then((today_result) => {
+                getApofooAttackCalculation(state.mh_user.townDetails?.day, false).then((today_result) => {
                     estimations.today_attack = today_result;
-                        getApofooAttackCalculation(state.mh_user.townDetails?.day + 1, false).then((tomorrow_result) => {
+                    getApofooAttackCalculation(state.mh_user.townDetails?.day + 1, false).then((tomorrow_result) => {
                         estimations.tomorrow_attack = tomorrow_result;
                         resolve(estimations);
                     });
@@ -9725,14 +9821,14 @@
             });
         });
     }
-
     function getApofooAttackCalculation(day, beta) {
         return new Promise((resolve, reject) => {
             fetcher(state.api_url + `/attaqueEstimation/apofooAttackCalculation${beta ? '/beta' : ''}?day=${day}&townId=${state.mh_user.townDetails?.townId}`)
                 .then((response) => {
                 if (response.status === 200) {
                     return response.json();
-                } else {
+                }
+                else {
                     return convertResponsePromiseToError(response);
                 }
             })
@@ -9745,22 +9841,21 @@
             });
         });
     }
-
     function saveEstimations(estim_value, planif_value) {
         return new Promise((resolve, reject) => {
             getEstimations().then((estimations) => {
-                let new_estimations = {...estimations.estimations};
+                let new_estimations = { ...estimations.estimations };
                 if (estim_value && estim_value.value && (estim_value.value.min || estim_value.value.max)) {
                     /** Workaround pour définir sur l'extension firefox sans passer par cloneinto */
-                    let new_estimations_workaround_estim = {...new_estimations.estim};
-                    new_estimations_workaround_estim['_' + estim_value.percent] = {...estim_value.value};
-                    new_estimations.estim = {...new_estimations_workaround_estim};
+                    let new_estimations_workaround_estim = { ...new_estimations.estim };
+                    new_estimations_workaround_estim['_' + estim_value.percent] = { ...estim_value.value };
+                    new_estimations.estim = { ...new_estimations_workaround_estim };
                 }
                 if (planif_value && planif_value.value && (planif_value.value.min || planif_value.value.max)) {
                     /** Workaround pour définir sur l'extension firefox sans passer par cloneinto */
-                    let new_estimations_workaround_planif = {...new_estimations.planif};
-                    new_estimations_workaround_planif['_' + planif_value.percent] = {...planif_value.value};
-                    new_estimations.planif = {...new_estimations_workaround_planif};
+                    let new_estimations_workaround_planif = { ...new_estimations.planif };
+                    new_estimations_workaround_planif['_' + planif_value.percent] = { ...planif_value.value };
+                    new_estimations.planif = { ...new_estimations_workaround_planif };
                 }
                 fetcher(state.api_url + `/AttaqueEstimation/Estimations?townId=${state.mh_user.townDetails?.townId}&userId=${state.mh_user.id}`, {
                     method: 'POST',
@@ -9772,7 +9867,8 @@
                     .then((response) => {
                     if (response.status === 200) {
                         return response.text();
-                    } else {
+                    }
+                    else {
                         return convertResponsePromiseToError(response);
                     }
                 })
@@ -9818,12 +9914,12 @@
                 let updateEstimationRow = (estimations, percent, type) => {
                     if (!estimations.estimations[type][`_${percent}`]) {
                         /** Workaround pour définir sur l'extension firefox sans passer par cloneinto */
-                        let estimations_workaround_estim = {...estimations.estimations};
-                        let estimations_workaround_type = {...estimations_workaround_estim[type]};
-                        let estimations_workaround_type_percent = {min: null, max: null};
-                        estimations_workaround_type[`_${percent}`] = {...estimations_workaround_type_percent};
-                        estimations_workaround_estim[type] = {...estimations_workaround_type};
-                        estimations.estimations = {...estimations_workaround_estim};
+                        let estimations_workaround_estim = { ...estimations.estimations };
+                        let estimations_workaround_type = { ...estimations_workaround_estim[type] };
+                        let estimations_workaround_type_percent = { min: null, max: null };
+                        estimations_workaround_type[`_${percent}`] = { ...estimations_workaround_type_percent };
+                        estimations_workaround_estim[type] = { ...estimations_workaround_type };
+                        estimations.estimations = { ...estimations_workaround_estim };
                     }
                     let estimation = estimations.estimations[type][`_${percent}`];
                     let main = document.querySelector(`#${mho_watchtower_estim_id}`);
@@ -9847,7 +9943,8 @@
                                 calc_attack.firstElementChild.innerText = estimations.today_attack.result.min;
                                 calc_attack.lastElementChild.innerText = estimations.today_attack.result.max;
                             }
-                        } else {
+                        }
+                        else {
                             if (calc_attack) {
                                 calc_attack.firstElementChild.innerText = estimations.tomorrow_attack.result.min;
                                 calc_attack.lastElementChild.innerText = estimations.tomorrow_attack.result.max;
@@ -9856,7 +9953,7 @@
                     }
                 };
                 getEstimations().then((estimations) => {
-                    estimations = {...estimations};
+                    estimations = { ...estimations };
                     estim_block = document.createElement('div');
                     estim_block.style.marginTop = '1em';
                     estim_block.style.padding = '0.25em';
@@ -9897,20 +9994,20 @@
                             }
                         })
                             .then(() => {
-                                estim_block_title_save_button.innerHTML = `<img src="${repo_img_hordes_url}icons/done.png">`;
-                                getEstimations().then((new_saved_estimations) => {
-                                    updateCalculatedAttackRow(new_saved_estimations, 'estim');
-                                    updateCalculatedAttackRow(new_saved_estimations, 'planif');
-                                    TDG_VALUES.forEach((percent) => {
-                                        updateEstimationRow(new_saved_estimations, percent, 'estim');
-                                    });
-                                    if (watchtower_planif_block && watchtower_planif_block_prediction) {
-                                        PLANIF_VALUES.forEach((percent) => {
-                                            updateEstimationRow(new_saved_estimations, percent, 'planif');
-                                        });
-                                    }
+                            estim_block_title_save_button.innerHTML = `<img src="${repo_img_hordes_url}icons/done.png">`;
+                            getEstimations().then((new_saved_estimations) => {
+                                updateCalculatedAttackRow(new_saved_estimations, 'estim');
+                                updateCalculatedAttackRow(new_saved_estimations, 'planif');
+                                TDG_VALUES.forEach((percent) => {
+                                    updateEstimationRow(new_saved_estimations, percent, 'estim');
                                 });
+                                if (watchtower_planif_block && watchtower_planif_block_prediction) {
+                                    PLANIF_VALUES.forEach((percent) => {
+                                        updateEstimationRow(new_saved_estimations, percent, 'planif');
+                                    });
+                                }
                             });
+                        });
                     });
                     let estim_block_title_share_button = document.createElement('button');
                     estim_block_title_share_button.style.flex = '0';
@@ -9931,7 +10028,8 @@
                                 const value = saved_estimations.estimations.estim['_' + value_key];
                                 if (value && (value.min || value.max)) {
                                     text += `[b][${value_key}%][/b] ${value.min || '?'} - ${value.max || '?'} :zombie:\n`;
-                                } else {
+                                }
+                                else {
                                     text += `[b][${value_key}%][/b] \n`;
                                 }
                             });
@@ -9976,13 +10074,13 @@
                         } : undefined;
                         if (!estimations.estimations.estim['_' + value]) {
                             /** Workaround pour définir sur l'extension firefox sans passer par cloneinto */
-                            let new_estimations = {...estimations};
-                            let new_estimations_estimations = {...new_estimations.estimations};
-                            let new_estimations_estimations_estim = {...new_estimations_estimations.estim};
-                            new_estimations_estimations_estim['_' + value] = {min: null, max: null};
-                            new_estimations_estimations.estim = {...new_estimations_estimations_estim};
-                            new_estimations.estimations = {...new_estimations_estimations};
-                            estimations = {...new_estimations};
+                            let new_estimations = { ...estimations };
+                            let new_estimations_estimations = { ...new_estimations.estimations };
+                            let new_estimations_estimations_estim = { ...new_estimations_estimations.estim };
+                            new_estimations_estimations_estim['_' + value] = { min: null, max: null };
+                            new_estimations_estimations.estim = { ...new_estimations_estimations_estim };
+                            new_estimations.estimations = { ...new_estimations_estimations };
+                            estimations = { ...new_estimations };
                         }
                         let value_block = document.createElement('div');
                         value_block.style.display = 'flex';
@@ -10024,13 +10122,13 @@
                             } : undefined;
                             if (!estimations.estimations.planif['_' + value]) {
                                 /** Workaround pour définir sur l'extension firefox sans passer par cloneinto */
-                                let new_estimations = {...estimations};
-                                let new_estimations_estimations = {...new_estimations.estimations};
-                                let new_estimations_estimations_planif = {...new_estimations_estimations.planif};
-                                new_estimations_estimations_planif['_' + value] = {min: null, max: null};
-                                new_estimations_estimations.planif = {...new_estimations_estimations_planif};
-                                new_estimations.estimations = {...new_estimations_estimations};
-                                estimations = {...new_estimations};
+                                let new_estimations = { ...estimations };
+                                let new_estimations_estimations = { ...new_estimations.estimations };
+                                let new_estimations_estimations_planif = { ...new_estimations_estimations.planif };
+                                new_estimations_estimations_planif['_' + value] = { min: null, max: null };
+                                new_estimations_estimations.planif = { ...new_estimations_estimations_planif };
+                                new_estimations.estimations = { ...new_estimations_estimations };
+                                estimations = { ...new_estimations };
                             }
                             let value_block = document.createElement('div');
                             value_block.style.display = 'flex';
@@ -10077,7 +10175,8 @@
                             clearInterval(interval);
                             notifyOnSearchEnd();
                         }, 10000);
-                    } else {
+                    }
+                    else {
                         let timeout_counter = countdown / 2 * 1000;
                         setTimeout(() => {
                             clearInterval(interval);
@@ -10085,13 +10184,13 @@
                         }, timeout_counter);
                     }
                 }
-            } else {
+            }
+            else {
                 clearInterval(interval);
                 notifyOnSearchEnd();
             }
         }, 250);
     }
-
     /** Affiche le nombre de zombies morts aujourd'hui */
     function displayNbDeadZombies() {
         if (state.mho_parameters.display_nb_dead_zombies && pageIsDesert()) {
@@ -10099,7 +10198,8 @@
                 setTimeout(() => {
                     displayNbDeadZombies();
                 }, 100);
-            } else {
+            }
+            else {
                 let zone_dist = document.querySelectorAll(`.zone-dist:not(#${zone_info_zombies_id})`)[0];
                 if (zone_dist) {
                     let zone_info_zombies = document.getElementById(zone_info_zombies_id);
@@ -10128,7 +10228,8 @@
                         despair_deaths_text.innerHTML = `${getI18N(texts.nb_despair_deaths)} : <b id="${despair_deaths_id}">${despair_deaths}</span>`;
                         rows_container_info_zombies.appendChild(despair_deaths_text);
                         zone_dist.parentNode.appendChild(zone_info_zombies);
-                    } else {
+                    }
+                    else {
                         let nb_dead_zombies_element = document.getElementById(nb_dead_zombies_id);
                         nb_dead_zombies_element.innerText = (nb_dead_zombies);
                         let despair_deaths_element = document.getElementById(despair_deaths_id);
@@ -10136,7 +10237,8 @@
                     }
                 }
             }
-        } else {
+        }
+        else {
             let zone_info_zombies = document.getElementById(zone_info_zombies_id);
             if (zone_info_zombies) {
                 zone_info_zombies.remove();
@@ -10154,7 +10256,6 @@
         }, 500);
         displayEstimationsOnWatchtower();
     }
-
     function initOptionsWithoutLoginNeeded() {
         createWikiToolsWindow();
         preventFromLeaving();
@@ -10182,9 +10283,8 @@
         sortOmniscienceList();
         // blockUsersPosts();
     }
-
     function updateFetchRequestOptions(options) {
-        const update = {...options};
+        const update = { ...options };
         update.headers = {
             ...update.headers,
             'Mho-Origin': 'mho-addon',
@@ -10192,7 +10292,8 @@
         };
         if (isValidToken()) {
             update.headers.Authorization = `Bearer ${state.token.token.accessToken?.toString()}`;
-        } else {
+        }
+        else {
             getToken().then(() => {
                 if (isValidToken()) {
                     update.headers.Authorization = `Bearer ${state.token.token.accessToken?.toString()}`;
@@ -10201,9 +10302,8 @@
         }
         return update;
     }
-
     function updateFetchRequestOptionsWithoutBearer(options) {
-        const update = {...options};
+        const update = { ...options };
         update.headers = {
             ...update.headers,
             'Mho-Origin': 'mho-addon',
@@ -10211,15 +10311,12 @@
         };
         return update;
     }
-
     function fetcher(url, options) {
         return fetch(url, updateFetchRequestOptions(options));
     }
-
     function fetcherWithoutBearer(url, options) {
         return fetch(url, updateFetchRequestOptionsWithoutBearer(options));
     }
-
     /**
      * Copie un texte
      * @param {string} le texte à copier
@@ -10241,7 +10338,8 @@
                     .then((response) => {
                     if (response.status === 200) {
                         return response.text();
-                    } else {
+                    }
+                    else {
                         return convertResponsePromiseToError(response);
                     }
                 })
@@ -10253,7 +10351,8 @@
                                 state.external_app_id = manual_app_id_key;
                                 setStorageItem(gm_mh_external_app_id_key, state.external_app_id);
                                 resolve(state.external_app_id);
-                            } else {
+                            }
+                            else {
                                 reject(response);
                             }
                         }
@@ -10266,10 +10365,12 @@
                             state.external_app_id = id.value;
                             setStorageItem(gm_mh_external_app_id_key, state.external_app_id);
                             resolve(state.external_app_id);
-                        } else {
+                        }
+                        else {
                             manual();
                         }
-                    } else {
+                    }
+                    else {
                         manual();
                     }
                 })
@@ -10277,7 +10378,8 @@
                     reject(error);
                     addError(error);
                 });
-            } else {
+            }
+            else {
                 resolve(state.external_app_id);
             }
         });
@@ -10287,21 +10389,22 @@
         return new Promise((resolve, reject) => {
             fetcherWithoutBearer(state.api_url + '/parameters/parameters')
                 .then((response) => {
-                    if (response.status === 200) {
-                        return response.json();
-                    } else {
-                        return convertResponsePromiseToError(response);
-                    }
-                })
+                if (response.status === 200) {
+                    return response.json();
+                }
+                else {
+                    return convertResponsePromiseToError(response);
+                }
+            })
                 .then((response) => {
-                    state.parameters = response;
-                    isScriptVersionLastVersion();
-                    resolve();
-                })
+                state.parameters = response;
+                isScriptVersionLastVersion();
+                resolve();
+            })
                 .catch((error) => {
-                    addError(error);
-                    reject(error);
-                });
+                addError(error);
+                reject(error);
+            });
         });
     }
 
@@ -10311,10 +10414,12 @@
         if (is_mh_beta) {
             state.website = `https://myhordes-optimizer-beta.web.app/`;
             state.api_url = `https://api.myhordesoptimizer.fr/beta`;
-        } else if (is_mh_local) {
+        }
+        else if (is_mh_local) {
             state.website = `http://localhost:4200/`;
             state.api_url = `http://localhost:5001`;
-        } else {
+        }
+        else {
             state.website = `https://myhordes-optimizer.web.app/`;
             state.api_url = `https://api.myhordesoptimizer.fr`;
         }
@@ -10364,11 +10469,6 @@
         });
         copy_button_parent.appendChild(copy_button);
     }
-
-    ///////////
-    // STYLE //
-    ///////////
-    /** Add styles to this page */
 
     /** Create Optimize button */
     function createOptimizerBtn() {
@@ -10429,7 +10529,8 @@
                             optimizer_btn.addEventListener('mouseout', () => {
                                 optimizer_btn.classList.remove('mho-btn-opened');
                             });
-                        } else {
+                        }
+                        else {
                             optimizer_btn.addEventListener('mouseenter', () => {
                                 optimizer_btn.classList.add('mho-btn-opened');
                             });
@@ -10448,10 +10549,9 @@
         };
         const apps_exists_observer = new MutationObserver(apps_exists_callback);
         const mh_content = document.querySelector('#content'); // ou un autre élément parent approprié
-        const apps_exists_config = {childList: true, subtree: false, attributes: false};
+        const apps_exists_config = { childList: true, subtree: false, attributes: false };
         apps_exists_observer.observe(mh_content, apps_exists_config);
     }
-
     /** Crée le contenu du bouton de l'optimizer (bouton de wiki, bouton de configuration, etc) */
     function createOptimizerButtonContent() {
         let optimizer_btn = buttonOptimizerElement();
@@ -10517,7 +10617,8 @@
             content.appendChild(informations_container);
             toggleNewChangelog(state.has_new_changelog);
             isScriptVersionLastVersion();
-        } else {
+        }
+        else {
             let no_external_app_id = document.createElement('div');
             no_external_app_id.innerHTML = getI18N(texts.external_app_id_help);
             content.appendChild(no_external_app_id);
@@ -10551,7 +10652,7 @@
             }
         };
         const observer = new MutationObserver(callback);
-        const config = {attributes: true, subtree: false, childList: false};
+        const config = { attributes: true, subtree: false, childList: false };
         observer.observe(postbox, config);
     }
 
@@ -10977,7 +11078,7 @@
             margin: 0.25em 0;
             padding: 0.25em 0;
         }
-        .mho-tooltip-translations .tooltip-translation {
+        .brown-tag {
             display: flex;
             flex-direction: row;
             gap: 0.5em;
@@ -11165,6 +11266,16 @@
             white-space: nowrap;
         }
     `;
+        let anti_abuse = `
+        .mho-anti-abuse-counter-content {
+            border-bottom: 1px solid #ddab76;
+            display: flex;
+            gap: 0.25em;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            padding: calc(0.25em - 2px) 0 0.25em;
+        }
+    `;
         let multi_select = `
         .mho-checkbox-dropdown-panel {
             display: none;
@@ -11232,6 +11343,118 @@
             transform: translateY(-50%);
         }
     `;
+        const mho_changelog_modal = `
+        .mho-changelog-modal-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.65);
+        }
+        .mho-changelog-modal-box {
+            background: url(${repo_img_hordes_url}background/box/panel_00.gif) 0 0 no-repeat,
+                        url(${repo_img_hordes_url}background/box/panel_02.gif) 100% 0 no-repeat,
+                        url(${repo_img_hordes_url}background/box/panel_20.gif) 0 100% no-repeat,
+                        url(${repo_img_hordes_url}background/box/panel_22.gif) 100% 100% no-repeat,
+                        url(${repo_img_hordes_url}background/box/panel_01.gif) 0 0 repeat-x,
+                        url(${repo_img_hordes_url}background/box/panel_10.gif) 0 0 repeat-y,
+                        url(${repo_img_hordes_url}background/box/panel_12.gif) 100% 0 repeat-y,
+                        url(${repo_img_hordes_url}background/box/panel_21.gif) 0 100% repeat-x,
+                        #7e4d2a;
+            border-radius: 12px;
+            box-shadow: 0 0 20px #000;
+            color: #f0d79e;
+            display: flex;
+            flex-direction: column;
+            max-height: 80vh;
+            max-width: 600px;
+            min-width: 320px;
+            padding: 1em 1.5em;
+            gap: 0.75em;
+        }
+        .mho-changelog-modal-title {
+            color: #fff;
+            font-family: Trebuchet MS, Arial, Verdana, sans-serif;
+            font-variant: small-caps;
+            margin: 0;
+            border-bottom: 1px solid #ddab76;
+            padding-bottom: 0.5em;
+        }
+        .mho-changelog-modal-body {
+            flex: 1;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-break: break-word;
+            font-family: Trebuchet MS, Arial, Verdana, sans-serif;
+            font-size: 0.9em;
+            margin: 0;
+            color: #f0d79e;
+        }
+        .mho-changelog-modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            border-top: 1px solid #ddab76;
+            padding-top: 0.5em;
+        }
+        .mho-changelog-modal-btn {
+            background-color: #5c2b20;
+            border: 1px solid #f0d79e;
+            color: #f0d79e;
+            cursor: pointer;
+            font-family: Trebuchet MS, Arial, Verdana, sans-serif;
+            font-variant: small-caps;
+            padding: 0.25em 1.5em;
+        }
+        .mho-changelog-modal-btn:hover {
+            background-color: #7e4d2a;
+            outline: 1px solid #f0d79e;
+        }
+        .mho-changelog-history-toggle {
+            color: #ddab76;
+            cursor: pointer;
+            font-family: Trebuchet MS, Arial, Verdana, sans-serif;
+            font-size: 0.85em;
+            font-variant: small-caps;
+            text-decoration: underline dotted;
+            user-select: none;
+        }
+        .mho-changelog-history-toggle:hover {
+            color: #f0d79e;
+        }
+        .mho-changelog-history-section {
+            border-top: 1px solid #7e4d2a;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75em;
+            max-height: 35vh;
+            overflow-y: auto;
+            padding-top: 0.5em;
+        }
+        .mho-changelog-history-block {
+            border-bottom: 1px dotted #7e4d2a;
+            padding-bottom: 0.5em;
+        }
+        .mho-changelog-history-block:last-child {
+            border-bottom: none;
+        }
+        .mho-changelog-history-version {
+            color: #ddab76;
+            font-family: Trebuchet MS, Arial, Verdana, sans-serif;
+            font-variant: small-caps;
+            font-size: 0.9em;
+            margin: 0 0 0.25em 0;
+        }
+        .mho-changelog-history-body {
+            color: #c8a870;
+            font-family: Trebuchet MS, Arial, Verdana, sans-serif;
+            font-size: 0.8em;
+            margin: 0;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+    `;
         let css = params_style + btn_style + mho_window_style + new_changelog + new_version
             + mho_window_style_tabs + tab_content_style + tab_content_item_list_style + tab_content_item_list_item_style + tab_content_item_list_item_selected_style + tab_content_item_list_item_not_selected_properties_style + item_category
             + parameters_informations_ul_style + li_style + recipe_style + input_number_webkit_style + input_number_firefox_style
@@ -11239,20 +11462,17 @@
             + item_title_style + add_to_wishlist_button_img_style + advanced_tooltip + item_list_element_style
             + wishlist_label + wishlist_header + wishlist_header_cell + wishlist_cols + wishlist_delete + wishlist_in_app + wishlist_in_app_item + wishlist_even
             + item_priority + item_tags
-            + display_map_btn + mho_map_td + mho_ruin_td + dotted_background + empty_bat_before_after + empty_bat_after + camping_spaced_label + hidden + sort_arrow + multi_select + mho_filters;
+            + display_map_btn + mho_map_td + mho_ruin_td + dotted_background + empty_bat_before_after + empty_bat_after + camping_spaced_label + hidden + sort_arrow + multi_select + mho_filters
+            + mho_changelog_modal + anti_abuse;
         let style = document.createElement('style');
         if (style.styleSheet) {
             style.styleSheet.cssText = css;
-        } else {
+        }
+        else {
             style.appendChild(document.createTextNode(css));
         }
         document.getElementsByTagName('head')[0].appendChild(style);
     }
-
-    ////////////////////////////
-    // Appels outils externes //
-    ////////////////////////////
-    /** Récupère la carte de GH */
 
     bootstrap();
     ///////////////////////////
@@ -11273,21 +11493,24 @@
                 block_copy_map_button = 'ul_infos_1';
                 block_copy_ruin_button = 'cl1';
                 source = 'bbh';
-            } else if (document.URL.startsWith(gest_hordes_url) || document.URL.startsWith(gest_hordes_old_url)) {
+            }
+            else if (document.URL.startsWith(gest_hordes_url) || document.URL.startsWith(gest_hordes_old_url)) {
                 current_key = gm_gh_updated_key;
                 map_block_id = 'zoneCarte';
                 ruin_block_id = 'carteRuine';
                 block_copy_map_button = 'zoneInfoVilleAutre';
                 block_copy_ruin_button = 'menuRuine';
                 source = 'gh';
-            } else if (document.URL.startsWith(fata_morgana_url)) {
+            }
+            else if (document.URL.startsWith(fata_morgana_url)) {
                 current_key = gm_fata_updated_key;
                 map_block_id = 'map';
                 ruin_block_id = 'ruinmap';
                 block_copy_map_button = 'modeBar';
                 block_copy_ruin_button = 'modeBar';
                 source = 'fm';
-            } else if (document.URL.startsWith(state.website)) {
+            }
+            else if (document.URL.startsWith(state.website)) {
                 current_key = gm_mho_updated_key;
                 source = 'mho';
             }
@@ -11298,16 +11521,20 @@
                         setStorageItem(current_key, false);
                         if (current_key === gm_bbh_updated_key && state.mho_parameters.refresh_bbh_after_update) {
                             location.reload();
-                        } else if (current_key === gm_gh_updated_key && state.mho_parameters.refresh_gh_after_update) {
+                        }
+                        else if (current_key === gm_gh_updated_key && state.mho_parameters.refresh_gh_after_update) {
                             const refresh_btn = document.querySelector('#zoneRefresh');
                             if (refresh_btn) {
                                 refresh_btn.click();
-                            } else {
+                            }
+                            else {
                                 location.reload();
                             }
-                        } else if (current_key === gm_fata_updated_key && state.mho_parameters.refresh_fm_after_update) {
+                        }
+                        else if (current_key === gm_fata_updated_key && state.mho_parameters.refresh_fm_after_update) {
                             location.reload();
-                        } else if (current_key === gm_mho_updated_key && state.mho_parameters.refresh_mho_after_update) {
+                        }
+                        else if (current_key === gm_mho_updated_key && state.mho_parameters.refresh_mho_after_update) {
                             location.reload();
                         }
                     }
@@ -11321,18 +11548,22 @@
                     if (map_block || ruin_block) {
                         if (ruin_block) {
                             createCopyButton(source, 'ruin', ruin_block_id, block_copy_ruin_button);
-                        } else if (map_block) {
+                        }
+                        else if (map_block) {
                             createCopyButton(source, 'map', map_block_id, block_copy_map_button);
                         }
                     }
-                } else if (!state.mho_parameters.display_map && copy_button) {
+                }
+                else if (!state.mho_parameters.display_map && copy_button) {
                     copy_button.remove();
                     clearInterval(interval);
-                } else {
+                }
+                else {
                     clearInterval(interval);
                 }
             }, 1000);
-        } else {
+        }
+        else {
             /** Vérifie si la version est nouvelle ou non */
             getStorageItem(mho_version_key).then((version) => {
                 toggleNewChangelog(isNewVersion(version));
@@ -11355,7 +11586,8 @@
                                         initOptionsWithLoginNeeded();
                                         initOptionsWithoutLoginNeeded();
                                     });
-                                } else {
+                                }
+                                else {
                                     initOptionsWithLoginNeeded();
                                     initOptionsWithoutLoginNeeded();
                                 }
@@ -11369,7 +11601,7 @@
                                     target: document.documentElement,
                                     events: [ /*'sig-inventory-bag-loaded', 'sig-inventory-changed', 'sig-inventory-changed-b', 'sig-inventory-changed-headless', 'sig-log-changed', 'sig-map-changed', 'sig-web-navigation'*/]
                                 },
-                            ].forEach(({target, events}) => {
+                            ].forEach(({ target, events }) => {
                                 events.forEach((event_name) => {
                                     target.addEventListener(event_name, handleEvent(event_name));
                                 });

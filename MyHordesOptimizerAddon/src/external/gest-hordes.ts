@@ -7,7 +7,7 @@ import {getStorageItem} from '../utils/storage';
 // untyped JS behaviour (no behaviour change, pure typing aid).
 const arrFrom = (x: any): any[] => Array.from(x);
 
-
+/** Récupère la carte de GH */
 export function getGHMap() {
     return new Promise<any>((resolve, reject) => {
         let getArrow = (arrow) => {
@@ -160,7 +160,6 @@ export function getGHMap() {
 
 
 /** Récupère la carte de Gest'Hordes */
-
 export function getGHRuin() {
     return new Promise<any>((resolve, reject) => {
         getStorageItem(mho_map_key).then((mho_map) => {
@@ -279,5 +278,3 @@ export function getGHRuin() {
     });
 }
 
-
-/** Récupère la carte de GH */

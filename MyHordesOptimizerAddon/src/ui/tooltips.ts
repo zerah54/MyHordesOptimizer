@@ -267,7 +267,7 @@ export function createAdvancedProperties(content, item, tooltip) {
     if (state.mho_parameters.enhanced_tooltips_item_translations) {
         let translations = '';
         supported_languages.filter((language) => language.value !== lang).forEach((language) => {
-            translations += `<div class="tooltip-translation"><span class="tooltip-translation-flag">${language.img}</span><span class="tooltip-translation-value">${item.label[language.value]}</span></div>`
+            translations += `<div class="brown-tag"><span class="tooltip-translation-flag">${language.img}</span><span class="tooltip-translation-value">${item.label[language.value]}</span></div>`
         });
         let item_translations = document.createElement('div');
         item_translations.classList.add('mho-tooltip-translations');

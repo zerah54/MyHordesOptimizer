@@ -12,7 +12,3 @@ export let fill_items_messages_pool = {
         {title: 'Hola', content: ':iloveu:'}
     ]
 }
-
-//////////////////////////////////
-// La liste des onglets du wiki //
-//////////////////////////////////

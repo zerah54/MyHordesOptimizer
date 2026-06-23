@@ -1,4 +1,5 @@
 import {mh_optimizer_map_window_id, mh_optimizer_window_id, repo_img_hordes_url} from '../config/constants';
+import {changelogs} from '../data/changelogs';
 import {tabs_list} from '../data/tabs';
 import {state} from '../state';
 import {displayBank, displayItems} from './bank';
@@ -6,6 +7,7 @@ import {displayCamping} from './camping';
 import {displayRecipes} from './recipes';
 import {displayRuins} from './ruins';
 import {getI18N} from '../utils/i18n';
+import {getScriptInfo} from '../utils/version';
 
 export function createWindow(id, full_size) {
     let window = document.querySelector(`#${id}`);
@@ -305,6 +307,101 @@ export function dispatchWikiToolsContent(window_type, tab) {
 
 export function filterItems(source_items) {
     return source_items;
+}
+
+/**
+ * Affiche une modale personnalisée avec le contenu du changelog et un bouton OK.
+ * Utilise une modale HTML/CSS au lieu de alert() pour éviter le blocage silencieux du navigateur.
+ * @param {string} content      Le texte du changelog à afficher
+ * @param {() => void} onConfirm  Callback appelé uniquement quand l'utilisateur clique OK
+ */
+export function showChangelogModal(content: string, onConfirm?: () => void): void {
+    const modal_id = 'mho-changelog-modal';
+
+    // Supprimer une éventuelle modale existante
+    document.getElementById(modal_id)?.remove();
+
+    const overlay = document.createElement('div');
+    overlay.id = modal_id;
+    overlay.classList.add('mho-changelog-modal-overlay');
+
+    const box = document.createElement('div');
+    box.classList.add('mho-changelog-modal-box');
+
+    const title = document.createElement('h3');
+    title.classList.add('mho-changelog-modal-title');
+    title.textContent = content.split('\n')[0].trim();
+
+    const body = document.createElement('pre');
+    body.classList.add('mho-changelog-modal-body');
+    body.textContent = content.split('\n').slice(1).map((line) => line.trim()).join('\n').trim();
+
+    // Lien pour afficher l'historique complet des versions passées
+    const current_version: string = getScriptInfo().version;
+    const older_versions = Object.entries(changelogs).filter(([v]) => v !== current_version);
+
+    if (older_versions.length > 0) {
+        const history_toggle = document.createElement('span');
+        history_toggle.classList.add('mho-changelog-history-toggle');
+        history_toggle.textContent = '▶ Voir les notes de versions plus anciennes';
+
+        const history_section = document.createElement('div');
+        history_section.classList.add('mho-changelog-history-section');
+        history_section.style.display = 'none';
+
+        older_versions.forEach(([version, notes]) => {
+            const version_block = document.createElement('div');
+            version_block.classList.add('mho-changelog-history-block');
+
+            const version_title = document.createElement('h4');
+            version_title.classList.add('mho-changelog-history-version');
+            version_title.textContent = `${getScriptInfo().name} ${version}`;
+
+            const version_body = document.createElement('pre');
+            version_body.classList.add('mho-changelog-history-body');
+            version_body.textContent = notes.split('\n').map((line) => line.trim()).join('\n').trim();
+
+            version_block.appendChild(version_title);
+            version_block.appendChild(version_body);
+            history_section.appendChild(version_block);
+        });
+
+        history_toggle.addEventListener('click', () => {
+            const is_open = history_section.style.display !== 'none';
+            history_section.style.display = is_open ? 'none' : 'block';
+            history_toggle.textContent = (is_open ? '▶' : '▼') + ' Voir les notes de versions plus anciennes';
+        });
+
+        box.appendChild(title);
+        box.appendChild(body);
+        box.appendChild(history_toggle);
+        box.appendChild(history_section);
+    } else {
+        box.appendChild(title);
+        box.appendChild(body);
+    }
+
+    const footer = document.createElement('div');
+    footer.classList.add('mho-changelog-modal-footer');
+
+    const ok_btn = document.createElement('button');
+    ok_btn.textContent = 'OK';
+    ok_btn.classList.add('mho-changelog-modal-btn');
+    ok_btn.addEventListener('click', () => {
+        overlay.remove();
+        if (onConfirm) onConfirm();
+    });
+
+    footer.appendChild(ok_btn);
+    box.appendChild(footer);
+    overlay.appendChild(box);
+
+    const post_office = document.getElementById('post-office');
+    if (post_office) {
+        post_office.parentNode.insertBefore(overlay, post_office.nextSibling);
+    } else {
+        document.body.appendChild(overlay);
+    }
 }
 
 /**

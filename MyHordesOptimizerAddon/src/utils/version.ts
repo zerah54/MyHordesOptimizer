@@ -4,6 +4,7 @@ import {state} from '../state';
 import {getI18N} from './i18n';
 import {buttonOptimizerElement} from './page';
 import {setStorageItem} from './storage';
+import {changelogs} from '../data/changelogs';
 
 export function convertResponsePromiseToError(response: any): Promise<any> {
     return response.text().then((text) => {
@@ -13,7 +14,6 @@ export function convertResponsePromiseToError(response: any): Promise<any> {
         throw error;
     })
 }
-
 
 export function getErrorFromApi(error) {
     if (error.name !== 'AbortError' && error.name !== 'TypeError') {
@@ -29,7 +29,6 @@ export function getErrorFromApi(error) {
         return error_text;
     }
 }
-
 
 export function isScriptVersionLastVersion() {
     if (!isScript()) return true;
@@ -51,7 +50,6 @@ export function isScriptVersionLastVersion() {
     });
 }
 
-
 export function isNewVersion(version) {
     if (!version || typeof version !== "object") {
         version = {};
@@ -59,7 +57,6 @@ export function isNewVersion(version) {
     }
     return !version || !version[getScriptInfo().version];
 }
-
 
 export function toggleNewChangelog(new_changelog) {
     state.has_new_changelog = new_changelog;
@@ -81,7 +78,6 @@ export function toggleNewChangelog(new_changelog) {
         }
     }
 }
-
 
 export function toggleNewVersion(new_version) {
     let optimizer_btn = buttonOptimizerElement();
@@ -109,15 +105,14 @@ export function toggleNewVersion(new_version) {
     }
 }
 
-
-export function getOrigin() {
+export function getOrigin(): 'script' | 'firefox' | 'chrome' {
     try {
         GM_info.script;
         return 'script';
     } catch (error) {
         try {
             browser.runtime;
-            return 'firerox';
+            return 'firefox';
         } catch (error) {
             try {
                 chrome.runtime;
@@ -129,11 +124,9 @@ export function getOrigin() {
     }
 }
 
-
-export function isScript() {
+export function isScript(): boolean {
     return getOrigin() === 'script';
 }
-
 
 export function getScriptInfo() {
     try {
@@ -153,7 +146,8 @@ export function getScriptInfo() {
 }
 
 export function getChangelog(): string {
-    return `${getScriptInfo().name} : Changelog pour la version ${getScriptInfo().version}\n\n`
-        + `[Correctif] La mise à jour de la carte de GH après une mise à jour des outils externes fonctionne de nouveau correctement sans recharger toute la page \n\n`
-        + `[Nouveauté] Deux nouvelles options permettent d'afficher des filtres sur les pages de liste des citoyens et d'omniscience`;
+    const version: string = getScriptInfo().version;
+    const content: string = changelogs[version] ?? `Aucune note de version disponible pour cette mise à jour.`;
+    return `${getScriptInfo().name} : Changelog pour la version ${version}
+        ${content}`;
 }

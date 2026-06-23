@@ -21,7 +21,6 @@ export function getTooltipItem(img, isStatus) {
     };
 }
 
-
 export function getClickedItem(target) {
     let item_icon = event.target.closest('span.item-icon') || event.target.previousElementSibling?.closest('span.item-icon') || event.target.previousElementSibling?.querySelector('span.item-icon');
     if (item_icon) {
@@ -31,7 +30,6 @@ export function getClickedItem(target) {
     }
 }
 
-
 export function getFixedImagePath(img_src) {
     const index = img_src.indexOf(hordes_img_url);
     if (index === -1) {
@@ -40,9 +38,9 @@ export function getFixedImagePath(img_src) {
     }
     return img_src
         .slice(index + hordes_img_url.length)
-        .replace(/\/(.+)\.(\w+?)\.(\w+?)$/, '/$1.$3');
+        .replace(/\/(.+)\.(\w+?)\.(\w+?)$/, '/$1.$3')
+        .replace('.b.', '.');
 }
-
 
 export function getItemFromImg(img_src) {
     if (img_src) {
@@ -50,7 +48,6 @@ export function getItemFromImg(img_src) {
         return state.items?.find((item) => item.img === img_path);
     }
 }
-
 
 export function getStatusFromImg(img_src) {
     if (img_src) {

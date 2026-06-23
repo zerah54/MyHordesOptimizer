@@ -1,10 +1,10 @@
 import {
-    btn_id,
-    mh_optimizer_map_window_id,
-    mho_display_expeditions_id,
-    mho_display_map_id,
-    mho_store_notifications_id,
-    repo_img_hordes_url
+ btn_id,
+ mh_optimizer_map_window_id,
+ mho_display_expeditions_id,
+ mho_display_map_id,
+ mho_store_notifications_id,
+ repo_img_hordes_url
 } from '../config/constants';
 
 export function createStyles() {
@@ -461,7 +461,7 @@ export function createStyles() {
             margin: 0.25em 0;
             padding: 0.25em 0;
         }
-        .mho-tooltip-translations .tooltip-translation {
+        .brown-tag {
             display: flex;
             flex-direction: row;
             gap: 0.5em;
@@ -663,6 +663,17 @@ export function createStyles() {
         }
     `;
 
+    let anti_abuse = `
+        .mho-anti-abuse-counter-content {
+            border-bottom: 1px solid #ddab76;
+            display: flex;
+            gap: 0.25em;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            padding: calc(0.25em - 2px) 0 0.25em;
+        }
+    `;
+
     let multi_select = `
         .mho-checkbox-dropdown-panel {
             display: none;
@@ -732,6 +743,119 @@ export function createStyles() {
         }
     `;
 
+    const mho_changelog_modal = `
+        .mho-changelog-modal-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.65);
+        }
+        .mho-changelog-modal-box {
+            background: url(${repo_img_hordes_url}background/box/panel_00.gif) 0 0 no-repeat,
+                        url(${repo_img_hordes_url}background/box/panel_02.gif) 100% 0 no-repeat,
+                        url(${repo_img_hordes_url}background/box/panel_20.gif) 0 100% no-repeat,
+                        url(${repo_img_hordes_url}background/box/panel_22.gif) 100% 100% no-repeat,
+                        url(${repo_img_hordes_url}background/box/panel_01.gif) 0 0 repeat-x,
+                        url(${repo_img_hordes_url}background/box/panel_10.gif) 0 0 repeat-y,
+                        url(${repo_img_hordes_url}background/box/panel_12.gif) 100% 0 repeat-y,
+                        url(${repo_img_hordes_url}background/box/panel_21.gif) 0 100% repeat-x,
+                        #7e4d2a;
+            border-radius: 12px;
+            box-shadow: 0 0 20px #000;
+            color: #f0d79e;
+            display: flex;
+            flex-direction: column;
+            max-height: 80vh;
+            max-width: 600px;
+            min-width: 320px;
+            padding: 1em 1.5em;
+            gap: 0.75em;
+        }
+        .mho-changelog-modal-title {
+            color: #fff;
+            font-family: Trebuchet MS, Arial, Verdana, sans-serif;
+            font-variant: small-caps;
+            margin: 0;
+            border-bottom: 1px solid #ddab76;
+            padding-bottom: 0.5em;
+        }
+        .mho-changelog-modal-body {
+            flex: 1;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-break: break-word;
+            font-family: Trebuchet MS, Arial, Verdana, sans-serif;
+            font-size: 0.9em;
+            margin: 0;
+            color: #f0d79e;
+        }
+        .mho-changelog-modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            border-top: 1px solid #ddab76;
+            padding-top: 0.5em;
+        }
+        .mho-changelog-modal-btn {
+            background-color: #5c2b20;
+            border: 1px solid #f0d79e;
+            color: #f0d79e;
+            cursor: pointer;
+            font-family: Trebuchet MS, Arial, Verdana, sans-serif;
+            font-variant: small-caps;
+            padding: 0.25em 1.5em;
+        }
+        .mho-changelog-modal-btn:hover {
+            background-color: #7e4d2a;
+            outline: 1px solid #f0d79e;
+        }
+        .mho-changelog-history-toggle {
+            color: #ddab76;
+            cursor: pointer;
+            font-family: Trebuchet MS, Arial, Verdana, sans-serif;
+            font-size: 0.85em;
+            font-variant: small-caps;
+            text-decoration: underline dotted;
+            user-select: none;
+        }
+        .mho-changelog-history-toggle:hover {
+            color: #f0d79e;
+        }
+        .mho-changelog-history-section {
+            border-top: 1px solid #7e4d2a;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75em;
+            max-height: 35vh;
+            overflow-y: auto;
+            padding-top: 0.5em;
+        }
+        .mho-changelog-history-block {
+            border-bottom: 1px dotted #7e4d2a;
+            padding-bottom: 0.5em;
+        }
+        .mho-changelog-history-block:last-child {
+            border-bottom: none;
+        }
+        .mho-changelog-history-version {
+            color: #ddab76;
+            font-family: Trebuchet MS, Arial, Verdana, sans-serif;
+            font-variant: small-caps;
+            font-size: 0.9em;
+            margin: 0 0 0.25em 0;
+        }
+        .mho-changelog-history-body {
+            color: #c8a870;
+            font-family: Trebuchet MS, Arial, Verdana, sans-serif;
+            font-size: 0.8em;
+            margin: 0;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+    `;
+
     let css = params_style + btn_style + mho_window_style + new_changelog + new_version
         + mho_window_style_tabs + tab_content_style + tab_content_item_list_style + tab_content_item_list_item_style + tab_content_item_list_item_selected_style + tab_content_item_list_item_not_selected_properties_style + item_category
         + parameters_informations_ul_style + li_style + recipe_style + input_number_webkit_style + input_number_firefox_style
@@ -739,7 +863,8 @@ export function createStyles() {
         + item_title_style + add_to_wishlist_button_img_style + advanced_tooltip + item_list_element_style
         + wishlist_label + wishlist_header + wishlist_header_cell + wishlist_cols + wishlist_delete + wishlist_in_app + wishlist_in_app_item + wishlist_even
         + item_priority + item_tags
-        + display_map_btn + mho_map_td + mho_ruin_td + dotted_background + empty_bat_before_after + empty_bat_after + camping_spaced_label + hidden + sort_arrow + multi_select + mho_filters;
+        + display_map_btn + mho_map_td + mho_ruin_td + dotted_background + empty_bat_before_after + empty_bat_after + camping_spaced_label + hidden + sort_arrow + multi_select + mho_filters
+        + mho_changelog_modal + anti_abuse;
 
     let style = document.createElement('style');
 
@@ -751,9 +876,3 @@ export function createStyles() {
 
     document.getElementsByTagName('head')[0].appendChild(style);
 }
-
-////////////////////////////
-// Appels outils externes //
-////////////////////////////
-
-/** Récupère la carte de GH */

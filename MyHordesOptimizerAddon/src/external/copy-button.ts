@@ -37,9 +37,3 @@ export function createCopyButton(source, map, map_id, button_block_id) {
     });
     copy_button_parent.appendChild(copy_button);
 }
-
-///////////
-// STYLE //
-///////////
-
-/** Add styles to this page */

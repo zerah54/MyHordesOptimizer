@@ -197,4 +197,3 @@ export function getBBHRuin() {
     });
 }
 
-/** Récupère la carte de FataMorgana */

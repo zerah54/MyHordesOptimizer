@@ -8,6 +8,7 @@ import {getStorageItem} from '../utils/storage';
 const arrFrom = (x: any): any[] => Array.from(x);
 
 
+/** Récupère la carte de FataMorgana */
 export function getFMMap() {
     return new Promise<any>((resolve, reject) => {
         let map_html = document.createElement('div');
@@ -56,7 +57,6 @@ export function getFMMap() {
 }
 
 /** Récupère la carte de FataMorgana */
-
 export function getFMRuin() {
     return new Promise<any>((resolve, reject) => {
         getStorageItem(mho_map_key).then((mho_map) => {
@@ -162,7 +162,3 @@ export function getFMRuin() {
         })
     });
 }
-
-////////////////
-// Appels API //
-////////////////

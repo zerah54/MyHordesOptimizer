@@ -144,7 +144,7 @@ export function displaySearchFieldOnBuildings() {
 
         let search_field = document.createElement('input');
         search_field.type = 'text';
-        search_field.placeholder = getI18N(params_categories.find((category) => category.id === 'display').params.find((param) => param.id === 'display_search_fields').children.find((child) => child.id === 'display_search_field_buildings').label);
+        search_field.placeholder = getI18N(params_categories.find((category) => category.id === 'display').params.find((param) => param.id === 'sort_and_filter').children.find((param) => param.id === 'display_search_fields').children.find((child) => child.id === 'display_search_field_buildings').label);
         search_field.classList.add('mho-input', 'inline');
         search_field.setAttribute('style', 'min-width: 200px; padding-left: 24px;');
         search_field_div.appendChild(search_field);
@@ -228,7 +228,7 @@ export function displaySearchFieldOnRecipientList() {
             search_field = document.createElement('input');
             search_field.type = 'text';
             search_field.id = mho_search_recipient_field_id;
-            search_field.placeholder = getI18N(params_categories.find((category) => category.id === 'display').params.find((param) => param.id === 'display_search_fields').children.find((child) => child.id === 'display_search_field_recipients').label);
+            search_field.placeholder = getI18N(params_categories.find((category) => category.id === 'display').params.find((param) => param.id === 'sort_and_filter').children.find((param) => param.id === 'display_search_fields').children.find((child) => child.id === 'display_search_field_recipients').label);
             search_field.classList.add('mho-input', 'inline');
             search_field.setAttribute('style', 'padding-left: 24px; margin-bottom: 0.25em;');
 
@@ -296,7 +296,7 @@ export function displaySearchFieldOnDump() {
 
                 search_field = document.createElement('input');
                 search_field.type = 'text';
-                search_field.placeholder = getI18N(params_categories.find((category) => category.id === 'display').params.find((param) => param.id === 'display_search_fields').children.find((child) => child.id === 'display_search_field_dump').label);
+                search_field.placeholder = getI18N(params_categories.find((category) => category.id === 'display').params.find((param) => param.id === 'sort_and_filter').children.find((param) => param.id === 'display_search_fields').children.find((child) => child.id === 'display_search_field_dump').label);
                 search_field.classList.add('mho-input', 'inline');
                 search_field.setAttribute('style', 'padding-left: 24px; margin-bottom: 0.25em;');
 

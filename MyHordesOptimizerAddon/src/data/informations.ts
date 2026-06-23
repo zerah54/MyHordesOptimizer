@@ -3,6 +3,7 @@ import {texts} from '../i18n/texts';
 import {state} from '../state';
 import {getI18N} from '../utils/i18n';
 import {getStorageItem, setStorageItem} from '../utils/storage';
+import {showChangelogModal} from '../ui/window';
 import {
     getChangelog,
     getScriptInfo,
@@ -27,11 +28,13 @@ export let informations: InformationDefinition[] = [
         action: () => {
             getStorageItem(mho_version_key).then((version) => {
                 if (isNewVersion(version)) {
-                    version[getScriptInfo().version] = confirm(getChangelog());
-                    toggleNewChangelog(!!version[getScriptInfo().version]);
-                    setStorageItem(mho_version_key, version);
+                    showChangelogModal(getChangelog(), () => {
+                        version[getScriptInfo().version] = true;
+                        toggleNewChangelog(false);
+                        setStorageItem(mho_version_key, version);
+                    });
                 } else {
-                    alert(getChangelog());
+                    showChangelogModal(getChangelog());
                 }
             });
         },
@@ -127,8 +130,3 @@ export const town_type = [
     {id: 'pande', label: {de: 'Pandämonium', en: 'Pandemonium', es: 'Pandemonio', fr: 'Pandémonium'}}
 ];
 
-/////////////////////////////////////////
-// Fonctions utiles / Useful functions //
-/////////////////////////////////////////
-
-/** @return {string}     website language */

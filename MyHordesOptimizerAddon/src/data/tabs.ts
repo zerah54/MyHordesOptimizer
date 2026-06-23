@@ -2,6 +2,9 @@ import {repo_img_hordes_url} from '../config/constants';
 
 import type {TabsList} from '../types';
 
+//////////////////////////////////
+// La liste des onglets du wiki //
+//////////////////////////////////
 export let tabs_list: TabsList = {
     wiki: [
         {
@@ -78,7 +81,3 @@ export let tabs_list: TabsList = {
     ]
 };
 
-
-//////////////////////////////////////////////
-// La liste des paramètres de l'application //
-//////////////////////////////////////////////

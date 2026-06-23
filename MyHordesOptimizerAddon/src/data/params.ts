@@ -1,5 +1,8 @@
 import type {ParamCategory} from '../types';
 
+//////////////////////////////////////////////
+// La liste des paramètres de l'application //
+//////////////////////////////////////////////
 export let params_categories: ParamCategory[] = [
     {
         id: `external_tools`,
