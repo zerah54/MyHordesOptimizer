@@ -258,28 +258,28 @@ export const texts = {
         es: `Faro`,
     },
     zombies_on_cell: {
-        en: `Number of zombies on the zone`,
-        fr: `Nombre de zombies sur la case`,
-        de: `Anzahl der Zombies auf der Zelle`,
-        es: `Cantidad de zombis en la zona`,
+        en: `Zombies on the zone`,
+        fr: `Zombies sur la case`,
+        de: `Zombies auf der Zelle`,
+        es: `Zombis en la zona`,
     },
     objects_in_bag: {
-        en: `Number of skins and tents in the bag`,
-        fr: `Nombre de pelures de peau et de toiles de tentes dans le sac`,
-        de: `Anzahl der Felle und Zelte in der Tasche`,
-        es: `Cantidad de pellejos humanos y telas de carpa en el bolso`,
+        en: `Skins and tents in the bag`,
+        fr: `Pelures et toiles dans le sac`,
+        de: `Felle und Zelte in der Tasche`,
+        es: `Pellejos y telas en el bolso`,
     },
     improve: {
-        en: `Number of simple improvements made on the zone (must subtract 3 after each attack)`,
-        fr: `Nombre d'améliorations simples faites sur la case (il faut en soustraire 3 après chaque attaque)`,
-        de: `Anzahl der einfachen Verbesserungen, die an der Zelle vorgenommen wurden (muss nach jedem Angriff 3 abziehen)`,
-        es: `Cantidad de mejoras simples hechas en la zona (hay que restar 3 luego de cada ataque)`,
+        en: `Simple improvements (must subtract 3 after each attack)`,
+        fr: `Améliorations simples (il faut en soustraire 3 après chaque attaque)`,
+        de: `Einfachen Verbesserungen (muss nach jedem Angriff 3 abziehen)`,
+        es: `Mejoras simples (hay que restar 3 luego de cada ataque)`,
     },
     object_improve: {
-        en: `Number of defense objects installed on the zone`,
-        fr: `Nombre d'objets de défense installés sur la case`,
-        de: `Anzahl der auf der Zelle installierten Verteidigungsobjekte`,
-        es: `Cantidad de objetos defensivos instalados en la zona`,
+        en: `Defense objects`,
+        fr: `Objets de défense`,
+        de: `Verteidigungsobjekte`,
+        es: `Objetos defensivos`,
     },
     camping_town: {
         en: `The town`,
@@ -545,6 +545,12 @@ export const texts = {
         de: 'ausgewählt',
         es: 'seleccionado(s)'
     },
+    camping_calculator: {
+        en: 'Camping calculator',
+        fr: 'Calculateur de camping',
+        de: 'Campingrechner',
+        es: 'Calculadora de camping'
+    }
 };
 
 export const status_texts = {

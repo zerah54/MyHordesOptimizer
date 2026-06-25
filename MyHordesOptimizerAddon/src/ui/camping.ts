@@ -27,6 +27,7 @@ export function displayCamping() {
             objects: 0,
             vest: false,
             tomb: false,
+            r4: false,
             zombies: 0,
             night: false,
             devastated: false,
@@ -198,6 +199,26 @@ export function displayCamping() {
         tomb_div.appendChild(tomb);
         tomb_div.appendChild(tomb_label);
 
+        /** R4 ? (impacte uniquement le maximum atteignable) */
+        let r4_div = document.createElement('div');
+        r4_div.classList.add('mho-camping-field');
+        my_info_content.appendChild(r4_div);
+
+        let r4_label = document.createElement('label');
+        r4_label.htmlFor = 'r4';
+        r4_label.innerText = 'R4';
+        let r4 = document.createElement('input');
+        r4.type = 'checkbox';
+        r4.id = 'r4';
+        r4.checked = conf.r4;
+        r4.classList.add('mho-input');
+        r4.addEventListener('change', ($event) => {
+            conf.r4 = $event.srcElement.checked;
+            calculateCamping(conf);
+        })
+        r4_div.appendChild(r4);
+        r4_div.appendChild(r4_label);
+
         /** Nombre de nuits déjà campées */
         let nb_campings_div = document.createElement('div');
         my_info_content.appendChild(nb_campings_div);
@@ -348,7 +369,7 @@ export function displayCamping() {
 
         let improve_label = document.createElement('label');
         improve_label.htmlFor = 'nb-improve';
-        improve_label.innerHTML = `<img src="${repo_img_hordes_url}icons/home_recycled.gif"> ${getI18N(texts.improve)}`;
+        improve_label.innerHTML = `<img src="${repo_img_hordes_url}icons/small_refine.gif"> ${getI18N(texts.improve)}`;
         improve_label.classList.add('spaced-label');
         let improve = document.createElement('input');
         improve.type = 'number';
@@ -368,7 +389,7 @@ export function displayCamping() {
 
         let object_improve_label = document.createElement('label');
         object_improve_label.htmlFor = 'nb-object-improve';
-        object_improve_label.innerHTML = `<img src="${repo_img_hordes_url}icons/home.gif"> ${getI18N(texts.object_improve)}`;
+        object_improve_label.innerHTML = `<img src="${repo_img_hordes_url}item/cat_def.gif"> ${getI18N(texts.object_improve)}`;
         object_improve_label.classList.add('spaced-label');
         let object_improve = document.createElement('input');
         object_improve.type = 'number';

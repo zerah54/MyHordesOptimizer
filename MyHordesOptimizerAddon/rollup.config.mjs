@@ -1,7 +1,23 @@
 import typescript from '@rollup/plugin-typescript';
 import {readFileSync} from 'fs';
+import * as sass from "sass";
 
 const banner = readFileSync('./src/header.txt', 'utf-8').trim();
+
+function cssAsRawString() {
+    return {
+        name: 'css-as-raw-string',
+        transform(code, id) {
+            if (!id.endsWith('.scss')) {
+                return null;
+            }
+            return {
+                code: `export default ${JSON.stringify(sass.compile(id).css)};`,
+                map: { mappings: '' }
+            };
+        }
+    };
+}
 
 export default {
     input: 'src/main.ts',
@@ -21,6 +37,7 @@ export default {
     // bundle is a 1:1 content match with the original, dead code included.
     treeshake: false,
     plugins: [
+        cssAsRawString(),
         typescript({tsconfig: './tsconfig.json'}),
     ],
     onwarn(warning, warn) {

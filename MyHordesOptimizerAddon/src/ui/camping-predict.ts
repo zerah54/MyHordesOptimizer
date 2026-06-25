@@ -1,12 +1,91 @@
-import {calculateCamping} from '../api/camping';
-import {getRuins} from '../api/ruins';
-import {mh_optimizer_icon, mho_camping_predict_id, repo_img_hordes_url} from '../config/constants';
-import {added_ruins} from '../data/informations';
-import {jobs, texts} from '../i18n/texts';
-import {state} from '../state';
-import {getI18N} from '../utils/i18n';
-import {pageIsDesert} from '../utils/page';
-import {getScriptInfo} from '../utils/version';
+import { calculateCamping } from '../api/camping';
+import { getRuins } from '../api/ruins';
+import { mh_optimizer_icon, mho_camping_predict_id, repo_img_hordes_url } from '../config/constants';
+import { added_ruins } from '../data/informations';
+import { jobs, texts } from '../i18n/texts';
+import { state } from '../state';
+import { getI18N } from '../utils/i18n';
+import { pageIsDesert } from '../utils/page';
+
+const stepper_minus_src: string = `${repo_img_hordes_url}icons/small_minus.gif`;
+const stepper_plus_src: string = `${repo_img_hordes_url}icons/small_more2.gif`;
+
+interface NumberFieldConfig {
+    readonly id: string;
+    readonly iconSrc: string;
+    readonly title: string;
+    readonly initialValue: number;
+    readonly minValue?: number;
+    readonly fieldId?: string;
+    readonly fullWidth?: boolean;
+    readonly onChange: (value: number) => void;
+}
+
+/**
+ * Crée un champ "input number" précédé d'une icône (avec title) et entouré
+ * de boutons +/- permettant d'incrémenter/décrémenter la valeur de 1.
+ */
+function createNumberField(config: NumberFieldConfig): HTMLDivElement {
+    const min_value: number = config.minValue ?? 0;
+
+    const field: HTMLDivElement = document.createElement('div');
+    field.classList.add('mho-camping-field');
+    if (config.fieldId) {
+        field.id = config.fieldId;
+    }
+    if (config.fullWidth) {
+        field.classList.add('mho-camping-field--full');
+    }
+
+    const label: HTMLLabelElement = document.createElement('label');
+    label.htmlFor = config.id;
+    label.innerHTML = `<img src="${config.iconSrc}" title="${config.title}">`;
+
+    const minus: HTMLImageElement = document.createElement('img');
+    minus.src = stepper_minus_src;
+    minus.alt = '-';
+    minus.classList.add('mho-camping-stepper-btn');
+
+    const input: HTMLInputElement = document.createElement('input');
+    input.type = 'number';
+    input.id = config.id;
+    input.value = String(config.initialValue);
+    input.min = String(min_value);
+    input.classList.add('mho-input', 'inline');
+
+    const plus: HTMLImageElement = document.createElement('img');
+    plus.src = stepper_plus_src;
+    plus.alt = '+';
+    plus.classList.add('mho-camping-stepper-btn');
+
+    const dispatch_change = (): void => {
+        input.dispatchEvent(new Event('change'));
+    };
+
+    minus.addEventListener('click', (_event: MouseEvent): void => {
+        const current: number = Number(input.value) || 0;
+        input.value = String(Math.max(min_value, current - 1));
+        dispatch_change();
+    });
+
+    plus.addEventListener('click', (_event: MouseEvent): void => {
+        const current: number = Number(input.value) || 0;
+        input.value = String(current + 1);
+        dispatch_change();
+    });
+
+    input.addEventListener('change', (event: Event): void => {
+        const target: HTMLInputElement = event.target as HTMLInputElement;
+        config.onChange(Number(target.value));
+    });
+
+    field.appendChild(label);
+    field.appendChild(minus);
+    field.appendChild(input);
+    field.appendChild(plus);
+
+    return field;
+}
 
 export function displayCampingPredict() {
     setTimeout(() => {
@@ -22,36 +101,41 @@ export function displayCampingPredict() {
 
                 let zone_camp_info = zone_camp.querySelector('.zone-camp-info');
                 let zone_camp_label = zone_camp.querySelector('label');
-                zone_camp_label.addEventListener('click', () => {
-                    camping_predict_container.style.display = camping_predict_container.style.display === 'none' ? 'block' : 'none';
-                    if (camping_predict_container.style.display !== 'none') {
-                        calculateCamping(conf);
-                    }
-                });
 
                 camping_predict_container = document.createElement('div');
                 camping_predict_container.id = mho_camping_predict_id;
-                camping_predict_container.style.border = '1px solid';
-                camping_predict_container.style.padding = '0.5em';
-                camping_predict_container.style.margin = '0.5em 0';
-
                 camping_predict_container.style.display = window.getComputedStyle(zone_camp_info).getPropertyValue('max-height') === '0px' ? 'none' : 'block';
                 zone_camp.appendChild(camping_predict_container);
 
+                zone_camp_label.addEventListener('click', () => {
+                    camping_predict_container.style.display = camping_predict_container.style.display === 'none' ? 'block' : 'none';
+                });
+
                 let updater_title = document.createElement('h5');
-                updater_title.style.marginTop = '0.5em';
+                updater_title.classList.add('mho-camping-title');
                 let updater_title_mho_img = document.createElement('img');
                 updater_title_mho_img.src = mh_optimizer_icon;
-                updater_title_mho_img.style.height = '24px';
-                updater_title_mho_img.style.marginRight = '0.5em';
                 updater_title.appendChild(updater_title_mho_img);
 
-                let updater_title_text = document.createElement('text');
-                updater_title_text.innerText = getScriptInfo().name;
-                updater_title_text.style.fontSize = '1.5em';
+                let updater_title_text = document.createElement('span');
+                updater_title_text.innerText = getI18N(texts.camping_calculator);
                 updater_title.appendChild(updater_title_text);
 
                 camping_predict_container.appendChild(updater_title);
+
+                let camping_predict_content = document.createElement('div');
+                camping_predict_content.classList.add('mho-camping-content');
+                camping_predict_content.style.display = 'none';
+                camping_predict_container.appendChild(camping_predict_content);
+
+                updater_title.addEventListener('click', () => {
+                    let is_hidden = camping_predict_content.style.display === 'none';
+                    camping_predict_content.style.display = is_hidden ? 'block' : 'none';
+                    camping_predict_container.classList.toggle('mho-camping-opened', is_hidden);
+                    if (is_hidden) {
+                        calculateCamping(conf);
+                    }
+                });
 
                 let zone_ruin = document.querySelector('.ruin-info b');
                 let ruin = '-1000';
@@ -68,6 +152,7 @@ export function displayCampingPredict() {
                     objects: 0,
                     vest: false,
                     tomb: false,
+                    r4: false,
                     zombies: document.querySelectorAll('.actor.zombie')?.length || 0,
                     night: !!document.querySelector('.map.night'),
                     devastated: state.mh_user.townDetails?.isDevaste,
@@ -80,38 +165,49 @@ export function displayCampingPredict() {
                     ruin: '-1000'
                 }
 
+                let columns_wrapper = document.createElement('div');
+                columns_wrapper.classList.add('mho-camping-columns');
+                camping_predict_content.appendChild(columns_wrapper);
+
                 let my_info = document.createElement('div');
-                camping_predict_container.appendChild(my_info);
+                my_info.classList.add('mho-camping-section', 'citizen');
+                columns_wrapper.appendChild(my_info);
 
                 let my_info_title = document.createElement('h3');
                 my_info_title.innerText = getI18N(texts.camping_citizen);
                 my_info.appendChild(my_info_title);
 
                 let my_info_content = document.createElement('div');
+                my_info_content.classList.add('mho-camping-section-content');
                 my_info.appendChild(my_info_content);
 
                 let town_info = document.createElement('div');
-                camping_predict_container.appendChild(town_info);
+                town_info.classList.add('mho-camping-section', 'town');
+                columns_wrapper.appendChild(town_info);
 
                 let town_info_title = document.createElement('h3');
                 town_info_title.innerText = getI18N(texts.camping_town);
                 town_info.appendChild(town_info_title);
 
                 let town_info_content = document.createElement('div');
+                town_info_content.classList.add('mho-camping-section-content');
                 town_info.appendChild(town_info_content);
 
                 let cell_info = document.createElement('div');
-                camping_predict_container.appendChild(cell_info);
+                cell_info.classList.add('mho-camping-section', 'zone');
+                columns_wrapper.appendChild(cell_info);
 
                 let cell_info_title = document.createElement('h3');
                 cell_info_title.innerText = getI18N(texts.camping_ruin);
                 cell_info.appendChild(cell_info_title);
 
                 let cell_info_content = document.createElement('div');
+                cell_info_content.classList.add('mho-camping-section-content');
                 cell_info.appendChild(cell_info_content);
 
                 let result = document.createElement('div');
-                camping_predict_container.appendChild(result);
+                result.classList.add('mho-camping-section');
+                camping_predict_content.appendChild(result);
 
                 let result_title = document.createElement('h3');
                 result_title.innerText = getI18N(texts.result);
@@ -124,12 +220,13 @@ export function displayCampingPredict() {
                 /** Capuche ? */
                 let vest_div = document.createElement('div');
                 vest_div.id = 'vest-field';
+                vest_div.classList.add('mho-camping-field');
                 vest_div.style.display = 'none';
                 my_info_content.appendChild(vest_div);
 
                 let vest_label = document.createElement('label');
                 vest_label.htmlFor = 'vest';
-                vest_label.innerHTML = `<img src="${repo_img_hordes_url}emotes/proscout.gif"> ${getI18N(texts.vest)}`;
+                vest_label.innerHTML = `<img src="${repo_img_hordes_url}emotes/proscout.gif" title="${getI18N(texts.vest)}">`;
                 let vest = document.createElement('input');
                 vest.type = 'checkbox';
                 vest.id = 'vest';
@@ -144,11 +241,12 @@ export function displayCampingPredict() {
 
                 /** Campeur pro ? */
                 let pro_camper_div = document.createElement('div');
+                pro_camper_div.classList.add('mho-camping-field');
                 my_info_content.appendChild(pro_camper_div);
 
                 let pro_camper_label = document.createElement('label');
                 pro_camper_label.htmlFor = 'pro';
-                pro_camper_label.innerHTML = `<img src="${repo_img_hordes_url}status/status_camper.gif"> ${getI18N(texts.pro_camper)}`;
+                pro_camper_label.innerHTML = `<img src="${repo_img_hordes_url}status/status_camper.gif" title="${getI18N(texts.pro_camper)}">`;
                 let pro_camper = document.createElement('input');
                 pro_camper.type = 'checkbox';
                 pro_camper.id = 'pro';
@@ -163,11 +261,12 @@ export function displayCampingPredict() {
 
                 /** Tombe ? */
                 let tomb_div = document.createElement('div');
+                tomb_div.classList.add('mho-camping-field');
                 my_info_content.appendChild(tomb_div);
 
                 let tomb_label = document.createElement('label');
                 tomb_label.htmlFor = 'tomb';
-                tomb_label.innerHTML = `<img src="${repo_img_hordes_url}building/small_cemetery.gif"> ${getI18N(texts.tomb)}`;
+                tomb_label.innerHTML = `<img src="${repo_img_hordes_url}building/small_cemetery.gif" title="${getI18N(texts.tomb)}">`;
                 let tomb = document.createElement('input');
                 tomb.type = 'checkbox';
                 tomb.id = 'tomb';
@@ -180,50 +279,60 @@ export function displayCampingPredict() {
                 tomb_div.appendChild(tomb);
                 tomb_div.appendChild(tomb_label);
 
-                /** Nombre de nuits déjà campées */
-                let nb_campings_div = document.createElement('div');
-                my_info_content.appendChild(nb_campings_div);
+                /** R4 ? (impacte uniquement le maximum atteignable) */
+                let r4_div = document.createElement('div');
+                r4_div.classList.add('mho-camping-field');
+                my_info_content.appendChild(r4_div);
 
-                let nb_campings_label = document.createElement('label');
-                nb_campings_label.htmlFor = 'nb-campings';
-                nb_campings_label.innerHTML = `<img src="${repo_img_hordes_url}emotes/sleep.gif"> ${getI18N(texts.nb_campings)}`;
-                nb_campings_label.classList.add('spaced-label');
-                let nb_campings = document.createElement('input');
-                nb_campings.type = 'number';
-                nb_campings.id = 'nb-campings';
-                nb_campings.value = (conf.campings) as any;
-                nb_campings.classList.add('mho-input', 'inline');
-                nb_campings.addEventListener('change', ($event) => {
-                    conf.campings = +$event.srcElement.value;
+                let r4_label = document.createElement('label');
+                r4_label.htmlFor = 'r4';
+                r4_label.innerText = 'R4';
+                let r4 = document.createElement('input');
+                r4.type = 'checkbox';
+                r4.id = 'r4';
+                r4.checked = conf.r4;
+                r4.classList.add('mho-input');
+                r4.addEventListener('change', ($event) => {
+                    conf.r4 = $event.srcElement.checked;
                     calculateCamping(conf);
                 })
-                nb_campings_div.appendChild(nb_campings_label);
-                nb_campings_div.appendChild(nb_campings);
+                r4_div.appendChild(r4);
+                r4_div.appendChild(r4_label);
+
+                /** Grille 2 colonnes pour les compteurs du bloc "Le citoyen" */
+                let citizen_numbers_grid: HTMLDivElement = document.createElement('div');
+                citizen_numbers_grid.classList.add('mho-camping-numbers-grid');
+                my_info_content.appendChild(citizen_numbers_grid);
+
+                /** Nombre de nuits déjà campées */
+                let nb_campings_field: HTMLDivElement = createNumberField({
+                    id: 'nb-campings',
+                    iconSrc: `${repo_img_hordes_url}emotes/sleep.gif`,
+                    title: getI18N(texts.nb_campings),
+                    initialValue: conf.campings,
+                    onChange: (value: number): void => {
+                        conf.campings = value;
+                        calculateCamping(conf);
+                    }
+                });
+                citizen_numbers_grid.appendChild(nb_campings_field);
 
                 /** Nombre de toiles de tente ou pelure de peau */
-                let objects_in_bag_div = document.createElement('div');
-                my_info_content.appendChild(objects_in_bag_div);
-
-                let objects_in_bag_label = document.createElement('label');
-                objects_in_bag_label.htmlFor = 'nb-objects';
-                objects_in_bag_label.innerText = getI18N(texts.objects_in_bag);
-                objects_in_bag_label.innerHTML = `<img src="${repo_img_hordes_url}emotes/bag.gif"> ${getI18N(texts.objects_in_bag)}`;
-                objects_in_bag_label.classList.add('spaced-label');
-                let objects_in_bag = document.createElement('input');
-                objects_in_bag.type = 'number';
-                objects_in_bag.id = 'nb-objects';
-                objects_in_bag.value = (conf.objects) as any;
-                objects_in_bag.classList.add('mho-input', 'inline');
-                objects_in_bag.addEventListener('change', ($event) => {
-                    conf.objects = +$event.srcElement.value;
-                    calculateCamping(conf);
-                })
-                objects_in_bag_div.appendChild(objects_in_bag_label);
-                objects_in_bag_div.appendChild(objects_in_bag);
-
+                let objects_in_bag_field: HTMLDivElement = createNumberField({
+                    id: 'nb-objects',
+                    iconSrc: `${repo_img_hordes_url}emotes/bag.gif`,
+                    title: getI18N(texts.objects_in_bag),
+                    initialValue: conf.objects,
+                    onChange: (value: number): void => {
+                        conf.objects = value;
+                        calculateCamping(conf);
+                    }
+                });
+                citizen_numbers_grid.appendChild(objects_in_bag_field);
 
                 /** Type de bâtiment */
                 let ruin_type_div = document.createElement('div');
+                ruin_type_div.classList.add('mho-camping-field', 'mho-camping-field--full');
                 cell_info_content.appendChild(ruin_type_div);
 
                 let select_ruin_label = document.createElement('label');
@@ -264,115 +373,86 @@ export function displayCampingPredict() {
                 ruin_type_div.appendChild(select_ruin);
 
                 /** Nombre de tas sur le bat ? */
-                let digs_div = document.createElement('div');
-                digs_div.id = 'digs-field'
-                digs_div.style.display = 'none'
-                cell_info_content.appendChild(digs_div);
+                let digs_field: HTMLDivElement = createNumberField({
+                    id: 'digs',
+                    fieldId: 'digs-field',
+                    fullWidth: true,
+                    iconSrc: `${repo_img_hordes_url}icons/uncover.gif`,
+                    title: getI18N(texts.digs),
+                    initialValue: conf.ruinBuryCount,
+                    onChange: (value: number): void => {
+                        conf.ruinBuryCount = value;
+                        calculateCamping(conf);
+                    }
+                });
+                digs_field.style.display = 'none';
+                cell_info_content.appendChild(digs_field);
 
-                let digs_label = document.createElement('label');
-                digs_label.htmlFor = 'digs';
-                digs_label.innerText = getI18N(texts.digs);
-                digs_label.innerHTML = `<img src="${repo_img_hordes_url}icons/uncover.gif"> ${getI18N(texts.digs)}`;
-                digs_label.classList.add('spaced-label');
-                let digs = document.createElement('input');
-                digs.type = 'number';
-                digs.id = 'digs';
-                digs.value = (conf.ruinBuryCount) as any;
-                digs.classList.add('mho-input', 'inline');
-                digs.addEventListener('change', ($event) => {
-                    conf.ruinBuryCount = +$event.srcElement.value;
-                    calculateCamping(conf);
-                })
-                digs_div.appendChild(digs_label);
-                digs_div.appendChild(digs);
+                /** Grille 2 colonnes pour les compteurs du bloc "Le bâtiment" */
+                let building_numbers_grid: HTMLDivElement = document.createElement('div');
+                building_numbers_grid.classList.add('mho-camping-numbers-grid');
+                cell_info_content.appendChild(building_numbers_grid);
 
                 /** Nombre de zombies sur la case */
-                let zombies_div = document.createElement('div');
-                cell_info_content.appendChild(zombies_div);
-
-                let zombies_label = document.createElement('label');
-                zombies_label.htmlFor = 'nb-zombies';
-                zombies_label.innerHTML = `<img src="${repo_img_hordes_url}emotes/zombie.gif"> ${getI18N(texts.zombies_on_cell)}`;
-                zombies_label.classList.add('spaced-label');
-                let zombies = document.createElement('input');
-                zombies.type = 'number';
-                zombies.id = 'nb-zombies';
-                zombies.value = (conf.zombies) as any;
-                zombies.classList.add('mho-input', 'inline');
-                zombies.addEventListener('change', ($event) => {
-                    conf.zombies = +$event.srcElement.value;
-                    calculateCamping(conf);
-                })
-                zombies_div.appendChild(zombies_label);
-                zombies_div.appendChild(zombies);
-
-                /** Nombre d'améliorations simples sur la case */
-                let improve_div = document.createElement('div');
-                cell_info_content.appendChild(improve_div);
-
-                let improve_label = document.createElement('label');
-                improve_label.htmlFor = 'nb-improve';
-                improve_label.innerHTML = `<img src="${repo_img_hordes_url}icons/home_recycled.gif"> ${getI18N(texts.improve)}`;
-                improve_label.classList.add('spaced-label');
-                let improve = document.createElement('input');
-                improve.type = 'number';
-                improve.id = 'nb-improve';
-                improve.value = (conf.improve) as any;
-                improve.classList.add('mho-input', 'inline');
-                improve.addEventListener('change', ($event) => {
-                    conf.improve = +$event.srcElement.value;
-                    calculateCamping(conf);
-                })
-                improve_div.appendChild(improve_label);
-                improve_div.appendChild(improve);
-
-                /** Nombre d'objets de campement installés sur la case */
-                let object_improve_div = document.createElement('div');
-                cell_info_content.appendChild(object_improve_div);
-
-                let object_improve_label = document.createElement('label');
-                object_improve_label.htmlFor = 'nb-object-improve';
-                object_improve_label.innerHTML = `<img src="${repo_img_hordes_url}icons/home.gif"> ${getI18N(texts.object_improve)}`;
-                object_improve_label.classList.add('spaced-label');
-                let object_improve = document.createElement('input');
-                object_improve.type = 'number';
-                object_improve.id = 'nb-object-improve';
-                object_improve.value = (conf.objectImprove) as any;
-                object_improve.classList.add('mho-input', 'inline');
-                object_improve.addEventListener('change', ($event) => {
-                    conf.objectImprove = +$event.srcElement.value;
-                    calculateCamping(conf);
-                })
-                object_improve_div.appendChild(object_improve_label);
-                object_improve_div.appendChild(object_improve);
+                let zombies_field: HTMLDivElement = createNumberField({
+                    id: 'nb-zombies',
+                    iconSrc: `${repo_img_hordes_url}emotes/zombie.gif`,
+                    title: getI18N(texts.zombies_on_cell),
+                    initialValue: conf.zombies,
+                    onChange: (value: number): void => {
+                        conf.zombies = value;
+                        calculateCamping(conf);
+                    }
+                });
+                building_numbers_grid.appendChild(zombies_field);
 
                 /** Nombre de personnes déjà cachées */
-                let hidden_campers_div = document.createElement('div');
-                cell_info_content.appendChild(hidden_campers_div);
+                let hidden_campers_field: HTMLDivElement = createNumberField({
+                    id: 'hidden-campers',
+                    iconSrc: `${repo_img_hordes_url}emotes/human.gif`,
+                    title: getI18N(texts.hidden_campers),
+                    initialValue: conf.hiddenCampers,
+                    onChange: (value: number): void => {
+                        conf.hiddenCampers = value;
+                        calculateCamping(conf);
+                    }
+                });
+                building_numbers_grid.appendChild(hidden_campers_field);
 
-                let hidden_campers_label = document.createElement('label');
-                hidden_campers_label.htmlFor = 'hidden-campers';
-                hidden_campers_label.innerHTML = `<img src="${repo_img_hordes_url}emotes/human.gif"> ${getI18N(texts.hidden_campers)}`;
-                hidden_campers_label.classList.add('spaced-label');
-                let hidden_campers = document.createElement('input');
-                hidden_campers.type = 'number';
-                hidden_campers.id = 'hidden-campers';
-                hidden_campers.value = (conf.hiddenCampers) as any;
-                hidden_campers.classList.add('mho-input', 'inline');
-                hidden_campers.addEventListener('change', ($event) => {
-                    conf.hiddenCampers = +$event.srcElement.value;
-                    calculateCamping(conf);
-                })
-                hidden_campers_div.appendChild(hidden_campers_label);
-                hidden_campers_div.appendChild(hidden_campers);
+                /** Nombre d'améliorations simples sur la case */
+                let improve_field: HTMLDivElement = createNumberField({
+                    id: 'nb-improve',
+                    iconSrc: `${repo_img_hordes_url}icons/small_refine.gif`,
+                    title: getI18N(texts.improve),
+                    initialValue: conf.improve,
+                    onChange: (value: number): void => {
+                        conf.improve = value;
+                        calculateCamping(conf);
+                    }
+                });
+                building_numbers_grid.appendChild(improve_field);
+
+                /** Nombre d'objets de campement installés sur la case */
+                let object_improve_field: HTMLDivElement = createNumberField({
+                    id: 'nb-object-improve',
+                    iconSrc: `${repo_img_hordes_url}item/cat_def.gif`,
+                    title: getI18N(texts.object_improve),
+                    initialValue: conf.objectImprove,
+                    onChange: (value: number): void => {
+                        conf.objectImprove = value;
+                        calculateCamping(conf);
+                    }
+                });
+                building_numbers_grid.appendChild(object_improve_field);
 
                 /** Nuit ? */
                 let night_div = document.createElement('div');
+                night_div.classList.add('mho-camping-field');
                 town_info_content.appendChild(night_div);
 
                 let night_label = document.createElement('label');
                 night_label.htmlFor = 'night';
-                night_label.innerHTML = `<img src="${repo_img_hordes_url}pictos/r_doutsd.gif"> ${getI18N(texts.night)}`;
+                night_label.innerHTML = `<img src="${repo_img_hordes_url}pictos/r_doutsd.gif" title="${getI18N(texts.night)}">`;
                 let night = document.createElement('input');
                 night.type = 'checkbox';
                 night.id = 'night';
@@ -387,12 +467,12 @@ export function displayCampingPredict() {
 
                 /** Phare construit ? */
                 let phare_div = document.createElement('div');
+                phare_div.classList.add('mho-camping-field');
                 town_info_content.appendChild(phare_div);
 
                 let phare_label = document.createElement('label');
                 phare_label.htmlFor = 'phare';
-                phare_label.innerText = getI18N(texts.phare);
-                phare_label.innerHTML = `<img src="${repo_img_hordes_url}building/small_lighthouse.gif"> ${getI18N(texts.phare)}`;
+                phare_label.innerHTML = `<img src="${repo_img_hordes_url}building/small_lighthouse.gif" title="${getI18N(texts.phare)}">`;
                 let phare = document.createElement('input');
                 phare.type = 'checkbox';
                 phare.id = 'phare';
@@ -405,9 +485,6 @@ export function displayCampingPredict() {
                 phare_div.appendChild(phare);
                 phare_div.appendChild(phare_label);
 
-                if (camping_predict_container.style.display !== 'none') {
-                    calculateCamping(conf);
-                }
             });
 
         } else if (camping_predict_container) {

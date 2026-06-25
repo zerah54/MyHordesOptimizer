@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MHO Addon
-// @version      1.1.44
+// @version      1.1.45
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/, rubrique Tutoriels
 // @author       Zerah
 //
@@ -296,15 +296,20 @@
     }
 
     const changelogs = {
+        '1.1.45': `
+        [Correction] Le compteur anti-abus ne fonctionnait pas correctement (mais on s'en rapproche de plus en plus !)
+
+        [Amélioration] Remise en forme du calculateur de camping intégré à la page
+    `,
         '1.1.44': `
-        [Correction] Les champs de recherche de la page de chantiers, de la page de veille et de la liste des destinataires ne fonctionnaient pas 
+        [Correction] Les champs de recherche de la page de chantiers, de la page de veille et de la liste des destinataires ne fonctionnaient pas
         [Correction] Le compteur anti-abus ne fonctionnait pas correctement (on croise les doigts pour que ce soit la bonne)
-        
+
         [Amélioration] L'affichage du changelog permet également de consulter les anciens changelogs
     `,
         '1.1.43': `
         [Correction] La mise à jour de la carte de GH après une mise à jour des outils externes fonctionne de nouveau correctement sans recharger toute la page
-        
+
         [Nouveauté] Deux nouvelles options permettent d'afficher des filtres sur les pages de liste des citoyens et d'omniscience
     `,
         '1.1.42': `
@@ -317,9 +322,9 @@
         '1.1.40': `
         [Correction] Fix de l'update des outils externes suite à la mise à jour de mi-saison
         [Correction] Affichage de la liste de courses dans la page
-        
+
         [Amélioration] Remaniement des options du script pour plus de clarté
-        
+
         [Nouveauté] Option pour trier la liste des citoyens et l'omniscience
     `,
         '1.1.39.0': `
@@ -336,18 +341,18 @@
     `,
         '1.1.35.0': `
         [Correction] Changement de comportement complet pour le tooltip amélioré pour en fluidifier et corriger l'usage. Merci Emmet pour le coup de main
-        
+
         [Amélioration] Affichage compact des recettes dans le tooltip amélioré
         [Amélioration] Ajout d'informations sur les propriétés des statuts et objets
-        
+
         [Nouveauté] Personnalisation des informations affichées dans le tooltip via des options distinctes (attention, ça désactive les options en question il faut les réactiver)
         [Nouveauté] Ajout de la traduction sur les tooltips des objets
     `,
         '1.1.34.0': `
         [Correction] Changement de comportement complet pour le tooltip amélioré pour en fluidifier et corriger l'usage. Merci Emmet pour le coup de main
-        
+
         [Amélioration] Affichage compact des recettes dans le tooltip amélioré
-        
+
         [Nouveauté] Personnalisation des informations affichées dans le tooltip via des options distinctes (attention, ça désactive les options en question il faut les réactiver)
         [Nouveauté] Ajout de la traduction sur les tooltips des objets
     `,
@@ -356,7 +361,7 @@
         [Correction] Correction des cas où le tooltip n'avait pas le conseil "shift" ou le bouton pour fermer une fois figé
         [Correction] Empêche de figer un tooltip qui n'a pas le conseil "shift" affiché
         [Correction] Meilleur affichage des boutons "Wiki" et "Outils" du tooltip
-        
+
         [Nouveauté] Personnalisation des informations affichées dans le tooltip via des options distinctes
         [Nouveauté] Ajout de la traduction sur les tooltips des objets
     `,
@@ -365,21 +370,21 @@
         [Correction] Correction des cas où le tooltip n'avait pas le conseil "shift" ou le bouton pour fermer une fois figé
         [Correction] Empêche de figer un tooltip qui n'a pas le conseil "shift" affiché
         [Correction] Meilleur affichage des boutons "Wiki" et "Outils" du tooltip
-        
+
         [Nouveauté] Personnalisation des informations affichées dans le tooltip via des options distinctes
         [Nouveauté] Ajout de la traduction sur les tooltips des objets
     `,
         '1.1.31.0': `
         [Correction] Changement de comportement complet pour le tooltip amélioré pour en fluidifier et corriger l'usage. Merci Emmet pour le coup de main
         [Correction] Meilleur affichage des boutons "Wiki" et "Outils" du tooltip
-        
+
         [Nouveauté] Personnalisation des informations affichées dans le tooltip via des options distinctes
         [Nouveauté] Ajout de la traduction sur les tooltips des objets
     `,
         '1.1.30.0': `
         [Correction] Changement de comportement complet pour le tooltip amélioré pour en fluidifier et corriger l'usage. Merci Emmet pour le coup de main
         [Correction] Meilleur affichage des boutons "Wiki" et "Outils" du tooltip
-        
+
         [Nouveauté] Personnalisation des informations affichées dans le tooltip via des options distinctes
         [Nouveauté] Ajout de la traduction sur les tooltips des objets
     `,
@@ -402,7 +407,7 @@
         [Correction] Le script fonctionne avec la nouvelle URL de gh
         [Correction] 429 quand on n'est pas en ville
         [Correction] Certains cas pour lesquels le sac ne s'ouvrait pas automatiquement avec l'option cochée
-        
+
         [Divers] Retrait de la mise à jour BBH (BBH ne fonctionne plus)
     `,
         '1.1.23.0': `
@@ -466,17 +471,17 @@
     `,
         '1.1.6.0': `
         [Correction] Affichage des PA manquants sur les chantiers en pandé
-        
+
         [Amélioration] Performances globales & stabilité
-        
+
         [Nouveauté] Il est possible d'afficher un compteur de caractères sur le chatcase
         [Nouveauté] Il est possible de relire les anciennes notifications (tant qu'on n'a pas refresh sa page)
     `,
         '1.1.5.0': `
         [Correction] Affichage des PA manquants sur les chantiers en pandé
-        
+
         [Amélioration] Performances globales & stabilité
-        
+
         [Nouveauté] Il est possible d'afficher un compteur de caractères sur le chatcase
         [Nouveauté] Il est possible de relire les anciennes notifications (tant qu'on n'a pas refresh sa page)
     `,
@@ -514,23 +519,23 @@
     `,
         '1.0.28.0': `
         [Correction] Correctif du calcul du camping sur la case
-        
-        
+
+
         html[lang]
         lang
         fr
     `,
         '1.0.27.0': `
         [Correction] Correctif du calcul du camping sur la case
-        
-        
+
+
         html[lang]
         lang
         fr
     `,
         '1.0.26.0': `
         [Correction] La copie du registre ne copie plus les lignes masquées par le filtre
-        
+
         [Modification] Retrait de la notion de "priorité" dans la liste de courses et affichage des couleurs en fonction de la position
     `,
         '1.0.25.0': `
@@ -561,9 +566,9 @@
     `,
         '1.0.17.0': `
         [Correction] La récupération automatique de l'identifiant externe est de nouveau disponible
-        
+
         [Amélioration] Diverses améliorations de performance (en tout cas on espère :D)
-        
+
         [Nouveauté] Ajout d'une option permettant de pré-remplir un message dans la maison quand vous souhaitez envoyer un objet et que le message est vide. Le message est pré-rempli avec des valeurs prises au hasard parmi celles dispo pour votre langue. Actuellement, il n'y a qu'un seul message par langue mais vous pouvez me faire vos suggestions pour que j'en ajoute ;)
         [Nouveauté] Ajout d'une option pour afficher en jeu les expéditions issues de MHO sur lesquelles vous êtes inscrit
     `,
@@ -573,39 +578,39 @@
         '1.0.15.0': `
         [Amélioration] Les mises à jour disponibles sont désormais signalées par un indicateur visuel et un nouveau lien fait son apparition dans le menu en cas de mise à jour disponible
         [Amélioration] Les changelogs ne sont plus affichés au chargement de l'application mais signalés par un indicateur visuel sur le menu
-        
+
         [Nouveauté] Une nouvelle option fait son apparition pour Fata Morgana : l'envoi du nombre de zombies tués
     `,
         '1.0.14.0': `
         [Correction] Traductions manquantes
         [Correction] Notification de fin de fouille
         [Correction] Divers bugs depuis la version 1.0.8.0
-        
+
         [Amélioration] Une nouvelle option est disponible pour mettre à jour Fata Morgana en ville dévastée
     `,
         '1.0.13.0': `
         [Correction] Traductions manquantes
         [Correction] Notification de fin de fouille
         [Correction] Divers bugs depuis la version 1.0.8.0
-        
+
         [Amélioration] Une nouvelle option est disponible pour mettre à jour Fata Morgana en ville dévastée
     `,
         '1.0.12.0': `
         [Correction] Traductions manquantes
         [Correction] Notification de fin de fouille
-        
+
         [Amélioration] Une nouvelle option est disponible pour mettre à jour Fata Morgana en ville dévastée
     `,
         '1.0.11.0': `
         [Correction] Traductions manquantes
         [Correction] Notification de fin de fouille
-        
+
         [Amélioration] Une nouvelle option est disponible pour mettre à jour Fata Morgana en ville dévastée
     `,
         '1.0.10.0': `
         [Correction] Traductions manquantes
         [Correction] Notification de fin de fouille
-        
+
         [Amélioration] Une nouvelle option est disponible pour mettre à jour Fata Morgana en ville dévastée
     `,
         '1.0.9.0': `
@@ -613,7 +618,7 @@
         [Correction] Correction d'un bug d'affichage des liens vers les profils externes des utilisateurs
         [Correction] Quelques corrections sur l'Anti-Abus (c'est pas fini, et j'ai l'impression de pas en voir le bout 🥲)
         [Correction] Correction d'un bug d'intégration avec Fata Morgana
-        
+
         [Suppression] Retrait de la fonctionnalité de notification lors d'un nouveau message, puisqu'elle existe maintenant nativement dans MyHordes
     `,
         '1.0.8.0': `
@@ -624,21 +629,21 @@
         [Correction] Correction d'un bug d'affichage des liens vers les profils externes des utilisateurs
         [Correction] Quelques corrections sur l'Anti-Abus (c'est pas fini, et j'ai l'impression de pas en voir le bout 🥲)
         [Correction] Correction d'un bug d'intégration avec Fata Morgana
-        
+
         [Suppression] Retrait de la fonctionnalité de notification lors d'un nouveau message, puisqu'elle existe maintenant nativement dans MyHordes
     `,
         '1.0.6.0': `
         [Correction] Affichage et enregistrement des estimations de la tour de guet dans l'extension Firefox
-        
+
         [Amélioration] Plus besoin d'appuyer sur Entrée pour démarrer une traduction, elle se lancera automatiquement à chaque recherche de plus de 2 lettres
         [Amélioration] Indicateur visuel sur le bouton de copie du registre quand la copie est effectuée
-        
+
         [Nouveauté] Ajout de liens vers les profils externes dans la popup d'un utilisateur
     `,
         '1.0.5.0': `
         [Correction] La première prise en banque ne compte de nouveau plus dans l'anti-abus
         [Correction] Traductions
-        
+
         [Nouveauté] Champs de recherche sur la page de décharge
         [Nouveauté] Affichage du % de voracité sur la jauge
     `,
@@ -656,28 +661,28 @@
         [Correction] Corrige l'affichage du loader sur les tooltips qui était en allemand alors qu'il ne devait pas avoir de texte
         [Correction] L'affichage du tooltip d'APAG est désormais plus propre
         [Correction] Corrige le calcul du camping qui prenait en compte la mauvaise valeur pour le bâtiment
-        
+
         [Nouveauté] Ajout d'un bouton pour cocher tous les paramètres
     `,
         '1.0.1.0': `
         Cette version contient des changements techniques importants. Pour cette raison, il faudra peut être remettre en place toutes vos options.
-        
+
         [Correction] Corrige le problème de chargement intempestif bloquant MyHordes.
-        
+
         [Amélioration] Ajout d'une option sur chaque outil externe pour choisir si on souhaite qu'il soit rafraîchi au changement d'onglet ou non. Si vous comptiez sur cette fonctionnalité qui était déjà en place, n'oubliez pas d'aller l'activer dans les options.
     `,
         '1.0.0.0': `
         Cette version contient des changements techniques importants. Pour cette raison, il faudra peut être remettre en place toutes vos options.
-        
+
         [Correction] Corrige le problème de chargement intempestif bloquant MyHordes.
-        
+
         [Amélioration] Ajout d'une option sur chaque outil externe pour choisir si on souhaite qu'il soit rafraîchi au changement d'onglet ou non. Si vous comptiez sur cette fonctionnalité qui était déjà en place, n'oubliez pas d'aller l'activer dans les options.
     `,
         '1.0.0': `
         Cette version contient des changements techniques importants. Pour cette raison, il faudra peut être remettre en place toutes vos options.
-        
+
         [Correction] Corrige le problème de chargement intempestif bloquant MyHordes.
-        
+
         [Amélioration] Ajout d'une option sur chaque outil externe pour choisir si on souhaite qu'il soit rafraîchi au changement d'onglet ou non. Si vous comptiez sur cette fonctionnalité qui était déjà en place, n'oubliez pas d'aller l'activer dans les options.
     `,
         '1.0.0-beta.73': `
@@ -688,18 +693,18 @@
         [Correction] Mise à jour du calculateur de camping en S16
         [Correction] Correction de l'affichage des réparations en pandemonium
         [Correction] Corrige la prise de ration dans l'anti-abus
-        
+
         [Amélioration] Le script ne devrait plus afficher plusieurs erreurs simultanées en cas de multiples appels en erreur en même temps
         [Amélioration] Les objets trouvables dans un bâtiment sont triés par probabilité
     `,
         '1.0.0-beta.71': `
         [Correction] Correction de l'affichage des informations complémentaires sur un bâtiment
-        
+
         [Amélioration] Mise en place de méthodes pour limiter le nombre d'appels à l'API MyHordes
     `,
         '1.0.0-beta.70': `
         [Correction] Correctifs de l'affichage des chantiers à réparer en pandé
-        
+
         [Amélioration] Les erreurs issues de MH sont désormais mieux gérées et affichées
         [Amélioration] Le bloc des informations complémentaires indique désormais les objets trouvables dans le bâtiment
     `,
@@ -710,30 +715,30 @@
     `,
         '1.0.0-beta.68': `
         [Correction] La copie du registre retire désormais les espaces en trop en début de ligne
-        
+
         [Amélioration] Les différents filtres ne tiennent désormais plus compte des accents
         [Amélioration] Amélioration visuelle du bloc d'informations complémentaires
-        
+
         [Nouveauté] Ajout d'un filtre pour masquer les chantiers terminés
     `,
         '1.0.0-beta.67': `
         [Correction] Correction d'un bug l'enregistrement de la valeur du 0 de la tdg
-        
+
         [Nouveauté] Un message sera désormais affiché au chargement du script si celui-ci n'est pas à sa version la plus récentes.
     `,
         '1.0.0-beta.66': `
         [Correction] Correction d'un bug l'enregistrement de la valeur du 0 de la tdg
-        
+
         [Nouveauté] Un message sera désormais affiché au chargement du script si celui-ci n'est pas à sa version la plus récentes.
     `,
         '1.0.0-beta.65': `
         [Correction] Correction d'un bug l'enregistrement de la valeur du 0 de la tdg
-        
+
         [Nouveauté] Un message sera désormais affiché au chargement du script si celui-ci n'est pas à sa version la plus récentes.
     `,
         '1.0.0-beta.64': `
         [Correction] Correction d'un bug l'enregistrement des valeurs de la tdg
-        
+
         [Amélioration] Tentative d'amélioration des tooltips pour afficher un scroll en cas de recettes
         [Amélioration] Le tooltip amélioré affiche désormais le lieu de dépose d'un objet de la liste de courses
         [Amélioration] La liste de course embarquée dans la page est désormais triée par priorité et n'affiche que les objets présents sur la case
@@ -753,13 +758,13 @@
     `,
         '1.0.0-beta.59': `
         Attention certains changements peuvent avoir impacté vos options sélectionnées, assurez-vous que tout est en ordre !
-        
+
         [Correction] Corrige l'affichage de certaines images qui ne s'affichaient pas toujours
         [Correction] Corrige la prise en compte du métier dans l'outil intégré de calcul de camping
-        
+
         [Amélioration] Réorganisation du menu dans lequel les options commençaient à prendre trop de place
         [Amélioration] Séparation de certaines options (mise à jour en ville dévastée et envoi du nombre de zombies tués / champs de recherches)
-        
+
         [Nouveauté] Ajout d'une option pour enregistrer les estimations de la TDG dans MHO, consulter les valeurs enregistrées et les copier pour le forum
         [Nouveauté] Ajout d'une option pour afficher un champ de recherche sur le registre
         [Nouveauté] Ajout d'une option pour choisir ses options d'escorte à appliquer à l'activation de l'attente d'escorte
@@ -767,16 +772,16 @@
     `,
         '1.0.0-beta.58': `
         [Correction] Corrige certains comportements du compteur anti-abus
-        
+
         [Nouveauté] Ajoute un bouton de copie du registre
-        
+
         [Remise en place] Réintègre l'option d'envoi des améliorations de maison. Un nouveau bouton sera créé sur la page des améliorations
     `,
         '1.0.0-beta.57': `
         [Correction] Corrige l'affichage du bouton de mise à jour sur petit écran si le mode compact n'est pas activé dans les options
         [Correction] Corrige certains comportements du compteur anti-abus
         [Correction] Devrait corriger l'affichage des images qui était parfois cassé
-        
+
         [Amélioration] Le bouton d'accès aux options du script est désormais aggrandi sur les petits écrans
     `,
         '1.0.0-beta.56': `
@@ -794,19 +799,19 @@
         '1.0.0-beta.52': `
         [Correction] Correction de l'affichage des tooltips améliorés suite à la mise à jour de MyHordes
         [Correction] Correction d'un bug de duplication des lignes des prises en banque dans l'outil de suivi de l'anti-abus
-        
+
         [Attention] Les améliorations de la maison ne sont plus envoyées à MHO et à GH suite à là mise à jour de MyHordes. J'essaierai de trouver une solution pour rétablir cette fonctionnalité mais sans certitudes.
     `,
         '1.0.0-beta.51': `
         [Correction] Correction de divers comportements
-        
+
         [Nouveauté] Ajout d'une option pour afficher un compteur de prises en banque
     `,
         '1.0.0-beta.50': `
         [Correction] Correction de divers comportements
-        
+
         [Amélioration] Devrait désormais fonctionner avec Greasemonkey
-        
+
         [Nouveauté] Ajout d'une option pour ouvrir automatiquement le menu "Utiliser un objet de son sac"
     `,
         '1.0.0-beta.49': `
@@ -833,14 +838,14 @@
     `,
         '1.0.0-beta.43': `
         [Correction] Ajout de traductions manquantes
-        
+
         [Amélioration] Une note est affichée sur la carte si l'option de fouilles est activée mais que les données de fouilles ne sont pas complètes (lignes du registre non chargées)
     `,
         '1.0.0-beta.42': `
         [Correction] Position de l'icône MHO
-        
+
         [Amélioration] Lors d'une mise à jour de GH, la page n'est plus intégralement rechargée, seulement sa carte
-        
+
         [Suppression] Suite à une discussion avec l'équipe de MyHordes (qui fait elle-même suite à une discussion intense sur le forum monde), la fonctionnalité d'informations complémentaires sur les citoyens - appelée par certains "Omniscience++" ou "O++" pour les plus flemmards - a été supprimée.
     `,
         '1.0.0-beta.41': `
@@ -849,7 +854,7 @@
         '1.0.0-beta.40': `
         [Amélioration] Traductions et wording divers
         [Amélioration] Regroupement des options de champs de recherches en une seule option
-        
+
         [Nouveauté] Ajout d'un simulateur de camping directement disponible sur la case
         [Nouveauté] Ajout d'une option permettant d'afficher des notes sur une case, issues de la carte de MHO
     `,
@@ -858,7 +863,7 @@
     `,
         '1.0.0-beta.38': `
         [MH][Correction] Le lien vers le site était invalide
-        
+
         [MH][Amélioration] Traductions espagnoles (merci Bacchus)
         [MH][Amélioration] La mise à jour de la liste de courses depuis la fenêtre "Outils" a été retirée et confiée explusivement au site
     `,
@@ -877,17 +882,17 @@
     `,
         '1.0.0-beta.33': `
         [MH][Correction] Correction du lien vers la doc utilisé dans tampermonkey
-        
+
         [MH][Amélioration] Déplacement du lien du site tout en haut de la liste des options (j'espère que cette fois tout le monde sera au courant qu'il existe 😊)
     `,
         '1.0.0-beta.32': `
         [MH][Correction] Correction des styles qui écrasaient les puces de MH dans les forums (désolée :( )
-        
+
         [MH][Amélioration] Ajout de traductions (anglaises et allemandes) - merci Xochi, Crazy Unicorn, Nekomine !
     `,
         '1.0.0-beta.31': `
         [MH][Correction] Digs => searches
-        
+
         [MH][Amélioration] Prise en compte de la quantité d'objets dans les sacs dans la liste de courses
     `,
         '1.0.0-beta.30': `
@@ -896,7 +901,7 @@
         '1.0.0-beta.29': `
         [MH][Amélioration] Replacement du bouton de suppression de l'id externe pour les apps par un bouton de modification
         [MH][Amélioration] Correctifs visuels sur la page d'informations complémentaires sur les citoyens
-        
+
         [MH][Nouveauté] Ajout d'une option pour remonter à MHO le résultat de vos fouilles. Des outils de lectures et de modification sont à votre disposition sur le site
     `,
         '1.0.0-beta.28': `
@@ -905,7 +910,7 @@
         '1.0.0-beta.27': `
         [MH-beta][Correction] Réparation de la liste des objets : le Serpent Agonisant n'existait pas dedans, ce qui provoquait des erreurs en cas de mise à jour avec un serpent agonisant
         [MH][Correction]La carte intégrée de GH est réparée (mais non, elle n'intègre toujours pas les expéditions)
-        
+
         [MH][Amélioration] La liste des citoyens améliorée, en ville, est désormais mieux organisée, et toujours rangée par ordre alphabétique. Contrepartie : elle est légèrement plus longue à charger
         [MH][Amélioration] Le Passage en Force fait désormais partie des AH enregistrées
     `,
@@ -917,7 +922,7 @@
     `,
         '1.0.0-beta.24': `
         [Correction] Remise en place de l'URL d'appels API qui avait disparue (magic everywhere)
-        
+
         [MH-beta] désactivation des appels vers BBH & Fata. Ils seront réactivés en cas d'existance d'une version compatible beta. Les options restent toujours visibles mais n'auront pas d'effet
     `,
         '1.0.0-beta.23': `
@@ -962,13 +967,13 @@
         '1.0.0-beta.10': `
         [Nouveauté] Il est désormais possible d'enregistrer le contenu de son sac via le bouton de mise à jour des outils externes. Les sacs sont consultables et modifiables depuis la liste des citoyens du site web de MHO.
         N'oubliez pas d'activer l'option associée depuis vos paramètres pour rendre cette mise à jour possible !
-        
+
         [Traductions] Merci à isaaclw qui nous a fourni quelques traductions en anglais ! Si vous voulez contribuer à la traduction, n'hésitez pas à rejoindre le discord, ou à me contacter en MP
     `,
         '1.0.0-beta.09': `
         [Nouveauté] Il est désormais possible d'enregistrer le contenu de son sac via le bouton de mise à jour des outils externes. Les sacs sont consultables et modifiables depuis la liste des citoyens du site web de MHO.
         N'oubliez pas d'activer l'option associée depuis vos paramètres pour rendre cette mise à jour possible !
-        
+
         [Traductions] Merci à isaaclw qui nous a fourni quelques traductions en anglais ! Si vous voulez contribuer à la traduction, n'hésitez pas à rejoindre le discord, ou à me contacter en MP
     `,
         '1.0.0-beta.08': `
@@ -981,13 +986,13 @@
     `,
         '1.0.0-beta.06': `
         [Correction] Correctif de l'enregistrement du nombre de zombies tués sur GH
-        
+
         [Important] Nous avons changé la structure de la base de données. Nous n'avons pas récupéré les listes de courses existantes. Si vous avez besoin de conserver votre liste de course, merci de nous contacter sur le discord de MHO pour qu'on vous la récupère.
     `,
         '1.0.0-beta.05': `
         [Nouveauté] Interface permettant de récupérer les évolutions de chaque citoyen (dans la page de citoyens)
         [Nouveauté] Nouvelle option permettant d'envoyer à GH le nombre de zombies tués sur la case afin de mettre des marqueurs zombies
-        
+
         [Important] Nous avons changé la structure de la base de données. Nous n'avons pas récupéré les listes de courses existantes. Si vous avez besoin de conserver votre liste de course, merci de nous contacter sur le discord de MHO pour qu'on vous la récupère.
     `,
         '1.0.0-beta.04': `
@@ -1031,17 +1036,17 @@
     `,
         '1.0.0-alpha.65': `
         [Correction] Ajout d'une phrase explicative sur le champ d'ajout d'un objet à la liste de courses
-        
+
         [Nouveauté] Dans la liste de courses, ajout de la possibilité de sélectionner un endroit où rapporter l'objet (banque ou zone de rapatriement)
     `,
         '1.0.0-alpha.64': `
         [Correction] Ajout d'une phrase explicative sur le champ d'ajout d'un objet à la liste de courses
-        
+
         [Nouveauté] Dans la liste de courses, ajout de la possibilité de sélectionner un endroit où rapporter l'objet (banque ou zone de rapatriement)
     `,
         '1.0.0-alpha.63': `
         [Correction] Ajout d'une phrase explicative sur le champ d'ajout d'un objet à la liste de courses
-        
+
         [Nouveauté] Dans la liste de courses, ajout de la possibilité de sélectionner un endroit où rapporter l'objet (banque ou zone de rapatriement)
     `,
         '1.0.0-alpha.62': `
@@ -1078,7 +1083,7 @@
     `,
         '1.0.0-alpha.52': `
         [Correction] Images des objets
-        
+
         [Nouveauté] Ajout d'un bouton pour retirer son ID d'app externes de MHO sans avoir à passer par les paramètres de l'extension
         [Nouveauté] Ajout de la date de dernière mise à jour de la liste des courses dans la page de liste de courses
     `,
@@ -1090,7 +1095,7 @@
     `,
         '1.0.0-alpha.49': `
         [Nouveauté] Liste des bâtiments et probabilités sur les objets qu'on peut trouver dedans, tout ça dans "Wiki" > "Bâtiments"
-        
+
         [Expérimental] Estimnation des chances de survie en camping. Ca se passe dans "Outils" > "Camping"
     `,
         '1.0.0-alpha.48': `
@@ -1114,7 +1119,7 @@
         '1.0.0-alpha.42': `
         [Correction] Oups, j'avais oublié de réactiver l'option pour la carte, elle était bien implémentée mais impossible de l'activer ^^'
         [Correction] Je tente d'améliorer la fonctionnalité de notification à la fin de la fouille depuis quelques temps, ça semble être plus stable
-        
+
         [Amélioration] Ajout des PA du café dans le tooltip amélioré
     `,
         '1.0.0-alpha.41': `
@@ -1142,7 +1147,7 @@
     `,
         '1.0.0-alpha.35': `
         [Correction] Quand on refusait une autorisation, on ne pouvait pas accéder au site
-        
+
         [Amélioration] Ajout du lien vers la documentation dans la description du script, afin que celui-ci soit accessible avant toute installation
     `,
         '1.0.0-alpha.34': `
@@ -1151,12 +1156,12 @@
     `,
         '1.0.0-alpha.33': `
         [Amélioration] Si un des outils externes ne se met pas bien à jour, on affiche le détail des succès et échecs
-        
+
         [Nouveauté] Prise en chage de Violentmonkey
     `,
         '1.0.0-alpha.32': `
         [Correction] Récupération de la carte depuis GH suite à la nouvelle version (mais la carte est toujours incomplète :'( )
-        
+
         [Attention] Suite à la mise à jour en V2 de Gest'Hordes, la mise à jour via le script et le site de MHO n'est plus fonctionnelle. Nous travaillons activement à une résolution du problème.
     `,
         '1.0.0-alpha.31': `
@@ -1171,7 +1176,7 @@
     `,
         '1.0.0-alpha.28': `
         [Correction] Résout le problème d'affichage de la barre de menu du jeu quand l'option de traduction est activée
-        
+
         [Amélioration] Ajout des traductions allemandes pour l'affichage de l'outil de traduction
     `,
         '1.0.0-alpha.27': `
@@ -1200,12 +1205,12 @@
     `,
         '1.0.0-alpha.19': `
         [Amélioration] Refonte des paramètres pour plus de lisibilité
-        
+
         [Nouveauté] Ajout d'un champ de recherche dans la liste des chantiers
     `,
         '1.0.0-alpha.18': `
         [Correction] Typo
-        
+
         [Amélioration] Ajout de l'info "Objet de camping" dans le tooltip amélioré
     `,
         '1.0.0-alpha.17': `
@@ -1217,7 +1222,7 @@
     `,
         '1.0.0-alpha.15': `
         [Amélioration] Ajout de certaines propriétés d'objets dans les tooltips améliorés
-        
+
         [Nouveauté] Ajout d'une option pour être prévenu à la fin de la fouille
     `,
         '1.0.0-alpha.14': `
@@ -1225,7 +1230,7 @@
         [Amélioration] Changement dans les couleurs des éléments de la liste de courses
         [Amélioration] Les couleurs des priorités d'affichent également sur l'image de l'objet dans la liste de courses intégrée
         [Amélioration] Affichage de certaines propriétés sur les tooltips des objets si l'option "afficher les tooltips détaillés" est activée
-        
+
         [Nouveauté] [expérimental] Ajout d'une option pour demander une confirmation avant de faire des actions "dangereuses" (consomation de cyanure, consomation de drogue si déjà drogué)
     `,
         '1.0.0-alpha.13': `
@@ -1233,9 +1238,9 @@
     `,
         '1.0.0-alpha.12': `
         [Correction] Ajout à la liste de courses depuis la liste d'objets
-        
+
         [Amélioration] Affichage des paramètre
-        
+
         [Nouveauté] Affichage de la version
         [Nouveauté] Affichage du changelog après une mise à jour
     `,
@@ -1641,28 +1646,28 @@
             es: `Faro`,
         },
         zombies_on_cell: {
-            en: `Number of zombies on the zone`,
-            fr: `Nombre de zombies sur la case`,
-            de: `Anzahl der Zombies auf der Zelle`,
-            es: `Cantidad de zombis en la zona`,
+            en: `Zombies on the zone`,
+            fr: `Zombies sur la case`,
+            de: `Zombies auf der Zelle`,
+            es: `Zombis en la zona`,
         },
         objects_in_bag: {
-            en: `Number of skins and tents in the bag`,
-            fr: `Nombre de pelures de peau et de toiles de tentes dans le sac`,
-            de: `Anzahl der Felle und Zelte in der Tasche`,
-            es: `Cantidad de pellejos humanos y telas de carpa en el bolso`,
+            en: `Skins and tents in the bag`,
+            fr: `Pelures et toiles dans le sac`,
+            de: `Felle und Zelte in der Tasche`,
+            es: `Pellejos y telas en el bolso`,
         },
         improve: {
-            en: `Number of simple improvements made on the zone (must subtract 3 after each attack)`,
-            fr: `Nombre d'améliorations simples faites sur la case (il faut en soustraire 3 après chaque attaque)`,
-            de: `Anzahl der einfachen Verbesserungen, die an der Zelle vorgenommen wurden (muss nach jedem Angriff 3 abziehen)`,
-            es: `Cantidad de mejoras simples hechas en la zona (hay que restar 3 luego de cada ataque)`,
+            en: `Simple improvements (must subtract 3 after each attack)`,
+            fr: `Améliorations simples (il faut en soustraire 3 après chaque attaque)`,
+            de: `Einfachen Verbesserungen (muss nach jedem Angriff 3 abziehen)`,
+            es: `Mejoras simples (hay que restar 3 luego de cada ataque)`,
         },
         object_improve: {
-            en: `Number of defense objects installed on the zone`,
-            fr: `Nombre d'objets de défense installés sur la case`,
-            de: `Anzahl der auf der Zelle installierten Verteidigungsobjekte`,
-            es: `Cantidad de objetos defensivos instalados en la zona`,
+            en: `Defense objects`,
+            fr: `Objets de défense`,
+            de: `Verteidigungsobjekte`,
+            es: `Objetos defensivos`,
         },
         camping_town: {
             en: `The town`,
@@ -1928,6 +1933,12 @@
             de: 'ausgewählt',
             es: 'seleccionado(s)'
         },
+        camping_calculator: {
+            en: 'Camping calculator',
+            fr: 'Calculateur de camping',
+            de: 'Campingrechner',
+            es: 'Calculadora de camping'
+        }
     };
     const status_texts = {
         head_wounded: {
@@ -2766,10 +2777,22 @@
         mho_anti_abuse_counter = document.createElement('div');
         mho_anti_abuse_counter.id = mho_anti_abuse_counter_id;
         if (pageIsBank()) {
-            const forum_preview = document.querySelector('.forum-preview-wrapper-bank');
-            if (!forum_preview)
-                return;
-            forum_preview.parentElement.insertBefore(mho_anti_abuse_counter, forum_preview.parentElement.firstElementChild);
+            if (window.innerWidth < 950) {
+                const bank_inventory = document.querySelector('#bank-inventory');
+                if (!bank_inventory)
+                    return;
+                const inventory_buttons = bank_inventory.querySelectorAll(':scope > button');
+                const last_inventory_button = inventory_buttons[inventory_buttons.length - 1];
+                if (!last_inventory_button)
+                    return;
+                last_inventory_button.parentElement.insertBefore(mho_anti_abuse_counter, last_inventory_button.nextElementSibling);
+            }
+            else {
+                const forum_preview = document.querySelector('.forum-preview-wrapper-bank');
+                if (!forum_preview)
+                    return;
+                forum_preview.parentElement.insertBefore(mho_anti_abuse_counter, forum_preview.parentElement.firstElementChild);
+            }
         }
         else {
             const actions_box = document.querySelector('.actions-box');
@@ -2888,6 +2911,7 @@
                     if (!rucksack)
                         return;
                     old_bag = document.querySelectorAll('#bank-inventory ul.rucksack li.item');
+                    const old_bag_items = arrFrom$2(old_bag).map((item_in_old_bag) => getItemFromImg(item_in_old_bag.querySelector('img').src));
                     state.bank_observer?.disconnect();
                     let observer;
                     const callback = (_mutationsList) => {
@@ -2900,7 +2924,6 @@
                                     if (!stored_values) {
                                         stored_values = [];
                                     }
-                                    const old_bag_items = arrFrom$2(old_bag).map((item_in_old_bag) => getItemFromImg(item_in_old_bag.querySelector('img').src));
                                     const new_bag_items = arrFrom$2(new_bag).map((item_in_new_bag) => getItemFromImg(item_in_new_bag.querySelector('img').src));
                                     new_bag_items.forEach((new_bag_item, index) => {
                                         const old_item_index = old_bag_items.findIndex((old_bag_item) => old_bag_item.id === new_bag_item.id);
@@ -4522,6 +4545,7 @@
                 objects: 0,
                 vest: false,
                 tomb: false,
+                r4: false,
                 zombies: 0,
                 night: false,
                 devastated: false,
@@ -4669,6 +4693,24 @@
             });
             tomb_div.appendChild(tomb);
             tomb_div.appendChild(tomb_label);
+            /** R4 ? (impacte uniquement le maximum atteignable) */
+            let r4_div = document.createElement('div');
+            r4_div.classList.add('mho-camping-field');
+            my_info_content.appendChild(r4_div);
+            let r4_label = document.createElement('label');
+            r4_label.htmlFor = 'r4';
+            r4_label.innerText = 'R4';
+            let r4 = document.createElement('input');
+            r4.type = 'checkbox';
+            r4.id = 'r4';
+            r4.checked = conf.r4;
+            r4.classList.add('mho-input');
+            r4.addEventListener('change', ($event) => {
+                conf.r4 = $event.srcElement.checked;
+                calculateCamping(conf);
+            });
+            r4_div.appendChild(r4);
+            r4_div.appendChild(r4_label);
             /** Nombre de nuits déjà campées */
             let nb_campings_div = document.createElement('div');
             my_info_content.appendChild(nb_campings_div);
@@ -4803,7 +4845,7 @@
             cell_info_content.appendChild(improve_div);
             let improve_label = document.createElement('label');
             improve_label.htmlFor = 'nb-improve';
-            improve_label.innerHTML = `<img src="${repo_img_hordes_url}icons/home_recycled.gif"> ${getI18N(texts.improve)}`;
+            improve_label.innerHTML = `<img src="${repo_img_hordes_url}icons/small_refine.gif"> ${getI18N(texts.improve)}`;
             improve_label.classList.add('spaced-label');
             let improve = document.createElement('input');
             improve.type = 'number';
@@ -4821,7 +4863,7 @@
             cell_info_content.appendChild(object_improve_div);
             let object_improve_label = document.createElement('label');
             object_improve_label.htmlFor = 'nb-object-improve';
-            object_improve_label.innerHTML = `<img src="${repo_img_hordes_url}icons/home.gif"> ${getI18N(texts.object_improve)}`;
+            object_improve_label.innerHTML = `<img src="${repo_img_hordes_url}item/cat_def.gif"> ${getI18N(texts.object_improve)}`;
             object_improve_label.classList.add('spaced-label');
             let object_improve = document.createElement('input');
             object_improve.type = 'number';
@@ -5440,6 +5482,62 @@
         { id: 'pande', label: { de: 'Pandämonium', en: 'Pandemonium', es: 'Pandemonio', fr: 'Pandémonium' } }
     ];
 
+    const stepper_minus_src = `${repo_img_hordes_url}icons/small_minus.gif`;
+    const stepper_plus_src = `${repo_img_hordes_url}icons/small_more2.gif`;
+    /**
+     * Crée un champ "input number" précédé d'une icône (avec title) et entouré
+     * de boutons +/- permettant d'incrémenter/décrémenter la valeur de 1.
+     */
+    function createNumberField(config) {
+        const min_value = config.minValue ?? 0;
+        const field = document.createElement('div');
+        field.classList.add('mho-camping-field');
+        if (config.fieldId) {
+            field.id = config.fieldId;
+        }
+        if (config.fullWidth) {
+            field.classList.add('mho-camping-field--full');
+        }
+        const label = document.createElement('label');
+        label.htmlFor = config.id;
+        label.innerHTML = `<img src="${config.iconSrc}" title="${config.title}">`;
+        const minus = document.createElement('img');
+        minus.src = stepper_minus_src;
+        minus.alt = '-';
+        minus.classList.add('mho-camping-stepper-btn');
+        const input = document.createElement('input');
+        input.type = 'number';
+        input.id = config.id;
+        input.value = String(config.initialValue);
+        input.min = String(min_value);
+        input.classList.add('mho-input', 'inline');
+        const plus = document.createElement('img');
+        plus.src = stepper_plus_src;
+        plus.alt = '+';
+        plus.classList.add('mho-camping-stepper-btn');
+        const dispatch_change = () => {
+            input.dispatchEvent(new Event('change'));
+        };
+        minus.addEventListener('click', (_event) => {
+            const current = Number(input.value) || 0;
+            input.value = String(Math.max(min_value, current - 1));
+            dispatch_change();
+        });
+        plus.addEventListener('click', (_event) => {
+            const current = Number(input.value) || 0;
+            input.value = String(current + 1);
+            dispatch_change();
+        });
+        input.addEventListener('change', (event) => {
+            const target = event.target;
+            config.onChange(Number(target.value));
+        });
+        field.appendChild(label);
+        field.appendChild(minus);
+        field.appendChild(input);
+        field.appendChild(plus);
+        return field;
+    }
     function displayCampingPredict() {
         setTimeout(() => {
             let camping_predict_container = document.getElementById(mho_camping_predict_id);
@@ -5452,31 +5550,34 @@
                     all_ruins = all_ruins.concat(ruins);
                     let zone_camp_info = zone_camp.querySelector('.zone-camp-info');
                     let zone_camp_label = zone_camp.querySelector('label');
+                    camping_predict_container = document.createElement('div');
+                    camping_predict_container.id = mho_camping_predict_id;
+                    camping_predict_container.style.display = window.getComputedStyle(zone_camp_info).getPropertyValue('max-height') === '0px' ? 'none' : 'block';
+                    zone_camp.appendChild(camping_predict_container);
                     zone_camp_label.addEventListener('click', () => {
                         camping_predict_container.style.display = camping_predict_container.style.display === 'none' ? 'block' : 'none';
-                        if (camping_predict_container.style.display !== 'none') {
+                    });
+                    let updater_title = document.createElement('h5');
+                    updater_title.classList.add('mho-camping-title');
+                    let updater_title_mho_img = document.createElement('img');
+                    updater_title_mho_img.src = mh_optimizer_icon;
+                    updater_title.appendChild(updater_title_mho_img);
+                    let updater_title_text = document.createElement('span');
+                    updater_title_text.innerText = getI18N(texts.camping_calculator);
+                    updater_title.appendChild(updater_title_text);
+                    camping_predict_container.appendChild(updater_title);
+                    let camping_predict_content = document.createElement('div');
+                    camping_predict_content.classList.add('mho-camping-content');
+                    camping_predict_content.style.display = 'none';
+                    camping_predict_container.appendChild(camping_predict_content);
+                    updater_title.addEventListener('click', () => {
+                        let is_hidden = camping_predict_content.style.display === 'none';
+                        camping_predict_content.style.display = is_hidden ? 'block' : 'none';
+                        camping_predict_container.classList.toggle('mho-camping-opened', is_hidden);
+                        if (is_hidden) {
                             calculateCamping(conf);
                         }
                     });
-                    camping_predict_container = document.createElement('div');
-                    camping_predict_container.id = mho_camping_predict_id;
-                    camping_predict_container.style.border = '1px solid';
-                    camping_predict_container.style.padding = '0.5em';
-                    camping_predict_container.style.margin = '0.5em 0';
-                    camping_predict_container.style.display = window.getComputedStyle(zone_camp_info).getPropertyValue('max-height') === '0px' ? 'none' : 'block';
-                    zone_camp.appendChild(camping_predict_container);
-                    let updater_title = document.createElement('h5');
-                    updater_title.style.marginTop = '0.5em';
-                    let updater_title_mho_img = document.createElement('img');
-                    updater_title_mho_img.src = mh_optimizer_icon;
-                    updater_title_mho_img.style.height = '24px';
-                    updater_title_mho_img.style.marginRight = '0.5em';
-                    updater_title.appendChild(updater_title_mho_img);
-                    let updater_title_text = document.createElement('text');
-                    updater_title_text.innerText = getScriptInfo().name;
-                    updater_title_text.style.fontSize = '1.5em';
-                    updater_title.appendChild(updater_title_text);
-                    camping_predict_container.appendChild(updater_title);
                     let zone_ruin = document.querySelector('.ruin-info b');
                     let ruin = '-1000';
                     if (zone_ruin) {
@@ -5492,6 +5593,7 @@
                         objects: 0,
                         vest: false,
                         tomb: false,
+                        r4: false,
                         zombies: document.querySelectorAll('.actor.zombie')?.length || 0,
                         night: !!document.querySelector('.map.night'),
                         devastated: state.mh_user.townDetails?.isDevaste,
@@ -5503,29 +5605,39 @@
                         ruinCapacity: 0,
                         ruin: '-1000'
                     };
+                    let columns_wrapper = document.createElement('div');
+                    columns_wrapper.classList.add('mho-camping-columns');
+                    camping_predict_content.appendChild(columns_wrapper);
                     let my_info = document.createElement('div');
-                    camping_predict_container.appendChild(my_info);
+                    my_info.classList.add('mho-camping-section', 'citizen');
+                    columns_wrapper.appendChild(my_info);
                     let my_info_title = document.createElement('h3');
                     my_info_title.innerText = getI18N(texts.camping_citizen);
                     my_info.appendChild(my_info_title);
                     let my_info_content = document.createElement('div');
+                    my_info_content.classList.add('mho-camping-section-content');
                     my_info.appendChild(my_info_content);
                     let town_info = document.createElement('div');
-                    camping_predict_container.appendChild(town_info);
+                    town_info.classList.add('mho-camping-section', 'town');
+                    columns_wrapper.appendChild(town_info);
                     let town_info_title = document.createElement('h3');
                     town_info_title.innerText = getI18N(texts.camping_town);
                     town_info.appendChild(town_info_title);
                     let town_info_content = document.createElement('div');
+                    town_info_content.classList.add('mho-camping-section-content');
                     town_info.appendChild(town_info_content);
                     let cell_info = document.createElement('div');
-                    camping_predict_container.appendChild(cell_info);
+                    cell_info.classList.add('mho-camping-section', 'zone');
+                    columns_wrapper.appendChild(cell_info);
                     let cell_info_title = document.createElement('h3');
                     cell_info_title.innerText = getI18N(texts.camping_ruin);
                     cell_info.appendChild(cell_info_title);
                     let cell_info_content = document.createElement('div');
+                    cell_info_content.classList.add('mho-camping-section-content');
                     cell_info.appendChild(cell_info_content);
                     let result = document.createElement('div');
-                    camping_predict_container.appendChild(result);
+                    result.classList.add('mho-camping-section');
+                    camping_predict_content.appendChild(result);
                     let result_title = document.createElement('h3');
                     result_title.innerText = getI18N(texts.result);
                     result.appendChild(result_title);
@@ -5535,11 +5647,12 @@
                     /** Capuche ? */
                     let vest_div = document.createElement('div');
                     vest_div.id = 'vest-field';
+                    vest_div.classList.add('mho-camping-field');
                     vest_div.style.display = 'none';
                     my_info_content.appendChild(vest_div);
                     let vest_label = document.createElement('label');
                     vest_label.htmlFor = 'vest';
-                    vest_label.innerHTML = `<img src="${repo_img_hordes_url}emotes/proscout.gif"> ${getI18N(texts.vest)}`;
+                    vest_label.innerHTML = `<img src="${repo_img_hordes_url}emotes/proscout.gif" title="${getI18N(texts.vest)}">`;
                     let vest = document.createElement('input');
                     vest.type = 'checkbox';
                     vest.id = 'vest';
@@ -5553,10 +5666,11 @@
                     vest_div.appendChild(vest_label);
                     /** Campeur pro ? */
                     let pro_camper_div = document.createElement('div');
+                    pro_camper_div.classList.add('mho-camping-field');
                     my_info_content.appendChild(pro_camper_div);
                     let pro_camper_label = document.createElement('label');
                     pro_camper_label.htmlFor = 'pro';
-                    pro_camper_label.innerHTML = `<img src="${repo_img_hordes_url}status/status_camper.gif"> ${getI18N(texts.pro_camper)}`;
+                    pro_camper_label.innerHTML = `<img src="${repo_img_hordes_url}status/status_camper.gif" title="${getI18N(texts.pro_camper)}">`;
                     let pro_camper = document.createElement('input');
                     pro_camper.type = 'checkbox';
                     pro_camper.id = 'pro';
@@ -5570,10 +5684,11 @@
                     pro_camper_div.appendChild(pro_camper_label);
                     /** Tombe ? */
                     let tomb_div = document.createElement('div');
+                    tomb_div.classList.add('mho-camping-field');
                     my_info_content.appendChild(tomb_div);
                     let tomb_label = document.createElement('label');
                     tomb_label.htmlFor = 'tomb';
-                    tomb_label.innerHTML = `<img src="${repo_img_hordes_url}building/small_cemetery.gif"> ${getI18N(texts.tomb)}`;
+                    tomb_label.innerHTML = `<img src="${repo_img_hordes_url}building/small_cemetery.gif" title="${getI18N(texts.tomb)}">`;
                     let tomb = document.createElement('input');
                     tomb.type = 'checkbox';
                     tomb.id = 'tomb';
@@ -5585,45 +5700,55 @@
                     });
                     tomb_div.appendChild(tomb);
                     tomb_div.appendChild(tomb_label);
+                    /** R4 ? (impacte uniquement le maximum atteignable) */
+                    let r4_div = document.createElement('div');
+                    r4_div.classList.add('mho-camping-field');
+                    my_info_content.appendChild(r4_div);
+                    let r4_label = document.createElement('label');
+                    r4_label.htmlFor = 'r4';
+                    r4_label.innerText = 'R4';
+                    let r4 = document.createElement('input');
+                    r4.type = 'checkbox';
+                    r4.id = 'r4';
+                    r4.checked = conf.r4;
+                    r4.classList.add('mho-input');
+                    r4.addEventListener('change', ($event) => {
+                        conf.r4 = $event.srcElement.checked;
+                        calculateCamping(conf);
+                    });
+                    r4_div.appendChild(r4);
+                    r4_div.appendChild(r4_label);
+                    /** Grille 2 colonnes pour les compteurs du bloc "Le citoyen" */
+                    let citizen_numbers_grid = document.createElement('div');
+                    citizen_numbers_grid.classList.add('mho-camping-numbers-grid');
+                    my_info_content.appendChild(citizen_numbers_grid);
                     /** Nombre de nuits déjà campées */
-                    let nb_campings_div = document.createElement('div');
-                    my_info_content.appendChild(nb_campings_div);
-                    let nb_campings_label = document.createElement('label');
-                    nb_campings_label.htmlFor = 'nb-campings';
-                    nb_campings_label.innerHTML = `<img src="${repo_img_hordes_url}emotes/sleep.gif"> ${getI18N(texts.nb_campings)}`;
-                    nb_campings_label.classList.add('spaced-label');
-                    let nb_campings = document.createElement('input');
-                    nb_campings.type = 'number';
-                    nb_campings.id = 'nb-campings';
-                    nb_campings.value = (conf.campings);
-                    nb_campings.classList.add('mho-input', 'inline');
-                    nb_campings.addEventListener('change', ($event) => {
-                        conf.campings = +$event.srcElement.value;
-                        calculateCamping(conf);
+                    let nb_campings_field = createNumberField({
+                        id: 'nb-campings',
+                        iconSrc: `${repo_img_hordes_url}emotes/sleep.gif`,
+                        title: getI18N(texts.nb_campings),
+                        initialValue: conf.campings,
+                        onChange: (value) => {
+                            conf.campings = value;
+                            calculateCamping(conf);
+                        }
                     });
-                    nb_campings_div.appendChild(nb_campings_label);
-                    nb_campings_div.appendChild(nb_campings);
+                    citizen_numbers_grid.appendChild(nb_campings_field);
                     /** Nombre de toiles de tente ou pelure de peau */
-                    let objects_in_bag_div = document.createElement('div');
-                    my_info_content.appendChild(objects_in_bag_div);
-                    let objects_in_bag_label = document.createElement('label');
-                    objects_in_bag_label.htmlFor = 'nb-objects';
-                    objects_in_bag_label.innerText = getI18N(texts.objects_in_bag);
-                    objects_in_bag_label.innerHTML = `<img src="${repo_img_hordes_url}emotes/bag.gif"> ${getI18N(texts.objects_in_bag)}`;
-                    objects_in_bag_label.classList.add('spaced-label');
-                    let objects_in_bag = document.createElement('input');
-                    objects_in_bag.type = 'number';
-                    objects_in_bag.id = 'nb-objects';
-                    objects_in_bag.value = (conf.objects);
-                    objects_in_bag.classList.add('mho-input', 'inline');
-                    objects_in_bag.addEventListener('change', ($event) => {
-                        conf.objects = +$event.srcElement.value;
-                        calculateCamping(conf);
+                    let objects_in_bag_field = createNumberField({
+                        id: 'nb-objects',
+                        iconSrc: `${repo_img_hordes_url}emotes/bag.gif`,
+                        title: getI18N(texts.objects_in_bag),
+                        initialValue: conf.objects,
+                        onChange: (value) => {
+                            conf.objects = value;
+                            calculateCamping(conf);
+                        }
                     });
-                    objects_in_bag_div.appendChild(objects_in_bag_label);
-                    objects_in_bag_div.appendChild(objects_in_bag);
+                    citizen_numbers_grid.appendChild(objects_in_bag_field);
                     /** Type de bâtiment */
                     let ruin_type_div = document.createElement('div');
+                    ruin_type_div.classList.add('mho-camping-field', 'mho-camping-field--full');
                     cell_info_content.appendChild(ruin_type_div);
                     let select_ruin_label = document.createElement('label');
                     select_ruin_label.htmlFor = 'select-ruin';
@@ -5660,104 +5785,79 @@
                     ruin_type_div.appendChild(select_ruin_label);
                     ruin_type_div.appendChild(select_ruin);
                     /** Nombre de tas sur le bat ? */
-                    let digs_div = document.createElement('div');
-                    digs_div.id = 'digs-field';
-                    digs_div.style.display = 'none';
-                    cell_info_content.appendChild(digs_div);
-                    let digs_label = document.createElement('label');
-                    digs_label.htmlFor = 'digs';
-                    digs_label.innerText = getI18N(texts.digs);
-                    digs_label.innerHTML = `<img src="${repo_img_hordes_url}icons/uncover.gif"> ${getI18N(texts.digs)}`;
-                    digs_label.classList.add('spaced-label');
-                    let digs = document.createElement('input');
-                    digs.type = 'number';
-                    digs.id = 'digs';
-                    digs.value = (conf.ruinBuryCount);
-                    digs.classList.add('mho-input', 'inline');
-                    digs.addEventListener('change', ($event) => {
-                        conf.ruinBuryCount = +$event.srcElement.value;
-                        calculateCamping(conf);
+                    let digs_field = createNumberField({
+                        id: 'digs',
+                        fieldId: 'digs-field',
+                        fullWidth: true,
+                        iconSrc: `${repo_img_hordes_url}icons/uncover.gif`,
+                        title: getI18N(texts.digs),
+                        initialValue: conf.ruinBuryCount,
+                        onChange: (value) => {
+                            conf.ruinBuryCount = value;
+                            calculateCamping(conf);
+                        }
                     });
-                    digs_div.appendChild(digs_label);
-                    digs_div.appendChild(digs);
+                    digs_field.style.display = 'none';
+                    cell_info_content.appendChild(digs_field);
+                    /** Grille 2 colonnes pour les compteurs du bloc "Le bâtiment" */
+                    let building_numbers_grid = document.createElement('div');
+                    building_numbers_grid.classList.add('mho-camping-numbers-grid');
+                    cell_info_content.appendChild(building_numbers_grid);
                     /** Nombre de zombies sur la case */
-                    let zombies_div = document.createElement('div');
-                    cell_info_content.appendChild(zombies_div);
-                    let zombies_label = document.createElement('label');
-                    zombies_label.htmlFor = 'nb-zombies';
-                    zombies_label.innerHTML = `<img src="${repo_img_hordes_url}emotes/zombie.gif"> ${getI18N(texts.zombies_on_cell)}`;
-                    zombies_label.classList.add('spaced-label');
-                    let zombies = document.createElement('input');
-                    zombies.type = 'number';
-                    zombies.id = 'nb-zombies';
-                    zombies.value = (conf.zombies);
-                    zombies.classList.add('mho-input', 'inline');
-                    zombies.addEventListener('change', ($event) => {
-                        conf.zombies = +$event.srcElement.value;
-                        calculateCamping(conf);
+                    let zombies_field = createNumberField({
+                        id: 'nb-zombies',
+                        iconSrc: `${repo_img_hordes_url}emotes/zombie.gif`,
+                        title: getI18N(texts.zombies_on_cell),
+                        initialValue: conf.zombies,
+                        onChange: (value) => {
+                            conf.zombies = value;
+                            calculateCamping(conf);
+                        }
                     });
-                    zombies_div.appendChild(zombies_label);
-                    zombies_div.appendChild(zombies);
-                    /** Nombre d'améliorations simples sur la case */
-                    let improve_div = document.createElement('div');
-                    cell_info_content.appendChild(improve_div);
-                    let improve_label = document.createElement('label');
-                    improve_label.htmlFor = 'nb-improve';
-                    improve_label.innerHTML = `<img src="${repo_img_hordes_url}icons/home_recycled.gif"> ${getI18N(texts.improve)}`;
-                    improve_label.classList.add('spaced-label');
-                    let improve = document.createElement('input');
-                    improve.type = 'number';
-                    improve.id = 'nb-improve';
-                    improve.value = (conf.improve);
-                    improve.classList.add('mho-input', 'inline');
-                    improve.addEventListener('change', ($event) => {
-                        conf.improve = +$event.srcElement.value;
-                        calculateCamping(conf);
-                    });
-                    improve_div.appendChild(improve_label);
-                    improve_div.appendChild(improve);
-                    /** Nombre d'objets de campement installés sur la case */
-                    let object_improve_div = document.createElement('div');
-                    cell_info_content.appendChild(object_improve_div);
-                    let object_improve_label = document.createElement('label');
-                    object_improve_label.htmlFor = 'nb-object-improve';
-                    object_improve_label.innerHTML = `<img src="${repo_img_hordes_url}icons/home.gif"> ${getI18N(texts.object_improve)}`;
-                    object_improve_label.classList.add('spaced-label');
-                    let object_improve = document.createElement('input');
-                    object_improve.type = 'number';
-                    object_improve.id = 'nb-object-improve';
-                    object_improve.value = (conf.objectImprove);
-                    object_improve.classList.add('mho-input', 'inline');
-                    object_improve.addEventListener('change', ($event) => {
-                        conf.objectImprove = +$event.srcElement.value;
-                        calculateCamping(conf);
-                    });
-                    object_improve_div.appendChild(object_improve_label);
-                    object_improve_div.appendChild(object_improve);
+                    building_numbers_grid.appendChild(zombies_field);
                     /** Nombre de personnes déjà cachées */
-                    let hidden_campers_div = document.createElement('div');
-                    cell_info_content.appendChild(hidden_campers_div);
-                    let hidden_campers_label = document.createElement('label');
-                    hidden_campers_label.htmlFor = 'hidden-campers';
-                    hidden_campers_label.innerHTML = `<img src="${repo_img_hordes_url}emotes/human.gif"> ${getI18N(texts.hidden_campers)}`;
-                    hidden_campers_label.classList.add('spaced-label');
-                    let hidden_campers = document.createElement('input');
-                    hidden_campers.type = 'number';
-                    hidden_campers.id = 'hidden-campers';
-                    hidden_campers.value = (conf.hiddenCampers);
-                    hidden_campers.classList.add('mho-input', 'inline');
-                    hidden_campers.addEventListener('change', ($event) => {
-                        conf.hiddenCampers = +$event.srcElement.value;
-                        calculateCamping(conf);
+                    let hidden_campers_field = createNumberField({
+                        id: 'hidden-campers',
+                        iconSrc: `${repo_img_hordes_url}emotes/human.gif`,
+                        title: getI18N(texts.hidden_campers),
+                        initialValue: conf.hiddenCampers,
+                        onChange: (value) => {
+                            conf.hiddenCampers = value;
+                            calculateCamping(conf);
+                        }
                     });
-                    hidden_campers_div.appendChild(hidden_campers_label);
-                    hidden_campers_div.appendChild(hidden_campers);
+                    building_numbers_grid.appendChild(hidden_campers_field);
+                    /** Nombre d'améliorations simples sur la case */
+                    let improve_field = createNumberField({
+                        id: 'nb-improve',
+                        iconSrc: `${repo_img_hordes_url}icons/small_refine.gif`,
+                        title: getI18N(texts.improve),
+                        initialValue: conf.improve,
+                        onChange: (value) => {
+                            conf.improve = value;
+                            calculateCamping(conf);
+                        }
+                    });
+                    building_numbers_grid.appendChild(improve_field);
+                    /** Nombre d'objets de campement installés sur la case */
+                    let object_improve_field = createNumberField({
+                        id: 'nb-object-improve',
+                        iconSrc: `${repo_img_hordes_url}item/cat_def.gif`,
+                        title: getI18N(texts.object_improve),
+                        initialValue: conf.objectImprove,
+                        onChange: (value) => {
+                            conf.objectImprove = value;
+                            calculateCamping(conf);
+                        }
+                    });
+                    building_numbers_grid.appendChild(object_improve_field);
                     /** Nuit ? */
                     let night_div = document.createElement('div');
+                    night_div.classList.add('mho-camping-field');
                     town_info_content.appendChild(night_div);
                     let night_label = document.createElement('label');
                     night_label.htmlFor = 'night';
-                    night_label.innerHTML = `<img src="${repo_img_hordes_url}pictos/r_doutsd.gif"> ${getI18N(texts.night)}`;
+                    night_label.innerHTML = `<img src="${repo_img_hordes_url}pictos/r_doutsd.gif" title="${getI18N(texts.night)}">`;
                     let night = document.createElement('input');
                     night.type = 'checkbox';
                     night.id = 'night';
@@ -5771,11 +5871,11 @@
                     night_div.appendChild(night_label);
                     /** Phare construit ? */
                     let phare_div = document.createElement('div');
+                    phare_div.classList.add('mho-camping-field');
                     town_info_content.appendChild(phare_div);
                     let phare_label = document.createElement('label');
                     phare_label.htmlFor = 'phare';
-                    phare_label.innerText = getI18N(texts.phare);
-                    phare_label.innerHTML = `<img src="${repo_img_hordes_url}building/small_lighthouse.gif"> ${getI18N(texts.phare)}`;
+                    phare_label.innerHTML = `<img src="${repo_img_hordes_url}building/small_lighthouse.gif" title="${getI18N(texts.phare)}">`;
                     let phare = document.createElement('input');
                     phare.type = 'checkbox';
                     phare.id = 'phare';
@@ -5787,9 +5887,6 @@
                     });
                     phare_div.appendChild(phare);
                     phare_div.appendChild(phare_label);
-                    if (camping_predict_container.style.display !== 'none') {
-                        calculateCamping(conf);
-                    }
                 });
             }
             else if (camping_predict_container) {
@@ -10656,821 +10753,23 @@
         observer.observe(postbox, config);
     }
 
+    const styleTemplate = "@charset \"UTF-8\";\n/*\n * Tokens remplacés au runtime par createStyles.ts à partir de config/constants.ts :\n *   __BTN_ID__, __MH_OPTIMIZER_MAP_WINDOW_ID__, __MHO_DISPLAY_EXPEDITIONS_ID__,\n *   __MHO_DISPLAY_MAP_ID__, __MHO_STORE_NOTIFICATIONS_ID__, __REPO_IMG_HORDES_URL__\n */\n.param-has-children > div::after {\n  content: \"▶︎\";\n  margin-left: auto;\n}\n\n#__BTN_ID__ {\n  background-color: #5c2b20;\n  border: 1px solid #f0d79e;\n  outline: 1px solid #000;\n  position: absolute;\n  top: 10px;\n  z-index: 997;\n}\n\n#__BTN_ID__.mho-btn-opened h1 span, #__BTN_ID__.mho-btn-opened h1 a, #__BTN_ID__.mho-btn-opened h1 img.close {\n  display: inline;\n}\n\n#__BTN_ID__.mho-btn-opened div {\n  display: block;\n}\n\n#__BTN_ID__ h1 {\n  height: auto;\n  font-size: 8pt;\n  text-transform: none;\n  font-variant: small-caps;\n  background: none;\n  cursor: help;\n  margin: 0 5px;\n  padding: 0;\n  line-height: 17px;\n  color: #f0d79e;\n  display: flex;\n  justify-content: space-between;\n  align-items: center;\n}\n\n#__BTN_ID__ h1 > div > img {\n  vertical-align: -9%;\n}\n\n#__BTN_ID__.mho-btn-opened h1 {\n  border-bottom: 1px solid #b37c4a;\n  margin-bottom: 5px;\n}\n\n#__BTN_ID__ h1 span, #__BTN_ID__ h1 a, #__BTN_ID__ h1 img.close {\n  color: #f0d79e;\n  cursor: help;\n  font-family: Trebuchet MS, Arial, Verdana, sans-serif;\n  letter-spacing: 1px;\n  line-height: 17px;\n  text-align: left;\n  text-transform: none;\n  margin-left: 1em;\n  display: none;\n}\n\n#__BTN_ID__ > div {\n  display: none;\n  margin: 0 5px 8px 5px;\n  font-size: 0.9em;\n  width: 350px;\n}\n\n#__BTN_ID__ .mho-parameters-btn {\n  margin-top: 0;\n  text-align: center;\n  display: block;\n}\n\n.mho-window {\n  opacity: 1;\n  transition: opacity 1s ease;\n  z-index: 999;\n  padding: 0;\n  position: fixed;\n  min-width: 150px;\n  min-height: 150px;\n}\n\n.mho-window:not(.fullsize) .mho-window-box {\n  resize: both;\n  overflow: auto;\n}\n\n.mho-window.fullsize {\n  background: url(__REPO_IMG_HORDES_URL__background/mask.png);\n  height: 100%;\n  width: 100%;\n  resize: none;\n}\n\n.mho-window:not(.visible), #__MH_OPTIMIZER_MAP_WINDOW_ID__:not(.visible) {\n  opacity: 0;\n  pointer-events: none;\n}\n\n.mho-window:not(.visible) .mho-window-box, .mho-window:not(.visible) #__MH_OPTIMIZER_MAP_WINDOW_ID__-box {\n  transform: scale(0) translateY(1000px);\n}\n\n.mho-window .mho-window-box {\n  background: url(__REPO_IMG_HORDES_URL__background/bg_content2.jpg) repeat-y 0 0/900px 263px, url(__REPO_IMG_HORDES_URL__background/bg_content2.jpg) repeat-y 100% 0/900px 263px;\n  border-radius: 8px;\n  box-shadow: 0 0 10px #000;\n  display: flex;\n  flex-direction: row;\n  position: absolute;\n  top: 10px;\n  bottom: 10px;\n  right: 10px;\n  left: 10px;\n  transform: scale(1) translateY(0);\n  transition: transform 0.5s ease;\n}\n\n#__MH_OPTIMIZER_MAP_WINDOW_ID__ #__MH_OPTIMIZER_MAP_WINDOW_ID__-box {\n  background: url(__REPO_IMG_HORDES_URL__background/bg_content2.jpg) repeat-y 0 0/900px 263px, url(__REPO_IMG_HORDES_URL__background/bg_content2.jpg) repeat-y 100% 0/900px 263px;\n  border-radius: 8px;\n  box-shadow: 0 0 10px #000;\n  position: absolute;\n  transform: scale(1) translateY(0);\n  transition: transform 0.5s ease;\n  resize: both;\n  overflow: auto;\n  z-index: 9999;\n}\n\n.mho-window .mho-window-box .mho-window-overlay, #__MH_OPTIMIZER_MAP_WINDOW_ID__ #__MH_OPTIMIZER_MAP_WINDOW_ID__-box #__MH_OPTIMIZER_MAP_WINDOW_ID__-overlay {\n  position: absolute;\n  right: 6px;\n  top: 6px;\n  text-align: right;\n}\n\n.mho-window .mho-window-box .mho-window-overlay ul, #__MH_OPTIMIZER_MAP_WINDOW_ID__ #__MH_OPTIMIZER_MAP_WINDOW_ID__-box #__MH_OPTIMIZER_MAP_WINDOW_ID__-overlay ul {\n  margin: 2px;\n  padding: 0;\n}\n\n.mho-window .mho-window-box .mho-window-overlay ul li, #__MH_OPTIMIZER_MAP_WINDOW_ID__ #__MH_OPTIMIZER_MAP_WINDOW_ID__-box #__MH_OPTIMIZER_MAP_WINDOW_ID__-overlay ul li {\n  cursor: pointer;\n  display: inline-block;\n}\n\n.mho-window .mho-window-drag-handle {\n  width: 18px;\n  height: 100%;\n}\n\n.mho-window-content, #__MH_OPTIMIZER_MAP_WINDOW_ID__-content {\n  flex: 1;\n  color: #fff;\n  overflow: auto;\n  background: url(__REPO_IMG_HORDES_URL__background/box/panel_00.gif) 0 0 no-repeat, url(__REPO_IMG_HORDES_URL__background/box/panel_02.gif) 100% 0 no-repeat, url(__REPO_IMG_HORDES_URL__background/box/panel_20.gif) 0 100% no-repeat, url(__REPO_IMG_HORDES_URL__background/box/panel_22.gif) 100% 100% no-repeat, url(__REPO_IMG_HORDES_URL__background/box/panel_01.gif) 0 0 repeat-x, url(__REPO_IMG_HORDES_URL__background/box/panel_10.gif) 0 0 repeat-y, url(__REPO_IMG_HORDES_URL__background/box/panel_12.gif) 100% 0 repeat-y, url(__REPO_IMG_HORDES_URL__background/box/panel_21.gif) 0 100% repeat-x, #7e4d2a;\n  border-radius: 12px;\n  padding: 8px;\n}\n\ndiv.mho-new-changelog::before {\n  position: absolute;\n  top: -3px;\n  left: -3px;\n}\n\na.mho-new-changelog::before {\n  position: relative;\n  top: 0;\n  left: 0;\n}\n\n.mho-new-changelog::before {\n  content: \"\";\n  width: 6px;\n  aspect-ratio: 1;\n  background: #4B107B;\n  border-radius: 50%;\n  box-shadow: 0px 0px 6px 3px #BF61CF;\n  display: inline-block;\n}\n\ndiv.mho-new-version::before {\n  position: absolute;\n  top: -3px;\n  left: -3px;\n}\n\n.mho-new-version::before {\n  content: \"\";\n  width: 8px;\n  aspect-ratio: 1;\n  background: #BF61CF;\n  border-radius: 50%;\n  box-shadow: 0px 0px 8px 4px #4B107B;\n  display: inline-block;\n}\n\n#tabs {\n  color: #ddab76;\n  font-size: 1.2rem;\n  margin-bottom: 20px;\n  position: relative;\n  height: 25px;\n  order-bottom: 1px solid #ddab76;\n}\n\n#tabs ul {\n  display: flex;\n  flex-wrap: wrap;\n  padding: 0;\n  background: url(__REPO_IMG_HORDES_URL__background/tabs-header-plain.gif) 0 100% round;\n  background-size: cover;\n  height: 24px;\n  margin-top: 2px;\n  margin-right: 20px;\n  padding-left: 0.5em;\n}\n\n#tabs > ul > li {\n  cursor: pointer;\n  display: inline-block;\n  margin-top: auto;\n  margin-bottom: auto;\n}\n\n#tabs > ul > li > div > img {\n  margin-right: 0.5em;\n}\n\n#tabs > ul > li > div {\n  background-image: url(__REPO_IMG_HORDES_URL__background/tab.gif);\n  background-position: 0 0;\n  background-repeat: no-repeat;\n  border-left: 1px solid #694023;\n  border-right: 1px solid #694023;\n  color: #f0d79e;\n  cursor: pointer;\n  float: right;\n  font-family: Arial, sans-serif;\n  font-size: 1rem;\n  font-variant: small-caps;\n  height: 21px;\n  margin-left: 2px;\n  margin-right: 0;\n  margin-top: 3px;\n  padding: 2px 4px 0;\n  text-decoration: underline;\n  white-space: nowrap;\n}\n\n#tabs > ul > li > div:hover {\n  outline: 1px solid #f0d79e;\n  text-decoration: underline;\n}\n\n#tabs > ul > li.selected {\n  position: relative;\n  top: 2px;\n}\n\n.tab-content {\n  position: absolute;\n  bottom: 10px;\n  left: 28px;\n  right: 8px;\n  top: 40px;\n  overflow: auto;\n}\n\n.tab-content > ul {\n  display: flex;\n  flex-wrap: wrap;\n  padding: 0;\n  margin: 0 0.5em;\n}\n\n.tab-content > ul > li {\n  min-width: 300px;\n  flex-basis: min-content;\n  padding: 0.125em 0.5em;\n  margin: 0;\n}\n\n.tab-content > ul > li.selected {\n  flex-basis: 100%;\n  padding: 0.25em;\n  margin: 0.25em 1px;\n}\n\n.tab-content > ul > li:not(.selected) .properties {\n  display: none;\n}\n\n.tab-content > ul div.mho-category {\n  width: 100%;\n  border-bottom: 1px solid;\n  margin: 1em 0 0.5em;\n}\n\n#categories > ul, ul.parameters, #informations > ul {\n  padding: 0;\n  margin: 0;\n  color: #f0d79e;\n}\n\n#categories > ul > li, ul.parameters > li, .tab-content ul > li, #informations ul > li {\n  list-style: none;\n}\n\n.tab-content #recipes-list > li, .tab-content #notifications-list > li, #wishlist > li {\n  min-width: 100% !important;\n  display: flex;\n}\n\ninput.mho-input::-webkit-outer-spin-button, input.mho-input::-webkit-inner-spin-button {\n  -webkit-appearance: none;\n  margin: 0;\n}\n\ninput.mho-input[type=number] {\n  -moz-appearance: textfield;\n}\n\n.mho-table {\n  border-collapse: collapse;\n  border-bottom: 1px solid #ddab76;\n}\n\n.mho-header {\n  font-size: 10pt;\n  background: linear-gradient(0deg, #643b25 0, rgba(100, 59, 37, 0) 50%, rgba(100, 59, 37, 0)) !important;\n  border-bottom: 2px solid #f0d79e;\n  color: #fff;\n  font-family: Trebuchet MS, Arial, Verdana, sans-serif;\n  font-weight: 700;\n}\n\n.mho-table tr:not(.mho-header) {\n  background-color: #5c2b20;\n  border-bottom: 1px solid #7e4d2a;\n}\n\n.mho-table tr th, .mho-table tr td {\n  padding: 0.25em;\n}\n\n.mho-table tr td {\n  border-left: 1px solid #7e4d2a;\n  color: #f0d79e;\n  font-size: 9pt;\n}\n\n.label_text {\n  font-size: 1.2rem;\n  font-variant: small-caps;\n}\n\n.item-title {\n  display: flex;\n  justify-content: space-between;\n}\n\n.add-to-wishlist > button > img {\n  margin-right: 0;\n}\n\n.mho-advanced-tooltip {\n  margin-top: 0.5em;\n  border-top: 1px solid;\n  max-height: 400px;\n  overflow-y: auto;\n}\n\n.mho-advanced-tooltip > table.recipes, #item-list > li.selected > .properties > table.recipes {\n  border-collapse: collapse;\n  width: 100%;\n}\n\n.mho-advanced-tooltip > table.recipes > tr, #item-list > li.selected > .properties > table.recipes > tr {\n  border: dotted;\n  border-width: 1px 0;\n}\n\n.mho-advanced-tooltip > table.recipes > tr:first-child, #item-list > li.selected > .properties > table.recipes > tr:first-child {\n  border-top: none;\n}\n\n.mho-advanced-tooltip > table.recipes > tr:last-child, #item-list > li.selected > .properties > table.recipes > tr:last-child {\n  border-bottom: none;\n}\n\n.mho-advanced-tooltip > table.recipes > tr > td.items > div, #item-list > li.selected > .properties > table.recipes > tr > td.items > div {\n  display: flex;\n  gap: 0.5em;\n}\n\n.mho-advanced-tooltip > table.recipes > tr > td:not(.results), #item-list > li.selected > .properties > table.recipes > tr > td:not(.results) {\n  width: 0;\n}\n\n.mho-advanced-tooltip > table.recipes > tr > td.results > div, #item-list > li.selected > .properties > table.recipes > tr > td.results > div {\n  flex-wrap: wrap;\n}\n\ndiv.tooltip.item:has(table.recipes) > div:first-of-type {\n  width: 0 !important;\n  min-width: 100% !important;\n}\n\n.mho-advanced-tooltip > table.recipes > tr > td.items > div > .item, #item-list > li.selected > .properties > table.recipes > tr > td.items > div > .item {\n  background-color: #524053;\n  padding: 0.5em;\n  border-radius: 0.25em;\n  white-space: nowrap;\n  display: flex;\n  align-items: center;\n  gap: 0.25em;\n}\n\n.mho-advanced-tooltip > table.recipes > tr > td.items > div > .item.mho-recipe-provoking, #item-list > li.selected > .properties > table.recipes > tr > td.items > div > .item.mho-recipe-provoking {\n  border: 1px dashed #ddab76;\n}\n\ndiv.tooltip.item:has(table.recipes) {\n  min-width: 250px !important;\n  max-width: 400px !important;\n  width: auto !important;\n}\n\n.mho-frozen {\n  pointer-events: all !important;\n}\n\n.mho-shift-hint {\n  display: inline-flex;\n  align-items: center;\n  gap: 2px;\n  margin-right: 6px;\n  opacity: 0.6;\n  font-size: 0.75em;\n  white-space: nowrap;\n  flex-shrink: 0;\n}\n\nkbd.mho-shift-hint {\n  border: 1px solid #f0d79e;\n  border-radius: 3px;\n  padding: 0 3px;\n  font-family: inherit;\n  line-height: 1.4;\n  background: rgba(240, 215, 158, 0.15);\n}\n\nimg.mho-close-hint {\n  margin-top: -6px;\n}\n\n.mho-close-hint {\n  display: none;\n}\n\n.mho-frozen .mho-shift-hint {\n  display: none;\n}\n\n.mho-frozen .mho-close-hint {\n  display: initial;\n}\n\n.mho-tooltip-translations {\n  display: flex;\n  flex-direction: row;\n  gap: 0.5em;\n  flex-wrap: wrap;\n  align-items: start;\n  justify-content: start;\n  border-bottom: 1px solid;\n  margin: 0.25em 0;\n  padding: 0.25em 0;\n}\n\n.brown-tag {\n  display: flex;\n  flex-direction: row;\n  gap: 0.5em;\n  flex-wrap: nowrap;\n  align-items: center;\n  justify-content: center;\n  background-color: #5c2b20;\n  border-radius: 0.25em;\n  padding: 0.25em 0.5em;\n}\n\nul#item-list > li {\n  background-color: #5c2b20;\n  margin: 1px 1px;\n  padding: 0.25em 0.5em;\n}\n\n#wishlist .label {\n  width: calc(100% - 775px);\n  min-width: 200px;\n  padding: 0 4px;\n}\n\n#wishlist .mho-header, #wishlist > li {\n  padding: 0 8px;\n  margin: 0.125em 0;\n  width: 100%;\n}\n\n#wishlist .mho-header > div {\n  display: inline-block;\n  vertical-align: middle;\n}\n\n#wishlist .priority, #wishlist .depot, #wishlist .bank_count, #wishlist .bag_count, #wishlist .bank_needed, #wishlist .diff {\n  width: 125px;\n  padding: 0 4px;\n}\n\n#wishlist .delete {\n  width: 25px;\n  text-align: center;\n}\n\n#wishlist-section ul {\n  padding-left: 0;\n}\n\n#wishlist-section ul > li {\n  display: flex;\n  justify-content: space-between;\n}\n\n.tab-content #recipes-list > li:nth-child(even), .tab-content #notifications-list > li:nth-child(even), #wishlist > li:nth-child(even) {\n  background-color: #5c2b20;\n}\n\nli.item[class^=priority_in], li.item[class*=\" priority_in\"], img[class^=priority_in], img[class*=\" priority_in\"] {\n  box-shadow: inset 0 0 0.5em whitesmoke, 0 0 0.5em whitesmoke;\n}\n\nli.item[class^=priority_out], li.item[class*=\" priority_out\"], img[class^=priority_out], img[class*=\" priority_out\"] {\n  box-shadow: inset 0 0 1em darkslategrey, 0 0 1em darkslategrey;\n}\n\nli.item.priority_trash, img.priority_trash {\n  box-shadow: inset 0 0 0.5em black, 0 0 0.5em black;\n}\n\ndiv.item-tag-food::after {\n  background: url(__REPO_IMG_HORDES_URL__status/status_haseaten.gif) 50%/contain no-repeat;\n}\n\ndiv.item-tag-load::after {\n  background: url(__REPO_IMG_HORDES_URL__item/item_pile.gif) 50%/contain no-repeat;\n}\n\ndiv.item-tag-hero::after {\n  background: url(__REPO_IMG_HORDES_URL__icons/star.gif) 50%/contain no-repeat;\n}\n\ndiv.item-tag-alcohol::after {\n  background: url(__REPO_IMG_HORDES_URL__status/status_drunk.gif) 50%/contain no-repeat;\n}\n\ndiv.item-tag-drug::after {\n  background: url(__REPO_IMG_HORDES_URL__status/status_drugged.gif) 50%/contain no-repeat;\n}\n\ndiv.item-tag.mho-item-tag-no-img {\n  padding-left: 2px;\n}\n\n.mho-item-tag {\n  min-height: 18px !important;\n  height: unset !important;\n}\n\n#__MHO_DISPLAY_MAP_ID__, #__MHO_STORE_NOTIFICATIONS_ID__, #__MHO_DISPLAY_EXPEDITIONS_ID__ {\n  background-color: rgba(62, 36, 23, 0.75);\n  border-radius: 6px;\n  color: #ddab76;\n  cursor: pointer;\n  font-size: 10px;\n  padding: 3px 5px;\n  transition: background-color 0.5s ease-in-out;\n  display: flex;\n  gap: 0.5em;\n}\n\n.mho-map tr td {\n  border: 1px dotted;\n  width: 30px;\n  min-width: 30px;\n  height: 30px;\n  min-height: 30px;\n  text-align: center;\n  vertical-align: middle;\n}\n\n.mho-ruin tr td {\n  border: 1px dotted;\n  width: 25px;\n  min-width: 25px;\n  height: 25px;\n  min-height: 25px;\n  text-align: center;\n  vertical-align: middle;\n}\n\n.dotted-background {\n  background-image: -moz-linear-gradient(45deg, #444 25%, transparent 25%), -moz-linear-gradient(-45deg, #444 25%, transparent 25%), -moz-linear-gradient(45deg, transparent 75%, #444 75%), -moz-linear-gradient(-45deg, transparent 75%, #444 75%);\n  background-image: -webkit-gradient(linear, 0 100%, 100% 0, color-stop(0.25, #444), color-stop(0.25, transparent)), -webkit-gradient(linear, 0 0, 100% 100%, color-stop(0.25, #444), color-stop(0.25, transparent)), -webkit-gradient(linear, 0 100%, 100% 0, color-stop(0.75, transparent), color-stop(0.75, #444)), -webkit-gradient(linear, 0 0, 100% 100%, color-stop(0.75, transparent), color-stop(0.75, #444));\n  background-image: -webkit-linear-gradient(45deg, #444 25%, transparent 25%), -webkit-linear-gradient(-45deg, #444 25%, transparent 25%), -webkit-linear-gradient(45deg, transparent 75%, #444 75%), -webkit-linear-gradient(-45deg, transparent 75%, #444 75%);\n  background-image: -o-linear-gradient(45deg, #444 25%, transparent 25%), -o-linear-gradient(-45deg, #444 25%, transparent 25%), -o-linear-gradient(45deg, transparent 75%, #444 75%), -o-linear-gradient(-45deg, transparent 75%, #444 75%);\n  background-image: linear-gradient(45deg, #444 25%, transparent 25%), linear-gradient(-45deg, #444 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #444 75%), linear-gradient(-45deg, transparent 75%, #444 75%);\n  -moz-background-size: 2px 2px;\n  background-size: 2px 2px;\n  -webkit-background-size: 2px 2px; /* override value for webkit */\n  background-position: 0 0, 1px 0, 1px -1px, 0px 1px;\n}\n\n.empty-bat:before, .empty-bat:after {\n  position: absolute;\n  content: \"\";\n  background: black;\n  display: block;\n  width: 1px;\n  height: 25px;\n  -webkit-transform: rotate(-45deg);\n  transform: rotate(-45deg);\n  left: 0;\n  right: 0;\n  top: 0;\n  bottom: 0;\n  margin: auto;\n}\n\n.empty-bat:after {\n  -webkit-transform: rotate(45deg);\n  transform: rotate(45deg);\n}\n\n.spaced-label:after {\n  content: \" : \";\n}\n\n.mho-hidden {\n  display: none !important;\n}\n\n.mho-sort-arrow {\n  display: inline-block;\n  margin-left: 2px;\n  opacity: 0.4;\n  font-size: 10px;\n  cursor: pointer;\n  user-select: none;\n  transition: opacity 0.15s;\n}\n\n.mho-sortable-cell {\n  cursor: pointer;\n  white-space: nowrap;\n}\n\n.mho-checkbox-dropdown-panel {\n  display: none;\n  position: absolute;\n  top: 100%;\n  left: 0;\n  z-index: 10;\n  max-height: 200px;\n  overflow-y: auto;\n  padding: 4px;\n  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);\n}\n\n.mho-checkbox-dropdown-panel > div {\n  display: flex;\n  align-items: center;\n  gap: 4px;\n  white-space: nowrap;\n}\n\n.mho-dropdown-toggle {\n  max-width: 200px;\n}\n\n#mho-filter-omniscience-stars {\n  min-width: 110px;\n}\n\n.mho-filter-bar {\n  display: flex;\n  flex-wrap: wrap;\n  gap: 0.5em;\n  margin-bottom: 0.5em;\n  align-items: flex-end;\n}\n\n.mho-filter-field {\n  display: flex;\n  flex-direction: column;\n  gap: 2px;\n  position: relative;\n}\n\n.mho-filter-label {\n  display: block !important;\n  width: 100%;\n  font-size: 0.8em;\n}\n\n.mho-search-wrapper {\n  position: relative;\n}\n\n.mho-search-input {\n  padding-left: 24px;\n  margin-bottom: 0;\n}\n\n.mho-search-icon {\n  height: 24px;\n  position: absolute;\n  left: 0;\n  top: 50%;\n  transform: translateY(-50%);\n}\n\n.mho-changelog-modal-overlay {\n  position: fixed;\n  inset: 0;\n  z-index: 10000;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  background: rgba(0, 0, 0, 0.65);\n}\n\n.mho-changelog-modal-box {\n  background: url(__REPO_IMG_HORDES_URL__background/box/panel_00.gif) 0 0 no-repeat, url(__REPO_IMG_HORDES_URL__background/box/panel_02.gif) 100% 0 no-repeat, url(__REPO_IMG_HORDES_URL__background/box/panel_20.gif) 0 100% no-repeat, url(__REPO_IMG_HORDES_URL__background/box/panel_22.gif) 100% 100% no-repeat, url(__REPO_IMG_HORDES_URL__background/box/panel_01.gif) 0 0 repeat-x, url(__REPO_IMG_HORDES_URL__background/box/panel_10.gif) 0 0 repeat-y, url(__REPO_IMG_HORDES_URL__background/box/panel_12.gif) 100% 0 repeat-y, url(__REPO_IMG_HORDES_URL__background/box/panel_21.gif) 0 100% repeat-x, #7e4d2a;\n  border-radius: 12px;\n  box-shadow: 0 0 20px #000;\n  color: #f0d79e;\n  display: flex;\n  flex-direction: column;\n  max-height: 80vh;\n  max-width: 600px;\n  min-width: 320px;\n  padding: 1em 1.5em;\n  gap: 0.75em;\n}\n\n.mho-changelog-modal-title {\n  color: #fff;\n  font-family: Trebuchet MS, Arial, Verdana, sans-serif;\n  font-variant: small-caps;\n  margin: 0;\n  border-bottom: 1px solid #ddab76;\n  padding-bottom: 0.5em;\n}\n\n.mho-changelog-modal-body {\n  flex: 1;\n  overflow-y: auto;\n  white-space: pre-wrap;\n  word-break: break-word;\n  font-family: Trebuchet MS, Arial, Verdana, sans-serif;\n  font-size: 0.9em;\n  margin: 0;\n  color: #f0d79e;\n}\n\n.mho-changelog-modal-footer {\n  display: flex;\n  justify-content: flex-end;\n  border-top: 1px solid #ddab76;\n  padding-top: 0.5em;\n}\n\n.mho-changelog-modal-btn {\n  background-color: #5c2b20;\n  border: 1px solid #f0d79e;\n  color: #f0d79e;\n  cursor: pointer;\n  font-family: Trebuchet MS, Arial, Verdana, sans-serif;\n  font-variant: small-caps;\n  padding: 0.25em 1.5em;\n}\n.mho-changelog-modal-btn:hover {\n  background-color: #7e4d2a;\n  outline: 1px solid #f0d79e;\n}\n\n.mho-changelog-history-toggle {\n  color: #ddab76;\n  cursor: pointer;\n  font-family: Trebuchet MS, Arial, Verdana, sans-serif;\n  font-size: 0.85em;\n  font-variant: small-caps;\n  text-decoration: underline dotted;\n  user-select: none;\n}\n\n.mho-changelog-history-toggle:hover {\n  color: #f0d79e;\n}\n\n.mho-changelog-history-section {\n  border-top: 1px solid #7e4d2a;\n  display: flex;\n  flex-direction: column;\n  gap: 0.75em;\n  max-height: 35vh;\n  overflow-y: auto;\n  padding-top: 0.5em;\n}\n\n.mho-changelog-history-block {\n  border-bottom: 1px dotted #7e4d2a;\n  padding-bottom: 0.5em;\n}\n\n.mho-changelog-history-block:last-child {\n  border-bottom: none;\n}\n\n.mho-changelog-history-version {\n  color: #ddab76;\n  font-family: Trebuchet MS, Arial, Verdana, sans-serif;\n  font-variant: small-caps;\n  font-size: 0.9em;\n  margin: 0 0 0.25em 0;\n}\n\n.mho-changelog-history-body {\n  color: #c8a870;\n  font-family: Trebuchet MS, Arial, Verdana, sans-serif;\n  font-size: 0.8em;\n  margin: 0;\n  white-space: pre-wrap;\n  word-break: break-word;\n}\n\n.mho-anti-abuse-counter-content {\n  border-bottom: 1px solid #ddab76;\n  display: flex;\n  gap: 0.5em;\n  justify-content: space-between;\n  flex-wrap: wrap;\n}\n\n#mho-camping-predict {\n  background-color: rgba(92, 43, 32, 0.35);\n  border: 1px solid #7e4d2a;\n  border-radius: 8px;\n  padding: 0.5em 0.75em;\n  margin: 0.5em 0;\n  color: #f0d79e;\n}\n#mho-camping-predict .mho-camping-title {\n  display: flex;\n  align-items: center;\n  gap: 0.5em;\n  margin: 0 0 0.5em;\n  padding-bottom: 0.4em;\n  border-bottom: 1px solid #7e4d2a;\n}\n#mho-camping-predict .mho-camping-title img {\n  height: 24px;\n}\n#mho-camping-predict .mho-camping-title span {\n  font-size: 1.25em;\n  font-variant: small-caps;\n  color: #fff;\n}\n#mho-camping-predict .mho-camping-section {\n  margin-bottom: 0.5em;\n}\n#mho-camping-predict .mho-camping-section:last-child {\n  margin-bottom: 0;\n}\n#mho-camping-predict .mho-camping-section > h3 {\n  font-size: 0.95em;\n  font-variant: small-caps;\n  color: #ddab76;\n  margin: 0 0 0.3em;\n  padding-bottom: 0.15em;\n  border-bottom: 1px dotted #7e4d2a;\n}\n#mho-camping-predict .mho-camping-columns {\n  display: flex;\n  flex-direction: row;\n  gap: 0;\n}\n#mho-camping-predict .mho-camping-columns > .mho-camping-section {\n  min-width: 0;\n  padding: 0 0.75em;\n  flex: 3 1 0;\n}\n#mho-camping-predict .mho-camping-columns > .mho-camping-section.town {\n  flex: 2 1 0;\n}\n#mho-camping-predict .mho-camping-columns > .mho-camping-section:first-child {\n  padding-left: 0;\n}\n#mho-camping-predict .mho-camping-columns > .mho-camping-section:last-child {\n  padding-right: 0;\n}\n#mho-camping-predict .mho-camping-columns > .mho-camping-section:not(:first-child) {\n  border-left: 1px solid #7e4d2a;\n}\n#mho-camping-predict .mho-camping-columns > .mho-camping-section > .mho-camping-section-content {\n  display: flex;\n  flex-wrap: wrap;\n  justify-content: space-around;\n  gap: 1em 2em;\n}\n#mho-camping-predict .mho-camping-field {\n  display: flex;\n  align-items: center;\n  gap: 0.4em;\n  padding: 0.15em 0;\n  min-width: 0;\n}\n#mho-camping-predict .mho-camping-field label {\n  display: flex;\n  align-items: center;\n  gap: 0.3em;\n  flex: 1 1 auto;\n  min-width: 0;\n  cursor: pointer;\n  white-space: nowrap;\n  overflow: hidden;\n  text-overflow: ellipsis;\n}\n#mho-camping-predict .mho-camping-field label img {\n  flex-shrink: 0;\n}\n#mho-camping-predict .mho-camping-field:has(input[type=checkbox]) {\n  display: inline-flex;\n}\n#mho-camping-predict .mho-camping-field:has(input[type=number]) {\n  width: 100%;\n}\n#mho-camping-predict .mho-camping-field input[type=number] {\n  flex: 0 0 auto;\n  width: 2em;\n  text-align: center;\n  margin: 0;\n}\n#mho-camping-predict .mho-camping-field input[type=checkbox] {\n  flex: 0 0 auto;\n  margin: 0;\n}\n#mho-camping-predict .mho-camping-field select {\n  flex: 1 1 auto;\n  min-width: 0;\n}\n#mho-camping-predict .mho-camping-stepper-btn {\n  flex-shrink: 0;\n  height: 14px;\n  width: auto;\n  cursor: pointer;\n  user-select: none;\n}\n#mho-camping-predict .mho-camping-field--full {\n  grid-column: 1/-1;\n}\n#mho-camping-predict .mho-camping-numbers-grid {\n  display: grid;\n  grid-template-columns: repeat(2, 1fr);\n  gap: 0.2em 0.6em;\n  width: 100%;\n}\n#mho-camping-predict .mho-camping-numbers-grid label {\n  flex: 0 0 auto;\n  width: 2em;\n}\n#mho-camping-predict .mho-camping-numbers-grid > .mho-camping-field:nth-child(2n) {\n  justify-content: flex-end;\n}\n#mho-camping-predict #camping-result {\n  background-color: rgba(0, 0, 0, 0.25);\n  border-radius: 6px;\n  padding: 0.5em 0.6em;\n  margin-top: 0.2em;\n}\n#mho-camping-predict .mho-camping-title {\n  cursor: pointer;\n  user-select: none;\n  position: relative;\n}\n#mho-camping-predict .mho-camping-title::before {\n  content: \"▶︎\";\n  transition: transform 0.2s ease;\n}\n#mho-camping-predict.mho-camping-opened .mho-camping-title::before {\n  transform: rotate(90deg);\n}\n#mho-camping-predict .mho-camping-content {\n  padding-top: 0.4em;\n}";
+
+    const STYLE_PLACEHOLDERS = new Map([
+        ['__BTN_ID__', btn_id],
+        ['__MH_OPTIMIZER_MAP_WINDOW_ID__', mh_optimizer_map_window_id],
+        ['__MHO_DISPLAY_EXPEDITIONS_ID__', mho_display_expeditions_id],
+        ['__MHO_DISPLAY_MAP_ID__', mho_display_map_id],
+        ['__MHO_STORE_NOTIFICATIONS_ID__', mho_store_notifications_id],
+        ['__REPO_IMG_HORDES_URL__', repo_img_hordes_url]
+    ]);
     function createStyles() {
-        const params_style = `.param-has-children > div::after {`
-            + `content: '▶︎';`
-            + `margin-left: auto;`
-            + `}`;
-        const btn_style = `
-    #${btn_id} {
-        background-color: #5c2b20;
-        border: 1px solid #f0d79e;
-        outline: 1px solid #000;
-        position: absolute;
-        top: 10px;
-        z-index: 997;
-    }
-    #${btn_id}.mho-btn-opened h1 span, #${btn_id}.mho-btn-opened h1 a, #${btn_id}.mho-btn-opened h1 img.close {
-        display: inline;
-    }
-    #${btn_id}.mho-btn-opened div {
-        display: block;
-    }
-    #${btn_id} h1 {
-        height: auto;
-        font-size: 8pt;
-        text-transform: none;
-        font-variant: small-caps;
-        background: none;
-        cursor: help;
-        margin: 0 5px;
-        padding: 0;
-        line-height: 17px;
-        color: #f0d79e;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-    #${btn_id} h1 > div > img {
-        vertical-align: -9%;
-    }
-    #${btn_id}.mho-btn-opened h1 {
-        border-bottom: 1px solid #b37c4a;
-        margin-bottom: 5px;
-    }
-    #${btn_id} h1 span, #${btn_id} h1 a, #${btn_id} h1 img.close {
-        color: #f0d79e;
-        cursor: help;
-        font-family: Trebuchet MS,Arial,Verdana,sans-serif;
-        letter-spacing: 1px;
-        line-height: 17px;
-        text-align: left;
-        text-transform: none;
-        margin-left: 1em;
-        display: none;
-    }
-    #${btn_id} > div {
-        display: none;
-        margin: 0 5px 8px 5px;
-        font-size: 0.9em;
-        width: 350px;
-    }
-    #${btn_id} .mho-parameters-btn {
-        margin-top: 0;
-        text-align: center;
-        display: block;
-    }
-    `;
-        const mho_window_style = `
-    .mho-window {
-        opacity: 1;
-        transition: opacity 1s ease;
-        z-index: 999;
-        padding: 0;
-        position: fixed;
-        min-width: 150px;
-        min-height: 150px;
-    }
-    .mho-window:not(.fullsize) .mho-window-box {
-        resize: both;
-        overflow: auto;
-    }
-    .mho-window.fullsize {
-        background: url(${repo_img_hordes_url}background/mask.png);
-        height: 100%;
-        width: 100%;
-        resize: none;
-    }
-    .mho-window:not(.visible), #${mh_optimizer_map_window_id}:not(.visible) {
-        opacity: 0;
-        pointer-events: none;
-    }
-    .mho-window:not(.visible) .mho-window-box, .mho-window:not(.visible) #${mh_optimizer_map_window_id}-box {
-        transform: scale(0) translateY(1000px);
-    }
-    .mho-window .mho-window-box {
-        background: url(${repo_img_hordes_url}background/bg_content2.jpg) repeat-y 0 0/900px 263px,url(${repo_img_hordes_url}background/bg_content2.jpg) repeat-y 100% 0/900px 263px;
-        border-radius: 8px;
-        box-shadow: 0 0 10px #000;
-        display: flex;
-        flex-direction: row;
-        position: absolute;
-        top: 10px;
-        bottom: 10px;
-        right: 10px;
-        left: 10px;
-        transform: scale(1) translateY(0);
-        transition: transform .5s ease;
-    }
-    #${mh_optimizer_map_window_id} #${mh_optimizer_map_window_id}-box {
-        background: url(${repo_img_hordes_url}background/bg_content2.jpg) repeat-y 0 0/900px 263px,url(${repo_img_hordes_url}background/bg_content2.jpg) repeat-y 100% 0/900px 263px;
-        border-radius: 8px;
-        box-shadow: 0 0 10px #000;
-        position: absolute;
-        transform: scale(1) translateY(0);
-        transition: transform .5s ease;
-        resize: both;
-        overflow: auto;
-        z-index: 9999;
-    }
-    .mho-window .mho-window-box .mho-window-overlay, #${mh_optimizer_map_window_id} #${mh_optimizer_map_window_id}-box #${mh_optimizer_map_window_id}-overlay {
-        position: absolute;
-        right: 6px;
-        top: 6px;
-        text-align: right;
-    }
-    .mho-window .mho-window-box .mho-window-overlay ul, #${mh_optimizer_map_window_id} #${mh_optimizer_map_window_id}-box #${mh_optimizer_map_window_id}-overlay ul {
-        margin: 2px;
-        padding: 0;
-    }
-    .mho-window .mho-window-box .mho-window-overlay ul li, #${mh_optimizer_map_window_id} #${mh_optimizer_map_window_id}-box #${mh_optimizer_map_window_id}-overlay ul li {
-        cursor: pointer;
-        display: inline-block;
-    }
-    .mho-window .mho-window-drag-handle {
-        width: 18px;
-        height: 100%;
-    }
-    .mho-window-content, #${mh_optimizer_map_window_id}-content {
-        flex: 1;
-        color: #fff;
-        overflow: auto;
-        background: url(${repo_img_hordes_url}background/box/panel_00.gif) 0 0 no-repeat,url(${repo_img_hordes_url}background/box/panel_02.gif) 100% 0 no-repeat,url(${repo_img_hordes_url}background/box/panel_20.gif) 0 100% no-repeat,url(${repo_img_hordes_url}background/box/panel_22.gif) 100% 100% no-repeat,url(${repo_img_hordes_url}background/box/panel_01.gif) 0 0 repeat-x,url(${repo_img_hordes_url}background/box/panel_10.gif) 0 0 repeat-y,url(${repo_img_hordes_url}background/box/panel_12.gif) 100% 0 repeat-y,url(${repo_img_hordes_url}background/box/panel_21.gif) 0 100% repeat-x,#7e4d2a;
-        border-radius: 12px;
-        padding: 8px;
-   }
-   `;
-        const mho_window_style_tabs = `
-    #tabs {
-        color: #ddab76;
-        font-size: 1.2rem;
-        margin-bottom: 20px;
-        position: relative;
-        height: 25px;
-        order-bottom: 1px solid #ddab76;
-    }
-    #tabs ul {
-        display: flex;
-        flex-wrap: wrap;
-        padding: 0;
-        background: url(${repo_img_hordes_url}background/tabs-header-plain.gif) 0 100% round;
-        background-size: cover;
-        height: 24px;
-        margin-top: 2px;
-        margin-right: 20px;
-        padding-left: 0.5em;
-    }
-    #tabs > ul > li {
-        cursor: pointer;
-        display: inline-block;
-        margin-top: auto;
-        margin-bottom: auto;
-    }
-    #tabs > ul > li > div > img {
-        margin-right: 0.5em;
-    }
-    #tabs > ul > li > div {
-        background-image: url(${repo_img_hordes_url}background/tab.gif);
-        background-position: 0 0;
-        background-repeat: no-repeat;
-        border-left: 1px solid #694023;
-        border-right: 1px solid #694023;
-        color: #f0d79e;
-        cursor: pointer;
-        float: right;
-        font-family: Arial,sans-serif;
-        font-size: 1rem;
-        font-variant: small-caps;
-        height: 21px;
-        margin-left: 2px;
-        margin-right: 0;
-        margin-top: 3px;
-        padding: 2px 4px 0;
-        text-decoration: underline;
-        white-space: nowrap;
-    }
-    #tabs > ul > li > div:hover {
-        outline: 1px solid #f0d79e;
-        text-decoration: underline;
-    }
-    #tabs > ul > li.selected {
-        position: relative;
-        top: 2px;
-    }
-    `;
-        const tab_content_style = '.tab-content {'
-            + 'position: absolute;'
-            + 'bottom: 10px;'
-            + 'left: 28px;'
-            + 'right: 8px;'
-            + 'top: 40px;'
-            + 'overflow: auto;'
-            + '}';
-        const tab_content_item_list_style = '.tab-content > ul {'
-            + 'display: flex;'
-            + 'flex-wrap: wrap;'
-            + 'padding: 0;'
-            + 'margin: 0 0.5em;'
-            + '}';
-        const tab_content_item_list_item_style = '.tab-content > ul > li {'
-            + 'min-width: 300px;'
-            + 'flex-basis: min-content;'
-            + 'padding: 0.125em 0.5em;'
-            + 'margin: 0;'
-            + '}';
-        const tab_content_item_list_item_selected_style = '.tab-content > ul > li.selected {'
-            + 'flex-basis: 100%;'
-            + 'padding: 0.25em;'
-            + 'margin: 0.25em 1px;'
-            + '}';
-        const tab_content_item_list_item_not_selected_properties_style = '.tab-content > ul > li:not(.selected) .properties {'
-            + 'display: none;'
-            + '}';
-        const item_category = '.tab-content > ul div.mho-category {'
-            + 'width: 100%;'
-            + 'border-bottom: 1px solid;'
-            + 'margin: 1em 0 0.5em;'
-            + '}';
-        const parameters_informations_ul_style = '#categories > ul, ul.parameters, #informations > ul {'
-            + 'padding: 0;'
-            + 'margin: 0;'
-            + 'color: #f0d79e;'
-            + '}';
-        const li_style = '#categories > ul > li, ul.parameters > li, .tab-content ul > li, #informations ul > li {'
-            + 'list-style: none;'
-            + '}';
-        const mho_table_style = '.mho-table {'
-            + 'border-collapse: collapse;'
-            + 'border-bottom: 1px solid #ddab76;'
-            + '}';
-        const mho_table_header_style = '.mho-header {'
-            + 'font-size: 10pt;'
-            + 'background: linear-gradient(0deg,#643b25 0,rgba(100,59,37,0) 50%,rgba(100,59,37,0)) !important;'
-            + 'border-bottom: 2px solid #f0d79e;'
-            + 'color: #fff;'
-            + 'font-family: Trebuchet MS,Arial,Verdana,sans-serif;'
-            + 'font-weight: 700;'
-            + '}';
-        const mho_table_row_style = '.mho-table tr:not(.mho-header) {'
-            + 'background-color: #5c2b20;'
-            + 'border-bottom: 1px solid #7e4d2a;'
-            + '}';
-        const mho_table_cells_style = '.mho-table tr th, .mho-table tr td {'
-            + 'padding: 0.25em;'
-            + '}';
-        const mho_table_cells_td_style = '.mho-table tr td {'
-            + 'border-left: 1px solid #7e4d2a;'
-            + 'color: #f0d79e;'
-            + 'font-size: 9pt;'
-            + '}';
-        const recipe_style = '.tab-content #recipes-list > li, .tab-content #notifications-list > li, #wishlist > li {'
-            + 'min-width: 100% !important;'
-            + 'display: flex;'
-            + '}';
-        const item_title_style = '.item-title {'
-            + 'display: flex;'
-            + 'justify-content: space-between;'
-            + '}';
-        const item_list_element_style = 'ul#item-list > li {'
-            + 'background-color: #5c2b20;'
-            + 'margin: 1px 1px;'
-            + 'padding: 0.25em 0.5em;'
-            + '}';
-        const add_to_wishlist_button_img_style = '.add-to-wishlist > button > img {'
-            + 'margin-right: 0;'
-            + '}';
-        const input_number_webkit_style = 'input.mho-input::-webkit-outer-spin-button, input.mho-input::-webkit-inner-spin-button {'
-            + '-webkit-appearance: none;'
-            + 'margin: 0;'
-            + '}';
-        const input_number_firefox_style = 'input.mho-input[type=number] {'
-            + '-moz-appearance: textfield;'
-            + '}';
-        const wishlist_header = '#wishlist .mho-header, #wishlist > li {'
-            + 'padding: 0 8px;'
-            + 'margin: 0.125em 0;'
-            + 'width: 100%;'
-            + '}';
-        const wishlist_even = '.tab-content #recipes-list > li:nth-child(even), .tab-content #notifications-list > li:nth-child(even), #wishlist > li:nth-child(even) {'
-            + 'background-color: #5c2b20;'
-            + '}';
-        const wishlist_header_cell = '#wishlist .mho-header > div {'
-            + 'display: inline-block;'
-            + 'vertical-align: middle;'
-            + '}';
-        const wishlist_label = '#wishlist .label {'
-            + 'width: calc(100% - 775px);'
-            + 'min-width: 200px;'
-            + 'padding: 0 4px;'
-            + '}';
-        const label_text = '.label_text {'
-            + 'font-size: 1.2rem;'
-            + 'font-variant: small-caps;'
-            + '}';
-        const wishlist_cols = '#wishlist .priority, #wishlist .depot, #wishlist .bank_count, #wishlist .bag_count, #wishlist .bank_needed, #wishlist .diff {'
-            + 'width: 125px;'
-            + 'padding: 0 4px;'
-            + '}';
-        const wishlist_delete = '#wishlist .delete {'
-            + 'width: 25px;'
-            + 'text-align: center;'
-            + '}';
-        const wishlist_in_app = '#wishlist-section ul {'
-            + 'padding-left: 0;'
-            + '}';
-        const wishlist_in_app_item = '#wishlist-section ul > li {'
-            + 'display: flex;'
-            + 'justify-content: space-between;'
-            + '}';
-        const advanced_tooltip = `
-        .mho-advanced-tooltip {
-            margin-top: 0.5em;
-            border-top: 1px solid;
-            max-height: 400px;
-            overflow-y: auto;
-        }
-        .mho-advanced-tooltip > table.recipes, #item-list > li.selected > .properties > table.recipes {
-            border-collapse: collapse;
-            width: 100%;
-        }
-        .mho-advanced-tooltip > table.recipes > tr, #item-list > li.selected > .properties > table.recipes > tr {
-              border: dotted;
-              border-width: 1px 0;
-        }
-        .mho-advanced-tooltip > table.recipes > tr:first-child, #item-list > li.selected > .properties > table.recipes > tr:first-child {
-            border-top: none;
-        }
-        .mho-advanced-tooltip > table.recipes > tr:last-child, #item-list > li.selected > .properties > table.recipes > tr:last-child {
-            border-bottom: none;
-        }
-        .mho-advanced-tooltip > table.recipes > tr > td.items > div, #item-list > li.selected > .properties > table.recipes > tr > td.items > div {
-            display: flex;
-            gap: 0.5em;
-        }
-        .mho-advanced-tooltip > table.recipes > tr > td:not(.results), #item-list > li.selected > .properties > table.recipes > tr > td:not(.results) {
-            width: 0;
-        }
-        .mho-advanced-tooltip > table.recipes > tr > td.results > div, #item-list > li.selected > .properties > table.recipes > tr > td.results > div {
-            flex-wrap: wrap;
-        }
-        div.tooltip.item:has(table.recipes) > div:first-of-type {
-            width: 0 !important;
-            min-width: 100% !important;
-        }
-        .mho-advanced-tooltip > table.recipes > tr > td.items > div > .item, #item-list > li.selected > .properties > table.recipes > tr > td.items > div > .item {
-            background-color: #524053;
-            padding: 0.5em;
-            border-radius: 0.25em;
-            white-space: nowrap;
-            display: flex;
-            align-items: center;
-            gap: 0.25em;
-        }
-        .mho-advanced-tooltip > table.recipes > tr > td.items > div > .item.mho-recipe-provoking, #item-list > li.selected > .properties > table.recipes > tr > td.items > div > .item.mho-recipe-provoking {
-            border: 1px dashed #ddab76;
-        }
-        div.tooltip.item:has(table.recipes) {
-            min-width: 250px !important;
-            max-width: 400px !important;
-            width: auto !important;
-        }
-        .mho-frozen {
-            pointer-events: all !important;
-        }
-        .mho-shift-hint {
-            display: inline-flex;
-            align-items: center;
-            gap: 2px;
-            margin-right: 6px;
-            opacity: 0.6;
-            font-size: 0.75em;
-            white-space: nowrap;
-            flex-shrink: 0;
-        }
-        kbd.mho-shift-hint {
-            border: 1px solid #f0d79e;
-            border-radius: 3px;
-            padding: 0 3px;
-            font-family: inherit;
-            line-height: 1.4;
-            background: rgba(240,215,158,0.15);
-        }
-        img.mho-close-hint {
-            margin-top: -6px;
-        }
-        .mho-close-hint {
-            display: none;
-        }
-        .mho-frozen .mho-shift-hint {
-            display: none;
-        }
-        .mho-frozen .mho-close-hint {
-            display: initial;
-        }
-        .mho-tooltip-translations {
-            display: flex;
-            flex-direction: row;
-            gap: 0.5em;
-            flex-wrap: wrap;
-            align-items: start;
-            justify-content: start;
-            border-bottom: 1px solid;
-            margin: 0.25em 0;
-            padding: 0.25em 0;
-        }
-        .brown-tag {
-            display: flex;
-            flex-direction: row;
-            gap: 0.5em;
-            flex-wrap: nowrap;
-            align-items: center;
-            justify-content: center;
-
-            background-color: #5c2b20;
-            border-radius: 0.25em;
-            padding: 0.25em 0.5em;
-        }
-    `;
-        const item_priority = `
-        li.item[class^='priority_in'], li.item[class*=' priority_in'], img[class^='priority_in'], img[class*=' priority_in'] {
-            box-shadow: inset 0 0 0.5em whitesmoke, 0 0 0.5em whitesmoke;
-        }
-        li.item[class^='priority_out'], li.item[class*=' priority_out'], img[class^='priority_out'], img[class*=' priority_out'] {
-            box-shadow: inset 0 0 1em darkslategrey, 0 0 1em darkslategrey;
-        }
-        li.item.priority_trash, img.priority_trash {
-            box-shadow: inset 0 0 0.5em black, 0 0 0.5em black;
-        }`;
-        const item_tags = `
-        div.item-tag-food::after {
-            background: url(${repo_img_hordes_url}status/status_haseaten.gif) 50%/contain no-repeat;
-        }
-
-        div.item-tag-load::after {
-            background: url(${repo_img_hordes_url}item/item_pile.gif) 50%/contain no-repeat;
-        }
-
-        div.item-tag-hero::after {
-            background: url(${repo_img_hordes_url}icons/star.gif) 50%/contain no-repeat;
-        }
-
-        div.item-tag-alcohol::after {
-            background: url(${repo_img_hordes_url}status/status_drunk.gif) 50%/contain no-repeat;
-        }
-
-        div.item-tag-drug::after {
-            background: url(${repo_img_hordes_url}status/status_drugged.gif) 50%/contain no-repeat;
-        }
-
-        div.item-tag.mho-item-tag-no-img {
-            padding-left: 2px;
-        }
-
-        .mho-item-tag {
-            min-height: 18px !important;
-            height: unset !important;
-        }
-    `;
-        const display_map_btn = `#${mho_display_map_id}, #${mho_store_notifications_id}, #${mho_display_expeditions_id} {`
-            + 'background-color: rgba(62,36,23,.75);'
-            + 'border-radius: 6px;'
-            + 'color: #ddab76;'
-            + 'cursor: pointer;'
-            + 'font-size: 10px;'
-            + 'padding: 3px 5px;'
-            + 'transition: background-color .5s ease-in-out;'
-            + 'display: flex;'
-            + 'gap: 0.5em;'
-            + '}';
-        const mho_map_td = `.mho-map tr td {`
-            + `border: 1px dotted;`
-            + `width: 30px;`
-            + `min-width: 30px;`
-            + `height: 30px;`
-            + `min-height: 30px;`
-            + `text-align: center;`
-            + `vertical-align: middle;`
-            + `}`;
-        const mho_ruin_td = `.mho-ruin tr td {`
-            + `border: 1px dotted;`
-            + `width: 25px;`
-            + `min-width: 25px;`
-            + `height: 25px;`
-            + `min-height: 25px;`
-            + `text-align: center;`
-            + `vertical-align: middle;`
-            + `}`;
-        const dotted_background = '.dotted-background {'
-            + `background-image: -moz-linear-gradient(45deg, #444 25%, transparent 25%),
-                         -moz-linear-gradient(-45deg, #444 25%, transparent 25%),
-                         -moz-linear-gradient(45deg, transparent 75%, #444 75%),
-                         -moz-linear-gradient(-45deg, transparent 75%, #444 75%);`
-            + `background-image: -webkit-gradient(linear, 0 100%, 100% 0, color-stop(.25, #444), color-stop(.25, transparent)),
-                         -webkit-gradient(linear, 0 0, 100% 100%, color-stop(.25, #444), color-stop(.25, transparent)),
-                         -webkit-gradient(linear, 0 100%, 100% 0, color-stop(.75, transparent), color-stop(.75, #444)),
-                         -webkit-gradient(linear, 0 0, 100% 100%, color-stop(.75, transparent), color-stop(.75, #444));`
-            + `background-image: -webkit-linear-gradient(45deg, #444 25%, transparent 25%),
-                         -webkit-linear-gradient(-45deg, #444 25%, transparent 25%),
-                         -webkit-linear-gradient(45deg, transparent 75%, #444 75%),
-                         -webkit-linear-gradient(-45deg, transparent 75%, #444 75%);`
-            + `background-image: -o-linear-gradient(45deg, #444 25%, transparent 25%),
-                         -o-linear-gradient(-45deg, #444 25%, transparent 25%),
-                         -o-linear-gradient(45deg, transparent 75%, #444 75%),
-                         -o-linear-gradient(-45deg, transparent 75%, #444 75%);`
-            + `background-image: linear-gradient(45deg, #444 25%, transparent 25%),
-                         linear-gradient(-45deg, #444 25%, transparent 25%),
-                         linear-gradient(45deg, transparent 75%, #444 75%),
-                         linear-gradient(-45deg, transparent 75%, #444 75%);`
-            + `-moz-background-size: 2px 2px;`
-            + `background-size: 2px 2px;`
-            + `-webkit-background-size: 2px 2px; /* override value for webkit */`
-            + `background-position: 0 0, 1px 0, 1px -1px, 0px 1px;`
-            + '}';
-        let empty_bat_before_after = '.empty-bat:before, .empty-bat:after {'
-            + 'position: absolute;'
-            + 'content: "";'
-            + 'background: black;'
-            + 'display: block;'
-            + 'width: 1px;'
-            + 'height: 25px;'
-            + '-webkit-transform: rotate(-45deg);'
-            + 'transform: rotate(-45deg);'
-            + 'left: 0;'
-            + 'right: 0;'
-            + 'top: 0;'
-            + 'bottom: 0;'
-            + 'margin: auto;'
-            + '}';
-        let empty_bat_after = '.empty-bat:after {'
-            + '-webkit-transform: rotate(45deg);'
-            + 'transform: rotate(45deg);'
-            + '}';
-        let camping_spaced_label = '.spaced-label:after {'
-            + `content: '\\00a0:\\00a0'`
-            + '}';
-        let hidden = `
-        .mho-hidden {
-            display: none !important;
-        }
-    `;
-        let new_changelog = `
-        div.mho-new-changelog::before {
-            position: absolute;
-            top: -3px;
-            left: -3px;
-        }
-        a.mho-new-changelog::before {
-            position: relative;
-            top: 0;
-            left: 0;
-        }
-        .mho-new-changelog::before {
-            content: '';
-            width: 6px;
-            aspect-ratio: 1;
-            background: #4B107B;
-            border-radius: 50%;
-            box-shadow: 0px 0px 6px 3px #BF61CF;
-            display: inline-block;
-        }
-        `;
-        let new_version = `
-        div.mho-new-version::before {
-            position: absolute;
-            top: -3px;
-            left: -3px;
-        }
-        .mho-new-version::before {
-            content: '';
-            width: 8px;
-            aspect-ratio: 1;
-            background: #BF61CF;
-            border-radius: 50%;
-            box-shadow: 0px 0px 8px 4px #4B107B;
-            display: inline-block;
-        }
-        `;
-        let sort_arrow = `
-        .mho-sort-arrow {
-            display: inline-block;
-            margin-left: 2px;
-            opacity: 0.4;
-            font-size: 10px;
-            cursor: pointer;
-            user-select: none;
-            transition: opacity .15s;
-        }
-
-        .mho-sortable-cell {
-            cursor: pointer;
-            white-space: nowrap;
-        }
-    `;
-        let anti_abuse = `
-        .mho-anti-abuse-counter-content {
-            border-bottom: 1px solid #ddab76;
-            display: flex;
-            gap: 0.25em;
-            justify-content: space-around;
-            flex-wrap: wrap;
-            padding: calc(0.25em - 2px) 0 0.25em;
-        }
-    `;
-        let multi_select = `
-        .mho-checkbox-dropdown-panel {
-            display: none;
-            position: absolute;
-            top: 100%;
-            left: 0;
-            z-index: 10;
-            max-height: 200px;
-            overflow-y: auto;
-            padding: 4px;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
-        }
-
-        .mho-checkbox-dropdown-panel > div {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            white-space: nowrap;
-        }
-
-        .mho-dropdown-toggle {
-            max-width: 200px;
-        }
-
-        #mho-filter-omniscience-stars {
-            min-width: 110px;
-        }
-    `;
-        let mho_filters = `
-        .mho-filter-bar {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.5em;
-            margin-bottom: 0.5em;
-            align-items: flex-end;
-        }
-
-        .mho-filter-field {
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-            position: relative;
-        }
-
-        .mho-filter-label {
-            display: block !important;
-            width: 100%;
-            font-size: 0.8em;
-        }
-
-        .mho-search-wrapper {
-            position: relative;
-        }
-
-        .mho-search-input {
-            padding-left: 24px;
-            margin-bottom: 0;
-        }
-
-        .mho-search-icon {
-            height: 24px;
-            position: absolute;
-            left: 0;
-            top: 50%;
-            transform: translateY(-50%);
-        }
-    `;
-        const mho_changelog_modal = `
-        .mho-changelog-modal-overlay {
-            position: fixed;
-            inset: 0;
-            z-index: 10000;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: rgba(0, 0, 0, 0.65);
-        }
-        .mho-changelog-modal-box {
-            background: url(${repo_img_hordes_url}background/box/panel_00.gif) 0 0 no-repeat,
-                        url(${repo_img_hordes_url}background/box/panel_02.gif) 100% 0 no-repeat,
-                        url(${repo_img_hordes_url}background/box/panel_20.gif) 0 100% no-repeat,
-                        url(${repo_img_hordes_url}background/box/panel_22.gif) 100% 100% no-repeat,
-                        url(${repo_img_hordes_url}background/box/panel_01.gif) 0 0 repeat-x,
-                        url(${repo_img_hordes_url}background/box/panel_10.gif) 0 0 repeat-y,
-                        url(${repo_img_hordes_url}background/box/panel_12.gif) 100% 0 repeat-y,
-                        url(${repo_img_hordes_url}background/box/panel_21.gif) 0 100% repeat-x,
-                        #7e4d2a;
-            border-radius: 12px;
-            box-shadow: 0 0 20px #000;
-            color: #f0d79e;
-            display: flex;
-            flex-direction: column;
-            max-height: 80vh;
-            max-width: 600px;
-            min-width: 320px;
-            padding: 1em 1.5em;
-            gap: 0.75em;
-        }
-        .mho-changelog-modal-title {
-            color: #fff;
-            font-family: Trebuchet MS, Arial, Verdana, sans-serif;
-            font-variant: small-caps;
-            margin: 0;
-            border-bottom: 1px solid #ddab76;
-            padding-bottom: 0.5em;
-        }
-        .mho-changelog-modal-body {
-            flex: 1;
-            overflow-y: auto;
-            white-space: pre-wrap;
-            word-break: break-word;
-            font-family: Trebuchet MS, Arial, Verdana, sans-serif;
-            font-size: 0.9em;
-            margin: 0;
-            color: #f0d79e;
-        }
-        .mho-changelog-modal-footer {
-            display: flex;
-            justify-content: flex-end;
-            border-top: 1px solid #ddab76;
-            padding-top: 0.5em;
-        }
-        .mho-changelog-modal-btn {
-            background-color: #5c2b20;
-            border: 1px solid #f0d79e;
-            color: #f0d79e;
-            cursor: pointer;
-            font-family: Trebuchet MS, Arial, Verdana, sans-serif;
-            font-variant: small-caps;
-            padding: 0.25em 1.5em;
-        }
-        .mho-changelog-modal-btn:hover {
-            background-color: #7e4d2a;
-            outline: 1px solid #f0d79e;
-        }
-        .mho-changelog-history-toggle {
-            color: #ddab76;
-            cursor: pointer;
-            font-family: Trebuchet MS, Arial, Verdana, sans-serif;
-            font-size: 0.85em;
-            font-variant: small-caps;
-            text-decoration: underline dotted;
-            user-select: none;
-        }
-        .mho-changelog-history-toggle:hover {
-            color: #f0d79e;
-        }
-        .mho-changelog-history-section {
-            border-top: 1px solid #7e4d2a;
-            display: flex;
-            flex-direction: column;
-            gap: 0.75em;
-            max-height: 35vh;
-            overflow-y: auto;
-            padding-top: 0.5em;
-        }
-        .mho-changelog-history-block {
-            border-bottom: 1px dotted #7e4d2a;
-            padding-bottom: 0.5em;
-        }
-        .mho-changelog-history-block:last-child {
-            border-bottom: none;
-        }
-        .mho-changelog-history-version {
-            color: #ddab76;
-            font-family: Trebuchet MS, Arial, Verdana, sans-serif;
-            font-variant: small-caps;
-            font-size: 0.9em;
-            margin: 0 0 0.25em 0;
-        }
-        .mho-changelog-history-body {
-            color: #c8a870;
-            font-family: Trebuchet MS, Arial, Verdana, sans-serif;
-            font-size: 0.8em;
-            margin: 0;
-            white-space: pre-wrap;
-            word-break: break-word;
-        }
-    `;
-        let css = params_style + btn_style + mho_window_style + new_changelog + new_version
-            + mho_window_style_tabs + tab_content_style + tab_content_item_list_style + tab_content_item_list_item_style + tab_content_item_list_item_selected_style + tab_content_item_list_item_not_selected_properties_style + item_category
-            + parameters_informations_ul_style + li_style + recipe_style + input_number_webkit_style + input_number_firefox_style
-            + mho_table_style + mho_table_header_style + mho_table_row_style + mho_table_cells_style + mho_table_cells_td_style + label_text
-            + item_title_style + add_to_wishlist_button_img_style + advanced_tooltip + item_list_element_style
-            + wishlist_label + wishlist_header + wishlist_header_cell + wishlist_cols + wishlist_delete + wishlist_in_app + wishlist_in_app_item + wishlist_even
-            + item_priority + item_tags
-            + display_map_btn + mho_map_td + mho_ruin_td + dotted_background + empty_bat_before_after + empty_bat_after + camping_spaced_label + hidden + sort_arrow + multi_select + mho_filters
-            + mho_changelog_modal + anti_abuse;
-        let style = document.createElement('style');
-        if (style.styleSheet) {
-            style.styleSheet.cssText = css;
-        }
-        else {
-            style.appendChild(document.createTextNode(css));
-        }
+        let css = styleTemplate;
+        for (const [placeholder, value] of STYLE_PLACEHOLDERS) {
+            css = css.replaceAll(placeholder, value);
+        }
+        const style = document.createElement('style');
+        style.appendChild(document.createTextNode(css));
         document.getElementsByTagName('head')[0].appendChild(style);
     }
 
