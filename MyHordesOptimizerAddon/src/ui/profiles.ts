@@ -1,19 +1,13 @@
-import {
-    big_broth_hordes_url,
-    fata_morgana_url,
-    gest_hordes_url,
-    mh_optimizer_icon,
-    mho_town_external_links_id,
-    repo_img_url
-} from '../config/constants';
-import {texts} from '../i18n/texts';
-import {state} from '../state';
-import {getI18N} from '../utils/i18n';
-import {pageIsTownHistory} from '../utils/page';
-import {getScriptInfo} from '../utils/version';
+import { big_broth_hordes_url, fata_morgana_url, gest_hordes_url, mh_optimizer_icon, mho_town_external_links_id, repo_img_url } from '../config/constants';
+import { texts } from '../i18n/texts';
+import { state } from '../state';
+import { getI18N } from '../utils/i18n';
+import { pageIsTownHistory } from '../utils/page';
+import { getScriptInfo } from '../utils/version';
 
 export function addExternalLinksToProfiles() {
-    if (state.mho_parameters.display_external_links) {
+    let mho_link_block = document.querySelector('.mho-link-blocks');
+    if (state.mho_parameters.display_external_links && !mho_link_block) {
         let user_tooltip = document.querySelector('#user-tooltip');
         if (user_tooltip) {
             let user_id = user_tooltip.querySelector('[x-ajax-href]')?.getAttribute('x-ajax-href')?.replace(/\D/g, '');
@@ -27,7 +21,7 @@ export function addExternalLinksToProfiles() {
             last_separator.parentNode.insertBefore(new_separator, last_separator.nextSibling);
 
             let new_part = document.createElement('div');
-            new_part.classList.add('link-blocks');
+            new_part.classList.add('link-blocks', 'mho-link-blocks');
             last_separator.parentNode.insertBefore(new_part, last_separator.nextSibling);
 
             let new_part_title = document.createElement('div');
@@ -55,6 +49,8 @@ export function addExternalLinksToProfiles() {
             bbh_title.innerText = `BigBroth'\nHordes`;
             bbh_link.appendChild(bbh_title);
 
+            new_part.appendChild(document.createTextNode('\u00A0'));
+
             let gh_link = document.createElement('a');
             gh_link.classList.add('link-block');
             gh_link.href = `${gest_hordes_url}/ame/${user_id}`;
@@ -73,10 +69,14 @@ export function addExternalLinksToProfiles() {
             gh_title.innerText = `Gest'Hordes`;
             gh_link.appendChild(gh_title);
 
+            new_part.appendChild(document.createTextNode('\u00A0'));
+
             let empty_link = document.createElement('div');
             empty_link.classList.add('link-block', 'empty');
             new_part.appendChild(empty_link);
         }
+    } else if (!state.mho_parameters.display_external_links && mho_link_block) {
+        mho_link_block.remove();
     }
 }
 

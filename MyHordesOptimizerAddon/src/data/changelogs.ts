@@ -1,4 +1,8 @@
 export const changelogs: Record<string, string> = {
+    '1.1.46': `
+        [Correction] Ajustement de la taille de certains filtres de la liste des citoyens
+        [Correction] Il y avait un bug de dupliquation des liens vers les outils externes dans la popup d'utilisateur
+    `,
     '1.1.45': `
         [Correction] Le compteur anti-abus ne fonctionnait pas correctement (mais on s'en rapproche de plus en plus !)
 

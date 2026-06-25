@@ -206,24 +206,25 @@ export function createCheckboxDropdown(labelText: string, id: string, options: a
  * @param {string} labelText
  * @param {string} id
  * @param {{value: string, text: string}[]} options
+ * @param {string[]} classList
  * @returns {{ container: HTMLDivElement, select: HTMLSelectElement }}
  */
-export function createSingleFilterSelect(labelText: string, id: string, options: any[]) {
-    let container = document.createElement('div');
-    container.classList.add('mho-filter-field');
+export function createSingleFilterSelect(labelText: string, id: string, options: {value: string, text: string}[], classList: string[] = []): {container: HTMLDivElement, select: HTMLSelectElement} {
+    let container: HTMLDivElement = document.createElement('div');
+    container.classList.add('mho-filter-field', ...classList);
 
-    let label = document.createElement('label');
+    let label: HTMLLabelElement = document.createElement('label');
     label.htmlFor = id;
     label.innerText = labelText;
     label.classList.add('mho-filter-label');
     container.appendChild(label);
 
-    let select = document.createElement('select');
+    let select: HTMLSelectElement = document.createElement('select');
     select.id = id;
     select.classList.add('mho-input');
 
-    options.forEach(({value, text}) => {
-        let opt = document.createElement('option');
+    options.forEach(({value, text}: {value: string, text: string}) => {
+        let opt: HTMLOptionElement = document.createElement('option');
         opt.value = value;
         opt.innerText = text;
         select.appendChild(opt);
