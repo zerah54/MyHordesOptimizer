@@ -137,6 +137,7 @@ export class CampingComponent implements OnInit {
                                     objects: [{value: 0, disabled: false}],
                                     vest: [{value: false, disabled: false}],
                                     tomb: [{value: false, disabled: false}],
+                                    r4: [{value: false, disabled: false}],
                                     zombies: [{value: 0, disabled: false}],
                                     night: [{value: false, disabled: false}],
                                     devastated: [{
@@ -312,6 +313,7 @@ export class CampingComponent implements OnInit {
             objects: this.configuration_form.get('objects')?.value ?? 0,
             vest: this.configuration_form.get('vest')?.value ?? 0,
             tomb: this.configuration_form.get('tomb')?.value ?? 0,
+            r4: this.configuration_form.get('r4')?.value ?? 0,
             zombies: this.configuration_form.get('zombies')?.value ?? 0,
             night: this.configuration_form.get('night')?.value,
             devastated: this.configuration_form.get('devastated')?.value,

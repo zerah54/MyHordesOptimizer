@@ -50,10 +50,13 @@
                             <img [ngSrc]="HORDES_IMG_REPO + 'status/status_camper.gif'" width="16" height="16">
                             <ng-container i18n>Campeur professionnel</ng-container>
                         </mat-checkbox>
-                        <mat-checkbox [formControlName]="'tomb'" style="margin-bottom: 0.5em">
+                        <mat-checkbox [formControlName]="'tomb'">
                             <img [ngSrc]="HORDES_IMG_REPO + 'building/small_cemetery.gif'" width="16" height="16">
                             <ng-container i18n>Tombe</ng-container>&nbsp;
                             <small>({{ bonus_string }}{{ bonus.tomb | campingDisplayBonus:display_bonus_ap:locale }})</small>
+                        </mat-checkbox>
+                        <mat-checkbox [formControlName]="'r4'" #R4 style="margin-bottom: 0.5em">
+                            <ng-container i18n>R4</ng-container>
                         </mat-checkbox>
                         <mat-form-field appearance="outline" class="short-bottom">
                             <mat-label i18n>Nombre de campings déjà effectués</mat-label>

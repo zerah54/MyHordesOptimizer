@@ -52,10 +52,20 @@ namespace MyHordesOptimizerApi.Services.Impl
         {
             var probability = GetCampingValues(campingParameters).Sum(chancePair => chancePair.Value);
             var odds = new CampingOddsDto();
-            odds.BoundedProbability = Math.Max(0, Math.Min(probability, campingParameters.Job == "survivalist" ? 100 : 90));
+            odds.BoundedProbability = Math.Max(0, Math.Min(probability, GetMaxBoundedProbability(campingParameters)));
             odds.Probability = probability;
             odds.Label = CampingResults.Find(result => result.Strict ? odds.BoundedProbability < result.Probability : odds.BoundedProbability <= result.Probability).Label;
             return odds;
+        }
+
+        private int GetMaxBoundedProbability(CampingParametersDto campingParameters)
+        {
+            if (campingParameters.Job == "survivalist")
+            {
+                return 100;
+            }
+
+            return campingParameters.R4 ? 99 : 90;
         }
 
         private Dictionary<string, int> GetCampingValues(CampingParametersDto campingParameters)

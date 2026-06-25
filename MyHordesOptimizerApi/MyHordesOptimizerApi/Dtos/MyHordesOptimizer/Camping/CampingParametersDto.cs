@@ -23,5 +23,6 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Camping
         public int RuinBonus { get; set; }
         public int RuinBuryCount { get; set; }
         public int RuinCapacity { get; set; }
+        public bool R4 { get; set; }
     }
 }

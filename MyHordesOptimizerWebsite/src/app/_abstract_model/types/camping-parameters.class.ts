@@ -12,6 +12,7 @@ export class CampingParameters extends CommonModel<CampingParametersDTO> {
     public objects: number = 0;
     public vest: boolean = false;
     public tomb: boolean = false;
+    public r4: boolean = false;
     public zombies: number = 0;
     public night: boolean = false;
     public devastated: boolean = false;
@@ -39,6 +40,7 @@ export class CampingParameters extends CommonModel<CampingParametersDTO> {
             objects: this.objects,
             vest: this.vest,
             tomb: this.tomb,
+            r4: this.r4,
             zombies: this.zombies,
             night: this.night,
             devastated: this.devastated,
@@ -62,6 +64,7 @@ export class CampingParameters extends CommonModel<CampingParametersDTO> {
             this.objects = dto.objects;
             this.vest = dto.vest;
             this.tomb = dto.tomb;
+            this.r4 = dto.r4;
             this.zombies = dto.zombies;
             this.night = dto.night;
             this.devastated = dto.devastated;

@@ -10,6 +10,7 @@ export interface CampingParametersDTO {
     objects: number;
     vest: boolean;
     tomb: boolean;
+    r4: boolean;
     zombies: number;
     night: boolean;
     devastated: boolean;
