@@ -1,4 +1,7 @@
 export const changelogs: Record<string, string> = {
+    '1.1.47': `
+        [Amélioration] Ajout de liens vers les pages des villes des outils externes sur la page de choix de ville
+    `,
     '1.1.46': `
         [Correction] Ajustement de la taille de certains filtres de la liste des citoyens
         [Correction] Il y avait un bug de dupliquation des liens vers les outils externes dans la popup d'utilisateur

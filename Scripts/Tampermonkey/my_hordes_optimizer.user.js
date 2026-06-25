@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MHO Addon
-// @version      1.1.46
+// @version      1.1.47
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/, rubrique Tutoriels
 // @author       Zerah
 //
@@ -156,6 +156,10 @@
     function buttonOptimizerElement() {
         return document.getElementById(btn_id);
     }
+    /** @return {boolean}    true si la page de l'utilisateur est la page de selection de ville */
+    function pageIsWelcome() {
+        return document.URL.endsWith('welcome');
+    }
     /** @return {boolean}    true si la page de l'utilisateur est la page de la ville */
     function pageIsTown() {
         return document.URL.indexOf('town') > -1;
@@ -296,6 +300,9 @@
     }
 
     const changelogs = {
+        '1.1.47': `
+        [Amélioration] Ajout de liens vers les pages des villes des outils externes sur la page de choix de ville
+    `,
         '1.1.46': `
         [Correction] Ajustement de la taille de certains filtres de la liste des citoyens
         [Correction] Il y avait un bug de dupliquation des liens vers les outils externes dans la popup d'utilisateur
@@ -6378,6 +6385,250 @@
     }
     /** Permet de bloquer / débloquer des utilisateurs et de masquer les posts des utilisateurs bloqués */
 
+    function addExternalLinksToProfiles() {
+        let mho_link_block = document.querySelector('.mho-link-blocks');
+        if (state.mho_parameters.display_external_links && !mho_link_block) {
+            let user_tooltip = document.querySelector('#user-tooltip');
+            if (user_tooltip) {
+                let user_id = user_tooltip.querySelector('[x-ajax-href]')?.getAttribute('x-ajax-href')?.replace(/\D/g, '');
+                if (!user_id)
+                    return;
+                let dash_separators = user_tooltip.querySelectorAll('hr.dashed');
+                let last_separator = Array.from(dash_separators).pop();
+                let link_color = window.getComputedStyle(user_tooltip.querySelector('.link')).getPropertyValue('color');
+                let new_separator = document.createElement('hr');
+                new_separator.classList.add('dashed');
+                last_separator.parentNode.insertBefore(new_separator, last_separator.nextSibling);
+                let new_part = document.createElement('div');
+                new_part.classList.add('link-blocks', 'mho-link-blocks');
+                last_separator.parentNode.insertBefore(new_part, last_separator.nextSibling);
+                let new_part_title = document.createElement('div');
+                new_part_title.innerHTML = `<img src="${mh_optimizer_icon}" style="width: 16px; margin-right: 0.5em;">${getI18N(texts.external_profiles)}`;
+                new_part_title.style.marginBottom = '0.5em';
+                new_part_title.style.textAlign = 'left';
+                new_part_title.style.color = link_color;
+                new_part.appendChild(new_part_title);
+                let bbh_link = document.createElement('a');
+                bbh_link.classList.add('link-block');
+                bbh_link.href = `${big_broth_hordes_url}/?pg=user&uid=5-${user_id}`;
+                new_part.appendChild(bbh_link);
+                bbh_link.addEventListener('click', () => user_tooltip.remove());
+                let bbh_img = document.createElement('img');
+                bbh_img.src = `${repo_img_url}external-tools/bbh.gif`;
+                bbh_link.appendChild(bbh_img);
+                let bbh_br = document.createElement('br');
+                bbh_link.appendChild(bbh_br);
+                let bbh_title = document.createElement('text');
+                bbh_title.innerText = `BigBroth'\nHordes`;
+                bbh_link.appendChild(bbh_title);
+                new_part.appendChild(document.createTextNode('\u00A0'));
+                let gh_link = document.createElement('a');
+                gh_link.classList.add('link-block');
+                gh_link.href = `${gest_hordes_url}/ame/${user_id}`;
+                new_part.appendChild(gh_link);
+                gh_link.addEventListener('click', () => user_tooltip.remove());
+                let gh_img = document.createElement('img');
+                gh_img.src = `${repo_img_url}external-tools/gh.gif`;
+                gh_link.appendChild(gh_img);
+                let gh_br = document.createElement('br');
+                gh_link.appendChild(gh_br);
+                let gh_title = document.createElement('text');
+                gh_title.innerText = `Gest'Hordes`;
+                gh_link.appendChild(gh_title);
+                new_part.appendChild(document.createTextNode('\u00A0'));
+                let empty_link = document.createElement('div');
+                empty_link.classList.add('link-block', 'empty');
+                new_part.appendChild(empty_link);
+            }
+        }
+        else if (!state.mho_parameters.display_external_links && mho_link_block) {
+            mho_link_block.remove();
+        }
+    }
+    function addExternalLinksToTowns() {
+        if (!pageIsTownHistory()) {
+            return;
+        }
+        let view_town = document.querySelector('.view-town');
+        if (!view_town)
+            return;
+        let btns_row = view_town.querySelector('button')?.parentElement;
+        if (!btns_row)
+            return;
+        let mho_block = btns_row.querySelector('#' + mho_town_external_links_id);
+        if (!state.mho_parameters.display_external_links) {
+            mho_block?.remove();
+            return;
+        }
+        if (mho_block)
+            return;
+        let town_id = view_town.getAttribute('data-town-id');
+        if (!town_id)
+            return;
+        mho_block = document.createElement('div');
+        mho_block.id = mho_town_external_links_id;
+        mho_block.style.marginTop = '0.5em';
+        mho_block.style.padding = '0.25em';
+        mho_block.style.border = '1px solid #ddab76';
+        btns_row.appendChild(mho_block);
+        let updater_title = document.createElement('h5');
+        updater_title.style.margin = '0 0 0.5em';
+        let btns_title_mho_img = document.createElement('img');
+        btns_title_mho_img.src = mh_optimizer_icon;
+        btns_title_mho_img.style.height = '24px';
+        btns_title_mho_img.style.marginRight = '0.5em';
+        updater_title.appendChild(btns_title_mho_img);
+        let btns_title_text = document.createElement('text');
+        btns_title_text.innerText = getScriptInfo().name;
+        updater_title.appendChild(btns_title_text);
+        mho_block.appendChild(updater_title);
+        let mho_btns_block = document.createElement('div');
+        mho_block.appendChild(mho_btns_block);
+        mho_btns_block.style.display = 'flex';
+        mho_btns_block.style.gap = '0.5em';
+        mho_btns_block.style.justifyContent = 'space-between';
+        mho_btns_block.style.alignItems = 'center';
+        createExternalLinksButtons(town_id).forEach((link) => {
+            mho_btns_block.appendChild(link);
+        });
+    }
+    const external_tool_links = [
+        // {
+        //     icon_file_name: 'bbh.gif',
+        //     label: `BigBroth'\nHordes`,
+        //     build_url: (town_id: string): string => `${big_broth_hordes_url}/?cid=5-${town_id}`,
+        // },
+        {
+            icon_file_name: 'gh.gif',
+            label: `Gest'\nHordes`,
+            build_url: (town_id) => `${gest_hordes_url}/carte/${town_id}`,
+        },
+        {
+            icon_file_name: 'fata.gif',
+            label: `Fata\nMorgana`,
+            build_url: (town_id) => `${fata_morgana_url}/spy/town/${town_id}`,
+        },
+    ];
+    function createExternalLinksButtons(town_id) {
+        return external_tool_links.map((tool_link) => {
+            const link = document.createElement('button');
+            link.classList.add('small');
+            link.style.display = 'flex';
+            link.style.alignItems = 'center';
+            link.style.gap = '0.5em';
+            link.onclick = () => window.open(tool_link.build_url(town_id), '_blank');
+            const img = document.createElement('img');
+            img.src = `${repo_img_url}external-tools/${tool_link.icon_file_name}`;
+            link.appendChild(img);
+            const title = document.createElement('text');
+            title.innerText = tool_link.label;
+            link.appendChild(title);
+            return link;
+        });
+    }
+    const mho_welcome_link_cell_class = 'mho-town-list-link-cell';
+    const mho_welcome_link_header_class = 'mho-town-list-link-header-cell';
+    const mho_welcome_link_panel_class = 'mho-town-list-link-panel';
+    let mho_welcome_outside_click_bound = false;
+    let mho_welcome_observed_element = null;
+    let mho_welcome_observer = null;
+    function addExternalLinksColumnToWelcomeTowns() {
+        if (!pageIsWelcome()) {
+            disconnectWelcomeObserver();
+            return;
+        }
+        let onboarding = document.querySelector('hordes-game-onboarding');
+        if (!onboarding)
+            return;
+        if (!state.mho_parameters.display_external_links) {
+            removeExternalLinksColumnFromWelcomeTowns();
+            disconnectWelcomeObserver();
+            return;
+        }
+        ensureWelcomeObserver(onboarding);
+        bindWelcomeOutsideClickOnce();
+        let header_rows = onboarding.querySelectorAll('.row-flex.header');
+        header_rows.forEach((header_row) => {
+            if (header_row.querySelector('.' + mho_welcome_link_header_class))
+                return;
+            let header_cell = document.createElement('div');
+            header_cell.classList.add('padded', 'cell', 'rw-1', 'hide-sm', mho_welcome_link_header_class);
+            let header_icon = document.createElement('img');
+            header_icon.src = mh_optimizer_icon;
+            header_icon.alt = 'MHO';
+            header_icon.style.width = '16px';
+            header_cell.appendChild(header_icon);
+            header_row.appendChild(header_cell);
+        });
+        let town_rows = onboarding.querySelectorAll('.town-row');
+        town_rows.forEach((town_row) => {
+            if (town_row.querySelector('.' + mho_welcome_link_cell_class))
+                return;
+            let town_id = town_row.getAttribute('data-town-id');
+            if (!town_id)
+                return;
+            let link_cell = document.createElement('div');
+            link_cell.classList.add('padded', 'cell', 'rw-1', 'rw-sm-2', mho_welcome_link_cell_class);
+            let map_icon = document.createElement('img');
+            map_icon.src = repo_img_hordes_url + 'icons/item_map.gif';
+            map_icon.alt = 'Carte';
+            link_cell.appendChild(map_icon);
+            let panel = document.createElement('div');
+            panel.classList.add(mho_welcome_link_panel_class);
+            createExternalLinksButtons(town_id).forEach((link) => {
+                panel.appendChild(link);
+            });
+            link_cell.appendChild(panel);
+            link_cell.addEventListener('click', (event) => {
+                event.stopPropagation();
+                let was_open = panel.classList.contains('mho-open');
+                closeAllWelcomeLinkPanels();
+                if (!was_open) {
+                    panel.classList.add('mho-open');
+                    positionWelcomeLinkPanel(panel);
+                }
+            });
+            town_row.appendChild(link_cell);
+        });
+    }
+    function ensureWelcomeObserver(onboarding) {
+        if (mho_welcome_observed_element === onboarding && mho_welcome_observer)
+            return;
+        disconnectWelcomeObserver();
+        mho_welcome_observed_element = onboarding;
+        mho_welcome_observer = new MutationObserver(() => {
+            addExternalLinksColumnToWelcomeTowns();
+        });
+        mho_welcome_observer.observe(onboarding, { childList: true, subtree: true });
+    }
+    function disconnectWelcomeObserver() {
+        mho_welcome_observer?.disconnect();
+        mho_welcome_observer = null;
+        mho_welcome_observed_element = null;
+    }
+    function removeExternalLinksColumnFromWelcomeTowns() {
+        document.querySelectorAll('.' + mho_welcome_link_cell_class + ', .' + mho_welcome_link_header_class)
+            .forEach((element) => element.remove());
+    }
+    function closeAllWelcomeLinkPanels() {
+        document.querySelectorAll('.' + mho_welcome_link_panel_class + '.mho-open')
+            .forEach((panel) => panel.classList.remove('mho-open'));
+    }
+    function bindWelcomeOutsideClickOnce() {
+        if (mho_welcome_outside_click_bound)
+            return;
+        mho_welcome_outside_click_bound = true;
+        document.addEventListener('click', closeAllWelcomeLinkPanels);
+    }
+    function positionWelcomeLinkPanel(panel) {
+        panel.classList.remove('mho-align-right');
+        let panel_rect = panel.getBoundingClientRect();
+        let overflows_right = panel_rect.right > window.innerWidth;
+        if (overflows_right) {
+            panel.classList.add('mho-align-right');
+        }
+    }
+
     let fill_items_messages_pool = {
         en: [
             { title: 'Hi', content: ':iloveu:' }
@@ -6554,143 +6805,6 @@
                 return;
             let voracite = ghoul_voracity_node.querySelector('.ghoul-hunger-bar').style.width;
             ghoul_voracity_node.firstChild.textContent = ghoul_voracity_node.firstChild.textContent.replace(':\n', `: ${voracite}\n`);
-        }
-    }
-
-    function addExternalLinksToProfiles() {
-        let mho_link_block = document.querySelector('.mho-link-blocks');
-        if (state.mho_parameters.display_external_links && !mho_link_block) {
-            let user_tooltip = document.querySelector('#user-tooltip');
-            if (user_tooltip) {
-                let user_id = user_tooltip.querySelector('[x-ajax-href]')?.getAttribute('x-ajax-href')?.replace(/\D/g, '');
-                if (!user_id)
-                    return;
-                let dash_separators = user_tooltip.querySelectorAll('hr.dashed');
-                let last_separator = Array.from(dash_separators).pop();
-                let link_color = window.getComputedStyle(user_tooltip.querySelector('.link')).getPropertyValue('color');
-                let new_separator = document.createElement('hr');
-                new_separator.classList.add('dashed');
-                last_separator.parentNode.insertBefore(new_separator, last_separator.nextSibling);
-                let new_part = document.createElement('div');
-                new_part.classList.add('link-blocks', 'mho-link-blocks');
-                last_separator.parentNode.insertBefore(new_part, last_separator.nextSibling);
-                let new_part_title = document.createElement('div');
-                new_part_title.innerHTML = `<img src="${mh_optimizer_icon}" style="width: 16px; margin-right: 0.5em;">${getI18N(texts.external_profiles)}`;
-                new_part_title.style.marginBottom = '0.5em';
-                new_part_title.style.textAlign = 'left';
-                new_part_title.style.color = link_color;
-                new_part.appendChild(new_part_title);
-                let bbh_link = document.createElement('a');
-                bbh_link.classList.add('link-block');
-                bbh_link.href = `${big_broth_hordes_url}/?pg=user&uid=5-${user_id}`;
-                new_part.appendChild(bbh_link);
-                bbh_link.addEventListener('click', () => user_tooltip.remove());
-                let bbh_img = document.createElement('img');
-                bbh_img.src = `${repo_img_url}external-tools/bbh.gif`;
-                bbh_link.appendChild(bbh_img);
-                let bbh_br = document.createElement('br');
-                bbh_link.appendChild(bbh_br);
-                let bbh_title = document.createElement('text');
-                bbh_title.innerText = `BigBroth'\nHordes`;
-                bbh_link.appendChild(bbh_title);
-                new_part.appendChild(document.createTextNode('\u00A0'));
-                let gh_link = document.createElement('a');
-                gh_link.classList.add('link-block');
-                gh_link.href = `${gest_hordes_url}/ame/${user_id}`;
-                new_part.appendChild(gh_link);
-                gh_link.addEventListener('click', () => user_tooltip.remove());
-                let gh_img = document.createElement('img');
-                gh_img.src = `${repo_img_url}external-tools/gh.gif`;
-                gh_link.appendChild(gh_img);
-                let gh_br = document.createElement('br');
-                gh_link.appendChild(gh_br);
-                let gh_title = document.createElement('text');
-                gh_title.innerText = `Gest'Hordes`;
-                gh_link.appendChild(gh_title);
-                new_part.appendChild(document.createTextNode('\u00A0'));
-                let empty_link = document.createElement('div');
-                empty_link.classList.add('link-block', 'empty');
-                new_part.appendChild(empty_link);
-            }
-        }
-        else if (!state.mho_parameters.display_external_links && mho_link_block) {
-            mho_link_block.remove();
-        }
-    }
-    function addExternalLinksToTowns() {
-        if (state.mho_parameters.display_external_links && pageIsTownHistory()) {
-            let mho_block = document.querySelector('#' + mho_town_external_links_id);
-            if (mho_block)
-                return;
-            let view_town = document.querySelector('.view-town');
-            if (!view_town)
-                return;
-            let btns_row = view_town.querySelector('button')?.parentElement;
-            if (!btns_row)
-                return;
-            let town_id = view_town.getAttribute('data-town-id');
-            mho_block = document.createElement('div');
-            mho_block.id = mho_town_external_links_id;
-            mho_block.style.marginTop = '0.5em';
-            mho_block.style.padding = '0.25em';
-            mho_block.style.border = '1px solid #ddab76';
-            btns_row.appendChild(mho_block);
-            let updater_title = document.createElement('h5');
-            updater_title.style.margin = '0 0 0.5em';
-            let btns_title_mho_img = document.createElement('img');
-            btns_title_mho_img.src = mh_optimizer_icon;
-            btns_title_mho_img.style.height = '24px';
-            btns_title_mho_img.style.marginRight = '0.5em';
-            updater_title.appendChild(btns_title_mho_img);
-            let btns_title_text = document.createElement('text');
-            btns_title_text.innerText = getScriptInfo().name;
-            updater_title.appendChild(btns_title_text);
-            mho_block.appendChild(updater_title);
-            let mho_btns_block = document.createElement('div');
-            mho_block.appendChild(mho_btns_block);
-            mho_btns_block.style.display = 'flex';
-            mho_btns_block.style.gap = '0.5em';
-            mho_btns_block.style.justifyContent = 'space-between';
-            mho_btns_block.style.alignItems = 'center';
-            let bbh_link = document.createElement('button');
-            bbh_link.classList.add('small');
-            bbh_link.style.display = 'flex';
-            bbh_link.style.alignItems = 'center';
-            bbh_link.style.gap = '0.5em';
-            bbh_link.onclick = () => window.open(`${big_broth_hordes_url}/?cid=5-${town_id}`, '_blank');
-            mho_btns_block.appendChild(bbh_link);
-            let bbh_img = document.createElement('img');
-            bbh_img.src = `${repo_img_url}external-tools/bbh.gif`;
-            bbh_link.appendChild(bbh_img);
-            let bbh_title = document.createElement('text');
-            bbh_title.innerText = `BigBroth'\nHordes`;
-            bbh_link.appendChild(bbh_title);
-            let gh_link = document.createElement('button');
-            gh_link.classList.add('small');
-            gh_link.style.display = 'flex';
-            gh_link.style.alignItems = 'center';
-            gh_link.style.gap = '0.5em';
-            gh_link.onclick = () => window.open(`${gest_hordes_url}/carte/${town_id}`, '_blank');
-            mho_btns_block.appendChild(gh_link);
-            let gh_img = document.createElement('img');
-            gh_img.src = `${repo_img_url}external-tools/gh.gif`;
-            gh_link.appendChild(gh_img);
-            let gh_title = document.createElement('text');
-            gh_title.innerText = `Gest'\nHordes`;
-            gh_link.appendChild(gh_title);
-            let fata_link = document.createElement('button');
-            fata_link.classList.add('small');
-            fata_link.style.display = 'flex';
-            fata_link.style.alignItems = 'center';
-            fata_link.style.gap = '0.5em';
-            fata_link.onclick = () => window.open(`${fata_morgana_url}/spy/town/${town_id}`, '_blank');
-            mho_btns_block.appendChild(fata_link);
-            let fata_img = document.createElement('img');
-            fata_img.src = `${repo_img_url}external-tools/fata.gif`;
-            fata_link.appendChild(fata_img);
-            let fata_title = document.createElement('text');
-            fata_title.innerText = `Fata\nMorgana`;
-            fata_link.appendChild(fata_title);
         }
     }
 
@@ -10387,6 +10501,7 @@
         displayCountCharacters();
         createStoreNotificationsBtn();
         addExternalLinksToTowns();
+        addExternalLinksColumnToWelcomeTowns();
         sortCitizenList();
         sortOmniscienceList();
         // blockUsersPosts();
@@ -10764,7 +10879,7 @@
         observer.observe(postbox, config);
     }
 
-    const styleTemplate = "@charset \"UTF-8\";\n/*\n * Tokens remplacés au runtime par createStyles.ts à partir de config/constants.ts :\n *   __BTN_ID__, __MH_OPTIMIZER_MAP_WINDOW_ID__, __MHO_DISPLAY_EXPEDITIONS_ID__,\n *   __MHO_DISPLAY_MAP_ID__, __MHO_STORE_NOTIFICATIONS_ID__, __REPO_IMG_HORDES_URL__\n */\n.param-has-children > div::after {\n  content: \"▶︎\";\n  margin-left: auto;\n}\n\n#__BTN_ID__ {\n  background-color: #5c2b20;\n  border: 1px solid #f0d79e;\n  outline: 1px solid #000;\n  position: absolute;\n  top: 10px;\n  z-index: 997;\n}\n\n#__BTN_ID__.mho-btn-opened h1 span, #__BTN_ID__.mho-btn-opened h1 a, #__BTN_ID__.mho-btn-opened h1 img.close {\n  display: inline;\n}\n\n#__BTN_ID__.mho-btn-opened div {\n  display: block;\n}\n\n#__BTN_ID__ h1 {\n  height: auto;\n  font-size: 8pt;\n  text-transform: none;\n  font-variant: small-caps;\n  background: none;\n  cursor: help;\n  margin: 0 5px;\n  padding: 0;\n  line-height: 17px;\n  color: #f0d79e;\n  display: flex;\n  justify-content: space-between;\n  align-items: center;\n}\n\n#__BTN_ID__ h1 > div > img {\n  vertical-align: -9%;\n}\n\n#__BTN_ID__.mho-btn-opened h1 {\n  border-bottom: 1px solid #b37c4a;\n  margin-bottom: 5px;\n}\n\n#__BTN_ID__ h1 span, #__BTN_ID__ h1 a, #__BTN_ID__ h1 img.close {\n  color: #f0d79e;\n  cursor: help;\n  font-family: Trebuchet MS, Arial, Verdana, sans-serif;\n  letter-spacing: 1px;\n  line-height: 17px;\n  text-align: left;\n  text-transform: none;\n  margin-left: 1em;\n  display: none;\n}\n\n#__BTN_ID__ > div {\n  display: none;\n  margin: 0 5px 8px 5px;\n  font-size: 0.9em;\n  width: 350px;\n}\n\n#__BTN_ID__ .mho-parameters-btn {\n  margin-top: 0;\n  text-align: center;\n  display: block;\n}\n\n.mho-window {\n  opacity: 1;\n  transition: opacity 1s ease;\n  z-index: 999;\n  padding: 0;\n  position: fixed;\n  min-width: 150px;\n  min-height: 150px;\n}\n\n.mho-window:not(.fullsize) .mho-window-box {\n  resize: both;\n  overflow: auto;\n}\n\n.mho-window.fullsize {\n  background: url(__REPO_IMG_HORDES_URL__background/mask.png);\n  height: 100%;\n  width: 100%;\n  resize: none;\n}\n\n.mho-window:not(.visible), #__MH_OPTIMIZER_MAP_WINDOW_ID__:not(.visible) {\n  opacity: 0;\n  pointer-events: none;\n}\n\n.mho-window:not(.visible) .mho-window-box, .mho-window:not(.visible) #__MH_OPTIMIZER_MAP_WINDOW_ID__-box {\n  transform: scale(0) translateY(1000px);\n}\n\n.mho-window .mho-window-box {\n  background: url(__REPO_IMG_HORDES_URL__background/bg_content2.jpg) repeat-y 0 0/900px 263px, url(__REPO_IMG_HORDES_URL__background/bg_content2.jpg) repeat-y 100% 0/900px 263px;\n  border-radius: 8px;\n  box-shadow: 0 0 10px #000;\n  display: flex;\n  flex-direction: row;\n  position: absolute;\n  top: 10px;\n  bottom: 10px;\n  right: 10px;\n  left: 10px;\n  transform: scale(1) translateY(0);\n  transition: transform 0.5s ease;\n}\n\n#__MH_OPTIMIZER_MAP_WINDOW_ID__ #__MH_OPTIMIZER_MAP_WINDOW_ID__-box {\n  background: url(__REPO_IMG_HORDES_URL__background/bg_content2.jpg) repeat-y 0 0/900px 263px, url(__REPO_IMG_HORDES_URL__background/bg_content2.jpg) repeat-y 100% 0/900px 263px;\n  border-radius: 8px;\n  box-shadow: 0 0 10px #000;\n  position: absolute;\n  transform: scale(1) translateY(0);\n  transition: transform 0.5s ease;\n  resize: both;\n  overflow: auto;\n  z-index: 9999;\n}\n\n.mho-window .mho-window-box .mho-window-overlay, #__MH_OPTIMIZER_MAP_WINDOW_ID__ #__MH_OPTIMIZER_MAP_WINDOW_ID__-box #__MH_OPTIMIZER_MAP_WINDOW_ID__-overlay {\n  position: absolute;\n  right: 6px;\n  top: 6px;\n  text-align: right;\n}\n\n.mho-window .mho-window-box .mho-window-overlay ul, #__MH_OPTIMIZER_MAP_WINDOW_ID__ #__MH_OPTIMIZER_MAP_WINDOW_ID__-box #__MH_OPTIMIZER_MAP_WINDOW_ID__-overlay ul {\n  margin: 2px;\n  padding: 0;\n}\n\n.mho-window .mho-window-box .mho-window-overlay ul li, #__MH_OPTIMIZER_MAP_WINDOW_ID__ #__MH_OPTIMIZER_MAP_WINDOW_ID__-box #__MH_OPTIMIZER_MAP_WINDOW_ID__-overlay ul li {\n  cursor: pointer;\n  display: inline-block;\n}\n\n.mho-window .mho-window-drag-handle {\n  width: 18px;\n  height: 100%;\n}\n\n.mho-window-content, #__MH_OPTIMIZER_MAP_WINDOW_ID__-content {\n  flex: 1;\n  color: #fff;\n  overflow: auto;\n  background: url(__REPO_IMG_HORDES_URL__background/box/panel_00.gif) 0 0 no-repeat, url(__REPO_IMG_HORDES_URL__background/box/panel_02.gif) 100% 0 no-repeat, url(__REPO_IMG_HORDES_URL__background/box/panel_20.gif) 0 100% no-repeat, url(__REPO_IMG_HORDES_URL__background/box/panel_22.gif) 100% 100% no-repeat, url(__REPO_IMG_HORDES_URL__background/box/panel_01.gif) 0 0 repeat-x, url(__REPO_IMG_HORDES_URL__background/box/panel_10.gif) 0 0 repeat-y, url(__REPO_IMG_HORDES_URL__background/box/panel_12.gif) 100% 0 repeat-y, url(__REPO_IMG_HORDES_URL__background/box/panel_21.gif) 0 100% repeat-x, #7e4d2a;\n  border-radius: 12px;\n  padding: 8px;\n}\n\ndiv.mho-new-changelog::before {\n  position: absolute;\n  top: -3px;\n  left: -3px;\n}\n\na.mho-new-changelog::before {\n  position: relative;\n  top: 0;\n  left: 0;\n}\n\n.mho-new-changelog::before {\n  content: \"\";\n  width: 6px;\n  aspect-ratio: 1;\n  background: #4B107B;\n  border-radius: 50%;\n  box-shadow: 0px 0px 6px 3px #BF61CF;\n  display: inline-block;\n}\n\ndiv.mho-new-version::before {\n  position: absolute;\n  top: -3px;\n  left: -3px;\n}\n\n.mho-new-version::before {\n  content: \"\";\n  width: 8px;\n  aspect-ratio: 1;\n  background: #BF61CF;\n  border-radius: 50%;\n  box-shadow: 0px 0px 8px 4px #4B107B;\n  display: inline-block;\n}\n\n#tabs {\n  color: #ddab76;\n  font-size: 1.2rem;\n  margin-bottom: 20px;\n  position: relative;\n  height: 25px;\n  order-bottom: 1px solid #ddab76;\n}\n\n#tabs ul {\n  display: flex;\n  flex-wrap: wrap;\n  padding: 0;\n  background: url(__REPO_IMG_HORDES_URL__background/tabs-header-plain.gif) 0 100% round;\n  background-size: cover;\n  height: 24px;\n  margin-top: 2px;\n  margin-right: 20px;\n  padding-left: 0.5em;\n}\n\n#tabs > ul > li {\n  cursor: pointer;\n  display: inline-block;\n  margin-top: auto;\n  margin-bottom: auto;\n}\n\n#tabs > ul > li > div > img {\n  margin-right: 0.5em;\n}\n\n#tabs > ul > li > div {\n  background-image: url(__REPO_IMG_HORDES_URL__background/tab.gif);\n  background-position: 0 0;\n  background-repeat: no-repeat;\n  border-left: 1px solid #694023;\n  border-right: 1px solid #694023;\n  color: #f0d79e;\n  cursor: pointer;\n  float: right;\n  font-family: Arial, sans-serif;\n  font-size: 1rem;\n  font-variant: small-caps;\n  height: 21px;\n  margin-left: 2px;\n  margin-right: 0;\n  margin-top: 3px;\n  padding: 2px 4px 0;\n  text-decoration: underline;\n  white-space: nowrap;\n}\n\n#tabs > ul > li > div:hover {\n  outline: 1px solid #f0d79e;\n  text-decoration: underline;\n}\n\n#tabs > ul > li.selected {\n  position: relative;\n  top: 2px;\n}\n\n.tab-content {\n  position: absolute;\n  bottom: 10px;\n  left: 28px;\n  right: 8px;\n  top: 40px;\n  overflow: auto;\n}\n\n.tab-content > ul {\n  display: flex;\n  flex-wrap: wrap;\n  padding: 0;\n  margin: 0 0.5em;\n}\n\n.tab-content > ul > li {\n  min-width: 300px;\n  flex-basis: min-content;\n  padding: 0.125em 0.5em;\n  margin: 0;\n}\n\n.tab-content > ul > li.selected {\n  flex-basis: 100%;\n  padding: 0.25em;\n  margin: 0.25em 1px;\n}\n\n.tab-content > ul > li:not(.selected) .properties {\n  display: none;\n}\n\n.tab-content > ul div.mho-category {\n  width: 100%;\n  border-bottom: 1px solid;\n  margin: 1em 0 0.5em;\n}\n\n#categories > ul, ul.parameters, #informations > ul {\n  padding: 0;\n  margin: 0;\n  color: #f0d79e;\n}\n\n#categories > ul > li, ul.parameters > li, .tab-content ul > li, #informations ul > li {\n  list-style: none;\n}\n\n.tab-content #recipes-list > li, .tab-content #notifications-list > li, #wishlist > li {\n  min-width: 100% !important;\n  display: flex;\n}\n\ninput.mho-input::-webkit-outer-spin-button, input.mho-input::-webkit-inner-spin-button {\n  -webkit-appearance: none;\n  margin: 0;\n}\n\ninput.mho-input[type=number] {\n  -moz-appearance: textfield;\n}\n\n.mho-table {\n  border-collapse: collapse;\n  border-bottom: 1px solid #ddab76;\n}\n\n.mho-header {\n  font-size: 10pt;\n  background: linear-gradient(0deg, #643b25 0, rgba(100, 59, 37, 0) 50%, rgba(100, 59, 37, 0)) !important;\n  border-bottom: 2px solid #f0d79e;\n  color: #fff;\n  font-family: Trebuchet MS, Arial, Verdana, sans-serif;\n  font-weight: 700;\n}\n\n.mho-table tr:not(.mho-header) {\n  background-color: #5c2b20;\n  border-bottom: 1px solid #7e4d2a;\n}\n\n.mho-table tr th, .mho-table tr td {\n  padding: 0.25em;\n}\n\n.mho-table tr td {\n  border-left: 1px solid #7e4d2a;\n  color: #f0d79e;\n  font-size: 9pt;\n}\n\n.label_text {\n  font-size: 1.2rem;\n  font-variant: small-caps;\n}\n\n.item-title {\n  display: flex;\n  justify-content: space-between;\n}\n\n.add-to-wishlist > button > img {\n  margin-right: 0;\n}\n\n.mho-advanced-tooltip {\n  margin-top: 0.5em;\n  border-top: 1px solid;\n  max-height: 400px;\n  overflow-y: auto;\n}\n\n.mho-advanced-tooltip > table.recipes, #item-list > li.selected > .properties > table.recipes {\n  border-collapse: collapse;\n  width: 100%;\n}\n\n.mho-advanced-tooltip > table.recipes > tr, #item-list > li.selected > .properties > table.recipes > tr {\n  border: dotted;\n  border-width: 1px 0;\n}\n\n.mho-advanced-tooltip > table.recipes > tr:first-child, #item-list > li.selected > .properties > table.recipes > tr:first-child {\n  border-top: none;\n}\n\n.mho-advanced-tooltip > table.recipes > tr:last-child, #item-list > li.selected > .properties > table.recipes > tr:last-child {\n  border-bottom: none;\n}\n\n.mho-advanced-tooltip > table.recipes > tr > td.items > div, #item-list > li.selected > .properties > table.recipes > tr > td.items > div {\n  display: flex;\n  gap: 0.5em;\n}\n\n.mho-advanced-tooltip > table.recipes > tr > td:not(.results), #item-list > li.selected > .properties > table.recipes > tr > td:not(.results) {\n  width: 0;\n}\n\n.mho-advanced-tooltip > table.recipes > tr > td.results > div, #item-list > li.selected > .properties > table.recipes > tr > td.results > div {\n  flex-wrap: wrap;\n}\n\ndiv.tooltip.item:has(table.recipes) > div:first-of-type {\n  width: 0 !important;\n  min-width: 100% !important;\n}\n\n.mho-advanced-tooltip > table.recipes > tr > td.items > div > .item, #item-list > li.selected > .properties > table.recipes > tr > td.items > div > .item {\n  background-color: #524053;\n  padding: 0.5em;\n  border-radius: 0.25em;\n  white-space: nowrap;\n  display: flex;\n  align-items: center;\n  gap: 0.25em;\n}\n\n.mho-advanced-tooltip > table.recipes > tr > td.items > div > .item.mho-recipe-provoking, #item-list > li.selected > .properties > table.recipes > tr > td.items > div > .item.mho-recipe-provoking {\n  border: 1px dashed #ddab76;\n}\n\ndiv.tooltip.item:has(table.recipes) {\n  min-width: 250px !important;\n  max-width: 400px !important;\n  width: auto !important;\n}\n\n.mho-frozen {\n  pointer-events: all !important;\n}\n\n.mho-shift-hint {\n  display: inline-flex;\n  align-items: center;\n  gap: 2px;\n  margin-right: 6px;\n  opacity: 0.6;\n  font-size: 0.75em;\n  white-space: nowrap;\n  flex-shrink: 0;\n}\n\nkbd.mho-shift-hint {\n  border: 1px solid #f0d79e;\n  border-radius: 3px;\n  padding: 0 3px;\n  font-family: inherit;\n  line-height: 1.4;\n  background: rgba(240, 215, 158, 0.15);\n}\n\nimg.mho-close-hint {\n  margin-top: -6px;\n}\n\n.mho-close-hint {\n  display: none;\n}\n\n.mho-frozen .mho-shift-hint {\n  display: none;\n}\n\n.mho-frozen .mho-close-hint {\n  display: initial;\n}\n\n.mho-tooltip-translations {\n  display: flex;\n  flex-direction: row;\n  gap: 0.5em;\n  flex-wrap: wrap;\n  align-items: start;\n  justify-content: start;\n  border-bottom: 1px solid;\n  margin: 0.25em 0;\n  padding: 0.25em 0;\n}\n\n.brown-tag {\n  display: flex;\n  flex-direction: row;\n  gap: 0.5em;\n  flex-wrap: nowrap;\n  align-items: center;\n  justify-content: center;\n  background-color: #5c2b20;\n  border-radius: 0.25em;\n  padding: 0.25em 0.5em;\n}\n\nul#item-list > li {\n  background-color: #5c2b20;\n  margin: 1px 1px;\n  padding: 0.25em 0.5em;\n}\n\n#wishlist .label {\n  width: calc(100% - 775px);\n  min-width: 200px;\n  padding: 0 4px;\n}\n\n#wishlist .mho-header, #wishlist > li {\n  padding: 0 8px;\n  margin: 0.125em 0;\n  width: 100%;\n}\n\n#wishlist .mho-header > div {\n  display: inline-block;\n  vertical-align: middle;\n}\n\n#wishlist .priority, #wishlist .depot, #wishlist .bank_count, #wishlist .bag_count, #wishlist .bank_needed, #wishlist .diff {\n  width: 125px;\n  padding: 0 4px;\n}\n\n#wishlist .delete {\n  width: 25px;\n  text-align: center;\n}\n\n#wishlist-section ul {\n  padding-left: 0;\n}\n\n#wishlist-section ul > li {\n  display: flex;\n  justify-content: space-between;\n}\n\n.tab-content #recipes-list > li:nth-child(even), .tab-content #notifications-list > li:nth-child(even), #wishlist > li:nth-child(even) {\n  background-color: #5c2b20;\n}\n\nli.item[class^=priority_in], li.item[class*=\" priority_in\"], img[class^=priority_in], img[class*=\" priority_in\"] {\n  box-shadow: inset 0 0 0.5em whitesmoke, 0 0 0.5em whitesmoke;\n}\n\nli.item[class^=priority_out], li.item[class*=\" priority_out\"], img[class^=priority_out], img[class*=\" priority_out\"] {\n  box-shadow: inset 0 0 1em darkslategrey, 0 0 1em darkslategrey;\n}\n\nli.item.priority_trash, img.priority_trash {\n  box-shadow: inset 0 0 0.5em black, 0 0 0.5em black;\n}\n\ndiv.item-tag-food::after {\n  background: url(__REPO_IMG_HORDES_URL__status/status_haseaten.gif) 50%/contain no-repeat;\n}\n\ndiv.item-tag-load::after {\n  background: url(__REPO_IMG_HORDES_URL__item/item_pile.gif) 50%/contain no-repeat;\n}\n\ndiv.item-tag-hero::after {\n  background: url(__REPO_IMG_HORDES_URL__icons/star.gif) 50%/contain no-repeat;\n}\n\ndiv.item-tag-alcohol::after {\n  background: url(__REPO_IMG_HORDES_URL__status/status_drunk.gif) 50%/contain no-repeat;\n}\n\ndiv.item-tag-drug::after {\n  background: url(__REPO_IMG_HORDES_URL__status/status_drugged.gif) 50%/contain no-repeat;\n}\n\ndiv.item-tag.mho-item-tag-no-img {\n  padding-left: 2px;\n}\n\n.mho-item-tag {\n  min-height: 18px !important;\n  height: unset !important;\n}\n\n#__MHO_DISPLAY_MAP_ID__, #__MHO_STORE_NOTIFICATIONS_ID__, #__MHO_DISPLAY_EXPEDITIONS_ID__ {\n  background-color: rgba(62, 36, 23, 0.75);\n  border-radius: 6px;\n  color: #ddab76;\n  cursor: pointer;\n  font-size: 10px;\n  padding: 3px 5px;\n  transition: background-color 0.5s ease-in-out;\n  display: flex;\n  gap: 0.5em;\n}\n\n.mho-map tr td {\n  border: 1px dotted;\n  width: 30px;\n  min-width: 30px;\n  height: 30px;\n  min-height: 30px;\n  text-align: center;\n  vertical-align: middle;\n}\n\n.mho-ruin tr td {\n  border: 1px dotted;\n  width: 25px;\n  min-width: 25px;\n  height: 25px;\n  min-height: 25px;\n  text-align: center;\n  vertical-align: middle;\n}\n\n.dotted-background {\n  background-image: -moz-linear-gradient(45deg, #444 25%, transparent 25%), -moz-linear-gradient(-45deg, #444 25%, transparent 25%), -moz-linear-gradient(45deg, transparent 75%, #444 75%), -moz-linear-gradient(-45deg, transparent 75%, #444 75%);\n  background-image: -webkit-gradient(linear, 0 100%, 100% 0, color-stop(0.25, #444), color-stop(0.25, transparent)), -webkit-gradient(linear, 0 0, 100% 100%, color-stop(0.25, #444), color-stop(0.25, transparent)), -webkit-gradient(linear, 0 100%, 100% 0, color-stop(0.75, transparent), color-stop(0.75, #444)), -webkit-gradient(linear, 0 0, 100% 100%, color-stop(0.75, transparent), color-stop(0.75, #444));\n  background-image: -webkit-linear-gradient(45deg, #444 25%, transparent 25%), -webkit-linear-gradient(-45deg, #444 25%, transparent 25%), -webkit-linear-gradient(45deg, transparent 75%, #444 75%), -webkit-linear-gradient(-45deg, transparent 75%, #444 75%);\n  background-image: -o-linear-gradient(45deg, #444 25%, transparent 25%), -o-linear-gradient(-45deg, #444 25%, transparent 25%), -o-linear-gradient(45deg, transparent 75%, #444 75%), -o-linear-gradient(-45deg, transparent 75%, #444 75%);\n  background-image: linear-gradient(45deg, #444 25%, transparent 25%), linear-gradient(-45deg, #444 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #444 75%), linear-gradient(-45deg, transparent 75%, #444 75%);\n  -moz-background-size: 2px 2px;\n  background-size: 2px 2px;\n  -webkit-background-size: 2px 2px; /* override value for webkit */\n  background-position: 0 0, 1px 0, 1px -1px, 0px 1px;\n}\n\n.empty-bat:before, .empty-bat:after {\n  position: absolute;\n  content: \"\";\n  background: black;\n  display: block;\n  width: 1px;\n  height: 25px;\n  -webkit-transform: rotate(-45deg);\n  transform: rotate(-45deg);\n  left: 0;\n  right: 0;\n  top: 0;\n  bottom: 0;\n  margin: auto;\n}\n\n.empty-bat:after {\n  -webkit-transform: rotate(45deg);\n  transform: rotate(45deg);\n}\n\n.spaced-label:after {\n  content: \" : \";\n}\n\n.mho-hidden {\n  display: none !important;\n}\n\n.mho-sort-arrow {\n  display: inline-block;\n  margin-left: 2px;\n  opacity: 0.4;\n  font-size: 10px;\n  cursor: pointer;\n  user-select: none;\n  transition: opacity 0.15s;\n}\n\n.mho-sortable-cell {\n  cursor: pointer;\n  white-space: nowrap;\n}\n\n.mho-checkbox-dropdown-panel {\n  display: none;\n  position: absolute;\n  top: 100%;\n  left: 0;\n  z-index: 10;\n  max-height: 200px;\n  overflow-y: auto;\n  padding: 4px;\n  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);\n}\n.mho-checkbox-dropdown-panel > div {\n  display: flex;\n  align-items: center;\n  gap: 4px;\n  white-space: nowrap;\n}\n\n.mho-dropdown-toggle {\n  max-width: 200px;\n}\n\n#mho-filter-omniscience-stars {\n  min-width: 100px;\n}\n\n#mho-filter-omniscience-online, #mho-filter-citizen-list-online {\n  max-width: 60px;\n}\n\n.mho-filter-bar {\n  display: flex;\n  flex-wrap: wrap;\n  gap: 0.5em;\n  margin-bottom: 0.5em;\n  align-items: flex-end;\n}\n\n.mho-filter-field {\n  display: flex;\n  flex-direction: column;\n  gap: 2px;\n  position: relative;\n}\n.mho-filter-field:has(.mho-checkbox-dropdown-panel) {\n  min-width: 65px;\n}\n\n.mho-filter-label {\n  display: block !important;\n  width: 100%;\n  font-size: 0.8em;\n}\n\n.mho-search-wrapper {\n  position: relative;\n}\n\n.mho-search-input {\n  padding-left: 24px;\n  margin-bottom: 0;\n}\n\n.mho-search-icon {\n  height: 24px;\n  position: absolute;\n  left: 0;\n  top: 50%;\n  transform: translateY(-50%);\n}\n\n.mho-changelog-modal-overlay {\n  position: fixed;\n  inset: 0;\n  z-index: 10000;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  background: rgba(0, 0, 0, 0.65);\n}\n\n.mho-changelog-modal-box {\n  background: url(__REPO_IMG_HORDES_URL__background/box/panel_00.gif) 0 0 no-repeat, url(__REPO_IMG_HORDES_URL__background/box/panel_02.gif) 100% 0 no-repeat, url(__REPO_IMG_HORDES_URL__background/box/panel_20.gif) 0 100% no-repeat, url(__REPO_IMG_HORDES_URL__background/box/panel_22.gif) 100% 100% no-repeat, url(__REPO_IMG_HORDES_URL__background/box/panel_01.gif) 0 0 repeat-x, url(__REPO_IMG_HORDES_URL__background/box/panel_10.gif) 0 0 repeat-y, url(__REPO_IMG_HORDES_URL__background/box/panel_12.gif) 100% 0 repeat-y, url(__REPO_IMG_HORDES_URL__background/box/panel_21.gif) 0 100% repeat-x, #7e4d2a;\n  border-radius: 12px;\n  box-shadow: 0 0 20px #000;\n  color: #f0d79e;\n  display: flex;\n  flex-direction: column;\n  max-height: 80vh;\n  max-width: 600px;\n  min-width: 320px;\n  padding: 1em 1.5em;\n  gap: 0.75em;\n}\n\n.mho-changelog-modal-title {\n  color: #fff;\n  font-family: Trebuchet MS, Arial, Verdana, sans-serif;\n  font-variant: small-caps;\n  margin: 0;\n  border-bottom: 1px solid #ddab76;\n  padding-bottom: 0.5em;\n}\n\n.mho-changelog-modal-body {\n  flex: 1;\n  overflow-y: auto;\n  white-space: pre-wrap;\n  word-break: break-word;\n  font-family: Trebuchet MS, Arial, Verdana, sans-serif;\n  font-size: 0.9em;\n  margin: 0;\n  color: #f0d79e;\n}\n\n.mho-changelog-modal-footer {\n  display: flex;\n  justify-content: flex-end;\n  border-top: 1px solid #ddab76;\n  padding-top: 0.5em;\n}\n\n.mho-changelog-modal-btn {\n  background-color: #5c2b20;\n  border: 1px solid #f0d79e;\n  color: #f0d79e;\n  cursor: pointer;\n  font-family: Trebuchet MS, Arial, Verdana, sans-serif;\n  font-variant: small-caps;\n  padding: 0.25em 1.5em;\n}\n.mho-changelog-modal-btn:hover {\n  background-color: #7e4d2a;\n  outline: 1px solid #f0d79e;\n}\n\n.mho-changelog-history-toggle {\n  color: #ddab76;\n  cursor: pointer;\n  font-family: Trebuchet MS, Arial, Verdana, sans-serif;\n  font-size: 0.85em;\n  font-variant: small-caps;\n  text-decoration: underline dotted;\n  user-select: none;\n}\n\n.mho-changelog-history-toggle:hover {\n  color: #f0d79e;\n}\n\n.mho-changelog-history-section {\n  border-top: 1px solid #7e4d2a;\n  display: flex;\n  flex-direction: column;\n  gap: 0.75em;\n  max-height: 35vh;\n  overflow-y: auto;\n  padding-top: 0.5em;\n}\n\n.mho-changelog-history-block {\n  border-bottom: 1px dotted #7e4d2a;\n  padding-bottom: 0.5em;\n}\n\n.mho-changelog-history-block:last-child {\n  border-bottom: none;\n}\n\n.mho-changelog-history-version {\n  color: #ddab76;\n  font-family: Trebuchet MS, Arial, Verdana, sans-serif;\n  font-variant: small-caps;\n  font-size: 0.9em;\n  margin: 0 0 0.25em 0;\n}\n\n.mho-changelog-history-body {\n  color: #c8a870;\n  font-family: Trebuchet MS, Arial, Verdana, sans-serif;\n  font-size: 0.8em;\n  margin: 0;\n  white-space: pre-wrap;\n  word-break: break-word;\n}\n\n.mho-anti-abuse-counter-content {\n  border-bottom: 1px solid #ddab76;\n  display: flex;\n  gap: 0.5em;\n  justify-content: space-between;\n  flex-wrap: wrap;\n}\n\n#mho-camping-predict {\n  background-color: rgba(92, 43, 32, 0.35);\n  border: 1px solid #7e4d2a;\n  border-radius: 8px;\n  padding: 0.5em 0.75em;\n  margin: 0.5em 0;\n  color: #f0d79e;\n}\n#mho-camping-predict .mho-camping-title {\n  display: flex;\n  align-items: center;\n  gap: 0.5em;\n  margin: 0 0 0.5em;\n  padding-bottom: 0.4em;\n  border-bottom: 1px solid #7e4d2a;\n}\n#mho-camping-predict .mho-camping-title img {\n  height: 24px;\n}\n#mho-camping-predict .mho-camping-title span {\n  font-size: 1.25em;\n  font-variant: small-caps;\n  color: #fff;\n}\n#mho-camping-predict .mho-camping-section {\n  margin-bottom: 0.5em;\n}\n#mho-camping-predict .mho-camping-section:last-child {\n  margin-bottom: 0;\n}\n#mho-camping-predict .mho-camping-section > h3 {\n  font-size: 0.95em;\n  font-variant: small-caps;\n  color: #ddab76;\n  margin: 0 0 0.3em;\n  padding-bottom: 0.15em;\n  border-bottom: 1px dotted #7e4d2a;\n}\n#mho-camping-predict .mho-camping-columns {\n  display: flex;\n  flex-direction: row;\n  gap: 0;\n}\n#mho-camping-predict .mho-camping-columns > .mho-camping-section {\n  min-width: 0;\n  padding: 0 0.75em;\n  flex: 3 1 0;\n}\n#mho-camping-predict .mho-camping-columns > .mho-camping-section.town {\n  flex: 2 1 0;\n}\n#mho-camping-predict .mho-camping-columns > .mho-camping-section:first-child {\n  padding-left: 0;\n}\n#mho-camping-predict .mho-camping-columns > .mho-camping-section:last-child {\n  padding-right: 0;\n}\n#mho-camping-predict .mho-camping-columns > .mho-camping-section:not(:first-child) {\n  border-left: 1px solid #7e4d2a;\n}\n#mho-camping-predict .mho-camping-columns > .mho-camping-section > .mho-camping-section-content {\n  display: flex;\n  flex-wrap: wrap;\n  justify-content: space-around;\n  gap: 1em 2em;\n}\n#mho-camping-predict .mho-camping-field {\n  display: flex;\n  align-items: center;\n  gap: 0.4em;\n  padding: 0.15em 0;\n  min-width: 0;\n}\n#mho-camping-predict .mho-camping-field label {\n  display: flex;\n  align-items: center;\n  gap: 0.3em;\n  flex: 1 1 auto;\n  min-width: 0;\n  cursor: pointer;\n  white-space: nowrap;\n  overflow: hidden;\n  text-overflow: ellipsis;\n}\n#mho-camping-predict .mho-camping-field label img {\n  flex-shrink: 0;\n}\n#mho-camping-predict .mho-camping-field:has(input[type=checkbox]) {\n  display: inline-flex;\n}\n#mho-camping-predict .mho-camping-field:has(input[type=number]) {\n  width: 100%;\n}\n#mho-camping-predict .mho-camping-field input[type=number] {\n  flex: 0 0 auto;\n  width: 2em;\n  text-align: center;\n  margin: 0;\n}\n#mho-camping-predict .mho-camping-field input[type=checkbox] {\n  flex: 0 0 auto;\n  margin: 0;\n}\n#mho-camping-predict .mho-camping-field select {\n  flex: 1 1 auto;\n  min-width: 0;\n}\n#mho-camping-predict .mho-camping-stepper-btn {\n  flex-shrink: 0;\n  height: 14px;\n  width: auto;\n  cursor: pointer;\n  user-select: none;\n}\n#mho-camping-predict .mho-camping-field--full {\n  grid-column: 1/-1;\n}\n#mho-camping-predict .mho-camping-numbers-grid {\n  display: grid;\n  grid-template-columns: repeat(2, 1fr);\n  gap: 0.2em 0.6em;\n  width: 100%;\n}\n#mho-camping-predict .mho-camping-numbers-grid label {\n  flex: 0 0 auto;\n  width: 2em;\n}\n#mho-camping-predict .mho-camping-numbers-grid > .mho-camping-field:nth-child(2n) {\n  justify-content: flex-end;\n}\n#mho-camping-predict #camping-result {\n  background-color: rgba(0, 0, 0, 0.25);\n  border-radius: 6px;\n  padding: 0.5em 0.6em;\n  margin-top: 0.2em;\n}\n#mho-camping-predict .mho-camping-title {\n  cursor: pointer;\n  user-select: none;\n  position: relative;\n}\n#mho-camping-predict .mho-camping-title::before {\n  content: \"▶︎\";\n  transition: transform 0.2s ease;\n}\n#mho-camping-predict.mho-camping-opened .mho-camping-title::before {\n  transform: rotate(90deg);\n}\n#mho-camping-predict .mho-camping-content {\n  padding-top: 0.4em;\n}";
+    const styleTemplate = "@charset \"UTF-8\";\n/*\n * Tokens remplacés au runtime par createStyles.ts à partir de config/constants.ts :\n *   __BTN_ID__, __MH_OPTIMIZER_MAP_WINDOW_ID__, __MHO_DISPLAY_EXPEDITIONS_ID__,\n *   __MHO_DISPLAY_MAP_ID__, __MHO_STORE_NOTIFICATIONS_ID__, __REPO_IMG_HORDES_URL__\n */\n.param-has-children > div::after {\n  content: \"▶︎\";\n  margin-left: auto;\n}\n\n#__BTN_ID__ {\n  background-color: #5c2b20;\n  border: 1px solid #f0d79e;\n  outline: 1px solid #000;\n  position: absolute;\n  top: 10px;\n  z-index: 997;\n}\n\n#__BTN_ID__.mho-btn-opened h1 span, #__BTN_ID__.mho-btn-opened h1 a, #__BTN_ID__.mho-btn-opened h1 img.close {\n  display: inline;\n}\n\n#__BTN_ID__.mho-btn-opened div {\n  display: block;\n}\n\n#__BTN_ID__ h1 {\n  height: auto;\n  font-size: 8pt;\n  text-transform: none;\n  font-variant: small-caps;\n  background: none;\n  cursor: help;\n  margin: 0 5px;\n  padding: 0;\n  line-height: 17px;\n  color: #f0d79e;\n  display: flex;\n  justify-content: space-between;\n  align-items: center;\n}\n\n#__BTN_ID__ h1 > div > img {\n  vertical-align: -9%;\n}\n\n#__BTN_ID__.mho-btn-opened h1 {\n  border-bottom: 1px solid #b37c4a;\n  margin-bottom: 5px;\n}\n\n#__BTN_ID__ h1 span, #__BTN_ID__ h1 a, #__BTN_ID__ h1 img.close {\n  color: #f0d79e;\n  cursor: help;\n  font-family: Trebuchet MS, Arial, Verdana, sans-serif;\n  letter-spacing: 1px;\n  line-height: 17px;\n  text-align: left;\n  text-transform: none;\n  margin-left: 1em;\n  display: none;\n}\n\n#__BTN_ID__ > div {\n  display: none;\n  margin: 0 5px 8px 5px;\n  font-size: 0.9em;\n  width: 350px;\n}\n\n#__BTN_ID__ .mho-parameters-btn {\n  margin-top: 0;\n  text-align: center;\n  display: block;\n}\n\n.mho-window {\n  opacity: 1;\n  transition: opacity 1s ease;\n  z-index: 999;\n  padding: 0;\n  position: fixed;\n  min-width: 150px;\n  min-height: 150px;\n}\n\n.mho-window:not(.fullsize) .mho-window-box {\n  resize: both;\n  overflow: auto;\n}\n\n.mho-window.fullsize {\n  background: url(__REPO_IMG_HORDES_URL__background/mask.png);\n  height: 100%;\n  width: 100%;\n  resize: none;\n}\n\n.mho-window:not(.visible), #__MH_OPTIMIZER_MAP_WINDOW_ID__:not(.visible) {\n  opacity: 0;\n  pointer-events: none;\n}\n\n.mho-window:not(.visible) .mho-window-box, .mho-window:not(.visible) #__MH_OPTIMIZER_MAP_WINDOW_ID__-box {\n  transform: scale(0) translateY(1000px);\n}\n\n.mho-window .mho-window-box {\n  background: url(__REPO_IMG_HORDES_URL__background/bg_content2.jpg) repeat-y 0 0/900px 263px, url(__REPO_IMG_HORDES_URL__background/bg_content2.jpg) repeat-y 100% 0/900px 263px;\n  border-radius: 8px;\n  box-shadow: 0 0 10px #000;\n  display: flex;\n  flex-direction: row;\n  position: absolute;\n  top: 10px;\n  bottom: 10px;\n  right: 10px;\n  left: 10px;\n  transform: scale(1) translateY(0);\n  transition: transform 0.5s ease;\n}\n\n#__MH_OPTIMIZER_MAP_WINDOW_ID__ #__MH_OPTIMIZER_MAP_WINDOW_ID__-box {\n  background: url(__REPO_IMG_HORDES_URL__background/bg_content2.jpg) repeat-y 0 0/900px 263px, url(__REPO_IMG_HORDES_URL__background/bg_content2.jpg) repeat-y 100% 0/900px 263px;\n  border-radius: 8px;\n  box-shadow: 0 0 10px #000;\n  position: absolute;\n  transform: scale(1) translateY(0);\n  transition: transform 0.5s ease;\n  resize: both;\n  overflow: auto;\n  z-index: 9999;\n}\n\n.mho-window .mho-window-box .mho-window-overlay, #__MH_OPTIMIZER_MAP_WINDOW_ID__ #__MH_OPTIMIZER_MAP_WINDOW_ID__-box #__MH_OPTIMIZER_MAP_WINDOW_ID__-overlay {\n  position: absolute;\n  right: 6px;\n  top: 6px;\n  text-align: right;\n}\n\n.mho-window .mho-window-box .mho-window-overlay ul, #__MH_OPTIMIZER_MAP_WINDOW_ID__ #__MH_OPTIMIZER_MAP_WINDOW_ID__-box #__MH_OPTIMIZER_MAP_WINDOW_ID__-overlay ul {\n  margin: 2px;\n  padding: 0;\n}\n\n.mho-window .mho-window-box .mho-window-overlay ul li, #__MH_OPTIMIZER_MAP_WINDOW_ID__ #__MH_OPTIMIZER_MAP_WINDOW_ID__-box #__MH_OPTIMIZER_MAP_WINDOW_ID__-overlay ul li {\n  cursor: pointer;\n  display: inline-block;\n}\n\n.mho-window .mho-window-drag-handle {\n  width: 18px;\n  height: 100%;\n}\n\n.mho-window-content, #__MH_OPTIMIZER_MAP_WINDOW_ID__-content {\n  flex: 1;\n  color: #fff;\n  overflow: auto;\n  background: url(__REPO_IMG_HORDES_URL__background/box/panel_00.gif) 0 0 no-repeat, url(__REPO_IMG_HORDES_URL__background/box/panel_02.gif) 100% 0 no-repeat, url(__REPO_IMG_HORDES_URL__background/box/panel_20.gif) 0 100% no-repeat, url(__REPO_IMG_HORDES_URL__background/box/panel_22.gif) 100% 100% no-repeat, url(__REPO_IMG_HORDES_URL__background/box/panel_01.gif) 0 0 repeat-x, url(__REPO_IMG_HORDES_URL__background/box/panel_10.gif) 0 0 repeat-y, url(__REPO_IMG_HORDES_URL__background/box/panel_12.gif) 100% 0 repeat-y, url(__REPO_IMG_HORDES_URL__background/box/panel_21.gif) 0 100% repeat-x, #7e4d2a;\n  border-radius: 12px;\n  padding: 8px;\n}\n\ndiv.mho-new-changelog::before {\n  position: absolute;\n  top: -3px;\n  left: -3px;\n}\n\na.mho-new-changelog::before {\n  position: relative;\n  top: 0;\n  left: 0;\n}\n\n.mho-new-changelog::before {\n  content: \"\";\n  width: 6px;\n  aspect-ratio: 1;\n  background: #4B107B;\n  border-radius: 50%;\n  box-shadow: 0px 0px 6px 3px #BF61CF;\n  display: inline-block;\n}\n\ndiv.mho-new-version::before {\n  position: absolute;\n  top: -3px;\n  left: -3px;\n}\n\n.mho-new-version::before {\n  content: \"\";\n  width: 8px;\n  aspect-ratio: 1;\n  background: #BF61CF;\n  border-radius: 50%;\n  box-shadow: 0px 0px 8px 4px #4B107B;\n  display: inline-block;\n}\n\n#tabs {\n  color: #ddab76;\n  font-size: 1.2rem;\n  margin-bottom: 20px;\n  position: relative;\n  height: 25px;\n  order-bottom: 1px solid #ddab76;\n}\n\n#tabs ul {\n  display: flex;\n  flex-wrap: wrap;\n  padding: 0;\n  background: url(__REPO_IMG_HORDES_URL__background/tabs-header-plain.gif) 0 100% round;\n  background-size: cover;\n  height: 24px;\n  margin-top: 2px;\n  margin-right: 20px;\n  padding-left: 0.5em;\n}\n\n#tabs > ul > li {\n  cursor: pointer;\n  display: inline-block;\n  margin-top: auto;\n  margin-bottom: auto;\n}\n\n#tabs > ul > li > div > img {\n  margin-right: 0.5em;\n}\n\n#tabs > ul > li > div {\n  background-image: url(__REPO_IMG_HORDES_URL__background/tab.gif);\n  background-position: 0 0;\n  background-repeat: no-repeat;\n  border-left: 1px solid #694023;\n  border-right: 1px solid #694023;\n  color: #f0d79e;\n  cursor: pointer;\n  float: right;\n  font-family: Arial, sans-serif;\n  font-size: 1rem;\n  font-variant: small-caps;\n  height: 21px;\n  margin-left: 2px;\n  margin-right: 0;\n  margin-top: 3px;\n  padding: 2px 4px 0;\n  text-decoration: underline;\n  white-space: nowrap;\n}\n\n#tabs > ul > li > div:hover {\n  outline: 1px solid #f0d79e;\n  text-decoration: underline;\n}\n\n#tabs > ul > li.selected {\n  position: relative;\n  top: 2px;\n}\n\n.tab-content {\n  position: absolute;\n  bottom: 10px;\n  left: 28px;\n  right: 8px;\n  top: 40px;\n  overflow: auto;\n}\n\n.tab-content > ul {\n  display: flex;\n  flex-wrap: wrap;\n  padding: 0;\n  margin: 0 0.5em;\n}\n\n.tab-content > ul > li {\n  min-width: 300px;\n  flex-basis: min-content;\n  padding: 0.125em 0.5em;\n  margin: 0;\n}\n\n.tab-content > ul > li.selected {\n  flex-basis: 100%;\n  padding: 0.25em;\n  margin: 0.25em 1px;\n}\n\n.tab-content > ul > li:not(.selected) .properties {\n  display: none;\n}\n\n.tab-content > ul div.mho-category {\n  width: 100%;\n  border-bottom: 1px solid;\n  margin: 1em 0 0.5em;\n}\n\n#categories > ul, ul.parameters, #informations > ul {\n  padding: 0;\n  margin: 0;\n  color: #f0d79e;\n}\n\n#categories > ul > li, ul.parameters > li, .tab-content ul > li, #informations ul > li {\n  list-style: none;\n}\n\n.tab-content #recipes-list > li, .tab-content #notifications-list > li, #wishlist > li {\n  min-width: 100% !important;\n  display: flex;\n}\n\ninput.mho-input::-webkit-outer-spin-button, input.mho-input::-webkit-inner-spin-button {\n  -webkit-appearance: none;\n  margin: 0;\n}\n\ninput.mho-input[type=number] {\n  -moz-appearance: textfield;\n}\n\n.mho-table {\n  border-collapse: collapse;\n  border-bottom: 1px solid #ddab76;\n}\n\n.mho-header {\n  font-size: 10pt;\n  background: linear-gradient(0deg, #643b25 0, rgba(100, 59, 37, 0) 50%, rgba(100, 59, 37, 0)) !important;\n  border-bottom: 2px solid #f0d79e;\n  color: #fff;\n  font-family: Trebuchet MS, Arial, Verdana, sans-serif;\n  font-weight: 700;\n}\n\n.mho-table tr:not(.mho-header) {\n  background-color: #5c2b20;\n  border-bottom: 1px solid #7e4d2a;\n}\n\n.mho-table tr th, .mho-table tr td {\n  padding: 0.25em;\n}\n\n.mho-table tr td {\n  border-left: 1px solid #7e4d2a;\n  color: #f0d79e;\n  font-size: 9pt;\n}\n\n.label_text {\n  font-size: 1.2rem;\n  font-variant: small-caps;\n}\n\n.item-title {\n  display: flex;\n  justify-content: space-between;\n}\n\n.add-to-wishlist > button > img {\n  margin-right: 0;\n}\n\n.mho-advanced-tooltip {\n  margin-top: 0.5em;\n  border-top: 1px solid;\n  max-height: 400px;\n  overflow-y: auto;\n}\n\n.mho-advanced-tooltip > table.recipes, #item-list > li.selected > .properties > table.recipes {\n  border-collapse: collapse;\n  width: 100%;\n}\n\n.mho-advanced-tooltip > table.recipes > tr, #item-list > li.selected > .properties > table.recipes > tr {\n  border: dotted;\n  border-width: 1px 0;\n}\n\n.mho-advanced-tooltip > table.recipes > tr:first-child, #item-list > li.selected > .properties > table.recipes > tr:first-child {\n  border-top: none;\n}\n\n.mho-advanced-tooltip > table.recipes > tr:last-child, #item-list > li.selected > .properties > table.recipes > tr:last-child {\n  border-bottom: none;\n}\n\n.mho-advanced-tooltip > table.recipes > tr > td.items > div, #item-list > li.selected > .properties > table.recipes > tr > td.items > div {\n  display: flex;\n  gap: 0.5em;\n}\n\n.mho-advanced-tooltip > table.recipes > tr > td:not(.results), #item-list > li.selected > .properties > table.recipes > tr > td:not(.results) {\n  width: 0;\n}\n\n.mho-advanced-tooltip > table.recipes > tr > td.results > div, #item-list > li.selected > .properties > table.recipes > tr > td.results > div {\n  flex-wrap: wrap;\n}\n\ndiv.tooltip.item:has(table.recipes) > div:first-of-type {\n  width: 0 !important;\n  min-width: 100% !important;\n}\n\n.mho-advanced-tooltip > table.recipes > tr > td.items > div > .item, #item-list > li.selected > .properties > table.recipes > tr > td.items > div > .item {\n  background-color: #524053;\n  padding: 0.5em;\n  border-radius: 0.25em;\n  white-space: nowrap;\n  display: flex;\n  align-items: center;\n  gap: 0.25em;\n}\n\n.mho-advanced-tooltip > table.recipes > tr > td.items > div > .item.mho-recipe-provoking, #item-list > li.selected > .properties > table.recipes > tr > td.items > div > .item.mho-recipe-provoking {\n  border: 1px dashed #ddab76;\n}\n\ndiv.tooltip.item:has(table.recipes) {\n  min-width: 250px !important;\n  max-width: 400px !important;\n  width: auto !important;\n}\n\n.mho-frozen {\n  pointer-events: all !important;\n}\n\n.mho-shift-hint {\n  display: inline-flex;\n  align-items: center;\n  gap: 2px;\n  margin-right: 6px;\n  opacity: 0.6;\n  font-size: 0.75em;\n  white-space: nowrap;\n  flex-shrink: 0;\n}\n\nkbd.mho-shift-hint {\n  border: 1px solid #f0d79e;\n  border-radius: 3px;\n  padding: 0 3px;\n  font-family: inherit;\n  line-height: 1.4;\n  background: rgba(240, 215, 158, 0.15);\n}\n\nimg.mho-close-hint {\n  margin-top: -6px;\n}\n\n.mho-close-hint {\n  display: none;\n}\n\n.mho-frozen .mho-shift-hint {\n  display: none;\n}\n\n.mho-frozen .mho-close-hint {\n  display: initial;\n}\n\n.mho-tooltip-translations {\n  display: flex;\n  flex-direction: row;\n  gap: 0.5em;\n  flex-wrap: wrap;\n  align-items: start;\n  justify-content: start;\n  border-bottom: 1px solid;\n  margin: 0.25em 0;\n  padding: 0.25em 0;\n}\n\n.brown-tag {\n  display: flex;\n  flex-direction: row;\n  gap: 0.5em;\n  flex-wrap: nowrap;\n  align-items: center;\n  justify-content: center;\n  background-color: #5c2b20;\n  border-radius: 0.25em;\n  padding: 0.25em 0.5em;\n}\n\nul#item-list > li {\n  background-color: #5c2b20;\n  margin: 1px 1px;\n  padding: 0.25em 0.5em;\n}\n\n#wishlist .label {\n  width: calc(100% - 775px);\n  min-width: 200px;\n  padding: 0 4px;\n}\n\n#wishlist .mho-header, #wishlist > li {\n  padding: 0 8px;\n  margin: 0.125em 0;\n  width: 100%;\n}\n\n#wishlist .mho-header > div {\n  display: inline-block;\n  vertical-align: middle;\n}\n\n#wishlist .priority, #wishlist .depot, #wishlist .bank_count, #wishlist .bag_count, #wishlist .bank_needed, #wishlist .diff {\n  width: 125px;\n  padding: 0 4px;\n}\n\n#wishlist .delete {\n  width: 25px;\n  text-align: center;\n}\n\n#wishlist-section ul {\n  padding-left: 0;\n}\n\n#wishlist-section ul > li {\n  display: flex;\n  justify-content: space-between;\n}\n\n.tab-content #recipes-list > li:nth-child(even), .tab-content #notifications-list > li:nth-child(even), #wishlist > li:nth-child(even) {\n  background-color: #5c2b20;\n}\n\nli.item[class^=priority_in], li.item[class*=\" priority_in\"], img[class^=priority_in], img[class*=\" priority_in\"] {\n  box-shadow: inset 0 0 0.5em whitesmoke, 0 0 0.5em whitesmoke;\n}\n\nli.item[class^=priority_out], li.item[class*=\" priority_out\"], img[class^=priority_out], img[class*=\" priority_out\"] {\n  box-shadow: inset 0 0 1em darkslategrey, 0 0 1em darkslategrey;\n}\n\nli.item.priority_trash, img.priority_trash {\n  box-shadow: inset 0 0 0.5em black, 0 0 0.5em black;\n}\n\ndiv.item-tag-food::after {\n  background: url(__REPO_IMG_HORDES_URL__status/status_haseaten.gif) 50%/contain no-repeat;\n}\n\ndiv.item-tag-load::after {\n  background: url(__REPO_IMG_HORDES_URL__item/item_pile.gif) 50%/contain no-repeat;\n}\n\ndiv.item-tag-hero::after {\n  background: url(__REPO_IMG_HORDES_URL__icons/star.gif) 50%/contain no-repeat;\n}\n\ndiv.item-tag-alcohol::after {\n  background: url(__REPO_IMG_HORDES_URL__status/status_drunk.gif) 50%/contain no-repeat;\n}\n\ndiv.item-tag-drug::after {\n  background: url(__REPO_IMG_HORDES_URL__status/status_drugged.gif) 50%/contain no-repeat;\n}\n\ndiv.item-tag.mho-item-tag-no-img {\n  padding-left: 2px;\n}\n\n.mho-item-tag {\n  min-height: 18px !important;\n  height: unset !important;\n}\n\n#__MHO_DISPLAY_MAP_ID__, #__MHO_STORE_NOTIFICATIONS_ID__, #__MHO_DISPLAY_EXPEDITIONS_ID__ {\n  background-color: rgba(62, 36, 23, 0.75);\n  border-radius: 6px;\n  color: #ddab76;\n  cursor: pointer;\n  font-size: 10px;\n  padding: 3px 5px;\n  transition: background-color 0.5s ease-in-out;\n  display: flex;\n  gap: 0.5em;\n}\n\n.mho-map tr td {\n  border: 1px dotted;\n  width: 30px;\n  min-width: 30px;\n  height: 30px;\n  min-height: 30px;\n  text-align: center;\n  vertical-align: middle;\n}\n\n.mho-ruin tr td {\n  border: 1px dotted;\n  width: 25px;\n  min-width: 25px;\n  height: 25px;\n  min-height: 25px;\n  text-align: center;\n  vertical-align: middle;\n}\n\n.dotted-background {\n  background-image: -moz-linear-gradient(45deg, #444 25%, transparent 25%), -moz-linear-gradient(-45deg, #444 25%, transparent 25%), -moz-linear-gradient(45deg, transparent 75%, #444 75%), -moz-linear-gradient(-45deg, transparent 75%, #444 75%);\n  background-image: -webkit-gradient(linear, 0 100%, 100% 0, color-stop(0.25, #444), color-stop(0.25, transparent)), -webkit-gradient(linear, 0 0, 100% 100%, color-stop(0.25, #444), color-stop(0.25, transparent)), -webkit-gradient(linear, 0 100%, 100% 0, color-stop(0.75, transparent), color-stop(0.75, #444)), -webkit-gradient(linear, 0 0, 100% 100%, color-stop(0.75, transparent), color-stop(0.75, #444));\n  background-image: -webkit-linear-gradient(45deg, #444 25%, transparent 25%), -webkit-linear-gradient(-45deg, #444 25%, transparent 25%), -webkit-linear-gradient(45deg, transparent 75%, #444 75%), -webkit-linear-gradient(-45deg, transparent 75%, #444 75%);\n  background-image: -o-linear-gradient(45deg, #444 25%, transparent 25%), -o-linear-gradient(-45deg, #444 25%, transparent 25%), -o-linear-gradient(45deg, transparent 75%, #444 75%), -o-linear-gradient(-45deg, transparent 75%, #444 75%);\n  background-image: linear-gradient(45deg, #444 25%, transparent 25%), linear-gradient(-45deg, #444 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #444 75%), linear-gradient(-45deg, transparent 75%, #444 75%);\n  -moz-background-size: 2px 2px;\n  background-size: 2px 2px;\n  -webkit-background-size: 2px 2px; /* override value for webkit */\n  background-position: 0 0, 1px 0, 1px -1px, 0px 1px;\n}\n\n.empty-bat:before, .empty-bat:after {\n  position: absolute;\n  content: \"\";\n  background: black;\n  display: block;\n  width: 1px;\n  height: 25px;\n  -webkit-transform: rotate(-45deg);\n  transform: rotate(-45deg);\n  left: 0;\n  right: 0;\n  top: 0;\n  bottom: 0;\n  margin: auto;\n}\n\n.empty-bat:after {\n  -webkit-transform: rotate(45deg);\n  transform: rotate(45deg);\n}\n\n.spaced-label:after {\n  content: \" : \";\n}\n\n.mho-hidden {\n  display: none !important;\n}\n\n.mho-sort-arrow {\n  display: inline-block;\n  margin-left: 2px;\n  opacity: 0.4;\n  font-size: 10px;\n  cursor: pointer;\n  user-select: none;\n  transition: opacity 0.15s;\n}\n\n.mho-sortable-cell {\n  cursor: pointer;\n  white-space: nowrap;\n}\n\n.mho-checkbox-dropdown-panel {\n  display: none;\n  position: absolute;\n  top: 100%;\n  left: 0;\n  z-index: 10;\n  max-height: 200px;\n  overflow-y: auto;\n  padding: 4px;\n  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);\n}\n.mho-checkbox-dropdown-panel > div {\n  display: flex;\n  align-items: center;\n  gap: 4px;\n  white-space: nowrap;\n}\n\n.mho-dropdown-toggle {\n  max-width: 200px;\n}\n\n#mho-filter-omniscience-stars {\n  min-width: 100px;\n}\n\n#mho-filter-omniscience-online, #mho-filter-citizen-list-online {\n  max-width: 60px;\n}\n\n.mho-filter-bar {\n  display: flex;\n  flex-wrap: wrap;\n  gap: 0.5em;\n  margin-bottom: 0.5em;\n  align-items: flex-end;\n}\n\n.mho-filter-field {\n  display: flex;\n  flex-direction: column;\n  gap: 2px;\n  position: relative;\n}\n.mho-filter-field:has(.mho-checkbox-dropdown-panel) {\n  min-width: 65px;\n}\n\n.mho-filter-label {\n  display: block !important;\n  width: 100%;\n  font-size: 0.8em;\n}\n\n.mho-search-wrapper {\n  position: relative;\n}\n\n.mho-search-input {\n  padding-left: 24px;\n  margin-bottom: 0;\n}\n\n.mho-search-icon {\n  height: 24px;\n  position: absolute;\n  left: 0;\n  top: 50%;\n  transform: translateY(-50%);\n}\n\n.mho-changelog-modal-overlay {\n  position: fixed;\n  inset: 0;\n  z-index: 10000;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  background: rgba(0, 0, 0, 0.65);\n}\n\n.mho-changelog-modal-box {\n  background: url(__REPO_IMG_HORDES_URL__background/box/panel_00.gif) 0 0 no-repeat, url(__REPO_IMG_HORDES_URL__background/box/panel_02.gif) 100% 0 no-repeat, url(__REPO_IMG_HORDES_URL__background/box/panel_20.gif) 0 100% no-repeat, url(__REPO_IMG_HORDES_URL__background/box/panel_22.gif) 100% 100% no-repeat, url(__REPO_IMG_HORDES_URL__background/box/panel_01.gif) 0 0 repeat-x, url(__REPO_IMG_HORDES_URL__background/box/panel_10.gif) 0 0 repeat-y, url(__REPO_IMG_HORDES_URL__background/box/panel_12.gif) 100% 0 repeat-y, url(__REPO_IMG_HORDES_URL__background/box/panel_21.gif) 0 100% repeat-x, #7e4d2a;\n  border-radius: 12px;\n  box-shadow: 0 0 20px #000;\n  color: #f0d79e;\n  display: flex;\n  flex-direction: column;\n  max-height: 80vh;\n  max-width: 600px;\n  min-width: 320px;\n  padding: 1em 1.5em;\n  gap: 0.75em;\n}\n\n.mho-changelog-modal-title {\n  color: #fff;\n  font-family: Trebuchet MS, Arial, Verdana, sans-serif;\n  font-variant: small-caps;\n  margin: 0;\n  border-bottom: 1px solid #ddab76;\n  padding-bottom: 0.5em;\n}\n\n.mho-changelog-modal-body {\n  flex: 1;\n  overflow-y: auto;\n  white-space: pre-wrap;\n  word-break: break-word;\n  font-family: Trebuchet MS, Arial, Verdana, sans-serif;\n  font-size: 0.9em;\n  margin: 0;\n  color: #f0d79e;\n}\n\n.mho-changelog-modal-footer {\n  display: flex;\n  justify-content: flex-end;\n  border-top: 1px solid #ddab76;\n  padding-top: 0.5em;\n}\n\n.mho-changelog-modal-btn {\n  background-color: #5c2b20;\n  border: 1px solid #f0d79e;\n  color: #f0d79e;\n  cursor: pointer;\n  font-family: Trebuchet MS, Arial, Verdana, sans-serif;\n  font-variant: small-caps;\n  padding: 0.25em 1.5em;\n}\n.mho-changelog-modal-btn:hover {\n  background-color: #7e4d2a;\n  outline: 1px solid #f0d79e;\n}\n\n.mho-changelog-history-toggle {\n  color: #ddab76;\n  cursor: pointer;\n  font-family: Trebuchet MS, Arial, Verdana, sans-serif;\n  font-size: 0.85em;\n  font-variant: small-caps;\n  text-decoration: underline dotted;\n  user-select: none;\n}\n\n.mho-changelog-history-toggle:hover {\n  color: #f0d79e;\n}\n\n.mho-changelog-history-section {\n  border-top: 1px solid #7e4d2a;\n  display: flex;\n  flex-direction: column;\n  gap: 0.75em;\n  max-height: 35vh;\n  overflow-y: auto;\n  padding-top: 0.5em;\n}\n\n.mho-changelog-history-block {\n  border-bottom: 1px dotted #7e4d2a;\n  padding-bottom: 0.5em;\n}\n\n.mho-changelog-history-block:last-child {\n  border-bottom: none;\n}\n\n.mho-changelog-history-version {\n  color: #ddab76;\n  font-family: Trebuchet MS, Arial, Verdana, sans-serif;\n  font-variant: small-caps;\n  font-size: 0.9em;\n  margin: 0 0 0.25em 0;\n}\n\n.mho-changelog-history-body {\n  color: #c8a870;\n  font-family: Trebuchet MS, Arial, Verdana, sans-serif;\n  font-size: 0.8em;\n  margin: 0;\n  white-space: pre-wrap;\n  word-break: break-word;\n}\n\n.mho-anti-abuse-counter-content {\n  border-bottom: 1px solid #ddab76;\n  display: flex;\n  gap: 0.5em;\n  justify-content: space-between;\n  flex-wrap: wrap;\n}\n\n#mho-camping-predict {\n  background-color: rgba(92, 43, 32, 0.35);\n  border: 1px solid #7e4d2a;\n  border-radius: 8px;\n  padding: 0.5em 0.75em;\n  margin: 0.5em 0;\n  color: #f0d79e;\n}\n#mho-camping-predict .mho-camping-title {\n  display: flex;\n  align-items: center;\n  gap: 0.5em;\n  margin: 0 0 0.5em;\n  padding-bottom: 0.4em;\n  border-bottom: 1px solid #7e4d2a;\n}\n#mho-camping-predict .mho-camping-title img {\n  height: 24px;\n}\n#mho-camping-predict .mho-camping-title span {\n  font-size: 1.25em;\n  font-variant: small-caps;\n  color: #fff;\n}\n#mho-camping-predict .mho-camping-section {\n  margin-bottom: 0.5em;\n}\n#mho-camping-predict .mho-camping-section:last-child {\n  margin-bottom: 0;\n}\n#mho-camping-predict .mho-camping-section > h3 {\n  font-size: 0.95em;\n  font-variant: small-caps;\n  color: #ddab76;\n  margin: 0 0 0.3em;\n  padding-bottom: 0.15em;\n  border-bottom: 1px dotted #7e4d2a;\n}\n#mho-camping-predict .mho-camping-columns {\n  display: flex;\n  flex-direction: row;\n  gap: 0;\n}\n#mho-camping-predict .mho-camping-columns > .mho-camping-section {\n  min-width: 0;\n  padding: 0 0.75em;\n  flex: 3 1 0;\n}\n#mho-camping-predict .mho-camping-columns > .mho-camping-section.town {\n  flex: 2 1 0;\n}\n#mho-camping-predict .mho-camping-columns > .mho-camping-section:first-child {\n  padding-left: 0;\n}\n#mho-camping-predict .mho-camping-columns > .mho-camping-section:last-child {\n  padding-right: 0;\n}\n#mho-camping-predict .mho-camping-columns > .mho-camping-section:not(:first-child) {\n  border-left: 1px solid #7e4d2a;\n}\n#mho-camping-predict .mho-camping-columns > .mho-camping-section > .mho-camping-section-content {\n  display: flex;\n  flex-wrap: wrap;\n  justify-content: space-around;\n  gap: 1em 2em;\n}\n#mho-camping-predict .mho-camping-field {\n  display: flex;\n  align-items: center;\n  gap: 0.4em;\n  padding: 0.15em 0;\n  min-width: 0;\n}\n#mho-camping-predict .mho-camping-field label {\n  display: flex;\n  align-items: center;\n  gap: 0.3em;\n  flex: 1 1 auto;\n  min-width: 0;\n  cursor: pointer;\n  white-space: nowrap;\n  overflow: hidden;\n  text-overflow: ellipsis;\n}\n#mho-camping-predict .mho-camping-field label img {\n  flex-shrink: 0;\n}\n#mho-camping-predict .mho-camping-field:has(input[type=checkbox]) {\n  display: inline-flex;\n}\n#mho-camping-predict .mho-camping-field:has(input[type=number]) {\n  width: 100%;\n}\n#mho-camping-predict .mho-camping-field input[type=number] {\n  flex: 0 0 auto;\n  width: 2em;\n  text-align: center;\n  margin: 0;\n}\n#mho-camping-predict .mho-camping-field input[type=checkbox] {\n  flex: 0 0 auto;\n  margin: 0;\n}\n#mho-camping-predict .mho-camping-field select {\n  flex: 1 1 auto;\n  min-width: 0;\n}\n#mho-camping-predict .mho-camping-stepper-btn {\n  flex-shrink: 0;\n  height: 14px;\n  width: auto;\n  cursor: pointer;\n  user-select: none;\n}\n#mho-camping-predict .mho-camping-field--full {\n  grid-column: 1/-1;\n}\n#mho-camping-predict .mho-camping-numbers-grid {\n  display: grid;\n  grid-template-columns: repeat(2, 1fr);\n  gap: 0.2em 0.6em;\n  width: 100%;\n}\n#mho-camping-predict .mho-camping-numbers-grid label {\n  flex: 0 0 auto;\n  width: 2em;\n}\n#mho-camping-predict .mho-camping-numbers-grid > .mho-camping-field:nth-child(2n) {\n  justify-content: flex-end;\n}\n#mho-camping-predict #camping-result {\n  background-color: rgba(0, 0, 0, 0.25);\n  border-radius: 6px;\n  padding: 0.5em 0.6em;\n  margin-top: 0.2em;\n}\n#mho-camping-predict .mho-camping-title {\n  cursor: pointer;\n  user-select: none;\n  position: relative;\n}\n#mho-camping-predict .mho-camping-title::before {\n  content: \"▶︎\";\n  transition: transform 0.2s ease;\n}\n#mho-camping-predict.mho-camping-opened .mho-camping-title::before {\n  transform: rotate(90deg);\n}\n#mho-camping-predict .mho-camping-content {\n  padding-top: 0.4em;\n}\n\n.row-table:has(.mho-town-list-link-cell) .cell.rw-1:has(img):not(:has(.language)), .row-table:has(.mho-town-list-link-cell) .cell.rw-1.right {\n  flex-basis: 4.166666665%;\n}\n.row-table:has(.mho-town-list-link-cell) .cell.rw-3 {\n  flex-basis: 20.833333335%;\n}\n\n.mho-town-list-link-cell {\n  align-items: center;\n  cursor: pointer;\n  display: flex;\n  gap: 0.25em;\n  position: relative;\n}\n\n.mho-town-list-link-panel {\n  background-color: #5c2b20;\n  border: 1px solid #ddab76;\n  border-radius: 6px;\n  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);\n  display: none;\n  flex-direction: column;\n  gap: 0.25em;\n  left: 0;\n  padding: 0.5em;\n  position: absolute;\n  top: 100%;\n  z-index: 10;\n}\n.mho-town-list-link-panel.mho-open {\n  display: flex;\n}\n.mho-town-list-link-panel.mho-align-right {\n  left: auto;\n  right: 0;\n}";
 
     const STYLE_PLACEHOLDERS = new Map([
         ['__BTN_ID__', btn_id],

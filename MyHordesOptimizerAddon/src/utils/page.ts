@@ -15,6 +15,11 @@ export function buttonOptimizerElement(): HTMLElement {
     return document.getElementById(btn_id);
 }
 
+/** @return {boolean}    true si la page de l'utilisateur est la page de selection de ville */
+export function pageIsWelcome(): boolean {
+    return document.URL.endsWith('welcome');
+}
+
 /** @return {boolean}    true si la page de l'utilisateur est la page de la ville */
 export function pageIsTown(): boolean {
     return document.URL.indexOf('town') > -1;

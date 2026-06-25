@@ -1074,3 +1074,44 @@ div.item-tag.mho-item-tag-no-img {
         padding-top: 0.4em;
     }
 }
+
+.row-table:has(.mho-town-list-link-cell) {
+    .cell.rw-1:has(img):not(:has(.language)), .cell.rw-1.right {
+        flex-basis: calc(8.33333333% / 2);
+    }
+    .cell.rw-3 {
+        flex-basis: calc(25% - (8.33333333% / 2));
+    }
+}
+
+.mho-town-list-link-cell {
+    align-items: center;
+    cursor: pointer;
+    display: flex;
+    gap: 0.25em;
+    position: relative;
+}
+
+.mho-town-list-link-panel {
+    background-color: #5c2b20;
+    border: 1px solid #ddab76;
+    border-radius: 6px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+    display: none;
+    flex-direction: column;
+    gap: 0.25em;
+    left: 0;
+    padding: 0.5em;
+    position: absolute;
+    top: 100%;
+    z-index: 10;
+
+    &.mho-open {
+        display: flex;
+    }
+
+    &.mho-align-right {
+        left: auto;
+        right: 0;
+    }
+}
