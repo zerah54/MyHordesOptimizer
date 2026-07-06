@@ -1,12 +1,13 @@
-import {getWishlist} from '../api/wishlist';
-import {mh_optimizer_icon, repo_img_hordes_url} from '../config/constants';
-import {texts, wishlist_depot, wishlist_headers, wishlist_title} from '../i18n/texts';
-import {state} from '../state';
-import {getI18N} from '../utils/i18n';
-import {getItemFromImg} from '../utils/item-lookup';
-import {fixMhCompiledImg} from '../utils/misc';
-import {pageIsDesert, pageIsWorkshop} from '../utils/page';
-import {getCurrentPosition} from '../utils/position';
+import { getWishlist } from '../api/wishlist';
+import { mh_optimizer_icon, repo_img_hordes_url } from '../config/constants';
+import { texts, wishlist_depot, wishlist_headers, wishlist_title } from '../i18n/texts';
+import { state } from '../state';
+import type { WishlistItem } from '../types';
+import { getI18N } from '../utils/i18n';
+import { getItemFromImg } from '../utils/item-lookup';
+import { fixMhCompiledImg } from '../utils/misc';
+import { pageIsDesert, pageIsWorkshop } from '../utils/page';
+import { getCurrentPosition } from '../utils/position';
 
 /** Affiche la liste de courses dans le désert et l'atelier */
 
@@ -266,17 +267,18 @@ export function displayPriorityOnItems() {
 }
 
 
-export function getWishlistForZone() {
+export function getWishlistForZone(): WishlistItem[] {
     if (!state.wishlist || !state.wishlist.wishList) return undefined;
-    if (!pageIsDesert()) return state.wishlist.wishList.find((wishlist_item) => wishlist_item.zone_x_pa === 0);
+    if (!pageIsDesert()) return [...state.wishlist.wishList];
 
     let position = getCurrentPosition();
     let current_zone = (Math.abs(position[0]) + Math.abs(position[1])) * 2 - 3;
 
-    let used_wishlist = [...state.wishlist.wishList.filter((wishlist_item) => wishlist_item.zone_x_pa === 0 || wishlist_item.zone_x_pa >= current_zone)];
+    let used_wishlist = [...state.wishlist.wishList.filter((wishlist_item) => wishlist_item.zoneXPa === 0 || wishlist_item.zoneXPa >= current_zone)];
     used_wishlist?.sort((item_a, item_b) => {
         return item_b.priority - item_a.priority;
     });
+
     return used_wishlist;
 }
 

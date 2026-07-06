@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MHO Addon
-// @version      1.1.47
+// @version      1.1.48
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/, rubrique Tutoriels
 // @author       Zerah
 //
@@ -300,6 +300,9 @@
     }
 
     const changelogs = {
+        '1.1.48': `
+        [Correction] La liste de courses ne s'affichait pas dans l'interface
+    `,
         '1.1.47': `
         [Amélioration] Ajout de liens vers les pages des villes des outils externes sur la page de choix de ville
     `,
@@ -3585,10 +3588,10 @@
         if (!state.wishlist || !state.wishlist.wishList)
             return undefined;
         if (!pageIsDesert())
-            return state.wishlist.wishList.find((wishlist_item) => wishlist_item.zone_x_pa === 0);
+            return [...state.wishlist.wishList];
         let position = getCurrentPosition();
         let current_zone = (Math.abs(position[0]) + Math.abs(position[1])) * 2 - 3;
-        let used_wishlist = [...state.wishlist.wishList.filter((wishlist_item) => wishlist_item.zone_x_pa === 0 || wishlist_item.zone_x_pa >= current_zone)];
+        let used_wishlist = [...state.wishlist.wishList.filter((wishlist_item) => wishlist_item.zoneXPa === 0 || wishlist_item.zoneXPa >= current_zone)];
         used_wishlist?.sort((item_a, item_b) => {
             return item_b.priority - item_a.priority;
         });

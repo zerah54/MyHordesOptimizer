@@ -1,4 +1,7 @@
 export const changelogs: Record<string, string> = {
+    '1.1.48': `
+        [Correction] La liste de courses ne s'affichait pas dans l'interface
+    `,
     '1.1.47': `
         [Amélioration] Ajout de liens vers les pages des villes des outils externes sur la page de choix de ville
     `,

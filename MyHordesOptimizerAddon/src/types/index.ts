@@ -117,17 +117,14 @@ export interface WishlistItem {
     bagCount: number;
     depot: number;
     priority: number;
-    zone_x_pa: number;
+    zoneXPa: number;
     isWorkshop: boolean;
-
-    [key: string]: any;
+    shouldSignal: boolean;
 }
 
 export interface ApiWishlist {
     wishList?: WishlistItem[];
     lastUpdateInfo?: { updateTime: string; userName: string };
-
-    [key: string]: any;
 }
 
 export interface BankItem {

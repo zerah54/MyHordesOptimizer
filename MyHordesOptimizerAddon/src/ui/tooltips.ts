@@ -1,26 +1,27 @@
-import {lang, repo_img_hordes_url, supported_languages} from '../config/constants';
-import {status_texts, wishlist_depot, wishlist_headers} from '../i18n/texts';
-import {state} from '../state';
-import {getRecipeElement} from './recipes';
-import {getWishlistForZone} from './wishlist';
-import {getI18N} from '../utils/i18n';
-import {getFixedImagePath, getTooltipItem} from '../utils/item-lookup';
+import { lang, repo_img_hordes_url, supported_languages } from '../config/constants';
+import { status_texts, wishlist_depot, wishlist_headers } from '../i18n/texts';
+import { state } from '../state';
+import type { WishlistItem } from '../types';
+import { getI18N } from '../utils/i18n';
+import { getFixedImagePath, getTooltipItem } from '../utils/item-lookup';
+import { getRecipeElement } from './recipes';
+import { getWishlistForZone } from './wishlist';
 
 export function enhanceTooltip(tooltip_container) {
     if (!tooltip_container) return;
 
     // Identifier l'objet actuellement dans le tooltip natif
-    let img = tooltip_container.querySelector('h1 > img:last-child');
-    const isStatus = !img;
+    let img: HTMLImageElement = tooltip_container.querySelector('h1 > img:last-child');
+    const isStatus: boolean = !img;
 
     if (isStatus) {
-        const label = tooltip_container.querySelector('h1')?.textContent.trim();
+        const label: string = tooltip_container.querySelector('h1')?.textContent.trim();
         img = document.querySelector(`li.status > img[alt="${label}"]`);
     }
 
     if (!img) return;
 
-    const imgPath = getFixedImagePath(img.src);
+    const imgPath: string = getFixedImagePath(img.src);
     if (!imgPath) return;
 
     // Vérifier si le tooltip amélioré existant correspond déjà au bon objet
@@ -44,8 +45,8 @@ export function enhanceTooltip(tooltip_container) {
 
     if (!item && !status) return;
 
-    const buildAdvancedTooltipContainer = () => {
-        const c = document.createElement('div');
+    const buildAdvancedTooltipContainer: () => HTMLDivElement = (): HTMLDivElement => {
+        const c: HTMLDivElement = document.createElement('div');
         c.classList.add('mho-advanced-tooltip');
         c.setAttribute('x-icon-path', imgPath);
         return c;
@@ -68,7 +69,7 @@ export function enhanceTooltip(tooltip_container) {
             createAdvancedProperties(advanced_tooltip_container, item, tooltip_container);
         }
     } else {
-        let should_display = state.mho_parameters.enhanced_tooltips && state.mho_parameters.enhanced_tooltips_statuses && (
+        let should_display: boolean = state.mho_parameters.enhanced_tooltips && state.mho_parameters.enhanced_tooltips_statuses && (
             status.watch_def !== undefined || status.watch_kills !== undefined ||
             status.searches !== undefined || status.terror !== undefined ||
             status.fatal_infection !== undefined || status.prevent_infection !== undefined ||
@@ -101,12 +102,12 @@ export function addFreezeHintsToTooltip(tooltip_container) {
     shift.classList.add('mho-shift-hint');
     shift.innerText = `⇧`;
 
-    const close = document.createElement('img');
+    const close: HTMLImageElement = document.createElement('img');
     close.classList.add('mho-close-hint');
     close.src = `${repo_img_hordes_url}icons/b_close.png`;
     close.alt = `close`;
 
-    const separator = document.createElement('div');
+    const separator: HTMLDivElement = document.createElement('div');
     separator.style.flex = '1';
 
     h1.prepend(shift, close, separator);
@@ -235,7 +236,7 @@ export function createAdvancedProperties(content, item, tooltip) {
     content.innerHtml = '';
 
     if (tooltip && state.mho_parameters.enhanced_tooltips_item_quantities) {
-        let stock_div = document.createElement('div');
+        let stock_div: HTMLDivElement = document.createElement('div');
         content.appendChild(stock_div);
         stock_div.style.display = 'flex';
         stock_div.style.flexWrap = 'wrap';
@@ -243,21 +244,21 @@ export function createAdvancedProperties(content, item, tooltip) {
         stock_div.style.columnGap = '1em';
         stock_div.style.borderBottom = '1px solid white';
 
-        let bank_div = document.createElement('div');
+        let bank_div: HTMLDivElement = document.createElement('div');
         bank_div.style.width = 'calc(50% - 0.5em)';
         bank_div.innerText = getI18N(wishlist_headers.find((header) => header.id === 'bank_count').label) + ' : ' + item.bankCount;
         stock_div.appendChild(bank_div);
 
-        let wishlist_for_zone = getWishlistForZone();
-        let item_in_wishlist = wishlist_for_zone?.find((iwfz) => item.id === iwfz.item.id);
+        let wishlist_for_zone: WishlistItem[] = getWishlistForZone();
+        let item_in_wishlist: WishlistItem = wishlist_for_zone?.find((iwfz) => item.id === iwfz.item.id);
 
         if (item_in_wishlist?.item.wishListCount > 0) {
-            let wishlist_wanted_div = document.createElement('div');
+            let wishlist_wanted_div: HTMLDivElement = document.createElement('div');
             wishlist_wanted_div.style.width = 'calc(50% - 0.5em)';
             wishlist_wanted_div.innerText = getI18N(wishlist_headers[5].label) + ' : ' + item_in_wishlist.item.wishListCount;
             stock_div.appendChild(wishlist_wanted_div);
 
-            let wishlist_depot_div = document.createElement('div');
+            let wishlist_depot_div: HTMLDivElement = document.createElement('div');
             wishlist_depot_div.style.width = 'calc(50% - 0.5em)';
             wishlist_depot_div.innerText = getI18N(wishlist_headers[2].label) + ' : ' + getI18N(wishlist_depot.find((depot) => item_in_wishlist.depot === depot.value).label);
             stock_div.appendChild(wishlist_depot_div);
@@ -265,11 +266,11 @@ export function createAdvancedProperties(content, item, tooltip) {
     }
 
     if (state.mho_parameters.enhanced_tooltips_item_translations) {
-        let translations = '';
+        let translations: string = '';
         supported_languages.filter((language) => language.value !== lang).forEach((language) => {
             translations += `<div class="brown-tag"><span class="tooltip-translation-flag">${language.img}</span><span class="tooltip-translation-value">${item.label[language.value]}</span></div>`
         });
-        let item_translations = document.createElement('div');
+        let item_translations: HTMLDivElement = document.createElement('div');
         item_translations.classList.add('mho-tooltip-translations');
         item_translations.innerHTML = translations;
         content.appendChild(item_translations);
@@ -285,7 +286,7 @@ export function createAdvancedProperties(content, item, tooltip) {
     if (!item.properties && !item.actions && item.recipes.length === 0) return;
 
     if (state.mho_parameters.enhanced_tooltips_item_properties && item.properties) {
-        let item_properties = document.createElement('div');
+        let item_properties: HTMLDivElement = document.createElement('div');
         content.appendChild(item_properties);
         item.properties.forEach((property) => {
             item_properties.appendChild(displayPropertiesOrActions(property, item));
@@ -293,7 +294,7 @@ export function createAdvancedProperties(content, item, tooltip) {
     }
 
     if (state.mho_parameters.enhanced_tooltips_item_actions && item.actions) {
-        let item_actions = document.createElement('div');
+        let item_actions: HTMLDivElement = document.createElement('div');
         content.appendChild(item_actions);
         item.actions.forEach((action) => {
             item_actions.appendChild(displayPropertiesOrActions(action, item));
@@ -301,7 +302,7 @@ export function createAdvancedProperties(content, item, tooltip) {
     }
 
     if (state.mho_parameters.enhanced_tooltips_item_recipes && item.recipes.length > 0) {
-        let item_recipes = document.createElement('table');
+        let item_recipes: HTMLTableElement = document.createElement('table');
         item_recipes.classList.add('recipes');
         content.appendChild(item_recipes);
         item.recipes.forEach((recipe) => {
@@ -313,7 +314,7 @@ export function createAdvancedProperties(content, item, tooltip) {
 
 export function createAdvancedStatus(content, status, tooltip) {
     content.innerHtml = '';
-    let status_details = document.createElement('div');
+    let status_details: HTMLDivElement = document.createElement('div');
     content.appendChild(status_details);
 
     const have_properties = status.properties?.length > 0;
@@ -323,25 +324,25 @@ export function createAdvancedStatus(content, status, tooltip) {
         && !have_properties) return;
 
     if (status.pdc !== undefined) {
-        let status_detail = document.createElement('div');
+        let status_detail: HTMLDivElement = document.createElement('div');
         status_detail.classList.add('item-tag', 'mho-item-tag', 'mho-item-tag-no-img');
         status_detail.innerHTML = `${status.pdc} ${Math.abs(status.pdc) > 1 ? 'points' : 'point'} de contrôle supplémentaire${Math.abs(status.pdc) > 1 ? 's' : ''}`;
         status_details.appendChild(status_detail);
     }
     if (status.terror !== undefined) {
-        let status_detail = document.createElement('div');
+        let status_detail: HTMLDivElement = document.createElement('div');
         status_detail.classList.add('item-tag', 'mho-item-tag', 'mho-item-tag-no-img');
         status_detail.innerHTML = `${getI18N(status_texts.terror)} : ${status.terror}%`;
         status_details.appendChild(status_detail);
     }
     if (status.prevent_infection !== undefined) {
-        let status_detail = document.createElement('div');
+        let status_detail: HTMLDivElement = document.createElement('div');
         status_detail.classList.add('item-tag', 'mho-item-tag', 'mho-item-tag-no-img');
         status_detail.innerHTML = `${getI18N(status_texts.prevent_infection)} : ${status.prevent_infection * 100}%`;
         status_details.appendChild(status_detail);
     }
     if (status.fatal_infection !== undefined) {
-        let status_detail = document.createElement('div');
+        let status_detail: HTMLDivElement = document.createElement('div');
         status_detail.classList.add('item-tag', 'mho-item-tag', 'mho-item-tag-no-img');
         status_detail.innerHTML = `${getI18N(status_texts.fatal_infection)} : ${status.fatal_infection < 0 ? status.fatal_infection * 100 : '+' + status.fatal_infection * 100}%`;
         status_details.appendChild(status_detail);
@@ -349,13 +350,13 @@ export function createAdvancedStatus(content, status, tooltip) {
 
     if (status.watch_def !== undefined || status.watch_kills !== undefined) {
         if (status.watch_def !== undefined) {
-            let status_detail = document.createElement('div');
+            let status_detail: HTMLDivElement = document.createElement('div');
             status_detail.classList.add('item-tag', 'mho-item-tag', 'mho-item-tag-no-img');
             status_detail.innerHTML = `${getI18N(status_texts.zombies_killed)} : ${status.watch_def}`;
             status_details.appendChild(status_detail);
         }
         if (status.watch_kills !== undefined) {
-            let status_detail = document.createElement('div');
+            let status_detail: HTMLDivElement = document.createElement('div');
             status_detail.classList.add('item-tag', 'mho-item-tag', 'mho-item-tag-no-img');
             status_detail.innerHTML = `${getI18N(status_texts.watch_survival_chances)} : ${status.watch_kills < 0 ? status.watch_kills * 100 : '+' + status.watch_kills * 100}%`;
             status_details.appendChild(status_detail);
@@ -363,7 +364,7 @@ export function createAdvancedStatus(content, status, tooltip) {
     }
 
     if (status.searches !== undefined) {
-        let status_detail = document.createElement('div');
+        let status_detail: HTMLDivElement = document.createElement('div');
         status_detail.classList.add('item-tag', 'mho-item-tag', 'mho-item-tag-no-img');
         status_detail.innerHTML = `${getI18N(status_texts.success_digs_changes)} : ${status.searches}`;
         status_details.appendChild(status_detail);
@@ -379,7 +380,7 @@ export function createAdvancedStatus(content, status, tooltip) {
 /** Affiche les propriétés ou les actions associées à l'objet survolé */
 
 export function displayPropertiesOrActions(property_or_action, hovered_item) {
-    let item_action = document.createElement('div');
+    let item_action: HTMLDivElement = document.createElement('div');
     // TODO MAPPING BACK
     item_action.classList.add('item-tag', 'mho-item-tag');
     switch (property_or_action) {
