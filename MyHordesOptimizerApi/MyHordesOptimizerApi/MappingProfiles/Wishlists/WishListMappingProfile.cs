@@ -31,7 +31,12 @@ namespace MyHordesOptimizerApi.MappingProfiles.Wishlists
                .ForMember(dest => dest.ShouldSignal, opt => opt.MapFrom(src => src.ShouldSignal))
                .ForMember(dest => dest.Priority, opt => opt.MapFrom(src => src.Priority))
                .ForMember(dest => dest.ZoneXPa, opt => opt.MapFrom(src => src.ZoneXpa))
-               .ForMember(dest => dest.BankCount, opt => opt.Ignore())
+               .ForMember(dest => dest.BankCount, opt => opt.MapFrom(src => src.IdItemNavigation.TownBankItems.Sum(bankItem => bankItem.Count)))
+               .ForMember(dest => dest.BagCount, opt => opt.MapFrom(src => src.IdTownNavigation.TownCitizens
+                    .Where(citizen => citizen.Dead != true && citizen.IdBagNavigation != null)
+                    .SelectMany(citizen => citizen.IdBagNavigation.BagItems)
+                    .Where(bagItem => bagItem.IdItem == src.IdItem)
+                    .Sum(bagItem => bagItem.Count)))
                .ForMember(dest => dest.IsWorkshop, opt => opt.Ignore())
                .ForMember(dest => dest.Item, opt => opt.MapFrom(src => src.IdItemNavigation));
 
