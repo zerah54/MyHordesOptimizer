@@ -8,6 +8,7 @@ export class WishlistItem extends CommonModel<WishlistItemDTO> {
     public count!: number;
     public bank_count!: number;
     public bag_count!: number;
+    public bag_citizens: string[] = [];
     public priority!: number;
     public depot!: WishlistDepot;
     public should_signal!: boolean;
@@ -26,6 +27,7 @@ export class WishlistItem extends CommonModel<WishlistItemDTO> {
             priority: this.priority,
             depot: this.depot.value.count,
             bagCount: this.bag_count,
+            bagCitizens: this.bag_citizens,
             zoneXPa: this.zone_x_pa,
             shouldSignal: this.should_signal
         };
@@ -40,6 +42,7 @@ export class WishlistItem extends CommonModel<WishlistItemDTO> {
             this.depot = WishlistDepot.getDepotFromCountAndPriority(dto.depot, dto.priority);
             this.should_signal = dto.shouldSignal;
             this.bag_count = dto.bagCount;
+            this.bag_citizens = dto.bagCitizens ?? [];
             this.zone_x_pa = dto.zoneXPa;
         }
     }

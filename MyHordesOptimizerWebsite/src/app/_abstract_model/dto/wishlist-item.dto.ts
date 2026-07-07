@@ -4,6 +4,7 @@ export interface WishlistItemDTO {
     count: number;
     bankCount: number;
     bagCount: number;
+    bagCitizens: string[];
     item: ItemDTO;
     priority: number;
     depot: number;

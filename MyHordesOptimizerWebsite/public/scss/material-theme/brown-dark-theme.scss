@@ -1,76 +1,110 @@
 @use 'sass:map';
 @use '@angular/material' as mat;
 
-$mh-palette: (
-    50: #965C36,
-    100: #8A5432,
-    200: #7E4D2A,
-    300: #663A27,
-    400: #5D3424,
-    500: #5E3525,
-    600: #5C2B20,
-    700: #532C21,
-    800: #3C2018,
-    900: #321914,
-    A100: #996739,
-    A200: #ffffff,
-    A400: #ffffff,
-    A700: #ffffff,
-    contrast: (
-        50: #f0d79e,
-        100: #f0d79e,
-        200: #f0d79e,
-        300: #f0d79e,
-        400: #f0d79e,
-        500: #f0d79e,
-        600: #f0d79e,
-        700: #f0d79e,
-        800: #f0d79e,
-        900: #f0d79e,
-        A100: #ffffff,
-        A200: #321914,
-        A400: #ffffff,
-        A700: #ffffff,
-    )
+$_palettes: (
+    primary: (
+        0: #321915,
+        10: #321915,
+        20: #321915,
+        25: #321915,
+        30: #321915,
+        35: #321915,
+        40: #321915,
+        50: #321915,
+        60: #321915,
+        70: #321915,
+        80: #321915,
+        90: #321915,
+        95: #321915,
+        98: #321915,
+        99: #321915,
+        100: #321915,
+    ),
+    secondary: (
+        0: #5E3525,
+        10: #5E3525,
+        20: #5E3525,
+        25: #5E3525,
+        30: #5E3525,
+        35: #5E3525,
+        40: #5E3525,
+        50: #5E3525,
+        60: #5E3525,
+        70: #5E3525,
+        80: #5E3525,
+        90: #8a5432,
+        95: #5E3525,
+        98: #5E3525,
+        99: #5E3525,
+        100: #5E3525,
+    ),
+    tertiary: (
+        0: #F0D79E,
+        10: #F0D79E,
+        20: #F0D79E,
+        25: #F0D79E,
+        30: #F0D79E,
+        35: #F0D79E,
+        40: #F0D79E,
+        50: #F0D79E,
+        60: #F0D79E,
+        70: #F0D79E,
+        80: #F0D79E,
+        90: #F0D79E,
+        95: #F0D79E,
+        98: #F0D79E,
+        99: #F0D79E,
+        100: #F0D79E,
+    ),
 );
 
-$theme-primary: mat.m2-define-palette($mh-palette, 900);
-$theme-accent: mat.m2-define-palette($mh-palette, A200, A100, A400);
-$theme-warn: mat.m2-define-palette(mat.$m2-red-palette);
-
-$default-theme: mat.m2-define-dark-theme(
-        (
-            color: (
-                primary: $theme-primary,
-                accent: $theme-accent,
-                warn: $theme-warn,
-                background: mat.m2-get-color-from-palette($theme-primary, 300)
-            )
-        )
+$_rest: (
+    secondary: map.get($_palettes, secondary),
+    tertiary: map.get($_palettes, tertiary),
 );
 
-@mixin brown-dark-theme($theme) {
-    $color-config: mat.m2-get-color-config($theme);
+$primary-palette: map.merge(map.get($_palettes, primary), $_rest);
+$secondary-palette: map.merge(map.get($_palettes, secondary), $_rest);
+$tertiary-palette: map.merge(map.get($_palettes, tertiary), $_rest);
 
-    $primary: mat.m2-get-color-from-palette(map.get($color-config, "primary"));
-    $accent: mat.m2-get-color-from-palette(map.get($color-config, "accent"));
+@mixin brown-dark-theme() {
+    color-scheme: dark;
 
-    $footer-color: mat.m2-get-color-from-palette(map.get($color-config, "primary"), 900);
-    $sidenav-bg-color: mat.m2-get-color-from-palette(map.get($color-config, "primary"), 500);
+    $theme: (
+        primary: $primary-palette,
+        secondary: $secondary-palette,
+        tertiary: $tertiary-palette,
+    );
+
+    @include mat.theme((
+        color: $theme,
+        typography: Roboto,
+        //typography: Nunito,
+        density: -2,
+    ));
+
+    $primary: mat.get-theme-color($theme, primary, 100);
+    $secondary: mat.get-theme-color($theme, secondary, 100);
+    $tertiary: mat.get-theme-color($theme, tertiary, 100);
+
+    $sidenav-bg-color: #5E3525;
+
     $item-color: rgba($primary, 0.25);
-    $map-details-color: mat.m2-get-color-from-palette(map.get($color-config, "primary"), 50);
-    $card-background-color: mat.m2-get-color-from-palette(map.get($color-config, "primary"), 100);
-    $switch-selected-accent-icon-color: mat.m2-get-contrast-color-from-palette(map.get($color-config, "accent"), 900);
+    $map-details-color: #965C36;
+
+    --mat-sys-surface: #{$secondary};
+    --mat-sys-on-surface: white;
+    --mat-sys-surface-container-low: #{mat.get-theme-color($theme, secondary, 90)};
+    --mat-sys-outline: rgba(255, 255, 255, 0.24);
+    --mat-sys-outline-variant: rgba(255, 255, 255, 0.12);
 
     --primary: #{$primary};
-    --accent: #{$accent};
+    --secondary: #{$secondary};
 
-    --footer-color: #{$footer-color};
     --sidenav-bg-color: #{$sidenav-bg-color};
     --item-color: #{$item-color};
     --map-details-color: #{$map-details-color};
-    --card-background-color: #{$card-background-color};
-    --switch-selected-accent-icon-color: #{$switch-selected-accent-icon-color};
+    --mat-button-text-label-text-color: white;
 
     --scrollbar-base-color: rgba(255, 255, 255, 0.15);
     --scrollbar-hover-color: rgba(255, 255, 255, 0.25);
@@ -78,6 +112,15 @@ $default-theme: mat.m2-define-dark-theme(
 
     --inactive-chip-base-color: rgba(0, 0, 0, 0.15);
     --img-shadow-color: rgba(255, 255, 255, 0.15);
+
+    // Compass (sélecteur de zones du scrutateur) : gris clairs, lisibles sur fond sombre.
+    --compass-center-color: #444;
+    --compass-cardinals-color: #DDD;
+    --compass-ordinals-color: #AAA;
+    // Zones sélectionnées : deux teintes brunes distinctes (comportement historique).
+    --compass-selected-center-color: var(--primary);
+    --compass-selected-cardinals-color: var(--sidenav-bg-color);
+    --compass-selected-ordinals-color: var(--primary);
 
     --accented-background-color: rgba(0, 0, 0, 0.15);
 

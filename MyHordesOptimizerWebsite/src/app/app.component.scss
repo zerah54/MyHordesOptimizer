@@ -7,93 +7,94 @@ $snow-1: url('/img/noel/s1.png');
 $snow-2: url('/img/noel/s2.png');
 $snow-3: url('/img/noel/s3.png');
 
-.mho-loading {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background-color: rgba(0, 0, 0, 0.50);
-    z-index: 9999;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+:host {
+    display: contents;
 
-    .mat-mdc-progress-spinner {
-        margin: auto;
-    }
-}
+    .mho-loading {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background-color: rgba(0, 0, 0, 0.50);
+        z-index: 9999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
 
-.mho-main {
-    height: 100%;
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    background-color: variables.$sidenav_bg_color;
-
-    .mho-container {
-        flex: 1;
-        overflow: hidden;
-        background-color: variables.$sidenav_bg_color !important;
-
-        > .mat-sidenav,
-        > .mho-content {
-            background-color: variables.$sidenav_bg_color !important;
-            border-width: 0;
+        .mat-mdc-progress-spinner {
+            margin: auto;
         }
+    }
 
-        .mho-content {
+    .mho-main {
+        height: 100%;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+
+        .mho-container {
+            flex: 1;
             overflow: hidden;
 
-            .mdc-card {
+            > .mat-sidenav,
+            > .mho-content {
+                border-width: 0;
+            }
+
+            .mho-content {
                 overflow: hidden;
-                margin: 0.5em;
-                height: calc(100% - 1em);
-                display: flex;
-                flex-direction: column;
 
-                .mat-mdc-card-header {
-                    height: 40px;
-                    align-items: center;
+                .mdc-card {
+                    overflow: hidden;
+                    margin: 0.5em;
+                    height: calc(100% - 1em);
 
-                    .mat-mdc-card-header-text {
-                        flex: 1;
-                    }
-                }
+                    ::ng-deep {
+                        .mat-mdc-card-header {
+                            height: 40px;
+                            align-items: center;
 
-                .mat-mdc-card-content {
-                    flex: 1;
-                    overflow: auto;
+                            .mat-mdc-card-header-text {
+                                flex: 1;
+                            }
+                        }
 
-                    .mat-mdc-tab-group {
-                        height: 100%;
+                        .mat-mdc-card-content {
+                            flex: 1;
+                            overflow: auto;
 
-                        .mat-mdc-tab-body-wrapper {
-                            height: 100%;
+                            .mat-mdc-tab-group {
+                                height: 100%;
+
+                                .mat-mdc-tab-body-wrapper {
+                                    height: 100%;
+                                }
+                            }
                         }
                     }
                 }
-            }
 
-            .citizen-identity {
-                display: inline-flex;
-                flex-direction: row;
-                gap: 0.25em;
-                flex-wrap: nowrap;
-                align-items: center;
+                .citizen-identity {
+                    display: inline-flex;
+                    flex-direction: row;
+                    gap: 0.25em;
+                    flex-wrap: nowrap;
+                    align-items: center;
+                }
             }
+        }
+
+        &.noel::after {
+            content: '';
+            pointer-events: none;
+            background-image: $snow-1, $snow-2, $snow-3;
+            height: 100dvh;
+            width: 100dvw;
         }
     }
 
-    &.noel::after {
-        content: '';
-        pointer-events: none;
-        background-image: $snow-1, $snow-2, $snow-3;
-        height: 100dvh;
-        width: 100dvw;
-    }
+    // .mat-elevation-z8 {
+    //     overflow-x: auto;
+    // }
 }
-
-// .mat-elevation-z8 {
-//     overflow-x: auto;
-// }

@@ -1,42 +1,111 @@
 @use 'sass:map';
 @use '@angular/material' as mat;
 
-$theme-primary: mat.m2-define-palette(mat.$m2-green-palette, 800);
-$theme-accent: mat.m2-define-palette(mat.$m2-red-palette, A200, A100, A400);
-$theme-warn: mat.m2-define-palette(mat.$m2-red-palette);
+$_brand: #2E7D32;  // vert sapin (primary)
+$_accent: #C62828; // rouge Noël (accent)
 
-$noel-theme: mat.m2-define-light-theme(
-        (
-            color: (
-                primary: $theme-primary,
-                accent: $theme-accent,
-                warn: $theme-warn,
-            )
-        )
+$_palettes: (
+    primary: (
+        0: #000000,
+        10: #2E7D32,
+        20: #2E7D32,
+        25: #2E7D32,
+        30: #2E7D32,
+        35: #2E7D32,
+        40: #2E7D32,
+        50: #2E7D32,
+        60: #2E7D32,
+        70: #2E7D32,
+        80: #2E7D32,
+        90: #C8E6C9,
+        95: #DFF5E0,
+        98: #F0FBF0,
+        99: #F6FFF5,
+        100: #FFFFFF,
+    ),
+    secondary: (
+        0: #000000,
+        10: #C62828,
+        20: #C62828,
+        25: #C62828,
+        30: #C62828,
+        35: #C62828,
+        40: #C62828,
+        50: #C62828,
+        60: #C62828,
+        70: #C62828,
+        80: #C62828,
+        90: #FFDAD6,
+        95: #FFEDEA,
+        98: #FFF8F7,
+        99: #FFFBFF,
+        100: #FFFFFF,
+    ),
+    tertiary: (
+        0: #000000,
+        10: #2E7D32,
+        20: #2E7D32,
+        25: #2E7D32,
+        30: #2E7D32,
+        35: #2E7D32,
+        40: #2E7D32,
+        50: #2E7D32,
+        60: #2E7D32,
+        70: #2E7D32,
+        80: #2E7D32,
+        90: #C8E6C9,
+        95: #DFF5E0,
+        98: #F0FBF0,
+        99: #F6FFF5,
+        100: #FFFFFF,
+    ),
 );
 
-@mixin noel-theme($theme) {
-    $color-config: mat.m2-get-color-config($theme);
+$_rest: (
+    secondary: map.get($_palettes, secondary),
+    tertiary: map.get($_palettes, tertiary),
+);
 
-    $primary: mat.m2-get-color-from-palette(map.get($color-config, "primary"));
-    $accent: mat.m2-get-color-from-palette(map.get($color-config, "accent"));
+$primary-palette: map.merge(map.get($_palettes, primary), $_rest);
+$secondary-palette: map.merge(map.get($_palettes, secondary), $_rest);
+$tertiary-palette: map.merge(map.get($_palettes, tertiary), $_rest);
 
-    $footer-color: mat.m2-get-color-from-palette(map.get($color-config, "primary"), 900);
-    $sidenav-bg-color: mat.m2-get-color-from-palette(map.get($color-config, "primary"), "lighter");
-    $item-color: rgba($accent, 0.25);
-    $map-details-color: mat.m2-get-color-from-palette(map.get($color-config, "accent"), "lighter");
-    $card-background-color: white;
-    $switch-selected-accent-icon-color: mat.m2-get-contrast-color-from-palette(map.get($color-config, "accent"), 900);
+@mixin noel-theme() {
+    color-scheme: light;
 
-    --primary: #{$primary};
-    --accent: #{$accent};
+    $theme: (
+        primary: $primary-palette,
+        secondary: $secondary-palette,
+        tertiary: $tertiary-palette,
+    );
 
-    --footer-color: #{$footer-color};
-    --sidenav-bg-color: #{$sidenav-bg-color};
-    --item-color: #{$item-color};
-    --map-details-color: #{$map-details-color};
-    --card-background-color: #{$card-background-color};
-    --switch-selected-accent-icon-color: #{$switch-selected-accent-icon-color};
+    @include mat.theme((
+        color: $theme,
+        typography: Roboto,
+        density: -2,
+    ));
+
+    --mat-sys-surface: white;
+    --mat-sys-on-surface: #1A1C19;
+    --mat-sys-on-surface-variant: rgba(0, 0, 0, 0.6); // textes secondaires / hints
+    --mat-sys-surface-container-low: #E8F5E9; // menus, tables, panneaux de select
+    --mat-sys-outline: rgba(0, 0, 0, 0.24); // bordures discrètes (champs, tables…)
+    --mat-sys-outline-variant: rgba(0, 0, 0, 0.12);
+
+    --mat-sys-primary-container: #{$_brand};
+    --mat-sys-on-primary-container: white;
+
+    --mat-card-elevated-container-color: white;
+
+    --primary: #{$_brand};
+    --secondary: #{$_accent};
+
+    --sidenav-bg-color: #{$_brand};
+    --item-color: #{rgba($_brand, 0.15)};
+    --map-details-color: #E8F5E9;
+    --card-background-color: white;
+    --mat-button-text-label-text-color: #{$_brand};
+    --switch-selected-accent-icon-color: white;
 
     --scrollbar-base-color: rgba(0, 0, 0, 0.3);
     --scrollbar-hover-color: rgba(0, 0, 0, 0.4);
@@ -45,5 +114,23 @@ $noel-theme: mat.m2-define-light-theme(
     --inactive-chip-base-color: rgba(0, 0, 0, 0.15);
     --img-shadow-color: rgba(0, 0, 0, 0.15);
 
+    // Zones sélectionnées : rouge Noël pour les cardinales, vert sapin pour les ordinales
+    // (secondary / primary du thème) + centre blanc (il ressort entouré des triangles).
+    --compass-selected-center-color: white;
+    --compass-selected-cardinals-color: var(--mat-sys-secondary); // rouge
+    --compass-selected-ordinals-color: var(--mat-sys-primary); // vert
+
     --accented-background-color: rgba(0, 0, 0, 0.15);
+
+    .mho-last-update {
+        img {
+            filter: none;
+        }
+    }
+
+    .mat-drawer {
+        --mat-sidenav-container-background-color: #E8F5E9;
+        --mat-button-text-label-text-color: black;
+        color: black;
+    }
 }

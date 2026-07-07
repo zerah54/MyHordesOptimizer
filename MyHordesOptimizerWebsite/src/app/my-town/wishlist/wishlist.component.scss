@@ -1,5 +1,14 @@
+@use '@angular/material' as mat;
+
 :host {
     display: contents;
+
+    .mat-mdc-form-field {
+        @include mat.form-field-overrides((
+            container-height: 32px,
+            container-vertical-padding: 4px,
+        ));
+    }
 
     .mho-wishlist-header {
         justify-content: space-between;
@@ -38,6 +47,25 @@
 
             table {
                 width: 100%;
+
+                tr.fulfilled {
+                    --mat-table-row-item-container-height: 28px;
+                    opacity: 0.45;
+
+                    > td {
+                        font-size: 0.8em;
+                    }
+                }
+
+                .bag-count-cell {
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 0.25em;
+
+                    .bag-citizens-icon {
+                        cursor: help;
+                    }
+                }
 
                 tr {
                     --mat-table-header-container-height: 40px;

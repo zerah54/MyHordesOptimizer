@@ -1,5 +1,3 @@
-@use 'variables';
-
 :host {
     display: contents;
 
@@ -34,7 +32,7 @@
                 cursor: pointer;
 
                 &:hover {
-                    color: variables.$accent;
+                    color: var(--footer-link-hover-color);
                 }
             }
 

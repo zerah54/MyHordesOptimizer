@@ -103,6 +103,7 @@ export class MenuComponent implements OnInit {
             label: $localize`Outils`, lvl: 0, displayed: true, authorized: (): boolean => true, expanded: true, children: [
                 {label: $localize`Camping`, path: 'tools/camping', displayed: true, lvl: 1, authorized: (): boolean => true, spoil: false},
                 {label: $localize`Chances de survie`, path: 'tools/probabilities', displayed: true, lvl: 1, authorized: (): boolean => true, spoil: false},
+                {label: $localize`Simulateur de débordement`, path: 'tools/overflow', displayed: true, lvl: 1, authorized: (): boolean => true, spoil: false},
             ], spoil: false
         },
         {
@@ -285,10 +286,12 @@ export class MenuComponent implements OnInit {
 
     private defineThemes(): void {
         /** Noël */
-        if (this.isNoel()) {
+        if (this.isNoel() || !environment.production) {
             this.themes.push({label: $localize`Noël`, class: 'noel'});
-            this.themes.splice(0, 1);
-            this.useEventTheme();
+            if (environment.production) {
+                this.themes.splice(0, 1);
+                this.useEventTheme();
+            }
         } else if (this.isNothing() && (this.selected_theme?.class === 'noel' || !this.selected_theme)) {
             setTimeout(() => {
                 this.changeTheme(this.themes[0]);
@@ -296,10 +299,12 @@ export class MenuComponent implements OnInit {
         }
 
         /** Halloween */
-        if (this.isHalloween()) {
+        if (this.isHalloween() || !environment.production) {
             this.themes.push({label: $localize`Halloween`, class: 'halloween'});
-            this.themes.splice(0, 1);
-            this.useEventTheme();
+            if (environment.production) {
+                this.themes.splice(0, 1);
+                this.useEventTheme();
+            }
         } else if (this.isNothing() && (this.selected_theme?.class === 'halloween' || !this.selected_theme)) {
             setTimeout(() => {
                 this.changeTheme(this.themes[0]);

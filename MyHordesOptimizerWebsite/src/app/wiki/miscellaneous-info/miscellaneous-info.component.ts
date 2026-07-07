@@ -1,10 +1,11 @@
 import { CommonModule, formatNumber } from '@angular/common';
-import { Component, ViewEncapsulation } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatDialog } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
+import { Router } from '@angular/router';
 import moment from 'moment';
 import { Misc } from '../../_abstract_model/interfaces';
 import { Imports } from '../../_abstract_model/types/_types';
@@ -13,7 +14,6 @@ import { ColumnIdPipe } from '../../_core/pipes/column-id.pipe';
 import { getMaxAttack, getMinAttack } from '../../_core/utilities/estimations.util';
 import { getTown } from '../../_core/utilities/localstorage.util';
 import { DespairDeathsCalculatorComponent } from './despair-deaths-calculator/despair-deaths-calculator.component';
-import { MaxActiveCalculatorComponent } from './max-active-calculator/max-active-calculator.component';
 import { IsTodayMiscRowPipe } from './miscellaneous-info.pipe';
 
 const angular_common: Imports = [CommonModule];
@@ -25,15 +25,14 @@ const material_modules: Imports = [MatButtonModule, MatCardModule, MatIconModule
     selector: 'mho-miscellaneous-info',
     templateUrl: './miscellaneous-info.component.html',
     styleUrls: ['./miscellaneous-info.component.scss'],
-    encapsulation: ViewEncapsulation.None,
-    host: {style: 'display: contents'},
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class MiscellaneousInfoComponent {
+    private readonly dialog: MatDialog = inject(MatDialog);
+    private readonly router: Router = inject(Router);
 
     public readonly locale: string = moment.locale();
     public readonly my_town: TownDetails | null = getTown();
-    public max_house_level: number = -1;
 
     public misc: Misc[] = [
         {
@@ -68,9 +67,9 @@ export class MiscellaneousInfoComponent {
             table: new MatTableDataSource(Array.from({length: 50}, (_: unknown, i: number): { [key: string]: number | string | null } => {
                 return {
                     day: i + 1,
-                    re_min: formatNumber(getMinAttack(i + 1, 'RE'), this.locale, '1.0-0'),
-                    re_max: formatNumber(getMaxAttack(i + 1, 'RE'), this.locale, '1.0-0'),
-                    re_moy: formatNumber((getMinAttack(i + 1, 'RE') + getMaxAttack(i + 1, 'RE')) / 2, this.locale, '1.0-0')
+                    re_min: formatNumber(getMinAttack(i + 1, this.my_town?.town_type ?? 'RE'), this.locale, '1.0-0'),
+                    re_max: formatNumber(getMaxAttack(i + 1, this.my_town?.town_type ?? 'RE'), this.locale, '1.0-0'),
+                    re_moy: formatNumber((getMinAttack(i + 1, this.my_town?.town_type ?? 'RE') + getMaxAttack(i + 1, this.my_town?.town_type ?? 'RE')) / 2, this.locale, '1.0-0')
                 };
             }))
         },
@@ -80,19 +79,17 @@ export class MiscellaneousInfoComponent {
             header_action: {
                 icon: 'calculate',
                 action: (): void => {
-                    this.openMaxActiveCalculator();
+                    this.openOverflowSimulator();
                 }
             },
             columns: [
                 {id: 'day', header: $localize`Jour`},
-                {id: 'max', header: $localize`Débordement maximum`},
-                {id: 'citizen', header: $localize`Citoyens maximum attaqués`},
+                {id: 'citizen', header: $localize`Citoyens ciblés`},
             ],
             table: new MatTableDataSource(Array.from({length: 50}, (_: unknown, i: number): { [key: string]: number | string | null } => {
                 return {
                     day: i + 1,
-                    max: this.getMaxActiveZombies(i + 2),
-                    citizen: this.getTargettedCitizen(i + 2),
+                    citizen: this.getTargettedCitizen(i + 1),
                 };
             }))
         },
@@ -142,17 +139,21 @@ export class MiscellaneousInfoComponent {
         }
     ];
 
-
-    constructor(private dialog: MatDialog) {
-
-    }
-
     private openDespairDeathCalculator(): void {
         this.dialog.open(DespairDeathsCalculatorComponent);
     }
 
-    private openMaxActiveCalculator(): void {
-        this.dialog.open(MaxActiveCalculatorComponent);
+    private openOverflowSimulator(): void {
+        this.router.navigate(['tools', 'overflow']);
+    }
+
+    /**
+     * Nombre de citoyens ciblés par le débordement au jour donné, plafonné à une ville standard (40).
+     * @see NightlyHandler::stage2_attack ($in_town)
+     */
+    private getTargettedCitizen(day: number): string {
+        const targeted: number = Math.min(10 + 2 * Math.floor(Math.max(0, day - 10) / 2), 40);
+        return formatNumber(targeted, this.locale, '1.0-0');
     }
 
     private getSurvivalistOdds(day: number, devastated: boolean): string {
@@ -174,13 +175,4 @@ export class MiscellaneousInfoComponent {
         return formatNumber(chances * 100, this.locale, '1.0-2') + '%';
     }
 
-    private getMaxActiveZombies(day: number): string {
-        let max_active: number = Math.round((40 / 3.0) * day * (8 + 1.5) * 1.1)
-        return formatNumber(max_active, this.locale, '1.0-2');
-    }
-
-    private getTargettedCitizen(day: number): string {
-        const max_targetted: number = Math.min(10 + 2 * Math.floor(Math.max(0, day - 10) / 2), Math.ceil(40));
-        return formatNumber(max_targetted, this.locale, '1.0-2');
-    }
 }

@@ -171,6 +171,20 @@ export class WishlistComponent implements OnInit {
             });
     }
 
+    /**
+     * Indique si la ligne est « satisfaite » : la quantité souhaitée est finie (>= 0)
+     * et la quantité manquante (souhaité - banque - sacs) est nulle ou négative.
+     * Ces lignes sont dévalorisées visuellement car l'objet n'a plus besoin d'être rapporté.
+     */
+    protected isFulfilled(row: WishlistItem): boolean {
+        return row.count >= 0 && (row.count - row.bank_count - row.bag_count) <= 0;
+    }
+
+    /** Construit le contenu du tooltip listant les citoyens dont le sac contient l'objet (un pseudo par ligne). */
+    protected getBagCitizensTooltip(row: WishlistItem): string {
+        return row.bag_citizens.join('\n');
+    }
+
     protected changeZoneXPa(item: WishlistItem, new_zone: number): void {
         item.zone_x_pa = new_zone;
         this.triggerSave();

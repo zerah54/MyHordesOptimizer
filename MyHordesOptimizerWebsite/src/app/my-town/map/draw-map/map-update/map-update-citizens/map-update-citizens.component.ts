@@ -22,7 +22,6 @@ const material_modules: Imports = [MatButtonModule, MatIconModule, MatListModule
     selector: 'mho-map-update-citizens',
     templateUrl: './map-update-citizens.component.html',
     styleUrls: ['./map-update-citizens.component.scss'],
-    host: {style: 'display: contents'},
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class MapUpdateCitizensComponent {

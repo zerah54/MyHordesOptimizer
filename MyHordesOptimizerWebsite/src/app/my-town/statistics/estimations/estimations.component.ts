@@ -257,7 +257,7 @@ export class EstimationsComponent implements OnInit {
             .map((ds: ChartDataset<'line'>, i: number): LegendItem => ({
                 text: ds.label?.substring(0, ds.label.indexOf('-')) || '',
                 datasetIndex: i,
-                fontColor: chart.legend?.options.labels.color,
+                fontColor: <Color>Chart.defaults.color,
                 fillStyle: <Color>chart.data.datasets[i].backgroundColor,
                 strokeStyle: <Color>chart.data.datasets[i].borderColor,
                 lineDash: <number[]>chart.data.datasets[i].borderDash,

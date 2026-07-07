@@ -9,7 +9,7 @@
 <mat-card-content class="mho-map">
     <mat-sidenav-container class="mho-map-sidenav-container">
 
-        <mat-sidenav-content class="map-container">
+        <mat-sidenav-content class="map-container" cartoScrollAura>
             <mho-draw-map [map]="map" [allItems]="all_items" [allRuins]="all_ruins" [options]="options"
                           [allCitizens]="all_citizens"></mho-draw-map>
         </mat-sidenav-content>

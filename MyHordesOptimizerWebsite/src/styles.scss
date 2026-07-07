@@ -1,6 +1,7 @@
-@use 'variables';
-@use 'tables';
+@use 'fonts';
 @use 'scrollbars';
+@use 'tables';
+@use 'variables';
 
 * {
     div[data-lastpass-icon-root] {
@@ -17,7 +18,6 @@ body {
 body {
     margin: 0;
     font-family: Roboto, "Helvetica Neue", sans-serif;
-    color: variables.$primary;
     overflow: hidden;
     display: flex;
     flex-direction: column;
@@ -31,7 +31,7 @@ a {
     color: variables.$warn;
 
     &:hover {
-        color: variables.$accent;
+        color: variables.$secondary;
     }
 }
 
@@ -41,29 +41,27 @@ a {
 
 .mat-mdc-snack-bar-container {
     &.snackbar-success {
-        --mat-snackbar-container-color: darkseagreen !important;
-        --mat-snackbar-supporting-text-color: black !important;
+        --mat-snack-bar-container-color: darkseagreen !important;
+        --mat-snack-bar-supporting-text-color: black !important;
     }
 
     &.snackbar-warning {
-        --mat-snackbar-container-color: coral !important;
-        --mat-snackbar-supporting-text-color: black !important;
+        --mat-snack-bar-container-color: coral !important;
+        --mat-snack-bar-supporting-text-color: black !important;
     }
 
     &.snackbar-error {
-        --mat-snackbar-container-color: firebrick !important;
-        --mat-snackbar-supporting-text-color: black !important;
+        --mat-snack-bar-container-color: firebrick !important;
+        --mat-snack-bar-supporting-text-color: black !important;
     }
 
     &.snackbar-information {
-        --mat-snackbar-container-color: cadetblue !important;
-        --mat-snackbar-supporting-text-color: black !important;
+        --mat-snack-bar-container-color: cadetblue !important;
+        --mat-snack-bar-supporting-text-color: black !important;
     }
 }
 
 .mat-mdc-card {
-    background-color: variables.$card-background-color !important;
-
     .mat-mdc-card-title {
         display: flex !important;
         align-items: center;
@@ -83,16 +81,6 @@ a {
     display: flex;
     justify-content: center;
     align-items: center;
-}
-
-.mat-button-toggle-group {
-    --mat-button-toggle-divider-color: #{variables.$primary};
-    --mat-button-toggle-background-color: variables.$card-background-color;
-    --mat-button-toggle-height: 42px;
-
-    .mat-button-toggle-checked {
-        background-color: variables.$item_color !important;
-    }
 }
 
 .defered-cell {

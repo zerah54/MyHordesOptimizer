@@ -1,7 +1,7 @@
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { OverlayContainer } from '@angular/cdk/overlay';
 import { CommonModule, NgOptimizedImage } from '@angular/common';
-import { Component, DestroyRef, HostListener, inject, LOCALE_ID, OnInit, Signal, viewChild, ViewEncapsulation } from '@angular/core';
+import { Component, DestroyRef, HostListener, inject, LOCALE_ID, OnInit, Signal, viewChild } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatCardModule } from '@angular/material/card';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
@@ -26,8 +26,6 @@ const material_modules: Imports = [MatCardModule, MatProgressSpinnerModule, MatS
     selector: 'mho-root',
     templateUrl: './app.component.html',
     styleUrls: ['./app.component.scss'],
-    encapsulation: ViewEncapsulation.None,
-    host: {style: 'display: contents'},
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class AppComponent implements OnInit {

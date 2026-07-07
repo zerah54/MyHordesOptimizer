@@ -60,14 +60,14 @@
                         </mat-checkbox>
                         <mat-form-field appearance="outline" class="short-bottom">
                             <mat-label i18n>Nombre de campings déjà effectués</mat-label>
-                            <img matPrefix [ngSrc]="HORDES_IMG_REPO + 'emotes/sleep.gif'" width="16" height="16">
+                            <img  matIconPrefix [ngSrc]="HORDES_IMG_REPO + 'emotes/sleep.gif'" width="16" height="16">
                             <input matInput type="number" #campings [formControlName]="'campings'" min="0">
                             <small
                                 matSuffix>{{ bonus_string }}{{ calculateNbCampingsChance(+campings.value, proCamper.checked, configuration_form.get('town')?.value['id'] === 'PANDE') | campingDisplayBonus:display_bonus_ap:locale }}</small>
                         </mat-form-field>
                         <mat-form-field appearance="outline" class="short-bottom">
                             <mat-label i18n>Nombre de pelures de peau et de toiles de tentes dans le sac</mat-label>
-                            <img matPrefix [ngSrc]="HORDES_IMG_REPO + 'emotes/bag.gif'" width="16" height="16">
+                            <img  matIconPrefix [ngSrc]="HORDES_IMG_REPO + 'emotes/bag.gif'" width="16" height="16">
                             <input matInput type="number" [formControlName]="'objects'" min="0">
                             <small matSuffix>{{ bonus_string }}x{{ bonus.camp_items | campingDisplayBonus:display_bonus_ap:locale }}</small>
                         </mat-form-field>
@@ -112,7 +112,7 @@
                     <div>
                         <mat-form-field appearance="outline" class="short-bottom">
                             <mat-label i18n>Distance de la ville (en km)</mat-label>
-                            <img matPrefix [ngSrc]="HORDES_IMG_REPO + 'emotes/explo.gif'" width="16" height="16">
+                            <img  matIconPrefix [ngSrc]="HORDES_IMG_REPO + 'emotes/explo.gif'" width="16" height="16">
                             <input matInput type="number" #townDistance [formControlName]="'distance'" min="1">
                             <small
                                 matSuffix>{{ bonus_string }}{{ calculateDistanceChance(+townDistance.value) | campingDisplayBonus:display_bonus_ap:locale }}</small>
@@ -132,13 +132,13 @@
                         @if (configuration_form.get('ruin')?.value['id'] === -1) {
                             <mat-form-field appearance="outline" class="short-bottom">
                                 <mat-label i18n>Nombre de tas</mat-label>
-                                <img matPrefix [ngSrc]="HORDES_IMG_REPO + 'icons/uncover.gif'" width="16" height="16">
+                                <img  matIconPrefix [ngSrc]="HORDES_IMG_REPO + 'icons/uncover.gif'" width="16" height="16">
                                 <input matInput type="number" [formControlName]="'bury_count'">
                             </mat-form-field>
                         }
                         <mat-form-field appearance="outline" class="short-bottom">
                             <mat-label i18n>Nombre de zombies sur la case</mat-label>
-                            <img matPrefix [ngSrc]="HORDES_IMG_REPO + 'emotes/zombie.gif'" width="16" height="16">
+                            <img  matIconPrefix [ngSrc]="HORDES_IMG_REPO + 'emotes/zombie.gif'" width="16" height="16">
                             <input matInput type="number" [formControlName]="'zombies'" min="0">
                             <small matSuffix>{{ bonus_string }}
                                 x{{ (configuration_form.get('vest')?.value ? bonus.zombie_vest : bonus.zombie_no_vest) | campingDisplayBonus:display_bonus_ap:locale }}</small>
@@ -146,7 +146,7 @@
 
                         <mat-form-field appearance="outline" class="short-bottom">
                             <mat-label i18n>Nombre de campeurs déjà cachés sur la case</mat-label>
-                            <img matPrefix [ngSrc]="HORDES_IMG_REPO + 'emotes/human.gif'" width="16" height="16">
+                            <img  matIconPrefix [ngSrc]="HORDES_IMG_REPO + 'emotes/human.gif'" width="16" height="16">
                             <input #hiddenCampers matInput type="number" [formControlName]="'hidden_campers'" min="0">
                             <small
                                 matSuffix>{{ bonus_string }}{{ calculateCrowdChance(+hiddenCampers.value) | campingDisplayBonus:display_bonus_ap:locale }}</small>
@@ -163,14 +163,14 @@
                         </h3>
                         <mat-form-field appearance="outline" class="short-bottom">
                             <mat-label i18n>Nombre d'améliorations simples faites sur la case</mat-label>
-                            <img matPrefix [ngSrc]="HORDES_IMG_REPO + 'icons/small_refine.gif'" width="16" height="16">
+                            <img  matIconPrefix [ngSrc]="HORDES_IMG_REPO + 'icons/small_refine.gif'" width="16" height="16">
                             <input matInput type="number" [formControlName]="'improve'" min="0">
                             <small matSuffix>{{ bonus_string }}x{{ bonus.improve | campingDisplayBonus:display_bonus_ap:locale }}</small>
                         </mat-form-field>
 
                         <mat-form-field appearance="outline" class="short-bottom">
                             <mat-label i18n>Nombre d'objets de défense installés sur la case</mat-label>
-                            <img matPrefix [ngSrc]="HORDES_IMG_REPO + 'item/cat_def.gif'" width="16" height="16">
+                            <img  matIconPrefix [ngSrc]="HORDES_IMG_REPO + 'item/cat_def.gif'" width="16" height="16">
                             <input matInput type="number" [formControlName]="'object_improve'" min="0">
                             <small matSuffix>{{ bonus_string }}x{{ bonus.object_improve | campingDisplayBonus:display_bonus_ap:locale }}</small>
                         </mat-form-field>
@@ -183,9 +183,9 @@
                         <mat-form-field appearance="outline" class="short-bottom">
                             <mat-label i18n>{{ display_bonus_ap ? 'Nombre' : 'Pourcentage' }} total d'améliotations sur la case</mat-label>
                             <span matPrefix>
-                            <img [ngSrc]="HORDES_IMG_REPO + 'icons/small_refine.gif'" width="16" height="16"> + <img
-                                [ngSrc]="HORDES_IMG_REPO + 'item/cat_def.gif'" width="16" height="16">
-                        </span>
+                                <img [ngSrc]="HORDES_IMG_REPO + 'icons/small_refine.gif'" width="16" height="16"> + <img
+                                    [ngSrc]="HORDES_IMG_REPO + 'item/cat_def.gif'" width="16" height="16">
+                            </span>
                             <input matInput type="number" [formControlName]="'complete_improve'" min="0">
                             <small matSuffix>{{ bonus_string }}x1</small>
                         </mat-form-field>

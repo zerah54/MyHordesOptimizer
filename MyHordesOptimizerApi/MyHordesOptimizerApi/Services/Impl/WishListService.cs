@@ -74,6 +74,10 @@ namespace MyHordesOptimizerApi.Services.Impl
                                 .ThenInclude(bagItem => bagItem.IdItemNavigation)
                                 .AsSplitQuery()
                 .Include(wishlist => wishlist.IdTownNavigation)
+                    .ThenInclude(town => town.TownCitizens.Where(townCitizen => townCitizen.IdTown == townId))
+                        .ThenInclude(townCitizen => townCitizen.IdUserNavigation)
+                        .AsSplitQuery()
+                .Include(wishlist => wishlist.IdTownNavigation)
                     .ThenInclude(town => town.IdUserWishListUpdaterNavigation)
                         .AsSplitQuery()
                 .ToList();

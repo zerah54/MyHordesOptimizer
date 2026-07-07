@@ -5,50 +5,126 @@
 @use 'spiders';
 @use 'ghost';
 
+$_brand: #FF5722;             // orange citrouille (accent principal)
+$_surface: #212121;           // fond sombre
+$_surface-container: #2E2E2E; // surface légèrement surélevée (menus, tables, cards)
+$_sidenav: #1A1A1A;           // sidenav plus sombre encore
 
-$theme-primary: mat.m2-define-palette(mat.$m2-deep-orange-palette);
-$theme-accent: mat.m2-define-palette(mat.$m2-grey-palette, 900);
-$theme-warn: mat.m2-define-palette(mat.$m2-red-palette);
-
-$halloween-theme: mat.m2-define-dark-theme(
-        (
-            color: (
-                primary: $theme-primary,
-                accent: $theme-accent,
-                warn: $theme-warn,
-            )
-        )
+$_palettes: (
+    primary: (
+        0: #000000,
+        10: #5A1A00,
+        20: #5A1A00,
+        25: #5A1A00,
+        30: #5A1A00,
+        35: #5A1A00,
+        40: #5A1A00,
+        50: #5A1A00,
+        60: #5A1A00,
+        70: #5A1A00,
+        80: #5A1A00,
+        90: #FF5722,
+        95: #FF5722,
+        98: #FF5722,
+        99: #FF5722,
+        100: #FF5722,
+    ),
+    secondary: (
+        0: #000000,
+        10: #1A1A1A,
+        20: #1A1A1A,
+        25: #1A1A1A,
+        30: #1A1A1A,
+        35: #1A1A1A,
+        40: #1A1A1A,
+        50: #1A1A1A,
+        60: #1A1A1A,
+        70: #1A1A1A,
+        80: #1A1A1A,
+        90: #212121,
+        95: #212121,
+        98: #212121,
+        99: #212121,
+        100: #212121,
+    ),
+    tertiary: (
+        0: #FF5722,
+        10: #FF5722,
+        20: #FF5722,
+        25: #FF5722,
+        30: #FF5722,
+        35: #FF5722,
+        40: #FF5722,
+        50: #FF5722,
+        60: #FF5722,
+        70: #FF5722,
+        80: #FF5722,
+        90: #FF5722,
+        95: #FF5722,
+        98: #FF5722,
+        99: #FF5722,
+        100: #FF5722,
+    ),
 );
 
-@mixin halloween-theme($theme) {
-    $color-config: mat.m2-get-color-config($theme);
+$_rest: (
+    secondary: map.get($_palettes, secondary),
+    tertiary: map.get($_palettes, tertiary),
+);
 
-    $primary: mat.m2-get-color-from-palette(map.get($color-config, "primary"));
-    $accent: mat.m2-get-color-from-palette(map.get($color-config, "accent"));
+$primary-palette: map.merge(map.get($_palettes, primary), $_rest);
+$secondary-palette: map.merge(map.get($_palettes, secondary), $_rest);
+$tertiary-palette: map.merge(map.get($_palettes, tertiary), $_rest);
 
-    $footer-color: mat.m2-get-color-from-palette(map.get($color-config, "primary"), 900);
-    $sidenav-bg-color: mat.m2-get-color-from-palette(map.get($color-config, "accent"), 700);
+@mixin halloween-theme() {
+    color-scheme: dark;
+
+    $theme: (
+        primary: $primary-palette,
+        secondary: $secondary-palette,
+        tertiary: $tertiary-palette,
+    );
+
+    @include mat.theme((
+        color: $theme,
+        typography: Roboto,
+        density: -2,
+    ));
+
+    $primary: mat.get-theme-color($theme, primary, 100);     // orange citrouille
+    $secondary: mat.get-theme-color($theme, secondary, 100); // fond sombre
+
     $item-color: rgba($primary, 0.25);
-    $map-details-color: mat.m2-get-color-from-palette(map.get($color-config, "accent"), 800);
-    $card-background-color: mat.m2-get-color-from-palette(map.get($color-config, "accent"), 800);
-    $switch-selected-accent-icon-color: mat.m2-get-contrast-color-from-palette(map.get($color-config, "accent"), A100);
+
+    --mat-sys-surface: #{$secondary};
+    --mat-sys-on-surface: white;
+    --mat-sys-surface-container-low: #{$_surface-container};
+    --mat-sys-outline: rgba(255, 255, 255, 0.24);
+    --mat-sys-outline-variant: rgba(255, 255, 255, 0.12);
+
+    --mat-sys-primary-container: #{$_brand};
+    --mat-sys-on-primary-container: white;
 
     --primary: #{$primary};
-    --accent: #{$accent};
+    --secondary: #{$secondary};
 
-    --footer-color: #{$footer-color};
-    --sidenav-bg-color: #{$sidenav-bg-color};
+    --sidenav-bg-color: #{$_sidenav};
     --item-color: #{$item-color};
-    --map-details-color: #{$map-details-color};
-    --card-background-color: #{$card-background-color};
-    --switch-selected-accent-icon-color: #{$switch-selected-accent-icon-color};
+    --map-details-color: #{$_surface-container};
+    --card-background-color: #{$_surface-container};
+    --mat-button-text-label-text-color: white;
+    --switch-selected-accent-icon-color: white;
 
-    --scrollbar-base-color: rgba(0, 0, 0, 0.3);
-    --scrollbar-hover-color: rgba(0, 0, 0, 0.4);
-    --scrollbar-active-color: rgba(0, 0, 0, 0.5);
+    --scrollbar-base-color: rgba(255, 255, 255, 0.15);
+    --scrollbar-hover-color: rgba(255, 255, 255, 0.25);
+    --scrollbar-active-color: rgba(255, 255, 255, 0.5);
 
     --inactive-chip-base-color: rgba(0, 0, 0, 0.15);
     --img-shadow-color: rgba(255, 255, 255, 0.15);
+
+    --compass-selected-center-color: var(--sidenav-bg-color);
+    --compass-selected-cardinals-color: var(--primary);
+    --compass-selected-ordinals-color: var(--primary);
 
     --accented-background-color: rgba(0, 0, 0, 0.15);
 

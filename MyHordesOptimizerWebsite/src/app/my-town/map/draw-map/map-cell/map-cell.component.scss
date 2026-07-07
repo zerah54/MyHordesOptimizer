@@ -18,6 +18,8 @@ $empty-color: gray;
         position: relative;
         z-index: 0;
         cursor: pointer;
+        min-width: 30px;
+        min-height: 30px;
 
         &.scrut-border-left {
             border-left: 1px solid variables.$primary;

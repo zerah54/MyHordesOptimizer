@@ -10,6 +10,7 @@ namespace MyHordesOptimizerApi.MappingProfiles.Wishlists
         {
             CreateMap<DefaultWishlistItem, WishListItemDto>()
                 .ForMember(dto => dto.BagCount, opt => opt.Ignore())
+                .ForMember(dto => dto.BagCitizens, opt => opt.Ignore())
                 .ForMember(dto => dto.BankCount, opt => opt.Ignore())
                 .ForMember(dto => dto.Count, opt => opt.MapFrom(src => src.Count))
                 .ForMember(dto => dto.Depot, opt => opt.MapFrom(src => src.Depot))

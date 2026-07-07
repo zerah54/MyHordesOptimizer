@@ -7,97 +7,112 @@
 
 @use 'variables';
 
-@include mat.all-component-typographies();
-@include mat.elevation-classes();
-@include mat.app-background();
+// Overrides de composants applicables à toute l'app. Ils utilisent des var() qui se
+// résolvent par thème, donc le même mixin convient à tous les thèmes.
+//
+// IMPORTANT : à ré-appliquer DANS chaque scope de thème (après le mixin de thème). En effet
+// mat.theme() (appelé dans chaque mixin de thème) ré-émet certains défauts — ex.
+// --mat-form-field-filled-label-display, --mat-toolbar-standard-height — à la spécificité du
+// sélecteur de thème (body:has(.pink)). Un override placé seulement au niveau `body` serait
+// alors écrasé dans le scope rose. On l'inclut donc aussi sous `&:has(.pink)`.
+@mixin app-component-overrides() {
+    @include mat.toolbar-overrides((
+        container-background-color: var(--mat-sys-primary-container),
+        container-text-color: var(--mat-sys-on-primary-container),
+        standard-height: 52px
+    ));
 
-.cdk-overlay-container,
-.mho-main {
+    @include mat.progress-spinner-overrides((
+        active-indicator-color: var(--mat-sys-on-primary-container),
+    ));
 
-    @include mat.all-component-themes(brown-dark-theme.$default-theme);
-    @include brown-dark-theme.brown-dark-theme(brown-dark-theme.$default-theme);
+    @include mat.menu-overrides((
+        container-color: var(--mat-sys-surface-container-low),
+    ));
 
-    &.pink {
-        @include mat.all-component-colors(pink-light-theme.$pink-theme);
-        @include pink-light-theme.pink-light-theme(pink-light-theme.$pink-theme);
+    @include mat.tooltip-overrides((
+        container-color: var(--mat-sys-primary-container),
+        supporting-text-color: white,
+    ));
+
+    @include mat.form-field-overrides((
+        filled-label-display: block,
+        filled-active-indicator-color: var(--mat-sys-outline),
+    ));
+
+    @include mat.tabs-overrides((
+        divider-height: 0,
+    ));
+
+    @include mat.table-overrides((
+        background-color: var(--mat-sys-surface-container-low),
+    ));
+
+    @include mat.checkbox-overrides((
+        selected-checkmark-color: var(--mat-sys-on-primary-container),
+    ));
+
+    @include mat.select-overrides((
+        panel-background-color: var(--mat-sys-surface-container-low),
+    ));
+
+    @include mat.paginator-overrides((
+        container-background-color: var(--mat-sys-surface-container-low),
+    ));
+
+    @include mat.button-toggle-overrides((
+        divider-color: variables.$primary,
+        background-color: variables.$card-background-color,
+        height: 42px,
+        selected-state-background-color: variables.$primary,
+        selected-state-text-color: white,
+    ));
+}
+
+html:has(.mho-main) {
+
+    @include brown-dark-theme.brown-dark-theme();
+
+    &:has(.pink) {
+        @include pink-light-theme.pink-light-theme();
     }
 
-    &.noel {
-        @include mat.all-component-colors(noel-theme.$noel-theme);
-        @include noel-theme.noel-theme(noel-theme.$noel-theme);
+    &:has(.noel) {
+        @include noel-theme.noel-theme();
     }
 
-    &.halloween {
-        @include mat.all-component-colors(halloween-theme.$halloween-theme);
-        @include halloween-theme.halloween-theme(halloween-theme.$halloween-theme);
+    &:has(.halloween) {
+        @include halloween-theme.halloween-theme();
     }
 
+    @include app-component-overrides();
 
-    --mat-icon-button-icon-size: 16px !important;
-    --mat-checkbox-state-layer-size: 32px !important;
+    background-color: var(--mat-sys-surface);
+    color: var(--mat-sys-on-surface);
+    font: var(--mat-sys-body-medium);
 
-    .mat-mdc-list-base {
-        --mat-list-list-item-one-line-container-height: 40px !important;
-        --mat-list-list-item-two-line-container-height: 56px !important;
-        --mat-list-list-item-three-line-container-height: 80px !important;
+    // Survol des liens du footer : suit --mat-sys-on-surface, qui est déjà adaptatif
+    // (blanc en thème sombre, foncé en thème clair) → plus clair en sombre, plus foncé en clair.
+    --footer-link-hover-color: var(--mat-sys-on-surface);
+
+    .mat-drawer {
+        --mat-sidenav-container-width: auto;
+        --mat-sidenav-content-text-color: var(--font-color);
     }
 
-    .mat-mdc-tab-header {
-        --mat-tab-container-height: 40px !important;
+    .mat-mdc-card {
+        box-shadow: unset;
     }
 
-    .mat-mdc-form-field.compact-field {
-        .mdc-text-field--outlined {
-            .mat-mdc-form-field-infix {
-                --mat-form-field-container-vertical-padding: 8px !important;
-                min-height: unset;
-            }
-
-            .mat-mdc-floating-label:not(.mdc-floating-label--float-above) {
-                top: 20px !important;
-            }
-        }
+    .mat-divider {
+        opacity: 0.12;
     }
 
-    .mat-mdc-dialog-container {
-        --mat-dialog-container-color: #{variables.$card-background-color} !important;
-    }
-
-    .mat-mdc-menu-panel {
-        --mat-menu-container-color: #{variables.$card-background-color} !important;
-    }
-
-    .mat-mdc-standard-chip:not(.mdc-evolution-chip--disabled):not(.mat-mdc-chip-highlighted) {
-        --mat-chip-elevated-container-color: #{variables.$inactive-chip-base-color} !important;
-    }
-
-    .mat-toolbar.mho-footer {
-        --mat-toolbar-container-background-color: #{variables.$footer-color} !important;
-    }
-
-    .mat-mdc-select-panel {
-        --mat-select-panel-background-color: #{variables.$card-background-color};
-    }
-
-    .mat-mdc-slide-toggle.mat-accent {
-        --mat-slide-toggle-selected-icon-color: #{variables.$switch-selected-accent-icon-color};
-    }
-
-    .mat-mdc-table {
-        --mat-table-background-color: #{variables.$card-background-color};
-    }
-
-    .mat-expansion-panel {
-        --mat-expansion-container-background-color: #{variables.$card-background-color};
-    }
-
-
-    .mdc-text-field--filled:not(.mdc-text-field--disabled) {
-        background-color: variables.$card-background-color !important;
-    }
-
-    .mdc-text-field {
-        --mat-form-field-filled-disabled-container-color: variables.$card-background-color;
-        --mat-form-field-filled-container-color: variables.$card-background-color;
-    }
+    //.mat-mdc-standard-chip:not(.mdc-evolution-chip--disabled):not(.mat-mdc-chip-highlighted) {
+    //    --mat-chip-elevated-container-color: #{variables.$inactive-chip-base-color} !important;
+    //}
+    //
+    //.mat-mdc-slide-toggle.mat-accent {
+    //    --mat-slide-toggle-selected-icon-color: #{variables.$switch-selected-accent-icon-color};
+    //}
 }

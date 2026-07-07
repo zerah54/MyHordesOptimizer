@@ -1,95 +1,84 @@
 @use 'variables';
 
-.mho-probabilities-header {
-    display: flex;
-    flex-direction: row;
-    gap: 1em;
-    justify-content: space-between;
-    align-items: center;
-
-    .mat-mdc-form-field.default-value {
-        .mat-mdc-form-field-infix {
-            padding-top: 8px;
-            padding-bottom: 8px;
-            min-height: unset;
-        }
-    }
-}
-
-.mho-probabilities {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 2em;
-    justify-content: space-between;
-
-    > div {
-        flex: 1;
-    }
-
-    .header,
-    .chances {
+:host {
+    display: contents;
+    .mho-probabilities-header {
         display: flex;
+        flex-direction: row;
+        gap: 1em;
+        justify-content: space-between;
         align-items: center;
-        gap: 0.5em;
     }
 
-    .header {
+    .mho-probabilities {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 2em;
+        justify-content: space-between;
 
         > div {
+            flex: 1;
+        }
+
+        .header,
+        .chances {
             display: flex;
             align-items: center;
-            gap: 1em;
+            gap: 0.5em;
+        }
 
-            h3 {
-                margin: 0;
+        .header {
+
+            > div {
                 display: flex;
                 align-items: center;
+                gap: 1em;
+
+                h3 {
+                    margin: 0;
+                    display: flex;
+                    align-items: center;
+                }
+            }
+
+        }
+
+        .content {
+            display: flex;
+            gap: 0.5em;
+            align-items: baseline;
+
+            .chances {
+                min-width: 100px;
+                justify-content: left;
+                flex: 1;
+                align-items: start;
+                flex-wrap: wrap;
+            }
+
+            .results {
+                border: 1px solid variables.$primary;
+                border-radius: 0.25em;
+                background-color: variables.$item_color;
             }
         }
 
-    }
+        table {
 
-    .content {
-        display: flex;
-        gap: 0.5em;
-        align-items: baseline;
-
-        .chances {
-            min-width: 100px;
-            justify-content: left;
-            flex: 1;
-            align-items: start;
-            flex-wrap: wrap;
-        }
-
-        .results {
-            border: 1px solid variables.$primary;
-            border-radius: 0.25em;
-            background-color: variables.$item_color;
-        }
-    }
-
-    table {
-
-        th,
-        td {
-            padding: 0.25em;
-        }
-
-        tbody {
+            th,
             td {
-                text-align: right;
+                padding: 0.25em;
+            }
+
+            tbody {
+                td {
+                    text-align: right;
+                }
             }
         }
-    }
 
-    .mat-mdc-form-field.surviving-chance {
-        width: 175px;
-
-        .mat-mdc-form-field-infix {
-            padding-top: 8px;
-            padding-bottom: 8px;
-            min-height: unset;
+        .mat-mdc-form-field.surviving-chance {
+            width: 175px;
         }
     }
 }

@@ -1,0 +1,201 @@
+@use 'variables';
+
+:host {
+    display: contents;
+
+    .mho-overflow-header {
+        display: flex;
+        flex-direction: row;
+        gap: 1em;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.5em;
+    }
+
+    .mho-overflow {
+
+        .intro {
+            display: block;
+            margin-bottom: 1em;
+            opacity: 0.85;
+        }
+
+        .layout {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2em;
+            align-items: flex-start;
+
+            .inputs,
+            .results {
+                flex: 1;
+                min-width: 320px;
+            }
+        }
+
+        h3 {
+            margin: 1em 0 0.5em;
+        }
+
+        h4 {
+            margin: 1em 0 0.25em;
+        }
+
+        .fields {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75em;
+
+            mat-form-field {
+                flex: 1 1 180px;
+            }
+
+            &.houses {
+                display: grid;
+                grid-template-columns: repeat(5, 1fr);
+
+                mat-form-field {
+                    flex: initial;
+                    width: 100%;
+                    min-width: 0;
+                }
+            }
+        }
+
+        .door {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5em;
+            margin-top: 0.75em;
+            align-items: flex-start;
+
+            .door-label {
+                font-size: 0.85em;
+                opacity: 0.85;
+            }
+
+            .mode-hint {
+                opacity: 0.75;
+            }
+        }
+
+        .toggles {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1em;
+            margin-top: 0.5em;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 0.5em;
+
+            th,
+            td {
+                padding: 0.35em 0.5em;
+            }
+
+            &.summary {
+                margin-bottom: 0.25em;
+
+                th {
+                    text-align: left;
+                    font-weight: 500;
+                }
+
+                td {
+                    text-align: right;
+                    white-space: nowrap;
+                }
+
+                tr.key {
+                    font-weight: 700;
+
+                    th,
+                    td {
+                        background-color: variables.$item_color;
+                    }
+
+                    th {
+                        border-top-left-radius: 0.25em;
+                        border-bottom-left-radius: 0.25em;
+                    }
+
+                    td {
+                        border-top-right-radius: 0.25em;
+                        border-bottom-right-radius: 0.25em;
+                    }
+                }
+
+                .muted {
+                    opacity: 0.7;
+                    font-weight: 400;
+                }
+
+                .range {
+                    opacity: 0.7;
+                    font-weight: 400;
+                    font-size: 0.9em;
+                }
+            }
+
+            &.chain tbody tr:not(.key):not(:first-child) th {
+                padding-left: 1.25em;
+                font-weight: 400;
+            }
+
+            &.ranks {
+                border: 1px solid variables.$primary;
+                border-radius: 0.25em;
+                background-color: variables.$item_color;
+
+                thead th {
+                    text-align: center;
+                    border-bottom: 1px solid variables.$primary;
+                }
+
+                tbody {
+                    th {
+                        text-align: center;
+                    }
+
+                    td {
+                        text-align: right;
+                    }
+
+                    tr.dies {
+                        color: variables.$warn;
+                        font-weight: 600;
+                    }
+                }
+            }
+        }
+
+        .step-label {
+            margin: 1.25em 0 0.35em;
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 0.8em;
+            letter-spacing: 0.03em;
+            color: variables.$primary;
+        }
+
+        .step-caption {
+            display: block;
+            margin-bottom: 0.5em;
+            opacity: 0.8;
+        }
+
+        .no-attack {
+            margin-top: 1em;
+            padding: 0.75em;
+            border-radius: 0.25em;
+            background-color: variables.$item_color;
+        }
+
+        .scenario {
+            margin-top: 1em;
+        }
+    }
+}

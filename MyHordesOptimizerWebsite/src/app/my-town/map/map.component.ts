@@ -25,11 +25,13 @@ import { Citizen } from '../../_abstract_model/types/citizen.class';
 import { Item } from '../../_abstract_model/types/item.class';
 import { Ruin } from '../../_abstract_model/types/ruin.class';
 import { Town } from '../../_abstract_model/types/town.class';
+import { ScrollAuraDirective } from '../../_core/directives/scroll-aura.directive';
 import { CompassRoseComponent } from '../../_shared/compass-rose/compass-rose.component';
 import { DrawMapComponent } from './draw-map/draw-map.component';
 
 const angular_common: Imports = [CommonModule, FormsModule];
 const components: Imports = [CompassRoseComponent, DrawMapComponent];
+const directives: Imports = [ScrollAuraDirective];
 const pipes: Imports = [];
 const material_modules: Imports = [MatButtonModule, MatCardModule, MatCheckboxModule, MatChipsModule, MatFormFieldModule, MatIconModule, MatInputModule, MatListModule, MatMenuModule, MatOptionModule, MatSelectModule, MatSidenavModule];
 
@@ -37,7 +39,7 @@ const material_modules: Imports = [MatButtonModule, MatCardModule, MatCheckboxMo
     selector: 'mho-map',
     templateUrl: './map.component.html',
     styleUrls: ['./map.component.scss'],
-    imports: [...angular_common, ...components, ...material_modules, ...pipes]
+    imports: [...angular_common, ...components, ...directives, ...material_modules, ...pipes]
 })
 export class MapComponent implements OnInit {
     private readonly breakpoint_observer: BreakpointObserver = inject(BreakpointObserver);

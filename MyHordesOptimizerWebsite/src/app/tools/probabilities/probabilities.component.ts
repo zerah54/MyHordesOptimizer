@@ -1,5 +1,5 @@
 import { CommonModule, DecimalPipe } from '@angular/common';
-import { AfterViewInit, Component, ViewEncapsulation } from '@angular/core';
+import { AfterViewInit, Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -19,8 +19,6 @@ const material_modules: Imports = [MatButtonModule, MatCardModule, MatFormFieldM
     selector: 'mho-probabilities',
     templateUrl: './probabilities.component.html',
     styleUrls: ['./probabilities.component.scss'],
-    encapsulation: ViewEncapsulation.None,
-    host: {style: 'display: contents'},
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class ProbabilitiesComponent implements AfterViewInit {
