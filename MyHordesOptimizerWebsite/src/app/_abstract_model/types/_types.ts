@@ -20,7 +20,9 @@ export interface Dictionary<T> {
     [key: string | number]: T;
 }
 
-export type TownTypeId = 'RNE' | 'RE' | 'PANDE';
+export type TownTypeId = 'RNE' | 'PANDE' | 'RE' | 'CUSTOM';
+export type TownState = 'NORMAL' | 'CHAOS' | 'DEVASTED';
+export type TownPhase = 'ALPHA' | 'BETA' | 'IMPORT' | 'NATIVE';
 
 export type ExpeditionOrderType = 'checkbox' | 'text';
 
