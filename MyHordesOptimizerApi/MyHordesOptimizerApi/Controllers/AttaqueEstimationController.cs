@@ -70,17 +70,17 @@ namespace MyHordesOptimizerApi.Controllers
         }
 
         [HttpGet]
-        [Route("apofooAttackCalculation")]
-        public ActionResult<string> ApofooTodayAttackCalculation([FromQuery] int day, [FromQuery] int townId)
+        [Route("attackCalculation")]
+        public ActionResult<string> TodayAttackCalculation([FromQuery] int day, [FromQuery] int townId, [FromQuery] AttackDifficulty difficulty = AttackDifficulty.Normal)
         {
-            return Ok(EstimationService.ApofooCalculateAttack(townId, day));
+            return Ok(EstimationService.CalculateAttack(townId, day, difficulty: difficulty));
         }
 
         [HttpGet]
-        [Route("apofooAttackCalculation/beta")]
-        public ActionResult<string> ApofooTodayAttackCalculationBeta([FromQuery] int day, [FromQuery] int townId)
+        [Route("attackCalculation/beta")]
+        public ActionResult<string> TodayAttackCalculationBeta([FromQuery] int day, [FromQuery] int townId, [FromQuery] AttackDifficulty difficulty = AttackDifficulty.Normal)
         {
-            return Ok(EstimationService.ApofooCalculateAttack(townId, day, true));
+            return Ok(EstimationService.CalculateAttack(townId, day, true, difficulty));
         }
     }
 }

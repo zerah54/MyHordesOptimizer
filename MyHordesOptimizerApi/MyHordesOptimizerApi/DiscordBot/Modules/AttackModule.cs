@@ -10,6 +10,8 @@ using MyHordesOptimizerApi.Services.Interfaces.Estimations;
 
 namespace MyHordesOptimizerApi.DiscordBot.Modules
 {
+    [IntegrationType(ApplicationIntegrationType.GuildInstall, ApplicationIntegrationType.UserInstall)]
+    [CommandContextType(InteractionContextType.Guild, InteractionContextType.BotDm, InteractionContextType.PrivateChannel)]
     [Group(name: "attack", description: "Tools related to attack estimation")]
     public class AttackModule : InteractionModuleBase<SocketInteractionContext>
     {
@@ -38,11 +40,11 @@ namespace MyHordesOptimizerApi.DiscordBot.Modules
                 using var scope = _serviceScopeFactory.CreateScope();
                 var estimationService = scope.ServiceProvider.GetRequiredService<IMyHordesOptimizerEstimationService>();
 
-                var resultForDay = estimationService.ApofooCalculateAttack(townId: townId, dayAttack: day);
-                var resultForDayBeta = estimationService.ApofooCalculateAttack(townId: townId, dayAttack: day, beta: true);
+                var resultForDay = estimationService.CalculateAttack(townId: townId, dayAttack: day);
+                var resultForDayBeta = estimationService.CalculateAttack(townId: townId, dayAttack: day, beta: true);
 
-                var resultForDayDisplay = $"*Attaque J{day} calculée (par Apofoo)* : {resultForDay.Result.Min} - {resultForDay.Result.Max}";
-                var resultForDayBetaDisplay = $"*Attaque J{day} calculée (par Apofoo) (Beta)* : {resultForDayBeta.Result.Min} - {resultForDayBeta.Result.Max}";
+                var resultForDayDisplay = $"*Attaque J{day} calculée* : {resultForDay.Result.Min} - {resultForDay.Result.Max}";
+                var resultForDayBetaDisplay = $"*Attaque J{day} calculée (Beta)* : {resultForDayBeta.Result.Min} - {resultForDayBeta.Result.Max}";
 
                 var embedBuilder = new EmbedBuilder()
                     .WithTitle($"Estimations pour le jour {day}")

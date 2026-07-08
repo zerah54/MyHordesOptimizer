@@ -78,9 +78,7 @@ export class EstimationsComponent implements OnInit {
     protected tomorrow_offset_mode!: boolean;
 
     protected today_calculated_attack!: EstimationsResult | null;
-    protected today_calculated_attack_beta!: EstimationsResult | null;
     protected tomorrow_calculated_attack!: EstimationsResult | null;
-    protected tomorrow_calculated_attack_beta!: EstimationsResult | null;
 
     protected step?: number = 0;
 
@@ -108,33 +106,19 @@ export class EstimationsComponent implements OnInit {
                 next: (estimations: Estimations) => {
                     this.estimations = estimations;
                     this.town_statistics_service
-                        .getApofooAttackCalculation(this.selected_day, false)
+                        .getAttackCalculation(this.selected_day, false)
                         .subscribe({
                             next: (result: EstimationsResult) => {
                                 this.today_calculated_attack = result;
-                                this.town_statistics_service
-                                    .getApofooAttackCalculation(this.selected_day, true)
-                                    .subscribe({
-                                        next: (result: EstimationsResult) => {
-                                            this.today_calculated_attack_beta = result;
-                                            this.defineTodayCanvas();
-                                        }
-                                    });
+                                this.defineTodayCanvas();
                             }
                         });
                     this.town_statistics_service
-                        .getApofooAttackCalculation(this.selected_day + 1, false)
+                        .getAttackCalculation(this.selected_day + 1, false)
                         .subscribe({
                             next: (result: EstimationsResult) => {
                                 this.tomorrow_calculated_attack = result;
-                                this.town_statistics_service
-                                    .getApofooAttackCalculation(this.selected_day + 1, true)
-                                    .subscribe({
-                                        next: (result: EstimationsResult) => {
-                                            this.tomorrow_calculated_attack_beta = result;
-                                            this.defineTomorrowCanvas();
-                                        }
-                                    });
+                                this.defineTomorrowCanvas();
                             }
                         });
                 }
@@ -152,7 +136,7 @@ export class EstimationsComponent implements OnInit {
                 this.today_estim_chart.destroy();
             }
             const today_estim_ctx: CanvasRenderingContext2D = today_estim_canvas.nativeElement.getContext('2d');
-            this.today_estim_chart = new Chart<'line'>(today_estim_ctx, this.getEstimConfig(this.selected_day, TDG_VALUES, this.estimations.estim, this.today_calculated_attack?.result, this.today_calculated_attack_beta?.result));
+            this.today_estim_chart = new Chart<'line'>(today_estim_ctx, this.getEstimConfig(this.selected_day, TDG_VALUES, this.estimations.estim, this.today_calculated_attack?.result));
         }
 
         const today_offset_canvas = this.today_offset_canvas();
@@ -172,7 +156,7 @@ export class EstimationsComponent implements OnInit {
                 this.tomorrow_estim_chart.destroy();
             }
             const tomorrow_estim_ctx: CanvasRenderingContext2D = tomorrow_estim_canvas.nativeElement.getContext('2d');
-            this.tomorrow_estim_chart = new Chart<'line'>(tomorrow_estim_ctx, this.getEstimConfig(this.selected_day + 1, PLANIF_VALUES, this.estimations.planif, this.tomorrow_calculated_attack?.result, this.tomorrow_calculated_attack_beta?.result));
+            this.tomorrow_estim_chart = new Chart<'line'>(tomorrow_estim_ctx, this.getEstimConfig(this.selected_day + 1, PLANIF_VALUES, this.estimations.planif, this.tomorrow_calculated_attack?.result));
         }
 
         const tomorrow_offset_canvas = this.tomorrow_offset_canvas();
@@ -181,7 +165,7 @@ export class EstimationsComponent implements OnInit {
                 this.tomorrow_offset_chart.destroy();
             }
             const tomorrow_offset_ctx: CanvasRenderingContext2D = tomorrow_offset_canvas.nativeElement.getContext('2d');
-            this.tomorrow_offset_chart = new Chart<'bar'>(tomorrow_offset_ctx, this.getOffsetConfig(this.selected_day + 1, this.tomorrow_calculated_attack?.min_list, this.tomorrow_calculated_attack_beta?.max_list));
+            this.tomorrow_offset_chart = new Chart<'bar'>(tomorrow_offset_ctx, this.getOffsetConfig(this.selected_day + 1, this.tomorrow_calculated_attack?.min_list, this.tomorrow_calculated_attack?.max_list));
         }
     }
 
@@ -267,7 +251,7 @@ export class EstimationsComponent implements OnInit {
             .filter((_ds: LegendItem, i: number) => i % 2);
     }
 
-    private getEstimConfig(day: number, PERCENTS: number[], values: Dictionary<MinMax>, calculated_attack: MinMax | undefined, calculated_attack_beta: MinMax | undefined)
+    private getEstimConfig(day: number, PERCENTS: number[], values: Dictionary<MinMax>, calculated_attack: MinMax | undefined)
         : ChartConfiguration<'line'> {
         return {
             type: 'line',
@@ -281,7 +265,8 @@ export class EstimationsComponent implements OnInit {
                         borderColor: '#36A2EB',
                         backgroundColor: '#36A2EB88',
                         pointRadius: 0,
-                        pointHoverRadius: 0
+                        pointHoverRadius: 0,
+                        borderDash: [3, 3]
                     },
                     {
                         label: $localize`Attaque théorique - Max`,
@@ -290,10 +275,11 @@ export class EstimationsComponent implements OnInit {
                         borderColor: '#36A2EB',
                         backgroundColor: '#36A2EB88',
                         pointRadius: 0,
-                        pointHoverRadius: 0
+                        pointHoverRadius: 0,
+                        borderDash: [3, 3]
                     },
                     {
-                        label: $localize`Attaque J${day} calculée (Par Apofoo) - Min`,
+                        label: $localize`Attaque J${day} calculée - Min`,
                         data: Array(PERCENTS.length).fill(calculated_attack?.min),
                         spanGaps: true,
                         borderColor: '#FF6384',
@@ -302,33 +288,13 @@ export class EstimationsComponent implements OnInit {
                         pointHoverRadius: 0
                     },
                     {
-                        label: $localize`Attaque J${day} calculée (Par Apofoo) - Max`,
+                        label: $localize`Attaque J${day} calculée - Max`,
                         data: Array(PERCENTS.length).fill(calculated_attack?.max),
                         spanGaps: true,
                         borderColor: '#FF6384',
                         backgroundColor: '#FF638488',
                         pointRadius: 0,
                         pointHoverRadius: 0
-                    },
-                    {
-                        label: $localize`Attaque J${day} calculée (Par Apofoo) (beta) - Min`,
-                        data: Array(PERCENTS.length).fill(calculated_attack_beta?.min),
-                        spanGaps: true,
-                        borderColor: '#FF6384',
-                        backgroundColor: '#FF638488',
-                        pointRadius: 0,
-                        pointHoverRadius: 0,
-                        borderDash: [3, 3]
-                    },
-                    {
-                        label: $localize`Attaque J${day} calculée (Par Apofoo) (beta) - Max`,
-                        data: Array(PERCENTS.length).fill(calculated_attack_beta?.max),
-                        spanGaps: true,
-                        borderColor: '#FF6384',
-                        backgroundColor: '#FF638488',
-                        pointRadius: 0,
-                        pointHoverRadius: 0,
-                        borderDash: [3, 3]
                     },
                     {
                         label: $localize`Estimation de l'attaque - Min`,

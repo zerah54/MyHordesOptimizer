@@ -14,9 +14,9 @@ import { GlobalService } from './_global.service';
 @Injectable({providedIn: 'root'})
 export class TownStatisticsService extends GlobalService {
 
-    public getApofooAttackCalculation(day: number, beta: boolean): Observable<EstimationsResult> {
+    public getAttackCalculation(day: number, beta: boolean): Observable<EstimationsResult> {
         return new Observable((sub: Subscriber<EstimationsResult>) => {
-            super.get<EstimationsResultDTO>(this.API_URL + `/attaqueEstimation/apofooAttackCalculation${beta ? '/beta' : ''}?day=${day}&townId=${getTown()?.town_id}`)
+            super.get<EstimationsResultDTO>(this.API_URL + `/attaqueEstimation/AttackCalculation${beta ? '/beta' : ''}?day=${day}&townId=${getTown()?.town_id}`)
                 .subscribe({
                     next: (response: HttpResponse<EstimationsResultDTO>) => {
                         sub.next(new EstimationsResult(response.body));

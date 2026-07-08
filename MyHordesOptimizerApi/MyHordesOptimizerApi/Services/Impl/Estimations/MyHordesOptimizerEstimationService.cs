@@ -20,11 +20,6 @@ namespace MyHordesOptimizerApi.Services.Impl.Estimations
         protected IMapper Mapper { get; private set; }
         protected MhoContext DbContext { get; set; }
 
-        private double _shift = 10;
-
-        private List<double> _safetyRatioOffsets = new List<double>([5.191, 5.191, 4.273, 3.49, 3.325, 3.223, 3.159, 3.118, 3.088, 3.07, 3.058, 3.045, 3.037, 3.031, 3.027, 3.023, 3.019, 3.016, 3.014, 3.012, 3.011, 3.01, 3.009, 3.008, 3.007, 3.006, 3.006]);
-        private double _safetyRatioOffsetDefault = 3.005;
-
         public MyHordesOptimizerEstimationService(IServiceScopeFactory serviceScopeFactory,
             IUserInfoProvider userInfoProvider,
             ILogger<MyHordesOptimizerEstimationService> logger,
@@ -72,7 +67,7 @@ namespace MyHordesOptimizerApi.Services.Impl.Estimations
         {
             var models = DbContext.TownEstimations.Where(x => x.Day == day && x.IdTown == townId)
                 .ToList();
-            if(models.Any())
+            if (models.Any())
             {
                 var dto = Mapper.Map<EstimationRequestDto>(models);
                 return dto;
@@ -86,184 +81,192 @@ namespace MyHordesOptimizerApi.Services.Impl.Estimations
             }
         }
 
-        public EstimationResultDto ApofooCalculateAttack(int townId, int dayAttack, bool beta = false)
+        // Solveur déterministe (aucune probabilité, aucun aléatoire). On borne l'attaque réelle par des
+        // INÉGALITÉS toujours vraies, jamais par une hypothèse de convergence.
+        //
+        // Mécanique du jeu (rules.yml : shift=10, spread=10, variance=48, offset 15/36) : le serveur tire
+        // une valeur puis en dérive une bande cible [targetMin, targetMax] de largeur value*shift*factor/100.
+        // La tour affiche cette bande ÉLARGIE par des offsets qui décroissent avec le nombre de citoyens,
+        // souvent de façon UNILATÉRALE (une seule borne bouge). On ne peut donc PAS supposer qu'au plus
+        // haut % la bande affichée vaut exactement [targetMin, targetMax].
+        //
+        // Invariant rigoureux, pour toute ligne q : min_q ≤ targetMin ≤ attaque ≤ targetMax ≤ max_q.
+        //  ⟹ borne basse = max_q(min_q) ; borne haute = min_q(max_q).
+        // Resserrement rigoureux du haut : targetMax-targetMin = value*shiftSpan (±1 d'arrondi) et
+        // max_q-min_q ≥ targetMax-targetMin ⟹ attaque ≤ (min_q(max_q-min_q) + 1) / shiftSpan.
+        // (Ce resserrement encaisse aussi le facteur d'âmes : bande et attaque sont scalées à l'identique.)
+        public EstimationResultDto CalculateAttack(int townId, int dayAttack, bool beta = false, AttackDifficulty difficulty = AttackDifficulty.Normal)
         {
-            var estim = GetEstimations(townId, dayAttack).Estim;
-            var planif = GetEstimations(townId, dayAttack - 1).Planif;
+            var estimObj = GetEstimations(townId, dayAttack);
+            var planifObj = GetEstimations(townId, dayAttack - 1);
 
-            var lastPlanif = GetLast(planif);
-            var lastEstim = GetLast(estim);
+            // Pool de contraintes = tour(J) + planificateur(J-1) AGRÉGÉS. Par essence, planif(J-1) renseigne
+            // l'attaque du jour J : il lit la MÊME ZombieEstimation (mêmes targetMin/targetMax) que la tour(J),
+            // seulement ARRONDIE au bloc (ceil(day/5)*5). Ses lignes sont donc des contraintes VALIDES (juste
+            // plus grossières) : l'invariant min_q ≤ targetMin ≤ attaque ≤ targetMax ≤ max_q tient pour chacune.
+            // On les met dans le même pool → sur une tour PARTIELLE (tout le monde n'est pas encore passé), les
+            // niveaux du planif peuvent resserrer la fenêtre ; sur une tour complète, ils sont dominés (aucun
+            // effet). Tour vide → il ne reste que le planif (ancien comportement de secours). Le slot J-1 garantit
+            // l'alignement sur le même jour d'attaque : NE PAS agréger un autre jour (ce serait une autre attaque).
+            var rows = ExtractRows(estimObj?.Estim);
+            rows.AddRange(ExtractRows(planifObj?.Planif));
 
-            var redSouls = 0;
+            // Difficulté : RNE/RE/PANDE = normal (le champ `hard` de MyHordes = type panda, NORMAL pour
+            // l'estimation). Easy/Hard n'existent que sur villes CUSTOM, exposées par aucune API : à forcer
+            // via le paramètre `difficulty` (défaut normal) en attendant les paramètres custom de ville.
+            var config = difficulty switch
+            {
+                AttackDifficulty.Easy => EstimationSolverConfig.Easy,
+                AttackDifficulty.Hard => EstimationSolverConfig.Hard,
+                _ => EstimationSolverConfig.Normal,
+            };
 
-            var constRatioBase = 0.5;
-            var constRatioLow = 0.75;
-            var confAttackMode = "normal";
-            var confAttackByMode = new Dictionary<string, double>() { {"normal", 1.1}, {"hard", 3.1}, {"easy", constRatioLow} };
+            double factor = dayAttack <= 15 ? 1.0 : (dayAttack <= 20 ? 0.75 : (dayAttack <= 30 ? 0.5 : (dayAttack <= 40 ? 0.25 : 0.15)));
+            double ratioMin = dayAttack <= 3 ? 0.75 : config.MaxRatio;
+            double ratioMax = dayAttack <= 1 ? 0.5 : (dayAttack <= 3 ? 0.75 : config.MaxRatio);
+            int minGlobal = (int)Math.Round(ratioMin * Math.Pow(Math.Max(1, dayAttack - 1) * 0.75 + 2.5, 3), MidpointRounding.AwayFromZero);
+            int maxGlobal = (int)Math.Round(ratioMax * Math.Pow(dayAttack * 0.75 + 3.5, 3), MidpointRounding.AwayFromZero);
+            double shiftSpan = config.Shift * factor / 100.0;
 
-            var maxRatio = confAttackByMode[confAttackMode];
-
-            var ratioMin = dayAttack <= 3 ? 0.66 : maxRatio;
-            var ratioMax = dayAttack <= 3 ? (dayAttack <= 1 ? constRatioBase : constRatioLow) : maxRatio;
-
-            var attaqueMin = Math.Round(ratioMin * Math.Pow(Math.Max(1, dayAttack - 1) * 0.75 + 2.5, 3), MidpointRounding.AwayFromZero);
-            var attaqueMax = Math.Round(ratioMax * Math.Pow(dayAttack * 0.75 + 3.5, 3), MidpointRounding.AwayFromZero);
-
-            var planif0 = planif._0;
-            var planif100 = planif._100;
-
-            var estim100 = estim._100;
-
-            var resultsMin = new List<double>();
-            var resultsMax = new List<double>();
             var result = new EstimationResultDto();
+            result.Result ??= new EstimationValueDto();
 
-            /* Le planif 0% doit exister pour pouvoir pouvoir affiner le résultat de l'attaque */
-            if (planif0 != null)
+            if (rows.Count == 0)
             {
-                var lastMinDiffFrom100Planif = GetLastMinDiffFrom100(planif);
-                var lastMaxDiffFrom100Planif = GetLastMaxDiffFrom100(planif);
-                var lastMinDiffFrom100Estim = GetLastMinDiffFrom100(estim);
-                var lastMaxDiffFrom100Estim = GetLastMaxDiffFrom100(estim);
-                var lastMaxBehind50Planif = GetLastMaxBehind50(planif);
-                var lastMaxBehind50Estim = GetLastMaxBehind50(estim);
+                // Aucune estimation : on ne sait rien de plus que les bornes théoriques du jour.
+                result.Result.Min = minGlobal;
+                result.Result.Max = maxGlobal;
+                return result;
+            }
 
-                var startOffsetMin = 5;
-                var endOffsetMin = 26;
+            int lower = rows.Max(row => row.Min);   // borne basse garantie (min de la ligne la plus haute)
+            int upper = rows.Min(row => row.Max);   // borne haute garantie (invariant)
 
-                /*
-                 * Si le planif 100 existe, et que la borne max du planif ne bouge pas, on peut réduire l'offset min à 25 ou 26
-                 * Sinon, si le planif 100 existe, on peut réduire à 24, 25 et 26
-                 */
-                if (planif100 != null && planif0.Max == planif100.Max)
+            // Raffinement RIGOUREUX de la ligne 0 % (planif à 0 citoyen). Une ligne affichée à 0 % ⟺ 0 citoyen
+            // (quality = citizen_count/24, round(quality*100)=0 ⟺ 0 citoyen ; si un preset a un cc_offset>0 la
+            // ligne 0 % n'apparaît jamais). Or à 0 citoyen calculate_offsets ne tourne pas (end=min(0,24)=0) :
+            // les offsets AFFICHÉS sont donc EXACTEMENT les offsets STOCKÉS, qui sont garantis ≥ un plancher —
+            // contrairement à toute autre ligne où l'offset peut avoir été réduit jusqu'à 0. Source
+            // (PrepareZombieAttackEstimationAction) : off_min ∈ [round(f*5), round(f*26)], off_max = round(f*28)-off_min,
+            // et en cas de rebound le "protect" force chaque offset ≥ protect (3 si jour≤30, sinon 1) tout en
+            // conservant la somme. Plancher garanti = min(borne mt_rand, protect). On peut donc "dé-offset"
+            // partiellement, le blocage floor/ceil du planif ne faisant que desserrer la borne :
+            //   value ≥ targetMin ≥ (min - 0.5) / (1 - offMinFloor/100)
+            //   value ≤ targetMax ≤ (max + 0.5) / (1 + offMaxFloor/100)
+            // Valable pour TOUTES les difficultés : les offsets ne dépendent pas du mode d'attaque (seul `value`
+            // change en hard, mais targetMin ≤ value ≤ targetMax reste vrai). Ne s'applique QU'À la ligne 0 %.
+            int protect = dayAttack <= 30 ? 3 : 1;
+            int offMinFloor = Math.Min((int)Math.Round(factor * 5, MidpointRounding.AwayFromZero), protect);
+            int offMaxFloor = Math.Min((int)Math.Round(factor * 28, MidpointRounding.AwayFromZero)
+                                     - (int)Math.Round(factor * 26, MidpointRounding.AwayFromZero), protect);
+            foreach (var row in rows.Where(row => row.Percent == 0))
+            {
+                if (offMinFloor > 0)
                 {
-                    startOffsetMin = 25;
-                }
-                else if (planif100 != null)
-                {
-                    endOffsetMin = 24;
-                }
-
-                for (var currentOffsetMin = startOffsetMin; currentOffsetMin <= endOffsetMin; currentOffsetMin++)
-                {
-                    var currentOffsetMax = 28 - currentOffsetMin;
-
-                    var startTargetMin = CalculateTarget("min", planif0.Min, currentOffsetMin);
-                    var endTargetMin = Math.Ceiling((planif0.Min + 24) / (1.0 - currentOffsetMin / 100.0));
-
-                    var startTargetMax = CalculateTarget("max", planif0.Max, currentOffsetMax);
-                    var endTargetMax = Math.Floor((planif0.Max - 24) / (1.0 + currentOffsetMax / 100.0));
-
-                    /**
-                     * Si l'estim 100 existe, le planif 100 existe, et le planif stagne
-                     * Note : Si le planif stagne, alors l'estim stagne
-                     */
-                    if (currentOffsetMax <= 3 && planif100 != null && planif100.Max == planif0.Max && estim100 != null)
+                    int refinedLower = (int)Math.Ceiling((row.Min - 0.5) / (1.0 - offMinFloor / 100.0));
+                    if (refinedLower > lower)
                     {
-                        var tempTargetMax = CalculateTarget("max", estim100.Max, currentOffsetMax);
-                        var estimFirstValue = GetFirstNonEmptyValue(estim);
-                        if (estimFirstValue != null
-                            && CalculateBorne("max", tempTargetMax, currentOffsetMax) == estimFirstValue.Max)
-                        {
-                            startTargetMax = tempTargetMax;
-                            endTargetMax = tempTargetMax;
-                        }
-                        else
-                        {
-                            continue;
-                        }
-                    }
-
-                    for (var targetMin = startTargetMin; targetMin <= endTargetMin; targetMin++)
-                    {
-                        for (var targetMax = startTargetMax; targetMax >= endTargetMax; targetMax--)
-                        {
-                            var calculatePlanifMin =
-                                RoundTo25("min", CalculateBorne("min", targetMin, currentOffsetMin));
-                            var calculatePlanifMax =
-                                RoundTo25("max", CalculateBorne("max", targetMax, currentOffsetMax));
-
-                            var calculateAttack = (targetMax - targetMin) * _shift;
-                            var calculateAttackMin = calculateAttack - 10;
-                            var calculateAttackMax = calculateAttack + 10;
-
-                            /**
-                             * La liste des filtres à passer
-                             * Si tous ces filtres sont à true, ça veut dire que la valeur calculée est une valeur possible pour l'attaque
-                             */
-                            if (calculatePlanifMin == planif0.Min
-                                && calculatePlanifMax == planif0.Max
-                                && IsValidAttack(targetMin, targetMax, calculateAttackMin, calculateAttackMax)
-                                && IsValidOffsetMinPlanifFinal(planif100, targetMin, lastMinDiffFrom100Planif, dayAttack)
-                                && IsValidOffsetMaxPlanifFinal(planif100, targetMax, lastMaxDiffFrom100Planif, dayAttack)
-                                && IsValidOffsetMinEstimFinal(estim100, targetMin, lastMinDiffFrom100Estim, dayAttack)
-                                && IsValidOffsetMaxEstimFinal(estim100, targetMax, lastMaxDiffFrom100Estim, dayAttack)
-                                && IsValidStagnationFinalePlanifOffsetMin(planif100, lastMaxBehind50Planif,
-                                    targetMin, dayAttack)
-                                && IsValidStagnationFinalePlanifOffsetMax(planif100, lastMaxBehind50Planif,
-                                    targetMax, dayAttack)
-                                && IsValidStagnationFinaleEstimOffsetMin(estim100, lastMaxBehind50Estim, targetMin, dayAttack)
-                                && IsValidStagnationFinaleEstimOffsetMax(estim100, lastMaxBehind50Estim, targetMax, dayAttack)
-                                && IsValidSommeOffsets100AndPrevious(planif100, lastMinDiffFrom100Planif, lastMaxDiffFrom100Planif, targetMin,
-                                    targetMax)
-                                && IsValidAlter(estim, targetMin, targetMax, beta)
-                               )
-                            {
-                                calculateAttackMin = Math.Max(calculateAttackMin, targetMin);
-                                calculateAttackMax = Math.Min(calculateAttackMax, targetMax);
-
-                                resultsMin.Add(calculateAttackMin);
-                                resultsMax.Add(calculateAttackMax);
-                            }
-                        }
+                        lower = refinedLower;
                     }
                 }
-
-                result.minList = resultsMin
-                    .Where(result => result >= attaqueMin)
-                    .Select(result => Convert.ToInt32(result))
-                    .ToList();
-                result.maxList = resultsMax
-                    .Where(result => result <= attaqueMax)
-                    .Select(result => Convert.ToInt32(result))
-                    .ToList();
-
-                /**
-                 * Si le tableau des résultats possibles a bien été alimenté, alors on peut déterminer un min et un max de l'attaque
-                 * On choisi la valeur parmi toutes les valeurs possibles ainsi que la valeur théorique
-                 */
-                if (resultsMin.Count > 0 && resultsMax.Count > 0)
+                if (offMaxFloor > 0)
                 {
-                    result.Result.Min = Convert.ToInt32(Math.Max(resultsMin.Min(), attaqueMin));
-                    result.Result.Max = Convert.ToInt32(Math.Min(resultsMax.Max(), attaqueMax));
-                    if (lastEstim != null)
+                    int refinedUpper = (int)Math.Floor((row.Max + 0.5) / (1.0 + offMaxFloor / 100.0));
+                    if (refinedUpper > 0 && refinedUpper < upper)
                     {
-                        result.Result.Min = Math.Max(result.Result.Min, lastEstim.Min);
-                        result.Result.Max = Math.Min(result.Result.Max, lastEstim.Max);
+                        upper = refinedUpper;
                     }
-                    if (lastPlanif != null)
-                    {
-                        result.Result.Min = Math.Max(result.Result.Min, lastPlanif.Min);
-                        result.Result.Max = Math.Min(result.Result.Max, lastPlanif.Max);
-                    }
-                    return result;
                 }
             }
 
-            /* Si le planif 0% n'existe pas, ou que la fonction ne renvoie pas de résultat, alors on renvoie le min et le max théorique du jour */
-            result.Result.Min = Convert.ToInt32(attaqueMin);
-            result.Result.Max = Convert.ToInt32(attaqueMax);
-            if (lastEstim != null)
+            // Resserrement du haut par la largeur de la bande la plus étroite. Pas en mode hard : l'attaque
+            // y est un re-tirage uniforme dans la bande et peut atteindre targetMax (donc pas de resserrement).
+            if (!config.RerollInBand && shiftSpan > 0)
             {
-                result.Result.Min = Math.Max(result.Result.Min, lastEstim.Min);
-                result.Result.Max = Math.Min(result.Result.Max, lastEstim.Max);
+                int minWidth = rows.Min(row => row.Max - row.Min);
+                int widthBound = (int)Math.Floor((minWidth + 1) / shiftSpan);
+                if (widthBound < upper)
+                {
+                    upper = widthBound;
+                }
             }
-            if (lastPlanif != null)
+
+            // Bornes théoriques du jour : la VRAIE attaque (= mt_rand(minGlobal, maxGlobal)) est TOUJOURS dans
+            // [minGlobal, maxGlobal], même quand la bande AFFICHÉE de la tour en sort (le deshift de MH ne rabat
+            // qu'un seul côté et reverse l'excédent sur l'autre → l'affichage peut déborder, surtout aux bas %).
+            // On intersecte donc la fenêtre avec ces bornes → resserre une tour éparse dont la bande a débordé,
+            // sans jamais exclure la vraie attaque. UNIQUEMENT en difficulté Normal : minGlobal/maxGlobal
+            // utilisent le ratio 1.1 ; en Easy/Hard (ratio 0.75/3.1, non exposé par l'API) ils seraient faux et
+            // le clamp exclurait à tort la vraie attaque. Si Easy/Hard est un jour branché, les bornes seront
+            // recalculées avec le bon ratio et ce clamp redeviendra valide.
+            if (difficulty == AttackDifficulty.Normal)
             {
-                result.Result.Min = Math.Max(result.Result.Min, lastPlanif.Min);
-                result.Result.Max = Math.Min(result.Result.Max, lastPlanif.Max);
+                lower = Math.Max(lower, minGlobal);
+                upper = Math.Min(upper, maxGlobal);
             }
+
+            if (upper < lower)
+            {
+                upper = lower; // garde-fou si les lignes sont incohérentes entre elles
+            }
+
+            result.Result.Min = lower;
+            result.Result.Max = upper;
+
+            // Répartition : CHAQUE valeur de la fenêtre est une attaque possible → au moins une barre.
+            // En plus (COMPLÉMENT indicatif), on rehausse les valeurs les plus vraisemblables par le nombre
+            // de partages de shift qui reproduisent EXACTEMENT la bande observée au plus haut % [min100, max100].
+            // Ce bonus culmine près de la vraie valeur quand la tour a convergé des deux côtés (J9 pic ≈ 820) ;
+            // il est nul si la convergence est unilatérale (J10) → l'histogramme reste alors plat sur la fenêtre.
+            // Bande OBSERVÉE au plus haut % (recalculée depuis les lignes, PAS depuis `lower` qui a pu être
+            // remonté par le clamp bornes-du-jour) : le bonus doit se comparer à la vraie bande, pas à la fenêtre.
+            int min100 = rows.Max(row => row.Min);     // = max_q(min_q)
+            int max100 = rows.Min(row => row.Max);     // = min_q(max_q)
+            bool weightByShift = !config.RerollInBand && shiftSpan > 0;
+            int shiftSteps = weightByShift ? (int)Math.Round(config.Shift * factor * 100, MidpointRounding.AwayFromZero) : 0;
+
+            var distribution = new List<int>();
+            for (int value = lower; value <= upper; value++)
+            {
+                int weight = 1; // valeur possible → présente au moins une fois
+                if (weightByShift)
+                {
+                    for (int step = 0; step <= shiftSteps; step++)
+                    {
+                        double shiftMin = step / 10000.0;
+                        int bandMin = (int)Math.Round(value * (1 - shiftMin), MidpointRounding.AwayFromZero);
+                        int bandMax = (int)Math.Round(value * (1 + shiftSpan - shiftMin), MidpointRounding.AwayFromZero);
+                        if (bandMin == min100 && bandMax == max100)
+                        {
+                            weight++;
+                        }
+                    }
+                }
+                for (int occurrence = 0; occurrence < weight; occurrence++)
+                {
+                    distribution.Add(value);
+                }
+            }
+
+            result.minList = distribution;
+            result.maxList = distribution.ToList();
+
             return result;
+        }
+
+        /// <summary>Lignes (%min-max) effectivement renseignées, triées par % croissant.</summary>
+        private static List<(int Percent, int Min, int Max)> ExtractRows(EstimationsDto? estim)
+        {
+            var rows = new List<(int Percent, int Min, int Max)>();
+            if (estim is null) return rows;
+            foreach (var property in estim.GetType().GetProperties())
+            {
+                if (property.GetValue(estim) is not EstimationValueDto value) continue;
+                if (value.Min <= 0 || value.Max <= 0) continue;
+                if (!int.TryParse(property.Name.Replace("_", string.Empty), out int percent)) continue;
+                rows.Add((percent, value.Min, value.Max));
+            }
+            return rows.OrderBy(row => row.Percent).ToList();
         }
 
         public EstimationTuple CreateTupleFromValue(string key, EstimationValueDto value)
@@ -276,449 +279,6 @@ namespace MyHordesOptimizerApi.Services.Impl.Estimations
 
             return new EstimationTuple(percent: int.Parse(key.Replace("_", "")), key: key, min: null,
                 max: null);
-        }
-
-        /* true si l'attaque calculée à cet instant est bien cohérente avec le targetMin et le targetMax */
-        private bool IsValidAttack(double targetMin, double targetMax, double calculateAttackMin,
-            double calculateAttackMax)
-        {
-            if (calculateAttackMin >= targetMax) return false;
-            if (calculateAttackMax <= targetMin) return false;
-            return true;
-        }
-
-        /*
-         * on skip ce test si si le planif100 n'existe pas, ou si la borne minimum du planif100 stagne
-         * true si deux offsets min de planifs différents consécutifs sont supérieurs à 3
-         */
-        private bool IsValidOffsetMinPlanifFinal(EstimationValueDto planif100, double targetMin,
-            EstimationValueDto lastMinDiffFrom100Planif, int dayAttack)
-        {
-            if (planif100 == null || lastMinDiffFrom100Planif == null ||
-                planif100.Min == lastMinDiffFrom100Planif.Min) return true;
-
-            var offsetMinPrevious = CalculateOffset("min", targetMin, lastMinDiffFrom100Planif.Min);
-            var offsetMin100 = CalculateOffset("min", targetMin, planif100.Min);
-
-            return !(offsetMin100 < GetSafetyRatioOffset(dayAttack) && offsetMinPrevious < GetSafetyRatioOffset(dayAttack));
-        }
-
-        /*
-         * on skip ce test si si le planif100 n'existe pas, ou si la borne maximum du planif100 stagne
-         * true si deux offsets max de planifs différents consécutifs sont supérieurs à 3
-         */
-        private bool IsValidOffsetMaxPlanifFinal(EstimationValueDto planif100, double targetMax,
-            EstimationValueDto lastMaxDiffFrom100Planif, int dayAttack)
-        {
-            if (planif100 == null || lastMaxDiffFrom100Planif == null ||
-                planif100.Max == lastMaxDiffFrom100Planif.Max) return true;
-
-            var offsetMaxPrevious = CalculateOffset("max", targetMax, lastMaxDiffFrom100Planif.Max);
-            var offsetMax100 = CalculateOffset("max", targetMax, planif100.Max);
-
-            return !(offsetMax100 < GetSafetyRatioOffset(dayAttack) && offsetMaxPrevious < GetSafetyRatioOffset(dayAttack));
-        }
-
-        /*
-         * on skip ce test si si le estim100 n'existe pas, ou si la borne minimum de l'estim100 stagne
-         * true si deux offsets min d'estims consécutifs sont supérieurs à 3
-         */
-        private bool IsValidOffsetMinEstimFinal(EstimationValueDto estim100, double targetMin,
-            EstimationValueDto lastMinDiffFrom100Estim, int dayAttack)
-        {
-            if (estim100 == null || lastMinDiffFrom100Estim == null ||
-                estim100.Min == lastMinDiffFrom100Estim.Min) return true;
-
-            var offsetMinPrevious = CalculateOffset("min", targetMin, lastMinDiffFrom100Estim.Min);
-            var offsetMin100 = CalculateOffset("min", targetMin, estim100.Min);
-
-            return !(offsetMin100 < GetSafetyRatioOffset(dayAttack) && offsetMinPrevious < GetSafetyRatioOffset(dayAttack));
-        }
-
-        /*
-         * on skip ce test si si le estim100 n'existe pas, ou si la borne maximum de l'estim100 stagne
-         * true si deux offsets max d'estims consécutifs sont supérieurs à 3
-         */
-        private bool IsValidOffsetMaxEstimFinal(EstimationValueDto estim100, double targetMax,
-            EstimationValueDto lastMaxDiffFrom100Estim, int dayAttack)
-        {
-            if (estim100 == null || lastMaxDiffFrom100Estim == null ||
-                estim100.Max == lastMaxDiffFrom100Estim.Max) return true;
-
-            var offsetMaxPrevious = CalculateOffset("max", targetMax, lastMaxDiffFrom100Estim.Max);
-            var offsetMax100 = CalculateOffset("max", targetMax, estim100.Max);
-
-            return !(offsetMax100 < GetSafetyRatioOffset(dayAttack) && offsetMaxPrevious < GetSafetyRatioOffset(dayAttack));
-        }
-
-        /*
-         * on skip ce test si il n'y a aucune valeur en dessous de 50%, si il n'y a pas le planif 100, ou si la borne min ne stagne pas
-         *
-         */
-        private bool IsValidStagnationFinalePlanifOffsetMin(EstimationValueDto planif100,
-            EstimationValueDto lastMaxBehind50, double targetMin, int dayAttack)
-        {
-            if (lastMaxBehind50 == null || planif100 == null || lastMaxBehind50.Min != planif100.Min) return true;
-
-            var planif100EcartMaxOffsetMin = CalculateOffset("min", targetMin, planif100.Min + 24);
-
-            return planif100EcartMaxOffsetMin < GetSafetyRatioOffset(dayAttack);
-        }
-
-        /*
-         * on skip ce test si il n'y a aucune valeur en dessous de 50%, si il n'y a pas le planif 100, ou si la borne max ne stagne pas
-         *
-         */
-        private bool IsValidStagnationFinalePlanifOffsetMax(EstimationValueDto planif100,
-            EstimationValueDto lastMaxBehind50, double targetMax, int dayAttack)
-        {
-            if (lastMaxBehind50 == null || planif100 == null || lastMaxBehind50.Max != planif100.Max) return true;
-
-            var planif100EcartMaxOffsetMax = CalculateOffset("max", targetMax, planif100.Max - 24);
-
-            return planif100EcartMaxOffsetMax < GetSafetyRatioOffset(dayAttack);
-        }
-
-        /*
-         * on skip ce test si il n'y a aucune valeur en dessous de 50%, si il n'y a pas l'estim 100, ou si la borne min ne stagne pas
-         *
-         */
-        private bool IsValidStagnationFinaleEstimOffsetMin(EstimationValueDto estim100,
-            EstimationValueDto lastMaxBehind50, double targetMin, int dayAttack)
-        {
-            if (lastMaxBehind50 == null || estim100 == null || lastMaxBehind50.Min != estim100.Min) return true;
-            var offsetMin100 = CalculateOffset("min", targetMin, estim100.Min);
-
-            return offsetMin100 < GetSafetyRatioOffset(dayAttack);
-        }
-
-        /*
-         * on skip ce test si il n'y a aucune valeur en dessous de 50%, si il n'y a pas l'estim 100, ou si la borne max ne stagne pas
-         *
-         */
-        private bool IsValidStagnationFinaleEstimOffsetMax(EstimationValueDto estim100,
-            EstimationValueDto lastMaxBehind50, double targetMax, int dayAttack)
-        {
-            if (lastMaxBehind50 == null || estim100 == null || lastMaxBehind50.Max != estim100.Max) return true;
-            var offsetMax100 = CalculateOffset("max", targetMax, estim100.Max);
-
-            return offsetMax100 < GetSafetyRatioOffset(dayAttack);
-        }
-
-        /*
-         * on skip ce test si il n'y a pas de planif 100, ou pas de valeur de planif différente du planif 100
-         * true si deux somme d'offsets de planifs consécutifs sont inférieures au shift
-         */
-        private bool IsValidSommeOffsets100AndPrevious(EstimationValueDto planif100,
-            EstimationValueDto lastMinDiffFrom100Planif, EstimationValueDto lastMaxDiffFrom100Planif, double targetMin, double targetMax)
-        {
-            if (planif100 == null || lastMinDiffFrom100Planif == null || lastMaxDiffFrom100Planif == null
-                || planif100.Min == 0 || planif100.Max == 0
-                || lastMinDiffFrom100Planif.Min == 0 || lastMinDiffFrom100Planif.Max == 0
-                || lastMaxDiffFrom100Planif.Min == 0 || lastMaxDiffFrom100Planif.Max == 0) return true;
-
-            var offsetMinPrevious = CalculateOffset("min", targetMin, lastMinDiffFrom100Planif.Min);
-            var offsetMaxPrevious = CalculateOffset("max", targetMax, lastMaxDiffFrom100Planif.Max);
-
-            var offsetMin100 = CalculateOffset("min", targetMin, planif100.Min);
-            var offsetMax100 = CalculateOffset("max", targetMax, planif100.Max);
-
-            var sommeOffsets100 = offsetMin100 + offsetMax100;
-            var sommeOffsetsPrevious = offsetMinPrevious + offsetMaxPrevious;
-
-            return !(sommeOffsets100 < _shift && sommeOffsetsPrevious < _shift);
-        }
-
-        private bool IsValidAlter(EstimationsDto estim, double targetMin, double targetMax, bool beta)
-        {
-
-            var values = new List<EstimationTuple>();
-            foreach (var tuple in estim.GetType().GetProperties())
-            {
-                var estimationTuple = CreateTupleFromValue(tuple.Name, tuple.GetValue(estim) as EstimationValueDto);
-                if (estimationTuple.Percent >= 33)
-                {
-                    // ne marche que pour la TDG et il n'y a pas d'estim < 33 sur la TDG
-                    values.Add(estimationTuple);
-                }
-            }
-
-            values.Sort((value1, value2) => value2.Percent.CompareTo(value1.Percent));
-
-            var percentBinoms = new List<List<string>>();
-            for (var valueIndex = 0; valueIndex < values.Count - 1; valueIndex++)
-            {
-                var percentBinom = new List<string>();
-
-                percentBinom.Add(values[valueIndex].Key);
-                percentBinom.Add(values[valueIndex + 1].Key);
-
-                percentBinoms.Add(percentBinom);
-            }
-
-            var i = 23;
-            foreach (var percentBinom in percentBinoms)
-            {
-                i--;
-
-                var firstEstim = typeof(EstimationsDto).GetProperty(percentBinom.Last()).GetValue(estim) as
-                    EstimationValueDto;
-                var lastEstim = typeof(EstimationsDto).GetProperty(percentBinom.First()).GetValue(estim) as
-                    EstimationValueDto;
-
-                if (firstEstim == null || firstEstim.Min == null || firstEstim.Max == null) continue;
-                if (lastEstim == null || lastEstim.Min == null || lastEstim.Max == null) continue;
-
-
-                // Pour le calcul d'ecart
-                var offsetMinHighMin = CalculateOffset("min", targetMin, firstEstim.Min + (beta ? 0.501 : 1)); // Min 100% le plus loin
-                var offsetMinHighMax = CalculateOffset("min", targetMin, firstEstim.Min - (beta ? 0.501 : 1)); // Min 100% le plus pres
-
-                var offsetMaxHighMin = CalculateOffset("max", targetMax, firstEstim.Max - (beta ? 0.501 : 1)); // Max 100% le plus loin
-                var offsetMaxHighMax = CalculateOffset("max", targetMax, firstEstim.Max + (beta ? 0.501 : 1)); // Max 100% le plus pres
-
-                var spendableMin = (Math.Max(0, offsetMinHighMin - 3) + Math.Max(0, offsetMaxHighMin - 3)) /
-                                   (24 - (i + 1));
-                var spendableMax = (Math.Max(0, offsetMinHighMax - 3) + Math.Max(0, offsetMaxHighMax - 3)) /
-                                   (24 - (i + 1));
-
-                var alterMin = Math.Floor(spendableMin * 250) / 1000.0;
-                var alterMax = Math.Floor(spendableMax * 1000) / 1000.0;
-
-
-                if (firstEstim.Min != lastEstim.Min)
-                {
-                    var ecartMin = CalculateOffset("min", targetMin, firstEstim.Min + (beta ? 0.501 : 1)) -
-                                   CalculateOffset("min", targetMin, lastEstim.Min -  (beta ? 0.501 : 1));
-                    var ecartMax = CalculateOffset("min", targetMin, firstEstim.Min - (beta ? 0.501 : 1)) -
-                                   CalculateOffset("min", targetMin, lastEstim.Min + (beta ? 0.501 : 1));
-
-                    if (!IsInBetween(ecartMin, alterMin, alterMax) && !IsInBetween(ecartMax, alterMin, alterMax))
-                    {
-                        return false;
-                    }
-                }
-
-                if (firstEstim.Max != lastEstim.Max)
-                {
-                    var ecartMin = CalculateOffset("max", targetMax, firstEstim.Max - (beta ? 0.501 : 1)) -
-                                   CalculateOffset("max", targetMax, lastEstim.Max + (beta ? 0.501 : 1));
-                    var ecartMax = CalculateOffset("max", targetMax, firstEstim.Max + (beta ? 0.501 : 1)) -
-                                   CalculateOffset("max", targetMax, lastEstim.Max - (beta ? 0.501 : 1));
-
-                    if (!IsInBetween(ecartMin, alterMin, alterMax) && !IsInBetween(ecartMax, alterMin, alterMax))
-                    {
-                        return false;
-                    }
-                }
-            }
-
-            return true;
-        }
-
-        private EstimationValueDto GetLastMinDiffFrom100(EstimationsDto estim)
-        {
-            var values = new List<EstimationTuple>();
-            foreach (var tuple in estim.GetType().GetProperties())
-            {
-                var estimationTuple = CreateTupleFromValue(tuple.Name, tuple.GetValue(estim) as EstimationValueDto);
-                if (estimationTuple != null
-                    && estimationTuple.Min != null && estimationTuple.Min > 0
-                    && estimationTuple.Max != null && estimationTuple.Max > 0
-                    && estim._100 != null && estimationTuple.Key != "_100" && estimationTuple.Min != estim._100.Min)
-                {
-                    values.Add(estimationTuple);
-                }
-            }
-
-            var orderedValues = values.OrderBy(tuple => tuple.Percent).ToList();
-            if (orderedValues.Count > 0)
-            {
-                return typeof(EstimationsDto).GetProperty(orderedValues.Last().Key).GetValue(estim) as
-                    EstimationValueDto;
-            }
-
-            return null;
-        }
-
-        private EstimationValueDto GetFirstNonEmptyValue(EstimationsDto estim)
-        {
-            var values = estim.GetType().GetProperties();
-            var nonEmptyValues = new List<EstimationValueDto>();
-            if (values != null && values.Length > 0)
-            {
-                nonEmptyValues = values
-                    .Where((value) => value.GetValue(estim) as EstimationValueDto != null)
-                    .Select((value) => value.GetValue(estim) as EstimationValueDto)
-                    .ToList();
-                return nonEmptyValues.First();
-            }
-
-            return null;
-        }
-
-        private EstimationValueDto GetLastMaxDiffFrom100(EstimationsDto estim)
-        {
-            var values = new List<EstimationTuple>();
-            foreach (var tuple in estim.GetType().GetProperties())
-            {
-                var estimationTuple = CreateTupleFromValue(tuple.Name, tuple.GetValue(estim) as EstimationValueDto);
-                if (estimationTuple != null
-                    && estimationTuple.Min != null && estimationTuple.Min > 0
-                    && estimationTuple.Max != null && estimationTuple.Max > 0
-                    && estim._100 != null && estimationTuple.Key != "_100" && estimationTuple.Max != estim._100.Max)
-                {
-                    values.Add(estimationTuple);
-                }
-            }
-
-            var orderedValues = values.OrderBy(tuple => tuple.Percent).ToList();
-            if (orderedValues.Count > 0)
-            {
-                return typeof(EstimationsDto).GetProperty(orderedValues.Last().Key).GetValue(estim) as
-                    EstimationValueDto;
-            }
-
-            return null;
-        }
-
-        private EstimationValueDto GetLastMaxBehind50(EstimationsDto estim)
-        {
-            var values = new List<EstimationTuple>();
-            foreach (var tuple in estim.GetType().GetProperties())
-            {
-                var estimationTuple = CreateTupleFromValue(tuple.Name, tuple.GetValue(estim) as EstimationValueDto);
-                if (estimationTuple != null
-                    && estimationTuple.Min != null && estimationTuple.Min > 0
-                    && estimationTuple.Max != null && estimationTuple.Max > 0
-                    && estimationTuple.Key != "_0" && estimationTuple.Percent <= 50)
-                {
-                    values.Add(estimationTuple);
-                }
-            }
-
-            var orderedValues = values.OrderBy(tuple => tuple.Percent).ToList();
-            if (orderedValues.Count > 0)
-            {
-                return typeof(EstimationsDto).GetProperty(orderedValues.Last().Key).GetValue(estim) as
-                    EstimationValueDto;
-            }
-
-            return null;
-        }
-
-        private EstimationValueDto GetLastDiffFrom100(EstimationsDto estim)
-        {
-            var values = new List<EstimationTuple>();
-            foreach (var tuple in estim.GetType().GetProperties())
-            {
-                var estimationTuple = CreateTupleFromValue(tuple.Name, tuple.GetValue(estim) as EstimationValueDto);
-                if (estimationTuple != null
-                    && estimationTuple.Min != null && estimationTuple.Min > 0
-                    && estimationTuple.Max != null && estimationTuple.Max > 0
-                    && estim._100 != null
-                    && estimationTuple.Key != "_100"
-                    && (estimationTuple.Min != estim._100.Min || estimationTuple.Max != estim._100.Max)
-                   )
-                {
-                    values.Add(estimationTuple);
-                }
-            }
-
-            var orderedValues = values.OrderBy(tuple => tuple.Percent).ToList();
-            if (orderedValues.Count > 0)
-            {
-                return typeof(EstimationsDto).GetProperty(orderedValues.Last().Key).GetValue(estim) as
-                    EstimationValueDto;
-            }
-
-            return null;
-        }
-
-        private EstimationValueDto GetLast(EstimationsDto estim)
-        {
-            var values = new List<EstimationTuple>();
-            foreach (var tuple in estim.GetType().GetProperties())
-            {
-                var estimationTuple = CreateTupleFromValue(tuple.Name, tuple.GetValue(estim) as EstimationValueDto);
-                if (estimationTuple != null
-                    && estimationTuple.Min != null && estimationTuple.Min > 0
-                    && estimationTuple.Max != null && estimationTuple.Max > 0
-                   )
-                {
-                    values.Add(estimationTuple);
-                }
-            }
-
-            var orderedValues = values.OrderBy(tuple => tuple.Percent).ToList();
-            if (orderedValues.Count > 0)
-            {
-                return typeof(EstimationsDto).GetProperty(orderedValues.Last().Key).GetValue(estim) as
-                    EstimationValueDto;
-            }
-
-            return null;
-        }
-
-        private double CalculateOffset(string type, double target, double borne)
-        {
-            if (type == "min")
-            {
-                return 100 * (target - borne) / target;
-            }
-
-            return 100 * (borne - target) / target;
-        }
-
-        private double CalculateBorne(string type, double target, double offset)
-        {
-            if (type == "min")
-            {
-                return Math.Round(target - (target * offset / 100), MidpointRounding.AwayFromZero);
-            }
-
-            return Math.Round(target + (target * offset / 100), MidpointRounding.AwayFromZero);
-        }
-
-        private double CalculateTarget(string type, double borne, double offset)
-        {
-            if (type == "min")
-            {
-                return Math.Round(borne / (1 - offset / 100), MidpointRounding.AwayFromZero);
-            }
-
-            return Math.Round(borne / (1 + offset / 100), MidpointRounding.AwayFromZero);
-        }
-
-        private double RoundTo25(string type, double borne)
-        {
-            if (type == "min")
-            {
-                return Math.Floor(borne / 25) * 25;
-            }
-
-            return Math.Ceiling(borne / 25) * 25;
-        }
-
-        /** true si la valeur est strictement comprise entre la borne 1 et la borne 2 */
-        private bool IsInBetween(double value, double borne1, double borne2)
-        {
-            if (borne1 > borne2)
-            {
-                return (value < borne1 && value > borne2);
-            }
-
-            if (borne2 > borne1)
-            {
-                return value < borne2 && value > borne1;
-            }
-
-            return false;
-        }
-
-        private double GetSafetyRatioOffset(int currentDay)
-        {
-            return currentDay <= _safetyRatioOffsets.Count && _safetyRatioOffsets[currentDay - 1] != null  ? _safetyRatioOffsets[currentDay - 1] : _safetyRatioOffsetDefault;
         }
     }
 
@@ -736,5 +296,52 @@ namespace MyHordesOptimizerApi.Services.Impl.Estimations
             Min = min;
             Max = max;
         }
+    }
+
+    /// <summary>
+    /// Constantes de la mécanique d'estimation d'attaque (MyHordes, config/app/rules.yml).
+    /// Les constantes d'estimation (shift/spread/variance/offset) sont identiques pour tous les presets
+    /// (default/small/remote/panda/custom) ; seule la difficulté des attaques varie.
+    /// </summary>
+    public sealed class EstimationSolverConfig
+    {
+        public double Shift { get; init; }      // estimation.shift
+        public double Spread { get; init; }     // estimation.spread
+        public double Variance { get; init; }   // estimation.variance
+        public double OffsetMin { get; init; }  // estimation.offset.min
+        public double OffsetMax { get; init; }  // estimation.offset.max
+        public double MaxRatio { get; init; }   // difficulté : easy=0.75, normal=1.1, hard=3.1
+
+        /// <summary>
+        /// Mode « attaques sévères » : le nombre de zombies est un re-tirage uniforme dans
+        /// [targetMin, targetMax] après calcul de la bande. On ne peut donc pas resserrer sous la
+        /// bande cible (l'attaque n'est plus liée à la valeur qui a servi à la construire).
+        /// </summary>
+        public bool RerollInBand { get; init; }
+
+        private const double EstimationShift = 10;
+        private const double EstimationSpread = 10;
+        private const double EstimationVariance = 48;
+        private const double EstimationOffsetMin = 15;
+        private const double EstimationOffsetMax = 36;
+
+        public static EstimationSolverConfig Default => Normal;
+
+        // RNE / RE / PANDE = normal. Easy / Hard n'existent que sur les villes CUSTOM et ne sont exposés
+        // par aucune API : réservés à une future inférence (bornes des estimations) ou surcharge manuelle.
+        public static EstimationSolverConfig Normal => Build(maxRatio: 1.1, rerollInBand: false);
+        public static EstimationSolverConfig Easy => Build(maxRatio: 0.75, rerollInBand: false);
+        public static EstimationSolverConfig Hard => Build(maxRatio: 3.1, rerollInBand: true);
+
+        private static EstimationSolverConfig Build(double maxRatio, bool rerollInBand) => new()
+        {
+            Shift = EstimationShift,
+            Spread = EstimationSpread,
+            Variance = EstimationVariance,
+            OffsetMin = EstimationOffsetMin,
+            OffsetMax = EstimationOffsetMax,
+            MaxRatio = maxRatio,
+            RerollInBand = rerollInBand,
+        };
     }
 }

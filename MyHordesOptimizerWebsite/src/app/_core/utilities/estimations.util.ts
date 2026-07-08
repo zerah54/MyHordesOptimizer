@@ -6,6 +6,7 @@ const conf_attack_by_mode: Record<TownTypeId, number> = {
     RE: 1.1,
     PANDE: 3.1,
     RNE: const_ratio_low,
+    CUSTOM: 1.1
 };
 
 function getMinRatio(day: number, town_type: TownTypeId): number {
@@ -29,11 +30,9 @@ function getMaxRatio(day: number, town_type: TownTypeId): number {
 }
 
 export function getMinAttack(day: number, town_type: TownTypeId): number {
-    town_type = 'RE';
     return Math.round(getMinRatio(day, town_type) * Math.pow(Math.max(1, day - 1) * 0.75 + 2.5, 3));
 }
 
 export function getMaxAttack(day: number, town_type: TownTypeId): number {
-    town_type = 'RE';
     return Math.round(getMaxRatio(day, town_type) * Math.pow(day * 0.75 + 3.5, 3));
 }

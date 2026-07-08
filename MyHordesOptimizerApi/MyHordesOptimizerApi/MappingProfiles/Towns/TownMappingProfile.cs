@@ -24,6 +24,10 @@ namespace MyHordesOptimizerApi.MappingProfiles.Towns
                 .ForMember(dest => dest.IsChaos, opt => opt.MapFrom(src => src.Map.City.Chaos))
                 .ForMember(dest => dest.IsDevasted, opt => opt.MapFrom(src => src.Map.City.Devast))
                 .ForMember(dest => dest.IsDoorOpen, opt => opt.MapFrom(src => src.Map.City.Door))
+                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Map.City.Name))
+                .ForMember(dest => dest.Season, opt => opt.MapFrom(src => src.Map.Season))
+                .ForMember(dest => dest.TownTypeId, opt => opt.MapFrom(src => (int?)TownExtensions.MapTownType(src.Map.City.Type)))
+                .ForMember(dest => dest.PhaseId, opt => opt.MapFrom(src => (int?)TownExtensions.MapTownPhase(src.Map.Phase)))
                 .ForMember(dest => dest.MapCellDigUpdates, opt => opt.Ignore())
                 .ForMember(dest => dest.MapCells, opt => opt.Ignore())
                 .ForMember(dest => dest.TownBankItems, opt => opt.MapFrom((src, dest, srcMember, context) =>

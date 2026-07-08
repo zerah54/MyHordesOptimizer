@@ -2412,7 +2412,7 @@
       <trans-unit id="3167198928570165301" datatype="html">
         <source>Attaque J
                     <x id="INTERPOLATION" equiv-text="{{ selected_day }}"/>
-                    calculée (par Apofoo)
+            calculée
                 </source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/my-town/statistics/estimations/estimations.component.html</context>
@@ -2424,7 +2424,7 @@
         </context-group>
         <target state="needs-translation">Attaque J
                     <x id="INTERPOLATION" equiv-text="{{ selected_day }}"/>
-                    calculée (par Apofoo)
+            calculée
                 </target>
       </trans-unit>
       <trans-unit id="795113065551434631" datatype="html">
@@ -2486,7 +2486,7 @@
       <trans-unit id="6940019443590511183" datatype="html">
         <source>Attaque J
                     <x id="PH" equiv-text="day"/>
-                    calculée (Par Apofoo) - Min
+            calculée - Min
                 </source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/my-town/statistics/estimations/estimations.component.ts</context>
@@ -2494,13 +2494,13 @@
         </context-group>
         <target state="needs-translation">Attaque J
                     <x id="PH" equiv-text="day"/>
-                    calculée (Par Apofoo) - Min
+            calculée - Min
                 </target>
       </trans-unit>
       <trans-unit id="6403535731908270838" datatype="html">
         <source>Attaque J
                     <x id="PH" equiv-text="day"/>
-                    calculée (Par Apofoo) - Max
+            calculée - Max
                 </source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/my-town/statistics/estimations/estimations.component.ts</context>
@@ -2508,13 +2508,13 @@
         </context-group>
         <target state="needs-translation">Attaque J
                     <x id="PH" equiv-text="day"/>
-                    calculée (Par Apofoo) - Max
+            calculée - Max
                 </target>
       </trans-unit>
       <trans-unit id="4578996312563618431" datatype="html">
         <source>Attaque J
                     <x id="PH" equiv-text="day"/>
-                    calculée (Par Apofoo) (beta) - Min
+            calculée (beta) - Min
                 </source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/my-town/statistics/estimations/estimations.component.ts</context>
@@ -2522,13 +2522,13 @@
         </context-group>
         <target state="needs-translation">Attaque J
                     <x id="PH" equiv-text="day"/>
-                    calculée (Par Apofoo) (beta) - Min
+            calculée (beta) - Min
                 </target>
       </trans-unit>
       <trans-unit id="5430737185209049312" datatype="html">
         <source>Attaque J
                     <x id="PH" equiv-text="day"/>
-                    calculée (Par Apofoo) (beta) - Max
+            calculée (beta) - Max
                 </source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/my-town/statistics/estimations/estimations.component.ts</context>
@@ -2536,7 +2536,7 @@
         </context-group>
         <target state="needs-translation">Attaque J
                     <x id="PH" equiv-text="day"/>
-                    calculée (Par Apofoo) (beta) - Max
+            calculée (beta) - Max
                 </target>
       </trans-unit>
       <trans-unit id="7065021988584818620" datatype="html">
