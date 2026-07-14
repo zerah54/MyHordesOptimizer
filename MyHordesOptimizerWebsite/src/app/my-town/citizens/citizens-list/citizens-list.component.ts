@@ -27,6 +27,7 @@ import { ColumnIdPipe } from '../../../_core/pipes/column-id.pipe';
 import { getTown, getUser } from '../../../_core/utilities/localstorage.util';
 import { AvatarComponent } from '../../../_shared/avatar/avatar.component';
 import { CitizenInfoComponent } from '../../../_shared/citizen-info/citizen-info.component';
+import { DeferredCellComponent } from '../../../_shared/deferred-cell/deferred-cell.component';
 import { LastUpdateComponent } from '../../../_shared/last-update/last-update.component';
 import { ListElementAddRemoveComponent } from '../../../_shared/list-elements-add-remove/list-element-add-remove.component';
 import { HeaderWithSelectFilterComponent } from '../../../_shared/lists/header-with-select-filter/header-with-select-filter.component';
@@ -34,7 +35,7 @@ import { BathForDayPipe } from '../bath-for-day.pipe';
 import { TypeRowPipe } from './type-row.pipe';
 
 const angular_common: Imports = [CommonModule, FormsModule, NgOptimizedImage];
-const components: Imports = [AvatarComponent, CitizenInfoComponent, HeaderWithSelectFilterComponent, LastUpdateComponent, ListElementAddRemoveComponent];
+const components: Imports = [AvatarComponent, CitizenInfoComponent, DeferredCellComponent, HeaderWithSelectFilterComponent, LastUpdateComponent, ListElementAddRemoveComponent];
 const pipes: Imports = [BathForDayPipe, ColumnIdPipe, TypeRowPipe];
 const material_modules: Imports = [MatCheckboxModule, MatFormFieldModule, MatInputModule, MatOptionModule, MatSelectModule, MatSortModule, MatTableModule];
 

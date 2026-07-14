@@ -35,6 +35,7 @@ namespace MyHordesOptimizerApi.Services.Impl.Estimations
 
         public void UpdateEstimations(int townId, EstimationRequestDto request)
         {
+            townId = DbContext.ResolveTownId(townId);
             using var transaction = DbContext.Database.BeginTransaction();
             var newLastUpdate = DbContext.LastUpdateInfos.Update(Mapper.Map<LastUpdateInfo>(UserInfoProvider.GenerateLastUpdateInfo(), opt => opt.SetDbContext(DbContext)));
             DbContext.SaveChanges();
@@ -65,6 +66,7 @@ namespace MyHordesOptimizerApi.Services.Impl.Estimations
 
         public EstimationRequestDto GetEstimations(int townId, int day)
         {
+            townId = DbContext.ResolveTownId(townId);
             var models = DbContext.TownEstimations.Where(x => x.Day == day && x.IdTown == townId)
                 .ToList();
             if (models.Any())

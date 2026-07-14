@@ -71,12 +71,12 @@ namespace MyHordesOptimizerApi.Services.Impl
         private Dictionary<string, int> GetCampingValues(CampingParametersDto campingParameters)
         {
 
-            var campChances = getCampChancesDependingOnNbPreviousCampings(campingParameters.TownType == TownType.Pande, campingParameters.ProCamper);
+            var campChances = getCampChancesDependingOnNbPreviousCampings(campingParameters.TownType == TownType.PANDE, campingParameters.ProCamper);
 
             var chance = new Dictionary<string, int>() {
                 {"previous", campChances[Math.Min(Math.Max(campingParameters.Campings, 0), campChances.Length - 1)]},
                 {"tomb", campingParameters.Tomb ? CampingBonus.Tomb : 0},
-                {"town", campingParameters.TownType == TownType.Pande ? CampingBonus.Pande : 0},
+                {"town", campingParameters.TownType == TownType.PANDE ? CampingBonus.Pande : 0},
                 {"zone", (campingParameters.Improve * CampingBonus.Improve) + (campingParameters.ObjectImprove * CampingBonus.ObjectImprove)},
                 {"zoneBuilding", GetZoneBuildingBonus(campingParameters.RuinBuryCount, campingParameters.RuinBonus, campingParameters.HiddenCampers, campingParameters.RuinCapacity)},
                 {"lighthouse", campingParameters.Phare ? CampingBonus.Lighthouse : 0},

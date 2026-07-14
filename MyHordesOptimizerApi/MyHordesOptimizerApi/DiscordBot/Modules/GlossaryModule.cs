@@ -8,6 +8,8 @@ using MyHordesOptimizerApi.Services.Interfaces;
 
 namespace MyHordesOptimizerApi.DiscordBot.Modules
 {
+    [IntegrationType(ApplicationIntegrationType.GuildInstall, ApplicationIntegrationType.UserInstall)]
+    [CommandContextType(InteractionContextType.Guild, InteractionContextType.BotDm, InteractionContextType.PrivateChannel)]
     public class GlossaryModule : InteractionModuleBase<SocketInteractionContext>
     {
         private readonly IGlossaryService _glossaryService;

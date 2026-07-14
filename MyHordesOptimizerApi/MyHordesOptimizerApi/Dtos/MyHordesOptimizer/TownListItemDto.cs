@@ -14,7 +14,6 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer
         public TownPhase? Phase { get; set; }
         public string? Language { get; set; }
         public int? Score { get; set; }
-        public int? SoulPoints { get; set; }
         public bool IsChaos { get; set; }
         public bool IsDevasted { get; set; }
         public bool IsFinished { get; set; }

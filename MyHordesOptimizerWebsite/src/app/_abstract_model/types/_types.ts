@@ -21,7 +21,7 @@ export interface Dictionary<T> {
 }
 
 export type TownTypeId = 'RNE' | 'PANDE' | 'RE' | 'CUSTOM';
-export type TownState = 'NORMAL' | 'CHAOS' | 'DEVASTED';
+export type TownState = 'NORMAL' | 'CHAOS' | 'DEVASTED' | 'FINISHED';
 export type TownPhase = 'ALPHA' | 'BETA' | 'IMPORT' | 'NATIVE';
 
 export type ExpeditionOrderType = 'checkbox' | 'text';

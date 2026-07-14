@@ -2,7 +2,9 @@
 using Microsoft.EntityFrameworkCore;
 using MyHordesOptimizerApi.Dtos.MyHordes;
 using MyHordesOptimizerApi.Dtos.MyHordes.Me;
+using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
 using MyHordesOptimizerApi.Extensions;
+using MyHordesOptimizerApi.Extensions.Models;
 using MyHordesOptimizerApi.MappingProfiles.Resolvers.MyHordes;
 using MyHordesOptimizerApi.Models;
 using System.Collections.Generic;
@@ -19,11 +21,18 @@ namespace MyHordesOptimizerApi.MappingProfiles.Towns
                 .ForMember(dest => dest.Day, opt => opt.MapFrom(src => src.Map.Days))
                 .ForMember(dest => dest.Expeditions, opt => opt.Ignore())
                 .ForMember(dest => dest.Height, opt => opt.MapFrom(src => src.Map.Hei))
-                .ForMember(dest => dest.IdTown, opt => opt.MapFrom(src => src.MapId))
+                // IdTown provisoire = -mapId : un townId réel (import saison) est toujours positif,
+                // ça garantit qu'une ligne pas encore migrée ne peut jamais entrer en collision avec
+                // une ville déjà connue par son townId stable (mapId recyclé d'une saison à l'autre).
+                .ForMember(dest => dest.IdTown, opt => opt.MapFrom(src => -src.MapId))
                 .ForMember(dest => dest.IdUserWishListUpdater, opt => opt.Ignore())
                 .ForMember(dest => dest.IsChaos, opt => opt.MapFrom(src => src.Map.City.Chaos))
                 .ForMember(dest => dest.IsDevasted, opt => opt.MapFrom(src => src.Map.City.Devast))
                 .ForMember(dest => dest.IsDoorOpen, opt => opt.MapFrom(src => src.Map.City.Door))
+                // La langue de la ville n'est pas portée par /json/map : on la déduit du locale du
+                // citoyen connecté (les villes MyHordes sont ségréguées par langue, le locale du joueur
+                // correspond donc à celle de sa ville — même valeur que le `language` de /json/towns).
+                .ForMember(dest => dest.Language, opt => opt.MapFrom(src => src.Locale))
                 .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Map.City.Name))
                 .ForMember(dest => dest.Season, opt => opt.MapFrom(src => src.Map.Season))
                 .ForMember(dest => dest.TownTypeId, opt => opt.MapFrom(src => (int?)TownExtensions.MapTownType(src.Map.City.Type)))
@@ -38,7 +47,7 @@ namespace MyHordesOptimizerApi.MappingProfiles.Towns
                         var model = context.Mapper.Map<TownBankItem>(myHordesBank);
                         model.IdLastUpdateInfo = src.Map.LastUpdateInfo.IdLastUpdateInfo;
                         model.IdLastUpdateInfoNavigation = src.Map.LastUpdateInfo;
-                        model.IdTown = src.MapId;
+                        model.IdTown = -src.MapId;
                         results.Add(model);
                     }
                     return results;
@@ -51,7 +60,7 @@ namespace MyHordesOptimizerApi.MappingProfiles.Towns
                         var model = context.Mapper.Map<TownCitizen>(myHordeCitizen);
                         model.IdLastUpdateInfo = src.Map.LastUpdateInfo.IdLastUpdateInfo;
                         model.IdLastUpdateInfoNavigation = src.Map.LastUpdateInfo;
-                        model.IdTown = src.MapId;
+                        model.IdTown = -src.MapId;
                         results.Add(model);
                     }
                     return results;
@@ -64,7 +73,7 @@ namespace MyHordesOptimizerApi.MappingProfiles.Towns
                         var model = context.Mapper.Map<TownCadaver>(myHordeCadaver);
                         model.IdLastUpdateInfo = src.Map.LastUpdateInfo.IdLastUpdateInfo;
                         model.IdLastUpdateInfoNavigation = src.Map.LastUpdateInfo;
-                        model.IdTown = src.MapId;
+                        model.IdTown = -src.MapId;
                         results.Add(model);
                     }
                     return results;
@@ -94,7 +103,6 @@ namespace MyHordesOptimizerApi.MappingProfiles.Towns
 
             CreateMap<MyHordesCitizen, TownCitizen>()
                 .ForMember(dest => dest.Apagcharges, opt => opt.Ignore())
-                .ForMember(dest => dest.Avatar, opt => opt.MapFrom(src => src.Avatar))
                 .ForMember(dest => dest.ChestLevel, opt => opt.Ignore())
                 .ForMember(dest => dest.Dead, opt => opt.MapFrom(src => src.Dead))
                 .ForMember(dest => dest.GhoulVoracity, opt => opt.Ignore())
@@ -170,12 +178,9 @@ namespace MyHordesOptimizerApi.MappingProfiles.Towns
                 .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
                 .ForMember(dest => dest.TownCadavers, opt => opt.Ignore())
                 .ForMember(dest => dest.TownCitizens, opt => opt.Ignore())
-                .ForMember(dest => dest.UserKey, opt => opt.Ignore())
                 .ForMember(dest => dest.WishlistCategories, opt => opt.Ignore());
 
             CreateMap<MyHordesCadaver, TownCadaver>()
-                .ForMember(model => model.Avatar, opt => opt.MapFrom(dto => dto.Avatar))
-                .ForMember(model => model.CadaverName, opt => opt.MapFrom(dto => dto.Name))
                 .ForMember(model => model.CauseOfDeath, opt => opt.MapFrom(dto => dto.Dtype))
                 .ForMember(model => model.CauseOfDeathNavigation, opt => opt.Ignore())
                 .ForMember(model => model.CleanUp, opt => opt.Ignore())
@@ -196,8 +201,21 @@ namespace MyHordesOptimizerApi.MappingProfiles.Towns
                         {
                             IdUser = src.Id,
                             Name = src.Name,
+                            Avatar = src.Avatar
                         };
                         dbContext.Add(user);
+                    }
+                    else
+                    {
+                        // Name et avatar ne vivent que sur User : on les rafraîchit depuis le cadavre
+                        if (!string.IsNullOrEmpty(src.Name))
+                        {
+                            dbUser.Name = src.Name;
+                        }
+                        if (!string.IsNullOrEmpty(src.Avatar))
+                        {
+                            dbUser.Avatar = src.Avatar;
+                        }
                     }
                     return dbUser;
                 }))
@@ -205,5 +223,6 @@ namespace MyHordesOptimizerApi.MappingProfiles.Towns
                 .ForMember(model => model.SurvivalDay, opt => opt.MapFrom(dto => dto.Survival))
                 .ForMember(model => model.TownMessage, opt => opt.MapFrom(dto => dto.Comment));
         }
+
     }
 }

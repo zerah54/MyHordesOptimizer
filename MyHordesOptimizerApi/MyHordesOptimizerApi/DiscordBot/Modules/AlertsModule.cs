@@ -6,7 +6,10 @@ using Microsoft.Extensions.Logging;
 using MyHordesOptimizerApi.DiscordBot.Utility;
 
 namespace MyHordesOptimizerApi.DiscordBot.Modules
-{
+{   
+
+    [IntegrationType(ApplicationIntegrationType.GuildInstall, ApplicationIntegrationType.UserInstall)]
+    [CommandContextType(InteractionContextType.Guild, InteractionContextType.BotDm, InteractionContextType.PrivateChannel)]
     public class AlertsModule : InteractionModuleBase<SocketInteractionContext>
     {
         private readonly ILogger<AlertsModule> _logger;
@@ -47,13 +50,11 @@ namespace MyHordesOptimizerApi.DiscordBot.Modules
 
                 if (privateMsg)
                 {
-                    await Context.User.SendMessageAsync(
-                        $"{Context.User.Mention} Le compteur anti-abus a été réinitialisé !");
+                    await FollowupAsync($"{Context.User.Mention} Le compteur anti-abus a été réinitialisé !", ephemeral: true);
                 }
                 else
                 {
-                    await Context.Channel.SendMessageAsync(
-                        $"{Context.User.Mention} Le compteur anti-abus a été réinitialisé !");
+                    await FollowupAsync($"{Context.User.Mention} Le compteur anti-abus a été réinitialisé !");
                 }
             }
             catch (Exception e)
@@ -125,11 +126,11 @@ namespace MyHordesOptimizerApi.DiscordBot.Modules
 
                 if (privateMsg)
                 {
-                    await Context.User.SendMessageAsync($"{Context.User.Mention} {reason}");
+                    await FollowupAsync($"{Context.User.Mention} {reason}", ephemeral: true);
                 }
                 else
                 {
-                    await Context.Channel.SendMessageAsync($"{Context.User.Mention} {reason}");
+                    await FollowupAsync($"{Context.User.Mention} {reason}");
                 }
             }
             catch (Exception e)

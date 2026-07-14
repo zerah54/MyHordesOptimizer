@@ -131,5 +131,13 @@ namespace MyHordesOptimizerApi.Controllers
             await MyHordesImportService.ImportJobsAsync();
             return Ok();
         }
+
+        [HttpPost]
+        [Route("Towns")]
+        public async Task<ActionResult> ImportTownsAsync([FromQuery] int? season = null)
+        {
+            await MyHordesImportService.ImportTownsAsync(season);
+            return Ok();
+        }
     }
 }

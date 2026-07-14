@@ -1,4 +1,3 @@
-﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -18,8 +17,9 @@ public partial class User
     [MySqlCollation("utf8mb3_general_ci")]
     public string Name { get; set; } = null!;
 
+    [Column("avatar")]
     [StringLength(255)]
-    public string? UserKey { get; set; }
+    public string? Avatar { get; set; }
 
     [InverseProperty("IdUserNavigation")]
     public virtual ICollection<ExpeditionCitizen> ExpeditionCitizens { get; set; } = new List<ExpeditionCitizen>();
@@ -44,4 +44,7 @@ public partial class User
 
     [InverseProperty("IdUserAuthorNavigation")]
     public virtual ICollection<WishlistCategorie> WishlistCategories { get; set; } = new List<WishlistCategorie>();
+
+    [InverseProperty("IdUserNavigation")]
+    public virtual ICollection<UserPicto> UserPictos { get; set; } = new List<UserPicto>();
 }

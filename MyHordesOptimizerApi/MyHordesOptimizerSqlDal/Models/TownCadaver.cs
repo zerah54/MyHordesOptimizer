@@ -25,18 +25,6 @@ public partial class TownCadaver
     [Column("idLastUpdateInfo", TypeName = "int(11)")]
     public int? IdLastUpdateInfo { get; set; }
 
-    [Column("cadaverName")]
-    [StringLength(255)]
-    [MySqlCharSet("utf8mb3")]
-    [MySqlCollation("utf8mb3_general_ci")]
-    public string? CadaverName { get; set; }
-
-    [Column("avatar")]
-    [StringLength(255)]
-    [MySqlCharSet("utf8mb3")]
-    [MySqlCollation("utf8mb3_general_ci")]
-    public string? Avatar { get; set; }
-
     [Column("survivalDay", TypeName = "int(11)")]
     public int? SurvivalDay { get; set; }
 

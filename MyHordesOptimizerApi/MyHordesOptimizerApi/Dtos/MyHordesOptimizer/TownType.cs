@@ -9,14 +9,20 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer
     [JsonConverter(typeof(StringEnumConverter))]
     public enum TownType
     {
+        // Le nom des membres doit correspondre exactement à la valeur attendue par le front (cf.
+        // _types.ts : TownTypeId = 'RNE' | 'PANDE' | 'RE' | 'CUSTOM') : le JsonStringEnumConverter
+        // global (Program.cs) sérialise sur le nom du membre, pas sur [EnumMember]/[Description].
         [Description("RNE")]
         [EnumMember(Value = "RNE")]
-        Rne,
+        RNE,
         [Description("PANDE")]
         [EnumMember(Value = "PANDE")]
-        Pande,
+        PANDE,
         [Description("RE")]
         [EnumMember(Value = "RE")]
-        Re
+        RE,
+        [Description("CUSTOM")]
+        [EnumMember(Value = "CUSTOM")]
+        CUSTOM
     }
 }

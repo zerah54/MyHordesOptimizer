@@ -29,6 +29,20 @@ namespace MyHordesOptimizerApi
             base.OnConfiguring(optionsBuilder);
         }
 
+        // Le client (front/addon) envoie toujours le mapId de la ville, jamais le townId stable
+        // attribué par l'import global. Si la ville a été migrée vers ce townId, MapId conserve
+        // l'ancien mapId d'origine : on retrouve alors la vraie ligne. Sinon (pas encore migrée),
+        // la ligne provisoire vit sous IdTown = -mapId (cf. TownMappingProfile) : un townId réel
+        // étant toujours positif, ça exclut structurellement toute collision entre les deux espaces.
+        public int ResolveTownId(int townId)
+        {
+            var resolved = this.Towns
+                .Where(t => t.MapId == townId)
+                .Select(t => (int?)t.IdTown)
+                .FirstOrDefault();
+            return resolved ?? -townId;
+        }
+
         public IQueryable<TownCitizen> GetTownCitizen(int townId)
         {
             return this.TownCitizens.Where(townCitizen => townCitizen.IdTown == townId)

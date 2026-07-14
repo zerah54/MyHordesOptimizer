@@ -21,7 +21,7 @@ namespace MyHordesOptimizerApi.MappingProfiles.Citizens
 
             CreateMap<TownCitizen, CitizenDto>()
                 .ForMember(dto => dto.ActionsHeroic, opt => opt.MapFrom(model => model))
-                .ForMember(dto => dto.Avatar, opt => opt.MapFrom(model => model.Avatar))
+                .ForMember(dto => dto.Avatar, opt => opt.MapFrom(model => model.IdUserNavigation.Avatar))
                 .ForMember(dto => dto.Bag, opt => opt.MapFrom(model => model.IdBagNavigation))
                 .ForMember(dto => dto.Baths, opt => opt.MapFrom(model => model.IdTownNavigation.TownCitizenBaths.Where(townBath => townBath.IdUser == model.IdUser)))
                 .ForMember(dto => dto.Cadaver, opt => opt.Ignore()) // ??

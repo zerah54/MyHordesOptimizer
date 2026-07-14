@@ -75,7 +75,7 @@
                             </th>
 
                             <td mat-cell *matCellDef="let row">
-                                @defer (on viewport) {
+                                <mho-deferred-cell>
                                     @switch (column.id) {
                                         @case ('sort') {
                                             <div cdkDragHandle
@@ -208,9 +208,7 @@
                                             </button>
                                         }
                                     }
-                                } @placeholder {
-                                    <div class="defered-cell"></div>
-                                }
+                                </mho-deferred-cell>
                             </td>
                         </ng-container>
                     }

@@ -2,7 +2,7 @@ import { getWishlist } from '../api/wishlist';
 import { mh_optimizer_icon, repo_img_hordes_url } from '../config/constants';
 import { texts, wishlist_depot, wishlist_headers, wishlist_title } from '../i18n/texts';
 import { state } from '../state';
-import type { WishlistItem } from '../types';
+import type { MhoItem, WishlistItem } from '../types';
 import { getI18N } from '../utils/i18n';
 import { getItemFromImg } from '../utils/item-lookup';
 import { fixMhCompiledImg } from '../utils/misc';
@@ -14,8 +14,8 @@ import { getCurrentPosition } from '../utils/position';
 export function displayWishlistInApp(count = 0) {
     let wishlist_section = document.getElementById('wishlist-section');
 
-    let is_desert = pageIsDesert();
-    let is_workshop = pageIsWorkshop();
+    let is_desert: boolean = pageIsDesert();
+    let is_workshop: boolean = pageIsWorkshop();
     if (state.wishlist && state.mho_parameters.display_wishlist && (is_workshop || is_desert)) {
         if (wishlist_section) return;
 
@@ -28,15 +28,15 @@ export function displayWishlistInApp(count = 0) {
 
         if (!zone_to_insert) return;
 
-        let used_wishlist = getWishlistForZone();
+        let used_wishlist: WishlistItem[] = getWishlistForZone();
 
         if (!used_wishlist) return;
 
-        let list_to_display = used_wishlist.filter((item) => {
+        let list_to_display: WishlistItem[] = used_wishlist.filter((item: WishlistItem) => {
             if (is_workshop) {
                 return item.isWorkshop;
             } else {
-                let items_in_cell = Array.from(document.querySelectorAll('.inventory li.item img')).map((item_element) => getItemFromImg(item_element.src));
+                let items_in_cell: MhoItem[] = Array.from(document.querySelectorAll('.inventory li.item img')).map((item_element: HTMLImageElement) => getItemFromImg(item_element.src));
                 return items_in_cell.some((item_in_cell) => item_in_cell?.id === item.item.id);
             }
         });
@@ -44,10 +44,10 @@ export function displayWishlistInApp(count = 0) {
         if (is_workshop && list_to_display.length === 0) return;
 
         let refreshWishlist = () => {
-            let update_section = document.createElement('div');
+            let update_section: HTMLDivElement = document.createElement('div');
             header.appendChild(update_section);
 
-            let last_update = document.createElement('span');
+            let last_update: HTMLSpanElement = document.createElement('span');
             last_update.classList.add('small');
             last_update.setAttribute('style', 'margin-right: 0.5em;');
             if (state.wishlist.lastUpdateInfo) {
@@ -58,7 +58,7 @@ export function displayWishlistInApp(count = 0) {
             }
             update_section.appendChild(last_update);
 
-            let update_btn = document.createElement('button');
+            let update_btn: HTMLButtonElement = document.createElement('button');
             update_btn.classList.add('inline');
             update_btn.innerText = getI18N(texts.update);
             update_btn.addEventListener('click', () => {
@@ -74,18 +74,18 @@ export function displayWishlistInApp(count = 0) {
             });
             update_section.appendChild(update_btn);
 
-            let list = document.createElement('div');
+            let list: HTMLDivElement = document.createElement('div');
             list.classList.add('row-table');
             content.appendChild(list);
 
-            let list_header = document.createElement('div');
+            let list_header: HTMLDivElement = document.createElement('div');
             list_header.classList.add('row-flex', 'mho-header', 'bottom');
             list.appendChild(list_header);
 
             wishlist_headers
                 .filter((header_cell_item) => header_cell_item.id !== 'delete')
                 .forEach((header_cell_item) => {
-                    let header_cell = document.createElement('div');
+                    let header_cell: HTMLDivElement = document.createElement('div');
                     header_cell.classList.add('padded', 'cell');
                     header_cell.classList.add(header_cell_item.id === 'label' ? 'rw-5' : (header_cell_item.id === 'depot' ? 'rw-3' : 'rw-2'));
                     header_cell.innerText = getI18N(header_cell_item.label);
@@ -93,37 +93,37 @@ export function displayWishlistInApp(count = 0) {
                 });
 
             list_to_display
-                .forEach((item) => {
-                    let list_item = document.createElement('div');
+                .forEach((item: WishlistItem) => {
+                    let list_item: HTMLDivElement = document.createElement('div');
                     list_item.classList.add('row-flex');
                     list.appendChild(list_item);
 
-                    let title = document.createElement('div');
+                    let title: HTMLDivElement = document.createElement('div');
                     title.classList.add('padded', 'cell', 'rw-5');
                     title.innerHTML = `<img src="${repo_img_hordes_url + item.item.img}" style="margin-right: 5px" /><span class="small">${getI18N(item.item.label)}</span>`;
                     list_item.appendChild(title);
 
-                    let item_depot = document.createElement('span');
+                    let item_depot: HTMLSpanElement = document.createElement('span');
                     item_depot.classList.add('padded', 'cell', 'rw-3');
                     item_depot.innerHTML = `<span class="small">${getI18N(wishlist_depot.find((depot) => item.depot === depot.value).label)}</span>`;
                     list_item.appendChild(item_depot);
 
-                    let bank_count = document.createElement('span');
+                    let bank_count: HTMLSpanElement = document.createElement('span');
                     bank_count.classList.add('padded', 'cell', 'rw-2');
                     bank_count.innerHTML = `<span class="small">${item.bankCount}</span>`;
                     list_item.appendChild(bank_count);
 
-                    let bag_count = document.createElement('span');
+                    let bag_count: HTMLSpanElement = document.createElement('span');
                     bag_count.classList.add('padded', 'cell', 'rw-2');
                     bag_count.innerHTML = `<span class="small">${item.bagCount}</span>`;
                     list_item.appendChild(bag_count);
 
-                    let bank_need = document.createElement('span');
+                    let bank_need: HTMLSpanElement = document.createElement('span');
                     bank_need.classList.add('padded', 'cell', 'rw-2');
                     bank_need.innerHTML = `<span class="small">${item.count >= 0 ? item.count : '∞'}</span>`;
                     list_item.appendChild(bank_need);
 
-                    let needed = document.createElement('span');
+                    let needed: HTMLSpanElement = document.createElement('span');
                     needed.classList.add('padded', 'cell', 'rw-2');
                     needed.innerHTML = `<span class="small">${item.count >= 0 ? (item.count - item.bankCount - item.bagCount) : '∞'}</span>`;
                     list_item.appendChild(needed);

@@ -4,6 +4,7 @@ import { TownListItemDTO } from './town-list-item.dto';
 export interface TownListQuery {
     season?: number;
     phase?: TownPhase;
+    playerId?: number;
     page: number;
     pageSize: number;
     sortColumn?: string;
@@ -13,7 +14,6 @@ export interface TownListQuery {
     types?: TownTypeId[];
     languages?: string[];
     states?: TownState[];
-    refresh?: boolean;
 }
 
 export interface TownListPageResultDTO {

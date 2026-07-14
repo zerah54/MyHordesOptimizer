@@ -1,0 +1,164 @@
+<div class="data-import">
+
+    <section class="import-section">
+        <h3 i18n>Tout importer</h3>
+        <p class="import-desc" i18n>
+            Importe tous les référentiels depuis l'API MyHordes en une seule opération.
+        </p>
+        <div class="import-actions">
+            <button mat-flat-button color="primary"
+                    [disabled]="loadingAll()"
+                    (click)="importAll()">
+                @if (loadingAll()) {
+                    <mat-spinner diameter="20"/>
+                } @else {
+                    <ng-container>
+                        <mat-icon fontSet="material-symbols-outlined">download</mat-icon>
+                        <ng-container i18n>Importer toutes les données</ng-container>
+                    </ng-container>
+                }
+            </button>
+            @if (resultAll() === 'success') {
+                <mat-icon class="result-icon success" fontSet="material-symbols-outlined"
+                          matTooltip="Import réussi" i18n-matTooltip>check_circle
+                </mat-icon>
+            }
+            @if (resultAll() === 'error') {
+                <mat-icon class="result-icon error" fontSet="material-symbols-outlined"
+                          matTooltip="Erreur lors de l'import" i18n-matTooltip>error
+                </mat-icon>
+            }
+        </div>
+    </section>
+
+    <mat-divider/>
+
+    <section class="import-section">
+        <h3 i18n>Imports individuels</h3>
+        <div class="import-grid">
+            @for (action of importActions; track action.key) {
+                <div class="import-item">
+                    <button mat-stroked-button
+                            [disabled]="isLoading(action.key)"
+                            (click)="runImport(action)">
+                        @if (isLoading(action.key)) {
+                            <mat-spinner diameter="18"/>
+                        } @else {
+                            <ng-container>
+                                <mat-icon fontSet="material-symbols-outlined">{{ action.icon }}</mat-icon>
+                                {{ action.label }}
+                            </ng-container>
+                        }
+                    </button>
+                    @if (getResult(action.key) === 'success') {
+                        <mat-icon class="result-icon success" fontSet="material-symbols-outlined"
+                                  matTooltip="Import réussi" i18n-matTooltip>check_circle
+                        </mat-icon>
+                    }
+                    @if (getResult(action.key) === 'error') {
+                        <mat-icon class="result-icon error" fontSet="material-symbols-outlined"
+                                  matTooltip="Erreur lors de l'import" i18n-matTooltip>error
+                        </mat-icon>
+                    }
+                </div>
+            }
+        </div>
+    </section>
+
+    <mat-divider/>
+
+    <section class="import-section">
+        <h3 i18n>Villes des saisons passées</h3>
+        <p class="import-desc" i18n>
+            Importe les données des villes depuis l'API MyHordes (<code>/json/towns</code>).
+            Laisse le filtre vide pour toutes les saisons, ou sélectionne une saison spécifique.
+        </p>
+        <div class="import-actions">
+            <mat-form-field appearance="outline" class="season-select">
+                <mat-label i18n>Saison</mat-label>
+                <mat-select [formControl]="seasonControl">
+                    <mat-option [value]="null" i18n>Toutes les saisons</mat-option>
+                    @for (season of seasons(); track season.id) {
+                        <mat-option [value]="season.id">
+                            S{{ season.id }}
+                            @if (season.isFinished) {
+                                <mat-icon fontSet="material-symbols-outlined"
+                                          class="season-finished-icon"
+                                          matTooltip="Saison terminée" i18n-matTooltip>lock
+                                </mat-icon>
+                            }
+                        </mat-option>
+                    }
+                </mat-select>
+            </mat-form-field>
+            <button mat-flat-button color="primary"
+                    [disabled]="loadingTowns()"
+                    (click)="importTowns()">
+                @if (loadingTowns()) {
+                    <mat-spinner diameter="20"/>
+                } @else {
+                    <ng-container>
+                        <mat-icon fontSet="material-symbols-outlined">location_city</mat-icon>
+                        <ng-container i18n>Importer les villes</ng-container>
+                    </ng-container>
+                }
+            </button>
+            @if (resultTowns() === 'success') {
+                <mat-icon class="result-icon success" fontSet="material-symbols-outlined"
+                          matTooltip="Import réussi" i18n-matTooltip>check_circle
+                </mat-icon>
+            }
+            @if (resultTowns() === 'error') {
+                <mat-icon class="result-icon error" fontSet="material-symbols-outlined"
+                          matTooltip="Erreur lors de l'import" i18n-matTooltip>error
+                </mat-icon>
+            }
+        </div>
+
+        @if (seasons().length > 0) {
+            <div class="seasons-list">
+                <h4 i18n>Marquer une saison comme terminée</h4>
+                <p class="import-desc" i18n>
+                    Une saison terminée ne sera plus jamais mise à jour automatiquement.
+                </p>
+                <div class="import-grid">
+                    @for (season of seasons(); track season.id) {
+                        <div class="import-item">
+                            <button mat-stroked-button
+                                    [disabled]="isFinishLoading(season.id)"
+                                    [matTooltip]="season.isFinished ? 'Marquer comme non terminée' : 'Marquer comme terminée'"
+                                    i18n-matTooltip
+                                    (click)="toggleSeasonFinished(season.id, season.isFinished)">
+                                @if (isFinishLoading(season.id)) {
+                                    <mat-spinner diameter="18"/>
+                                } @else if (season.isFinished) {
+                                    <ng-container>
+                                        <mat-icon fontSet="material-symbols-outlined">lock</mat-icon>
+                                        <span>S{{ season.id }}</span>
+                                    </ng-container>
+                                } @else {
+                                    <ng-container>
+                                        <mat-icon fontSet="material-symbols-outlined">lock_open</mat-icon>
+                                        <span>S{{ season.id }}</span>
+                                    </ng-container>
+                                }
+                            </button>
+                            @if (getFinishResult(season.id) === 'success') {
+                                <mat-icon class="result-icon success" fontSet="material-symbols-outlined"
+                                          [matTooltip]="season.isFinished ? 'Saison marquée terminée' : 'Saison marquée non terminée'"
+                                          i18n-matTooltip>check_circle
+                                </mat-icon>
+                            }
+                            @if (getFinishResult(season.id) === 'error') {
+                                <mat-icon class="result-icon error" fontSet="material-symbols-outlined"
+                                          matTooltip="Erreur" i18n-matTooltip>error
+                                </mat-icon>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+    </section>
+
+</div>

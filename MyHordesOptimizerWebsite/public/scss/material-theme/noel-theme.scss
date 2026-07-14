@@ -89,7 +89,7 @@ $tertiary-palette: map.merge(map.get($_palettes, tertiary), $_rest);
     --mat-sys-on-surface: #1A1C19;
     --mat-sys-on-surface-variant: rgba(0, 0, 0, 0.6); // textes secondaires / hints
     --mat-sys-surface-container-low: #E8F5E9; // menus, tables, panneaux de select
-    --mat-sys-outline: rgba(0, 0, 0, 0.24); // bordures discrètes (champs, tables…)
+    --mat-sys-outline: rgba(0, 0, 0, 0.24); // bordures discrètes (champs, tables...)
     --mat-sys-outline-variant: rgba(0, 0, 0, 0.12);
 
     --mat-sys-primary-container: #{$_brand};

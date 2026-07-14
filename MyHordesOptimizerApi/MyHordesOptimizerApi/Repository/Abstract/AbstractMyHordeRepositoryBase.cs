@@ -26,6 +26,9 @@ namespace MyHordesOptimizerApi.Repository.Abstract
         protected const string EndpointMe = "me";
         protected const string EndpointRuins = "ruins";
         protected const string EndpointBuilding = "buildings";
+        protected const string EndpointTownList = "townlist";
+        protected const string EndpointTowns = "towns";
+        protected const string EndpointMap = "map";
 
 
         protected AbstractMyHordeRepositoryBase(ILogger<AbstractMyHordeRepositoryBase> logger,

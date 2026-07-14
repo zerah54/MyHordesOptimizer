@@ -28,7 +28,7 @@ body {
 }
 
 a {
-    color: variables.$warn;
+    color: variables.$tertiary;
 
     &:hover {
         color: variables.$secondary;
@@ -87,4 +87,8 @@ a {
     width: 100%;
     height: 1em;
     background-color: rgba(0, 0, 0, 0.25);
+}
+
+.citizens-tooltip {
+    white-space: pre-line;
 }

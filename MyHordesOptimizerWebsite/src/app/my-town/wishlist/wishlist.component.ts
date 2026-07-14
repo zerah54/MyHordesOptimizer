@@ -47,6 +47,7 @@ import { WishlistItem } from '../../_abstract_model/types/wishlist-item.class';
 import { ColumnIdPipe } from '../../_core/pipes/column-id.pipe';
 import { ClipboardService } from '../../_core/services/clipboard.service';
 import { ConfirmDialogComponent, ConfirmDialogData } from '../../_shared/confirm-dialog/confirm-dialog.component';
+import { DeferredCellComponent } from '../../_shared/deferred-cell/deferred-cell.component';
 import { LastUpdateComponent } from '../../_shared/last-update/last-update.component';
 import { HeaderWithStringFilterComponent } from '../../_shared/lists/header-with-string-filter/header-with-string-filter.component';
 import { SelectComponent } from '../../_shared/select/select.component';
@@ -54,7 +55,7 @@ import { IsItemDisplayedPipe } from './is-item-displayed.pipe';
 import { ItemAlreadyInListPipe } from './item-already-in-list.pipe';
 
 const angular_common: Imports = [CommonModule, FormsModule, NgOptimizedImage];
-const components: Imports = [HeaderWithStringFilterComponent, LastUpdateComponent, SelectComponent];
+const components: Imports = [DeferredCellComponent, HeaderWithStringFilterComponent, LastUpdateComponent, SelectComponent];
 const pipes: Imports = [ColumnIdPipe, IsItemDisplayedPipe];
 const material_modules: Imports = [DragDropModule, MatButtonModule, MatCardModule, MatCheckboxModule, MatFormFieldModule, MatIconModule, MatInputModule, MatMenuModule, MatOptionModule, MatSelectModule, MatSlideToggleModule, MatTableModule, MatTooltipModule];
 

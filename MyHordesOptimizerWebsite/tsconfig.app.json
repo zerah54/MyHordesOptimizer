@@ -2,9 +2,14 @@
     "extends": "./tsconfig.json",
     "compilerOptions": {
         "outDir": "./out-tsc/app",
+        "typeRoots": [
+            "node_modules/@types",
+            "node_modules"
+        ],
         "types": [
             "node",
-            "@angular/localize"
+            "@angular/localize",
+            "@webgpu/types"
         ]
     },
     "files": [

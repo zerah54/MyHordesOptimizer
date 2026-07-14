@@ -30,6 +30,9 @@ namespace MyHordesOptimizerApi.Dtos.MyHordes
         [JsonProperty("devast")]
         public bool Devast { get; set; }
 
+        [JsonProperty("type")]
+        public string Type { get; set; }
+
         [JsonProperty("chantiers")]
         public List<MyHordesChantier> Chantiers { get; set; }
 

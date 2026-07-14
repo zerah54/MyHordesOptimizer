@@ -48,6 +48,9 @@ namespace MyHordesOptimizerApi.Dtos.MyHordes
         [JsonProperty("season")]
         public int Season { get; set; }
 
+        [JsonProperty("phase")]
+        public string Phase { get; set; }
+
         [JsonProperty("shaman")]
         public int Shaman { get; set; }
 

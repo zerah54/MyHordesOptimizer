@@ -5,6 +5,8 @@ using Discord.Interactions;
 
 namespace MyHordesOptimizerApi.DiscordBot.Modules
 {
+    [IntegrationType(ApplicationIntegrationType.GuildInstall, ApplicationIntegrationType.UserInstall)]
+    [CommandContextType(InteractionContextType.Guild, InteractionContextType.BotDm, InteractionContextType.PrivateChannel)]
     public class EmbedMessagesModule : InteractionModuleBase<SocketInteractionContext>
     {
 

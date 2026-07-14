@@ -45,13 +45,11 @@ namespace MyHordesOptimizerApi.MappingProfiles
             //User
             CreateMap<CitizenDto, User>()
                 .ForMember(dest => dest.IdUser, opt => opt.MapFrom(src => src.Id))
-                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
-                .ForMember(dest => dest.UserKey, opt => opt.Ignore());
+                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name));
 
             CreateMap<CadaverDto, User>()
                .ForMember(dest => dest.IdUser, opt => opt.MapFrom(src => src.Id))
-               .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
-               .ForMember(dest => dest.UserKey, opt => opt.Ignore());
+               .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name));
 
             //TownCitizen
             CreateMap<CitizenDto, TownCitizen>()
@@ -71,8 +69,6 @@ namespace MyHordesOptimizerApi.MappingProfiles
             //TownCadaver
             CreateMap<CadaverDto, TownCadaver>()
                 .ForMember(dest => dest.IdUser, opt => opt.MapFrom(src => src.Id))
-                .ForMember(dest => dest.CadaverName, opt => opt.MapFrom(src => src.Name))
-                .ForMember(dest => dest.Avatar, opt => opt.MapFrom(src => src.Avatar))
                 .ForMember(dest => dest.CauseOfDeath, opt => opt.Ignore())
                 .ForMember(dest => dest.DeathMessage, opt => opt.MapFrom(src => src.Msg))
                 .ForMember(dest => dest.TownMessage, opt => opt.MapFrom(src => src.TownMsg))

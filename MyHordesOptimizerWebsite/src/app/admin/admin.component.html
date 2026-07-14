@@ -2,5 +2,15 @@
     <mat-card-title i18n>Administration</mat-card-title>
 </mat-card-header>
 <mat-card-content>
-    <mho-log-viewer></mho-log-viewer>
+    <mat-tab-group>
+        <mat-tab label="Logs" i18n-label>
+            <mho-log-viewer/>
+        </mat-tab>
+        <mat-tab label="Import données jeu" i18n-label>
+            <mho-data-import/>
+        </mat-tab>
+        <mat-tab label="Villes" i18n-label>
+            <mho-admin-towns/>
+        </mat-tab>
+    </mat-tab-group>
 </mat-card-content>

@@ -31,9 +31,6 @@ namespace MyHordesOptimizerApi.Dtos.MyHordes.Town
         [JsonProperty("score")]
         public int? Score { get; set; }
 
-        [JsonProperty("sp")]
-        public int? Sp { get; set; }
-
         [JsonProperty("wid")]
         public int? Wid { get; set; }
 

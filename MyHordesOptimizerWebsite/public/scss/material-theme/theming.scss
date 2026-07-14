@@ -7,18 +7,10 @@
 
 @use 'variables';
 
-// Overrides de composants applicables à toute l'app. Ils utilisent des var() qui se
-// résolvent par thème, donc le même mixin convient à tous les thèmes.
-//
-// IMPORTANT : à ré-appliquer DANS chaque scope de thème (après le mixin de thème). En effet
-// mat.theme() (appelé dans chaque mixin de thème) ré-émet certains défauts — ex.
-// --mat-form-field-filled-label-display, --mat-toolbar-standard-height — à la spécificité du
-// sélecteur de thème (body:has(.pink)). Un override placé seulement au niveau `body` serait
-// alors écrasé dans le scope rose. On l'inclut donc aussi sous `&:has(.pink)`.
 @mixin app-component-overrides() {
     @include mat.toolbar-overrides((
         container-background-color: var(--mat-sys-primary-container),
-        container-text-color: var(--mat-sys-on-primary-container),
+        container-text-color: var(--mat-toolbar-container-text-color),
         standard-height: 52px
     ));
 
@@ -42,6 +34,9 @@
 
     @include mat.tabs-overrides((
         divider-height: 0,
+        inactive-focus-label-text-color: var(--mat-sys-primary-container),
+        inactive-hover-label-text-color: var(--mat-sys-primary-container),
+        active-label-text-color: var(--mat-sys-primary-container)
     ));
 
     @include mat.table-overrides((
@@ -67,6 +62,12 @@
         selected-state-background-color: variables.$primary,
         selected-state-text-color: white,
     ));
+
+    @include mat.button-overrides((
+        protected-label-text-color: var(--mat-sys-on-surface),
+        outlined-label-text-color: var(--mat-sys-on-surface),
+        filled-label-text-color: var(--mat-sys-on-surface)
+    ))
 }
 
 html:has(.mho-main) {

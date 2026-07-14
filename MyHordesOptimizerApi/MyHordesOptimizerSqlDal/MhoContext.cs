@@ -103,7 +103,13 @@ public partial class MhoContext : DbContext
 
     public virtual DbSet<TownWishListItem> TownWishListItems { get; set; }
 
+    public virtual DbSet<Season> Seasons { get; set; }
+
     public virtual DbSet<User> Users { get; set; }
+
+    public virtual DbSet<Picto> Pictos { get; set; }
+
+    public virtual DbSet<UserPicto> UserPictos { get; set; }
 
     public virtual DbSet<WishlistCategorie> WishlistCategories { get; set; }
 
@@ -614,9 +620,9 @@ public partial class MhoContext : DbContext
 
         modelBuilder.Entity<TownCitizen>(entity =>
         {
-            entity.HasKey(e => new { e.IdTown, e.IdUser, e.IdLastUpdateInfo })
+            entity.HasKey(e => new { e.IdTown, e.IdUser })
                 .HasName("PRIMARY")
-                .HasAnnotation("MySql:IndexPrefixLength", new[] { 0, 0, 0 });
+                .HasAnnotation("MySql:IndexPrefixLength", new[] { 0, 0 });
 
             entity.Property(e => e.Apagcharges).HasDefaultValueSql("-1");
             entity.Property(e => e.ChestLevel).HasDefaultValueSql("'0'");
@@ -706,6 +712,28 @@ public partial class MhoContext : DbContext
             entity.Property(e => e.IdUser).ValueGeneratedNever();
         });
 
+        modelBuilder.Entity<Picto>(entity =>
+        {
+            entity.HasKey(e => e.IdPicto).HasName("PRIMARY");
+
+            entity.Property(e => e.IdPicto).ValueGeneratedNever();
+        });
+
+        modelBuilder.Entity<UserPicto>(entity =>
+        {
+            entity.HasKey(e => new { e.IdUser, e.IdPicto })
+                .HasName("PRIMARY")
+                .HasAnnotation("MySql:IndexPrefixLength", new[] { 0, 0 });
+
+            entity.HasOne(d => d.IdUserNavigation).WithMany(p => p.UserPictos)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("UserPicto_fk_user");
+
+            entity.HasOne(d => d.IdPictoNavigation).WithMany(p => p.UserPictos)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("UserPicto_fk_picto");
+        });
+
         modelBuilder.Entity<WishlistCategorie>(entity =>
         {
             entity.HasKey(e => e.IdCategory).HasName("PRIMARY");
@@ -737,6 +765,15 @@ public partial class MhoContext : DbContext
                             .HasColumnType("int(11)")
                             .HasColumnName("idItem");
                     });
+        });
+
+        modelBuilder.Entity<Season>(entity =>
+        {
+            entity.HasKey(e => e.IdSeason).HasName("PRIMARY");
+
+            entity.Property(e => e.IdSeason).ValueGeneratedNever();
+            entity.Property(e => e.IsCurrent).HasDefaultValueSql("b'0'");
+            entity.Property(e => e.IsFinished).HasDefaultValueSql("b'0'");
         });
 
         OnModelCreatingPartial(modelBuilder);

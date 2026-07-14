@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using MyHordesOptimizerApi.Configuration.Interfaces;
 using MyHordesOptimizerApi.Dtos.MyHordes;
+using MyHordesOptimizerApi.Dtos.MyHordes.Me;
 using MyHordesOptimizerApi.Dtos.MyHordes.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Citizens;
@@ -61,6 +62,7 @@ namespace MyHordesOptimizerApi.Services.Impl
             var sw = new Stopwatch();
             if (townId.HasValue)
             {
+                townId = DbContext.ResolveTownId(townId.Value);
                 sw.Start();
                 var townBankItemLastUpdateId = DbContext.TownBankItems.Where(tbi => tbi.IdTown == townId).Max(tbi => (int?)tbi.IdLastUpdateInfo);
                 var items = DbContext.Items
@@ -133,7 +135,7 @@ namespace MyHordesOptimizerApi.Services.Impl
             Logger.LogDebug($"GetSimpleMeAsync Lock ok après {sw.Elapsed} ms");
             try
             {
-                if (myHordeMeResponse.Map != null) // Si l'utilisateur est en ville
+                if (myHordeMeResponse.Map != null && !HasTownIdCollision(myHordeMeResponse)) // Si l'utilisateur est en ville
                 {
                     Logger.LogDebug($"GetSimpleMeAsync User en ville !");
 
@@ -147,6 +149,14 @@ namespace MyHordesOptimizerApi.Services.Impl
                         DbContext.ChangeTracker.Clear();
                         Logger.LogDebug($"GetSimpleMeAsync Création du user en DB après {sw.Elapsed} ms");
                     }
+
+                    // Mise à jour de l'avatar à chaque connexion
+                    // ExecuteUpdate : pas de tracking, évite tout conflit d'identité avec
+                    // les User résolus plus loin (LastUpdateInfo, TownCitizen.IdUserNavigation)
+                    DbContext.Users
+                        .Where(u => u.IdUser == UserInfoProvider.UserId && u.Avatar != myHordeMeResponse.Avatar)
+                        .ExecuteUpdate(setters => setters.SetProperty(u => u.Avatar, myHordeMeResponse.Avatar));
+
                     using var transaction = DbContext.Database.BeginTransaction();
                     var newLastUpdate = DbContext.LastUpdateInfos.Update(Mapper.Map<LastUpdateInfo>(UserInfoProvider.GenerateLastUpdateInfo()));
                     DbContext.SaveChanges();
@@ -155,6 +165,10 @@ namespace MyHordesOptimizerApi.Services.Impl
                     Logger.LogDebug($"GetSimpleMeAsync Récupération du lastupdate {sw.Elapsed} ms");
                     myHordeMeResponse.Map.LastUpdateInfo = lastUpdate;
                     var town = Mapper.Map<Town>(myHordeMeResponse, opts => opts.SetDbContext(DbContext));
+                    // Garde-fou : cette ville est celle où le citoyen connecté se trouve actuellement,
+                    // elle ne peut donc pas être terminée, même si l'import global l'a marquée à tort
+                    // (le endpoint /json/towns en bulk ne remonte parfois que des citoyens déjà morts).
+                    town.IsFinished = false;
                     var citizens = town.TownCitizens;
                     town.TownCitizens = null;
                     var bankItems = town.TownBankItems;
@@ -191,31 +205,63 @@ namespace MyHordesOptimizerApi.Services.Impl
                     else
                     {
                         Logger.LogDebug($"GetSimpleMeAsync La Town existe {town.IdTown} !");
-                        // On met à jour la ville
-                        existingTown.UpdateNoNullProperties(town);
+                        // On met à jour la ville (logique partagée avec les outils externes et l'import)
+                        existingTown.UpdateFromMapDetails(myHordeMeResponse.Map);
+                        if (myHordeMeResponse.MapId > 0)
+                        {
+                            existingTown.MapId = myHordeMeResponse.MapId;
+                        }
+                        // La langue n'est pas portée par /json/map : on la rafraîchit depuis le locale
+                        // du citoyen connecté (UpdateFromMapDetails ne peut pas la déduire de la carte).
+                        if (!string.IsNullOrEmpty(myHordeMeResponse.Locale))
+                        {
+                            existingTown.Language = myHordeMeResponse.Locale;
+                        }
+                        // Garde-fou : le citoyen connecté est dans cette ville, elle ne peut pas être terminée
+                        existingTown.IsFinished = false;
                         DbContext.Update(existingTown);
                         // On ajoute une nouvelle banque avec un nouveau lastupdate
                         DbContext.AddRange(bankItems);
-                        // On maj les citoyen en gardant tout ce qui remonte pas de MH
-                        DbContext.RemoveRange(existingTown.TownCitizens);
-                        foreach (var citizen in existingTown.TownCitizens)
+                        // On maj les citoyens en place, sans jamais supprimer de ligne :
+                        // le TownCitizen d'un mort est conservé (Dead = true) et le détail
+                        // qui ne remonte pas de MH (maison, actions héroïques, statuts,
+                        // chaman, sac) est préservé grâce à ignoreNull
+                        foreach (var c in citizens)
                         {
-                            foreach (var c in citizens)
+                            var existingCitizen = existingTown.TownCitizens.FirstOrDefault(citizen => citizen.IdUser == c.IdUser);
+                            if (existingCitizen == null)
                             {
-                                if (c.IdUser == citizen.IdUser)
-                                {
-                                    c.ImportHomeDetail(citizen);
-                                    c.ImportHeroicActionDetail(citizen);
-                                    c.ImportStatusDetail(citizen);
-                                    c.ImportChamanicDetail(citizen);
-                                    c.IdBag = citizen.IdBag;
-                                }
+                                DbContext.Add(c);
+                            }
+                            else
+                            {
+                                existingCitizen.UpdateAllButKeysProperties(c, ignoreNull: true);
+                                existingCitizen.IdLastUpdateInfo = lastUpdate.IdLastUpdateInfo;
                             }
                         }
-                        DbContext.AddRange(citizens);
-                        // On maj les cadavers
-                        DbContext.RemoveRange(existingTown.TownCadavers);
-                        DbContext.AddRange(cadavers);
+                        // Les citoyens passés côté cadavres ne sont plus listés dans map.citizens :
+                        // on marque leur ligne comme morte au lieu de la perdre
+                        foreach (var cadaver in cadavers)
+                        {
+                            var deadCitizen = existingTown.TownCitizens.FirstOrDefault(citizen => citizen.IdUser == cadaver.IdUser);
+                            if (deadCitizen != null)
+                            {
+                                deadCitizen.Dead = true;
+                            }
+                        }
+                        // On maj les cadavers en place (CleanUp, renseigné à part, est préservé)
+                        foreach (var cadaver in cadavers)
+                        {
+                            var existingCadaver = existingTown.TownCadavers.FirstOrDefault(c => c.IdUser == cadaver.IdUser);
+                            if (existingCadaver == null)
+                            {
+                                DbContext.Add(cadaver);
+                            }
+                            else
+                            {
+                                existingCadaver.UpdateAllButKeysProperties(cadaver, ignoreNull: true);
+                            }
+                        }
                         // On maj les cellsdigs
                         if (DbContext.MapCellDigUpdates.FirstOrDefault(x => x.IdTown == town.IdTown && x.Day == town.Day) == null) // Si on a déjà fait la maj de la regen, il faut pas la refaire
                         {
@@ -345,6 +391,19 @@ namespace MyHordesOptimizerApi.Services.Impl
                     transaction.Commit();
                     Logger.LogDebug($"GetSimpleMeAsync Transaction commit {sw.Elapsed} ms");
                 }
+
+                // Historique des villes terminées du joueur (vies passées) : on les importe / marque
+                // comme terminées. Indépendant du fait que le joueur soit actuellement en ville, et
+                // isolé pour qu'un échec ici ne casse pas la synchro de la ville courante.
+                try
+                {
+                    UpsertPlayedMaps(myHordeMeResponse.PlayedMaps);
+                }
+                catch (Exception ex)
+                {
+                    Logger.LogWarning(ex, "GetSimpleMeAsync: échec de la mise à jour des playedMaps");
+                }
+
                 var simpleMe = Mapper.Map<SimpleMeDto>(myHordeMeResponse);
 
                 return simpleMe;
@@ -358,6 +417,155 @@ namespace MyHordesOptimizerApi.Services.Impl
                 Lock.Release();
                 Logger.LogDebug($"GetSimpleMeAsync Lock released {sw.Elapsed} ms");
             }
+        }
+
+        // Une ligne provisoire (pas encore migrée vers son townId stable) vit sous IdTown = -mapId,
+        // un espace qui ne peut jamais entrer en collision avec un vrai townId (toujours positif).
+        // Le seul risque résiduel : un mapId recyclé d'une saison à l'autre retombant sur une ancienne
+        // ligne provisoire jamais migrée. On la détecte via la saison et on refuse de la réutiliser.
+        private bool HasTownIdCollision(MyHordesMeResponseDto myHordeMeResponse)
+        {
+            var mapId = myHordeMeResponse.MapId;
+            var season = myHordeMeResponse.Map?.Season;
+            var existing = DbContext.Towns.FirstOrDefault(t => t.IdTown == -mapId);
+            if (existing == null) return false;
+            if (!existing.Season.HasValue || !season.HasValue || existing.Season.Value == season.Value) return false;
+
+            Logger.LogError(
+                "GetSimpleMeAsync: mapId {MapId} recyclé — ligne provisoire existante (saison={ExistingSeason}) incompatible avec la ville actuelle (saison={CurrentSeason}). Synchronisation ignorée pour ne pas écraser une ville différente.",
+                mapId, existing.Season, season);
+            return true;
+        }
+
+        // Importe / met à jour les villes de l'historique du joueur (playedMaps = vies passées).
+        // Ce sont toujours des villes TERMINÉES : on peut donc les marquer IsFinished sans ambiguïté,
+        // et on récupère au passage type + score + nom + saison (indisponibles via /json/towns).
+        // Seul le mapId est fourni (pas le townId réel) → on clé par ligne provisoire -mapId, qu'un
+        // import groupé ultérieur pourra migrer vers le townId stable. Un mapId pouvant être recyclé
+        // d'une saison à l'autre, on ne réutilise une ligne existante que si la saison est compatible.
+        private void UpsertPlayedMaps(List<MyHordesPlayedMapDto> playedMaps)
+        {
+            if (playedMaps == null || playedMaps.Count == 0)
+            {
+                return;
+            }
+
+            // L'historique peut compter >100 villes (127 observées en réel) : on charge toutes les lignes
+            // candidates en UNE requête (par townId réel via MapId, ou par clé provisoire -mapId) plutôt
+            // qu'une requête par entrée.
+            var mapIds = playedMaps.Where(p => p.MapId.HasValue).Select(p => p.MapId.Value).Distinct().ToList();
+            if (mapIds.Count == 0)
+            {
+                return;
+            }
+            var provisionalIds = mapIds.Select(id => -id).ToList();
+            var existingTowns = DbContext.Towns
+                .Where(t => (t.MapId.HasValue && mapIds.Contains(t.MapId.Value)) || provisionalIds.Contains(t.IdTown))
+                .ToList();
+
+            // IdTown des villes de l'historique effectivement traitées : sert ensuite à rattacher
+            // le joueur courant à ces villes via TownCitizen (le profil liste les villes par ce lien).
+            var processedTownIds = new HashSet<int>();
+
+            foreach (var played in playedMaps)
+            {
+                if (!played.MapId.HasValue)
+                {
+                    continue;
+                }
+                var mapId = played.MapId.Value;
+
+                var candidates = existingTowns
+                    .Where(t => t.MapId == mapId || t.IdTown == -mapId)
+                    .ToList();
+                var town = candidates.FirstOrDefault(t =>
+                    !t.Season.HasValue || !played.Season.HasValue || t.Season.Value == played.Season.Value);
+
+                if (town == null)
+                {
+                    // Aucune ligne compatible. Si -mapId est déjà occupé par une ville d'une autre saison,
+                    // on ne l'écrase pas (même garde-fou que HasTownIdCollision).
+                    if (candidates.Any(t => t.IdTown == -mapId))
+                    {
+                        Logger.LogWarning("UpsertPlayedMaps: mapId {MapId} recyclé (ligne provisoire d'une autre saison) — entrée ignorée.", mapId);
+                        continue;
+                    }
+                    town = new Town { IdTown = -mapId, MapId = mapId };
+                    DbContext.Towns.Add(town);
+                    existingTowns.Add(town);
+                }
+
+                processedTownIds.Add(town.IdTown);
+
+                town.IsFinished = true;
+                if (!string.IsNullOrEmpty(played.MapName))
+                {
+                    town.Name = played.MapName;
+                }
+                if (played.Season.HasValue)
+                {
+                    town.Season = played.Season;
+                }
+                if (played.Score.HasValue)
+                {
+                    town.Score = played.Score;
+                }
+                if (played.Day.HasValue)
+                {
+                    town.Day = played.Day.Value;
+                }
+                var phase = TownExtensions.MapTownPhase(played.Phase);
+                if (phase != null)
+                {
+                    town.PhaseId = (int)phase;
+                }
+                var type = TownExtensions.MapTownType(played.Type);
+                if (type != null)
+                {
+                    town.TownTypeId = (int)type;
+                }
+            }
+
+            DbContext.SaveChanges();
+
+            // Rattache le joueur courant à chacune de ses villes d'historique. Sans ce lien TownCitizen,
+            // ses villes terminées n'apparaîtraient pas dans son profil (qui liste les villes via
+            // TownCitizen) : sur une ville terminée, le joueur n'est plus présent dans map.citizens et
+            // n'est donc jamais rattaché par la synchro classique. On ne crée que les liens manquants,
+            // et seulement si l'utilisateur existe déjà en base (playedMaps peut arriver hors ville).
+            var userId = UserInfoProvider.UserId;
+            if (userId > 0 && processedTownIds.Count > 0 && DbContext.Users.Any(u => u.IdUser == userId))
+            {
+                var townIdList = processedTownIds.ToList();
+                var alreadyLinked = new HashSet<int>(DbContext.TownCitizens
+                    .Where(c => c.IdUser == userId && townIdList.Contains(c.IdTown))
+                    .Select(c => c.IdTown)
+                    .ToList());
+                LastUpdateInfo systemLastUpdate = null;
+                foreach (var townId in processedTownIds)
+                {
+                    if (alreadyLinked.Contains(townId))
+                    {
+                        continue;
+                    }
+                    if (systemLastUpdate == null)
+                    {
+                        // LastUpdateInfo « système » partagé : rattachement non lié à une synchro précise.
+                        systemLastUpdate = new LastUpdateInfo { DateUpdate = DateTime.UtcNow };
+                        DbContext.LastUpdateInfos.Add(systemLastUpdate);
+                    }
+                    DbContext.TownCitizens.Add(new TownCitizen
+                    {
+                        IdTown = townId,
+                        IdUser = userId,
+                        IsImmuneToSoul = false,
+                        IdLastUpdateInfoNavigation = systemLastUpdate
+                    });
+                }
+                DbContext.SaveChanges();
+            }
+
+            DbContext.ChangeTracker.Clear();
         }
 
         public IEnumerable<HeroSkillDto> GetHeroSkills()
@@ -434,7 +642,7 @@ namespace MyHordesOptimizerApi.Services.Impl
                 Logger.LogError(e, $"Erreur lors de l'enregistrement de la bank depuis MH : {e}");
             }
             var townDetail = UserInfoProvider.TownDetail;
-            var townId = townDetail.TownId;
+            var townId = DbContext.ResolveTownId(townDetail.TownId);
             if (lastUpdateId == -1)
             {
                 lastUpdateId = DbContext.TownBankItems.Where(tbi => tbi.IdTown == townId).Max(tbi => tbi.IdLastUpdateInfo);
@@ -499,6 +707,7 @@ namespace MyHordesOptimizerApi.Services.Impl
 
         public CitizensLastUpdateDto GetCitizens(int townId)
         {
+            townId = DbContext.ResolveTownId(townId);
             var models = DbContext.GetTownCitizen(townId)
                 .ToList();
             var dtos = Mapper.Map<CitizensLastUpdateDto>(models);
@@ -509,6 +718,7 @@ namespace MyHordesOptimizerApi.Services.Impl
         {
             if (townId.HasValue)
             {
+                townId = DbContext.ResolveTownId(townId.Value);
                 var models = DbContext.MapCells
                      .Where(cell => cell.IdTown == townId)
                      .Where(cell => cell.IdRuin.HasValue)
@@ -554,6 +764,7 @@ namespace MyHordesOptimizerApi.Services.Impl
 
         public MyHordesOptimizerMapDto GetMap(int townId)
         {
+            townId = DbContext.ResolveTownId(townId);
             var model = DbContext.Towns
                 .Where(cell => cell.IdTown == townId)
                 .Include(town => town.MapCells)
@@ -578,6 +789,7 @@ namespace MyHordesOptimizerApi.Services.Impl
 
         public IEnumerable<MyHordesOptimizerMapDigDto> GetMapDigs(int townId)
         {
+            townId = DbContext.ResolveTownId(townId);
             var model = DbContext.Towns
                 .Where(town => town.IdTown == townId)
                 .Include(town => town.MapCells)
@@ -597,6 +809,7 @@ namespace MyHordesOptimizerApi.Services.Impl
 
         public List<MyHordesOptimizerMapDigDto> CreateOrUpdateMapDigs(int townId, int userId, List<MyHordesOptimizerMapDigDto> requests)
         {
+            townId = DbContext.ResolveTownId(townId);
             using var transaction = DbContext.Database.BeginTransaction();
             var newLastUpdate = DbContext.LastUpdateInfos.Update(Mapper.Map<LastUpdateInfo>(UserInfoProvider.GenerateLastUpdateInfo(), opt => opt.SetDbContext(DbContext)));
             DbContext.SaveChanges();
@@ -638,6 +851,7 @@ namespace MyHordesOptimizerApi.Services.Impl
 
         public IEnumerable<MyHordesOptimizerMapUpdateDto> GetMapUpdates(int townId)
         {
+            townId = DbContext.ResolveTownId(townId);
             var models = DbContext.MapCellDigUpdates.Where(x => x.IdTown == townId)
                 .ToList();
             var dtos = Mapper.Map<List<MyHordesOptimizerMapUpdateDto>>(models);

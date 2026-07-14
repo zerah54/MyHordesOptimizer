@@ -68,6 +68,13 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
         {
             var response = new UpdateResponseDto(updateRequestDto);
             var townDetails = updateRequestDto.TownDetails;
+            // Le client envoie toujours le mapId (jamais le townId stable attribué par l'import global) :
+            // on résout une fois ici et on réutilise cette valeur dans toutes les tâches parallèles.
+            int resolvedTownId;
+            using (var resolveScope = ServiceScopeFactory.CreateScope())
+            {
+                resolvedTownId = resolveScope.ServiceProvider.GetRequiredService<MhoContext>().ResolveTownId(townDetails.TownId);
+            }
             var tasks = new List<Task>();
 
             #region Maps
@@ -148,10 +155,26 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                         var listCellItems = new List<MapCellItem>();
                         var driedCell = new List<MapCell>();
 
-                        var townId = me.Map.Id;
+                        var townId = resolvedTownId;
+
+                        var townEntity = dbContext.Towns.Find(townId);
+                        if (townEntity != null)
+                        {
+                            // Mise à jour centralisée : on exploite tout le /json/me déjà payé
+                            // (day, puits, porte, dimensions, coordonnées...), pas seulement 6 champs
+                            townEntity.UpdateFromMapDetails(me.Map);
+                            if (me.MapId > 0)
+                            {
+                                townEntity.MapId = me.MapId;
+                            }
+                            // Garde-fou : le joueur qui met à jour est dans cette ville, elle ne peut pas être terminée
+                            townEntity.IsFinished = false;
+                            dbContext.Update(townEntity);
+                        }
+
                         var zoneItemX = -1;
                         var zoneItemY = -1;
-                        var allCell = dbContext.MapCells.Where(cell => cell.IdTown == updateRequestDto.TownDetails.TownId)
+                        var allCell = dbContext.MapCells.Where(cell => cell.IdTown == townId)
                                                         .ToList();
                         foreach (var zone in zones)
                         {
@@ -238,19 +261,15 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
 
                             if (updateCellDto.CitizenId.Any())
                             {
-                                var citizenModels = dbContext.TownCitizens.Where(citizen => citizen.IdTown == updateRequestDto.TownDetails.TownId
+                                var citizenModels = dbContext.TownCitizens.Where(citizen => citizen.IdTown == townId
                                                                                  && updateCellDto.CitizenId.Contains(citizen.IdUser))
                                                                          .ToList();
-                                dbContext.RemoveRange(citizenModels);
-                                var newCitizenModels = citizenModels.Select(citizen =>
+                                foreach (var citizen in citizenModels)
                                 {
-                                    var newCitizen = citizen.ToJson().FromJson<TownCitizen>();
-                                    newCitizen.PositionX = realX;
-                                    newCitizen.PositionY = realY;
-                                    newCitizen.IdLastUpdateInfo = newLastUpdate.IdLastUpdateInfo;
-                                    var entity = dbContext.Add(newCitizen).Entity;
-                                    return entity;
-                                }).ToList();
+                                    citizen.PositionX = realX;
+                                    citizen.PositionY = realY;
+                                    citizen.IdLastUpdateInfo = newLastUpdate.IdLastUpdateInfo;
+                                }
                                 dbContext.SaveChanges();
                             }
                         }
@@ -353,7 +372,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                 {
                     try
                     {
-                        UpdateBags(townDetails.TownId, updateRequestDto.Bags.Contents);
+                        UpdateBags(resolvedTownId, updateRequestDto.Bags.Contents);
 
                     }
                     catch (Exception e)
@@ -372,7 +391,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
             {
                 var townCitizenDetail = new TownCitizen()
                 {
-                    IdTown = townDetails.TownId,
+                    IdTown = resolvedTownId,
                     IdUser = UserInfoProvider.UserId
                 };
                 var ghUpdateCitizenRequest = new GestHordesMajCitizenRequest(UserInfoProvider.UserId, UserInfoProvider.UserKey);
@@ -513,16 +532,16 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                     var cellDigsToUpdate = new List<MapCellDig>();
                     var realX = updateRequestDto.TownDetails.TownX + successedDig.Cell.X;
                     var realY = updateRequestDto.TownDetails.TownY - successedDig.Cell.Y;
-                    int townId = updateRequestDto.TownDetails.TownId;
+                    var townId = resolvedTownId;
 
-                    var cellId = dbContext.MapCells.Where(cell => cell.IdTown == updateRequestDto.TownDetails.TownId
+                    var cellId = dbContext.MapCells.Where(cell => cell.IdTown == townId
                                                                      && cell.X == realX
                                                                      && cell.Y == realY)
                                                                 .Select(cell => cell.IdCell)
                                                                 .Single();
                     foreach (var dig in successedDig.Values)
                     {
-                        var cellDigModel = dbContext.MapCellDigs.Where(cellDig => cellDig.IdCellNavigation.IdTown == updateRequestDto.TownDetails.TownId
+                        var cellDigModel = dbContext.MapCellDigs.Where(cellDig => cellDig.IdCellNavigation.IdTown == townId
                                                                        && cellDig.Day == successedDig.Cell.Day
                                                                        && cellDig.IdCellNavigation.X == realX
                                                                        && cellDig.IdCellNavigation.Y == realY
@@ -833,6 +852,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
         {
             using var scope = ServiceScopeFactory.CreateScope();
             var dbContext = scope.ServiceProvider.GetRequiredService<MhoContext>();
+            townId = dbContext.ResolveTownId(townId);
             using var transaction = dbContext.Database.BeginTransaction();
             LastUpdateInfoDto lastUpdateInfoDto = UserInfoProvider.GenerateLastUpdateInfo();
             var newLastUpdate = dbContext.LastUpdateInfos.Update(Mapper.Map<LastUpdateInfo>(lastUpdateInfoDto, opt => opt.SetDbContext(dbContext))).Entity;
@@ -878,6 +898,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
         {
             using var scope = ServiceScopeFactory.CreateScope();
             var dbContext = scope.ServiceProvider.GetRequiredService<MhoContext>();
+            townId = dbContext.ResolveTownId(townId);
             using var transaction = dbContext.Database.BeginTransaction();
             LastUpdateInfoDto lastUpdateInfoDto = UserInfoProvider.GenerateLastUpdateInfo();
             var newLastUpdate = dbContext.LastUpdateInfos.Update(Mapper.Map<LastUpdateInfo>(lastUpdateInfoDto, opt => opt.SetDbContext(dbContext))).Entity;
@@ -899,6 +920,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
         {
             using var scope = ServiceScopeFactory.CreateScope();
             var dbContext = scope.ServiceProvider.GetRequiredService<MhoContext>();
+            townId = dbContext.ResolveTownId(townId);
             using var transaction = dbContext.Database.BeginTransaction();
             LastUpdateInfoDto lastUpdateInfoDto = UserInfoProvider.GenerateLastUpdateInfo();
             var newLastUpdate = dbContext.LastUpdateInfos.Update(Mapper.Map<LastUpdateInfo>(lastUpdateInfoDto, opt => opt.SetDbContext(dbContext))).Entity;
@@ -1025,6 +1047,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
         {
             using var scope = ServiceScopeFactory.CreateScope();
             var dbContext = scope.ServiceProvider.GetRequiredService<MhoContext>();
+            townId = dbContext.ResolveTownId(townId);
             using var transaction = dbContext.Database.BeginTransaction();
             LastUpdateInfoDto lastUpdateInfoDto = UserInfoProvider.GenerateLastUpdateInfo();
             var newLastUpdate = dbContext.LastUpdateInfos.Update(Mapper.Map<LastUpdateInfo>(lastUpdateInfoDto, opt => opt.SetDbContext(dbContext))).Entity;
@@ -1048,6 +1071,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
         {
             using var scope = ServiceScopeFactory.CreateScope();
             var dbContext = scope.ServiceProvider.GetRequiredService<MhoContext>();
+            townId = dbContext.ResolveTownId(townId);
             using var transaction = dbContext.Database.BeginTransaction();
             LastUpdateInfoDto lastUpdateInfoDto = UserInfoProvider.GenerateLastUpdateInfo();
             var newLastUpdate = dbContext.LastUpdateInfos.Update(Mapper.Map<LastUpdateInfo>(lastUpdateInfoDto, opt => opt.SetDbContext(dbContext))).Entity;

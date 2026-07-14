@@ -11,6 +11,9 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer
         public int? Season { get; set; }
         public TownPhase? Phase { get; set; }
 
+        // Restreint la liste aux villes où ce joueur est (ou a été) citoyen. Utilisé par le profil.
+        public int? PlayerId { get; set; }
+
         public int Page { get; set; } = 1;
         public int PageSize { get; set; } = 50;
 
@@ -22,9 +25,5 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer
         public List<TownType>? Types { get; set; }
         public List<string>? Languages { get; set; }
         public List<string>? States { get; set; }
-
-        // Rafraîchissement des villes non terminées via l'API MyHordes : coûteux, déclenché
-        // uniquement au changement de combinaison saison/phase, pas à chaque page/tri/filtre.
-        public bool Refresh { get; set; }
     }
 }

@@ -2,12 +2,16 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using MyHordesOptimizerApi.Attributes;
+using MyHordesOptimizerApi.Exceptions;
 using MyHordesOptimizerApi.Models.Logs;
 using MyHordesOptimizerApi.Providers.Interfaces;
 using MyHordesOptimizerApi.Services.Impl;
+using MyHordesOptimizerApi.Services.Interfaces;
+using MyHordesOptimizerApi.Services.Interfaces.Import;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace MyHordesOptimizerApi.Controllers
 {
@@ -17,15 +21,21 @@ namespace MyHordesOptimizerApi.Controllers
     {
         private readonly AdminService _adminService;
         private readonly IUserInfoProvider _userInfoProvider;
+        private readonly IMyHordesImportService _importService;
+        private readonly ITownService _townService;
         private readonly int[] _adminUserIds;
 
         public AdminController(
             AdminService adminService,
             IUserInfoProvider userInfoProvider,
+            IMyHordesImportService importService,
+            ITownService townService,
             IConfiguration configuration)
         {
             _adminService = adminService;
             _userInfoProvider = userInfoProvider;
+            _importService = importService;
+            _townService = townService;
             _adminUserIds = configuration.GetSection("Admin:UserIds").Get<int[]>() ?? [];
         }
 
@@ -49,6 +59,179 @@ namespace MyHordesOptimizerApi.Controllers
         public ActionResult<List<DateOnly>> GetAvailableDates()
         {
             return Ok(_adminService.GetAvailableDates());
+        }
+
+        [HttpPost("import/all")]
+        [Authorize]
+        [AdminOnly]
+        public async Task<ActionResult> ImportAll()
+        {
+            await _importService.ImportAllAsync();
+            return Ok();
+        }
+
+        [HttpPost("import/hero-skills")]
+        [Authorize]
+        [AdminOnly]
+        public async Task<ActionResult> ImportHeroSkills()
+        {
+            await _importService.ImportHeroSkill();
+            return Ok();
+        }
+
+        [HttpPost("import/causes-of-death")]
+        [Authorize]
+        [AdminOnly]
+        public async Task<ActionResult> ImportCausesOfDeath()
+        {
+            await _importService.ImportCauseOfDeath();
+            return Ok();
+        }
+
+        [HttpPost("import/cleanup-types")]
+        [Authorize]
+        [AdminOnly]
+        public ActionResult ImportCleanupTypes()
+        {
+            _importService.ImportCleanUpTypes();
+            return Ok();
+        }
+
+        [HttpPost("import/items")]
+        [Authorize]
+        [AdminOnly]
+        public async Task<ActionResult> ImportItems()
+        {
+            await _importService.ImportItemsAsync();
+            return Ok();
+        }
+
+        [HttpPost("import/ruins")]
+        [Authorize]
+        [AdminOnly]
+        public ActionResult ImportRuins()
+        {
+            _importService.ImportRuins();
+            return Ok();
+        }
+
+        [HttpPost("import/categories")]
+        [Authorize]
+        [AdminOnly]
+        public async Task<ActionResult> ImportCategories()
+        {
+            await _importService.ImportCategoriesAsync();
+            return Ok();
+        }
+
+        [HttpPost("import/wishlist-categories")]
+        [Authorize]
+        [AdminOnly]
+        public ActionResult ImportWishlistCategories()
+        {
+            _importService.ImportWishlistCategorie();
+            return Ok();
+        }
+
+        [HttpPost("import/default-wishlists")]
+        [Authorize]
+        [AdminOnly]
+        public ActionResult ImportDefaultWishlists()
+        {
+            _importService.ImportDefaultWishlists();
+            return Ok();
+        }
+
+        [HttpPost("import/buildings")]
+        [Authorize]
+        [AdminOnly]
+        public async Task<ActionResult> ImportBuildings()
+        {
+            await _importService.ImportBuildingAsync();
+            return Ok();
+        }
+
+        [HttpPost("import/jobs")]
+        [Authorize]
+        [AdminOnly]
+        public async Task<ActionResult> ImportJobs()
+        {
+            await _importService.ImportJobsAsync();
+            return Ok();
+        }
+
+        [HttpPost("import/towns")]
+        [Authorize]
+        [AdminOnly]
+        public async Task<ActionResult> ImportTowns([FromQuery] int? season = null)
+        {
+            try
+            {
+                await _importService.ImportTownsAsync(season);
+                return Ok();
+            }
+            catch (MyHordesApiException ex)
+            {
+                return StatusCode((int)ex.StatusCode, new { error = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = ex.Message, detail = ex.InnerException?.Message, stackTrace = ex.StackTrace });
+            }
+        }
+
+        [HttpPost("towns/{townId}/import")]
+        [Authorize]
+        [AdminOnly]
+        public async Task<ActionResult> ImportSingleTown([FromRoute] int townId)
+        {
+            try
+            {
+                await _importService.ImportSingleTownAsync(townId);
+                return Ok();
+            }
+            catch (MyHordesApiException ex)
+            {
+                return StatusCode((int)ex.StatusCode, new { error = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = ex.Message, detail = ex.InnerException?.Message });
+            }
+        }
+
+        [HttpDelete("towns/{townId}")]
+        [Authorize]
+        [AdminOnly]
+        public ActionResult DeleteTown([FromRoute] int townId)
+        {
+            try
+            {
+                _townService.DeleteTown(townId);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = ex.Message, detail = ex.InnerException?.Message });
+            }
+        }
+
+        [HttpPost("seasons/{season}/finish")]
+        [Authorize]
+        [AdminOnly]
+        public ActionResult FinishSeason([FromRoute] int season)
+        {
+            _townService.FinishSeason(season);
+            return Ok();
+        }
+
+        [HttpPost("seasons/{season}/unfinish")]
+        [Authorize]
+        [AdminOnly]
+        public ActionResult UnfinishSeason([FromRoute] int season)
+        {
+            _townService.UnfinishSeason(season);
+            return Ok();
         }
 
         /// <summary>

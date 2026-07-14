@@ -152,6 +152,7 @@ builder.Services.AddScoped<ICampingService, CampingService>();
 builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
 builder.Services.AddScoped<IExpeditionService, ExpeditionService>();
 builder.Services.AddScoped<ITownService, TownService>();
+builder.Services.AddScoped<IUserAccountService, UserAccountService>();
 
 // Add the discord client to services
 builder.Services.AddSingleton(new DiscordSocketClient(new DiscordSocketConfig

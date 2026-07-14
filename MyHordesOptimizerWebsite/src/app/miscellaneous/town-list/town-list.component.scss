@@ -1,0 +1,149 @@
+:host {
+    display: contents;
+
+    ::ng-deep > .mat-mdc-card-header {
+        padding-left: 0;
+        padding-right: 0;
+    }
+
+    .town-list {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+    }
+
+    .bulk-actions {
+        display: flex;
+        align-items: center;
+        gap: 1em;
+        padding: 0.5em 0;
+
+        button {
+            display: flex;
+            align-items: center;
+            gap: 0.25em;
+        }
+    }
+
+    .town-list__table-wrapper {
+        flex: 1;
+        overflow: auto;
+        border: 1px solid var(--mat-sys-outline-variant);
+        border-radius: 0.25em;
+    }
+
+    .town-table {
+        width: 100%;
+    }
+
+    .field--id {
+        padding-top: 0.5em;
+        min-width: 100px;
+        width: 100px
+    }
+
+    .field--name {
+        padding-top: 0.5em;
+        min-width: 160px;
+    }
+
+    .mho-town-list-header {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1em;
+        width: 100%;
+    }
+
+    .season-phase-filter {
+        min-width: 160px;
+    }
+
+    .field--select {
+        padding-top: 0.5em;
+        min-width: 110px;
+    }
+
+    .field--icons {
+        padding-top: 0.5em;
+        width: 100px;
+    }
+
+    .field--language {
+        padding-top: 0.5em;
+        width: 120px;
+    }
+
+    // Ensure form fields stretch within mat-sort-header-content
+    .mat-sort-header-content {
+        width: 100%;
+    }
+
+    .cell--flag {
+        font-size: 1.25rem;
+
+        .flag {
+            cursor: default;
+        }
+    }
+
+    .state-cell {
+        display: flex;
+        align-items: center;
+        gap: 0.5em;
+    }
+
+    .cell--citizens {
+        display: flex;
+        align-items: center;
+        gap: 0.25em;
+        cursor: default;
+
+        mat-icon {
+            font-size: 1.1rem;
+            width: 1.1rem;
+            height: 1.1rem;
+        }
+    }
+
+    .cell--actions {
+        display: flex;
+        align-items: center;
+        gap: 0.25em;
+    }
+
+    .result-icon {
+        font-size: 1.1rem;
+        width: 1.1rem;
+        height: 1.1rem;
+
+        &--success { color: var(--mat-sys-tertiary); }
+        &--error { color: var(--mat-sys-error); }
+    }
+
+    .season-finished-icon {
+        font-size: 1rem;
+        width: 1rem;
+        height: 1rem;
+        vertical-align: middle;
+        margin-left: 4px;
+    }
+
+    .town-list__empty,
+    .town-list__loading {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 32px;
+        color: var(--mat-sys-on-surface-variant);
+
+        mat-icon {
+            font-size: 48px;
+            width: 48px;
+            height: 48px;
+        }
+    }
+}

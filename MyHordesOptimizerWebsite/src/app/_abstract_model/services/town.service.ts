@@ -1,7 +1,7 @@
-import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
+import { HttpErrorResponse, HttpParams, HttpResponse } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import moment from 'moment';
-import { Observable, Subscriber } from 'rxjs';
+import { map, Observable, Subscriber } from 'rxjs';
 import { SnackbarService } from '../../_core/services/snackbar.service';
 import { getBankWithExpirationDate, getExternalAppId, getTown, getUserId, setBankWithExpirationDate, } from '../../_core/utilities/localstorage.util';
 import { BankInfoDTO } from '../dto/bank-info.dto';
@@ -9,15 +9,21 @@ import { CellDTO } from '../dto/cell.dto';
 import { CitizenInfoDTO } from '../dto/citizen-info.dto';
 import { CitizenDTO } from '../dto/citizen.dto';
 import { RuinDTO } from '../dto/ruin.dto';
+import { SeasonDTO } from '../dto/season.dto';
+import { SeasonPhaseDTO } from '../dto/season-phase.dto';
+import { TownListItemDTO } from '../dto/town-list-item.dto';
+import { TownListPageResultDTO, TownListQuery } from '../dto/town-list-page.dto';
 import { TownDTO } from '../dto/town.dto';
 import { UpdateInfoDTO } from '../dto/update-info.dto';
+import { TownListMapper } from '../mapper/town-list-item.mapper';
 import { dtoToModelArray } from '../types/_common.class';
-import { ToolsToUpdate } from '../types/_types';
+import { ToolsToUpdate, TownState, TownTypeId } from '../types/_types';
 import { BankInfo } from '../types/bank-info.class';
 import { Cell } from '../types/cell.class';
 import { CitizenInfo } from '../types/citizen-info.class';
 import { Citizen } from '../types/citizen.class';
 import { Ruin } from '../types/ruin.class';
+import { TownListPageResult } from '../types/town-list-item.model';
 import { Town } from '../types/town.class';
 import { UpdateInfo } from '../types/update-info.class';
 import { GlobalService } from './_global.service';
@@ -277,6 +283,57 @@ export class TownService extends GlobalService {
                     }
                 });
         });
+    }
+
+    public getSeasons(): Observable<SeasonDTO[]> {
+        return super.get<SeasonDTO[]>(`${this.API_URL}/town/seasons`, false)
+            .pipe(map((response: HttpResponse<SeasonDTO[]>) => response.body ?? []));
+    }
+
+    public getSeasonPhases(): Observable<SeasonPhaseDTO[]> {
+        return super.get<SeasonPhaseDTO[]>(`${this.API_URL}/town/season-phases`, false)
+            .pipe(map((response: HttpResponse<SeasonPhaseDTO[]>) => response.body ?? []));
+    }
+
+    public getTownsPaged(query: TownListQuery): Observable<TownListPageResult> {
+        let params: HttpParams = new HttpParams()
+            .set('page', String(query.page))
+            .set('pageSize', String(query.pageSize));
+        if (query.season != null) {
+            params = params.set('season', String(query.season));
+        }
+        if (query.phase != null) {
+            params = params.set('phase', query.phase);
+        }
+        if (query.playerId != null) {
+            params = params.set('playerId', String(query.playerId));
+        }
+        if (query.sortColumn) {
+            params = params.set('sortColumn', query.sortColumn);
+        }
+        if (query.sortDirection) {
+            params = params.set('sortDirection', query.sortDirection);
+        }
+        if (query.name) {
+            params = params.set('name', query.name);
+        }
+        if (query.id) {
+            params = params.set('id', query.id);
+        }
+        (query.types ?? []).forEach((type: TownTypeId) => params = params.append('types', type));
+        (query.languages ?? []).forEach((language: string) => params = params.append('languages', language));
+        (query.states ?? []).forEach((state: TownState) => params = params.append('states', state));
+
+        return super.get<TownListPageResultDTO>(`${this.API_URL}/town/list`, false, params)
+            .pipe(map((response: HttpResponse<TownListPageResultDTO>) => {
+                const body: TownListPageResultDTO | null = response.body;
+                return {
+                    items: (body?.items ?? []).map((dto: TownListItemDTO) => TownListMapper.dtoToModel(dto)),
+                    totalCount: body?.totalCount ?? 0,
+                    availableTypes: body?.availableTypes ?? [],
+                    availableLanguages: body?.availableLanguages ?? [],
+                };
+            }));
     }
 }
 

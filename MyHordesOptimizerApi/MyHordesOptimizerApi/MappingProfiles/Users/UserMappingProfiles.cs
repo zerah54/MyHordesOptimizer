@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using MyHordesOptimizerApi.Dtos.MyHordes.Me;
 using MyHordesOptimizerApi.Models;
 
@@ -11,7 +11,7 @@ namespace MyHordesOptimizerApi.MappingProfiles.Users
             CreateMap<MyHordesMeResponseDto, User>()
                 .ForMember(user => user.IdUser, opt => opt.MapFrom(dto => dto.Id))
                 .ForMember(user => user.Name, opt => opt.MapFrom(dto => dto.Name))
-                .ForMember(user => user.UserKey, opt => opt.Ignore());
+                .ForMember(user => user.Avatar, opt => opt.MapFrom(dto => dto.Avatar));
         }
     }
 }

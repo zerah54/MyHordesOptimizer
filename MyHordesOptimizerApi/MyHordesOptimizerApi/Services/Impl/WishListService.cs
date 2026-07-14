@@ -41,6 +41,7 @@ namespace MyHordesOptimizerApi.Services.Impl
 
         public WishListLastUpdateDto GetWishList(int townId)
         {
+            townId = DbContext.ResolveTownId(townId);
             var townBankItemLastUpdateId = DbContext.TownBankItems
                 .Where(tbi => tbi.IdTown == townId)
                 .Max(tbi => (int?)tbi.IdLastUpdateInfo);
@@ -104,6 +105,7 @@ namespace MyHordesOptimizerApi.Services.Impl
 
         public WishListLastUpdateDto PutWishList(int townId, int userId, List<WishListPutResquestDto> wishListPutRequest)
         {
+            townId = DbContext.ResolveTownId(townId);
             var items = Mapper.Map<List<TownWishListItem>>(wishListPutRequest);
             using var transaction = DbContext.Database.BeginTransaction();
             DbContext.TownWishListItems.RemoveRange(DbContext.TownWishListItems.Where(townWishListItem => townWishListItem.IdTown == townId));
@@ -122,6 +124,7 @@ namespace MyHordesOptimizerApi.Services.Impl
 
         public WishListLastUpdateDto CreateFromTemplate(int townId, int userId, int templateId)
         {
+            townId = DbContext.ResolveTownId(townId);
             using var transaction = DbContext.Database.BeginTransaction();
             DbContext.TownWishListItems.RemoveRange(DbContext.TownWishListItems.Where(townWishListItem => townWishListItem.IdTown == townId));
             var templateWishList = DbContext.DefaultWishlistItems.Where(defaultWishListitem => defaultWishListitem.IdDefaultWishlist == templateId)
@@ -142,6 +145,7 @@ namespace MyHordesOptimizerApi.Services.Impl
 
         public void AddItemToWishList(int townId, int userId, int itemId, int zoneXPa)
         {
+            townId = DbContext.ResolveTownId(townId);
             using var transaction = DbContext.Database.BeginTransaction();
             var town = DbContext.Towns
              .Where(town => town.IdTown == townId)

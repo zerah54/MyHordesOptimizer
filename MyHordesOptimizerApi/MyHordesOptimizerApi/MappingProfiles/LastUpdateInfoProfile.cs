@@ -52,7 +52,6 @@ namespace MyHordesOptimizerApi.MappingProfiles
                 }))
                 .ForMember(user => user.TownCadavers, opt => opt.Ignore())
                 .ForMember(user => user.TownCitizens, opt => opt.Ignore())
-                .ForMember(user => user.UserKey, opt => opt.Ignore())
                 .ForMember(user => user.WishlistCategories, opt => opt.Ignore());
         }
     }

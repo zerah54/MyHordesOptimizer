@@ -112,7 +112,11 @@ namespace MyHordesOptimizerApi.MappingProfiles.Maps
             public List<MyHordesOptimizerCellDto> Convert(Town town, List<MyHordesOptimizerCellDto> destination, ResolutionContext context)
             {
                 var results = new List<MyHordesOptimizerCellDto>();
-                var citizenByPosition = town.TownCitizens.GroupBy(townCitizen => new { X = townCitizen.PositionX.Value, Y = townCitizen.PositionY.Value })
+                // Les TownCitizen des morts sont conservés en base : on ne place sur la carte
+                // que les vivants dont la position est connue
+                var citizenByPosition = town.TownCitizens
+                    .Where(townCitizen => townCitizen.Dead != true && townCitizen.PositionX.HasValue && townCitizen.PositionY.HasValue)
+                    .GroupBy(townCitizen => new { X = townCitizen.PositionX.Value, Y = townCitizen.PositionY.Value })
                     .ToDictionary(x => x.Key, x => x.ToList());
                 foreach (var mapCell in town.MapCells)
                 {

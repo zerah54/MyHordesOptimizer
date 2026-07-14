@@ -13,6 +13,8 @@ using MyHordesOptimizerApi.Services.Interfaces;
 
 namespace MyHordesOptimizerApi.DiscordBot.Modules
 {
+    [IntegrationType(ApplicationIntegrationType.GuildInstall, ApplicationIntegrationType.UserInstall)]
+    [CommandContextType(InteractionContextType.Guild, InteractionContextType.BotDm, InteractionContextType.PrivateChannel)]
     public class RecipesModule : InteractionModuleBase<SocketInteractionContext>
     {
         private readonly ILogger<RecipesModule> _logger;

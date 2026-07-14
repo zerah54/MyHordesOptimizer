@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace MyHordesOptimizerApi.Models;
 
-[PrimaryKey("IdTown", "IdUser", "IdLastUpdateInfo")]
+[PrimaryKey("IdTown", "IdUser")]
 [Table("TownCitizen")]
 [Index("IdLastUpdateChamanic", Name = "TownCitizen_fk_last_update_chamanic")]
 [Index("IdBag", Name = "idBag")]
@@ -15,7 +15,6 @@ namespace MyHordesOptimizerApi.Models;
 [Index("IdLastUpdateInfoHeroicAction", Name = "idLastUpdateInfoHeroicAction")]
 [Index("IdLastUpdateInfoHome", Name = "idLastUpdateInfoHome")]
 [Index("IdLastUpdateInfoStatus", Name = "idLastUpdateInfoStatus")]
-[Index("IdTown", "IdUser", Name = "idTown", IsUnique = true)]
 [Index("IdUser", Name = "idUser")]
 public partial class TownCitizen
 {
@@ -54,13 +53,13 @@ public partial class TownCitizen
     [Column("isShunned")]
     public bool? IsShunned { get; set; }
 
+    // [Key] conservé volontairement bien que la PK soit désormais (IdTown, IdUser) :
+    // UpdateAllButKeysProperties s'appuie sur cet attribut pour ne jamais écraser
+    // cette valeur avec le 0 des TownCitizen partiels construits à la volée.
+    // La PK EF est définie par [PrimaryKey] sur la classe et le HasKey du MhoContext.
     [Key]
     [Column("idLastUpdateInfo", TypeName = "int(11)")]
     public int IdLastUpdateInfo { get; set; }
-
-    [Column("avatar")]
-    [StringLength(255)]
-    public string? Avatar { get; set; }
 
     [Column("idBag", TypeName = "int(11)")]
     public int? IdBag { get; set; }

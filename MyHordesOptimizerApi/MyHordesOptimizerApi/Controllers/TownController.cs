@@ -6,6 +6,7 @@ using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Citizens;
 using MyHordesOptimizerApi.Providers.Interfaces;
 using MyHordesOptimizerApi.Services.Interfaces;
+using System.Collections.Generic;
 
 namespace MyHordesOptimizerApi.Controllers
 {
@@ -33,7 +34,7 @@ namespace MyHordesOptimizerApi.Controllers
         [Route("{townId}/user/{userId}/bath")]
         public ActionResult<LastUpdateInfoDto> AddCitizenBath([FromRoute] int townId, [FromRoute] int userId, [FromQuery] int? day)
         {
-            if(!day.HasValue)
+            if (!day.HasValue)
             {
                 return BadRequest($"{nameof(day)} must be > 0");
             }
@@ -70,6 +71,30 @@ namespace MyHordesOptimizerApi.Controllers
             var updatedCitizen = TownService.UpdateCitizenChamanicDetail(townId, userId, chamanicDetailDto);
             return Ok(updatedCitizen);
 
+        }
+
+        [HttpGet]
+        [Route("list")]
+        public ActionResult<TownListPageResultDto> GetTowns([FromQuery] TownListQueryDto query)
+        {
+            var towns = TownService.GetTowns(query);
+            return Ok(towns);
+        }
+
+        [HttpGet]
+        [Route("seasons")]
+        public ActionResult<List<SeasonDto>> GetSeasons()
+        {
+            var seasons = TownService.GetSeasons();
+            return Ok(seasons);
+        }
+
+        [HttpGet]
+        [Route("season-phases")]
+        public ActionResult<List<SeasonPhaseDto>> GetSeasonPhases()
+        {
+            var seasonPhases = TownService.GetSeasonPhases();
+            return Ok(seasonPhases);
         }
     }
 }

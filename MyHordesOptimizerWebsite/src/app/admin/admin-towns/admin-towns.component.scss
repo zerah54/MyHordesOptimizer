@@ -1,0 +1,7 @@
+:host {
+    display: contents;
+
+    ::ng-deep .mat-mdc-card-content {
+        padding: 0;
+    }
+}

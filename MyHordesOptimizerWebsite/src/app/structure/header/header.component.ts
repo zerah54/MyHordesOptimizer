@@ -12,7 +12,7 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { Title } from '@angular/platform-browser';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { skip } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { BREAKPOINTS } from '../../_abstract_model/const';
@@ -27,7 +27,7 @@ import { HeaderService } from './header.service';
 const angular_common: Imports = [CommonModule, NgOptimizedImage, FormsModule];
 const components: Imports = [CitizenMenuComponent];
 const pipes: Imports = [];
-const material_modules: Imports = [MatButtonModule, MatDividerModule, MatFormFieldModule, MatIconModule, MatInputModule, MatMenuModule, MatToolbarModule, MatTooltipModule];
+const material_modules: Imports = [MatButtonModule, MatDividerModule, MatFormFieldModule, MatIconModule, MatInputModule, MatMenuModule, MatToolbarModule, MatTooltipModule, RouterLink];
 
 @Component({
     selector: 'mho-header',

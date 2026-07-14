@@ -9,15 +9,15 @@ namespace MyHordesOptimizerApi.Extensions
         {
             if (map.City.Hard)
             {
-                return TownType.Pande;
+                return TownType.PANDE;
             }
             else if (map.Wid >= 25)
             {
-                return TownType.Re;
+                return TownType.RE;
             }
             else
             {
-                return TownType.Rne;
+                return TownType.RNE;
             }
         }
     }

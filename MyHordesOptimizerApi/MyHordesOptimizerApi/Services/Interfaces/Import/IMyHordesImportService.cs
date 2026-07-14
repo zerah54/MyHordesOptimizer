@@ -15,5 +15,7 @@ namespace MyHordesOptimizerApi.Services.Interfaces.Import
         Task ImportAllAsync();
         void ImportWishlistCategorie();
         void ImportDefaultWishlists();
+        Task ImportTownsAsync(int? season = null);
+        Task ImportSingleTownAsync(int townId);
     }
 }

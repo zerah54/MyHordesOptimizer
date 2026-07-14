@@ -8,6 +8,8 @@ using MyHordesOptimizerApi.Configuration.Interfaces;
 
 namespace MyHordesOptimizerApi.DiscordBot.Modules
 {
+    [IntegrationType(ApplicationIntegrationType.GuildInstall, ApplicationIntegrationType.UserInstall)]
+    [CommandContextType(InteractionContextType.Guild, InteractionContextType.BotDm, InteractionContextType.PrivateChannel)]
     public class FeedbacksModule : InteractionModuleBase<SocketInteractionContext>
     {
         private readonly DiscordSocketClient _discordSocketClient;

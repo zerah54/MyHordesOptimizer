@@ -8,6 +8,8 @@ using MyHordesOptimizerApi.Extensions;
 
 namespace MyHordesOptimizerApi.DiscordBot.Modules
 {
+    [IntegrationType(ApplicationIntegrationType.GuildInstall, ApplicationIntegrationType.UserInstall)]
+    [CommandContextType(InteractionContextType.Guild, InteractionContextType.BotDm, InteractionContextType.PrivateChannel)]
     public class PlayModule : InteractionModuleBase<SocketInteractionContext>
     {
         [SlashCommand(name: "play", description: "The same games as on MyHordes, but on Discord")]

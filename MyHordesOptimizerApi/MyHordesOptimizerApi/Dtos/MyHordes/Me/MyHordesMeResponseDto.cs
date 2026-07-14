@@ -30,7 +30,7 @@ namespace MyHordesOptimizerApi.Dtos.MyHordes.Me
         public object HomeMessage { get; set; }
 
         [JsonProperty("avatar")]
-        public string Avatar { get; set; }
+        public string? Avatar { get; set; }
 
         [JsonProperty("hero")]
         public bool Hero { get; set; }
@@ -58,5 +58,8 @@ namespace MyHordesOptimizerApi.Dtos.MyHordes.Me
 
         [JsonProperty("rewards")]
         public List<MyHordesReward> Rewards { get; set; }
+
+        [JsonProperty("playedMaps")]
+        public List<MyHordesPlayedMapDto>? PlayedMaps { get; set; }
     }
 }

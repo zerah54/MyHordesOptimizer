@@ -13,11 +13,11 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import moment from 'moment';
 import { HomeEnum } from '../../_abstract_model/enum/home.enum';
-import { TownService } from '../../_abstract_model/services/town.service';
 import { TownStatisticsService } from '../../_abstract_model/services/town-statistics.service';
+import { TownService } from '../../_abstract_model/services/town.service';
 import { I18nLabels, Imports } from '../../_abstract_model/types/_types';
-import { Citizen } from '../../_abstract_model/types/citizen.class';
 import { CitizenInfo } from '../../_abstract_model/types/citizen-info.class';
+import { Citizen } from '../../_abstract_model/types/citizen.class';
 import { EstimationsResult } from '../../_abstract_model/types/estimations-result.class';
 import { HomeWithValue } from '../../_abstract_model/types/home.class';
 import { TownDetails } from '../../_abstract_model/types/town-details.class';
@@ -97,7 +97,7 @@ export class OverflowComponent implements OnInit {
     public nb_alive: number = 40;
     /** Population de la ville (nombre de places, dénominateur du facteur actif). */
     public population: number = 40;
-    /** Nombre d'habitations par niveau (index = niveau, 0 = Lit de camp … 8 = Château). */
+    /** Nombre d'habitations par niveau (index = niveau, 0 = Lit de camp ... 8 = Château). */
     public house_counts: number[] = new Array(HOUSE_LEVEL_COUNT).fill(0);
     /** Libellés des paliers d'habitation, dans la langue courante. */
     public readonly house_labels: string[] = (HomeEnum.HOUSE_LEVEL.value.house_options ?? [])

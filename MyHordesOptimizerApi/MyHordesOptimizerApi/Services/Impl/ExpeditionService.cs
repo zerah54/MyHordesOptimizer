@@ -46,6 +46,7 @@ namespace MyHordesOptimizerApi.Services.Impl
 
         public async Task<ExpeditionDto> SaveExpeditionAsync(ExpeditionRequestDto expeditionDto, int idTown, int day)
         {
+            idTown = DbContext.ResolveTownId(idTown);
             await Lock.WaitAsync();
             try
             {
@@ -118,6 +119,7 @@ namespace MyHordesOptimizerApi.Services.Impl
 
         public List<ExpeditionDto> GetExpeditionsByDay(int townId, int day)
         {
+            townId = DbContext.ResolveTownId(townId);
             var models = DbContext.Expeditions.Where(expedition => expedition.IdTown == townId && expedition.Day == day)
                 .IncludeAll()
                 .ToList();
@@ -127,6 +129,7 @@ namespace MyHordesOptimizerApi.Services.Impl
 
         public List<ExpeditionDto> GetUserExpeditionsByDay(int townId, int userId, int day)
         {
+            townId = DbContext.ResolveTownId(townId);
             var models = DbContext.Expeditions.Where(expedition => expedition.IdTown == townId && expedition.Day == day)
                 .Where(expedition => expedition.ExpeditionParts.Any(part => part.ExpeditionCitizens.Any(citizen => citizen.IdUser == userId)))
                 .IncludeAll()
@@ -145,6 +148,7 @@ namespace MyHordesOptimizerApi.Services.Impl
 
         public async Task<List<ExpeditionDto>> CopyExpeditionsAsync(int townId, int fromDay, int targetDay)
         {
+            townId = DbContext.ResolveTownId(townId);
             await Lock.WaitAsync();
             try
             {
@@ -196,6 +200,7 @@ namespace MyHordesOptimizerApi.Services.Impl
 
         public ExpeditionInhorenceModel ValidateExpeditions(int townId, int day)
         {
+            townId = DbContext.ResolveTownId(townId);
             var expeditions = DbContext.GetTownExpeditionsByDay(townId, day)
                 .Include(expedition => expedition.ExpeditionParts)
                     .ThenInclude(part => part.ExpeditionCitizens)
@@ -386,7 +391,7 @@ namespace MyHordesOptimizerApi.Services.Impl
                     }
                 }
             }
-            var nbAliveCitizen = DbContext.TownCitizens.Count(townCitizen => townCitizen.IdTown == townId);
+            var nbAliveCitizen = DbContext.TownCitizens.Count(townCitizen => townCitizen.IdTown == townId && townCitizen.Dead != true);
             if (expeditions.Sum(expe => expe.ExpeditionParts.Max(part => part.ExpeditionCitizens.Count)) > nbAliveCitizen)
             {
                 townExpeditionIncoherences.Add(new TownExpeditionIncoherenceModel(townId, day, TownExpeditionIncoherenceType.TooMuchExpedition));

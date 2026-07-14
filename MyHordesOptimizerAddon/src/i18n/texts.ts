@@ -56,7 +56,7 @@ export const texts = {
     update_external_tools_pending_btn_label: {
         en: `Updating...`,
         fr: `Mise à jour en cours...`,
-        de: `Aktualisierung…`,
+        de: `Aktualisierung...`,
         es: `Actualizando...`
     },
     update_external_tools_success_btn_label: {

@@ -87,7 +87,7 @@ $tertiary-palette: map.merge(map.get($_palettes, tertiary), $_rest);
     $secondary: mat.get-theme-color($theme, secondary, 100);
     $tertiary: mat.get-theme-color($theme, tertiary, 100);
 
-    $sidenav-bg-color: #5E3525;
+    $sidenav-bg-color: $secondary;
 
     $item-color: rgba($primary, 0.25);
     $map-details-color: #965C36;
@@ -97,6 +97,8 @@ $tertiary-palette: map.merge(map.get($_palettes, tertiary), $_rest);
     --mat-sys-surface-container-low: #{mat.get-theme-color($theme, secondary, 90)};
     --mat-sys-outline: rgba(255, 255, 255, 0.24);
     --mat-sys-outline-variant: rgba(255, 255, 255, 0.12);
+    --mat-button-text-label-text-color: $tertiary;
+    --mat-toolbar-container-text-color: $tertiary;
 
     --primary: #{$primary};
     --secondary: #{$secondary};
@@ -104,7 +106,6 @@ $tertiary-palette: map.merge(map.get($_palettes, tertiary), $_rest);
     --sidenav-bg-color: #{$sidenav-bg-color};
     --item-color: #{$item-color};
     --map-details-color: #{$map-details-color};
-    --mat-button-text-label-text-color: white;
 
     --scrollbar-base-color: rgba(255, 255, 255, 0.15);
     --scrollbar-hover-color: rgba(255, 255, 255, 0.25);

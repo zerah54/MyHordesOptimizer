@@ -7,6 +7,8 @@ using MyHordesOptimizerApi.DiscordBot.Utility;
 
 namespace MyHordesOptimizerApi.DiscordBot.Modules
 {
+    [IntegrationType(ApplicationIntegrationType.GuildInstall, ApplicationIntegrationType.UserInstall)]
+    [CommandContextType(InteractionContextType.Guild, InteractionContextType.BotDm, InteractionContextType.PrivateChannel)]
     [Group(name: "faq", description: "Frequently Asked Questions")]
     public class FaqModule : InteractionModuleBase<SocketInteractionContext>
     {
@@ -205,7 +207,7 @@ namespace MyHordesOptimizerApi.DiscordBot.Modules
                     break;
                 case Locales.Fr:                  
                 default:  
-                    description += "`0% - 10%` : Vous estimez que vos chances de survie ici sont quasi nulles… Autant gober du cyanure tout de suite.";
+                    description += "`0% - 10%` : Vous estimez que vos chances de survie ici sont quasi nulles... Autant gober du cyanure tout de suite.";
                     description += "`11% - 30%` : Vous estimez que vos chances de survie ici sont très faibles. Peut-être que vous aimez jouer à pile ou face ?";
                     description += "`31% - 50%` : Vous estimez que vos chances de survie ici sont faibles. Difficile à dire.";
                     description += "`51% - 65%` : Vous estimez que vos chances de survie ici sont limitées, bien que ça puisse se tenter. Mais un accident est vite arrivé...";

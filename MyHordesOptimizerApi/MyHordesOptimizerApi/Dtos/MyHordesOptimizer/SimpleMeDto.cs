@@ -6,6 +6,7 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer
     {
         public int Id { get; set; }
         public string UserName { get; set; }
+        public string? Avatar { get; set; }
         public SimpleMeTownDetailDto TownDetails { get; set; }
         public SimpleMeJobDetailDto JobDetails { get; set; }
 

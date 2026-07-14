@@ -43,7 +43,7 @@ namespace MyHordesOptimizerApi.DiscordBot.Services
             _discordSocketClient.InteractionCreated += OnInteractionAsync;
             _interactionService.LocalizationManager = _localizationManager;
 
-            await _interactionService.AddModulesAsync(Assembly.GetEntryAssembly(), _serviceProvider);
+            await _interactionService.AddModulesAsync(typeof(InteractionHandlingHostedService).Assembly, _serviceProvider);
         }
 
         public Task StopAsync(CancellationToken cancellationToken)
@@ -69,7 +69,14 @@ namespace MyHordesOptimizerApi.DiscordBot.Services
 
                 if (!result.IsSuccess)
                 {
-                    await context.Channel.SendMessageAsync(result.ToString());
+                    if (interaction.HasResponded)
+                    {
+                        await interaction.FollowupAsync($"Une erreur est survenue : {result.ErrorReason}", ephemeral: true);
+                    }
+                    else
+                    {
+                        await interaction.RespondAsync($"Une erreur est survenue : {result.ErrorReason}", ephemeral: true);
+                    }
                 }
             }
             catch (Exception e)
@@ -78,7 +85,7 @@ namespace MyHordesOptimizerApi.DiscordBot.Services
                 if (interaction.Type == InteractionType.ApplicationCommand)
                 {
                     await interaction.GetOriginalResponseAsync()
-                        .ContinueWith(msg => msg.Result.DeleteAsync());
+                        .ContinueWith(msg => msg.Result?.DeleteAsync());
                 }
             }
         }

@@ -4,6 +4,7 @@ import { HeaderService } from './structure/header/header.service';
 
 export const ROUTES: Route[] = [
     {path: 'admin', loadChildren: () => import('./admin/admin.routes')},
+    {path: 'account', loadChildren: () => import('./account/account.routes')},
     {path: 'my-town', loadChildren: () => import('./my-town/my-town.routes')},
     {path: 'tools', loadChildren: () => import('./tools/tools.routes')},
     {path: 'tutorials', loadChildren: () => import('./tutorials/tutorials.routes')},

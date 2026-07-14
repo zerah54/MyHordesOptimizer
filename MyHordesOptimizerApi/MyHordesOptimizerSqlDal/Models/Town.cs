@@ -38,6 +38,30 @@ public partial class Town
     [Column("waterWell", TypeName = "int(11)")]
     public int WaterWell { get; set; }
 
+    [Column("name", TypeName = "nvarchar(255)")]
+    public string? Name { get; set; }
+
+    [Column("townType", TypeName = "int(11)")]
+    public int? TownTypeId { get; set; }
+
+    [Column("season", TypeName = "int(11)")]
+    public int? Season { get; set; }
+
+    [Column("phase", TypeName = "int(11)")]
+    public int? PhaseId { get; set; }
+
+    [Column("language", TypeName = "nvarchar(10)")]
+    public string? Language { get; set; }
+
+    [Column("score", TypeName = "int(11)")]
+    public int? Score { get; set; }
+
+    [Column("mapId", TypeName = "int(11)")]
+    public int? MapId { get; set; }
+
+    [Column("isFinished")]
+    public bool IsFinished { get; set; }
+
     [Column("isDoorOpen")]
     public bool IsDoorOpen { get; set; }
 
@@ -77,4 +101,5 @@ public partial class Town
 
     [InverseProperty("IdTownNavigation")]
     public virtual ICollection<TownWishListItem> TownWishListItems { get; set; } = new List<TownWishListItem>();
+
 }

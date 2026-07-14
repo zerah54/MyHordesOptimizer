@@ -5,6 +5,7 @@ import { CommonModel } from './_common.class';
 export class Me extends CommonModel<MeDTO> {
     public id!: number;
     public username!: string;
+    public avatar!: string | null;
     public town_details!: TownDetails;
 
     constructor(dto?: MeDTO) {
@@ -16,6 +17,7 @@ export class Me extends CommonModel<MeDTO> {
         return {
             id: this.id,
             userName: this.username,
+            avatar: this.avatar,
             townDetails: this.town_details.modelToDto()
         };
     }
@@ -24,6 +26,7 @@ export class Me extends CommonModel<MeDTO> {
         if (dto) {
             this.id = dto.id;
             this.username = dto.userName;
+            this.avatar = dto.avatar ?? null;
             this.town_details = new TownDetails(dto.townDetails);
         }
     }

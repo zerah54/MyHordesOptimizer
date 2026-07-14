@@ -1,0 +1,274 @@
+<mat-card-header class="mho-town-list-header">
+    <mat-card-title i18n>Villes</mat-card-title>
+    <mat-form-field appearance="outline" subscriptSizing="dynamic" class="season-phase-filter">
+        <mat-label i18n>Saison / phase</mat-label>
+        <mat-select [formControl]="seasonPhaseControl" [compareWith]="compareCombo">
+            @for (combo of seasonPhases(); track getComboLabel(combo)) {
+                <mat-option [value]="combo">
+                    {{ getComboLabel(combo) }}
+                    @if (combo.isFinished) {
+                        <mat-icon fontSet="material-symbols-outlined"
+                                  class="season-finished-icon"
+                                  matTooltip="Saison terminée" i18n-matTooltip>lock
+                        </mat-icon>
+                    }
+                </mat-option>
+            }
+        </mat-select>
+    </mat-form-field>
+</mat-card-header>
+<mat-card-content class="mho-town-list-content" [formGroup]="filtersForm">
+
+    <div class="town-list">
+
+        @if (isAdmin() && (selectedIds().size > 0 || bulkDeleting())) {
+            <div class="bulk-actions">
+                <span i18n>{{ selectedIds().size }} ville(s) sélectionnée(s)</span>
+                <button mat-raised-button color="warn"
+                        (click)="bulkDelete()"
+                        [disabled]="bulkDeleting() || selectedIds().size === 0">
+                    @if (bulkDeleting()) {
+                        <mat-spinner diameter="18"/>
+                    } @else {
+                        <ng-container>
+                            <mat-icon fontSet="material-symbols-outlined">delete</mat-icon>
+                            <ng-container i18n>Supprimer la sélection</ng-container>
+                        </ng-container>
+                    }
+                </button>
+            </div>
+        }
+
+        <div class="town-list__table-wrapper">
+            <table mat-table [dataSource]="towns()" [trackBy]="trackById" matSort matSortActive="id" matSortDirection="desc" class="town-table">
+
+                <ng-container matColumnDef="select" sticky>
+                    <th mat-header-cell *matHeaderCellDef>
+                        <mat-checkbox [checked]="allSelected()"
+                                      [indeterminate]="someSelected()"
+                                      (change)="toggleAll()"/>
+                    </th>
+                    <td mat-cell *matCellDef="let row">
+                        <mat-checkbox [checked]="selectedIds().has(row.id)"
+                                      (change)="toggleSelection(row.id)"/>
+                    </td>
+                </ng-container>
+
+                <ng-container matColumnDef="id" sticky>
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header="id" disableClear>
+                        <mat-form-field appearance="outline" subscriptSizing="dynamic" class="field--id" (click)="$event.stopPropagation()">
+                            <mat-label i18n>ID</mat-label>
+                            <input matInput formControlName="id"/>
+                            @if (filtersForm.controls['id'].value) {
+                                <button matIconSuffix mat-icon-button (click)="filtersForm.controls['id'].setValue(''); $event.stopPropagation()">
+                                    <mat-icon fontSet="material-symbols-outlined">close</mat-icon>
+                                </button>
+                            }
+                        </mat-form-field>
+                    </th>
+                    <td mat-cell *matCellDef="let row">
+                        <mho-deferred-cell>{{ row.mapId ?? row.id }}</mho-deferred-cell>
+                    </td>
+                </ng-container>
+
+                <ng-container matColumnDef="name" sticky>
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header="name" disableClear>
+                        <mat-form-field appearance="outline" subscriptSizing="dynamic" class="field--name" (click)="$event.stopPropagation()">
+                            <mat-label i18n>Nom</mat-label>
+                            <input matInput formControlName="name"/>
+                            @if (filtersForm.controls['name'].value) {
+                                <button matIconSuffix mat-icon-button (click)="filtersForm.controls['name'].setValue(''); $event.stopPropagation()">
+                                    <mat-icon fontSet="material-symbols-outlined">close</mat-icon>
+                                </button>
+                            }
+                        </mat-form-field>
+                    </th>
+                    <td mat-cell *matCellDef="let row">
+                        <mho-deferred-cell>{{ row.name ?? '—' }}</mho-deferred-cell>
+                    </td>
+                </ng-container>
+
+                <ng-container matColumnDef="size">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header="size" disableClear i18n>Taille</th>
+                    <td mat-cell *matCellDef="let row">
+                        <mho-deferred-cell>{{ (row.width && row.height) ? (row.width + ' × ' + row.height) : '—' }}</mho-deferred-cell>
+                    </td>
+                </ng-container>
+
+                <ng-container matColumnDef="type">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header="type" disableClear>
+                        <mat-form-field appearance="outline" subscriptSizing="dynamic" class="field--icons" (click)="$event.stopPropagation()">
+                            <mat-label i18n>Type</mat-label>
+                            <mat-select multiple formControlName="type">
+                                <mat-select-trigger>
+                                    @for (t of (filtersForm.controls['type'].value ?? []); track t) {
+                                        <img [src]="HORDES_IMG_REPO + typeImgMap[t]" width="16" height="16" [title]="t"/>
+                                    }
+                                </mat-select-trigger>
+                                @for (t of availableTypes(); track t) {
+                                    <mat-option [value]="t">
+                                        <img [src]="HORDES_IMG_REPO + typeImgMap[t]" width="16" height="16" [title]="t"/>
+                                    </mat-option>
+                                }
+                            </mat-select>
+                        </mat-form-field>
+                    </th>
+                    <td mat-cell *matCellDef="let row">
+                        <mho-deferred-cell>
+                            @if (row.townType) {
+                                <img [src]="HORDES_IMG_REPO + typeImgMap[row.townType]" width="16" height="16" [title]="row.townType"/>
+                            } @else {
+                                —
+                            }
+                        </mho-deferred-cell>
+                    </td>
+                </ng-container>
+
+                <ng-container matColumnDef="language">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header="language" disableClear>
+                        <mat-form-field appearance="outline" subscriptSizing="dynamic" class="field--language" (click)="$event.stopPropagation()">
+                            <mat-label i18n>Langue</mat-label>
+                            <mat-select multiple formControlName="language">
+                                <mat-select-trigger>
+                                    @for (lang of (filtersForm.controls['language'].value ?? []); track lang) {
+                                        {{ getLanguageFlag(lang) }}
+                                    }
+                                </mat-select-trigger>
+                                @for (lang of availableLanguages(); track lang) {
+                                    <mat-option [value]="lang">{{ getLanguageFlag(lang) }}</mat-option>
+                                }
+                            </mat-select>
+                        </mat-form-field>
+                    </th>
+                    <td mat-cell *matCellDef="let row" class="cell--flag">
+                        <mho-deferred-cell>
+                            <span [matTooltip]="row.language ?? ''" class="flag">{{ getLanguageFlag(row.language) }}</span>
+                        </mho-deferred-cell>
+                    </td>
+                </ng-container>
+
+                <ng-container matColumnDef="score">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header="score" disableClear i18n>Score</th>
+                    <td mat-cell *matCellDef="let row">
+                        <mho-deferred-cell>{{ row.score != null ? row.score : '—' }}</mho-deferred-cell>
+                    </td>
+                </ng-container>
+
+                <ng-container matColumnDef="citizens">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header="citizens" disableClear i18n>Citoyens</th>
+                    <td mat-cell *matCellDef="let row">
+                        <mho-deferred-cell>
+                            <div class="cell--citizens"
+                                 [matTooltip]="getCitizensTooltip(row.citizens)"
+                                 matTooltipClass="citizens-tooltip">
+                                @if (row.citizens.length > 0) {
+                                    <mat-icon fontSet="material-symbols-outlined">group</mat-icon>
+                                    <span>{{ row.citizens.length }}</span>
+                                } @else {
+                                    <span>—</span>
+                                }
+                            </div>
+                        </mho-deferred-cell>
+                    </td>
+                </ng-container>
+
+                <ng-container matColumnDef="state">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header="state" disableClear>
+                        <mat-form-field appearance="outline" subscriptSizing="dynamic" class="field--icons" (click)="$event.stopPropagation()">
+                            <mat-label i18n>État</mat-label>
+                            <mat-select multiple formControlName="state">
+                                <mat-select-trigger>
+                                    @for (s of (filtersForm.controls['state'].value ?? []); track s) {
+                                        <img [src]="HORDES_IMG_REPO + stateImgMap[s]" width="16" height="16" [title]="stateLabelMap[s]"/>
+                                    }
+                                </mat-select-trigger>
+                                @for (s of townStates; track s) {
+                                    <mat-option [value]="s">
+                                        <img [src]="HORDES_IMG_REPO + stateImgMap[s]" width="16" height="16" [title]="stateLabelMap[s]"/>
+                                    </mat-option>
+                                }
+                            </mat-select>
+                        </mat-form-field>
+                    </th>
+                    <td mat-cell *matCellDef="let row">
+                        <mho-deferred-cell>
+                            <div class="state-cell">
+                                @let state = getTownState(row);
+                                <img [src]="HORDES_IMG_REPO + stateImgMap[state]" width="16" height="16" [title]="stateLabelMap[state]"/>
+                            </div>
+                        </mho-deferred-cell>
+                    </td>
+                </ng-container>
+
+                <ng-container matColumnDef="actions">
+                    <th mat-header-cell *matHeaderCellDef i18n>Actions</th>
+                    <td mat-cell *matCellDef="let row">
+                        <div class="cell--actions">
+                            <button mat-icon-button
+                                    [disabled]="importingIds().has(row.id)"
+                                    (click)="importTown(row.id)"
+                                    matTooltip="Importer la ville" i18n-matTooltip
+                                    matTooltipPosition="above"
+                                    [matTooltipShowDelay]="300">
+                                @if (importingIds().has(row.id)) {
+                                    <mat-spinner diameter="20"/>
+                                } @else {
+                                    <mat-icon fontSet="material-symbols-outlined">download</mat-icon>
+                                }
+                            </button>
+                            @if (importResults()[row.id] === 'success') {
+                                <mat-icon class="result-icon result-icon--success" fontSet="material-symbols-outlined"
+                                          matTooltip="Import réussi" i18n-matTooltip>check_circle
+                                </mat-icon>
+                            }
+                            @if (importResults()[row.id] === 'error') {
+                                <mat-icon class="result-icon result-icon--error" fontSet="material-symbols-outlined"
+                                          matTooltip="Erreur lors de l'import" i18n-matTooltip>error
+                                </mat-icon>
+                            }
+                            <button mat-icon-button
+                                    [disabled]="deletingIds().has(row.id)"
+                                    (click)="deleteTown(row.id)"
+                                    matTooltip="Supprimer la ville" i18n-matTooltip
+                                    matTooltipPosition="above"
+                                    [matTooltipShowDelay]="300">
+                                @if (deletingIds().has(row.id)) {
+                                    <mat-spinner diameter="20"/>
+                                } @else {
+                                    <mat-icon fontSet="material-symbols-outlined">delete</mat-icon>
+                                }
+                            </button>
+                        </div>
+                    </td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="displayedColumns(); sticky: true"></tr>
+                <tr mat-row *matRowDef="let row; columns: displayedColumns()"></tr>
+
+            </table>
+
+            @if (!loading() && towns().length === 0) {
+                <div class="town-list__empty">
+                    <mat-icon fontSet="material-symbols-outlined">location_city</mat-icon>
+                    <ng-container i18n>Aucune ville trouvée</ng-container>
+                </div>
+            }
+
+            @if (loading()) {
+                <div class="town-list__loading">
+                    <mat-spinner diameter="40"/>
+                </div>
+            }
+        </div>
+
+        <mat-paginator
+            [length]="totalCount()"
+            [pageSize]="pageSize()"
+            [pageSizeOptions]="pageSizeOptions"
+            [pageIndex]="pageIndex()"
+            (page)="onPageChange($event)"
+            showFirstLastButtons/>
+
+    </div>
+
+</mat-card-content>

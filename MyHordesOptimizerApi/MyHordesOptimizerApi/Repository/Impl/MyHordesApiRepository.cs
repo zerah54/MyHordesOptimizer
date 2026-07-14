@@ -4,6 +4,7 @@ using MyHordesOptimizerApi.Dtos.MyHordes;
 using MyHordesOptimizerApi.Dtos.MyHordes.Building;
 using MyHordesOptimizerApi.Dtos.MyHordes.Items;
 using MyHordesOptimizerApi.Dtos.MyHordes.Me;
+using MyHordesOptimizerApi.Dtos.MyHordes.Town;
 using MyHordesOptimizerApi.Providers.Interfaces;
 using MyHordesOptimizerApi.Repository.Abstract;
 using MyHordesOptimizerApi.Repository.Interfaces;
@@ -36,7 +37,7 @@ namespace MyHordesOptimizerApi.Repository.Impl
         public MyHordesMeResponseDto GetMe()
         {
             var url = GenerateUrl(EndpointMe);
-            url = AddParameterToQuery(url, _parameterFields, "id,name,isGhost,locale,twinId,mapId,map.fields(id,date,wid,hei,conspiracy,bonusPts,days,custom,zones.fields(x,y,nvt,tag,danger,details.fields(z,h,dried),items.fields(uid,id,count,broken),building.fields(type,dig,camped,dried)),citizens.fields(id,name,isGhost,twinId,mapId,homeMessage,avatar,hero,job.fields(uid,name,id,desc),dead,out,baseDef,ban,x,y),city.fields(name,water,x,y,door,chaos,hard,devast,chantiers.fields(id,icon,name,pa,maxLife,votes,breakable,def,resources.fields(amount,rsc.fields(id,name)),actions,hasLevels),buildings.fields(id,name,life,maxLife,breakable,def,hasUpgrade,rarity,temporary,parent,actions,hasLevels),news.fields(z,def,content,regenDir,water),defense.fields(total,base,buildings,upgrades,items,itemsMul,citizenHomes,citizenGuardians,watchmen,souls,temp,cadavers,guardiansInfos.fields(gardians,def),bonus),upgrades.fields(total,list.fields(name,level,update,buildingId)),estimations.fields(days,min,max,maxed),estimationsNext.fields(days,min,max,maxed),bank.fields(uid,id,count,broken)),cadavers.fields(id,name,avatar,survival,origin,score,dtype,comment,msg,cleanup.fields(user,type)),expeditions.fields(name,author.fields(id),length,points.fields(x,y)),season,shaman,guide),homeMessage,avatar,hero,job.fields(uid,name,id,desc),dead,out,baseDef,ban,x,y,rewards.fields(id,number)");
+            url = AddParameterToQuery(url, _parameterFields, "id,name,isGhost,locale,twinId,mapId,map.fields(id,date,wid,hei,conspiracy,bonusPts,days,custom,zones.fields(x,y,nvt,tag,danger,details.fields(z,h,dried),items.fields(uid,id,count,broken),building.fields(type,dig,camped,dried)),citizens.fields(id,name,isGhost,twinId,mapId,homeMessage,avatar,hero,job.fields(uid,name,id,desc),dead,out,baseDef,ban,x,y),city.fields(name,water,x,y,door,chaos,hard,devast,chantiers.fields(id,icon,name,pa,maxLife,votes,breakable,def,resources.fields(amount,rsc.fields(id,name)),actions,hasLevels),buildings.fields(id,name,life,maxLife,breakable,def,hasUpgrade,rarity,temporary,parent,actions,hasLevels),news.fields(z,def,content,regenDir,water),defense.fields(total,base,buildings,upgrades,items,itemsMul,citizenHomes,citizenGuardians,watchmen,souls,temp,cadavers,guardiansInfos.fields(gardians,def),bonus),upgrades.fields(total,list.fields(name,level,update,buildingId)),estimations.fields(days,min,max,maxed),estimationsNext.fields(days,min,max,maxed),bank.fields(uid,id,count,broken)),cadavers.fields(id,name,avatar,survival,origin,score,dtype,comment,msg,cleanup.fields(user,type)),expeditions.fields(name,author.fields(id),length,points.fields(x,y)),season,shaman,guide),homeMessage,avatar,hero,job.fields(uid,name,id,desc),dead,out,baseDef,ban,x,y,rewards.fields(id,number),playedMaps.fields(mapId,mapName,season,phase,score,type,day)");
             var response = base.Get<MyHordesMeResponseDto>(url);
             UserKeyProvider.UserId = response.Id;
             UserKeyProvider.UserName = response.Name;
@@ -55,6 +56,42 @@ namespace MyHordesOptimizerApi.Repository.Impl
             var url = GenerateUrl(EndpointBuilding);
             url = AddParameterToQuery(url, _parameterFields, "id,img,name,desc,pa,maxLife,breakable,def,hasUpgrade,rarity,temporary,parent,resources");
             return Task.FromResult(base.Get<Dictionary<string, MyHordesApiBuildingDto>>(url));
+        }
+
+        public List<int> GetTownList(int? season = null)
+        {
+            var url = GenerateUrl(EndpointTownList);
+            if (season.HasValue)
+            {
+                url = AddParameterToQuery(url, "season", season.Value.ToString());
+            }
+            var response = base.Get<MyHordesTownListResponseDto>(url);
+            return response?.Towns ?? new List<int>();
+        }
+
+        public List<MyHordesTownDetailsDto> GetTownDetails(List<int> ids)
+        {
+            if (ids == null || ids.Count == 0)
+                return new List<MyHordesTownDetailsDto>();
+
+            var url = GenerateUrl(EndpointTowns);
+            url = AddParameterToQuery(url, "ids", string.Join(",", ids));
+            // ⚠️ Testé en réel le 2026-07-09 sur myhordes.de ET myhordes.eu : le déployé N'expose PAS les
+            // points d'âme (pas de `sp`, et `citizens.score` = le score de la VILLE répété, pas un score
+            // d'âme individuel) — on ne les demande donc plus. wid/hei/city ne sont pas non plus exposés ici
+            // (endpoint ranking) : Taille/Type ne viennent que de /json/map (ville live).
+            url = AddParameterToQuery(url, _parameterFields,
+                "id,mapId,day,mapName,language,season,phase,score,citizens.fields(id,name,survival,avatar,dtype,score,msg,comment)");
+            return base.Get<List<MyHordesTownDetailsDto>>(url);
+        }
+
+        public MyHordesMap GetMapDetails(int mapId)
+        {
+            var url = GenerateUrl(EndpointMap);
+            url = AddParameterToQuery(url, "mapId", mapId.ToString());
+            url = AddParameterToQuery(url, _parameterFields,
+                "season,phase,wid,hei,city.fields(type,chaos,devast,door,water,x,y),citizens.fields(id,name,avatar,homeMessage),cadavers.fields(id,name,avatar,survival,score,dtype,msg,comment)");
+            return base.Get<MyHordesMap>(url);
         }
     }
 }
