@@ -186,12 +186,24 @@ namespace MyHordesOptimizerApi.Services.Impl
                         Logger.LogDebug($"GetSimpleMeAsync La Town n'existe pas !");
                         // On Crée la ville
                         DbContext.Add(town);
-                        // On crée les citoyen
-                        DbContext.AddRange(citizens);
-                        // On crée la banque
-                        DbContext.AddRange(bankItems);
-                        // On crée les cadavers
-                        DbContext.AddRange(cadavers);
+                        // On crée les citoyens (dédoublonnage sur la PK (IdTown, IdUser))
+                        List<TownCitizen> distinctCitizens = citizens
+                            .GroupBy(citizen => citizen.IdUser)
+                            .Select(group => group.First())
+                            .ToList();
+                        DbContext.AddRange(distinctCitizens);
+                        // On crée la banque (dédoublonnage sur (IdItem, IsBroken), IdLastUpdateInfo constant ici)
+                        List<TownBankItem> distinctBankItems = bankItems
+                            .GroupBy(bankItem => new { bankItem.IdItem, bankItem.IsBroken })
+                            .Select(group => group.First())
+                            .ToList();
+                        DbContext.AddRange(distinctBankItems);
+                        // On crée les cadavres (dédoublonnage sur la PK (IdTown, IdUser))
+                        List<TownCadaver> distinctCadavers = cadavers
+                            .GroupBy(cadaver => cadaver.IdUser)
+                            .Select(group => group.First())
+                            .ToList();
+                        DbContext.AddRange(distinctCadavers);
                         // On crée les cells
                         var cells = CreateCellsForTown(xVille: myHordeMeResponse.Map.City.X,
                             yVille: myHordeMeResponse.Map.City.Y,
