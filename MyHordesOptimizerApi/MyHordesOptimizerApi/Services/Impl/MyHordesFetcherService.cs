@@ -186,10 +186,22 @@ namespace MyHordesOptimizerApi.Services.Impl
                         Logger.LogDebug($"GetSimpleMeAsync La Town n'existe pas !");
                         // On Crée la ville
                         DbContext.Add(town);
-                        // On crée les citoyens (dédoublonnage sur la PK (IdTown, IdUser))
+                        // Lignes filles déjà présentes en base pour cette ville provisoire (orphelines :
+                        // la ligne Towns manque mais pas ses TownCitizen/TownCadaver). On exclut leurs clés
+                        // pour n'insérer que ce qui manque, sinon violation de la PK (IdTown, IdUser).
+                        HashSet<int> existingCitizenUserIds = DbContext.TownCitizens
+                            .Where(citizen => citizen.IdTown == town.IdTown)
+                            .Select(citizen => citizen.IdUser)
+                            .ToHashSet();
+                        HashSet<int> existingCadaverUserIds = DbContext.TownCadavers
+                            .Where(cadaver => cadaver.IdTown == town.IdTown)
+                            .Select(cadaver => cadaver.IdUser)
+                            .ToHashSet();
+                        // On crée les citoyens manquants (dédoublonnage + exclusion des existants ; PK (IdTown, IdUser))
                         List<TownCitizen> distinctCitizens = citizens
                             .GroupBy(citizen => citizen.IdUser)
                             .Select(group => group.First())
+                            .Where(citizen => !existingCitizenUserIds.Contains(citizen.IdUser))
                             .ToList();
                         DbContext.AddRange(distinctCitizens);
                         // On crée la banque (dédoublonnage sur (IdItem, IsBroken), IdLastUpdateInfo constant ici)
@@ -198,10 +210,11 @@ namespace MyHordesOptimizerApi.Services.Impl
                             .Select(group => group.First())
                             .ToList();
                         DbContext.AddRange(distinctBankItems);
-                        // On crée les cadavres (dédoublonnage sur la PK (IdTown, IdUser))
+                        // On crée les cadavres manquants (dédoublonnage + exclusion des existants ; PK (IdTown, IdUser))
                         List<TownCadaver> distinctCadavers = cadavers
                             .GroupBy(cadaver => cadaver.IdUser)
                             .Select(group => group.First())
+                            .Where(cadaver => !existingCadaverUserIds.Contains(cadaver.IdUser))
                             .ToList();
                         DbContext.AddRange(distinctCadavers);
                         // On crée les cells
