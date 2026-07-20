@@ -63,6 +63,7 @@ export class DataImportComponent implements OnInit {
         { key: 'categories', label: $localize`Catégories`, icon: 'category', fn: () => this.adminService.importCategories() },
         { key: 'items', label: $localize`Objets`, icon: 'inventory_2', fn: () => this.adminService.importItems() },
         { key: 'ruins', label: $localize`Ruines`, icon: 'domain', fn: () => this.adminService.importRuins() },
+        { key: 'pictos', label: $localize`Pictos`, icon: 'emoji_events', fn: () => this.adminService.importPictos() },
         { key: 'buildings', label: $localize`Bâtiments`, icon: 'apartment', fn: () => this.adminService.importBuildings() },
         { key: 'causes-of-death', label: $localize`Causes de mort`, icon: 'skull', fn: () => this.adminService.importCausesOfDeath() },
         { key: 'cleanup-types', label: $localize`Types de nettoyage`, icon: 'cleaning_services', fn: () => this.adminService.importCleanupTypes() },

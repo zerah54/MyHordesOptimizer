@@ -61,7 +61,6 @@ namespace MyHordesOptimizerApi.MappingProfiles
                 .ForMember(dest => dest.PositionX, opt => opt.MapFrom(src => src.X))
                 .ForMember(dest => dest.JobUid, opt => opt.MapFrom(src => src.JobUid))
                 .ForMember(dest => dest.JobName, opt => opt.MapFrom(src => src.JobName))
-                .ForMember(dest => dest.IsGhost, opt => opt.MapFrom(src => src.IsGhost))
                 .ForMember(dest => dest.Dead, opt => opt.MapFrom(src => src.Dead))
                 .ForMember(dest => dest.IdBag, opt => opt.Ignore());
    

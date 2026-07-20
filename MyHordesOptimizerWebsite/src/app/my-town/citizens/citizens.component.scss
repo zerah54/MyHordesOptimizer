@@ -8,6 +8,9 @@
 
         .mat-mdc-tab-nav-panel {
             flex: 1;
+            // min-height: 0 indispensable : sans lui un enfant flex garde min-height:auto
+            // et grandit avec son contenu au lieu de scroller (cas de la liste des morts).
+            min-height: 0;
             overflow: auto;
         }
     }

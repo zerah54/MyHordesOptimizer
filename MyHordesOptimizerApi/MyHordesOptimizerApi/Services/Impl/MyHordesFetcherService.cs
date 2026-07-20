@@ -10,6 +10,7 @@ using MyHordesOptimizerApi.Dtos.MyHordes.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Citizens;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Map;
+using MyHordesOptimizerApi.Exceptions;
 using MyHordesOptimizerApi.Extensions;
 using MyHordesOptimizerApi.Extensions.Models;
 using MyHordesOptimizerApi.Models;
@@ -390,6 +391,18 @@ namespace MyHordesOptimizerApi.Services.Impl
                     }
                     transaction.Commit();
                     Logger.LogDebug($"GetSimpleMeAsync Transaction commit {sw.Elapsed} ms");
+
+                    // Pictos gagnés par les morts dans cette ville. Hors transaction et isolé pour
+                    // qu'un échec ici ne casse pas la synchro de la ville.
+                    try
+                    {
+                        UpsertCadaverPictos(town.IdTown, myHordeMeResponse.Map.Cadavers);
+                        Logger.LogDebug($"GetSimpleMeAsync Pictos des cadavers {sw.Elapsed} ms");
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.LogWarning(ex, "GetSimpleMeAsync: échec de la mise à jour des pictos des cadavers");
+                    }
                 }
 
                 // Historique des villes terminées du joueur (vies passées) : on les importe / marque
@@ -397,7 +410,7 @@ namespace MyHordesOptimizerApi.Services.Impl
                 // isolé pour qu'un échec ici ne casse pas la synchro de la ville courante.
                 try
                 {
-                    UpsertPlayedMaps(myHordeMeResponse.PlayedMaps);
+                    UpsertPlayedMaps(myHordeMeResponse.PlayedMaps, UserInfoProvider.UserId);
                 }
                 catch (Exception ex)
                 {
@@ -437,13 +450,259 @@ namespace MyHordesOptimizerApi.Services.Impl
             return true;
         }
 
+        // Pictos obtenus par chaque mort DANS cette ville (champ `rewards` des cadavers).
+        // Le référentiel Picto est complété à la volée : `rewards` porte les libellés dans les
+        // 4 langues demandées, mais pas `community`, qui reste donc à sa valeur par défaut.
+        // Ne couvre que les morts : les pictos d'un survivant ne remontent jamais par cette voie.
+        private void UpsertCadaverPictos(int townId, List<MyHordesCadaver> cadavers)
+        {
+            var cadaversWithPictos = cadavers?
+                .Where(cadaver => cadaver.Rewards != null && cadaver.Rewards.Count > 0)
+                .ToList();
+            if (cadaversWithPictos == null || cadaversWithPictos.Count == 0)
+            {
+                return;
+            }
+
+            var rewards = cadaversWithPictos.SelectMany(cadaver => cadaver.Rewards.Values).ToList();
+
+            // Référentiel d'abord : Picto porte la FK de TownCitizenPicto
+            var pictoIds = rewards.Select(reward => reward.Id).Distinct().ToList();
+            var knownPictoIds = DbContext.Pictos
+                .Where(picto => pictoIds.Contains(picto.IdPicto))
+                .Select(picto => picto.IdPicto)
+                .ToHashSet();
+            foreach (var reward in rewards.GroupBy(reward => reward.Id).Select(group => group.First()))
+            {
+                if (knownPictoIds.Contains(reward.Id))
+                {
+                    continue;
+                }
+                DbContext.Pictos.Add(new Picto()
+                {
+                    IdPicto = reward.Id,
+                    Img = MyHordesExtensions.RemoveImageFingerprint(reward.Img) ?? string.Empty,
+                    NameFr = GetLabelForLanguage(reward.Name, "fr"),
+                    NameEn = GetLabelForLanguage(reward.Name, "en"),
+                    NameEs = GetLabelForLanguage(reward.Name, "es"),
+                    NameDe = GetLabelForLanguage(reward.Name, "de"),
+                    DescFr = GetLabelForLanguage(reward.Desc, "fr"),
+                    DescEn = GetLabelForLanguage(reward.Desc, "en"),
+                    DescEs = GetLabelForLanguage(reward.Desc, "es"),
+                    DescDe = GetLabelForLanguage(reward.Desc, "de"),
+                    Rare = reward.Rare
+                });
+                knownPictoIds.Add(reward.Id);
+            }
+
+            var lastUpdate = DateTime.UtcNow;
+            var existingLines = DbContext.TownCitizenPictos
+                .Where(picto => picto.IdTown == townId)
+                .ToList();
+            foreach (var cadaver in cadaversWithPictos)
+            {
+                foreach (var reward in cadaver.Rewards.Values)
+                {
+                    var existingLine = existingLines.FirstOrDefault(line => line.IdUser == cadaver.Id && line.IdPicto == reward.Id);
+                    if (existingLine == null)
+                    {
+                        DbContext.TownCitizenPictos.Add(new TownCitizenPicto()
+                        {
+                            IdTown = townId,
+                            IdUser = cadaver.Id,
+                            IdPicto = reward.Id,
+                            Count = reward.Number,
+                            LastUpdate = lastUpdate
+                        });
+                    }
+                    else
+                    {
+                        existingLine.Count = reward.Number;
+                        existingLine.LastUpdate = lastUpdate;
+                    }
+                }
+            }
+            DbContext.SaveChanges();
+        }
+
+        private static string GetLabelForLanguage(IDictionary<string, string> labels, string language)
+        {
+            return labels != null && labels.TryGetValue(language, out var label) ? label : null;
+        }
+
+        // Délai minimal entre deux imports de pictos d'un même joueur. L'appel est le plus lourd de
+        // MyHordes (une requête SQL par ville jouée, sans cache de leur côté) et n'importe qui peut
+        // le déclencher depuis n'importe quel profil : sans cette garde, la fonctionnalité serait
+        // intenable. Les pictos ne bougeant qu'en fin de ville, un jour de fraîcheur suffit.
+        private static readonly TimeSpan PictosImportMinimumInterval = TimeSpan.FromHours(24);
+
+        /// <summary>
+        /// Importe le total des pictos d'un joueur et le détail de son historique par ville, en un
+        /// seul appel MyHordes. Renvoie false sans rien faire si l'import est déjà récent.
+        /// </summary>
+        public bool ImportUserPictos(int userId)
+        {
+            var user = DbContext.Users.FirstOrDefault(u => u.IdUser == userId);
+            if (user == null)
+            {
+                throw new MhoTechnicalException($"Utilisateur introuvable : {userId}");
+            }
+            if (user.PictosHistoryImportedAt.HasValue
+                && DateTime.UtcNow - user.PictosHistoryImportedAt.Value < PictosImportMinimumInterval)
+            {
+                Logger.LogDebug("ImportUserPictos: import ignoré pour {UserId}, déjà fait le {Date}", userId, user.PictosHistoryImportedAt);
+                return false;
+            }
+
+            var response = MyHordesJsonApiRepository.GetUserPictos(userId);
+
+            // L'import crée / met à jour des lignes Town, comme la synchronisation de ville : sans ce
+            // verrou, deux écritures concurrentes sur la même ville se marcheraient dessus. Il n'est
+            // pris qu'ici, une fois l'appel réseau terminé — le tenir pendant les ~15s de la requête
+            // bloquerait toutes les synchronisations pour rien (même découpage que GetSimpleMeAsync).
+            Lock.Wait();
+            try
+            {
+                PersistUserPictos(response, userId);
+            }
+            finally
+            {
+                Lock.Release();
+            }
+            return true;
+        }
+
+        private void PersistUserPictos(MyHordesUserPictosDto response, int userId)
+        {
+            // Les villes de l'historique doivent exister avant d'y rattacher des pictos (FK).
+            // Attention : UpsertPlayedMaps se termine par un ChangeTracker.Clear(). Toute entité
+            // chargée avant lui est détachée, et la modifier ensuite ne partirait jamais en base —
+            // sans la moindre erreur. Rien ne doit donc être chargé avant cet appel pour être écrit
+            // après (le `user` l'était, et sa date d'import était silencieusement perdue).
+            UpsertPlayedMaps(response.PlayedMaps, userId);
+
+            var lastUpdate = DateTime.UtcNow;
+            var rewards = response.Rewards ?? new List<MyHordesReward>();
+            var pictosByTown = (response.PlayedMaps ?? new List<MyHordesPlayedMapDto>())
+                .Where(played => played.MapId.HasValue && played.Rewards != null && played.Rewards.Count > 0)
+                .ToList();
+
+            // Référentiel : les deux sources décrivent les pictos dans les 4 langues, et doivent être
+            // créées avant tout compteur (FK). Aucune ne porte `community`, qui reste à sa valeur par
+            // défaut. Le total et l'historique ne se recouvrent pas exactement (le total inclut les
+            // imports Twinoid, l'historique peut contenir des villes alpha exclues du total).
+            var knownPictoIds = DbContext.Pictos.Select(picto => picto.IdPicto).ToHashSet();
+            foreach (var reward in rewards.Where(reward => !knownPictoIds.Contains(reward.Id)))
+            {
+                DbContext.Pictos.Add(new Picto()
+                {
+                    IdPicto = reward.Id,
+                    Img = MyHordesExtensions.RemoveImageFingerprint(reward.Img) ?? string.Empty,
+                    NameFr = reward.Name?.Fr,
+                    NameEn = reward.Name?.En,
+                    NameEs = reward.Name?.Es,
+                    NameDe = reward.Name?.De,
+                    DescFr = reward.Desc?.Fr,
+                    DescEn = reward.Desc?.En,
+                    DescEs = reward.Desc?.Es,
+                    DescDe = reward.Desc?.De,
+                    Rare = reward.Rare != 0
+                });
+                knownPictoIds.Add(reward.Id);
+            }
+            var describedRewards = pictosByTown
+                .SelectMany(played => played.Rewards.Values)
+                .GroupBy(reward => reward.Id)
+                .Select(group => group.First())
+                .ToList();
+            foreach (var reward in describedRewards.Where(reward => !knownPictoIds.Contains(reward.Id)))
+            {
+                DbContext.Pictos.Add(new Picto()
+                {
+                    IdPicto = reward.Id,
+                    Img = MyHordesExtensions.RemoveImageFingerprint(reward.Img) ?? string.Empty,
+                    NameFr = GetLabelForLanguage(reward.Name, "fr"),
+                    NameEn = GetLabelForLanguage(reward.Name, "en"),
+                    NameEs = GetLabelForLanguage(reward.Name, "es"),
+                    NameDe = GetLabelForLanguage(reward.Name, "de"),
+                    DescFr = GetLabelForLanguage(reward.Desc, "fr"),
+                    DescEn = GetLabelForLanguage(reward.Desc, "en"),
+                    DescEs = GetLabelForLanguage(reward.Desc, "es"),
+                    DescDe = GetLabelForLanguage(reward.Desc, "de"),
+                    Rare = reward.Rare
+                });
+                knownPictoIds.Add(reward.Id);
+            }
+            DbContext.SaveChanges();
+
+            // Total du joueur
+            var existingTotals = DbContext.UserPictos.Where(picto => picto.IdUser == userId).ToList();
+            foreach (var reward in rewards)
+            {
+                var existingTotal = existingTotals.FirstOrDefault(picto => picto.IdPicto == reward.Id);
+                if (existingTotal == null)
+                {
+                    DbContext.UserPictos.Add(new UserPicto()
+                    {
+                        IdUser = userId,
+                        IdPicto = reward.Id,
+                        Count = reward.Number,
+                        LastUpdate = lastUpdate
+                    });
+                }
+                else
+                {
+                    existingTotal.Count = reward.Number;
+                    existingTotal.LastUpdate = lastUpdate;
+                }
+            }
+
+            // Détail par ville
+            var existingTownPictos = DbContext.TownCitizenPictos.Where(picto => picto.IdUser == userId).ToList();
+            foreach (var played in pictosByTown)
+            {
+                var townId = DbContext.ResolveTownId(played.MapId.Value);
+                foreach (var reward in played.Rewards.Values)
+                {
+                    var existingLine = existingTownPictos.FirstOrDefault(line => line.IdTown == townId && line.IdPicto == reward.Id);
+                    if (existingLine == null)
+                    {
+                        DbContext.TownCitizenPictos.Add(new TownCitizenPicto()
+                        {
+                            IdTown = townId,
+                            IdUser = userId,
+                            IdPicto = reward.Id,
+                            Count = reward.Number,
+                            LastUpdate = lastUpdate
+                        });
+                    }
+                    else
+                    {
+                        existingLine.Count = reward.Number;
+                        existingLine.LastUpdate = lastUpdate;
+                    }
+                }
+            }
+
+            // Rechargé ici, et non réutilisé depuis l'appelant : le ChangeTracker.Clear() de
+            // UpsertPlayedMaps aurait détaché l'instance chargée en amont.
+            var user = DbContext.Users.First(u => u.IdUser == userId);
+            user.PictosHistoryImportedAt = lastUpdate;
+            DbContext.SaveChanges();
+            Logger.LogInformation("ImportUserPictos: {PictoCount} pictos et {TownCount} villes importés pour {UserId}",
+                rewards.Count, pictosByTown.Count, userId);
+        }
+
         // Importe / met à jour les villes de l'historique du joueur (playedMaps = vies passées).
         // Ce sont toujours des villes TERMINÉES : on peut donc les marquer IsFinished sans ambiguïté,
         // et on récupère au passage type + score + nom + saison (indisponibles via /json/towns).
         // Seul le mapId est fourni (pas le townId réel) → on clé par ligne provisoire -mapId, qu'un
         // import groupé ultérieur pourra migrer vers le townId stable. Un mapId pouvant être recyclé
         // d'une saison à l'autre, on ne réutilise une ligne existante que si la saison est compatible.
-        private void UpsertPlayedMaps(List<MyHordesPlayedMapDto> playedMaps)
+        // `userId` est le joueur À QUI appartient cet historique : ce n'est pas toujours le joueur
+        // connecté (l'import de pictos passe l'historique d'un tiers), et s'y tromper rattacherait
+        // les villes d'autrui au compte courant.
+        private void UpsertPlayedMaps(List<MyHordesPlayedMapDto> playedMaps, int userId)
         {
             if (playedMaps == null || playedMaps.Count == 0)
             {
@@ -528,12 +787,11 @@ namespace MyHordesOptimizerApi.Services.Impl
 
             DbContext.SaveChanges();
 
-            // Rattache le joueur courant à chacune de ses villes d'historique. Sans ce lien TownCitizen,
+            // Rattache le joueur à chacune de ses villes d'historique. Sans ce lien TownCitizen,
             // ses villes terminées n'apparaîtraient pas dans son profil (qui liste les villes via
             // TownCitizen) : sur une ville terminée, le joueur n'est plus présent dans map.citizens et
             // n'est donc jamais rattaché par la synchro classique. On ne crée que les liens manquants,
             // et seulement si l'utilisateur existe déjà en base (playedMaps peut arriver hors ville).
-            var userId = UserInfoProvider.UserId;
             if (userId > 0 && processedTownIds.Count > 0 && DbContext.Users.Any(u => u.IdUser == userId))
             {
                 var townIdList = processedTownIds.ToList();
@@ -643,9 +901,29 @@ namespace MyHordesOptimizerApi.Services.Impl
             }
             var townDetail = UserInfoProvider.TownDetail;
             var townId = DbContext.ResolveTownId(townDetail.TownId);
+            return GetBankFromDb(townId, lastUpdateId);
+        }
+
+        public BankLastUpdateDto GetBank(int townId)
+        {
+            var resolvedTownId = DbContext.ResolveTownId(townId);
+            return GetBankFromDb(resolvedTownId, -1);
+        }
+
+        private BankLastUpdateDto GetBankFromDb(int townId, int lastUpdateId)
+        {
             if (lastUpdateId == -1)
             {
-                lastUpdateId = DbContext.TownBankItems.Where(tbi => tbi.IdTown == townId).Max(tbi => tbi.IdLastUpdateInfo);
+                lastUpdateId = DbContext.TownBankItems.Where(tbi => tbi.IdTown == townId).Max(tbi => (int?)tbi.IdLastUpdateInfo) ?? -1;
+            }
+            if (lastUpdateId == -1)
+            {
+                // Aucune banque connue pour cette ville (jamais synchronisée)
+                return new BankLastUpdateDto()
+                {
+                    Bank = new List<StackableItemDto>(),
+                    LastUpdateInfo = null
+                };
             }
             var townModel = DbContext.Towns
                 .Where(town => town.IdTown == townId)
@@ -711,6 +989,22 @@ namespace MyHordesOptimizerApi.Services.Impl
             var models = DbContext.GetTownCitizen(townId)
                 .ToList();
             var dtos = Mapper.Map<CitizensLastUpdateDto>(models);
+            // Détail des cadavres : TownCadaver n'a pas de navigation depuis TownCitizen
+            // (PK (idTown, idUser) partagée mais sans FK), on l'affecte donc à la main.
+            var cadaverByUser = DbContext.TownCadavers
+                .Where(cadaver => cadaver.IdTown == townId)
+                .Include(cadaver => cadaver.CauseOfDeathNavigation)
+                .Include(cadaver => cadaver.CleanUpNavigation)
+                .Include(cadaver => cadaver.IdUserNavigation)
+                .ToList()
+                .ToDictionary(cadaver => cadaver.IdUser);
+            foreach (var citizen in dtos.Citizens.Where(citizen => citizen.Dead))
+            {
+                if (cadaverByUser.TryGetValue(citizen.Id, out var cadaverModel))
+                {
+                    citizen.Cadaver = Mapper.Map<CadaverDto>(cadaverModel);
+                }
+            }
             return dtos;
         }
 

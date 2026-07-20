@@ -30,7 +30,6 @@ namespace MyHordesOptimizerApi.MappingProfiles.Citizens
                 .ForMember(dto => dto.Home, opt => opt.MapFrom(model => model))
                 .ForMember(dto => dto.HomeMessage, opt => opt.MapFrom(model => model.HomeMessage))
                 .ForMember(dto => dto.Id, opt => opt.MapFrom(model => model.IdUser))
-                .ForMember(dto => dto.IsGhost, opt => opt.MapFrom(model => model.IsGhost))
                 .ForMember(dto => dto.IsShunned, opt => opt.MapFrom(model => model.IsShunned))
                 .ForMember(dto => dto.JobName, opt => opt.MapFrom(model => model.JobName))
                 .ForMember(dto => dto.JobUid, opt => opt.MapFrom(model => model.JobUid))
@@ -39,6 +38,19 @@ namespace MyHordesOptimizerApi.MappingProfiles.Citizens
                 .ForMember(dto => dto.Status, opt => opt.MapFrom(model => model))
                 .ForMember(dto => dto.X, opt => opt.MapFrom(model => model.PositionX))
                 .ForMember(dto => dto.Y, opt => opt.MapFrom(model => model.PositionY));
+
+            // Détail du décès : TownCadaver partage la PK (idTown, idUser) avec TownCitizen
+            // mais sans navigation EF ; l'affectation se fait dans GetCitizens.
+            CreateMap<TownCadaver, CadaverDto>()
+                .ForMember(dto => dto.Id, opt => opt.MapFrom(model => model.IdUser))
+                .ForMember(dto => dto.Name, opt => opt.MapFrom(model => model.IdUserNavigation.Name))
+                .ForMember(dto => dto.Avatar, opt => opt.MapFrom(model => model.IdUserNavigation.Avatar))
+                .ForMember(dto => dto.Survival, opt => opt.MapFrom(model => model.SurvivalDay))
+                .ForMember(dto => dto.Score, opt => opt.MapFrom(model => model.Score))
+                .ForMember(dto => dto.Msg, opt => opt.MapFrom(model => model.DeathMessage))
+                .ForMember(dto => dto.TownMsg, opt => opt.MapFrom(model => model.TownMessage))
+                .ForMember(dto => dto.CauseOfDeath, opt => opt.MapFrom(model => model.CauseOfDeathNavigation))
+                .ForMember(dto => dto.CleanUp, opt => opt.MapFrom(model => model.CleanUpNavigation));
 
             CreateMap<TownCitizen, CitizenHomeDto>()
                 .ForMember(dest => dest.Content, opt => opt.MapFrom(src => src))

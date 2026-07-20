@@ -52,7 +52,7 @@ $snow-3: url('/img/noel/s3.png');
 
                     ::ng-deep {
                         .mat-mdc-card-header {
-                            height: 40px;
+                            min-height: 40px;
                             align-items: center;
 
                             .mat-mdc-card-header-text {

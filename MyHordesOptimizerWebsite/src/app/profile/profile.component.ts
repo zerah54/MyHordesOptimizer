@@ -1,44 +1,50 @@
-import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, DestroyRef, inject, OnInit, signal, WritableSignal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatCardModule } from '@angular/material/card';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { ActivatedRoute } from '@angular/router';
+import { MatTabsModule } from '@angular/material/tabs';
+import { ActivatedRoute, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { environment } from '../../environments/environment';
 import { UserAccountPublicDTO } from '../_abstract_model/dto/user-account.dto';
 import { UserAccountService } from '../_abstract_model/services/user-account.service';
 import { Imports } from '../_abstract_model/types/_types';
-import { TownListComponent } from '../miscellaneous/town-list/town-list.component';
 
-const angular_common: Imports = [CommonModule];
-const components: Imports = [TownListComponent];
-const material_modules: Imports = [
-    MatCardModule,
-    MatProgressSpinnerModule
-];
+const angular_common: Imports = [RouterLink, RouterLinkActive, RouterOutlet];
+const components: Imports = [];
+const pipes: Imports = [];
+const material_modules: Imports = [MatCardModule, MatProgressSpinnerModule, MatTabsModule];
 
 @Component({
-    selector: 'mho-account',
-    imports: [...angular_common, ...components, ...material_modules],
+    selector: 'mho-profile',
+    imports: [...angular_common, ...components, ...material_modules, ...pipes],
     changeDetection: ChangeDetectionStrategy.OnPush,
-    templateUrl: './account.component.html',
-    styleUrl: './account.component.scss'
+    templateUrl: './profile.component.html',
+    styleUrl: './profile.component.scss'
 })
-export class AccountComponent implements OnInit {
+export class ProfileComponent implements OnInit {
     private readonly route: ActivatedRoute = inject(ActivatedRoute);
     private readonly service: UserAccountService = inject(UserAccountService);
     private readonly destroy_ref: DestroyRef = inject(DestroyRef);
 
-    protected readonly myhordes_url: string = environment.myhordes_url;
+    private readonly myhordes_url: string = environment.myhordes_url;
 
-    protected userId: WritableSignal<number | undefined> = signal<number | undefined>(undefined);
-    protected profile: WritableSignal<UserAccountPublicDTO | null> = signal<UserAccountPublicDTO | null>(null);
-    protected loading: WritableSignal<boolean> = signal<boolean>(true);
-    protected error: WritableSignal<boolean> = signal<boolean>(false);
+    protected readonly profile: WritableSignal<UserAccountPublicDTO | null> = signal<UserAccountPublicDTO | null>(null);
+    protected readonly loading: WritableSignal<boolean> = signal<boolean>(true);
+    protected readonly error: WritableSignal<boolean> = signal<boolean>(false);
+
+    protected readonly links: Link[] = [
+        {
+            label: $localize`Villes`,
+            link: 'towns'
+        },
+        {
+            label: $localize`Pictos`,
+            link: 'pictos'
+        }
+    ];
 
     public ngOnInit(): void {
         const user_id: number = Number(this.route.snapshot.paramMap.get('userId'));
-        this.userId.set(user_id);
         this.service.getPublicProfile(user_id)
             .pipe(takeUntilDestroyed(this.destroy_ref))
             .subscribe({
@@ -58,4 +64,9 @@ export class AccountComponent implements OnInit {
         if (avatar.startsWith('http')) return avatar;
         return this.myhordes_url.replace(/\/$/, '') + avatar;
     }
+}
+
+interface Link {
+    label: string;
+    link: string;
 }

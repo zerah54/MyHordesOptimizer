@@ -8,7 +8,7 @@ import { AfterViewInit, Directive, ElementRef, inject, NgZone, OnDestroy, Render
  * du contenu masqué.
  */
 @Directive({
-    selector: '[cartoScrollAura]',
+    selector: '[mhoScrollAura]',
 })
 export class ScrollAuraDirective implements AfterViewInit, OnDestroy {
 

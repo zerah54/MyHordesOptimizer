@@ -18,7 +18,6 @@ export class Citizen extends CommonModel<CitizenDTO> {
     public home_message?: string;
     public id!: number;
     public is_shunned?: boolean;
-    public is_ghost?: boolean;
     public is_dead?: boolean;
     public job?: JobEnum;
     public name!: string;
@@ -45,7 +44,6 @@ export class Citizen extends CommonModel<CitizenDTO> {
             homeMessage: this.home_message,
             id: this.id,
             isShunned: this.is_shunned,
-            isGhost: this.is_ghost,
             dead: this.is_dead,
             jobName: '',
             jobUid: this.job?.key,
@@ -59,7 +57,8 @@ export class Citizen extends CommonModel<CitizenDTO> {
             home: this.home?.modelToDto(),
             actionsHeroic: this.heroic_actions?.modelToDto(),
             baths: this.baths ? modelToDtoArray(this.baths) : [],
-            chamanicDetail: this.chamanic_detail.modelToDto()
+            chamanicDetail: this.chamanic_detail.modelToDto(),
+            cadaver: this.cadaver?.modelToDto()
         };
     }
 
@@ -110,7 +109,6 @@ export class Citizen extends CommonModel<CitizenDTO> {
             this.avatar = dto.avatar;
             this.home_message = dto.homeMessage;
             this.id = dto.id;
-            this.is_ghost = dto.isGhost;
             this.is_shunned = dto.isShunned;
             this.is_dead = dto.dead;
             this.job = dto.jobUid ? <JobEnum>JobEnum.getByKey(dto.jobUid) : undefined;
@@ -125,6 +123,7 @@ export class Citizen extends CommonModel<CitizenDTO> {
             this.heroic_actions = new HeroicActions(dto.actionsHeroic);
             this.baths = dtoToModelArray(Bath, dto.baths);
             this.chamanic_detail = new ChamanicDetail(dto.chamanicDetail);
+            this.cadaver = dto.cadaver ? new Cadaver(dto.cadaver) : undefined;
         }
     }
 }

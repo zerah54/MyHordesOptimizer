@@ -12,6 +12,9 @@ namespace MyHordesOptimizerApi.Repository.Interfaces
     {
         Dictionary<string, MyHordesItem> GetItems();
         MyHordesMeResponseDto GetMe();
+        MyHordesUserPictosDto GetUserPictos(int userId);
+        List<MyHordesUserIdentityDto> GetUsersIdentity(List<int> ids);
+        Dictionary<string, MyHordesApiPictoDto> GetPictos();
         Dictionary<string, MyHordesApiRuinDto> GetRuins();
         Task<Dictionary<string, MyHordesApiBuildingDto>> GetBuildingAsync();
         List<int> GetTownList(int? season = null);

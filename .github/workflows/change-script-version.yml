@@ -14,7 +14,7 @@ jobs:
         runs-on: ubuntu-latest
 
         steps:
-            -   uses: actions/checkout@main
+            -   uses: actions/checkout@v4
 
             -   name: Read Script
                 id: read-script
@@ -41,11 +41,39 @@ jobs:
                       --header "Authorization: Basic ${{secrets.AUTHENTICATION_BASIC}}" \
                       --data '{"name": "ScriptVersion", "value": "${{ steps.get-version.outputs.version }}"}'
 
-    deploy_chrome_extension:
+    build_extensions:
+
         runs-on: ubuntu-latest
 
         steps:
-            -   uses: actions/checkout@main
+            -   uses: actions/checkout@v4
+
+            -   uses: actions/setup-node@v4
+                with:
+                    node-version: '24.15.0'
+
+            -   name: Generate extension files
+                run: node Scripts/Extensions/convert_script_to_extension.js
+
+            -   name: Upload extensions
+                uses: actions/upload-artifact@v4
+                with:
+                    name: extensions
+                    path: Extensions/
+                    retention-days: 1
+                    if-no-files-found: error
+
+    deploy_chrome_extension:
+
+        needs: build_extensions
+        runs-on: ubuntu-latest
+
+        steps:
+            -   name: Download extensions
+                uses: actions/download-artifact@v4
+                with:
+                    name: extensions
+                    path: Extensions
 
             -   name: Zip
                 uses: vimtor/action-zip@v1.1
@@ -63,10 +91,15 @@ jobs:
                     refresh-token: ${{ secrets.CHROME_EXTENSION_REFRESH_TOKEN }}
 
     deploy_firefox_extension:
+        needs: build_extensions
         runs-on: ubuntu-latest
 
         steps:
-            -   uses: actions/checkout@main
+            -   name: Download extensions
+                uses: actions/download-artifact@v4
+                with:
+                    name: extensions
+                    path: Extensions
 
             -   name: Zip
                 uses: vimtor/action-zip@v1.1

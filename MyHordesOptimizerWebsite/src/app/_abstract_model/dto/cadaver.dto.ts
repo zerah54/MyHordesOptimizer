@@ -1,7 +1,10 @@
+import { CauseOfDeathDTO } from './cause-of-death.dto';
+import { CleanUpDTO } from './clean-up.dto';
+
 export interface CadaverDTO {
     avatar?: string;
-    causeOfDeath?: undefined;
-    cleanup?: undefined;
+    causeOfDeath?: CauseOfDeathDTO;
+    cleanUp?: CleanUpDTO;
     id: number;
     name: string;
     score: number;

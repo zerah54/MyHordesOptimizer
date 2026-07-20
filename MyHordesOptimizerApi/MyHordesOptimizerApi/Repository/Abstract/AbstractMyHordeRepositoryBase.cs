@@ -24,7 +24,10 @@ namespace MyHordesOptimizerApi.Repository.Abstract
 
         protected const string EndpointItems = "items";
         protected const string EndpointMe = "me";
+        protected const string EndpointUser = "user";
+        protected const string EndpointUsers = "users";
         protected const string EndpointRuins = "ruins";
+        protected const string EndpointPictos = "pictos";
         protected const string EndpointBuilding = "buildings";
         protected const string EndpointTownList = "townlist";
         protected const string EndpointTowns = "towns";

@@ -70,9 +70,12 @@ namespace MyHordesOptimizerApi.Controllers
         [HttpGet]
         [Route("Bank")]
         [Authorize]
-        public ActionResult<BankLastUpdateDto> GetBank()
+        public ActionResult<BankLastUpdateDto> GetBank(int? townId)
         {
-            var bank = _myHordesFetcherService.GetBank();
+            // Avec townId : lecture pure en base (mode observateur), sans synchro MyHordes
+            var bank = townId.HasValue
+                ? _myHordesFetcherService.GetBank(townId.Value)
+                : _myHordesFetcherService.GetBank();
             return bank;
         }
 

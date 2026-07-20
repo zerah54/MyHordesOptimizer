@@ -1,7 +1,5 @@
-@if (src() && src() !== '' && src() !== 'False') {
+@if (url(); as avatarUrl) {
     <picture class="mho-avatar" [class.rounded]="rounded()">
-        <source [srcset]="MYHORDES_URL + src()" type="image/avif"/>
-        <source [srcset]="MYHORDES_URL + src()" type="image/webp"/>
-        <img [src]="MYHORDES_URL + src()">
+        <img [src]="avatarUrl" alt=""/>
     </picture>
 }

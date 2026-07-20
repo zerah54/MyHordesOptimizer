@@ -1,3 +1,15 @@
 .vscode/launch.json
 .vscode/tasks.json
 .idea
+
+/Extensions/Chrome/assets/
+/Extensions/Chrome/manifest.json
+/Extensions/Chrome/my_hordes_optimizer.user.js
+
+/Extensions/Firefox/assets/
+/Extensions/Firefox/manifest.json
+/Extensions/Firefox/my_hordes_optimizer.user.js
+
+/Extensions/Opera/assets/
+/Extensions/Opera/manifest.json
+/Extensions/Opera/my_hordes_optimizer.user.js

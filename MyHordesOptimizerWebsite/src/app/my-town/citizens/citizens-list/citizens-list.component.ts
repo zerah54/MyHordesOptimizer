@@ -2,13 +2,17 @@ import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { Component, DestroyRef, EventEmitter, inject, OnInit, Signal, viewChild } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
+import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxChange, MatCheckboxModule } from '@angular/material/checkbox';
 import { MatOptionModule } from '@angular/material/core';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import moment from 'moment';
 import { HORDES_IMG_REPO } from '../../../_abstract_model/const';
 import { StatusEnum } from '../../../_abstract_model/enum/status.enum';
@@ -16,7 +20,6 @@ import { StandardColumn } from '../../../_abstract_model/interfaces';
 import { ApiService } from '../../../_abstract_model/services/api.service';
 import { TownService } from '../../../_abstract_model/services/town.service';
 import { Imports, ListForAddRemove } from '../../../_abstract_model/types/_types';
-import { Cadaver } from '../../../_abstract_model/types/cadaver.class';
 import { CitizenInfo } from '../../../_abstract_model/types/citizen-info.class';
 import { Citizen } from '../../../_abstract_model/types/citizen.class';
 import { HeroicActionsWithValue } from '../../../_abstract_model/types/heroic-actions.class';
@@ -24,6 +27,7 @@ import { HomeWithValue } from '../../../_abstract_model/types/home.class';
 import { Item } from '../../../_abstract_model/types/item.class';
 import { UpdateInfo } from '../../../_abstract_model/types/update-info.class';
 import { ColumnIdPipe } from '../../../_core/pipes/column-id.pipe';
+import { TownContextService } from '../../../_core/services/town-context.service';
 import { getTown, getUser } from '../../../_core/utilities/localstorage.util';
 import { AvatarComponent } from '../../../_shared/avatar/avatar.component';
 import { CitizenInfoComponent } from '../../../_shared/citizen-info/citizen-info.component';
@@ -32,12 +36,13 @@ import { LastUpdateComponent } from '../../../_shared/last-update/last-update.co
 import { ListElementAddRemoveComponent } from '../../../_shared/list-elements-add-remove/list-element-add-remove.component';
 import { HeaderWithSelectFilterComponent } from '../../../_shared/lists/header-with-select-filter/header-with-select-filter.component';
 import { BathForDayPipe } from '../bath-for-day.pipe';
+import { CitizenPictosDialogComponent, CitizenPictosDialogData } from '../citizen-pictos-dialog/citizen-pictos-dialog.component';
 import { TypeRowPipe } from './type-row.pipe';
 
 const angular_common: Imports = [CommonModule, FormsModule, NgOptimizedImage];
 const components: Imports = [AvatarComponent, CitizenInfoComponent, DeferredCellComponent, HeaderWithSelectFilterComponent, LastUpdateComponent, ListElementAddRemoveComponent];
 const pipes: Imports = [BathForDayPipe, ColumnIdPipe, TypeRowPipe];
-const material_modules: Imports = [MatCheckboxModule, MatFormFieldModule, MatInputModule, MatOptionModule, MatSelectModule, MatSortModule, MatTableModule];
+const material_modules: Imports = [MatButtonModule, MatCheckboxModule, MatDialogModule, MatFormFieldModule, MatIconModule, MatInputModule, MatOptionModule, MatSelectModule, MatSortModule, MatTableModule, MatTooltipModule];
 
 @Component({
     selector: 'mho-citizens-list',
@@ -59,12 +64,14 @@ export class CitizensListComponent implements OnInit {
     /** La datasource pour le tableau */
     public citizen_list: MatTableDataSource<Citizen> = new MatTableDataSource();
     /** La datasource des citoyens morts */
-    public dead_citizen_list: MatTableDataSource<Cadaver> = new MatTableDataSource();
+    public dead_citizen_list: MatTableDataSource<Citizen> = new MatTableDataSource();
     /** La liste complète des items */
     public all_items: Item[] = [];
     /** Le dossier dans lequel sont stockées les images */
     public readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
     public readonly current_day: number = getTown()?.day || 1;
+    /** Mode observateur : désactive toute action d'écriture. */
+    public readonly is_readonly: Signal<boolean> = inject(TownContextService).isReadonly;
     /** La locale */
     public readonly locale: string = moment.locale();
     /** Les filtres de la liste des citoyens */
@@ -82,6 +89,11 @@ export class CitizensListComponent implements OnInit {
     /** La liste des colonnes pour les citoyens morts */
     public readonly dead_citizen_list_columns: StandardColumn[] = [
         {id: 'avatar_name', header: $localize`Citoyen`, class: 'center', sticky: true},
+        {id: 'cause_of_death', header: $localize`Cause de la mort`, class: ''},
+        {id: 'survival', header: $localize`Jours de survie`, class: 'center'},
+        {id: 'score', header: $localize`Score`, class: 'center'},
+        {id: 'death_messages', header: $localize`Messages`, class: ''},
+        {id: 'pictos', header: $localize`Pictos`, class: 'center'},
     ];
 
     public readonly all_status: StatusEnum[] = StatusEnum.getAllValues();
@@ -96,6 +108,19 @@ export class CitizensListComponent implements OnInit {
     private readonly api_service: ApiService = inject(ApiService);
     private readonly town_service: TownService = inject(TownService);
     private readonly destroy_ref: DestroyRef = inject(DestroyRef);
+    private readonly dialog: MatDialog = inject(MatDialog);
+
+    /** Ouvre le détail des pictos gagnés par un citoyen dans la ville en cours. */
+    public openPictos(citizen: Citizen): void {
+        const town_id: number | undefined = getTown()?.town_id;
+        if (!town_id) return;
+        const data: CitizenPictosDialogData = {
+            userId: citizen.id,
+            citizenName: citizen.name,
+            townId: town_id
+        };
+        this.dialog.open(CitizenPictosDialogComponent, {data: data});
+    }
 
     public ngOnInit(): void {
         this.citizen_list = new MatTableDataSource();
@@ -404,10 +429,11 @@ export class CitizensListComponent implements OnInit {
                     this.citizen_list.data = [...alive_citizen_info.citizens];
 
                     const dead_citizen_info: CitizenInfo = Object.assign({}, citizen_info);
-                    dead_citizen_info.citizens = dead_citizen_info.citizens.filter((citizen: Citizen) => citizen.is_dead && citizen.cadaver);
+                    // Les morts sont affichés directement depuis les objets Citizen : l'API ne renvoie pas
+                    // d'objet `cadaver` distinct (le filtre `&& citizen.cadaver` masquait donc tous les morts).
+                    dead_citizen_info.citizens = dead_citizen_info.citizens.filter((citizen: Citizen) => citizen.is_dead);
                     this.dead_citizen_info = dead_citizen_info;
-                    this.dead_citizen_list.data = [...dead_citizen_info.citizens.map((citizen: Citizen) => <Cadaver>citizen.cadaver)];
-                    console.log('dead_citizen_info', dead_citizen_info);
+                    this.dead_citizen_list.data = [...dead_citizen_info.citizens];
                 }
             });
     }

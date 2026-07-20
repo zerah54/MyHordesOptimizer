@@ -97,8 +97,10 @@ $tertiary-palette: map.merge(map.get($_palettes, tertiary), $_rest);
     --mat-sys-surface-container-low: #{mat.get-theme-color($theme, secondary, 90)};
     --mat-sys-outline: rgba(255, 255, 255, 0.24);
     --mat-sys-outline-variant: rgba(255, 255, 255, 0.12);
-    --mat-button-text-label-text-color: $tertiary;
-    --mat-toolbar-container-text-color: $tertiary;
+    --mat-button-dark-text-label-text-color: #{$tertiary};
+    --mat-button-light-text-label-text-color: white;
+    --mat-button-text-label-text-color: white;
+    --mat-toolbar-container-text-color: #{$tertiary};
 
     --primary: #{$primary};
     --secondary: #{$secondary};

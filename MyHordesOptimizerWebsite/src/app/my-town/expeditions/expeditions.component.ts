@@ -37,6 +37,7 @@ import { Me } from '../../_abstract_model/types/me.class';
 import { CitizenFromIdPipe } from '../../_core/pipes/citizens-from-id.pipe';
 import { JobFromIdPipe } from '../../_core/pipes/job-from-id.pipe';
 import { ClipboardService } from '../../_core/services/clipboard.service';
+import { TownContextService } from '../../_core/services/town-context.service';
 import { getCitizenFromId } from '../../_core/utilities/citizen.util';
 import { getTown, getUser } from '../../_core/utilities/localstorage.util';
 import { ActiveCitizensComponent } from '../../_shared/active-citizens/active-citizens.component';
@@ -92,6 +93,9 @@ export class ExpeditionsComponent implements OnInit {
     private readonly clipboard: ClipboardService = inject(ClipboardService);
     private readonly dialog: MatDialog = inject(MatDialog);
 
+    /** Mode observateur : lecture seule, aucune écriture ni synchro temps réel. */
+    protected readonly is_readonly: Signal<boolean> = inject(TownContextService).isReadonly;
+
     public async ngOnInit(): Promise<void> {
         this.town_service
             .getCitizens()
@@ -124,6 +128,18 @@ export class ExpeditionsComponent implements OnInit {
         const existing_expeditions: Expedition[] = await firstValueFrom(this.expedition_service.getExpeditions(this.selected_tab_index() + 1));
         this.expeditions.set([...existing_expeditions]);
 
+        // Mode observateur : pas de synchro temps réel (le hub est scopé à la ville du token,
+        // pas à la ville observée) et aucune édition possible.
+        if (this.is_readonly()) {
+            this.edition_mode.set(false);
+            this.editable.set(false);
+            return;
+        }
+
+        this.subscribeToRealtimeExpeditions();
+    }
+
+    private subscribeToRealtimeExpeditions(): void {
         this.realtime_expeditions_service.expedition_updated$
             .pipe(takeUntilDestroyed(this.destroy_ref))
             .subscribe((expedition: Expedition) => {
@@ -454,7 +470,7 @@ export class ExpeditionsComponent implements OnInit {
     public async changeTab(event: MatTabChangeEvent): Promise<void> {
         const existing_expeditions: Expedition[] = await firstValueFrom(this.expedition_service.getExpeditions(this.selected_tab_index() + 1));
         this.expeditions.set([...existing_expeditions]);
-        this.editable.set(event.index >= this.current_day() - 1);
+        this.editable.set(!this.is_readonly() && event.index >= this.current_day() - 1);
     }
 
     public changeExpeditionState(expedition: Expedition, event: boolean): void {

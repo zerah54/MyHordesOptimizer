@@ -11,8 +11,6 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Citizens
 
         public string Name { get; set; }
 
-        public bool IsGhost { get; set; }
-
         public bool Dead { get; set; }
 
         public string HomeMessage { get; set; }

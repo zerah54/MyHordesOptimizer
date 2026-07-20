@@ -6,10 +6,15 @@
 
 -- ============================================================
 -- 1. Users : suppression UserKey, ajout avatar
+--    pictosHistoryImportedAt : date du dernier import des pictos
+--    du joueur (/json/user?id=X : total + historique par ville).
+--    NULL = jamais importé. Sert à la fois de garde anti-abus
+--    (appel lourd côté MyHordes) et de date affichée au joueur.
 -- ============================================================
 ALTER TABLE Users
     DROP COLUMN UserKey,
-    ADD COLUMN avatar VARCHAR(255) NULL;
+    ADD COLUMN avatar VARCHAR(255) NULL,
+    ADD COLUMN pictosHistoryImportedAt DATETIME NULL;
 
 -- Migration one-shot : peuple Users.avatar depuis la dernière
 -- entrée TownCitizen connue (avatar non NULL, idTown le plus récent)
@@ -68,7 +73,26 @@ CREATE TABLE UserPicto (
 );
 
 -- ============================================================
--- 5. UserScriptConfig — sets de paramètres nommés du script
+-- 5. TownCitizenPicto — pictos obtenus par un joueur DANS une ville
+--    Alimenté via cadavers.fields(...,rewards) et playedMaps
+--    Distinct de UserPicto : le total (PictoRollup côté MyHordes)
+--    couvre aussi les villes jamais observées, les imports Twinoid
+--    et l'alpha — SUM(TownCitizenPicto) ne le reconstitue donc pas.
+-- ============================================================
+CREATE TABLE TownCitizenPicto (
+    idTown     INT      NOT NULL,
+    idUser     INT      NOT NULL,
+    idPicto    INT      NOT NULL,
+    count      INT      NOT NULL DEFAULT 0,
+    lastUpdate DATETIME NOT NULL,
+    PRIMARY KEY (idTown, idUser, idPicto),
+    CONSTRAINT fk_towncitizenpicto_town  FOREIGN KEY (idTown)  REFERENCES Town(idTown),
+    CONSTRAINT fk_towncitizenpicto_user  FOREIGN KEY (idUser)  REFERENCES Users(idUser),
+    CONSTRAINT fk_towncitizenpicto_picto FOREIGN KEY (idPicto) REFERENCES Picto(idPicto)
+);
+
+-- ============================================================
+-- 6. UserScriptConfig — sets de paramètres nommés du script
 --    Un utilisateur peut avoir plusieurs sets nommés
 -- ============================================================
 CREATE TABLE UserScriptConfig (
@@ -84,7 +108,7 @@ CREATE TABLE UserScriptConfig (
 );
 
 -- ============================================================
--- 6. UserNote — notes privées d'un utilisateur sur un autre
+-- 7. UserNote — notes privées d'un utilisateur sur un autre
 --    idTown = 0  → note globale (sentinelle, pas de FK)
 --    idTown > 0  → note contextualisée à une ville commune
 --    La contrainte UNIQUE garantit une seule note par

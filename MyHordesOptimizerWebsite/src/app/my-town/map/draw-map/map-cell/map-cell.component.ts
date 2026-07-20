@@ -11,6 +11,7 @@ import { Citizen } from '../../../../_abstract_model/types/citizen.class';
 import { Item } from '../../../../_abstract_model/types/item.class';
 import { Ruin } from '../../../../_abstract_model/types/ruin.class';
 import { MapCellTooltipDirective } from '../../../../_core/directives/map-cell-tooltip.directive';
+import { TownContextService } from '../../../../_core/services/town-context.service';
 import { MapOptions } from '../../map.component';
 import { MapUpdateComponent, MapUpdateData } from '../map-update/map-update.component';
 import { DigLevelPipe } from './pipes/dig-level.pipe';
@@ -64,8 +65,13 @@ export class MapCellComponent {
     public readonly locale: string = moment.locale();
 
     private readonly destroy_ref: DestroyRef = inject(DestroyRef);
+    private readonly town_context: TownContextService = inject(TownContextService);
 
     public openCellUpdate(): void {
+        // Mode observateur : la carte reste consultable, mais on n'ouvre pas l'éditeur de cellule.
+        if (this.town_context.isReadonly()) {
+            return;
+        }
         this.dialog
             .open(MapUpdateComponent, {
                 data: <MapUpdateData>{

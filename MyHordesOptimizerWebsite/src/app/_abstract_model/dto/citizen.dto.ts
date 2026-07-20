@@ -1,5 +1,6 @@
 import { BagDTO } from './bag.dto';
 import { BathDTO } from './bath.dto';
+import { CadaverDTO } from './cadaver.dto';
 import { ChamanicDetailDTO } from './chamanic-detail.dto';
 import { HeroicActionsDTO } from './heroic-actions.dto';
 import { HomeDTO } from './home.dto';
@@ -9,7 +10,6 @@ export interface CitizenDTO {
     avatar?: string;
     homeMessage?: string;
     id: number;
-    isGhost?: boolean;
     isShunned?: boolean;
     dead?: boolean;
     jobName?: string;
@@ -25,4 +25,5 @@ export interface CitizenDTO {
     actionsHeroic?: HeroicActionsDTO;
     baths: BathDTO[];
     chamanicDetail: ChamanicDetailDTO;
+    cadaver?: CadaverDTO;
 }

@@ -147,7 +147,6 @@ namespace MyHordesOptimizerApi.MappingProfiles.Towns
                 .ForMember(dest => dest.IsDrunk, opt => opt.Ignore())
                 .ForMember(dest => dest.IsEyeWounded, opt => opt.Ignore())
                 .ForMember(dest => dest.IsFootWounded, opt => opt.Ignore())
-                .ForMember(dest => dest.IsGhost, opt => opt.MapFrom(src => src.IsGhost))
                 .ForMember(dest => dest.IsGhoul, opt => opt.Ignore())
                 .ForMember(dest => dest.IsHandWounded, opt => opt.Ignore())
                 .ForMember(dest => dest.IsHeadWounded, opt => opt.Ignore())
@@ -207,11 +206,10 @@ namespace MyHordesOptimizerApi.MappingProfiles.Towns
                     }
                     else
                     {
-                        // Name et avatar ne vivent que sur User : on les rafraîchit depuis le cadavre
-                        if (!string.IsNullOrEmpty(src.Name))
-                        {
-                            dbUser.Name = src.Name;
-                        }
+                        // Name n'est volontairement PAS rafraîchi ici : getCadaversInformation renvoie
+                        // `getAlias() ?? getUser()->getName()`, donc un nom d'emprunt dans les villes à
+                        // alias, qui écraserait le pseudo réel partout (name ne vit que sur User). Seuls
+                        // les chemins getUserData font autorité. L'avatar, lui, est toujours celui du User.
                         if (!string.IsNullOrEmpty(src.Avatar))
                         {
                             dbUser.Avatar = src.Avatar;

@@ -17,7 +17,9 @@ import { CitizenInfo } from '../../../_abstract_model/types/citizen-info.class';
 import { Citizen } from '../../../_abstract_model/types/citizen.class';
 import { UpdateInfo } from '../../../_abstract_model/types/update-info.class';
 import { ColumnIdPipe } from '../../../_core/pipes/column-id.pipe';
+import { TownContextService } from '../../../_core/services/town-context.service';
 import { getTown } from '../../../_core/utilities/localstorage.util';
+import { AvatarComponent } from '../../../_shared/avatar/avatar.component';
 import { CitizenInfoComponent } from '../../../_shared/citizen-info/citizen-info.component';
 import {
     HeaderWithNumberPreviousNextFilterComponent
@@ -27,7 +29,7 @@ import { BathForDayPipe } from '../bath-for-day.pipe';
 import { CitizenGroupByBathStatePipe } from './citizen-group-by-bath_state.pipe';
 
 const angular_common: Imports = [CommonModule, FormsModule];
-const components: Imports = [HeaderWithNumberPreviousNextFilterComponent, HeaderWithSelectFilterComponent, CitizenInfoComponent];
+const components: Imports = [AvatarComponent, HeaderWithNumberPreviousNextFilterComponent, HeaderWithSelectFilterComponent, CitizenInfoComponent];
 const pipes: Imports = [BathForDayPipe, CitizenGroupByBathStatePipe, ColumnIdPipe];
 const material_modules: Imports = [MatCheckboxModule, MatSlideToggleModule, MatSortModule, MatTableModule, MatButtonToggleModule];
 
@@ -50,6 +52,8 @@ export class CitizensWatchComponent implements OnInit {
     public readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
     /** La locale */
     public readonly locale: string = moment.locale();
+    /** Mode observateur : désactive toute action d'écriture. */
+    public readonly is_readonly: Signal<boolean> = inject(TownContextService).isReadonly;
     /** La liste des citoyens a été mise à jour */
     public citizen_filter_change: EventEmitter<void> = new EventEmitter<void>();
     /** La liste des colonnes */

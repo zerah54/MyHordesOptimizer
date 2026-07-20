@@ -73,6 +73,19 @@ namespace MyHordesOptimizerApi.Controllers
         }
 
         [HttpPost]
+        [Route("Pictos")]
+        public ActionResult ImportPictos(string userKey)
+        {
+            if (string.IsNullOrWhiteSpace(userKey))
+            {
+                return BadRequest($"{nameof(userKey)} cannot be empty");
+            }
+            UserInfoProvider.UserKey = userKey;
+            MyHordesImportService.ImportPictos();
+            return Ok();
+        }
+
+        [HttpPost]
         [Route("Categories")]
         public async Task<ActionResult> ImportCategories()
         {

@@ -23,7 +23,7 @@
         }
 
         @if (adminService.isAdmin()) {
-            <button mat-button type="button" routerLinkActive="link-selected" [routerLinkActiveOptions]="{exact : true}" [routerLink]="['/admin']">
+            <button mat-button type="button" routerLinkActive="link-selected" [routerLink]="['/admin']">
                 <mat-icon fontSet="material-symbols-outlined">lock</mat-icon>
                 <ng-container i18n>Administration</ng-container>
             </button>
@@ -71,13 +71,13 @@
 <ng-template #routeLink let-route>
     @if (route.displayed && route.authorized()) {
         <a mat-list-item routerLinkActive="link-selected"
-           [routerLinkActiveOptions]="{exact : true}" [routerLink]="route.path"
+           [routerLinkActiveOptions]="{exact : true}" [routerLink]="resolvePath(route)"
            (click)="route.expanded = !route.expanded; toggleDisplayChildren(route)" [class]="`lvl-${route.lvl}`">
             <div>
                 @if (route.children && route.children.length > 0) {
                     <mat-icon fontSet="material-symbols-outlined">{{ route.expanded ? 'expand_more' : 'chevron_right' }}</mat-icon>
                 }
-                {{ route.label }}
+                {{ resolveLabel(route) }}
                 @if (route.spoil) {
                     <span class="spoil" matTooltip="Cette page peut contenir des spoils de la saison 19" i18n-matTooltip>Spoil S19</span>
                 }

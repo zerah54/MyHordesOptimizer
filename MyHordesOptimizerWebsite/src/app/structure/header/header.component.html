@@ -61,7 +61,7 @@
                 <mho-header-citizen-menu></mho-header-citizen-menu>
             }
             @if (me && me.id) {
-                <a mat-menu-item [routerLink]="['/account', me.id]" i18n>Mon compte</a>
+                <a mat-menu-item [routerLink]="['/profile', me.id]" i18n>Mon compte</a>
             }
             <div mat-menu-item (click)="disconnect()" i18n>Déconnexion</div>
         }

@@ -46,6 +46,7 @@ import { WishlistInfo } from '../../_abstract_model/types/wishlist-info.class';
 import { WishlistItem } from '../../_abstract_model/types/wishlist-item.class';
 import { ColumnIdPipe } from '../../_core/pipes/column-id.pipe';
 import { ClipboardService } from '../../_core/services/clipboard.service';
+import { TownContextService } from '../../_core/services/town-context.service';
 import { ConfirmDialogComponent, ConfirmDialogData } from '../../_shared/confirm-dialog/confirm-dialog.component';
 import { DeferredCellComponent } from '../../_shared/deferred-cell/deferred-cell.component';
 import { LastUpdateComponent } from '../../_shared/last-update/last-update.component';
@@ -98,6 +99,8 @@ export class WishlistComponent implements OnInit {
     protected wishlist_info: WritableSignal<WishlistInfo | null> = signal(null);
     protected items: WritableSignal<Item[]> = signal([]);
     protected edition_mode: WritableSignal<boolean> = signal(JSON.parse(localStorage.getItem(WISHLIST_EDITION_MODE_KEY) || 'false'));
+    /** Mode observateur : lecture seule, l'édition est désactivée. */
+    protected readonly is_readonly: Signal<boolean> = inject(TownContextService).isReadonly;
     protected drag_disabled: WritableSignal<boolean> = signal(true);
     protected wishlist_filters: WritableSignal<WishlistFilters> = signal({items: '', depot: []});
     protected current_zone_xp_pa_add_item: WritableSignal<number> = signal(0);
@@ -136,6 +139,10 @@ export class WishlistComponent implements OnInit {
     }
 
     public ngOnInit(): void {
+
+        if (this.is_readonly()) {
+            this.edition_mode.set(false);
+        }
 
         this.auto_save$
             .pipe(

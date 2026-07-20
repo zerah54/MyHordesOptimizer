@@ -10,13 +10,17 @@
         <button mat-icon-button type="button" [matMenuTriggerFor]="shareMenu" matTooltip="Import / Export" i18n-matTooltip>
             <mat-icon fontSet="material-symbols-outlined">import_export</mat-icon>
         </button>
-        <mat-slide-toggle [(ngModel)]="edition_mode" (ngModelChange)="changeEditionMode()" i18n>Mode édition</mat-slide-toggle>
+        @if (!is_readonly()) {
+            <mat-slide-toggle [(ngModel)]="edition_mode" (ngModelChange)="changeEditionMode()" i18n>Mode édition</mat-slide-toggle>
+        }
 
         <mat-menu #shareMenu="matMenu">
             <div mat-menu-item (click)="shareExcel()" i18n>Enregistrer dans un fichier Excel</div>
-            <div mat-menu-item (click)="importFileInput.click()" i18n>Importer depuis un fichier Excel</div>
-            <input #importFileInput type="file" style="display: none;" (change)="importExcel(importFileInput)"
-                   accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">
+            @if (!is_readonly()) {
+                <div mat-menu-item (click)="importFileInput.click()" i18n>Importer depuis un fichier Excel</div>
+                <input #importFileInput type="file" style="display: none;" (change)="importExcel(importFileInput)"
+                       accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">
+            }
         </mat-menu>
     </div>
 

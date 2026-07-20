@@ -10,7 +10,7 @@
 @mixin app-component-overrides() {
     @include mat.toolbar-overrides((
         container-background-color: var(--mat-sys-primary-container),
-        container-text-color: var(--mat-toolbar-container-text-color),
+        container-text-color: var(--mat-sys-on-surface),
         standard-height: 52px
     ));
 
@@ -64,9 +64,9 @@
     ));
 
     @include mat.button-overrides((
-        protected-label-text-color: var(--mat-sys-on-surface),
-        outlined-label-text-color: var(--mat-sys-on-surface),
-        filled-label-text-color: var(--mat-sys-on-surface)
+        protected-label-text-color: var(--mat-button-light-text-label-text-color),
+        outlined-label-text-color: var(--mat-button-light-text-label-text-color),
+        filled-label-text-color: var(--mat-button-dark-text-label-text-color)
     ))
 }
 

@@ -1,11 +1,6 @@
 :host {
     display: contents;
 
-    ::ng-deep > .mat-mdc-card-header {
-        padding-left: 0;
-        padding-right: 0;
-    }
-
     .town-list {
         display: flex;
         flex-direction: column;
@@ -28,8 +23,6 @@
     .town-list__table-wrapper {
         flex: 1;
         overflow: auto;
-        border: 1px solid var(--mat-sys-outline-variant);
-        border-radius: 0.25em;
     }
 
     .town-table {
@@ -45,15 +38,6 @@
     .field--name {
         padding-top: 0.5em;
         min-width: 160px;
-    }
-
-    .mho-town-list-header {
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-        justify-content: space-between;
-        gap: 1em;
-        width: 100%;
     }
 
     .season-phase-filter {
@@ -128,6 +112,14 @@
         height: 1rem;
         vertical-align: middle;
         margin-left: 4px;
+    }
+
+    tr.clickable-row {
+        cursor: pointer;
+
+        &:hover {
+            background-color: var(--mat-sys-surface-container-high);
+        }
     }
 
     .town-list__empty,

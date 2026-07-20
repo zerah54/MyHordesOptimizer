@@ -77,6 +77,8 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
             DbContext.ChangeTracker.Clear();
             ImportRuins();
             DbContext.ChangeTracker.Clear();
+            ImportPictos();
+            DbContext.ChangeTracker.Clear();
             ImportWishlistCategorie();
             DbContext.ChangeTracker.Clear();
             ImportDefaultWishlists();
@@ -447,6 +449,70 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
 
         #region Ruins
 
+        /// <summary>
+        /// Référentiel complet des pictos (/json/pictos). Les pictos sont aussi créés à la volée
+        /// depuis les récompenses des joueurs, mais celles-ci ne portent pas `community` : cet
+        /// import est la seule source de ce flag, et le seul à connaître les pictos que personne
+        /// n'a encore gagnés.
+        /// </summary>
+        public void ImportPictos()
+        {
+            var pictosFromMyHordes = MyHordesApiRepository.GetPictos();
+            if (pictosFromMyHordes == null || pictosFromMyHordes.Count == 0)
+            {
+                return;
+            }
+
+            // Pas de Patch ici : il supprime les lignes absentes de la source, or Picto est référencé
+            // par UserPicto et TownCitizenPicto. Un picto retiré du jeu mais encore compté chez un
+            // joueur ferait échouer l'import sur sa contrainte de clé étrangère.
+            var pictosFromDb = DbContext.Pictos.ToList();
+            foreach (var picto in pictosFromMyHordes.Values)
+            {
+                var existingPicto = pictosFromDb.FirstOrDefault(fromDb => fromDb.IdPicto == picto.Id);
+                if (existingPicto == null)
+                {
+                    DbContext.Pictos.Add(new Picto()
+                    {
+                        IdPicto = picto.Id,
+                        Img = MyHordesExtensions.RemoveImageFingerprint(picto.Img) ?? string.Empty,
+                        NameFr = GetLabel(picto.Name, "fr"),
+                        NameEn = GetLabel(picto.Name, "en"),
+                        NameEs = GetLabel(picto.Name, "es"),
+                        NameDe = GetLabel(picto.Name, "de"),
+                        DescFr = GetLabel(picto.Desc, "fr"),
+                        DescEn = GetLabel(picto.Desc, "en"),
+                        DescEs = GetLabel(picto.Desc, "es"),
+                        DescDe = GetLabel(picto.Desc, "de"),
+                        Community = picto.Community,
+                        Rare = picto.Rare
+                    });
+                }
+                else
+                {
+                    existingPicto.Img = MyHordesExtensions.RemoveImageFingerprint(picto.Img) ?? existingPicto.Img;
+                    existingPicto.NameFr = GetLabel(picto.Name, "fr") ?? existingPicto.NameFr;
+                    existingPicto.NameEn = GetLabel(picto.Name, "en") ?? existingPicto.NameEn;
+                    existingPicto.NameEs = GetLabel(picto.Name, "es") ?? existingPicto.NameEs;
+                    existingPicto.NameDe = GetLabel(picto.Name, "de") ?? existingPicto.NameDe;
+                    existingPicto.DescFr = GetLabel(picto.Desc, "fr") ?? existingPicto.DescFr;
+                    existingPicto.DescEn = GetLabel(picto.Desc, "en") ?? existingPicto.DescEn;
+                    existingPicto.DescEs = GetLabel(picto.Desc, "es") ?? existingPicto.DescEs;
+                    existingPicto.DescDe = GetLabel(picto.Desc, "de") ?? existingPicto.DescDe;
+                    existingPicto.Community = picto.Community;
+                    existingPicto.Rare = picto.Rare;
+                    DbContext.Update(existingPicto);
+                }
+            }
+            DbContext.SaveChanges();
+            Logger.LogInformation($"{pictosFromMyHordes.Count} pictos importés");
+        }
+
+        private static string GetLabel(IDictionary<string, string> labels, string language)
+        {
+            return labels != null && labels.TryGetValue(language, out var label) ? label : null;
+        }
+
         public void ImportRuins()
         {
             var ruinsFromMyHordes = MyHordesApiRepository.GetRuins();
@@ -636,6 +702,95 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
                 DbContext.ChangeTracker.Clear();
             }
 
+            // L'import vient de créer des joueurs et des participations : l'annuaire lit des colonnes
+            // dénormalisées, qui seraient sinon périmées jusqu'au prochain recalcul manuel.
+            return RecomputeUserDirectoryStatsAsync();
+        }
+
+        // Recalcule les statistiques dénormalisées servant la liste des citoyens. En SQL brut : EF ne
+        // sait pas faire d'UPDATE ... JOIN, et un aller-retour par joueur serait intenable.
+        // Idempotent, donc rejouable à volonté.
+        public Task RecomputeUserDirectoryStatsAsync()
+        {
+            // lastTownId ignore les villes provisoires (idTown = -mapId, pas encore migrées vers leur
+            // identifiant stable) : leur id négatif les ferait passer pour les plus anciennes alors
+            // qu'elles sont justement les plus récentes. Elles restent comptées dans nbTownsPlayed.
+            var affected = DbContext.Database.ExecuteSqlRaw(@"
+                UPDATE Users u
+                LEFT JOIN (
+                    SELECT idUser,
+                           COUNT(*) AS nbTowns,
+                           MAX(CASE WHEN idTown > 0 THEN idTown END) AS lastTownId
+                    FROM TownCitizen
+                    GROUP BY idUser
+                ) tc ON tc.idUser = u.idUser
+                LEFT JOIN (
+                    SELECT idUser, MAX(survivalDay) AS bestSurvival
+                    FROM TownCadaver
+                    GROUP BY idUser
+                ) cad ON cad.idUser = u.idUser
+                SET u.nbTownsPlayed = COALESCE(tc.nbTowns, 0),
+                    u.lastTownId    = tc.lastTownId,
+                    u.bestSurvival  = cad.bestSurvival");
+
+            Logger.LogInformation("RecomputeUserDirectoryStats: {Affected} joueurs mis à jour", affected);
+            return Task.CompletedTask;
+        }
+
+        // Rafraîchit les pseudos depuis /json/users, seule source faisant autorité : les chemins
+        // « cadavre » (/json/towns, cadavres de /json/map) renvoient `getAlias() ?? getName()` et ne
+        // peuvent donc pas écrire Users.name. Coût proportionnel au nombre de joueurs DISTINCTS et
+        // non au nombre de villes : un joueur vu dans 50 villes ne coûte qu'une entrée de batch.
+        public Task RefreshUserNamesAsync(int? limit = null)
+        {
+            // Jamais rafraîchis d'abord (pseudo potentiellement aliasé), puis les plus anciens
+            var idsQuery = DbContext.Users
+                .OrderBy(user => user.NameRefreshedAt.HasValue)
+                .ThenBy(user => user.NameRefreshedAt)
+                .Select(user => user.IdUser);
+            if (limit.HasValue)
+            {
+                idsQuery = idsQuery.Take(limit.Value);
+            }
+            var ids = idsQuery.ToList();
+            DbContext.ChangeTracker.Clear();
+
+            var refreshed = 0;
+            foreach (var batch in ids.Chunk(100))
+            {
+                var batchIds = batch.ToList();
+                var identities = MyHordesApiRepository.GetUsersIdentity(batchIds);
+                // getUsersAPI renvoie une entrée d'erreur (sans id) pour un joueur inconnu
+                var identityByUserId = identities
+                    .Where(identity => identity.Id > 0)
+                    .ToDictionary(identity => identity.Id);
+
+                var users = DbContext.Users.Where(user => batchIds.Contains(user.IdUser)).ToList();
+                var now = DateTime.UtcNow;
+                foreach (var user in users)
+                {
+                    // Marqué même sans réponse (compte supprimé côté MyHordes) : sinon le joueur
+                    // resterait en tête de file à chaque passe et bloquerait les suivants.
+                    user.NameRefreshedAt = now;
+                    if (!identityByUserId.TryGetValue(user.IdUser, out var identity))
+                    {
+                        continue;
+                    }
+                    if (!string.IsNullOrEmpty(identity.Name))
+                    {
+                        user.Name = identity.Name;
+                    }
+                    if (!string.IsNullOrEmpty(identity.Avatar))
+                    {
+                        user.Avatar = identity.Avatar;
+                    }
+                    refreshed++;
+                }
+                DbContext.SaveChanges();
+                DbContext.ChangeTracker.Clear();
+            }
+
+            Logger.LogInformation("RefreshUserNames: {Refreshed}/{Total} joueurs rafraîchis", refreshed, ids.Count);
             return Task.CompletedTask;
         }
 
@@ -860,7 +1015,8 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
             {
                 foreach (var c in map.Citizens)
                 {
-                    var user = UpsertUser(c.Id, c.Name, c.Avatar as string);
+                    // Citoyens vivants : getCitizensData délègue à getUserData, le nom est le vrai pseudo
+                    var user = UpsertUser(c.Id, c.Name, c.Avatar as string, nameIsAuthoritative: true);
                     var citizen = GetOrCreateTownCitizen(townId, user, existingCitizens, ref lastUpdate);
                     citizen.Dead = false;
                     if (!string.IsNullOrEmpty(c.HomeMessage))
@@ -874,9 +1030,10 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
             {
                 foreach (var c in map.Cadavers)
                 {
-                    var user = UpsertUser(c.Id, c.Name, c.Avatar);
+                    var user = UpsertUser(c.Id, c.Name, c.Avatar, nameIsAuthoritative: false);
                     var citizen = GetOrCreateTownCitizen(townId, user, existingCitizens, ref lastUpdate);
                     citizen.Dead = true;
+                    citizen.NameInTown = c.Name;
                     var cadaver = GetOrCreateTownCadaver(townId, user, existingCadavers);
                     cadaver.SurvivalDay = c.Survival;
                     cadaver.Score = c.Score;
@@ -899,8 +1056,10 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
 
             foreach (var citizenDto in citizens)
             {
-                var user = UpsertUser(citizenDto.Id, citizenDto.Name, citizenDto.Avatar);
+                // /json/towns passe par getCadaversInformation : le nom peut être un alias
+                var user = UpsertUser(citizenDto.Id, citizenDto.Name, citizenDto.Avatar, nameIsAuthoritative: false);
                 var citizen = GetOrCreateTownCitizen(townId, user, existingCitizens, ref lastUpdate);
+                citizen.NameInTown = citizenDto.Name;
                 var isDead = citizenDto.Dtype.HasValue && citizenDto.Dtype.Value > 0;
                 citizen.Dead = isDead;
                 if (isDead)
@@ -915,7 +1074,15 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
             }
         }
 
-        private User UpsertUser(int userId, string name, string avatar)
+        /// <param name="nameIsAuthoritative">
+        /// Faux quand `name` vient d'un chemin « cadavre » (`getCadaversInformation` : /json/towns
+        /// citizens, /json/map cadavers), qui renvoie `getAlias() ?? getUser()->getName()` : dans une
+        /// ville à alias, ce nom est un nom d'emprunt et écraserait le pseudo réel partout, puisque
+        /// name ne vit que sur User. Le nom brut est conservé sur TownCitizen.NameInTown ; seul un
+        /// chemin `getUserData` (/json/me, /json/map citizens) fait autorité sur le pseudo.
+        /// L'avatar, lui, est toujours celui du User : il est fiable sur tous les chemins.
+        /// </param>
+        private User UpsertUser(int userId, string name, string avatar, bool nameIsAuthoritative)
         {
             // Le tracker d'abord : le même joueur peut apparaître dans plusieurs villes
             // d'un même batch, avant le SaveChanges
@@ -923,13 +1090,14 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
                 ?? DbContext.Users.FirstOrDefault(u => u.IdUser == userId);
             if (user == null)
             {
+                // À la création on n'a que ce nom, potentiellement un alias : un refresh ultérieur
+                // via /json/users le corrigera. Mieux vaut un nom approximatif que vide.
                 user = new User { IdUser = userId, Name = name ?? string.Empty, Avatar = avatar };
                 DbContext.Users.Add(user);
             }
             else
             {
-                // Name et avatar ne vivent que sur User : on les rafraîchit à chaque import
-                if (!string.IsNullOrEmpty(name))
+                if (nameIsAuthoritative && !string.IsNullOrEmpty(name))
                 {
                     user.Name = name;
                 }

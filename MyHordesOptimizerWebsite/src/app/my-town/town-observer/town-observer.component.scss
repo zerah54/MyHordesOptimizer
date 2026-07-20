@@ -1,0 +1,33 @@
+:host {
+    display: block;
+}
+
+.observer-banner {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    background-color: var(--mat-sys-secondary-container);
+    color: var(--mat-sys-on-secondary-container);
+    border-radius: 4px;
+    margin-bottom: 8px;
+
+    &__label {
+        font-weight: 600;
+    }
+
+    &__town {
+        font-weight: 600;
+    }
+
+    &__day {
+        margin-left: auto;
+        opacity: 0.85;
+    }
+}
+
+.observer-loading {
+    display: flex;
+    justify-content: center;
+    padding: 32px;
+}

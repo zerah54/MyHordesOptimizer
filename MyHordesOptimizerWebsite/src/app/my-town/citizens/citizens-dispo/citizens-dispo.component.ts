@@ -13,6 +13,7 @@ import { Citizen } from '../../../_abstract_model/types/citizen.class';
 import { Dig } from '../../../_abstract_model/types/dig.class';
 import { ColumnIdPipe } from '../../../_core/pipes/column-id.pipe';
 import { getTown } from '../../../_core/utilities/localstorage.util';
+import { AvatarComponent } from '../../../_shared/avatar/avatar.component';
 import { CitizenInfoComponent } from '../../../_shared/citizen-info/citizen-info.component';
 import {
     HeaderWithNumberPreviousNextFilterComponent
@@ -20,7 +21,7 @@ import {
 import { HeaderWithSelectFilterComponent } from '../../../_shared/lists/header-with-select-filter/header-with-select-filter.component';
 
 const angular_common: Imports = [CommonModule];
-const components: Imports = [HeaderWithNumberPreviousNextFilterComponent, HeaderWithSelectFilterComponent, CitizenInfoComponent];
+const components: Imports = [AvatarComponent, HeaderWithNumberPreviousNextFilterComponent, HeaderWithSelectFilterComponent, CitizenInfoComponent];
 const pipes: Imports = [ColumnIdPipe];
 const material_modules: Imports = [MatSortModule, MatTableModule];
 

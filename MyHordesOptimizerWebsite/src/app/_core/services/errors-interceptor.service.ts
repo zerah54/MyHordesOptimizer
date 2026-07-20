@@ -1,8 +1,11 @@
-import { HttpErrorResponse, HttpEvent, HttpHandlerFn, HttpRequest } from '@angular/common/http';
+import { HttpContextToken, HttpErrorResponse, HttpEvent, HttpHandlerFn, HttpRequest } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { catchError, Observable, retry, throwError } from 'rxjs';
 import { AuthenticationService } from '../../_abstract_model/services/authentication.service';
 import { SnackbarService } from './snackbar.service';
+
+/** Laisse l'erreur remonter telle quelle, sans message ni tentative de reconnexion */
+export const BYPASS_ERROR: HttpContextToken<boolean> = new HttpContextToken(() => false);
 
 /** Intercepte les appels REST pour afficher un loader */
 export function errorInterceptor(request: HttpRequest<unknown>, next: HttpHandlerFn): Observable<HttpEvent<unknown>> {
@@ -10,7 +13,9 @@ export function errorInterceptor(request: HttpRequest<unknown>, next: HttpHandle
     const authentication_service: AuthenticationService = inject(AuthenticationService);
     return next(request)
         .pipe(
-            catchError((error: HttpErrorResponse) => handleError(error, snackbar, authentication_service))
+            catchError((error: HttpErrorResponse) => request.context.get(BYPASS_ERROR)
+                ? throwError(() => error)
+                : handleError(error, snackbar, authentication_service))
         );
 }
 

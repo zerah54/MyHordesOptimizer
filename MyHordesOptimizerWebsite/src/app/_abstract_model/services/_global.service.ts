@@ -2,14 +2,17 @@ import { HttpClient, HttpContext, HttpHeaders, HttpParams, HttpResponse } from '
 import { inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
+import { BYPASS_ERROR } from '../../_core/services/errors-interceptor.service';
 import { BYPASS_LOADING } from '../../_core/services/loading-interceptor.service';
 
 export class GlobalService {
     protected readonly API_URL: string = environment.api_url;
     protected readonly http: HttpClient = inject(HttpClient);
 
-    protected get<T>(url: string, bypass_loading?: boolean, params?: HttpParams): Observable<HttpResponse<T>> {
-        const context: HttpContext = new HttpContext().set(BYPASS_LOADING, bypass_loading);
+    protected get<T>(url: string, bypass_loading?: boolean, params?: HttpParams, bypass_error?: boolean): Observable<HttpResponse<T>> {
+        const context: HttpContext = new HttpContext()
+            .set(BYPASS_LOADING, bypass_loading)
+            .set(BYPASS_ERROR, !!bypass_error);
         return this.http.get<T>(url, {
             responseType: 'json',
             context: context,

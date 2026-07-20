@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Newtonsoft.Json;
 
 namespace MyHordesOptimizerApi.Dtos.MyHordes.Me
@@ -28,5 +29,11 @@ namespace MyHordesOptimizerApi.Dtos.MyHordes.Me
 
         [JsonProperty("day")]
         public int? Day { get; set; }
+
+        // Pictos gagnés par le joueur dans cette ville, indexés par idPicto. Coûteux côté MyHordes
+        // (une requête SQL par ville) : n'est demandé que par l'import de pictos, à la demande.
+        [JsonProperty("rewards")]
+        [JsonConverter(typeof(CadaverRewardsConverter))]
+        public IDictionary<string, MyHordesCadaverReward>? Rewards { get; set; }
     }
 }

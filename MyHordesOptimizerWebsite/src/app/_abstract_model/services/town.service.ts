@@ -3,6 +3,7 @@ import { inject, Injectable } from '@angular/core';
 import moment from 'moment';
 import { map, Observable, Subscriber } from 'rxjs';
 import { SnackbarService } from '../../_core/services/snackbar.service';
+import { TownContextService } from '../../_core/services/town-context.service';
 import { getBankWithExpirationDate, getExternalAppId, getTown, getUserId, setBankWithExpirationDate, } from '../../_core/utilities/localstorage.util';
 import { BankInfoDTO } from '../dto/bank-info.dto';
 import { CellDTO } from '../dto/cell.dto';
@@ -31,6 +32,7 @@ import { GlobalService } from './_global.service';
 @Injectable({providedIn: 'root'})
 export class TownService extends GlobalService {
     private snackbar: SnackbarService = inject(SnackbarService);
+    private readonly town_context: TownContextService = inject(TownContextService);
 
     /** La locale */
     private readonly locale: string = moment.locale();
@@ -42,6 +44,20 @@ export class TownService extends GlobalService {
      */
     public getBank(force?: boolean): Observable<BankInfo> {
         return new Observable((sub: Subscriber<BankInfo>) => {
+            // Mode observateur : banque d'une ville tierce, en lecture pure côté serveur (?townId=),
+            // sans passer par le cache localStorage (non indexé par ville) pour ne pas le polluer.
+            if (this.town_context.isReadonly()) {
+                super.get<BankInfoDTO>(this.API_URL + `/Fetcher/bank?townId=${getTown()?.town_id}`)
+                    .subscribe({
+                        next: (response: HttpResponse<BankInfoDTO>) => {
+                            sub.next(new BankInfo(response.body));
+                        },
+                        error: (error: HttpErrorResponse) => {
+                            sub.error(error);
+                        }
+                    });
+                return;
+            }
             const saved_bank: BankInfo | undefined = getBankWithExpirationDate();
             if (saved_bank && saved_bank.items.length > 0 && !force) {
                 sub.next(saved_bank);

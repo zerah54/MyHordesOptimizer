@@ -97,6 +97,9 @@ public partial class Town
     public virtual ICollection<TownCitizen> TownCitizens { get; set; } = new List<TownCitizen>();
 
     [InverseProperty("IdTownNavigation")]
+    public virtual ICollection<TownCitizenPicto> TownCitizenPictos { get; set; } = new List<TownCitizenPicto>();
+
+    [InverseProperty("IdTownNavigation")]
     public virtual ICollection<TownEstimation> TownEstimations { get; set; } = new List<TownEstimation>();
 
     [InverseProperty("IdTownNavigation")]

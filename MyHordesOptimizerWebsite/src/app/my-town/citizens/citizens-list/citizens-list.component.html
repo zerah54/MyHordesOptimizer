@@ -35,6 +35,7 @@
                                         <div>
                                             <div class="status">
                                                 <mho-list-element-add-remove
+                                                    [readonly]="is_readonly()"
                                                     [currentList]="row.status?.icons || []"
                                                     [lists]="status_lists"
                                                     label="États"
@@ -54,6 +55,7 @@
                                             </div>
                                             <div class="bag">
                                                 <mho-list-element-add-remove
+                                                    [readonly]="is_readonly()"
                                                     [currentList]="row.bag?.items || []"
                                                     label="Sac"
                                                     i18n-label
@@ -72,7 +74,7 @@
                                                 </mho-last-update>
                                             </div>
                                             <div class="bath">
-                                                <mat-checkbox [checked]="row.baths | bathForDay : current_day" (change)="saveBath(row, $event)">
+                                                <mat-checkbox [checked]="row.baths | bathForDay : current_day" [disabled]="is_readonly()" (change)="saveBath(row, $event)">
                                                     <ng-container i18n>Bain pris</ng-container>
                                                 </mat-checkbox>
                                                 <mho-last-update
@@ -88,10 +90,10 @@
                                                             <img [ngSrc]="HORDES_IMG_REPO + 'item/item_potion.gif'" width="16" height="16" />
                                                             <ng-container i18n>Potions bues</ng-container>
                                                         </mat-label>
-                                                        <input matInput type="number" [(ngModel)]="row.chamanic_detail.nb_potion_shaman" (ngModelChange)="saveChamanicDetails(row)" />
+                                                        <input matInput type="number" [disabled]="is_readonly()" [(ngModel)]="row.chamanic_detail.nb_potion_shaman" (ngModelChange)="saveChamanicDetails(row)" />
                                                     </mat-form-field>
 
-                                                    <mat-checkbox [(ngModel)]="row.chamanic_detail.is_immune_to_soul" (ngModelChange)="saveChamanicDetails(row)">
+                                                    <mat-checkbox [(ngModel)]="row.chamanic_detail.is_immune_to_soul" [disabled]="is_readonly()" (ngModelChange)="saveChamanicDetails(row)">
                                                         <img [ngSrc]="HORDES_IMG_REPO + 'item/item_potion.gif'" width="16" height="16" />
                                                         <ng-container i18n>Immunisé</ng-container>
                                                     </mat-checkbox>
@@ -107,7 +109,7 @@
                                                     @if (action.element.value.max_lvl > 1) {
                                                         <mat-form-field [appearance]="'outline'" class="short-bottom compact-field">
                                                             <mat-label>{{ action.element.value.label }}</mat-label>
-                                                            <mat-select [(ngModel)]="action.value" (ngModelChange)="updateActions(action, $event, row.id)">
+                                                            <mat-select [(ngModel)]="action.value" [disabled]="is_readonly()" (ngModelChange)="updateActions(action, $event, row.id)">
                                                                 @for (option of action.element.value.options; track option) {
                                                                     <mat-option [value]="option">{{ option }}</mat-option>
                                                                 }
@@ -117,6 +119,7 @@
                                                         <mat-checkbox
                                                             [checked]="action.value === true"
                                                             [indeterminate]="action.value === null || action.value === undefined"
+                                                            [disabled]="is_readonly()"
                                                             (change)="updateActions(action, $event, row.id)">
                                                             {{ action.element.getLabel() }}
                                                         </mat-checkbox>
@@ -142,7 +145,7 @@
                                                                     width="16"
                                                                     height="16" />
                                                             }
-                                                            <mat-select [ngModel]="home.value" (ngModelChange)="updateHome(home, $event, row.id)">
+                                                            <mat-select [ngModel]="home.value" [disabled]="is_readonly()" (ngModelChange)="updateHome(home, $event, row.id)">
                                                                 @for (option of $any(home.element.value.house_options || home.element.value.options); track option; let i = $index; ) {
                                                                     <mat-option [value]="i">
                                                                         @if (!$any(option)[locale]) {
@@ -159,6 +162,7 @@
                                                         <mat-checkbox
                                                             [checked]="home.value === true"
                                                             [indeterminate]="home.value === null || home.value === undefined"
+                                                            [disabled]="is_readonly()"
                                                             (change)="updateHome(home, $event, row.id)">
                                                             @if (home.element.value.img) {
                                                                 <img
@@ -212,6 +216,8 @@
                                     [options]="dead_citizen_info.citizens"
                                     [bindLabel]="'name'">
                                 </mho-header-with-select-filter>
+                            } @default {
+                                {{ column.header }}
                             }
                         }
                     </th>
@@ -222,6 +228,40 @@
                                     @case ('avatar_name') {
                                         <mho-avatar [src]="row.avatar"></mho-avatar>
                                         <div>{{ row.name }}</div>
+                                    } @case ('cause_of_death') {
+                                        @if (row.cadaver?.cause_of_death; as cause) {
+                                            <div class="cause-of-death">
+                                                @if (cause.icon) {
+                                                    <img class="death-icon" [src]="HORDES_IMG_REPO + 'death/' + cause.icon + '.jpg'" [alt]="cause.getLabel()" [title]="cause.getDescription()" />
+                                                }
+                                                <span>{{ cause.getLabel() }}</span>
+                                            </div>
+                                        }
+                                    } @case ('survival') {
+                                        {{ row.cadaver?.survival }}
+                                    } @case ('score') {
+                                        {{ row.cadaver?.score }}
+                                    } @case ('death_messages') {
+                                        <div class="death-messages">
+                                            @if (row.cadaver?.msg) {
+                                                <div class="death-message">
+                                                    <span class="label" i18n>Derniers mots :</span>
+                                                    <span>{{ row.cadaver?.getMsg() }}</span>
+                                                </div>
+                                            }
+                                            @if (row.cadaver?.town_msg) {
+                                                <div class="town-message">
+                                                    <span class="label" i18n>Message à la ville :</span>
+                                                    <span>{{ row.cadaver?.town_msg }}</span>
+                                                </div>
+                                            }
+                                        </div>
+                                    } @case ('pictos') {
+                                        <button mat-icon-button type="button" (click)="openPictos(row)"
+                                                i18n-matTooltip matTooltip="Voir les pictos obtenus dans cette ville"
+                                                i18n-aria-label aria-label="Voir les pictos obtenus dans cette ville">
+                                            <mat-icon fontSet="material-symbols-outlined">emoji_events</mat-icon>
+                                        </button>
                                     }
                                 }
                             }

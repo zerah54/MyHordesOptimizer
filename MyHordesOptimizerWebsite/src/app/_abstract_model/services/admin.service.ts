@@ -42,6 +42,10 @@ export class AdminService extends GlobalService {
         return super.post<void>(`${this.API_URL}/admin/import/ruins`);
     }
 
+    public importPictos(): Observable<void> {
+        return super.post<void>(`${this.API_URL}/admin/import/pictos`);
+    }
+
     public importCategories(): Observable<void> {
         return super.post<void>(`${this.API_URL}/admin/import/categories`);
     }

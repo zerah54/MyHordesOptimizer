@@ -115,6 +115,15 @@ namespace MyHordesOptimizerApi.Controllers
             return Ok();
         }
 
+        [HttpPost("import/pictos")]
+        [Authorize]
+        [AdminOnly]
+        public ActionResult ImportPictos()
+        {
+            _importService.ImportPictos();
+            return Ok();
+        }
+
         [HttpPost("import/categories")]
         [Authorize]
         [AdminOnly]
@@ -177,6 +186,46 @@ namespace MyHordesOptimizerApi.Controllers
             catch (Exception ex)
             {
                 return StatusCode(500, new { error = ex.Message, detail = ex.InnerException?.Message, stackTrace = ex.StackTrace });
+            }
+        }
+
+        // Déjà appelé en fin d'import des villes ; exposé à part pour rattraper les statistiques
+        // après une modification directe en base ou un import partiel.
+        [HttpPost("users/recompute-stats")]
+        [Authorize]
+        [AdminOnly]
+        public async Task<ActionResult> RecomputeUserStats()
+        {
+            try
+            {
+                await _importService.RecomputeUserDirectoryStatsAsync();
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = ex.Message, detail = ex.InnerException?.Message });
+            }
+        }
+
+        // `limit` borne le nombre de joueurs traités (les jamais rafraîchis d'abord) : le refresh
+        // complet se fait ainsi en plusieurs passes plutôt qu'en un appel interminable.
+        [HttpPost("users/refresh-names")]
+        [Authorize]
+        [AdminOnly]
+        public async Task<ActionResult> RefreshUserNames([FromQuery] int? limit = null)
+        {
+            try
+            {
+                await _importService.RefreshUserNamesAsync(limit);
+                return Ok();
+            }
+            catch (MyHordesApiException ex)
+            {
+                return StatusCode((int)ex.StatusCode, new { error = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = ex.Message, detail = ex.InnerException?.Message });
             }
         }
 

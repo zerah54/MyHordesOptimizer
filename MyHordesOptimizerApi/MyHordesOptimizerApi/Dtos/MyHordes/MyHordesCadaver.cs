@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using System.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace MyHordesOptimizerApi.Dtos.MyHordes
 {
@@ -30,5 +31,10 @@ namespace MyHordesOptimizerApi.Dtos.MyHordes
 
         [JsonProperty("cleanup")]
         public MyHordesCleanup Cleanup { get; set; }
+
+        // Pictos obtenus par ce citoyen DANS cette ville, indexés par idPicto.
+        [JsonProperty("rewards")]
+        [JsonConverter(typeof(CadaverRewardsConverter))]
+        public IDictionary<string, MyHordesCadaverReward> Rewards { get; set; }
     }
 }

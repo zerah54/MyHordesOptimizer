@@ -52,4 +52,7 @@ public partial class Picto
 
     [InverseProperty("IdPictoNavigation")]
     public virtual ICollection<UserPicto> UserPictos { get; set; } = new List<UserPicto>();
+
+    [InverseProperty("IdPictoNavigation")]
+    public virtual ICollection<TownCitizenPicto> TownCitizenPictos { get; set; } = new List<TownCitizenPicto>();
 }

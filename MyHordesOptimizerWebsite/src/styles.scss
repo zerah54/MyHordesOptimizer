@@ -83,6 +83,29 @@ a {
     align-items: center;
 }
 
+// Material projette les <mat-icon> vers un ng-content dédié qui leur applique taille et
+// alignement. Un @if / @for autour de l'icône casse cette projection (elle est résolue à la
+// compilation) : le contenu retombe dans .mdc-button__label et perd ces styles. On les rétablit.
+.mat-mdc-button-base .mdc-button__label {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+
+    > .mat-icon {
+        margin: 0;
+        flex-shrink: 0;
+        font-size: 1.125rem;
+        height: 1.125rem;
+        width: 1.125rem;
+    }
+
+    > img,
+    > svg {
+        flex-shrink: 0;
+    }
+}
+
 .defered-cell {
     width: 100%;
     height: 1em;

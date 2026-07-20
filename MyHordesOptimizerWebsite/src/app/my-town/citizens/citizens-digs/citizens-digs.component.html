@@ -28,9 +28,7 @@
                     <td mat-cell *matCellDef="let row" [class]="`${column.id} ${column.class || ''}`">
                         @switch (column.id) {
                             @case ('avatar_name') {
-                                @if (row.citizen.avatar && row.citizen.avatar !== 'False') {
-                                    <img [src]="row.citizen.avatar" width="100">
-                                }
+                                <mho-avatar [src]="row.citizen.avatar"></mho-avatar>
                                 <div>
                                     <mho-citizen-info displayJob displayShunStatus [displayPseudoMode]="'simple'"
                                                       [citizen]="row.citizen"></mho-citizen-info>

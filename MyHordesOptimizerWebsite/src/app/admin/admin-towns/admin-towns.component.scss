@@ -1,7 +1,14 @@
 :host {
     display: contents;
 
+    // mho-town-list est ici imbriqué dans un onglet qui porte déjà son padding : celui de la carte
+    // ferait doublon. En page routée, le composant garde le padding par défaut.
     ::ng-deep .mat-mdc-card-content {
         padding: 0;
+    }
+
+    ::ng-deep .mat-mdc-card-header {
+        padding-left: 0;
+        padding-right: 0;
     }
 }

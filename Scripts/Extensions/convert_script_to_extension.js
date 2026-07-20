@@ -53,6 +53,7 @@ function extractHeaderData(header) {
 
 async function constructFirefoxManifest(header_data) {
     const name = 'Firefox';
+    ensureDirs(name);
     copySourceFile(name);
     copyLogos(name);
     let manifest = await generateManifestV2(header_data);
@@ -63,6 +64,7 @@ async function constructFirefoxManifest(header_data) {
 
 async function constructChromeManifest(header_data) {
     const name = 'Chrome';
+    ensureDirs(name);
     copySourceFile(name);
     copyLogos(name);
     let manifest = await generateManifestV3(header_data);
@@ -72,6 +74,7 @@ async function constructChromeManifest(header_data) {
 
 async function constructOperaManifest(header_data) {
     const name = 'Opera';
+    ensureDirs(name);
     copySourceFile(name);
     copyLogos(name);
     let manifest = await generateManifestV3(header_data);
@@ -186,4 +189,8 @@ async function generateManifestV2(header_data) {
             gecko_android: {}
         }
     };
+}
+
+function ensureDirs(url_part) {
+    fs.mkdirSync(path.join(target_dir, url_part, 'assets', 'img', 'logo'), {recursive: true});
 }

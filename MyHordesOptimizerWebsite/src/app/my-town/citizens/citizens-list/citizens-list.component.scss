@@ -105,6 +105,38 @@
                         }
                     }
 
+                    .cause-of-death {
+                        display: flex;
+                        flex-direction: row;
+                        align-items: center;
+                        gap: 0.5em;
+
+                        .death-icon {
+                            height: 40px;
+                            width: auto;
+                            flex-shrink: 0;
+                        }
+                    }
+
+                    .death-messages {
+                        display: flex;
+                        flex-direction: column;
+                        gap: 0.5em;
+                        max-width: 350px;
+
+                        .death-message,
+                        .town-message {
+                            display: flex;
+                            flex-direction: column;
+
+                            .label {
+                                font-weight: bold;
+                                font-size: 0.85em;
+                                opacity: 0.8;
+                            }
+                        }
+                    }
+
                     .heroic-actions,
                     .home {
 

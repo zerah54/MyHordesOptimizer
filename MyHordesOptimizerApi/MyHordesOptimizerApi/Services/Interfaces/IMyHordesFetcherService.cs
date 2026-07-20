@@ -16,6 +16,8 @@ namespace MyHordesOptimizerApi.Services.Interfaces
         IEnumerable<CleanUpTypeDto> GetCleanUpTypes();
         IEnumerable<ItemRecipeDto> GetRecipes();
         BankLastUpdateDto GetBank();
+        BankLastUpdateDto GetBank(int townId);
+        bool ImportUserPictos(int userId);
         CitizensLastUpdateDto GetCitizens(int townId);
         IEnumerable<MyHordesOptimizerRuinDto> GetRuins(int? townId);
         MyHordesOptimizerMapDto GetMap(int townId);

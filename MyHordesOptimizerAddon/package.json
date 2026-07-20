@@ -4,7 +4,7 @@
     "private": true,
     "scripts": {
         "build": "rollup -c rollup.config.mjs",
-        "postbuild": "node ../Scripts/Extensions/convert_script_to_extension.js",
+        "build:extensions": "node ../Scripts/Extensions/convert_script_to_extension.js",
         "watch": "rollup -c rollup.config.mjs --watch",
         "typecheck": "tsc --noEmit"
     },

@@ -1,12 +1,12 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { Component } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatTabsModule } from '@angular/material/tabs';
-import { Router, RouterLink, RouterOutlet } from '@angular/router';
+import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { environment } from '../../../environments/environment';
 import { Imports } from '../../_abstract_model/types/_types';
 
-const angular_common: Imports = [CommonModule, RouterLink, RouterOutlet];
+const angular_common: Imports = [CommonModule, RouterLink, RouterLinkActive, RouterOutlet];
 const components: Imports = [];
 const pipes: Imports = [];
 const material_modules: Imports = [MatCardModule, MatTabsModule];
@@ -18,33 +18,31 @@ const material_modules: Imports = [MatCardModule, MatTabsModule];
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class CitizensComponent {
-    protected router: Router = inject(Router);
-
 
     protected links: Link[] = [
         {
             label: $localize`Citoyens`,
-            path: '/my-town/citizens/list',
+            path: 'list',
             displayed: true
         },
         {
             label: $localize`Fouilles`,
-            path: '/my-town/citizens/digs',
+            path: 'digs',
             displayed: true
         },
         {
             label: $localize`Bains`,
-            path: '/my-town/citizens/watch',
+            path: 'watch',
             displayed: true
         },
         {
             label: $localize`Immunités`,
-            path: '/my-town/citizens/immune',
+            path: 'immune',
             displayed: true
         },
         {
             label: $localize`Disponibilités`,
-            path: '/my-town/citizens/dispo',
+            path: 'dispo',
             displayed: !environment.production
         }
     ];

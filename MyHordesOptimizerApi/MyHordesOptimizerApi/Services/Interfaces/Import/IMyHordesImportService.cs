@@ -10,6 +10,7 @@ namespace MyHordesOptimizerApi.Services.Interfaces.Import
         void ImportCleanUpTypes();
         Task ImportBuildingAsync();
         void ImportRuins();
+        void ImportPictos();
         Task ImportCategoriesAsync();
         Task ImportItemsAsync();
         Task ImportAllAsync();
@@ -17,5 +18,7 @@ namespace MyHordesOptimizerApi.Services.Interfaces.Import
         void ImportDefaultWishlists();
         Task ImportTownsAsync(int? season = null);
         Task ImportSingleTownAsync(int townId);
+        Task RefreshUserNamesAsync(int? limit = null);
+        Task RecomputeUserDirectoryStatsAsync();
     }
 }

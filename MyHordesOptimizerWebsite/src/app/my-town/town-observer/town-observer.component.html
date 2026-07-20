@@ -1,0 +1,18 @@
+<div class="observer-banner">
+    <mat-icon fontSet="material-symbols-outlined">visibility</mat-icon>
+    <span class="observer-banner__label" i18n>Mode observateur</span>
+    @if (town_name()) {
+        <span class="observer-banner__town">{{ town_name() }}</span>
+    }
+    @if (town_day() !== null) {
+        <span class="observer-banner__day" i18n>Jour {{ town_day() }}</span>
+    }
+</div>
+
+@if (context_ready()) {
+    <router-outlet></router-outlet>
+} @else {
+    <div class="observer-loading">
+        <mat-spinner diameter="48"/>
+    </div>
+}

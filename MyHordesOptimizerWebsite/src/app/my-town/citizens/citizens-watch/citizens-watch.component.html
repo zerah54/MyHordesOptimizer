@@ -49,14 +49,12 @@
                             <td mat-cell *matCellDef="let row" [class]="`${column.id} ${column.class || ''}`">
                                 @switch (column.id) {
                                     @case ('avatar_name') {
-                                        @if (row.avatar && row.avatar !== 'False') {
-                                            <img [src]="row.avatar" width="100">
-                                        }
+                                        <mho-avatar [src]="row.avatar"></mho-avatar>
                                         <div>{{ row.name }}</div>
                                     }
                                     @default {
                                         @if (row.baths) {
-                                            <mat-checkbox [checked]="row.baths | bathForDay:+column.id" (change)="saveBath(row, $event, +column.id)">
+                                            <mat-checkbox [checked]="row.baths | bathForDay:+column.id" [disabled]="is_readonly()" (change)="saveBath(row, $event, +column.id)">
                                                 <!--                                        [disabled]="+column.id !== current_day"-->
                                                 <ng-container i18n>Bain pris</ng-container>
                                             </mat-checkbox>

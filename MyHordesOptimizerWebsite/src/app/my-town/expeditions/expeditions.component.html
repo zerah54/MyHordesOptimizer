@@ -7,9 +7,11 @@
         <mho-active-citizens [citizenList]="active_citizens_list()" [completeCitizenList]="all_citizens()"></mho-active-citizens>
     </mat-card-title>
     <div class="actions">
-        <mat-slide-toggle [(ngModel)]="edition_mode" (ngModelChange)="changeEditionMode()">
-            <ng-container i18n>Mode édition</ng-container>
-        </mat-slide-toggle>
+        @if (!is_readonly()) {
+            <mat-slide-toggle [(ngModel)]="edition_mode" (ngModelChange)="changeEditionMode()">
+                <ng-container i18n>Mode édition</ng-container>
+            </mat-slide-toggle>
+        }
     </div>
 </mat-card-header>
 <mat-card-content class="mho-expeditions">

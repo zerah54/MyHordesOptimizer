@@ -26,6 +26,17 @@ public partial class TownCitizen
     [Column("idUser", TypeName = "int(11)")]
     public int IdUser { get; set; }
 
+    /// <summary>
+    /// Nom sous lequel le joueur est apparu dans cette ville : son alias quand la ville a
+    /// l'option `features.citizen_alias`, sinon son pseudo. L'API ne distingue jamais les deux
+    /// (`getAlias() ?? getUser()->getName()`), on stocke donc le nom brut : l'alias se déduit à
+    /// la lecture par comparaison avec Users.name. Ne vaut que pour les morts, un joueur vivant
+    /// étant toujours renvoyé sous son vrai pseudo.
+    /// </summary>
+    [Column("nameInTown")]
+    [StringLength(255)]
+    public string? NameInTown { get; set; }
+
     [Column("homeMessage", TypeName = "text")]
     public string? HomeMessage { get; set; }
 
@@ -43,9 +54,6 @@ public partial class TownCitizen
 
     [Column("positionY", TypeName = "int(11)")]
     public int? PositionY { get; set; }
-
-    [Column("isGhost")]
-    public bool? IsGhost { get; set; }
 
     [Column("dead")]
     public bool? Dead { get; set; }

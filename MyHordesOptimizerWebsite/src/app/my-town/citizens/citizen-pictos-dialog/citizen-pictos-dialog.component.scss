@@ -1,0 +1,14 @@
+.citizen-pictos {
+    min-width: 320px;
+
+    &__spinner {
+        display: flex;
+        justify-content: center;
+        padding: 24px;
+    }
+
+    &__error {
+        padding: 16px;
+        color: var(--mat-sys-error);
+    }
+}

@@ -36,7 +36,17 @@ export function setExternalAppId(id: string | null): void {
     localStorage.setItem(EXTERNAL_APP_ID_KEY, id ? id : '');
 }
 
+/** Ville observée (mode observateur) : quand définie, elle remplace la ville du localStorage pour tous les consommateurs de getTown(). Gérée exclusivement par TownContextService. */
+let observed_town: TownDetails | null = null;
+
+export function setObservedTown(town: TownDetails | null): void {
+    observed_town = town;
+}
+
 export function getTown(): TownDetails | null {
+    if (observed_town) {
+        return observed_town;
+    }
     const town: string | null = localStorage.getItem(TOWN_KEY);
     return town ? JSON.parse(town) : null;
 }

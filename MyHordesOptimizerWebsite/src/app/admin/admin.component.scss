@@ -3,14 +3,29 @@
 :host {
     display: contents;
 
-    // L'onglet « Villes » héberge mho-town-list (display: contents), dont les
-    // mat-card-header/content deviennent enfants directs du tab-body-content.
-    // On en fait un flex column pour que seul le tableau scrolle, pas tout l'onglet.
-    // Scopé via :has() pour ne pas impacter les onglets Logs / Import (scroll naturel).
-    ::ng-deep .mat-mdc-tab-body-content:has(mho-admin-towns) {
+    .mho-admin {
+
         display: flex;
         flex-direction: column;
-        overflow: hidden;
+
+        .mat-mdc-tab-nav-panel {
+            flex: 1;
+            // min-height: 0 indispensable : sans lui un enfant flex garde min-height:auto
+            // et grandit avec son contenu au lieu de scroller
+            min-height: 0;
+            overflow: auto;
+        }
+
+        // L'onglet « Villes » héberge mho-town-list (display: contents), dont les
+        // mat-card-header/content deviennent enfants directs du panneau.
+        // On en fait un flex column pour que seul le tableau scrolle, pas tout l'onglet.
+        // Scopé via :has() pour ne pas impacter les onglets Logs / Import (scroll naturel).
+        // ::ng-deep : le composant routé n'est pas scopé par cette vue.
+        ::ng-deep .mat-mdc-tab-nav-panel:has(mho-admin-towns) {
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
     }
 
     .mho-camping-header {

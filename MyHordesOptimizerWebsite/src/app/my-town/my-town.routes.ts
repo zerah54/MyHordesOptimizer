@@ -19,7 +19,7 @@ import { ScrutateurComponent } from './statistics/scrutateur/scrutateur.componen
 import { StatisticsComponent } from './statistics/statistics.component';
 import { WishlistComponent } from './wishlist/wishlist.component';
 
-export default [
+export const MY_TOWN_ROUTES: Route[] = [
     { path: '', redirectTo: 'citizens/list', pathMatch: 'full' },
     { path: 'citizens', redirectTo: 'citizens/list', pathMatch: 'full' },
     { path: 'stats', redirectTo: 'stats/estimations', pathMatch: 'full' },
@@ -111,4 +111,6 @@ export default [
         component: WishlistComponent,
         title: 'MyHordes Optimizer' + ' - ' + $localize`Ma ville` + ' - ' + $localize`Liste de courses`,
     }
-] satisfies Route[];
+];
+
+export default MY_TOWN_ROUTES;

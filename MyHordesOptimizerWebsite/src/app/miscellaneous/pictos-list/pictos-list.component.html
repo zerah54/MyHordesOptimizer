@@ -1,0 +1,20 @@
+@if (is_empty()) {
+    <div class="pictos-list__empty" i18n>Aucun picto à afficher.</div>
+} @else {
+    <ul class="pictos-list">
+        @for (picto of pictos(); track picto.id) {
+            <li class="pictos-list__item" [class.pictos-list__item--rare]="picto.rare" [matTooltip]="picto.getDescription()">
+                @if (picto.img) {
+                    <img class="picto__img" [src]="HORDES_IMG_REPO + picto.img" [alt]="picto.getLabel()" />
+                }
+                <span class="picto__name">{{ picto.getLabel() }}</span>
+                @if (showTotal() && picto.count_in_town !== null && picto.count_in_town !== undefined) {
+                    <span class="picto__count">×{{ picto.count_in_town }}</span>
+                    <span class="picto__total" i18n>{{ picto.count }} au total</span>
+                } @else {
+                    <span class="picto__count">×{{ picto.count }}</span>
+                }
+            </li>
+        }
+    </ul>
+}

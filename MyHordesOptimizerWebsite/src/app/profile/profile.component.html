@@ -1,0 +1,35 @@
+@let p = profile();
+
+<mat-card-header>
+    @if (p) {
+        <mat-card-title class="mho-profile__title">
+            @if (getAvatarUrl(p.avatar); as avatarUrl) {
+                <img class="mho-profile__avatar" [src]="avatarUrl" [alt]="p.userName" width="90" height="30"/>
+            }
+            {{ p.userName }}
+        </mat-card-title>
+    } @else {
+        <mat-card-title i18n>Compte</mat-card-title>
+    }
+</mat-card-header>
+<mat-card-content class="mho-profile">
+    @if (loading()) {
+        <div class="mho-profile__spinner">
+            <mat-spinner diameter="48"/>
+        </div>
+    } @else if (error()) {
+        <div class="mho-profile__error" i18n>Utilisateur introuvable.</div>
+    } @else if (p) {
+        <nav mat-tab-nav-bar [mat-stretch-tabs]="false" mat-align-tabs="start" [tabPanel]="panel">
+            @for (link of links; track link.link) {
+                <a mat-tab-link [routerLink]="[link.link]" routerLinkActive #rla="routerLinkActive" [active]="rla.isActive">
+                    {{ link.label }}
+                </a>
+            }
+        </nav>
+
+        <mat-tab-nav-panel #panel>
+            <router-outlet></router-outlet>
+        </mat-tab-nav-panel>
+    }
+</mat-card-content>

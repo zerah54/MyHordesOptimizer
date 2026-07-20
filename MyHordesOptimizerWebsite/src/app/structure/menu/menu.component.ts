@@ -15,7 +15,8 @@ import { AdminService } from '../../_abstract_model/services/admin.service';
 import { Imports } from '../../_abstract_model/types/_types';
 import { TownDetails } from '../../_abstract_model/types/town-details.class';
 import { ChartsThemingService } from '../../_core/services/charts-theming.service';
-import { getTown } from '../../_core/utilities/localstorage.util';
+import { TownContextService } from '../../_core/services/town-context.service';
+import { getTown, getUser } from '../../_core/utilities/localstorage.util';
 
 const angular_common: Imports = [CommonModule, NgTemplateOutlet, RouterLink, RouterLinkActive];
 const components: Imports = [];
@@ -32,6 +33,7 @@ export class MenuComponent implements OnInit {
     private readonly locale_id: string = inject(LOCALE_ID);
     private readonly document: Document = inject<Document>(DOCUMENT);
     protected readonly adminService: AdminService = inject(AdminService);
+    private readonly town_context: TownContextService = inject(TownContextService);
 
     public sidenavContainer: ModelSignal<MatSidenavContainer> = model.required();
 
@@ -59,23 +61,24 @@ export class MenuComponent implements OnInit {
 
     public routes: SidenavLinks[] = [
         {
-            label: $localize`Ma ville`, lvl: 0, displayed: true, authorized: (): boolean => this.isInTown(), expanded: true, children: [
-                {label: $localize`Carte des fouilles`, path: 'my-town/map', displayed: true, lvl: 1, authorized: (): boolean => this.isInTown(), spoil: false},
-                {label: $localize`Banque`, path: 'my-town/bank', displayed: true, lvl: 1, authorized: (): boolean => this.isInTown(), spoil: false},
-                {label: $localize`Citoyens`, path: 'my-town/citizens', displayed: true, lvl: 1, authorized: (): boolean => this.isInTown(), spoil: false},
+            label: $localize`Ma ville`, lvl: 0, displayed: true, isTownRoot: true, authorized: (): boolean => this.isInTown(), expanded: true, children: [
+                {label: $localize`Revenir à ma ville`, returnHome: true, displayed: true, lvl: 1, authorized: (): boolean => this.isReadonly(), spoil: false},
+                {label: $localize`Carte des fouilles`, townSuffix: 'map', displayed: true, lvl: 1, authorized: (): boolean => this.isInTown(), spoil: false},
+                {label: $localize`Banque`, townSuffix: 'bank', displayed: true, lvl: 1, authorized: (): boolean => this.isInTown(), spoil: false},
+                {label: $localize`Citoyens`, townSuffix: 'citizens', displayed: true, lvl: 1, authorized: (): boolean => this.isInTown(), spoil: false},
                 {
                     label: $localize`Liste de courses`,
-                    path: 'my-town/wishlist',
+                    townSuffix: 'wishlist',
                     displayed: true,
                     lvl: 1,
                     authorized: (): boolean => this.isInTown(),
                     spoil: false
                 },
-                {label: $localize`Statistiques`, path: 'my-town/stats', displayed: true, lvl: 1, authorized: (): boolean => this.isInTown(), spoil: false},
-                {label: $localize`Expéditions`, path: 'my-town/expeditions', displayed: true, lvl: 1, authorized: (): boolean => this.isInTown(), spoil: false},
+                {label: $localize`Statistiques`, townSuffix: 'stats', displayed: true, lvl: 1, authorized: (): boolean => this.isInTown(), spoil: false},
+                {label: $localize`Expéditions`, townSuffix: 'expeditions', displayed: true, lvl: 1, authorized: (): boolean => this.isInTown(), spoil: false},
                 {
                     label: $localize`Chantiers`,
-                    path: 'my-town/buildings',
+                    townSuffix: 'buildings',
                     displayed: true,
                     lvl: 1,
                     authorized: (): boolean => this.isInTown() && !environment.production,
@@ -83,7 +86,7 @@ export class MenuComponent implements OnInit {
                 },
                 {
                     label: $localize`Veilles`,
-                    path: 'my-town/nightwatch',
+                    townSuffix: 'nightwatch',
                     displayed: true,
                     lvl: 1,
                     authorized: (): boolean => this.isInTown() && !environment.production,
@@ -91,7 +94,7 @@ export class MenuComponent implements OnInit {
                 },
                 {
                     label: $localize`Campings`,
-                    path: 'my-town/campings',
+                    townSuffix: 'campings',
                     displayed: true,
                     lvl: 1,
                     authorized: (): boolean => this.isInTown() && !environment.production,
@@ -107,15 +110,21 @@ export class MenuComponent implements OnInit {
             ], spoil: false
         },
         {
-            label: $localize`Wiki`, lvl: 0, displayed: true, authorized: (): boolean => true, expanded: true, children: [
-                {label: $localize`Objets`, path: 'wiki/items', displayed: true, lvl: 1, authorized: (): boolean => true, spoil: true},
-                {label: $localize`Recettes`, path: 'wiki/recipes', displayed: true, lvl: 1, authorized: (): boolean => true, spoil: true},
-                {label: $localize`Pouvoirs`, path: 'wiki/hero-skills', displayed: true, lvl: 1, authorized: (): boolean => true, spoil: false},
-                {label: $localize`Bâtiments`, path: 'wiki/ruins', displayed: true, lvl: 1, authorized: (): boolean => true, spoil: true},
+            label: $localize`Annuaire`, lvl: 0, displayed: true, authorized: (): boolean => true, expanded: false, children: [
+                {label: $localize`Citoyens`, path: 'directory/citizens', displayed: false, lvl: 1, authorized: (): boolean => true, spoil: false},
+                {label: $localize`Villes`, path: 'directory/towns', displayed: false, lvl: 1, authorized: (): boolean => true, spoil: false},
+            ], spoil: false
+        },
+        {
+            label: $localize`Wiki`, lvl: 0, displayed: true, authorized: (): boolean => true, expanded: false, children: [
+                {label: $localize`Objets`, path: 'wiki/items', displayed: false, lvl: 1, authorized: (): boolean => true, spoil: true},
+                {label: $localize`Recettes`, path: 'wiki/recipes', displayed: false, lvl: 1, authorized: (): boolean => true, spoil: true},
+                {label: $localize`Pouvoirs`, path: 'wiki/hero-skills', displayed: false, lvl: 1, authorized: (): boolean => true, spoil: false},
+                {label: $localize`Bâtiments`, path: 'wiki/ruins', displayed: false, lvl: 1, authorized: (): boolean => true, spoil: true},
                 {
                     label: $localize`Informations diverses`,
                     path: 'wiki/miscellaneous-info',
-                    displayed: true,
+                    displayed: false,
                     lvl: 1,
                     authorized: (): boolean => true,
                     spoil: false
@@ -123,7 +132,7 @@ export class MenuComponent implements OnInit {
                 {
                     label: $localize`Villes privées`,
                     path: 'wiki/private-towns',
-                    displayed: true,
+                    displayed: false,
                     lvl: 1,
                     authorized: (): boolean => true,
                     spoil: false
@@ -275,6 +284,37 @@ export class MenuComponent implements OnInit {
         return town.town_id !== null && town.town_id !== undefined && town.town_id !== 0;
     }
 
+    /** Vrai quand on observe une ville tierce : la section « Ma ville » cible alors cette ville. */
+    protected isReadonly(): boolean {
+        return this.town_context.isReadonly();
+    }
+
+    /** Base des liens de la section ville : la ville observée en mode observateur, sinon la sienne. */
+    private townBasePath(): string {
+        const observed: TownDetails | null = this.town_context.observedTown();
+        return observed ? `town/${observed.town_id}` : 'my-town';
+    }
+
+    /** Destination du bouton retour : sa propre ville si elle existe, sinon la liste des villes. */
+    private returnPath(): string {
+        return getUser()?.town_details?.town_id ? 'my-town' : 'directory/towns';
+    }
+
+    /** Résout le lien d'une entrée en tenant compte du contexte d'observation. */
+    protected resolvePath(route: SidenavLinks): string | undefined {
+        if (route.returnHome) return this.returnPath();
+        if (route.townSuffix) return `${this.townBasePath()}/${route.townSuffix}`;
+        return route.path;
+    }
+
+    /** Résout le libellé : la section ville prend le nom de la ville observée en mode observateur. */
+    protected resolveLabel(route: SidenavLinks): string {
+        if (route.isTownRoot && this.isReadonly()) {
+            return this.town_context.observedTownName() ?? $localize`Ville observée`;
+        }
+        return route.label;
+    }
+
     private resizeSidenav(): void {
         const sidenavContainer: MatSidenavContainer = this.sidenavContainer();
         sidenavContainer.autosize = true;
@@ -346,6 +386,12 @@ export class MenuComponent implements OnInit {
 interface SidenavLinks {
     label: string;
     path?: string;
+    /** Suffixe relatif à la ville (map, bank, …) : le chemin complet est calculé selon le contexte. */
+    townSuffix?: string;
+    /** Section racine « Ma ville » : son libellé devient le nom de la ville observée en observation. */
+    isTownRoot?: boolean;
+    /** Entrée « Revenir à ma ville », affichée seulement en mode observateur. */
+    returnHome?: boolean;
     children?: SidenavLinks[];
     lvl?: number;
     displayed: boolean;

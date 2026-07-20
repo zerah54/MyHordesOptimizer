@@ -76,7 +76,11 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddHttpClient();
 builder.Services.AddHttpClient(nameof(MyHordesApiRepository), client =>
 {
-    client.Timeout = TimeSpan.FromSeconds(10);
+    // 30s et non 10 : MyHordes a déjà connu des épisodes de latence où 10s coupait des appels
+    // pourtant en train d'aboutir. L'import des pictos d'un joueur (/json/user avec l'historique
+    // par ville) mesure à lui seul ~15s en temps normal. L'appel HTTP est fait hors du verrou de
+    // synchronisation, donc allonger ce délai ne bloque pas les autres utilisateurs.
+    client.Timeout = TimeSpan.FromSeconds(30);
 });
 builder.Services.AddHttpClient(nameof(GestHordesRepository)).ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler()
 {

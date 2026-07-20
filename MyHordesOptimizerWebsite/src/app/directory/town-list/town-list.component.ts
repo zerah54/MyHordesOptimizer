@@ -14,7 +14,9 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatSort, MatSortModule, SortDirection } from '@angular/material/sort';
 import { MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { Router } from '@angular/router';
 import { catchError, debounceTime, EMPTY, finalize, forkJoin, of } from 'rxjs';
+import { getTown } from '../../_core/utilities/localstorage.util';
 import { HORDES_IMG_REPO } from '../../_abstract_model/const';
 import { SeasonPhaseDTO } from '../../_abstract_model/dto/season-phase.dto';
 import { TownListQuery } from '../../_abstract_model/dto/town-list-page.dto';
@@ -43,6 +45,7 @@ const material_modules: Imports = [
 export class TownListComponent implements OnInit, AfterViewInit {
     private readonly townService: TownService = inject(TownService);
     private readonly adminService: AdminService = inject(AdminService);
+    private readonly router: Router = inject(Router);
     private readonly destroy_ref: DestroyRef = inject(DestroyRef);
 
     public readonly isAdmin = input<boolean>(false);
@@ -345,5 +348,23 @@ export class TownListComponent implements OnInit, AfterViewInit {
 
     protected trackById(_index: number, town: TownListItem): number {
         return town.id;
+    }
+
+    /** Une ligne n'est ouvrable en observateur que si la ville a un mapId (identifiant public MyHordes). */
+    protected isRowClickable(town: TownListItem): boolean {
+        return town.mapId != null;
+    }
+
+    /** Ouvre la ville : sa propre ville courante en mode normal, toute autre ville en mode observateur. */
+    protected onRowClick(town: TownListItem): void {
+        if (town.mapId == null) {
+            return;
+        }
+        const currentTownId: number | undefined = getTown()?.town_id;
+        if (currentTownId != null && town.mapId === currentTownId) {
+            this.router.navigate(['/my-town']);
+        } else {
+            this.router.navigate(['/town', town.mapId, 'citizens', 'list']);
+        }
     }
 }

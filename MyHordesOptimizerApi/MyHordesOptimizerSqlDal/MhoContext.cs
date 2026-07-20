@@ -111,6 +111,8 @@ public partial class MhoContext : DbContext
 
     public virtual DbSet<UserPicto> UserPictos { get; set; }
 
+    public virtual DbSet<TownCitizenPicto> TownCitizenPictos { get; set; }
+
     public virtual DbSet<WishlistCategorie> WishlistCategories { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -732,6 +734,25 @@ public partial class MhoContext : DbContext
             entity.HasOne(d => d.IdPictoNavigation).WithMany(p => p.UserPictos)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("UserPicto_fk_picto");
+        });
+
+        modelBuilder.Entity<TownCitizenPicto>(entity =>
+        {
+            entity.HasKey(e => new { e.IdTown, e.IdUser, e.IdPicto })
+                .HasName("PRIMARY")
+                .HasAnnotation("MySql:IndexPrefixLength", new[] { 0, 0, 0 });
+
+            entity.HasOne(d => d.IdTownNavigation).WithMany(p => p.TownCitizenPictos)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("fk_towncitizenpicto_town");
+
+            entity.HasOne(d => d.IdUserNavigation).WithMany(p => p.TownCitizenPictos)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("fk_towncitizenpicto_user");
+
+            entity.HasOne(d => d.IdPictoNavigation).WithMany(p => p.TownCitizenPictos)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("fk_towncitizenpicto_picto");
         });
 
         modelBuilder.Entity<WishlistCategorie>(entity =>

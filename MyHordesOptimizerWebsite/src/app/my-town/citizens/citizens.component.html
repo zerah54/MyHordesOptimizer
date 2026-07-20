@@ -5,7 +5,7 @@
     <nav mat-tab-nav-bar [mat-stretch-tabs]="false" mat-align-tabs="start" [tabPanel]="panel">
         @for (link of links; track link.path) {
             @if (link.displayed) {
-                <a mat-tab-link [routerLink]="[link.path]" [active]="router.url === link.path">
+                <a mat-tab-link [routerLink]="[link.path]" routerLinkActive #rla="routerLinkActive" [active]="rla.isActive">
                     {{ link.label }}
                 </a>
             }
