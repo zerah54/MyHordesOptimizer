@@ -1,9 +1,0 @@
-:host {
-    display: contents;
-
-    // mho-town-list est ici imbriqué dans un onglet du profil, qui porte déjà son padding.
-    ::ng-deep .mat-mdc-card-header {
-        padding-left: 0;
-        padding-right: 0;
-    }
-}

@@ -25,6 +25,15 @@ public partial class User
     public DateTime? PictosHistoryImportedAt { get; set; }
 
     /// <summary>
+    /// Dernier import de l'historique des villes jouées (playedMaps). Null = jamais importé, seul cas
+    /// où la synchronisation de connexion s'en charge : l'opération est trop lourde pour tourner sous
+    /// le verrou global à chaque getMe. Ensuite, elle passe par l'import des pictos, qui remonte le
+    /// même historique.
+    /// </summary>
+    [Column("playedMapsImportedAt")]
+    public DateTime? PlayedMapsImportedAt { get; set; }
+
+    /// <summary>
     /// Dernier rafraîchissement du pseudo via /json/users. Null = jamais rafraîchi : le nom peut
     /// provenir d'un chemin « cadavre » et donc être un alias de ville.
     /// </summary>

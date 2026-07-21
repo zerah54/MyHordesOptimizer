@@ -61,10 +61,11 @@ export class UserAccountService extends GlobalService {
     }
 
     /**
-     * Lance l'import des pictos du joueur depuis MyHordes et renvoie son total à jour.
-     * Appel lourd côté MyHordes : le serveur le refuse (429) s'il a déjà eu lieu récemment.
+     * Lance l'import MyHordes du joueur (pictos ET historique des villes, remontés par le même
+     * appel) et renvoie ses pictos à jour. Appel lourd côté MyHordes : le serveur le refuse (429)
+     * s'il a déjà eu lieu récemment.
      */
-    public importPictos(userId: number): Observable<UserPictosDTO> {
+    public importUserData(userId: number): Observable<UserPictosDTO> {
         return this.post<UserPictosDTO>(`${this.API_URL}/UserAccount/${userId}/pictos/import`);
     }
 }

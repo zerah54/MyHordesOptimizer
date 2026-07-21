@@ -4,19 +4,6 @@
             <mat-spinner diameter="32"/>
         </div>
     } @else {
-        <div class="pictos-tab__freshness">
-            <button mat-button type="button" (click)="importPictos()" [disabled]="pictos_importing()">
-                @if (pictos_importing()) {
-                    <mat-spinner diameter="18"/>
-                } @else {
-                    @if (pictos_imported_at(); as importedAt) {
-                        <ng-container i18n>Récompenses à jour au {{ importedAt | date:'short' }}</ng-container>
-                    } @else {
-                        <ng-container i18n>Récompenses jamais importées</ng-container>
-                    }
-                }
-            </button>
-        </div>
         <mho-pictos-list [pictos]="pictos()"/>
     }
 </div>

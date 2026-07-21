@@ -433,13 +433,23 @@ namespace MyHordesOptimizerApi.Services.Impl
                 // Historique des villes terminées du joueur (vies passées) : on les importe / marque
                 // comme terminées. Indépendant du fait que le joueur soit actuellement en ville, et
                 // isolé pour qu'un échec ici ne casse pas la synchro de la ville courante.
-                try
+                //
+                // UNIQUEMENT au premier import (date nulle). Cet upsert réécrit tout l'historique —
+                // >100 villes pour un vétéran, ~2,3 s en moyenne et jusqu'à 10 s mesurées — sous le
+                // verrou global, alors que son résultat ne change qu'en fin de ville. Le faire à
+                // chaque connexion plafonnait le débit à ~0,5 req/s : au pic de minuit la file
+                // atteignait 15 min et nginx renvoyait des 502. Les rafraîchissements suivants
+                // passent par l'import des pictos, dont le playedMaps est un sur-ensemble strict.
+                if (!DbContext.Users.Any(u => u.IdUser == UserInfoProvider.UserId && u.PlayedMapsImportedAt != null))
                 {
-                    UpsertPlayedMaps(myHordeMeResponse.PlayedMaps, UserInfoProvider.UserId);
-                }
-                catch (Exception ex)
-                {
-                    Logger.LogWarning(ex, "GetSimpleMeAsync: échec de la mise à jour des playedMaps");
+                    try
+                    {
+                        UpsertPlayedMaps(myHordeMeResponse.PlayedMaps, UserInfoProvider.UserId);
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.LogWarning(ex, "GetSimpleMeAsync: échec de la mise à jour des playedMaps");
+                    }
                 }
 
                 var simpleMe = Mapper.Map<SimpleMeDto>(myHordeMeResponse);
@@ -731,6 +741,9 @@ namespace MyHordesOptimizerApi.Services.Impl
         {
             if (playedMaps == null || playedMaps.Count == 0)
             {
+                // Rien à importer, mais l'import a bien eu lieu : sans cette marque, un joueur sans
+                // historique (premier séjour) le retenterait à chacune de ses connexions.
+                MarkPlayedMapsImported(userId);
                 return;
             }
 
@@ -740,6 +753,7 @@ namespace MyHordesOptimizerApi.Services.Impl
             var mapIds = playedMaps.Where(p => p.MapId.HasValue).Select(p => p.MapId.Value).Distinct().ToList();
             if (mapIds.Count == 0)
             {
+                MarkPlayedMapsImported(userId);
                 return;
             }
             var provisionalIds = mapIds.Select(id => -id).ToList();
@@ -849,6 +863,26 @@ namespace MyHordesOptimizerApi.Services.Impl
             }
 
             DbContext.ChangeTracker.Clear();
+            MarkPlayedMapsImported(userId);
+        }
+
+        /// <summary>
+        /// Date le dernier import de l'historique des villes du joueur. C'est elle qui dispense la
+        /// synchronisation de connexion de refaire ce travail à chaque getMe.
+        /// ExecuteUpdate et non une entité suivie : UpsertPlayedMaps se termine par un
+        /// ChangeTracker.Clear() qui détacherait tout User chargé, et l'écriture serait perdue en
+        /// silence. Un joueur absent de la table n'est pas mis à jour (0 ligne) : sa date reste nulle
+        /// et l'import sera retenté à sa prochaine connexion, une fois son compte créé.
+        /// </summary>
+        private void MarkPlayedMapsImported(int userId)
+        {
+            if (userId <= 0)
+            {
+                return;
+            }
+            DbContext.Users
+                .Where(u => u.IdUser == userId)
+                .ExecuteUpdate(setters => setters.SetProperty(u => u.PlayedMapsImportedAt, DateTime.UtcNow));
         }
 
         public IEnumerable<HeroSkillDto> GetHeroSkills()
