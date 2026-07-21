@@ -1,4 +1,6 @@
-﻿using System.Threading.Tasks;
+﻿using MyHordesOptimizerApi.Models.Import;
+using System;
+using System.Threading.Tasks;
 
 namespace MyHordesOptimizerApi.Services.Interfaces.Import
 {
@@ -13,10 +15,10 @@ namespace MyHordesOptimizerApi.Services.Interfaces.Import
         void ImportPictos();
         Task ImportCategoriesAsync();
         Task ImportItemsAsync();
-        Task ImportAllAsync();
+        Task ImportAllAsync(Action<ImportStepProgress> onStep = null);
         void ImportWishlistCategorie();
         void ImportDefaultWishlists();
-        Task ImportTownsAsync(int? season = null);
+        Task ImportTownsAsync(int? season = null, Action<ImportStepProgress> onStep = null);
         Task ImportSingleTownAsync(int townId);
         Task RefreshUserNamesAsync(int? limit = null);
         Task RecomputeUserDirectoryStatsAsync();

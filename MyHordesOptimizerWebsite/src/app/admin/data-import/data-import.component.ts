@@ -9,8 +9,9 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { catchError, EMPTY, finalize, Observable } from 'rxjs';
+import { catchError, EMPTY, finalize, first, Observable, switchMap, tap, timer } from 'rxjs';
 
+import { ImportJobKey, ImportJobStateDTO } from '../../_abstract_model/dto/import-job-state.dto';
 import { SeasonDTO } from '../../_abstract_model/dto/season.dto';
 import { AdminService } from '../../_abstract_model/services/admin.service';
 import { TownService } from '../../_abstract_model/services/town.service';
@@ -22,6 +23,15 @@ interface ImportAction {
     icon: string;
     fn: () => Observable<void>;
 }
+
+/** Intervalle d'interrogation de l'état des imports en tâche de fond */
+const IMPORT_POLLING_INTERVAL_MS: number = 3000;
+
+/** Libellés d'avancement qui ne correspondent à aucun import individuel */
+const PROGRESS_LABELS: Record<string, string> = {
+    'towns': $localize`Villes`,
+    'user-stats': $localize`Statistiques des joueurs`
+};
 
 const angular_common: Imports = [CommonModule, ReactiveFormsModule];
 const components: Imports = [];
@@ -41,10 +51,6 @@ const material_modules: Imports = [
 export class DataImportComponent implements OnInit {
     protected readonly seasons: WritableSignal<SeasonDTO[]> = signal<SeasonDTO[]>([]);
     protected readonly seasonControl: FormControl<number | null> = new FormControl<number | null>(null);
-    protected readonly loadingAll: WritableSignal<boolean> = signal(false);
-    protected readonly resultAll: WritableSignal<'success' | 'error' | null> = signal(null);
-    protected readonly loadingTowns: WritableSignal<boolean> = signal(false);
-    protected readonly resultTowns: WritableSignal<'success' | 'error' | null> = signal(null);
     private readonly adminService: AdminService = inject(AdminService);
     protected readonly importActions: ImportAction[] = [
         { key: 'jobs', label: $localize`Jobs`, icon: 'work', fn: () => this.adminService.importJobs() },
@@ -61,6 +67,10 @@ export class DataImportComponent implements OnInit {
     ];
     private readonly townService: TownService = inject(TownService);
     private readonly destroy_ref: DestroyRef = inject(DestroyRef);
+    /** État des imports exécutés en tâche de fond côté serveur, indexé par {@link ImportJobKey} */
+    private readonly importStates: WritableSignal<Record<string, ImportJobStateDTO>> = signal({});
+    private readonly loadingJobs: WritableSignal<Record<string, boolean>> = signal({});
+    private readonly resultJobs: WritableSignal<Record<string, 'success' | 'error' | null>> = signal({});
     private readonly loadingMap: WritableSignal<Record<string, boolean>> = signal({});
     private readonly resultMap: WritableSignal<Record<string, 'success' | 'error' | null>> = signal({});
     private readonly loadingFinish: WritableSignal<Record<number, boolean>> = signal({});
@@ -75,21 +85,45 @@ export class DataImportComponent implements OnInit {
                     this.seasonControl.setValue(seasons[0].id);
                 }
             });
+        this.watchRunningImport('all');
+        this.watchRunningImport('towns');
     }
 
+    /**
+     * L'import global dure plusieurs minutes : le serveur le lance en tâche de fond et répond
+     * immédiatement. L'avancement et l'issue sont ensuite obtenus par interrogation périodique.
+     */
     protected importAll(): void {
-        this.loadingAll.set(true);
-        this.resultAll.set(null);
-        this.adminService.importAll()
-            .pipe(
-                finalize(() => this.loadingAll.set(false)),
-                catchError(() => {
-                    this.resultAll.set('error');
-                    return EMPTY;
-                }),
-                takeUntilDestroyed(this.destroy_ref)
-            )
-            .subscribe(() => this.resultAll.set('success'));
+        this.startBackgroundImport('all', this.adminService.importAll());
+    }
+
+    /** Même mécanique que {@link importAll} : l'import tourne côté serveur, on en suit l'avancement */
+    protected importTowns(): void {
+        const season: number | null = this.seasonControl.value;
+        this.startBackgroundImport('towns', this.adminService.importTowns(season ?? undefined));
+    }
+
+    protected importState(job: ImportJobKey): ImportJobStateDTO | null {
+        return this.importStates()[job] ?? null;
+    }
+
+    /** Libellé de l'étape en cours, ou de l'unité comptée pour les imports qui n'ont pas d'étapes */
+    protected currentStepLabel(job: ImportJobKey): string | null {
+        const step: string | null = this.importState(job)?.currentStep ?? null;
+        if (step === null) {
+            return null;
+        }
+        return this.importActions.find((action: ImportAction) => action.key === step)?.label
+            ?? PROGRESS_LABELS[step]
+            ?? step;
+    }
+
+    protected isImportLoading(job: ImportJobKey): boolean {
+        return this.loadingJobs()[job] ?? false;
+    }
+
+    protected getImportResult(job: ImportJobKey): 'success' | 'error' | null {
+        return this.resultJobs()[job] ?? null;
     }
 
     protected runImport(action: ImportAction): void {
@@ -105,22 +139,6 @@ export class DataImportComponent implements OnInit {
                 takeUntilDestroyed(this.destroy_ref)
             )
             .subscribe(() => this.resultMap.update((m) => ({ ...m, [action.key]: 'success' })));
-    }
-
-    protected importTowns(): void {
-        this.loadingTowns.set(true);
-        this.resultTowns.set(null);
-        const season: number | null = this.seasonControl.value;
-        this.adminService.importTowns(season ?? undefined)
-            .pipe(
-                finalize(() => this.loadingTowns.set(false)),
-                catchError(() => {
-                    this.resultTowns.set('error');
-                    return EMPTY;
-                }),
-                takeUntilDestroyed(this.destroy_ref)
-            )
-            .subscribe(() => this.resultTowns.set('success'));
     }
 
     protected toggleSeasonFinished(seasonId: number, currentlyFinished: boolean): void {
@@ -159,5 +177,63 @@ export class DataImportComponent implements OnInit {
 
     protected getFinishResult(seasonId: number): 'success' | 'error' | null {
         return this.resultFinish()[seasonId] ?? null;
+    }
+
+    private startBackgroundImport(job: ImportJobKey, start$: Observable<ImportJobStateDTO>): void {
+        this.loadingJobs.update((jobs: Record<string, boolean>) => ({ ...jobs, [job]: true }));
+        this.resultJobs.update((results: Record<string, 'success' | 'error' | null>) => ({ ...results, [job]: null }));
+        start$
+            .pipe(
+                tap((state: ImportJobStateDTO) => this.setImportState(job, state)),
+                switchMap(() => this.waitForImportEnd(job)),
+                takeUntilDestroyed(this.destroy_ref)
+            )
+            .subscribe({
+                next: (state: ImportJobStateDTO) => this.applyImportEnd(job, state),
+                error: () => {
+                    this.loadingJobs.update((jobs: Record<string, boolean>) => ({ ...jobs, [job]: false }));
+                    this.resultJobs.update((results: Record<string, 'success' | 'error' | null>) => ({ ...results, [job]: 'error' }));
+                }
+            });
+    }
+
+    /** Reprend le suivi d'un import déclenché ailleurs (autre onglet, page rechargée) */
+    private watchRunningImport(job: ImportJobKey): void {
+        this.adminService.getImportStatus(job)
+            .pipe(takeUntilDestroyed(this.destroy_ref))
+            .subscribe((state: ImportJobStateDTO) => {
+                this.setImportState(job, state);
+                if (!state.isRunning) {
+                    return;
+                }
+                this.loadingJobs.update((jobs: Record<string, boolean>) => ({ ...jobs, [job]: true }));
+                this.waitForImportEnd(job)
+                    .pipe(takeUntilDestroyed(this.destroy_ref))
+                    .subscribe((final_state: ImportJobStateDTO) => this.applyImportEnd(job, final_state));
+            });
+    }
+
+    /** Émet une seule fois, quand l'import n'est plus en cours */
+    private waitForImportEnd(job: ImportJobKey): Observable<ImportJobStateDTO> {
+        return timer(IMPORT_POLLING_INTERVAL_MS, IMPORT_POLLING_INTERVAL_MS)
+            .pipe(
+                // Une interrogation en échec (coupure réseau, redémarrage de l'API) est ignorée :
+                // l'import continue côté serveur, la suivante reprendra le suivi.
+                switchMap(() => this.adminService.getImportStatus(job).pipe(catchError(() => EMPTY))),
+                tap((state: ImportJobStateDTO) => this.setImportState(job, state)),
+                first((state: ImportJobStateDTO) => !state.isRunning)
+            );
+    }
+
+    private applyImportEnd(job: ImportJobKey, state: ImportJobStateDTO): void {
+        this.loadingJobs.update((jobs: Record<string, boolean>) => ({ ...jobs, [job]: false }));
+        this.resultJobs.update((results: Record<string, 'success' | 'error' | null>) => ({
+            ...results,
+            [job]: state.lastRunSucceeded ? 'success' : 'error'
+        }));
+    }
+
+    private setImportState(job: ImportJobKey, state: ImportJobStateDTO): void {
+        this.importStates.update((states: Record<string, ImportJobStateDTO>) => ({ ...states, [job]: state }));
     }
 }

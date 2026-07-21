@@ -7,9 +7,9 @@
         </p>
         <div class="import-actions">
             <button mat-flat-button color="primary"
-                    [disabled]="loadingAll()"
+                    [disabled]="isImportLoading('all')"
                     (click)="importAll()">
-                @if (loadingAll()) {
+                @if (isImportLoading('all')) {
                     <mat-spinner diameter="20"/>
                 } @else {
                     <ng-container>
@@ -18,17 +18,27 @@
                     </ng-container>
                 }
             </button>
-            @if (resultAll() === 'success') {
+            @if (getImportResult('all') === 'success') {
                 <mat-icon class="result-icon success" fontSet="material-symbols-outlined"
                           matTooltip="Import réussi" i18n-matTooltip>check_circle
                 </mat-icon>
             }
-            @if (resultAll() === 'error') {
+            @if (getImportResult('all') === 'error') {
                 <mat-icon class="result-icon error" fontSet="material-symbols-outlined"
-                          matTooltip="Erreur lors de l'import" i18n-matTooltip>error
+                          [matTooltip]="importState('all')?.error ?? 'Erreur lors de l\'import'">error
                 </mat-icon>
             }
+            @if (isImportLoading('all') && currentStepLabel('all'); as stepLabel) {
+                <span class="import-progress">
+                    {{ importState('all')?.currentStepIndex }}/{{ importState('all')?.totalSteps }} — {{ stepLabel }}
+                </span>
+            }
         </div>
+        @if (isImportLoading('all')) {
+            <p class="import-desc" i18n>
+                L'import se poursuit sur le serveur même si tu quittes cette page.
+            </p>
+        }
     </section>
 
     <mat-divider/>
@@ -92,9 +102,9 @@
                 </mat-select>
             </mat-form-field>
             <button mat-flat-button color="primary"
-                    [disabled]="loadingTowns()"
+                    [disabled]="isImportLoading('towns')"
                     (click)="importTowns()">
-                @if (loadingTowns()) {
+                @if (isImportLoading('towns')) {
                     <mat-spinner diameter="20"/>
                 } @else {
                     <ng-container>
@@ -103,17 +113,27 @@
                     </ng-container>
                 }
             </button>
-            @if (resultTowns() === 'success') {
+            @if (getImportResult('towns') === 'success') {
                 <mat-icon class="result-icon success" fontSet="material-symbols-outlined"
                           matTooltip="Import réussi" i18n-matTooltip>check_circle
                 </mat-icon>
             }
-            @if (resultTowns() === 'error') {
+            @if (getImportResult('towns') === 'error') {
                 <mat-icon class="result-icon error" fontSet="material-symbols-outlined"
-                          matTooltip="Erreur lors de l'import" i18n-matTooltip>error
+                          [matTooltip]="importState('towns')?.error ?? 'Erreur lors de l\'import'">error
                 </mat-icon>
             }
+            @if (isImportLoading('towns') && currentStepLabel('towns'); as stepLabel) {
+                <span class="import-progress">
+                    {{ importState('towns')?.currentStepIndex }}/{{ importState('towns')?.totalSteps }} — {{ stepLabel }}
+                </span>
+            }
         </div>
+        @if (isImportLoading('towns')) {
+            <p class="import-desc" i18n>
+                L'import se poursuit sur le serveur même si tu quittes cette page.
+            </p>
+        }
 
         @if (seasons().length > 0) {
             <div class="seasons-list">
