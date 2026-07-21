@@ -6,7 +6,7 @@
 export class SeededRng {
     private state: number;
 
-    constructor(seed: number) {
+    public constructor(seed: number) {
         this.state = seed >>> 0;
     }
 
@@ -59,7 +59,7 @@ class SetStore {
             y++;
         }
 
-        const k = this.key(x, y, mask);
+        const k: string = this.key(x, y, mask);
         if (this.sets.has(k)) return; // already exists
 
         const s: MineSet = { x, y, mask, mines, in_todo: false, prev: null, next: null };
@@ -168,7 +168,7 @@ class SquareTodo {
     private head: number = -1;
     private tail: number = -1;
 
-    constructor(size: number) {
+    public constructor(size: number) {
         this.next = new Int32Array(size).fill(-1);
     }
 
@@ -334,7 +334,7 @@ function minesolve(
             const all_sets: MineSet[] = set_store.allSets();
             const nsets: number = all_sets.length;
             if (nsets > 0 && nsets <= 10) {
-                const setused = new Int32Array(nsets);
+                const setused: Int32Array = new Int32Array(nsets);
                 let cursor: number = 0;
                 let sq_left: number = squares_left;
                 let mn_left: number = mines_left;
@@ -488,7 +488,7 @@ function mineperturb(
         }
     }
 
-    candidates.sort((a, b) => a.type !== b.type ? a.type - b.type : a.rand - b.rand);
+    candidates.sort((a: Square, b: Square) => a.type !== b.type ? a.type - b.type : a.rand - b.rand);
 
     // Count full/empty squares in the input set
     let nfull: number = 0;

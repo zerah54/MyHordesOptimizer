@@ -43,20 +43,20 @@ export class MapUpdateCellComponent implements OnInit {
     public cell: InputSignal<Cell> = input.required();
     public cellChange: OutputEmitterRef<Cell> = output();
 
-    public all_items: Item[] = [];
+    protected all_items: Item[] = [];
 
-    public cell_form!: FormGroup;
+    protected cell_form!: FormGroup;
 
     /** Les quatre directions accessibles, dans l'ordre d'affichage du radar */
-    public readonly directions: RadarDirection[] = [
+    protected readonly directions: RadarDirection[] = [
         { key: 'north', label: Direction.NORTH.getLabel() },
         { key: 'west', label: Direction.WEST.getLabel() },
         { key: 'east', label: Direction.EAST.getLabel() },
         { key: 'south', label: Direction.SOUTH.getLabel() }
     ];
 
-    public readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
-    public readonly locale: string = moment.locale();
+    protected readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
+    protected readonly locale: string = moment.locale();
 
     private readonly api: ApiService = inject(ApiService);
     private readonly destroy_ref: DestroyRef = inject(DestroyRef);
@@ -129,7 +129,7 @@ export class MapUpdateCellComponent implements OnInit {
      * @param {Cell} cell
      * @param {number} item_id
      */
-    public addItem(cell: Cell, item_id: number): void {
+    protected addItem(cell: Cell, item_id: number): void {
         if (cell) {
             const item_in_list_index: number | undefined = cell.items.findIndex((item_in_cell: ItemCountShort): boolean => item_in_cell.item_id === item_id);
             if (item_in_list_index !== undefined && item_in_list_index !== null && item_in_list_index > -1) {
@@ -156,7 +156,7 @@ export class MapUpdateCellComponent implements OnInit {
      * @param {Cell} cell
      * @param {number} item_id
      */
-    public removeItem(cell: Cell, item_id: number): void {
+    protected removeItem(cell: Cell, item_id: number): void {
         if (cell) {
             const item_in_list_index: number | undefined = cell.items.findIndex((item_in_cell: ItemCountShort) => item_in_cell.item_id === item_id);
 
@@ -176,7 +176,7 @@ export class MapUpdateCellComponent implements OnInit {
      *
      * @param {Cell} cell
      */
-    public emptyItems(cell: Cell): void {
+    protected emptyItems(cell: Cell): void {
         if (cell) {
             cell.items = [];
 

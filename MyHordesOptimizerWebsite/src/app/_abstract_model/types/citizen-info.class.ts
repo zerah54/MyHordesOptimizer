@@ -6,10 +6,10 @@ import { Citizen } from './citizen.class';
 import { UpdateInfo } from './update-info.class';
 
 export class CitizenInfo extends CommonModel<CitizenInfoDTO> {
-    citizens: Citizen[] = [];
-    update_info!: UpdateInfo;
+    public citizens: Citizen[] = [];
+    private update_info!: UpdateInfo;
 
-    constructor(dto?: CitizenInfoDTO | null) {
+    public constructor(dto?: CitizenInfoDTO | null) {
         super();
         this.dtoToModel(dto);
     }

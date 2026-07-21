@@ -3,14 +3,14 @@ import { CommonModel } from './_common.class';
 import { I18nLabels } from './_types';
 
 export class HeroSkill extends CommonModel<HeroSkillDTO> {
-    public name!: string;
-    public description!: I18nLabels;
-    public icon!: string;
-    public label!: I18nLabels;
-    public nb_uses!: number;
+    private name!: string;
+    private description!: I18nLabels;
+    private icon!: string;
+    private label!: I18nLabels;
+    private nb_uses!: number;
     public days_needed!: number;
 
-    constructor(dto?: HeroSkillDTO) {
+    public constructor(dto?: HeroSkillDTO) {
         super();
         this.dtoToModel(dto);
     }

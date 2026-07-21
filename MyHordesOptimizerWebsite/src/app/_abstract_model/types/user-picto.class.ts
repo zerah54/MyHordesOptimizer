@@ -7,13 +7,13 @@ import { Dictionary } from './_types';
 export class UserPicto extends CommonModel<UserPictoDTO> {
     public id!: number;
     public img?: string;
-    public label?: Dictionary<string>;
-    public description?: Dictionary<string>;
+    private label?: Dictionary<string>;
+    private description?: Dictionary<string>;
     public rare!: boolean;
     public count!: number;
     public count_in_town?: number | null;
 
-    constructor(dto?: UserPictoDTO) {
+    public constructor(dto?: UserPictoDTO) {
         super();
         this.dtoToModel(dto);
     }

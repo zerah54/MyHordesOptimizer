@@ -42,23 +42,23 @@ const material_modules: Imports = [MatCheckboxModule, MatSlideToggleModule, MatS
 })
 export class CitizensWatchComponent implements OnInit {
 
-    protected readonly sort: Signal<MatSort> = viewChild.required(MatSort);
-    protected readonly table: Signal<MatTable<Citizen>> = viewChild.required(MatTable);
+    private readonly sort: Signal<MatSort> = viewChild.required(MatSort);
+    public readonly table: Signal<MatTable<Citizen>> = viewChild.required(MatTable);
 
     /** La liste des citoyens */
-    public citizen_info!: CitizenInfo;
+    protected citizen_info!: CitizenInfo;
     /** La datasource pour le tableau */
-    public datasource: MatTableDataSource<Citizen> = new MatTableDataSource();
+    protected datasource: MatTableDataSource<Citizen> = new MatTableDataSource();
     /** Le dossier dans lequel sont stockées les images */
     public readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
     /** La locale */
     public readonly locale: string = moment.locale();
     /** Mode observateur : désactive toute action d'écriture. */
-    public readonly is_readonly: Signal<boolean> = inject(TownContextService).isReadonly;
+    protected readonly is_readonly: Signal<boolean> = inject(TownContextService).isReadonly;
     /** La liste des citoyens a été mise à jour */
-    public citizen_filter_change: EventEmitter<void> = new EventEmitter<void>();
+    protected citizen_filter_change: EventEmitter<void> = new EventEmitter<void>();
     /** La liste des colonnes */
-    public readonly columns: StandardColumn[] = [
+    protected readonly columns: StandardColumn[] = [
         { id: 'avatar_name', header: $localize`Citoyen`, class: 'center', sticky: true },
         ...Array.from({ length: getTown()?.day || 1 }, (_: unknown, i: number): StandardColumn => {
             return {
@@ -69,13 +69,13 @@ export class CitizensWatchComponent implements OnInit {
             };
         }),
     ];
-    public readonly current_day: number = getTown()?.day || 1;
-    public filters: WatchFilter = {
+    protected readonly current_day: number = getTown()?.day || 1;
+    protected filters: WatchFilter = {
         citizen: []
     };
-    public list_mode: boolean = false;
-    public display_pseudo: 'simple' | 'mh_id' = 'simple';
-    public selected_day: number = this.current_day;
+    protected list_mode: boolean = false;
+    protected display_pseudo: 'simple' | 'mh_id' = 'simple';
+    protected selected_day: number = this.current_day;
 
     private readonly town_service: TownService = inject(TownService);
     private readonly destroy_ref: DestroyRef = inject(DestroyRef);
@@ -97,7 +97,7 @@ export class CitizensWatchComponent implements OnInit {
         this.getCitizens();
     }
 
-    public saveBath(citizen: Citizen, event: MatCheckboxChange, day: number): void {
+    protected saveBath(citizen: Citizen, event: MatCheckboxChange, day: number): void {
         const bath_to_update_index: number = citizen.baths.findIndex((bath: Bath) => bath.day === day);
         if (event.checked) {
             this.town_service

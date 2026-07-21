@@ -8,7 +8,7 @@ export class ChamanicDetail extends CommonModel<ChamanicDetailDTO> {
     public update_info!: UpdateInfo;
 
 
-    constructor(dto?: ChamanicDetailDTO) {
+    public constructor(dto?: ChamanicDetailDTO) {
         super();
         this.dtoToModel(dto);
     }

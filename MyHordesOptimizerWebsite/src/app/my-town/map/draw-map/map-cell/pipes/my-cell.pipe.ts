@@ -9,7 +9,7 @@ import { getUserId } from '../../../../../_core/utilities/localstorage.util';
     name: 'myCell'
 })
 export class MyCellPipe implements PipeTransform {
-    transform(cell: Cell): boolean {
+    public transform(cell: Cell): boolean {
         return cell.citizens.some((citizen: Citizen): boolean => citizen.id === getUserId()) || false;
     }
 }

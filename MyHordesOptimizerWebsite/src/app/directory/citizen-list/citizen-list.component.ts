@@ -51,10 +51,10 @@ export class CitizenListComponent implements OnInit, AfterViewInit {
     protected readonly loading: WritableSignal<boolean> = signal(false);
 
     // Défaut aligné sur le serveur : les joueurs les plus actifs d'abord
-    protected readonly sortState: WritableSignal<{ active: string; direction: SortDirection }> =
+    private readonly sortState: WritableSignal<{ active: string; direction: SortDirection }> =
         signal({ active: 'nbTownsPlayed', direction: 'desc' as SortDirection });
 
-    protected readonly nameFilter: WritableSignal<string> = signal('');
+    private readonly nameFilter: WritableSignal<string> = signal('');
 
     protected readonly filtersForm: FormGroup = new FormGroup({
         name: new FormControl<string>(''),

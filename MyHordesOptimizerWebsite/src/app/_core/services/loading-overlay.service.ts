@@ -10,7 +10,7 @@ export class LoadingOverlayService {
     /** Le nombre d'éléments ayant demandé un loading */
     private loading_counter: number = 0;
 
-    constructor() {
+    public constructor() {
         this.is_loading_obs = this.is_loading.asObservable();
     }
 

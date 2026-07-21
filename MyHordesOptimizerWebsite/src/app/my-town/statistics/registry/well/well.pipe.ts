@@ -9,7 +9,7 @@ import { groupBy } from '../../../../_core/utilities/array.util';
     name: 'well'
 })
 export class WellPipe implements PipeTransform {
-    transform(entries: Entry[], complete_citizen_list: CitizenInfo): { citizen: Citizen[], rations: number }[] {
+    public transform(entries: Entry[], complete_citizen_list: CitizenInfo): { citizen: Citizen[], rations: number }[] {
 
         const rations_per_citizen: { citizen: Citizen, rations: number }[] = complete_citizen_list.citizens
             .map((citizen: Citizen): { citizen: Citizen, rations: number } => {

@@ -28,8 +28,8 @@ const material_modules: Imports = [MatSortModule, MatTableModule];
 })
 export class ScrutateurComponent implements OnInit {
 
-    protected readonly pie_canvas: Signal<ElementRef> = viewChild.required<ElementRef>('pieCanvas');
-    protected readonly polar_canvas: Signal<ElementRef> = viewChild.required<ElementRef>('polarCanvas');
+    private readonly pie_canvas: Signal<ElementRef> = viewChild.required<ElementRef>('pieCanvas');
+    private readonly polar_canvas: Signal<ElementRef> = viewChild.required<ElementRef>('polarCanvas');
 
     /** La datasource pour le tableau */
     protected datasource: MatTableDataSource<Regen> = new MatTableDataSource();
@@ -41,8 +41,8 @@ export class ScrutateurComponent implements OnInit {
         { id: 'taux_regen', header: $localize`Taux`, class: '' }
     ];
 
-    protected polar_chart!: Chart<'polarArea'>;
-    protected pie_chart!: Chart<'pie'>;
+    public polar_chart!: Chart<'polarArea'>;
+    public pie_chart!: Chart<'pie'>;
 
     private all_zones_regen: Direction[] = (<Direction[]>Direction.getAllValues()).sort((zone_a: Direction, zone_b: Direction) => {
         return zone_a.value.order_by - zone_b.value.order_by;
@@ -145,7 +145,7 @@ export class ScrutateurComponent implements OnInit {
             });
     }
 
-    protected groupByDiago(item: Regen): string {
+    private groupByDiago(item: Regen): string {
         return (<Direction>item.direction_regen).value.diag + '';
     }
 }

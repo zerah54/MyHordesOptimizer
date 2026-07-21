@@ -22,14 +22,14 @@ const NORTHWEST_DATA: DirectionData = { label: $localize`Nord-Ouest`, class: 'no
 
 /** Type de champs de propriétés existants */
 export class Direction extends CommonEnum {
-    static NORTH: Direction = new Direction(NORTH_KEY, NORTH_DATA);
-    static NORTHEAST: Direction = new Direction(NORTHEAST_KEY, NORTHEAST_DATA);
-    static EAST: Direction = new Direction(EAST_KEY, EAST_DATA);
-    static SOUTHEAST: Direction = new Direction(SOUTHEAST_KEY, SOUTHEAST_DATA);
-    static SOUTH: Direction = new Direction(SOUTH_KEY, SOUTH_DATA);
-    static SOUTHWEST: Direction = new Direction(SOUTHWEST_KEY, SOUTHWEST_DATA);
-    static WEST: Direction = new Direction(WEST_KEY, WEST_DATA);
-    static NORTHWEST: Direction = new Direction(NORTHWEST_KEY, NORTHWEST_DATA);
+    public static NORTH: Direction = new Direction(NORTH_KEY, NORTH_DATA);
+    public static NORTHEAST: Direction = new Direction(NORTHEAST_KEY, NORTHEAST_DATA);
+    public static EAST: Direction = new Direction(EAST_KEY, EAST_DATA);
+    public static SOUTHEAST: Direction = new Direction(SOUTHEAST_KEY, SOUTHEAST_DATA);
+    public static SOUTH: Direction = new Direction(SOUTH_KEY, SOUTH_DATA);
+    public static SOUTHWEST: Direction = new Direction(SOUTHWEST_KEY, SOUTHWEST_DATA);
+    public static WEST: Direction = new Direction(WEST_KEY, WEST_DATA);
+    public static NORTHWEST: Direction = new Direction(NORTHWEST_KEY, NORTHWEST_DATA);
 
     /**
      * Le constructeur privé empêche la création d'autres instances de cette classe.
@@ -37,7 +37,7 @@ export class Direction extends CommonEnum {
      * @param {string} key
      * @param {DirectionData} value
      */
-    protected constructor(public override key: string, public override value: DirectionData) {
+    public constructor(public override key: string, public override value: DirectionData) {
         super(key, value);
     }
 

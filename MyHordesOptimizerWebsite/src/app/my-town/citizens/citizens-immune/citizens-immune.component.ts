@@ -32,14 +32,14 @@ const material_modules: Imports = [MatCheckboxModule, MatDividerModule, MatFormF
 })
 export class CitizensImmuneComponent implements OnInit {
 
-    protected readonly sort: Signal<MatSort> = viewChild.required(MatSort);
+    public readonly sort: Signal<MatSort> = viewChild.required(MatSort);
 
     /** La liste des citoyens */
-    public citizen_info!: CitizenInfo;
+    protected citizen_info!: CitizenInfo;
     /** La liste filtrée des citoyens */
-    public filtered_citizen!: Citizen[];
+    protected filtered_citizen!: Citizen[];
     /** La liste des métiers des citoyens */
-    public all_citizens_job!: JobEnum[];
+    protected all_citizens_job!: JobEnum[];
     /** Le dossier dans lequel sont stockées les images */
     public readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
     /** La locale */
@@ -56,7 +56,7 @@ export class CitizensImmuneComponent implements OnInit {
         this.getCitizens();
     }
 
-    public changeFilters(): void {
+    protected changeFilters(): void {
         this.filtered_citizen = [...this.citizen_info.citizens]
             .filter((citizen: Citizen) => {
                 if (this.filters.jobs.length > 0 && !this.filters.jobs.some((job: JobEnum) => job?.key === citizen.job?.key)) return false;

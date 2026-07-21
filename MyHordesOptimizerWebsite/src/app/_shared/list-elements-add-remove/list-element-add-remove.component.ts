@@ -44,9 +44,9 @@ export class ListElementAddRemoveComponent {
 
 
     /** Le dossier dans lequel sont stockées les images */
-    public readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
+    protected readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
     /** La langue du site */
-    public readonly locale: string = moment.locale();
+    protected readonly locale: string = moment.locale();
 
 }
 

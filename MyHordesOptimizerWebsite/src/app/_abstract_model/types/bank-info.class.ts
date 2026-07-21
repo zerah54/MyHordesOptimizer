@@ -7,9 +7,9 @@ import { UpdateInfo } from './update-info.class';
 
 export class BankInfo extends CommonModel<BankInfoDTO> {
     public items: Item[] = [];
-    public update_info!: UpdateInfo;
+    private update_info!: UpdateInfo;
 
-    constructor(dto?: BankInfoDTO | null) {
+    public constructor(dto?: BankInfoDTO | null) {
         super();
         this.dtoToModel(dto);
     }

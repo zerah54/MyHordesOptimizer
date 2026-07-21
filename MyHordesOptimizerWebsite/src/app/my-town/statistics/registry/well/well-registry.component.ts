@@ -26,7 +26,7 @@ export class WellRegistryComponent {
 
     // TODO: Skipped for migration because:
     //  Accessor inputs cannot be migrated as they are too complex.
-    @Input({ required: true }) set registry(registry: Entry[] | undefined) {
+    @Input({ required: true }) public set registry(registry: Entry[] | undefined) {
         if (registry) {
             this.entries = registry.filter((entry: Entry) => {
                 return this.well_keywords.some((well_keywords: string): boolean => entry.entry?.indexOf(' ' + well_keywords + ' ') > -1);

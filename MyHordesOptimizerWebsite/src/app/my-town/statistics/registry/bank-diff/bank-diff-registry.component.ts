@@ -30,7 +30,7 @@ export class BankDiffRegistryComponent {
 
     // TODO: Skipped for migration because:
     //  Accessor inputs cannot be migrated as they are too complex.
-    @Input({ required: true }) set registry(registry: Entry[] | undefined) {
+    @Input({ required: true }) public set registry(registry: Entry[] | undefined) {
         if (registry) {
             this.entries = registry.filter((entry: Entry) => {
                 return this.give_keywords.some((give_keyword: string): boolean => entry.entry?.indexOf(' ' + give_keyword + ' ') > -1 || entry.entry?.indexOf(' ' + give_keyword + ':') > -1)
@@ -52,7 +52,7 @@ export class BankDiffRegistryComponent {
         'a donné', 'folgendes gespendet', 'has given', 'ha donado',
         'cabot malodorant', 'stinkende Köter', 'foul-smelling dog', 'el perro maloliente'
     ];
-    protected readonly take_keywords: string[] = [
+    private readonly take_keywords: string[] = [
         'a pris', 'Gegenstand aus der Bank genommen', 'has taken', 'ha cogito',
     ];
 }

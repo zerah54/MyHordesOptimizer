@@ -49,7 +49,7 @@ export class LogViewerComponent implements OnInit {
     protected totalCount: WritableSignal<number> = signal(0);
     protected loading: WritableSignal<boolean> = signal(false);
     protected expandedRow: WritableSignal<LogEntry | null> = signal<LogEntry | null>(null);
-    protected availableDates: WritableSignal<Set<string>> = signal<Set<string>>(new Set());
+    private availableDates: WritableSignal<Set<string>> = signal<Set<string>>(new Set());
 
     protected page: number = 1;
     protected pageSize: number = 200;
@@ -61,7 +61,7 @@ export class LogViewerComponent implements OnInit {
         search: new FormControl<string>(''),
     });
 
-    protected readonly levelColorMap: Record<LogLevel, string> = {
+    private readonly levelColorMap: Record<LogLevel, string> = {
         Verbose: '#9e9e9e',
         Debug: '#2196f3',
         Information: '#4caf50',

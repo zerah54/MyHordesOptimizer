@@ -45,15 +45,15 @@ export class RegistryComponent {
 
     public dev_mode: boolean = !environment.production;
 
-    public registry: string | undefined;
-    public registry_entries: Entry[] | undefined;
-    public display_mode: RegistryMode;
+    protected registry: string | undefined;
+    protected registry_entries: Entry[] | undefined;
+    protected display_mode: RegistryMode;
 
-    public complete_citizen_list$: Observable<CitizenInfo> = this.town_service.getCitizens();
-    public complete_items_list$: Observable<Item[]> = this.api_service.getItems();
-    public display_pseudo: DisplayPseudoMode = 'simple';
+    protected complete_citizen_list$: Observable<CitizenInfo> = this.town_service.getCitizens();
+    protected complete_items_list$: Observable<Item[]> = this.api_service.getItems();
+    protected display_pseudo: DisplayPseudoMode = 'simple';
 
-    public tabs: Tab[] = [
+    protected tabs: Tab[] = [
         { mode: 'plays', label: $localize`Dés / Cartes / Ballon`, img: 'item/item_game_box.gif' },
         { mode: 'bank_diff', label: $localize`Différenciel de la banque`, img: 'icons/home.gif' },
         { mode: 'well', label: $localize`Prises dans le puits`, img: 'icons/small_well.gif' },
@@ -64,11 +64,11 @@ export class RegistryComponent {
         { mode: 'buildings', label: $localize`Utilisation des chantiers`, img: 'icons/home.gif' }
     ];
 
-    public readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
+    protected readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
     /** La locale */
     public readonly locale: string = moment.locale();
 
-    public readLogs(display_mode: RegistryMode): void {
+    protected readLogs(display_mode: RegistryMode): void {
         if (this.registry) {
             this.registry_entries = this.registry.split('\n')
                 .map((entry: string): Entry => {

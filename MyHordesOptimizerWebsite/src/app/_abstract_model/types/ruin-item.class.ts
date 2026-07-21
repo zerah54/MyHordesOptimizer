@@ -4,10 +4,10 @@ import { Item } from './item.class';
 
 export class RuinItem extends CommonModel<RuinItemDTO> {
     public probability!: number;
-    public weight!: number;
+    private weight!: number;
     public item!: Item;
 
-    constructor(dto?: RuinItemDTO) {
+    public constructor(dto?: RuinItemDTO) {
         super();
         this.dtoToModel(dto);
     }

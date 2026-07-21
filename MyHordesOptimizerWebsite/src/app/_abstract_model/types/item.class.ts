@@ -25,7 +25,7 @@ export class Item extends CommonModel<ItemDTO> {
     public drop_rate_praf!: number;
     public is_broken?: boolean;
 
-    constructor(dto?: ItemDTO) {
+    public constructor(dto?: ItemDTO) {
         super();
         this.dtoToModel(dto);
     }

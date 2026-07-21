@@ -6,7 +6,7 @@ import { getValueFromPropertyName } from '../../_core/utilities/object.util';
     name: 'bind'
 })
 export class BindPipe implements PipeTransform {
-    transform<T>(value: T | T[], bind_value: string | undefined, options: T[]): unknown | unknown[] | undefined {
+    public transform<T>(value: T | T[], bind_value: string | undefined, options: T[]): unknown | unknown[] | undefined {
         if (!bind_value || !options) return value;
         if (Array.isArray(value)) {
             return value.map((solo_value: T) => {
@@ -22,7 +22,7 @@ export class BindPipe implements PipeTransform {
     name: 'bindValue'
 })
 export class BindValuePipe implements PipeTransform {
-    transform<T>(option: T, property_name: string | undefined): string | T | undefined {
+    public transform<T>(option: T, property_name: string | undefined): string | T | undefined {
         if (!property_name) return option;
         return getValueFromPropertyName(option, property_name);
     }

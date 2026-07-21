@@ -8,7 +8,7 @@ import { Distance, MapOptions } from '../../../map.component';
     name: 'distBorderLeft'
 })
 export class DistBorderLeft implements PipeTransform {
-    transform(cell: Cell, options: MapOptions, drawed_map: Cell[][]): boolean {
+    public transform(cell: Cell, options: MapOptions, drawed_map: Cell[][]): boolean {
         let border: boolean = false;
         options.distances.forEach((distance: Distance) => {
             if (!border) {
@@ -31,7 +31,7 @@ export class DistBorderLeft implements PipeTransform {
     name: 'distBorderRight'
 })
 export class DistBorderRight implements PipeTransform {
-    transform(cell: Cell, options: MapOptions, drawed_map: Cell[][]): boolean {
+    public transform(cell: Cell, options: MapOptions, drawed_map: Cell[][]): boolean {
         let border: boolean = false;
         options.distances.forEach((distance: Distance) => {
             if (!border) {
@@ -54,7 +54,7 @@ export class DistBorderRight implements PipeTransform {
     name: 'distBorderTop'
 })
 export class DistBorderTop implements PipeTransform {
-    transform(cell: Cell, options: MapOptions, drawed_map: Cell[][]): boolean {
+    public transform(cell: Cell, options: MapOptions, drawed_map: Cell[][]): boolean {
         let border: boolean = false;
         options.distances.forEach((distance: Distance) => {
             if (!border) {
@@ -77,7 +77,7 @@ export class DistBorderTop implements PipeTransform {
     name: 'distBorderBottom'
 })
 export class DistBorderBottom implements PipeTransform {
-    transform(cell: Cell, options: MapOptions, drawed_map: Cell[][]): boolean {
+    public transform(cell: Cell, options: MapOptions, drawed_map: Cell[][]): boolean {
         let border: boolean = false;
         options.distances.forEach((distance: Distance) => {
             if (!border) {

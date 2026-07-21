@@ -8,7 +8,7 @@ export class CampingOdds extends CommonModel<CampingOddsDTO> {
     public label!: I18nLabels;
 
 
-    constructor(dto?: CampingOddsDTO) {
+    public constructor(dto?: CampingOddsDTO) {
         super();
         this.dtoToModel(dto);
     }

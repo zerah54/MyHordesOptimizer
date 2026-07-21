@@ -4,15 +4,17 @@ import { Pipe, PipeTransform } from '@angular/core';
     name: 'label'
 })
 export class LabelPipe<T> implements PipeTransform {
-    transform(object: string | T, bind_label: string | undefined): string {
+    public transform(object: string | T, bind_label: string | undefined): string {
         if (!bind_label) return <string>object;
 
         const label_levels: string[] = bind_label.split('.');
-        let final_label: any = object;
+        let final_label: string | T = object;
         label_levels.forEach((level: string) => {
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
             final_label = final_label[level];
         });
-        return final_label;
+        return final_label as string;
     }
 }
 
@@ -20,16 +22,18 @@ export class LabelPipe<T> implements PipeTransform {
     name: 'multipleLabel'
 })
 export class MultipleLabelPipe<T> implements PipeTransform {
-    transform(objects: string[] | T[], bind_label: string | undefined): string[] {
+    public transform(objects: string[] | T[], bind_label: string | undefined): string[] {
         if (!bind_label) return <string[]>objects;
 
         const label_levels: string[] = bind_label.split('.');
         const final_objects: string[] = objects.map((object: string | T) => {
-            let final_label: any = object;
+            let final_label: string | T = object;
             label_levels.forEach((level: string) => {
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-ignore
                 final_label = final_label[level];
             });
-            return final_label;
+            return final_label as string;
         });
         return final_objects;
     }

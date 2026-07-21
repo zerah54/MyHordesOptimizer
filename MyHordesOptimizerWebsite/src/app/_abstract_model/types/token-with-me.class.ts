@@ -8,7 +8,7 @@ export class TokenWithMe extends CommonModel<TokenWithMeDTO> {
     public token!: Token;
     public simple_me!: Me;
 
-    constructor(dto?: TokenWithMeDTO | null) {
+    public constructor(dto?: TokenWithMeDTO | null) {
         super();
         this.dtoToModel(dto);
     }

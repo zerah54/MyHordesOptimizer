@@ -8,7 +8,7 @@ import { MapOptions } from '../../../map.component';
     name: 'scrutBorderLeft'
 })
 export class ScrutBorderLeft implements PipeTransform {
-    transform(cell: Cell, options: MapOptions, drawed_map: Cell[][]): boolean {
+    public transform(cell: Cell, options: MapOptions, drawed_map: Cell[][]): boolean {
         return drawed_map[cell.y][cell.x - 1] && drawed_map[cell.y][cell.x - 1].zone_regen?.key !== cell.zone_regen?.key && options.displayed_scrut_zone[<string>cell.zone_regen?.key];
     }
 }
@@ -17,7 +17,7 @@ export class ScrutBorderLeft implements PipeTransform {
     name: 'scrutBorderRight'
 })
 export class ScrutBorderRight implements PipeTransform {
-    transform(cell: Cell, options: MapOptions, drawed_map: Cell[][]): boolean {
+    public transform(cell: Cell, options: MapOptions, drawed_map: Cell[][]): boolean {
         return drawed_map[cell.y][cell.x + 1] && drawed_map[cell.y][cell.x + 1].zone_regen?.key !== cell.zone_regen?.key && options.displayed_scrut_zone[<string>cell.zone_regen?.key];
     }
 }
@@ -26,7 +26,7 @@ export class ScrutBorderRight implements PipeTransform {
     name: 'scrutBorderTop'
 })
 export class ScrutBorderTop implements PipeTransform {
-    transform(cell: Cell, options: MapOptions, drawed_map: Cell[][]): boolean {
+    public transform(cell: Cell, options: MapOptions, drawed_map: Cell[][]): boolean {
         return drawed_map[cell.y - 1] && drawed_map[cell.y - 1][cell.x]?.zone_regen?.key !== cell.zone_regen?.key && options.displayed_scrut_zone[<string>cell.zone_regen?.key];
     }
 }
@@ -35,7 +35,7 @@ export class ScrutBorderTop implements PipeTransform {
     name: 'scrutBorderBottom'
 })
 export class ScrutBorderBottom implements PipeTransform {
-    transform(cell: Cell, options: MapOptions, drawed_map: Cell[][]): boolean {
+    public transform(cell: Cell, options: MapOptions, drawed_map: Cell[][]): boolean {
         return drawed_map[cell.y + 1] && drawed_map[cell.y + 1][cell.x]?.zone_regen?.key !== cell.zone_regen?.key && options.displayed_scrut_zone[<string>cell.zone_regen?.key];
     }
 }

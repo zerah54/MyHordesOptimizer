@@ -11,7 +11,7 @@ import { getPreRegistered } from './expeditions.utils';
     name: 'citizensForExpe'
 })
 export class CitizensForExpePipe implements PipeTransform {
-    transform(all_citizens: Citizen[], expedition_citizen: CitizenExpedition/*, current_expedition: Expedition, all_expeditions: Expedition[]*/): Citizen[] {
+    public transform(all_citizens: Citizen[], expedition_citizen: CitizenExpedition/*, current_expedition: Expedition, all_expeditions: Expedition[]*/): Citizen[] {
         if (!expedition_citizen.preinscrit_job) return all_citizens;
 
         return all_citizens.filter((citizen: Citizen): boolean => {
@@ -48,7 +48,7 @@ export class CitizensForExpePipe implements PipeTransform {
     pure: false
 })
 export class SomeHeroicActionNeededPipe implements PipeTransform {
-    transform(expedition_citizen: CitizenExpedition[]): boolean {
+    public transform(expedition_citizen: CitizenExpedition[]): boolean {
         if (!expedition_citizen) return false;
         return expedition_citizen.some((citizen: CitizenExpedition): boolean => citizen.preinscrit_job !== undefined && citizen.preinscrit_job !== null);
     }
@@ -59,7 +59,7 @@ export class SomeHeroicActionNeededPipe implements PipeTransform {
     pure: false
 })
 export class FormatPreRegisteredPipe implements PipeTransform {
-    transform(expeditions: Expedition[], all_citizen: Citizen[]): string {
+    public transform(expeditions: Expedition[], all_citizen: Citizen[]): string {
         return getPreRegistered(expeditions, all_citizen).map((citizen: Citizen) => {
             if (citizen.job) {
                 return `<img src="${HORDES_IMG_REPO}${citizen.job?.value.img}">&nbsp;${citizen.name}`;

@@ -25,8 +25,8 @@ export class TutoScriptWikiComponent {
     private readonly document: Document = inject<Document>(DOCUMENT);
 
 
-    public readonly title: string = $localize`Wiki`;
-    public readonly tuto_script_items: AccordionItem[] = [
+    protected readonly title: string = $localize`Wiki`;
+    protected readonly tuto_script_items: AccordionItem[] = [
         {
             title: $localize`Objets`,
             content: $localize`Affiche la liste de tous les objets existant dans MyHordes (ainsi que des informations complémentaires à leur sujet).<br /><br />
@@ -46,12 +46,12 @@ export class TutoScriptWikiComponent {
         }
     ];
 
-    public copyUrl(): void {
+    protected copyUrl(): void {
         const url: string = this.document.location.href;
         this.clipboard.copy(url, $localize`Le lien a bien été copié`);
     }
 
-    public shareForum(): void {
+    protected shareForum(): void {
         let text: string = '';
 
         text += `[b][big]${this.title}[/big][/b]`;

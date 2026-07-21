@@ -7,10 +7,10 @@ import { Dictionary } from './_types';
 export class Estimations extends CommonModel<EstimationsDTO> {
     public estim!: Dictionary<MinMax>;
     public planif!: Dictionary<MinMax>;
-    public day!: number;
+    private day!: number;
 
 
-    constructor(dto?: EstimationsDTO | null | undefined) {
+    public constructor(dto?: EstimationsDTO | null | undefined) {
         super();
         this.dtoToModel(dto);
     }

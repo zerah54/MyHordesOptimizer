@@ -18,7 +18,7 @@ export class CitizenExpedition extends CommonModel<CitizenExpeditionDTO> {
     public is_thirsty?: boolean;
     public starts_7_ap?: boolean;
 
-    constructor(dto?: CitizenExpeditionDTO | null) {
+    public constructor(dto?: CitizenExpeditionDTO | null) {
         super();
         this.dtoToModel(dto);
     }

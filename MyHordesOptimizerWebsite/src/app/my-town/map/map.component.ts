@@ -46,20 +46,20 @@ export class MapComponent implements OnInit {
     private readonly breakpoint_observer: BreakpointObserver = inject(BreakpointObserver);
 
     /** La carte de la ville */
-    public map!: Town;
-    public all_ruins!: Ruin[];
-    public all_items!: Item[];
-    public all_citizens!: Citizen[];
+    protected map!: Town;
+    protected all_ruins!: Ruin[];
+    protected all_items!: Item[];
+    protected all_citizens!: Citizen[];
 
-    public options!: MapOptions;
-    public readonly is_dev: boolean = !environment.production;
+    protected options!: MapOptions;
+    protected readonly is_dev: boolean = !environment.production;
 
-    public new_distance_option: Distance = {
+    protected new_distance_option: Distance = {
         value: 1,
         unit: 'km'
     };
 
-    public is_gt_xs: boolean = this.breakpoint_observer.isMatched(BREAKPOINTS['gt-xs']);
+    protected is_gt_xs: boolean = this.breakpoint_observer.isMatched(BREAKPOINTS['gt-xs']);
 
     private readonly default_options: MapOptions = {
         map_type: 'digs',
@@ -74,11 +74,11 @@ export class MapComponent implements OnInit {
     private readonly destroy_ref: DestroyRef = inject(DestroyRef);
 
     @HostListener('window:resize', ['$event'])
-    onResize(): void {
+    public onResize(): void {
         this.is_gt_xs = this.breakpoint_observer.isMatched(BREAKPOINTS['gt-xs']);
     }
 
-    ngOnInit(): void {
+    public ngOnInit(): void {
         this.town_service
             .getMap()
             .pipe(takeUntilDestroyed(this.destroy_ref))
@@ -116,7 +116,7 @@ export class MapComponent implements OnInit {
         this.checkIfAllOptionsExist();
     }
 
-    public addDistanceToList(): void {
+    protected addDistanceToList(): void {
 
         this.new_distance_option.value = +this.new_distance_option.value;
         /** On nettoie les options impossibles */
@@ -142,7 +142,7 @@ export class MapComponent implements OnInit {
     }
 
 
-    public removeDistanceFromList(distance_to_remove: Distance): void {
+    protected removeDistanceFromList(distance_to_remove: Distance): void {
 
         const current_distances: Distance[] = [...this.options.distances];
 
@@ -161,7 +161,7 @@ export class MapComponent implements OnInit {
         this.changeOptions('distances', current_distances);
     }
 
-    public changeOptions<T>(key: string, value: T): void {
+    protected changeOptions<T>(key: string, value: T): void {
         (<{ [key: string]: unknown }><unknown>this.options)[key] = value;
         setTimeout(() => {
             this.options = { ...this.options };

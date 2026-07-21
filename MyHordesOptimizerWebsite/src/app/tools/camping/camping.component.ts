@@ -52,40 +52,40 @@ export class CampingComponent implements OnInit {
     private readonly location: Location = inject(Location);
     private readonly document: Document = inject<Document>(DOCUMENT);
 
-    public ruins: Ruin[] = [];
-    public town_ruins: Ruin[] = [];
-    public town: TownDetails | null = getTown();
-    public and_amelio: boolean = true;
-    public display_bonus_ap: boolean = false;
+    protected ruins: Ruin[] = [];
+    protected town_ruins: Ruin[] = [];
+    protected town: TownDetails | null = getTown();
+    protected and_amelio: boolean = true;
+    protected display_bonus_ap: boolean = false;
 
-    public town_types: TownType[] = [
+    protected town_types: TownType[] = [
         { id: 'RNE', label: $localize`Petite carte`, bonus: 0 },
         { id: 'RE', label: $localize`Région éloignée`, bonus: 0 },
         { id: 'PANDE', label: $localize`Pandémonium`, bonus: 0 }
     ];
 
-    public bonus!: CampingBonus;
+    protected bonus!: CampingBonus;
 
-    public configuration_form!: UntypedFormGroup;
+    protected configuration_form!: UntypedFormGroup;
     // public configuration_form!: ModelFormGroup<CampingParameters>;
-    public camping_result!: CampingOdds;
+    protected camping_result!: CampingOdds;
     /** Le dossier dans lequel sont stockées les images */
-    public readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
-    public readonly locale: string = moment.locale();
-    public readonly help_ruins: string = $localize`La liste est impactée par la distance choisie`;
-    public readonly help_amelio: string = $localize`Il faut en soustraire 3 après chaque attaque`;
+    protected readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
+    protected readonly locale: string = moment.locale();
+    protected readonly help_ruins: string = $localize`La liste est impactée par la distance choisie`;
+    protected readonly help_amelio: string = $localize`Il faut en soustraire 3 après chaque attaque`;
     // eslint-disable-next-line no-irregular-whitespace
-    public readonly bonus_string: string = $localize`Bonus : `;
+    protected readonly bonus_string: string = $localize`Bonus : `;
     // eslint-disable-next-line no-irregular-whitespace
-    public readonly capacity_string: string = $localize`Capacité : `;
+    private readonly capacity_string: string = $localize`Capacité : `;
 
-    public readonly jobs: JobEnum[] = JobEnum.getAllValues();
-    public readonly JOB_SCOUT: JobEnum = JobEnum.SCOUT;
+    protected readonly jobs: JobEnum[] = JobEnum.getAllValues();
+    protected readonly JOB_SCOUT: JobEnum = JobEnum.SCOUT;
 
-    public getMoreRuinInfoFn: (ruin: string | Ruin) => string = this.getMoreRuinInfo.bind(this);
-    public getMoreTownTypeInfoFn: (ruin: string | TownType) => string = this.getMoreTownTypeInfo.bind(this);
+    protected getMoreRuinInfoFn: (ruin: string | Ruin) => string = this.getMoreRuinInfo.bind(this);
+    protected getMoreTownTypeInfoFn: (ruin: string | TownType) => string = this.getMoreTownTypeInfo.bind(this);
 
-    public in_town_camping: boolean = !!this.town;
+    protected in_town_camping: boolean = !!this.town;
 
     private readonly camping_service: CampingService = inject(CampingService);
     private readonly api: ApiService = inject(ApiService);
@@ -167,13 +167,13 @@ export class CampingComponent implements OnInit {
             });
     }
 
-    public shareCamping(): void {
+    protected shareCamping(): void {
         let url: string = this.document.location.href;
         url += '?' + this.convertFormToEasyReadable();
         this.clipboard.copy(url, $localize`Le lien a bien été copié`);
     }
 
-    public getMoreRuinInfo(ruin: string | Ruin): string {
+    private getMoreRuinInfo(ruin: string | Ruin): string {
         if (typeof ruin === 'string') {
             return ruin;
         } else {
@@ -198,7 +198,7 @@ export class CampingComponent implements OnInit {
         }
     }
 
-    public getMoreTownTypeInfo(town_type: string | TownType): string {
+    private getMoreTownTypeInfo(town_type: string | TownType): string {
         if (typeof town_type === 'string') {
             return town_type;
         } else {
@@ -206,15 +206,15 @@ export class CampingComponent implements OnInit {
         }
     }
 
-    public calculateCrowdChance(value: number): number {
+    protected calculateCrowdChance(value: number): number {
         return this.bonus.crowd_chances[Math.min(this.bonus.crowd_chances.length - 1, value)];
     }
 
-    public calculateDistanceChance(value: number): number {
+    protected calculateDistanceChance(value: number): number {
         return this.bonus.dist_chances[Math.min(this.bonus.dist_chances.length - 1, value)];
     }
 
-    public changeBonusMode(display_bonus_ap: boolean): void {
+    protected changeBonusMode(display_bonus_ap: boolean): void {
         if (display_bonus_ap) {
             this.configuration_form.get('complete_improve')?.setValue(+this.configuration_form.get('complete_improve')?.value / 5);
         } else {
@@ -222,7 +222,7 @@ export class CampingComponent implements OnInit {
         }
     }
 
-    public calculateNbCampingsChance(value: number, pro_camper: boolean, pande: boolean): number {
+    protected calculateNbCampingsChance(value: number, pro_camper: boolean, pande: boolean): number {
 
         let chance: number[];
         if (pande) {
@@ -242,7 +242,7 @@ export class CampingComponent implements OnInit {
         return chance[Math.min(value, chance.length - 1)];
     }
 
-    public changeInTownMode(): void {
+    protected changeInTownMode(): void {
         const town_type_control: FormControl<TownType> = <FormControl>this.configuration_form.get('town');
         const devastated_control: FormControl<boolean> = <FormControl>this.configuration_form.get('devastated');
         if (this.in_town_camping && this.town) {

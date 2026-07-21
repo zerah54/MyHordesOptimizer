@@ -68,7 +68,7 @@ export class RealtimeExpeditionsService extends RealtimeGlobalService {
     private user_left_subject: Subject<number[]> = new Subject<number[]>();
     public user_left$: Observable<number[]> = this.user_left_subject.asObservable();
 
-    constructor() {
+    public constructor() {
         super();
 
         this.defineConnexion('expeditions').then(() => {

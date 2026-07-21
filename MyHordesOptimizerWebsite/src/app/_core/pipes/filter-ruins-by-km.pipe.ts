@@ -8,7 +8,7 @@ import { getTown } from '../utilities/localstorage.util';
 })
 export class FilterRuinsByKmPipe implements PipeTransform {
 
-    transform(ruins: Ruin[], km: string | number): Ruin[] {
+    public transform(ruins: Ruin[], km: string | number): Ruin[] {
         if (!ruins) return [];
         if (getTown()?.town_type === 'PANDE') return ruins;
         if (km === '' || km === null || km === undefined) return ruins;

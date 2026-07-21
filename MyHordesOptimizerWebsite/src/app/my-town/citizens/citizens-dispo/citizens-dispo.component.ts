@@ -35,26 +35,26 @@ const material_modules: Imports = [MatSortModule, MatTableModule];
 })
 export class CitizensDispoComponent implements OnInit {
 
-    protected readonly sort: Signal<MatSort> = viewChild.required(MatSort);
-    protected readonly table: Signal<MatTable<DispoByCitizen>> = viewChild.required(MatTable);
+    private readonly sort: Signal<MatSort> = viewChild.required(MatSort);
+    public readonly table: Signal<MatTable<DispoByCitizen>> = viewChild.required(MatTable);
 
     /** La liste des citoyens */
-    public citizen_info!: CitizenInfo;
+    protected citizen_info!: CitizenInfo;
     /** La datasource pour le tableau */
-    public datasource: MatTableDataSource<DispoByCitizen> = new MatTableDataSource();
+    protected datasource: MatTableDataSource<DispoByCitizen> = new MatTableDataSource();
     /** Le dossier dans lequel sont stockées les images */
     public readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
     /** La locale */
     public readonly locale: string = moment.locale();
     /** La liste des citoyens a été mise à jour */
-    public citizen_filter_change: EventEmitter<void> = new EventEmitter<void>();
+    protected citizen_filter_change: EventEmitter<void> = new EventEmitter<void>();
     /** La liste des colonnes */
-    public readonly columns: StandardColumn[] = [
+    protected readonly columns: StandardColumn[] = [
         { id: 'avatar_name', header: $localize`Citoyen`, class: 'center' },
         { id: 'today_dispo', header: $localize`Disponibilités du jour`, class: '' },
     ];
-    public readonly current_day: number = getTown()?.day || 1;
-    public filters: DispoFilter = {
+    protected readonly current_day: number = getTown()?.day || 1;
+    protected filters: DispoFilter = {
         selected_day: this.current_day,
         citizen: []
     };

@@ -17,7 +17,7 @@ import {
     Signal,
     signal,
     viewChild,
-    WritableSignal} from '@angular/core';
+    WritableSignal } from '@angular/core';
 import { AbstractControl, ControlValueAccessor, NgControl, UntypedFormControl, ValidationErrors, Validator, Validators } from '@angular/forms';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatOption, MatOptionModule } from '@angular/material/core';
@@ -57,12 +57,12 @@ const material_modules: Imports = [MatChipsModule, MatDividerModule, MatFormFiel
 export class SelectComponent<T> implements ControlValueAccessor, Validator, MatFormFieldControl<T | string | T[] | string[] | undefined>, OnDestroy {
     public ngControl: NgControl | null = inject(NgControl, { optional: true, self: true });
     public validator: Validators | null = inject(Validators, { optional: true, self: true });
-    protected readonly parent_form_field: MatFormField | null = inject(MatFormField, { optional: true });
+    public readonly parent_form_field: MatFormField | null = inject(MatFormField, { optional: true });
     private readonly _elementRef: ElementRef = inject(ElementRef);
 
     private static nextId: number = 0;
 
-    @HostBinding('class.floating') floating: boolean = this.shouldLabelFloat;
+    @HostBinding('class.floating') public floating: boolean = this.shouldLabelFloat;
 
     // get reference to the input element
     public select: Signal<MatSelect | undefined> = viewChild(MatSelect);
@@ -86,7 +86,7 @@ export class SelectComponent<T> implements ControlValueAccessor, Validator, MatF
 
     // TODO: Skipped for migration because:
     //  Accessor inputs cannot be migrated as they are too complex.
-    @Input() set options(options: (T | string)[]) {
+    @Input() public set options(options: (T | string)[]) {
         this.displayed_options.set(options);
         this.complete_options.set(options);
     }
@@ -94,37 +94,37 @@ export class SelectComponent<T> implements ControlValueAccessor, Validator, MatF
     // TODO: Skipped for migration because:
     //  This input overrides a field from a superclass, while the superclass field
     //  is not migrated.
-    @Input() userAriaDescribedBy!: string;
+    @Input() public userAriaDescribedBy!: string;
 
     // TODO: Skipped for migration because:
     //  Accessor inputs cannot be migrated as they are too complex.
-    @Input() get placeholder(): string {
+    @Input() public get placeholder(): string {
         return this._placeholder;
     }
 
-    set placeholder(plh: string) {
+    public set placeholder(plh: string) {
         this._placeholder = plh;
         this.stateChanges.next();
     }
 
     // TODO: Skipped for migration because:
     //  Accessor inputs cannot be migrated as they are too complex.
-    @Input() get required(): boolean {
+    @Input() public get required(): boolean {
         return this._required;
     }
 
-    set required(req: boolean) {
+    public set required(req: boolean) {
         this._required = coerceBooleanProperty(req);
         this.stateChanges.next();
     }
 
     // TODO: Skipped for migration because:
     //  Accessor inputs cannot be migrated as they are too complex.
-    @Input() get disabled(): boolean {
+    @Input() public get disabled(): boolean {
         return this._disabled;
     }
 
-    set disabled(value: boolean) {
+    public set disabled(value: boolean) {
         this._disabled = coerceBooleanProperty(value);
         this._disabled ? this.form_control().disable() : this.form_control().enable();
         this.stateChanges.next();
@@ -134,13 +134,13 @@ export class SelectComponent<T> implements ControlValueAccessor, Validator, MatF
     public closed: OutputEmitterRef<void> = output();
 
 
-    get shouldLabelFloat(): boolean {
+    public get shouldLabelFloat(): boolean {
         return this.focused || !this.empty;
     }
 
     public id: string = `mho-select-${SelectComponent.nextId++}`;
 
-    public displayed_options: WritableSignal<(T | string)[]> = signal([]);
+    protected displayed_options: WritableSignal<(T | string)[]> = signal([]);
 
     public stateChanges: Subject<void> = new Subject<void>();
     public controlType?: string | undefined;
@@ -148,7 +148,7 @@ export class SelectComponent<T> implements ControlValueAccessor, Validator, MatF
 
     public focused: boolean = false;
 
-    protected readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
+    public readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
 
     protected complete_options: WritableSignal<(T | string)[]> = signal([]);
     //The internal data model for form control value access
@@ -164,10 +164,10 @@ export class SelectComponent<T> implements ControlValueAccessor, Validator, MatF
 
     /** propagate changes into the custom form control */
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    public propagateChange = (_: unknown): void => {
+    private propagateChange = (_: unknown): void => {
         //no-empty
     };
-    public onTouched = (): void => {
+    private onTouched = (): void => {
         //no-empty
     };
 
@@ -178,7 +178,7 @@ export class SelectComponent<T> implements ControlValueAccessor, Validator, MatF
     }
 
     // event fired when input value is changed . later propagated up to the form control using the custom value accessor interface
-    public onChange(value: T | string | undefined | T[] | string[]): void {
+    private onChange(value: T | string | undefined | T[] | string[]): void {
         //set changed value
         this.innerValue = value;
         // propagate value into form control using control value accessor interface
@@ -292,7 +292,7 @@ export class SelectComponent<T> implements ControlValueAccessor, Validator, MatF
         }
     }
 
-    ngOnDestroy(): void {
+    public ngOnDestroy(): void {
         this.stateChanges.complete();
     }
 

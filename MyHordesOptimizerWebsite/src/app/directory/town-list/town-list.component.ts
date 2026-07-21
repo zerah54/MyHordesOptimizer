@@ -1,5 +1,19 @@
 import { CommonModule } from '@angular/common';
-import { AfterViewInit, ChangeDetectionStrategy, Component, computed, DestroyRef, inject, input, OnInit, Signal, signal,ViewChild, WritableSignal } from '@angular/core';
+import {
+    AfterViewInit,
+    ChangeDetectionStrategy,
+    Component,
+    computed,
+    DestroyRef,
+    inject,
+    input,
+    InputSignal,
+    OnInit,
+    Signal,
+    signal,
+    ViewChild,
+    WritableSignal
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -11,7 +25,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
-import { MatSort, MatSortModule, SortDirection } from '@angular/material/sort';
+import { MatSort, MatSortModule, Sort, SortDirection } from '@angular/material/sort';
 import { MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { Router } from '@angular/router';
@@ -44,23 +58,13 @@ const material_modules: Imports = [
     styleUrl: './town-list.component.scss',
 })
 export class TownListComponent implements OnInit, AfterViewInit {
-    private readonly townService: TownService = inject(TownService);
-    private readonly adminService: AdminService = inject(AdminService);
-    private readonly router: Router = inject(Router);
-    private readonly destroy_ref: DestroyRef = inject(DestroyRef);
-
-    public readonly isAdmin = input<boolean>(false);
-
+    public readonly isAdmin: InputSignal<boolean> = input<boolean>(false);
     // Quand défini, restreint la liste aux villes de ce joueur (utilisé par la page profil).
-    public readonly playerId = input<number | undefined>(undefined);
-
+    public readonly playerId: InputSignal<number | undefined> = input<number | undefined>(undefined);
     protected readonly displayedColumns: Signal<string[]> = computed(() => {
-        const cols = ['id', 'language', 'name', 'size', 'type', 'score', 'citizens', 'state'];
+        const cols: string[] = ['id', 'language', 'name', 'size', 'type', 'score', 'citizens', 'state'];
         return this.isAdmin() ? ['select', ...cols, 'actions'] : cols;
     });
-
-    @ViewChild(MatSort) private matSort!: MatSort;
-
     protected readonly towns: WritableSignal<TownListItem[]> = signal<TownListItem[]>([]);
     protected readonly totalCount: WritableSignal<number> = signal(0);
     protected readonly pageIndex: WritableSignal<number> = signal(0);
@@ -71,25 +75,13 @@ export class TownListComponent implements OnInit, AfterViewInit {
     // Options de filtres fournies par le backend sur toute la combinaison (pas seulement la page courante)
     protected readonly availableTypes: WritableSignal<TownTypeId[]> = signal<TownTypeId[]>([]);
     protected readonly availableLanguages: WritableSignal<string[]> = signal<string[]>([]);
-
     // Filtre combiné saison/phase, hors tableau : pilote la récupération des données côté serveur
     protected readonly seasonPhaseControl: FormControl<SeasonPhaseDTO | null> = new FormControl<SeasonPhaseDTO | null>(null);
-
-    protected readonly sortState: WritableSignal<{ active: string; direction: SortDirection }> =
-        signal({ active: 'id', direction: 'desc' as SortDirection });
-
-    protected readonly nameFilter: WritableSignal<string> = signal('');
-    protected readonly idFilter: WritableSignal<string> = signal('');
-    protected readonly typeFilter: WritableSignal<TownTypeId[]> = signal([]);
-    protected readonly languageFilter: WritableSignal<string[]> = signal([]);
-    protected readonly stateFilter: WritableSignal<TownState[]> = signal([]);
-
     protected readonly importingIds: WritableSignal<Set<number>> = signal(new Set<number>());
     protected readonly importResults: WritableSignal<Record<number, 'success' | 'error' | null>> = signal({});
     protected readonly deletingIds: WritableSignal<Set<number>> = signal(new Set<number>());
     protected readonly selectedIds: WritableSignal<Set<number>> = signal(new Set<number>());
     protected readonly bulkDeleting: WritableSignal<boolean> = signal(false);
-
     // La sélection « tout » ne porte que sur la page courante (pagination serveur)
     protected readonly allSelected: Signal<boolean> = computed(() => {
         const visible: TownListItem[] = this.towns();
@@ -98,7 +90,6 @@ export class TownListComponent implements OnInit, AfterViewInit {
     protected readonly someSelected: Signal<boolean> = computed(() =>
         this.towns().some((t: TownListItem) => this.selectedIds().has(t.id)) && !this.allSelected()
     );
-
     protected readonly filtersForm: FormGroup = new FormGroup({
         name: new FormControl<string>(''),
         id: new FormControl<string>(''),
@@ -106,33 +97,39 @@ export class TownListComponent implements OnInit, AfterViewInit {
         language: new FormControl<string[]>([]),
         state: new FormControl<TownState[]>([]),
     });
-
     protected readonly townStates: TownState[] = ['NORMAL', 'CHAOS', 'DEVASTED', 'FINISHED'];
-
     protected readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
-
     protected readonly typeImgMap: Record<string, string> = {
         RNE: 'building/small_falsecity.gif',
         PANDE: 'icons/small_arma.gif',
         CUSTOM: 'item/item_chair.gif',
         RE: 'icons/item_map.gif',
     };
-
     protected readonly stateImgMap: Record<string, string> = {
         NORMAL: 'icons/home.gif',
         CHAOS: 'professions/death.gif',
         DEVASTED: 'item/item_out_def_broken.gif',
         FINISHED: 'item/item_lock.gif',
     };
-
     protected readonly stateLabelMap: Record<string, string> = {
         NORMAL: 'Normal',
         CHAOS: 'Chaos',
         DEVASTED: 'Dévasté',
         FINISHED: 'Terminée',
     };
-
-    protected readonly languageFlagMap: Record<string, string> = {
+    private readonly townService: TownService = inject(TownService);
+    private readonly adminService: AdminService = inject(AdminService);
+    private readonly router: Router = inject(Router);
+    private readonly destroy_ref: DestroyRef = inject(DestroyRef);
+    @ViewChild(MatSort) private matSort!: MatSort;
+    private readonly sortState: WritableSignal<{ active: string; direction: SortDirection }> =
+        signal({ active: 'id', direction: 'desc' as SortDirection });
+    private readonly nameFilter: WritableSignal<string> = signal('');
+    private readonly idFilter: WritableSignal<string> = signal('');
+    private readonly typeFilter: WritableSignal<TownTypeId[]> = signal([]);
+    private readonly languageFilter: WritableSignal<string[]> = signal([]);
+    private readonly stateFilter: WritableSignal<TownState[]> = signal([]);
+    private readonly languageFlagMap: Record<string, string> = {
         fr: '🇫🇷',
         en: '🇬🇧',
         de: '🇩🇪',
@@ -179,7 +176,7 @@ export class TownListComponent implements OnInit, AfterViewInit {
     public ngAfterViewInit(): void {
         this.matSort.sortChange
             .pipe(takeUntilDestroyed(this.destroy_ref))
-            .subscribe(change => {
+            .subscribe((change: Sort) => {
                 this.sortState.set({ active: change.active, direction: change.direction });
                 this.resetAndReload();
             });
@@ -224,10 +221,10 @@ export class TownListComponent implements OnInit, AfterViewInit {
     }
 
     protected deleteTown(townId: number): void {
-        this.deletingIds.update(s => new Set([...s, townId]));
+        this.deletingIds.update((s: Set<number>) => new Set([...s, townId]));
         this.adminService.deleteTown(townId)
             .pipe(
-                finalize(() => this.deletingIds.update(s => {
+                finalize(() => this.deletingIds.update((s: Set<number>) => {
                     const next = new Set(s);
                     next.delete(townId);
                     return next;
@@ -239,8 +236,8 @@ export class TownListComponent implements OnInit, AfterViewInit {
     }
 
     protected importTown(townId: number): void {
-        this.importingIds.update(s => new Set([...s, townId]));
-        this.importResults.update(r => ({ ...r, [townId]: null }));
+        this.importingIds.update((s: Set<number>) => new Set([...s, townId]));
+        this.importResults.update((r) => ({ ...r, [townId]: null }));
         this.adminService.importTown(townId)
             .pipe(
                 // On retire l'id de importingIds dans les handlers next/error (qui s'exécutent de façon
@@ -256,27 +253,75 @@ export class TownListComponent implements OnInit, AfterViewInit {
             )
             .subscribe(() => {
                 this.stopImporting(townId);
-                this.importResults.update(r => ({ ...r, [townId]: 'success' }));
+                this.importResults.update((r) => ({ ...r, [townId]: 'success' }));
                 this.reload();
             });
     }
 
-    /** Retire la ville de l'ensemble des imports en cours (masque le spinner du bouton). */
-    private stopImporting(townId: number): void {
-        this.importingIds.update(s => {
-            const next = new Set(s);
-            next.delete(townId);
-            return next;
-        });
-    }
-
     protected getCitizensTooltip(citizens: TownPublicCitizen[]): string {
-        const alive: string[] = citizens.filter(c => c.deathTypeId == null).map(c => c.name ?? '?');
-        const dead: string[] = citizens.filter(c => c.deathTypeId != null).map(c => c.name ?? '?');
+        const alive: string[] = citizens.filter((c: TownPublicCitizen) => c.deathTypeId === null).map((c: TownPublicCitizen) => c.name ?? '?');
+        const dead: string[] = citizens.filter((c: TownPublicCitizen) => c.deathTypeId !== null).map((c: TownPublicCitizen) => c.name ?? '?');
         const parts: string[] = [];
         if (alive.length > 0) parts.push('Vivants :\n' + alive.join('\n'));
         if (dead.length > 0) parts.push('Morts :\n' + dead.join('\n'));
         return parts.join('\n\n') || '—';
+    }
+
+    protected getTownState(town: TownListItem): TownState {
+        // Ville terminée : le chaos/dévastation figé au dernier passage n'est plus significatif,
+        // on n'affiche que le cadenas
+        if (town.isFinished) return 'FINISHED';
+        if (town.isDevasted) return 'DEVASTED';
+        if (town.isChaos) return 'CHAOS';
+        return 'NORMAL';
+    }
+
+    /** Libellé d'une combinaison saison/phase : « SX-phase » (phase en minuscules), « SX » seul si native. */
+    protected getComboLabel(combo: SeasonPhaseDTO): string {
+        const season: string = 'S' + combo.season;
+        return combo.phase && combo.phase !== 'NATIVE'
+            ? season + '-' + combo.phase.toLowerCase()
+            : season;
+    }
+
+    /** Comparateur pour le mat-select : les combos sont réidentifiés par saison + phase. */
+    protected compareCombo(a: SeasonPhaseDTO | null, b: SeasonPhaseDTO | null): boolean {
+        return a?.season === b?.season && a?.phase === b?.phase;
+    }
+
+    protected getLanguageFlag(lang: string | null): string {
+        return lang ? (this.languageFlagMap[lang] ?? lang) : '—';
+    }
+
+    protected trackById(_index: number, town: TownListItem): number {
+        return town.id;
+    }
+
+    /** Une ligne n'est ouvrable en observateur que si la ville a un mapId (identifiant public MyHordes). */
+    protected isRowClickable(town: TownListItem): boolean {
+        return town.mapId !== null;
+    }
+
+    /** Ouvre la ville : sa propre ville courante en mode normal, toute autre ville en mode observateur. */
+    protected onRowClick(town: TownListItem): void {
+        if (town.mapId === null) {
+            return;
+        }
+        const currentTownId: number | undefined = getTown()?.town_id;
+        if (currentTownId !== null && town.mapId === currentTownId) {
+            this.router.navigate(['/my-town']);
+        } else {
+            this.router.navigate(['/town', town.mapId, 'citizens', 'list']);
+        }
+    }
+
+    /** Retire la ville de l'ensemble des imports en cours (masque le spinner du bouton). */
+    private stopImporting(townId: number): void {
+        this.importingIds.update((s: Set<number>) => {
+            const next = new Set(s);
+            next.delete(townId);
+            return next;
+        });
     }
 
     /** Repart page 1 puis recharge (changement de filtre/tri/combinaison). */
@@ -319,53 +364,5 @@ export class TownListComponent implements OnInit, AfterViewInit {
                 this.availableLanguages.set(result.availableLanguages);
                 this.loading.set(false);
             });
-    }
-
-    protected getTownState(town: TownListItem): TownState {
-        // Ville terminée : le chaos/dévastation figé au dernier passage n'est plus significatif,
-        // on n'affiche que le cadenas
-        if (town.isFinished) return 'FINISHED';
-        if (town.isDevasted) return 'DEVASTED';
-        if (town.isChaos) return 'CHAOS';
-        return 'NORMAL';
-    }
-
-    /** Libellé d'une combinaison saison/phase : « SX-phase » (phase en minuscules), « SX » seul si native. */
-    protected getComboLabel(combo: SeasonPhaseDTO): string {
-        const season: string = 'S' + combo.season;
-        return combo.phase && combo.phase !== 'NATIVE'
-            ? season + '-' + combo.phase.toLowerCase()
-            : season;
-    }
-
-    /** Comparateur pour le mat-select : les combos sont réidentifiés par saison + phase. */
-    protected compareCombo(a: SeasonPhaseDTO | null, b: SeasonPhaseDTO | null): boolean {
-        return a?.season === b?.season && a?.phase === b?.phase;
-    }
-
-    protected getLanguageFlag(lang: string | null): string {
-        return lang ? (this.languageFlagMap[lang] ?? lang) : '—';
-    }
-
-    protected trackById(_index: number, town: TownListItem): number {
-        return town.id;
-    }
-
-    /** Une ligne n'est ouvrable en observateur que si la ville a un mapId (identifiant public MyHordes). */
-    protected isRowClickable(town: TownListItem): boolean {
-        return town.mapId != null;
-    }
-
-    /** Ouvre la ville : sa propre ville courante en mode normal, toute autre ville en mode observateur. */
-    protected onRowClick(town: TownListItem): void {
-        if (town.mapId == null) {
-            return;
-        }
-        const currentTownId: number | undefined = getTown()?.town_id;
-        if (currentTownId != null && town.mapId === currentTownId) {
-            this.router.navigate(['/my-town']);
-        } else {
-            this.router.navigate(['/town', town.mapId, 'citizens', 'list']);
-        }
     }
 }

@@ -29,7 +29,7 @@ export class FlagRegistryComponent {
 
     // TODO: Skipped for migration because:
     //  Accessor inputs cannot be migrated as they are too complex.
-    @Input({ required: true }) set registry(registry: Entry[] | undefined) {
+    @Input({ required: true }) public set registry(registry: Entry[] | undefined) {
         if (registry) {
             this.entries = registry;
             this.filterEntries(registry);

@@ -62,13 +62,13 @@ export class MapCellComponent {
     public cellChange: OutputEmitterRef<Cell> = output();
     public currentHoveredCellChange: OutputEmitterRef<Cell | undefined> = output();
 
-    public readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
-    public readonly locale: string = moment.locale();
+    protected readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
+    protected readonly locale: string = moment.locale();
 
     private readonly destroy_ref: DestroyRef = inject(DestroyRef);
     private readonly town_context: TownContextService = inject(TownContextService);
 
-    public openCellUpdate(): void {
+    protected openCellUpdate(): void {
         // Mode observateur : la carte reste consultable, mais on n'ouvre pas l'éditeur de cellule.
         if (this.town_context.isReadonly()) {
             return;
@@ -91,7 +91,7 @@ export class MapCellComponent {
             });
     }
 
-    public changeCurrentCell(cell?: Cell): void {
+    protected changeCurrentCell(cell?: Cell): void {
         this.currentHoveredCellChange.emit(cell);
     }
 }

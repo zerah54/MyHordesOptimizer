@@ -12,7 +12,7 @@ import { Item } from '../../_abstract_model/types/item.class';
     pure: false
 })
 export class CountAvailableApPipe implements PipeTransform {
-    transform(list: (Item | StatusEnum)[], all_lists: ListForAddRemove[]): number {
+    public transform(list: (Item | StatusEnum)[], all_lists: ListForAddRemove[]): number {
         if (!list) return 0;
         const typed_list: Item[] = <Item[]>list;
         // TODO ajouter citizen status blessé

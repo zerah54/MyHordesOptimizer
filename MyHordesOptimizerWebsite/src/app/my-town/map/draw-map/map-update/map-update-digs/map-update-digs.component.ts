@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, input, InputSignal, output,OutputEmitterRef } from '@angular/core';
+import { Component, input, InputSignal, output, OutputEmitterRef } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -43,10 +43,10 @@ export class MapUpdateDigsComponent {
 
     public readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
     public readonly locale: string = moment.locale();
-    public readonly current_day: number = getTown()?.day || 1;
-    public selected_day: number = this.current_day;
+    protected readonly current_day: number = getTown()?.day || 1;
+    protected selected_day: number = this.current_day;
 
-    public addCitizen(citizen: Citizen): void {
+    protected addCitizen(citizen: Citizen): void {
         const new_dig: Dig = new Dig();
         new_dig.digger_name = citizen.name;
         new_dig.digger_id = citizen.id;
@@ -56,15 +56,15 @@ export class MapUpdateDigsComponent {
         new_dig.nb_success = 0;
         new_dig.nb_total_dig = 0;
 
-        const digs = [...this.digs()];
+        const digs: Dig[] = [...this.digs()];
         digs.push(new_dig);
         this.digsChange.emit(digs);
     }
 
-    public removeCitizen(citizen_id: number): void {
+    protected removeCitizen(citizen_id: number): void {
         const citizen_digs_index: number = this.digs().findIndex((dig: Dig) => dig.digger_id === citizen_id);
         if (citizen_digs_index > -1) {
-            const digs = [...this.digs()];
+            const digs: Dig[] = [...this.digs()];
             digs.splice(citizen_digs_index, 1);
             this.digsChange.emit(digs);
         }

@@ -8,7 +8,7 @@ export class Home extends CommonModel<HomeDTO> {
     public content!: HomeWithValue[];
     public update_info!: UpdateInfo;
 
-    constructor(dto?: HomeDTO) {
+    public constructor(dto?: HomeDTO) {
         super();
         this.dtoToModel(dto);
     }

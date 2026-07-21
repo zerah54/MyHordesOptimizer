@@ -14,7 +14,7 @@ export class ItemsGroupByCategoryPipe implements PipeTransform {
 
     private locale: string = moment.locale();
 
-    transform(items: Item[], order_by?: 'id'): CategoryWithItem[] {
+    public transform(items: Item[], order_by?: 'id'): CategoryWithItem[] {
         items = items.sort((item_a: Item, item_b: Item) => {
             return normalizeString(item_a.label[this.locale]).localeCompare(normalizeString(item_b.label[this.locale]));
         });

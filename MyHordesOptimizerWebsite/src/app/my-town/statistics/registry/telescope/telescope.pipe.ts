@@ -9,7 +9,7 @@ import { normalizeString } from '../../../../_core/utilities/string.utils';
     name: 'citizenTakeTelescope'
 })
 export class TelescopePipe implements PipeTransform {
-    transform(entries: Entry[], complete_citizen_list: CitizenInfo, mode: 'taken' | 'not-taken'): Citizen[] {
+    public transform(entries: Entry[], complete_citizen_list: CitizenInfo, mode: 'taken' | 'not-taken'): Citizen[] {
         const citizen_for_entry: Citizen[] = [];
         let citizen_to_write: Citizen[] = [];
 

@@ -37,7 +37,7 @@ const material_modules: Imports = [MatButtonModule, MatDividerModule, MatFormFie
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class HeaderComponent implements OnInit {
-    protected readonly router: Router = inject(Router);
+    public readonly router: Router = inject(Router);
     private breakpoint_observer: BreakpointObserver = inject(BreakpointObserver);
 
     public changeSidenavStatus: OutputEmitterRef<void> = output();
@@ -46,18 +46,18 @@ export class HeaderComponent implements OnInit {
     public title: string = '';
 
     /** La valeur du champ d'identifiant d'app externe */
-    public external_app_id_field_value: string | null = null;
+    protected external_app_id_field_value: string | null = null;
     /** L'idendifiant d'app externe si il existe */
-    public saved_external_app_id: string | null = getExternalAppId();
+    protected saved_external_app_id: string | null = getExternalAppId();
     /** Les informations de l'utilisateur */
-    public me: Me | null = getUser();
-    public readonly is_dev: boolean = !environment.production;
-    public readonly myhordes_url: string = environment.myhordes_url;
-    public readonly myhordes_app_id: number = environment.myhordes_app_id;
+    protected me: Me | null = getUser();
+    protected readonly is_dev: boolean = !environment.production;
+    protected readonly myhordes_url: string = environment.myhordes_url;
+    protected readonly myhordes_app_id: number = environment.myhordes_app_id;
 
-    public is_in_town: boolean = !!getTown()?.town_id;
+    protected is_in_town: boolean = !!getTown()?.town_id;
 
-    public is_gt_xs: boolean = this.breakpoint_observer.isMatched(BREAKPOINTS['gt-xs']);
+    protected is_gt_xs: boolean = this.breakpoint_observer.isMatched(BREAKPOINTS['gt-xs']);
 
     private readonly title_service: Title = inject(Title);
     private readonly authentication_api: AuthenticationService = inject(AuthenticationService);
@@ -66,7 +66,7 @@ export class HeaderComponent implements OnInit {
     private readonly destroy_ref: DestroyRef = inject(DestroyRef);
 
     @HostListener('window:resize', ['$event'])
-    onResize(): void {
+    public onResize(): void {
         this.is_gt_xs = this.breakpoint_observer.isMatched(BREAKPOINTS['gt-xs']);
     }
 
@@ -86,20 +86,20 @@ export class HeaderComponent implements OnInit {
     }
 
     /** Enregistre le nouvel id d'app externe */
-    public saveExternalAppId(): void {
+    protected saveExternalAppId(): void {
         setExternalAppId(this.external_app_id_field_value);
         this.updateMe();
     }
 
     /** Supprime l'identifiant d'app externe */
-    public disconnect(): void {
+    protected disconnect(): void {
         setExternalAppId(null);
         setTokenWithMeWithExpirationDate();
         location.reload();
     }
 
     /** Mise à jour des outils externes */
-    public updateExternalTools(): void {
+    protected updateExternalTools(): void {
         this.town_service.updateExternalTools();
     }
 

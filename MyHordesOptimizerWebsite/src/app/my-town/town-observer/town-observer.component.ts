@@ -25,7 +25,7 @@ const material_modules: Imports = [MatIconModule, MatProgressSpinnerModule];
 })
 export class TownObserverComponent implements OnInit, OnDestroy {
 
-    protected readonly router: Router = inject(Router);
+    private readonly router: Router = inject(Router);
 
     private readonly route: ActivatedRoute = inject(ActivatedRoute);
     private readonly town_service: TownService = inject(TownService);

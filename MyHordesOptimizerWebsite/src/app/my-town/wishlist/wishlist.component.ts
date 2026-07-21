@@ -12,7 +12,8 @@ import {
     Signal,
     signal,
     viewChild,
-    WritableSignal} from '@angular/core';
+    WritableSignal
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -68,19 +69,13 @@ const material_modules: Imports = [DragDropModule, MatButtonModule, MatCardModul
     imports: [...angular_common, ...components, ...material_modules, ...pipes, ItemAlreadyInListPipe]
 })
 export class WishlistComponent implements OnInit {
-    private readonly clipboard: ClipboardService = inject(ClipboardService);
-    private readonly dialog: MatDialog = inject(MatDialog);
-    private readonly document: Document = inject<Document>(DOCUMENT);
-    private readonly api: ApiService = inject(ApiService);
-    private readonly wishlist_services: WishlistService = inject(WishlistService);
-    private readonly destroy_ref: DestroyRef = inject(DestroyRef);
-
-    protected readonly sort: Signal<MatSort | undefined> = viewChild(MatSort);
-    protected readonly table: Signal<MatTable<WishlistItem> | undefined> = viewChild(MatTable);
-    protected readonly add_item_select: Signal<SelectComponent<Item> | undefined> = viewChild<SelectComponent<Item>>('addItemSelect');
-
+    public readonly table: Signal<MatTable<WishlistItem> | undefined> = viewChild(MatTable);
     protected readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
     protected readonly locale: string = moment.locale();
+    protected readonly depots: WishlistDepot[] = WishlistDepot.getAllValues();
+    protected wishlist_info: WritableSignal<WishlistInfo | null> = signal(null);
+    protected items: WritableSignal<Item[]> = signal([]);
+    protected edition_mode: WritableSignal<boolean> = signal(JSON.parse(localStorage.getItem(WISHLIST_EDITION_MODE_KEY) || 'false'));
     protected readonly columns: StandardColumn[] = [
         { id: 'sort', header: '', displayed: (): boolean => this.edition_mode() },
         { id: 'name', header: $localize`Objet`, sticky: true },
@@ -94,21 +89,21 @@ export class WishlistComponent implements OnInit {
         { id: 'should_signal', header: $localize`Signaler` },
         { id: 'delete', header: '', displayed: (): boolean => this.edition_mode() },
     ];
-    protected readonly depots: WishlistDepot[] = WishlistDepot.getAllValues();
-
-    protected wishlist_info: WritableSignal<WishlistInfo | null> = signal(null);
-    protected items: WritableSignal<Item[]> = signal([]);
-    protected edition_mode: WritableSignal<boolean> = signal(JSON.parse(localStorage.getItem(WISHLIST_EDITION_MODE_KEY) || 'false'));
     /** Mode observateur : lecture seule, l'édition est désactivée. */
     protected readonly is_readonly: Signal<boolean> = inject(TownContextService).isReadonly;
     protected drag_disabled: WritableSignal<boolean> = signal(true);
     protected wishlist_filters: WritableSignal<WishlistFilters> = signal({ items: '', depot: [] });
     protected current_zone_xp_pa_add_item: WritableSignal<number> = signal(0);
-
     protected datasource: MatTableDataSource<WishlistItem> = new MatTableDataSource();
-
     protected wishlist_filters_change: EventEmitter<void> = new EventEmitter();
-
+    private readonly clipboard: ClipboardService = inject(ClipboardService);
+    private readonly dialog: MatDialog = inject(MatDialog);
+    private readonly document: Document = inject<Document>(DOCUMENT);
+    private readonly api: ApiService = inject(ApiService);
+    private readonly wishlist_services: WishlistService = inject(WishlistService);
+    private readonly destroy_ref: DestroyRef = inject(DestroyRef);
+    private readonly sort: Signal<MatSort | undefined> = viewChild(MatSort);
+    private readonly add_item_select: Signal<SelectComponent<Item> | undefined> = viewChild<SelectComponent<Item>>('addItemSelect');
     private readonly auto_save$: Subject<WishlistInfo> = new Subject();
 
     private readonly excel_headers: { [key: string]: { label: string, comment?: string } } = {

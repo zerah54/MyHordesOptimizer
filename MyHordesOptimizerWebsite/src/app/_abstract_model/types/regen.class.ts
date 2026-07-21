@@ -3,13 +3,13 @@ import { Direction } from '../enum/direction.enum';
 import { CommonModel } from './_common.class';
 
 export class Regen extends CommonModel<RegenDTO> {
-    public day!: number;
+    private day!: number;
     public direction_regen?: Direction;
-    public id_town!: number;
-    public level_regen!: number;
-    public taux_regen!: number;
+    private id_town!: number;
+    private level_regen!: number;
+    private taux_regen!: number;
 
-    constructor(dto?: RegenDTO) {
+    public constructor(dto?: RegenDTO) {
         super();
         this.dtoToModel(dto);
     }

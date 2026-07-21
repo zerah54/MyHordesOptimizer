@@ -7,7 +7,7 @@ import { Citizen } from '../../../_abstract_model/types/citizen.class';
     name: 'typeRow'
 })
 export class TypeRowPipe implements PipeTransform {
-    transform(row: Citizen): Citizen {
+    public transform(row: Citizen): Citizen {
         return row;
     }
 }

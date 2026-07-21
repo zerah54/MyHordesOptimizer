@@ -14,7 +14,7 @@ export class Dig extends CommonModel<DigDTO> {
     public nb_total_dig!: number;
     public update_info!: UpdateInfo;
 
-    constructor(dto?: DigDTO) {
+    public constructor(dto?: DigDTO) {
         super();
         this.dtoToModel(dto);
     }

@@ -1,15 +1,15 @@
 <mat-card-header class="mho-town-list-header">
     <mat-card-title i18n>Villes</mat-card-title>
-    <mat-form-field appearance="outline" subscriptSizing="dynamic" class="season-phase-filter">
+    <mat-form-field appearance="outline" class="season-phase-filter" subscriptSizing="dynamic">
         <mat-label i18n>Saison / phase</mat-label>
-        <mat-select [formControl]="seasonPhaseControl" [compareWith]="compareCombo">
+        <mat-select [compareWith]="compareCombo" [formControl]="seasonPhaseControl">
             @for (combo of seasonPhases(); track getComboLabel(combo)) {
                 <mat-option [value]="combo">
                     {{ getComboLabel(combo) }}
                     @if (combo.isFinished) {
-                        <mat-icon fontSet="material-symbols-outlined"
-                                  class="season-finished-icon"
-                                  matTooltip="Saison terminée" i18n-matTooltip>lock
+                        <mat-icon class="season-finished-icon"
+                                  fontSet="material-symbols-outlined"
+                                  i18n-matTooltip matTooltip="Saison terminée">lock
                         </mat-icon>
                     }
                 </mat-option>
@@ -17,16 +17,16 @@
         </mat-select>
     </mat-form-field>
 </mat-card-header>
-<mat-card-content class="mho-town-list-content" [formGroup]="filtersForm">
+<mat-card-content [formGroup]="filtersForm" class="mho-town-list-content">
 
     <div class="town-list">
 
         @if (isAdmin() && (selectedIds().size > 0 || bulkDeleting())) {
             <div class="bulk-actions">
                 <span i18n>{{ selectedIds().size }} ville(s) sélectionnée(s)</span>
-                <button mat-raised-button color="warn"
-                        (click)="bulkDelete()"
-                        [disabled]="bulkDeleting() || selectedIds().size === 0">
+                <button (click)="bulkDelete()" [disabled]="bulkDeleting() || selectedIds().size === 0"
+                        color="warn"
+                        mat-raised-button>
                     @if (bulkDeleting()) {
                         <mat-spinner diameter="18"/>
                     } @else {
@@ -40,83 +40,83 @@
         }
 
         <div class="town-list__table-wrapper">
-            <table mat-table [dataSource]="towns()" [trackBy]="trackById" matSort matSortActive="id" matSortDirection="desc" class="town-table">
+            <table [dataSource]="towns()" [trackBy]="trackById" class="town-table" mat-table matSort matSortActive="id" matSortDirection="desc">
 
                 <ng-container matColumnDef="select" sticky>
-                    <th mat-header-cell *matHeaderCellDef>
-                        <mat-checkbox [checked]="allSelected()"
-                                      [indeterminate]="someSelected()"
-                                      (change)="toggleAll()"/>
+                    <th *matHeaderCellDef mat-header-cell>
+                        <mat-checkbox (change)="toggleAll()"
+                                      [checked]="allSelected()"
+                                      [indeterminate]="someSelected()"/>
                     </th>
-                    <td mat-cell *matCellDef="let row" (click)="$event.stopPropagation()">
-                        <mat-checkbox [checked]="selectedIds().has(row.id)"
-                                      (change)="toggleSelection(row.id)"/>
+                    <td (click)="$event.stopPropagation()" *matCellDef="let row" mat-cell>
+                        <mat-checkbox (change)="toggleSelection(row.id)"
+                                      [checked]="selectedIds().has(row.id)"/>
                     </td>
                 </ng-container>
 
                 <ng-container matColumnDef="id" sticky>
-                    <th mat-header-cell *matHeaderCellDef mat-sort-header="id" disableClear>
-                        <mat-form-field appearance="outline" subscriptSizing="dynamic" class="field--id" (click)="$event.stopPropagation()">
+                    <th *matHeaderCellDef disableClear mat-header-cell mat-sort-header="id">
+                        <mat-form-field (click)="$event.stopPropagation()" appearance="outline" class="field--id" subscriptSizing="dynamic">
                             <mat-label i18n>ID</mat-label>
-                            <input matInput formControlName="id"/>
+                            <input formControlName="id" matInput/>
                             @if (filtersForm.controls['id'].value) {
-                                <button matIconSuffix mat-icon-button (click)="filtersForm.controls['id'].setValue(''); $event.stopPropagation()">
+                                <button (click)="filtersForm.controls['id'].setValue(''); $event.stopPropagation()" mat-icon-button matIconSuffix>
                                     <mat-icon fontSet="material-symbols-outlined">close</mat-icon>
                                 </button>
                             }
                         </mat-form-field>
                     </th>
-                    <td mat-cell *matCellDef="let row">
+                    <td *matCellDef="let row" mat-cell>
                         <mho-deferred-cell>{{ row.mapId ?? row.id }}</mho-deferred-cell>
                     </td>
                 </ng-container>
 
                 <ng-container matColumnDef="name" sticky>
-                    <th mat-header-cell *matHeaderCellDef mat-sort-header="name" disableClear>
-                        <mat-form-field appearance="outline" subscriptSizing="dynamic" class="field--name" (click)="$event.stopPropagation()">
+                    <th *matHeaderCellDef disableClear mat-header-cell mat-sort-header="name">
+                        <mat-form-field (click)="$event.stopPropagation()" appearance="outline" class="field--name" subscriptSizing="dynamic">
                             <mat-label i18n>Nom</mat-label>
-                            <input matInput formControlName="name"/>
+                            <input formControlName="name" matInput/>
                             @if (filtersForm.controls['name'].value) {
-                                <button matIconSuffix mat-icon-button (click)="filtersForm.controls['name'].setValue(''); $event.stopPropagation()">
+                                <button (click)="filtersForm.controls['name'].setValue(''); $event.stopPropagation()" mat-icon-button matIconSuffix>
                                     <mat-icon fontSet="material-symbols-outlined">close</mat-icon>
                                 </button>
                             }
                         </mat-form-field>
                     </th>
-                    <td mat-cell *matCellDef="let row">
+                    <td *matCellDef="let row" mat-cell>
                         <mho-deferred-cell>{{ row.name ?? '—' }}</mho-deferred-cell>
                     </td>
                 </ng-container>
 
                 <ng-container matColumnDef="size">
-                    <th mat-header-cell *matHeaderCellDef mat-sort-header="size" disableClear i18n>Taille</th>
-                    <td mat-cell *matCellDef="let row">
+                    <th *matHeaderCellDef disableClear i18n mat-header-cell mat-sort-header="size">Taille</th>
+                    <td *matCellDef="let row" mat-cell>
                         <mho-deferred-cell>{{ (row.width && row.height) ? (row.width + ' × ' + row.height) : '—' }}</mho-deferred-cell>
                     </td>
                 </ng-container>
 
                 <ng-container matColumnDef="type">
-                    <th mat-header-cell *matHeaderCellDef mat-sort-header="type" disableClear>
-                        <mat-form-field appearance="outline" subscriptSizing="dynamic" class="field--icons" (click)="$event.stopPropagation()">
+                    <th *matHeaderCellDef disableClear mat-header-cell mat-sort-header="type">
+                        <mat-form-field (click)="$event.stopPropagation()" appearance="outline" class="field--icons" subscriptSizing="dynamic">
                             <mat-label i18n>Type</mat-label>
-                            <mat-select multiple formControlName="type">
+                            <mat-select formControlName="type" multiple>
                                 <mat-select-trigger>
                                     @for (t of (filtersForm.controls['type'].value ?? []); track t) {
-                                        <img [src]="HORDES_IMG_REPO + typeImgMap[t]" width="16" height="16" [title]="t"/>
+                                        <img [src]="HORDES_IMG_REPO + typeImgMap[t]" [title]="t" height="16" width="16"/>
                                     }
                                 </mat-select-trigger>
                                 @for (t of availableTypes(); track t) {
                                     <mat-option [value]="t">
-                                        <img [src]="HORDES_IMG_REPO + typeImgMap[t]" width="16" height="16" [title]="t"/>
+                                        <img [src]="HORDES_IMG_REPO + typeImgMap[t]" [title]="t" height="16" width="16"/>
                                     </mat-option>
                                 }
                             </mat-select>
                         </mat-form-field>
                     </th>
-                    <td mat-cell *matCellDef="let row">
+                    <td *matCellDef="let row" mat-cell>
                         <mho-deferred-cell>
                             @if (row.townType) {
-                                <img [src]="HORDES_IMG_REPO + typeImgMap[row.townType]" width="16" height="16" [title]="row.townType"/>
+                                <img [src]="HORDES_IMG_REPO + typeImgMap[row.townType]" [title]="row.townType" height="16" width="16"/>
                             } @else {
                                 —
                             }
@@ -125,10 +125,10 @@
                 </ng-container>
 
                 <ng-container matColumnDef="language">
-                    <th mat-header-cell *matHeaderCellDef mat-sort-header="language" disableClear>
-                        <mat-form-field appearance="outline" subscriptSizing="dynamic" class="field--language" (click)="$event.stopPropagation()">
+                    <th *matHeaderCellDef disableClear mat-header-cell mat-sort-header="language">
+                        <mat-form-field (click)="$event.stopPropagation()" appearance="outline" class="field--language" subscriptSizing="dynamic">
                             <mat-label i18n>Langue</mat-label>
-                            <mat-select multiple formControlName="language">
+                            <mat-select formControlName="language" multiple>
                                 <mat-select-trigger>
                                     @for (lang of (filtersForm.controls['language'].value ?? []); track lang) {
                                         {{ getLanguageFlag(lang) }}
@@ -140,7 +140,7 @@
                             </mat-select>
                         </mat-form-field>
                     </th>
-                    <td mat-cell *matCellDef="let row" class="cell--flag">
+                    <td *matCellDef="let row" class="cell--flag" mat-cell>
                         <mho-deferred-cell>
                             <span [matTooltip]="row.language ?? ''" class="flag">{{ getLanguageFlag(row.language) }}</span>
                         </mho-deferred-cell>
@@ -148,18 +148,18 @@
                 </ng-container>
 
                 <ng-container matColumnDef="score">
-                    <th mat-header-cell *matHeaderCellDef mat-sort-header="score" disableClear i18n>Score</th>
-                    <td mat-cell *matCellDef="let row">
-                        <mho-deferred-cell>{{ row.score != null ? row.score : '—' }}</mho-deferred-cell>
+                    <th *matHeaderCellDef disableClear i18n mat-header-cell mat-sort-header="score">Score</th>
+                    <td *matCellDef="let row" mat-cell>
+                        <mho-deferred-cell>{{ row.score !== null ? row.score : '—' }}</mho-deferred-cell>
                     </td>
                 </ng-container>
 
                 <ng-container matColumnDef="citizens">
-                    <th mat-header-cell *matHeaderCellDef mat-sort-header="citizens" disableClear i18n>Citoyens</th>
-                    <td mat-cell *matCellDef="let row">
+                    <th *matHeaderCellDef disableClear i18n mat-header-cell mat-sort-header="citizens">Citoyens</th>
+                    <td *matCellDef="let row" mat-cell>
                         <mho-deferred-cell>
-                            <div class="cell--citizens"
-                                 [matTooltip]="getCitizensTooltip(row.citizens)"
+                            <div [matTooltip]="getCitizensTooltip(row.citizens)"
+                                 class="cell--citizens"
                                  matTooltipClass="citizens-tooltip">
                                 @if (row.citizens.length > 0) {
                                     <mat-icon fontSet="material-symbols-outlined">group</mat-icon>
@@ -173,43 +173,43 @@
                 </ng-container>
 
                 <ng-container matColumnDef="state">
-                    <th mat-header-cell *matHeaderCellDef mat-sort-header="state" disableClear>
-                        <mat-form-field appearance="outline" subscriptSizing="dynamic" class="field--icons" (click)="$event.stopPropagation()">
+                    <th *matHeaderCellDef disableClear mat-header-cell mat-sort-header="state">
+                        <mat-form-field (click)="$event.stopPropagation()" appearance="outline" class="field--icons" subscriptSizing="dynamic">
                             <mat-label i18n>État</mat-label>
-                            <mat-select multiple formControlName="state">
+                            <mat-select formControlName="state" multiple>
                                 <mat-select-trigger>
                                     @for (s of (filtersForm.controls['state'].value ?? []); track s) {
-                                        <img [src]="HORDES_IMG_REPO + stateImgMap[s]" width="16" height="16" [title]="stateLabelMap[s]"/>
+                                        <img [src]="HORDES_IMG_REPO + stateImgMap[s]" [title]="stateLabelMap[s]" height="16" width="16"/>
                                     }
                                 </mat-select-trigger>
                                 @for (s of townStates; track s) {
                                     <mat-option [value]="s">
-                                        <img [src]="HORDES_IMG_REPO + stateImgMap[s]" width="16" height="16" [title]="stateLabelMap[s]"/>
+                                        <img [src]="HORDES_IMG_REPO + stateImgMap[s]" [title]="stateLabelMap[s]" height="16" width="16"/>
                                     </mat-option>
                                 }
                             </mat-select>
                         </mat-form-field>
                     </th>
-                    <td mat-cell *matCellDef="let row">
+                    <td *matCellDef="let row" mat-cell>
                         <mho-deferred-cell>
                             <div class="state-cell">
                                 @let state = getTownState(row);
-                                <img [src]="HORDES_IMG_REPO + stateImgMap[state]" width="16" height="16" [title]="stateLabelMap[state]"/>
+                                <img [src]="HORDES_IMG_REPO + stateImgMap[state]" [title]="stateLabelMap[state]" height="16" width="16"/>
                             </div>
                         </mho-deferred-cell>
                     </td>
                 </ng-container>
 
                 <ng-container matColumnDef="actions">
-                    <th mat-header-cell *matHeaderCellDef i18n>Actions</th>
-                    <td mat-cell *matCellDef="let row" (click)="$event.stopPropagation()">
+                    <th *matHeaderCellDef i18n mat-header-cell>Actions</th>
+                    <td (click)="$event.stopPropagation()" *matCellDef="let row" mat-cell>
                         <div class="cell--actions">
-                            <button mat-icon-button
+                            <button (click)="importTown(row.id)"
                                     [disabled]="importingIds().has(row.id)"
-                                    (click)="importTown(row.id)"
-                                    matTooltip="Importer la ville" i18n-matTooltip
-                                    matTooltipPosition="above"
-                                    [matTooltipShowDelay]="300">
+                                    [matTooltipShowDelay]="300"
+                                    i18n-matTooltip mat-icon-button
+                                    matTooltip="Importer la ville"
+                                    matTooltipPosition="above">
                                 @if (importingIds().has(row.id)) {
                                     <mat-spinner diameter="20"/>
                                 } @else {
@@ -218,20 +218,20 @@
                             </button>
                             @if (importResults()[row.id] === 'success') {
                                 <mat-icon class="result-icon result-icon--success" fontSet="material-symbols-outlined"
-                                          matTooltip="Import réussi" i18n-matTooltip>check_circle
+                                          i18n-matTooltip matTooltip="Import réussi">check_circle
                                 </mat-icon>
                             }
                             @if (importResults()[row.id] === 'error') {
                                 <mat-icon class="result-icon result-icon--error" fontSet="material-symbols-outlined"
-                                          matTooltip="Erreur lors de l'import" i18n-matTooltip>error
+                                          i18n-matTooltip matTooltip="Erreur lors de l'import">error
                                 </mat-icon>
                             }
-                            <button mat-icon-button
+                            <button (click)="deleteTown(row.id)"
                                     [disabled]="deletingIds().has(row.id)"
-                                    (click)="deleteTown(row.id)"
-                                    matTooltip="Supprimer la ville" i18n-matTooltip
-                                    matTooltipPosition="above"
-                                    [matTooltipShowDelay]="300">
+                                    [matTooltipShowDelay]="300"
+                                    i18n-matTooltip mat-icon-button
+                                    matTooltip="Supprimer la ville"
+                                    matTooltipPosition="above">
                                 @if (deletingIds().has(row.id)) {
                                     <mat-spinner diameter="20"/>
                                 } @else {
@@ -242,10 +242,10 @@
                     </td>
                 </ng-container>
 
-                <tr mat-header-row *matHeaderRowDef="displayedColumns(); sticky: true"></tr>
-                <tr mat-row *matRowDef="let row; columns: displayedColumns()"
+                <tr *matHeaderRowDef="displayedColumns(); sticky: true" mat-header-row></tr>
+                <tr (click)="onRowClick(row)" *matRowDef="let row; columns: displayedColumns()"
                     [class.clickable-row]="isRowClickable(row)"
-                    (click)="onRowClick(row)"></tr>
+                    mat-row></tr>
 
             </table>
 
@@ -264,11 +264,11 @@
         </div>
 
         <mat-paginator
-            [length]="totalCount()"
-            [pageSize]="pageSize()"
-            [pageSizeOptions]="pageSizeOptions"
-            [pageIndex]="pageIndex()"
             (page)="onPageChange($event)"
+            [length]="totalCount()"
+            [pageIndex]="pageIndex()"
+            [pageSizeOptions]="pageSizeOptions"
+            [pageSize]="pageSize()"
             showFirstLastButtons/>
 
     </div>

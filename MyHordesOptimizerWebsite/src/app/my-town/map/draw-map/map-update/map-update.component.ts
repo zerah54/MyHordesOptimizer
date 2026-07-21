@@ -38,16 +38,16 @@ export class MapUpdateComponent implements OnInit {
     protected readonly data: MapUpdateData = inject<MapUpdateData>(MAT_DIALOG_DATA);
 
     /** La cellule potentiellement modifiée */
-    public cell: Cell;
-    public digs!: Dig[];
+    protected cell: Cell;
+    protected digs!: Dig[];
 
-    public readonly locale: string = moment.locale();
+    protected readonly locale: string = moment.locale();
 
     private readonly digs_service: DigsService = inject(DigsService);
     private readonly town_service: TownService = inject(TownService);
     private readonly destroy_ref: DestroyRef = inject(DestroyRef);
 
-    constructor() {
+    public constructor() {
         this.cell = new Cell({ ...this.data.cell.modelToDto() });
     }
 
@@ -62,7 +62,7 @@ export class MapUpdateComponent implements OnInit {
             });
     }
 
-    saveCell(): void {
+    protected saveCell(): void {
         this.town_service
             .saveCell(this.cell)
             .pipe(takeUntilDestroyed(this.destroy_ref))

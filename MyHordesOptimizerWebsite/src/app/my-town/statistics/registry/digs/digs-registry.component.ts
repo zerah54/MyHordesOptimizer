@@ -34,7 +34,7 @@ export class DigsRegistryComponent {
 
     // TODO: Skipped for migration because:
     //  Accessor inputs cannot be migrated as they are too complex.
-    @Input({ required: true }) set registry(registry: Entry[] | undefined) {
+    @Input({ required: true }) public set registry(registry: Entry[] | undefined) {
         this.current_day = getTown()?.day || 1;
 
         if (registry) {
@@ -102,17 +102,17 @@ export class DigsRegistryComponent {
         }
     }
 
-    protected entries: Entry[] = [];
+    public entries: Entry[] = [];
     protected digs: Dig[] = [];
     protected current_day!: number;
 
     /** La locale */
-    protected readonly locale: string = moment.locale();
+    public readonly locale: string = moment.locale();
 
-    protected readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
+    public readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
 
-    protected readonly arrival_keywords: string[] = ['est arrivé depuis', 'angekommen', 'has arrived from the', 'ha llegado desde el'];
-    protected readonly failed_digs_keywords: string[] = ['rien trouvé...', 'durch Graben nichts gefunden...', 'found nothing during their last search...', 'no encontró nada...'];
+    private readonly arrival_keywords: string[] = ['est arrivé depuis', 'angekommen', 'has arrived from the', 'ha llegado desde el'];
+    private readonly failed_digs_keywords: string[] = ['rien trouvé...', 'durch Graben nichts gefunden...', 'found nothing during their last search...', 'no encontró nada...'];
 
     protected addCitizen(citizen: Citizen): void {
         const new_dig: Dig = new Dig();

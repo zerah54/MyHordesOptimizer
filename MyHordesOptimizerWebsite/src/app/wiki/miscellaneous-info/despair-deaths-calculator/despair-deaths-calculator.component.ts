@@ -25,7 +25,7 @@ export class DespairDeathsCalculatorComponent {
 
     public readonly locale: string = moment.locale();
 
-    public day_0: KilledZombiesForDay = {
+    private day_0: KilledZombiesForDay = {
         day: $localize`Jour J`,
         nb_night_dead_zombies: null,
         nb_killed_zombies: null,
@@ -33,11 +33,11 @@ export class DespairDeathsCalculatorComponent {
         nb_pdc: null
 
     };
-    public days: KilledZombiesForDay[] = [
+    protected days: KilledZombiesForDay[] = [
         this.day_0
     ];
 
-    public rebuildElements(): void {
+    protected rebuildElements(): void {
         const saved_days: KilledZombiesForDay[] = [...this.days];
         const new_days: KilledZombiesForDay[] = [this.day_0];
 

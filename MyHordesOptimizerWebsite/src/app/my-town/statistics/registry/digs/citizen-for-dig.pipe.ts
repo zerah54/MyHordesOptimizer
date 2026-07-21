@@ -9,7 +9,7 @@ import { Dig } from '../../../../_abstract_model/types/dig.class';
     name: 'citizenForDig'
 })
 export class CitizenForDigPipe implements PipeTransform {
-    transform(dig: Dig, complete_citizen_list: CitizenInfo): Citizen {
+    public transform(dig: Dig, complete_citizen_list: CitizenInfo): Citizen {
         return <Citizen>complete_citizen_list.citizens.find((citizen: Citizen): boolean => citizen.id === dig.digger_id);
     }
 }
@@ -18,7 +18,7 @@ export class CitizenForDigPipe implements PipeTransform {
     name: 'citizenNotInDigList'
 })
 export class CitizenNotInDigListPipe implements PipeTransform {
-    transform(complete_citizen_list: CitizenInfo, digs_list: Dig[]): Citizen[] {
+    public transform(complete_citizen_list: CitizenInfo, digs_list: Dig[]): Citizen[] {
         return <Citizen[]>complete_citizen_list.citizens
             .filter((citizen: Citizen) => !digs_list.some((dig: Dig): boolean => dig.digger_id === citizen.id));
     }

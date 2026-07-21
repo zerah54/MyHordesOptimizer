@@ -15,17 +15,17 @@ import { Status } from './status.class';
 
 export class Citizen extends CommonModel<CitizenDTO> {
     public avatar?: string;
-    public home_message?: string;
+    private home_message?: string;
     public id!: number;
     public is_shunned?: boolean;
     public is_dead?: boolean;
     public job?: JobEnum;
     public name!: string;
-    public nombre_jour_hero?: number;
-    public x?: number;
-    public y?: number;
+    private nombre_jour_hero?: number;
+    private x?: number;
+    private y?: number;
     public bag?: Bag;
-    public chest?: Bag;
+    private chest?: Bag;
     public status?: Status;
     public home?: Home;
     public heroic_actions?: HeroicActions;
@@ -33,7 +33,7 @@ export class Citizen extends CommonModel<CitizenDTO> {
     public baths: Bath[] = [];
     public chamanic_detail!: ChamanicDetail;
 
-    constructor(dto?: CitizenDTO) {
+    public constructor(dto?: CitizenDTO) {
         super();
         this.dtoToModel(dto);
     }

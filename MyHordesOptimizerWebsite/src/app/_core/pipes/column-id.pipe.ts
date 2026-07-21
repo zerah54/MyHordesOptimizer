@@ -8,7 +8,7 @@ import { StandardColumn } from '../../_abstract_model/interfaces';
     pure: false
 })
 export class ColumnIdPipe implements PipeTransform {
-    transform(columns: StandardColumn[]): string[] {
+    public transform(columns: StandardColumn[]): string[] {
         return columns
             .filter((column: StandardColumn) => !column.displayed || column.displayed())
             .map((column: StandardColumn): string => column.id);

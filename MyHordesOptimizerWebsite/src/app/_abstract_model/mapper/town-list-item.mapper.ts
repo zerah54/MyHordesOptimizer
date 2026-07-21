@@ -1,4 +1,4 @@
-import { TownListItemDTO } from '../dto/town-list-item.dto';
+import { TownListItemDTO, TownPublicCitizenDTO } from '../dto/town-list-item.dto';
 import { TownListItem, TownPublicCitizen } from '../types/town-list-item.model';
 
 export class TownListMapper {
@@ -17,10 +17,10 @@ export class TownListMapper {
             isChaos: dto.isChaos,
             isDevasted: dto.isDevasted,
             isFinished: dto.isFinished,
-            citizens: (dto.citizens ?? []).map((c): TownPublicCitizen => ({
-                id: c.id,
-                name: c.name,
-                deathTypeId: c.deathTypeId,
+            citizens: (dto.citizens ?? []).map((citizen_dto: TownPublicCitizenDTO): TownPublicCitizen => ({
+                id: citizen_dto.id,
+                name: citizen_dto.name,
+                deathTypeId: citizen_dto.deathTypeId,
             })),
         };
     }

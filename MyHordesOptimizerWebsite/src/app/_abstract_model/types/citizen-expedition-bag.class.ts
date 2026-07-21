@@ -11,7 +11,7 @@ export class CitizenExpeditionBag extends CommonModel<CitizenExpeditionBagDTO> {
     public expeditions_citizen_id?: number;
     public expeditions_part_id?: number;
 
-    constructor(dto?: CitizenExpeditionBagDTO) {
+    public constructor(dto?: CitizenExpeditionBagDTO) {
         super();
         this.dtoToModel(dto);
     }
@@ -30,7 +30,7 @@ export class CitizenExpeditionBag extends CommonModel<CitizenExpeditionBagDTO> {
         };
     }
 
-    public toShortItemCountList(): ItemCountDTO[] {
+    private toShortItemCountList(): ItemCountDTO[] {
         const short_items_count: ItemCountDTO[] = [];
         this.items?.forEach((item: Item) => {
             const item_in_existing_list: ItemCountDTO | undefined = short_items_count.find((short_item_count: ItemCountDTO) => {
@@ -49,7 +49,7 @@ export class CitizenExpeditionBag extends CommonModel<CitizenExpeditionBagDTO> {
         return short_items_count;
     }
 
-    public toShortItemCountListShort(): ItemCountShortDTO[] {
+    private toShortItemCountListShort(): ItemCountShortDTO[] {
         const short_items_count: ItemCountShortDTO[] = [];
         this.items?.forEach((item: Item) => {
             const item_in_existing_list: ItemCountShortDTO | undefined = short_items_count.find((short_item_count: ItemCountShortDTO) => {

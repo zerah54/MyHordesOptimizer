@@ -9,7 +9,7 @@ export class WishlistInfo extends CommonModel<WishlistInfoDTO> {
     public wishlist_items!: WishlistItem[];
     public update_info!: UpdateInfo;
 
-    constructor(dto?: WishlistInfoDTO | null) {
+    public constructor(dto?: WishlistInfoDTO | null) {
         super();
         this.dtoToModel(dto);
     }

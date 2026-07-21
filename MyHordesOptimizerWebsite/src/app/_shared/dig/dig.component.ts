@@ -36,7 +36,7 @@ export class DigComponent {
 
     // TODO: Skipped for migration because:
     //  Accessor inputs cannot be migrated as they are too complex.
-    @Input({ required: true }) set dig(dig: Dig | undefined) {
+    @Input({ required: true }) public set dig(dig: Dig | undefined) {
         setTimeout(() => {
             if (this.digsMode() === 'registry') {
                 this.updated_dig = dig;

@@ -6,7 +6,7 @@ export class Bath extends CommonModel<BathDTO> {
     public day!: number;
     public update_info!: UpdateInfo;
 
-    constructor(dto?: BathDTO | null) {
+    public constructor(dto?: BathDTO | null) {
         super();
         this.dtoToModel(dto);
     }

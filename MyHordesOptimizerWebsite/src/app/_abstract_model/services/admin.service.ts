@@ -1,12 +1,12 @@
 import { HttpResponse } from '@angular/common/http';
-import { Injectable, signal,WritableSignal } from '@angular/core';
+import { Injectable, signal, WritableSignal } from '@angular/core';
 import { catchError, map, Observable, of, tap } from 'rxjs';
 
 import { GlobalService } from './_global.service';
 
 @Injectable({ providedIn: 'root' })
 export class AdminService extends GlobalService {
-    readonly isAdmin: WritableSignal<boolean> = signal<boolean>(false);
+    public readonly isAdmin: WritableSignal<boolean> = signal<boolean>(false);
 
     public checkIsAdmin(): Observable<boolean> {
         return super.get<boolean>(`${this.API_URL}/admin/is-admin`).pipe(
@@ -68,7 +68,7 @@ export class AdminService extends GlobalService {
     }
 
     public importTowns(season?: number): Observable<void> {
-        const url: string = season != null
+        const url: string = season !== null
             ? `${this.API_URL}/admin/import/towns?season=${season}`
             : `${this.API_URL}/admin/import/towns`;
         return super.post<void>(url);

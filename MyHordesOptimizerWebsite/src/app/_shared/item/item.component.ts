@@ -34,12 +34,12 @@ export class ItemComponent implements OnInit {
     public forceOpen: InputSignalWithTransform<boolean, unknown> = input(false, { transform: booleanAttribute });
 
     /** Le dossier dans lequel sont stockées les images */
-    public readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
+    protected readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
     /** La locale */
-    public readonly locale: string = moment.locale();
+    protected readonly locale: string = moment.locale();
 
-    public display_mode: 'simple' | 'advanced' = 'simple';
-    public town: TownDetails | null = getTown();
+    protected display_mode: 'simple' | 'advanced' = 'simple';
+    protected town: TownDetails | null = getTown();
 
     private readonly destroy_ref: DestroyRef = inject(DestroyRef);
 
@@ -54,7 +54,7 @@ export class ItemComponent implements OnInit {
      *
      * @param {Item} item
      */
-    public addItemToWishlist(item: Item): void {
+    protected addItemToWishlist(item: Item): void {
         this.wishlist_services.addItemToWishlist(item, 0)
             .pipe(takeUntilDestroyed(this.destroy_ref))
             .subscribe(() => {
@@ -64,7 +64,7 @@ export class ItemComponent implements OnInit {
             });
     }
 
-    public toggleAdvancedMode(): void {
+    protected toggleAdvancedMode(): void {
         if (this.forceOpen()) {
             this.display_mode = 'advanced';
         } else {

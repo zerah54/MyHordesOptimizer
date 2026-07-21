@@ -23,17 +23,17 @@ export class TutoDiscordBotInstallationComponent {
     private readonly clipboard: ClipboardService = inject(ClipboardService);
     private readonly document: Document = inject<Document>(DOCUMENT);
 
-    public readonly title: string = $localize`Installation du Bot sur un serveur Discord`;
-    public readonly download_link: string = $localize`<a href="https://discord.com/api/oauth2/authorize?client_id=1140035117746765914&permissions=277025459200&scope=bot" target="_blank">lien d'installation du bot</a>`;
-    public text_1: string = $localize`Vous devez être propriétaire ou avoir les droits d'administration sur le serveur Discord sur lequel vous voulez inviter le Bot.`;
-    public text_2: string = $localize`En cliquant sur le ${this.download_link}, vous serez redirigé vers une page d'installation.`;
+    protected readonly title: string = $localize`Installation du Bot sur un serveur Discord`;
+    private readonly download_link: string = $localize`<a href="https://discord.com/api/oauth2/authorize?client_id=1140035117746765914&permissions=277025459200&scope=bot" target="_blank">lien d'installation du bot</a>`;
+    protected text_1: string = $localize`Vous devez être propriétaire ou avoir les droits d'administration sur le serveur Discord sur lequel vous voulez inviter le Bot.`;
+    protected text_2: string = $localize`En cliquant sur le ${this.download_link}, vous serez redirigé vers une page d'installation.`;
 
-    public copyUrl(): void {
+    protected copyUrl(): void {
         const url: string = this.document.location.href;
         this.clipboard.copy(url, $localize`Le lien a bien été copié`);
     }
 
-    public shareForum(): void {
+    protected shareForum(): void {
         let text: string = '';
 
         text += `[b][big]${this.title}[/big][/b]`;

@@ -5,14 +5,14 @@ import { Dictionary } from './_types';
 import { UpdateInfo } from './update-info.class';
 
 export class Status extends CommonModel<StatusDTO> {
-    public content!: Dictionary<boolean>;
+    private content!: Dictionary<boolean>;
     public icons!: StatusEnum[];
     public update_info!: UpdateInfo;
-    public is_ghoul!: boolean;
-    public ghoul_voracity!: number;
-    public ghoul_status_update_info!: UpdateInfo;
+    private is_ghoul!: boolean;
+    private ghoul_voracity!: number;
+    private ghoul_status_update_info!: UpdateInfo;
 
-    constructor(dto?: StatusDTO) {
+    public constructor(dto?: StatusDTO) {
         super();
         this.dtoToModel(dto);
     }

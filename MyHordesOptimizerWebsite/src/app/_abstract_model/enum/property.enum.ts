@@ -72,36 +72,36 @@ const DECO_DATA: PropertyData = { label: $localize`Décoration`, category: 'cate
 
 /** Type de champs de propriétés existants */
 export class Property extends CommonEnum {
-    static ESC_FIXED: Property = new Property(ESC_FIXED_KEY, ESC_FIXED_DATA);
-    static LOCK: Property = new Property(LOCK_KEY, LOCK_DATA);
-    static FOUND_POISONED: Property = new Property(FOUND_POISONED_KEY, FOUND_POISONED_DATA);
-    static ESC_FPREVENT_TERRORXED: Property = new Property(PREVENT_TERROR_KEY, PREVENT_TERROR_DATA);
-    static HERO_FIND_LUCKY: Property = new Property(HERO_FIND_LUCKY_KEY, HERO_FIND_LUCKY_DATA);
-    static HERO_FIND: Property = new Property(HERO_FIND_KEY, HERO_FIND_DATA);
-    static IMPOUNDABLE: Property = new Property(IMPOUNDABLE_KEY, IMPOUNDABLE_DATA);
-    static PREVENT_NIGHT: Property = new Property(PREVENT_NIGHT_KEY, PREVENT_NIGHT_DATA);
-    static IS_WATER: Property = new Property(IS_WATER_KEY, IS_WATER_DATA);
+    public static ESC_FIXED: Property = new Property(ESC_FIXED_KEY, ESC_FIXED_DATA);
+    public static LOCK: Property = new Property(LOCK_KEY, LOCK_DATA);
+    public static FOUND_POISONED: Property = new Property(FOUND_POISONED_KEY, FOUND_POISONED_DATA);
+    public static ESC_FPREVENT_TERRORXED: Property = new Property(PREVENT_TERROR_KEY, PREVENT_TERROR_DATA);
+    public static HERO_FIND_LUCKY: Property = new Property(HERO_FIND_LUCKY_KEY, HERO_FIND_LUCKY_DATA);
+    public static HERO_FIND: Property = new Property(HERO_FIND_KEY, HERO_FIND_DATA);
+    public static IMPOUNDABLE: Property = new Property(IMPOUNDABLE_KEY, IMPOUNDABLE_DATA);
+    public static PREVENT_NIGHT: Property = new Property(PREVENT_NIGHT_KEY, PREVENT_NIGHT_DATA);
+    public static IS_WATER: Property = new Property(IS_WATER_KEY, IS_WATER_DATA);
 
     /** Veille */
-    static NW_ARMORY: Property = new Property(NW_ARMORY_KEY, NW_ARMORY_DATA);
-    static NW_IKEA: Property = new Property(NW_IKEA_KEY, NW_IKEA_DATA);
-    static NW_TREBUCHET: Property = new Property(NW_TREBUCHET_KEY, NW_TREBUCHET_DATA);
-    static NW_SHOOTING: Property = new Property(NW_SHOOTING_KEY, NW_SHOOTING_DATA);
+    public static NW_ARMORY: Property = new Property(NW_ARMORY_KEY, NW_ARMORY_DATA);
+    public static NW_IKEA: Property = new Property(NW_IKEA_KEY, NW_IKEA_DATA);
+    public static NW_TREBUCHET: Property = new Property(NW_TREBUCHET_KEY, NW_TREBUCHET_DATA);
+    public static NW_SHOOTING: Property = new Property(NW_SHOOTING_KEY, NW_SHOOTING_DATA);
 
     /** Catapulte */
-    static FRAGILE: Property = new Property(FRAGILE_KEY, FRAGILE_DATA);
+    public static FRAGILE: Property = new Property(FRAGILE_KEY, FRAGILE_DATA);
     
     /** Modifications possibles */
-    static CAN_POISON: Property = new Property(CAN_POISON_KEY, CAN_POISON_DATA);
-    static CAN_COOK: Property = new Property(CAN_COOK_KEY, CAN_COOK_DATA);
+    public static CAN_POISON: Property = new Property(CAN_POISON_KEY, CAN_POISON_DATA);
+    public static CAN_COOK: Property = new Property(CAN_COOK_KEY, CAN_COOK_DATA);
     /** Catégories */
-    static FOOD: Property = new Property(FOOD_KEY, FOOD_DATA);
-    static DRUG: Property = new Property(DRUG_KEY, DRUG_DATA);
-    static WEAPON: Property = new Property(WEAPON_KEY, WEAPON_DATA);
-    static RESSOURCE: Property = new Property(RESSOURCE_KEY, RESSOURCE_DATA);
-    static DEFENCE: Property = new Property(DEFENCE_KEY, DEFENCE_DATA);
-    static PET: Property = new Property(PET_KEY, PET_DATA);
-    static DECO: Property = new Property(DECO_KEY, DECO_DATA);
+    public static FOOD: Property = new Property(FOOD_KEY, FOOD_DATA);
+    public static DRUG: Property = new Property(DRUG_KEY, DRUG_DATA);
+    public static WEAPON: Property = new Property(WEAPON_KEY, WEAPON_DATA);
+    public static RESSOURCE: Property = new Property(RESSOURCE_KEY, RESSOURCE_DATA);
+    public static DEFENCE: Property = new Property(DEFENCE_KEY, DEFENCE_DATA);
+    public static PET: Property = new Property(PET_KEY, PET_DATA);
+    public static DECO: Property = new Property(DECO_KEY, DECO_DATA);
 
 
     /**
@@ -110,12 +110,12 @@ export class Property extends CommonEnum {
      * @param {string} key La clé de l'objet
      * @param {PropertyData} value la valeur correspondante
      */
-    protected constructor(public override key: string, public override value: PropertyData) {
+    public constructor(public override key: string, public override value: PropertyData) {
         super(key, value);
     }
 
     /** @return {string} le libellé du droit */
-    public getLabel(): string {
+    protected getLabel(): string {
         return this.value.label;
     }
 }

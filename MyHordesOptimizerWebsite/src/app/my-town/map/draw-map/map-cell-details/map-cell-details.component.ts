@@ -36,7 +36,7 @@ export class MapCellDetailsComponent {
     public allCitizens: InputSignal<Citizen[]> = input.required();
     public allItems: InputSignal<Item[]> = input.required();
 
-    public readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
-    public readonly locale: string = moment.locale();
+    private readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
+    private readonly locale: string = moment.locale();
 
 }

@@ -20,9 +20,9 @@ export class FilterFieldComponent {
 
     public filterChange: OutputEmitterRef<string> = output();
 
-    public filter_value: string = '';
+    protected filter_value: string = '';
 
-    public applyFilter(value: string): void {
+    protected applyFilter(value: string): void {
         this.filterChange.emit(value);
     }
 }

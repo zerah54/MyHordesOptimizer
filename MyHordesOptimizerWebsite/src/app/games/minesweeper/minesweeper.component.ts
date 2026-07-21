@@ -33,7 +33,7 @@ export class MinesweeperComponent implements OnInit, OnDestroy {
     protected game_over: WritableSignal<boolean> = signal(false);
     protected start_time: WritableSignal<Moment | undefined> = signal(undefined);
     protected end_time: WritableSignal<Moment | undefined> = signal(undefined);
-    protected board_initialized: WritableSignal<boolean> = signal(false);
+    private board_initialized: WritableSignal<boolean> = signal(false);
     protected seed: WritableSignal<number | undefined> = signal(Math.floor(Math.random() * 0xFFFFFFFF));
     protected random_seed: WritableSignal<boolean> = signal(true);
 
@@ -79,7 +79,7 @@ export class MinesweeperComponent implements OnInit, OnDestroy {
         });
     }
 
-    public revealCell(i: number, j: number): void {
+    protected revealCell(i: number, j: number): void {
         if (this.game_over() || this.board()[i][j].is_flagged || this.board()[i][j].is_questioned) return;
 
         if (!this.board_initialized()) {

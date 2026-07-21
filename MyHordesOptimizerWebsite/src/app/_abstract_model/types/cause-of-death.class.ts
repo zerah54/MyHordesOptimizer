@@ -5,13 +5,13 @@ import { CommonModel } from './_common.class';
 import { Dictionary } from './_types';
 
 export class CauseOfDeath extends CommonModel<CauseOfDeathDTO> {
-    public dtype!: number;
-    public ref?: string;
+    private dtype!: number;
+    private ref?: string;
     public icon?: string;
-    public label?: Dictionary<string>;
-    public description?: Dictionary<string>;
+    private label?: Dictionary<string>;
+    private description?: Dictionary<string>;
 
-    constructor(dto?: CauseOfDeathDTO) {
+    public constructor(dto?: CauseOfDeathDTO) {
         super();
         this.dtoToModel(dto);
     }

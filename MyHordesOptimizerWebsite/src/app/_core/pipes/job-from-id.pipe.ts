@@ -7,7 +7,7 @@ import { JobEnum } from '../../_abstract_model/enum/job.enum';
     name: 'jobFromId'
 })
 export class JobFromIdPipe implements PipeTransform {
-    transform(job_id?: string): JobEnum | undefined {
+    public transform(job_id?: string): JobEnum | undefined {
         if (!job_id) return undefined;
         return JobEnum.getByKey(job_id);
     }

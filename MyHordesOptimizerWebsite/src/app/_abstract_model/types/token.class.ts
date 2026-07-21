@@ -6,10 +6,10 @@ import { CommonModel } from './_common.class';
 export class Token extends CommonModel<TokenDTO> {
 
     public access_token!: string;
-    public valid_from!: Moment;
+    private valid_from!: Moment;
     public valid_to!: Moment;
 
-    constructor(dto?: TokenDTO | null) {
+    public constructor(dto?: TokenDTO | null) {
         super();
         this.dtoToModel(dto);
     }

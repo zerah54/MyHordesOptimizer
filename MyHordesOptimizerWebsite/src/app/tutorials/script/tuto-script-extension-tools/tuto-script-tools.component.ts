@@ -24,8 +24,8 @@ export class TutoScriptToolsComponent {
     private readonly clipboard: ClipboardService = inject(ClipboardService);
     private readonly document: Document = inject<Document>(DOCUMENT);
 
-    public readonly title: string = $localize`Outils`;
-    public readonly tuto_script_items: AccordionItem[] = [
+    protected readonly title: string = $localize`Outils`;
+    protected readonly tuto_script_items: AccordionItem[] = [
         {
             title: $localize`Banque`,
             content: $localize`Affiche la liste des objets de la banque et leur quantité.<br /><br />
@@ -37,12 +37,12 @@ export class TutoScriptToolsComponent {
         }
     ];
 
-    public copyUrl(): void {
+    protected copyUrl(): void {
         const url: string = this.document.location.href;
         this.clipboard.copy(url, $localize`Le lien a bien été copié`);
     }
 
-    public shareForum(): void {
+    protected shareForum(): void {
         let text: string = '';
 
         text += `[b][big]${this.title}[/big][/b]`;

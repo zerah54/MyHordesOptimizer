@@ -24,11 +24,15 @@ export function modelArrayToDictionnary<DTO, MODEL extends CommonModel<DTO>>(mod
     const items: Dictionary<DTO> = <Dictionary<DTO>><unknown>[];
     models.forEach((model_item: MODEL) => {
         const key_parts: string[] = key.split('.');
-        let item_key: any = model_item;
+        let item_key: MODEL = model_item;
         key_parts.forEach((key_part: string) => {
-            item_key = item_key[<any>key_part];
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
+            item_key = item_key[key_part];
         });
-        items[<any>item_key] = model_item.modelToDto();
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        items[item_key] = model_item.modelToDto();
     });
     return items;
 }

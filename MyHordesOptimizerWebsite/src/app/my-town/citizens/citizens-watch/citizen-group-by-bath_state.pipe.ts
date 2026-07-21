@@ -8,7 +8,7 @@ import { Citizen } from '../../../_abstract_model/types/citizen.class';
 })
 export class CitizenGroupByBathStatePipe implements PipeTransform {
 
-    transform(citizens: Citizen[], day: number): BathState[] {
+    public transform(citizens: Citizen[], day: number): BathState[] {
         if (!citizens) return [];
 
         return [

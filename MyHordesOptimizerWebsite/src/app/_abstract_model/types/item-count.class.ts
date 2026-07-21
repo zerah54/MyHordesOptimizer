@@ -7,7 +7,7 @@ export class ItemCount extends CommonModel<ItemCountDTO> {
     public is_broken!: boolean;
     public item!: Item;
 
-    constructor(dto?: ItemCountDTO) {
+    public constructor(dto?: ItemCountDTO) {
         super();
         this.dtoToModel(dto);
     }

@@ -14,14 +14,14 @@ import { CitizenInfo } from '../../../../_abstract_model/types/citizen-info.clas
 })
 export class DoorsRegistryComponent {
 
-    protected readonly doors_canvas: Signal<ElementRef> = viewChild.required<ElementRef>('doorsCanvas');
+    private readonly doors_canvas: Signal<ElementRef> = viewChild.required<ElementRef>('doorsCanvas');
 
     public completeCitizenList: InputSignal<CitizenInfo> = input.required();
     public displayPseudo: InputSignal<DisplayPseudoMode> = input.required();
 
     // TODO: Skipped for migration because:
     //  Accessor inputs cannot be migrated as they are too complex.
-    @Input({ required: true }) set registry(registry: Entry[] | undefined) {
+    @Input({ required: true }) public set registry(registry: Entry[] | undefined) {
         if (registry) {
             this.entries = registry.filter((entry: Entry) => {
                 return this.doors_entering_keywords.some((doors_entering: string): boolean => entry.entry?.indexOf(' ' + doors_entering) > -1)
@@ -35,8 +35,8 @@ export class DoorsRegistryComponent {
         }
     }
 
-    protected entries: Entry[] = [];
-    protected doors_chart!: Chart<'bar'>;
+    private entries: Entry[] = [];
+    public doors_chart!: Chart<'bar'>;
 
     private readonly doors_leaving_keywords: string[] = ['a quitté la ville', 'left', 'verlassen', 'ha salido del'];
     private readonly doors_entering_keywords: string[] = ['est de retour en ville', 'entered', 'betreten', 'está de vuelta en el'];

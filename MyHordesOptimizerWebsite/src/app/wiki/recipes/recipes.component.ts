@@ -30,17 +30,17 @@ const material_modules: Imports = [MatCardModule, MatSortModule, MatTableModule]
 })
 export class RecipesComponent implements OnInit {
 
-    public recipes: Recipe[] = [];
+    protected recipes: Recipe[] = [];
     /** La datasource pour le tableau */
-    public datasource: MatTableDataSource<Recipe> = new MatTableDataSource();
+    protected datasource: MatTableDataSource<Recipe> = new MatTableDataSource();
 
     /** Le dossier dans lequel sont stockées les images */
-    public readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
+    protected readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
     /** La locale */
-    public readonly locale: string = moment.locale();
+    protected readonly locale: string = moment.locale();
 
     /** La liste des colonnes */
-    public readonly columns: StandardColumn[] = [
+    protected readonly columns: StandardColumn[] = [
         { id: 'type', header: $localize`Type de recette` },
         { id: 'components', header: $localize`Composants` },
         { id: 'transformation', header: '' },
@@ -50,7 +50,7 @@ export class RecipesComponent implements OnInit {
     private readonly api: ApiService = inject(ApiService);
     private readonly destroy_ref: DestroyRef = inject(DestroyRef);
 
-    ngOnInit(): void {
+    public ngOnInit(): void {
         this.api.getRecipes()
             .pipe(takeUntilDestroyed(this.destroy_ref))
             .subscribe((recipes: Recipe[]): void => {
@@ -61,7 +61,7 @@ export class RecipesComponent implements OnInit {
     }
 
     /** Filtre la liste à afficher */
-    public applyFilter(value: string): void {
+    protected applyFilter(value: string): void {
         this.datasource.filter = value.trim().toLowerCase();
     }
 

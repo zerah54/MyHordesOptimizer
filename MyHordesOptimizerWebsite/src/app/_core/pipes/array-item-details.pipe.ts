@@ -8,7 +8,7 @@ import { ItemCountShort } from '../../_abstract_model/types/item-count-short.cla
     name: 'arrayItemDetails'
 })
 export class ArrayItemDetailsPipe implements PipeTransform {
-    transform(item: ItemCountShort[], all_items: Item[]): Item[] {
+    public transform(item: ItemCountShort[], all_items: Item[]): Item[] {
         return item.map((short_item: ItemCountShort): Item => <Item>all_items.find((item_in_all: Item) => item_in_all.id === short_item.item_id));
     }
 }

@@ -20,7 +20,7 @@ const material_modules: Imports = [MatFormFieldModule, MatIconModule, MatInputMo
 })
 export class HeaderWithStringFilterComponent {
 
-    readonly filter: Signal<ElementRef<HTMLInputElement>> = viewChild.required<ElementRef<HTMLInputElement>>('filter');
+    private readonly filter: Signal<ElementRef<HTMLInputElement>> = viewChild.required<ElementRef<HTMLInputElement>>('filter');
 
     public header: InputSignal<string> = input.required();
     public textAlign: InputSignal<string> = input('left');
@@ -29,10 +29,10 @@ export class HeaderWithStringFilterComponent {
     public filterValueChange: OutputEmitterRef<string> = output();
 
 
-    public visible: boolean = false;
+    protected visible: boolean = false;
 
     /** Affiche le filtre */
-    public displayFilter(): void {
+    protected displayFilter(): void {
         this.visible = true;
         setTimeout(() => {
             this.filter().nativeElement.focus();
@@ -40,7 +40,7 @@ export class HeaderWithStringFilterComponent {
     }
 
     /** Vérifie si le filtre doit toujours être affiché */
-    public checkVisibility(): void {
+    protected checkVisibility(): void {
         this.visible = this.filterValue() !== '' && this.filterValue() !== null && this.filterValue() !== undefined;
     }
 

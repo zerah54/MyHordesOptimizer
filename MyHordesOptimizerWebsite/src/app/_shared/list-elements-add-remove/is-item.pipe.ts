@@ -8,7 +8,7 @@ import { Item } from '../../_abstract_model/types/item.class';
     name: 'isItems'
 })
 export class IsItemsPipe implements PipeTransform {
-    transform(list: (Item | StatusEnum)[]): boolean {
+    public transform(list: (Item | StatusEnum)[]): boolean {
         if (!list) return false;
 
         return list.some((element: Item | StatusEnum) => element instanceof Item);

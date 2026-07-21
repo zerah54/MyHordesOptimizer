@@ -12,7 +12,7 @@ export class ExpeditionOrder extends CommonModel<ExpeditionOrderDTO> {
     public expedition_citizen_id?: number;
     public expedition_parts_id?: number;
 
-    constructor(dto?: ExpeditionOrderDTO | null) {
+    public constructor(dto?: ExpeditionOrderDTO | null) {
         super();
         this.dtoToModel(dto);
     }

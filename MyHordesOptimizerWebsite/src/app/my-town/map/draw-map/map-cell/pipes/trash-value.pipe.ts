@@ -12,7 +12,7 @@ import { MapOptions } from '../../../map.component';
     name: 'trashValue'
 })
 export class TrashValuePipe implements PipeTransform {
-    transform(cell: Cell, option: MapOptions, items: Item[]): number {
+    public transform(cell: Cell, option: MapOptions, items: Item[]): number {
         option;
         let value: number = 0;
         const decharge: boolean = true;

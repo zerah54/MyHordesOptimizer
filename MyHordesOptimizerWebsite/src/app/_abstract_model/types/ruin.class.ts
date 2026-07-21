@@ -6,18 +6,18 @@ import { RuinItem } from './ruin-item.class';
 export class Ruin extends CommonModel<RuinDTO> {
     public id!: number;
     public camping!: number;
-    public chance!: number;
+    private chance!: number;
     public label!: I18nLabels;
     public description!: I18nLabels;
     public explorable!: boolean;
-    public img!: string;
+    private img!: string;
     public formatted_img!: string;
     public min_dist!: number;
     public max_dist!: number;
     public drops: RuinItem[] = [];
     public capacity?: number;
 
-    constructor(dto?: RuinDTO) {
+    public constructor(dto?: RuinDTO) {
         super();
         this.dtoToModel(dto);
     }

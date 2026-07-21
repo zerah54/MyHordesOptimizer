@@ -41,21 +41,21 @@ const material_modules: Imports = [MatButtonModule, MatCardModule, MatIconModule
 export class RuinsComponent implements OnInit {
 
     /** Le dossier dans lequel sont stockées les images */
-    public readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
+    protected readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
     /** La locale */
-    public readonly locale: string = moment.locale();
+    protected readonly locale: string = moment.locale();
     /** La ville actuelle */
-    public readonly town: TownDetails | null = getTown();
+    protected readonly town: TownDetails | null = getTown();
     /** La liste des bâtiments du jeu */
-    public ruins!: Ruin[];
+    protected ruins!: Ruin[];
     /** La liste des bâtiments de la ville */
-    public town_ruins!: Ruin[];
+    protected town_ruins!: Ruin[];
     /** La liste des objets du jeu */
-    public items: RuinItem[] = [];
+    protected items: RuinItem[] = [];
     /** La datasource pour le tableau */
-    public datasource: MatTableDataSource<Ruin> = new MatTableDataSource();
+    protected datasource: MatTableDataSource<Ruin> = new MatTableDataSource();
     /** La liste des colonnes */
-    public readonly columns: RuinColumns[] = [
+    protected readonly columns: RuinColumns[] = [
         { id: 'label', header: $localize`Nom du bâtiment`, sortable: true, sticky: true },
         { id: 'description', header: $localize`Description`, sortable: false },
         { id: 'min_dist', header: $localize`Distance minimum`, sortable: true },
@@ -64,15 +64,15 @@ export class RuinsComponent implements OnInit {
         { id: 'capacity', header: $localize`Capacité`, sortable: true },
         { id: 'drops', header: $localize`Objets`, sortable: false }
     ];
-    public ruins_filters: RuinFilters = {
+    protected ruins_filters: RuinFilters = {
         label: '',
         min_dist: '',
         max_dist: '',
         objects: [],
         inside_town: false
     };
-    public ruins_filters_change: EventEmitter<void> = new EventEmitter();
-    protected readonly sort: Signal<MatSort> = viewChild.required(MatSort);
+    protected ruins_filters_change: EventEmitter<void> = new EventEmitter();
+    private readonly sort: Signal<MatSort> = viewChild.required(MatSort);
     private town_service: TownService = inject(TownService);
     private api_service: ApiService = inject(ApiService);
     private readonly destroy_ref: DestroyRef = inject(DestroyRef);

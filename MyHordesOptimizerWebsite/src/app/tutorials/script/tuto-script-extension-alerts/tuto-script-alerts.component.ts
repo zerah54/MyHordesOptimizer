@@ -23,9 +23,9 @@ const material_modules: Imports = [MatButtonModule, MatCardModule, MatIconModule
 export class TutoScriptAlertsComponent {
     private readonly clipboard: ClipboardService = inject(ClipboardService);
 
-    public readonly title: string = $localize`Notifications`;
+    protected readonly title: string = $localize`Notifications`;
 
-    public readonly tuto_script_items: AccordionItem[] = [
+    protected readonly tuto_script_items: AccordionItem[] = [
         {
             title: $localize`Avertissement en cas de fermeture de la page`, content: $localize`Dans l'interface, vous pouvez cocher l'option "Demander confirmation avant de quitter la page", ce qui activera la fonctionnalité.
                 Une fois activée, si vous êtes dans le désert et que votre attente d'escorte n'est pas activée, ou si vous n'avez pas relâché votre escorte, alors au moment de fermer la fenêtre ou l'onglet vous verrez apparaitre un avertissement demandant de confirmer votre action.`
@@ -44,12 +44,12 @@ export class TutoScriptAlertsComponent {
         },
     ];
 
-    public copyUrl(): void {
+    protected copyUrl(): void {
         const url: string = window.location.href;
         this.clipboard.copy(url, $localize`Le lien a bien été copié`);
     }
 
-    public shareForum(): void {
+    protected shareForum(): void {
         let text: string = '';
 
         text += `[b][big]${this.title}[/big][/b]`;

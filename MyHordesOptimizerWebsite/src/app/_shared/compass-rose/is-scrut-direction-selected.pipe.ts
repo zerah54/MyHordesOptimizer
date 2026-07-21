@@ -7,7 +7,7 @@ import { Dictionary } from '../../_abstract_model/types/_types';
     name: 'isDirectionSelected'
 })
 export class IsDirectionSelectedPipe implements PipeTransform {
-    transform(selected_direction: Dictionary<boolean>, direction: string): boolean {
+    public transform(selected_direction: Dictionary<boolean>, direction: string): boolean {
         return selected_direction[direction];
     }
 }
@@ -16,7 +16,7 @@ export class IsDirectionSelectedPipe implements PipeTransform {
     name: 'areAllDirectionsSelected'
 })
 export class AreAllDirectionsSelectedPipe implements PipeTransform {
-    transform(selected_direction: Dictionary<boolean>): boolean {
+    public transform(selected_direction: Dictionary<boolean>): boolean {
         return areAllDirectionsSelected(selected_direction);
     }
 }

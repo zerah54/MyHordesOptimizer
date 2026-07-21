@@ -3,28 +3,28 @@ import { CommonModel } from './_common.class';
 import { TownTypeId } from './_types';
 
 export class CampingParameters extends CommonModel<CampingParametersDTO> {
-    public town_type: TownTypeId = 'RE';
-    public job: string = 'citizen';
-    public distance: number = 0;
-    public campings: number = 0;
-    public pro_camper: boolean = false;
-    public hidden_campers: number = 0;
-    public objects: number = 0;
-    public vest: boolean = false;
-    public tomb: boolean = false;
-    public r4: boolean = false;
-    public zombies: number = 0;
-    public night: boolean = false;
-    public devastated: boolean = false;
-    public phare: boolean = false;
-    public improve: number = 0;
-    public object_improve: number = 0;
-    public ruin_bonus: number = 0;
-    public ruin_bury_count: number = 0;
-    public ruin_capacity: number = 0;
+    private town_type: TownTypeId = 'RE';
+    private job: string = 'citizen';
+    private distance: number = 0;
+    private campings: number = 0;
+    private pro_camper: boolean = false;
+    private hidden_campers: number = 0;
+    private objects: number = 0;
+    private vest: boolean = false;
+    private tomb: boolean = false;
+    private r4: boolean = false;
+    private zombies: number = 0;
+    private night: boolean = false;
+    private devastated: boolean = false;
+    private phare: boolean = false;
+    private improve: number = 0;
+    private object_improve: number = 0;
+    private ruin_bonus: number = 0;
+    private ruin_bury_count: number = 0;
+    private ruin_capacity: number = 0;
 
 
-    constructor(dto?: CampingParametersDTO) {
+    public constructor(dto?: CampingParametersDTO) {
         super();
         this.dtoToModel(dto);
     }

@@ -18,7 +18,7 @@ export class Cell extends CommonModel<CellDTO> {
     public nb_zombie!: number;
     public nb_zombie_killed!: number;
     public nb_hero!: number;
-    public is_ruin_camped!: boolean;
+    private is_ruin_camped!: boolean;
     public is_ruin_dryed!: boolean;
     public nb_ruin_dig!: number;
     public total_success!: number;
@@ -33,7 +33,7 @@ export class Cell extends CommonModel<CellDTO> {
     public displayed_x!: number;
     public displayed_y!: number;
     public note!: string;
-    public nb_ruin_success!: number;
+    private nb_ruin_success!: number;
     public nb_eruin_blue!: number;
     public nb_eruin_yellow!: number;
     public nb_eruin_violet!: number;
@@ -54,7 +54,7 @@ export class Cell extends CommonModel<CellDTO> {
     /** Radar de l'éclaireur saisi manuellement depuis cette case, jamais renvoyé par l'API */
     public scout_next_cells: ScoutNextCellsDTO | null = null;
 
-    constructor(dto?: CellDTO) {
+    public constructor(dto?: CellDTO) {
         super();
         this.dtoToModel(dto);
     }

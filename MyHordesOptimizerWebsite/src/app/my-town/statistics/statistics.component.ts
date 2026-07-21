@@ -19,7 +19,7 @@ const material_modules: Imports = [MatCardModule, MatTabsModule];
 })
 export class StatisticsComponent {
 
-    public links: Link[] = [
+    protected links: Link[] = [
         {
             label: $localize`Estimations`,
             link: 'estimations'

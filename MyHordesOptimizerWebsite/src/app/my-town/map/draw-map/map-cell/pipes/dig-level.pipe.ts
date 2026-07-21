@@ -8,7 +8,7 @@ import { MapOptions } from '../../../map.component';
     name: 'digLevel'
 })
 export class DigLevelPipe implements PipeTransform {
-    transform(cell: Cell, option: MapOptions): number {
+    public transform(cell: Cell, option: MapOptions): number {
         /** Le relevé d'un fouineur est une information certaine : il prime sur l'estimation */
         if (cell.scav_zone_level !== null && cell.scav_zone_level !== undefined) {
             return cell.scav_zone_level;

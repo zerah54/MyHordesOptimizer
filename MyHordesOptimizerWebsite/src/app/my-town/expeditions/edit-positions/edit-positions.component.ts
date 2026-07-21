@@ -22,20 +22,20 @@ const material_modules: Imports = [DragDropModule, MatButtonModule, MatButtonTog
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class EditPositionsComponent {
-    protected data: EditPositionsData = inject<EditPositionsData>(MAT_DIALOG_DATA);
+    private data: EditPositionsData = inject<EditPositionsData>(MAT_DIALOG_DATA);
 
 
-    public expeditions: Expedition[] = [];
+    protected expeditions: Expedition[] = [];
 
     public constructor() {
         this.expeditions = this.data?.expeditions ? [...this.data.expeditions.map((expedition: Expedition) => new Expedition(expedition.modelToDto()))] : [];
     }
 
-    public drop(event: CdkDragDrop<string[]>): void {
+    protected drop(event: CdkDragDrop<string[]>): void {
         moveItemInArray(this.expeditions, event.previousIndex, event.currentIndex);
     }
 
-    public dropPart(event: CdkDragDrop<string[]>, expedition: Expedition): void {
+    protected dropPart(event: CdkDragDrop<string[]>, expedition: Expedition): void {
         moveItemInArray(expedition.parts, event.previousIndex, event.currentIndex);
     }
 }

@@ -25,7 +25,7 @@ export class CompassRoseComponent {
     public selectedScrutZone: InputSignal<Dictionary<boolean>> = input.required();
     public selectedScrutZoneChange: OutputEmitterRef<Dictionary<boolean>> = output();
 
-    public addToSelection(direction: string): void {
+    protected addToSelection(direction: string): void {
         if (!this.readonly()) {
             if (this.multiple()) {
                 const selected_scrut: Dictionary<boolean> = { ...this.selectedScrutZone() };
@@ -39,7 +39,7 @@ export class CompassRoseComponent {
         }
     }
 
-    public addAllToSelection(): void {
+    protected addAllToSelection(): void {
         if (!this.readonly() && this.multiple() && this.withDiags()) {
             const is_all_selected: boolean = areAllDirectionsSelected(this.selectedScrutZone());
 

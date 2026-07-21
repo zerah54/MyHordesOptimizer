@@ -36,7 +36,7 @@ export class AppComponent implements OnInit {
     private locale_id: string = inject(LOCALE_ID);
 
 
-    protected readonly sidenav_container: Signal<MatSidenavContainer> = viewChild.required<MatSidenavContainer>('sidenavContainer');
+    private readonly sidenav_container: Signal<MatSidenavContainer> = viewChild.required<MatSidenavContainer>('sidenavContainer');
 
     protected is_gt_xs: boolean = this.breakpoint_observer.isMatched(BREAKPOINTS['gt-xs']);
     protected is_loading: boolean = false;
@@ -48,11 +48,11 @@ export class AppComponent implements OnInit {
     private readonly destroy_ref: DestroyRef = inject(DestroyRef);
 
     @HostListener('window:resize', ['$event'])
-    onResize(): void {
+    public onResize(): void {
         this.is_gt_xs = this.breakpoint_observer.isMatched(BREAKPOINTS['gt-xs']);
     }
 
-    constructor() {
+    public constructor() {
         moment.locale(this.locale_id);
     }
 

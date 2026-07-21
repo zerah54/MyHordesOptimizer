@@ -10,7 +10,7 @@ export class HeaderService {
     /** Le token */
     private token: BehaviorSubject<string | null> = new BehaviorSubject(getExternalAppId());
 
-    constructor() {
+    public constructor() {
         this.token_obs = this.token.asObservable();
     }
 

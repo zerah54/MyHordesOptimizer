@@ -20,11 +20,11 @@ const material_modules: Imports = [MatToolbarModule];
 })
 export class FooterComponent {
 
-    public readonly myhordes_url: string = environment.myhordes_url;
+    protected readonly myhordes_url: string = environment.myhordes_url;
 
     private dialog: MatDialog = inject(MatDialog);
 
-    public openThanks(): void {
+    protected openThanks(): void {
         this.dialog.open(ThanksComponent, {
             width: '50%',
             minWidth: '250px',

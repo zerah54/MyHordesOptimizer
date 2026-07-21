@@ -8,15 +8,15 @@ import { ItemCount } from './item-count.class';
 import { RecipeResultItem } from './recipe-result-item.class';
 
 export class Recipe extends CommonModel<RecipeDTO> {
-    public actions!: I18nLabels;
     public components!: Item[];
     public name!: string;
     public result!: RecipeResultItem[];
-    public type!: 'WORKSHOP' | 'MANUAL_ANYWHERE' | 'WORKSHOP_SHAMAN';
-    public stealthy?: boolean;
     public provoking?: Item;
+    private actions!: I18nLabels;
+    private type!: 'WORKSHOP' | 'MANUAL_ANYWHERE' | 'WORKSHOP_SHAMAN';
+    private stealthy?: boolean;
 
-    constructor(dto?: RecipeDTO) {
+    public constructor(dto?: RecipeDTO) {
         super();
         this.dtoToModel(dto);
     }
@@ -40,7 +40,7 @@ export class Recipe extends CommonModel<RecipeDTO> {
             const complete_component_list: ItemDTO[] = [];
             dto?.components
                 .forEach((component: ItemCountDTO) => {
-                    for (let i = 0; i < component.count; i++) {
+                    for (let i: number = 0; i < component.count; i++) {
                         complete_component_list.push(component.item);
                     }
                 });

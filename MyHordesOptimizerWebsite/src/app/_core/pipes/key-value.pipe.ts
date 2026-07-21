@@ -4,7 +4,7 @@ import { Pipe, PipeTransform } from '@angular/core';
     name: 'customKeyValue'
 })
 export class CustomKeyValuePipe<T> implements PipeTransform {
-    transform(map: Map<string, T>): { key: string, value: T }[] {
+    public transform(map: Map<string, T>): { key: string, value: T }[] {
         return Array.from(map.entries()).map((entry: [string, T]) => {
             return {
                 key: entry[0],

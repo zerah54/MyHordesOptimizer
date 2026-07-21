@@ -32,10 +32,10 @@ export class MiscellaneousInfoComponent {
     private readonly dialog: MatDialog = inject(MatDialog);
     private readonly router: Router = inject(Router);
 
-    public readonly locale: string = moment.locale();
-    public readonly my_town: TownDetails | null = getTown();
+    private readonly locale: string = moment.locale();
+    protected readonly my_town: TownDetails | null = getTown();
 
-    public misc: Misc[] = [
+    protected misc: Misc[] = [
         {
             header: $localize`Morts par désespoir`,
             highlight_day: false,

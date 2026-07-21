@@ -24,9 +24,9 @@ export class TutoScriptDisplayComponent {
     private readonly clipboard: ClipboardService = inject(ClipboardService);
     private readonly document: Document = inject<Document>(DOCUMENT);
 
-    public readonly title: string = $localize`Affichage`;
+    protected readonly title: string = $localize`Affichage`;
 
-    public readonly tuto_script_items: AccordionItem[] = [
+    protected readonly tuto_script_items: AccordionItem[] = [
         {
             title: $localize`Affichage des tooltips détaillés`,
             content: $localize`Modifie les tooltips natifs de l'application pour afficher en plus la liste des recettes dans lesquelles l'objet survolé apparait ainsi que quelques informations complémentaires (nombre de points d'action rendus par un aliment par exemple).`
@@ -101,12 +101,12 @@ export class TutoScriptDisplayComponent {
         },
     ];
 
-    public copyUrl(): void {
+    protected copyUrl(): void {
         const url: string = this.document.location.href;
         this.clipboard.copy(url, $localize`Le lien a bien été copié`);
     }
 
-    public shareForum(): void {
+    protected shareForum(): void {
         let text: string = '';
 
         text += `[b][big]${this.title}[/big][/b]`;

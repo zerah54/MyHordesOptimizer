@@ -1,5 +1,14 @@
-<td #cellHtml class="cell map-cell" [class.town]="cell().is_town" [class.visited-today]="cell().is_visited_today"
+<td #cellHtml (click)="openCellUpdate()" (mouseenter)="changeCurrentCell(cell())" (mouseleave)="changeCurrentCell(undefined)"
+    [class.alert]="options().map_type === 'danger'"
+    [class.digs]="options().map_type === 'digs'"
     [class.never-visited]="cell().is_never_visited"
+    [class.scout]="options().map_type === 'scout'"
+    [class.scrut-border-bottom]="cell() | scrutBorderBottom:options():drawedMap()"
+    [class.scrut-border-left]="cell() | scrutBorderLeft:options():drawedMap()"
+    [class.scrut-border-right]="cell() | scrutBorderRight:options():drawedMap()" [class.scrut-border-top]="cell() | scrutBorderTop:options():drawedMap()"
+    [class.town]="cell().is_town"
+    [class.trash]="options().map_type === 'trash'"
+    [class.visited-today]="cell().is_visited_today"
     [class]="`
         ${options().map_type === 'danger' ? 'danger-' + cell().danger_level : ''}
         ${options().map_type === 'digs' ? 'dig-' + (cell() | digLevel:options()) : ''}
@@ -7,17 +16,10 @@
         ${options().map_type === 'scout' && cell().scout_zone_level !== null ? 'scout-' + cell().scout_zone_level : ''}
         ${cell().zone_regen ? cell().zone_regen?.value?.class : ''}
     `"
-    [mapCellTooltip]="cell()"
-    [mapCellTooltipAllItems]="allItems()"
-    [mapCellTooltipAllCitizens]="allCitizens()"
-    [mapCellTooltipAllRuins]="allRuins()"
-    [class.alert]="options().map_type === 'danger'" [class.digs]="options().map_type === 'digs'" [class.trash]="options().map_type === 'trash'"
-    [class.scout]="options().map_type === 'scout'"
-    [class.scrut-border-left]="cell() | scrutBorderLeft:options():drawedMap()"
-    [class.scrut-border-top]="cell() | scrutBorderTop:options():drawedMap()"
-    [class.scrut-border-right]="cell() | scrutBorderRight:options():drawedMap()"
-    [class.scrut-border-bottom]="cell() | scrutBorderBottom:options():drawedMap()"
-    (click)="openCellUpdate()" (mouseenter)="changeCurrentCell(cell())" (mouseleave)="changeCurrentCell(undefined)">
+    [mhoMapCellTooltipAllCitizens]="allCitizens()"
+    [mhoMapCellTooltipAllItems]="allItems()"
+    [mhoMapCellTooltipAllRuins]="allRuins()"
+    [mhoMapCellTooltip]="cell()" class="cell map-cell">
 
     @if (cell().ruin_id) {
         <div [class]="'ruin'">
@@ -26,7 +28,7 @@
                     <ng-container>R</ng-container>
                 }
                 @if (cell().nb_ruin_dig) {
-                    <img [ngSrc]="HORDES_IMG_REPO + 'building/small_dig.gif'" width="16" height="16">
+                    <img [ngSrc]="HORDES_IMG_REPO + 'building/small_dig.gif'" height="16" width="16">
                     <span class="nb-digs">{{ cell().nb_ruin_dig }}</span>
                 }
             </span>
@@ -35,7 +37,7 @@
 
     @if (cell().is_town) {
         <div [class]="'town-draw'">
-            <img [ngSrc]="HORDES_IMG_REPO + 'icons/map/map_zone_town.svg'" width="25" height="25">
+            <img [ngSrc]="HORDES_IMG_REPO + 'icons/map/map_zone_town.svg'" height="25" width="25">
         </div>
     }
 
@@ -47,22 +49,22 @@
         <div [class]="'my-cell'"></div>
     }
 
-    <div [class.dist-border-left]="cell() | distBorderLeft:options():drawedMap()"
-         [class.dist-border-top]="cell() | distBorderTop:options():drawedMap()"
+    <div [class.dist-border-bottom]="cell() | distBorderBottom:options():drawedMap()"
+         [class.dist-border-left]="cell() | distBorderLeft:options():drawedMap()"
          [class.dist-border-right]="cell() | distBorderRight:options():drawedMap()"
-         [class.dist-border-bottom]="cell() | distBorderBottom:options():drawedMap()"></div>
+         [class.dist-border-top]="cell() | distBorderTop:options():drawedMap()"></div>
 
     @if (!cell().is_town) {
         <div class="content">
             <div class="corner-top-left corner">
                 @if (cell().note) {
-                    <img [ngSrc]="HORDES_IMG_REPO + 'icons/small_talk.gif'" width="12" height="12">
+                    <img [ngSrc]="HORDES_IMG_REPO + 'icons/small_talk.gif'" height="12" width="12">
                 }
             </div>
             <div class="corner-top-right corner">
                 @if ((cell().citizens && cell().citizens.length > 0) || cell().nb_hero > 0) {
                     <div>
-                        <img [ngSrc]="HORDES_IMG_REPO + 'log/citizen.gif'" width="12" height="12">
+                        <img [ngSrc]="HORDES_IMG_REPO + 'log/citizen.gif'" height="12" width="12">
                         <span class="detail-value">{{ cell().nb_hero }}</span>
                     </div>
                 }
@@ -70,7 +72,7 @@
             <div class="corner-bottom-left corner">
                 @if (options().map_type === 'danger') {
                     <div>
-                        <img [ngSrc]="HORDES_IMG_REPO + 'icons/map/map_icon_splatter.png'" width="12" height="9">
+                        <img [ngSrc]="HORDES_IMG_REPO + 'icons/map/map_icon_splatter.png'" height="9" width="12">
                         <span class="detail-value">{{ cell().nb_zombie_killed || 0 }}</span>
                     </div>
                 }
@@ -78,10 +80,11 @@
             <div class="corner-bottom-right corner">
                 @if (options().map_type === 'danger') {
                     <div>
-                        <img [ngSrc]="HORDES_IMG_REPO + 'icons/small_zombie.gif'" width="12" height="12">
+                        <img [ngSrc]="HORDES_IMG_REPO + 'icons/small_zombie.gif'" height="12" width="12">
                         @if (cell().hasFresherScoutEstimation()) {
                             <span class="detail-value estimation"
-                                  i18n-title title="Estimation d'un éclaireur : entre {{ cell().scout_estimation_min }} et {{ cell().scout_estimation_max }} zombies">
+                                  i18n-title
+                                  title="Estimation d'un éclaireur : entre {{ cell().scout_estimation_min }} et {{ cell().scout_estimation_max }} zombies">
                                 ≈{{ cell().scout_estimation_zombie }}
                             </span>
                         } @else {

@@ -18,13 +18,13 @@ const TECHNICIAN_DATA: JobEnumData = { id: 'technician', img: 'professions/tech.
 
 /** Type de champs de propriétés existants */
 export class JobEnum extends CommonEnum {
-    static CITIZEN: JobEnum = new JobEnum(CITIZEN_KEY, CITIZEN_DATA);
-    static SCAVENGER: JobEnum = new JobEnum(SCAVENGER_KEY, SCAVENGER_DATA);
-    static SCOUT: JobEnum = new JobEnum(SCOUT_KEY, SCOUT_DATA);
-    static GUARDIAN: JobEnum = new JobEnum(GUARDIAN_KEY, GUARDIAN_DATA);
-    static SURVIVALIST: JobEnum = new JobEnum(SURVIVALIST_KEY, SURVIVALIST_DATA);
-    static TAMER: JobEnum = new JobEnum(TAMER_KEY, TAMER_DATA);
-    static TECHNICIAN: JobEnum = new JobEnum(TECHNICIAN_KEY, TECHNICIAN_DATA);
+    public static CITIZEN: JobEnum = new JobEnum(CITIZEN_KEY, CITIZEN_DATA);
+    public static SCAVENGER: JobEnum = new JobEnum(SCAVENGER_KEY, SCAVENGER_DATA);
+    public static SCOUT: JobEnum = new JobEnum(SCOUT_KEY, SCOUT_DATA);
+    public static GUARDIAN: JobEnum = new JobEnum(GUARDIAN_KEY, GUARDIAN_DATA);
+    public static SURVIVALIST: JobEnum = new JobEnum(SURVIVALIST_KEY, SURVIVALIST_DATA);
+    public static TAMER: JobEnum = new JobEnum(TAMER_KEY, TAMER_DATA);
+    public static TECHNICIAN: JobEnum = new JobEnum(TECHNICIAN_KEY, TECHNICIAN_DATA);
 
     /**
      * Le constructeur privé empêche la création d'autres instances de cette classe.
@@ -32,11 +32,11 @@ export class JobEnum extends CommonEnum {
      * @param {string} key
      * @param {JobEnumData} value
      */
-    protected constructor(public override key: string, public override value: JobEnumData) {
+    public constructor(public override key: string, public override value: JobEnumData) {
         super(key, value);
     }
 
-    public getLabel(): string {
+    protected getLabel(): string {
         return this.value.label;
     }
 

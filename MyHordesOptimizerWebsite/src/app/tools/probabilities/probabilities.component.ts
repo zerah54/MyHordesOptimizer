@@ -24,12 +24,12 @@ const material_modules: Imports = [MatButtonModule, MatCardModule, MatFormFieldM
 })
 export class ProbabilitiesComponent implements AfterViewInit {
 
-    public simulations: Simulation[] = [
+    protected simulations: Simulation[] = [
         { nb_people: 1, current_chances: [0], result_probabilities: [], title: $localize`Simulation 1`, editing_title: false, show_detail: true }
     ];
 
-    public default_value: number = 0;
-    public readonly locale: string = moment.locale();
+    protected default_value: number = 0;
+    protected readonly locale: string = moment.locale();
 
     public ngAfterViewInit(): void {
         this.simulations.forEach((simulation: Simulation) => {
@@ -37,7 +37,7 @@ export class ProbabilitiesComponent implements AfterViewInit {
         });
     }
 
-    public createSimulation(): void {
+    protected createSimulation(): void {
         const new_simulation: Simulation = {
             nb_people: 1,
             current_chances: [0],
@@ -50,11 +50,11 @@ export class ProbabilitiesComponent implements AfterViewInit {
         this.calculateProbabilities(new_simulation);
     }
 
-    public deleteSimulation(index: number): void {
+    protected deleteSimulation(index: number): void {
         this.simulations.splice(index, 1);
     }
 
-    public convertFieldsToChances(simulation: Simulation): void {
+    protected convertFieldsToChances(simulation: Simulation): void {
         if (simulation.current_chances.length > simulation.nb_people) {
             simulation.current_chances = simulation.current_chances.slice(0, simulation.nb_people);
         } else if (simulation.current_chances.length < simulation.nb_people) {
@@ -64,7 +64,7 @@ export class ProbabilitiesComponent implements AfterViewInit {
         this.calculateProbabilities(simulation);
     }
 
-    public calculateProbabilities(simulation: Simulation): void {
+    protected calculateProbabilities(simulation: Simulation): void {
         if (!simulation.current_chances) {
             simulation.result_probabilities = [];
         } else {

@@ -24,12 +24,12 @@ export class TutoScriptExternalToolsComponent {
     private readonly clipboard: ClipboardService = inject(ClipboardService);
     private readonly document: Document = inject<Document>(DOCUMENT);
 
-    public readonly title: string = $localize`Outils externes`;
+    protected readonly title: string = $localize`Outils externes`;
 
-    public readonly header: string = $localize`Une des fonctionnalités du script est de permettre la mise à jour de plusieurs outils externes en un seul clic depuis le site de MyHordes. Pour ce faire, il faut activer les options associées dans la liste des options de MyHordes Optimizer.
+    private readonly header: string = $localize`Une des fonctionnalités du script est de permettre la mise à jour de plusieurs outils externes en un seul clic depuis le site de MyHordes. Pour ce faire, il faut activer les options associées dans la liste des options de MyHordes Optimizer.
     Si vous avez l'un des outils en question ouvert dans votre navigateur, alors la prochaine fois que vous naviguerez vers son onglet celui-ci sera automatiquement rafraîchi.`;
 
-    public readonly tuto_script_items: AccordionItem[] = [
+    protected readonly tuto_script_items: AccordionItem[] = [
         {
             title: 'MyHordes Optimizer', content: $localize`
             En cochant l'option "Mettre à jour MyHordesOptimizer", quand vous cliquerez sur le bouton "Mettre à jour les outils externes", la mise à jour de MyHordes Optimizer se fera automatiquement.
@@ -76,12 +76,12 @@ export class TutoScriptExternalToolsComponent {
         }
     ];
 
-    public copyUrl(): void {
+    protected copyUrl(): void {
         const url: string = this.document.location.href;
         this.clipboard.copy(url, $localize`Le lien a bien été copié`);
     }
 
-    public shareForum(): void {
+    protected shareForum(): void {
         let text: string = '';
 
         text += `[b][big]${this.title}[/big][/b]`;

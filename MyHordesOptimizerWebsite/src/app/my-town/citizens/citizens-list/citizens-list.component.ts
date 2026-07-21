@@ -56,31 +56,31 @@ export class CitizensListComponent implements OnInit {
     // @ViewChild(MenuAddComponent) menuAdd!: MenuAddComponent;
     // @ViewChild(MenuRemoveComponent) menuRemove!: MenuRemoveComponent;
 
-    public sort: Signal<MatSort | undefined> = viewChild(MatSort);
+    private sort: Signal<MatSort | undefined> = viewChild(MatSort);
 
     /** La liste des citoyens en vie */
-    public alive_citizen_info!: CitizenInfo;
+    protected alive_citizen_info!: CitizenInfo;
     /** La liste des citoyens morts */
-    public dead_citizen_info!: CitizenInfo;
+    protected dead_citizen_info!: CitizenInfo;
     /** La datasource pour le tableau */
-    public citizen_list: MatTableDataSource<Citizen> = new MatTableDataSource();
+    protected citizen_list: MatTableDataSource<Citizen> = new MatTableDataSource();
     /** La datasource des citoyens morts */
-    public dead_citizen_list: MatTableDataSource<Citizen> = new MatTableDataSource();
+    protected dead_citizen_list: MatTableDataSource<Citizen> = new MatTableDataSource();
     /** La liste complète des items */
-    public all_items: Item[] = [];
+    private all_items: Item[] = [];
     /** Le dossier dans lequel sont stockées les images */
-    public readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
-    public readonly current_day: number = getTown()?.day || 1;
+    protected readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
+    protected readonly current_day: number = getTown()?.day || 1;
     /** Mode observateur : désactive toute action d'écriture. */
-    public readonly is_readonly: Signal<boolean> = inject(TownContextService).isReadonly;
+    protected readonly is_readonly: Signal<boolean> = inject(TownContextService).isReadonly;
     /** La locale */
-    public readonly locale: string = moment.locale();
+    protected readonly locale: string = moment.locale();
     /** Les filtres de la liste des citoyens */
-    public citizen_filters: Citizen[] = [];
+    protected citizen_filters: Citizen[] = [];
     /** La liste des citoyens a été mise à jour */
-    public citizen_filter_change: EventEmitter<void> = new EventEmitter<void>();
+    protected citizen_filter_change: EventEmitter<void> = new EventEmitter<void>();
     /** La liste des colonnes */
-    public readonly citizen_list_columns: StandardColumn[] = [
+    protected readonly citizen_list_columns: StandardColumn[] = [
         { id: 'avatar_name', header: $localize`Citoyen`, class: 'center', sticky: true },
         { id: 'more_status', header: $localize`États`, class: '' },
         { id: 'heroic_actions', header: $localize`Actions héroïques`, class: '' },
@@ -88,7 +88,7 @@ export class CitizensListComponent implements OnInit {
         // { id: 'chest', header: $localize`Coffre` },
     ];
     /** La liste des colonnes pour les citoyens morts */
-    public readonly dead_citizen_list_columns: StandardColumn[] = [
+    protected readonly dead_citizen_list_columns: StandardColumn[] = [
         { id: 'avatar_name', header: $localize`Citoyen`, class: 'center', sticky: true },
         { id: 'cause_of_death', header: $localize`Cause de la mort`, class: '' },
         { id: 'survival', header: $localize`Jours de survie`, class: 'center' },
@@ -97,12 +97,12 @@ export class CitizensListComponent implements OnInit {
         { id: 'pictos', header: $localize`Pictos`, class: 'center' },
     ];
 
-    public readonly all_status: StatusEnum[] = StatusEnum.getAllValues();
+    private readonly all_status: StatusEnum[] = StatusEnum.getAllValues();
 
     /** La liste des listes disponibles dans le sac */
-    public bag_lists: ListForAddRemove[] = [];
+    protected bag_lists: ListForAddRemove[] = [];
     /** La liste des listes disponibles dans les status */
-    public readonly status_lists: ListForAddRemove[] = [
+    protected readonly status_lists: ListForAddRemove[] = [
         { label: $localize`Tous`, list: this.all_status }
     ];
 
@@ -112,7 +112,7 @@ export class CitizensListComponent implements OnInit {
     private readonly dialog: MatDialog = inject(MatDialog);
 
     /** Ouvre le détail des pictos gagnés par un citoyen dans la ville en cours. */
-    public openPictos(citizen: Citizen): void {
+    protected openPictos(citizen: Citizen): void {
         const town_id: number | undefined = getTown()?.town_id;
         if (!town_id) return;
         const data: CitizenPictosDialogData = {
@@ -160,7 +160,7 @@ export class CitizensListComponent implements OnInit {
      * @param {number} citizen_id
      * @param {number} item_id
      */
-    public addItem(citizen_id: number, item_id: number): void {
+    protected addItem(citizen_id: number, item_id: number): void {
         const citizen: Citizen | undefined = this.citizen_list.data.find((citizen: Citizen) => citizen.id === citizen_id);
         if (citizen && citizen.bag) {
             citizen.bag.items.push(<Item>this.all_items.find((item: Item) => item.id === item_id));
@@ -186,7 +186,7 @@ export class CitizensListComponent implements OnInit {
      * @param {number} citizen_id
      * @param {number} item_id
      */
-    public removeItem(citizen_id: number, item_id: number): void {
+    protected removeItem(citizen_id: number, item_id: number): void {
         const citizen: Citizen | undefined = this.citizen_list.data.find((citizen: Citizen) => citizen.id === citizen_id);
         if (citizen && citizen.bag) {
             const item_in_datasource_index: number | undefined = citizen.bag.items.findIndex((item_in_bag: Item) => item_in_bag.id === item_id);
@@ -212,7 +212,7 @@ export class CitizensListComponent implements OnInit {
      *
      * @param {number} citizen_id
      */
-    public emptyBag(citizen_id: number): void {
+    protected emptyBag(citizen_id: number): void {
         const citizen: Citizen | undefined = this.citizen_list.data.find((citizen: Citizen) => citizen.id === citizen_id);
         if (citizen && citizen.bag) {
             citizen.bag.items = [];
@@ -236,7 +236,7 @@ export class CitizensListComponent implements OnInit {
      * @param {number} citizen_id
      * @param {number} status_key
      */
-    public addStatus(citizen_id: number, status_key: string): void {
+    protected addStatus(citizen_id: number, status_key: string): void {
         const citizen: Citizen | undefined = this.citizen_list.data.find((citizen: Citizen) => citizen.id === citizen_id);
         if (citizen && citizen.status) {
             citizen.status.icons.push(<StatusEnum>this.all_status.find((status: StatusEnum) => status?.key === status_key));
@@ -261,7 +261,7 @@ export class CitizensListComponent implements OnInit {
      * @param {number} citizen_id
      * @param {number} status_key
      */
-    public removeStatus(citizen_id: number, status_key: string): void {
+    protected removeStatus(citizen_id: number, status_key: string): void {
         const citizen: Citizen | undefined = this.citizen_list.data.find((citizen: Citizen) => citizen.id === citizen_id);
         if (citizen && citizen.status) {
             const existing_status_index: number | undefined = citizen.status.icons.findIndex((status: StatusEnum) => status?.key === status_key);
@@ -287,7 +287,7 @@ export class CitizensListComponent implements OnInit {
      *
      * @param {number} citizen_id
      */
-    public emptyStatus(citizen_id: number): void {
+    protected emptyStatus(citizen_id: number): void {
         const citizen: Citizen | undefined = this.citizen_list.data.find((citizen: Citizen) => citizen.id === citizen_id);
         if (citizen && citizen.status) {
             citizen.status.icons = [];
@@ -312,7 +312,7 @@ export class CitizensListComponent implements OnInit {
      * @param {MatCheckboxChange} event
      * @param {number} citizen_id
      */
-    public updateHome(element: HomeWithValue, event: MatCheckboxChange | number, citizen_id: number): void {
+    protected updateHome(element: HomeWithValue, event: MatCheckboxChange | number, citizen_id: number): void {
         const old_element_value: boolean | number = element.value;
         if (event instanceof MatCheckboxChange) {
             element.value = event.checked;
@@ -346,7 +346,7 @@ export class CitizensListComponent implements OnInit {
      * @param {MatCheckboxChange} event
      * @param {number} citizen_id
      */
-    public updateActions(element: HeroicActionsWithValue, event: MatCheckboxChange | number, citizen_id: number): void {
+    protected updateActions(element: HeroicActionsWithValue, event: MatCheckboxChange | number, citizen_id: number): void {
         const old_element_value: boolean | number = element.value;
         if (event instanceof MatCheckboxChange) {
             element.value = event.checked;
@@ -373,7 +373,7 @@ export class CitizensListComponent implements OnInit {
         }
     }
 
-    public saveBath(citizen: Citizen, event: MatCheckboxChange): void {
+    protected saveBath(citizen: Citizen, event: MatCheckboxChange): void {
         if (event.checked) {
             this.town_service
                 .addBath(citizen)
@@ -396,7 +396,7 @@ export class CitizensListComponent implements OnInit {
         }
     }
 
-    public saveChamanicDetails(citizen: Citizen): void {
+    protected saveChamanicDetails(citizen: Citizen): void {
         this.town_service
             .saveChamanicDetails(citizen)
             .subscribe({
@@ -418,7 +418,7 @@ export class CitizensListComponent implements OnInit {
         return false;
     }
 
-    public getCitizens(): void {
+    private getCitizens(): void {
         this.town_service
             .getCitizens()
             .pipe(takeUntilDestroyed(this.destroy_ref))

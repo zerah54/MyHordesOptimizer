@@ -12,10 +12,10 @@ const TELEPORT_DATA: WishlistDepotData = { count: 1, label: $localize`Zone de ra
 
 /** Type de champs de propriétés existants */
 export class WishlistDepot extends CommonEnum {
-    static NONE: WishlistDepot = new WishlistDepot(NONE_KEY, NONE_DATA);
-    static BANK: WishlistDepot = new WishlistDepot(BANK_KEY, BANK_DATA);
-    static TELEPORT: WishlistDepot = new WishlistDepot(TELEPORT_KEY, TELEPORT_DATA);
-    static DO_NOT_BRING_BACK: WishlistDepot = new WishlistDepot(DO_NOT_BRING_BACK_KEY, DO_NOT_BRING_BACK_DATA);
+    private static NONE: WishlistDepot = new WishlistDepot(NONE_KEY, NONE_DATA);
+    public static BANK: WishlistDepot = new WishlistDepot(BANK_KEY, BANK_DATA);
+    public static TELEPORT: WishlistDepot = new WishlistDepot(TELEPORT_KEY, TELEPORT_DATA);
+    private static DO_NOT_BRING_BACK: WishlistDepot = new WishlistDepot(DO_NOT_BRING_BACK_KEY, DO_NOT_BRING_BACK_DATA);
 
     /**
      * Le constructeur privé empêche la création d'autres instances de cette classe.
@@ -23,11 +23,11 @@ export class WishlistDepot extends CommonEnum {
      * @param {string} key
      * @param {ZoneRegenData} value
      */
-    protected constructor(public override key: string, public override value: WishlistDepotData) {
+    public constructor(public override key: string, public override value: WishlistDepotData) {
         super(key, value);
     }
 
-    public getLabel(): string {
+    protected getLabel(): string {
         return this.value.label;
     }
 

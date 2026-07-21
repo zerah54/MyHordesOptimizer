@@ -73,15 +73,15 @@ export class ExpeditionsComponent implements OnInit {
     protected all_heroics: Signal<HeroicActionEnum[]> = signal((<HeroicActionEnum[]>HeroicActionEnum.getAllValues())
         .filter((action: HeroicActionEnum) => action.value.count_in_daily && action.value.action !== ''));
 
-    protected edition_mode: ModelSignal<boolean> = model(JSON.parse(localStorage.getItem(EXPEDITIONS_EDITION_MODE_KEY) || 'false'));
-    protected selected_tab_index: ModelSignal<number> = model(this.current_day() - 1);
+    public edition_mode: ModelSignal<boolean> = model(JSON.parse(localStorage.getItem(EXPEDITIONS_EDITION_MODE_KEY) || 'false'));
+    public selected_tab_index: ModelSignal<number> = model(this.current_day() - 1);
 
     protected all_citizens: WritableSignal<Citizen[]> = signal([]);
     protected all_citizens_job: WritableSignal<JobEnum[]> = signal([]);
     /** La liste complète des items */
     protected all_items: WritableSignal<Item[]> = signal([]);
     /** La liste des items en banque */
-    protected bank_items: WritableSignal<Item[]> = signal([]);
+    private bank_items: WritableSignal<Item[]> = signal([]);
     protected expeditions: WritableSignal<Expedition[]> = signal([]);
     protected active_citizens_list: WritableSignal<number[]> = signal([]);
     protected editable: WritableSignal<boolean> = signal(true);
@@ -464,50 +464,50 @@ export class ExpeditionsComponent implements OnInit {
     /**
      * Enregistre le mode d'affichage des expéditions
      */
-    public changeEditionMode(): void {
+    protected changeEditionMode(): void {
         localStorage.setItem(EXPEDITIONS_EDITION_MODE_KEY, JSON.stringify(this.edition_mode()));
     }
 
-    public async changeTab(event: MatTabChangeEvent): Promise<void> {
+    protected async changeTab(event: MatTabChangeEvent): Promise<void> {
         const existing_expeditions: Expedition[] = await firstValueFrom(this.expedition_service.getExpeditions(this.selected_tab_index() + 1));
         this.expeditions.set([...existing_expeditions]);
         this.editable.set(!this.is_readonly() && event.index >= this.current_day() - 1);
     }
 
-    public changeExpeditionState(expedition: Expedition, event: boolean): void {
+    protected changeExpeditionState(expedition: Expedition, event: boolean): void {
         expedition.state = event ? 'ready' : 'stop';
         this.saveExpedition(expedition);
     }
 
     /** Importe les expéditions depuis celles du jour sélectionné */
-    public async importExpeditions(day: number): Promise<void> {
+    protected async importExpeditions(day: number): Promise<void> {
         await this.realtime_expeditions_service.copyExpeditions(day, this.selected_tab_index() + 1);
     }
 
-    public addNewMemberToExpedition(expedition: Expedition, citizen_to_copy?: CitizenExpedition): void {
+    protected addNewMemberToExpedition(expedition: Expedition, citizen_to_copy?: CitizenExpedition): void {
         expedition.parts.forEach(async (expedition_part: ExpeditionPart) => {
             await this.realtime_expeditions_service.updateExpeditionCitizen(expedition_part, new CitizenExpedition(citizen_to_copy?.modelToDto()));
         });
     }
 
-    public async addNewMemberToPart(expedition_part: ExpeditionPart, citizen_to_copy?: CitizenExpedition): Promise<void> {
+    protected async addNewMemberToPart(expedition_part: ExpeditionPart, citizen_to_copy?: CitizenExpedition): Promise<void> {
         await this.realtime_expeditions_service.updateExpeditionCitizen(expedition_part, new CitizenExpedition(citizen_to_copy?.modelToDto()));
     }
 
-    public async addNewExpedition(): Promise<void> {
+    protected async addNewExpedition(): Promise<void> {
         await this.realtime_expeditions_service.updateExpedition(this.selected_tab_index() + 1, new Expedition());
     }
 
-    public async addNewExpeditionPart(expedition: Expedition): Promise<void> {
+    protected async addNewExpeditionPart(expedition: Expedition): Promise<void> {
         const new_part: ExpeditionPart = new ExpeditionPart();
         await this.realtime_expeditions_service.updateExpeditionPart(expedition, new_part);
     }
 
-    public async removeCitizenFromPart(citizen: CitizenExpedition): Promise<void> {
+    protected async removeCitizenFromPart(citizen: CitizenExpedition): Promise<void> {
         await this.realtime_expeditions_service.deleteExpeditionCitizen(citizen);
     }
 
-    public removeExpedition(expedition: Expedition): void {
+    protected removeExpedition(expedition: Expedition): void {
         this.dialog
             .open<ConfirmDialogComponent, ConfirmDialogData>(ConfirmDialogComponent, {
                 data: {
@@ -524,7 +524,7 @@ export class ExpeditionsComponent implements OnInit {
             });
     }
 
-    public removeExpeditionPart(expedition_part: ExpeditionPart): void {
+    protected removeExpeditionPart(expedition_part: ExpeditionPart): void {
         this.dialog
             .open<ConfirmDialogComponent, ConfirmDialogData>(ConfirmDialogComponent, {
                 data: {
@@ -541,7 +541,7 @@ export class ExpeditionsComponent implements OnInit {
             });
     }
 
-    public openExpeditionOrders(orders: ExpeditionOrder[], prop: CitizenExpedition | ExpeditionPart): void {
+    protected openExpeditionOrders(orders: ExpeditionOrder[], prop: CitizenExpedition | ExpeditionPart): void {
         this.dialog
             .open<EditOrdersComponent, EditOrdersData>(EditOrdersComponent, {
                 data: {
@@ -573,7 +573,7 @@ export class ExpeditionsComponent implements OnInit {
      * @param {CitizenExpedition} citizen
      * @param {number} item_id
      */
-    public addItem(citizen: CitizenExpedition, item_id: number): void {
+    protected addItem(citizen: CitizenExpedition, item_id: number): void {
         if (citizen && citizen.bag) {
             citizen.bag.items.push(<Item>this.all_items().find((item: Item): boolean => item.id === item_id));
             this.saveBag(citizen);
@@ -588,7 +588,7 @@ export class ExpeditionsComponent implements OnInit {
      * @param {CitizenExpedition} citizen
      * @param {number} item_id
      */
-    public removeItem(citizen: CitizenExpedition, item_id: number): void {
+    protected removeItem(citizen: CitizenExpedition, item_id: number): void {
         if (citizen && citizen.bag) {
             const item_in_datasource_index: number | undefined = citizen.bag.items.findIndex((item_in_bag: Item) => item_in_bag.id === item_id);
             if (item_in_datasource_index !== undefined && item_in_datasource_index !== null && item_in_datasource_index > -1) {
@@ -603,14 +603,14 @@ export class ExpeditionsComponent implements OnInit {
      *
      * @param {CitizenExpedition} citizen
      */
-    public async emptyBag(citizen: CitizenExpedition): Promise<void> {
+    protected async emptyBag(citizen: CitizenExpedition): Promise<void> {
         if (citizen && citizen.bag) {
             citizen.bag.items = [];
             await this.realtime_expeditions_service.updateExpeditionBag(citizen);
         }
     }
 
-    public openReorganize(): void {
+    protected openReorganize(): void {
         this.dialog
             .open<EditPositionsComponent, EditPositionsData>(EditPositionsComponent, {
                 data: { expeditions: this.expeditions() },
@@ -643,7 +643,7 @@ export class ExpeditionsComponent implements OnInit {
             });
     }
 
-    public get spots(): number {
+    protected get spots(): number {
         let spots: number = 0;
         this.expeditions()?.forEach((expedition: Expedition) => {
             if (expedition.parts && expedition.parts.length > 0) {
@@ -653,7 +653,7 @@ export class ExpeditionsComponent implements OnInit {
         return spots;
     }
 
-    public get objectsList(): ListForAddRemove[] {
+    protected get objectsList(): ListForAddRemove[] {
         return [
             {
                 label: $localize`Favoris`, list: this.all_items().filter((item: Item) => {
@@ -665,20 +665,20 @@ export class ExpeditionsComponent implements OnInit {
         ];
     }
 
-    public async saveExpedition(expedition: Expedition): Promise<void> {
+    protected async saveExpedition(expedition: Expedition): Promise<void> {
         await this.realtime_expeditions_service.updateExpedition(this.selected_tab_index() + 1, expedition);
     }
 
-    public async saveExpeditionPart(expedition: Expedition, expedition_part: ExpeditionPart): Promise<void> {
+    protected async saveExpeditionPart(expedition: Expedition, expedition_part: ExpeditionPart): Promise<void> {
         await this.realtime_expeditions_service.updateExpeditionPart(expedition, expedition_part);
     }
 
-    public async saveOrder(order: ExpeditionOrder, change: MatCheckboxChange): Promise<void> {
+    protected async saveOrder(order: ExpeditionOrder, change: MatCheckboxChange): Promise<void> {
         order.is_done = change.checked;
         await this.realtime_expeditions_service.updateExpeditionOrder(order);
     }
 
-    public changeThirstyMode(citizen: CitizenExpedition): void {
+    protected changeThirstyMode(citizen: CitizenExpedition): void {
         if (this.edition_mode()) {
             if (citizen.is_preinscrit_soif === null || citizen.is_preinscrit_soif === undefined) {
                 citizen.is_preinscrit_soif = false;
@@ -692,7 +692,7 @@ export class ExpeditionsComponent implements OnInit {
         }
     }
 
-    public change7ApMode(citizen: CitizenExpedition): void {
+    protected change7ApMode(citizen: CitizenExpedition): void {
         if (this.edition_mode()) {
             if (citizen.starts_7_ap === null || citizen.starts_7_ap === undefined) {
                 citizen.starts_7_ap = false;
@@ -704,7 +704,7 @@ export class ExpeditionsComponent implements OnInit {
         }
     }
 
-    public async saveCitizen(expedition_part: ExpeditionPart, citizen: CitizenExpedition, expedition_part_index?: number, expedition?: Expedition, citizen_index?: number): Promise<void> {
+    protected async saveCitizen(expedition_part: ExpeditionPart, citizen: CitizenExpedition, expedition_part_index?: number, expedition?: Expedition, citizen_index?: number): Promise<void> {
         console.log('expedition_part', expedition_part);
         if (expedition && expedition_part_index !== undefined && expedition_part_index !== null && citizen_index !== undefined && citizen_index !== null) {
             if (expedition_part_index === 0 && expedition?.parts.length > 1) {
@@ -726,11 +726,11 @@ export class ExpeditionsComponent implements OnInit {
         }
     }
 
-    public async saveBag(citizen: CitizenExpedition): Promise<void> {
+    private async saveBag(citizen: CitizenExpedition): Promise<void> {
         await this.realtime_expeditions_service.updateExpeditionBag(citizen);
     }
 
-    public shareExpeditionForum(): void {
+    protected shareExpeditionForum(): void {
         let text: string = `[big][b][i]${$localize`Expéditions (J${this.selected_tab_index() + 1})`}[/i][/b][/big]\n`;
 
         const pre_registered: Citizen[] = this.registered;
@@ -773,7 +773,7 @@ export class ExpeditionsComponent implements OnInit {
     }
 
     /** true si l'expédition doit être étendue par défaut */
-    public isDefaultExpanded(expedition: Expedition): boolean {
+    protected isDefaultExpanded(expedition: Expedition): boolean {
         if (this.edition_mode()) return true;
         const my_expedition: boolean = expedition.parts
             .some((part: ExpeditionPart) => part.citizens.some((citizen: CitizenExpedition) => citizen.citizen_id === this.me()?.id));
@@ -788,7 +788,7 @@ export class ExpeditionsComponent implements OnInit {
         return false;
     }
 
-    public get preRegisteredJobs(): { count: number, job: string }[] {
+    protected get preRegisteredJobs(): { count: number, job: string }[] {
         const pre_registered_jobs: { count: number, job: string }[] = [];
         this.expeditions()?.forEach((expedition: Expedition) => {
             if (expedition.parts && expedition.parts.length > 0) {

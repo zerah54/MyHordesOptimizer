@@ -25,13 +25,13 @@ export class TutoScriptInstallationComponent {
     private readonly document: Document = inject<Document>(DOCUMENT);
 
 
-    public readonly title: string = $localize`Script / Extension`;
-    public readonly download_link: string = $localize`<a href="https://github.com/zerah54/MyHordesOptimizer/raw/main/Scripts/Tampermonkey/my_hordes_optimizer.user.js" target="_blank">lien de téléchargement du script</a>`;
-    public readonly firefox_link_href: string = 'https://addons.mozilla.org/fr/firefox/addon/mho-addon';
-    public readonly firefox_extension_link: string = $localize`<a href="${this.firefox_link_href}" target="_blank">page de l'extension</a>`;
-    public readonly chrome_link_href: string = 'https://chromewebstore.google.com/detail/myhordes-optimizer/jolghobcgphmgaiachbipnpiimmgknno';
-    public readonly chrome_extension_link: string = $localize`<a href="${this.chrome_link_href}" target="_blank">page de l'extension</a>`;
-    public readonly tuto_script_items: AccordionItem[] = [
+    protected readonly title: string = $localize`Script / Extension`;
+    private readonly download_link: string = $localize`<a href="https://github.com/zerah54/MyHordesOptimizer/raw/main/Scripts/Tampermonkey/my_hordes_optimizer.user.js" target="_blank">lien de téléchargement du script</a>`;
+    private readonly firefox_link_href: string = 'https://addons.mozilla.org/fr/firefox/addon/mho-addon';
+    private readonly firefox_extension_link: string = $localize`<a href="${this.firefox_link_href}" target="_blank">page de l'extension</a>`;
+    private readonly chrome_link_href: string = 'https://chromewebstore.google.com/detail/myhordes-optimizer/jolghobcgphmgaiachbipnpiimmgknno';
+    private readonly chrome_extension_link: string = $localize`<a href="${this.chrome_link_href}" target="_blank">page de l'extension</a>`;
+    protected readonly tuto_script_items: AccordionItem[] = [
         {
             title: $localize`Ordinateur`,
             content: $localize`Il faut d'abord installer l'application de gestion des scripts de votre choix. Il en existe plusieurs, comme par exemple Tampermonkey ou Violentmonkey. Ensuite, il suffit de cliquer sur le ${this.download_link}, qui lancera la procédure d'installation. Enfin, il faudra confirmer dans la page qui se sera ouverte.`
@@ -75,7 +75,7 @@ export class TutoScriptInstallationComponent {
             </ul>`
         }
     ];
-    public readonly tuto_extension_items: AccordionItem[] = [
+    protected readonly tuto_extension_items: AccordionItem[] = [
         {
             title: 'Firefox',
             content: $localize`Rendez-vous sur la ${this.firefox_extension_link} pour l'installer.`
@@ -85,15 +85,15 @@ export class TutoScriptInstallationComponent {
             content: $localize`Rendez-vous sur la ${this.chrome_extension_link} pour l'installer.`
         }
     ];
-    public readonly script_final_text: string = '\n' + $localize`Une fois le script installé, il faudra rafraîchir la page du jeu. Vous verrez alors apparaitre un nouveau bouton en haut de votre page MyHordes. Au survol, une fenêtre s'affiche, donnant accès aux options du script ainsi qu'à certaines de ses fonctionnalités.`;
-    public readonly extension_final_text: string = '\n' + $localize`Une fois l'extension installée, il faudra rafraîchir la page du jeu. Vous verrez alors apparaitre un nouveau bouton en haut de votre page MyHordes. Au survol, une fenêtre s'affiche, donnant accès aux options du script ainsi qu'à certaines de ses fonctionnalités.`;
+    protected readonly script_final_text: string = '\n' + $localize`Une fois le script installé, il faudra rafraîchir la page du jeu. Vous verrez alors apparaitre un nouveau bouton en haut de votre page MyHordes. Au survol, une fenêtre s'affiche, donnant accès aux options du script ainsi qu'à certaines de ses fonctionnalités.`;
+    protected readonly extension_final_text: string = '\n' + $localize`Une fois l'extension installée, il faudra rafraîchir la page du jeu. Vous verrez alors apparaitre un nouveau bouton en haut de votre page MyHordes. Au survol, une fenêtre s'affiche, donnant accès aux options du script ainsi qu'à certaines de ses fonctionnalités.`;
 
-    public copyUrl(): void {
+    protected copyUrl(): void {
         const url: string = this.document.location.href;
         this.clipboard.copy(url, $localize`Le lien a bien été copié`);
     }
 
-    public shareForum(): void {
+    protected shareForum(): void {
         let text: string = '';
 
         text += `[b][big]${this.title}[/big][/b]`;

@@ -33,7 +33,7 @@ const material_modules: Imports = [MatButtonModule, MatFormFieldModule, MatIconM
 })
 export class HeaderWithNumberPreviousNextFilterComponent implements OnInit {
 
-    readonly filter: Signal<ElementRef<HTMLInputElement>> = viewChild.required<ElementRef<HTMLInputElement>>('filter');
+    private readonly filter: Signal<ElementRef<HTMLInputElement>> = viewChild.required<ElementRef<HTMLInputElement>>('filter');
 
     public header: InputSignal<string> = input('');
     public textAlign: InputSignal<string> = input('left');
@@ -45,14 +45,14 @@ export class HeaderWithNumberPreviousNextFilterComponent implements OnInit {
     public filterValue: InputSignal<number> = input.required();
     public filterValueChange: OutputEmitterRef<number> = output();
 
-    public visible: boolean = false;
+    protected visible: boolean = false;
 
     public ngOnInit(): void {
         this.checkVisibility();
     }
 
     /** Affiche le filtre */
-    public displayFilter(): void {
+    protected displayFilter(): void {
         this.visible = true;
         setTimeout(() => {
             this.filter().nativeElement.focus();
@@ -60,7 +60,7 @@ export class HeaderWithNumberPreviousNextFilterComponent implements OnInit {
     }
 
     /** Vérifie si le filtre doit toujours être affiché */
-    public checkVisibility(): void {
+    private checkVisibility(): void {
         this.visible = this.filterValue() !== null && this.filterValue() !== undefined;
     }
 }

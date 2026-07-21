@@ -129,16 +129,16 @@ const HAS_FENCE_DATA: HomeEnumData = {
 
 /** Type de champs de propriétés existants */
 export class HomeEnum extends CommonEnum {
-    static HOUSE_LEVEL: HomeEnum = new HomeEnum(HOUSE_LEVEL_KEY, HOUSE_LEVEL_DATA);
-    static HAS_ALARM: HomeEnum = new HomeEnum(HAS_ALARM_KEY, HAS_ALARM_DATA);
-    static CHEST_LEVEL: HomeEnum = new HomeEnum(CHEST_LEVEL_KEY, CHEST_LEVEL_DATA);
-    static HAS_CURTAIN: HomeEnum = new HomeEnum(HAS_CURTAIN_KEY, HAS_CURTAIN_DATA);
-    static HOUSE_DEFENSE: HomeEnum = new HomeEnum(HOUSE_DEFENSE_KEY, HOUSE_DEFENSE_DATA);
-    static KITCHEN_LEVEL: HomeEnum = new HomeEnum(KITCHEN_LEVEL_KEY, KITCHEN_LEVEL_DATA);
-    static LAB_LEVEL: HomeEnum = new HomeEnum(LAB_LEVEL_KEY, LAB_LEVEL_DATA);
-    static REST_LEVEL: HomeEnum = new HomeEnum(REST_LEVEL_KEY, REST_LEVEL_DATA);
-    static HAS_LOCK: HomeEnum = new HomeEnum(HAS_LOCK_KEY, HAS_LOCK_DATA);
-    static HAS_FENCE: HomeEnum = new HomeEnum(HAS_FENCE_KEY, HAS_FENCE_DATA);
+    public static HOUSE_LEVEL: HomeEnum = new HomeEnum(HOUSE_LEVEL_KEY, HOUSE_LEVEL_DATA);
+    public static HAS_ALARM: HomeEnum = new HomeEnum(HAS_ALARM_KEY, HAS_ALARM_DATA);
+    public static CHEST_LEVEL: HomeEnum = new HomeEnum(CHEST_LEVEL_KEY, CHEST_LEVEL_DATA);
+    public static HAS_CURTAIN: HomeEnum = new HomeEnum(HAS_CURTAIN_KEY, HAS_CURTAIN_DATA);
+    public static HOUSE_DEFENSE: HomeEnum = new HomeEnum(HOUSE_DEFENSE_KEY, HOUSE_DEFENSE_DATA);
+    public static KITCHEN_LEVEL: HomeEnum = new HomeEnum(KITCHEN_LEVEL_KEY, KITCHEN_LEVEL_DATA);
+    public static LAB_LEVEL: HomeEnum = new HomeEnum(LAB_LEVEL_KEY, LAB_LEVEL_DATA);
+    public static REST_LEVEL: HomeEnum = new HomeEnum(REST_LEVEL_KEY, REST_LEVEL_DATA);
+    public static HAS_LOCK: HomeEnum = new HomeEnum(HAS_LOCK_KEY, HAS_LOCK_DATA);
+    public static HAS_FENCE: HomeEnum = new HomeEnum(HAS_FENCE_KEY, HAS_FENCE_DATA);
 
     /**
      * Le constructeur privé empêche la création d'autres instances de cette classe.
@@ -146,7 +146,7 @@ export class HomeEnum extends CommonEnum {
      * @param {string} key
      * @param {HomeEnumData} value
      */
-    protected constructor(public override key: string, public override value: HomeEnumData) {
+    public constructor(public override key: string, public override value: HomeEnumData) {
         super(key, value);
     }
 

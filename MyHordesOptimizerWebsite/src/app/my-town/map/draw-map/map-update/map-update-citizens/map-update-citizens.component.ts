@@ -1,5 +1,5 @@
 import { CommonModule, NgOptimizedImage } from '@angular/common';
-import { Component, input, InputSignal, output,OutputEmitterRef } from '@angular/core';
+import { Component, input, InputSignal, output, OutputEmitterRef } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
@@ -32,13 +32,13 @@ export class MapUpdateCitizensComponent {
     public citizens: InputSignal<Citizen[]> = input.required();
     public citizensChange: OutputEmitterRef<Citizen[]> = output();
 
-    public heroics: HeroicActionEnum[] = HeroicActionEnum.getAllValues();
+    protected heroics: HeroicActionEnum[] = HeroicActionEnum.getAllValues();
 
-    public readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
-    public readonly locale: string = moment.locale();
+    protected readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
+    protected readonly locale: string = moment.locale();
 
-    addCitizen(citizen: Citizen): void {
-        const new_citizens = this.citizens();
+    protected addCitizen(citizen: Citizen): void {
+        const new_citizens: Citizen[] = this.citizens();
         new_citizens.push(citizen);
         new_citizens.sort((citizen_a: Citizen, citizen_b: Citizen) => citizen_a.name.toLocaleLowerCase().localeCompare(citizen_b.name.toLocaleLowerCase()));
         this.citizensChange.emit(new_citizens);

@@ -21,7 +21,7 @@ export class CampingBonus extends CommonModel<CampingBonusDTO> {
     public desert_bonus!: number;
 
 
-    constructor(dto?: CampingBonusDTO) {
+    public constructor(dto?: CampingBonusDTO) {
         super();
         this.dtoToModel(dto);
     }

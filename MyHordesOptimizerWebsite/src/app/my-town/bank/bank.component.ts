@@ -35,31 +35,31 @@ const material_modules: Imports = [MatCardModule, MatFormFieldModule, MatSlideTo
 export class BankComponent implements OnInit {
 
     /** La banque remontée par l'appel */
-    public bank!: BankInfo;
+    private bank!: BankInfo;
 
     /** Les objets affichés par le filtre */
-    public displayed_bank_items!: Item[];
+    protected displayed_bank_items!: Item[];
     /** L'objet dont le détail est affiché */
-    public detailed_item!: Item;
+    protected detailed_item!: Item;
 
 
     /** Le champ de filtre sur les objets */
-    public filter_value: string = '';
+    protected filter_value: string = '';
     /** Le champ de filtres sur les propriétés */
-    public select_value: (Property | Action)[] = [];
+    protected select_value: (Property | Action)[] = [];
 
-    public condensed_display: boolean = JSON.parse(localStorage.getItem(BANK_CONDENSED_DISPLAY_KEY) || 'false');
+    protected condensed_display: boolean = JSON.parse(localStorage.getItem(BANK_CONDENSED_DISPLAY_KEY) || 'false');
 
     /** La liste des filtres */
-    public options: (Property | Action)[] = [...<Property[]>Property.getAllValues(), ...<Action[]>Action.getAllValues()];
+    protected options: (Property | Action)[] = [...<Property[]>Property.getAllValues(), ...<Action[]>Action.getAllValues()];
 
-    public readonly locale: string = moment.locale();
-    public readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
+    protected readonly locale: string = moment.locale();
+    protected readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
 
     private town_service: TownService = inject(TownService);
     private readonly destroy_ref: DestroyRef = inject(DestroyRef);
 
-    ngOnInit(): void {
+    public ngOnInit(): void {
         this.town_service
             .getBank(true)
             .pipe(takeUntilDestroyed(this.destroy_ref))
@@ -83,7 +83,7 @@ export class BankComponent implements OnInit {
             });
     }
 
-    public applyFilters(): void {
+    protected applyFilters(): void {
         if (this.filter_value !== null && this.filter_value !== undefined && this.filter_value !== '') {
             this.displayed_bank_items = [...this.bank.items.filter((bank_item: Item) => normalizeString(bank_item.label[this.locale]).indexOf(normalizeString(this.filter_value)) > -1)];
         } else {
@@ -108,7 +108,7 @@ export class BankComponent implements OnInit {
     /**
      * Enregistre le mode d'affichage de la banque
      */
-    public changeCondensedDisplay(): void {
+    protected changeCondensedDisplay(): void {
         localStorage.setItem(BANK_CONDENSED_DISPLAY_KEY, JSON.stringify(this.condensed_display));
     }
 }

@@ -6,7 +6,7 @@ export class ItemCountShort extends CommonModel<ItemCountShortDTO> {
     public is_broken!: boolean;
     public item_id!: number;
 
-    constructor(dto?: ItemCountShortDTO | null | undefined) {
+    public constructor(dto?: ItemCountShortDTO | null | undefined) {
         super();
         this.dtoToModel(dto);
     }

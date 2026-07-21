@@ -25,14 +25,14 @@ const material_modules: Imports = [MatCardModule, MatTableModule, MatIconModule,
 export class PrivateTownsComponent implements OnInit {
 
     /** Le dossier dans lequel sont stockées les images */
-    public readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
+    protected readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
     /** La locale */
-    public readonly locale: string = moment.locale();
+    protected readonly locale: string = moment.locale();
 
     /** La datasource pour le tableau */
-    public datasource: MatTableDataSource<FlattenedPrivateTownData> = new MatTableDataSource();
+    protected datasource: MatTableDataSource<FlattenedPrivateTownData> = new MatTableDataSource();
     /** La liste des colonnes à afficher */
-    public displayed_columns: string[] = ['name', 'option_name', 'option_description', 'default_rne', 'default_re', 'default_pande'];
+    protected displayed_columns: string[] = ['name', 'option_name', 'option_description', 'default_rne', 'default_re', 'default_pande'];
 
     /** La liste des colonnes */
     public readonly columns: StandardColumn[] = [
@@ -47,7 +47,7 @@ export class PrivateTownsComponent implements OnInit {
         this.datasource = new MatTableDataSource(flattened_data);
     }
 
-    public getRowSpan(column: string, index: number): number {
+    protected getRowSpan(column: string, index: number): number {
         if (column === 'name') {
             return this.datasource.data.filter(
                 (row: FlattenedPrivateTownData, i: number) => i < index && row.name === this.datasource.data[index].name

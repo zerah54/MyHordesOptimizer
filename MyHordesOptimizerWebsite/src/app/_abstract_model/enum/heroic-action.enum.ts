@@ -79,15 +79,15 @@ const HAS_BROTHERSINARM_DATA: HeroicActionEnumData = {
 
 /** Type de champs de propriétés existants */
 export class HeroicActionEnum extends CommonEnum {
-    static HAS_RESCUE: HeroicActionEnum = new HeroicActionEnum(HAS_RESCUE_KEY, HAS_RESCUE_DATA);
-    static APAG_CHARGE: HeroicActionEnum = new HeroicActionEnum(APAG_CHARGES_KEY, APAG_CHARGES_DATA);
-    static HAS_UPPERCUT: HeroicActionEnum = new HeroicActionEnum(HAS_UPPERCUT_KEY, HAS_UPPERCUT_DATA);
-    static HAS_SECONDWIND: HeroicActionEnum = new HeroicActionEnum(HAS_SECONDWIND_KEY, HAS_SECONDWIND_DATA);
-    static HAS_LUCKYFIND: HeroicActionEnum = new HeroicActionEnum(HAS_LUCKYFIND_KEY, HAS_LUCKYFIND_DATA);
-    static HAS_CHEATDEATH: HeroicActionEnum = new HeroicActionEnum(HAS_CHEATDEATH_KEY, HAS_CHEATDEATH_DATA);
-    static HAS_HEROICRETURN: HeroicActionEnum = new HeroicActionEnum(HAS_HEROICRETURN_KEY, HAS_HEROICRETURN_DATA);
-    static HAS_BREAKTHROUGH: HeroicActionEnum = new HeroicActionEnum(HAS_BREAKTHROUGH_KEY, HAS_BREAKTHROUGH_DATA);
-    static HAS_BROTHERSINARM: HeroicActionEnum = new HeroicActionEnum(HAS_BROTHERSINARM_KEY, HAS_BROTHERSINARM_DATA);
+    public static HAS_RESCUE: HeroicActionEnum = new HeroicActionEnum(HAS_RESCUE_KEY, HAS_RESCUE_DATA);
+    public static APAG_CHARGE: HeroicActionEnum = new HeroicActionEnum(APAG_CHARGES_KEY, APAG_CHARGES_DATA);
+    public static HAS_UPPERCUT: HeroicActionEnum = new HeroicActionEnum(HAS_UPPERCUT_KEY, HAS_UPPERCUT_DATA);
+    public static HAS_SECONDWIND: HeroicActionEnum = new HeroicActionEnum(HAS_SECONDWIND_KEY, HAS_SECONDWIND_DATA);
+    public static HAS_LUCKYFIND: HeroicActionEnum = new HeroicActionEnum(HAS_LUCKYFIND_KEY, HAS_LUCKYFIND_DATA);
+    public static HAS_CHEATDEATH: HeroicActionEnum = new HeroicActionEnum(HAS_CHEATDEATH_KEY, HAS_CHEATDEATH_DATA);
+    public static HAS_HEROICRETURN: HeroicActionEnum = new HeroicActionEnum(HAS_HEROICRETURN_KEY, HAS_HEROICRETURN_DATA);
+    public static HAS_BREAKTHROUGH: HeroicActionEnum = new HeroicActionEnum(HAS_BREAKTHROUGH_KEY, HAS_BREAKTHROUGH_DATA);
+    public static HAS_BROTHERSINARM: HeroicActionEnum = new HeroicActionEnum(HAS_BROTHERSINARM_KEY, HAS_BROTHERSINARM_DATA);
 
     /**
      * Le constructeur privé empêche la création d'autres instances de cette classe.
@@ -95,7 +95,7 @@ export class HeroicActionEnum extends CommonEnum {
      * @param {string} key
      * @param {HeroicActionEnumData} value
      */
-    protected constructor(public override key: string, public override value: HeroicActionEnumData) {
+    public constructor(public override key: string, public override value: HeroicActionEnumData) {
         super(key, value);
     }
 

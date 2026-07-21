@@ -14,32 +14,32 @@ export class MapBorderComponent {
 
     // TODO: Skipped for migration because:
     //  Accessor inputs cannot be migrated as they are too complex.
-    @Input() set index(index: null | number) {
+    @Input() public set index(index: null | number) {
         this.cell_index = index;
         this.isMyPos();
     }
 
     // TODO: Skipped for migration because:
     //  Accessor inputs cannot be migrated as they are too complex.
-    @Input() set myCell(cell: Cell | undefined) {
+    @Input() public set myCell(cell: Cell | undefined) {
         this.my_cell = cell;
         this.isMyPos();
     }
 
     // TODO: Skipped for migration because:
     //  Accessor inputs cannot be migrated as they are too complex.
-    @Input() set hoveredCell(cell: Cell | undefined) {
+    @Input() public set hoveredCell(cell: Cell | undefined) {
         this.hovered_cell = cell;
         this.isHoveredPos();
     }
 
-    public my_pos: boolean = false;
-    public my_cell!: Cell | undefined;
-    public hovered_cell!: Cell | undefined;
-    public hovered_pos!: boolean;
-    public cell_index: number | null = null;
+    protected my_pos: boolean = false;
+    private my_cell!: Cell | undefined;
+    private hovered_cell!: Cell | undefined;
+    protected hovered_pos!: boolean;
+    protected cell_index: number | null = null;
 
-    public isMyPos(): void {
+    private isMyPos(): void {
         if (this.my_cell === undefined || this.my_cell === null || this.cell_index === undefined || this.cell_index === null) return;
 
         if (this.vertical() && this.my_cell.displayed_y === this.cell_index) {
@@ -50,7 +50,7 @@ export class MapBorderComponent {
         }
     }
 
-    public isHoveredPos(): void {
+    private isHoveredPos(): void {
         if (this.hovered_cell === undefined || this.hovered_cell === null || this.cell_index === undefined || this.cell_index === null) return;
 
         if (this.vertical() && this.hovered_cell.displayed_y === this.cell_index) {

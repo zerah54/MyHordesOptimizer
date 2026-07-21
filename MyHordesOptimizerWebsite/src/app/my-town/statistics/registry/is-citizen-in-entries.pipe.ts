@@ -9,7 +9,7 @@ import { normalizeString } from '../../../_core/utilities/string.utils';
     name: 'isCitizenInEntries'
 })
 export class IsCitizenInEntriesPipe implements PipeTransform {
-    transform(entries: Entry[], complete_citizen_list: CitizenInfo, reverse?: boolean): Citizen[] {
+    public transform(entries: Entry[], complete_citizen_list: CitizenInfo, reverse?: boolean): Citizen[] {
         const citizen_for_entry: Citizen[] = [];
         let citizen_to_write: Citizen[] = [];
 

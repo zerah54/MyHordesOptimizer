@@ -20,9 +20,6 @@ const material_modules: Imports = [ MatCardModule, DragDropModule ];
 })
 export class PictosGameComponent implements OnInit {
 
-    protected cells: Signal<readonly ElementRef<HTMLDivElement>[]> = viewChildren('cellDiv', { read: ElementRef });
-    protected cells_lot: Signal<readonly ElementRef<HTMLDivElement>[]> = viewChildren('cellLotDiv', { read: ElementRef });
-
     protected board: (PictosGameCell | undefined)[][] = [];
     protected pictos_rescued: number = 0;
     protected attempts: number = 0;
@@ -31,16 +28,17 @@ export class PictosGameComponent implements OnInit {
     protected highlighted_cells: [ { row: number, col: number; }, { row: number, col: number; } ] | [] = [];
     protected game_over: boolean = true;
     protected time_spent: number = 0; // Time in seconds
-    protected interval?: NodeJS.Timeout;
-    protected picto: PictosGameCell[] = [
+    protected HORDES_IMG_REPO: string = HORDES_IMG_REPO; // Path to the folder where images are stored
+    protected readonly pictos_to_rescue: number = 368; // Total number of pictos to rescue
+    private cells: Signal<readonly ElementRef<HTMLDivElement>[]> = viewChildren('cellDiv', { read: ElementRef });
+    private cells_lot: Signal<readonly ElementRef<HTMLDivElement>[]> = viewChildren('cellLotDiv', { read: ElementRef });
+    private interval?: NodeJS.Timeout;
+    private picto: PictosGameCell[] = [
         { id: 1, img: 'pictos/r_batgun.gif', to_remove: false },
         { id: 2, img: 'pictos/r_watgun.gif', to_remove: false },
         { id: 3, img: 'pictos/r_tronco.gif', to_remove: false },
         { id: 4, img: 'pictos/r_cdhwin.gif', to_remove: false }
     ];
-    protected HORDES_IMG_REPO: string = HORDES_IMG_REPO; // Path to the folder where images are stored
-
-    protected readonly pictos_to_rescue: number = 368; // Total number of pictos to rescue
 
     public ngOnInit(): void {
         this.init();
@@ -89,7 +87,7 @@ export class PictosGameComponent implements OnInit {
     }
 
     protected onDragMoved(): void {
-        const first_cell_lot = this.cells_lot()[ 0 ];
+        const first_cell_lot: ElementRef<HTMLDivElement> = this.cells_lot()[ 0 ];
         if (!first_cell_lot || !this.cells() || this.cells().length <= 0) return;
 
         /** On regarde si il y a superposition */
@@ -126,7 +124,7 @@ export class PictosGameComponent implements OnInit {
 
     protected onDragRelease(event: CdkDragRelease): void {
 
-        const first_cell_lot = this.cells_lot()[ 0 ];
+        const first_cell_lot: ElementRef<HTMLDivElement> = this.cells_lot()[ 0 ];
         if (!first_cell_lot || !this.cells() || this.cells().length <= 0) return;
 
         /** On regarde si il y a superposition */
@@ -182,8 +180,8 @@ export class PictosGameComponent implements OnInit {
     private canPlaceLot(): boolean {
         if (this.is_lot_horizontal) {
             // Check if the current lot can be placed horizontally
-            for (let i = 0; i < 6; i++) {
-                for (let j = 0; j < 5; j++) {
+            for (let i: number = 0; i < 6; i++) {
+                for (let j: number = 0; j < 5; j++) {
                     if (this.board[ i ][ j ] === undefined && this.board[ i ][ j + 1 ] === undefined) {
                         return true;
                     }
@@ -191,8 +189,8 @@ export class PictosGameComponent implements OnInit {
             }
         } else {
             // Check if the current lot can be placed vertically
-            for (let j = 0; j < 6; j++) {
-                for (let i = 0; i < 5; i++) {
+            for (let j: number = 0; j < 6; j++) {
+                for (let i: number = 0; i < 5; i++) {
                     if (this.board[ i ][ j ] === undefined && this.board[ i + 1 ][ j ] === undefined) {
                         return true;
                     }
@@ -207,9 +205,9 @@ export class PictosGameComponent implements OnInit {
         const to_remove: { row: number, col: number, picto: number | undefined; }[] = [];
 
         // Mark horizontal groups
-        for (let i = 0; i < 6; i++) {
+        for (let i: number = 0; i < 6; i++) {
             let count: number = 1;
-            for (let j = 0; j < 6; j++) {
+            for (let j: number = 0; j < 6; j++) {
                 if (this.board[ i ][ j ] !== undefined) {
                     count = 1;
                     const current_picto: number | undefined = this.board[ i ][ j ]?.id;
@@ -218,7 +216,7 @@ export class PictosGameComponent implements OnInit {
                         j++;
                     }
                     if (count >= 3) {
-                        for (let k = j; k >= j - count + 1; k--) {
+                        for (let k: number = j; k >= j - count + 1; k--) {
                             to_remove.push({ row: i, col: k, picto: current_picto });
                         }
                     }
@@ -227,9 +225,9 @@ export class PictosGameComponent implements OnInit {
         }
 
         // Mark vertical groups
-        for (let j = 0; j < 6; j++) {
+        for (let j: number = 0; j < 6; j++) {
             let count: number = 1;
-            for (let i = 0; i < 6; i++) {
+            for (let i: number = 0; i < 6; i++) {
                 if (this.board[ i ][ j ] !== undefined) {
                     count = 1;
                     const current_picto: number | undefined = this.board[ i ][ j ]?.id;
@@ -238,7 +236,7 @@ export class PictosGameComponent implements OnInit {
                         i++;
                     }
                     if (count >= 3) {
-                        for (let k = i; k >= i - count + 1; k--) {
+                        for (let k: number = i; k >= i - count + 1; k--) {
                             to_remove.push({ row: k, col: j, picto: current_picto });
                         }
                     }

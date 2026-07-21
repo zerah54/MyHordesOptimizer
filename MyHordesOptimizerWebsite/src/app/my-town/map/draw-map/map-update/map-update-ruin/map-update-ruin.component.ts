@@ -36,10 +36,10 @@ export class MapUpdateRuinComponent implements OnInit {
     public cell: InputSignal<Cell> = input.required();
     public cellChange: OutputEmitterRef<Cell> = output();
 
-    public readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
-    public readonly locale: string = moment.locale();
+    protected readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
+    protected readonly locale: string = moment.locale();
 
-    public cell_form!: FormGroup;
+    protected cell_form!: FormGroup;
 
     private readonly destroy_ref: DestroyRef = inject(DestroyRef);
 

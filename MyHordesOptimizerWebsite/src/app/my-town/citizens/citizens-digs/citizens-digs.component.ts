@@ -37,28 +37,28 @@ const material_modules: Imports = [MatSortModule, MatTableModule];
 })
 export class CitizensDigsComponent implements OnInit {
 
-    protected readonly sort: Signal<MatSort> = viewChild.required(MatSort);
-    protected readonly table: Signal<MatTable<DigsByCitizen>> = viewChild.required(MatTable);
+    private readonly sort: Signal<MatSort> = viewChild.required(MatSort);
+    public readonly table: Signal<MatTable<DigsByCitizen>> = viewChild.required(MatTable);
 
     /** La liste des citoyens */
-    public citizen_info!: CitizenInfo;
+    protected citizen_info!: CitizenInfo;
     /** La liste des fouilles */
-    public digs!: Dig[];
+    private digs!: Dig[];
     /** La datasource pour le tableau */
-    public datasource: MatTableDataSource<DigsByCitizen> = new MatTableDataSource();
+    protected datasource: MatTableDataSource<DigsByCitizen> = new MatTableDataSource();
     /** Le dossier dans lequel sont stockées les images */
     public readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
     /** La locale */
     public readonly locale: string = moment.locale();
     /** La liste des citoyens a été mise à jour */
-    public citizen_filter_change: EventEmitter<void> = new EventEmitter<void>();
+    protected citizen_filter_change: EventEmitter<void> = new EventEmitter<void>();
     /** La liste des colonnes */
-    public readonly columns: StandardColumn[] = [
+    protected readonly columns: StandardColumn[] = [
         { id: 'avatar_name', header: $localize`Citoyen`, class: 'center', sticky: true },
         { id: 'today_digs', header: $localize`Fouilles du jour`, class: '' },
     ];
-    public readonly current_day: number = getTown()?.day || 1;
-    public filters: DigFilter = {
+    protected readonly current_day: number = getTown()?.day || 1;
+    protected filters: DigFilter = {
         selected_day: this.current_day,
         citizen: []
     };

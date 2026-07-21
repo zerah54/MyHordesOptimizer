@@ -9,7 +9,7 @@ import { groupBy } from '../../../_core/utilities/array.util';
 })
 export class CitizenGroupByImmuneStatePipe implements PipeTransform {
 
-    transform(citizen: Citizen[]): ImmuneState[] {
+    public transform(citizen: Citizen[]): ImmuneState[] {
         if (!citizen) return [];
 
         citizen.sort((citizen_a: Citizen, citizen_b: Citizen) => {

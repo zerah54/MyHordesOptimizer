@@ -1,7 +1,7 @@
 import { HttpErrorResponse, HttpParams, HttpResponse } from '@angular/common/http';
-import { inject,Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import moment from 'moment';
-import { map,Observable, Subscriber } from 'rxjs';
+import { map, Observable, Subscriber } from 'rxjs';
 
 import { SnackbarService } from '../../_core/services/snackbar.service';
 import { TownContextService } from '../../_core/services/town-context.service';
@@ -316,13 +316,13 @@ export class TownService extends GlobalService {
         let params: HttpParams = new HttpParams()
             .set('page', String(query.page))
             .set('pageSize', String(query.pageSize));
-        if (query.season != null) {
+        if (query.season) {
             params = params.set('season', String(query.season));
         }
-        if (query.phase != null) {
+        if (query.phase) {
             params = params.set('phase', query.phase);
         }
-        if (query.playerId != null) {
+        if (query.playerId) {
             params = params.set('playerId', String(query.playerId));
         }
         if (query.sortColumn) {

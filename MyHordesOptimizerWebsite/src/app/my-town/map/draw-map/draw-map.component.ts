@@ -33,7 +33,7 @@ export class DrawMapComponent {
 
     // TODO: Skipped for migration because:
     //  Accessor inputs cannot be migrated as they are too complex.
-    @Input() set map(map: Town) {
+    @Input() public set map(map: Town) {
         if (map) {
             this.complete_map = map;
             this.x_row = Array.from({ length: map?.map_width }, (_: unknown, i: number) => i - +map.town_x);
@@ -59,11 +59,11 @@ export class DrawMapComponent {
         }
     }
 
-    public x_row: number[] = [];
+    protected x_row: number[] = [];
 
-    public complete_map!: Town;
-    public my_cell: Cell | undefined;
-    public hovered_cell: Cell | undefined;
-    public drawed_map: Cell[][] = [];
+    protected complete_map!: Town;
+    protected my_cell: Cell | undefined;
+    protected hovered_cell: Cell | undefined;
+    protected drawed_map: Cell[][] = [];
 
 }

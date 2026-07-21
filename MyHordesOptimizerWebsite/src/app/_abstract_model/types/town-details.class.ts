@@ -13,7 +13,7 @@ export class TownDetails extends CommonModel<TownDetailsDTO> {
     public day!: number;
     public town_type!: TownTypeId;
 
-    constructor(dto?: TownDetailsDTO) {
+    public constructor(dto?: TownDetailsDTO) {
         super();
         this.dtoToModel(dto);
     }

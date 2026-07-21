@@ -37,6 +37,6 @@ export class MapCellTooltipComponent {
     public allCitizens: WritableSignal<Citizen[]> = signal([]);
     public allItems: WritableSignal<Item[]> = signal([]);
 
-    public readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
-    public readonly locale: string = moment.locale();
+    protected readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
+    protected readonly locale: string = moment.locale();
 }

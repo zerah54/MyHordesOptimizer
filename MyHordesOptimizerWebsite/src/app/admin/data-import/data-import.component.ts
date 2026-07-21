@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, DestroyRef, inject, OnInit, signal,WritableSignal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, OnInit, signal, WritableSignal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -9,7 +9,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { catchError, EMPTY, finalize,Observable } from 'rxjs';
+import { catchError, EMPTY, finalize, Observable } from 'rxjs';
 
 import { SeasonDTO } from '../../_abstract_model/dto/season.dto';
 import { AdminService } from '../../_abstract_model/services/admin.service';
@@ -39,25 +39,13 @@ const material_modules: Imports = [
     styleUrl: './data-import.component.scss',
 })
 export class DataImportComponent implements OnInit {
-    private readonly adminService: AdminService = inject(AdminService);
-    private readonly townService: TownService = inject(TownService);
-    private readonly destroy_ref: DestroyRef = inject(DestroyRef);
-
     protected readonly seasons: WritableSignal<SeasonDTO[]> = signal<SeasonDTO[]>([]);
     protected readonly seasonControl: FormControl<number | null> = new FormControl<number | null>(null);
-
     protected readonly loadingAll: WritableSignal<boolean> = signal(false);
     protected readonly resultAll: WritableSignal<'success' | 'error' | null> = signal(null);
-
     protected readonly loadingTowns: WritableSignal<boolean> = signal(false);
     protected readonly resultTowns: WritableSignal<'success' | 'error' | null> = signal(null);
-
-    protected readonly loadingMap: WritableSignal<Record<string, boolean>> = signal({});
-    protected readonly resultMap: WritableSignal<Record<string, 'success' | 'error' | null>> = signal({});
-
-    protected readonly loadingFinish: WritableSignal<Record<number, boolean>> = signal({});
-    protected readonly resultFinish: WritableSignal<Record<number, 'success' | 'error' | null>> = signal({});
-
+    private readonly adminService: AdminService = inject(AdminService);
     protected readonly importActions: ImportAction[] = [
         { key: 'jobs', label: $localize`Jobs`, icon: 'work', fn: () => this.adminService.importJobs() },
         { key: 'hero-skills', label: $localize`Compétences héros`, icon: 'military_tech', fn: () => this.adminService.importHeroSkills() },
@@ -71,6 +59,12 @@ export class DataImportComponent implements OnInit {
         { key: 'wishlist-categories', label: $localize`Catégories de liste de souhaits`, icon: 'checklist', fn: () => this.adminService.importWishlistCategories() },
         { key: 'default-wishlists', label: $localize`Listes de souhaits par défaut`, icon: 'playlist_add', fn: () => this.adminService.importDefaultWishlists() },
     ];
+    private readonly townService: TownService = inject(TownService);
+    private readonly destroy_ref: DestroyRef = inject(DestroyRef);
+    private readonly loadingMap: WritableSignal<Record<string, boolean>> = signal({});
+    private readonly resultMap: WritableSignal<Record<string, 'success' | 'error' | null>> = signal({});
+    private readonly loadingFinish: WritableSignal<Record<number, boolean>> = signal({});
+    private readonly resultFinish: WritableSignal<Record<number, 'success' | 'error' | null>> = signal({});
 
     public ngOnInit(): void {
         this.townService.getSeasons()
@@ -99,18 +93,18 @@ export class DataImportComponent implements OnInit {
     }
 
     protected runImport(action: ImportAction): void {
-        this.loadingMap.update(m => ({ ...m, [action.key]: true }));
-        this.resultMap.update(m => ({ ...m, [action.key]: null }));
+        this.loadingMap.update((m: Record<number, boolean>) => ({ ...m, [action.key]: true }));
+        this.resultMap.update((m) => ({ ...m, [action.key]: null }));
         action.fn()
             .pipe(
-                finalize(() => this.loadingMap.update(m => ({ ...m, [action.key]: false }))),
+                finalize(() => this.loadingMap.update((m: Record<number, boolean>) => ({ ...m, [action.key]: false }))),
                 catchError(() => {
-                    this.resultMap.update(m => ({ ...m, [action.key]: 'error' }));
+                    this.resultMap.update((m) => ({ ...m, [action.key]: 'error' }));
                     return EMPTY;
                 }),
                 takeUntilDestroyed(this.destroy_ref)
             )
-            .subscribe(() => this.resultMap.update(m => ({ ...m, [action.key]: 'success' })));
+            .subscribe(() => this.resultMap.update((m) => ({ ...m, [action.key]: 'success' })));
     }
 
     protected importTowns(): void {
@@ -130,24 +124,24 @@ export class DataImportComponent implements OnInit {
     }
 
     protected toggleSeasonFinished(seasonId: number, currentlyFinished: boolean): void {
-        this.loadingFinish.update(m => ({ ...m, [seasonId]: true }));
-        this.resultFinish.update(m => ({ ...m, [seasonId]: null }));
+        this.loadingFinish.update((m: Record<number, boolean>) => ({ ...m, [seasonId]: true }));
+        this.resultFinish.update((m) => ({ ...m, [seasonId]: null }));
         const nextFinished: boolean = !currentlyFinished;
         const request$: Observable<void> = nextFinished
             ? this.adminService.finishSeason(seasonId)
             : this.adminService.unfinishSeason(seasonId);
         request$
             .pipe(
-                finalize(() => this.loadingFinish.update(m => ({ ...m, [seasonId]: false }))),
+                finalize(() => this.loadingFinish.update((m: Record<number, boolean>) => ({ ...m, [seasonId]: false }))),
                 catchError(() => {
-                    this.resultFinish.update(m => ({ ...m, [seasonId]: 'error' }));
+                    this.resultFinish.update((m) => ({ ...m, [seasonId]: 'error' }));
                     return EMPTY;
                 }),
                 takeUntilDestroyed(this.destroy_ref)
             )
             .subscribe(() => {
-                this.resultFinish.update(m => ({ ...m, [seasonId]: 'success' }));
-                this.seasons.update(list => list.map(s => s.id === seasonId ? { ...s, isFinished: nextFinished } : s));
+                this.resultFinish.update((m) => ({ ...m, [seasonId]: 'success' }));
+                this.seasons.update((list: SeasonDTO[]) => list.map((s: SeasonDTO) => s.id === seasonId ? { ...s, isFinished: nextFinished } : s));
             });
     }
 

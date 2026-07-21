@@ -50,23 +50,23 @@ const LOAD_PILEGUN_DATA: ActionData = { label: $localize`Peut être rechargé av
 
 /** Type de champs de propriétés existants */
 export class Action extends CommonEnum {
-    static EAT_6AP: Action = new Action(EAT_6AP_KEY, EAT_6AP_DATA);
-    static EAT_7AP: Action = new Action(EAT_7AP_KEY, EAT_7AP_DATA);
+    public static EAT_6AP: Action = new Action(EAT_6AP_KEY, EAT_6AP_DATA);
+    public static EAT_7AP: Action = new Action(EAT_7AP_KEY, EAT_7AP_DATA);
 
-    static DRUG_6AP_1: Action = new Action(DRUG_6AP_1_KEY, DRUG_6AP_1_DATA);
+    public static DRUG_6AP_1: Action = new Action(DRUG_6AP_1_KEY, DRUG_6AP_1_DATA);
     // static DRUG_6AP_2: Action = new Action(DRUG_6AP_2_KEY, DRUG_6AP_2_DATA);
 
-    static DRUG_8AP_1: Action = new Action(DRUG_8AP_1_KEY, DRUG_8AP_1_DATA);
+    public static DRUG_8AP_1: Action = new Action(DRUG_8AP_1_KEY, DRUG_8AP_1_DATA);
     // static DRUG_8AP_2: Action = new Action(DRUG_8AP_2_KEY, DRUG_8AP_2_DATA);
 
-    static COFFEE: Action = new Action(COFFEE_KEY, COFFEE_DATA);
+    public static COFFEE: Action = new Action(COFFEE_KEY, COFFEE_DATA);
 
-    static ALCOHOL: Action = new Action(ALCOHOL_KEY, ALCOHOL_DATA);
-    static ALCOHOL_DX: Action = new Action(ALCOHOL_DX_KEY, ALCOHOL_DX_DATA);
+    public static ALCOHOL: Action = new Action(ALCOHOL_KEY, ALCOHOL_DATA);
+    public static ALCOHOL_DX: Action = new Action(ALCOHOL_DX_KEY, ALCOHOL_DX_DATA);
 
-    static SPECIAl_GUITAR: Action = new Action(SPECIAl_GUITAR_KEY, SPECIAl_GUITAR_DATA);
+    public static SPECIAl_GUITAR: Action = new Action(SPECIAl_GUITAR_KEY, SPECIAl_GUITAR_DATA);
 
-    static LOAD_PILEGUN: Action = new Action(LOAD_PILEGUN_KEY, LOAD_PILEGUN_DATA);
+    public static LOAD_PILEGUN: Action = new Action(LOAD_PILEGUN_KEY, LOAD_PILEGUN_DATA);
 
 
     /**
@@ -75,7 +75,7 @@ export class Action extends CommonEnum {
      * @param {string} key La clé de l'objet
      * @param {ActionData} value la valeur correspondante
      */
-    protected constructor(public override key: string, public override value: ActionData) {
+    public constructor(public override key: string, public override value: ActionData) {
         super(key, value);
     }
 
@@ -104,7 +104,7 @@ export class Action extends CommonEnum {
 
 
     /** @return {string} le libellé du droit */
-    public getLabel(): string {
+    protected getLabel(): string {
         return this.value.label;
     }
 }

@@ -5,11 +5,11 @@ import { CommonModel } from './_common.class';
 
 export class UpdateInfo extends CommonModel<UpdateInfoDTO> {
     public update_time!: Moment;
-    public user_id!: string;
+    private user_id!: string;
     public username?: string;
-    public userkey!: string;
+    private userkey!: string;
 
-    constructor(dto?: UpdateInfoDTO | null) {
+    public constructor(dto?: UpdateInfoDTO | null) {
         super();
         this.dtoToModel(dto);
     }

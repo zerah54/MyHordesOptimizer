@@ -10,7 +10,7 @@ import { groupBy } from '../../../../_core/utilities/array.util';
     name: 'bankCleanEntries'
 })
 export class BankCleanEntriesPipe implements PipeTransform {
-    transform(entries: Entry[], give_keywords: string[], complete_citizen_list: CitizenInfo, complete_item_list: Item[], strict: boolean): BankEntry[] {
+    public transform(entries: Entry[], give_keywords: string[], complete_citizen_list: CitizenInfo, complete_item_list: Item[], strict: boolean): BankEntry[] {
 
         let clean_entries: BankEntry[] = entries.map((entry: Entry): BankEntry => {
             return {
@@ -75,7 +75,7 @@ export class BankCleanEntriesPipe implements PipeTransform {
     name: 'bankDiff'
 })
 export class BankDiffPipe implements PipeTransform {
-    transform(entries: BankEntry[], mode: 'gift' | 'take'): BankEntry[] {
+    public transform(entries: BankEntry[], mode: 'gift' | 'take'): BankEntry[] {
         return mode === 'gift'
             ? entries.filter((entry: BankEntry): boolean => entry.mode === 'gifted')
             : entries.filter((entry: BankEntry): boolean => entry.mode === 'taken');

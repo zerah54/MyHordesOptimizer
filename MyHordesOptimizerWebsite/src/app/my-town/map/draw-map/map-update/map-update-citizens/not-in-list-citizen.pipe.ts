@@ -7,7 +7,7 @@ import { Citizen } from '../../../../../_abstract_model/types/citizen.class';
     name: 'notInListCitizen'
 })
 export class NotInListCitizenPipe implements PipeTransform {
-    transform(all_citizens: Citizen[], in_list_citizens: Citizen[]): Citizen[] {
+    public transform(all_citizens: Citizen[], in_list_citizens: Citizen[]): Citizen[] {
         return all_citizens.filter((citizen: Citizen) => !in_list_citizens.some((in_list_citizen: Citizen) => in_list_citizen.id === citizen.id));
     }
 }

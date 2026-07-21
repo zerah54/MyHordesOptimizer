@@ -28,7 +28,7 @@ export class BuildingsRegistryComponent {
 
     // TODO: Skipped for migration because:
     //  Accessor inputs cannot be migrated as they are too complex.
-    @Input({ required: true }) set registry(registry: Entry[] | undefined) {
+    @Input({ required: true }) public set registry(registry: Entry[] | undefined) {
         if (registry) {
             this.entries = registry;
             this.filterEntriesByType(registry);
@@ -38,7 +38,7 @@ export class BuildingsRegistryComponent {
     }
 
     protected entries_by_type: Entry[] = [];
-    protected building_type!: BuildingType;
+    private building_type!: BuildingType;
 
     protected readonly tabs: BuldingTab[] = [
         {
@@ -61,7 +61,7 @@ export class BuildingsRegistryComponent {
     private readonly vet_keywords: string[] = ['a attiré', 'in die Stadt gelockt', 'lured', 'atrajo a', 'hat vergeblich', 'a tenté d\'attirer', 'tried to lure', 'pero sin éxito'];
 
 
-    public changeBuildingTab(event: MatTabChangeEvent): void {
+    protected changeBuildingTab(event: MatTabChangeEvent): void {
         this.building_type = <BuildingType>event.tab.labelClass;
         setTimeout(() => {
             this.filterEntriesByType(this.entries);

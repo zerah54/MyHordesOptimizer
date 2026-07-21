@@ -1,5 +1,5 @@
 import { CommonModule, NgTemplateOutlet } from '@angular/common';
-import { Component, DOCUMENT, inject, LOCALE_ID, model,ModelSignal, OnInit } from '@angular/core';
+import { Component, DOCUMENT, inject, LOCALE_ID, model, ModelSignal, OnInit } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
@@ -31,36 +31,24 @@ const material_modules: Imports = [MatButtonModule, MatDividerModule, MatIconMod
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class MenuComponent implements OnInit {
-    private readonly locale_id: string = inject(LOCALE_ID);
-    private readonly document: Document = inject<Document>(DOCUMENT);
-    protected readonly adminService: AdminService = inject(AdminService);
-    private readonly town_context: TownContextService = inject(TownContextService);
-
     public sidenavContainer: ModelSignal<MatSidenavContainer> = model.required();
-
-    public charts_theming_service: ChartsThemingService = inject(ChartsThemingService);
-
-    public themes: Theme[] = [
+    protected readonly adminService: AdminService = inject(AdminService);
+    protected themes: Theme[] = [
         { label: $localize`Par défaut`, class: '' },
         { label: $localize`Rose`, class: 'pink' },
         { label: $localize`Brun`, class: 'brown' },
     ];
-
-    public selected_theme: Theme | undefined = this.themes.find((theme: Theme) => theme.class === localStorage.getItem('theme'));
-
+    protected selected_theme: Theme | undefined = this.themes.find((theme: Theme) => theme.class === localStorage.getItem('theme'));
     /** La liste des langues disponibles */
-    public language_list: Language[] = [
+    protected language_list: Language[] = [
         { code: 'en', label: 'English' },
         { code: 'fr', label: 'Français', default: true },
         { code: 'es', label: 'Español' },
         { code: 'de', label: 'Deutsch' }
     ];
-
     /** La langue sélectionnée pour l'affichage de l'application */
-    public site_language: Language | undefined;
-
-
-    public routes: SidenavLinks[] = [
+    protected site_language: Language | undefined;
+    protected routes: SidenavLinks[] = [
         {
             label: $localize`Ma ville`, lvl: 0, displayed: true, isTownRoot: true, authorized: (): boolean => this.isInTown(), expanded: true, children: [
                 { label: $localize`Revenir à ma ville`, returnHome: true, displayed: true, lvl: 1, authorized: (): boolean => this.isReadonly(), spoil: false },
@@ -227,6 +215,10 @@ export class MenuComponent implements OnInit {
             ], spoil: false
         },
     ];
+    private readonly locale_id: string = inject(LOCALE_ID);
+    private readonly document: Document = inject<Document>(DOCUMENT);
+    private readonly town_context: TownContextService = inject(TownContextService);
+    private charts_theming_service: ChartsThemingService = inject(ChartsThemingService);
 
     public ngOnInit(): void {
         /** Si il y a une langue enregistrée, on l'utilise, sinon on utilise le français */
@@ -244,7 +236,7 @@ export class MenuComponent implements OnInit {
         });
     }
 
-    public toggleDisplayChildren(route: SidenavLinks): void {
+    protected toggleDisplayChildren(route: SidenavLinks): void {
         if (route.children && route.children.length > 0) {
             route.children?.forEach((child: SidenavLinks) => {
                 child.displayed = route.expanded || false;
@@ -257,7 +249,7 @@ export class MenuComponent implements OnInit {
         }
     }
 
-    public changeTheme(new_theme: Theme): void {
+    protected changeTheme(new_theme: Theme): void {
         this.selected_theme = new_theme;
         localStorage.setItem('theme', new_theme.class);
         setTimeout(() => {
@@ -270,35 +262,12 @@ export class MenuComponent implements OnInit {
      *
      * @param {Language} new_language
      */
-    public changeLanguage(new_language: Language): void {
+    protected changeLanguage(new_language: Language): void {
         this.site_language = new_language;
         localStorage.setItem('mho-locale', new_language.code);
         setTimeout(() => {
             this.document.location.reload();
         });
-    }
-
-    private isInTown(): boolean {
-        if (!environment.production) return true;
-        const town: TownDetails | null = getTown();
-        if (!town) return false;
-        return town.town_id !== null && town.town_id !== undefined && town.town_id !== 0;
-    }
-
-    /** Vrai quand on observe une ville tierce : la section « Ma ville » cible alors cette ville. */
-    protected isReadonly(): boolean {
-        return this.town_context.isReadonly();
-    }
-
-    /** Base des liens de la section ville : la ville observée en mode observateur, sinon la sienne. */
-    private townBasePath(): string {
-        const observed: TownDetails | null = this.town_context.observedTown();
-        return observed ? `town/${observed.town_id}` : 'my-town';
-    }
-
-    /** Destination du bouton retour : sa propre ville si elle existe, sinon la liste des villes. */
-    private returnPath(): string {
-        return getUser()?.town_details?.town_id ? 'my-town' : 'directory/towns';
     }
 
     /** Résout le lien d'une entrée en tenant compte du contexte d'observation. */
@@ -314,6 +283,29 @@ export class MenuComponent implements OnInit {
             return this.town_context.observedTownName() ?? $localize`Ville observée`;
         }
         return route.label;
+    }
+
+    private isInTown(): boolean {
+        if (!environment.production) return true;
+        const town: TownDetails | null = getTown();
+        if (!town) return false;
+        return town.town_id !== null && town.town_id !== undefined && town.town_id !== 0;
+    }
+
+    /** Vrai quand on observe une ville tierce : la section « Ma ville » cible alors cette ville. */
+    private isReadonly(): boolean {
+        return this.town_context.isReadonly();
+    }
+
+    /** Base des liens de la section ville : la ville observée en mode observateur, sinon la sienne. */
+    private townBasePath(): string {
+        const observed: TownDetails | null = this.town_context.observedTown();
+        return observed ? `town/${observed.town_id}` : 'my-town';
+    }
+
+    /** Destination du bouton retour : sa propre ville si elle existe, sinon la liste des villes. */
+    private returnPath(): string {
+        return getUser()?.town_details?.town_id ? 'my-town' : 'directory/towns';
     }
 
     private resizeSidenav(): void {
@@ -357,7 +349,7 @@ export class MenuComponent implements OnInit {
             || this.themes.find((theme: Theme) => theme.class === '');
 
 
-        this.charts_theming_service.defineColorsWithTheme(this.selected_theme);
+        this.charts_theming_service.defineColorsWithTheme();
     }
 
     private isNoel(): boolean {

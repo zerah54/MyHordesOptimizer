@@ -5,10 +5,10 @@ import { TownDetails } from './town-details.class';
 export class Me extends CommonModel<MeDTO> {
     public id!: number;
     public username!: string;
-    public avatar!: string | null;
+    private avatar!: string | null;
     public town_details!: TownDetails;
 
-    constructor(dto?: MeDTO) {
+    public constructor(dto?: MeDTO) {
         super();
         this.dtoToModel(dto);
     }

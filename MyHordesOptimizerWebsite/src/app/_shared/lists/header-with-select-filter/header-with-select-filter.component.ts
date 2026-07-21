@@ -20,7 +20,7 @@ const material_modules: Imports = [MatFormFieldModule, MatIconModule];
 })
 export class HeaderWithSelectFilterComponent<T> {
 
-    readonly filter: Signal<SelectComponent<T>> = viewChild.required<SelectComponent<T>>('filter');
+    private readonly filter: Signal<SelectComponent<T>> = viewChild.required<SelectComponent<T>>('filter');
 
     public header: InputSignal<string> = input.required();
     public textAlign: InputSignal<string> = input('left');

@@ -28,14 +28,14 @@ const material_modules: Imports = [MatCardModule, MatSortModule, MatTableModule,
 export class HeroSkillsComponent implements OnInit {
 
     /** Le dossier dans lequel sont stockées les images */
-    public readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
+    protected readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
     /** La locale */
-    public readonly locale: string = moment.locale();
+    protected readonly locale: string = moment.locale();
 
     /** La liste des pouvoirs héroïques */
     public old_hero_skills!: HeroSkill[];
     /** La nouvelle liste des pouvoirs héroïques */
-    public new_hero_skills: NewHeroSkill[] = skills;
+    protected new_hero_skills: NewHeroSkill[] = skills;
     /** La liste des colonnes */
     public readonly columns: StandardColumn[] = [
         { id: 'icon', header: '' },
@@ -47,7 +47,7 @@ export class HeroSkillsComponent implements OnInit {
     private readonly api: ApiService = inject(ApiService);
     private readonly destroy_ref: DestroyRef = inject(DestroyRef);
 
-    ngOnInit(): void {
+    public ngOnInit(): void {
         this.api.getHeroSkill()
             .pipe(takeUntilDestroyed(this.destroy_ref))
             .subscribe((old_hero_skills: HeroSkill[]) => {

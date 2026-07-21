@@ -31,24 +31,24 @@ const material_modules: Imports = [MatCardModule, MatFormFieldModule];
 export class ItemsComponent implements OnInit {
 
     /** La liste des objets du jeu */
-    public items!: Item[];
+    private items!: Item[];
 
-    public displayed_items!: Item[];
+    protected displayed_items!: Item[];
 
-    public readonly locale: string = moment.locale();
+    protected readonly locale: string = moment.locale();
 
     /** Le champ de filtre sur les objets */
-    public filter_value: string = '';
+    protected filter_value: string = '';
     /** Le champ de filtres sur les propriétés */
-    public select_value: (Property | Action)[] = [];
+    protected select_value: (Property | Action)[] = [];
 
     /** La liste des filtres */
-    public options: (Property | Action)[] = [...<Property[]>Property.getAllValues(), ...<Action[]>Action.getAllValues()];
+    protected options: (Property | Action)[] = [...<Property[]>Property.getAllValues(), ...<Action[]>Action.getAllValues()];
 
     private readonly api: ApiService = inject(ApiService);
     private readonly destroy_ref: DestroyRef = inject(DestroyRef);
 
-    ngOnInit(): void {
+    public ngOnInit(): void {
         this.api.getItems(true)
             .pipe(takeUntilDestroyed(this.destroy_ref))
             .subscribe((items: Item[]) => {
@@ -64,7 +64,7 @@ export class ItemsComponent implements OnInit {
             });
     }
 
-    public applyFilters(): void {
+    protected applyFilters(): void {
         if (this.filter_value !== null && this.filter_value !== undefined && this.filter_value !== '') {
             this.displayed_items = [...this.items.filter((item: Item) => normalizeString(item.label[this.locale]).indexOf(normalizeString(this.filter_value)) > -1)];
         } else {

@@ -9,7 +9,7 @@ import { ItemCount } from '../../../../../_abstract_model/types/item-count.class
     name: 'itemsInBags'
 })
 export class ItemsInBagsPipe implements PipeTransform {
-    transform(citizens: Citizen[], all_citizens: Citizen[]): ItemCount[] {
+    public transform(citizens: Citizen[], all_citizens: Citizen[]): ItemCount[] {
         const items: ItemCount[] = [];
         citizens.forEach((citizen: Citizen): void => {
             const complete_citizen: Citizen = <Citizen>all_citizens.find((citizen_in_all: Citizen): boolean => citizen_in_all.id === citizen.id);

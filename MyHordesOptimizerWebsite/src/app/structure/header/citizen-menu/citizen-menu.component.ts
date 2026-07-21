@@ -39,20 +39,20 @@ const material_modules: Imports = [MatCheckboxModule, MatDividerModule, MatFormF
 })
 export class CitizenMenuComponent implements OnInit {
 
-    public citizen!: Citizen;
-    public readonly me: Me | null = getUser();
-    public readonly current_day: number = getTown()?.day || 1;
-    public readonly locale: string = moment.locale();
+    protected citizen!: Citizen;
+    private readonly me: Me | null = getUser();
+    private readonly current_day: number = getTown()?.day || 1;
+    protected readonly locale: string = moment.locale();
 
     /** La liste complète des items */
-    public all_items: Item[] = [];
+    private all_items: Item[] = [];
     /** La liste complète des statuts */
-    public readonly all_status: StatusEnum[] = StatusEnum.getAllValues();
+    private readonly all_status: StatusEnum[] = StatusEnum.getAllValues();
 
     /** La liste des listes disponibles dans le sac */
-    public bag_lists: ListForAddRemove[] = [];
+    protected bag_lists: ListForAddRemove[] = [];
     /** La liste des listes disponibles dans les status */
-    public readonly status_lists: ListForAddRemove[] = [
+    protected readonly status_lists: ListForAddRemove[] = [
         { label: $localize`Tous`, list: this.all_status }
     ];
 
@@ -93,7 +93,7 @@ export class CitizenMenuComponent implements OnInit {
      *
      * @param {number} item_id
      */
-    public addItem(item_id: number): void {
+    protected addItem(item_id: number): void {
         if (this.citizen && this.citizen.bag) {
             this.citizen.bag.items.push(<Item>this.all_items.find((item: Item) => item.id === item_id));
 
@@ -117,7 +117,7 @@ export class CitizenMenuComponent implements OnInit {
      *
      * @param {number} item_id
      */
-    public removeItem(item_id: number): void {
+    protected removeItem(item_id: number): void {
         if (this.citizen && this.citizen.bag) {
             const item_in_datasource_index: number | undefined = this.citizen.bag.items.findIndex((item_in_bag: Item) => item_in_bag.id === item_id);
             if (item_in_datasource_index !== undefined && item_in_datasource_index !== null && item_in_datasource_index > -1) {
@@ -138,7 +138,7 @@ export class CitizenMenuComponent implements OnInit {
     }
 
     /** On vide complètement le sac */
-    public emptyBag(): void {
+    protected emptyBag(): void {
         if (this.citizen && this.citizen.bag) {
             this.citizen.bag.items = [];
             this.town_service
@@ -160,7 +160,7 @@ export class CitizenMenuComponent implements OnInit {
      *
      * @param {number} status_key
      */
-    public addStatus(status_key: string): void {
+    protected addStatus(status_key: string): void {
         if (this.citizen && this.citizen.status) {
             this.citizen.status.icons.push(<StatusEnum>this.all_status.find((status: StatusEnum) => status.key === status_key));
 
@@ -183,7 +183,7 @@ export class CitizenMenuComponent implements OnInit {
      *
      * @param {number} status_key
      */
-    public removeStatus(status_key: string): void {
+    protected removeStatus(status_key: string): void {
         if (this.citizen && this.citizen.status) {
             const existing_status_index: number | undefined = this.citizen.status.icons.findIndex((status: StatusEnum) => status.key === status_key);
             if (existing_status_index !== undefined && existing_status_index !== null && existing_status_index > -1) {
@@ -204,7 +204,7 @@ export class CitizenMenuComponent implements OnInit {
     }
 
     /** On vide complètement les statuts */
-    public emptyStatus(): void {
+    protected emptyStatus(): void {
         if (this.citizen && this.citizen.status) {
             this.citizen.status.icons = [];
             this.town_service
@@ -221,11 +221,11 @@ export class CitizenMenuComponent implements OnInit {
         }
     }
 
-    public dailyBathTaken(): boolean {
+    protected dailyBathTaken(): boolean {
         return this.citizen.baths.some((bath: Bath) => bath.day === this.current_day && bath.update_info);
     }
 
-    public saveBath(event: MatCheckboxChange): void {
+    protected saveBath(event: MatCheckboxChange): void {
         if (event.checked) {
             this.town_service
                 .addBath(this.citizen)
@@ -244,7 +244,7 @@ export class CitizenMenuComponent implements OnInit {
         }
     }
 
-    public saveChamanicDetails(citizen: Citizen): void {
+    protected saveChamanicDetails(citizen: Citizen): void {
         this.town_service
             .saveChamanicDetails(citizen)
             .subscribe({
@@ -263,7 +263,7 @@ export class CitizenMenuComponent implements OnInit {
      * @param {HeroicActionsWithValue} element
      * @param {MatCheckboxChange | number} event
      */
-    public updateActions(element: HeroicActionsWithValue, event: MatCheckboxChange | number): void {
+    protected updateActions(element: HeroicActionsWithValue, event: MatCheckboxChange | number): void {
         const old_element_value: boolean | number = element.value;
         if (event instanceof MatCheckboxChange) {
             element.value = event.checked;
@@ -295,7 +295,7 @@ export class CitizenMenuComponent implements OnInit {
      * @param {HomeWithValue} element
      * @param {MatCheckboxChange | MatSelectChange} event
      */
-    public updateHome(element: HomeWithValue, event: MatCheckboxChange | number): void {
+    protected updateHome(element: HomeWithValue, event: MatCheckboxChange | number): void {
         const old_element_value: boolean | number = element.value;
         if (event instanceof MatCheckboxChange) {
             element.value = event.checked;

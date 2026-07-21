@@ -23,7 +23,7 @@ export class LastUpdateComponent {
     public thresholds: InputSignal<[number, number, number, number] | undefined> = input<[number, number, number, number] | undefined>(undefined);
     public hideDetails: InputSignalWithTransform<boolean, unknown> = input(false, { transform: booleanAttribute });
 
-    public moment: Moment = moment();
+    protected moment: Moment = moment();
 
 }
 

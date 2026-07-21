@@ -6,10 +6,10 @@ export class Category extends CommonModel<CategoryDTO> {
 
     public id_category!: number;
     public label!: I18nLabels;
-    public name!: string;
+    private name!: string;
     public ordering!: number;
 
-    constructor(dto?: CategoryDTO) {
+    public constructor(dto?: CategoryDTO) {
         super();
         this.dtoToModel(dto);
     }

@@ -2,45 +2,45 @@
     <mat-card-title i18n>Citoyens</mat-card-title>
 </mat-card-header>
 
-<mat-card-content class="mho-citizen-list-content" [formGroup]="filtersForm">
+<mat-card-content [formGroup]="filtersForm" class="mho-citizen-list-content">
 
     <div class="citizen-list">
 
         <div class="citizen-list__table-wrapper">
-            <table mat-table [dataSource]="citizens()" [trackBy]="trackById" matSort matSortActive="nbTownsPlayed"
-                   matSortDirection="desc" class="citizen-table">
+            <table [dataSource]="citizens()" [trackBy]="trackById" class="citizen-table" mat-table matSort
+                   matSortActive="nbTownsPlayed" matSortDirection="desc">
 
                 <ng-container matColumnDef="avatar_name" sticky>
-                    <th mat-header-cell *matHeaderCellDef mat-sort-header="name" disableClear>
-                        <mat-form-field appearance="outline" subscriptSizing="dynamic" class="field--name"
-                                        (click)="$event.stopPropagation()">
+                    <th *matHeaderCellDef disableClear mat-header-cell mat-sort-header="name">
+                        <mat-form-field (click)="$event.stopPropagation()" appearance="outline" class="field--name"
+                                        subscriptSizing="dynamic">
                             <mat-label i18n>Pseudo</mat-label>
-                            <input matInput formControlName="name"/>
+                            <input formControlName="name" matInput/>
                             @if (filtersForm.controls['name'].value) {
-                                <button matIconSuffix mat-icon-button
-                                        (click)="filtersForm.controls['name'].setValue(''); $event.stopPropagation()">
+                                <button (click)="filtersForm.controls['name'].setValue(''); $event.stopPropagation()" mat-icon-button
+                                        matIconSuffix>
                                     <mat-icon fontSet="material-symbols-outlined">close</mat-icon>
                                 </button>
                             }
                         </mat-form-field>
                     </th>
-                    <td mat-cell *matCellDef="let row">
+                    <td *matCellDef="let row" mat-cell>
                         <mho-avatar [src]="row.avatar" rounded></mho-avatar>
                         <span class="citizen-name">{{ row.name }}</span>
                     </td>
                 </ng-container>
 
                 <ng-container matColumnDef="nbTownsPlayed">
-                    <th mat-header-cell *matHeaderCellDef mat-sort-header="nbTownsPlayed" disableClear i18n>Villes</th>
-                    <td mat-cell *matCellDef="let row">{{ row.nbTownsPlayed }}</td>
+                    <th *matHeaderCellDef disableClear i18n mat-header-cell mat-sort-header="nbTownsPlayed">Villes</th>
+                    <td *matCellDef="let row" mat-cell>{{ row.nbTownsPlayed }}</td>
                 </ng-container>
 
                 <ng-container matColumnDef="bestSurvival">
-                    <th mat-header-cell *matHeaderCellDef mat-sort-header="bestSurvival" disableClear i18n>
+                    <th *matHeaderCellDef disableClear i18n mat-header-cell mat-sort-header="bestSurvival">
                         Meilleure survie
                     </th>
-                    <td mat-cell *matCellDef="let row">
-                        @if (row.bestSurvival != null) {
+                    <td *matCellDef="let row" mat-cell>
+                        @if (row.bestSurvival !== null) {
                             <ng-container i18n>Jour {{ row.bestSurvival }}</ng-container>
                         } @else {
                             <span class="citizen-list__unknown">—</span>
@@ -49,12 +49,12 @@
                 </ng-container>
 
                 <ng-container matColumnDef="lastTown">
-                    <th mat-header-cell *matHeaderCellDef mat-sort-header="lastTown" disableClear i18n>Dernière ville
+                    <th *matHeaderCellDef disableClear i18n mat-header-cell mat-sort-header="lastTown">Dernière ville
                     </th>
-                    <td mat-cell *matCellDef="let row">
-                        @if (row.lastTownId != null) {
+                    <td *matCellDef="let row" mat-cell>
+                        @if (row.lastTownId !== null) {
                             <span>{{ row.lastTownName }}</span>
-                            @if (row.lastTownSeason != null) {
+                            @if (row.lastTownSeason !== null) {
                                 <span class="citizen-list__season" i18n>(saison {{ row.lastTownSeason }})</span>
                             }
                         } @else {
@@ -63,10 +63,10 @@
                     </td>
                 </ng-container>
 
-                <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
-                <tr mat-row *matRowDef="let row; columns: displayedColumns"
+                <tr *matHeaderRowDef="displayedColumns; sticky: true" mat-header-row></tr>
+                <tr (click)="onRowClick(row)" *matRowDef="let row; columns: displayedColumns"
                     class="clickable-row"
-                    (click)="onRowClick(row)"></tr>
+                    mat-row></tr>
 
             </table>
 
@@ -85,11 +85,11 @@
         </div>
 
         <mat-paginator
-            [length]="totalCount()"
-            [pageSize]="pageSize()"
-            [pageSizeOptions]="pageSizeOptions"
-            [pageIndex]="pageIndex()"
             (page)="onPageChange($event)"
+            [length]="totalCount()"
+            [pageIndex]="pageIndex()"
+            [pageSizeOptions]="pageSizeOptions"
+            [pageSize]="pageSize()"
             showFirstLastButtons/>
 
     </div>

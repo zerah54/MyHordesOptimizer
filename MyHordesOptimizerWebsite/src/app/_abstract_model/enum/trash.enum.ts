@@ -45,12 +45,12 @@ const ANIMALS_TRASH_DATA: TrashData = { label: $localize`Enclos`, property: Prop
 /** Type de champs de propriétés existants */
 export class Trash extends CommonEnum {
 
-    static WEAPONS_TRASH: Trash = new Trash(WEAPONS_TRASH_KEY, WEAPONS_TRASH_DATA);
-    static DEFENSE_TRASH: Trash = new Trash(DEFENSE_TRASH_KEY, DEFENSE_TRASH_DATA);
-    static FOOD_TRASH: Trash = new Trash(FOOD_TRASH_KEY, FOOD_TRASH_DATA);
-    static WOOD_TRASH: Trash = new Trash(WOOD_TRASH_KEY, WOOD_TRASH_DATA);
-    static METAL_TRASH: Trash = new Trash(METAL_TRASH_KEY, METAL_TRASH_DATA);
-    static ANIMALS_TRASH: Trash = new Trash(ANIMALS_TRASH_KEY, ANIMALS_TRASH_DATA);
+    public static WEAPONS_TRASH: Trash = new Trash(WEAPONS_TRASH_KEY, WEAPONS_TRASH_DATA);
+    public static DEFENSE_TRASH: Trash = new Trash(DEFENSE_TRASH_KEY, DEFENSE_TRASH_DATA);
+    public static FOOD_TRASH: Trash = new Trash(FOOD_TRASH_KEY, FOOD_TRASH_DATA);
+    public static WOOD_TRASH: Trash = new Trash(WOOD_TRASH_KEY, WOOD_TRASH_DATA);
+    public static METAL_TRASH: Trash = new Trash(METAL_TRASH_KEY, METAL_TRASH_DATA);
+    public static ANIMALS_TRASH: Trash = new Trash(ANIMALS_TRASH_KEY, ANIMALS_TRASH_DATA);
 
     /**
      * Le constructeur privé empêche la création d'autres instances de cette classe.
@@ -58,12 +58,12 @@ export class Trash extends CommonEnum {
      * @param {string} key La clé de l'objet
      * @param {TrashData} value la valeur correspondante
      */
-    protected constructor(public override key: string, public override value: TrashData) {
+    public constructor(public override key: string, public override value: TrashData) {
         super(key, value);
     }
 
     /** @return {string} le libellé du droit */
-    public getLabel(): string {
+    protected getLabel(): string {
         return this.value.label;
     }
 }

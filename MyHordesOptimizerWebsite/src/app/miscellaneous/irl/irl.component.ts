@@ -25,13 +25,13 @@ const material_modules: Imports = [MatCardModule, MatFormFieldModule];
 })
 export class IrlComponent implements OnInit {
 
-    readonly container: Signal<ElementRef> = viewChild.required<ElementRef>('hordiens');
+    private readonly container: Signal<ElementRef> = viewChild.required<ElementRef>('hordiens');
 
-    public people: IrlPeople[] = people;
-    public links: IrlLink[] = links;
-    public towns: IrlTowns[] = towns;
+    private people: IrlPeople[] = people;
+    private links: IrlLink[] = links;
+    protected towns: IrlTowns[] = towns;
 
-    public nodes: DataSet<IrlNode> = new DataSet(
+    private nodes: DataSet<IrlNode> = new DataSet(
         this.people.map((data: IrlPeople): IrlNode => {
             return {
                 id: data.id,
@@ -45,7 +45,7 @@ export class IrlComponent implements OnInit {
         })
     );
 
-    public edges: DataSet<IrlEdge> = new DataSet(
+    private edges: DataSet<IrlEdge> = new DataSet(
         this.links.map((edge: IrlLink, index: number): IrlEdge => {
             let color: string;
             let arrows: string | undefined;
@@ -72,9 +72,9 @@ export class IrlComponent implements OnInit {
         })
     );
 
-    public selected_towns: IrlTowns[] = [...towns];
+    protected selected_towns: IrlTowns[] = [...towns];
 
-    public nodes_view: DataView<IrlNode> = new DataView(
+    protected nodes_view: DataView<IrlNode> = new DataView(
         this.nodes,
         { filter: (node: IrlNode) => node.towns.some((town: TownId): boolean => this.selected_towns.some((selected_town: IrlTowns): boolean => town === selected_town.id)) }
     );

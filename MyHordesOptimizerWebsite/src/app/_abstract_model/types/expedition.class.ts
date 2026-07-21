@@ -11,7 +11,7 @@ export class Expedition extends CommonModel<ExpeditionDTO> {
     public position!: number;
 
 
-    constructor(dto?: ExpeditionDTO | null) {
+    public constructor(dto?: ExpeditionDTO | null) {
         super();
         this.dtoToModel(dto);
     }

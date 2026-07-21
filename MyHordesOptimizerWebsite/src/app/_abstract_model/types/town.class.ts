@@ -4,19 +4,19 @@ import { Cell } from './cell.class';
 
 export class Town extends CommonModel<TownDTO> {
 
-    public town_id!: number;
+    private town_id!: number;
     public town_x!: number;
     public town_y!: number;
     public map_height!: number;
     public map_width!: number;
     public is_chaos!: boolean;
     public is_devasted!: boolean;
-    public is_door_open!: boolean;
-    public water_well!: number;
+    private is_door_open!: boolean;
+    private water_well!: number;
     public day!: number;
     public cells!: Cell[];
 
-    constructor(dto?: TownDTO | null) {
+    public constructor(dto?: TownDTO | null) {
         super();
         this.dtoToModel(dto);
     }

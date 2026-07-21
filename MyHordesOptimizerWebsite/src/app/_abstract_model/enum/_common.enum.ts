@@ -2,36 +2,8 @@ import { environment } from '../../../environments/environment';
 
 export abstract class CommonEnum {
 
-    /**
-     * Retourne l'objet correspondant à la clé fournie
-     *
-     * @param {string} key la clé
-     *
-     * @return {T} l'object correspondant.
-     */
-    public static getValue<T extends CommonEnum>(key: string): T | undefined {
-        if (key === null || key === undefined) return undefined;
-
-        const property_descriptor: PropertyDescriptor | undefined = Object.getOwnPropertyDescriptor(this, key);
-        if (property_descriptor) {
-            return property_descriptor.value.valueOf();
-        } else {
-            if (!environment.production) {
-                // console.error(`Aucune valeur pour "${this.name}" correspondant à la clé "${key}"`);
-            }
-            return undefined;
-        }
-    }
-
-    /**
-     * Retourne les objets correspondant aux clés fournies
-     *
-     * @param {string[]} keys les clés
-     *
-     * @return {T[]} les objets correspondant.
-     */
-    public static getValues<T extends CommonEnum>(keys: string[]): T[] {
-        return keys ? <T[]>keys.filter((value: string) => this.getValue(value)).map((value: string) => this.getValue(value)) : [];
+    /** Le constructeur de la classe parente aux Enum personnalisés */
+    public constructor(public key: string, public value: CommonEnumData) {
     }
 
     /**
@@ -53,7 +25,6 @@ export abstract class CommonEnum {
             return element;
         }
     }
-
 
     /**
      * Vérifie l'égalité entre deux enum custom
@@ -77,14 +48,41 @@ export abstract class CommonEnum {
         return this.getValues<T>(Object.keys(this)).filter((value: T | undefined) => value instanceof this);
     }
 
-
     /** @return {string} la liste des clés possibles */
     public static getAllKeys<T extends CommonEnum>(): (string | undefined)[] {
         return this.getAllValues<T>().map((value: T | undefined) => value?.key);
     }
 
-    /** Le constructeur de la classe parente aux Enum personnalisés */
-    protected constructor(public key: string, public value: CommonEnumData) {
+    /**
+     * Retourne l'objet correspondant à la clé fournie
+     *
+     * @param {string} key la clé
+     *
+     * @return {T} l'object correspondant.
+     */
+    private static getValue<T extends CommonEnum>(key: string): T | undefined {
+        if (key === null || key === undefined) return undefined;
+
+        const property_descriptor: PropertyDescriptor | undefined = Object.getOwnPropertyDescriptor(this, key);
+        if (property_descriptor) {
+            return property_descriptor.value.valueOf();
+        } else {
+            if (!environment.production) {
+                // console.error(`Aucune valeur pour "${this.name}" correspondant à la clé "${key}"`);
+            }
+            return undefined;
+        }
+    }
+
+    /**
+     * Retourne les objets correspondant aux clés fournies
+     *
+     * @param {string[]} keys les clés
+     *
+     * @return {T[]} les objets correspondant.
+     */
+    private static getValues<T extends CommonEnum>(keys: string[]): T[] {
+        return keys ? <T[]>keys.filter((value: string) => this.getValue(value)).map((value: string) => this.getValue(value)) : [];
     }
 
     /** @return {string} Retourne la clé */
@@ -109,10 +107,11 @@ export abstract class CommonEnum {
     }
 
     /** @return {string} Le libellé principal */
-    public abstract getLabel(): string;
+    protected abstract getLabel(): string;
 
 }
 
-
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
 export interface CommonEnumData {
 }

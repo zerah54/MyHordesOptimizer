@@ -1,6 +1,6 @@
 import { HttpParams, HttpResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { map,Observable } from 'rxjs';
+import { map, Observable } from 'rxjs';
 
 import { CitizenListItemDTO, CitizenListPageResultDTO, CitizenListQuery } from '../dto/citizen-list-page.dto';
 import { UserAccountPublicDTO } from '../dto/user-account.dto';
@@ -26,7 +26,7 @@ export class UserAccountService extends GlobalService {
         if (query.name) {
             params = params.set('name', query.name);
         }
-        if (query.sharedWithPlayerId != null) {
+        if (query.sharedWithPlayerId !== null) {
             params = params.set('sharedWithPlayerId', String(query.sharedWithPlayerId));
         }
 

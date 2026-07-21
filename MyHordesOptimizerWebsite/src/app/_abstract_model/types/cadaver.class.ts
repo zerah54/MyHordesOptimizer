@@ -4,17 +4,17 @@ import { CommonModel } from './_common.class';
 import { CauseOfDeath } from './cause-of-death.class';
 
 export class Cadaver extends CommonModel<CadaverDTO> {
-    public avatar?: string;
+    private avatar?: string;
     public cause_of_death?: CauseOfDeath;
-    public cleanup?: CleanUpDTO;
-    public id!: number;
-    public name!: string;
+    private cleanup?: CleanUpDTO;
+    private id!: number;
+    private name!: string;
     public score!: number;
     public survival!: number;
     public msg?: string;
     public town_msg?: string;
 
-    constructor(dto?: CadaverDTO) {
+    public constructor(dto?: CadaverDTO) {
         super();
         this.dtoToModel(dto);
     }

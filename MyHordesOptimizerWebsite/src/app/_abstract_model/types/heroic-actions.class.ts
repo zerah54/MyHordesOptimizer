@@ -8,7 +8,7 @@ export class HeroicActions extends CommonModel<HeroicActionsDTO> {
     public content!: HeroicActionsWithValue[];
     public update_info!: UpdateInfo;
 
-    constructor(dto?: HeroicActionsDTO) {
+    public constructor(dto?: HeroicActionsDTO) {
         super();
         this.dtoToModel(dto);
     }

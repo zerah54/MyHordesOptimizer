@@ -12,11 +12,11 @@ import { TokenWithMe } from '../types/token-with-me.class';
     providedIn: 'root'
 })
 export abstract class RealtimeGlobalService {
-    public hubConnection!: signalR.HubConnection;
+    protected hubConnection!: signalR.HubConnection;
 
-    protected readonly HUB_URL: string = environment.api_url + '/hub/';
+    private readonly HUB_URL: string = environment.api_url + '/hub/';
 
-    protected options: IHttpConnectionOptions = {
+    private options: IHttpConnectionOptions = {
         accessTokenFactory: () => {
             const token: TokenWithMe | null = getTokenWithMeWithExpirationDate();
             if (isValidToken(token)) {
@@ -31,7 +31,7 @@ export abstract class RealtimeGlobalService {
         // skipNegotiation: true,
         // transport: HttpTransportType.WebSockets,
     };
-    protected snackbar: SnackbarService = inject(SnackbarService);
+    private snackbar: SnackbarService = inject(SnackbarService);
 
     protected async defineConnexion(part: string): Promise<void> {
 
@@ -44,7 +44,7 @@ export abstract class RealtimeGlobalService {
         await this.startConnexion();
     }
 
-    protected async startConnexion(): Promise<void> {
+    private async startConnexion(): Promise<void> {
         await this.hubConnection
             .start()
             .then(() => console.log('Connected to SignalR hub'))

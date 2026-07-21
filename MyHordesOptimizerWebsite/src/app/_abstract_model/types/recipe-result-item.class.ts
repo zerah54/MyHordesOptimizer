@@ -4,11 +4,11 @@ import { Item } from './item.class';
 
 export class RecipeResultItem extends CommonModel<RecipeResultItemDTO> {
     public probability!: number;
-    public weight!: number;
+    private weight!: number;
     public item!: Item;
-    public picto_uid!: string;
+    private picto_uid!: string;
 
-    constructor(dto?: RecipeResultItemDTO) {
+    public constructor(dto?: RecipeResultItemDTO) {
         super();
         this.dtoToModel(dto);
     }

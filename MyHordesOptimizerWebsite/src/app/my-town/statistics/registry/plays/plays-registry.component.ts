@@ -31,7 +31,7 @@ export class PlaysRegistryComponent {
 
     // TODO: Skipped for migration because:
     //  Accessor inputs cannot be migrated as they are too complex.
-    @Input({ required: true }) set registry(registry: Entry[] | undefined) {
+    @Input({ required: true }) public set registry(registry: Entry[] | undefined) {
         if (registry) {
             this.entries = registry;
             this.filterEntriesByType(registry);
@@ -41,7 +41,7 @@ export class PlaysRegistryComponent {
     }
 
     protected entries_by_type: Entry[] = [];
-    protected play_type!: PlayType;
+    private play_type!: PlayType;
 
     protected readonly tabs: GameTab[] = [
         {

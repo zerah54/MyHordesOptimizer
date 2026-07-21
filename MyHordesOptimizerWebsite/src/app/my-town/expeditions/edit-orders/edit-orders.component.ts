@@ -23,26 +23,26 @@ const material_modules: Imports = [DragDropModule, MatButtonModule, MatButtonTog
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class EditOrdersComponent {
-    protected data: EditOrdersData = inject<EditOrdersData>(MAT_DIALOG_DATA);
+    private data: EditOrdersData = inject<EditOrdersData>(MAT_DIALOG_DATA);
 
 
-    public orders: ExpeditionOrder[] = [];
+    protected orders: ExpeditionOrder[] = [];
 
     public constructor() {
         this.orders = this.data?.orders ? [...this.data.orders.map((order: ExpeditionOrder) => new ExpeditionOrder(order.modelToDto()))] : [];
     }
 
-    public addOrder(): void {
+    protected addOrder(): void {
         const order: ExpeditionOrder = new ExpeditionOrder();
         order.type = 'checkbox';
         this.orders.push(order);
     }
 
-    public drop(event: CdkDragDrop<string[]>): void {
+    protected drop(event: CdkDragDrop<string[]>): void {
         moveItemInArray(this.orders, event.previousIndex, event.currentIndex);
     }
 
-    public deleteOrder(index: number): void {
+    protected deleteOrder(index: number): void {
         this.orders.splice(index, 1);
     }
 }

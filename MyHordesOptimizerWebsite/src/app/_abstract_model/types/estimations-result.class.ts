@@ -8,7 +8,7 @@ export class EstimationsResult extends CommonModel<EstimationsResultDTO> {
     public max_list: EstimationGraphValues[] = [];
 
 
-    constructor(dto?: EstimationsResultDTO | null | undefined) {
+    public constructor(dto?: EstimationsResultDTO | null | undefined) {
         super();
         this.dtoToModel(dto);
     }

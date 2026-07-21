@@ -26,6 +26,6 @@ export class CitizenInfoComponent {
     public displayJob: InputSignalWithTransform<boolean, unknown> = input(false, { transform: booleanAttribute });
 
     /** La langue du site */
-    protected readonly locale: string = moment.locale();
+    public readonly locale: string = moment.locale();
     protected readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
 }

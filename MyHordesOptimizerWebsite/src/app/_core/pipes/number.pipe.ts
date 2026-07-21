@@ -4,7 +4,7 @@ import { Pipe, PipeTransform } from '@angular/core';
     name: 'min'
 })
 export class MinPipe implements PipeTransform {
-    transform(numbers: number[]): number {
+    public transform(numbers: number[]): number {
         return Math.min(...numbers);
     }
 }
@@ -13,7 +13,7 @@ export class MinPipe implements PipeTransform {
     name: 'max'
 })
 export class MaxPipe implements PipeTransform {
-    transform(numbers: number[]): number {
+    public transform(numbers: number[]): number {
         return Math.max(...numbers);
     }
 }

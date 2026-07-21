@@ -15,7 +15,7 @@ export class ExpeditionPart extends CommonModel<ExpeditionPartDTO> {
     public direction: Dictionary<boolean> = {};
 
 
-    constructor(dto?: ExpeditionPartDTO | null) {
+    public constructor(dto?: ExpeditionPartDTO | null) {
         super();
         this.dtoToModel(dto);
     }

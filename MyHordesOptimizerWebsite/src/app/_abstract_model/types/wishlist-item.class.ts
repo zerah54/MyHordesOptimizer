@@ -14,7 +14,7 @@ export class WishlistItem extends CommonModel<WishlistItemDTO> {
     public should_signal!: boolean;
     public zone_x_pa!: number;
 
-    constructor(dto?: WishlistItemDTO) {
+    public constructor(dto?: WishlistItemDTO) {
         super();
         this.dtoToModel(dto);
     }
