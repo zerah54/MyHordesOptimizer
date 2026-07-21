@@ -1,4 +1,7 @@
 export const changelogs: Record<string, string> = {
+    '1.1.49': `
+        [Correction] Estimations depuis la mise à jour du site
+    `,
     '1.1.48': `
         [Correction] La liste de courses ne s'affichait pas dans l'interface
     `,

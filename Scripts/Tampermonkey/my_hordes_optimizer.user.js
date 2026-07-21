@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MHO Addon
-// @version      1.1.48
+// @version      1.1.49
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/, rubrique Tutoriels
 // @author       Zerah
 //
@@ -300,6 +300,9 @@
     }
 
     const changelogs = {
+        '1.1.49': `
+        [Correction] Estimations depuis la mise à jour du site
+    `,
         '1.1.48': `
         [Correction] La liste de courses ne s'affichait pas dans l'interface
     `,
@@ -1458,7 +1461,7 @@
         update_external_tools_pending_btn_label: {
             en: `Updating...`,
             fr: `Mise à jour en cours...`,
-            de: `Aktualisierung…`,
+            de: `Aktualisierung...`,
             es: `Actualizando...`
         },
         update_external_tools_success_btn_label: {
@@ -10032,9 +10035,9 @@
                     today_attack: undefined,
                     tomorrow_attack: undefined
                 };
-                getApofooAttackCalculation(state.mh_user.townDetails?.day, false).then((today_result) => {
+                getAttackCalculation(state.mh_user.townDetails?.day, false).then((today_result) => {
                     estimations.today_attack = today_result;
-                    getApofooAttackCalculation(state.mh_user.townDetails?.day + 1, false).then((tomorrow_result) => {
+                    getAttackCalculation(state.mh_user.townDetails?.day + 1, false).then((tomorrow_result) => {
                         estimations.tomorrow_attack = tomorrow_result;
                         resolve(estimations);
                     });
@@ -10046,9 +10049,9 @@
             });
         });
     }
-    function getApofooAttackCalculation(day, beta) {
+    function getAttackCalculation(day, beta) {
         return new Promise((resolve, reject) => {
-            fetcher(state.api_url + `/attaqueEstimation/apofooAttackCalculation${beta ? '/beta' : ''}?day=${day}&townId=${state.mh_user.townDetails?.townId}`)
+            fetcher(state.api_url + `/attaqueEstimation/attackCalculation${beta ? '/beta' : ''}?day=${day}&townId=${state.mh_user.townDetails?.townId}`)
                 .then((response) => {
                 if (response.status === 200) {
                     return response.json();
@@ -10133,7 +10136,7 @@
                 };
                 let createCalculatedAttackRow = (calculated_attack) => {
                     let estim_values_block_title_calculated_text = ``;
-                    estim_values_block_title_calculated_text += `<div class="attack" style="display: flex; justify-content: space-between; gap: 1em;"><b>${getI18N(texts.calculated_attack)} (Apofoo)</b><div><span>${calculated_attack.result.min}</span> - <span>${calculated_attack.result.max}</span></div></div>`;
+                    estim_values_block_title_calculated_text += `<div class="attack" style="display: flex; justify-content: space-between; gap: 1em;"><b>${getI18N(texts.calculated_attack)}</b><div><span>${calculated_attack.result.min}</span> - <span>${calculated_attack.result.max}</span></div></div>`;
                     return estim_values_block_title_calculated_text;
                 };
                 let updateEstimationRow = (estimations, percent, type) => {

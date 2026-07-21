@@ -19,9 +19,9 @@ export function getEstimations() {
                     today_attack: undefined,
                     tomorrow_attack: undefined
                 }
-                getApofooAttackCalculation(state.mh_user.townDetails?.day, false).then((today_result) => {
+                getAttackCalculation(state.mh_user.townDetails?.day, false).then((today_result) => {
                     estimations.today_attack = today_result;
-                    getApofooAttackCalculation(state.mh_user.townDetails?.day + 1, false).then((tomorrow_result) => {
+                    getAttackCalculation(state.mh_user.townDetails?.day + 1, false).then((tomorrow_result) => {
                         estimations.tomorrow_attack = tomorrow_result;
                         resolve(estimations);
                     });
@@ -35,9 +35,9 @@ export function getEstimations() {
 }
 
 
-export function getApofooAttackCalculation(day, beta) {
+export function getAttackCalculation(day, beta) {
     return new Promise<any>((resolve, reject) => {
-        fetcher(state.api_url + `/attaqueEstimation/apofooAttackCalculation${beta ? '/beta' : ''}?day=${day}&townId=${state.mh_user.townDetails?.townId}`)
+        fetcher(state.api_url + `/attaqueEstimation/attackCalculation${beta ? '/beta' : ''}?day=${day}&townId=${state.mh_user.townDetails?.townId}`)
             .then((response) => {
                 if (response.status === 200) {
                     return response.json();

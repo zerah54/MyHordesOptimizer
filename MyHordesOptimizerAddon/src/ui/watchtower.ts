@@ -37,7 +37,7 @@ export function displayEstimationsOnWatchtower() {
             };
             let createCalculatedAttackRow = (calculated_attack) => {
                 let estim_values_block_title_calculated_text = ``;
-                estim_values_block_title_calculated_text += `<div class="attack" style="display: flex; justify-content: space-between; gap: 1em;"><b>${getI18N(texts.calculated_attack)} (Apofoo)</b><div><span>${calculated_attack.result.min}</span> - <span>${calculated_attack.result.max}</span></div></div>`;
+                estim_values_block_title_calculated_text += `<div class="attack" style="display: flex; justify-content: space-between; gap: 1em;"><b>${getI18N(texts.calculated_attack)}</b><div><span>${calculated_attack.result.min}</span> - <span>${calculated_attack.result.max}</span></div></div>`;
 
                 return estim_values_block_title_calculated_text;
             }
