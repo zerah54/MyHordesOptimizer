@@ -1,11 +1,12 @@
 import { CommonModule, NgOptimizedImage, NgTemplateOutlet } from '@angular/common';
-import { Component, computed, input, Input, InputSignal, Signal } from '@angular/core';
+import { Component, computed, Input, input,InputSignal, Signal } from '@angular/core';
 import { MatTabChangeEvent, MatTabsModule } from '@angular/material/tabs';
+
 import { HORDES_IMG_REPO } from '../../../../_abstract_model/const';
 import { DisplayPseudoMode, Entry } from '../../../../_abstract_model/interfaces';
 import { Imports } from '../../../../_abstract_model/types/_types';
-import { CitizenInfo } from '../../../../_abstract_model/types/citizen-info.class';
 import { Citizen } from '../../../../_abstract_model/types/citizen.class';
+import { CitizenInfo } from '../../../../_abstract_model/types/citizen-info.class';
 import { Item } from '../../../../_abstract_model/types/item.class';
 import { entryHasKeyword } from '../../../../_core/utilities/registry.util';
 import { CitizenInfoComponent } from '../../../../_shared/citizen-info/citizen-info.component';
@@ -30,7 +31,7 @@ export class PlaysRegistryComponent {
 
     // TODO: Skipped for migration because:
     //  Accessor inputs cannot be migrated as they are too complex.
-    @Input({required: true}) set registry(registry: Entry[] | undefined) {
+    @Input({ required: true }) set registry(registry: Entry[] | undefined) {
         if (registry) {
             this.entries = registry;
             this.filterEntriesByType(registry);

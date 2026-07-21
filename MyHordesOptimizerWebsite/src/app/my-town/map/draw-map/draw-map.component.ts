@@ -1,5 +1,6 @@
 import { CommonModule, NgTemplateOutlet } from '@angular/common';
-import { Component, input, Input, InputSignal } from '@angular/core';
+import { Component, Input, input,InputSignal } from '@angular/core';
+
 import { Imports } from '../../../_abstract_model/types/_types';
 import { Cell } from '../../../_abstract_model/types/cell.class';
 import { Citizen } from '../../../_abstract_model/types/citizen.class';
@@ -35,7 +36,7 @@ export class DrawMapComponent {
     @Input() set map(map: Town) {
         if (map) {
             this.complete_map = map;
-            this.x_row = Array.from({length: map?.map_width}, (_: unknown, i: number) => i - +map.town_x);
+            this.x_row = Array.from({ length: map?.map_width }, (_: unknown, i: number) => i - +map.town_x);
             const rows: Cell[][] = groupBy(map?.cells || [], (cell: Cell) => cell.y);
 
             rows.forEach((row: Cell[]) => {

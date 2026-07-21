@@ -1,6 +1,7 @@
 import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, Subscriber } from 'rxjs';
+
 import { CampingBonusDTO } from '../dto/camping-bonus.dto';
 import { CampingOddsDTO } from '../dto/camping-odds.dto';
 import { CampingBonus } from '../types/camping-bonus.class';

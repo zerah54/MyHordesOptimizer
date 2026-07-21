@@ -1,17 +1,18 @@
 import { Injectable } from '@angular/core';
 import { Observable, Subject } from 'rxjs';
+
 import { getTown } from '../../_core/utilities/localstorage.util';
-import { CitizenExpeditionBagDTO } from '../dto/citizen-expedition-bag.dto';
 import { CitizenExpeditionDTO } from '../dto/citizen-expedition.dto';
+import { CitizenExpeditionBagDTO } from '../dto/citizen-expedition-bag.dto';
+import { ExpeditionDTO } from '../dto/expedition.dto';
 import { ExpeditionOrderDTO } from '../dto/expedition-order.dto';
 import { ExpeditionPartDTO } from '../dto/expedition-part.dto';
-import { ExpeditionDTO } from '../dto/expedition.dto';
 import { dtoToModelArray, modelToDtoArray } from '../types/_common.class';
-import { CitizenExpeditionBag } from '../types/citizen-expedition-bag.class';
 import { CitizenExpedition } from '../types/citizen-expedition.class';
+import { CitizenExpeditionBag } from '../types/citizen-expedition-bag.class';
+import { Expedition } from '../types/expedition.class';
 import { ExpeditionOrder } from '../types/expedition-order.class';
 import { ExpeditionPart } from '../types/expedition-part.class';
-import { Expedition } from '../types/expedition.class';
 import { RealtimeGlobalService } from './_realtime-global.service';
 
 @Injectable({

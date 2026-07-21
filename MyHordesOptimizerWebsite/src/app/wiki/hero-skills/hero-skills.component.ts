@@ -1,11 +1,12 @@
 import { CommonModule, NgOptimizedImage } from '@angular/common';
-import { Component, DestroyRef, inject, OnInit } from '@angular/core';
+import { Component, DestroyRef, inject,OnInit } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatCardModule } from '@angular/material/card';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatSortModule } from '@angular/material/sort';
 import { MatTableModule } from '@angular/material/table';
 import moment from 'moment';
+
 import { HORDES_IMG_REPO } from '../../_abstract_model/const';
 import { StandardColumn } from '../../_abstract_model/interfaces';
 import { ApiService } from '../../_abstract_model/services/api.service';
@@ -37,10 +38,10 @@ export class HeroSkillsComponent implements OnInit {
     public new_hero_skills: NewHeroSkill[] = skills;
     /** La liste des colonnes */
     public readonly columns: StandardColumn[] = [
-        {id: 'icon', header: ''},
-        {id: 'label', header: $localize`Pouvoir`, sticky: true},
-        {id: 'days_needed', header: $localize`Jours héros nécessaires`},
-        {id: 'description', header: $localize`Description`}
+        { id: 'icon', header: '' },
+        { id: 'label', header: $localize`Pouvoir`, sticky: true },
+        { id: 'days_needed', header: $localize`Jours héros nécessaires` },
+        { id: 'description', header: $localize`Description` }
     ];
 
     private readonly api: ApiService = inject(ApiService);

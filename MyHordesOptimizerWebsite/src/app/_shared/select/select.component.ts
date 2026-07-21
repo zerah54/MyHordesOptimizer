@@ -7,8 +7,8 @@ import {
     ElementRef,
     HostBinding,
     inject,
-    input,
     Input,
+    input,
     InputSignal,
     InputSignalWithTransform,
     OnDestroy,
@@ -17,8 +17,7 @@ import {
     Signal,
     signal,
     viewChild,
-    WritableSignal
-} from '@angular/core';
+    WritableSignal} from '@angular/core';
 import { AbstractControl, ControlValueAccessor, NgControl, UntypedFormControl, ValidationErrors, Validator, Validators } from '@angular/forms';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatOption, MatOptionModule } from '@angular/material/core';
@@ -28,6 +27,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInput, MatInputModule } from '@angular/material/input';
 import { MatSelect, MatSelectModule } from '@angular/material/select';
 import { Subject } from 'rxjs';
+
 import { HORDES_IMG_REPO } from '../../_abstract_model/const';
 import { Imports } from '../../_abstract_model/types/_types';
 import { normalizeString } from '../../_core/utilities/string.utils';
@@ -55,9 +55,9 @@ const material_modules: Imports = [MatChipsModule, MatDividerModule, MatFormFiel
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class SelectComponent<T> implements ControlValueAccessor, Validator, MatFormFieldControl<T | string | T[] | string[] | undefined>, OnDestroy {
-    public ngControl: NgControl | null = inject(NgControl, {optional: true, self: true});
-    public validator: Validators | null = inject(Validators, {optional: true, self: true});
-    protected readonly parent_form_field: MatFormField | null = inject(MatFormField, {optional: true});
+    public ngControl: NgControl | null = inject(NgControl, { optional: true, self: true });
+    public validator: Validators | null = inject(Validators, { optional: true, self: true });
+    protected readonly parent_form_field: MatFormField | null = inject(MatFormField, { optional: true });
     private readonly _elementRef: ElementRef = inject(ElementRef);
 
     private static nextId: number = 0;
@@ -68,10 +68,10 @@ export class SelectComponent<T> implements ControlValueAccessor, Validator, MatF
     public select: Signal<MatSelect | undefined> = viewChild(MatSelect);
     public filter_input: Signal<MatInput | undefined> = viewChild(MatInput);
 
-    public multiple: InputSignalWithTransform<boolean, unknown> = input(false, {transform: booleanAttribute});
-    public noLabel: InputSignalWithTransform<boolean, unknown> = input(false, {transform: booleanAttribute});
-    public emptyOption: InputSignalWithTransform<boolean, unknown> = input(false, {transform: booleanAttribute});
-    public clearable: InputSignalWithTransform<boolean, unknown> = input(false, {transform: booleanAttribute});
+    public multiple: InputSignalWithTransform<boolean, unknown> = input(false, { transform: booleanAttribute });
+    public noLabel: InputSignalWithTransform<boolean, unknown> = input(false, { transform: booleanAttribute });
+    public emptyOption: InputSignalWithTransform<boolean, unknown> = input(false, { transform: booleanAttribute });
+    public clearable: InputSignalWithTransform<boolean, unknown> = input(false, { transform: booleanAttribute });
     public bindLabel: InputSignal<string | undefined> = input();
     public bindValue: InputSignal<string | undefined> = input();
     public bindIcon: InputSignal<string | undefined> = input();
@@ -79,10 +79,10 @@ export class SelectComponent<T> implements ControlValueAccessor, Validator, MatF
     public moreInfo: InputSignal<((element: string | T) => string) | undefined> = input<((element: string | T) => string) | undefined>(undefined);
     //current form control input. helpful in validating and accessing form control
     public form_control: InputSignal<UntypedFormControl> = input(new UntypedFormControl());
-    public searchable: InputSignalWithTransform<boolean, unknown> = input(false, {transform: booleanAttribute});
+    public searchable: InputSignalWithTransform<boolean, unknown> = input(false, { transform: booleanAttribute });
     public class: InputSignal<string> = input('');
     /** Doit-on afficher sous forme de chips les différentes valeurs ? Fonctionne uniquement si "multiple" */
-    public chips: InputSignalWithTransform<boolean, unknown> = input(false, {transform: booleanAttribute});
+    public chips: InputSignalWithTransform<boolean, unknown> = input(false, { transform: booleanAttribute });
 
     // TODO: Skipped for migration because:
     //  Accessor inputs cannot be migrated as they are too complex.
@@ -163,7 +163,7 @@ export class SelectComponent<T> implements ControlValueAccessor, Validator, MatF
     private label_pipe: LabelPipe<T> = new LabelPipe();
 
     /** propagate changes into the custom form control */
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     public propagateChange = (_: unknown): void => {
         //no-empty
     };

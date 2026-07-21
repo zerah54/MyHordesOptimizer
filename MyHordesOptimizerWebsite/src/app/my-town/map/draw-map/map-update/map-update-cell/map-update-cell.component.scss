@@ -11,6 +11,46 @@
             }
         }
 
+        /** Relevés des métiers fouineur et éclaireur, saisis depuis cette case */
+        .job-radar {
+
+            h4 {
+                margin: 0 0 0.5em;
+            }
+
+            .zone-levels {
+                display: flex;
+                flex-direction: column;
+            }
+
+            .radar-help {
+                font-size: 0.85em;
+                font-style: italic;
+                margin: 0 0 0.5em;
+            }
+
+            .radars {
+                display: flex;
+                flex-direction: column;
+                gap: 0.25em;
+
+                .radar-direction {
+                    display: flex;
+                    align-items: center;
+                    gap: 0.5em;
+
+                    .direction-label {
+                        flex: 0 0 5em;
+                    }
+
+                    .mat-mdc-form-field {
+                        flex: 1 1 0;
+                        min-width: 0;
+                    }
+                }
+            }
+        }
+
         .items {
             display: flex;
             align-items: center;

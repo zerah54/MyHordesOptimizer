@@ -1,4 +1,5 @@
 import moment from 'moment-timezone';
+
 import { TokenWithMe } from '../../_abstract_model/types/token-with-me.class';
 
 export function isValidToken(token: TokenWithMe | null): boolean {

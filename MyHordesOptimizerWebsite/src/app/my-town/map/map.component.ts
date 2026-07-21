@@ -1,6 +1,6 @@
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { CommonModule } from '@angular/common';
-import { Component, DestroyRef, HostListener, inject, OnInit } from '@angular/core';
+import { Component, DestroyRef, HostListener, inject,OnInit } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -15,13 +15,14 @@ import { MatListModule } from '@angular/material/list';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSidenavModule } from '@angular/material/sidenav';
+
 import { environment } from '../../../environments/environment';
 import { BREAKPOINTS } from '../../_abstract_model/const';
 import { ApiService } from '../../_abstract_model/services/api.service';
 import { TownService } from '../../_abstract_model/services/town.service';
 import { Dictionary, Imports } from '../../_abstract_model/types/_types';
-import { CitizenInfo } from '../../_abstract_model/types/citizen-info.class';
 import { Citizen } from '../../_abstract_model/types/citizen.class';
+import { CitizenInfo } from '../../_abstract_model/types/citizen-info.class';
 import { Item } from '../../_abstract_model/types/item.class';
 import { Ruin } from '../../_abstract_model/types/ruin.class';
 import { Town } from '../../_abstract_model/types/town.class';
@@ -135,7 +136,7 @@ export class MapComponent implements OnInit {
         if (already_exists && current_distances.length > 0) return;
 
         /** Sinon, on ajoute à la liste */
-        current_distances.push({...this.new_distance_option});
+        current_distances.push({ ...this.new_distance_option });
 
         this.changeOptions('distances', [...current_distances]);
     }
@@ -163,7 +164,7 @@ export class MapComponent implements OnInit {
     public changeOptions<T>(key: string, value: T): void {
         (<{ [key: string]: unknown }><unknown>this.options)[key] = value;
         setTimeout(() => {
-            this.options = {...this.options};
+            this.options = { ...this.options };
             localStorage.setItem('MAP_OPTIONS', JSON.stringify(this.options));
         });
     }
@@ -182,7 +183,7 @@ export class MapComponent implements OnInit {
 }
 
 export interface MapOptions {
-    map_type: 'digs' | 'danger' | 'trash';
+    map_type: 'digs' | 'danger' | 'trash' | 'scout';
     dig_mode: 'max' | 'average';
     trash_mode: 'nb' | 'def';
     displayed_scrut_zone: Dictionary<boolean>;

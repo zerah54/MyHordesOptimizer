@@ -7,21 +7,21 @@ import {
     ElementRef,
     HostBinding,
     inject,
-    input,
     Input,
+    input,
     InputSignalWithTransform,
     OnChanges,
     OnDestroy,
     output,
     OutputEmitterRef,
     SecurityContext,
-    SimpleChanges
-} from '@angular/core';
+    SimpleChanges} from '@angular/core';
 import { ControlValueAccessor, FormsModule, NgControl } from '@angular/forms';
 import { MatFormFieldControl, MatFormFieldModule } from '@angular/material/form-field';
 import { DomSanitizer } from '@angular/platform-browser';
 import { AngularEditorConfig, AngularEditorModule } from '@kolkov/angular-editor';
 import { Subject } from 'rxjs';
+
 import { Imports } from '../../_abstract_model/types/_types';
 
 const angular_common: Imports = [FormsModule];
@@ -43,7 +43,7 @@ const material_modules: Imports = [MatFormFieldModule];
     imports: [...angular_common, ...components, ...material_modules, ...pipes, AngularEditorModule]
 })
 export class EditorComponent implements ControlValueAccessor, OnChanges, OnDestroy, MatFormFieldControl<string> {
-    public ngControl: NgControl | null = inject(NgControl, {optional: true, self: true});
+    public ngControl: NgControl | null = inject(NgControl, { optional: true, self: true });
     protected sanitizer: DomSanitizer = inject(DomSanitizer);
     private cdr: ChangeDetectorRef = inject(ChangeDetectorRef);
     private element_ref: ElementRef = inject(ElementRef);
@@ -57,7 +57,7 @@ export class EditorComponent implements ControlValueAccessor, OnChanges, OnDestr
     // public name: InputSignal<string> = input('');
     /** Le libellé du champ */
     // public label: InputSignal<string> = input('');
-    public showToolbarOnFocus: InputSignalWithTransform<boolean, unknown> = input(false, {transform: booleanAttribute});
+    public showToolbarOnFocus: InputSignalWithTransform<boolean, unknown> = input(false, { transform: booleanAttribute });
 
     // TODO: Skipped for migration because:
     //  Accessor inputs cannot be migrated as they are too complex.
@@ -87,7 +87,7 @@ export class EditorComponent implements ControlValueAccessor, OnChanges, OnDestr
         }
     }
 
-    // eslint-disable-next-line @angular-eslint/no-input-rename
+     
     // TODO: Skipped for migration because:
     //  This input overrides a field from a superclass, while the superclass field
     //  is not migrated.

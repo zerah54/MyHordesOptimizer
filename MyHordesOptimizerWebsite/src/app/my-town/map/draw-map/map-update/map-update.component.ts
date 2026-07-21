@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, DestroyRef, inject, OnInit } from '@angular/core';
+import { Component, DestroyRef, inject,OnInit } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -9,6 +9,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatTabsModule } from '@angular/material/tabs';
 import moment from 'moment';
+
 import { DigsService } from '../../../../_abstract_model/services/digs.service';
 import { TownService } from '../../../../_abstract_model/services/town.service';
 import { Imports } from '../../../../_abstract_model/types/_types';
@@ -47,7 +48,7 @@ export class MapUpdateComponent implements OnInit {
     private readonly destroy_ref: DestroyRef = inject(DestroyRef);
 
     constructor() {
-        this.cell = new Cell({...this.data.cell.modelToDto()});
+        this.cell = new Cell({ ...this.data.cell.modelToDto() });
     }
 
     public ngOnInit(): void {
@@ -67,7 +68,7 @@ export class MapUpdateComponent implements OnInit {
             .pipe(takeUntilDestroyed(this.destroy_ref))
             .subscribe({
                 next: (): void => {
-                    this.data.cell = new Cell({...this.cell.modelToDto()});
+                    this.data.cell = new Cell({ ...this.cell.modelToDto() });
                 }
             });
         if (this.digs?.length > 0) {

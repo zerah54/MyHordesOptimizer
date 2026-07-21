@@ -1,6 +1,6 @@
 import { TownDTO } from '../dto/town.dto';
-import { Cell } from './cell.class';
 import { CommonModel, dtoToModelArray, modelToDtoArray } from './_common.class';
+import { Cell } from './cell.class';
 
 export class Town extends CommonModel<TownDTO> {
 

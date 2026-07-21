@@ -1,6 +1,7 @@
 import { HttpContextToken, HttpErrorResponse, HttpEvent, HttpHandlerFn, HttpRequest } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { catchError, Observable, retry, throwError } from 'rxjs';
+
 import { AuthenticationService } from '../../_abstract_model/services/authentication.service';
 import { SnackbarService } from './snackbar.service';
 

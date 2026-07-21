@@ -3,21 +3,19 @@
 
 import '@angular/localize/init';
 import 'zone.js';
+import 'moment/dist/locale/de';
+import 'moment/dist/locale/en-gb';
+import 'moment/dist/locale/es';
+import 'moment/dist/locale/fr';
 
 import { registerLocaleData } from '@angular/common';
 import localeDE from '@angular/common/locales/de';
 import localeEN from '@angular/common/locales/en';
 import localeES from '@angular/common/locales/es';
 import localeFR from '@angular/common/locales/fr';
-
-import 'moment/dist/locale/de';
-import 'moment/dist/locale/en-gb';
-import 'moment/dist/locale/es';
-import 'moment/dist/locale/fr';
 import { enableProdMode } from '@angular/core';
 import { loadTranslations } from '@angular/localize';
 import { bootstrapApplication } from '@angular/platform-browser';
-
 import * as Sentry from '@sentry/angular';
 
 import { AppComponent } from './app/app.component';

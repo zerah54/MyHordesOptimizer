@@ -3,6 +3,7 @@ using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.Bags;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Map;
 using MyHordesOptimizerApi.Extensions;
 using MyHordesOptimizerApi.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -52,6 +53,19 @@ namespace MyHordesOptimizerApi.MappingProfiles.Maps
                 .ForMember(dto => dto.NbZombie, opt => opt.MapFrom(model => model.NbZombie))
                 .ForMember(dto => dto.NbZombieKilled, opt => opt.MapFrom(model => model.NbZombieKilled))
                 .ForMember(dto => dto.Note, opt => opt.MapFrom(model => model.Note))
+                .ForMember(dto => dto.ScavZoneLevel, opt => opt.MapFrom(model => model.ScavZoneLevel))
+                .ForMember(dto => dto.ScoutZoneLevel, opt => opt.MapFrom(model => model.ScoutZoneLevel))
+                .ForMember(dto => dto.ScoutEstimationZombie, opt => opt.MapFrom(model => model.ScoutEstimationZombie))
+                // L'estimation de l'Éclaireur est bruitée : seul l'encadrement est exploitable
+                .ForMember(dto => dto.ScoutEstimationMin, opt => opt.MapFrom(model =>
+                    model.ScoutEstimationZombie.HasValue
+                        ? (int?)Math.Max(0, model.ScoutEstimationZombie.Value - MapCellRadarExtensions.GetScoutEstimationRange(model.ScoutZoneLevel))
+                        : (int?)null))
+                .ForMember(dto => dto.ScoutEstimationMax, opt => opt.MapFrom(model =>
+                    model.ScoutEstimationZombie.HasValue
+                        ? (int?)(model.ScoutEstimationZombie.Value + MapCellRadarExtensions.GetScoutEstimationRange(model.ScoutZoneLevel))
+                        : (int?)null))
+                .ForMember(dto => dto.ScoutEstimationLastUpdateInfo, opt => opt.MapFrom(model => model.IdScoutEstimationLastUpdateInfoNavigation))
                 .ForMember(dto => dto.TotalSucces, opt => opt.Ignore())
                 .ForMember(dto => dto.X, opt => opt.MapFrom(model => model.X))
                 .ForMember(dto => dto.Y, opt => opt.MapFrom(model => model.Y))
@@ -96,6 +110,12 @@ namespace MyHordesOptimizerApi.MappingProfiles.Maps
                .ForMember(dest => dest.NbRuinDig, opt => opt.Ignore())
                .ForMember(dest => dest.NbZombie, opt => opt.MapFrom(src => src.NbZombie))
                .ForMember(dest => dest.NbZombieKilled, opt => opt.MapFrom(src => src.NbZombieKilled))
+               // Les relevés des métiers touchent aussi les cases voisines : ils sont appliqués
+               // par MapCellRadarExtensions, pas par ce mapping
+               .ForMember(dest => dest.ScavZoneLevel, opt => opt.Ignore())
+               .ForMember(dest => dest.ScoutZoneLevel, opt => opt.Ignore())
+               .ForMember(dest => dest.ScoutEstimationZombie, opt => opt.Ignore())
+               .ForMember(dest => dest.IdScoutEstimationLastUpdateInfo, opt => opt.Ignore())
                .ForMember(dest => dest.X, opt => opt.MapFrom(src => src.X))
                .ForMember(dest => dest.Y, opt => opt.MapFrom(src => src.Y))
                .ForMember(dest => dest.ZoneRegen, opt => opt.Ignore());

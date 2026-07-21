@@ -1,4 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core';
+
 import { HeroicActionEnum } from '../../../../../_abstract_model/enum/heroic-action.enum';
 import { HeroicActions, HeroicActionsWithValue } from '../../../../../_abstract_model/types/heroic-actions.class';
 

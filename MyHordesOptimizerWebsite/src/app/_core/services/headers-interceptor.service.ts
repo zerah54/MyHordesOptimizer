@@ -1,6 +1,7 @@
 import { HttpEvent, HttpHandlerFn, HttpHeaders, HttpRequest } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { catchError, map, Observable, of, switchMap } from 'rxjs';
+
 import { AuthenticationService } from '../../_abstract_model/services/authentication.service';
 import { TokenWithMe } from '../../_abstract_model/types/token-with-me.class';
 import { getExternalAppId, getTokenWithMeWithExpirationDate } from '../utilities/localstorage.util';

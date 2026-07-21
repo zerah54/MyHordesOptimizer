@@ -1,30 +1,40 @@
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, HostListener, inject, OnInit, Signal, viewChild } from '@angular/core';
+import { Component, ElementRef, HostListener, inject, OnDestroy, OnInit, Signal, viewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
+import { MatCheckbox } from '@angular/material/checkbox';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSlideToggle } from '@angular/material/slide-toggle';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { ChartConfiguration, ChartDataset, ChartEvent, LegendElement, LegendItem } from 'chart.js';
 import Chart from 'chart.js/auto';
 import { Color } from 'chartjs-plugin-datalabels/types/options';
+import moment from 'moment';
+import { firstValueFrom } from 'rxjs';
+
 import { PLANIF_VALUES, TDG_VALUES } from '../../../_abstract_model/const';
 import { MinMax } from '../../../_abstract_model/interfaces';
+import { AdminService } from '../../../_abstract_model/services/admin.service';
 import { TownStatisticsService } from '../../../_abstract_model/services/town-statistics.service';
-import { Dictionary, Imports } from '../../../_abstract_model/types/_types';
-import { EstimationGraphValues, EstimationsResult } from '../../../_abstract_model/types/estimations-result.class';
+import { Dictionary, Imports, TownTypeId } from '../../../_abstract_model/types/_types';
 import { Estimations } from '../../../_abstract_model/types/estimations.class';
+import { EstimationGraphValues, EstimationsResult } from '../../../_abstract_model/types/estimations-result.class';
 import { Regen } from '../../../_abstract_model/types/regen.class';
 import { ClipboardService } from '../../../_core/services/clipboard.service';
+import { TownContextService } from '../../../_core/services/town-context.service';
 import { getMaxAttack, getMinAttack } from '../../../_core/utilities/estimations.util';
 import { getTown } from '../../../_core/utilities/localstorage.util';
 import {
     HeaderWithNumberPreviousNextFilterComponent
 } from '../../../_shared/lists/header-with-number-previous-next/header-with-number-previous-next-filter.component';
+import { deriveValueRange, isReboundPossible,NO_CONSTRAINT, RED_SOUL_FACTOR_CAP, RED_SOUL_PENALTY, RefinerParams } from './refiner/attack-model';
+import { AttackRefinerService, RefineResult } from './refiner/attack-refiner.service';
 
 const angular_common: Imports = [CommonModule, FormsModule];
 const components: Imports = [HeaderWithNumberPreviousNextFilterComponent];

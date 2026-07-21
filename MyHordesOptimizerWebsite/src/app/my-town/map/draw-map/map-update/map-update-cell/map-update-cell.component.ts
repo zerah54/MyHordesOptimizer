@@ -1,5 +1,5 @@
 import { CommonModule, NgOptimizedImage } from '@angular/common';
-import { Component, DestroyRef, inject, input, InputSignal, OnInit, output, OutputEmitterRef } from '@angular/core';
+import { Component, DestroyRef, inject, input, InputSignal, OnInit, output,OutputEmitterRef } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatCheckboxModule } from '@angular/material/checkbox';
@@ -7,14 +7,17 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatMenuModule } from '@angular/material/menu';
+import { MatSelectModule } from '@angular/material/select';
 import moment from 'moment';
+
 import { HORDES_IMG_REPO } from '../../../../../_abstract_model/const';
+import { Direction } from '../../../../../_abstract_model/enum/direction.enum';
 import { ApiService } from '../../../../../_abstract_model/services/api.service';
 import { Imports } from '../../../../../_abstract_model/types/_types';
 import { Cell } from '../../../../../_abstract_model/types/cell.class';
 import { Citizen } from '../../../../../_abstract_model/types/citizen.class';
-import { ItemCountShort } from '../../../../../_abstract_model/types/item-count-short.class';
 import { Item } from '../../../../../_abstract_model/types/item.class';
+import { ItemCountShort } from '../../../../../_abstract_model/types/item-count-short.class';
 import { ArrayItemDetailsPipe } from '../../../../../_core/pipes/array-item-details.pipe';
 import { ItemDetailsPipe } from '../../../../../_core/pipes/item-details.pipe';
 import { LastUpdateComponent } from '../../../../../_shared/last-update/last-update.component';
@@ -23,7 +26,7 @@ import { ItemsInBagsPipe } from './items-in-bags.pipe';
 const angular_common: Imports = [CommonModule, FormsModule, NgOptimizedImage, ReactiveFormsModule];
 const components: Imports = [LastUpdateComponent];
 const pipes: Imports = [ArrayItemDetailsPipe, ItemDetailsPipe, ItemsInBagsPipe];
-const material_modules: Imports = [MatCheckboxModule, MatDividerModule, MatFormFieldModule, MatInputModule, MatMenuModule];
+const material_modules: Imports = [MatCheckboxModule, MatDividerModule, MatFormFieldModule, MatInputModule, MatMenuModule, MatSelectModule];
 
 @Component({
     selector: 'mho-map-update-cell',
@@ -44,6 +47,14 @@ export class MapUpdateCellComponent implements OnInit {
 
     public cell_form!: FormGroup;
 
+    /** Les quatre directions accessibles, dans l'ordre d'affichage du radar */
+    public readonly directions: RadarDirection[] = [
+        { key: 'north', label: Direction.NORTH.getLabel() },
+        { key: 'west', label: Direction.WEST.getLabel() },
+        { key: 'east', label: Direction.EAST.getLabel() },
+        { key: 'south', label: Direction.SOUTH.getLabel() }
+    ];
+
     public readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
     public readonly locale: string = moment.locale();
 
@@ -62,18 +73,52 @@ export class MapUpdateCellComponent implements OnInit {
             nb_killed_zombies: [this.cell().nb_zombie_killed],
             is_dryed: [this.cell().is_dryed],
             items: [this.cell().items],
+            scav_zone_level: [this.cell().scav_zone_level],
+            scout_zone_level: [this.cell().scout_zone_level],
+            scav_north: [null],
+            scav_south: [null],
+            scav_east: [null],
+            scav_west: [null],
+            scout_north: [null],
+            scout_south: [null],
+            scout_east: [null],
+            scout_west: [null],
         });
 
         this.cell_form.valueChanges
             .pipe(takeUntilDestroyed(this.destroy_ref))
             .subscribe((values: CellInfoUpdate) => {
-                let new_cell: Cell = this.cell();
+                const new_cell: Cell = this.cell();
                 new_cell.is_dryed = values.is_dryed;
                 new_cell.nb_zombie = +values.nb_zombies;
                 new_cell.nb_zombie_killed = +values.nb_killed_zombies;
                 new_cell.items = [...values.items];
+                new_cell.scav_zone_level = MapUpdateCellComponent.toNullableNumber(values.scav_zone_level);
+                new_cell.scout_zone_level = MapUpdateCellComponent.toNullableNumber(values.scout_zone_level);
+                /** Les radars décrivent les cases voisines : ils ne sont envoyés que si au moins une direction est renseignée */
+                new_cell.scav_next_cells = MapUpdateCellComponent.buildRadar<boolean>([values.scav_north, values.scav_south, values.scav_east, values.scav_west]);
+                new_cell.scout_next_cells = MapUpdateCellComponent.buildRadar<number>([
+                    MapUpdateCellComponent.toNullableNumber(values.scout_north),
+                    MapUpdateCellComponent.toNullableNumber(values.scout_south),
+                    MapUpdateCellComponent.toNullableNumber(values.scout_east),
+                    MapUpdateCellComponent.toNullableNumber(values.scout_west)
+                ]);
                 this.cellChange.emit(new_cell);
             });
+    }
+
+    /** Un champ vide ou non renseigné ne doit pas être transmis comme la valeur 0 */
+    private static toNullableNumber(value: number | string | null | undefined): number | null {
+        if (value === null || value === undefined || value === '') return null;
+        const parsed: number = +value;
+        return isNaN(parsed) ? null : parsed;
+    }
+
+    /** Construit un radar à partir des 4 directions, ou null si aucune n'est renseignée */
+    private static buildRadar<T>(values: (T | null)[]): { north: T | null, south: T | null, east: T | null, west: T | null } | null {
+        const [north, south, east, west]: (T | null)[] = values;
+        if (north === null && south === null && east === null && west === null) return null;
+        return { north, south, east, west };
     }
 
 
@@ -142,9 +187,26 @@ export class MapUpdateCellComponent implements OnInit {
 }
 
 
+interface RadarDirection {
+    key: 'north' | 'south' | 'east' | 'west';
+    label: string;
+}
+
 interface CellInfoUpdate {
     nb_zombies: number;
     nb_killed_zombies: number;
     is_dryed: boolean;
     items: ItemCountShort[];
+    scav_zone_level: number | null;
+    scout_zone_level: number | null;
+    /** Radar du fouineur : true = case voisine épuisée, false = il reste des objets, null = non renseigné */
+    scav_north: boolean | null;
+    scav_south: boolean | null;
+    scav_east: boolean | null;
+    scav_west: boolean | null;
+    /** Radar de l'éclaireur : estimation du nombre de zombies par direction */
+    scout_north: number | null;
+    scout_south: number | null;
+    scout_east: number | null;
+    scout_west: number | null;
 }

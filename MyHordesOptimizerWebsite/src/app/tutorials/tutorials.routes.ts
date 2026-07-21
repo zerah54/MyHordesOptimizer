@@ -1,4 +1,5 @@
 import { Route } from '@angular/router';
+
 import { TutoDiscordBotInstallationComponent } from './discord-bot/tuto-discord-bot-installation/tuto-discord-bot-installation.component';
 import { TutoScriptAlertsComponent } from './script/tuto-script-extension-alerts/tuto-script-alerts.component';
 import { TutoScriptDisplayComponent } from './script/tuto-script-extension-display/tuto-script-display.component';

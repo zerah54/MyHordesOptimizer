@@ -11,13 +11,14 @@ import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import moment from 'moment';
+
 import { HORDES_IMG_REPO } from '../../_abstract_model/const';
 import { StandardColumn } from '../../_abstract_model/interfaces';
 import { ApiService } from '../../_abstract_model/services/api.service';
 import { TownService } from '../../_abstract_model/services/town.service';
 import { Imports } from '../../_abstract_model/types/_types';
-import { RuinItem } from '../../_abstract_model/types/ruin-item.class';
 import { Ruin } from '../../_abstract_model/types/ruin.class';
+import { RuinItem } from '../../_abstract_model/types/ruin-item.class';
 import { TownDetails } from '../../_abstract_model/types/town-details.class';
 import { ColumnIdPipe } from '../../_core/pipes/column-id.pipe';
 import { getTown } from '../../_core/utilities/localstorage.util';
@@ -39,15 +40,12 @@ const material_modules: Imports = [MatButtonModule, MatCardModule, MatIconModule
 })
 export class RuinsComponent implements OnInit {
 
-    protected readonly sort: Signal<MatSort> = viewChild.required(MatSort);
-
     /** Le dossier dans lequel sont stockées les images */
     public readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
     /** La locale */
     public readonly locale: string = moment.locale();
     /** La ville actuelle */
     public readonly town: TownDetails | null = getTown();
-
     /** La liste des bâtiments du jeu */
     public ruins!: Ruin[];
     /** La liste des bâtiments de la ville */
@@ -58,15 +56,14 @@ export class RuinsComponent implements OnInit {
     public datasource: MatTableDataSource<Ruin> = new MatTableDataSource();
     /** La liste des colonnes */
     public readonly columns: RuinColumns[] = [
-        {id: 'label', header: $localize`Nom du bâtiment`, sortable: true, sticky: true},
-        {id: 'description', header: $localize`Description`, sortable: false},
-        {id: 'min_dist', header: $localize`Distance minimum`, sortable: true},
-        {id: 'max_dist', header: $localize`Distance maximum`, sortable: true},
-        {id: 'camping', header: $localize`Bonus en camping`, sortable: true},
-        {id: 'capacity', header: $localize`Capacité`, sortable: true},
-        {id: 'drops', header: $localize`Objets`, sortable: false}
+        { id: 'label', header: $localize`Nom du bâtiment`, sortable: true, sticky: true },
+        { id: 'description', header: $localize`Description`, sortable: false },
+        { id: 'min_dist', header: $localize`Distance minimum`, sortable: true },
+        { id: 'max_dist', header: $localize`Distance maximum`, sortable: true },
+        { id: 'camping', header: $localize`Bonus en camping`, sortable: true },
+        { id: 'capacity', header: $localize`Capacité`, sortable: true },
+        { id: 'drops', header: $localize`Objets`, sortable: false }
     ];
-
     public ruins_filters: RuinFilters = {
         label: '',
         min_dist: '',
@@ -74,9 +71,8 @@ export class RuinsComponent implements OnInit {
         objects: [],
         inside_town: false
     };
-
     public ruins_filters_change: EventEmitter<void> = new EventEmitter();
-
+    protected readonly sort: Signal<MatSort> = viewChild.required(MatSort);
     private town_service: TownService = inject(TownService);
     private api_service: ApiService = inject(ApiService);
     private readonly destroy_ref: DestroyRef = inject(DestroyRef);

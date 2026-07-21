@@ -1,15 +1,16 @@
 import { inject } from '@angular/core';
 import { Route } from '@angular/router';
+
 import { InDevModeGuard } from '../_core/guards/in-dev-mode.guard';
 import { BankComponent } from './bank/bank.component';
 import { BuildingsComponent } from './buildings/buildings.component';
 import { CampingsComponent } from './campings/campings.component';
+import { CitizensComponent } from './citizens/citizens.component';
 import { CitizensDigsComponent } from './citizens/citizens-digs/citizens-digs.component';
 import { CitizensDispoComponent } from './citizens/citizens-dispo/citizens-dispo.component';
 import { CitizensImmuneComponent } from './citizens/citizens-immune/citizens-immune.component';
 import { CitizensListComponent } from './citizens/citizens-list/citizens-list.component';
 import { CitizensWatchComponent } from './citizens/citizens-watch/citizens-watch.component';
-import { CitizensComponent } from './citizens/citizens.component';
 import { ExpeditionsComponent } from './expeditions/expeditions.component';
 import { MapComponent } from './map/map.component';
 import { NightwatchComponent } from './nightwatch/nightwatch.component';

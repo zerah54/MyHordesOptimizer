@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
+
 import { Imports } from '../../_abstract_model/types/_types';
 
 const angular_common: Imports = [];

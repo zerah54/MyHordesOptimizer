@@ -1,9 +1,10 @@
 import { CdkDragRelease, DragDropModule } from '@angular/cdk/drag-drop';
-import { Component, ElementRef, Signal, viewChildren } from '@angular/core';
+import { Component, ElementRef, OnInit, Signal, viewChildren } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { HORDES_IMG_REPO } from 'src/app/_abstract_model/const';
 import { Imports } from 'src/app/_abstract_model/types/_types';
 import { MaxPipe } from 'src/app/_core/pipes/number.pipe';
+
 import { PictosHighlightedCell } from './368-pictos-highlighted-cell.pipe';
 
 const angular_common: Imports = [];
@@ -17,7 +18,7 @@ const material_modules: Imports = [ MatCardModule, DragDropModule ];
     styleUrls: [ '368-pictos.component.scss' ],
     imports: [ ...angular_common, ...components, ...material_modules, ...pipes ]
 })
-export class PictosGameComponent {
+export class PictosGameComponent implements OnInit {
 
     protected cells: Signal<readonly ElementRef<HTMLDivElement>[]> = viewChildren('cellDiv', { read: ElementRef });
     protected cells_lot: Signal<readonly ElementRef<HTMLDivElement>[]> = viewChildren('cellLotDiv', { read: ElementRef });
@@ -103,7 +104,7 @@ export class PictosGameComponent {
             const y: number = +(overlap.nativeElement.getAttribute('y') || 0);
 
             /** On regarde si l'élément est dans la liste des cellules */
-            let cell_is_in_highlighted_index: number = this.highlighted_cells.findIndex((cell_highlighted: { row: number, col: number; }) => {
+            const cell_is_in_highlighted_index: number = this.highlighted_cells.findIndex((cell_highlighted: { row: number, col: number; }) => {
                 return cell_highlighted.row === x && cell_highlighted.col === y;
             });
 
@@ -203,7 +204,7 @@ export class PictosGameComponent {
     }
 
     private checkAndRemoveGroups(): void {
-        let to_remove: { row: number, col: number, picto: number | undefined; }[] = [];
+        const to_remove: { row: number, col: number, picto: number | undefined; }[] = [];
 
         // Mark horizontal groups
         for (let i = 0; i < 6; i++) {
@@ -211,7 +212,7 @@ export class PictosGameComponent {
             for (let j = 0; j < 6; j++) {
                 if (this.board[ i ][ j ] !== undefined) {
                     count = 1;
-                    let current_picto: number | undefined = this.board[ i ][ j ]?.id;
+                    const current_picto: number | undefined = this.board[ i ][ j ]?.id;
                     while (j + 1 < 6 && this.board[ i ][ j + 1 ]?.id === current_picto) {
                         count++;
                         j++;
@@ -231,7 +232,7 @@ export class PictosGameComponent {
             for (let i = 0; i < 6; i++) {
                 if (this.board[ i ][ j ] !== undefined) {
                     count = 1;
-                    let current_picto: number | undefined = this.board[ i ][ j ]?.id;
+                    const current_picto: number | undefined = this.board[ i ][ j ]?.id;
                     while (i + 1 < 6 && this.board[ i + 1 ][ j ]?.id === current_picto) {
                         count++;
                         i++;
@@ -258,7 +259,7 @@ export class PictosGameComponent {
 
         if (this.pictos_rescued >= this.pictos_to_rescue) {
             this.endGame();
-            alert(`Congratulations!`);
+            alert('Congratulations!');
         }
     }
 

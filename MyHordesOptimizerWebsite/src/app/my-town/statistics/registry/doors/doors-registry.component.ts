@@ -1,10 +1,11 @@
-import { Component, ElementRef, input, Input, InputSignal, Signal, viewChild } from '@angular/core';
+import { Component, ElementRef, Input, input, InputSignal, Signal, viewChild } from '@angular/core';
 import { Scale, TooltipItem } from 'chart.js';
 import Chart from 'chart.js/auto';
 import moment from 'moment';
+
 import { DisplayPseudoMode, Entry } from '../../../../_abstract_model/interfaces';
-import { CitizenInfo } from '../../../../_abstract_model/types/citizen-info.class';
 import { Citizen } from '../../../../_abstract_model/types/citizen.class';
+import { CitizenInfo } from '../../../../_abstract_model/types/citizen-info.class';
 
 @Component({
     selector: 'mho-registry-doors',
@@ -20,7 +21,7 @@ export class DoorsRegistryComponent {
 
     // TODO: Skipped for migration because:
     //  Accessor inputs cannot be migrated as they are too complex.
-    @Input({required: true}) set registry(registry: Entry[] | undefined) {
+    @Input({ required: true }) set registry(registry: Entry[] | undefined) {
         if (registry) {
             this.entries = registry.filter((entry: Entry) => {
                 return this.doors_entering_keywords.some((doors_entering: string): boolean => entry.entry?.indexOf(' ' + doors_entering) > -1)
@@ -83,7 +84,7 @@ export class DoorsRegistryComponent {
                         afterBuildTicks: (axis: Scale): { value: number; }[] => {
                             const ticks: string[] = ['0:00', '2:00', '4:00', '6:00', '8:00', '10:00', '12:00', '14:00', '16:00', '18:00', '20:00', '22:00', '23:59'];
 
-                            return axis.ticks = ticks.map((v: string): { value: number } => ({value: +moment(v, 'k:m').format('x')}));
+                            return axis.ticks = ticks.map((v: string): { value: number } => ({ value: +moment(v, 'k:m').format('x') }));
                         },
                         stacked: false,
                         min: +moment('0:00', 'k:mm').format('x'),

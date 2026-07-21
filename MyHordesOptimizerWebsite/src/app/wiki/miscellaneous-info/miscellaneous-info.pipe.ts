@@ -1,4 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core';
+
 import { Misc } from '../../_abstract_model/interfaces';
 import { TownDetails } from '../../_abstract_model/types/town-details.class';
 

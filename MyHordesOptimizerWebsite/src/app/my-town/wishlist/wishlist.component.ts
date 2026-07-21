@@ -12,8 +12,7 @@ import {
     Signal,
     signal,
     viewChild,
-    WritableSignal
-} from '@angular/core';
+    WritableSignal} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -34,6 +33,7 @@ import moment from 'moment';
 import { Subject } from 'rxjs';
 import { debounceTime, switchMap } from 'rxjs/operators';
 import { read, utils, WorkBook, WorkSheet, write } from 'xlsx';
+
 import { environment } from '../../../environments/environment';
 import { HORDES_IMG_REPO, WISHLIST_EDITION_MODE_KEY } from '../../_abstract_model/const';
 import { WishlistDepot } from '../../_abstract_model/enum/wishlist-depot.enum';
@@ -82,17 +82,17 @@ export class WishlistComponent implements OnInit {
     protected readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
     protected readonly locale: string = moment.locale();
     protected readonly columns: StandardColumn[] = [
-        {id: 'sort', header: '', displayed: (): boolean => this.edition_mode()},
-        {id: 'name', header: $localize`Objet`, sticky: true},
-        {id: 'heaver', header: ''},
-        {id: 'depot', header: $localize`Dépôt`},
-        {id: 'zone_x_pa', header: $localize`Zone en PA`},
-        {id: 'bank_count', header: $localize`Banque`},
-        {id: 'bag_count', header: $localize`Sacs`},
-        {id: 'count', header: $localize`Stock souhaité`},
-        {id: 'needed', header: $localize`Quantité manquante`},
-        {id: 'should_signal', header: $localize`Signaler`},
-        {id: 'delete', header: '', displayed: (): boolean => this.edition_mode()},
+        { id: 'sort', header: '', displayed: (): boolean => this.edition_mode() },
+        { id: 'name', header: $localize`Objet`, sticky: true },
+        { id: 'heaver', header: '' },
+        { id: 'depot', header: $localize`Dépôt` },
+        { id: 'zone_x_pa', header: $localize`Zone en PA` },
+        { id: 'bank_count', header: $localize`Banque` },
+        { id: 'bag_count', header: $localize`Sacs` },
+        { id: 'count', header: $localize`Stock souhaité` },
+        { id: 'needed', header: $localize`Quantité manquante` },
+        { id: 'should_signal', header: $localize`Signaler` },
+        { id: 'delete', header: '', displayed: (): boolean => this.edition_mode() },
     ];
     protected readonly depots: WishlistDepot[] = WishlistDepot.getAllValues();
 
@@ -102,7 +102,7 @@ export class WishlistComponent implements OnInit {
     /** Mode observateur : lecture seule, l'édition est désactivée. */
     protected readonly is_readonly: Signal<boolean> = inject(TownContextService).isReadonly;
     protected drag_disabled: WritableSignal<boolean> = signal(true);
-    protected wishlist_filters: WritableSignal<WishlistFilters> = signal({items: '', depot: []});
+    protected wishlist_filters: WritableSignal<WishlistFilters> = signal({ items: '', depot: [] });
     protected current_zone_xp_pa_add_item: WritableSignal<number> = signal(0);
 
     protected datasource: MatTableDataSource<WishlistItem> = new MatTableDataSource();
@@ -112,8 +112,8 @@ export class WishlistComponent implements OnInit {
     private readonly auto_save$: Subject<WishlistInfo> = new Subject();
 
     private readonly excel_headers: { [key: string]: { label: string, comment?: string } } = {
-        id: {label: $localize`Identifiant`},
-        name: {label: $localize`Nom de l'objet`},
+        id: { label: $localize`Identifiant` },
+        name: { label: $localize`Nom de l'objet` },
         depot: {
             label: $localize`Zone de dépôt`,
             comment: `(0 : ${$localize`Banque`}, 1 : ${$localize`Zone de rappatriement`}, 2 : ${$localize`Non définie`})`
@@ -122,7 +122,7 @@ export class WishlistComponent implements OnInit {
             label: $localize`Zone`,
             comment: `(0 : ${$localize`Banque`}, 1 : ${$localize`Zone de rappatriement`}, 2 : ${$localize`Non définie`})`
         },
-        count: {label: $localize`Quantité souhaitée`},
+        count: { label: $localize`Quantité souhaitée` },
     };
 
     public constructor() {
@@ -336,7 +336,7 @@ export class WishlistComponent implements OnInit {
         if (!info) return;
 
         const workbook: WorkBook = {
-            Props: {Author: 'MyHordes Optimizer', Title: `MyHordes Optimizer - ${$localize`Liste de course`}`},
+            Props: { Author: 'MyHordes Optimizer', Title: `MyHordes Optimizer - ${$localize`Liste de course`}` },
             Sheets: {},
             SheetNames: []
         };
@@ -351,12 +351,12 @@ export class WishlistComponent implements OnInit {
             return final_item;
         });
 
-        const data: WorkSheet = utils.json_to_sheet(simplify_item, {cellStyles: true});
+        const data: WorkSheet = utils.json_to_sheet(simplify_item, { cellStyles: true });
         workbook.SheetNames.push($localize`Liste de courses`);
         workbook.Sheets[$localize`Liste de courses`] = data;
 
-        const u8: Uint8Array = write(workbook, {type: 'buffer', bookType: 'xlsx'});
-        const blob: Blob = new Blob([u8], {type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+        const u8: Uint8Array = write(workbook, { type: 'buffer', bookType: 'xlsx' });
+        const blob: Blob = new Blob([u8], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
         const url: string = URL.createObjectURL(blob);
         const hidden_link: HTMLAnchorElement = this.document.createElement('a');
         this.document.body.appendChild(hidden_link);

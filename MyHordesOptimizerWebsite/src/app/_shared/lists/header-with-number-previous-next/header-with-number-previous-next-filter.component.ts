@@ -17,6 +17,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
+
 import { Imports } from '../../../_abstract_model/types/_types';
 
 const angular_common: Imports = [CommonModule, FormsModule];
@@ -36,7 +37,7 @@ export class HeaderWithNumberPreviousNextFilterComponent implements OnInit {
 
     public header: InputSignal<string> = input('');
     public textAlign: InputSignal<string> = input('left');
-    public displayFirstLast: InputSignalWithTransform<boolean, unknown> = input(false, {transform: booleanAttribute});
+    public displayFirstLast: InputSignalWithTransform<boolean, unknown> = input(false, { transform: booleanAttribute });
 
     public min: InputSignal<number> = input(1);
     public max: InputSignal<number> = input(1);

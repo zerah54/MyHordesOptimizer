@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
-import { Component, input, Input, InputSignal } from '@angular/core';
+import { Component, Input, input,InputSignal } from '@angular/core';
 import { MatDividerModule } from '@angular/material/divider';
+
 import { DisplayPseudoMode, Entry } from '../../../../_abstract_model/interfaces';
 import { Imports } from '../../../../_abstract_model/types/_types';
 import { CitizenInfo } from '../../../../_abstract_model/types/citizen-info.class';
@@ -25,7 +26,7 @@ export class WellRegistryComponent {
 
     // TODO: Skipped for migration because:
     //  Accessor inputs cannot be migrated as they are too complex.
-    @Input({required: true}) set registry(registry: Entry[] | undefined) {
+    @Input({ required: true }) set registry(registry: Entry[] | undefined) {
         if (registry) {
             this.entries = registry.filter((entry: Entry) => {
                 return this.well_keywords.some((well_keywords: string): boolean => entry.entry?.indexOf(' ' + well_keywords + ' ') > -1);

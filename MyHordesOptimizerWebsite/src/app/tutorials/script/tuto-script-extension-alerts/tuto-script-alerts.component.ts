@@ -4,6 +4,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatTooltipModule } from '@angular/material/tooltip';
+
 import { Imports } from '../../../_abstract_model/types/_types';
 import { ClipboardService } from '../../../_core/services/clipboard.service';
 import { AccordionComponent, AccordionItem } from '../../../_shared/accordion/accordion.component';

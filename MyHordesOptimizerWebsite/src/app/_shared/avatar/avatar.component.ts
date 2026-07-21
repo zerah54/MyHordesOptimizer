@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { booleanAttribute, Component, computed, input, InputSignal, InputSignalWithTransform, Signal } from '@angular/core';
+import { booleanAttribute, Component, computed, input,InputSignal, InputSignalWithTransform, Signal } from '@angular/core';
+
 import { environment } from '../../../environments/environment';
 import { Imports } from '../../_abstract_model/types/_types';
 
@@ -17,7 +18,7 @@ const material_modules: Imports = [];
 export class AvatarComponent {
 
     public src: InputSignal<string | undefined> = input();
-    public rounded: InputSignalWithTransform<boolean, unknown> = input(false, {transform: booleanAttribute});
+    public rounded: InputSignalWithTransform<boolean, unknown> = input(false, { transform: booleanAttribute });
 
     /**
      * MyHordes renvoie aujourd'hui un chemin relatif (`/storage/...`), mais d'anciens avatars ont été

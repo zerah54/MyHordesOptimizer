@@ -1,5 +1,5 @@
-import { CommonModule, DecimalPipe, formatNumber, Location, NgOptimizedImage, NgTemplateOutlet } from '@angular/common';
-import { Component, DestroyRef, DOCUMENT, inject, OnInit } from '@angular/core';
+import { CommonModule, DecimalPipe, formatNumber,Location, NgOptimizedImage, NgTemplateOutlet } from '@angular/common';
+import { Component, DestroyRef, DOCUMENT, inject,OnInit } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -14,6 +14,7 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { ActivatedRoute, Router } from '@angular/router';
 import moment from 'moment';
+
 import { HORDES_IMG_REPO, NO_RUIN } from '../../_abstract_model/const';
 import { JobEnum } from '../../_abstract_model/enum/job.enum';
 import { ApiService } from '../../_abstract_model/services/api.service';
@@ -58,9 +59,9 @@ export class CampingComponent implements OnInit {
     public display_bonus_ap: boolean = false;
 
     public town_types: TownType[] = [
-        {id: 'RNE', label: $localize`Petite carte`, bonus: 0},
-        {id: 'RE', label: $localize`Région éloignée`, bonus: 0},
-        {id: 'PANDE', label: $localize`Pandémonium`, bonus: 0}
+        { id: 'RNE', label: $localize`Petite carte`, bonus: 0 },
+        { id: 'RE', label: $localize`Région éloignée`, bonus: 0 },
+        { id: 'PANDE', label: $localize`Pandémonium`, bonus: 0 }
     ];
 
     public bonus!: CampingBonus;
@@ -129,27 +130,27 @@ export class CampingComponent implements OnInit {
                                         value: <TownType>this.town_types.find((town_type: TownType) => this.town && this.in_town_camping ? town_type.id === (<TownDetails>this.town).town_type : town_type.id === 'RNE'),
                                         disabled: false
                                     }],
-                                    job: [{value: <JobEnum>this.jobs.find((job: JobEnum) => job.value.id === 'citizen'), disabled: false}],
-                                    distance: [{value: 1, disabled: false}],
-                                    campings: [{value: 0, disabled: false}],
-                                    pro: [{value: false, disabled: false}],
-                                    hidden_campers: [{value: 0, disabled: false}],
-                                    objects: [{value: 0, disabled: false}],
-                                    vest: [{value: false, disabled: false}],
-                                    tomb: [{value: false, disabled: false}],
-                                    r4: [{value: false, disabled: false}],
-                                    zombies: [{value: 0, disabled: false}],
-                                    night: [{value: false, disabled: false}],
+                                    job: [{ value: <JobEnum>this.jobs.find((job: JobEnum) => job.value.id === 'citizen'), disabled: false }],
+                                    distance: [{ value: 1, disabled: false }],
+                                    campings: [{ value: 0, disabled: false }],
+                                    pro: [{ value: false, disabled: false }],
+                                    hidden_campers: [{ value: 0, disabled: false }],
+                                    objects: [{ value: 0, disabled: false }],
+                                    vest: [{ value: false, disabled: false }],
+                                    tomb: [{ value: false, disabled: false }],
+                                    r4: [{ value: false, disabled: false }],
+                                    zombies: [{ value: 0, disabled: false }],
+                                    night: [{ value: false, disabled: false }],
                                     devastated: [{
                                         value: this.town && this.in_town_camping ? this.town.is_devaste : false,
                                         disabled: this.town && this.in_town_camping
                                     }],
-                                    phare: [{value: false, disabled: false}],
-                                    improve: [{value: 0, disabled: false}],
-                                    object_improve: [{value: 0, disabled: false}],
-                                    complete_improve: [{value: 0, disabled: false}],
-                                    ruin: [{value: this.no_ruin, disabled: false}],
-                                    bury_count: [{value: 0, disabled: false}],
+                                    phare: [{ value: false, disabled: false }],
+                                    improve: [{ value: 0, disabled: false }],
+                                    object_improve: [{ value: 0, disabled: false }],
+                                    complete_improve: [{ value: 0, disabled: false }],
+                                    ruin: [{ value: this.no_ruin, disabled: false }],
+                                    bury_count: [{ value: 0, disabled: false }],
                                 });
                                 this.calculateCamping();
 
@@ -159,7 +160,7 @@ export class CampingComponent implements OnInit {
                                         this.calculateCamping();
                                     });
 
-                                const url: string = this.router.createUrlTree([], {relativeTo: this.activated_route}).toString();
+                                const url: string = this.router.createUrlTree([], { relativeTo: this.activated_route }).toString();
                                 this.location.go(url);
                             });
                     });
@@ -387,10 +388,10 @@ export class CampingComponent implements OnInit {
             const tested_improve_objects: number = (complete_improve * 100 - i * 100) / 100 / (this.display_bonus_ap ? (this.bonus.object_improve / this.bonus.improve) : this.bonus.object_improve);
             if (Number.isInteger(tested_improve_objects)) {
                 const improve: number = complete_improve - (tested_improve_objects * (this.display_bonus_ap ? (this.bonus.object_improve / this.bonus.improve) : this.bonus.object_improve));
-                return {improve: improve / (this.display_bonus_ap ? 1 : this.bonus.improve), improve_objects: tested_improve_objects};
+                return { improve: improve / (this.display_bonus_ap ? 1 : this.bonus.improve), improve_objects: tested_improve_objects };
             }
         }
-        return {improve: Math.round(complete_improve / (this.display_bonus_ap ? 1 : this.bonus.improve)), improve_objects: 0};
+        return { improve: Math.round(complete_improve / (this.display_bonus_ap ? 1 : this.bonus.improve)), improve_objects: 0 };
     }
 }
 

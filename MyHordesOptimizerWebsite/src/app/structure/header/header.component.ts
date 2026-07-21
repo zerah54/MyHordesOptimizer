@@ -1,6 +1,6 @@
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { CommonModule, NgOptimizedImage } from '@angular/common';
-import { Component, DestroyRef, HostListener, inject, OnInit, output, OutputEmitterRef } from '@angular/core';
+import { Component, DestroyRef, HostListener, inject, OnInit, output,OutputEmitterRef } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -14,6 +14,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { Title } from '@angular/platform-browser';
 import { Router, RouterLink } from '@angular/router';
 import { skip } from 'rxjs';
+
 import { environment } from '../../../environments/environment';
 import { BREAKPOINTS } from '../../_abstract_model/const';
 import { AuthenticationService } from '../../_abstract_model/services/authentication.service';
@@ -81,7 +82,7 @@ export class HeaderComponent implements OnInit {
                     this.external_app_id_field_value = token;
                     this.saveExternalAppId();
                 }
-            })
+            });
     }
 
     /** Enregistre le nouvel id d'app externe */

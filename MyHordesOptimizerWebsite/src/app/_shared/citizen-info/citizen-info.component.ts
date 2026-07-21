@@ -1,6 +1,7 @@
 import { CommonModule, NgOptimizedImage } from '@angular/common';
-import { booleanAttribute, Component, input, InputSignal, InputSignalWithTransform } from '@angular/core';
+import { booleanAttribute, Component, input,InputSignal, InputSignalWithTransform } from '@angular/core';
 import moment from 'moment';
+
 import { HORDES_IMG_REPO } from '../../_abstract_model/const';
 import { DisplayPseudoMode } from '../../_abstract_model/interfaces';
 import { Imports } from '../../_abstract_model/types/_types';
@@ -21,8 +22,8 @@ export class CitizenInfoComponent {
 
     public citizen: InputSignal<Citizen> = input.required();
     public displayPseudoMode: InputSignal<DisplayPseudoMode> = input<DisplayPseudoMode>('simple');
-    public displayShunStatus: InputSignalWithTransform<boolean, unknown> = input(false, {transform: booleanAttribute});
-    public displayJob: InputSignalWithTransform<boolean, unknown> = input(false, {transform: booleanAttribute});
+    public displayShunStatus: InputSignalWithTransform<boolean, unknown> = input(false, { transform: booleanAttribute });
+    public displayJob: InputSignalWithTransform<boolean, unknown> = input(false, { transform: booleanAttribute });
 
     /** La langue du site */
     protected readonly locale: string = moment.locale();

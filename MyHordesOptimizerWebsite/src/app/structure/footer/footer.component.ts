@@ -2,6 +2,7 @@ import { NgTemplateOutlet } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatToolbarModule } from '@angular/material/toolbar';
+
 import { environment } from '../../../environments/environment';
 import { Imports } from '../../_abstract_model/types/_types';
 import { ThanksComponent } from '../../thanks/thanks.component';

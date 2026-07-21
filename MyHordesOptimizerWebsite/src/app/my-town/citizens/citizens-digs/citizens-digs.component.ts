@@ -4,13 +4,14 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatTable, MatTableDataSource, MatTableModule } from '@angular/material/table';
 import moment from 'moment';
+
 import { HORDES_IMG_REPO } from '../../../_abstract_model/const';
 import { StandardColumn } from '../../../_abstract_model/interfaces';
 import { DigsService } from '../../../_abstract_model/services/digs.service';
 import { TownService } from '../../../_abstract_model/services/town.service';
 import { Imports } from '../../../_abstract_model/types/_types';
-import { CitizenInfo } from '../../../_abstract_model/types/citizen-info.class';
 import { Citizen } from '../../../_abstract_model/types/citizen.class';
+import { CitizenInfo } from '../../../_abstract_model/types/citizen-info.class';
 import { Dig } from '../../../_abstract_model/types/dig.class';
 import { ColumnIdPipe } from '../../../_core/pipes/column-id.pipe';
 import { getTown } from '../../../_core/utilities/localstorage.util';
@@ -53,8 +54,8 @@ export class CitizensDigsComponent implements OnInit {
     public citizen_filter_change: EventEmitter<void> = new EventEmitter<void>();
     /** La liste des colonnes */
     public readonly columns: StandardColumn[] = [
-        {id: 'avatar_name', header: $localize`Citoyen`, class: 'center', sticky: true},
-        {id: 'today_digs', header: $localize`Fouilles du jour`, class: ''},
+        { id: 'avatar_name', header: $localize`Citoyen`, class: 'center', sticky: true },
+        { id: 'today_digs', header: $localize`Fouilles du jour`, class: '' },
     ];
     public readonly current_day: number = getTown()?.day || 1;
     public filters: DigFilter = {

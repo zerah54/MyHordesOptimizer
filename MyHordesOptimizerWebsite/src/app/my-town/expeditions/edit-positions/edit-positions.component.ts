@@ -6,6 +6,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
+
 import { Imports } from '../../../_abstract_model/types/_types';
 import { Expedition } from '../../../_abstract_model/types/expedition.class';
 

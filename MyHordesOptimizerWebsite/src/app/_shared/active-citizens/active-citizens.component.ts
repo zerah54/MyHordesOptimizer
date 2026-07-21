@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, input, InputSignal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input,InputSignal } from '@angular/core';
 import { MatTooltipModule } from '@angular/material/tooltip';
+
 import { Imports } from '../../_abstract_model/types/_types';
 import { Citizen } from '../../_abstract_model/types/citizen.class';
 import { CitizenFromIdPipe } from '../../_core/pipes/citizens-from-id.pipe';

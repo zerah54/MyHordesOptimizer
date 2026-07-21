@@ -2,6 +2,7 @@ import { HttpContextToken, HttpEvent, HttpHandlerFn, HttpRequest } from '@angula
 import { inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { finalize } from 'rxjs/operators';
+
 import { LoadingOverlayService } from './loading-overlay.service';
 
 export const BYPASS_LOADING: HttpContextToken<boolean> = new HttpContextToken(() => false);

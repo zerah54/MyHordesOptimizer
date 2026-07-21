@@ -1,4 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core';
+
 import { JobEnum } from '../../_abstract_model/enum/job.enum';
 
 

@@ -25,7 +25,7 @@ const DEFENSE_TRASH_DATA: TrashData = {
     improved_value: 5,
     specialized_trash_add_value: 2
 };
-const FOOD_TRASH_DATA: TrashData = {label: $localize`Appâts odorants`, property: Property.FOOD, value: 1, improved_value: 2, specialized_trash_add_value: 3};
+const FOOD_TRASH_DATA: TrashData = { label: $localize`Appâts odorants`, property: Property.FOOD, value: 1, improved_value: 2, specialized_trash_add_value: 3 };
 const WOOD_TRASH_DATA: TrashData = {
     label: $localize`Déchardes de bois`,
     add_items_uid: ['wood_bad_#00', 'wood2_#00'],
@@ -40,7 +40,7 @@ const METAL_TRASH_DATA: TrashData = {
     improved_value: 2,
     specialized_trash_add_value: 1
 };
-const ANIMALS_TRASH_DATA: TrashData = {label: $localize`Enclos`, property: Property.PET, value: 1, improved_value: 2, specialized_trash_add_value: 6};
+const ANIMALS_TRASH_DATA: TrashData = { label: $localize`Enclos`, property: Property.PET, value: 1, improved_value: 2, specialized_trash_add_value: 6 };
 
 /** Type de champs de propriétés existants */
 export class Trash extends CommonEnum {

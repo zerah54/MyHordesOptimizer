@@ -1,35 +1,36 @@
 import { HttpErrorResponse, HttpParams, HttpResponse } from '@angular/common/http';
-import { inject, Injectable } from '@angular/core';
+import { inject,Injectable } from '@angular/core';
 import moment from 'moment';
-import { map, Observable, Subscriber } from 'rxjs';
+import { map,Observable, Subscriber } from 'rxjs';
+
 import { SnackbarService } from '../../_core/services/snackbar.service';
 import { TownContextService } from '../../_core/services/town-context.service';
 import { getBankWithExpirationDate, getExternalAppId, getTown, getUserId, setBankWithExpirationDate, } from '../../_core/utilities/localstorage.util';
 import { BankInfoDTO } from '../dto/bank-info.dto';
 import { CellDTO } from '../dto/cell.dto';
-import { CitizenInfoDTO } from '../dto/citizen-info.dto';
 import { CitizenDTO } from '../dto/citizen.dto';
+import { CitizenInfoDTO } from '../dto/citizen-info.dto';
 import { RuinDTO } from '../dto/ruin.dto';
 import { SeasonDTO } from '../dto/season.dto';
 import { SeasonPhaseDTO } from '../dto/season-phase.dto';
+import { TownDTO } from '../dto/town.dto';
 import { TownListItemDTO } from '../dto/town-list-item.dto';
 import { TownListPageResultDTO, TownListQuery } from '../dto/town-list-page.dto';
-import { TownDTO } from '../dto/town.dto';
 import { UpdateInfoDTO } from '../dto/update-info.dto';
 import { TownListMapper } from '../mapper/town-list-item.mapper';
 import { dtoToModelArray } from '../types/_common.class';
 import { ToolsToUpdate, TownState, TownTypeId } from '../types/_types';
 import { BankInfo } from '../types/bank-info.class';
 import { Cell } from '../types/cell.class';
-import { CitizenInfo } from '../types/citizen-info.class';
 import { Citizen } from '../types/citizen.class';
+import { CitizenInfo } from '../types/citizen-info.class';
 import { Ruin } from '../types/ruin.class';
-import { TownListPageResult } from '../types/town-list-item.model';
 import { Town } from '../types/town.class';
+import { TownListPageResult } from '../types/town-list-item.model';
 import { UpdateInfo } from '../types/update-info.class';
 import { GlobalService } from './_global.service';
 
-@Injectable({providedIn: 'root'})
+@Injectable({ providedIn: 'root' })
 export class TownService extends GlobalService {
     private snackbar: SnackbarService = inject(SnackbarService);
     private readonly town_context: TownContextService = inject(TownContextService);
@@ -99,10 +100,10 @@ export class TownService extends GlobalService {
         };
 
         super.post(this.API_URL + `/externaltools/update?userKey=${getExternalAppId()}&userId=${getUserId()}`,
-            JSON.stringify({
-                map: {toolsToUpdate: tools_to_update},
-                townDetails: town_details
-            })
+                   JSON.stringify({
+                       map: { toolsToUpdate: tools_to_update },
+                       townDetails: town_details
+                   })
         )
             .subscribe({
                 next: () => {

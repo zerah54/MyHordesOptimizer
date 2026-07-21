@@ -1,4 +1,4 @@
-import { CellDTO, SaveCellDTO } from '../dto/cell.dto';
+import { CellDTO, SaveCellDTO, ScavNextCellsDTO, ScoutNextCellsDTO } from '../dto/cell.dto';
 import { Direction } from '../enum/direction.enum';
 import { CommonModel, dtoToModelArray, modelToDtoArray } from './_common.class';
 import { Citizen } from './citizen.class';
@@ -37,6 +37,22 @@ export class Cell extends CommonModel<CellDTO> {
     public nb_eruin_blue!: number;
     public nb_eruin_yellow!: number;
     public nb_eruin_violet!: number;
+    /** Niveau d'abondance de la zone relevé par un fouineur, de 0 (épuisée) à 3 (abondante) */
+    public scav_zone_level!: number | null;
+    /** Niveau d'exploration de la zone relevé par un éclaireur, de 0 à 3 */
+    public scout_zone_level!: number | null;
+    /** Estimation bruitée du nombre de zombies, issue du radar d'un éclaireur voisin */
+    public scout_estimation_zombie!: number | null;
+    /** Borne basse du nombre réel de zombies déduite de l'estimation */
+    public scout_estimation_min!: number | null;
+    /** Borne haute du nombre réel de zombies déduite de l'estimation */
+    public scout_estimation_max!: number | null;
+    /** Fraîcheur propre à l'estimation, à comparer à update_info */
+    public scout_estimation_update_info!: UpdateInfo | null;
+    /** Radar du fouineur saisi manuellement depuis cette case, jamais renvoyé par l'API */
+    public scav_next_cells: ScavNextCellsDTO | null = null;
+    /** Radar de l'éclaireur saisi manuellement depuis cette case, jamais renvoyé par l'API */
+    public scout_next_cells: ScoutNextCellsDTO | null = null;
 
     constructor(dto?: CellDTO) {
         super();
@@ -63,6 +79,12 @@ export class Cell extends CommonModel<CellDTO> {
             totalSucces: this.total_success,
             averagePotentialRemainingDig: this.average_potential_remaining_dig,
             maxPotentialRemainingDig: this.max_potential_remaining_dig,
+            scavZoneLevel: this.scav_zone_level,
+            scoutZoneLevel: this.scout_zone_level,
+            scoutEstimationZombie: this.scout_estimation_zombie,
+            scoutEstimationMin: this.scout_estimation_min,
+            scoutEstimationMax: this.scout_estimation_max,
+            scoutEstimationLastUpdateInfo: this.scout_estimation_update_info?.modelToDto() ?? null,
             lastUpdateInfo: this.update_info?.modelToDto(),
             items: modelToDtoArray(this.items),
             nbKm: this.nb_km,
@@ -79,11 +101,26 @@ export class Cell extends CommonModel<CellDTO> {
         };
     }
 
+    /**
+     * L'estimation d'un éclaireur ne prime sur le nombre de zombies connu que si elle
+     * a été relevée après la dernière mise à jour de la case.
+     */
+    public hasFresherScoutEstimation(): boolean {
+        if (this.scout_estimation_zombie === null || this.scout_estimation_zombie === undefined) return false;
+        if (!this.scout_estimation_update_info?.update_time) return false;
+        if (!this.update_info?.update_time) return true;
+        return this.scout_estimation_update_info.update_time.isAfter(this.update_info.update_time);
+    }
+
     public toSaveCellDTO(): SaveCellDTO {
         return {
             x: this.x,
             y: this.y,
             isDryed: this.is_dryed,
+            scavZoneLevel: this.scav_zone_level,
+            scoutZoneLevel: this.scout_zone_level,
+            scavNextCells: this.scav_next_cells,
+            scoutNextCells: this.scout_next_cells,
             nbZombie: this.nb_hero || 0,
             nbZombieKilled: this.nb_zombie_killed || 0,
             isRuinCamped: this.is_ruin_camped,
@@ -119,6 +156,12 @@ export class Cell extends CommonModel<CellDTO> {
             this.total_success = dto.totalSucces;
             this.average_potential_remaining_dig = dto.averagePotentialRemainingDig;
             this.max_potential_remaining_dig = dto.maxPotentialRemainingDig;
+            this.scav_zone_level = dto.scavZoneLevel;
+            this.scout_zone_level = dto.scoutZoneLevel;
+            this.scout_estimation_zombie = dto.scoutEstimationZombie;
+            this.scout_estimation_min = dto.scoutEstimationMin;
+            this.scout_estimation_max = dto.scoutEstimationMax;
+            this.scout_estimation_update_info = dto.scoutEstimationLastUpdateInfo ? new UpdateInfo(dto.scoutEstimationLastUpdateInfo) : null;
             this.update_info = new UpdateInfo(dto.lastUpdateInfo);
             this.items = dtoToModelArray(ItemCountShort, dto.items);
             this.citizens = dtoToModelArray(Citizen, dto.citizens);

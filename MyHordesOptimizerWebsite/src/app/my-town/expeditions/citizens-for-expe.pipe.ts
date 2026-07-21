@@ -1,7 +1,8 @@
 import { Pipe, PipeTransform } from '@angular/core';
+
 import { HORDES_IMG_REPO } from '../../_abstract_model/const';
-import { CitizenExpedition } from '../../_abstract_model/types/citizen-expedition.class';
 import { Citizen } from '../../_abstract_model/types/citizen.class';
+import { CitizenExpedition } from '../../_abstract_model/types/citizen-expedition.class';
 import { Expedition } from '../../_abstract_model/types/expedition.class';
 import { getPreRegistered } from './expeditions.utils';
 

@@ -1,10 +1,11 @@
 import { CommonModule, NgOptimizedImage } from '@angular/common';
-import { Component, input, InputSignal, output, OutputEmitterRef } from '@angular/core';
+import { Component, input, InputSignal, output,OutputEmitterRef } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
 import { MatMenuModule } from '@angular/material/menu';
 import moment from 'moment';
+
 import { HORDES_IMG_REPO } from '../../../../../_abstract_model/const';
 import { HeroicActionEnum } from '../../../../../_abstract_model/enum/heroic-action.enum';
 import { Imports } from '../../../../../_abstract_model/types/_types';
@@ -37,7 +38,7 @@ export class MapUpdateCitizensComponent {
     public readonly locale: string = moment.locale();
 
     addCitizen(citizen: Citizen): void {
-        let new_citizens = this.citizens()
+        const new_citizens = this.citizens();
         new_citizens.push(citizen);
         new_citizens.sort((citizen_a: Citizen, citizen_b: Citizen) => citizen_a.name.toLocaleLowerCase().localeCompare(citizen_b.name.toLocaleLowerCase()));
         this.citizensChange.emit(new_citizens);

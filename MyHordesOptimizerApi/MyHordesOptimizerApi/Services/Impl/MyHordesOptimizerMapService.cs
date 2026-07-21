@@ -52,14 +52,27 @@ namespace MyHordesOptimizerApi.Services.Impl
             }
             var cellItems = Mapper.Map<List<MapCellItem>>(updateRequest.Items);
 
-            var cellModel = DbContext.MapCells
+            // Les relevés des métiers portent aussi sur les cases adjacentes : on charge
+            // toute la ville pour pouvoir les mettre à jour au passage
+            var townCells = DbContext.MapCells
                 .Include(cell => cell.MapCellItems)
-                .Single(cell => cell.IdTown == townId && cell.X == updateRequest.X && cell.Y == updateRequest.Y);
+                .Where(cell => cell.IdTown == townId)
+                .ToList();
+
+            var cellModel = townCells.Single(cell => cell.X == updateRequest.X && cell.Y == updateRequest.Y);
 
             DbContext.MapCellItems.RemoveRange(cellModel.MapCellItems);
             DbContext.SaveChanges();
             cellModel.UpdateAllButKeysProperties(cell, ignoreNull: true);
             cellModel.MapCellItems = cellItems;
+
+            townCells.ApplyJobRadars(updateRequest.X,
+                updateRequest.Y,
+                updateRequest.ScavZoneLevel,
+                updateRequest.ScoutZoneLevel,
+                updateRequest.ScavNextCells,
+                updateRequest.ScoutNextCells,
+                newLastUpdate.IdLastUpdateInfo);
 
             var citizens = DbContext.TownCitizens.Where(x => x.IdTown == townId && updateRequest.Citizens.Contains(x.IdUser)).ToList();
             citizens.ForEach(citizen =>

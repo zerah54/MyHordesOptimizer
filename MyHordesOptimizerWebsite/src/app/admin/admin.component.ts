@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatTabsModule } from '@angular/material/tabs';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+
 import { Imports } from '../_abstract_model/types/_types';
 
 const angular_common: Imports = [RouterLink, RouterLinkActive, RouterOutlet];

@@ -1,5 +1,5 @@
 import { CommonModule, NgTemplateOutlet } from '@angular/common';
-import { Component, DOCUMENT, inject, LOCALE_ID, model, ModelSignal, OnInit } from '@angular/core';
+import { Component, DOCUMENT, inject, LOCALE_ID, model,ModelSignal, OnInit } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
@@ -9,6 +9,7 @@ import { MatSidenavContainer } from '@angular/material/sidenav';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import moment from 'moment';
+
 import { environment } from '../../../environments/environment';
 import { Theme } from '../../_abstract_model/interfaces';
 import { AdminService } from '../../_abstract_model/services/admin.service';
@@ -40,19 +41,19 @@ export class MenuComponent implements OnInit {
     public charts_theming_service: ChartsThemingService = inject(ChartsThemingService);
 
     public themes: Theme[] = [
-        {label: $localize`Par défaut`, class: ''},
-        {label: $localize`Rose`, class: 'pink'},
-        {label: $localize`Brun`, class: 'brown'},
+        { label: $localize`Par défaut`, class: '' },
+        { label: $localize`Rose`, class: 'pink' },
+        { label: $localize`Brun`, class: 'brown' },
     ];
 
     public selected_theme: Theme | undefined = this.themes.find((theme: Theme) => theme.class === localStorage.getItem('theme'));
 
     /** La liste des langues disponibles */
     public language_list: Language[] = [
-        {code: 'en', label: 'English'},
-        {code: 'fr', label: 'Français', default: true},
-        {code: 'es', label: 'Español'},
-        {code: 'de', label: 'Deutsch'}
+        { code: 'en', label: 'English' },
+        { code: 'fr', label: 'Français', default: true },
+        { code: 'es', label: 'Español' },
+        { code: 'de', label: 'Deutsch' }
     ];
 
     /** La langue sélectionnée pour l'affichage de l'application */
@@ -62,10 +63,10 @@ export class MenuComponent implements OnInit {
     public routes: SidenavLinks[] = [
         {
             label: $localize`Ma ville`, lvl: 0, displayed: true, isTownRoot: true, authorized: (): boolean => this.isInTown(), expanded: true, children: [
-                {label: $localize`Revenir à ma ville`, returnHome: true, displayed: true, lvl: 1, authorized: (): boolean => this.isReadonly(), spoil: false},
-                {label: $localize`Carte des fouilles`, townSuffix: 'map', displayed: true, lvl: 1, authorized: (): boolean => this.isInTown(), spoil: false},
-                {label: $localize`Banque`, townSuffix: 'bank', displayed: true, lvl: 1, authorized: (): boolean => this.isInTown(), spoil: false},
-                {label: $localize`Citoyens`, townSuffix: 'citizens', displayed: true, lvl: 1, authorized: (): boolean => this.isInTown(), spoil: false},
+                { label: $localize`Revenir à ma ville`, returnHome: true, displayed: true, lvl: 1, authorized: (): boolean => this.isReadonly(), spoil: false },
+                { label: $localize`Carte des fouilles`, townSuffix: 'map', displayed: true, lvl: 1, authorized: (): boolean => this.isInTown(), spoil: false },
+                { label: $localize`Banque`, townSuffix: 'bank', displayed: true, lvl: 1, authorized: (): boolean => this.isInTown(), spoil: false },
+                { label: $localize`Citoyens`, townSuffix: 'citizens', displayed: true, lvl: 1, authorized: (): boolean => this.isInTown(), spoil: false },
                 {
                     label: $localize`Liste de courses`,
                     townSuffix: 'wishlist',
@@ -74,8 +75,8 @@ export class MenuComponent implements OnInit {
                     authorized: (): boolean => this.isInTown(),
                     spoil: false
                 },
-                {label: $localize`Statistiques`, townSuffix: 'stats', displayed: true, lvl: 1, authorized: (): boolean => this.isInTown(), spoil: false},
-                {label: $localize`Expéditions`, townSuffix: 'expeditions', displayed: true, lvl: 1, authorized: (): boolean => this.isInTown(), spoil: false},
+                { label: $localize`Statistiques`, townSuffix: 'stats', displayed: true, lvl: 1, authorized: (): boolean => this.isInTown(), spoil: false },
+                { label: $localize`Expéditions`, townSuffix: 'expeditions', displayed: true, lvl: 1, authorized: (): boolean => this.isInTown(), spoil: false },
                 {
                     label: $localize`Chantiers`,
                     townSuffix: 'buildings',
@@ -104,23 +105,23 @@ export class MenuComponent implements OnInit {
         },
         {
             label: $localize`Outils`, lvl: 0, displayed: true, authorized: (): boolean => true, expanded: true, children: [
-                {label: $localize`Camping`, path: 'tools/camping', displayed: true, lvl: 1, authorized: (): boolean => true, spoil: false},
-                {label: $localize`Chances de survie`, path: 'tools/probabilities', displayed: true, lvl: 1, authorized: (): boolean => true, spoil: false},
-                {label: $localize`Simulateur de débordement`, path: 'tools/overflow', displayed: true, lvl: 1, authorized: (): boolean => true, spoil: false},
+                { label: $localize`Camping`, path: 'tools/camping', displayed: true, lvl: 1, authorized: (): boolean => true, spoil: false },
+                { label: $localize`Chances de survie`, path: 'tools/probabilities', displayed: true, lvl: 1, authorized: (): boolean => true, spoil: false },
+                { label: $localize`Simulateur de débordement`, path: 'tools/overflow', displayed: true, lvl: 1, authorized: (): boolean => true, spoil: false },
             ], spoil: false
         },
         {
             label: $localize`Annuaire`, lvl: 0, displayed: true, authorized: (): boolean => true, expanded: false, children: [
-                {label: $localize`Citoyens`, path: 'directory/citizens', displayed: false, lvl: 1, authorized: (): boolean => true, spoil: false},
-                {label: $localize`Villes`, path: 'directory/towns', displayed: false, lvl: 1, authorized: (): boolean => true, spoil: false},
+                { label: $localize`Citoyens`, path: 'directory/citizens', displayed: false, lvl: 1, authorized: (): boolean => true, spoil: false },
+                { label: $localize`Villes`, path: 'directory/towns', displayed: false, lvl: 1, authorized: (): boolean => true, spoil: false },
             ], spoil: false
         },
         {
             label: $localize`Wiki`, lvl: 0, displayed: true, authorized: (): boolean => true, expanded: false, children: [
-                {label: $localize`Objets`, path: 'wiki/items', displayed: false, lvl: 1, authorized: (): boolean => true, spoil: true},
-                {label: $localize`Recettes`, path: 'wiki/recipes', displayed: false, lvl: 1, authorized: (): boolean => true, spoil: true},
-                {label: $localize`Pouvoirs`, path: 'wiki/hero-skills', displayed: false, lvl: 1, authorized: (): boolean => true, spoil: false},
-                {label: $localize`Bâtiments`, path: 'wiki/ruins', displayed: false, lvl: 1, authorized: (): boolean => true, spoil: true},
+                { label: $localize`Objets`, path: 'wiki/items', displayed: false, lvl: 1, authorized: (): boolean => true, spoil: true },
+                { label: $localize`Recettes`, path: 'wiki/recipes', displayed: false, lvl: 1, authorized: (): boolean => true, spoil: true },
+                { label: $localize`Pouvoirs`, path: 'wiki/hero-skills', displayed: false, lvl: 1, authorized: (): boolean => true, spoil: false },
+                { label: $localize`Bâtiments`, path: 'wiki/ruins', displayed: false, lvl: 1, authorized: (): boolean => true, spoil: true },
                 {
                     label: $localize`Informations diverses`,
                     path: 'wiki/miscellaneous-info',
@@ -221,8 +222,8 @@ export class MenuComponent implements OnInit {
         },
         {
             label: $localize`Mini-Jeux`, lvl: 0, displayed: true, authorized: (): boolean => true, expanded: false, children: [
-                {label: $localize`368 Pictos`, path: 'games/368-pictos', displayed: false, lvl: 1, authorized: (): boolean => true, spoil: false},
-                {label: $localize`Démineur`, path: 'games/minesweeper', displayed: false, lvl: 1, authorized: (): boolean => true, spoil: false},
+                { label: $localize`368 Pictos`, path: 'games/368-pictos', displayed: false, lvl: 1, authorized: (): boolean => true, spoil: false },
+                { label: $localize`Démineur`, path: 'games/minesweeper', displayed: false, lvl: 1, authorized: (): boolean => true, spoil: false },
             ], spoil: false
         },
     ];
@@ -318,16 +319,16 @@ export class MenuComponent implements OnInit {
     private resizeSidenav(): void {
         const sidenavContainer: MatSidenavContainer = this.sidenavContainer();
         sidenavContainer.autosize = true;
-        this.sidenavContainer.set(sidenavContainer)
+        this.sidenavContainer.set(sidenavContainer);
         setTimeout((): void => {
-            this.sidenavContainer.set(sidenavContainer)
+            this.sidenavContainer.set(sidenavContainer);
         });
     }
 
     private defineThemes(): void {
         /** Noël */
         if (this.isNoel() || !environment.production) {
-            this.themes.push({label: $localize`Noël`, class: 'noel'});
+            this.themes.push({ label: $localize`Noël`, class: 'noel' });
             if (environment.production) {
                 this.themes.splice(0, 1);
                 this.useEventTheme();
@@ -340,7 +341,7 @@ export class MenuComponent implements OnInit {
 
         /** Halloween */
         if (this.isHalloween() || !environment.production) {
-            this.themes.push({label: $localize`Halloween`, class: 'halloween'});
+            this.themes.push({ label: $localize`Halloween`, class: 'halloween' });
             if (environment.production) {
                 this.themes.splice(0, 1);
                 this.useEventTheme();

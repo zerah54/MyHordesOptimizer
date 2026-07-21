@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, DestroyRef, inject, OnInit, signal, WritableSignal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, OnInit, signal,WritableSignal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -9,10 +9,11 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { catchError, EMPTY, finalize, Observable } from 'rxjs';
+import { catchError, EMPTY, finalize,Observable } from 'rxjs';
+
+import { SeasonDTO } from '../../_abstract_model/dto/season.dto';
 import { AdminService } from '../../_abstract_model/services/admin.service';
 import { TownService } from '../../_abstract_model/services/town.service';
-import { SeasonDTO } from '../../_abstract_model/dto/season.dto';
 import { Imports } from '../../_abstract_model/types/_types';
 
 interface ImportAction {

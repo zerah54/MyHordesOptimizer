@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { AfterViewInit, ChangeDetectionStrategy, Component, computed, DestroyRef, inject, input, OnInit, Signal, signal, ViewChild, WritableSignal } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, Component, computed, DestroyRef, inject, input, OnInit, Signal, signal,ViewChild, WritableSignal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -16,15 +16,16 @@ import { MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { Router } from '@angular/router';
 import { catchError, debounceTime, EMPTY, finalize, forkJoin, of } from 'rxjs';
-import { getTown } from '../../_core/utilities/localstorage.util';
+
 import { HORDES_IMG_REPO } from '../../_abstract_model/const';
 import { SeasonPhaseDTO } from '../../_abstract_model/dto/season-phase.dto';
 import { TownListQuery } from '../../_abstract_model/dto/town-list-page.dto';
 import { AdminService } from '../../_abstract_model/services/admin.service';
 import { TownService } from '../../_abstract_model/services/town.service';
-import { DeferredCellComponent } from '../../_shared/deferred-cell/deferred-cell.component';
 import { Imports, TownState, TownTypeId } from '../../_abstract_model/types/_types';
 import { TownListItem, TownListPageResult, TownPublicCitizen } from '../../_abstract_model/types/town-list-item.model';
+import { getTown } from '../../_core/utilities/localstorage.util';
+import { DeferredCellComponent } from '../../_shared/deferred-cell/deferred-cell.component';
 
 const angular_common: Imports = [CommonModule, ReactiveFormsModule];
 const components: Imports = [DeferredCellComponent];

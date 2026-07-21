@@ -18,7 +18,7 @@ export class EstimationsResult extends CommonModel<EstimationsResultDTO> {
             result: this.result,
             minList: this.min_list.map((element: EstimationGraphValues) => element.value),
             maxList: this.max_list.map((element: EstimationGraphValues) => element.value)
-        }
+        };
     }
 
     protected override dtoToModel(dto?: EstimationsResultDTO | null | undefined): void {
@@ -36,14 +36,14 @@ export class EstimationsResult extends CommonModel<EstimationsResultDTO> {
             if (value_in_list) {
                 value_in_list.count += 1;
             } else {
-                graph_list.push({value: value, count: 1})
+                graph_list.push({ value: value, count: 1 });
             }
         });
         graph_list.sort((element_a: EstimationGraphValues, element_b: EstimationGraphValues) => {
             if (element_a.value < element_b.value) return -1;
             if (element_a.value > element_b.value) return 1;
             return 0;
-        })
+        });
         return graph_list;
     }
 }

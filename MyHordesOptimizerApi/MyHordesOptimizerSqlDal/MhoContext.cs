@@ -406,6 +406,8 @@ public partial class MhoContext : DbContext
 
             entity.HasOne(d => d.IdLastUpdateInfoNavigation).WithMany(p => p.MapCells).HasConstraintName("MapCell_ibfk_2");
 
+            entity.HasOne(d => d.IdScoutEstimationLastUpdateInfoNavigation).WithMany(p => p.ScoutEstimationMapCells).HasConstraintName("MapCell_ibfk_4");
+
             entity.HasOne(d => d.IdRuinNavigation).WithMany(p => p.MapCells).HasConstraintName("MapCell_ibfk_3");
 
             entity.HasOne(d => d.IdTownNavigation).WithMany(p => p.MapCells).HasConstraintName("MapCell_ibfk_1");

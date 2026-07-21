@@ -1,6 +1,7 @@
 import { CommonModule, NgOptimizedImage, NgTemplateOutlet } from '@angular/common';
-import { Component, input, Input, InputSignal } from '@angular/core';
+import { Component, Input, input,InputSignal } from '@angular/core';
 import { MatTabChangeEvent, MatTabsModule } from '@angular/material/tabs';
+
 import { HORDES_IMG_REPO } from '../../../../_abstract_model/const';
 import { DisplayPseudoMode, Entry } from '../../../../_abstract_model/interfaces';
 import { Imports } from '../../../../_abstract_model/types/_types';
@@ -27,7 +28,7 @@ export class BuildingsRegistryComponent {
 
     // TODO: Skipped for migration because:
     //  Accessor inputs cannot be migrated as they are too complex.
-    @Input({required: true}) set registry(registry: Entry[] | undefined) {
+    @Input({ required: true }) set registry(registry: Entry[] | undefined) {
         if (registry) {
             this.entries = registry;
             this.filterEntriesByType(registry);

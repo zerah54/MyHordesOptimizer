@@ -1,4 +1,5 @@
 import moment from 'moment';
+
 import { CauseOfDeathDTO } from '../dto/cause-of-death.dto';
 import { CommonModel } from './_common.class';
 import { Dictionary } from './_types';

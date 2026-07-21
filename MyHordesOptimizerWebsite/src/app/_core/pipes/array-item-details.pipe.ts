@@ -1,6 +1,7 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import { ItemCountShort } from '../../_abstract_model/types/item-count-short.class';
+
 import { Item } from '../../_abstract_model/types/item.class';
+import { ItemCountShort } from '../../_abstract_model/types/item-count-short.class';
 
 
 @Pipe({

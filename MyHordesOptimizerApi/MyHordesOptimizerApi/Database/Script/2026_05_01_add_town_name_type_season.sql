@@ -15,7 +15,7 @@ ALTER TABLE Town
     ADD COLUMN IF NOT EXISTS phase      INT          NULL,
     ADD COLUMN IF NOT EXISTS language   VARCHAR(10)  CHARACTER SET utf8mb4 NULL,
     ADD COLUMN IF NOT EXISTS score      INT          NULL,
-    ADD COLUMN IF NOT EXISTS isFinished BIT          NOT NULL DEFAULT 0;
+    ADD COLUMN IF NOT EXISTS isFinished BIT          NOT NULL DEFAULT 0,
     ADD COLUMN IF NOT EXISTS mapId      INT          NULL;  
 
 -- ============================================================

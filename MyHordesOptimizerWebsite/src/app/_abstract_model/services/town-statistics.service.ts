@@ -1,17 +1,18 @@
 import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, Subscriber } from 'rxjs';
+
 import { getTown, getUserId, } from '../../_core/utilities/localstorage.util';
-import { EstimationsResultDTO } from '../dto/estimations-result.dto';
 import { EstimationsDTO } from '../dto/estimations.dto';
+import { EstimationsResultDTO } from '../dto/estimations-result.dto';
 import { RegenDTO } from '../dto/regen.dto';
 import { dtoToModelArray } from '../types/_common.class';
-import { EstimationsResult } from '../types/estimations-result.class';
 import { Estimations } from '../types/estimations.class';
+import { EstimationsResult } from '../types/estimations-result.class';
 import { Regen } from '../types/regen.class';
 import { GlobalService } from './_global.service';
 
-@Injectable({providedIn: 'root'})
+@Injectable({ providedIn: 'root' })
 export class TownStatisticsService extends GlobalService {
 
     public getAttackCalculation(day: number, beta: boolean): Observable<EstimationsResult> {

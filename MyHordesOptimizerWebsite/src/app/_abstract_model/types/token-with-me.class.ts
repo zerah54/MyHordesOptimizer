@@ -1,5 +1,5 @@
-import { CommonModel } from './_common.class';
 import { TokenWithMeDTO } from '../dto/token-with-me.dto';
+import { CommonModel } from './_common.class';
 import { Me } from './me.class';
 import { Token } from './token.class';
 

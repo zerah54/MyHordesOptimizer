@@ -1,286 +1,298 @@
 {
-    "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
-    "version": 1,
-    "newProjectRoot": "projects",
-    "projects": {
-        "MyHordesOptimizerWebsite": {
-            "projectType": "application",
-            "schematics": {
-                "@schematics/angular:component": {
-                    "style": "scss"
-                }
-            },
-            "root": "",
-            "sourceRoot": "src",
-            "prefix": "mho",
-            "architect": {
-                "build": {
-                    "builder": "@angular-devkit/build-angular:browser",
-                    "options": {
-                        "sourceMap": true,
-                        "preserveSymlinks": true,
-                        "outputPath": "dist/MyHordesOptimizerWebsite/browser",
-                        "index": "src/index.html",
-                        "main": "src/main.ts",
-                        "polyfills": [
-                            "zone.js"
-                        ],
-                        "tsConfig": "tsconfig.app.json",
-                        "webWorkerTsConfig": "tsconfig.worker.json",
-                        "assets": [
-                            {
-                                "glob": "**/*",
-                                "input": "public"
-                            }
-                        ],
-                        "styles": [
-                            "node_modules/material-symbols/index.css",
-                            "node_modules/@fortawesome/fontawesome-free/css/all.css",
-                            "node_modules/highlight.js/styles/atom-one-dark.min.css",
-                            "src/styles.scss",
-                            "public/scss/material-theme/theming.scss"
-                        ],
-                        "stylePreprocessorOptions": {
-                            "includePaths": [
-                                "public/scss",
-                                "public/scss/material-theme",
-                                "public/scss/noel",
-                                "public/scss/halloween"
-                            ]
-                        },
-                        "scripts": []
-                    },
-                    "configurations": {
-                        "production": {
-                            "budgets": [
-                                {
-                                    "type": "initial",
-                                    "maximumWarning": "5mb",
-                                    "maximumError": "10mb"
-                                },
-                                {
-                                    "type": "anyComponentStyle",
-                                    "maximumWarning": "10kb",
-                                    "maximumError": "15kb"
-                                }
-                            ],
-                            "fileReplacements": [
-                                {
-                                    "replace": "src/environments/environment.ts",
-                                    "with": "src/environments/environment.prod.ts"
-                                }
-                            ],
-                            "outputHashing": "all"
-                        },
-                        "development": {
-                            "buildOptimizer": false,
-                            "optimization": false,
-                            "vendorChunk": true,
-                            "extractLicenses": false,
-                            "sourceMap": true,
-                            "namedChunks": true
-                        },
-                        "staging": {
-                            "budgets": [
-                                {
-                                    "type": "initial",
-                                    "maximumWarning": "5mb",
-                                    "maximumError": "10mb"
-                                },
-                                {
-                                    "type": "anyComponentStyle",
-                                    "maximumWarning": "10kb",
-                                    "maximumError": "15kb"
-                                }
-                            ],
-                            "fileReplacements": [
-                                {
-                                    "replace": "src/environments/environment.ts",
-                                    "with": "src/environments/environment.dev.ts"
-                                }
-                            ],
-                            "outputHashing": "all"
-                        }
-                    },
-                    "defaultConfiguration": "production"
-                },
-                "serve": {
-                    "builder": "@angular-devkit/build-angular:dev-server",
-                    "options": {
-                        "proxyConfig": "src/proxy.conf.json"
-                    },
-                    "configurations": {
-                        "production": {
-                            "buildTarget": "MyHordesOptimizerWebsite:build:production"
-                        },
-                        "development": {
-                            "buildTarget": "MyHordesOptimizerWebsite:build:development"
-                        },
-                        "staging": {
-                            "buildTarget": "MyHordesOptimizerWebsite:build:staging"
-                        }
-                    },
-                    "defaultConfiguration": "development"
-                },
-                "extract-i18n": {
-                    "builder": "@angular-devkit/build-angular:extract-i18n",
-                    "options": {
-                        "buildTarget": "MyHordesOptimizerWebsite:build"
-                    }
-                },
-                "test": {
-                    "builder": "@angular-devkit/build-angular:karma",
-                    "options": {
-                        "polyfills": [
-                            "zone.js",
-                            "zone.js.testing"
-                        ],
-                        "tsConfig": "tsconfig.spec.json",
-                        "assets": [
-                            {
-                                "glob": "**/*",
-                                "input": "public"
-                            }
-                        ],
-                        "styles": [
-                            "node_modules/material-symbols/index.css",
-                            "node_modules/@fortawesome/fontawesome-free/css/all.css",
-                            "node_modules/highlight.js/styles/atom-one-dark.min.css",
-                            "src/styles.scss"
-                        ],
-                        "stylePreprocessorOptions": {
-                            "includePaths": [
-                                "public/scss",
-                                "public/scss/material-theme",
-                                "public/scss/noel",
-                                "public/scss/halloween"
-                            ]
-                        },
-                        "scripts": []
-                    }
-                },
-                "server": {
-                    "builder": "@angular-devkit/build-angular:server",
-                    "options": {
-                        "outputPath": "dist/MyHordesOptimizerWebsite/server",
-                        "main": "server.ts",
-                        "tsConfig": "tsconfig.server.json",
-                        "stylePreprocessorOptions": {
-                            "includePaths": [
-                                "public/scss",
-                                "public/scss/**/"
-                            ]
-                        },
-                        "preserveSymlinks": true
-                    },
-                    "configurations": {
-                        "production": {
-                            "outputHashing": "media",
-                            "fileReplacements": [
-                                {
-                                    "replace": "src/environments/environment.ts",
-                                    "with": "src/environments/environment.prod.ts"
-                                }
-                            ]
-                        },
-                        "development": {
-                            "buildOptimizer": false,
-                            "optimization": false,
-                            "sourceMap": true,
-                            "extractLicenses": false,
-                            "vendorChunk": true
-                        },
-                        "staging": {
-                            "outputHashing": "media",
-                            "fileReplacements": [
-                                {
-                                    "replace": "src/environments/environment.ts",
-                                    "with": "src/environments/environment.staging.ts"
-                                }
-                            ]
-                        }
-                    },
-                    "defaultConfiguration": "production"
-                },
-                "serve-ssr": {
-                    "builder": "@angular-devkit/build-angular:ssr-dev-server",
-                    "configurations": {
-                        "production": {
-                            "browserTarget": "MyHordesOptimizerWebsite:build:production",
-                            "serverTarget": "MyHordesOptimizerWebsite:server:production"
-                        },
-                        "development": {
-                            "browserTarget": "MyHordesOptimizerWebsite:build:development",
-                            "serverTarget": "MyHordesOptimizerWebsite:server:development"
-                        },
-                        "staging": {
-                            "browserTarget": "MyHordesOptimizerWebsite:build:staging",
-                            "serverTarget": "MyHordesOptimizerWebsite:server:staging"
-                        }
-                    },
-                    "defaultConfiguration": "development"
-                },
-                "prerender": {
-                    "builder": "@angular-devkit/build-angular:prerender",
-                    "options": {
-                        "routes": [
-                            "/"
-                        ]
-                    },
-                    "configurations": {
-                        "production": {
-                            "browserTarget": "MyHordesOptimizerWebsite:build:production",
-                            "serverTarget": "MyHordesOptimizerWebsite:server:production"
-                        },
-                        "development": {
-                            "browserTarget": "MyHordesOptimizerWebsite:build:development",
-                            "serverTarget": "MyHordesOptimizerWebsite:server:development"
-                        },
-                        "staging": {
-                            "browserTarget": "MyHordesOptimizerWebsite:build:staging",
-                            "serverTarget": "MyHordesOptimizerWebsite:server:staging"
-                        }
-                    },
-                    "defaultConfiguration": "production"
-                }
-            },
-            "i18n": {
-                "sourceLocale": "fr",
-                "locales": {
-                    "de": "public/i18n/xlf-files/messages.de.xlf",
-                    "en": "public/i18n/xlf-files/messages.en.xlf",
-                    "es": "public/i18n/xlf-files/messages.es.xlf"
-                }
-            }
+  "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
+  "version": 1,
+  "newProjectRoot": "projects",
+  "projects": {
+    "MyHordesOptimizerWebsite": {
+      "projectType": "application",
+      "schematics": {
+        "@schematics/angular:component": {
+          "style": "scss"
         }
-    },
-    "schematics": {
-      "@schematics/angular:component": {
-        "type": "component"
       },
-      "@schematics/angular:directive": {
-        "type": "directive"
+      "root": "",
+      "sourceRoot": "src",
+      "prefix": "mho",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:browser",
+          "options": {
+            "sourceMap": true,
+            "preserveSymlinks": true,
+            "outputPath": "dist/MyHordesOptimizerWebsite/browser",
+            "index": "src/index.html",
+            "main": "src/main.ts",
+            "polyfills": [
+              "zone.js"
+            ],
+            "tsConfig": "tsconfig.app.json",
+            "webWorkerTsConfig": "tsconfig.worker.json",
+            "assets": [
+              {
+                "glob": "**/*",
+                "input": "public"
+              }
+            ],
+            "styles": [
+              "node_modules/material-symbols/index.css",
+              "node_modules/@fortawesome/fontawesome-free/css/all.css",
+              "node_modules/highlight.js/styles/atom-one-dark.min.css",
+              "src/styles.scss",
+              "public/scss/material-theme/theming.scss"
+            ],
+            "stylePreprocessorOptions": {
+              "includePaths": [
+                "public/scss",
+                "public/scss/material-theme",
+                "public/scss/noel",
+                "public/scss/halloween"
+              ]
+            },
+            "scripts": []
+          },
+          "configurations": {
+            "production": {
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "5mb",
+                  "maximumError": "10mb"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "10kb",
+                  "maximumError": "15kb"
+                }
+              ],
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.prod.ts"
+                }
+              ],
+              "outputHashing": "all"
+            },
+            "development": {
+              "buildOptimizer": false,
+              "optimization": false,
+              "vendorChunk": true,
+              "extractLicenses": false,
+              "sourceMap": true,
+              "namedChunks": true
+            },
+            "staging": {
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "5mb",
+                  "maximumError": "10mb"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "10kb",
+                  "maximumError": "15kb"
+                }
+              ],
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.dev.ts"
+                }
+              ],
+              "outputHashing": "all"
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "serve": {
+          "builder": "@angular-devkit/build-angular:dev-server",
+          "options": {
+            "proxyConfig": "src/proxy.conf.json"
+          },
+          "configurations": {
+            "production": {
+              "buildTarget": "MyHordesOptimizerWebsite:build:production"
+            },
+            "development": {
+              "buildTarget": "MyHordesOptimizerWebsite:build:development"
+            },
+            "staging": {
+              "buildTarget": "MyHordesOptimizerWebsite:build:staging"
+            }
+          },
+          "defaultConfiguration": "development"
+        },
+        "extract-i18n": {
+          "builder": "@angular-devkit/build-angular:extract-i18n",
+          "options": {
+            "buildTarget": "MyHordesOptimizerWebsite:build"
+          }
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "polyfills": [
+              "zone.js",
+              "zone.js.testing"
+            ],
+            "tsConfig": "tsconfig.spec.json",
+            "assets": [
+              {
+                "glob": "**/*",
+                "input": "public"
+              }
+            ],
+            "styles": [
+              "node_modules/material-symbols/index.css",
+              "node_modules/@fortawesome/fontawesome-free/css/all.css",
+              "node_modules/highlight.js/styles/atom-one-dark.min.css",
+              "src/styles.scss"
+            ],
+            "stylePreprocessorOptions": {
+              "includePaths": [
+                "public/scss",
+                "public/scss/material-theme",
+                "public/scss/noel",
+                "public/scss/halloween"
+              ]
+            },
+            "scripts": []
+          }
+        },
+        "server": {
+          "builder": "@angular-devkit/build-angular:server",
+          "options": {
+            "outputPath": "dist/MyHordesOptimizerWebsite/server",
+            "main": "server.ts",
+            "tsConfig": "tsconfig.server.json",
+            "stylePreprocessorOptions": {
+              "includePaths": [
+                "public/scss",
+                "public/scss/**/"
+              ]
+            },
+            "preserveSymlinks": true
+          },
+          "configurations": {
+            "production": {
+              "outputHashing": "media",
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.prod.ts"
+                }
+              ]
+            },
+            "development": {
+              "buildOptimizer": false,
+              "optimization": false,
+              "sourceMap": true,
+              "extractLicenses": false,
+              "vendorChunk": true
+            },
+            "staging": {
+              "outputHashing": "media",
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.staging.ts"
+                }
+              ]
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "serve-ssr": {
+          "builder": "@angular-devkit/build-angular:ssr-dev-server",
+          "configurations": {
+            "production": {
+              "browserTarget": "MyHordesOptimizerWebsite:build:production",
+              "serverTarget": "MyHordesOptimizerWebsite:server:production"
+            },
+            "development": {
+              "browserTarget": "MyHordesOptimizerWebsite:build:development",
+              "serverTarget": "MyHordesOptimizerWebsite:server:development"
+            },
+            "staging": {
+              "browserTarget": "MyHordesOptimizerWebsite:build:staging",
+              "serverTarget": "MyHordesOptimizerWebsite:server:staging"
+            }
+          },
+          "defaultConfiguration": "development"
+        },
+        "prerender": {
+          "builder": "@angular-devkit/build-angular:prerender",
+          "options": {
+            "routes": [
+              "/"
+            ]
+          },
+          "configurations": {
+            "production": {
+              "browserTarget": "MyHordesOptimizerWebsite:build:production",
+              "serverTarget": "MyHordesOptimizerWebsite:server:production"
+            },
+            "development": {
+              "browserTarget": "MyHordesOptimizerWebsite:build:development",
+              "serverTarget": "MyHordesOptimizerWebsite:server:development"
+            },
+            "staging": {
+              "browserTarget": "MyHordesOptimizerWebsite:build:staging",
+              "serverTarget": "MyHordesOptimizerWebsite:server:staging"
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "lint": {
+          "builder": "@angular-eslint/builder:lint",
+          "options": {
+            "lintFilePatterns": [
+              "src/**/*.ts",
+              "src/**/*.html"
+            ]
+          }
+        }
       },
-      "@schematics/angular:service": {
-        "type": "service"
-      },
-      "@schematics/angular:guard": {
-        "typeSeparator": "."
-      },
-      "@schematics/angular:interceptor": {
-        "typeSeparator": "."
-      },
-      "@schematics/angular:module": {
-        "typeSeparator": "."
-      },
-      "@schematics/angular:pipe": {
-        "typeSeparator": "."
-      },
-      "@schematics/angular:resolver": {
-        "typeSeparator": "."
+      "i18n": {
+        "sourceLocale": "fr",
+        "locales": {
+          "de": "public/i18n/xlf-files/messages.de.xlf",
+          "en": "public/i18n/xlf-files/messages.en.xlf",
+          "es": "public/i18n/xlf-files/messages.es.xlf"
+        }
       }
-    },
-    "cli": {
-        "analytics": false
     }
+  },
+  "schematics": {
+    "@schematics/angular:component": {
+      "type": "component"
+    },
+    "@schematics/angular:directive": {
+      "type": "directive"
+    },
+    "@schematics/angular:service": {
+      "type": "service"
+    },
+    "@schematics/angular:guard": {
+      "typeSeparator": "."
+    },
+    "@schematics/angular:interceptor": {
+      "typeSeparator": "."
+    },
+    "@schematics/angular:module": {
+      "typeSeparator": "."
+    },
+    "@schematics/angular:pipe": {
+      "typeSeparator": "."
+    },
+    "@schematics/angular:resolver": {
+      "typeSeparator": "."
+    }
+  },
+  "cli": {
+    "analytics": false,
+    "schematicCollections": [
+      "angular-eslint"
+    ]
+  }
 }

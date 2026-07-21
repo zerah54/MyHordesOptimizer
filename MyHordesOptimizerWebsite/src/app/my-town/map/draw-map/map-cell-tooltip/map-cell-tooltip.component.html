@@ -35,6 +35,31 @@
                 <img [ngSrc]="HORDES_IMG_REPO + 'emotes/human.gif'" width="16" height="16">
                 {{ cell().nb_hero || 0 }}&nbsp;<ng-container i18n>points</ng-container>
             </div>
+            @if (cell().scout_estimation_zombie !== null || cell().scav_zone_level !== null || cell().scout_zone_level !== null) {
+                <mat-divider></mat-divider>
+                <div class="job-radar">
+                    @if (cell().scout_estimation_zombie !== null) {
+                        <div class="scout-estimation">
+                            <img [ngSrc]="HORDES_IMG_REPO + 'professions/vest.gif'" width="16" height="16">
+                            <ng-container i18n>Estimation&nbsp;:</ng-container>&nbsp;{{ cell().scout_estimation_zombie }}
+                            <span class="range">({{ cell().scout_estimation_min }}&nbsp;–&nbsp;{{ cell().scout_estimation_max }})</span>
+                        </div>
+                        <mho-last-update [lastUpdateInfo]="cell().scout_estimation_update_info ?? undefined"></mho-last-update>
+                    }
+                    @if (cell().scav_zone_level !== null) {
+                        <div class="scav-zone-level">
+                            <img [ngSrc]="HORDES_IMG_REPO + 'professions/dig.gif'" width="16" height="16">
+                            <ng-container i18n>Abondance&nbsp;:</ng-container>&nbsp;{{ cell().scav_zone_level }}/3
+                        </div>
+                    }
+                    @if (cell().scout_zone_level !== null) {
+                        <div class="scout-zone-level">
+                            <img [ngSrc]="HORDES_IMG_REPO + 'professions/vest.gif'" width="16" height="16">
+                            <ng-container i18n>Exploration&nbsp;:</ng-container>&nbsp;{{ cell().scout_zone_level }}/3
+                        </div>
+                    }
+                </div>
+            }
             <mat-divider></mat-divider>
         </div>
     }

@@ -3,12 +3,13 @@ import { ApplicationConfig, ErrorHandler, importProvidersFrom, inject, LOCALE_ID
 import { initializeApp, provideFirebaseApp } from '@angular/fire/app';
 import { AngularFireModule } from '@angular/fire/compat';
 import { AngularFireAnalyticsModule } from '@angular/fire/compat/analytics';
-import { provideMomentDateAdapter } from '@angular/material-moment-adapter';
 import { MatPaginatorIntl } from '@angular/material/paginator';
+import { provideMomentDateAdapter } from '@angular/material-moment-adapter';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { provideRouter, Router, withRouterConfig } from '@angular/router';
 import * as Sentry from '@sentry/angular';
+
 import { environment } from '../environments/environment';
 import { Modules } from './_abstract_model/types/_types';
 import { MhoPaginatorIntl } from './_core/intl/mho-paginator.intl';
@@ -38,7 +39,7 @@ export const appConfig: ApplicationConfig = {
             provide: LOCALE_ID,
             useFactory: (): string | null => localStorage.getItem('mho-locale') || 'fr'
         },
-        provideAppInitializer(() => {inject(Sentry.TraceService)}),
+        provideAppInitializer(() => {inject(Sentry.TraceService);}),
         {
             provide: ErrorHandler,
             useValue: Sentry.createErrorHandler(),

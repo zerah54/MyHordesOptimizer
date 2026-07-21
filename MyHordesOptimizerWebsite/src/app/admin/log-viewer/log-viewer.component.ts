@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, DestroyRef, inject, OnInit, signal, WritableSignal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, OnInit, signal,WritableSignal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -16,6 +16,7 @@ import { MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import moment, { Moment } from 'moment';
 import { catchError, debounceTime, EMPTY, Observable, Subject, switchMap } from 'rxjs';
+
 import { LogViewerService } from '../../_abstract_model/services/log-viewer.service';
 import { Imports, LogLevel } from '../../_abstract_model/types/_types';
 import { LogEntry, LogPageResult } from '../../_abstract_model/types/log-viewer.model';
@@ -24,11 +25,11 @@ import { HighlightJsonPipe } from '../../_core/pipes/highlight-json.pipe';
 const LOG_LEVELS: LogLevel[] = ['Verbose', 'Debug', 'Information', 'Warning', 'Error', 'Fatal'];
 
 const angular_common: Imports = [CommonModule,
-    ReactiveFormsModule,];
+                                 ReactiveFormsModule,];
 const components: Imports = [];
 const pipes: Imports = [HighlightJsonPipe];
 const material_modules: Imports = [MatTableModule, MatPaginatorModule, MatFormFieldModule, MatInputModule, MatSelectModule, MatDatepickerModule,
-    MatIconModule, MatButtonModule, MatProgressSpinnerModule, MatTooltipModule, MatChipsModule, MatDividerModule];
+                                   MatIconModule, MatButtonModule, MatProgressSpinnerModule, MatTooltipModule, MatChipsModule, MatDividerModule];
 
 @Component({
     selector: 'mho-log-viewer',
@@ -79,7 +80,7 @@ export class LogViewerComponent implements OnInit {
     public ngOnInit(): void {
         this.loadTrigger$.pipe(
             switchMap(() => {
-                const {date, level, correlationId, search} = this.filtersForm.value;
+                const { date, level, correlationId, search } = this.filtersForm.value;
                 if (!date) return EMPTY;
                 this.loading.set(true);
                 return this.service.getLogs(date, this.page, this.pageSize, {
@@ -112,10 +113,10 @@ export class LogViewerComponent implements OnInit {
                 this.page = 1;
                 setTimeout(() => {
                     this.loadLogs();
-                })
+                });
             });
 
-        const {level, correlationId, search} = this.filtersForm.controls;
+        const { level, correlationId, search } = this.filtersForm.controls;
         [level.valueChanges, correlationId.valueChanges, search.valueChanges].forEach((obs: Observable<string | null>) =>
             obs.pipe(debounceTime(400), takeUntilDestroyed(this.destroy_ref))
                 .subscribe(() => {

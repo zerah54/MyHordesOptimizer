@@ -62,7 +62,7 @@ class SetStore {
         const k = this.key(x, y, mask);
         if (this.sets.has(k)) return; // already exists
 
-        const s: MineSet = {x, y, mask, mines, in_todo: false, prev: null, next: null};
+        const s: MineSet = { x, y, mask, mines, in_todo: false, prev: null, next: null };
         this.sets.set(k, s);
         this.addToTodo(s);
     }
@@ -345,7 +345,7 @@ function minesolve(
                         for (let j: number = 0; j < cursor; j++) {
                             if (setused[j] &&
                                 setmunge(all_sets[cursor].x, all_sets[cursor].y, all_sets[cursor].mask,
-                                    all_sets[j].x, all_sets[j].y, all_sets[j].mask, false)) {
+                                         all_sets[j].x, all_sets[j].y, all_sets[j].mask, false)) {
                                 ok = false;
                                 break;
                             }
@@ -366,7 +366,7 @@ function minesolve(
                                     for (let k: number = 0; k < nsets; k++) {
                                         if (setused[k] &&
                                             setmunge(all_sets[k].x, all_sets[k].y, all_sets[k].mask,
-                                                jx, jy, 1, false)) {
+                                                     jx, jy, 1, false)) {
                                             outside = false;
                                             break;
                                         }
@@ -484,7 +484,7 @@ function mineperturb(
                 }
             }
 
-            candidates.push({x, y, type, rand: rng.bits31()});
+            candidates.push({ x, y, type, rand: rng.bits31() });
         }
     }
 
@@ -572,12 +572,12 @@ function mineperturb(
     // Build the perturbation list
     const changes: Perturbation[] = [];
     for (const sq of todo) {
-        changes.push({x: sq.x, y: sq.y, delta: dtodo});
+        changes.push({ x: sq.x, y: sq.y, delta: dtodo });
     }
 
     if (set_indices !== null) {
         for (const idx of set_indices) {
-            changes.push({x: idx % width, y: (idx / width) | 0, delta: dset});
+            changes.push({ x: idx % width, y: (idx / width) | 0, delta: dset });
         }
     } else if (mask !== 0) {
         for (let dy: number = 0; dy < 3; dy++) {
@@ -585,7 +585,7 @@ function mineperturb(
                 if (mask & (1 << (dy * 3 + dx))) {
                     const currval: 1 | -1 = mines[(sety + dy) * width + (setx + dx)] ? +1 : -1;
                     if (dset === -currval) {
-                        changes.push({x: setx + dx, y: sety + dy, delta: dset});
+                        changes.push({ x: setx + dx, y: sety + dy, delta: dset });
                     }
                 }
             }
@@ -596,7 +596,7 @@ function mineperturb(
                 if (grid[y * width + x] === UNKNOWN) {
                     const currval: 1 | -1 = mines[y * width + x] ? +1 : -1;
                     if (dset === -currval) {
-                        changes.push({x, y, delta: dset});
+                        changes.push({ x, y, delta: dset });
                     }
                 }
             }
@@ -685,7 +685,7 @@ export function minegen(
             }
         }
 
-        let k: number = candidates.length;
+        const k: number = candidates.length;
         for (let i: number = 0; i < nb_mines; i++) {
             const j: number = i + rng.upto(k - i);
             [candidates[i], candidates[j]] = [candidates[j], candidates[i]];
@@ -766,5 +766,5 @@ export function generateSolvableBoard(
         }
     }
 
-    return {mines, adjacent_counts: adjacent_counts, width: width, height: height};
+    return { mines, adjacent_counts: adjacent_counts, width: width, height: height };
 }

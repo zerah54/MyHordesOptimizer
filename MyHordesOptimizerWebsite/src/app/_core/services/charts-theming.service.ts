@@ -1,6 +1,7 @@
 import { DOCUMENT } from '@angular/common';
-import { inject, Injectable } from '@angular/core';
+import { inject,Injectable } from '@angular/core';
 import Chart from 'chart.js/auto';
+
 import { Theme } from '../../_abstract_model/interfaces';
 
 @Injectable({ providedIn: 'root' })

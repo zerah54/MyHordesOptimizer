@@ -1,6 +1,7 @@
 import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
-import { inject, Injectable } from '@angular/core';
+import { inject,Injectable } from '@angular/core';
 import { Observable, Subscriber } from 'rxjs';
+
 import { SnackbarService } from '../../_core/services/snackbar.service';
 import { getTown, getUserId } from '../../_core/utilities/localstorage.util';
 import { DigDTO } from '../dto/dig.dto';
@@ -9,7 +10,7 @@ import { Dig } from '../types/dig.class';
 import { GlobalService } from './_global.service';
 
 
-@Injectable({providedIn: 'root'})
+@Injectable({ providedIn: 'root' })
 export class DigsService extends GlobalService {
     private snackbar: SnackbarService = inject(SnackbarService);
 

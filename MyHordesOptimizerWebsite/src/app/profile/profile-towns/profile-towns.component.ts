@@ -1,12 +1,13 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+
 import { TownListComponent } from '../../directory/town-list/town-list.component';
 
 @Component({
     selector: 'mho-profile-towns',
     imports: [TownListComponent],
     changeDetection: ChangeDetectionStrategy.OnPush,
-    template: `<mho-town-list [playerId]="userId"/>`,
+    template: '<mho-town-list [playerId]="userId"/>',
     styleUrl: './profile-towns.component.scss',
 })
 export class ProfileTownsComponent {

@@ -1,5 +1,5 @@
-import { Dictionary } from '../types/_types';
 import { MinMax } from '../interfaces';
+import { Dictionary } from '../types/_types';
 
 export interface EstimationsDTO {
     estim?: Dictionary<MinMax>;

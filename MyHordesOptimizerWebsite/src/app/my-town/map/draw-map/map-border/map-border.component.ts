@@ -1,4 +1,5 @@
-import { booleanAttribute, Component, input, Input, InputSignalWithTransform } from '@angular/core';
+import { booleanAttribute, Component, Input, input,InputSignalWithTransform } from '@angular/core';
+
 import { Cell } from '../../../../_abstract_model/types/cell.class';
 
 @Component({
@@ -8,8 +9,8 @@ import { Cell } from '../../../../_abstract_model/types/cell.class';
 })
 export class MapBorderComponent {
 
-    public horizontal: InputSignalWithTransform<boolean, unknown> = input(false, {transform: booleanAttribute});
-    public vertical: InputSignalWithTransform<boolean, unknown> = input(false, {transform: booleanAttribute});
+    public horizontal: InputSignalWithTransform<boolean, unknown> = input(false, { transform: booleanAttribute });
+    public vertical: InputSignalWithTransform<boolean, unknown> = input(false, { transform: booleanAttribute });
 
     // TODO: Skipped for migration because:
     //  Accessor inputs cannot be migrated as they are too complex.

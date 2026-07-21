@@ -8,6 +8,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import moment from 'moment';
+
 import { Imports } from '../../_abstract_model/types/_types';
 
 const angular_common: Imports = [CommonModule, FormsModule];
@@ -24,7 +25,7 @@ const material_modules: Imports = [MatButtonModule, MatCardModule, MatFormFieldM
 export class ProbabilitiesComponent implements AfterViewInit {
 
     public simulations: Simulation[] = [
-        {nb_people: 1, current_chances: [0], result_probabilities: [], title: $localize`Simulation 1`, editing_title: false, show_detail: true}
+        { nb_people: 1, current_chances: [0], result_probabilities: [], title: $localize`Simulation 1`, editing_title: false, show_detail: true }
     ];
 
     public default_value: number = 0;

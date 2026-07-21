@@ -8,6 +8,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import moment from 'moment';
 import { Observable } from 'rxjs';
+
 import { environment } from '../../../../environments/environment';
 import { HORDES_IMG_REPO } from '../../../_abstract_model/const';
 import { DisplayPseudoMode, Entry } from '../../../_abstract_model/interfaces';
@@ -27,7 +28,7 @@ import { WellRegistryComponent } from './well/well-registry.component';
 
 const angular_common: Imports = [CommonModule, FormsModule, NgOptimizedImage];
 const components: Imports = [BankDiffRegistryComponent, PlaysRegistryComponent, DigsRegistryComponent, DoorsRegistryComponent, WellRegistryComponent,
-    TelescopeRegistryComponent, FlagRegistryComponent, BuildingsRegistryComponent];
+                             TelescopeRegistryComponent, FlagRegistryComponent, BuildingsRegistryComponent];
 const pipes: Imports = [];
 const material_modules: Imports = [MatButtonModule, MatButtonToggleModule, MatFormFieldModule, MatInputModule, MatTooltipModule];
 
@@ -53,14 +54,14 @@ export class RegistryComponent {
     public display_pseudo: DisplayPseudoMode = 'simple';
 
     public tabs: Tab[] = [
-        {mode: 'plays', label: $localize`Dés / Cartes / Ballon`, img: 'item/item_game_box.gif'},
-        {mode: 'bank_diff', label: $localize`Différenciel de la banque`, img: 'icons/home.gif'},
-        {mode: 'well', label: $localize`Prises dans le puits`, img: 'icons/small_well.gif'},
-        {mode: 'digs', label: $localize`Fouilles`, img: 'building/small_dig.gif'},
-        {mode: 'doors', label: $localize`Entrées / Sorties`, img: 'log/door_open.gif'},
-        {mode: 'telescope', label: $localize`Téléscope`, img: 'item/item_scope.gif'},
+        { mode: 'plays', label: $localize`Dés / Cartes / Ballon`, img: 'item/item_game_box.gif' },
+        { mode: 'bank_diff', label: $localize`Différenciel de la banque`, img: 'icons/home.gif' },
+        { mode: 'well', label: $localize`Prises dans le puits`, img: 'icons/small_well.gif' },
+        { mode: 'digs', label: $localize`Fouilles`, img: 'building/small_dig.gif' },
+        { mode: 'doors', label: $localize`Entrées / Sorties`, img: 'log/door_open.gif' },
+        { mode: 'telescope', label: $localize`Téléscope`, img: 'item/item_scope.gif' },
         // {mode: 'flag', label: $localize`Drapeau`, img: 'item/item_flag.gif'},
-        {mode: 'buildings', label: $localize`Utilisation des chantiers`, img: 'icons/home.gif'}
+        { mode: 'buildings', label: $localize`Utilisation des chantiers`, img: 'icons/home.gif' }
     ];
 
     public readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;

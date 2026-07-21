@@ -36,6 +36,9 @@ public partial class LastUpdateInfo
     [InverseProperty("IdLastUpdateInfoNavigation")]
     public virtual ICollection<MapCell> MapCells { get; set; } = new List<MapCell>();
 
+    [InverseProperty("IdScoutEstimationLastUpdateInfoNavigation")]
+    public virtual ICollection<MapCell> ScoutEstimationMapCells { get; set; } = new List<MapCell>();
+
     [InverseProperty("IdLastUpdateInfoNavigation")]
     public virtual ICollection<TownBankItem> TownBankItems { get; set; } = new List<TownBankItem>();
 

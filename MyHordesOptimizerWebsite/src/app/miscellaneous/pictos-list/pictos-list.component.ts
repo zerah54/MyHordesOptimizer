@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, input, InputSignal, Signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input,InputSignal, Signal } from '@angular/core';
 import { MatTooltipModule } from '@angular/material/tooltip';
+
 import { HORDES_IMG_REPO } from '../../_abstract_model/const';
 import { Imports } from '../../_abstract_model/types/_types';
 import { UserPicto } from '../../_abstract_model/types/user-picto.class';

@@ -1,6 +1,6 @@
 import { RuinItemDTO } from '../dto/ruin-item.dto';
-import { Item } from './item.class';
 import { CommonModel } from './_common.class';
+import { Item } from './item.class';
 
 export class RuinItem extends CommonModel<RuinItemDTO> {
     public probability!: number;

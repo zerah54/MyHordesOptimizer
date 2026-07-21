@@ -1,4 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core';
+
 import { CitizenExpedition } from '../../_abstract_model/types/citizen-expedition.class';
 import { ExpeditionPart } from '../../_abstract_model/types/expedition-part.class';
 

@@ -8,13 +8,14 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatTable, MatTableDataSource, MatTableModule } from '@angular/material/table';
 import moment from 'moment';
+
 import { HORDES_IMG_REPO } from '../../../_abstract_model/const';
 import { StandardColumn } from '../../../_abstract_model/interfaces';
 import { TownService } from '../../../_abstract_model/services/town.service';
 import { Imports } from '../../../_abstract_model/types/_types';
 import { Bath } from '../../../_abstract_model/types/bath.class';
-import { CitizenInfo } from '../../../_abstract_model/types/citizen-info.class';
 import { Citizen } from '../../../_abstract_model/types/citizen.class';
+import { CitizenInfo } from '../../../_abstract_model/types/citizen-info.class';
 import { UpdateInfo } from '../../../_abstract_model/types/update-info.class';
 import { ColumnIdPipe } from '../../../_core/pipes/column-id.pipe';
 import { TownContextService } from '../../../_core/services/town-context.service';
@@ -58,8 +59,8 @@ export class CitizensWatchComponent implements OnInit {
     public citizen_filter_change: EventEmitter<void> = new EventEmitter<void>();
     /** La liste des colonnes */
     public readonly columns: StandardColumn[] = [
-        {id: 'avatar_name', header: $localize`Citoyen`, class: 'center', sticky: true},
-        ...Array.from({length: getTown()?.day || 1}, (_: unknown, i: number): StandardColumn => {
+        { id: 'avatar_name', header: $localize`Citoyen`, class: 'center', sticky: true },
+        ...Array.from({ length: getTown()?.day || 1 }, (_: unknown, i: number): StandardColumn => {
             return {
                 id: (i + 1).toString(10),
                 header: $localize`Jour` + ' ' + (i + 1).toString(10),
@@ -106,7 +107,7 @@ export class CitizensWatchComponent implements OnInit {
                         if (bath_to_update_index > -1) {
                             citizen.baths[bath_to_update_index].update_info = update_info;
                         } else {
-                            citizen.baths.push(new Bath({day: day, lastUpdateInfo: update_info.modelToDto()}));
+                            citizen.baths.push(new Bath({ day: day, lastUpdateInfo: update_info.modelToDto() }));
                         }
                     }
                 });

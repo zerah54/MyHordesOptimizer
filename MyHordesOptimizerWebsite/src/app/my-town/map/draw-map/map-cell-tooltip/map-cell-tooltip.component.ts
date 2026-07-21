@@ -1,7 +1,8 @@
 import { NgOptimizedImage } from '@angular/common';
-import { ChangeDetectionStrategy, Component, signal, WritableSignal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, signal,WritableSignal } from '@angular/core';
 import { MatDivider } from '@angular/material/list';
 import moment from 'moment/moment';
+
 import { HORDES_IMG_REPO } from '../../../../_abstract_model/const';
 import { Cell } from '../../../../_abstract_model/types/cell.class';
 import { Citizen } from '../../../../_abstract_model/types/citizen.class';

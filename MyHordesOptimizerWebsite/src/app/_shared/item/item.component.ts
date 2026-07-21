@@ -1,9 +1,10 @@
 import { CommonModule, DecimalPipe, NgOptimizedImage } from '@angular/common';
-import { booleanAttribute, Component, DestroyRef, inject, input, InputSignalWithTransform, model, ModelSignal, OnInit } from '@angular/core';
+import { booleanAttribute, Component, DestroyRef, inject, input, InputSignalWithTransform, model,ModelSignal, OnInit } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDividerModule } from '@angular/material/divider';
 import moment from 'moment';
+
 import { HORDES_IMG_REPO } from '../../_abstract_model/const';
 import { WishlistService } from '../../_abstract_model/services/wishlist.service';
 import { Imports } from '../../_abstract_model/types/_types';
@@ -57,7 +58,7 @@ export class ItemComponent implements OnInit {
         this.wishlist_services.addItemToWishlist(item, 0)
             .pipe(takeUntilDestroyed(this.destroy_ref))
             .subscribe(() => {
-                let new_item: Item = this.item()
+                const new_item: Item = this.item();
                 new_item.wishlist_count = 1;
                 this.item.set(new_item);
             });

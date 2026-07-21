@@ -1,6 +1,7 @@
 import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
 import { map } from 'rxjs';
+
 import { AdminService } from '../../_abstract_model/services/admin.service';
 
 export const isAdminGuard: CanActivateFn = () => {

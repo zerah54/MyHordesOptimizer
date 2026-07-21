@@ -52,6 +52,15 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.FataMorgana
         [JsonPropertyName("scavRadar")]
         public FataMorganaScavRadarDto? ScavRadar { get; set; }
 
+        /// <summary>
+        /// Niveau d'abondance de la zone attendu par FataMorgana, de 1 à 3
+        /// (1 = presque épuisée, 2 = à moitié vide, 3 = zone abondante).
+        /// Le niveau 0 du jeu n'est pas transmis ici : il est porté par <see cref="ZoneDepleted"/>.
+        /// </summary>
+        [JsonProperty("scavZoneStatus", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonPropertyName("scavZoneStatus")]
+        public int? ScavZoneStatus { get; set; }
+
         [JsonProperty("playerList")]
         [JsonPropertyName("playerList")]
         public List<int>? PlayerList { get; set; }

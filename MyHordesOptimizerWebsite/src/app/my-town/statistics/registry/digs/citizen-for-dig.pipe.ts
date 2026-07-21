@@ -1,6 +1,7 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import { CitizenInfo } from '../../../../_abstract_model/types/citizen-info.class';
+
 import { Citizen } from '../../../../_abstract_model/types/citizen.class';
+import { CitizenInfo } from '../../../../_abstract_model/types/citizen-info.class';
 import { Dig } from '../../../../_abstract_model/types/dig.class';
 
 

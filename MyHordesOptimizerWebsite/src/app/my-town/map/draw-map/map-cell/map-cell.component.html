@@ -4,6 +4,7 @@
         ${options().map_type === 'danger' ? 'danger-' + cell().danger_level : ''}
         ${options().map_type === 'digs' ? 'dig-' + (cell() | digLevel:options()) : ''}
         ${options().map_type === 'trash' ? 'trash-' + ((cell() | trashValue:options():allItems())|trashLevel) : ''}
+        ${options().map_type === 'scout' && cell().scout_zone_level !== null ? 'scout-' + cell().scout_zone_level : ''}
         ${cell().zone_regen ? cell().zone_regen?.value?.class : ''}
     `"
     [mapCellTooltip]="cell()"
@@ -11,6 +12,7 @@
     [mapCellTooltipAllCitizens]="allCitizens()"
     [mapCellTooltipAllRuins]="allRuins()"
     [class.alert]="options().map_type === 'danger'" [class.digs]="options().map_type === 'digs'" [class.trash]="options().map_type === 'trash'"
+    [class.scout]="options().map_type === 'scout'"
     [class.scrut-border-left]="cell() | scrutBorderLeft:options():drawedMap()"
     [class.scrut-border-top]="cell() | scrutBorderTop:options():drawedMap()"
     [class.scrut-border-right]="cell() | scrutBorderRight:options():drawedMap()"
@@ -77,7 +79,14 @@
                 @if (options().map_type === 'danger') {
                     <div>
                         <img [ngSrc]="HORDES_IMG_REPO + 'icons/small_zombie.gif'" width="12" height="12">
-                        <span class="detail-value">{{ cell().nb_zombie || 0 }}</span>
+                        @if (cell().hasFresherScoutEstimation()) {
+                            <span class="detail-value estimation"
+                                  i18n-title title="Estimation d'un éclaireur : entre {{ cell().scout_estimation_min }} et {{ cell().scout_estimation_max }} zombies">
+                                ≈{{ cell().scout_estimation_zombie }}
+                            </span>
+                        } @else {
+                            <span class="detail-value">{{ cell().nb_zombie || 0 }}</span>
+                        }
                     </div>
                 }
                 @if (options().map_type === 'digs') {

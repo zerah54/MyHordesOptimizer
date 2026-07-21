@@ -1,6 +1,6 @@
 import { DictionaryUtils } from '../../_core/utilities/dictionary.util';
-import { CitizenInfoDTO } from '../dto/citizen-info.dto';
 import { CitizenDTO } from '../dto/citizen.dto';
+import { CitizenInfoDTO } from '../dto/citizen-info.dto';
 import { CommonModel, dtoToModelArray, modelArrayToDictionnary } from './_common.class';
 import { Citizen } from './citizen.class';
 import { UpdateInfo } from './update-info.class';

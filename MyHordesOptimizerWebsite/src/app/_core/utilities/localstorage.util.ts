@@ -1,5 +1,6 @@
 import { Moment } from 'moment';
 import moment from 'moment-timezone';
+
 import { BANK_KEY, EXTERNAL_APP_ID_KEY, ITEMS_KEY, RUINS_KEY, TOKEN_KEY, TOWN_KEY, USER_KEY } from '../../_abstract_model/const';
 import { BankInfoDTO } from '../../_abstract_model/dto/bank-info.dto';
 import { ItemDTO } from '../../_abstract_model/dto/item.dto';
@@ -129,7 +130,7 @@ export function setTokenWithMeWithExpirationDate(token?: TokenWithMe): void {
         };
         localStorage.setItem(TOKEN_KEY, JSON.stringify(element_with_expiration));
     } else {
-        localStorage.removeItem(TOKEN_KEY)
+        localStorage.removeItem(TOKEN_KEY);
     }
 }
 

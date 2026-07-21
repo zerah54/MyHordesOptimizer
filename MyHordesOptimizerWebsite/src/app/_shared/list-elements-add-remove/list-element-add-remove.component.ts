@@ -1,7 +1,8 @@
 import { CommonModule, NgOptimizedImage, NgTemplateOutlet } from '@angular/common';
-import { booleanAttribute, Component, input, InputSignal, InputSignalWithTransform, output, OutputEmitterRef } from '@angular/core';
+import { booleanAttribute, Component, input, InputSignal, InputSignalWithTransform, output,OutputEmitterRef } from '@angular/core';
 import { MatMenuModule } from '@angular/material/menu';
 import moment from 'moment';
+
 import { HORDES_IMG_REPO } from '../../_abstract_model/const';
 import { StatusEnum } from '../../_abstract_model/enum/status.enum';
 import { Imports, ListForAddRemove } from '../../_abstract_model/types/_types';
@@ -30,7 +31,7 @@ export class ListElementAddRemoveComponent {
 
     public label: InputSignal<string> = input.required();
     public class: InputSignal<string> = input('');
-    public readonly: InputSignalWithTransform<boolean, unknown> = input(false, {transform: booleanAttribute});
+    public readonly: InputSignalWithTransform<boolean, unknown> = input(false, { transform: booleanAttribute });
 
     public addLabel: InputSignal<string> = input.required();
     public add: OutputEmitterRef<number | string> = output();

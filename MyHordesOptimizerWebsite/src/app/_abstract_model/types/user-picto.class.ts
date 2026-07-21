@@ -1,4 +1,5 @@
 import moment from 'moment';
+
 import { UserPictoDTO } from '../dto/user-picto.dto';
 import { CommonModel } from './_common.class';
 import { Dictionary } from './_types';

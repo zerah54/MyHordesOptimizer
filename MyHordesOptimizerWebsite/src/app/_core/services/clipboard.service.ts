@@ -1,5 +1,6 @@
 import { Clipboard } from '@angular/cdk/clipboard';
-import { inject, Injectable } from '@angular/core';
+import { inject,Injectable } from '@angular/core';
+
 import { SnackbarService } from './snackbar.service';
 
 @Injectable({ providedIn: 'root' })

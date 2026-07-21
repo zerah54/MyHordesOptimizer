@@ -1,5 +1,5 @@
 import { CommonModule, NgOptimizedImage } from '@angular/common';
-import { ChangeDetectionStrategy, Component, DestroyRef, inject, model, ModelSignal, OnInit, Signal, signal, WritableSignal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, model, ModelSignal, OnInit, Signal, signal,WritableSignal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -15,6 +15,7 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatTabChangeEvent, MatTabsModule } from '@angular/material/tabs';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { firstValueFrom } from 'rxjs';
+
 import { environment } from '../../../environments/environment';
 import { EXPEDITIONS_EDITION_MODE_KEY, FAVORITE_EXPEDITION_ITEMS_UID, HORDES_IMG_REPO } from '../../_abstract_model/const';
 import { HeroicActionEnum } from '../../_abstract_model/enum/heroic-action.enum';
@@ -25,13 +26,13 @@ import { ExpeditionService } from '../../_abstract_model/services/expedition.ser
 import { TownService } from '../../_abstract_model/services/town.service';
 import { Imports, ListForAddRemove } from '../../_abstract_model/types/_types';
 import { BankInfo } from '../../_abstract_model/types/bank-info.class';
-import { CitizenExpeditionBag } from '../../_abstract_model/types/citizen-expedition-bag.class';
-import { CitizenExpedition } from '../../_abstract_model/types/citizen-expedition.class';
-import { CitizenInfo } from '../../_abstract_model/types/citizen-info.class';
 import { Citizen } from '../../_abstract_model/types/citizen.class';
+import { CitizenExpedition } from '../../_abstract_model/types/citizen-expedition.class';
+import { CitizenExpeditionBag } from '../../_abstract_model/types/citizen-expedition-bag.class';
+import { CitizenInfo } from '../../_abstract_model/types/citizen-info.class';
+import { Expedition } from '../../_abstract_model/types/expedition.class';
 import { ExpeditionOrder } from '../../_abstract_model/types/expedition-order.class';
 import { ExpeditionPart } from '../../_abstract_model/types/expedition-part.class';
-import { Expedition } from '../../_abstract_model/types/expedition.class';
 import { Item } from '../../_abstract_model/types/item.class';
 import { Me } from '../../_abstract_model/types/me.class';
 import { CitizenFromIdPipe } from '../../_core/pipes/citizens-from-id.pipe';
@@ -612,7 +613,7 @@ export class ExpeditionsComponent implements OnInit {
     public openReorganize(): void {
         this.dialog
             .open<EditPositionsComponent, EditPositionsData>(EditPositionsComponent, {
-                data: {expeditions: this.expeditions()},
+                data: { expeditions: this.expeditions() },
                 width: '500px'
             })
             .afterClosed()
@@ -659,8 +660,8 @@ export class ExpeditionsComponent implements OnInit {
                     return FAVORITE_EXPEDITION_ITEMS_UID.some((uid: string) => uid === item.uid);
                 })
             },
-            {label: $localize`Banque`, list: this.bank_items()},
-            {label: $localize`Tous`, list: this.all_items()},
+            { label: $localize`Banque`, list: this.bank_items() },
+            { label: $localize`Tous`, list: this.all_items() },
         ];
     }
 
@@ -801,7 +802,7 @@ export class ExpeditionsComponent implements OnInit {
                         if (pre_registered_job) {
                             pre_registered_job.count += 1;
                         } else {
-                            pre_registered_jobs.push({count: 1, job: citizen?.preinscrit_job});
+                            pre_registered_jobs.push({ count: 1, job: citizen?.preinscrit_job });
                         }
                     } else if (citizen.preinscrit) {
                         const pre_registered_citizen: Citizen = <Citizen>getCitizenFromId(this.all_citizens(), citizen.citizen_id);
@@ -814,7 +815,7 @@ export class ExpeditionsComponent implements OnInit {
                         if (pre_registered_job) {
                             pre_registered_job.count += 1;
                         } else {
-                            pre_registered_jobs.push({count: 1, job: <string>pre_registered_citizen?.job?.key});
+                            pre_registered_jobs.push({ count: 1, job: <string>pre_registered_citizen?.job?.key });
                         }
                     }
                 });

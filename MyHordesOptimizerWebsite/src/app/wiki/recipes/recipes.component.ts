@@ -1,17 +1,18 @@
 import { CommonModule, DecimalPipe, NgOptimizedImage } from '@angular/common';
-import { Component, DestroyRef, inject, OnInit } from '@angular/core';
+import { Component, DestroyRef, inject,OnInit } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatCardModule } from '@angular/material/card';
 import { MatSortModule } from '@angular/material/sort';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import moment from 'moment';
+
 import { HORDES_IMG_REPO } from '../../_abstract_model/const';
 import { StandardColumn } from '../../_abstract_model/interfaces';
 import { ApiService } from '../../_abstract_model/services/api.service';
 import { Imports } from '../../_abstract_model/types/_types';
 import { Item } from '../../_abstract_model/types/item.class';
-import { RecipeResultItem } from '../../_abstract_model/types/recipe-result-item.class';
 import { Recipe } from '../../_abstract_model/types/recipe.class';
+import { RecipeResultItem } from '../../_abstract_model/types/recipe-result-item.class';
 import { ColumnIdPipe } from '../../_core/pipes/column-id.pipe';
 import { normalizeString } from '../../_core/utilities/string.utils';
 import { FilterFieldComponent } from '../../_shared/filter-field/filter-field.component';
@@ -40,10 +41,10 @@ export class RecipesComponent implements OnInit {
 
     /** La liste des colonnes */
     public readonly columns: StandardColumn[] = [
-        {id: 'type', header: $localize`Type de recette`},
-        {id: 'components', header: $localize`Composants`},
-        {id: 'transformation', header: ''},
-        {id: 'result', header: $localize`Résultat`},
+        { id: 'type', header: $localize`Type de recette` },
+        { id: 'components', header: $localize`Composants` },
+        { id: 'transformation', header: '' },
+        { id: 'result', header: $localize`Résultat` },
     ];
 
     private readonly api: ApiService = inject(ApiService);

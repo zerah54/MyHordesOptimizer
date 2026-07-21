@@ -1,9 +1,10 @@
 import { animate, style, transition, trigger } from '@angular/animations';
 import { CommonModule, DecimalPipe, NgOptimizedImage } from '@angular/common';
-import { Component, DestroyRef, inject, input, InputSignal, output, OutputEmitterRef } from '@angular/core';
+import { Component, DestroyRef, inject, input, InputSignal, output,OutputEmitterRef } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatDialog } from '@angular/material/dialog';
 import moment from 'moment';
+
 import { HORDES_IMG_REPO } from '../../../../_abstract_model/const';
 import { Imports } from '../../../../_abstract_model/types/_types';
 import { Cell } from '../../../../_abstract_model/types/cell.class';
@@ -36,12 +37,12 @@ const material_modules: Imports = [];
     animations: [
         trigger('toggleCurrentCell', [
             transition(':enter', [
-                style({opacity: 0, display: 'inline'}),
-                animate('500ms ease-out', style({opacity: 1}))
+                style({ opacity: 0, display: 'inline' }),
+                animate('500ms ease-out', style({ opacity: 1 }))
             ]),
             transition(':leave', [
-                style({opacity: 1, display: 'inline'}),
-                animate('500ms ease-in', style({opacity: 0}))
+                style({ opacity: 1, display: 'inline' }),
+                animate('500ms ease-in', style({ opacity: 0 }))
             ])
         ])
     ],

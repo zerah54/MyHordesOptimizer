@@ -24,12 +24,20 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.Map
         [JsonProperty("citizenId")]
         public List<int>? CitizenId { get; set; }
 
+        /// <summary>Radar du Fouineur sur les cases adjacentes. true = la case voisine est épuisée.</summary>
         [JsonProperty("scavNextCells")]
         public ScavNextCellsDto? ScavNextCells { get; set; }
 
+        /// <summary>Radar de l'Éclaireur sur les cases adjacentes : estimation bruitée du nombre de zombies.</summary>
         [JsonProperty("scoutNextCells")]
         public ScoutNextCellsDto? ScoutNextCells { get; set; }
 
+        /// <summary>Niveau d'abondance (0-3) de la case courante, relevé par un Fouineur. 0 = zone épuisée.</summary>
+        [JsonProperty("scavZoneLevel")]
+        [JsonPropertyName("scavZoneLevel")]
+        public int? ScavZoneLevel { get; set; }
+
+        /// <summary>Niveau d'exploration (0-3) de la case courante, relevé par un Éclaireur.</summary>
         [JsonProperty("scoutZoneLvl")]
         [JsonPropertyName("scoutZoneLvl")]
         public int? ScoutZoneLvl { get; set; }

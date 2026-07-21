@@ -1,7 +1,8 @@
 import { CdkAccordionModule } from '@angular/cdk/accordion';
 import { CommonModule } from '@angular/common';
-import { Component, input, InputSignal } from '@angular/core';
+import { Component, input,InputSignal } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
+
 import { Imports } from '../../_abstract_model/types/_types';
 
 const angular_common: Imports = [CommonModule];

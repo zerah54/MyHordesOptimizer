@@ -1,4 +1,5 @@
-import { computed, Injectable, Signal, signal, WritableSignal } from '@angular/core';
+import { computed, Injectable, Signal, signal,WritableSignal } from '@angular/core';
+
 import { TownDetails } from '../../_abstract_model/types/town-details.class';
 import { setObservedTown } from '../utilities/localstorage.util';
 

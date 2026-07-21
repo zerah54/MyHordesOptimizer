@@ -1,15 +1,16 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, OnDestroy, OnInit, signal, WritableSignal } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit, signal,WritableSignal } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { Title } from '@angular/platform-browser';
 import { ActivatedRoute, ParamMap, Router, RouterOutlet } from '@angular/router';
 import { forkJoin, Subscription, take } from 'rxjs';
+
 import { TownService } from '../../_abstract_model/services/town.service';
 import { Imports } from '../../_abstract_model/types/_types';
+import { Town } from '../../_abstract_model/types/town.class';
 import { TownDetails } from '../../_abstract_model/types/town-details.class';
 import { TownListItem, TownListPageResult } from '../../_abstract_model/types/town-list-item.model';
-import { Town } from '../../_abstract_model/types/town.class';
 import { SnackbarService } from '../../_core/services/snackbar.service';
 import { TownContextService } from '../../_core/services/town-context.service';
 

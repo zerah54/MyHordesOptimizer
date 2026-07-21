@@ -1,4 +1,5 @@
 import { Route } from '@angular/router';
+
 import { CitizenListComponent } from './citizen-list/citizen-list.component';
 import { TownListComponent } from './town-list/town-list.component';
 

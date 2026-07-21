@@ -1,4 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core';
+
 import { getValueFromPropertyName } from '../../_core/utilities/object.util';
 
 @Pipe({

@@ -1,6 +1,7 @@
-import { booleanAttribute, Component, input, InputSignal, InputSignalWithTransform, output, OutputEmitterRef } from '@angular/core';
+import { booleanAttribute, Component, input, InputSignal, InputSignalWithTransform, output,OutputEmitterRef } from '@angular/core';
+
 import { Dictionary, Imports } from '../../_abstract_model/types/_types';
-import { areAllDirectionsSelected, AreAllDirectionsSelectedPipe, IsDirectionSelectedPipe } from './is-scrut-direction-selected.pipe';
+import { areAllDirectionsSelected,AreAllDirectionsSelectedPipe, IsDirectionSelectedPipe } from './is-scrut-direction-selected.pipe';
 
 const angular_common: Imports = [];
 const components: Imports = [];
@@ -16,10 +17,10 @@ const material_modules: Imports = [];
 export class CompassRoseComponent {
 
 
-    public readonly: InputSignalWithTransform<boolean, unknown> = input(false, {transform: booleanAttribute});
-    public withDiags: InputSignalWithTransform<boolean, unknown> = input(false, {transform: booleanAttribute});
-    public multiple: InputSignalWithTransform<boolean, unknown> = input(false, {transform: booleanAttribute});
-    public withLegend: InputSignalWithTransform<boolean, unknown> = input(false, {transform: booleanAttribute});
+    public readonly: InputSignalWithTransform<boolean, unknown> = input(false, { transform: booleanAttribute });
+    public withDiags: InputSignalWithTransform<boolean, unknown> = input(false, { transform: booleanAttribute });
+    public multiple: InputSignalWithTransform<boolean, unknown> = input(false, { transform: booleanAttribute });
+    public withLegend: InputSignalWithTransform<boolean, unknown> = input(false, { transform: booleanAttribute });
 
     public selectedScrutZone: InputSignal<Dictionary<boolean>> = input.required();
     public selectedScrutZoneChange: OutputEmitterRef<Dictionary<boolean>> = output();
@@ -27,7 +28,7 @@ export class CompassRoseComponent {
     public addToSelection(direction: string): void {
         if (!this.readonly()) {
             if (this.multiple()) {
-                const selected_scrut: Dictionary<boolean> = {...this.selectedScrutZone()};
+                const selected_scrut: Dictionary<boolean> = { ...this.selectedScrutZone() };
                 selected_scrut[direction] = !selected_scrut[direction];
                 this.selectedScrutZoneChange.emit(selected_scrut);
             } else {
@@ -42,7 +43,7 @@ export class CompassRoseComponent {
         if (!this.readonly() && this.multiple() && this.withDiags()) {
             const is_all_selected: boolean = areAllDirectionsSelected(this.selectedScrutZone());
 
-            const selected_scrut: Dictionary<boolean> = {...this.selectedScrutZone()};
+            const selected_scrut: Dictionary<boolean> = { ...this.selectedScrutZone() };
 
             Object.keys(this.selectedScrutZone()).forEach((key: string) => {
                 selected_scrut[key] = !is_all_selected;

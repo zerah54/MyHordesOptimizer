@@ -1,6 +1,6 @@
 import { ItemCountDTO } from '../dto/item-count.dto';
-import { Item } from './item.class';
 import { CommonModel } from './_common.class';
+import { Item } from './item.class';
 
 export class ItemCount extends CommonModel<ItemCountDTO> {
     public count!: number;

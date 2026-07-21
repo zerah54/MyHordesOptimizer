@@ -1,9 +1,10 @@
 import { Route } from '@angular/router';
-import { MinesweeperComponent } from './minesweeper/minesweeper.component';
+
 import { PictosGameComponent } from './368-pictos/368-pictos.component';
+import { MinesweeperComponent } from './minesweeper/minesweeper.component';
 
 export default [
-    {path: '', redirectTo: 'minesweeper', pathMatch: 'full'},
+    { path: '', redirectTo: 'minesweeper', pathMatch: 'full' },
     {
         path: 'minesweeper',
         component: MinesweeperComponent,

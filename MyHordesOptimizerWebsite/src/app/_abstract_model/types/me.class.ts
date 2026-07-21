@@ -1,6 +1,6 @@
 import { MeDTO } from '../dto/me.dto';
-import { TownDetails } from './town-details.class';
 import { CommonModel } from './_common.class';
+import { TownDetails } from './town-details.class';
 
 export class Me extends CommonModel<MeDTO> {
     public id!: number;

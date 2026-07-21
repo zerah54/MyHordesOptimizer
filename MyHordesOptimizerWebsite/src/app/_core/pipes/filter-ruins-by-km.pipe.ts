@@ -1,4 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core';
+
 import { Ruin } from '../../_abstract_model/types/ruin.class';
 import { getTown } from '../utilities/localstorage.util';
 

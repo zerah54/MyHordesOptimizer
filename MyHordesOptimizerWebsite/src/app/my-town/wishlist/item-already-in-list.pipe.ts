@@ -1,4 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core';
+
 import { WishlistItem } from '../../_abstract_model/types/wishlist-item.class';
 
 

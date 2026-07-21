@@ -1,14 +1,15 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, input, InputSignal } from '@angular/core';
+import { Component, Input, input,InputSignal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import moment, { Moment } from 'moment';
+
 import { HORDES_IMG_REPO } from '../../../../_abstract_model/const';
 import { JobEnum } from '../../../../_abstract_model/enum/job.enum';
 import { DisplayPseudoMode, Entry } from '../../../../_abstract_model/interfaces';
 import { Imports } from '../../../../_abstract_model/types/_types';
-import { CitizenInfo } from '../../../../_abstract_model/types/citizen-info.class';
 import { Citizen } from '../../../../_abstract_model/types/citizen.class';
+import { CitizenInfo } from '../../../../_abstract_model/types/citizen-info.class';
 import { Dig } from '../../../../_abstract_model/types/dig.class';
 import { getTown } from '../../../../_core/utilities/localstorage.util';
 import { DigComponent } from '../../../../_shared/dig/dig.component';
@@ -33,7 +34,7 @@ export class DigsRegistryComponent {
 
     // TODO: Skipped for migration because:
     //  Accessor inputs cannot be migrated as they are too complex.
-    @Input({required: true}) set registry(registry: Entry[] | undefined) {
+    @Input({ required: true }) set registry(registry: Entry[] | undefined) {
         this.current_day = getTown()?.day || 1;
 
         if (registry) {

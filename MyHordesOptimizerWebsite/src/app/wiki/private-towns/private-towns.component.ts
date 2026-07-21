@@ -5,10 +5,11 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import moment from 'moment';
+
 import { HORDES_IMG_REPO } from '../../_abstract_model/const';
 import { StandardColumn } from '../../_abstract_model/interfaces';
 import { I18nLabels, Imports } from '../../_abstract_model/types/_types';
-import { private_town_params, PrivateTownParamOptions, PrivateTownParams } from './private-towns-params.const';
+import { private_town_params,PrivateTownParamOptions, PrivateTownParams } from './private-towns-params.const';
 
 const angular_common: Imports = [CommonModule, NgOptimizedImage];
 const components: Imports = [];
@@ -35,10 +36,10 @@ export class PrivateTownsComponent implements OnInit {
 
     /** La liste des colonnes */
     public readonly columns: StandardColumn[] = [
-        {id: 'icon', header: ''},
-        {id: 'label', header: $localize`Pouvoir`, sticky: true},
-        {id: 'days_needed', header: $localize`Jours héros nécessaires`},
-        {id: 'description', header: $localize`Description`}
+        { id: 'icon', header: '' },
+        { id: 'label', header: $localize`Pouvoir`, sticky: true },
+        { id: 'days_needed', header: $localize`Jours héros nécessaires` },
+        { id: 'description', header: $localize`Description` }
     ];
 
     public ngOnInit(): void {

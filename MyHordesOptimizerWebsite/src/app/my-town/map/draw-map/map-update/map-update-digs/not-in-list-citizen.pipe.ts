@@ -1,4 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core';
+
 import { Citizen } from '../../../../../_abstract_model/types/citizen.class';
 import { Dig } from '../../../../../_abstract_model/types/dig.class';
 

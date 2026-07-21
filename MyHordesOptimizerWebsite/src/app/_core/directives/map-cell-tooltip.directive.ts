@@ -1,6 +1,7 @@
 import { FlexibleConnectedPositionStrategy, Overlay, OverlayPositionBuilder, OverlayRef } from '@angular/cdk/overlay';
 import { ComponentPortal } from '@angular/cdk/portal';
-import { ComponentRef, Directive, ElementRef, inject, input, InputSignal, OnDestroy } from '@angular/core';
+import { ComponentRef, Directive, ElementRef, inject, input,InputSignal, OnDestroy } from '@angular/core';
+
 import { Cell } from '../../_abstract_model/types/cell.class';
 import { Citizen } from '../../_abstract_model/types/citizen.class';
 import { Item } from '../../_abstract_model/types/item.class';
@@ -60,7 +61,7 @@ export class MapCellTooltipDirective implements OnDestroy {
                 },
             ]);
 
-        this.overlayRef = this.overlay.create({positionStrategy});
+        this.overlayRef = this.overlay.create({ positionStrategy });
 
         const portal: ComponentPortal<MapCellTooltipComponent> = new ComponentPortal(MapCellTooltipComponent);
         const componentRef: ComponentRef<MapCellTooltipComponent> = this.overlayRef.attach(portal);

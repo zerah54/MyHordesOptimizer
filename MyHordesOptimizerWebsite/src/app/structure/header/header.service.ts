@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
+
 import { getExternalAppId } from '../../_core/utilities/localstorage.util';
 
-@Injectable({providedIn: 'root'})
+@Injectable({ providedIn: 'root' })
 export class HeaderService {
     /** L'observable à souscrire pour vérifier le token */
     public token_obs: Observable<string | null>;

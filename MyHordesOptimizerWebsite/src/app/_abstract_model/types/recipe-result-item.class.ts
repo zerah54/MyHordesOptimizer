@@ -1,6 +1,6 @@
 import { RecipeResultItemDTO } from '../dto/recipe-result-item.dto';
-import { Item } from './item.class';
 import { CommonModel } from './_common.class';
+import { Item } from './item.class';
 
 export class RecipeResultItem extends CommonModel<RecipeResultItemDTO> {
     public probability!: number;

@@ -57,6 +57,21 @@
 
         .pdc {
         }
+
+        /** Relevés des métiers fouineur et éclaireur */
+        .job-radar {
+
+            > div {
+                display: flex;
+                align-items: center;
+                gap: 0.25em;
+            }
+
+            .range {
+                font-size: 0.85em;
+                font-style: italic;
+            }
+        }
     }
 
     .citizens {

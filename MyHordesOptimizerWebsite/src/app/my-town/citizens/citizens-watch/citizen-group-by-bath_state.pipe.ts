@@ -1,4 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core';
+
 import { Bath } from '../../../_abstract_model/types/bath.class';
 import { Citizen } from '../../../_abstract_model/types/citizen.class';
 
@@ -11,8 +12,8 @@ export class CitizenGroupByBathStatePipe implements PipeTransform {
         if (!citizens) return [];
 
         return [
-            {label: $localize`Bain pris`, citizen: citizens.filter((citizen: Citizen) => this.hasBathForDay(citizen, day))},
-            {label: $localize`Pas de bain`, citizen: citizens.filter((citizen: Citizen) => !this.hasBathForDay(citizen, day))}
+            { label: $localize`Bain pris`, citizen: citizens.filter((citizen: Citizen) => this.hasBathForDay(citizen, day)) },
+            { label: $localize`Pas de bain`, citizen: citizens.filter((citizen: Citizen) => !this.hasBathForDay(citizen, day)) }
         ];
     }
 

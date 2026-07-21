@@ -1,6 +1,7 @@
 import { HttpClient, HttpContext, HttpHeaders, HttpParams, HttpResponse } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { Observable } from 'rxjs';
+
 import { environment } from '../../../environments/environment';
 import { BYPASS_ERROR } from '../../_core/services/errors-interceptor.service';
 import { BYPASS_LOADING } from '../../_core/services/loading-interceptor.service';
@@ -23,7 +24,7 @@ export class GlobalService {
 
     protected post<T>(url: string, params?: string): Observable<T> {
         const headers: HttpHeaders = new HttpHeaders().set('Content-Type', 'application/json; charset=utf-8');
-        return this.http.post<T>(url, params, {responseType: 'json', headers: headers});
+        return this.http.post<T>(url, params, { responseType: 'json', headers: headers });
     }
 
     protected put<T>(url: string, body: unknown): Observable<HttpResponse<T>> {

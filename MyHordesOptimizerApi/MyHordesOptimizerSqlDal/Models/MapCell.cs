@@ -82,9 +82,29 @@ public partial class MapCell
     [Column("note", TypeName = "text")]
     public string? Note { get; set; }
 
+    /// <summary>Niveau d'abondance de la zone (0-3) relevé par un Fouineur présent sur la case. 0 = zone épuisée.</summary>
+    [Column("scavZoneLevel", TypeName = "int(11)")]
+    public int? ScavZoneLevel { get; set; }
+
+    /// <summary>Niveau d'exploration de la zone (0-3) relevé par un Éclaireur présent sur la case.</summary>
+    [Column("scoutZoneLevel", TypeName = "int(11)")]
+    public int? ScoutZoneLevel { get; set; }
+
+    /// <summary>Estimation bruitée du nombre de zombies, issue du radar d'un Éclaireur situé sur une case voisine.</summary>
+    [Column("scoutEstimationZombie", TypeName = "int(11)")]
+    public int? ScoutEstimationZombie { get; set; }
+
+    /// <summary>Fraîcheur propre à <see cref="ScoutEstimationZombie"/>, à comparer à <see cref="IdLastUpdateInfo"/>.</summary>
+    [Column("idScoutEstimationLastUpdateInfo", TypeName = "int(11)")]
+    public int? IdScoutEstimationLastUpdateInfo { get; set; }
+
     [ForeignKey("IdLastUpdateInfo")]
     [InverseProperty("MapCells")]
     public virtual LastUpdateInfo? IdLastUpdateInfoNavigation { get; set; }
+
+    [ForeignKey("IdScoutEstimationLastUpdateInfo")]
+    [InverseProperty("ScoutEstimationMapCells")]
+    public virtual LastUpdateInfo? IdScoutEstimationLastUpdateInfoNavigation { get; set; }
 
     [ForeignKey("IdRuin")]
     [InverseProperty("MapCells")]

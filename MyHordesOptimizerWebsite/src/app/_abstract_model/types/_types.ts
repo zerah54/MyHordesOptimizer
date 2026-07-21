@@ -1,5 +1,6 @@
 import { ComponentType } from '@angular/cdk/overlay';
 import { ModuleWithProviders, Type } from '@angular/core';
+
 import { StatusEnum } from '../enum/status.enum';
 import { Item } from './item.class';
 

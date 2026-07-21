@@ -1,5 +1,5 @@
 import { CommonModule, DecimalPipe } from '@angular/common';
-import { Component, DestroyRef, inject, OnInit } from '@angular/core';
+import { Component, DestroyRef, inject,OnInit } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -12,12 +12,13 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import moment from 'moment';
+
 import { HomeEnum } from '../../_abstract_model/enum/home.enum';
-import { TownStatisticsService } from '../../_abstract_model/services/town-statistics.service';
 import { TownService } from '../../_abstract_model/services/town.service';
+import { TownStatisticsService } from '../../_abstract_model/services/town-statistics.service';
 import { I18nLabels, Imports } from '../../_abstract_model/types/_types';
-import { CitizenInfo } from '../../_abstract_model/types/citizen-info.class';
 import { Citizen } from '../../_abstract_model/types/citizen.class';
+import { CitizenInfo } from '../../_abstract_model/types/citizen-info.class';
 import { EstimationsResult } from '../../_abstract_model/types/estimations-result.class';
 import { HomeWithValue } from '../../_abstract_model/types/home.class';
 import { TownDetails } from '../../_abstract_model/types/town-details.class';

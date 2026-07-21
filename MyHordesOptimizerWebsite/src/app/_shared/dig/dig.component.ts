@@ -1,11 +1,12 @@
 import { CommonModule, NgOptimizedImage } from '@angular/common';
-import { Component, DestroyRef, inject, Input, input, InputSignal, output, OutputEmitterRef } from '@angular/core';
+import { Component, DestroyRef, inject, Input, input, InputSignal, output,OutputEmitterRef } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatTooltipModule } from '@angular/material/tooltip';
+
 import { HORDES_IMG_REPO } from '../../_abstract_model/const';
 import { DigsService } from '../../_abstract_model/services/digs.service';
 import { Imports } from '../../_abstract_model/types/_types';
@@ -35,7 +36,7 @@ export class DigComponent {
 
     // TODO: Skipped for migration because:
     //  Accessor inputs cannot be migrated as they are too complex.
-    @Input({required: true}) set dig(dig: Dig | undefined) {
+    @Input({ required: true }) set dig(dig: Dig | undefined) {
         setTimeout(() => {
             if (this.digsMode() === 'registry') {
                 this.updated_dig = dig;

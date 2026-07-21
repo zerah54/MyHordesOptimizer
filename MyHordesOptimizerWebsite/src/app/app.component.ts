@@ -9,6 +9,7 @@ import { MatSidenavContainer, MatSidenavModule } from '@angular/material/sidenav
 import { Event, NavigationCancel, NavigationEnd, NavigationSkipped, NavigationStart, Router, RouterOutlet } from '@angular/router';
 import moment from 'moment';
 import { filter } from 'rxjs';
+
 import { BREAKPOINTS } from './_abstract_model/const';
 import { AuthenticationService } from './_abstract_model/services/authentication.service';
 import { Imports } from './_abstract_model/types/_types';

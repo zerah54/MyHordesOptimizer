@@ -1,7 +1,8 @@
 import { CommonModule, NgOptimizedImage } from '@angular/common';
-import { Component, input, InputSignal } from '@angular/core';
+import { Component, input,InputSignal } from '@angular/core';
 import { MatDividerModule } from '@angular/material/divider';
 import moment from 'moment';
+
 import { HORDES_IMG_REPO } from '../../../../_abstract_model/const';
 import { Imports } from '../../../../_abstract_model/types/_types';
 import { Cell } from '../../../../_abstract_model/types/cell.class';

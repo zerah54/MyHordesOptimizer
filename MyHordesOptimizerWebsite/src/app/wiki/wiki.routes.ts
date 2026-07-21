@@ -1,4 +1,5 @@
 import { Route } from '@angular/router';
+
 import { HeroSkillsComponent } from './hero-skills/hero-skills.component';
 import { ItemsComponent } from './items/items.component';
 import { MiscellaneousInfoComponent } from './miscellaneous-info/miscellaneous-info.component';

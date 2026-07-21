@@ -1,4 +1,5 @@
 import moment, { Moment } from 'moment';
+
 import { TokenDTO } from '../dto/token.dto';
 import { CommonModel } from './_common.class';
 

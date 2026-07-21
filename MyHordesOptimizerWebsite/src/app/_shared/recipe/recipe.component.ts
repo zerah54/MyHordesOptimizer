@@ -1,6 +1,7 @@
 import { CommonModule, DecimalPipe, NgOptimizedImage } from '@angular/common';
-import { Component, input, InputSignal } from '@angular/core';
+import { Component, input,InputSignal } from '@angular/core';
 import moment from 'moment';
+
 import { HORDES_IMG_REPO } from '../../_abstract_model/const';
 import { Imports } from '../../_abstract_model/types/_types';
 import { Recipe } from '../../_abstract_model/types/recipe.class';

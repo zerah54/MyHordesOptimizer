@@ -4,6 +4,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatSortModule } from '@angular/material/sort';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import Chart from 'chart.js/auto';
+
 import { Direction } from '../../../_abstract_model/enum/direction.enum';
 import { StandardColumn } from '../../../_abstract_model/interfaces';
 import { TownStatisticsService } from '../../../_abstract_model/services/town-statistics.service';
@@ -34,10 +35,10 @@ export class ScrutateurComponent implements OnInit {
     protected datasource: MatTableDataSource<Regen> = new MatTableDataSource();
     /** La liste des colonnes */
     protected columns: StandardColumn[] = [
-        {id: 'day', header: $localize`Jour`, sticky: true},
-        {id: 'direction_regen', header: $localize`Direction`, class: ''},
-        {id: 'level_regen', header: $localize`Niveau`, class: ''},
-        {id: 'taux_regen', header: $localize`Taux`, class: ''}
+        { id: 'day', header: $localize`Jour`, sticky: true },
+        { id: 'direction_regen', header: $localize`Direction`, class: '' },
+        { id: 'level_regen', header: $localize`Niveau`, class: '' },
+        { id: 'taux_regen', header: $localize`Taux`, class: '' }
     ];
 
     protected polar_chart!: Chart<'polarArea'>;

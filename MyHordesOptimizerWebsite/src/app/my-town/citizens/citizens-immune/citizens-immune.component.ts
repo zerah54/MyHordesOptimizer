@@ -8,12 +8,13 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatTableModule } from '@angular/material/table';
 import moment from 'moment';
+
 import { HORDES_IMG_REPO } from '../../../_abstract_model/const';
 import { JobEnum } from '../../../_abstract_model/enum/job.enum';
 import { TownService } from '../../../_abstract_model/services/town.service';
 import { Imports } from '../../../_abstract_model/types/_types';
-import { CitizenInfo } from '../../../_abstract_model/types/citizen-info.class';
 import { Citizen } from '../../../_abstract_model/types/citizen.class';
+import { CitizenInfo } from '../../../_abstract_model/types/citizen-info.class';
 import { CitizenInfoComponent } from '../../../_shared/citizen-info/citizen-info.component';
 import { SelectComponent } from '../../../_shared/select/select.component';
 import { CitizenGroupByImmuneStatePipe } from './citizen-group-by-immune-state.pipe';

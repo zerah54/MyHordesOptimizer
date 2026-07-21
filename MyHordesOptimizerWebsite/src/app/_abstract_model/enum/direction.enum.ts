@@ -10,14 +10,14 @@ const SOUTHWEST_KEY: string = 'Südwesten';
 const WEST_KEY: string = 'Westen';
 const NORTHWEST_KEY: string = 'Nordwesten';
 
-const NORTH_DATA: DirectionData = {label: $localize`Nord`, class: 'north', diag: false, order_by: 1, accessible: true};
-const NORTHEAST_DATA: DirectionData = {label: $localize`Nord-Est`, class: 'north-east', diag: true, order_by: 2, accessible: false};
-const EAST_DATA: DirectionData = {label: $localize`Est`, class: 'east', diag: false, order_by: 3, accessible: true};
-const SOUTHEAST_DATA: DirectionData = {label: $localize`Sud-Est`, class: 'south-east', diag: true, order_by: 4, accessible: false};
-const SOUTH_DATA: DirectionData = {label: $localize`Sud`, class: 'south', diag: false, order_by: 5, accessible: true};
-const SOUTHWEST_DATA: DirectionData = {label: $localize`Sud-Ouest`, class: 'south-west', diag: true, order_by: 6, accessible: false};
-const WEST_DATA: DirectionData = {label: $localize`Ouest`, class: 'west', diag: false, order_by: 7, accessible: true};
-const NORTHWEST_DATA: DirectionData = {label: $localize`Nord-Ouest`, class: 'north-west', diag: true, order_by: 8, accessible: false};
+const NORTH_DATA: DirectionData = { label: $localize`Nord`, class: 'north', diag: false, order_by: 1, accessible: true };
+const NORTHEAST_DATA: DirectionData = { label: $localize`Nord-Est`, class: 'north-east', diag: true, order_by: 2, accessible: false };
+const EAST_DATA: DirectionData = { label: $localize`Est`, class: 'east', diag: false, order_by: 3, accessible: true };
+const SOUTHEAST_DATA: DirectionData = { label: $localize`Sud-Est`, class: 'south-east', diag: true, order_by: 4, accessible: false };
+const SOUTH_DATA: DirectionData = { label: $localize`Sud`, class: 'south', diag: false, order_by: 5, accessible: true };
+const SOUTHWEST_DATA: DirectionData = { label: $localize`Sud-Ouest`, class: 'south-west', diag: true, order_by: 6, accessible: false };
+const WEST_DATA: DirectionData = { label: $localize`Ouest`, class: 'west', diag: false, order_by: 7, accessible: true };
+const NORTHWEST_DATA: DirectionData = { label: $localize`Nord-Ouest`, class: 'north-west', diag: true, order_by: 8, accessible: false };
 
 
 /** Type de champs de propriétés existants */

@@ -1,4 +1,4 @@
-import { AfterViewInit, Directive, ElementRef, inject, NgZone, OnDestroy, Renderer2 } from '@angular/core';
+import { AfterViewInit, Directive, ElementRef, inject,NgZone, OnDestroy, Renderer2 } from '@angular/core';
 
 /**
  * Détecte la présence de scroll dans un conteneur et pose les classes `can-scroll-{up,down,
@@ -26,13 +26,13 @@ export class ScrollAuraDirective implements AfterViewInit, OnDestroy {
     public ngAfterViewInit(): void {
         this.zone.runOutsideAngular((): void => {
             const element: HTMLElement = this.elementRef.nativeElement;
-            element.addEventListener('scroll', this.scheduleUpdate, {passive: true});
+            element.addEventListener('scroll', this.scheduleUpdate, { passive: true });
 
             this.resizeObserver = new ResizeObserver(this.scheduleUpdate);
             this.resizeObserver.observe(element);
 
             this.mutationObserver = new MutationObserver(this.scheduleUpdate);
-            this.mutationObserver.observe(element, {childList: true, subtree: true});
+            this.mutationObserver.observe(element, { childList: true, subtree: true });
 
             this.update();
         });

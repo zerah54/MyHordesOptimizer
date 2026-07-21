@@ -259,6 +259,17 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                             items.ForEach(item => item.IdCell = cellToUpdate.IdCell);
                             listCellItems.AddRange(items);
 
+                            // Relevés des métiers Fouineur et Éclaireur : ils portent sur la case
+                            // courante et sur les quatre cases adjacentes, d'où l'application sur
+                            // l'ensemble des cases de la ville et non sur la seule case courante.
+                            allCell.ApplyJobRadars(realX,
+                                realY,
+                                updateCellDto.ScavZoneLevel,
+                                updateCellDto.ScoutZoneLvl,
+                                updateCellDto.ScavNextCells,
+                                updateCellDto.ScoutNextCells,
+                                newLastUpdate.IdLastUpdateInfo);
+
                             if (updateCellDto.CitizenId.Any())
                             {
                                 var citizenModels = dbContext.TownCitizens.Where(citizen => citizen.IdTown == townId

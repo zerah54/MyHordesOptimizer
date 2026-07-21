@@ -1,8 +1,9 @@
-import { inject, Injectable } from '@angular/core';
+import { inject,Injectable } from '@angular/core';
 import { Router } from '@angular/router';
+
 import { environment } from '../../../environments/environment';
 
-@Injectable({providedIn: 'root'})
+@Injectable({ providedIn: 'root' })
 export class InDevModeGuard {
     private router: Router = inject(Router);
 

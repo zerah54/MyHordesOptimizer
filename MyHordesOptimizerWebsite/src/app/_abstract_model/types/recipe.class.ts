@@ -1,10 +1,10 @@
-import { ItemCountDTO } from '../dto/item-count.dto';
 import { ItemDTO } from '../dto/item.dto';
+import { ItemCountDTO } from '../dto/item-count.dto';
 import { RecipeDTO } from '../dto/recipe.dto';
 import { CommonModel, dtoToModelArray, modelToDtoArray } from './_common.class';
 import { I18nLabels } from './_types';
-import { ItemCount } from './item-count.class';
 import { Item } from './item.class';
+import { ItemCount } from './item-count.class';
 import { RecipeResultItem } from './recipe-result-item.class';
 
 export class Recipe extends CommonModel<RecipeDTO> {
@@ -25,7 +25,7 @@ export class Recipe extends CommonModel<RecipeDTO> {
         return {
             actions: this.actions,
             components: modelToDtoArray(this.components.map((component: Item) => {
-                return new ItemCount({item: component.modelToDto(), count: 1, isBroken: false});
+                return new ItemCount({ item: component.modelToDto(), count: 1, isBroken: false });
             })),
             name: this.name,
             result: modelToDtoArray(this.result),

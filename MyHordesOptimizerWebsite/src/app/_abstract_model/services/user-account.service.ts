@@ -1,6 +1,7 @@
 import { HttpParams, HttpResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { map, Observable } from 'rxjs';
+import { map,Observable } from 'rxjs';
+
 import { CitizenListItemDTO, CitizenListPageResultDTO, CitizenListQuery } from '../dto/citizen-list-page.dto';
 import { UserAccountPublicDTO } from '../dto/user-account.dto';
 import { UserPictosDTO } from '../dto/user-picto.dto';

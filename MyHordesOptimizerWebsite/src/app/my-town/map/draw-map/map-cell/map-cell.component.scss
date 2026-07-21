@@ -116,6 +116,26 @@ $empty-color: gray;
                 }
             }
 
+            /** Niveau d'exploration relevé par un éclaireur : plus la zone est explorée,
+                plus le risque d'être repéré en y entrant est faible */
+            &.scout {
+                &.scout-0 {
+                    background-color: $red;
+                }
+
+                &.scout-1 {
+                    background-color: $orange;
+                }
+
+                &.scout-2 {
+                    background-color: $yellow;
+                }
+
+                &.scout-3 {
+                    background-color: $green;
+                }
+            }
+
             &.trash {
                 &.trash-0 {
                     background-color: $green;
@@ -158,6 +178,11 @@ $empty-color: gray;
                             text-shadow: #000000 1px 1px, #000000 -1px 1px, #000000 -1px -1px, #000000 1px -1px;
                             font-size: 8px;
                             right: 6px;
+
+                            /** Valeur issue du radar d'un éclaireur : approximative par nature */
+                            &.estimation {
+                                font-style: italic;
+                            }
                         }
                     }
 

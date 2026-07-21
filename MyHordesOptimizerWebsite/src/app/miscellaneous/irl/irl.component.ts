@@ -5,6 +5,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { DataSet, DataView } from 'vis-data/peer';
 import { Data, Network, Options } from 'vis-network/peer';
+
 import { Imports } from '../../_abstract_model/types/_types';
 import { SelectComponent } from '../../_shared/select/select.component';
 import { IrlLink, links } from './irl-links.const';
@@ -75,7 +76,7 @@ export class IrlComponent implements OnInit {
 
     public nodes_view: DataView<IrlNode> = new DataView(
         this.nodes,
-        {filter: (node: IrlNode) => node.towns.some((town: TownId): boolean => this.selected_towns.some((selected_town: IrlTowns): boolean => town === selected_town.id))}
+        { filter: (node: IrlNode) => node.towns.some((town: TownId): boolean => this.selected_towns.some((selected_town: IrlTowns): boolean => town === selected_town.id)) }
     );
 
     public ngOnInit(): void {
@@ -102,7 +103,7 @@ export class IrlComponent implements OnInit {
                 maxVelocity: 146,
                 solver: 'forceAtlas2Based',
                 timestep: 0.35,
-                stabilization: {iterations: 150}
+                stabilization: { iterations: 150 }
             }
         };
 

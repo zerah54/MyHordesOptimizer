@@ -14,14 +14,15 @@ import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import moment from 'moment';
+
 import { HORDES_IMG_REPO } from '../../../_abstract_model/const';
 import { StatusEnum } from '../../../_abstract_model/enum/status.enum';
 import { StandardColumn } from '../../../_abstract_model/interfaces';
 import { ApiService } from '../../../_abstract_model/services/api.service';
 import { TownService } from '../../../_abstract_model/services/town.service';
 import { Imports, ListForAddRemove } from '../../../_abstract_model/types/_types';
-import { CitizenInfo } from '../../../_abstract_model/types/citizen-info.class';
 import { Citizen } from '../../../_abstract_model/types/citizen.class';
+import { CitizenInfo } from '../../../_abstract_model/types/citizen-info.class';
 import { HeroicActionsWithValue } from '../../../_abstract_model/types/heroic-actions.class';
 import { HomeWithValue } from '../../../_abstract_model/types/home.class';
 import { Item } from '../../../_abstract_model/types/item.class';
@@ -80,20 +81,20 @@ export class CitizensListComponent implements OnInit {
     public citizen_filter_change: EventEmitter<void> = new EventEmitter<void>();
     /** La liste des colonnes */
     public readonly citizen_list_columns: StandardColumn[] = [
-        {id: 'avatar_name', header: $localize`Citoyen`, class: 'center', sticky: true},
-        {id: 'more_status', header: $localize`États`, class: ''},
-        {id: 'heroic_actions', header: $localize`Actions héroïques`, class: ''},
-        {id: 'home', header: $localize`Améliorations`, class: ''},
+        { id: 'avatar_name', header: $localize`Citoyen`, class: 'center', sticky: true },
+        { id: 'more_status', header: $localize`États`, class: '' },
+        { id: 'heroic_actions', header: $localize`Actions héroïques`, class: '' },
+        { id: 'home', header: $localize`Améliorations`, class: '' },
         // { id: 'chest', header: $localize`Coffre` },
     ];
     /** La liste des colonnes pour les citoyens morts */
     public readonly dead_citizen_list_columns: StandardColumn[] = [
-        {id: 'avatar_name', header: $localize`Citoyen`, class: 'center', sticky: true},
-        {id: 'cause_of_death', header: $localize`Cause de la mort`, class: ''},
-        {id: 'survival', header: $localize`Jours de survie`, class: 'center'},
-        {id: 'score', header: $localize`Score`, class: 'center'},
-        {id: 'death_messages', header: $localize`Messages`, class: ''},
-        {id: 'pictos', header: $localize`Pictos`, class: 'center'},
+        { id: 'avatar_name', header: $localize`Citoyen`, class: 'center', sticky: true },
+        { id: 'cause_of_death', header: $localize`Cause de la mort`, class: '' },
+        { id: 'survival', header: $localize`Jours de survie`, class: 'center' },
+        { id: 'score', header: $localize`Score`, class: 'center' },
+        { id: 'death_messages', header: $localize`Messages`, class: '' },
+        { id: 'pictos', header: $localize`Pictos`, class: 'center' },
     ];
 
     public readonly all_status: StatusEnum[] = StatusEnum.getAllValues();
@@ -102,7 +103,7 @@ export class CitizensListComponent implements OnInit {
     public bag_lists: ListForAddRemove[] = [];
     /** La liste des listes disponibles dans les status */
     public readonly status_lists: ListForAddRemove[] = [
-        {label: $localize`Tous`, list: this.all_status}
+        { label: $localize`Tous`, list: this.all_status }
     ];
 
     private readonly api_service: ApiService = inject(ApiService);
@@ -119,7 +120,7 @@ export class CitizensListComponent implements OnInit {
             citizenName: citizen.name,
             townId: town_id
         };
-        this.dialog.open(CitizenPictosDialogComponent, {data: data});
+        this.dialog.open(CitizenPictosDialogComponent, { data: data });
     }
 
     public ngOnInit(): void {
@@ -144,7 +145,7 @@ export class CitizensListComponent implements OnInit {
                 next: (items: Item[]) => {
                     this.all_items = items;
                     this.bag_lists = [
-                        {label: $localize`Tous`, list: this.all_items}
+                        { label: $localize`Tous`, list: this.all_items }
                     ];
                 }
             });

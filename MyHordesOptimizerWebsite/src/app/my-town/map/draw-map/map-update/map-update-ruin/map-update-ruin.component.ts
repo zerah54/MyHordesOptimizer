@@ -1,5 +1,5 @@
 import { CommonModule, DecimalPipe, NgOptimizedImage } from '@angular/common';
-import { Component, DestroyRef, inject, input, InputSignal, OnInit, output, OutputEmitterRef } from '@angular/core';
+import { Component, DestroyRef, inject, input, InputSignal, OnInit, output,OutputEmitterRef } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatCheckboxModule } from '@angular/material/checkbox';
@@ -8,6 +8,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatListModule } from '@angular/material/list';
 import moment from 'moment';
+
 import { HORDES_IMG_REPO } from '../../../../../_abstract_model/const';
 import { Imports } from '../../../../../_abstract_model/types/_types';
 import { Cell } from '../../../../../_abstract_model/types/cell.class';
@@ -57,7 +58,7 @@ export class MapUpdateRuinComponent implements OnInit {
             .pipe(takeUntilDestroyed(this.destroy_ref))
             .subscribe((values: RuinInfoUpdate) => {
                 // this.cell.nb_ruin_success = values.nb_ruin_success;
-                let new_cell: Cell = this.cell();
+                const new_cell: Cell = this.cell();
                 new_cell.nb_eruin_yellow = +values.nb_eruin_yellow;
                 new_cell.nb_eruin_blue = +values.nb_eruin_blue;
                 new_cell.nb_eruin_violet = +values.nb_eruin_violet;
