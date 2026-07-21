@@ -33,6 +33,11 @@
         }
     }
 
+    .import-progress {
+        color: var(--mat-sys-on-surface-variant, #666);
+        font-size: 0.875rem;
+    }
+
     .import-grid {
         display: flex;
         flex-wrap: wrap;

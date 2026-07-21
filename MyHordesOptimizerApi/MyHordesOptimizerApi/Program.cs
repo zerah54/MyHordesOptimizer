@@ -145,6 +145,8 @@ builder.Services.AddSingleton<ITranslastionRepository, GitlabWebApiTranslationRe
 builder.Services.AddScoped<IMyHordesFetcherService, MyHordesFetcherService>();
 builder.Services.AddScoped<IExternalToolsService, ExternalToolsService>();
 builder.Services.AddScoped<IMyHordesImportService, MyHordesImportService>();
+// Singleton : porte l'état de l'import global, qui survit à la requête qui l'a déclenché
+builder.Services.AddSingleton<ImportJobRunner>();
 builder.Services.AddScoped<IWishListService, WishListService>();
 builder.Services.AddSingleton<ITranslationService, TranslationService>();
 builder.Services.AddSingleton<IMyHordesRuineService, MyHordesRuineService>();

@@ -3,9 +3,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using MyHordesOptimizerApi.Attributes;
 using MyHordesOptimizerApi.Exceptions;
+using MyHordesOptimizerApi.Models.Import;
 using MyHordesOptimizerApi.Models.Logs;
 using MyHordesOptimizerApi.Providers.Interfaces;
 using MyHordesOptimizerApi.Services.Impl;
+using MyHordesOptimizerApi.Services.Impl.Import;
 using MyHordesOptimizerApi.Services.Interfaces;
 using MyHordesOptimizerApi.Services.Interfaces.Import;
 using System;
@@ -23,6 +25,7 @@ namespace MyHordesOptimizerApi.Controllers
         private readonly IUserInfoProvider _userInfoProvider;
         private readonly IMyHordesImportService _importService;
         private readonly ITownService _townService;
+        private readonly ImportJobRunner _importJobRunner;
         private readonly int[] _adminUserIds;
 
         public AdminController(
@@ -30,12 +33,14 @@ namespace MyHordesOptimizerApi.Controllers
             IUserInfoProvider userInfoProvider,
             IMyHordesImportService importService,
             ITownService townService,
+            ImportJobRunner importJobRunner,
             IConfiguration configuration)
         {
             _adminService = adminService;
             _userInfoProvider = userInfoProvider;
             _importService = importService;
             _townService = townService;
+            _importJobRunner = importJobRunner;
             _adminUserIds = configuration.GetSection("Admin:UserIds").Get<int[]>() ?? [];
         }
 
@@ -61,13 +66,23 @@ namespace MyHordesOptimizerApi.Controllers
             return Ok(_adminService.GetAvailableDates());
         }
 
+        // L'import global dure plusieurs minutes : il est lancé en tâche de fond et la réponse est
+        // immédiate, sinon le reverse proxy coupe la requête (504) avant la fin du traitement.
+        // Le client suit l'avancement via import/{job}/status.
         [HttpPost("import/all")]
         [Authorize]
         [AdminOnly]
-        public async Task<ActionResult> ImportAll()
+        public ActionResult<ImportJobState> ImportAll()
         {
-            await _importService.ImportAllAsync();
-            return Ok();
+            return StartImportJob(ImportJobKeys.All, (service, onStep) => service.ImportAllAsync(onStep));
+        }
+
+        [HttpGet("import/{job}/status")]
+        [Authorize]
+        [AdminOnly]
+        public ActionResult<ImportJobState> GetImportStatus([FromRoute] string job)
+        {
+            return Ok(_importJobRunner.GetState(job));
         }
 
         [HttpPost("import/hero-skills")]
@@ -169,24 +184,25 @@ namespace MyHordesOptimizerApi.Controllers
             return Ok();
         }
 
+        // Comme l'import global : lancé en tâche de fond, l'import de toutes les villes d'une saison
+        // dépasse largement le temps de réponse toléré par le reverse proxy.
         [HttpPost("import/towns")]
         [Authorize]
         [AdminOnly]
-        public async Task<ActionResult> ImportTowns([FromQuery] int? season = null)
+        public ActionResult<ImportJobState> ImportTowns([FromQuery] int? season = null)
         {
-            try
-            {
-                await _importService.ImportTownsAsync(season);
-                return Ok();
-            }
-            catch (MyHordesApiException ex)
-            {
-                return StatusCode((int)ex.StatusCode, new { error = ex.Message });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { error = ex.Message, detail = ex.InnerException?.Message, stackTrace = ex.StackTrace });
-            }
+            return StartImportJob(ImportJobKeys.Towns, (service, onStep) => service.ImportTownsAsync(season, onStep));
+        }
+
+        private ActionResult<ImportJobState> StartImportJob(string job, Func<IMyHordesImportService, Action<ImportStepProgress>, Task> work)
+        {
+            var started = _importJobRunner.TryStart(job,
+                _userInfoProvider.UserId,
+                _userInfoProvider.UserKey,
+                _userInfoProvider.UserName,
+                work);
+            var state = _importJobRunner.GetState(job);
+            return started ? Accepted(state) : Conflict(state);
         }
 
         // Déjà appelé en fin d'import des villes ; exposé à part pour rattraper les statistiques

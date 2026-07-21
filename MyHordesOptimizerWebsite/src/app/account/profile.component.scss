@@ -1,0 +1,39 @@
+:host {
+    display: contents;
+
+    .mho-account {
+
+        display: flex;
+        flex-direction: column;
+
+        .mat-mdc-tab-nav-panel {
+            flex: 1;
+            // min-height: 0 indispensable : sans lui un enfant flex garde min-height:auto
+            // et grandit avec son contenu au lieu de scroller
+            min-height: 0;
+            overflow: auto;
+        }
+
+        &__spinner,
+        &__error {
+            display: flex;
+            justify-content: center;
+            padding: 48px;
+        }
+
+        &__error {
+            color: var(--mat-sys-error);
+        }
+    }
+
+    .mho-account__title {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .mho-account__avatar {
+        border-radius: 4px;
+        object-fit: contain;
+    }
+}

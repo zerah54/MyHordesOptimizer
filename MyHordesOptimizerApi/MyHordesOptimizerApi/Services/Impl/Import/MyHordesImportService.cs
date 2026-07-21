@@ -10,6 +10,7 @@ using MyHordesOptimizerApi.Exceptions;
 using MyHordesOptimizerApi.Extensions;
 using MyHordesOptimizerApi.Extensions.Models;
 using MyHordesOptimizerApi.Models;
+using MyHordesOptimizerApi.Models.Import;
 using MyHordesOptimizerApi.Repository.Interfaces;
 using MyHordesOptimizerApi.Services.Interfaces.Import;
 using MyHordesOptimizerApi.Services.Interfaces.Translations;
@@ -36,6 +37,10 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
         protected readonly ILogger<MyHordesImportService> Logger;
         protected MhoContext DbContext { get; set; }
 
+        // Clés d'avancement propres à l'import des villes, que le front traduit en libellé
+        public const string TownsImportStep = "towns";
+        public const string UserStatsImportStep = "user-stats";
+
 
         public MyHordesImportService(IServiceScopeFactory serviceScopeFactory,
             IWebApiRepository webApiRepository,
@@ -59,30 +64,32 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
         }
 
 
-        public async Task ImportAllAsync()
+        // Les clés d'étape sont celles utilisées par le front pour les imports individuels : elles lui
+        // permettent d'afficher le libellé déjà traduit de l'étape en cours.
+        public async Task ImportAllAsync(Action<ImportStepProgress> onStep = null)
         {
-            await ImportJobsAsync();
-            DbContext.ChangeTracker.Clear();
-            await ImportHeroSkill();
-            DbContext.ChangeTracker.Clear();
-            await ImportCategoriesAsync();
-            DbContext.ChangeTracker.Clear();
-            await ImportItemsAsync();
-            DbContext.ChangeTracker.Clear();
-            await ImportCauseOfDeath();
-            DbContext.ChangeTracker.Clear();
-            ImportCleanUpTypes();
-            DbContext.ChangeTracker.Clear();
-            await ImportBuildingAsync();
-            DbContext.ChangeTracker.Clear();
-            ImportRuins();
-            DbContext.ChangeTracker.Clear();
-            ImportPictos();
-            DbContext.ChangeTracker.Clear();
-            ImportWishlistCategorie();
-            DbContext.ChangeTracker.Clear();
-            ImportDefaultWishlists();
-            DbContext.ChangeTracker.Clear();
+            var steps = new List<(string Key, Func<Task> Run)>
+            {
+                ("jobs", ImportJobsAsync),
+                ("hero-skills", ImportHeroSkill),
+                ("categories", ImportCategoriesAsync),
+                ("items", ImportItemsAsync),
+                ("causes-of-death", ImportCauseOfDeath),
+                ("cleanup-types", () => { ImportCleanUpTypes(); return Task.CompletedTask; }),
+                ("buildings", ImportBuildingAsync),
+                ("ruins", () => { ImportRuins(); return Task.CompletedTask; }),
+                ("pictos", () => { ImportPictos(); return Task.CompletedTask; }),
+                ("wishlist-categories", () => { ImportWishlistCategorie(); return Task.CompletedTask; }),
+                ("default-wishlists", () => { ImportDefaultWishlists(); return Task.CompletedTask; })
+            };
+
+            for (var i = 0; i < steps.Count; i++)
+            {
+                var (key, run) = steps[i];
+                onStep?.Invoke(new ImportStepProgress(key, i + 1, steps.Count));
+                await run();
+                DbContext.ChangeTracker.Clear();
+            }
         }
 
         #region Jobs
@@ -640,9 +647,10 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
 
         #region Towns
 
-        public Task ImportTownsAsync(int? season = null)
+        public Task ImportTownsAsync(int? season = null, Action<ImportStepProgress> onStep = null)
         {
             var allMhIds = MyHordesApiRepository.GetTownList(season);
+            var importedTowns = 0;
 
             // Snapshot BDD pour détection de migration
             var bddQuery = DbContext.Towns.AsQueryable();
@@ -700,10 +708,13 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
                 }
                 DbContext.SaveChanges();
                 DbContext.ChangeTracker.Clear();
+                importedTowns += batch.Length;
+                onStep?.Invoke(new ImportStepProgress(TownsImportStep, importedTowns, allMhIds.Count));
             }
 
             // L'import vient de créer des joueurs et des participations : l'annuaire lit des colonnes
             // dénormalisées, qui seraient sinon périmées jusqu'au prochain recalcul manuel.
+            onStep?.Invoke(new ImportStepProgress(UserStatsImportStep, 1, 1));
             return RecomputeUserDirectoryStatsAsync();
         }
 
