@@ -1,15 +1,33 @@
 @let p = profile();
 
-<mat-card-header>
-    @if (p) {
-        <mat-card-title class="mho-profile__title">
+<mat-card-header class="mho-profile__header">
+    <mat-card-title class="mho-profile__title">
+        @if (p) {
             @if (getAvatarUrl(p.avatar); as avatarUrl) {
                 <img class="mho-profile__avatar" [src]="avatarUrl" [alt]="p.userName" width="90" height="30"/>
             }
             {{ p.userName }}
-        </mat-card-title>
-    } @else {
-        <mat-card-title i18n>Compte</mat-card-title>
+        } @else {
+            <ng-container i18n>Compte</ng-container>
+        }
+    </mat-card-title>
+
+    @if (p) {
+        <button class="mho-profile__import" mat-stroked-button type="button"
+                (click)="triggerImport()" [disabled]="importing()">
+            @if (importing()) {
+                <mat-spinner diameter="18"/>
+            } @else {
+                <span class="mho-profile__import-label">
+                    <mat-icon>refresh</mat-icon>
+                    @if (importedAt(); as importedAt) {
+                        <ng-container i18n>À jour au {{ importedAt | date:'short' }}</ng-container>
+                    } @else {
+                        <ng-container i18n>Importer mes données</ng-container>
+                    }
+                </span>
+            }
+        </button>
     }
 </mat-card-header>
 <mat-card-content class="mho-profile">

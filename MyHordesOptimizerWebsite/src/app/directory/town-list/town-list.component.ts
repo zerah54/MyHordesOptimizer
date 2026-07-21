@@ -5,6 +5,7 @@ import {
     Component,
     computed,
     DestroyRef,
+    effect,
     inject,
     input,
     InputSignal,
@@ -61,6 +62,9 @@ export class TownListComponent implements OnInit, AfterViewInit {
     public readonly isAdmin: InputSignal<boolean> = input<boolean>(false);
     // Quand défini, restreint la liste aux villes de ce joueur (utilisé par la page profil).
     public readonly playerId: InputSignal<number | undefined> = input<number | undefined>(undefined);
+    // Jeton de rechargement externe : incrémenté par le parent (import du profil) pour forcer un
+    // reload sans changer les filtres. Sa valeur importe peu, seule sa variation déclenche le reload.
+    public readonly reloadToken: InputSignal<number> = input<number>(0);
     protected readonly displayedColumns: Signal<string[]> = computed(() => {
         const cols: string[] = ['id', 'language', 'name', 'size', 'type', 'score', 'citizens', 'state'];
         return this.isAdmin() ? ['select', ...cols, 'actions'] : cols;
@@ -136,6 +140,20 @@ export class TownListComponent implements OnInit, AfterViewInit {
         es: '🇪🇸',
         multi: '🌍',
     };
+
+    public constructor() {
+        // Rechargement forcé par le parent (import du profil). La valeur initiale (0) est ignorée :
+        // le chargement initial est fait par ngOnInit une fois les combinaisons saison/phase récupérées.
+        let previousToken: number = this.reloadToken();
+        effect(() => {
+            const token: number = this.reloadToken();
+            if (token === previousToken) {
+                return;
+            }
+            previousToken = token;
+            this.resetAndReload();
+        });
+    }
 
     public ngOnInit(): void {
         this.townService.getSeasonPhases()

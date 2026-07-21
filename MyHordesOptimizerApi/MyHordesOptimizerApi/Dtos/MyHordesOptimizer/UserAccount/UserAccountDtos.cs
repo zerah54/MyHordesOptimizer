@@ -8,6 +8,13 @@ public class UserAccountPublicDto
     public int Id { get; set; }
     public string UserName { get; set; } = null!;
     public string? Avatar { get; set; }
+
+    /// <summary>
+    /// Date du dernier import MyHordes de ce joueur (pictos et historique des villes, que le même
+    /// appel remonte). Null = jamais importé. Portée par le profil et non par l'onglet Pictos :
+    /// l'import alimente tous les onglets, et le bouton qui l'affiche vit dans l'en-tête.
+    /// </summary>
+    public DateTime? ImportedAt { get; set; }
 }
 
 /// <summary>

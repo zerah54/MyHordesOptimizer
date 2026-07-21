@@ -119,7 +119,8 @@ public class UserAccountService : IUserAccountService
             {
                 Id = u.IdUser,
                 UserName = u.Name,
-                Avatar = u.Avatar
+                Avatar = u.Avatar,
+                ImportedAt = u.PictosHistoryImportedAt
             })
             .SingleOrDefault();
 

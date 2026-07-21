@@ -26,10 +26,34 @@
         }
     }
 
+    .mho-profile__header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+    }
+
     .mho-profile__title {
         display: flex;
         align-items: center;
         gap: 12px;
+    }
+
+    .mho-profile__import {
+        flex-shrink: 0;
+
+        // Le spinner du loader remplace icône ET texte : rien à ses côtés pendant l'import.
+        mat-spinner {
+            display: inline-block;
+        }
+    }
+
+    // Icône + libellé regroupés dans un seul nœud (projection de slot MatButton) : on rétablit
+    // l'alignement et l'espacement que le slot d'icône aurait fournis.
+    .mho-profile__import-label {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
     }
 
     .mho-profile__avatar {
