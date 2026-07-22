@@ -2,8 +2,8 @@
     <mat-card-title i18n>Simulateur de débordement</mat-card-title>
 
     @if (my_town) {
-        <mat-slide-toggle [(ngModel)]="in_town" (ngModelChange)="changeInTownMode()"
-                          matTooltip="Reprend le jour, le chaos, la dévastation et l'attaque estimée de votre ville" i18n-matTooltip>
+        <mat-slide-toggle (ngModelChange)="changeInTownMode()" [(ngModel)]="in_town"
+                          i18n-matTooltip matTooltip="Reprend le jour, le chaos, la dévastation et l'attaque estimée de votre ville">
             <ng-container i18n>Ma ville</ng-container>
         </mat-slide-toggle>
     }
@@ -17,29 +17,29 @@
             <div class="fields">
                 <mat-form-field appearance="outline">
                     <mat-label i18n>Attaque estimée (zombies)</mat-label>
-                    <input matInput type="number" [min]="0" [(ngModel)]="attack" (ngModelChange)="compute()">
+                    <input (ngModelChange)="scheduleCompute()" [(ngModel)]="attack" [min]="0" matInput type="number">
                     <mat-hint i18n>Nombre de zombies, âmes rouges comprises</mat-hint>
                 </mat-form-field>
 
                 <mat-form-field appearance="outline">
                     <mat-label i18n>Défense de la ville</mat-label>
-                    <input matInput type="number" [min]="0" [(ngModel)]="town_defense" (ngModelChange)="compute()">
+                    <input (ngModelChange)="scheduleCompute()" [(ngModel)]="town_defense" [min]="0" matInput type="number">
                     <mat-hint i18n>Ignorée si la porte est ouverte</mat-hint>
                 </mat-form-field>
 
                 <mat-form-field appearance="outline">
                     <mat-label i18n>Défense de veille</mat-label>
-                    <input matInput type="number" [min]="0" [(ngModel)]="watch_defense" (ngModelChange)="compute()">
+                    <input (ngModelChange)="scheduleCompute()" [(ngModel)]="watch_defense" [min]="0" matInput type="number">
                     <mat-hint i18n>Défense collective des veilleurs</mat-hint>
                 </mat-form-field>
             </div>
 
             <div class="door">
                 <span class="door-label" i18n>État de la porte</span>
-                <mat-button-toggle-group [(ngModel)]="door_state" (ngModelChange)="compute()">
-                    <mat-button-toggle value="closed" i18n>Fermée</mat-button-toggle>
-                    <mat-button-toggle value="open" i18n>Ouverte (&lt; 30 min)</mat-button-toggle>
-                    <mat-button-toggle value="open_long" i18n>Ouverte (&ge; 30 min)</mat-button-toggle>
+                <mat-button-toggle-group (ngModelChange)="compute()" [(ngModel)]="door_state">
+                    <mat-button-toggle i18n value="closed">Fermée</mat-button-toggle>
+                    <mat-button-toggle i18n value="open">Ouverte (&lt; 30 min)</mat-button-toggle>
+                    <mat-button-toggle i18n value="open_long">Ouverte (&ge; 30 min)</mat-button-toggle>
                 </mat-button-toggle-group>
             </div>
 
@@ -47,18 +47,18 @@
             <div class="fields">
                 <mat-form-field appearance="outline">
                     <mat-label i18n>Jour</mat-label>
-                    <input matInput type="number" [min]="1" [(ngModel)]="day" (ngModelChange)="compute()">
+                    <input (ngModelChange)="scheduleCompute()" [(ngModel)]="day" [min]="1" matInput type="number">
                     <mat-hint i18n>Détermine le nombre de citoyens ciblés</mat-hint>
                 </mat-form-field>
 
                 <mat-form-field appearance="outline">
                     <mat-label i18n>Citoyens vivants en ville</mat-label>
-                    <input matInput type="number" [min]="1" [(ngModel)]="nb_alive" (ngModelChange)="compute()">
+                    <input (ngModelChange)="scheduleCompute()" [(ngModel)]="nb_alive" [min]="1" matInput type="number">
                 </mat-form-field>
 
                 <mat-form-field appearance="outline">
                     <mat-label i18n>Population de la ville</mat-label>
-                    <input matInput type="number" [min]="1" [(ngModel)]="population" (ngModelChange)="compute()">
+                    <input (ngModelChange)="scheduleCompute()" [(ngModel)]="population" [min]="1" matInput type="number">
                     <mat-hint i18n>Nombre de places (souvent 40)</mat-hint>
                 </mat-form-field>
             </div>
@@ -75,27 +75,27 @@
                 @for (label of house_labels; track $index) {
                     <mat-form-field appearance="outline">
                         <mat-label>{{ label }} ({{ $index }})</mat-label>
-                        <input matInput type="number" [min]="0" [(ngModel)]="house_counts[$index]" (ngModelChange)="compute()">
+                        <input (ngModelChange)="scheduleCompute()" [(ngModel)]="house_counts[$index]" [min]="0" matInput type="number">
                     </mat-form-field>
                 }
             </div>
 
             <div class="toggles">
-                <mat-checkbox [(ngModel)]="chaos" (ngModelChange)="compute()" i18n>Ville en chaos</mat-checkbox>
-                <mat-checkbox [(ngModel)]="devastated" (ngModelChange)="compute()" i18n>Ville dévastée</mat-checkbox>
+                <mat-checkbox (ngModelChange)="compute()" [(ngModel)]="chaos" i18n>Ville en chaos</mat-checkbox>
+                <mat-checkbox (ngModelChange)="compute()" [(ngModel)]="devastated" i18n>Ville dévastée</mat-checkbox>
             </div>
 
             <h3 i18n>Répartition</h3>
             <div class="fields">
                 <mat-form-field appearance="outline">
                     <mat-label i18n>Défense de maison de référence</mat-label>
-                    <input matInput type="number" [min]="0" [(ngModel)]="home_defense" (ngModelChange)="compute()">
+                    <input (ngModelChange)="scheduleCompute()" [(ngModel)]="home_defense" [min]="0" matInput type="number">
                     <mat-hint i18n>Un citoyen meurt si les zombies reçus dépassent sa défense</mat-hint>
                 </mat-form-field>
 
                 <mat-form-field appearance="outline">
                     <mat-label i18n>Nombre de simulations</mat-label>
-                    <input matInput type="number" [min]="100" [(ngModel)]="iterations" (ngModelChange)="compute()">
+                    <input (ngModelChange)="scheduleCompute()" [(ngModel)]="iterations" [min]="100" matInput type="number">
                     <mat-hint i18n>Plus élevé = plus précis mais plus lent</mat-hint>
                 </mat-form-field>
             </div>
@@ -109,28 +109,28 @@
             <p class="step-label" i18n>1. Ce qui entre en ville</p>
             <table class="summary chain">
                 <tbody>
-                    <tr>
-                        <th i18n>Attaque estimée</th>
-                        <td>{{ attack | number:'1.0-0':locale }}</td>
-                    </tr>
-                    <tr>
-                        <th i18n>Défense de la ville</th>
-                        <td>
-                            @if (door_state === 'closed') {
-                                −{{ town_defense | number:'1.0-0':locale }}
-                            } @else {
-                                <span class="muted" i18n>ignorée (porte ouverte)</span>
-                            }
-                        </td>
-                    </tr>
-                    <tr>
-                        <th i18n>Veilleurs</th>
-                        <td>−{{ watch_defense | number:'1.0-0':locale }}</td>
-                    </tr>
-                    <tr class="key">
-                        <th i18n>Débordement</th>
-                        <td>{{ overflow_after_watch | number:'1.0-0':locale }}</td>
-                    </tr>
+                <tr>
+                    <th i18n>Attaque estimée</th>
+                    <td>{{ attack | number:'1.0-0':locale }}</td>
+                </tr>
+                <tr>
+                    <th i18n>Défense de la ville</th>
+                    <td>
+                        @if (door_state === 'closed') {
+                            −{{ town_defense | number:'1.0-0':locale }}
+                        } @else {
+                            <span class="muted" i18n>ignorée (porte ouverte)</span>
+                        }
+                    </td>
+                </tr>
+                <tr>
+                    <th i18n>Veilleurs</th>
+                    <td>−{{ watch_defense | number:'1.0-0':locale }}</td>
+                </tr>
+                <tr class="key">
+                    <th i18n>Débordement</th>
+                    <td>{{ overflow_after_watch | number:'1.0-0':locale }}</td>
+                </tr>
                 </tbody>
             </table>
 
@@ -148,79 +148,80 @@
                 </small>
                 <table class="summary">
                     <tbody>
-                        <tr>
-                            <th i18n>Facteur de zombies actifs</th>
-                            <td>
-                                {{ factor_min * 100 | number:'1.0-1':locale }}%
-                                – {{ factor_max * 100 | number:'1.0-1':locale }}%
-                            </td>
-                        </tr>
-                        <tr>
-                            <th i18n>Citoyens ciblés</th>
-                            <td>{{ targeted_count | number:'1.0-0':locale }}</td>
-                        </tr>
+                    <tr>
+                        <th i18n>Facteur de zombies actifs</th>
+                        <td>
+                            {{ factor_min * 100 | number:'1.0-1':locale }}%
+                            – {{ factor_max * 100 | number:'1.0-1':locale }}%
+                        </td>
+                    </tr>
+                    <tr>
+                        <th i18n>Citoyens ciblés</th>
+                        <td>{{ targeted_count | number:'1.0-0':locale }}</td>
+                    </tr>
                     </tbody>
                 </table>
 
                 <div class="door">
                     <span class="door-label" i18n>Mode d'affichage des résultats</span>
-                    <mat-button-toggle-group [(ngModel)]="result_mode" (ngModelChange)="compute()">
-                        <mat-button-toggle value="realistic" i18n>Réaliste</mat-button-toggle>
-                        <mat-button-toggle value="bounds" i18n>Favorable / défavorable</mat-button-toggle>
+                    <mat-button-toggle-group (ngModelChange)="compute()" [(ngModel)]="result_mode">
+                        <mat-button-toggle i18n value="realistic">Réaliste</mat-button-toggle>
+                        <mat-button-toggle i18n value="bounds">Favorable / défavorable</mat-button-toggle>
                     </mat-button-toggle-group>
                 </div>
 
                 @for (scenario of scenarios; track scenario.label) {
                     <div class="scenario">
-                            <h4>{{ scenario.label }}</h4>
-                            <table class="summary">
-                                <tbody>
-                                    <tr>
-                                        <th i18n>Zombies actifs (attaquants)</th>
-                                        <td>{{ scenario.attacking | number:'1.0-0':locale }}</td>
-                                    </tr>
-                                    <tr>
-                                        <th i18n>Citoyens réellement touchés</th>
-                                        <td>
-                                            {{ scenario.touched_mean | number:'1.0-1':locale }}
-                                            <span class="range">({{ scenario.touched_min }}–{{ scenario.touched_max }})</span>
-                                        </td>
-                                    </tr>
-                                    <tr class="key">
-                                        <th i18n>Citoyens tués</th>
-                                        <td>
-                                            {{ scenario.deaths_mean | number:'1.0-1':locale }}
-                                            <span class="range">({{ scenario.deaths_min }}–{{ scenario.deaths_max }})</span>
-                                            &nbsp;·&nbsp;
-                                            <ng-container i18n>au moins 1</ng-container>&nbsp;:&nbsp;{{ scenario.death_at_least_one * 100 | number:'1.0-0':locale }}%
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                        <h4>{{ scenario.label }}</h4>
+                        <table class="summary">
+                            <tbody>
+                            <tr>
+                                <th i18n>Zombies actifs (attaquants)</th>
+                                <td>{{ scenario.attacking | number:'1.0-0':locale }}</td>
+                            </tr>
+                            <tr>
+                                <th i18n>Citoyens réellement touchés</th>
+                                <td>
+                                    {{ scenario.touched_mean | number:'1.0-1':locale }}
+                                    <span class="range">({{ scenario.touched_min }}–{{ scenario.touched_max }})</span>
+                                </td>
+                            </tr>
+                            <tr class="key">
+                                <th i18n>Citoyens tués</th>
+                                <td>
+                                    {{ scenario.deaths_mean | number:'1.0-1':locale }}
+                                    <span class="range">({{ scenario.deaths_min }}–{{ scenario.deaths_max }})</span>
+                                    &nbsp;·&nbsp;
+                                    <ng-container i18n>au moins 1
+                                    </ng-container>&nbsp;:&nbsp;{{ scenario.death_at_least_one * 100 | number:'1.0-5':locale }}%
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
 
-                            <table class="ranks">
-                                <thead>
-                                    <tr>
-                                        <th i18n>Rang</th>
-                                        <th i18n>Zombies (moyenne)</th>
-                                        <th i18n>Min–Max</th>
-                                        <th i18n>Fourchette (5–95%)</th>
-                                        <th i18n>Proba de mort</th>
+                        <table class="ranks">
+                            <thead>
+                            <tr>
+                                <th i18n>Rang</th>
+                                <th i18n>Zombies (moyenne)</th>
+                                <th i18n>Min–Max</th>
+                                <th i18n>Fourchette (5–95%)</th>
+                                <th i18n>Proba de mort</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                                @for (rank of scenario.ranks; track rank.rank) {
+                                    <tr [class.dies]="rank.death_probability >= 0.5">
+                                        <th>{{ rank.rank }}</th>
+                                        <td>{{ rank.mean | number:'1.0-1':locale }}</td>
+                                        <td>{{ rank.min }} – {{ rank.max }}</td>
+                                        <td>{{ rank.p5 }} – {{ rank.p95 }}</td>
+                                        <td>{{ rank.death_probability * 100 | number:'1.0-5':locale }}%</td>
                                     </tr>
-                                </thead>
-                                <tbody>
-                                    @for (rank of scenario.ranks; track rank.rank) {
-                                        <tr [class.dies]="rank.death_probability >= 0.5">
-                                            <th>{{ rank.rank }}</th>
-                                            <td>{{ rank.mean | number:'1.0-1':locale }}</td>
-                                            <td>{{ rank.min }} – {{ rank.max }}</td>
-                                            <td>{{ rank.p5 }} – {{ rank.p95 }}</td>
-                                            <td>{{ rank.death_probability * 100 | number:'1.0-0':locale }}%</td>
-                                        </tr>
-                                    }
-                                </tbody>
-                            </table>
-                        </div>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
                 }
             }
         </section>
