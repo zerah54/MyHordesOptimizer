@@ -1,8 +1,8 @@
-import {state} from '../state';
-import {fetcher} from '../utils/fetch';
-import {getI18N} from '../utils/i18n';
-import {addError} from '../utils/notifications';
-import {convertResponsePromiseToError} from '../utils/version';
+import { state } from '../state';
+import { fetcher } from '../utils/fetch';
+import { getI18N } from '../utils/i18n';
+import { addError } from '../utils/notifications';
+import { convertResponsePromiseToError } from '../utils/version';
 
 export function getRuins() {
     return new Promise<any>((resolve, reject) => {
@@ -36,7 +36,7 @@ export function getRuins() {
                                 return 0;
                             }
                         });
-                    })
+                    });
                     resolve(state.ruins);
                 })
                 .catch((error) => {
@@ -46,7 +46,7 @@ export function getRuins() {
         } else {
             resolve(state.ruins);
         }
-    })
+    });
 }
 
 /** Récupère les informations de la ville */

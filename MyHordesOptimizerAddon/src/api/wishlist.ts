@@ -1,9 +1,9 @@
-import {api_texts} from '../i18n/texts';
-import {state} from '../state';
-import {fetcher} from '../utils/fetch';
-import {getI18N} from '../utils/i18n';
-import {addError, addSuccess} from '../utils/notifications';
-import {convertResponsePromiseToError} from '../utils/version';
+import { api_texts } from '../i18n/texts';
+import { state } from '../state';
+import { fetcher } from '../utils/fetch';
+import { getI18N } from '../utils/i18n';
+import { addError, addSuccess } from '../utils/notifications';
+import { convertResponsePromiseToError } from '../utils/version';
 
 export function getWishlist() {
     return new Promise<any>((resolve, reject) => {
@@ -16,7 +16,7 @@ export function getWishlist() {
                 }
             })
             .then((response) => {
-                state.wishlist = {...response};
+                state.wishlist = { ...response };
                 resolve(state.wishlist);
             })
             .catch((error) => {

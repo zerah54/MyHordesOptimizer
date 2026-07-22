@@ -16,9 +16,11 @@ using MyHordesOptimizerApi.Extensions.Models;
 using MyHordesOptimizerApi.Models;
 using MyHordesOptimizerApi.Providers.Interfaces;
 using MyHordesOptimizerApi.Repository.Interfaces;
+using MyHordesOptimizerApi.Services.Impl.Locking;
 using MyHordesOptimizerApi.Services.Interfaces;
 using Newtonsoft.Json.Linq;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -29,7 +31,7 @@ namespace MyHordesOptimizerApi.Services.Impl
 {
     public class MyHordesFetcherService : IMyHordesFetcherService
     {
-        public static SemaphoreSlim Lock = new SemaphoreSlim(1);
+        protected TownSyncLock TownSyncLock { get; set; }
         protected ILogger<MyHordesFetcherService> Logger { get; set; }
         protected IMyHordesApiRepository MyHordesJsonApiRepository { get; set; }
         protected IServiceScopeFactory ServiceScopeFactory { get; private set; }
@@ -46,8 +48,10 @@ namespace MyHordesOptimizerApi.Services.Impl
             IMapper mapper,
             IUserInfoProvider userInfoProvider,
             IMyHordesScrutateurConfiguration myHordesScrutateurConfiguration,
+            TownSyncLock townSyncLock,
             MhoContext mhoContext)
         {
+            TownSyncLock = townSyncLock;
             Logger = logger;
             MyHordesJsonApiRepository = myHordesJsonApiRepository;
             ServiceScopeFactory = serviceScopeFactory;
@@ -125,19 +129,31 @@ namespace MyHordesOptimizerApi.Services.Impl
             }
         }
 
+        /// <summary>
+        /// Synchronise la ville du citoyen connecté et renvoie son profil.
+        /// <para>
+        /// Cet appel est sur le chemin critique de TOUTES les connexions à l'addon : il ne doit
+        /// contenir aucun import (historique des villes jouées, pictos), sous peine de rendre
+        /// l'authentification tributaire d'un traitement long. Ne reste ici que ce qui décrit
+        /// l'instant présent de la ville, sous le verrou de cette ville seulement.
+        /// </para>
+        /// </summary>
         public async Task<SimpleMeDto> GetSimpleMeAsync()
         {
             var sw = new Stopwatch();
             sw.Start();
             var myHordeMeResponse = MyHordesJsonApiRepository.GetMe();
             Logger.LogDebug($"GetSimpleMeAsync MyHordesJsonApiRepository.GetMe() après {sw.Elapsed} ms");
-            Logger.LogDebug("GetSimpleMeAsync Waiting for Lock");
-            await Lock.WaitAsync();
-            Logger.LogDebug($"GetSimpleMeAsync Lock ok après {sw.Elapsed} ms");
-            try
+            var townSynchronized = false;
+            if (myHordeMeResponse.Map != null) // Si l'utilisateur est en ville
             {
-                if (myHordeMeResponse.Map != null && !HasTownIdCollision(myHordeMeResponse)) // Si l'utilisateur est en ville
+                Logger.LogDebug("GetSimpleMeAsync Waiting for Lock");
+                // Clé de verrou : l'IdTown provisoire (-mapId) écrit par le mapping ci-dessous.
+                await using var townLock = await TownSyncLock.AcquireTownAsync(-myHordeMeResponse.MapId);
+                Logger.LogDebug($"GetSimpleMeAsync Lock ok après {sw.Elapsed} ms");
+                if (!HasTownIdCollision(myHordeMeResponse))
                 {
+                    townSynchronized = true;
                     Logger.LogDebug($"GetSimpleMeAsync User en ville !");
 
                     if (!DbContext.Users.Any(u => u.IdUser == UserInfoProvider.UserId))
@@ -416,55 +432,85 @@ namespace MyHordesOptimizerApi.Services.Impl
                     }
                     transaction.Commit();
                     Logger.LogDebug($"GetSimpleMeAsync Transaction commit {sw.Elapsed} ms");
-
-                    // Pictos gagnés par les morts dans cette ville. Hors transaction et isolé pour
-                    // qu'un échec ici ne casse pas la synchro de la ville.
-                    try
-                    {
-                        UpsertCadaverPictos(town.IdTown, myHordeMeResponse.Map.Cadavers);
-                        Logger.LogDebug($"GetSimpleMeAsync Pictos des cadavers {sw.Elapsed} ms");
-                    }
-                    catch (Exception ex)
-                    {
-                        Logger.LogWarning(ex, "GetSimpleMeAsync: échec de la mise à jour des pictos des cadavers");
-                    }
                 }
-
-                // Historique des villes terminées du joueur (vies passées) : on les importe / marque
-                // comme terminées. Indépendant du fait que le joueur soit actuellement en ville, et
-                // isolé pour qu'un échec ici ne casse pas la synchro de la ville courante.
-                //
-                // UNIQUEMENT au premier import (date nulle). Cet upsert réécrit tout l'historique —
-                // >100 villes pour un vétéran, ~2,3 s en moyenne et jusqu'à 10 s mesurées — sous le
-                // verrou global, alors que son résultat ne change qu'en fin de ville. Le faire à
-                // chaque connexion plafonnait le débit à ~0,5 req/s : au pic de minuit la file
-                // atteignait 15 min et nginx renvoyait des 502. Les rafraîchissements suivants
-                // passent par l'import des pictos, dont le playedMaps est un sur-ensemble strict.
-                if (!DbContext.Users.Any(u => u.IdUser == UserInfoProvider.UserId && u.PlayedMapsImportedAt != null))
-                {
-                    try
-                    {
-                        UpsertPlayedMaps(myHordeMeResponse.PlayedMaps, UserInfoProvider.UserId);
-                    }
-                    catch (Exception ex)
-                    {
-                        Logger.LogWarning(ex, "GetSimpleMeAsync: échec de la mise à jour des playedMaps");
-                    }
-                }
-
-                var simpleMe = Mapper.Map<SimpleMeDto>(myHordeMeResponse);
-
-                return simpleMe;
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-            finally
-            {
-                Lock.Release();
                 Logger.LogDebug($"GetSimpleMeAsync Lock released {sw.Elapsed} ms");
             }
+
+            // Pictos gagnés par les morts dans cette ville. Aucune requête MyHordes supplémentaire
+            // (les données sont déjà dans la réponse ci-dessus), mais un volume d'écritures qui n'a
+            // rien à faire sur le chemin de l'authentification : on le confie à une tâche de fond,
+            // qui reprendra le verrou de la ville pour son compte.
+            if (townSynchronized)
+            {
+                QueueCadaverPictosUpsert(-myHordeMeResponse.MapId, myHordeMeResponse.Map.Cadavers);
+            }
+
+            // L'historique des villes jouées n'est plus importé ici : il est alimenté par
+            // ImportUserPictos (page profil), dont le playedMaps est un sur-ensemble strict.
+
+            return Mapper.Map<SimpleMeDto>(myHordeMeResponse);
+        }
+
+        /// <summary>
+        /// Délai minimal entre deux enregistrements des pictos d'une même ville. Tous les citoyens
+        /// d'une ville portent la même liste de cadavres : sans cette garde, une ville de 40 joueurs
+        /// se connectant au changement de jour lancerait 40 fois le même travail, sérialisé sur le
+        /// verrou de la ville — donc en compétition avec les synchronisations, elles sur le chemin
+        /// HTTP. Le contenu ne change qu'à la mort d'un citoyen, quelques minutes de retard sont sans
+        /// conséquence. En mémoire seulement : au redémarrage, un premier passage à vide est bénin.
+        /// </summary>
+        private static readonly TimeSpan CadaverPictosMinimumInterval = TimeSpan.FromMinutes(15);
+        private static readonly ConcurrentDictionary<int, DateTime> LastCadaverPictosUpsert = new();
+
+        /// <summary>
+        /// Enregistre les pictos des cadavres d'une ville hors du cycle de vie de la requête HTTP.
+        /// Le scope dédié est indispensable : le <see cref="MhoContext"/> de la requête est libéré
+        /// dès la réponse envoyée, l'utiliser depuis la tâche de fond lèverait un ObjectDisposed.
+        /// </summary>
+        private void QueueCadaverPictosUpsert(int townId, List<MyHordesCadaver> cadavers)
+        {
+            if (cadavers == null || cadavers.Count == 0)
+            {
+                return;
+            }
+            var now = DateTime.UtcNow;
+            // AddOrUpdate plutôt que Try* : la date n'est remplacée que si la précédente est assez
+            // ancienne, et l'opération étant atomique, deux connexions simultanées ne peuvent pas
+            // toutes les deux se croire les premières.
+            var scheduled = false;
+            LastCadaverPictosUpsert.AddOrUpdate(townId,
+                _ =>
+                {
+                    scheduled = true;
+                    return now;
+                },
+                (_, previous) =>
+                {
+                    if (now - previous < CadaverPictosMinimumInterval)
+                    {
+                        return previous;
+                    }
+                    scheduled = true;
+                    return now;
+                });
+            if (!scheduled)
+            {
+                return;
+            }
+            _ = Task.Run(async () =>
+            {
+                try
+                {
+                    using var scope = ServiceScopeFactory.CreateScope();
+                    var dbContext = scope.ServiceProvider.GetRequiredService<MhoContext>();
+                    await using var townLock = await TownSyncLock.AcquireTownAsync(townId);
+                    UpsertCadaverPictos(dbContext, townId, cadavers);
+                }
+                catch (Exception ex)
+                {
+                    Logger.LogWarning(ex, "GetSimpleMeAsync: échec de la mise à jour des pictos des cadavers de la ville {TownId}", townId);
+                }
+            });
         }
 
         // Une ligne provisoire (pas encore migrée vers son townId stable) vit sous IdTown = -mapId,
@@ -485,11 +531,19 @@ namespace MyHordesOptimizerApi.Services.Impl
             return true;
         }
 
+        /// <summary>
+        /// Le référentiel Picto est commun à toutes les villes : deux villes synchronisées en
+        /// parallèle découvriraient le même picto inconnu et l'insèreraient deux fois (violation de
+        /// clé primaire). Le verrou de ville ne protège pas ce cas, celui-ci si.
+        /// </summary>
+        private static readonly SemaphoreSlim PictoReferentialLock = new SemaphoreSlim(1, 1);
+
         // Pictos obtenus par chaque mort DANS cette ville (champ `rewards` des cadavers).
         // Le référentiel Picto est complété à la volée : `rewards` porte les libellés dans les
         // 4 langues demandées, mais pas `community`, qui reste donc à sa valeur par défaut.
         // Ne couvre que les morts : les pictos d'un survivant ne remontent jamais par cette voie.
-        private void UpsertCadaverPictos(int townId, List<MyHordesCadaver> cadavers)
+        // Le contexte est passé explicitement : l'appelant tourne en tâche de fond, avec le sien.
+        private void UpsertCadaverPictos(MhoContext dbContext, int townId, List<MyHordesCadaver> cadavers)
         {
             var cadaversWithPictos = cadavers?
                 .Where(cadaver => cadaver.Rewards != null && cadaver.Rewards.Count > 0)
@@ -502,46 +556,26 @@ namespace MyHordesOptimizerApi.Services.Impl
             var rewards = cadaversWithPictos.SelectMany(cadaver => cadaver.Rewards.Values).ToList();
 
             // Référentiel d'abord : Picto porte la FK de TownCitizenPicto
-            var pictoIds = rewards.Select(reward => reward.Id).Distinct().ToList();
-            var knownPictoIds = DbContext.Pictos
-                .Where(picto => pictoIds.Contains(picto.IdPicto))
-                .Select(picto => picto.IdPicto)
-                .ToHashSet();
-            foreach (var reward in rewards.GroupBy(reward => reward.Id).Select(group => group.First()))
-            {
-                if (knownPictoIds.Contains(reward.Id))
-                {
-                    continue;
-                }
-                DbContext.Pictos.Add(new Picto()
-                {
-                    IdPicto = reward.Id,
-                    Img = MyHordesExtensions.RemoveImageFingerprint(reward.Img) ?? string.Empty,
-                    NameFr = GetLabelForLanguage(reward.Name, "fr"),
-                    NameEn = GetLabelForLanguage(reward.Name, "en"),
-                    NameEs = GetLabelForLanguage(reward.Name, "es"),
-                    NameDe = GetLabelForLanguage(reward.Name, "de"),
-                    DescFr = GetLabelForLanguage(reward.Desc, "fr"),
-                    DescEn = GetLabelForLanguage(reward.Desc, "en"),
-                    DescEs = GetLabelForLanguage(reward.Desc, "es"),
-                    DescDe = GetLabelForLanguage(reward.Desc, "de"),
-                    Rare = reward.Rare
-                });
-                knownPictoIds.Add(reward.Id);
-            }
+            UpsertPictoReferential(dbContext, rewards);
 
             var lastUpdate = DateTime.UtcNow;
-            var existingLines = DbContext.TownCitizenPictos
+            // Indexation par (citoyen, picto) : le rapprochement ligne à ligne était quadratique,
+            // et une ville de fin de saison peut compter plusieurs centaines de lignes.
+            var existingLines = dbContext.TownCitizenPictos
                 .Where(picto => picto.IdTown == townId)
-                .ToList();
+                .ToDictionary(picto => (picto.IdUser, picto.IdPicto));
             foreach (var cadaver in cadaversWithPictos)
             {
                 foreach (var reward in cadaver.Rewards.Values)
                 {
-                    var existingLine = existingLines.FirstOrDefault(line => line.IdUser == cadaver.Id && line.IdPicto == reward.Id);
-                    if (existingLine == null)
+                    if (existingLines.TryGetValue((cadaver.Id, reward.Id), out var existingLine))
                     {
-                        DbContext.TownCitizenPictos.Add(new TownCitizenPicto()
+                        existingLine.Count = reward.Number;
+                        existingLine.LastUpdate = lastUpdate;
+                    }
+                    else
+                    {
+                        dbContext.TownCitizenPictos.Add(new TownCitizenPicto()
                         {
                             IdTown = townId,
                             IdUser = cadaver.Id,
@@ -550,14 +584,56 @@ namespace MyHordesOptimizerApi.Services.Impl
                             LastUpdate = lastUpdate
                         });
                     }
-                    else
-                    {
-                        existingLine.Count = reward.Number;
-                        existingLine.LastUpdate = lastUpdate;
-                    }
                 }
             }
-            DbContext.SaveChanges();
+            dbContext.SaveChanges();
+        }
+
+        /// <summary>
+        /// Complète le référentiel des pictos avec ceux encore inconnus, sous
+        /// <see cref="PictoReferentialLock"/> et avec son propre enregistrement : les lignes de
+        /// détail qui les référencent ne peuvent être écrites qu'une fois ceux-ci en base.
+        /// </summary>
+        private void UpsertPictoReferential(MhoContext dbContext, List<MyHordesCadaverReward> rewards)
+        {
+            var pictoIds = rewards.Select(reward => reward.Id).Distinct().ToList();
+            PictoReferentialLock.Wait();
+            try
+            {
+                var knownPictoIds = dbContext.Pictos
+                    .Where(picto => pictoIds.Contains(picto.IdPicto))
+                    .Select(picto => picto.IdPicto)
+                    .ToHashSet();
+                var missingPictos = rewards
+                    .GroupBy(reward => reward.Id)
+                    .Select(group => group.First())
+                    .Where(reward => !knownPictoIds.Contains(reward.Id))
+                    .Select(reward => new Picto()
+                    {
+                        IdPicto = reward.Id,
+                        Img = MyHordesExtensions.RemoveImageFingerprint(reward.Img) ?? string.Empty,
+                        NameFr = GetLabelForLanguage(reward.Name, "fr"),
+                        NameEn = GetLabelForLanguage(reward.Name, "en"),
+                        NameEs = GetLabelForLanguage(reward.Name, "es"),
+                        NameDe = GetLabelForLanguage(reward.Name, "de"),
+                        DescFr = GetLabelForLanguage(reward.Desc, "fr"),
+                        DescEn = GetLabelForLanguage(reward.Desc, "en"),
+                        DescEs = GetLabelForLanguage(reward.Desc, "es"),
+                        DescDe = GetLabelForLanguage(reward.Desc, "de"),
+                        Rare = reward.Rare
+                    })
+                    .ToList();
+                if (missingPictos.Count == 0)
+                {
+                    return;
+                }
+                dbContext.Pictos.AddRange(missingPictos);
+                dbContext.SaveChanges();
+            }
+            finally
+            {
+                PictoReferentialLock.Release();
+            }
         }
 
         private static string GetLabelForLanguage(IDictionary<string, string> labels, string language)
@@ -575,7 +651,7 @@ namespace MyHordesOptimizerApi.Services.Impl
         /// Importe le total des pictos d'un joueur et le détail de son historique par ville, en un
         /// seul appel MyHordes. Renvoie false sans rien faire si l'import est déjà récent.
         /// </summary>
-        public bool ImportUserPictos(int userId)
+        public async Task<bool> ImportUserPictosAsync(int userId)
         {
             var user = DbContext.Users.FirstOrDefault(u => u.IdUser == userId);
             if (user == null)
@@ -592,17 +668,13 @@ namespace MyHordesOptimizerApi.Services.Impl
             var response = MyHordesJsonApiRepository.GetUserPictos(userId);
 
             // L'import crée / met à jour des lignes Town, comme la synchronisation de ville : sans ce
-            // verrou, deux écritures concurrentes sur la même ville se marcheraient dessus. Il n'est
-            // pris qu'ici, une fois l'appel réseau terminé — le tenir pendant les ~15s de la requête
-            // bloquerait toutes les synchronisations pour rien (même découpage que GetSimpleMeAsync).
-            Lock.Wait();
-            try
+            // verrou, deux écritures concurrentes sur la même ville se marcheraient dessus. Il touche
+            // TOUTES les villes jouées, il ne peut donc pas se contenter du verrou de l'une d'elles :
+            // il prend le verrou global en exclusif. Uniquement ici, une fois l'appel réseau terminé —
+            // le tenir pendant les ~15 s de la requête bloquerait toutes les synchronisations pour rien.
+            await using (await TownSyncLock.AcquireAllTownsAsync())
             {
                 PersistUserPictos(response, userId);
-            }
-            finally
-            {
-                Lock.Release();
             }
             return true;
         }

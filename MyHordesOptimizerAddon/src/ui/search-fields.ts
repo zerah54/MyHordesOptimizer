@@ -5,15 +5,16 @@ import {
     mho_search_building_field_id,
     mho_search_dump_field_id,
     mho_search_recipient_field_id,
-    mho_search_registry_field_id
+    mho_search_registry_field_id,
+    mho_search_trap_field_id
 } from '../config/constants';
-import {params_categories} from '../data/params';
-import {texts} from '../i18n/texts';
-import {state} from '../state';
-import {createCheckboxDropdown, createSingleFilterSelect} from '../utils/dom';
-import {getI18N} from '../utils/i18n';
-import {normalizeString} from '../utils/notifications';
-import {pageIsCitizens, pageIsConstructions, pageIsDump, pageIsMsgReceived, pageIsOmniscience} from '../utils/page';
+import { params_categories } from '../data/params';
+import { texts } from '../i18n/texts';
+import { state } from '../state';
+import { createCheckboxDropdown, createSingleFilterSelect } from '../utils/dom';
+import { getI18N } from '../utils/i18n';
+import { normalizeString } from '../utils/notifications';
+import { pageIsCitizens, pageIsConstructions, pageIsDump, pageIsMsgReceived, pageIsOmniscience, pageIsTrap, trapItemsTableElement } from '../utils/page';
 
 // Local helper: TypeScript's arrFrom(any) sometimes infers element type
 // 'unknown' rather than 'any' when the source isn't a statically-typed
@@ -28,6 +29,7 @@ export function displaySearchFields() {
         displaySearchFieldOnRecipientList();
         displaySearchFieldOnRegistry();
         displaySearchFieldOnDump();
+        displaySearchFieldOnTrap();
         hideCompletedBuildings();
         displayFiltersOnOmniscience();
         displayFiltersOnCitizenList();
@@ -38,8 +40,8 @@ export function displaySearchFields() {
 
 export function hideCompletedBuildings() {
 
-    let hideBuildings = (buildings) => {
-        let building_rows = [];
+    const hideBuildings = (buildings) => {
+        const building_rows = [];
         buildings.forEach((building) => {
             building_rows.push(...arrFrom(building.querySelectorAll('.building')));
         });
@@ -61,9 +63,9 @@ export function hideCompletedBuildings() {
                 building.classList.remove('mho-hidden');
             }
         });
-    }
+    };
 
-    let showBuildings = (buildings) => {
+    const showBuildings = (buildings) => {
         buildings?.forEach((building) => {
             if (building.classList.contains('mho-hidden')) {
                 building.classList.remove('mho-hidden');
@@ -72,13 +74,13 @@ export function hideCompletedBuildings() {
                 buildingRow.classList.remove('mho-hidden');
             });
         });
-    }
+    };
 
-    let observeBuildings = () => {
+    const observeBuildings = () => {
         const observer = new MutationObserver((mutations) => {
             mutations.forEach((mutation) => {
                 if (mutation.addedNodes.length > 0) {
-                    let buildings = arrFrom(document.querySelectorAll('.buildings') || []);
+                    const buildings = arrFrom(document.querySelectorAll('.buildings') || []);
                     if (buildings.length > 0) {
                         hideBuildings(buildings);
                         observer.disconnect();
@@ -87,11 +89,11 @@ export function hideCompletedBuildings() {
             });
         });
 
-        observer.observe(document.body, {childList: true, subtree: true});
-    }
+        observer.observe(document.body, { childList: true, subtree: true });
+    };
 
     if (pageIsConstructions()) {
-        let buildings = arrFrom(document.querySelectorAll('.buildings') || []);
+        const buildings = arrFrom(document.querySelectorAll('.buildings') || []);
         if (state.mho_parameters.hide_completed_buildings_field) {
             if (buildings.length > 0) {
                 hideBuildings(buildings);
@@ -111,10 +113,10 @@ export function displaySearchFieldOnBuildings() {
     let searchFieldAdded = false; // Indicateur pour suivre l'ajout du champ de recherche
 
 
-    let addSearchField = (tabs) => {
+    const addSearchField = (tabs) => {
         if (searchFieldAdded) return; // Vérifie si le champ de recherche a déjà été ajouté
 
-        let tabs_block = tabs.parentElement;
+        const tabs_block = tabs.parentElement;
 
         fields_container = document.getElementById(mho_search_building_field_id);
         if (fields_container) return; // Vérifie si le conteneur existe déjà
@@ -128,7 +130,7 @@ export function displaySearchFieldOnBuildings() {
         fields_container.id = mho_search_building_field_id;
         tabs_block.insertBefore(fields_container, tabs);
 
-        let search_field_div = document.createElement('div');
+        const search_field_div = document.createElement('div');
         search_field_div.style.display = 'flex';
         search_field_div.style.alignItems = 'center';
         fields_container.appendChild(search_field_div);
@@ -136,28 +138,28 @@ export function displaySearchFieldOnBuildings() {
             search_field_div.classList.add('hidden');
         }
 
-        let header_mho_img = document.createElement('img');
+        const header_mho_img = document.createElement('img');
         header_mho_img.src = mh_optimizer_icon;
         header_mho_img.style.height = '24px';
         header_mho_img.style.position = 'absolute';
         search_field_div.appendChild(header_mho_img);
 
-        let search_field = document.createElement('input');
+        const search_field = document.createElement('input');
         search_field.type = 'text';
         search_field.placeholder = getI18N(params_categories.find((category) => category.id === 'display').params.find((param) => param.id === 'sort_and_filter').children.find((param) => param.id === 'display_search_fields').children.find((child) => child.id === 'display_search_field_buildings').label);
         search_field.classList.add('mho-input', 'inline');
         search_field.setAttribute('style', 'min-width: 200px; padding-left: 24px;');
         search_field_div.appendChild(search_field);
 
-        let buildings = arrFrom(document.querySelectorAll('.buildings') || []);
+        const buildings = arrFrom(document.querySelectorAll('.buildings') || []);
 
-        let filterBuildings = () => {
-            let building_rows = [];
+        const filterBuildings = () => {
+            const building_rows = [];
             buildings.forEach((building) => {
                 building_rows.push(...arrFrom(building.querySelectorAll('.building')));
             });
             building_rows.forEach((building_row) => {
-                let force_hide = state.mho_parameters.hide_completed_buildings_field && building_row.classList.contains('complete');
+                const force_hide = state.mho_parameters.hide_completed_buildings_field && building_row.classList.contains('complete');
 
                 if (force_hide) {
                     building_row.classList.add('hidden');
@@ -182,13 +184,13 @@ export function displaySearchFieldOnBuildings() {
         });
 
         searchFieldAdded = true; // Mettre à jour l'indicateur après l'ajout
-    }
+    };
 
-    let observeTabs = () => {
+    const observeTabs = () => {
         const observer = new MutationObserver((mutations) => {
             mutations.forEach((mutation) => {
                 if (mutation.addedNodes.length > 0) {
-                    let tabs = document.querySelector('ul.buildings-tabs');
+                    const tabs = document.querySelector('ul.buildings-tabs');
                     if (tabs) {
                         addSearchField(tabs);
                         observer.disconnect();
@@ -197,13 +199,13 @@ export function displaySearchFieldOnBuildings() {
             });
         });
 
-        observer.observe(document.body, {childList: true, subtree: true});
-    }
+        observer.observe(document.body, { childList: true, subtree: true });
+    };
 
     if (state.mho_parameters.display_search_field_buildings && pageIsConstructions()) {
         if (fields_container) return;
 
-        let tabs = document.querySelector('ul.buildings-tabs');
+        const tabs = document.querySelector('ul.buildings-tabs');
         if (tabs) {
             addSearchField(tabs);
         } else {
@@ -221,9 +223,9 @@ export function displaySearchFieldOnRecipientList() {
     if (state.mho_parameters.display_search_field_recipients && pageIsMsgReceived()) {
         if (search_field) return;
 
-        let recipients = document.querySelector('#recipient_list');
+        const recipients = document.querySelector('#recipient_list');
         if (recipients) {
-            let search_field_container = document.createElement('div');
+            const search_field_container = document.createElement('div');
 
             search_field = document.createElement('input');
             search_field.type = 'text';
@@ -233,7 +235,7 @@ export function displaySearchFieldOnRecipientList() {
             search_field.setAttribute('style', 'padding-left: 24px; margin-bottom: 0.25em;');
 
             search_field.addEventListener('keyup', (event) => {
-                let recipients_list = arrFrom(document.querySelectorAll('.recipient.link') || []);
+                const recipients_list = arrFrom(document.querySelectorAll('.recipient.link') || []);
                 recipients_list.forEach((recipient) => {
                     if (normalizeString(recipient.innerText).indexOf(normalizeString(search_field.value)) > -1) {
                         recipient.classList.remove('hidden');
@@ -245,7 +247,7 @@ export function displaySearchFieldOnRecipientList() {
 
             search_field_container.appendChild(search_field);
 
-            let header_mho_img = document.createElement('img');
+            const header_mho_img = document.createElement('img');
             header_mho_img.src = mh_optimizer_icon;
             header_mho_img.style.height = '24px';
             header_mho_img.style.position = 'absolute';
@@ -266,21 +268,21 @@ export function displaySearchFieldOnDump() {
     if (state.mho_parameters.display_search_field_dump && pageIsDump()) {
         if (search_field) return;
 
-        let main_content = document.querySelector('.town-main-content');
+        const main_content = document.querySelector('.town-main-content');
         if (main_content) {
-            let table = main_content.querySelector('.row-table');
+            const table = main_content.querySelector('.row-table');
             if (table) {
-                let filterFunction = (name_search_field, can_be_dump_field, can_be_recovered_field) => {
-                    let items_list = arrFrom(table.querySelectorAll('div.row-flex') || []);
+                const filterFunction = (name_search_field, can_be_dump_field, can_be_recovered_field) => {
+                    const items_list = arrFrom(table.querySelectorAll('div.row-flex') || []);
                     items_list.forEach((item) => {
-                        let item_label = item.querySelector('div.item-line img');
-                        let item_counts = item.children.item(1).querySelectorAll('div');
-                        let item_bank_count = +item_counts[0].innerText.replace(/\D*/, '');
-                        let item_dump_count = +item_counts[1].innerText.replace(/\D*/, '');
+                        const item_label = item.querySelector('div.item-line img');
+                        const item_counts = item.children.item(1).querySelectorAll('div');
+                        const item_bank_count = +item_counts[0].innerText.replace(/\D*/, '');
+                        const item_dump_count = +item_counts[1].innerText.replace(/\D*/, '');
 
-                        let is_search_in_string = normalizeString(item_label.getAttribute('alt')).indexOf(normalizeString(name_search_field.value)) > -1;
-                        let can_be_recovered = can_be_recovered_field.checked && item_dump_count > 0;
-                        let can_be_dump = can_be_dump_field.checked && item_bank_count > 0;
+                        const is_search_in_string = normalizeString(item_label.getAttribute('alt')).indexOf(normalizeString(name_search_field.value)) > -1;
+                        const can_be_recovered = can_be_recovered_field.checked && item_dump_count > 0;
+                        const can_be_dump = can_be_dump_field.checked && item_bank_count > 0;
 
                         if (is_search_in_string && (can_be_dump || can_be_recovered)) {
                             item.classList.remove('hidden');
@@ -288,9 +290,9 @@ export function displaySearchFieldOnDump() {
                             item.classList.add('hidden');
                         }
                     });
-                }
+                };
 
-                let search_field_container = document.createElement('div');
+                const search_field_container = document.createElement('div');
                 search_field_container.setAttribute('style', ' display: flex; flex-wrap: wrap; gap: 0.5em;');
                 search_field_container.id = mho_search_dump_field_id;
 
@@ -302,32 +304,32 @@ export function displaySearchFieldOnDump() {
 
                 search_field_container.appendChild(search_field);
 
-                let can_be_dumped = document.createElement('div');
+                const can_be_dumped = document.createElement('div');
                 search_field_container.appendChild(can_be_dumped);
 
-                let can_be_dumped_input = document.createElement('input');
+                const can_be_dumped_input = document.createElement('input');
                 can_be_dumped_input.type = 'checkbox';
                 can_be_dumped_input.id = 'can_be_dumped';
                 can_be_dumped_input.checked = true;
                 can_be_dumped_input.classList.add('mho-input');
                 can_be_dumped.appendChild(can_be_dumped_input);
 
-                let can_be_dumped_label = document.createElement('label');
+                const can_be_dumped_label = document.createElement('label');
                 can_be_dumped_label.innerText = getI18N(texts.can_be_dumped);
                 can_be_dumped_label.htmlFor = 'can_be_dumped';
                 can_be_dumped.appendChild(can_be_dumped_label);
 
-                let can_be_recovered = document.createElement('div');
+                const can_be_recovered = document.createElement('div');
                 search_field_container.appendChild(can_be_recovered);
 
-                let can_be_recovered_input = document.createElement('input');
+                const can_be_recovered_input = document.createElement('input');
                 can_be_recovered_input.type = 'checkbox';
                 can_be_recovered_input.id = 'can_be_recovered';
                 can_be_recovered_input.checked = true;
                 can_be_recovered_input.classList.add('mho-input');
                 can_be_recovered.appendChild(can_be_recovered_input);
 
-                let can_be_recovered_label = document.createElement('label');
+                const can_be_recovered_label = document.createElement('label');
                 can_be_recovered_label.innerText = getI18N(texts.can_be_recovered);
                 can_be_recovered_label.htmlFor = 'can_be_recovered';
                 can_be_recovered.appendChild(can_be_recovered_label);
@@ -344,7 +346,7 @@ export function displaySearchFieldOnDump() {
                     filterFunction(search_field, can_be_dumped_input, can_be_recovered_input);
                 });
 
-                let header_mho_img = document.createElement('img');
+                const header_mho_img = document.createElement('img');
                 header_mho_img.src = mh_optimizer_icon;
                 header_mho_img.style.height = '24px';
                 header_mho_img.style.position = 'absolute';
@@ -361,17 +363,90 @@ export function displaySearchFieldOnDump() {
 
 /** Si l'option associée est activée, affiche un champ de recherche sur le registre */
 
+/** Nœud de l'arborescence des paramètres, réduit à ce qui est nécessaire pour retrouver un libellé */
+interface ParamNode {
+    id: string;
+    label?: unknown;
+    params?: ParamNode[];
+    children?: ParamNode[];
+}
+
+/** Recherche en profondeur, pour ne pas dépendre du niveau d'imbrication exact d'une option */
+function findParamNode(nodes: ParamNode[], param_id: string): ParamNode | undefined {
+    const direct: ParamNode | undefined = nodes.find((node: ParamNode) => node.id === param_id);
+    if (direct) return direct;
+
+    return nodes
+        .map((node: ParamNode) => findParamNode([...(node.params ?? []), ...(node.children ?? [])], param_id))
+        .find((found: ParamNode | undefined) => !!found);
+}
+
+/** Libellé traduit d'une option, réutilisé comme texte indicatif du champ de recherche correspondant */
+function getParamLabel(param_id: string): string {
+    return getI18N(findParamNode(params_categories as ParamNode[], param_id)?.label);
+}
+
+/** Si l'option associée est activée, affiche un champ de recherche sur la liste des appâts de la page de pièges */
+
+export function displaySearchFieldOnTrap(): void {
+    const existing_field: HTMLElement | null = document.getElementById(mho_search_trap_field_id);
+
+    if (!state.mho_parameters.display_search_field_trap || !pageIsTrap()) {
+        existing_field?.remove();
+        return;
+    }
+
+    if (existing_field) return;
+
+    const table: Element | undefined = trapItemsTableElement();
+    if (!table?.parentElement) return;
+
+    const search_field_container: HTMLDivElement = document.createElement('div');
+    search_field_container.id = mho_search_trap_field_id;
+    search_field_container.setAttribute('style', 'display: flex; align-items: center; gap: 0.5em; margin-bottom: 0.25em;');
+
+    const header_mho_img: HTMLImageElement = document.createElement('img');
+    header_mho_img.src = mh_optimizer_icon;
+    header_mho_img.style.height = '24px';
+    header_mho_img.style.position = 'absolute';
+    search_field_container.appendChild(header_mho_img);
+
+    const search_field: HTMLInputElement = document.createElement('input');
+    search_field.type = 'text';
+    search_field.placeholder = getParamLabel('display_search_field_trap');
+    search_field.classList.add('mho-input', 'inline');
+    search_field.setAttribute('style', 'min-width: 200px; padding-left: 24px;');
+    search_field_container.appendChild(search_field);
+
+    /** Le libellé de l'appât n'est présent en texte que dans un bloc masqué sur petit écran : on lit l'alt de l'icône, toujours renseigné */
+    const filterBaits = (): void => {
+        arrFrom(table.querySelectorAll(':scope > .row:not(.header)')).forEach((row: HTMLElement) => {
+            const label: string = row.querySelector('img[alt]')?.getAttribute('alt') ?? '';
+            if (normalizeString(label).indexOf(normalizeString(search_field.value)) > -1) {
+                row.classList.remove('hidden');
+            } else {
+                row.classList.add('hidden');
+            }
+        });
+    };
+
+    search_field.addEventListener('keyup', () => filterBaits());
+
+    table.parentElement.insertBefore(search_field_container, table);
+}
+
+
 export function displaySearchFieldOnRegistry() {
     let search_field = document.getElementById(mho_search_registry_field_id);
     if (state.mho_parameters.display_search_field_registry) {
 
         if (search_field) return;
 
-        let logs = document.querySelector('hordes-log');
+        const logs = document.querySelector('hordes-log');
 
         if (logs) {
-            let search_field_container = document.createElement('div');
-            let logs_title = logs.parentElement.previousElementSibling;
+            const search_field_container = document.createElement('div');
+            const logs_title = logs.parentElement.previousElementSibling;
 
             search_field = document.createElement('input');
             search_field.type = 'text';
@@ -382,7 +457,7 @@ export function displaySearchFieldOnRegistry() {
 
             search_field_container.appendChild(search_field);
 
-            let header_mho_img = document.createElement('img');
+            const header_mho_img = document.createElement('img');
             header_mho_img.src = mh_optimizer_icon;
             header_mho_img.style.height = '24px';
             header_mho_img.style.position = 'absolute';
@@ -400,7 +475,7 @@ export function displaySearchFieldOnRegistry() {
                     search_field.classList.add('inline');
 
 
-                    let first_link = logs_title.querySelector('a');
+                    const first_link = logs_title.querySelector('a');
                     if (first_link) {
                         first_link.style.marginLeft = 'auto';
                     }
@@ -413,11 +488,11 @@ export function displaySearchFieldOnRegistry() {
                     header_mho_img.style.left = '4px';
                 }
 
-                logs_title.appendChild(search_field_container)
+                logs_title.appendChild(search_field_container);
 
 
                 search_field.addEventListener('keyup', (event) => {
-                    let logs_list = arrFrom(document.querySelectorAll('.log-entry .log-part-content') || []);
+                    const logs_list = arrFrom(document.querySelectorAll('.log-entry .log-part-content') || []);
                     logs_list.forEach((log) => {
                         if (normalizeString(log.innerText).indexOf(normalizeString(search_field.value)) > -1) {
                             log.parentElement.classList.remove('hidden');
@@ -438,7 +513,7 @@ export function displaySearchFieldOnRegistry() {
 export function displayMinApOnBuildings(count = 0) {
     state.tooltips_observer?.disconnect();
     if (state.mho_parameters.display_missing_ap_for_buildings_to_be_safe && pageIsConstructions()) {
-        let complete_buildings = document.querySelectorAll('.building.complete');
+        const complete_buildings = document.querySelectorAll('.building.complete');
         if ((!complete_buildings || complete_buildings.length === 0) && count < 10) {
             setTimeout(() => {
                 displayMinApOnBuildings(count + 1);
@@ -448,42 +523,42 @@ export function displayMinApOnBuildings(count = 0) {
 
         ///////////////////////// Observe les modifications sur les tooltips pour mieux alimenter les barres /////////////////////////
         // Selectionne le noeud dont les mutations seront observées
-        let tooltip_container = document.querySelector('#tooltip_container');
+        const tooltip_container = document.querySelector('#tooltip_container');
         // Options de l'observateur (quelles sont les mutations à observer)
-        let config = {childList: true, subtree: true};
+        const config = { childList: true, subtree: true };
 
         // Fonction callback à éxécuter quand une mutation est observée
-        let callback = function (mutationsList) {
+        const callback = function (mutationsList) {
             if (state.mho_parameters.display_missing_ap_for_buildings_to_be_safe && pageIsConstructions()) {
-                let broken_buildings = arrFrom(complete_buildings).filter((complete_building) => complete_building.querySelector('.to_repair'));
+                const broken_buildings = arrFrom(complete_buildings).filter((complete_building) => complete_building.querySelector('.to_repair'));
 
                 if (!broken_buildings || broken_buildings.length === 0) return;
 
                 broken_buildings.forEach((broken_building) => {
-                    let bar_element = broken_building.querySelector('.ap-bar');
-                    let to_repair_element = broken_building.querySelector('.to_repair');
-                    let nb_ap_element = broken_building.querySelector('.build-req');
+                    const bar_element = broken_building.querySelector('.ap-bar');
+                    const to_repair_element = broken_building.querySelector('.to_repair');
+                    const nb_ap_element = broken_building.querySelector('.build-req');
 
                     to_repair_element.dispatchEvent(new Event('mouseenter'));
-                    let tooltip: any = document.querySelector('.tooltip:not(.mho)[style*="display: block"]');
+                    const tooltip: any = document.querySelector('.tooltip:not(.mho)[style*="display: block"]');
                     to_repair_element.dispatchEvent(new Event('mouseleave'));
                     if (!tooltip || !tooltip.innerHTML) return;
 
-                    let tooltip_status_match = tooltip.innerText.match(/[0-9]+\/[0-9]+/);
+                    const tooltip_status_match = tooltip.innerText.match(/[0-9]+\/[0-9]+/);
                     if (!tooltip_status_match || tooltip_status_match.length <= 0) return;
-                    let building_status = tooltip_status_match[0]?.split('/');
+                    const building_status = tooltip_status_match[0]?.split('/');
 
-                    let tooltip_match = tooltip.innerHTML.match(/[0-9]+/g);
+                    const tooltip_match = tooltip.innerHTML.match(/[0-9]+/g);
                     if (!tooltip_match || tooltip_match.length <= 0) return;
 
-                    let nb_pts_per_ap = parseInt(tooltip_match[tooltip_match.length - 1].match(/[0-9]+/)[0], 10);
-                    let current_pv = parseInt(building_status[0], 10);
-                    let total_pv = parseInt(building_status[1], 10);
+                    const nb_pts_per_ap = parseInt(tooltip_match[tooltip_match.length - 1].match(/[0-9]+/)[0], 10);
+                    const current_pv = parseInt(building_status[0], 10);
+                    const total_pv = parseInt(building_status[1], 10);
 
-                    let minimum_safe = Math.ceil(total_pv * 70 / 100) + 1
+                    const minimum_safe = Math.ceil(total_pv * 70 / 100) + 1;
                     if (minimum_safe <= current_pv) return;
 
-                    let missing_pts = minimum_safe - current_pv;
+                    const missing_pts = minimum_safe - current_pv;
 
                     bar_element.style.display = 'flex';
                     let new_ap_bar = bar_element.querySelector('.mho-safe-ap');
@@ -497,7 +572,7 @@ export function displayMinApOnBuildings(count = 0) {
 
                     let missing_ap_info = nb_ap_element.querySelector('.mho-missing-ap');
                     if (!missing_ap_info) {
-                        missing_ap_info = document.createElement('span')
+                        missing_ap_info = document.createElement('span');
                         missing_ap_info.classList.add('mho-missing-ap');
                     }
                     missing_ap_info.style.fontWeight = 'initial';
@@ -521,11 +596,11 @@ export function displayMinApOnBuildings(count = 0) {
 
 
     } else if (pageIsConstructions()) {
-        let missing_ap_infos = document.querySelectorAll('.mho-missing-ap');
+        const missing_ap_infos = document.querySelectorAll('.mho-missing-ap');
         if (!missing_ap_infos) return;
-        arrFrom(missing_ap_infos).forEach((missing_ap_info) => missing_ap_info.remove())
+        arrFrom(missing_ap_infos).forEach((missing_ap_info) => missing_ap_info.remove());
 
-        let mho_safe_aps = document.querySelectorAll('.mho-safe-ap');
+        const mho_safe_aps = document.querySelectorAll('.mho-safe-ap');
         if (!mho_safe_aps) return;
         arrFrom(mho_safe_aps).forEach((mho_safe_ap) => mho_safe_ap.remove());
     }
@@ -538,23 +613,23 @@ function displayFiltersOnCitizenList() {
     if (state.mho_parameters.display_filters_citizen_list && pageIsCitizens()) {
         if (filter_container) return;
 
-        let main_content = document.querySelector('.town-main-content');
+        const main_content = document.querySelector('.town-main-content');
         if (!main_content) return;
 
-        let table = main_content.querySelector('.row-table');
+        const table = main_content.querySelector('.row-table');
         if (!table) return;
 
-        let rows = Array.from(table.querySelectorAll('div.row-flex:not(.header)'));
+        const rows = Array.from(table.querySelectorAll('div.row-flex:not(.header)'));
 
-        let professions = new Map();
-        let houseLevels = new Map();
+        const professions = new Map();
+        const houseLevels = new Map();
 
         rows.forEach((row) => {
-            let profImg = row.querySelector('.userCell img[alt]:not([alt=""])');
+            const profImg = row.querySelector('.userCell img[alt]:not([alt=""])');
             if (profImg) professions.set(profImg.getAttribute('alt'), profImg.src);
 
-            let defenseLabel = row.querySelector('.citizen-defense');
-            let houseImg = defenseLabel?.closest('.citizen-box')?.querySelector('img[alt]');
+            const defenseLabel = row.querySelector('.citizen-defense');
+            const houseImg = defenseLabel?.closest('.citizen-box')?.querySelector('img[alt]');
             if (houseImg) houseLevels.set(houseImg.getAttribute('alt'), houseImg.src);
         });
 
@@ -562,22 +637,22 @@ function displayFiltersOnCitizenList() {
         filter_container.id = mho_filter_citizen_list_id;
         filter_container.classList.add('mho-filter-bar');
 
-        let dropdownDestroyers = [];
+        const dropdownDestroyers = [];
         let applyFilters = () => {
         };
-        let triggerFilters = () => applyFilters();
+        const triggerFilters = () => applyFilters();
 
         // Recherche par nom
-        let nameWrapper = document.createElement('div');
+        const nameWrapper = document.createElement('div');
         nameWrapper.classList.add('mho-search-wrapper');
 
-        let nameInput = document.createElement('input');
+        const nameInput = document.createElement('input');
         nameInput.type = 'text';
         nameInput.placeholder = getI18N(texts.filter_search_name);
         nameInput.classList.add('mho-input', 'inline', 'mho-search-input');
         nameWrapper.appendChild(nameInput);
 
-        let iconImg = document.createElement('img');
+        const iconImg = document.createElement('img');
         iconImg.src = mh_optimizer_icon;
         iconImg.classList.add('mho-search-icon');
         nameWrapper.appendChild(iconImg);
@@ -586,34 +661,34 @@ function displayFiltersOnCitizenList() {
         nameInput.addEventListener('keyup', triggerFilters);
 
         // Select : statut de connexion
-        let {container: onlineCtnr, select: onlineSelect} = createSingleFilterSelect(
+        const { container: onlineCtnr, select: onlineSelect } = createSingleFilterSelect(
             getI18N(texts.filter_online_label),
             `${mho_filter_citizen_list_id}-online`,
             [
-                {value: 'all', text: getI18N(texts.filter_all)},
-                {value: 'online', text: getI18N(texts.filter_online_online)},
-                {value: 'offline', text: getI18N(texts.filter_online_offline)}
+                { value: 'all', text: getI18N(texts.filter_all) },
+                { value: 'online', text: getI18N(texts.filter_online_online) },
+                { value: 'offline', text: getI18N(texts.filter_online_offline) }
             ]
         );
         filter_container.appendChild(onlineCtnr);
         onlineSelect.addEventListener('change', triggerFilters);
 
         // Volet : profession
-        let {
+        const {
             container: profCtnr,
             getSelectedValues: getSelectedProfessions,
             destroy: destroyProfDropdown
         } = createCheckboxDropdown(
             getI18N(texts.job),
             `${mho_filter_citizen_list_id}-profession`,
-            Array.from(professions.entries()).map(([alt, src]) => ({value: alt, text: alt, icon: src})),
+            Array.from(professions.entries()).map(([alt, src]) => ({ value: alt, text: alt, icon: src })),
             triggerFilters
         );
         filter_container.appendChild(profCtnr);
         dropdownDestroyers.push(destroyProfDropdown);
 
         // Volet : niveau de maison
-        let {
+        const {
             container: houseCtnr,
             getSelectedValues: getSelectedHouseLevels,
             destroy: destroyHouseDropdown
@@ -631,45 +706,45 @@ function displayFiltersOnCitizenList() {
         dropdownDestroyers.push(destroyHouseDropdown);
 
         // Select : emplacement
-        let {container: locationCtnr, select: locationSelect} = createSingleFilterSelect(
+        const { container: locationCtnr, select: locationSelect } = createSingleFilterSelect(
             getI18N(texts.filter_location_label),
             `${mho_filter_citizen_list_id}-location`,
             [
-                {value: 'all', text: getI18N(texts.filter_all)},
-                {value: 'outside', text: getI18N(texts.filter_location_outside)},
-                {value: 'inside', text: getI18N(texts.filter_location_inside)}
+                { value: 'all', text: getI18N(texts.filter_all) },
+                { value: 'outside', text: getI18N(texts.filter_location_outside) },
+                { value: 'inside', text: getI18N(texts.filter_location_inside) }
             ]
         );
         filter_container.appendChild(locationCtnr);
         locationSelect.addEventListener('change', triggerFilters);
 
         applyFilters = () => {
-            let nameVal = normalizeString(nameInput.value);
-            let onlineVal = onlineSelect.value;
-            let locationVal = locationSelect.value;
-            let selectedProfs = getSelectedProfessions();
-            let selectedLvls = getSelectedHouseLevels();
+            const nameVal = normalizeString(nameInput.value);
+            const onlineVal = onlineSelect.value;
+            const locationVal = locationSelect.value;
+            const selectedProfs = getSelectedProfessions();
+            const selectedLvls = getSelectedHouseLevels();
 
             rows.forEach((row) => {
-                let nameEl = row.querySelector('.userCell a.username');
-                let rowName = normalizeString(nameEl?.innerText.trim() ?? '');
+                const nameEl = row.querySelector('.userCell a.username');
+                const rowName = normalizeString(nameEl?.innerText.trim() ?? '');
 
-                let statusEl = row.querySelector('.citizen-online, .citizen-offline');
-                let connectionStatus = statusEl?.classList.contains('citizen-online') ? 'online'
+                const statusEl = row.querySelector('.citizen-online, .citizen-offline');
+                const connectionStatus = statusEl?.classList.contains('citizen-online') ? 'online'
                     : statusEl?.classList.contains('citizen-offline') ? 'offline'
                         : null;
 
-                let locEl = row.querySelector('.citizen-box.location');
-                let isOutside = locEl ? /\[/.test(locEl.innerText) : false;
+                const locEl = row.querySelector('.citizen-box.location');
+                const isOutside = locEl ? /\[/.test(locEl.innerText) : false;
 
-                let profImg = row.querySelector('.userCell img[alt]:not([alt=""])');
-                let prof = profImg?.getAttribute('alt') ?? '';
+                const profImg = row.querySelector('.userCell img[alt]:not([alt=""])');
+                const prof = profImg?.getAttribute('alt') ?? '';
 
-                let defenseLabel = row.querySelector('.citizen-defense');
-                let houseImg = defenseLabel?.closest('.citizen-box')?.querySelector('img[alt]');
-                let houseLevel = houseImg?.getAttribute('alt') ?? '';
+                const defenseLabel = row.querySelector('.citizen-defense');
+                const houseImg = defenseLabel?.closest('.citizen-box')?.querySelector('img[alt]');
+                const houseLevel = houseImg?.getAttribute('alt') ?? '';
 
-                let pass = (nameVal === '' || rowName.includes(nameVal))
+                const pass = (nameVal === '' || rowName.includes(nameVal))
                     && (onlineVal === 'all' || onlineVal === connectionStatus)
                     && (locationVal === 'all' || (locationVal === 'outside') === isOutside)
                     && (selectedProfs.length === 0 || selectedProfs.includes(prof))
@@ -695,39 +770,39 @@ function displayFiltersOnOmniscience() {
     if (state.mho_parameters.display_filters_omniscience && pageIsOmniscience()) {
         if (filter_container) return;
 
-        let main_content = document.querySelector('.town-main-content');
+        const main_content = document.querySelector('.town-main-content');
         if (!main_content) return;
 
-        let table = main_content.querySelector('.row-table');
+        const table = main_content.querySelector('.row-table');
         if (!table) return;
 
-        let rows = Array.from(table.querySelectorAll('div.row-flex:not(.header)'));
+        const rows = Array.from(table.querySelectorAll('div.row-flex:not(.header)'));
 
-        let professions = new Map();
-        let houseLevels = new Map();
-        let starCounts = new Set();
-        let chestItems = new Map();
+        const professions = new Map();
+        const houseLevels = new Map();
+        const starCounts = new Set();
+        const chestItems = new Map();
         let hasEmptyChest = false;
 
         rows.forEach((row) => {
-            let profImg = row.querySelector('.citizen-box-name img[alt]:not([alt=""]), .citizen-box-name-me img[alt]:not([alt=""])');
+            const profImg = row.querySelector('.citizen-box-name img[alt]:not([alt=""]), .citizen-box-name-me img[alt]:not([alt=""])');
             if (profImg) professions.set(profImg.getAttribute('alt'), profImg.src);
 
-            let houseImg = row.querySelector('.cell.factor-0.content-center-vertical img[alt]');
+            const houseImg = row.querySelector('.cell.factor-0.content-center-vertical img[alt]');
             if (houseImg) houseLevels.set(houseImg.getAttribute('alt'), houseImg.src);
 
-            let isDead = row.querySelector('.citizen-dead') !== null;
+            const isDead = row.querySelector('.citizen-dead') !== null;
             if (!isDead) {
-                let starsCell = row.querySelector('.cell.rw-3:not(.rw-md-2).citizen-box');
+                const starsCell = row.querySelector('.cell.rw-3:not(.rw-md-2).citizen-box');
                 starCounts.add(starsCell ? starsCell.querySelectorAll('img[alt="*"]').length : 0);
             }
 
-            let itemImgs = Array.from(row.querySelectorAll('.inventory .item-icon img[alt]:not([alt=""])'));
+            const itemImgs = Array.from(row.querySelectorAll('.inventory .item-icon img[alt]:not([alt=""])'));
             if (itemImgs.length === 0) {
                 hasEmptyChest = true;
             } else {
                 itemImgs.forEach((img) => {
-                    let alt = img.getAttribute('alt');
+                    const alt = img.getAttribute('alt');
                     if (!chestItems.has(alt)) chestItems.set(alt, img.src);
                 });
             }
@@ -737,22 +812,22 @@ function displayFiltersOnOmniscience() {
         filter_container.id = mho_filter_omniscience_id;
         filter_container.classList.add('mho-filter-bar');
 
-        let dropdownDestroyers = [];
+        const dropdownDestroyers = [];
         let applyFilters = () => {
         };
-        let triggerFilters = () => applyFilters();
+        const triggerFilters = () => applyFilters();
 
         // Recherche par nom
-        let nameWrapper = document.createElement('div');
+        const nameWrapper = document.createElement('div');
         nameWrapper.classList.add('mho-search-wrapper');
 
-        let nameInput = document.createElement('input');
+        const nameInput = document.createElement('input');
         nameInput.type = 'text';
         nameInput.placeholder = getI18N(texts.filter_search_name);
         nameInput.classList.add('mho-input', 'inline', 'mho-search-input');
         nameWrapper.appendChild(nameInput);
 
-        let iconImg = document.createElement('img');
+        const iconImg = document.createElement('img');
         iconImg.src = mh_optimizer_icon;
         iconImg.classList.add('mho-search-icon');
         nameWrapper.appendChild(iconImg);
@@ -761,20 +836,20 @@ function displayFiltersOnOmniscience() {
         nameInput.addEventListener('keyup', triggerFilters);
 
         // Select : statut de connexion
-        let {container: onlineCtnr, select: onlineSelect} = createSingleFilterSelect(
+        const { container: onlineCtnr, select: onlineSelect } = createSingleFilterSelect(
             getI18N(texts.filter_online_label),
             `${mho_filter_omniscience_id}-online`,
             [
-                {value: 'all', text: getI18N(texts.filter_all)},
-                {value: 'online', text: getI18N(texts.filter_online_online)},
-                {value: 'offline', text: getI18N(texts.filter_online_offline)}
+                { value: 'all', text: getI18N(texts.filter_all) },
+                { value: 'online', text: getI18N(texts.filter_online_online) },
+                { value: 'offline', text: getI18N(texts.filter_online_offline) }
             ]
         );
         filter_container.appendChild(onlineCtnr);
         onlineSelect.addEventListener('change', triggerFilters);
 
         // Volet : niveau de maison
-        let {
+        const {
             container: houseCtnr,
             getSelectedValues: getSelectedHouseLevels,
             destroy: destroyHouseDropdown
@@ -792,25 +867,25 @@ function displayFiltersOnOmniscience() {
         dropdownDestroyers.push(destroyHouseDropdown);
 
         // Volet : profession
-        let {
+        const {
             container: profCtnr,
             getSelectedValues: getSelectedProfessions,
             destroy: destroyProfDropdown
         } = createCheckboxDropdown(
             getI18N(texts.job),
             `${mho_filter_omniscience_id}-profession`,
-            Array.from(professions.entries()).map(([alt, src]) => ({value: alt, text: alt, icon: src})),
+            Array.from(professions.entries()).map(([alt, src]) => ({ value: alt, text: alt, icon: src })),
             triggerFilters
         );
         filter_container.appendChild(profCtnr);
         dropdownDestroyers.push(destroyProfDropdown);
 
         // Volet : objets en coffre
-        let itemOptions = [];
-        if (hasEmptyChest) itemOptions.push({value: '__empty__', text: '—'});
-        chestItems.forEach((src, alt) => itemOptions.push({value: alt, text: alt, icon: src}));
+        const itemOptions = [];
+        if (hasEmptyChest) itemOptions.push({ value: '__empty__', text: '—' });
+        chestItems.forEach((src, alt) => itemOptions.push({ value: alt, text: alt, icon: src }));
 
-        let {
+        const {
             container: itemsCtnr,
             getSelectedValues: getSelectedItems,
             destroy: destroyItemsDropdown
@@ -825,7 +900,7 @@ function displayFiltersOnOmniscience() {
 
         // Volet : étoiles d'activité (les morts n'ont aucune case correspondante ;
         // ils ne remontent que lorsqu'aucune case n'est cochée)
-        let {
+        const {
             container: starsCtnr,
             getSelectedValues: getSelectedStars,
             destroy: destroyStarsDropdown
@@ -842,42 +917,42 @@ function displayFiltersOnOmniscience() {
         dropdownDestroyers.push(destroyStarsDropdown);
 
         applyFilters = () => {
-            let nameVal = normalizeString(nameInput.value);
-            let onlineVal = onlineSelect.value;
-            let selectedProfs = getSelectedProfessions();
-            let selectedLvls = getSelectedHouseLevels();
-            let selectedStars = getSelectedStars();
-            let selectedItems = getSelectedItems();
-            let filterEmpty = selectedItems.includes('__empty__');
-            let itemFilter = selectedItems.filter((value) => value !== '__empty__');
+            const nameVal = normalizeString(nameInput.value);
+            const onlineVal = onlineSelect.value;
+            const selectedProfs = getSelectedProfessions();
+            const selectedLvls = getSelectedHouseLevels();
+            const selectedStars = getSelectedStars();
+            const selectedItems = getSelectedItems();
+            const filterEmpty = selectedItems.includes('__empty__');
+            const itemFilter = selectedItems.filter((value) => value !== '__empty__');
 
             rows.forEach((row) => {
-                let nameEl = row.querySelector('.citizen-box-name a.username, .citizen-box-name-me a.username');
-                let rowName = normalizeString(nameEl?.innerText.trim() ?? '');
+                const nameEl = row.querySelector('.citizen-box-name a.username, .citizen-box-name-me a.username');
+                const rowName = normalizeString(nameEl?.innerText.trim() ?? '');
 
-                let statusEl = row.querySelector('.citizen-online, .citizen-offline, .citizen-dead');
-                let isDead = statusEl?.classList.contains('citizen-dead') ?? false;
-                let connectionStatus = statusEl?.classList.contains('citizen-online') ? 'online'
+                const statusEl = row.querySelector('.citizen-online, .citizen-offline, .citizen-dead');
+                const isDead = statusEl?.classList.contains('citizen-dead') ?? false;
+                const connectionStatus = statusEl?.classList.contains('citizen-online') ? 'online'
                     : statusEl?.classList.contains('citizen-offline') ? 'offline'
                         : null;
 
-                let profImg = row.querySelector('.citizen-box-name img[alt]:not([alt=""]), .citizen-box-name-me img[alt]:not([alt=""])');
-                let prof = profImg?.getAttribute('alt') ?? '';
+                const profImg = row.querySelector('.citizen-box-name img[alt]:not([alt=""]), .citizen-box-name-me img[alt]:not([alt=""])');
+                const prof = profImg?.getAttribute('alt') ?? '';
 
-                let houseImg = row.querySelector('.cell.factor-0.content-center-vertical img[alt]');
-                let houseLevel = houseImg?.getAttribute('alt') ?? '';
+                const houseImg = row.querySelector('.cell.factor-0.content-center-vertical img[alt]');
+                const houseLevel = houseImg?.getAttribute('alt') ?? '';
 
-                let starsCell = isDead ? null : row.querySelector('.cell.rw-3:not(.rw-md-2).citizen-box');
-                let starValue = isDead ? '__dead__' : String(starsCell ? starsCell.querySelectorAll('img[alt="*"]').length : 0);
+                const starsCell = isDead ? null : row.querySelector('.cell.rw-3:not(.rw-md-2).citizen-box');
+                const starValue = isDead ? '__dead__' : String(starsCell ? starsCell.querySelectorAll('img[alt="*"]').length : 0);
 
-                let rowItems = Array.from(row.querySelectorAll('.inventory .item-icon img[alt]:not([alt=""])')).map((img) => img.getAttribute('alt'));
-                let chestEmpty = rowItems.length === 0;
+                const rowItems = Array.from(row.querySelectorAll('.inventory .item-icon img[alt]:not([alt=""])')).map((img) => img.getAttribute('alt'));
+                const chestEmpty = rowItems.length === 0;
 
-                let passItems = selectedItems.length === 0
+                const passItems = selectedItems.length === 0
                     || (filterEmpty && chestEmpty)
                     || itemFilter.some((item) => rowItems.includes(item));
 
-                let pass = (nameVal === '' || rowName.includes(nameVal))
+                const pass = (nameVal === '' || rowName.includes(nameVal))
                     && (onlineVal === 'all' || onlineVal === connectionStatus)
                     && (selectedProfs.length === 0 || selectedProfs.includes(prof))
                     && (selectedLvls.length === 0 || selectedLvls.includes(houseLevel))

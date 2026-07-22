@@ -14,8 +14,8 @@ import { getCurrentPosition } from '../utils/position';
 export function displayWishlistInApp(count = 0) {
     let wishlist_section = document.getElementById('wishlist-section');
 
-    let is_desert: boolean = pageIsDesert();
-    let is_workshop: boolean = pageIsWorkshop();
+    const is_desert: boolean = pageIsDesert();
+    const is_workshop: boolean = pageIsWorkshop();
     if (state.wishlist && state.mho_parameters.display_wishlist && (is_workshop || is_desert)) {
         if (wishlist_section) return;
 
@@ -28,26 +28,39 @@ export function displayWishlistInApp(count = 0) {
 
         if (!zone_to_insert) return;
 
-        let used_wishlist: WishlistItem[] = getWishlistForZone();
+        const used_wishlist: WishlistItem[] = getWishlistForZone();
 
         if (!used_wishlist) return;
 
-        let list_to_display: WishlistItem[] = used_wishlist.filter((item: WishlistItem) => {
+        /**
+         * Le contenu de la case ne dépend pas de la ligne de liste de courses examinée :
+         * on le résout une seule fois, sous forme d'ensemble d'identifiants, plutôt qu'à
+         * chaque passage dans le prédicat de filtrage.
+         */
+        const item_ids_in_cell: Set<number> = is_workshop
+            ? new Set<number>()
+            : new Set<number>(
+                Array.from(document.querySelectorAll('.inventory li.item img'))
+                    .map((item_element: HTMLImageElement) => getItemFromImg(item_element.src))
+                    .filter((item_in_cell: MhoItem | undefined) => !!item_in_cell)
+                    .map((item_in_cell: MhoItem) => item_in_cell.id)
+            );
+
+        const list_to_display: WishlistItem[] = used_wishlist.filter((item: WishlistItem) => {
             if (is_workshop) {
                 return item.isWorkshop;
             } else {
-                let items_in_cell: MhoItem[] = Array.from(document.querySelectorAll('.inventory li.item img')).map((item_element: HTMLImageElement) => getItemFromImg(item_element.src));
-                return items_in_cell.some((item_in_cell) => item_in_cell?.id === item.item.id);
+                return item_ids_in_cell.has(item.item.id);
             }
         });
 
         if (is_workshop && list_to_display.length === 0) return;
 
-        let refreshWishlist = () => {
-            let update_section: HTMLDivElement = document.createElement('div');
+        const refreshWishlist = () => {
+            const update_section: HTMLDivElement = document.createElement('div');
             header.appendChild(update_section);
 
-            let last_update: HTMLSpanElement = document.createElement('span');
+            const last_update: HTMLSpanElement = document.createElement('span');
             last_update.classList.add('small');
             last_update.setAttribute('style', 'margin-right: 0.5em;');
             if (state.wishlist.lastUpdateInfo) {
@@ -58,7 +71,7 @@ export function displayWishlistInApp(count = 0) {
             }
             update_section.appendChild(last_update);
 
-            let update_btn: HTMLButtonElement = document.createElement('button');
+            const update_btn: HTMLButtonElement = document.createElement('button');
             update_btn.classList.add('inline');
             update_btn.innerText = getI18N(texts.update);
             update_btn.addEventListener('click', () => {
@@ -74,18 +87,18 @@ export function displayWishlistInApp(count = 0) {
             });
             update_section.appendChild(update_btn);
 
-            let list: HTMLDivElement = document.createElement('div');
+            const list: HTMLDivElement = document.createElement('div');
             list.classList.add('row-table');
             content.appendChild(list);
 
-            let list_header: HTMLDivElement = document.createElement('div');
+            const list_header: HTMLDivElement = document.createElement('div');
             list_header.classList.add('row-flex', 'mho-header', 'bottom');
             list.appendChild(list_header);
 
             wishlist_headers
                 .filter((header_cell_item) => header_cell_item.id !== 'delete')
                 .forEach((header_cell_item) => {
-                    let header_cell: HTMLDivElement = document.createElement('div');
+                    const header_cell: HTMLDivElement = document.createElement('div');
                     header_cell.classList.add('padded', 'cell');
                     header_cell.classList.add(header_cell_item.id === 'label' ? 'rw-5' : (header_cell_item.id === 'depot' ? 'rw-3' : 'rw-2'));
                     header_cell.innerText = getI18N(header_cell_item.label);
@@ -94,36 +107,36 @@ export function displayWishlistInApp(count = 0) {
 
             list_to_display
                 .forEach((item: WishlistItem) => {
-                    let list_item: HTMLDivElement = document.createElement('div');
+                    const list_item: HTMLDivElement = document.createElement('div');
                     list_item.classList.add('row-flex');
                     list.appendChild(list_item);
 
-                    let title: HTMLDivElement = document.createElement('div');
+                    const title: HTMLDivElement = document.createElement('div');
                     title.classList.add('padded', 'cell', 'rw-5');
                     title.innerHTML = `<img src="${repo_img_hordes_url + item.item.img}" style="margin-right: 5px" /><span class="small">${getI18N(item.item.label)}</span>`;
                     list_item.appendChild(title);
 
-                    let item_depot: HTMLSpanElement = document.createElement('span');
+                    const item_depot: HTMLSpanElement = document.createElement('span');
                     item_depot.classList.add('padded', 'cell', 'rw-3');
                     item_depot.innerHTML = `<span class="small">${getI18N(wishlist_depot.find((depot) => item.depot === depot.value).label)}</span>`;
                     list_item.appendChild(item_depot);
 
-                    let bank_count: HTMLSpanElement = document.createElement('span');
+                    const bank_count: HTMLSpanElement = document.createElement('span');
                     bank_count.classList.add('padded', 'cell', 'rw-2');
                     bank_count.innerHTML = `<span class="small">${item.bankCount}</span>`;
                     list_item.appendChild(bank_count);
 
-                    let bag_count: HTMLSpanElement = document.createElement('span');
+                    const bag_count: HTMLSpanElement = document.createElement('span');
                     bag_count.classList.add('padded', 'cell', 'rw-2');
                     bag_count.innerHTML = `<span class="small">${item.bagCount}</span>`;
                     list_item.appendChild(bag_count);
 
-                    let bank_need: HTMLSpanElement = document.createElement('span');
+                    const bank_need: HTMLSpanElement = document.createElement('span');
                     bank_need.classList.add('padded', 'cell', 'rw-2');
                     bank_need.innerHTML = `<span class="small">${item.count >= 0 ? item.count : '∞'}</span>`;
                     list_item.appendChild(bank_need);
 
-                    let needed: HTMLSpanElement = document.createElement('span');
+                    const needed: HTMLSpanElement = document.createElement('span');
                     needed.classList.add('padded', 'cell', 'rw-2');
                     needed.innerHTML = `<span class="small">${item.count >= 0 ? (item.count - item.bankCount - item.bagCount) : '∞'}</span>`;
                     list_item.appendChild(needed);
@@ -150,7 +163,7 @@ export function displayWishlistInApp(count = 0) {
                 update_section.classList.toggle('hidden');
                 header_title.show = !header_title.show;
             });
-            state.is_refresh_wishlist = false
+            state.is_refresh_wishlist = false;
             displayWishlistInApp();
         };
 
@@ -161,36 +174,36 @@ export function displayWishlistInApp(count = 0) {
         if (pageIsWorkshop()) {
             zone_to_insert.parentNode.insertBefore(wishlist_section, zone_to_insert.nextSibling);
         } else {
-            let main_actions = zone_to_insert.parentNode;
+            const main_actions = zone_to_insert.parentNode;
             main_actions.parentNode.insertBefore(wishlist_section, main_actions.nextSibling);
         }
 
-        let cell = document.createElement('div');
+        const cell = document.createElement('div');
         wishlist_section.appendChild(cell);
 
-        let header = document.createElement('h5');
+        const header = document.createElement('h5');
         header.setAttribute('style', 'display: flex; justify-content: space-between;');
         cell.appendChild(header);
 
-        let header_title = document.createElement('span');
-        header_title.setAttribute('style', 'margin-top: 7px; cursor: pointer;')
+        const header_title = document.createElement('span');
+        header_title.setAttribute('style', 'margin-top: 7px; cursor: pointer;');
         header.appendChild(header_title);
 
-        let hide_state = document.createElement('span');
+        const hide_state = document.createElement('span');
         hide_state.setAttribute('style', 'margin-right: 0.5em');
         header_title.appendChild(hide_state);
 
-        let header_mho_img = document.createElement('img');
+        const header_mho_img = document.createElement('img');
         header_mho_img.src = mh_optimizer_icon;
         header_mho_img.style.height = '24px';
         header_mho_img.style.marginRight = '0.5em';
         header_title.appendChild(header_mho_img);
 
-        let header_label = document.createElement('span');
+        const header_label = document.createElement('span');
         header_label.innerText = getI18N(wishlist_title);
         header_title.appendChild(header_label);
 
-        let content = document.createElement('div');
+        const content = document.createElement('div');
         cell.appendChild(content);
 
         refreshWishlist();
@@ -199,7 +212,7 @@ export function displayWishlistInApp(count = 0) {
     } else if (count < 3) {
         setTimeout(() => {
             displayWishlistInApp(count + 1);
-        }, 250)
+        }, 250);
     }
 }
 
@@ -207,27 +220,27 @@ export function displayWishlistInApp(count = 0) {
 
 export function displayPriorityOnItems() {
     if (state.mho_parameters.display_wishlist && pageIsDesert() && state.wishlist) {
-        let present_items = [];
-        let avalaible_slots = [];
-        let used_spaces = [];
-        let inventories = document.querySelectorAll('.inventory');
-        let rucksacks = document.querySelectorAll('.inventory.rucksack, .inventory.rucksack-escort');
+        const present_items = [];
+        const avalaible_slots = [];
+        const used_spaces = [];
+        const inventories = document.querySelectorAll('.inventory');
+        const rucksacks = document.querySelectorAll('.inventory.rucksack, .inventory.rucksack-escort');
 
         if (inventories) {
-            for (let inventory of inventories) {
+            for (const inventory of inventories) {
                 present_items.push(...inventory?.querySelectorAll('li.item:not(.locked):not(.plus)') || []);
             }
         }
 
         if (rucksacks) {
-            for (let rucksack of rucksacks) {
+            for (const rucksack of rucksacks) {
                 avalaible_slots.push(...rucksack?.querySelectorAll('li.free, li.item:not(.locked):not(.plus)') || []);
             }
         }
 
-        let used_wishlist = getWishlistForZone();
-        let item_count = avalaible_slots.length;
-        let heavy_slots = avalaible_slots.filter((slot) => slot.classList.contains('bg-heavy')).length;
+        const used_wishlist = getWishlistForZone();
+        const item_count = avalaible_slots.length;
+        const heavy_slots = avalaible_slots.filter((slot) => slot.classList.contains('bg-heavy')).length;
 
         if (used_wishlist) {
             let count = 0;
@@ -271,10 +284,10 @@ export function getWishlistForZone(): WishlistItem[] {
     if (!state.wishlist || !state.wishlist.wishList) return undefined;
     if (!pageIsDesert()) return [...state.wishlist.wishList];
 
-    let position = getCurrentPosition();
-    let current_zone = (Math.abs(position[0]) + Math.abs(position[1])) * 2 - 3;
+    const position = getCurrentPosition();
+    const current_zone = (Math.abs(position[0]) + Math.abs(position[1])) * 2 - 3;
 
-    let used_wishlist = [...state.wishlist.wishList.filter((wishlist_item) => wishlist_item.zoneXPa === 0 || wishlist_item.zoneXPa >= current_zone)];
+    const used_wishlist = [...state.wishlist.wishList.filter((wishlist_item) => wishlist_item.zoneXPa === 0 || wishlist_item.zoneXPa >= current_zone)];
     used_wishlist?.sort((item_a, item_b) => {
         return item_b.priority - item_a.priority;
     });

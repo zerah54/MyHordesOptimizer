@@ -1,8 +1,8 @@
-import {action_types} from '../i18n/texts';
-import {state} from '../state';
-import {fetcher} from '../utils/fetch';
-import {addError} from '../utils/notifications';
-import {convertResponsePromiseToError} from '../utils/version';
+import { action_types } from '../i18n/texts';
+import { state } from '../state';
+import { fetcher } from '../utils/fetch';
+import { addError } from '../utils/notifications';
+import { convertResponsePromiseToError } from '../utils/version';
 
 export function getRecipes() {
     return new Promise<any>((resolve, reject) => {
@@ -16,15 +16,15 @@ export function getRecipes() {
                     }
                 })
                 .then((response) => {
-                    let new_recipes = response
+                    const new_recipes = response
                         .map((recipe) => {
-                            let new_recipe = {...recipe};
-                            let new_recipe_components = [];
+                            const new_recipe = { ...recipe };
+                            const new_recipe_components = [];
                             new_recipe.components.forEach((component) => {
                                 for (let i = 0; i < component.count; i++) {
                                     new_recipe_components.push(component.item);
                                 }
-                            })
+                            });
                             new_recipe.components = new_recipe_components;
                             new_recipe.type = action_types.find((type) => type.id === new_recipe.type);
                             if (!new_recipe.type) {

@@ -1,13 +1,13 @@
-import {mh_optimizer_map_window_id, mh_optimizer_window_id, repo_img_hordes_url} from '../config/constants';
-import {changelogs} from '../data/changelogs';
-import {tabs_list} from '../data/tabs';
-import {state} from '../state';
-import {displayBank, displayItems} from './bank';
-import {displayCamping} from './camping';
-import {displayRecipes} from './recipes';
-import {displayRuins} from './ruins';
-import {getI18N} from '../utils/i18n';
-import {getScriptInfo} from '../utils/version';
+import { mh_optimizer_map_window_id, mh_optimizer_window_id, repo_img_hordes_url } from '../config/constants';
+import { changelogs } from '../data/changelogs';
+import { tabs_list } from '../data/tabs';
+import { state } from '../state';
+import { getI18N } from '../utils/i18n';
+import { getScriptInfo } from '../utils/version';
+import { displayBank, displayItems } from './bank';
+import { displayCamping } from './camping';
+import { displayRecipes } from './recipes';
+import { displayRuins } from './ruins';
 
 export function createWindow(id, full_size) {
     let window = document.querySelector(`#${id}`);
@@ -22,12 +22,12 @@ export function createWindow(id, full_size) {
         window.classList.add('fullsize');
     }
 
-    let window_box = document.createElement('div');
+    const window_box = document.createElement('div');
     window_box.id = id + '-box';
     window_box.classList.add('mho-window-box');
     window.appendChild(window_box);
 
-    let window_drag_handler = document.createElement('div');
+    const window_drag_handler = document.createElement('div');
     window_drag_handler.id = id + '-drag-handle';
     if (!full_size) {
         window_drag_handler.style.cursor = 'move';
@@ -35,34 +35,34 @@ export function createWindow(id, full_size) {
     window_drag_handler.classList.add('mho-window-drag-handle');
     window_box.appendChild(window_drag_handler);
 
-    let window_content = document.createElement('div');
+    const window_content = document.createElement('div');
     window_content.id = id + '-content';
     window_content.classList.add('mho-window-content');
     window_box.appendChild(window_content);
 
-    let window_overlay = document.createElement('div');
+    const window_overlay = document.createElement('div');
     window_overlay.id = id + '-overlay';
     window_overlay.classList.add('mho-window-overlay');
     window_box.appendChild(window_overlay);
 
-    let window_overlay_ul = document.createElement('ul');
+    const window_overlay_ul = document.createElement('ul');
     window_overlay.appendChild(window_overlay_ul);
 
-    let window_overlay_li = document.createElement('li');
+    const window_overlay_li = document.createElement('li');
     window_overlay_ul.appendChild(window_overlay_li);
 
-    let window_overlay_img = document.createElement('img');
+    const window_overlay_img = document.createElement('img');
     window_overlay_img.alt = '(X)';
     window_overlay_img.src = repo_img_hordes_url + 'icons/b_close.png';
     window_overlay_li.appendChild(window_overlay_img);
 
     window_overlay_img.addEventListener('click', () => {
         window.classList.remove('visible');
-        let body = document.getElementsByTagName('body')[0];
+        const body = document.getElementsByTagName('body')[0];
         (body as any).removeAttribute('style', 'overflow: hidden');
     });
 
-    let post_office = document.getElementById('post-office');
+    const post_office = document.getElementById('post-office');
     if (post_office) {
         post_office.parentNode.insertBefore(window, post_office.nextSibling);
     }
@@ -88,10 +88,10 @@ export function createWindow(id, full_size) {
                 pos3 = e.clientX;
                 pos4 = e.clientY;
                 // set the element's new position:
-                window.style.top = (window.offsetTop - pos2) + "px";
-                window.style.left = (window.offsetLeft - pos1) + "px";
+                window.style.top = (window.offsetTop - pos2) + 'px';
+                window.style.left = (window.offsetLeft - pos1) + 'px';
             };
-        }
+        };
     }
 
 }
@@ -108,16 +108,16 @@ export function createWikiToolsWindow() {
  */
 
 export function createWikiToolsTabs(window_type) {
-    let window_content = document.getElementById(mh_optimizer_window_id + '-content');
+    const window_content = document.getElementById(mh_optimizer_window_id + '-content');
     window_content.innerHTML = '';
 
-    let tabs_div = document.createElement('div');
+    const tabs_div = document.createElement('div');
     tabs_div.id = 'tabs';
 
     window_content.appendChild(tabs_div);
-    let tabs_ul = document.createElement('ul');
+    const tabs_ul = document.createElement('ul');
 
-    let current_tabs_list = tabs_list[window_type]
+    const current_tabs_list = tabs_list[window_type]
         .filter((tab) => state.mh_user.townDetails?.townId || !tab.needs_town)
         .sort((a, b) => {
             if (a.ordering > b.ordering) {
@@ -129,18 +129,18 @@ export function createWikiToolsTabs(window_type) {
             }
         });
     current_tabs_list.forEach((tab, index) => {
-        let tab_link = document.createElement('div');
+        const tab_link = document.createElement('div');
 
         if (tab.icon) {
-            let tab_icon = document.createElement('img');
+            const tab_icon = document.createElement('img');
             tab_icon.src = tab.icon;
             tab_link.appendChild(tab_icon);
         }
 
-        let tab_text = document.createTextNode(getI18N(tab.label));
+        const tab_text = document.createTextNode(getI18N(tab.label));
         tab_link.appendChild(tab_text);
 
-        let tab_li = document.createElement('li');
+        const tab_li = document.createElement('li');
         tab_li.appendChild(tab_link);
 
         if (index === 0) {
@@ -151,16 +151,16 @@ export function createWikiToolsTabs(window_type) {
         const tab_content = document.getElementById(mh_optimizer_window_id + '-tab-content');
         tab_li.addEventListener('click', () => {
             if (!tab_li.classList.contains('selected') && tab_content !== undefined && tab_content !== null) {
-                for (let li of tabs_ul.children) {
+                for (const li of tabs_ul.children) {
                     li.classList.remove('selected');
                 }
                 tab_li.classList.add('selected');
             }
             dispatchWikiToolsContent(window_type, tab);
-        })
+        });
 
         tabs_ul.appendChild(tab_li);
-    })
+    });
     tabs_div.appendChild(tabs_ul);
 
 }
@@ -170,30 +170,30 @@ export function createWikiToolsTabs(window_type) {
 export function createMapWindow() {
     let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
 
-    let window_content = document.createElement('div');
+    const window_content = document.createElement('div');
     window_content.id = mh_optimizer_map_window_id + '-content';
     window_content.setAttribute('style', 'height: calc(100% - 26px); position: initial; margin-top: 26px;');
 
-    let window_overlay_img = document.createElement('img');
+    const window_overlay_img = document.createElement('img');
     window_overlay_img.alt = '(X)';
     window_overlay_img.src = repo_img_hordes_url + 'icons/b_close.png';
-    let window_overlay_li = document.createElement('li');
+    const window_overlay_li = document.createElement('li');
     window_overlay_li.appendChild(window_overlay_img);
-    let window_overlay_ul = document.createElement('ul');
+    const window_overlay_ul = document.createElement('ul');
     window_overlay_ul.style.margin = '-2px -2px 0 0';
     window_overlay_ul.appendChild(window_overlay_li);
 
-    let window_overlay = document.createElement('div');
+    const window_overlay = document.createElement('div');
     window_overlay.id = mh_optimizer_map_window_id + '-overlay';
     window_overlay.setAttribute('style', 'cursor: move; width: 100%;');
 
-    let window_box = document.createElement('div');
+    const window_box = document.createElement('div');
     window_box.id = mh_optimizer_map_window_id + '-box';
     window_box.draggable = true;
 
-    let window = document.createElement('div');
-    window.style.minWidth = '150px;'
-    window.style.minHeight = '150px;'
+    const window = document.createElement('div');
+    window.style.minWidth = '150px;';
+    window.style.minHeight = '150px;';
     window.id = mh_optimizer_map_window_id;
 
     window_overlay.onmousedown = (e) => {
@@ -216,10 +216,10 @@ export function createMapWindow() {
             pos3 = e.clientX;
             pos4 = e.clientY;
             // set the element's new position:
-            window_box.style.top = (window_box.offsetTop - pos2) + "px";
-            window_box.style.left = (window_box.offsetLeft - pos1) + "px";
+            window_box.style.top = (window_box.offsetTop - pos2) + 'px';
+            window_box.style.left = (window_box.offsetLeft - pos1) + 'px';
         };
-    }
+    };
     window_overlay.appendChild(window_overlay_ul);
 
     window_box.appendChild(window_content);
@@ -227,7 +227,7 @@ export function createMapWindow() {
 
     window.appendChild(window_box);
 
-    let post_office = document.getElementById('post-office');
+    const post_office = document.getElementById('post-office');
     if (post_office) {
         post_office.parentNode.insertBefore(window, post_office.nextSibling);
     }
@@ -244,7 +244,7 @@ export function createMapWindow() {
 
 export function displayWindow(window_type) {
     document.getElementById(mh_optimizer_window_id).classList.add('visible');
-    let body = document.getElementsByTagName('body')[0];
+    const body = document.getElementsByTagName('body')[0];
     body.setAttribute('style', 'overflow: hidden');
     createWikiToolsTabs(window_type);
 }
@@ -255,7 +255,7 @@ export function displayWindow(window_type) {
  */
 
 export function createWikiToolsTabContent(window_type) {
-    let window_content = document.getElementById(mh_optimizer_window_id + '-content');
+    const window_content = document.getElementById(mh_optimizer_window_id + '-content');
 
     let tab_content = document.getElementById(mh_optimizer_window_id + '-tab-content');
     if (tab_content) {
@@ -278,7 +278,7 @@ export function dispatchWikiToolsContent(window_type, tab) {
 
     createWikiToolsTabContent(window_type);
 
-    let list = document.getElementById(mh_optimizer_window_id + '-tab-content');
+    const list = document.getElementById(mh_optimizer_window_id + '-tab-content');
     if (list) {
         list.innerHTML = '';
     }
@@ -323,17 +323,17 @@ export function showChangelogModal(content: string, onConfirm?: () => void): voi
 
     const overlay = document.createElement('div');
     overlay.id = modal_id;
-    overlay.classList.add('mho-changelog-modal-overlay');
+    overlay.classList.add('mho-modal-overlay');
 
     const box = document.createElement('div');
-    box.classList.add('mho-changelog-modal-box');
+    box.classList.add('mho-modal-box');
 
     const title = document.createElement('h3');
-    title.classList.add('mho-changelog-modal-title');
+    title.classList.add('mho-modal-title');
     title.textContent = content.split('\n')[0].trim();
 
     const body = document.createElement('pre');
-    body.classList.add('mho-changelog-modal-body');
+    body.classList.add('mho-modal-body');
     body.textContent = content.split('\n').slice(1).map((line) => line.trim()).join('\n').trim();
 
     // Lien pour afficher l'historique complet des versions passées
@@ -382,11 +382,11 @@ export function showChangelogModal(content: string, onConfirm?: () => void): voi
     }
 
     const footer = document.createElement('div');
-    footer.classList.add('mho-changelog-modal-footer');
+    footer.classList.add('mho-modal-footer');
 
     const ok_btn = document.createElement('button');
     ok_btn.textContent = 'OK';
-    ok_btn.classList.add('mho-changelog-modal-btn');
+    ok_btn.classList.add('mho-modal-btn');
     ok_btn.addEventListener('click', () => {
         overlay.remove();
         if (onConfirm) onConfirm();

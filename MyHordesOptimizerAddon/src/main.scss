@@ -689,6 +689,17 @@ div.item-tag.mho-item-tag-no-img {
     white-space: nowrap;
 }
 
+/* Étiquette de tri autonome, pour les cellules d'en-tête portant plusieurs critères */
+.mho-sort-control {
+    cursor: pointer;
+    white-space: nowrap;
+    user-select: none;
+
+    & + .mho-sort-control {
+        margin-left: 0.75em;
+    }
+}
+
 .mho-checkbox-dropdown-panel {
     display: none;
     position: absolute;
@@ -762,7 +773,7 @@ div.item-tag.mho-item-tag-no-img {
     transform: translateY(-50%);
 }
 
-.mho-changelog-modal-overlay {
+.mho-modal-overlay {
     position: fixed;
     inset: 0;
     z-index: 10000;
@@ -772,7 +783,7 @@ div.item-tag.mho-item-tag-no-img {
     background: rgba(0, 0, 0, 0.65);
 }
 
-.mho-changelog-modal-box {
+.mho-modal-box {
     background: url(__REPO_IMG_HORDES_URL__background/box/panel_00.gif) 0 0 no-repeat,
     url(__REPO_IMG_HORDES_URL__background/box/panel_02.gif) 100% 0 no-repeat,
     url(__REPO_IMG_HORDES_URL__background/box/panel_20.gif) 0 100% no-repeat,
@@ -794,7 +805,7 @@ div.item-tag.mho-item-tag-no-img {
     gap: 0.75em;
 }
 
-.mho-changelog-modal-title {
+.mho-modal-title {
     color: #fff;
     font-family: Trebuchet MS, Arial, Verdana, sans-serif;
     font-variant: small-caps;
@@ -803,7 +814,7 @@ div.item-tag.mho-item-tag-no-img {
     padding-bottom: 0.5em;
 }
 
-.mho-changelog-modal-body {
+.mho-modal-body {
     flex: 1;
     overflow-y: auto;
     white-space: pre-wrap;
@@ -814,21 +825,15 @@ div.item-tag.mho-item-tag-no-img {
     color: #f0d79e;
 }
 
-.mho-changelog-modal-footer {
+.mho-modal-footer {
     display: flex;
     justify-content: flex-end;
     border-top: 1px solid #ddab76;
     padding-top: 0.5em;
 }
 
-.mho-changelog-modal-btn {
-    background-color: #5c2b20;
-    border: 1px solid #f0d79e;
-    color: #f0d79e;
-    cursor: pointer;
-    font-family: Trebuchet MS, Arial, Verdana, sans-serif;
-    font-variant: small-caps;
-    padding: 0.25em 1.5em;
+.mho-modal-btn {
+    margin: 0 !important;
 
     &:hover {
         background-color: #7e4d2a;
@@ -999,7 +1004,8 @@ div.item-tag.mho-item-tag-no-img {
         &:has(input[type=checkbox]) {
             display: inline-flex;
         }
-        &:has(input[type=number]){
+
+        &:has(input[type=number]) {
             width: 100%
         }
 
@@ -1009,10 +1015,12 @@ div.item-tag.mho-item-tag-no-img {
             text-align: center;
             margin: 0;
         }
+
         input[type=checkbox] {
             flex: 0 0 auto;
             margin: 0;
         }
+
         select {
             flex: 1 1 auto;
             min-width: 0;
@@ -1079,6 +1087,7 @@ div.item-tag.mho-item-tag-no-img {
     .cell.rw-1:has(img):not(:has(.language)), .cell.rw-1.right {
         flex-basis: calc(8.33333333% / 2);
     }
+
     .cell.rw-3 {
         flex-basis: calc(25% - (8.33333333% / 2));
     }
@@ -1114,4 +1123,241 @@ div.item-tag.mho-item-tag-no-img {
         left: auto;
         right: 0;
     }
+}
+
+//////////////////////////////////////////////////////
+// Styles personnalisés des noms de sujets du forum //
+//////////////////////////////////////////////////////
+
+.mho-param-action {
+    background-color: #5c2b20;
+    border: 1px solid #ddab76;
+    color: #f0d79e;
+    cursor: pointer;
+    font-size: 0.85em;
+    font-variant: small-caps;
+    margin: 0 0.5em;
+    padding: 0 0.5em;
+    white-space: nowrap;
+
+    &:hover {
+        background-color: #7e4d2a;
+    }
+}
+
+// La boîte reprend le gabarit commun des modales, en plus large
+.mho-forum-styles-box {
+    max-width: 750px;
+    width: 90vw;
+}
+
+.mho-forum-styles-help {
+    font-size: 0.85em;
+    font-style: italic;
+    margin: 0;
+}
+
+.mho-forum-styles-rules {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    gap: 0.5em;
+    overflow-y: auto;
+    padding-right: 0.25em;
+}
+
+.mho-forum-styles-rule {
+    background-color: #5c2b20;
+    border: 1px solid #ddab76;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35em;
+    padding: 0.5em;
+
+    &.mho-forum-styles-rule-disabled {
+        opacity: 0.5;
+    }
+}
+
+.mho-forum-styles-rule-header {
+    align-items: center;
+    border-bottom: 1px solid rgba(240, 215, 158, 0.3);
+    display: flex;
+    gap: 0.5em;
+    padding-bottom: 0.35em;
+}
+
+.mho-forum-styles-preview {
+    display: inline-block;
+    flex: 1;
+    padding: 0.25em 1em;
+}
+
+.mho-forum-styles-rule-actions {
+    display: flex;
+    gap: 0.25em;
+}
+
+.mho-forum-styles-icon-btn {
+
+    margin: 0 !important;
+
+    &:disabled {
+        cursor: default;
+        opacity: 0.4;
+    }
+
+    &:not(:disabled):hover {
+        background-color: #a06a3c;
+    }
+}
+
+// Deux blocs : les tags d'un côté, les mots de l'autre
+.mho-forum-styles-criteria {
+    align-items: flex-end;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.25em;
+}
+
+.mho-forum-styles-criteria-group {
+    align-items: flex-end;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5em;
+}
+
+// Le trait sépare les deux blocs, y compris quand ils passent à la ligne
+.mho-forum-styles-words-field {
+    border-left: 1px solid rgba(240, 215, 158, 0.3);
+    flex: 1;
+    min-width: 180px;
+    padding-left: 1.25em;
+}
+
+// Les tags retenus, rappelés à côté du volet déroulant
+.mho-forum-styles-selected-tags {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25em;
+    padding-bottom: 2px;
+}
+
+// .thread-tag fournit le gabarit du jeu (fond, arrondi, gras) : on ne complète que le retrait
+.mho-forum-styles-tag-chip {
+    align-items: center;
+    display: inline-flex;
+    gap: 0.35em;
+    margin: 0;
+    white-space: nowrap;
+}
+
+.mho-forum-styles-tag-remove {
+    cursor: pointer;
+    font-size: 0.8em;
+    line-height: 1;
+    opacity: 0.7;
+
+    &:hover {
+        opacity: 1;
+    }
+}
+
+// Les options du volet sont des libellés, donc stylables comme les tags du forum
+.mho-checkbox-dropdown-panel label:has(.mho-forum-styles-tag-chip) {
+    cursor: pointer;
+    display: block;
+}
+
+.mho-forum-styles-words {
+    margin: 0;
+    width: 100%;
+}
+
+.mho-forum-styles-warning {
+    color: #ffb4b4;
+    display: none;
+    font-size: 0.8em;
+    font-style: italic;
+}
+
+.mho-forum-styles-style {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25em 0.75em;
+}
+
+.mho-forum-styles-field {
+    align-items: center;
+    cursor: pointer;
+    display: inline-flex;
+    font-size: 0.85em;
+    gap: 0.25em;
+}
+
+.mho-forum-styles-color {
+    background: none;
+    border: 1px solid #ddab76;
+    cursor: pointer;
+    height: 18px;
+    padding: 0;
+    width: 28px;
+
+    &:disabled {
+        cursor: default;
+        opacity: 0.4;
+    }
+}
+
+.mho-forum-styles-number {
+    background-color: #f0d79e;
+    border: 1px solid #5c2b20;
+    color: #000;
+    width: 55px;
+}
+
+.mho-forum-styles-prefix {
+    background-color: #f0d79e;
+    border: 1px solid #5c2b20;
+    color: #000;
+    text-align: center;
+    width: 45px;
+}
+
+// « Ajouter une règle » vit au-dessus du séparateur, avec la liste des règles
+.mho-forum-styles-add {
+    display: flex;
+}
+
+// Zone d'import, dépliée à la demande
+.mho-forum-styles-exchange {
+    flex-direction: column;
+    gap: 0.35em;
+}
+
+.mho-forum-styles-exchange-input {
+    font-family: monospace;
+    font-size: 0.8em;
+    margin: 0;
+    resize: vertical;
+    width: 100%;
+}
+
+.mho-forum-styles-exchange-actions {
+    display: flex;
+    gap: 0.5em;
+}
+
+// Les actions de la modale tiennent sur une seule ligne
+.mho-forum-styles-footer {
+    align-items: center;
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 0.5em;
+    justify-content: flex-start;
+}
+
+.mho-forum-styles-footer-spacer {
+    flex: 1;
 }

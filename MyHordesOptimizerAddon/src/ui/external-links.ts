@@ -14,72 +14,72 @@ import { pageIsTownHistory, pageIsWelcome } from '../utils/page';
 import { getScriptInfo } from '../utils/version';
 
 export function addExternalLinksToProfiles() {
-    let mho_link_block = document.querySelector('.mho-link-blocks');
+    const mho_link_block = document.querySelector('.mho-link-blocks');
     if (state.mho_parameters.display_external_links && !mho_link_block) {
-        let user_tooltip = document.querySelector('#user-tooltip');
+        const user_tooltip = document.querySelector('#user-tooltip');
         if (user_tooltip) {
-            let user_id = user_tooltip.querySelector('[x-ajax-href]')?.getAttribute('x-ajax-href')?.replace(/\D/g, '');
+            const user_id = user_tooltip.querySelector('[x-ajax-href]')?.getAttribute('x-ajax-href')?.replace(/\D/g, '');
             if (!user_id) return;
-            let dash_separators = user_tooltip.querySelectorAll('hr.dashed');
-            let last_separator = Array.from(dash_separators).pop();
-            let link_color = window.getComputedStyle(user_tooltip.querySelector('.link')).getPropertyValue('color');
+            const dash_separators = user_tooltip.querySelectorAll('hr.dashed');
+            const last_separator = Array.from(dash_separators).pop();
+            const link_color = window.getComputedStyle(user_tooltip.querySelector('.link')).getPropertyValue('color');
 
-            let new_separator = document.createElement('hr');
+            const new_separator = document.createElement('hr');
             new_separator.classList.add('dashed');
             last_separator.parentNode.insertBefore(new_separator, last_separator.nextSibling);
 
-            let new_part = document.createElement('div');
+            const new_part = document.createElement('div');
             new_part.classList.add('link-blocks', 'mho-link-blocks');
             last_separator.parentNode.insertBefore(new_part, last_separator.nextSibling);
 
-            let new_part_title = document.createElement('div');
+            const new_part_title = document.createElement('div');
             new_part_title.innerHTML = `<img src="${mh_optimizer_icon}" style="width: 16px; margin-right: 0.5em;">${getI18N(texts.external_profiles)}`;
             new_part_title.style.marginBottom = '0.5em';
             new_part_title.style.textAlign = 'left';
             new_part_title.style.color = link_color;
             new_part.appendChild(new_part_title);
 
-            let bbh_link = document.createElement('a');
+            const bbh_link = document.createElement('a');
             bbh_link.classList.add('link-block');
             bbh_link.href = `${big_broth_hordes_url}/?pg=user&uid=5-${user_id}`;
             new_part.appendChild(bbh_link);
 
-            bbh_link.addEventListener('click', () => user_tooltip.remove())
+            bbh_link.addEventListener('click', () => user_tooltip.remove());
 
-            let bbh_img = document.createElement('img');
+            const bbh_img = document.createElement('img');
             bbh_img.src = `${repo_img_url}external-tools/bbh.gif`;
             bbh_link.appendChild(bbh_img);
 
-            let bbh_br = document.createElement('br');
+            const bbh_br = document.createElement('br');
             bbh_link.appendChild(bbh_br);
 
-            let bbh_title = document.createElement('text');
-            bbh_title.innerText = `BigBroth'\nHordes`;
+            const bbh_title = document.createElement('text');
+            bbh_title.innerText = 'BigBroth\'\nHordes';
             bbh_link.appendChild(bbh_title);
 
             new_part.appendChild(document.createTextNode('\u00A0'));
 
-            let gh_link = document.createElement('a');
+            const gh_link = document.createElement('a');
             gh_link.classList.add('link-block');
             gh_link.href = `${gest_hordes_url}/ame/${user_id}`;
             new_part.appendChild(gh_link);
 
-            gh_link.addEventListener('click', () => user_tooltip.remove())
+            gh_link.addEventListener('click', () => user_tooltip.remove());
 
-            let gh_img = document.createElement('img');
+            const gh_img = document.createElement('img');
             gh_img.src = `${repo_img_url}external-tools/gh.gif`;
             gh_link.appendChild(gh_img);
 
-            let gh_br = document.createElement('br');
+            const gh_br = document.createElement('br');
             gh_link.appendChild(gh_br);
 
-            let gh_title = document.createElement('text');
-            gh_title.innerText = `Gest'Hordes`;
+            const gh_title = document.createElement('text');
+            gh_title.innerText = 'Gest\'Hordes';
             gh_link.appendChild(gh_title);
 
             new_part.appendChild(document.createTextNode('\u00A0'));
 
-            let empty_link = document.createElement('div');
+            const empty_link = document.createElement('div');
             empty_link.classList.add('link-block', 'empty');
             new_part.appendChild(empty_link);
         }
@@ -94,10 +94,10 @@ export function addExternalLinksToTowns(): void {
         return;
     }
 
-    let view_town: HTMLElement | null = document.querySelector('.view-town');
+    const view_town: HTMLElement | null = document.querySelector('.view-town');
     if (!view_town) return;
 
-    let btns_row: HTMLElement | null | undefined = view_town.querySelector('button')?.parentElement;
+    const btns_row: HTMLElement | null | undefined = view_town.querySelector('button')?.parentElement;
     if (!btns_row) return;
 
     let mho_block: HTMLDivElement | null = btns_row.querySelector<HTMLDivElement>('#' + mho_town_external_links_id);
@@ -109,7 +109,7 @@ export function addExternalLinksToTowns(): void {
 
     if (mho_block) return;
 
-    let town_id: string | null = view_town.getAttribute('data-town-id');
+    const town_id: string | null = view_town.getAttribute('data-town-id');
     if (!town_id) return;
 
     mho_block = document.createElement('div');
@@ -119,22 +119,22 @@ export function addExternalLinksToTowns(): void {
     mho_block.style.border = '1px solid #ddab76';
     btns_row.appendChild(mho_block);
 
-    let updater_title: HTMLHeadingElement = document.createElement('h5');
+    const updater_title: HTMLHeadingElement = document.createElement('h5');
     updater_title.style.margin = '0 0 0.5em';
 
-    let btns_title_mho_img: HTMLImageElement = document.createElement('img');
+    const btns_title_mho_img: HTMLImageElement = document.createElement('img');
     btns_title_mho_img.src = mh_optimizer_icon;
     btns_title_mho_img.style.height = '24px';
     btns_title_mho_img.style.marginRight = '0.5em';
     updater_title.appendChild(btns_title_mho_img);
 
-    let btns_title_text: HTMLElement = document.createElement('text');
+    const btns_title_text: HTMLElement = document.createElement('text');
     btns_title_text.innerText = getScriptInfo().name;
     updater_title.appendChild(btns_title_text);
 
     mho_block.appendChild(updater_title);
 
-    let mho_btns_block: HTMLDivElement = document.createElement('div');
+    const mho_btns_block: HTMLDivElement = document.createElement('div');
     mho_block.appendChild(mho_btns_block);
     mho_btns_block.style.display = 'flex';
     mho_btns_block.style.gap = '0.5em';
@@ -160,12 +160,12 @@ const external_tool_links: readonly ExternalToolLinkDefinition[] = [
     // },
     {
         icon_file_name: 'gh.gif',
-        label: `Gest'\nHordes`,
+        label: 'Gest\'\nHordes',
         build_url: (town_id: string): string => `${gest_hordes_url}/carte/${town_id}`,
     },
     {
         icon_file_name: 'fata.gif',
-        label: `Fata\nMorgana`,
+        label: 'Fata\nMorgana',
         build_url: (town_id: string): string => `${fata_morgana_url}/spy/town/${town_id}`,
     },
 ];
@@ -204,7 +204,7 @@ export function addExternalLinksColumnToWelcomeTowns(): void {
         return;
     }
 
-    let onboarding: HTMLElement | null = document.querySelector('hordes-game-onboarding');
+    const onboarding: HTMLElement | null = document.querySelector('hordes-game-onboarding');
     if (!onboarding) return;
 
     if (!state.mho_parameters.display_external_links) {
@@ -216,14 +216,14 @@ export function addExternalLinksColumnToWelcomeTowns(): void {
     ensureWelcomeObserver(onboarding);
     bindWelcomeOutsideClickOnce();
 
-    let header_rows: NodeListOf<HTMLElement> = onboarding.querySelectorAll('.row-flex.header');
+    const header_rows: NodeListOf<HTMLElement> = onboarding.querySelectorAll('.row-flex.header');
     header_rows.forEach((header_row: HTMLElement): void => {
         if (header_row.querySelector('.' + mho_welcome_link_header_class)) return;
 
-        let header_cell: HTMLDivElement = document.createElement('div');
+        const header_cell: HTMLDivElement = document.createElement('div');
         header_cell.classList.add('padded', 'cell', 'rw-1', 'hide-sm', mho_welcome_link_header_class);
 
-        let header_icon: HTMLImageElement = document.createElement('img');
+        const header_icon: HTMLImageElement = document.createElement('img');
         header_icon.src = mh_optimizer_icon;
         header_icon.alt = 'MHO';
         header_icon.style.width = '16px';
@@ -232,22 +232,22 @@ export function addExternalLinksColumnToWelcomeTowns(): void {
         header_row.appendChild(header_cell);
     });
 
-    let town_rows: NodeListOf<HTMLElement> = onboarding.querySelectorAll('.town-row');
+    const town_rows: NodeListOf<HTMLElement> = onboarding.querySelectorAll('.town-row');
     town_rows.forEach((town_row: HTMLElement): void => {
         if (town_row.querySelector('.' + mho_welcome_link_cell_class)) return;
 
-        let town_id: string | null = town_row.getAttribute('data-town-id');
+        const town_id: string | null = town_row.getAttribute('data-town-id');
         if (!town_id) return;
 
-        let link_cell: HTMLDivElement = document.createElement('div');
+        const link_cell: HTMLDivElement = document.createElement('div');
         link_cell.classList.add('padded', 'cell', 'rw-1', 'rw-sm-2', mho_welcome_link_cell_class);
 
-        let map_icon: HTMLImageElement = document.createElement('img');
+        const map_icon: HTMLImageElement = document.createElement('img');
         map_icon.src = repo_img_hordes_url + 'icons/item_map.gif';
         map_icon.alt = 'Carte';
         link_cell.appendChild(map_icon);
 
-        let panel: HTMLDivElement = document.createElement('div');
+        const panel: HTMLDivElement = document.createElement('div');
         panel.classList.add(mho_welcome_link_panel_class);
         createExternalLinksButtons(town_id).forEach((link: HTMLButtonElement): void => {
             panel.appendChild(link);
@@ -256,7 +256,7 @@ export function addExternalLinksColumnToWelcomeTowns(): void {
 
         link_cell.addEventListener('click', (event: MouseEvent): void => {
             event.stopPropagation();
-            let was_open: boolean = panel.classList.contains('mho-open');
+            const was_open: boolean = panel.classList.contains('mho-open');
             closeAllWelcomeLinkPanels();
             if (!was_open) {
                 panel.classList.add('mho-open');
@@ -305,8 +305,8 @@ function bindWelcomeOutsideClickOnce(): void {
 function positionWelcomeLinkPanel(panel: HTMLElement): void {
     panel.classList.remove('mho-align-right');
 
-    let panel_rect: DOMRect = panel.getBoundingClientRect();
-    let overflows_right: boolean = panel_rect.right > window.innerWidth;
+    const panel_rect: DOMRect = panel.getBoundingClientRect();
+    const overflows_right: boolean = panel_rect.right > window.innerWidth;
 
     if (overflows_right) {
         panel.classList.add('mho-align-right');

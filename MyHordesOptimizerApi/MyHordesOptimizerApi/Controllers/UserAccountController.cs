@@ -1,4 +1,5 @@
 using System.Net;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -66,9 +67,9 @@ public class UserAccountController : AbstractMyHordesOptimizerControllerBase
     [HttpPost]
     [Route("{userId:int}/pictos/import")]
     [Authorize]
-    public ActionResult<UserPictosDto> ImportPictos([FromRoute] int userId)
+    public async Task<ActionResult<UserPictosDto>> ImportPictos([FromRoute] int userId)
     {
-        if (!_myHordesFetcherService.ImportUserPictos(userId))
+        if (!await _myHordesFetcherService.ImportUserPictosAsync(userId))
         {
             return StatusCode((int)HttpStatusCode.TooManyRequests,
                 "Les récompenses de ce joueur ont déjà été importées récemment.");

@@ -17,7 +17,7 @@ namespace MyHordesOptimizerApi.Services.Interfaces
         IEnumerable<ItemRecipeDto> GetRecipes();
         BankLastUpdateDto GetBank();
         BankLastUpdateDto GetBank(int townId);
-        bool ImportUserPictos(int userId);
+        Task<bool> ImportUserPictosAsync(int userId);
         CitizensLastUpdateDto GetCitizens(int townId);
         IEnumerable<MyHordesOptimizerRuinDto> GetRuins(int? townId);
         MyHordesOptimizerMapDto GetMap(int townId);

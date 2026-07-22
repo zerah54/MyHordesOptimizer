@@ -219,6 +219,47 @@ export interface ParamCategory {
 export type MhoParameters = Record<string, any>;
 
 // ---------------------------------------------------------------------
+// Styles personnalisés des titres de sujets du forum
+// ---------------------------------------------------------------------
+
+/** Les propriétés visuelles applicables à un titre de sujet */
+export interface ForumThreadStyle {
+    /** Couleur du titre, au format `#rrggbb` ; `null` = ne pas modifier */
+    color: string | null;
+    /** Couleur de fond de la ligne, au format `#rrggbb` ; `null` = ne pas modifier */
+    background: string | null;
+    /** Couleur de la bordure gauche de la ligne, au format `#rrggbb` ; `null` = pas de bordure */
+    border: string | null;
+    /** Taille du titre, en pourcentage de la taille d'origine (100 = inchangée) */
+    size: number;
+    /** Opacité de la ligne, en pourcentage (100 = opaque) */
+    opacity: number;
+    /** Caractère(s) inséré(s) devant le titre ; chaîne vide = aucun */
+    prefix: string;
+}
+
+/** Une règle de style : des critères de sélection et le style à appliquer */
+export interface ForumThreadStyleRule {
+    id: string;
+    enabled: boolean;
+    /** Noms techniques des tags concernés (`rp`, `help`, ...) ; vide = pas de critère de tag */
+    tags: string[];
+    /** Mots devant apparaître dans le titre (insensible à la casse et aux accents) ; vide = pas de critère de mot */
+    words: string[];
+    style: ForumThreadStyle;
+}
+
+/** Un tag de sujet tel que défini côté MyHordes */
+export interface ForumThreadTag {
+    /** Nom technique, seule valeur stable entre les langues */
+    name: string;
+    /** Couleur de fond du tag, au format `#rrggbb`, utilisée en dernier recours pour l'identifier */
+    color: string | null;
+    /** Libellé de secours, affiché dans la modale quand la page ne fournit pas les tags */
+    label: I18nLabel;
+}
+
+// ---------------------------------------------------------------------
 // Tabs
 // ---------------------------------------------------------------------
 export interface TabDefinition {

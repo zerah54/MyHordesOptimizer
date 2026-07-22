@@ -1,14 +1,14 @@
-import {mh_optimizer_icon, mho_copy_map_id, mho_map_key} from '../config/constants';
-import {texts} from '../i18n/texts';
-import {getI18N} from '../utils/i18n';
-import {getStorageItem, setStorageItem} from '../utils/storage';
+import { mh_optimizer_icon, mho_copy_map_id, mho_map_key } from '../config/constants';
+import { texts } from '../i18n/texts';
+import { getI18N } from '../utils/i18n';
+import { getStorageItem, setStorageItem } from '../utils/storage';
 
 export function createCopyButton(source, map, map_id, button_block_id) {
-    let copy_button_parent = document.getElementById(button_block_id);
-    let copy_button = document.createElement('button');
-    let copyText = (text, add) => {
+    const copy_button_parent = document.getElementById(button_block_id);
+    const copy_button = document.createElement('button');
+    const copyText = (text, add) => {
         return `<img src="${mh_optimizer_icon}" style="margin: auto; vertical-align: middle;" width="20" height="20"><span style="margin: auto; vertical-align: middle;">${text}<br /><small>${add}</small></span>`;
-    }
+    };
     copy_button.setAttribute('style', 'max-width: initial; float: right');
     copy_button.innerHTML = copyText(getI18N(texts.copy_map), '');
     copy_button.id = mho_copy_map_id;
@@ -32,7 +32,7 @@ export function createCopyButton(source, map, map_id, button_block_id) {
 
         setTimeout(() => {
             copy_button.innerHTML = copyText(getI18N(texts.copy_map), '');
-        }, 5000)
+        }, 5000);
         copy_button.disabled = false;
     });
     copy_button_parent.appendChild(copy_button);

@@ -1,57 +1,56 @@
-import {repo_img_hordes_url} from '../config/constants';
-
-import type {TabsList} from '../types';
+import { repo_img_hordes_url } from '../config/constants';
+import type { TabsList } from '../types';
 
 //////////////////////////////////
 // La liste des onglets du wiki //
 //////////////////////////////////
-export let tabs_list: TabsList = {
+export const tabs_list: TabsList = {
     wiki: [
         {
             ordering: 0,
-            id: `items`,
+            id: 'items',
             label: {
-                en: `Items`,
-                fr: `Objets`,
-                de: `Gegenstände`,
-                es: `Objetos`
+                en: 'Items',
+                fr: 'Objets',
+                de: 'Gegenstände',
+                es: 'Objetos'
             },
-            icon: repo_img_hordes_url + `emotes/bag.gif`
+            icon: repo_img_hordes_url + 'emotes/bag.gif'
         },
         {
             ordering: 1,
-            id: `recipes`,
+            id: 'recipes',
             label: {
-                en: `Recipes`,
-                fr: `Recettes`,
-                de: `Rezepte`,
-                es: `Transformaciones`
+                en: 'Recipes',
+                fr: 'Recettes',
+                de: 'Rezepte',
+                es: 'Transformaciones'
             },
-            icon: repo_img_hordes_url + `building/small_refine.gif`
+            icon: repo_img_hordes_url + 'building/small_refine.gif'
         },
         {
             ordering: 2,
-            id: `ruins`,
+            id: 'ruins',
             label: {
-                en: `Ruins`,
-                fr: `Bâtiments`,
-                de: `Ruinen`,
-                es: `Ruinas`
+                en: 'Ruins',
+                fr: 'Bâtiments',
+                de: 'Ruinen',
+                es: 'Ruinas'
             },
-            icon: repo_img_hordes_url + `icons/home.gif`,
+            icon: repo_img_hordes_url + 'icons/home.gif',
         }
     ],
     tools: [
         {
             ordering: 0,
-            id: `bank`,
+            id: 'bank',
             label: {
-                en: `Bank`,
-                fr: `Banque`,
-                de: `Bank`,
-                es: `Almacén`
+                en: 'Bank',
+                fr: 'Banque',
+                de: 'Bank',
+                es: 'Almacén'
             },
-            icon: repo_img_hordes_url + `icons/home.gif`,
+            icon: repo_img_hordes_url + 'icons/home.gif',
             needs_town: true,
         },
         // {
@@ -68,14 +67,14 @@ export let tabs_list: TabsList = {
         // },
         {
             ordering: 2,
-            id: `camping`,
+            id: 'camping',
             label: {
-                en: `Camping`,
-                fr: `Camping`,
-                de: `Camping`,
-                es: `Camping`
+                en: 'Camping',
+                fr: 'Camping',
+                de: 'Camping',
+                es: 'Camping'
             },
-            icon: repo_img_hordes_url + `status/status_camper.gif`,
+            icon: repo_img_hordes_url + 'status/status_camper.gif',
             needs_town: false,
         }
     ]

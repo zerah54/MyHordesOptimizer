@@ -1,5 +1,5 @@
-import {btn_id} from '../config/constants';
-import {state} from '../state';
+import { btn_id } from '../config/constants';
+import { state } from '../state';
 
 /////////////////////////////////////////
 // Fonctions utiles / Useful functions //
@@ -57,6 +57,38 @@ export function pageIsWatchtower(): boolean {
     return document.URL.indexOf('town/watchtower') > -1;
 }
 
+/** @return {boolean}    true si la page de l'utilisateur est la page de la veille (onglet des remparts, route town_nightwatch) */
+export function pageIsNightwatch(): boolean {
+    return document.URL.indexOf('town/nightwatch') > -1;
+}
+
+/**
+ * Tableau des objets de la page de la décharge.
+ * Même absence de classe distinctive que sur la page de pièges : on le reconnaît à sa
+ * cellule d'en-tête de largeur 5.
+ * @return {Element | undefined}
+ */
+export function dumpItemsTableElement(): Element | undefined {
+    return Array.from(document.querySelectorAll('.row-table'))
+        .find((table: Element) => !!table.querySelector('.row.header .cell.rw-5'));
+}
+
+/** @return {boolean}    true si la page de l'utilisateur est la page du système de pièges (route town_tamer_trap) */
+export function pageIsTrap(): boolean {
+    return document.URL.indexOf('town/trap') > -1;
+}
+
+/**
+ * Tableau des appâts disponibles de la page de pièges.
+ * Le jeu ne pose aucune classe distinctive dessus : on le reconnaît à sa cellule d'en-tête
+ * de largeur 7, propre à ce tableau.
+ * @return {Element | undefined}
+ */
+export function trapItemsTableElement(): Element | undefined {
+    return Array.from(document.querySelectorAll('.row-table'))
+        .find((table: Element) => !!table.querySelector('.row.header .cell.rw-7'));
+}
+
 /** @return {boolean}    true si la page de l'utilisateur est la page du puit */
 export function pageIsWell(): boolean {
     return document.URL.indexOf('town/well') > -1;
@@ -105,6 +137,21 @@ export function pageIsTownHistory(): boolean {
 /** @return {boolean}    true si la page de l'utilisateur est liste omniscience */
 export function pageIsOmniscience(): boolean {
     return document.URL.endsWith('omniscience');
+}
+
+/**
+ * Signature ville + jour telle qu'affichée par l'horloge du jeu.
+ * Permet de savoir si un rafraîchissement forcé des données utilisateur a déjà été
+ * effectué pour cet état : `shouldRefreshMe()` peut rester vrai en boucle tant que
+ * l'horloge est incomplète, sans qu'un nouvel appel réseau n'y change quoi que ce soit.
+ * @return {string | undefined}    undefined si l'horloge n'est pas (encore) dans le DOM
+ */
+export function getTownClockSignature(): string | undefined {
+    const game_clock: Element | null = document.querySelector('.game-clock[data-town-id]');
+    if (!game_clock) return undefined;
+
+    const day: Element | null = game_clock.querySelector('.day-number');
+    return `${game_clock.getAttribute('data-town-id')}|${day?.textContent?.trim() ?? ''}`;
 }
 
 /** @return {boolean}    on doit refresh le user actuel si le jour de la ville est différent du jour précédent */

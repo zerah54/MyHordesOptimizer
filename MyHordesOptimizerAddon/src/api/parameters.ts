@@ -1,7 +1,7 @@
-import {state} from '../state';
-import {fetcherWithoutBearer} from '../utils/fetch';
-import {addError} from '../utils/notifications';
-import {convertResponsePromiseToError, isScriptVersionLastVersion} from '../utils/version';
+import { state } from '../state';
+import { fetcherWithoutBearer } from '../utils/fetch';
+import { addError } from '../utils/notifications';
+import { convertResponsePromiseToError, isScriptVersionLastVersion } from '../utils/version';
 
 export function getParameters() {
     return new Promise<void>((resolve, reject) => {

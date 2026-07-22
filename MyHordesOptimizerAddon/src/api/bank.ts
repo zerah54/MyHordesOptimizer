@@ -1,7 +1,7 @@
-import {state} from '../state';
-import {fetcher} from '../utils/fetch';
-import {addError} from '../utils/notifications';
-import {convertResponsePromiseToError} from '../utils/version';
+import { state } from '../state';
+import { fetcher } from '../utils/fetch';
+import { addError } from '../utils/notifications';
+import { convertResponsePromiseToError } from '../utils/version';
 
 export function getBank() {
     return new Promise<any>((resolve, reject) => {

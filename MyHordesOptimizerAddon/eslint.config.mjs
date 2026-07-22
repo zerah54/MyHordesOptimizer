@@ -2,6 +2,7 @@ import path from "node:path";
 import {fileURLToPath} from "node:url";
 import js from "@eslint/js";
 import {FlatCompat} from "@eslint/eslintrc";
+import simpleImportSort from "eslint-plugin-simple-import-sort";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -22,12 +23,16 @@ export default [{
 })), {
     files: ["**/*.ts"],
 
+    plugins: {
+        "simple-import-sort": simpleImportSort,
+    },
+
     languageOptions: {
         ecmaVersion: 5,
         sourceType: "script",
 
         parserOptions: {
-            project: ["tsconfig.json", "e2e/tsconfig.json"],
+            project: ["tsconfig.json"],
             createDefaultProgram: true,
         },
     },
@@ -50,13 +55,7 @@ export default [{
         }],
         semi: ["warn", "always"],
         quotes: ["warn", "single"],
-        "sort-imports": ["error", {
-            ignoreCase: false,
-            ignoreDeclarationSort: false,
-            ignoreMemberSort: false,
-            memberSyntaxSortOrder: ["none", "all", "multiple", "single"],
-            allowSeparatedGroups: false
-        }],
+        "simple-import-sort/imports": "error",
         "object-curly-spacing": ["warn", "always"],
         eqeqeq: ["error", "always"],
         "@typescript-eslint/no-inferrable-types": "off",

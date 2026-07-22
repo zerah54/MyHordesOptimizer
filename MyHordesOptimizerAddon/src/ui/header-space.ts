@@ -1,10 +1,10 @@
-import {mho_header_space_id} from '../config/constants';
+import { mho_header_space_id } from '../config/constants';
 
 export function createMhoHeaderSpace() {
-    let mh_header = document.querySelector('#header');
+    const mh_header = document.querySelector('#header');
     if (!mh_header) return;
 
-    let postbox = document.querySelector('#postbox');
+    const postbox = document.querySelector('#postbox');
     if (!postbox) return;
 
     let header_space = document.querySelector(`#${mho_header_space_id}`);
@@ -31,7 +31,7 @@ export function createMhoHeaderSpace() {
     };
 
     const observer = new MutationObserver(callback);
-    const config = {attributes: true, subtree: false, childList: false};
+    const config = { attributes: true, subtree: false, childList: false };
 
     observer.observe(postbox, config);
 }
