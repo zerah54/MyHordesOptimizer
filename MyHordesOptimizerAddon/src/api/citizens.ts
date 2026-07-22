@@ -1,7 +1,7 @@
-import {state} from '../state';
-import {fetcher} from '../utils/fetch';
-import {addError} from '../utils/notifications';
-import {convertResponsePromiseToError} from '../utils/version';
+import { state } from '../state';
+import { fetcher } from '../utils/fetch';
+import { addError } from '../utils/notifications';
+import { convertResponsePromiseToError } from '../utils/version';
 
 export function getCitizens() {
     return new Promise<any>((resolve, reject) => {
@@ -15,7 +15,7 @@ export function getCitizens() {
             })
             .then((response) => {
                 state.citizens = response;
-                (state.citizens as any).citizens = Object.keys((state.citizens as any).citizens).map((key) => (state.citizens as any).citizens[key])
+                (state.citizens as any).citizens = Object.keys((state.citizens as any).citizens).map((key) => (state.citizens as any).citizens[key]);
                 resolve(state.citizens);
             })
             .catch((error) => {

@@ -1,42 +1,42 @@
-import {lang, mh_optimizer_icon, mho_blacklist_key} from '../config/constants';
-import {fill_items_messages_pool} from '../data/fill-items-messages';
-import {state} from '../state';
-import {pageIsDesert, pageIsForum, pageIsMsgReceived} from '../utils/page';
-import {getStorageItem, setStorageItem} from '../utils/storage';
+import { lang, mh_optimizer_icon, mho_blacklist_key } from '../config/constants';
+import { fill_items_messages_pool } from '../data/fill-items-messages';
+import { state } from '../state';
+import { pageIsDesert, pageIsForum, pageIsMsgReceived } from '../utils/page';
+import { getStorageItem, setStorageItem } from '../utils/storage';
 
 export function fillItemsMessages() {
     if (state.mho_parameters.fill_items_messages && pageIsMsgReceived()) {
-        let row_send = document.querySelector('#rows-send');
+        const row_send = document.querySelector('#rows-send');
         if (!row_send) return;
 
-        let sendable_items = row_send.querySelector('.sendable-items');
+        const sendable_items = row_send.querySelector('.sendable-items');
         if (!sendable_items) return;
 
-        let editor_block = document.querySelector('#pm-forum-editor');
+        const editor_block = document.querySelector('#pm-forum-editor');
         if (!editor_block) return;
 
         setTimeout(() => {
 
-            let editor = editor_block.querySelector('hordes-twino-editor');
+            const editor = editor_block.querySelector('hordes-twino-editor');
             if (!editor) return;
 
-            let sendable_items_item = sendable_items.querySelectorAll('li.item');
+            const sendable_items_item = sendable_items.querySelectorAll('li.item');
             Array.from(sendable_items_item).forEach((item) => {
                 item.addEventListener('click', () => {
-                    let message_title = editor.querySelector('input');
-                    let message_content = editor.querySelector('textarea');
+                    const message_title = editor.querySelector('input');
+                    const message_content = editor.querySelector('textarea');
                     if ((message_title.value === undefined || message_title.value === null || message_title.value === '')
                         && (message_content.value === undefined || message_content.value === null || message_content.value === '')) {
-                        let lang_fillers = fill_items_messages_pool[lang];
-                        let random_filler = lang_fillers[Math.floor(Math.random() * lang_fillers.length)];
+                        const lang_fillers = fill_items_messages_pool[lang];
+                        const random_filler = lang_fillers[Math.floor(Math.random() * lang_fillers.length)];
 
                         message_title.setAttribute('value', random_filler.title);
-                        message_title.dispatchEvent(new Event('input', {bubbles: true}));
+                        message_title.dispatchEvent(new Event('input', { bubbles: true }));
 
                         message_content.value = random_filler.content;
-                        message_content.dispatchEvent(new Event('input', {bubbles: true}));
+                        message_content.dispatchEvent(new Event('input', { bubbles: true }));
                     }
-                }, {once: true});
+                }, { once: true });
             });
         }, 250);
     }
@@ -45,12 +45,12 @@ export function fillItemsMessages() {
 
 export function blockUsersPosts() {
     if (state.mho_parameters.block_users && pageIsForum()) {
-        let posts = document.querySelectorAll('.forum-post');
+        const posts = document.querySelectorAll('.forum-post');
         if (posts) {
             Array.from(posts).forEach((post) => {
-                let blacklisted_user = post.querySelector("#blacklist")
-                let user = post.querySelector('.username');
-                let user_id = user.getAttribute('x-user-id');
+                let blacklisted_user = post.querySelector('#blacklist');
+                const user = post.querySelector('.username');
+                const user_id = user.getAttribute('x-user-id');
                 if (user_id === state.mh_user.id.toString()) return;
 
                 getStorageItem(mho_blacklist_key).then((blacklist) => {
@@ -58,8 +58,8 @@ export function blockUsersPosts() {
                         blacklist = [];
                     }
 
-                    let is_user_in_blacklist = blacklist.some((blacklist_user_id) => blacklist_user_id === user_id);
-                    let original_post_content = post.querySelector('.forum-post-content:not(.replace-original)');
+                    const is_user_in_blacklist = blacklist.some((blacklist_user_id) => blacklist_user_id === user_id);
+                    const original_post_content = post.querySelector('.forum-post-content:not(.replace-original)');
                     let new_post_content = post.querySelector('.replace-original');
 
                     if (!blacklisted_user) {
@@ -70,14 +70,14 @@ export function blockUsersPosts() {
                         blacklisted_user.style.cursor = 'pointer';
                         blacklisted_user.addEventListener('click', () => {
                             getStorageItem(mho_blacklist_key).then((keys) => {
-                                let temp_blacklist = [...keys];
+                                const temp_blacklist = [...keys];
                                 if (!blacklisted_user.getAttribute('blacklisted')) {
                                     temp_blacklist.push(user_id);
                                     blacklisted_user.setAttribute('blacklisted', 'true');
-                                    let user_posts = Array.from(document.querySelectorAll(`.username[x-user-id="${user_id}"]`) || []).map((user_tag) => user_tag.parentElement.parentElement.querySelector('.original'));
+                                    const user_posts = Array.from(document.querySelectorAll(`.username[x-user-id="${user_id}"]`) || []).map((user_tag) => user_tag.parentElement.parentElement.querySelector('.original'));
                                     user_posts.forEach((user_post) => user_post.classList.remove('force-display'));
                                 } else {
-                                    let index = temp_blacklist.findIndex((blacklisted_user_id) => blacklisted_user_id === user_id);
+                                    const index = temp_blacklist.findIndex((blacklisted_user_id) => blacklisted_user_id === user_id);
                                     if (index > -1) {
                                         temp_blacklist.splice(index, 1);
                                         blacklisted_user.removeAttribute('blacklisted');
@@ -86,8 +86,8 @@ export function blockUsersPosts() {
                                 setStorageItem(mho_blacklist_key, [...temp_blacklist]);
                                 getStorageItem(mho_blacklist_key).then((new_blacklist) => {
                                     blacklist = [...new_blacklist];
-                                })
-                            })
+                                });
+                            });
                         });
 
                         user.parentNode.insertBefore(blacklisted_user, user);
@@ -105,7 +105,7 @@ export function blockUsersPosts() {
                         if (!new_post_content) {
                             new_post_content = document.createElement('div');
                             new_post_content.classList.add('forum-post-content', 'replace-original');
-                            let link = document.createElement('a');
+                            const link = document.createElement('a');
                             link.innerText = 'Cliquez ici pour afficher ce message.';
                             link.style.cursor = 'pointer';
                             link.addEventListener('click', ($event) => {
@@ -142,11 +142,11 @@ export function displayCountCharacters() {
     let counter = document.querySelector('#mho_registry_counter_id');
 
     if (!counter && state.mho_parameters.display_counter_on_input_registry && pageIsDesert()) {
-        let log_block = document.querySelector('#beyond-log');
+        const log_block = document.querySelector('#beyond-log');
         if (!log_block) return;
 
-        let log_input = log_block.querySelector('.overlay-central input');
-        if (!log_input) return
+        const log_input = log_block.querySelector('.overlay-central input');
+        if (!log_input) return;
 
         counter = document.createElement('div');
         counter.id = 'mho_registry_counter_id';
@@ -160,8 +160,8 @@ export function displayCountCharacters() {
         });
 
         log_input.addEventListener('change', (event) => {
-            let log_block_new = document.querySelector('#beyond-log');
-            let log_input_new = log_block_new.querySelector('.overlay-central input');
+            const log_block_new = document.querySelector('#beyond-log');
+            const log_input_new = log_block_new.querySelector('.overlay-central input');
             counter.innerText = `${log_block_new.value?.trim().length ?? 0}/256`;
         });
     } else if (counter) {

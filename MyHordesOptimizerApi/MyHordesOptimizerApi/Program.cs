@@ -32,6 +32,7 @@ using MyHordesOptimizerApi.Services.Impl;
 using MyHordesOptimizerApi.Services.Impl.Estimations;
 using MyHordesOptimizerApi.Services.Impl.ExternalTools;
 using MyHordesOptimizerApi.Services.Impl.Import;
+using MyHordesOptimizerApi.Services.Impl.Locking;
 using MyHordesOptimizerApi.Services.Impl.Translations;
 using MyHordesOptimizerApi.Services.Interfaces;
 using MyHordesOptimizerApi.Services.Interfaces.Estimations;
@@ -147,6 +148,8 @@ builder.Services.AddScoped<IExternalToolsService, ExternalToolsService>();
 builder.Services.AddScoped<IMyHordesImportService, MyHordesImportService>();
 // Singleton : porte l'état de l'import global, qui survit à la requête qui l'a déclenché
 builder.Services.AddSingleton<ImportJobRunner>();
+// Verrou d'écriture des villes : forcément un singleton, il n'a de sens que partagé par tous.
+builder.Services.AddSingleton<TownSyncLock>();
 builder.Services.AddScoped<IWishListService, WishListService>();
 builder.Services.AddSingleton<ITranslationService, TranslationService>();
 builder.Services.AddSingleton<IMyHordesRuineService, MyHordesRuineService>();

@@ -1,6 +1,6 @@
-import {mh_optimizer_icon} from '../config/constants';
-import {state} from '../state';
-import {getErrorFromApi, getScriptInfo} from './version';
+import { mh_optimizer_icon } from '../config/constants';
+import { state } from '../state';
+import { getErrorFromApi, getScriptInfo } from './version';
 
 export function normalizeString(str) {
     return str.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
@@ -9,8 +9,8 @@ export function normalizeString(str) {
 /** Affiche une notification de réussite */
 
 export function addSuccess(message) {
-    let notifications = document.getElementById('notifications');
-    let notification = document.createElement('div');
+    const notifications = document.getElementById('notifications');
+    const notification = document.createElement('div');
     notification.classList.add('notice', 'show');
     notification.innerText = `${getScriptInfo().name} : ${message}`;
     notifications?.appendChild(notification);
@@ -26,10 +26,10 @@ export function addSuccess(message) {
 /** Affiche une notification de warning */
 
 export function addWarning(message) {
-    let notifications = document.getElementById('notifications');
-    if (!notifications) return
+    const notifications = document.getElementById('notifications');
+    if (!notifications) return;
 
-    let notification = document.createElement('div');
+    const notification = document.createElement('div');
     notification.classList.add('warning', 'show');
     notification.innerText = `${getScriptInfo().name} : ${message}`;
     notifications?.appendChild(notification);
@@ -47,22 +47,22 @@ export function addError(error) {
     if (typeof error === 'string' || (error.name !== 'AbortError' && error.name !== 'TypeError') && !state.is_error) {
         if (error?.status === 503) return;
 
-        let notifications = document.getElementById('notifications');
-        let notification = document.createElement('div');
+        const notifications = document.getElementById('notifications');
+        const notification = document.createElement('div');
         notification.classList.add('error', 'show');
-        let error_text = `
+        const error_text = `
             <div style="vertical_align: middle"><img src="${mh_optimizer_icon}" style="width: 24px; margin-right: 0.5em;">${getScriptInfo().name}</div>
             <br />
         `;
         notification.innerHTML = error_text + (typeof error === 'string' ? error : getErrorFromApi(error));
         notifications?.appendChild(notification);
-        state.is_error = true
+        state.is_error = true;
         notification.addEventListener('click', () => {
             notification.remove();
         });
         setTimeout(() => {
             state.is_error = false;
-        }, 5000)
+        }, 5000);
         setTimeout(() => {
             notification.remove();
         }, 10000);

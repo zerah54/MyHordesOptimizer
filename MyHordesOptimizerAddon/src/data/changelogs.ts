@@ -1,4 +1,10 @@
 export const changelogs: Record<string, string> = {
+    '1.1.50': `
+        [Nouveauté] Les listes de la veille, des pièges et de la décharge peuvent désormais être triées
+        [Nouveauté] Un champ de recherche d'appât peut être affiché sur la page des pièges
+        [Nouveauté] Nouvelle option pour figer les avatars animés, qui ne se réaniment qu'au survol de la souris
+        [Nouveauté] Nouvelle option pour appliquer un style personnalisé aux noms de sujets du forum, selon leur tag et les mots qu'ils contiennent, configurable via une fenêtre dédiée
+    `,
     '1.1.49': `
         [Correction] Estimations depuis la mise à jour du site
     `,

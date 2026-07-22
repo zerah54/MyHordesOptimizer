@@ -1,4 +1,4 @@
-import {state} from '../state';
+import { state } from '../state';
 
 export function automaticallyOpenBag(count = 0) {
     if (!state.mho_parameters.automatically_open_bag) return;
@@ -26,7 +26,7 @@ export function automaticallyOpenBag(count = 0) {
                 }
             });
 
-            inventories.forEach(item => observer.observe(item, {attributes: true}));
+            inventories.forEach(item => observer.observe(item, { attributes: true }));
         });
     });
 }

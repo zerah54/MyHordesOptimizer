@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MHO Addon
-// @version      1.1.49
+// @version      1.1.50
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/, rubrique Tutoriels
 // @author       Zerah
 //
@@ -61,6 +61,7 @@
     const mho_map_key = 'MHO_map';
     const mho_token_key = 'MHO_token';
     const mho_blacklist_key = 'MHO_blacklist';
+    const mho_forum_thread_styles_key = 'MHO_forum_thread_styles';
     const mho_anti_abuse_key = 'MHO_anti_abuse';
     const mho_version_key = 'MHO_version';
     const gm_mh_external_app_id_key = is_mh_beta ? 'MHO_mh_beta_external_app_id' : 'MHO_mh_external_app_id';
@@ -93,6 +94,7 @@
     const mho_search_recipient_field_id = 'mho-search-recipient-field';
     const mho_search_dump_field_id = 'mho-search-dump-field';
     const mho_search_registry_field_id = 'mho-search-registry-field';
+    const mho_search_trap_field_id = 'mho-search-trap-field';
     const mho_filter_citizen_list_id = 'mho-filter-citizen-list';
     const mho_filter_omniscience_id = 'mho-filter-omniscience';
     const mho_display_translate_input_id = 'mho-display-translate-input';
@@ -100,206 +102,15 @@
     const mho_anti_abuse_counter_id = 'mho-anti-abuse-counter';
     const mho_town_external_links_id = 'mho-town-external-links';
     const mho_copy_logs_id = 'mho-copy-logs';
-
-    //////////////////////////////////////
-    // Les éléments récupérés via l'API //
-    //////////////////////////////////////
-    const state = {
-        website: '',
-        api_url: '',
-        mho_parameters: undefined,
-        mh_user: undefined,
-        external_app_id: undefined,
-        token: undefined,
-        items: undefined,
-        ruins: undefined,
-        recipes: undefined,
-        citizens: undefined,
-        hero_skills: undefined,
-        wishlist: undefined,
-        parameters: undefined,
-        map: undefined,
-        current_cell: undefined,
-        my_expeditions: undefined,
-        tooltips_observer: undefined,
-        loading_area_observer: undefined,
-        bank_observer: undefined,
-        anti_abuse_controller: undefined,
-        ///////////////////
-        // Les variables //
-        ///////////////////
-        is_refresh_wishlist: undefined,
-        /** true quand le changelog est nouveau et qu'il faut afficher une pastille sur le menu */
-        has_new_changelog: false,
-        /** True quand une erreur vient d'être affichée. Repasse à false au bout d'une seconde, pour éviter le spam d'erreurs */
-        is_error: false,
-        /** La liste des notifications récupérées depuis le dernier chargement de l'application */
-        mh_notifications: [],
-        /** Le mutation observer pour les tooltips */
-        advanced_tooltips_observer: undefined,
-    };
-
-    function getI18N(item) {
-        if (!item)
-            return;
-        return item?.[lang] !== 'TODO' ? item?.[lang] : (item?.en === 'TODO' ? item?.fr : item?.en);
-    }
-
-    /////////////////////////////////////////
-    // Fonctions utiles / Useful functions //
-    /////////////////////////////////////////
-    /** @return {string}     website language */
-    function getWebsiteLanguage() {
-        return document.getElementsByTagName('html')[0].attributes.lang.value;
-    }
-    /** @return {boolean}     true if button exists */
-    function buttonOptimizerElement() {
-        return document.getElementById(btn_id);
-    }
-    /** @return {boolean}    true si la page de l'utilisateur est la page de selection de ville */
-    function pageIsWelcome() {
-        return document.URL.endsWith('welcome');
-    }
-    /** @return {boolean}    true si la page de l'utilisateur est la page de la ville */
-    function pageIsTown() {
-        return document.URL.indexOf('town') > -1;
-    }
-    /** @return {boolean}    true si la page de l'utilisateur est la page de l'atelier */
-    function pageIsWorkshop() {
-        return document.URL.endsWith('workshop');
-    }
-    /** @return {boolean}    true si la page de l'utilisateur est la page principale de sa maison */
-    function pageIsHouse() {
-        return document.URL.indexOf('town/house/dash') > -1;
-    }
-    /** @return {boolean}    true si la page de l'utilisateur est la page d'envoi de messages */
-    function pageIsMsgReceived() {
-        return document.URL.indexOf('town/house/messages') > -1;
-    }
-    /** @return {boolean}    true si la page de l'utilisateur est la page des améliorations de sa maison */
-    function pageIsAmelio() {
-        return document.URL.indexOf('town/house/build') > -1;
-    }
-    /** @return {boolean}    true si la page de l'utilisateur est la page de la porte */
-    function pageIsDoors() {
-        return document.URL.endsWith('town/door');
-    }
-    /** @return {boolean}    true si la page de l'utilisateur est la page de la tour de guet */
-    function pageIsWatchtower() {
-        return document.URL.indexOf('town/watchtower') > -1;
-    }
-    /** @return {boolean}    true si la page de l'utilisateur est la page du puit */
-    function pageIsWell() {
-        return document.URL.indexOf('town/well') > -1;
-    }
-    /** @return {boolean}    true si la page de l'utilisateur est la page de la banque */
-    function pageIsBank() {
-        return document.URL.indexOf('town/bank') > -1;
-    }
-    /** @return {boolean}    true si la page de l'utilisateur est la page de la décharge */
-    function pageIsDump() {
-        return document.URL.indexOf('town/dump') > -1;
-    }
-    /** @return {boolean}    true si la page de l'utilisateur est la liste des citoyens */
-    function pageIsCitizens() {
-        return document.URL.endsWith('citizens');
-    }
-    /** @return {boolean}    true si la page de l'utilisateur est la page des chantiers */
-    function pageIsConstructions() {
-        return document.URL.endsWith('constructions');
-    }
-    /** @return {boolean}    true si la page de l'utilisateur est la page du désert */
-    function pageIsDesert() {
-        return document.URL.indexOf('desert') > -1;
-    }
-    /** @return {boolean}    true si la page de l'utilisateur est la page du forum */
-    function pageIsForum() {
-        return document.URL.indexOf('forum') > -1;
-    }
-    /** @return {boolean}    true si la page de l'utilisateur est une âme */
-    function pageIsSoul() {
-        return document.URL.indexOf('soul') > -1;
-    }
-    /** @return {boolean}    true si la page est un historique de ville */
-    function pageIsTownHistory() {
-        return document.URL.indexOf('town') > -1 && (document.URL.indexOf('me') > -1 || document.URL.indexOf('soul') > -1);
-    }
-    /** @return {boolean}    true si la page de l'utilisateur est liste omniscience */
-    function pageIsOmniscience() {
-        return document.URL.endsWith('omniscience');
-    }
-    /** @return {boolean}    on doit refresh le user actuel si le jour de la ville est différent du jour précédent */
-    function shouldRefreshMe() {
-        // Si on est pendant l'attaque, on ne fait rien
-        const during_attack = document.querySelector('.during-attack');
-        if (during_attack)
-            return false;
-        // si on change de ville on force le refresh
-        const game_clock = document.querySelector('.game-clock[data-town-id]');
-        if (!game_clock)
-            return false;
-        const current_town_id = game_clock?.getAttribute('data-town-id');
-        if (isNaN(current_town_id) && +state.mh_user.townDetails?.townId === 0)
-            return false;
-        if (+current_town_id !== +(state.mh_user.townDetails?.townId ?? 0))
-            return true;
-        const current_town_day = game_clock?.querySelector('.day-number');
-        if (!current_town_day)
-            return true;
-        // si on change de jour, on force le refresh
-        return +current_town_day.innerText.replace(/(\D)*/, '') > +state.mh_user.townDetails?.day;
-    }
-
-    function getStorageItem(key) {
-        return new Promise((resolve, error) => {
-            try {
-                GM.getValue(key).then((result) => {
-                    resolve(result);
-                });
-            }
-            catch (error) {
-                try {
-                    browser.storage.local.get(key).then((result) => {
-                        resolve(result[key]);
-                    });
-                }
-                catch (error) {
-                    try {
-                        chrome.storage.local.get(key).then((result) => {
-                            resolve(result[key]);
-                        });
-                    }
-                    catch (error) {
-                        console.error(error);
-                    }
-                }
-            }
-        });
-    }
-    function setStorageItem(key, value) {
-        try {
-            return GM.setValue(key, value);
-        }
-        catch (error) {
-            try {
-                const key_value = {};
-                key_value[key] = value;
-                return browser.storage.local.set(key_value);
-            }
-            catch (error) {
-                try {
-                    const key_value = {};
-                    key_value[key] = value;
-                    return chrome.storage.local.set(key_value);
-                }
-                catch (error) {
-                    console.error(error);
-                }
-            }
-        }
-    }
+    const mho_forum_styles_modal_id = 'mho-forum-styles-modal';
 
     const changelogs = {
+        '1.1.50': `
+        [Nouveauté] Les listes de la veille, des pièges et de la décharge peuvent désormais être triées
+        [Nouveauté] Un champ de recherche d'appât peut être affiché sur la page des pièges
+        [Nouveauté] Nouvelle option pour figer les avatars animés, qui ne se réaniment qu'au survol de la souris
+        [Nouveauté] Nouvelle option pour appliquer un style personnalisé aux noms de sujets du forum, selon leur tag et les mots qu'ils contiennent, configurable via une fenêtre dédiée
+    `,
         '1.1.49': `
         [Correction] Estimations depuis la mise à jour du site
     `,
@@ -1263,9 +1074,251 @@
     `,
     };
 
+    //////////////////////////////////////
+    // Les éléments récupérés via l'API //
+    //////////////////////////////////////
+    const state = {
+        website: '',
+        api_url: '',
+        mho_parameters: undefined,
+        mh_user: undefined,
+        external_app_id: undefined,
+        token: undefined,
+        items: undefined,
+        ruins: undefined,
+        recipes: undefined,
+        citizens: undefined,
+        hero_skills: undefined,
+        wishlist: undefined,
+        parameters: undefined,
+        map: undefined,
+        current_cell: undefined,
+        my_expeditions: undefined,
+        tooltips_observer: undefined,
+        loading_area_observer: undefined,
+        bank_observer: undefined,
+        anti_abuse_controller: undefined,
+        ///////////////////
+        // Les variables //
+        ///////////////////
+        is_refresh_wishlist: undefined,
+        /** true quand le changelog est nouveau et qu'il faut afficher une pastille sur le menu */
+        has_new_changelog: false,
+        /** True quand une erreur vient d'être affichée. Repasse à false au bout d'une seconde, pour éviter le spam d'erreurs */
+        is_error: false,
+        /** La liste des notifications récupérées depuis le dernier chargement de l'application */
+        mh_notifications: [],
+        /** Le mutation observer pour les tooltips */
+        advanced_tooltips_observer: undefined,
+    };
+
+    function getI18N(item) {
+        if (!item)
+            return;
+        return item?.[lang] !== 'TODO' ? item?.[lang] : (item?.en === 'TODO' ? item?.fr : item?.en);
+    }
+
+    /////////////////////////////////////////
+    // Fonctions utiles / Useful functions //
+    /////////////////////////////////////////
+    /** @return {string}     website language */
+    function getWebsiteLanguage() {
+        return document.getElementsByTagName('html')[0].attributes.lang.value;
+    }
+    /** @return {boolean}     true if button exists */
+    function buttonOptimizerElement() {
+        return document.getElementById(btn_id);
+    }
+    /** @return {boolean}    true si la page de l'utilisateur est la page de selection de ville */
+    function pageIsWelcome() {
+        return document.URL.endsWith('welcome');
+    }
+    /** @return {boolean}    true si la page de l'utilisateur est la page de la ville */
+    function pageIsTown() {
+        return document.URL.indexOf('town') > -1;
+    }
+    /** @return {boolean}    true si la page de l'utilisateur est la page de l'atelier */
+    function pageIsWorkshop() {
+        return document.URL.endsWith('workshop');
+    }
+    /** @return {boolean}    true si la page de l'utilisateur est la page principale de sa maison */
+    function pageIsHouse() {
+        return document.URL.indexOf('town/house/dash') > -1;
+    }
+    /** @return {boolean}    true si la page de l'utilisateur est la page d'envoi de messages */
+    function pageIsMsgReceived() {
+        return document.URL.indexOf('town/house/messages') > -1;
+    }
+    /** @return {boolean}    true si la page de l'utilisateur est la page des améliorations de sa maison */
+    function pageIsAmelio() {
+        return document.URL.indexOf('town/house/build') > -1;
+    }
+    /** @return {boolean}    true si la page de l'utilisateur est la page de la porte */
+    function pageIsDoors() {
+        return document.URL.endsWith('town/door');
+    }
+    /** @return {boolean}    true si la page de l'utilisateur est la page de la tour de guet */
+    function pageIsWatchtower() {
+        return document.URL.indexOf('town/watchtower') > -1;
+    }
+    /** @return {boolean}    true si la page de l'utilisateur est la page de la veille (onglet des remparts, route town_nightwatch) */
+    function pageIsNightwatch() {
+        return document.URL.indexOf('town/nightwatch') > -1;
+    }
+    /**
+     * Tableau des objets de la page de la décharge.
+     * Même absence de classe distinctive que sur la page de pièges : on le reconnaît à sa
+     * cellule d'en-tête de largeur 5.
+     * @return {Element | undefined}
+     */
+    function dumpItemsTableElement() {
+        return Array.from(document.querySelectorAll('.row-table'))
+            .find((table) => !!table.querySelector('.row.header .cell.rw-5'));
+    }
+    /** @return {boolean}    true si la page de l'utilisateur est la page du système de pièges (route town_tamer_trap) */
+    function pageIsTrap() {
+        return document.URL.indexOf('town/trap') > -1;
+    }
+    /**
+     * Tableau des appâts disponibles de la page de pièges.
+     * Le jeu ne pose aucune classe distinctive dessus : on le reconnaît à sa cellule d'en-tête
+     * de largeur 7, propre à ce tableau.
+     * @return {Element | undefined}
+     */
+    function trapItemsTableElement() {
+        return Array.from(document.querySelectorAll('.row-table'))
+            .find((table) => !!table.querySelector('.row.header .cell.rw-7'));
+    }
+    /** @return {boolean}    true si la page de l'utilisateur est la page du puit */
+    function pageIsWell() {
+        return document.URL.indexOf('town/well') > -1;
+    }
+    /** @return {boolean}    true si la page de l'utilisateur est la page de la banque */
+    function pageIsBank() {
+        return document.URL.indexOf('town/bank') > -1;
+    }
+    /** @return {boolean}    true si la page de l'utilisateur est la page de la décharge */
+    function pageIsDump() {
+        return document.URL.indexOf('town/dump') > -1;
+    }
+    /** @return {boolean}    true si la page de l'utilisateur est la liste des citoyens */
+    function pageIsCitizens() {
+        return document.URL.endsWith('citizens');
+    }
+    /** @return {boolean}    true si la page de l'utilisateur est la page des chantiers */
+    function pageIsConstructions() {
+        return document.URL.endsWith('constructions');
+    }
+    /** @return {boolean}    true si la page de l'utilisateur est la page du désert */
+    function pageIsDesert() {
+        return document.URL.indexOf('desert') > -1;
+    }
+    /** @return {boolean}    true si la page de l'utilisateur est la page du forum */
+    function pageIsForum() {
+        return document.URL.indexOf('forum') > -1;
+    }
+    /** @return {boolean}    true si la page de l'utilisateur est une âme */
+    function pageIsSoul() {
+        return document.URL.indexOf('soul') > -1;
+    }
+    /** @return {boolean}    true si la page est un historique de ville */
+    function pageIsTownHistory() {
+        return document.URL.indexOf('town') > -1 && (document.URL.indexOf('me') > -1 || document.URL.indexOf('soul') > -1);
+    }
+    /** @return {boolean}    true si la page de l'utilisateur est liste omniscience */
+    function pageIsOmniscience() {
+        return document.URL.endsWith('omniscience');
+    }
+    /**
+     * Signature ville + jour telle qu'affichée par l'horloge du jeu.
+     * Permet de savoir si un rafraîchissement forcé des données utilisateur a déjà été
+     * effectué pour cet état : `shouldRefreshMe()` peut rester vrai en boucle tant que
+     * l'horloge est incomplète, sans qu'un nouvel appel réseau n'y change quoi que ce soit.
+     * @return {string | undefined}    undefined si l'horloge n'est pas (encore) dans le DOM
+     */
+    function getTownClockSignature() {
+        const game_clock = document.querySelector('.game-clock[data-town-id]');
+        if (!game_clock)
+            return undefined;
+        const day = game_clock.querySelector('.day-number');
+        return `${game_clock.getAttribute('data-town-id')}|${day?.textContent?.trim() ?? ''}`;
+    }
+    /** @return {boolean}    on doit refresh le user actuel si le jour de la ville est différent du jour précédent */
+    function shouldRefreshMe() {
+        // Si on est pendant l'attaque, on ne fait rien
+        const during_attack = document.querySelector('.during-attack');
+        if (during_attack)
+            return false;
+        // si on change de ville on force le refresh
+        const game_clock = document.querySelector('.game-clock[data-town-id]');
+        if (!game_clock)
+            return false;
+        const current_town_id = game_clock?.getAttribute('data-town-id');
+        if (isNaN(current_town_id) && +state.mh_user.townDetails?.townId === 0)
+            return false;
+        if (+current_town_id !== +(state.mh_user.townDetails?.townId ?? 0))
+            return true;
+        const current_town_day = game_clock?.querySelector('.day-number');
+        if (!current_town_day)
+            return true;
+        // si on change de jour, on force le refresh
+        return +current_town_day.innerText.replace(/(\D)*/, '') > +state.mh_user.townDetails?.day;
+    }
+
+    /**
+     * Exécute un accès au stockage en ramenant tous ses modes d'échec à un rejet de promesse.
+     *
+     * Les backends ne signalent pas leurs erreurs de la même façon : un gestionnaire de
+     * userscript absent lève une `ReferenceError` synchrone, tandis qu'un stockage présent
+     * mais indisponible (quota, permission) rejette sa promesse. Les deux doivent conduire
+     * au backend suivant, faute de quoi la promesse retournée à l'appelant reste en attente
+     * indéfiniment — et `bootstrap()` étant attendu au démarrage, l'addon ne démarre alors
+     * jamais, silencieusement.
+     */
+    function tryStorageBackend(access) {
+        try {
+            return Promise.resolve(access());
+        }
+        catch (error) {
+            return Promise.reject(error);
+        }
+    }
+    /**
+     * Lit une valeur persistée, en essayant successivement le gestionnaire de userscript
+     * puis les API d'extension.
+     * @param {string} key    La clé à lire
+     * @returns {Promise<any>}    La valeur lue, ou undefined si aucun backend n'a répondu
+     */
+    function getStorageItem(key) {
+        return tryStorageBackend(() => GM.getValue(key))
+            .catch(() => tryStorageBackend(() => browser.storage.local.get(key).then((result) => result[key])))
+            .catch(() => tryStorageBackend(() => chrome.storage.local.get(key).then((result) => result[key])))
+            .catch((error) => {
+            // Aucun backend de stockage disponible : on résout quand même
+            // pour ne jamais laisser la promesse en attente indéfiniment
+            console.error('MHO - lecture du stockage impossible', error);
+            return undefined;
+        });
+    }
+    /**
+     * Écrit une valeur persistée, en essayant successivement le gestionnaire de userscript
+     * puis les API d'extension.
+     * @param {string} key    La clé à écrire
+     * @param {any} value    La valeur à persister
+     * @returns {Promise<void>}    Résolue même en cas d'échec : aucun appelant ne doit rester bloqué
+     */
+    function setStorageItem(key, value) {
+        return tryStorageBackend(() => GM.setValue(key, value))
+            .catch(() => tryStorageBackend(() => browser.storage.local.set({ [key]: value })))
+            .catch(() => tryStorageBackend(() => chrome.storage.local.set({ [key]: value })))
+            .catch((error) => {
+            console.error('MHO - écriture dans le stockage impossible', error);
+        });
+    }
+
     function convertResponsePromiseToError(response) {
         return response.text().then((text) => {
-            let error = new Error(text);
+            const error = new Error(text);
             error.status = response.status;
             error.name = response.statusText;
             throw error;
@@ -1304,7 +1357,7 @@
         });
     }
     function isNewVersion(version) {
-        if (!version || typeof version !== "object") {
+        if (!version || typeof version !== 'object') {
             version = {};
             setStorageItem(mho_version_key, version);
         }
@@ -1312,7 +1365,7 @@
     }
     function toggleNewChangelog(new_changelog) {
         state.has_new_changelog = new_changelog;
-        let optimizer_btn = buttonOptimizerElement();
+        const optimizer_btn = buttonOptimizerElement();
         if (optimizer_btn) {
             if (new_changelog && !optimizer_btn.classList.contains('mho-new-changelog')) {
                 optimizer_btn.classList.add('mho-new-changelog');
@@ -1320,7 +1373,7 @@
             else if (optimizer_btn.classList.contains('mho-new-changelog')) {
                 optimizer_btn.classList.remove('mho-new-changelog');
             }
-            let changelog_item = optimizer_btn.querySelector('#version');
+            const changelog_item = optimizer_btn.querySelector('#version');
             if (changelog_item) {
                 if (new_changelog && !changelog_item.classList.contains('mho-new-changelog')) {
                     changelog_item.classList.add('mho-new-changelog');
@@ -1332,7 +1385,7 @@
         }
     }
     function toggleNewVersion(new_version) {
-        let optimizer_btn = buttonOptimizerElement();
+        const optimizer_btn = buttonOptimizerElement();
         if (optimizer_btn) {
             if (new_version && !optimizer_btn.classList.contains('mho-new-version')) {
                 optimizer_btn.classList.add('mho-new-version');
@@ -1340,7 +1393,7 @@
             else if (!new_version && optimizer_btn.classList.contains('mho-new-version')) {
                 optimizer_btn.classList.remove('mho-new-version');
             }
-            let update_item = optimizer_btn.querySelector('#update');
+            const update_item = optimizer_btn.querySelector('#update');
             if (update_item) {
                 if (new_version && !update_item.classList.contains('mho-new-version')) {
                     update_item.classList.add('mho-new-version');
@@ -1401,7 +1454,7 @@
     }
     function getChangelog() {
         const version = getScriptInfo().version;
-        const content = changelogs[version] ?? `Aucune note de version disponible pour cette mise à jour.`;
+        const content = changelogs[version] ?? 'Aucune note de version disponible pour cette mise à jour.';
         return `${getScriptInfo().name} : Changelog pour la version ${version}
         ${content}`;
     }
@@ -1411,538 +1464,550 @@
     ////////////////
     const texts = {
         website: {
-            en: `Website`,
-            fr: `Site web`,
-            de: `Webseite`,
-            es: `Sitio web`
+            en: 'Website',
+            fr: 'Site web',
+            de: 'Webseite',
+            es: 'Sitio web'
         },
         save_external_app_id: {
-            en: `Save your external ID for apps`,
-            fr: `Enregistrez votre ID d'app externe`,
-            de: `Speichern Sie Ihre externe ID für Apps`,
-            es: `Guarde su identificador externo para aplicaciones`
+            en: 'Save your external ID for apps',
+            fr: 'Enregistrez votre ID d\'app externe',
+            de: 'Speichern Sie Ihre externe ID für Apps',
+            es: 'Guarde su identificador externo para aplicaciones'
         },
         external_app_id_help: {
-            en: `You must have an external ID for apps. <br />You can create it by following “My soul” > “Settings” > “Advanced” > “External Applications” `,
-            fr: `Vous devez posséder un ID externe pour les apps. <br />Vous pouvez la créer dans "Votre âme" > "Réglages" > "Avancés" > "Applications externes"`,
-            de: `Sie haben eine externe ID für Apps entwickelt. <br />Sie können es wie folgt erstellen “Deine Seele” > “Einstellungen” > “Erweitert” > “Externe Anwendungen” `,
-            es: `Debe tener una identificación externa para las aplicaciones. <br />Puedes crearlo siguiendo “Tu alma” > “Configuración” > “Avanzada” > “Aplicaciones Externas”`
+            en: 'You must have an external ID for apps. <br />You can create it by following “My soul” > “Settings” > “Advanced” > “External Applications” ',
+            fr: 'Vous devez posséder un ID externe pour les apps. <br />Vous pouvez la créer dans "Votre âme" > "Réglages" > "Avancés" > "Applications externes"',
+            de: 'Sie haben eine externe ID für Apps entwickelt. <br />Sie können es wie folgt erstellen “Deine Seele” > “Einstellungen” > “Erweitert” > “Externe Anwendungen” ',
+            es: 'Debe tener una identificación externa para las aplicaciones. <br />Puedes crearlo siguiendo “Tu alma” > “Configuración” > “Avanzada” > “Aplicaciones Externas”'
         },
         external_app_id_help_label: {
-            en: `Help`,
-            fr: `Aide`,
-            de: `Hilfe`,
-            es: `Ayuda`
+            en: 'Help',
+            fr: 'Aide',
+            de: 'Hilfe',
+            es: 'Ayuda'
         },
         tools_btn_label: {
-            en: `Tools`,
-            fr: `Outils`,
-            de: `Werkzeugen`,
-            es: `Herramientas`
+            en: 'Tools',
+            fr: 'Outils',
+            de: 'Werkzeugen',
+            es: 'Herramientas'
         },
         parameters_section_label: {
-            en: `Parameters`,
-            fr: `Paramètres`,
-            de: `Einstellungen`,
-            es: `Parámetros`
+            en: 'Parameters',
+            fr: 'Paramètres',
+            de: 'Einstellungen',
+            es: 'Parámetros'
         },
         informations_section_label: {
-            en: `Informations`,
-            fr: `Informations`,
-            de: `Informationen`,
-            es: `Informaciones`
+            en: 'Informations',
+            fr: 'Informations',
+            de: 'Informationen',
+            es: 'Informaciones'
         },
         update_external_tools_needed_btn_label: {
-            en: `Update external tools`,
-            fr: `Mettre à jour les outils externes`,
-            de: `Externe Tools Aktualisieren`,
-            es: `Actualizar aplicaciones externas`
+            en: 'Update external tools',
+            fr: 'Mettre à jour les outils externes',
+            de: 'Externe Tools Aktualisieren',
+            es: 'Actualizar aplicaciones externas'
         },
         update_external_tools_pending_btn_label: {
-            en: `Updating...`,
-            fr: `Mise à jour en cours...`,
-            de: `Aktualisierung...`,
-            es: `Actualizando...`
+            en: 'Updating...',
+            fr: 'Mise à jour en cours...',
+            de: 'Aktualisierung...',
+            es: 'Actualizando...'
         },
         update_external_tools_success_btn_label: {
-            en: `Update completed!`,
-            fr: `Mise à jour terminée !`,
-            de: `Aktualisierung abgeschlossen!`,
-            es: `¡Actualización exitosa!`
+            en: 'Update completed!',
+            fr: 'Mise à jour terminée !',
+            de: 'Aktualisierung abgeschlossen!',
+            es: '¡Actualización exitosa!'
         },
         update_external_tools_errors_btn_label: {
-            en: `Update completed with errors.`,
-            fr: `Mise à jour terminée avec des erreurs.`,
-            de: `Aktualisierung mit Fehlern abgeschlossen.`,
-            es: `Actualización completada con errores.`
+            en: 'Update completed with errors.',
+            fr: 'Mise à jour terminée avec des erreurs.',
+            de: 'Aktualisierung mit Fehlern abgeschlossen.',
+            es: 'Actualización completada con errores.'
         },
         update_external_tools_fail_btn_label: {
-            en: `Can not update.`,
-            fr: `Impossible de mettre à jour.`,
-            de: `Aktualisierung unmöglich`,
-            es: `No se puede actualizar.`
+            en: 'Can not update.',
+            fr: 'Impossible de mettre à jour.',
+            de: 'Aktualisierung unmöglich',
+            es: 'No se puede actualizar.'
         },
         prevent_from_leaving_information: {
-            en: `You asked to be notified before leaving if your escort options were not good: `,
-            fr: `Vous avez demandé à être prévenu avant de quitter la page si vos options d'escorte ne sont pas les bonnes : `,
-            de: `Sie haben dafür gewählt vor der Abreise benachrichtigt zu werden wenn Ihre Eskorte-Optionen nicht gut waren:`,
-            es: `Ha pedido ser notificado antes de cerrar la página si sus opciones de escolta son incorrectas: `
+            en: 'You asked to be notified before leaving if your escort options were not good: ',
+            fr: 'Vous avez demandé à être prévenu avant de quitter la page si vos options d\'escorte ne sont pas les bonnes : ',
+            de: 'Sie haben dafür gewählt vor der Abreise benachrichtigt zu werden wenn Ihre Eskorte-Optionen nicht gut waren:',
+            es: 'Ha pedido ser notificado antes de cerrar la página si sus opciones de escolta son incorrectas: '
         },
         prevent_not_in_ae: {
-            en: `You are not waiting for an escort.`,
-            fr: `Vous n'êtes pas en attente d'escorte.`,
-            de: `Sie warten nicht auf eine Eskorte.`,
-            es: `Su escolta no está activada.`
+            en: 'You are not waiting for an escort.',
+            fr: 'Vous n\'êtes pas en attente d\'escorte.',
+            de: 'Sie warten nicht auf eine Eskorte.',
+            es: 'Su escolta no está activada.'
         },
         escort_not_released: {
-            en: `You did not let go of your escort`,
-            fr: `Vous n'avez pas relâché votre escorte.`,
-            de: `Sie haben Ihre Eskorte nicht losgelassen`,
-            es: `No ha soltado a sus acompañantes en escolta.`
+            en: 'You did not let go of your escort',
+            fr: 'Vous n\'avez pas relâché votre escorte.',
+            de: 'Sie haben Ihre Eskorte nicht losgelassen',
+            es: 'No ha soltado a sus acompañantes en escolta.'
         },
         save: {
-            en: `Save`,
-            fr: `Enregistrer`,
-            de: `Speichern`,
-            es: `Guardar`
+            en: 'Save',
+            fr: 'Enregistrer',
+            de: 'Speichern',
+            es: 'Guardar'
         },
         update: {
-            en: `Refresh wishlist`,
-            fr: `Rafraîchir la liste`,
-            de: `Aktualisieren`,
-            es: `Actualizar`
+            en: 'Refresh wishlist',
+            fr: 'Rafraîchir la liste',
+            de: 'Aktualisieren',
+            es: 'Actualizar'
         },
         search_ended: {
-            en: `Search completed`,
-            fr: `La fouille est terminée`,
-            de: `Grabungsaktion fertig`,
-            es: `La búsqueda ha finalizado`
+            en: 'Search completed',
+            fr: 'La fouille est terminée',
+            de: 'Grabungsaktion fertig',
+            es: 'La búsqueda ha finalizado'
         },
         new_message: {
-            en: `You have %VAR% new message(s)`,
-            fr: `Vous avez %VAR% nouveau(x) message(s)`,
-            de: `Sie haben %VAR% neue Nachricht(en)`,
-            es: `Tienes %VAR% mensaje(s) nuevo(s)`
+            en: 'You have %VAR% new message(s)',
+            fr: 'Vous avez %VAR% nouveau(x) message(s)',
+            de: 'Sie haben %VAR% neue Nachricht(en)',
+            es: 'Tienes %VAR% mensaje(s) nuevo(s)'
         },
         nb_dead_zombies: {
-            en: `Number of zombies that died here today`,
-            fr: `Nombre de zombies morts sur cette case aujourd'hui`,
-            de: `Anzahl der Zombies die heute hier gestorben sind`,
-            es: `Número de zombis que han muerto aquí el día de hoy`
+            en: 'Number of zombies that died here today',
+            fr: 'Nombre de zombies morts sur cette case aujourd\'hui',
+            de: 'Anzahl der Zombies die heute hier gestorben sind',
+            es: 'Número de zombis que han muerto aquí el día de hoy'
         },
         nb_despair_deaths: {
-            en: `Amount of zombies that will die from despair`,
-            fr: `Nombre de zombies qui vont mourir de désespoir`,
-            de: `Anzahl von Zombies, die abwandern werden`,
-            es: `Número de zombis que morirán por desesperación`
+            en: 'Amount of zombies that will die from despair',
+            fr: 'Nombre de zombies qui vont mourir de désespoir',
+            de: 'Anzahl von Zombies, die abwandern werden',
+            es: 'Número de zombis que morirán por desesperación'
         },
         copy_map: {
-            en: `Copy map`,
-            fr: `Copier la carte`,
-            de: `Karte kopieren`,
-            es: `Copiar el mapa`
+            en: 'Copy map',
+            fr: 'Copier la carte',
+            de: 'Karte kopieren',
+            es: 'Copiar el mapa'
         },
         copy_map_end: {
-            en: `The map has been copied`,
-            fr: `La carte a été copiée`,
-            de: `Die Karte wurde kopiert`,
-            es: `El mapa ha sido copiado`
+            en: 'The map has been copied',
+            fr: 'La carte a été copiée',
+            de: 'Die Karte wurde kopiert',
+            es: 'El mapa ha sido copiado'
         },
         copy_map_end_more: {
-            en: `The previous map has been replaced`,
-            fr: `La carte précédente a été remplacée`,
-            de: `Die vorherige Karte wurde ersetzt`,
-            es: `El mapa anterior ha sido reemplazada`
+            en: 'The previous map has been replaced',
+            fr: 'La carte précédente a été remplacée',
+            de: 'Die vorherige Karte wurde ersetzt',
+            es: 'El mapa anterior ha sido reemplazada'
         },
         copy_registry: {
-            en: `Copy visible town registry entries`,
-            fr: `Copier les entrées visibles du registre`,
-            de: `Kopieren Sie sichtbare Stadtregister`,
-            es: `Copiar entradas de registro del pueblo visibles`
+            en: 'Copy visible town registry entries',
+            fr: 'Copier les entrées visibles du registre',
+            de: 'Kopieren Sie sichtbare Stadtregister',
+            es: 'Copiar entradas de registro del pueblo visibles'
         },
         translation_file_context: {
-            en: `Context (translation file)`,
-            fr: `Contexte (fichier de traduction)`,
-            de: `Kontext (Übersetzungsdatei)`,
-            es: `Contexto (archivo de traducción)`,
+            en: 'Context (translation file)',
+            fr: 'Contexte (fichier de traduction)',
+            de: 'Kontext (Übersetzungsdatei)',
+            es: 'Contexto (archivo de traducción)',
         },
         display_all_search_result: {
-            en: `Display all results`,
-            fr: `Afficher tous les résultats`,
-            de: `Alle Ergebnisse anzeigen`,
-            es: `Mostrar todos los resultados`
+            en: 'Display all results',
+            fr: 'Afficher tous les résultats',
+            de: 'Alle Ergebnisse anzeigen',
+            es: 'Mostrar todos los resultados'
         },
         display_exact_search_result: {
-            en: `Only display exact results`,
-            fr: `Afficher uniquement les résultats exacts`,
-            de: `Nur exakte Ergebnisse anzeigen`,
-            es: `Mostrar sólo los resultados exactos`
+            en: 'Only display exact results',
+            fr: 'Afficher uniquement les résultats exacts',
+            de: 'Nur exakte Ergebnisse anzeigen',
+            es: 'Mostrar sólo los resultados exactos'
         },
         missing_ap_explanation: {
-            en: `(including %VAR% for the building to stay overnight)`,
-            fr: `(dont %VAR% pour que le bâtiment passe la nuit)`,
-            de: `(einschließlich %VAR% für das Gebäude zum Übernachten)`,
-            es: `(incluyendo %VAR% para que el edificio resista el ataque)`,
+            en: '(including %VAR% for the building to stay overnight)',
+            fr: '(dont %VAR% pour que le bâtiment passe la nuit)',
+            de: '(einschließlich %VAR% für das Gebäude zum Übernachten)',
+            es: '(incluyendo %VAR% para que el edificio resista el ataque)',
         },
         job: {
-            en: `Profession`,
-            fr: `Métier`,
-            de: `Beruf`,
-            es: `Oficio`,
+            en: 'Profession',
+            fr: 'Métier',
+            de: 'Beruf',
+            es: 'Oficio',
+        },
+        pseudo: {
+            en: 'Username',
+            fr: 'Pseudo',
+            de: 'Benutzername',
+            es: 'Usuario',
+        },
+        defense: {
+            en: 'Def.',
+            fr: 'Déf.',
+            de: 'Vert.',
+            es: 'Def.',
         },
         town_type: {
-            en: `Town type`,
-            fr: `Type de ville`,
-            de: `Stadttyp`,
-            es: `Tipo de pueblo`,
+            en: 'Town type',
+            fr: 'Type de ville',
+            de: 'Stadttyp',
+            es: 'Tipo de pueblo',
         },
         ruin: {
-            en: `Ruin`,
-            fr: `Bâtiment`,
-            de: `Ruine`,
-            es: `Ruina`,
+            en: 'Ruin',
+            fr: 'Bâtiment',
+            de: 'Ruine',
+            es: 'Ruina',
         },
         pro_camper: {
-            en: `Pro Camper`,
-            fr: `Campeur professionnel`,
-            de: `Proficamper`,
-            es: `Campista Experto`,
+            en: 'Pro Camper',
+            fr: 'Campeur professionnel',
+            de: 'Proficamper',
+            es: 'Campista Experto',
         },
         distance: {
-            en: `Distance from town (in km)`,
-            fr: `Distance de la ville (en km)`,
-            de: `Entfernung von der Stadt (in km)`,
-            es: `Distancia con respecto al pueblo (en km)`,
+            en: 'Distance from town (in km)',
+            fr: 'Distance de la ville (en km)',
+            de: 'Entfernung von der Stadt (in km)',
+            es: 'Distancia con respecto al pueblo (en km)',
         },
         digs: {
-            en: `Number of piles on the ruin`,
-            fr: `Nombre de tas sur le bâtiment`,
-            de: `Anzahl der Pfähle am Gebäude`,
-            es: `Número de pilotes en el edificio`,
+            en: 'Number of piles on the ruin',
+            fr: 'Nombre de tas sur le bâtiment',
+            de: 'Anzahl der Pfähle am Gebäude',
+            es: 'Número de pilotes en el edificio',
         },
         nb_campings: {
-            en: `Number of campsites already made`,
-            fr: `Nombre de campings déjà effectués`,
-            de: `Anzahl der bereits gemachten Campingplätze`,
-            es: `Cantidad de acampes ya realizados`,
+            en: 'Number of campsites already made',
+            fr: 'Nombre de campings déjà effectués',
+            de: 'Anzahl der bereits gemachten Campingplätze',
+            es: 'Cantidad de acampes ya realizados',
         },
         hidden_campers: {
-            en: `Number of campers already hidden on the zone`,
-            fr: `Nombre de campeurs déjà cachés sur la case`,
-            de: `Anzahl der Camper, die bereits auf der Zelle versteckt sind`,
-            es: `Cantidad de campistas ya escondidos en la zona`,
+            en: 'Number of campers already hidden on the zone',
+            fr: 'Nombre de campeurs déjà cachés sur la case',
+            de: 'Anzahl der Camper, die bereits auf der Zelle versteckt sind',
+            es: 'Cantidad de campistas ya escondidos en la zona',
         },
         vest: {
-            en: `Camouflage Vest`,
-            fr: `Tenue de camouflage`,
-            de: `Tarnanzug`,
-            es: `Camuflaje`,
+            en: 'Camouflage Vest',
+            fr: 'Tenue de camouflage',
+            de: 'Tarnanzug',
+            es: 'Camuflaje',
         },
         tomb: {
-            en: `Tomb`,
-            fr: `Tombe`,
-            de: `Grab`,
-            es: `Tumba`,
+            en: 'Tomb',
+            fr: 'Tombe',
+            de: 'Grab',
+            es: 'Tumba',
         },
         night: {
-            en: `Night`,
-            fr: `Nuit`,
-            de: `Nacht`,
-            es: `Noche`,
+            en: 'Night',
+            fr: 'Nuit',
+            de: 'Nacht',
+            es: 'Noche',
         },
         devastated: {
-            en: `Devastated town`,
-            fr: `Ville dévastée`,
-            de: `Zerstörte Stadt`,
-            es: `Pueblo devastado`,
+            en: 'Devastated town',
+            fr: 'Ville dévastée',
+            de: 'Zerstörte Stadt',
+            es: 'Pueblo devastado',
         },
         phare: {
-            en: `Lighthouse`,
-            fr: `Phare`,
-            de: `Leuchtturm`,
-            es: `Faro`,
+            en: 'Lighthouse',
+            fr: 'Phare',
+            de: 'Leuchtturm',
+            es: 'Faro',
         },
         zombies_on_cell: {
-            en: `Zombies on the zone`,
-            fr: `Zombies sur la case`,
-            de: `Zombies auf der Zelle`,
-            es: `Zombis en la zona`,
+            en: 'Zombies on the zone',
+            fr: 'Zombies sur la case',
+            de: 'Zombies auf der Zelle',
+            es: 'Zombis en la zona',
         },
         objects_in_bag: {
-            en: `Skins and tents in the bag`,
-            fr: `Pelures et toiles dans le sac`,
-            de: `Felle und Zelte in der Tasche`,
-            es: `Pellejos y telas en el bolso`,
+            en: 'Skins and tents in the bag',
+            fr: 'Pelures et toiles dans le sac',
+            de: 'Felle und Zelte in der Tasche',
+            es: 'Pellejos y telas en el bolso',
         },
         improve: {
-            en: `Simple improvements (must subtract 3 after each attack)`,
-            fr: `Améliorations simples (il faut en soustraire 3 après chaque attaque)`,
-            de: `Einfachen Verbesserungen (muss nach jedem Angriff 3 abziehen)`,
-            es: `Mejoras simples (hay que restar 3 luego de cada ataque)`,
+            en: 'Simple improvements (must subtract 3 after each attack)',
+            fr: 'Améliorations simples (il faut en soustraire 3 après chaque attaque)',
+            de: 'Einfachen Verbesserungen (muss nach jedem Angriff 3 abziehen)',
+            es: 'Mejoras simples (hay que restar 3 luego de cada ataque)',
         },
         object_improve: {
-            en: `Defense objects`,
-            fr: `Objets de défense`,
-            de: `Verteidigungsobjekte`,
-            es: `Objetos defensivos`,
+            en: 'Defense objects',
+            fr: 'Objets de défense',
+            de: 'Verteidigungsobjekte',
+            es: 'Objetos defensivos',
         },
         camping_town: {
-            en: `The town`,
-            fr: `La ville`,
-            de: `Die Stadt`,
-            es: `El pueblo`,
+            en: 'The town',
+            fr: 'La ville',
+            de: 'Die Stadt',
+            es: 'El pueblo',
         },
         camping_citizen: {
-            en: `The citizen`,
-            fr: `Le citoyen`,
-            de: `Der Bürger`,
-            es: `El habitante`,
+            en: 'The citizen',
+            fr: 'Le citoyen',
+            de: 'Der Bürger',
+            es: 'El habitante',
         },
         camping_ruin: {
-            en: `The ruin`,
-            fr: `Le bâtiment`,
-            de: `Die Ruine`,
-            es: `La ruina`,
+            en: 'The ruin',
+            fr: 'Le bâtiment',
+            de: 'Die Ruine',
+            es: 'La ruina',
         },
         result: {
-            en: `Result`,
-            fr: `Résultat`,
-            de: `Ergebnis`,
-            es: `Resultado`,
+            en: 'Result',
+            fr: 'Résultat',
+            de: 'Ergebnis',
+            es: 'Resultado',
         },
         searchObjectToAdd: {
-            en: `Find an object to add`,
-            fr: `Rechercher un objet à ajouter`,
-            de: `Suchen Sie ein hinzuzufügendes Objekt`,
-            es: `Encuentre un objeto para agregar`,
+            en: 'Find an object to add',
+            fr: 'Rechercher un objet à ajouter',
+            de: 'Suchen Sie ein hinzuzufügendes Objekt',
+            es: 'Encuentre un objeto para agregar',
         },
         broken: {
-            en: `Broken`,
-            fr: `Cassé`,
-            de: `Kaputt`,
-            es: `Roto/a`,
+            en: 'Broken',
+            fr: 'Cassé',
+            de: 'Kaputt',
+            es: 'Roto/a',
         },
         manually_add_app_id_key: {
-            en: `Your external ID could not be retrieved automatically. You can enter it manually here.`,
-            fr: `Votre identifiant n'a pas pu être récupéré automatiquement. Vous pouvez le saisir manuellement ici.`,
-            de: `Ihr externe ID konnte nicht automatisch abgerufen werden. Sie können ihn hier manuell eingeben.`,
-            es: `Ihr Benutzername konnte nicht automatisch abgerufen werden. Sie können ihn hier manuell eingeben.`,
+            en: 'Your external ID could not be retrieved automatically. You can enter it manually here.',
+            fr: 'Votre identifiant n\'a pas pu être récupéré automatiquement. Vous pouvez le saisir manuellement ici.',
+            de: 'Ihr externe ID konnte nicht automatisch abgerufen werden. Sie können ihn hier manuell eingeben.',
+            es: 'Ihr Benutzername konnte nicht automatisch abgerufen werden. Sie können ihn hier manuell eingeben.',
         },
         edit_add_app_id_key: {
-            en: `Enter your external ID here.\nYou can also clear the form field to remove it.`,
-            fr: `Saisissez votre identifiant externe pour les applications ici.\nVous pouvez vider le champ pour le supprimer.`,
-            de: `Bitte hier Deine externe ID eintragen oder den Inhalt des Felds entfernen, um sie zu löschen.`,
-            es: `Introduzca su ID externo aquí. También puede borrar el campo del formulario para eliminarlo.`,
+            en: 'Enter your external ID here.\nYou can also clear the form field to remove it.',
+            fr: 'Saisissez votre identifiant externe pour les applications ici.\nVous pouvez vider le champ pour le supprimer.',
+            de: 'Bitte hier Deine externe ID eintragen oder den Inhalt des Felds entfernen, um sie zu löschen.',
+            es: 'Introduzca su ID externo aquí. También puede borrar el campo del formulario para eliminarlo.',
         },
         wishlist_moved: {
-            en: `Due to too much complexity, the shopping list has been moved to the website.`,
-            fr: `Du fait d'une trop grande complexité, la liste de courses a été déplacée sur le site web.`,
-            de: `Aufgrund zu großer Komplexität wurde die Einkaufsliste auf die Website verschoben.`,
-            es: `Debido a demasiada complejidad, la lista de compras se ha movido al sitio web.`
+            en: 'Due to too much complexity, the shopping list has been moved to the website.',
+            fr: 'Du fait d\'une trop grande complexité, la liste de courses a été déplacée sur le site web.',
+            de: 'Aufgrund zu großer Komplexität wurde die Einkaufsliste auf die Website verschoben.',
+            es: 'Debido a demasiada complejidad, la lista de compras se ha movido al sitio web.'
         },
         go_to_website: {
-            en: `Go to website`,
-            fr: `Aller sur le site`,
-            de: `Gehen Sie zur Website`,
-            es: `Ir al sitio`
+            en: 'Go to website',
+            fr: 'Aller sur le site',
+            de: 'Gehen Sie zur Website',
+            es: 'Ir al sitio'
         },
         note: {
-            en: `Box note`,
-            fr: `Note de la case`,
-            de: `Box-Hinweis`,
-            es: `Nota de caja`
+            en: 'Box note',
+            fr: 'Note de la case',
+            de: 'Box-Hinweis',
+            es: 'Nota de caja'
         },
         no_note: {
-            en: `No note for this box`,
-            fr: `Pas de note pour cette case`,
-            de: `Keine Hinweis für diese Box`,
-            es: `No hay nota para esta caja`
+            en: 'No note for this box',
+            fr: 'Pas de note pour cette case',
+            de: 'Keine Hinweis für diese Box',
+            es: 'No hay nota para esta caja'
         },
         ruin_dried: {
-            en: `The ruin is empty`,
-            fr: `Le bâtiment est vide`,
-            de: `Die Ruine ist leer`,
-            es: `La ruina esta vacia`
+            en: 'The ruin is empty',
+            fr: 'Le bâtiment est vide',
+            de: 'Die Ruine ist leer',
+            es: 'La ruina esta vacia'
         },
         ruin_not_dried: {
-            en: `The ruin is not empty`,
-            fr: `Le bâtiment n'est pas vide`,
-            de: `Die Ruine ist nicht leer`,
-            es: `La ruina no está vacía`
+            en: 'The ruin is not empty',
+            fr: 'Le bâtiment n\'est pas vide',
+            de: 'Die Ruine ist nicht leer',
+            es: 'La ruina no está vacía'
         },
         additional_informations: {
-            en: `Further information`,
-            fr: `Informations complémentaires`,
-            de: `Weitere Informationen`,
-            es: `Informaciones complementarias`
+            en: 'Further information',
+            fr: 'Informations complémentaires',
+            de: 'Weitere Informationen',
+            es: 'Informaciones complementarias'
         },
         anti_abuse_title: {
-            en: `Anti-abuse counter`,
-            fr: `Compteur anti-abus`,
-            de: `Zähler gegen Missbrauch`,
-            es: `Contador anti-abuso`
+            en: 'Anti-abuse counter',
+            fr: 'Compteur anti-abus',
+            de: 'Zähler gegen Missbrauch',
+            es: 'Contador anti-abuso'
         },
         warn_missing_logs_title: {
-            en: `Warning: Missing searches data`,
-            fr: `Attention : Données de fouilles manquantes`,
-            de: `Warnung: Fehlende Ausgrabungsdaten`,
-            es: `Advertencia: Faltan datos de excavación`,
+            en: 'Warning: Missing searches data',
+            fr: 'Attention : Données de fouilles manquantes',
+            de: 'Warnung: Fehlende Ausgrabungsdaten',
+            es: 'Advertencia: Faltan datos de excavación',
         },
         warn_missing_logs_help: {
-            en: `This message appears because you checked the option <strong>"Save successful searches"</strong> and not all of the registry entries in your cell are displayed in the page.<br /><br />You must click the <strong>"Show All Entries"</strong> button at the bottom of the registry for the information to be complete.`,
-            fr: `Ce message s'affiche parce que vous avez coché l'option <strong>"Enregistrer les fouilles réussies"</strong> et que toutes les entrées du registre de votre case ne sont pas affichées dans la page.<br /><br />Vous devez cliquer sur le bouton <strong>"Afficher toutes les entrées"</strong> en bas du registre pour que les informations soient complètes.`,
-            de: `Diese Meldung wird angezeigt, weil Sie die Option <strong>"Erfolgreiche Ausgrabungen speichern"</strong> aktiviert haben und nicht alle Registrierungseinträge in Ihrer Box auf der Seite angezeigt werden.<br /><br />Sie müssen auf die Schaltfläche <strong >"Alle Einträge anzeigen"</strong> unten in der Registrierung, damit die Informationen vollständig sind.`,
-            es: `Este mensaje aparece porque seleccionó la opción <strong>"Guardar excavaciones exitosas"</strong> y no todas las entradas de registro en su casilla se muestran en la página.<br /><br />Debe hacer clic en <strong >"Mostrar todas las entradas"</strong> en la parte inferior del registro para que la información esté completa.`,
+            en: 'This message appears because you checked the option <strong>"Save successful searches"</strong> and not all of the registry entries in your cell are displayed in the page.<br /><br />You must click the <strong>"Show All Entries"</strong> button at the bottom of the registry for the information to be complete.',
+            fr: 'Ce message s\'affiche parce que vous avez coché l\'option <strong>"Enregistrer les fouilles réussies"</strong> et que toutes les entrées du registre de votre case ne sont pas affichées dans la page.<br /><br />Vous devez cliquer sur le bouton <strong>"Afficher toutes les entrées"</strong> en bas du registre pour que les informations soient complètes.',
+            de: 'Diese Meldung wird angezeigt, weil Sie die Option <strong>"Erfolgreiche Ausgrabungen speichern"</strong> aktiviert haben und nicht alle Registrierungseinträge in Ihrer Box auf der Seite angezeigt werden.<br /><br />Sie müssen auf die Schaltfläche <strong >"Alle Einträge anzeigen"</strong> unten in der Registrierung, damit die Informationen vollständig sind.',
+            es: 'Este mensaje aparece porque seleccionó la opción <strong>"Guardar excavaciones exitosas"</strong> y no todas las entradas de registro en su casilla se muestran en la página.<br /><br />Debe hacer clic en <strong >"Mostrar todas las entradas"</strong> en la parte inferior del registro para que la información esté completa.',
         },
         estim_title: {
-            en: `Today's attack`,
-            fr: `Attaque du jour`,
-            de: `Heutiger Angriff`,
-            es: `Ataque del día`,
+            en: 'Today\'s attack',
+            fr: 'Attaque du jour',
+            de: 'Heutiger Angriff',
+            es: 'Ataque del día',
         },
         planif_title: {
-            en: `Tomorrow's attack`,
-            fr: `Attaque du lendemain`,
-            de: `Morgige Abschätzung`,
-            es: `Ataque de la noche siguiente`,
+            en: 'Tomorrow\'s attack',
+            fr: 'Attaque du lendemain',
+            de: 'Morgige Abschätzung',
+            es: 'Ataque de la noche siguiente',
         },
         copy_forum: {
-            en: `Copy to forum format`,
-            fr: `Copier au format forum`,
-            de: `In Forumformat kopieren`,
-            es: `Copiar al formato del foro`
+            en: 'Copy to forum format',
+            fr: 'Copier au format forum',
+            de: 'In Forumformat kopieren',
+            es: 'Copiar al formato del foro'
         },
         copy_forum_watchtower_tooltip: {
-            en: `Make sure you save before copying`,
-            fr: `Assurez-vous d'avoir enregistré avant de copier`,
-            de: `Stellen Sie sicher, dass Sie vor dem Kopieren speichern`,
-            es: `Asegúrate de guardar antes de copiar`
+            en: 'Make sure you save before copying',
+            fr: 'Assurez-vous d\'avoir enregistré avant de copier',
+            de: 'Stellen Sie sicher, dass Sie vor dem Kopieren speichern',
+            es: 'Asegúrate de guardar antes de copiar'
         },
         digs_state_header: {
-            en: `Digs state`,
-            fr: `État des fouilles`,
-            de: `Stand der Ausgrabungen`,
-            es: `Estado de las excavaciones`
+            en: 'Digs state',
+            fr: 'État des fouilles',
+            de: 'Stand der Ausgrabungen',
+            es: 'Estado de las excavaciones'
         },
         ruin_state_header: {
-            en: `Ruin`,
-            fr: `Bâtiment`,
-            de: `Ruine`,
-            es: `Ruina`
+            en: 'Ruin',
+            fr: 'Bâtiment',
+            de: 'Ruine',
+            es: 'Ruina'
         },
         digs_average: {
-            en: `Average remaining digs`,
-            fr: `Fouilles moyennes restantes`,
-            de: `Verbleibende mittlere Ausgrabungen`,
-            es: `Restos de excavaciones medianas`
+            en: 'Average remaining digs',
+            fr: 'Fouilles moyennes restantes',
+            de: 'Verbleibende mittlere Ausgrabungen',
+            es: 'Restos de excavaciones medianas'
         },
         digs_max: {
-            en: `Maximum remaining digs`,
-            fr: `Fouilles maximum restantes`,
-            de: `Maximal verbleibende Ausgrabungen`,
-            es: `Máximas excavaciones restantes`
+            en: 'Maximum remaining digs',
+            fr: 'Fouilles maximum restantes',
+            de: 'Maximal verbleibende Ausgrabungen',
+            es: 'Máximas excavaciones restantes'
         },
         check_all: {
-            en: `Check all`,
-            fr: `Tout cocher`,
-            de: `Alle überprüfen`,
-            es: `Comprobar todo`
+            en: 'Check all',
+            fr: 'Tout cocher',
+            de: 'Alle überprüfen',
+            es: 'Comprobar todo'
         },
         can_be_dumped: {
-            en: `Can be dumped`,
-            fr: `Peut être jeté`,
-            de: `Kann weggeworfen werden`,
-            es: `Se puede tirar`,
+            en: 'Can be dumped',
+            fr: 'Peut être jeté',
+            de: 'Kann weggeworfen werden',
+            es: 'Se puede tirar',
         },
         can_be_recovered: {
-            en: `Can be recovered`,
-            fr: `Peut être récupéré`,
-            de: `Kann wiederhergestellt werden`,
-            es: `Se puede recuperar`,
+            en: 'Can be recovered',
+            fr: 'Peut être récupéré',
+            de: 'Kann wiederhergestellt werden',
+            es: 'Se puede recuperar',
         },
         calculated_attack: {
-            en: `Calculated`,
-            fr: `Calculée`,
-            de: `Berechnet`,
-            es: `Calculado`
+            en: 'Calculated',
+            fr: 'Calculée',
+            de: 'Berechnet',
+            es: 'Calculado'
         },
         external_profiles: {
-            en: `External profiles`,
-            fr: `Profils externes`,
-            de: `Externe Profile`,
-            es: `Perfiles externos`,
+            en: 'External profiles',
+            fr: 'Profils externes',
+            de: 'Externe Profile',
+            es: 'Perfiles externos',
         },
         external_links: {
-            en: `External links`,
-            fr: `Liens externes`,
-            de: `Externe Links`,
-            es: `Enlaces externos`,
+            en: 'External links',
+            fr: 'Liens externes',
+            de: 'Externe Links',
+            es: 'Enlaces externos',
         },
         filter_search_name: {
-            en: `Search a citizen`,
-            fr: `Rechercher un citoyen`,
-            de: `Bürger suchen`,
-            es: `Buscar ciudadano`
+            en: 'Search a citizen',
+            fr: 'Rechercher un citoyen',
+            de: 'Bürger suchen',
+            es: 'Buscar ciudadano'
         },
         filter_all: {
-            en: `All`,
-            fr: `Tous`,
-            de: `Alle`,
-            es: `Todos`
+            en: 'All',
+            fr: 'Tous',
+            de: 'Alle',
+            es: 'Todos'
         },
         filter_online_label: {
-            en: `Online status`,
-            fr: `Connexion`,
-            de: `Status`,
-            es: `Estado`
+            en: 'Online status',
+            fr: 'Connexion',
+            de: 'Status',
+            es: 'Estado'
         },
         filter_online_online: {
-            en: `Online`,
-            fr: `En ligne`,
-            de: `Online`,
-            es: `En línea`
+            en: 'Online',
+            fr: 'En ligne',
+            de: 'Online',
+            es: 'En línea'
         },
         filter_online_offline: {
-            en: `Offline`,
-            fr: `Hors ligne`,
-            de: `Offline`,
-            es: `Sin conexión`
+            en: 'Offline',
+            fr: 'Hors ligne',
+            de: 'Offline',
+            es: 'Sin conexión'
         },
         filter_location_label: {
-            en: `Location`,
-            fr: `Emplacement`,
-            de: `Ort`,
-            es: `Ubicación`
+            en: 'Location',
+            fr: 'Emplacement',
+            de: 'Ort',
+            es: 'Ubicación'
         },
         filter_location_outside: {
-            en: `Outside`,
-            fr: `Dehors`,
-            de: `Draußen`,
-            es: `Fuera`
+            en: 'Outside',
+            fr: 'Dehors',
+            de: 'Draußen',
+            es: 'Fuera'
         },
         filter_location_inside: {
-            en: `In town`,
-            fr: `En ville`,
-            de: `In der Stadt`,
-            es: `En la ciudad`
+            en: 'In town',
+            fr: 'En ville',
+            de: 'In der Stadt',
+            es: 'En la ciudad'
         },
         filter_house_level_label: {
-            en: `Habitation`,
-            fr: `Habitation`,
-            de: `Haus`,
-            es: `Casa`
+            en: 'Habitation',
+            fr: 'Habitation',
+            de: 'Haus',
+            es: 'Casa'
         },
         filter_stars_label: {
-            en: `Activity`,
-            fr: `Activité`,
-            de: `Aktivität`,
-            es: `Actividad`
+            en: 'Activity',
+            fr: 'Activité',
+            de: 'Aktivität',
+            es: 'Actividad'
         },
         filter_chest_items_label: {
-            en: `Chest`,
-            fr: `Coffre`,
-            de: `Truhe`,
-            es: `Cofre`
+            en: 'Chest',
+            fr: 'Coffre',
+            de: 'Truhe',
+            es: 'Cofre'
         },
         filter_selected_count: {
             en: 'selected',
@@ -1955,68 +2020,236 @@
             fr: 'Calculateur de camping',
             de: 'Campingrechner',
             es: 'Calculadora de camping'
+        },
+        forum_styles_configure: {
+            en: 'Configure',
+            fr: 'Configurer',
+            de: 'Konfigurieren',
+            es: 'Configurar'
+        },
+        forum_styles_title: {
+            en: 'Style of forum thread titles',
+            fr: 'Style des noms de sujets du forum',
+            de: 'Stil der Forenthemen-Titel',
+            es: 'Estilo de los títulos de los temas del foro'
+        },
+        forum_styles_rule: {
+            en: 'Rule',
+            fr: 'Règle',
+            de: 'Regel',
+            es: 'Regla'
+        },
+        forum_styles_add_rule: {
+            en: 'Add a rule',
+            fr: 'Ajouter une règle',
+            de: 'Regel hinzufügen',
+            es: 'Añadir una regla'
+        },
+        forum_styles_reset: {
+            en: 'Restore default rules',
+            fr: 'Restaurer les règles par défaut',
+            de: 'Standardregeln wiederherstellen',
+            es: 'Restaurar las reglas por defecto'
+        },
+        forum_styles_save: {
+            en: 'Save',
+            fr: 'Enregistrer',
+            de: 'Speichern',
+            es: 'Guardar'
+        },
+        forum_styles_cancel: {
+            en: 'Cancel',
+            fr: 'Annuler',
+            de: 'Abbrechen',
+            es: 'Cancelar'
+        },
+        forum_styles_tags: {
+            en: 'Tags',
+            fr: 'Tags',
+            de: 'Tags',
+            es: 'Etiquetas'
+        },
+        forum_styles_words: {
+            en: 'Words in the title',
+            fr: 'Mots du titre',
+            de: 'Wörter im Titel',
+            es: 'Palabras del título'
+        },
+        forum_styles_words_placeholder: {
+            en: 'words separated by commas',
+            fr: 'mots séparés par des virgules',
+            de: 'durch Kommas getrennte Wörter',
+            es: 'palabras separadas por comas'
+        },
+        forum_styles_no_criteria: {
+            en: 'Without any criterion, this rule applies to no thread.',
+            fr: 'Sans aucun critère, cette règle ne s\'applique à aucun sujet.',
+            de: 'Ohne Kriterium gilt diese Regel für kein Thema.',
+            es: 'Sin ningún criterio, esta regla no se aplica a ningún tema.'
+        },
+        forum_styles_text_color: {
+            en: 'Text color',
+            fr: 'Couleur du texte',
+            de: 'Textfarbe',
+            es: 'Color del texto'
+        },
+        forum_styles_background: {
+            en: 'Background',
+            fr: 'Fond',
+            de: 'Hintergrund',
+            es: 'Fondo'
+        },
+        forum_styles_border: {
+            en: 'Left border',
+            fr: 'Bordure gauche',
+            de: 'Linker Rand',
+            es: 'Borde izquierdo'
+        },
+        forum_styles_size: {
+            en: 'Size',
+            fr: 'Taille',
+            de: 'Größe',
+            es: 'Tamaño'
+        },
+        forum_styles_opacity: {
+            en: 'Opacity',
+            fr: 'Opacité',
+            de: 'Deckkraft',
+            es: 'Opacidad'
+        },
+        forum_styles_prefix: {
+            en: 'Prefix',
+            fr: 'Préfixe',
+            de: 'Präfix',
+            es: 'Prefijo'
+        },
+        forum_styles_preview_text: {
+            en: 'Thread title',
+            fr: 'Titre de sujet',
+            de: 'Themen-Titel',
+            es: 'Título del tema'
+        },
+        forum_styles_move_up: {
+            en: 'Move up',
+            fr: 'Monter',
+            de: 'Nach oben',
+            es: 'Subir'
+        },
+        forum_styles_move_down: {
+            en: 'Move down',
+            fr: 'Descendre',
+            de: 'Nach unten',
+            es: 'Bajar'
+        },
+        forum_styles_delete: {
+            en: 'Delete',
+            fr: 'Supprimer',
+            de: 'Löschen',
+            es: 'Eliminar'
+        },
+        forum_styles_export: {
+            en: 'Export',
+            fr: 'Exporter',
+            de: 'Exportieren',
+            es: 'Exportar'
+        },
+        forum_styles_export_done: {
+            en: 'The configuration has been copied : you can now paste it to another player.',
+            fr: 'La configuration a été copiée : vous pouvez la coller à un autre joueur.',
+            de: 'Die Konfiguration wurde kopiert: Sie können sie einem anderen Spieler einfügen.',
+            es: 'La configuración ha sido copiada: puede pegarla a otro jugador.'
+        },
+        forum_styles_import: {
+            en: 'Import',
+            fr: 'Importer',
+            de: 'Importieren',
+            es: 'Importar'
+        },
+        forum_styles_import_confirm: {
+            en: 'Replace my rules',
+            fr: 'Remplacer mes règles',
+            de: 'Meine Regeln ersetzen',
+            es: 'Reemplazar mis reglas'
+        },
+        forum_styles_import_placeholder: {
+            en: 'Paste here the configuration exported by another player',
+            fr: 'Collez ici la configuration exportée par un autre joueur',
+            de: 'Fügen Sie hier die von einem anderen Spieler exportierte Konfiguration ein',
+            es: 'Pegue aquí la configuración exportada por otro jugador'
+        },
+        forum_styles_import_error: {
+            en: 'This configuration cannot be read. Paste the exported text as is, without altering it.',
+            fr: 'Cette configuration est illisible. Collez le texte exporté tel quel, sans le modifier.',
+            de: 'Diese Konfiguration ist unlesbar. Fügen Sie den exportierten Text unverändert ein.',
+            es: 'Esta configuración es ilegible. Pegue el texto exportado tal cual, sin modificarlo.'
+        },
+        forum_styles_empty: {
+            en: 'No rule yet : add one to style the thread titles.',
+            fr: 'Aucune règle : ajoutez-en une pour styler les noms de sujets.',
+            de: 'Keine Regel: Fügen Sie eine hinzu, um die Themen-Titel zu gestalten.',
+            es: 'Ninguna regla: añada una para dar estilo a los títulos de los temas.'
         }
     };
     const status_texts = {
         head_wounded: {
-            en: `Alters messages on the Town Forum`,
-            fr: `Déforme les messages sur le Forum Ville`,
-            de: `Verändert Nachrichten im Stadtforum`,
-            es: `Deforma los mensajes en el Foro del Pueblo`,
+            en: 'Alters messages on the Town Forum',
+            fr: 'Déforme les messages sur le Forum Ville',
+            de: 'Verändert Nachrichten im Stadtforum',
+            es: 'Deforma los mensajes en el Foro del Pueblo',
         },
         hand_wounded: {
-            en: `Prevents the use of certain items`,
-            fr: `Empêche l'utilisation de certains objets`,
-            de: `Verhindert die Nutzung bestimmter Gegenstände`,
-            es: `Impide el uso de ciertos objetos`,
+            en: 'Prevents the use of certain items',
+            fr: 'Empêche l\'utilisation de certains objets',
+            de: 'Verhindert die Nutzung bestimmter Gegenstände',
+            es: 'Impide el uso de ciertos objetos',
         },
         arm_wounded: {
-            en: `Prevents working on projects or handling the gate`,
-            fr: `Empêche de travailler aux chantiers ou de manipuler la porte`,
-            de: `Verhindert Arbeiten an Projekten oder das Bedienen des Tors`,
-            es: `Impide trabajar en proyectos o manipular la puerta`,
+            en: 'Prevents working on projects or handling the gate',
+            fr: 'Empêche de travailler aux chantiers ou de manipuler la porte',
+            de: 'Verhindert Arbeiten an Projekten oder das Bedienen des Tors',
+            es: 'Impide trabajar en proyectos o manipular la puerta',
         },
         leg_wounded: {
-            en: `20% chance to prevent movement in the desert while consuming the AP`,
-            fr: `20% de chances d'empêcher un déplacement dans le désert tout en consommant le PA`,
-            de: `20% Chance, Bewegung in der Wüste zu verhindern, während AP verbraucht werden`,
-            es: `20% de probabilidad de impedir el movimiento en el desierto mientras se consume el PA`,
+            en: '20% chance to prevent movement in the desert while consuming the AP',
+            fr: '20% de chances d\'empêcher un déplacement dans le désert tout en consommant le PA',
+            de: '20% Chance, Bewegung in der Wüste zu verhindern, während AP verbraucht werden',
+            es: '20% de probabilidad de impedir el movimiento en el desierto mientras se consume el PA',
         },
         zombies_killed: {
-            en: `Zombies killed while on watch`,
-            fr: `Zombies tués en veille`,
-            de: `Zombies, die während der Wache getötet wurden`,
-            es: `Zombis eliminados mientras estás de guardia`,
+            en: 'Zombies killed while on watch',
+            fr: 'Zombies tués en veille',
+            de: 'Zombies, die während der Wache getötet wurden',
+            es: 'Zombis eliminados mientras estás de guardia',
         },
         watch_survival_chances: {
-            en: `Survival chances while on watch`,
-            fr: `Chances de survie en veille`,
-            de: `Überlebenschancen während der Wache`,
-            es: `Probabilidades de supervivencia mientras estás de guardia`,
+            en: 'Survival chances while on watch',
+            fr: 'Chances de survie en veille',
+            de: 'Überlebenschancen während der Wache',
+            es: 'Probabilidades de supervivencia mientras estás de guardia',
         },
         success_digs_changes: {
-            en: `Success chances for digging`,
-            fr: `Chances de réussite des fouilles`,
-            de: `Erfolgsaussichten der Ausgrabungen`,
-            es: `Probabilidades de éxito de las excavaciones`,
+            en: 'Success chances for digging',
+            fr: 'Chances de réussite des fouilles',
+            de: 'Erfolgsaussichten der Ausgrabungen',
+            es: 'Probabilidades de éxito de las excavaciones',
         },
         terror: {
-            en: `Chances of being terrorized in case of an overflow`,
-            fr: `Chances d'être terrorisé en cas de débordement`,
-            de: `Wahrscheinlichkeit, im Falle eines Überlaufs terrorisiert zu werden`,
-            es: `Posibilidades de ser aterrorizado en caso de desbordamiento`,
+            en: 'Chances of being terrorized in case of an overflow',
+            fr: 'Chances d\'être terrorisé en cas de débordement',
+            de: 'Wahrscheinlichkeit, im Falle eines Überlaufs terrorisiert zu werden',
+            es: 'Posibilidades de ser aterrorizado en caso de desbordamiento',
         },
         prevent_infection: {
-            en: `Chances of not becoming infected following an injury`,
-            fr: `Chances de ne pas être infecté des suites d'une blessure`,
-            de: `Chancen, sich nach einer Verletzung nicht zu infizieren`,
-            es: `Probabilidades de no infectarse tras una lesión`,
+            en: 'Chances of not becoming infected following an injury',
+            fr: 'Chances de ne pas être infecté des suites d\'une blessure',
+            de: 'Chancen, sich nach einer Verletzung nicht zu infizieren',
+            es: 'Probabilidades de no infectarse tras una lesión',
         },
         fatal_infection: {
-            en: `Chances of dying from an infection`,
-            fr: `Chances de mourir d'une infection`,
-            de: `Sterblichkeitsrisiko durch eine Infektion`,
-            es: `Probabilidades de morir por una infección`,
+            en: 'Chances of dying from an infection',
+            fr: 'Chances de mourir d\'une infection',
+            de: 'Sterblichkeitsrisiko durch eine Infektion',
+            es: 'Probabilidades de morir por una infección',
         }
     };
     const jobs = [
@@ -2024,10 +2257,10 @@
             id: 'citizen',
             img: 'basic',
             label: {
-                de: `Einwohner`,
-                en: `Citizen`,
-                es: `Resident`,
-                fr: `Habitant`
+                de: 'Einwohner',
+                en: 'Citizen',
+                es: 'Resident',
+                fr: 'Habitant'
             },
             camping_factor: 0.9
         },
@@ -2035,10 +2268,10 @@
             id: 'scavenger',
             img: 'dig',
             label: {
-                de: `Buddler`,
-                en: `Scavenger`,
-                es: `Excavador`,
-                fr: `Fouineur`
+                de: 'Buddler',
+                en: 'Scavenger',
+                es: 'Excavador',
+                fr: 'Fouineur'
             },
             camping_factor: 0.9
         },
@@ -2046,10 +2279,10 @@
             id: 'scout',
             img: 'vest',
             label: {
-                de: `Aufklärer`,
-                en: `Scout`,
-                es: `Explorador`,
-                fr: `Éclaireur`
+                de: 'Aufklärer',
+                en: 'Scout',
+                es: 'Explorador',
+                fr: 'Éclaireur'
             },
             camping_factor: 0.9
         },
@@ -2057,10 +2290,10 @@
             id: 'guardian',
             img: 'shield',
             label: {
-                de: `Wächter`,
-                en: `Guardian`,
-                es: `Guardián`,
-                fr: `Gardien`
+                de: 'Wächter',
+                en: 'Guardian',
+                es: 'Guardián',
+                fr: 'Gardien'
             },
             camping_factor: 0.9
         },
@@ -2068,10 +2301,10 @@
             id: 'survivalist',
             img: 'book',
             label: {
-                de: `Einsiedler`,
-                en: `Survivalist`,
-                es: `Ermitaño`,
-                fr: `Ermite`
+                de: 'Einsiedler',
+                en: 'Survivalist',
+                es: 'Ermitaño',
+                fr: 'Ermite'
             },
             camping_factor: 1
         },
@@ -2079,10 +2312,10 @@
             id: 'tamer',
             img: 'tamer',
             label: {
-                de: `Dompteur`,
-                en: `Tamer`,
-                es: `Domador`,
-                fr: `Apprivoiseur`
+                de: 'Dompteur',
+                en: 'Tamer',
+                es: 'Domador',
+                fr: 'Apprivoiseur'
             },
             camping_factor: 0.9
         },
@@ -2090,75 +2323,75 @@
             id: 'technician',
             img: 'tech',
             label: {
-                de: `Techniker`,
-                en: `Technician`,
-                es: `Técnico`,
-                fr: `Technicien`
+                de: 'Techniker',
+                en: 'Technician',
+                es: 'Técnico',
+                fr: 'Technicien'
             },
             camping_factor: 0.9
         },
     ];
     const status_list = [
-        { id: "clean", img: "status/status_clean.gif", pdc: 1, terror: -3 }, // Jamais drogué
-        { id: "hasdrunk", img: "status/status_hasdrunk.gif" }, // A bu
-        { id: "haseaten", img: "status/status_haseaten.gif" }, // A mangé
-        { id: "camper", img: "status/status_camper.gif", searches: '+10%' }, // A campé
-        { id: "immune", img: "status/status_immune.gif", watch_death: -0.01 }, // Immunisé
-        { id: "hsurvive", img: "status/status_hsurvive.gif" }, // VLM niveau 1
-        { id: "hsurvive2", img: "status/status_hsurvive2.gif" }, // VLM niveau 2
-        { id: "hsurvive3", img: "status/status_hsurvive3.gif" }, // VLM niveau 3
-        { id: "tired", img: "status/status_tired.gif" }, // Fatigué
-        { id: "terror", img: "status/status_terror.gif", watch_def: -30, watch_death: 0.05 }, // Terrorisé
-        { id: "thirst1", img: "status/status_thirst1.gif", watch_def: -5 }, // Soif
-        { id: "thirst2", img: "status/status_thirst2.gif", watch_def: -10, wath_death: 0.03 }, // Deshy
-        { id: "drugged", img: "status/status_drugged.gif", watch_def: 10 }, // Drogué
-        { id: "addict", img: "status/status_addict.gif", watch_def: 10, watch_death: 0.06 }, // Dépendant
-        { id: "infection", img: "status/status_infection.gif", watch_def: -15, watch_death: 0.1 }, // Infecté
-        { id: "drunk", img: "status/status_drunk.gif", watch_def: 15, watch_death: -0.02, searches: '-20%' }, // Ivre
-        { id: "hungover", img: "status/status_hungover.gif", watch_def: -15, watch_death: 0.06 }, // Gueule de bois
+        { id: 'clean', img: 'status/status_clean.gif', pdc: 1, terror: -3 }, // Jamais drogué
+        { id: 'hasdrunk', img: 'status/status_hasdrunk.gif' }, // A bu
+        { id: 'haseaten', img: 'status/status_haseaten.gif' }, // A mangé
+        { id: 'camper', img: 'status/status_camper.gif', searches: '+10%' }, // A campé
+        { id: 'immune', img: 'status/status_immune.gif', watch_death: -0.01 }, // Immunisé
+        { id: 'hsurvive', img: 'status/status_hsurvive.gif' }, // VLM niveau 1
+        { id: 'hsurvive2', img: 'status/status_hsurvive2.gif' }, // VLM niveau 2
+        { id: 'hsurvive3', img: 'status/status_hsurvive3.gif' }, // VLM niveau 3
+        { id: 'tired', img: 'status/status_tired.gif' }, // Fatigué
+        { id: 'terror', img: 'status/status_terror.gif', watch_def: -30, watch_death: 0.05 }, // Terrorisé
+        { id: 'thirst1', img: 'status/status_thirst1.gif', watch_def: -5 }, // Soif
+        { id: 'thirst2', img: 'status/status_thirst2.gif', watch_def: -10, wath_death: 0.03 }, // Deshy
+        { id: 'drugged', img: 'status/status_drugged.gif', watch_def: 10 }, // Drogué
+        { id: 'addict', img: 'status/status_addict.gif', watch_def: 10, watch_death: 0.06 }, // Dépendant
+        { id: 'infection', img: 'status/status_infection.gif', watch_def: -15, watch_death: 0.1 }, // Infecté
+        { id: 'drunk', img: 'status/status_drunk.gif', watch_def: 15, watch_death: -0.02, searches: '-20%' }, // Ivre
+        { id: 'hungover', img: 'status/status_hungover.gif', watch_def: -15, watch_death: 0.06 }, // Gueule de bois
         {
-            id: "wound1",
-            img: "status/status_wound1.gif",
+            id: 'wound1',
+            img: 'status/status_wound1.gif',
             watch_def: -15,
             watch_death: 0.10,
             properties: ['wounded', 'head_wounded']
         }, // Blessure à la tête
         {
-            id: "wound2",
-            img: "status/status_wound2.gif",
+            id: 'wound2',
+            img: 'status/status_wound2.gif',
             watch_def: -15,
             watch_death: 0.10,
             properties: ['wounded', 'hand_wounded']
         }, // Blessure à la main
         {
-            id: "wound3",
-            img: "status/status_wound3.gif",
+            id: 'wound3',
+            img: 'status/status_wound3.gif',
             watch_def: -15,
             watch_death: 0.10,
             properties: ['wounded', 'arm_wounded']
         }, // Blessure au bras
         {
-            id: "wound4",
-            img: "status/status_wound4.gif",
+            id: 'wound4',
+            img: 'status/status_wound4.gif',
             watch_def: -15,
             watch_death: 0.10,
             properties: ['wounded', 'leg_wounded']
         }, // Blessure à la jambe
         {
-            id: "wound5",
-            img: "status/status_wound5.gif",
+            id: 'wound5',
+            img: 'status/status_wound5.gif',
             watch_def: -15,
             watch_death: 0.10,
             properties: ['wounded'],
             searches: '/2'
         }, // Blessure à l'oeil
-        { id: "wound6", img: "status/status_wound6.gif", watch_def: -15, watch_death: 0.10, properties: ['wounded'] }, // Blessure au pied
-        { id: "healed", img: "status/status_healed.gif", watch_def: -15, watch_death: 0.05 }, // Convalescent
-        { id: "hydrated", img: "status/status_hydrated.gif", pdc: 1 }, // Hydraté
-        { id: "sober", img: "status/status_sober.gif", pdc: 1 }, // Sobre
+        { id: 'wound6', img: 'status/status_wound6.gif', watch_def: -15, watch_death: 0.10, properties: ['wounded'] }, // Blessure au pied
+        { id: 'healed', img: 'status/status_healed.gif', watch_def: -15, watch_death: 0.05 }, // Convalescent
+        { id: 'hydrated', img: 'status/status_hydrated.gif', pdc: 1 }, // Hydraté
+        { id: 'sober', img: 'status/status_sober.gif', pdc: 1 }, // Sobre
         {
-            id: "good_smell",
-            img: "status/status_good_smell.gif",
+            id: 'good_smell',
+            img: 'status/status_good_smell.gif',
             terror: -25,
             fatal_infection: -0.25,
             prevent_infection: 0.25
@@ -2166,22 +2399,22 @@
     ];
     const api_texts = {
         error: {
-            en: `An error occured. (Error : $error$)`,
-            fr: `Une erreur s'est produite. (Erreur : $error$)`,
-            de: `Fehler aufgetreten. (Fehler : $error$)`,
-            es: `Ha ocurrido un error. (Error: $error$)`
+            en: 'An error occured. (Error : $error$)',
+            fr: 'Une erreur s\'est produite. (Erreur : $error$)',
+            de: 'Fehler aufgetreten. (Fehler : $error$)',
+            es: 'Ha ocurrido un error. (Error: $error$)'
         },
         error_version: {
-            en: `Your script is not up to date (your version: $your_version$ / most recent version: $recent_version$). Update the script, then try again.`,
-            fr: `Votre script n'est pas à jour (votre version : $your_version$ / version la plus récente : $recent_version$). Mettez le script à jour, puis réessayez.`,
-            de: `Ihr Skript ist nicht aktuell (Ihre Version: $your_version$ / neueste Version: $recent_version$). Aktualisieren Sie das Skript und versuchen Sie es erneut.`,
-            es: `Tu script no está actualizado (tu versión: $your_version$ / versión más reciente: $recent_version$). Actualice el script y vuelva a intentarlo.`
+            en: 'Your script is not up to date (your version: $your_version$ / most recent version: $recent_version$). Update the script, then try again.',
+            fr: 'Votre script n\'est pas à jour (votre version : $your_version$ / version la plus récente : $recent_version$). Mettez le script à jour, puis réessayez.',
+            de: 'Ihr Skript ist nicht aktuell (Ihre Version: $your_version$ / neueste Version: $recent_version$). Aktualisieren Sie das Skript und versuchen Sie es erneut.',
+            es: 'Tu script no está actualizado (tu versión: $your_version$ / versión más reciente: $recent_version$). Actualice el script y vuelva a intentarlo.'
         },
         error_version_startup: {
-            en: `Your script is not up to date (your version: $your_version$ / most recent version: $recent_version$).<br /><br />Some features may not work.<br /><br />Update the script to no longer see this error.`,
-            fr: `Votre script n'est pas à jour (votre version : $your_version$ / version la plus récente : $recent_version$).<br /><br />Certaines fonctionnalités risquent de ne pas fonctionner.<br /><br />Mettez le script à jour pour ne plus voir cette erreur.`,
-            de: `Ihr Skript ist nicht aktuell (Ihre Version: $your_version$ / aktuellste Version: $recent_version$).<br /><br />Einige Funktionen funktionieren möglicherweise nicht.<br /><br />Aktualisieren Sie das Skript, damit dieser Fehler nicht mehr angezeigt wird.`,
-            es: `Tu script no está actualizado (su versión: $your_version$ / versión más reciente: $recent_version$).<br /><br />Es posible que algunas funciones no funcionen.<br /><br />Actualice el script para que ya no vea este error.`
+            en: 'Your script is not up to date (your version: $your_version$ / most recent version: $recent_version$).<br /><br />Some features may not work.<br /><br />Update the script to no longer see this error.',
+            fr: 'Votre script n\'est pas à jour (votre version : $your_version$ / version la plus récente : $recent_version$).<br /><br />Certaines fonctionnalités risquent de ne pas fonctionner.<br /><br />Mettez le script à jour pour ne plus voir cette erreur.',
+            de: 'Ihr Skript ist nicht aktuell (Ihre Version: $your_version$ / aktuellste Version: $recent_version$).<br /><br />Einige Funktionen funktionieren möglicherweise nicht.<br /><br />Aktualisieren Sie das Skript, damit dieser Fehler nicht mehr angezeigt wird.',
+            es: 'Tu script no está actualizado (su versión: $your_version$ / versión más reciente: $recent_version$).<br /><br />Es posible que algunas funciones no funcionen.<br /><br />Actualice el script para que ya no vea este error.'
         },
         update_script: {
             en: `To update your script, you can use your extension's update functionality or <a target="_blank" href="${getScriptInfo().updateURL}" style="text-decoration: underline;"><i >click on this link</i></a>, then refresh the game page.`,
@@ -2190,63 +2423,63 @@
             es: `Para actualizar su secuencia de comandos, puede utilizar la función de actualización de su extensión o <a target="_blank" href="${getScriptInfo().updateURL}" style="text-decoration: underline;"><i >haga clic en este enlace</ i></a>, luego actualiza la página del juego.`
         },
         error_discord: {
-            en: `If the error persists, please let us know on <a href="https://discord.gg/ZQH7ZPWcCm">Discord</a>.`,
-            fr: `Si l'erreur persiste, n'hésitez pas à nous la signaler sur <a href="https://discord.gg/ZQH7ZPWcCm">Discord</a>.`,
-            de: `Wenn der Fehler weiterhin besteht, teilen Sie uns dies bitte auf <a href="https://discord.gg/ZQH7ZPWcCm">Discord</a> mit.`,
-            es: `Si el error persiste, infórmanos en <a href="https://discord.gg/ZQH7ZPWcCm">Discord</a>.`
+            en: 'If the error persists, please let us know on <a href="https://discord.gg/ZQH7ZPWcCm">Discord</a>.',
+            fr: 'Si l\'erreur persiste, n\'hésitez pas à nous la signaler sur <a href="https://discord.gg/ZQH7ZPWcCm">Discord</a>.',
+            de: 'Wenn der Fehler weiterhin besteht, teilen Sie uns dies bitte auf <a href="https://discord.gg/ZQH7ZPWcCm">Discord</a> mit.',
+            es: 'Si el error persiste, infórmanos en <a href="https://discord.gg/ZQH7ZPWcCm">Discord</a>.'
         },
         update_wishlist_success: {
-            en: `Shopping list updated.`,
-            fr: `La liste de courses a bien été mise à jour.`,
-            de: `Einkaufsliste aktualisiert.`,
-            es: `La lista de deseos ha sido actualizada.`
+            en: 'Shopping list updated.',
+            fr: 'La liste de courses a bien été mise à jour.',
+            de: 'Einkaufsliste aktualisiert.',
+            es: 'La lista de deseos ha sido actualizada.'
         },
         add_to_wishlist_success: {
-            en: `Item has been added to the shopping list.`,
-            fr: `L'objet a bien été ajouté à la liste de courses.`,
-            de: `Gegenstand wurde der Einkaufsliste hinzugefügt.`,
-            es: `El objeto ha sido añadido a la lista de deseos.`
+            en: 'Item has been added to the shopping list.',
+            fr: 'L\'objet a bien été ajouté à la liste de courses.',
+            de: 'Gegenstand wurde der Einkaufsliste hinzugefügt.',
+            es: 'El objeto ha sido añadido a la lista de deseos.'
         },
     };
     const action_types = [
         {
-            id: `Recipe::ManualAnywhere`,
-            label: { en: `Citizen actions`, fr: `Actions du citoyen`, de: `Bürgeraktionen`, es: `Acciones del habitante` },
+            id: 'Recipe::ManualAnywhere',
+            label: { en: 'Citizen actions', fr: 'Actions du citoyen', de: 'Bürgeraktionen', es: 'Acciones del habitante' },
             ordering: 1
         },
         {
-            id: `Recipe::ManualInside`,
+            id: 'Recipe::ManualInside',
             label: {
-                en: `Citizen actions inside`,
-                fr: `Actions du citoyen à l'intérieur`,
-                de: `Bürgeraktionen im Inneren`,
-                es: `Acciones del habitante en el interior`
+                en: 'Citizen actions inside',
+                fr: 'Actions du citoyen à l\'intérieur',
+                de: 'Bürgeraktionen im Inneren',
+                es: 'Acciones del habitante en el interior'
             },
             ordering: 2
         },
         {
-            id: `Recipe::ManualOutside`,
+            id: 'Recipe::ManualOutside',
             label: {
-                en: `Citizen actions outside`,
-                fr: `Actions du citoyen à l'extérieur`,
-                de: `Bürgeraktionen draußen`,
-                es: `Acciones del habitanteen el exterior`
+                en: 'Citizen actions outside',
+                fr: 'Actions du citoyen à l\'extérieur',
+                de: 'Bürgeraktionen draußen',
+                es: 'Acciones del habitanteen el exterior'
             },
             ordering: 3
         },
-        { id: `Recipe::WorkshopType`, label: { en: `Workshop`, fr: `Atelier`, de: `Werkstatt`, es: `Taller` }, ordering: 0 },
+        { id: 'Recipe::WorkshopType', label: { en: 'Workshop', fr: 'Atelier', de: 'Werkstatt', es: 'Taller' }, ordering: 0 },
         {
-            id: `Recipe::WorkshopTypeShamanSpecific`,
-            label: { en: `Workshop - Shaman`, fr: `Atelier - Chaman`, de: `Werkstatt - Schamane`, es: `Taller - Chamán` },
+            id: 'Recipe::WorkshopTypeShamanSpecific',
+            label: { en: 'Workshop - Shaman', fr: 'Atelier - Chaman', de: 'Werkstatt - Schamane', es: 'Taller - Chamán' },
             ordering: 4
         },
         {
-            id: `Recipe::WorkshopTypeTechSpecific`,
+            id: 'Recipe::WorkshopTypeTechSpecific',
             label: {
-                en: `Technicians Workbench`,
-                fr: `Établi des Techniciens`,
-                de: `Techniker-Werkstatte`,
-                es: `Mesa de Trabajo de Técnicos`
+                en: 'Technicians Workbench',
+                fr: 'Établi des Techniciens',
+                de: 'Techniker-Werkstatte',
+                es: 'Mesa de Trabajo de Técnicos'
             },
             ordering: 5
         },
@@ -2255,114 +2488,142 @@
         {
             value: -1000,
             label: {
-                en: `Do not bring back`,
-                fr: `Ne pas ramener`,
-                de: `Nicht zurückbringen`,
-                es: `No traer de vuelta`
+                en: 'Do not bring back',
+                fr: 'Ne pas ramener',
+                de: 'Nicht zurückbringen',
+                es: 'No traer de vuelta'
             }
         },
         {
             value: -1,
             label: {
-                en: `Not defined`,
-                fr: `Non défini`,
-                de: `Nicht definiert`,
-                es: `Indefinida`
+                en: 'Not defined',
+                fr: 'Non défini',
+                de: 'Nicht definiert',
+                es: 'Indefinida'
             }
         },
         {
             value: 0,
             label: {
-                en: `Bank`,
-                fr: `Banque`,
-                de: `Bank`,
-                es: `Almacén`
+                en: 'Bank',
+                fr: 'Banque',
+                de: 'Bank',
+                es: 'Almacén'
             }
         },
         {
             value: 1,
             label: {
-                en: `Teleport area`,
-                fr: `Zone de rapatriement`,
-                de: `Rettungs-Bereich`,
-                es: `Zona de volver`
+                en: 'Teleport area',
+                fr: 'Zone de rapatriement',
+                de: 'Rettungs-Bereich',
+                es: 'Zona de volver'
             }
         }
     ];
     const wishlist_title = {
-        en: `Wishlist`,
-        fr: `Liste de courses`,
-        de: `Wunschzettel`,
-        es: `Lista de deseos`
+        en: 'Wishlist',
+        fr: 'Liste de courses',
+        de: 'Wunschzettel',
+        es: 'Lista de deseos'
     };
     const wishlist_headers = [
         {
             label: {
-                en: `Item`,
-                fr: `Objet`,
-                de: `Gegenstand`,
-                es: `Objeto`
+                en: 'Item',
+                fr: 'Objet',
+                de: 'Gegenstand',
+                es: 'Objeto'
             },
-            id: `label`
+            id: 'label'
         },
         {
             label: {
-                en: `Location`,
-                fr: `Dépôt`,
-                de: `Ort`,
-                es: `Depósito`
+                en: 'Location',
+                fr: 'Dépôt',
+                de: 'Ort',
+                es: 'Depósito'
             },
-            id: `depot`
+            id: 'depot'
         },
         {
             label: {
-                en: `In bank`,
-                fr: `En banque`,
-                de: `In der Bank`,
-                es: `En el almacén`
+                en: 'In bank',
+                fr: 'En banque',
+                de: 'In der Bank',
+                es: 'En el almacén'
             },
-            id: `bank_count`
+            id: 'bank_count'
         },
         {
             label: {
-                en: `In rucksack`,
-                fr: `En sacs`,
-                de: `In den Rucksäcken`,
-                es: `En las mochilas`
+                en: 'In rucksack',
+                fr: 'En sacs',
+                de: 'In den Rucksäcken',
+                es: 'En las mochilas'
             },
-            id: `bag_count`
+            id: 'bag_count'
         },
         {
             label: {
-                en: `Desired stock`,
-                fr: `Stock souhaité`,
-                de: `Gewünschter Bestand`,
-                es: `Cantidad deseada`
+                en: 'Desired stock',
+                fr: 'Stock souhaité',
+                de: 'Gewünschter Bestand',
+                es: 'Cantidad deseada'
             },
-            id: `bank_needed`
+            id: 'bank_needed'
         },
         {
             label: {
-                en: `Missing quantity`,
-                fr: `Quantité manquante`,
-                de: `Fehlende Menge`,
-                es: `Cantidad necesaria`
+                en: 'Missing quantity',
+                fr: 'Quantité manquante',
+                de: 'Fehlende Menge',
+                es: 'Cantidad necesaria'
             },
-            id: `diff`
+            id: 'diff'
         },
         {
-            label: { en: ``, fr: ``, es: ``, de: `` },
+            label: { en: '', fr: '', es: '', de: '' },
             id: 'delete'
         },
     ];
+
+    function isTouchScreen() {
+        return 'ontouchstart' in window || navigator.msMaxTouchPoints;
+    }
+    /** Calcule le nombre de zombies qui vont mourir par désespoir */
+    function calculateDespairDeaths(nb_killed_zombies) {
+        return Math.floor(Math.max(0, (nb_killed_zombies - 1) / 2));
+    }
+    function fixMhCompiledImg(img) {
+        if (!img)
+            return;
+        return img.replace(/\/(\w+)\.(\w+)\.(\w+)/, '/$1.$3');
+    }
+    function isValidToken() {
+        if (!state.token || !state.token.token || !state.token.token.accessToken)
+            return false;
+        const expiration_date = new Date(state.token.token.validTo).getTime();
+        const current_date = new Date().getTime();
+        return !shouldRefreshMe() && current_date < expiration_date;
+    }
+    function copyToClipboard(text) {
+        const input = document.createElement('textarea');
+        input.value = text;
+        document.body.appendChild(input);
+        input.select();
+        document.execCommand('copy');
+        input.remove();
+    }
 
     function normalizeString(str) {
         return str.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
     }
     /** Affiche une notification de réussite */
     function addSuccess(message) {
-        let notifications = document.getElementById('notifications');
-        let notification = document.createElement('div');
+        const notifications = document.getElementById('notifications');
+        const notification = document.createElement('div');
         notification.classList.add('notice', 'show');
         notification.innerText = `${getScriptInfo().name} : ${message}`;
         notifications?.appendChild(notification);
@@ -2375,10 +2636,10 @@
     }
     /** Affiche une notification de warning */
     function addWarning(message) {
-        let notifications = document.getElementById('notifications');
+        const notifications = document.getElementById('notifications');
         if (!notifications)
             return;
-        let notification = document.createElement('div');
+        const notification = document.createElement('div');
         notification.classList.add('warning', 'show');
         notification.innerText = `${getScriptInfo().name} : ${message}`;
         notifications?.appendChild(notification);
@@ -2394,10 +2655,10 @@
         if (typeof error === 'string' || (error.name !== 'AbortError' && error.name !== 'TypeError') && !state.is_error) {
             if (error?.status === 503)
                 return;
-            let notifications = document.getElementById('notifications');
-            let notification = document.createElement('div');
+            const notifications = document.getElementById('notifications');
+            const notification = document.createElement('div');
             notification.classList.add('error', 'show');
-            let error_text = `
+            const error_text = `
             <div style="vertical_align: middle"><img src="${mh_optimizer_icon}" style="width: 24px; margin-right: 0.5em;">${getScriptInfo().name}</div>
             <br />
         `;
@@ -2475,8 +2736,8 @@
                     .filter((item) => is_mh_beta ? true : +item.id !== 302);
                 new_items?.forEach((new_item) => {
                     new_item.recipes = new_item?.recipes?.map((recipe) => {
-                        let new_recipe = { ...recipe };
-                        let new_recipe_components = [];
+                        const new_recipe = { ...recipe };
+                        const new_recipe_components = [];
                         new_recipe.components.forEach((component) => {
                             for (let i = 0; i < component.count; i++) {
                                 new_recipe_components.push(component.item);
@@ -2624,55 +2885,76 @@
     }
     /** Met à jour les outils externes (BBH, GH et Fata) en fonction des paramètres sélectionnés */
 
-    function isTouchScreen() {
-        return 'ontouchstart' in window || navigator.msMaxTouchPoints;
-    }
-    /** Calcule le nombre de zombies qui vont mourir par désespoir */
-    function calculateDespairDeaths(nb_killed_zombies) {
-        return Math.floor(Math.max(0, (nb_killed_zombies - 1) / 2));
-    }
-    function fixMhCompiledImg(img) {
-        if (!img)
-            return;
-        return img.replace(/\/(\w+)\.(\w+)\.(\w+)/, '/$1.$3');
-    }
-    function isValidToken() {
-        if (!state.token || !state.token.token || !state.token.token.accessToken)
-            return false;
-        let expiration_date = new Date(state.token.token.validTo).getTime();
-        let current_date = new Date().getTime();
-        return !shouldRefreshMe() && current_date < expiration_date;
-    }
-    function copyToClipboard(text) {
-        let input = document.createElement('textarea');
-        input.value = text;
-        document.body.appendChild(input);
-        input.select();
-        document.execCommand('copy');
-        input.remove();
-    }
-
+    /**
+     * Authentification en cours, partagée par tous les appelants.
+     * Sans ce partage, chaque appel API dont le token paraît invalide (y compris via
+     * `shouldRefreshMe()`, cf. `isValidToken()`) lance sa propre authentification, et chacune
+     * recharge derrière elle objets, liste de courses, et sur le désert carte et ruines.
+     */
+    let in_flight_token_promise;
+    /** True si l'authentification en cours a été demandée en mode forcé */
+    let in_flight_is_forced = false;
+    /**
+     * Récupère le token, en réutilisant l'authentification déjà en cours s'il y en a une.
+     * @param {boolean} force   Ignore le token en cache et en redemande un nouveau
+     * @param {boolean} stop    Interdit la seconde tentative après récupération de la clé d'app
+     */
     function getToken(force, stop) {
+        if (in_flight_token_promise) {
+            /**
+             * Un appel forcé exige des données fraîches : s'il survient derrière un appel non
+             * forcé, qui a pu se contenter du token en cache, on l'enchaîne plutôt que de le
+             * confondre avec lui. Dans tous les autres cas, l'appel en cours fait déjà le travail.
+             */
+            if (!force || in_flight_is_forced)
+                return in_flight_token_promise;
+            return in_flight_token_promise.then(() => getToken(true, stop));
+        }
+        in_flight_is_forced = !!force;
+        in_flight_token_promise = requestToken(force, stop)
+            .finally(() => {
+            in_flight_token_promise = undefined;
+            in_flight_is_forced = false;
+        });
+        return in_flight_token_promise;
+    }
+    /**
+     * Termine l'authentification quoi qu'il arrive au chargement des données qui la suit.
+     * L'authentification étant partagée par tous les appelants, une promesse qui ne se
+     * résoudrait pas les bloquerait tous, définitivement. Les erreurs sont déjà signalées
+     * à l'utilisateur par chacun des chargements concernés.
+     */
+    function settleAfterTokenReceived(token_received, resolve) {
+        token_received
+            .catch((error) => console.error('MHO - chargement des données après authentification en échec', error))
+            .then(() => resolve());
+    }
+    /**
+     * Exécute réellement l'authentification. Appelée uniquement par `getToken` et par sa
+     * propre relance interne : celle-ci doit court-circuiter le partage ci-dessus, sinon elle
+     * attendrait l'authentification dont elle fait elle-même partie.
+     */
+    function requestToken(force, stop) {
         return new Promise((resolve, reject) => {
             if (state.external_app_id) {
-                let tokenReceived = async () => {
+                const tokenReceived = async () => {
                     console.log('MHO - I am...', state.mh_user);
                     if (state.mh_user !== '' && state.mh_user !== undefined && state.mh_user !== null) {
                         if (state.mh_user.townDetails?.townId) {
-                            let get_items_promise = getItems();
-                            let get_wishlist_promise = getWishlist();
+                            const get_items_promise = getItems();
+                            const get_wishlist_promise = getWishlist();
                             if (pageIsDesert()) {
-                                let get_ruins_promise = getRuins();
-                                let get_map_promise = getMap();
+                                const get_ruins_promise = getRuins();
+                                const get_map_promise = getMap();
                                 await Promise.all([get_items_promise, get_ruins_promise, get_wishlist_promise, get_map_promise]);
                             }
                             else {
-                                let get_wishlist_promise = getWishlist();
+                                const get_wishlist_promise = getWishlist();
                                 await Promise.all([get_items_promise, get_wishlist_promise]);
                             }
                         }
                         else {
-                            let get_items_promise = getItems();
+                            const get_items_promise = getItems();
                             await Promise.all([get_items_promise]);
                         }
                     }
@@ -2695,14 +2977,14 @@
                         }
                         setStorageItem(mh_user_key, state.mh_user);
                         setStorageItem(mho_token_key, state.token);
-                        tokenReceived().then(() => resolve());
+                        settleAfterTokenReceived(tokenReceived(), resolve);
                     })
                         .catch((error) => {
                         if (error.status === 400 && !stop) {
                             /** Si on a une erreur 400 ça peut être parce que la clé d'app n'est pas bonne : on tente de récupérer la clé d'app une seule et unique fois pour essayer de rendre ça transparent pour l'utilisateur */
                             state.external_app_id = undefined;
                             getApiKey().then(() => {
-                                getToken(false, true).then(() => {
+                                requestToken(false, true).then(() => {
                                     resolve();
                                 });
                             });
@@ -2715,7 +2997,7 @@
                 }
                 else {
                     state.mh_user = state.token.simpleMe;
-                    tokenReceived().then(() => resolve());
+                    settleAfterTokenReceived(tokenReceived(), resolve);
                 }
             }
             else {
@@ -2725,6 +3007,32 @@
     }
     /** Récupère les informations de la ville */
 
+    /** Tableau d'objets à partir duquel l'index ci-dessous a été construit */
+    let indexed_items_source;
+    /** Index chemin d'image → objet, évitant un parcours linéaire du référentiel à chaque résolution */
+    let items_by_img = new Map();
+    /**
+     * Retourne l'index des objets par chemin d'image, en le reconstruisant dès que le
+     * référentiel a été remplacé.
+     *
+     * `getItems()` produit un nouveau tableau à chaque appel, avec des compteurs de banque et
+     * de liste de courses rafraîchis : la comparaison de référence garantit que l'index suit,
+     * sans avoir à le notifier depuis les points de chargement. Les objets sont indexés par
+     * référence, donc toute modification faite sur place (compteurs, état cassé) reste visible.
+     */
+    function getItemsByImg() {
+        if (state.items === indexed_items_source)
+            return items_by_img;
+        indexed_items_source = state.items;
+        items_by_img = new Map();
+        state.items?.forEach((item) => {
+            /** `find` retenait la première occurrence : on conserve ce comportement si deux objets partagent une image */
+            if (!items_by_img.has(item.img)) {
+                items_by_img.set(item.img, item);
+            }
+        });
+        return items_by_img;
+    }
     function getTooltipItem(img, isStatus) {
         let hovered_item;
         let hovered_status;
@@ -2743,10 +3051,10 @@
         };
     }
     function getClickedItem(target) {
-        let item_icon = event.target.closest('span.item-icon') || event.target.previousElementSibling?.closest('span.item-icon') || event.target.previousElementSibling?.querySelector('span.item-icon');
+        const item_icon = event.target.closest('span.item-icon') || event.target.previousElementSibling?.closest('span.item-icon') || event.target.previousElementSibling?.querySelector('span.item-icon');
         if (item_icon) {
-            let hovered_item = getItemFromImg(item_icon.querySelector('img').src);
-            let broken = item_icon.parentElement.classList.contains('broken');
+            const hovered_item = getItemFromImg(item_icon.querySelector('img').src);
+            const broken = item_icon.parentElement.classList.contains('broken');
             return { item: hovered_item, broken: broken };
         }
     }
@@ -2764,7 +3072,7 @@
     function getItemFromImg(img_src) {
         if (img_src) {
             const img_path = getFixedImagePath(img_src);
-            return state.items?.find((item) => item.img === img_path);
+            return getItemsByImg().get(img_path);
         }
     }
     function getStatusFromImg(img_src) {
@@ -2895,10 +3203,10 @@
                 state.anti_abuse_controller.abort();
                 const fictive_item = {
                     label: {
-                        de: `Benutzerdefinierter Zähler`,
-                        en: `Custom counter`,
-                        es: `Contador personalizado`,
-                        fr: `Compteur personnalisé`,
+                        de: 'Benutzerdefinierter Zähler',
+                        en: 'Custom counter',
+                        es: 'Contador personalizado',
+                        fr: 'Compteur personnalisé',
                     },
                     img: 'icons/small_warning.gif'
                 };
@@ -2986,10 +3294,10 @@
                             return;
                         const well_item = {
                             label: {
-                                de: `Eine weitere Ration erhalten`,
-                                en: `Extra ration`,
-                                es: `Ración adicional`,
-                                fr: `Ration supplémentaire`,
+                                de: 'Eine weitere Ration erhalten',
+                                en: 'Extra ration',
+                                es: 'Ración adicional',
+                                fr: 'Ration supplémentaire',
                             },
                             img: 'log/well.gif'
                         };
@@ -3012,6 +3320,120 @@
             else {
                 state.anti_abuse_controller.abort();
             }
+        });
+    }
+
+    /** Sélecteur des images d'avatars susceptibles d'être animées */
+    const avatar_img_selector = 'div.avatar img';
+    /** Classe posée sur les canvas de gel, pour pouvoir les retrouver et les supprimer */
+    const frozen_canvas_class = 'mho-frozen-avatar';
+    /** Observer unique : évite d'en empiler un à chaque ré-initialisation des options */
+    let avatars_observer;
+    /** Permet de retirer d'un seul coup tous les listeners posés sur les images */
+    let listeners_controller;
+    /**
+     * Fige les avatars animés (WebP) en superposant à l'image un canvas contenant sa première frame,
+     * et masque ce canvas au survol pour laisser l'animation reprendre.
+     */
+    function freezeAvatarsAnimations() {
+        if (!state.mho_parameters?.freeze_avatars_animations) {
+            unfreezeAllAvatars();
+            return;
+        }
+        if (!listeners_controller) {
+            listeners_controller = new AbortController();
+        }
+        freezeAllAvatars();
+        /** L'observer n'est posé qu'une seule fois, il gère ensuite tous les avatars ajoutés dynamiquement */
+        if (avatars_observer)
+            return;
+        avatars_observer = new MutationObserver((mutations) => {
+            for (const mutation of mutations) {
+                for (const node of mutation.addedNodes) {
+                    if (!(node instanceof Element))
+                        continue;
+                    if (node instanceof HTMLImageElement) {
+                        if (node.closest('div.avatar')) {
+                            freezeImage(node);
+                        }
+                        continue;
+                    }
+                    node.querySelectorAll(avatar_img_selector).forEach(freezeImage);
+                }
+            }
+        });
+        avatars_observer.observe(document.body, { childList: true, subtree: true });
+    }
+    function freezeAllAvatars() {
+        document.querySelectorAll(avatar_img_selector).forEach(freezeImage);
+    }
+    function freezeImage(img) {
+        if (!isWebP(img) || img.dataset.mhoAnimFrozen)
+            return;
+        img.dataset.mhoAnimFrozen = 'true';
+        const signal = listeners_controller?.signal;
+        const applyFreeze = () => {
+            /** L'option a pu être décochée entre le chargement de l'image et son traitement */
+            if (!state.mho_parameters?.freeze_avatars_animations || signal?.aborted)
+                return;
+            const rect = img.getBoundingClientRect();
+            const display_width = rect.width || img.offsetWidth || img.naturalWidth || 40;
+            const display_height = rect.height || img.offsetHeight || img.naturalHeight || 40;
+            const canvas = document.createElement('canvas');
+            canvas.classList.add(frozen_canvas_class);
+            canvas.width = img.naturalWidth || display_width;
+            canvas.height = img.naturalHeight || display_height;
+            canvas.style.cssText = [
+                'position:absolute',
+                'left:0',
+                'top:0',
+                `width:${display_width}px`,
+                `height:${display_height}px`,
+                'margin:0',
+                'padding:0',
+                'pointer-events:none',
+            ].join(';');
+            const context = canvas.getContext('2d');
+            if (!context)
+                return;
+            if (window.getComputedStyle(img).getPropertyValue('position') === 'static') {
+                img.style.position = 'relative';
+                img.dataset.mhoAnimPositioned = 'true';
+            }
+            context.drawImage(img, 0, 0, canvas.width, canvas.height);
+            img.insertAdjacentElement('afterend', canvas);
+            img.addEventListener('mouseenter', () => {
+                canvas.style.visibility = 'hidden';
+            }, { signal });
+            img.addEventListener('mouseleave', () => {
+                context.clearRect(0, 0, canvas.width, canvas.height);
+                context.drawImage(img, 0, 0, canvas.width, canvas.height);
+                canvas.style.visibility = 'visible';
+            }, { signal });
+        };
+        if (img.complete && img.naturalWidth > 0) {
+            applyFreeze();
+        }
+        else {
+            img.addEventListener('load', applyFreeze, { once: true, signal });
+        }
+    }
+    function isWebP(img) {
+        return (img.getAttribute('src') || '').toLowerCase().includes('.webp');
+    }
+    /** Retire tout ce qui a été posé par l'option : canvas, listeners, observer et styles */
+    function unfreezeAllAvatars() {
+        avatars_observer?.disconnect();
+        avatars_observer = undefined;
+        listeners_controller?.abort();
+        listeners_controller = undefined;
+        document.querySelectorAll(`canvas.${frozen_canvas_class}`).forEach((canvas) => canvas.remove());
+        document.querySelectorAll('img[data-mho-anim-frozen]').forEach((img) => {
+            if (img.dataset.mhoAnimPositioned) {
+                img.style.position = '';
+                delete img.dataset.mhoAnimPositioned;
+            }
+            delete img.dataset.mhoAnimFrozen;
         });
     }
 
@@ -3064,7 +3486,7 @@
                 }
             })
                 .then((camping_result) => {
-                let result = document.querySelector('#camping-result');
+                const result = document.querySelector('#camping-result');
                 if (result) {
                     result.innerText = result ? `${getI18N(camping_result.label)} - ${camping_result.boundedProbability}% (${camping_result.boundedProbability}%)` : '';
                 }
@@ -3080,53 +3502,53 @@
     //////////////////////////////////
     // La liste des onglets du wiki //
     //////////////////////////////////
-    let tabs_list = {
+    const tabs_list = {
         wiki: [
             {
                 ordering: 0,
-                id: `items`,
+                id: 'items',
                 label: {
-                    en: `Items`,
-                    fr: `Objets`,
-                    de: `Gegenstände`,
-                    es: `Objetos`
+                    en: 'Items',
+                    fr: 'Objets',
+                    de: 'Gegenstände',
+                    es: 'Objetos'
                 },
-                icon: repo_img_hordes_url + `emotes/bag.gif`
+                icon: repo_img_hordes_url + 'emotes/bag.gif'
             },
             {
                 ordering: 1,
-                id: `recipes`,
+                id: 'recipes',
                 label: {
-                    en: `Recipes`,
-                    fr: `Recettes`,
-                    de: `Rezepte`,
-                    es: `Transformaciones`
+                    en: 'Recipes',
+                    fr: 'Recettes',
+                    de: 'Rezepte',
+                    es: 'Transformaciones'
                 },
-                icon: repo_img_hordes_url + `building/small_refine.gif`
+                icon: repo_img_hordes_url + 'building/small_refine.gif'
             },
             {
                 ordering: 2,
-                id: `ruins`,
+                id: 'ruins',
                 label: {
-                    en: `Ruins`,
-                    fr: `Bâtiments`,
-                    de: `Ruinen`,
-                    es: `Ruinas`
+                    en: 'Ruins',
+                    fr: 'Bâtiments',
+                    de: 'Ruinen',
+                    es: 'Ruinas'
                 },
-                icon: repo_img_hordes_url + `icons/home.gif`,
+                icon: repo_img_hordes_url + 'icons/home.gif',
             }
         ],
         tools: [
             {
                 ordering: 0,
-                id: `bank`,
+                id: 'bank',
                 label: {
-                    en: `Bank`,
-                    fr: `Banque`,
-                    de: `Bank`,
-                    es: `Almacén`
+                    en: 'Bank',
+                    fr: 'Banque',
+                    de: 'Bank',
+                    es: 'Almacén'
                 },
-                icon: repo_img_hordes_url + `icons/home.gif`,
+                icon: repo_img_hordes_url + 'icons/home.gif',
                 needs_town: true,
             },
             // {
@@ -3143,14 +3565,14 @@
             // },
             {
                 ordering: 2,
-                id: `camping`,
+                id: 'camping',
                 label: {
-                    en: `Camping`,
-                    fr: `Camping`,
-                    de: `Camping`,
-                    es: `Camping`
+                    en: 'Camping',
+                    fr: 'Camping',
+                    de: 'Camping',
+                    es: 'Camping'
                 },
-                icon: repo_img_hordes_url + `status/status_camper.gif`,
+                icon: repo_img_hordes_url + 'status/status_camper.gif',
                 needs_town: false,
             }
         ]
@@ -3208,10 +3630,10 @@
                     }
                 })
                     .then((response) => {
-                    let new_recipes = response
+                    const new_recipes = response
                         .map((recipe) => {
-                        let new_recipe = { ...recipe };
-                        let new_recipe_components = [];
+                        const new_recipe = { ...recipe };
+                        const new_recipe_components = [];
                         new_recipe.components.forEach((component) => {
                             for (let i = 0; i < component.count; i++) {
                                 new_recipe_components.push(component.item);
@@ -3253,15 +3675,15 @@
     function displayRecipes() {
         getRecipes().then((recipes) => {
             if (recipes) {
-                let tab_content = document.getElementById(mh_optimizer_window_id + '-tab-content');
-                let recipes_list = document.createElement('ul');
+                const tab_content = document.getElementById(mh_optimizer_window_id + '-tab-content');
+                const recipes_list = document.createElement('ul');
                 recipes_list.id = 'recipes-list';
                 tab_content.appendChild(recipes_list);
                 recipes.forEach((recipe, index) => {
                     if (index === 0 || recipes[index - 1].type.id !== recipe.type.id) {
-                        let category_text = document.createElement('span');
+                        const category_text = document.createElement('span');
                         category_text.innerText = getI18N(recipe.type.label);
-                        let category_container = document.createElement('div');
+                        const category_container = document.createElement('div');
                         category_container.classList.add('mho-category');
                         category_container.classList.add('mho-header');
                         category_container.appendChild(category_text);
@@ -3274,11 +3696,11 @@
     }
     /** Affiche une recette */
     function getRecipeElement(recipe) {
-        let recipe_container = document.createElement('tr');
+        const recipe_container = document.createElement('tr');
         recipe_container.classList.add('recipe');
-        let recipe_type_container = document.createElement('td');
+        const recipe_type_container = document.createElement('td');
         recipe_container.appendChild(recipe_type_container);
-        let recipe_type_img = document.createElement('img');
+        const recipe_type_img = document.createElement('img');
         recipe_type_img.title = getI18N(recipe.type.label);
         recipe_type_img.setAttribute('style', 'margin-left: 0.5em; margin-right: 0.5em');
         switch (recipe.type.id ?? recipe.type) {
@@ -3297,16 +3719,16 @@
                 break;
         }
         recipe_type_container.appendChild(recipe_type_img);
-        let compos_cell = document.createElement('td');
+        const compos_cell = document.createElement('td');
         compos_cell.classList.add('items', 'components');
-        let compos_container = document.createElement('div');
+        const compos_container = document.createElement('div');
         recipe.components.forEach((compo) => {
-            let compo_container = document.createElement('span');
+            const compo_container = document.createElement('span');
             compo_container.classList.add('item');
             if (compo.id === recipe.provoking?.id) {
                 compo_container.classList.add('mho-recipe-provoking');
             }
-            let component_img = document.createElement('img');
+            const component_img = document.createElement('img');
             component_img.src = repo_img_hordes_url + fixMhCompiledImg(compo?.item?.img ?? compo?.img);
             component_img.title = getI18N(compo?.item?.label ?? compo?.label);
             compo_container.appendChild(component_img);
@@ -3314,25 +3736,25 @@
         });
         compos_cell.appendChild(compos_container);
         recipe_container.appendChild(compos_cell);
-        let transform_img_container = document.createElement('td');
+        const transform_img_container = document.createElement('td');
         recipe_container.appendChild(transform_img_container);
-        let transform_img = document.createElement('img');
+        const transform_img = document.createElement('img');
         transform_img.alt = '=>';
         transform_img.src = repo_img_hordes_url + 'icons/small_move.gif';
         transform_img.setAttribute('style', 'margin-left: 0.5em; margin-right: 0.5em');
         transform_img_container.appendChild(transform_img);
-        let results_cell = document.createElement('td');
+        const results_cell = document.createElement('td');
         results_cell.classList.add('items', 'results');
-        let results_container = document.createElement('div');
+        const results_container = document.createElement('div');
         recipe.result.forEach((result) => {
-            let result_container = document.createElement('span');
+            const result_container = document.createElement('span');
             result_container.classList.add('item');
-            let result_img = document.createElement('img');
+            const result_img = document.createElement('img');
             result_img.src = repo_img_hordes_url + fixMhCompiledImg(result.item?.img);
             result_img.title = getI18N(result.item.label);
             result_container.appendChild(result_img);
             if (result.probability !== 1) {
-                let result_proba = document.createElement('span');
+                const result_proba = document.createElement('span');
                 result_proba.setAttribute('style', 'font-style: italic; color: #ddab76;');
                 result_proba.classList.add('label_text');
                 result_proba.innerText = Math.round(result.probability * 100) + '%';
@@ -3353,7 +3775,7 @@
         return document.querySelector('.current-location')?.innerText.replace(/.*: ?/, '').split('/') ?? [0, 0];
     }
     function getCellDetailsByPosition() {
-        let position = getCurrentPosition();
+        const position = getCurrentPosition();
         if (position && state.map && state.map.cells) {
             return state.map.cells.find((cell) => +cell.displayX === +position[0] && +cell.displayY === +position[1]);
         }
@@ -3362,8 +3784,8 @@
     /** Affiche la liste de courses dans le désert et l'atelier */
     function displayWishlistInApp(count = 0) {
         let wishlist_section = document.getElementById('wishlist-section');
-        let is_desert = pageIsDesert();
-        let is_workshop = pageIsWorkshop();
+        const is_desert = pageIsDesert();
+        const is_workshop = pageIsWorkshop();
         if (state.wishlist && state.mho_parameters.display_wishlist && (is_workshop || is_desert)) {
             if (wishlist_section)
                 return;
@@ -3376,24 +3798,34 @@
             }
             if (!zone_to_insert)
                 return;
-            let used_wishlist = getWishlistForZone();
+            const used_wishlist = getWishlistForZone();
             if (!used_wishlist)
                 return;
-            let list_to_display = used_wishlist.filter((item) => {
+            /**
+             * Le contenu de la case ne dépend pas de la ligne de liste de courses examinée :
+             * on le résout une seule fois, sous forme d'ensemble d'identifiants, plutôt qu'à
+             * chaque passage dans le prédicat de filtrage.
+             */
+            const item_ids_in_cell = is_workshop
+                ? new Set()
+                : new Set(Array.from(document.querySelectorAll('.inventory li.item img'))
+                    .map((item_element) => getItemFromImg(item_element.src))
+                    .filter((item_in_cell) => !!item_in_cell)
+                    .map((item_in_cell) => item_in_cell.id));
+            const list_to_display = used_wishlist.filter((item) => {
                 if (is_workshop) {
                     return item.isWorkshop;
                 }
                 else {
-                    let items_in_cell = Array.from(document.querySelectorAll('.inventory li.item img')).map((item_element) => getItemFromImg(item_element.src));
-                    return items_in_cell.some((item_in_cell) => item_in_cell?.id === item.item.id);
+                    return item_ids_in_cell.has(item.item.id);
                 }
             });
             if (is_workshop && list_to_display.length === 0)
                 return;
-            let refreshWishlist = () => {
-                let update_section = document.createElement('div');
+            const refreshWishlist = () => {
+                const update_section = document.createElement('div');
                 header.appendChild(update_section);
-                let last_update = document.createElement('span');
+                const last_update = document.createElement('span');
                 last_update.classList.add('small');
                 last_update.setAttribute('style', 'margin-right: 0.5em;');
                 if (state.wishlist.lastUpdateInfo) {
@@ -3403,7 +3835,7 @@
                     }).format(new Date(state.wishlist.lastUpdateInfo.updateTime)) + ' - ' + state.wishlist.lastUpdateInfo.userName;
                 }
                 update_section.appendChild(last_update);
-                let update_btn = document.createElement('button');
+                const update_btn = document.createElement('button');
                 update_btn.classList.add('inline');
                 update_btn.innerText = getI18N(texts.update);
                 update_btn.addEventListener('click', () => {
@@ -3418,16 +3850,16 @@
                     });
                 });
                 update_section.appendChild(update_btn);
-                let list = document.createElement('div');
+                const list = document.createElement('div');
                 list.classList.add('row-table');
                 content.appendChild(list);
-                let list_header = document.createElement('div');
+                const list_header = document.createElement('div');
                 list_header.classList.add('row-flex', 'mho-header', 'bottom');
                 list.appendChild(list_header);
                 wishlist_headers
                     .filter((header_cell_item) => header_cell_item.id !== 'delete')
                     .forEach((header_cell_item) => {
-                    let header_cell = document.createElement('div');
+                    const header_cell = document.createElement('div');
                     header_cell.classList.add('padded', 'cell');
                     header_cell.classList.add(header_cell_item.id === 'label' ? 'rw-5' : (header_cell_item.id === 'depot' ? 'rw-3' : 'rw-2'));
                     header_cell.innerText = getI18N(header_cell_item.label);
@@ -3435,30 +3867,30 @@
                 });
                 list_to_display
                     .forEach((item) => {
-                    let list_item = document.createElement('div');
+                    const list_item = document.createElement('div');
                     list_item.classList.add('row-flex');
                     list.appendChild(list_item);
-                    let title = document.createElement('div');
+                    const title = document.createElement('div');
                     title.classList.add('padded', 'cell', 'rw-5');
                     title.innerHTML = `<img src="${repo_img_hordes_url + item.item.img}" style="margin-right: 5px" /><span class="small">${getI18N(item.item.label)}</span>`;
                     list_item.appendChild(title);
-                    let item_depot = document.createElement('span');
+                    const item_depot = document.createElement('span');
                     item_depot.classList.add('padded', 'cell', 'rw-3');
                     item_depot.innerHTML = `<span class="small">${getI18N(wishlist_depot.find((depot) => item.depot === depot.value).label)}</span>`;
                     list_item.appendChild(item_depot);
-                    let bank_count = document.createElement('span');
+                    const bank_count = document.createElement('span');
                     bank_count.classList.add('padded', 'cell', 'rw-2');
                     bank_count.innerHTML = `<span class="small">${item.bankCount}</span>`;
                     list_item.appendChild(bank_count);
-                    let bag_count = document.createElement('span');
+                    const bag_count = document.createElement('span');
                     bag_count.classList.add('padded', 'cell', 'rw-2');
                     bag_count.innerHTML = `<span class="small">${item.bagCount}</span>`;
                     list_item.appendChild(bag_count);
-                    let bank_need = document.createElement('span');
+                    const bank_need = document.createElement('span');
                     bank_need.classList.add('padded', 'cell', 'rw-2');
                     bank_need.innerHTML = `<span class="small">${item.count >= 0 ? item.count : '∞'}</span>`;
                     list_item.appendChild(bank_need);
-                    let needed = document.createElement('span');
+                    const needed = document.createElement('span');
                     needed.classList.add('padded', 'cell', 'rw-2');
                     needed.innerHTML = `<span class="small">${item.count >= 0 ? (item.count - item.bankCount - item.bagCount) : '∞'}</span>`;
                     list_item.appendChild(needed);
@@ -3494,29 +3926,29 @@
                 zone_to_insert.parentNode.insertBefore(wishlist_section, zone_to_insert.nextSibling);
             }
             else {
-                let main_actions = zone_to_insert.parentNode;
+                const main_actions = zone_to_insert.parentNode;
                 main_actions.parentNode.insertBefore(wishlist_section, main_actions.nextSibling);
             }
-            let cell = document.createElement('div');
+            const cell = document.createElement('div');
             wishlist_section.appendChild(cell);
-            let header = document.createElement('h5');
+            const header = document.createElement('h5');
             header.setAttribute('style', 'display: flex; justify-content: space-between;');
             cell.appendChild(header);
-            let header_title = document.createElement('span');
+            const header_title = document.createElement('span');
             header_title.setAttribute('style', 'margin-top: 7px; cursor: pointer;');
             header.appendChild(header_title);
-            let hide_state = document.createElement('span');
+            const hide_state = document.createElement('span');
             hide_state.setAttribute('style', 'margin-right: 0.5em');
             header_title.appendChild(hide_state);
-            let header_mho_img = document.createElement('img');
+            const header_mho_img = document.createElement('img');
             header_mho_img.src = mh_optimizer_icon;
             header_mho_img.style.height = '24px';
             header_mho_img.style.marginRight = '0.5em';
             header_title.appendChild(header_mho_img);
-            let header_label = document.createElement('span');
+            const header_label = document.createElement('span');
             header_label.innerText = getI18N(wishlist_title);
             header_title.appendChild(header_label);
-            let content = document.createElement('div');
+            const content = document.createElement('div');
             cell.appendChild(content);
             refreshWishlist();
         }
@@ -3532,24 +3964,24 @@
     /** Affiche la priorité directement sur les éléments si l'option associée est cochée */
     function displayPriorityOnItems() {
         if (state.mho_parameters.display_wishlist && pageIsDesert() && state.wishlist) {
-            let present_items = [];
-            let avalaible_slots = [];
-            let used_spaces = [];
-            let inventories = document.querySelectorAll('.inventory');
-            let rucksacks = document.querySelectorAll('.inventory.rucksack, .inventory.rucksack-escort');
+            const present_items = [];
+            const avalaible_slots = [];
+            const used_spaces = [];
+            const inventories = document.querySelectorAll('.inventory');
+            const rucksacks = document.querySelectorAll('.inventory.rucksack, .inventory.rucksack-escort');
             if (inventories) {
-                for (let inventory of inventories) {
+                for (const inventory of inventories) {
                     present_items.push(...inventory?.querySelectorAll('li.item:not(.locked):not(.plus)') || []);
                 }
             }
             if (rucksacks) {
-                for (let rucksack of rucksacks) {
+                for (const rucksack of rucksacks) {
                     avalaible_slots.push(...rucksack?.querySelectorAll('li.free, li.item:not(.locked):not(.plus)') || []);
                 }
             }
-            let used_wishlist = getWishlistForZone();
-            let item_count = avalaible_slots.length;
-            let heavy_slots = avalaible_slots.filter((slot) => slot.classList.contains('bg-heavy')).length;
+            const used_wishlist = getWishlistForZone();
+            const item_count = avalaible_slots.length;
+            const heavy_slots = avalaible_slots.filter((slot) => slot.classList.contains('bg-heavy')).length;
             if (used_wishlist) {
                 let count = 0;
                 let heavy_count = 0;
@@ -3592,9 +4024,9 @@
             return undefined;
         if (!pageIsDesert())
             return [...state.wishlist.wishList];
-        let position = getCurrentPosition();
-        let current_zone = (Math.abs(position[0]) + Math.abs(position[1])) * 2 - 3;
-        let used_wishlist = [...state.wishlist.wishList.filter((wishlist_item) => wishlist_item.zoneXPa === 0 || wishlist_item.zoneXPa >= current_zone)];
+        const position = getCurrentPosition();
+        const current_zone = (Math.abs(position[0]) + Math.abs(position[1])) * 2 - 3;
+        const used_wishlist = [...state.wishlist.wishList.filter((wishlist_item) => wishlist_item.zoneXPa === 0 || wishlist_item.zoneXPa >= current_zone)];
         used_wishlist?.sort((item_a, item_b) => {
             return item_b.priority - item_a.priority;
         });
@@ -3630,9 +4062,9 @@
             existingHints.forEach(el => el.remove());
         }
         tooltip_container.addEventListener('click', (e) => e.stopImmediatePropagation());
-        let item_or_status = getTooltipItem(img, isStatus);
-        let item = item_or_status.item;
-        let status = item_or_status.status;
+        const item_or_status = getTooltipItem(img, isStatus);
+        const item = item_or_status.item;
+        const status = item_or_status.status;
         if (!item && !status)
             return;
         const buildAdvancedTooltipContainer = () => {
@@ -3643,8 +4075,8 @@
         };
         let advanced_tooltip_container;
         if (item) {
-            let item_deco = tooltip_container.getElementsByClassName('item-tag-deco')[0];
-            let should_display = state.mho_parameters.enhanced_tooltips && state.mho_parameters.enhanced_tooltips_items && ((state.mho_parameters.enhanced_tooltips_item_quantities && tooltip_container) ||
+            const item_deco = tooltip_container.getElementsByClassName('item-tag-deco')[0];
+            const should_display = state.mho_parameters.enhanced_tooltips && state.mho_parameters.enhanced_tooltips_items && ((state.mho_parameters.enhanced_tooltips_item_quantities && tooltip_container) ||
                 (state.mho_parameters.enhanced_tooltips_item_properties && item.properties) ||
                 (state.mho_parameters.enhanced_tooltips_item_actions && item.actions) ||
                 (state.mho_parameters.enhanced_tooltips_item_recipes && item.recipes.length > 0) ||
@@ -3656,7 +4088,7 @@
             }
         }
         else {
-            let should_display = state.mho_parameters.enhanced_tooltips && state.mho_parameters.enhanced_tooltips_statuses && (status.watch_def !== undefined || status.watch_kills !== undefined ||
+            const should_display = state.mho_parameters.enhanced_tooltips && state.mho_parameters.enhanced_tooltips_statuses && (status.watch_def !== undefined || status.watch_kills !== undefined ||
                 status.searches !== undefined || status.terror !== undefined ||
                 status.fatal_infection !== undefined || status.prevent_infection !== undefined ||
                 status.properties?.length > 0);
@@ -3681,11 +4113,11 @@
         }
         const shift = document.createElement('kbd');
         shift.classList.add('mho-shift-hint');
-        shift.innerText = `⇧`;
+        shift.innerText = '⇧';
         const close = document.createElement('img');
         close.classList.add('mho-close-hint');
         close.src = `${repo_img_hordes_url}icons/b_close.png`;
-        close.alt = `close`;
+        close.alt = 'close';
         const separator = document.createElement('div');
         separator.style.flex = '1';
         h1.prepend(shift, close, separator);
@@ -3767,7 +4199,7 @@
             const container = document.getElementById('tooltip_container');
             if (!container)
                 return;
-            let hint = container.querySelector('.mho-shift-hint');
+            const hint = container.querySelector('.mho-shift-hint');
             if (!hint)
                 return;
             const visibleTooltip = [...container.querySelectorAll('.item')].find(el => el.style.display === 'block');
@@ -3800,25 +4232,25 @@
         }
         content.innerHtml = '';
         if (tooltip && state.mho_parameters.enhanced_tooltips_item_quantities) {
-            let stock_div = document.createElement('div');
+            const stock_div = document.createElement('div');
             content.appendChild(stock_div);
             stock_div.style.display = 'flex';
             stock_div.style.flexWrap = 'wrap';
             stock_div.style.justifyContent = 'space-between';
             stock_div.style.columnGap = '1em';
             stock_div.style.borderBottom = '1px solid white';
-            let bank_div = document.createElement('div');
+            const bank_div = document.createElement('div');
             bank_div.style.width = 'calc(50% - 0.5em)';
             bank_div.innerText = getI18N(wishlist_headers.find((header) => header.id === 'bank_count').label) + ' : ' + item.bankCount;
             stock_div.appendChild(bank_div);
-            let wishlist_for_zone = getWishlistForZone();
-            let item_in_wishlist = wishlist_for_zone?.find((iwfz) => item.id === iwfz.item.id);
+            const wishlist_for_zone = getWishlistForZone();
+            const item_in_wishlist = wishlist_for_zone?.find((iwfz) => item.id === iwfz.item.id);
             if (item_in_wishlist?.item.wishListCount > 0) {
-                let wishlist_wanted_div = document.createElement('div');
+                const wishlist_wanted_div = document.createElement('div');
                 wishlist_wanted_div.style.width = 'calc(50% - 0.5em)';
                 wishlist_wanted_div.innerText = getI18N(wishlist_headers[5].label) + ' : ' + item_in_wishlist.item.wishListCount;
                 stock_div.appendChild(wishlist_wanted_div);
-                let wishlist_depot_div = document.createElement('div');
+                const wishlist_depot_div = document.createElement('div');
                 wishlist_depot_div.style.width = 'calc(50% - 0.5em)';
                 wishlist_depot_div.innerText = getI18N(wishlist_headers[2].label) + ' : ' + getI18N(wishlist_depot.find((depot) => item_in_wishlist.depot === depot.value).label);
                 stock_div.appendChild(wishlist_depot_div);
@@ -3829,7 +4261,7 @@
             supported_languages.filter((language) => language.value !== lang).forEach((language) => {
                 translations += `<div class="brown-tag"><span class="tooltip-translation-flag">${language.img}</span><span class="tooltip-translation-value">${item.label[language.value]}</span></div>`;
             });
-            let item_translations = document.createElement('div');
+            const item_translations = document.createElement('div');
             item_translations.classList.add('mho-tooltip-translations');
             item_translations.innerHTML = translations;
             content.appendChild(item_translations);
@@ -3837,27 +4269,27 @@
         if ((!item_deco || item.deco === 0) && !item.properties && !item.actions && item.recipes.length === 0)
             return;
         if (item_deco && item.deco > 0) {
-            let text = item_deco.innerText.replace(/ \(.*\)*/, '');
+            const text = item_deco.innerText.replace(/ \(.*\)*/, '');
             item_deco.innerHTML = `<span>${text} <em>( +${item.deco} )</em></span>`;
         }
         if (!item.properties && !item.actions && item.recipes.length === 0)
             return;
         if (state.mho_parameters.enhanced_tooltips_item_properties && item.properties) {
-            let item_properties = document.createElement('div');
+            const item_properties = document.createElement('div');
             content.appendChild(item_properties);
             item.properties.forEach((property) => {
                 item_properties.appendChild(displayPropertiesOrActions(property, item));
             });
         }
         if (state.mho_parameters.enhanced_tooltips_item_actions && item.actions) {
-            let item_actions = document.createElement('div');
+            const item_actions = document.createElement('div');
             content.appendChild(item_actions);
             item.actions.forEach((action) => {
                 item_actions.appendChild(displayPropertiesOrActions(action, item));
             });
         }
         if (state.mho_parameters.enhanced_tooltips_item_recipes && item.recipes.length > 0) {
-            let item_recipes = document.createElement('table');
+            const item_recipes = document.createElement('table');
             item_recipes.classList.add('recipes');
             content.appendChild(item_recipes);
             item.recipes.forEach((recipe) => {
@@ -3867,7 +4299,7 @@
     }
     function createAdvancedStatus(content, status, tooltip) {
         content.innerHtml = '';
-        let status_details = document.createElement('div');
+        const status_details = document.createElement('div');
         content.appendChild(status_details);
         const have_properties = status.properties?.length > 0;
         if (status.pdc === undefined && status.watch_def === undefined
@@ -3875,45 +4307,45 @@
             && !have_properties)
             return;
         if (status.pdc !== undefined) {
-            let status_detail = document.createElement('div');
+            const status_detail = document.createElement('div');
             status_detail.classList.add('item-tag', 'mho-item-tag', 'mho-item-tag-no-img');
             status_detail.innerHTML = `${status.pdc} ${Math.abs(status.pdc) > 1 ? 'points' : 'point'} de contrôle supplémentaire${Math.abs(status.pdc) > 1 ? 's' : ''}`;
             status_details.appendChild(status_detail);
         }
         if (status.terror !== undefined) {
-            let status_detail = document.createElement('div');
+            const status_detail = document.createElement('div');
             status_detail.classList.add('item-tag', 'mho-item-tag', 'mho-item-tag-no-img');
             status_detail.innerHTML = `${getI18N(status_texts.terror)} : ${status.terror}%`;
             status_details.appendChild(status_detail);
         }
         if (status.prevent_infection !== undefined) {
-            let status_detail = document.createElement('div');
+            const status_detail = document.createElement('div');
             status_detail.classList.add('item-tag', 'mho-item-tag', 'mho-item-tag-no-img');
             status_detail.innerHTML = `${getI18N(status_texts.prevent_infection)} : ${status.prevent_infection * 100}%`;
             status_details.appendChild(status_detail);
         }
         if (status.fatal_infection !== undefined) {
-            let status_detail = document.createElement('div');
+            const status_detail = document.createElement('div');
             status_detail.classList.add('item-tag', 'mho-item-tag', 'mho-item-tag-no-img');
             status_detail.innerHTML = `${getI18N(status_texts.fatal_infection)} : ${status.fatal_infection < 0 ? status.fatal_infection * 100 : '+' + status.fatal_infection * 100}%`;
             status_details.appendChild(status_detail);
         }
         if (status.watch_def !== undefined || status.watch_kills !== undefined) {
             if (status.watch_def !== undefined) {
-                let status_detail = document.createElement('div');
+                const status_detail = document.createElement('div');
                 status_detail.classList.add('item-tag', 'mho-item-tag', 'mho-item-tag-no-img');
                 status_detail.innerHTML = `${getI18N(status_texts.zombies_killed)} : ${status.watch_def}`;
                 status_details.appendChild(status_detail);
             }
             if (status.watch_kills !== undefined) {
-                let status_detail = document.createElement('div');
+                const status_detail = document.createElement('div');
                 status_detail.classList.add('item-tag', 'mho-item-tag', 'mho-item-tag-no-img');
                 status_detail.innerHTML = `${getI18N(status_texts.watch_survival_chances)} : ${status.watch_kills < 0 ? status.watch_kills * 100 : '+' + status.watch_kills * 100}%`;
                 status_details.appendChild(status_detail);
             }
         }
         if (status.searches !== undefined) {
-            let status_detail = document.createElement('div');
+            const status_detail = document.createElement('div');
             status_detail.classList.add('item-tag', 'mho-item-tag', 'mho-item-tag-no-img');
             status_detail.innerHTML = `${getI18N(status_texts.success_digs_changes)} : ${status.searches}`;
             status_details.appendChild(status_detail);
@@ -3926,41 +4358,41 @@
     }
     /** Affiche les propriétés ou les actions associées à l'objet survolé */
     function displayPropertiesOrActions(property_or_action, hovered_item) {
-        let item_action = document.createElement('div');
+        const item_action = document.createElement('div');
         // TODO MAPPING BACK
         item_action.classList.add('item-tag', 'mho-item-tag');
         switch (property_or_action) {
             case 'eat_6ap':
             case 'eat_7ap':
             case 'eat_4ap':
-                item_action.classList.add(`item-tag-food`);
+                item_action.classList.add('item-tag-food');
                 item_action.innerHTML = `+${property_or_action.slice(4, 5)}<img src="${repo_img_hordes_url}emotes/ap.${lang}.gif">`;
                 break;
             case 'coffee':
-                item_action.classList.add(`item-tag-coffee`);
+                item_action.classList.add('item-tag-coffee');
                 item_action.innerHTML = `+4<img src="${repo_img_hordes_url}emotes/ap.${lang}.gif">`;
                 break;
             case 'drug_6ap_1':
             case 'drug_8ap_1':
-                item_action.classList.add(`item-tag-drug`);
+                item_action.classList.add('item-tag-drug');
                 item_action.innerHTML = `+${property_or_action.slice(5, 6)}<img src="${repo_img_hordes_url}emotes/ap.${lang}.gif">`;
                 break;
             case 'alcohol':
-                item_action.classList.add(`item-tag-alcohol`);
+                item_action.classList.add('item-tag-alcohol');
                 item_action.innerHTML = `+6<img src="${repo_img_hordes_url}emotes/ap.${lang}.gif">`;
                 break;
             case 'cyanide':
-                item_action.classList.add(`mho-item-tag-no-img`);
+                item_action.classList.add('mho-item-tag-no-img');
                 item_action.innerHTML = `<img src="${repo_img_hordes_url}emotes/death.gif">`;
                 break;
             case 'hero_find':
-                item_action.classList.add(`item-tag-hero`);
-                item_action.innerText = `Trouvaille`;
+                item_action.classList.add('item-tag-hero');
+                item_action.innerText = 'Trouvaille';
                 break;
             case 'hero_find_lucky':
                 if (!(hovered_item.properties && hovered_item.properties.some((property) => property === 'hero_find')) && !(hovered_item.actions && hovered_item.actions.some((property) => property === 'hero_find'))) {
-                    item_action.classList.add(`item-tag-hero`);
-                    item_action.innerText = `Jolie trouvaille`;
+                    item_action.classList.add('item-tag-hero');
+                    item_action.innerText = 'Jolie trouvaille';
                 }
                 else {
                     item_action.classList.remove('item-tag', 'mho-item-tag');
@@ -3968,8 +4400,8 @@
                 break;
             case 'hero_find_lucky2':
                 if (!(hovered_item.properties && hovered_item.properties.some((property) => property === 'hero_find_lucky')) && !(hovered_item.actions && hovered_item.actions.some((property) => property === 'hero_find_lucky'))) {
-                    item_action.classList.add(`item-tag-hero`);
-                    item_action.innerText = `Impressionnante trouvaille`;
+                    item_action.classList.add('item-tag-hero');
+                    item_action.innerText = 'Impressionnante trouvaille';
                 }
                 else {
                     item_action.classList.remove('item-tag', 'mho-item-tag');
@@ -3977,52 +4409,52 @@
                 break;
             case 'hero_find_lucky3':
                 if (!(hovered_item.properties && hovered_item.properties.some((property) => property === 'hero_find_lucky2')) && !(hovered_item.actions && hovered_item.actions.some((property) => property === 'hero_find_lucky2'))) {
-                    item_action.classList.add(`item-tag-hero`);
-                    item_action.innerText = `Incroyable trouvaille`;
+                    item_action.classList.add('item-tag-hero');
+                    item_action.innerText = 'Incroyable trouvaille';
                 }
                 else {
                     item_action.classList.remove('item-tag', 'mho-item-tag');
                 }
                 break;
             case 'flash_photo_1': {
-                item_action.classList.add(`mho-item-tag-large`);
-                let fail_1 = Math.round(60 / 90 * 100);
+                item_action.classList.add('mho-item-tag-large');
+                const fail_1 = Math.round(60 / 90 * 100);
                 item_action.innerText = `${100 - fail_1}% de chances de pouvoir fuir pendant 30 secondes`;
                 break;
             }
             case 'flash_photo_2': {
-                item_action.classList.add(`mho-item-tag-large`);
-                let fail_2 = Math.round(30 / 90 * 100);
+                item_action.classList.add('mho-item-tag-large');
+                const fail_2 = Math.round(30 / 90 * 100);
                 item_action.innerText = `${100 - fail_2}% de chances de pouvoir fuir pendant 60 secondes`;
                 break;
             }
             case 'flash_photo_3': {
-                item_action.classList.add(`mho-item-tag-large`);
-                let fail_3 = 1;
+                item_action.classList.add('mho-item-tag-large');
+                const fail_3 = 1;
                 item_action.innerText = `Succès : ${100 - fail_3}% de chances de pouvoir fuir pendant 120 secondes`;
                 break;
             }
             case 'flash_photo_4': {
-                item_action.classList.add(`mho-item-tag-large`);
-                let fail_4 = 1;
+                item_action.classList.add('mho-item-tag-large');
+                const fail_4 = 1;
                 item_action.innerText = `Succès : ${100 - fail_4}% de chances de pouvoir fuir pendant 120 secondes`;
                 break;
             }
             case 'can_cook':
-                item_action.classList.add(`mho-item-tag-no-img`);
-                item_action.innerText = `Peut être cuisiné`;
+                item_action.classList.add('mho-item-tag-no-img');
+                item_action.innerText = 'Peut être cuisiné';
                 break;
             case 'pet':
-                item_action.classList.add(`mho-item-tag-no-img`);
-                item_action.innerText = `Animal`;
+                item_action.classList.add('mho-item-tag-no-img');
+                item_action.innerText = 'Animal';
                 break;
             case 'can_poison':
-                item_action.classList.add(`mho-item-tag-no-img`);
-                item_action.innerText = `Peut être empoisonné`;
+                item_action.classList.add('mho-item-tag-no-img');
+                item_action.innerText = 'Peut être empoisonné';
                 break;
             case 'camp_bonus':
-                item_action.classList.add(`mho-item-tag-no-img`);
-                item_action.innerText = `Dans le sac, augmente de 5% les chances de survie en camping`;
+                item_action.classList.add('mho-item-tag-no-img');
+                item_action.innerText = 'Dans le sac, augmente de 5% les chances de survie en camping';
                 break;
             case 'load_maglite':
             case 'load_lamp':
@@ -4037,17 +4469,17 @@
             case 'load_pilegun2':
             case 'load_emt':
             case 'load_rmk2':
-                item_action.classList.add(`item-tag-load`);
-                item_action.innerText = `Peut être rechargé`;
+                item_action.classList.add('item-tag-load');
+                item_action.innerText = 'Peut être rechargé';
                 break;
             case 'smokebomb':
-                item_action.classList.add(`item-tag-smokebomb`);
-                item_action.classList.add(`mho-item-tag-no-img`);
-                item_action.innerHTML = `Efface les entrées du registre (-3 minutes)<br />Dissimule votre prochaine entrée (+1 minute)`;
+                item_action.classList.add('item-tag-smokebomb');
+                item_action.classList.add('mho-item-tag-no-img');
+                item_action.innerHTML = 'Efface les entrées du registre (-3 minutes)<br />Dissimule votre prochaine entrée (+1 minute)';
                 break;
             case 'improve':
-                item_action.classList.add(`mho-item-tag-no-img`);
-                item_action.innerText = `Permet d'aménager un campement`;
+                item_action.classList.add('mho-item-tag-no-img');
+                item_action.innerText = 'Permet d\'aménager un campement';
                 break;
             case 'defence':
                 // déjà affichés par le jeu
@@ -4060,9 +4492,9 @@
                 break;
             case 'hero_surv_1':
                 if (state.mh_user.townDetails) {
-                    var days = state.mh_user.townDetails?.day;
-                    var devastated = state.mh_user.townDetails?.isDevaste;
-                    var chances = 1;
+                    const days = state.mh_user.townDetails?.day;
+                    const devastated = state.mh_user.townDetails?.isDevaste;
+                    let chances = 1;
                     if (days >= 20) {
                         chances = 0.50;
                     }
@@ -4080,8 +4512,8 @@
                     }
                     if (devastated)
                         chances = Math.max(0.1, chances - 0.2);
-                    var success = chances * 100;
-                    item_action.classList.add(`mho-item-tag-no-img`);
+                    const success = chances * 100;
+                    item_action.classList.add('mho-item-tag-no-img');
                     item_action.innerText = `${success}% de chances de réussir son manuel`;
                 }
                 else {
@@ -4093,28 +4525,28 @@
                 item_action.classList.remove('item-tag', 'mho-item-tag');
                 break;
             case 'prevent_night':
-                item_action.classList.add(`mho-item-tag-no-img`);
-                item_action.innerText = `Malus de nuit divisé par 4`;
+                item_action.classList.add('mho-item-tag-no-img');
+                item_action.innerText = 'Malus de nuit divisé par 4';
                 break;
             case 'no_post':
-                item_action.classList.add(`mho-item-tag-no-img`);
-                item_action.innerText = `Ne peut pas être envoyé par message`;
+                item_action.classList.add('mho-item-tag-no-img');
+                item_action.innerText = 'Ne peut pas être envoyé par message';
                 break;
             case 'wagging_flag':
-                item_action.classList.add(`mho-item-tag-no-img`);
-                item_action.innerText = `Attire 2.5% des zombies du débordement`;
+                item_action.classList.add('mho-item-tag-no-img');
+                item_action.innerText = 'Attire 2.5% des zombies du débordement';
                 break;
             case 'fragile':
-                item_action.classList.add(`mho-item-tag-no-img`);
-                item_action.innerText = `Se casse en cas d'envoi par catapulte`;
+                item_action.classList.add('mho-item-tag-no-img');
+                item_action.innerText = 'Se casse en cas d\'envoi par catapulte';
                 break;
             case 'esc_fixed':
-                item_action.classList.add(`mho-item-tag-no-img`);
-                item_action.innerText = `Ne peut pas être déposé par le chef d'escorte`;
+                item_action.classList.add('mho-item-tag-no-img');
+                item_action.innerText = 'Ne peut pas être déposé par le chef d\'escorte';
                 break;
             case 'impoundable':
-                item_action.classList.add(`mho-item-tag-no-img`);
-                item_action.innerText = `Perdu en cas de bannissement`;
+                item_action.classList.add('mho-item-tag-no-img');
+                item_action.innerText = 'Perdu en cas de bannissement';
                 break;
             case 'box_opener':
             case 'can_opener':
@@ -4430,7 +4862,7 @@
         return item_action;
     }
     function displayStatusProperties(status_properties, hovered_item) {
-        let item_action = document.createElement('div');
+        const item_action = document.createElement('div');
         item_action.classList.add('item-tag', 'mho-item-tag');
         switch (status_properties) {
             case 'head_wounded':
@@ -4473,69 +4905,69 @@
      * @param {string} tab_id l'onglet dans lequel on se trouve
      */
     function displayItems(filtered_items, tab_id) {
-        let tab_content = document.getElementById(mh_optimizer_window_id + '-tab-content');
-        let item_list = document.createElement('ul');
+        const tab_content = document.getElementById(mh_optimizer_window_id + '-tab-content');
+        const item_list = document.createElement('ul');
         item_list.id = 'item-list';
         tab_content.appendChild(item_list);
         filtered_items?.forEach((item, index) => {
             if (index === 0 || filtered_items[index - 1].category.idCategory !== item.category.idCategory) {
-                let category_text = document.createElement('span');
+                const category_text = document.createElement('span');
                 category_text.innerText = item.category.label[lang];
-                let category_container = document.createElement('div');
+                const category_container = document.createElement('div');
                 category_container.classList.add('mho-category', 'mho-header');
                 category_container.appendChild(category_text);
                 item_list.appendChild(category_container);
             }
-            let item_title_and_add_container = document.createElement('div');
+            const item_title_and_add_container = document.createElement('div');
             item_title_and_add_container.classList.add('item-title');
-            let item_title_container = document.createElement('div');
+            const item_title_container = document.createElement('div');
             item_title_container.setAttribute('style', 'flex: 1; cursor: pointer;');
             item_title_and_add_container.appendChild(item_title_container);
             if ((tab_id === 'bank' || tab_id === 'items') && item.wishListCount === 0 && state.mh_user.townDetails?.townId) {
-                let item_add_to_wishlist = document.createElement('div');
+                const item_add_to_wishlist = document.createElement('div');
                 item_add_to_wishlist.classList.add('add-to-wishlist');
                 item_title_and_add_container.appendChild(item_add_to_wishlist);
-                let add_to_wishlist_button = document.createElement('button');
+                const add_to_wishlist_button = document.createElement('button');
                 add_to_wishlist_button.classList.add('inline');
                 add_to_wishlist_button.addEventListener('click', () => {
                     addItemToWishlist(item).then((wishlist) => {
                         item_add_to_wishlist.remove();
                     });
                 });
-                let img = document.createElement('img');
+                const img = document.createElement('img');
                 img.src = `${repo_img_hordes_url}item/item_cart.gif`;
                 img.alt = '&#x1F6D2;';
                 add_to_wishlist_button.appendChild(img);
                 item_add_to_wishlist.appendChild(add_to_wishlist_button);
             }
-            let icon_container = document.createElement('span');
+            const icon_container = document.createElement('span');
             icon_container.setAttribute('style', 'margin-right: 0.5em');
             item_title_container.appendChild(icon_container);
-            let item_icon = document.createElement('img');
+            const item_icon = document.createElement('img');
             if (item.broken) {
                 item_icon.style.border = '1px dashed red';
             }
             item_icon.src = repo_img_hordes_url + item.img;
             icon_container.appendChild(item_icon);
             if (tab_id === 'bank' && item.bankCount > 1) {
-                let item_count = document.createElement('span');
+                const item_count = document.createElement('span');
                 item_count.setAttribute('style', 'vertical-align: sub; font-size: 10px;');
                 item_count.innerText = item.bankCount;
                 icon_container.appendChild(item_count);
             }
-            let item_title = document.createElement('span');
+            const item_title = document.createElement('span');
             item_title.classList.add('label_text');
             item_title.innerText = getI18N(item.label) + (item.broken ? ' (' + getI18N(texts.broken) + ')' : '');
             item_title_container.appendChild(item_title);
-            let item_properties_container = document.createElement('div');
+            const item_properties_container = document.createElement('div');
             item_properties_container.classList.add('properties');
             item_properties_container.innerHTML = `<span class="small">${getI18N(item.description)}</span>`;
             createAdvancedProperties(item_properties_container, item, undefined);
-            let item_container = document.createElement('li');
+            const item_container = document.createElement('li');
             item_container.appendChild(item_title_and_add_container);
             item_container.appendChild(item_properties_container);
             item_title_container.addEventListener('click', () => {
-                let selected_items = document.getElementsByClassName('selected');
+                const selected_items = document.getElementsByClassName('selected');
                 item_container.classList.toggle('selected');
             });
             item_list.appendChild(item_container);
@@ -4547,12 +4979,12 @@
         getRuins().then((ruins) => {
             let all_ruins = [...added_ruins];
             all_ruins = all_ruins.concat(ruins);
-            let tab_content = document.getElementById(mh_optimizer_window_id + '-tab-content');
-            let camping_tab_content = document.createElement('div');
+            const tab_content = document.getElementById(mh_optimizer_window_id + '-tab-content');
+            const camping_tab_content = document.createElement('div');
             camping_tab_content.style.padding = '0 0.5em';
             camping_tab_content.classList.add('camping-tab');
             tab_content.appendChild(camping_tab_content);
-            let conf = {
+            const conf = {
                 townType: 'RNE',
                 job: 'citizen',
                 distance: 1,
@@ -4574,48 +5006,48 @@
                 ruinCapacity: 0,
                 ruin: '-1000'
             };
-            let my_info = document.createElement('div');
+            const my_info = document.createElement('div');
             camping_tab_content.appendChild(my_info);
-            let my_info_title = document.createElement('h3');
+            const my_info_title = document.createElement('h3');
             my_info_title.innerText = getI18N(texts.camping_citizen);
             my_info.appendChild(my_info_title);
-            let my_info_content = document.createElement('div');
+            const my_info_content = document.createElement('div');
             my_info.appendChild(my_info_content);
-            let town_info = document.createElement('div');
+            const town_info = document.createElement('div');
             camping_tab_content.appendChild(town_info);
-            let town_info_title = document.createElement('h3');
+            const town_info_title = document.createElement('h3');
             town_info_title.innerText = getI18N(texts.camping_town);
             town_info.appendChild(town_info_title);
-            let town_info_content = document.createElement('div');
+            const town_info_content = document.createElement('div');
             town_info.appendChild(town_info_content);
-            let cell_info = document.createElement('div');
+            const cell_info = document.createElement('div');
             camping_tab_content.appendChild(cell_info);
-            let cell_info_title = document.createElement('h3');
+            const cell_info_title = document.createElement('h3');
             cell_info_title.innerText = getI18N(texts.camping_ruin);
             cell_info.appendChild(cell_info_title);
-            let cell_info_content = document.createElement('div');
+            const cell_info_content = document.createElement('div');
             cell_info.appendChild(cell_info_content);
-            let result = document.createElement('div');
+            const result = document.createElement('div');
             camping_tab_content.appendChild(result);
-            let result_title = document.createElement('h3');
+            const result_title = document.createElement('h3');
             result_title.innerText = getI18N(texts.result);
             result.appendChild(result_title);
-            let result_content = document.createElement('div');
+            const result_content = document.createElement('div');
             result_content.id = 'camping-result';
             result.appendChild(result_content);
             /** Type de ville */
-            let town_div = document.createElement('div');
+            const town_div = document.createElement('div');
             town_info_content.appendChild(town_div);
-            let select_town_label = document.createElement('label');
+            const select_town_label = document.createElement('label');
             select_town_label.htmlFor = 'select-town';
             select_town_label.classList.add('spaced-label');
             select_town_label.innerText = getI18N(texts.town_type);
-            let select_town = document.createElement('select');
+            const select_town = document.createElement('select');
             select_town.id = 'select-town';
             select_town.value = conf.town;
             select_town.classList.add('small');
             town_type.forEach((town) => {
-                let town_option = document.createElement('option');
+                const town_option = document.createElement('option');
                 town_option.value = town.id;
                 town_option.label = getI18N(town.label);
                 select_town.appendChild(town_option);
@@ -4627,25 +5059,25 @@
             town_div.appendChild(select_town_label);
             town_div.appendChild(select_town);
             /** Métier */
-            let job_div = document.createElement('div');
+            const job_div = document.createElement('div');
             my_info_content.appendChild(job_div);
-            let select_job_label = document.createElement('label');
+            const select_job_label = document.createElement('label');
             select_job_label.htmlFor = 'select-job';
             select_job_label.innerText = getI18N(texts.job);
             select_job_label.classList.add('spaced-label');
-            let select_job = document.createElement('select');
+            const select_job = document.createElement('select');
             select_job.id = 'select-job';
             select_job.value = conf.job;
             select_job.classList.add('small');
             jobs.forEach((job) => {
-                let job_option = document.createElement('option');
+                const job_option = document.createElement('option');
                 job_option.value = job.id;
                 job_option.label = getI18N(job.label);
                 select_job.appendChild(job_option);
             });
             select_job.addEventListener('change', ($event) => {
                 conf.job = $event.srcElement.value;
-                let vest_field = document.querySelector('#vest-field');
+                const vest_field = document.querySelector('#vest-field');
                 if (conf.job !== 'scout') {
                     conf.vest = false;
                     vest_field.style.display = 'none';
@@ -4658,14 +5090,14 @@
             job_div.appendChild(select_job_label);
             job_div.appendChild(select_job);
             /** Capuche ? */
-            let vest_div = document.createElement('div');
+            const vest_div = document.createElement('div');
             vest_div.id = 'vest-field';
             vest_div.style.display = 'none';
             my_info_content.appendChild(vest_div);
-            let vest_label = document.createElement('label');
+            const vest_label = document.createElement('label');
             vest_label.htmlFor = 'vest';
             vest_label.innerHTML = `<img src="${repo_img_hordes_url}emotes/proscout.gif"> ${getI18N(texts.vest)}`;
-            let vest = document.createElement('input');
+            const vest = document.createElement('input');
             vest.classList.add('mho-input');
             vest.type = 'checkbox';
             vest.id = 'vest';
@@ -4677,12 +5109,12 @@
             vest_div.appendChild(vest);
             vest_div.appendChild(vest_label);
             /** Campeur pro ? */
-            let pro_camper_div = document.createElement('div');
+            const pro_camper_div = document.createElement('div');
             my_info_content.appendChild(pro_camper_div);
-            let pro_camper_label = document.createElement('label');
+            const pro_camper_label = document.createElement('label');
             pro_camper_label.htmlFor = 'pro';
             pro_camper_label.innerHTML = `<img src="${repo_img_hordes_url}status/status_camper.gif"> ${getI18N(texts.pro_camper)}`;
-            let pro_camper = document.createElement('input');
+            const pro_camper = document.createElement('input');
             pro_camper.classList.add('mho-input');
             pro_camper.type = 'checkbox';
             pro_camper.id = 'pro';
@@ -4694,12 +5126,12 @@
             pro_camper_div.appendChild(pro_camper);
             pro_camper_div.appendChild(pro_camper_label);
             /** Tombe ? */
-            let tomb_div = document.createElement('div');
+            const tomb_div = document.createElement('div');
             my_info_content.appendChild(tomb_div);
-            let tomb_label = document.createElement('label');
+            const tomb_label = document.createElement('label');
             tomb_label.htmlFor = 'tomb';
             tomb_label.innerHTML = `<img src="${repo_img_hordes_url}building/small_cemetery.gif"> ${getI18N(texts.tomb)}`;
-            let tomb = document.createElement('input');
+            const tomb = document.createElement('input');
             tomb.classList.add('mho-input');
             tomb.type = 'checkbox';
             tomb.id = 'tomb';
@@ -4711,13 +5143,13 @@
             tomb_div.appendChild(tomb);
             tomb_div.appendChild(tomb_label);
             /** R4 ? (impacte uniquement le maximum atteignable) */
-            let r4_div = document.createElement('div');
+            const r4_div = document.createElement('div');
             r4_div.classList.add('mho-camping-field');
             my_info_content.appendChild(r4_div);
-            let r4_label = document.createElement('label');
+            const r4_label = document.createElement('label');
             r4_label.htmlFor = 'r4';
             r4_label.innerText = 'R4';
-            let r4 = document.createElement('input');
+            const r4 = document.createElement('input');
             r4.type = 'checkbox';
             r4.id = 'r4';
             r4.checked = conf.r4;
@@ -4729,13 +5161,13 @@
             r4_div.appendChild(r4);
             r4_div.appendChild(r4_label);
             /** Nombre de nuits déjà campées */
-            let nb_campings_div = document.createElement('div');
+            const nb_campings_div = document.createElement('div');
             my_info_content.appendChild(nb_campings_div);
-            let nb_campings_label = document.createElement('label');
+            const nb_campings_label = document.createElement('label');
             nb_campings_label.htmlFor = 'nb-campings';
             nb_campings_label.innerHTML = `<img src="${repo_img_hordes_url}emotes/sleep.gif"> ${getI18N(texts.nb_campings)}`;
             nb_campings_label.classList.add('spaced-label');
-            let nb_campings = document.createElement('input');
+            const nb_campings = document.createElement('input');
             nb_campings.type = 'number';
             nb_campings.id = 'nb-campings';
             nb_campings.value = (conf.campings);
@@ -4747,14 +5179,14 @@
             nb_campings_div.appendChild(nb_campings_label);
             nb_campings_div.appendChild(nb_campings);
             /** Nombre de toiles de tente ou pelure de peau */
-            let objects_in_bag_div = document.createElement('div');
+            const objects_in_bag_div = document.createElement('div');
             my_info_content.appendChild(objects_in_bag_div);
-            let objects_in_bag_label = document.createElement('label');
+            const objects_in_bag_label = document.createElement('label');
             objects_in_bag_label.htmlFor = 'nb-objects';
             objects_in_bag_label.innerText = getI18N(texts.objects_in_bag);
             objects_in_bag_label.innerHTML = `<img src="${repo_img_hordes_url}emotes/bag.gif"> ${getI18N(texts.objects_in_bag)}`;
             objects_in_bag_label.classList.add('spaced-label');
-            let objects_in_bag = document.createElement('input');
+            const objects_in_bag = document.createElement('input');
             objects_in_bag.type = 'number';
             objects_in_bag.id = 'nb-objects';
             objects_in_bag.value = (conf.objects);
@@ -4766,28 +5198,28 @@
             objects_in_bag_div.appendChild(objects_in_bag_label);
             objects_in_bag_div.appendChild(objects_in_bag);
             /** Type de bâtiment */
-            let ruin_type_div = document.createElement('div');
+            const ruin_type_div = document.createElement('div');
             cell_info_content.appendChild(ruin_type_div);
-            let select_ruin_label = document.createElement('label');
+            const select_ruin_label = document.createElement('label');
             select_ruin_label.htmlFor = 'select-ruin';
             select_ruin_label.innerText = getI18N(texts.ruin);
             select_ruin_label.classList.add('spaced-label');
-            let select_ruin = document.createElement('select');
+            const select_ruin = document.createElement('select');
             select_ruin.id = 'select-ruin';
             select_ruin.value = conf.ruin;
             select_ruin.classList.add('small');
             all_ruins.forEach((ruin) => {
-                let ruin_option = document.createElement('option');
+                const ruin_option = document.createElement('option');
                 ruin_option.value = ruin.id;
                 ruin_option.label = getI18N(ruin.label);
                 select_ruin.appendChild(ruin_option);
             });
             select_ruin.addEventListener('change', ($event) => {
                 conf.ruin = $event.srcElement.value;
-                let current_ruin = all_ruins.find((_current_ruin) => +_current_ruin.id === +conf.ruin);
+                const current_ruin = all_ruins.find((_current_ruin) => +_current_ruin.id === +conf.ruin);
                 conf.ruinBonus = current_ruin.camping;
                 conf.ruinCapacity = current_ruin.capacity;
-                let digs_field = document.querySelector('#digs-field');
+                const digs_field = document.querySelector('#digs-field');
                 if (+current_ruin.id === -1) {
                     digs_field.style.display = 'block';
                 }
@@ -4800,16 +5232,16 @@
             ruin_type_div.appendChild(select_ruin_label);
             ruin_type_div.appendChild(select_ruin);
             /** Nombre de tas sur le bat ? */
-            let digs_div = document.createElement('div');
+            const digs_div = document.createElement('div');
             digs_div.id = 'digs-field';
             digs_div.style.display = 'none';
             cell_info_content.appendChild(digs_div);
-            let digs_label = document.createElement('label');
+            const digs_label = document.createElement('label');
             digs_label.htmlFor = 'digs';
             digs_label.innerText = getI18N(texts.digs);
             digs_label.innerHTML = `<img src="${repo_img_hordes_url}icons/uncover.gif"> ${getI18N(texts.digs)}`;
             digs_label.classList.add('spaced-label');
-            let digs = document.createElement('input');
+            const digs = document.createElement('input');
             digs.type = 'number';
             digs.id = 'digs';
             digs.value = (conf.ruinBuryCount);
@@ -4821,14 +5253,14 @@
             digs_div.appendChild(digs_label);
             digs_div.appendChild(digs);
             /** Distance de la ville */
-            let distance_div = document.createElement('div');
+            const distance_div = document.createElement('div');
             cell_info_content.appendChild(distance_div);
-            let distance_label = document.createElement('label');
+            const distance_label = document.createElement('label');
             distance_label.htmlFor = 'distance';
             distance_label.innerText = getI18N(texts.distance).replace('%VAR%', '');
             distance_label.innerHTML = `<img src="${repo_img_hordes_url}emotes/explo.gif"> ${getI18N(texts.distance).replace('%VAR%', '')}`;
             distance_label.classList.add('spaced-label');
-            let distance = document.createElement('input');
+            const distance = document.createElement('input');
             distance.type = 'number';
             distance.id = 'distance';
             distance.value = (conf.distance);
@@ -4840,13 +5272,13 @@
             distance_div.appendChild(distance_label);
             distance_div.appendChild(distance);
             /** Nombre de zombies sur la case */
-            let zombies_div = document.createElement('div');
+            const zombies_div = document.createElement('div');
             cell_info_content.appendChild(zombies_div);
-            let zombies_label = document.createElement('label');
+            const zombies_label = document.createElement('label');
             zombies_label.htmlFor = 'nb-zombies';
             zombies_label.innerHTML = `<img src="${repo_img_hordes_url}emotes/zombie.gif"> ${getI18N(texts.zombies_on_cell)}`;
             zombies_label.classList.add('spaced-label');
-            let zombies = document.createElement('input');
+            const zombies = document.createElement('input');
             zombies.type = 'number';
             zombies.id = 'nb-zombies';
             zombies.value = (conf.zombies);
@@ -4858,13 +5290,13 @@
             zombies_div.appendChild(zombies_label);
             zombies_div.appendChild(zombies);
             /** Nombre d'améliorations simples sur la case */
-            let improve_div = document.createElement('div');
+            const improve_div = document.createElement('div');
             cell_info_content.appendChild(improve_div);
-            let improve_label = document.createElement('label');
+            const improve_label = document.createElement('label');
             improve_label.htmlFor = 'nb-improve';
             improve_label.innerHTML = `<img src="${repo_img_hordes_url}icons/small_refine.gif"> ${getI18N(texts.improve)}`;
             improve_label.classList.add('spaced-label');
-            let improve = document.createElement('input');
+            const improve = document.createElement('input');
             improve.type = 'number';
             improve.id = 'nb-improve';
             improve.value = (conf.improve);
@@ -4876,13 +5308,13 @@
             improve_div.appendChild(improve_label);
             improve_div.appendChild(improve);
             /** Nombre d'objets de campement installés sur la case */
-            let object_improve_div = document.createElement('div');
+            const object_improve_div = document.createElement('div');
             cell_info_content.appendChild(object_improve_div);
-            let object_improve_label = document.createElement('label');
+            const object_improve_label = document.createElement('label');
             object_improve_label.htmlFor = 'nb-object-improve';
             object_improve_label.innerHTML = `<img src="${repo_img_hordes_url}item/cat_def.gif"> ${getI18N(texts.object_improve)}`;
             object_improve_label.classList.add('spaced-label');
-            let object_improve = document.createElement('input');
+            const object_improve = document.createElement('input');
             object_improve.type = 'number';
             object_improve.id = 'nb-object-improve';
             object_improve.value = (conf.objectImprove);
@@ -4894,13 +5326,13 @@
             object_improve_div.appendChild(object_improve_label);
             object_improve_div.appendChild(object_improve);
             /** Nombre de personnes déjà cachées */
-            let hidden_campers_div = document.createElement('div');
+            const hidden_campers_div = document.createElement('div');
             cell_info_content.appendChild(hidden_campers_div);
-            let hidden_campers_label = document.createElement('label');
+            const hidden_campers_label = document.createElement('label');
             hidden_campers_label.htmlFor = 'hidden-campers';
             hidden_campers_label.innerHTML = `<img src="${repo_img_hordes_url}emotes/human.gif"> ${getI18N(texts.hidden_campers)}`;
             hidden_campers_label.classList.add('spaced-label');
-            let hidden_campers = document.createElement('input');
+            const hidden_campers = document.createElement('input');
             hidden_campers.type = 'number';
             hidden_campers.id = 'hidden-campers';
             hidden_campers.value = (conf.hiddenCampers);
@@ -4912,12 +5344,12 @@
             hidden_campers_div.appendChild(hidden_campers_label);
             hidden_campers_div.appendChild(hidden_campers);
             /** Nuit ? */
-            let night_div = document.createElement('div');
+            const night_div = document.createElement('div');
             town_info_content.appendChild(night_div);
-            let night_label = document.createElement('label');
+            const night_label = document.createElement('label');
             night_label.htmlFor = 'night';
             night_label.innerHTML = `<img src="${repo_img_hordes_url}pictos/r_doutsd.gif"> ${getI18N(texts.night)}`;
-            let night = document.createElement('input');
+            const night = document.createElement('input');
             night.type = 'checkbox';
             night.id = 'night';
             night.checked = conf.night;
@@ -4929,12 +5361,12 @@
             night_div.appendChild(night);
             night_div.appendChild(night_label);
             /** Ville dévastée ? */
-            let devastated_div = document.createElement('div');
+            const devastated_div = document.createElement('div');
             town_info_content.appendChild(devastated_div);
-            let devastated_label = document.createElement('label');
+            const devastated_label = document.createElement('label');
             devastated_label.htmlFor = 'devastated';
             devastated_label.innerHTML = `<img src="${repo_img_hordes_url}item/item_out_def_broken.gif"> ${getI18N(texts.devastated)}`;
-            let devastated = document.createElement('input');
+            const devastated = document.createElement('input');
             devastated.type = 'checkbox';
             devastated.id = 'devastated';
             devastated.checked = conf.devastated;
@@ -4946,13 +5378,13 @@
             devastated_div.appendChild(devastated);
             devastated_div.appendChild(devastated_label);
             /** Phare construit ? */
-            let phare_div = document.createElement('div');
+            const phare_div = document.createElement('div');
             town_info_content.appendChild(phare_div);
-            let phare_label = document.createElement('label');
+            const phare_label = document.createElement('label');
             phare_label.htmlFor = 'phare';
             phare_label.innerText = getI18N(texts.phare);
             phare_label.innerHTML = `<img src="${repo_img_hordes_url}building/small_lighthouse.gif"> ${getI18N(texts.phare)}`;
-            let phare = document.createElement('input');
+            const phare = document.createElement('input');
             phare.type = 'checkbox';
             phare.id = 'phare';
             phare.checked = conf.phare;
@@ -4971,25 +5403,25 @@
     function displayRuins() {
         getRuins().then((ruins) => {
             if (ruins) {
-                let tab_content = document.getElementById(mh_optimizer_window_id + '-tab-content');
-                let header_cells = [...table_ruins_headers];
-                let header_row = document.createElement('tr');
+                const tab_content = document.getElementById(mh_optimizer_window_id + '-tab-content');
+                const header_cells = [...table_ruins_headers];
+                const header_row = document.createElement('tr');
                 header_row.classList.add('mho-header');
                 header_cells.forEach((header_cell) => {
-                    let cell = document.createElement('th');
+                    const cell = document.createElement('th');
                     cell.innerText = getI18N(header_cell.label);
                     header_row.appendChild(cell);
                 });
-                let table = document.createElement('table');
+                const table = document.createElement('table');
                 table.classList.add('mho-table');
                 table.appendChild(header_row);
                 tab_content.appendChild(table);
                 ruins.forEach((ruin) => {
-                    let ruin_row = document.createElement('tr');
+                    const ruin_row = document.createElement('tr');
                     table.appendChild(ruin_row);
                     header_cells.forEach((header_cell) => {
-                        let cell = document.createElement(header_cell.type);
-                        let img = document.createElement('img');
+                        const cell = document.createElement(header_cell.type);
+                        const img = document.createElement('img');
                         switch (header_cell.id) {
                             case 'img':
                                 img.src = `${repo_img_hordes_url}ruin/${ruin[header_cell.id]}.gif`;
@@ -5008,16 +5440,16 @@
                                 item_divs.style.justifyContent = 'space-around';
                                 cell.appendChild(item_divs);
                                 ruin[header_cell.id].forEach((item) => {
-                                    let item_div = document.createElement('div');
+                                    const item_div = document.createElement('div');
                                     item_div.style.margin = '0 0.5em';
                                     item_div.title = getI18N(item.item.label);
-                                    let item_img = document.createElement('img');
+                                    const item_img = document.createElement('img');
                                     item_img.src = repo_img_hordes_url + item.item.img;
                                     item_img.style.display = 'block';
                                     item_img.style.margin = 'auto';
                                     // let item_label = document.createElement('span');
                                     // item_label.innerText = getI18N(item.item.label);
-                                    let item_proba = document.createElement('span');
+                                    const item_proba = document.createElement('span');
                                     item_proba.innerText = Math.round(item.probability * 1000) / 10 + '%';
                                     item_proba.style.display = 'block';
                                     item_proba.style.margin = 'auto';
@@ -5062,39 +5494,39 @@
         if (full_size) {
             window.classList.add('fullsize');
         }
-        let window_box = document.createElement('div');
+        const window_box = document.createElement('div');
         window_box.id = id + '-box';
         window_box.classList.add('mho-window-box');
         window.appendChild(window_box);
-        let window_drag_handler = document.createElement('div');
+        const window_drag_handler = document.createElement('div');
         window_drag_handler.id = id + '-drag-handle';
         if (!full_size) {
             window_drag_handler.style.cursor = 'move';
         }
         window_drag_handler.classList.add('mho-window-drag-handle');
         window_box.appendChild(window_drag_handler);
-        let window_content = document.createElement('div');
+        const window_content = document.createElement('div');
         window_content.id = id + '-content';
         window_content.classList.add('mho-window-content');
         window_box.appendChild(window_content);
-        let window_overlay = document.createElement('div');
+        const window_overlay = document.createElement('div');
         window_overlay.id = id + '-overlay';
         window_overlay.classList.add('mho-window-overlay');
         window_box.appendChild(window_overlay);
-        let window_overlay_ul = document.createElement('ul');
+        const window_overlay_ul = document.createElement('ul');
         window_overlay.appendChild(window_overlay_ul);
-        let window_overlay_li = document.createElement('li');
+        const window_overlay_li = document.createElement('li');
         window_overlay_ul.appendChild(window_overlay_li);
-        let window_overlay_img = document.createElement('img');
+        const window_overlay_img = document.createElement('img');
         window_overlay_img.alt = '(X)';
         window_overlay_img.src = repo_img_hordes_url + 'icons/b_close.png';
         window_overlay_li.appendChild(window_overlay_img);
         window_overlay_img.addEventListener('click', () => {
             window.classList.remove('visible');
-            let body = document.getElementsByTagName('body')[0];
+            const body = document.getElementsByTagName('body')[0];
             body.removeAttribute('style', 'overflow: hidden');
         });
-        let post_office = document.getElementById('post-office');
+        const post_office = document.getElementById('post-office');
         if (post_office) {
             post_office.parentNode.insertBefore(window, post_office.nextSibling);
         }
@@ -5119,8 +5551,8 @@
                     pos3 = e.clientX;
                     pos4 = e.clientY;
                     // set the element's new position:
-                    window.style.top = (window.offsetTop - pos2) + "px";
-                    window.style.left = (window.offsetLeft - pos1) + "px";
+                    window.style.top = (window.offsetTop - pos2) + 'px';
+                    window.style.left = (window.offsetLeft - pos1) + 'px';
                 };
             };
         }
@@ -5134,13 +5566,13 @@
      * @param {string} window_type
      */
     function createWikiToolsTabs(window_type) {
-        let window_content = document.getElementById(mh_optimizer_window_id + '-content');
+        const window_content = document.getElementById(mh_optimizer_window_id + '-content');
         window_content.innerHTML = '';
-        let tabs_div = document.createElement('div');
+        const tabs_div = document.createElement('div');
         tabs_div.id = 'tabs';
         window_content.appendChild(tabs_div);
-        let tabs_ul = document.createElement('ul');
-        let current_tabs_list = tabs_list[window_type]
+        const tabs_ul = document.createElement('ul');
+        const current_tabs_list = tabs_list[window_type]
             .filter((tab) => state.mh_user.townDetails?.townId || !tab.needs_town)
             .sort((a, b) => {
             if (a.ordering > b.ordering) {
@@ -5154,15 +5586,15 @@
             }
         });
         current_tabs_list.forEach((tab, index) => {
-            let tab_link = document.createElement('div');
+            const tab_link = document.createElement('div');
             if (tab.icon) {
-                let tab_icon = document.createElement('img');
+                const tab_icon = document.createElement('img');
                 tab_icon.src = tab.icon;
                 tab_link.appendChild(tab_icon);
             }
-            let tab_text = document.createTextNode(getI18N(tab.label));
+            const tab_text = document.createTextNode(getI18N(tab.label));
             tab_link.appendChild(tab_text);
-            let tab_li = document.createElement('li');
+            const tab_li = document.createElement('li');
             tab_li.appendChild(tab_link);
             if (index === 0) {
                 tab_li.classList.add('selected');
@@ -5171,7 +5603,7 @@
             const tab_content = document.getElementById(mh_optimizer_window_id + '-tab-content');
             tab_li.addEventListener('click', () => {
                 if (!tab_li.classList.contains('selected') && tab_content !== undefined && tab_content !== null) {
-                    for (let li of tabs_ul.children) {
+                    for (const li of tabs_ul.children) {
                         li.classList.remove('selected');
                     }
                     tab_li.classList.add('selected');
@@ -5185,24 +5617,24 @@
     /** Crée la fenêtre de wiki */
     function createMapWindow() {
         let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
-        let window_content = document.createElement('div');
+        const window_content = document.createElement('div');
         window_content.id = mh_optimizer_map_window_id + '-content';
         window_content.setAttribute('style', 'height: calc(100% - 26px); position: initial; margin-top: 26px;');
-        let window_overlay_img = document.createElement('img');
+        const window_overlay_img = document.createElement('img');
         window_overlay_img.alt = '(X)';
         window_overlay_img.src = repo_img_hordes_url + 'icons/b_close.png';
-        let window_overlay_li = document.createElement('li');
+        const window_overlay_li = document.createElement('li');
         window_overlay_li.appendChild(window_overlay_img);
-        let window_overlay_ul = document.createElement('ul');
+        const window_overlay_ul = document.createElement('ul');
         window_overlay_ul.style.margin = '-2px -2px 0 0';
         window_overlay_ul.appendChild(window_overlay_li);
-        let window_overlay = document.createElement('div');
+        const window_overlay = document.createElement('div');
         window_overlay.id = mh_optimizer_map_window_id + '-overlay';
         window_overlay.setAttribute('style', 'cursor: move; width: 100%;');
-        let window_box = document.createElement('div');
+        const window_box = document.createElement('div');
         window_box.id = mh_optimizer_map_window_id + '-box';
         window_box.draggable = true;
-        let window = document.createElement('div');
+        const window = document.createElement('div');
         window.style.minWidth = '150px;';
         window.style.minHeight = '150px;';
         window.id = mh_optimizer_map_window_id;
@@ -5226,15 +5658,15 @@
                 pos3 = e.clientX;
                 pos4 = e.clientY;
                 // set the element's new position:
-                window_box.style.top = (window_box.offsetTop - pos2) + "px";
-                window_box.style.left = (window_box.offsetLeft - pos1) + "px";
+                window_box.style.top = (window_box.offsetTop - pos2) + 'px';
+                window_box.style.left = (window_box.offsetLeft - pos1) + 'px';
             };
         };
         window_overlay.appendChild(window_overlay_ul);
         window_box.appendChild(window_content);
         window_box.appendChild(window_overlay);
         window.appendChild(window_box);
-        let post_office = document.getElementById('post-office');
+        const post_office = document.getElementById('post-office');
         if (post_office) {
             post_office.parentNode.insertBefore(window, post_office.nextSibling);
         }
@@ -5248,7 +5680,7 @@
      */
     function displayWindow(window_type) {
         document.getElementById(mh_optimizer_window_id).classList.add('visible');
-        let body = document.getElementsByTagName('body')[0];
+        const body = document.getElementsByTagName('body')[0];
         body.setAttribute('style', 'overflow: hidden');
         createWikiToolsTabs(window_type);
     }
@@ -5257,7 +5689,7 @@
      * @param {string} window_tyme     Le type de fenêtre à afficher, correspondant au nom utilisé dans la liste des onglets
      */
     function createWikiToolsTabContent(window_type) {
-        let window_content = document.getElementById(mh_optimizer_window_id + '-content');
+        const window_content = document.getElementById(mh_optimizer_window_id + '-content');
         let tab_content = document.getElementById(mh_optimizer_window_id + '-tab-content');
         if (tab_content) {
             tab_content.remove();
@@ -5274,7 +5706,7 @@
      */
     function dispatchWikiToolsContent(window_type, tab) {
         createWikiToolsTabContent(window_type);
-        let list = document.getElementById(mh_optimizer_window_id + '-tab-content');
+        const list = document.getElementById(mh_optimizer_window_id + '-tab-content');
         if (list) {
             list.innerHTML = '';
         }
@@ -5314,14 +5746,14 @@
         document.getElementById(modal_id)?.remove();
         const overlay = document.createElement('div');
         overlay.id = modal_id;
-        overlay.classList.add('mho-changelog-modal-overlay');
+        overlay.classList.add('mho-modal-overlay');
         const box = document.createElement('div');
-        box.classList.add('mho-changelog-modal-box');
+        box.classList.add('mho-modal-box');
         const title = document.createElement('h3');
-        title.classList.add('mho-changelog-modal-title');
+        title.classList.add('mho-modal-title');
         title.textContent = content.split('\n')[0].trim();
         const body = document.createElement('pre');
-        body.classList.add('mho-changelog-modal-body');
+        body.classList.add('mho-modal-body');
         body.textContent = content.split('\n').slice(1).map((line) => line.trim()).join('\n').trim();
         // Lien pour afficher l'historique complet des versions passées
         const current_version = getScriptInfo().version;
@@ -5361,10 +5793,10 @@
             box.appendChild(body);
         }
         const footer = document.createElement('div');
-        footer.classList.add('mho-changelog-modal-footer');
+        footer.classList.add('mho-modal-footer');
         const ok_btn = document.createElement('button');
         ok_btn.textContent = 'OK';
-        ok_btn.classList.add('mho-changelog-modal-btn');
+        ok_btn.classList.add('mho-modal-btn');
         ok_btn.addEventListener('click', () => {
             overlay.remove();
             if (onConfirm)
@@ -5386,9 +5818,9 @@
      * @param {string} tab_id
      */
 
-    let informations = [
+    const informations = [
         {
-            id: `version`,
+            id: 'version',
             label: {
                 en: `Changelog ${getScriptInfo().version}`,
                 fr: `Notes de version ${getScriptInfo().version}`,
@@ -5410,44 +5842,44 @@
                     }
                 });
             },
-            img: `emotes/rptext.gif`
+            img: 'emotes/rptext.gif'
         },
         {
-            id: `update`,
+            id: 'update',
             label: {
-                en: `Update available`,
-                fr: `Mise à jour disponible`,
-                de: `Update verfügbar`,
-                es: `Actualización disponible`
+                en: 'Update available',
+                fr: 'Mise à jour disponible',
+                de: 'Update verfügbar',
+                es: 'Actualización disponible'
             },
             src: isScript() ? getScriptInfo().updateURL : undefined,
             action: undefined,
-            img: `icons/small_news.gif`,
+            img: 'icons/small_news.gif',
             display: () => isScript() && !isScriptVersionLastVersion()
         },
         {
-            id: `discord-url-id`,
+            id: 'discord-url-id',
             label: {
-                en: `Bugs? Ideas?`,
-                fr: `Des bugs ? Des idées ?`,
-                de: `Fehler ? Ideen ?`,
-                es: `¿Bugs? ¿Ideas?`
+                en: 'Bugs? Ideas?',
+                fr: 'Des bugs ? Des idées ?',
+                de: 'Fehler ? Ideen ?',
+                es: '¿Bugs? ¿Ideas?'
             },
-            src: `https://discord.gg/ZQH7ZPWcCm`,
+            src: 'https://discord.gg/ZQH7ZPWcCm',
             action: undefined,
             img: `${repo_img_url}discord.ico`
         },
         {
-            id: `edit-app-id`,
+            id: 'edit-app-id',
             label: {
-                en: `Change my external ID for apps`,
-                fr: `Modifier mon ID externe pour les apps`,
-                de: `Meine externe ID für externe Programme ändern`,
-                es: `Cambiar mi ID externo para las aplicaciones`
+                en: 'Change my external ID for apps',
+                fr: 'Modifier mon ID externe pour les apps',
+                de: 'Meine externe ID für externe Programme ändern',
+                es: 'Cambiar mi ID externo para las aplicaciones'
             },
             src: undefined,
             action: () => {
-                let manual_app_id_key = prompt(getI18N(texts.edit_add_app_id_key), state.external_app_id);
+                const manual_app_id_key = prompt(getI18N(texts.edit_add_app_id_key), state.external_app_id);
                 if (manual_app_id_key !== null && manual_app_id_key !== undefined && manual_app_id_key !== '') {
                     state.external_app_id = manual_app_id_key;
                     setStorageItem(gm_mh_external_app_id_key, state.external_app_id);
@@ -5457,41 +5889,41 @@
                     setStorageItem(gm_mh_external_app_id_key, undefined);
                 }
             },
-            img: `icons/small_remove.gif`
+            img: 'icons/small_remove.gif'
         }
     ];
     const table_ruins_headers = [
-        { id: 'img', label: { en: ``, fr: ``, de: ``, es: `` }, type: 'th' },
-        { id: 'label', label: { en: `Name`, fr: 'Nom', de: `Name`, es: `Nombre` }, type: 'th' },
+        { id: 'img', label: { en: '', fr: '', de: '', es: '' }, type: 'th' },
+        { id: 'label', label: { en: 'Name', fr: 'Nom', de: 'Name', es: 'Nombre' }, type: 'th' },
         {
             id: 'description',
-            label: { en: `Description`, fr: `Description`, de: `Beschreibung`, es: `Descripción` },
+            label: { en: 'Description', fr: 'Description', de: 'Beschreibung', es: 'Descripción' },
             type: 'td'
         },
         {
             id: 'minDist',
-            label: { en: `Minimum distance`, fr: `Distance minimum`, de: `Mindestabstand`, es: `Distancia mínima` },
+            label: { en: 'Minimum distance', fr: 'Distance minimum', de: 'Mindestabstand', es: 'Distancia mínima' },
             type: 'td'
         },
         {
             id: 'maxDist',
-            label: { en: `Maximum distance`, fr: `Distance maximum`, de: `Maximale Entfernung`, es: `Distancia máxima` },
+            label: { en: 'Maximum distance', fr: 'Distance maximum', de: 'Maximale Entfernung', es: 'Distancia máxima' },
             type: 'td'
         },
         {
             id: 'camping',
-            label: { en: `Camping bonus`, fr: `Bonus en camping`, de: `Campingbonus`, es: `Bono de acampada` },
+            label: { en: 'Camping bonus', fr: 'Bonus en camping', de: 'Campingbonus', es: 'Bono de acampada' },
             type: 'td'
         },
         {
             id: 'capacity',
-            label: { en: `Capacity`, fr: `Capacité`, de: `Kapazität`, es: `Capacidad` },
+            label: { en: 'Capacity', fr: 'Capacité', de: 'Kapazität', es: 'Capacidad' },
             type: 'td'
         },
-        { id: 'drops', label: { en: `Items`, fr: 'Objets', de: `Gegenstände`, es: `Objetos` }, type: 'td' },
+        { id: 'drops', label: { en: 'Items', fr: 'Objets', de: 'Gegenstände', es: 'Objetos' }, type: 'td' },
     ];
     const added_ruins = [
-        { id: '-1000', camping: 0, label: { en: `None`, fr: `Aucun`, de: `Kein`, es: `Ninguna` } }
+        { id: '-1000', camping: 0, label: { en: 'None', fr: 'Aucun', de: 'Kein', es: 'Ninguna' } }
     ];
     const town_type = [
         { id: 'rne', label: { de: 'Kleine Stadt', en: 'Small Town', es: 'Amateur', fr: 'Petite carte' } },
@@ -5505,7 +5937,7 @@
      * Crée un champ "input number" précédé d'une icône (avec title) et entouré
      * de boutons +/- permettant d'incrémenter/décrémenter la valeur de 1.
      */
-    function createNumberField(config) {
+    function createNumberField$1(config) {
         const min_value = config.minValue ?? 0;
         const field = document.createElement('div');
         field.classList.add('mho-camping-field');
@@ -5558,15 +5990,15 @@
     function displayCampingPredict() {
         setTimeout(() => {
             let camping_predict_container = document.getElementById(mho_camping_predict_id);
-            let zone_camp = document.querySelector('.zone-camp');
+            const zone_camp = document.querySelector('.zone-camp');
             if (state.mho_parameters.display_camping_predict && pageIsDesert() && zone_camp) {
                 if (camping_predict_container)
                     return;
                 getRuins().then((ruins) => {
                     let all_ruins = [...added_ruins];
                     all_ruins = all_ruins.concat(ruins);
-                    let zone_camp_info = zone_camp.querySelector('.zone-camp-info');
-                    let zone_camp_label = zone_camp.querySelector('label');
+                    const zone_camp_info = zone_camp.querySelector('.zone-camp-info');
+                    const zone_camp_label = zone_camp.querySelector('label');
                     camping_predict_container = document.createElement('div');
                     camping_predict_container.id = mho_camping_predict_id;
                     camping_predict_container.style.display = window.getComputedStyle(zone_camp_info).getPropertyValue('max-height') === '0px' ? 'none' : 'block';
@@ -5574,33 +6006,33 @@
                     zone_camp_label.addEventListener('click', () => {
                         camping_predict_container.style.display = camping_predict_container.style.display === 'none' ? 'block' : 'none';
                     });
-                    let updater_title = document.createElement('h5');
+                    const updater_title = document.createElement('h5');
                     updater_title.classList.add('mho-camping-title');
-                    let updater_title_mho_img = document.createElement('img');
+                    const updater_title_mho_img = document.createElement('img');
                     updater_title_mho_img.src = mh_optimizer_icon;
                     updater_title.appendChild(updater_title_mho_img);
-                    let updater_title_text = document.createElement('span');
+                    const updater_title_text = document.createElement('span');
                     updater_title_text.innerText = getI18N(texts.camping_calculator);
                     updater_title.appendChild(updater_title_text);
                     camping_predict_container.appendChild(updater_title);
-                    let camping_predict_content = document.createElement('div');
+                    const camping_predict_content = document.createElement('div');
                     camping_predict_content.classList.add('mho-camping-content');
                     camping_predict_content.style.display = 'none';
                     camping_predict_container.appendChild(camping_predict_content);
                     updater_title.addEventListener('click', () => {
-                        let is_hidden = camping_predict_content.style.display === 'none';
+                        const is_hidden = camping_predict_content.style.display === 'none';
                         camping_predict_content.style.display = is_hidden ? 'block' : 'none';
                         camping_predict_container.classList.toggle('mho-camping-opened', is_hidden);
                         if (is_hidden) {
                             calculateCamping(conf);
                         }
                     });
-                    let zone_ruin = document.querySelector('.ruin-info b');
+                    const zone_ruin = document.querySelector('.ruin-info b');
                     let ruin = '-1000';
                     if (zone_ruin) {
                         ruin = all_ruins.find((one_ruin) => getI18N(one_ruin.label).toLowerCase() === zone_ruin.innerText.toLowerCase()).id;
                     }
-                    let conf = {
+                    const conf = {
                         townType: state.mh_user.townDetails?.townType.toUpperCase(),
                         job: jobs.find((job) => state.mh_user.jobDetails.uid === job.img)?.id,
                         distance: document.querySelector('.zone-dist > div > b')?.innerText.replace('km', ''), // OK
@@ -5622,55 +6054,55 @@
                         ruinCapacity: 0,
                         ruin: '-1000'
                     };
-                    let columns_wrapper = document.createElement('div');
+                    const columns_wrapper = document.createElement('div');
                     columns_wrapper.classList.add('mho-camping-columns');
                     camping_predict_content.appendChild(columns_wrapper);
-                    let my_info = document.createElement('div');
+                    const my_info = document.createElement('div');
                     my_info.classList.add('mho-camping-section', 'citizen');
                     columns_wrapper.appendChild(my_info);
-                    let my_info_title = document.createElement('h3');
+                    const my_info_title = document.createElement('h3');
                     my_info_title.innerText = getI18N(texts.camping_citizen);
                     my_info.appendChild(my_info_title);
-                    let my_info_content = document.createElement('div');
+                    const my_info_content = document.createElement('div');
                     my_info_content.classList.add('mho-camping-section-content');
                     my_info.appendChild(my_info_content);
-                    let town_info = document.createElement('div');
+                    const town_info = document.createElement('div');
                     town_info.classList.add('mho-camping-section', 'town');
                     columns_wrapper.appendChild(town_info);
-                    let town_info_title = document.createElement('h3');
+                    const town_info_title = document.createElement('h3');
                     town_info_title.innerText = getI18N(texts.camping_town);
                     town_info.appendChild(town_info_title);
-                    let town_info_content = document.createElement('div');
+                    const town_info_content = document.createElement('div');
                     town_info_content.classList.add('mho-camping-section-content');
                     town_info.appendChild(town_info_content);
-                    let cell_info = document.createElement('div');
+                    const cell_info = document.createElement('div');
                     cell_info.classList.add('mho-camping-section', 'zone');
                     columns_wrapper.appendChild(cell_info);
-                    let cell_info_title = document.createElement('h3');
+                    const cell_info_title = document.createElement('h3');
                     cell_info_title.innerText = getI18N(texts.camping_ruin);
                     cell_info.appendChild(cell_info_title);
-                    let cell_info_content = document.createElement('div');
+                    const cell_info_content = document.createElement('div');
                     cell_info_content.classList.add('mho-camping-section-content');
                     cell_info.appendChild(cell_info_content);
-                    let result = document.createElement('div');
+                    const result = document.createElement('div');
                     result.classList.add('mho-camping-section');
                     camping_predict_content.appendChild(result);
-                    let result_title = document.createElement('h3');
+                    const result_title = document.createElement('h3');
                     result_title.innerText = getI18N(texts.result);
                     result.appendChild(result_title);
-                    let result_content = document.createElement('div');
+                    const result_content = document.createElement('div');
                     result_content.id = 'camping-result';
                     result.appendChild(result_content);
                     /** Capuche ? */
-                    let vest_div = document.createElement('div');
+                    const vest_div = document.createElement('div');
                     vest_div.id = 'vest-field';
                     vest_div.classList.add('mho-camping-field');
                     vest_div.style.display = 'none';
                     my_info_content.appendChild(vest_div);
-                    let vest_label = document.createElement('label');
+                    const vest_label = document.createElement('label');
                     vest_label.htmlFor = 'vest';
                     vest_label.innerHTML = `<img src="${repo_img_hordes_url}emotes/proscout.gif" title="${getI18N(texts.vest)}">`;
-                    let vest = document.createElement('input');
+                    const vest = document.createElement('input');
                     vest.type = 'checkbox';
                     vest.id = 'vest';
                     vest.checked = conf.vest;
@@ -5682,13 +6114,13 @@
                     vest_div.appendChild(vest);
                     vest_div.appendChild(vest_label);
                     /** Campeur pro ? */
-                    let pro_camper_div = document.createElement('div');
+                    const pro_camper_div = document.createElement('div');
                     pro_camper_div.classList.add('mho-camping-field');
                     my_info_content.appendChild(pro_camper_div);
-                    let pro_camper_label = document.createElement('label');
+                    const pro_camper_label = document.createElement('label');
                     pro_camper_label.htmlFor = 'pro';
                     pro_camper_label.innerHTML = `<img src="${repo_img_hordes_url}status/status_camper.gif" title="${getI18N(texts.pro_camper)}">`;
-                    let pro_camper = document.createElement('input');
+                    const pro_camper = document.createElement('input');
                     pro_camper.type = 'checkbox';
                     pro_camper.id = 'pro';
                     pro_camper.checked = conf.pro;
@@ -5700,13 +6132,13 @@
                     pro_camper_div.appendChild(pro_camper);
                     pro_camper_div.appendChild(pro_camper_label);
                     /** Tombe ? */
-                    let tomb_div = document.createElement('div');
+                    const tomb_div = document.createElement('div');
                     tomb_div.classList.add('mho-camping-field');
                     my_info_content.appendChild(tomb_div);
-                    let tomb_label = document.createElement('label');
+                    const tomb_label = document.createElement('label');
                     tomb_label.htmlFor = 'tomb';
                     tomb_label.innerHTML = `<img src="${repo_img_hordes_url}building/small_cemetery.gif" title="${getI18N(texts.tomb)}">`;
-                    let tomb = document.createElement('input');
+                    const tomb = document.createElement('input');
                     tomb.type = 'checkbox';
                     tomb.id = 'tomb';
                     tomb.checked = conf.tomb;
@@ -5718,13 +6150,13 @@
                     tomb_div.appendChild(tomb);
                     tomb_div.appendChild(tomb_label);
                     /** R4 ? (impacte uniquement le maximum atteignable) */
-                    let r4_div = document.createElement('div');
+                    const r4_div = document.createElement('div');
                     r4_div.classList.add('mho-camping-field');
                     my_info_content.appendChild(r4_div);
-                    let r4_label = document.createElement('label');
+                    const r4_label = document.createElement('label');
                     r4_label.htmlFor = 'r4';
                     r4_label.innerText = 'R4';
-                    let r4 = document.createElement('input');
+                    const r4 = document.createElement('input');
                     r4.type = 'checkbox';
                     r4.id = 'r4';
                     r4.checked = conf.r4;
@@ -5736,11 +6168,11 @@
                     r4_div.appendChild(r4);
                     r4_div.appendChild(r4_label);
                     /** Grille 2 colonnes pour les compteurs du bloc "Le citoyen" */
-                    let citizen_numbers_grid = document.createElement('div');
+                    const citizen_numbers_grid = document.createElement('div');
                     citizen_numbers_grid.classList.add('mho-camping-numbers-grid');
                     my_info_content.appendChild(citizen_numbers_grid);
                     /** Nombre de nuits déjà campées */
-                    let nb_campings_field = createNumberField({
+                    const nb_campings_field = createNumberField$1({
                         id: 'nb-campings',
                         iconSrc: `${repo_img_hordes_url}emotes/sleep.gif`,
                         title: getI18N(texts.nb_campings),
@@ -5752,7 +6184,7 @@
                     });
                     citizen_numbers_grid.appendChild(nb_campings_field);
                     /** Nombre de toiles de tente ou pelure de peau */
-                    let objects_in_bag_field = createNumberField({
+                    const objects_in_bag_field = createNumberField$1({
                         id: 'nb-objects',
                         iconSrc: `${repo_img_hordes_url}emotes/bag.gif`,
                         title: getI18N(texts.objects_in_bag),
@@ -5764,19 +6196,19 @@
                     });
                     citizen_numbers_grid.appendChild(objects_in_bag_field);
                     /** Type de bâtiment */
-                    let ruin_type_div = document.createElement('div');
+                    const ruin_type_div = document.createElement('div');
                     ruin_type_div.classList.add('mho-camping-field', 'mho-camping-field--full');
                     cell_info_content.appendChild(ruin_type_div);
-                    let select_ruin_label = document.createElement('label');
+                    const select_ruin_label = document.createElement('label');
                     select_ruin_label.htmlFor = 'select-ruin';
                     select_ruin_label.innerText = getI18N(texts.ruin);
                     select_ruin_label.classList.add('spaced-label');
-                    let select_ruin = document.createElement('select');
+                    const select_ruin = document.createElement('select');
                     select_ruin.id = 'select-ruin';
                     select_ruin.value = conf.ruin;
                     select_ruin.classList.add('small');
                     all_ruins.forEach((ruin) => {
-                        let ruin_option = document.createElement('option');
+                        const ruin_option = document.createElement('option');
                         ruin_option.value = ruin.id;
                         ruin_option.label = getI18N(ruin.label);
                         if (ruin.id === conf.ruin) {
@@ -5786,10 +6218,10 @@
                     });
                     select_ruin.addEventListener('change', ($event) => {
                         conf.ruin = $event.srcElement.value;
-                        let current_ruin = all_ruins.find((_current_ruin) => +_current_ruin.id === +conf.ruin);
+                        const current_ruin = all_ruins.find((_current_ruin) => +_current_ruin.id === +conf.ruin);
                         conf.ruinBonus = current_ruin.camping;
                         conf.ruinCapacity = current_ruin.capacity;
-                        let digs_field = document.querySelector('#digs-field');
+                        const digs_field = document.querySelector('#digs-field');
                         if (+current_ruin.id === -1) {
                             digs_field.style.display = 'block';
                         }
@@ -5802,7 +6234,7 @@
                     ruin_type_div.appendChild(select_ruin_label);
                     ruin_type_div.appendChild(select_ruin);
                     /** Nombre de tas sur le bat ? */
-                    let digs_field = createNumberField({
+                    const digs_field = createNumberField$1({
                         id: 'digs',
                         fieldId: 'digs-field',
                         fullWidth: true,
@@ -5817,11 +6249,11 @@
                     digs_field.style.display = 'none';
                     cell_info_content.appendChild(digs_field);
                     /** Grille 2 colonnes pour les compteurs du bloc "Le bâtiment" */
-                    let building_numbers_grid = document.createElement('div');
+                    const building_numbers_grid = document.createElement('div');
                     building_numbers_grid.classList.add('mho-camping-numbers-grid');
                     cell_info_content.appendChild(building_numbers_grid);
                     /** Nombre de zombies sur la case */
-                    let zombies_field = createNumberField({
+                    const zombies_field = createNumberField$1({
                         id: 'nb-zombies',
                         iconSrc: `${repo_img_hordes_url}emotes/zombie.gif`,
                         title: getI18N(texts.zombies_on_cell),
@@ -5833,7 +6265,7 @@
                     });
                     building_numbers_grid.appendChild(zombies_field);
                     /** Nombre de personnes déjà cachées */
-                    let hidden_campers_field = createNumberField({
+                    const hidden_campers_field = createNumberField$1({
                         id: 'hidden-campers',
                         iconSrc: `${repo_img_hordes_url}emotes/human.gif`,
                         title: getI18N(texts.hidden_campers),
@@ -5845,7 +6277,7 @@
                     });
                     building_numbers_grid.appendChild(hidden_campers_field);
                     /** Nombre d'améliorations simples sur la case */
-                    let improve_field = createNumberField({
+                    const improve_field = createNumberField$1({
                         id: 'nb-improve',
                         iconSrc: `${repo_img_hordes_url}icons/small_refine.gif`,
                         title: getI18N(texts.improve),
@@ -5857,7 +6289,7 @@
                     });
                     building_numbers_grid.appendChild(improve_field);
                     /** Nombre d'objets de campement installés sur la case */
-                    let object_improve_field = createNumberField({
+                    const object_improve_field = createNumberField$1({
                         id: 'nb-object-improve',
                         iconSrc: `${repo_img_hordes_url}item/cat_def.gif`,
                         title: getI18N(texts.object_improve),
@@ -5869,13 +6301,13 @@
                     });
                     building_numbers_grid.appendChild(object_improve_field);
                     /** Nuit ? */
-                    let night_div = document.createElement('div');
+                    const night_div = document.createElement('div');
                     night_div.classList.add('mho-camping-field');
                     town_info_content.appendChild(night_div);
-                    let night_label = document.createElement('label');
+                    const night_label = document.createElement('label');
                     night_label.htmlFor = 'night';
                     night_label.innerHTML = `<img src="${repo_img_hordes_url}pictos/r_doutsd.gif" title="${getI18N(texts.night)}">`;
-                    let night = document.createElement('input');
+                    const night = document.createElement('input');
                     night.type = 'checkbox';
                     night.id = 'night';
                     night.checked = conf.night;
@@ -5887,13 +6319,13 @@
                     night_div.appendChild(night);
                     night_div.appendChild(night_label);
                     /** Phare construit ? */
-                    let phare_div = document.createElement('div');
+                    const phare_div = document.createElement('div');
                     phare_div.classList.add('mho-camping-field');
                     town_info_content.appendChild(phare_div);
-                    let phare_label = document.createElement('label');
+                    const phare_label = document.createElement('label');
                     phare_label.htmlFor = 'phare';
                     phare_label.innerHTML = `<img src="${repo_img_hordes_url}building/small_lighthouse.gif" title="${getI18N(texts.phare)}">`;
-                    let phare = document.createElement('input');
+                    const phare = document.createElement('input');
                     phare.type = 'checkbox';
                     phare.id = 'phare';
                     phare.checked = conf.phare;
@@ -5912,130 +6344,160 @@
         }, 500);
     }
 
+    /** Évite d'enchaîner plusieurs chargements concurrents */
+    let is_loading_map = false;
+    let is_loading_ruins = false;
     function displayCellDetailsOnPage() {
-        if (state.mho_parameters.display_more_informations_from_mho && pageIsDesert()) {
-            let cell = getCellDetailsByPosition();
-            let cell_informations = document.querySelector('#cell-informations');
-            if (cell) {
-                state.current_cell = cell;
-                if (!cell_informations) {
-                    cell_informations = document.createElement('div');
-                    cell_informations.id = 'cell-informations';
-                    cell_informations.classList.add('row');
-                    let cell_informations_div = document.createElement('div');
-                    cell_informations_div.style.width = '100%';
-                    cell_informations_div.classList.add('background', 'cell');
-                    cell_informations.appendChild(cell_informations_div);
-                    let cell_informations_header = document.createElement('h5');
-                    cell_informations_header.style.marginTop = '0';
-                    cell_informations_header.style.display = 'flex';
-                    cell_informations_header.style.justifyContent = 'space-between';
-                    cell_informations_header.style.alignItems = 'center';
-                    cell_informations_div.appendChild(cell_informations_header);
-                    let cell_informations_header_left = document.createElement('div');
-                    cell_informations_header_left.innerHTML = `<img src="${mh_optimizer_icon}" style="width: 24px; height: 24px; margin-right: 0.5em">${getI18N(texts.additional_informations)}`;
-                    cell_informations_header.appendChild(cell_informations_header_left);
-                    let cell_informations_header_right = document.createElement('div');
-                    cell_informations_header_right.innerText = `🗘`;
-                    cell_informations_header_right.style.fontSize = '16px';
-                    cell_informations_header_right.style.cursor = 'pointer';
-                    cell_informations_header.appendChild(cell_informations_header_right);
-                    cell_informations_header_right.addEventListener('click', () => {
-                        if (cell_informations.querySelector('#cell-note-content')) {
-                            cell_informations.querySelector('#cell-note-content').innerText = '🗘';
-                        }
-                        if (cell_informations.querySelector('#cell-digs-content')) {
-                            cell_informations.querySelector('#cell-digs-content').innerText = '🗘';
-                        }
-                        if (cell_informations.querySelector('#cell-ruin-content')) {
-                            cell_informations.querySelector('#cell-ruin-content').innerText = '🗘';
-                        }
-                        getMap().then(() => {
-                            cell = getCellDetailsByPosition();
-                            updateInformations(cell);
-                        });
-                    });
-                    let cell_informations_content = document.createElement('div');
-                    cell_informations_content.style.display = 'flex';
-                    cell_informations_content.style.flexDirection = 'column';
-                    cell_informations_content.style.gap = '0.5em';
-                    cell_informations_div.appendChild(cell_informations_content);
-                    let createSubBlock = (id, title) => {
-                        let sub_block = document.createElement('div');
-                        sub_block.id = id;
-                        cell_informations_content.appendChild(sub_block);
-                        let sub_block_header = document.createElement('h5');
-                        sub_block_header.id = id + '-header';
-                        sub_block_header.style.marginTop = '0';
-                        sub_block_header.style.borderBottomWidth = '1px';
-                        sub_block_header.style.fontWeight = 'normal';
-                        sub_block_header.innerText = title;
-                        sub_block.appendChild(sub_block_header);
-                        let sub_block_content = document.createElement('div');
-                        sub_block_content.id = id + '-content';
-                        sub_block.appendChild(sub_block_content);
-                    };
-                    let map_box = document.querySelector('.map-box');
-                    map_box.parentElement.parentElement.appendChild(cell_informations);
-                    let cell_note = createSubBlock('cell-note', getI18N(texts.note));
-                    let cell_digs = createSubBlock('cell-digs', getI18N(texts.digs_state_header));
-                    if (state.current_cell.idRuin !== null && state.current_cell.idRuin !== undefined) {
-                        let cell_ruin = createSubBlock('cell-ruin', getI18N(texts.ruin_state_header));
-                    }
+        if (!state.mho_parameters.display_more_informations_from_mho || !pageIsDesert()) {
+            state.current_cell = undefined;
+            return;
+        }
+        let cell = getCellDetailsByPosition();
+        if (!cell) {
+            /**
+             * La carte n'est chargée qu'au moment de la récupération du token, et
+             * uniquement si l'on se trouve déjà dans le désert : en navigation SPA
+             * depuis la ville elle manque. On la charge alors à la demande.
+             */
+            if (!state.map?.cells?.length && !is_loading_map) {
+                is_loading_map = true;
+                getMap()
+                    .then(() => displayCellDetailsOnPage())
+                    .catch(() => undefined)
+                    .finally(() => is_loading_map = false);
+                return;
+            }
+            return;
+        }
+        state.current_cell = cell;
+        let cell_informations = document.querySelector('#cell-informations');
+        if (!cell_informations) {
+            const map_box = document.querySelector('.map-box');
+            if (!map_box?.parentElement?.parentElement) {
+                return;
+            }
+            cell_informations = document.createElement('div');
+            cell_informations.id = 'cell-informations';
+            cell_informations.classList.add('row');
+            const cell_informations_div = document.createElement('div');
+            cell_informations_div.style.width = '100%';
+            cell_informations_div.classList.add('background', 'cell');
+            cell_informations.appendChild(cell_informations_div);
+            const cell_informations_header = document.createElement('h5');
+            cell_informations_header.style.marginTop = '0';
+            cell_informations_header.style.display = 'flex';
+            cell_informations_header.style.justifyContent = 'space-between';
+            cell_informations_header.style.alignItems = 'center';
+            cell_informations_div.appendChild(cell_informations_header);
+            const cell_informations_header_left = document.createElement('div');
+            cell_informations_header_left.innerHTML = `<img src="${mh_optimizer_icon}" style="width: 24px; height: 24px; margin-right: 0.5em">${getI18N(texts.additional_informations)}`;
+            cell_informations_header.appendChild(cell_informations_header_left);
+            const cell_informations_header_right = document.createElement('div');
+            cell_informations_header_right.innerText = '🗘';
+            cell_informations_header_right.style.fontSize = '16px';
+            cell_informations_header_right.style.cursor = 'pointer';
+            cell_informations_header.appendChild(cell_informations_header_right);
+            cell_informations_header_right.addEventListener('click', () => {
+                if (cell_informations.querySelector('#cell-note-content')) {
+                    cell_informations.querySelector('#cell-note-content').innerText = '🗘';
                 }
-                let insertCellNote = (cell) => {
-                    if (cell_informations.querySelector('#cell-note-content')) {
-                        cell_informations.querySelector('#cell-note-content').innerHTML = cell.note && cell.note !== ''
-                            ? `<div>${cell.note}</div>`
-                            : `<div style="opacity: 0.5; font-style: italic; font-size: 12px;">${getI18N(texts.no_note)}</div>`;
-                    }
-                };
-                let insertCellDigs = (cell) => {
-                    if (cell_informations.querySelector('#cell-digs-content')) {
-                        cell_informations.querySelector('#cell-digs-content').innerHTML = `
+                if (cell_informations.querySelector('#cell-digs-content')) {
+                    cell_informations.querySelector('#cell-digs-content').innerText = '🗘';
+                }
+                if (cell_informations.querySelector('#cell-ruin-content')) {
+                    cell_informations.querySelector('#cell-ruin-content').innerText = '🗘';
+                }
+                getMap().then(() => {
+                    cell = getCellDetailsByPosition();
+                    updateInformations(cell);
+                });
+            });
+            const cell_informations_content = document.createElement('div');
+            cell_informations_content.style.display = 'flex';
+            cell_informations_content.style.flexDirection = 'column';
+            cell_informations_content.style.gap = '0.5em';
+            cell_informations_div.appendChild(cell_informations_content);
+            const createSubBlock = (id, title) => {
+                const sub_block = document.createElement('div');
+                sub_block.id = id;
+                cell_informations_content.appendChild(sub_block);
+                const sub_block_header = document.createElement('h5');
+                sub_block_header.id = id + '-header';
+                sub_block_header.style.marginTop = '0';
+                sub_block_header.style.borderBottomWidth = '1px';
+                sub_block_header.style.fontWeight = 'normal';
+                sub_block_header.innerText = title;
+                sub_block.appendChild(sub_block_header);
+                const sub_block_content = document.createElement('div');
+                sub_block_content.id = id + '-content';
+                sub_block.appendChild(sub_block_content);
+            };
+            map_box.parentElement.parentElement.appendChild(cell_informations);
+            createSubBlock('cell-note', getI18N(texts.note));
+            createSubBlock('cell-digs', getI18N(texts.digs_state_header));
+            if (state.current_cell.idRuin !== null && state.current_cell.idRuin !== undefined) {
+                createSubBlock('cell-ruin', getI18N(texts.ruin_state_header));
+            }
+        }
+        const insertCellNote = (cell) => {
+            if (cell_informations.querySelector('#cell-note-content')) {
+                cell_informations.querySelector('#cell-note-content').innerHTML = cell.note && cell.note !== ''
+                    ? `<div>${cell.note}</div>`
+                    : `<div style="opacity: 0.5; font-style: italic; font-size: 12px;">${getI18N(texts.no_note)}</div>`;
+            }
+        };
+        const insertCellDigs = (cell) => {
+            if (cell_informations.querySelector('#cell-digs-content')) {
+                cell_informations.querySelector('#cell-digs-content').innerHTML = `
                     <div>${getI18N(texts.digs_max)} : ${Math.round(cell.maxPotentialRemainingDig - cell.totalSucces)}</div>
                     <div>${getI18N(texts.digs_average)} : ${Math.round(cell.averagePotentialRemainingDig - cell.totalSucces)}</div>
                 `;
-                    }
-                };
-                let insertRuinDigs = (cell) => {
-                    if (state.current_cell.idRuin !== null && state.current_cell.idRuin !== undefined && state.current_cell.idRuin > 0) {
-                        let current_ruin = state.ruins.find((ruin) => ruin.id === state.current_cell.idRuin);
-                        let empty_text = `<div style="opacity: 0.5; font-style: italic; font-size: 12px;">${getI18N(texts.ruin_dried)}</div>`;
-                        let complete_text = `<div>${getI18N(texts.ruin_not_dried)}</div>`;
-                        let ruin_drops = ``;
-                        if (current_ruin && (current_ruin.explorable || !state.current_cell.isRuinDryed)) {
-                            ruin_drops += `<div style="display: flex; flex-direction: row; gap: 0.5em; flex-wrap: wrap; font-size: 12px;">`;
-                            if (current_ruin?.drops) {
-                                current_ruin.drops.forEach((drop) => {
-                                    ruin_drops += `<span style="display: flex; flex-direction: column; align-items: center;"><img src="${repo_img_hordes_url}/${drop.item.img}">${Math.round(drop.probability * 100 * 10) / 10}%</span>`;
-                                });
-                            }
-                        }
-                        ruin_drops += `</div>`;
-                        if (cell_informations.querySelector('#cell-ruin-content')) {
-                            cell_informations.querySelector('#cell-ruin-content').innerHTML = (!current_ruin?.explorable ? (state.current_cell.isRuinDryed ? empty_text : complete_text) : '') + ruin_drops;
-                        }
-                    }
-                };
-                let updateInformations = (cell) => {
-                    insertCellNote(cell);
-                    insertCellDigs(cell);
-                    insertRuinDigs(cell);
-                };
-                updateInformations(cell);
             }
-        }
-        else {
-            state.current_cell = undefined;
-        }
+        };
+        const insertRuinDigs = () => {
+            if (state.current_cell.idRuin !== null && state.current_cell.idRuin !== undefined && state.current_cell.idRuin > 0) {
+                /** Les ruines suivent le même chargement conditionnel que la carte : on les récupère à la demande */
+                if (!state.ruins?.length) {
+                    if (!is_loading_ruins) {
+                        is_loading_ruins = true;
+                        getRuins()
+                            .then(() => insertRuinDigs())
+                            .catch(() => undefined)
+                            .finally(() => is_loading_ruins = false);
+                    }
+                    return;
+                }
+                const current_ruin = state.ruins.find((ruin) => ruin.id === state.current_cell.idRuin);
+                const empty_text = `<div style="opacity: 0.5; font-style: italic; font-size: 12px;">${getI18N(texts.ruin_dried)}</div>`;
+                const complete_text = `<div>${getI18N(texts.ruin_not_dried)}</div>`;
+                let ruin_drops = '';
+                if (current_ruin && (current_ruin.explorable || !state.current_cell.isRuinDryed)) {
+                    ruin_drops += '<div style="display: flex; flex-direction: row; gap: 0.5em; flex-wrap: wrap; font-size: 12px;">';
+                    if (current_ruin?.drops) {
+                        current_ruin.drops.forEach((drop) => {
+                            ruin_drops += `<span style="display: flex; flex-direction: column; align-items: center;"><img src="${repo_img_hordes_url}/${drop.item.img}">${Math.round(drop.probability * 100 * 10) / 10}%</span>`;
+                        });
+                    }
+                }
+                ruin_drops += '</div>';
+                if (cell_informations.querySelector('#cell-ruin-content')) {
+                    cell_informations.querySelector('#cell-ruin-content').innerHTML = (!current_ruin?.explorable ? (state.current_cell.isRuinDryed ? empty_text : complete_text) : '') + ruin_drops;
+                }
+            }
+        };
+        const updateInformations = (cell) => {
+            insertCellNote(cell);
+            insertCellDigs(cell);
+            insertRuinDigs();
+        };
+        updateInformations(cell);
     }
 
     function preventFromLeaving() {
         if (state.mho_parameters.alert_if_no_escort && state.mho_parameters.prevent_from_leaving && pageIsDesert()) {
-            let prevent_function = (event) => {
-                let e = event || window.event;
-                let ae_button = document.querySelector('button[x-toggle-escort="1"]:not([x-escort-control-endpoint])');
+            const prevent_function = (event) => {
+                const e = event || window.event;
+                const ae_button = document.querySelector('button[x-toggle-escort="1"]:not([x-escort-control-endpoint])');
                 if (ae_button) {
                     let mho_leaving_info = document.getElementById('mho-leaving-info');
                     if (!mho_leaving_info) {
@@ -6046,7 +6508,7 @@
                         ae_button.parentNode.insertBefore(mho_leaving_info, ae_button.nextSibling);
                     }
                 }
-                let is_escorting = document.getElementsByClassName('beyond-escort-on')[0];
+                const is_escorting = document.getElementsByClassName('beyond-escort-on')[0];
                 if (is_escorting) {
                     let mho_leaving_info = document.getElementById('mho-leaving-info');
                     if (!mho_leaving_info) {
@@ -6072,9 +6534,9 @@
     /** Si l'option associée est activée, demande confirmation avant de quitter si les options d'escorte ne sont pas bonnes */
     function alertIfInactiveAndNoEscort() {
         if (state.mho_parameters.alert_if_no_escort && state.mho_parameters.alert_if_inactive && pageIsDesert()) {
-            let ae_button = document.querySelector('button[x-toggle-escort="1"]:not([x-escort-control-endpoint])');
-            let is_escorting = document.getElementsByClassName('beyond-escort-on')[0];
-            let notify = () => {
+            const ae_button = document.querySelector('button[x-toggle-escort="1"]:not([x-escort-control-endpoint])');
+            const is_escorting = document.getElementsByClassName('beyond-escort-on')[0];
+            const notify = () => {
                 createNotification(getI18N(ae_button ? texts.prevent_not_in_ae : texts.escort_not_released));
             };
             if (ae_button || is_escorting) {
@@ -6174,20 +6636,20 @@
     }
 
     function createExpeditionsBtn() {
-        let expeditions_btn = document.getElementById(mho_display_expeditions_id);
+        const expeditions_btn = document.getElementById(mho_display_expeditions_id);
         if (state.mho_parameters.display_my_expeditions) {
             createWindow(mho_expeditions_window_id, false);
             const mho_header_space = document.getElementById(mho_header_space_id);
             if (expeditions_btn || !mho_header_space)
                 return;
-            let btn_container = document.createElement('div');
+            const btn_container = document.createElement('div');
             btn_container.id = mho_display_expeditions_id;
-            let postbox_img = document.querySelector('#postbox img');
-            let btn_mho_img = document.createElement('img');
+            const postbox_img = document.querySelector('#postbox img');
+            const btn_mho_img = document.createElement('img');
             btn_mho_img.src = mh_optimizer_icon;
             btn_mho_img.style.height = postbox_img && postbox_img.height ? postbox_img.height + 'px' : '16px';
             btn_container.appendChild(btn_mho_img);
-            let btn_img = document.createElement('img');
+            const btn_img = document.createElement('img');
             btn_img.src = repo_img_hordes_url + '/icons/planner.gif';
             btn_img.style.height = postbox_img && postbox_img.height ? postbox_img.height + 'px' : '16px';
             btn_container.appendChild(btn_img);
@@ -6204,17 +6666,17 @@
         }
     }
     function createExpeditionsWindowContent() {
-        let get_my_expeditions_promise = getMyExpeditions();
-        let get_citizens_promize = getCitizens();
+        const get_my_expeditions_promise = getMyExpeditions();
+        const get_citizens_promize = getCitizens();
         Promise.all([get_my_expeditions_promise, get_citizens_promize]).then(([expeditions, citizens]) => {
-            let window_content = document.querySelector(`#${mho_expeditions_window_id}-content`);
+            const window_content = document.querySelector(`#${mho_expeditions_window_id}-content`);
             window_content.innerHTML = '';
-            let tabs_ul = document.createElement('ul');
+            const tabs_ul = document.createElement('ul');
             expeditions.forEach((expedition, index) => {
-                let tab_link = document.createElement('div');
-                let tab_text = document.createTextNode(expedition.label || ' ');
+                const tab_link = document.createElement('div');
+                const tab_text = document.createTextNode(expedition.label || ' ');
                 tab_link.appendChild(tab_text);
-                let tab_li = document.createElement('li');
+                const tab_li = document.createElement('li');
                 tab_li.appendChild(tab_link);
                 if (index === 0) {
                     tab_li.classList.add('selected');
@@ -6223,7 +6685,7 @@
                 const tab_content = document.getElementById(mho_expeditions_window_id + '-tab-content');
                 tab_li.addEventListener('click', () => {
                     if (!tab_li.classList.contains('selected') && tab_content !== undefined && tab_content !== null) {
-                        for (let li of tabs_ul.children) {
+                        for (const li of tabs_ul.children) {
                             li.classList.remove('selected');
                         }
                         tab_li.classList.add('selected');
@@ -6232,14 +6694,14 @@
                 });
                 tabs_ul.appendChild(tab_li);
             });
-            let tabs_div = document.createElement('div');
+            const tabs_div = document.createElement('div');
             tabs_div.id = 'tabs';
             tabs_div.appendChild(tabs_ul);
             window_content.appendChild(tabs_div);
         });
     }
     function dispatchExpeditionContent(expedition, citizens) {
-        let window_content = document.getElementById(mho_expeditions_window_id + '-content');
+        const window_content = document.getElementById(mho_expeditions_window_id + '-content');
         let tab_content = document.getElementById(mho_expeditions_window_id + '-tab-content');
         if (tab_content) {
             tab_content.remove();
@@ -6249,14 +6711,14 @@
         tab_content.classList.add('tab-content');
         window_content.appendChild(tab_content);
         expedition.parts.forEach((part, index) => {
-            let part_content = document.createElement('div');
+            const part_content = document.createElement('div');
             tab_content.appendChild(part_content);
             if (part.label) {
-                let part_content_header = document.createElement('h2');
+                const part_content_header = document.createElement('h2');
                 part_content_header.innerText = part.label;
                 part_content.appendChild(part_content_header);
             }
-            let part_content_path = document.createElement('h5');
+            const part_content_path = document.createElement('h5');
             part_content_path.innerText = part.path;
             part_content.appendChild(part_content_path);
             switch (part.direction) {
@@ -6275,16 +6737,16 @@
                 default:
                     break;
             }
-            let table = document.createElement('table');
+            const table = document.createElement('table');
             table.style.width = '100%';
             table.classList.add('mho-table');
             part_content.appendChild(table);
-            let header = document.createElement('thead');
+            const header = document.createElement('thead');
             table.appendChild(header);
-            let header_row = document.createElement('tr');
+            const header_row = document.createElement('tr');
             header_row.classList.add('mho-header');
             header.appendChild(header_row);
-            let header_cells = [
+            const header_cells = [
                 {
                     id: 'citizen',
                     label: {
@@ -6315,34 +6777,34 @@
                 {
                     id: 'orders',
                     label: {
-                        de: `Anweisungen`,
-                        en: `Instructions`,
-                        es: `Instrucciones`,
-                        fr: `Consignes`
+                        de: 'Anweisungen',
+                        en: 'Instructions',
+                        es: 'Instrucciones',
+                        fr: 'Consignes'
                     }
                 },
                 {
                     id: 'bag',
                     label: {
-                        de: `Rucksack`,
-                        en: `Backpack`,
-                        es: `Mochila`,
-                        fr: `Sac`
+                        de: 'Rucksack',
+                        en: 'Backpack',
+                        es: 'Mochila',
+                        fr: 'Sac'
                     }
                 }
             ];
             header_cells.forEach((header_cell) => {
-                let header_cell_html = document.createElement('th');
+                const header_cell_html = document.createElement('th');
                 header_cell_html.innerHTML = header_cell.label[lang];
                 header_row.appendChild(header_cell_html);
             });
-            let body = document.createElement('tbody');
+            const body = document.createElement('tbody');
             table.appendChild(body);
             part.citizens.forEach((citizen_part) => {
-                let citizen_row = document.createElement('tr');
+                const citizen_row = document.createElement('tr');
                 body.appendChild(citizen_row);
                 header_cells.forEach((header_cell) => {
-                    let cell = document.createElement('td');
+                    const cell = document.createElement('td');
                     switch (header_cell.id) {
                         case 'citizen':
                             cell.innerText = citizens.find((citizen) => citizen.id === citizen_part.idUser)?.name ?? '';
@@ -6352,19 +6814,19 @@
                             cell.style.textAlign = 'center';
                             break;
                         case 'starts7ap':
-                            cell.innerHTML = citizen_part.nombrePaDepart === 7 ? `✓` : (citizen_part.nombrePaDepart === 6 ? '𐄂' : '');
+                            cell.innerHTML = citizen_part.nombrePaDepart === 7 ? '✓' : (citizen_part.nombrePaDepart === 6 ? '𐄂' : '');
                             cell.style.textAlign = 'center';
                             break;
                         case 'orders':
                             citizen_part.orders.forEach((order) => {
-                                let order_html = document.createElement('div');
+                                const order_html = document.createElement('div');
                                 order_html.innerHTML = order.text;
                                 cell.appendChild(order_html);
                             });
                             break;
                         case 'bag':
                             citizen_part.bag?.items?.forEach((item) => {
-                                let bag_item = document.createElement('span');
+                                const bag_item = document.createElement('span');
                                 bag_item.innerHTML = `<img src="${repo_img_hordes_url}${item.item.img}">`;
                                 cell.appendChild(bag_item);
                             });
@@ -6375,16 +6837,16 @@
                     citizen_row.appendChild(cell);
                 });
             });
-            let part_orders = document.createElement('div');
+            const part_orders = document.createElement('div');
             part_orders.style.width = '100%';
             part.orders.forEach((order) => {
-                let order_html = document.createElement('div');
+                const order_html = document.createElement('div');
                 order_html.innerHTML = order.text;
                 part_orders.appendChild(order_html);
             });
             part_content.appendChild(part_orders);
             if (index < expedition.parts.length - 1) {
-                let separator = document.createElement('hr');
+                const separator = document.createElement('hr');
                 tab_content.appendChild(separator);
             }
         });
@@ -6392,57 +6854,57 @@
     /** Permet de bloquer / débloquer des utilisateurs et de masquer les posts des utilisateurs bloqués */
 
     function addExternalLinksToProfiles() {
-        let mho_link_block = document.querySelector('.mho-link-blocks');
+        const mho_link_block = document.querySelector('.mho-link-blocks');
         if (state.mho_parameters.display_external_links && !mho_link_block) {
-            let user_tooltip = document.querySelector('#user-tooltip');
+            const user_tooltip = document.querySelector('#user-tooltip');
             if (user_tooltip) {
-                let user_id = user_tooltip.querySelector('[x-ajax-href]')?.getAttribute('x-ajax-href')?.replace(/\D/g, '');
+                const user_id = user_tooltip.querySelector('[x-ajax-href]')?.getAttribute('x-ajax-href')?.replace(/\D/g, '');
                 if (!user_id)
                     return;
-                let dash_separators = user_tooltip.querySelectorAll('hr.dashed');
-                let last_separator = Array.from(dash_separators).pop();
-                let link_color = window.getComputedStyle(user_tooltip.querySelector('.link')).getPropertyValue('color');
-                let new_separator = document.createElement('hr');
+                const dash_separators = user_tooltip.querySelectorAll('hr.dashed');
+                const last_separator = Array.from(dash_separators).pop();
+                const link_color = window.getComputedStyle(user_tooltip.querySelector('.link')).getPropertyValue('color');
+                const new_separator = document.createElement('hr');
                 new_separator.classList.add('dashed');
                 last_separator.parentNode.insertBefore(new_separator, last_separator.nextSibling);
-                let new_part = document.createElement('div');
+                const new_part = document.createElement('div');
                 new_part.classList.add('link-blocks', 'mho-link-blocks');
                 last_separator.parentNode.insertBefore(new_part, last_separator.nextSibling);
-                let new_part_title = document.createElement('div');
+                const new_part_title = document.createElement('div');
                 new_part_title.innerHTML = `<img src="${mh_optimizer_icon}" style="width: 16px; margin-right: 0.5em;">${getI18N(texts.external_profiles)}`;
                 new_part_title.style.marginBottom = '0.5em';
                 new_part_title.style.textAlign = 'left';
                 new_part_title.style.color = link_color;
                 new_part.appendChild(new_part_title);
-                let bbh_link = document.createElement('a');
+                const bbh_link = document.createElement('a');
                 bbh_link.classList.add('link-block');
                 bbh_link.href = `${big_broth_hordes_url}/?pg=user&uid=5-${user_id}`;
                 new_part.appendChild(bbh_link);
                 bbh_link.addEventListener('click', () => user_tooltip.remove());
-                let bbh_img = document.createElement('img');
+                const bbh_img = document.createElement('img');
                 bbh_img.src = `${repo_img_url}external-tools/bbh.gif`;
                 bbh_link.appendChild(bbh_img);
-                let bbh_br = document.createElement('br');
+                const bbh_br = document.createElement('br');
                 bbh_link.appendChild(bbh_br);
-                let bbh_title = document.createElement('text');
-                bbh_title.innerText = `BigBroth'\nHordes`;
+                const bbh_title = document.createElement('text');
+                bbh_title.innerText = 'BigBroth\'\nHordes';
                 bbh_link.appendChild(bbh_title);
                 new_part.appendChild(document.createTextNode('\u00A0'));
-                let gh_link = document.createElement('a');
+                const gh_link = document.createElement('a');
                 gh_link.classList.add('link-block');
                 gh_link.href = `${gest_hordes_url}/ame/${user_id}`;
                 new_part.appendChild(gh_link);
                 gh_link.addEventListener('click', () => user_tooltip.remove());
-                let gh_img = document.createElement('img');
+                const gh_img = document.createElement('img');
                 gh_img.src = `${repo_img_url}external-tools/gh.gif`;
                 gh_link.appendChild(gh_img);
-                let gh_br = document.createElement('br');
+                const gh_br = document.createElement('br');
                 gh_link.appendChild(gh_br);
-                let gh_title = document.createElement('text');
-                gh_title.innerText = `Gest'Hordes`;
+                const gh_title = document.createElement('text');
+                gh_title.innerText = 'Gest\'Hordes';
                 gh_link.appendChild(gh_title);
                 new_part.appendChild(document.createTextNode('\u00A0'));
-                let empty_link = document.createElement('div');
+                const empty_link = document.createElement('div');
                 empty_link.classList.add('link-block', 'empty');
                 new_part.appendChild(empty_link);
             }
@@ -6455,10 +6917,10 @@
         if (!pageIsTownHistory()) {
             return;
         }
-        let view_town = document.querySelector('.view-town');
+        const view_town = document.querySelector('.view-town');
         if (!view_town)
             return;
-        let btns_row = view_town.querySelector('button')?.parentElement;
+        const btns_row = view_town.querySelector('button')?.parentElement;
         if (!btns_row)
             return;
         let mho_block = btns_row.querySelector('#' + mho_town_external_links_id);
@@ -6468,7 +6930,7 @@
         }
         if (mho_block)
             return;
-        let town_id = view_town.getAttribute('data-town-id');
+        const town_id = view_town.getAttribute('data-town-id');
         if (!town_id)
             return;
         mho_block = document.createElement('div');
@@ -6477,18 +6939,18 @@
         mho_block.style.padding = '0.25em';
         mho_block.style.border = '1px solid #ddab76';
         btns_row.appendChild(mho_block);
-        let updater_title = document.createElement('h5');
+        const updater_title = document.createElement('h5');
         updater_title.style.margin = '0 0 0.5em';
-        let btns_title_mho_img = document.createElement('img');
+        const btns_title_mho_img = document.createElement('img');
         btns_title_mho_img.src = mh_optimizer_icon;
         btns_title_mho_img.style.height = '24px';
         btns_title_mho_img.style.marginRight = '0.5em';
         updater_title.appendChild(btns_title_mho_img);
-        let btns_title_text = document.createElement('text');
+        const btns_title_text = document.createElement('text');
         btns_title_text.innerText = getScriptInfo().name;
         updater_title.appendChild(btns_title_text);
         mho_block.appendChild(updater_title);
-        let mho_btns_block = document.createElement('div');
+        const mho_btns_block = document.createElement('div');
         mho_block.appendChild(mho_btns_block);
         mho_btns_block.style.display = 'flex';
         mho_btns_block.style.gap = '0.5em';
@@ -6506,12 +6968,12 @@
         // },
         {
             icon_file_name: 'gh.gif',
-            label: `Gest'\nHordes`,
+            label: 'Gest\'\nHordes',
             build_url: (town_id) => `${gest_hordes_url}/carte/${town_id}`,
         },
         {
             icon_file_name: 'fata.gif',
-            label: `Fata\nMorgana`,
+            label: 'Fata\nMorgana',
             build_url: (town_id) => `${fata_morgana_url}/spy/town/${town_id}`,
         },
     ];
@@ -6543,7 +7005,7 @@
             disconnectWelcomeObserver();
             return;
         }
-        let onboarding = document.querySelector('hordes-game-onboarding');
+        const onboarding = document.querySelector('hordes-game-onboarding');
         if (!onboarding)
             return;
         if (!state.mho_parameters.display_external_links) {
@@ -6553,33 +7015,33 @@
         }
         ensureWelcomeObserver(onboarding);
         bindWelcomeOutsideClickOnce();
-        let header_rows = onboarding.querySelectorAll('.row-flex.header');
+        const header_rows = onboarding.querySelectorAll('.row-flex.header');
         header_rows.forEach((header_row) => {
             if (header_row.querySelector('.' + mho_welcome_link_header_class))
                 return;
-            let header_cell = document.createElement('div');
+            const header_cell = document.createElement('div');
             header_cell.classList.add('padded', 'cell', 'rw-1', 'hide-sm', mho_welcome_link_header_class);
-            let header_icon = document.createElement('img');
+            const header_icon = document.createElement('img');
             header_icon.src = mh_optimizer_icon;
             header_icon.alt = 'MHO';
             header_icon.style.width = '16px';
             header_cell.appendChild(header_icon);
             header_row.appendChild(header_cell);
         });
-        let town_rows = onboarding.querySelectorAll('.town-row');
+        const town_rows = onboarding.querySelectorAll('.town-row');
         town_rows.forEach((town_row) => {
             if (town_row.querySelector('.' + mho_welcome_link_cell_class))
                 return;
-            let town_id = town_row.getAttribute('data-town-id');
+            const town_id = town_row.getAttribute('data-town-id');
             if (!town_id)
                 return;
-            let link_cell = document.createElement('div');
+            const link_cell = document.createElement('div');
             link_cell.classList.add('padded', 'cell', 'rw-1', 'rw-sm-2', mho_welcome_link_cell_class);
-            let map_icon = document.createElement('img');
+            const map_icon = document.createElement('img');
             map_icon.src = repo_img_hordes_url + 'icons/item_map.gif';
             map_icon.alt = 'Carte';
             link_cell.appendChild(map_icon);
-            let panel = document.createElement('div');
+            const panel = document.createElement('div');
             panel.classList.add(mho_welcome_link_panel_class);
             createExternalLinksButtons(town_id).forEach((link) => {
                 panel.appendChild(link);
@@ -6587,7 +7049,7 @@
             link_cell.appendChild(panel);
             link_cell.addEventListener('click', (event) => {
                 event.stopPropagation();
-                let was_open = panel.classList.contains('mho-open');
+                const was_open = panel.classList.contains('mho-open');
                 closeAllWelcomeLinkPanels();
                 if (!was_open) {
                     panel.classList.add('mho-open');
@@ -6628,14 +7090,14 @@
     }
     function positionWelcomeLinkPanel(panel) {
         panel.classList.remove('mho-align-right');
-        let panel_rect = panel.getBoundingClientRect();
-        let overflows_right = panel_rect.right > window.innerWidth;
+        const panel_rect = panel.getBoundingClientRect();
+        const overflows_right = panel_rect.right > window.innerWidth;
         if (overflows_right) {
             panel.classList.add('mho-align-right');
         }
     }
 
-    let fill_items_messages_pool = {
+    const fill_items_messages_pool = {
         en: [
             { title: 'Hi', content: ':iloveu:' }
         ],
@@ -6652,28 +7114,28 @@
 
     function fillItemsMessages() {
         if (state.mho_parameters.fill_items_messages && pageIsMsgReceived()) {
-            let row_send = document.querySelector('#rows-send');
+            const row_send = document.querySelector('#rows-send');
             if (!row_send)
                 return;
-            let sendable_items = row_send.querySelector('.sendable-items');
+            const sendable_items = row_send.querySelector('.sendable-items');
             if (!sendable_items)
                 return;
-            let editor_block = document.querySelector('#pm-forum-editor');
+            const editor_block = document.querySelector('#pm-forum-editor');
             if (!editor_block)
                 return;
             setTimeout(() => {
-                let editor = editor_block.querySelector('hordes-twino-editor');
+                const editor = editor_block.querySelector('hordes-twino-editor');
                 if (!editor)
                     return;
-                let sendable_items_item = sendable_items.querySelectorAll('li.item');
+                const sendable_items_item = sendable_items.querySelectorAll('li.item');
                 Array.from(sendable_items_item).forEach((item) => {
                     item.addEventListener('click', () => {
-                        let message_title = editor.querySelector('input');
-                        let message_content = editor.querySelector('textarea');
+                        const message_title = editor.querySelector('input');
+                        const message_content = editor.querySelector('textarea');
                         if ((message_title.value === undefined || message_title.value === null || message_title.value === '')
                             && (message_content.value === undefined || message_content.value === null || message_content.value === '')) {
-                            let lang_fillers = fill_items_messages_pool[lang];
-                            let random_filler = lang_fillers[Math.floor(Math.random() * lang_fillers.length)];
+                            const lang_fillers = fill_items_messages_pool[lang];
+                            const random_filler = lang_fillers[Math.floor(Math.random() * lang_fillers.length)];
                             message_title.setAttribute('value', random_filler.title);
                             message_title.dispatchEvent(new Event('input', { bubbles: true }));
                             message_content.value = random_filler.content;
@@ -6686,20 +7148,20 @@
     }
     function blockUsersPosts() {
         if (state.mho_parameters.block_users && pageIsForum()) {
-            let posts = document.querySelectorAll('.forum-post');
+            const posts = document.querySelectorAll('.forum-post');
             if (posts) {
                 Array.from(posts).forEach((post) => {
-                    let blacklisted_user = post.querySelector("#blacklist");
-                    let user = post.querySelector('.username');
-                    let user_id = user.getAttribute('x-user-id');
+                    let blacklisted_user = post.querySelector('#blacklist');
+                    const user = post.querySelector('.username');
+                    const user_id = user.getAttribute('x-user-id');
                     if (user_id === state.mh_user.id.toString())
                         return;
                     getStorageItem(mho_blacklist_key).then((blacklist) => {
                         if (!blacklist) {
                             blacklist = [];
                         }
-                        let is_user_in_blacklist = blacklist.some((blacklist_user_id) => blacklist_user_id === user_id);
-                        let original_post_content = post.querySelector('.forum-post-content:not(.replace-original)');
+                        const is_user_in_blacklist = blacklist.some((blacklist_user_id) => blacklist_user_id === user_id);
+                        const original_post_content = post.querySelector('.forum-post-content:not(.replace-original)');
                         let new_post_content = post.querySelector('.replace-original');
                         if (!blacklisted_user) {
                             blacklisted_user = document.createElement('span');
@@ -6709,15 +7171,15 @@
                             blacklisted_user.style.cursor = 'pointer';
                             blacklisted_user.addEventListener('click', () => {
                                 getStorageItem(mho_blacklist_key).then((keys) => {
-                                    let temp_blacklist = [...keys];
+                                    const temp_blacklist = [...keys];
                                     if (!blacklisted_user.getAttribute('blacklisted')) {
                                         temp_blacklist.push(user_id);
                                         blacklisted_user.setAttribute('blacklisted', 'true');
-                                        let user_posts = Array.from(document.querySelectorAll(`.username[x-user-id="${user_id}"]`) || []).map((user_tag) => user_tag.parentElement.parentElement.querySelector('.original'));
+                                        const user_posts = Array.from(document.querySelectorAll(`.username[x-user-id="${user_id}"]`) || []).map((user_tag) => user_tag.parentElement.parentElement.querySelector('.original'));
                                         user_posts.forEach((user_post) => user_post.classList.remove('force-display'));
                                     }
                                     else {
-                                        let index = temp_blacklist.findIndex((blacklisted_user_id) => blacklisted_user_id === user_id);
+                                        const index = temp_blacklist.findIndex((blacklisted_user_id) => blacklisted_user_id === user_id);
                                         if (index > -1) {
                                             temp_blacklist.splice(index, 1);
                                             blacklisted_user.removeAttribute('blacklisted');
@@ -6741,7 +7203,7 @@
                             if (!new_post_content) {
                                 new_post_content = document.createElement('div');
                                 new_post_content.classList.add('forum-post-content', 'replace-original');
-                                let link = document.createElement('a');
+                                const link = document.createElement('a');
                                 link.innerText = 'Cliquez ici pour afficher ce message.';
                                 link.style.cursor = 'pointer';
                                 link.addEventListener('click', ($event) => {
@@ -6775,10 +7237,10 @@
     function displayCountCharacters() {
         let counter = document.querySelector('#mho_registry_counter_id');
         if (!counter && state.mho_parameters.display_counter_on_input_registry && pageIsDesert()) {
-            let log_block = document.querySelector('#beyond-log');
+            const log_block = document.querySelector('#beyond-log');
             if (!log_block)
                 return;
-            let log_input = log_block.querySelector('.overlay-central input');
+            const log_input = log_block.querySelector('.overlay-central input');
             if (!log_input)
                 return;
             counter = document.createElement('div');
@@ -6791,8 +7253,8 @@
                 counter.innerText = `${event.srcElement.value?.trim().length ?? 0}/256`;
             });
             log_input.addEventListener('change', (event) => {
-                let log_block_new = document.querySelector('#beyond-log');
-                let log_input_new = log_block_new.querySelector('.overlay-central input');
+                const log_block_new = document.querySelector('#beyond-log');
+                const log_input_new = log_block_new.querySelector('.overlay-central input');
                 counter.innerText = `${log_block_new.value?.trim().length ?? 0}/256`;
             });
         }
@@ -6804,27 +7266,488 @@
     // BOUTONS SUR LES OUTILS EXTERNES //
     /////////////////////////////////////
 
+    /////////////////////////////////////////////////////////////////////////
+    // Les tags de sujets connus côté MyHordes.                            //
+    // Seul le `name` est stable d'une langue à l'autre : le libellé rendu //
+    // dans la page est traduit. Les libellés ci-dessous ne servent que de  //
+    // secours quand la page ne permet pas de reconstruire la liste.        //
+    // L'ordre reprend celui des fixtures du jeu (ForumThreadTagDataService),//
+    // qui est aussi l'ordre d'affichage des tags dans l'interface.          //
+    /////////////////////////////////////////////////////////////////////////
+    const forum_thread_tags = [
+        {
+            name: 'bugs',
+            color: '#3b1c32',
+            label: { fr: 'Bug', en: 'Bug', de: 'Fehler', es: 'Error' }
+        },
+        {
+            name: 'help',
+            color: '#ca054d',
+            label: { fr: 'Aide', en: 'Help', de: 'Hilfe', es: 'Ayuda' }
+        },
+        {
+            name: 'update',
+            color: '#3d405b',
+            label: { fr: 'Changelog', en: 'Changelog', de: 'Changelog', es: 'Changelog' }
+        },
+        {
+            name: 'event',
+            color: '#43aa8b',
+            label: { fr: 'Event', en: 'Event', de: 'Event', es: 'Evento' }
+        },
+        {
+            name: 'rp',
+            color: '#d4a373',
+            label: { fr: 'RP', en: 'RP', de: 'RP', es: 'RP' }
+        },
+        {
+            name: 'official',
+            color: '#aa0000',
+            label: { fr: 'Officiel', en: 'Official', de: 'Offiziell', es: 'Oficial' }
+        },
+        {
+            name: 'dsc_update',
+            color: null,
+            label: { fr: 'Mise à jour', en: 'Update', de: 'Update', es: 'Actualización' }
+        },
+        {
+            name: 'dsc_post',
+            color: null,
+            label: { fr: 'Post', en: 'Post', de: 'Post', es: 'Post' }
+        },
+        {
+            name: 'dsc_disc',
+            color: null,
+            label: { fr: 'Disc.', en: 'Disc.', de: 'Disk.', es: 'Disc.' }
+        },
+        {
+            name: 'dsc_guide',
+            color: null,
+            label: { fr: 'Guide', en: 'Guide', de: 'Guide', es: 'Guía' }
+        },
+        {
+            name: 'dsc_orga',
+            color: '#ff8c00',
+            label: { fr: 'Orga.', en: 'Orga.', de: 'Orga.', es: 'Orga.' }
+        },
+        {
+            name: 'dsc_sugg',
+            color: null,
+            label: { fr: 'Suggestion', en: 'Suggestion', de: 'Vorschlag', es: 'Sugerencia' }
+        },
+        {
+            name: 'dsc_salc',
+            color: null,
+            label: { fr: 'SALC', en: 'SALC', de: 'SALC', es: 'SALC' }
+        },
+        {
+            name: 'dsc_proj',
+            color: null,
+            label: { fr: 'Projet', en: 'Project', de: 'Projekt', es: 'Proyecto' }
+        },
+        {
+            name: 'dsc_game',
+            color: null,
+            label: { fr: 'Jeu', en: 'Game', de: 'Spiel', es: 'Juego' }
+        },
+        {
+            name: 'dsc_flood',
+            color: null,
+            label: { fr: 'Flood', en: 'Spam', de: 'Spam', es: 'Spam' }
+        }
+    ];
+    /** Le style « neutre » : tout est laissé tel quel */
+    const empty_forum_thread_style = {
+        color: null,
+        background: null,
+        border: null,
+        size: 100,
+        opacity: 100,
+        prefix: ''
+    };
+    /**
+     * Crée une règle vierge.
+     * @param {string} id   L'identifiant unique de la règle
+     */
+    function createEmptyForumThreadStyleRule(id) {
+        return {
+            id: id,
+            enabled: true,
+            tags: [],
+            words: [],
+            style: { ...empty_forum_thread_style }
+        };
+    }
+    /**
+     * Les règles livrées par défaut : elles ne portent que sur les tags, donc
+     * elles fonctionnent quelle que soit la langue du joueur.
+     */
+    function getDefaultForumThreadStyleRules() {
+        return [
+            {
+                id: 'default_official',
+                enabled: true,
+                tags: ['official'],
+                words: [],
+                style: { ...empty_forum_thread_style, background: '#63181b', border: '#aa0000' }
+            },
+            {
+                id: 'default_update',
+                enabled: true,
+                tags: ['update', 'dsc_update'],
+                words: [],
+                style: { ...empty_forum_thread_style, color: '#9db4ff', border: '#3d405b', prefix: '📢' }
+            },
+            {
+                id: 'default_help',
+                enabled: true,
+                tags: ['help'],
+                words: [],
+                style: { ...empty_forum_thread_style, color: '#ff8fb3', prefix: '❓' }
+            },
+            {
+                id: 'default_event',
+                enabled: true,
+                tags: ['event'],
+                words: [],
+                style: { ...empty_forum_thread_style, color: '#7fd8bd', prefix: '🎉' }
+            },
+            {
+                id: 'default_orga',
+                enabled: true,
+                tags: ['dsc_orga'],
+                words: [],
+                style: { ...empty_forum_thread_style, color: '#ffa94d', background: '#5f371d' }
+            },
+            {
+                id: 'default_guide',
+                enabled: true,
+                tags: ['dsc_guide'],
+                words: [],
+                style: { ...empty_forum_thread_style, color: '#c9a9ff', prefix: '📖' }
+            },
+            {
+                id: 'default_rp',
+                enabled: true,
+                tags: ['rp'],
+                words: [],
+                style: { ...empty_forum_thread_style, color: '#d4a373' }
+            },
+            {
+                id: 'default_flood',
+                enabled: true,
+                tags: ['dsc_flood'],
+                words: [],
+                style: { ...empty_forum_thread_style, opacity: 55, size: 90 }
+            }
+        ];
+    }
+
+    /** Classe posée sur le span créé autour du texte du titre, pour pouvoir le styler sans toucher aux tags et icônes */
+    const title_class = 'mho-thread-title';
+    /** Classe posée sur le span de préfixe, recréé à chaque passe */
+    const prefix_class = 'mho-thread-prefix';
+    /** Les propriétés que l'on pose sur la ligne du sujet, et donc les seules à retirer lors d'une remise à zéro */
+    const row_properties = ['background-color', 'background-image', 'opacity'];
+    /** Épaisseur de la barre de couleur posée à gauche de la ligne */
+    const border_width = '4px';
+    /** Délais des nouvelles tentatives quand le contenu du forum n'est pas encore injecté dans la page */
+    const forum_list_retry_delays = [250, 750];
+    /**
+     * Les règles en mémoire, pour que l'application des styles reste synchrone
+     * une fois le premier chargement effectué.
+     */
+    let rules_cache = undefined;
+    //////////////////////////////
+    // Chargement / persistance //
+    //////////////////////////////
+    /** Charge les règles depuis le stockage, en retombant sur les règles par défaut à la première utilisation */
+    function loadForumThreadStyleRules() {
+        if (rules_cache)
+            return Promise.resolve(rules_cache);
+        return getStorageItem(mho_forum_thread_styles_key).then((stored) => {
+            rules_cache = Array.isArray(stored) ? stored.map(sanitizeRule) : getDefaultForumThreadStyleRules();
+            return rules_cache;
+        });
+    }
+    /** Les règles déjà chargées, ou un tableau vide si le chargement n'a pas encore eu lieu */
+    function getForumThreadStyleRules() {
+        return rules_cache ?? [];
+    }
+    /** Persiste les règles et met le cache à jour */
+    function saveForumThreadStyleRules(rules) {
+        rules_cache = rules.map(sanitizeRule);
+        return Promise.resolve(setStorageItem(mho_forum_thread_styles_key, rules_cache)).then(() => undefined);
+    }
+    /** Sérialise des règles en une ligne, format d'échange entre joueurs */
+    function serializeForumThreadStyleRules(rules) {
+        return JSON.stringify(rules.map(sanitizeRule));
+    }
+    /**
+     * Relit des règles reçues d'un autre joueur. Le contenu est saisi à la main :
+     * tout est vérifié, et `null` signale une saisie inexploitable.
+     * @param {string} value    Le texte collé par l'utilisateur
+     */
+    function parseForumThreadStyleRules(value) {
+        let parsed;
+        try {
+            parsed = JSON.parse((value ?? '').trim());
+        }
+        catch {
+            return null;
+        }
+        if (!Array.isArray(parsed) || parsed.length === 0)
+            return null;
+        if (parsed.some((rule) => typeof rule !== 'object' || rule === null || Array.isArray(rule)))
+            return null;
+        return parsed.map(sanitizeRule);
+    }
+    /**
+     * Complète une règle éventuellement partielle (stockage écrit par une version
+     * antérieure de l'addon, ou altéré) pour garantir la forme attendue.
+     */
+    function sanitizeRule(rule) {
+        const style = rule?.style ?? {};
+        return {
+            id: rule?.id ?? `rule_${Date.now()}_${Math.floor(Math.random() * 10000)}`,
+            enabled: rule?.enabled !== false,
+            tags: Array.isArray(rule?.tags) ? rule.tags.filter((tag) => !!tag) : [],
+            words: Array.isArray(rule?.words) ? rule.words.map((word) => `${word}`.trim()).filter((word) => word !== '') : [],
+            style: {
+                color: style.color ?? null,
+                background: style.background ?? null,
+                border: style.border ?? null,
+                size: typeof style.size === 'number' ? style.size : 100,
+                opacity: typeof style.opacity === 'number' ? style.opacity : 100,
+                prefix: style.prefix ?? ''
+            }
+        };
+    }
+    /////////////
+    // Ciblage //
+    /////////////
+    /** Minuscules, sans accents ni espaces superflus : la seule forme sur laquelle on compare des textes */
+    function normalizeForumText(value) {
+        return (value ?? '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+    }
+    /**
+     * Les tags proposés dans la modale : ceux réellement autorisés dans le forum
+     * affiché (lus dans le formulaire de filtre, seul endroit de la page qui
+     * associe le nom technique au libellé traduit), complétés par les tags connus.
+     */
+    function getAvailableForumThreadTags() {
+        const from_page = [];
+        const filters = document.querySelectorAll('.forum-filter-list label');
+        Array.from(filters).forEach((filter) => {
+            const input = filter.querySelector('input[name]');
+            const name = input?.getAttribute('name') ?? null;
+            const label = (filter.textContent ?? '').trim();
+            if (!name || label === '')
+                return;
+            const known = forum_thread_tags.find((tag) => tag.name === name);
+            from_page.push({
+                name: name,
+                color: known?.color ?? null,
+                label: { fr: label, en: label, de: label, es: label }
+            });
+        });
+        const missing = forum_thread_tags.filter((tag) => !from_page.some((page_tag) => page_tag.name === tag.name));
+        return [...from_page, ...missing];
+    }
+    /** Associe le libellé traduit affiché sur un sujet au nom technique du tag correspondant */
+    function buildTagLabelMap() {
+        const map = new Map();
+        getAvailableForumThreadTags().forEach((tag) => {
+            const label = normalizeForumText(getI18N(tag.label));
+            if (label !== '' && !map.has(label)) {
+                map.set(label, tag.name);
+            }
+        });
+        return map;
+    }
+    /** Convertit une couleur calculée par le navigateur (`rgb(...)`) en `#rrggbb` */
+    function rgbToHex(color) {
+        const match = (color ?? '').match(/^rgba?\((\d+),\s*(\d+),\s*(\d+)/);
+        if (!match)
+            return null;
+        return '#' + [match[1], match[2], match[3]].map((part) => (+part).toString(16).padStart(2, '0')).join('');
+    }
+    /**
+     * Le nom technique du tag d'un sujet. Le DOM n'affiche que le libellé traduit :
+     * on le retraduit via le formulaire de filtre, et à défaut via la couleur du tag,
+     * qui est propre à chaque tag coloré.
+     */
+    function resolveTagName(row, label_to_name) {
+        const tag_element = row.querySelector('.thread-tag');
+        if (!tag_element)
+            return null;
+        const by_label = label_to_name.get(normalizeForumText(tag_element.textContent ?? ''));
+        if (by_label)
+            return by_label;
+        const color = rgbToHex(tag_element.style.backgroundColor);
+        const by_color = color ? forum_thread_tags.find((tag) => tag.color === color) : undefined;
+        return by_color?.name ?? null;
+    }
+    /** Une règle s'applique si tous ses critères renseignés sont satisfaits ; une règle sans critère ne cible rien */
+    function ruleMatches(rule, tag_name, title) {
+        if (!rule.enabled)
+            return false;
+        const has_tags = rule.tags.length > 0;
+        const has_words = rule.words.length > 0;
+        if (!has_tags && !has_words)
+            return false;
+        if (has_tags && (!tag_name || !rule.tags.includes(tag_name)))
+            return false;
+        if (has_words) {
+            const normalized_title = normalizeForumText(title);
+            if (!rule.words.some((word) => normalized_title.includes(normalizeForumText(word))))
+                return false;
+        }
+        return true;
+    }
+    /**
+     * Empile les styles des règles correspondantes : l'ordre de la liste est un
+     * ordre de priorité, donc pour une propriété donnée c'est la première règle
+     * qui la renseigne qui l'emporte.
+     */
+    function mergeForumThreadStyles(styles) {
+        return styles.reduce((merged, style) => ({
+            color: merged.color ?? style.color,
+            background: merged.background ?? style.background,
+            border: merged.border ?? style.border,
+            size: merged.size !== 100 ? merged.size : style.size,
+            opacity: merged.opacity !== 100 ? merged.opacity : style.opacity,
+            prefix: merged.prefix !== '' ? merged.prefix : style.prefix
+        }), { ...empty_forum_thread_style });
+    }
+    //////////////////
+    // Application  //
+    //////////////////
+    /**
+     * Isole le texte du titre dans un span dédié : le conteneur d'origine porte
+     * aussi le tag et les icônes de modération, qui ne doivent pas être stylés.
+     */
+    function ensureTitleElement(row) {
+        const container = row.querySelector('.title > div');
+        if (!container)
+            return null;
+        const existing = container.querySelector(`.${title_class}`);
+        if (existing)
+            return existing;
+        const text_nodes = Array.from(container.childNodes)
+            .filter((node) => node.nodeType === Node.TEXT_NODE && (node.textContent ?? '').trim() !== '');
+        if (text_nodes.length === 0)
+            return null;
+        const wrapper = document.createElement('span');
+        wrapper.classList.add(title_class);
+        container.insertBefore(wrapper, text_nodes[0]);
+        text_nodes.forEach((node) => wrapper.appendChild(node));
+        return wrapper;
+    }
+    /** Retire tout ce que l'addon a pu poser sur une ligne, sans défaire l'isolation du titre */
+    function resetRow(row) {
+        row_properties.forEach((property) => row.style.removeProperty(property));
+        row.querySelector(`.${prefix_class}`)?.remove();
+        const title_element = row.querySelector(`.${title_class}`);
+        if (title_element) {
+            title_element.removeAttribute('style');
+        }
+    }
+    /** Applique un style fusionné à une ligne et à son titre ; également utilisé pour l'aperçu de la modale */
+    function applyForumThreadStyleToElements(row, title_element, style) {
+        if (style.color)
+            title_element.style.color = style.color;
+        if (style.size !== 100)
+            title_element.style.fontSize = `${style.size}%`;
+        if (style.background)
+            row.style.backgroundColor = style.background;
+        // Barre peinte dans le fond plutôt qu'en bordure : une vraie bordure élargirait
+        // la ligne et décalerait la pastille de sujet non lu, positionnée en absolu par le jeu
+        if (style.border) {
+            row.style.backgroundImage = `linear-gradient(to right, ${style.border} 0, ${style.border} ${border_width}, transparent ${border_width})`;
+        }
+        if (style.opacity !== 100)
+            row.style.opacity = `${style.opacity / 100}`;
+        if (style.prefix !== '') {
+            const prefix = document.createElement('span');
+            prefix.classList.add(prefix_class);
+            prefix.textContent = `${style.prefix} `;
+            if (style.color)
+                prefix.style.color = style.color;
+            title_element.parentElement?.insertBefore(prefix, title_element);
+        }
+    }
+    /**
+     * Style les titres des sujets de la liste du forum selon les règles enregistrées.
+     * Rejouée à chaque navigation : la fonction est idempotente et remet d'abord
+     * chaque ligne dans son état d'origine.
+     */
+    function styleForumThreadTitles() {
+        styleForumThreadTitlesAttempt(0);
+    }
+    /**
+     * La liste des sujets est injectée en AJAX : elle peut n'être présente qu'après
+     * l'évènement de navigation, d'où quelques tentatives espacées.
+     * @param {number} attempt  Le numéro de la tentative en cours
+     */
+    function styleForumThreadTitlesAttempt(attempt) {
+        const is_enabled = !!state.mho_parameters?.custom_forum_thread_styles && pageIsForum();
+        const rows = Array.from(document.querySelectorAll('.forum-thread'));
+        if (rows.length === 0) {
+            if (is_enabled && attempt < forum_list_retry_delays.length) {
+                setTimeout(() => styleForumThreadTitlesAttempt(attempt + 1), forum_list_retry_delays[attempt]);
+            }
+            return;
+        }
+        if (!is_enabled) {
+            rows.forEach(resetRow);
+            return;
+        }
+        loadForumThreadStyleRules().then((rules) => applyForumThreadStyles(rules));
+    }
+    /** Applique immédiatement un jeu de règles à la liste affichée (utilisé aussi à l'enregistrement de la modale) */
+    function applyForumThreadStyles(rules) {
+        const rows = Array.from(document.querySelectorAll('.forum-thread'));
+        if (rows.length === 0)
+            return;
+        const label_to_name = buildTagLabelMap();
+        rows.forEach((row) => {
+            resetRow(row);
+            const title_element = ensureTitleElement(row);
+            if (!title_element)
+                return;
+            const tag_name = resolveTagName(row, label_to_name);
+            const title = title_element.textContent ?? '';
+            const matching = rules
+                .filter((rule) => ruleMatches(rule, tag_name, title))
+                .map((rule) => rule.style);
+            if (matching.length === 0)
+                return;
+            applyForumThreadStyleToElements(row, title_element, mergeForumThreadStyles(matching));
+        });
+    }
+
     function displayGhoulVoracityPercent() {
         if (state.mho_parameters.display_ghoul_voracity_percent) {
-            let ghoul_voracity_node = document.querySelector('.status-ghoul');
+            const ghoul_voracity_node = document.querySelector('.status-ghoul');
             if (!ghoul_voracity_node)
                 return;
-            let voracite = ghoul_voracity_node.querySelector('.ghoul-hunger-bar').style.width;
+            const voracite = ghoul_voracity_node.querySelector('.ghoul-hunger-bar').style.width;
             ghoul_voracity_node.firstChild.textContent = ghoul_voracity_node.firstChild.textContent.replace(':\n', `: ${voracite}\n`);
         }
     }
 
     function addCopyRegistryButton() {
         if (state.mho_parameters.copy_registry) {
-            let logs = document.querySelector('hordes-log');
-            let logs_complete_links = document.querySelector('log-complete-link');
-            let copy_button = document.querySelector(`#${mho_copy_logs_id}`);
-            let createCopyRegistryButtonContent = (value) => {
+            const logs = document.querySelector('hordes-log');
+            const logs_complete_links = document.querySelector('log-complete-link');
+            const copy_button = document.querySelector(`#${mho_copy_logs_id}`);
+            const createCopyRegistryButtonContent = (value) => {
                 return `<div style="display: flex; gap: 0.5em; align-items: center;"><img src="${mh_optimizer_icon}" style="width: 16px !important;">${value}</div>`;
             };
             if (logs && !copy_button && !logs_complete_links) {
-                let title = logs.parentElement.previousElementSibling;
-                let copy_button = document.createElement('a');
+                const title = logs.parentElement.previousElementSibling;
+                const copy_button = document.createElement('a');
                 title.appendChild(copy_button);
                 copy_button.innerHTML = createCopyRegistryButtonContent('⧉');
                 copy_button.id = mho_copy_logs_id;
@@ -6834,14 +7757,14 @@
                 copy_button.style.cursor = 'pointer';
                 copy_button.title = getI18N(texts.copy_registry);
                 copy_button.addEventListener('click', () => {
-                    let entries = logs.querySelectorAll('.log-entry:not(.hidden)');
-                    let soft_entries = Array.from(entries).map((entry) => {
-                        let time = entry.querySelector('.log-part-time').innerText.trim();
-                        let separator = ' [X] ';
-                        let content = entry.querySelector('.log-part-content').innerText.trim();
+                    const entries = logs.querySelectorAll('.log-entry:not(.hidden)');
+                    const soft_entries = Array.from(entries).map((entry) => {
+                        const time = entry.querySelector('.log-part-time').innerText.trim();
+                        const separator = ' [X] ';
+                        const content = entry.querySelector('.log-part-content').innerText.trim();
                         return time + separator + content;
                     });
-                    let final_text = soft_entries.join('\n');
+                    const final_text = soft_entries.join('\n');
                     copyToClipboard(final_text);
                     copy_button.innerHTML = createCopyRegistryButtonContent(`<img src="${repo_img_hordes_url}icons/done.png">`);
                     setTimeout(() => {
@@ -6854,7 +7777,7 @@
                         copy_button.style.float = 'right';
                         copy_button.style.position = 'relative';
                         copy_button.style.bottom = '7px';
-                        let first_link = title.querySelector('a');
+                        const first_link = title.querySelector('a');
                         if (first_link) {
                             first_link.style.marginLeft = 'auto';
                         }
@@ -6871,41 +7794,41 @@
     //////////////////////////////////////////////
     // La liste des paramètres de l'application //
     //////////////////////////////////////////////
-    let params_categories = [
+    const params_categories = [
         {
-            id: `external_tools`,
+            id: 'external_tools',
             label: {
-                en: `External tools`,
-                fr: `Outils externes`,
-                de: `Externen Tool`,
-                es: `Aplicaciones externas`
+                en: 'External tools',
+                fr: 'Outils externes',
+                de: 'Externen Tool',
+                es: 'Aplicaciones externas'
             },
             params: [
                 {
-                    id: `synchronize_external_tools`,
+                    id: 'synchronize_external_tools',
                     label: {
-                        en: `External tools update`,
-                        fr: `Mise à jour des outils externes`,
-                        de: `Aktualisierung externer Tools`,
-                        es: `Actualización de herramientas externas`
+                        en: 'External tools update',
+                        fr: 'Mise à jour des outils externes',
+                        de: 'Aktualisierung externer Tools',
+                        es: 'Actualización de herramientas externas'
                     },
                     children: [
                         {
-                            id: `update_mho`,
+                            id: 'update_mho',
                             label: {
-                                en: `Update MyHordes Optimiser`,
-                                fr: `Mettre à jour MyHordes Optimiser`,
-                                de: `MyHordes Optimiser Aktualisieren`,
-                                es: `Actualizar MyHordes Optimiser`
+                                en: 'Update MyHordes Optimiser',
+                                fr: 'Mettre à jour MyHordes Optimiser',
+                                de: 'MyHordes Optimiser Aktualisieren',
+                                es: 'Actualizar MyHordes Optimiser'
                             },
                             children: [
                                 {
-                                    id: `update_mho_killed_zombies`,
+                                    id: 'update_mho_killed_zombies',
                                     label: {
-                                        en: `Record the number of zombies killed`,
-                                        fr: `Enregistrer le nombre de zombies tués`,
-                                        de: `Notieren Sie die Anzahl der getöteten Zombies`,
-                                        es: `Registrar el número de zombis asesinados`
+                                        en: 'Record the number of zombies killed',
+                                        fr: 'Enregistrer le nombre de zombies tués',
+                                        de: 'Notieren Sie die Anzahl der getöteten Zombies',
+                                        es: 'Registrar el número de zombis asesinados'
                                     },
                                 },
                                 // {
@@ -6918,45 +7841,45 @@
                                 //     },
                                 // },
                                 {
-                                    id: `update_mho_devastated`,
+                                    id: 'update_mho_devastated',
                                     label: {
-                                        en: `Zone update even after the town is in Chaos`,
-                                        fr: `Mise à jour même quand la ville est en Chaos`,
-                                        de: `Zonen-Update, nachdem die Stadt bereits zerstört wurde`,
-                                        es: `Actualización de zona cuando los pueblo está sumida en el caos`
+                                        en: 'Zone update even after the town is in Chaos',
+                                        fr: 'Mise à jour même quand la ville est en Chaos',
+                                        de: 'Zonen-Update, nachdem die Stadt bereits zerstört wurde',
+                                        es: 'Actualización de zona cuando los pueblo está sumida en el caos'
                                     },
                                 },
                                 {
-                                    id: `update_mho_actions`,
+                                    id: 'update_mho_actions',
                                     label: {
-                                        en: `Heroic Actions`,
-                                        fr: `Actions héroïques`,
-                                        de: `Heldentaten`,
-                                        es: `Acciones heroicas`
+                                        en: 'Heroic Actions',
+                                        fr: 'Actions héroïques',
+                                        de: 'Heldentaten',
+                                        es: 'Acciones heroicas'
                                     },
                                 },
                                 {
-                                    id: `update_mho_house`,
+                                    id: 'update_mho_house',
                                     label: {
-                                        en: `Home upgrades`,
-                                        fr: `Améliorations de la maison`,
-                                        de: `Hausverbesserungen`,
-                                        es: `Mejoras de la casa`
+                                        en: 'Home upgrades',
+                                        fr: 'Améliorations de la maison',
+                                        de: 'Hausverbesserungen',
+                                        es: 'Mejoras de la casa'
                                     },
                                     help: {
-                                        en: `A new button will be placed on the improvements page`,
-                                        fr: `Un nouveau bouton sera placé sur la page des améliorations`,
-                                        de: `Auf der Verbesserungsseite wird eine neue Schaltfläche platziert`,
-                                        es: `Se colocará un nuevo botón en la página de mejoras.`
+                                        en: 'A new button will be placed on the improvements page',
+                                        fr: 'Un nouveau bouton sera placé sur la page des améliorations',
+                                        de: 'Auf der Verbesserungsseite wird eine neue Schaltfläche platziert',
+                                        es: 'Se colocará un nuevo botón en la página de mejoras.'
                                     },
                                 },
                                 {
-                                    id: `update_mho_bags`,
+                                    id: 'update_mho_bags',
                                     label: {
-                                        en: `Details of my rucksack and those of my escort`,
-                                        fr: `Détail de mon sac et de ceux de mon escorte`,
-                                        de: `Details meines Inventars und des Inventars meiner Eskorte`,
-                                        es: `Detalles de mi mochila y las de mi escolta`
+                                        en: 'Details of my rucksack and those of my escort',
+                                        fr: 'Détail de mon sac et de ceux de mon escorte',
+                                        de: 'Details meines Inventars und des Inventars meiner Eskorte',
+                                        es: 'Detalles de mi mochila y las de mi escolta'
                                     },
                                 },
                                 // {
@@ -6969,21 +7892,21 @@
                                 //     },
                                 // },
                                 {
-                                    id: `update_mho_status`,
+                                    id: 'update_mho_status',
                                     label: {
-                                        en: `Status`,
-                                        fr: `États`,
-                                        de: `Status`,
-                                        es: `Estatus`
+                                        en: 'Status',
+                                        fr: 'États',
+                                        de: 'Status',
+                                        es: 'Estatus'
                                     },
                                 },
                                 {
-                                    id: `update_mho_digs`,
+                                    id: 'update_mho_digs',
                                     label: {
-                                        en: `Record successful searches`,
-                                        fr: `Enregistrer les fouilles réussies`,
-                                        de: `Zeichnen Sie erfolgreiche Ausgrabungen auf`,
-                                        es: `Grabar excavaciones exitosas`
+                                        en: 'Record successful searches',
+                                        fr: 'Enregistrer les fouilles réussies',
+                                        de: 'Zeichnen Sie erfolgreiche Ausgrabungen auf',
+                                        es: 'Grabar excavaciones exitosas'
                                     },
                                 },
                                 // {
@@ -6996,18 +7919,18 @@
                                 //     },
                                 // },
                                 {
-                                    id: `refresh_mho_after_update`,
+                                    id: 'refresh_mho_after_update',
                                     label: {
-                                        en: `Refresh tab after update`,
-                                        fr: `Rafraîchir l'onglet après la mise à jour`,
-                                        de: `Registerkarte „Aktualisieren“ nach dem Update`,
-                                        es: `Actualizar pestaña después de la actualización`
+                                        en: 'Refresh tab after update',
+                                        fr: 'Rafraîchir l\'onglet après la mise à jour',
+                                        de: 'Registerkarte „Aktualisieren“ nach dem Update',
+                                        es: 'Actualizar pestaña después de la actualización'
                                     },
                                     help: {
-                                        en: `Will only work if the page is opened in a tab in the same browser window`,
-                                        fr: `Ne fonctionnera que si la page est ouverte dans un onglet dans la même fenêtre du navigateur`,
-                                        de: `Funktioniert nur, wenn die Seite in einem Tab im selben Browserfenster geöffnet wird`,
-                                        es: `Solo funcionará si la página se abre en una pestaña en la misma ventana del navegador.`
+                                        en: 'Will only work if the page is opened in a tab in the same browser window',
+                                        fr: 'Ne fonctionnera que si la page est ouverte dans un onglet dans la même fenêtre du navigateur',
+                                        de: 'Funktioniert nur, wenn die Seite in einem Tab im selben Browserfenster geöffnet wird',
+                                        es: 'Solo funcionará si la página se abre en una pestaña en la misma ventana del navegador.'
                                     }
                                 }
                             ]
@@ -7039,131 +7962,131 @@
                         //     ]
                         // },
                         {
-                            id: `update_gh`,
+                            id: 'update_gh',
                             label: {
-                                en: `Update Gest’Hordes`,
-                                fr: `Mettre à jour Gest'Hordes`,
-                                de: `Gest’Hordes aktualisieren`,
-                                es: `Actualizar Gest'Hordes`
+                                en: 'Update Gest’Hordes',
+                                fr: 'Mettre à jour Gest\'Hordes',
+                                de: 'Gest’Hordes aktualisieren',
+                                es: 'Actualizar Gest\'Hordes'
                             },
                             children: [
                                 {
-                                    id: `update_gh_killed_zombies`,
+                                    id: 'update_gh_killed_zombies',
                                     label: {
-                                        en: `Record the number of zombies killed`,
-                                        fr: `Enregistrer le nombre de zombies tués`,
-                                        de: `Notieren Sie die Anzahl der getöteten Zombies`,
-                                        es: `Registrar el número de zombis asesinados`
+                                        en: 'Record the number of zombies killed',
+                                        fr: 'Enregistrer le nombre de zombies tués',
+                                        de: 'Notieren Sie die Anzahl der getöteten Zombies',
+                                        es: 'Registrar el número de zombis asesinados'
                                     },
                                 },
                                 {
-                                    id: `update_gh_devastated`,
+                                    id: 'update_gh_devastated',
                                     label: {
-                                        en: `Zone update even after the town is in Chaos`,
-                                        fr: `Mise à jour quand la ville est en Chaos`,
-                                        de: `Zonen-Update, nachdem die Stadt bereits zerstört wurde`,
-                                        es: `Actualización de zona cuando los pueblo está sumida en el caos`
+                                        en: 'Zone update even after the town is in Chaos',
+                                        fr: 'Mise à jour quand la ville est en Chaos',
+                                        de: 'Zonen-Update, nachdem die Stadt bereits zerstört wurde',
+                                        es: 'Actualización de zona cuando los pueblo está sumida en el caos'
                                     },
                                 },
                                 {
-                                    id: `update_gh_ah`,
+                                    id: 'update_gh_ah',
                                     label: {
-                                        en: `Heroic Actions`,
-                                        fr: `Actions héroïques`,
-                                        de: `Heldentaten`,
-                                        es: `Acciones heroicas`
+                                        en: 'Heroic Actions',
+                                        fr: 'Actions héroïques',
+                                        de: 'Heldentaten',
+                                        es: 'Acciones heroicas'
                                     },
                                 },
                                 {
-                                    id: `update_gh_amelios`,
+                                    id: 'update_gh_amelios',
                                     label: {
-                                        en: `Home upgrades`,
-                                        fr: `Améliorations de la maison`,
-                                        de: `Hausverbesserungen`,
-                                        es: `Mejoras de la casa`
+                                        en: 'Home upgrades',
+                                        fr: 'Améliorations de la maison',
+                                        de: 'Hausverbesserungen',
+                                        es: 'Mejoras de la casa'
                                     },
                                     help: {
-                                        en: `A new button will be placed on the improvements page`,
-                                        fr: `Un nouveau bouton sera placé sur la page des améliorations`,
-                                        de: `Auf der Verbesserungsseite wird eine neue Schaltfläche platziert`,
-                                        es: `Se colocará un nuevo botón en la página de mejoras.`
+                                        en: 'A new button will be placed on the improvements page',
+                                        fr: 'Un nouveau bouton sera placé sur la page des améliorations',
+                                        de: 'Auf der Verbesserungsseite wird eine neue Schaltfläche platziert',
+                                        es: 'Se colocará un nuevo botón en la página de mejoras.'
                                     },
                                 },
                                 {
-                                    id: `update_gh_status`,
+                                    id: 'update_gh_status',
                                     label: {
-                                        en: `Status`,
-                                        fr: `États`,
-                                        de: `Status`,
-                                        es: `Estatus`
+                                        en: 'Status',
+                                        fr: 'États',
+                                        de: 'Status',
+                                        es: 'Estatus'
                                     },
                                 },
                                 {
-                                    id: `refresh_gh_after_update`,
+                                    id: 'refresh_gh_after_update',
                                     label: {
-                                        en: `Refresh tab after update`,
-                                        fr: `Rafraîchir l'onglet après la mise à jour`,
-                                        de: `Registerkarte „Aktualisieren“ nach dem Update`,
-                                        es: `Actualizar pestaña después de la actualización`
+                                        en: 'Refresh tab after update',
+                                        fr: 'Rafraîchir l\'onglet après la mise à jour',
+                                        de: 'Registerkarte „Aktualisieren“ nach dem Update',
+                                        es: 'Actualizar pestaña después de la actualización'
                                     },
                                     help: {
-                                        en: `Will only work if the page is opened in a tab in the same browser window`,
-                                        fr: `Ne fonctionnera que si la page est ouverte dans un onglet dans la même fenêtre du navigateur`,
-                                        de: `Funktioniert nur, wenn die Seite in einem Tab im selben Browserfenster geöffnet wird`,
-                                        es: `Solo funcionará si la página se abre en una pestaña en la misma ventana del navegador.`
+                                        en: 'Will only work if the page is opened in a tab in the same browser window',
+                                        fr: 'Ne fonctionnera que si la page est ouverte dans un onglet dans la même fenêtre du navigateur',
+                                        de: 'Funktioniert nur, wenn die Seite in einem Tab im selben Browserfenster geöffnet wird',
+                                        es: 'Solo funcionará si la página se abre en una pestaña en la misma ventana del navegador.'
                                     }
                                 }
                             ]
                         },
                         {
-                            id: `update_fata`,
+                            id: 'update_fata',
                             label: {
-                                en: `Update Fata Morgana`,
-                                fr: `Mettre à jour Fata Morgana`,
-                                de: `Fata Morgana aktualisieren`,
-                                es: `Actualizar Fata Morgana`
+                                en: 'Update Fata Morgana',
+                                fr: 'Mettre à jour Fata Morgana',
+                                de: 'Fata Morgana aktualisieren',
+                                es: 'Actualizar Fata Morgana'
                             },
                             children: [
                                 {
-                                    id: `update_fata_killed_zombies`,
+                                    id: 'update_fata_killed_zombies',
                                     label: {
-                                        en: `Record the number of zombies killed`,
-                                        fr: `Enregistrer le nombre de zombies tués`,
-                                        de: `Notieren Sie die Anzahl der getöteten Zombies`,
-                                        es: `Registrar el número de zombis asesinados`
+                                        en: 'Record the number of zombies killed',
+                                        fr: 'Enregistrer le nombre de zombies tués',
+                                        de: 'Notieren Sie die Anzahl der getöteten Zombies',
+                                        es: 'Registrar el número de zombis asesinados'
                                     },
                                 },
                                 {
-                                    id: `update_fata_job_markers`,
+                                    id: 'update_fata_job_markers',
                                     label: {
-                                        en: `Updates information from job markers`,
-                                        fr: `Met à jour les informations issues des marqueurs de métiers`,
-                                        de: `Aktualisiert Informationen von Jobmarkierungen`,
-                                        es: `Actualiza la información de los marcadores de trabajo.`
+                                        en: 'Updates information from job markers',
+                                        fr: 'Met à jour les informations issues des marqueurs de métiers',
+                                        de: 'Aktualisiert Informationen von Jobmarkierungen',
+                                        es: 'Actualiza la información de los marcadores de trabajo.'
                                     },
                                 },
                                 {
-                                    id: `update_fata_devastated`,
+                                    id: 'update_fata_devastated',
                                     label: {
-                                        en: `Update even when the town is in Chaos or when the quota is exceeded`,
-                                        fr: `Mise à jour même quand la ville est en Chaos ou quand le quota est dépassé`,
-                                        de: `Aktualisierung auch dann, wenn in der Stadt Chaos herrscht oder das Kontingent überschritten wird`,
-                                        es: `Actualizar incluso cuando la ciudad esté en Caos o cuando se exceda la cuota`
+                                        en: 'Update even when the town is in Chaos or when the quota is exceeded',
+                                        fr: 'Mise à jour même quand la ville est en Chaos ou quand le quota est dépassé',
+                                        de: 'Aktualisierung auch dann, wenn in der Stadt Chaos herrscht oder das Kontingent überschritten wird',
+                                        es: 'Actualizar incluso cuando la ciudad esté en Caos o cuando se exceda la cuota'
                                     },
                                 },
                                 {
-                                    id: `refresh_fm_after_update`,
+                                    id: 'refresh_fm_after_update',
                                     label: {
-                                        en: `Refresh tab after update`,
-                                        fr: `Rafraîchir l'onglet après la mise à jour`,
-                                        de: `Registerkarte „Aktualisieren“ nach dem Update`,
-                                        es: `Actualizar pestaña después de la actualización`
+                                        en: 'Refresh tab after update',
+                                        fr: 'Rafraîchir l\'onglet après la mise à jour',
+                                        de: 'Registerkarte „Aktualisieren“ nach dem Update',
+                                        es: 'Actualizar pestaña después de la actualización'
                                     },
                                     help: {
-                                        en: `Will only work if the page is opened in a tab in the same browser window`,
-                                        fr: `Ne fonctionnera que si la page est ouverte dans un onglet dans la même fenêtre du navigateur`,
-                                        de: `Funktioniert nur, wenn die Seite in einem Tab im selben Browserfenster geöffnet wird`,
-                                        es: `Solo funcionará si la página se abre en una pestaña en la misma ventana del navegador.`
+                                        en: 'Will only work if the page is opened in a tab in the same browser window',
+                                        fr: 'Ne fonctionnera que si la page est ouverte dans un onglet dans la même fenêtre du navigateur',
+                                        de: 'Funktioniert nur, wenn die Seite in einem Tab im selben Browserfenster geöffnet wird',
+                                        es: 'Solo funcionará si la página se abre en una pestaña en la misma ventana del navegador.'
                                     }
                                 }
                             ]
@@ -7186,277 +8109,313 @@
                 //     },
                 // },
                 {
-                    id: `display_more_informations_from_mho`,
+                    id: 'display_more_informations_from_mho',
                     label: {
-                        en: `Shows miscellaneous information from MyHordes Optimizer`,
-                        fr: `Affiche des informations diverses issues de MyHordes Optimizer`,
-                        de: `Zeigt Verschiedene Informationen von MyHordes Optimizer`,
-                        es: `Muestra Información miscelánea de MyHordes Optimizer`
+                        en: 'Shows miscellaneous information from MyHordes Optimizer',
+                        fr: 'Affiche des informations diverses issues de MyHordes Optimizer',
+                        de: 'Zeigt Verschiedene Informationen von MyHordes Optimizer',
+                        es: 'Muestra Información miscelánea de MyHordes Optimizer'
                     },
                     help: {
-                        en: `Displays the note of the box, if it exists.`,
-                        fr: `Affiche la note de la case, si elle existe.`,
-                        de: `Zeigt die Notiz der Box an, falls vorhanden.`,
-                        es: `Muestra la nota de la caja, si existe.`
+                        en: 'Displays the note of the box, if it exists.',
+                        fr: 'Affiche la note de la case, si elle existe.',
+                        de: 'Zeigt die Notiz der Box an, falls vorhanden.',
+                        es: 'Muestra la nota de la caja, si existe.'
                     },
                 },
                 {
-                    id: `display_my_expeditions`,
+                    id: 'display_my_expeditions',
                     label: {
-                        en: `Shows details of the MyHordes Optimizer expeditions I am registered for`,
-                        fr: `Affiche les détails des expéditions de MyHordes Optimizer auxquelles je suis inscrit`,
-                        de: `Zeigt Details zu MyHordes Optimizer-Expeditionen an, für die ich registriert bin`,
-                        es: `Muestra los detalles de las expediciones de MyHordes Optimizer a las que estoy registrado`
+                        en: 'Shows details of the MyHordes Optimizer expeditions I am registered for',
+                        fr: 'Affiche les détails des expéditions de MyHordes Optimizer auxquelles je suis inscrit',
+                        de: 'Zeigt Details zu MyHordes Optimizer-Expeditionen an, für die ich registriert bin',
+                        es: 'Muestra los detalles de las expediciones de MyHordes Optimizer a las que estoy registrado'
                     },
                 },
                 {
-                    id: `display_external_links`,
+                    id: 'display_external_links',
                     label: {
-                        en: `Shows links to external profiles and towns`,
-                        fr: `Affiche des liens vers les profils et villes externes`,
-                        de: `Zeigt Links zu externen Profilen und Städten an`,
-                        es: `Muestra enlaces a perfiles y ciudades externos`
+                        en: 'Shows links to external profiles and towns',
+                        fr: 'Affiche des liens vers les profils et villes externes',
+                        de: 'Zeigt Links zu externen Profilen und Städten an',
+                        es: 'Muestra enlaces a perfiles y ciudades externos'
                     },
                 }
             ]
         },
         {
-            id: `additionnal_info`,
+            id: 'additionnal_info',
             label: {
-                en: `Further information`,
-                fr: `Informations complémentaires`,
-                de: `Weitere Informationen`,
-                es: `Informaciones complementarias`
+                en: 'Further information',
+                fr: 'Informations complémentaires',
+                de: 'Weitere Informationen',
+                es: 'Informaciones complementarias'
             },
             params: [
                 {
-                    id: `enhanced_tooltips`,
+                    id: 'enhanced_tooltips',
                     label: {
-                        en: `Detailed tooltips`,
-                        fr: `Tooltips détaillés`,
-                        de: `Detaillierte Tooltips`,
-                        es: `Tooltips detallados`
+                        en: 'Detailed tooltips',
+                        fr: 'Tooltips détaillés',
+                        de: 'Detaillierte Tooltips',
+                        es: 'Tooltips detallados'
                     },
                     children: [
                         {
-                            id: `enhanced_tooltips_items`,
+                            id: 'enhanced_tooltips_items',
                             label: {
-                                en: `Items`,
-                                fr: `Objets`,
-                                de: `Gegenstände`,
-                                es: `Objetos`
+                                en: 'Items',
+                                fr: 'Objets',
+                                de: 'Gegenstände',
+                                es: 'Objetos'
                             },
                             children: [
                                 {
-                                    id: `enhanced_tooltips_item_quantities`,
+                                    id: 'enhanced_tooltips_item_quantities',
                                     label: {
-                                        en: `Bank quantity & wishlist`,
-                                        fr: `Quantité en banque & liste de courses`,
-                                        de: `Bankbestand & Wunschzettel`,
-                                        es: `Cantidad en banco & lista de deseos`
+                                        en: 'Bank quantity & wishlist',
+                                        fr: 'Quantité en banque & liste de courses',
+                                        de: 'Bankbestand & Wunschzettel',
+                                        es: 'Cantidad en banco & lista de deseos'
                                     },
                                 },
                                 {
-                                    id: `enhanced_tooltips_item_properties`,
+                                    id: 'enhanced_tooltips_item_properties',
                                     label: {
-                                        en: `Properties`,
-                                        fr: `Propriétés`,
-                                        de: `Eigenschaften`,
-                                        es: `Propiedades`
+                                        en: 'Properties',
+                                        fr: 'Propriétés',
+                                        de: 'Eigenschaften',
+                                        es: 'Propiedades'
                                     },
                                 },
                                 {
-                                    id: `enhanced_tooltips_item_actions`,
+                                    id: 'enhanced_tooltips_item_actions',
                                     label: {
-                                        en: `Actions`,
-                                        fr: `Actions`,
-                                        de: `Aktionen`,
-                                        es: `Acciones`
+                                        en: 'Actions',
+                                        fr: 'Actions',
+                                        de: 'Aktionen',
+                                        es: 'Acciones'
                                     },
                                 },
                                 {
-                                    id: `enhanced_tooltips_item_recipes`,
+                                    id: 'enhanced_tooltips_item_recipes',
                                     label: {
-                                        en: `Recipes`,
-                                        fr: `Recettes`,
-                                        de: `Rezepte`,
-                                        es: `Transformaciones`
+                                        en: 'Recipes',
+                                        fr: 'Recettes',
+                                        de: 'Rezepte',
+                                        es: 'Transformaciones'
                                     },
                                 },
                                 {
-                                    id: `enhanced_tooltips_item_translations`,
+                                    id: 'enhanced_tooltips_item_translations',
                                     label: {
-                                        en: `Translations`,
-                                        fr: `Traductions`,
-                                        de: `Übersetzungen`,
-                                        es: `Traducciones`
+                                        en: 'Translations',
+                                        fr: 'Traductions',
+                                        de: 'Übersetzungen',
+                                        es: 'Traducciones'
                                     },
                                 },
                             ]
                         },
                         {
-                            id: `enhanced_tooltips_statuses`,
+                            id: 'enhanced_tooltips_statuses',
                             label: {
-                                en: `Statuses`,
-                                fr: `États`,
-                                de: `Status`,
-                                es: `Estatus`
+                                en: 'Statuses',
+                                fr: 'États',
+                                de: 'Status',
+                                es: 'Estatus'
                             },
                         },
                     ]
                 },
                 {
-                    id: `display_wishlist`,
+                    id: 'display_wishlist',
                     label: {
-                        en: `Wishlist in interface`,
-                        fr: `Liste de courses dans l'interface`,
-                        de: `Wunschzettel in der Benutzeroberfläche`,
-                        es: `Lista de deseos en la interfaz`
+                        en: 'Wishlist in interface',
+                        fr: 'Liste de courses dans l\'interface',
+                        de: 'Wunschzettel in der Benutzeroberfläche',
+                        es: 'Lista de deseos en la interfaz'
                     },
                 },
                 {
-                    id: `display_estimations_on_watchtower`,
+                    id: 'display_estimations_on_watchtower',
                     label: {
-                        en: `Estimates saved on the watchtower page`,
-                        fr: `Estimations enregistrées sur la page de la tour de guet`,
-                        de: `Schätzungen, die auf der Wachturm aufgezeichnet wurden`,
-                        es: `Estimaciones registradas en la página de la torre de vigilancia`
+                        en: 'Estimates saved on the watchtower page',
+                        fr: 'Estimations enregistrées sur la page de la tour de guet',
+                        de: 'Schätzungen, die auf der Wachturm aufgezeichnet wurden',
+                        es: 'Estimaciones registradas en la página de la torre de vigilancia'
                     },
                 },
                 {
-                    id: `display_camping_predict`,
+                    id: 'display_camping_predict',
                     label: {
-                        en: `Camping predictions in area information`,
-                        fr: `Prédictions de camping dans les informations du secteur`,
-                        de: `Campingvorhersagen in Gebietsinformationen`,
-                        es: `Predicciones para acampar en la información del área`
+                        en: 'Camping predictions in area information',
+                        fr: 'Prédictions de camping dans les informations du secteur',
+                        de: 'Campingvorhersagen in Gebietsinformationen',
+                        es: 'Predicciones para acampar en la información del área'
                     },
                 },
             ]
         },
         {
-            id: `display`,
+            id: 'display',
             label: {
-                en: `Interface improvements`,
-                fr: `Améliorations de l'interface`,
-                de: `Benutzeroberfläche Verbesserungen`,
-                es: `Mejoras de la interfaz`
+                en: 'Interface improvements',
+                fr: 'Améliorations de l\'interface',
+                de: 'Benutzeroberfläche Verbesserungen',
+                es: 'Mejoras de la interfaz'
             },
             params: [
                 {
-                    id: `sort_and_filter`,
+                    id: 'sort_and_filter',
                     label: {
-                        en: `Sorts and filters`,
-                        fr: `Tris et filtres`,
-                        de: `Sortierungen und Filter`,
-                        es: `Ordena y filtra`
+                        en: 'Sorts and filters',
+                        fr: 'Tris et filtres',
+                        de: 'Sortierungen und Filter',
+                        es: 'Ordena y filtra'
                     },
                     children: [
                         {
-                            id: `display_search_fields`,
+                            id: 'display_search_fields',
                             label: {
-                                en: `Additional filters`,
-                                fr: `Filtres supplémentaires`,
-                                de: `Zusätzliche Filter`,
-                                es: `Filtros adicionales`
+                                en: 'Additional filters',
+                                fr: 'Filtres supplémentaires',
+                                de: 'Zusätzliche Filter',
+                                es: 'Filtros adicionales'
                             },
                             children: [
                                 {
-                                    id: `hide_completed_buildings_field`,
+                                    id: 'hide_completed_buildings_field',
                                     label: {
-                                        en: `Hide completed projects`,
-                                        fr: `Masquer les chantiers terminés`,
-                                        de: `Abgeschlossene Bauprojekte ausblenden`,
-                                        es: `Ocultar obras completados`
+                                        en: 'Hide completed projects',
+                                        fr: 'Masquer les chantiers terminés',
+                                        de: 'Abgeschlossene Bauprojekte ausblenden',
+                                        es: 'Ocultar obras completados'
                                     },
                                 },
                                 {
-                                    id: `display_search_field_buildings`,
+                                    id: 'display_search_field_buildings',
                                     label: {
-                                        en: `Search for a construction site`,
-                                        fr: `Rechercher un chantier`,
-                                        de: `Baustelle suchen`,
-                                        es: `Buscar una construcción`
+                                        en: 'Search for a construction site',
+                                        fr: 'Rechercher un chantier',
+                                        de: 'Baustelle suchen',
+                                        es: 'Buscar una construcción'
                                     },
                                 },
                                 {
-                                    id: `display_search_field_recipients`,
+                                    id: 'display_search_field_recipients',
                                     label: {
-                                        en: `Find a recipient`,
-                                        fr: `Rechercher un destinataire`,
-                                        de: `Finden Sie einen Empfänger`,
-                                        es: `Encuentra un destinatario`
+                                        en: 'Find a recipient',
+                                        fr: 'Rechercher un destinataire',
+                                        de: 'Finden Sie einen Empfänger',
+                                        es: 'Encuentra un destinatario'
                                     }
                                 },
                                 {
-                                    id: `display_search_field_dump`,
+                                    id: 'display_search_field_dump',
                                     label: {
-                                        en: `Search for an object in the landfill`,
-                                        fr: `Rechercher un objet de la décharge`,
-                                        de: `Suchen Sie nach einem Objekt auf der Mülldeponie`,
-                                        es: `Buscar un objeto en el vertedero`
+                                        en: 'Search for an object in the landfill',
+                                        fr: 'Rechercher un objet de la décharge',
+                                        de: 'Suchen Sie nach einem Objekt auf der Mülldeponie',
+                                        es: 'Buscar un objeto en el vertedero'
                                     }
                                 },
                                 {
-                                    id: `display_search_field_registry`,
+                                    id: 'display_search_field_trap',
                                     label: {
-                                        en: `Search the registry`,
-                                        fr: `Rechercher dans le registre`,
-                                        de: `Durchsuchen Sie die Registrierung`,
-                                        es: `Buscar en el registro`
+                                        en: 'Search for a bait',
+                                        fr: 'Rechercher un appât',
+                                        de: 'Nach einem Köder suchen',
+                                        es: 'Buscar un cebo'
+                                    }
+                                },
+                                {
+                                    id: 'display_search_field_registry',
+                                    label: {
+                                        en: 'Search the registry',
+                                        fr: 'Rechercher dans le registre',
+                                        de: 'Durchsuchen Sie die Registrierung',
+                                        es: 'Buscar en el registro'
                                     },
                                     help: {
-                                        en: `The search will only be done in the displayed lines of the registry`,
-                                        fr: `La recherche ne se fera que dans les lignes affichées du registre`,
-                                        de: `Die Suche erfolgt nur in den angezeigten Zeilen des Registers`,
-                                        es: `La búsqueda sólo se realizará en las líneas desplegadas del registro`
+                                        en: 'The search will only be done in the displayed lines of the registry',
+                                        fr: 'La recherche ne se fera que dans les lignes affichées du registre',
+                                        de: 'Die Suche erfolgt nur in den angezeigten Zeilen des Registers',
+                                        es: 'La búsqueda sólo se realizará en las líneas desplegadas del registro'
                                     }
                                 },
                                 {
-                                    id: `display_filters_citizen_list`,
+                                    id: 'display_filters_citizen_list',
                                     label: {
-                                        en: `Search the citizens list`,
-                                        fr: `Rechercher dans la liste des citoyens`,
-                                        de: `Durchsuchen Sie die Bürgerliste`,
-                                        es: `Buscar en el lista ciudadanos`
+                                        en: 'Search the citizens list',
+                                        fr: 'Rechercher dans la liste des citoyens',
+                                        de: 'Durchsuchen Sie die Bürgerliste',
+                                        es: 'Buscar en el lista ciudadanos'
                                     }
                                 },
                                 {
-                                    id: `display_filters_omniscience`,
+                                    id: 'display_filters_omniscience',
                                     label: {
-                                        en: `Search the omniscience`,
-                                        fr: `Rechercher dans l'omniscience`,
-                                        de: `Durchsuchen Sie die Omniscience`,
-                                        es: `Buscar en el omnisciencia`
+                                        en: 'Search the omniscience',
+                                        fr: 'Rechercher dans l\'omniscience',
+                                        de: 'Durchsuchen Sie die Omniscience',
+                                        es: 'Buscar en el omnisciencia'
                                     }
                                 },
                             ]
                         },
                         {
-                            id: `sort_lists`,
+                            id: 'sort_lists',
                             label: {
-                                en: `Additional sorts`,
-                                fr: `Tris supplémentaires`,
-                                de: `Zusätzliche Sorten`,
-                                es: `Tipos adicionales`
+                                en: 'Additional sorts',
+                                fr: 'Tris supplémentaires',
+                                de: 'Zusätzliche Sorten',
+                                es: 'Tipos adicionales'
                             },
                             children: [
                                 {
-                                    id: `sort_citizen_list`,
+                                    id: 'sort_citizen_list',
                                     label: {
-                                        en: `List of citizens`,
-                                        fr: `Liste des citoyens`,
-                                        de: `Liste der Bürger`,
-                                        es: `Lista de ciudadanos`,
+                                        en: 'List of citizens',
+                                        fr: 'Liste des citoyens',
+                                        de: 'Liste der Bürger',
+                                        es: 'Lista de ciudadanos',
                                     }
                                 },
                                 {
-                                    id: `sort_omniscience_list`,
+                                    id: 'sort_omniscience_list',
                                     label: {
-                                        en: `Omniscience`,
-                                        fr: `Omniscience`,
-                                        de: `Allwissenheit`,
-                                        es: `Omnisciencia`,
+                                        en: 'Omniscience',
+                                        fr: 'Omniscience',
+                                        de: 'Allwissenheit',
+                                        es: 'Omnisciencia',
+                                    }
+                                },
+                                {
+                                    id: 'sort_nightwatch_list',
+                                    label: {
+                                        en: 'Night watch',
+                                        fr: 'Veille',
+                                        de: 'Nachtwache',
+                                        es: 'Guardia nocturna',
+                                    }
+                                },
+                                {
+                                    id: 'sort_trap_list',
+                                    label: {
+                                        en: 'Traps',
+                                        fr: 'Pièges',
+                                        de: 'Fallensystem',
+                                        es: 'Trampas',
+                                    }
+                                },
+                                {
+                                    id: 'sort_dump_list',
+                                    label: {
+                                        en: 'Dump',
+                                        fr: 'Décharge',
+                                        de: 'Müllhalde',
+                                        es: 'Vertedero',
                                     }
                                 }
                             ]
@@ -7464,141 +8423,172 @@
                     ]
                 },
                 {
-                    id: `default_escort_options`,
+                    id: 'default_escort_options',
                     label: {
-                        en: `Set default escort options`,
-                        fr: `Définir des options d'escorte par défaut`,
-                        de: `Legen Sie Standard-Escort-Optionen fest`,
-                        es: `Establecer opciones de acompañamiento predeterminadas`
+                        en: 'Set default escort options',
+                        fr: 'Définir des options d\'escorte par défaut',
+                        de: 'Legen Sie Standard-Escort-Optionen fest',
+                        es: 'Establecer opciones de acompañamiento predeterminadas'
                     },
                     children: [
                         {
-                            id: `default_escort_force_return`,
+                            id: 'default_escort_force_return',
                             label: {
-                                en: `Don't allow my escort to take me further away from the town`,
-                                fr: `Interdire au chef d'escorte de m'éloigner de la ville`,
-                                de: `Ich will auf direktem Weg zurück zur Stadt`,
-                                es: `Prohibir al jefe de la escolta alejarme del pueblo`
+                                en: 'Don\'t allow my escort to take me further away from the town',
+                                fr: 'Interdire au chef d\'escorte de m\'éloigner de la ville',
+                                de: 'Ich will auf direktem Weg zurück zur Stadt',
+                                es: 'Prohibir al jefe de la escolta alejarme del pueblo'
                             },
                         },
                         {
-                            id: `default_escort_allow_rucksack`,
+                            id: 'default_escort_allow_rucksack',
                             label: {
-                                en: `Allow the objects in my rucksack to be viewed and used`,
-                                fr: `Permettre de voir et de manipuler les objets de mon sac`,
-                                de: `Zugriff auf meinen Rucksack zulassen`,
-                                es: `Permitir ver y manipular los objetos en mi mochila`
+                                en: 'Allow the objects in my rucksack to be viewed and used',
+                                fr: 'Permettre de voir et de manipuler les objets de mon sac',
+                                de: 'Zugriff auf meinen Rucksack zulassen',
+                                es: 'Permitir ver y manipular los objetos en mi mochila'
                             },
                         }
                     ]
                 },
                 {
-                    id: `automatically_open_bag`,
+                    id: 'automatically_open_bag',
                     label: {
-                        en: `Automatically opens the "Use an object from my rucksack" menu`,
-                        fr: `Ouvre automatiquement le menu "Utiliser un objet de mon sac"`,
-                        de: `Öffnet automatisch das Menü "Gegenstand verwenden"`,
-                        es: `Abre automáticamente el menú "Usar un objeto de mi mochila"`
+                        en: 'Automatically opens the "Use an object from my rucksack" menu',
+                        fr: 'Ouvre automatiquement le menu "Utiliser un objet de mon sac"',
+                        de: 'Öffnet automatisch das Menü "Gegenstand verwenden"',
+                        es: 'Abre automáticamente el menú "Usar un objeto de mi mochila"'
                     },
                 },
                 {
-                    id: `display_nb_dead_zombies`,
+                    id: 'display_nb_dead_zombies',
                     label: {
-                        en: `Number of zombie that died today`,
-                        fr: `Nombre de zombies morts aujourd'hui`,
-                        de: `Anzahl der Zombies die heute hier gestorben sind`,
-                        es: `Cantidad de zombis que murieron hoy`
+                        en: 'Number of zombie that died today',
+                        fr: 'Nombre de zombies morts aujourd\'hui',
+                        de: 'Anzahl der Zombies die heute hier gestorben sind',
+                        es: 'Cantidad de zombis que murieron hoy'
                     },
                     help: {
-                        en: `Allows to display the number of blood splatters on the map`,
-                        fr: `Permet d'afficher le nombre de taches de sang sur la carte`,
-                        de: `Ermöglicht die Anzeige der Anzahl der Blutfleck auf der Karte`,
-                        es: `Permite mostrar la cantidad de manchas de sangre en el mapa`
+                        en: 'Allows to display the number of blood splatters on the map',
+                        fr: 'Permet d\'afficher le nombre de taches de sang sur la carte',
+                        de: 'Ermöglicht die Anzeige der Anzahl der Blutfleck auf der Karte',
+                        es: 'Permite mostrar la cantidad de manchas de sangre en el mapa'
                     },
                 },
                 {
-                    id: `display_missing_ap_for_buildings_to_be_safe`,
+                    id: 'display_missing_ap_for_buildings_to_be_safe',
                     label: {
-                        en: `Missing AP to repair construction sites`,
-                        fr: `PA manquants pour réparer les chantiers`,
-                        de: `Fehlende AP, um Konstruktionen zu reparieren`,
-                        es: `PA faltantes para reparar las construcciones`
+                        en: 'Missing AP to repair construction sites',
+                        fr: 'PA manquants pour réparer les chantiers',
+                        de: 'Fehlende AP, um Konstruktionen zu reparieren',
+                        es: 'PA faltantes para reparar las construcciones'
                     },
                     help: {
-                        en: `In Pandemonium (Hardcore towns), the construction sites are damaged during the attack. The damages can amount to 70% max of the construction's life points (rounded up to the nearest whole number). This option displays over the constructions the number of AP needed to keep them safe.`,
-                        fr: `En Pandémonium, les bâtiments prennent des dégâts lors de l'attaque. Ces dégâts équivalent à un maximum de 70% des points de vie du bâtiment (arrondi à l'entier supérieur). Cette option affiche sur les bâtiments les PA à investir pour que le bâtiment soit en sécurité.`,
-                        de: `In Pandämonium-Städten nehmen Gebäude während des nächtlichen Angriffs Schaden. Diese Schäden können bis zu 70% eines Gebäudes ausmachen (aufgerundet zur nächsten ganzen Zahl). Diese Einstellung zeigt oberhalb der Bau-AP an, wieviele AP benötigt werden, um das Gebäude für die Nacht zu schützen.`,
-                        es: `En Pandemonio, las construcciones sufren daños durante el ataque. Estos daños equivalen a un máximo de 70% de los puntos de vida de la construcción (redondeados al entero superior). Esta opción muestra sobre las construcciones la cantidad de PA a invertir para evitar que puedan ser destruidas.`
+                        en: 'In Pandemonium (Hardcore towns), the construction sites are damaged during the attack. The damages can amount to 70% max of the construction\'s life points (rounded up to the nearest whole number). This option displays over the constructions the number of AP needed to keep them safe.',
+                        fr: 'En Pandémonium, les bâtiments prennent des dégâts lors de l\'attaque. Ces dégâts équivalent à un maximum de 70% des points de vie du bâtiment (arrondi à l\'entier supérieur). Cette option affiche sur les bâtiments les PA à investir pour que le bâtiment soit en sécurité.',
+                        de: 'In Pandämonium-Städten nehmen Gebäude während des nächtlichen Angriffs Schaden. Diese Schäden können bis zu 70% eines Gebäudes ausmachen (aufgerundet zur nächsten ganzen Zahl). Diese Einstellung zeigt oberhalb der Bau-AP an, wieviele AP benötigt werden, um das Gebäude für die Nacht zu schützen.',
+                        es: 'En Pandemonio, las construcciones sufren daños durante el ataque. Estos daños equivalen a un máximo de 70% de los puntos de vida de la construcción (redondeados al entero superior). Esta opción muestra sobre las construcciones la cantidad de PA a invertir para evitar que puedan ser destruidas.'
                     },
                 },
                 {
-                    id: `display_translate_tool`,
+                    id: 'display_translate_tool',
                     label: {
-                        en: `MyHordes' item translation bar`,
-                        fr: `Barre de traduction des éléments de MyHordes`,
-                        de: `Übersetzungsleiste für MyHordes Elemente`,
-                        es: `Barra de traducción de elementos de MyHordes`
+                        en: 'MyHordes\' item translation bar',
+                        fr: 'Barre de traduction des éléments de MyHordes',
+                        de: 'Übersetzungsleiste für MyHordes Elemente',
+                        es: 'Barra de traducción de elementos de MyHordes'
                     },
                     help: {
-                        en: `Shows a translation bar. You must choose the initial language, then type the searched element to get the other translations.`,
-                        fr: `Affiche une barre de traduction. Vous devez choisir la langue initiale, puis saisir l'élément recherché pour en récupérer les différentes traductions.`,
-                        de: `Zeigt eine Übersetzungsleiste an. Sie müssen die Ausgangssprache auswählen, und dann die Zielelemente eingeben um die Übersetzungen zu generieren.`,
-                        es: `Muestra una barra de traducción. Primero se debe escoger el idioma inicial, y luego ingresar el elemento buscado en la barra para obtener las distintas traducciones.`
+                        en: 'Shows a translation bar. You must choose the initial language, then type the searched element to get the other translations.',
+                        fr: 'Affiche une barre de traduction. Vous devez choisir la langue initiale, puis saisir l\'élément recherché pour en récupérer les différentes traductions.',
+                        de: 'Zeigt eine Übersetzungsleiste an. Sie müssen die Ausgangssprache auswählen, und dann die Zielelemente eingeben um die Übersetzungen zu generieren.',
+                        es: 'Muestra una barra de traducción. Primero se debe escoger el idioma inicial, y luego ingresar el elemento buscado en la barra para obtener las distintas traducciones.'
                     },
                 },
                 {
-                    id: `copy_registry`,
+                    id: 'copy_registry',
                     label: {
-                        en: `Button to copy registry contents`,
-                        fr: `Bouton permettant de copier le contenu du registre`,
-                        de: `Schaltfläche zum Kopieren von Registrierungsinhalten hinzu`,
-                        es: `Botón para copiar el contenido del registro`
+                        en: 'Button to copy registry contents',
+                        fr: 'Bouton permettant de copier le contenu du registre',
+                        de: 'Schaltfläche zum Kopieren von Registrierungsinhalten hinzu',
+                        es: 'Botón para copiar el contenido del registro'
                     },
                 },
                 {
-                    id: `display_anti_abuse`,
+                    id: 'display_anti_abuse',
                     label: {
-                        en: `Counter to manage anti-abuse`,
-                        fr: `Compteur pour gérer l'anti-abus`,
-                        de: `Zähler zur Verwaltung der Missbrauchsbekämpfung an`,
-                        es: `Contador para gestionar anti-abuso`
+                        en: 'Counter to manage anti-abuse',
+                        fr: 'Compteur pour gérer l\'anti-abus',
+                        de: 'Zähler zur Verwaltung der Missbrauchsbekämpfung an',
+                        es: 'Contador para gestionar anti-abuso'
                     },
                 },
                 {
-                    id: `display_ghoul_voracity_percent`,
+                    id: 'display_ghoul_voracity_percent',
                     label: {
-                        en: `Percentage on the voracity gauge`,
-                        fr: `Pourcentage sur la jauge de voracité`,
-                        de: `Prozentsatz der Unersättlichkeitsanzeige an`,
-                        es: `Porcentaje en el indicador de voracidad`
+                        en: 'Percentage on the voracity gauge',
+                        fr: 'Pourcentage sur la jauge de voracité',
+                        de: 'Prozentsatz der Unersättlichkeitsanzeige an',
+                        es: 'Porcentaje en el indicador de voracidad'
                     },
                 },
                 {
-                    id: `store_notifications`,
+                    id: 'store_notifications',
                     label: {
-                        en: `Stores notifications until cleared or page refreshed`,
-                        fr: `Stocke les notifications jusqu'à effacement ou rafraichissement de la page`,
-                        de: `Speichert Benachrichtigungen, bis sie gelöscht oder die Seite aktualisiert wird`,
-                        es: `Almacena notificaciones hasta que se borran o se actualiza la página`
+                        en: 'Stores notifications until cleared or page refreshed',
+                        fr: 'Stocke les notifications jusqu\'à effacement ou rafraichissement de la page',
+                        de: 'Speichert Benachrichtigungen, bis sie gelöscht oder die Seite aktualisiert wird',
+                        es: 'Almacena notificaciones hasta que se borran o se actualiza la página'
                     },
                 },
                 {
-                    id: `display_counter_on_input_registry`,
+                    id: 'display_counter_on_input_registry',
                     label: {
-                        en: `Character counter on the chatcase.`,
-                        fr: `Compteur de caractères sur le chatcase`,
-                        de: `Zeichenzähler im Chatcase an`,
-                        es: `Contador de caracteres en el caso de chat`
+                        en: 'Character counter on the chatcase.',
+                        fr: 'Compteur de caractères sur le chatcase',
+                        de: 'Zeichenzähler im Chatcase an',
+                        es: 'Contador de caracteres en el caso de chat'
                     },
                 },
                 {
-                    id: `fill_items_messages`,
+                    id: 'fill_items_messages',
                     label: {
-                        en: `Pre-populate the contents of empty messages containing items`,
-                        fr: `Pré-remplir le contenu des messages vides contenant des objets`,
-                        de: `Füllen Sie den Inhalt leerer Nachrichten mit Gegenstand vorab aus`,
-                        es: `Complete previamente el contenido de mensajes vacíos que contengan objetos`
+                        en: 'Pre-populate the contents of empty messages containing items',
+                        fr: 'Pré-remplir le contenu des messages vides contenant des objets',
+                        de: 'Füllen Sie den Inhalt leerer Nachrichten mit Gegenstand vorab aus',
+                        es: 'Complete previamente el contenido de mensajes vacíos que contengan objetos'
                     },
+                },
+                {
+                    id: 'freeze_avatars_animations',
+                    label: {
+                        en: 'Freeze animated avatars',
+                        fr: 'Figer les avatars animés',
+                        de: 'Animierte Avatare einfrieren',
+                        es: 'Congelar los avatares animados'
+                    },
+                    help: {
+                        en: 'Animated avatars are displayed as a still image, and play again when hovered over',
+                        fr: 'Les avatars animés sont affichés fixes, et se réaniment au survol de la souris',
+                        de: 'Animierte Avatare werden als Standbild angezeigt und werden beim Überfahren mit der Maus wieder animiert',
+                        es: 'Los avatares animados se muestran fijos y vuelven a animarse al pasar el ratón por encima'
+                    },
+                },
+                {
+                    id: 'custom_forum_thread_styles',
+                    label: {
+                        en: 'Apply a custom style to forum thread titles',
+                        fr: 'Appliquer un style personnalisé aux noms de sujets du forum',
+                        de: 'Einen benutzerdefinierten Stil auf die Titel der Forenthemen anwenden',
+                        es: 'Aplicar un estilo personalizado a los títulos de los temas del foro'
+                    },
+                    help: {
+                        en: 'Colors, highlights or dims the thread titles of the forum list according to their tag and / or the words they contain. The styles are configured through the button next to this option.',
+                        fr: 'Colore, met en avant ou atténue les noms de sujets de la liste du forum selon leur tag et / ou les mots qu\'ils contiennent. Les styles se configurent via le bouton à côté de cette option.',
+                        de: 'Färbt, hebt hervor oder dämpft die Themen-Titel der Forenliste je nach Tag und / oder enthaltenen Wörtern. Die Stile werden über die Schaltfläche neben dieser Option konfiguriert.',
+                        es: 'Colorea, destaca o atenúa los títulos de los temas de la lista del foro según su etiqueta y / o las palabras que contienen. Los estilos se configuran mediante el botón junto a esta opción.'
+                    },
+                    action: 'forum_thread_styles'
                 }
                 // {
                 //     id: `block_users`,
@@ -7619,56 +8609,56 @@
             ]
         },
         {
-            id: `notifications`,
+            id: 'notifications',
             label: {
-                en: `Notifications and warnings`,
-                fr: `Notifications et avertissements`,
-                de: `Hinweise und Warnungen`,
-                es: `Notificaciones y advertencias`
+                en: 'Notifications and warnings',
+                fr: 'Notifications et avertissements',
+                de: 'Hinweise und Warnungen',
+                es: 'Notificaciones y advertencias'
             },
             params: [
                 {
-                    id: `alert_if_no_escort`,
+                    id: 'alert_if_no_escort',
                     label: {
-                        en: `Notify me when there is no escort or if you have not released your escort`,
-                        fr: `Me notifier en l'absence d'escorte ou si vous n'avez pas relâché votre escorte`,
-                        de: `Benachrichtigen Sie mich, wenn keine Begleitung da ist oder wenn Sie Ihre Begleitperson nicht freigegeben haben`,
-                        es: `Pavísame cuando no haya escolta o si no has soltado tu escolta`
+                        en: 'Notify me when there is no escort or if you have not released your escort',
+                        fr: 'Me notifier en l\'absence d\'escorte ou si vous n\'avez pas relâché votre escorte',
+                        de: 'Benachrichtigen Sie mich, wenn keine Begleitung da ist oder wenn Sie Ihre Begleitperson nicht freigegeben haben',
+                        es: 'Pavísame cuando no haya escolta o si no has soltado tu escolta'
                     },
                     children: [
                         {
-                            id: `prevent_from_leaving`,
+                            id: 'prevent_from_leaving',
                             label: {
-                                en: `Ask for confirmation before leaving the page`,
-                                fr: `Demander confirmation avant de quitter la page`,
-                                de: `Bitten Sie um eine Bestätigung, bevor Sie die Seite verlassen`,
-                                es: `Pide confirmación antes de salir de la página`
+                                en: 'Ask for confirmation before leaving the page',
+                                fr: 'Demander confirmation avant de quitter la page',
+                                de: 'Bitten Sie um eine Bestätigung, bevor Sie die Seite verlassen',
+                                es: 'Pide confirmación antes de salir de la página'
                             },
                         },
                         {
-                            id: `alert_if_inactive`,
+                            id: 'alert_if_inactive',
                             label: {
-                                en: `Notify me if I'm inactive for more than 5 minutes on the page`,
-                                fr: `Me notifier si je suis inactif depuis 5 minutes sur la page`,
-                                de: `Benachrichtigen Sie mich, wenn ich länger als 5 Minuten auf der Seite inaktiv bin`,
-                                es: `Notificarme si estoy inactivo por más de 5 minutos en la página`
+                                en: 'Notify me if I\'m inactive for more than 5 minutes on the page',
+                                fr: 'Me notifier si je suis inactif depuis 5 minutes sur la page',
+                                de: 'Benachrichtigen Sie mich, wenn ich länger als 5 Minuten auf der Seite inaktiv bin',
+                                es: 'Notificarme si estoy inactivo por más de 5 minutos en la página'
                             },
                         }
                     ]
                 },
                 {
-                    id: `notify_on_search_end`,
+                    id: 'notify_on_search_end',
                     label: {
-                        en: `Notify me at the end of a search`,
-                        fr: `Me notifier à la fin de la fouille`,
-                        de: `Mich Benachrichtigen am Ende einer Grabungsaktion`,
-                        es: `Notificarme al final de la búsquedas`
+                        en: 'Notify me at the end of a search',
+                        fr: 'Me notifier à la fin de la fouille',
+                        de: 'Mich Benachrichtigen am Ende einer Grabungsaktion',
+                        es: 'Notificarme al final de la búsquedas'
                     },
                     help: {
-                        en: `Allows to receive a notification when a search ends if the page was not closed in the meantime`,
-                        fr: `Permet de recevoir une notification lorsque la fouille est terminée si la page n'a pas été quittée entre temps`,
-                        de: `Ermöglicht den Erhalt einer Benachrichtigung wann eine Grabungsaktion endet wenn die Seite in der Zwischenzeit nicht geschlossen wurde`,
-                        es: `Permite recibir una notificación al terminar una búsqueda si la página no ha sido cerrada entre tanto`
+                        en: 'Allows to receive a notification when a search ends if the page was not closed in the meantime',
+                        fr: 'Permet de recevoir une notification lorsque la fouille est terminée si la page n\'a pas été quittée entre temps',
+                        de: 'Ermöglicht den Erhalt einer Benachrichtigung wann eine Grabungsaktion endet wenn die Seite in der Zwischenzeit nicht geschlossen wurde',
+                        es: 'Permite recibir una notificación al terminar una búsqueda si la página no ha sido cerrada entre tanto'
                     },
                 }
             ]
@@ -7676,23 +8666,23 @@
     ];
 
     function createSelectWithSearch() {
-        let select_complete = document.createElement('div');
-        let select = document.createElement('label');
-        let input = document.createElement('input');
+        const select_complete = document.createElement('div');
+        const select = document.createElement('label');
+        const input = document.createElement('input');
         input.classList.add('mho-input');
         input.type = 'text';
         input.autocomplete = 'off';
-        let close = document.createElement('div');
+        const close = document.createElement('div');
         close.innerHTML = '&#128473';
         close.setAttribute('style', 'position: relative; float: right; top: -23px; color: #5c2b20;');
         select.appendChild(input);
         select.appendChild(close);
         select_complete.appendChild(select);
-        let options = document.createElement('div');
+        const options = document.createElement('div');
         options.classList.add('hidden');
         options.setAttribute('style', 'position: absolute; background: #5c2b20; border: 1px solid #ddab76; box-shadow: 0 0 3px #000; outline: 1px solid #000; color: #ddab76; max-height: 50vh; overflow: auto;');
         input.addEventListener('keyup', (event) => {
-            let temp_input = input.value.replace(/\W*/gm, '');
+            const temp_input = input.value.replace(/\W*/gm, '');
             if (temp_input.length > 2) {
                 options.classList.remove('hidden');
             }
@@ -7735,50 +8725,56 @@
      * avoir à dupliquer ses couleurs dans notre CSS.
      * @param {string} labelText
      * @param {string} id
-     * @param {{value: string, text: string}[]} options
+     * @param {{value: string, text: string, icon?: string, decorate?: () => HTMLElement}[]} options
      * @param {() => void} onChange
+     * @param {string[]} selected_values   Les valeurs cochées à l'ouverture
      * @returns {{ container: HTMLDivElement, getSelectedValues: () => string[] }}
      */
-    function createCheckboxDropdown(labelText, id, options, onChange) {
+    function createCheckboxDropdown(labelText, id, options, onChange, selected_values = []) {
         ensureCheckboxDropdownGlobalListener();
-        let container = document.createElement('div');
+        const container = document.createElement('div');
         container.classList.add('mho-filter-field');
-        let label = document.createElement('label');
+        const label = document.createElement('label');
         label.innerText = labelText;
         label.classList.add('mho-filter-label');
         container.appendChild(label);
-        let toggle = document.createElement('select');
+        const toggle = document.createElement('select');
         toggle.id = id;
         toggle.classList.add('mho-input', 'mho-dropdown-toggle');
-        let toggleOption = document.createElement('option');
+        const toggleOption = document.createElement('option');
         toggle.appendChild(toggleOption);
         container.appendChild(toggle);
-        let panel = document.createElement('div');
+        const panel = document.createElement('div');
         panel.classList.add('mho-checkbox-dropdown-panel');
         container.appendChild(panel);
-        let checkboxes = [];
-        let updateToggleLabel = () => {
-            let selectedCount = checkboxes.filter((checkbox) => checkbox.checked).length;
+        const checkboxes = [];
+        const updateToggleLabel = () => {
+            const selectedCount = checkboxes.filter((checkbox) => checkbox.checked).length;
             toggleOption.innerText = selectedCount === 0
                 ? getI18N(texts.filter_all)
                 : `${selectedCount} ${getI18N(texts.filter_selected_count)}`;
         };
-        options.forEach(({ value, text, icon }) => {
-            let optionLine = document.createElement('div');
-            let checkbox = document.createElement('input');
+        options.forEach(({ value, text, icon, decorate }) => {
+            const optionLine = document.createElement('div');
+            const checkbox = document.createElement('input');
             checkbox.type = 'checkbox';
             checkbox.value = value;
             checkbox.id = `${id}-opt-${value}`;
             checkbox.classList.add('mho-input');
-            let optionLabel = document.createElement('label');
+            checkbox.checked = selected_values.includes(value);
+            const optionLabel = document.createElement('label');
             optionLabel.htmlFor = checkbox.id;
             optionLabel.title = text;
             if (icon) {
-                let optionIcon = document.createElement('img');
+                const optionIcon = document.createElement('img');
                 optionIcon.src = icon;
                 optionIcon.alt = text;
                 optionIcon.classList.add('mho-dropdown-option-icon');
                 optionLabel.appendChild(optionIcon);
+            }
+            else if (decorate) {
+                // L'appelant fournit le rendu de l'option (ex: pastille colorée)
+                optionLabel.appendChild(decorate());
             }
             else {
                 optionLabel.innerText = text;
@@ -7792,8 +8788,8 @@
             panel.appendChild(optionLine);
             checkboxes.push(checkbox);
         });
-        let togglePanel = () => {
-            let wasOpen = panel.style.display === 'block';
+        const togglePanel = () => {
+            const wasOpen = panel.style.display === 'block';
             document.querySelectorAll('.mho-checkbox-dropdown-panel').forEach((p) => {
                 p.style.display = 'none';
             });
@@ -7821,16 +8817,16 @@
         });
         panel.addEventListener('click', (event) => event.stopPropagation());
         updateToggleLabel();
-        let syncPanelWidth = () => {
+        const syncPanelWidth = () => {
             panel.style.width = `${toggle.offsetWidth}px`;
         };
         // Le select peut changer de largeur quand son contenu texte change
         // (ex: "2 sélectionné(s)" vs "Tous"), donc on resynchronise le panel
         // à chaque redimensionnement plutôt qu'une seule fois au chargement.
-        let toggleResizeObserver = new ResizeObserver(syncPanelWidth);
+        const toggleResizeObserver = new ResizeObserver(syncPanelWidth);
         toggleResizeObserver.observe(toggle);
         setTimeout(() => {
-            let toggleComputedStyle = getComputedStyle(toggle);
+            const toggleComputedStyle = getComputedStyle(toggle);
             panel.style.backgroundColor = toggleComputedStyle.backgroundColor;
             panel.style.color = toggleComputedStyle.color;
             syncPanelWidth();
@@ -7850,18 +8846,18 @@
      * @returns {{ container: HTMLDivElement, select: HTMLSelectElement }}
      */
     function createSingleFilterSelect(labelText, id, options, classList = []) {
-        let container = document.createElement('div');
+        const container = document.createElement('div');
         container.classList.add('mho-filter-field', ...classList);
-        let label = document.createElement('label');
+        const label = document.createElement('label');
         label.htmlFor = id;
         label.innerText = labelText;
         label.classList.add('mho-filter-label');
         container.appendChild(label);
-        let select = document.createElement('select');
+        const select = document.createElement('select');
         select.id = id;
         select.classList.add('mho-input');
         options.forEach(({ value, text }) => {
-            let opt = document.createElement('option');
+            const opt = document.createElement('option');
             opt.value = value;
             opt.innerText = text;
             select.appendChild(opt);
@@ -7881,6 +8877,7 @@
             displaySearchFieldOnRecipientList();
             displaySearchFieldOnRegistry();
             displaySearchFieldOnDump();
+            displaySearchFieldOnTrap();
             hideCompletedBuildings();
             displayFiltersOnOmniscience();
             displayFiltersOnCitizenList();
@@ -7888,8 +8885,8 @@
     }
     /** Si l'option associée est activée, masque les chantiers complétés sur la page de chantiers */
     function hideCompletedBuildings() {
-        let hideBuildings = (buildings) => {
-            let building_rows = [];
+        const hideBuildings = (buildings) => {
+            const building_rows = [];
             buildings.forEach((building) => {
                 building_rows.push(...arrFrom$1(building.querySelectorAll('.building')));
             });
@@ -7912,7 +8909,7 @@
                 }
             });
         };
-        let showBuildings = (buildings) => {
+        const showBuildings = (buildings) => {
             buildings?.forEach((building) => {
                 if (building.classList.contains('mho-hidden')) {
                     building.classList.remove('mho-hidden');
@@ -7922,11 +8919,11 @@
                 });
             });
         };
-        let observeBuildings = () => {
+        const observeBuildings = () => {
             const observer = new MutationObserver((mutations) => {
                 mutations.forEach((mutation) => {
                     if (mutation.addedNodes.length > 0) {
-                        let buildings = arrFrom$1(document.querySelectorAll('.buildings') || []);
+                        const buildings = arrFrom$1(document.querySelectorAll('.buildings') || []);
                         if (buildings.length > 0) {
                             hideBuildings(buildings);
                             observer.disconnect();
@@ -7937,7 +8934,7 @@
             observer.observe(document.body, { childList: true, subtree: true });
         };
         if (pageIsConstructions()) {
-            let buildings = arrFrom$1(document.querySelectorAll('.buildings') || []);
+            const buildings = arrFrom$1(document.querySelectorAll('.buildings') || []);
             if (state.mho_parameters.hide_completed_buildings_field) {
                 if (buildings.length > 0) {
                     hideBuildings(buildings);
@@ -7955,10 +8952,10 @@
     function displaySearchFieldOnBuildings() {
         let fields_container = document.getElementById(mho_search_building_field_id);
         let searchFieldAdded = false; // Indicateur pour suivre l'ajout du champ de recherche
-        let addSearchField = (tabs) => {
+        const addSearchField = (tabs) => {
             if (searchFieldAdded)
                 return; // Vérifie si le champ de recherche a déjà été ajouté
-            let tabs_block = tabs.parentElement;
+            const tabs_block = tabs.parentElement;
             fields_container = document.getElementById(mho_search_building_field_id);
             if (fields_container)
                 return; // Vérifie si le conteneur existe déjà
@@ -7970,32 +8967,32 @@
             fields_container.style.marginTop = '0.5em';
             fields_container.id = mho_search_building_field_id;
             tabs_block.insertBefore(fields_container, tabs);
-            let search_field_div = document.createElement('div');
+            const search_field_div = document.createElement('div');
             search_field_div.style.display = 'flex';
             search_field_div.style.alignItems = 'center';
             fields_container.appendChild(search_field_div);
             if (!state.mho_parameters.display_search_field_buildings) {
                 search_field_div.classList.add('hidden');
             }
-            let header_mho_img = document.createElement('img');
+            const header_mho_img = document.createElement('img');
             header_mho_img.src = mh_optimizer_icon;
             header_mho_img.style.height = '24px';
             header_mho_img.style.position = 'absolute';
             search_field_div.appendChild(header_mho_img);
-            let search_field = document.createElement('input');
+            const search_field = document.createElement('input');
             search_field.type = 'text';
             search_field.placeholder = getI18N(params_categories.find((category) => category.id === 'display').params.find((param) => param.id === 'sort_and_filter').children.find((param) => param.id === 'display_search_fields').children.find((child) => child.id === 'display_search_field_buildings').label);
             search_field.classList.add('mho-input', 'inline');
             search_field.setAttribute('style', 'min-width: 200px; padding-left: 24px;');
             search_field_div.appendChild(search_field);
-            let buildings = arrFrom$1(document.querySelectorAll('.buildings') || []);
-            let filterBuildings = () => {
-                let building_rows = [];
+            const buildings = arrFrom$1(document.querySelectorAll('.buildings') || []);
+            const filterBuildings = () => {
+                const building_rows = [];
                 buildings.forEach((building) => {
                     building_rows.push(...arrFrom$1(building.querySelectorAll('.building')));
                 });
                 building_rows.forEach((building_row) => {
-                    let force_hide = state.mho_parameters.hide_completed_buildings_field && building_row.classList.contains('complete');
+                    const force_hide = state.mho_parameters.hide_completed_buildings_field && building_row.classList.contains('complete');
                     if (force_hide) {
                         building_row.classList.add('hidden');
                     }
@@ -8020,11 +9017,11 @@
             });
             searchFieldAdded = true; // Mettre à jour l'indicateur après l'ajout
         };
-        let observeTabs = () => {
+        const observeTabs = () => {
             const observer = new MutationObserver((mutations) => {
                 mutations.forEach((mutation) => {
                     if (mutation.addedNodes.length > 0) {
-                        let tabs = document.querySelector('ul.buildings-tabs');
+                        const tabs = document.querySelector('ul.buildings-tabs');
                         if (tabs) {
                             addSearchField(tabs);
                             observer.disconnect();
@@ -8037,7 +9034,7 @@
         if (state.mho_parameters.display_search_field_buildings && pageIsConstructions()) {
             if (fields_container)
                 return;
-            let tabs = document.querySelector('ul.buildings-tabs');
+            const tabs = document.querySelector('ul.buildings-tabs');
             if (tabs) {
                 addSearchField(tabs);
             }
@@ -8055,9 +9052,9 @@
         if (state.mho_parameters.display_search_field_recipients && pageIsMsgReceived()) {
             if (search_field)
                 return;
-            let recipients = document.querySelector('#recipient_list');
+            const recipients = document.querySelector('#recipient_list');
             if (recipients) {
-                let search_field_container = document.createElement('div');
+                const search_field_container = document.createElement('div');
                 search_field = document.createElement('input');
                 search_field.type = 'text';
                 search_field.id = mho_search_recipient_field_id;
@@ -8065,7 +9062,7 @@
                 search_field.classList.add('mho-input', 'inline');
                 search_field.setAttribute('style', 'padding-left: 24px; margin-bottom: 0.25em;');
                 search_field.addEventListener('keyup', (event) => {
-                    let recipients_list = arrFrom$1(document.querySelectorAll('.recipient.link') || []);
+                    const recipients_list = arrFrom$1(document.querySelectorAll('.recipient.link') || []);
                     recipients_list.forEach((recipient) => {
                         if (normalizeString(recipient.innerText).indexOf(normalizeString(search_field.value)) > -1) {
                             recipient.classList.remove('hidden');
@@ -8076,7 +9073,7 @@
                     });
                 });
                 search_field_container.appendChild(search_field);
-                let header_mho_img = document.createElement('img');
+                const header_mho_img = document.createElement('img');
                 header_mho_img.src = mh_optimizer_icon;
                 header_mho_img.style.height = '24px';
                 header_mho_img.style.position = 'absolute';
@@ -8095,20 +9092,20 @@
         if (state.mho_parameters.display_search_field_dump && pageIsDump()) {
             if (search_field)
                 return;
-            let main_content = document.querySelector('.town-main-content');
+            const main_content = document.querySelector('.town-main-content');
             if (main_content) {
-                let table = main_content.querySelector('.row-table');
+                const table = main_content.querySelector('.row-table');
                 if (table) {
-                    let filterFunction = (name_search_field, can_be_dump_field, can_be_recovered_field) => {
-                        let items_list = arrFrom$1(table.querySelectorAll('div.row-flex') || []);
+                    const filterFunction = (name_search_field, can_be_dump_field, can_be_recovered_field) => {
+                        const items_list = arrFrom$1(table.querySelectorAll('div.row-flex') || []);
                         items_list.forEach((item) => {
-                            let item_label = item.querySelector('div.item-line img');
-                            let item_counts = item.children.item(1).querySelectorAll('div');
-                            let item_bank_count = +item_counts[0].innerText.replace(/\D*/, '');
-                            let item_dump_count = +item_counts[1].innerText.replace(/\D*/, '');
-                            let is_search_in_string = normalizeString(item_label.getAttribute('alt')).indexOf(normalizeString(name_search_field.value)) > -1;
-                            let can_be_recovered = can_be_recovered_field.checked && item_dump_count > 0;
-                            let can_be_dump = can_be_dump_field.checked && item_bank_count > 0;
+                            const item_label = item.querySelector('div.item-line img');
+                            const item_counts = item.children.item(1).querySelectorAll('div');
+                            const item_bank_count = +item_counts[0].innerText.replace(/\D*/, '');
+                            const item_dump_count = +item_counts[1].innerText.replace(/\D*/, '');
+                            const is_search_in_string = normalizeString(item_label.getAttribute('alt')).indexOf(normalizeString(name_search_field.value)) > -1;
+                            const can_be_recovered = can_be_recovered_field.checked && item_dump_count > 0;
+                            const can_be_dump = can_be_dump_field.checked && item_bank_count > 0;
                             if (is_search_in_string && (can_be_dump || can_be_recovered)) {
                                 item.classList.remove('hidden');
                             }
@@ -8117,7 +9114,7 @@
                             }
                         });
                     };
-                    let search_field_container = document.createElement('div');
+                    const search_field_container = document.createElement('div');
                     search_field_container.setAttribute('style', ' display: flex; flex-wrap: wrap; gap: 0.5em;');
                     search_field_container.id = mho_search_dump_field_id;
                     search_field = document.createElement('input');
@@ -8126,27 +9123,27 @@
                     search_field.classList.add('mho-input', 'inline');
                     search_field.setAttribute('style', 'padding-left: 24px; margin-bottom: 0.25em;');
                     search_field_container.appendChild(search_field);
-                    let can_be_dumped = document.createElement('div');
+                    const can_be_dumped = document.createElement('div');
                     search_field_container.appendChild(can_be_dumped);
-                    let can_be_dumped_input = document.createElement('input');
+                    const can_be_dumped_input = document.createElement('input');
                     can_be_dumped_input.type = 'checkbox';
                     can_be_dumped_input.id = 'can_be_dumped';
                     can_be_dumped_input.checked = true;
                     can_be_dumped_input.classList.add('mho-input');
                     can_be_dumped.appendChild(can_be_dumped_input);
-                    let can_be_dumped_label = document.createElement('label');
+                    const can_be_dumped_label = document.createElement('label');
                     can_be_dumped_label.innerText = getI18N(texts.can_be_dumped);
                     can_be_dumped_label.htmlFor = 'can_be_dumped';
                     can_be_dumped.appendChild(can_be_dumped_label);
-                    let can_be_recovered = document.createElement('div');
+                    const can_be_recovered = document.createElement('div');
                     search_field_container.appendChild(can_be_recovered);
-                    let can_be_recovered_input = document.createElement('input');
+                    const can_be_recovered_input = document.createElement('input');
                     can_be_recovered_input.type = 'checkbox';
                     can_be_recovered_input.id = 'can_be_recovered';
                     can_be_recovered_input.checked = true;
                     can_be_recovered_input.classList.add('mho-input');
                     can_be_recovered.appendChild(can_be_recovered_input);
-                    let can_be_recovered_label = document.createElement('label');
+                    const can_be_recovered_label = document.createElement('label');
                     can_be_recovered_label.innerText = getI18N(texts.can_be_recovered);
                     can_be_recovered_label.htmlFor = 'can_be_recovered';
                     can_be_recovered.appendChild(can_be_recovered_label);
@@ -8159,7 +9156,7 @@
                     can_be_recovered.addEventListener('change', (event) => {
                         filterFunction(search_field, can_be_dumped_input, can_be_recovered_input);
                     });
-                    let header_mho_img = document.createElement('img');
+                    const header_mho_img = document.createElement('img');
                     header_mho_img.src = mh_optimizer_icon;
                     header_mho_img.style.height = '24px';
                     header_mho_img.style.position = 'absolute';
@@ -8173,16 +9170,69 @@
             search_field.parentElement.remove();
         }
     }
-    /** Si l'option associée est activée, affiche un champ de recherche sur le registre */
+    /** Recherche en profondeur, pour ne pas dépendre du niveau d'imbrication exact d'une option */
+    function findParamNode(nodes, param_id) {
+        const direct = nodes.find((node) => node.id === param_id);
+        if (direct)
+            return direct;
+        return nodes
+            .map((node) => findParamNode([...(node.params ?? []), ...(node.children ?? [])], param_id))
+            .find((found) => !!found);
+    }
+    /** Libellé traduit d'une option, réutilisé comme texte indicatif du champ de recherche correspondant */
+    function getParamLabel(param_id) {
+        return getI18N(findParamNode(params_categories, param_id)?.label);
+    }
+    /** Si l'option associée est activée, affiche un champ de recherche sur la liste des appâts de la page de pièges */
+    function displaySearchFieldOnTrap() {
+        const existing_field = document.getElementById(mho_search_trap_field_id);
+        if (!state.mho_parameters.display_search_field_trap || !pageIsTrap()) {
+            existing_field?.remove();
+            return;
+        }
+        if (existing_field)
+            return;
+        const table = trapItemsTableElement();
+        if (!table?.parentElement)
+            return;
+        const search_field_container = document.createElement('div');
+        search_field_container.id = mho_search_trap_field_id;
+        search_field_container.setAttribute('style', 'display: flex; align-items: center; gap: 0.5em; margin-bottom: 0.25em;');
+        const header_mho_img = document.createElement('img');
+        header_mho_img.src = mh_optimizer_icon;
+        header_mho_img.style.height = '24px';
+        header_mho_img.style.position = 'absolute';
+        search_field_container.appendChild(header_mho_img);
+        const search_field = document.createElement('input');
+        search_field.type = 'text';
+        search_field.placeholder = getParamLabel('display_search_field_trap');
+        search_field.classList.add('mho-input', 'inline');
+        search_field.setAttribute('style', 'min-width: 200px; padding-left: 24px;');
+        search_field_container.appendChild(search_field);
+        /** Le libellé de l'appât n'est présent en texte que dans un bloc masqué sur petit écran : on lit l'alt de l'icône, toujours renseigné */
+        const filterBaits = () => {
+            arrFrom$1(table.querySelectorAll(':scope > .row:not(.header)')).forEach((row) => {
+                const label = row.querySelector('img[alt]')?.getAttribute('alt') ?? '';
+                if (normalizeString(label).indexOf(normalizeString(search_field.value)) > -1) {
+                    row.classList.remove('hidden');
+                }
+                else {
+                    row.classList.add('hidden');
+                }
+            });
+        };
+        search_field.addEventListener('keyup', () => filterBaits());
+        table.parentElement.insertBefore(search_field_container, table);
+    }
     function displaySearchFieldOnRegistry() {
         let search_field = document.getElementById(mho_search_registry_field_id);
         if (state.mho_parameters.display_search_field_registry) {
             if (search_field)
                 return;
-            let logs = document.querySelector('hordes-log');
+            const logs = document.querySelector('hordes-log');
             if (logs) {
-                let search_field_container = document.createElement('div');
-                let logs_title = logs.parentElement.previousElementSibling;
+                const search_field_container = document.createElement('div');
+                const logs_title = logs.parentElement.previousElementSibling;
                 search_field = document.createElement('input');
                 search_field.type = 'text';
                 search_field.id = mho_search_registry_field_id;
@@ -8190,7 +9240,7 @@
                 search_field.placeholder = getI18N(params_categories.find((category) => category.id === 'display').params.find((param) => param.id === 'sort_and_filter').children.find((param) => param.id === 'display_search_fields').children.find((child) => child.id === 'display_search_field_registry').label);
                 search_field.setAttribute('style', 'padding-left: 24px; margin-bottom: 0.25em;');
                 search_field_container.appendChild(search_field);
-                let header_mho_img = document.createElement('img');
+                const header_mho_img = document.createElement('img');
                 header_mho_img.src = mh_optimizer_icon;
                 header_mho_img.style.height = '24px';
                 header_mho_img.style.position = 'absolute';
@@ -8202,7 +9252,7 @@
                         search_field_container.style.position = 'relative';
                         search_field_container.style.bottom = '7px';
                         search_field.classList.add('inline');
-                        let first_link = logs_title.querySelector('a');
+                        const first_link = logs_title.querySelector('a');
                         if (first_link) {
                             first_link.style.marginLeft = 'auto';
                         }
@@ -8215,7 +9265,7 @@
                     }
                     logs_title.appendChild(search_field_container);
                     search_field.addEventListener('keyup', (event) => {
-                        let logs_list = arrFrom$1(document.querySelectorAll('.log-entry .log-part-content') || []);
+                        const logs_list = arrFrom$1(document.querySelectorAll('.log-entry .log-part-content') || []);
                         logs_list.forEach((log) => {
                             if (normalizeString(log.innerText).indexOf(normalizeString(search_field.value)) > -1) {
                                 log.parentElement.classList.remove('hidden');
@@ -8236,7 +9286,7 @@
     function displayMinApOnBuildings(count = 0) {
         state.tooltips_observer?.disconnect();
         if (state.mho_parameters.display_missing_ap_for_buildings_to_be_safe && pageIsConstructions()) {
-            let complete_buildings = document.querySelectorAll('.building.complete');
+            const complete_buildings = document.querySelectorAll('.building.complete');
             if ((!complete_buildings || complete_buildings.length === 0) && count < 10) {
                 setTimeout(() => {
                     displayMinApOnBuildings(count + 1);
@@ -8245,38 +9295,38 @@
             }
             ///////////////////////// Observe les modifications sur les tooltips pour mieux alimenter les barres /////////////////////////
             // Selectionne le noeud dont les mutations seront observées
-            let tooltip_container = document.querySelector('#tooltip_container');
+            const tooltip_container = document.querySelector('#tooltip_container');
             // Options de l'observateur (quelles sont les mutations à observer)
-            let config = { childList: true, subtree: true };
+            const config = { childList: true, subtree: true };
             // Fonction callback à éxécuter quand une mutation est observée
-            let callback = function (mutationsList) {
+            const callback = function (mutationsList) {
                 if (state.mho_parameters.display_missing_ap_for_buildings_to_be_safe && pageIsConstructions()) {
-                    let broken_buildings = arrFrom$1(complete_buildings).filter((complete_building) => complete_building.querySelector('.to_repair'));
+                    const broken_buildings = arrFrom$1(complete_buildings).filter((complete_building) => complete_building.querySelector('.to_repair'));
                     if (!broken_buildings || broken_buildings.length === 0)
                         return;
                     broken_buildings.forEach((broken_building) => {
-                        let bar_element = broken_building.querySelector('.ap-bar');
-                        let to_repair_element = broken_building.querySelector('.to_repair');
-                        let nb_ap_element = broken_building.querySelector('.build-req');
+                        const bar_element = broken_building.querySelector('.ap-bar');
+                        const to_repair_element = broken_building.querySelector('.to_repair');
+                        const nb_ap_element = broken_building.querySelector('.build-req');
                         to_repair_element.dispatchEvent(new Event('mouseenter'));
-                        let tooltip = document.querySelector('.tooltip:not(.mho)[style*="display: block"]');
+                        const tooltip = document.querySelector('.tooltip:not(.mho)[style*="display: block"]');
                         to_repair_element.dispatchEvent(new Event('mouseleave'));
                         if (!tooltip || !tooltip.innerHTML)
                             return;
-                        let tooltip_status_match = tooltip.innerText.match(/[0-9]+\/[0-9]+/);
+                        const tooltip_status_match = tooltip.innerText.match(/[0-9]+\/[0-9]+/);
                         if (!tooltip_status_match || tooltip_status_match.length <= 0)
                             return;
-                        let building_status = tooltip_status_match[0]?.split('/');
-                        let tooltip_match = tooltip.innerHTML.match(/[0-9]+/g);
+                        const building_status = tooltip_status_match[0]?.split('/');
+                        const tooltip_match = tooltip.innerHTML.match(/[0-9]+/g);
                         if (!tooltip_match || tooltip_match.length <= 0)
                             return;
-                        let nb_pts_per_ap = parseInt(tooltip_match[tooltip_match.length - 1].match(/[0-9]+/)[0], 10);
-                        let current_pv = parseInt(building_status[0], 10);
-                        let total_pv = parseInt(building_status[1], 10);
-                        let minimum_safe = Math.ceil(total_pv * 70 / 100) + 1;
+                        const nb_pts_per_ap = parseInt(tooltip_match[tooltip_match.length - 1].match(/[0-9]+/)[0], 10);
+                        const current_pv = parseInt(building_status[0], 10);
+                        const total_pv = parseInt(building_status[1], 10);
+                        const minimum_safe = Math.ceil(total_pv * 70 / 100) + 1;
                         if (minimum_safe <= current_pv)
                             return;
-                        let missing_pts = minimum_safe - current_pv;
+                        const missing_pts = minimum_safe - current_pv;
                         bar_element.style.display = 'flex';
                         let new_ap_bar = bar_element.querySelector('.mho-safe-ap');
                         if (!new_ap_bar) {
@@ -8310,11 +9360,11 @@
             ////////////////////////////////////////////////////////
         }
         else if (pageIsConstructions()) {
-            let missing_ap_infos = document.querySelectorAll('.mho-missing-ap');
+            const missing_ap_infos = document.querySelectorAll('.mho-missing-ap');
             if (!missing_ap_infos)
                 return;
             arrFrom$1(missing_ap_infos).forEach((missing_ap_info) => missing_ap_info.remove());
-            let mho_safe_aps = document.querySelectorAll('.mho-safe-ap');
+            const mho_safe_aps = document.querySelectorAll('.mho-safe-ap');
             if (!mho_safe_aps)
                 return;
             arrFrom$1(mho_safe_aps).forEach((mho_safe_ap) => mho_safe_ap.remove());
@@ -8326,47 +9376,47 @@
         if (state.mho_parameters.display_filters_citizen_list && pageIsCitizens()) {
             if (filter_container)
                 return;
-            let main_content = document.querySelector('.town-main-content');
+            const main_content = document.querySelector('.town-main-content');
             if (!main_content)
                 return;
-            let table = main_content.querySelector('.row-table');
+            const table = main_content.querySelector('.row-table');
             if (!table)
                 return;
-            let rows = Array.from(table.querySelectorAll('div.row-flex:not(.header)'));
-            let professions = new Map();
-            let houseLevels = new Map();
+            const rows = Array.from(table.querySelectorAll('div.row-flex:not(.header)'));
+            const professions = new Map();
+            const houseLevels = new Map();
             rows.forEach((row) => {
-                let profImg = row.querySelector('.userCell img[alt]:not([alt=""])');
+                const profImg = row.querySelector('.userCell img[alt]:not([alt=""])');
                 if (profImg)
                     professions.set(profImg.getAttribute('alt'), profImg.src);
-                let defenseLabel = row.querySelector('.citizen-defense');
-                let houseImg = defenseLabel?.closest('.citizen-box')?.querySelector('img[alt]');
+                const defenseLabel = row.querySelector('.citizen-defense');
+                const houseImg = defenseLabel?.closest('.citizen-box')?.querySelector('img[alt]');
                 if (houseImg)
                     houseLevels.set(houseImg.getAttribute('alt'), houseImg.src);
             });
             filter_container = document.createElement('div');
             filter_container.id = mho_filter_citizen_list_id;
             filter_container.classList.add('mho-filter-bar');
-            let dropdownDestroyers = [];
+            const dropdownDestroyers = [];
             let applyFilters = () => {
             };
-            let triggerFilters = () => applyFilters();
+            const triggerFilters = () => applyFilters();
             // Recherche par nom
-            let nameWrapper = document.createElement('div');
+            const nameWrapper = document.createElement('div');
             nameWrapper.classList.add('mho-search-wrapper');
-            let nameInput = document.createElement('input');
+            const nameInput = document.createElement('input');
             nameInput.type = 'text';
             nameInput.placeholder = getI18N(texts.filter_search_name);
             nameInput.classList.add('mho-input', 'inline', 'mho-search-input');
             nameWrapper.appendChild(nameInput);
-            let iconImg = document.createElement('img');
+            const iconImg = document.createElement('img');
             iconImg.src = mh_optimizer_icon;
             iconImg.classList.add('mho-search-icon');
             nameWrapper.appendChild(iconImg);
             filter_container.appendChild(nameWrapper);
             nameInput.addEventListener('keyup', triggerFilters);
             // Select : statut de connexion
-            let { container: onlineCtnr, select: onlineSelect } = createSingleFilterSelect(getI18N(texts.filter_online_label), `${mho_filter_citizen_list_id}-online`, [
+            const { container: onlineCtnr, select: onlineSelect } = createSingleFilterSelect(getI18N(texts.filter_online_label), `${mho_filter_citizen_list_id}-online`, [
                 { value: 'all', text: getI18N(texts.filter_all) },
                 { value: 'online', text: getI18N(texts.filter_online_online) },
                 { value: 'offline', text: getI18N(texts.filter_online_offline) }
@@ -8374,11 +9424,11 @@
             filter_container.appendChild(onlineCtnr);
             onlineSelect.addEventListener('change', triggerFilters);
             // Volet : profession
-            let { container: profCtnr, getSelectedValues: getSelectedProfessions, destroy: destroyProfDropdown } = createCheckboxDropdown(getI18N(texts.job), `${mho_filter_citizen_list_id}-profession`, Array.from(professions.entries()).map(([alt, src]) => ({ value: alt, text: alt, icon: src })), triggerFilters);
+            const { container: profCtnr, getSelectedValues: getSelectedProfessions, destroy: destroyProfDropdown } = createCheckboxDropdown(getI18N(texts.job), `${mho_filter_citizen_list_id}-profession`, Array.from(professions.entries()).map(([alt, src]) => ({ value: alt, text: alt, icon: src })), triggerFilters);
             filter_container.appendChild(profCtnr);
             dropdownDestroyers.push(destroyProfDropdown);
             // Volet : niveau de maison
-            let { container: houseCtnr, getSelectedValues: getSelectedHouseLevels, destroy: destroyHouseDropdown } = createCheckboxDropdown(getI18N(texts.filter_house_level_label), `${mho_filter_citizen_list_id}-house-level`, Array.from(houseLevels.entries()).sort((a, b) => a[0].localeCompare(b[0])).map(([level, src]) => ({
+            const { container: houseCtnr, getSelectedValues: getSelectedHouseLevels, destroy: destroyHouseDropdown } = createCheckboxDropdown(getI18N(texts.filter_house_level_label), `${mho_filter_citizen_list_id}-house-level`, Array.from(houseLevels.entries()).sort((a, b) => a[0].localeCompare(b[0])).map(([level, src]) => ({
                 value: level,
                 text: level,
                 icon: src
@@ -8386,7 +9436,7 @@
             filter_container.appendChild(houseCtnr);
             dropdownDestroyers.push(destroyHouseDropdown);
             // Select : emplacement
-            let { container: locationCtnr, select: locationSelect } = createSingleFilterSelect(getI18N(texts.filter_location_label), `${mho_filter_citizen_list_id}-location`, [
+            const { container: locationCtnr, select: locationSelect } = createSingleFilterSelect(getI18N(texts.filter_location_label), `${mho_filter_citizen_list_id}-location`, [
                 { value: 'all', text: getI18N(texts.filter_all) },
                 { value: 'outside', text: getI18N(texts.filter_location_outside) },
                 { value: 'inside', text: getI18N(texts.filter_location_inside) }
@@ -8394,26 +9444,26 @@
             filter_container.appendChild(locationCtnr);
             locationSelect.addEventListener('change', triggerFilters);
             applyFilters = () => {
-                let nameVal = normalizeString(nameInput.value);
-                let onlineVal = onlineSelect.value;
-                let locationVal = locationSelect.value;
-                let selectedProfs = getSelectedProfessions();
-                let selectedLvls = getSelectedHouseLevels();
+                const nameVal = normalizeString(nameInput.value);
+                const onlineVal = onlineSelect.value;
+                const locationVal = locationSelect.value;
+                const selectedProfs = getSelectedProfessions();
+                const selectedLvls = getSelectedHouseLevels();
                 rows.forEach((row) => {
-                    let nameEl = row.querySelector('.userCell a.username');
-                    let rowName = normalizeString(nameEl?.innerText.trim() ?? '');
-                    let statusEl = row.querySelector('.citizen-online, .citizen-offline');
-                    let connectionStatus = statusEl?.classList.contains('citizen-online') ? 'online'
+                    const nameEl = row.querySelector('.userCell a.username');
+                    const rowName = normalizeString(nameEl?.innerText.trim() ?? '');
+                    const statusEl = row.querySelector('.citizen-online, .citizen-offline');
+                    const connectionStatus = statusEl?.classList.contains('citizen-online') ? 'online'
                         : statusEl?.classList.contains('citizen-offline') ? 'offline'
                             : null;
-                    let locEl = row.querySelector('.citizen-box.location');
-                    let isOutside = locEl ? /\[/.test(locEl.innerText) : false;
-                    let profImg = row.querySelector('.userCell img[alt]:not([alt=""])');
-                    let prof = profImg?.getAttribute('alt') ?? '';
-                    let defenseLabel = row.querySelector('.citizen-defense');
-                    let houseImg = defenseLabel?.closest('.citizen-box')?.querySelector('img[alt]');
-                    let houseLevel = houseImg?.getAttribute('alt') ?? '';
-                    let pass = (nameVal === '' || rowName.includes(nameVal))
+                    const locEl = row.querySelector('.citizen-box.location');
+                    const isOutside = locEl ? /\[/.test(locEl.innerText) : false;
+                    const profImg = row.querySelector('.userCell img[alt]:not([alt=""])');
+                    const prof = profImg?.getAttribute('alt') ?? '';
+                    const defenseLabel = row.querySelector('.citizen-defense');
+                    const houseImg = defenseLabel?.closest('.citizen-box')?.querySelector('img[alt]');
+                    const houseLevel = houseImg?.getAttribute('alt') ?? '';
+                    const pass = (nameVal === '' || rowName.includes(nameVal))
                         && (onlineVal === 'all' || onlineVal === connectionStatus)
                         && (locationVal === 'all' || (locationVal === 'outside') === isOutside)
                         && (selectedProfs.length === 0 || selectedProfs.includes(prof))
@@ -8435,37 +9485,37 @@
         if (state.mho_parameters.display_filters_omniscience && pageIsOmniscience()) {
             if (filter_container)
                 return;
-            let main_content = document.querySelector('.town-main-content');
+            const main_content = document.querySelector('.town-main-content');
             if (!main_content)
                 return;
-            let table = main_content.querySelector('.row-table');
+            const table = main_content.querySelector('.row-table');
             if (!table)
                 return;
-            let rows = Array.from(table.querySelectorAll('div.row-flex:not(.header)'));
-            let professions = new Map();
-            let houseLevels = new Map();
-            let starCounts = new Set();
-            let chestItems = new Map();
+            const rows = Array.from(table.querySelectorAll('div.row-flex:not(.header)'));
+            const professions = new Map();
+            const houseLevels = new Map();
+            const starCounts = new Set();
+            const chestItems = new Map();
             let hasEmptyChest = false;
             rows.forEach((row) => {
-                let profImg = row.querySelector('.citizen-box-name img[alt]:not([alt=""]), .citizen-box-name-me img[alt]:not([alt=""])');
+                const profImg = row.querySelector('.citizen-box-name img[alt]:not([alt=""]), .citizen-box-name-me img[alt]:not([alt=""])');
                 if (profImg)
                     professions.set(profImg.getAttribute('alt'), profImg.src);
-                let houseImg = row.querySelector('.cell.factor-0.content-center-vertical img[alt]');
+                const houseImg = row.querySelector('.cell.factor-0.content-center-vertical img[alt]');
                 if (houseImg)
                     houseLevels.set(houseImg.getAttribute('alt'), houseImg.src);
-                let isDead = row.querySelector('.citizen-dead') !== null;
+                const isDead = row.querySelector('.citizen-dead') !== null;
                 if (!isDead) {
-                    let starsCell = row.querySelector('.cell.rw-3:not(.rw-md-2).citizen-box');
+                    const starsCell = row.querySelector('.cell.rw-3:not(.rw-md-2).citizen-box');
                     starCounts.add(starsCell ? starsCell.querySelectorAll('img[alt="*"]').length : 0);
                 }
-                let itemImgs = Array.from(row.querySelectorAll('.inventory .item-icon img[alt]:not([alt=""])'));
+                const itemImgs = Array.from(row.querySelectorAll('.inventory .item-icon img[alt]:not([alt=""])'));
                 if (itemImgs.length === 0) {
                     hasEmptyChest = true;
                 }
                 else {
                     itemImgs.forEach((img) => {
-                        let alt = img.getAttribute('alt');
+                        const alt = img.getAttribute('alt');
                         if (!chestItems.has(alt))
                             chestItems.set(alt, img.src);
                     });
@@ -8474,26 +9524,26 @@
             filter_container = document.createElement('div');
             filter_container.id = mho_filter_omniscience_id;
             filter_container.classList.add('mho-filter-bar');
-            let dropdownDestroyers = [];
+            const dropdownDestroyers = [];
             let applyFilters = () => {
             };
-            let triggerFilters = () => applyFilters();
+            const triggerFilters = () => applyFilters();
             // Recherche par nom
-            let nameWrapper = document.createElement('div');
+            const nameWrapper = document.createElement('div');
             nameWrapper.classList.add('mho-search-wrapper');
-            let nameInput = document.createElement('input');
+            const nameInput = document.createElement('input');
             nameInput.type = 'text';
             nameInput.placeholder = getI18N(texts.filter_search_name);
             nameInput.classList.add('mho-input', 'inline', 'mho-search-input');
             nameWrapper.appendChild(nameInput);
-            let iconImg = document.createElement('img');
+            const iconImg = document.createElement('img');
             iconImg.src = mh_optimizer_icon;
             iconImg.classList.add('mho-search-icon');
             nameWrapper.appendChild(iconImg);
             filter_container.appendChild(nameWrapper);
             nameInput.addEventListener('keyup', triggerFilters);
             // Select : statut de connexion
-            let { container: onlineCtnr, select: onlineSelect } = createSingleFilterSelect(getI18N(texts.filter_online_label), `${mho_filter_omniscience_id}-online`, [
+            const { container: onlineCtnr, select: onlineSelect } = createSingleFilterSelect(getI18N(texts.filter_online_label), `${mho_filter_omniscience_id}-online`, [
                 { value: 'all', text: getI18N(texts.filter_all) },
                 { value: 'online', text: getI18N(texts.filter_online_online) },
                 { value: 'offline', text: getI18N(texts.filter_online_offline) }
@@ -8501,7 +9551,7 @@
             filter_container.appendChild(onlineCtnr);
             onlineSelect.addEventListener('change', triggerFilters);
             // Volet : niveau de maison
-            let { container: houseCtnr, getSelectedValues: getSelectedHouseLevels, destroy: destroyHouseDropdown } = createCheckboxDropdown(getI18N(texts.filter_house_level_label), `${mho_filter_omniscience_id}-house-level`, Array.from(houseLevels.entries()).sort((a, b) => a[0].localeCompare(b[0])).map(([level, src]) => ({
+            const { container: houseCtnr, getSelectedValues: getSelectedHouseLevels, destroy: destroyHouseDropdown } = createCheckboxDropdown(getI18N(texts.filter_house_level_label), `${mho_filter_omniscience_id}-house-level`, Array.from(houseLevels.entries()).sort((a, b) => a[0].localeCompare(b[0])).map(([level, src]) => ({
                 value: level,
                 text: level,
                 icon: src
@@ -8509,54 +9559,54 @@
             filter_container.appendChild(houseCtnr);
             dropdownDestroyers.push(destroyHouseDropdown);
             // Volet : profession
-            let { container: profCtnr, getSelectedValues: getSelectedProfessions, destroy: destroyProfDropdown } = createCheckboxDropdown(getI18N(texts.job), `${mho_filter_omniscience_id}-profession`, Array.from(professions.entries()).map(([alt, src]) => ({ value: alt, text: alt, icon: src })), triggerFilters);
+            const { container: profCtnr, getSelectedValues: getSelectedProfessions, destroy: destroyProfDropdown } = createCheckboxDropdown(getI18N(texts.job), `${mho_filter_omniscience_id}-profession`, Array.from(professions.entries()).map(([alt, src]) => ({ value: alt, text: alt, icon: src })), triggerFilters);
             filter_container.appendChild(profCtnr);
             dropdownDestroyers.push(destroyProfDropdown);
             // Volet : objets en coffre
-            let itemOptions = [];
+            const itemOptions = [];
             if (hasEmptyChest)
                 itemOptions.push({ value: '__empty__', text: '—' });
             chestItems.forEach((src, alt) => itemOptions.push({ value: alt, text: alt, icon: src }));
-            let { container: itemsCtnr, getSelectedValues: getSelectedItems, destroy: destroyItemsDropdown } = createCheckboxDropdown(getI18N(texts.filter_chest_items_label), `${mho_filter_omniscience_id}-items`, itemOptions, triggerFilters);
+            const { container: itemsCtnr, getSelectedValues: getSelectedItems, destroy: destroyItemsDropdown } = createCheckboxDropdown(getI18N(texts.filter_chest_items_label), `${mho_filter_omniscience_id}-items`, itemOptions, triggerFilters);
             filter_container.appendChild(itemsCtnr);
             dropdownDestroyers.push(destroyItemsDropdown);
             // Volet : étoiles d'activité (les morts n'ont aucune case correspondante ;
             // ils ne remontent que lorsqu'aucune case n'est cochée)
-            let { container: starsCtnr, getSelectedValues: getSelectedStars, destroy: destroyStarsDropdown } = createCheckboxDropdown(getI18N(texts.filter_stars_label), `${mho_filter_omniscience_id}-stars`, Array.from(starCounts).sort((a, b) => a - b).map((count) => ({
+            const { container: starsCtnr, getSelectedValues: getSelectedStars, destroy: destroyStarsDropdown } = createCheckboxDropdown(getI18N(texts.filter_stars_label), `${mho_filter_omniscience_id}-stars`, Array.from(starCounts).sort((a, b) => a - b).map((count) => ({
                 value: String(count),
                 text: count > 0 ? '★'.repeat(count) : '—'
             })), triggerFilters);
             filter_container.appendChild(starsCtnr);
             dropdownDestroyers.push(destroyStarsDropdown);
             applyFilters = () => {
-                let nameVal = normalizeString(nameInput.value);
-                let onlineVal = onlineSelect.value;
-                let selectedProfs = getSelectedProfessions();
-                let selectedLvls = getSelectedHouseLevels();
-                let selectedStars = getSelectedStars();
-                let selectedItems = getSelectedItems();
-                let filterEmpty = selectedItems.includes('__empty__');
-                let itemFilter = selectedItems.filter((value) => value !== '__empty__');
+                const nameVal = normalizeString(nameInput.value);
+                const onlineVal = onlineSelect.value;
+                const selectedProfs = getSelectedProfessions();
+                const selectedLvls = getSelectedHouseLevels();
+                const selectedStars = getSelectedStars();
+                const selectedItems = getSelectedItems();
+                const filterEmpty = selectedItems.includes('__empty__');
+                const itemFilter = selectedItems.filter((value) => value !== '__empty__');
                 rows.forEach((row) => {
-                    let nameEl = row.querySelector('.citizen-box-name a.username, .citizen-box-name-me a.username');
-                    let rowName = normalizeString(nameEl?.innerText.trim() ?? '');
-                    let statusEl = row.querySelector('.citizen-online, .citizen-offline, .citizen-dead');
-                    let isDead = statusEl?.classList.contains('citizen-dead') ?? false;
-                    let connectionStatus = statusEl?.classList.contains('citizen-online') ? 'online'
+                    const nameEl = row.querySelector('.citizen-box-name a.username, .citizen-box-name-me a.username');
+                    const rowName = normalizeString(nameEl?.innerText.trim() ?? '');
+                    const statusEl = row.querySelector('.citizen-online, .citizen-offline, .citizen-dead');
+                    const isDead = statusEl?.classList.contains('citizen-dead') ?? false;
+                    const connectionStatus = statusEl?.classList.contains('citizen-online') ? 'online'
                         : statusEl?.classList.contains('citizen-offline') ? 'offline'
                             : null;
-                    let profImg = row.querySelector('.citizen-box-name img[alt]:not([alt=""]), .citizen-box-name-me img[alt]:not([alt=""])');
-                    let prof = profImg?.getAttribute('alt') ?? '';
-                    let houseImg = row.querySelector('.cell.factor-0.content-center-vertical img[alt]');
-                    let houseLevel = houseImg?.getAttribute('alt') ?? '';
-                    let starsCell = isDead ? null : row.querySelector('.cell.rw-3:not(.rw-md-2).citizen-box');
-                    let starValue = isDead ? '__dead__' : String(starsCell ? starsCell.querySelectorAll('img[alt="*"]').length : 0);
-                    let rowItems = Array.from(row.querySelectorAll('.inventory .item-icon img[alt]:not([alt=""])')).map((img) => img.getAttribute('alt'));
-                    let chestEmpty = rowItems.length === 0;
-                    let passItems = selectedItems.length === 0
+                    const profImg = row.querySelector('.citizen-box-name img[alt]:not([alt=""]), .citizen-box-name-me img[alt]:not([alt=""])');
+                    const prof = profImg?.getAttribute('alt') ?? '';
+                    const houseImg = row.querySelector('.cell.factor-0.content-center-vertical img[alt]');
+                    const houseLevel = houseImg?.getAttribute('alt') ?? '';
+                    const starsCell = isDead ? null : row.querySelector('.cell.rw-3:not(.rw-md-2).citizen-box');
+                    const starValue = isDead ? '__dead__' : String(starsCell ? starsCell.querySelectorAll('img[alt="*"]').length : 0);
+                    const rowItems = Array.from(row.querySelectorAll('.inventory .item-icon img[alt]:not([alt=""])')).map((img) => img.getAttribute('alt'));
+                    const chestEmpty = rowItems.length === 0;
+                    const passItems = selectedItems.length === 0
                         || (filterEmpty && chestEmpty)
                         || itemFilter.some((item) => rowItems.includes(item));
-                    let pass = (nameVal === '' || rowName.includes(nameVal))
+                    const pass = (nameVal === '' || rowName.includes(nameVal))
                         && (onlineVal === 'all' || onlineVal === connectionStatus)
                         && (selectedProfs.length === 0 || selectedProfs.includes(prof))
                         && (selectedLvls.length === 0 || selectedLvls.includes(houseLevel))
@@ -8577,23 +9627,28 @@
     // TypeScript's arrFrom(any) can infer element type as 'unknown' rather
     // than 'any' when the source isn't a statically-typed iterable.
     const arrFrom = (x) => Array.from(x);
-    ////////////////////////
-    // TRI SUR LES LISTES //
-    ////////////////////////
-    function mhoInitSortableTable(table, columns, rowSelector) {
+    function mhoInitSortableTable(table, columns, rowSelector, options = {}) {
         if (!table || table.dataset.sortEnabled)
             return;
         table.dataset.sortEnabled = 'true';
+        const header_selector = options.header_selector ?? '.row-flex.header';
+        const footer_selector = options.footer_selector;
         arrFrom(table.querySelectorAll(rowSelector))
             .forEach((row, i) => {
             row.dataset.origIdx = i;
         });
-        const header = table.querySelector('.row-flex.header');
+        const header = table.querySelector(header_selector);
         if (!header)
             return;
         const cells = arrFrom(header.children).filter((el) => el.classList.contains('cell'));
         let activeCol = -1;
         let direction = 0;
+        /** Remet en bas les lignes de total, que le réordonnancement fait forcément remonter */
+        const moveFooterRowsToEnd = () => {
+            if (!footer_selector)
+                return;
+            arrFrom(table.querySelectorAll(footer_selector)).forEach((footer_row) => table.appendChild(footer_row));
+        };
         const doSort = (colIndex, dir) => {
             const rows = arrFrom(table.querySelectorAll(rowSelector));
             if (dir === 0) {
@@ -8604,16 +9659,46 @@
                 rows.sort((a, b) => dir * compare(extract(a), extract(b)));
             }
             rows.forEach((row) => table.appendChild(row));
+            moveFooterRowsToEnd();
         };
-        const arrows = cells.map((cell, colIdx) => {
+        const arrows = columns.map((column, colIdx) => {
+            /** Plusieurs critères peuvent viser la même cellule d'en-tête (métier et pseudo, par exemple) */
+            const cell = cells[column.cell_index ?? colIdx];
+            if (!cell)
+                return undefined;
             cell.querySelector('.help-button')
                 ?.addEventListener('click', (e) => e.stopPropagation());
+            /**
+             * Les cellules d'en-tête que l'on garnit peuvent avoir besoin d'une classe de mise en
+             * forme du jeu. On mémorise l'ajout pour ne retirer au nettoyage que ce que l'on a posé.
+             */
+            if (options.header_cell_class && !cell.classList.contains(options.header_cell_class)) {
+                cell.classList.add(options.header_cell_class);
+                cell.dataset.mhoHeaderClass = options.header_cell_class;
+            }
             const arrow = document.createElement('span');
             arrow.className = 'mho-sort-arrow';
             arrow.textContent = ' ⇅';
-            cell.classList.add('mho-sortable-cell');
-            cell.appendChild(arrow);
-            cell.addEventListener('click', () => {
+            /**
+             * Sans libellé, la cellule entière reste la zone de clic, comme sur la liste des
+             * citoyens. Avec libellé, chaque critère reçoit sa propre étiquette cliquable :
+             * c'est la seule façon d'en loger plusieurs dans une même cellule sans ambiguïté.
+             */
+            let trigger;
+            if (column.label) {
+                const control = document.createElement('span');
+                control.className = 'mho-sort-control';
+                control.textContent = column.label;
+                control.appendChild(arrow);
+                cell.appendChild(control);
+                trigger = control;
+            }
+            else {
+                cell.classList.add('mho-sortable-cell');
+                cell.appendChild(arrow);
+                trigger = cell;
+            }
+            trigger.addEventListener('click', () => {
                 if (activeCol !== colIdx) {
                     activeCol = colIdx;
                     direction = 1;
@@ -8631,6 +9716,9 @@
                     }
                 }
                 arrows.forEach((a, j) => {
+                    /** Une colonne dont la cellule d'en-tête est absente n'a pas de flèche */
+                    if (!a)
+                        return;
                     const on = (j === activeCol && direction !== 0);
                     a.textContent = on ? (direction === 1 ? ' ↑' : ' ↓') : ' ⇅';
                     a.style.opacity = on ? '1' : '0.4';
@@ -8640,15 +9728,25 @@
             return arrow;
         });
     }
-    function mhoCleanupSortableTable(table, rowSelector) {
+    function mhoCleanupSortableTable(table, rowSelector, options = {}) {
         if (!table?.dataset.sortEnabled)
             return;
+        const header_selector = options.header_selector ?? '.row-flex.header';
+        /** Les étiquettes cliquables contiennent leur propre flèche : elles partent en premier */
+        table.querySelectorAll('.mho-sort-control').forEach((control) => control.remove());
         table.querySelectorAll('.mho-sort-arrow').forEach(a => a.remove());
-        const header = table.querySelector('.row-flex.header');
+        const header = table.querySelector(header_selector);
         if (header) {
             arrFrom(header.children)
                 .filter((el) => el.classList.contains('cell'))
-                .forEach((cell) => cell.classList.remove('mho-sortable-cell'));
+                .forEach((cell) => {
+                cell.classList.remove('mho-sortable-cell');
+                /** Ne retirer que la classe que l'on a effectivement ajoutée */
+                if (cell.dataset.mhoHeaderClass) {
+                    cell.classList.remove(cell.dataset.mhoHeaderClass);
+                    delete cell.dataset.mhoHeaderClass;
+                }
+            });
         }
         const rows = arrFrom(table.querySelectorAll(rowSelector));
         rows.sort((a, b) => Number(a.dataset.origIdx) - Number(b.dataset.origIdx));
@@ -8656,6 +9754,9 @@
             table.appendChild(row);
             delete row.dataset.origIdx;
         });
+        if (options.footer_selector) {
+            arrFrom(table.querySelectorAll(options.footer_selector)).forEach((footer_row) => table.appendChild(footer_row));
+        }
         delete table.dataset.sortEnabled;
     }
     function sortCitizenList() {
@@ -8733,9 +9834,196 @@
             mhoCleanupSortableTable(table, '.row-flex.stretch');
         }
     }
+    /** Sélecteur du tableau de la veille */
+    const nightwatch_table_selector = '.row-table.nightwatch';
+    /** La ligne de total ne participe pas au tri et doit rester en bas */
+    const nightwatch_row_selector = '.row.small:not(.total)';
+    const nightwatch_options = {
+        header_selector: '.row.header',
+        footer_selector: '.row.small.total',
+        /** Les cellules de données correspondantes sont centrées : l'en-tête doit l'être aussi */
+        header_cell_class: 'center'
+    };
+    /**
+     * Observer unique guettant l'injection AJAX de la liste de veille.
+     * Un seul peut exister à la fois, il est déconnecté dès que le tableau est trouvé, et
+     * `sortNightwatchList` le coupe à la première ré-initialisation faite hors de cette page :
+     * il ne peut donc ni s'empiler ni survivre à la navigation.
+     */
+    let nightwatch_observer;
+    function stopWatchingNightwatchList() {
+        nightwatch_observer?.disconnect();
+        nightwatch_observer = undefined;
+    }
+    /**
+     * Attend que l'onglet des remparts ait injecté la liste, puis équipe le tableau une fois.
+     * L'observation est volontairement limitée à la zone de contenu du jeu et à sa seule
+     * arborescence d'éléments, et ne dure que le temps du chargement.
+     */
+    function watchForNightwatchList() {
+        if (nightwatch_observer)
+            return;
+        const container = document.getElementById(mh_content_id) ?? document.body;
+        if (!container)
+            return;
+        nightwatch_observer = new MutationObserver(() => {
+            /** L'option a pu être décochée ou la page quittée pendant l'attente */
+            if (!state.mho_parameters.sort_nightwatch_list || !pageIsNightwatch()) {
+                stopWatchingNightwatchList();
+                return;
+            }
+            const table = document.querySelector(nightwatch_table_selector);
+            if (!table)
+                return;
+            stopWatchingNightwatchList();
+            mhoInitSortableTable(table, buildNightwatchColumns(), nightwatch_row_selector, nightwatch_options);
+        });
+        nightwatch_observer.observe(container, { childList: true, subtree: true });
+    }
+    /**
+     * Libellé traduit du métier d'une ligne de veille.
+     *
+     * Le rapprochement se fait sur le nom de fichier de l'icône (`tamer`, `book`, `tech`…), qui
+     * correspond au champ `img` du référentiel des métiers : le texte `alt` de l'image ne peut pas
+     * servir de clé, il est traduit et peut varier d'une ligne à l'autre. On trie donc sur un
+     * libellé lisible tout en garantissant que deux citoyens du même métier restent groupés.
+     */
+    function getJobLabelFromRow(row) {
+        const src = row.querySelector('img[src*="/professions/"]')?.getAttribute('src') ?? '';
+        /** '/build/images/professions/tamer.198b64bc.gif' → 'tamer' */
+        const job_img = src.split('/').pop().split('.')[0];
+        const job = jobs.find((known_job) => known_job.img === job_img);
+        /** Métier inconnu du référentiel : on retombe sur la clé technique, qui groupe toujours correctement */
+        return (getI18N(job?.label) ?? job_img).toLowerCase();
+    }
+    function buildNightwatchColumns() {
+        return [
+            {
+                cell_index: 0,
+                label: getI18N(texts.job),
+                extract: (row) => getJobLabelFromRow(row),
+                compare: (a, b) => a.localeCompare(b, 'fr', { sensitivity: 'base' }),
+            },
+            {
+                cell_index: 0,
+                label: getI18N(texts.pseudo),
+                extract: (row) => (row.querySelector('a')?.textContent ?? '').trim().toLowerCase(),
+                compare: (a, b) => a.localeCompare(b, 'fr', { sensitivity: 'base' }),
+            },
+            {
+                cell_index: 1,
+                label: getI18N(texts.defense),
+                extract: (row) => {
+                    /** Les milliers peuvent être séparés par une espace insécable */
+                    const matched = (row.querySelector('.rw-2')?.textContent ?? '').replace(/\s/g, '').match(/(\d+)/);
+                    return matched ? parseInt(matched[1], 10) : 0;
+                },
+                compare: (a, b) => a - b,
+            },
+        ];
+    }
+    function sortNightwatchList() {
+        /** Toute ré-initialisation hors de la page de veille coupe une attente restée en cours */
+        if (!pageIsNightwatch()) {
+            stopWatchingNightwatchList();
+            return;
+        }
+        const is_enabled = !!state.mho_parameters.sort_nightwatch_list;
+        const table = document.querySelector(nightwatch_table_selector);
+        if (!is_enabled) {
+            stopWatchingNightwatchList();
+            if (table) {
+                mhoCleanupSortableTable(table, nightwatch_row_selector, nightwatch_options);
+            }
+            return;
+        }
+        /**
+         * L'onglet des remparts charge sa liste en AJAX : elle peut ne pas être là au moment de
+         * l'évènement de navigation. On l'attend alors, plutôt que de sonder la page à l'aveugle.
+         */
+        if (!table) {
+            watchForNightwatchList();
+            return;
+        }
+        stopWatchingNightwatchList();
+        mhoInitSortableTable(table, buildNightwatchColumns(), nightwatch_row_selector, nightwatch_options);
+    }
+    /** Les lignes d'appâts sont les enfants directs du tableau, hors ligne d'en-tête */
+    const trap_row_selector = ':scope > .row:not(.header)';
+    const trap_options = { header_selector: '.row.header' };
+    function sortTrapList() {
+        if (!pageIsTrap())
+            return;
+        const table = trapItemsTableElement();
+        if (!table)
+            return;
+        const COLUMNS = [
+            {
+                extract: (row) => (row.querySelector('img[alt]')?.getAttribute('alt') ?? '').trim().toLowerCase(),
+                compare: (a, b) => a.localeCompare(b, 'fr', { sensitivity: 'base' }),
+            },
+            {
+                extract: (row) => {
+                    const matched = (row.querySelector('.cell.rw-2')?.textContent ?? '').replace(/\s/g, '').match(/(\d+)/);
+                    return matched ? parseInt(matched[1], 10) : 0;
+                },
+                compare: (a, b) => a - b,
+            },
+        ];
+        if (state.mho_parameters.sort_trap_list) {
+            mhoInitSortableTable(table, COLUMNS, trap_row_selector, trap_options);
+        }
+        else {
+            mhoCleanupSortableTable(table, trap_row_selector, trap_options);
+        }
+    }
+    /** Les lignes d'objets de la décharge sont des `.row-flex`, alors que son en-tête reste une `.row` */
+    const dump_row_selector = ':scope > .row-flex';
+    const dump_options = { header_selector: '.row.header' };
+    /**
+     * Nombre porté par la n-ième ligne de la cellule « Stock ».
+     * Le jeu y empile « Banque : x » puis « Décharge : y », et n'ajoute « Sac : z » qu'à la fin
+     * et sous condition : les deux premiers indices sont donc toujours stables.
+     */
+    function getDumpCount(row, line_index) {
+        const stock_cell = Array.from(row.querySelectorAll('.cell'))[1];
+        const line = Array.from(stock_cell?.querySelectorAll('div.small') ?? [])[line_index];
+        const matched = (line?.textContent ?? '').replace(/\s/g, '').match(/(\d+)/);
+        return matched ? parseInt(matched[1], 10) : 0;
+    }
+    function sortDumpList() {
+        if (!pageIsDump())
+            return;
+        const table = dumpItemsTableElement();
+        if (!table)
+            return;
+        const COLUMNS = [
+            {
+                extract: (row) => (row.querySelector('.item-line img')?.getAttribute('alt') ?? row.querySelector('img[alt]')?.getAttribute('alt') ?? '').trim().toLowerCase(),
+                compare: (a, b) => a.localeCompare(b, 'fr', { sensitivity: 'base' }),
+            },
+            {
+                extract: (row) => getDumpCount(row, 0) + getDumpCount(row, 1),
+                compare: (a, b) => a - b,
+            },
+            {
+                extract: (row) => {
+                    const matched = (row.querySelector('.defense')?.textContent ?? '').replace(/\s/g, '').match(/(\d+)/);
+                    return matched ? parseInt(matched[1], 10) : 0;
+                },
+                compare: (a, b) => a - b,
+            },
+        ];
+        if (state.mho_parameters.sort_dump_list) {
+            mhoInitSortableTable(table, COLUMNS, dump_row_selector, dump_options);
+        }
+        else {
+            mhoCleanupSortableTable(table, dump_row_selector, dump_options);
+        }
+    }
 
     function createStoreNotificationsBtn() {
-        let stored_notifications_btn = document.getElementById(mho_store_notifications_id);
+        const stored_notifications_btn = document.getElementById(mho_store_notifications_id);
         if (state.mho_parameters.store_notifications) {
             createWindow(mho_store_notifications_window_id, false);
             const notifications_space = document.querySelector('#notifications');
@@ -8756,14 +10044,14 @@
             const config = { childList: true };
             // Commencez à observer l'élément cible pour les modifications configurées
             observer.observe(notifications_space, config);
-            let btn_container = document.createElement('div');
+            const btn_container = document.createElement('div');
             btn_container.id = mho_store_notifications_id;
-            let postbox_img = document.querySelector('#postbox img');
-            let btn_mho_img = document.createElement('img');
+            const postbox_img = document.querySelector('#postbox img');
+            const btn_mho_img = document.createElement('img');
             btn_mho_img.src = mh_optimizer_icon;
             btn_mho_img.style.height = postbox_img && postbox_img.height ? postbox_img.height + 'px' : '16px';
             btn_container.appendChild(btn_mho_img);
-            let btn_img = document.createElement('img');
+            const btn_img = document.createElement('img');
             btn_img.src = repo_img_hordes_url + '/icons/news.gif';
             btn_img.style.height = postbox_img && postbox_img.height ? postbox_img.height + 'px' : '16px';
             btn_container.appendChild(btn_img);
@@ -8780,20 +10068,20 @@
         }
     }
     function createNotificationsWindowContent() {
-        let window_content = document.querySelector(`#${mho_store_notifications_window_id}-content`);
+        const window_content = document.querySelector(`#${mho_store_notifications_window_id}-content`);
         window_content.innerHTML = '';
-        let window = window_content.parentElement;
+        const window = window_content.parentElement;
         window.style.minWidth = '500px';
         window.style.maxWidth = '100dvw';
-        let tabs_div = document.createElement('div');
+        const tabs_div = document.createElement('div');
         tabs_div.id = 'tabs';
         window_content.appendChild(tabs_div);
-        let tabs_ul = document.createElement('ul');
+        const tabs_ul = document.createElement('ul');
         tabs_div.appendChild(tabs_ul);
         dispatchNotificationsContent();
     }
     function dispatchNotificationsContent() {
-        let window_content = document.getElementById(mho_store_notifications_window_id + '-content');
+        const window_content = document.getElementById(mho_store_notifications_window_id + '-content');
         let tab_content = document.getElementById(mho_store_notifications_window_id + '-tab-content');
         if (tab_content) {
             tab_content.remove();
@@ -8802,20 +10090,20 @@
         tab_content.id = mho_expeditions_window_id + '-tab-content';
         tab_content.classList.add('tab-content');
         window_content.appendChild(tab_content);
-        let notifications_list = document.createElement('ul');
+        const notifications_list = document.createElement('ul');
         notifications_list.id = 'notifications-list';
         tab_content.appendChild(notifications_list);
         state.mh_notifications.forEach((notification, index) => {
-            let notification_container = document.createElement('li');
+            const notification_container = document.createElement('li');
             notification_container.style.display = 'flex';
             notification_container.style.gap = '0.5em';
             notification_container.style.alignItems = 'center';
             notifications_list.appendChild(notification_container);
-            let notification_content = document.createElement('div');
+            const notification_content = document.createElement('div');
             notification_content.style.flex = (1);
             notification_content.innerHTML = notification.innerHTML;
             notification_container.appendChild(notification_content);
-            let remove_notification = document.createElement('img');
+            const remove_notification = document.createElement('img');
             remove_notification.src = repo_img_hordes_url + '/icons/small_trash_red.png';
             remove_notification.style.cursor = 'pointer';
             notification_container.appendChild(remove_notification);
@@ -8829,8 +10117,8 @@
     function getTranslation(string_to_translate, source_language) {
         return new Promise((resolve, reject) => {
             if (string_to_translate && string_to_translate !== '') {
-                let locale = 'locale=' + source_language;
-                let sourceString = 'sourceString=' + string_to_translate;
+                const locale = 'locale=' + source_language;
+                const sourceString = 'sourceString=' + string_to_translate;
                 fetcher(state.api_url + '/Translation?' + locale + '&' + sourceString)
                     .then((response) => {
                     if (response.status === 200) {
@@ -8854,32 +10142,32 @@
 
     function displayTranslateTool() {
         /** On doit laisser l'interval tourner quand l'option est activée, sinon l'input est supprimé lors de changements de page dans l'application */
-        let display_translate_input = document.getElementById(mho_display_translate_input_id);
+        const display_translate_input = document.getElementById(mho_display_translate_input_id);
         if (state.mho_parameters.display_translate_tool) {
             if (display_translate_input)
                 return;
             const mho_header_space = document.getElementById(mho_header_space_id);
             if (!mho_header_space)
                 return;
-            let mho_display_translate_input_div = createSelectWithSearch();
+            const mho_display_translate_input_div = createSelectWithSearch();
             mho_display_translate_input_div.id = mho_display_translate_input_id;
             mho_display_translate_input_div.setAttribute('style', 'margin: 0; width: 200px; height: 22px;');
-            let label = mho_display_translate_input_div.firstElementChild;
-            let input = label.firstElementChild;
+            const label = mho_display_translate_input_div.firstElementChild;
+            const input = label.firstElementChild;
             input.setAttribute('style', 'width: calc(100% - 35px); display: inline-block; padding-right: 40px; height: 22px');
-            let btn_mho_img = document.createElement('img');
+            const btn_mho_img = document.createElement('img');
             btn_mho_img.src = mh_optimizer_icon;
             btn_mho_img.style.height = '22px';
             btn_mho_img.style.float = 'right';
             btn_mho_img.style.position = 'relative';
             btn_mho_img.style.top = '-22px';
             label.insertBefore(btn_mho_img, label.lastElementChild);
-            let select = document.createElement('select');
+            const select = document.createElement('select');
             select.classList.add('small');
             select.setAttribute('style', 'height: 22px; width: 35px; font-size: 12px; outline: unset');
             select.value = lang;
             supported_languages.forEach((language) => {
-                let option = document.createElement('option');
+                const option = document.createElement('option');
                 option.value = language.value;
                 option.setAttribute('style', 'font-size: 16px');
                 option.innerText = language.img;
@@ -8887,21 +10175,21 @@
                 select.appendChild(option);
             });
             label.insertBefore(select, input);
-            let block_to_display = mho_display_translate_input_div.lastElementChild;
+            const block_to_display = mho_display_translate_input_div.lastElementChild;
             block_to_display.setAttribute('style', 'float: right; z-index: 10; position: absolute; right: 0; min-width: 350px; background: #5c2b20; border: 1px solid #ddab76; box-shadow: 0 0 3px #000; outline: 1px solid #000; color: #ddab76; max-height: 50vh; overflow: auto;');
             input.addEventListener('keyup', (event) => {
-                let temp_input = input.value.replace(/\W*/gm, '');
+                const temp_input = input.value.replace(/\W*/gm, '');
                 if (temp_input.length > 2) {
                     getTranslation(input.value, select.value).then((response) => {
                         block_to_display.innerHTML = '';
                         let show_exact_match = response.translations.some((translation) => translation.key.isExactMatch);
                         if (show_exact_match) {
-                            let display_all = document.createElement('div');
+                            const display_all = document.createElement('div');
                             display_all.setAttribute('style', 'padding: 4px; border-bottom: 1px solid; cursor: pointer');
-                            let display_all_img = document.createElement('img');
+                            const display_all_img = document.createElement('img');
                             display_all_img.src = `${repo_img_hordes_url}/icons/small_more.gif`;
                             display_all_img.setAttribute('style', 'margin-right: 8px');
-                            let display_all_text = document.createElement('text');
+                            const display_all_text = document.createElement('text');
                             display_all_text.innerText = getI18N(texts.display_all_search_result);
                             display_all.appendChild(display_all_img);
                             display_all.appendChild(display_all_text);
@@ -8916,7 +10204,7 @@
                                     display_all_img.src = `${repo_img_hordes_url}/icons/small_less.gif`;
                                     display_all_text.innerText = getI18N(texts.display_exact_search_result);
                                 }
-                                let not_exact = Array.from(block_to_display.getElementsByClassName('not-exact') || []);
+                                const not_exact = Array.from(block_to_display.getElementsByClassName('not-exact') || []);
                                 not_exact.forEach((not_exact_item) => {
                                     not_exact_item.classList.toggle('hidden');
                                 });
@@ -8925,7 +10213,7 @@
                         response.translations
                             .forEach((translation) => {
                             if (response.translations.length > 1) {
-                                let context_div = document.createElement('div');
+                                const context_div = document.createElement('div');
                                 context_div.setAttribute('style', 'text-align: center; padding: 4px; font-variant: small-caps; font-size: 14px;');
                                 context_div.innerHTML = getI18N(texts.translation_file_context) + ` <img src="${repo_img_hordes_url}/emotes/arrowright.gif"> ` + translation.key.context;
                                 if (!translation.key.isExactMatch && show_exact_match) {
@@ -8934,15 +10222,15 @@
                                 block_to_display.appendChild(context_div);
                             }
                             let key_index = 0;
-                            for (let lang_key in translation.value) {
-                                let lang = translation.value[lang_key];
+                            for (const lang_key in translation.value) {
+                                const lang = translation.value[lang_key];
                                 lang.forEach((result) => {
-                                    let content_div = document.createElement('div');
-                                    let img = document.createElement('img');
+                                    const content_div = document.createElement('div');
+                                    const img = document.createElement('img');
                                     img.src = `${repo_img_hordes_url}/lang/${lang_key}.png`;
                                     img.setAttribute('style', 'margin-right: 8px');
-                                    let button_div = document.createElement('div');
-                                    let button = document.createElement('button');
+                                    const button_div = document.createElement('div');
+                                    const button = document.createElement('button');
                                     button_div.appendChild(button);
                                     button.innerHTML = '&#10697';
                                     button.setAttribute('style', 'font-size: 16px');
@@ -9001,10 +10289,10 @@
     function updateExternalTools() {
         const { mh_user, mho_parameters, api_url, external_app_id } = state;
         return new Promise(async (resolve, reject) => {
-            let convertListOfSingleObjectsIntoListOfCountedObjects = (objects) => {
-                let object_map = [];
+            const convertListOfSingleObjectsIntoListOfCountedObjects = (objects) => {
+                const object_map = [];
                 objects.forEach((object) => {
-                    let object_in_map = object_map.find((_object_in_map) => _object_in_map.id === object.id && _object_in_map.isBroken === object.isBroken);
+                    const object_in_map = object_map.find((_object_in_map) => _object_in_map.id === object.id && _object_in_map.isBroken === object.isBroken);
                     if (object_in_map) {
                         object_in_map.count += 1;
                     }
@@ -9015,8 +10303,8 @@
                 });
                 return object_map;
             };
-            let data = {};
-            let nb_dead_zombies = +document.querySelectorAll('.actor.splatter').length;
+            const data = {};
+            const nb_dead_zombies = +document.querySelectorAll('.actor.splatter').length;
             data.townDetails = {
                 townX: mh_user.townDetails?.townX,
                 townY: mh_user.townDetails?.townY,
@@ -9030,7 +10318,7 @@
                 isGestHordes: mho_parameters && mho_parameters.update_gh ? 'api' : 'none',
                 isMyHordesOptimizer: mho_parameters && mho_parameters.update_mho ? 'api' : 'none'
             };
-            let position = getCurrentPosition();
+            const position = getCurrentPosition();
             let citizen_list = Array.from(document.querySelectorAll('.citizen-box .username[x-user-id]') || [])?.map((citizen_box) => {
                 return {
                     id: +citizen_box.getAttribute('x-user-id'),
@@ -9053,11 +10341,11 @@
                 if (mho_parameters.update_fata && mho_parameters.update_fata_devastated) {
                     data.map.toolsToUpdate.isFataMorgana = 'cell';
                 }
-                let objects = Array.from(document.querySelector('.inventory.desert')?.querySelectorAll('li.item') || []).map((desert_item) => {
-                    let item = getItemFromImg(desert_item.querySelector('img')?.src);
+                const objects = Array.from(document.querySelector('.inventory.desert')?.querySelectorAll('li.item') || []).map((desert_item) => {
+                    const item = getItemFromImg(desert_item.querySelector('img')?.src);
                     return { id: item?.id, isBroken: desert_item.classList.contains('broken') };
                 });
-                let content = {
+                const content = {
                     x: +position[0],
                     y: +position[1],
                     zombies: +document.querySelectorAll('.actor.zombie').length,
@@ -9089,7 +10377,7 @@
                 if (mho_parameters.update_fata && mho_parameters.update_fata_killed_zombies) {
                     data.map.toolsToUpdate.isFataMorgana = 'cell';
                 }
-                let content = {
+                const content = {
                     x: +position[0],
                     y: +position[1],
                     deadZombies: nb_dead_zombies,
@@ -9113,10 +10401,19 @@
                     data.map.toolsToUpdate.isFataMorgana = 'cell';
                 }
                 if (mh_user.jobDetails.uid === 'dig') {
-                    let zone_scav_level_img = fixMhCompiledImg(document.querySelector('.zone-scavenger img')?.src);
-                    let index = zone_scav_level_img.indexOf(hordes_img_url);
-                    zone_scav_level_img = zone_scav_level_img.slice(index).replace(hordes_img_url, '').replace('icons/', '');
-                    let content = {
+                    // L'indicateur d'abondance est absent de la page quand le niveau de fouille est inconnu.
+                    // Dans ce cas la valeur doit rester indéfinie : un 0 signifierait « zone épuisée ».
+                    const scav_zone_level_src = document.querySelector('.zone-scavenger img')?.src;
+                    let scav_zone_level = undefined;
+                    if (scav_zone_level_src) {
+                        let zone_scav_level_img = fixMhCompiledImg(scav_zone_level_src);
+                        const index = zone_scav_level_img.indexOf(hordes_img_url);
+                        zone_scav_level_img = zone_scav_level_img.slice(index).replace(hordes_img_url, '').replace('icons/', '');
+                        // Les niveaux 1 à 3 utilisent collec_lvX.gif, le niveau 0 utilise Small_broken.gif
+                        const level_match = zone_scav_level_img.match(/\d/);
+                        scav_zone_level = level_match && level_match.length > 0 ? +level_match[0] : 0;
+                    }
+                    const content = {
                         x: +position[0],
                         y: +position[1],
                         scavNextCells: {
@@ -9125,7 +10422,7 @@
                             south: document.querySelector('.scavenger-sense-south') ? !document.querySelector('.scavenger-sense-south.scavenger-sense-1') : undefined,
                             west: document.querySelector('.scavenger-sense-west') ? !document.querySelector('.scavenger-sense-west.scavenger-sense-1') : undefined
                         },
-                        scavZoneLevel: zone_scav_level_img.match(/\d/)?.length > 0 ? +zone_scav_level_img.match(/\d/)[0] : 0,
+                        scavZoneLevel: scav_zone_level,
                         citizenId: citizen_list.map((citizen) => citizen.id),
                     };
                     if (data.map.cell) {
@@ -9137,10 +10434,19 @@
                     }
                 }
                 else if (mh_user.jobDetails.uid === 'vest') {
-                    let zone_scout_level_src = document.querySelector('.zone-scout')?.querySelector('img').src;
-                    let index = zone_scout_level_src.indexOf(hordes_img_url);
-                    zone_scout_level_src = zone_scout_level_src.slice(index).replace(hordes_img_url, '');
-                    let content = {
+                    // Le bloc .zone-scout n'existe pas si le niveau d'exploration est inconnu
+                    // ou si le joueur n'est pas en mode expert : on ne remonte alors aucun niveau.
+                    let zone_scout_level_src = document.querySelector('.zone-scout')?.querySelector('img')?.src;
+                    let scout_zone_level = undefined;
+                    if (zone_scout_level_src) {
+                        const index = zone_scout_level_src.indexOf(hordes_img_url);
+                        zone_scout_level_src = zone_scout_level_src.slice(index).replace(hordes_img_url, '');
+                        scout_zone_level = +fixMhCompiledImg(zone_scout_level_src).replace(/\D/g, '');
+                        if (isNaN(scout_zone_level)) {
+                            scout_zone_level = undefined;
+                        }
+                    }
+                    const content = {
                         x: +position[0],
                         y: +position[1],
                         scoutNextCells: {
@@ -9149,7 +10455,7 @@
                             south: document.querySelector('.scout-sense-south') ? +document.querySelector('.scout-sense-south').querySelector('text')?.innerHTML : undefined,
                             west: document.querySelector('.scout-sense-west') ? +document.querySelector('.scout-sense-west').querySelector('text')?.innerHTML : undefined
                         },
-                        scoutZoneLvl: +fixMhCompiledImg(zone_scout_level_src).replace(/\D/g, '') || undefined
+                        scoutZoneLvl: scout_zone_level
                     };
                     if (data.map.cell) {
                         data.map.cell.scoutNextCells = content.scoutNextCells;
@@ -9170,9 +10476,9 @@
                     isGestHordes: false,
                     isMyHordesOptimizer: mho_parameters && mho_parameters.update_mho_bags
                 };
-                let rucksacks = [];
-                let my_rusksack = Array.from(document.querySelector('.inventory.rucksack')?.querySelectorAll('li.item:not(.locked)') || []).map((rucksack_item) => {
-                    let item = getItemFromImg(rucksack_item.querySelector('img')?.src);
+                const rucksacks = [];
+                const my_rusksack = Array.from(document.querySelector('.inventory.rucksack')?.querySelectorAll('li.item:not(.locked)') || []).map((rucksack_item) => {
+                    const item = getItemFromImg(rucksack_item.querySelector('img')?.src);
                     if (item) {
                         return { id: item.id, isBroken: rucksack_item.classList.contains('broken') };
                     }
@@ -9182,11 +10488,11 @@
                     objects: convertListOfSingleObjectsIntoListOfCountedObjects(my_rusksack),
                 });
                 if (pageIsDesert()) {
-                    let escorts = Array.from(document.querySelectorAll('.beyond-escort-on:not(.beyond-escort-on-all)') || []);
+                    const escorts = Array.from(document.querySelectorAll('.beyond-escort-on:not(.beyond-escort-on-all)') || []);
                     escorts.forEach((escort) => {
-                        let escort_id = +escort.querySelector('span.username')?.getAttribute('x-user-id');
-                        let escort_rucksack = Array.from(escort.querySelector('.inventory.rucksack-escort')?.querySelectorAll('li.item:not(.locked):not(.plus)') || []).map((rucksack_item) => {
-                            let item = getItemFromImg(rucksack_item.querySelector('img')?.src);
+                        const escort_id = +escort.querySelector('span.username')?.getAttribute('x-user-id');
+                        const escort_rucksack = Array.from(escort.querySelector('.inventory.rucksack-escort')?.querySelectorAll('li.item:not(.locked):not(.plus)') || []).map((rucksack_item) => {
+                            const item = getItemFromImg(rucksack_item.querySelector('img')?.src);
                             return { id: item?.id, isBroken: rucksack_item.classList.contains('broken') };
                         });
                         rucksacks.push({
@@ -9207,8 +10513,8 @@
                     isGestHordes: false,
                     isMyHordesOptimizer: mho_parameters && mho_parameters.update_mho_chest
                 };
-                let chest_elements = Array.from(document.querySelector('.inventory.chest')?.querySelectorAll('li.item:not(.locked)') || []).map((chest_item) => {
-                    let item = getItemFromImg(chest_item.querySelector('img')?.src);
+                const chest_elements = Array.from(document.querySelector('.inventory.chest')?.querySelectorAll('li.item:not(.locked)') || []).map((chest_item) => {
+                    const item = getItemFromImg(chest_item.querySelector('img')?.src);
                     return { id: item.id, isBroken: chest_item.classList.contains('broken') };
                 });
                 data.chest.contents = convertListOfSingleObjectsIntoListOfCountedObjects(chest_elements);
@@ -9223,12 +10529,12 @@
                     };
                 });
                 data.souls = soul_areas;
-                console.log("data.souls", data.souls);
-                console.log("user", mh_user);
+                console.log('data.souls', data.souls);
+                console.log('user', mh_user);
             }
             /** Récupération des pouvoirs héroïques */
             if (((mho_parameters.update_gh && mho_parameters.update_gh_ah) || (mho_parameters.update_mho && mho_parameters.update_mho_actions)) && (pageIsDesert() || pageIsHouse())) {
-                let no_interaction = document.querySelector('.no-interaction');
+                const no_interaction = document.querySelector('.no-interaction');
                 data.heroicActions = {};
                 data.heroicActions.actions = [];
                 data.heroicActions.toolsToUpdate = {
@@ -9237,10 +10543,10 @@
                     isGestHordes: mho_parameters && mho_parameters.update_gh_ah,
                     isMyHordesOptimizer: mho_parameters && mho_parameters.update_mho_actions
                 };
-                let heroics = Array.from(document.querySelector('.heroic_actions')?.querySelectorAll('.heroic_action:not(.help)') || []);
+                const heroics = Array.from(document.querySelector('.heroic_actions')?.querySelectorAll('.heroic_action:not(.help)') || []);
                 if (heroics && heroics.length > 0) {
-                    for (let heroic of heroics) {
-                        let action = {
+                    for (const heroic of heroics) {
+                        const action = {
                             locale: lang,
                             label: heroic.querySelector('.label')?.innerText,
                             value: heroic.classList.contains('already') ? 0 : 1
@@ -9249,16 +10555,16 @@
                     }
                 }
                 else if (!no_interaction) {
-                    let action = {
+                    const action = {
                         locale: lang,
                         label: 'Empty',
                         value: pageIsDesert() ? 0 /* 'desert' */ : 1 /* 'town' */
                     };
                     data.heroicActions.actions.push(action);
                 }
-                let apag = document.querySelector('.pointer.rucksack [src*=item_photo]');
+                const apag = document.querySelector('.pointer.rucksack [src*=item_photo]');
                 if (apag) {
-                    let action = {
+                    const action = {
                         locale: lang,
                         label: apag.alt,
                         value: +apag.src.replace(/.*item_photo_(\d).*/, '$1') || 0
@@ -9266,9 +10572,9 @@
                     data.heroicActions.actions.push(action);
                 }
                 if (pageIsDesert()) {
-                    let pef = document.querySelector('ul.special_actions [src*=armag]');
+                    const pef = document.querySelector('ul.special_actions [src*=armag]');
                     if (pef) {
-                        let action = {
+                        const action = {
                             locale: lang,
                             label: 'PEF',
                             value: 1
@@ -9276,7 +10582,7 @@
                         data.heroicActions.actions.push(action);
                     }
                     else if (!no_interaction) {
-                        let action = {
+                        const action = {
                             locale: lang,
                             label: 'PEF',
                             value: 0
@@ -9295,13 +10601,13 @@
                     isGestHordes: mho_parameters && mho_parameters.update_gh_amelios,
                     isMyHordesOptimizer: mho_parameters && mho_parameters.update_mho_house
                 };
-                let amelios = Array.from(document.querySelectorAll('.row-table .row:not(.header)') || []);
+                const amelios = Array.from(document.querySelectorAll('.row-table .row:not(.header)') || []);
                 if (amelios && amelios.length > 0) {
                     amelios.forEach((amelio) => {
-                        let amelio_img = amelio.querySelector('img');
-                        let name = amelio_img.src.replace(/.*\/home\/(.*)\..*\..*/, '$1');
+                        const amelio_img = amelio.querySelector('img');
+                        const name = amelio_img.src.replace(/.*\/home\/(.*)\..*\..*/, '$1');
                         if (name !== 'fence') {
-                            let amelio_value = amelio_img?.nextElementSibling.innerText.match(/\d+/);
+                            const amelio_value = amelio_img?.nextElementSibling.innerText.match(/\d+/);
                             data.amelios.values[name] = amelio_value ? +amelio_value[0] : 0;
                         }
                         else {
@@ -9309,7 +10615,7 @@
                         }
                     });
                 }
-                let house_level = +document.querySelector('[x-tab-group="home-main"][x-tab-id="values"] .town-summary')?.querySelector('.row-detail img')?.alt || undefined;
+                const house_level = +document.querySelector('[x-tab-group="home-main"][x-tab-id="values"] .town-summary')?.querySelector('.row-detail img')?.alt || undefined;
                 data.amelios.values.house = house_level;
             }
             /** Récupération des status */
@@ -9322,11 +10628,11 @@
                     isGestHordes: mho_parameters && mho_parameters.update_gh_status,
                     isMyHordesOptimizer: mho_parameters && mho_parameters.update_mho_status
                 };
-                let statuses = Array.from(document.querySelectorAll('.rucksack_status_union li.status img') || []);
+                const statuses = Array.from(document.querySelectorAll('.rucksack_status_union li.status img') || []);
                 if (statuses && statuses.length > 0) {
                     statuses
                         .filter((status) => {
-                        let status_name = status.src.replace(/.*\/status\/status_(.*)\..*\..*/, '$1');
+                        const status_name = status.src.replace(/.*\/status\/status_(.*)\..*\..*/, '$1');
                         return status.src.indexOf('/status') > -1 && status_name !== 'ghoul' && status_name !== 'unknown';
                     })
                         .forEach((status) => {
@@ -9349,20 +10655,20 @@
                     isGestHordes: false,
                     isMyHordesOptimizer: mho_parameters && mho_parameters.update_mho_digs
                 };
-                let logs = Array.from(document.querySelectorAll('div.log-entry'));
-                let arrivals_texts = {
-                    de: `angekommen`,
-                    en: `has arrived from the`,
-                    es: `ha llegado desde el`,
-                    fr: `est arrivé depuis`
+                const logs = Array.from(document.querySelectorAll('div.log-entry'));
+                const arrivals_texts = {
+                    de: 'angekommen',
+                    en: 'has arrived from the',
+                    es: 'ha llegado desde el',
+                    fr: 'est arrivé depuis'
                 };
-                let arrivals = logs.filter((log) => normalizeString(log.innerText).indexOf(normalizeString(getI18N(arrivals_texts))) > -1).map((log) => {
+                const arrivals = logs.filter((log) => normalizeString(log.innerText).indexOf(normalizeString(getI18N(arrivals_texts))) > -1).map((log) => {
                     return {
                         time: log.querySelector('.log-part-time')?.innerText,
                         citizen: log.querySelector('.log-part-content .container span')?.innerText
                     };
                 });
-                let now = document.querySelector('.game-clock .town-time')?.innerText;
+                const now = document.querySelector('.game-clock .town-time')?.innerText;
                 if (now) {
                     citizen_list
                         .filter((citizen) => {
@@ -9376,17 +10682,17 @@
                         return is_digging;
                     })
                         .forEach((citizen) => {
-                        let failed_texts = {
-                            de: `durch Graben nichts gefunden...`,
-                            en: `found nothing during their last search...`,
-                            es: `no encontró nada...`,
-                            fr: `rien trouvé...`
+                        const failed_texts = {
+                            de: 'durch Graben nichts gefunden...',
+                            en: 'found nothing during their last search...',
+                            es: 'no encontró nada...',
+                            fr: 'rien trouvé...'
                         };
-                        let failed_digs = Array.from(logs.filter((log) => normalizeString(log.innerText).indexOf(normalizeString(getI18N(failed_texts))) > -1) || []).filter((log) => log.innerText.indexOf(citizen.userName) > -1) || [];
-                        let nb_failed_digs = failed_digs.length;
-                        let nb_minutes_for_dig = citizen.job === 'dig' ? 90 : 120; // Une fouille = 2h = 120 minutes pour un tous les métiers, ou 1h30 = 90 minutes pour une pelle
-                        let citizen_arrivals = arrivals.filter((arrival) => arrival.citizen === citizen.userName); // Les heures d'arrivées du citoyen sur la case
-                        let citizen_last_arrival = citizen_arrivals[0]?.time;
+                        const failed_digs = Array.from(logs.filter((log) => normalizeString(log.innerText).indexOf(normalizeString(getI18N(failed_texts))) > -1) || []).filter((log) => log.innerText.indexOf(citizen.userName) > -1) || [];
+                        const nb_failed_digs = failed_digs.length;
+                        const nb_minutes_for_dig = citizen.job === 'dig' ? 90 : 120; // Une fouille = 2h = 120 minutes pour un tous les métiers, ou 1h30 = 90 minutes pour une pelle
+                        const citizen_arrivals = arrivals.filter((arrival) => arrival.citizen === citizen.userName); // Les heures d'arrivées du citoyen sur la case
+                        const citizen_last_arrival = citizen_arrivals[0]?.time;
                         let start_date;
                         if (citizen_last_arrival) { // Si le citoyen a une heure d'arrivée alors on se base sur cette heure comme heure de début de fouilles
                             start_date = citizen_last_arrival;
@@ -9396,9 +10702,9 @@
                         }
                         let nb_digs;
                         if (start_date) {
-                            let now_minutes = (+now.split(':')[0] * 60) + (+now.split(':')[1]);
-                            let start_date_minutes = (+start_date.split(':')[0] * 60) + (+start_date.split(':')[1]);
-                            let nb_minutes_digging = now_minutes - start_date_minutes; // Le nombre total de minutes passées à fouiller
+                            const now_minutes = (+now.split(':')[0] * 60) + (+now.split(':')[1]);
+                            const start_date_minutes = (+start_date.split(':')[0] * 60) + (+start_date.split(':')[1]);
+                            const nb_minutes_digging = now_minutes - start_date_minutes; // Le nombre total de minutes passées à fouiller
                             nb_digs = Math.floor(nb_minutes_digging / nb_minutes_for_dig) + 1;
                         }
                         else {
@@ -9417,7 +10723,7 @@
             if ((mho_parameters.update_mho && mho_parameters.update_mho_status) && pageIsHouse()) {
                 /** Bain */
                 let bath_taken;
-                let bath_row = document.querySelector('.heroic_action img[src*=pool]')?.parentElement;
+                const bath_row = document.querySelector('.heroic_action img[src*=pool]')?.parentElement;
                 if (bath_row) {
                     if (bath_row.attributes.disabled) {
                         // si barré = le chantier est construit et le bain a été pris
@@ -9467,36 +10773,457 @@
     }
     /** Récupère les traductions de la chaine de caractères */
 
+    /** La couleur des tags que MyHordes laisse sans couleur propre (`00000030` côté fixtures) */
+    const default_tag_color = 'rgba(0, 0, 0, 0.19)';
+    /** Les couleurs proposées par défaut dans les sélecteurs, quand la propriété vient d'être activée */
+    const default_colors = {
+        color: '#f0d79e',
+        background: '#5c2b20',
+        border: '#ddab76'
+    };
+    /** Ouvre la modale de configuration des styles de titres de sujets */
+    function openForumThreadStylesModal() {
+        document.getElementById(mho_forum_styles_modal_id)?.remove();
+        loadForumThreadStyleRules().then((rules) => {
+            // Copie de travail : rien n'est persisté tant que l'utilisateur n'a pas enregistré
+            const working_rules = rules.map(cloneRule);
+            const available_tags = getAvailableForumThreadTags();
+            const overlay = document.createElement('div');
+            overlay.id = mho_forum_styles_modal_id;
+            overlay.classList.add('mho-modal-overlay');
+            const box = document.createElement('div');
+            box.classList.add('mho-modal-box', 'mho-forum-styles-box');
+            overlay.appendChild(box);
+            const title = document.createElement('h3');
+            title.classList.add('mho-modal-title');
+            title.innerText = getI18N(texts.forum_styles_title);
+            box.appendChild(title);
+            const rules_container = document.createElement('div');
+            rules_container.classList.add('mho-forum-styles-rules');
+            box.appendChild(rules_container);
+            const renderRules = () => {
+                rules_container.innerHTML = '';
+                if (working_rules.length === 0) {
+                    const empty = document.createElement('p');
+                    empty.classList.add('mho-forum-styles-help');
+                    empty.innerText = getI18N(texts.forum_styles_empty);
+                    rules_container.appendChild(empty);
+                    return;
+                }
+                working_rules.forEach((rule, index) => {
+                    rules_container.appendChild(createRuleBlock(rule, index, working_rules, available_tags, renderRules));
+                });
+            };
+            renderRules();
+            // « Ajouter une règle » prolonge la liste : il reste au-dessus du séparateur
+            const add_container = document.createElement('div');
+            add_container.classList.add('mho-forum-styles-add');
+            box.appendChild(add_container);
+            const add_button = createModalButton(texts.forum_styles_add_rule);
+            add_button.addEventListener('click', () => {
+                working_rules.push(createEmptyForumThreadStyleRule(`rule_${Date.now()}`));
+                renderRules();
+            });
+            add_container.appendChild(add_button);
+            // Zone d'échange : l'export copie la configuration affichée, l'import la remplace
+            const exchange = document.createElement('div');
+            exchange.classList.add('mho-forum-styles-exchange');
+            exchange.style.display = 'none';
+            box.appendChild(exchange);
+            const exchange_input = document.createElement('textarea');
+            exchange_input.classList.add('mho-input', 'mho-forum-styles-exchange-input');
+            exchange_input.rows = 3;
+            exchange_input.placeholder = getI18N(texts.forum_styles_import_placeholder);
+            exchange.appendChild(exchange_input);
+            const exchange_error = document.createElement('div');
+            exchange_error.classList.add('mho-forum-styles-warning');
+            exchange_error.innerText = getI18N(texts.forum_styles_import_error);
+            exchange.appendChild(exchange_error);
+            const exchange_actions = document.createElement('div');
+            exchange_actions.classList.add('mho-forum-styles-exchange-actions');
+            exchange.appendChild(exchange_actions);
+            const exchange_confirm = createModalButton(texts.forum_styles_import_confirm);
+            exchange_confirm.addEventListener('click', () => {
+                const imported = parseForumThreadStyleRules(exchange_input.value);
+                if (!imported) {
+                    exchange_error.style.display = 'block';
+                    return;
+                }
+                working_rules.splice(0, working_rules.length, ...imported);
+                renderRules();
+                exchange.style.display = 'none';
+                exchange_input.value = '';
+            });
+            exchange_actions.appendChild(exchange_confirm);
+            const exchange_cancel = createModalButton(texts.forum_styles_cancel);
+            exchange_cancel.addEventListener('click', () => {
+                exchange.style.display = 'none';
+                exchange_input.value = '';
+            });
+            exchange_actions.appendChild(exchange_cancel);
+            const footer = document.createElement('div');
+            footer.classList.add('mho-modal-footer', 'mho-forum-styles-footer');
+            box.appendChild(footer);
+            const reset_button = createModalButton(texts.forum_styles_reset);
+            reset_button.addEventListener('click', () => {
+                working_rules.splice(0, working_rules.length, ...getDefaultForumThreadStyleRules());
+                renderRules();
+            });
+            footer.appendChild(reset_button);
+            const export_button = createModalButton(texts.forum_styles_export);
+            export_button.addEventListener('click', () => {
+                copyToClipboard(serializeForumThreadStyleRules(working_rules));
+                addSuccess(getI18N(texts.forum_styles_export_done));
+            });
+            footer.appendChild(export_button);
+            const import_button = createModalButton(texts.forum_styles_import);
+            import_button.addEventListener('click', () => {
+                exchange.style.display = 'flex';
+                exchange_error.style.display = 'none';
+                exchange_input.focus();
+            });
+            footer.appendChild(import_button);
+            const spacer = document.createElement('span');
+            spacer.classList.add('mho-forum-styles-footer-spacer');
+            footer.appendChild(spacer);
+            const cancel_button = createModalButton(texts.forum_styles_cancel);
+            cancel_button.addEventListener('click', () => overlay.remove());
+            footer.appendChild(cancel_button);
+            const save_button = createModalButton(texts.forum_styles_save);
+            save_button.addEventListener('click', () => {
+                saveForumThreadStyleRules(working_rules).then(() => {
+                    applyForumThreadStyles(working_rules);
+                    overlay.remove();
+                });
+            });
+            footer.appendChild(save_button);
+            overlay.addEventListener('click', (event) => {
+                if (event.target === overlay)
+                    overlay.remove();
+            });
+            const post_office = document.getElementById('post-office');
+            if (post_office) {
+                post_office.parentNode?.insertBefore(overlay, post_office.nextSibling);
+            }
+            else {
+                document.body.appendChild(overlay);
+            }
+        });
+    }
+    /** Copie profonde d'une règle, pour ne pas modifier le cache tant que rien n'est enregistré */
+    function cloneRule(rule) {
+        return { ...rule, tags: [...rule.tags], words: [...rule.words], style: { ...rule.style } };
+    }
+    /**
+     * Construit le bloc d'édition d'une règle.
+     * @param {ForumThreadStyleRule} rule            La règle éditée (modifiée en place)
+     * @param {number} index                         Sa position dans la liste
+     * @param {ForumThreadStyleRule[]} rules         La liste complète, pour le déplacement et la suppression
+     * @param {ForumThreadTag[]} available_tags      Les tags proposés
+     * @param {Function} onStructureChange           À appeler quand la liste elle-même change
+     */
+    function createRuleBlock(rule, index, rules, available_tags, onStructureChange) {
+        const block = document.createElement('div');
+        block.classList.add('mho-forum-styles-rule');
+        // ── En-tête : activation, aperçu, déplacement, suppression ──────────────
+        const header = document.createElement('div');
+        header.classList.add('mho-forum-styles-rule-header');
+        block.appendChild(header);
+        const enabled_input = document.createElement('input');
+        enabled_input.type = 'checkbox';
+        enabled_input.checked = rule.enabled;
+        enabled_input.classList.add('mho-input');
+        header.appendChild(enabled_input);
+        const preview = document.createElement('span');
+        preview.classList.add('mho-forum-styles-preview');
+        header.appendChild(preview);
+        const updatePreview = () => renderPreview(preview, rule.style);
+        updatePreview();
+        enabled_input.addEventListener('change', () => {
+            rule.enabled = enabled_input.checked;
+            block.classList.toggle('mho-forum-styles-rule-disabled', !rule.enabled);
+        });
+        block.classList.toggle('mho-forum-styles-rule-disabled', !rule.enabled);
+        const actions = document.createElement('span');
+        actions.classList.add('mho-forum-styles-rule-actions');
+        header.appendChild(actions);
+        const up_button = createIconButton('▲', texts.forum_styles_move_up);
+        up_button.disabled = index === 0;
+        up_button.addEventListener('click', () => {
+            rules.splice(index - 1, 0, ...rules.splice(index, 1));
+            onStructureChange();
+        });
+        actions.appendChild(up_button);
+        const down_button = createIconButton('▼', texts.forum_styles_move_down);
+        down_button.disabled = index === rules.length - 1;
+        down_button.addEventListener('click', () => {
+            rules.splice(index + 1, 0, ...rules.splice(index, 1));
+            onStructureChange();
+        });
+        actions.appendChild(down_button);
+        const delete_button = createIconButton('✕', texts.forum_styles_delete);
+        delete_button.addEventListener('click', () => {
+            rules.splice(index, 1);
+            onStructureChange();
+        });
+        actions.appendChild(delete_button);
+        // ── Critères : tags et mots ─────────────────────────────────────────────
+        const criteria = document.createElement('div');
+        criteria.classList.add('mho-forum-styles-criteria');
+        block.appendChild(criteria);
+        // Le volet et les tags retenus forment un bloc, les mots en forment un autre
+        const tags_group = document.createElement('div');
+        tags_group.classList.add('mho-forum-styles-criteria-group');
+        criteria.appendChild(tags_group);
+        // Le même volet déroulant à cases à cocher que les filtres des listes de citoyens,
+        // mais dont les options sont rendues comme les tags le sont dans le forum
+        const tags_dropdown = createCheckboxDropdown(getI18N(texts.forum_styles_tags), `mho-forum-styles-tags-${rule.id}`, available_tags.map((tag) => ({
+            value: tag.name,
+            text: getI18N(tag.label),
+            decorate: () => createTagChip(tag)
+        })), () => {
+            rule.tags = tags_dropdown.getSelectedValues();
+            renderSelectedTags();
+            updateCriteriaWarning();
+        }, rule.tags);
+        tags_group.appendChild(tags_dropdown.container);
+        // Le volet s'ouvre dans une zone défilante : on le ramène dans la vue s'il déborde
+        tags_dropdown.container.addEventListener('click', () => {
+            setTimeout(() => {
+                const panel = tags_dropdown.container.querySelector('.mho-checkbox-dropdown-panel');
+                if (panel && panel.style.display === 'block')
+                    panel.scrollIntoView({ block: 'nearest' });
+            });
+        });
+        // Rappel des tags retenus, retirables sans rouvrir le volet
+        const selected_tags = document.createElement('div');
+        selected_tags.classList.add('mho-forum-styles-selected-tags');
+        tags_group.appendChild(selected_tags);
+        function renderSelectedTags() {
+            selected_tags.innerHTML = '';
+            rule.tags.forEach((name) => {
+                const tag = available_tags.find((available) => available.name === name);
+                if (!tag)
+                    return;
+                selected_tags.appendChild(createTagChip(tag, () => {
+                    // On décoche la case du volet : c'est elle qui fait foi, et son
+                    // évènement remet à jour la règle, le libellé du volet et cette liste
+                    const checkbox = tags_dropdown.container.querySelector(`input[type="checkbox"][value="${name}"]`);
+                    if (!checkbox)
+                        return;
+                    checkbox.checked = false;
+                    checkbox.dispatchEvent(new Event('change'));
+                }));
+            });
+        }
+        renderSelectedTags();
+        const words_field = document.createElement('div');
+        words_field.classList.add('mho-filter-field', 'mho-forum-styles-words-field');
+        criteria.appendChild(words_field);
+        const words_label = document.createElement('label');
+        words_label.classList.add('mho-filter-label');
+        words_label.innerText = getI18N(texts.forum_styles_words);
+        words_field.appendChild(words_label);
+        const words_input = document.createElement('input');
+        words_input.type = 'text';
+        words_input.classList.add('mho-input', 'mho-forum-styles-words');
+        words_input.placeholder = getI18N(texts.forum_styles_words_placeholder);
+        words_input.value = rule.words.join(', ');
+        words_input.addEventListener('input', () => {
+            rule.words = words_input.value.split(',').map((word) => word.trim()).filter((word) => word !== '');
+            updateCriteriaWarning();
+        });
+        words_field.appendChild(words_input);
+        const warning = document.createElement('div');
+        warning.classList.add('mho-forum-styles-warning');
+        warning.innerText = getI18N(texts.forum_styles_no_criteria);
+        block.appendChild(warning);
+        function updateCriteriaWarning() {
+            warning.style.display = rule.tags.length === 0 && rule.words.length === 0 ? 'block' : 'none';
+        }
+        updateCriteriaWarning();
+        // ── Style ───────────────────────────────────────────────────────────────
+        const style_container = document.createElement('div');
+        style_container.classList.add('mho-forum-styles-style');
+        block.appendChild(style_container);
+        style_container.appendChild(createColorField(texts.forum_styles_text_color, rule.style, 'color', updatePreview));
+        style_container.appendChild(createColorField(texts.forum_styles_background, rule.style, 'background', updatePreview));
+        style_container.appendChild(createColorField(texts.forum_styles_border, rule.style, 'border', updatePreview));
+        style_container.appendChild(createNumberField(texts.forum_styles_size, rule.style, 'size', 50, 200, 5, updatePreview));
+        style_container.appendChild(createNumberField(texts.forum_styles_opacity, rule.style, 'opacity', 10, 100, 5, updatePreview));
+        const prefix_field = document.createElement('label');
+        prefix_field.classList.add('mho-forum-styles-field');
+        prefix_field.appendChild(document.createTextNode(getI18N(texts.forum_styles_prefix)));
+        const prefix_input = document.createElement('input');
+        prefix_input.type = 'text';
+        prefix_input.maxLength = 4;
+        prefix_input.classList.add('mho-forum-styles-prefix');
+        prefix_input.value = rule.style.prefix;
+        prefix_input.addEventListener('input', () => {
+            rule.style.prefix = prefix_input.value.trim();
+            updatePreview();
+        });
+        prefix_field.appendChild(prefix_input);
+        style_container.appendChild(prefix_field);
+        return block;
+    }
+    /**
+     * Reproduit le rendu d'un tag tel que le forum l'affiche : pastille colorée dont
+     * la couleur de texte suit la même règle de luminance que le site.
+     * @param {ForumThreadTag} tag      Le tag à représenter
+     * @param {Function} onRemove       Ajoute une croix de retrait quand elle est fournie
+     */
+    function createTagChip(tag, onRemove) {
+        const chip = document.createElement('span');
+        chip.classList.add('thread-tag', 'mho-forum-styles-tag-chip');
+        chip.style.backgroundColor = tag.color ?? default_tag_color;
+        chip.style.color = getTagTextColor(tag.color);
+        chip.appendChild(document.createTextNode(getI18N(tag.label)));
+        if (onRemove) {
+            const remove = document.createElement('span');
+            remove.classList.add('mho-forum-styles-tag-remove');
+            remove.innerText = '✕';
+            remove.title = getI18N(texts.forum_styles_delete);
+            remove.addEventListener('click', (event) => {
+                event.preventDefault();
+                event.stopPropagation();
+                onRemove();
+            });
+            chip.appendChild(remove);
+        }
+        return chip;
+    }
+    /**
+     * Noir ou blanc selon la luminance du fond, avec les coefficients et le seuil
+     * utilisés par MyHordes pour ses propres tags.
+     * @param {string} color    La couleur de fond du tag, ou `null` pour la couleur par défaut
+     */
+    function getTagTextColor(color) {
+        if (!color)
+            return '#ffffff';
+        const hex = color.replace('#', '');
+        if (hex.length < 6)
+            return '#ffffff';
+        const luminance = parseInt(hex.substring(0, 2), 16) * 0.299
+            + parseInt(hex.substring(2, 4), 16) * 0.587
+            + parseInt(hex.substring(4, 6), 16) * 0.114;
+        return luminance > 150 ? '#000000' : '#ffffff';
+    }
+    /** Rend l'aperçu d'un style, en réutilisant exactement le rendu appliqué au forum */
+    function renderPreview(container, style) {
+        container.innerHTML = '';
+        container.removeAttribute('style');
+        const title = document.createElement('span');
+        title.innerText = getI18N(texts.forum_styles_preview_text);
+        container.appendChild(title);
+        applyForumThreadStyleToElements(container, title, style);
+    }
+    /** Champ « couleur » : une case pour activer la propriété, un sélecteur pour la valeur */
+    function createColorField(label, style, property, onChange) {
+        const field = document.createElement('label');
+        field.classList.add('mho-forum-styles-field');
+        const enabled_input = document.createElement('input');
+        enabled_input.type = 'checkbox';
+        enabled_input.classList.add('mho-input');
+        enabled_input.checked = style[property] !== null;
+        field.appendChild(enabled_input);
+        field.appendChild(document.createTextNode(getI18N(label)));
+        const color_input = document.createElement('input');
+        color_input.type = 'color';
+        color_input.classList.add('mho-forum-styles-color');
+        color_input.value = style[property] ?? default_colors[property];
+        color_input.disabled = style[property] === null;
+        field.appendChild(color_input);
+        enabled_input.addEventListener('change', () => {
+            style[property] = enabled_input.checked ? color_input.value : null;
+            color_input.disabled = !enabled_input.checked;
+            onChange();
+        });
+        color_input.addEventListener('input', () => {
+            style[property] = color_input.value;
+            onChange();
+        });
+        return field;
+    }
+    /** Champ numérique exprimé en pourcentage : taille et opacité */
+    function createNumberField(label, style, property, min, max, step, onChange) {
+        const field = document.createElement('label');
+        field.classList.add('mho-forum-styles-field');
+        field.appendChild(document.createTextNode(getI18N(label)));
+        const input = document.createElement('input');
+        input.type = 'number';
+        input.min = `${min}`;
+        input.max = `${max}`;
+        input.step = `${step}`;
+        input.value = `${style[property]}`;
+        input.classList.add('mho-forum-styles-number');
+        input.addEventListener('input', () => {
+            const value = Math.min(max, Math.max(min, +input.value || 100));
+            style[property] = value;
+            onChange();
+        });
+        field.appendChild(input);
+        field.appendChild(document.createTextNode('%'));
+        return field;
+    }
+    /** Bouton d'action de la modale, au gabarit commun aux modales de l'addon */
+    function createModalButton(label) {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.classList.add('mho-modal-btn', 'inline');
+        button.innerText = getI18N(label);
+        return button;
+    }
+    /** Petit bouton d'action sur une règle */
+    function createIconButton(icon, label) {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.classList.add('mho-forum-styles-icon-btn', 'inline');
+        button.innerText = icon;
+        button.title = getI18N(label);
+        return button;
+    }
+
+    /**
+     * Les actions déclenchables depuis une ligne de paramètre : un paramètre qui
+     * déclare `action: '<clé>'` affiche un bouton, visible tant qu'il est coché.
+     */
+    const param_actions = {
+        forum_thread_styles: {
+            label: texts.forum_styles_configure,
+            handler: openForumThreadStylesModal
+        }
+    };
     function createParams(content) {
-        let categories_container = document.createElement('div');
+        const categories_container = document.createElement('div');
         categories_container.style.maxHeight = '75vh';
         categories_container.style.overflow = 'auto';
         categories_container.id = 'categories';
         content.appendChild(categories_container);
-        let params_title = document.createElement('h5');
+        const params_title = document.createElement('h5');
         params_title.style.display = 'flex';
         params_title.style.justifyContent = 'space-between';
         categories_container.appendChild(params_title);
-        let params_title_text = document.createElement('span');
+        const params_title_text = document.createElement('span');
         params_title_text.innerText = getI18N(texts.parameters_section_label);
         params_title.appendChild(params_title_text);
-        let params_title_select_all = document.createElement('a');
+        const params_title_select_all = document.createElement('a');
         params_title_select_all.innerText = getI18N(texts.check_all);
         params_title_select_all.style.cursor = 'pointer';
         params_title.appendChild(params_title_select_all);
         params_title_select_all.addEventListener('click', () => {
-            let unchecked = Array.from(categories_container.querySelectorAll('input.mho-param[type=checkbox]:not(:checked)'));
+            const unchecked = Array.from(categories_container.querySelectorAll('input.mho-param[type=checkbox]:not(:checked)'));
             unchecked.forEach((checkbox) => checkbox.click());
         });
-        let categories_list = document.createElement('ul');
+        const categories_list = document.createElement('ul');
         categories_container.appendChild(categories_list);
         params_categories.forEach((category) => {
-            let category_container = document.createElement('li');
+            const category_container = document.createElement('li');
             categories_list.appendChild(category_container);
-            let category_title = document.createElement('h1');
+            const category_title = document.createElement('h1');
             category_title.innerText = getI18N(category.label);
             category_container.appendChild(category_title);
-            let category_content = document.createElement('ul');
+            const category_content = document.createElement('ul');
             category_content.classList.add('parameters');
             category_container.appendChild(category_content);
             category.params.forEach((param) => {
@@ -9513,27 +11240,27 @@
     function createParamItem(param, parent, depth) {
         const has_children = param.children && param.children.length > 0;
         const is_touch = isTouchScreen();
-        let param_container = document.createElement('li');
+        const param_container = document.createElement('li');
         param_container.id = param.id;
         parent.appendChild(param_container);
         // Ligne principale : checkbox + label + help
-        let param_row = document.createElement('div');
+        const param_row = document.createElement('div');
         param_row.style.display = 'flex';
         param_row.style.alignItems = 'center';
         param_row.style.justifyContent = 'space-between';
         param_container.appendChild(param_row);
-        let param_input_div = document.createElement('div');
+        const param_input_div = document.createElement('div');
         param_input_div.style.display = 'flex';
         param_input_div.style.alignItems = 'center';
         param_input_div.style.flex = '1';
         param_row.appendChild(param_input_div);
-        let param_input = document.createElement('input');
+        const param_input = document.createElement('input');
         param_input.type = 'checkbox';
         param_input.id = param.id + '_input';
         param_input.classList.add('mho-input', 'mho-param');
         param_input.checked = state.mho_parameters?.[param.id] ?? false;
         param_input_div.appendChild(param_input);
-        let param_label = document.createElement('label');
+        const param_label = document.createElement('label');
         param_label.classList.add('small');
         // Sur mobile on ne lie pas le label à l'input (le clic label = toggle expand, pas check)
         param_label.htmlFor = (!is_touch && window.innerWidth > 1000) ? param.id + '_input' : '';
@@ -9551,6 +11278,9 @@
             arrow_indicator.innerText = '▶';
             param_input_div.appendChild(arrow_indicator);
         }
+        if (param.action && param_actions[param.action]) {
+            param_row.appendChild(createParamActionButton(param_actions[param.action], param_input));
+        }
         if (param.help) {
             param_row.appendChild(createHelpButton(getI18N(param.help)));
         }
@@ -9563,7 +11293,7 @@
             return;
         }
         // Conteneur enfants
-        let children_container = document.createElement('ul');
+        const children_container = document.createElement('ul');
         children_container.style.listStyle = 'none';
         children_container.style.display = 'none';
         param_container.appendChild(children_container);
@@ -9745,19 +11475,40 @@
             return;
         param.children.forEach((child) => {
             updateParam(child.id, checked);
-            let child_input = document.querySelector(`#${child.id}_input`);
+            const child_input = document.querySelector(`#${child.id}_input`);
             if (child_input)
                 child_input.checked = checked;
             setParamChildrenChecked(child, checked);
         });
     }
+    /**
+     * Crée le bouton d'action d'un paramètre. Il n'a de sens que si le paramètre
+     * est actif : sa visibilité suit donc l'état de la case à cocher.
+     * @param {object} action                   L'action à déclencher
+     * @param {HTMLInputElement} param_input    La case à cocher du paramètre
+     */
+    function createParamActionButton(action, param_input) {
+        const action_button = document.createElement('a');
+        action_button.classList.add('mho-param-action');
+        action_button.innerText = getI18N(action.label);
+        action_button.style.display = param_input.checked ? 'inline-block' : 'none';
+        action_button.addEventListener('click', (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            action.handler();
+        });
+        param_input.addEventListener('change', () => {
+            action_button.style.display = param_input.checked ? 'inline-block' : 'none';
+        });
+        return action_button;
+    }
     function createHelpButton(text_to_display) {
-        let help_button = document.createElement('a');
+        const help_button = document.createElement('a');
         help_button.innerText = getI18N(texts.external_app_id_help_label);
         help_button.classList.add('help-button');
-        let help_tooltip = document.createElement('div');
+        const help_tooltip = document.createElement('div');
         help_tooltip.classList.add('tooltip', 'help', 'hidden', 'mho');
-        help_tooltip.setAttribute('style', `text-transform: initial; display: block; position: absolute; width: 250px;`);
+        help_tooltip.setAttribute('style', 'text-transform: initial; display: block; position: absolute; width: 250px;');
         help_tooltip.innerHTML = text_to_display;
         help_button.appendChild(help_tooltip);
         help_button.addEventListener('mouseenter', function () {
@@ -9772,21 +11523,21 @@
     }
     /** Enregistre les paramètres de l'extension */
     function saveParameters() {
-        let parameters = document.getElementsByClassName('parameter');
+        const parameters = document.getElementsByClassName('parameter');
     }
     /** Affiche le bouton de mise à jour des outils externes */
 
     function createUpdateExternalToolsButton(count = 0) {
-        let tools_to_update = {
+        const tools_to_update = {
             isBigBrothHordes: /* mho_parameters && !is_mh_beta ? mho_parameters.update_bbh : */ false,
             isFataMorgana: state.mho_parameters ? state.mho_parameters.update_fata : false,
             isGestHordes: state.mho_parameters ? state.mho_parameters.update_gh : false,
             isMyHordesOptimizer: state.mho_parameters ? state.mho_parameters.update_mho : false
         };
-        let nb_tools_to_update = Object.keys(tools_to_update).map((key) => tools_to_update[key]).filter((tool) => tool).length;
-        let zone_marker = document.querySelector('#zone-marker');
-        let compact_actions_zone = document.querySelector('.actions-box .mdg');
-        let update_external_tools_btn = document.getElementById(mh_update_external_tools_id);
+        const nb_tools_to_update = Object.keys(tools_to_update).map((key) => tools_to_update[key]).filter((tool) => tool).length;
+        const zone_marker = document.querySelector('#zone-marker');
+        const compact_actions_zone = document.querySelector('.actions-box .mdg');
+        const update_external_tools_btn = document.getElementById(mh_update_external_tools_id);
         const external_display_zone = zone_marker ? (window.innerWidth < 480 && compact_actions_zone ? compact_actions_zone : zone_marker) : undefined;
         const chest = document.querySelector('hordes-inventory');
         const amelios = document.querySelector('#upgrade_home_level')?.parentElement?.parentElement;
@@ -9800,8 +11551,8 @@
             if (external_display_zone || (chest && pageIsHouse()) || (amelios && pageIsAmelio()) || (map_actions && pageIsDoors() && state.mho_parameters.update_mho && state.mho_parameters.update_mho_souls)) {
                 if (!update_external_tools_btn) {
                     if (window.innerWidth < 480 && compact_actions_zone) {
-                        let el = external_display_zone ?? chest?.parentElement ?? amelios ?? map_actions;
-                        let updater_bloc = createSmallUpdateExternalToolsButton(update_external_tools_btn);
+                        const el = external_display_zone ?? chest?.parentElement ?? amelios ?? map_actions;
+                        const updater_bloc = createSmallUpdateExternalToolsButton(update_external_tools_btn);
                         if (amelios) {
                             el.parentElement.insertBefore(updater_bloc, el.nextElementSibling);
                         }
@@ -9810,8 +11561,8 @@
                         }
                     }
                     else {
-                        let el = external_display_zone?.parentElement.parentElement.parentElement ?? chest?.parentElement ?? amelios ?? map_actions;
-                        let updater_bloc = createLargeUpdateExternalToolsButton(update_external_tools_btn);
+                        const el = external_display_zone?.parentElement.parentElement.parentElement ?? chest?.parentElement ?? amelios ?? map_actions;
+                        const updater_bloc = createLargeUpdateExternalToolsButton(update_external_tools_btn);
                         if (amelios) {
                             el.parentElement.insertBefore(updater_bloc, el.nextElementSibling);
                         }
@@ -9829,7 +11580,7 @@
                 let warn_missing_logs = document.getElementById(mho_warn_missing_logs_id);
                 if (!warn_missing_logs && document.querySelector('.log-complete-link') && external_display_zone && update_external_tools_btn && state.mho_parameters.update_mho_digs) {
                     if (window.innerWidth < 480 && compact_actions_zone) {
-                        let external_tools_btn_tooltip = document.querySelector('#external-tools-btn-tooltip');
+                        const external_tools_btn_tooltip = document.querySelector('#external-tools-btn-tooltip');
                         warn_missing_logs = document.createElement('div');
                         warn_missing_logs.id = mho_warn_missing_logs_id;
                         warn_missing_logs.classList.add('note', 'note-important');
@@ -9842,7 +11593,7 @@
                         warn_missing_logs.id = mho_warn_missing_logs_id;
                         warn_missing_logs.classList.add('note', 'note-important');
                         warn_missing_logs.innerText = getI18N(texts.warn_missing_logs_title);
-                        let warn_help = createHelpButton(getI18N(texts.warn_missing_logs_help));
+                        const warn_help = createHelpButton(getI18N(texts.warn_missing_logs_help));
                         warn_missing_logs.appendChild(warn_help);
                         update_external_tools_btn.parentElement.appendChild(warn_missing_logs);
                     }
@@ -9862,18 +11613,18 @@
         }
     }
     function createLargeUpdateExternalToolsButton(update_external_tools_btn) {
-        let updater_bloc = document.createElement('div');
+        const updater_bloc = document.createElement('div');
         updater_bloc.style.marginTop = '1em';
         updater_bloc.style.padding = '0.25em';
         updater_bloc.style.border = '1px solid #ddab76';
-        let updater_title = document.createElement('h5');
+        const updater_title = document.createElement('h5');
         updater_title.style.margin = '0 0 0.5em';
-        let updater_title_mho_img = document.createElement('img');
+        const updater_title_mho_img = document.createElement('img');
         updater_title_mho_img.src = mh_optimizer_icon;
         updater_title_mho_img.style.height = '24px';
         updater_title_mho_img.style.marginRight = '0.5em';
         updater_title.appendChild(updater_title_mho_img);
-        let updater_title_text = document.createElement('text');
+        const updater_title_text = document.createElement('text');
         updater_title_text.innerText = getScriptInfo().name;
         updater_title.appendChild(updater_title_text);
         updater_bloc.appendChild(updater_title);
@@ -9894,32 +11645,32 @@
                 if (response.mapResponseDto.mhoApiStatus.toLowerCase() === 'ok')
                     setStorageItem(gm_mho_updated_key, true);
                 let tools_fail = [];
-                let response_items = Object.keys(response).map((key) => {
+                const response_items = Object.keys(response).map((key) => {
                     return { key: key, value: response[key] };
                 });
                 response_items.forEach((response_item, index) => {
-                    let final = Object.keys(response_item.value).map((key) => {
+                    const final = Object.keys(response_item.value).map((key) => {
                         return { key: key, value: response_item.value[key] };
                     });
                     tools_fail = [...tools_fail, ...final.filter((final_item) => !final_item.value || (final_item.value.toLowerCase() !== 'ok' && final_item.value.toLowerCase() !== 'not activated'))];
                     if (index >= response_items.length - 1) {
                         update_external_tools_btn.innerText = '';
                         if (tools_fail.length === 0) {
-                            let icon = document.createElement('img');
+                            const icon = document.createElement('img');
                             icon.src = `${repo_img_hordes_url}icons/done.png`;
                             update_external_tools_btn.appendChild(icon);
-                            let text = document.createElement('text');
+                            const text = document.createElement('text');
                             text.innerText = getI18N(texts.update_external_tools_success_btn_label);
                             update_external_tools_btn.appendChild(text);
                         }
                         else {
-                            let icon = document.createElement('img');
+                            const icon = document.createElement('img');
                             icon.src = `${repo_img_hordes_url}emotes/warning.gif`;
                             update_external_tools_btn.appendChild(icon);
-                            let text = document.createElement('div');
+                            const text = document.createElement('div');
                             update_external_tools_btn.appendChild(text);
                             tools_fail.forEach((tool_fail) => {
-                                let tool_text = document.createElement('div');
+                                const tool_text = document.createElement('div');
                                 tool_text.innerText = tool_text.key.replace('Status', tool_text.value);
                                 text.appendChild(tool_fail);
                             });
@@ -9927,15 +11678,15 @@
                     }
                 });
                 if (tools_fail.length > 0) {
-                    console.error(`Erreur lors de la mise à jour de l'un des outils`, response);
+                    console.error('Erreur lors de la mise à jour de l\'un des outils', response);
                 }
             })
                 .catch((e) => {
                 update_external_tools_btn.innerText = '';
-                let icon = document.createElement('img');
+                const icon = document.createElement('img');
                 icon.src = `${repo_img_hordes_url}professions/death.gif`;
                 update_external_tools_btn.appendChild(icon);
-                let text = document.createElement('text');
+                const text = document.createElement('text');
                 text.innerText = getI18N(texts.update_external_tools_fail_btn_label);
                 update_external_tools_btn.appendChild(text);
             });
@@ -9947,7 +11698,7 @@
         update_external_tools_btn = document.createElement('button');
         update_external_tools_btn.innerHTML = `<img src="${mh_optimizer_icon}" height="16" width="16"><img src="${repo_img_hordes_url}emotes/arrowright.gif" height="16">`;
         update_external_tools_btn.id = mh_update_external_tools_id;
-        let tooltips_container = document.querySelector('#tooltip_container');
+        const tooltips_container = document.querySelector('#tooltip_container');
         let external_tools_btn_tooltip = tooltips_container.querySelector('#external-tools-btn-tooltip');
         if (!external_tools_btn_tooltip) {
             external_tools_btn_tooltip = document.createElement('div');
@@ -9958,11 +11709,11 @@
         else {
             external_tools_btn_tooltip.innerHTML = undefined;
         }
-        let title = document.createElement('div');
+        const title = document.createElement('div');
         title.classList.add('title');
         title.innerHTML = `<h5 style="margin-top: 0; font-size: 10px;">${getScriptInfo().name}</h5>`;
         external_tools_btn_tooltip.appendChild(title);
-        let status_div = document.createElement('div');
+        const status_div = document.createElement('div');
         status_div.classList.add('status');
         status_div.innerText = getI18N(texts.update_external_tools_needed_btn_label);
         external_tools_btn_tooltip.appendChild(status_div);
@@ -9989,11 +11740,11 @@
                 if (response.mapResponseDto.mhoApiStatus.toLowerCase() === 'ok')
                     setStorageItem(gm_mho_updated_key, true);
                 let tools_fail = [];
-                let response_items = Object.keys(response).map((key) => {
+                const response_items = Object.keys(response).map((key) => {
                     return { key: key, value: response[key] };
                 });
                 response_items.forEach((response_item, index) => {
-                    let final = Object.keys(response_item.value).map((key) => {
+                    const final = Object.keys(response_item.value).map((key) => {
                         return { key: key, value: response_item.value[key] };
                     });
                     tools_fail = [...tools_fail, ...final.filter((final_item) => !final_item.value || (final_item.value.toLowerCase() !== 'ok' && final_item.value.toLowerCase() !== 'not activated'))];
@@ -10006,11 +11757,11 @@
                     }
                 });
                 if (tools_fail.length > 0) {
-                    console.error(`Erreur lors de la mise à jour de l'un des outils`, response);
+                    console.error('Erreur lors de la mise à jour de l\'un des outils', response);
                 }
             })
                 .catch((error) => {
-                console.error(`Erreur lors de la mise à jour de l'un des outils`, error);
+                console.error('Erreur lors de la mise à jour de l\'un des outils', error);
                 update_external_tools_btn.innerHTML = `<img src="${mh_optimizer_icon}" height="16" width="16"><img src="${repo_img_hordes_url}professions/death.gif" height="16">`;
                 status_div.innerText = getI18N(texts.update_external_tools_fail_btn_label);
             });
@@ -10030,7 +11781,7 @@
                 }
             })
                 .then((response) => {
-                let estimations = {
+                const estimations = {
                     estimations: response,
                     today_attack: undefined,
                     tomorrow_attack: undefined
@@ -10072,16 +11823,16 @@
     function saveEstimations(estim_value, planif_value) {
         return new Promise((resolve, reject) => {
             getEstimations().then((estimations) => {
-                let new_estimations = { ...estimations.estimations };
+                const new_estimations = { ...estimations.estimations };
                 if (estim_value && estim_value.value && (estim_value.value.min || estim_value.value.max)) {
                     /** Workaround pour définir sur l'extension firefox sans passer par cloneinto */
-                    let new_estimations_workaround_estim = { ...new_estimations.estim };
+                    const new_estimations_workaround_estim = { ...new_estimations.estim };
                     new_estimations_workaround_estim['_' + estim_value.percent] = { ...estim_value.value };
                     new_estimations.estim = { ...new_estimations_workaround_estim };
                 }
                 if (planif_value && planif_value.value && (planif_value.value.min || planif_value.value.max)) {
                     /** Workaround pour définir sur l'extension firefox sans passer par cloneinto */
-                    let new_estimations_workaround_planif = { ...new_estimations.planif };
+                    const new_estimations_workaround_planif = { ...new_estimations.planif };
                     new_estimations_workaround_planif['_' + planif_value.percent] = { ...planif_value.value };
                     new_estimations.planif = { ...new_estimations_workaround_planif };
                 }
@@ -10114,7 +11865,7 @@
     function displayEstimationsOnWatchtower() {
         if (state.mho_parameters.display_estimations_on_watchtower && pageIsWatchtower()) {
             let estim_block = document.querySelector(`#${mho_watchtower_estim_id}`);
-            let small_note = document.querySelector('.small-note');
+            const small_note = document.querySelector('.small-note');
             if (estim_block || !small_note)
                 return;
             const TDG_VALUES = [33, 38, 42, 46, 50, 54, 58, 63, 67, 71, 75, 79, 83, 88, 92, 96, 100];
@@ -10128,44 +11879,44 @@
                 const watchtower_planif_block_prediction = watchtower_planif_block.querySelector('.x-copy-prediction')?.querySelector('[x-contain-prediction]')?.innerText;
                 const current_planif_percent_read = watchtower_planif_block.querySelector('.watchtower-prediction-text')?.innerText?.replace('%', '');
                 const current_planif_percent = current_planif_percent_read !== undefined && current_planif_percent_read !== null ? +current_planif_percent_read : (watchtower_planif_block_prediction ? 100 : undefined);
-                let createEstimationRow = (value, is_new_estimation, estimation, type) => {
+                const createEstimationRow = (value, is_new_estimation, estimation, type) => {
                     return `<b style="color: #afb3cf; opacity: .8;">[${value}%]</b>
                         <div id="${type}_${value}" style="font-weight: ${is_new_estimation ? 'bold' : 'normal'}; color: ${is_new_estimation ? 'lightgreen' : 'unset'}">
                             <span class="start" style="width: 100px">${estimation?.min || ''}</span> - <span class="end" style="width: 100px">${estimation?.max || ''}</span><img src="${repo_img_hordes_url}emotes/zombie.gif">
                         </div>`;
                 };
-                let createCalculatedAttackRow = (calculated_attack) => {
-                    let estim_values_block_title_calculated_text = ``;
+                const createCalculatedAttackRow = (calculated_attack) => {
+                    let estim_values_block_title_calculated_text = '';
                     estim_values_block_title_calculated_text += `<div class="attack" style="display: flex; justify-content: space-between; gap: 1em;"><b>${getI18N(texts.calculated_attack)}</b><div><span>${calculated_attack.result.min}</span> - <span>${calculated_attack.result.max}</span></div></div>`;
                     return estim_values_block_title_calculated_text;
                 };
-                let updateEstimationRow = (estimations, percent, type) => {
+                const updateEstimationRow = (estimations, percent, type) => {
                     if (!estimations.estimations[type][`_${percent}`]) {
                         /** Workaround pour définir sur l'extension firefox sans passer par cloneinto */
-                        let estimations_workaround_estim = { ...estimations.estimations };
-                        let estimations_workaround_type = { ...estimations_workaround_estim[type] };
-                        let estimations_workaround_type_percent = { min: null, max: null };
+                        const estimations_workaround_estim = { ...estimations.estimations };
+                        const estimations_workaround_type = { ...estimations_workaround_estim[type] };
+                        const estimations_workaround_type_percent = { min: null, max: null };
                         estimations_workaround_type[`_${percent}`] = { ...estimations_workaround_type_percent };
                         estimations_workaround_estim[type] = { ...estimations_workaround_type };
                         estimations.estimations = { ...estimations_workaround_estim };
                     }
-                    let estimation = estimations.estimations[type][`_${percent}`];
-                    let main = document.querySelector(`#${mho_watchtower_estim_id}`);
-                    let row = main.querySelector(`#${type}_${percent}`);
+                    const estimation = estimations.estimations[type][`_${percent}`];
+                    const main = document.querySelector(`#${mho_watchtower_estim_id}`);
+                    const row = main.querySelector(`#${type}_${percent}`);
                     row.style.fontWeight = 'normal';
                     row.style.color = 'unset';
-                    let start = row.querySelector(`.start`);
+                    const start = row.querySelector('.start');
                     start.innerText = estimation?.min || '';
-                    let end = row.querySelector(`.end`);
+                    const end = row.querySelector('.end');
                     end.innerText = estimation?.max || '';
                 };
-                let updateCalculatedAttackRow = (estimations, type) => {
-                    let main = document.querySelector(`#${mho_watchtower_estim_id}`);
-                    let block = main.querySelector(`#${type}`);
+                const updateCalculatedAttackRow = (estimations, type) => {
+                    const main = document.querySelector(`#${mho_watchtower_estim_id}`);
+                    const block = main.querySelector(`#${type}`);
                     if (block) {
-                        let header = block.querySelector(`h5`);
-                        let calc_block = header.lastElementChild;
-                        let calc_attack = calc_block.querySelector('.attack').lastElementChild;
+                        const header = block.querySelector('h5');
+                        const calc_block = header.lastElementChild;
+                        const calc_attack = calc_block.querySelector('.attack').lastElementChild;
                         if (type === 'estim') {
                             if (calc_attack) {
                                 calc_attack.firstElementChild.innerText = estimations.today_attack.result.min;
@@ -10187,24 +11938,24 @@
                     estim_block.style.padding = '0.25em';
                     estim_block.style.border = '1px solid #ddab76';
                     estim_block.id = mho_watchtower_estim_id;
-                    let estim_block_title = document.createElement('h5');
+                    const estim_block_title = document.createElement('h5');
                     estim_block_title.style.margin = '0 0 0.5em';
                     estim_block_title.style.display = 'flex';
                     estim_block_title.style.gap = '0.5em';
                     estim_block_title.style.alignItems = 'center';
                     estim_block.appendChild(estim_block_title);
-                    let estim_block_title_mho_img = document.createElement('img');
+                    const estim_block_title_mho_img = document.createElement('img');
                     estim_block_title_mho_img.src = mh_optimizer_icon;
                     estim_block_title_mho_img.style.height = '24px';
                     estim_block_title.appendChild(estim_block_title_mho_img);
-                    let estim_block_title_text = document.createElement('text');
+                    const estim_block_title_text = document.createElement('text');
                     estim_block_title_text.style.flex = '1';
                     estim_block_title_text.innerText = getScriptInfo().name;
                     estim_block_title.appendChild(estim_block_title_text);
-                    let estim_block_title_save_button = document.createElement('button');
+                    const estim_block_title_save_button = document.createElement('button');
                     estim_block_title_save_button.style.flex = '0';
                     estim_block_title_save_button.style.margin = '0';
-                    estim_block_title_save_button.innerText = `💾`;
+                    estim_block_title_save_button.innerText = '💾';
                     estim_block_title_save_button.title = getI18N(texts.save);
                     estim_block_title.appendChild(estim_block_title_save_button);
                     estim_block_title_save_button.addEventListener('click', () => {
@@ -10237,7 +11988,7 @@
                             });
                         });
                     });
-                    let estim_block_title_share_button = document.createElement('button');
+                    const estim_block_title_share_button = document.createElement('button');
                     estim_block_title_share_button.style.flex = '0';
                     estim_block_title_share_button.style.margin = '0';
                     estim_block_title_share_button.style.whiteSpace = 'nowrap';
@@ -10277,47 +12028,47 @@
                         });
                     });
                     small_note.parentElement.insertBefore(estim_block, small_note);
-                    let estim_block_content = document.createElement('div');
+                    const estim_block_content = document.createElement('div');
                     estim_block_content.style.display = 'flex';
                     estim_block_content.style.flexWrap = 'wrap';
                     estim_block_content.style.justifyContent = 'space-around';
                     estim_block.appendChild(estim_block_content);
-                    let estim_values_block = document.createElement('div');
+                    const estim_values_block = document.createElement('div');
                     estim_values_block.id = 'estim';
                     estim_block_content.appendChild(estim_values_block);
-                    let estim_values_block_title = document.createElement('h5');
+                    const estim_values_block_title = document.createElement('h5');
                     estim_values_block_title.style.marginTop = '0.25em';
-                    let estim_values_block_title_title = document.createElement('div');
+                    const estim_values_block_title_title = document.createElement('div');
                     estim_values_block_title_title.innerText = getI18N(texts.estim_title);
                     estim_values_block_title.appendChild(estim_values_block_title_title);
-                    let estim_values_block_title_calculated = document.createElement('div');
-                    let estim_values_block_title_calculated_text = createCalculatedAttackRow(estimations.today_attack);
+                    const estim_values_block_title_calculated = document.createElement('div');
+                    const estim_values_block_title_calculated_text = createCalculatedAttackRow(estimations.today_attack);
                     estim_values_block_title_calculated.innerHTML = estim_values_block_title_calculated_text;
                     estim_values_block_title.appendChild(estim_values_block_title_calculated);
                     estim_values_block.appendChild(estim_values_block_title);
                     TDG_VALUES.forEach((value) => {
-                        let saved_estimation = estimations.estimations.estim['_' + value] ? {
+                        const saved_estimation = estimations.estimations.estim['_' + value] ? {
                             min: estimations.estimations.estim['_' + value].min,
                             max: estimations.estimations.estim['_' + value].max
                         } : undefined;
                         if (!estimations.estimations.estim['_' + value]) {
                             /** Workaround pour définir sur l'extension firefox sans passer par cloneinto */
-                            let new_estimations = { ...estimations };
-                            let new_estimations_estimations = { ...new_estimations.estimations };
-                            let new_estimations_estimations_estim = { ...new_estimations_estimations.estim };
+                            const new_estimations = { ...estimations };
+                            const new_estimations_estimations = { ...new_estimations.estimations };
+                            const new_estimations_estimations_estim = { ...new_estimations_estimations.estim };
                             new_estimations_estimations_estim['_' + value] = { min: null, max: null };
                             new_estimations_estimations.estim = { ...new_estimations_estimations_estim };
                             new_estimations.estimations = { ...new_estimations_estimations };
                             estimations = { ...new_estimations };
                         }
-                        let value_block = document.createElement('div');
+                        const value_block = document.createElement('div');
                         value_block.style.display = 'flex';
                         value_block.style.justifyContent = 'space-between';
                         value_block.style.gap = '1em';
                         estim_values_block.appendChild(value_block);
-                        let estimation = estimations.estimations.estim['_' + value];
+                        const estimation = estimations.estimations.estim['_' + value];
                         if (current_estimation_percent === value) {
-                            let current_estimation_value = {
+                            const current_estimation_value = {
                                 min: watchtower_estim_block_prediction.split(' ')[0],
                                 max: watchtower_estim_block_prediction.split(' ')[2]
                             };
@@ -10330,42 +12081,42 @@
                         value_block.innerHTML = createEstimationRow(value, is_new_estimation, estimation, 'estim');
                     });
                     if (watchtower_planif_block && watchtower_planif_block_prediction) {
-                        let planif_values_block = document.createElement('div');
+                        const planif_values_block = document.createElement('div');
                         planif_values_block.id = 'planif';
                         estim_block_content.appendChild(planif_values_block);
-                        let planif_values_block_title = document.createElement('h5');
+                        const planif_values_block_title = document.createElement('h5');
                         planif_values_block_title.style.marginTop = '0.25em';
-                        let planif_values_block_title_title = document.createElement('div');
+                        const planif_values_block_title_title = document.createElement('div');
                         planif_values_block_title_title.innerText = getI18N(texts.planif_title);
                         planif_values_block_title.appendChild(planif_values_block_title_title);
-                        let planif_values_block_title_calculated = document.createElement('div');
-                        let planif_values_block_title_calculated_text = createCalculatedAttackRow(estimations.tomorrow_attack);
+                        const planif_values_block_title_calculated = document.createElement('div');
+                        const planif_values_block_title_calculated_text = createCalculatedAttackRow(estimations.tomorrow_attack);
                         planif_values_block_title_calculated.innerHTML = planif_values_block_title_calculated_text;
                         planif_values_block_title.appendChild(planif_values_block_title_calculated);
                         planif_values_block.appendChild(planif_values_block_title);
                         PLANIF_VALUES.forEach((value) => {
-                            let saved_estimation = estimations.estimations.planif['_' + value] ? {
+                            const saved_estimation = estimations.estimations.planif['_' + value] ? {
                                 min: estimations.estimations.planif['_' + value].min,
                                 max: estimations.estimations.planif['_' + value].max
                             } : undefined;
                             if (!estimations.estimations.planif['_' + value]) {
                                 /** Workaround pour définir sur l'extension firefox sans passer par cloneinto */
-                                let new_estimations = { ...estimations };
-                                let new_estimations_estimations = { ...new_estimations.estimations };
-                                let new_estimations_estimations_planif = { ...new_estimations_estimations.planif };
+                                const new_estimations = { ...estimations };
+                                const new_estimations_estimations = { ...new_estimations.estimations };
+                                const new_estimations_estimations_planif = { ...new_estimations_estimations.planif };
                                 new_estimations_estimations_planif['_' + value] = { min: null, max: null };
                                 new_estimations_estimations.planif = { ...new_estimations_estimations_planif };
                                 new_estimations.estimations = { ...new_estimations_estimations };
                                 estimations = { ...new_estimations };
                             }
-                            let value_block = document.createElement('div');
+                            const value_block = document.createElement('div');
                             value_block.style.display = 'flex';
                             value_block.style.justifyContent = 'space-between';
                             value_block.style.gap = '1em';
                             planif_values_block.appendChild(value_block);
-                            let estimation = estimations.estimations.planif['_' + value];
+                            const estimation = estimations.estimations.planif['_' + value];
                             if (current_planif_percent === value) {
-                                let current_estimation_value = {
+                                const current_estimation_value = {
                                     min: watchtower_planif_block_prediction.split(' ')[0],
                                     max: watchtower_planif_block_prediction.split(' ')[2]
                                 };
@@ -10384,16 +12135,16 @@
     }
 
     function notifyOnSearchEnd() {
-        let interval = setInterval(() => {
+        const interval = setInterval(() => {
             if (state.mho_parameters.notify_on_search_end && pageIsDesert()) {
-                let count = document.querySelector('span[x-countdown-to]');
+                const count = document.querySelector('span[x-countdown-to]');
                 if (count) {
                     clearInterval(interval);
-                    let countdown_array = count.innerText.split(':');
+                    const countdown_array = count.innerText.split(':');
                     if (countdown_array.length < 3) {
                         countdown_array.splice(0, 0, 0);
                     }
-                    let countdown = (+countdown_array[0] * 60 * 60) + (+countdown_array[1] * 60) + (+countdown_array[2]);
+                    const countdown = (+countdown_array[0] * 60 * 60) + (+countdown_array[1] * 60) + (+countdown_array[2]);
                     if (countdown < 5) {
                         if (!pageIsTown()) {
                             createNotification(getI18N(texts.search_ended));
@@ -10405,7 +12156,7 @@
                         }, 10000);
                     }
                     else {
-                        let timeout_counter = countdown / 2 * 1000;
+                        const timeout_counter = countdown / 2 * 1000;
                         setTimeout(() => {
                             clearInterval(interval);
                             notifyOnSearchEnd();
@@ -10428,89 +12179,107 @@
                 }, 100);
             }
             else {
-                let zone_dist = document.querySelectorAll(`.zone-dist:not(#${zone_info_zombies_id})`)[0];
+                const zone_dist = document.querySelectorAll(`.zone-dist:not(#${zone_info_zombies_id})`)[0];
                 if (zone_dist) {
                     let zone_info_zombies = document.getElementById(zone_info_zombies_id);
-                    let nb_dead_zombies = document.querySelectorAll('.splatter').length;
-                    let despair_deaths = calculateDespairDeaths(nb_dead_zombies);
+                    const nb_dead_zombies = document.querySelectorAll('.splatter').length;
+                    const despair_deaths = calculateDespairDeaths(nb_dead_zombies);
                     if (!zone_info_zombies) {
                         zone_info_zombies = document.createElement('div');
                         zone_info_zombies.id = zone_info_zombies_id;
                         zone_info_zombies.classList.add('row', 'zone-dist');
-                        let content_info_zombie = document.createElement('div');
+                        const content_info_zombie = document.createElement('div');
                         content_info_zombie.style.display = 'flex';
                         content_info_zombie.classList.add('cell', 'rw-12', 'center');
                         zone_info_zombies.appendChild(content_info_zombie);
-                        let btn_mho_img = document.createElement('img');
+                        const btn_mho_img = document.createElement('img');
                         btn_mho_img.src = mh_optimizer_icon;
                         btn_mho_img.style.height = '16px';
                         btn_mho_img.style.margin = 'auto 0.25em';
                         content_info_zombie.appendChild(btn_mho_img);
-                        let rows_container_info_zombies = document.createElement('div');
+                        const rows_container_info_zombies = document.createElement('div');
                         rows_container_info_zombies.style.margin = 'auto 0.25em';
                         content_info_zombie.appendChild(rows_container_info_zombies);
-                        let nb_dead_zombies_text = document.createElement('div');
+                        const nb_dead_zombies_text = document.createElement('div');
                         nb_dead_zombies_text.innerHTML = `${getI18N(texts.nb_dead_zombies)} : <b id="${nb_dead_zombies_id}">${nb_dead_zombies}</span>`;
                         rows_container_info_zombies.appendChild(nb_dead_zombies_text);
-                        let despair_deaths_text = document.createElement('div');
+                        const despair_deaths_text = document.createElement('div');
                         despair_deaths_text.innerHTML = `${getI18N(texts.nb_despair_deaths)} : <b id="${despair_deaths_id}">${despair_deaths}</span>`;
                         rows_container_info_zombies.appendChild(despair_deaths_text);
                         zone_dist.parentNode.appendChild(zone_info_zombies);
                     }
                     else {
-                        let nb_dead_zombies_element = document.getElementById(nb_dead_zombies_id);
+                        const nb_dead_zombies_element = document.getElementById(nb_dead_zombies_id);
                         nb_dead_zombies_element.innerText = (nb_dead_zombies);
-                        let despair_deaths_element = document.getElementById(despair_deaths_id);
+                        const despair_deaths_element = document.getElementById(despair_deaths_id);
                         despair_deaths_element.innerText = (despair_deaths);
                     }
                 }
             }
         }
         else {
-            let zone_info_zombies = document.getElementById(zone_info_zombies_id);
+            const zone_info_zombies = document.getElementById(zone_info_zombies_id);
             if (zone_info_zombies) {
                 zone_info_zombies.remove();
             }
         }
     }
 
+    /**
+     * Exécute une initialisation en isolant ses erreurs : une fonctionnalité qui
+     * casse (état incomplet, DOM inattendu, backend injoignable) ne doit jamais
+     * empêcher les suivantes de s'afficher.
+     */
+    function runSafely(init) {
+        try {
+            init();
+        }
+        catch (error) {
+            console.error(`MHO - initialisation en échec : ${init.name || 'anonyme'}`, error);
+        }
+    }
     function initOptionsWithLoginNeeded() {
-        displayWishlistInApp();
-        displayPriorityOnItems();
-        createUpdateExternalToolsButton();
-        createExpeditionsBtn();
-        setTimeout(() => {
-            displayCellDetailsOnPage();
-        }, 500);
-        displayEstimationsOnWatchtower();
+        [
+            displayWishlistInApp,
+            displayPriorityOnItems,
+            createUpdateExternalToolsButton,
+            createExpeditionsBtn,
+            displayEstimationsOnWatchtower
+        ].forEach(runSafely);
+        setTimeout(() => runSafely(displayCellDetailsOnPage), 500);
     }
     function initOptionsWithoutLoginNeeded() {
-        createWikiToolsWindow();
-        preventFromLeaving();
-        alertIfInactiveAndNoEscort();
-        displaySearchFields();
-        displayMinApOnBuildings();
-        setTimeout(() => {
-            displayNbDeadZombies();
-        }, 250);
-        displayAdvancedTooltips();
-        displayTranslateTool();
-        displayCampingPredict();
-        displayAntiAbuseCounter();
-        automaticallyOpenBag();
-        addCopyRegistryButton();
-        changeDefaultEscortOptions();
-        displayGhoulVoracityPercent();
-        addExternalLinksToProfiles();
-        // createDisplayMapButton();
-        fillItemsMessages();
-        displayCountCharacters();
-        createStoreNotificationsBtn();
-        addExternalLinksToTowns();
-        addExternalLinksColumnToWelcomeTowns();
-        sortCitizenList();
-        sortOmniscienceList();
-        // blockUsersPosts();
+        [
+            createWikiToolsWindow,
+            preventFromLeaving,
+            alertIfInactiveAndNoEscort,
+            displaySearchFields,
+            displayMinApOnBuildings,
+            displayAdvancedTooltips,
+            displayTranslateTool,
+            displayCampingPredict,
+            displayAntiAbuseCounter,
+            automaticallyOpenBag,
+            addCopyRegistryButton,
+            changeDefaultEscortOptions,
+            displayGhoulVoracityPercent,
+            freezeAvatarsAnimations,
+            addExternalLinksToProfiles,
+            // createDisplayMapButton,
+            fillItemsMessages,
+            displayCountCharacters,
+            createStoreNotificationsBtn,
+            addExternalLinksToTowns,
+            addExternalLinksColumnToWelcomeTowns,
+            sortCitizenList,
+            sortOmniscienceList,
+            sortNightwatchList,
+            sortTrapList,
+            sortDumpList,
+            styleForumThreadTitles
+            // blockUsersPosts
+        ].forEach(runSafely);
+        setTimeout(() => runSafely(displayNbDeadZombies), 250);
     }
     function updateFetchRequestOptions(options) {
         const update = { ...options };
@@ -10554,7 +12323,7 @@
     function getApiKey() {
         return new Promise((resolve, reject) => {
             if (!state.external_app_id || state.external_app_id === '') {
-                fetcherWithoutBearer(location.origin + `/jx/soul/settings`, {
+                fetcherWithoutBearer(`${location.origin}/jx/soul/settings`, {
                     method: 'POST',
                     body: JSON.stringify({}),
                     headers: {
@@ -10573,23 +12342,25 @@
                     }
                 })
                     .then((response) => {
-                    let manual = () => {
-                        if (document.querySelector('.soul')) {
-                            let manual_app_id_key = prompt(getI18N(texts.manually_add_app_id_key));
-                            if (manual_app_id_key) {
-                                state.external_app_id = manual_app_id_key;
-                                setStorageItem(gm_mh_external_app_id_key, state.external_app_id);
-                                resolve(state.external_app_id);
-                            }
-                            else {
-                                reject(response);
-                            }
+                    const manual = () => {
+                        if (!document.querySelector('.soul')) {
+                            reject(response);
+                            return;
+                        }
+                        const manual_app_id_key = prompt(getI18N(texts.manually_add_app_id_key));
+                        if (manual_app_id_key) {
+                            state.external_app_id = manual_app_id_key;
+                            setStorageItem(gm_mh_external_app_id_key, state.external_app_id);
+                            resolve(state.external_app_id);
+                        }
+                        else {
+                            reject(response);
                         }
                     };
-                    let temp_body = document.createElement('body');
+                    const temp_body = document.createElement('body');
                     if (response) {
                         temp_body.innerHTML = response;
-                        let id = temp_body.querySelector('#app_ext');
+                        const id = temp_body.querySelector('#app_ext');
                         if (id && id !== '' && id !== 'not set' && id.value && id.value !== '' && id.value !== 'not set') {
                             state.external_app_id = id.value;
                             setStorageItem(gm_mh_external_app_id_key, state.external_app_id);
@@ -10639,37 +12410,39 @@
 
     // Runs once at script load: resolves environment URLs and restores
     // persisted state (parameters, cached user/token) from storage.
-    function bootstrap() {
+    // La promesse doit être attendue avant toute initialisation : de nombreuses
+    // fonctions déréférencent directement `state.mho_parameters`.
+    async function bootstrap() {
         if (is_mh_beta) {
-            state.website = `https://myhordes-optimizer-beta.web.app/`;
-            state.api_url = `https://api.myhordesoptimizer.fr/beta`;
+            state.website = 'https://myhordes-optimizer-beta.web.app/';
+            state.api_url = 'https://api.myhordesoptimizer.fr/beta';
         }
         else if (is_mh_local) {
-            state.website = `http://localhost:4200/`;
-            state.api_url = `http://localhost:5001`;
+            state.website = 'http://localhost:4200/';
+            state.api_url = 'http://localhost:5001';
         }
         else {
-            state.website = `https://myhordes-optimizer.web.app/`;
-            state.api_url = `https://api.myhordesoptimizer.fr`;
+            state.website = 'https://myhordes-optimizer.web.app/';
+            state.api_url = 'https://api.myhordesoptimizer.fr';
         }
-        getStorageItem(mho_parameters_key).then((params) => {
-            state.mho_parameters = params || {};
-        });
-        getStorageItem(mh_user_key).then((user) => {
-            state.mh_user = user;
-        });
-        getStorageItem(gm_mh_external_app_id_key).then((app_id) => {
-            state.external_app_id = app_id;
-        });
-        getStorageItem(mho_token_key).then((saved_token) => {
-            state.token = saved_token;
-        });
+        // Valeur par défaut immédiate : le reste du script suppose l'objet toujours défini
+        state.mho_parameters = {};
+        const [params, user, app_id, saved_token] = await Promise.all([
+            getStorageItem(mho_parameters_key),
+            getStorageItem(mh_user_key),
+            getStorageItem(gm_mh_external_app_id_key),
+            getStorageItem(mho_token_key)
+        ]);
+        state.mho_parameters = params || {};
+        state.mh_user = user;
+        state.external_app_id = app_id;
+        state.token = saved_token;
     }
 
     function createCopyButton(source, map, map_id, button_block_id) {
-        let copy_button_parent = document.getElementById(button_block_id);
-        let copy_button = document.createElement('button');
-        let copyText = (text, add) => {
+        const copy_button_parent = document.getElementById(button_block_id);
+        const copy_button = document.createElement('button');
+        const copyText = (text, add) => {
             return `<img src="${mh_optimizer_icon}" style="margin: auto; vertical-align: middle;" width="20" height="20"><span style="margin: auto; vertical-align: middle;">${text}<br /><small>${add}</small></span>`;
         };
         copy_button.setAttribute('style', 'max-width: initial; float: right');
@@ -10703,31 +12476,31 @@
     function createOptimizerBtn() {
         const apps_exists_callback = function (appsExistsMutationsList, observer) {
             for (const appsExistsMutation of appsExistsMutationsList) {
-                let apps_block = document.querySelector('.app-directory');
+                const apps_block = document.querySelector('.app-directory');
                 if (appsExistsMutation.type === 'childList' && apps_block) {
                     let optimizer_btn = buttonOptimizerElement();
                     if (!optimizer_btn) {
-                        let content_zone = document.getElementById(mh_content_id);
-                        let img = document.createElement('img');
-                        let annuary = apps_block.querySelector('img');
+                        const content_zone = document.getElementById(mh_content_id);
+                        const img = document.createElement('img');
+                        const annuary = apps_block.querySelector('img');
                         img.src = mh_optimizer_icon;
                         img.setAttribute('height', annuary && annuary.height ? annuary.height + 'px' : '16px');
                         img.setAttribute('width', annuary && annuary.width ? annuary.width + 'px' : '16px');
                         img.style.margin = '1px 0 2px';
-                        let title_hidden = document.createElement('span');
+                        const title_hidden = document.createElement('span');
                         title_hidden.classList.add('label_text');
                         title_hidden.innerText = getScriptInfo().name;
-                        let title = document.createElement('h1');
-                        let title_first_part = document.createElement('div');
+                        const title = document.createElement('h1');
+                        const title_first_part = document.createElement('div');
                         title_first_part.style.display = 'flex';
                         title_first_part.style.alignItems = 'center';
                         title.appendChild(title_first_part);
-                        let title_second_part = document.createElement('div');
+                        const title_second_part = document.createElement('div');
                         title_second_part.style.display = 'flex';
                         title_second_part.style.alignItems = 'center';
                         title_second_part.style.gap = '0.5em';
                         title.appendChild(title_second_part);
-                        let website_link = document.createElement('a');
+                        const website_link = document.createElement('a');
                         website_link.innerHTML = `<img src="${repo_img_hordes_url}icons/small_world.gif" style="vertical-align: top; margin-right: 0.25em;">${getI18N(texts.website)}`;
                         website_link.href = state.website;
                         website_link.target = '_blank';
@@ -10735,8 +12508,8 @@
                         title_second_part.appendChild(website_link);
                         title_first_part.appendChild(img);
                         title_first_part.appendChild(title_hidden);
-                        let mhe_button = document.querySelector('#mhe_button');
-                        let left_position = mhe_button ? (mhe_button.offsetLeft + mhe_button.offsetWidth + 5) : apps_block?.getBoundingClientRect().width + (annuary && annuary.height ? annuary.height : 34);
+                        const mhe_button = document.querySelector('#mhe_button');
+                        const left_position = mhe_button ? (mhe_button.offsetLeft + mhe_button.offsetWidth + 5) : apps_block?.getBoundingClientRect().width + (annuary && annuary.height ? annuary.height : 34);
                         optimizer_btn = document.createElement('div');
                         optimizer_btn.id = btn_id;
                         optimizer_btn.setAttribute('style', 'left: ' + left_position + 'px');
@@ -10745,7 +12518,7 @@
                             event.stopPropagation();
                         });
                         if (isTouchScreen()) {
-                            let close_link = document.createElement('img');
+                            const close_link = document.createElement('img');
                             close_link.src = `${repo_img_hordes_url}icons/b_close.png`;
                             close_link.classList.add('close');
                             title_second_part.appendChild(close_link);
@@ -10768,7 +12541,7 @@
                             });
                         }
                         content_zone.appendChild(optimizer_btn);
-                        let mho_content_zone = document.createElement('div');
+                        const mho_content_zone = document.createElement('div');
                         mho_content_zone.id = content_btn_id;
                         content_zone.appendChild(mho_content_zone);
                         createOptimizerButtonContent();
@@ -10783,27 +12556,27 @@
     }
     /** Crée le contenu du bouton de l'optimizer (bouton de wiki, bouton de configuration, etc) */
     function createOptimizerButtonContent() {
-        let optimizer_btn = buttonOptimizerElement();
-        let content = document.getElementById(content_btn_id);
+        const optimizer_btn = buttonOptimizerElement();
+        const content = document.getElementById(content_btn_id);
         content.innerHTML = '';
         optimizer_btn.appendChild(content);
         if (state.external_app_id) {
             /////////////////////
             // SECTION BOUTONS //
             /////////////////////
-            let btn_content = document.createElement('div');
+            const btn_content = document.createElement('div');
             btn_content.style.display = 'flex';
             btn_content.style.gap = '0.5em';
             btn_content.style.alignItems = 'center';
             content.appendChild(btn_content);
-            let wiki_btn = document.createElement('a');
+            const wiki_btn = document.createElement('a');
             wiki_btn.classList.add('button', 'mho-parameters-btn');
             wiki_btn.innerText = 'Wiki';
             wiki_btn.addEventListener('click', () => {
                 displayWindow('wiki');
             });
             btn_content.appendChild(wiki_btn);
-            let tools_btn = document.createElement('a');
+            const tools_btn = document.createElement('a');
             tools_btn.classList.add('button', 'mho-parameters-btn');
             tools_btn.innerText = getI18N(texts.tools_btn_label);
             tools_btn.addEventListener('click', () => {
@@ -10817,17 +12590,17 @@
             //////////////////////////
             // SECTION INFORMATIONS //
             //////////////////////////
-            let informations_title = document.createElement('h5');
+            const informations_title = document.createElement('h5');
             informations_title.innerText = getI18N(texts.informations_section_label);
-            let informations_list = document.createElement('ul');
-            let informations_container = document.createElement('div');
+            const informations_list = document.createElement('ul');
+            const informations_container = document.createElement('div');
             informations_container.id = 'informations';
             informations_container.appendChild(informations_title);
             informations_container.appendChild(informations_list);
             informations.forEach((information) => {
-                let information_link = document.createElement('a');
+                const information_link = document.createElement('a');
                 information_link.id = information.id;
-                information_link.innerHTML = (information.img ? `<img src="${information.img.startsWith('http') ? information.img : repo_img_hordes_url + information.img}" style="margin: 0 4px 0 3px; width: 16px">` : ``) + `<span class=small>${getI18N(information.label)}</span>`;
+                information_link.innerHTML = (information.img ? `<img src="${information.img.startsWith('http') ? information.img : repo_img_hordes_url + information.img}" style="margin: 0 4px 0 3px; width: 16px">` : '') + `<span class=small>${getI18N(information.label)}</span>`;
                 information_link.href = information.src;
                 information_link.target = '_blank';
                 if (!information.src) {
@@ -10836,7 +12609,7 @@
                         information.action();
                     });
                 }
-                let information_container = document.createElement('li');
+                const information_container = document.createElement('li');
                 information_container.appendChild(information_link);
                 informations_list.appendChild(information_container);
                 if (information.display && !information.display()) {
@@ -10848,17 +12621,17 @@
             isScriptVersionLastVersion();
         }
         else {
-            let no_external_app_id = document.createElement('div');
+            const no_external_app_id = document.createElement('div');
             no_external_app_id.innerHTML = getI18N(texts.external_app_id_help);
             content.appendChild(no_external_app_id);
         }
     }
 
     function createMhoHeaderSpace() {
-        let mh_header = document.querySelector('#header');
+        const mh_header = document.querySelector('#header');
         if (!mh_header)
             return;
-        let postbox = document.querySelector('#postbox');
+        const postbox = document.querySelector('#postbox');
         if (!postbox)
             return;
         let header_space = document.querySelector(`#${mho_header_space_id}`);
@@ -10885,7 +12658,7 @@
         observer.observe(postbox, config);
     }
 
-    const styleTemplate = "@charset \"UTF-8\";\n/*\n * Tokens remplacés au runtime par createStyles.ts à partir de config/constants.ts :\n *   __BTN_ID__, __MH_OPTIMIZER_MAP_WINDOW_ID__, __MHO_DISPLAY_EXPEDITIONS_ID__,\n *   __MHO_DISPLAY_MAP_ID__, __MHO_STORE_NOTIFICATIONS_ID__, __REPO_IMG_HORDES_URL__\n */\n.param-has-children > div::after {\n  content: \"▶︎\";\n  margin-left: auto;\n}\n\n#__BTN_ID__ {\n  background-color: #5c2b20;\n  border: 1px solid #f0d79e;\n  outline: 1px solid #000;\n  position: absolute;\n  top: 10px;\n  z-index: 997;\n}\n\n#__BTN_ID__.mho-btn-opened h1 span, #__BTN_ID__.mho-btn-opened h1 a, #__BTN_ID__.mho-btn-opened h1 img.close {\n  display: inline;\n}\n\n#__BTN_ID__.mho-btn-opened div {\n  display: block;\n}\n\n#__BTN_ID__ h1 {\n  height: auto;\n  font-size: 8pt;\n  text-transform: none;\n  font-variant: small-caps;\n  background: none;\n  cursor: help;\n  margin: 0 5px;\n  padding: 0;\n  line-height: 17px;\n  color: #f0d79e;\n  display: flex;\n  justify-content: space-between;\n  align-items: center;\n}\n\n#__BTN_ID__ h1 > div > img {\n  vertical-align: -9%;\n}\n\n#__BTN_ID__.mho-btn-opened h1 {\n  border-bottom: 1px solid #b37c4a;\n  margin-bottom: 5px;\n}\n\n#__BTN_ID__ h1 span, #__BTN_ID__ h1 a, #__BTN_ID__ h1 img.close {\n  color: #f0d79e;\n  cursor: help;\n  font-family: Trebuchet MS, Arial, Verdana, sans-serif;\n  letter-spacing: 1px;\n  line-height: 17px;\n  text-align: left;\n  text-transform: none;\n  margin-left: 1em;\n  display: none;\n}\n\n#__BTN_ID__ > div {\n  display: none;\n  margin: 0 5px 8px 5px;\n  font-size: 0.9em;\n  width: 350px;\n}\n\n#__BTN_ID__ .mho-parameters-btn {\n  margin-top: 0;\n  text-align: center;\n  display: block;\n}\n\n.mho-window {\n  opacity: 1;\n  transition: opacity 1s ease;\n  z-index: 999;\n  padding: 0;\n  position: fixed;\n  min-width: 150px;\n  min-height: 150px;\n}\n\n.mho-window:not(.fullsize) .mho-window-box {\n  resize: both;\n  overflow: auto;\n}\n\n.mho-window.fullsize {\n  background: url(__REPO_IMG_HORDES_URL__background/mask.png);\n  height: 100%;\n  width: 100%;\n  resize: none;\n}\n\n.mho-window:not(.visible), #__MH_OPTIMIZER_MAP_WINDOW_ID__:not(.visible) {\n  opacity: 0;\n  pointer-events: none;\n}\n\n.mho-window:not(.visible) .mho-window-box, .mho-window:not(.visible) #__MH_OPTIMIZER_MAP_WINDOW_ID__-box {\n  transform: scale(0) translateY(1000px);\n}\n\n.mho-window .mho-window-box {\n  background: url(__REPO_IMG_HORDES_URL__background/bg_content2.jpg) repeat-y 0 0/900px 263px, url(__REPO_IMG_HORDES_URL__background/bg_content2.jpg) repeat-y 100% 0/900px 263px;\n  border-radius: 8px;\n  box-shadow: 0 0 10px #000;\n  display: flex;\n  flex-direction: row;\n  position: absolute;\n  top: 10px;\n  bottom: 10px;\n  right: 10px;\n  left: 10px;\n  transform: scale(1) translateY(0);\n  transition: transform 0.5s ease;\n}\n\n#__MH_OPTIMIZER_MAP_WINDOW_ID__ #__MH_OPTIMIZER_MAP_WINDOW_ID__-box {\n  background: url(__REPO_IMG_HORDES_URL__background/bg_content2.jpg) repeat-y 0 0/900px 263px, url(__REPO_IMG_HORDES_URL__background/bg_content2.jpg) repeat-y 100% 0/900px 263px;\n  border-radius: 8px;\n  box-shadow: 0 0 10px #000;\n  position: absolute;\n  transform: scale(1) translateY(0);\n  transition: transform 0.5s ease;\n  resize: both;\n  overflow: auto;\n  z-index: 9999;\n}\n\n.mho-window .mho-window-box .mho-window-overlay, #__MH_OPTIMIZER_MAP_WINDOW_ID__ #__MH_OPTIMIZER_MAP_WINDOW_ID__-box #__MH_OPTIMIZER_MAP_WINDOW_ID__-overlay {\n  position: absolute;\n  right: 6px;\n  top: 6px;\n  text-align: right;\n}\n\n.mho-window .mho-window-box .mho-window-overlay ul, #__MH_OPTIMIZER_MAP_WINDOW_ID__ #__MH_OPTIMIZER_MAP_WINDOW_ID__-box #__MH_OPTIMIZER_MAP_WINDOW_ID__-overlay ul {\n  margin: 2px;\n  padding: 0;\n}\n\n.mho-window .mho-window-box .mho-window-overlay ul li, #__MH_OPTIMIZER_MAP_WINDOW_ID__ #__MH_OPTIMIZER_MAP_WINDOW_ID__-box #__MH_OPTIMIZER_MAP_WINDOW_ID__-overlay ul li {\n  cursor: pointer;\n  display: inline-block;\n}\n\n.mho-window .mho-window-drag-handle {\n  width: 18px;\n  height: 100%;\n}\n\n.mho-window-content, #__MH_OPTIMIZER_MAP_WINDOW_ID__-content {\n  flex: 1;\n  color: #fff;\n  overflow: auto;\n  background: url(__REPO_IMG_HORDES_URL__background/box/panel_00.gif) 0 0 no-repeat, url(__REPO_IMG_HORDES_URL__background/box/panel_02.gif) 100% 0 no-repeat, url(__REPO_IMG_HORDES_URL__background/box/panel_20.gif) 0 100% no-repeat, url(__REPO_IMG_HORDES_URL__background/box/panel_22.gif) 100% 100% no-repeat, url(__REPO_IMG_HORDES_URL__background/box/panel_01.gif) 0 0 repeat-x, url(__REPO_IMG_HORDES_URL__background/box/panel_10.gif) 0 0 repeat-y, url(__REPO_IMG_HORDES_URL__background/box/panel_12.gif) 100% 0 repeat-y, url(__REPO_IMG_HORDES_URL__background/box/panel_21.gif) 0 100% repeat-x, #7e4d2a;\n  border-radius: 12px;\n  padding: 8px;\n}\n\ndiv.mho-new-changelog::before {\n  position: absolute;\n  top: -3px;\n  left: -3px;\n}\n\na.mho-new-changelog::before {\n  position: relative;\n  top: 0;\n  left: 0;\n}\n\n.mho-new-changelog::before {\n  content: \"\";\n  width: 6px;\n  aspect-ratio: 1;\n  background: #4B107B;\n  border-radius: 50%;\n  box-shadow: 0px 0px 6px 3px #BF61CF;\n  display: inline-block;\n}\n\ndiv.mho-new-version::before {\n  position: absolute;\n  top: -3px;\n  left: -3px;\n}\n\n.mho-new-version::before {\n  content: \"\";\n  width: 8px;\n  aspect-ratio: 1;\n  background: #BF61CF;\n  border-radius: 50%;\n  box-shadow: 0px 0px 8px 4px #4B107B;\n  display: inline-block;\n}\n\n#tabs {\n  color: #ddab76;\n  font-size: 1.2rem;\n  margin-bottom: 20px;\n  position: relative;\n  height: 25px;\n  order-bottom: 1px solid #ddab76;\n}\n\n#tabs ul {\n  display: flex;\n  flex-wrap: wrap;\n  padding: 0;\n  background: url(__REPO_IMG_HORDES_URL__background/tabs-header-plain.gif) 0 100% round;\n  background-size: cover;\n  height: 24px;\n  margin-top: 2px;\n  margin-right: 20px;\n  padding-left: 0.5em;\n}\n\n#tabs > ul > li {\n  cursor: pointer;\n  display: inline-block;\n  margin-top: auto;\n  margin-bottom: auto;\n}\n\n#tabs > ul > li > div > img {\n  margin-right: 0.5em;\n}\n\n#tabs > ul > li > div {\n  background-image: url(__REPO_IMG_HORDES_URL__background/tab.gif);\n  background-position: 0 0;\n  background-repeat: no-repeat;\n  border-left: 1px solid #694023;\n  border-right: 1px solid #694023;\n  color: #f0d79e;\n  cursor: pointer;\n  float: right;\n  font-family: Arial, sans-serif;\n  font-size: 1rem;\n  font-variant: small-caps;\n  height: 21px;\n  margin-left: 2px;\n  margin-right: 0;\n  margin-top: 3px;\n  padding: 2px 4px 0;\n  text-decoration: underline;\n  white-space: nowrap;\n}\n\n#tabs > ul > li > div:hover {\n  outline: 1px solid #f0d79e;\n  text-decoration: underline;\n}\n\n#tabs > ul > li.selected {\n  position: relative;\n  top: 2px;\n}\n\n.tab-content {\n  position: absolute;\n  bottom: 10px;\n  left: 28px;\n  right: 8px;\n  top: 40px;\n  overflow: auto;\n}\n\n.tab-content > ul {\n  display: flex;\n  flex-wrap: wrap;\n  padding: 0;\n  margin: 0 0.5em;\n}\n\n.tab-content > ul > li {\n  min-width: 300px;\n  flex-basis: min-content;\n  padding: 0.125em 0.5em;\n  margin: 0;\n}\n\n.tab-content > ul > li.selected {\n  flex-basis: 100%;\n  padding: 0.25em;\n  margin: 0.25em 1px;\n}\n\n.tab-content > ul > li:not(.selected) .properties {\n  display: none;\n}\n\n.tab-content > ul div.mho-category {\n  width: 100%;\n  border-bottom: 1px solid;\n  margin: 1em 0 0.5em;\n}\n\n#categories > ul, ul.parameters, #informations > ul {\n  padding: 0;\n  margin: 0;\n  color: #f0d79e;\n}\n\n#categories > ul > li, ul.parameters > li, .tab-content ul > li, #informations ul > li {\n  list-style: none;\n}\n\n.tab-content #recipes-list > li, .tab-content #notifications-list > li, #wishlist > li {\n  min-width: 100% !important;\n  display: flex;\n}\n\ninput.mho-input::-webkit-outer-spin-button, input.mho-input::-webkit-inner-spin-button {\n  -webkit-appearance: none;\n  margin: 0;\n}\n\ninput.mho-input[type=number] {\n  -moz-appearance: textfield;\n}\n\n.mho-table {\n  border-collapse: collapse;\n  border-bottom: 1px solid #ddab76;\n}\n\n.mho-header {\n  font-size: 10pt;\n  background: linear-gradient(0deg, #643b25 0, rgba(100, 59, 37, 0) 50%, rgba(100, 59, 37, 0)) !important;\n  border-bottom: 2px solid #f0d79e;\n  color: #fff;\n  font-family: Trebuchet MS, Arial, Verdana, sans-serif;\n  font-weight: 700;\n}\n\n.mho-table tr:not(.mho-header) {\n  background-color: #5c2b20;\n  border-bottom: 1px solid #7e4d2a;\n}\n\n.mho-table tr th, .mho-table tr td {\n  padding: 0.25em;\n}\n\n.mho-table tr td {\n  border-left: 1px solid #7e4d2a;\n  color: #f0d79e;\n  font-size: 9pt;\n}\n\n.label_text {\n  font-size: 1.2rem;\n  font-variant: small-caps;\n}\n\n.item-title {\n  display: flex;\n  justify-content: space-between;\n}\n\n.add-to-wishlist > button > img {\n  margin-right: 0;\n}\n\n.mho-advanced-tooltip {\n  margin-top: 0.5em;\n  border-top: 1px solid;\n  max-height: 400px;\n  overflow-y: auto;\n}\n\n.mho-advanced-tooltip > table.recipes, #item-list > li.selected > .properties > table.recipes {\n  border-collapse: collapse;\n  width: 100%;\n}\n\n.mho-advanced-tooltip > table.recipes > tr, #item-list > li.selected > .properties > table.recipes > tr {\n  border: dotted;\n  border-width: 1px 0;\n}\n\n.mho-advanced-tooltip > table.recipes > tr:first-child, #item-list > li.selected > .properties > table.recipes > tr:first-child {\n  border-top: none;\n}\n\n.mho-advanced-tooltip > table.recipes > tr:last-child, #item-list > li.selected > .properties > table.recipes > tr:last-child {\n  border-bottom: none;\n}\n\n.mho-advanced-tooltip > table.recipes > tr > td.items > div, #item-list > li.selected > .properties > table.recipes > tr > td.items > div {\n  display: flex;\n  gap: 0.5em;\n}\n\n.mho-advanced-tooltip > table.recipes > tr > td:not(.results), #item-list > li.selected > .properties > table.recipes > tr > td:not(.results) {\n  width: 0;\n}\n\n.mho-advanced-tooltip > table.recipes > tr > td.results > div, #item-list > li.selected > .properties > table.recipes > tr > td.results > div {\n  flex-wrap: wrap;\n}\n\ndiv.tooltip.item:has(table.recipes) > div:first-of-type {\n  width: 0 !important;\n  min-width: 100% !important;\n}\n\n.mho-advanced-tooltip > table.recipes > tr > td.items > div > .item, #item-list > li.selected > .properties > table.recipes > tr > td.items > div > .item {\n  background-color: #524053;\n  padding: 0.5em;\n  border-radius: 0.25em;\n  white-space: nowrap;\n  display: flex;\n  align-items: center;\n  gap: 0.25em;\n}\n\n.mho-advanced-tooltip > table.recipes > tr > td.items > div > .item.mho-recipe-provoking, #item-list > li.selected > .properties > table.recipes > tr > td.items > div > .item.mho-recipe-provoking {\n  border: 1px dashed #ddab76;\n}\n\ndiv.tooltip.item:has(table.recipes) {\n  min-width: 250px !important;\n  max-width: 400px !important;\n  width: auto !important;\n}\n\n.mho-frozen {\n  pointer-events: all !important;\n}\n\n.mho-shift-hint {\n  display: inline-flex;\n  align-items: center;\n  gap: 2px;\n  margin-right: 6px;\n  opacity: 0.6;\n  font-size: 0.75em;\n  white-space: nowrap;\n  flex-shrink: 0;\n}\n\nkbd.mho-shift-hint {\n  border: 1px solid #f0d79e;\n  border-radius: 3px;\n  padding: 0 3px;\n  font-family: inherit;\n  line-height: 1.4;\n  background: rgba(240, 215, 158, 0.15);\n}\n\nimg.mho-close-hint {\n  margin-top: -6px;\n}\n\n.mho-close-hint {\n  display: none;\n}\n\n.mho-frozen .mho-shift-hint {\n  display: none;\n}\n\n.mho-frozen .mho-close-hint {\n  display: initial;\n}\n\n.mho-tooltip-translations {\n  display: flex;\n  flex-direction: row;\n  gap: 0.5em;\n  flex-wrap: wrap;\n  align-items: start;\n  justify-content: start;\n  border-bottom: 1px solid;\n  margin: 0.25em 0;\n  padding: 0.25em 0;\n}\n\n.brown-tag {\n  display: flex;\n  flex-direction: row;\n  gap: 0.5em;\n  flex-wrap: nowrap;\n  align-items: center;\n  justify-content: center;\n  background-color: #5c2b20;\n  border-radius: 0.25em;\n  padding: 0.25em 0.5em;\n}\n\nul#item-list > li {\n  background-color: #5c2b20;\n  margin: 1px 1px;\n  padding: 0.25em 0.5em;\n}\n\n#wishlist .label {\n  width: calc(100% - 775px);\n  min-width: 200px;\n  padding: 0 4px;\n}\n\n#wishlist .mho-header, #wishlist > li {\n  padding: 0 8px;\n  margin: 0.125em 0;\n  width: 100%;\n}\n\n#wishlist .mho-header > div {\n  display: inline-block;\n  vertical-align: middle;\n}\n\n#wishlist .priority, #wishlist .depot, #wishlist .bank_count, #wishlist .bag_count, #wishlist .bank_needed, #wishlist .diff {\n  width: 125px;\n  padding: 0 4px;\n}\n\n#wishlist .delete {\n  width: 25px;\n  text-align: center;\n}\n\n#wishlist-section ul {\n  padding-left: 0;\n}\n\n#wishlist-section ul > li {\n  display: flex;\n  justify-content: space-between;\n}\n\n.tab-content #recipes-list > li:nth-child(even), .tab-content #notifications-list > li:nth-child(even), #wishlist > li:nth-child(even) {\n  background-color: #5c2b20;\n}\n\nli.item[class^=priority_in], li.item[class*=\" priority_in\"], img[class^=priority_in], img[class*=\" priority_in\"] {\n  box-shadow: inset 0 0 0.5em whitesmoke, 0 0 0.5em whitesmoke;\n}\n\nli.item[class^=priority_out], li.item[class*=\" priority_out\"], img[class^=priority_out], img[class*=\" priority_out\"] {\n  box-shadow: inset 0 0 1em darkslategrey, 0 0 1em darkslategrey;\n}\n\nli.item.priority_trash, img.priority_trash {\n  box-shadow: inset 0 0 0.5em black, 0 0 0.5em black;\n}\n\ndiv.item-tag-food::after {\n  background: url(__REPO_IMG_HORDES_URL__status/status_haseaten.gif) 50%/contain no-repeat;\n}\n\ndiv.item-tag-load::after {\n  background: url(__REPO_IMG_HORDES_URL__item/item_pile.gif) 50%/contain no-repeat;\n}\n\ndiv.item-tag-hero::after {\n  background: url(__REPO_IMG_HORDES_URL__icons/star.gif) 50%/contain no-repeat;\n}\n\ndiv.item-tag-alcohol::after {\n  background: url(__REPO_IMG_HORDES_URL__status/status_drunk.gif) 50%/contain no-repeat;\n}\n\ndiv.item-tag-drug::after {\n  background: url(__REPO_IMG_HORDES_URL__status/status_drugged.gif) 50%/contain no-repeat;\n}\n\ndiv.item-tag.mho-item-tag-no-img {\n  padding-left: 2px;\n}\n\n.mho-item-tag {\n  min-height: 18px !important;\n  height: unset !important;\n}\n\n#__MHO_DISPLAY_MAP_ID__, #__MHO_STORE_NOTIFICATIONS_ID__, #__MHO_DISPLAY_EXPEDITIONS_ID__ {\n  background-color: rgba(62, 36, 23, 0.75);\n  border-radius: 6px;\n  color: #ddab76;\n  cursor: pointer;\n  font-size: 10px;\n  padding: 3px 5px;\n  transition: background-color 0.5s ease-in-out;\n  display: flex;\n  gap: 0.5em;\n}\n\n.mho-map tr td {\n  border: 1px dotted;\n  width: 30px;\n  min-width: 30px;\n  height: 30px;\n  min-height: 30px;\n  text-align: center;\n  vertical-align: middle;\n}\n\n.mho-ruin tr td {\n  border: 1px dotted;\n  width: 25px;\n  min-width: 25px;\n  height: 25px;\n  min-height: 25px;\n  text-align: center;\n  vertical-align: middle;\n}\n\n.dotted-background {\n  background-image: -moz-linear-gradient(45deg, #444 25%, transparent 25%), -moz-linear-gradient(-45deg, #444 25%, transparent 25%), -moz-linear-gradient(45deg, transparent 75%, #444 75%), -moz-linear-gradient(-45deg, transparent 75%, #444 75%);\n  background-image: -webkit-gradient(linear, 0 100%, 100% 0, color-stop(0.25, #444), color-stop(0.25, transparent)), -webkit-gradient(linear, 0 0, 100% 100%, color-stop(0.25, #444), color-stop(0.25, transparent)), -webkit-gradient(linear, 0 100%, 100% 0, color-stop(0.75, transparent), color-stop(0.75, #444)), -webkit-gradient(linear, 0 0, 100% 100%, color-stop(0.75, transparent), color-stop(0.75, #444));\n  background-image: -webkit-linear-gradient(45deg, #444 25%, transparent 25%), -webkit-linear-gradient(-45deg, #444 25%, transparent 25%), -webkit-linear-gradient(45deg, transparent 75%, #444 75%), -webkit-linear-gradient(-45deg, transparent 75%, #444 75%);\n  background-image: -o-linear-gradient(45deg, #444 25%, transparent 25%), -o-linear-gradient(-45deg, #444 25%, transparent 25%), -o-linear-gradient(45deg, transparent 75%, #444 75%), -o-linear-gradient(-45deg, transparent 75%, #444 75%);\n  background-image: linear-gradient(45deg, #444 25%, transparent 25%), linear-gradient(-45deg, #444 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #444 75%), linear-gradient(-45deg, transparent 75%, #444 75%);\n  -moz-background-size: 2px 2px;\n  background-size: 2px 2px;\n  -webkit-background-size: 2px 2px; /* override value for webkit */\n  background-position: 0 0, 1px 0, 1px -1px, 0px 1px;\n}\n\n.empty-bat:before, .empty-bat:after {\n  position: absolute;\n  content: \"\";\n  background: black;\n  display: block;\n  width: 1px;\n  height: 25px;\n  -webkit-transform: rotate(-45deg);\n  transform: rotate(-45deg);\n  left: 0;\n  right: 0;\n  top: 0;\n  bottom: 0;\n  margin: auto;\n}\n\n.empty-bat:after {\n  -webkit-transform: rotate(45deg);\n  transform: rotate(45deg);\n}\n\n.spaced-label:after {\n  content: \" : \";\n}\n\n.mho-hidden {\n  display: none !important;\n}\n\n.mho-sort-arrow {\n  display: inline-block;\n  margin-left: 2px;\n  opacity: 0.4;\n  font-size: 10px;\n  cursor: pointer;\n  user-select: none;\n  transition: opacity 0.15s;\n}\n\n.mho-sortable-cell {\n  cursor: pointer;\n  white-space: nowrap;\n}\n\n.mho-checkbox-dropdown-panel {\n  display: none;\n  position: absolute;\n  top: 100%;\n  left: 0;\n  z-index: 10;\n  max-height: 200px;\n  overflow-y: auto;\n  padding: 4px;\n  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);\n}\n.mho-checkbox-dropdown-panel > div {\n  display: flex;\n  align-items: center;\n  gap: 4px;\n  white-space: nowrap;\n}\n\n.mho-dropdown-toggle {\n  max-width: 200px;\n}\n\n#mho-filter-omniscience-stars {\n  min-width: 100px;\n}\n\n#mho-filter-omniscience-online, #mho-filter-citizen-list-online {\n  max-width: 60px;\n}\n\n.mho-filter-bar {\n  display: flex;\n  flex-wrap: wrap;\n  gap: 0.5em;\n  margin-bottom: 0.5em;\n  align-items: flex-end;\n}\n\n.mho-filter-field {\n  display: flex;\n  flex-direction: column;\n  gap: 2px;\n  position: relative;\n}\n.mho-filter-field:has(.mho-checkbox-dropdown-panel) {\n  min-width: 65px;\n}\n\n.mho-filter-label {\n  display: block !important;\n  width: 100%;\n  font-size: 0.8em;\n}\n\n.mho-search-wrapper {\n  position: relative;\n}\n\n.mho-search-input {\n  padding-left: 24px;\n  margin-bottom: 0;\n}\n\n.mho-search-icon {\n  height: 24px;\n  position: absolute;\n  left: 0;\n  top: 50%;\n  transform: translateY(-50%);\n}\n\n.mho-changelog-modal-overlay {\n  position: fixed;\n  inset: 0;\n  z-index: 10000;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  background: rgba(0, 0, 0, 0.65);\n}\n\n.mho-changelog-modal-box {\n  background: url(__REPO_IMG_HORDES_URL__background/box/panel_00.gif) 0 0 no-repeat, url(__REPO_IMG_HORDES_URL__background/box/panel_02.gif) 100% 0 no-repeat, url(__REPO_IMG_HORDES_URL__background/box/panel_20.gif) 0 100% no-repeat, url(__REPO_IMG_HORDES_URL__background/box/panel_22.gif) 100% 100% no-repeat, url(__REPO_IMG_HORDES_URL__background/box/panel_01.gif) 0 0 repeat-x, url(__REPO_IMG_HORDES_URL__background/box/panel_10.gif) 0 0 repeat-y, url(__REPO_IMG_HORDES_URL__background/box/panel_12.gif) 100% 0 repeat-y, url(__REPO_IMG_HORDES_URL__background/box/panel_21.gif) 0 100% repeat-x, #7e4d2a;\n  border-radius: 12px;\n  box-shadow: 0 0 20px #000;\n  color: #f0d79e;\n  display: flex;\n  flex-direction: column;\n  max-height: 80vh;\n  max-width: 600px;\n  min-width: 320px;\n  padding: 1em 1.5em;\n  gap: 0.75em;\n}\n\n.mho-changelog-modal-title {\n  color: #fff;\n  font-family: Trebuchet MS, Arial, Verdana, sans-serif;\n  font-variant: small-caps;\n  margin: 0;\n  border-bottom: 1px solid #ddab76;\n  padding-bottom: 0.5em;\n}\n\n.mho-changelog-modal-body {\n  flex: 1;\n  overflow-y: auto;\n  white-space: pre-wrap;\n  word-break: break-word;\n  font-family: Trebuchet MS, Arial, Verdana, sans-serif;\n  font-size: 0.9em;\n  margin: 0;\n  color: #f0d79e;\n}\n\n.mho-changelog-modal-footer {\n  display: flex;\n  justify-content: flex-end;\n  border-top: 1px solid #ddab76;\n  padding-top: 0.5em;\n}\n\n.mho-changelog-modal-btn {\n  background-color: #5c2b20;\n  border: 1px solid #f0d79e;\n  color: #f0d79e;\n  cursor: pointer;\n  font-family: Trebuchet MS, Arial, Verdana, sans-serif;\n  font-variant: small-caps;\n  padding: 0.25em 1.5em;\n}\n.mho-changelog-modal-btn:hover {\n  background-color: #7e4d2a;\n  outline: 1px solid #f0d79e;\n}\n\n.mho-changelog-history-toggle {\n  color: #ddab76;\n  cursor: pointer;\n  font-family: Trebuchet MS, Arial, Verdana, sans-serif;\n  font-size: 0.85em;\n  font-variant: small-caps;\n  text-decoration: underline dotted;\n  user-select: none;\n}\n\n.mho-changelog-history-toggle:hover {\n  color: #f0d79e;\n}\n\n.mho-changelog-history-section {\n  border-top: 1px solid #7e4d2a;\n  display: flex;\n  flex-direction: column;\n  gap: 0.75em;\n  max-height: 35vh;\n  overflow-y: auto;\n  padding-top: 0.5em;\n}\n\n.mho-changelog-history-block {\n  border-bottom: 1px dotted #7e4d2a;\n  padding-bottom: 0.5em;\n}\n\n.mho-changelog-history-block:last-child {\n  border-bottom: none;\n}\n\n.mho-changelog-history-version {\n  color: #ddab76;\n  font-family: Trebuchet MS, Arial, Verdana, sans-serif;\n  font-variant: small-caps;\n  font-size: 0.9em;\n  margin: 0 0 0.25em 0;\n}\n\n.mho-changelog-history-body {\n  color: #c8a870;\n  font-family: Trebuchet MS, Arial, Verdana, sans-serif;\n  font-size: 0.8em;\n  margin: 0;\n  white-space: pre-wrap;\n  word-break: break-word;\n}\n\n.mho-anti-abuse-counter-content {\n  border-bottom: 1px solid #ddab76;\n  display: flex;\n  gap: 0.5em;\n  justify-content: space-between;\n  flex-wrap: wrap;\n}\n\n#mho-camping-predict {\n  background-color: rgba(92, 43, 32, 0.35);\n  border: 1px solid #7e4d2a;\n  border-radius: 8px;\n  padding: 0.5em 0.75em;\n  margin: 0.5em 0;\n  color: #f0d79e;\n}\n#mho-camping-predict .mho-camping-title {\n  display: flex;\n  align-items: center;\n  gap: 0.5em;\n  margin: 0 0 0.5em;\n  padding-bottom: 0.4em;\n  border-bottom: 1px solid #7e4d2a;\n}\n#mho-camping-predict .mho-camping-title img {\n  height: 24px;\n}\n#mho-camping-predict .mho-camping-title span {\n  font-size: 1.25em;\n  font-variant: small-caps;\n  color: #fff;\n}\n#mho-camping-predict .mho-camping-section {\n  margin-bottom: 0.5em;\n}\n#mho-camping-predict .mho-camping-section:last-child {\n  margin-bottom: 0;\n}\n#mho-camping-predict .mho-camping-section > h3 {\n  font-size: 0.95em;\n  font-variant: small-caps;\n  color: #ddab76;\n  margin: 0 0 0.3em;\n  padding-bottom: 0.15em;\n  border-bottom: 1px dotted #7e4d2a;\n}\n#mho-camping-predict .mho-camping-columns {\n  display: flex;\n  flex-direction: row;\n  gap: 0;\n}\n#mho-camping-predict .mho-camping-columns > .mho-camping-section {\n  min-width: 0;\n  padding: 0 0.75em;\n  flex: 3 1 0;\n}\n#mho-camping-predict .mho-camping-columns > .mho-camping-section.town {\n  flex: 2 1 0;\n}\n#mho-camping-predict .mho-camping-columns > .mho-camping-section:first-child {\n  padding-left: 0;\n}\n#mho-camping-predict .mho-camping-columns > .mho-camping-section:last-child {\n  padding-right: 0;\n}\n#mho-camping-predict .mho-camping-columns > .mho-camping-section:not(:first-child) {\n  border-left: 1px solid #7e4d2a;\n}\n#mho-camping-predict .mho-camping-columns > .mho-camping-section > .mho-camping-section-content {\n  display: flex;\n  flex-wrap: wrap;\n  justify-content: space-around;\n  gap: 1em 2em;\n}\n#mho-camping-predict .mho-camping-field {\n  display: flex;\n  align-items: center;\n  gap: 0.4em;\n  padding: 0.15em 0;\n  min-width: 0;\n}\n#mho-camping-predict .mho-camping-field label {\n  display: flex;\n  align-items: center;\n  gap: 0.3em;\n  flex: 1 1 auto;\n  min-width: 0;\n  cursor: pointer;\n  white-space: nowrap;\n  overflow: hidden;\n  text-overflow: ellipsis;\n}\n#mho-camping-predict .mho-camping-field label img {\n  flex-shrink: 0;\n}\n#mho-camping-predict .mho-camping-field:has(input[type=checkbox]) {\n  display: inline-flex;\n}\n#mho-camping-predict .mho-camping-field:has(input[type=number]) {\n  width: 100%;\n}\n#mho-camping-predict .mho-camping-field input[type=number] {\n  flex: 0 0 auto;\n  width: 2em;\n  text-align: center;\n  margin: 0;\n}\n#mho-camping-predict .mho-camping-field input[type=checkbox] {\n  flex: 0 0 auto;\n  margin: 0;\n}\n#mho-camping-predict .mho-camping-field select {\n  flex: 1 1 auto;\n  min-width: 0;\n}\n#mho-camping-predict .mho-camping-stepper-btn {\n  flex-shrink: 0;\n  height: 14px;\n  width: auto;\n  cursor: pointer;\n  user-select: none;\n}\n#mho-camping-predict .mho-camping-field--full {\n  grid-column: 1/-1;\n}\n#mho-camping-predict .mho-camping-numbers-grid {\n  display: grid;\n  grid-template-columns: repeat(2, 1fr);\n  gap: 0.2em 0.6em;\n  width: 100%;\n}\n#mho-camping-predict .mho-camping-numbers-grid label {\n  flex: 0 0 auto;\n  width: 2em;\n}\n#mho-camping-predict .mho-camping-numbers-grid > .mho-camping-field:nth-child(2n) {\n  justify-content: flex-end;\n}\n#mho-camping-predict #camping-result {\n  background-color: rgba(0, 0, 0, 0.25);\n  border-radius: 6px;\n  padding: 0.5em 0.6em;\n  margin-top: 0.2em;\n}\n#mho-camping-predict .mho-camping-title {\n  cursor: pointer;\n  user-select: none;\n  position: relative;\n}\n#mho-camping-predict .mho-camping-title::before {\n  content: \"▶︎\";\n  transition: transform 0.2s ease;\n}\n#mho-camping-predict.mho-camping-opened .mho-camping-title::before {\n  transform: rotate(90deg);\n}\n#mho-camping-predict .mho-camping-content {\n  padding-top: 0.4em;\n}\n\n.row-table:has(.mho-town-list-link-cell) .cell.rw-1:has(img):not(:has(.language)), .row-table:has(.mho-town-list-link-cell) .cell.rw-1.right {\n  flex-basis: 4.166666665%;\n}\n.row-table:has(.mho-town-list-link-cell) .cell.rw-3 {\n  flex-basis: 20.833333335%;\n}\n\n.mho-town-list-link-cell {\n  align-items: center;\n  cursor: pointer;\n  display: flex;\n  gap: 0.25em;\n  position: relative;\n}\n\n.mho-town-list-link-panel {\n  background-color: #5c2b20;\n  border: 1px solid #ddab76;\n  border-radius: 6px;\n  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);\n  display: none;\n  flex-direction: column;\n  gap: 0.25em;\n  left: 0;\n  padding: 0.5em;\n  position: absolute;\n  top: 100%;\n  z-index: 10;\n}\n.mho-town-list-link-panel.mho-open {\n  display: flex;\n}\n.mho-town-list-link-panel.mho-align-right {\n  left: auto;\n  right: 0;\n}";
+    const styleTemplate = "@charset \"UTF-8\";\n/*\n * Tokens remplacés au runtime par createStyles.ts à partir de config/constants.ts :\n *   __BTN_ID__, __MH_OPTIMIZER_MAP_WINDOW_ID__, __MHO_DISPLAY_EXPEDITIONS_ID__,\n *   __MHO_DISPLAY_MAP_ID__, __MHO_STORE_NOTIFICATIONS_ID__, __REPO_IMG_HORDES_URL__\n */\n.param-has-children > div::after {\n  content: \"▶︎\";\n  margin-left: auto;\n}\n\n#__BTN_ID__ {\n  background-color: #5c2b20;\n  border: 1px solid #f0d79e;\n  outline: 1px solid #000;\n  position: absolute;\n  top: 10px;\n  z-index: 997;\n}\n\n#__BTN_ID__.mho-btn-opened h1 span, #__BTN_ID__.mho-btn-opened h1 a, #__BTN_ID__.mho-btn-opened h1 img.close {\n  display: inline;\n}\n\n#__BTN_ID__.mho-btn-opened div {\n  display: block;\n}\n\n#__BTN_ID__ h1 {\n  height: auto;\n  font-size: 8pt;\n  text-transform: none;\n  font-variant: small-caps;\n  background: none;\n  cursor: help;\n  margin: 0 5px;\n  padding: 0;\n  line-height: 17px;\n  color: #f0d79e;\n  display: flex;\n  justify-content: space-between;\n  align-items: center;\n}\n\n#__BTN_ID__ h1 > div > img {\n  vertical-align: -9%;\n}\n\n#__BTN_ID__.mho-btn-opened h1 {\n  border-bottom: 1px solid #b37c4a;\n  margin-bottom: 5px;\n}\n\n#__BTN_ID__ h1 span, #__BTN_ID__ h1 a, #__BTN_ID__ h1 img.close {\n  color: #f0d79e;\n  cursor: help;\n  font-family: Trebuchet MS, Arial, Verdana, sans-serif;\n  letter-spacing: 1px;\n  line-height: 17px;\n  text-align: left;\n  text-transform: none;\n  margin-left: 1em;\n  display: none;\n}\n\n#__BTN_ID__ > div {\n  display: none;\n  margin: 0 5px 8px 5px;\n  font-size: 0.9em;\n  width: 350px;\n}\n\n#__BTN_ID__ .mho-parameters-btn {\n  margin-top: 0;\n  text-align: center;\n  display: block;\n}\n\n.mho-window {\n  opacity: 1;\n  transition: opacity 1s ease;\n  z-index: 999;\n  padding: 0;\n  position: fixed;\n  min-width: 150px;\n  min-height: 150px;\n}\n\n.mho-window:not(.fullsize) .mho-window-box {\n  resize: both;\n  overflow: auto;\n}\n\n.mho-window.fullsize {\n  background: url(__REPO_IMG_HORDES_URL__background/mask.png);\n  height: 100%;\n  width: 100%;\n  resize: none;\n}\n\n.mho-window:not(.visible), #__MH_OPTIMIZER_MAP_WINDOW_ID__:not(.visible) {\n  opacity: 0;\n  pointer-events: none;\n}\n\n.mho-window:not(.visible) .mho-window-box, .mho-window:not(.visible) #__MH_OPTIMIZER_MAP_WINDOW_ID__-box {\n  transform: scale(0) translateY(1000px);\n}\n\n.mho-window .mho-window-box {\n  background: url(__REPO_IMG_HORDES_URL__background/bg_content2.jpg) repeat-y 0 0/900px 263px, url(__REPO_IMG_HORDES_URL__background/bg_content2.jpg) repeat-y 100% 0/900px 263px;\n  border-radius: 8px;\n  box-shadow: 0 0 10px #000;\n  display: flex;\n  flex-direction: row;\n  position: absolute;\n  top: 10px;\n  bottom: 10px;\n  right: 10px;\n  left: 10px;\n  transform: scale(1) translateY(0);\n  transition: transform 0.5s ease;\n}\n\n#__MH_OPTIMIZER_MAP_WINDOW_ID__ #__MH_OPTIMIZER_MAP_WINDOW_ID__-box {\n  background: url(__REPO_IMG_HORDES_URL__background/bg_content2.jpg) repeat-y 0 0/900px 263px, url(__REPO_IMG_HORDES_URL__background/bg_content2.jpg) repeat-y 100% 0/900px 263px;\n  border-radius: 8px;\n  box-shadow: 0 0 10px #000;\n  position: absolute;\n  transform: scale(1) translateY(0);\n  transition: transform 0.5s ease;\n  resize: both;\n  overflow: auto;\n  z-index: 9999;\n}\n\n.mho-window .mho-window-box .mho-window-overlay, #__MH_OPTIMIZER_MAP_WINDOW_ID__ #__MH_OPTIMIZER_MAP_WINDOW_ID__-box #__MH_OPTIMIZER_MAP_WINDOW_ID__-overlay {\n  position: absolute;\n  right: 6px;\n  top: 6px;\n  text-align: right;\n}\n\n.mho-window .mho-window-box .mho-window-overlay ul, #__MH_OPTIMIZER_MAP_WINDOW_ID__ #__MH_OPTIMIZER_MAP_WINDOW_ID__-box #__MH_OPTIMIZER_MAP_WINDOW_ID__-overlay ul {\n  margin: 2px;\n  padding: 0;\n}\n\n.mho-window .mho-window-box .mho-window-overlay ul li, #__MH_OPTIMIZER_MAP_WINDOW_ID__ #__MH_OPTIMIZER_MAP_WINDOW_ID__-box #__MH_OPTIMIZER_MAP_WINDOW_ID__-overlay ul li {\n  cursor: pointer;\n  display: inline-block;\n}\n\n.mho-window .mho-window-drag-handle {\n  width: 18px;\n  height: 100%;\n}\n\n.mho-window-content, #__MH_OPTIMIZER_MAP_WINDOW_ID__-content {\n  flex: 1;\n  color: #fff;\n  overflow: auto;\n  background: url(__REPO_IMG_HORDES_URL__background/box/panel_00.gif) 0 0 no-repeat, url(__REPO_IMG_HORDES_URL__background/box/panel_02.gif) 100% 0 no-repeat, url(__REPO_IMG_HORDES_URL__background/box/panel_20.gif) 0 100% no-repeat, url(__REPO_IMG_HORDES_URL__background/box/panel_22.gif) 100% 100% no-repeat, url(__REPO_IMG_HORDES_URL__background/box/panel_01.gif) 0 0 repeat-x, url(__REPO_IMG_HORDES_URL__background/box/panel_10.gif) 0 0 repeat-y, url(__REPO_IMG_HORDES_URL__background/box/panel_12.gif) 100% 0 repeat-y, url(__REPO_IMG_HORDES_URL__background/box/panel_21.gif) 0 100% repeat-x, #7e4d2a;\n  border-radius: 12px;\n  padding: 8px;\n}\n\ndiv.mho-new-changelog::before {\n  position: absolute;\n  top: -3px;\n  left: -3px;\n}\n\na.mho-new-changelog::before {\n  position: relative;\n  top: 0;\n  left: 0;\n}\n\n.mho-new-changelog::before {\n  content: \"\";\n  width: 6px;\n  aspect-ratio: 1;\n  background: #4B107B;\n  border-radius: 50%;\n  box-shadow: 0px 0px 6px 3px #BF61CF;\n  display: inline-block;\n}\n\ndiv.mho-new-version::before {\n  position: absolute;\n  top: -3px;\n  left: -3px;\n}\n\n.mho-new-version::before {\n  content: \"\";\n  width: 8px;\n  aspect-ratio: 1;\n  background: #BF61CF;\n  border-radius: 50%;\n  box-shadow: 0px 0px 8px 4px #4B107B;\n  display: inline-block;\n}\n\n#tabs {\n  color: #ddab76;\n  font-size: 1.2rem;\n  margin-bottom: 20px;\n  position: relative;\n  height: 25px;\n  order-bottom: 1px solid #ddab76;\n}\n\n#tabs ul {\n  display: flex;\n  flex-wrap: wrap;\n  padding: 0;\n  background: url(__REPO_IMG_HORDES_URL__background/tabs-header-plain.gif) 0 100% round;\n  background-size: cover;\n  height: 24px;\n  margin-top: 2px;\n  margin-right: 20px;\n  padding-left: 0.5em;\n}\n\n#tabs > ul > li {\n  cursor: pointer;\n  display: inline-block;\n  margin-top: auto;\n  margin-bottom: auto;\n}\n\n#tabs > ul > li > div > img {\n  margin-right: 0.5em;\n}\n\n#tabs > ul > li > div {\n  background-image: url(__REPO_IMG_HORDES_URL__background/tab.gif);\n  background-position: 0 0;\n  background-repeat: no-repeat;\n  border-left: 1px solid #694023;\n  border-right: 1px solid #694023;\n  color: #f0d79e;\n  cursor: pointer;\n  float: right;\n  font-family: Arial, sans-serif;\n  font-size: 1rem;\n  font-variant: small-caps;\n  height: 21px;\n  margin-left: 2px;\n  margin-right: 0;\n  margin-top: 3px;\n  padding: 2px 4px 0;\n  text-decoration: underline;\n  white-space: nowrap;\n}\n\n#tabs > ul > li > div:hover {\n  outline: 1px solid #f0d79e;\n  text-decoration: underline;\n}\n\n#tabs > ul > li.selected {\n  position: relative;\n  top: 2px;\n}\n\n.tab-content {\n  position: absolute;\n  bottom: 10px;\n  left: 28px;\n  right: 8px;\n  top: 40px;\n  overflow: auto;\n}\n\n.tab-content > ul {\n  display: flex;\n  flex-wrap: wrap;\n  padding: 0;\n  margin: 0 0.5em;\n}\n\n.tab-content > ul > li {\n  min-width: 300px;\n  flex-basis: min-content;\n  padding: 0.125em 0.5em;\n  margin: 0;\n}\n\n.tab-content > ul > li.selected {\n  flex-basis: 100%;\n  padding: 0.25em;\n  margin: 0.25em 1px;\n}\n\n.tab-content > ul > li:not(.selected) .properties {\n  display: none;\n}\n\n.tab-content > ul div.mho-category {\n  width: 100%;\n  border-bottom: 1px solid;\n  margin: 1em 0 0.5em;\n}\n\n#categories > ul, ul.parameters, #informations > ul {\n  padding: 0;\n  margin: 0;\n  color: #f0d79e;\n}\n\n#categories > ul > li, ul.parameters > li, .tab-content ul > li, #informations ul > li {\n  list-style: none;\n}\n\n.tab-content #recipes-list > li, .tab-content #notifications-list > li, #wishlist > li {\n  min-width: 100% !important;\n  display: flex;\n}\n\ninput.mho-input::-webkit-outer-spin-button, input.mho-input::-webkit-inner-spin-button {\n  -webkit-appearance: none;\n  margin: 0;\n}\n\ninput.mho-input[type=number] {\n  -moz-appearance: textfield;\n}\n\n.mho-table {\n  border-collapse: collapse;\n  border-bottom: 1px solid #ddab76;\n}\n\n.mho-header {\n  font-size: 10pt;\n  background: linear-gradient(0deg, #643b25 0, rgba(100, 59, 37, 0) 50%, rgba(100, 59, 37, 0)) !important;\n  border-bottom: 2px solid #f0d79e;\n  color: #fff;\n  font-family: Trebuchet MS, Arial, Verdana, sans-serif;\n  font-weight: 700;\n}\n\n.mho-table tr:not(.mho-header) {\n  background-color: #5c2b20;\n  border-bottom: 1px solid #7e4d2a;\n}\n\n.mho-table tr th, .mho-table tr td {\n  padding: 0.25em;\n}\n\n.mho-table tr td {\n  border-left: 1px solid #7e4d2a;\n  color: #f0d79e;\n  font-size: 9pt;\n}\n\n.label_text {\n  font-size: 1.2rem;\n  font-variant: small-caps;\n}\n\n.item-title {\n  display: flex;\n  justify-content: space-between;\n}\n\n.add-to-wishlist > button > img {\n  margin-right: 0;\n}\n\n.mho-advanced-tooltip {\n  margin-top: 0.5em;\n  border-top: 1px solid;\n  max-height: 400px;\n  overflow-y: auto;\n}\n\n.mho-advanced-tooltip > table.recipes, #item-list > li.selected > .properties > table.recipes {\n  border-collapse: collapse;\n  width: 100%;\n}\n\n.mho-advanced-tooltip > table.recipes > tr, #item-list > li.selected > .properties > table.recipes > tr {\n  border: dotted;\n  border-width: 1px 0;\n}\n\n.mho-advanced-tooltip > table.recipes > tr:first-child, #item-list > li.selected > .properties > table.recipes > tr:first-child {\n  border-top: none;\n}\n\n.mho-advanced-tooltip > table.recipes > tr:last-child, #item-list > li.selected > .properties > table.recipes > tr:last-child {\n  border-bottom: none;\n}\n\n.mho-advanced-tooltip > table.recipes > tr > td.items > div, #item-list > li.selected > .properties > table.recipes > tr > td.items > div {\n  display: flex;\n  gap: 0.5em;\n}\n\n.mho-advanced-tooltip > table.recipes > tr > td:not(.results), #item-list > li.selected > .properties > table.recipes > tr > td:not(.results) {\n  width: 0;\n}\n\n.mho-advanced-tooltip > table.recipes > tr > td.results > div, #item-list > li.selected > .properties > table.recipes > tr > td.results > div {\n  flex-wrap: wrap;\n}\n\ndiv.tooltip.item:has(table.recipes) > div:first-of-type {\n  width: 0 !important;\n  min-width: 100% !important;\n}\n\n.mho-advanced-tooltip > table.recipes > tr > td.items > div > .item, #item-list > li.selected > .properties > table.recipes > tr > td.items > div > .item {\n  background-color: #524053;\n  padding: 0.5em;\n  border-radius: 0.25em;\n  white-space: nowrap;\n  display: flex;\n  align-items: center;\n  gap: 0.25em;\n}\n\n.mho-advanced-tooltip > table.recipes > tr > td.items > div > .item.mho-recipe-provoking, #item-list > li.selected > .properties > table.recipes > tr > td.items > div > .item.mho-recipe-provoking {\n  border: 1px dashed #ddab76;\n}\n\ndiv.tooltip.item:has(table.recipes) {\n  min-width: 250px !important;\n  max-width: 400px !important;\n  width: auto !important;\n}\n\n.mho-frozen {\n  pointer-events: all !important;\n}\n\n.mho-shift-hint {\n  display: inline-flex;\n  align-items: center;\n  gap: 2px;\n  margin-right: 6px;\n  opacity: 0.6;\n  font-size: 0.75em;\n  white-space: nowrap;\n  flex-shrink: 0;\n}\n\nkbd.mho-shift-hint {\n  border: 1px solid #f0d79e;\n  border-radius: 3px;\n  padding: 0 3px;\n  font-family: inherit;\n  line-height: 1.4;\n  background: rgba(240, 215, 158, 0.15);\n}\n\nimg.mho-close-hint {\n  margin-top: -6px;\n}\n\n.mho-close-hint {\n  display: none;\n}\n\n.mho-frozen .mho-shift-hint {\n  display: none;\n}\n\n.mho-frozen .mho-close-hint {\n  display: initial;\n}\n\n.mho-tooltip-translations {\n  display: flex;\n  flex-direction: row;\n  gap: 0.5em;\n  flex-wrap: wrap;\n  align-items: start;\n  justify-content: start;\n  border-bottom: 1px solid;\n  margin: 0.25em 0;\n  padding: 0.25em 0;\n}\n\n.brown-tag {\n  display: flex;\n  flex-direction: row;\n  gap: 0.5em;\n  flex-wrap: nowrap;\n  align-items: center;\n  justify-content: center;\n  background-color: #5c2b20;\n  border-radius: 0.25em;\n  padding: 0.25em 0.5em;\n}\n\nul#item-list > li {\n  background-color: #5c2b20;\n  margin: 1px 1px;\n  padding: 0.25em 0.5em;\n}\n\n#wishlist .label {\n  width: calc(100% - 775px);\n  min-width: 200px;\n  padding: 0 4px;\n}\n\n#wishlist .mho-header, #wishlist > li {\n  padding: 0 8px;\n  margin: 0.125em 0;\n  width: 100%;\n}\n\n#wishlist .mho-header > div {\n  display: inline-block;\n  vertical-align: middle;\n}\n\n#wishlist .priority, #wishlist .depot, #wishlist .bank_count, #wishlist .bag_count, #wishlist .bank_needed, #wishlist .diff {\n  width: 125px;\n  padding: 0 4px;\n}\n\n#wishlist .delete {\n  width: 25px;\n  text-align: center;\n}\n\n#wishlist-section ul {\n  padding-left: 0;\n}\n\n#wishlist-section ul > li {\n  display: flex;\n  justify-content: space-between;\n}\n\n.tab-content #recipes-list > li:nth-child(even), .tab-content #notifications-list > li:nth-child(even), #wishlist > li:nth-child(even) {\n  background-color: #5c2b20;\n}\n\nli.item[class^=priority_in], li.item[class*=\" priority_in\"], img[class^=priority_in], img[class*=\" priority_in\"] {\n  box-shadow: inset 0 0 0.5em whitesmoke, 0 0 0.5em whitesmoke;\n}\n\nli.item[class^=priority_out], li.item[class*=\" priority_out\"], img[class^=priority_out], img[class*=\" priority_out\"] {\n  box-shadow: inset 0 0 1em darkslategrey, 0 0 1em darkslategrey;\n}\n\nli.item.priority_trash, img.priority_trash {\n  box-shadow: inset 0 0 0.5em black, 0 0 0.5em black;\n}\n\ndiv.item-tag-food::after {\n  background: url(__REPO_IMG_HORDES_URL__status/status_haseaten.gif) 50%/contain no-repeat;\n}\n\ndiv.item-tag-load::after {\n  background: url(__REPO_IMG_HORDES_URL__item/item_pile.gif) 50%/contain no-repeat;\n}\n\ndiv.item-tag-hero::after {\n  background: url(__REPO_IMG_HORDES_URL__icons/star.gif) 50%/contain no-repeat;\n}\n\ndiv.item-tag-alcohol::after {\n  background: url(__REPO_IMG_HORDES_URL__status/status_drunk.gif) 50%/contain no-repeat;\n}\n\ndiv.item-tag-drug::after {\n  background: url(__REPO_IMG_HORDES_URL__status/status_drugged.gif) 50%/contain no-repeat;\n}\n\ndiv.item-tag.mho-item-tag-no-img {\n  padding-left: 2px;\n}\n\n.mho-item-tag {\n  min-height: 18px !important;\n  height: unset !important;\n}\n\n#__MHO_DISPLAY_MAP_ID__, #__MHO_STORE_NOTIFICATIONS_ID__, #__MHO_DISPLAY_EXPEDITIONS_ID__ {\n  background-color: rgba(62, 36, 23, 0.75);\n  border-radius: 6px;\n  color: #ddab76;\n  cursor: pointer;\n  font-size: 10px;\n  padding: 3px 5px;\n  transition: background-color 0.5s ease-in-out;\n  display: flex;\n  gap: 0.5em;\n}\n\n.mho-map tr td {\n  border: 1px dotted;\n  width: 30px;\n  min-width: 30px;\n  height: 30px;\n  min-height: 30px;\n  text-align: center;\n  vertical-align: middle;\n}\n\n.mho-ruin tr td {\n  border: 1px dotted;\n  width: 25px;\n  min-width: 25px;\n  height: 25px;\n  min-height: 25px;\n  text-align: center;\n  vertical-align: middle;\n}\n\n.dotted-background {\n  background-image: -moz-linear-gradient(45deg, #444 25%, transparent 25%), -moz-linear-gradient(-45deg, #444 25%, transparent 25%), -moz-linear-gradient(45deg, transparent 75%, #444 75%), -moz-linear-gradient(-45deg, transparent 75%, #444 75%);\n  background-image: -webkit-gradient(linear, 0 100%, 100% 0, color-stop(0.25, #444), color-stop(0.25, transparent)), -webkit-gradient(linear, 0 0, 100% 100%, color-stop(0.25, #444), color-stop(0.25, transparent)), -webkit-gradient(linear, 0 100%, 100% 0, color-stop(0.75, transparent), color-stop(0.75, #444)), -webkit-gradient(linear, 0 0, 100% 100%, color-stop(0.75, transparent), color-stop(0.75, #444));\n  background-image: -webkit-linear-gradient(45deg, #444 25%, transparent 25%), -webkit-linear-gradient(-45deg, #444 25%, transparent 25%), -webkit-linear-gradient(45deg, transparent 75%, #444 75%), -webkit-linear-gradient(-45deg, transparent 75%, #444 75%);\n  background-image: -o-linear-gradient(45deg, #444 25%, transparent 25%), -o-linear-gradient(-45deg, #444 25%, transparent 25%), -o-linear-gradient(45deg, transparent 75%, #444 75%), -o-linear-gradient(-45deg, transparent 75%, #444 75%);\n  background-image: linear-gradient(45deg, #444 25%, transparent 25%), linear-gradient(-45deg, #444 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #444 75%), linear-gradient(-45deg, transparent 75%, #444 75%);\n  -moz-background-size: 2px 2px;\n  background-size: 2px 2px;\n  -webkit-background-size: 2px 2px; /* override value for webkit */\n  background-position: 0 0, 1px 0, 1px -1px, 0px 1px;\n}\n\n.empty-bat:before, .empty-bat:after {\n  position: absolute;\n  content: \"\";\n  background: black;\n  display: block;\n  width: 1px;\n  height: 25px;\n  -webkit-transform: rotate(-45deg);\n  transform: rotate(-45deg);\n  left: 0;\n  right: 0;\n  top: 0;\n  bottom: 0;\n  margin: auto;\n}\n\n.empty-bat:after {\n  -webkit-transform: rotate(45deg);\n  transform: rotate(45deg);\n}\n\n.spaced-label:after {\n  content: \" : \";\n}\n\n.mho-hidden {\n  display: none !important;\n}\n\n.mho-sort-arrow {\n  display: inline-block;\n  margin-left: 2px;\n  opacity: 0.4;\n  font-size: 10px;\n  cursor: pointer;\n  user-select: none;\n  transition: opacity 0.15s;\n}\n\n.mho-sortable-cell {\n  cursor: pointer;\n  white-space: nowrap;\n}\n\n/* Étiquette de tri autonome, pour les cellules d'en-tête portant plusieurs critères */\n.mho-sort-control {\n  cursor: pointer;\n  white-space: nowrap;\n  user-select: none;\n}\n.mho-sort-control + .mho-sort-control {\n  margin-left: 0.75em;\n}\n\n.mho-checkbox-dropdown-panel {\n  display: none;\n  position: absolute;\n  top: 100%;\n  left: 0;\n  z-index: 10;\n  max-height: 200px;\n  overflow-y: auto;\n  padding: 4px;\n  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);\n}\n.mho-checkbox-dropdown-panel > div {\n  display: flex;\n  align-items: center;\n  gap: 4px;\n  white-space: nowrap;\n}\n\n.mho-dropdown-toggle {\n  max-width: 200px;\n}\n\n#mho-filter-omniscience-stars {\n  min-width: 100px;\n}\n\n#mho-filter-omniscience-online, #mho-filter-citizen-list-online {\n  max-width: 60px;\n}\n\n.mho-filter-bar {\n  display: flex;\n  flex-wrap: wrap;\n  gap: 0.5em;\n  margin-bottom: 0.5em;\n  align-items: flex-end;\n}\n\n.mho-filter-field {\n  display: flex;\n  flex-direction: column;\n  gap: 2px;\n  position: relative;\n}\n.mho-filter-field:has(.mho-checkbox-dropdown-panel) {\n  min-width: 65px;\n}\n\n.mho-filter-label {\n  display: block !important;\n  width: 100%;\n  font-size: 0.8em;\n}\n\n.mho-search-wrapper {\n  position: relative;\n}\n\n.mho-search-input {\n  padding-left: 24px;\n  margin-bottom: 0;\n}\n\n.mho-search-icon {\n  height: 24px;\n  position: absolute;\n  left: 0;\n  top: 50%;\n  transform: translateY(-50%);\n}\n\n.mho-modal-overlay {\n  position: fixed;\n  inset: 0;\n  z-index: 10000;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  background: rgba(0, 0, 0, 0.65);\n}\n\n.mho-modal-box {\n  background: url(__REPO_IMG_HORDES_URL__background/box/panel_00.gif) 0 0 no-repeat, url(__REPO_IMG_HORDES_URL__background/box/panel_02.gif) 100% 0 no-repeat, url(__REPO_IMG_HORDES_URL__background/box/panel_20.gif) 0 100% no-repeat, url(__REPO_IMG_HORDES_URL__background/box/panel_22.gif) 100% 100% no-repeat, url(__REPO_IMG_HORDES_URL__background/box/panel_01.gif) 0 0 repeat-x, url(__REPO_IMG_HORDES_URL__background/box/panel_10.gif) 0 0 repeat-y, url(__REPO_IMG_HORDES_URL__background/box/panel_12.gif) 100% 0 repeat-y, url(__REPO_IMG_HORDES_URL__background/box/panel_21.gif) 0 100% repeat-x, #7e4d2a;\n  border-radius: 12px;\n  box-shadow: 0 0 20px #000;\n  color: #f0d79e;\n  display: flex;\n  flex-direction: column;\n  max-height: 80vh;\n  max-width: 600px;\n  min-width: 320px;\n  padding: 1em 1.5em;\n  gap: 0.75em;\n}\n\n.mho-modal-title {\n  color: #fff;\n  font-family: Trebuchet MS, Arial, Verdana, sans-serif;\n  font-variant: small-caps;\n  margin: 0;\n  border-bottom: 1px solid #ddab76;\n  padding-bottom: 0.5em;\n}\n\n.mho-modal-body {\n  flex: 1;\n  overflow-y: auto;\n  white-space: pre-wrap;\n  word-break: break-word;\n  font-family: Trebuchet MS, Arial, Verdana, sans-serif;\n  font-size: 0.9em;\n  margin: 0;\n  color: #f0d79e;\n}\n\n.mho-modal-footer {\n  display: flex;\n  justify-content: flex-end;\n  border-top: 1px solid #ddab76;\n  padding-top: 0.5em;\n}\n\n.mho-modal-btn {\n  margin: 0 !important;\n}\n.mho-modal-btn:hover {\n  background-color: #7e4d2a;\n  outline: 1px solid #f0d79e;\n}\n\n.mho-changelog-history-toggle {\n  color: #ddab76;\n  cursor: pointer;\n  font-family: Trebuchet MS, Arial, Verdana, sans-serif;\n  font-size: 0.85em;\n  font-variant: small-caps;\n  text-decoration: underline dotted;\n  user-select: none;\n}\n\n.mho-changelog-history-toggle:hover {\n  color: #f0d79e;\n}\n\n.mho-changelog-history-section {\n  border-top: 1px solid #7e4d2a;\n  display: flex;\n  flex-direction: column;\n  gap: 0.75em;\n  max-height: 35vh;\n  overflow-y: auto;\n  padding-top: 0.5em;\n}\n\n.mho-changelog-history-block {\n  border-bottom: 1px dotted #7e4d2a;\n  padding-bottom: 0.5em;\n}\n\n.mho-changelog-history-block:last-child {\n  border-bottom: none;\n}\n\n.mho-changelog-history-version {\n  color: #ddab76;\n  font-family: Trebuchet MS, Arial, Verdana, sans-serif;\n  font-variant: small-caps;\n  font-size: 0.9em;\n  margin: 0 0 0.25em 0;\n}\n\n.mho-changelog-history-body {\n  color: #c8a870;\n  font-family: Trebuchet MS, Arial, Verdana, sans-serif;\n  font-size: 0.8em;\n  margin: 0;\n  white-space: pre-wrap;\n  word-break: break-word;\n}\n\n.mho-anti-abuse-counter-content {\n  border-bottom: 1px solid #ddab76;\n  display: flex;\n  gap: 0.5em;\n  justify-content: space-between;\n  flex-wrap: wrap;\n}\n\n#mho-camping-predict {\n  background-color: rgba(92, 43, 32, 0.35);\n  border: 1px solid #7e4d2a;\n  border-radius: 8px;\n  padding: 0.5em 0.75em;\n  margin: 0.5em 0;\n  color: #f0d79e;\n}\n#mho-camping-predict .mho-camping-title {\n  display: flex;\n  align-items: center;\n  gap: 0.5em;\n  margin: 0 0 0.5em;\n  padding-bottom: 0.4em;\n  border-bottom: 1px solid #7e4d2a;\n}\n#mho-camping-predict .mho-camping-title img {\n  height: 24px;\n}\n#mho-camping-predict .mho-camping-title span {\n  font-size: 1.25em;\n  font-variant: small-caps;\n  color: #fff;\n}\n#mho-camping-predict .mho-camping-section {\n  margin-bottom: 0.5em;\n}\n#mho-camping-predict .mho-camping-section:last-child {\n  margin-bottom: 0;\n}\n#mho-camping-predict .mho-camping-section > h3 {\n  font-size: 0.95em;\n  font-variant: small-caps;\n  color: #ddab76;\n  margin: 0 0 0.3em;\n  padding-bottom: 0.15em;\n  border-bottom: 1px dotted #7e4d2a;\n}\n#mho-camping-predict .mho-camping-columns {\n  display: flex;\n  flex-direction: row;\n  gap: 0;\n}\n#mho-camping-predict .mho-camping-columns > .mho-camping-section {\n  min-width: 0;\n  padding: 0 0.75em;\n  flex: 3 1 0;\n}\n#mho-camping-predict .mho-camping-columns > .mho-camping-section.town {\n  flex: 2 1 0;\n}\n#mho-camping-predict .mho-camping-columns > .mho-camping-section:first-child {\n  padding-left: 0;\n}\n#mho-camping-predict .mho-camping-columns > .mho-camping-section:last-child {\n  padding-right: 0;\n}\n#mho-camping-predict .mho-camping-columns > .mho-camping-section:not(:first-child) {\n  border-left: 1px solid #7e4d2a;\n}\n#mho-camping-predict .mho-camping-columns > .mho-camping-section > .mho-camping-section-content {\n  display: flex;\n  flex-wrap: wrap;\n  justify-content: space-around;\n  gap: 1em 2em;\n}\n#mho-camping-predict .mho-camping-field {\n  display: flex;\n  align-items: center;\n  gap: 0.4em;\n  padding: 0.15em 0;\n  min-width: 0;\n}\n#mho-camping-predict .mho-camping-field label {\n  display: flex;\n  align-items: center;\n  gap: 0.3em;\n  flex: 1 1 auto;\n  min-width: 0;\n  cursor: pointer;\n  white-space: nowrap;\n  overflow: hidden;\n  text-overflow: ellipsis;\n}\n#mho-camping-predict .mho-camping-field label img {\n  flex-shrink: 0;\n}\n#mho-camping-predict .mho-camping-field:has(input[type=checkbox]) {\n  display: inline-flex;\n}\n#mho-camping-predict .mho-camping-field:has(input[type=number]) {\n  width: 100%;\n}\n#mho-camping-predict .mho-camping-field input[type=number] {\n  flex: 0 0 auto;\n  width: 2em;\n  text-align: center;\n  margin: 0;\n}\n#mho-camping-predict .mho-camping-field input[type=checkbox] {\n  flex: 0 0 auto;\n  margin: 0;\n}\n#mho-camping-predict .mho-camping-field select {\n  flex: 1 1 auto;\n  min-width: 0;\n}\n#mho-camping-predict .mho-camping-stepper-btn {\n  flex-shrink: 0;\n  height: 14px;\n  width: auto;\n  cursor: pointer;\n  user-select: none;\n}\n#mho-camping-predict .mho-camping-field--full {\n  grid-column: 1/-1;\n}\n#mho-camping-predict .mho-camping-numbers-grid {\n  display: grid;\n  grid-template-columns: repeat(2, 1fr);\n  gap: 0.2em 0.6em;\n  width: 100%;\n}\n#mho-camping-predict .mho-camping-numbers-grid label {\n  flex: 0 0 auto;\n  width: 2em;\n}\n#mho-camping-predict .mho-camping-numbers-grid > .mho-camping-field:nth-child(2n) {\n  justify-content: flex-end;\n}\n#mho-camping-predict #camping-result {\n  background-color: rgba(0, 0, 0, 0.25);\n  border-radius: 6px;\n  padding: 0.5em 0.6em;\n  margin-top: 0.2em;\n}\n#mho-camping-predict .mho-camping-title {\n  cursor: pointer;\n  user-select: none;\n  position: relative;\n}\n#mho-camping-predict .mho-camping-title::before {\n  content: \"▶︎\";\n  transition: transform 0.2s ease;\n}\n#mho-camping-predict.mho-camping-opened .mho-camping-title::before {\n  transform: rotate(90deg);\n}\n#mho-camping-predict .mho-camping-content {\n  padding-top: 0.4em;\n}\n\n.row-table:has(.mho-town-list-link-cell) .cell.rw-1:has(img):not(:has(.language)), .row-table:has(.mho-town-list-link-cell) .cell.rw-1.right {\n  flex-basis: 4.166666665%;\n}\n.row-table:has(.mho-town-list-link-cell) .cell.rw-3 {\n  flex-basis: 20.833333335%;\n}\n\n.mho-town-list-link-cell {\n  align-items: center;\n  cursor: pointer;\n  display: flex;\n  gap: 0.25em;\n  position: relative;\n}\n\n.mho-town-list-link-panel {\n  background-color: #5c2b20;\n  border: 1px solid #ddab76;\n  border-radius: 6px;\n  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);\n  display: none;\n  flex-direction: column;\n  gap: 0.25em;\n  left: 0;\n  padding: 0.5em;\n  position: absolute;\n  top: 100%;\n  z-index: 10;\n}\n.mho-town-list-link-panel.mho-open {\n  display: flex;\n}\n.mho-town-list-link-panel.mho-align-right {\n  left: auto;\n  right: 0;\n}\n\n.mho-param-action {\n  background-color: #5c2b20;\n  border: 1px solid #ddab76;\n  color: #f0d79e;\n  cursor: pointer;\n  font-size: 0.85em;\n  font-variant: small-caps;\n  margin: 0 0.5em;\n  padding: 0 0.5em;\n  white-space: nowrap;\n}\n.mho-param-action:hover {\n  background-color: #7e4d2a;\n}\n\n.mho-forum-styles-box {\n  max-width: 750px;\n  width: 90vw;\n}\n\n.mho-forum-styles-help {\n  font-size: 0.85em;\n  font-style: italic;\n  margin: 0;\n}\n\n.mho-forum-styles-rules {\n  display: flex;\n  flex-direction: column;\n  flex: 1;\n  gap: 0.5em;\n  overflow-y: auto;\n  padding-right: 0.25em;\n}\n\n.mho-forum-styles-rule {\n  background-color: #5c2b20;\n  border: 1px solid #ddab76;\n  display: flex;\n  flex-direction: column;\n  gap: 0.35em;\n  padding: 0.5em;\n}\n.mho-forum-styles-rule.mho-forum-styles-rule-disabled {\n  opacity: 0.5;\n}\n\n.mho-forum-styles-rule-header {\n  align-items: center;\n  border-bottom: 1px solid rgba(240, 215, 158, 0.3);\n  display: flex;\n  gap: 0.5em;\n  padding-bottom: 0.35em;\n}\n\n.mho-forum-styles-preview {\n  display: inline-block;\n  flex: 1;\n  padding: 0.25em 1em;\n}\n\n.mho-forum-styles-rule-actions {\n  display: flex;\n  gap: 0.25em;\n}\n\n.mho-forum-styles-icon-btn {\n  margin: 0 !important;\n}\n.mho-forum-styles-icon-btn:disabled {\n  cursor: default;\n  opacity: 0.4;\n}\n.mho-forum-styles-icon-btn:not(:disabled):hover {\n  background-color: #a06a3c;\n}\n\n.mho-forum-styles-criteria {\n  align-items: flex-end;\n  display: flex;\n  flex-wrap: wrap;\n  gap: 1.25em;\n}\n\n.mho-forum-styles-criteria-group {\n  align-items: flex-end;\n  display: flex;\n  flex-wrap: wrap;\n  gap: 0.5em;\n}\n\n.mho-forum-styles-words-field {\n  border-left: 1px solid rgba(240, 215, 158, 0.3);\n  flex: 1;\n  min-width: 180px;\n  padding-left: 1.25em;\n}\n\n.mho-forum-styles-selected-tags {\n  align-items: center;\n  display: flex;\n  flex-wrap: wrap;\n  gap: 0.25em;\n  padding-bottom: 2px;\n}\n\n.mho-forum-styles-tag-chip {\n  align-items: center;\n  display: inline-flex;\n  gap: 0.35em;\n  margin: 0;\n  white-space: nowrap;\n}\n\n.mho-forum-styles-tag-remove {\n  cursor: pointer;\n  font-size: 0.8em;\n  line-height: 1;\n  opacity: 0.7;\n}\n.mho-forum-styles-tag-remove:hover {\n  opacity: 1;\n}\n\n.mho-checkbox-dropdown-panel label:has(.mho-forum-styles-tag-chip) {\n  cursor: pointer;\n  display: block;\n}\n\n.mho-forum-styles-words {\n  margin: 0;\n  width: 100%;\n}\n\n.mho-forum-styles-warning {\n  color: #ffb4b4;\n  display: none;\n  font-size: 0.8em;\n  font-style: italic;\n}\n\n.mho-forum-styles-style {\n  display: flex;\n  flex-wrap: wrap;\n  gap: 0.25em 0.75em;\n}\n\n.mho-forum-styles-field {\n  align-items: center;\n  cursor: pointer;\n  display: inline-flex;\n  font-size: 0.85em;\n  gap: 0.25em;\n}\n\n.mho-forum-styles-color {\n  background: none;\n  border: 1px solid #ddab76;\n  cursor: pointer;\n  height: 18px;\n  padding: 0;\n  width: 28px;\n}\n.mho-forum-styles-color:disabled {\n  cursor: default;\n  opacity: 0.4;\n}\n\n.mho-forum-styles-number {\n  background-color: #f0d79e;\n  border: 1px solid #5c2b20;\n  color: #000;\n  width: 55px;\n}\n\n.mho-forum-styles-prefix {\n  background-color: #f0d79e;\n  border: 1px solid #5c2b20;\n  color: #000;\n  text-align: center;\n  width: 45px;\n}\n\n.mho-forum-styles-add {\n  display: flex;\n}\n\n.mho-forum-styles-exchange {\n  flex-direction: column;\n  gap: 0.35em;\n}\n\n.mho-forum-styles-exchange-input {\n  font-family: monospace;\n  font-size: 0.8em;\n  margin: 0;\n  resize: vertical;\n  width: 100%;\n}\n\n.mho-forum-styles-exchange-actions {\n  display: flex;\n  gap: 0.5em;\n}\n\n.mho-forum-styles-footer {\n  align-items: center;\n  display: flex;\n  flex-wrap: nowrap;\n  gap: 0.5em;\n  justify-content: flex-start;\n}\n\n.mho-forum-styles-footer-spacer {\n  flex: 1;\n}";
 
     const STYLE_PLACEHOLDERS = new Map([
         ['__BTN_ID__', btn_id],
@@ -10905,11 +12678,13 @@
         document.getElementsByTagName('head')[0].appendChild(style);
     }
 
-    bootstrap();
     ///////////////////////////
     //     MAIN FUNCTION     //
     ///////////////////////////
-    (function () {
+    (async function () {
+        // Les URLs d'environnement et les paramètres persistés doivent être chargés
+        // avant toute initialisation : la suite les lit de manière synchrone
+        await bootstrap();
         if (document.URL.startsWith(big_broth_hordes_url) || document.URL.startsWith(gest_hordes_url) || document.URL.startsWith(gest_hordes_old_url) || document.URL.startsWith(fata_morgana_url) || document.URL.startsWith(state.website)) {
             let current_key;
             let map_block_id;
@@ -10971,11 +12746,11 @@
                     }
                 });
             });
-            let interval = setInterval(() => {
-                let copy_button = document.getElementById(mho_copy_map_id);
+            const interval = setInterval(() => {
+                const copy_button = document.getElementById(mho_copy_map_id);
                 if (state.mho_parameters.display_map && !copy_button) {
-                    let map_block = document.getElementById(map_block_id);
-                    let ruin_block = document.getElementById(ruin_block_id);
+                    const map_block = document.getElementById(map_block_id);
+                    const ruin_block = document.getElementById(ruin_block_id);
                     if (map_block || ruin_block) {
                         if (ruin_block) {
                             createCopyButton(source, 'ruin', ruin_block_id, block_copy_ruin_button);
@@ -10995,58 +12770,130 @@
             }, 1000);
         }
         else {
-            /** Vérifie si la version est nouvelle ou non */
-            getStorageItem(mho_version_key).then((version) => {
-                toggleNewChangelog(isNewVersion(version));
-                createStyles();
-                createOptimizerBtn();
-                createMhoHeaderSpace();
-                notifyOnSearchEnd();
+            /** True dès qu'un token a pu être récupéré : conditionne les fonctionnalités nécessitant d'être connecté */
+            const hasToken = () => !!state.token?.token?.accessToken;
+            /** Horodatage du dernier rejeu complet des initialisations, base de la limitation de fréquence */
+            let last_init_at = 0;
+            /** Rejoue les initialisations disponibles, que le backend ait répondu ou non */
+            const initAvailableOptions = () => {
+                last_init_at = Date.now();
+                if (hasToken()) {
+                    initOptionsWithLoginNeeded();
+                }
                 initOptionsWithoutLoginNeeded();
-                getParameters().then(() => {
-                    getApiKey().then(() => {
-                        getToken().then(() => {
-                            setTimeout(() => {
-                                initOptionsWithLoginNeeded();
-                                initOptionsWithoutLoginNeeded();
-                            });
-                            const handleEvent = (event_name) => (event) => {
-                                console.log('MHO - handled event', event_name);
-                                if (shouldRefreshMe()) {
-                                    getToken(true).then(() => {
-                                        initOptionsWithLoginNeeded();
-                                        initOptionsWithoutLoginNeeded();
-                                    });
-                                }
-                                else {
-                                    initOptionsWithLoginNeeded();
-                                    initOptionsWithoutLoginNeeded();
-                                }
-                            };
-                            [
-                                {
-                                    target: document,
-                                    events: [/*'mh-navigation-begin', */ 'mh-navigation-complete', 'mh-current-log-update', 'mh-current-log-refresh' /*, 'tokenExchangeCompleted', 'load', 'tooltipAppear', 'tooltipDisappear', 'pop', 'load', 'popstate', 'error', 'push', 'tab-switch', '_react', 'x-react-degenerate', 'DOMContentLoaded', 'movement-reset', 'readystatechange'*/]
-                                },
-                                {
-                                    target: document.documentElement,
-                                    events: [ /*'sig-inventory-bag-loaded', 'sig-inventory-changed', 'sig-inventory-changed-b', 'sig-inventory-changed-headless', 'sig-log-changed', 'sig-map-changed', 'sig-web-navigation'*/]
-                                },
-                            ].forEach(({ target, events }) => {
-                                events.forEach((event_name) => {
-                                    target.addEventListener(event_name, handleEvent(event_name));
-                                });
-                            });
-                        })
-                            .catch(() => {
-                            initOptionsWithoutLoginNeeded();
-                        });
+            };
+            /** Vérifie si la version est nouvelle ou non */
+            const version = await getStorageItem(mho_version_key);
+            toggleNewChangelog(isNewVersion(version));
+            createStyles();
+            createOptimizerBtn();
+            createMhoHeaderSpace();
+            notifyOnSearchEnd();
+            initOptionsWithoutLoginNeeded();
+            /**
+             * Les écouteurs de navigation sont posés immédiatement, avant tout appel réseau :
+             * MyHordes étant une SPA, sans eux plus rien n'est réinjecté après une navigation.
+             * Ils ne doivent donc dépendre d'aucun appel backend, qui peut échouer ou ne jamais répondre.
+             */
+            /**
+             * MyHordes émet plusieurs de ces évènements à la suite pour une même action
+             * (navigation, puis rafraîchissements du journal). Comme un rejeu complet des
+             * initialisations parcourt tout le document, on regroupe les évènements reçus
+             * dans une même fenêtre pour n'en déclencher qu'un seul.
+             */
+            const init_throttle_delay = 250;
+            /** Évènements reçus depuis le dernier rejeu, uniquement pour la trace */
+            let pending_event_names = [];
+            /** Rejeu déjà programmé : tout évènement supplémentaire s'y agrège au lieu d'en programmer un autre */
+            let pending_init_timeout;
+            /** Un rafraîchissement de token est en cours : il rejouera lui-même les initialisations à son terme */
+            let token_refresh_in_progress = false;
+            /**
+             * Ville + jour pour lesquels les données utilisateur ont déjà été chargées.
+             * Reste undefined tant qu'aucun état n'a été observé : dans ce cas la chaîne de
+             * démarrage a déjà récupéré le token, il n'y a donc rien à rafraîchir.
+             */
+            let last_refresh_signature;
+            /**
+             * Un rafraîchissement forcé recharge objets, liste de courses, et sur le désert carte
+             * et ruines : il ne doit se déclencher que si la ville ou le jour ont réellement changé.
+             * `shouldRefreshMe()` seul ne suffit pas — il renvoie vrai tant que l'horloge du jeu est
+             * incomplète, ce qui reboucle à chaque évènement sans qu'un appel réseau n'y remédie.
+             */
+            const shouldForceRefresh = () => {
+                if (!state.external_app_id || !shouldRefreshMe())
+                    return false;
+                const signature = getTownClockSignature();
+                if (last_refresh_signature === undefined) {
+                    /** Premier état observé : on l'enregistre sans rien recharger */
+                    last_refresh_signature = signature;
+                    return false;
+                }
+                if (signature === last_refresh_signature)
+                    return false;
+                last_refresh_signature = signature;
+                return true;
+            };
+            const runPendingInit = () => {
+                pending_init_timeout = undefined;
+                const event_names = pending_event_names;
+                pending_event_names = [];
+                console.log('MHO - handled events', event_names.join(', '));
+                /**
+                 * Le rafraîchissement en cours recharge déjà les données utilisateur et rejouera
+                 * les initialisations à son terme : en relancer un second dupliquerait ces appels.
+                 */
+                if (token_refresh_in_progress)
+                    return;
+                if (shouldForceRefresh()) {
+                    token_refresh_in_progress = true;
+                    getToken(true)
+                        .then(() => initAvailableOptions())
+                        .catch((error) => {
+                        console.error('MHO - rafraîchissement du token en échec', error);
+                        initOptionsWithoutLoginNeeded();
+                    })
+                        .finally(() => {
+                        token_refresh_in_progress = false;
                     });
-                })
-                    .catch(() => {
-                    initOptionsWithoutLoginNeeded();
+                }
+                else {
+                    initAvailableOptions();
+                }
+            };
+            const handleEvent = (event_name) => () => {
+                pending_event_names.push(event_name);
+                if (pending_init_timeout !== undefined)
+                    return;
+                /** Le premier évènement d'une salve n'est pas retardé ; les suivants attendent la fin de la fenêtre */
+                const elapsed = Date.now() - last_init_at;
+                const delay = Math.max(0, init_throttle_delay - elapsed);
+                pending_init_timeout = setTimeout(runPendingInit, delay);
+            };
+            [
+                {
+                    target: document,
+                    events: [/*'mh-navigation-begin', */ 'mh-navigation-complete', 'mh-current-log-update', 'mh-current-log-refresh' /*, 'tokenExchangeCompleted', 'load', 'tooltipAppear', 'tooltipDisappear', 'pop', 'load', 'popstate', 'error', 'push', 'tab-switch', '_react', 'x-react-degenerate', 'DOMContentLoaded', 'movement-reset', 'readystatechange'*/]
+                },
+                {
+                    target: document.documentElement,
+                    events: [ /*'sig-inventory-bag-loaded', 'sig-inventory-changed', 'sig-inventory-changed-b', 'sig-inventory-changed-headless', 'sig-log-changed', 'sig-map-changed', 'sig-web-navigation'*/]
+                },
+            ].forEach(({ target, events }) => {
+                events.forEach((event_name) => {
+                    target.addEventListener(event_name, handleEvent(event_name));
                 });
             });
+            /** Chaîne d'appels backend, en best effort : un échec ne doit dégrader que les fonctionnalités connectées */
+            try {
+                await getParameters();
+                await getApiKey();
+                await getToken();
+            }
+            catch (error) {
+                console.error('MHO - initialisation connectée en échec', error);
+            }
+            setTimeout(() => initAvailableOptions());
         }
     })();
 

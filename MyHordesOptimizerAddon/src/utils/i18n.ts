@@ -1,4 +1,4 @@
-import {lang} from '../config/constants';
+import { lang } from '../config/constants';
 
 export function getI18N(item) {
     if (!item) return;

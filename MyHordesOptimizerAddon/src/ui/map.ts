@@ -1,36 +1,29 @@
-import {
-    mh_optimizer_icon,
-    mh_optimizer_map_window_id,
-    mho_display_map_id,
-    mho_header_space_id,
-    mho_map_key,
-    repo_img_hordes_url
-} from '../config/constants';
-import {getBBHMap, getBBHRuin} from '../external/bbh';
-import {getFMMap, getFMRuin} from '../external/fata-morgana';
-import {getGHMap, getGHRuin} from '../external/gest-hordes';
-import {state} from '../state';
-import {createMapWindow} from './window';
-import {getStorageItem} from '../utils/storage';
+import { mh_optimizer_icon, mh_optimizer_map_window_id, mho_display_map_id, mho_header_space_id, mho_map_key, repo_img_hordes_url } from '../config/constants';
+import { getBBHMap, getBBHRuin } from '../external/bbh';
+import { getFMMap, getFMRuin } from '../external/fata-morgana';
+import { getGHMap, getGHRuin } from '../external/gest-hordes';
+import { state } from '../state';
+import { getStorageItem } from '../utils/storage';
+import { createMapWindow } from './window';
 
 export function createDisplayMapButton() {
-    let display_map_btn = document.getElementById(mho_display_map_id);
+    const display_map_btn = document.getElementById(mho_display_map_id);
 
     if (state.mho_parameters.display_map) {
         const mho_header_space = document.getElementById(mho_header_space_id);
         if (display_map_btn || !mho_header_space) return;
 
-        let btn_container = document.createElement('div');
+        const btn_container = document.createElement('div');
         btn_container.id = mho_display_map_id;
 
-        let postbox_img = document.querySelector('#postbox img');
+        const postbox_img = document.querySelector('#postbox img');
 
-        let btn_mho_img = document.createElement('img');
+        const btn_mho_img = document.createElement('img');
         btn_mho_img.src = mh_optimizer_icon;
         btn_mho_img.style.height = postbox_img && postbox_img.height ? postbox_img.height + 'px' : '16px';
         btn_container.appendChild(btn_mho_img);
 
-        let btn_img = document.createElement('img');
+        const btn_img = document.createElement('img');
         btn_img.src = repo_img_hordes_url + 'emotes/explo.gif';
         btn_img.style.height = postbox_img && postbox_img.height ? postbox_img.height + 'px' : '16px';
         btn_container.appendChild(btn_img);
@@ -51,46 +44,46 @@ export function createDisplayMapButton() {
 
 
 export function displayMapContent() {
-    let map_window = document.getElementById(mh_optimizer_map_window_id);
+    const map_window = document.getElementById(mh_optimizer_map_window_id);
     map_window.classList.add('visible');
     displayMap();
 }
 
 
 export function displayMap() {
-    let content = document.getElementById(mh_optimizer_map_window_id + '-content');
+    const content = document.getElementById(mh_optimizer_map_window_id + '-content');
     let table = content.querySelector('table');
     if (table) {
         table.outerHTML = '';
     }
 
-    let transformMapping = (map) => {
+    const transformMapping = (map) => {
         table = document.createElement('table');
         table.setAttribute('style', 'border-collapse: collapse;');
         table.classList.add('mho-map');
-        let init_col_tr = document.createElement('tr');
+        const init_col_tr = document.createElement('tr');
         table.appendChild(init_col_tr);
 
         map.vertical_mapping.forEach((cell) => {
-            let td = document.createElement('td');
+            const td = document.createElement('td');
             td.innerText = cell;
             td.classList.add('around-map');
             init_col_tr.appendChild(td);
         });
 
         map.map.forEach((row) => {
-            let tr = document.createElement('tr');
+            const tr = document.createElement('tr');
             row.forEach((cell, cell_index) => {
                 if (cell_index === 0) {
-                    let init_row_td = document.createElement('td');
+                    const init_row_td = document.createElement('td');
                     init_row_td.innerText = cell.horizontal;
                     init_row_td.classList.add('around-map');
                     tr.appendChild(init_row_td);
                 }
-                let td = document.createElement('td');
+                const td = document.createElement('td');
                 tr.appendChild(td);
 
-                let td_content = document.createElement('div');
+                const td_content = document.createElement('div');
                 td_content.style.position = 'relative';
                 td_content.style.height = '100%';
                 td_content.style.width = '100%';
@@ -114,7 +107,7 @@ export function displayMap() {
 
 
                 if (cell.town) {
-                    let town_here = document.createElement('div');
+                    const town_here = document.createElement('div');
                     town_here.innerText = '🏠';
                     town_here.style.position = 'absolute';
                     town_here.style.inset = 'calc(50% - 11px)';
@@ -122,7 +115,7 @@ export function displayMap() {
                     td_content.appendChild(town_here);
                 }
                 if (cell.bat) {
-                    let bat_here = document.createElement('div');
+                    const bat_here = document.createElement('div');
                     bat_here.style.backgroundColor = 'grey';
                     bat_here.style.position = 'absolute';
                     bat_here.style.inset = '4px';
@@ -137,7 +130,7 @@ export function displayMap() {
                 }
 
                 if (cell.empty && !cell.town && !cell.not_yet_visited) {
-                    let empty_here = document.createElement('div');
+                    const empty_here = document.createElement('div');
                     empty_here.classList.add('dotted-background');
                     empty_here.style.position = 'absolute';
                     empty_here.style.inset = '-1px';
@@ -146,7 +139,7 @@ export function displayMap() {
                 }
 
                 if (cell.my_pos) {
-                    let player_here = document.createElement('div');
+                    const player_here = document.createElement('div');
                     player_here.style.backgroundColor = 'white';
                     player_here.style.margin = 'auto';
                     player_here.style.width = '6px';
@@ -166,7 +159,7 @@ export function displayMap() {
                 // }
 
                 if (cell_index === row.length - 1) {
-                    let final_row_td = document.createElement('td');
+                    const final_row_td = document.createElement('td');
                     final_row_td.innerText = cell.horizontal;
                     final_row_td.classList.add('around-map');
                     tr.appendChild(final_row_td);
@@ -175,9 +168,9 @@ export function displayMap() {
             table.appendChild(tr);
         });
 
-        let final_col_tr = document.createElement('tr');
+        const final_col_tr = document.createElement('tr');
         map.vertical_mapping.forEach((cell) => {
-            let td = document.createElement('td');
+            const td = document.createElement('td');
             td.innerText = cell;
             td.classList.add('around-map');
             final_col_tr.appendChild(td);
@@ -187,34 +180,34 @@ export function displayMap() {
         table.firstElementChild.firstElementChild.style.cursor = 'pointer';
         table.firstElementChild.firstElementChild.addEventListener('click', () => displayMap());
         content.appendChild(table);
-    }
+    };
 
-    let transformRuinMapping = (map) => {
+    const transformRuinMapping = (map) => {
         table = document.createElement('table');
         table.setAttribute('style', 'border-collapse: collapse;');
         table.classList.add('mho-ruin');
-        let init_col_tr = document.createElement('tr');
+        const init_col_tr = document.createElement('tr');
         table.appendChild(init_col_tr);
 
         map.vertical_mapping.forEach((cell) => {
-            let td = document.createElement('td');
+            const td = document.createElement('td');
             td.innerText = cell;
             td.classList.add('around-map');
             init_col_tr.appendChild(td);
         });
         map.map.forEach((row) => {
-            let tr = document.createElement('tr');
+            const tr = document.createElement('tr');
             row.forEach((cell, cell_index) => {
                 if (cell_index === 0) {
-                    let init_row_td = document.createElement('td');
+                    const init_row_td = document.createElement('td');
                     init_row_td.innerText = cell.horizontal;
                     init_row_td.classList.add('around-map');
                     tr.appendChild(init_row_td);
                 }
-                let td = document.createElement('td');
+                const td = document.createElement('td');
                 td.style.padding = (0) as any;
                 tr.appendChild(td);
-                let td_content = document.createElement('div')
+                const td_content = document.createElement('div');
                 td.style.position = 'relative';
                 td.appendChild(td_content);
 
@@ -227,7 +220,7 @@ export function displayMap() {
                     td_content.style.bottom = '0';
                     td_content.style.right = '0';
 
-                    let path = document.createElement('div');
+                    const path = document.createElement('div');
                     path.style.position = 'absolute';
                     path.style.backgroundColor = 'grey';
                     if (cell.borders === 'exit') {
@@ -249,7 +242,7 @@ export function displayMap() {
                 }
 
                 if (cell.zombies && cell.zombies !== '' && cell.zombies > 0) {
-                    let zombies = document.createElement('div');
+                    const zombies = document.createElement('div');
                     zombies.innerText = cell.zombies;
                     zombies.style.position = 'absolute';
                     zombies.style.bottom = '4px';
@@ -260,7 +253,7 @@ export function displayMap() {
                 }
 
                 if (cell.door) {
-                    let img = document.createElement('img');
+                    const img = document.createElement('img');
                     img.src = `${repo_img_hordes_url}item/${cell.door}.gif`;
                     img.style.position = 'absolute';
                     img.style.left = 'calc(50% - 8px)';
@@ -271,18 +264,18 @@ export function displayMap() {
                 }
 
                 if (cell_index === row.length - 1) {
-                    let final_row_td = document.createElement('td');
+                    const final_row_td = document.createElement('td');
                     final_row_td.innerText = cell.horizontal;
                     final_row_td.classList.add('around-map');
                     tr.appendChild(final_row_td);
                 }
 
                 td.addEventListener('click', () => {
-                    let my_pos = table.querySelector('.my-pos');
+                    const my_pos = table.querySelector('.my-pos');
                     if (my_pos) {
                         my_pos.remove();
                     }
-                    let new_pos = document.createElement('div');
+                    const new_pos = document.createElement('div');
                     new_pos.classList.add('my-pos');
                     new_pos.style.position = 'absolute';
                     new_pos.style.backgroundColor = 'white';
@@ -294,9 +287,9 @@ export function displayMap() {
             table.appendChild(tr);
         });
 
-        let final_col_tr = document.createElement('tr');
+        const final_col_tr = document.createElement('tr');
         map.vertical_mapping.forEach((cell) => {
-            let td = document.createElement('td');
+            const td = document.createElement('td');
             td.innerText = cell;
             td.classList.add('around-map');
             final_col_tr.appendChild(td);
@@ -306,7 +299,7 @@ export function displayMap() {
         table.firstElementChild.firstElementChild.style.cursor = 'pointer';
         table.firstElementChild.firstElementChild.addEventListener('click', () => displayMap());
         content.appendChild(table);
-    }
+    };
 
     getStorageItem(mho_map_key).then((mho_map) => {
         if (mho_map) {

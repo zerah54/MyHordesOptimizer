@@ -6,7 +6,6 @@ import {
     mho_store_notifications_id,
     repo_img_hordes_url
 } from '../config/constants';
-
 import styleTemplate from '../main.scss';
 
 const STYLE_PLACEHOLDERS: ReadonlyMap<string, string> = new Map([

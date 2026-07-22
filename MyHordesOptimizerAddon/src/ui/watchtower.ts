@@ -1,16 +1,16 @@
-import {getEstimations, saveEstimations} from '../api/estimations';
-import {mh_optimizer_icon, mho_watchtower_estim_id, repo_img_hordes_url} from '../config/constants';
-import {texts} from '../i18n/texts';
-import {state} from '../state';
-import {getI18N} from '../utils/i18n';
-import {copyToClipboard} from '../utils/misc';
-import {pageIsWatchtower} from '../utils/page';
-import {getScriptInfo} from '../utils/version';
+import { getEstimations, saveEstimations } from '../api/estimations';
+import { mh_optimizer_icon, mho_watchtower_estim_id, repo_img_hordes_url } from '../config/constants';
+import { texts } from '../i18n/texts';
+import { state } from '../state';
+import { getI18N } from '../utils/i18n';
+import { copyToClipboard } from '../utils/misc';
+import { pageIsWatchtower } from '../utils/page';
+import { getScriptInfo } from '../utils/version';
 
 export function displayEstimationsOnWatchtower() {
     if (state.mho_parameters.display_estimations_on_watchtower && pageIsWatchtower()) {
         let estim_block = document.querySelector(`#${mho_watchtower_estim_id}`);
-        let small_note = document.querySelector('.small-note');
+        const small_note = document.querySelector('.small-note');
         if (estim_block || !small_note) return;
 
 
@@ -26,52 +26,52 @@ export function displayEstimationsOnWatchtower() {
 
             const watchtower_planif_block = watchtower_estim_block.nextElementSibling;
             const watchtower_planif_block_prediction = watchtower_planif_block.querySelector('.x-copy-prediction')?.querySelector('[x-contain-prediction]')?.innerText;
-            const current_planif_percent_read = watchtower_planif_block.querySelector('.watchtower-prediction-text')?.innerText?.replace('%', '')
+            const current_planif_percent_read = watchtower_planif_block.querySelector('.watchtower-prediction-text')?.innerText?.replace('%', '');
             const current_planif_percent = current_planif_percent_read !== undefined && current_planif_percent_read !== null ? +current_planif_percent_read : (watchtower_planif_block_prediction ? 100 : undefined);
 
-            let createEstimationRow = (value, is_new_estimation, estimation, type) => {
+            const createEstimationRow = (value, is_new_estimation, estimation, type) => {
                 return `<b style="color: #afb3cf; opacity: .8;">[${value}%]</b>
                         <div id="${type}_${value}" style="font-weight: ${is_new_estimation ? 'bold' : 'normal'}; color: ${is_new_estimation ? 'lightgreen' : 'unset'}">
                             <span class="start" style="width: 100px">${estimation?.min || ''}</span> - <span class="end" style="width: 100px">${estimation?.max || ''}</span><img src="${repo_img_hordes_url}emotes/zombie.gif">
                         </div>`;
             };
-            let createCalculatedAttackRow = (calculated_attack) => {
-                let estim_values_block_title_calculated_text = ``;
+            const createCalculatedAttackRow = (calculated_attack) => {
+                let estim_values_block_title_calculated_text = '';
                 estim_values_block_title_calculated_text += `<div class="attack" style="display: flex; justify-content: space-between; gap: 1em;"><b>${getI18N(texts.calculated_attack)}</b><div><span>${calculated_attack.result.min}</span> - <span>${calculated_attack.result.max}</span></div></div>`;
 
                 return estim_values_block_title_calculated_text;
-            }
+            };
 
-            let updateEstimationRow = (estimations, percent, type) => {
+            const updateEstimationRow = (estimations, percent, type) => {
                 if (!estimations.estimations[type][`_${percent}`]) {
                     /** Workaround pour définir sur l'extension firefox sans passer par cloneinto */
-                    let estimations_workaround_estim = {...estimations.estimations};
-                    let estimations_workaround_type = {...estimations_workaround_estim[type]};
-                    let estimations_workaround_type_percent = {min: null, max: null};
-                    estimations_workaround_type[`_${percent}`] = {...estimations_workaround_type_percent};
-                    estimations_workaround_estim[type] = {...estimations_workaround_type};
-                    estimations.estimations = {...estimations_workaround_estim};
+                    const estimations_workaround_estim = { ...estimations.estimations };
+                    const estimations_workaround_type = { ...estimations_workaround_estim[type] };
+                    const estimations_workaround_type_percent = { min: null, max: null };
+                    estimations_workaround_type[`_${percent}`] = { ...estimations_workaround_type_percent };
+                    estimations_workaround_estim[type] = { ...estimations_workaround_type };
+                    estimations.estimations = { ...estimations_workaround_estim };
                 }
 
-                let estimation = estimations.estimations[type][`_${percent}`];
-                let main = document.querySelector(`#${mho_watchtower_estim_id}`);
-                let row = main.querySelector(`#${type}_${percent}`);
+                const estimation = estimations.estimations[type][`_${percent}`];
+                const main = document.querySelector(`#${mho_watchtower_estim_id}`);
+                const row = main.querySelector(`#${type}_${percent}`);
                 row.style.fontWeight = 'normal';
                 row.style.color = 'unset';
 
-                let start = row.querySelector(`.start`);
+                const start = row.querySelector('.start');
                 start.innerText = estimation?.min || '';
-                let end = row.querySelector(`.end`);
+                const end = row.querySelector('.end');
                 end.innerText = estimation?.max || '';
-            }
+            };
 
-            let updateCalculatedAttackRow = (estimations, type) => {
-                let main = document.querySelector(`#${mho_watchtower_estim_id}`);
-                let block = main.querySelector(`#${type}`);
+            const updateCalculatedAttackRow = (estimations, type) => {
+                const main = document.querySelector(`#${mho_watchtower_estim_id}`);
+                const block = main.querySelector(`#${type}`);
                 if (block) {
-                    let header = block.querySelector(`h5`);
-                    let calc_block = header.lastElementChild;
-                    let calc_attack = calc_block.querySelector('.attack').lastElementChild;
+                    const header = block.querySelector('h5');
+                    const calc_block = header.lastElementChild;
+                    const calc_attack = calc_block.querySelector('.attack').lastElementChild;
                     if (type === 'estim') {
                         if (calc_attack) {
                             calc_attack.firstElementChild.innerText = estimations.today_attack.result.min;
@@ -84,60 +84,60 @@ export function displayEstimationsOnWatchtower() {
                         }
                     }
                 }
-            }
+            };
 
             getEstimations().then((estimations) => {
-                estimations = {...estimations};
+                estimations = { ...estimations };
                 estim_block = document.createElement('div');
                 estim_block.style.marginTop = '1em';
                 estim_block.style.padding = '0.25em';
                 estim_block.style.border = '1px solid #ddab76';
                 estim_block.id = mho_watchtower_estim_id;
 
-                let estim_block_title = document.createElement('h5');
+                const estim_block_title = document.createElement('h5');
                 estim_block_title.style.margin = '0 0 0.5em';
                 estim_block_title.style.display = 'flex';
                 estim_block_title.style.gap = '0.5em';
                 estim_block_title.style.alignItems = 'center';
                 estim_block.appendChild(estim_block_title);
-                let estim_block_title_mho_img = document.createElement('img');
+                const estim_block_title_mho_img = document.createElement('img');
                 estim_block_title_mho_img.src = mh_optimizer_icon;
                 estim_block_title_mho_img.style.height = '24px';
                 estim_block_title.appendChild(estim_block_title_mho_img);
 
-                let estim_block_title_text = document.createElement('text');
+                const estim_block_title_text = document.createElement('text');
                 estim_block_title_text.style.flex = '1';
                 estim_block_title_text.innerText = getScriptInfo().name;
                 estim_block_title.appendChild(estim_block_title_text);
 
-                let estim_block_title_save_button = document.createElement('button');
+                const estim_block_title_save_button = document.createElement('button');
                 estim_block_title_save_button.style.flex = '0';
                 estim_block_title_save_button.style.margin = '0';
-                estim_block_title_save_button.innerText = `💾`;
+                estim_block_title_save_button.innerText = '💾';
                 estim_block_title_save_button.title = getI18N(texts.save);
                 estim_block_title.appendChild(estim_block_title_save_button);
 
                 estim_block_title_save_button.addEventListener('click', () => {
                     saveEstimations({
-                            percent: current_estimation_percent,
-                            value: {
-                                min: +watchtower_estim_block_prediction?.split(' ')[0],
-                                max: +watchtower_estim_block_prediction?.split(' ')[2]
-                            }
-                        },
-                        {
-                            percent: current_planif_percent,
-                            value: {
-                                min: +watchtower_planif_block_prediction?.split(' ')[0],
-                                max: +watchtower_planif_block_prediction?.split(' ')[2]
-                            }
-                        })
+                        percent: current_estimation_percent,
+                        value: {
+                            min: +watchtower_estim_block_prediction?.split(' ')[0],
+                            max: +watchtower_estim_block_prediction?.split(' ')[2]
+                        }
+                    },
+                                    {
+                                        percent: current_planif_percent,
+                                        value: {
+                                            min: +watchtower_planif_block_prediction?.split(' ')[0],
+                                            max: +watchtower_planif_block_prediction?.split(' ')[2]
+                                        }
+                                    })
                         .then(() => {
                             estim_block_title_save_button.innerHTML = `<img src="${repo_img_hordes_url}icons/done.png">`;
 
                             getEstimations().then((new_saved_estimations) => {
-                                updateCalculatedAttackRow(new_saved_estimations, 'estim')
-                                updateCalculatedAttackRow(new_saved_estimations, 'planif')
+                                updateCalculatedAttackRow(new_saved_estimations, 'estim');
+                                updateCalculatedAttackRow(new_saved_estimations, 'planif');
                                 TDG_VALUES.forEach((percent) => {
                                     updateEstimationRow(new_saved_estimations, percent, 'estim');
                                 });
@@ -150,7 +150,7 @@ export function displayEstimationsOnWatchtower() {
                         });
                 });
 
-                let estim_block_title_share_button = document.createElement('button');
+                const estim_block_title_share_button = document.createElement('button');
                 estim_block_title_share_button.style.flex = '0';
                 estim_block_title_share_button.style.margin = '0';
                 estim_block_title_share_button.style.whiteSpace = 'nowrap';
@@ -173,7 +173,7 @@ export function displayEstimationsOnWatchtower() {
                             if (value && (value.min || value.max)) {
                                 text += `[b][${value_key}%][/b] ${value.min || '?'} - ${value.max || '?'} :zombie:\n`;
                             } else {
-                                text += `[b][${value_key}%][/b] \n`
+                                text += `[b][${value_key}%][/b] \n`;
                             }
                         });
 
@@ -199,56 +199,56 @@ export function displayEstimationsOnWatchtower() {
 
                 small_note.parentElement.insertBefore(estim_block, small_note);
 
-                let estim_block_content = document.createElement('div');
+                const estim_block_content = document.createElement('div');
                 estim_block_content.style.display = 'flex';
                 estim_block_content.style.flexWrap = 'wrap';
                 estim_block_content.style.justifyContent = 'space-around';
                 estim_block.appendChild(estim_block_content);
 
-                let estim_values_block = document.createElement('div');
+                const estim_values_block = document.createElement('div');
                 estim_values_block.id = 'estim';
                 estim_block_content.appendChild(estim_values_block);
 
-                let estim_values_block_title = document.createElement('h5');
+                const estim_values_block_title = document.createElement('h5');
                 estim_values_block_title.style.marginTop = '0.25em';
 
-                let estim_values_block_title_title = document.createElement('div');
+                const estim_values_block_title_title = document.createElement('div');
                 estim_values_block_title_title.innerText = getI18N(texts.estim_title);
                 estim_values_block_title.appendChild(estim_values_block_title_title);
 
-                let estim_values_block_title_calculated = document.createElement('div');
-                let estim_values_block_title_calculated_text = createCalculatedAttackRow(estimations.today_attack);
+                const estim_values_block_title_calculated = document.createElement('div');
+                const estim_values_block_title_calculated_text = createCalculatedAttackRow(estimations.today_attack);
                 estim_values_block_title_calculated.innerHTML = estim_values_block_title_calculated_text;
                 estim_values_block_title.appendChild(estim_values_block_title_calculated);
 
                 estim_values_block.appendChild(estim_values_block_title);
 
                 TDG_VALUES.forEach((value) => {
-                    let saved_estimation = estimations.estimations.estim['_' + value] ? {
+                    const saved_estimation = estimations.estimations.estim['_' + value] ? {
                         min: estimations.estimations.estim['_' + value].min,
                         max: estimations.estimations.estim['_' + value].max
                     } : undefined;
 
                     if (!estimations.estimations.estim['_' + value]) {
                         /** Workaround pour définir sur l'extension firefox sans passer par cloneinto */
-                        let new_estimations = {...estimations};
-                        let new_estimations_estimations = {...new_estimations.estimations};
-                        let new_estimations_estimations_estim = {...new_estimations_estimations.estim};
-                        new_estimations_estimations_estim['_' + value] = {min: null, max: null};
-                        new_estimations_estimations.estim = {...new_estimations_estimations_estim};
-                        new_estimations.estimations = {...new_estimations_estimations};
-                        estimations = {...new_estimations};
+                        const new_estimations = { ...estimations };
+                        const new_estimations_estimations = { ...new_estimations.estimations };
+                        const new_estimations_estimations_estim = { ...new_estimations_estimations.estim };
+                        new_estimations_estimations_estim['_' + value] = { min: null, max: null };
+                        new_estimations_estimations.estim = { ...new_estimations_estimations_estim };
+                        new_estimations.estimations = { ...new_estimations_estimations };
+                        estimations = { ...new_estimations };
                     }
-                    let value_block = document.createElement('div');
+                    const value_block = document.createElement('div');
                     value_block.style.display = 'flex';
                     value_block.style.justifyContent = 'space-between';
                     value_block.style.gap = '1em';
                     estim_values_block.appendChild(value_block);
 
-                    let estimation = estimations.estimations.estim['_' + value];
+                    const estimation = estimations.estimations.estim['_' + value];
 
                     if (current_estimation_percent === value) {
-                        let current_estimation_value = {
+                        const current_estimation_value = {
                             min: watchtower_estim_block_prediction.split(' ')[0],
                             max: watchtower_estim_block_prediction.split(' ')[2]
                         };
@@ -263,26 +263,26 @@ export function displayEstimationsOnWatchtower() {
 
                 if (watchtower_planif_block && watchtower_planif_block_prediction) {
 
-                    let planif_values_block = document.createElement('div');
+                    const planif_values_block = document.createElement('div');
                     planif_values_block.id = 'planif';
                     estim_block_content.appendChild(planif_values_block);
 
-                    let planif_values_block_title = document.createElement('h5');
+                    const planif_values_block_title = document.createElement('h5');
                     planif_values_block_title.style.marginTop = '0.25em';
 
-                    let planif_values_block_title_title = document.createElement('div');
+                    const planif_values_block_title_title = document.createElement('div');
                     planif_values_block_title_title.innerText = getI18N(texts.planif_title);
                     planif_values_block_title.appendChild(planif_values_block_title_title);
 
-                    let planif_values_block_title_calculated = document.createElement('div');
-                    let planif_values_block_title_calculated_text = createCalculatedAttackRow(estimations.tomorrow_attack);
+                    const planif_values_block_title_calculated = document.createElement('div');
+                    const planif_values_block_title_calculated_text = createCalculatedAttackRow(estimations.tomorrow_attack);
                     planif_values_block_title_calculated.innerHTML = planif_values_block_title_calculated_text;
                     planif_values_block_title.appendChild(planif_values_block_title_calculated);
 
                     planif_values_block.appendChild(planif_values_block_title);
 
                     PLANIF_VALUES.forEach((value) => {
-                        let saved_estimation = estimations.estimations.planif['_' + value] ? {
+                        const saved_estimation = estimations.estimations.planif['_' + value] ? {
                             min: estimations.estimations.planif['_' + value].min,
                             max: estimations.estimations.planif['_' + value].max
                         } : undefined;
@@ -290,25 +290,25 @@ export function displayEstimationsOnWatchtower() {
 
                         if (!estimations.estimations.planif['_' + value]) {
                             /** Workaround pour définir sur l'extension firefox sans passer par cloneinto */
-                            let new_estimations = {...estimations};
-                            let new_estimations_estimations = {...new_estimations.estimations};
-                            let new_estimations_estimations_planif = {...new_estimations_estimations.planif};
-                            new_estimations_estimations_planif['_' + value] = {min: null, max: null};
-                            new_estimations_estimations.planif = {...new_estimations_estimations_planif};
-                            new_estimations.estimations = {...new_estimations_estimations};
-                            estimations = {...new_estimations};
+                            const new_estimations = { ...estimations };
+                            const new_estimations_estimations = { ...new_estimations.estimations };
+                            const new_estimations_estimations_planif = { ...new_estimations_estimations.planif };
+                            new_estimations_estimations_planif['_' + value] = { min: null, max: null };
+                            new_estimations_estimations.planif = { ...new_estimations_estimations_planif };
+                            new_estimations.estimations = { ...new_estimations_estimations };
+                            estimations = { ...new_estimations };
                         }
 
-                        let value_block = document.createElement('div');
+                        const value_block = document.createElement('div');
                         value_block.style.display = 'flex';
                         value_block.style.justifyContent = 'space-between';
                         value_block.style.gap = '1em';
                         planif_values_block.appendChild(value_block);
 
-                        let estimation = estimations.estimations.planif['_' + value];
+                        const estimation = estimations.estimations.planif['_' + value];
 
                         if (current_planif_percent === value) {
-                            let current_estimation_value = {
+                            const current_estimation_value = {
                                 min: watchtower_planif_block_prediction.split(' ')[0],
                                 max: watchtower_planif_block_prediction.split(' ')[2]
                             };

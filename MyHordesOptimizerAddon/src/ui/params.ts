@@ -1,50 +1,63 @@
-import {mho_parameters_key} from '../config/constants';
-import {params_categories} from '../data/params';
-import {texts} from '../i18n/texts';
-import {state} from '../state';
-import {initOptionsWithLoginNeeded, initOptionsWithoutLoginNeeded} from '../utils/fetch';
-import {getI18N} from '../utils/i18n';
-import {isTouchScreen} from '../utils/misc';
-import {getStorageItem, setStorageItem} from '../utils/storage';
+import { mho_parameters_key } from '../config/constants';
+import { params_categories } from '../data/params';
+import { texts } from '../i18n/texts';
+import { state } from '../state';
+import type { I18nLabel } from '../types';
+import { initOptionsWithLoginNeeded, initOptionsWithoutLoginNeeded } from '../utils/fetch';
+import { getI18N } from '../utils/i18n';
+import { isTouchScreen } from '../utils/misc';
+import { getStorageItem, setStorageItem } from '../utils/storage';
+import { openForumThreadStylesModal } from './forum-styles-modal';
+
+/**
+ * Les actions déclenchables depuis une ligne de paramètre : un paramètre qui
+ * déclare `action: '<clé>'` affiche un bouton, visible tant qu'il est coché.
+ */
+const param_actions: Record<string, { label: I18nLabel; handler: () => void }> = {
+    forum_thread_styles: {
+        label: texts.forum_styles_configure,
+        handler: openForumThreadStylesModal
+    }
+};
 
 export function createParams(content) {
-    let categories_container = document.createElement('div');
+    const categories_container = document.createElement('div');
     categories_container.style.maxHeight = '75vh';
     categories_container.style.overflow = 'auto';
     categories_container.id = 'categories';
     content.appendChild(categories_container);
 
-    let params_title = document.createElement('h5');
+    const params_title = document.createElement('h5');
     params_title.style.display = 'flex';
     params_title.style.justifyContent = 'space-between';
     categories_container.appendChild(params_title);
 
-    let params_title_text = document.createElement('span');
+    const params_title_text = document.createElement('span');
     params_title_text.innerText = getI18N(texts.parameters_section_label);
     params_title.appendChild(params_title_text);
 
-    let params_title_select_all = document.createElement('a');
+    const params_title_select_all = document.createElement('a');
     params_title_select_all.innerText = getI18N(texts.check_all);
     params_title_select_all.style.cursor = 'pointer';
     params_title.appendChild(params_title_select_all);
 
     params_title_select_all.addEventListener('click', () => {
-        let unchecked = Array.from(categories_container.querySelectorAll('input.mho-param[type=checkbox]:not(:checked)'));
+        const unchecked = Array.from(categories_container.querySelectorAll('input.mho-param[type=checkbox]:not(:checked)'));
         unchecked.forEach((checkbox) => checkbox.click());
     });
 
-    let categories_list = document.createElement('ul');
+    const categories_list = document.createElement('ul');
     categories_container.appendChild(categories_list);
 
     params_categories.forEach((category) => {
-        let category_container = document.createElement('li');
+        const category_container = document.createElement('li');
         categories_list.appendChild(category_container);
 
-        let category_title = document.createElement('h1');
+        const category_title = document.createElement('h1');
         category_title.innerText = getI18N(category.label);
         category_container.appendChild(category_title);
 
-        let category_content = document.createElement('ul');
+        const category_content = document.createElement('ul');
         category_content.classList.add('parameters');
         category_container.appendChild(category_content);
 
@@ -66,31 +79,31 @@ export function createParamItem(param, parent, depth) {
     const has_children = param.children && param.children.length > 0;
     const is_touch = isTouchScreen();
 
-    let param_container = document.createElement('li');
+    const param_container = document.createElement('li');
     param_container.id = param.id;
     parent.appendChild(param_container);
 
     // Ligne principale : checkbox + label + help
-    let param_row = document.createElement('div');
+    const param_row = document.createElement('div');
     param_row.style.display = 'flex';
     param_row.style.alignItems = 'center';
     param_row.style.justifyContent = 'space-between';
     param_container.appendChild(param_row);
 
-    let param_input_div = document.createElement('div');
+    const param_input_div = document.createElement('div');
     param_input_div.style.display = 'flex';
     param_input_div.style.alignItems = 'center';
     param_input_div.style.flex = '1';
     param_row.appendChild(param_input_div);
 
-    let param_input = document.createElement('input');
+    const param_input = document.createElement('input');
     param_input.type = 'checkbox';
     param_input.id = param.id + '_input';
     param_input.classList.add('mho-input', 'mho-param');
     param_input.checked = state.mho_parameters?.[param.id] ?? false;
     param_input_div.appendChild(param_input);
 
-    let param_label = document.createElement('label');
+    const param_label = document.createElement('label');
     param_label.classList.add('small');
     // Sur mobile on ne lie pas le label à l'input (le clic label = toggle expand, pas check)
     param_label.htmlFor = (!is_touch && window.innerWidth > 1000) ? param.id + '_input' : '';
@@ -110,6 +123,10 @@ export function createParamItem(param, parent, depth) {
         param_input_div.appendChild(arrow_indicator);
     }
 
+    if (param.action && param_actions[param.action]) {
+        param_row.appendChild(createParamActionButton(param_actions[param.action], param_input));
+    }
+
     if (param.help) {
         param_row.appendChild(createHelpButton(getI18N(param.help)));
     }
@@ -124,7 +141,7 @@ export function createParamItem(param, parent, depth) {
     }
 
     // Conteneur enfants
-    let children_container = document.createElement('ul');
+    const children_container = document.createElement('ul');
     children_container.style.listStyle = 'none';
     children_container.style.display = 'none';
     param_container.appendChild(children_container);
@@ -321,22 +338,48 @@ export function setParamChildrenChecked(param, checked) {
     if (!param.children) return;
     param.children.forEach((child) => {
         updateParam(child.id, checked);
-        let child_input = document.querySelector(`#${child.id}_input`);
+        const child_input = document.querySelector(`#${child.id}_input`);
         if (child_input) child_input.checked = checked;
         setParamChildrenChecked(child, checked);
     });
 }
 
 
+/**
+ * Crée le bouton d'action d'un paramètre. Il n'a de sens que si le paramètre
+ * est actif : sa visibilité suit donc l'état de la case à cocher.
+ * @param {object} action                   L'action à déclencher
+ * @param {HTMLInputElement} param_input    La case à cocher du paramètre
+ */
+function createParamActionButton(action: { label: I18nLabel; handler: () => void }, param_input: HTMLInputElement): HTMLElement {
+    const action_button: HTMLElement = document.createElement('a');
+    action_button.classList.add('mho-param-action');
+    action_button.innerText = getI18N(action.label);
+    action_button.style.display = param_input.checked ? 'inline-block' : 'none';
+
+    action_button.addEventListener('click', (event: MouseEvent) => {
+        event.preventDefault();
+        event.stopPropagation();
+        action.handler();
+    });
+
+    param_input.addEventListener('change', () => {
+        action_button.style.display = param_input.checked ? 'inline-block' : 'none';
+    });
+
+    return action_button;
+}
+
+
 export function createHelpButton(text_to_display) {
 
-    let help_button = document.createElement('a');
+    const help_button = document.createElement('a');
     help_button.innerText = getI18N(texts.external_app_id_help_label);
     help_button.classList.add('help-button');
 
-    let help_tooltip = document.createElement('div')
+    const help_tooltip = document.createElement('div');
     help_tooltip.classList.add('tooltip', 'help', 'hidden', 'mho');
-    help_tooltip.setAttribute('style', `text-transform: initial; display: block; position: absolute; width: 250px;`);
+    help_tooltip.setAttribute('style', 'text-transform: initial; display: block; position: absolute; width: 250px;');
     help_tooltip.innerHTML = text_to_display;
     help_button.appendChild(help_tooltip);
 
@@ -344,18 +387,18 @@ export function createHelpButton(text_to_display) {
         help_tooltip.style.top = (help_button.getBoundingClientRect().top) as any;
         help_tooltip.style.right = (help_button.getBoundingClientRect().right) as any;
         help_tooltip.classList.remove('hidden');
-    })
+    });
     help_button.addEventListener('mouseleave', function () {
         help_tooltip.classList.add('hidden');
-    })
+    });
 
-    return help_button
+    return help_button;
 }
 
 /** Enregistre les paramètres de l'extension */
 
 export function saveParameters() {
-    let parameters = document.getElementsByClassName('parameter');
+    const parameters = document.getElementsByClassName('parameter');
 }
 
 /** Affiche le bouton de mise à jour des outils externes */

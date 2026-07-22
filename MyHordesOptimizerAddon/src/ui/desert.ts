@@ -1,15 +1,15 @@
-import {texts} from '../i18n/texts';
-import {state} from '../state';
-import {getI18N} from '../utils/i18n';
-import {createNotification} from '../utils/notifications';
-import {pageIsDesert} from '../utils/page';
+import { texts } from '../i18n/texts';
+import { state } from '../state';
+import { getI18N } from '../utils/i18n';
+import { createNotification } from '../utils/notifications';
+import { pageIsDesert } from '../utils/page';
 
 export function preventFromLeaving() {
     if (state.mho_parameters.alert_if_no_escort && state.mho_parameters.prevent_from_leaving && pageIsDesert()) {
-        let prevent_function = (event) => {
-            let e = event || window.event;
+        const prevent_function = (event) => {
+            const e = event || window.event;
 
-            let ae_button = document.querySelector('button[x-toggle-escort="1"]:not([x-escort-control-endpoint])');
+            const ae_button = document.querySelector('button[x-toggle-escort="1"]:not([x-escort-control-endpoint])');
             if (ae_button) {
                 let mho_leaving_info = document.getElementById('mho-leaving-info');
                 if (!mho_leaving_info) {
@@ -21,7 +21,7 @@ export function preventFromLeaving() {
                 }
             }
 
-            let is_escorting = document.getElementsByClassName('beyond-escort-on')[0];
+            const is_escorting = document.getElementsByClassName('beyond-escort-on')[0];
 
             if (is_escorting) {
                 let mho_leaving_info = document.getElementById('mho-leaving-info');
@@ -43,7 +43,7 @@ export function preventFromLeaving() {
 
                 return '';
             }
-        }
+        };
 
         window.addEventListener('beforeunload', prevent_function, false);
     }
@@ -54,11 +54,11 @@ export function preventFromLeaving() {
 export function alertIfInactiveAndNoEscort() {
     if (state.mho_parameters.alert_if_no_escort && state.mho_parameters.alert_if_inactive && pageIsDesert()) {
 
-        let ae_button = document.querySelector('button[x-toggle-escort="1"]:not([x-escort-control-endpoint])');
-        let is_escorting = document.getElementsByClassName('beyond-escort-on')[0];
+        const ae_button = document.querySelector('button[x-toggle-escort="1"]:not([x-escort-control-endpoint])');
+        const is_escorting = document.getElementsByClassName('beyond-escort-on')[0];
 
-        let notify = () => {
-            createNotification(getI18N(ae_button ? texts.prevent_not_in_ae : texts.escort_not_released))
+        const notify = () => {
+            createNotification(getI18N(ae_button ? texts.prevent_not_in_ae : texts.escort_not_released));
         };
 
         if (ae_button || is_escorting) {
@@ -69,12 +69,12 @@ export function alertIfInactiveAndNoEscort() {
 
             document.addEventListener('click', () => {
                 clearTimeout(timeout);
-                timeout = setTimeout(timeout as any, timer)
+                timeout = setTimeout(timeout as any, timer);
             });
 
             document.addEventListener('mousemove', () => {
                 clearTimeout(timeout);
-                timeout = setTimeout(timeout as any, timer)
+                timeout = setTimeout(timeout as any, timer);
             });
         }
     }
@@ -107,7 +107,7 @@ export function changeDefaultEscortOptions() {
                         escort_allow_rucksack.click();
                     }
                 }
-            }, {once: true});
+            }, { once: true });
         });
     }
 }

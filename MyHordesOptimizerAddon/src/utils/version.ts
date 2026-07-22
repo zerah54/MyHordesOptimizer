@@ -1,18 +1,18 @@
-import {mho_version_key} from '../config/constants';
-import {api_texts} from '../i18n/texts';
-import {state} from '../state';
-import {getI18N} from './i18n';
-import {buttonOptimizerElement} from './page';
-import {setStorageItem} from './storage';
-import {changelogs} from '../data/changelogs';
+import { mho_version_key } from '../config/constants';
+import { changelogs } from '../data/changelogs';
+import { api_texts } from '../i18n/texts';
+import { state } from '../state';
+import { getI18N } from './i18n';
+import { buttonOptimizerElement } from './page';
+import { setStorageItem } from './storage';
 
 export function convertResponsePromiseToError(response: any): Promise<any> {
     return response.text().then((text) => {
-        let error = new Error(text);
+        const error = new Error(text);
         error.status = response.status;
         error.name = response.statusText;
         throw error;
-    })
+    });
 }
 
 export function getErrorFromApi(error) {
@@ -20,7 +20,7 @@ export function getErrorFromApi(error) {
         let error_text = '';
         error_text += `
             <div>${getI18N(api_texts.error).replace('$error$', (error.status ?? '') + (error.status !== 500 && error.status !== 502 && error.status !== 504 ? ' - ' + (error.message ?? error.name ?? error.statusText) : ''))}</div>
-            <br />`
+            <br />`;
         if (!isScriptVersionLastVersion()) {
             error_text += `<div><small>${getI18N(api_texts.error_version).replace('$your_version$', getScriptInfo().version).replace('$recent_version$', state.parameters?.find((param) => param.name === 'ScriptVersion')?.value)}</small></div>`;
             error_text += `<small>${getI18N(api_texts.update_script)}</small>`;
@@ -51,7 +51,7 @@ export function isScriptVersionLastVersion() {
 }
 
 export function isNewVersion(version) {
-    if (!version || typeof version !== "object") {
+    if (!version || typeof version !== 'object') {
         version = {};
         setStorageItem(mho_version_key, version);
     }
@@ -60,7 +60,7 @@ export function isNewVersion(version) {
 
 export function toggleNewChangelog(new_changelog) {
     state.has_new_changelog = new_changelog;
-    let optimizer_btn = buttonOptimizerElement();
+    const optimizer_btn = buttonOptimizerElement();
     if (optimizer_btn) {
         if (new_changelog && !optimizer_btn.classList.contains('mho-new-changelog')) {
             optimizer_btn.classList.add('mho-new-changelog');
@@ -68,7 +68,7 @@ export function toggleNewChangelog(new_changelog) {
             optimizer_btn.classList.remove('mho-new-changelog');
         }
 
-        let changelog_item = optimizer_btn.querySelector('#version');
+        const changelog_item = optimizer_btn.querySelector('#version');
         if (changelog_item) {
             if (new_changelog && !changelog_item.classList.contains('mho-new-changelog')) {
                 changelog_item.classList.add('mho-new-changelog');
@@ -80,7 +80,7 @@ export function toggleNewChangelog(new_changelog) {
 }
 
 export function toggleNewVersion(new_version) {
-    let optimizer_btn = buttonOptimizerElement();
+    const optimizer_btn = buttonOptimizerElement();
     if (optimizer_btn) {
         if (new_version && !optimizer_btn.classList.contains('mho-new-version')) {
             optimizer_btn.classList.add('mho-new-version');
@@ -88,7 +88,7 @@ export function toggleNewVersion(new_version) {
             optimizer_btn.classList.remove('mho-new-version');
         }
 
-        let update_item = optimizer_btn.querySelector('#update');
+        const update_item = optimizer_btn.querySelector('#update');
         if (update_item) {
             if (new_version && !update_item.classList.contains('mho-new-version')) {
                 update_item.classList.add('mho-new-version');
@@ -147,7 +147,7 @@ export function getScriptInfo() {
 
 export function getChangelog(): string {
     const version: string = getScriptInfo().version;
-    const content: string = changelogs[version] ?? `Aucune note de version disponible pour cette mise à jour.`;
+    const content: string = changelogs[version] ?? 'Aucune note de version disponible pour cette mise à jour.';
     return `${getScriptInfo().name} : Changelog pour la version ${version}
         ${content}`;
 }

@@ -1,25 +1,25 @@
-import {saveBath} from './bath';
-import {getMap} from './map';
-import {getWishlist} from './wishlist';
-import {hordes_img_url, lang} from '../config/constants';
-import {state} from '../state';
-import {fetcher} from '../utils/fetch';
-import {getI18N} from '../utils/i18n';
-import {fixMhCompiledImg} from '../utils/misc';
-import {addError, normalizeString} from '../utils/notifications';
-import {pageIsAmelio, pageIsDesert, pageIsDoors, pageIsHouse} from '../utils/page';
-import {getCurrentPosition} from '../utils/position';
-import {convertResponsePromiseToError} from '../utils/version';
-import {getItemFromImg} from '../utils/item-lookup';
+import { hordes_img_url, lang } from '../config/constants';
+import { state } from '../state';
+import { fetcher } from '../utils/fetch';
+import { getI18N } from '../utils/i18n';
+import { getItemFromImg } from '../utils/item-lookup';
+import { fixMhCompiledImg } from '../utils/misc';
+import { addError, normalizeString } from '../utils/notifications';
+import { pageIsAmelio, pageIsDesert, pageIsDoors, pageIsHouse } from '../utils/page';
+import { getCurrentPosition } from '../utils/position';
+import { convertResponsePromiseToError } from '../utils/version';
+import { saveBath } from './bath';
+import { getMap } from './map';
+import { getWishlist } from './wishlist';
 
 export function updateExternalTools() {
-    const {mh_user, mho_parameters, api_url, external_app_id} = state as any;
+    const { mh_user, mho_parameters, api_url, external_app_id } = state as any;
     return new Promise(async (resolve, reject) => {
 
-        let convertListOfSingleObjectsIntoListOfCountedObjects = (objects) => {
-            let object_map = [];
+        const convertListOfSingleObjectsIntoListOfCountedObjects = (objects) => {
+            const object_map = [];
             objects.forEach((object) => {
-                let object_in_map = object_map.find((_object_in_map) => _object_in_map.id === object.id && _object_in_map.isBroken === object.isBroken);
+                const object_in_map = object_map.find((_object_in_map) => _object_in_map.id === object.id && _object_in_map.isBroken === object.isBroken);
                 if (object_in_map) {
                     object_in_map.count += 1;
                 } else if (object) {
@@ -28,10 +28,10 @@ export function updateExternalTools() {
                 }
             });
             return object_map;
-        }
+        };
 
-        let data: any = {};
-        let nb_dead_zombies = +document.querySelectorAll('.actor.splatter').length;
+        const data: any = {};
+        const nb_dead_zombies = +document.querySelectorAll('.actor.splatter').length;
 
         data.townDetails = {
             townX: mh_user.townDetails?.townX,
@@ -40,7 +40,7 @@ export function updateExternalTools() {
             isChaos: mh_user.townDetails?.isChaos,
         };
 
-        data.map = {}
+        data.map = {};
         data.map.toolsToUpdate = {
             isBigBrothHordes: /* mho_parameters && mho_parameters.update_bbh && !is_mh_beta ? 'api' : */ 'none',
             isFataMorgana: mho_parameters && mho_parameters.update_fata ? 'api' : 'none',
@@ -48,18 +48,18 @@ export function updateExternalTools() {
             isMyHordesOptimizer: mho_parameters && mho_parameters.update_mho ? 'api' : 'none'
         };
 
-        let position = getCurrentPosition();
+        const position = getCurrentPosition();
         let citizen_list: any[] = Array.from(document.querySelectorAll('.citizen-box .username[x-user-id]') || [])?.map((citizen_box: any) => {
             return {
                 id: +citizen_box.getAttribute('x-user-id'),
                 userName: citizen_box.innerText,
                 job: citizen_box.parentElement.parentElement.querySelector('img[src*=professions]').src.replace(/.*professions\/(\w+).*/, '$1'),
                 row: citizen_box
-            }
+            };
         });
 
         if (!citizen_list || citizen_list.length === 0) {
-            citizen_list = [{id: mh_user.id, userName: mh_user.userName, job: mh_user.jobDetails.uid}];
+            citizen_list = [{ id: mh_user.id, userName: mh_user.userName, job: mh_user.jobDetails.uid }];
         }
 
         // Mise à jour en ville chaos
@@ -75,19 +75,19 @@ export function updateExternalTools() {
                 data.map.toolsToUpdate.isFataMorgana = 'cell';
             }
 
-            let objects = Array.from(document.querySelector('.inventory.desert')?.querySelectorAll('li.item') || []).map((desert_item) => {
-                let item = getItemFromImg(desert_item.querySelector('img')?.src);
-                return {id: item?.id, isBroken: desert_item.classList.contains('broken')};
+            const objects = Array.from(document.querySelector('.inventory.desert')?.querySelectorAll('li.item') || []).map((desert_item) => {
+                const item = getItemFromImg(desert_item.querySelector('img')?.src);
+                return { id: item?.id, isBroken: desert_item.classList.contains('broken') };
             });
 
-            let content = {
+            const content = {
                 x: +position[0],
                 y: +position[1],
                 zombies: +document.querySelectorAll('.actor.zombie').length,
                 zoneEmpty: !!document.querySelector('#mgd-zone-note'),
                 objects: convertListOfSingleObjectsIntoListOfCountedObjects(objects),
                 citizenId: citizen_list.map((citizen) => citizen.id)
-            }
+            };
             if (data.map.cell) {
                 data.map.cell.zombies = content.zombies;
                 data.map.cell.zoneEmpty = content.zoneEmpty;
@@ -114,12 +114,12 @@ export function updateExternalTools() {
                 data.map.toolsToUpdate.isFataMorgana = 'cell';
             }
 
-            let content = {
+            const content = {
                 x: +position[0],
                 y: +position[1],
                 deadZombies: nb_dead_zombies,
                 citizenId: citizen_list.map((citizen) => citizen.id)
-            }
+            };
 
             if (data.map.cell) {
                 data.map.cell.deadZombies = nb_dead_zombies;
@@ -142,11 +142,20 @@ export function updateExternalTools() {
 
             if (mh_user.jobDetails.uid === 'dig') {
 
-                let zone_scav_level_img = fixMhCompiledImg(document.querySelector('.zone-scavenger img')?.src);
-                let index = zone_scav_level_img.indexOf(hordes_img_url);
-                zone_scav_level_img = zone_scav_level_img.slice(index).replace(hordes_img_url, '').replace('icons/', '');
+                // L'indicateur d'abondance est absent de la page quand le niveau de fouille est inconnu.
+                // Dans ce cas la valeur doit rester indéfinie : un 0 signifierait « zone épuisée ».
+                const scav_zone_level_src = document.querySelector('.zone-scavenger img')?.src;
+                let scav_zone_level = undefined;
+                if (scav_zone_level_src) {
+                    let zone_scav_level_img = fixMhCompiledImg(scav_zone_level_src);
+                    const index = zone_scav_level_img.indexOf(hordes_img_url);
+                    zone_scav_level_img = zone_scav_level_img.slice(index).replace(hordes_img_url, '').replace('icons/', '');
+                    // Les niveaux 1 à 3 utilisent collec_lvX.gif, le niveau 0 utilise Small_broken.gif
+                    const level_match = zone_scav_level_img.match(/\d/);
+                    scav_zone_level = level_match && level_match.length > 0 ? +level_match[0] : 0;
+                }
 
-                let content = {
+                const content = {
                     x: +position[0],
                     y: +position[1],
                     scavNextCells: {
@@ -155,9 +164,9 @@ export function updateExternalTools() {
                         south: document.querySelector('.scavenger-sense-south') ? !document.querySelector('.scavenger-sense-south.scavenger-sense-1') : undefined,
                         west: document.querySelector('.scavenger-sense-west') ? !document.querySelector('.scavenger-sense-west.scavenger-sense-1') : undefined
                     },
-                    scavZoneLevel: zone_scav_level_img.match(/\d/)?.length > 0 ? +zone_scav_level_img.match(/\d/)[0] : 0,
+                    scavZoneLevel: scav_zone_level,
                     citizenId: citizen_list.map((citizen) => citizen.id),
-                }
+                };
 
                 if (data.map.cell) {
                     data.map.cell.scavNextCells = content.scavNextCells;
@@ -166,10 +175,19 @@ export function updateExternalTools() {
                     data.map.cell = content;
                 }
             } else if (mh_user.jobDetails.uid === 'vest') {
-                let zone_scout_level_src = document.querySelector('.zone-scout')?.querySelector('img').src;
-                let index = zone_scout_level_src.indexOf(hordes_img_url);
-                zone_scout_level_src = zone_scout_level_src.slice(index).replace(hordes_img_url, '')
-                let content = {
+                // Le bloc .zone-scout n'existe pas si le niveau d'exploration est inconnu
+                // ou si le joueur n'est pas en mode expert : on ne remonte alors aucun niveau.
+                let zone_scout_level_src = document.querySelector('.zone-scout')?.querySelector('img')?.src;
+                let scout_zone_level = undefined;
+                if (zone_scout_level_src) {
+                    const index = zone_scout_level_src.indexOf(hordes_img_url);
+                    zone_scout_level_src = zone_scout_level_src.slice(index).replace(hordes_img_url, '');
+                    scout_zone_level = +fixMhCompiledImg(zone_scout_level_src).replace(/\D/g, '');
+                    if (isNaN(scout_zone_level)) {
+                        scout_zone_level = undefined;
+                    }
+                }
+                const content = {
                     x: +position[0],
                     y: +position[1],
                     scoutNextCells: {
@@ -178,8 +196,8 @@ export function updateExternalTools() {
                         south: document.querySelector('.scout-sense-south') ? +document.querySelector('.scout-sense-south').querySelector('text')?.innerHTML : undefined,
                         west: document.querySelector('.scout-sense-west') ? +document.querySelector('.scout-sense-west').querySelector('text')?.innerHTML : undefined
                     },
-                    scoutZoneLvl: +fixMhCompiledImg(zone_scout_level_src).replace(/\D/g, '') || undefined
-                }
+                    scoutZoneLvl: scout_zone_level
+                };
 
                 if (data.map.cell) {
                     data.map.cell.scoutNextCells = content.scoutNextCells;
@@ -193,7 +211,7 @@ export function updateExternalTools() {
         // Mise à jour du contenu des sacs
         if (mho_parameters.update_mho && mho_parameters.update_mho_bags) {
 
-            data.bags = {}
+            data.bags = {};
             data.bags.contents = [];
             data.bags.toolsToUpdate = {
                 isBigBrothHordes: false,
@@ -202,11 +220,11 @@ export function updateExternalTools() {
                 isMyHordesOptimizer: mho_parameters && mho_parameters.update_mho_bags
             };
 
-            let rucksacks = [];
-            let my_rusksack = Array.from(document.querySelector('.inventory.rucksack')?.querySelectorAll('li.item:not(.locked)') || []).map((rucksack_item) => {
-                let item = getItemFromImg(rucksack_item.querySelector('img')?.src);
+            const rucksacks = [];
+            const my_rusksack = Array.from(document.querySelector('.inventory.rucksack')?.querySelectorAll('li.item:not(.locked)') || []).map((rucksack_item) => {
+                const item = getItemFromImg(rucksack_item.querySelector('img')?.src);
                 if (item) {
-                    return {id: item.id, isBroken: rucksack_item.classList.contains('broken')};
+                    return { id: item.id, isBroken: rucksack_item.classList.contains('broken') };
                 }
             });
 
@@ -216,19 +234,19 @@ export function updateExternalTools() {
             });
 
             if (pageIsDesert()) {
-                let escorts = Array.from(document.querySelectorAll('.beyond-escort-on:not(.beyond-escort-on-all)') || []);
+                const escorts = Array.from(document.querySelectorAll('.beyond-escort-on:not(.beyond-escort-on-all)') || []);
                 escorts.forEach((escort) => {
-                    let escort_id = +escort.querySelector('span.username')?.getAttribute('x-user-id');
-                    let escort_rucksack = Array.from(escort.querySelector('.inventory.rucksack-escort')?.querySelectorAll('li.item:not(.locked):not(.plus)') || []).map((rucksack_item) => {
-                        let item = getItemFromImg(rucksack_item.querySelector('img')?.src);
-                        return {id: item?.id, isBroken: rucksack_item.classList.contains('broken')};
+                    const escort_id = +escort.querySelector('span.username')?.getAttribute('x-user-id');
+                    const escort_rucksack = Array.from(escort.querySelector('.inventory.rucksack-escort')?.querySelectorAll('li.item:not(.locked):not(.plus)') || []).map((rucksack_item) => {
+                        const item = getItemFromImg(rucksack_item.querySelector('img')?.src);
+                        return { id: item?.id, isBroken: rucksack_item.classList.contains('broken') };
                     });
 
                     rucksacks.push({
                         userId: escort_id,
                         objects: convertListOfSingleObjectsIntoListOfCountedObjects(escort_rucksack),
                     });
-                })
+                });
             }
 
             data.bags.contents = rucksacks;
@@ -238,7 +256,7 @@ export function updateExternalTools() {
         // Mise à jour du contenu du coffre
         if (mho_parameters.update_mho && mho_parameters.update_mho_chest && pageIsHouse()) {
 
-            data.chest = {}
+            data.chest = {};
             data.chest.contents = [];
             data.chest.toolsToUpdate = {
                 isBigBrothHordes: false,
@@ -247,9 +265,9 @@ export function updateExternalTools() {
                 isMyHordesOptimizer: mho_parameters && mho_parameters.update_mho_chest
             };
 
-            let chest_elements = Array.from(document.querySelector('.inventory.chest')?.querySelectorAll('li.item:not(.locked)') || []).map((chest_item) => {
-                let item = getItemFromImg(chest_item.querySelector('img')?.src);
-                return {id: item.id, isBroken: chest_item.classList.contains('broken')};
+            const chest_elements = Array.from(document.querySelector('.inventory.chest')?.querySelectorAll('li.item:not(.locked)') || []).map((chest_item) => {
+                const item = getItemFromImg(chest_item.querySelector('img')?.src);
+                return { id: item.id, isBroken: chest_item.classList.contains('broken') };
             });
 
             data.chest.contents = convertListOfSingleObjectsIntoListOfCountedObjects(chest_elements);
@@ -263,19 +281,19 @@ export function updateExternalTools() {
                     x: soul_area.parentElement?.style?.gridRowStart,
                     y: soul_area.parentElement?.style?.gridColumnStart
                 };
-            })
+            });
             data.souls = soul_areas;
-            console.log("data.souls", data.souls);
-            console.log("user", mh_user);
+            console.log('data.souls', data.souls);
+            console.log('user', mh_user);
         }
 
 
         /** Récupération des pouvoirs héroïques */
         if (((mho_parameters.update_gh && mho_parameters.update_gh_ah) || (mho_parameters.update_mho && mho_parameters.update_mho_actions)) && (pageIsDesert() || pageIsHouse())) {
 
-            let no_interaction = document.querySelector('.no-interaction');
+            const no_interaction = document.querySelector('.no-interaction');
 
-            data.heroicActions = {}
+            data.heroicActions = {};
             data.heroicActions.actions = [];
             data.heroicActions.toolsToUpdate = {
                 isBigBrothHordes: false,
@@ -283,50 +301,50 @@ export function updateExternalTools() {
                 isGestHordes: mho_parameters && mho_parameters.update_gh_ah,
                 isMyHordesOptimizer: mho_parameters && mho_parameters.update_mho_actions
             };
-            let heroics = Array.from(document.querySelector('.heroic_actions')?.querySelectorAll('.heroic_action:not(.help)') || []);
+            const heroics = Array.from(document.querySelector('.heroic_actions')?.querySelectorAll('.heroic_action:not(.help)') || []);
             if (heroics && heroics.length > 0) {
-                for (let heroic of heroics) {
-                    let action = {
+                for (const heroic of heroics) {
+                    const action = {
                         locale: lang,
                         label: heroic.querySelector('.label')?.innerText,
                         value: heroic.classList.contains('already') ? 0 : 1
-                    }
+                    };
                     data.heroicActions.actions.push(action);
                 }
             } else if (!no_interaction) {
-                let action = {
+                const action = {
                     locale: lang,
                     label: 'Empty',
                     value: pageIsDesert() ? 0 /* 'desert' */ : 1 /* 'town' */
-                }
+                };
                 data.heroicActions.actions.push(action);
             }
 
-            let apag = document.querySelector('.pointer.rucksack [src*=item_photo]');
+            const apag = document.querySelector('.pointer.rucksack [src*=item_photo]');
             if (apag) {
-                let action = {
+                const action = {
                     locale: lang,
                     label: apag.alt,
                     value: +apag.src.replace(/.*item_photo_(\d).*/, '$1') || 0
-                }
+                };
                 data.heroicActions.actions.push(action);
             }
 
             if (pageIsDesert()) {
-                let pef = document.querySelector('ul.special_actions [src*=armag]');
+                const pef = document.querySelector('ul.special_actions [src*=armag]');
                 if (pef) {
-                    let action = {
+                    const action = {
                         locale: lang,
                         label: 'PEF',
                         value: 1
-                    }
+                    };
                     data.heroicActions.actions.push(action);
                 } else if (!no_interaction) {
-                    let action = {
+                    const action = {
                         locale: lang,
                         label: 'PEF',
                         value: 0
-                    }
+                    };
                     data.heroicActions.actions.push(action);
                 }
             }
@@ -334,7 +352,7 @@ export function updateExternalTools() {
 
         /** Récupération des améliorations de maison */
         if (((mho_parameters.update_gh && mho_parameters.update_gh_amelios) || (mho_parameters.update_mho && mho_parameters.update_mho_house)) && pageIsAmelio()) {
-            data.amelios = {}
+            data.amelios = {};
             data.amelios.values = {};
             data.amelios.toolsToUpdate = {
                 isBigBrothHordes: false,
@@ -342,26 +360,26 @@ export function updateExternalTools() {
                 isGestHordes: mho_parameters && mho_parameters.update_gh_amelios,
                 isMyHordesOptimizer: mho_parameters && mho_parameters.update_mho_house
             };
-            let amelios = Array.from(document.querySelectorAll('.row-table .row:not(.header)') || []);
+            const amelios = Array.from(document.querySelectorAll('.row-table .row:not(.header)') || []);
             if (amelios && amelios.length > 0) {
                 amelios.forEach((amelio) => {
-                    let amelio_img = amelio.querySelector('img');
-                    let name = amelio_img.src.replace(/.*\/home\/(.*)\..*\..*/, '$1');
+                    const amelio_img = amelio.querySelector('img');
+                    const name = amelio_img.src.replace(/.*\/home\/(.*)\..*\..*/, '$1');
                     if (name !== 'fence') {
-                        let amelio_value = amelio_img?.nextElementSibling.innerText.match(/\d+/);
+                        const amelio_value = amelio_img?.nextElementSibling.innerText.match(/\d+/);
                         data.amelios.values[name] = amelio_value ? +amelio_value[0] : 0;
                     } else {
                         data.amelios.values[name] = !amelio.querySelector('button[x-upgrade-id]') ? 1 : 0;
                     }
                 });
             }
-            let house_level = +document.querySelector('[x-tab-group="home-main"][x-tab-id="values"] .town-summary')?.querySelector('.row-detail img')?.alt || undefined;
+            const house_level = +document.querySelector('[x-tab-group="home-main"][x-tab-id="values"] .town-summary')?.querySelector('.row-detail img')?.alt || undefined;
             data.amelios.values.house = house_level;
         }
 
         /** Récupération des status */
         if ((mho_parameters.update_mho && mho_parameters.update_mho_status) || (mho_parameters.update_gh && mho_parameters.update_gh_status)) {
-            data.status = {}
+            data.status = {};
             data.status.values = [];
             data.status.toolsToUpdate = {
                 isBigBrothHordes: false,
@@ -369,11 +387,11 @@ export function updateExternalTools() {
                 isGestHordes: mho_parameters && mho_parameters.update_gh_status,
                 isMyHordesOptimizer: mho_parameters && mho_parameters.update_mho_status
             };
-            let statuses = Array.from(document.querySelectorAll('.rucksack_status_union li.status img') || []);
+            const statuses = Array.from(document.querySelectorAll('.rucksack_status_union li.status img') || []);
             if (statuses && statuses.length > 0) {
                 statuses
                     .filter((status) => {
-                        let status_name = status.src.replace(/.*\/status\/status_(.*)\..*\..*/, '$1');
+                        const status_name = status.src.replace(/.*\/status\/status_(.*)\..*\..*/, '$1');
                         return status.src.indexOf('/status') > -1 && status_name !== 'ghoul' && status_name !== 'unknown';
                     })
                     .forEach((status) => {
@@ -389,7 +407,7 @@ export function updateExternalTools() {
                 day: mh_user.townDetails?.day,
                 x: +position[0],
                 y: +position[1]
-            }
+            };
             data.successedDig.values = [];
             data.successedDig.toolsToUpdate = {
                 isBigBrothHordes: false,
@@ -398,28 +416,28 @@ export function updateExternalTools() {
                 isMyHordesOptimizer: mho_parameters && mho_parameters.update_mho_digs
             };
 
-            let logs = Array.from(document.querySelectorAll('div.log-entry'));
-            let arrivals_texts = {
-                de: `angekommen`,
-                en: `has arrived from the`,
-                es: `ha llegado desde el`,
-                fr: `est arrivé depuis`
-            }
+            const logs = Array.from(document.querySelectorAll('div.log-entry'));
+            const arrivals_texts = {
+                de: 'angekommen',
+                en: 'has arrived from the',
+                es: 'ha llegado desde el',
+                fr: 'est arrivé depuis'
+            };
 
-            let arrivals = logs.filter((log) => normalizeString(log.innerText).indexOf(normalizeString(getI18N(arrivals_texts))) > -1).map((log) => {
+            const arrivals = logs.filter((log) => normalizeString(log.innerText).indexOf(normalizeString(getI18N(arrivals_texts))) > -1).map((log) => {
                 return {
                     time: log.querySelector('.log-part-time')?.innerText,
                     citizen: log.querySelector('.log-part-content .container span')?.innerText
                 };
             });
 
-            let now = document.querySelector('.game-clock .town-time')?.innerText;
+            const now = document.querySelector('.game-clock .town-time')?.innerText;
             if (now) {
                 citizen_list
                     .filter((citizen) => { // On ne garde que les citoyens actuellement en train de fouiller
                         let is_digging = false;
                         if (citizen.id === mh_user.id) { // Il s'agit de l'utilisateur qui a cliqué sur le bouton
-                            is_digging = document.querySelector('#mgd-digging-note [x-countdown-to]') ? true : false
+                            is_digging = document.querySelector('#mgd-digging-note [x-countdown-to]') ? true : false;
                         } else { // Les autres
                             is_digging = citizen.row.parentElement.parentElement.parentElement.querySelector('li.status img[src*=small_gather]') ? true : false;
                         }
@@ -427,20 +445,20 @@ export function updateExternalTools() {
                     })
                     .forEach((citizen) => {
 
-                        let failed_texts = {
-                            de: `durch Graben nichts gefunden...`,
-                            en: `found nothing during their last search...`,
-                            es: `no encontró nada...`,
-                            fr: `rien trouvé...`
+                        const failed_texts = {
+                            de: 'durch Graben nichts gefunden...',
+                            en: 'found nothing during their last search...',
+                            es: 'no encontró nada...',
+                            fr: 'rien trouvé...'
                         };
-                        let failed_digs = Array.from(logs.filter((log) => normalizeString(log.innerText).indexOf(normalizeString(getI18N(failed_texts))) > -1) || []).filter((log) => log.innerText.indexOf(citizen.userName) > -1) || [];
-                        let nb_failed_digs = failed_digs.length;
+                        const failed_digs = Array.from(logs.filter((log) => normalizeString(log.innerText).indexOf(normalizeString(getI18N(failed_texts))) > -1) || []).filter((log) => log.innerText.indexOf(citizen.userName) > -1) || [];
+                        const nb_failed_digs = failed_digs.length;
 
-                        let nb_minutes_for_dig = citizen.job === 'dig' ? 90 : 120; // Une fouille = 2h = 120 minutes pour un tous les métiers, ou 1h30 = 90 minutes pour une pelle
+                        const nb_minutes_for_dig = citizen.job === 'dig' ? 90 : 120; // Une fouille = 2h = 120 minutes pour un tous les métiers, ou 1h30 = 90 minutes pour une pelle
 
-                        let citizen_arrivals = arrivals.filter((arrival) => arrival.citizen === citizen.userName); // Les heures d'arrivées du citoyen sur la case
+                        const citizen_arrivals = arrivals.filter((arrival) => arrival.citizen === citizen.userName); // Les heures d'arrivées du citoyen sur la case
 
-                        let citizen_last_arrival = citizen_arrivals[0]?.time;
+                        const citizen_last_arrival = citizen_arrivals[0]?.time;
                         let start_date;
 
                         if (citizen_last_arrival) { // Si le citoyen a une heure d'arrivée alors on se base sur cette heure comme heure de début de fouilles
@@ -451,10 +469,10 @@ export function updateExternalTools() {
 
                         let nb_digs;
                         if (start_date) {
-                            let now_minutes = (+now.split(':')[0] * 60) + (+now.split(':')[1]);
-                            let start_date_minutes = (+start_date.split(':')[0] * 60) + (+start_date.split(':')[1]);
+                            const now_minutes = (+now.split(':')[0] * 60) + (+now.split(':')[1]);
+                            const start_date_minutes = (+start_date.split(':')[0] * 60) + (+start_date.split(':')[1]);
 
-                            let nb_minutes_digging = now_minutes - start_date_minutes; // Le nombre total de minutes passées à fouiller
+                            const nb_minutes_digging = now_minutes - start_date_minutes; // Le nombre total de minutes passées à fouiller
                             nb_digs = Math.floor(nb_minutes_digging / nb_minutes_for_dig) + 1;
 
                         } else {
@@ -464,7 +482,7 @@ export function updateExternalTools() {
                             citizenId: citizen.id,
                             successDigs: nb_digs - nb_failed_digs,
                             totalDigs: nb_digs
-                        })
+                        });
                     });
             }
         }
@@ -475,7 +493,7 @@ export function updateExternalTools() {
 
             /** Bain */
             let bath_taken;
-            let bath_row = document.querySelector('.heroic_action img[src*=pool]')?.parentElement;
+            const bath_row = document.querySelector('.heroic_action img[src*=pool]')?.parentElement;
             if (bath_row) {
                 if ((bath_row.attributes as any).disabled) {
                     // si barré = le chantier est construit et le bain a été pris

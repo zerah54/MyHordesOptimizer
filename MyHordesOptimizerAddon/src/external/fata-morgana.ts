@@ -1,5 +1,5 @@
-import {mho_map_key} from '../config/constants';
-import {getStorageItem} from '../utils/storage';
+import { mho_map_key } from '../config/constants';
+import { getStorageItem } from '../utils/storage';
 
 // Local helper: TypeScript's arrFrom(any) sometimes infers element type
 // 'unknown' rather than 'any' when the source isn't a statically-typed
@@ -11,27 +11,27 @@ const arrFrom = (x: any): any[] => Array.from(x);
 /** Récupère la carte de FataMorgana */
 export function getFMMap() {
     return new Promise<any>((resolve, reject) => {
-        let map_html = document.createElement('div');
+        const map_html = document.createElement('div');
 
         getStorageItem(mho_map_key).then((mho_map) => {
             map_html.innerHTML = mho_map.block;
 
-            let new_map = [];
-            let map = arrFrom(map_html.querySelector('#map')?.children);
-            let x_mapping = arrFrom(map[0].children).map((x) => x.innerText);
+            const new_map = [];
+            const map = arrFrom(map_html.querySelector('#map')?.children);
+            const x_mapping = arrFrom(map[0].children).map((x) => x.innerText);
 
             map
                 .filter((row) => arrFrom(row.children).some((cell) => cell.classList.contains('mapzone')))
                 .forEach((row) => {
-                    let cells = [];
+                    const cells = [];
                     let y;
                     arrFrom(row.children).forEach((cell, index) => {
                         if (cell.classList.contains('mapruler')) {
                             y = cell.innerText;
                         } else {
-                            let cell_parts = arrFrom(cell.children);
+                            const cell_parts = arrFrom(cell.children);
 
-                            let new_cell: any = {
+                            const new_cell: any = {
                                 horizontal: y,
                                 vertical: x_mapping[index],
                                 town: cell.classList.contains('city'),
@@ -51,7 +51,7 @@ export function getFMMap() {
                     });
                     new_map.push(cells);
                 });
-            resolve({map: new_map, vertical_mapping: x_mapping});
+            resolve({ map: new_map, vertical_mapping: x_mapping });
         });
     });
 }
@@ -61,30 +61,30 @@ export function getFMRuin() {
     return new Promise<any>((resolve, reject) => {
         getStorageItem(mho_map_key).then((mho_map) => {
             if (mho_map.ruin) {
-                let map_html = document.createElement('div');
+                const map_html = document.createElement('div');
                 map_html.innerHTML = mho_map.ruin;
 
-                let new_map = [];
-                let rows = arrFrom(map_html.querySelector('#ruinmap')?.children);
-                let x_mapping = arrFrom(rows[0].children).map((x) => x.innerText);
+                const new_map = [];
+                const rows = arrFrom(map_html.querySelector('#ruinmap')?.children);
+                const x_mapping = arrFrom(rows[0].children).map((x) => x.innerText);
                 rows
                     .filter((row) => arrFrom(row.children).some((cell) => cell.classList.contains('mapzone')))
                     .forEach((row, row_index, rows_array) => {
-                        let new_cells = [];
-                        let cells = arrFrom(row.children);
+                        const new_cells = [];
+                        const cells = arrFrom(row.children);
                         let y;
                         cells.forEach((cell, cell_index, cell_array) => {
                             if (cell.classList.contains('mapruler')) {
                                 y = cell.innerText;
                             } else {
-                                let new_cell: any = {
+                                const new_cell: any = {
                                     horizontal: y,
                                     vertical: x_mapping[cell_index],
                                     borders: '0000',
                                     zombies: cell.getAttribute('z')
                                 };
 
-                                let img = arrFrom(cell.classList).find((class_name) => class_name.startsWith('tile-'));
+                                const img = arrFrom(cell.classList).find((class_name) => class_name.startsWith('tile-'));
                                 switch (img) {
                                     case 'tile-1':
                                         new_cell.borders = '0100';
@@ -157,8 +157,8 @@ export function getFMRuin() {
                         });
                         new_map.push(new_cells);
                     });
-                resolve({map: new_map, vertical_mapping: x_mapping});
+                resolve({ map: new_map, vertical_mapping: x_mapping });
             }
-        })
+        });
     });
 }

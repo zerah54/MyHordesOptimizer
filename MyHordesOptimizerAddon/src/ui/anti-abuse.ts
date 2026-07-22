@@ -139,14 +139,14 @@ export function displayAntiAbuseCounter(): void {
             state.anti_abuse_controller.abort();
             const fictive_item: any = {
                 label: {
-                    de: `Benutzerdefinierter Zähler`,
-                    en: `Custom counter`,
-                    es: `Contador personalizado`,
-                    fr: `Compteur personnalisé`,
+                    de: 'Benutzerdefinierter Zähler',
+                    en: 'Custom counter',
+                    es: 'Contador personalizado',
+                    fr: 'Compteur personnalisé',
                 },
                 img: 'icons/small_warning.gif'
             };
-            const counter_value: any = {item: {item: fictive_item, broken: false}, take_at: Date.now() + 5000};
+            const counter_value: any = { item: { item: fictive_item, broken: false }, take_at: Date.now() + 5000 };
             counter_values.push(counter_value);
             setStorageItem(mho_anti_abuse_key, counter_values);
             const new_mho_anti_abuse_counter: Element | null = document.querySelector(`#${mho_anti_abuse_counter_id}`);
@@ -229,8 +229,8 @@ export function displayAntiAbuseCounter(): void {
 
                 observer = new MutationObserver(callback);
                 state.bank_observer = observer;
-                observer.observe(rucksack, {childList: true, subtree: true, attributes: false});
-            }, {signal: state.anti_abuse_controller.signal});
+                observer.observe(rucksack, { childList: true, subtree: true, attributes: false });
+            }, { signal: state.anti_abuse_controller.signal });
 
         } else if (pageIsWell()) {
             const btn: HTMLButtonElement | null = document.querySelector('button[data-fetch-method="get"][data-fetch-confirm]');
@@ -240,10 +240,10 @@ export function displayAntiAbuseCounter(): void {
                     if (!pageIsWell()) return;
                     const well_item: any = {
                         label: {
-                            de: `Eine weitere Ration erhalten`,
-                            en: `Extra ration`,
-                            es: `Ración adicional`,
-                            fr: `Ration supplémentaire`,
+                            de: 'Eine weitere Ration erhalten',
+                            en: 'Extra ration',
+                            es: 'Ración adicional',
+                            fr: 'Ration supplémentaire',
                         },
                         img: 'log/well.gif'
                     };
@@ -251,7 +251,7 @@ export function displayAntiAbuseCounter(): void {
                         if (!stored_values) {
                             stored_values = [];
                         }
-                        const counter_value: any = {item: {item: well_item, broken: false}, take_at: Date.now() + 5000};
+                        const counter_value: any = { item: { item: well_item, broken: false }, take_at: Date.now() + 5000 };
                         stored_values.push(counter_value);
                         counter_values.push(counter_value);
                         setStorageItem(mho_anti_abuse_key, stored_values);
@@ -260,8 +260,8 @@ export function displayAntiAbuseCounter(): void {
                             define_row(counter_value, new_mho_anti_abuse_counter.querySelector('.mho-anti-abuse-counter-content'));
                         }
                     });
-                }, {once: true});
-            }, {signal: state.anti_abuse_controller.signal});
+                }, { once: true });
+            }, { signal: state.anti_abuse_controller.signal });
         } else {
             state.anti_abuse_controller.abort();
         }

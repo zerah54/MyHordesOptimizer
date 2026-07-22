@@ -1,4 +1,4 @@
-import type {MhoState} from '../types';
+import type { MhoState } from '../types';
 
 //////////////////////////////////////
 // Les éléments récupérés via l'API //
