@@ -1,5 +1,5 @@
 import { CommonModule, DecimalPipe } from '@angular/common';
-import { Component, DestroyRef, inject,OnInit } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -12,6 +12,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import moment from 'moment';
+import { debounceTime, Subject } from 'rxjs';
 
 import { HomeEnum } from '../../_abstract_model/enum/home.enum';
 import { TownService } from '../../_abstract_model/services/town.service';
@@ -26,6 +27,9 @@ import { getTown } from '../../_core/utilities/localstorage.util';
 
 /** Nombre de paliers d'habitation dans le jeu (niveaux 0 à 8 : Lit de camp → Château). */
 const HOUSE_LEVEL_COUNT: number = 9;
+
+/** Délai d'inactivité avant de relancer la simulation, pour ne pas recalculer à chaque frappe. */
+const COMPUTE_DEBOUNCE_MS: number = 400;
 
 const angular_common: Imports = [CommonModule, FormsModule];
 const pipes: Imports = [DecimalPipe];
@@ -76,11 +80,6 @@ export class OverflowComponent implements OnInit {
 
     /** Mode « Ma ville » (valeurs pré-remplies et verrouillées) vs « Hors ville » (tout manuel). */
     protected in_town: boolean = !!this.my_town;
-
-    private readonly town_statistics_service: TownStatisticsService = inject(TownStatisticsService);
-    private readonly town_service: TownService = inject(TownService);
-    private readonly destroy_ref: DestroyRef = inject(DestroyRef);
-
     // --- Chaîne d'attaque ---
     /** Attaque estimée (nombre de zombies, après facteur d'âmes rouges). */
     protected attack: number = 500;
@@ -90,7 +89,6 @@ export class OverflowComponent implements OnInit {
     protected door_state: DoorState = 'closed';
     /** Défense de veille collective des veilleurs. */
     protected watch_defense: number = 0;
-
     // --- Contexte ville (pour le facteur de zombies actifs et le ciblage) ---
     /** Jour d'attaque (détermine le nombre de citoyens ciblés). */
     protected day: number = 1;
@@ -105,10 +103,6 @@ export class OverflowComponent implements OnInit {
         .map((labels: I18nLabels) => (<Record<string, string>><unknown>labels)[this.locale] ?? labels['en']);
     protected chaos: boolean = false;
     protected devastated: boolean = false;
-
-    /** Niveau d'habitation au tercile, dérivé de house_counts (formule du jeu). */
-    private habitation_level: number = 0;
-
     // --- Répartition / mortalité ---
     /** Défense de maison de référence, pour estimer les morts (mort si zombies > def). */
     protected home_defense: number = 0;
@@ -120,16 +114,27 @@ export class OverflowComponent implements OnInit {
      * - `bounds` : deux scénarios encadrants (facteur figé à 45 % et 55 %).
      */
     protected result_mode: 'realistic' | 'bounds' = 'realistic';
-
-    // --- Résultats déterministes ---
-    private overflow_after_defense: number = 0;
     protected overflow_after_watch: number = 0;
     protected targeted_count: number = 0;
     protected factor_min: number = 0;
     protected factor_max: number = 0;
-
     /** Scénarios calculés : un seul en mode réaliste, deux (favorable/défavorable) en mode bornes. */
     protected scenarios: ScenarioResult[] = [];
+    private readonly town_statistics_service: TownStatisticsService = inject(TownStatisticsService);
+    private readonly town_service: TownService = inject(TownService);
+    private readonly destroy_ref: DestroyRef = inject(DestroyRef);
+    /** Niveau d'habitation au tercile, dérivé de house_counts (formule du jeu). */
+    private habitation_level: number = 0;
+    // --- Résultats déterministes ---
+    private overflow_after_defense: number = 0;
+    /** Demandes de recalcul émises par les champs de saisie, regroupées par {@link COMPUTE_DEBOUNCE_MS}. */
+    private readonly compute_request: Subject<void> = new Subject<void>();
+
+    public constructor() {
+        this.compute_request
+            .pipe(debounceTime(COMPUTE_DEBOUNCE_MS), takeUntilDestroyed(this.destroy_ref))
+            .subscribe(() => this.compute());
+    }
 
     public ngOnInit(): void {
         if (this.in_town && this.my_town) {
@@ -148,9 +153,62 @@ export class OverflowComponent implements OnInit {
         }
     }
 
+    /** Demande un recalcul différé : utilisé par les champs saisis au clavier, où chaque frappe est une valeur intermédiaire. */
+    protected scheduleCompute(): void {
+        this.compute_request.next();
+    }
+
     /** Nombre total d'habitations renseignées (pour vérifier qu'aucune n'est oubliée ou comptée deux fois). */
     protected totalHouses(): number {
         return this.house_counts.reduce((a: number, b: number) => a + b, 0);
+    }
+
+    /**
+     * Rejoue la chaîne du jeu (NightlyHandler::stage2) :
+     * attaque → défenses ville → veilleurs → zombies actifs → répartition dans les maisons.
+     */
+    protected compute(): void {
+        const attack: number = Math.max(0, Math.round(this.attack));
+        const door_open: boolean = this.door_state !== 'closed';
+        const door_long: boolean = this.door_state === 'open_long';
+
+        // 1. Défenses de la ville : ignorées si la porte est ouverte.
+        this.overflow_after_defense = door_open
+            ? attack
+            : Math.max(0, attack - Math.max(0, this.town_defense));
+
+        // 2. Veilleurs : leur défense de veille collective est soustraite.
+        this.overflow_after_watch = Math.max(0, this.overflow_after_defense - Math.max(0, this.watch_defense));
+
+        // 3. Nombre de citoyens ciblés : croît avec le jour, plafonné par la population vivante.
+        this.targeted_count = Math.min(
+            10 + 2 * Math.floor(Math.max(0, this.day - 10) / 2),
+            Math.max(0, Math.ceil(this.nb_alive))
+        );
+
+        // 3 bis. Niveau d'habitation au tercile, dérivé du nombre d'habitations par niveau.
+        this.habitation_level = this.computeHabitationLevel();
+
+        // 4. Facteur de zombies actifs (base tirée entre 45 et 55 en jeu).
+        this.factor_min = this.activeFactor(45, door_open, door_long);
+        this.factor_max = this.activeFactor(55, door_open, door_long);
+
+        if (this.result_mode === 'realistic') {
+            // Un seul scénario : le facteur est retiré aléatoirement (45–55) à chaque itération.
+            this.scenarios = [
+                this.runScenario(
+                    $localize`Distribution réaliste`,
+                    () => this.activeFactor(45 + Math.random() * 10, door_open, door_long),
+                    attack
+                )
+            ];
+        } else {
+            // Deux scénarios encadrants : facteur figé au minimum (45) et au maximum (55).
+            this.scenarios = [
+                this.runScenario($localize`Scénario favorable`, () => this.factor_min, attack),
+                this.runScenario($localize`Scénario défavorable`, () => this.factor_max, attack)
+            ];
+        }
     }
 
     /** Reprend les valeurs connues de la ville courante (jour, chaos, dévastation, attaque estimée et habitations). */
@@ -201,54 +259,6 @@ export class OverflowComponent implements OnInit {
             return null;
         }
         return typeof entry.value === 'number' ? entry.value : null;
-    }
-
-    /**
-     * Rejoue la chaîne du jeu (NightlyHandler::stage2) :
-     * attaque → défenses ville → veilleurs → zombies actifs → répartition dans les maisons.
-     */
-    protected compute(): void {
-        const attack: number = Math.max(0, Math.round(this.attack));
-        const door_open: boolean = this.door_state !== 'closed';
-        const door_long: boolean = this.door_state === 'open_long';
-
-        // 1. Défenses de la ville : ignorées si la porte est ouverte.
-        this.overflow_after_defense = door_open
-            ? attack
-            : Math.max(0, attack - Math.max(0, this.town_defense));
-
-        // 2. Veilleurs : leur défense de veille collective est soustraite.
-        this.overflow_after_watch = Math.max(0, this.overflow_after_defense - Math.max(0, this.watch_defense));
-
-        // 3. Nombre de citoyens ciblés : croît avec le jour, plafonné par la population vivante.
-        this.targeted_count = Math.min(
-            10 + 2 * Math.floor(Math.max(0, this.day - 10) / 2),
-            Math.max(0, Math.ceil(this.nb_alive))
-        );
-
-        // 3 bis. Niveau d'habitation au tercile, dérivé du nombre d'habitations par niveau.
-        this.habitation_level = this.computeHabitationLevel();
-
-        // 4. Facteur de zombies actifs (base tirée entre 45 et 55 en jeu).
-        this.factor_min = this.activeFactor(45, door_open, door_long);
-        this.factor_max = this.activeFactor(55, door_open, door_long);
-
-        if (this.result_mode === 'realistic') {
-            // Un seul scénario : le facteur est retiré aléatoirement (45–55) à chaque itération.
-            this.scenarios = [
-                this.runScenario(
-                    $localize`Distribution réaliste`,
-                    () => this.activeFactor(45 + Math.random() * 10, door_open, door_long),
-                    attack
-                )
-            ];
-        } else {
-            // Deux scénarios encadrants : facteur figé au minimum (45) et au maximum (55).
-            this.scenarios = [
-                this.runScenario($localize`Scénario favorable`, () => this.factor_min, attack),
-                this.runScenario($localize`Scénario défavorable`, () => this.factor_max, attack)
-            ];
-        }
     }
 
     /**
