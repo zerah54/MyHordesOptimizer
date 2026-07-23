@@ -1,3 +1,4 @@
+import terser from '@rollup/plugin-terser';
 import typescript from '@rollup/plugin-typescript';
 import {readFileSync} from 'fs';
 import * as sass from "sass";
@@ -24,7 +25,9 @@ export default {
     output: {
         file: '../Scripts/Tampermonkey/my_hordes_optimizer.user.js',
         format: 'iife',
-        banner,
+        // Le bandeau ==UserScript== n'est PAS passé via `output.banner` : terser (ci-dessous)
+        // le supprimerait avec les autres commentaires. Il est injecté par le `preamble` de
+        // terser, qui n'est pas soumis au stripping. Voir le plugin de minification.
         // No outer variable name needed for a userscript IIFE
         generatedCode: {constBindings: true},
     },
@@ -39,6 +42,15 @@ export default {
     plugins: [
         cssAsRawString(),
         typescript({tsconfig: './tsconfig.json'}),
+        // Minification. `format.comments: false` retire tous les commentaires ; le bandeau
+        // ==UserScript== est réinjecté via `preamble`, non soumis à ce retrait, et doit donc
+        // rester en tête (sans lui le script ne s'installe pas). `keep_fnames` préserve les
+        // noms de fonctions, dont `runSafely` se sert (`init.name`) pour dire quelle
+        // initialisation a échoué.
+        terser({
+            format: {comments: false, preamble: banner},
+            keep_fnames: true,
+        }),
     ],
     onwarn(warning, warn) {
         // Suppress circular-dependency warnings inherent in a monolithic-script

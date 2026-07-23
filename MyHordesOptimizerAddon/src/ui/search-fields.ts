@@ -12,6 +12,7 @@ import { params_categories } from '../data/params';
 import { texts } from '../i18n/texts';
 import { state } from '../state';
 import { createCheckboxDropdown, createSingleFilterSelect } from '../utils/dom';
+import { cancelWaitForElement, waitForElement } from '../utils/dom-wait';
 import { getI18N } from '../utils/i18n';
 import { normalizeString } from '../utils/notifications';
 import { pageIsCitizens, pageIsConstructions, pageIsDump, pageIsMsgReceived, pageIsOmniscience, pageIsTrap, trapItemsTableElement } from '../utils/page';
@@ -21,6 +22,11 @@ import { pageIsCitizens, pageIsConstructions, pageIsDump, pageIsMsgReceived, pag
 // iterable. This explicit-any wrapper avoids that, matching the original
 // untyped JS behaviour (no behaviour change, pure typing aid).
 const arrFrom = (x: any): any[] => Array.from(x);
+
+/** Clés d'attente d'élément : une seule attente en vol par cible, quel que soit le nombre de rejeux */
+const wait_key_buildings: string = 'search-fields:buildings';
+const wait_key_building_tabs: string = 'search-fields:building-tabs';
+const wait_key_complete_buildings: string = 'search-fields:complete-buildings';
 
 
 export function displaySearchFields() {
@@ -76,34 +82,32 @@ export function hideCompletedBuildings() {
         });
     };
 
-    const observeBuildings = () => {
-        const observer = new MutationObserver((mutations) => {
-            mutations.forEach((mutation) => {
-                if (mutation.addedNodes.length > 0) {
-                    const buildings = arrFrom(document.querySelectorAll('.buildings') || []);
-                    if (buildings.length > 0) {
-                        hideBuildings(buildings);
-                        observer.disconnect();
-                    }
-                }
-            });
-        });
-
-        observer.observe(document.body, { childList: true, subtree: true });
-    };
-
-    if (pageIsConstructions()) {
-        const buildings = arrFrom(document.querySelectorAll('.buildings') || []);
-        if (state.mho_parameters.hide_completed_buildings_field) {
-            if (buildings.length > 0) {
-                hideBuildings(buildings);
-            } else {
-                observeBuildings();
-            }
-        } else {
-            showBuildings(buildings);
-        }
+    if (!pageIsConstructions()) {
+        cancelWaitForElement(wait_key_buildings);
+        return;
     }
+
+    const buildings = arrFrom(document.querySelectorAll('.buildings') || []);
+    if (!state.mho_parameters.hide_completed_buildings_field) {
+        cancelWaitForElement(wait_key_buildings);
+        showBuildings(buildings);
+        return;
+    }
+
+    if (buildings.length > 0) {
+        hideBuildings(buildings);
+        return;
+    }
+
+    /**
+     * Les chantiers sont rendus après la navigation : on attend leur apparition.
+     * L'attente est enregistrée sous une clé fixe, donc un rejeu des initialisations
+     * la remplace au lieu d'empiler un observateur de plus.
+     */
+    waitForElement(wait_key_buildings, '.buildings', () => {
+        if (!pageIsConstructions() || !state.mho_parameters.hide_completed_buildings_field) return;
+        hideBuildings(arrFrom(document.querySelectorAll('.buildings') || []));
+    });
 }
 
 /** Si l'option associée est activée, affiche un champ de recherche sur la page de chantiers */
@@ -186,33 +190,21 @@ export function displaySearchFieldOnBuildings() {
         searchFieldAdded = true; // Mettre à jour l'indicateur après l'ajout
     };
 
-    const observeTabs = () => {
-        const observer = new MutationObserver((mutations) => {
-            mutations.forEach((mutation) => {
-                if (mutation.addedNodes.length > 0) {
-                    const tabs = document.querySelector('ul.buildings-tabs');
-                    if (tabs) {
-                        addSearchField(tabs);
-                        observer.disconnect();
-                    }
-                }
-            });
-        });
-
-        observer.observe(document.body, { childList: true, subtree: true });
-    };
-
     if (state.mho_parameters.display_search_field_buildings && pageIsConstructions()) {
         if (fields_container) return;
 
-        const tabs = document.querySelector('ul.buildings-tabs');
-        if (tabs) {
+        /**
+         * Les onglets de chantiers sont rendus après la navigation. L'attente est
+         * enregistrée sous une clé fixe : un rejeu des initialisations la remplace
+         * au lieu d'empiler un observateur de plus.
+         */
+        waitForElement(wait_key_building_tabs, 'ul.buildings-tabs', (tabs: Element) => {
+            if (!state.mho_parameters.display_search_field_buildings || !pageIsConstructions()) return;
             addSearchField(tabs);
-        } else {
-            observeTabs();
-        }
-    } else if (fields_container) {
-        fields_container.remove();
+        });
+    } else {
+        cancelWaitForElement(wait_key_building_tabs);
+        if (fields_container) fields_container.remove();
     }
 }
 
@@ -510,100 +502,152 @@ export function displaySearchFieldOnRegistry() {
 
 /** Si l'option associée est activée, affiche le nombre de pa nécessaires pour réparer un bâtiment suffisemment pour qu'il ne soit pas détruit lors de l'attaque */
 
-export function displayMinApOnBuildings(count = 0) {
+export function displayMinApOnBuildings() {
     state.tooltips_observer?.disconnect();
-    if (state.mho_parameters.display_missing_ap_for_buildings_to_be_safe && pageIsConstructions()) {
-        const complete_buildings = document.querySelectorAll('.building.complete');
-        if ((!complete_buildings || complete_buildings.length === 0) && count < 10) {
-            setTimeout(() => {
-                displayMinApOnBuildings(count + 1);
-            }, 100);
-            return;
-        }
 
-        ///////////////////////// Observe les modifications sur les tooltips pour mieux alimenter les barres /////////////////////////
-        // Selectionne le noeud dont les mutations seront observées
-        const tooltip_container = document.querySelector('#tooltip_container');
-        // Options de l'observateur (quelles sont les mutations à observer)
-        const config = { childList: true, subtree: true };
+    if (!pageIsConstructions()) {
+        cancelWaitForElement(wait_key_complete_buildings);
+        return;
+    }
 
-        // Fonction callback à éxécuter quand une mutation est observée
-        const callback = function (mutationsList) {
-            if (state.mho_parameters.display_missing_ap_for_buildings_to_be_safe && pageIsConstructions()) {
-                const broken_buildings = arrFrom(complete_buildings).filter((complete_building) => complete_building.querySelector('.to_repair'));
+    if (state.mho_parameters.display_missing_ap_for_buildings_to_be_safe) {
+        /**
+         * Les chantiers sont rendus après la navigation : on attend leur apparition au
+         * lieu des dix tentatives à 100 ms d'origine, qui abandonnaient au bout d'une
+         * seconde et laissaient alors les barres sans repère.
+         */
+        waitForElement(wait_key_complete_buildings, '.building.complete', () => {
+            if (!state.mho_parameters.display_missing_ap_for_buildings_to_be_safe || !pageIsConstructions()) return;
+            observeTooltipsForBuildings();
+        });
+    } else {
+        cancelWaitForElement(wait_key_complete_buildings);
 
-                if (!broken_buildings || broken_buildings.length === 0) return;
-
-                broken_buildings.forEach((broken_building) => {
-                    const bar_element = broken_building.querySelector('.ap-bar');
-                    const to_repair_element = broken_building.querySelector('.to_repair');
-                    const nb_ap_element = broken_building.querySelector('.build-req');
-
-                    to_repair_element.dispatchEvent(new Event('mouseenter'));
-                    const tooltip: any = document.querySelector('.tooltip:not(.mho)[style*="display: block"]');
-                    to_repair_element.dispatchEvent(new Event('mouseleave'));
-                    if (!tooltip || !tooltip.innerHTML) return;
-
-                    const tooltip_status_match = tooltip.innerText.match(/[0-9]+\/[0-9]+/);
-                    if (!tooltip_status_match || tooltip_status_match.length <= 0) return;
-                    const building_status = tooltip_status_match[0]?.split('/');
-
-                    const tooltip_match = tooltip.innerHTML.match(/[0-9]+/g);
-                    if (!tooltip_match || tooltip_match.length <= 0) return;
-
-                    const nb_pts_per_ap = parseInt(tooltip_match[tooltip_match.length - 1].match(/[0-9]+/)[0], 10);
-                    const current_pv = parseInt(building_status[0], 10);
-                    const total_pv = parseInt(building_status[1], 10);
-
-                    const minimum_safe = Math.ceil(total_pv * 70 / 100) + 1;
-                    if (minimum_safe <= current_pv) return;
-
-                    const missing_pts = minimum_safe - current_pv;
-
-                    bar_element.style.display = 'flex';
-                    let new_ap_bar = bar_element.querySelector('.mho-safe-ap');
-                    if (!new_ap_bar) {
-                        new_ap_bar = document.createElement('div');
-                        new_ap_bar.classList.add('mho-safe-ap');
-                    }
-                    new_ap_bar.style.background = 'yellow';
-                    new_ap_bar.style.width = missing_pts / total_pv * 100 + '%';
-                    bar_element.appendChild(new_ap_bar);
-
-                    let missing_ap_info = nb_ap_element.querySelector('.mho-missing-ap');
-                    if (!missing_ap_info) {
-                        missing_ap_info = document.createElement('span');
-                        missing_ap_info.classList.add('mho-missing-ap');
-                    }
-                    missing_ap_info.style.fontWeight = 'initial';
-                    missing_ap_info.style.fontSize = '0.8em';
-                    missing_ap_info.style.overflow = 'hidden';
-                    missing_ap_info.style.textOverflow = 'ellipsis';
-                    missing_ap_info.innerText = getI18N(texts.missing_ap_explanation).replace('%VAR%', Math.ceil(missing_pts / nb_pts_per_ap));
-                    nb_ap_element.appendChild(missing_ap_info);
-                });
-            } else {
-                state.tooltips_observer?.disconnect();
-            }
-        };
-
-        // Créé une instance de l'observateur lié à la fonction de callback
-        state.tooltips_observer = new MutationObserver(callback);
-        // Commence à observer le noeud cible pour les mutations précédemment configurées
-        state.tooltips_observer.observe(tooltip_container, config);
-
-        ////////////////////////////////////////////////////////
-
-
-    } else if (pageIsConstructions()) {
         const missing_ap_infos = document.querySelectorAll('.mho-missing-ap');
-        if (!missing_ap_infos) return;
         arrFrom(missing_ap_infos).forEach((missing_ap_info) => missing_ap_info.remove());
 
         const mho_safe_aps = document.querySelectorAll('.mho-safe-ap');
-        if (!mho_safe_aps) return;
         arrFrom(mho_safe_aps).forEach((mho_safe_ap) => mho_safe_ap.remove());
     }
+}
+
+/** Met à jour les barres de PA à partir des bulles d'aide du jeu, et suit leurs changements */
+function observeTooltipsForBuildings(): void {
+    const complete_buildings = document.querySelectorAll('.building.complete');
+
+    ///////////////////////// Observe les modifications sur les tooltips pour mieux alimenter les barres /////////////////////////
+    // Selectionne le noeud dont les mutations seront observées
+    const tooltip_container = document.querySelector('#tooltip_container');
+    /** Le conteneur de bulles appartient au jeu : sans lui, rien à observer */
+    if (!tooltip_container) return;
+    // Options de l'observateur (quelles sont les mutations à observer)
+    const config = { childList: true, subtree: true };
+
+    // Fonction callback à éxécuter quand une mutation est observée
+    const callback = function (mutationsList) {
+        if (state.mho_parameters.display_missing_ap_for_buildings_to_be_safe && pageIsConstructions()) {
+            const broken_buildings = arrFrom(complete_buildings).filter((complete_building) => complete_building.querySelector('.to_repair'));
+
+            if (!broken_buildings || broken_buildings.length === 0) return;
+
+            broken_buildings.forEach((broken_building) => {
+                const bar_element = broken_building.querySelector('.ap-bar');
+                const to_repair_element = broken_building.querySelector('.to_repair');
+                const nb_ap_element = broken_building.querySelector('.build-req');
+
+                to_repair_element.dispatchEvent(new Event('mouseenter'));
+                const tooltip: any = document.querySelector('.tooltip:not(.mho)[style*="display: block"]');
+                to_repair_element.dispatchEvent(new Event('mouseleave'));
+                if (!tooltip || !tooltip.innerHTML) return;
+
+                const tooltip_status_match = tooltip.innerText.match(/[0-9]+\/[0-9]+/);
+                if (!tooltip_status_match || tooltip_status_match.length <= 0) return;
+                const building_status = tooltip_status_match[0]?.split('/');
+
+                const tooltip_match = tooltip.innerHTML.match(/[0-9]+/g);
+                if (!tooltip_match || tooltip_match.length <= 0) return;
+
+                const nb_pts_per_ap = parseInt(tooltip_match[tooltip_match.length - 1].match(/[0-9]+/)[0], 10);
+                const current_pv = parseInt(building_status[0], 10);
+                const total_pv = parseInt(building_status[1], 10);
+
+                /**
+                 * Bâtiment concerné, identifié par son icône. Le point final borne le nom
+                 * (l'URL compilée est `…/building/<icone>.<hash>.gif`).
+                 */
+                const building_icon: string = broken_building.querySelector('.building_icon')?.getAttribute('src') ?? '';
+                const matchesIcon = (icon_name: string): boolean => building_icon.includes(`${icon_name}.`);
+
+                /**
+                 * Pertes de PV subies pendant la nuit, à compenser pour garantir la survie.
+                 *
+                 * Terme d'attaque : seule la pandé inflige des dégâts aux bâtiments pendant
+                 * l'attaque (côté jeu, `building_attack_damage` n'est vrai que pour ce type de
+                 * ville). En RE / RNE un bâtiment ne perd rien à l'attaque.
+                 *
+                 * Le réacteur est écarté même en pandé car il est imperméable (`isImpervious`,
+                 * donc hors de la boucle d'attaque du jeu). C'est le seul bâtiment imperméable
+                 * à traiter ici : les autres ne subissent aucun dégât, ne sont donc jamais
+                 * réparables, et n'atteignent jamais ce callback.
+                 */
+                const is_pande: boolean = state.mh_user?.townDetails?.townType?.toUpperCase() === 'PANDE';
+                const is_reactor: boolean = matchesIcon('small_arma');
+                const attack_loss: number = (is_pande && !is_reactor) ? Math.ceil(total_pv * 0.7) : 0;
+
+                /**
+                 * Terme propre à certains bâtiments, qui perdent des PV chaque nuit
+                 * indépendamment de l'attaque, donc aussi en RE. Valeurs relevées dans
+                 * `BuildingEffectListener` du jeu ; seuls ces deux-là ont une perte propre.
+                 */
+                let self_loss: number = 0;
+                if (matchesIcon('small_fireworks')) {
+                    self_loss = 20; // feux d'artifice : 20 PV fixes
+                } else if (is_reactor) {
+                    self_loss = 125; // réacteur soviétique : mt_rand(50, 125), pire cas retenu
+                }
+
+                /**
+                 * Seuil de survie garanti, plafonné au PV max : au-delà, aucune réparation ne
+                 * suffirait, le mieux possible étant alors de réparer entièrement.
+                 */
+                const minimum_safe: number = Math.min(total_pv, attack_loss + self_loss + 1);
+                if (minimum_safe <= current_pv) return;
+
+                const missing_pts = minimum_safe - current_pv;
+
+                bar_element.style.display = 'flex';
+                let new_ap_bar = bar_element.querySelector('.mho-safe-ap');
+                if (!new_ap_bar) {
+                    new_ap_bar = document.createElement('div');
+                    new_ap_bar.classList.add('mho-safe-ap');
+                }
+                new_ap_bar.style.background = 'yellow';
+                new_ap_bar.style.width = missing_pts / total_pv * 100 + '%';
+                bar_element.appendChild(new_ap_bar);
+
+                let missing_ap_info = nb_ap_element.querySelector('.mho-missing-ap');
+                if (!missing_ap_info) {
+                    missing_ap_info = document.createElement('span');
+                    missing_ap_info.classList.add('mho-missing-ap');
+                }
+                missing_ap_info.style.fontWeight = 'initial';
+                missing_ap_info.style.fontSize = '0.8em';
+                missing_ap_info.style.overflow = 'hidden';
+                missing_ap_info.style.textOverflow = 'ellipsis';
+                missing_ap_info.innerText = getI18N(texts.missing_ap_explanation).replace('%VAR%', Math.ceil(missing_pts / nb_pts_per_ap));
+                nb_ap_element.appendChild(missing_ap_info);
+            });
+        } else {
+            state.tooltips_observer?.disconnect();
+        }
+    };
+
+    // Créé une instance de l'observateur lié à la fonction de callback
+    state.tooltips_observer = new MutationObserver(callback);
+    // Commence à observer le noeud cible pour les mutations précédemment configurées
+    state.tooltips_observer.observe(tooltip_container, config);
+
+    ////////////////////////////////////////////////////////
 }
 
 /** Si l'option associée est activée, affiche des filtres sur la liste des citoyens */

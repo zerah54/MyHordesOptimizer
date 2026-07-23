@@ -1,6 +1,6 @@
 import { calculateCamping } from '../api/camping';
 import { getRuins } from '../api/ruins';
-import { mh_optimizer_window_id, repo_img_hordes_url } from '../config/constants';
+import { mh_optimizer_window_id, mho_hidden_class, repo_img_hordes_url } from '../config/constants';
 import { added_ruins, town_type } from '../data/informations';
 import { jobs, texts } from '../i18n/texts';
 import { getI18N } from '../utils/i18n';
@@ -128,11 +128,10 @@ export function displayCamping() {
         select_job.addEventListener('change', ($event) => {
             conf.job = $event.srcElement.value;
             const vest_field = document.querySelector('#vest-field');
+            /** Masquage par classe et non par style en ligne, pour ne pas écraser la mise en page du champ */
+            vest_field?.classList.toggle(mho_hidden_class, conf.job !== 'scout');
             if (conf.job !== 'scout') {
                 conf.vest = false;
-                vest_field.style.display = 'none';
-            } else {
-                vest_field.style.display = 'initial';
             }
             calculateCamping(conf);
         });
@@ -143,7 +142,7 @@ export function displayCamping() {
         /** Capuche ? */
         const vest_div = document.createElement('div');
         vest_div.id = 'vest-field';
-        vest_div.style.display = 'none';
+        vest_div.classList.add(mho_hidden_class);
         my_info_content.appendChild(vest_div);
 
         const vest_label = document.createElement('label');
@@ -265,10 +264,6 @@ export function displayCamping() {
         const ruin_type_div = document.createElement('div');
         cell_info_content.appendChild(ruin_type_div);
 
-        const select_ruin_label = document.createElement('label');
-        select_ruin_label.htmlFor = 'select-ruin';
-        select_ruin_label.innerText = getI18N(texts.ruin);
-        select_ruin_label.classList.add('spaced-label');
         const select_ruin = document.createElement('select');
         select_ruin.id = 'select-ruin';
         select_ruin.value = conf.ruin;
@@ -287,22 +282,23 @@ export function displayCamping() {
             conf.ruinCapacity = current_ruin.capacity;
 
             const digs_field = document.querySelector('#digs-field');
-            if (+current_ruin.id === -1) {
-                digs_field.style.display = 'block';
-            } else {
-                digs_field.style.display = 'none';
-                digs_field.querySelector('input').value = (0) as any;
+            /** Masquage par classe et non par style en ligne, pour ne pas écraser la mise en page du champ */
+            const is_undug_ruin: boolean = +current_ruin.id === -1;
+            digs_field?.classList.toggle(mho_hidden_class, !is_undug_ruin);
+            if (!is_undug_ruin) {
+                const digs_input: HTMLInputElement | null | undefined = digs_field?.querySelector('input');
+                if (digs_input) digs_input.value = '0';
+                conf.ruinBuryCount = 0;
             }
 
             calculateCamping(conf);
         });
-        ruin_type_div.appendChild(select_ruin_label);
         ruin_type_div.appendChild(select_ruin);
 
         /** Nombre de tas sur le bat ? */
         const digs_div = document.createElement('div');
         digs_div.id = 'digs-field';
-        digs_div.style.display = 'none';
+        digs_div.classList.add(mho_hidden_class);
         cell_info_content.appendChild(digs_div);
 
         const digs_label = document.createElement('label');

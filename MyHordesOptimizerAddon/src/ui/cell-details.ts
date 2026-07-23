@@ -6,6 +6,7 @@ import { state } from '../state';
 import { getI18N } from '../utils/i18n';
 import { pageIsDesert } from '../utils/page';
 import { getCellDetailsByPosition } from '../utils/position';
+import { unwatchRendered, watchMap } from '../utils/render-watch';
 
 /** Évite d'enchaîner plusieurs chargements concurrents */
 let is_loading_map: boolean = false;
@@ -13,9 +14,19 @@ let is_loading_ruins: boolean = false;
 
 export function displayCellDetailsOnPage() {
     if (!state.mho_parameters.display_more_informations_from_mho || !pageIsDesert()) {
+        /** Hors désert ou option décochée : plus rien à afficher, on arrête d'écouter la carte */
+        unwatchRendered('cell-details');
         state.current_cell = undefined;
         return;
     }
+
+    /**
+     * La position courante (`.current-location`) est rendue par React, après l'injection
+     * du HTML : c'est ce que compensait le délai fixe de 500 ms à l'appel. On se cale
+     * désormais sur le rendu réel de la carte, ce qui couvre aussi les déplacements —
+     * le bloc suit alors la case sans attendre un rejeu des initialisations.
+     */
+    watchMap('cell-details', displayCellDetailsOnPage);
 
     let cell = getCellDetailsByPosition();
 

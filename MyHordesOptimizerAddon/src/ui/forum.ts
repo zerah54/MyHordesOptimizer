@@ -2,6 +2,7 @@ import { lang, mh_optimizer_icon, mho_blacklist_key } from '../config/constants'
 import { fill_items_messages_pool } from '../data/fill-items-messages';
 import { state } from '../state';
 import { pageIsDesert, pageIsForum, pageIsMsgReceived } from '../utils/page';
+import { unwatchRendered, watchRendered } from '../utils/render-watch';
 import { getStorageItem, setStorageItem } from '../utils/storage';
 
 export function fillItemsMessages() {
@@ -137,36 +138,55 @@ export function blockUsersPosts() {
 }
 
 
+/** Longueur maximale d'une entrée de registre, imposée par le jeu */
+const registry_max_length: number = 256;
+
 export function displayCountCharacters() {
+    const counter = document.querySelector('#mho_registry_counter_id');
 
-    let counter = document.querySelector('#mho_registry_counter_id');
-
-    if (!counter && state.mho_parameters.display_counter_on_input_registry && pageIsDesert()) {
-        const log_block = document.querySelector('#beyond-log');
-        if (!log_block) return;
-
-        const log_input = log_block.querySelector('.overlay-central input');
-        if (!log_input) return;
-
-        counter = document.createElement('div');
-        counter.id = 'mho_registry_counter_id';
-        counter.classList.add('cell', 'grow-0', 'small');
-        counter.style.margin = 'auto';
-        counter.innerText = `${log_input.value.length}/256`;
-
-        log_input.parentElement?.parentElement?.parentElement?.parentElement?.parentNode.insertBefore(counter, log_input.parentElement.parentElement.parentElement.parentElement.nextSibling);
-        log_input.addEventListener('input', (event) => {
-            counter.innerText = `${event.srcElement.value?.trim().length ?? 0}/256`;
-        });
-
-        log_input.addEventListener('change', (event) => {
-            const log_block_new = document.querySelector('#beyond-log');
-            const log_input_new = log_block_new.querySelector('.overlay-central input');
-            counter.innerText = `${log_block_new.value?.trim().length ?? 0}/256`;
-        });
-    } else if (counter) {
-        counter.remove();
+    if (!state.mho_parameters.display_counter_on_input_registry || !pageIsDesert()) {
+        unwatchRendered('registry-counter');
+        counter?.remove();
+        return;
     }
+
+    /**
+     * Le journal est un composant rendu par le jeu : son champ de saisie n'existe pas
+     * encore quand les initialisations sont rejouées. On se cale donc sur son rendu,
+     * ce qui couvre aussi ses remplacements ultérieurs.
+     */
+    watchRendered('registry-counter', 'hordes-log', displayCountCharacters);
+
+    /**
+     * Déjà en place : il n'y a rien à refaire.
+     * La version précédente retirait ici le compteur — la condition de création portant
+     * un `!counter`, tout rejeu des initialisations le faisait tomber dans la branche de
+     * suppression. Il disparaissait donc un passage sur deux, et notamment à chaque
+     * `mh-current-log-update`, c'est-à-dire au moment même où l'on écrit dans le registre.
+     */
+    if (counter) return;
+
+    const log_input: HTMLInputElement | null = document.querySelector('#beyond-log .overlay-central input');
+    if (!log_input) return;
+
+    const new_counter: HTMLDivElement = document.createElement('div');
+    new_counter.id = 'mho_registry_counter_id';
+    new_counter.classList.add('cell', 'grow-0', 'small');
+    new_counter.style.margin = 'auto';
+
+    const refreshCount = (): void => {
+        new_counter.innerText = `${log_input.value?.trim().length ?? 0}/${registry_max_length}`;
+    };
+    refreshCount();
+
+    /** Le champ est enfoui de quelques niveaux dans la grille du journal ; on insère le compteur juste après ce bloc */
+    const input_block: HTMLElement | null | undefined = log_input.parentElement?.parentElement?.parentElement?.parentElement;
+    if (!input_block?.parentNode) return;
+
+    input_block.parentNode.insertBefore(new_counter, input_block.nextSibling);
+
+    log_input.addEventListener('input', refreshCount);
+    log_input.addEventListener('change', refreshCount);
 }
 
 /////////////////////////////////////

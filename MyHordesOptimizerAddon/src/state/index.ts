@@ -37,6 +37,4 @@ export const state: MhoState = {
     is_error: false,
     /** La liste des notifications récupérées depuis le dernier chargement de l'application */
     mh_notifications: [],
-    /** Le mutation observer pour les tooltips */
-    advanced_tooltips_observer: undefined,
 };

@@ -21,7 +21,7 @@ import { createUpdateExternalToolsButton } from '../ui/update-button';
 import { displayEstimationsOnWatchtower } from '../ui/watchtower';
 import { createWikiToolsWindow } from '../ui/window';
 import { displayPriorityOnItems, displayWishlistInApp } from '../ui/wishlist';
-import { displayNbDeadZombies } from '../ui/zombie-counter';
+import { displayNbDeadZombies, notifyOnSearchEnd } from '../ui/zombie-counter';
 import { isValidToken } from './misc';
 import { getScriptInfo } from './version';
 
@@ -45,10 +45,10 @@ export function initOptionsWithLoginNeeded(): void {
         displayPriorityOnItems,
         createUpdateExternalToolsButton,
         createExpeditionsBtn,
-        displayEstimationsOnWatchtower
+        displayEstimationsOnWatchtower,
+        /** Se cale elle-même sur le rendu de la carte : plus besoin de la retarder */
+        displayCellDetailsOnPage
     ].forEach(runSafely);
-
-    setTimeout(() => runSafely(displayCellDetailsOnPage), 500);
 }
 
 
@@ -80,11 +80,13 @@ export function initOptionsWithoutLoginNeeded(): void {
         sortNightwatchList,
         sortTrapList,
         sortDumpList,
-        styleForumThreadTitles
+        styleForumThreadTitles,
         // blockUsersPosts
+        /** Se cale elle-même sur le rendu de la carte : plus besoin de la retarder */
+        displayNbDeadZombies,
+        /** Idempotente : elle reprogramme son réveil à chaque navigation, au lieu de s'auto-relancer sans fin */
+        notifyOnSearchEnd
     ].forEach(runSafely);
-
-    setTimeout(() => runSafely(displayNbDeadZombies), 250);
 }
 
 

@@ -318,7 +318,6 @@ export interface MhoState {
     loading_area_observer: MutationObserver | undefined;
     bank_observer: MutationObserver | undefined;
     anti_abuse_controller: AbortController | undefined;
-    advanced_tooltips_observer: MutationObserver | undefined;
     is_refresh_wishlist: boolean | undefined;
     has_new_changelog: boolean;
     is_error: boolean;

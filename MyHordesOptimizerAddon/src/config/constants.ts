@@ -28,19 +28,36 @@ export const gm_bbh_updated_key = 'MHO_bbh_updated';
 export const gm_gh_updated_key = 'MHO_gh_updated';
 export const gm_fata_updated_key = 'MHO_fata_updated';
 export const gm_mho_updated_key = 'MHO_mho_updated';
+/**
+ * En local, les clés qui portent une SESSION sont isolées : sans cela, jouer sur
+ * `myhordes.localhost` écraserait le jeton, l'utilisateur et la clé d'application de
+ * la production, et inversement — le stockage du script est commun à tous les sites.
+ * Les préfixes de production et de bêta restent strictement inchangés.
+ */
+const local_storage_prefix: string = is_mh_local ? 'local_' : '';
+
+/** Les paramètres d'affichage restent communs : les retrouver identiques en local est un confort, pas un risque */
 export const mho_parameters_key = 'MHO_parameters';
-export const mh_user_key = 'MHO_mh_user';
-export const mho_map_key = 'MHO_map';
-export const mho_token_key = 'MHO_token';
+export const mh_user_key = `MHO_${local_storage_prefix}mh_user`;
+export const mho_map_key = `MHO_${local_storage_prefix}map`;
+export const mho_token_key = `MHO_${local_storage_prefix}token`;
 export const mho_blacklist_key = 'MHO_blacklist';
 export const mho_forum_thread_styles_key = 'MHO_forum_thread_styles';
 export const mho_anti_abuse_key = 'MHO_anti_abuse';
 export const mho_version_key = 'MHO_version';
-export const gm_mh_external_app_id_key = is_mh_beta ? 'MHO_mh_beta_external_app_id' : 'MHO_mh_external_app_id';
+export const gm_mh_external_app_id_key = is_mh_beta ? 'MHO_mh_beta_external_app_id' : `MHO_${local_storage_prefix}mh_external_app_id`;
 
 ///////////////////////////////////////////
 // Listes de constantes / Constants list //
 ///////////////////////////////////////////
+
+/**
+ * Classe de masquage de l'addon (`display: none !important`).
+ * À préférer systématiquement à un `style.display` en ligne : celui-ci écrase la mise en
+ * page définie par la feuille de style, et un champ masqué puis réaffiché réapparaît alors
+ * dans le mauvais mode d'affichage.
+ */
+export const mho_hidden_class = 'mho-hidden';
 
 export const hordes_img_url = '/build/images/';
 export const repo_img_url = 'https://myhordes-optimizer.web.app/img/';

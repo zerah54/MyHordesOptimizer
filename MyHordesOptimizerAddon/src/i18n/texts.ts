@@ -389,6 +389,18 @@ export const texts = {
         de: 'Zähler gegen Missbrauch',
         es: 'Contador anti-abuso'
     },
+    anti_abuse_takes_remaining: {
+        en: 'Available',
+        fr: 'Disponible',
+        de: 'Verfügbar',
+        es: 'Disponible'
+    },
+    anti_abuse_limit_reached: {
+        en: 'Limit reached: the next take will trigger the anti-abuse system',
+        fr: 'Limite atteinte : la prochaine prise déclenchera l\'anti-abus',
+        de: 'Limit erreicht: Die nächste Entnahme löst das Missbrauchssystem aus',
+        es: 'Límite alcanzado: la próxima toma activará el sistema anti-abuso'
+    },
     warn_missing_logs_title: {
         en: 'Warning: Missing searches data',
         fr: 'Attention : Données de fouilles manquantes',

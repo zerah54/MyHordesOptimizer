@@ -1,32 +1,51 @@
 import { state } from '../state';
+import { cancelWaitForElement, waitForElement } from '../utils/dom-wait';
+import { unwatchRendered, watchInventory } from '../utils/render-watch';
 
-export function automaticallyOpenBag(count = 0) {
+/** Clé d'attente : une seule attente du bouton en vol, quel que soit le nombre de rejeux */
+const wait_key_bag_toggle: string = 'bag:action-toggle';
+
+/** Bouton « utiliser un objet » ; masqué par le jeu (`display: none`) dès que la liste est dépliée */
+const bag_toggle_selector: string = '[x-item-action-toggle="1"]';
+
+/**
+ * Déplie la liste d'actions d'objets si c'est possible et que ça n'est pas déjà fait.
+ * Idempotent : une fois dépliée, le jeu masque le bouton, donc un second appel ne fait rien.
+ */
+function openBagIfPossible(): void {
     if (!state.mho_parameters.automatically_open_bag) return;
 
-    const button = document.querySelector('[x-item-action-toggle="1"]');
-    const inventories = document.querySelectorAll('hordes-inventory .inventory li.item:not(.locked)');
+    const button: HTMLElement | null = document.querySelector(bag_toggle_selector);
+    if (!button) return;
 
-    if (!button || inventories?.length === 0) {
-        if (count < 3) setTimeout(() => automaticallyOpenBag(count + 1), 250);
+    /** Le jeu masque le bouton quand la liste est déjà dépliée */
+    if (button.getAttribute('style')?.includes('display: none')) return;
+
+    /**
+     * Aucune vérification du contenu du sac : le jeu ne rend ce bouton que s'il existe
+     * au moins une action d'objet ou une recette (`templates/ajax/game/actions.html.twig`),
+     * ou qu'elles restent à charger. Sa seule présence suffit donc, et exiger en plus un
+     * objet dans le sac empêchait l'ouverture sac vide alors que des actions étaient
+     * pourtant disponibles — par exemple depuis le sol ou l'atelier.
+     */
+    button.click();
+}
+
+/**
+ * Si l'option associée est activée, déplie automatiquement la liste d'actions d'objets.
+ *
+ * Deux déclencheurs complémentaires : l'apparition du bouton, qui couvre le premier
+ * affichage de la page, et le rendu de l'inventaire, car le jeu réévalue les actions
+ * disponibles après un transfert d'objet et peut alors réafficher le bouton.
+ */
+export function automaticallyOpenBag(): void {
+    if (!state.mho_parameters.automatically_open_bag) {
+        /** Option décochée : on cesse d'attendre le bouton comme d'écouter les inventaires */
+        cancelWaitForElement(wait_key_bag_toggle);
+        unwatchRendered('bag');
         return;
     }
 
-    const isVisible = !button.getAttribute('style')?.includes('display: none');
-    if (!isVisible) return;
-
-    // Attendre que le bouton soit prêt via rAF + microtask
-    requestAnimationFrame(() => {
-        Promise.resolve().then(() => {
-            button.click();
-
-            const observer = new MutationObserver(() => {
-                const btn = document.querySelector('[x-item-action-toggle="1"]');
-                if (btn && !btn.getAttribute('style')?.includes('display: none')) {
-                    btn.click();
-                }
-            });
-
-            inventories.forEach(item => observer.observe(item, { attributes: true }));
-        });
-    });
+    watchInventory('bag', () => openBagIfPossible());
+    waitForElement(wait_key_bag_toggle, bag_toggle_selector, () => openBagIfPossible());
 }

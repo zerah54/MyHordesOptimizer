@@ -2,6 +2,7 @@ import { mho_forum_thread_styles_key } from '../config/constants';
 import { empty_forum_thread_style, forum_thread_tags, getDefaultForumThreadStyleRules } from '../data/forum-styles';
 import { state } from '../state';
 import type { ForumThreadStyle, ForumThreadStyleRule, ForumThreadTag } from '../types';
+import { cancelWaitForElement, waitForElement } from '../utils/dom-wait';
 import { getI18N } from '../utils/i18n';
 import { pageIsForum } from '../utils/page';
 import { getStorageItem, setStorageItem } from '../utils/storage';
@@ -14,8 +15,8 @@ const prefix_class: string = 'mho-thread-prefix';
 const row_properties: string[] = ['background-color', 'background-image', 'opacity'];
 /** Épaisseur de la barre de couleur posée à gauche de la ligne */
 const border_width: string = '4px';
-/** Délais des nouvelles tentatives quand le contenu du forum n'est pas encore injecté dans la page */
-const forum_list_retry_delays: number[] = [250, 750];
+/** Clé d'attente : une seule attente de la liste en vol, quel que soit le nombre de rejeux */
+const wait_key_forum_threads: string = 'forum-styles:thread-list';
 
 /**
  * Les règles en mémoire, pour que l'application des styles reste synchrone
@@ -265,33 +266,30 @@ export function applyForumThreadStyleToElements(row: HTMLElement, title_element:
  * Style les titres des sujets de la liste du forum selon les règles enregistrées.
  * Rejouée à chaque navigation : la fonction est idempotente et remet d'abord
  * chaque ligne dans son état d'origine.
+ *
+ * La liste est injectée en AJAX et peut n'arriver qu'après l'évènement de navigation.
+ * On attend donc son apparition, au lieu des deux tentatives espacées d'origine qui
+ * abandonnaient au bout d'une seconde et laissaient la liste non stylée.
+ *
+ * Volontairement PAS de surveillance des re-rendus ici : l'application des styles
+ * retire puis réinsère le préfixe de chaque ligne, ce qu'un observateur poserait
+ * sur la liste interpréterait comme un changement, en boucle sans fin.
  */
 export function styleForumThreadTitles(): void {
-    styleForumThreadTitlesAttempt(0);
-}
-
-/**
- * La liste des sujets est injectée en AJAX : elle peut n'être présente qu'après
- * l'évènement de navigation, d'où quelques tentatives espacées.
- * @param {number} attempt  Le numéro de la tentative en cours
- */
-function styleForumThreadTitlesAttempt(attempt: number): void {
     const is_enabled: boolean = !!state.mho_parameters?.custom_forum_thread_styles && pageIsForum();
-    const rows: HTMLElement[] = Array.from(document.querySelectorAll('.forum-thread'));
-
-    if (rows.length === 0) {
-        if (is_enabled && attempt < forum_list_retry_delays.length) {
-            setTimeout(() => styleForumThreadTitlesAttempt(attempt + 1), forum_list_retry_delays[attempt]);
-        }
-        return;
-    }
 
     if (!is_enabled) {
-        rows.forEach(resetRow);
+        cancelWaitForElement(wait_key_forum_threads);
+        Array.from(document.querySelectorAll('.forum-thread')).forEach(resetRow);
         return;
     }
 
-    loadForumThreadStyleRules().then((rules: ForumThreadStyleRule[]) => applyForumThreadStyles(rules));
+    waitForElement(wait_key_forum_threads, '.forum-thread', () => {
+        /** La liste peut apparaître après un changement de page ou d'option */
+        if (!state.mho_parameters?.custom_forum_thread_styles || !pageIsForum()) return;
+
+        loadForumThreadStyleRules().then((rules: ForumThreadStyleRule[]) => applyForumThreadStyles(rules));
+    });
 }
 
 /** Applique immédiatement un jeu de règles à la liste affichée (utilisé aussi à l'enregistrement de la modale) */

@@ -68,7 +68,7 @@
     },
     "camping-phrases": {
       "name": "camping-cätze",
-      "description": "Die verschiedenen Formulierungen, die man auf dem Campingplatz erhält, hängen von den Überlebenschancen ab",
+      "description": "Die verschiedenen Formulierungen beim Campen, je nach tatsächlichen Überlebenschancen",
       "private-msg": {
         "name": "private-nachricht",
         "description": "True, wenn die Nachricht nicht für alle sichtbar sein soll"

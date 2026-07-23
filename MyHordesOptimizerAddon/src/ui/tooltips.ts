@@ -7,6 +7,14 @@ import { getFixedImagePath, getTooltipItem } from '../utils/item-lookup';
 import { getRecipeElement } from './recipes';
 import { getWishlistForZone } from './wishlist';
 
+/**
+ * Nœuds de bulle déjà équipés du garde de clic. Le jeu réutilise le même nœud pour des
+ * objets différents : sans ce suivi, chaque enrichissement rajoutait un listener anonyme,
+ * jamais retirable, qui s'accumulait sur le nœud. Un `WeakSet` n'empêche pas la collecte
+ * du nœud et ne laisse aucune trace dans le DOM.
+ */
+const click_guarded_tooltips: WeakSet<Element> = new WeakSet<Element>();
+
 export function enhanceTooltip(tooltip_container) {
     if (!tooltip_container) return;
 
@@ -37,7 +45,15 @@ export function enhanceTooltip(tooltip_container) {
         existingHints.forEach(el => el.remove());
     }
 
-    tooltip_container.addEventListener('click', (e) => e.stopImmediatePropagation());
+    /**
+     * Un seul listener par nœud : `stopImmediatePropagation` arrête déjà les autres
+     * listeners du même élément, donc une seule copie a toujours été effective — en
+     * empiler d'autres à chaque enrichissement était sans effet, hormis la fuite.
+     */
+    if (!click_guarded_tooltips.has(tooltip_container)) {
+        click_guarded_tooltips.add(tooltip_container);
+        tooltip_container.addEventListener('click', (e) => e.stopImmediatePropagation());
+    }
 
     const item_or_status = getTooltipItem(img, isStatus);
     const item = item_or_status.item;
@@ -114,36 +130,46 @@ export function addFreezeHintsToTooltip(tooltip_container) {
 }
 
 
-export function observeNewTooltips(tries = 10) {
-    if (state.advanced_tooltips_observer) return;
-    const tooltip_container = document.querySelector('#tooltip_container');
-    if (!tooltip_container) {
-        if (tries > 0) {
-            setTimeout(observeNewTooltips, 100, tries - 1);
-        } else {
-            console.warn('tooltip_container not found');
+/** Le listener de survol n'est posé qu'une fois pour toute la durée de vie de la page */
+let tooltip_hover_bound: boolean = false;
+
+/**
+ * Enrichit les bulles au survol de l'élément auquel elles sont rattachées, via le lien
+ * `aria-describedby` (élément → `id` de sa bulle) que le jeu pose sur l'élément survolable.
+ *
+ * Remplace l'observation de l'attribut `style` de tout le conteneur de bulles, qui se
+ * redéclenchait à chaque repositionnement, au moindre mouvement de souris. Ici on lit le
+ * contenu de la bulle AU MOMENT du survol : l'objet est donc toujours à jour, y compris
+ * quand le jeu a réutilisé un nœud pour un autre objet (réconciliation React), quelle que
+ * soit la façon dont le contenu a été modifié.
+ *
+ * Phase capture : on passe avant les gestionnaires d'affichage du jeu (`mouseenter` /
+ * `pointerdown`), l'enrichissement est donc déjà en place quand la bulle devient visible.
+ */
+function bindTooltipHoverEnrichment(): void {
+    if (tooltip_hover_bound) return;
+    tooltip_hover_bound = true;
+    document.addEventListener('pointerover', enrichHoveredTooltip, true);
+}
+
+function enrichHoveredTooltip(event: PointerEvent): void {
+    if (!state.mho_parameters.enhanced_tooltips || !state.items) return;
+
+    const target: HTMLElement | null = event.target instanceof HTMLElement ? event.target : null;
+    const described: HTMLElement | null = target?.closest?.('[aria-describedby]') ?? null;
+    if (!described) return;
+
+    const tooltip_container: HTMLElement | null = document.getElementById('tooltip_container');
+    if (!tooltip_container) return;
+
+    /** L'attribut peut lister plusieurs ids : on ne retient que la bulle d'objet du conteneur */
+    for (const id of (described.getAttribute('aria-describedby') ?? '').split(/\s+/)) {
+        if (!id) continue;
+        const tooltip: HTMLElement | null = document.getElementById(id);
+        if (tooltip && tooltip.classList.contains('item') && tooltip_container.contains(tooltip)) {
+            enhanceTooltip(tooltip);
         }
-        return;
     }
-    state.advanced_tooltips_observer = new MutationObserver((records, observer) => {
-        for (const record of records) {
-            for (const node of record.addedNodes) {
-                if (node instanceof HTMLElement && node.classList.contains('item')) {
-                    enhanceTooltip(node);
-                }
-            }
-            const tooltipItem = record.target.closest?.('.item');
-            if (tooltipItem && !record.addedNodes.length) {
-                enhanceTooltip(tooltipItem);
-            }
-        }
-    });
-    state.advanced_tooltips_observer.observe(tooltip_container, {
-        childList: true,
-        subtree: true,
-        attributes: true,
-        attributeFilter: ['style']
-    });
 }
 
 /** Affiche les tooltips avancés */
@@ -151,9 +177,9 @@ export function observeNewTooltips(tries = 10) {
 export function displayAdvancedTooltips() {
     if (state.mho_parameters.enhanced_tooltips && state.items) {
         initTooltipFreezeOnShift();
-        // observation des bulles qui apparaîtront plus tard
-        observeNewTooltips();
-        // traitement des bulles déjà présentes
+        // enrichissement au survol, via le lien aria-describedby élément → bulle
+        bindTooltipHoverEnrichment();
+        // bulles éventuellement déjà présentes (ex. une déjà affichée au chargement)
         document.querySelectorAll('#tooltip_container > .item').forEach(function (element) {
             enhanceTooltip(element);
         });
