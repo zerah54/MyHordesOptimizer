@@ -15,7 +15,7 @@
     outline: 1px solid #000;
     position: absolute;
     top: 10px;
-    z-index: 997;
+    z-index: 995;
 }
 
 #__BTN_ID__.mho-btn-opened h1 span, #__BTN_ID__.mho-btn-opened h1 a, #__BTN_ID__.mho-btn-opened h1 img.close {
@@ -891,12 +891,33 @@ div.item-tag.mho-item-tag-no-img {
     word-break: break-word;
 }
 
+#mho-anti-abuse-counter {
+    padding: 0 3px;
+}
+
 .mho-anti-abuse-counter-content {
     border-bottom: 1px solid #ddab76;
     display: flex;
     gap: 0.5em;
     justify-content: space-between;
     flex-wrap: wrap;
+}
+
+/*
+ * Cellule du forum de la banque quand le compteur anti-abus y est inséré : on l'empile
+ * en colonne (compteur en haut, forum en dessous) au lieu de casser le positionnement
+ * absolu du forum. Le forum conserve ainsi son panneau à défilement natif, dimensionné
+ * à l'espace restant. Trois classes sur le wrapper pour l'emporter sur la règle du jeu
+ * (`.forum-preview-wrapper.forum-preview-wrapper-bank { min-height: 100% }`).
+ */
+.mho-bank-forum-cell {
+    display: flex;
+    flex-direction: column;
+}
+
+.mho-bank-forum-cell .forum-preview-wrapper.forum-preview-wrapper-bank {
+    flex: 1 1 auto;
+    min-height: 0;
 }
 
 #mho-camping-predict {
@@ -1037,6 +1058,34 @@ div.item-tag.mho-item-tag-no-img {
 
     .mho-camping-field--full {
         grid-column: 1 / -1;
+    }
+
+    /**
+     * Le bâtiment et son nombre de tas tiennent sur une seule ligne : le sélecteur occupe
+     * la place disponible, le compteur de tas prend juste la sienne. Ce dernier est
+     * simplement absent quand le bâtiment n'est pas « non déterré ».
+     */
+    .mho-camping-ruin-row {
+        display: flex;
+        align-items: center;
+        gap: 0.6em;
+        width: 100%;
+        min-width: 0;
+        flex-wrap: nowrap;
+
+        > .mho-camping-field {
+            flex: 1 1 auto;
+            min-width: 0;
+        }
+    }
+
+    /**
+     * Largeur fixée par le contenu, contre la règle générale des champs numériques
+     * (`width: 100%`) qui le renverrait seul à la ligne suivante.
+     */
+    #digs-field {
+        width: auto;
+        flex: 0 0 auto;
     }
 
     .mho-camping-numbers-grid {

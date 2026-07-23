@@ -11,13 +11,24 @@ import {
 } from '../config/constants';
 import { texts } from '../i18n/texts';
 import { state } from '../state';
+import { cancelWaitForElement, waitForElement } from '../utils/dom-wait';
 import { getI18N } from '../utils/i18n';
 import { pageIsAmelio, pageIsDoors, pageIsHouse } from '../utils/page';
 import { setStorageItem } from '../utils/storage';
 import { getScriptInfo } from '../utils/version';
 import { createHelpButton } from './params';
 
-export function createUpdateExternalToolsButton(count = 0) {
+/** Clés d'attente : une seule attente en vol par cible, quel que soit le nombre de rejeux */
+const wait_key_anchor: string = 'update-button:anchor';
+const wait_key_complete_log: string = 'update-button:complete-log';
+
+/**
+ * Zones d'ancrage possibles du bouton. Toutes sont rendues par le jeu APRÈS
+ * `mh-navigation-complete` : on attend leur apparition au lieu d'enchaîner des essais.
+ */
+const anchor_selector: string = '#zone-marker, hordes-inventory, #upgrade_home_level, #door_opener, #door_exit';
+
+export function createUpdateExternalToolsButton() {
     const tools_to_update = {
         isBigBrothHordes: /* mho_parameters && !is_mh_beta ? mho_parameters.update_bbh : */ false,
         isFataMorgana: state.mho_parameters ? state.mho_parameters.update_fata : false,
@@ -36,7 +47,45 @@ export function createUpdateExternalToolsButton(count = 0) {
     const amelios = document.querySelector('#upgrade_home_level')?.parentElement?.parentElement;
     const map_actions = document.querySelector('#door_opener')?.parentElement ?? document.querySelector('#door_exit')?.parentElement;
 
+    /**
+     * L'avertissement « journal incomplet » est traité à part : au tour où le bouton
+     * vient d'être créé, la variable locale lue plus haut vaut encore null. On relit
+     * donc le bouton dans le DOM, ce qui évite le tour de rattrapage d'origine.
+     */
+    const handleMissingLogsWarning = (): void => {
+        const btn: HTMLElement | null = document.getElementById(mh_update_external_tools_id);
+        let warn_missing_logs = document.getElementById(mho_warn_missing_logs_id);
+        const has_complete_log: boolean = !!document.querySelector('.log-complete-link');
+
+        if (!warn_missing_logs && has_complete_log && external_display_zone && btn && state.mho_parameters.update_mho_digs) {
+            if (window.innerWidth < 480 && compact_actions_zone) {
+                const external_tools_btn_tooltip = document.querySelector('#external-tools-btn-tooltip');
+                if (!external_tools_btn_tooltip) return;
+                warn_missing_logs = document.createElement('div');
+                warn_missing_logs.id = mho_warn_missing_logs_id;
+                warn_missing_logs.classList.add('note', 'note-important');
+                warn_missing_logs.style.fontSize = '10px';
+                warn_missing_logs.innerHTML = getI18N(texts.warn_missing_logs_title) + '<br /><br />' + getI18N(texts.warn_missing_logs_help);
+
+                external_tools_btn_tooltip.appendChild(warn_missing_logs);
+            } else {
+                warn_missing_logs = document.createElement('div');
+                warn_missing_logs.id = mho_warn_missing_logs_id;
+                warn_missing_logs.classList.add('note', 'note-important');
+                warn_missing_logs.innerText = getI18N(texts.warn_missing_logs_title);
+                const warn_help = createHelpButton(getI18N(texts.warn_missing_logs_help));
+                warn_missing_logs.appendChild(warn_help);
+
+                btn.parentElement.appendChild(warn_missing_logs);
+            }
+        } else if (warn_missing_logs && (!has_complete_log || !state.mho_parameters.update_mho_digs)) {
+            warn_missing_logs.remove();
+        }
+    };
+
     if (nb_tools_to_update <= 0 || !state.external_app_id) {
+        cancelWaitForElement(wait_key_anchor);
+        cancelWaitForElement(wait_key_complete_log);
         if (update_external_tools_btn) {
             update_external_tools_btn.parentElement.remove();
         }
@@ -60,44 +109,38 @@ export function createUpdateExternalToolsButton(count = 0) {
                         el.appendChild(updater_bloc);
                     }
                 }
-            } else if (count < 3) {
-                setTimeout(() => {
-                    createUpdateExternalToolsButton(count + 1);
-                }, 250);
-                return;
             }
 
-            let warn_missing_logs = document.getElementById(mho_warn_missing_logs_id);
+            cancelWaitForElement(wait_key_anchor);
+            handleMissingLogsWarning();
 
-            if (!warn_missing_logs && document.querySelector('.log-complete-link') && external_display_zone && update_external_tools_btn && state.mho_parameters.update_mho_digs) {
-                if (window.innerWidth < 480 && compact_actions_zone) {
-                    const external_tools_btn_tooltip = document.querySelector('#external-tools-btn-tooltip');
-                    warn_missing_logs = document.createElement('div');
-                    warn_missing_logs.id = mho_warn_missing_logs_id;
-                    warn_missing_logs.classList.add('note', 'note-important');
-                    warn_missing_logs.style.fontSize = '10px';
-                    warn_missing_logs.innerHTML = getI18N(texts.warn_missing_logs_title) + '<br /><br />' + getI18N(texts.warn_missing_logs_help);
-
-                    external_tools_btn_tooltip.appendChild(warn_missing_logs);
-                } else {
-                    warn_missing_logs = document.createElement('div');
-                    warn_missing_logs.id = mho_warn_missing_logs_id;
-                    warn_missing_logs.classList.add('note', 'note-important');
-                    warn_missing_logs.innerText = getI18N(texts.warn_missing_logs_title);
-                    const warn_help = createHelpButton(getI18N(texts.warn_missing_logs_help));
-                    warn_missing_logs.appendChild(warn_help);
-
-                    update_external_tools_btn.parentElement.appendChild(warn_missing_logs);
-                }
-            } else if (warn_missing_logs && (!document.querySelector('.log-complete-link') || !state.mho_parameters.update_mho_digs)) {
-                warn_missing_logs.remove();
+            /**
+             * Le lien de journal complet peut n'apparaître qu'après le bouton : on
+             * attend son arrivée plutôt que de repasser à intervalle fixe. Si le
+             * traitement a déjà tout réglé, l'attente est simplement remplacée au
+             * rejeu suivant.
+             */
+            if (!document.getElementById(mho_warn_missing_logs_id) && state.mho_parameters.update_mho_digs) {
+                waitForElement(wait_key_complete_log, '.log-complete-link', () => handleMissingLogsWarning());
+            } else {
+                cancelWaitForElement(wait_key_complete_log);
             }
         } else if (update_external_tools_btn && (!(external_display_zone && pageIsHouse()) || !(amelios && pageIsAmelio()))) {
+            cancelWaitForElement(wait_key_anchor);
             update_external_tools_btn.parentElement.remove();
-        } else if (!update_external_tools_btn && external_display_zone && count < 10) {
-            setTimeout(() => {
-                createUpdateExternalToolsButton(count + 1);
-            }, 250);
+        } else if (!update_external_tools_btn && !document.querySelector(anchor_selector)) {
+            /**
+             * Aucune zone d'ancrage n'est encore rendue : on se met en attente de la
+             * première qui apparaîtra. La branche de repli d'origine exigeait
+             * `external_display_zone`, dont l'absence est justement la condition pour
+             * l'atteindre : elle était morte, et le bouton n'apparaissait donc qu'au
+             * rejeu suivant, déclenché par une action de l'utilisateur.
+             *
+             * L'attente n'est posée que si aucune ancre n'est présente : le sélecteur
+             * couvre plus de cas que les conditions de placement ci-dessus, et un
+             * rappel immédiat sur une ancre déjà là bouclerait indéfiniment.
+             */
+            waitForElement(wait_key_anchor, anchor_selector, () => createUpdateExternalToolsButton());
         }
     }
 }

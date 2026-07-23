@@ -13,7 +13,13 @@ export async function bootstrap(): Promise<void> {
         state.api_url = 'https://api.myhordesoptimizer.fr/beta';
     } else if (is_mh_local) {
         state.website = 'http://localhost:4200/';
-        state.api_url = 'http://localhost:5001';
+        /**
+         * Le profil de lancement de l'API expose 5001 en HTTPS et 5000 en HTTP
+         * (`Properties/launchSettings.json`). On vise directement le port HTTPS :
+         * `UseHttpsRedirection` renverrait sinon la requête de 5000 vers 5001, et une
+         * redirection fait échouer la requête préliminaire CORS.
+         */
+        state.api_url = 'https://localhost:5001';
     } else {
         state.website = 'https://myhordes-optimizer.web.app/';
         state.api_url = 'https://api.myhordesoptimizer.fr';

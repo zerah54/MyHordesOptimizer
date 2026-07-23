@@ -19,7 +19,7 @@ import { state } from './state';
 import { createOptimizerBtn } from './ui/btn';
 import { createMhoHeaderSpace } from './ui/header-space';
 import { createStyles } from './ui/styles';
-import { notifyOnSearchEnd } from './ui/zombie-counter';
+import { waitForElement } from './utils/dom-wait';
 import { initOptionsWithLoginNeeded, initOptionsWithoutLoginNeeded } from './utils/fetch';
 import { getTownClockSignature, shouldRefreshMe } from './utils/page';
 import { getStorageItem, setStorageItem } from './utils/storage';
@@ -90,25 +90,37 @@ import { isNewVersion, toggleNewChangelog } from './utils/version';
             });
         });
 
-        const interval = setInterval(() => {
-            const copy_button = document.getElementById(mho_copy_map_id);
-            if (state.mho_parameters.display_map && !copy_button) {
-                const map_block = document.getElementById(map_block_id);
-                const ruin_block = document.getElementById(ruin_block_id);
-                if (map_block || ruin_block) {
-                    if (ruin_block) {
+        /**
+         * Bouton « copier la carte » sur les sites externes. Ces sites n'émettent pas les
+         * évènements de navigation du jeu : on attend l'apparition du bloc carte ou ruine.
+         *
+         * L'option `display_map` ne peut pas changer pendant la vie de la page : l'interface
+         * de réglages n'est montée que sur le jeu, pas ici. Rien à faire donc si elle est
+         * décochée, et pas besoin de surveiller un décochage.
+         *
+         * L'ancienne version sondait toutes les secondes et ne s'arrêtait jamais tant que le
+         * bloc n'apparaissait pas — en particulier sur le site MHO où les identifiants de bloc
+         * sont indéfinis, donc introuvables à chaque tick, indéfiniment.
+         */
+        if (state.mho_parameters.display_map) {
+            const block_selector: string = [ruin_block_id, map_block_id]
+                .filter((block_id) => !!block_id)
+                .map((block_id) => `#${block_id}`)
+                .join(', ');
+
+            if (block_selector) {
+                waitForElement('external-copy-map-button', block_selector, () => {
+                    if (document.getElementById(mho_copy_map_id)) return;
+
+                    /** La ruine prime sur la carte quand les deux sont présents */
+                    if (ruin_block_id && document.getElementById(ruin_block_id)) {
                         createCopyButton(source, 'ruin', ruin_block_id, block_copy_ruin_button);
-                    } else if (map_block) {
+                    } else if (map_block_id && document.getElementById(map_block_id)) {
                         createCopyButton(source, 'map', map_block_id, block_copy_map_button);
                     }
-                }
-            } else if (!state.mho_parameters.display_map && copy_button) {
-                copy_button.remove();
-                clearInterval(interval);
-            } else {
-                clearInterval(interval);
+                }, { timeout_ms: 30000 });
             }
-        }, 1000);
+        }
     } else {
         /** True dès qu'un token a pu être récupéré : conditionne les fonctionnalités nécessitant d'être connecté */
         const hasToken = (): boolean => !!state.token?.token?.accessToken;
@@ -132,8 +144,8 @@ import { isNewVersion, toggleNewChangelog } from './utils/version';
         createStyles();
         createOptimizerBtn();
         createMhoHeaderSpace();
-        notifyOnSearchEnd();
 
+        /** `notifyOnSearchEnd` fait désormais partie des initialisations rejouées ci-dessous */
         initOptionsWithoutLoginNeeded();
 
         /**
@@ -211,7 +223,8 @@ import { isNewVersion, toggleNewChangelog } from './utils/version';
             }
         };
 
-        const handleEvent = (event_name: string) => (): void => {
+        /** Met l'évènement en file et programme le rejeu des initialisations */
+        const queueInit = (event_name: string): void => {
             pending_event_names.push(event_name);
             if (pending_init_timeout !== undefined) return;
 
@@ -219,6 +232,43 @@ import { isNewVersion, toggleNewChangelog } from './utils/version';
             const elapsed: number = Date.now() - last_init_at;
             const delay: number = Math.max(0, init_throttle_delay - elapsed);
             pending_init_timeout = setTimeout(runPendingInit, delay);
+        };
+
+        /**
+         * Filet de sécurité si la promesse de rendu ne se résolvait jamais : le jeu
+         * garantit le déblocage à 1250 ms, on laisse une marge au-delà.
+         */
+        const render_wait_timeout: number = 2500;
+
+        const handleEvent = (event_name: string) => (event: Event): void => {
+            /**
+             * Lors d'un déplacement dans le désert, le jeu suspend le rendu le temps de son
+             * animation (`push_renderblock`) : `mh-navigation-complete` est alors émis AVANT
+             * que le nouveau contenu ne soit dans le document, et le rendu réel n'arrive
+             * qu'au déblocage, plus d'une seconde après. Rejouer les initialisations tout de
+             * suite reviendrait à travailler sur l'ancien DOM — d'où un sac qui ne s'ouvre pas
+             * et un bouton d'outils externes absent après un déplacement.
+             *
+             * L'évènement porte une promesse résolue APRÈS l'exécution du rendu en attente
+             * (`pop_renderblock` vide la file de rendu avant de résoudre) : on l'attend.
+             * Hors blocage, elle est déjà résolue et le comportement ne change pas.
+             */
+            const render_promise: Promise<unknown> | undefined = (event as CustomEvent)?.detail?.render;
+            if (!render_promise || typeof render_promise.then !== 'function') {
+                queueInit(event_name);
+                return;
+            }
+
+            /** Le premier des deux déclencheurs l'emporte, jamais les deux */
+            let already_queued: boolean = false;
+            const queueOnce = (): void => {
+                if (already_queued) return;
+                already_queued = true;
+                queueInit(event_name);
+            };
+
+            render_promise.then(queueOnce, queueOnce);
+            setTimeout(queueOnce, render_wait_timeout);
         };
 
         [

@@ -42,8 +42,10 @@ using MyHordesOptimizerApi.Services.Interfaces.Translations;
 using Sentry;
 using Serilog;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
+using System.Net.Sockets;
 using System.Reflection;
 using System.Text.Json.Serialization;
 using System.Threading.RateLimiting;
@@ -56,6 +58,30 @@ SentrySdk.Init(options =>
 });
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Bascule vers un MyHordes lancé en local, demandée par le profil de lancement
+// « MyHordesOptimizerApi (MyHordes local) ».
+// Les valeurs elles-mêmes (URL et clé d'application, qui diffèrent de celles de production)
+// sont lues dans la section MyHordesLocalGame d'appsettings.Development.json : ce fichier
+// n'est pas versionné, alors que launchSettings.json l'est. Le profil ne porte donc qu'un
+// drapeau, et aucun secret ne part dans le dépôt.
+if (builder.Environment.IsDevelopment()
+    && string.Equals(Environment.GetEnvironmentVariable("MHO_USE_LOCAL_GAME"), "true", StringComparison.OrdinalIgnoreCase))
+{
+    var localGameSection = builder.Configuration.GetSection("MyHordesLocalGame");
+    var localGameOverrides = new Dictionary<string, string?>();
+    // Toute clé présente dans la section surcharge son homologue de MyHordes : rien à
+    // recompiler pour en ajouter une nouvelle.
+    foreach (var setting in localGameSection.GetChildren())
+    {
+        localGameOverrides[$"MyHordes:{setting.Key}"] = setting.Value;
+    }
+
+    if (localGameOverrides.Count > 0)
+    {
+        builder.Configuration.AddInMemoryCollection(localGameOverrides);
+    }
+}
 
 // Swagger
 builder.Services.AddEndpointsApiExplorer();
@@ -75,7 +101,7 @@ builder.Host.UseSerilog((_, services, configuration) =>
                              .Enrich.With(services.GetService<MyHordesOptimizerEnricher>()!));
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddHttpClient();
-builder.Services.AddHttpClient(nameof(MyHordesApiRepository), client =>
+var myHordesHttpClientBuilder = builder.Services.AddHttpClient(nameof(MyHordesApiRepository), client =>
 {
     // 30s et non 10 : MyHordes a déjà connu des épisodes de latence où 10s coupait des appels
     // pourtant en train d'aboutir. L'import des pictos d'un joueur (/json/user avec l'historique
@@ -83,6 +109,40 @@ builder.Services.AddHttpClient(nameof(MyHordesApiRepository), client =>
     // synchronisation, donc allonger ce délai ne bloque pas les autres utilisateurs.
     client.Timeout = TimeSpan.FromSeconds(30);
 });
+
+if (builder.Environment.IsDevelopment())
+{
+    // Permet de viser un MyHordes lancé en local (http://myhordes.localhost) sans toucher au
+    // fichier hosts de la machine : les navigateurs résolvent d'eux-mêmes tout nom en
+    // `.localhost` vers l'adresse de bouclage (RFC 6761), mais le résolveur de Windows ne le
+    // fait pas et .NET s'appuie sur lui — d'où un "Hôte inconnu" au moindre appel.
+    // On rétablit donc cette résolution ici, au moment de la connexion uniquement : l'URL
+    // demandée n'est pas modifiée, l'en-tête Host reste le nom d'origine, ce dont dépend
+    // l'hôte virtuel qui sert le jeu.
+    myHordesHttpClientBuilder.ConfigurePrimaryHttpMessageHandler(() => new SocketsHttpHandler
+    {
+        ConnectCallback = async (context, cancellationToken) =>
+        {
+            var requestedHost = context.DnsEndPoint.Host;
+            var targetHost = requestedHost.Equals("localhost", StringComparison.OrdinalIgnoreCase)
+                             || requestedHost.EndsWith(".localhost", StringComparison.OrdinalIgnoreCase)
+                ? "127.0.0.1"
+                : requestedHost;
+
+            var socket = new Socket(SocketType.Stream, ProtocolType.Tcp) { NoDelay = true };
+            try
+            {
+                await socket.ConnectAsync(targetHost, context.DnsEndPoint.Port, cancellationToken);
+                return new NetworkStream(socket, ownsSocket: true);
+            }
+            catch
+            {
+                socket.Dispose();
+                throw;
+            }
+        }
+    });
+}
 builder.Services.AddHttpClient(nameof(GestHordesRepository)).ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler()
 {
     UseCookies = true,
@@ -211,11 +271,18 @@ if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
 }
+// configure CORS
+// En développement seulement, on autorise les origines du jeu et du site lancés en local,
+// pour pouvoir tester l'addon contre cette API.
+// AllowAnyOrigin est impossible ici : il est incompatible avec AllowCredentials.
+var allowedOrigins = app.Environment.IsDevelopment()
+    ? new[] { "null", "http://myhordes.localhost", "https://myhordes.localhost", "http://localhost:4200" }
+    : new[] { "null" };
 app.UseCors(x => x
-        .WithOrigins("null")
+        .WithOrigins(allowedOrigins)
         .AllowAnyMethod()
         .AllowCredentials()
-        .AllowAnyHeader()); // configure CORS
+        .AllowAnyHeader());
 app.Use((context, next) =>
 {
     context.Request.EnableBuffering();

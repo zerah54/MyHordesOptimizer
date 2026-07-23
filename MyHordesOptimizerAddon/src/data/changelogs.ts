@@ -1,4 +1,18 @@
 export const changelogs: Record<string, string> = {
+    '1.1.51': `
+        [Nouveauté] Sur la page de la banque, un compteur indique le nombre de prises encore possibles avant de déclencher l'anti-abus, avec une alerte lorsque la limite est atteinte
+        [Nouveauté] Le calcul des PA nécessaires pour qu'un bâtiment survive à la nuit prend désormais en compte les feux d'artifice et le réacteur soviétique, avec la bonne valeur en Région Éloignée comme en Pandémonium
+
+        [Amélioration] Le script a été considérablement allégé et optimisé
+        [Amélioration] Le bouton MHO se positionne désormais correctement
+
+        [Correction] Le sac ne s'ouvrait pas toujours automatiquement, y compris lorsqu'aucun objet ne s'y trouvait
+        [Correction] La liste de courses pouvait s'afficher vide et n'apparaître qu'après un clic sur « Rafraîchir »
+        [Correction] Les priorités affichées sur les objets disparaissaient au ramassage ou à la dépose
+        [Correction] Le bouton de mise à jour des outils externes n'apparaissait pas toujours, notamment après un déplacement
+        [Correction] Le compteur de caractères du registre disparaissait par moments
+        [Correction] Le compteur anti-abus se retire maintenant lorsque l'option est décochée
+    `,
     '1.1.50': `
         [Nouveauté] Les listes de la veille, des pièges et de la décharge peuvent désormais être triées
         [Nouveauté] Un champ de recherche d'appât peut être affiché sur la page des pièges
