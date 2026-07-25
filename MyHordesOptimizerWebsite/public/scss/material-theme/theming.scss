@@ -10,7 +10,7 @@
 @mixin app-component-overrides() {
     @include mat.toolbar-overrides((
         container-background-color: var(--mat-sys-primary-container),
-        container-text-color: var(--mat-sys-on-surface),
+        container-text-color: var(--mat-sys-tertiary),
         standard-height: 52px
     ));
 
@@ -19,7 +19,7 @@
     ));
 
     @include mat.menu-overrides((
-        container-color: var(--mat-sys-surface-container-low),
+        container-color: var(--mat-sys-surface),
     ));
 
     @include mat.tooltip-overrides((
@@ -44,8 +44,11 @@
     ));
 
     @include mat.checkbox-overrides((
-        selected-checkmark-color: var(--mat-sys-on-primary-container),
+        selected-checkmark-color: var(--mat-sys-tertiary),
     ));
+
+    --mat-pseudo-checkbox-full-selected-checkmark-color: var(--mat-sys-tertiary);
+    --mat-pseudo-checkbox-minimal-selected-checkmark-color: var(--mat-sys-tertiary);
 
     @include mat.select-overrides((
         panel-background-color: var(--mat-sys-surface-container-low),

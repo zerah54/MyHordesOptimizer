@@ -1,179 +1,374 @@
+@use '@angular/material' as mat;
+
 :host {
     display: contents;
+
+    // Conteneur sidenav : la liste occupe le contenu, les filtres la sidenav droite.
+    .citizens-container {
+        height: 100%;
+    }
+
+    // Toggles de filtre plus compacts que le 42px global (theming.scss) — via l'API officielle Material,
+    // pas de ::ng-deep ni de token brut.
+    .filters-panel {
+        @include mat.button-toggle-overrides((height: 32px));
+    }
+
+    .filters-sidenav {
+        width: 310px;
+        max-width: 92vw;
+    }
+
+    .filters-panel {
+        display: flex;
+        flex-direction: column;
+        padding: 0.25em 0.75em 1em;
+
+        // En-tête sans fond distinct : reste de la couleur de la sidenav.
+        .filters-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5em;
+            padding: 0.25em 0;
+
+            .title {
+                font-weight: 600;
+                font-size: 1.1em;
+            }
+
+            .spacer {
+                flex: 1 1 auto;
+            }
+        }
+
+        .filters-section {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25em;
+            margin-top: 0.4em;
+
+            h4 {
+                margin: 0.2em 0;
+                opacity: 0.7;
+                font-weight: 600;
+            }
+
+            mat-form-field {
+                width: 100%;
+            }
+
+            // Sections de toggles (labels icône seule) : grille compacte, 3+ colonnes.
+            &.toggles {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(125px, 1fr));
+                gap: 0.25em 0.5em;
+                align-items: center;
+
+                h4 {
+                    grid-column: 1 / -1;
+                }
+            }
+
+            .filter-row {
+                display: flex;
+                align-items: center;
+                justify-content: flex-start;
+                gap: 0.5em;
+
+                .filter-label {
+                    display: flex;
+                    align-items: center;
+                    gap: 0.4em;
+                    min-width: 0;
+
+                    span {
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                        white-space: nowrap;
+                    }
+                }
+
+                .value-filter {
+                    flex-shrink: 0;
+                    flex-wrap: wrap;
+                }
+
+                // Icônes MH dans les toggles de valeur (métiers) : taille native, en inline (comme le texte
+                // des chiffres) — un `display: block` casse la mise en page interne du mat-button-toggle.
+                .toggle-icon {
+                    display: inline-block;
+                    vertical-align: middle;
+                }
+
+                // Filtre booléen : checkbox 3 états, l'icône du champ sert de label.
+                .filter-icon {
+                    display: inline-block;
+                    vertical-align: middle;
+                }
+
+                // Wrapper cliquable : la mat-checkbox est purement présentationnelle (pilotée par ses inputs),
+                // sinon son état interne au clic « rebat » les bindings [checked]/[indeterminate].
+                .bool-control {
+                    display: inline-flex;
+                    align-items: center;
+                    cursor: pointer;
+
+                    mat-checkbox {
+                        pointer-events: none;
+                    }
+                }
+            }
+        }
+    }
 
     .mho-citizens-list {
         height: 100%;
         overflow: auto;
 
+        .citizens-list-toolbar {
+            display: flex;
+            align-items: center;
+            gap: 0.5em;
+            padding: 0.5em;
+            // Le badge du bouton Filtres dépasse en haut à droite : ne pas le rogner.
+            overflow: visible;
+
+            // Couleurs explicites du badge (le variant « accent » donne un fond vide en thème monochrome).
+            .filters-button {
+                --mat-badge-background-color: var(--mat-sys-tertiary);
+                --mat-badge-text-color: var(--mat-sys-surface);
+            }
+
+            .spacer {
+                flex: 1 1 auto;
+            }
+
+            mat-button-toggle-group {
+                mat-icon {
+                    margin-right: 0.25em;
+                    vertical-align: middle;
+                }
+            }
+
+            // Uniquement les boutons AVEC texte (Trier/Filtres) : espacer l'icône du libellé.
+            // Exclut les mat-icon-button (icône seule), qui centrent déjà l'icône via flex.
+            button:not(.mat-mdc-icon-button) mat-icon {
+                margin-right: 0.25em;
+                vertical-align: middle;
+            }
+        }
+
+        // Conteneur à défilement horizontal : indispensable au mode étendu (une colonne par champ).
+        .table-scroll {
+            width: 100%;
+            overflow-x: auto;
+
+            &.columns table {
+                width: auto;
+                min-width: 100%;
+            }
+        }
+
         table {
             width: 100%;
 
-            tr {
+            // La colonne citoyen est collante : elle a besoin d'un fond opaque pour masquer
+            // les colonnes qui défilent derrière en mode étendu.
+            th.avatar_name,
+            td.avatar_name {
+                background-color: var(--mat-sys-surface-container-low);
+            }
 
-                > td {
-                    padding: 0 0.5em;
-
-                    &.center {
-                        text-align: center;
-                    }
-
-                    &.avatar_name {
-                        > img {
-                            max-width: 100px;
-                        }
-
-                        > div {
-                            text-align: center;
-                            margin: auto;
-                        }
-                    }
-
-                    &.more_status {
-                        > div {
-                            display: flex;
-                            flex-direction: column;
-                            gap: 0.5em;
-
-                            > div {
-                                display: flex;
-                                flex-direction: row;
-                                align-items: center;
-                                justify-content: space-between;
-
-                                .list-element-add-remove {
-                                    flex: 1;
-
-                                    .list {
-                                        white-space: nowrap;
-                                    }
-                                }
-
-                                &.chamanic {
-                                    .fields {
-                                        img {
-                                            margin-right: 0.5em;
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                    .heroic-actions {
-                        min-width: 300px;
-                        max-width: 400px;
-
-                        .lvl-element {
-                            .mat-mdc-form-field {
-                                width: 100%;
-                                max-width: 100%;
-                            }
-
-                            &.full-width {
-                                width: 100%;
-                            }
-
-                            /** Ajoute une marge au-dessus du premier select pour l'éloigner des checkboxes */
-                            &:nth-child(1 of .full-width) {
-                                margin-top: 0.5em;
-                            }
-                        }
-                    }
-
-                    .home {
-                        min-width: 450px;
-
-                        .lvl-element {
-                            .mat-mdc-form-field {
-                                width: 95%;
-                                max-width: 95%;
-
-                                .mat-form-field-infix {
-                                    width: 125px;
-                                }
-
-                            }
-
-                            &.third-width {
-                                width: calc(100% / 3);
-                            }
-
-                            /** Ajoute une marge au-dessus du premier select pour l'éloigner des checkboxes */
-                            &:nth-child(1 of .third-width) {
-                                margin-top: 0.5em;
-                            }
-                        }
-                    }
-
-                    .cause-of-death {
-                        display: flex;
-                        flex-direction: row;
-                        align-items: center;
-                        gap: 0.5em;
-
-                        .death-icon {
-                            height: 40px;
-                            width: auto;
-                            flex-shrink: 0;
-                        }
-                    }
-
-                    .death-messages {
-                        display: flex;
-                        flex-direction: column;
-                        gap: 0.5em;
-                        max-width: 350px;
-
-                        .death-message,
-                        .town-message {
-                            display: flex;
-                            flex-direction: column;
-
-                            .label {
-                                font-weight: bold;
-                                font-size: 0.85em;
-                                opacity: 0.8;
-                            }
-                        }
-                    }
-
-                    .heroic-actions,
-                    .home {
-
-                        white-space: pre-wrap;
-
-                        .lvl-element {
-                            width: 50%;
-                            display: inline-block;
-
-                            .mat-mdc-form-field {
-
-                                .mat-mdc-form-field-infix {
-                                    display: flex;
-                                    align-items: center;
-                                }
-
-                                .mat-mdc-floating-label:not(.mdc-floating-label--float-above) {
-                                    padding-left: calc(16px + 0.5em);
-                                }
-                            }
-                        }
-                    }
-                }
-
-                th,
-                td {
-                    &:not(.avatar_name) {
-                        padding: 0.5em;
-                    }
-
+            th,
+            td {
+                &:not(.avatar_name) {
+                    padding: 0.5em;
                 }
             }
 
-            .table-filters {
+            // ---- Colonne citoyen : avatar entier + nom ----
+            td.avatar_name {
+                padding: 0.25em 0.5em;
+
+                .citizen-cell {
+                    display: flex;
+                    flex-direction: row;
+                    align-items: center;
+                    gap: 0.5em;
+
+                    mho-avatar {
+                        flex-shrink: 0;
+                    }
+                }
+            }
+
+            // ---- Colonnes « champ » du mode étendu : compactes et centrées ----
+            th.field-col,
+            td.field-col {
+                text-align: center;
+                white-space: nowrap;
+
+                // En-tête chamanique : deux icônes (immunité + potions) côte à côte.
+                .chamanic-header {
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 3px;
+                }
+
+                // Taille d'icône NON fixée : sprites pixel art, les redimensionner altère le rendu.
+                .col-header-icon {
+                    display: inline-block;
+                    vertical-align: middle;
+                }
+            }
+
+            // ---- Bandes horizontales (mode compact) : actions quotidiennes / héroïques / améliorations ----
+            .band {
                 display: flex;
+                flex-direction: row;
+                flex-wrap: wrap;
+                align-items: center;
+                gap: 4px;
+            }
+
+            .band-cell {
+                min-width: 160px;
+            }
+
+            // Colonne métier collante (avant le nom) : icône seule, fond opaque pour le défilement.
+            // Largeur FIXE : sinon la colonne rétrécit pendant le defer (placeholder étroit) puis s'élargit
+            // au chargement de l'icône → la colonne citoyen (sticky, juste après) se décale horizontalement.
+            th.job-col,
+            td.job-col {
+                width: 30px;
+                min-width: 30px;
+                background-color: var(--mat-sys-surface-container-low);
+                text-align: center;
+                padding: 0.25em 0;
+
+                .job-cell-icon {
+                    display: inline-block;
+                    vertical-align: middle;
+                }
+            }
+
+            // ---- Cellules groupées États / Sac / Chamanique ----
+            .group-stack {
+                display: flex;
+                flex-direction: column;
+                gap: 0.5em;
+            }
+
+            .status,
+            .bag,
+            .chamanic {
+                display: flex;
+                flex-direction: row;
+                align-items: center;
                 justify-content: space-between;
+                gap: 0.5em;
+
+                .list-element-add-remove {
+                    flex: 1;
+
+                    .list {
+                        white-space: nowrap;
+                    }
+                }
+            }
+
+            .chamanic {
+                .fields {
+                    display: flex;
+                    flex-direction: row;
+                    align-items: center;
+                    gap: 0.75em;
+
+                    img {
+                        margin-right: 0.5em;
+                    }
+                }
+            }
+
+            .daily-action {
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+                gap: 0.25em;
+            }
+
+            // ---- Tableau des citoyens morts (inchangé) ----
+            td.center {
+                text-align: center;
+            }
+
+            .cause-of-death {
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+                gap: 0.5em;
+
+                .death-icon {
+                    height: 40px;
+                    width: auto;
+                    flex-shrink: 0;
+                }
+            }
+
+            .death-messages {
+                display: flex;
+                flex-direction: column;
+                gap: 0.5em;
+                max-width: 350px;
+
+                .death-message,
+                .town-message {
+                    display: flex;
+                    flex-direction: column;
+
+                    .label {
+                        font-weight: bold;
+                        font-size: 0.85em;
+                        opacity: 0.8;
+                    }
+                }
+            }
+
+            // Déclencheur de l'indicateur de MàJ en fin de ligne.
+            .last-update-trigger {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                padding: 0;
+                border: none;
+                background: transparent;
+                cursor: pointer;
             }
         }
+    }
+}
+
+// Menu de détail des dernières MàJ : rendu dans l'overlay CDK, donc HORS de :host — styles au niveau racine.
+.updates-menu-title {
+    padding: 8px 16px 4px;
+    font-weight: 600;
+    opacity: 0.7;
+}
+
+.update-detail {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1em;
+    padding: 4px 16px;
+    white-space: nowrap;
+
+    .update-label {
+        font-weight: 500;
+    }
+
+    .update-never {
+        opacity: 0.5;
+        font-style: italic;
     }
 }

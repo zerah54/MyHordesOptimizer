@@ -1,291 +1,617 @@
 @if (alive_citizen_info || dead_citizen_info) {
-<div class="mho-citizens-list">
-    @if (citizen_list.data.length > 0) {
-        <table mat-table [dataSource]="citizen_list" matSort>
-            @for (column of citizen_list_columns; track column.id) {
-                <ng-container [matColumnDef]="column.id" [sticky]="column.sticky || false">
-                    <th mat-header-cell *matHeaderCellDef [class]="`${column.id} ${column.class || ''}`">
-                        @switch (column.id) { @case ('avatar_name') {
-                            <mho-header-with-select-filter
-                                [header]="column.header"
-                                [(filterValue)]="citizen_filters"
-                                (filterValueChange)="citizen_filter_change.next()"
-                                [options]="alive_citizen_info.citizens"
-                                [bindLabel]="'name'">
-                            </mho-header-with-select-filter>
-                        } @case ('more_status') {
-                            {{ column.header }}
-                        } @case ('heroic_actions') {
-                            {{ column.header }}
-                        } @case ('home') {
-                            {{ column.header }}
-                        } }
-                    </th>
+    <mat-sidenav-container class="citizens-container">
 
-                    <td mat-cell *matCellDef="let untyped_row" [class]="`${column.id} ${column.class || ''}`">
-                        <mho-deferred-cell>
-                            @if (untyped_row | typeRow; as row) {
-                                @switch (column.id) {
-                                    @case ('avatar_name') {
-                                        <mho-avatar [src]="row.avatar"></mho-avatar>
-                                        <div>
-                                            <mho-citizen-info displayJob displayShunStatus [displayPseudoMode]="'simple'" [citizen]="row"></mho-citizen-info>
-                                        </div>
-                                    } @case ('more_status') {
-                                        <div>
-                                            <div class="status">
-                                                <mho-list-element-add-remove
-                                                    [readonly]="is_readonly()"
-                                                    [currentList]="row.status?.icons || []"
-                                                    [lists]="status_lists"
-                                                    label="États"
-                                                    i18n-label
-                                                    addLabel="Ajouter aux états"
-                                                    i18n-addLabel
-                                                    (add)="addStatus(row.id, $event + '')"
-                                                    removeLabel="Retirer des états"
-                                                    i18n-removeLabel
-                                                    (remove)="removeStatus(row.id, $event + '')"
-                                                    emptyLabel="Vider les états"
-                                                    i18n-emptyLabel
-                                                    (empty)="emptyStatus(row.id)">
-                                                </mho-list-element-add-remove>
-                                                <mho-last-update [lastUpdateInfo]="row.status?.update_info" [thresholds]="[30, 120, 120 * 2, 120 * 3]" hideDetails>
-                                                </mho-last-update>
-                                            </div>
-                                            <div class="bag">
-                                                <mho-list-element-add-remove
-                                                    [readonly]="is_readonly()"
-                                                    [currentList]="row.bag?.items || []"
-                                                    label="Sac"
-                                                    i18n-label
-                                                    [lists]="bag_lists"
-                                                    addLabel="Ajouter au sac"
-                                                    i18n-addLabel
-                                                    (add)="addItem(row.id, +$event)"
-                                                    removeLabel="Retirer du sac"
-                                                    i18n-removeLabel
-                                                    (remove)="removeItem(row.id, +$event)"
-                                                    emptyLabel="Vider le sac"
-                                                    i18n-emptyLabel
-                                                    (empty)="emptyBag(row.id)">
-                                                </mho-list-element-add-remove>
-                                                <mho-last-update [lastUpdateInfo]="row.bag?.update_info" [thresholds]="[30, 120, 120 * 2, 120 * 3]" hideDetails>
-                                                </mho-last-update>
-                                            </div>
-                                            <div class="bath">
-                                                <mat-checkbox [checked]="row.baths | bathForDay : current_day" [disabled]="is_readonly()" (change)="saveBath(row, $event)">
-                                                    <ng-container i18n>Bain pris</ng-container>
-                                                </mat-checkbox>
-                                                <mho-last-update
-                                                    [lastUpdateInfo]="(row.baths | bathForDay : current_day)?.update_info"
-                                                    [thresholds]="[30, 120, 120 * 2, 120 * 3]"
-                                                    hideDetails>
-                                                </mho-last-update>
-                                            </div>
-                                            <div class="chamanic">
-                                                <div class="fields">
-                                                    <mat-form-field [appearance]="'outline'" class="short-bottom compact-field">
-                                                        <mat-label>
-                                                            <img [ngSrc]="HORDES_IMG_REPO + 'item/item_potion.gif'" width="16" height="16" />
-                                                            <ng-container i18n>Potions bues</ng-container>
-                                                        </mat-label>
-                                                        <input matInput type="number" [disabled]="is_readonly()" [(ngModel)]="row.chamanic_detail.nb_potion_shaman" (ngModelChange)="saveChamanicDetails(row)" />
-                                                    </mat-form-field>
+        <!-- ============ Sidenav droite : tous les filtres ============ -->
+        <mat-sidenav [opened]="filters_open()" class="filters-sidenav" mode="side" position="end">
+            <div class="filters-panel">
+                <div class="filters-header">
+                    <span class="title" i18n>Filtres</span>
+                    <span class="spacer"></span>
+                    <button (click)="resetFilters()" i18n mat-button type="button">Réinitialiser</button>
+                    <button (click)="filters_open.set(false)" aria-label="Fermer" i18n-aria-label mat-icon-button type="button">
+                        <mat-icon fontSet="material-symbols-outlined">close</mat-icon>
+                    </button>
+                </div>
 
-                                                    <mat-checkbox [(ngModel)]="row.chamanic_detail.is_immune_to_soul" [disabled]="is_readonly()" (ngModelChange)="saveChamanicDetails(row)">
-                                                        <img [ngSrc]="HORDES_IMG_REPO + 'item/item_potion.gif'" width="16" height="16" />
-                                                        <ng-container i18n>Immunisé</ng-container>
-                                                    </mat-checkbox>
-                                                </div>
-                                                <mho-last-update [lastUpdateInfo]="row.chamanic_detail.update_info" [thresholds]="[30, 120, 120 * 2, 120 * 3]" hideDetails>
-                                                </mho-last-update>
-                                            </div>
-                                        </div>
-                                    } @case ('heroic_actions') {
-                                        <div class="heroic-actions">
-                                            @for (action of (row.heroic_actions?.content || []); track $index) {
-                                                <div class="lvl-element" [class.full-width]="action.element.value.max_lvl > 1">
-                                                    @if (action.element.value.max_lvl > 1) {
-                                                        <mat-form-field [appearance]="'outline'" class="short-bottom compact-field">
-                                                            <mat-label>{{ action.element.value.label }}</mat-label>
-                                                            <mat-select [(ngModel)]="action.value" [disabled]="is_readonly()" (ngModelChange)="updateActions(action, $event, row.id)">
-                                                                @for (option of action.element.value.options; track option) {
-                                                                    <mat-option [value]="option">{{ option }}</mat-option>
-                                                                }
-                                                            </mat-select>
-                                                        </mat-form-field>
-                                                    } @else if (action.element.value.max_lvl === 1) {
-                                                        <mat-checkbox
-                                                            [checked]="action.value === true"
-                                                            [indeterminate]="action.value === null || action.value === undefined"
-                                                            [disabled]="is_readonly()"
-                                                            (change)="updateActions(action, $event, row.id)">
-                                                            {{ action.element.getLabel() }}
-                                                        </mat-checkbox>
-                                                    }
-                                                </div>
-                                            }
-                                        </div>
-                                        <mho-last-update [lastUpdateInfo]="row.heroic_actions?.update_info" [thresholds]="[30, 120, 120 * 2, 120 * 3]"> </mho-last-update>
-                                    } @case ('home') {
-                                        <div class="home">
-                                            @for (home of (row.home?.content || []); track $index) {
-                                                <div class="lvl-element" [class.third-width]="home.element.value.max_lvl > 1">
-                                                    @if (home.element.value.max_lvl > 1) {
-                                                        <mat-form-field [appearance]="'outline'" class="short-bottom compact-field">
-                                                            <mat-label>{{ home.element.value.label }}</mat-label>
-                                                            @if (home.element.value.img && home.element.value.img !== '') {
-                                                                <img style="vertical-align: super; margin-right: 0.5em" [ngSrc]="HORDES_IMG_REPO + home.element.value.img" width="16" height="16" />
-                                                            }
-                                                            @if (home.element.value.house_options) {
-                                                                <img
-                                                                    style="vertical-align: super; margin-right: 0.5em"
-                                                                    [ngSrc]="HORDES_IMG_REPO + 'home/home_lv' + home.value + '.gif'"
-                                                                    width="16"
-                                                                    height="16" />
-                                                            }
-                                                            <mat-select [ngModel]="home.value" [disabled]="is_readonly()" (ngModelChange)="updateHome(home, $event, row.id)">
-                                                                @for (option of $any(home.element.value.house_options || home.element.value.options); track option; let i = $index; ) {
-                                                                    <mat-option [value]="i">
-                                                                        @if (!$any(option)[locale]) {
-                                                                            {{ i }}
-                                                                        } @else {
-                                                                            <img [ngSrc]="HORDES_IMG_REPO + 'home/home_lv' + i + '.gif'" style="margin-right: 0.5em" width="16" height="16" />
-                                                                            {{$any(option)[locale]}}
-                                                                        }
-                                                                    </mat-option>
-                                                                }
-                                                            </mat-select>
-                                                        </mat-form-field>
-                                                    } @else {
-                                                        <mat-checkbox
-                                                            [checked]="home.value === true"
-                                                            [indeterminate]="home.value === null || home.value === undefined"
-                                                            [disabled]="is_readonly()"
-                                                            (change)="updateHome(home, $event, row.id)">
-                                                            @if (home.element.value.img) {
-                                                                <img
-                                                                    style="vertical-align: middle; margin-right: 0.5em"
-                                                                    [ngSrc]="HORDES_IMG_REPO + home.element.value.img"
-                                                                    width="16"
-                                                                    height="16" />
-                                                            }
-                                                            {{ home.element.value.label }}
-                                                        </mat-checkbox>
-                                                    }
-                                                </div>
-                                            }
-                                        </div>
-                                        <mho-last-update [lastUpdateInfo]="row.home?.update_info" [thresholds]="[30, 120, 120 * 2, 120 * 3]"> </mho-last-update>
-                                    }
+                <section class="filters-section">
+                    <h4 i18n>Général</h4>
+                    <mat-form-field subscriptSizing="dynamic">
+                        <mat-label i18n>Nom</mat-label>
+                        <mho-select (ngModelChange)="citizen_filters = $event; applyCitizenFilters()" [ngModel]="citizen_filters" [options]="alive_citizen_info.citizens" bindLabel="name"
+                                    multiple searchable></mho-select>
+                    </mat-form-field>
+                    <div class="filter-row">
+                        <mat-button-toggle-group (change)="job_filters = $event.value; applyCitizenFilters()" [value]="job_filters" class="value-filter"
+                                                 hideMultipleSelectionIndicator multiple>
+                            @for (job of all_jobs; track job.key) {
+                                <mat-button-toggle [matTooltip]="job.value.label" [value]="job">
+                                    <img [alt]="job.value.label" [src]="HORDES_IMG_REPO + job.value.img" class="toggle-icon">
+                                </mat-button-toggle>
+                            }
+                        </mat-button-toggle-group>
+                    </div>
+                    <mat-form-field subscriptSizing="dynamic">
+                        <mat-label i18n>Sac</mat-label>
+                        <mho-select (ngModelChange)="bag_filter = $event; applyCitizenFilters()" [bindLabel]="item_bind_label" [ngModel]="bag_filter" [options]="all_items" bindIcon="img"
+                                    multiple searchable></mho-select>
+                    </mat-form-field>
+                    <mat-form-field subscriptSizing="dynamic">
+                        <mat-label i18n>États</mat-label>
+                        <mho-select (ngModelChange)="status_filter = $event; applyCitizenFilters()" [ngModel]="status_filter" [options]="all_status" bindIcon="img" bindLabel="label"
+                                    multiple searchable></mho-select>
+                    </mat-form-field>
+                    <!-- Chamanique : potions puis immunité, sur une même ligne (ordre de la liste). -->
+                    <div class="filter-row">
+                        @if ((value_options['potions'] || []).length > 0) {
+                            <span class="filter-label" i18n-matTooltip matTooltip="Potions bues">
+                            <img [src]="HORDES_IMG_REPO + 'item/item_potion.gif'" alt="Potions bues" i18n-alt>
+                        </span>
+                            <mat-button-toggle-group (change)="setValueFilter('potions', $event.value)" [value]="valueFilter('potions')" class="value-filter"
+                                                     hideMultipleSelectionIndicator multiple>
+                                @for (value of value_options['potions']; track value) {
+                                    <mat-button-toggle [value]="value">{{ value }}</mat-button-toggle>
                                 }
-                            }
-                        </mho-deferred-cell>
-                    </td>
-                </ng-container>
-            }
-            <tr mat-header-row *matHeaderRowDef="citizen_list_columns | ids; sticky: true"></tr>
-            <tr mat-row *matRowDef="let row; columns: citizen_list_columns | ids"></tr>
-            <!-- <tr mat-footer-row *matFooterRowDef="['save']; sticky: true"></tr> -->
-
-            <!-- Row shown when there is no matching data. -->
-            <tr class="mat-row" *matNoDataRow>
-                <td class="mat-cell" [attr.colspan]="'100%'">
-                    @if (citizen_filters && citizen_filters.length > 0) {
-                        <ng-container i18n>Aucun objet ne correspond au filtre "{{ citizen_filters }}"</ng-container>
-                    } @else {
-                        <ng-container i18n>La liste est vide</ng-container>
-                    }
-                </td>
-            </tr>
-        </table>
-    }
-
-    @if (dead_citizen_list.data.length > 0) {
-        <table mat-table [dataSource]="dead_citizen_list" matSort>
-            @for (column of dead_citizen_list_columns; track column.id) {
-                <ng-container [matColumnDef]="column.id" [sticky]="column.sticky || false">
-                    <th mat-header-cell *matHeaderCellDef [class]="`${column.id} ${column.class || ''}`">
-                        @switch (column.id) {
-                            @case ('avatar_name') {
-                                <mho-header-with-select-filter
-                                    [header]="column.header"
-                                    [(filterValue)]="citizen_filters"
-                                    (filterValueChange)="citizen_filter_change.next()"
-                                    [options]="dead_citizen_info.citizens"
-                                    [bindLabel]="'name'">
-                                </mho-header-with-select-filter>
-                            } @default {
-                                {{ column.header }}
-                            }
+                            </mat-button-toggle-group>
                         }
-                    </th>
-                    <td mat-cell *matCellDef="let untyped_row" [class]="`${column.id} ${column.class || ''}`">
-                        <mho-deferred-cell>
-                            @if (untyped_row | typeRow; as row) {
-                                @switch (column.id) {
-                                    @case ('avatar_name') {
-                                        <mho-avatar [src]="row.avatar"></mho-avatar>
-                                        <div>{{ row.name }}</div>
-                                    } @case ('cause_of_death') {
-                                        @if (row.cadaver?.cause_of_death; as cause) {
-                                            <div class="cause-of-death">
-                                                @if (cause.icon) {
-                                                    <img class="death-icon" [src]="HORDES_IMG_REPO + 'death/' + cause.icon + '.jpg'" [alt]="cause.getLabel()" [title]="cause.getDescription()" />
-                                                }
-                                                <span>{{ cause.getLabel() }}</span>
-                                            </div>
-                                        }
-                                    } @case ('survival') {
-                                        {{ row.cadaver?.survival }}
-                                    } @case ('score') {
-                                        {{ row.cadaver?.score }}
-                                    } @case ('death_messages') {
-                                        <div class="death-messages">
-                                            @if (row.cadaver?.msg) {
-                                                <div class="death-message">
-                                                    <span class="label" i18n>Derniers mots :</span>
-                                                    <span>{{ row.cadaver?.getMsg() }}</span>
-                                                </div>
-                                            }
-                                            @if (row.cadaver?.town_msg) {
-                                                <div class="town-message">
-                                                    <span class="label" i18n>Message à la ville :</span>
-                                                    <span>{{ row.cadaver?.town_msg }}</span>
-                                                </div>
-                                            }
-                                        </div>
-                                    } @case ('pictos') {
-                                        <button mat-icon-button type="button" (click)="openPictos(row)"
-                                                i18n-matTooltip matTooltip="Voir les pictos obtenus dans cette ville"
-                                                i18n-aria-label aria-label="Voir les pictos obtenus dans cette ville">
-                                            <mat-icon fontSet="material-symbols-outlined">emoji_events</mat-icon>
-                                        </button>
-                                    }
-                                }
-                            }
-                        </mho-deferred-cell>
-                    </td>
-                </ng-container>
-            }
-            <tr mat-header-row *matHeaderRowDef="dead_citizen_list_columns | ids; sticky: true"></tr>
-            <tr mat-row *matRowDef="let row; columns: dead_citizen_list_columns | ids"></tr>
-            <!-- <tr mat-footer-row *matFooterRowDef="['save']; sticky: true"></tr> -->
+                        <span (click)="cycleBoolFilter('immune')" class="bool-control"
+                              i18n-matTooltip matTooltip="Immunité — coché : oui · décoché : non · indéterminé : tous">
+                        <mat-checkbox [checked]="boolFilter('immune') === true" [indeterminate]="boolFilter('immune') === null"
+                                      class="bool-filter"
+                                      disableRipple>
+                            <img [src]="HORDES_IMG_REPO + 'icons/small_restoresp.gif'" alt="Immunité" class="filter-icon" i18n-alt>
+                        </mat-checkbox>
+                    </span>
+                    </div>
+                </section>
 
-            <!-- Row shown when there is no matching data. -->
-            <tr class="mat-row" *matNoDataRow>
-                <td class="mat-cell" [attr.colspan]="'100%'">
-                    @if (citizen_filters && citizen_filters.length > 0) {
-                        <ng-container i18n>Aucun objet ne correspond au filtre "{{ citizen_filters }}"</ng-container>
-                    } @else {
-                        <ng-container i18n>La liste est vide</ng-container>
+                <section class="filters-section">
+                    <h4 i18n>Actions quotidiennes</h4>
+                    <div class="filter-row bool-row">
+                    <span (click)="cycleBoolFilter('daily_bath')" class="bool-control"
+                          i18n-matTooltip matTooltip="Bain — coché : oui · décoché : non · indéterminé : tous">
+                        <mat-checkbox [checked]="boolFilter('daily_bath') === true" [indeterminate]="boolFilter('daily_bath') === null"
+                                      class="bool-filter"
+                                      disableRipple>
+                            <img [src]="HORDES_IMG_REPO + 'building/small_pool.gif'" alt="Bain" class="filter-icon" i18n-alt>
+                        </mat-checkbox>
+                    </span>
+                    </div>
+                </section>
+
+                <section class="filters-section toggles">
+                    <h4 i18n>Actions héroïques</h4>
+                    @for (action of heroic_actions_all; track action.key) {
+                        @if (action.value.max_lvl === 1) {
+                            <div class="filter-row bool-row">
+                            <span (click)="cycleBoolFilter('heroic_' + action.key)" [matTooltip]="action.getLabel() + bool_filter_hint"
+                                  class="bool-control">
+                                <mat-checkbox [checked]="boolFilter('heroic_' + action.key) === true" [indeterminate]="boolFilter('heroic_' + action.key) === null"
+                                              class="bool-filter"
+                                              disableRipple>
+                                    <img [alt]="action.getLabel()" [src]="HORDES_IMG_REPO + action.value.img" class="filter-icon">
+                                </mat-checkbox>
+                            </span>
+                            </div>
+                        } @else if ((value_options['heroic_' + action.key] || []).length > 0) {
+                            <div class="filter-row">
+                            <span [matTooltip]="action.getLabel()" class="filter-label">
+                                <img [alt]="action.getLabel()" [src]="HORDES_IMG_REPO + action.value.img">
+                            </span>
+                                <mat-button-toggle-group (change)="setValueFilter('heroic_' + action.key, $event.value)" [value]="valueFilter('heroic_' + action.key)" class="value-filter"
+                                                         hideMultipleSelectionIndicator multiple>
+                                    @for (value of value_options['heroic_' + action.key]; track value) {
+                                        <mat-button-toggle [value]="value">{{ value }}</mat-button-toggle>
+                                    }
+                                </mat-button-toggle-group>
+                            </div>
+                        }
                     }
-                </td>
-            </tr>
-        </table>
-    }
-</div>
+                </section>
+
+                <section class="filters-section toggles">
+                    <h4 i18n>Améliorations</h4>
+                    @for (home of home_all; track home.key) {
+                        @if (home.value.max_lvl === 1) {
+                            <div class="filter-row bool-row">
+                            <span (click)="cycleBoolFilter('home_' + home.key)" [matTooltip]="home.getLabel() + bool_filter_hint"
+                                  class="bool-control">
+                                <mat-checkbox [checked]="boolFilter('home_' + home.key) === true" [indeterminate]="boolFilter('home_' + home.key) === null"
+                                              class="bool-filter"
+                                              disableRipple>
+                                    <img [alt]="home.getLabel()" [src]="HORDES_IMG_REPO + homeHeaderIcon(home)" class="filter-icon">
+                                </mat-checkbox>
+                            </span>
+                            </div>
+                        } @else if ((value_options['home_' + home.key] || []).length > 0) {
+                            <div class="filter-row">
+                            <span [matTooltip]="home.getLabel()" class="filter-label">
+                                <img [alt]="home.getLabel()" [src]="HORDES_IMG_REPO + homeHeaderIcon(home)">
+                            </span>
+                                <mat-button-toggle-group (change)="setValueFilter('home_' + home.key, $event.value)" [value]="valueFilter('home_' + home.key)" class="value-filter"
+                                                         hideMultipleSelectionIndicator multiple>
+                                    @for (value of value_options['home_' + home.key]; track value) {
+                                        <mat-button-toggle [value]="value">{{ value }}</mat-button-toggle>
+                                    }
+                                </mat-button-toggle-group>
+                            </div>
+                        }
+                    }
+                </section>
+            </div>
+        </mat-sidenav>
+
+        <mat-sidenav-content>
+            <div class="mho-citizens-list">
+                @if (citizen_list.data.length > 0) {
+
+                    <div class="citizens-list-toolbar">
+                        <mat-button-toggle-group (change)="changeDisplayMode($event.value)" [value]="display_mode()" hideSingleSelectionIndicator>
+                            <mat-button-toggle i18n-matTooltip matTooltip="Vue groupée par type" value="grouped">
+                                <mat-icon fontSet="material-symbols-outlined">view_agenda</mat-icon>
+                                <span i18n>Groupé</span>
+                            </mat-button-toggle>
+                            <mat-button-toggle i18n-matTooltip matTooltip="Vue en colonnes : une par champ" value="columns">
+                                <mat-icon fontSet="material-symbols-outlined">grid_on</mat-icon>
+                                <span i18n>Colonnes</span>
+                            </mat-button-toggle>
+                        </mat-button-toggle-group>
+
+                        <span class="spacer"></span>
+
+                        <button [matMenuTriggerFor]="copyMenu" aria-label="Copier la liste des citoyens" i18n-aria-label
+                                i18n-matTooltip mat-icon-button
+                                matTooltip="Copier la liste des citoyens" type="button">
+                            <mat-icon fontSet="material-symbols-outlined">content_copy</mat-icon>
+                        </button>
+
+                        <button [matMenuTriggerFor]="sortMenu" mat-stroked-button type="button">
+                            <mat-icon
+                                fontSet="material-symbols-outlined">{{ activeSortLabel() ? (sort_direction() === 'asc' ? 'arrow_upward' : 'arrow_downward') : 'sort' }}
+                            </mat-icon>
+                            <span>{{ activeSortLabel() ?? sort_button_label }}</span>
+                        </button>
+                        <button (click)="toggleFilters()" [matBadgeHidden]="activeFilterCount() === 0" [matBadge]="activeFilterCount()" class="filters-button"
+                                mat-stroked-button type="button">
+                            <mat-icon fontSet="material-symbols-outlined">filter_alt</mat-icon>
+                            <span i18n>Filtres</span>
+                        </button>
+                    </div>
+
+                    <div [class.columns]="display_mode() === 'columns'" class="table-scroll">
+                        <table [dataSource]="citizen_list" [trackBy]="trackByCitizen" mat-table matSort>
+
+                            <!-- Colonne partagée : citoyen (avatar + nom) -->
+                            <ng-container matColumnDef="avatar_name" sticky>
+                                <th *matHeaderCellDef class="avatar_name" i18n mat-header-cell>Citoyen</th>
+                                <td *matCellDef="let row" class="avatar_name" mat-cell>
+                                    <mho-deferred-cell [content]="citizenCell" [context]="{ $implicit: row }"></mho-deferred-cell>
+                                </td>
+                            </ng-container>
+
+                            <!-- Colonne métier (mode colonnes), avant le nom, icône seule, sans en-tête -->
+                            <ng-container matColumnDef="job" sticky>
+                                <th *matHeaderCellDef class="job-col" mat-header-cell></th>
+                                <td *matCellDef="let row" class="job-col" mat-cell>
+                                    <mho-deferred-cell [content]="jobCell" [context]="{ $implicit: row }"></mho-deferred-cell>
+                                </td>
+                            </ng-container>
+
+                            <!-- ============ Mode groupé : colonnes regroupées ============ -->
+
+                            <ng-container matColumnDef="etats_sac">
+                                <th *matHeaderCellDef i18n mat-header-cell>États / Sac</th>
+                                <td *matCellDef="let row" class="group-cell" mat-cell>
+                                    <mho-deferred-cell [content]="etatsSacGroup" [context]="{ $implicit: row }"></mho-deferred-cell>
+                                </td>
+                            </ng-container>
+
+                            <ng-container matColumnDef="daily_actions">
+                                <th *matHeaderCellDef i18n mat-header-cell>Actions quotidiennes</th>
+                                <td *matCellDef="let row" class="band-cell" mat-cell>
+                                    <mho-deferred-cell [content]="dailyBand" [context]="{ $implicit: row }"></mho-deferred-cell>
+                                </td>
+                            </ng-container>
+
+                            <ng-container matColumnDef="heroic_actions">
+                                <th *matHeaderCellDef i18n mat-header-cell>Actions héroïques</th>
+                                <td *matCellDef="let row" class="band-cell" mat-cell>
+                                    <mho-deferred-cell [content]="heroicBand" [context]="{ $implicit: row }"></mho-deferred-cell>
+                                </td>
+                            </ng-container>
+
+                            <ng-container matColumnDef="home">
+                                <th *matHeaderCellDef i18n mat-header-cell>Améliorations</th>
+                                <td *matCellDef="let row" class="band-cell" mat-cell>
+                                    <mho-deferred-cell [content]="homeBand" [context]="{ $implicit: row }"></mho-deferred-cell>
+                                </td>
+                            </ng-container>
+
+                            <!-- ============ Mode colonnes : une colonne par champ ============ -->
+
+                            <ng-container matColumnDef="sac">
+                                <th *matHeaderCellDef class="field-col" mat-header-cell>
+                                    <img [src]="HORDES_IMG_REPO + 'item/item_bag.gif'" alt="Sac"
+                                         class="col-header-icon" i18n-alt i18n-matTooltip matTooltip="Sac">
+                                </th>
+                                <td *matCellDef="let row" class="group-cell" mat-cell>
+                                    <mho-deferred-cell [content]="sacContent" [context]="{ $implicit: row }"></mho-deferred-cell>
+                                </td>
+                            </ng-container>
+
+                            <ng-container matColumnDef="etats">
+                                <th *matHeaderCellDef class="field-col" mat-header-cell>
+                                    <mat-icon class="col-header-icon" fontSet="material-symbols-outlined"
+                                              i18n-matTooltip matTooltip="États">label
+                                    </mat-icon>
+                                </th>
+                                <td *matCellDef="let row" class="group-cell" mat-cell>
+                                    <mho-deferred-cell [content]="etatsContent" [context]="{ $implicit: row }"></mho-deferred-cell>
+                                </td>
+                            </ng-container>
+
+                            <ng-container matColumnDef="immune">
+                                <th *matHeaderCellDef class="field-col" mat-header-cell>
+                                    <img [src]="HORDES_IMG_REPO + 'item/item_potion.gif'" alt="Potions / Immunité"
+                                         class="col-header-icon" i18n-alt i18n-matTooltip matTooltip="Potions / Immunité">
+                                </th>
+                                <td *matCellDef="let row" class="group-cell" mat-cell>
+                                    <mho-deferred-cell [content]="chamanicCell" [context]="{ $implicit: row }"></mho-deferred-cell>
+                                </td>
+                            </ng-container>
+
+                            <ng-container matColumnDef="daily_bath">
+                                <th *matHeaderCellDef class="field-col" mat-header-cell>
+                                    <img [src]="HORDES_IMG_REPO + 'building/small_pool.gif'" alt="Bain"
+                                         class="col-header-icon" i18n-alt i18n-matTooltip matTooltip="Bain">
+                                </th>
+                                <td *matCellDef="let row" class="field-col" mat-cell>
+                                    <mho-deferred-cell [content]="bathContent" [context]="{ $implicit: row }"></mho-deferred-cell>
+                                </td>
+                            </ng-container>
+
+                            @for (action of heroic_actions_all; track action.key) {
+                                <ng-container [matColumnDef]="'heroic_' + action.key">
+                                    <th *matHeaderCellDef class="field-col" mat-header-cell>
+                                        <img [alt]="action.getLabel()" [matTooltip]="action.getLabel()"
+                                             [src]="HORDES_IMG_REPO + action.value.img" class="col-header-icon">
+                                    </th>
+                                    <td *matCellDef="let row" class="field-col" mat-cell>
+                                        <mho-deferred-cell [content]="heroicCell"
+                                                           [context]="{ $implicit: getHeroicAction(row, action), citizenId: row.id }"></mho-deferred-cell>
+                                    </td>
+                                </ng-container>
+                            }
+
+                            @for (home of home_all; track home.key) {
+                                <ng-container [matColumnDef]="'home_' + home.key">
+                                    <th *matHeaderCellDef class="field-col" mat-header-cell>
+                                        <img [alt]="home.getLabel()" [matTooltip]="home.getLabel()"
+                                             [src]="HORDES_IMG_REPO + homeHeaderIcon(home)" class="col-header-icon">
+                                    </th>
+                                    <td *matCellDef="let row" class="field-col" mat-cell>
+                                        <mho-deferred-cell [content]="homeCell"
+                                                           [context]="{ $implicit: getHomeUpgrade(row, home), citizenId: row.id }"></mho-deferred-cell>
+                                    </td>
+                                </ng-container>
+                            }
+
+                            <ng-container matColumnDef="last_update">
+                                <th *matHeaderCellDef class="field-col" mat-header-cell>
+                                    <mat-icon class="col-header-icon" fontSet="material-symbols-outlined"
+                                              i18n-matTooltip matTooltip="Dernière mise à jour">update
+                                    </mat-icon>
+                                </th>
+                                <td *matCellDef="let row" class="field-col" mat-cell>
+                                    <mho-deferred-cell [content]="lastUpdateCell" [context]="{ $implicit: row }"></mho-deferred-cell>
+                                </td>
+                            </ng-container>
+
+                            <tr *matHeaderRowDef="displayed_columns(); sticky: true" mat-header-row></tr>
+                            <tr *matRowDef="let row; columns: displayed_columns();" mat-row></tr>
+
+                            <tr *matNoDataRow class="mat-row">
+                                <td [attr.colspan]="'100%'" class="mat-cell">
+                                    <ng-container i18n>Aucun citoyen ne correspond aux filtres</ng-container>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                }
+
+                @if (dead_citizen_list.data.length > 0) {
+                    <table [dataSource]="dead_citizen_list" [trackBy]="trackByCitizen" mat-table>
+                        @for (column of dead_citizen_list_columns; track column.id) {
+                            <ng-container [matColumnDef]="column.id" [sticky]="column.sticky || false">
+                                <th *matHeaderCellDef [class]="`${column.id} ${column.class || ''}`" mat-header-cell>
+                                    {{ column.header }}
+                                </th>
+                                <td *matCellDef="let untyped_row" [class]="`${column.id} ${column.class || ''}`" mat-cell>
+                                    <mho-deferred-cell>
+                                        @if (untyped_row | typeRow; as row) {
+                                            @switch (column.id) {
+                                                @case ('avatar_name') {
+                                                    <mho-avatar [src]="row.avatar"></mho-avatar>
+                                                    <div>{{ row.name }}</div>
+                                                }
+                                                @case ('cause_of_death') {
+                                                    @if (row.cadaver?.cause_of_death; as cause) {
+                                                        <div class="cause-of-death">
+                                                            @if (cause.icon) {
+                                                                <img [alt]="cause.getLabel()" [src]="HORDES_IMG_REPO + 'death/' + cause.icon + '.jpg'"
+                                                                     [title]="cause.getDescription()" class="death-icon"/>
+                                                            }
+                                                            <span>{{ cause.getLabel() }}</span>
+                                                        </div>
+                                                    }
+                                                }
+                                                @case ('survival') {
+                                                    {{ row.cadaver?.survival }}
+                                                }
+                                                @case ('score') {
+                                                    {{ row.cadaver?.score }}
+                                                }
+                                                @case ('death_messages') {
+                                                    <div class="death-messages">
+                                                        @if (row.cadaver?.msg) {
+                                                            <div class="death-message">
+                                                                <span class="label" i18n>Derniers mots :</span>
+                                                                <span>{{ row.cadaver?.getMsg() }}</span>
+                                                            </div>
+                                                        }
+                                                        @if (row.cadaver?.town_msg) {
+                                                            <div class="town-message">
+                                                                <span class="label" i18n>Message à la ville :</span>
+                                                                <span>{{ row.cadaver?.town_msg }}</span>
+                                                            </div>
+                                                        }
+                                                    </div>
+                                                }
+                                                @case ('pictos') {
+                                                    <button (click)="openPictos(row)" aria-label="Voir les pictos obtenus dans cette ville" i18n-aria-label
+                                                            i18n-matTooltip mat-icon-button
+                                                            matTooltip="Voir les pictos obtenus dans cette ville" type="button">
+                                                        <mat-icon fontSet="material-symbols-outlined">emoji_events</mat-icon>
+                                                    </button>
+                                                }
+                                            }
+                                        }
+                                    </mho-deferred-cell>
+                                </td>
+                            </ng-container>
+                        }
+                        <tr *matHeaderRowDef="dead_citizen_list_columns | ids; sticky: true" mat-header-row></tr>
+                        <tr *matRowDef="let row; columns: dead_citizen_list_columns | ids" mat-row></tr>
+
+                        <tr *matNoDataRow class="mat-row">
+                            <td [attr.colspan]="'100%'" class="mat-cell">
+                                <ng-container i18n>La liste est vide</ng-container>
+                            </td>
+                        </tr>
+                    </table>
+                }
+            </div>
+        </mat-sidenav-content>
+    </mat-sidenav-container>
 }
-<!--<mho-menu-add #menuAdd="menuAdd"></mho-menu-add>-->
-<!--<mho-menu-remove #menuRemove="menuRemove"></mho-menu-remove>-->
+
+<!-- ============ Menu « Copier » ============ -->
+<mat-menu #copyMenu="matMenu">
+    <button (click)="copyNames()" i18n mat-menu-item type="button">Noms bruts</button>
+    <button (click)="copyTags()" i18n mat-menu-item type="button">Identifiants MyHordes</button>
+</mat-menu>
+
+<!-- ============ Menu « Trier par » ============ -->
+<mat-menu #sortMenu="matMenu">
+    @for (field of sortable_fields; track field.id) {
+        <button (click)="sortBy(field.id)" mat-menu-item type="button">
+            <span>{{ field.label }}</span>
+            @if (sort_field() === field.id) {
+                <mat-icon fontSet="material-symbols-outlined">{{ sort_direction() === 'asc' ? 'arrow_upward' : 'arrow_downward' }}</mat-icon>
+            }
+        </button>
+    }
+</mat-menu>
+
+<!-- ============ Menu de détail des dernières MàJ (au survol) ============ -->
+<mat-menu #updatesMenu="matMenu" [hasBackdrop]="false">
+    <div (mouseenter)="cancelUpdatesMenuClose()" (mouseleave)="scheduleUpdatesMenuClose()" class="updates-menu-content">
+        @if (menu_row(); as row) {
+            <div class="updates-menu-title" i18n>Dernières mises à jour</div>
+            @for (update of lastUpdates(row); track update.label) {
+                <div class="update-detail">
+                    <span class="update-label">{{ update.label }}</span>
+                    @if (update.info) {
+                        <mho-last-update [lastUpdateInfo]="update.info" [thresholds]="[30, 120, 120 * 2, 120 * 3]" noTooltip></mho-last-update>
+                    } @else {
+                        <span class="update-never" i18n>Jamais</span>
+                    }
+                </div>
+            }
+        }
+    </div>
+</mat-menu>
+
+<!-- ============ Templates de cellules ============ -->
+
+<ng-template #citizenCell let-row>
+    <div class="citizen-cell">
+        @if (display_mode() === 'grouped') {
+            <mho-avatar [src]="row.avatar"></mho-avatar>
+        }
+        <mho-citizen-info [citizen]="row" [displayJob]="display_mode() === 'grouped'" [displayPseudoMode]="'simple'" displayShunStatus></mho-citizen-info>
+    </div>
+</ng-template>
+
+<ng-template #jobCell let-row>
+    @if (row.job) {
+        <img [alt]="row.job.value.label" [matTooltip]="row.job.value.label"
+             [src]="HORDES_IMG_REPO + row.job.value.img" class="job-cell-icon">
+    }
+</ng-template>
+
+<!-- Groupe compact États + Sac empilés (potions + immunité = colonne chamanique dédiée) -->
+<ng-template #etatsSacGroup let-row>
+    <div class="group-stack">
+        <ng-container [ngTemplateOutletContext]="{ $implicit: row }" [ngTemplateOutlet]="etatsContent"></ng-container>
+        <ng-container [ngTemplateOutletContext]="{ $implicit: row }" [ngTemplateOutlet]="sacContent"></ng-container>
+    </div>
+</ng-template>
+
+<ng-template #dailyBand let-row>
+    <div class="band">
+        <ng-container [ngTemplateOutletContext]="{ $implicit: row }" [ngTemplateOutlet]="bathContent"></ng-container>
+    </div>
+</ng-template>
+
+<ng-template #heroicBand let-row>
+    <div class="band">
+        @for (action of row.heroic_actions?.content || []; track action.element.key) {
+            <ng-container [ngTemplateOutletContext]="{ $implicit: action, citizenId: row.id }"
+                          [ngTemplateOutlet]="heroicCell"></ng-container>
+        }
+    </div>
+</ng-template>
+
+<ng-template #homeBand let-row>
+    <div class="band">
+        @for (home of row.home?.content || []; track home.element.key) {
+            <ng-container [ngTemplateOutletContext]="{ $implicit: home, citizenId: row.id }"
+                          [ngTemplateOutlet]="homeCell"></ng-container>
+        }
+    </div>
+</ng-template>
+
+<ng-template #etatsContent let-row>
+    <div class="status">
+        <mho-list-element-add-remove
+            (add)="addStatus(row.id, $event + '')"
+            (empty)="emptyStatus(row.id)"
+            (remove)="removeStatus(row.id, $event + '')"
+            [currentList]="row.status?.icons || []" [lists]="status_lists"
+            [readonly]="is_readonly()" addLabel="Ajouter aux états"
+            emptyLabel="Vider les états"
+            i18n-addLabel i18n-emptyLabel
+            i18n-label
+            i18n-removeLabel label="États"
+            removeLabel="Retirer des états">
+        </mho-list-element-add-remove>
+    </div>
+</ng-template>
+
+<ng-template #sacContent let-row>
+    <div class="bag">
+        <mho-list-element-add-remove
+            (add)="addItem(row.id, +$event)"
+            (empty)="emptyBag(row.id)"
+            (remove)="removeItem(row.id, +$event)" [currentList]="row.bag?.items || []"
+            [lists]="bag_lists"
+            [readonly]="is_readonly()" addLabel="Ajouter au sac"
+            emptyLabel="Vider le sac"
+            i18n-addLabel i18n-emptyLabel
+            i18n-label
+            i18n-removeLabel label="Sac"
+            removeLabel="Retirer du sac">
+        </mho-list-element-add-remove>
+    </div>
+</ng-template>
+
+<!-- Champ potions bues seul (réutilisé groupé + colonnes) -->
+<ng-template #potionsField let-row>
+    <mho-compact-stepper
+        (valueChange)="changePotions(row, $event)"
+        [disabled]="is_readonly() || !!row.chamanic_detail.is_immune_to_soul" [min]="0"
+        [value]="row.chamanic_detail.nb_potion_shaman || 0"
+        i18n-label
+        icon="item/item_potion.gif"
+        label="Potions bues">
+    </mho-compact-stepper>
+</ng-template>
+
+<!-- Champ immunité seul (réutilisé groupé + colonnes) -->
+<ng-template #immuneField let-row>
+    <mho-compact-toggle
+        (valueChange)="changeImmune(row, $event)"
+        [disabled]="is_readonly()" [value]="row.chamanic_detail.is_immune_to_soul"
+        i18n-label
+        icon="icons/small_restoresp.gif"
+        label="Immunisé">
+    </mho-compact-toggle>
+</ng-template>
+
+<!-- Colonne chamanique (potions + immunité ensemble) — les deux modes -->
+<ng-template #chamanicCell let-row>
+    <div class="chamanic">
+        <div class="fields">
+            <ng-container [ngTemplateOutletContext]="{ $implicit: row }" [ngTemplateOutlet]="potionsField"></ng-container>
+            <ng-container [ngTemplateOutletContext]="{ $implicit: row }" [ngTemplateOutlet]="immuneField"></ng-container>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #bathContent let-row>
+    <div class="daily-action">
+        <mho-compact-toggle
+            (valueChange)="saveBath(row, $event)"
+            [disabled]="is_readonly()" [value]="!!(row.baths | bathForDay : current_day)"
+            i18n-label
+            icon="building/small_pool.gif"
+            label="Bain pris">
+        </mho-compact-toggle>
+    </div>
+</ng-template>
+
+<ng-template #heroicCell let-action let-citizenId="citizenId">
+    @if (action) {
+        @if (action.element.value.max_lvl === 1) {
+            <mho-compact-toggle
+                (valueChange)="updateActions(action, $event, citizenId)"
+                [disabled]="is_readonly()"
+                [icon]="getHeroicIcon(action)"
+                [label]="action.element.getLabel()"
+                [value]="$any(action.value)">
+            </mho-compact-toggle>
+        } @else {
+            <mho-compact-stepper
+                (valueChange)="updateActions(action, $event, citizenId)"
+                [disabled]="is_readonly()"
+                [icon]="getHeroicIcon(action)"
+                [label]="action.element.getLabel()"
+                [max]="action.element.value.max_lvl"
+                [min]="0"
+                [value]="$any(action.value)">
+            </mho-compact-stepper>
+        }
+    }
+</ng-template>
+
+<ng-template #homeCell let-citizenId="citizenId" let-home>
+    @if (home) {
+        @if (home.element.value.max_lvl === 1) {
+            <mho-compact-toggle
+                (valueChange)="updateHome(home, $event, citizenId)"
+                [disabled]="is_readonly()"
+                [icon]="home.element.value.img"
+                [label]="home.element.getLabel()"
+                [value]="$any(home.value)">
+            </mho-compact-toggle>
+        } @else {
+            <mho-compact-stepper
+                (valueChange)="updateHome(home, $event, citizenId)"
+                [disabled]="is_readonly()"
+                [icon]="getHomeIcon(home)"
+                [label]="home.element.getLabel()"
+                [max]="home.element.value.max_lvl"
+                [min]="0"
+                [value]="$any(home.value)">
+            </mho-compact-stepper>
+        }
+    }
+</ng-template>
+
+<!-- Cellule de fin de ligne : indicateur unique de MàJ, menu de détail au survol -->
+<ng-template #lastUpdateCell let-row>
+    <span #uTrigger="matMenuTrigger" (mouseenter)="openUpdatesMenu(uTrigger, row)" (mouseleave)="scheduleUpdatesMenuClose()"
+          [matMenuTriggerFor]="updatesMenu" class="last-update-trigger">
+        <mho-last-update [lastUpdateInfo]="latestUpdate(row)" [thresholds]="[30, 120, 120 * 2, 120 * 3]" hideDetails noTooltip></mho-last-update>
+    </span>
+</ng-template>

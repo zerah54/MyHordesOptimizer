@@ -1,0 +1,28 @@
+<div class="mho-header-with-toggle">
+    <div [style.text-align]="textAlign()">
+        @if (headerImg()) {
+            <img class="header-icon" [src]="HORDES_IMG_REPO + headerImg()" [alt]="headerTooltip() || header()"
+                 [matTooltip]="headerTooltip() || ''">
+        } @else if (headerIconName()) {
+            <mat-icon class="header-icon" fontSet="material-symbols-outlined" [matTooltip]="headerTooltip() || ''">{{ headerIconName() }}</mat-icon>
+        } @else {
+            {{ header() }}
+        }
+
+        @if (!visible && filterValue() === null) {
+            <mat-icon fontSet="material-symbols-outlined" class="open-menu-icon"
+                      (click)="$event.preventDefault(); $event.stopPropagation(); displayFilter()">
+                filter_alt
+            </mat-icon>
+        }
+    </div>
+
+    @if (visible || filterValue() !== null) {
+        <mat-button-toggle-group class="toggle-filter" [value]="filterValue()" (change)="setValue($event)"
+                                 (click)="$event.stopPropagation()" hideSingleSelectionIndicator>
+            <mat-button-toggle [value]="null" i18n>Tous</mat-button-toggle>
+            <mat-button-toggle [value]="true" i18n>Oui</mat-button-toggle>
+            <mat-button-toggle [value]="false" i18n>Non</mat-button-toggle>
+        </mat-button-toggle-group>
+    }
+</div>

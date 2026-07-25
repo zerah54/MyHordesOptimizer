@@ -20,9 +20,9 @@ const HAS_RESCUE_DATA: HeroicActionEnumData = {
 };
 const APAG_CHARGES_DATA: HeroicActionEnumData = {
     label: $localize`Appareil Photo d'Avant-Guerre`,
-    max_lvl: 3,
+    max_lvl: 4,
     img: 'heroskill/f_cam.gif',
-    options: Array.from({ length: 4 }, (_: unknown, i: number) => i),
+    options: Array.from({ length: 5 }, (_: unknown, i: number) => i),
     count_in_daily: false,
     action: ''
 };

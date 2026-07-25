@@ -175,6 +175,17 @@ export class WishlistComponent implements OnInit {
     }
 
     /**
+     * Identité stable d'une ligne pour le mat-table.
+     * Sans elle, chaque mise à jour (qui remplace toutes les WishlistItem par de nouvelles instances)
+     * détruit et recrée toutes les lignes ; les cellules `@defer (on viewport)` repassent alors par leur
+     * placeholder vide (clignotement en dev, liste vidée en prod jusqu'au scroll/F5).
+     * La clé (item.id, zone_x_pa) est l'identité utilisée partout ailleurs dans ce composant.
+     */
+    protected trackByWishlistItem(_index: number, row: WishlistItem): string {
+        return `${row.item.id}_${row.zone_x_pa}`;
+    }
+
+    /**
      * Indique si la ligne est « satisfaite » : la quantité souhaitée est finie (>= 0)
      * et la quantité manquante (souhaité - banque - sacs) est nulle ou négative.
      * Ces lignes sont dévalorisées visuellement car l'objet n'a plus besoin d'être rapporté.

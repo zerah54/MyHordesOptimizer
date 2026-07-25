@@ -56,6 +56,7 @@
             </div>
             <div class="mat-elevation-z8" style="flex: 1">
                 <table mat-table [dataSource]="datasource"
+                       [trackBy]="trackByWishlistItem"
                        cdkDropList
                        cdkDropListLockAxis="y"
                        [cdkDropListData]="datasource"
