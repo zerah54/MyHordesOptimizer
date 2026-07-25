@@ -1,0 +1,56 @@
+:host {
+    display: inline-flex;
+}
+
+.compact-stepper {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    padding: 2px 4px;
+    border: 1px solid var(--mat-sys-outline-variant);
+    border-radius: 6px;
+
+    // Taille d'image NON fixée : sprites pixel art, les redimensionner altère le rendu.
+    .stepper-icon {
+        display: block;
+        margin-right: 2px;
+    }
+
+    .stepper-value {
+        min-width: 1.4em;
+        text-align: center;
+        font-variant-numeric: tabular-nums;
+        font-weight: 600;
+    }
+
+    .stepper-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 22px;
+        height: 22px;
+        padding: 0;
+        border: none;
+        border-radius: 4px;
+        background: transparent;
+        color: var(--mat-sys-on-surface);
+        cursor: pointer;
+        transition: background-color 0.12s ease, opacity 0.12s ease;
+
+        mat-icon {
+            font-size: 18px;
+            width: 18px;
+            height: 18px;
+            line-height: 18px;
+        }
+
+        &:not(:disabled):hover {
+            background-color: var(--accented-background-color);
+        }
+
+        &:disabled {
+            opacity: 0.3;
+            cursor: default;
+        }
+    }
+}

@@ -1,5 +1,9 @@
 @defer (on viewport) {
-    <ng-content/>
+    @if (content(); as tpl) {
+        <ng-container [ngTemplateOutlet]="tpl" [ngTemplateOutletContext]="context()"></ng-container>
+    } @else {
+        <ng-content/>
+    }
 } @placeholder {
     <div class="defered-cell"></div>
 }

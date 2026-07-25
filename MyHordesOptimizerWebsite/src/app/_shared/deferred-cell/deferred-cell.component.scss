@@ -1,3 +1,10 @@
 :host {
     display: contents;
 }
+
+// Placeholder du bloc différé : une dimension minimale garantit que l'IntersectionObserver
+// de `on viewport` se déclenche (un élément de hauteur nulle peut ne jamais « intersecter »).
+.defered-cell {
+    min-height: 1.25em;
+    min-width: 1px;
+}

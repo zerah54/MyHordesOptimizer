@@ -5,6 +5,7 @@ export const EXTERNAL_APP_ID_KEY: string = 'external_app_id';
 export const BANK_CONDENSED_DISPLAY_KEY: string = 'bank_condensed_display';
 export const WISHLIST_EDITION_MODE_KEY: string = 'wishlist_edition_mode';
 export const EXPEDITIONS_EDITION_MODE_KEY: string = 'expeditions_edition_mode';
+export const CITIZENS_LIST_DISPLAY_MODE_KEY: string = 'citizens_list_display_mode';
 export const USER_KEY: string = 'user';
 export const TOWN_KEY: string = 'town';
 export const ITEMS_KEY: string = 'all_items';

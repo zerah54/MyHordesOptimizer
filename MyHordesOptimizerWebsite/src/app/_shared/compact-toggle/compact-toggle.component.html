@@ -1,0 +1,16 @@
+<button type="button"
+        class="compact-toggle"
+        [class.on]="state() === 'on'"
+        [class.off]="state() === 'off'"
+        [class.unknown]="state() === 'unknown'"
+        [disabled]="disabled()"
+        [attr.aria-pressed]="state() === 'on'"
+        [attr.aria-label]="label()"
+        [matTooltip]="label()"
+        (click)="toggle()">
+    @if (state() === 'unknown') {
+        <span class="unknown-mark" aria-hidden="true">?</span>
+    } @else {
+        <img [src]="src()" [alt]="label()">
+    }
+</button>

@@ -1,0 +1,29 @@
+:host {
+    display: block;
+}
+
+.mho-header-with-toggle {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+
+    .header-icon {
+        vertical-align: middle;
+    }
+
+    .open-menu-icon {
+        cursor: pointer;
+        vertical-align: middle;
+        font-size: 18px;
+        width: 18px;
+        height: 18px;
+    }
+
+    // Contrôle Tous/Oui/Non compact.
+    .toggle-filter {
+        --mat-standard-button-toggle-height: 26px;
+        font-size: 0.75rem;
+        white-space: nowrap;
+    }
+}

@@ -1,6 +1,13 @@
 <div class="mho-header-with-filter">
     <div [style.text-align]="textAlign()">
-        {{ header() }}
+        @if (headerImg()) {
+            <img class="header-icon" [src]="HORDES_IMG_REPO + headerImg()" [alt]="headerTooltip() || header()"
+                 [matTooltip]="headerTooltip() || ''">
+        } @else if (headerIconName()) {
+            <mat-icon class="header-icon" fontSet="material-symbols-outlined" [matTooltip]="headerTooltip() || ''">{{ headerIconName() }}</mat-icon>
+        } @else {
+            {{ header() }}
+        }
 
         @if (!visible) {
             <mat-icon fontSet="material-symbols-outlined" class="open-menu-icon" (click)="$event.preventDefault(); $event.stopPropagation(); displayFilter()">
@@ -11,7 +18,7 @@
 
     @if (visible) {
         <mat-form-field (click)="$event.stopPropagation()" class="short-bottom">
-            <mho-select #filter multiple [options]="options()" [bindLabel]="bindLabel()" [ngModel]="filterValue()"
+            <mho-select #filter multiple [options]="options()" [bindLabel]="bindLabel()" [bindIcon]="bindIcon()" [ngModel]="filterValue()"
                         (ngModelChange)="filterValueChange.emit($event); checkVisibility()" (closed)="checkVisibility();" searchable>
             </mho-select>
         </mat-form-field>

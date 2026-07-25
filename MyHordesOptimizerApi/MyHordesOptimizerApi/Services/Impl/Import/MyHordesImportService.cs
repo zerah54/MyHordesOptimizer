@@ -1136,7 +1136,30 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
                     IdTown = townId,
                     IdUser = user.IdUser,
                     IdUserNavigation = user,
-                    IdLastUpdateInfoNavigation = lastUpdate
+                    IdLastUpdateInfoNavigation = lastUpdate,
+
+                    // Défauts à l'initialisation d'un citoyen (état de départ « connu ») :
+                    // les actions héroïques sont disponibles par défaut...
+                    HasRescue = true,
+                    HasUppercut = true,
+                    HasSecondWind = true,
+                    HasLuckyFind = true,
+                    HasCheatDeath = true,
+                    HasHeroicReturn = true,
+                    // ...sauf APAG, Passage en Force et Camaraderie, laissés inconnus (null).
+
+                    // Améliorations de maison : commencent à 0 / non construit.
+                    HouseLevel = 0,
+                    HouseDefense = 0,
+                    ChestLevel = 0,
+                    RenfortLevel = 0,
+                    KitchenLevel = 0,
+                    LaboLevel = 0,
+                    RestLevel = 0,
+                    HasAlarm = false,
+                    HasCurtain = false,
+                    HasFence = false,
+                    HasLock = false
                 };
                 DbContext.TownCitizens.Add(citizen);
                 existingCitizens.Add(citizen);

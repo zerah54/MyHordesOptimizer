@@ -1,0 +1,65 @@
+:host {
+    display: inline-flex;
+}
+
+.compact-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 3px;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    background: transparent;
+    cursor: pointer;
+    line-height: 0;
+    transition: opacity 0.12s ease, background-color 0.12s ease, border-color 0.12s ease;
+
+    // Taille d'image NON fixée : ce sont des sprites pixel art, les redimensionner altère le rendu.
+    img {
+        display: block;
+    }
+
+    // Marque « inconnu » : remplace l'icône quand la valeur n'est pas connue. Petite boîte pour rester
+    // aligné avec les icônes voisines sans dépendre de la taille (variable) des sprites.
+    .unknown-mark {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 16px;
+        min-height: 16px;
+        font-weight: 700;
+        color: var(--mat-sys-on-surface);
+        opacity: 0.6;
+    }
+
+    &:not(:disabled):hover {
+        background-color: var(--accented-background-color);
+    }
+
+    &:disabled {
+        cursor: default;
+    }
+
+    // Activé : icône pleine, léger fond/contour d'accent.
+    &.on img {
+        opacity: 1;
+        filter: none;
+    }
+
+    &.on {
+        background-color: var(--accented-background-color);
+        border-color: var(--mat-sys-outline);
+    }
+
+    // Désactivé : icône estompée et désaturée.
+    &.off img {
+        opacity: 0.3;
+        filter: grayscale(100%);
+    }
+
+    // Indéterminé : état inconnu, contour pointillé (l'icône est remplacée par un « ? »).
+    &.unknown {
+        border-style: dashed;
+        border-color: var(--mat-sys-outline-variant);
+    }
+}

@@ -1,0 +1,12 @@
+<div class="compact-stepper" [matTooltip]="label()">
+    <img class="stepper-icon" [src]="src()" [alt]="label()">
+    <button type="button" class="stepper-btn" [disabled]="!canDecrement()"
+            [attr.aria-label]="'-'" (click)="decrement()">
+        <mat-icon fontSet="material-symbols-outlined">remove</mat-icon>
+    </button>
+    <span class="stepper-value">{{ display() }}</span>
+    <button type="button" class="stepper-btn" [disabled]="!canIncrement()"
+            [attr.aria-label]="'+'" (click)="increment()">
+        <mat-icon fontSet="material-symbols-outlined">add</mat-icon>
+    </button>
+</div>

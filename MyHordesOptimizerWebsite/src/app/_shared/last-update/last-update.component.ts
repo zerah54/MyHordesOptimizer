@@ -1,5 +1,5 @@
 import { CommonModule, DatePipe, NgOptimizedImage, NgTemplateOutlet } from '@angular/common';
-import { booleanAttribute, Component, input,InputSignal, InputSignalWithTransform } from '@angular/core';
+import { booleanAttribute, Component, input, InputSignal, InputSignalWithTransform } from '@angular/core';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import moment, { Moment } from 'moment';
 
@@ -22,6 +22,8 @@ export class LastUpdateComponent {
     public lastUpdateInfo: InputSignal<UpdateInfo | undefined> = input.required();
     public thresholds: InputSignal<[number, number, number, number] | undefined> = input<[number, number, number, number] | undefined>(undefined);
     public hideDetails: InputSignalWithTransform<boolean, unknown> = input(false, { transform: booleanAttribute });
+    /** Désactive le matTooltip interne de l'indicateur (ex : quand un menu/tooltip parent affiche déjà l'info). */
+    public noTooltip: InputSignalWithTransform<boolean, unknown> = input(false, { transform: booleanAttribute });
 
     protected moment: Moment = moment();
 
