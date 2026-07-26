@@ -2,6 +2,7 @@
 using AutoMapper;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Estimations;
 using MyHordesOptimizerApi.Extensions;
 using MyHordesOptimizerApi.Models;
@@ -110,8 +111,9 @@ namespace MyHordesOptimizerApi.Services.Impl.Estimations
             // niveaux du planif peuvent resserrer la fenêtre ; sur une tour complète, ils sont dominés (aucun
             // effet). Tour vide → il ne reste que le planif (ancien comportement de secours). Le slot J-1 garantit
             // l'alignement sur le même jour d'attaque : NE PAS agréger un autre jour (ce serait une autre attaque).
-            var rows = ExtractRows(estimObj?.Estim);
-            rows.AddRange(ExtractRows(planifObj?.Planif));
+            int planifBlocks = (int)(Math.Ceiling(dayAttack / 5.0) * 5);
+            var rows = ExtractRows(estimObj?.Estim, blocks: 1);
+            rows.AddRange(ExtractRows(planifObj?.Planif, blocks: planifBlocks));
 
             // Difficulté : RNE/RE/PANDE = normal (le champ `hard` de MyHordes = type panda, NORMAL pour
             // l'estimation). Easy/Hard n'existent que sur villes CUSTOM, exposées par aucune API : à forcer
@@ -212,6 +214,51 @@ namespace MyHordesOptimizerApi.Services.Impl.Estimations
                 upper = lower; // garde-fou si les lignes sont incohérentes entre elles
             }
 
+            // Affinage « paires d'offsets » (2026-07-26, validé banc pairbench : 250k sims × 5 régimes
+            // sans violation, 6k énumérations complètes sans exclusion, 6 attaques réelles contenues).
+            // Idée : la paire initiale (offMin0, offMax0) est ENTIÈRE, de somme round(f·(variance−2·shift))
+            // (déplacée mais PRÉSERVÉE par deshift/protect), et la ligne 0 % du planif l'affiche TELLE
+            // QUELLE (0 itération de réduction). On énumère donc paires initiales × bandes candidates
+            // (targetMin, Δ) et on ne garde une valeur V que s'il EXISTE une combinaison satisfaisant
+            // toutes les CONDITIONS NÉCESSAIRES (fenêtres d'inversion des arrondis par ligne, bornes et
+            // monotonie décroissante PAR CÔTÉ, cônes de décroissance de la somme). Conditions nécessaires
+            // uniquement ⟹ la vraie attaque n'est JAMAIS exclue ; le gain vit surtout à J13+ (jusqu'à
+            // −65 % de largeur observé). Pas en mode hard (l'attaque re-tirée casse le lien Δ↔V).
+            bool[] pairFeasible = null;
+            int pairWindowStart = lower;
+            if (!config.RerollInBand && shiftSpan > 0 && upper > lower)
+            {
+                // Les bandes affichées et l'attaque réelle sont scalées ×soulFactor (âmes rouges) : les
+                // marges du filtre doivent couvrir ce facteur. Cap réel 1.2 (rules) pour RNE/RE ; 666 en
+                // panda ⟹ marge large (s ≤ 5, ~100 âmes) pour PANDE/CUSTOM/type inconnu.
+                int resolvedTownId = DbContext.ResolveTownId(townId);
+                var townTypeId = DbContext.Towns.Where(town => town.IdTown == resolvedTownId)
+                    .Select(town => town.TownTypeId).FirstOrDefault();
+                double soulCap = townTypeId == (int)TownType.RNE || townTypeId == (int)TownType.RE ? 1.2 : 5.0;
+                pairFeasible = ComputeOffsetPairFeasibility(rows, lower, upper, dayAttack, factor, shiftSpan, config, soulCap);
+                if (pairFeasible != null)
+                {
+                    int feasibleLower = -1, feasibleUpper = -1;
+                    for (int i = 0; i < pairFeasible.Length; i++)
+                    {
+                        if (pairFeasible[i])
+                        {
+                            if (feasibleLower < 0) feasibleLower = pairWindowStart + i;
+                            feasibleUpper = pairWindowStart + i;
+                        }
+                    }
+                    if (feasibleLower >= 0)
+                    {
+                        lower = feasibleLower;
+                        upper = feasibleUpper;
+                    }
+                    else
+                    {
+                        pairFeasible = null; // données incohérentes : on garde la fenêtre invariante
+                    }
+                }
+            }
+
             result.Result.Min = lower;
             result.Result.Max = upper;
 
@@ -230,6 +277,12 @@ namespace MyHordesOptimizerApi.Services.Impl.Estimations
             var distribution = new List<int>();
             for (int value = lower; value <= upper; value++)
             {
+                // Le jeu faisable des paires peut avoir des TROUS (ancrage discret) : on les exclut
+                // aussi de l'histogramme, l'enveloppe [lower, upper] restant la fenêtre garantie.
+                if (pairFeasible != null && !pairFeasible[value - pairWindowStart])
+                {
+                    continue;
+                }
                 int weight = 1; // valeur possible → présente au moins une fois
                 if (weightByShift)
                 {
@@ -256,19 +309,247 @@ namespace MyHordesOptimizerApi.Services.Impl.Estimations
             return result;
         }
 
+        /// <summary>
+        /// Ligne d'estimation renseignée. <see cref="CitizenCount"/> = nombre de citoyens montés (= nombre
+        /// d'itérations de réduction d'offsets), déduit du % affiché : les paliers sont round(n·100/24)
+        /// pour n = 0..24, tous distincts, donc l'inversion est EXACTE (−1 si % inconnu → ligne ignorée
+        /// par le filtre de paires, mais conservée pour l'invariant). <see cref="Blocks"/> = arrondi bloc
+        /// (1 = tour exacte ; planif = ceil(jourAttaque/5)·5, floor du min / ceil du max).
+        /// </summary>
+        private readonly record struct EstimationRow(int Percent, int CitizenCount, int Min, int Max, int Blocks);
+
+        /// <summary>Paliers % affichés par la tour/planif, indexés par nombre de citoyens 0..24 (67 ↔ colonne SQL _68).</summary>
+        private static readonly int[] BucketPercents = { 0, 4, 8, 13, 17, 21, 25, 29, 33, 38, 42, 46, 50, 54, 58, 63, 67, 71, 75, 79, 83, 88, 92, 96, 100 };
+
         /// <summary>Lignes (%min-max) effectivement renseignées, triées par % croissant.</summary>
-        private static List<(int Percent, int Min, int Max)> ExtractRows(EstimationsDto? estim)
+        private static List<EstimationRow> ExtractRows(EstimationsDto? estim, int blocks)
         {
-            var rows = new List<(int Percent, int Min, int Max)>();
+            var rows = new List<EstimationRow>();
             if (estim is null) return rows;
             foreach (var property in estim.GetType().GetProperties())
             {
                 if (property.GetValue(estim) is not EstimationValueDto value) continue;
                 if (value.Min <= 0 || value.Max <= 0) continue;
                 if (!int.TryParse(property.Name.Replace("_", string.Empty), out int percent)) continue;
-                rows.Add((percent, value.Min, value.Max));
+                rows.Add(new EstimationRow(percent, Array.IndexOf(BucketPercents, percent), value.Min, value.Max, blocks));
             }
             return rows.OrderBy(row => row.Percent).ToList();
+        }
+
+        // ================== Filtre « paires d'offsets » ==================
+        // Toutes les conditions ci-dessous sont des SUR-APPROXIMATIONS (conditions nécessaires avec
+        // marges d'arrondi explicites) : on n'élimine une valeur que si AUCUNE réalisation du jeu ne
+        // peut produire les lignes observées. Validé par simulateur forward (port fidèle de
+        // Prepare/EstimateZombieAttackAction) : 0 violation sur 250k tirages × 5 régimes de jour,
+        // 0 exclusion de l'attaque réelle sur 6k énumérations complètes.
+
+        private const double PairEps = 1e-9;
+
+        /// <summary>
+        /// Marque les valeurs de [lower, upper] admettant au moins une combinaison (bande, paire
+        /// initiale, trajectoire d'offsets) compatible avec toutes les lignes. Null si inapplicable.
+        /// soulCap = majorant du facteur d'âmes rouges (bande et attaque scalées à l'identique).
+        /// </summary>
+        private static bool[] ComputeOffsetPairFeasibility(List<EstimationRow> rows, int lower, int upper,
+            int dayAttack, double factor, double shiftSpan, EstimationSolverConfig config, double soulCap)
+        {
+            var filterRows = rows.Where(row => row.CitizenCount >= 0).OrderBy(row => row.CitizenCount).ToList();
+            if (filterRows.Count == 0)
+            {
+                return null;
+            }
+            var pairs = BuildInitialPairs(dayAttack, factor, config);
+            var cones = new Dictionary<int, (double[] Lo, double[] Hi, double[] Cum)>();
+            foreach (var (sum, _) in pairs)
+            {
+                if (!cones.ContainsKey(sum))
+                {
+                    cones[sum] = BuildConeTables(sum);
+                }
+            }
+
+            // Marges : |Δ_brut − V_brut·shiftSpan| ≤ 1 (2 round()) devient, scalé ×s puis posé sur la
+            // grille entière (±0.5 par extrémité de bande, ±0.5 sur round(Ṽ)) : ≤ s + 1 + 0.05.
+            // Appartenance à la bande : V ≥ targetMin − (0.5s + 1), symétrique côté max.
+            double deltaSlack = soulCap + 1.1;
+            int bandSlack = (int)Math.Ceiling(0.5 * soulCap + 1.0);
+
+            var feasible = new bool[upper - lower + 1];
+            var windows = new double[filterRows.Count, 4];
+            int deltaLow = Math.Max(1, (int)Math.Floor(lower * shiftSpan - deltaSlack));
+            int deltaHigh = (int)Math.Ceiling(upper * shiftSpan + deltaSlack);
+            for (int delta = deltaLow; delta <= deltaHigh; delta++)
+            {
+                int vLow = Math.Max(lower, (int)Math.Ceiling((delta - deltaSlack) / shiftSpan - PairEps));
+                int vHigh = Math.Min(upper, (int)Math.Floor((delta + deltaSlack) / shiftSpan + PairEps));
+                if (vLow > vHigh) continue;
+                for (int targetMin = vLow - delta - bandSlack; targetMin <= vHigh + bandSlack; targetMin++)
+                {
+                    if (targetMin < 2) continue;
+                    int targetMax = targetMin + delta;
+                    int markLow = Math.Max(vLow, targetMin - bandSlack);
+                    int markHigh = Math.Min(vHigh, targetMax + bandSlack);
+                    if (markLow > markHigh) continue;
+                    bool allMarked = true;
+                    for (int value = markLow; value <= markHigh && allMarked; value++)
+                    {
+                        allMarked = feasible[value - lower];
+                    }
+                    if (allMarked) continue;
+                    if (!TryFillRowWindows(filterRows, targetMin, targetMax, windows)) continue;
+                    bool anyPair = false;
+                    foreach (var (sum, offMin) in pairs)
+                    {
+                        if (BandPairIsFeasible(filterRows, windows, sum, offMin, cones[sum]))
+                        {
+                            anyPair = true;
+                            break;
+                        }
+                    }
+                    if (!anyPair) continue;
+                    for (int value = markLow; value <= markHigh; value++)
+                    {
+                        feasible[value - lower] = true;
+                    }
+                }
+            }
+            return feasible;
+        }
+
+        /// <summary>
+        /// Paires initiales (somme, offMin0) possibles. Sans rebound : somme = round(f·(variance−2·shift))
+        /// EXACTE, offMin0 ∈ [round(f·(offsetMin−shift)), round(f·(offsetMax−shift))]. Avec rebound
+        /// (deshift des offsets vs bornes du jour) : somme préservée à ±1 (round de la paire), chaque
+        /// côté ramené ≥ protect. Union des deux cas — les offsets STOCKÉS sont toujours entiers.
+        /// </summary>
+        private static List<(int Sum, int OffMin)> BuildInitialPairs(int dayAttack, double factor, EstimationSolverConfig config)
+        {
+            int protect = dayAttack <= 30 ? 3 : 1;
+            int baseSum = (int)Math.Round(factor * (config.Variance - 2 * config.Shift), MidpointRounding.AwayFromZero);
+            int offMinLow = (int)Math.Round(factor * (config.OffsetMin - config.Shift), MidpointRounding.AwayFromZero);
+            int offMinHigh = (int)Math.Round(factor * (config.OffsetMax - config.Shift), MidpointRounding.AwayFromZero);
+            var pairs = new List<(int Sum, int OffMin)>();
+            for (int sum = baseSum - 1; sum <= baseSum + 1; sum++)
+            {
+                int low = sum == baseSum ? Math.Min(offMinLow, protect) : protect;
+                int high = sum == baseSum ? Math.Max(offMinHigh, sum - protect) : sum - protect;
+                for (int offMin = Math.Max(0, low); offMin <= high; offMin++)
+                {
+                    pairs.Add((sum, offMin));
+                }
+            }
+            return pairs;
+        }
+
+        /// <summary>
+        /// Cônes de la somme d'offsets restante après n itérations de calculate_offsets, depuis une somme
+        /// initiale exacte. Lo[n] : décroissance MAXIMALE (branche 25 % : les 2 côtés −spendable chacun,
+        /// spendable = somme/(24−i)) ⟹ produit télescopique (24−n)(23−n)/(24·23). Hi[n] : décroissance
+        /// MINIMALE (une seule réduction ≥ floor(spendable·250)/1000 ≥ spendable/4 − 0.001), avec 2 étapes
+        /// « gratuites » (traversées de zéro, au plus une par côté), placées sur les plus gros facteurs
+        /// (les dernières) pour MAJORER. Cum[n] = Σ spendable_i majoré = dépense max possible d'UN côté.
+        /// </summary>
+        private static (double[] Lo, double[] Hi, double[] Cum) BuildConeTables(int initialSum)
+        {
+            var lo = new double[25];
+            var hi = new double[25];
+            var cum = new double[25];
+            for (int n = 0; n <= 24; n++)
+            {
+                lo[n] = n >= 23 ? 0 : initialSum * (24 - n) * (23 - n) / 552.0;
+                double remaining = initialSum;
+                for (int i = 0; i <= n - 3; i++)
+                {
+                    remaining = remaining * (1 - 0.25 / (24 - i)) + 0.001;
+                }
+                hi[n] = remaining;
+            }
+            for (int n = 1; n <= 24; n++)
+            {
+                cum[n] = cum[n - 1] + hi[n - 1] / (24 - (n - 1));
+            }
+            return (lo, hi, cum);
+        }
+
+        /// <summary>Facteur MINIMAL de somme d'offsets entre n1 et n2 itérations (décroissance max).</summary>
+        private static double SumDecayMin(int n1, int n2)
+        {
+            return n1 >= 23 ? 0 : (double)((24 - n2) * (23 - n2)) / ((24 - n1) * (23 - n1));
+        }
+
+        /// <summary>
+        /// Fenêtres d'offsets [aLo, aHi, bLo, bHi] par ligne pour une bande candidate, par inversion des
+        /// arrondis : min = round(targetMin·(1−a/100)·soulFactor) (élargi du bloc planif), idem max.
+        /// Le ±0.5 sur targetMin/targetMax = grille entière posée sur la bande SCALÉE (réelle-valuée).
+        /// False si une fenêtre est vide (bande impossible, aucune paire à tester).
+        /// </summary>
+        private static bool TryFillRowWindows(List<EstimationRow> rows, int targetMin, int targetMax, double[,] windows)
+        {
+            for (int i = 0; i < rows.Count; i++)
+            {
+                var row = rows[i];
+                double blocks = row.Blocks;
+                double aLow = 100.0 * (1.0 - (row.Min + blocks - 0.5) / (targetMin - 0.5));
+                double aHigh = 100.0 * (1.0 - (row.Min - 0.5) / (targetMin + 0.5));
+                double bLow = 100.0 * ((row.Max - blocks + 0.5) / (targetMax + 0.5) - 1.0);
+                double bHigh = 100.0 * ((row.Max + 0.5) / (targetMax - 0.5) - 1.0);
+                if (Math.Max(aLow, 0) > aHigh + PairEps || Math.Max(bLow, 0) > bHigh + PairEps)
+                {
+                    return false;
+                }
+                windows[i, 0] = aLow;
+                windows[i, 1] = aHigh;
+                windows[i, 2] = bLow;
+                windows[i, 3] = bHigh;
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// Existe-t-il une trajectoire d'offsets partant de (offMin0, sum−offMin0) compatible avec toutes
+        /// les lignes ? Conditions nécessaires : fenêtres d'inversion, bornes par côté
+        /// [max(0, X0−Cum[n]), X0], monotonie décroissante par côté (les offsets ne remontent jamais),
+        /// cône de somme absolu + relatif entre lignes successives. La ligne 0 % (planif) ancre la paire
+        /// EXACTEMENT (0 itération ⟹ offsets affichés = offsets stockés).
+        /// </summary>
+        private static bool BandPairIsFeasible(List<EstimationRow> rows, double[,] windows, int sum, int offMin0,
+            (double[] Lo, double[] Hi, double[] Cum) cone)
+        {
+            double offMax0 = sum - offMin0;
+            double aPrevHigh = offMin0, bPrevHigh = offMax0, sumPrevHigh = sum, sumPrevLow = 0;
+            int nPrev = -1;
+            for (int i = 0; i < rows.Count; i++)
+            {
+                int n = rows[i].CitizenCount;
+                double aLow = Math.Max(Math.Max(windows[i, 0], offMin0 - cone.Cum[n]), 0);
+                double aHigh = Math.Min(windows[i, 1], Math.Min(offMin0, aPrevHigh));
+                if (aLow > aHigh + PairEps)
+                {
+                    return false;
+                }
+                double bLow = Math.Max(Math.Max(windows[i, 2], offMax0 - cone.Cum[n]), 0);
+                double bHigh = Math.Min(windows[i, 3], Math.Min(offMax0, bPrevHigh));
+                if (bLow > bHigh + PairEps)
+                {
+                    return false;
+                }
+                double sumLow = Math.Max(aLow + bLow, cone.Lo[n]);
+                if (nPrev >= 0)
+                {
+                    sumLow = Math.Max(sumLow, sumPrevLow * SumDecayMin(nPrev, n));
+                }
+                double sumHigh = Math.Min(aHigh + bHigh, Math.Min(cone.Hi[n], sumPrevHigh));
+                if (sumLow > sumHigh + PairEps)
+                {
+                    return false;
+                }
+                aPrevHigh = aHigh;
+                bPrevHigh = bHigh;
+                sumPrevHigh = sumHigh;
+                sumPrevLow = sumLow;
+                nPrev = n;
+            }
+            return true;
         }
 
         public EstimationTuple CreateTupleFromValue(string key, EstimationValueDto value)
