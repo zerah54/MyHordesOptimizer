@@ -119,6 +119,12 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
                 state.CurrentStep = progress.Key;
                 state.CurrentStepIndex = progress.Index;
                 state.TotalSteps = progress.Total;
+                // Ne s'efface pas d'une étape à l'autre : le constat porte sur l'import entier, pas
+                // sur l'étape qui l'a signalé.
+                if (progress.Message != null)
+                {
+                    state.Warning = progress.Message;
+                }
             }
         }
     }

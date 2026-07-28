@@ -3,6 +3,7 @@ import { ChangeDetectionStrategy, Component, DestroyRef, inject, OnInit, signal,
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
@@ -37,7 +38,7 @@ const angular_common: Imports = [CommonModule, ReactiveFormsModule];
 const components: Imports = [];
 const pipes: Imports = [];
 const material_modules: Imports = [
-    MatButtonModule, MatIconModule, MatProgressSpinnerModule,
+    MatButtonModule, MatCheckboxModule, MatIconModule, MatProgressSpinnerModule,
     MatDividerModule, MatFormFieldModule, MatSelectModule, MatTooltipModule
 ];
 
@@ -51,6 +52,12 @@ const material_modules: Imports = [
 export class DataImportComponent implements OnInit {
     protected readonly seasons: WritableSignal<SeasonDTO[]> = signal<SeasonDTO[]>([]);
     protected readonly seasonControl: FormControl<number | null> = new FormControl<number | null>(null);
+    /**
+     * Coché par défaut : le quota MyHordes interrompt l'import d'une saison ancienne bien avant sa
+     * fin, et sans reprise chaque relance rejouerait les mêmes villes sans jamais atteindre les
+     * suivantes. Se décoche pour rafraîchir des villes déjà importées.
+     */
+    protected readonly resumeControl: FormControl<boolean> = new FormControl<boolean>(true, { nonNullable: true });
     private readonly adminService: AdminService = inject(AdminService);
     protected readonly importActions: ImportAction[] = [
         { key: 'jobs', label: $localize`Jobs`, icon: 'work', fn: () => this.adminService.importJobs() },
@@ -100,7 +107,7 @@ export class DataImportComponent implements OnInit {
     /** Même mécanique que {@link importAll} : l'import tourne côté serveur, on en suit l'avancement */
     protected importTowns(): void {
         const season: number | null = this.seasonControl.value;
-        this.startBackgroundImport('towns', this.adminService.importTowns(season ?? undefined));
+        this.startBackgroundImport('towns', this.adminService.importTowns(season ?? undefined, this.resumeControl.value));
     }
 
     protected importState(job: ImportJobKey): ImportJobStateDTO | null {

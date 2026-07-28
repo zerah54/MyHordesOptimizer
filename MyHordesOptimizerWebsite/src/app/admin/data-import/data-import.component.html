@@ -82,6 +82,8 @@
         <p class="import-desc" i18n>
             Importe les données des villes depuis l'API MyHordes (<code>/json/towns</code>).
             Laisse le filtre vide pour toutes les saisons, ou sélectionne une saison spécifique.
+            MyHordes ne renvoie que 50 villes par requête et limite la clé à 150 requêtes par heure :
+            une saison ancienne s'importe en plusieurs passes, à reprendre d'une heure sur l'autre.
         </p>
         <div class="import-actions">
             <mat-form-field appearance="outline" class="season-select">
@@ -101,6 +103,11 @@
                     }
                 </mat-select>
             </mat-form-field>
+            <mat-checkbox [formControl]="resumeControl"
+                          matTooltip="Reprend là où le quota avait interrompu la passe précédente. Décoche pour réimporter des villes déjà connues."
+                          i18n-matTooltip>
+                <ng-container i18n>Reprendre</ng-container>
+            </mat-checkbox>
             <button mat-flat-button color="primary"
                     [disabled]="isImportLoading('towns')"
                     (click)="importTowns()">
@@ -132,6 +139,12 @@
         @if (isImportLoading('towns')) {
             <p class="import-desc" i18n>
                 L'import se poursuit sur le serveur même si tu quittes cette page.
+            </p>
+        }
+        @if (!isImportLoading('towns') && importState('towns')?.warning; as warning) {
+            <p class="import-warning">
+                <mat-icon fontSet="material-symbols-outlined">hourglass_top</mat-icon>
+                {{ warning }}
             </p>
         }
 

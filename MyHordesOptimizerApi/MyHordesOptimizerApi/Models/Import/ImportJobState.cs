@@ -18,7 +18,11 @@ namespace MyHordesOptimizerApi.Models.Import
     /// <param name="Key">Nature de ce qui est en cours de traitement (étape ou unité comptée).</param>
     /// <param name="Index">Quantité déjà traitée, à partir de 1.</param>
     /// <param name="Total">Quantité totale à traiter.</param>
-    public record ImportStepProgress(string Key, int Index, int Total);
+    /// <param name="Message">
+    /// Constat à remonter au client sur un import qui aboutit sans être complet — un quota externe
+    /// épuisé, par exemple. Null le reste du temps : ce n'est pas une erreur.
+    /// </param>
+    public record ImportStepProgress(string Key, int Index, int Total, string Message = null);
 
     /// <summary>
     /// État d'un import en tâche de fond, interrogeable pendant et après son exécution.
@@ -37,6 +41,11 @@ namespace MyHordesOptimizerApi.Models.Import
         /// <summary>Null tant que cet import n'est pas allé au bout depuis le démarrage de l'application.</summary>
         public bool? LastRunSucceeded { get; set; }
         public string Error { get; set; }
+        /// <summary>
+        /// Constat sur un import réussi mais incomplet (quota externe épuisé, notamment). Distinct de
+        /// <see cref="Error"/> : l'import s'est bien terminé, il reste simplement du travail.
+        /// </summary>
+        public string Warning { get; set; }
 
         public ImportJobState Clone()
         {

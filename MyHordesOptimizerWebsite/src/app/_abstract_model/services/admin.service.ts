@@ -34,12 +34,21 @@ export class AdminService extends GlobalService {
         );
     }
 
-    /** Comme {@link importAll}, s'exécute en tâche de fond et se suit via {@link getImportStatus} */
-    public importTowns(season?: number): Observable<ImportJobStateDTO> {
-        const url: string = season !== undefined
-            ? `${this.API_URL}/admin/import/towns?season=${season}`
-            : `${this.API_URL}/admin/import/towns`;
-        return this.startImportJob(url);
+    /**
+     * Comme {@link importAll}, s'exécute en tâche de fond et se suit via {@link getImportStatus}.
+     * @param resume Ignore les villes déjà importées, pour reprendre une saison là où le quota
+     * MyHordes avait interrompu la passe précédente plutôt que de la rejouer depuis le début.
+     */
+    public importTowns(season?: number, resume: boolean = false): Observable<ImportJobStateDTO> {
+        const params: string[] = [];
+        if (season !== undefined) {
+            params.push(`season=${season}`);
+        }
+        if (resume) {
+            params.push('resume=true');
+        }
+        const query: string = params.length > 0 ? `?${params.join('&')}` : '';
+        return this.startImportJob(`${this.API_URL}/admin/import/towns${query}`);
     }
 
     public importHeroSkills(): Observable<void> {
