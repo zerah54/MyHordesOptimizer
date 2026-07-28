@@ -68,9 +68,15 @@ namespace MyHordesOptimizerApi.Repository.Impl
             var powerPath = "Data/Heroes/powers.json";
             var powerJson = File.ReadAllText(powerPath);
             var powerDictionnary = powerJson.FromJson<Dictionary<string, MyHordesHerosCapacitiesCodeModel>>();
-            powerDictionnary = powerDictionnary.Where(powerKeyValue => capacitiesDictionnary.Values.Any(capacity => capacity.Action != powerKeyValue.Key))
-                .ToDictionary();
-            
+
+            // Il y avait ici un filtre censé écarter les pouvoirs déjà pointés par le champ
+            // « action » d'une capacité. Il était inopérant : Any(c => c.Action != cle) est vrai
+            // dès qu'UNE capacité porte une action différente, ce qui est toujours le cas, donc
+            // le filtre conservait tout. MyHordes a par ailleurs supprimé « action » du
+            // référentiel, ce qui le prive de sa source. Le retirer préserve donc exactement le
+            // comportement actuel — les clés des deux fichiers ne se chevauchent pas.
+
+
             foreach(var power in powerDictionnary)
             {
                 capacitiesDictionnary.Add(power.Key, power.Value);

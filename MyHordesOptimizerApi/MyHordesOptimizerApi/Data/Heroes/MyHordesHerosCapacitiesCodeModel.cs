@@ -16,10 +16,14 @@ namespace MyHordesOptimizerApi.Data.Heroes
         [JsonProperty("icon")]
         public string Icon { get; set; }
 
-        [JsonProperty("daysNeeded")]
-        public int DaysNeeded { get; set; }
+        /// <summary>
+        /// MyHordes a renommé « daysNeeded » en « unlockAt ». Le champ « action » a disparu
+        /// du référentiel amont ; rien ne le lisait.
+        /// </summary>
+        [JsonProperty("unlockAt")]
+        public int UnlockAt { get; set; }
 
-        [JsonProperty("action")]
-        public string Action { get; set; }
+        [JsonProperty("legacy")]
+        public bool Legacy { get; set; }
     }
 }

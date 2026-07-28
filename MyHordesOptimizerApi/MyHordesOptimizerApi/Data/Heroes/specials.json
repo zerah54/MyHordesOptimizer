@@ -1,10 +1,5 @@
 [
     {
-        "name": "special_armag",
-        "icon": "armag",
-        "consumable": true
-    },
-    {
         "name": "special_armag_d",
         "icon": "armag",
         "consumable": true

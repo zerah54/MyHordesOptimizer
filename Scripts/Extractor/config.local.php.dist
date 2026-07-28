@@ -1,0 +1,19 @@
+<?php
+
+declare(strict_types=1);
+
+/**
+ * Modèle de configuration locale.
+ *
+ * Copier ce fichier en `config.local.php` (gitignoré) et l'adapter.
+ * Aucun chemin propre à une machine ne doit être versionné.
+ */
+
+return [
+    // Référence MyHordes à extraire : 'master', un nom de branche, ou un SHA complet.
+    'ref' => 'master',
+
+    // Chemin d'un clone local de MyHordes, utilisé par --offline.
+    // null si vous n'en avez pas.
+    'chemin_hors_ligne' => null,
+];
