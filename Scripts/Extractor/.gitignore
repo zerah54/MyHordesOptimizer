@@ -1,0 +1,5 @@
+/vendor/
+/raw/
+/.source/
+/config.local.php
+/.phpunit.cache/

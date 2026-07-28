@@ -4,64 +4,94 @@
         "title": "Tipp-Ex",
         "description": "Du kannst 2 Mal pro Partie einen Registereintrag unkenntlich machen. Dazu musst du nur auf das kleine Icon \"Fälschen\" klicken. Dieses befindet sich links neben dem \"störenden\" Registereintrag. ;-)",
         "icon": "small_falsify",
-        "daysNeeded": 3
+        "citizenProperties": {
+            "props.limit.log_manipulation": 2
+        },
+        "unlockAt": 3,
+        "legacy": true
     },
     "clairvoyance": {
         "name": "clairvoyance",
         "title": "Hellseherei",
         "description": "Du erfährst, wie aktiv ein bestimmter Bürger in deiner Stadt spielt. Du musst dazu lediglich bei ihm daheim vorbeischauen...",
         "icon": "small_view",
-        "daysNeeded": 7
+        "citizenProperties": {
+            "features.clairvoyance.base": true
+        },
+        "unlockAt": 7,
+        "legacy": true
     },
     "writer": {
         "name": "writer",
         "title": "Rundbrief",
         "description": "Mit dieser Funktion kannst du alle Stadteinwohner auf einmal anschreiben. Du kannst damit in den Foren zudem Rollenspielthreads (RP) erstellen (Übertreibe es aber bitte nicht - Danke!).",
         "icon": "item_rp_sheets",
-        "daysNeeded": 16
+        "citizenProperties": {
+            "features.group_messages": true
+        },
+        "unlockAt": 16,
+        "legacy": true
     },
     "brothers": {
         "name": "brothers",
         "title": "Freundschaft",
         "description": "Mit dieser Fähigkeit kannst du 1 Mal pro Partie (Stadt) jemandem eine deiner noch ungenutzten Heldentaten schenken! Die anderen werden in dir den Messias erkennen! BEACHTE: Verschenkte Heldentaten kannst du in dieser Stadt nicht mehr selbst verwenden. Um jemandem eine Heldentat zu schenken, musst mit ihm in der gleichen Zone stehen oder, wenn du in der Stadt bist, ihn daheim besuchen.",
         "icon": "r_share",
-        "daysNeeded": 25
+        "disabled": true,
+        "unlockAt": 25,
+        "legacy": true
     },
     "dictator": {
         "name": "dictator",
         "title": "Diktator",
         "description": "Schreibe auf die Tafel, die sich auf der Übersichtsseite deiner Stadt befindet. Darüberhinaus kannst du auch deinen Mitbürgern ein Bauprojekt empfehlen. Das Gebäude mit den meisten Empfehlungen wird auf der Bauseite der Stadt hervorgehoben.",
         "icon": "small_chat",
-        "daysNeeded": 31
+        "citizenProperties": {
+            "features.blackboard": true,
+            "features.building_recommendation": true
+        },
+        "unlockAt": 31,
+        "legacy": true
     },
     "largechest1": {
         "name": "largechest1",
         "title": "Große Truhe",
         "description": "Du erhältst einen zusätzlichen Platz in deiner Truhe.",
         "icon": "item_home_box",
-        "daysNeeded": 45
+        "unlockAt": 45,
+        "legacy": true,
+        "chestSpace": 1
     },
     "healthybody": {
         "name": "healthybody",
         "title": "Top in Form",
         "description": "Solange du \"Clean\" bist (sprich: Du hast in der Partie noch keine Drogen zu Dir genommen.), verfügst du über einen zusätzlichen Zonenkontrollpunkt in der Außenwelt.",
         "icon": "status_clean",
-        "daysNeeded": 61
+        "citizenProperties": {
+            "props.bonus.zone_control.clean": 1
+        },
+        "unlockAt": 61,
+        "legacy": true
     },
     "omniscience": {
         "name": "omniscience",
         "title": "Allwissenheit",
         "description": "Allwissenheit funktioniert wie Hellseherei, außer, dass du jetzt eine Übersicht zur Aktivität aller Stadteinwohner bekommst. Klicke dazu in der Bürgerliste einfach auf den Button \"Allwissenheit\".",
         "icon": "small_view",
-        "daysNeeded": 75
+        "citizenProperties": {
+            "features.clairvoyance.expanded": true
+        },
+        "unlockAt": 75,
+        "legacy": true
     },
     "resourcefulness": {
         "name": "resourcefulness",
         "title": "Einfallsreichtum",
         "description": "Du beginnst jede neue Stadt mit einem zusätzlichen nützlichen Gegenstand.",
         "icon": "item_chest_hero",
-        "daysNeeded": 91,
-        "items": [
+        "unlockAt": 91,
+        "legacy": true,
+        "grantsItems": [
             "chest_hero_#00"
         ]
     },
@@ -70,38 +100,54 @@
         "title": "Doppelter Boden",
         "description": "Du bekommst einen weiteren Platz in deiner Truhe.",
         "icon": "item_home_box",
-        "daysNeeded": 105
+        "unlockAt": 105,
+        "legacy": true,
+        "chestSpace": 1
     },
     "luckyfind": {
         "name": "luckyfind",
         "title": "Schönes Fundstück",
         "description": "Mit deiner Heldenfähigkeit \"Fundstück\" stöberst du jetzt NOCH BESSERE Gegenstände auf.",
         "icon": "item_chest_hero",
-        "daysNeeded": 121,
-        "action": "hero_generic_find_lucky"
+        "unlockAt": 121,
+        "legacy": true,
+        "unlocksActions": [
+            "hero_generic_find_lucky"
+        ]
     },
     "largerucksack1": {
         "name": "largerucksack1",
         "title": "Aufgeräumte Tasche",
         "description": "Du bekommst einen zusätzlichen Platz in deinem Rucksack.",
         "icon": "item_bag",
-        "daysNeeded": 135
+        "citizenProperties": {
+            "props.bonus.rucksack_space": 1
+        },
+        "unlockAt": 135,
+        "legacy": true
     },
     "secondwind": {
         "name": "secondwind",
         "title": "Zweite Lunge",
         "description": "Du verfügst ab sofort über eine mächtige Heldenfähigkeit, mit der du 6 AP wiederherstellen kannst und die deine Müdigkeit aufhebt.",
         "icon": "small_pa",
-        "daysNeeded": 151,
-        "action": "hero_generic_ap"
+        "unlockAt": 151,
+        "legacy": true,
+        "unlocksActions": [
+            "hero_generic_ap"
+        ],
+        "citizenProperties": {
+            "props.actions.hero_sw.ap": 6
+        }
     },
     "breakfast1": {
         "name": "breakfast1",
         "title": "Weitsichtig",
         "description": "Du beginnst jede neue Stadt mit einer zusätzlichen Nahrungsmittelration.",
         "icon": "item_food_bag",
-        "daysNeeded": 165,
-        "items": [
+        "unlockAt": 165,
+        "legacy": true,
+        "grantsItems": [
             "food_bag_#00"
         ]
     },
@@ -110,52 +156,89 @@
         "title": "Profi-Fotograph",
         "description": "Du beginst jede neue Stadt mit einer Kamera aus Vorkriegstagen.",
         "icon": "f_cam",
-        "daysNeeded": 181
+        "unlockAt": 181,
+        "legacy": true,
+        "grantsItems": [
+            "photo_3_#00"
+        ],
+        "itemsGrantedAsProfessionItems": true,
+        "inhibitedByFeatureUnlock": "f_cam"
     },
     "brick": {
         "name": "brick",
         "title": "Panzerschrank",
         "description": "Dank deiner zahlreichen Zombiekontakte verfügst du in der Außenwelt ab sofort über einen zusätzlichen Zonenkontrollpunkt.",
         "icon": "item_shield",
-        "daysNeeded": 195
+        "citizenProperties": {
+            "props.bonus.zone_control.base": 1
+        },
+        "unlockAt": 195,
+        "legacy": true
     },
     "treachery": {
         "name": "treachery",
         "title": "Hinterhältigkeit",
         "description": "Die \"Tipp-Ex\" Fähigkeit wird noch besser! Ab sofort kannst du pro Partie (Stadt) noch mehr Registereinträge fälschen! Du kannst ab sofort 4 Mal pro Partie einen Registereintrag unkenntlich machen.",
         "icon": "small_falsify",
-        "daysNeeded": 211
+        "citizenProperties": {
+            "props.limit.log_manipulation": 4
+        },
+        "unlockAt": 211,
+        "legacy": true
     },
     "cheatdeath": {
         "name": "cheatdeath",
         "title": "Den Tod besiegen",
         "description": "Sobald diese neue Heldenfähigkeit aktiviert wurde, spürst du beim nächsten Zombieangriff keinen Durst, keine Drogenabhängigkeit und keine Infektion (nur eine Nacht lang gültig). Verhindert auch Ghulverhungern (Hungerbalken steigt trotzdem).",
         "icon": "small_wrestle",
-        "daysNeeded": 226,
-        "action": "hero_generic_immune"
+        "unlockAt": 226,
+        "legacy": true,
+        "unlocksActions": [
+            "hero_generic_immune"
+        ],
+        "citizenProperties": {
+            "props.actions.hero_immune.protection": [
+                "thirst",
+                "infection",
+                "addiction",
+                "hunger"
+            ]
+        }
     },
     "revenge": {
         "name": "revenge",
         "title": "Süße Rache",
         "description": "Solltest du am dritten Tag oder an einem späteren Zeitpunkt verbannt werden, bekommst du automatisch etwas Gift geschenkt, das du nach Belieben einsetzen kannst... Tja, man hätte dich besser nicht ärgern sollen!",
         "icon": "item_april_drug",
-        "daysNeeded": 241
+        "citizenProperties": {
+            "config.revenge_items": [
+                "poison_#00",
+                "poison_#00"
+            ]
+        },
+        "unlockAt": 241,
+        "legacy": true
     },
     "procamp": {
         "name": "procamp",
         "title": "Proficamper",
         "description": "Die Nachteile, die bei wiederholtem Campen auftreten, fallen bei dir nicht mehr so stark aus: Somit kannst du in einer Stadt öfter campen.",
         "icon": "small_camp",
-        "daysNeeded": 301
+        "citizenProperties": {
+            "features.pro.camper": true
+        },
+        "unlockAt": 301,
+        "legacy": true
     },
     "medicine1": {
         "name": "medicine1",
         "title": "Erfahrener Junkie",
-        "description": "Du beginnst jede neue Stadt mit einer Ration Paracetoid 7g in deinem Rucksack.",
-        "icon": "item_disinfect",
-        "daysNeeded": 361,
-        "items": [
-            "disinfect_#00"
+        "description": "Du beginnst jede neue Stadt mit einer Erste Hilfe Tasche in deinem Rucksack.",
+        "icon": "item_medic",
+        "unlockAt": 361,
+        "legacy": true,
+        "grantsItems": [
+            "medic_#00"
         ]
     },
     "mayor": {
@@ -163,15 +246,18 @@
         "title": "Bürgermeister",
         "description": "Du kannst Privatstädte gründen (nach deinem nächsten Tod, auf der Seite \"Spielen\").",
         "icon": "item_map",
-        "daysNeeded": 541
+        "disabled": true,
+        "unlockAt": 541,
+        "legacy": true
     },
     "architect": {
         "name": "architect",
         "title": "Architekt",
         "description": "Du beginnst jede Stadt mit einem Gebäudeplan.",
         "icon": "item_bplan_c",
-        "daysNeeded": 721,
-        "items": [
+        "unlockAt": 721,
+        "legacy": true,
+        "grantsItems": [
             "bplan_c_#00"
         ]
     },
@@ -180,6 +266,597 @@
         "title": "Profiwächter",
         "description": "Du hast permanent um 5% bessere Chancen auf der Nachtwache.",
         "icon": "r_guard",
-        "daysNeeded": 1000
+        "citizenProperties": {
+            "features.pro.watchman": true
+        },
+        "unlockAt": 1000,
+        "legacy": true
+    },
+    "super_strategist_0": {
+        "sort": 0,
+        "group": "Strategie",
+        "title": "Strategie",
+        "legacy": false,
+        "icon": "super_s0",
+        "name": "super_strategist_0",
+        "bullets": [
+            "+10 Verteidigung bei der Nachtwache",
+            "Zugang zum Schwarzen Brett",
+            "Versenden von Nachrichten an alle Bürger",
+            "Konstruktionen empfehlen"
+        ],
+        "citizenProperties": {
+            "props.watch_defense": 10,
+            "features.blackboard": true,
+            "features.group_messages": true,
+            "features.building_recommendation": true
+        },
+        "level": 0,
+        "unlockAt": 0
+    },
+    "super_strategist_1": {
+        "sort": 0,
+        "group": "Strategie",
+        "title": "Strategie",
+        "legacy": false,
+        "icon": "super_s1",
+        "name": "super_strategist_1",
+        "bullets": [
+            "Ration Wasser",
+            "Kamera aus Vorkriegstagen (2 Ladungen)",
+            "1 anonymen Foren-Post verfassen"
+        ],
+        "citizenProperties": {
+            "props.watch_defense": 10,
+            "features.blackboard": true,
+            "features.group_messages": true,
+            "features.building_recommendation": true,
+            "props.limit.anonymous.posts": 1
+        },
+        "level": 1,
+        "unlockAt": 0,
+        "grantsItems": {
+            "0": "water_#00",
+            "apag": "photo_2_#00"
+        },
+        "itemTypesGrantedAsProfessionItems": [
+            "photo_2_#00"
+        ]
+    },
+    "super_strategist_2": {
+        "sort": 0,
+        "group": "Strategie",
+        "title": "Strategie",
+        "legacy": false,
+        "icon": "super_s2",
+        "name": "super_strategist_2",
+        "bullets": [
+            "Profi-Wächter: Deine Überlebenschancen bei der Nachtwache reduzieren sich langsamer",
+            "Kamera aus Vorkriegstagen (3 Ladungen)",
+            "Unbegrenzt anonyme Foren-Posts verfassen",
+            "Eine zusätzliche Beschwerde pro Tag möglich"
+        ],
+        "citizenProperties": {
+            "props.watch_defense": 10,
+            "features.blackboard": true,
+            "features.group_messages": true,
+            "features.building_recommendation": true,
+            "props.limit.anonymous.posts": -1,
+            "features.pro.watchman": true,
+            "props.limit.anonymous.complaint": 5
+        },
+        "level": 2,
+        "unlockAt": 40,
+        "grantsItems": {
+            "0": "water_#00",
+            "apag": "photo_3_#00"
+        },
+        "itemTypesGrantedAsProfessionItems": [
+            "photo_2_#00",
+            "photo_3_#00"
+        ]
+    },
+    "super_strategist_3": {
+        "sort": 0,
+        "group": "Strategie",
+        "title": "Strategie",
+        "legacy": false,
+        "icon": "super_s3",
+        "name": "super_strategist_3",
+        "bullets": [
+            "2% Bonus-Überlebenschance auf der Nachtwache",
+            "Unbegrenzt anonyme Nachrichten verfassen",
+            "Kamera aus Vorkriegstagen (4 Ladungen)",
+            "Diebstahl von Bürgern in der Stadt möglich",
+            "Durchgang in Kraft"
+        ],
+        "citizenProperties": {
+            "props.watch_defense": 10,
+            "features.blackboard": true,
+            "features.group_messages": true,
+            "features.building_recommendation": true,
+            "props.limit.anonymous.posts": -1,
+            "features.pro.watchman": true,
+            "props.limit.anonymous.complaint": 5,
+            "props.bonus.watch.survival": 0.02,
+            "props.limit.anonymous.messages": -1,
+            "features.advanced_theft": true
+        },
+        "level": 3,
+        "unlockAt": 80,
+        "grantsItems": {
+            "0": "water_#00",
+            "apag": "photo_4_#00"
+        },
+        "itemTypesGrantedAsProfessionItems": [
+            "photo_2_#00",
+            "photo_3_#00",
+            "photo_4_#00"
+        ],
+        "unlocksActions": [
+            "hero_armag"
+        ]
+    },
+    "super_university_0": {
+        "sort": 1,
+        "group": "Umsicht",
+        "title": "Umsicht",
+        "legacy": false,
+        "icon": "super_u0",
+        "name": "super_university_0",
+        "bullets": [
+            "Rettung eines anderen Bürgers (Distanz: 1km)",
+            "Den Tod besiegen (Dehydration & Infektion)",
+            "Fund"
+        ],
+        "unlocksActions": {
+            "0": "hero_generic_rescue",
+            "1": "hero_generic_immune",
+            "find": "hero_generic_find"
+        },
+        "citizenProperties": {
+            "props.actions.hero_rescue.range": 1,
+            "props.actions.hero_immune.protection": [
+                "thirst",
+                "infection"
+            ],
+            "config.status_override_map": {
+                "hsurvive2": "hsurvive2_l0"
+            }
+        },
+        "level": 0,
+        "unlockAt": 0
+    },
+    "super_university_1": {
+        "sort": 1,
+        "group": "Umsicht",
+        "title": "Umsicht",
+        "legacy": false,
+        "icon": "super_u1",
+        "name": "super_university_1",
+        "bullets": [
+            "Rettung eines anderen Bürgers (Distanz: 2km)",
+            "Den Tod besiegen (zusätzlicher Schutz vor Drogenentzug)",
+            "Schönes Fundstück (ersetzt Fund)"
+        ],
+        "unlocksActions": {
+            "0": "hero_generic_rescue",
+            "1": "hero_generic_immune",
+            "find": "hero_generic_find_lucky"
+        },
+        "citizenProperties": {
+            "props.actions.hero_rescue.range": 2,
+            "props.actions.hero_immune.protection": [
+                "thirst",
+                "infection",
+                "addiction"
+            ],
+            "config.status_override_map": {
+                "hsurvive2": "hsurvive2_l1"
+            }
+        },
+        "level": 1,
+        "unlockAt": 0
+    },
+    "super_university_2": {
+        "sort": 1,
+        "group": "Umsicht",
+        "title": "Umsicht",
+        "legacy": false,
+        "icon": "super_u2",
+        "name": "super_university_2",
+        "bullets": [
+            "Rettung eines anderen Bürgers (Distanz: 3km)",
+            "Den Tod besiegen (zusätzlicher Schutz vor Hungertod als Ghul)",
+            "Ein zusätzlicher Platz in der Truhe",
+            "Beeindruckendes Fundstück (ersetzt Schönes Fundstück)"
+        ],
+        "unlocksActions": {
+            "0": "hero_generic_rescue",
+            "1": "hero_generic_immune",
+            "find": "hero_generic_find_lucky2"
+        },
+        "citizenProperties": {
+            "props.actions.hero_rescue.range": 3,
+            "props.actions.hero_immune.protection": [
+                "thirst",
+                "infection",
+                "addiction",
+                "hunger"
+            ],
+            "config.status_override_map": {
+                "hsurvive2": "hsurvive2_l2"
+            },
+            "props.bonus.chest_space": 1
+        },
+        "level": 2,
+        "unlockAt": 40
+    },
+    "super_university_3": {
+        "sort": 1,
+        "group": "Umsicht",
+        "title": "Umsicht",
+        "legacy": false,
+        "icon": "super_u3",
+        "name": "super_university_3",
+        "bullets": [
+            "Den Tod besiegen (heilt Kater, Bandagiert und Angst)",
+            "Rudimentäre Pflege",
+            "Erstaunliches Fundstück (ersetzt Beeindruckendes Fundstück)"
+        ],
+        "unlocksActions": {
+            "0": "hero_generic_rescue",
+            "1": "hero_generic_immune",
+            "find": "hero_generic_find_lucky3",
+            "2": "hero_generic_immune2"
+        },
+        "citizenProperties": {
+            "props.actions.hero_rescue.range": 3,
+            "props.actions.hero_immune.protection": [
+                "thirst",
+                "infection",
+                "addiction",
+                "hunger"
+            ],
+            "config.status_override_map": {
+                "hsurvive2": "hsurvive2_l3"
+            },
+            "props.bonus.chest_space": 1,
+            "props.actions.hero_immune.heals": true
+        },
+        "level": 3,
+        "unlockAt": 80
+    },
+    "super_preparation_0": {
+        "sort": 2,
+        "group": "Planung",
+        "title": "Planung",
+        "legacy": false,
+        "icon": "super_p0",
+        "name": "super_preparation_0",
+        "bullets": [
+            "1 zusätzlicher Zonenkontrollpunkt wenn \"clean\"",
+            "Hellseherei: Du erfährst, wie aktiv ein bestimmter Bürger in deiner Stadt spielt.",
+            "Doggybag"
+        ],
+        "citizenProperties": {
+            "props.bonus.zone_control.clean": 1,
+            "features.clairvoyance.base": true
+        },
+        "grantsItems": {
+            "doggybag": "food_bag_#00"
+        },
+        "level": 0,
+        "unlockAt": 0
+    },
+    "super_preparation_1": {
+        "sort": 2,
+        "group": "Planung",
+        "title": "Planung",
+        "legacy": false,
+        "icon": "super_p1",
+        "name": "super_preparation_1",
+        "bullets": [
+            "1 zusätzlicher Zonenkontrollpunkt",
+            "Allwissenheit: Wie Hellseherei, außer, dass du jetzt eine Übersicht zur Aktivität aller Stadteinwohner bekommst",
+            "Vorräte eines umsichtigen Bürgers",
+            "Erste Hilfe Tasche"
+        ],
+        "citizenProperties": {
+            "props.bonus.zone_control.clean": 1,
+            "features.clairvoyance.base": true,
+            "props.bonus.zone_control.base": 1,
+            "features.clairvoyance.expanded": true
+        },
+        "grantsItems": {
+            "doggybag": "food_bag_#00",
+            "0": "chest_hero_#00",
+            "1": "medic_#00"
+        },
+        "level": 1,
+        "unlockAt": 0
+    },
+    "super_preparation_2": {
+        "sort": 2,
+        "group": "Planung",
+        "title": "Planung",
+        "legacy": false,
+        "icon": "super_p2",
+        "name": "super_preparation_2",
+        "bullets": [
+            "1 zusätzlicher Zonenkontrollpunkt wenn nicht \"durstig\" oder \"dehydriert\"",
+            "Gewöhnlicher Bauplan",
+            "Lunchbox (statt Doggybag)"
+        ],
+        "citizenProperties": {
+            "props.bonus.zone_control.clean": 1,
+            "features.clairvoyance.base": true,
+            "props.bonus.zone_control.base": 1,
+            "features.clairvoyance.expanded": true,
+            "props.bonus.zone_control.hydrated": 1
+        },
+        "grantsItems": {
+            "doggybag": "food_armag_#00",
+            "0": "chest_hero_#00",
+            "1": "medic_#00",
+            "plan": "bplan_c_#00"
+        },
+        "level": 2,
+        "unlockAt": 40
+    },
+    "super_preparation_3": {
+        "sort": 2,
+        "group": "Planung",
+        "title": "Planung",
+        "legacy": false,
+        "icon": "super_p3",
+        "name": "super_preparation_3",
+        "bullets": [
+            "1 zusätzlicher Zonenkontrollpunkt wenn nicht \"betrunken\" oder \"verkatert\"",
+            "Abgenutzte Kuriertasche (statt Bauplan) beim Start der Stadt",
+            "Cellokasten"
+        ],
+        "citizenProperties": {
+            "props.bonus.zone_control.clean": 1,
+            "features.clairvoyance.base": true,
+            "props.bonus.zone_control.base": 1,
+            "features.clairvoyance.expanded": true,
+            "props.bonus.zone_control.hydrated": 1,
+            "props.bonus.zone_control.sober": 1
+        },
+        "grantsItems": {
+            "doggybag": "food_armag_#00",
+            "0": "chest_hero_#00",
+            "1": "medic_#00",
+            "plan": "bplan_drop_#00",
+            "2": "cello_box_#00"
+        },
+        "level": 3,
+        "unlockAt": 80
+    },
+    "super_enduring_0": {
+        "sort": 3,
+        "group": "Eifer",
+        "title": "Eifer",
+        "legacy": false,
+        "icon": "super_e0",
+        "name": "super_enduring_0",
+        "bullets": [
+            "Ein zusätzlicher Platz im Rucksack",
+            "Ein zusätzlicher Platz in der Truhe",
+            "Wildstyle Uppercut",
+            "Zweite Lunge (3 AP, 1 EP)"
+        ],
+        "citizenProperties": {
+            "props.bonus.rucksack_space": 1,
+            "props.bonus.chest_space": 1,
+            "props.actions.hero_sw.ap": 3,
+            "props.actions.hero_sw.sp": 1
+        },
+        "unlocksActions": [
+            "hero_generic_punch",
+            "hero_generic_ap"
+        ],
+        "level": 0,
+        "unlockAt": 0
+    },
+    "super_enduring_1": {
+        "sort": 3,
+        "group": "Eifer",
+        "title": "Eifer",
+        "legacy": false,
+        "icon": "super_e1",
+        "name": "super_enduring_1",
+        "bullets": [
+            "Ein weiterer zusätzlicher Platz im Rucksack",
+            "Ein weiterer zusätzlicher Platz in der Truhe",
+            "Verbesserung Wildstyle Uppercut (3 Zombies)",
+            "Verbesserung Zweite Lunge (3 AP, 3 EP)"
+        ],
+        "citizenProperties": {
+            "props.bonus.rucksack_space": 2,
+            "props.bonus.chest_space": 2,
+            "props.actions.hero_sw.ap": 3,
+            "props.actions.hero_sw.sp": 3,
+            "props.actions.hero_punch.kills": 3
+        },
+        "unlocksActions": [
+            "hero_generic_punch",
+            "hero_generic_ap"
+        ],
+        "level": 1,
+        "unlockAt": 0
+    },
+    "super_enduring_2": {
+        "sort": 3,
+        "group": "Eifer",
+        "title": "Eifer",
+        "legacy": false,
+        "icon": "super_e2",
+        "name": "super_enduring_2",
+        "bullets": [
+            "1 Gegenstand in der Truhe ist versteckt",
+            "Verbesserung Wildstyle Uppercut (4 Zombies)",
+            "Verbesserung Zweite Lunge (4 AP, 4 EP)",
+            "15 Extra-O² in begehbaren Ruinen"
+        ],
+        "citizenProperties": {
+            "props.bonus.rucksack_space": 2,
+            "props.bonus.chest_space": 2,
+            "props.actions.hero_sw.ap": 4,
+            "props.actions.hero_sw.sp": 4,
+            "props.actions.hero_punch.kills": 4,
+            "props.limit.chest.hidden.count": 1,
+            "props.bonus.oxygen_time": 45
+        },
+        "unlocksActions": [
+            "hero_generic_punch",
+            "hero_generic_ap"
+        ],
+        "level": 2,
+        "unlockAt": 40
+    },
+    "super_enduring_3": {
+        "sort": 3,
+        "group": "Eifer",
+        "title": "Eifer",
+        "legacy": false,
+        "icon": "super_e3",
+        "name": "super_enduring_3",
+        "bullets": [
+            "Ein weiterer zusätzlicher Platz im Rucksack",
+            "Verbesserung Zweite Lunge (4 AP, 6 EP)",
+            "30 Extra-O² in begehbaren Ruinen"
+        ],
+        "citizenProperties": {
+            "props.bonus.rucksack_space": 3,
+            "props.bonus.chest_space": 2,
+            "props.actions.hero_sw.ap": 4,
+            "props.actions.hero_sw.sp": 6,
+            "props.actions.hero_punch.kills": 4,
+            "props.limit.chest.hidden.count": 1,
+            "props.bonus.oxygen_time": 90
+        },
+        "unlocksActions": [
+            "hero_generic_punch",
+            "hero_generic_ap"
+        ],
+        "level": 3,
+        "unlockAt": 80
+    },
+    "super_recluse0": {
+        "sort": 4,
+        "group": "Ruhe",
+        "title": "Ruhe",
+        "legacy": false,
+        "icon": "super_r0",
+        "name": "super_recluse0",
+        "bullets": [
+            "Rückkehr des Helden (9km)",
+            "Proficamper (auf 6 Campings begrenzt)",
+            "Manipulieren von Registereinträgen (max. 1)"
+        ],
+        "unlocksActions": [
+            "hero_generic_return"
+        ],
+        "citizenProperties": {
+            "features.pro.camper": true,
+            "props.limit.camping.pro": 6,
+            "props.limit.log_manipulation": 1
+        },
+        "level": 0,
+        "unlockAt": 0
+    },
+    "super_recluse1": {
+        "sort": 4,
+        "group": "Ruhe",
+        "title": "Ruhe",
+        "legacy": false,
+        "icon": "super_r1",
+        "name": "super_recluse1",
+        "bullets": [
+            "Rückkehr des Helden (11km)",
+            "Proficamper (auf 8 Campings begrenzt)",
+            "Solltest du am dritten Tag oder an einem späteren Zeitpunkt verbannt werden, bekommst du automatisch etwas Gift geschenkt, das du nach Belieben einsetzen kannst... Tja, man hätte dich besser nicht ärgern sollen!",
+            "Manipulieren von Registereinträgen (max. 2)"
+        ],
+        "unlocksActions": [
+            "hero_generic_return"
+        ],
+        "citizenProperties": {
+            "features.pro.camper": true,
+            "props.limit.camping.pro": 8,
+            "props.limit.log_manipulation": 2,
+            "props.actions.hero_return.range": 11,
+            "config.revenge_items": [
+                "poison_#00",
+                "poison_#00"
+            ]
+        },
+        "level": 1,
+        "unlockAt": 0
+    },
+    "super_recluse2": {
+        "sort": 4,
+        "group": "Ruhe",
+        "title": "Ruhe",
+        "legacy": false,
+        "icon": "super_r2",
+        "name": "super_recluse2",
+        "bullets": [
+            "Rückkehr des Helden (13km)",
+            "Solltest du am dritten Tag oder an einem späteren Zeitpunkt verbannt werden, bekommst du automatisch etwas Toxin geschenkt, das du nach Belieben einsetzen kannst... Tja, man hätte dich besser nicht ärgern sollen!",
+            "1 zusätzliche Mülldurchwühlung pro Tag",
+            "Manipulieren von Registereinträgen (max. 3)"
+        ],
+        "unlocksActions": [
+            "hero_generic_return"
+        ],
+        "citizenProperties": {
+            "features.pro.camper": true,
+            "props.limit.camping.pro": 8,
+            "props.limit.log_manipulation": 3,
+            "props.actions.hero_return.range": 13,
+            "config.revenge_items": [
+                "poison_#00",
+                "poison_#00",
+                "infect_poison_#00"
+            ],
+            "props.limit.trash.count": 4
+        },
+        "level": 2,
+        "unlockAt": 40
+    },
+    "super_recluse3": {
+        "sort": 4,
+        "group": "Ruhe",
+        "title": "Ruhe",
+        "legacy": false,
+        "icon": "super_r3",
+        "name": "super_recluse3",
+        "bullets": [
+            "Rückkehr des Helden (15km)",
+            "Ermöglicht Überlebenschance beim Camping von bis zu 99%",
+            "Löschen von Registereinträgen (max. 1)"
+        ],
+        "unlocksActions": [
+            "hero_generic_return"
+        ],
+        "citizenProperties": {
+            "features.pro.camper": true,
+            "props.limit.camping.pro": 8,
+            "props.limit.log_manipulation": 3,
+            "props.actions.hero_return.range": 15,
+            "config.revenge_items": [
+                "poison_#00",
+                "poison_#00",
+                "infect_poison_#00"
+            ],
+            "props.limit.trash.count": 4,
+            "props.limit.camping.cap": 0.99,
+            "props.limit.log_purge": 1
+        },
+        "level": 3,
+        "unlockAt": 80
     }
 }

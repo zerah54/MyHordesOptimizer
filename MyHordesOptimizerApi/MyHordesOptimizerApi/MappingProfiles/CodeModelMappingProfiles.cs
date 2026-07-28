@@ -27,7 +27,7 @@ namespace MyHordesOptimizerApi.MappingProfiles
 
             CreateMap<MyHordesHerosCapacitiesCodeModel, HeroSkill>()
                 .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
-                .ForMember(dest => dest.DaysNeeded, opt => opt.MapFrom(src => src.DaysNeeded))
+                .ForMember(dest => dest.DaysNeeded, opt => opt.MapFrom(src => src.UnlockAt))
                 .ForMember(dest => dest.NbUses, opt => opt.Ignore())
                 .ForMember(dest => dest.Icon, opt => opt.MapFrom(src => src.Icon))
                 .ForMember(dest => dest.LabelDe, opt => opt.MapFrom(src => src.Title))
