@@ -4,9 +4,25 @@ namespace MyHordesOptimizerApi.Extensions.Models
 {
     public static class TownCitizenExtensions
     {
+        /// <summary>
+        /// Applique le détail « maison » remonté par le script depuis la page des travaux.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// <b>Le niveau de la maison n'est volontairement PAS écrit ici.</b> MyHordes le donne déjà,
+        /// pour tous les citoyens et sans saisie : <c>baseDef</c> vaut la défense du prototype de la
+        /// maison, fonction du seul niveau (0, 1, 4, 9, 16, 25, 36, 49, 64 — soit n²), et il est
+        /// persisté dans <c>HouseDefense</c>. Une valeur lue dans le DOM ne peut être qu'au mieux
+        /// redondante, au pire périmée : elle ne doit pas prendre le pas sur celle du jeu.
+        /// </para>
+        /// <para>
+        /// Le script continue de l'envoyer pour l'instant, et le mapping continue de la décoder —
+        /// c'est délibéré, le temps de vérifier si un autre consommateur s'en sert. Seule
+        /// l'écriture en base est retirée.
+        /// </para>
+        /// </remarks>
         public static void ImportHomeDetail(this TownCitizen src, TownCitizen homeDetail)
         {
-            src.HouseLevel = homeDetail.HouseLevel;
             src.HasAlarm = homeDetail.HasAlarm;
             src.ChestLevel = homeDetail.ChestLevel;
             src.HasCurtain = homeDetail.HasCurtain;

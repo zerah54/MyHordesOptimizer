@@ -22,5 +22,12 @@ namespace MyHordesOptimizerApi.Services.Interfaces.Import
         Task ImportSingleTownAsync(int townId);
         Task RefreshUserNamesAsync(int? limit = null);
         Task RecomputeUserDirectoryStatsAsync();
+
+        /// <summary>
+        /// Reprise unique : renseigne <c>mhId</c> sur les quatre référentiels, et <c>uid</c> sur
+        /// les pictos, en rapprochant chaque ligne de MyHordes sur son identité. Constate sans
+        /// marquer d'obsolescence.
+        /// </summary>
+        Task<ReferentialBackfillReport> BackfillReferentialIdsAsync();
     }
 }

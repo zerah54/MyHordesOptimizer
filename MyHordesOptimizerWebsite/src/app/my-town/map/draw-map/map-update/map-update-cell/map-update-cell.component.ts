@@ -1,5 +1,5 @@
 import { CommonModule, NgOptimizedImage } from '@angular/common';
-import { Component, DestroyRef, inject, input, InputSignal, OnInit, output,OutputEmitterRef } from '@angular/core';
+import { Component, DestroyRef, inject, input, InputSignal, OnInit, output, OutputEmitterRef } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatCheckboxModule } from '@angular/material/checkbox';
@@ -20,12 +20,13 @@ import { Item } from '../../../../../_abstract_model/types/item.class';
 import { ItemCountShort } from '../../../../../_abstract_model/types/item-count-short.class';
 import { ArrayItemDetailsPipe } from '../../../../../_core/pipes/array-item-details.pipe';
 import { ItemDetailsPipe } from '../../../../../_core/pipes/item-details.pipe';
+import { ItemImgPipe } from '../../../../../_core/pipes/item-img.pipe';
 import { LastUpdateComponent } from '../../../../../_shared/last-update/last-update.component';
 import { ItemsInBagsPipe } from './items-in-bags.pipe';
 
 const angular_common: Imports = [CommonModule, FormsModule, NgOptimizedImage, ReactiveFormsModule];
 const components: Imports = [LastUpdateComponent];
-const pipes: Imports = [ArrayItemDetailsPipe, ItemDetailsPipe, ItemsInBagsPipe];
+const pipes: Imports = [ArrayItemDetailsPipe, ItemImgPipe, ItemDetailsPipe, ItemsInBagsPipe];
 const material_modules: Imports = [MatCheckboxModule, MatDividerModule, MatFormFieldModule, MatInputModule, MatMenuModule, MatSelectModule];
 
 @Component({
@@ -35,18 +36,11 @@ const material_modules: Imports = [MatCheckboxModule, MatDividerModule, MatFormF
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class MapUpdateCellComponent implements OnInit {
-    private readonly fb: FormBuilder = inject(FormBuilder);
-
-
     public citizens: InputSignal<Citizen[]> = input.required();
-
     public cell: InputSignal<Cell> = input.required();
     public cellChange: OutputEmitterRef<Cell> = output();
-
     protected all_items: Item[] = [];
-
     protected cell_form!: FormGroup;
-
     /** Les quatre directions accessibles, dans l'ordre d'affichage du radar */
     protected readonly directions: RadarDirection[] = [
         { key: 'north', label: Direction.NORTH.getLabel() },
@@ -54,12 +48,25 @@ export class MapUpdateCellComponent implements OnInit {
         { key: 'east', label: Direction.EAST.getLabel() },
         { key: 'south', label: Direction.SOUTH.getLabel() }
     ];
-
     protected readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
     protected readonly locale: string = moment.locale();
-
+    private readonly fb: FormBuilder = inject(FormBuilder);
     private readonly api: ApiService = inject(ApiService);
     private readonly destroy_ref: DestroyRef = inject(DestroyRef);
+
+    /** Un champ vide ou non renseigné ne doit pas être transmis comme la valeur 0 */
+    private static toNullableNumber(value: number | string | null | undefined): number | null {
+        if (value === null || value === undefined || value === '') return null;
+        const parsed: number = +value;
+        return isNaN(parsed) ? null : parsed;
+    }
+
+    /** Construit un radar à partir des 4 directions, ou null si aucune n'est renseignée */
+    private static buildRadar<T>(values: (T | null)[]): { north: T | null, south: T | null, east: T | null, west: T | null } | null {
+        const [north, south, east, west]: (T | null)[] = values;
+        if (north === null && south === null && east === null && west === null) return null;
+        return { north, south, east, west };
+    }
 
     public ngOnInit(): void {
         this.api.getItems()
@@ -106,21 +113,6 @@ export class MapUpdateCellComponent implements OnInit {
                 this.cellChange.emit(new_cell);
             });
     }
-
-    /** Un champ vide ou non renseigné ne doit pas être transmis comme la valeur 0 */
-    private static toNullableNumber(value: number | string | null | undefined): number | null {
-        if (value === null || value === undefined || value === '') return null;
-        const parsed: number = +value;
-        return isNaN(parsed) ? null : parsed;
-    }
-
-    /** Construit un radar à partir des 4 directions, ou null si aucune n'est renseignée */
-    private static buildRadar<T>(values: (T | null)[]): { north: T | null, south: T | null, east: T | null, west: T | null } | null {
-        const [north, south, east, west]: (T | null)[] = values;
-        if (north === null && south === null && east === null && west === null) return null;
-        return { north, south, east, west };
-    }
-
 
     /**
      * Si l'item est déjà dans la liste, on fait +1

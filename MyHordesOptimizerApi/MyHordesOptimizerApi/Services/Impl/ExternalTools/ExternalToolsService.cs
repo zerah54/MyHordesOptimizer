@@ -163,6 +163,9 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                             // Mise à jour centralisée : on exploite tout le /json/me déjà payé
                             // (day, puits, porte, dimensions, coordonnées...), pas seulement 6 champs
                             townEntity.UpdateFromMapDetails(me.Map);
+                            // Appel SÉPARÉ, et réservé à /json/me : c'est la seule source qui demande
+                            // les trois rôles, et leur absence y signifie « plus personne ».
+                            townEntity.UpdateRolesFromMapDetails(me.Map);
                             if (me.MapId > 0)
                             {
                                 townEntity.MapId = me.MapId;
@@ -176,20 +179,33 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                         var zoneItemY = -1;
                         var allCell = dbContext.MapCells.Where(cell => cell.IdTown == townId)
                                                         .ToList();
-                        foreach (var zone in zones)
+                        // Les identifiants de ruine et d'objet portés par la carte sont ceux de
+                        // MyHordes : ce sont des auto-incréments de fixtures, ils se traduisent en
+                        // clés MHO plutôt que de se recopier. Une entrée dont le mhId n'est pas
+                        // encore renseigné est lue sous sa clé, ce qu'elle signifiait avant le
+                        // découplage.
+                        var clesRuineParMhId = dbContext.Ruins.ToList()
+                            .ToDictionary(ruin => ruin.MhId ?? ruin.IdRuin, ruin => ruin.IdRuin);
+                        var clesItemParMhId = dbContext.Items.ToList()
+                            .ToDictionary(item => item.MhId ?? item.IdItem, item => item.IdItem);
+                        // X et Y sont les clés de la case. MyHordes les ajoute d'office, même non
+                        // demandés, mais on ne s'appuie pas sur une chaîne `fields=` : sans
+                        // coordonnées, la case n'est pas localisable.
+                        foreach (var zone in zones.Where(zone => zone.X.HasValue && zone.Y.HasValue))
                         {
                             int? nbHero = null;
                             int? nbZombie = null;
                             bool? isDried = null;
 
+                            // Details est désormais typé : le tableau vide que MyHordes renvoie pour
+                            // les cases sans détail est traduit en null par EmptyPhpArrayConverter,
+                            // ce qui remplace la désérialisation manuelle qui vivait ici.
                             var details = zone.Details;
-                            if (details.GetType() != typeof(JArray))
+                            if (details != null)
                             {
-                                var jObject = details as JObject;
-                                var detail = jObject.ToObject<MyHordesDetails>();
-                                nbHero = detail.H;
-                                nbZombie = detail.Z;
-                                isDried = detail.Dried;
+                                nbHero = details.H;
+                                nbZombie = details.Z;
+                                isDried = details.Dried;
                             }
 
                             int? averagePotentialRemainingDig = null;
@@ -199,15 +215,31 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                                 averagePotentialRemainingDig = 0;
                                 maxPotentialRemainingDig = 0;
                             }
+                            // Le sentinel négatif (case enterrée) n'est pas un prototype du jeu :
+                            // MHO lui réserve la ruine « bâtiment non déterré », de clé négative
+                            // elle aussi. Aucune traduction ne doit y toucher.
                             int? type = zone.Building?.Type;
+                            if (type.HasValue && type.Value >= 0)
+                            {
+                                if (clesRuineParMhId.TryGetValue(type.Value, out var cleRuine))
+                                {
+                                    type = cleRuine;
+                                }
+                                else
+                                {
+                                    Logger.LogWarning("UpdateMap : ruine {MhId} inconnue en {X}/{Y}, case laissée sans bâtiment.",
+                                        type.Value, zone.X, zone.Y);
+                                    type = null;
+                                }
+                            }
                             var cellModel = allCell.FirstOrDefault(cell => cell.X == zone.X
                                                                   && cell.Y == zone.Y);
                             var cell = new MapCell()
                             {
                                 IdTown = townId,
                                 IdLastUpdateInfo = newLastUpdate.IdLastUpdateInfo,
-                                X = zone.X,
-                                Y = zone.Y,
+                                X = zone.X.Value,
+                                Y = zone.Y.Value,
                                 IsTown = zone.X == me.Map.City.X && zone.Y == me.Map.City.Y,
                                 IsVisitedToday = !Convert.ToBoolean(zone.Nvt),
                                 IsNeverVisited = false,
@@ -225,14 +257,22 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                             };
                             if (zone.Items != null)
                             {
-                                zoneItemX = zone.X;
-                                zoneItemY = zone.Y;
-                                foreach (var item in zone.Items)
+                                zoneItemX = zone.X.Value;
+                                zoneItemY = zone.Y.Value;
+                                // IdItem est une clé étrangère : un objet sans id n'est pas un objet.
+                                // On l'ignore plutôt que d'inventer un identifiant.
+                                foreach (var item in zone.Items.Where(item => item.Id.HasValue))
                                 {
+                                    if (!clesItemParMhId.TryGetValue(item.Id.Value, out var cleItem))
+                                    {
+                                        Logger.LogWarning("UpdateMap : objet {MhId} inconnu en {X}/{Y}, ignoré.",
+                                            item.Id.Value, zone.X, zone.Y);
+                                        continue;
+                                    }
                                     var cellItem = new MapCellItem()
                                     {
                                         Count = item.Count,
-                                        IdItem = item.Id,
+                                        IdItem = cleItem,
                                         IsBroken = item.Broken,
                                         IdCell = cellModel.IdCell
                                     };

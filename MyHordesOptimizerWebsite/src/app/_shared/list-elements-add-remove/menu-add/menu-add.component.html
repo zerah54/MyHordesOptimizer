@@ -1,9 +1,9 @@
 <mat-menu #menuAdd="matMenu" class="mho-menu-add {{class()}}">
-    <ng-template matMenuContent let-menuLabel="menuLabel" let-lists="lists">
-        <div class="search" (click)="$event.stopPropagation()">
-            <mat-form-field subscriptSizing="dynamic" style="width: 100%">
+    <ng-template let-lists="lists" let-menuLabel="menuLabel" matMenuContent>
+        <div (click)="$event.stopPropagation()" class="search">
+            <mat-form-field style="width: 100%" subscriptSizing="dynamic">
                 <mat-label>{{ menuLabel }}</mat-label>
-                <input matInput #searchItem>
+                <input #searchItem matInput>
             </mat-form-field>
         </div>
         <div class="items">
@@ -27,8 +27,8 @@
                         <div>{{ category.category.label[locale] }}</div>
                         @for (item of category.items; track item) {
                             @if (searchItem.value === '' || $any(item.label[$any(locale)] ? item.label[$any(locale)] : item.label).toLowerCase().indexOf(searchItem.value.toLowerCase()) > -1) {
-                                <img [ngSrc]="HORDES_IMG_REPO + item.img" (click)="add.emit(item.id);" width="16" height="16"
-                                     [title]="$any(item.label[$any(locale)] ? (item.label[$any(locale)] || '') : item.label)">
+                                <img (click)="add.emit(item.id);" [ngSrc]="HORDES_IMG_REPO + item.img" [title]="$any(item.label[$any(locale)] ? (item.label[$any(locale)] || '') : item.label)" height="16"
+                                     width="16">
                             }
                         }
                     </div>
@@ -36,8 +36,9 @@
             } @else {
                 @for (item of itemList; track item) {
                     @if (searchItem.value === '' || $any(item.label[$any(locale)] ? item.label[$any(locale)] : item.label).toLowerCase().indexOf(searchItem.value.toLowerCase()) > -1) {
-                        <img [ngSrc]="HORDES_IMG_REPO + item.img" [class.broken]="item.is_broken" (click)="add.emit(item.id);" width="16" height="16"
-                             [title]="$any(item.label[$any(locale)] ? item.label[$any(locale)] : item.label)">
+                        <img (click)="add.emit(item.id);" [class.broken]="item.is_broken" [ngSrc]="HORDES_IMG_REPO + (item | itemImg:item.is_broken)" [title]="$any(item.label[$any(locale)] ? item.label[$any(locale)] : item.label)"
+                             height="16"
+                             width="16">
                     }
                 }
             }

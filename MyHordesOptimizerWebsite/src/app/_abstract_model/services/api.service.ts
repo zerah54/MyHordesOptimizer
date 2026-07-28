@@ -10,11 +10,13 @@ import {
     setItemsWithExpirationDate,
     setRuinsWithExpirationDate,
 } from '../../_core/utilities/localstorage.util';
+import { BuildingDTO } from '../dto/building.dto';
 import { HeroSkillDTO } from '../dto/hero-skill.dto';
 import { ItemDTO } from '../dto/item.dto';
 import { RecipeDTO } from '../dto/recipe.dto';
 import { RuinDTO } from '../dto/ruin.dto';
 import { dtoToModelArray } from '../types/_common.class';
+import { Building } from '../types/building.class';
 import { HeroSkill } from '../types/hero-skill.class';
 import { Item } from '../types/item.class';
 import { Recipe } from '../types/recipe.class';
@@ -58,6 +60,26 @@ export class ApiService extends GlobalService {
      *
      * @returns {Observable<Ruin[]>}
      */
+    /**
+     * Référentiel des chantiers de ville, pour la page wiki.
+     *
+     * Pas de cache local : la liste est petite (166 entrées) et ne change qu'aux mises à jour du
+     * jeu — le cache des objets et des ruines existe parce qu'ils sont lus à chaque écran.
+     */
+    public getBuildings(): Observable<Building[]> {
+        return new Observable((sub: Subscriber<Building[]>) => {
+            super.get<BuildingDTO[]>(`${this.API_URL}/Fetcher/Buildings`)
+                .subscribe({
+                    next: (response: HttpResponse<BuildingDTO[]>) => {
+                        sub.next(dtoToModelArray(Building, response.body));
+                    },
+                    error: (error: HttpErrorResponse) => {
+                        sub.error(error);
+                    }
+                });
+        });
+    }
+
     public getRuins(force?: boolean): Observable<Ruin[]> {
         return new Observable((sub: Subscriber<Ruin[]>) => {
             const saved_ruins: Ruin[] = getRuinsWithExpirationDate();

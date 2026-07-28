@@ -10,13 +10,14 @@ import { HORDES_IMG_REPO } from '../../../../../_abstract_model/const';
 import { HeroicActionEnum } from '../../../../../_abstract_model/enum/heroic-action.enum';
 import { Imports } from '../../../../../_abstract_model/types/_types';
 import { Citizen } from '../../../../../_abstract_model/types/citizen.class';
+import { ItemImgPipe } from '../../../../../_core/pipes/item-img.pipe';
 import { CitizenInfoComponent } from '../../../../../_shared/citizen-info/citizen-info.component';
 import { HasStillHeroicPipe } from './has-still-heroic.pipe';
 import { NotInListCitizenPipe } from './not-in-list-citizen.pipe';
 
 const angular_common: Imports = [CommonModule, NgOptimizedImage];
 const components: Imports = [CitizenInfoComponent];
-const pipes: Imports = [HasStillHeroicPipe, NotInListCitizenPipe];
+const pipes: Imports = [HasStillHeroicPipe, ItemImgPipe, NotInListCitizenPipe];
 const material_modules: Imports = [MatButtonModule, MatIconModule, MatListModule, MatMenuModule];
 
 @Component({

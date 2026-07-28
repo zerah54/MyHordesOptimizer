@@ -5,9 +5,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using MyHordesOptimizerApi.Configuration.Interfaces;
 using MyHordesOptimizerApi.Dtos.MyHordes;
-using MyHordesOptimizerApi.Dtos.MyHordes.Me;
 using MyHordesOptimizerApi.Dtos.MyHordes.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
+using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Buildings;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Citizens;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Map;
 using MyHordesOptimizerApi.Exceptions;
@@ -71,6 +71,10 @@ namespace MyHordesOptimizerApi.Services.Impl
                 sw.Start();
                 var townBankItemLastUpdateId = DbContext.TownBankItems.Where(tbi => tbi.IdTown == townId).Max(tbi => (int?)tbi.IdLastUpdateInfo);
                 var items = DbContext.Items
+                    // Catalogue : les prototypes que MyHordes ne renvoie plus n'ont plus à être
+                    // proposés. Leur ligne reste en base et reste résolvable par navigation — la
+                    // banque, les sacs et la carte continuent de les afficher.
+                    .Where(item => !item.IsObsolete)
                     .Include(item => item.IdCategoryNavigation)
                     .AsSplitQuery()
                     .Include(item => item.PropertyNames)
@@ -103,6 +107,8 @@ namespace MyHordesOptimizerApi.Services.Impl
             {
                 sw.Start();
                 var items = DbContext.Items
+                   // Catalogue : voir la branche par ville ci-dessus.
+                   .Where(item => !item.IsObsolete)
                    .Include(item => item.IdCategoryNavigation)
                    .AsSplitQuery()
                    .Include(item => item.PropertyNames)
@@ -149,7 +155,7 @@ namespace MyHordesOptimizerApi.Services.Impl
             {
                 Logger.LogDebug("GetSimpleMeAsync Waiting for Lock");
                 // Clé de verrou : l'IdTown provisoire (-mapId) écrit par le mapping ci-dessous.
-                await using var townLock = await TownSyncLock.AcquireTownAsync(-myHordeMeResponse.MapId);
+                await using var townLock = await TownSyncLock.AcquireTownAsync(-myHordeMeResponse.MapId.Value);
                 Logger.LogDebug($"GetSimpleMeAsync Lock ok après {sw.Elapsed} ms");
                 if (!HasTownIdCollision(myHordeMeResponse))
                 {
@@ -234,10 +240,10 @@ namespace MyHordesOptimizerApi.Services.Impl
                             .ToList();
                         DbContext.AddRange(distinctCadavers);
                         // On crée les cells
-                        var cells = CreateCellsForTown(xVille: myHordeMeResponse.Map.City.X,
-                            yVille: myHordeMeResponse.Map.City.Y,
-                            mapWid: myHordeMeResponse.Map.Wid,
-                            mapHei: myHordeMeResponse.Map.Hei,
+                        var cells = CreateCellsForTown(xVille: myHordeMeResponse.Map.City.X.Value,
+                            yVille: myHordeMeResponse.Map.City.Y.Value,
+                            mapWid: myHordeMeResponse.Map.Wid.Value,
+                            mapHei: myHordeMeResponse.Map.Hei.Value,
                             townId: town.IdTown,
                             lastUpdate);
                         DbContext.AddRange(cells);
@@ -249,16 +255,18 @@ namespace MyHordesOptimizerApi.Services.Impl
                         Logger.LogDebug($"GetSimpleMeAsync La Town existe {town.IdTown} !");
                         // On met à jour la ville (logique partagée avec les outils externes et l'import)
                         existingTown.UpdateFromMapDetails(myHordeMeResponse.Map);
+                        // Appel SÉPARÉ, et réservé à /json/me : c'est la seule source qui demande les
+                        // trois rôles, et leur absence y signifie « plus personne » — pas « non transmis ».
+                        existingTown.UpdateRolesFromMapDetails(myHordeMeResponse.Map);
                         if (myHordeMeResponse.MapId > 0)
                         {
                             existingTown.MapId = myHordeMeResponse.MapId;
                         }
-                        // La langue n'est pas portée par /json/map : on la rafraîchit depuis le locale
-                        // du citoyen connecté (UpdateFromMapDetails ne peut pas la déduire de la carte).
-                        if (!string.IsNullOrEmpty(myHordeMeResponse.Locale))
-                        {
-                            existingTown.Language = myHordeMeResponse.Locale;
-                        }
+                        // La langue de la ville vient UNIQUEMENT de `map.language`, écrit par
+                        // UpdateFromMapDetails. Le `locale` du joueur qui synchronise n'a AUCUN
+                        // rapport avec elle — un joueur allemand dans une ville française reste un
+                        // joueur allemand — et ne doit jamais l'alimenter, pas même en repli : mieux
+                        // vaut une colonne vide qu'une langue fausse.
                         // Garde-fou : le citoyen connecté est dans cette ville, elle ne peut pas être terminée
                         existingTown.IsFinished = false;
                         DbContext.Update(existingTown);
@@ -339,24 +347,17 @@ namespace MyHordesOptimizerApi.Services.Impl
                                 .ToList();
                             DirectionEnum regen = DirectionEnum.All;
 
-                            var dynamicNews = myHordeMeResponse.Map.City.News;
-                            MyHordesNews news = null;
-                            if (dynamicNews.GetType() == typeof(JObject))
-                            {
-                                var jObject = dynamicNews as JObject;
-                                if (jObject != null)
-                                {
-                                    news = jObject.ToObject<MyHordesNews>();
-                                }
-                            }
+                            // News est désormais typé : le tableau vide renvoyé au jour 1, ou quand la
+                            // gazette ne se rend pas, est traduit en null par EmptyPhpArrayConverter.
+                            var news = myHordeMeResponse.Map.City.News;
                             if (news != null && news.RegenDir != null)
                             {
                                 var regenDirLabel = news.RegenDir.De;
                                 regen = regenDirLabel.GetEnumFromDescription<DirectionEnum>();
                             }
                             float averageNbOfItemAdded = ((float)MyHordesScrutateurConfiguration.MinItemAdd + ((float)MyHordesScrutateurConfiguration.MaxItemAdd - (float)MyHordesScrutateurConfiguration.MinItemAdd) / (float)2);
-                            var xVille = myHordeMeResponse.Map.City.X;
-                            var yVille = myHordeMeResponse.Map.City.Y;
+                            var xVille = myHordeMeResponse.Map.City.X.Value;
+                            var yVille = myHordeMeResponse.Map.City.Y.Value;
                             foreach (var cell in cells)
                             {
                                 var xFromTown = cell.X - xVille;
@@ -418,7 +419,7 @@ namespace MyHordesOptimizerApi.Services.Impl
                             }
                             var mapCellDigUpdate = new MapCellDigUpdate()
                             {
-                                Day = myHordeMeResponse.Map.Days,
+                                Day = myHordeMeResponse.Map.Days.Value,
                                 IdTown = town.IdTown,
                                 DirectionRegen = (int)regen,
                                 LevelRegen = scrutLevel,
@@ -442,7 +443,7 @@ namespace MyHordesOptimizerApi.Services.Impl
             // qui reprendra le verrou de la ville pour son compte.
             if (townSynchronized)
             {
-                QueueCadaverPictosUpsert(-myHordeMeResponse.MapId, myHordeMeResponse.Map.Cadavers);
+                QueueCadaverPictosUpsert(-myHordeMeResponse.MapId.Value, myHordeMeResponse.Map.Cadavers);
             }
 
             // L'historique des villes jouées n'est plus importé ici : il est alimenté par
@@ -467,7 +468,7 @@ namespace MyHordesOptimizerApi.Services.Impl
         /// Le scope dédié est indispensable : le <see cref="MhoContext"/> de la requête est libéré
         /// dès la réponse envoyée, l'utiliser depuis la tâche de fond lèverait un ObjectDisposed.
         /// </summary>
-        private void QueueCadaverPictosUpsert(int townId, List<MyHordesCadaver> cadavers)
+        private void QueueCadaverPictosUpsert(int townId, List<MyHordesCitizenRankingDto> cadavers)
         {
             if (cadavers == null || cadavers.Count == 0)
             {
@@ -517,7 +518,7 @@ namespace MyHordesOptimizerApi.Services.Impl
         // un espace qui ne peut jamais entrer en collision avec un vrai townId (toujours positif).
         // Le seul risque résiduel : un mapId recyclé d'une saison à l'autre retombant sur une ancienne
         // ligne provisoire jamais migrée. On la détecte via la saison et on refuse de la réutiliser.
-        private bool HasTownIdCollision(MyHordesMeResponseDto myHordeMeResponse)
+        private bool HasTownIdCollision(MyHordesUserDetailsDto myHordeMeResponse)
         {
             var mapId = myHordeMeResponse.MapId;
             var season = myHordeMeResponse.Map?.Season;
@@ -543,10 +544,11 @@ namespace MyHordesOptimizerApi.Services.Impl
         // 4 langues demandées, mais pas `community`, qui reste donc à sa valeur par défaut.
         // Ne couvre que les morts : les pictos d'un survivant ne remontent jamais par cette voie.
         // Le contexte est passé explicitement : l'appelant tourne en tâche de fond, avec le sien.
-        private void UpsertCadaverPictos(MhoContext dbContext, int townId, List<MyHordesCadaver> cadavers)
+        private void UpsertCadaverPictos(MhoContext dbContext, int townId, List<MyHordesCitizenRankingDto> cadavers)
         {
+            // L'id du cadavre sert de clé (IdUser) : sans lui la ligne n'identifie personne.
             var cadaversWithPictos = cadavers?
-                .Where(cadaver => cadaver.Rewards != null && cadaver.Rewards.Count > 0)
+                .Where(cadaver => cadaver.Id.HasValue && cadaver.Rewards != null && cadaver.Rewards.Count > 0)
                 .ToList();
             if (cadaversWithPictos == null || cadaversWithPictos.Count == 0)
             {
@@ -556,7 +558,7 @@ namespace MyHordesOptimizerApi.Services.Impl
             var rewards = cadaversWithPictos.SelectMany(cadaver => cadaver.Rewards.Values).ToList();
 
             // Référentiel d'abord : Picto porte la FK de TownCitizenPicto
-            UpsertPictoReferential(dbContext, rewards);
+            var clesPictoParMhId = UpsertPictoReferential(dbContext, rewards);
 
             var lastUpdate = DateTime.UtcNow;
             // Indexation par (citoyen, picto) : le rapprochement ligne à ligne était quadratique,
@@ -566,11 +568,22 @@ namespace MyHordesOptimizerApi.Services.Impl
                 .ToDictionary(picto => (picto.IdUser, picto.IdPicto));
             foreach (var cadaver in cadaversWithPictos)
             {
-                foreach (var reward in cadaver.Rewards.Values)
+                // Une ligne de picto n'a de sens qu'avec son id ET son compteur. Si MyHordes ne les
+                // a pas transmis, on n'écrit rien : ni ligne inventée, ni compteur existant écrasé.
+                foreach (var reward in cadaver.Rewards.Values.Where(reward => reward.Id.HasValue && reward.Number.HasValue))
                 {
-                    if (existingLines.TryGetValue((cadaver.Id, reward.Id), out var existingLine))
+                    // L'identifiant reçu est celui de MyHordes : il se traduit en clé MHO, il ne se
+                    // recopie pas. Le référentiel vient d'être complété, un mhId absent de la
+                    // correspondance signalerait un défaut de cet appel — la ligne est écartée
+                    // plutôt que rattachée à un picto au hasard.
+                    if (!clesPictoParMhId.TryGetValue(reward.Id.Value, out var clePicto))
                     {
-                        existingLine.Count = reward.Number;
+                        Logger.LogWarning("UpsertTownCitizenPictos : picto {MhId} non résolu, ligne ignorée.", reward.Id.Value);
+                        continue;
+                    }
+                    if (existingLines.TryGetValue((cadaver.Id.Value, clePicto), out var existingLine))
+                    {
+                        existingLine.Count = reward.Number.Value;
                         existingLine.LastUpdate = lastUpdate;
                     }
                     else
@@ -578,9 +591,9 @@ namespace MyHordesOptimizerApi.Services.Impl
                         dbContext.TownCitizenPictos.Add(new TownCitizenPicto()
                         {
                             IdTown = townId,
-                            IdUser = cadaver.Id,
-                            IdPicto = reward.Id,
-                            Count = reward.Number,
+                            IdUser = cadaver.Id.Value,
+                            IdPicto = clePicto,
+                            Count = reward.Number.Value,
                             LastUpdate = lastUpdate
                         });
                     }
@@ -594,51 +607,81 @@ namespace MyHordesOptimizerApi.Services.Impl
         /// <see cref="PictoReferentialLock"/> et avec son propre enregistrement : les lignes de
         /// détail qui les référencent ne peuvent être écrites qu'une fois ceux-ci en base.
         /// </summary>
-        private void UpsertPictoReferential(MhoContext dbContext, List<MyHordesCadaverReward> rewards)
+        private Dictionary<int, int> UpsertPictoReferential(MhoContext dbContext, List<MyHordesTownPictoDto> rewards)
         {
-            var pictoIds = rewards.Select(reward => reward.Id).Distinct().ToList();
+            var modeles = rewards
+                .Where(reward => reward.Id.HasValue)
+                .GroupBy(reward => reward.Id.Value)
+                .ToDictionary(group => group.Key, group => group.First());
+            return ResoudreClesPictos(dbContext, modeles.Keys, mhId =>
+            {
+                var reward = modeles[mhId];
+                return new Picto()
+                {
+                    Img = MyHordesExtensions.RemoveImageFingerprint(reward.Img) ?? string.Empty,
+                    NameFr = reward.Name?.Fr,
+                    NameEn = reward.Name?.En,
+                    NameEs = reward.Name?.Es,
+                    NameDe = reward.Name?.De,
+                    DescFr = reward.Desc?.Fr,
+                    DescEn = reward.Desc?.En,
+                    DescEs = reward.Desc?.Es,
+                    DescDe = reward.Desc?.De,
+                    Rare = reward.Rare == true
+                };
+            });
+        }
+
+        /// <summary>
+        /// Garantit qu'un picto existe en base pour chaque identifiant MyHordes fourni, et renvoie
+        /// la correspondance <c>mhId → clé MHO</c> dont les compteurs ont besoin.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// La clé appartient à MHO dès la création, jamais celle de MyHordes : c'est un
+        /// auto-incrément de fixtures, qui change d'une instance du jeu à l'autre.
+        /// </para>
+        /// <para>
+        /// Les récompenses des joueurs ne portent pas le nom du prototype : ces pictos naissent donc
+        /// sans <c>uid</c>. C'est <c>/json/pictos</c> qui le leur donnera, en les rattachant par
+        /// leur <c>mhId</c> — voir l'adoption préalable de <c>ImportPictos</c>.
+        /// </para>
+        /// <para>
+        /// Un picto dont le <c>mhId</c> n'est pas encore renseigné est lu sous sa clé : c'est ce
+        /// qu'elle signifiait avant le découplage, et la seule lecture possible d'une base que le
+        /// remplissage n'aurait pas encore traversée.
+        /// </para>
+        /// </remarks>
+        private Dictionary<int, int> ResoudreClesPictos(MhoContext dbContext, IEnumerable<int> mhIds, Func<int, Picto> creer)
+        {
             PictoReferentialLock.Wait();
             try
             {
-                var knownPictoIds = dbContext.Pictos
-                    .Where(picto => pictoIds.Contains(picto.IdPicto))
-                    .Select(picto => picto.IdPicto)
-                    .ToHashSet();
-                var missingPictos = rewards
-                    .GroupBy(reward => reward.Id)
-                    .Select(group => group.First())
-                    .Where(reward => !knownPictoIds.Contains(reward.Id))
-                    .Select(reward => new Picto()
-                    {
-                        IdPicto = reward.Id,
-                        Img = MyHordesExtensions.RemoveImageFingerprint(reward.Img) ?? string.Empty,
-                        NameFr = GetLabelForLanguage(reward.Name, "fr"),
-                        NameEn = GetLabelForLanguage(reward.Name, "en"),
-                        NameEs = GetLabelForLanguage(reward.Name, "es"),
-                        NameDe = GetLabelForLanguage(reward.Name, "de"),
-                        DescFr = GetLabelForLanguage(reward.Desc, "fr"),
-                        DescEn = GetLabelForLanguage(reward.Desc, "en"),
-                        DescEs = GetLabelForLanguage(reward.Desc, "es"),
-                        DescDe = GetLabelForLanguage(reward.Desc, "de"),
-                        Rare = reward.Rare
-                    })
-                    .ToList();
-                if (missingPictos.Count == 0)
+                var parMhId = dbContext.Pictos
+                    .Select(picto => new { picto.IdPicto, picto.MhId })
+                    .ToList()
+                    .ToDictionary(picto => picto.MhId ?? picto.IdPicto, picto => picto.IdPicto);
+                var manquants = mhIds.Distinct().Where(mhId => !parMhId.ContainsKey(mhId)).ToList();
+                if (manquants.Count == 0)
                 {
-                    return;
+                    return parMhId;
                 }
-                dbContext.Pictos.AddRange(missingPictos);
+                var prochaineCle = dbContext.Pictos.Any() ? dbContext.Pictos.Max(picto => picto.IdPicto) + 1 : 1;
+                foreach (var mhId in manquants)
+                {
+                    var picto = creer(mhId);
+                    picto.IdPicto = prochaineCle++;
+                    picto.MhId = mhId;
+                    dbContext.Pictos.Add(picto);
+                    parMhId[mhId] = picto.IdPicto;
+                }
                 dbContext.SaveChanges();
+                return parMhId;
             }
             finally
             {
                 PictoReferentialLock.Release();
             }
-        }
-
-        private static string GetLabelForLanguage(IDictionary<string, string> labels, string language)
-        {
-            return labels != null && labels.TryGetValue(language, out var label) ? label : null;
         }
 
         // Délai minimal entre deux imports de pictos d'un même joueur. L'appel est le plus lourd de
@@ -679,7 +722,7 @@ namespace MyHordesOptimizerApi.Services.Impl
             return true;
         }
 
-        private void PersistUserPictos(MyHordesUserPictosDto response, int userId)
+        private void PersistUserPictos(MyHordesUserDetailsDto response, int userId)
         {
             // Les villes de l'historique doivent exister avant d'y rattacher des pictos (FK).
             // Attention : UpsertPlayedMaps se termine par un ChangeTracker.Clear(). Toute entité
@@ -690,7 +733,7 @@ namespace MyHordesOptimizerApi.Services.Impl
 
             var lastUpdate = DateTime.UtcNow;
             var rewards = response.Rewards ?? new List<MyHordesReward>();
-            var pictosByTown = (response.PlayedMaps ?? new List<MyHordesPlayedMapDto>())
+            var pictosByTown = (response.PlayedMaps ?? new List<MyHordesCitizenRankingDto>())
                 .Where(played => played.MapId.HasValue && played.Rewards != null && played.Rewards.Count > 0)
                 .ToList();
 
@@ -698,68 +741,84 @@ namespace MyHordesOptimizerApi.Services.Impl
             // créées avant tout compteur (FK). Aucune ne porte `community`, qui reste à sa valeur par
             // défaut. Le total et l'historique ne se recouvrent pas exactement (le total inclut les
             // imports Twinoid, l'historique peut contenir des villes alpha exclues du total).
-            var knownPictoIds = DbContext.Pictos.Select(picto => picto.IdPicto).ToHashSet();
-            foreach (var reward in rewards.Where(reward => !knownPictoIds.Contains(reward.Id)))
-            {
-                DbContext.Pictos.Add(new Picto()
-                {
-                    IdPicto = reward.Id,
-                    Img = MyHordesExtensions.RemoveImageFingerprint(reward.Img) ?? string.Empty,
-                    NameFr = reward.Name?.Fr,
-                    NameEn = reward.Name?.En,
-                    NameEs = reward.Name?.Es,
-                    NameDe = reward.Name?.De,
-                    DescFr = reward.Desc?.Fr,
-                    DescEn = reward.Desc?.En,
-                    DescEs = reward.Desc?.Es,
-                    DescDe = reward.Desc?.De,
-                    Rare = reward.Rare != 0
-                });
-                knownPictoIds.Add(reward.Id);
-            }
+            // Les identifiants reçus sont ceux de MyHordes : ils se traduisent en clés MHO. La
+            // résolution crée au passage les pictos encore inconnus, sous une clé attribuée par MHO.
+            var modelesParMhId = rewards
+                .Where(reward => reward.Id.HasValue)
+                .GroupBy(reward => reward.Id.Value)
+                .ToDictionary(group => group.Key, group => group.First());
             var describedRewards = pictosByTown
                 .SelectMany(played => played.Rewards.Values)
-                .GroupBy(reward => reward.Id)
+                .Where(reward => reward.Id.HasValue)
+                .GroupBy(reward => reward.Id.Value)
                 .Select(group => group.First())
                 .ToList();
-            foreach (var reward in describedRewards.Where(reward => !knownPictoIds.Contains(reward.Id)))
-            {
-                DbContext.Pictos.Add(new Picto()
+            var describedParMhId = describedRewards.ToDictionary(reward => reward.Id.Value);
+
+            var clesPictoParMhId = ResoudreClesPictos(DbContext,
+                modelesParMhId.Keys.Concat(describedParMhId.Keys),
+                mhId =>
                 {
-                    IdPicto = reward.Id,
-                    Img = MyHordesExtensions.RemoveImageFingerprint(reward.Img) ?? string.Empty,
-                    NameFr = GetLabelForLanguage(reward.Name, "fr"),
-                    NameEn = GetLabelForLanguage(reward.Name, "en"),
-                    NameEs = GetLabelForLanguage(reward.Name, "es"),
-                    NameDe = GetLabelForLanguage(reward.Name, "de"),
-                    DescFr = GetLabelForLanguage(reward.Desc, "fr"),
-                    DescEn = GetLabelForLanguage(reward.Desc, "en"),
-                    DescEs = GetLabelForLanguage(reward.Desc, "es"),
-                    DescDe = GetLabelForLanguage(reward.Desc, "de"),
-                    Rare = reward.Rare
+                    // Le total et l'historique ne se recouvrent pas exactement : le total inclut les
+                    // imports Twinoid, l'historique peut contenir des villes alpha qui en sont
+                    // exclues. Les deux décrivent le picto dans les 4 langues, l'un ou l'autre suffit.
+                    if (modelesParMhId.TryGetValue(mhId, out var reward))
+                    {
+                        return new Picto()
+                        {
+                            Img = MyHordesExtensions.RemoveImageFingerprint(reward.Img) ?? string.Empty,
+                            NameFr = reward.Name?.Fr,
+                            NameEn = reward.Name?.En,
+                            NameEs = reward.Name?.Es,
+                            NameDe = reward.Name?.De,
+                            DescFr = reward.Desc?.Fr,
+                            DescEn = reward.Desc?.En,
+                            DescEs = reward.Desc?.Es,
+                            DescDe = reward.Desc?.De,
+                            Rare = reward.Rare != 0
+                        };
+                    }
+                    var described = describedParMhId[mhId];
+                    return new Picto()
+                    {
+                        Img = MyHordesExtensions.RemoveImageFingerprint(described.Img) ?? string.Empty,
+                        NameFr = described.Name?.Fr,
+                        NameEn = described.Name?.En,
+                        NameEs = described.Name?.Es,
+                        NameDe = described.Name?.De,
+                        DescFr = described.Desc?.Fr,
+                        DescEn = described.Desc?.En,
+                        DescEs = described.Desc?.Es,
+                        DescDe = described.Desc?.De,
+                        Rare = described.Rare == true
+                    };
                 });
-                knownPictoIds.Add(reward.Id);
-            }
-            DbContext.SaveChanges();
 
             // Total du joueur
             var existingTotals = DbContext.UserPictos.Where(picto => picto.IdUser == userId).ToList();
-            foreach (var reward in rewards)
+            // Id et compteur sont tous deux indispensables : sans eux la ligne n'est ni créée, ni
+            // mise à jour — un total existant ne doit pas être écrasé par une valeur inventée.
+            foreach (var reward in rewards.Where(reward => reward.Id.HasValue && reward.Number.HasValue))
             {
-                var existingTotal = existingTotals.FirstOrDefault(picto => picto.IdPicto == reward.Id);
+                if (!clesPictoParMhId.TryGetValue(reward.Id.Value, out var clePicto))
+                {
+                    Logger.LogWarning("ImportUserPictos : picto {MhId} non résolu, total ignoré.", reward.Id.Value);
+                    continue;
+                }
+                var existingTotal = existingTotals.FirstOrDefault(picto => picto.IdPicto == clePicto);
                 if (existingTotal == null)
                 {
                     DbContext.UserPictos.Add(new UserPicto()
                     {
                         IdUser = userId,
-                        IdPicto = reward.Id,
-                        Count = reward.Number,
+                        IdPicto = clePicto,
+                        Count = reward.Number.Value,
                         LastUpdate = lastUpdate
                     });
                 }
                 else
                 {
-                    existingTotal.Count = reward.Number;
+                    existingTotal.Count = reward.Number.Value;
                     existingTotal.LastUpdate = lastUpdate;
                 }
             }
@@ -769,23 +828,28 @@ namespace MyHordesOptimizerApi.Services.Impl
             foreach (var played in pictosByTown)
             {
                 var townId = DbContext.ResolveTownId(played.MapId.Value);
-                foreach (var reward in played.Rewards.Values)
+                foreach (var reward in played.Rewards.Values.Where(reward => reward.Id.HasValue && reward.Number.HasValue))
                 {
-                    var existingLine = existingTownPictos.FirstOrDefault(line => line.IdTown == townId && line.IdPicto == reward.Id);
+                    if (!clesPictoParMhId.TryGetValue(reward.Id.Value, out var clePicto))
+                    {
+                        Logger.LogWarning("ImportUserPictos : picto {MhId} non résolu, détail par ville ignoré.", reward.Id.Value);
+                        continue;
+                    }
+                    var existingLine = existingTownPictos.FirstOrDefault(line => line.IdTown == townId && line.IdPicto == clePicto);
                     if (existingLine == null)
                     {
                         DbContext.TownCitizenPictos.Add(new TownCitizenPicto()
                         {
                             IdTown = townId,
                             IdUser = userId,
-                            IdPicto = reward.Id,
-                            Count = reward.Number,
+                            IdPicto = clePicto,
+                            Count = reward.Number.Value,
                             LastUpdate = lastUpdate
                         });
                     }
                     else
                     {
-                        existingLine.Count = reward.Number;
+                        existingLine.Count = reward.Number.Value;
                         existingLine.LastUpdate = lastUpdate;
                     }
                 }
@@ -809,7 +873,7 @@ namespace MyHordesOptimizerApi.Services.Impl
         // `userId` est le joueur À QUI appartient cet historique : ce n'est pas toujours le joueur
         // connecté (l'import de pictos passe l'historique d'un tiers), et s'y tromper rattacherait
         // les villes d'autrui au compte courant.
-        private void UpsertPlayedMaps(List<MyHordesPlayedMapDto> playedMaps, int userId)
+        private void UpsertPlayedMaps(List<MyHordesCitizenRankingDto> playedMaps, int userId)
         {
             if (playedMaps == null || playedMaps.Count == 0)
             {
@@ -836,6 +900,10 @@ namespace MyHordesOptimizerApi.Services.Impl
             // IdTown des villes de l'historique effectivement traitées : sert ensuite à rattacher
             // le joueur courant à ces villes via TownCitizen (le profil liste les villes par ce lien).
             var processedTownIds = new HashSet<int>();
+            // Correspondance mapId → clé de ville, établie ici parce que la résolution n'est pas
+            // triviale (clé réelle ou provisoire -mapId, avec garde-fou de saison) et qu'elle est
+            // nécessaire pour rattacher les points d'âme du joueur, plus bas.
+            var mapIdToTownId = new Dictionary<int, int>();
 
             foreach (var played in playedMaps)
             {
@@ -866,6 +934,7 @@ namespace MyHordesOptimizerApi.Services.Impl
                 }
 
                 processedTownIds.Add(town.IdTown);
+                mapIdToTownId[mapId] = town.IdTown;
 
                 town.IsFinished = true;
                 if (!string.IsNullOrEmpty(played.MapName))
@@ -932,10 +1001,92 @@ namespace MyHordesOptimizerApi.Services.Impl
                     });
                 }
                 DbContext.SaveChanges();
+
+                UpsertPlayedMapsCadavers(playedMaps, userId, mapIdToTownId);
+                DbContext.SaveChanges();
             }
 
             DbContext.ChangeTracker.Clear();
             MarkPlayedMapsImported(userId);
+        }
+
+        /// <summary>
+        /// Enregistre les points d'âme que le joueur a gagnés dans chacune de ses villes passées.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// Mesuré le 2026-07-27 contre myhordes.de : <c>playedMaps</c> renvoie <c>sp</c> sur
+        /// 127 entrées sur 127. C'est la source la plus large pour un joueur donné, la seule qui
+        /// couvre toutes ses villes passées d'un coup. Chaque vie passée est une vie terminée
+        /// (<c>getPastLifes()</c> écarte les citoyens encore vivants), la ligne <c>TownCadaver</c>
+        /// est donc le bon porteur.
+        /// </para>
+        /// <para>
+        /// À appeler AVANT le <c>ChangeTracker.Clear()</c> qui clôt <c>UpsertPlayedMaps</c> :
+        /// après lui, toute entité chargée est détachée et l'écriture serait perdue en silence.
+        /// </para>
+        /// </remarks>
+        private void UpsertPlayedMapsCadavers(List<MyHordesCitizenRankingDto> playedMaps, int userId,
+            IReadOnlyDictionary<int, int> mapIdToTownId)
+        {
+            var parTown = new Dictionary<int, MyHordesCitizenRankingDto>();
+            foreach (var played in playedMaps)
+            {
+                // `dtype > 0` est le discriminant du décès déjà employé par l'import de villes. Sur
+                // les 127 vies passées du compte de test, toutes le portent : une vie passée est une
+                // vie terminée. On le lit tout de même plutôt que de le supposer.
+                if (!played.MapId.HasValue || !(played.Dtype > 0))
+                {
+                    continue;
+                }
+                if (mapIdToTownId.TryGetValue(played.MapId.Value, out var townId))
+                {
+                    parTown[townId] = played;
+                }
+            }
+            if (parTown.Count == 0)
+            {
+                return;
+            }
+
+            var townIds = parTown.Keys.ToList();
+            var cadavresExistants = DbContext.TownCadavers
+                .Where(cadaver => cadaver.IdUser == userId && townIds.Contains(cadaver.IdTown))
+                .ToList();
+            // Le drapeau `Dead` du citoyen conditionne l'affichage : GetCitizens ne rattache le
+            // cadavre qu'aux citoyens morts. Sans lui, les points d'âme seraient écrits en base et
+            // invisibles — c'est exactement ce qui arrivait avant cette correction.
+            var citoyens = DbContext.TownCitizens
+                .Where(citizen => citizen.IdUser == userId && townIds.Contains(citizen.IdTown))
+                .ToList();
+
+            foreach (var (townId, played) in parTown)
+            {
+                var cadaver = cadavresExistants.FirstOrDefault(c => c.IdTown == townId);
+                if (cadaver == null)
+                {
+                    cadaver = new TownCadaver { IdTown = townId, IdUser = userId };
+                    DbContext.TownCadavers.Add(cadaver);
+                }
+                // Écritures gardées : ce DTO sert plusieurs projections aux champs différents.
+                if (played.Sp.HasValue)
+                {
+                    cadaver.SoulPoints = played.Sp;
+                }
+                if (played.Survival.HasValue)
+                {
+                    cadaver.SurvivalDay = played.Survival;
+                }
+                cadaver.CauseOfDeath = played.Dtype;
+
+                var citoyen = citoyens.FirstOrDefault(c => c.IdTown == townId);
+                if (citoyen != null)
+                {
+                    citoyen.Dead = true;
+                }
+            }
+            Logger.LogInformation("UpsertPlayedMaps: {Count} vies passées enregistrées pour {UserId} (points d'âme, survie, cause du décès)",
+                parTown.Count, userId);
         }
 
         /// <summary>
@@ -1139,6 +1290,27 @@ namespace MyHordesOptimizerApi.Services.Impl
             return dtos;
         }
 
+        /// <summary>
+        /// Référentiel complet des chantiers, pour la page wiki. Sans ville : c'est le prototype,
+        /// pas l'état d'un chantier dans une partie.
+        /// </summary>
+        /// <remarks>
+        /// Les coûts renvoyés sont ceux du jeu de ressources PAR DÉFAUT. Le mode Pandémonium en
+        /// utilise un autre, réellement différent pour 71 chantiers sur 166, mais que l'API
+        /// n'expose pas — il faudra l'extraire des fixtures. Le site doit donc annoncer que la
+        /// page vaut pour les modes standard.
+        /// </remarks>
+        public IEnumerable<BuildingDto> GetBuildings()
+        {
+            var models = DbContext.Buildings
+                // Les prototypes retirés du jeu n'ont pas à figurer dans un catalogue.
+                .Where(building => !building.IsObsolete)
+                .Include(building => building.BuildingRessources)
+                    .ThenInclude(resource => resource.IdItemNavigation)
+                .ToList();
+            return Mapper.Map<List<BuildingDto>>(models);
+        }
+
         public IEnumerable<MyHordesOptimizerRuinDto> GetRuins(int? townId)
         {
             if (townId.HasValue)
@@ -1172,6 +1344,10 @@ namespace MyHordesOptimizerApi.Services.Impl
             else
             {
                 var models = DbContext.Ruins
+                   // Catalogue seulement. La branche par ville, elle, part des cases de la carte :
+                   // c'est un chemin de RÉSOLUTION, et une ruine obsolète encore posée sur une case
+                   // doit continuer de s'y afficher — on n'y filtre rien.
+                   .Where(ruin => !ruin.IsObsolete)
                    .Include(ruin => ruin.RuinItemDrops)
                      .ThenInclude(itemRuinDrop => itemRuinDrop.IdItemNavigation)
                         .ThenInclude(item => item.ActionNames)

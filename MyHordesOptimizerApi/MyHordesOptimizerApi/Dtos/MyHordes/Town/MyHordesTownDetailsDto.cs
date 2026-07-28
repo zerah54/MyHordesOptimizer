@@ -5,37 +5,18 @@ namespace MyHordesOptimizerApi.Dtos.MyHordes.Town
 {
     public class MyHordesTownDetailsDto : MyHordesTownListItemDto
     {
+        /// <summary>
+        /// TOUS les citoyens de la ville, vivants comme morts : <c>getRankingInformation</c> passe
+        /// l'intégralité de <c>$town-&gt;getCitizens()</c> sans filtrer sur les vivants, à la
+        /// différence de <c>map.cadavers</c> qui, lui, ne garde que les morts. D'où le type
+        /// partagé.
+        /// </summary>
+        /// <remarks>
+        /// Cet endpoint applique une whitelist (<c>array_intersect</c>) qui limite les sous-champs
+        /// à <c>id, twinId, etwinId, survival, avatar, name, dtype, score, msg, comment</c> :
+        /// <c>sp</c> en est exclu, d'où l'attribut <c>MhUnavailableOn</c> qui le porte.
+        /// </remarks>
         [JsonProperty("citizens")]
-        public List<MyHordesTownCitizenDto>? Citizens { get; set; }
-    }
-
-    public class MyHordesTownCitizenDto
-    {
-        [JsonProperty("id")]
-        public int Id { get; set; }
-
-        [JsonProperty("twinId")]
-        public int? TwinId { get; set; }
-
-        [JsonProperty("name")]
-        public string? Name { get; set; }
-
-        [JsonProperty("avatar")]
-        public string? Avatar { get; set; }
-
-        [JsonProperty("survival")]
-        public int? Survival { get; set; }
-
-        [JsonProperty("score")]
-        public int? Score { get; set; }
-
-        [JsonProperty("dtype")]
-        public int? Dtype { get; set; }
-
-        [JsonProperty("msg")]
-        public string? Msg { get; set; }
-
-        [JsonProperty("comment")]
-        public string? Comment { get; set; }
+        public List<MyHordesCitizenRankingDto>? Citizens { get; set; }
     }
 }

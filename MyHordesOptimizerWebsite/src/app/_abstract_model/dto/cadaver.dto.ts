@@ -7,7 +7,8 @@ export interface CadaverDTO {
     cleanUp?: CleanUpDTO;
     id: number;
     name: string;
-    score: number;
+    /** Points d ame du citoyen (et non le score de la ville). */
+    soulPoints: number | null;
     survival: number;
     msg?: string;
     townMsg?: string;

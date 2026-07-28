@@ -8,12 +8,13 @@ import moment from 'moment';
 
 import { HORDES_IMG_REPO } from '../../../_abstract_model/const';
 import { Imports } from '../../../_abstract_model/types/_types';
+import { ItemImgPipe } from '../../../_core/pipes/item-img.pipe';
 import { ItemsGroupByCategoryPipe } from '../../../_core/pipes/items-group-by-category.pipe';
 import { IsItemsPipe } from '../is-item.pipe';
 
 const angular_common: Imports = [CommonModule, NgOptimizedImage];
 const components: Imports = [];
-const pipes: Imports = [IsItemsPipe, ItemsGroupByCategoryPipe];
+const pipes: Imports = [IsItemsPipe, ItemImgPipe, ItemsGroupByCategoryPipe];
 const material_modules: Imports = [MatFormFieldModule, MatInputModule, MatMenuModule, MatTabsModule];
 
 @Component({

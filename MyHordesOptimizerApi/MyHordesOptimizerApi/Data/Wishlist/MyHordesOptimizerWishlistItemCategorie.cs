@@ -12,6 +12,7 @@ namespace MyHordesOptimizerApi.Data.Wishlist
         public Dictionary<string,string> Name { get; set; }
 
         [JsonProperty("items")]
-        public List<int> Items { get; set; }
+        /// <summary>Identités MyHordes des objets de la catégorie — voir le commentaire ci-dessus.</summary>
+        public List<string> Items { get; set; }
     }
 }

@@ -1,0 +1,141 @@
+<mat-card-header class="mho-buildings-header">
+    <mat-card-title>
+        <ng-container i18n>Chantiers</ng-container>
+    </mat-card-title>
+</mat-card-header>
+
+<mat-card-content class="mho-buildings">
+    <!-- Les coûts affichés sont ceux du jeu de ressources par défaut. Le mode Pandémonium en
+         utilise un autre, réellement différent pour de nombreux chantiers : l'avertissement est en
+         tête et non en pied, pour être lu avant les chiffres plutôt qu'après. -->
+    <div class="warning-banner">
+        <mat-icon fontSet="material-symbols-outlined">info</mat-icon>
+        <span i18n>Les coûts indiqués valent pour les modes de ville habituels. En Pandémonium, de nombreux chantiers
+            demandent des ressources différentes — cette page ne les reflète pas encore.</span>
+    </div>
+
+    <div class="mat-elevation-z8 table-scroll">
+        <table [dataSource]="datasource" mat-table>
+
+            <!-- Nom : icône du chantier + libellé, avec l'indentation qui porte la hiérarchie -->
+            <ng-container matColumnDef="label" sticky>
+                <th *matHeaderCellDef mat-header-cell>
+                    <mho-header-with-string-filter [(filterValue)]="filters.label" [header]="headerOf('label')"
+                                                   (filterValueChange)="filters_change.next()">
+                    </mho-header-with-string-filter>
+                </th>
+                <td *matCellDef="let row" mat-cell>
+                    <div [class.is-root]="row.depth === 0" class="label-cell">
+                        <!-- Un trait vertical par niveau d'ancêtre : c'est lui qui rattache
+                             visuellement une évolution à son chantier parent. L'indentation seule
+                             ne suffisait pas à le montrer sur quatre niveaux. -->
+                        @for (level of depthLevels(row); track $index) {
+                            <span class="guide"></span>
+                        }
+                        <span class="toggle">
+                            @if (row.children.length > 0) {
+                                <button (click)="toggle(row)" [attr.aria-expanded]="!isCollapsed(row)"
+                                        mat-icon-button type="button">
+                                    <mat-icon fontSet="material-symbols-outlined">
+                                        {{ isCollapsed(row) ? 'chevron_right' : 'expand_more' }}
+                                    </mat-icon>
+                                </button>
+                            }
+                        </span>
+                        <img [alt]="row.label[locale]" [src]="HORDES_IMG_REPO + row.img" class="building-icon">
+                        <span [matTooltip]="row.description[locale]" class="name">{{ row.label[locale] }}</span>
+                        <!-- Le parent est rappelé sur les évolutions : sur une ligne isolée au
+                             milieu de 166, l'indentation ne dit pas DE QUOI on est l'évolution. -->
+                        @if (parentNameOf(row); as parent_name) {
+                            <span class="parent-hint">← {{ parent_name }}</span>
+                        }
+                    </div>
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="pa">
+                <th *matHeaderCellDef mat-header-cell class="center">
+                    <mho-icon-ap></mho-icon-ap>
+                </th>
+                <td *matCellDef="let row" mat-cell class="center">{{ row.pa }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="defence">
+                <th *matHeaderCellDef mat-header-cell class="center">{{ headerOf('defence') }}</th>
+                <td *matCellDef="let row" mat-cell class="center">
+                    @if (row.defence > 0) {
+                        {{ row.defence }}
+                    }
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="max_life">
+                <th *matHeaderCellDef mat-header-cell class="center">{{ headerOf('max_life') }}</th>
+                <td *matCellDef="let row" mat-cell class="center">
+                    @if (row.max_life > 0) {
+                        {{ row.max_life }}
+                    }
+                </td>
+            </ng-container>
+
+            <!-- Rareté : une icône de plan, rien quand le chantier n'en demande pas, et un point
+                 d'interrogation VISIBLE si le niveau sort de ceux qu'on connaît. -->
+            <ng-container matColumnDef="rarity">
+                <th *matHeaderCellDef mat-header-cell class="center">{{ headerOf('rarity') }}</th>
+                <td *matCellDef="let row" mat-cell class="center">
+                    @if (row.blueprint; as blueprint) {
+                        @if (blueprint.value.img) {
+                            <img [alt]="blueprint.value.label" [matTooltip]="blueprint.value.label"
+                                 [src]="HORDES_IMG_REPO + blueprint.value.img">
+                        } @else {
+                            <span [matTooltip]="blueprint.value.label" class="dash">—</span>
+                        }
+                    } @else {
+                        <span [matTooltip]="unknownRarityHint(row)" class="unknown">?</span>
+                    }
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="flags">
+                <th *matHeaderCellDef mat-header-cell class="center">{{ headerOf('flags') }}</th>
+                <td *matCellDef="let row" mat-cell class="center flags">
+                    @if (row.temporary) {
+                        <mat-icon class="flag-icon temporary" fontSet="material-symbols-outlined"
+                                  i18n-matTooltip matTooltip="Chantier temporaire : il disparaît au bout d’un moment">
+                            warning
+                        </mat-icon>
+                    }
+                    @if (row.breakable) {
+                        <mat-icon class="flag-icon breakable" fontSet="material-symbols-outlined"
+                                  i18n-matTooltip matTooltip="Peut être détruit par l’attaque">
+                            heart_broken
+                        </mat-icon>
+                    }
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="resources">
+                <th *matHeaderCellDef mat-header-cell>{{ headerOf('resources') }}</th>
+                <td *matCellDef="let row" mat-cell>
+                    <ul class="resources">
+                        @for (resource of row.resources; track resource.item_id) {
+                            <li [matTooltip]="resource.label[locale]">
+                                <img [alt]="resource.label[locale]" [src]="HORDES_IMG_REPO + resource.img">
+                                <span>×{{ resource.count }}</span>
+                            </li>
+                        }
+                    </ul>
+                </td>
+            </ng-container>
+
+            <tr *matHeaderRowDef="displayed_columns; sticky: true" mat-header-row></tr>
+            <tr *matRowDef="let row; columns: displayed_columns;" mat-row></tr>
+
+            <tr *matNoDataRow class="mat-row">
+                <td [attr.colspan]="displayed_columns.length" class="mat-cell" i18n>
+                    Aucun chantier ne correspond à cette recherche.
+                </td>
+            </tr>
+        </table>
+    </div>
+</mat-card-content>

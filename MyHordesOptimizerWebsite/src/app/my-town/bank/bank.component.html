@@ -36,7 +36,7 @@
                                 @for (bank_item of category.items; track $index) {
                                     <li class="item" (click)="detailed_item = bank_item"
                                         [class.broken]="bank_item.is_broken" [matTooltip]="bank_item.label[locale]">
-                                        <img class="item-icon" [ngSrc]="HORDES_IMG_REPO + bank_item.img" width="16" height="16">
+                                        <img class="item-icon" [ngSrc]="HORDES_IMG_REPO + (bank_item | itemImg:bank_item.is_broken)" width="16" height="16">
                                         @if (bank_item.bank_count > 1) {
                                             <span class="item-count">{{ bank_item.bank_count }}</span>
                                         }

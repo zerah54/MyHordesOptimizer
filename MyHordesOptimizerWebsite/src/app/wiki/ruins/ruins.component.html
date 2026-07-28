@@ -49,9 +49,6 @@
                         } @else {
                             <th mat-header-cell *matHeaderCellDef>
                                 @switch (column.id) {
-                                    @case ('description') {
-                                        {{ column.header }}
-                                    }
                                     @case ('drops') {
                                         <mho-header-with-select-filter [header]="column.header"
                                                                        [(filterValue)]="ruins_filters.objects"
@@ -67,10 +64,9 @@
                             @switch (column.id) {
                                 @case ('label') {
                                     <img [src]="HORDES_IMG_REPO + 'ruin/' + row.img + '.gif'">
-                                    <div>{{ row[column.id][locale] }}</div>
-                                }
-                                @case ('description') {
-                                    <span [innerHTML]="row[column.id][locale]"></span>
+                                    <!-- La description tient dans une infobulle : en colonne, elle
+                                         mangeait toute la largeur du tableau. -->
+                                    <div [matTooltip]="row.description[locale]">{{ row[column.id][locale] }}</div>
                                 }
                                 @case ('drops') {
                                     <div class="drops-list">

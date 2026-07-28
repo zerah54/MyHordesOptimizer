@@ -1,0 +1,140 @@
+.warning-banner {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5em;
+    margin-bottom: 1em;
+    padding: 0.6em 0.8em;
+    border: 1px solid var(--mat-sys-outline-variant);
+    border-radius: 6px;
+    background-color: var(--mat-sys-surface-container-low);
+
+    mat-icon {
+        flex: 0 0 auto;
+    }
+}
+
+:host {
+    display: contents;
+}
+
+.mho-buildings {
+    // La page occupe la hauteur disponible et ne la dépasse pas : c'est le TABLEAU qui défile,
+    // pas la fenêtre. Sans ça, 166 lignes poussent l'en-tête collant hors de vue et la carte
+    // s'étire bien au-delà de l'écran.
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+
+    .table-scroll {
+        flex: 1;
+        min-height: 0;
+        overflow: auto;
+    }
+
+    table {
+        width: 100%;
+    }
+
+    .center {
+        text-align: center;
+    }
+
+    .label-cell {
+        display: flex;
+        align-items: center;
+        gap: 0.4em;
+    }
+
+    // Un trait vertical par niveau d'ancêtre. L'indentation seule ne suffisait pas : sur quatre
+    // niveaux et 166 lignes, on ne voyait plus à quelle branche on appartenait.
+    .guide {
+        flex: 0 0 1.2em;
+        align-self: stretch;
+        border-left: 1px solid var(--mat-sys-outline-variant);
+    }
+
+    .toggle {
+        // Largeur réservée même sans bouton, sinon les feuilles se décalent par rapport aux nœuds
+        // qui en ont un et la colonne devient illisible.
+        flex: 0 0 2.5em;
+    }
+
+    // Les racines ouvrent une branche : elles se détachent pour qu'on repère d'un coup d'œil où
+    // commence chaque groupe.
+    .label-cell.is-root {
+        .name {
+            font-weight: 600;
+        }
+    }
+
+    // Rappel du parent, discret : il complète les traits sans concurrencer le nom.
+    .parent-hint {
+        margin-left: 0.5em;
+        font-size: 0.85em;
+        font-style: italic;
+        opacity: 0.6;
+        white-space: nowrap;
+    }
+
+    // Taille NON fixée sur les icônes : sprites pixel art, les redimensionner altère le rendu.
+    .building-icon {
+        flex: 0 0 auto;
+    }
+
+    .name {
+        white-space: nowrap;
+    }
+
+    .description {
+        min-width: 18em;
+    }
+
+    .dash,
+    .unknown {
+        opacity: 0.6;
+    }
+
+    .unknown {
+        font-weight: bold;
+        opacity: 1;
+    }
+
+    .flags .flag-icon {
+        vertical-align: middle;
+
+        &.temporary {
+            color: var(--mat-sys-error);
+        }
+
+        &.breakable {
+            opacity: 0.7;
+        }
+    }
+
+    .resources {
+        // Sur UNE ligne : un retour à la ligne faisait grandir la hauteur de la ligne au gré du
+        // nombre de ressources, et l'alignement des colonnes voisines partait avec.
+        display: flex;
+        flex-wrap: nowrap;
+        gap: 0.6em;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+        white-space: nowrap;
+
+        li {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.15em;
+            white-space: nowrap;
+        }
+    }
+}
+
+@media screen and (max-width: 599px) {
+    .mho-buildings .guide {
+        // Les traits mangeraient toute la largeur sur mobile : on les resserre sans les
+        // supprimer, sinon la hiérarchie disparaît complètement.
+        flex-basis: 0.6em;
+    }
+}

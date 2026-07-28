@@ -89,7 +89,7 @@
                 @for (item of cell().items; track item.item_id) {
                     <div>
                         @if (item | itemDetails:all_items; as complete_item) {
-                            <img [ngSrc]="HORDES_IMG_REPO + complete_item.img" [class.broken]="item.is_broken" width="16" height="16">
+                            <img [ngSrc]="HORDES_IMG_REPO + (complete_item | itemImg:item.is_broken)" [class.broken]="item.is_broken" width="16" height="16">
                         }
                         <span class="item-quantity">{{ item.count }}</span>
                     </div>
@@ -108,7 +108,7 @@
                     @for (item of (cell().citizens | itemsInBags:citizens()); track item.item.id) {
                         <div>
                             @if (item) {
-                                <img [ngSrc]="HORDES_IMG_REPO + item.item.img" [class.broken]="item.is_broken"
+                                <img [ngSrc]="HORDES_IMG_REPO + (item.item | itemImg:item.is_broken)" [class.broken]="item.is_broken"
                                      [title]="item.item.label[locale]" width="16" height="16">
                             }
                             <span class="item-quantity">{{ item.count }}</span>

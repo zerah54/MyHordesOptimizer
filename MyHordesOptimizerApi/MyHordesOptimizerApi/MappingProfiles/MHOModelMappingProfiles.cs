@@ -72,7 +72,7 @@ namespace MyHordesOptimizerApi.MappingProfiles
                 .ForMember(dest => dest.DeathMessage, opt => opt.MapFrom(src => src.Msg))
                 .ForMember(dest => dest.TownMessage, opt => opt.MapFrom(src => src.TownMsg))
                 .ForMember(dest => dest.SurvivalDay, opt => opt.MapFrom(src => src.Survival))
-                .ForMember(dest => dest.Score, opt => opt.MapFrom(src => src.Score))
+                .ForMember(dest => dest.SoulPoints, opt => opt.MapFrom(src => src.SoulPoints))
                 .ForMember(dest => dest.IdLastUpdateInfo, opt => opt.Ignore())
                 .ForMember(dest => dest.CleanUp, opt => opt.Ignore());
 

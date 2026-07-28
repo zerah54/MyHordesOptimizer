@@ -85,6 +85,27 @@ public partial class Ruin
     [Column("capacity", TypeName = "int(11)")]
     public int? Capacity { get; set; }
 
+    /// <summary>
+    /// Identifiant du prototype chez MyHordes, à l'instant de la dernière synchronisation.
+    /// MUTABLE et sans valeur d'identité : c'est un auto-incrément de fixtures, qui change
+    /// d'une instance du jeu à l'autre. Peut différer de <c>IdRuin</c> — c'est normal et voulu.
+    /// </summary>
+    /// <remarks>
+    /// L'identité d'une ruine est son <c>Img</c>, et c'est la plus faible des quatre :
+    /// <c>ZonePrototype</c> n'a pas de champ <c>name</c> et <c>/json/ruins</c> est indexé par
+    /// l'identifiant numérique. L'icône ne fait office d'identité que par convention des
+    /// fixtures du jeu, vérifiée sur les 65 ruines sans écart.
+    /// </remarks>
+    [Column("mhId", TypeName = "int(11)")]
+    public int? MhId { get; set; }
+
+    /// <summary>
+    /// Vrai quand le prototype a disparu du jeu. La ligne est CONSERVÉE pour que les données
+    /// qui la référencent restent résolvables ; elle est seulement exclue des catalogues.
+    /// </summary>
+    [Column("isObsolete")]
+    public bool IsObsolete { get; set; }
+
     [InverseProperty("IdRuinNavigation")]
     public virtual ICollection<MapCell> MapCells { get; set; } = new List<MapCell>();
 

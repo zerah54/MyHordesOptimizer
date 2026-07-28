@@ -4,7 +4,7 @@
             <div class="title-part" (click)="toggleAdvancedMode()">
                 <div class="item_title">
                     <div class="item_img">
-                        <img [src]="HORDES_IMG_REPO + item().img">
+                        <img [src]="HORDES_IMG_REPO + (item() | itemImg:item().is_broken)">
                         @if (item().bank_count && item().bank_count > 1) {
                             <span class="item_count">{{ item().bank_count }}</span>
                         }

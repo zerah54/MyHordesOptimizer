@@ -3,6 +3,7 @@ import { ItemCountDTO } from '../dto/item-count.dto';
 import { ShortItemCountDTO } from '../dto/short-item-count.dto';
 import { JobEnum } from '../enum/job.enum';
 import { StatusEnum } from '../enum/status.enum';
+import { TownRoleEnum } from '../enum/town-role.enum';
 import { CommonModel, dtoToModelArray, modelToDtoArray } from './_common.class';
 import { Dictionary } from './_types';
 import { Bag } from './bag.class';
@@ -15,23 +16,25 @@ import { Status } from './status.class';
 
 export class Citizen extends CommonModel<CitizenDTO> {
     public avatar?: string;
-    private home_message?: string;
     public id!: number;
     public is_shunned?: boolean;
     public is_dead?: boolean;
     public job?: JobEnum;
+    /** Rôles de ville portés. Une liste : un citoyen peut en cumuler plusieurs. */
+    public town_roles: TownRoleEnum[] = [];
     public name!: string;
-    private nombre_jour_hero?: number;
-    private x?: number;
-    private y?: number;
     public bag?: Bag;
-    private chest?: Bag;
     public status?: Status;
     public home?: Home;
     public heroic_actions?: HeroicActions;
     public cadaver?: Cadaver;
     public baths: Bath[] = [];
     public chamanic_detail!: ChamanicDetail;
+    private home_message?: string;
+    private nombre_jour_hero?: number;
+    private x?: number;
+    private y?: number;
+    private chest?: Bag;
 
     public constructor(dto?: CitizenDTO) {
         super();
@@ -47,6 +50,7 @@ export class Citizen extends CommonModel<CitizenDTO> {
             dead: this.is_dead,
             jobName: '',
             jobUid: this.job?.key,
+            townRoles: this.town_roles.map((role: TownRoleEnum): string => role.key),
             nombreJourHero: this.nombre_jour_hero,
             x: this.x,
             y: this.y,
@@ -112,6 +116,9 @@ export class Citizen extends CommonModel<CitizenDTO> {
             this.is_shunned = dto.isShunned;
             this.is_dead = dto.dead;
             this.job = dto.jobUid ? <JobEnum>JobEnum.getByKey(dto.jobUid) : undefined;
+            this.town_roles = (dto.townRoles ?? [])
+                .map((key: string) => TownRoleEnum.getByKey<TownRoleEnum>(key))
+                .filter((role: TownRoleEnum | undefined): role is TownRoleEnum => !!role);
             this.nombre_jour_hero = dto.nombreJourHero;
             this.x = dto.x;
             this.y = dto.y;

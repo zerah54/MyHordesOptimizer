@@ -89,6 +89,41 @@ public partial class Building
     [Column("watchSurvivalBonusUpgradeLevelRequired", TypeName = "int(11)")]
     public int WatchSurvivalBonusUpgradeLevelRequired { get; set; }
 
+    /// <summary>
+    /// Identifiant du prototype chez MyHordes, à l'instant de la dernière synchronisation.
+    /// MUTABLE et sans valeur d'identité : c'est un auto-incrément de fixtures, qui change
+    /// d'une instance du jeu à l'autre. L'identité, c'est <see cref="Uid"/>.
+    /// </summary>
+    /// <remarks>
+    /// ATTENTION : cette valeur DIFFÈRE couramment de <c>IdBuilding</c>, et c'est voulu.
+    /// Mesuré le 2026-07-27 : 128 des 166 bâtiments avaient déjà divergé. Ne pas « corriger »
+    /// cet écart — c'est précisément ce que ce découplage protège. Les charges de ville
+    /// (<c>city.chantiers</c>, <c>city.buildings</c>) ne portent aucun <c>uid</c> : c'est par
+    /// cette colonne, et elle seule, qu'on sait de quel bâtiment elles parlent.
+    /// </remarks>
+    [Column("mhId", TypeName = "int(11)")]
+    public int? MhId { get; set; }
+
+    /// <summary>
+    /// Rang d'affichage officiel du jeu (<c>BuildingPrototype::getOrderBy</c>).
+    /// </summary>
+    /// <remarks>
+    /// NON UNIQUE, et ce n'est pas un défaut : relevé le 2026-07-28, les 166 bâtiments se répartissent
+    /// sur les valeurs 0 à 13, plusieurs partageant la même (Douves, Grand fossé et Muraille rasoir
+    /// sont tous à 0). C'est un rang DANS un groupe, pas un ordre total : il doit se combiner à un
+    /// autre critère — le parent, ou le nom — pour trier une liste complète.
+    /// La colonne ne s'appelle pas <c>order</c> : c'est un mot réservé de SQL.
+    /// </remarks>
+    [Column("displayOrder", TypeName = "int(11)")]
+    public int? DisplayOrder { get; set; }
+
+    /// <summary>
+    /// Vrai quand le prototype a disparu du jeu. La ligne est CONSERVÉE pour que les données
+    /// qui la référencent restent résolvables ; elle est seulement exclue des catalogues.
+    /// </summary>
+    [Column("isObsolete")]
+    public bool IsObsolete { get; set; }
+
     [InverseProperty("IdBuildingNavigation")]
     public virtual ICollection<BuildingRessource> BuildingRessources { get; set; } = new List<BuildingRessource>();
 

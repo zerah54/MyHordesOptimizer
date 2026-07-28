@@ -83,6 +83,22 @@ public partial class Item
     [MySqlCollation("utf8mb3_general_ci")]
     public string? Img { get; set; }
 
+    /// <summary>
+    /// Icône de l'objet cassé, quand le jeu en prévoit une DISTINCTE de <see cref="Img"/>.
+    /// </summary>
+    /// <remarks>
+    /// Null n'est pas ici un « non renseigné » : MyHordes n'émet <c>img_b</c> que lorsqu'il diffère
+    /// de <c>img</c> (<c>if ($img_b !== $img)</c> dans <c>JSONv1Controller::getItemData</c>). Null
+    /// signifie donc « cet objet n'a pas d'icône cassée propre », information qu'il ne faut pas
+    /// détruire en recopiant <c>Img</c> à l'import : c'est au rendu de choisir le repli.
+    /// Sur 383 objets, 20 en ont une (relevé du 2026-07-27).
+    /// </remarks>
+    [Column("img_broken")]
+    [StringLength(255)]
+    [MySqlCharSet("utf8mb3")]
+    [MySqlCollation("utf8mb3_general_ci")]
+    public string? ImgBroken { get; set; }
+
     [Column("isHeaver")]
     public bool? IsHeaver { get; set; }
 
@@ -91,6 +107,23 @@ public partial class Item
 
     [Column("dropRate_notPraf")]
     public float? DropRateNotPraf { get; set; }
+
+    /// <summary>
+    /// Identifiant du prototype chez MyHordes, à l'instant de la dernière synchronisation.
+    /// MUTABLE et sans valeur d'identité : c'est un auto-incrément de fixtures, qui change
+    /// d'une instance du jeu à l'autre. L'identité, c'est <see cref="Uid"/>.
+    /// Peut différer de <c>IdItem</c> — c'est normal et voulu.
+    /// </summary>
+    [Column("mhId", TypeName = "int(11)")]
+    public int? MhId { get; set; }
+
+    /// <summary>
+    /// Vrai quand le prototype a disparu du jeu. La ligne est CONSERVÉE pour que les données
+    /// qui la référencent restent résolvables — un objet en banque ou en sac doit rester
+    /// affichable ; elle est seulement exclue des catalogues.
+    /// </summary>
+    [Column("isObsolete")]
+    public bool IsObsolete { get; set; }
 
     [InverseProperty("IdItemNavigation")]
     public virtual ICollection<BagItem> BagItems { get; set; } = new List<BagItem>();

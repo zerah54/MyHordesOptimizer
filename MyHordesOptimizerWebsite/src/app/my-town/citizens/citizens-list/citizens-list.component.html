@@ -196,6 +196,16 @@
                                 </td>
                             </ng-container>
 
+                            <!-- Colonne des rôles de ville (mode colonnes), entre le métier et le nom.
+                                 Une seule colonne pour les trois : ils sont exclusifs par ville, et un
+                                 citoyen qui en cumule deux affiche simplement deux icônes. -->
+                            <ng-container matColumnDef="town_roles" sticky>
+                                <th *matHeaderCellDef class="town-roles-col" mat-header-cell></th>
+                                <td *matCellDef="let row" class="town-roles-col" mat-cell>
+                                    <mho-deferred-cell [content]="townRolesCell" [context]="{ $implicit: row }"></mho-deferred-cell>
+                                </td>
+                            </ng-container>
+
                             <!-- ============ Mode groupé : colonnes regroupées ============ -->
 
                             <ng-container matColumnDef="etats_sac">
@@ -347,8 +357,8 @@
                                                 @case ('survival') {
                                                     {{ row.cadaver?.survival }}
                                                 }
-                                                @case ('score') {
-                                                    {{ row.cadaver?.score }}
+                                                @case ('soul_points') {
+                                                    {{ row.cadaver?.soul_points ?? '—' }}
                                                 }
                                                 @case ('death_messages') {
                                                     <div class="death-messages">
@@ -446,6 +456,14 @@
     @if (row.job) {
         <img [alt]="row.job.value.label" [matTooltip]="row.job.value.label"
              [src]="HORDES_IMG_REPO + row.job.value.img" class="job-cell-icon">
+    }
+</ng-template>
+
+<!-- Rôles de ville : icône seule, l'infobulle porte le libellé officiel du jeu -->
+<ng-template #townRolesCell let-row>
+    @for (role of row.town_roles; track role.key) {
+        <img [alt]="role.value.label" [matTooltip]="role.value.label"
+             [src]="HORDES_IMG_REPO + role.value.img" class="town-role-icon">
     }
 </ng-template>
 
@@ -586,7 +604,15 @@
 
 <ng-template #homeCell let-citizenId="citizenId" let-home>
     @if (home) {
-        @if (home.element.value.max_lvl === 1) {
+        @if (!isHomeEditable(home)) {
+            <!-- Niveau de maison : renseigné depuis MyHordes, jamais saisi. L'information reste
+                 dans la grille, sous la même icône que le contrôle qu'elle remplace, pour que la
+                 colonne ne devienne pas un trou. -->
+            <span [matTooltip]="home.element.getLabel()" class="home-readonly">
+                <img [alt]="home.element.getLabel()" [src]="HORDES_IMG_REPO + getHomeIcon(home)">
+                <span class="home-readonly-value">{{ home.value }}</span>
+            </span>
+        } @else if (home.element.value.max_lvl === 1) {
             <mho-compact-toggle
                 (valueChange)="updateHome(home, $event, citizenId)"
                 [disabled]="is_readonly()"

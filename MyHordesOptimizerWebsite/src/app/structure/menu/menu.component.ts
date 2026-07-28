@@ -109,7 +109,11 @@ export class MenuComponent implements OnInit {
                 { label: $localize`Objets`, path: 'wiki/items', displayed: false, lvl: 1, authorized: (): boolean => true, spoil: true },
                 { label: $localize`Recettes`, path: 'wiki/recipes', displayed: false, lvl: 1, authorized: (): boolean => true, spoil: true },
                 { label: $localize`Pouvoirs`, path: 'wiki/hero-skills', displayed: false, lvl: 1, authorized: (): boolean => true, spoil: false },
+                // « Bâtiments » désigne ici les bâtiments d'EXTÉRIEUR (les ruines). Les constructions
+                // en ville portent leur nom du jeu, « Chantiers », pour que les deux entrées ne
+                // soient pas homonymes.
                 { label: $localize`Bâtiments`, path: 'wiki/ruins', displayed: false, lvl: 1, authorized: (): boolean => true, spoil: true },
+                { label: $localize`Chantiers`, path: 'wiki/buildings', displayed: false, lvl: 1, authorized: (): boolean => true, spoil: true },
                 {
                     label: $localize`Informations diverses`,
                     path: 'wiki/miscellaneous-info',

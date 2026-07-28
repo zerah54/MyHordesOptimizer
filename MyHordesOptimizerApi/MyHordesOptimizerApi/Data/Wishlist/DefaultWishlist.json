@@ -9,256 +9,256 @@
     },
     "items": [
       {
-        "itemId": 147,
         "count": 1000,
         "priority": 3000,
         "depot": 0,
-        "shouldSignal": false
+        "shouldSignal": false,
+        "uid": "table_#00"
       },
       {
-        "itemId": 143,
         "count": 1000,
         "priority": 3000,
         "depot": 0,
-        "shouldSignal": false
+        "shouldSignal": false,
+        "uid": "deco_box_#00"
       },
       {
-        "itemId": 161,
         "count": 1,
         "priority": 2000,
         "depot": 0,
-        "shouldSignal": false
+        "shouldSignal": false,
+        "uid": "machine_1_#00"
       },
       {
-        "itemId": 136,
         "count": 13,
         "priority": 2000,
         "depot": 0,
-        "shouldSignal": false
+        "shouldSignal": false,
+        "uid": "wood_beam_#00"
       },
       {
-        "itemId": 137,
         "count": 1,
         "priority": 2000,
         "depot": 0,
-        "shouldSignal": false
+        "shouldSignal": false,
+        "uid": "metal_beam_#00"
       },
       {
-        "itemId": 162,
         "count": 4,
         "priority": 1000,
         "depot": 0,
-        "shouldSignal": false
+        "shouldSignal": false,
+        "uid": "machine_2_#00"
       },
       {
-        "itemId": 41,
         "count": 1000,
         "priority": 1000,
         "depot": 0,
-        "shouldSignal": false
+        "shouldSignal": false,
+        "uid": "pet_snake_#00"
       },
       {
-        "itemId": 144,
         "count": 1,
         "priority": 3000,
         "depot": 0,
-        "shouldSignal": false
+        "shouldSignal": false,
+        "uid": "saw_tool_part_#00"
       },
       {
-        "itemId": 65,
         "count": 1,
         "priority": 3000,
         "depot": 0,
-        "shouldSignal": false
+        "shouldSignal": false,
+        "uid": "rustine_#00"
       },
       {
-        "itemId": 35,
         "count": 2,
         "priority": 3000,
         "depot": 0,
-        "shouldSignal": false
+        "shouldSignal": false,
+        "uid": "meca_parts_#00"
       },
       {
-        "itemId": 279,
         "count": 2,
         "priority": 3000,
         "depot": 0,
-        "shouldSignal": false
+        "shouldSignal": false,
+        "uid": "wire_#00"
       },
       {
-        "itemId": 13,
         "count": 1,
         "priority": 3000,
         "depot": 0,
-        "shouldSignal": false
+        "shouldSignal": false,
+        "uid": "staff_#00"
       },
       {
-        "itemId": 280,
         "count": 1,
         "priority": 3000,
         "depot": 0,
-        "shouldSignal": false
+        "shouldSignal": false,
+        "uid": "oilcan_#00"
       },
       {
-        "itemId": 79,
         "count": 1000,
         "priority": 3000,
         "depot": 0,
-        "shouldSignal": false
+        "shouldSignal": false,
+        "uid": "coffee_#00"
       },
       {
-        "itemId": 76,
         "count": 1000,
         "priority": 3000,
         "depot": 0,
-        "shouldSignal": false
+        "shouldSignal": false,
+        "uid": "pharma_#00"
       },
       {
-        "itemId": 232,
         "count": 1,
         "priority": 3000,
         "depot": 0,
-        "shouldSignal": false
+        "shouldSignal": false,
+        "uid": "maglite_off_#00"
       },
       {
-        "itemId": 284,
         "count": 1,
         "priority": 3000,
         "depot": 0,
-        "shouldSignal": false
+        "shouldSignal": false,
+        "uid": "diode_#00"
       },
       {
-        "itemId": 79,
         "count": 1000,
         "priority": 3000,
         "depot": 0,
-        "shouldSignal": false
+        "shouldSignal": false,
+        "uid": "coffee_#00"
       },
       {
-        "itemId": 67,
         "count": 3,
         "priority": 3000,
         "depot": 0,
-        "shouldSignal": false
+        "shouldSignal": false,
+        "uid": "tube_#00"
       },
       {
-        "itemId": 82,
         "count": 4,
         "priority": 3000,
         "depot": 0,
-        "shouldSignal": false
+        "shouldSignal": false,
+        "uid": "electro_#00"
       },
       {
-        "itemId": 282,
         "count": 1000,
         "priority": 3000,
         "depot": 0,
-        "shouldSignal": false
+        "shouldSignal": false,
+        "uid": "angryc_#00"
       },
       {
-        "itemId": 54,
         "count": 1000,
         "priority": 3000,
         "depot": 0,
-        "shouldSignal": false
+        "shouldSignal": false,
+        "uid": "bandage_#00"
       },
       {
-        "itemId": 100,
         "count": 1,
         "priority": 3000,
         "depot": 0,
-        "shouldSignal": false
+        "shouldSignal": false,
+        "uid": "sport_elec_empty_#00"
       },
       {
-        "itemId": 16,
         "count": 4,
         "priority": 3000,
         "depot": 0,
-        "shouldSignal": false
+        "shouldSignal": false,
+        "uid": "small_knife_#00"
       },
       {
-        "itemId": 32,
         "count": 1,
         "priority": 3000,
         "depot": 0,
-        "shouldSignal": false
+        "shouldSignal": false,
+        "uid": "dice_#00"
       },
       {
-        "itemId": 130,
         "count": 1,
         "priority": 3000,
         "depot": 0,
-        "shouldSignal": false
+        "shouldSignal": false,
+        "uid": "cards_#00"
       },
       {
-        "itemId": 295,
         "count": 2,
         "priority": 3000,
         "depot": 0,
-        "shouldSignal": false
+        "shouldSignal": false,
+        "uid": "lilboo_#00"
       },
       {
-        "itemId": 105,
         "count": 1000,
         "priority": 2000,
         "depot": 0,
-        "shouldSignal": false
+        "shouldSignal": false,
+        "uid": "tagger_#00"
       },
       {
-        "itemId": 116,
         "count": 1000,
         "priority": 2000,
         "depot": 0,
-        "shouldSignal": false
+        "shouldSignal": false,
+        "uid": "digger_#00"
       },
       {
-        "itemId": 151,
         "count": 1000,
         "priority": 2000,
         "depot": 0,
-        "shouldSignal": false
+        "shouldSignal": false,
+        "uid": "flash_#00"
       },
       {
-        "itemId": 49,
         "count": 1000,
         "priority": 2000,
         "depot": 0,
-        "shouldSignal": false
+        "shouldSignal": false,
+        "uid": "wood2_#00"
       },
       {
-        "itemId": 50,
         "count": 1000,
         "priority": 2000,
         "depot": 0,
-        "shouldSignal": false
+        "shouldSignal": false,
+        "uid": "metal_#00"
       },
       {
-        "itemId": 58,
         "count": 5,
         "priority": 1000,
         "depot": 0,
-        "shouldSignal": false
+        "shouldSignal": false,
+        "uid": "explo_#00"
       },
       {
-        "itemId": 59,
         "count": 2,
         "priority": 1000,
         "depot": 0,
-        "shouldSignal": false
+        "shouldSignal": false,
+        "uid": "hmeat_#00"
       },
       {
-        "itemId": 178,
         "count": 2,
         "priority": 1000,
         "depot": 0,
-        "shouldSignal": false
+        "shouldSignal": false,
+        "uid": "fence_#00"
       },
       {
-        "itemId": 36,
         "count": 2,
         "priority": 1000,
         "depot": 0,
-        "shouldSignal": false
+        "shouldSignal": false,
+        "uid": "pet_chick_#00"
       }
     ],
     "categories": [

@@ -49,6 +49,7 @@ namespace MyHordesOptimizerApi.MappingProfiles.Items
                 .ForMember(dest => dest.Guard, opt => opt.MapFrom(src => src.Guard))
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.IdItem))
                 .ForMember(dest => dest.Img, opt => opt.MapFrom(src => src.Img))
+                .ForMember(dest => dest.ImgBroken, opt => opt.MapFrom(src => src.ImgBroken))
                 .ForMember(dest => dest.IsHeaver, opt => opt.MapFrom(src => src.IsHeaver))
                 .ForMember(dest => dest.Label, opt => opt.MapFrom(src => new Dictionary<string, string>()
                 {
@@ -117,8 +118,21 @@ namespace MyHordesOptimizerApi.MappingProfiles.Items
                 .ForMember(dest => dest.IdCategories, opt => opt.Ignore())
                 .ForMember(dest => dest.IdCategory, opt => opt.ConvertUsing<DeutchNameToCategoryIdConverter, string>(src => src.Value.Category["de"]))
                 .ForMember(dest => dest.IdCategoryNavigation, opt => opt.Ignore())
-                .ForMember(dest => dest.IdItem, opt => opt.MapFrom(src => src.Value.Id))
-                .ForMember(dest => dest.Img, opt => opt.MapFrom(src => Regex.Replace(src.Value.Img, @"(.*)\.(.*)\.(.*)", "$1.$3")))
+                // La clé appartient à MHO et n'est PAS celle de MyHordes : celle-ci n'est qu'un
+                // auto-incrément de fixtures, instable d'une instance du jeu à l'autre. Le service
+                // d'import l'attribue après rapprochement sur le uid.
+                .ForMember(dest => dest.IdItem, opt => opt.Ignore())
+                // .Value volontairement explicite : si un jour l'appelant cesse de filtrer les
+                // objets sans id, on veut une exception bruyante plutôt qu'un mhId à 0.
+                .ForMember(dest => dest.MhId, opt => opt.MapFrom(src => src.Value.Id.Value))
+                .ForMember(dest => dest.IsObsolete, opt => opt.Ignore())
+                .ForMember(dest => dest.Img, opt => opt.MapFrom(src => SansEmpreinte(src.Value.Img)))
+                // MyHordes n'émet `img_b` que s'il DIFFÈRE de `img`. Son absence signifie donc
+                // « pas d'icône cassée propre », et non « non transmis » : on écrit null, sans
+                // jamais recopier `Img`. Replier ici détruirait l'information, et c'est au rendu
+                // de décider — le jeu lui-même n'utilise l'icône cassée que dans son infobulle
+                // de détail, et garde l'icône normale dans ses listes.
+                .ForMember(dest => dest.ImgBroken, opt => opt.MapFrom(src => SansEmpreinte(src.Value.ImgBroken)))
                 .ForMember(dest => dest.IsHeaver, opt => opt.MapFrom(src => src.Value.Heavy))
                 .ForMember(dest => dest.LabelDe, opt => opt.MapFrom(src => src.Value.Label["de"]))
                 .ForMember(dest => dest.LabelEn, opt => opt.MapFrom(src => src.Value.Label["en"]))
@@ -132,6 +146,20 @@ namespace MyHordesOptimizerApi.MappingProfiles.Items
                 .ForMember(dest => dest.TownBankItems, opt => opt.Ignore())
                 .ForMember(dest => dest.TownWishListItems, opt => opt.Ignore())
                 .ForMember(dest => dest.Uid, opt => opt.MapFrom(src => src.Key));
+        }
+
+        /// <summary>
+        /// Ramène un chemin d'image MyHordes à sa forme stable en retirant l'empreinte de version :
+        /// <c>item/item_lawn.b5d3807d.gif</c> devient <c>item/item_lawn.gif</c>.
+        /// </summary>
+        /// <remarks>
+        /// Le quantificateur gourmand fait que la même expression convient à l'icône cassée, dont
+        /// le nom porte un point de plus : <c>item/item_lawn.b.b5d3807d.gif</c> devient
+        /// <c>item/item_lawn.b.gif</c>. Le null est rendu tel quel — il porte une information.
+        /// </remarks>
+        private static string SansEmpreinte(string chemin)
+        {
+            return chemin == null ? null : Regex.Replace(chemin, @"(.*)\.(.*)\.(.*)", "$1.$3");
         }
     }
 }

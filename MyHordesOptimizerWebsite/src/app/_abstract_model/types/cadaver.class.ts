@@ -4,15 +4,16 @@ import { CommonModel } from './_common.class';
 import { CauseOfDeath } from './cause-of-death.class';
 
 export class Cadaver extends CommonModel<CadaverDTO> {
-    private avatar?: string;
     public cause_of_death?: CauseOfDeath;
-    private cleanup?: CleanUpDTO;
-    private id!: number;
-    private name!: string;
-    public score!: number;
+    /** Points d ame du citoyen. Null tant qu aucune source MyHordes ne les a fournis. */
+    public soul_points: number | null = null;
     public survival!: number;
     public msg?: string;
     public town_msg?: string;
+    private avatar?: string;
+    private cleanup?: CleanUpDTO;
+    private id!: number;
+    private name!: string;
 
     public constructor(dto?: CadaverDTO) {
         super();
@@ -34,7 +35,7 @@ export class Cadaver extends CommonModel<CadaverDTO> {
             cleanUp: this.cleanup,
             id: this.id,
             name: this.name,
-            score: this.score,
+            soulPoints: this.soul_points,
             survival: this.survival,
             msg: this.msg,
             townMsg: this.town_msg,
@@ -48,7 +49,7 @@ export class Cadaver extends CommonModel<CadaverDTO> {
             this.cleanup = dto.cleanUp;
             this.id = dto.id;
             this.name = dto.name;
-            this.score = dto.score;
+            this.soul_points = dto.soulPoints ?? null;
             this.survival = dto.survival;
             this.msg = dto.msg;
             this.town_msg = dto.townMsg;
