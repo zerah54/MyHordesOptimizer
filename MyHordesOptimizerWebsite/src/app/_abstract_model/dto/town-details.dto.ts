@@ -10,4 +10,6 @@ export interface TownDetailsDTO {
     isDevaste: boolean;
     day: number;
     townType: TownTypeId;
+    /** La ville a-t-elle activé l option d API externe de MyHordes ? Null si non constaté. */
+    hasExternalApi: boolean | null;
 }

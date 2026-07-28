@@ -1,5 +1,5 @@
 import { NgOptimizedImage } from '@angular/common';
-import { ChangeDetectionStrategy, Component, signal,WritableSignal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, signal, WritableSignal } from '@angular/core';
 import { MatDivider } from '@angular/material/list';
 import moment from 'moment/moment';
 
@@ -10,6 +10,7 @@ import { Item } from '../../../../_abstract_model/types/item.class';
 import { Ruin } from '../../../../_abstract_model/types/ruin.class';
 import { CitizensFromShortPipe } from '../../../../_core/pipes/citizens-from-short.pipe';
 import { ItemDetailsPipe } from '../../../../_core/pipes/item-details.pipe';
+import { ItemImgPipe } from '../../../../_core/pipes/item-img.pipe';
 import { CitizenInfoComponent } from '../../../../_shared/citizen-info/citizen-info.component';
 import { IconApComponent } from '../../../../_shared/icon-ap/icon-ap.component';
 import { LastUpdateComponent } from '../../../../_shared/last-update/last-update.component';
@@ -23,6 +24,7 @@ import { RuinInCell } from '../map-cell-details/ruin-in-cell.pipe';
     imports: [
         CitizensFromShortPipe,
         ItemDetailsPipe,
+        ItemImgPipe,
         MatDivider,
         NgOptimizedImage,
         RuinInCell,

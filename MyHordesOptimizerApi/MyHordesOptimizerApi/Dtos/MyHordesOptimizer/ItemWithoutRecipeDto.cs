@@ -8,6 +8,12 @@ namespace MyHordesOptimizerApi.Dtos.MyHordes.MyHordesOptimizer
     {
         public string Uid { get; set; }
         public string Img { get; set; }
+
+        /// <summary>
+        /// Icône de l'objet cassé, ou null quand le jeu n'en prévoit pas de distincte — auquel cas
+        /// c'est <see cref="Img"/> qui s'affiche. 20 objets sur 383 en ont une.
+        /// </summary>
+        public string ImgBroken { get; set; }
         public IDictionary<string, string> Label { get; set; }
         public int Id { get; set; }
         public CategoryDto Category { get; set; }

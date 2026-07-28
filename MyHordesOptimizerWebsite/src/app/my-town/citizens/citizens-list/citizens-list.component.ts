@@ -30,6 +30,7 @@ import { CitizenInfo } from '../../../_abstract_model/types/citizen-info.class';
 import { HeroicActionsWithValue } from '../../../_abstract_model/types/heroic-actions.class';
 import { HomeWithValue } from '../../../_abstract_model/types/home.class';
 import { Item } from '../../../_abstract_model/types/item.class';
+import { isHouseLevelEditable } from '../../../_abstract_model/types/town-details.class';
 import { UpdateInfo } from '../../../_abstract_model/types/update-info.class';
 import { ColumnIdPipe } from '../../../_core/pipes/column-id.pipe';
 import { ClipboardService } from '../../../_core/services/clipboard.service';
@@ -128,7 +129,20 @@ export class CitizensListComponent implements OnInit {
     /** Toutes les actions héroïques possibles, ordonnées (booléens puis niveaux) : pilotent les colonnes du mode étendu. */
     protected readonly heroic_actions_all: HeroicActionEnum[] = [...HeroicActionEnum.getAllValues<HeroicActionEnum>()].sort(byMaxLvlAsc);
     /** Toutes les améliorations possibles, ordonnées : pilotent les colonnes du mode étendu. */
-    protected readonly home_all: HomeEnum[] = [...HomeEnum.getAllValues<HomeEnum>()].sort(byMaxLvlAsc);
+    /**
+     * Champs de la maison, le NIVEAU D'HABITATION en tête.
+     *
+     * C'est lui qui conditionne tous les autres travaux — on ne pose pas une porte blindée dans un
+     * lit de camp — et il est désormais renseigné automatiquement depuis MyHordes. Le laisser au
+     * milieu des améliorations, où le tri par niveau maximum le plaçait, revenait à noyer la seule
+     * information qui donne du sens aux suivantes.
+     */
+    protected readonly home_all: HomeEnum[] = [
+        HomeEnum.HOUSE_LEVEL,
+        ...HomeEnum.getAllValues<HomeEnum>()
+            .filter((home: HomeEnum): boolean => home.key !== HomeEnum.HOUSE_LEVEL.key)
+            .sort(byMaxLvlAsc)
+    ];
     /** Citoyen dont le menu de détail des mises à jour est ouvert (menu partagé). */
     protected readonly menu_row: WritableSignal<Citizen | null> = signal<Citizen | null>(null);
     /** Ouverture de la sidenav de filtres. */
@@ -144,7 +158,7 @@ export class CitizensListComponent implements OnInit {
         { id: 'avatar_name', header: $localize`Citoyen`, class: 'center', sticky: true },
         { id: 'cause_of_death', header: $localize`Cause de la mort`, class: '' },
         { id: 'survival', header: $localize`Jours de survie`, class: 'center' },
-        { id: 'score', header: $localize`Score`, class: 'center' },
+        { id: 'soul_points', header: $localize`Points d’âme`, class: 'center' },
         { id: 'death_messages', header: $localize`Messages`, class: '' },
         { id: 'pictos', header: $localize`Pictos`, class: 'center' },
     ];
@@ -160,7 +174,7 @@ export class CitizensListComponent implements OnInit {
     private readonly grouped_columns: string[] = ['avatar_name', 'etats_sac', 'immune', 'daily_actions', 'heroic_actions', 'home', 'last_update'];
     /** Colonnes affichées en mode « colonnes » (une par champ). */
     private readonly per_field_columns: string[] = [
-        'job', 'avatar_name', 'sac', 'etats', 'immune', 'daily_bath',
+        'job', 'town_roles', 'avatar_name', 'sac', 'etats', 'immune', 'daily_bath',
         ...this.heroic_actions_all.map((action: HeroicActionEnum): string => 'heroic_' + action.key),
         ...this.home_all.map((home: HomeEnum): string => 'home_' + home.key),
         'last_update',
@@ -337,6 +351,14 @@ export class CitizensListComponent implements OnInit {
      * niveau, d'où l'image `home_lv{niveau}.gif`. Un niveau négatif (-1 = non défini) retombe sur le
      * visuel du niveau 0 pour éviter une image cassée.
      */
+    /**
+     * Le champ maison donné est-il saisissable ? Tous le sont, sauf le niveau de la maison, que
+     * MyHordes fournit et que le back déduit de `baseDef` — voir {@link isHouseLevelEditable}.
+     */
+    protected isHomeEditable(home: HomeWithValue): boolean {
+        return isHouseLevelEditable(getTown()) || home.element?.key !== HomeEnum.HOUSE_LEVEL.key;
+    }
+
     protected getHomeIcon(home: HomeWithValue): string {
         const img: string = home.element.value.img;
         if (img && img !== '') return img;

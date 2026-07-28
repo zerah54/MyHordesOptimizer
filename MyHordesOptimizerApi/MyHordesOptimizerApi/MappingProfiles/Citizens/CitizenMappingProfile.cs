@@ -16,7 +16,11 @@ namespace MyHordesOptimizerApi.MappingProfiles.Citizens
         public CitizenMappingProfile()
         {
             CreateMap<List<TownCitizen>, CitizensLastUpdateDto>()
-                .ForMember(dto => dto.LastUpdateInfo, opt => opt.MapFrom(list => list.First().IdLastUpdateInfoNavigation))
+                // `FirstOrDefault` et non `First` : une ville sans citoyen est un cas LÉGITIME —
+                // ligne provisoire créée par UpsertPlayedMaps, ville jamais synchronisée — et
+                // `First()` y levait « Sequence contains no elements », soit un 500 sur une
+                // demande parfaitement valide.
+                .ForMember(dto => dto.LastUpdateInfo, opt => opt.MapFrom(list => list.Count == 0 ? null : list[0].IdLastUpdateInfoNavigation))
                 .ForMember(dto => dto.Citizens, opt => opt.MapFrom(list => list));
 
             CreateMap<TownCitizen, CitizenDto>()
@@ -36,6 +40,7 @@ namespace MyHordesOptimizerApi.MappingProfiles.Citizens
                 .ForMember(dto => dto.Name, opt => opt.MapFrom(model => model.IdUserNavigation.Name))
                 .ForMember(dto => dto.NombreJourHero, opt => opt.Ignore()) // Plus tard
                 .ForMember(dto => dto.Status, opt => opt.MapFrom(model => model))
+                .ForMember(dto => dto.TownRoles, opt => opt.MapFrom(model => RolesDe(model)))
                 .ForMember(dto => dto.X, opt => opt.MapFrom(model => model.PositionX))
                 .ForMember(dto => dto.Y, opt => opt.MapFrom(model => model.PositionY));
 
@@ -46,7 +51,7 @@ namespace MyHordesOptimizerApi.MappingProfiles.Citizens
                 .ForMember(dto => dto.Name, opt => opt.MapFrom(model => model.IdUserNavigation.Name))
                 .ForMember(dto => dto.Avatar, opt => opt.MapFrom(model => model.IdUserNavigation.Avatar))
                 .ForMember(dto => dto.Survival, opt => opt.MapFrom(model => model.SurvivalDay))
-                .ForMember(dto => dto.Score, opt => opt.MapFrom(model => model.Score))
+                .ForMember(dto => dto.SoulPoints, opt => opt.MapFrom(model => model.SoulPoints))
                 .ForMember(dto => dto.Msg, opt => opt.MapFrom(model => model.DeathMessage))
                 .ForMember(dto => dto.TownMsg, opt => opt.MapFrom(model => model.TownMessage))
                 .ForMember(dto => dto.CauseOfDeath, opt => opt.MapFrom(model => model.CauseOfDeathNavigation))
@@ -233,6 +238,38 @@ namespace MyHordesOptimizerApi.MappingProfiles.Citizens
                 result.Add(StatusValue.FootWounded.GetDescription());
             }
             return result;
+        }
+
+        /// <summary>
+        /// Rôles de ville portés par ce citoyen. Les trois porteurs sont stockés sur la ville : on
+        /// les retourne ici du point de vue du citoyen, pour que le site n'ait aucun recoupement à
+        /// faire à l'affichage.
+        /// </summary>
+        /// <remarks>
+        /// Un même citoyen peut en porter plusieurs — le jeu garantit un seul porteur par rôle,
+        /// pas un seul rôle par porteur.
+        /// </remarks>
+        private static List<string> RolesDe(TownCitizen citizen)
+        {
+            var roles = new List<string>();
+            var town = citizen.IdTownNavigation;
+            if (town == null)
+            {
+                return roles;
+            }
+            if (town.IdShaman == citizen.IdUser)
+            {
+                roles.Add("shaman");
+            }
+            if (town.IdGuide == citizen.IdUser)
+            {
+                roles.Add("guide");
+            }
+            if (town.IdCata == citizen.IdUser)
+            {
+                roles.Add("cata");
+            }
+            return roles;
         }
         #endregion
     }

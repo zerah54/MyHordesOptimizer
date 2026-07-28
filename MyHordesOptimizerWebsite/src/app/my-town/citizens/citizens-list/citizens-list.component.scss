@@ -252,11 +252,52 @@
                 }
             }
 
+            // ---- Colonne des rôles de ville (Chaman / Guide / Catapulte) ----
+            // Un peu plus large que le métier : un citoyen peut cumuler deux rôles, et les icônes
+            // doivent alors tenir côte à côte sans élargir la colonne au fil des villes.
+            th.town-roles-col,
+            td.town-roles-col {
+                width: 46px;
+                min-width: 46px;
+                background-color: var(--mat-sys-surface-container-low);
+                text-align: center;
+                padding: 0.25em 0;
+                white-space: nowrap;
+
+                .town-role-icon {
+                    display: inline-block;
+                    vertical-align: middle;
+                }
+            }
+
             // ---- Cellules groupées États / Sac / Chamanique ----
             .group-stack {
                 display: flex;
                 flex-direction: column;
                 gap: 0.5em;
+            }
+
+            // Niveau de maison : affiché, jamais saisi. On reprend la pastille du stepper qu'il
+            // remplace, moins les boutons, pour que la colonne garde son alignement au lieu de
+            // paraître vide à côté des autres champs de la maison.
+            .home-readonly {
+                display: inline-flex;
+                align-items: center;
+                gap: 2px;
+                padding: 2px 4px;
+                border: 1px solid var(--mat-sys-outline-variant);
+                border-radius: 6px;
+
+                // Taille d'image NON fixée : sprites pixel art, les redimensionner altère le rendu.
+                img {
+                    display: block;
+                    margin-right: 2px;
+                }
+
+                .home-readonly-value {
+                    min-width: 1.4em;
+                    text-align: center;
+                }
             }
 
             .status,

@@ -14,6 +14,8 @@ export interface CitizenDTO {
     dead?: boolean;
     jobName?: string;
     jobUid?: string;
+    /** Rôles de ville portés par ce citoyen, parmi `shaman`, `guide` et `cata`. */
+    townRoles?: string[];
     name: string;
     nombreJourHero?: number;
     x?: number;

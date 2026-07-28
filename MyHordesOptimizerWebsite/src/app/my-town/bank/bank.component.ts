@@ -1,5 +1,5 @@
 import { CommonModule, NgOptimizedImage } from '@angular/common';
-import { Component, DestroyRef, inject,OnInit } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
@@ -15,6 +15,7 @@ import { TownService } from '../../_abstract_model/services/town.service';
 import { Imports } from '../../_abstract_model/types/_types';
 import { BankInfo } from '../../_abstract_model/types/bank-info.class';
 import { Item } from '../../_abstract_model/types/item.class';
+import { ItemImgPipe } from '../../_core/pipes/item-img.pipe';
 import { ItemsGroupByCategoryPipe } from '../../_core/pipes/items-group-by-category.pipe';
 import { normalizeString } from '../../_core/utilities/string.utils';
 import { FilterFieldComponent } from '../../_shared/filter-field/filter-field.component';
@@ -23,7 +24,7 @@ import { SelectComponent } from '../../_shared/select/select.component';
 
 const angular_common: Imports = [CommonModule, FormsModule, NgOptimizedImage];
 const components: Imports = [FilterFieldComponent, ItemComponent, SelectComponent];
-const pipes: Imports = [ItemsGroupByCategoryPipe];
+const pipes: Imports = [ItemImgPipe, ItemsGroupByCategoryPipe];
 const material_modules: Imports = [MatCardModule, MatFormFieldModule, MatSlideToggleModule, MatTooltipModule];
 
 @Component({
@@ -34,28 +35,21 @@ const material_modules: Imports = [MatCardModule, MatFormFieldModule, MatSlideTo
 })
 export class BankComponent implements OnInit {
 
-    /** La banque remontée par l'appel */
-    private bank!: BankInfo;
-
     /** Les objets affichés par le filtre */
     protected displayed_bank_items!: Item[];
     /** L'objet dont le détail est affiché */
     protected detailed_item!: Item;
-
-
     /** Le champ de filtre sur les objets */
     protected filter_value: string = '';
     /** Le champ de filtres sur les propriétés */
     protected select_value: (Property | Action)[] = [];
-
     protected condensed_display: boolean = JSON.parse(localStorage.getItem(BANK_CONDENSED_DISPLAY_KEY) || 'false');
-
     /** La liste des filtres */
     protected options: (Property | Action)[] = [...<Property[]>Property.getAllValues(), ...<Action[]>Action.getAllValues()];
-
     protected readonly locale: string = moment.locale();
     protected readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
-
+    /** La banque remontée par l'appel */
+    private bank!: BankInfo;
     private town_service: TownService = inject(TownService);
     private readonly destroy_ref: DestroyRef = inject(DestroyRef);
 

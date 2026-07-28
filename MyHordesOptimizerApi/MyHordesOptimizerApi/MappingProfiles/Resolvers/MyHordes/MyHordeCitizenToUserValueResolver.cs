@@ -7,7 +7,7 @@ using System.Linq;
 
 namespace MyHordesOptimizerApi.MappingProfiles.Resolvers.MyHordes
 {
-    public class MyHordeCitizenToUserValueResolver : IValueResolver<MyHordesCitizen, object, User>
+    public class MyHordeCitizenToUserValueResolver : IValueResolver<MyHordesUserDto, object, User>
     {
         protected IServiceScopeFactory ServiceScopeFactory { get; private set; }
 
@@ -16,17 +16,19 @@ namespace MyHordesOptimizerApi.MappingProfiles.Resolvers.MyHordes
             ServiceScopeFactory = serviceScopeFactory;
         }
 
-        public User Resolve(MyHordesCitizen source, object destination, User destMember, ResolutionContext context)
+        public User Resolve(MyHordesUserDto source, object destination, User destMember, ResolutionContext context)
         {
             var dbContext = context.GetDbContext();
-            // Avatar est désérialisé en object : string quand il y en a un, bool false sinon
-            var avatar = source.Avatar as string;
+            // Sur les chemins getUserData, `avatar` vaut l'URL ou null — jamais le booléen `false`
+            // que renvoie getCadaversInformation (`getSource(200) ?: false`). D'où le typage
+            // string? plutôt que l'ancien object, et la disparition du cast défensif.
+            var avatar = source.Avatar;
             var dbUser = dbContext.Users.FirstOrDefault(x => x.IdUser == source.Id);
             if (dbUser == null)
             {
                 var user = new User()
                 {
-                    IdUser = source.Id,
+                    IdUser = source.Id.Value,
                     Name = source.Name,
                     Avatar = avatar
                 };

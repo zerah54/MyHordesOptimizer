@@ -47,6 +47,8 @@ namespace MyHordesOptimizerApi.MappingProfiles.Ruins
                 .ForMember(dest => dest.DescriptionFr, opt => opt.Ignore())
                 .ForMember(dest => dest.Explorable, opt => opt.Ignore())
                 .ForMember(dest => dest.IdRuin, opt => opt.Ignore())
+                .ForMember(dest => dest.MhId, opt => opt.Ignore())
+                .ForMember(dest => dest.IsObsolete, opt => opt.Ignore())
                 .ForMember(dest => dest.Img, opt => opt.MapFrom(src => src.Value.Icon))
                 .ForMember(dest => dest.LabelDe, opt => opt.Ignore())
                 .ForMember(dest => dest.LabelEn, opt => opt.Ignore())
@@ -66,7 +68,12 @@ namespace MyHordesOptimizerApi.MappingProfiles.Ruins
                 .ForMember(dest => dest.DescriptionEs, opt => opt.MapFrom(src => src.Value.Desc["es"]))
                 .ForMember(dest => dest.DescriptionFr, opt => opt.MapFrom(src => src.Value.Desc["fr"]))
                 .ForMember(dest => dest.Explorable, opt => opt.MapFrom(src => src.Value.Explorable))
-                .ForMember(dest => dest.IdRuin, opt => opt.MapFrom(src => src.Value.Id))
+                // La clé appartient à MHO et n'est PAS celle de MyHordes : celle-ci n'est qu'un
+                // auto-incrément de fixtures, instable d'une instance du jeu à l'autre. Le service
+                // d'import l'attribue après rapprochement sur l'icône.
+                .ForMember(dest => dest.IdRuin, opt => opt.Ignore())
+                .ForMember(dest => dest.MhId, opt => opt.MapFrom(src => src.Value.Id))
+                .ForMember(dest => dest.IsObsolete, opt => opt.Ignore())
                 .ForMember(dest => dest.Img, opt => opt.MapFrom(src => GetNameIdFromImg(src.Value.Img)))
                 .ForMember(dest => dest.LabelDe, opt => opt.MapFrom(src => src.Value.Name["de"]))
                 .ForMember(dest => dest.LabelEn, opt => opt.MapFrom(src => src.Value.Name["en"]))

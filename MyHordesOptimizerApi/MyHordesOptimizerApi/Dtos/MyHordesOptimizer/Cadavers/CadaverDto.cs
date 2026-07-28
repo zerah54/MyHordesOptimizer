@@ -11,7 +11,8 @@
         public string Avatar { get; set; }
 
         public int Survival { get; set; }
-        public int Score { get; set; }
+        /// <summary>Points d ame du citoyen. Null tant qu aucune source ne les a fournis.</summary>
+        public int? SoulPoints { get; set; }
 
         public string Msg { get; set; }
         public string TownMsg { get; set; }

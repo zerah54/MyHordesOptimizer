@@ -4,6 +4,7 @@ using System.Net.Http;
 using System.Web;
 using Microsoft.Extensions.Logging;
 using MyHordesOptimizerApi.Configuration.Interfaces;
+using MyHordesOptimizerApi.Dtos.MyHordes.Contract;
 using MyHordesOptimizerApi.Exceptions;
 using MyHordesOptimizerApi.Providers.Interfaces;
 using Newtonsoft.Json;
@@ -22,16 +23,18 @@ namespace MyHordesOptimizerApi.Repository.Abstract
         protected const string _parameterFields = "fields";
         protected const string _parameterLanguages = "languages";
 
-        protected const string EndpointItems = "items";
-        protected const string EndpointMe = "me";
-        protected const string EndpointUser = "user";
-        protected const string EndpointUsers = "users";
-        protected const string EndpointRuins = "ruins";
-        protected const string EndpointPictos = "pictos";
-        protected const string EndpointBuilding = "buildings";
-        protected const string EndpointTownList = "townlist";
-        protected const string EndpointTowns = "towns";
-        protected const string EndpointMap = "map";
+        // Les littéraux vivent dans MhEndpoints : les attributs de contrat portés par les DTO en
+        // ont besoin, et ces constantes-ci sont protected donc inatteignables depuis un DTO.
+        protected const string EndpointItems = MhEndpoints.Items;
+        protected const string EndpointMe = MhEndpoints.Me;
+        protected const string EndpointUser = MhEndpoints.User;
+        protected const string EndpointUsers = MhEndpoints.Users;
+        protected const string EndpointRuins = MhEndpoints.Ruins;
+        protected const string EndpointPictos = MhEndpoints.Pictos;
+        protected const string EndpointBuilding = MhEndpoints.Buildings;
+        protected const string EndpointTownList = MhEndpoints.TownList;
+        protected const string EndpointTowns = MhEndpoints.Towns;
+        protected const string EndpointMap = MhEndpoints.Map;
 
 
         protected AbstractMyHordeRepositoryBase(ILogger<AbstractMyHordeRepositoryBase> logger,

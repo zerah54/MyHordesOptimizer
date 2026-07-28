@@ -17,8 +17,8 @@ import { StandardColumn } from '../../_abstract_model/interfaces';
 import { ApiService } from '../../_abstract_model/services/api.service';
 import { TownService } from '../../_abstract_model/services/town.service';
 import { Imports } from '../../_abstract_model/types/_types';
-import { Ruin } from '../../_abstract_model/types/ruin.class';
 import { RuinItem } from '../../_abstract_model/types/ruin-item.class';
+import { Ruin } from '../../_abstract_model/types/ruin.class';
 import { TownDetails } from '../../_abstract_model/types/town-details.class';
 import { ColumnIdPipe } from '../../_core/pipes/column-id.pipe';
 import { getTown } from '../../_core/utilities/localstorage.util';
@@ -57,7 +57,6 @@ export class RuinsComponent implements OnInit {
     /** La liste des colonnes */
     protected readonly columns: RuinColumns[] = [
         { id: 'label', header: $localize`Nom du bâtiment`, sortable: true, sticky: true },
-        { id: 'description', header: $localize`Description`, sortable: false },
         { id: 'min_dist', header: $localize`Distance minimum`, sortable: true },
         { id: 'max_dist', header: $localize`Distance maximum`, sortable: true },
         { id: 'camping', header: $localize`Bonus en camping`, sortable: true },

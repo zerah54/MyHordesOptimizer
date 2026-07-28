@@ -9,21 +9,21 @@ namespace MyHordesOptimizerApi.Dtos.MyHordes
     public class MyHordesApiPictoDto
     {
         [JsonProperty("id")]
-        public int Id { get; set; }
+        public int? Id { get; set; }
 
         [JsonProperty("img")]
-        public string Img { get; set; }
+        public string? Img { get; set; }
 
         [JsonProperty("name")]
-        public IDictionary<string, string> Name { get; set; }
+        public IDictionary<string, string>? Name { get; set; }
 
         [JsonProperty("desc")]
-        public IDictionary<string, string> Desc { get; set; }
+        public IDictionary<string, string>? Desc { get; set; }
 
         [JsonProperty("community")]
-        public bool Community { get; set; }
+        public bool? Community { get; set; }
 
         [JsonProperty("rare")]
-        public bool Rare { get; set; }
+        public bool? Rare { get; set; }
     }
 }

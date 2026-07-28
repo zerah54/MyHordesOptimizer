@@ -4,6 +4,7 @@ using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Citizens;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Map;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Buildings;
 
 namespace MyHordesOptimizerApi.Services.Interfaces
 {
@@ -20,6 +21,7 @@ namespace MyHordesOptimizerApi.Services.Interfaces
         Task<bool> ImportUserPictosAsync(int userId);
         CitizensLastUpdateDto GetCitizens(int townId);
         IEnumerable<MyHordesOptimizerRuinDto> GetRuins(int? townId);
+        IEnumerable<BuildingDto> GetBuildings();
         MyHordesOptimizerMapDto GetMap(int townId);
         IEnumerable<MyHordesOptimizerMapDigDto> GetMapDigs(int townId);
         List<MyHordesOptimizerMapDigDto> CreateOrUpdateMapDigs(int townId, int userId, List<MyHordesOptimizerMapDigDto> requests);

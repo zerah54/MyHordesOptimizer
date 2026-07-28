@@ -10,6 +10,7 @@ using MyHordesOptimizerApi.Providers.Interfaces;
 using MyHordesOptimizerApi.Services.Interfaces;
 using System.Collections.Generic;
 using System.Linq;
+using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Buildings;
 
 namespace MyHordesOptimizerApi.Controllers
 {
@@ -105,6 +106,17 @@ namespace MyHordesOptimizerApi.Controllers
         {
             var ruins = _myHordesFetcherService.GetRuins(townId).ToList();
             return ruins;
+        }
+
+        /// <summary>
+        /// Référentiel des chantiers de ville. Aucun paramètre de ville : ce sont les prototypes.
+        /// Les coûts sont ceux du jeu de ressources par défaut — voir <c>GetBuildings</c>.
+        /// </summary>
+        [HttpGet]
+        [Route("Buildings")]
+        public ActionResult<IEnumerable<BuildingDto>> GetBuildings()
+        {
+            return _myHordesFetcherService.GetBuildings().ToList();
         }
 
         [HttpGet]

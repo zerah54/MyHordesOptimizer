@@ -28,6 +28,17 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer
         public bool IsChaos { get; set; }
         public string TownType { get; set; }
         public int Day { get; set; }
+
+        /// <summary>
+        /// La ville a-t-elle activé l'option d'API externe de MyHordes ? Null tant qu'on ne l'a pas
+        /// constaté.
+        /// </summary>
+        /// <remarks>
+        /// Le site s'en sert pour n'autoriser la saisie manuelle du niveau de maison que là où la
+        /// donnée ne peut pas arriver : sans API externe, pas de <c>baseDef</c>, donc pas de niveau
+        /// déduit. Partout ailleurs une saisie serait écrasée à la synchronisation suivante.
+        /// </remarks>
+        public bool? HasExternalApi { get; set; }
     }
 
     public class SimpleMeJobDetailDto

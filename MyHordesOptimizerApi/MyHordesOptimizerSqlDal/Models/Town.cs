@@ -56,6 +56,40 @@ public partial class Town
     [Column("score", TypeName = "int(11)")]
     public int? Score { get; set; }
 
+    /// <summary>
+    /// La ville a-t-elle activé l'option d'API externe ? Null tant qu'on ne l'a pas constaté.
+    /// </summary>
+    /// <remarks>
+    /// Constaté, jamais deviné : MyHordes renvoie <c>{"error":"ApiDisabled"}</c> à la place des
+    /// données de carte quand l'option est coupée (garde <c>OptFeatureXml</c> dans
+    /// <c>getMapData</c>, qui sert aussi bien <c>/json/map</c> que la branche <c>map</c> de
+    /// <c>/json/me</c>). Une ville sans API ne nous transmettra jamais <c>baseDef</c> : c'est la
+    /// seule où la saisie manuelle du niveau de maison garde un sens.
+    /// </remarks>
+    [Column("hasExternalApi")]
+    public bool? HasExternalApi { get; set; }
+
+    /// <summary>
+    /// Identifiant du joueur portant le rôle de Chaman, ou null si personne ne le porte.
+    /// </summary>
+    /// <remarks>
+    /// Un seul porteur par ville à la fois, mais il peut changer en cours de partie (mort,
+    /// bannissement). MyHordes ne renvoie que le DERNIER porteur, et seulement s'il est VIVANT :
+    /// le champ est omis sinon, ce qui vaut « plus personne » et doit remettre la colonne à null.
+    /// Cette écriture n'est donc légitime que depuis une source qui demande les trois rôles —
+    /// voir <c>TownExtensions.UpdateRolesFromMapDetails</c>.
+    /// </remarks>
+    [Column("idShaman", TypeName = "int(11)")]
+    public int? IdShaman { get; set; }
+
+    /// <summary>Identifiant du Guide de l'Outre-Monde. Mêmes règles que <see cref="IdShaman"/>.</summary>
+    [Column("idGuide", TypeName = "int(11)")]
+    public int? IdGuide { get; set; }
+
+    /// <summary>Identifiant du Responsable de la catapulte. Mêmes règles que <see cref="IdShaman"/>.</summary>
+    [Column("idCata", TypeName = "int(11)")]
+    public int? IdCata { get; set; }
+
     [Column("mapId", TypeName = "int(11)")]
     public int? MapId { get; set; }
 

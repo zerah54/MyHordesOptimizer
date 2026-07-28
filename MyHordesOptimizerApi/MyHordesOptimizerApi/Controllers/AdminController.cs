@@ -245,6 +245,30 @@ namespace MyHordesOptimizerApi.Controllers
             }
         }
 
+        /// <summary>
+        /// Reprise unique des identifiants de référentiel, à jouer après le script
+        /// <c>2026_07_28_chantier_dto_myhordes.sql</c>. Renvoie un constat détaillé plutôt
+        /// qu'un simple OK : les lignes restées sans correspondance sont l'information utile.
+        /// </summary>
+        [HttpPost("referentials/backfill")]
+        [Authorize]
+        [AdminOnly]
+        public async Task<ActionResult<ReferentialBackfillReport>> BackfillReferentialIds()
+        {
+            try
+            {
+                return Ok(await _importService.BackfillReferentialIdsAsync());
+            }
+            catch (MyHordesApiException ex)
+            {
+                return StatusCode((int)ex.StatusCode, new { error = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = ex.Message, detail = ex.InnerException?.Message });
+            }
+        }
+
         [HttpPost("towns/{townId}/import")]
         [Authorize]
         [AdminOnly]

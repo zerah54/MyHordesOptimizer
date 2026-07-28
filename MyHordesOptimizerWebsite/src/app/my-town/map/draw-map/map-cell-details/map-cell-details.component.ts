@@ -1,5 +1,5 @@
 import { CommonModule, NgOptimizedImage } from '@angular/common';
-import { Component, input,InputSignal } from '@angular/core';
+import { Component, input, InputSignal } from '@angular/core';
 import { MatDividerModule } from '@angular/material/divider';
 import moment from 'moment';
 
@@ -11,6 +11,7 @@ import { Item } from '../../../../_abstract_model/types/item.class';
 import { Ruin } from '../../../../_abstract_model/types/ruin.class';
 import { CitizensFromShortPipe } from '../../../../_core/pipes/citizens-from-short.pipe';
 import { ItemDetailsPipe } from '../../../../_core/pipes/item-details.pipe';
+import { ItemImgPipe } from '../../../../_core/pipes/item-img.pipe';
 import { CitizenInfoComponent } from '../../../../_shared/citizen-info/citizen-info.component';
 import { IconApComponent } from '../../../../_shared/icon-ap/icon-ap.component';
 import { LastUpdateComponent } from '../../../../_shared/last-update/last-update.component';
@@ -19,7 +20,7 @@ import { RuinInCell } from './ruin-in-cell.pipe';
 
 const angular_common: Imports = [CommonModule, NgOptimizedImage];
 const components: Imports = [LastUpdateComponent, IconApComponent, CitizenInfoComponent];
-const pipes: Imports = [CellDetailsBottomPipe, CellDetailsLeftPipe, CellDetailsRightPipe, CellDetailsTopPipe, CitizensFromShortPipe, ItemDetailsPipe, RuinInCell];
+const pipes: Imports = [CellDetailsBottomPipe, CellDetailsLeftPipe, CellDetailsRightPipe, CellDetailsTopPipe, CitizensFromShortPipe, ItemImgPipe, ItemDetailsPipe, RuinInCell];
 const material_modules: Imports = [MatDividerModule];
 
 @Component({

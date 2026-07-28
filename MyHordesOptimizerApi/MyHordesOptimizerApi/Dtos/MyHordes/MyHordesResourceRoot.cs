@@ -5,9 +5,9 @@ namespace MyHordesOptimizerApi.Dtos.MyHordes
     public class MyHordesResourceRoot
     {
         [JsonProperty("amount")]
-        public int Amount { get; set; }
+        public int? Amount { get; set; }
 
         [JsonProperty("rsc")]
-        public MyHordesResource Rsc { get; set; }
+        public MyHordesResource? Rsc { get; set; }
     }
 }

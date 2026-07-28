@@ -9,6 +9,8 @@ import { Recipe } from './recipe.class';
 export class Item extends CommonModel<ItemDTO> {
     public uid!: string;
     public img!: string;
+    /** Icône de l'objet cassé, `null` quand le jeu n'en prévoit pas de distincte. */
+    public img_broken: string | null = null;
     public label!: I18nLabels;
     public description!: I18nLabels;
     public id!: number;
@@ -39,6 +41,7 @@ export class Item extends CommonModel<ItemDTO> {
             description: this.description,
             guard: this.guard,
             img: this.img,
+            imgBroken: this.img_broken,
             isHeaver: this.is_heaver,
             label: this.label,
             properties: this.properties ? this.properties.filter((property: Property) => property).map((property: Property) => property?.key) : [],
@@ -60,6 +63,10 @@ export class Item extends CommonModel<ItemDTO> {
             this.description = dto.description;
             this.guard = dto.guard;
             this.img = dto.img ? dto.img.replace(/\..*\./, '.') : '';
+            // Surtout PAS le même nettoyage d'empreinte : le nom d'une icône cassée porte un point
+            // de plus (`item_wrench.b.gif`), et l'expression le prendrait pour une empreinte de
+            // version — elle rendrait `item_wrench.gif`, c'est-à-dire l'icône intacte.
+            this.img_broken = dto.imgBroken ?? null;
             this.is_heaver = dto.isHeaver;
             this.label = dto.label;
             this.properties = dto.properties ? <Property[]>dto.properties.map((property: string) => Property.getByKey(property)) : [];

@@ -5,9 +5,9 @@ namespace MyHordesOptimizerApi.Dtos.MyHordes
     public class MyHordesCleanup
     {
         [JsonProperty("user")]
-        public string User { get; set; }
+        public string? User { get; set; }
 
         [JsonProperty("type")]
-        public string Type { get; set; }
+        public string? Type { get; set; }
     }
 }

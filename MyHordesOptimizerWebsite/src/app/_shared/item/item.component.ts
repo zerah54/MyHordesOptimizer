@@ -1,5 +1,5 @@
 import { CommonModule, DecimalPipe, NgOptimizedImage } from '@angular/common';
-import { booleanAttribute, Component, DestroyRef, inject, input, InputSignalWithTransform, model,ModelSignal, OnInit } from '@angular/core';
+import { booleanAttribute, Component, DestroyRef, inject, input, InputSignalWithTransform, model, ModelSignal, OnInit } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDividerModule } from '@angular/material/divider';
@@ -10,12 +10,13 @@ import { WishlistService } from '../../_abstract_model/services/wishlist.service
 import { Imports } from '../../_abstract_model/types/_types';
 import { Item } from '../../_abstract_model/types/item.class';
 import { TownDetails } from '../../_abstract_model/types/town-details.class';
+import { ItemImgPipe } from '../../_core/pipes/item-img.pipe';
 import { getTown } from '../../_core/utilities/localstorage.util';
 import { RecipeComponent } from '../recipe/recipe.component';
 
 const angular_common: Imports = [CommonModule, NgOptimizedImage];
 const components: Imports = [RecipeComponent];
-const pipes: Imports = [DecimalPipe];
+const pipes: Imports = [DecimalPipe, ItemImgPipe];
 const material_modules: Imports = [MatButtonModule, MatDividerModule];
 
 @Component({
@@ -25,22 +26,17 @@ const material_modules: Imports = [MatButtonModule, MatDividerModule];
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class ItemComponent implements OnInit {
-    private wishlist_services: WishlistService = inject(WishlistService);
-
-
     /** L'élément à afficher si c'est un objet standard */
     public item: ModelSignal<Item> = model.required();
     /** Force l'ouverture de l'élément */
     public forceOpen: InputSignalWithTransform<boolean, unknown> = input(false, { transform: booleanAttribute });
-
     /** Le dossier dans lequel sont stockées les images */
     protected readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
     /** La locale */
     protected readonly locale: string = moment.locale();
-
     protected display_mode: 'simple' | 'advanced' = 'simple';
     protected town: TownDetails | null = getTown();
-
+    private wishlist_services: WishlistService = inject(WishlistService);
     private readonly destroy_ref: DestroyRef = inject(DestroyRef);
 
     public ngOnInit(): void {

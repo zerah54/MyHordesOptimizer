@@ -7,10 +7,10 @@ namespace MyHordesOptimizerApi.Dtos.MyHordes.Building
     {
         [JsonProperty("id")]
         [JsonPropertyName("id")]
-        public int Id { get; set; }
+        public int? Id { get; set; }
 
         [JsonProperty("uid")]
         [JsonPropertyName("uid")]
-        public string Uid { get; set; }
+        public string? Uid { get; set; }
     }
 }

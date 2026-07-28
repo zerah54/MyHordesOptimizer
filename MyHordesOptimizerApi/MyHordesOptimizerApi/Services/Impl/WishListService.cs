@@ -175,26 +175,50 @@ namespace MyHordesOptimizerApi.Services.Impl
 
         public List<WishlistTemplateDto> GetWishListTemplates()
         {
-            var models = DbContext.DefaultWishlistItems.ToList();
+            // L'objet est CHARGÉ, sinon la navigation reste nulle et chaque entrée sort avec
+            // « item: null » — un modèle de liste de courses sans aucun objet identifiable.
+            // Catégorie, propriétés et actions suivent parce que le DTO d'objet les expose, comme
+            // sur les autres chemins qui le produisent.
+            var models = DbContext.DefaultWishlistItems
+                .Include(model => model.IdItemNavigation)
+                    .ThenInclude(item => item.IdCategoryNavigation)
+                .Include(model => model.IdItemNavigation)
+                    .ThenInclude(item => item.PropertyNames)
+                .Include(model => model.IdItemNavigation)
+                    .ThenInclude(item => item.ActionNames)
+                .AsSplitQuery()
+                .ToList();
+
+            // Regroupement sur des valeurs SCALAIRES uniquement. La version précédente incluait un
+            // Dictionary dans la clé anonyme : les dictionnaires se comparant par référence, chaque
+            // ligne formait son propre groupe — d'où 35 modèles d'un objet là où le fichier n'en
+            // décrit qu'un seul de 35 objets.
             var templates = models.GroupBy(model => new
             {
                 model.IdDefaultWishlist,
                 model.IdUserAuthor,
-                Labels = new Dictionary<string, string>() { { "fr", model.LabelFr }, { "en", model.LabelEn }, { "es", model.LabelEs }, { "de", model.LabelDe } },
-                model.Name
+                model.Name,
+                model.LabelFr,
+                model.LabelEn,
+                model.LabelEs,
+                model.LabelDe
             });
             var dtos = new List<WishlistTemplateDto>();
             foreach (var group in templates)
             {
-                var templateId = group.Key.IdDefaultWishlist;
-                var items = Mapper.Map<List<WishListItemDto>>(group.ToList());
                 dtos.Add(new WishlistTemplateDto()
                 {
-                    IdTemplate = templateId,
+                    IdTemplate = group.Key.IdDefaultWishlist,
                     IdUserAuthor = group.Key.IdUserAuthor,
-                    Labels = group.Key.Labels,
+                    Labels = new Dictionary<string, string>()
+                    {
+                        { "fr", group.Key.LabelFr },
+                        { "en", group.Key.LabelEn },
+                        { "es", group.Key.LabelEs },
+                        { "de", group.Key.LabelDe }
+                    },
                     Name = group.Key.Name,
-                    Items = items
+                    Items = Mapper.Map<List<WishListItemDto>>(group.ToList())
                 });
             }
             return dtos;

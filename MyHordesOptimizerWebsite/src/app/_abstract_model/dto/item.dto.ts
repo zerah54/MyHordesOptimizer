@@ -5,6 +5,8 @@ import { RecipeDTO } from './recipe.dto';
 export interface ItemDTO {
     uid: string;
     img: string;
+    /** Icône de l'objet cassé, `null` quand le jeu n'en prévoit pas de distincte (363 objets sur 383). */
+    imgBroken: string | null;
     label: I18nLabels;
     description: I18nLabels;
     id: number;

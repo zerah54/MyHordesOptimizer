@@ -22,8 +22,8 @@ namespace MyHordesOptimizerApi.MappingProfiles.Wishlists
                 .ForMember(dest => dest.LabelEs, opt => opt.MapFrom(src => src.Name["es"]))
                 .ForMember(dest => dest.LabelEn, opt => opt.MapFrom(src => src.Name["en"]))
                 .ForMember(dest => dest.LabelDe, opt => opt.MapFrom(src => src.Name["de"]));
-            CreateMap<int, Item>()
-                .ConvertUsing<IntToItemConverter>();
+            CreateMap<string, Item>()
+                .ConvertUsing<UidToItemConverter>();
 
             CreateMap<TownWishListItem, WishListItemDto>()
                .ForMember(dest => dest.Count, opt => opt.MapFrom(src => src.Count))
@@ -71,12 +71,24 @@ namespace MyHordesOptimizerApi.MappingProfiles.Wishlists
                  .ForMember(dest => dest.Items, opt => opt.MapFrom(src => src.IdItems.Select(item => item.IdItem).ToList()));                   
         }
 
-        private class IntToItemConverter : ITypeConverter<int, Item>
+        /// <summary>
+        /// Résout un objet par son IDENTITÉ (« table_#00 »), telle que la portent les fichiers de
+        /// catégories saisis à la main.
+        /// </summary>
+        /// <remarks>
+        /// Remplace une résolution par identifiant numérique : celui-ci n'est qu'un auto-incrément
+        /// de fixtures côté MyHordes, et une renumérotation de leur part aurait fait pointer chaque
+        /// catégorie sur d'autres objets, sans la moindre erreur.
+        /// </remarks>
+        private class UidToItemConverter : ITypeConverter<string, Item>
         {
-            public Item Convert(int source, Item destination, ResolutionContext context)
+            public Item Convert(string source, Item destination, ResolutionContext context)
             {
                 var dbContext = context.GetDbContext();
-                return dbContext.Items.Single(item => item.IdItem == source);
+                // `Single` et non `SingleOrDefault` : une catégorie qui désigne un objet inexistant
+                // est une erreur du fichier, pas un cas à absorber en silence. La contrainte
+                // d'unicité sur `uid` garantit par ailleurs qu'il n'y a jamais deux candidats.
+                return dbContext.Items.Single(item => item.Uid == source);
             }
         }
     }

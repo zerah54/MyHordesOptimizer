@@ -6,18 +6,18 @@ namespace MyHordesOptimizerApi.Dtos.MyHordes
     public class MyHordesApiRuinDto
     {
         [JsonProperty("id")]
-        public int Id { get; set; }
+        public int? Id { get; set; }
 
         [JsonProperty("name")]
-        public IDictionary<string, string> Name { get; set; }
+        public IDictionary<string, string>? Name { get; set; }
 
         [JsonProperty("desc")]
-        public IDictionary<string, string> Desc { get; set; }
+        public IDictionary<string, string>? Desc { get; set; }
 
         [JsonProperty("explorable")]
-        public bool Explorable { get; set; }
+        public bool? Explorable { get; set; }
 
         [JsonProperty("img")]
-        public string Img { get; set; }
+        public string? Img { get; set; }
     }
 }

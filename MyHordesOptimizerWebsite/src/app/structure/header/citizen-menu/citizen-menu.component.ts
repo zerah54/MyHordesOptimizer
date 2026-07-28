@@ -1,5 +1,5 @@
 import { NgOptimizedImage } from '@angular/common';
-import { Component, DestroyRef, inject,OnInit } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { MatCheckboxChange, MatCheckboxModule } from '@angular/material/checkbox';
@@ -11,6 +11,7 @@ import { MatSelectModule } from '@angular/material/select';
 import moment from 'moment';
 
 import { HORDES_IMG_REPO } from '../../../_abstract_model/const';
+import { HomeEnum } from '../../../_abstract_model/enum/home.enum';
 import { StatusEnum } from '../../../_abstract_model/enum/status.enum';
 import { ApiService } from '../../../_abstract_model/services/api.service';
 import { TownService } from '../../../_abstract_model/services/town.service';
@@ -21,6 +22,7 @@ import { HeroicActionsWithValue } from '../../../_abstract_model/types/heroic-ac
 import { HomeWithValue } from '../../../_abstract_model/types/home.class';
 import { Item } from '../../../_abstract_model/types/item.class';
 import { Me } from '../../../_abstract_model/types/me.class';
+import { isHouseLevelEditable } from '../../../_abstract_model/types/town-details.class';
 import { UpdateInfo } from '../../../_abstract_model/types/update-info.class';
 import { getTown, getUser } from '../../../_core/utilities/localstorage.util';
 import { CitizenInfoComponent } from '../../../_shared/citizen-info/citizen-info.component';
@@ -40,24 +42,20 @@ const material_modules: Imports = [MatCheckboxModule, MatDividerModule, MatFormF
 export class CitizenMenuComponent implements OnInit {
 
     protected citizen!: Citizen;
+    protected readonly locale: string = moment.locale();
+    /** La liste des listes disponibles dans le sac */
+    protected bag_lists: ListForAddRemove[] = [];
+    protected readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
     private readonly me: Me | null = getUser();
     private readonly current_day: number = getTown()?.day || 1;
-    protected readonly locale: string = moment.locale();
-
     /** La liste complète des items */
     private all_items: Item[] = [];
     /** La liste complète des statuts */
     private readonly all_status: StatusEnum[] = StatusEnum.getAllValues();
-
-    /** La liste des listes disponibles dans le sac */
-    protected bag_lists: ListForAddRemove[] = [];
     /** La liste des listes disponibles dans les status */
     protected readonly status_lists: ListForAddRemove[] = [
         { label: $localize`Tous`, list: this.all_status }
     ];
-
-    protected readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
-
     private readonly api: ApiService = inject(ApiService);
     private readonly destroy_ref: DestroyRef = inject(DestroyRef);
     private readonly town_service: TownService = inject(TownService);
@@ -287,6 +285,14 @@ export class CitizenMenuComponent implements OnInit {
                     }
                 });
         }
+    }
+
+    /**
+     * Le champ maison donné est-il saisissable ? Tous le sont, sauf le niveau de la maison, que
+     * MyHordes fournit et que le back déduit de `baseDef` — voir {@link isHouseLevelEditable}.
+     */
+    protected isHomeEditable(home: HomeWithValue): boolean {
+        return isHouseLevelEditable(getTown()) || home.element?.key !== HomeEnum.HOUSE_LEVEL.key;
     }
 
     /**

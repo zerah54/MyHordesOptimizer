@@ -14,6 +14,7 @@ export const RUINS_KEY: string = 'all_ruins';
 export const TOKEN_KEY: string = 'MHO_TOKEN';
 export const HORDES_IMG_REPO: string = 'img/hordes_img/';
 
+
 export const BREAKPOINTS: Dictionary<string> = {
     'xs': 'screen and (max-width: 599px)',
     'sm': 'screen and (min-width: 600px) and (max-width: 959px)',

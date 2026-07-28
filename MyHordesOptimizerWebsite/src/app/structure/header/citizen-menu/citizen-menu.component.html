@@ -86,7 +86,14 @@
               class="mho-menu-citizen-details home">
         @for (home of (citizen.home?.content || []); track $index) {
             <div mat-menu-item [role]="home.element.value.max_lvl > 1 ? 'menuitem': 'menuitemcheckbox'" (click)="$event.stopPropagation();">
-                @if (home.element.value.max_lvl > 1) {
+                @if (!isHomeEditable(home)) {
+                    <!-- Niveau de maison : renseigné depuis MyHordes, jamais saisi. On garde l'icône
+                         et le libellé pour que l'entrée reste lisible sans son contrôle. -->
+                    <img style="vertical-align: middle; margin-right: 0.5em;"
+                         [ngSrc]="HORDES_IMG_REPO + 'home/home_lv' + home.value + '.gif'"
+                         width="16" height="16">
+                    <span>{{ home.element.value.label }}&nbsp;: {{ home.value }}</span>
+                } @else if (home.element.value.max_lvl > 1) {
                     <mat-form-field subscriptSizing="dynamic" [appearance]="'outline'" class="compact-field">
                         <mat-label>{{ home.element.value.label }}</mat-label>
                         @if (home.element.value.img && home.element.value.img !== '') {

@@ -50,6 +50,30 @@ public partial class Picto
     [Column("community")]
     public bool Community { get; set; }
 
+    /// <summary>
+    /// Nom du prototype côté MyHordes (ex. <c>r_ripflash_#00</c>), clé du dictionnaire renvoyé
+    /// par <c>/json/pictos</c>. C'est l'identité stable du picto, que l'import jetait avant.
+    /// </summary>
+    [Column("uid")]
+    public string? Uid { get; set; }
+
+    /// <summary>
+    /// Identifiant du prototype chez MyHordes, à l'instant de la dernière synchronisation.
+    /// MUTABLE et sans valeur d'identité : c'est un auto-incrément de fixtures, qui change
+    /// d'une instance du jeu à l'autre. L'identité, c'est <see cref="Uid"/>.
+    /// Peut différer de <c>IdPicto</c> — c'est normal et voulu.
+    /// </summary>
+    [Column("mhId", TypeName = "int(11)")]
+    public int? MhId { get; set; }
+
+    /// <summary>
+    /// Vrai quand le prototype a disparu du jeu. La ligne est CONSERVÉE pour que les données
+    /// qui la référencent restent résolvables — un picto gagné il y a trois saisons doit
+    /// rester affichable ; elle est seulement exclue des catalogues.
+    /// </summary>
+    [Column("isObsolete")]
+    public bool IsObsolete { get; set; }
+
     [InverseProperty("IdPictoNavigation")]
     public virtual ICollection<UserPicto> UserPictos { get; set; } = new List<UserPicto>();
 

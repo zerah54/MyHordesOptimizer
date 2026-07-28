@@ -20,6 +20,17 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Citizens
         public string JobName { get; set; }
         public string JobUid { get; set; }
 
+        /// <summary>
+        /// Rôles de ville portés par ce citoyen, parmi <c>shaman</c>, <c>guide</c> et <c>cata</c> —
+        /// vide s'il n'en porte aucun.
+        /// </summary>
+        /// <remarks>
+        /// Une LISTE, et non une valeur unique : le jeu garantit un seul porteur par rôle, pas un
+        /// seul rôle par porteur. Rien n'empêche un même citoyen d'être à la fois Chaman et Guide
+        /// de l'Outre-Monde.
+        /// </remarks>
+        public List<string> TownRoles { get; set; } = new List<string>();
+
         public int X { get; set; }
 
         public int Y { get; set; }

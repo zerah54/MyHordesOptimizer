@@ -59,7 +59,7 @@
                 @for (item of cell().items; track item.item_id) {
                     <div>
                         @if (item | itemDetails:allItems(); as complete_item) {
-                            <img [ngSrc]="HORDES_IMG_REPO + complete_item.img" [class.broken]="item.is_broken" width="16" height="16">
+                            <img [ngSrc]="HORDES_IMG_REPO + (complete_item | itemImg:item.is_broken)" [class.broken]="item.is_broken" width="16" height="16">
                         }
                         <span class="item-quantity">{{ item.count }}</span>
                     </div>
