@@ -186,12 +186,15 @@ namespace MyHordesOptimizerApi.Controllers
 
         // Comme l'import global : lancé en tâche de fond, l'import de toutes les villes d'une saison
         // dépasse largement le temps de réponse toléré par le reverse proxy.
+        // `resume` ignore les villes déjà importées depuis le classement : une saison ancienne ne
+        // s'importe qu'en plusieurs passes, le quota MyHordes tombant bien avant la fin de la liste.
+        // Faux par défaut, pour que le rafraîchissement de villes déjà connues reste possible.
         [HttpPost("import/towns")]
         [Authorize]
         [AdminOnly]
-        public ActionResult<ImportJobState> ImportTowns([FromQuery] int? season = null)
+        public ActionResult<ImportJobState> ImportTowns([FromQuery] int? season = null, [FromQuery] bool resume = false)
         {
-            return StartImportJob(ImportJobKeys.Towns, (service, onStep) => service.ImportTownsAsync(season, onStep));
+            return StartImportJob(ImportJobKeys.Towns, (service, onStep) => service.ImportTownsAsync(season, resume, onStep));
         }
 
         private ActionResult<ImportJobState> StartImportJob(string job, Func<IMyHordesImportService, Action<ImportStepProgress>, Task> work)

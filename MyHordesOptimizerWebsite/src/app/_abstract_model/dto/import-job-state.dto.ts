@@ -14,4 +14,6 @@ export interface ImportJobStateDTO {
     /** Null tant qu'aucun import n'est allé au bout depuis le démarrage de l'API */
     lastRunSucceeded: boolean | null;
     error: string | null;
+    /** Constat sur un import réussi mais incomplet (quota MyHordes épuisé) — ce n'est pas une erreur */
+    warning: string | null;
 }

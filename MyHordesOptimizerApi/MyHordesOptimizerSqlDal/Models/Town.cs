@@ -93,6 +93,20 @@ public partial class Town
     [Column("mapId", TypeName = "int(11)")]
     public int? MapId { get; set; }
 
+    /// <summary>
+    /// Date du dernier import de cette ville depuis le classement (<c>/json/towns</c>), ou null si
+    /// elle n'en a jamais fait l'objet.
+    /// </summary>
+    /// <remarks>
+    /// Point de reprise de l'import d'une saison : MyHordes tronque <c>/json/towns</c> à 50
+    /// identifiants et limite la clé personnelle à 150 requêtes par heure glissante, si bien qu'une
+    /// saison ancienne ne s'importe qu'en plusieurs passes. Null ne se déduit PAS de l'absence de la
+    /// ligne : <c>UpsertPlayedMaps</c> crée des lignes <c>Town</c> sans jamais importer leurs
+    /// cadavres, et il faut pouvoir les compléter.
+    /// </remarks>
+    [Column("rankingImportedAt", TypeName = "datetime")]
+    public DateTime? RankingImportedAt { get; set; }
+
     [Column("isFinished")]
     public bool IsFinished { get; set; }
 

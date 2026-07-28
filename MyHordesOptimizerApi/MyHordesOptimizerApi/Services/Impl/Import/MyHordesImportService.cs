@@ -1102,9 +1102,28 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
 
         #region Towns
 
-        public Task ImportTownsAsync(int? season = null, Action<ImportStepProgress> onStep = null)
+        public Task ImportTownsAsync(int? season = null, bool resume = false, Action<ImportStepProgress> onStep = null)
         {
             var allMhIds = MyHordesApiRepository.GetTownList(season);
+            var listedTowns = allMhIds.Count;
+            var skippedTowns = 0;
+
+            if (resume)
+            {
+                // Reprise : les villes déjà importées depuis le classement sont acquises — une saison
+                // passée ne bouge plus — et les rejouer ne ferait que rebrûler le quota. Le filtre porte
+                // sur les identifiants renvoyés par /json/townlist pour la saison demandée, jamais sur
+                // Town.season : l'appartenance à la saison est déjà prouvée par la liste elle-même.
+                var alreadyImportedIds = DbContext.Towns
+                    .Where(town => town.RankingImportedAt != null)
+                    .Select(town => town.IdTown)
+                    .ToHashSet();
+                allMhIds = allMhIds.Where(id => !alreadyImportedIds.Contains(id)).ToList();
+                skippedTowns = listedTowns - allMhIds.Count;
+                Logger.LogInformation("ImportTowns (saison {Season}) : reprise, {Skipped}/{Listed} villes déjà importées sont ignorées.",
+                    season, skippedTowns, listedTowns);
+            }
+
             var importedTowns = 0;
 
             // Snapshot BDD pour détection de migration
@@ -1132,9 +1151,25 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
             // toujours déclenché manuellement, il doit donc pouvoir rafraîchir une ville même
             // considérée comme terminée. Le coût reste raisonnable (/json/towns batché par 50,
             // aucun appel /json/map par ville dans ce chemin).
+            var quotaReached = false;
             foreach (var batch in allMhIds.Chunk(50))
             {
-                var towns = MyHordesApiRepository.GetTownDetails(batch.ToList());
+                List<MyHordesTownDetailsDto> towns;
+                try
+                {
+                    towns = MyHordesApiRepository.GetTownDetails(batch.ToList());
+                }
+                catch (MyHordesApiException ex) when (ex.StatusCode == System.Net.HttpStatusCode.TooManyRequests)
+                {
+                    // Le quota (150 requêtes par heure glissante sur la clé personnelle) est atteint :
+                    // le lot en cours n'a rien écrit, tous les précédents sont commités. On s'arrête ici
+                    // plutôt que de laisser l'exception tuer le job, pour que les statistiques de fin
+                    // soient tout de même recalculées et que l'état rapporte l'avancement réel.
+                    quotaReached = true;
+                    Logger.LogWarning(ex, "ImportTowns (saison {Season}) : quota MyHordes atteint après {Imported} villes, arrêt propre.",
+                        season, importedTowns);
+                    break;
+                }
                 // L'id de classement est la clé de la ville : sans lui il n'y a rien à rapprocher.
                 foreach (var townDto in towns.Where(town => town.Id.HasValue))
                 {
@@ -1165,12 +1200,18 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
                 DbContext.SaveChanges();
                 DbContext.ChangeTracker.Clear();
                 importedTowns += batch.Length;
-                onStep?.Invoke(new ImportStepProgress(TownsImportStep, importedTowns, allMhIds.Count));
+                // L'avancement est rapporté sur la saison entière, villes déjà acquises comprises :
+                // c'est la progression que l'on suit d'une passe à l'autre, pas celle de la passe.
+                onStep?.Invoke(new ImportStepProgress(TownsImportStep, skippedTowns + importedTowns, listedTowns));
             }
 
             // L'import vient de créer des joueurs et des participations : l'annuaire lit des colonnes
             // dénormalisées, qui seraient sinon périmées jusqu'au prochain recalcul manuel.
-            onStep?.Invoke(new ImportStepProgress(UserStatsImportStep, 1, 1));
+            var remainingTowns = listedTowns - skippedTowns - importedTowns;
+            var message = quotaReached
+                ? $"Quota MyHordes atteint : {skippedTowns + importedTowns}/{listedTowns} villes importées, {remainingTowns} restantes. Relance l'import en reprise dans une heure."
+                : null;
+            onStep?.Invoke(new ImportStepProgress(UserStatsImportStep, 1, 1, message));
             return RecomputeUserDirectoryStatsAsync();
         }
 
@@ -1415,6 +1456,10 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
             {
                 existing.PhaseId = (int)phase;
             }
+
+            // Toutes les entrées de cette méthode viennent de /json/towns : la ville est donc importée
+            // depuis le classement, ce que la reprise de l'import de saison utilise comme point d'arrêt.
+            existing.RankingImportedAt = DateTime.UtcNow;
 
             // IsFinished n'est PAS déduit d'ici : le endpoint bulk /json/towns ne remonte souvent que
             // les citoyens déjà morts (pas les vivants), donc dto.Citizens.All(dead) est presque

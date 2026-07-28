@@ -38,6 +38,21 @@
         font-size: 0.875rem;
     }
 
+    .import-warning {
+        display: flex;
+        align-items: center;
+        gap: 0.4em;
+        margin: 0;
+        color: var(--mat-sys-tertiary, #f0d79e);
+        font-size: 0.875rem;
+
+        mat-icon {
+            font-size: 1.25rem;
+            width: 1.25rem;
+            height: 1.25rem;
+        }
+    }
+
     .import-grid {
         display: flex;
         flex-wrap: wrap;

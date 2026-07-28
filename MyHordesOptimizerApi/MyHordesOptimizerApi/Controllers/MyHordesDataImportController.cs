@@ -145,11 +145,13 @@ namespace MyHordesOptimizerApi.Controllers
             return Ok();
         }
 
+        // `resume` ignore les villes déjà importées depuis le classement : sans lui, une saison
+        // ancienne interrompue par le quota MyHordes repart du premier lot à chaque relance.
         [HttpPost]
         [Route("Towns")]
-        public async Task<ActionResult> ImportTownsAsync([FromQuery] int? season = null)
+        public async Task<ActionResult> ImportTownsAsync([FromQuery] int? season = null, [FromQuery] bool resume = false)
         {
-            await MyHordesImportService.ImportTownsAsync(season);
+            await MyHordesImportService.ImportTownsAsync(season, resume);
             return Ok();
         }
     }
