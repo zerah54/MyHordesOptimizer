@@ -2424,7 +2424,7 @@
         </context-group>
         <target state="final">Angriff T
                     <x id="INTERPOLATION" equiv-text="{{ selected_day }}"/>
-            berechnet
+                    berechnet
                 </target>
       </trans-unit>
       <trans-unit id="795113065551434631" datatype="html">
@@ -4999,17 +4999,20 @@
                     Das macht auch andere erweiterte Aktualisierungsoptionen zugänglich.
                     &lt;ul&gt;
                     &lt;li&gt;&lt;strong&gt;Anzahl der getöteten Zombies:&lt;/strong&gt; Speichert die Anzahl der getöteten Zombies auf der Zone&lt;/li&gt;
-                    &lt;li&gt;&lt;strong&gt;Aktualisierung in zerstörter Stadt:&lt;/strong&gt; Wenn die Stadt zerstört ist, werden Informationen aus der Zone abgerufen,
+                    &lt;li&gt;&lt;strong&gt;Aktualisierung in zerstörter Stadt:&lt;/strong&gt; Wenn die Stadt zerstört ist, werden Informationen aus der Zone
+                    abgerufen,
                     um sie
                     an MyHordes Optimizer zu senden.&lt;/li&gt;
                     &lt;li&gt;&lt;strong&gt;Heldentaten:&lt;/strong&gt; Speichert die verfügbaren / verwendeten Heldentaten&lt;/li&gt;
                     &lt;li&gt;&lt;strong&gt;Hausverbesserungen:&lt;/strong&gt; Speichert Informationen über dein Haus&lt;/li&gt;
-                    &lt;li&gt;&lt;strong&gt;Details zu meinem Rucksack und den Rucksäcken meiner Eskorte:&lt;/strong&gt; Speichert den Inhalt deines Rucksacks und den
+                    &lt;li&gt;&lt;strong&gt;Details zu meinem Rucksack und den Rucksäcken meiner Eskorte:&lt;/strong&gt; Speichert den Inhalt deines Rucksacks
+                    und den
                     Inhalt
                     der Rucksäcke deiner Eskorte&lt;/li&gt;
                     &lt;li&gt;&lt;strong&gt;Status:&lt;/strong&gt; Speichert deine verschiedenen Statuswerte (satt, durstig, etc... Achtung: Speichert nicht den
                     Ghul-Status)&lt;/li&gt;
-                    &lt;li&gt;&lt;strong&gt;Erfolgreiche Grabungen aufzeichnen:&lt;/strong&gt; Zeichnet erfolgreiche Grabungen auf, um Statistiken über die Grabungen in
+                    &lt;li&gt;&lt;strong&gt;Erfolgreiche Grabungen aufzeichnen:&lt;/strong&gt; Zeichnet erfolgreiche Grabungen auf, um Statistiken über die
+                    Grabungen in
                     einer
                     speziellen Karte wiederzugeben&lt;/li&gt;&lt;/ul&gt;
                 </target>
@@ -5037,7 +5040,8 @@
                     Das macht auch andere Aktualisierungsoptionen zugänglich.
                     &lt;ul&gt;
                     &lt;li&gt;&lt;strong&gt;Anzahl der getöteten Zombies :&lt;/strong&gt; Zeichnet die Anzahl der getöteten Zombies auf der Zone auf&lt;/li&gt;
-                    &lt;li&gt;&lt;strong&gt;Update in zerstörter Stadt :&lt;/strong&gt;Wenn die Stadt zerstört ist, werden die Zoneninformationen gesammelt, um sie an
+                    &lt;li&gt;&lt;strong&gt;Update in zerstörter Stadt :&lt;/strong&gt;Wenn die Stadt zerstört ist, werden die Zoneninformationen gesammelt, um
+                    sie an
                     Gest'Hordes zu schicken.&lt;/li&gt;
                     &lt;li&gt;&lt;strong&gt;Heldentaten :&lt;/strong&gt; Zeichnet verfügbare / verwendete Heldentaten auf&lt;/li&gt;
                     &lt;li&gt;&lt;strong&gt;Hausverbesserungen :&lt;/strong&gt; Speichert Informationen über dein Haus&lt;/li&gt;
@@ -5780,6 +5784,22 @@
           <context context-type="linenumber">23</context>
         </context-group>
         <target state="final">Bürgeraktion</target>
+      </trans-unit>
+      <trans-unit id="4043696163111238377" datatype="html">
+        <source>Action de citoyen (en ville)</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/wiki/recipes/recipes.component.html</context>
+          <context context-type="linenumber">26</context>
+        </context-group>
+        <target state="translated">Bürgeraktion (in der Stadt)</target>
+      </trans-unit>
+      <trans-unit id="7516219511604042381" datatype="html">
+        <source>Action de citoyen (dans l&apos;Outre-Monde)</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/wiki/recipes/recipes.component.html</context>
+          <context context-type="linenumber">29</context>
+        </context-group>
+        <target state="translated">Bürgeraktion (in der Außenwelt)</target>
       </trans-unit>
       <trans-unit id="6743161373003242548" datatype="html" approved="yes">
         <source>Atelier</source>
