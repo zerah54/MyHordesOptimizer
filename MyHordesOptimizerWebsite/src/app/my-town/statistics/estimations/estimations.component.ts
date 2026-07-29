@@ -46,20 +46,26 @@ export class EstimationsComponent implements OnInit {
     protected readonly tdg_values: number[] = TDG_VALUES;
     protected readonly planif_values: number[] = PLANIF_VALUES;
     protected readonly current_day: number = getTown()?.day || 1;
+    /** Mode observateur : masque la sauvegarde et verrouille la saisie (le refiner local reste actif). */
+    protected readonly is_readonly: Signal<boolean> = inject(TownContextService).isReadonly;
     protected selected_day: number = this.current_day;
     protected estimations!: Estimations;
     /** La datasource pour le tableau */
     protected datasource: MatTableDataSource<Regen> = new MatTableDataSource();
-    protected today_estim_chart!: Chart<'line'>;
-    protected today_offset_chart!: Chart<'bar'>;
     protected today_offset_mode!: boolean;
-    protected tomorrow_estim_chart!: Chart<'line'>;
-    protected tomorrow_offset_chart!: Chart<'bar'>;
     protected tomorrow_offset_mode!: boolean;
     protected today_calculated_attack!: EstimationsResult | null;
     protected tomorrow_calculated_attack!: EstimationsResult | null;
     protected step?: number = 0;
-    protected separators: string[] = [' à ', ' - '];
+    private readonly today_estim_canvas: Signal<ElementRef> = viewChild.required<ElementRef>('todayEstimCanvas');
+    private readonly today_offset_canvas: Signal<ElementRef> = viewChild.required<ElementRef>('todayOffsetCanvas');
+    private readonly tomorrow_estim_canvas: Signal<ElementRef> = viewChild.required<ElementRef>('tomorrowEstimCanvas');
+    private readonly tomorrow_offset_canvas: Signal<ElementRef> = viewChild.required<ElementRef>('tomorrowOffsetCanvas');
+    private today_estim_chart!: Chart<'line'>;
+    private today_offset_chart!: Chart<'bar'>;
+    private tomorrow_estim_chart!: Chart<'line'>;
+    private tomorrow_offset_chart!: Chart<'bar'>;
+    private separators: string[] = [' à ', ' - '];
     private readonly clipboard: ClipboardService = inject(ClipboardService);
     private town_statistics_service: TownStatisticsService = inject(TownStatisticsService);
 
