@@ -1,6 +1,6 @@
 <div class="mho-estimations">
     <div class="header">
-        <mho-header-with-number-previous-next-filter (filterValueChange)="getEstimations()" [(filterValue)]="selected_day" [max]="current_day"
+        <mho-header-with-number-previous-next-filter [(filterValue)]="selected_day" (filterValueChange)="getEstimations()" [max]="current_day"
                                                      [min]="1" class="previous-next">
         </mho-header-with-number-previous-next-filter>
         <div class="actions">
