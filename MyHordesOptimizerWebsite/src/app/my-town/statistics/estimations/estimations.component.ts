@@ -21,6 +21,7 @@ import { Estimations } from '../../../_abstract_model/types/estimations.class';
 import { EstimationGraphValues, EstimationsResult } from '../../../_abstract_model/types/estimations-result.class';
 import { Regen } from '../../../_abstract_model/types/regen.class';
 import { ClipboardService } from '../../../_core/services/clipboard.service';
+import { TownContextService } from '../../../_core/services/town-context.service';
 import { getMaxAttack, getMinAttack } from '../../../_core/utilities/estimations.util';
 import { getTown } from '../../../_core/utilities/localstorage.util';
 import {
@@ -57,10 +58,6 @@ export class EstimationsComponent implements OnInit {
     protected today_calculated_attack!: EstimationsResult | null;
     protected tomorrow_calculated_attack!: EstimationsResult | null;
     protected step?: number = 0;
-    private readonly today_estim_canvas: Signal<ElementRef> = viewChild.required<ElementRef>('todayEstimCanvas');
-    private readonly today_offset_canvas: Signal<ElementRef> = viewChild.required<ElementRef>('todayOffsetCanvas');
-    private readonly tomorrow_estim_canvas: Signal<ElementRef> = viewChild.required<ElementRef>('tomorrowEstimCanvas');
-    private readonly tomorrow_offset_canvas: Signal<ElementRef> = viewChild.required<ElementRef>('tomorrowOffsetCanvas');
     private today_estim_chart!: Chart<'line'>;
     private today_offset_chart!: Chart<'bar'>;
     private tomorrow_estim_chart!: Chart<'line'>;
