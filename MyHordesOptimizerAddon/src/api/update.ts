@@ -373,8 +373,6 @@ export function updateExternalTools() {
                     }
                 });
             }
-            const house_level = +document.querySelector('[x-tab-group="home-main"][x-tab-id="values"] .town-summary')?.querySelector('.row-detail img')?.alt || undefined;
-            data.amelios.values.house = house_level;
         }
 
         /** Récupération des status */

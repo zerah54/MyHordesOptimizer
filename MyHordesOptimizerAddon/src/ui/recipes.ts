@@ -56,6 +56,8 @@ export function getRecipeElement(recipe) {
         case 'Recipe::WorkshopTypeShamanSpecific':
             recipe_type_img.src = repo_img_hordes_url + 'log/workshop.gif';
             break;
+        case 'Recipe::ManualInside':
+        case 'Recipe::ManualOutside':
         default:
             recipe_type_img.src = repo_img_hordes_url + 'icons/small_move.gif';
             break;

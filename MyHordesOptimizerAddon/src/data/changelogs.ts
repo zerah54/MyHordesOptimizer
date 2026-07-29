@@ -1,4 +1,11 @@
 export const changelogs: Record<string, string> = {
+    '1.1.52': `
+        [Amélioration] En cas de coéxistence du script et de l'extension, un message d'erreur s'affiche et seul l'un des deux est chargé
+
+        [Correction] Retrait de la recette de montage d'une tronçonneuse en extérieur (recette spécifique car échoue) qui donnait l'impression que la recette existait deux fois à l'identique
+        [Correction] Retrait de l'utilisation sur myHordes.localhost qui s'était glissée là par erreur pendant des tests
+        [Correction] L'utilisation du pouvoir héroïque "Trouvaille" et ses variantes devrait désormais être bien mise à jour
+    `,
     '1.1.51': `
         [Nouveauté] Sur la page de la banque, un compteur indique le nombre de prises encore possibles avant de déclencher l'anti-abus, avec une alerte lorsque la limite est atteinte
         [Nouveauté] Le calcul des PA nécessaires pour qu'un bâtiment survive à la nuit prend désormais en compte les feux d'artifice et le réacteur soviétique, avec la bonne valeur en Région Éloignée comme en Pandémonium

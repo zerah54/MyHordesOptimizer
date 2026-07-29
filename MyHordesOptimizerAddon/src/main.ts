@@ -20,6 +20,7 @@ import { createOptimizerBtn } from './ui/btn';
 import { createMhoHeaderSpace } from './ui/header-space';
 import { createStyles } from './ui/styles';
 import { waitForElement } from './utils/dom-wait';
+import { isDoubleInstall } from './utils/double-install-guard';
 import { initOptionsWithLoginNeeded, initOptionsWithoutLoginNeeded } from './utils/fetch';
 import { getTownClockSignature, shouldRefreshMe } from './utils/page';
 import { getStorageItem, setStorageItem } from './utils/storage';
@@ -29,6 +30,13 @@ import { isNewVersion, toggleNewChangelog } from './utils/version';
 //     MAIN FUNCTION     //
 ///////////////////////////
 (async function () {
+    /**
+     * Détection en tout premier, avant tout accès réseau ou au stockage : si une autre
+     * instance (script ou extension) est déjà active sur la page, celle-ci n'a rien
+     * d'autre à faire que d'afficher son bandeau d'avertissement.
+     */
+    if (isDoubleInstall()) return;
+
     // Les URLs d'environnement et les paramètres persistés doivent être chargés
     // avant toute initialisation : la suite les lit de manière synchrone
     await bootstrap();

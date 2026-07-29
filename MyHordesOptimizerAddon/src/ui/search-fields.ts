@@ -11,6 +11,7 @@ import {
 import { params_categories } from '../data/params';
 import { texts } from '../i18n/texts';
 import { state } from '../state';
+import type { I18nLabel } from '../types';
 import { createCheckboxDropdown, createSingleFilterSelect } from '../utils/dom';
 import { cancelWaitForElement, waitForElement } from '../utils/dom-wait';
 import { getI18N } from '../utils/i18n';
@@ -358,7 +359,7 @@ export function displaySearchFieldOnDump() {
 /** Nœud de l'arborescence des paramètres, réduit à ce qui est nécessaire pour retrouver un libellé */
 interface ParamNode {
     id: string;
-    label?: unknown;
+    label?: I18nLabel;
     params?: ParamNode[];
     children?: ParamNode[];
 }
@@ -634,7 +635,7 @@ function observeTooltipsForBuildings(): void {
                 missing_ap_info.style.fontSize = '0.8em';
                 missing_ap_info.style.overflow = 'hidden';
                 missing_ap_info.style.textOverflow = 'ellipsis';
-                missing_ap_info.innerText = getI18N(texts.missing_ap_explanation).replace('%VAR%', Math.ceil(missing_pts / nb_pts_per_ap));
+                missing_ap_info.innerText = getI18N(texts.missing_ap_explanation).replace('%VAR%', String(Math.ceil(missing_pts / nb_pts_per_ap)));
                 nb_ap_element.appendChild(missing_ap_info);
             });
         } else {
