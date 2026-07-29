@@ -58,7 +58,9 @@
           <context context-type="sourcefile">src/app/_abstract_model/enum/action.enum.ts</context>
           <context context-type="linenumber">44</context>
         </context-group>
-        <target state="final">Restores one action point to everyone in the town, up to their maximum action point limit. If drunk or drugged adds one extra action point to respective citizens.                </target>
+        <target state="final">Restores one action point to everyone in the town, up to their maximum action point limit. If drunk or drugged adds one
+                    extra action point to respective citizens.
+                </target>
       </trans-unit>
       <trans-unit id="5265432085520184033" datatype="html" approved="yes">
         <source>Peut être rechargé avec une pile</source>
@@ -2491,7 +2493,7 @@
         </context-group>
         <target state="final">Calculated attack D
                     <x id="PH" equiv-text="day"/>
-            - Min
+                    - Min
                 </target>
       </trans-unit>
       <trans-unit id="6403535731908270838" datatype="html" approved="yes">
@@ -2505,7 +2507,7 @@
         </context-group>
         <target state="final">Calculated attack D
                     <x id="PH" equiv-text="day"/>
-            - Max
+                    - Max
                 </target>
       </trans-unit>
       <trans-unit id="4578996312563618431" datatype="html" approved="yes">
@@ -2519,7 +2521,7 @@
         </context-group>
         <target state="final">Calculated attack D
                     <x id="PH" equiv-text="day"/>
-            (beta) - Min
+                    (beta) - Min
                 </target>
       </trans-unit>
       <trans-unit id="5430737185209049312" datatype="html" approved="yes">
@@ -2533,7 +2535,7 @@
         </context-group>
         <target state="final">Calculated attack D
                     <x id="PH" equiv-text="day"/>
-            (beta) - Max
+                    (beta) - Max
                 </target>
       </trans-unit>
       <trans-unit id="7065021988584818620" datatype="html" approved="yes">
@@ -4151,9 +4153,9 @@
           <context context-type="linenumber">178</context>
         </context-group>
         <target state="final">
-Total
+                    Total
                     <x id="INTERPOLATION" equiv-text="{{ display_bonus_ap ? 'number' : 'percentage' }}"/>
-                     of improvements in the zone
+                    of improvements in the zone
                 </target>
       </trans-unit>
       <trans-unit id="2902261471051690112" datatype="html" approved="yes">
@@ -5147,8 +5149,9 @@ Total
           <context context-type="linenumber">35</context>
         </context-group>
         <target state="final">First, you need to install the script management application of your choice. There are several, such as
-                     Tampermonkey or Violentmonkey. Then, just click on the<x id="PH" equiv-text="this.download_link"/>, which will start the installation procedure.
-                     Finally, you will need to confirm on the page that will open.
+                    Tampermonkey or Violentmonkey. Then, just click on the<x id="PH" equiv-text="this.download_link"/>, which will start the installation
+                    procedure.
+                    Finally, you will need to confirm on the page that will open.
                 </target>
       </trans-unit>
       <trans-unit id="4519018646004234371" datatype="html" approved="yes">
@@ -5286,7 +5289,8 @@ Total
           <context context-type="linenumber">30,31</context>
         </context-group>
         <target state="final">Displays a list of items in the bank and their quantity.&lt;br /&gt;&lt;br /&gt;
-                    If you are incarnated, items that are not on the shopping list are followed by a button with a shopping cart. Clicking this button adds them to the shopping list.
+                    If you are incarnated, items that are not on the shopping list are followed by a button with a shopping cart. Clicking this button adds them
+                    to the shopping list.
                 </target>
       </trans-unit>
       <trans-unit id="3388979422666988091" datatype="html" approved="yes">
@@ -5308,9 +5312,10 @@ Total
           <context context-type="linenumber">30,31</context>
         </context-group>
         <target state="final">Displays a list of all items in MyHordes (along with additional information about them).
-&lt;br /&gt;&lt;br
+                    &lt;br /&gt;&lt;br
                     /&gt;
-                    If you are incarnated, items that are not in the shopping list will have a shopping cart button next to them. Clicking this button will add them to the shopping list.
+                    If you are incarnated, items that are not in the shopping list will have a shopping cart button next to them. Clicking this button will add
+                    them to the shopping list.
                 </target>
       </trans-unit>
       <trans-unit id="6739215722471437099" datatype="html" approved="yes">
@@ -5337,7 +5342,9 @@ Total
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-wiki/tuto-script-wiki.component.ts</context>
           <context context-type="linenumber">43</context>
         </context-group>
-        <target state="final">Displays a list of all buildings in the game, their distance from the city, as well as a list of items that can be obtained by searching them and their drop probabilities.                </target>
+        <target state="final">Displays a list of all buildings in the game, their distance from the city, as well as a list of items that can be
+                    obtained by searching them and their drop probabilities.
+                </target>
       </trans-unit>
       <trans-unit id="6781675583173132570" datatype="html" approved="yes">
         <source>Première utilisation du site</source>
@@ -5503,7 +5510,9 @@ Total
           <context context-type="sourcefile">src/app/wiki/miscellaneous-info/max-active-calculator/max-active-calculator.component.html</context>
           <context context-type="linenumber">9</context>
         </context-group>
-        <target state="final">The overflow depends on the day and the number of citizens alive. It may also depend on the number of citizens present in the city.                </target>
+        <target state="final">The overflow depends on the day and the number of citizens alive. It may also depend on the number of citizens present in
+                    the city.
+                </target>
       </trans-unit>
       <trans-unit id="5757378082117611724" datatype="html" approved="yes">
         <source>Nombre de citoyens en ville</source>
@@ -5740,6 +5749,22 @@ Total
           <context context-type="linenumber">23</context>
         </context-group>
         <target state="final">Citizen action</target>
+      </trans-unit>
+      <trans-unit id="4043696163111238377" datatype="html">
+        <source>Action de citoyen (en ville)</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/wiki/recipes/recipes.component.html</context>
+          <context context-type="linenumber">26</context>
+        </context-group>
+        <target state="translated">Citizen action (in the town)</target>
+      </trans-unit>
+      <trans-unit id="7516219511604042381" datatype="html">
+        <source>Action de citoyen (dans l&apos;Outre-Monde)</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/wiki/recipes/recipes.component.html</context>
+          <context context-type="linenumber">29</context>
+        </context-group>
+        <target state="translated">Citizen action (in the World Beyond)</target>
       </trans-unit>
       <trans-unit id="6743161373003242548" datatype="html" approved="yes">
         <source>Atelier</source>
