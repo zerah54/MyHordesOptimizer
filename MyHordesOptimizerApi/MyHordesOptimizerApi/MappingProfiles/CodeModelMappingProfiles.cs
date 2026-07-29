@@ -63,6 +63,7 @@ namespace MyHordesOptimizerApi.MappingProfiles
                 .ForMember(dest => dest.ActionDe, opt => opt.MapFrom(src => src.Value.Action))
                 .ForMember(dest => dest.Stealthy, opt => opt.MapFrom(src => src.Value.Stealthy))
                 .ForMember(dest => dest.PictoUid, opt => opt.MapFrom(src => src.Value.Picto))
+                .ForMember(dest => dest.ForcedErrorMessage, opt => opt.MapFrom(src => src.Value.Error))
                 .ForMember(dest => dest.ActionFr, opt => opt.Ignore())
                 .ForMember(dest => dest.ActionEs, opt => opt.Ignore())
                 .ForMember(dest => dest.ActionEn, opt => opt.Ignore());

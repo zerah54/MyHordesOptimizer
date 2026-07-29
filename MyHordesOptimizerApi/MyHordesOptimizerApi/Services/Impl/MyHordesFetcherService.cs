@@ -1132,6 +1132,10 @@ namespace MyHordesOptimizerApi.Services.Impl
         public IEnumerable<ItemRecipeDto> GetRecipes()
         {
             var models = DbContext.Recipes
+                // Une recette à erreur forcée n'assemble jamais rien : côté jeu, elle affiche
+                // seulement un message. L'exposer la ferait apparaître comme un doublon de la
+                // vraie recette, à laquelle rien ne la distingue par ailleurs.
+                .Where(recipe => recipe.ForcedErrorMessage == null)
                 .Include(recipe => recipe.RecipeItemComponents)
                     .ThenInclude(item => item.IdItemNavigation)
                 .Include(recipe => recipe.RecipeItemResults)

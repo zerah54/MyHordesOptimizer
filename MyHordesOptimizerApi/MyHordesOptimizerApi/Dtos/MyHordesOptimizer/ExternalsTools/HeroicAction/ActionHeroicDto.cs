@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using System;
+using System.Linq;
 using System.Reflection;
 
 namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.HeroicAction
@@ -24,10 +25,13 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.HeroicActio
         Uppercut,
         [Fr("Second souffle"), En("Second wind"), De("Zweite Lunge"), Es("Segundo Aliento")]
         SecondWind,
-        [Fr("Trouvaille (améliorée)"), En("Lucky Find"), De("Schönes Fundstück"), Es("Hallazgo")]
-        LuckyFind,   
+        // La trouvaille possède 4 libellés selon le niveau de héros (hero_generic_find, _lucky, _lucky2, _lucky3).
+        // Chaque niveau remplace le précédent : un citoyen n'en voit jamais qu'un seul à la fois.
         [Fr("Trouvaille"), En("Seeker"), De("Fund"), Es("Hallazgo")]
-        NormalFind,
+        [Fr("Trouvaille (améliorée)"), En("Lucky Find"), De("Schönes Fundstück"), Es("Hallazgo")]
+        [Fr("Impressionnante trouvaille"), En("Impressive find"), De("Beeindruckendes Fundstück"), Es("Hallazgo perfeccionado")]
+        [Fr("Incroyable trouvaille"), En("Incredible find"), De("Erstaunliches Fundstück"), Es("Hallazgo milagroso")]
+        LuckyFind,
         [Fr("Vaincre la mort"), En("Cheat Death"), De("Den Tod besiegen"), Es("Vencer a la muerte")]
         CheatDeath,
         [Fr("Retour du Héros"), En("Heroic Return"), De("Die Rückkehr des Helden"), Es("El retorno del Héroe")]
@@ -46,6 +50,7 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.HeroicActio
         Inside
     }
 
+    [AttributeUsage(AttributeTargets.Field, AllowMultiple = true)]
     internal class LocaleAttribute : Attribute
     {
         public string Name { get; set; }
@@ -117,13 +122,10 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.HeroicActio
                         case "de":
                             attrType = typeof(DeAttribute);
                             break;                     }
-                    LocaleAttribute attr =
-                           Attribute.GetCustomAttribute(field,
-                             attrType) as LocaleAttribute;
-                    if (attr != null)
-                    {
-                        return attr.Name == label;
-                    }
+                    // Un même membre peut porter plusieurs libellés pour une locale (ex : les 4 niveaux de trouvaille)
+                    return Attribute.GetCustomAttributes(field, attrType)
+                        .Cast<LocaleAttribute>()
+                        .Any(attr => attr.Name == label);
                 }
             }
             return false;
