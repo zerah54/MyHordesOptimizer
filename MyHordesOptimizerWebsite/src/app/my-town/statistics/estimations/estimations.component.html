@@ -1,10 +1,10 @@
 <div class="mho-estimations">
     <div class="header">
-        <mho-header-with-number-previous-next-filter class="previous-next" [(filterValue)]="selected_day" (filterValueChange)="getEstimations()"
-                                                     [min]="1" [max]="current_day">
+        <mho-header-with-number-previous-next-filter (filterValueChange)="getEstimations()" [(filterValue)]="selected_day" [max]="current_day"
+                                                     [min]="1" class="previous-next">
         </mho-header-with-number-previous-next-filter>
         <div class="actions">
-            <button mat-icon-button type="button" matTooltip="Copier au format forum" i18n-matTooltip (click)="shareEstimsForum()">
+            <button (click)="shareEstimsForum()" i18n-matTooltip mat-icon-button matTooltip="Copier au format forum" type="button">
                 <mat-icon fontSet="material-symbols-outlined">share</mat-icon>
             </button>
             @if (!is_readonly()) {
@@ -25,15 +25,17 @@
                     <tr>
                         <th>{{ percent }}%</th>
                         <td>
-                            <mat-form-field subscriptSizing="dynamic" appearance="outline">
-                                <input matInput type="text" [min]="0" [(ngModel)]="estimations.estim['_' + percent].min"
-                                       (paste)="pasteFromMH($event, estimations.estim['_' + percent], true)">
+                            <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                                <input (paste)="pasteFromMH($event, estimations.estim['_' + percent], true)" [(ngModel)]="estimations.estim['_' + percent].min"
+                                       [min]="0" [readonly]="is_readonly()" matInput
+                                       type="text">
                             </mat-form-field>
                         </td>
                         <td>
-                            <mat-form-field subscriptSizing="dynamic" appearance="outline">
-                                <input matInput type="text" [min]="0" [(ngModel)]="estimations.estim['_' + percent].max"
-                                       (paste)="pasteFromMH($event, estimations.estim['_' + percent], false)">
+                            <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                                <input (paste)="pasteFromMH($event, estimations.estim['_' + percent], false)" [(ngModel)]="estimations.estim['_' + percent].max"
+                                       [min]="0" [readonly]="is_readonly()" matInput
+                                       type="text">
                             </mat-form-field>
                         </td>
                     </tr>
@@ -50,15 +52,17 @@
                     <tr>
                         <th>{{ percent }}%</th>
                         <td>
-                            <mat-form-field subscriptSizing="dynamic" appearance="outline">
-                                <input matInput type="text" [min]="0" [(ngModel)]="estimations.planif['_' + percent].min"
-                                       (paste)="pasteFromMH($event, estimations.planif['_' + percent], true)">
+                            <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                                <input (paste)="pasteFromMH($event, estimations.planif['_' + percent], true)"
+                                       [(ngModel)]="estimations.planif['_' + percent].min" [min]="0" [readonly]="is_readonly()" matInput
+                                       type="text">
                             </mat-form-field>
                         </td>
                         <td>
-                            <mat-form-field subscriptSizing="dynamic" appearance="outline">
-                                <input matInput type="text" [min]="0" [(ngModel)]="estimations.planif['_' + percent].max"
-                                       (paste)="pasteFromMH($event, estimations.planif['_' + percent], false)">
+                            <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                                <input (paste)="pasteFromMH($event, estimations.planif['_' + percent], false)"
+                                       [(ngModel)]="estimations.planif['_' + percent].max" [min]="0" [readonly]="is_readonly()" matInput
+                                       type="text">
                             </mat-form-field>
                         </td>
                     </tr>
@@ -70,7 +74,7 @@
             <!--        </div>-->
 
             <mat-accordion class="canvas">
-                <mat-expansion-panel class="mat-elevation-z8" [expanded]="step === 0" (opened)="setStep(0)">
+                <mat-expansion-panel (opened)="setStep(0)" [expanded]="step === 0" class="mat-elevation-z8">
                     <mat-expansion-panel-header>
                         <mat-panel-title i18n>Attaque du jour (J{{ selected_day }})</mat-panel-title>
                         @if (today_calculated_attack) {
@@ -95,7 +99,7 @@
                     </div>
                 </mat-expansion-panel>
 
-                <mat-expansion-panel class="mat-elevation-z8" [expanded]="step === 1" (opened)="setStep(1)">
+                <mat-expansion-panel (opened)="setStep(1)" [expanded]="step === 1" class="mat-elevation-z8">
                     <mat-expansion-panel-header>
                         <mat-panel-title i18n>Attaque du lendemain (J{{ selected_day + 1 }})</mat-panel-title>
                         @if (tomorrow_calculated_attack) {
