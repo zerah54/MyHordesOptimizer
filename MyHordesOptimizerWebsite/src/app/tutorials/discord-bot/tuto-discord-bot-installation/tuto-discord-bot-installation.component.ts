@@ -7,9 +7,10 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 
 import { Imports } from '../../../_abstract_model/types/_types';
 import { ClipboardService } from '../../../_core/services/clipboard.service';
+import { AccordionComponent, AccordionItem } from '../../../_shared/accordion/accordion.component';
 
 const angular_common: Imports = [];
-const components: Imports = [];
+const components: Imports = [AccordionComponent];
 const pipes: Imports = [];
 const material_modules: Imports = [MatButtonModule, MatCardModule, MatIconModule, MatMenuModule, MatTooltipModule];
 
@@ -20,13 +21,21 @@ const material_modules: Imports = [MatButtonModule, MatCardModule, MatIconModule
     imports: [...angular_common, ...components, ...material_modules, ...pipes],
 })
 export class TutoDiscordBotInstallationComponent {
+    protected readonly title: string = $localize`Installation du Bot Discord`;
     private readonly clipboard: ClipboardService = inject(ClipboardService);
     private readonly document: Document = inject<Document>(DOCUMENT);
+    private readonly download_link: string = $localize`<a href="https://discord.com/oauth2/authorize?client_id=1140035117746765914" target="_blank">lien d'installation du bot</a>`;
 
-    protected readonly title: string = $localize`Installation du Bot sur un serveur Discord`;
-    private readonly download_link: string = $localize`<a href="https://discord.com/api/oauth2/authorize?client_id=1140035117746765914&permissions=277025459200&scope=bot" target="_blank">lien d'installation du bot</a>`;
-    protected text_1: string = $localize`Vous devez être propriétaire ou avoir les droits d'administration sur le serveur Discord sur lequel vous voulez inviter le Bot.`;
-    protected text_2: string = $localize`En cliquant sur le ${this.download_link}, vous serez redirigé vers une page d'installation.`;
+    protected readonly tuto_bot_items: AccordionItem[] = [
+        {
+            title: $localize`En tant qu'application (Recommandé)`,
+            content: $localize`En l'installant en tant qu'application, vous pourrez utiliser les commandes du bot partout sur Discord (en messages privés, dans des groupes, ou sur des serveurs où le bot n'est pas présent).<br><br>Cliquez sur le ${this.download_link} et choisissez <strong>Ajouter à mes applications</strong>.`
+        },
+        {
+            title: $localize`Sur un serveur`,
+            content: $localize`Vous pouvez également ajouter le bot à un serveur entier pour que tous les membres puissent l'utiliser. Pour cela, vous devez être propriétaire ou avoir les droits d'administration sur le serveur Discord.<br><br>Cliquez sur le ${this.download_link} et choisissez <strong>Ajouter à un serveur</strong>.`
+        }
+    ];
 
     protected copyUrl(): void {
         const url: string = this.document.location.href;
@@ -38,9 +47,9 @@ export class TutoDiscordBotInstallationComponent {
 
         text += `[b][big]${this.title}[/big][/b]`;
         text += '\n\n';
-        text += this.text_1.replace(/<a .* href="(.*)" .*>(.*)<\/a>/g, '[link=$1]$2[/link]');
-        text += '\n\n';
-        text += this.text_2.replace(/<a .* href="(.*)" .*>(.*)<\/a>/g, '[link=$1]$2[/link]');
+        this.tuto_bot_items.forEach((item: AccordionItem) => {
+            text += `[collapse=${item.title}]${item.content.replace(/<br>/g, '\n').replace(/<strong>(.*?)<\/strong>/g, '[b]$1[/b]').replace(/<a .*? href="(.*?)" .*?>(.*?)<\/a>/g, '[link=$1]$2[/link]')}[/collapse]\n\n`;
+        });
 
         this.clipboard.copy(text, $localize`Le texte a bien été copié`);
     }
