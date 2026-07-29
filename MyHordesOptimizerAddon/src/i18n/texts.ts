@@ -1,3 +1,4 @@
+import type { I18nLabel } from '../types';
 import { getScriptInfo } from '../utils/version';
 
 ////////////////
@@ -742,8 +743,20 @@ export const texts = {
         fr: 'Aucune règle : ajoutez-en une pour styler les noms de sujets.',
         de: 'Keine Regel: Fügen Sie eine hinzu, um die Themen-Titel zu gestalten.',
         es: 'Ninguna regla: añada una para dar estilo a los títulos de los temas.'
+    },
+    double_install_title: {
+        en: 'MHO Addon: duplicate installation detected',
+        fr: 'MHO Addon : double installation détectée',
+        de: 'MHO Addon: doppelte Installation erkannt',
+        es: 'MHO Addon: instalación duplicada detectada'
+    },
+    double_install_help: {
+        en: 'You have both the Tampermonkey script and the browser extension installed. This can cause instability. It is recommended to keep the browser extension and uninstall the Tampermonkey script.',
+        fr: 'Vous avez à la fois le script Tampermonkey et l\'extension navigateur installés. Cela peut provoquer des instabilités. Il est recommandé de privilégier l\'extension navigateur et de désinstaller le script Tampermonkey.',
+        de: 'Sie haben sowohl das Tampermonkey-Skript als auch die Browser-Erweiterung installiert. Dies kann zu Instabilität führen. Es wird empfohlen, die Browser-Erweiterung zu behalten und das Tampermonkey-Skript zu deinstallieren.',
+        es: 'Tienes instalados tanto el script de Tampermonkey como la extensión del navegador. Esto puede causar inestabilidad. Se recomienda mantener la extensión del navegador y desinstalar el script de Tampermonkey.'
     }
-};
+} satisfies Record<string, I18nLabel>;
 
 export const status_texts = {
     head_wounded: {
@@ -806,9 +819,9 @@ export const status_texts = {
         de: 'Sterblichkeitsrisiko durch eine Infektion',
         es: 'Probabilidades de morir por una infección',
     }
-};
+} satisfies Record<string, I18nLabel>;
 
-export const jobs = [
+export const jobs: { id: string; img: string; label: I18nLabel; camping_factor: number }[] = [
     {
         id: 'citizen',
         img: 'basic',
@@ -998,9 +1011,9 @@ export const api_texts = {
         de: 'Gegenstand wurde der Einkaufsliste hinzugefügt.',
         es: 'El objeto ha sido añadido a la lista de deseos.'
     },
-};
+} satisfies Record<string, I18nLabel>;
 
-export const action_types = [
+export const action_types: { id: string; label: I18nLabel; ordering: number }[] = [
     {
         id: 'Recipe::ManualAnywhere',
         label: { en: 'Citizen actions', fr: 'Actions du citoyen', de: 'Bürgeraktionen', es: 'Acciones del habitante' },
@@ -1009,20 +1022,20 @@ export const action_types = [
     {
         id: 'Recipe::ManualInside',
         label: {
-            en: 'Citizen actions inside',
-            fr: 'Actions du citoyen à l\'intérieur',
-            de: 'Bürgeraktionen im Inneren',
-            es: 'Acciones del habitante en el interior'
+            en: 'Citizen actions in the town',
+            fr: 'Actions du citoyen en ville',
+            de: 'Bürgeraktionen in der Stadt',
+            es: 'Acciones del habitante en el pueblo'
         },
         ordering: 2
     },
     {
         id: 'Recipe::ManualOutside',
         label: {
-            en: 'Citizen actions outside',
-            fr: 'Actions du citoyen à l\'extérieur',
-            de: 'Bürgeraktionen draußen',
-            es: 'Acciones del habitanteen el exterior'
+            en: 'Citizen actions in the World Beyond',
+            fr: 'Actions du citoyen dans l\'Outre-Monde',
+            de: 'Bürgeraktionen in der Außenwelt',
+            es: 'Acciones del habitante en el ultramundo'
         },
         ordering: 3
     },
@@ -1044,7 +1057,7 @@ export const action_types = [
     },
 ];
 
-export const wishlist_depot = [
+export const wishlist_depot: { value: number; label: I18nLabel }[] = [
     {
         value: -1000,
         label: {
@@ -1083,14 +1096,14 @@ export const wishlist_depot = [
     }
 ];
 
-export const wishlist_title = {
+export const wishlist_title: I18nLabel = {
     en: 'Wishlist',
     fr: 'Liste de courses',
     de: 'Wunschzettel',
     es: 'Lista de deseos'
 };
 
-export const wishlist_headers = [
+export const wishlist_headers: { label: I18nLabel; id: string }[] = [
     {
         label: {
             en: 'Item',

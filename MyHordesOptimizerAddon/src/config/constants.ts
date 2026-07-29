@@ -96,3 +96,11 @@ export const mho_anti_abuse_counter_id = 'mho-anti-abuse-counter';
 export const mho_town_external_links_id = 'mho-town-external-links';
 export const mho_copy_logs_id = 'mho-copy-logs';
 export const mho_forum_styles_modal_id = 'mho-forum-styles-modal';
+export const mho_double_install_banner_id = 'mho-double-install-banner';
+
+/**
+ * Posé sur `<html>` par la première instance (script OU extension) à démarrer sur la
+ * page : le DOM est le seul terrain commun entre les deux, qui tournent dans des mondes
+ * JS isolés l'un de l'autre. Sert à détecter une double installation.
+ */
+export const mho_double_install_marker_attr = 'data-mho-addon-active';
