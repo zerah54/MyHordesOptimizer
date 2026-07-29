@@ -45,6 +45,17 @@ public partial class Recipe
     [MySqlCollation("utf8mb3_general_ci")]
     public string? Type { get; set; }
 
+    /// <summary>
+    /// Message d'erreur forcé repris des fixtures MyHordes. Une recette qui en porte un
+    /// n'assemble jamais rien : le jeu se contente d'afficher le message. Elle ne doit donc
+    /// pas être exposée aux clients.
+    /// </summary>
+    [Column("forcedErrorMessage")]
+    [StringLength(255)]
+    [MySqlCharSet("utf8mb3")]
+    [MySqlCollation("utf8mb3_general_ci")]
+    public string? ForcedErrorMessage { get; set; }
+
     [Column("pictoUid")]
     [StringLength(255)]
     [MySqlCharSet("utf8mb3")]

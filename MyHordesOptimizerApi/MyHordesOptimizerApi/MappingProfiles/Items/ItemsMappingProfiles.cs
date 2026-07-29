@@ -74,7 +74,12 @@ namespace MyHordesOptimizerApi.MappingProfiles.Items
                 .Include<Item, ItemDto>();
 
             CreateMap<Item, ItemDto>()
-                .ForMember(dest => dest.Recipes, opt => opt.MapFrom(src => src.RecipeItemComponents.Select(ric => ric.RecipeNameNavigation)));
+                // Les recettes à erreur forcée n'assemblent jamais rien : elles ne sont pas
+                // exposées. La garde sur la navigation préserve le comportement des requêtes
+                // qui ne l'incluent pas.
+                .ForMember(dest => dest.Recipes, opt => opt.MapFrom(src => src.RecipeItemComponents
+                    .Where(ric => ric.RecipeNameNavigation == null || ric.RecipeNameNavigation.ForcedErrorMessage == null)
+                    .Select(ric => ric.RecipeNameNavigation)));
 
             CreateMap<TownBankItem, StackableItemDto>()
                 .ForMember(dest => dest.Count, opt => opt.MapFrom(src => src.Count))

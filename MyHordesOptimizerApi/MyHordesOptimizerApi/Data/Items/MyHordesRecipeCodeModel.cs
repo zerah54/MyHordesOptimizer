@@ -16,6 +16,13 @@ namespace MyHordesOptimizerApi.Data.Items
 
         [JsonProperty("action")]
         public string Action { get; set; }
+
+        /// <summary>
+        /// Message d'erreur forcé : la recette qui en porte un n'assemble jamais rien.
+        /// </summary>
+        [JsonProperty("error")]
+        public string Error { get; set; }
+
         [JsonProperty("picto")]
         public string Picto { get; set; }
         [JsonProperty("stealthy")]
