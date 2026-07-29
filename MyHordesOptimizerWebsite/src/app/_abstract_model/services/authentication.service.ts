@@ -25,8 +25,13 @@ export class AuthenticationService extends GlobalService {
                 if (saved_me && !force) {
                     sub.next(saved_me);
                 } else {
-                    this.getToken().subscribe((token: TokenWithMe) => {
-                        sub.next(token.simple_me);
+                    this.getToken().subscribe({
+                        next: (token: TokenWithMe) => {
+                            sub.next(token.simple_me);
+                        },
+                        error: (err: HttpErrorResponse) => {
+                            sub.error(err);
+                        }
                     });
                 }
 
