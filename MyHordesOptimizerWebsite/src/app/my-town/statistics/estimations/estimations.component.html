@@ -7,7 +7,9 @@
             <button mat-icon-button type="button" matTooltip="Copier au format forum" i18n-matTooltip (click)="shareEstimsForum()">
                 <mat-icon fontSet="material-symbols-outlined">share</mat-icon>
             </button>
-            <button mat-raised-button type="button" [color]="'accent'" (click)="saveEstimations()" i18n>Enregistrer</button>
+            @if (!is_readonly()) {
+                <button (click)="saveEstimations()" [color]="'accent'" i18n mat-flat-button type="button">Enregistrer</button>
+            }
         </div>
     </div>
     @if (estimations) {
