@@ -10,8 +10,10 @@ using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.Home;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.Map;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.Status;
 using MyHordesOptimizerApi.Extensions;
+using MyHordesOptimizerApi.Models.ExternalTools;
 using MyHordesOptimizerApi.Models.ExternalTools.GestHordes;
 using MyHordesOptimizerApi.Providers.Interfaces;
+using MyHordesOptimizerApi.Services.Impl.ExternalTools;
 using MyHordesOptimizerApi.Services.Interfaces.ExternalTools;
 using Newtonsoft.Json.Linq;
 using System;
@@ -25,17 +27,19 @@ namespace MyHordesOptimizerApi.Controllers
     public class ExternalToolsController : AbstractMyHordesOptimizerControllerBase
     {
         protected IExternalToolsService ExternalToolsService { get; private set; }
+        protected ExternalToolsUpdateJobRunner UpdateJobRunner { get; private set; }
 
         public ExternalToolsController(ILogger<ExternalToolsController> logger,
             IUserInfoProvider userKeyProvider,
-            IExternalToolsService externalToolsService) : base(logger, userKeyProvider)
+            IExternalToolsService externalToolsService,
+            ExternalToolsUpdateJobRunner externalToolsUpdateJobRunner) : base(logger, userKeyProvider)
         {
             ExternalToolsService = externalToolsService;
+            UpdateJobRunner = externalToolsUpdateJobRunner;
         }
 
-        [HttpPost]
-        [Route("Update")]
-        public async Task<ActionResult<UpdateResponseDto>> UpdateExternalsTools(string userKey, int userId, [FromBody] UpdateRequestDto updateRequestDto)
+        /// <summary>Contrôles communs aux deux routes de mise à jour. Null si la requête est valide.</summary>
+        private ActionResult ValidateUpdateRequest(string userKey, UpdateRequestDto updateRequestDto)
         {
             if (string.IsNullOrWhiteSpace(userKey))
             {
@@ -49,16 +53,60 @@ namespace MyHordesOptimizerApi.Controllers
             {
                 return BadRequest($"{nameof(updateRequestDto.TownDetails)} cannot be empty");
             }
-            var bbh = updateRequestDto.Map.ToolsToUpdate.IsBigBrothHordes;
-            if (UpdateRequestMapToolsToUpdateDetailsDto.IsCell(bbh))
+            if (UpdateRequestMapToolsToUpdateDetailsDto.IsCell(updateRequestDto.Map.ToolsToUpdate.IsBigBrothHordes))
             {
                 return BadRequest($"IsBigBrothHordes ne peut pas avoir une valeur autre que \"api\" ou \"none\"");
+            }
+            return null;
+        }
+
+        [HttpPost]
+        [Route("Update")]
+        public async Task<ActionResult<UpdateResponseDto>> UpdateExternalsTools(string userKey, int userId, [FromBody] UpdateRequestDto updateRequestDto)
+        {
+            var invalid = ValidateUpdateRequest(userKey, updateRequestDto);
+            if (invalid != null)
+            {
+                return invalid;
             }
 
             UserInfoProvider.UserKey = userKey;
             UserInfoProvider.UserId = userId;
             var response = await ExternalToolsService.UpdateExternalsTools(updateRequestDto);
             return Ok(response);
+        }
+
+        [HttpPost]
+        [Route("Update/Start")]
+        public ActionResult<ExternalToolsUpdateJobState> StartUpdateExternalsTools(string userKey, int userId, [FromBody] UpdateRequestDto updateRequestDto)
+        {
+            var invalid = ValidateUpdateRequest(userKey, updateRequestDto);
+            if (invalid != null)
+            {
+                return invalid;
+            }
+
+            UserInfoProvider.UserKey = userKey;
+            UserInfoProvider.UserId = userId;
+
+            var state = UpdateJobRunner.TryStart(userId, userKey, UserInfoProvider.UserName, updateRequestDto);
+            if (state == null)
+            {
+                // Double clic ou second onglet : le client suit le lancement déjà en cours.
+                return Conflict(UpdateJobRunner.GetState(userId));
+            }
+            return Accepted(state);
+        }
+
+        [HttpGet]
+        [Route("Update/Status")]
+        public ActionResult<ExternalToolsUpdateJobState> GetUpdateExternalsToolsStatus(string userKey, int userId)
+        {
+            if (string.IsNullOrWhiteSpace(userKey))
+            {
+                return BadRequest($"{nameof(userKey)} cannot be empty");
+            }
+            return Ok(UpdateJobRunner.GetState(userId));
         }
 
         [HttpPost]

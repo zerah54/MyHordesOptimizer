@@ -19,6 +19,7 @@ using MyHordesOptimizerApi.Exceptions;
 using MyHordesOptimizerApi.Extensions;
 using MyHordesOptimizerApi.Extensions.Models;
 using MyHordesOptimizerApi.Models;
+using MyHordesOptimizerApi.Models.ExternalTools;
 using MyHordesOptimizerApi.Models.ExternalTools.GestHordes;
 using MyHordesOptimizerApi.Providers.Interfaces;
 using MyHordesOptimizerApi.Repository.Interfaces;
@@ -64,58 +65,76 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
             MyHordesApiRepository = myHordesApiRepository;
         }
 
-        public async Task<UpdateResponseDto> UpdateExternalsTools(UpdateRequestDto updateRequestDto)
+        public async Task<UpdateResponseDto> UpdateExternalsTools(UpdateRequestDto updateRequestDto, IExternalToolsProgressSink sink = null)
         {
+            sink ??= NullExternalToolsProgressSink.Instance;
+            var plan = ExternalToolsUpdatePlan.Build(updateRequestDto);
             var response = new UpdateResponseDto(updateRequestDto);
             var townDetails = updateRequestDto.TownDetails;
-            // Le client envoie toujours le mapId (jamais le townId stable attribué par l'import global) :
-            // on résout une fois ici et on réutilise cette valeur dans toutes les tâches parallèles.
-            int resolvedTownId;
-            using (var resolveScope = ServiceScopeFactory.CreateScope())
-            {
-                resolvedTownId = resolveScope.ServiceProvider.GetRequiredService<MhoContext>().ResolveTownId(townDetails.TownId);
-            }
             var tasks = new List<Task>();
 
-            #region Maps
-            var bbh = updateRequestDto.Map.ToolsToUpdate.IsBigBrothHordes;
-            var gh = updateRequestDto.Map.ToolsToUpdate.IsGestHordes;
-            var fata = updateRequestDto.Map.ToolsToUpdate.IsFataMorgana;
-            var mho = updateRequestDto.Map.ToolsToUpdate.IsMyHordesOptimizer;
+            // Le client envoie toujours le mapId (jamais le townId stable attribué par l'import global) :
+            // on résout une fois ici et on réutilise cette valeur dans toutes les tâches parallèles.
+            // Ce préalable, comme le LastUpdateInfo, n'est lu que par des unités MyHordes Optimizer :
+            // son échec ne doit donc faire tomber que MHO, pas Gest'Hordes ni Fata Morgana.
+            var resolvedTownId = 0;
             LastUpdateInfo newLastUpdate = null;
-            if (UpdateRequestMapToolsToUpdateDetailsDto.IsApi(mho)
-                || UpdateRequestMapToolsToUpdateDetailsDto.IsCell(mho)
-                || updateRequestDto.SuccessedDig != null
-                || updateRequestDto.Amelios?.ToolsToUpdate.IsMyHordesOptimizer == true)
+            var mhoPreambleFailed = false;
+            if (plan.NeedsTownId)
             {
-                using var scope = ServiceScopeFactory.CreateScope();
-                var dbContext = scope.ServiceProvider.GetRequiredService<MhoContext>();
-                newLastUpdate = dbContext.LastUpdateInfos.Update(Mapper.Map<LastUpdateInfo>(UserInfoProvider.GenerateLastUpdateInfo(), opt => opt.SetDbContext(dbContext))).Entity;
-                dbContext.SaveChanges();
+                try
+                {
+                    using (var resolveScope = ServiceScopeFactory.CreateScope())
+                    {
+                        resolvedTownId = resolveScope.ServiceProvider.GetRequiredService<MhoContext>().ResolveTownId(townDetails.TownId);
+                    }
+                    if (plan.NeedsLastUpdateInfo)
+                    {
+                        using var scope = ServiceScopeFactory.CreateScope();
+                        var dbContext = scope.ServiceProvider.GetRequiredService<MhoContext>();
+                        newLastUpdate = dbContext.LastUpdateInfos.Update(Mapper.Map<LastUpdateInfo>(UserInfoProvider.GenerateLastUpdateInfo(), opt => opt.SetDbContext(dbContext))).Entity;
+                        dbContext.SaveChanges();
+                    }
+                }
+                catch (Exception e)
+                {
+                    // Changement de comportement par rapport à l'ancienne route (avant cette refonte) :
+                    // une exception ici remontait alors non attrapée jusqu'au contrôleur (HTTP 500).
+                    // Désormais elle est rattrapée, et l'ancienne route répond 200 avec un statut
+                    // d'erreur porté par MapResponseDto.MhoApiStatus.
+                    Logger.LogWarning($"Exception pendant le préalable MHO : {e} => {updateRequestDto.ToJson()}");
+                    sink.FailAllPending(ExternalToolUpdateUnits.Map, e.Message, ExternalToolId.MyHordesOptimizer);
+                    response.MapResponseDto.MhoApiStatus = e.Message;
+                    mhoPreambleFailed = true;
+                }
             }
 
-            if (UpdateRequestMapToolsToUpdateDetailsDto.IsApi(bbh))
+            #region Maps
+            if (plan.Bbh)
             {
                 var bbhTask = Task.Run(() =>
                 {
                     try
                     {
                         BigBrothHordesRepository.Update();
+                        sink.Succeeded(ExternalToolId.BigBrothHordes, ExternalToolUpdateUnits.Map);
                     }
                     catch (WebApiException e)
                     {
                         Logger.LogWarning($"Exception pendant la maj globale BBH : {e} => {updateRequestDto.ToJson()}");
                         response.MapResponseDto.BigBrothHordesStatus = $"{e.Message} : {e.Response}";
+                        sink.Failed(ExternalToolId.BigBrothHordes, ExternalToolUpdateUnits.Map, $"{e.Message} : {e.Response}");
                     }
                     catch (Exception e)
                     {
                         Logger.LogWarning($"Exception pendant la maj globale BBH : {e} => {updateRequestDto.ToJson()}");
                         response.MapResponseDto.BigBrothHordesStatus = e.Message;
+                        sink.Failed(ExternalToolId.BigBrothHordes, ExternalToolUpdateUnits.Map, e.Message);
                     }
                 });
                 tasks.Add(bbhTask);
             }
-            if (UpdateRequestMapToolsToUpdateDetailsDto.IsApi(fata) || UpdateRequestMapToolsToUpdateDetailsDto.IsCell(fata))
+            if (plan.Fata)
             {
                 var fataTask = Task.Run(async () =>
                 {
@@ -125,21 +144,24 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                         fataRequestDto.UserId = UserInfoProvider.UserId;
                         fataRequestDto.UserKey = UserInfoProvider.UserKey;
                         await FataMorganaRepository.UpdateAsync(fataRequestDto);
+                        sink.Succeeded(ExternalToolId.FataMorgana, ExternalToolUpdateUnits.Map);
                     }
                     catch (WebApiException e)
                     {
                         Logger.LogWarning($"Exception pendant la maj globale Fata : {e} => {updateRequestDto.ToJson()}");
                         response.MapResponseDto.FataMorganaStatus = $"{e.Message} : {e.Response}";
+                        sink.Failed(ExternalToolId.FataMorgana, ExternalToolUpdateUnits.Map, $"{e.Message} : {e.Response}");
                     }
                     catch (Exception e)
                     {
                         Logger.LogWarning($"Exception pendant la maj globale Fata : {e} => {updateRequestDto.ToJson()}");
                         response.MapResponseDto.FataMorganaStatus = e.Message;
+                        sink.Failed(ExternalToolId.FataMorgana, ExternalToolUpdateUnits.Map, e.Message);
                     }
                 });
                 tasks.Add(fataTask);
             }
-            if (UpdateRequestMapToolsToUpdateDetailsDto.IsApi(mho) || UpdateRequestMapToolsToUpdateDetailsDto.IsCell(mho))
+            if (plan.MhoMap && !mhoPreambleFailed)
             {
                 var mhoTask = Task.Run(() =>
                 {
@@ -282,7 +304,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                             cellModel.UpdateAllButKeysProperties(cell, ignoreNull: true);
                             listCells.Add(cellModel);
                         }
-                        if (UpdateRequestMapToolsToUpdateDetailsDto.IsCell(mho) && updateRequestDto.Map.Cell != null)
+                        if (UpdateRequestMapToolsToUpdateDetailsDto.IsCell(updateRequestDto.Map.ToolsToUpdate.IsMyHordesOptimizer) && updateRequestDto.Map.Cell != null)
                         {
                             UpdateCellInfoDto updateCellDto = updateRequestDto.Map.Cell;
                             var realX = updateRequestDto.TownDetails.TownX + updateCellDto.X;
@@ -350,19 +372,22 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                         }
                         dbContext.SaveChanges();
                         transaction.Commit();
+                        sink.Succeeded(ExternalToolId.MyHordesOptimizer, ExternalToolUpdateUnits.Map);
                     }
                     catch (Exception e)
                     {
                         Logger.LogWarning($"Exception pendant la maj map MHO {e.ToString()} => {updateRequestDto.ToJson()}");
                         response.MapResponseDto.MhoApiStatus = e.Message;
+                        sink.Failed(ExternalToolId.MyHordesOptimizer, ExternalToolUpdateUnits.Map, e.Message);
                     }
                 });
                 tasks.Add(mhoTask);
             }
-            var ghTask = Task.Run(() =>
+            if (plan.GhMap)
             {
-                if (UpdateRequestMapToolsToUpdateDetailsDto.IsApi(gh) || UpdateRequestMapToolsToUpdateDetailsDto.IsCell(gh))
+                var ghTask = Task.Run(() =>
                 {
+                    var ghFailed = false;
                     try
                     {
                         GestHordesRepository.Update();
@@ -371,65 +396,88 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                     {
                         Logger.LogWarning($"Exception pendant la maj api GH :  {e} => {updateRequestDto.ToJson()}");
                         response.MapResponseDto.GestHordesApiStatus = $"{e.Message} : {e.Response}";
+                        sink.Failed(ExternalToolId.GestHordes, ExternalToolUpdateUnits.Map, $"{e.Message} : {e.Response}");
+                        ghFailed = true;
                     }
                     catch (Exception e)
                     {
                         Logger.LogWarning($"Exception pendant la maj api GH :  {e} => {updateRequestDto.ToJson()}");
                         response.MapResponseDto.GestHordesApiStatus = e.Message;
+                        sink.Failed(ExternalToolId.GestHordes, ExternalToolUpdateUnits.Map, e.Message);
+                        ghFailed = true;
                     }
-                }
-                if (UpdateRequestMapToolsToUpdateDetailsDto.IsCell(gh))
-                {
-                    try
+
+                    if (UpdateRequestMapToolsToUpdateDetailsDto.IsCell(updateRequestDto.Map.ToolsToUpdate.IsGestHordes))
                     {
-                        var cell = updateRequestDto.Map.Cell;
-                        var realX = updateRequestDto.TownDetails.TownX + cell.X;
-                        var realY = updateRequestDto.TownDetails.TownY - cell.Y;
-                        if (townDetails.IsChaos || cell.DeadZombies > 0)
+                        try
                         {
-
-                            if (cell.Objects != null && townDetails.IsChaos)
+                            var cell = updateRequestDto.Map.Cell;
+                            var realX = updateRequestDto.TownDetails.TownX + cell.X;
+                            var realY = updateRequestDto.TownDetails.TownY - cell.Y;
+                            if (townDetails.IsChaos || cell.DeadZombies > 0)
                             {
-                                var request = Mapper.Map<GestHordesMajCaseRequestDto>(updateRequestDto);
-                                GestHordesRepository.UpdateCellItem(request);
-                            }
 
-                            if (cell.DeadZombies > 0)
-                            {
-                                var request = Mapper.Map<GestHordesMajCaseZombiesDto>(updateRequestDto);
-                                GestHordesRepository.UpdateCellZombies(request);
+                                if (cell.Objects != null && townDetails.IsChaos)
+                                {
+                                    var request = Mapper.Map<GestHordesMajCaseRequestDto>(updateRequestDto);
+                                    GestHordesRepository.UpdateCellItem(request);
+                                }
+
+                                if (cell.DeadZombies > 0)
+                                {
+                                    var request = Mapper.Map<GestHordesMajCaseZombiesDto>(updateRequestDto);
+                                    GestHordesRepository.UpdateCellZombies(request);
+                                }
                             }
                         }
+                        catch (WebApiException e)
+                        {
+                            Logger.LogWarning($"Exception pendant la maj cell GH : {e} => {updateRequestDto.ToJson()}");
+                            response.MapResponseDto.GestHordesCellsStatus = $"{e.Message} : {e.Response}";
+                            // L'appel API ci-dessus a pu déjà échouer, sur la même unité GhMap : dans ce cas
+                            // AddError ajoute ce message sans redécompter l'unité (déjà décomptée par le
+                            // premier Failed). Sinon (API réussie), c'est le premier échec de l'unité : il
+                            // doit la décompter via Failed, sans quoi son PendingUnits ne retombe jamais à 0.
+                            if (ghFailed) sink.AddError(ExternalToolId.GestHordes, ExternalToolUpdateUnits.Map, $"{e.Message} : {e.Response}");
+                            else sink.Failed(ExternalToolId.GestHordes, ExternalToolUpdateUnits.Map, $"{e.Message} : {e.Response}");
+                            ghFailed = true;
+                        }
+                        catch (Exception e)
+                        {
+                            Logger.LogWarning($"Exception pendant la maj cell GH : {e} => {updateRequestDto.ToJson()}");
+                            response.MapResponseDto.GestHordesCellsStatus = e.Message;
+                            if (ghFailed) sink.AddError(ExternalToolId.GestHordes, ExternalToolUpdateUnits.Map, e.Message);
+                            else sink.Failed(ExternalToolId.GestHordes, ExternalToolUpdateUnits.Map, e.Message);
+                            ghFailed = true;
+                        }
                     }
-                    catch (WebApiException e)
+
+                    // Une seule fin pour une seule unité : sans ce garde-fou, un envoi réussi après un envoi
+                    // en échec redonnerait une notification de succès sur une unité déjà close.
+                    if (!ghFailed)
                     {
-                        Logger.LogWarning($"Exception pendant la maj cell GH : {e} => {updateRequestDto.ToJson()}");
-                        response.MapResponseDto.GestHordesCellsStatus = $"{e.Message} : {e.Response}";
+                        sink.Succeeded(ExternalToolId.GestHordes, ExternalToolUpdateUnits.Map);
                     }
-                    catch (Exception e)
-                    {
-                        Logger.LogWarning($"Exception pendant la maj cell GH : {e} => {updateRequestDto.ToJson()}");
-                        response.MapResponseDto.GestHordesCellsStatus = e.Message;
-                    }
-                }
-            });
-            tasks.Add(ghTask);
+                });
+                tasks.Add(ghTask);
+            }
             #endregion
 
             #region Bag
-            if (updateRequestDto.Bags != null && updateRequestDto.Bags.ToolsToUpdate.IsMyHordesOptimizer)
+            if (plan.MhoBags && !mhoPreambleFailed)
             {
                 var mHOBagTask = Task.Run(() =>
                 {
                     try
                     {
                         UpdateBags(resolvedTownId, updateRequestDto.Bags.Contents);
-
+                        sink.Succeeded(ExternalToolId.MyHordesOptimizer, ExternalToolUpdateUnits.Bags);
                     }
                     catch (Exception e)
                     {
                         Logger.LogWarning($"Exception pendant la MAJ des sacs de MHO : {e.ToString()} => {updateRequestDto.ToJson()}");
                         response.BagsResponseDto.MhoStatus = e.Message;
+                        sink.Failed(ExternalToolId.MyHordesOptimizer, ExternalToolUpdateUnits.Bags, e.Message);
                     }
                 });
                 tasks.Add(mHOBagTask);
@@ -500,7 +548,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                     }
                 }
 
-                if (patchHomeMho || patchStatusMho || patchHeroicActionMho)
+                if (plan.MhoCitizen && !mhoPreambleFailed)
                 {
                     var mHOCitizenDetailTask = Task.Run(() =>
                     {
@@ -526,6 +574,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                             dbContext.Update(citizenDetail);
                             dbContext.SaveChanges();
                             transaction.Commit();
+                            sink.Succeeded(ExternalToolId.MyHordesOptimizer, ExternalToolUpdateUnits.Citizen);
                         }
                         catch (Exception e)
                         {
@@ -533,18 +582,20 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                             response.HeroicActionsResponseDto.MhoStatus = e.Message;
                             response.StatusResponseDto.MhoStatus = e.Message;
                             response.HomeResponseDto.MhoStatus = e.Message;
+                            sink.Failed(ExternalToolId.MyHordesOptimizer, ExternalToolUpdateUnits.Citizen, e.Message);
                         }
                     });
                     tasks.Add(mHOCitizenDetailTask);
                 }
 
-                if (patchHomeGh || patchStatusGh || patchHeroicActionGh)
+                if (plan.GhCitizen)
                 {
                     var gHCitizenDetailTask = Task.Run(() =>
                     {
                         try
                         {
                             GestHordesRepository.UpdateCitizen(ghUpdateCitizenRequest);
+                            sink.Succeeded(ExternalToolId.GestHordes, ExternalToolUpdateUnits.Citizen);
                         }
                         catch (Exception e)
                         {
@@ -552,6 +603,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                             response.HeroicActionsResponseDto.GestHordesStatus = e.Message;
                             response.StatusResponseDto.GestHordesStatus = e.Message;
                             response.HomeResponseDto.GestHordesStatus = e.Message;
+                            sink.Failed(ExternalToolId.GestHordes, ExternalToolUpdateUnits.Citizen, e.Message);
                         }
                     });
                     tasks.Add(gHCitizenDetailTask);
@@ -565,70 +617,80 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                 response.StatusResponseDto.MhoStatus = e.Message;
                 response.HomeResponseDto.MhoStatus = e.Message;
                 response.HomeResponseDto.GestHordesStatus = e.Message;
+                // Un Failed sur une unité non déclarée volerait le solde d'une autre unité du même
+                // outil (ex. la Map de MHO encore en cours) : ne notifier que les unités du plan.
+                if (plan.MhoCitizen) sink.Failed(ExternalToolId.MyHordesOptimizer, ExternalToolUpdateUnits.Citizen, e.Message);
+                if (plan.GhCitizen) sink.Failed(ExternalToolId.GestHordes, ExternalToolUpdateUnits.Citizen, e.Message);
             }
 
             #endregion
 
             #region SuccesDig
 
-            var successedDig = updateRequestDto.SuccessedDig;
-            if (successedDig != null)
+            if (plan.MhoDigs && !mhoPreambleFailed)
             {
-                try
+                var digsTask = Task.Run(() =>
                 {
-                    using var scope = ServiceScopeFactory.CreateScope();
-                    var dbContext = scope.ServiceProvider.GetRequiredService<MhoContext>();
-                    using var transaction = dbContext.Database.BeginTransaction();
-
-                    var cellDigsToUpdate = new List<MapCellDig>();
-                    var realX = updateRequestDto.TownDetails.TownX + successedDig.Cell.X;
-                    var realY = updateRequestDto.TownDetails.TownY - successedDig.Cell.Y;
-                    var townId = resolvedTownId;
-
-                    var cellId = dbContext.MapCells.Where(cell => cell.IdTown == townId
-                                                                     && cell.X == realX
-                                                                     && cell.Y == realY)
-                                                                .Select(cell => cell.IdCell)
-                                                                .Single();
-                    foreach (var dig in successedDig.Values)
+                    var successedDig = updateRequestDto.SuccessedDig;
+                    try
                     {
-                        var cellDigModel = dbContext.MapCellDigs.Where(cellDig => cellDig.IdCellNavigation.IdTown == townId
-                                                                       && cellDig.Day == successedDig.Cell.Day
-                                                                       && cellDig.IdCellNavigation.X == realX
-                                                                       && cellDig.IdCellNavigation.Y == realY
-                                                                       && cellDig.IdUser == dig.CitizenId)
-                                                                 .FirstOrDefault();
-                        if (cellDigModel == null)
+                        using var scope = ServiceScopeFactory.CreateScope();
+                        var dbContext = scope.ServiceProvider.GetRequiredService<MhoContext>();
+                        using var transaction = dbContext.Database.BeginTransaction();
+
+                        var cellDigsToUpdate = new List<MapCellDig>();
+                        var realX = updateRequestDto.TownDetails.TownX + successedDig.Cell.X;
+                        var realY = updateRequestDto.TownDetails.TownY - successedDig.Cell.Y;
+                        var townId = resolvedTownId;
+
+                        var cellId = dbContext.MapCells.Where(cell => cell.IdTown == townId
+                                                                         && cell.X == realX
+                                                                         && cell.Y == realY)
+                                                                    .Select(cell => cell.IdCell)
+                                                                    .Single();
+                        foreach (var dig in successedDig.Values)
                         {
-                            cellDigModel = new MapCellDig()
+                            var cellDigModel = dbContext.MapCellDigs.Where(cellDig => cellDig.IdCellNavigation.IdTown == townId
+                                                                           && cellDig.Day == successedDig.Cell.Day
+                                                                           && cellDig.IdCellNavigation.X == realX
+                                                                           && cellDig.IdCellNavigation.Y == realY
+                                                                           && cellDig.IdUser == dig.CitizenId)
+                                                                     .FirstOrDefault();
+                            if (cellDigModel == null)
                             {
-                                Day = successedDig.Cell.Day,
-                                IdCell = cellId,
-                                IdUser = dig.CitizenId,
-                                NbSucces = dig.SuccessDigs,
-                                NbTotalDig = dig.TotalDigs,
-                                IdLastUpdateInfo = newLastUpdate.IdLastUpdateInfo
-                            };
-                            dbContext.Add(cellDigModel);
+                                cellDigModel = new MapCellDig()
+                                {
+                                    Day = successedDig.Cell.Day,
+                                    IdCell = cellId,
+                                    IdUser = dig.CitizenId,
+                                    NbSucces = dig.SuccessDigs,
+                                    NbTotalDig = dig.TotalDigs,
+                                    IdLastUpdateInfo = newLastUpdate.IdLastUpdateInfo
+                                };
+                                dbContext.Add(cellDigModel);
+                            }
+                            else
+                            {
+                                cellDigModel.Day = successedDig.Cell.Day;
+                                cellDigModel.IdUser = dig.CitizenId;
+                                cellDigModel.NbSucces = dig.SuccessDigs;
+                                cellDigModel.NbTotalDig = dig.TotalDigs;
+                                cellDigModel.IdLastUpdateInfo = newLastUpdate.IdLastUpdateInfo;
+                                dbContext.Update(cellDigModel);
+                            }
                         }
-                        else
-                        {
-                            cellDigModel.Day = successedDig.Cell.Day;
-                            cellDigModel.IdUser = dig.CitizenId;
-                            cellDigModel.NbSucces = dig.SuccessDigs;
-                            cellDigModel.NbTotalDig = dig.TotalDigs;
-                            cellDigModel.IdLastUpdateInfo = newLastUpdate.IdLastUpdateInfo;
-                            dbContext.Update(cellDigModel);
-                        }
+                        dbContext.SaveChanges();
+                        transaction.Commit();
+                        sink.Succeeded(ExternalToolId.MyHordesOptimizer, ExternalToolUpdateUnits.Digs);
                     }
-                    dbContext.SaveChanges();
-                    transaction.Commit();
-                }
-                catch (Exception e)
-                {
-                    Logger.LogWarning($"Exception pendant la MAJ des digs de MHO : {e.ToString()} => {updateRequestDto.ToJson()}");
-                    response.DigResponseDto.MhoStatus = e.Message;
-                }
+                    catch (Exception e)
+                    {
+                        Logger.LogWarning($"Exception pendant la MAJ des digs de MHO : {e.ToString()} => {updateRequestDto.ToJson()}");
+                        response.DigResponseDto.MhoStatus = e.Message;
+                        sink.Failed(ExternalToolId.MyHordesOptimizer, ExternalToolUpdateUnits.Digs, e.Message);
+                    }
+                });
+                tasks.Add(digsTask);
             }
 
             #endregion

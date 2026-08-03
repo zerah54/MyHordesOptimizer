@@ -1,7 +1,7 @@
-import { HttpErrorResponse, HttpParams, HttpResponse } from '@angular/common/http';
+import { HttpErrorResponse, HttpParams, HttpResponse, HttpStatusCode } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import moment from 'moment';
-import { map, Observable, Subscriber } from 'rxjs';
+import { catchError, concat, EMPTY, exhaustMap, filter, map, Observable, of, Subscriber, switchMap, takeUntil, takeWhile, throwError, timer } from 'rxjs';
 
 import { SnackbarService } from '../../_core/services/snackbar.service';
 import { TownContextService } from '../../_core/services/town-context.service';
@@ -10,6 +10,7 @@ import { BankInfoDTO } from '../dto/bank-info.dto';
 import { CellDTO } from '../dto/cell.dto';
 import { CitizenDTO } from '../dto/citizen.dto';
 import { CitizenInfoDTO } from '../dto/citizen-info.dto';
+import { ExternalToolsUpdateJobStateDTO } from '../dto/external-tools-update-state.dto';
 import { RuinDTO } from '../dto/ruin.dto';
 import { SeasonDTO } from '../dto/season.dto';
 import { SeasonPhaseDTO } from '../dto/season-phase.dto';
@@ -78,10 +79,19 @@ export class TownService extends GlobalService {
         });
     }
 
-    /** Met à jour les outils externes */
-    public updateExternalTools(): void {
+    /** Intervalle d'interrogation de l'avancement d'une mise à jour des outils externes */
+    private static readonly UPDATE_POLLING_INTERVAL_MS: number = 800;
+    /** Au-delà, le suivi s'arrête ; le traitement, lui, continue côté serveur */
+    private static readonly UPDATE_TIMEOUT_MS: number = 120000;
+
+    /**
+     * Met à jour les outils externes et émet l'avancement au fur et à mesure. Le serveur exécute le
+     * travail en tâche de fond : on lance, puis on interroge son état jusqu'à la fin.
+     */
+    public updateExternalTools(): Observable<ExternalToolsUpdateJobStateDTO> {
         const tools_to_update: ToolsToUpdate = {
-            isBigBrothHordes: 'api',
+            // BigBroth'Hordes ne fonctionne plus ; l'outil reste connu au cas où son développeur reprendrait le projet
+            isBigBrothHordes: 'none',
             isFataMorgana: 'api',
             isGestHordes: 'api',
             isMyHordesOptimizer: 'api'
@@ -99,17 +109,54 @@ export class TownService extends GlobalService {
             townId: getTown()?.town_id || 0
         };
 
-        super.post(this.API_URL + `/externaltools/update?userKey=${getExternalAppId()}&userId=${getUserId()}`,
-                   JSON.stringify({
-                       map: { toolsToUpdate: tools_to_update },
-                       townDetails: town_details
-                   })
-        )
-            .subscribe({
-                next: () => {
-                    this.snackbar.successSnackbar($localize`Les outils externes ont bien été mis à jour`);
-                }
-            });
+        return super.post<ExternalToolsUpdateJobStateDTO>(
+            this.API_URL + `/ExternalTools/Update/Start?userKey=${getExternalAppId()}&userId=${getUserId()}`,
+            JSON.stringify({
+                map: { toolsToUpdate: tools_to_update },
+                townDetails: town_details
+            }),
+            true)
+            .pipe(
+                catchError((error: HttpErrorResponse) => {
+                    // 409 : une mise à jour du même joueur tourne déjà (double clic, second onglet).
+                    // Ce n'est pas une erreur, on suit celle qui est en cours.
+                    if (error.status === HttpStatusCode.Conflict && error.error) {
+                        return of(error.error as ExternalToolsUpdateJobStateDTO);
+                    }
+                    return throwError(() => error);
+                }),
+                switchMap((initial_state: ExternalToolsUpdateJobStateDTO) => concat(
+                    of(initial_state),
+                    this.followExternalToolsUpdate(initial_state.jobId)
+                ))
+            );
+    }
+
+    /** Émet chaque état du lancement suivi, puis se termine sur le dernier */
+    private followExternalToolsUpdate(job_id: string): Observable<ExternalToolsUpdateJobStateDTO> {
+        return timer(TownService.UPDATE_POLLING_INTERVAL_MS, TownService.UPDATE_POLLING_INTERVAL_MS)
+            .pipe(
+                // exhaustMap (pas switchMap) : si une interrogation n'a pas fini avant le tick suivant
+                // (ex. rafraîchissement du token imbriqué plus lent que l'intervalle), on ignore ce tick
+                // au lieu d'annuler la requête en cours — sinon elle ne finit jamais et boucle en échec.
+                // Une interrogation en échec (coupure réseau, redémarrage de l'API) est ignorée :
+                // le traitement continue côté serveur, la suivante reprendra le suivi.
+                exhaustMap(() => this.getExternalToolsUpdateStatus().pipe(catchError(() => EMPTY))),
+                // Un état sans lancement connu, ou portant un autre identifiant, n'est pas le nôtre :
+                // le prendre pour argent comptant se lirait comme une fin de traitement réussie.
+                filter((state: ExternalToolsUpdateJobStateDTO) => state.jobId === job_id),
+                takeWhile((state: ExternalToolsUpdateJobStateDTO) => state.isRunning, true),
+                takeUntil(timer(TownService.UPDATE_TIMEOUT_MS))
+            );
+    }
+
+    private getExternalToolsUpdateStatus(): Observable<ExternalToolsUpdateJobStateDTO> {
+        return super.get<ExternalToolsUpdateJobStateDTO>(
+            this.API_URL + `/ExternalTools/Update/Status?userKey=${getExternalAppId()}&userId=${getUserId()}`,
+            true,
+            undefined,
+            true)
+            .pipe(map((response: HttpResponse<ExternalToolsUpdateJobStateDTO>) => response.body as ExternalToolsUpdateJobStateDTO));
     }
 
     public getTownRuins(): Observable<Ruin[]> {

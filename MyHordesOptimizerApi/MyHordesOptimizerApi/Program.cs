@@ -208,6 +208,8 @@ builder.Services.AddScoped<IExternalToolsService, ExternalToolsService>();
 builder.Services.AddScoped<IMyHordesImportService, MyHordesImportService>();
 // Singleton : porte l'état de l'import global, qui survit à la requête qui l'a déclenché
 builder.Services.AddSingleton<ImportJobRunner>();
+// Singleton : porte l'état des mises à jour d'outils externes, qui survit à la requête qui les a déclenchées
+builder.Services.AddSingleton<ExternalToolsUpdateJobRunner>();
 // Verrou d'écriture des villes : forcément un singleton, il n'a de sens que partagé par tous.
 builder.Services.AddSingleton<TownSyncLock>();
 builder.Services.AddScoped<IWishListService, WishListService>();

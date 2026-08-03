@@ -1,5 +1,5 @@
 import { CommonModule, NgOptimizedImage, NgTemplateOutlet } from '@angular/common';
-import { Component, computed, Input, input,InputSignal, Signal } from '@angular/core';
+import { Component, computed, Input, input, InputSignal, Signal } from '@angular/core';
 import { MatTabChangeEvent, MatTabsModule } from '@angular/material/tabs';
 
 import { HORDES_IMG_REPO } from '../../../../_abstract_model/const';
@@ -47,7 +47,7 @@ export class PlaysRegistryComponent {
         {
             id: 'plays',
             img: 'item/item_game_box.gif',
-            label: $localize`Dés / Cartes / socceron`
+            label: $localize`Dés / Cartes / Ballon`
         },
         {
             id: 'dice',
@@ -62,7 +62,7 @@ export class PlaysRegistryComponent {
         {
             id: 'soccer',
             img: 'item/item_soccer.gif',
-            label: $localize`socceron`
+            label: $localize`Ballon`
         }
     ];
 

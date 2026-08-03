@@ -139,9 +139,18 @@
           "defaultConfiguration": "development"
         },
         "extract-i18n": {
-          "builder": "@angular-devkit/build-angular:extract-i18n",
+          "builder": "ng-extract-i18n-merge:ng-extract-i18n-merge",
           "options": {
-            "buildTarget": "MyHordesOptimizerWebsite:build"
+            "buildTarget": "MyHordesOptimizerWebsite:build",
+            "builderI18n": "@angular-devkit/build-angular:extract-i18n",
+            "format": "xlf",
+            "outputPath": ".",
+            "sourceFile": "src/i18n/messages.xlf",
+            "targetFiles": [
+              "public/i18n/xlf-files/messages.de.xlf",
+              "public/i18n/xlf-files/messages.en.xlf",
+              "public/i18n/xlf-files/messages.es.xlf"
+            ]
           }
         },
         "test": {

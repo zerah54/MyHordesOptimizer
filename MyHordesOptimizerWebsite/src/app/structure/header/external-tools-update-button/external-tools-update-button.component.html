@@ -1,0 +1,36 @@
+@if (badges().length === 0) {
+    @if (isCompact()) {
+        <button mat-icon-button type="button" [color]="'accent'" (click)="update()"
+                matTooltip="Mettre à jour les outils externes" i18n-matTooltip="@@mho_external_tools_update_label">
+            <mat-icon fontSet="material-symbols-outlined">send</mat-icon>
+        </button>
+    } @else {
+        <button mat-button type="button" [color]="'accent'" (click)="update()">
+            <mat-icon fontSet="material-symbols-outlined">send</mat-icon>
+            <ng-container i18n="@@mho_external_tools_update_label">Mettre à jour les outils externes</ng-container>
+        </button>
+    }
+} @else {
+    <button mat-button type="button" class="tools-progress" (click)="update()">
+        @for (badge of badges(); track badge.name) {
+            <span class="tool" [matTooltip]="badge.tooltip" matTooltipClass="mho-multiline-tooltip">
+                <img [src]="badge.icon" [alt]="badge.name" height="16" width="16">
+                <span class="badge" [class.pending]="badge.status === 'pending'"
+                      [class.success]="badge.status === 'success'"
+                      [class.error]="badge.status === 'error'">
+                    @switch (badge.status) {
+                        @case ('pending') {
+                            …
+                        }
+                        @case ('success') {
+                            ✔
+                        }
+                        @default {
+                            ✖
+                        }
+                    }
+                </span>
+            </span>
+        }
+    </button>
+}

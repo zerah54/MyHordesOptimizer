@@ -10,19 +10,29 @@
     }
 </mat-tab-group>
 <ng-template #template>
+    @let citizens_played = entries_by_type | isCitizenInEntries:completeCitizenList();
+    @let citizens_not_played = entries_by_type | isCitizenInEntries:completeCitizenList():true;
     <div class="plays-dices-cards">
         <div class="citizen-plays">
-            <h4 i18n>Ont joué</h4>
-            @for (citizen of entries_by_type | isCitizenInEntries:completeCitizenList(); track citizen) {
-                <div>
-                    <mho-citizen-info displayShunStatus [displayPseudoMode]="displayPseudo()"
-                                      [citizen]="citizen"></mho-citizen-info>
-                </div>
-            }
+            <h4>
+                <ng-container i18n>Ont joué</ng-container>
+                ({{ citizens_played.length }})
+            </h4>
+            <div>
+                @for (citizen of citizens_played; track citizen) {
+                    <div>
+                        <mho-citizen-info displayShunStatus [displayPseudoMode]="displayPseudo()"
+                                          [citizen]="citizen"></mho-citizen-info>
+                    </div>
+                }
+            </div>
         </div>
         <div class="citizen-doesnt-play">
-            <h4 i18n>N'ont pas joué</h4>
-            @for (citizen of entries_by_type | isCitizenInEntries:completeCitizenList():true; track citizen) {
+            <h4>
+                <ng-container i18n>N'ont pas joué</ng-container>
+                ({{ citizens_not_played.length }})
+            </h4>
+            @for (citizen of citizens_not_played; track citizen) {
                 <div>
                     <mho-citizen-info displayShunStatus [displayPseudoMode]="displayPseudo()"
                                       [citizen]="citizen"></mho-citizen-info>
