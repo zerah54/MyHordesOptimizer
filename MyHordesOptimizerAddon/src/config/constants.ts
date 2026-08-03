@@ -64,6 +64,8 @@ export const repo_img_url = 'https://myhordes-optimizer.web.app/img/';
 export const repo_img_hordes_url = repo_img_url + 'hordes_img/';
 
 export const mh_optimizer_icon = 'https://myhordes-optimizer.web.app/img/logo/logo_mho_64x64_outlined.png';
+/** Variante 16x16 : à utiliser telle quelle plutôt que de redimensionner l'icône 64x64 en CSS */
+export const mh_optimizer_icon_16x16: string = repo_img_url + 'logo/logo_mho_16x16.png';
 
 export const mh_optimizer_window_id = 'optimizer-window';
 export const mh_optimizer_map_window_id = 'optimizer-map-window';

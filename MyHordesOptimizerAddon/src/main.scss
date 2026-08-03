@@ -1410,3 +1410,76 @@ div.item-tag.mho-item-tag-no-img {
 .mho-forum-styles-footer-spacer {
     flex: 1;
 }
+
+body.mho-spoiler-pin-enabled .forum-post-content .spoiler {
+    cursor: pointer;
+}
+
+// Mirrors the game's `.spoiler:not(:hover)` masking rules (assets/less/modules/forum.less)
+// so a pinned spoiler looks exactly like a genuinely hovered one, without touching the
+// `content` of nested pseudo-elements that carry unrelated decorations (rpauthor's ": ",
+// a nested collapsor's "▶").
+// The game's rule is applied through the `.forum-content-format()` LESS mixin, invoked as
+// `.forum-post > .forum-post-content { .forum-content-format(); }` — it therefore compiles
+// to `.forum-post > .forum-post-content .spoiler:not(:hover) ...` (4 classes/pseudo-classes
+// of specificity). Matching only `.forum-post-content .spoiler.mho-spoiler-pinned` (3) loses
+// that tie, so the `.forum-post` ancestor is required here, plus a doubled pinned class for
+// a safety margin against any other selector this scope may still be missing.
+.forum-post .forum-post-content .spoiler.mho-spoiler-pinned.mho-spoiler-pinned {
+    background-color: transparent !important;
+    color: inherit !important;
+    text-shadow: none !important;
+
+    a {
+        pointer-events: auto !important;
+    }
+
+    img {
+        opacity: 1 !important;
+    }
+
+    div, .username, .rpauthor, blockquote, span.quoteauthor, ul, ol, pre, hr {
+        &::after {
+            position: static !important;
+            background: none !important;
+        }
+    }
+
+    a, b, i, span.bad, div.collapsor {
+        background-color: transparent !important;
+        color: inherit !important;
+        text-shadow: none !important;
+    }
+
+    div.collapsor::before {
+        opacity: 1 !important;
+    }
+}
+
+.mho-forum-image-block {
+    display: block;
+    max-width: 100%;
+    margin-top: 4px;
+    text-align: center;
+
+    a {
+        display: block;
+        max-width: 100%;
+    }
+
+    img {
+        display: block;
+        max-width: 100%;
+        height: auto;
+        border: 6px double currentColor;
+        border-radius: 4px;
+        margin: 0 auto;
+    }
+}
+
+.mho-forum-image-caption {
+    margin-top: 2px;
+    font-size: 0.85em;
+    font-style: italic;
+    opacity: 0.8;
+}

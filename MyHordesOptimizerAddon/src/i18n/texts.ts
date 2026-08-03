@@ -60,23 +60,35 @@ export const texts = {
         de: 'Aktualisierung...',
         es: 'Actualizando...'
     },
-    update_external_tools_success_btn_label: {
-        en: 'Update completed!',
-        fr: 'Mise à jour terminée !',
-        de: 'Aktualisierung abgeschlossen!',
-        es: '¡Actualización exitosa!'
-    },
-    update_external_tools_errors_btn_label: {
-        en: 'Update completed with errors.',
-        fr: 'Mise à jour terminée avec des erreurs.',
-        de: 'Aktualisierung mit Fehlern abgeschlossen.',
-        es: 'Actualización completada con errores.'
-    },
     update_external_tools_fail_btn_label: {
         en: 'Can not update.',
         fr: 'Impossible de mettre à jour.',
         de: 'Aktualisierung unmöglich',
         es: 'No se puede actualizar.'
+    },
+    update_external_tools_tool_pending: {
+        en: 'updating',
+        fr: 'mise à jour en cours',
+        de: 'wird aktualisiert',
+        es: 'actualizando'
+    },
+    update_external_tools_tool_success: {
+        en: 'up to date',
+        fr: 'à jour',
+        de: 'aktuell',
+        es: 'actualizado'
+    },
+    update_external_tools_tool_error: {
+        en: 'failed',
+        fr: 'échec',
+        de: 'fehlgeschlagen',
+        es: 'error'
+    },
+    update_external_tools_timeout: {
+        en: 'Timed out',
+        fr: 'Délai dépassé',
+        de: 'Zeitüberschreitung',
+        es: 'Tiempo agotado'
     },
     prevent_from_leaving_information: {
         en: 'You asked to be notified before leaving if your escort options were not good: ',

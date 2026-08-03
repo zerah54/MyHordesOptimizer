@@ -42,8 +42,13 @@ export function createParams(content) {
     params_title.appendChild(params_title_select_all);
 
     params_title_select_all.addEventListener('click', () => {
-        const unchecked = Array.from(categories_container.querySelectorAll('input.mho-param[type=checkbox]:not(:checked)'));
-        unchecked.forEach((checkbox) => checkbox.click());
+        // Ne pas figer un snapshot des cases non cochées : cocher un parent coche déjà
+        // ses enfants (cascade dans le handler 'change'), donc on revérifie .checked à
+        // chaque itération pour ne pas re-cliquer (donc décocher) une case déjà cochée.
+        const checkboxes = Array.from(categories_container.querySelectorAll('input.mho-param[type=checkbox]')) as HTMLInputElement[];
+        checkboxes.forEach((checkbox) => {
+            if (!checkbox.checked) checkbox.click();
+        });
     });
 
     const categories_list = document.createElement('ul');

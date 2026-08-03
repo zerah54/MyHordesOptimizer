@@ -798,6 +798,44 @@ export const params_categories: ParamCategory[] = [
                     es: 'Colorea, destaca o atenúa los títulos de los temas de la lista del foro según su etiqueta y / o las palabras que contienen. Los estilos se configuran mediante el botón junto a esta opción.'
                 },
                 action: 'forum_thread_styles'
+            },
+            {
+                id: 'forum_options',
+                label: {
+                    en: 'Forum',
+                    fr: 'Forum',
+                    de: 'Forum',
+                    es: 'Foro'
+                },
+                children: [
+                    {
+                        id: 'forum_auto_expand_collapse',
+                        label: {
+                            en: 'Automatically expand collapsed sections',
+                            fr: 'Déplier automatiquement les sections repliées',
+                            de: 'Eingeklappte Abschnitte automatisch ausklappen',
+                            es: 'Desplegar automáticamente las secciones plegadas'
+                        },
+                    },
+                    {
+                        id: 'forum_pin_spoiler_on_click',
+                        label: {
+                            en: 'Click a spoiler to keep it revealed',
+                            fr: 'Cliquer sur un spoiler pour le garder affiché',
+                            de: 'Auf einen Spoiler klicken, um ihn dauerhaft anzuzeigen',
+                            es: 'Hacer clic en un spoiler para mantenerlo visible'
+                        },
+                    },
+                    {
+                        id: 'forum_auto_display_images',
+                        label: {
+                            en: 'Show images from links in posts',
+                            fr: 'Afficher les images des liens dans les posts',
+                            de: 'Bilder von Links in Beiträgen anzeigen',
+                            es: 'Mostrar las imágenes de los enlaces en los mensajes'
+                        },
+                    }
+                ]
             }
             // {
             //     id: `block_users`,
