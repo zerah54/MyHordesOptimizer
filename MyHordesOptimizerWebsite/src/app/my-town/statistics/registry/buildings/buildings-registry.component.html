@@ -10,24 +10,36 @@
     }
 </mat-tab-group>
 <ng-template #template let-tab>
+    @let citizens_contribute = entries_by_type | isCitizenInEntries:completeCitizenList();
+    @let citizens_didnt_contribute = entries_by_type | isCitizenInEntries:completeCitizenList():true;
     <div class="contributions">
         <div class="citizen-contribute">
-            <h4 i18n>Ont contribué</h4>
-            @for (citizen of entries_by_type | isCitizenInEntries:completeCitizenList(); track citizen) {
-                <div>
-                    <mho-citizen-info displayShunStatus [displayJob]="tab.id === 'vet'" [displayPseudoMode]="displayPseudo()"
-                                      [citizen]="citizen"></mho-citizen-info>
-                </div>
-            }
+            <h4>
+                <ng-container i18n>Ont contribué</ng-container>
+                ({{ citizens_contribute.length }})
+            </h4>
+            <div>
+                @for (citizen of citizens_contribute; track citizen) {
+                    <div>
+                        <mho-citizen-info displayShunStatus [displayJob]="tab.id === 'vet'" [displayPseudoMode]="displayPseudo()"
+                                          [citizen]="citizen"></mho-citizen-info>
+                    </div>
+                }
+            </div>
         </div>
         <div class="citizen-didnt-contribute">
-            <h4 i18n>N'ont pas contribué</h4>
-            @for (citizen of entries_by_type | isCitizenInEntries:completeCitizenList():true; track citizen) {
-                <div>
-                    <mho-citizen-info displayShunStatus [displayJob]="tab.id === 'vet'" [displayPseudoMode]="displayPseudo()"
-                                      [citizen]="citizen"></mho-citizen-info>
-                </div>
-            }
+            <h4>
+                <ng-container i18n>N'ont pas contribué</ng-container>
+                ({{ citizens_didnt_contribute.length }})
+            </h4>
+            <div>
+                @for (citizen of citizens_didnt_contribute; track citizen) {
+                    <div>
+                        <mho-citizen-info displayShunStatus [displayJob]="tab.id === 'vet'" [displayPseudoMode]="displayPseudo()"
+                                          [citizen]="citizen"></mho-citizen-info>
+                    </div>
+                }
+            </div>
         </div>
     </div>
 </ng-template>

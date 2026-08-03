@@ -2,10 +2,15 @@
     <mat-slide-toggle #diffToggle i18n>Afficher uniquement la différence</mat-slide-toggle>
     @if (entries | bankCleanEntries:give_keywords:completeCitizenList():completeItemsList():diffToggle.checked; as cleanEntries) {
         <div>
+            @let taken_entries = cleanEntries | bankDiff:'take';
+            @let gifted_entries = cleanEntries | bankDiff:'gift';
             <div class="taken">
-                <h4 i18n>Ont été pris</h4>
-                @for (entry of cleanEntries | bankDiff:'take'; track entry) {
-                    @if (entry.item) {
+                <h4>
+                    <ng-container i18n>Ont été pris</ng-container>
+                    ({{ taken_entries.length }})
+                </h4>
+                <div>
+                    @for (entry of taken_entries; track entry) {
                         <div>
                             <div class="entry">
                                 [{{ entry.hour }}]
@@ -21,12 +26,15 @@
                             </div>
                         </div>
                     }
-                }
+                </div>
             </div>
             <div class="gifted">
-                <h4 i18n>Ont été donnés</h4>
-                @for (entry of cleanEntries | bankDiff:'gift'; track entry) {
-                    @if (entry.item) {
+                <h4>
+                    <ng-container i18n>Ont été donnés</ng-container>
+                    ({{ gifted_entries.length }})
+                </h4>
+                <div>
+                    @for (entry of gifted_entries; track entry) {
                         <div class="entry">
                             [{{ entry.hour }}]
                             <img [ngSrc]="HORDES_IMG_REPO + entry.item.img" width="16" height="16">
@@ -39,7 +47,7 @@
                             </div>
                         </div>
                     }
-                }
+                </div>
             </div>
         </div>
     }

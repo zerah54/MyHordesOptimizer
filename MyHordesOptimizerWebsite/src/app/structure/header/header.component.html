@@ -6,17 +6,7 @@
     <div class="title">{{ is_gt_xs ? 'MyHordes Optimizer' : 'MHO' }}</div>
     <span class="spacer"></span>
     @if (saved_external_app_id && is_in_town) {
-        @if (is_gt_xs) {
-            <button mat-button type="button" [color]="'accent'" (click)="updateExternalTools()">
-                <mat-icon fontSet="material-symbols-outlined">send</mat-icon>
-                <ng-container i18n>Mettre à jour les outils externes</ng-container>
-            </button>
-        } @else {
-            <button mat-icon-button type="button" [color]="'accent'" (click)="updateExternalTools()"
-                    matTooltip="Mettre à jour les outils externes" i18n-matTooltip>
-                <mat-icon fontSet="material-symbols-outlined">send</mat-icon>
-            </button>
-        }
+        <mho-external-tools-update-button [isCompact]="!is_gt_xs"/>
     }
 
     @if (is_dev) {

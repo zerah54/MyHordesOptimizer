@@ -75,10 +75,10 @@ export class BankCleanEntriesPipe implements PipeTransform {
     name: 'bankDiff'
 })
 export class BankDiffPipe implements PipeTransform {
-    public transform(entries: BankEntry[], mode: 'gift' | 'take'): BankEntry[] {
+    public transform(entries: BankEntry[], mode: 'gift' | 'take'): BankEntryWithItem[] {
         return mode === 'gift'
-            ? entries.filter((entry: BankEntry): boolean => entry.mode === 'gifted')
-            : entries.filter((entry: BankEntry): boolean => entry.mode === 'taken');
+            ? entries.filter((entry: BankEntry): entry is BankEntryWithItem => entry.mode === 'gifted' && !!entry.item)
+            : entries.filter((entry: BankEntry): entry is BankEntryWithItem => entry.mode === 'taken' && !!entry.item);
     }
 }
 
@@ -88,3 +88,5 @@ interface BankEntry {
     item?: Item;
     hour: string;
 }
+
+type BankEntryWithItem = BankEntry & { item: Item };

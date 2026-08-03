@@ -1,6 +1,6 @@
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { CommonModule, NgOptimizedImage } from '@angular/common';
-import { Component, DestroyRef, HostListener, inject, OnInit, output,OutputEmitterRef } from '@angular/core';
+import { Component, DestroyRef, HostListener, inject, OnInit, output, OutputEmitterRef } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -18,15 +18,15 @@ import { skip } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { BREAKPOINTS } from '../../_abstract_model/const';
 import { AuthenticationService } from '../../_abstract_model/services/authentication.service';
-import { TownService } from '../../_abstract_model/services/town.service';
 import { Imports } from '../../_abstract_model/types/_types';
 import { Me } from '../../_abstract_model/types/me.class';
 import { getExternalAppId, getTown, getUser, setExternalAppId, setTokenWithMeWithExpirationDate } from '../../_core/utilities/localstorage.util';
 import { CitizenMenuComponent } from './citizen-menu/citizen-menu.component';
+import { ExternalToolsUpdateButtonComponent } from './external-tools-update-button/external-tools-update-button.component';
 import { HeaderService } from './header.service';
 
 const angular_common: Imports = [CommonModule, NgOptimizedImage, FormsModule];
-const components: Imports = [CitizenMenuComponent];
+const components: Imports = [CitizenMenuComponent, ExternalToolsUpdateButtonComponent];
 const pipes: Imports = [];
 const material_modules: Imports = [MatButtonModule, MatDividerModule, MatFormFieldModule, MatIconModule, MatInputModule, MatMenuModule, MatToolbarModule, MatTooltipModule, RouterLink];
 
@@ -61,7 +61,6 @@ export class HeaderComponent implements OnInit {
 
     private readonly title_service: Title = inject(Title);
     private readonly authentication_api: AuthenticationService = inject(AuthenticationService);
-    private readonly town_service: TownService = inject(TownService);
     private readonly header_service: HeaderService = inject(HeaderService);
     private readonly destroy_ref: DestroyRef = inject(DestroyRef);
 
@@ -96,11 +95,6 @@ export class HeaderComponent implements OnInit {
         setExternalAppId(null);
         setTokenWithMeWithExpirationDate();
         location.reload();
-    }
-
-    /** Mise à jour des outils externes */
-    protected updateExternalTools(): void {
-        this.town_service.updateExternalTools();
     }
 
     private updateMe(): void {
