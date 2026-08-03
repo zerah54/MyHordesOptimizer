@@ -12,9 +12,33 @@ import { saveBath } from './bath';
 import { getMap } from './map';
 import { getWishlist } from './wishlist';
 
-export function updateExternalTools() {
+export interface ExternalToolUpdateError {
+    unit: string;
+    message: string;
+}
+
+export interface ExternalToolUpdateState {
+    tool: string;
+    status: 'pending' | 'success' | 'error';
+    errors: ExternalToolUpdateError[];
+}
+
+export interface ExternalToolsUpdateJobState {
+    jobId: string;
+    isRunning: boolean;
+    tools: ExternalToolUpdateState[];
+}
+
+/** Identifiant rendu par le serveur quand aucun lancement n'est connu pour ce joueur */
+const empty_job_id: string = '00000000-0000-0000-0000-000000000000';
+/** Intervalle d'interrogation de l'avancement */
+const polling_interval_ms: number = 800;
+/** Au-delà, on cesse de suivre ; le traitement, lui, continue côté serveur */
+const polling_timeout_ms: number = 120000;
+
+export function updateExternalTools(on_progress?: (state: ExternalToolsUpdateJobState) => void): Promise<ExternalToolsUpdateJobState> {
     const { mh_user, mho_parameters, api_url, external_app_id } = state as any;
-    return new Promise(async (resolve, reject) => {
+    return new Promise<ExternalToolsUpdateJobState>(async (resolve, reject) => {
 
         const convertListOfSingleObjectsIntoListOfCountedObjects = (objects) => {
             const object_map = [];
@@ -521,30 +545,96 @@ export function updateExternalTools() {
         /** Envoi des informations */
         console.log('MHO - Envoyé pour enregistrement :', data);
 
-        fetcher(api_url + '/externaltools/update?userKey=' + external_app_id + '&userId=' + mh_user.id, {
+        fetcher(api_url + '/externaltools/update/start?userKey=' + external_app_id + '&userId=' + mh_user.id, {
             method: 'POST',
             body: JSON.stringify(data),
             headers: {
                 'Content-Type': 'application/json'
             }
         })
-            .then((response) => {
-                if (response.status === 200) {
+            .then((response: Response) => {
+                // 409 : une mise à jour du même joueur tourne déjà (second onglet, double clic).
+                // Le corps porte l'état de ce lancement, on le suit au lieu de le signaler.
+                if (response.status === 200 || response.status === 202 || response.status === 409) {
                     return response.json();
-                } else {
-                    return convertResponsePromiseToError(response);
                 }
+                return convertResponsePromiseToError(response);
             })
-            .then((response) => {
-                getWishlist();
-                getMap();
-                resolve(response);
+            .then((initial_state: ExternalToolsUpdateJobState) => {
+                if (on_progress) {
+                    on_progress(initial_state);
+                }
+                return followUpdateJob(initial_state, on_progress);
             })
+            .then((final_state: ExternalToolsUpdateJobState) => resolve(final_state))
             .catch((error) => {
-                reject();
+                reject(error);
                 addError(error);
             });
     });
+}
+
+/**
+ * Interroge l'avancement jusqu'à la fin du lancement suivi. Les rafraîchissements de la liste de
+ * courses et de la carte sont déclenchés dès que MyHordes Optimizer est à jour : les rattacher à
+ * la fin du traitement les supprimerait quand le garde-fou de deux minutes arrête le suivi, et un
+ * Gest'Hordes lent n'a aucune raison de les retarder.
+ */
+async function followUpdateJob(initial_state: ExternalToolsUpdateJobState, on_progress?: (state: ExternalToolsUpdateJobState) => void): Promise<ExternalToolsUpdateJobState> {
+    const started_at: number = Date.now();
+    let current_state: ExternalToolsUpdateJobState = initial_state;
+    let mho_refreshed: boolean = false;
+
+    const refreshMhoDataOnce = (): void => {
+        if (mho_refreshed) {
+            return;
+        }
+        mho_refreshed = true;
+        getWishlist();
+        getMap();
+    };
+
+    const isMhoDone = (job_state: ExternalToolsUpdateJobState): boolean => {
+        return job_state.tools.some((tool: ExternalToolUpdateState) => tool.tool === 'myHordesOptimizer' && tool.status === 'success');
+    };
+
+    if (isMhoDone(current_state)) {
+        refreshMhoDataOnce();
+    }
+
+    while (current_state.isRunning && Date.now() - started_at < polling_timeout_ms) {
+        await new Promise<void>((wait: () => void) => setTimeout(wait, polling_interval_ms));
+
+        let next_state: ExternalToolsUpdateJobState;
+        try {
+            const response: Response = await fetcher(state.api_url + '/externaltools/update/status?userKey=' + state.external_app_id + '&userId=' + state.mh_user.id);
+            if (response.status !== 200) {
+                continue;
+            }
+            next_state = await response.json();
+        } catch {
+            // Interrogation en échec (coupure, redémarrage de l'API) : le traitement continue
+            // côté serveur, la suivante reprendra le suivi.
+            continue;
+        }
+
+        // Un état sans lancement connu, ou portant un autre identifiant, n'est pas le nôtre :
+        // le prendre pour argent comptant se lirait comme une fin de traitement réussie.
+        if (next_state.jobId === empty_job_id || next_state.jobId !== current_state.jobId) {
+            continue;
+        }
+
+        current_state = next_state;
+        if (on_progress) {
+            on_progress(current_state);
+        }
+        if (isMhoDone(current_state)) {
+            refreshMhoDataOnce();
+        }
+    }
+
+    refreshMhoDataOnce();
+    return current_state;
 }
 
 /** Récupère les traductions de la chaine de caractères */

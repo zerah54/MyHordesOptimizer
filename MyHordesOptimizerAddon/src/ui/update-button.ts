@@ -1,3 +1,4 @@
+import type { ExternalToolsUpdateJobState, ExternalToolUpdateError, ExternalToolUpdateState } from '../api/update';
 import { updateExternalTools } from '../api/update';
 import {
     gm_bbh_updated_key,
@@ -5,9 +6,11 @@ import {
     gm_gh_updated_key,
     gm_mho_updated_key,
     mh_optimizer_icon,
+    mh_optimizer_icon_16x16,
     mh_update_external_tools_id,
     mho_warn_missing_logs_id,
-    repo_img_hordes_url
+    repo_img_hordes_url,
+    repo_img_url
 } from '../config/constants';
 import { texts } from '../i18n/texts';
 import { state } from '../state';
@@ -146,6 +149,102 @@ export function createUpdateExternalToolsButton() {
 }
 
 
+interface ToolDisplay {
+    id: string;
+    /** Nom propre : jamais traduit */
+    name: string;
+    icon: string;
+    storage_key?: string;
+}
+
+const external_tools: ToolDisplay[] = [
+    { id: 'myHordesOptimizer', name: 'MyHordes Optimizer', icon: mh_optimizer_icon_16x16, storage_key: gm_mho_updated_key },
+    { id: 'gestHordes', name: 'Gest\'Hordes', icon: `${repo_img_url}external-tools/gh.gif`, storage_key: gm_gh_updated_key },
+    { id: 'fataMorgana', name: 'Fata Morgana', icon: `${repo_img_url}external-tools/fata.gif`, storage_key: gm_fata_updated_key },
+    { id: 'bigBrothHordes', name: 'BigBroth\'Hordes', icon: `${repo_img_url}external-tools/bbh.gif`, storage_key: gm_bbh_updated_key }
+];
+
+/**
+ * Remplace le contenu du bouton par une icône par outil sollicité, badgée de son état. Partagée
+ * par les deux boutons : leur logique de résultat était dupliquée, et celle du grand était cassée.
+ */
+function renderToolsProgress(container: HTMLElement, job_state: ExternalToolsUpdateJobState, icon_size: number): void {
+    container.innerHTML = '';
+    container.style.textAlign = 'center';
+    job_state.tools.forEach((tool_state: ExternalToolUpdateState) => {
+        const display: ToolDisplay | undefined = external_tools.find((tool: ToolDisplay) => tool.id === tool_state.tool);
+        if (!display) {
+            return;
+        }
+
+        const wrapper: HTMLElement = document.createElement('span');
+        wrapper.style.position = 'relative';
+        wrapper.style.display = 'inline-block';
+        wrapper.style.marginRight = '0.7em';
+        wrapper.title = buildToolTitle(display.name, tool_state);
+
+        const icon: HTMLImageElement = document.createElement('img');
+        icon.src = display.icon;
+        icon.height = icon_size;
+        icon.width = icon_size;
+        wrapper.appendChild(icon);
+
+        const badge: HTMLElement = document.createElement('span');
+        badge.style.position = 'absolute';
+        badge.style.right = '-0.3em';
+        badge.style.bottom = '-0.3em';
+        badge.style.fontSize = `${Math.round(icon_size * 0.6)}px`;
+        badge.style.lineHeight = '1';
+        if (tool_state.status === 'pending') {
+            badge.innerText = '…';
+        } else if (tool_state.status === 'success') {
+            badge.innerText = '✔';
+        } else {
+            badge.innerText = '✖';
+        }
+        wrapper.appendChild(badge);
+
+        container.appendChild(wrapper);
+    });
+}
+
+function buildToolTitle(name: string, tool_state: ExternalToolUpdateState): string {
+    if (tool_state.status === 'pending') {
+        return `${name} : ${getI18N(texts.update_external_tools_tool_pending)}`;
+    }
+    if (tool_state.status === 'success') {
+        return `${name} : ${getI18N(texts.update_external_tools_tool_success)}`;
+    }
+    const messages: string = tool_state.errors.map((error: ExternalToolUpdateError) => `${error.unit} : ${error.message}`).join('\n');
+    return `${name} : ${getI18N(texts.update_external_tools_tool_error)}\n${messages}`;
+}
+
+/** Pose le drapeau « à jour » de chaque outil dès qu'il passe au vert, sans attendre la fin */
+function storeUpdatedTools(job_state: ExternalToolsUpdateJobState): void {
+    job_state.tools
+        .filter((tool_state: ExternalToolUpdateState) => tool_state.status === 'success')
+        .forEach((tool_state: ExternalToolUpdateState) => {
+            const display: ToolDisplay | undefined = external_tools.find((tool: ToolDisplay) => tool.id === tool_state.tool);
+            if (display?.storage_key) {
+                setStorageItem(display.storage_key, true);
+            }
+        });
+}
+
+/** Les outils encore en cours quand le suivi s'arrête sont présentés comme dépassés */
+function markPendingAsTimedOut(job_state: ExternalToolsUpdateJobState): ExternalToolsUpdateJobState {
+    if (!job_state.isRunning) {
+        return job_state;
+    }
+    return {
+        ...job_state,
+        isRunning: false,
+        tools: job_state.tools.map((tool_state: ExternalToolUpdateState) => tool_state.status === 'pending'
+            ? { ...tool_state, status: 'error' as const, errors: [{ unit: 'job', message: getI18N(texts.update_external_tools_timeout) }] }
+            : tool_state)
+    };
+}
+
 export function createLargeUpdateExternalToolsButton(update_external_tools_btn) {
     const updater_bloc = document.createElement('div');
     updater_bloc.style.marginTop = '1em';
@@ -171,59 +270,22 @@ export function createLargeUpdateExternalToolsButton(update_external_tools_btn) 
     update_external_tools_btn.id = mh_update_external_tools_id;
 
     update_external_tools_btn.addEventListener('click', () => {
-        /** Au clic sur le bouton, on appelle la fonction de mise à jour */
         update_external_tools_btn.innerHTML = `<img src="${repo_img_hordes_url}emotes/middot.gif">` + getI18N(texts.update_external_tools_pending_btn_label);
-        updateExternalTools()
-            .then((response: any) => {
-                if (response.mapResponseDto.bigBrothHordesStatus.toLowerCase() === 'ok') setStorageItem(gm_bbh_updated_key, true);
-                if (response.mapResponseDto.gestHordesApiStatus.toLowerCase() === 'ok' || response.mapResponseDto.gestHordesCellsStatus.toLowerCase() === 'ok') setStorageItem(gm_gh_updated_key, true);
-                if (response.mapResponseDto.fataMorganaStatus.toLowerCase() === 'ok') setStorageItem(gm_fata_updated_key, true);
-                if (response.mapResponseDto.mhoApiStatus.toLowerCase() === 'ok') setStorageItem(gm_mho_updated_key, true);
 
-                let tools_fail = [];
-                const response_items = Object.keys(response).map((key) => {
-                    return { key: key, value: response[key] };
-                });
-
-                response_items.forEach((response_item, index) => {
-
-                    const final = Object.keys(response_item.value).map((key) => {
-                        return { key: key, value: response_item.value[key] };
-                    });
-                    tools_fail = [...tools_fail, ...final.filter((final_item) => !final_item.value || (final_item.value.toLowerCase() !== 'ok' && final_item.value.toLowerCase() !== 'not activated'))];
-                    if (index >= response_items.length - 1) {
-
-                        update_external_tools_btn.innerText = '';
-                        if (tools_fail.length === 0) {
-                            const icon = document.createElement('img');
-                            icon.src = `${repo_img_hordes_url}icons/done.png`;
-                            update_external_tools_btn.appendChild(icon);
-
-                            const text = document.createElement('text');
-                            text.innerText = getI18N(texts.update_external_tools_success_btn_label);
-                            update_external_tools_btn.appendChild(text);
-                        } else {
-                            const icon = document.createElement('img');
-                            icon.src = `${repo_img_hordes_url}emotes/warning.gif`;
-                            update_external_tools_btn.appendChild(icon);
-
-                            const text = document.createElement('div');
-                            update_external_tools_btn.appendChild(text);
-
-                            tools_fail.forEach((tool_fail) => {
-                                const tool_text = document.createElement('div');
-                                tool_text.innerText = tool_text.key.replace('Status', tool_text.value);
-                                text.appendChild(tool_fail);
-                            });
-                        }
-                    }
-                });
-
-                if (tools_fail.length > 0) {
-                    console.error('Erreur lors de la mise à jour de l\'un des outils', response);
+        updateExternalTools((job_state: ExternalToolsUpdateJobState) => {
+            storeUpdatedTools(job_state);
+            renderToolsProgress(update_external_tools_btn, job_state, 16);
+        })
+            .then((final_state: ExternalToolsUpdateJobState) => {
+                const displayed_state: ExternalToolsUpdateJobState = markPendingAsTimedOut(final_state);
+                storeUpdatedTools(displayed_state);
+                renderToolsProgress(update_external_tools_btn, displayed_state, 16);
+                const failed: ExternalToolUpdateState[] = displayed_state.tools.filter((tool: ExternalToolUpdateState) => tool.status === 'error');
+                if (failed.length > 0) {
+                    console.error('Erreur lors de la mise à jour de l\'un des outils', displayed_state);
                 }
             })
-            .catch((e) => {
+            .catch(() => {
                 update_external_tools_btn.innerText = '';
 
                 const icon = document.createElement('img');
@@ -267,6 +329,7 @@ export function createSmallUpdateExternalToolsButton(update_external_tools_btn) 
 
     const status_div = document.createElement('div');
     status_div.classList.add('status');
+    status_div.style.whiteSpace = 'pre-line';
     status_div.innerText = getI18N(texts.update_external_tools_needed_btn_label);
     external_tools_btn_tooltip.appendChild(status_div);
 
@@ -281,36 +344,27 @@ export function createSmallUpdateExternalToolsButton(update_external_tools_btn) 
     });
 
     update_external_tools_btn.addEventListener('click', () => {
-        /** Au clic sur le bouton, on appelle la fonction de mise à jour */
         update_external_tools_btn.innerHTML = `<img src="${mh_optimizer_icon}" height="16" width="16"><img src="${repo_img_hordes_url}emotes/middot.gif" height="16">`;
         status_div.innerText = getI18N(texts.update_external_tools_pending_btn_label);
 
-        updateExternalTools()
-            .then((response: any) => {
-                if (response.mapResponseDto.bigBrothHordesStatus.toLowerCase() === 'ok') setStorageItem(gm_bbh_updated_key, true);
-                if (response.mapResponseDto.gestHordesApiStatus.toLowerCase() === 'ok' || response.mapResponseDto.gestHordesCellsStatus.toLowerCase() === 'ok') setStorageItem(gm_gh_updated_key, true);
-                if (response.mapResponseDto.fataMorganaStatus.toLowerCase() === 'ok') setStorageItem(gm_fata_updated_key, true);
-                if (response.mapResponseDto.mhoApiStatus.toLowerCase() === 'ok') setStorageItem(gm_mho_updated_key, true);
+        const render = (job_state: ExternalToolsUpdateJobState): void => {
+            storeUpdatedTools(job_state);
+            renderToolsProgress(update_external_tools_btn, job_state, 16);
+            status_div.innerHTML = '';
+            job_state.tools.forEach((tool_state: ExternalToolUpdateState) => {
+                const line: HTMLElement = document.createElement('div');
+                const display: ToolDisplay | undefined = external_tools.find((tool: ToolDisplay) => tool.id === tool_state.tool);
+                line.innerText = buildToolTitle(display ? display.name : tool_state.tool, tool_state);
+                status_div.appendChild(line);
+            });
+        };
 
-                let tools_fail = [];
-                const response_items = Object.keys(response).map((key) => {
-                    return { key: key, value: response[key] };
-                });
-                response_items.forEach((response_item, index) => {
-                    const final = Object.keys(response_item.value).map((key) => {
-                        return { key: key, value: response_item.value[key] };
-                    });
-                    tools_fail = [...tools_fail, ...final.filter((final_item) => !final_item.value || (final_item.value.toLowerCase() !== 'ok' && final_item.value.toLowerCase() !== 'not activated'))];
-                    if (index >= response_items.length - 1) {
-                        update_external_tools_btn.innerHTML = tools_fail.length === 0
-                            ? `<img src="${mh_optimizer_icon}" height="16" width="16"><img src="${repo_img_hordes_url}icons/done.png" height="16">`
-                            : `<img src="${mh_optimizer_icon}" height="16" width="16"><img src="${repo_img_hordes_url}emotes/warning.gif" height="16">`;
-                        status_div.innerHTML = tools_fail.length === 0 ? getI18N(texts.update_external_tools_success_btn_label)
-                            : `${getI18N(texts.update_external_tools_errors_btn_label)}<br>${tools_fail.map((item) => item.key.replace('Status', ` : ${item.value}`)).join('<br>')}`;
-                    }
-                });
-                if (tools_fail.length > 0) {
-                    console.error('Erreur lors de la mise à jour de l\'un des outils', response);
+        updateExternalTools(render)
+            .then((final_state: ExternalToolsUpdateJobState) => {
+                const displayed_state: ExternalToolsUpdateJobState = markPendingAsTimedOut(final_state);
+                render(displayed_state);
+                if (displayed_state.tools.some((tool: ExternalToolUpdateState) => tool.status === 'error')) {
+                    console.error('Erreur lors de la mise à jour de l\'un des outils', displayed_state);
                 }
             })
             .catch((error) => {

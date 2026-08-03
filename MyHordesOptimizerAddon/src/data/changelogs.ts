@@ -1,4 +1,11 @@
 export const changelogs: Record<string, string> = {
+    '1.1.53': `
+        [Nouveauté] Trois nouvelles options de lecture du forum : déplier automatiquement les sections repliées, cliquer sur un spoiler pour le garder affiché, et afficher les images des liens directement dans les posts
+        [Nouveauté] La mise à jour des outils externes affiche désormais la progression outil par outil (icône + statut) au lieu d'un simple message global, avec le détail des erreurs pour chaque outil en échec
+
+        [Correction] Le bouton "Tout cocher" des paramètres ne décoche plus par erreur des options déjà cochées par cascade
+        [Correction] Le bouton de mise à jour des outils externes (version étendue) pouvait planter au lieu d'afficher le résultat en cas d'échec d'un des outils
+    `,
     '1.1.52': `
         [Amélioration] En cas de coéxistence du script et de l'extension, un message d'erreur s'affiche et seul l'un des deux est chargé
 
