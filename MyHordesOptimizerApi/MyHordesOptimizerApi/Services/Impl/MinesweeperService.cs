@@ -69,6 +69,10 @@ public class MinesweeperService : IMinesweeperService
 
         uint seed = (uint)Random.Shared.NextInt64(0, (long)uint.MaxValue + 1L);
 
+        // Génération AVANT la capture de StartedAt : le temps de calcul de la grille (garantie de zone
+        // sûre au 1er clic) ne doit pas être compté dans le chrono qui sert au classement.
+        var board = BoardGenerator.Generate(width, height, mineCount, request.FirstClickX.Value, request.FirstClickY.Value, seed);
+
         var game = new MinesweeperGame
         {
             IdUser = userId,
@@ -89,7 +93,6 @@ public class MinesweeperService : IMinesweeperService
         DbContext.MinesweeperGames.Add(game);
         await DbContext.SaveChangesAsync();
 
-        var board = BoardGenerator.Generate(width, height, mineCount, request.FirstClickX.Value, request.FirstClickY.Value, seed);
         return ToStartedDto(game, board, timerStarted: true);
     }
 
@@ -108,6 +111,10 @@ public class MinesweeperService : IMinesweeperService
 
     public async Task<CompleteMinesweeperGameResponseDto> CompleteGameAsync(int gameId, CompleteMinesweeperGameRequestDto request)
     {
+        // Capturé avant la lecture BDD de la partie : la latence de cette lecture ne doit pas être
+        // comptée dans le chrono, symétriquement à StartedAt côté CreateGameAsync.
+        DateTime endedAt = DateTime.UtcNow;
+
         if (request.Outcome != "won" && request.Outcome != "lost")
         {
             throw new MyHordesApiException($"Issue inconnue : {request.Outcome}", HttpStatusCode.BadRequest);
@@ -120,7 +127,7 @@ public class MinesweeperService : IMinesweeperService
             throw new MyHordesApiException("Cette partie est déjà terminée", HttpStatusCode.Conflict);
         }
 
-        game.EndedAt = DateTime.UtcNow;
+        game.EndedAt = endedAt;
         game.Status = request.Outcome;
 
         int? elapsedMs = null;

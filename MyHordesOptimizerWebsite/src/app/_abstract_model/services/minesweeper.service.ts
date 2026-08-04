@@ -27,6 +27,10 @@ export interface MinesweeperGameStarted {
     startedAt: string | null;
 }
 
+export interface MinesweeperGameStartResult {
+    startedAt: string;
+}
+
 export interface MinesweeperGameCompleted {
     outcome: 'won' | 'lost';
     elapsedMs: number | null;
@@ -82,11 +86,11 @@ export class MinesweeperService extends GlobalService {
         });
     }
 
-    public startGame(gameId: number): Observable<void> {
-        return new Observable((sub: Subscriber<void>) => {
-            super.post(this.API_URL + `/Minesweeper/${gameId}/Start`, undefined)
+    public startGame(gameId: number): Observable<MinesweeperGameStartResult> {
+        return new Observable((sub: Subscriber<MinesweeperGameStartResult>) => {
+            super.post<MinesweeperGameStartResult>(this.API_URL + `/Minesweeper/${gameId}/Start`, undefined)
                 .subscribe({
-                    next: () => { sub.next(); sub.complete(); },
+                    next: (result: MinesweeperGameStartResult) => { sub.next(result); sub.complete(); },
                     error: (error: HttpErrorResponse) => sub.error(error)
                 });
         });
