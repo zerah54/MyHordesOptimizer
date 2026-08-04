@@ -115,6 +115,8 @@ public partial class MhoContext : DbContext
 
     public virtual DbSet<WishlistCategorie> WishlistCategories { get; set; }
 
+    public virtual DbSet<MinesweeperGame> MinesweeperGames { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder
@@ -797,6 +799,15 @@ public partial class MhoContext : DbContext
             entity.Property(e => e.IdSeason).ValueGeneratedNever();
             entity.Property(e => e.IsCurrent).HasDefaultValueSql("b'0'");
             entity.Property(e => e.IsFinished).HasDefaultValueSql("b'0'");
+        });
+
+        modelBuilder.Entity<MinesweeperGame>(entity =>
+        {
+            entity.HasKey(e => e.IdMinesweeperGame).HasName("PRIMARY");
+
+            entity.HasOne(d => d.IdUserNavigation).WithMany(p => p.MinesweeperGames)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("MinesweeperGame_ibfk_1");
         });
 
         OnModelCreatingPartial(modelBuilder);

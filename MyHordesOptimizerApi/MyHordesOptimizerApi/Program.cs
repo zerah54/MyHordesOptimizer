@@ -213,6 +213,8 @@ builder.Services.AddSingleton<ExternalToolsUpdateJobRunner>();
 // Verrou d'écriture des villes : forcément un singleton, il n'a de sens que partagé par tous.
 builder.Services.AddSingleton<TownSyncLock>();
 builder.Services.AddScoped<IWishListService, WishListService>();
+builder.Services.AddSingleton<IMinesweeperBoardGenerator, MinesweeperBoardGenerator>();
+builder.Services.AddScoped<IMinesweeperService, MinesweeperService>();
 builder.Services.AddSingleton<ITranslationService, TranslationService>();
 builder.Services.AddSingleton<IMyHordesRuineService, MyHordesRuineService>();
 builder.Services.AddSingleton<IGlossaryService, GlossaryService>();

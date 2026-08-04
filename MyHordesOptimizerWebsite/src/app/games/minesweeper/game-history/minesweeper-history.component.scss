@@ -1,0 +1,16 @@
+.minesweeper-history {
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+    padding: 1em;
+
+    .history-table {
+        width: 100%;
+        border-collapse: collapse;
+
+        th, td {
+            padding: 0.4em 0.8em;
+            text-align: left;
+        }
+    }
+}

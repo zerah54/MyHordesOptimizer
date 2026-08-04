@@ -1,0 +1,13 @@
+<div class="mho-minesweeper-leaderboard-dialog">
+    <div mat-dialog-title>
+        <div>
+            <h2 i18n>Classement</h2>
+            <button mat-icon-button mat-dialog-close type="button" class="close-button">
+                <mat-icon fontSet="material-symbols-outlined">close</mat-icon>
+            </button>
+        </div>
+    </div>
+    <mat-dialog-content>
+        <ng-container *ngTemplateOutlet="data.template"></ng-container>
+    </mat-dialog-content>
+</div>

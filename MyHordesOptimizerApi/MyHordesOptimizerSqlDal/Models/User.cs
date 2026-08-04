@@ -89,4 +89,7 @@ public partial class User
 
     [InverseProperty("IdUserNavigation")]
     public virtual ICollection<TownCitizenPicto> TownCitizenPictos { get; set; } = new List<TownCitizenPicto>();
+
+    [InverseProperty("IdUserNavigation")]
+    public virtual ICollection<MinesweeperGame> MinesweeperGames { get; set; } = new List<MinesweeperGame>();
 }

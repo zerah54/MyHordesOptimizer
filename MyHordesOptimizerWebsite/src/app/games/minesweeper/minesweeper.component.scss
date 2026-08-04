@@ -1,164 +1,272 @@
 @use 'variables';
 
+// Aucune règle ci-dessous (sauf :host) n'est imbriquée sous un ancêtre DOM propre à la vue en ligne :
+// le template partagé est aussi projeté en plein écran via un overlay CDK attaché sous <body>, hors
+// de <mho-minesweeper>/.mho-minesweeper — un sélecteur du type `:host .foo` n'y matcherait jamais.
 :host {
-
     display: contents;
-    .mho-minesweeper-header {
-        justify-content: space-between;
+}
 
-        .actions {
-            display: flex;
-            flex-direction: row;
-            align-items: center;
-            gap: 0.5em;
-        }
+.mho-minesweeper-header {
+    justify-content: space-between;
+
+    .mode-selector {
+        --mat-button-toggle-height: 30px;
     }
 
-    .mho-minesweeper {
-        -webkit-user-select: none; /* Safari */
-        -ms-user-select: none; /* Anciennes versions d'Internet Explorer/Edge */
-        user-select: none; /* Standard (Chrome, Firefox, Opera, Edge) */
-
-        .game-container {
-
-            width: fit-content;
-
-            .game-header {
-                display: flex;
-                flex-direction: row;
-                justify-content: space-between;
-                align-items: center;
-                gap: 1em;
-
-                .state {
-                    height: 26px;
-                    width: 26px;
-                }
-
-            }
-
-            .game-board {
-                display: inline-block;
-                cursor: default;
-
-                .row {
-                    display: flex;
-                    flex-wrap: nowrap;
-                }
-
-                .cell {
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                    flex-wrap: nowrap;
-                    width: 16px;
-                    height: 16px;
-                    box-sizing: border-box;
-                }
-            }
-
-
-
-            /* Styles pour le thème legacy */
-            &.legacy {
-                $ms-bg: #bdbdbd;
-                $ms-light: #ffffff;
-                $ms-shadow-dark: #7b7b7b;
-                $ms-digit-bg: #000000;
-
-                background-color: $ms-bg;
-                padding: 10px;
-                border-top: 3px solid $ms-light;
-                border-left: 3px solid $ms-light;
-                border-right: 3px solid $ms-shadow-dark;
-                border-bottom: 3px solid $ms-shadow-dark;
-
-                .cell {
-                    &:not(.revealed):not(.highlighted):not(.no-bomb):not(.mined), &.questioned:not(.revealed), &.flagged:not(.no-bomb) {
-                        border-top: 2px solid $ms-light;
-                        border-left: 2px solid $ms-light;
-                        border-right: 2px solid $ms-shadow-dark;
-                        border-bottom: 2px solid $ms-shadow-dark;
-                    }
-
-                    &.revealed:not(.flagged):not(.questioned), &.highlighted, &.mined, &.no-bomb {
-                        border-top: 1px solid $ms-shadow-dark;
-                        border-left: 1px solid $ms-shadow-dark;
-                    }
-
-
-                    &.revealed.mined {
-                        &.game-over {
-                            background: red;
-                        }
-                    }
-                }
-
-                .game-header {
-                    padding: 6px;
-                    margin-bottom: 10px;
-
-                    .state {
-                        height: 26px;
-                        width: 26px;
-
-                        &.lose {
-                            background-image: url(/img/minesweeper/lose.gif);
-                        }
-
-                        &.play {
-                            background-image: url(/img/minesweeper/smile.gif);
-                        }
-
-                        &.win {
-                            background-image: url(/img/minesweeper/win.gif);
-                        }
-
-                        &.clicked {
-
-                        }
-                    }
-
-                    .remain-mines, .timer {
-                        flex: 1;
-                        display: flex;
-
-                        > div {
-                            background-color: $ms-digit-bg;
-                            border: 1px solid $ms-shadow-dark;
-                            display: flex;
-                        }
-                    }
-
-                    .remain-mines {
-                        justify-content: flex-start;
-                    }
-
-                    .timer {
-                        justify-content: flex-end;
-                    }
-                }
-
-                .game-board, .game-header {
-                    border-top: 3px solid $ms-shadow-dark;
-                    border-left: 3px solid $ms-shadow-dark;
-                    border-right: 3px solid $ms-light;
-                    border-bottom: 3px solid $ms-light;
-                }
-            }
-
-            /* Styles pour le thème myhordes */
-            &.myhordes {
-
-            }
-        }
+    .guest-warning {
+        font-size: 0.85em;
+        opacity: 0.8;
+        margin-left: 1em;
     }
 
-
-    .custom-grid-size {
+    .actions {
         display: flex;
+        flex-direction: row;
         align-items: center;
-        justify-content: space-between;
         gap: 0.5em;
     }
 }
+
+.minesweeper-error {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5em;
+    padding: 2em;
+}
+
+.game-container {
+    -webkit-user-select: none; /* Safari */
+    -ms-user-select: none; /* Anciennes versions d'Internet Explorer/Edge */
+    user-select: none; /* Standard (Chrome, Firefox, Opera, Edge) */
+    // fit-content pour un petit plateau, plafonné par max-width pour un grand plateau.
+    width: fit-content;
+    max-width: 100%;
+
+    // Bloc collant unique (barre d'outils + en-tête mines/chrono), frère de .game-scroll-x : reste
+    // figé sur la largeur plafonnée du conteneur, indépendamment du scroll horizontal de la grille.
+    // Largeur déjà plafonnée par .game-container → le flex (space-between) suffit, pas besoin de
+    // sticky individuel par enfant (c'était ce cumul sticky+flex qui cassait l'alignement).
+    .sticky-controls {
+        position: sticky;
+        top: 0;
+        z-index: 2;
+    }
+
+    .board-toolbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.5em;
+
+        .zoom-controls {
+            display: flex;
+            gap: 0.25em;
+        }
+    }
+
+    .game-header {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        gap: 1em;
+
+        .state {
+            height: 26px;
+            width: 26px;
+            flex-shrink: 0;
+            // Reste cliquable même si .remain-mines/.timer débordent sur un écran étroit.
+            z-index: 2;
+        }
+
+    }
+
+    // Seul ce bloc défile horizontalement ; .sticky-controls reste figé sur la largeur plafonnée.
+    .game-scroll-x {
+        width: 100%;
+        overflow-x: auto;
+    }
+
+    .game-board {
+        display: inline-block;
+        cursor: default;
+
+        .row {
+            display: flex;
+            flex-wrap: nowrap;
+        }
+
+        .cell {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: nowrap;
+            width: calc(16px * var(--mho-ms-zoom, 1));
+            height: calc(16px * var(--mho-ms-zoom, 1));
+            box-sizing: border-box;
+            touch-action: manipulation;
+            -webkit-touch-callout: none;
+
+            img {
+                width: calc(16px * var(--mho-ms-zoom, 1));
+                height: calc(16px * var(--mho-ms-zoom, 1));
+                // L'attribut draggable="false" ne suffit pas toujours sur Safari : ceinture et bretelles.
+                -webkit-user-drag: none;
+            }
+        }
+    }
+
+
+    /* Styles pour le thème legacy */
+    &.legacy {
+        $ms-bg: #bdbdbd;
+        $ms-light: #ffffff;
+        $ms-shadow-dark: #7b7b7b;
+        $ms-digit-bg: #000000;
+
+        background-color: $ms-bg;
+        // padding-top/border-top posés sur .sticky-controls (pas ici) pour éviter un décalage visible
+        // au scroll avant que le bloc collant n'atteigne son seuil.
+        padding: 0 10px 10px 10px;
+        border-left: 3px solid $ms-light;
+        border-right: 3px solid $ms-shadow-dark;
+        border-bottom: 3px solid $ms-shadow-dark;
+
+        // 16px = padding de la card, 10px/3px = padding/bordure de la grille (absents en plein écran).
+        max-width: calc(100% - 16px - 10px);
+
+        // content-box : max-width:100% seul ignore le padding (20px) + les bordures (6px) de
+        // .game-container, qui s'ajouteraient par-dessus et déborderaient de la même valeur.
+        &.fullscreen {
+            max-width: calc(100% - 26px);
+        }
+
+        .cell {
+            &:not(.revealed):not(.highlighted):not(.no-bomb):not(.mined), &.questioned:not(.revealed), &.flagged:not(.no-bomb) {
+                border-top: calc(2px * var(--mho-ms-zoom, 1)) solid $ms-light;
+                border-left: calc(2px * var(--mho-ms-zoom, 1)) solid $ms-light;
+                border-right: calc(2px * var(--mho-ms-zoom, 1)) solid $ms-shadow-dark;
+                border-bottom: calc(2px * var(--mho-ms-zoom, 1)) solid $ms-shadow-dark;
+            }
+
+            &.revealed:not(.flagged):not(.questioned), &.highlighted, &.mined, &.no-bomb {
+                border-top: calc(1px * var(--mho-ms-zoom, 1)) solid $ms-shadow-dark;
+                border-left: calc(1px * var(--mho-ms-zoom, 1)) solid $ms-shadow-dark;
+            }
+
+
+            &.revealed.mined {
+                &.game-over {
+                    background: red;
+                }
+            }
+        }
+
+        .sticky-controls {
+            // Opaque : masque les cellules qui défilent dessous une fois le bloc collé.
+            background-color: $ms-bg;
+            box-sizing: border-box;
+            // width:auto (annule le 100% de la base) : sinon width + marges figées sur-contraint la
+            // boîte et le navigateur ignore silencieusement la marge droite.
+            width: auto;
+            // padding-top/border-top de .game-container récupérés ici pour se figer avec le bloc
+            // collant. Marge négative = padding(10) + bordure(3) du parent, pour aligner les bordures
+            // gauche/droite avec celles de .game-container (superposées, invisibles au repos ; visibles
+            // une fois .game-container lui-même sorti du cadre au scroll vertical).
+            margin: 0 -13px;
+            padding: 10px 10px 0 10px;
+            border-top: 3px solid $ms-light;
+            border-left: 3px solid $ms-light;
+            border-right: 3px solid $ms-shadow-dark;
+        }
+
+        .game-header {
+            padding: 6px;
+            margin-bottom: 10px;
+            background-color: $ms-bg;
+
+            .state {
+                height: 26px;
+                width: 26px;
+                box-sizing: border-box;
+
+                // Effet "enfoncé" : relief inversé plutôt qu'un sprite dédié (aussi en fin de partie).
+                &:active {
+                    border-top: 1px solid $ms-shadow-dark;
+                    border-left: 1px solid $ms-shadow-dark;
+                    border-right: 1px solid $ms-light;
+                    border-bottom: 1px solid $ms-light;
+                }
+
+                &.lose {
+                    background-image: url(/img/minesweeper/lose.gif);
+                }
+
+                &.play {
+                    background-image: url(/img/minesweeper/smile.gif);
+                }
+
+                &.win {
+                    background-image: url(/img/minesweeper/win.gif);
+                }
+            }
+
+            .remain-mines, .timer {
+                flex: 1;
+                display: flex;
+                background-color: $ms-bg;
+
+                > div {
+                    background-color: $ms-digit-bg;
+                    border: 1px solid $ms-shadow-dark;
+                    display: flex;
+                }
+            }
+
+            .remain-mines {
+                justify-content: flex-start;
+            }
+
+            .timer {
+                justify-content: flex-end;
+            }
+        }
+
+        .game-board, .game-header {
+            border-top: 3px solid $ms-shadow-dark;
+            border-left: 3px solid $ms-shadow-dark;
+            border-right: 3px solid $ms-light;
+            border-bottom: 3px solid $ms-light;
+        }
+    }
+
+    /* Styles pour le thème myhordes */
+    &.myhordes {
+
+    }
+}
+
+
+.custom-grid-size {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5em;
+}
+
+.leaderboard-filters {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5em;
+    margin-bottom: 1em;
+    // Même hauteur que le sélecteur de mode hors de cette modale (.mho-minesweeper-header .mode-selector).
+    --mat-button-toggle-height: 30px;
+}
+
+// Le style du panneau plein écran (.mho-minesweeper-fullscreen-overlay) est global, dans
+// src/styles.scss : le panelClass d'un CDK Overlay est posé sur un élément créé hors de la
+// compilation de CE composant (attaché sous <body>, comme MatDialog), il ne porte donc aucun
+// attribut d'encapsulation Angular — une règle scopée ici ne le matcherait jamais.

@@ -1,0 +1,77 @@
+<div class="minesweeper-leaderboard">
+    @if (isCustomSize()) {
+        <p i18n>Pas de classement public pour la taille Personnalisée — retrouve tes parties dans l'onglet "Mes parties".</p>
+    } @else {
+        @if (loading()) {
+            <mat-spinner diameter="32"></mat-spinner>
+        } @else {
+            @let showMyRow = showMyRankRow();
+            @let myEntry = myRank();
+            <table class="leaderboard-table">
+                <thead>
+                <tr>
+                    <th i18n>Rang</th>
+                    <th i18n>Joueur</th>
+                    <th i18n>Temps</th>
+                </tr>
+                </thead>
+                <tbody>
+                    @for (entry of items(); track entry.rank) {
+                        <tr [class.my-row]="isMyRow(entry)">
+                            <td>{{ entry.rank }}</td>
+                            <td>
+                                <div class="player-cell">
+                                    <div class="player-avatar">
+                                        <mho-avatar [src]="entry.avatar ?? undefined" rounded></mho-avatar>
+                                    </div>
+                                    <span>{{ entry.userName }}</span>
+                                </div>
+                            </td>
+                            <td>{{ entry.elapsedMs | elapsedSeconds }}
+                                <ng-container i18n>s</ng-container>
+                            </td>
+                        </tr>
+                    } @empty {
+                        <tr>
+                            <td colspan="3" i18n>Aucun score pour l'instant.</td>
+                        </tr>
+                    }
+                    @if (showMyRow) {
+                        <!-- Signale l'écart entre la dernière ligne affichée et le rang réel du joueur courant, ajouté juste en dessous. -->
+                        <tr class="my-row-gap">
+                            <td colspan="3">⋯</td>
+                        </tr>
+                    }
+                </tbody>
+                @if (showMyRow && myEntry) {
+                    <tfoot>
+                    <tr class="my-row my-row--extra">
+                        <td>{{ myEntry.rank }}</td>
+                        <td>
+                            <div class="player-cell">
+                                <div class="player-avatar">
+                                    <mho-avatar [src]="myEntry.avatar ?? undefined" rounded></mho-avatar>
+                                </div>
+                                <span>{{ myEntry.userName }}</span>
+                            </div>
+                        </td>
+                        <td>{{ myEntry.elapsedMs | elapsedSeconds }}
+                            <ng-container i18n>s</ng-container>
+                        </td>
+                    </tr>
+                    </tfoot>
+                }
+            </table>
+
+            @if (view() === 'players') {
+                <mat-paginator
+                    (page)="onPageChange($event)"
+                    [length]="totalCount()"
+                    [pageIndex]="pageIndex()"
+                    [pageSize]="pageSize"
+                    [hidePageSize]="true"
+                    showFirstLastButtons/>
+            }
+        }
+    }
+</div>

@@ -120,3 +120,15 @@ a {
 .mho-multiline-tooltip {
     white-space: pre-line;
 }
+
+// Plein écran du Démineur : panelClass d'un CDK Overlay attaché sous <body> (hors de tout contexte
+// d'empilement de la page — voir minesweeper.component.ts, openFullscreen()). Doit rester global :
+// cet élément n'a aucun attribut d'encapsulation d'un composant Angular particulier.
+.mho-minesweeper-fullscreen-overlay {
+    background-color: var(--mat-sys-surface);
+    overflow: auto;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 0 13px;
+}
