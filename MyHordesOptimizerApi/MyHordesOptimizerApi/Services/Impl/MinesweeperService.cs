@@ -73,6 +73,16 @@ public class MinesweeperService : IMinesweeperService
         // sûre au 1er clic) ne doit pas être compté dans le chrono qui sert au classement.
         var board = BoardGenerator.Generate(width, height, mineCount, request.FirstClickX.Value, request.FirstClickY.Value, seed);
 
+        DateTime now = DateTime.UtcNow;
+
+        // Toute partie "in_progress" restante (fermeture abrupte du navigateur, crash...) n'a plus lieu
+        // d'être dès qu'une nouvelle partie démarre : elle est close en abandonnée plutôt que de rester
+        // orpheline indéfiniment.
+        if (userId.HasValue)
+        {
+            await AbandonOtherInProgressGamesAsync(userId.Value, now);
+        }
+
         var game = new MinesweeperGame
         {
             IdUser = userId,
@@ -85,8 +95,8 @@ public class MinesweeperService : IMinesweeperService
             Seed = seed,
             FirstClickX = request.FirstClickX.Value,
             FirstClickY = request.FirstClickY.Value,
-            CreatedAt = DateTime.UtcNow,
-            StartedAt = DateTime.UtcNow,
+            CreatedAt = now,
+            StartedAt = now,
             Status = "in_progress"
         };
 
@@ -94,6 +104,28 @@ public class MinesweeperService : IMinesweeperService
         await DbContext.SaveChangesAsync();
 
         return ToStartedDto(game, board, timerStarted: true);
+    }
+
+    // Marque abandonnées toutes les parties "in_progress" d'un joueur (autres que celle en cours de création/reprise).
+    private async Task AbandonOtherInProgressGamesAsync(int userId, DateTime now)
+    {
+        await DbContext.MinesweeperGames
+            .Where(g => g.IdUser == userId && g.Status == "in_progress")
+            .ExecuteUpdateAsync(setters => setters
+                .SetProperty(g => g.Status, "abandoned")
+                .SetProperty(g => g.EndedAt, now));
+    }
+
+    // Marque abandonnés les défis du jour "in_progress" dont la date est déjà passée (ChallengeDate < today).
+    // Portée volontairement plus étroite qu'AbandonOtherInProgressGamesAsync : ne touche jamais une partie
+    // datée d'aujourd'hui, même en cours ailleurs (mode normal ou autre taille du défi du jour).
+    private async Task AbandonStalePastDailyGamesAsync(int userId, DateOnly today, DateTime now)
+    {
+        await DbContext.MinesweeperGames
+            .Where(g => g.IdUser == userId && g.Mode == "daily" && g.Status == "in_progress" && g.ChallengeDate < today)
+            .ExecuteUpdateAsync(setters => setters
+                .SetProperty(g => g.Status, "abandoned")
+                .SetProperty(g => g.EndedAt, now));
     }
 
     public async Task<StartMinesweeperGameResponseDto> StartGameAsync(int gameId)
@@ -115,7 +147,7 @@ public class MinesweeperService : IMinesweeperService
         // comptée dans le chrono, symétriquement à StartedAt côté CreateGameAsync.
         DateTime endedAt = DateTime.UtcNow;
 
-        if (request.Outcome != "won" && request.Outcome != "lost")
+        if (request.Outcome != "won" && request.Outcome != "lost" && request.Outcome != "abandoned")
         {
             throw new MyHordesApiException($"Issue inconnue : {request.Outcome}", HttpStatusCode.BadRequest);
         }
@@ -339,6 +371,14 @@ public class MinesweeperService : IMinesweeperService
         int? userId = UserInfoProvider.UserId > 0 ? UserInfoProvider.UserId : null;
         DateOnly today = DateOnly.FromDateTime(DateTime.UtcNow);
 
+        // Un défi du jour "in_progress" dont la date est dépassée ne redeviendra jamais reprenable
+        // (CreateOrResumeDailyGameAsync ne cherche qu'un essai daté d'aujourd'hui) : il est donc clos ici,
+        // dès la consultation de la page, sans attendre qu'une nouvelle partie soit démarrée ailleurs.
+        if (userId.HasValue)
+        {
+            await AbandonStalePastDailyGamesAsync(userId.Value, today, DateTime.UtcNow);
+        }
+
         var result = new List<MinesweeperChallengeStatusDto>();
         foreach (string sizeId in PresetSizes.Keys)
         {
@@ -420,6 +460,11 @@ public class MinesweeperService : IMinesweeperService
         int centerX = width / 2;
         int centerY = height / 2;
         long dailySeed = ComputeDailySeed(today, sizeId);
+
+        if (userId.HasValue)
+        {
+            await AbandonOtherInProgressGamesAsync(userId.Value, DateTime.UtcNow);
+        }
 
         var game = new MinesweeperGame
         {

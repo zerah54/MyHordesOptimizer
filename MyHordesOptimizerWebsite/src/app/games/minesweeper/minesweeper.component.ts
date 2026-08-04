@@ -137,6 +137,7 @@ export class MinesweeperComponent implements OnInit, OnDestroy {
     }
 
     public ngOnDestroy(): void {
+        this.abandonCurrentGameIfInProgress();
         this.clearLongPressTimer();
         this.fullscreenOverlayRef?.dispose();
         this.preloadLinks.update((links: HTMLLinkElement[]) => {
@@ -323,7 +324,14 @@ export class MinesweeperComponent implements OnInit, OnDestroy {
         }
     }
 
-    private completeCurrentGame(outcome: 'won' | 'lost'): void {
+    /** Partie quittée sans conclusion (navigation ailleurs, reset, changement de taille/mode) : à clôturer côté serveur pour ne pas la laisser "in_progress" indéfiniment (bloque sinon le défi du jour). */
+    private abandonCurrentGameIfInProgress(): void {
+        if (this.board_initialized() && !this.game_over()) {
+            this.completeCurrentGame('abandoned');
+        }
+    }
+
+    private completeCurrentGame(outcome: 'won' | 'lost' | 'abandoned'): void {
         const game_id: number | undefined = this.current_game_id();
         if (!game_id) return;
         this.minesweeperService.completeGame(game_id, outcome).subscribe({
@@ -340,6 +348,7 @@ export class MinesweeperComponent implements OnInit, OnDestroy {
     }
 
     protected resetGame(new_selected_size?: Partial<MinesweeperSize>): void {
+        this.abandonCurrentGameIfInProgress();
         if (new_selected_size) {
             this.selected_size.update((selected_size: MinesweeperSize) => {
                 if (new_selected_size.id) {
