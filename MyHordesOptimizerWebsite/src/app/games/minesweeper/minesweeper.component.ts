@@ -32,6 +32,7 @@ import moment, { Moment } from 'moment';
 import { MINESWEEPER_ZOOM_KEY } from '../../_abstract_model/const';
 import {
     MinesweeperChallengeStatus,
+    MinesweeperGameCompleted,
     MinesweeperGameStarted,
     MinesweeperGameStartResult,
     MinesweeperService
@@ -325,7 +326,17 @@ export class MinesweeperComponent implements OnInit, OnDestroy {
     private completeCurrentGame(outcome: 'won' | 'lost'): void {
         const game_id: number | undefined = this.current_game_id();
         if (!game_id) return;
-        this.minesweeperService.completeGame(game_id, outcome).subscribe();
+        this.minesweeperService.completeGame(game_id, outcome).subscribe({
+            next: (completed: MinesweeperGameCompleted) => {
+                // Recale le chrono figé sur la valeur qui fait foi côté serveur (celle utilisée pour le
+                // classement) : sans ça, la latence du POST de complétion n'est jamais répercutée sur le
+                // temps affiché, qui reste figé sur l'instant de détection locale de la victoire/défaite.
+                const start: Moment | undefined = this.start_time();
+                if (completed.elapsedMs !== null && start) {
+                    this.end_time.set(start.clone().add(completed.elapsedMs, 'milliseconds'));
+                }
+            }
+        });
     }
 
     protected resetGame(new_selected_size?: Partial<MinesweeperSize>): void {
