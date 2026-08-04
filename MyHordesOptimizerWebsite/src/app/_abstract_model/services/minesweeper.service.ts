@@ -32,7 +32,7 @@ export interface MinesweeperGameStartResult {
 }
 
 export interface MinesweeperGameCompleted {
-    outcome: 'won' | 'lost';
+    outcome: 'won' | 'lost' | 'abandoned';
     elapsedMs: number | null;
     scored: boolean;
 }
@@ -63,7 +63,7 @@ export interface MinesweeperGameHistoryEntry {
     height: number;
     mineCount: number;
     mode: 'normal' | 'daily';
-    status: 'in_progress' | 'won' | 'lost';
+    status: 'in_progress' | 'won' | 'lost' | 'abandoned';
     elapsedMs: number | null;
     createdAt: string;
 }
@@ -96,7 +96,7 @@ export class MinesweeperService extends GlobalService {
         });
     }
 
-    public completeGame(gameId: number, outcome: 'won' | 'lost'): Observable<MinesweeperGameCompleted> {
+    public completeGame(gameId: number, outcome: 'won' | 'lost' | 'abandoned'): Observable<MinesweeperGameCompleted> {
         return new Observable((sub: Subscriber<MinesweeperGameCompleted>) => {
             super.post<MinesweeperGameCompleted>(this.API_URL + `/Minesweeper/${gameId}/Complete`, JSON.stringify({ outcome }))
                 .subscribe({
