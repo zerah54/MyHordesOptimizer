@@ -30,7 +30,12 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import moment, { Moment } from 'moment';
 
 import { MINESWEEPER_ZOOM_KEY } from '../../_abstract_model/const';
-import { MinesweeperChallengeStatus, MinesweeperGameStarted, MinesweeperService } from '../../_abstract_model/services/minesweeper.service';
+import {
+    MinesweeperChallengeStatus,
+    MinesweeperGameStarted,
+    MinesweeperGameStartResult,
+    MinesweeperService
+} from '../../_abstract_model/services/minesweeper.service';
 import { Imports } from '../../_abstract_model/types/_types';
 import { CounterFromDatePipe, DiffBetweenDatesPipe } from '../../_core/utilities/date.util';
 import { createDelayedLoadingController, DelayedLoadingController } from '../../_core/utilities/delayed-loading.util';
@@ -230,9 +235,15 @@ export class MinesweeperComponent implements OnInit, OnDestroy {
 
         if (!this.timer_started_by_server()) {
             this.timer_started_by_server.set(true);
-            this.start_time.set(moment());
-            this.end_time.set(undefined);
-            this.minesweeperService.startGame(this.current_game_id() as number).subscribe();
+            // Le chrono affiché attend la réponse serveur (horodatage faisant foi pour le classement)
+            // plutôt que de partir sur l'horloge locale puis se corriger après coup : ça évite un saut
+            // visible de l'affichage, la latence réseau restant de toute façon incompressible.
+            this.minesweeperService.startGame(this.current_game_id() as number).subscribe({
+                next: (result: MinesweeperGameStartResult) => {
+                    this.start_time.set(moment(result.startedAt));
+                    this.end_time.set(undefined);
+                }
+            });
         }
 
         if (this.board()[i][j].is_revealed) {
@@ -284,7 +295,9 @@ export class MinesweeperComponent implements OnInit, OnDestroy {
                 this.mine_counter_digits.set(started.mineCount.toString().length);
                 this.board_initialized.set(true);
                 this.board_loading_controller.stop();
-                this.start_time.set(moment());
+                // Horodatage serveur (capturé après génération de la grille côté back) : le chrono
+                // affiché part de la même référence que celle utilisée pour le classement.
+                this.start_time.set(started.startedAt ? moment(started.startedAt) : moment());
                 this.end_time.set(undefined);
                 this.revealCell(clickY, clickX);
             },
