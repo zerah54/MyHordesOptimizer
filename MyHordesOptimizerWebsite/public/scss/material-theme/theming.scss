@@ -55,7 +55,7 @@
     ));
 
     @include mat.paginator-overrides((
-        container-background-color: var(--mat-sys-surface-container-low),
+        container-background-color: transparent,
     ));
 
     @include mat.button-toggle-overrides((

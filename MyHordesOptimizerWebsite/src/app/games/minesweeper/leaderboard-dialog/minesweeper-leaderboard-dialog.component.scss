@@ -1,0 +1,37 @@
+:host {
+    display: contents;
+
+    .mho-minesweeper-leaderboard-dialog {
+        .mat-mdc-dialog-title {
+            display: flex;
+
+            > div {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                position: relative;
+                width: 100%;
+
+                h2 {
+                    display: inline-block;
+                    margin: 0;
+                }
+
+                .close-button {
+                    right: -24px;
+                }
+            }
+        }
+
+        // `.mat-mdc-tab-body-wrapper` calcule sa hauteur en JS à partir du contenu de l'onglet actif
+        // et l'applique en style inline, animée (transition: height). À l'intérieur d'une modale qui
+        // vient de s'ouvrir, cette mesure peut se figer à une valeur nulle/incorrecte — et comme le
+        // conteneur est en overflow: hidden, le contenu de l'onglet reste alors invisible. Ce même
+        // constat existe déjà ailleurs dans ce dépôt pour mat-tab-group (voir app.component.scss,
+        // citizens.component.scss, etc.) : on repasse ici en hauteur naturelle (perte de l'animation
+        // de hauteur au changement d'onglet, mais plus fiable dans une modale).
+        ::ng-deep .mat-mdc-tab-body-wrapper {
+            height: auto !important;
+        }
+    }
+}

@@ -1,0 +1,52 @@
+.minesweeper-leaderboard {
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+    padding: 1em;
+
+    .leaderboard-table {
+        width: 100%;
+        border-collapse: collapse;
+
+        th, td {
+            padding: 0.4em 0.8em;
+            text-align: left;
+        }
+
+        .player-cell {
+            display: flex;
+            align-items: center;
+            gap: 0.5em;
+
+            // Le composant avatar dimensionne son image en 100px puis la recadre par transform
+            // (scale + translate) : sans un cadre fixe en overflow:hidden pour le contenir, sa boîte
+            // de mise en page pousse le reste de la ligne. Repris tel quel du seul autre endroit du
+            // dépôt qui utilise déjà ce composant hors d'un mat-cell (active-citizens.component.scss).
+            .player-avatar {
+                position: relative;
+                width: 25px;
+                height: 25px;
+                overflow: hidden;
+                border-radius: 50%;
+                flex-shrink: 0;
+            }
+        }
+
+        .my-row {
+            font-weight: bold;
+            background-color: var(--mat-sys-secondary-container);
+        }
+
+        // Ligne ajoutée pour le joueur courant quand il n'apparaît pas dans la page affichée :
+        // séparée visuellement du reste du tableau, comme un total de pied de page.
+        .my-row--extra td {
+            border-top: 2px solid var(--mat-sys-outline);
+        }
+
+        .my-row-gap td {
+            text-align: center;
+            opacity: 0.6;
+            padding: 0 0.8em;
+        }
+    }
+}

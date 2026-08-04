@@ -1,7 +1,12 @@
 <mat-card-header class="mho-minesweeper-header">
     <mat-card-title i18n>Démineur</mat-card-title>
+    @if (is_guest()) {
+        <span class="guest-warning" i18n>Vous n'êtes pas connecté(e) — vos scores ne seront pas enregistrés.</span>
+    }
     <div class="actions">
-
+        <button mat-icon-button type="button" (click)="openLeaderboard()" matTooltip="Classement" i18n-matTooltip>
+            <mat-icon fontSet="material-symbols-outlined">trophy</mat-icon>
+        </button>
         @if (false) {
             <mat-slide-toggle
                 [checked]="selected_theme() === 'legacy'"
@@ -9,14 +14,29 @@
                 <ng-container i18n>Thème Windows</ng-container>
             </mat-slide-toggle>
         }
+        <mat-button-toggle-group class="mode-selector" [value]="game_mode()" (change)="switchMode($event.value)">
+            <mat-button-toggle value="normal">
+                <ng-container i18n>Normal</ng-container>
+            </mat-button-toggle>
+            <mat-button-toggle value="daily">
+                <ng-container i18n>Défi du jour</ng-container>
+            </mat-button-toggle>
+        </mat-button-toggle-group>
+        <button mat-stroked-button [matMenuTriggerFor]="difficultyMenu">
+            <mat-icon fontSet="material-symbols-outlined">expand_more</mat-icon>
+            <mat-icon fontSet="material-symbols-outlined">settings</mat-icon>
+            {{ selected_size().label }}
+        </button>
         <mat-menu #difficultyMenu="matMenu" xPosition="before">
             @for (size of sizes_list(); track size.id) {
                 @if (size.id !== 'custom') {
-                    <button mat-menu-item (click)="resetGame(size)">
-                        <mat-icon fontSet="material-symbols-outlined">{{ selected_size().id === size.id ? 'check' : '' }}</mat-icon>
+                    <button mat-menu-item [disabled]="isAlreadyPlayedToday(size.id)" (click)="resetGame(size)">
+                        <mat-icon fontSet="material-symbols-outlined">
+                            {{ selected_size().id === size.id ? 'check' : (isAlreadyPlayedToday(size.id) ? 'block' : '') }}
+                        </mat-icon>
                         {{ size.label }}
                     </button>
-                } @else {
+                } @else if (game_mode() === 'normal') {
                     <button mat-menu-item (click)="resetGame(size); $event.stopImmediatePropagation();">
                         <mat-icon fontSet="material-symbols-outlined">{{ selected_size().id === 'custom' ? 'check' : '' }}</mat-icon>
                         {{ size.label }}
@@ -47,90 +67,176 @@
                 }
             }
         </mat-menu>
-        <button mat-stroked-button [matMenuTriggerFor]="difficultyMenu">
-            <mat-icon fontSet="material-symbols-outlined">expand_more</mat-icon>
-            <mat-icon fontSet="material-symbols-outlined">settings</mat-icon>
-            {{ selected_size().label }}
-        </button>
-
-        @if (false) {
-            <mat-form-field subscriptSizing="dynamic">
-                <mat-label i18n>Seed</mat-label>
-                <input matInput type="number" [ngModel]="seed()" (ngModelChange)="seed.set($event); random_seed.set(false); resetGame()"
-                       [disabled]="random_seed()">
-                <mat-checkbox matSuffix [ngModel]="random_seed()" (ngModelChange)="random_seed.set($event);"></mat-checkbox>
-            </mat-form-field>
-        }
     </div>
 </mat-card-header>
 
 <mat-card-content class="mho-minesweeper">
-    <div class="game-container" [class]="selected_theme()">
-        <div class="game-header">
-            <div class="remain-mines">
-                <div>
-                    @for (digit of Math.max(remaining_mines(), 0).toString().split(''); track $index) {
-                        <img [src]="`img/minesweeper/timer_${digit}.png`">
-                    }
-                </div>
+    <ng-template #boardAndControlsTemplate>
+        @if (board_error()) {
+            <div class="minesweeper-error">
+                <p i18n>Impossible de démarrer la partie.</p>
+                <button mat-stroked-button (click)="resetGame()">
+                    <ng-container i18n>Réessayer</ng-container>
+                </button>
             </div>
-            <div class="state"
-                 [class.lose]="game_over() && remaining_mines() > 0"
-                 [class.play]="!game_over()"
-                 [class.win]="game_over() && remaining_mines() === 0"
-                 (click)="resetGame()"
-            >
-            </div>
-            <div class="timer">
-                <div>
-                    @let timer = end_time() ? (start_time() | diffBetweenDates:end_time()) : (start_time() | counterFromDate | async);
-                    @for (digit of timer?.toString()?.split('') ?? [0]; track $index) {
-                        <img [src]="`img/minesweeper/timer_${digit}.png`">
-                    }
-                </div>
-            </div>
-        </div>
-        <div class="game-board">
-            @for (row of board(); track i; let i = $index) {
-                <div class="row">
-                    @for (cell of row; track j; let j = $index) {
-                        <div [class]="'cell' + (cell.is_revealed && !cell.is_flagged && !cell.is_mine ? ' revealed-' + cell.adjacent_mines : '')"
-                             [class.revealed]="cell.is_revealed"
-                             [class.flagged]="cell.is_flagged"
-                             [class.questioned]="cell.is_questioned"
-                             [class.highlighted]="cell.is_highlighted"
-                             [class.mined]="cell.is_mine && !cell.is_flagged && game_over()"
-                             [class.game-over]="cell.is_mine && cell.is_game_over && game_over()"
-                             [class.no-bomb]="!cell.is_mine && cell.is_flagged && game_over()"
-                             (click)="revealCell(i, j)"
-                             (contextmenu)="cycleMarker(i, j, $event)"
-                             (mousedown)="highlightAdjacentCells(i, j, $event)"
-                             (mouseup)="unhighlightCells()"
-                             (mouseleave)="unhighlightCells()">
-                            @if (cell.is_revealed && cell.adjacent_mines > 0) {
-                                <img [src]="`img/minesweeper/adjacent_${cell.adjacent_mines}.png`">
-                            }
-                            @if (game_over()) {
-                                @if (cell.is_mine) {
-                                    @if (cell.is_flagged) {
-                                        <img src="img/minesweeper/bombflagged.png">
-                                    } @else {
-                                        <img src="img/minesweeper/bomb.png">
-                                    }
-                                } @else if (cell.is_flagged) {
-                                    <img src="img/minesweeper/nobomb.png">
-                                }
-                            } @else {
-                                @if (cell.is_flagged) {
-                                    <img src="img/minesweeper/bombflagged.png">
-                                } @else if (cell.is_questioned) {
-                                    <img src="img/minesweeper/bombquestion.png">
-                                }
-                            }
+        } @else {
+            <div class="game-container" [class]="selected_theme()" [class.fullscreen]="is_fullscreen()">
+                <div class="sticky-controls">
+                    <div class="board-toolbar">
+                        <div class="zoom-controls">
+                            <button mat-icon-button type="button" [disabled]="zoom_level() <= 100" (click)="decreaseZoom()" matTooltip="Réduire le zoom"
+                                    i18n-matTooltip>
+                                <mat-icon fontSet="material-symbols-outlined">remove</mat-icon>
+                            </button>
+                            <button mat-icon-button type="button" (click)="increaseZoom()" matTooltip="Agrandir le zoom" i18n-matTooltip>
+                                <mat-icon fontSet="material-symbols-outlined">add</mat-icon>
+                            </button>
                         </div>
-                    }
+                        @if (is_fullscreen()) {
+                            <button mat-icon-button type="button" (click)="closeFullscreen()" matTooltip="Quitter le plein écran" i18n-matTooltip>
+                                <mat-icon fontSet="material-symbols-outlined">fullscreen_exit</mat-icon>
+                            </button>
+                        } @else {
+                            <button mat-icon-button type="button" (click)="openFullscreen()" matTooltip="Plein écran" i18n-matTooltip>
+                                <mat-icon fontSet="material-symbols-outlined">fullscreen</mat-icon>
+                            </button>
+                        }
+                    </div>
+                    <div class="game-header">
+                        <div class="remain-mines">
+                            <div>
+                                @for (digit of formatDigits(remaining_mines(), mine_counter_digits()); track $index) {
+                                    <img [src]="`img/minesweeper/timer_${digit}.png`" draggable="false">
+                                }
+                            </div>
+                        </div>
+                        <div class="state"
+                             [class.lose]="game_over() && remaining_mines() > 0"
+                             [class.play]="!game_over()"
+                             [class.win]="game_over() && remaining_mines() === 0"
+                             (click)="resetGame()"
+                        >
+                        </div>
+                        <div class="timer">
+                            <div>
+                                @let timer = end_time() ? (start_time() | diffBetweenDates:end_time()) : (start_time() | counterFromDate | async);
+                                @for (digit of formatDigits(timer ?? 0, 3); track $index) {
+                                    <img [src]="`img/minesweeper/timer_${digit}.png`" draggable="false">
+                                }
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            }
+                <div class="game-scroll-x">
+                    <div class="game-board" [style.--mho-ms-zoom]="zoom_level() / 100">
+                        @for (row of board(); track i; let i = $index) {
+                            <div class="row">
+                                @for (cell of row; track j; let j = $index) {
+                                    <div [class]="'cell' + (cell.is_revealed && !cell.is_flagged && !cell.is_mine ? ' revealed-' + cell.adjacent_mines : '')"
+                                         [class.revealed]="cell.is_revealed"
+                                         [class.flagged]="cell.is_flagged"
+                                         [class.questioned]="cell.is_questioned"
+                                         [class.highlighted]="cell.is_highlighted"
+                                         [class.mined]="cell.is_mine && !cell.is_flagged && game_over()"
+                                         [class.game-over]="cell.is_mine && cell.is_game_over && game_over()"
+                                         [class.no-bomb]="!cell.is_mine && cell.is_flagged && game_over()"
+                                         (click)="revealCell(i, j)"
+                                         (contextmenu)="cycleMarker(i, j, $event)"
+                                         (mousedown)="onCellMouseDown(i, j, $event)"
+                                         (mouseenter)="onCellMouseEnter(i, j)"
+                                         (mouseup)="unhighlightCells()"
+                                         (mouseleave)="unhighlightCells()"
+                                         (touchstart)="onCellTouchStart(i, j, $event)"
+                                         (touchend)="onCellTouchEnd($event)"
+                                         (touchmove)="onCellTouchMove($event)"
+                                         (touchcancel)="onCellTouchCancel()">
+                                        @if (cell.is_revealed && cell.adjacent_mines > 0) {
+                                            <img [src]="`img/minesweeper/adjacent_${cell.adjacent_mines}.png`" draggable="false">
+                                        }
+                                        @if (game_over()) {
+                                            @if (cell.is_mine) {
+                                                @if (cell.is_flagged) {
+                                                    <img src="img/minesweeper/bombflagged.png" draggable="false">
+                                                } @else {
+                                                    <img src="img/minesweeper/bomb.png" draggable="false">
+                                                }
+                                            } @else if (cell.is_flagged) {
+                                                <img src="img/minesweeper/nobomb.png" draggable="false">
+                                            }
+                                        } @else {
+                                            @if (cell.is_flagged) {
+                                                <img src="img/minesweeper/bombflagged.png" draggable="false">
+                                            } @else if (cell.is_questioned) {
+                                                <img src="img/minesweeper/bombquestion.png" draggable="false">
+                                            }
+                                        }
+                                    </div>
+                                }
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    </ng-template>
+    <ng-template #leaderboardFiltersTemplate>
+        <div class="leaderboard-filters">
+            <mat-button-toggle-group [value]="leaderboard_mode()" (change)="leaderboard_mode.set($event.value)">
+                <mat-button-toggle value="normal">
+                    <ng-container i18n>Normal</ng-container>
+                </mat-button-toggle>
+                <mat-button-toggle value="daily">
+                    <ng-container i18n>Défi du jour</ng-container>
+                </mat-button-toggle>
+            </mat-button-toggle-group>
+            <button mat-stroked-button [matMenuTriggerFor]="leaderboardSizeMenu">
+                <mat-icon fontSet="material-symbols-outlined">expand_more</mat-icon>
+                <mat-icon fontSet="material-symbols-outlined">settings</mat-icon>
+                {{ leaderboardSizeLabel() }}
+            </button>
+            <mat-menu #leaderboardSizeMenu="matMenu" xPosition="before">
+                @for (size of sizes_list(); track size.id) {
+                    @if (size.id !== 'custom') {
+                        <button mat-menu-item (click)="leaderboard_size_id.set(size.id)">
+                            <mat-icon fontSet="material-symbols-outlined">{{ leaderboard_size_id() === size.id ? 'check' : '' }}</mat-icon>
+                            {{ size.label }}
+                        </button>
+                    }
+                }
+            </mat-menu>
         </div>
-    </div>
+    </ng-template>
+    <ng-template #leaderboardTemplate>
+        <mat-tab-group>
+            <mat-tab>
+                <ng-template mat-tab-label>
+                    <ng-container i18n>Meilleurs scores</ng-container>
+                </ng-template>
+                <ng-template matTabContent>
+                    <ng-container *ngTemplateOutlet="leaderboardFiltersTemplate"></ng-container>
+                    <mho-minesweeper-leaderboard [sizeId]="leaderboard_size_id()" [mode]="leaderboard_mode()" [view]="'top'"></mho-minesweeper-leaderboard>
+                </ng-template>
+            </mat-tab>
+            <mat-tab>
+                <ng-template mat-tab-label>
+                    <ng-container i18n>Classement des joueurs</ng-container>
+                </ng-template>
+                <ng-template matTabContent>
+                    <ng-container *ngTemplateOutlet="leaderboardFiltersTemplate"></ng-container>
+                    <mho-minesweeper-leaderboard [sizeId]="leaderboard_size_id()" [mode]="leaderboard_mode()" [view]="'players'"></mho-minesweeper-leaderboard>
+                </ng-template>
+            </mat-tab>
+            <mat-tab>
+                <ng-template mat-tab-label>
+                    <ng-container i18n>Mes parties</ng-container>
+                </ng-template>
+                <ng-template matTabContent>
+                    <mho-minesweeper-history></mho-minesweeper-history>
+                </ng-template>
+            </mat-tab>
+        </mat-tab-group>
+    </ng-template>
+    @if (!is_fullscreen()) {
+        <ng-container *ngTemplateOutlet="boardAndControlsTemplate"></ng-container>
+    }
 </mat-card-content>

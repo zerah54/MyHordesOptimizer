@@ -1,0 +1,65 @@
+<div class="minesweeper-history">
+    @if (loading()) {
+        <mat-spinner diameter="32"></mat-spinner>
+    } @else {
+        <table class="history-table">
+            <thead>
+            <tr>
+                <th i18n>Date</th>
+                <th i18n>Taille</th>
+                <th i18n>Mode</th>
+                <th i18n>Résultat</th>
+                <th i18n>Temps</th>
+            </tr>
+            </thead>
+            <tbody>
+                @for (entry of items(); track entry.gameId) {
+                    <tr>
+                        <td>{{ entry.createdAt | date:'short' }}</td>
+                        <td>{{ entry.width }} × {{ entry.height }} ({{ entry.mineCount }})</td>
+                        <td>
+                            @if (entry.mode === 'daily') {
+                                <ng-container i18n>Défi du jour</ng-container>
+                            } @else {
+                                <ng-container i18n>Normal</ng-container>
+                            }
+                        </td>
+                        <td>
+                            @switch (entry.status) {
+                                @case ('won') {
+                                    <ng-container i18n>Gagnée</ng-container>
+                                }
+                                @case ('lost') {
+                                    <ng-container i18n>Perdue</ng-container>
+                                }
+                                @default {
+                                    <ng-container i18n>En cours</ng-container>
+                                }
+                            }
+                        </td>
+                        <td>
+                            @if (entry.elapsedMs !== null) {
+                                {{ entry.elapsedMs | elapsedSeconds }}
+                                <ng-container i18n>s</ng-container>
+                            } @else {
+                                —
+                            }
+                        </td>
+                    </tr>
+                } @empty {
+                    <tr>
+                        <td colspan="5" i18n>Aucune partie jouée pour l'instant.</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <mat-paginator
+            (page)="onPageChange($event)"
+            [length]="totalCount()"
+            [pageIndex]="pageIndex()"
+            [pageSize]="pageSize"
+            [hidePageSize]="true"
+            showFirstLastButtons/>
+    }
+</div>
