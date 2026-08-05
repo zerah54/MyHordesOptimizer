@@ -1,0 +1,1602 @@
+{
+  "small_wallimprove_#00": {
+    "tier0": {
+      "resources": {
+        "wood2_#00": 10,
+        "metal_#00": 5
+      },
+      "ap": 25
+    },
+    "tier1": {
+      "resources": {
+        "wood2_#00": 10,
+        "metal_#00": 5
+      },
+      "ap": 25
+    },
+    "tier2": {
+      "ap": 25
+    }
+  },
+  "small_waterhole_#00": {
+    "tier0": {
+      "resources": {
+        "water_#00": 60
+      },
+      "ap": 60
+    },
+    "tier1": {
+      "resources": {
+        "water_#00": 15
+      },
+      "ap": 60
+    },
+    "tier2": {
+      "ap": 39
+    },
+    "rareteEffective": 1
+  },
+  "small_spears_#00": {
+    "tier0": {
+      "resources": {
+        "metal_#00": 8,
+        "wood_beam_#00": 24
+      },
+      "ap": 35
+    },
+    "tier1": {
+      "resources": {
+        "metal_#00": 1,
+        "wood_beam_#00": 5
+      },
+      "ap": 35
+    },
+    "tier2": {
+      "ap": 24
+    },
+    "rareteEffective": 2
+  },
+  "small_barbed_#00": {
+    "tier0": {
+      "resources": {
+        "metal_#00": 4,
+        "wire_#00": 6
+      },
+      "ap": 10
+    },
+    "tier1": {
+      "resources": {
+        "metal_#00": 1,
+        "wire_#00": 1
+      },
+      "ap": 10
+    },
+    "tier2": {
+      "ap": 6
+    },
+    "rareteEffective": 1
+  },
+  "small_meatbarbed_#00": {
+    "tier0": {
+      "resources": {
+        "bone_meat_#00": 4
+      },
+      "ap": 10
+    },
+    "tier1": {
+      "resources": {
+        "bone_meat_#00": 1
+      },
+      "ap": 10
+    },
+    "tier2": {
+      "ap": 6
+    },
+    "rareteEffective": 1
+  },
+  "small_wallimprove_#01": {
+    "tier0": {
+      "resources": {
+        "meca_parts_#00": 6,
+        "wood_beam_#00": 15,
+        "metal_beam_#00": 15
+      },
+      "ap": 40
+    },
+    "tier1": {
+      "resources": {
+        "meca_parts_#00": 1,
+        "wood_beam_#00": 4,
+        "metal_beam_#00": 4
+      },
+      "ap": 40
+    },
+    "tier2": {
+      "ap": 28
+    },
+    "rareteEffective": 2
+  },
+  "item_plate_#02": {
+    "tier0": {
+      "resources": {
+        "wood2_#00": 20,
+        "metal_#00": 8,
+        "concrete_wall_#00": 3
+      },
+      "ap": 35
+    },
+    "tier1": {
+      "resources": {
+        "wood2_#00": 4,
+        "metal_#00": 1,
+        "concrete_wall_#00": 1
+      },
+      "ap": 35
+    },
+    "tier2": {
+      "ap": 22
+    }
+  },
+  "item_plate_#03": {
+    "tier0": {
+      "resources": {
+        "wood2_#00": 40,
+        "metal_#00": 40,
+        "concrete_wall_#00": 6,
+        "wood_beam_#00": 30,
+        "metal_beam_#00": 30
+      },
+      "ap": 50
+    },
+    "tier1": {
+      "resources": {
+        "wood2_#00": 8,
+        "metal_#00": 8,
+        "concrete_wall_#00": 1,
+        "wood_beam_#00": 8,
+        "metal_beam_#00": 8
+      },
+      "ap": 50
+    },
+    "tier2": {
+      "ap": 32
+    }
+  },
+  "item_home_def_#00": {
+    "tier0": {
+      "resources": {
+        "wood2_#00": 20,
+        "metal_#00": 60,
+        "concrete_wall_#00": 6
+      },
+      "ap": 65
+    },
+    "tier1": {
+      "resources": {
+        "wood2_#00": 4,
+        "metal_#00": 12,
+        "concrete_wall_#00": 1
+      },
+      "ap": 65
+    },
+    "tier2": {
+      "ap": 48
+    }
+  },
+  "small_gather_#01": {
+    "tier0": {
+      "resources": {
+        "metal_beam_#00": 3,
+        "plate_#00": 6
+      },
+      "ap": 25
+    },
+    "tier1": {
+      "resources": {
+        "metal_beam_#00": 1,
+        "plate_#00": 1
+      },
+      "ap": 25
+    },
+    "tier2": {
+      "ap": 17
+    },
+    "rareteEffective": 2
+  },
+  "small_waterspray_#00": {
+    "tier0": {
+      "resources": {
+        "meca_parts_#00": 6,
+        "metal_#00": 32,
+        "tube_#00": 8,
+        "metal_beam_#00": 6,
+        "wire_#00": 6,
+        "deto_#00": 3
+      },
+      "ap": 50
+    },
+    "tier1": {
+      "resources": {
+        "meca_parts_#00": 1,
+        "metal_#00": 6,
+        "tube_#00": 1,
+        "metal_beam_#00": 1,
+        "wire_#00": 1,
+        "deto_#00": 1
+      },
+      "ap": 50
+    },
+    "tier2": {
+      "ap": 35
+    },
+    "rareteEffective": 2
+  },
+  "small_acidspray_#00": {
+    "tier0": {
+      "resources": {
+        "water_#00": 9,
+        "pharma_#00": 8
+      },
+      "ap": 25
+    },
+    "tier1": {
+      "resources": {
+        "water_#00": 2,
+        "pharma_#00": 1
+      },
+      "ap": 25
+    },
+    "tier2": {
+      "ap": 16
+    }
+  },
+  "small_gazspray_#00": {
+    "tier0": {
+      "resources": {
+        "metal_beam_#00": 15,
+        "water_#00": 15,
+        "meca_parts_#00": 3,
+        "tube_#00": 4,
+        "pharma_#00": 8,
+        "poison_part_#00": 2
+      },
+      "ap": 60
+    },
+    "tier1": {
+      "resources": {
+        "metal_beam_#00": 4,
+        "water_#00": 4,
+        "meca_parts_#00": 1,
+        "tube_#00": 1,
+        "pharma_#00": 1,
+        "poison_part_#00": 1
+      },
+      "ap": 60
+    },
+    "tier2": {
+      "ap": 39
+    }
+  },
+  "item_plate_#06": {
+    "tier0": {
+      "resources": {
+        "wood2_#00": 40
+      },
+      "ap": 30
+    },
+    "tier1": {
+      "resources": {
+        "wood2_#00": 8
+      },
+      "ap": 30
+    },
+    "tier2": {
+      "ap": 21
+    },
+    "rareteEffective": 2
+  },
+  "item_plate_#07": {
+    "tier0": {
+      "resources": {
+        "metal_#00": 40
+      },
+      "ap": 30
+    },
+    "tier1": {
+      "resources": {
+        "metal_#00": 8
+      },
+      "ap": 30
+    },
+    "tier2": {
+      "ap": 21
+    },
+    "rareteEffective": 2
+  },
+  "item_plate_#10": {
+    "tier0": {
+      "resources": {
+        "wood2_#00": 60,
+        "metal_#00": 60
+      },
+      "ap": 25
+    },
+    "tier1": {
+      "resources": {
+        "wood2_#00": 12,
+        "metal_#00": 12
+      },
+      "ap": 25
+    },
+    "tier2": {
+      "ap": 16
+    }
+  },
+  "small_round_path_#00": {
+    "tier0": {
+      "resources": {
+        "wood2_#00": 20,
+        "wood_beam_#00": 5,
+        "metal_beam_#00": 5,
+        "meca_parts_#00": 2
+      },
+      "ap": 25
+    },
+    "tier1": {
+      "resources": {
+        "wood2_#00": 5,
+        "wood_beam_#00": 1,
+        "metal_beam_#00": 1,
+        "meca_parts_#00": 1
+      },
+      "ap": 25
+    },
+    "tier2": {
+      "ap": 17
+    },
+    "rareteEffective": 2
+  },
+  "item_jerrycan_#00": {
+    "tier0": {
+      "resources": {
+        "meca_parts_#00": 3,
+        "wood2_#00": 20,
+        "metal_#00": 20,
+        "tube_#00": 8,
+        "oilcan_#00": 8
+      },
+      "ap": 75
+    },
+    "tier1": {
+      "resources": {
+        "meca_parts_#00": 1,
+        "wood2_#00": 4,
+        "metal_#00": 4,
+        "tube_#00": 1,
+        "oilcan_#00": 1
+      },
+      "ap": 75
+    },
+    "tier2": {
+      "ap": 52
+    },
+    "rareteEffective": 2
+  },
+  "item_bgrenade_#00": {
+    "tier0": {
+      "resources": {
+        "water_#00": 30,
+        "metal_#00": 12,
+        "explo_#00": 3,
+        "deto_#00": 3
+      },
+      "ap": 50
+    },
+    "tier1": {
+      "resources": {
+        "water_#00": 8,
+        "metal_#00": 2,
+        "explo_#00": 1,
+        "deto_#00": 1
+      },
+      "ap": 50
+    },
+    "tier2": {
+      "ap": 32
+    }
+  },
+  "item_bgrenade_#01": {
+    "tier0": {
+      "resources": {
+        "water_#00": 30,
+        "wood2_#00": 20,
+        "explo_#00": 15,
+        "oilcan_#00": 4
+      },
+      "ap": 40
+    },
+    "tier1": {
+      "resources": {
+        "water_#00": 8,
+        "wood2_#00": 4,
+        "explo_#00": 4,
+        "oilcan_#00": 1
+      },
+      "ap": 40
+    },
+    "tier2": {
+      "ap": 28
+    }
+  },
+  "small_eden_#00": {
+    "tier0": {
+      "resources": {
+        "wood2_#00": 40,
+        "explo_#00": 6,
+        "deto_#00": 3,
+        "metal_beam_#00": 15
+      },
+      "ap": 50
+    },
+    "tier1": {
+      "resources": {
+        "wood2_#00": 8,
+        "explo_#00": 1,
+        "deto_#00": 1,
+        "metal_beam_#00": 4
+      },
+      "ap": 50
+    },
+    "tier2": {
+      "ap": 35
+    }
+  },
+  "small_waterspray_#01": {
+    "tier0": {
+      "resources": {
+        "water_#00": 30,
+        "tube_#00": 3,
+        "wood2_#00": 40,
+        "metal_beam_#00": 15,
+        "oilcan_#00": 4
+      },
+      "ap": 40
+    },
+    "tier1": {
+      "resources": {
+        "water_#00": 7,
+        "tube_#00": 1,
+        "wood2_#00": 8,
+        "metal_beam_#00": 4,
+        "oilcan_#00": 1
+      },
+      "ap": 40
+    },
+    "tier2": {
+      "ap": 26
+    }
+  },
+  "small_grinder_#00": {
+    "tier0": {
+      "resources": {
+        "plate_#00": 6,
+        "tube_#00": 8,
+        "wood_beam_#00": 12,
+        "metal_beam_#00": 30
+      },
+      "ap": 55
+    },
+    "tier1": {
+      "resources": {
+        "plate_#00": 1,
+        "tube_#00": 1,
+        "wood_beam_#00": 3,
+        "metal_beam_#00": 8
+      },
+      "ap": 55
+    },
+    "tier2": {
+      "ap": 35
+    }
+  },
+  "small_sprinkler_#00": {
+    "tier0": {
+      "resources": {
+        "water_#00": 60,
+        "tube_#00": 4,
+        "wood_beam_#00": 21,
+        "metal_beam_#00": 45,
+        "diode_#00": 3
+      },
+      "ap": 85
+    },
+    "tier1": {
+      "resources": {
+        "water_#00": 15,
+        "tube_#00": 1,
+        "wood_beam_#00": 5,
+        "metal_beam_#00": 11,
+        "diode_#00": 1
+      },
+      "ap": 85
+    },
+    "tier2": {
+      "ap": 63
+    }
+  },
+  "item_tube_#00": {
+    "tier0": {
+      "resources": {
+        "water_#00": 75,
+        "tube_#00": 24,
+        "metal_beam_#00": 30
+      },
+      "ap": 50
+    },
+    "tier1": {
+      "resources": {
+        "water_#00": 19,
+        "tube_#00": 5,
+        "metal_beam_#00": 6
+      },
+      "ap": 50
+    },
+    "tier2": {
+      "ap": 37
+    }
+  },
+  "item_tube_#01": {
+    "tier0": {
+      "resources": {
+        "metal_#00": 8
+      },
+      "ap": 10
+    },
+    "tier1": {
+      "resources": {
+        "metal_#00": 1
+      },
+      "ap": 10
+    },
+    "tier2": {
+      "ap": 6
+    }
+  },
+  "small_watercanon_#00": {
+    "tier0": {
+      "resources": {
+        "water_#00": 45,
+        "wood2_#00": 20,
+        "metal_#00": 20,
+        "metal_beam_#00": 15
+      },
+      "ap": 40
+    },
+    "tier1": {
+      "resources": {
+        "water_#00": 11,
+        "wood2_#00": 4,
+        "metal_#00": 4,
+        "metal_beam_#00": 4
+      },
+      "ap": 40
+    },
+    "tier2": {
+      "ap": 28
+    }
+  },
+  "small_appletree_#00": {
+    "tier0": {
+      "resources": {
+        "water_#00": 30,
+        "hmeat_#00": 6,
+        "pharma_#00": 12,
+        "wood_beam_#00": 3
+      },
+      "ap": 30
+    },
+    "tier1": {
+      "resources": {
+        "water_#00": 8,
+        "hmeat_#00": 1,
+        "pharma_#00": 2,
+        "wood_beam_#00": 1
+      },
+      "ap": 30
+    },
+    "tier2": {
+      "ap": 22
+    }
+  },
+  "item_meat_#00": {
+    "tier0": {
+      "resources": {
+        "wood2_#00": 25,
+        "metal_#00": 12
+      },
+      "ap": 40
+    },
+    "tier1": {
+      "resources": {
+        "wood2_#00": 7,
+        "metal_#00": 3
+      },
+      "ap": 40
+    },
+    "tier2": {
+      "ap": 28
+    },
+    "rareteEffective": 2
+  },
+  "item_hmeat_#00": {
+    "tier0": {
+      "resources": {
+        "wood_beam_#00": 18,
+        "metal_beam_#00": 3
+      },
+      "ap": 40
+    },
+    "tier1": {
+      "resources": {
+        "wood_beam_#00": 4,
+        "metal_beam_#00": 1
+      },
+      "ap": 40
+    },
+    "tier2": {
+      "ap": 28
+    }
+  },
+  "item_meca_parts_#00": {
+    "tier0": {
+      "resources": {
+        "meca_parts_#00": 9,
+        "wood_beam_#00": 24,
+        "metal_beam_#00": 24
+      },
+      "ap": 50
+    },
+    "tier1": {
+      "resources": {
+        "meca_parts_#00": 2,
+        "wood_beam_#00": 6,
+        "metal_beam_#00": 6
+      },
+      "ap": 50
+    },
+    "tier2": {
+      "ap": 37
+    },
+    "rareteEffective": 3
+  },
+  "item_courroie_#00": {
+    "tier0": {
+      "resources": {
+        "wood2_#00": 8,
+        "metal_#00": 8,
+        "tube_#00": 4,
+        "courroie_#00": 2,
+        "lens_#00": 3,
+        "electro_#00": 3
+      },
+      "ap": 40
+    },
+    "tier1": {
+      "resources": {
+        "wood2_#00": 1,
+        "metal_#00": 1,
+        "tube_#00": 1,
+        "courroie_#00": 1,
+        "lens_#00": 1,
+        "electro_#00": 1
+      },
+      "ap": 40
+    },
+    "tier2": {
+      "ap": 26
+    }
+  },
+  "item_electro_#00": {
+    "tier0": {
+      "resources": {
+        "pile_#00": 8,
+        "metal_#00": 20,
+        "diode_#00": 3,
+        "radio_on_#00": 8,
+        "electro_#00": 3
+      },
+      "ap": 25
+    },
+    "tier1": {
+      "resources": {
+        "pile_#00": 1,
+        "metal_#00": 4,
+        "diode_#00": 1,
+        "radio_on_#00": 1,
+        "electro_#00": 1
+      },
+      "ap": 25
+    },
+    "tier2": {
+      "ap": 16
+    }
+  },
+  "item_tagger_#02": {
+    "tier0": {
+      "resources": {
+        "rustine_#00": 4,
+        "electro_#00": 3
+      },
+      "ap": 20
+    },
+    "tier1": {
+      "resources": {
+        "rustine_#00": 1,
+        "electro_#00": 1
+      },
+      "ap": 20
+    },
+    "tier2": {
+      "ap": 13
+    }
+  },
+  "status_terror_#00": {
+    "tier0": {
+      "resources": {
+        "wood2_#00": 20,
+        "metal_#00": 20
+      },
+      "ap": 40
+    },
+    "tier1": {
+      "resources": {
+        "wood2_#00": 4,
+        "metal_#00": 4
+      },
+      "ap": 40
+    },
+    "tier2": {
+      "ap": 28
+    },
+    "rareteEffective": 2
+  },
+  "item_wood_plate_#00": {
+    "tier0": {
+      "resources": {
+        "wood2_#00": 24
+      },
+      "ap": 20
+    },
+    "tier1": {
+      "resources": {
+        "wood2_#00": 5
+      },
+      "ap": 20
+    },
+    "tier2": {
+      "ap": 13
+    },
+    "rareteEffective": 1
+  },
+  "small_trap_#00": {
+    "tier0": {
+      "resources": {
+        "wood2_#00": 20
+      },
+      "ap": 15
+    },
+    "tier1": {
+      "resources": {
+        "wood2_#00": 4
+      },
+      "ap": 15
+    },
+    "tier2": {
+      "ap": 9
+    },
+    "rareteEffective": 1
+  },
+  "small_trap_#01": {
+    "tier0": {
+      "resources": {
+        "wood_beam_#00": 9,
+        "metal_beam_#00": 9,
+        "metal_#00": 20,
+        "rustine_#00": 4,
+        "wire_#00": 3
+      },
+      "ap": 30
+    },
+    "tier1": {
+      "resources": {
+        "wood_beam_#00": 2,
+        "metal_beam_#00": 2,
+        "metal_#00": 4,
+        "rustine_#00": 1,
+        "wire_#00": 1
+      },
+      "ap": 30
+    },
+    "tier2": {
+      "ap": 19
+    },
+    "rareteEffective": 1
+  },
+  "small_dig_#01": {
+    "tier0": {
+      "resources": {
+        "wood2_#00": 8,
+        "metal_#00": 8
+      },
+      "ap": 10
+    },
+    "tier1": {
+      "resources": {
+        "wood2_#00": 1,
+        "metal_#00": 1
+      },
+      "ap": 10
+    },
+    "tier2": {
+      "ap": 6
+    },
+    "rareteEffective": 1
+  },
+  "small_dig_#02": {
+    "tier0": {
+      "resources": {
+        "metal_#00": 8
+      },
+      "ap": 40
+    },
+    "tier1": {
+      "resources": {
+        "metal_#00": 1
+      },
+      "ap": 40
+    },
+    "tier2": {
+      "ap": 26
+    }
+  },
+  "small_trap_#02": {
+    "tier0": {
+      "resources": {
+        "metal_#00": 20,
+        "hmeat_#00": 3
+      },
+      "ap": 15
+    },
+    "tier1": {
+      "resources": {
+        "metal_#00": 2,
+        "hmeat_#00": 1
+      },
+      "ap": 15
+    },
+    "tier2": {
+      "ap": 9
+    },
+    "rareteEffective": 1
+  },
+  "small_tnt_#00": {
+    "tier0": {
+      "resources": {
+        "explo_#00": 8
+      },
+      "ap": 30
+    },
+    "tier1": {
+      "resources": {
+        "explo_#00": 1
+      },
+      "ap": 30
+    },
+    "tier2": {
+      "ap": 19
+    }
+  },
+  "status_terror_#01": {
+    "tier0": {
+      "resources": {
+        "water_#00": 6,
+        "wood2_#00": 20,
+        "metal_#00": 20,
+        "meca_parts_#00": 3
+      },
+      "ap": 25
+    },
+    "tier1": {
+      "resources": {
+        "water_#00": 1,
+        "wood2_#00": 4,
+        "metal_#00": 4,
+        "meca_parts_#00": 1
+      },
+      "ap": 25
+    },
+    "tier2": {
+      "ap": 16
+    }
+  },
+  "small_bamba_#00": {
+    "tier0": {
+      "resources": {
+        "wood2_#00": 12,
+        "diode_#00": 3,
+        "radio_on_#00": 12,
+        "guitar_#00": 3,
+        "metal_#00": 20
+      },
+      "ap": 20
+    },
+    "tier1": {
+      "resources": {
+        "wood2_#00": 2,
+        "diode_#00": 1,
+        "radio_on_#00": 2,
+        "guitar_#00": 1,
+        "metal_#00": 4
+      },
+      "ap": 20
+    },
+    "tier2": {
+      "ap": 13
+    }
+  },
+  "small_watchmen_#00": {
+    "tier0": {
+      "resources": {
+        "meca_parts_#00": 3,
+        "plate_#00": 3,
+        "wood_beam_#00": 30,
+        "metal_beam_#00": 6
+      },
+      "ap": 35
+    },
+    "tier1": {
+      "resources": {
+        "meca_parts_#00": 1,
+        "plate_#00": 1,
+        "wood_beam_#00": 7,
+        "metal_beam_#00": 1
+      },
+      "ap": 35
+    },
+    "tier2": {
+      "ap": 26
+    }
+  },
+  "small_armor_#00": {
+    "tier0": {
+      "resources": {
+        "meca_parts_#00": 2,
+        "wood2_#00": 35,
+        "metal_#00": 27,
+        "plate_#00": 5,
+        "rustine_#00": 8
+      },
+      "ap": 40
+    },
+    "tier1": {
+      "resources": {
+        "meca_parts_#00": 1,
+        "wood2_#00": 8,
+        "metal_#00": 6,
+        "plate_#00": 1,
+        "rustine_#00": 2
+      },
+      "ap": 40
+    },
+    "tier2": {
+      "ap": 28
+    },
+    "rareteEffective": 2
+  },
+  "small_watchmen_#01": {
+    "tier0": {
+      "resources": {
+        "tube_#00": 4,
+        "scope_#00": 2,
+        "metal_beam_#00": 9,
+        "wood2_#00": 8,
+        "plate_#00": 3,
+        "tagger_#00": 6,
+        "pile_#00": 4
+      },
+      "ap": 25
+    },
+    "tier1": {
+      "resources": {
+        "tube_#00": 1,
+        "scope_#00": 1,
+        "metal_beam_#00": 2,
+        "wood2_#00": 1,
+        "plate_#00": 1,
+        "tagger_#00": 1,
+        "pile_#00": 1
+      },
+      "ap": 25
+    },
+    "tier2": {
+      "ap": 18
+    }
+  },
+  "small_novlamps_#00": {
+    "tier0": {
+      "resources": {
+        "meca_parts_#00": 3,
+        "deto_#00": 3,
+        "lens_#00": 6,
+        "diode_#00": 6,
+        "metal_beam_#00": 24,
+        "wire_#00": 3,
+        "pile_#00": 16
+      },
+      "ap": 25
+    },
+    "tier1": {
+      "resources": {
+        "meca_parts_#00": 1,
+        "deto_#00": 1,
+        "lens_#00": 1,
+        "diode_#00": 1,
+        "metal_beam_#00": 6,
+        "wire_#00": 1,
+        "pile_#00": 3
+      },
+      "ap": 25
+    },
+    "tier2": {
+      "ap": 16
+    }
+  },
+  "small_derrick_#00": {
+    "tier0": {
+      "resources": {
+        "wood2_#00": 20,
+        "wood_beam_#00": 30,
+        "metal_beam_#00": 45,
+        "tube_#00": 4
+      },
+      "ap": 86
+    },
+    "tier1": {
+      "resources": {
+        "wood2_#00": 4,
+        "wood_beam_#00": 8,
+        "metal_beam_#00": 11,
+        "tube_#00": 1
+      },
+      "ap": 86
+    },
+    "tier2": {
+      "ap": 64
+    }
+  },
+  "small_valve_#00": {
+    "tier0": {
+      "resources": {
+        "engine_#00": 2,
+        "meca_parts_#00": 12,
+        "metal_#00": 40,
+        "metal_beam_#00": 9,
+        "oilcan_#00": 12,
+        "wood2_#00": 24
+      },
+      "ap": 130
+    },
+    "tier1": {
+      "resources": {
+        "engine_#00": 1,
+        "meca_parts_#00": 3,
+        "metal_#00": 8,
+        "metal_beam_#00": 2,
+        "oilcan_#00": 2,
+        "wood2_#00": 5
+      },
+      "ap": 130
+    },
+    "tier2": {
+      "ap": 97
+    }
+  },
+  "small_lighthouse_#00": {
+    "tier0": {
+      "resources": {
+        "electro_#00": 2,
+        "wood_beam_#00": 15,
+        "metal_beam_#00": 15,
+        "pile_#00": 4,
+        "diode_#00": 1
+      },
+      "ap": 30
+    },
+    "tier1": {
+      "resources": {
+        "electro_#00": 1,
+        "wood_beam_#00": 4,
+        "metal_beam_#00": 4,
+        "pile_#00": 1,
+        "diode_#00": 1
+      },
+      "ap": 30
+    },
+    "tier2": {
+      "ap": 22
+    }
+  },
+  "small_city_up_#00": {
+    "tier0": {
+      "resources": {
+        "concrete_wall_#00": 6,
+        "wood_beam_#00": 45,
+        "metal_beam_#00": 30,
+        "metal_#00": 20
+      },
+      "ap": 50
+    },
+    "tier1": {
+      "resources": {
+        "concrete_wall_#00": 1,
+        "wood_beam_#00": 11,
+        "metal_beam_#00": 8,
+        "metal_#00": 3
+      },
+      "ap": 50
+    },
+    "tier2": {
+      "ap": 35
+    }
+  },
+  "small_balloon_#00": {
+    "tier0": {
+      "resources": {
+        "wood2_#00": 8,
+        "meca_parts_#00": 3,
+        "lights_#00": 4,
+        "sheet_#00": 4,
+        "wood_beam_#00": 15,
+        "metal_beam_#00": 15
+      },
+      "ap": 80
+    },
+    "tier1": {
+      "resources": {
+        "wood2_#00": 1,
+        "meca_parts_#00": 1,
+        "lights_#00": 1,
+        "sheet_#00": 1,
+        "wood_beam_#00": 4,
+        "metal_beam_#00": 4
+      },
+      "ap": 80
+    },
+    "tier2": {
+      "ap": 68
+    }
+  },
+  "small_labyrinth_#00": {
+    "tier0": {
+      "resources": {
+        "meca_parts_#00": 6,
+        "wood2_#00": 80,
+        "metal_#00": 40,
+        "concrete_wall_#00": 12
+      },
+      "ap": 200
+    },
+    "tier1": {
+      "resources": {
+        "meca_parts_#00": 1,
+        "wood2_#00": 16,
+        "metal_#00": 8,
+        "concrete_wall_#00": 2
+      },
+      "ap": 200
+    },
+    "tier2": {
+      "ap": 150
+    }
+  },
+  "small_lastchance_#00": {
+    "tier0": {
+      "resources": {
+        "meca_parts_#00": 3,
+        "wood2_#00": 40,
+        "metal_#00": 60
+      },
+      "ap": 200
+    },
+    "tier1": {
+      "resources": {
+        "meca_parts_#00": 1,
+        "wood2_#00": 8,
+        "metal_#00": 12
+      },
+      "ap": 200
+    },
+    "tier2": {
+      "ap": 140
+    },
+    "rareteEffective": 2
+  },
+  "small_fireworks_#00": {
+    "tier0": {
+      "resources": {
+        "firework_powder_#00": 1,
+        "firework_tube_#00": 1,
+        "firework_box_#00": 2,
+        "metal_beam_#00": 10,
+        "wood_beam_#00": 10,
+        "rustine_#00": 5,
+        "torch_#00": 3
+      },
+      "ap": 90
+    },
+    "tier1": {
+      "resources": {
+        "firework_powder_#00": 1,
+        "firework_tube_#00": 1,
+        "firework_box_#00": 2
+      },
+      "ap": 90
+    },
+    "tier2": {
+      "ap": 62
+    },
+    "rareteEffective": 2
+  },
+  "small_pmvbig_#00": {
+    "tier0": {
+      "resources": {
+        "meca_parts_#00": 15,
+        "metal_#00": 150
+      },
+      "ap": 300
+    },
+    "tier1": {
+      "resources": {
+        "meca_parts_#00": 1,
+        "metal_#00": 25
+      },
+      "ap": 300
+    },
+    "tier2": {
+      "ap": 255
+    }
+  },
+  "small_wheel_#00": {
+    "tier0": {
+      "resources": {
+        "water_#00": 100,
+        "concrete_wall_#00": 10,
+        "metal_beam_#00": 30,
+        "metal_#00": 50
+      },
+      "ap": 300
+    },
+    "tier1": {
+      "resources": {
+        "water_#00": 15,
+        "concrete_wall_#00": 2,
+        "metal_beam_#00": 4,
+        "metal_#00": 4
+      },
+      "ap": 300
+    },
+    "tier2": {
+      "ap": 255
+    }
+  },
+  "small_castle_#00": {
+    "tier0": {
+      "resources": {
+        "water_#00": 150,
+        "wood_beam_#00": 60,
+        "metal_beam_#00": 40
+      },
+      "ap": 300
+    },
+    "tier1": {
+      "resources": {
+        "water_#00": 25,
+        "wood_beam_#00": 12,
+        "metal_beam_#00": 8
+      },
+      "ap": 300
+    },
+    "tier2": {
+      "ap": 255
+    }
+  },
+  "small_arma_#00": {
+    "tier0": {
+      "resources": {
+        "pile_#00": 25,
+        "engine_#00": 2,
+        "electro_#00": 8,
+        "concrete_wall_#00": 10,
+        "metal_beam_#00": 50
+      },
+      "ap": 100
+    },
+    "tier1": {
+      "resources": {
+        "pile_#00": 7,
+        "engine_#00": 1,
+        "electro_#00": 3,
+        "concrete_wall_#00": 2,
+        "metal_beam_#00": 12
+      },
+      "ap": 100
+    },
+    "tier2": {
+      "ap": 85
+    }
+  },
+  "small_door_closed_#00": {
+    "tier0": {
+      "resources": {
+        "metal_#00": 2,
+        "plate_#00": 1
+      },
+      "ap": 15
+    },
+    "tier1": {
+      "resources": {
+        "metal_#00": 2
+      },
+      "ap": 15
+    },
+    "tier2": {
+      "ap": 15
+    }
+  },
+  "small_spa4souls_#00": {
+    "tier0": {
+      "resources": {
+        "wood2_#00": 8,
+        "plate_#00": 6
+      },
+      "ap": 20
+    },
+    "tier1": {
+      "resources": {
+        "wood2_#00": 1,
+        "plate_#00": 1
+      },
+      "ap": 20
+    },
+    "tier2": {
+      "ap": 14
+    }
+  },
+  "small_gallery_#00": {
+    "tier0": {
+      "resources": {
+        "explo_#00": 3,
+        "wood_beam_#00": 9,
+        "deto_#00": 3
+      },
+      "ap": 30
+    },
+    "tier1": {
+      "resources": {
+        "explo_#00": 1,
+        "wood_beam_#00": 2,
+        "deto_#00": 1
+      },
+      "ap": 30
+    },
+    "tier2": {
+      "ap": 22
+    }
+  },
+  "small_survarea_#00": {
+    "tier0": {
+      "resources": {
+        "ryebag_#00": 8,
+        "wood2_#00": 20,
+        "radio_on_#00": 4,
+        "oilcan_#00": 8
+      },
+      "ap": 60
+    },
+    "tier1": {
+      "resources": {
+        "ryebag_#00": 1,
+        "wood2_#00": 4,
+        "radio_on_#00": 1,
+        "oilcan_#00": 1
+      },
+      "ap": 60
+    },
+    "tier2": {
+      "ap": 45
+    }
+  },
+  "item_boomfruit_#01": {
+    "tier0": {
+      "resources": {
+        "metal_beam_#00": 6,
+        "wire_#00": 3,
+        "deto_#00": 3,
+        "boomfruit_#00": 15
+      },
+      "ap": 40
+    },
+    "tier1": {
+      "resources": {
+        "metal_beam_#00": 1,
+        "wire_#00": 1,
+        "deto_#00": 1,
+        "boomfruit_#00": 2
+      },
+      "ap": 40
+    },
+    "tier2": {
+      "ap": 30
+    }
+  },
+  "small_techtable_#00": {
+    "tier0": {
+      "resources": {
+        "wood_beam_#00": 15,
+        "metal_beam_#00": 30,
+        "plate_#00": 3,
+        "wire_#00": 6,
+        "ryebag_#00": 4,
+        "lens_#00": 3,
+        "meca_parts_#00": 6,
+        "drug_hero_#00": 3
+      },
+      "ap": 60
+    },
+    "tier1": {
+      "resources": {
+        "wood_beam_#00": 3,
+        "metal_beam_#00": 7,
+        "plate_#00": 1,
+        "wire_#00": 1,
+        "ryebag_#00": 1,
+        "lens_#00": 1,
+        "meca_parts_#00": 2,
+        "drug_hero_#00": 1
+      },
+      "ap": 60
+    },
+    "tier2": {
+      "ap": 45
+    }
+  },
+  "small_watchmen_#02": {
+    "tier0": {
+      "resources": {
+        "wood_beam_#00": 18,
+        "metal_#00": 40,
+        "meca_parts_#00": 6,
+        "metal_beam_#00": 15,
+        "ryebag_#00": 8,
+        "lights_#00": 2,
+        "coffee_machine_#00": 2,
+        "cigs_#00": 2,
+        "trestle_#00": 3,
+        "chair_basic_#00": 3
+      },
+      "ap": 50
+    },
+    "tier1": {
+      "resources": {
+        "wood_beam_#00": 4,
+        "metal_#00": 8,
+        "meca_parts_#00": 1,
+        "metal_beam_#00": 3,
+        "ryebag_#00": 1,
+        "lights_#00": 1,
+        "coffee_machine_#00": 1,
+        "cigs_#00": 1,
+        "trestle_#00": 1,
+        "chair_basic_#00": 1
+      },
+      "ap": 50
+    },
+    "tier2": {
+      "ap": 37
+    }
+  },
+  "small_pet_#00": {
+    "tier0": {
+      "resources": {
+        "wood2_#00": 16,
+        "water_#00": 30,
+        "meca_parts_#00": 3,
+        "drug_#00": 3
+      },
+      "ap": 40
+    },
+    "tier1": {
+      "resources": {
+        "wood2_#00": 3,
+        "water_#00": 7,
+        "meca_parts_#00": 1,
+        "drug_#00": 1
+      },
+      "ap": 40
+    },
+    "tier2": {
+      "ap": 30
+    }
+  },
+  "small_infirmary_#00": {
+    "tier0": {
+      "resources": {
+        "pharma_#00": 24,
+        "disinfect_#00": 3,
+        "wood_beam_#00": 15,
+        "metal_beam_#00": 15
+      },
+      "ap": 40
+    },
+    "tier1": {
+      "resources": {
+        "pharma_#00": 4,
+        "disinfect_#00": 1,
+        "wood_beam_#00": 4,
+        "metal_beam_#00": 4
+      },
+      "ap": 40
+    },
+    "tier2": {
+      "ap": 30
+    }
+  },
+  "small_thermal_#00": {
+    "tier0": {
+      "resources": {
+        "water_#00": 250,
+        "metal_beam_#00": 20,
+        "tube_#00": 10,
+        "wood_beam_#00": 10,
+        "concrete_wall_#00": 5,
+        "fence_#00": 3,
+        "water_cleaner_#00": 5
+      },
+      "ap": 300
+    },
+    "tier1": {
+      "resources": {
+        "water_#00": 90,
+        "metal_beam_#00": 6,
+        "tube_#00": 4,
+        "wood_beam_#00": 4,
+        "concrete_wall_#00": 1,
+        "fence_#00": 1,
+        "water_cleaner_#00": 3
+      },
+      "ap": 300
+    },
+    "tier2": {
+      "ap": 255
+    }
+  },
+  "small_crow_#00": {
+    "tier0": {
+      "resources": {
+        "hmeat_#00": 10,
+        "wood_beam_#00": 80
+      },
+      "ap": 300
+    },
+    "tier1": {
+      "resources": {
+        "hmeat_#00": 2,
+        "wood_beam_#00": 30
+      },
+      "ap": 300
+    },
+    "tier2": {
+      "ap": 255
+    }
+  }
+}

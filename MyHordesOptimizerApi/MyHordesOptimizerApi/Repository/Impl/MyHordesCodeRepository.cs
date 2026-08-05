@@ -11,6 +11,7 @@ using MyHordesOptimizerApi.Data.Camping;
 using Newtonsoft.Json.Linq;
 using System.Linq;
 using MyHordesOptimizerApi.Data.Building;
+using MyHordesOptimizerApi.Data.Buildings;
 using MyHordesOptimizerApi.Data.Jobs;
 
 namespace MyHordesOptimizerApi.Repository.Impl
@@ -146,6 +147,22 @@ namespace MyHordesOptimizerApi.Repository.Impl
             var path = "Data/Building/building.json";
             var json = File.ReadAllText(path);
             var dico = json.FromJson<Dictionary<string, BuildingCodeModel>>();
+            return dico;
+        }
+
+        public Dictionary<string, BuildingHardResourcesCodeModel> GetBuildingHardResources()
+        {
+            var path = "Data/Buildings/hard-resources.json";
+            var json = File.ReadAllText(path);
+            var dico = json.FromJson<Dictionary<string, BuildingHardResourcesCodeModel>>();
+            return dico;
+        }
+
+        public Dictionary<string, Dictionary<string, string>> GetBuildingAvailability()
+        {
+            var path = "Data/Buildings/availability.json";
+            var json = File.ReadAllText(path);
+            var dico = json.FromJson<Dictionary<string, Dictionary<string, string>>>();
             return dico;
         }
 

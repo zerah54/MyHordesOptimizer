@@ -1299,10 +1299,9 @@ namespace MyHordesOptimizerApi.Services.Impl
         /// pas l'état d'un chantier dans une partie.
         /// </summary>
         /// <remarks>
-        /// Les coûts renvoyés sont ceux du jeu de ressources PAR DÉFAUT. Le mode Pandémonium en
-        /// utilise un autre, réellement différent pour 71 chantiers sur 166, mais que l'API
-        /// n'expose pas — il faudra l'extraire des fixtures. Le site doit donc annoncer que la
-        /// page vaut pour les modes standard.
+        /// Porte désormais les trois paliers Pandémonium (0/1/2 plans lus, <see cref="BuildingDto.Tier0Ap"/>
+        /// et suivants) et la disponibilité par TownType — extraits depuis les fixtures et
+        /// <c>rules.yml</c> du jeu, aucune API MyHordes ne les expose (chantier du 2026-08-06).
         /// </remarks>
         public IEnumerable<BuildingDto> GetBuildings()
         {
@@ -1311,6 +1310,7 @@ namespace MyHordesOptimizerApi.Services.Impl
                 .Where(building => !building.IsObsolete)
                 .Include(building => building.BuildingRessources)
                     .ThenInclude(resource => resource.IdItemNavigation)
+                .Include(building => building.BuildingAvailabilities)
                 .ToList();
             return Mapper.Map<List<BuildingDto>>(models);
         }

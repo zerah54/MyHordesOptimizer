@@ -23,6 +23,8 @@ public partial class MhoContext : DbContext
 
     public virtual DbSet<Building> Buildings { get; set; }
 
+    public virtual DbSet<BuildingAvailability> BuildingAvailabilities { get; set; }
+
     public virtual DbSet<BuildingRessource> BuildingRessources { get; set; }
 
     public virtual DbSet<BuildingWatchSurvivalBonusJob> BuildingWatchSurvivalBonusJobs { get; set; }
@@ -163,9 +165,9 @@ public partial class MhoContext : DbContext
 
         modelBuilder.Entity<BuildingRessource>(entity =>
         {
-            entity.HasKey(e => new { e.IdBuilding, e.IdItem })
+            entity.HasKey(e => new { e.IdBuilding, e.IdItem, e.ResourceTier })
                 .HasName("PRIMARY")
-                .HasAnnotation("MySql:IndexPrefixLength", new[] { 0, 0 });
+                .HasAnnotation("MySql:IndexPrefixLength", new[] { 0, 0, 0 });
 
             entity.HasOne(d => d.IdBuildingNavigation).WithMany(p => p.BuildingRessources)
                 .OnDelete(DeleteBehavior.ClientSetNull)
@@ -174,6 +176,17 @@ public partial class MhoContext : DbContext
             entity.HasOne(d => d.IdItemNavigation).WithMany(p => p.BuildingRessources)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("BuildingRessources_ibfk_2");
+        });
+
+        modelBuilder.Entity<BuildingAvailability>(entity =>
+        {
+            entity.HasKey(e => new { e.IdBuilding, e.TownType })
+                .HasName("PRIMARY");
+
+            entity.HasOne<Building>().WithMany(p => p.BuildingAvailabilities)
+                .HasForeignKey(e => e.IdBuilding)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("BuildingAvailability_ibfk_1");
         });
 
         modelBuilder.Entity<BuildingWatchSurvivalBonusJob>(entity =>

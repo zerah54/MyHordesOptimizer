@@ -6,6 +6,7 @@ using MyHordesOptimizerApi.Data.Wishlist;
 using System.Collections.Generic;
 using MyHordesOptimizerApi.Data.Camping;
 using MyHordesOptimizerApi.Data.Building;
+using MyHordesOptimizerApi.Data.Buildings;
 using MyHordesOptimizerApi.Data.Jobs;
 
 namespace MyHordesOptimizerApi.Repository.Interfaces
@@ -26,6 +27,8 @@ namespace MyHordesOptimizerApi.Repository.Interfaces
         MyHordesCampingBonusModel GetCampingBonus();
         List<MyHordesCampingResultModel> GetCampingResults();
         Dictionary<string, BuildingCodeModel> GetBuildings();
+        Dictionary<string, BuildingHardResourcesCodeModel> GetBuildingHardResources();
+        Dictionary<string, Dictionary<string, string>> GetBuildingAvailability();
         Dictionary<string, JobCodeModel> GetJobs();
     }
 }

@@ -124,6 +124,41 @@ public partial class Building
     [Column("isObsolete")]
     public bool IsObsolete { get; set; }
 
+    /// <summary>
+    /// Vrai si ce chantier a un jeu de ressources Pandémonium distinct (0 plan lu = Hard, 1 plan
+    /// lu = Easy, 2 plans lus = Easy avec PA réduit). 71/166 mesuré le 2026-08-05.
+    /// </summary>
+    [Column("hasHardMode")]
+    public bool HasHardMode { get; set; }
+
+    /// <summary>0 plan lu — jeu Hard. NULL quand <see cref="HasHardMode"/> est faux.</summary>
+    [Column("tier0Ap", TypeName = "int(11)")]
+    public int? Tier0Ap { get; set; }
+
+    /// <summary>1 plan lu — jeu Easy. NULL quand <see cref="HasHardMode"/> est faux.</summary>
+    [Column("tier1Ap", TypeName = "int(11)")]
+    public int? Tier1Ap { get; set; }
+
+    /// <summary>
+    /// 2 plans lus — jeu Easy avec PA réduit selon la rareté effective (voir l'extracteur,
+    /// `Projections::normaliserPaliersPandemonium`). NULL quand <see cref="HasHardMode"/> est faux.
+    /// </summary>
+    [Column("tier2Ap", TypeName = "int(11)")]
+    public int? Tier2Ap { get; set; }
+
+    /// <summary>
+    /// Rareté effective en Pandémonium (niveau de plan réellement requis), quand rules.yml
+    /// override ce chantier NOMMÉMENT. NULL pour un chantier sans override nommé — même quand la
+    /// règle générique lui donne un facteur de réduction (voir l'extracteur), ce n'est pas une
+    /// vraie rareté de plan au sens du jeu.
+    /// </summary>
+    [Column("hardBlueprintLevel", TypeName = "int(11)")]
+    public int? HardBlueprintLevel { get; set; }
+
+    // Pas de [InverseProperty] : BuildingAvailability n'a délibérément aucune navigation retour
+    // (voir son commentaire de classe) — la relation est configurée en Fluent API dans MhoContext.
+    public virtual ICollection<BuildingAvailability> BuildingAvailabilities { get; set; } = new List<BuildingAvailability>();
+
     [InverseProperty("IdBuildingNavigation")]
     public virtual ICollection<BuildingRessource> BuildingRessources { get; set; } = new List<BuildingRessource>();
 

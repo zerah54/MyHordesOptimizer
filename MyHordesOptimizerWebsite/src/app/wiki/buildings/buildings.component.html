@@ -2,18 +2,15 @@
     <mat-card-title>
         <ng-container i18n>Chantiers</ng-container>
     </mat-card-title>
+    <div class="actions">
+        <mat-button-toggle-group [(ngModel)]="hard_mode" i18n-aria-label aria-label="Mode de jeu">
+            <mat-button-toggle [value]="false" i18n>Normal</mat-button-toggle>
+            <mat-button-toggle [value]="true" i18n>Pandémonium</mat-button-toggle>
+        </mat-button-toggle-group>
+    </div>
 </mat-card-header>
 
 <mat-card-content class="mho-buildings">
-    <!-- Les coûts affichés sont ceux du jeu de ressources par défaut. Le mode Pandémonium en
-         utilise un autre, réellement différent pour de nombreux chantiers : l'avertissement est en
-         tête et non en pied, pour être lu avant les chiffres plutôt qu'après. -->
-    <div class="warning-banner">
-        <mat-icon fontSet="material-symbols-outlined">info</mat-icon>
-        <span i18n>Les coûts indiqués valent pour les modes de ville habituels. En Pandémonium, de nombreux chantiers
-            demandent des ressources différentes — cette page ne les reflète pas encore.</span>
-    </div>
-
     <div class="mat-elevation-z8 table-scroll">
         <table [dataSource]="datasource" mat-table>
 
@@ -57,7 +54,7 @@
                 <th *matHeaderCellDef mat-header-cell class="center">
                     <mho-icon-ap></mho-icon-ap>
                 </th>
-                <td *matCellDef="let row" mat-cell class="center">{{ row.pa }}</td>
+                <td *matCellDef="let row" mat-cell class="center">{{ costFor(row, plansLusFor(row)).ap }}</td>
             </ng-container>
 
             <ng-container matColumnDef="defence">
@@ -79,38 +76,49 @@
             </ng-container>
 
             <!-- Rareté : une icône de plan, rien quand le chantier n'en demande pas, et un point
-                 d'interrogation VISIBLE si le niveau sort de ceux qu'on connaît. -->
+                 d'interrogation VISIBLE si le niveau sort de ceux qu'on connaît. En Pandémonium,
+                 fusionnée avec « Plans lus » : le stepper remplace l'icône statique, avec l'icône
+                 de la rareté EFFECTIVE (celle réellement requise à la lecture d'un plan). -->
             <ng-container matColumnDef="rarity">
                 <th *matHeaderCellDef mat-header-cell class="center">{{ headerOf('rarity') }}</th>
                 <td *matCellDef="let row" mat-cell class="center">
-                    @if (row.blueprint; as blueprint) {
-                        @if (blueprint.value.img) {
-                            <img [alt]="blueprint.value.label" [matTooltip]="blueprint.value.label"
-                                 [src]="HORDES_IMG_REPO + blueprint.value.img">
-                        } @else {
-                            <span [matTooltip]="blueprint.value.label" class="dash">—</span>
-                        }
+                    @if (hard_mode && row.has_hard_mode) {
+                        <mho-compact-stepper
+                            (valueChange)="setPlansLus(row, $event)"
+                            [icon]="stepperIcon(row)"
+                            [max]="2" [min]="0"
+                            [value]="plansLusFor(row)"
+                            i18n-label
+                            label="Plan">
+                        </mho-compact-stepper>
                     } @else {
-                        <span [matTooltip]="unknownRarityHint(row)" class="unknown">?</span>
+                        @if (row.blueprint; as blueprint) {
+                            @if (blueprint.value.img) {
+                                <img [alt]="blueprint.value.label" [matTooltip]="blueprint.value.label"
+                                     [src]="HORDES_IMG_REPO + blueprint.value.img">
+                            } @else {
+                                <span [matTooltip]="blueprint.value.label" class="dash">—</span>
+                            }
+                        } @else {
+                            <span [matTooltip]="unknownRarityHint(row)" class="unknown">?</span>
+                        }
                     }
                 </td>
             </ng-container>
 
             <ng-container matColumnDef="flags">
                 <th *matHeaderCellDef mat-header-cell class="center">{{ headerOf('flags') }}</th>
-                <td *matCellDef="let row" mat-cell class="center flags">
-                    @if (row.temporary) {
-                        <mat-icon class="flag-icon temporary" fontSet="material-symbols-outlined"
-                                  i18n-matTooltip matTooltip="Chantier temporaire : il disparaît au bout d’un moment">
-                            warning
-                        </mat-icon>
-                    }
-                    @if (row.breakable) {
-                        <mat-icon class="flag-icon breakable" fontSet="material-symbols-outlined"
-                                  i18n-matTooltip matTooltip="Peut être détruit par l’attaque">
-                            heart_broken
-                        </mat-icon>
-                    }
+                <td *matCellDef="let row" mat-cell class="center">
+                    <div class="flags">
+                        @if (row.temporary) {
+                            <img [src]="HORDES_IMG_REPO + 'icons/small_warning.gif'" alt="" class="flag-icon"
+                                 i18n-matTooltip matTooltip="Chantier temporaire">
+                        }
+                        @if (showsBreakableFlag(row)) {
+                            <img [src]="HORDES_IMG_REPO + 'icons/small_def_broken.gif'" alt="" class="flag-icon"
+                                 i18n-matTooltip matTooltip="Peut être endommagé par l’attaque">
+                        }
+                    </div>
                 </td>
             </ng-container>
 
@@ -118,7 +126,7 @@
                 <th *matHeaderCellDef mat-header-cell>{{ headerOf('resources') }}</th>
                 <td *matCellDef="let row" mat-cell>
                     <ul class="resources">
-                        @for (resource of row.resources; track resource.item_id) {
+                        @for (resource of costFor(row, plansLusFor(row)).resources; track resource.item_id) {
                             <li [matTooltip]="resource.label[locale]">
                                 <img [alt]="resource.label[locale]" [src]="HORDES_IMG_REPO + resource.img">
                                 <span>×{{ resource.count }}</span>

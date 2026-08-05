@@ -1,11 +1,10 @@
-import { HttpContextToken, HttpEvent, HttpHandlerFn, HttpRequest } from '@angular/common/http';
+import { HttpEvent, HttpHandlerFn, HttpRequest } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { finalize } from 'rxjs/operators';
 
+import { BYPASS_LOADING } from './http-context-tokens';
 import { LoadingOverlayService } from './loading-overlay.service';
-
-export const BYPASS_LOADING: HttpContextToken<boolean> = new HttpContextToken(() => false);
 
 /** Intercepte les appels REST pour afficher un loader */
 export function loadingInterceptor(request: HttpRequest<unknown>, next: HttpHandlerFn): Observable<HttpEvent<unknown>> {

@@ -1,0 +1,297 @@
+{
+  "small_refine_#00": {
+    "RNE": "initial",
+    "PANDE": "unlocked"
+  },
+  "small_door_closed_#00": {
+    "RNE": "initial",
+    "PANDE": "unlocked"
+  },
+  "item_tagger_#00": {
+    "RNE": "initial",
+    "PANDE": "unlocked"
+  },
+  "small_wallimprove_#00": {
+    "RNE": "initial",
+    "PANDE": "unlocked"
+  },
+  "small_gather_#02": {
+    "RNE": "unlocked",
+    "PANDE": "unlocked"
+  },
+  "small_vaudoudoll_#00": {
+    "RNE": "disabled",
+    "RE": "disabled",
+    "PANDE": "disabled",
+    "CUSTOM": "disabled"
+  },
+  "small_bokorsword_#00": {
+    "RNE": "disabled",
+    "RE": "disabled",
+    "PANDE": "disabled",
+    "CUSTOM": "disabled"
+  },
+  "small_spiritmirage_#00": {
+    "RNE": "disabled",
+    "RE": "disabled",
+    "PANDE": "disabled",
+    "CUSTOM": "disabled"
+  },
+  "small_holyrain_#00": {
+    "RNE": "disabled",
+    "RE": "disabled",
+    "PANDE": "disabled",
+    "CUSTOM": "disabled"
+  },
+  "small_novlamps_#00": {
+    "RNE": "disabled",
+    "PANDE": "unlocked"
+  },
+  "small_spa4souls_#01": {
+    "RNE": "disabled",
+    "PANDE": "unlocked"
+  },
+  "status_terror_#00": {
+    "PANDE": "unlocked"
+  },
+  "small_dig_#01": {
+    "PANDE": "unlocked"
+  },
+  "small_trap_#00": {
+    "PANDE": "unlocked"
+  },
+  "small_dig_#02": {
+    "PANDE": "unlocked"
+  },
+  "small_trap_#02": {
+    "PANDE": "unlocked"
+  },
+  "small_tnt_#00": {
+    "PANDE": "unlocked"
+  },
+  "item_wood_plate_#00": {
+    "PANDE": "unlocked"
+  },
+  "small_bamba_#00": {
+    "PANDE": "unlocked"
+  },
+  "small_trap_#01": {
+    "PANDE": "unlocked"
+  },
+  "status_terror_#01": {
+    "PANDE": "unlocked"
+  },
+  "small_grinder_#00": {
+    "PANDE": "unlocked"
+  },
+  "small_gather_#00": {
+    "PANDE": "unlocked"
+  },
+  "small_gallery_#00": {
+    "PANDE": "unlocked"
+  },
+  "small_gather_#01": {
+    "PANDE": "unlocked"
+  },
+  "small_spears_#00": {
+    "PANDE": "unlocked"
+  },
+  "small_waterhole_#00": {
+    "PANDE": "unlocked"
+  },
+  "small_barbed_#00": {
+    "PANDE": "unlocked"
+  },
+  "small_meatbarbed_#00": {
+    "PANDE": "unlocked"
+  },
+  "small_wallimprove_#01": {
+    "PANDE": "unlocked"
+  },
+  "item_plate_#02": {
+    "PANDE": "unlocked"
+  },
+  "item_home_def_#00": {
+    "PANDE": "unlocked"
+  },
+  "item_plate_#03": {
+    "PANDE": "unlocked"
+  },
+  "item_plate_#06": {
+    "PANDE": "unlocked"
+  },
+  "item_plate_#07": {
+    "PANDE": "unlocked"
+  },
+  "item_plate_#10": {
+    "PANDE": "unlocked"
+  },
+  "small_water_#00": {
+    "PANDE": "unlocked"
+  },
+  "small_waterspray_#00": {
+    "PANDE": "unlocked"
+  },
+  "small_waterspray_#01": {
+    "PANDE": "unlocked"
+  },
+  "small_watercanon_#00": {
+    "PANDE": "unlocked"
+  },
+  "small_gazspray_#00": {
+    "PANDE": "unlocked"
+  },
+  "small_sprinkler_#00": {
+    "PANDE": "unlocked"
+  },
+  "small_acidspray_#00": {
+    "PANDE": "unlocked"
+  },
+  "item_jerrycan_#00": {
+    "PANDE": "unlocked"
+  },
+  "item_vegetable_tasty_#00": {
+    "PANDE": "unlocked"
+  },
+  "item_bgrenade_#01": {
+    "PANDE": "unlocked"
+  },
+  "item_boomfruit_#01": {
+    "PANDE": "unlocked"
+  },
+  "small_appletree_#00": {
+    "PANDE": "unlocked"
+  },
+  "item_bgrenade_#00": {
+    "PANDE": "unlocked"
+  },
+  "small_eden_#00": {
+    "PANDE": "unlocked"
+  },
+  "small_derrick_#00": {
+    "PANDE": "unlocked"
+  },
+  "item_firework_tube_#00": {
+    "PANDE": "unlocked"
+  },
+  "small_valve_#00": {
+    "PANDE": "unlocked"
+  },
+  "small_survarea_#00": {
+    "PANDE": "unlocked"
+  },
+  "item_tube_#00": {
+    "PANDE": "unlocked"
+  },
+  "item_tube_#01": {
+    "PANDE": "unlocked"
+  },
+  "item_meat_#00": {
+    "PANDE": "unlocked"
+  },
+  "item_hmeat_#00": {
+    "PANDE": "unlocked"
+  },
+  "small_factory_#00": {
+    "PANDE": "unlocked"
+  },
+  "r_dhang_#00": {
+    "PANDE": "unlocked"
+  },
+  "small_fleshcage_#00": {
+    "PANDE": "unlocked"
+  },
+  "small_techtable_#00": {
+    "PANDE": "unlocked"
+  },
+  "item_tagger_#02": {
+    "PANDE": "unlocked"
+  },
+  "item_courroie_#00": {
+    "PANDE": "unlocked"
+  },
+  "small_lighthouse_#00": {
+    "PANDE": "unlocked"
+  },
+  "small_round_path_#00": {
+    "PANDE": "unlocked"
+  },
+  "small_armor_#00": {
+    "PANDE": "unlocked"
+  },
+  "small_watchmen_#00": {
+    "PANDE": "unlocked"
+  },
+  "small_watchmen_#02": {
+    "PANDE": "unlocked"
+  },
+  "small_pet_#00": {
+    "PANDE": "unlocked"
+  },
+  "item_scope_#00": {
+    "PANDE": "unlocked"
+  },
+  "item_electro_#00": {
+    "PANDE": "unlocked"
+  },
+  "small_watchmen_#01": {
+    "PANDE": "unlocked"
+  },
+  "small_building_#00": {
+    "PANDE": "unlocked"
+  },
+  "item_meca_parts_#00": {
+    "PANDE": "unlocked"
+  },
+  "small_city_up_#00": {
+    "PANDE": "unlocked"
+  },
+  "small_castle_#00": {
+    "PANDE": "unlocked"
+  },
+  "small_pmvbig_#00": {
+    "PANDE": "unlocked"
+  },
+  "small_wheel_#00": {
+    "PANDE": "unlocked"
+  },
+  "small_lastchance_#00": {
+    "PANDE": "unlocked"
+  },
+  "small_fireworks_#00": {
+    "PANDE": "unlocked"
+  },
+  "small_labyrinth_#00": {
+    "PANDE": "unlocked"
+  },
+  "small_arma_#00": {
+    "PANDE": "unlocked"
+  },
+  "small_infirmary_#00": {
+    "PANDE": "unlocked"
+  },
+  "small_crow_#00": {
+    "PANDE": "unlocked"
+  },
+  "small_thermal_#00": {
+    "PANDE": "unlocked"
+  },
+  "item_soul_blue_static_#00": {
+    "PANDE": "unlocked"
+  },
+  "small_spa4souls_#00": {
+    "PANDE": "unlocked"
+  },
+  "item_rp_book2_#00": {
+    "PANDE": "unlocked"
+  },
+  "small_cemetery_#00": {
+    "PANDE": "unlocked"
+  },
+  "small_pyre_#00": {
+    "PANDE": "unlocked"
+  },
+  "small_balloon_#00": {
+    "PANDE": "unlocked"
+  }
+}
