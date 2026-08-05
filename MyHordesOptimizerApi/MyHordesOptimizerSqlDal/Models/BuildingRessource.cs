@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace MyHordesOptimizerApi.Models;
 
-[PrimaryKey("IdBuilding", "IdItem")]
+[PrimaryKey("IdBuilding", "IdItem", "ResourceTier")]
 [Index("IdItem", Name = "idItem")]
 public partial class BuildingRessource
 {
@@ -17,6 +17,11 @@ public partial class BuildingRessource
     [Key]
     [Column("idItem", TypeName = "int(11)")]
     public int IdItem { get; set; }
+
+    /// <summary>0 = Default (existant), 1 = Hard (tier0), 2 = Easy (tier1 et tier2).</summary>
+    [Key]
+    [Column("resourceTier")]
+    public int ResourceTier { get; set; }
 
     [Column("count", TypeName = "int(11)")]
     public int Count { get; set; }

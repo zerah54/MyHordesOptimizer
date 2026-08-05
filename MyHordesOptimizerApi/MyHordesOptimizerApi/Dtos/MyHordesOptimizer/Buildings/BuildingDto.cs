@@ -1,3 +1,4 @@
+using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
 using System.Collections.Generic;
 
 namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Buildings
@@ -6,16 +7,10 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Buildings
     /// Un chantier du référentiel, tel que le site l'affiche.
     /// </summary>
     /// <remarks>
-    /// <para>
-    /// Les valeurs de coût — <see cref="Pa"/> et <see cref="Resources"/> — sont celles du jeu de
-    /// ressources PAR DÉFAUT. MyHordes en définit trois (défaut, facile, difficile) et le mode
-    /// Pandémonium utilise le difficile, qui diffère réellement pour 71 chantiers sur 166 (la
-    /// Pompe y coûte 60 eau au lieu de 20). Ces jeux ne sont pas exposés par l'API : ils vivent
-    /// dans les fixtures du jeu, et leur extraction reste à faire.
-    /// </para>
-    /// <para>
-    /// C'est pourquoi le site doit dire explicitement que la page vaut pour les modes standard.
-    /// </para>
+    /// <see cref="Pa"/>/<see cref="Resources"/> sont le jeu Default (affiché hors Pandémonium).
+    /// Porte aussi les trois paliers Pandémonium (0/1/2 plans lus, <see cref="Tier0Ap"/> et
+    /// suivants) et la disponibilité par TownType — extraits depuis les fixtures et
+    /// <c>rules.yml</c> du jeu, aucune API MyHordes ne les expose (chantier du 2026-08-06).
     /// </remarks>
     public class BuildingDto
     {
@@ -44,7 +39,33 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Buildings
         /// <summary>Niveau de plan requis. 0 = constructible sans plan.</summary>
         public int Rarity { get; set; }
 
+        /// <summary>Jeu de ressources Default — celui affiché hors Pandémonium.</summary>
         public List<BuildingResourceDto> Resources { get; set; } = new List<BuildingResourceDto>();
+
+        /// <summary>Vrai si ce chantier a un jeu de ressources Pandémonium distinct.</summary>
+        public bool HasHardMode { get; set; }
+
+        /// <summary>0 plan lu — jeu Hard. Vide/null si HasHardMode est faux.</summary>
+        public int? Tier0Ap { get; set; }
+        public List<BuildingResourceDto> Tier0Resources { get; set; } = new List<BuildingResourceDto>();
+
+        /// <summary>1 plan lu — jeu Easy. Les ressources de Tier2 sont IDENTIQUES.</summary>
+        public int? Tier1Ap { get; set; }
+        public List<BuildingResourceDto> Tier1Resources { get; set; } = new List<BuildingResourceDto>();
+
+        /// <summary>2 plans lus — jeu Easy avec PA réduit. Pas de Tier2Resources : identiques à Tier1Resources.</summary>
+        public int? Tier2Ap { get; set; }
+
+        /// <summary>
+        /// Niveau de plan réellement requis en Pandémonium, quand ce chantier est overridé
+        /// nommément dans rules.yml. Null si le chantier ne relève que de la règle générique —
+        /// dans ce cas, la rareté de base (<see cref="Rarity"/>) reste la seule affichable.
+        /// </summary>
+        public int? HardBlueprintLevel { get; set; }
+
+        /// <summary>Disponibilité par TownType. Une entrée absente signifie « disponible normalement ».</summary>
+        public IDictionary<TownType, BuildingAvailabilityStatus> Availability { get; set; }
+            = new Dictionary<TownType, BuildingAvailabilityStatus>();
     }
 
     /// <summary>Une ressource requise par un chantier, avec sa quantité.</summary>

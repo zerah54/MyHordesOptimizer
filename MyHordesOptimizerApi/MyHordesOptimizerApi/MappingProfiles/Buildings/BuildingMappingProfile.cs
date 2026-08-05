@@ -87,7 +87,21 @@ namespace MyHordesOptimizerApi.MappingProfiles.Buildings
                     { "es", model.DescriptionEs },
                     { "de", model.DescriptionDe }
                 }))
-                .ForMember(dto => dto.Resources, opt => opt.MapFrom(model => model.BuildingRessources));
+                .ForMember(dto => dto.Resources, opt => opt.MapFrom(model =>
+                    model.BuildingRessources.Where(resource => resource.ResourceTier == 0)))
+                .ForMember(dto => dto.HasHardMode, opt => opt.MapFrom(model => model.HasHardMode))
+                .ForMember(dto => dto.Tier0Resources, opt => opt.MapFrom(model =>
+                    model.BuildingRessources.Where(resource => resource.ResourceTier == 1)))
+                .ForMember(dto => dto.Tier1Resources, opt => opt.MapFrom(model =>
+                    model.BuildingRessources.Where(resource => resource.ResourceTier == 2)))
+                .ForMember(dto => dto.Tier0Ap, opt => opt.MapFrom(model => model.Tier0Ap))
+                .ForMember(dto => dto.Tier1Ap, opt => opt.MapFrom(model => model.Tier1Ap))
+                .ForMember(dto => dto.Tier2Ap, opt => opt.MapFrom(model => model.Tier2Ap))
+                .ForMember(dto => dto.HardBlueprintLevel, opt => opt.MapFrom(model => model.HardBlueprintLevel))
+                .ForMember(dto => dto.Availability, opt => opt.MapFrom(model => model.BuildingAvailabilities
+                    .ToDictionary(
+                        availability => (Dtos.MyHordesOptimizer.TownType)availability.TownType,
+                        availability => (BuildingAvailabilityStatus)availability.Status)));
 
             CreateMap<BuildingRessource, BuildingResourceDto>()
                 .ForMember(dto => dto.ItemId, opt => opt.MapFrom(model => model.IdItem))

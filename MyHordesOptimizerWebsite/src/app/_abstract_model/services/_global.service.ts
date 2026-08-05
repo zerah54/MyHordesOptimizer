@@ -3,8 +3,7 @@ import { inject } from '@angular/core';
 import { Observable } from 'rxjs';
 
 import { environment } from '../../../environments/environment';
-import { BYPASS_ERROR } from '../../_core/services/errors-interceptor.service';
-import { BYPASS_LOADING } from '../../_core/services/loading-interceptor.service';
+import { BYPASS_ERROR, BYPASS_LOADING } from '../../_core/services/http-context-tokens';
 
 export class GlobalService {
     protected readonly API_URL: string = environment.api_url;

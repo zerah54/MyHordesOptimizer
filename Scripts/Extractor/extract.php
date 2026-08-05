@@ -18,6 +18,7 @@ use MyHordesOptimizer\Extractor\Config;
 use MyHordesOptimizer\Extractor\DriftReport;
 use MyHordesOptimizer\Extractor\FixtureHarness;
 use MyHordesOptimizer\Extractor\Projections;
+use MyHordesOptimizer\Extractor\RulesYamlReader;
 use MyHordesOptimizer\Extractor\SourceFetcher;
 
 require __DIR__ . '/vendor/autoload.php';
@@ -57,6 +58,12 @@ try {
     $brut = $harnais->extraire();
     $harnais->ecrireBrut(__DIR__ . '/raw', $brut, $meta);
     echo '  ', count($brut), ' chaînes écrites dans raw/', PHP_EOL;
+
+    echo '→ Lecture de rules.yml (disponibilité + overrides de rareté)…', PHP_EOL;
+    $rulesYaml = new RulesYamlReader();
+    $cheminRules = $source . '/config/app/rules.yml';
+    $brut['mho.buildings.availability'] = $rulesYaml->disponibilite($cheminRules);
+    $brut['mho.buildings.rarity_overrides'] = $rulesYaml->overridesRarete($cheminRules);
 
     if ($rawOnly) {
         echo 'Terminé (--raw-only).', PHP_EOL;

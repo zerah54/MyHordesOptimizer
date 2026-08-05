@@ -471,6 +471,22 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
                     buildingModel.WatchSurvivalBonusUpgradeLevelRequired = buildingCode.Value.WatchSurvivalBonusUpgradeLevelRequired;
                 }
             }
+
+            var buildingHardResources = MyHordesCodeRepository.GetBuildingHardResources();
+            foreach (var (uid, hardResources) in buildingHardResources)
+            {
+                var buildingModel = buildingModels.FirstOrDefault(building => building.Uid == uid);
+                if (buildingModel == null)
+                {
+                    continue;
+                }
+                buildingModel.HasHardMode = true;
+                buildingModel.Tier0Ap = hardResources.Tier0.Ap;
+                buildingModel.Tier1Ap = hardResources.Tier1.Ap;
+                buildingModel.Tier2Ap = hardResources.Tier2.Ap;
+                buildingModel.HardBlueprintLevel = hardResources.RareteEffective;
+            }
+
             var modelesParUid = buildingModels
                 .Where(building => !string.IsNullOrEmpty(building.Uid))
                 .ToDictionary(building => building.Uid!, StringComparer.Ordinal);
@@ -500,6 +516,13 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
             var clesItemParMhId = DbContext.Items
                 .Where(item => item.MhId != null)
                 .ToDictionary(item => item.MhId!.Value, item => item.IdItem);
+
+            // Les ressources des paliers Pandémonium (Data/Buildings/hard-resources.json)
+            // désignent les objets par uid, pas par MhId — voir BuildingImportHelpers.ConstruireRessourcesPandemonium
+            // plus bas, qui ne peut donc pas passer par clesItemParMhId ni PropagerCleAuxRessources.
+            var clesItemParUid = DbContext.Items
+                .Where(item => item.Uid != null)
+                .ToDictionary(item => item.Uid!, item => item.IdItem, StringComparer.Ordinal);
 
             var batimentsTraites = new List<Building>();
             foreach (var (existant, nouveauMhId) in rapprochement.AMettreAJour)
@@ -618,6 +641,19 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
                     sansIdentite.IdBuilding);
             }
 
+            foreach (var batiment in batimentsTraites)
+            {
+                if (batiment.Uid != null && buildingHardResources.TryGetValue(batiment.Uid, out var hardResources))
+                {
+                    var ressourcesPandemonium = BuildingImportHelpers.ConstruireRessourcesPandemonium(
+                        batiment.IdBuilding, hardResources, clesItemParUid, Logger);
+                    foreach (var ressource in ressourcesPandemonium)
+                    {
+                        batiment.BuildingRessources.Add(ressource);
+                    }
+                }
+            }
+
             DbContext.SaveChanges();
 
             var buildingWatchSurvivalJobs = new List<BuildingWatchSurvivalBonusJob>();
@@ -649,6 +685,15 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
             var comparer = EqualityComparerFactory.Create<BuildingWatchSurvivalBonusJob>(buildingSurvivalJob => HashCode.Combine(buildingSurvivalJob.JobUid, buildingSurvivalJob.IdBuilding),
                 (a, b) => a.JobUid == b.JobUid && a.IdBuilding == b.IdBuilding);
             DbContext.Patch(buildingSurvivalJobsFromDb, buildingWatchSurvivalJobs, comparer);
+
+            var buildingAvailability = MyHordesCodeRepository.GetBuildingAvailability();
+            var availabilityDesired = BuildingImportHelpers.ConstruireDisponibilite(buildingAvailability, clesParUid, Logger);
+
+            var availabilityFromDb = DbContext.BuildingAvailabilities.ToList();
+            var availabilityComparer = EqualityComparerFactory.Create<BuildingAvailability>(
+                a => HashCode.Combine(a.IdBuilding, a.TownType),
+                (a, b) => a.IdBuilding == b.IdBuilding && a.TownType == b.TownType);
+            DbContext.Patch(availabilityFromDb, availabilityDesired, availabilityComparer);
         }
 
         /// <summary>

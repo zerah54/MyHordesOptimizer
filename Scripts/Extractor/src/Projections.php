@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace MyHordesOptimizer\Extractor;
 
+use App\Entity\CauseOfDeath;
+use App\Entity\Recipe;
+use RuntimeException;
+
 /**
  * ③ Table de projection : les fichiers de `MyHordesOptimizerApi/MyHordesOptimizerApi/Data/**`
  * produits par l'extracteur.
@@ -23,7 +27,7 @@ final class Projections
                 'Items/find.json',
                 'myhordes.fixtures.items.groups',
                 null,
-                static fn (array $groupes): array => self::enveloppeNiveau2($groupes),
+                static fn(array $groupes): array => self::enveloppeNiveau2($groupes),
                 // Pas de schéma d'entrée fixe : les clés de premier niveau sont des noms de
                 // groupes et celles de deuxième niveau des codes d'objets — des données, pas des
                 // champs. Y détecter une dérive de forme ferait crier au loup à chaque ajout
@@ -35,14 +39,14 @@ final class Projections
                 'Items/recipes.json',
                 'myhordes.fixtures.recipes',
                 null,
-                static fn (array $recettes): array => self::normaliserRecettes($recettes)
+                static fn(array $recettes): array => self::normaliserRecettes($recettes)
             ),
 
             new Projection(
                 'Ruins/ruins.json',
                 'myhordes.fixtures.ruins.data',
                 null,
-                static fn (array $ruines): array => self::normaliserRuines($ruines)
+                static fn(array $ruines): array => self::normaliserRuines($ruines)
             ),
 
             new Projection('Heroes/capacities.json', 'myhordes.fixtures.heroskills'),
@@ -59,7 +63,7 @@ final class Projections
                 'Heroes/powers.json',
                 'myhordes.fixtures.actions',
                 'heroics',
-                static fn (array $heroics, array $brut): array => self::refondrePouvoirs(
+                static fn(array $heroics, array $brut): array => self::refondrePouvoirs(
                     $heroics,
                     self::auxiliaire($brut, 'myhordes.fixtures.actions', 'actions')
                 )
@@ -69,7 +73,7 @@ final class Projections
                 'Items/item-properties.json',
                 'myhordes.fixtures.items.properties',
                 null,
-                static fn (array $proprietes, array $brut): array => self::ajouterFragile(
+                static fn(array $proprietes, array $brut): array => self::ajouterFragile(
                     $proprietes,
                     self::auxiliaire($brut, 'myhordes.fixtures.actions', 'items_cata'),
                     self::auxiliaire($brut, 'myhordes.fixtures.actions', 'actions')
@@ -80,9 +84,95 @@ final class Projections
                 'CauseOfDeath/cause-of-death.json',
                 'myhordes.fixtures.citizen.deaths',
                 null,
-                static fn (array $causes): array => self::nommerCausesDeMort($causes)
+                static fn(array $causes): array => self::nommerCausesDeMort($causes)
+            ),
+
+            // Disponibilité par mode de ville — pas de schéma d'entrée fixe (les clés de premier
+            // niveau sont des uids de chantiers, pas des noms de champs), d'où detecterLaForme=false.
+            new Projection('Buildings/availability.json', 'mho.buildings.availability', null, null, false),
+
+            new Projection(
+                'Buildings/hard-resources.json',
+                'myhordes.fixtures.buildings',
+                null,
+                static fn(array $buildings, array $brut): array => self::normaliserPaliersPandemonium(
+                    $buildings,
+                    self::overridesRarete($brut)
+                )
             ),
         ];
+    }
+
+    /**
+     * Facteur de réduction du PA à la 2ᵉ lecture de plan, recopié de
+     * `App\Entity\Building::getPrototypeAP` (match sur la rareté effective). Non extractible : du
+     * code impératif, pas une donnée de fixtures — vigie par le test qui fige cette table.
+     */
+    private const FACTEUR_REDUCTION_TIER2 = [0 => 0.65, 1 => 0.65, 2 => 0.70, 3 => 0.75, 4 => 0.85];
+
+    /** @return array<string, array<mixed>> */
+    private static function overridesRarete(array $brut): array
+    {
+        if (!isset($brut['mho.buildings.rarity_overrides']) || !is_array($brut['mho.buildings.rarity_overrides'])) {
+            throw new RuntimeException("Chaîne auxiliaire « mho.buildings.rarity_overrides » absente.");
+        }
+
+        return $brut['mho.buildings.rarity_overrides'];
+    }
+
+    /**
+     * @param array<string, array<mixed>> $buildings
+     * @param array<string, int> $overridesRarete
+     * @return array<string, array<mixed>>
+     */
+    private static function normaliserPaliersPandemonium(array $buildings, array $overridesRarete): array
+    {
+        $resultat = [];
+
+        foreach ($buildings as $uid => $batiment) {
+            if (($batiment['hasHardMode'] ?? false) !== true) {
+                continue;
+            }
+
+            $rareteBase = (int)($batiment['blueprintLevel'] ?? 0);
+            $rareteEffective = $overridesRarete[$uid]
+                ?? $overridesRarete["{$rareteBase}>"]
+                ?? $overridesRarete['*']
+                ?? $rareteBase;
+
+            $facteur = self::FACTEUR_REDUCTION_TIER2[$rareteEffective] ?? 1;
+            // MyHordes n'émet hardAp/easyAp que lorsqu'ils DIFFÈRENT du PA par défaut
+            // (BuildingPrototypeDataElement.php:117,123 : `$this->hardAp ?? $this->ap`,
+            // `$this->easyAp ?? $this->ap`) — l'absence signifie repli, pas donnée manquante.
+            // Même repli pour les ressources (lignes 118, 124), par cohérence et robustesse.
+            $apParDefaut = (int)($batiment['ap'] ?? 0);
+            $ressourcesParDefaut = $batiment['resources'] ?? [];
+            $tier1Ap = (int)($batiment['easyAp'] ?? $apParDefaut);
+
+            $resultat[$uid] = [
+                'tier0' => [
+                    'resources' => $batiment['hardResources'] ?? $ressourcesParDefaut,
+                    'ap' => (int)($batiment['hardAp'] ?? $apParDefaut),
+                ],
+                'tier1' => [
+                    'resources' => $batiment['easyResources'] ?? $ressourcesParDefaut,
+                    'ap' => $tier1Ap,
+                ],
+                'tier2' => [
+                    'ap' => (int)floor($tier1Ap * $facteur),
+                ],
+            ];
+
+            // Exposée SEULEMENT quand le nom exact du bâtiment est dans la table d'overrides : la
+            // règle générique ('0>', '*') ne donne qu'un facteur de calcul, pas une vraie rareté de
+            // plan (son « 5 » n'a aucun rapport avec BlueprintEnum côté site, qui désigne par ce
+            // niveau un chantier d'événement Pâques).
+            if (array_key_exists($uid, $overridesRarete)) {
+                $resultat[$uid]['rareteEffective'] = $overridesRarete[$uid];
+            }
+        }
+
+        return $resultat;
     }
 
     /**
@@ -121,7 +211,7 @@ final class Projections
 
             if (isset($recette['type']) && is_int($recette['type'])) {
                 $recettes[$code]['type'] = PhpConstants::nomPour(
-                    \App\Entity\Recipe::class,
+                    Recipe::class,
                     $recette['type'],
                     'Recipe'
                 );
@@ -199,7 +289,7 @@ final class Projections
             $nom = $heroique['name'];
 
             if (!isset($actions[$nom])) {
-                throw new \RuntimeException(
+                throw new RuntimeException(
                     "Le pouvoir héroïque « $nom » n'a pas d'action correspondante."
                 );
             }
@@ -241,7 +331,7 @@ final class Projections
             // `morph_cata_fine`, donc l'objet serait marqué fragile. Une absence deviendrait une
             // affirmation. On échoue bruyamment à la place.
             if (!isset($actions[$effet]['result'])) {
-                throw new \RuntimeException(
+                throw new RuntimeException(
                     "L'effet de catapulte « $effet » de l'objet « $objet » n'a aucun résultat défini."
                 );
             }
@@ -268,7 +358,7 @@ final class Projections
     private static function auxiliaire(array $brut, string $chaine, string $sousCle): array
     {
         if (!isset($brut[$chaine][$sousCle]) || !is_array($brut[$chaine][$sousCle])) {
-            throw new \RuntimeException(
+            throw new RuntimeException(
                 "Sous-clé auxiliaire « $sousCle » introuvable dans la chaîne « $chaine »."
             );
         }
@@ -289,7 +379,7 @@ final class Projections
             $valeur = $cause['ref'];
 
             $causes[$index]['ref'] = PhpConstants::nomPour(
-                \App\Entity\CauseOfDeath::class,
+                CauseOfDeath::class,
                 $valeur,
                 ''
             );

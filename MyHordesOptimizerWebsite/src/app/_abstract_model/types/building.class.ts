@@ -1,7 +1,7 @@
-import { BuildingDTO, BuildingResourceDTO } from '../dto/building.dto';
+import { BuildingAvailabilityStatusDTO, BuildingDTO, BuildingResourceDTO } from '../dto/building.dto';
 import { BlueprintEnum } from '../enum/blueprint.enum';
 import { CommonModel } from './_common.class';
-import { I18nLabels } from './_types';
+import { I18nLabels, TownTypeId } from './_types';
 
 /** Une ressource requise par un chantier. */
 export class BuildingResource extends CommonModel<BuildingResourceDTO> {
@@ -48,6 +48,14 @@ export class Building extends CommonModel<BuildingDTO> {
     public has_upgrade!: boolean;
     public rarity!: number;
     public resources: BuildingResource[] = [];
+    public has_hard_mode!: boolean;
+    public tier0_ap: number | null = null;
+    public tier0_resources: BuildingResource[] = [];
+    public tier1_ap: number | null = null;
+    public tier1_resources: BuildingResource[] = [];
+    public tier2_ap: number | null = null;
+    public hard_blueprint_level: number | null = null;
+    public availability: Partial<Record<TownTypeId, BuildingAvailabilityStatusDTO>> = {};
 
     /** Évolutions directes, reconstruites à l'affichage — jamais transmises par l'API. */
     public children: Building[] = [];
@@ -80,7 +88,15 @@ export class Building extends CommonModel<BuildingDTO> {
             temporary: this.temporary,
             hasUpgrade: this.has_upgrade,
             rarity: this.rarity,
-            resources: this.resources.map((resource: BuildingResource): BuildingResourceDTO => resource.modelToDto())
+            resources: this.resources.map((resource: BuildingResource): BuildingResourceDTO => resource.modelToDto()),
+            hasHardMode: this.has_hard_mode,
+            tier0Ap: this.tier0_ap,
+            tier0Resources: this.tier0_resources.map((resource: BuildingResource): BuildingResourceDTO => resource.modelToDto()),
+            tier1Ap: this.tier1_ap,
+            tier1Resources: this.tier1_resources.map((resource: BuildingResource): BuildingResourceDTO => resource.modelToDto()),
+            tier2Ap: this.tier2_ap,
+            hardBlueprintLevel: this.hard_blueprint_level,
+            availability: this.availability
         };
     }
 
@@ -101,6 +117,14 @@ export class Building extends CommonModel<BuildingDTO> {
             this.has_upgrade = dto.hasUpgrade;
             this.rarity = dto.rarity;
             this.resources = (dto.resources ?? []).map((resource: BuildingResourceDTO): BuildingResource => new BuildingResource(resource));
+            this.has_hard_mode = dto.hasHardMode;
+            this.tier0_ap = dto.tier0Ap ?? null;
+            this.tier0_resources = (dto.tier0Resources ?? []).map((resource: BuildingResourceDTO): BuildingResource => new BuildingResource(resource));
+            this.tier1_ap = dto.tier1Ap ?? null;
+            this.tier1_resources = (dto.tier1Resources ?? []).map((resource: BuildingResourceDTO): BuildingResource => new BuildingResource(resource));
+            this.tier2_ap = dto.tier2Ap ?? null;
+            this.hard_blueprint_level = dto.hardBlueprintLevel ?? null;
+            this.availability = dto.availability ?? {};
         }
     }
 }
