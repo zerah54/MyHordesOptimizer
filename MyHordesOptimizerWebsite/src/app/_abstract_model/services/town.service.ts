@@ -1,7 +1,23 @@
 import { HttpErrorResponse, HttpParams, HttpResponse, HttpStatusCode } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import moment from 'moment';
-import { catchError, concat, EMPTY, exhaustMap, filter, map, Observable, of, Subscriber, switchMap, takeUntil, takeWhile, throwError, timer } from 'rxjs';
+import {
+    BehaviorSubject,
+    catchError,
+    concat,
+    EMPTY,
+    exhaustMap,
+    filter,
+    map,
+    Observable,
+    of,
+    Subscriber,
+    switchMap,
+    takeUntil,
+    takeWhile,
+    throwError,
+    timer
+} from 'rxjs';
 
 import { SnackbarService } from '../../_core/services/snackbar.service';
 import { TownContextService } from '../../_core/services/town-context.service';
@@ -38,6 +54,26 @@ export class TownService extends GlobalService {
 
     /** La locale */
     private readonly locale: string = moment.locale();
+
+    /** Source unique du citoyen du joueur courant, partagée entre le menu compte et la liste des
+     *  citoyens (cf. docs/superpowers/specs/2026-08-05-menu-compte-header-design.md). */
+    private readonly my_citizen_subject: BehaviorSubject<Citizen | null> = new BehaviorSubject<Citizen | null>(null);
+    /** Le citoyen du joueur courant, tel que publié en dernier par n'importe quel consommateur. */
+    public readonly myCitizen$: Observable<Citizen | null> = this.my_citizen_subject.asObservable();
+
+    /** Publie une nouvelle version du citoyen du joueur courant : à appeler après tout fetch ou toute mutation réussie le concernant. */
+    public publishMyCitizen(citizen: Citizen): void {
+        this.my_citizen_subject.next(citizen);
+    }
+
+    /** Recharge le citoyen du joueur courant depuis le serveur et le republie (ex : après une mise à jour des outils externes). */
+    public refreshMyCitizen(): void {
+        const user_id: number | null = getUserId();
+        if (!user_id) return;
+        this.getCitizen(user_id).subscribe({
+            next: (citizen: Citizen) => this.publishMyCitizen(citizen)
+        });
+    }
 
     /**
      * Récupère les informations de la banque
