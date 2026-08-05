@@ -110,6 +110,8 @@ export class ExternalToolsUpdateButtonComponent {
      * côté serveur : les outils encore en cours sont alors présentés comme dépassés.
      */
     private onFollowEnded(): void {
+        this.town_service.refreshMyCitizen();
+
         if (this.is_running) {
             this.tools_state.update((tools: ExternalToolUpdateStateDTO[]) => tools.map((tool: ExternalToolUpdateStateDTO) => {
                 if (tool.status !== 'pending') {

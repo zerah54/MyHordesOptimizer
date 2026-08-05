@@ -1,14 +1,21 @@
 @if (citizen) {
-    <div class="header-menu-citizen-part">
-        <div mat-menu-item class="pseudo" disabled>
-            <div>
-                <mho-citizen-info displayJob displayShunStatus [displayPseudoMode]="'simple'" [citizen]="citizen"></mho-citizen-info>
-            </div>
+    <div mat-menu-item class="pseudo" disabled>
+        <div>
+            <mho-avatar [src]="citizen.avatar"></mho-avatar>
+            <mho-citizen-info displayJob displayShunStatus [displayPseudoMode]="'simple'" [citizen]="citizen"></mho-citizen-info>
         </div>
-        <div mat-menu-item #statusItem [matMenuTriggerFor]="status" [role]="'menuitem'" i18n>États</div>
-        <div mat-menu-item [matMenuTriggerFor]="bag" [role]="'menuitem'" i18n>Sac</div>
-        <div mat-menu-item [matMenuTriggerFor]="heroicActions" [role]="'menuitem'" i18n>Actions héroïques</div>
-        <div mat-menu-item class="home" [matMenuTriggerFor]="home" [role]="'menuitem'" i18n>Améliorations</div>
+    </div>
+    <div mat-menu-item #statusTrigger="matMenuTrigger" [matMenuTriggerFor]="status" [role]="'menuitem'" (menuOpened)="closeOtherMenus('status')" i18n>États
+    </div>
+    <div mat-menu-item #bagTrigger="matMenuTrigger" [matMenuTriggerFor]="bag" [role]="'menuitem'" (menuOpened)="closeOtherMenus('bag')" i18n>Sac</div>
+    <div mat-menu-item #dailyActionsTrigger="matMenuTrigger" [matMenuTriggerFor]="dailyActions" [role]="'menuitem'"
+         (menuOpened)="closeOtherMenus('dailyActions')" i18n>Actions quotidiennes
+    </div>
+    <div mat-menu-item #heroicActionsTrigger="matMenuTrigger" [matMenuTriggerFor]="heroicActions" [role]="'menuitem'"
+         (menuOpened)="closeOtherMenus('heroicActions')" i18n>Actions héroïques
+    </div>
+    <div mat-menu-item #homeTrigger="matMenuTrigger" class="home" [matMenuTriggerFor]="home" [role]="'menuitem'" (menuOpened)="closeOtherMenus('home')" i18n>
+        Améliorations
     </div>
     <mat-menu #status (click)="$event.stopPropagation(); $event.preventDefault()" [xPosition]="'before'" [yPosition]="'below'"
               class="mho-menu-citizen-details statuses">
@@ -23,26 +30,22 @@
                                          i18n-emptyLabel (empty)="emptyStatus()">
             </mho-list-element-add-remove>
         </div>
-        <div class="bath" (click)="$event.stopPropagation();">
-            <mat-checkbox [checked]="dailyBathTaken()" (change)="saveBath($event)" i18n>Bain pris</mat-checkbox>
-        </div>
-        <div class="chamanic">
-            <div class="fields">
-                <mat-form-field [appearance]="'outline'" class="short-bottom compact-field" (click)="$event.stopPropagation();">
-                    <mat-label>
-                        <img [ngSrc]="HORDES_IMG_REPO + 'item/item_potion.gif'" width="16" height="16">
-                        <ng-container i18n>Potions bues</ng-container>
-                    </mat-label>
-                    <input matInput type="number" [(ngModel)]="citizen.chamanic_detail.nb_potion_shaman"
-                           (ngModelChange)="saveChamanicDetails(citizen)">
-                </mat-form-field>
-
-                <mat-checkbox [(ngModel)]="citizen.chamanic_detail.is_immune_to_soul"
-                              (ngModelChange)="saveChamanicDetails(citizen)">
-                    <img [ngSrc]="HORDES_IMG_REPO + 'item/item_potion.gif'" width="16" height="16">
-                    <ng-container i18n>Immunisé</ng-container>
-                </mat-checkbox>
-            </div>
+        <div class="chamanic band" (click)="$event.stopPropagation();">
+            <mho-compact-stepper
+                (valueChange)="changePotions($event)"
+                [disabled]="!!citizen.chamanic_detail.is_immune_to_soul" [min]="0"
+                [value]="citizen.chamanic_detail.nb_potion_shaman || 0"
+                i18n-label
+                icon="item/item_potion.gif"
+                label="Potions bues">
+            </mho-compact-stepper>
+            <mho-compact-toggle
+                (valueChange)="changeImmune($event)"
+                [value]="citizen.chamanic_detail.is_immune_to_soul"
+                i18n-label
+                icon="icons/small_restoresp.gif"
+                label="Immunisé">
+            </mho-compact-toggle>
         </div>
     </mat-menu>
     <mat-menu #bag (click)="$event.stopPropagation(); $event.preventDefault()" [xPosition]="'before'" [yPosition]="'below'"
@@ -59,81 +62,85 @@
             </mho-list-element-add-remove>
         </div>
     </mat-menu>
+    <mat-menu #dailyActions (click)="$event.stopPropagation(); $event.preventDefault()" [xPosition]="'before'" [yPosition]="'below'"
+              class="mho-menu-citizen-details daily-actions">
+        <div class="band" (click)="$event.stopPropagation();">
+            <mho-compact-toggle
+                (valueChange)="saveBath($event)"
+                [value]="dailyBathTaken()"
+                i18n-label
+                icon="building/small_pool.gif"
+                label="Bain pris">
+            </mho-compact-toggle>
+        </div>
+    </mat-menu>
     <mat-menu #heroicActions (click)="$event.stopPropagation(); $event.preventDefault()" [xPosition]="'before'" [yPosition]="'below'"
               class="mho-menu-citizen-details heroic-actions">
-        @for (action of (citizen.heroic_actions?.content || []); track $index) {
-            <div mat-menu-item [role]="action.element.value.max_lvl > 1 ? 'menuitem': 'menuitemcheckbox'" (click)="$event.stopPropagation();">
-                @if (action.element.value.max_lvl > 1) {
-                    <mat-form-field subscriptSizing="dynamic" [appearance]="'outline'" class="compact-field">
-                        <mat-label>{{ action.element.value.label }}</mat-label>
-                        <mat-select [(ngModel)]="action.value" (ngModelChange)="updateActions(action, $event)">
-                            @for (option of action.element.value.options; track option) {
-                                <mat-option [value]="option">{{ option }}</mat-option>
-                            }
-                        </mat-select>
-                    </mat-form-field>
-                } @else if (action.element.value.max_lvl === 1) {
-                    <mat-checkbox [checked]="action.value === true"
-                                  [indeterminate]="action.value === null || action.value === undefined"
-                                  (change)="updateActions(action, $event)">
-                        {{ action.element.value.label }}
-                    </mat-checkbox>
+        <div class="band" (click)="$event.stopPropagation();">
+            @for (action of (citizen.heroic_actions?.content || []); track $index) {
+                @if (action.element.value.max_lvl === 1) {
+                    <mho-compact-toggle
+                        (valueChange)="updateActions(action, $event)"
+                        [icon]="getHeroicIcon(action)"
+                        [label]="action.element.getLabel()"
+                        [value]="$any(action.value)">
+                    </mho-compact-toggle>
                 }
-            </div>
-        }
+            }
+        </div>
+        <div class="stepper-grid" (click)="$event.stopPropagation();">
+            @for (action of (citizen.heroic_actions?.content || []); track $index) {
+                @if (action.element.value.max_lvl > 1) {
+                    <mho-compact-stepper
+                        (valueChange)="updateActions(action, $event)"
+                        [icon]="getHeroicIcon(action)"
+                        [label]="action.element.getLabel()"
+                        [max]="action.element.value.max_lvl"
+                        [min]="0"
+                        [value]="$any(action.value)">
+                    </mho-compact-stepper>
+                }
+            }
+        </div>
     </mat-menu>
     <mat-menu #home (click)="$event.stopPropagation(); $event.preventDefault()" [xPosition]="'before'" [yPosition]="'below'"
               class="mho-menu-citizen-details home">
-        @for (home of (citizen.home?.content || []); track $index) {
-            <div mat-menu-item [role]="home.element.value.max_lvl > 1 ? 'menuitem': 'menuitemcheckbox'" (click)="$event.stopPropagation();">
+        <div class="band" (click)="$event.stopPropagation();">
+            @for (home of (citizen.home?.content || []); track $index) {
                 @if (!isHomeEditable(home)) {
-                    <!-- Niveau de maison : renseigné depuis MyHordes, jamais saisi. On garde l'icône
-                         et le libellé pour que l'entrée reste lisible sans son contrôle. -->
-                    <img style="vertical-align: middle; margin-right: 0.5em;"
-                         [ngSrc]="HORDES_IMG_REPO + 'home/home_lv' + home.value + '.gif'"
-                         width="16" height="16">
-                    <span>{{ home.element.value.label }}&nbsp;: {{ home.value }}</span>
-                } @else if (home.element.value.max_lvl > 1) {
-                    <mat-form-field subscriptSizing="dynamic" [appearance]="'outline'" class="compact-field">
-                        <mat-label>{{ home.element.value.label }}</mat-label>
-                        @if (home.element.value.img && home.element.value.img !== '') {
-                            <img style="vertical-align: super; margin-right: 0.5em;"
-                                 [ngSrc]="HORDES_IMG_REPO + home.element.value.img"
-                                 width="16" height="16">
-                        }
-                        @if (home.element.value.house_options) {
-                            <img style="vertical-align: super; margin-right: 0.5em;"
-                                 [ngSrc]="HORDES_IMG_REPO + 'home/home_lv' + home.value + '.gif'"
-                                 width="16" height="16">
-                        }
-                        <mat-select [ngModel]="home.value" (ngModelChange)="updateHome(home, $event)">
-                            @for (option of $any(home.element.value.house_options || home.element.value.options); track option; let i = $index; ) {
-                                <mat-option [value]="i">
-                                    @if (!$any(option)[locale]) {
-                                        {{ i }}
-                                    } @else {
-                                        <img [ngSrc]="HORDES_IMG_REPO + 'home/home_lv' + i + '.gif'"
-                                             style="margin-right: 0.5em;"
-                                             width="16" height="16">{{ $any(option)[locale] }}
-                                    }
-                                </mat-option>
-                            }
-                        </mat-select>
-                    </mat-form-field>
-                } @else {
-                    <mat-checkbox [checked]="home.value === true"
-                                  [indeterminate]="home.value === null || home.value === undefined"
-                                  (change)="updateHome(home, $event)">
-                        @if (home.element.value.img) {
-                            <img style="vertical-align: middle; margin-right: 0.5em;"
-                                 [ngSrc]="HORDES_IMG_REPO + home.element.value.img"
-                                 width="16" height="16">
-                        }
-                        {{ home.element.value.label }}
-                    </mat-checkbox>
+                    <!-- Niveau de maison : renseigné depuis MyHordes, jamais saisi. En tête de bande
+                         puisqu'elle n'est pas modifiable, à côté des toggles. -->
+                    <span [matTooltip]="home.element.getLabel()" class="home-readonly">
+                        <img [alt]="home.element.getLabel()" [src]="HORDES_IMG_REPO + getHomeIcon(home)">
+                        <span class="home-readonly-value">{{ home.value }}</span>
+                    </span>
                 }
-            </div>
-        }
+            }
+            @for (home of (citizen.home?.content || []); track $index) {
+                @if (isHomeEditable(home) && home.element.value.max_lvl === 1) {
+                    <mho-compact-toggle
+                        (valueChange)="updateHome(home, $event)"
+                        [icon]="home.element.value.img"
+                        [label]="home.element.getLabel()"
+                        [value]="$any(home.value)">
+                    </mho-compact-toggle>
+                }
+            }
+        </div>
+        <div class="stepper-grid" (click)="$event.stopPropagation();">
+            @for (home of (citizen.home?.content || []); track $index) {
+                @if (isHomeEditable(home) && home.element.value.max_lvl > 1) {
+                    <mho-compact-stepper
+                        (valueChange)="updateHome(home, $event)"
+                        [icon]="getHomeIcon(home)"
+                        [label]="home.element.getLabel()"
+                        [max]="home.element.value.max_lvl"
+                        [min]="0"
+                        [value]="$any(home.value)">
+                    </mho-compact-stepper>
+                }
+            }
+        </div>
     </mat-menu>
     <mat-divider></mat-divider>
 }

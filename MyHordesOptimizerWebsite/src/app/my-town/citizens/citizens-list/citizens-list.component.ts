@@ -30,11 +30,13 @@ import { CitizenInfo } from '../../../_abstract_model/types/citizen-info.class';
 import { HeroicActionsWithValue } from '../../../_abstract_model/types/heroic-actions.class';
 import { HomeWithValue } from '../../../_abstract_model/types/home.class';
 import { Item } from '../../../_abstract_model/types/item.class';
+import { Me } from '../../../_abstract_model/types/me.class';
 import { isHouseLevelEditable } from '../../../_abstract_model/types/town-details.class';
 import { UpdateInfo } from '../../../_abstract_model/types/update-info.class';
 import { ColumnIdPipe } from '../../../_core/pipes/column-id.pipe';
 import { ClipboardService } from '../../../_core/services/clipboard.service';
 import { TownContextService } from '../../../_core/services/town-context.service';
+import { getHeroicIcon, getHomeIcon } from '../../../_core/utilities/citizen.util';
 import { getTown, getUser } from '../../../_core/utilities/localstorage.util';
 import { AvatarComponent } from '../../../_shared/avatar/avatar.component';
 import { CitizenInfoComponent } from '../../../_shared/citizen-info/citizen-info.component';
@@ -187,6 +189,7 @@ export class CitizensListComponent implements OnInit {
     private update_menu_close_timer: ReturnType<typeof setTimeout> | null = null;
     private readonly api_service: ApiService = inject(ApiService);
     private readonly town_service: TownService = inject(TownService);
+    private readonly me: Me | null = getUser();
     private readonly destroy_ref: DestroyRef = inject(DestroyRef);
     private readonly dialog: MatDialog = inject(MatDialog);
     private readonly clipboard: ClipboardService = inject(ClipboardService);
@@ -212,6 +215,17 @@ export class CitizensListComponent implements OnInit {
         this.citizen_filter_change
             .pipe(takeUntilDestroyed(this.destroy_ref))
             .subscribe((): void => this.applyCitizenFilters());
+
+        this.town_service.myCitizen$
+            .pipe(takeUntilDestroyed(this.destroy_ref))
+            .subscribe({
+                next: (citizen: Citizen | null) => {
+                    if (!citizen) return;
+                    const index: number = this.citizen_list.data.findIndex((c: Citizen) => c.id === citizen.id);
+                    if (index === -1 || this.citizen_list.data[index] === citizen) return;
+                    this.citizen_list.data = this.citizen_list.data.map((c: Citizen) => c.id === citizen.id ? citizen : c);
+                }
+            });
 
         this.citizen_list.filterPredicate = (data: Citizen, filter: string): boolean => this.customFilter(data, filter);
         this.citizen_list.sortingDataAccessor = (citizen: Citizen, id: string): string | number => this.sortValue(citizen, id);
@@ -360,22 +374,12 @@ export class CitizensListComponent implements OnInit {
     }
 
     protected getHomeIcon(home: HomeWithValue): string {
-        const img: string = home.element.value.img;
-        if (img && img !== '') return img;
-        const level: number = typeof home.value === 'number' && home.value >= 0 ? home.value : 0;
-        return 'home/home_lv' + level + '.gif';
+        return getHomeIcon(home);
     }
 
-    /**
-     * Icône d'une action héroïque. Cas particulier de l'APAG (Appareil Photo d'Avant-Guerre) : l'icône
-     * reflète le nombre de charges restantes (`item_photo_{n}`, `item_photo_off` à 0). Quand c'est inconnu
-     * (valeur négative), on retombe sur l'icône générique du skill (`f_cam.gif`), comme dans l'en-tête.
-     */
+    /** Icône d'une action héroïque ; cas particulier de l'APAG dont l'icône dépend des charges restantes. */
     protected getHeroicIcon(action: HeroicActionsWithValue): string {
-        if (action.element.key !== HeroicActionEnum.APAG_CHARGE.key) return action.element.value.img;
-        const charges: number = typeof action.value === 'number' ? action.value : -1;
-        if (charges < 0) return action.element.value.img;
-        return charges === 0 ? 'item/item_photo_off.gif' : 'item/item_photo_' + charges + '.gif';
+        return getHeroicIcon(action);
     }
 
     /** Toutes les sources de mise à jour d'un citoyen (pour le menu de détail). */
@@ -434,6 +438,7 @@ export class CitizensListComponent implements OnInit {
                             citizen.bag.update_info.username = getUser()?.username;
                             citizen.bag.update_info.update_time = update_info.update_time;
                         }
+                        if (citizen.id === this.me?.id) this.town_service.publishMyCitizen(citizen);
                     }
                 });
         }
@@ -462,6 +467,7 @@ export class CitizensListComponent implements OnInit {
                             citizen.bag.update_info.username = getUser()?.username;
                             citizen.bag.update_info.update_time = update_info.update_time;
                         }
+                        if (citizen.id === this.me?.id) this.town_service.publishMyCitizen(citizen);
                     }
                 });
         }
@@ -485,6 +491,7 @@ export class CitizensListComponent implements OnInit {
                             citizen.bag.update_info.username = getUser()?.username;
                             citizen.bag.update_info.update_time = update_info.update_time;
                         }
+                        if (citizen.id === this.me?.id) this.town_service.publishMyCitizen(citizen);
                     }
                 });
         }
@@ -510,6 +517,7 @@ export class CitizensListComponent implements OnInit {
                             citizen.status.update_info.username = getUser()?.username;
                             citizen.status.update_info.update_time = update_info.update_time;
                         }
+                        if (citizen.id === this.me?.id) this.town_service.publishMyCitizen(citizen);
                     }
                 });
         }
@@ -537,6 +545,7 @@ export class CitizensListComponent implements OnInit {
                             citizen.status.update_info.username = getUser()?.username;
                             citizen.status.update_info.update_time = update_info.update_time;
                         }
+                        if (citizen.id === this.me?.id) this.town_service.publishMyCitizen(citizen);
                     }
                 });
         }
@@ -552,7 +561,7 @@ export class CitizensListComponent implements OnInit {
         if (citizen && citizen.status) {
             citizen.status.icons = [];
             this.town_service
-                .updateBag(citizen)
+                .updateStatus(citizen)
                 .pipe(takeUntilDestroyed(this.destroy_ref))
                 .subscribe({
                     next: (update_info: UpdateInfo) => {
@@ -560,6 +569,7 @@ export class CitizensListComponent implements OnInit {
                             citizen.status.update_info.username = getUser()?.username;
                             citizen.status.update_info.update_time = update_info.update_time;
                         }
+                        if (citizen.id === this.me?.id) this.town_service.publishMyCitizen(citizen);
                     }
                 });
         }
@@ -588,6 +598,7 @@ export class CitizensListComponent implements OnInit {
                             citizen.home.update_info.username = getUser()?.username;
                             citizen.home.update_info.update_time = update_info.update_time;
                         }
+                        if (citizen.id === this.me?.id) this.town_service.publishMyCitizen(citizen);
                     },
                     error: () => {
                         element.value = old_element_value;
@@ -620,6 +631,7 @@ export class CitizensListComponent implements OnInit {
                             citizen.heroic_actions.update_info.username = getUser()?.username;
                             citizen.heroic_actions.update_info.update_time = update_info.update_time;
                         }
+                        if (citizen.id === this.me?.id) this.town_service.publishMyCitizen(citizen);
                     },
                     error: () => {
                         element.value = old_element_value;
@@ -639,6 +651,7 @@ export class CitizensListComponent implements OnInit {
                             citizen.chamanic_detail.update_info.username = getUser()?.username;
                             citizen.chamanic_detail.update_info.update_time = update_info.update_time;
                         }
+                        if (citizen.id === this.me?.id) this.town_service.publishMyCitizen(citizen);
                     }
                 });
         } else {
@@ -646,7 +659,7 @@ export class CitizensListComponent implements OnInit {
                 .removeBath(citizen)
                 .subscribe({
                     next: () => {
-
+                        if (citizen.id === this.me?.id) this.town_service.publishMyCitizen(citizen);
                     }
                 });
         }
@@ -674,6 +687,7 @@ export class CitizensListComponent implements OnInit {
                         citizen.chamanic_detail.update_info.username = getUser()?.username;
                         citizen.chamanic_detail.update_info.update_time = update_info.update_time;
                     }
+                    if (citizen.id === this.me?.id) this.town_service.publishMyCitizen(citizen);
                 }
             });
     }
@@ -839,6 +853,9 @@ export class CitizensListComponent implements OnInit {
                     this.alive_citizen_info = alive_citizen_info;
                     this.citizen_list.data = [...alive_citizen_info.citizens];
                     this.buildValueOptions();
+
+                    const my_citizen: Citizen | undefined = alive_citizen_info.citizens.find((citizen: Citizen) => citizen.id === this.me?.id);
+                    if (my_citizen) this.town_service.publishMyCitizen(my_citizen);
 
                     const dead_citizen_info: CitizenInfo = Object.assign({}, citizen_info);
                     // Les morts sont affichés directement depuis les objets Citizen : l'API ne renvoie pas

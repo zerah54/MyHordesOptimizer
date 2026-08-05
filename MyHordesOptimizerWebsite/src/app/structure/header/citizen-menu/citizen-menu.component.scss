@@ -1,74 +1,82 @@
 :host {
     display: contents;
 
-    .header-menu-citizen-part {
-        .pseudo {
-            div {
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                gap: 0.5em;
-            }
+    .pseudo {
+        div {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.5em;
+        }
+
+        // mho-avatar est fixé à 100px dans son propre composant (pas d'input de taille) : trop grand
+        // à côté du pseudo dans ce menu. ::ng-deep + !important nécessaires pour dépasser la spécificité
+        // de sa propre règle (`.mho-avatar > *`), depuis l'extérieur du composant.
+        ::ng-deep mho-avatar .mho-avatar > * {
+            width: 40px !important;
+        }
+    }
+}
+
+// Les panneaux #status/#bag/#dailyActions/#heroicActions/#home sont chacun un mat-menu à part entière,
+// porté par CDK dans un overlay détaché du DOM de ce composant (pas de relation d'ascendance réelle
+// avec :host) : un sélecteur `:host .foo` ne peut jamais les atteindre. ::ng-deep + la classe posée via
+// panelClass (point d'extension officiel de mat-menu) est la façon correcte de les styler d'ici.
+::ng-deep .mho-menu-citizen-details {
+    // Le panneau par défaut de mat-menu plafonne à 280px (max-width interne) : trop étroit pour
+    // une liste d'états/objets ou une grille d'icônes compactes.
+    .mat-mdc-menu-panel {
+        max-width: 420px;
+    }
+
+    &.statuses, &.bag {
+        .mat-mdc-menu-content {
+            display: flex;
+            flex-direction: column;
+            margin: 0 0.75em;
+            gap: 0.5em;
         }
     }
 
-    .mho-menu-citizen-details {
-
-        &.statuses, &.bag {
-
-            .mat-mdc-menu-content {
-                display: flex;
-                flex-direction: column;
-                margin: 0 0.5em;
-                gap: 0.5em;
-            }
-        }
-
-        &.statuses {
-            .chamanic {
-                img {
-                    margin-right: 0.5em;
-                }
-            }
-        }
-
-        &.heroic-actions {
-            .mat-mdc-form-field {
-                width: 100%;
-                max-width: 100%;
-            }
-        }
-
-        &.home {
-            .mat-mdc-form-field {
-                width: 100%;
-                max-width: 100%;
-
-                .mat-form-field-infix {
-                    width: 125px;
-                }
-
-            }
-        }
-
-        //&.heroic-actions,
-        //&.home {
-        //
-        //    .mat-mdc-form-field {
-        //
-        //        .mat-mdc-form-field-infix {
-        //            display: flex;
-        //            align-items: center;
-        //        }
-        //
-        //        .mat-mdc-floating-label:not(.mdc-floating-label--float-above) {
-        //            padding-left: calc(16px + 0.5em);
-        //        }
-        //    }
-        //}
+    // Bande d'icônes compactes (chamanique, actions quotidiennes, actions héroïques, améliorations) :
+    // flex-wrap pour laisser les mho-compact-toggle/mho-compact-stepper s'aligner côte à côte sans
+    // repasser à la ligne pour chacun — c'est tout l'intérêt de la forme compacte.
+    .band {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.5em;
+        margin: 0.5em 0.75em;
     }
 
-    .cdk-overlay-pane:has(.mho-menu-citizen-details) {
-        transform: translateY(0) !important;
+    // Steppers (actions héroïques/améliorations à niveau) : groupés à part des toggles, 2 par ligne.
+    .stepper-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.5em;
+        margin: 0 0.75em 0.5em;
+    }
+
+    // Niveau de maison : affiché, jamais saisi. Pastille assortie aux mho-compact-toggle/stepper
+    // voisins (même gabarit que dans citizens-list) pour ne pas jurer dans la bande.
+    .home-readonly {
+        display: inline-flex;
+        align-items: center;
+        gap: 2px;
+        padding: 2px 4px;
+        border: 1px solid var(--mat-sys-outline-variant);
+        border-radius: 6px;
+
+        // Taille d'image NON fixée : sprites pixel art, les redimensionner altère le rendu.
+        img {
+            display: block;
+            margin-right: 2px;
+        }
+
+        .home-readonly-value {
+            min-width: 1.4em;
+            text-align: center;
+        }
     }
 }

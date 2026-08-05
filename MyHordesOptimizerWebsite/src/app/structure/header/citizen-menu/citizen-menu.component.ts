@@ -1,14 +1,8 @@
-import { NgOptimizedImage } from '@angular/common';
-import { Component, DestroyRef, inject, OnInit } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit, ViewChild } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { FormsModule } from '@angular/forms';
-import { MatCheckboxChange, MatCheckboxModule } from '@angular/material/checkbox';
 import { MatDividerModule } from '@angular/material/divider';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatMenuModule } from '@angular/material/menu';
-import { MatSelectModule } from '@angular/material/select';
-import moment from 'moment';
+import { MatMenuModule, MatMenuTrigger } from '@angular/material/menu';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 import { HORDES_IMG_REPO } from '../../../_abstract_model/const';
 import { HomeEnum } from '../../../_abstract_model/enum/home.enum';
@@ -24,14 +18,18 @@ import { Item } from '../../../_abstract_model/types/item.class';
 import { Me } from '../../../_abstract_model/types/me.class';
 import { isHouseLevelEditable } from '../../../_abstract_model/types/town-details.class';
 import { UpdateInfo } from '../../../_abstract_model/types/update-info.class';
+import { getHeroicIcon, getHomeIcon } from '../../../_core/utilities/citizen.util';
 import { getTown, getUser } from '../../../_core/utilities/localstorage.util';
+import { AvatarComponent } from '../../../_shared/avatar/avatar.component';
 import { CitizenInfoComponent } from '../../../_shared/citizen-info/citizen-info.component';
+import { CompactStepperComponent } from '../../../_shared/compact-stepper/compact-stepper.component';
+import { CompactToggleComponent } from '../../../_shared/compact-toggle/compact-toggle.component';
 import { ListElementAddRemoveComponent } from '../../../_shared/list-elements-add-remove/list-element-add-remove.component';
 
-const angular_common: Imports = [NgOptimizedImage, FormsModule];
-const components: Imports = [CitizenInfoComponent, ListElementAddRemoveComponent];
+const angular_common: Imports = [];
+const components: Imports = [AvatarComponent, CitizenInfoComponent, CompactStepperComponent, CompactToggleComponent, ListElementAddRemoveComponent];
 const pipes: Imports = [];
-const material_modules: Imports = [MatCheckboxModule, MatDividerModule, MatFormFieldModule, MatInputModule, MatMenuModule, MatSelectModule];
+const material_modules: Imports = [MatDividerModule, MatMenuModule, MatTooltipModule];
 
 @Component({
     selector: 'mho-header-citizen-menu',
@@ -42,7 +40,6 @@ const material_modules: Imports = [MatCheckboxModule, MatDividerModule, MatFormF
 export class CitizenMenuComponent implements OnInit {
 
     protected citizen!: Citizen;
-    protected readonly locale: string = moment.locale();
     /** La liste des listes disponibles dans le sac */
     protected bag_lists: ListForAddRemove[] = [];
     protected readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
@@ -60,13 +57,28 @@ export class CitizenMenuComponent implements OnInit {
     private readonly destroy_ref: DestroyRef = inject(DestroyRef);
     private readonly town_service: TownService = inject(TownService);
 
+    @ViewChild('statusTrigger') private status_trigger?: MatMenuTrigger;
+    @ViewChild('bagTrigger') private bag_trigger?: MatMenuTrigger;
+    @ViewChild('dailyActionsTrigger') private daily_actions_trigger?: MatMenuTrigger;
+    @ViewChild('heroicActionsTrigger') private heroic_actions_trigger?: MatMenuTrigger;
+    @ViewChild('homeTrigger') private home_trigger?: MatMenuTrigger;
+
     public ngOnInit(): void {
+        this.town_service.myCitizen$
+            .pipe(takeUntilDestroyed(this.destroy_ref))
+            .subscribe({
+                next: (citizen: Citizen | null) => {
+                    if (citizen) this.citizen = citizen;
+                }
+            });
+
         if (this.me) {
             this.town_service
                 .getCitizen(this.me.id)
+                .pipe(takeUntilDestroyed(this.destroy_ref))
                 .subscribe({
                     next: (citizen: Citizen) => {
-                        this.citizen = citizen;
+                        this.town_service.publishMyCitizen(citizen);
                     }
                 });
         }
@@ -82,7 +94,25 @@ export class CitizenMenuComponent implements OnInit {
                     ];
                 }
             });
+    }
 
+    /** Icône d'une action héroïque ; cas particulier de l'APAG dont l'icône dépend des charges restantes. */
+    protected getHeroicIcon(action: HeroicActionsWithValue): string {
+        return getHeroicIcon(action);
+    }
+
+    /** Icône d'une amélioration de maison ; niveau d'habitation par défaut si aucune icône dédiée. */
+    protected getHomeIcon(home: HomeWithValue): string {
+        return getHomeIcon(home);
+    }
+
+    /** Ferme les sous-menus autres que celui qui vient de s'ouvrir (un seul ouvert à la fois). */
+    protected closeOtherMenus(opened: 'status' | 'bag' | 'dailyActions' | 'heroicActions' | 'home'): void {
+        if (opened !== 'status') this.status_trigger?.closeMenu();
+        if (opened !== 'bag') this.bag_trigger?.closeMenu();
+        if (opened !== 'dailyActions') this.daily_actions_trigger?.closeMenu();
+        if (opened !== 'heroicActions') this.heroic_actions_trigger?.closeMenu();
+        if (opened !== 'home') this.home_trigger?.closeMenu();
     }
 
     /**
@@ -104,6 +134,7 @@ export class CitizenMenuComponent implements OnInit {
                             this.citizen.bag.update_info.username = getUser()?.username;
                             this.citizen.bag.update_info.update_time = update_info.update_time;
                         }
+                        this.town_service.publishMyCitizen(this.citizen);
                     }
                 });
         }
@@ -130,6 +161,7 @@ export class CitizenMenuComponent implements OnInit {
                             this.citizen.bag.update_info.username = getUser()?.username;
                             this.citizen.bag.update_info.update_time = update_info.update_time;
                         }
+                        this.town_service.publishMyCitizen(this.citizen);
                     }
                 });
         }
@@ -148,6 +180,7 @@ export class CitizenMenuComponent implements OnInit {
                             this.citizen.bag.update_info.username = getUser()?.username;
                             this.citizen.bag.update_info.update_time = update_info.update_time;
                         }
+                        this.town_service.publishMyCitizen(this.citizen);
                     }
                 });
         }
@@ -156,7 +189,7 @@ export class CitizenMenuComponent implements OnInit {
     /**
      * On ajoute un état
      *
-     * @param {number} status_key
+     * @param {string} status_key
      */
     protected addStatus(status_key: string): void {
         if (this.citizen && this.citizen.status) {
@@ -171,6 +204,7 @@ export class CitizenMenuComponent implements OnInit {
                             this.citizen.status.update_info.username = getUser()?.username;
                             this.citizen.status.update_info.update_time = update_info.update_time;
                         }
+                        this.town_service.publishMyCitizen(this.citizen);
                     }
                 });
         }
@@ -179,7 +213,7 @@ export class CitizenMenuComponent implements OnInit {
     /**
      * On retire un état
      *
-     * @param {number} status_key
+     * @param {string} status_key
      */
     protected removeStatus(status_key: string): void {
         if (this.citizen && this.citizen.status) {
@@ -196,6 +230,7 @@ export class CitizenMenuComponent implements OnInit {
                             this.citizen.status.update_info.username = getUser()?.username;
                             this.citizen.status.update_info.update_time = update_info.update_time;
                         }
+                        this.town_service.publishMyCitizen(this.citizen);
                     }
                 });
         }
@@ -206,7 +241,7 @@ export class CitizenMenuComponent implements OnInit {
         if (this.citizen && this.citizen.status) {
             this.citizen.status.icons = [];
             this.town_service
-                .updateBag(this.citizen)
+                .updateStatus(this.citizen)
                 .pipe(takeUntilDestroyed(this.destroy_ref))
                 .subscribe({
                     next: (update_info: UpdateInfo) => {
@@ -214,6 +249,7 @@ export class CitizenMenuComponent implements OnInit {
                             this.citizen.status.update_info.username = getUser()?.username;
                             this.citizen.status.update_info.update_time = update_info.update_time;
                         }
+                        this.town_service.publishMyCitizen(this.citizen);
                     }
                 });
         }
@@ -223,8 +259,9 @@ export class CitizenMenuComponent implements OnInit {
         return this.citizen.baths.some((bath: Bath) => bath.day === this.current_day && bath.update_info);
     }
 
-    protected saveBath(event: MatCheckboxChange): void {
-        if (event.checked) {
+    /** Prend ou retire le bain du jour. */
+    protected saveBath(checked: boolean): void {
+        if (checked) {
             this.town_service
                 .addBath(this.citizen)
                 .subscribe({
@@ -233,58 +270,44 @@ export class CitizenMenuComponent implements OnInit {
                             this.citizen.chamanic_detail.update_info.username = getUser()?.username;
                             this.citizen.chamanic_detail.update_info.update_time = update_info.update_time;
                         }
+                        this.town_service.publishMyCitizen(this.citizen);
                     }
                 });
         } else {
             this.town_service
                 .removeBath(this.citizen)
-                .subscribe();
-        }
-    }
-
-    protected saveChamanicDetails(citizen: Citizen): void {
-        this.town_service
-            .saveChamanicDetails(citizen)
-            .subscribe({
-                next: (update_info: UpdateInfo) => {
-                    if (citizen.chamanic_detail) {
-                        citizen.chamanic_detail.update_info.username = getUser()?.username;
-                        citizen.chamanic_detail.update_info.update_time = update_info.update_time;
-                    }
-                }
-            });
-    }
-
-    /**
-     * On met à jour la liste des actions héroiques
-     *
-     * @param {HeroicActionsWithValue} element
-     * @param {MatCheckboxChange | number} event
-     */
-    protected updateActions(element: HeroicActionsWithValue, event: MatCheckboxChange | number): void {
-        const old_element_value: boolean | number = element.value;
-        if (event instanceof MatCheckboxChange) {
-            element.value = event.checked;
-        } else {
-            element.value = event;
-        }
-
-        if (this.citizen && this.citizen.heroic_actions) {
-            this.town_service
-                .updateHeroicActions(this.citizen)
-                .pipe(takeUntilDestroyed(this.destroy_ref))
                 .subscribe({
-                    next: (update_info: UpdateInfo) => {
-                        if (this.citizen.heroic_actions) {
-                            this.citizen.heroic_actions.update_info.username = getUser()?.username;
-                            this.citizen.heroic_actions.update_info.update_time = update_info.update_time;
-                        }
-                    },
-                    error: () => {
-                        element.value = old_element_value;
+                    next: () => {
+                        this.town_service.publishMyCitizen(this.citizen);
                     }
                 });
         }
+    }
+
+    /** Met à jour le nombre de potions chamaniques bues (stepper). */
+    protected changePotions(value: number): void {
+        this.citizen.chamanic_detail.nb_potion_shaman = value;
+        this.saveChamanicDetails();
+    }
+
+    /** Met à jour l'immunité à l'âme (toggle). */
+    protected changeImmune(immune: boolean): void {
+        this.citizen.chamanic_detail.is_immune_to_soul = immune;
+        this.saveChamanicDetails();
+    }
+
+    private saveChamanicDetails(): void {
+        this.town_service
+            .saveChamanicDetails(this.citizen)
+            .subscribe({
+                next: (update_info: UpdateInfo) => {
+                    if (this.citizen.chamanic_detail) {
+                        this.citizen.chamanic_detail.update_info.username = getUser()?.username;
+                        this.citizen.chamanic_detail.update_info.update_time = update_info.update_time;
+                    }
+                    this.town_service.publishMyCitizen(this.citizen);
+                }
+            });
     }
 
     /**
@@ -299,15 +322,11 @@ export class CitizenMenuComponent implements OnInit {
      * On met à jour la liste des améliorations
      *
      * @param {HomeWithValue} element
-     * @param {MatCheckboxChange | MatSelectChange} event
+     * @param {number | boolean} value nouvelle valeur (toggle booléen ou stepper numérique)
      */
-    protected updateHome(element: HomeWithValue, event: MatCheckboxChange | number): void {
+    protected updateHome(element: HomeWithValue, value: number | boolean): void {
         const old_element_value: boolean | number = element.value;
-        if (event instanceof MatCheckboxChange) {
-            element.value = event.checked;
-        } else {
-            element.value = event;
-        }
+        element.value = value;
 
         if (this.citizen && this.citizen.home !== undefined) {
             this.town_service
@@ -319,6 +338,36 @@ export class CitizenMenuComponent implements OnInit {
                             this.citizen.home.update_info.username = getUser()?.username;
                             this.citizen.home.update_info.update_time = update_info.update_time;
                         }
+                        this.town_service.publishMyCitizen(this.citizen);
+                    },
+                    error: () => {
+                        element.value = old_element_value;
+                    }
+                });
+        }
+    }
+
+    /**
+     * On met à jour la liste des actions héroiques
+     *
+     * @param {HeroicActionsWithValue} element
+     * @param {number | boolean} value nouvelle valeur (toggle booléen ou stepper numérique)
+     */
+    protected updateActions(element: HeroicActionsWithValue, value: number | boolean): void {
+        const old_element_value: boolean | number = element.value;
+        element.value = value;
+
+        if (this.citizen && this.citizen.heroic_actions) {
+            this.town_service
+                .updateHeroicActions(this.citizen)
+                .pipe(takeUntilDestroyed(this.destroy_ref))
+                .subscribe({
+                    next: (update_info: UpdateInfo) => {
+                        if (this.citizen.heroic_actions) {
+                            this.citizen.heroic_actions.update_info.username = getUser()?.username;
+                            this.citizen.heroic_actions.update_info.update_time = update_info.update_time;
+                        }
+                        this.town_service.publishMyCitizen(this.citizen);
                     },
                     error: () => {
                         element.value = old_element_value;

@@ -47,6 +47,11 @@
                 </mat-form-field>
             </div>
         } @else {
+            <!-- Item factice, caché : mat-menu calcule le décalage de positionnement de ses sous-menus
+                 à partir de son PREMIER item direct (recherche qui ne traverse pas mho-header-citizen-menu).
+                 Sans lui, ce premier item devient « Mon compte » (après tout le bloc citoyen), ce qui
+                 décale tous les sous-menus de plusieurs centaines de pixels. -->
+            <button mat-menu-item disabled style="display: none" tabindex="-1"></button>
             @if (me && me.town_details.town_id) {
                 <mho-header-citizen-menu></mho-header-citizen-menu>
             }
