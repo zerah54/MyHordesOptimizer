@@ -42,6 +42,15 @@ namespace MyHordesOptimizerApi.Services.Impl
         public WishListLastUpdateDto GetWishList(int townId)
         {
             townId = DbContext.ResolveTownId(townId);
+            return GetWishListByResolvedTownId(townId);
+        }
+
+        // À appeler avec un townId DÉJÀ résolu (ex: en fin d'écriture, dans le même service).
+        // ResolveTownId ne doit être appliqué qu'une fois : le réappliquer à un IdTown déjà résolu
+        // le confond avec un MapId externe, ne trouve aucune correspondance, et retombe sur -townId
+        // (cf. commentaire sur MhoContext.ResolveTownId) → wishlist vide juste après l'écriture.
+        private WishListLastUpdateDto GetWishListByResolvedTownId(int townId)
+        {
             var townBankItemLastUpdateId = DbContext.TownBankItems
                 .Where(tbi => tbi.IdTown == townId)
                 .Max(tbi => (int?)tbi.IdLastUpdateInfo);
@@ -119,7 +128,7 @@ namespace MyHordesOptimizerApi.Services.Impl
             DbContext.Update(town);
             DbContext.SaveChanges();
             transaction.Commit();
-            return GetWishList(townId);
+            return GetWishListByResolvedTownId(townId);
         }
 
         public WishListLastUpdateDto CreateFromTemplate(int townId, int userId, int templateId)
@@ -140,7 +149,7 @@ namespace MyHordesOptimizerApi.Services.Impl
             DbContext.Update(town);
             DbContext.SaveChanges();
             transaction.Commit();
-            return GetWishList(townId);
+            return GetWishListByResolvedTownId(townId);
         }
 
         public void AddItemToWishList(int townId, int userId, int itemId, int zoneXPa)

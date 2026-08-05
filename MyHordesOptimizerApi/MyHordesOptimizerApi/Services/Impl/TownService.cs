@@ -39,6 +39,14 @@ namespace MyHordesOptimizerApi.Services.Impl
         public CitizenDto GetTownCitizen(int townId, int userId)
         {
             townId = DbContext.ResolveTownId(townId);
+            return GetTownCitizenByResolvedTownId(townId, userId);
+        }
+
+        // À appeler avec un townId DÉJÀ résolu. ResolveTownId cherche par MapId : le réappliquer à un
+        // IdTown déjà résolu ne trouve aucune correspondance et retombe sur -townId (cf. commentaire sur
+        // MhoContext.ResolveTownId), cassant silencieusement la recherche du citoyen.
+        private CitizenDto GetTownCitizenByResolvedTownId(int townId, int userId)
+        {
             var citizen = DbContext.GetTownCitizen(townId)
                 .Where(townCitizen => townCitizen.IdUser == userId)
                 .SingleOrDefault();
@@ -118,7 +126,7 @@ namespace MyHordesOptimizerApi.Services.Impl
                 DbContext.Remove(bath);
                 DbContext.SaveChanges();
             }
-            return GetTownCitizen(townId, userId);
+            return GetTownCitizenByResolvedTownId(townId, userId);
         }
 
         public LastUpdateInfoDto UpdateCitizenChamanicDetail(int townId, int userId, CitizenChamanicDetailDto chamanicDetailDto)
