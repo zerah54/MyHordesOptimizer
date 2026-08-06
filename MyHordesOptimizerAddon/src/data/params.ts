@@ -110,6 +110,15 @@ export const params_categories: ParamCategory[] = [
                                 },
                             },
                             {
+                                id: 'update_mho_daily_actions',
+                                label: {
+                                    en: 'Daily actions',
+                                    fr: 'Actions quotidiennes',
+                                    de: 'Tägliche Handlungen',
+                                    es: 'Acciones cotidianas'
+                                },
+                            },
+                            {
                                 id: 'update_mho_digs',
                                 label: {
                                     en: 'Record successful searches',
@@ -833,6 +842,15 @@ export const params_categories: ParamCategory[] = [
                             fr: 'Afficher les images des liens dans les posts',
                             de: 'Bilder von Links in Beiträgen anzeigen',
                             es: 'Mostrar las imágenes de los enlaces en los mensajes'
+                        },
+                    },
+                    {
+                        id: 'forum_auto_display_videos',
+                        label: {
+                            en: 'Show videos from links in posts',
+                            fr: 'Afficher les vidéos des liens dans les posts',
+                            de: 'Videos von Links in Beiträgen anzeigen',
+                            es: 'Mostrar los vídeos de los enlaces en los mensajes'
                         },
                     }
                 ]

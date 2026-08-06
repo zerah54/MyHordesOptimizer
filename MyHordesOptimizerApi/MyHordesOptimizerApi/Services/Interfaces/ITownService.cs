@@ -6,8 +6,8 @@ namespace MyHordesOptimizerApi.Services.Interfaces
 {
     public interface ITownService
     {
-        LastUpdateInfoDto AddCitizenBath(int townId, int userId, int day);
-        CitizenDto DeleteCitizenBath(int townId, int userId, int day);
+        LastUpdateInfoDto AddCitizenDailyAction(int townId, int userId, string actionKey, int day);
+        CitizenDto DeleteCitizenDailyAction(int townId, int userId, string actionKey, int day);
         CitizenDto GetTownCitizen(int townId, int userId);
         TownListPageResultDto GetTowns(TownListQueryDto query);
         List<SeasonDto> GetSeasons();

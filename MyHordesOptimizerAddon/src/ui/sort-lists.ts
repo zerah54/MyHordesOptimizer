@@ -1,6 +1,7 @@
 import { mh_content_id } from '../config/constants';
 import { jobs, texts } from '../i18n/texts';
 import { state } from '../state';
+import { getCitizenLocationSortKey } from '../utils/citizen-location';
 import { getI18N } from '../utils/i18n';
 import { dumpItemsTableElement, pageIsCitizens, pageIsDump, pageIsNightwatch, pageIsOmniscience, pageIsTrap, trapItemsTableElement } from '../utils/page';
 
@@ -198,16 +199,14 @@ export function sortCitizenList() {
         },
         { // Dehors ? — ↑ : en ville d'abord, puis plus proche → plus loin
             extract: row => {
-                const text = (row.querySelector('.location')?.textContent ?? '').trim();
-                const m = text.match(/\[(-?\d+),(-?\d+)\]/);
-                if (!m) return { inTown: true, dist: 0 };
-                const x = parseInt(m[1], 10), y = parseInt(m[2], 10);
-                return { inTown: false, dist: Math.abs(x) + Math.abs(y) };
+                const text = (row.querySelector('.location') as HTMLElement | null)?.innerText.trim() ?? '';
+                return getCitizenLocationSortKey(text);
             },
             compare: (a, b) => {
                 if (a.inTown && b.inTown) return 0;
                 if (a.inTown) return -1;
                 if (b.inTown) return 1;
+                if (a.dist === b.dist) return 0;
                 return a.dist - b.dist;
             },
         },

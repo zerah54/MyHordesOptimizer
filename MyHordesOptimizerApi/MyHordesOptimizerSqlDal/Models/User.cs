@@ -73,7 +73,7 @@ public partial class User
     public virtual ICollection<TownCadaver> TownCadavers { get; set; } = new List<TownCadaver>();
 
     [InverseProperty("IdUserNavigation")]
-    public virtual ICollection<TownCitizenBath> TownCitizenBaths { get; set; } = new List<TownCitizenBath>();
+    public virtual ICollection<TownCitizenDailyAction> TownCitizenDailyActions { get; set; } = new List<TownCitizenDailyAction>();
 
     [InverseProperty("IdUserNavigation")]
     public virtual ICollection<TownCitizen> TownCitizens { get; set; } = new List<TownCitizen>();

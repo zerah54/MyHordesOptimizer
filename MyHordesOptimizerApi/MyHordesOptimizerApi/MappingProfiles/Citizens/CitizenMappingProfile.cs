@@ -27,7 +27,7 @@ namespace MyHordesOptimizerApi.MappingProfiles.Citizens
                 .ForMember(dto => dto.ActionsHeroic, opt => opt.MapFrom(model => model))
                 .ForMember(dto => dto.Avatar, opt => opt.MapFrom(model => model.IdUserNavigation.Avatar))
                 .ForMember(dto => dto.Bag, opt => opt.MapFrom(model => model.IdBagNavigation))
-                .ForMember(dto => dto.Baths, opt => opt.MapFrom(model => model.IdTownNavigation.TownCitizenBaths.Where(townBath => townBath.IdUser == model.IdUser)))
+                .ForMember(dto => dto.DailyActions, opt => opt.MapFrom(model => model.IdTownNavigation.TownCitizenDailyActions.Where(townDailyAction => townDailyAction.IdUser == model.IdUser)))
                 .ForMember(dto => dto.Cadaver, opt => opt.Ignore()) // ??
                 .ForMember(dto => dto.ChamanicDetail, opt => opt.MapFrom(model => model))
                 .ForMember(dto => dto.Dead, opt => opt.MapFrom(model => model.Dead))
@@ -135,7 +135,8 @@ namespace MyHordesOptimizerApi.MappingProfiles.Citizens
                 .ForMember(cellCitizenDto => cellCitizenDto.Id, opt => opt.MapFrom(townCitizen => townCitizen.IdUser))
                 .ForMember(cellCitizenDto => cellCitizenDto.Name, opt => opt.MapFrom(townCitizen => townCitizen.IdUserNavigation.Name));
 
-            CreateMap<TownCitizenBath, BathDto>()
+            CreateMap<TownCitizenDailyAction, DailyActionDto>()
+                .ForMember(dto => dto.ActionKey, opt => opt.MapFrom(model => model.ActionKey))
                 .ForMember(dto => dto.Day, opt => opt.MapFrom(model => model.Day))
                 .ForMember(dto => dto.LastUpdateInfo, opt => opt.MapFrom(model => model.IdLastUpdateInfoNavigation));
         }

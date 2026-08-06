@@ -31,9 +31,13 @@ namespace MyHordesOptimizerApi.Controllers
         }
 
         [HttpPost]
-        [Route("{townId}/user/{userId}/bath")]
-        public ActionResult<LastUpdateInfoDto> AddCitizenBath([FromRoute] int townId, [FromRoute] int userId, [FromQuery] int? day)
+        [Route("{townId}/user/{userId}/dailyAction/{actionKey}")]
+        public ActionResult<LastUpdateInfoDto> AddCitizenDailyAction([FromRoute] int townId, [FromRoute] int userId, [FromRoute] string actionKey, [FromQuery] int? day)
         {
+            if (string.IsNullOrEmpty(actionKey))
+            {
+                return BadRequest($"{nameof(actionKey)} must not be empty");
+            }
             if (!day.HasValue)
             {
                 return BadRequest($"{nameof(day)} must be > 0");
@@ -42,15 +46,19 @@ namespace MyHordesOptimizerApi.Controllers
             {
                 return BadRequest($"{nameof(day)} must be > 0");
             }
-            var updatedCitizen = TownService.AddCitizenBath(townId, userId, day.Value);
+            var updatedCitizen = TownService.AddCitizenDailyAction(townId, userId, actionKey, day.Value);
             return Ok(updatedCitizen);
 
         }
 
         [HttpDelete]
-        [Route("{townId}/user/{userId}/bath")]
-        public ActionResult<CitizenDto> DeleteCitizenBath([FromRoute] int townId, [FromRoute] int userId, [FromQuery] int? day)
+        [Route("{townId}/user/{userId}/dailyAction/{actionKey}")]
+        public ActionResult<CitizenDto> DeleteCitizenDailyAction([FromRoute] int townId, [FromRoute] int userId, [FromRoute] string actionKey, [FromQuery] int? day)
         {
+            if (string.IsNullOrEmpty(actionKey))
+            {
+                return BadRequest($"{nameof(actionKey)} must not be empty");
+            }
             if (!day.HasValue)
             {
                 return BadRequest($"{nameof(day)} must be > 0");
@@ -59,7 +67,7 @@ namespace MyHordesOptimizerApi.Controllers
             {
                 return BadRequest($"{nameof(day)} must be > 0");
             }
-            var updatedCitizen = TownService.DeleteCitizenBath(townId, userId, day.Value);
+            var updatedCitizen = TownService.DeleteCitizenDailyAction(townId, userId, actionKey, day.Value);
             return Ok(updatedCitizen);
 
         }

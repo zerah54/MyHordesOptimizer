@@ -1456,30 +1456,77 @@ body.mho-spoiler-pin-enabled .forum-post-content .spoiler {
     }
 }
 
-.mho-forum-image-block {
+.mho-forum-media-block {
     display: block;
     max-width: 100%;
     margin-top: 4px;
     text-align: center;
+    color: white;
+    font-weight: normal;
 
-    a {
-        display: block;
-        max-width: 100%;
+    .mho-forum-media-caption {
+        margin-top: 2px;
+        font-size: 0.85em;
+        font-style: italic;
+        opacity: 0.8;
     }
 
-    img {
-        display: block;
-        max-width: 100%;
-        height: auto;
-        border: 6px double currentColor;
-        border-radius: 4px;
-        margin: 0 auto;
+    &.mho-forum-image-block {
+        img {
+            display: block;
+            max-width: 100%;
+            height: auto;
+            border: 6px double currentColor;
+            border-radius: 4px;
+            margin: 0 auto;
+        }
+    }
+
+    &.mho-forum-video-block {
+        iframe, .mho-forum-video-thumbnail {
+            display: inline-block;
+            aspect-ratio: 16 / 9;
+            height: auto;
+            border: 6px double currentColor;
+            border-radius: 4px;
+            margin: 0 auto;
+
+            img {
+                display: block;
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+        }
+
+        iframe {
+            display: block;
+            width: 100%;
+        }
+
+        /** Toujours rendue à l'intérieur de `.mho-forum-video-thumbnail`, qui porte déjà taille/bordure/arrondi */
+        .mho-forum-video-placeholder {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            background: #1a1a1a;
+        }
+
+        .mho-forum-video-play-icon-overlay {
+            position: absolute;
+            top: calc(50% + 28px);
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 0;
+            height: 0;
+            border-top: 14px solid transparent;
+            border-bottom: 14px solid transparent;
+            border-left: 22px solid rgba(255, 255, 255, 0.85);
+            filter: drop-shadow(0 0 4px rgba(0, 0, 0, 0.6));
+            pointer-events: none;
+        }
     }
 }
 
-.mho-forum-image-caption {
-    margin-top: 2px;
-    font-size: 0.85em;
-    font-style: italic;
-    opacity: 0.8;
-}

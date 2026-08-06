@@ -24,26 +24,26 @@ import { TownContextService } from '../../_core/services/town-context.service';
 import { getBankWithExpirationDate, getExternalAppId, getTown, getUserId, setBankWithExpirationDate, } from '../../_core/utilities/localstorage.util';
 import { BankInfoDTO } from '../dto/bank-info.dto';
 import { CellDTO } from '../dto/cell.dto';
-import { CitizenDTO } from '../dto/citizen.dto';
 import { CitizenInfoDTO } from '../dto/citizen-info.dto';
+import { CitizenDTO } from '../dto/citizen.dto';
 import { ExternalToolsUpdateJobStateDTO } from '../dto/external-tools-update-state.dto';
 import { RuinDTO } from '../dto/ruin.dto';
-import { SeasonDTO } from '../dto/season.dto';
 import { SeasonPhaseDTO } from '../dto/season-phase.dto';
-import { TownDTO } from '../dto/town.dto';
+import { SeasonDTO } from '../dto/season.dto';
 import { TownListItemDTO } from '../dto/town-list-item.dto';
 import { TownListPageResultDTO, TownListQuery } from '../dto/town-list-page.dto';
+import { TownDTO } from '../dto/town.dto';
 import { UpdateInfoDTO } from '../dto/update-info.dto';
 import { TownListMapper } from '../mapper/town-list-item.mapper';
 import { dtoToModelArray } from '../types/_common.class';
 import { ToolsToUpdate, TownState, TownTypeId } from '../types/_types';
 import { BankInfo } from '../types/bank-info.class';
 import { Cell } from '../types/cell.class';
-import { Citizen } from '../types/citizen.class';
 import { CitizenInfo } from '../types/citizen-info.class';
+import { Citizen } from '../types/citizen.class';
 import { Ruin } from '../types/ruin.class';
-import { Town } from '../types/town.class';
 import { TownListPageResult } from '../types/town-list-item.model';
+import { Town } from '../types/town.class';
 import { UpdateInfo } from '../types/update-info.class';
 import { GlobalService } from './_global.service';
 
@@ -343,9 +343,9 @@ export class TownService extends GlobalService {
         });
     }
 
-    public addBath(citizen: Citizen, day?: number): Observable<UpdateInfo> {
+    public addDailyAction(citizen: Citizen, actionKey: string, day?: number): Observable<UpdateInfo> {
         return new Observable((sub: Subscriber<UpdateInfo>) => {
-            super.post<UpdateInfoDTO>(this.API_URL + `/town/${getTown()?.town_id}/user/${citizen.id}/bath?day=${day ?? getTown()?.day}`)
+            super.post<UpdateInfoDTO>(this.API_URL + `/town/${getTown()?.town_id}/user/${citizen.id}/dailyAction/${actionKey}?day=${day ?? getTown()?.day}`)
                 .subscribe({
                     next: (update_info: UpdateInfoDTO) => {
                         sub.next(new UpdateInfo(update_info));
@@ -357,9 +357,9 @@ export class TownService extends GlobalService {
         });
     }
 
-    public removeBath(citizen: Citizen): Observable<void> {
+    public removeDailyAction(citizen: Citizen, actionKey: string, day?: number): Observable<void> {
         return new Observable((sub: Subscriber<void>) => {
-            super.delete(this.API_URL + `/town/${getTown()?.town_id}/user/${citizen.id}/bath?day=${getTown()?.day}`)
+            super.delete(this.API_URL + `/town/${getTown()?.town_id}/user/${citizen.id}/dailyAction/${actionKey}?day=${day ?? getTown()?.day}`)
                 .subscribe({
                     next: () => {
                         sub.next();
