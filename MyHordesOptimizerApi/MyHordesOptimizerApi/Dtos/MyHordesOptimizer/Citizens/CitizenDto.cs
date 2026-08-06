@@ -45,7 +45,7 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Citizens
         public CitizenActionsHeroic ActionsHeroic { get; set; }
         public CitizenChamanicDetailDto ChamanicDetail { get; set; }
         public CadaverDto Cadaver { get; set; }
-        public List<BathDto> Baths { get; set; }
+        public List<DailyActionDto> DailyActions { get; set; }
 
         public bool IsShunned { get; set; }
 

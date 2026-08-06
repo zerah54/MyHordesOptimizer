@@ -1,4 +1,11 @@
 export const changelogs: Record<string, string> = {
+    '1.1.54': `
+        [Nouveauté] Nouvelle options de lecture du forum : afficher les vidéos (youtube) directement dans les posts (pour d'autres providers, contactez moi)
+        [Nouveauté] Nouvelle option pour mettre à jour les actions quotidiennes dans MHO. L'envoi de l'information du bain est déplacée dedans, avec le rangement et le nettoyage des vêtements qui font leur apparition
+
+        [Correction] Tri et filtre sur la colonne de position du citoyen dans la liste des citoyens
+        [Correction] Dans de rares cas, la notification de doublon s'affichait alors qu'il n'y avait qu'un seul script / extension activé
+    `,
     '1.1.53': `
         [Nouveauté] Trois nouvelles options de lecture du forum : déplier automatiquement les sections repliées, cliquer sur un spoiler pour le garder affiché, et afficher les images des liens directement dans les posts
         [Nouveauté] La mise à jour des outils externes affiche désormais la progression outil par outil (icône + statut) au lieu d'un simple message global, avec le détail des erreurs pour chaque outil en échec

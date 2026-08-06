@@ -5,13 +5,14 @@ import { MatMenuModule, MatMenuTrigger } from '@angular/material/menu';
 import { MatTooltipModule } from '@angular/material/tooltip';
 
 import { HORDES_IMG_REPO } from '../../../_abstract_model/const';
+import { DailyActionEnum } from '../../../_abstract_model/enum/daily-action.enum';
 import { HomeEnum } from '../../../_abstract_model/enum/home.enum';
 import { StatusEnum } from '../../../_abstract_model/enum/status.enum';
 import { ApiService } from '../../../_abstract_model/services/api.service';
 import { TownService } from '../../../_abstract_model/services/town.service';
 import { Imports, ListForAddRemove } from '../../../_abstract_model/types/_types';
-import { Bath } from '../../../_abstract_model/types/bath.class';
 import { Citizen } from '../../../_abstract_model/types/citizen.class';
+import { DailyAction } from '../../../_abstract_model/types/daily-action.class';
 import { HeroicActionsWithValue } from '../../../_abstract_model/types/heroic-actions.class';
 import { HomeWithValue } from '../../../_abstract_model/types/home.class';
 import { Item } from '../../../_abstract_model/types/item.class';
@@ -255,29 +256,34 @@ export class CitizenMenuComponent implements OnInit {
         }
     }
 
-    protected dailyBathTaken(): boolean {
-        return this.citizen.baths.some((bath: Bath) => bath.day === this.current_day && bath.update_info);
+    protected readonly daily_action_keys: DailyActionEnum[] = DailyActionEnum.getAllValues<DailyActionEnum>();
+
+    /** L'action donnée a-t-elle déjà été faite aujourd'hui ? */
+    protected isDailyActionDone(actionKey: string): boolean {
+        return this.citizen.daily_actions.some((action: DailyAction) => action.day === this.current_day && action.action_key === actionKey && !!action.update_info);
     }
 
-    /** Prend ou retire le bain du jour. */
-    protected saveBath(checked: boolean): void {
+    /** Prend ou retire une action quotidienne du jour. */
+    protected saveDailyAction(actionKey: string, checked: boolean): void {
         if (checked) {
             this.town_service
-                .addBath(this.citizen)
+                .addDailyAction(this.citizen, actionKey)
                 .subscribe({
-                    next: (update_info: UpdateInfo) => {
-                        if (this.citizen.chamanic_detail) {
-                            this.citizen.chamanic_detail.update_info.username = getUser()?.username;
-                            this.citizen.chamanic_detail.update_info.update_time = update_info.update_time;
-                        }
+                    next: () => {
+                        this.citizen.daily_actions.push(new DailyAction({
+                            day: this.current_day, actionKey,
+                            lastUpdateInfo: { updateTime: new Date(), userId: getUser()?.id?.toString() ?? '', userName: getUser()?.username ?? '', userKey: '' }
+                        }));
                         this.town_service.publishMyCitizen(this.citizen);
                     }
                 });
         } else {
             this.town_service
-                .removeBath(this.citizen)
+                .removeDailyAction(this.citizen, actionKey)
                 .subscribe({
                     next: () => {
+                        const index: number = this.citizen.daily_actions.findIndex((action: DailyAction) => action.day === this.current_day && action.action_key === actionKey);
+                        if (index > -1) this.citizen.daily_actions.splice(index, 1);
                         this.town_service.publishMyCitizen(this.citizen);
                     }
                 });

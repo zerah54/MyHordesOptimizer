@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -6,11 +6,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace MyHordesOptimizerApi.Models;
 
-[PrimaryKey("IdTown", "IdUser", "IdLastUpdateInfo", "Day")]
-[Table("TownCitizenBath")]
+[PrimaryKey("IdTown", "IdUser", "IdLastUpdateInfo", "Day", "ActionKey")]
+[Table("TownCitizenDailyAction")]
 [Index("IdLastUpdateInfo", Name = "idLastUpdateInfo")]
 [Index("IdUser", Name = "idUser")]
-public partial class TownCitizenBath
+public partial class TownCitizenDailyAction
 {
     [Key]
     [Column("idTown", TypeName = "int(11)")]
@@ -28,15 +28,19 @@ public partial class TownCitizenBath
     [Column("day", TypeName = "int(11)")]
     public int Day { get; set; }
 
+    [Key]
+    [Column("actionKey", TypeName = "varchar(64)")]
+    public string ActionKey { get; set; } = null!;
+
     [ForeignKey("IdLastUpdateInfo")]
-    [InverseProperty("TownCitizenBaths")]
+    [InverseProperty("TownCitizenDailyActions")]
     public virtual LastUpdateInfo IdLastUpdateInfoNavigation { get; set; } = null!;
 
     [ForeignKey("IdTown")]
-    [InverseProperty("TownCitizenBaths")]
+    [InverseProperty("TownCitizenDailyActions")]
     public virtual Town IdTownNavigation { get; set; } = null!;
 
     [ForeignKey("IdUser")]
-    [InverseProperty("TownCitizenBaths")]
+    [InverseProperty("TownCitizenDailyActions")]
     public virtual User IdUserNavigation { get; set; } = null!;
 }

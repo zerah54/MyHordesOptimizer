@@ -75,18 +75,19 @@ namespace MyHordesOptimizerApi.Services.Impl
             return citizenDto;
         }
 
-        public LastUpdateInfoDto AddCitizenBath(int townId, int userId, int day)
+        public LastUpdateInfoDto AddCitizenDailyAction(int townId, int userId, string actionKey, int day)
         {
             townId = DbContext.ResolveTownId(townId);
-            var bath = DbContext.TownCitizenBaths
-                .Where(townCitizenBath => townCitizenBath.IdTown == townId)
-                .Where(townCitizenBath => townCitizenBath.IdUser == userId)
-                .Where(townCitizenBath => townCitizenBath.Day == day)
-                .Include(townCitizenBath => townCitizenBath.IdLastUpdateInfoNavigation)
+            var dailyAction = DbContext.TownCitizenDailyActions
+                .Where(townDailyAction => townDailyAction.IdTown == townId)
+                .Where(townDailyAction => townDailyAction.IdUser == userId)
+                .Where(townDailyAction => townDailyAction.Day == day)
+                .Where(townDailyAction => townDailyAction.ActionKey == actionKey)
+                .Include(townDailyAction => townDailyAction.IdLastUpdateInfoNavigation)
                     .ThenInclude(lastUpdateInfo => lastUpdateInfo.IdUserNavigation)
                 .FirstOrDefault();
             LastUpdateInfoDto result;
-            if (bath == null)
+            if (dailyAction == null)
             {
                 DbContext.ChangeTracker.Clear();
                 using var transaction = DbContext.Database.BeginTransaction();
@@ -95,35 +96,37 @@ namespace MyHordesOptimizerApi.Services.Impl
                 var newLastUpdate = DbContext.LastUpdateInfos.Update(Mapper.Map<LastUpdateInfo>(lastUpdateInfoDto, opt => opt.SetDbContext(DbContext))).Entity;
                 DbContext.SaveChanges();
                 DbContext.ChangeTracker.Clear();
-                bath = new TownCitizenBath()
+                dailyAction = new TownCitizenDailyAction()
                 {
                     Day = day,
+                    ActionKey = actionKey,
                     IdUser = userId,
                     IdTown = townId,
                     IdLastUpdateInfo = newLastUpdate.IdLastUpdateInfo
                 };
-                DbContext.Add(bath);
+                DbContext.Add(dailyAction);
                 DbContext.SaveChanges();
                 transaction.Commit();
             }
             else
             {
-                result = Mapper.Map<LastUpdateInfoDto>(bath.IdLastUpdateInfoNavigation);
+                result = Mapper.Map<LastUpdateInfoDto>(dailyAction.IdLastUpdateInfoNavigation);
             }
             return result;
         }
 
-        public CitizenDto DeleteCitizenBath(int townId, int userId, int day)
+        public CitizenDto DeleteCitizenDailyAction(int townId, int userId, string actionKey, int day)
         {
             townId = DbContext.ResolveTownId(townId);
-            var bath = DbContext.TownCitizenBaths
-               .Where(townCitizenBath => townCitizenBath.IdTown == townId)
-               .Where(townCitizenBath => townCitizenBath.IdUser == userId)
-               .Where(townCitizenBath => townCitizenBath.Day == day)
+            var dailyAction = DbContext.TownCitizenDailyActions
+               .Where(townDailyAction => townDailyAction.IdTown == townId)
+               .Where(townDailyAction => townDailyAction.IdUser == userId)
+               .Where(townDailyAction => townDailyAction.Day == day)
+               .Where(townDailyAction => townDailyAction.ActionKey == actionKey)
                .FirstOrDefault();
-            if (bath != null)
+            if (dailyAction != null)
             {
-                DbContext.Remove(bath);
+                DbContext.Remove(dailyAction);
                 DbContext.SaveChanges();
             }
             return GetTownCitizenByResolvedTownId(townId, userId);
@@ -216,7 +219,7 @@ namespace MyHordesOptimizerApi.Services.Impl
             DbContext.Database.ExecuteSqlRaw("DELETE FROM TownEstimation WHERE idTown = {0}", townId);
             DbContext.Database.ExecuteSqlRaw("DELETE FROM TownWishListItem WHERE idTown = {0}", townId);
             DbContext.Database.ExecuteSqlRaw("DELETE FROM TownBankItem WHERE idTown = {0}", townId);
-            DbContext.Database.ExecuteSqlRaw("DELETE FROM TownCitizenBath WHERE idTown = {0}", townId);
+            DbContext.Database.ExecuteSqlRaw("DELETE FROM TownCitizenDailyAction WHERE idTown = {0}", townId);
             DbContext.Database.ExecuteSqlRaw("DELETE FROM TownCadaver WHERE idTown = {0}", townId);
             DbContext.Database.ExecuteSqlRaw("DELETE FROM TownCitizen WHERE idTown = {0}", townId);
             DbContext.Database.ExecuteSqlRaw("DELETE FROM MapCellDigUpdate WHERE idTown = {0}", townId);

@@ -8,7 +8,14 @@ import { displayCellDetailsOnPage } from '../ui/cell-details';
 import { alertIfInactiveAndNoEscort, changeDefaultEscortOptions, preventFromLeaving } from '../ui/desert';
 import { createExpeditionsBtn } from '../ui/expeditions';
 import { addExternalLinksColumnToWelcomeTowns, addExternalLinksToProfiles, addExternalLinksToTowns } from '../ui/external-links';
-import { autoExpandForumCollapseSections, displayCountCharacters, displayForumLinkImages, fillItemsMessages, pinForumSpoilersOnClick } from '../ui/forum';
+import {
+    autoExpandForumCollapseSections,
+    displayCountCharacters,
+    displayForumLinkImages,
+    displayForumLinkVideos,
+    fillItemsMessages,
+    pinForumSpoilersOnClick
+} from '../ui/forum';
 import { styleForumThreadTitles } from '../ui/forum-styles';
 import { displayGhoulVoracityPercent } from '../ui/ghoul';
 import { addCopyRegistryButton } from '../ui/registry';
@@ -75,6 +82,7 @@ export function initOptionsWithoutLoginNeeded(): void {
         autoExpandForumCollapseSections,
         pinForumSpoilersOnClick,
         displayForumLinkImages,
+        displayForumLinkVideos,
         createStoreNotificationsBtn,
         addExternalLinksToTowns,
         addExternalLinksColumnToWelcomeTowns,

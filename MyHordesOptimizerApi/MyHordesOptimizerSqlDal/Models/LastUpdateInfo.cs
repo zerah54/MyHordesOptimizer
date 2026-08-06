@@ -46,7 +46,7 @@ public partial class LastUpdateInfo
     public virtual ICollection<TownCadaver> TownCadavers { get; set; } = new List<TownCadaver>();
 
     [InverseProperty("IdLastUpdateInfoNavigation")]
-    public virtual ICollection<TownCitizenBath> TownCitizenBaths { get; set; } = new List<TownCitizenBath>();
+    public virtual ICollection<TownCitizenDailyAction> TownCitizenDailyActions { get; set; } = new List<TownCitizenDailyAction>();
 
     [InverseProperty("IdLastUpdateChamanicNavigation")]
     public virtual ICollection<TownCitizen> TownCitizenIdLastUpdateChamanicNavigations { get; set; } = new List<TownCitizen>();

@@ -1,0 +1,48 @@
+:host {
+    display: contents;
+
+    .mho-citizens-daily-actions {
+        height: 100%;
+        overflow: auto;
+
+        table {
+            width: 100%;
+
+            tr {
+                > td {
+                    padding: 0 0.5em;
+
+                    &.center {
+                        text-align: center;
+                    }
+
+                    &.avatar_name {
+                        > img {
+                            max-width: 100px;
+                        }
+
+                        > div {
+                            text-align: center;
+                            margin: auto;
+                        }
+                    }
+                }
+
+                th,
+                td {
+                    &:not(.avatar_name) {
+                        padding: 0.5em;
+                    }
+                }
+            }
+
+            .band {
+                display: flex;
+                flex-direction: row;
+                flex-wrap: wrap;
+                align-items: center;
+                gap: 4px;
+            }
+        }
+    }
+}

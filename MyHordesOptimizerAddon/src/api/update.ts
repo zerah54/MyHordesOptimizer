@@ -1,5 +1,6 @@
 import { hordes_img_url, lang } from '../config/constants';
 import { state } from '../state';
+import { detectDailyActionDone } from '../utils/daily-action-detection';
 import { fetcher } from '../utils/fetch';
 import { getI18N } from '../utils/i18n';
 import { getItemFromImg } from '../utils/item-lookup';
@@ -8,7 +9,7 @@ import { addError, normalizeString } from '../utils/notifications';
 import { pageIsAmelio, pageIsDesert, pageIsDoors, pageIsHouse } from '../utils/page';
 import { getCurrentPosition } from '../utils/position';
 import { convertResponsePromiseToError } from '../utils/version';
-import { saveBath } from './bath';
+import { saveDailyAction } from './daily-actions';
 import { getMap } from './map';
 import { getWishlist } from './wishlist';
 
@@ -510,22 +511,11 @@ export function updateExternalTools(on_progress?: (state: ExternalToolsUpdateJob
         }
 
         /** Récupération des actions quotidiennes */
-        // TODO changer update_mho_status en update_mho_daily_actions quand on les aura toutes mises
-        if ((mho_parameters.update_mho && mho_parameters.update_mho_status) && pageIsHouse()) {
+        if ((mho_parameters.update_mho && mho_parameters.update_mho_daily_actions) && pageIsHouse()) {
 
-            /** Bain */
-            let bath_taken;
-            const bath_row = document.querySelector('.heroic_action img[src*=pool]')?.parentElement;
-            if (bath_row) {
-                if ((bath_row.attributes as any).disabled) {
-                    // si barré = le chantier est construit et le bain a été pris
-                    bath_taken = true;
-                } else {
-                    bath_taken = false;
-                    // si pas barré = le chantier est construit et le bain n'a pas été pris
-                }
-            }
-            await saveBath(bath_taken);
+            await saveDailyAction('home_pool', detectDailyActionDone('pool'));
+            await saveDailyAction('home_shower', detectDailyActionDone('shower'));
+            await saveDailyAction('home_clean', detectDailyActionDone('sort'));
 
             /** Espace naturel des ermites */
 

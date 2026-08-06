@@ -1361,7 +1361,7 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
             DbContext.Database.ExecuteSqlRaw("UPDATE TownEstimation SET idTown = {0} WHERE idTown = {1}", dto.Id, oldIdTown);
             DbContext.Database.ExecuteSqlRaw("UPDATE TownWishListItem SET idTown = {0} WHERE idTown = {1}", dto.Id, oldIdTown);
             DbContext.Database.ExecuteSqlRaw("UPDATE TownBankItem SET idTown = {0} WHERE idTown = {1}", dto.Id, oldIdTown);
-            DbContext.Database.ExecuteSqlRaw("UPDATE TownCitizenBath SET idTown = {0} WHERE idTown = {1}", dto.Id, oldIdTown);
+            DbContext.Database.ExecuteSqlRaw("UPDATE TownCitizenDailyAction SET idTown = {0} WHERE idTown = {1}", dto.Id, oldIdTown);
             DbContext.Database.ExecuteSqlRaw("UPDATE TownCadaver SET idTown = {0} WHERE idTown = {1}", dto.Id, oldIdTown);
             DbContext.Database.ExecuteSqlRaw("UPDATE TownCitizen SET idTown = {0} WHERE idTown = {1}", dto.Id, oldIdTown);
             DbContext.Database.ExecuteSqlRaw("UPDATE MapCellDigUpdate SET idTown = {0} WHERE idTown = {1}", dto.Id, oldIdTown);

@@ -7,9 +7,9 @@ import { TownRoleEnum } from '../enum/town-role.enum';
 import { CommonModel, dtoToModelArray, modelToDtoArray } from './_common.class';
 import { Dictionary } from './_types';
 import { Bag } from './bag.class';
-import { Bath } from './bath.class';
 import { Cadaver } from './cadaver.class';
 import { ChamanicDetail } from './chamanic-detail.class';
+import { DailyAction } from './daily-action.class';
 import { HeroicActions, HeroicActionsWithValue } from './heroic-actions.class';
 import { Home, HomeWithValue } from './home.class';
 import { Status } from './status.class';
@@ -28,7 +28,7 @@ export class Citizen extends CommonModel<CitizenDTO> {
     public home?: Home;
     public heroic_actions?: HeroicActions;
     public cadaver?: Cadaver;
-    public baths: Bath[] = [];
+    public daily_actions: DailyAction[] = [];
     public chamanic_detail!: ChamanicDetail;
     private home_message?: string;
     private nombre_jour_hero?: number;
@@ -60,7 +60,7 @@ export class Citizen extends CommonModel<CitizenDTO> {
             status: this.status?.modelToDto(),
             home: this.home?.modelToDto(),
             actionsHeroic: this.heroic_actions?.modelToDto(),
-            baths: this.baths ? modelToDtoArray(this.baths) : [],
+            dailyActions: this.daily_actions ? modelToDtoArray(this.daily_actions) : [],
             chamanicDetail: this.chamanic_detail.modelToDto(),
             cadaver: this.cadaver?.modelToDto()
         };
@@ -128,7 +128,7 @@ export class Citizen extends CommonModel<CitizenDTO> {
             this.status = new Status(dto.status);
             this.home = new Home(dto.home);
             this.heroic_actions = new HeroicActions(dto.actionsHeroic);
-            this.baths = dtoToModelArray(Bath, dto.baths);
+            this.daily_actions = dtoToModelArray(DailyAction, dto.dailyActions);
             this.chamanic_detail = new ChamanicDetail(dto.chamanicDetail);
             this.cadaver = dto.cadaver ? new Cadaver(dto.cadaver) : undefined;
         }

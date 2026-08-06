@@ -17,6 +17,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import moment from 'moment';
 
 import { CITIZENS_LIST_DISPLAY_MODE_KEY, HORDES_IMG_REPO } from '../../../_abstract_model/const';
+import { DailyActionEnum } from '../../../_abstract_model/enum/daily-action.enum';
 import { HeroicActionEnum } from '../../../_abstract_model/enum/heroic-action.enum';
 import { HomeEnum } from '../../../_abstract_model/enum/home.enum';
 import { JobEnum } from '../../../_abstract_model/enum/job.enum';
@@ -25,8 +26,9 @@ import { StandardColumn } from '../../../_abstract_model/interfaces';
 import { ApiService } from '../../../_abstract_model/services/api.service';
 import { TownService } from '../../../_abstract_model/services/town.service';
 import { Imports, ListForAddRemove } from '../../../_abstract_model/types/_types';
-import { Citizen } from '../../../_abstract_model/types/citizen.class';
 import { CitizenInfo } from '../../../_abstract_model/types/citizen-info.class';
+import { Citizen } from '../../../_abstract_model/types/citizen.class';
+import { DailyAction } from '../../../_abstract_model/types/daily-action.class';
 import { HeroicActionsWithValue } from '../../../_abstract_model/types/heroic-actions.class';
 import { HomeWithValue } from '../../../_abstract_model/types/home.class';
 import { Item } from '../../../_abstract_model/types/item.class';
@@ -46,13 +48,13 @@ import { DeferredCellComponent } from '../../../_shared/deferred-cell/deferred-c
 import { LastUpdateComponent } from '../../../_shared/last-update/last-update.component';
 import { ListElementAddRemoveComponent } from '../../../_shared/list-elements-add-remove/list-element-add-remove.component';
 import { SelectComponent } from '../../../_shared/select/select.component';
-import { BathForDayPipe } from '../bath-for-day.pipe';
 import { CitizenPictosDialogComponent, CitizenPictosDialogData } from '../citizen-pictos-dialog/citizen-pictos-dialog.component';
+import { DailyActionForDayPipe } from '../daily-action-for-day.pipe';
 import { TypeRowPipe } from './type-row.pipe';
 
 const angular_common: Imports = [CommonModule, FormsModule];
 const components: Imports = [AvatarComponent, CitizenInfoComponent, CompactStepperComponent, CompactToggleComponent, DeferredCellComponent, LastUpdateComponent, ListElementAddRemoveComponent, SelectComponent];
-const pipes: Imports = [BathForDayPipe, ColumnIdPipe, TypeRowPipe];
+const pipes: Imports = [DailyActionForDayPipe, ColumnIdPipe, TypeRowPipe];
 const material_modules: Imports = [MatBadgeModule, MatButtonModule, MatButtonToggleModule, MatCheckboxModule, MatDialogModule, MatFormFieldModule, MatIconModule, MatMenuModule, MatSidenavModule, MatSortModule, MatTableModule, MatTooltipModule];
 
 /** Une source de mise à jour d'un citoyen (libellé + info), pour le détail des dernières MàJ. */
@@ -128,6 +130,8 @@ export class CitizensListComponent implements OnInit {
     protected readonly display_mode: WritableSignal<CitizensDisplayMode> = signal<CitizensDisplayMode>(
         (localStorage.getItem(CITIZENS_LIST_DISPLAY_MODE_KEY) as CitizensDisplayMode | null) ?? 'grouped'
     );
+    /** Toutes les actions quotidiennes possibles : pilotent la bande compacte et les colonnes du mode étendu. */
+    protected readonly daily_action_keys: DailyActionEnum[] = DailyActionEnum.getAllValues<DailyActionEnum>();
     /** Toutes les actions héroïques possibles, ordonnées (booléens puis niveaux) : pilotent les colonnes du mode étendu. */
     protected readonly heroic_actions_all: HeroicActionEnum[] = [...HeroicActionEnum.getAllValues<HeroicActionEnum>()].sort(byMaxLvlAsc);
     /** Toutes les améliorations possibles, ordonnées : pilotent les colonnes du mode étendu. */
@@ -176,7 +180,8 @@ export class CitizensListComponent implements OnInit {
     private readonly grouped_columns: string[] = ['avatar_name', 'etats_sac', 'immune', 'daily_actions', 'heroic_actions', 'home', 'last_update'];
     /** Colonnes affichées en mode « colonnes » (une par champ). */
     private readonly per_field_columns: string[] = [
-        'job', 'town_roles', 'avatar_name', 'sac', 'etats', 'immune', 'daily_bath',
+        'job', 'town_roles', 'avatar_name', 'sac', 'etats', 'immune',
+        ...this.daily_action_keys.map((action: DailyActionEnum): string => 'daily_' + action.key),
         ...this.heroic_actions_all.map((action: HeroicActionEnum): string => 'heroic_' + action.key),
         ...this.home_all.map((home: HomeEnum): string => 'home_' + home.key),
         'last_update',
@@ -194,7 +199,7 @@ export class CitizensListComponent implements OnInit {
     private readonly dialog: MatDialog = inject(MatDialog);
     private readonly clipboard: ClipboardService = inject(ClipboardService);
     /** Pipe pur réutilisé pour le tri de la colonne bain. */
-    private readonly bath_pipe: BathForDayPipe = new BathForDayPipe();
+    private readonly daily_action_pipe: DailyActionForDayPipe = new DailyActionForDayPipe();
 
     public constructor() {
         // Connexion du MatSort à la datasource dès que la vue est initialisée (viewChild non résolu en ngOnInit).
@@ -388,7 +393,7 @@ export class CitizensListComponent implements OnInit {
             { label: $localize`États`, info: citizen.status?.update_info },
             { label: $localize`Sac`, info: citizen.bag?.update_info },
             { label: $localize`Chamanique`, info: citizen.chamanic_detail?.update_info },
-            { label: $localize`Bain`, info: this.bath_pipe.transform(citizen.baths, this.current_day)?.update_info },
+            { label: $localize`Bain`, info: this.daily_action_pipe.transform(citizen.daily_actions, this.current_day, 'home_pool')?.update_info },
             { label: $localize`Actions héroïques`, info: citizen.heroic_actions?.update_info },
             { label: $localize`Améliorations`, info: citizen.home?.update_info },
         ];
@@ -641,24 +646,40 @@ export class CitizensListComponent implements OnInit {
         }
     }
 
-    protected saveBath(citizen: Citizen, checked: boolean): void {
+    /** Résout la valeur courante d'une action pour un citoyen — même forme que getHeroicAction/getHomeUpgrade. */
+    protected getDailyAction(citizen: Citizen, action: DailyActionEnum): { element: DailyActionEnum; value: boolean } {
+        return {
+            element: action,
+            value: !!this.daily_action_pipe.transform(citizen.daily_actions, this.current_day, action.key)
+        };
+    }
+
+    /** Prend ou retire une action quotidienne. citizenId (pas une référence) : cellule différée, cf. updateActions/updateHome. */
+    protected saveDailyAction(actionKey: string, checked: boolean, citizenId: number): void {
+        const citizen: Citizen | undefined = this.citizen_list.data.find((c: Citizen) => c.id === citizenId);
+        if (!citizen) return;
+
         if (checked) {
             this.town_service
-                .addBath(citizen)
+                .addDailyAction(citizen, actionKey)
+                .pipe(takeUntilDestroyed(this.destroy_ref))
                 .subscribe({
-                    next: (update_info: UpdateInfo) => {
-                        if (citizen.chamanic_detail) {
-                            citizen.chamanic_detail.update_info.username = getUser()?.username;
-                            citizen.chamanic_detail.update_info.update_time = update_info.update_time;
-                        }
+                    next: () => {
+                        citizen.daily_actions.push(new DailyAction({
+                            day: this.current_day, actionKey,
+                            lastUpdateInfo: { updateTime: new Date(), userId: '', userName: '', userKey: '' }
+                        }));
                         if (citizen.id === this.me?.id) this.town_service.publishMyCitizen(citizen);
                     }
                 });
         } else {
             this.town_service
-                .removeBath(citizen)
+                .removeDailyAction(citizen, actionKey)
+                .pipe(takeUntilDestroyed(this.destroy_ref))
                 .subscribe({
                     next: () => {
+                        const index: number = citizen.daily_actions.findIndex((action: DailyAction) => action.day === this.current_day && action.action_key === actionKey);
+                        if (index > -1) citizen.daily_actions.splice(index, 1);
                         if (citizen.id === this.me?.id) this.town_service.publishMyCitizen(citizen);
                     }
                 });
@@ -736,7 +757,7 @@ export class CitizensListComponent implements OnInit {
      * Valeur de tri d'un citoyen selon la colonne.
      * - `avatar_name` : nom (insensible à la casse)
      * - `immune` : immunisé (oui avant non) puis nombre de potions bues (départage)
-     * - `daily_bath` : bain pris pour le jour courant (oui/non)
+     * - `daily_<key>` : action quotidienne faite pour le jour courant (oui/non)
      * - `heroic_<key>` / `home_<key>` : valeur du champ (booléen → 1/0, inconnu → -1)
      */
     private sortValue(citizen: Citizen, id: string): string | number {
@@ -747,7 +768,7 @@ export class CitizensListComponent implements OnInit {
             const potions: number = citizen.chamanic_detail?.nb_potion_shaman ?? 0;
             return immune * IMMUNE_SORT_FACTOR + potions;
         }
-        if (id === 'daily_bath') return this.bath_pipe.transform(citizen.baths, this.current_day) ? 1 : 0;
+        if (id.startsWith('daily_')) return this.daily_action_pipe.transform(citizen.daily_actions, this.current_day, id.substring('daily_'.length)) ? 1 : 0;
         if (id.startsWith('heroic_')) return this.fieldSortValue(citizen.heroic_actions?.content, id.substring('heroic_'.length));
         if (id.startsWith('home_')) return this.fieldSortValue(citizen.home?.content, id.substring('home_'.length));
         return '';
@@ -790,7 +811,7 @@ export class CitizensListComponent implements OnInit {
             { id: 'avatar_name', label: $localize`Nom` },
             { id: 'job', label: $localize`Métier` },
             { id: 'immune', label: $localize`Immunité` },
-            { id: 'daily_bath', label: $localize`Bain` },
+            ...this.daily_action_keys.map((action: DailyActionEnum): { id: string; label: string } => ({ id: 'daily_' + action.key, label: action.getLabel() })),
             ...this.heroic_actions_all.map((action: HeroicActionEnum): { id: string; label: string } => ({ id: 'heroic_' + action.key, label: action.getLabel() })),
             ...this.home_all.map((home: HomeEnum): { id: string; label: string } => ({ id: 'home_' + home.key, label: home.getLabel() })),
         ];
@@ -798,7 +819,7 @@ export class CitizensListComponent implements OnInit {
 
     /** Valeur booléenne d'un citoyen pour une colonne (ou null si inconnue/non applicable). */
     private citizenBoolValue(citizen: Citizen, id: string): boolean | null {
-        if (id === 'daily_bath') return !!this.bath_pipe.transform(citizen.baths, this.current_day);
+        if (id.startsWith('daily_')) return !!this.daily_action_pipe.transform(citizen.daily_actions, this.current_day, id.substring('daily_'.length));
         if (id === 'immune') return !!citizen.chamanic_detail?.is_immune_to_soul;
         const value: number | boolean | undefined = id.startsWith('heroic_')
             ? citizen.heroic_actions?.content?.find((c: HeroicActionsWithValue): boolean => c.element?.key === id.substring('heroic_'.length))?.value

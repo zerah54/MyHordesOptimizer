@@ -1,9 +1,12 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using MyHordesOptimizerApi;
+using MyHordesOptimizerApi.Configuration.Interfaces;
 using MyHordesOptimizerApi.Controllers.ActionFillters;
 using MyHordesOptimizerApi.Providers.Impl;
 using MyHordesOptimizerApi.Providers.Interfaces;
+using MyHordesOptimizerApi.Repository.Impl;
+using MyHordesOptimizerApi.Repository.Interfaces;
 using MyHordesOptimizerApi.Services.Impl;
 using MyHordesOptimizerApi.Services.Interfaces;
 using MyHordesOptimizerApiIntegrationTests.Configuration;
@@ -38,6 +41,11 @@ builder.Services.AddAutoMapper(opt =>
 // doit pouvoir résoudre.
 builder.Services.AddSingleton<IMinesweeperBoardGenerator, MinesweeperBoardGenerator>();
 builder.Services.AddScoped<IMinesweeperService, MinesweeperService>();
+
+// Requis par TownServiceDailyActionTests (Services.Impl.TownService).
+builder.Services.AddSingleton<IMyHordesApiConfiguration, MyHordesOptimizerApi.Configuration.Impl.MyHordesApiConfiguration>();
+builder.Services.AddScoped<IMyHordesApiRepository, MyHordesApiRepository>();
+builder.Services.AddScoped<ITownService, TownService>();
 
 var app = builder.Build();
 app.UseHttpsRedirection();

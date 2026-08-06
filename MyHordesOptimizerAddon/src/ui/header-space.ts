@@ -18,7 +18,7 @@ export function createMhoHeaderSpace() {
         header_space.style.display = 'none';
         header_space.style.gap = '0.5em';
         header_space.style.alignItems = 'flex-start';
-        header_space.style.zIndex = '996';
+        header_space.style.zIndex = '994';
     }
 
     const callback = function (mutationsList, observer) {

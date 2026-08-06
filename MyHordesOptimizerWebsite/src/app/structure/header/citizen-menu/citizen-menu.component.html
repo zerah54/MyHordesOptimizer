@@ -65,13 +65,14 @@
     <mat-menu #dailyActions (click)="$event.stopPropagation(); $event.preventDefault()" [xPosition]="'before'" [yPosition]="'below'"
               class="mho-menu-citizen-details daily-actions">
         <div class="band" (click)="$event.stopPropagation();">
-            <mho-compact-toggle
-                (valueChange)="saveBath($event)"
-                [value]="dailyBathTaken()"
-                i18n-label
-                icon="building/small_pool.gif"
-                label="Bain pris">
-            </mho-compact-toggle>
+            @for (action of daily_action_keys; track action.key) {
+                <mho-compact-toggle
+                    (valueChange)="saveDailyAction(action.key, $event)"
+                    [icon]="action.value.img"
+                    [label]="action.getLabel()"
+                    [value]="isDailyActionDone(action.key)">
+                </mho-compact-toggle>
+            }
         </div>
     </mat-menu>
     <mat-menu #heroicActions (click)="$event.stopPropagation(); $event.preventDefault()" [xPosition]="'before'" [yPosition]="'below'"

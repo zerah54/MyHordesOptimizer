@@ -1,26 +1,30 @@
 import { mh_optimizer_icon, mho_double_install_banner_id, mho_double_install_marker_attr } from '../config/constants';
 import { texts } from '../i18n/texts';
+import { isConflictingDoubleInstall } from './double-install-conflict';
 import { getI18N } from './i18n';
-import { getScriptInfo } from './version';
+import { getOrigin, getScriptInfo } from './version';
 
 /**
  * Le script (Tampermonkey) et l'extension navigateur partagent le même bundle : quand les
  * deux sont installés sur le même navigateur, ils s'exécutent en parallèle sur la page et
  * se marchent dessus (écouteurs et éléments DOM dupliqués, instabilités). Chacun tourne
  * dans un monde JS isolé de l'autre, seul le DOM leur est commun : on s'en sert comme
- * verrou. La première instance à atteindre ce point pose le marqueur et s'initialise
- * normalement ; la seconde le détecte, affiche un avertissement, et abandonne son
- * initialisation.
+ * verrou. Le marqueur porte l'origine (script/firefox/chrome) de l'instance qui l'a posé :
+ * une instance qui retrouve sa PROPRE origine (mise à jour non rafraîchie, réveil d'onglet)
+ * prend simplement le relais, seule une origine différente est un vrai doublon.
  *
  * @returns {boolean}    `true` si cette instance doit abandonner son initialisation
  */
 export function isDoubleInstall(): boolean {
-    if (document.documentElement.hasAttribute(mho_double_install_marker_attr)) {
+    const current_origin: string = getOrigin() ?? 'unknown';
+    const existing_marker: string | null = document.documentElement.getAttribute(mho_double_install_marker_attr);
+
+    if (isConflictingDoubleInstall(existing_marker, current_origin)) {
         showDoubleInstallWarning();
         return true;
     }
 
-    document.documentElement.setAttribute(mho_double_install_marker_attr, '1');
+    document.documentElement.setAttribute(mho_double_install_marker_attr, current_origin);
     return false;
 }
 

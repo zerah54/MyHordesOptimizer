@@ -1,9 +1,11 @@
 import { lang, mh_optimizer_icon, mho_blacklist_key } from '../config/constants';
 import { fill_items_messages_pool } from '../data/fill-items-messages';
 import { state } from '../state';
+import { findLinkInsertionPoint, type LinkInsertionPoint } from '../utils/forum-link-insertion';
 import { pageIsDesert, pageIsForum, pageIsMsgReceived } from '../utils/page';
 import { unwatchRendered, watchRendered } from '../utils/render-watch';
 import { getStorageItem, setStorageItem } from '../utils/storage';
+import { type MatchedVideo, matchVideoLink } from '../utils/video-providers';
 
 export function fillItemsMessages() {
     if (state.mho_parameters.fill_items_messages && pageIsMsgReceived()) {
@@ -302,6 +304,10 @@ export function pinForumSpoilersOnClick(): void {
 
 /** Extensions d'image reconnues sur le `pathname` d'un lien (insensible à la casse, tolère un `?query` en suffixe) */
 const image_url_pattern: RegExp = /\.(jpe?g|png|gif|webp|svg|bmp)$/i;
+/** Classe commune aux blocs image et vidéo injectés après un lien */
+const forum_media_block_class: string = 'mho-forum-media-block';
+/** Classe de la légende commune aux blocs image et vidéo */
+const forum_media_caption_class: string = 'mho-forum-media-caption';
 /** Classe du bloc image injecté après un lien, pour le retrouver et le retirer si l'option est décochée */
 const forum_image_block_class: string = 'mho-forum-image-block';
 
@@ -317,7 +323,7 @@ function isForumImageLink(href: string): boolean {
 /** Construit le bloc image + légende optionnelle à insérer après le lien d'origine */
 function buildForumImageBlock(href: string, caption: string | null): HTMLElement {
     const wrapper: HTMLElement = document.createElement('div');
-    wrapper.classList.add(forum_image_block_class);
+    wrapper.classList.add(forum_media_block_class, forum_image_block_class);
 
     const link: HTMLAnchorElement = document.createElement('a');
     link.href = href;
@@ -334,7 +340,7 @@ function buildForumImageBlock(href: string, caption: string | null): HTMLElement
 
     if (caption) {
         const caption_element: HTMLElement = document.createElement('div');
-        caption_element.classList.add('mho-forum-image-caption');
+        caption_element.classList.add(forum_media_caption_class);
         caption_element.textContent = caption;
         wrapper.appendChild(caption_element);
     }
@@ -342,42 +348,50 @@ function buildForumImageBlock(href: string, caption: string | null): HTMLElement
     return wrapper;
 }
 
-/** Un point d'insertion : le nœud auquel accrocher le bloc image, et la position `insertAdjacentElement` à utiliser */
-interface ForumImageInsertionPoint {
-    node: HTMLElement;
-    position: InsertPosition;
-}
-
 /**
- * Repère où poser le bloc image sans jamais quitter le conteneur direct du lien (celui-ci
- * peut être `.forum-post-content` lui-même, mais tout aussi bien un `<blockquote>` de citation
- * ou le `.collapsed` d'une section repliée — le bloc doit rester DEDANS pour, par exemple,
- * rester masqué avec une section repliée tant qu'elle ne s'ouvre pas).
- *
- * On ne remonte donc jamais au-delà de `link.parentElement` : on cherche le prochain `<br>`
- * parmi les frères directs du lien (un saut de paragraphe `<br><br>` est déjà couvert, on
- * s'arrête au premier des deux) et on se pose juste après ; s'il n'y en a pas (le lien est sur
- * la toute dernière ligne de son conteneur), on ajoute en tout dernier enfant de ce même
- * conteneur plutôt que juste après lui (ce qui en sortirait) — sauf si ce dernier enfant est la
- * flèche de dépli d'une section repliée (`div[data-etog]`, posée par le jeu en tout dernier),
- * auquel cas on se pose juste avant elle pour ne pas passer derrière.
+ * Squelette commun de `displayForumLinkImages` et `displayForumLinkVideos` :
+ * parcourt les liens non encore marqués, appelle `matchAndBuild` pour chacun,
+ * et insère le bloc résultant au bon endroit (enchaîné si consécutif).
  */
-function findForumImageInsertionPoint(link: HTMLAnchorElement): ForumImageInsertionPoint {
-    const parent: HTMLElement | null = link.parentElement;
-    if (!parent) return { node: link, position: 'afterend' };
-
-    let sibling: ChildNode | null = link.nextSibling;
-    while (sibling) {
-        if (sibling instanceof HTMLElement && sibling.tagName === 'BR') return { node: sibling, position: 'afterend' };
-        sibling = sibling.nextSibling;
+function processForumMediaLinks(
+    is_enabled: boolean,
+    block_class: string,
+    checked_data_attr: string,
+    matchAndBuild: (href: string, caption: string | null) => HTMLElement | null,
+): void {
+    if (!is_enabled) {
+        document.querySelectorAll(`.forum-post-content .${block_class}`).forEach((block: Element) => block.remove());
+        document.querySelectorAll<HTMLElement>(`.forum-post-content a[${checked_data_attr}]`).forEach((link: HTMLElement) => {
+            link.removeAttribute(checked_data_attr);
+        });
+        return;
     }
 
-    const collapse_toggle: Element | null = parent.lastElementChild;
-    if (collapse_toggle instanceof HTMLElement && collapse_toggle.hasAttribute('data-etog')) {
-        return { node: collapse_toggle, position: 'beforebegin' };
-    }
+    const links: HTMLAnchorElement[] = Array.from(document.querySelectorAll(`.forum-post-content a[href]:not([${checked_data_attr}])`));
+    /** Deux liens média consécutifs partageant le même point d'insertion : on chaîne sur le dernier bloc posé là, pas sur le point d'origine à chaque fois, pour garder l'ordre du texte */
+    const last_inserted_at_node: Map<HTMLElement, HTMLElement> = new Map();
 
-    return { node: parent, position: 'beforeend' };
+    links.forEach((link: HTMLAnchorElement) => {
+        link.setAttribute(checked_data_attr, '1');
+
+        const href: string = link.getAttribute('href') ?? '';
+        const link_text: string = (link.textContent ?? '').trim();
+        const caption: string | null = link_text !== '' && link_text !== href ? link_text : null;
+
+        const block: HTMLElement | null = matchAndBuild(href, caption);
+        if (!block) return;
+
+        const insertion_point: LinkInsertionPoint = findLinkInsertionPoint(link);
+        const previous_block: HTMLElement | undefined = last_inserted_at_node.get(insertion_point.node);
+
+        if (previous_block) {
+            previous_block.insertAdjacentElement('afterend', block);
+        } else {
+            insertion_point.node.insertAdjacentElement(insertion_point.position, block);
+        }
+
+        last_inserted_at_node.set(insertion_point.node, block);
+    });
 }
 
 /**
@@ -388,38 +402,100 @@ function findForumImageInsertionPoint(link: HTMLAnchorElement): ForumImageInsert
  */
 export function displayForumLinkImages(): void {
     const is_enabled: boolean = !!(state.mho_parameters?.forum_options && state.mho_parameters?.forum_auto_display_images);
+    processForumMediaLinks(is_enabled, forum_image_block_class, 'data-mho-image-checked', (href, caption) => {
+        if (!isForumImageLink(href)) return null;
+        return buildForumImageBlock(href, caption);
+    });
+}
 
-    if (!is_enabled) {
-        document.querySelectorAll(`.forum-post-content .${forum_image_block_class}`).forEach((block: Element) => block.remove());
-        document.querySelectorAll<HTMLElement>('.forum-post-content a[data-mho-image-checked]').forEach((link: HTMLElement) => {
-            delete link.dataset.mhoImageChecked;
+/** Classe du bloc vidéo injecté après un lien, pour le retrouver et le retirer si l'option est décochée */
+const forum_video_block_class: string = 'mho-forum-video-block';
+
+/** Vignette de secours (logo générique + icône lecture) : état de chargement ET repli en cas d'échec réseau */
+function buildGenericVideoPlaceholder(): HTMLElement {
+    const placeholder: HTMLElement = document.createElement('div');
+    placeholder.classList.add('mho-forum-video-placeholder');
+    return placeholder;
+}
+
+/**
+ * Construit le bloc vignette + légende optionnelle à insérer après le lien d'origine ; le clic sur
+ * la vignette bascule vers l'iframe du fournisseur. La vignette est un vrai `<a>` : ctrl/clic-molette
+ * ouvre la vidéo dans un nouvel onglet, et la bordure hérite ainsi de la couleur de lien du thème du
+ * jeu (`currentColor`) au lieu de la couleur de texte ambiante.
+ */
+function buildForumVideoBlock(matched: MatchedVideo, href: string, caption: string | null): HTMLElement {
+    const wrapper: HTMLElement = document.createElement('div');
+    wrapper.classList.add(forum_media_block_class, forum_video_block_class);
+
+    const thumbnail: HTMLAnchorElement = document.createElement('a');
+    thumbnail.classList.add('mho-forum-video-thumbnail');
+    thumbnail.href = href;
+    thumbnail.target = '_blank';
+    thumbnail.rel = 'noopener noreferrer';
+
+    if (matched.provider.getThumbnailUrl) {
+        const img: HTMLImageElement = document.createElement('img');
+        img.loading = 'lazy';
+        img.addEventListener('error', () => {
+            img.remove();
+            thumbnail.prepend(buildGenericVideoPlaceholder());
+        }, { once: true });
+        img.src = matched.provider.getThumbnailUrl(matched.videoId);
+        thumbnail.appendChild(img);
+    } else {
+        const placeholder: HTMLElement = buildGenericVideoPlaceholder();
+        thumbnail.appendChild(placeholder);
+
+        matched.provider.resolveThumbnailUrl?.(matched.videoId).then((thumbnail_url: string | undefined) => {
+            if (!thumbnail_url || !placeholder.isConnected) return;
+            const img: HTMLImageElement = document.createElement('img');
+            img.loading = 'lazy';
+            img.src = thumbnail_url;
+            placeholder.replaceWith(img);
         });
-        return;
     }
 
-    const links: HTMLAnchorElement[] = Array.from(document.querySelectorAll('.forum-post-content a[href]:not([data-mho-image-checked])'));
-    /** Deux liens image consécutifs partageant le même point d'insertion : on chaîne sur le dernier bloc posé là (toujours via `afterend`, lui-même déjà dans le bon conteneur), pas sur le point d'origine à chaque fois, pour garder l'ordre du texte */
-    const last_inserted_at_node: Map<HTMLElement, HTMLElement> = new Map();
+    const play_icon: HTMLElement = document.createElement('span');
+    play_icon.classList.add('mho-forum-video-play-icon-overlay');
+    thumbnail.appendChild(play_icon);
 
-    links.forEach((link: HTMLAnchorElement) => {
-        link.dataset.mhoImageChecked = '1';
+    thumbnail.addEventListener('click', (event: MouseEvent) => {
+        event.preventDefault();
 
-        const href: string = link.getAttribute('href') ?? '';
-        if (!isForumImageLink(href)) return;
+        const iframe: HTMLIFrameElement = document.createElement('iframe');
+        iframe.src = matched.provider.getEmbedUrl(matched.videoId);
+        iframe.referrerPolicy = 'strict-origin-when-cross-origin';
+        iframe.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen';
+        iframe.allowFullscreen = true;
 
-        const link_text: string = (link.textContent ?? '').trim();
-        const caption: string | null = link_text !== '' && link_text !== href ? link_text : null;
+        const a: HTMLAnchorElement = document.createElement('a');
+        a.appendChild(iframe);
+        wrapper.replaceChild(a, thumbnail);
+    }, { once: true });
 
-        const insertion_point: ForumImageInsertionPoint = findForumImageInsertionPoint(link);
-        const previous_block: HTMLElement | undefined = last_inserted_at_node.get(insertion_point.node);
-        const block: HTMLElement = buildForumImageBlock(href, caption);
+    wrapper.appendChild(thumbnail);
 
-        if (previous_block) {
-            previous_block.insertAdjacentElement('afterend', block);
-        } else {
-            insertion_point.node.insertAdjacentElement(insertion_point.position, block);
-        }
+    if (caption) {
+        const caption_element: HTMLElement = document.createElement('div');
+        caption_element.classList.add(forum_media_caption_class);
+        caption_element.textContent = caption;
+        wrapper.appendChild(caption_element);
+    }
 
-        last_inserted_at_node.set(insertion_point.node, block);
+    return wrapper;
+}
+
+/**
+ * Affiche une vignette cliquable sous chaque lien de post pointant vers une vidéo YouTube ou
+ * Dailymotion, sans jamais supprimer le lien texte d'origine. Même principe de rejeu que
+ * `displayForumLinkImages` (pas de `watchRendered`, s'appuie sur le rejeu de navigation SPA).
+ */
+export function displayForumLinkVideos(): void {
+    const is_enabled: boolean = !!(state.mho_parameters?.forum_options && state.mho_parameters?.forum_auto_display_videos);
+    processForumMediaLinks(is_enabled, forum_video_block_class, 'data-mho-video-checked', (href, caption) => {
+        const matched: MatchedVideo | null = matchVideoLink(href);
+        if (!matched) return null;
+        return buildForumVideoBlock(matched, href, caption);
     });
 }

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, DestroyRef, EventEmitter, inject, OnInit, Signal, viewChild } from '@angular/core';
+import { Component, DestroyRef, effect, EventEmitter, inject, OnInit, Signal, viewChild } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatTable, MatTableDataSource, MatTableModule } from '@angular/material/table';
@@ -10,8 +10,8 @@ import { StandardColumn } from '../../../_abstract_model/interfaces';
 import { DigsService } from '../../../_abstract_model/services/digs.service';
 import { TownService } from '../../../_abstract_model/services/town.service';
 import { Imports } from '../../../_abstract_model/types/_types';
-import { Citizen } from '../../../_abstract_model/types/citizen.class';
 import { CitizenInfo } from '../../../_abstract_model/types/citizen-info.class';
+import { Citizen } from '../../../_abstract_model/types/citizen.class';
 import { Dig } from '../../../_abstract_model/types/dig.class';
 import { ColumnIdPipe } from '../../../_core/pipes/column-id.pipe';
 import { getTown } from '../../../_core/utilities/localstorage.util';
@@ -37,8 +37,8 @@ const material_modules: Imports = [MatSortModule, MatTableModule];
 })
 export class CitizensDigsComponent implements OnInit {
 
-    private readonly sort: Signal<MatSort> = viewChild.required(MatSort);
-    public readonly table: Signal<MatTable<DigsByCitizen>> = viewChild.required(MatTable);
+    private readonly sort: Signal<MatSort | undefined> = viewChild(MatSort);
+    public readonly table: Signal<MatTable<DigsByCitizen> | undefined> = viewChild(MatTable);
 
     /** La liste des citoyens */
     protected citizen_info!: CitizenInfo;
@@ -69,10 +69,17 @@ export class CitizensDigsComponent implements OnInit {
     private readonly town_service: TownService = inject(TownService);
     private readonly destroy_ref: DestroyRef = inject(DestroyRef);
 
+    public constructor() {
+        // Le tableau (donc MatSort) n'existe qu'une fois citizen_info chargé (@if côté template) :
+        // le viewChild ne se résout qu'à ce moment-là, jamais de façon synchrone dans ngOnInit.
+        effect((): void => {
+            const sort: MatSort | undefined = this.sort();
+            if (sort) this.datasource.sort = sort;
+        });
+    }
 
     public ngOnInit(): void {
         this.datasource = new MatTableDataSource();
-        this.datasource.sort = this.sort();
 
         this.createDigsByCitizenAndDay();
         this.citizen_filter_change

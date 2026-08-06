@@ -32,13 +32,8 @@ export class CitizensComponent {
             displayed: true
         },
         {
-            label: $localize`Bains`,
-            path: 'watch',
-            displayed: true
-        },
-        {
-            label: $localize`Immunités`,
-            path: 'immune',
+            label: $localize`Actions quotidiennes`,
+            path: 'daily-actions',
             displayed: true
         },
         {

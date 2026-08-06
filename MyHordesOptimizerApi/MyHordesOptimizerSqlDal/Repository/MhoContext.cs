@@ -66,8 +66,8 @@ namespace MyHordesOptimizerApi
                     .ThenInclude(lastUpdate => lastUpdate.IdUserNavigation)
                 .Include(lastUpdate => lastUpdate.IdUserNavigation)
                 .Include(townCitizen => townCitizen.IdTownNavigation)
-                    .ThenInclude(town => town.TownCitizenBaths)
-                        .ThenInclude(townCitizenBath => townCitizenBath.IdLastUpdateInfoNavigation)
+                    .ThenInclude(town => town.TownCitizenDailyActions)
+                        .ThenInclude(townCitizenDailyAction => townCitizenDailyAction.IdLastUpdateInfoNavigation)
                             .ThenInclude(lastUpdate => lastUpdate.IdUserNavigation);
         }
     }

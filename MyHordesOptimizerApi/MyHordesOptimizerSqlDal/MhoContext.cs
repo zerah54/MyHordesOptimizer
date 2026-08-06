@@ -99,7 +99,7 @@ public partial class MhoContext : DbContext
 
     public virtual DbSet<TownCitizen> TownCitizens { get; set; }
 
-    public virtual DbSet<TownCitizenBath> TownCitizenBaths { get; set; }
+    public virtual DbSet<TownCitizenDailyAction> TownCitizenDailyActions { get; set; }
 
     public virtual DbSet<TownEstimation> TownEstimations { get; set; }
 
@@ -681,17 +681,17 @@ public partial class MhoContext : DbContext
                 .HasConstraintName("TownCitizen_ibfk_2");
         });
 
-        modelBuilder.Entity<TownCitizenBath>(entity =>
+        modelBuilder.Entity<TownCitizenDailyAction>(entity =>
         {
-            entity.HasKey(e => new { e.IdTown, e.IdUser, e.IdLastUpdateInfo, e.Day })
+            entity.HasKey(e => new { e.IdTown, e.IdUser, e.IdLastUpdateInfo, e.Day, e.ActionKey })
                 .HasName("PRIMARY")
-                .HasAnnotation("MySql:IndexPrefixLength", new[] { 0, 0, 0, 0 });
+                .HasAnnotation("MySql:IndexPrefixLength", new[] { 0, 0, 0, 0, 0 });
 
-            entity.HasOne(d => d.IdLastUpdateInfoNavigation).WithMany(p => p.TownCitizenBaths).HasConstraintName("TownCitizenBath_ibfk_3");
+            entity.HasOne(d => d.IdLastUpdateInfoNavigation).WithMany(p => p.TownCitizenDailyActions).HasConstraintName("TownCitizenDailyAction_ibfk_3");
 
-            entity.HasOne(d => d.IdTownNavigation).WithMany(p => p.TownCitizenBaths).HasConstraintName("TownCitizenBath_ibfk_1");
+            entity.HasOne(d => d.IdTownNavigation).WithMany(p => p.TownCitizenDailyActions).HasConstraintName("TownCitizenDailyAction_ibfk_1");
 
-            entity.HasOne(d => d.IdUserNavigation).WithMany(p => p.TownCitizenBaths).HasConstraintName("TownCitizenBath_ibfk_2");
+            entity.HasOne(d => d.IdUserNavigation).WithMany(p => p.TownCitizenDailyActions).HasConstraintName("TownCitizenDailyAction_ibfk_2");
         });
 
         modelBuilder.Entity<TownEstimation>(entity =>

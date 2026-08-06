@@ -69,16 +69,19 @@
 
                 <section class="filters-section">
                     <h4 i18n>Actions quotidiennes</h4>
-                    <div class="filter-row bool-row">
-                    <span (click)="cycleBoolFilter('daily_bath')" class="bool-control"
-                          i18n-matTooltip matTooltip="Bain — coché : oui · décoché : non · indéterminé : tous">
-                        <mat-checkbox [checked]="boolFilter('daily_bath') === true" [indeterminate]="boolFilter('daily_bath') === null"
-                                      class="bool-filter"
-                                      disableRipple>
-                            <img [src]="HORDES_IMG_REPO + 'building/small_pool.gif'" alt="Bain" class="filter-icon" i18n-alt>
-                        </mat-checkbox>
-                    </span>
-                    </div>
+                    @for (action of daily_action_keys; track action.key) {
+                        <div class="filter-row bool-row">
+                        <span (click)="cycleBoolFilter('daily_' + action.key)" [matTooltip]="action.getLabel() + bool_filter_hint"
+                              class="bool-control">
+                            <mat-checkbox [checked]="boolFilter('daily_' + action.key) === true"
+                                          [indeterminate]="boolFilter('daily_' + action.key) === null"
+                                          class="bool-filter"
+                                          disableRipple>
+                                <img [alt]="action.getLabel()" [src]="HORDES_IMG_REPO + action.value.img" class="filter-icon">
+                            </mat-checkbox>
+                        </span>
+                        </div>
+                    }
                 </section>
 
                 <section class="filters-section toggles">
@@ -275,15 +278,18 @@
                                 </td>
                             </ng-container>
 
-                            <ng-container matColumnDef="daily_bath">
-                                <th *matHeaderCellDef class="field-col" mat-header-cell>
-                                    <img [src]="HORDES_IMG_REPO + 'building/small_pool.gif'" alt="Bain"
-                                         class="col-header-icon" i18n-alt i18n-matTooltip matTooltip="Bain">
-                                </th>
-                                <td *matCellDef="let row" class="field-col" mat-cell>
-                                    <mho-deferred-cell [content]="bathContent" [context]="{ $implicit: row }"></mho-deferred-cell>
-                                </td>
-                            </ng-container>
+                            @for (action of daily_action_keys; track action.key) {
+                                <ng-container [matColumnDef]="'daily_' + action.key">
+                                    <th *matHeaderCellDef class="field-col" mat-header-cell>
+                                        <img [alt]="action.getLabel()" [matTooltip]="action.getLabel()"
+                                             [src]="HORDES_IMG_REPO + action.value.img" class="col-header-icon">
+                                    </th>
+                                    <td *matCellDef="let row" class="field-col" mat-cell>
+                                        <mho-deferred-cell [content]="dailyActionCell"
+                                                           [context]="{ $implicit: getDailyAction(row, action), citizenId: row.id }"></mho-deferred-cell>
+                                    </td>
+                                </ng-container>
+                            }
 
                             @for (action of heroic_actions_all; track action.key) {
                                 <ng-container [matColumnDef]="'heroic_' + action.key">
@@ -479,7 +485,10 @@
 
 <ng-template #dailyBand let-row>
     <div class="band">
-        <ng-container [ngTemplateOutletContext]="{ $implicit: row }" [ngTemplateOutlet]="bathContent"></ng-container>
+        @for (action of daily_action_keys; track action.key) {
+            <ng-container [ngTemplateOutletContext]="{ $implicit: getDailyAction(row, action), citizenId: row.id }"
+                          [ngTemplateOutlet]="dailyActionCell"></ng-container>
+        }
     </div>
 </ng-template>
 
@@ -568,16 +577,14 @@
     </div>
 </ng-template>
 
-<ng-template #bathContent let-row>
-    <div class="daily-action">
-        <mho-compact-toggle
-            (valueChange)="saveBath(row, $event)"
-            [disabled]="is_readonly()" [value]="!!(row.baths | bathForDay : current_day)"
-            i18n-label
-            icon="building/small_pool.gif"
-            label="Bain pris">
-        </mho-compact-toggle>
-    </div>
+<ng-template #dailyActionCell let-action let-citizenId="citizenId">
+    <mho-compact-toggle
+        (valueChange)="saveDailyAction(action.element.key, $event, citizenId)"
+        [disabled]="is_readonly()"
+        [icon]="action.element.value.img"
+        [label]="action.element.getLabel()"
+        [value]="action.value">
+    </mho-compact-toggle>
 </ng-template>
 
 <ng-template #heroicCell let-action let-citizenId="citizenId">
