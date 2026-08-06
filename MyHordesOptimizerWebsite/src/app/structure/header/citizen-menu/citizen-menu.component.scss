@@ -9,23 +9,17 @@
             gap: 0.5em;
         }
 
-        // mho-avatar est fixé à 100px dans son propre composant (pas d'input de taille) : trop grand
-        // à côté du pseudo dans ce menu. ::ng-deep + !important nécessaires pour dépasser la spécificité
-        // de sa propre règle (`.mho-avatar > *`), depuis l'extérieur du composant.
+        // mho-avatar est fixé à 100px sans input de taille : ::ng-deep + !important pour l'overrider ici.
         ::ng-deep mho-avatar .mho-avatar > * {
             width: 40px !important;
         }
     }
 }
 
-// Les panneaux #status/#bag/#dailyActions/#heroicActions/#home sont chacun un mat-menu à part entière,
-// porté par CDK dans un overlay détaché du DOM de ce composant (pas de relation d'ascendance réelle
-// avec :host) : un sélecteur `:host .foo` ne peut jamais les atteindre. ::ng-deep + la classe posée via
-// panelClass (point d'extension officiel de mat-menu) est la façon correcte de les styler d'ici.
+// Panneaux mat-menu rendus dans un overlay CDK hors de :host → ::ng-deep + panelClass pour les cibler.
 ::ng-deep .mho-menu-citizen-details {
-    // Le panneau par défaut de mat-menu plafonne à 280px (max-width interne) : trop étroit pour
-    // une liste d'états/objets ou une grille d'icônes compactes.
-    .mat-mdc-menu-panel {
+    // max-width par défaut de mat-menu (280px) trop étroit pour la liste d'états/objets ou la grille d'icônes.
+    &.mat-mdc-menu-panel {
         max-width: 420px;
     }
 
@@ -38,9 +32,7 @@
         }
     }
 
-    // Bande d'icônes compactes (chamanique, actions quotidiennes, actions héroïques, améliorations) :
-    // flex-wrap pour laisser les mho-compact-toggle/mho-compact-stepper s'aligner côte à côte sans
-    // repasser à la ligne pour chacun — c'est tout l'intérêt de la forme compacte.
+    // flex-wrap pour aligner les mho-compact-toggle/stepper côte à côte, forme compacte oblige.
     .band {
         display: flex;
         flex-direction: row;
@@ -58,8 +50,7 @@
         margin: 0 0.75em 0.5em;
     }
 
-    // Niveau de maison : affiché, jamais saisi. Pastille assortie aux mho-compact-toggle/stepper
-    // voisins (même gabarit que dans citizens-list) pour ne pas jurer dans la bande.
+    // Niveau de maison : affiché, jamais saisi — pastille au même gabarit que les toggles/steppers voisins.
     .home-readonly {
         display: inline-flex;
         align-items: center;

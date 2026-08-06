@@ -11,5 +11,9 @@
             vertical-align: bottom;
             margin: 0 0.5em;
         }
+
+        &.align-right {
+            direction: rtl;
+        }
     }
 }

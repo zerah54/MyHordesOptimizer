@@ -389,7 +389,11 @@
     }
 }
 
-// Menu de détail des dernières MàJ : rendu dans l'overlay CDK, donc HORS de :host — styles au niveau racine.
+// max-width par défaut de mat-menu (280px) trop étroit pour une ligne "Label : Mis à jour par <pseudo> <durée>".
+::ng-deep .mho-menu-updates-detail.mat-mdc-menu-panel {
+    max-width: 420px;
+}
+
 .updates-menu-title {
     padding: 8px 16px 4px;
     font-weight: 600;
@@ -400,16 +404,11 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 1em;
+    gap: 2em;
     padding: 4px 16px;
     white-space: nowrap;
 
     .update-label {
         font-weight: 500;
-    }
-
-    .update-never {
-        opacity: 0.5;
-        font-style: italic;
     }
 }
