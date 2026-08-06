@@ -17,7 +17,8 @@
                     <h4 i18n>Général</h4>
                     <mat-form-field subscriptSizing="dynamic">
                         <mat-label i18n>Nom</mat-label>
-                        <mho-select (ngModelChange)="citizen_filters = $event; applyCitizenFilters()" [ngModel]="citizen_filters" [options]="alive_citizen_info.citizens" bindLabel="name"
+                        <mho-select (ngModelChange)="citizen_filters = $event; applyCitizenFilters()" [ngModel]="citizen_filters"
+                                    [options]="alive_citizen_info.citizens" bindLabel="name"
                                     multiple searchable></mho-select>
                     </mat-form-field>
                     <div class="filter-row">
@@ -32,12 +33,14 @@
                     </div>
                     <mat-form-field subscriptSizing="dynamic">
                         <mat-label i18n>Sac</mat-label>
-                        <mho-select (ngModelChange)="bag_filter = $event; applyCitizenFilters()" [bindLabel]="item_bind_label" [ngModel]="bag_filter" [options]="all_items" bindIcon="img"
+                        <mho-select (ngModelChange)="bag_filter = $event; applyCitizenFilters()" [bindLabel]="item_bind_label" [ngModel]="bag_filter"
+                                    [options]="all_items" bindIcon="img"
                                     multiple searchable></mho-select>
                     </mat-form-field>
                     <mat-form-field subscriptSizing="dynamic">
                         <mat-label i18n>États</mat-label>
-                        <mho-select (ngModelChange)="status_filter = $event; applyCitizenFilters()" [ngModel]="status_filter" [options]="all_status" bindIcon="img" bindLabel="label"
+                        <mho-select (ngModelChange)="status_filter = $event; applyCitizenFilters()" [ngModel]="status_filter" [options]="all_status"
+                                    bindIcon="img" bindLabel="label"
                                     multiple searchable></mho-select>
                     </mat-form-field>
                     <!-- Chamanique : potions puis immunité, sur une même ligne (ordre de la liste). -->
@@ -85,7 +88,8 @@
                             <div class="filter-row bool-row">
                             <span (click)="cycleBoolFilter('heroic_' + action.key)" [matTooltip]="action.getLabel() + bool_filter_hint"
                                   class="bool-control">
-                                <mat-checkbox [checked]="boolFilter('heroic_' + action.key) === true" [indeterminate]="boolFilter('heroic_' + action.key) === null"
+                                <mat-checkbox [checked]="boolFilter('heroic_' + action.key) === true"
+                                              [indeterminate]="boolFilter('heroic_' + action.key) === null"
                                               class="bool-filter"
                                               disableRipple>
                                     <img [alt]="action.getLabel()" [src]="HORDES_IMG_REPO + action.value.img" class="filter-icon">
@@ -97,7 +101,8 @@
                             <span [matTooltip]="action.getLabel()" class="filter-label">
                                 <img [alt]="action.getLabel()" [src]="HORDES_IMG_REPO + action.value.img">
                             </span>
-                                <mat-button-toggle-group (change)="setValueFilter('heroic_' + action.key, $event.value)" [value]="valueFilter('heroic_' + action.key)" class="value-filter"
+                                <mat-button-toggle-group (change)="setValueFilter('heroic_' + action.key, $event.value)"
+                                                         [value]="valueFilter('heroic_' + action.key)" class="value-filter"
                                                          hideMultipleSelectionIndicator multiple>
                                     @for (value of value_options['heroic_' + action.key]; track value) {
                                         <mat-button-toggle [value]="value">{{ value }}</mat-button-toggle>
@@ -127,7 +132,8 @@
                             <span [matTooltip]="home.getLabel()" class="filter-label">
                                 <img [alt]="home.getLabel()" [src]="HORDES_IMG_REPO + homeHeaderIcon(home)">
                             </span>
-                                <mat-button-toggle-group (change)="setValueFilter('home_' + home.key, $event.value)" [value]="valueFilter('home_' + home.key)" class="value-filter"
+                                <mat-button-toggle-group (change)="setValueFilter('home_' + home.key, $event.value)" [value]="valueFilter('home_' + home.key)"
+                                                         class="value-filter"
                                                          hideMultipleSelectionIndicator multiple>
                                     @for (value of value_options['home_' + home.key]; track value) {
                                         <mat-button-toggle [value]="value">{{ value }}</mat-button-toggle>
@@ -423,18 +429,14 @@
 </mat-menu>
 
 <!-- ============ Menu de détail des dernières MàJ (au survol) ============ -->
-<mat-menu #updatesMenu="matMenu" [hasBackdrop]="false">
+<mat-menu #updatesMenu="matMenu" [hasBackdrop]="false" class="mho-menu-updates-detail">
     <div (mouseenter)="cancelUpdatesMenuClose()" (mouseleave)="scheduleUpdatesMenuClose()" class="updates-menu-content">
         @if (menu_row(); as row) {
             <div class="updates-menu-title" i18n>Dernières mises à jour</div>
             @for (update of lastUpdates(row); track update.label) {
                 <div class="update-detail">
                     <span class="update-label">{{ update.label }}</span>
-                    @if (update.info) {
-                        <mho-last-update [lastUpdateInfo]="update.info" [thresholds]="[30, 120, 120 * 2, 120 * 3]" noTooltip></mho-last-update>
-                    } @else {
-                        <span class="update-never" i18n>Jamais</span>
-                    }
+                    <mho-last-update [lastUpdateInfo]="update.info" [thresholds]="[30, 120, 120 * 2, 120 * 3]" noTooltip alignRight></mho-last-update>
                 </div>
             }
         }

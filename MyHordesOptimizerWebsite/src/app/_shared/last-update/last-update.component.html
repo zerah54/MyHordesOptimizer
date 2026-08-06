@@ -1,4 +1,4 @@
-<div class="mho-last-update">
+<div class="mho-last-update" [class.align-right]="alignRight()">
     @let _lastUpdateInfo = lastUpdateInfo();
     @if (_lastUpdateInfo && _lastUpdateInfo.update_time) {
         <small>

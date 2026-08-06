@@ -24,6 +24,7 @@ export class LastUpdateComponent {
     public hideDetails: InputSignalWithTransform<boolean, unknown> = input(false, { transform: booleanAttribute });
     /** Désactive le matTooltip interne de l'indicateur (ex : quand un menu/tooltip parent affiche déjà l'info). */
     public noTooltip: InputSignalWithTransform<boolean, unknown> = input(false, { transform: booleanAttribute });
+    public alignRight: InputSignalWithTransform<boolean, unknown> = input(false, { transform: booleanAttribute });
 
     protected moment: Moment = moment();
 
