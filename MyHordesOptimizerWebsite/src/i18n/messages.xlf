@@ -190,6 +190,9 @@
             <trans-unit id="4813554456449727568" datatype="html">
                 <source>Peut être empoisonné</source>
             </trans-unit>
+            <trans-unit id="7070563539639146322" datatype="html">
+                <source>Peut être endommagé par l’attaque</source>
+            </trans-unit>
             <trans-unit id="7070606596322847118" datatype="html">
                 <source>Peut être cuisiné</source>
             </trans-unit>
@@ -208,6 +211,9 @@
             <trans-unit id="2016944012945209299" datatype="html">
                 <source>Objet de défense</source>
             </trans-unit>
+            <trans-unit id="2026109244028945943" datatype="html">
+                <source>Vous n&apos;êtes pas connecté(e) — vos scores ne seront pas enregistrés.</source>
+            </trans-unit>
             <trans-unit id="7152806231676044539" datatype="html">
                 <source>Animal</source>
             </trans-unit>
@@ -216,6 +222,9 @@
             </trans-unit>
             <trans-unit id="2646799191669721083" datatype="html">
                 <source>Chaman</source>
+            </trans-unit>
+            <trans-unit id="265989447881349012" datatype="html">
+                <source>Pas de classement public pour la taille Personnalisée — retrouve tes parties dans l&apos;onglet &quot;Mes parties&quot;.</source>
             </trans-unit>
             <trans-unit id="788292028813273366" datatype="html">
                 <source>Guide de l’Outre-Monde</source>
@@ -261,6 +270,9 @@
             </trans-unit>
             <trans-unit id="5126997801267803550" datatype="html">
                 <source>La fouille a bien été mise à jour</source>
+            </trans-unit>
+            <trans-unit id="5136231281217932237" datatype="html">
+                <source>En cours</source>
             </trans-unit>
             <trans-unit id="5937107716887714291" datatype="html">
                 <source>La cellule a bien été modifiée</source>
@@ -339,6 +351,9 @@
             </trans-unit>
             <trans-unit id="180879386399550529" datatype="html">
                 <source>Supprimer</source>
+            </trans-unit>
+            <trans-unit id="4242937041384260306" datatype="html">
+                <source>Classement</source>
             </trans-unit>
             <trans-unit id="4247263368529700262" datatype="html">
                 <source>Confirmer</source>
@@ -449,6 +464,9 @@
             <trans-unit id="6791169760263814863" datatype="html">
                 <source>Reprendre</source>
             </trans-unit>
+            <trans-unit id="1467566692562963830" datatype="html">
+                <source>Réessayer</source>
+            </trans-unit>
             <trans-unit id="1467983175316497492" datatype="html">
                 <source>Importer les villes</source>
             </trans-unit>
@@ -475,9 +493,6 @@
             </trans-unit>
             <trans-unit id="1087900872515566478" datatype="html">
                 <source>Objets</source>
-            </trans-unit>
-            <trans-unit id="2634218306005917247" datatype="html">
-                <source>Ruines</source>
             </trans-unit>
             <trans-unit id="4354226191914852265" datatype="html">
                 <source>Pictos</source>
@@ -602,6 +617,9 @@
                     pictos restants
                 </source>
             </trans-unit>
+            <trans-unit id="8899726745077474249" datatype="html">
+                <source>Défi du jour</source>
+            </trans-unit>
             <trans-unit id="8988298967814910334" datatype="html">
                 <source>Coups :</source>
             </trans-unit>
@@ -620,9 +638,6 @@
             <trans-unit id="7710093706339223473" datatype="html">
                 <source>Thème Windows</source>
             </trans-unit>
-            <trans-unit id="1819215007804875232" datatype="html">
-                <source>Seed</source>
-            </trans-unit>
             <trans-unit id="4719813675126368011" datatype="html">
                 <source>Facile</source>
             </trans-unit>
@@ -640,6 +655,9 @@
             </trans-unit>
             <trans-unit id="219073679209014363" datatype="html">
                 <source>Personnalisé</source>
+            </trans-unit>
+            <trans-unit id="2195772151215033521" datatype="html">
+                <source>Impossible de démarrer la partie.</source>
             </trans-unit>
             <trans-unit id="7514759768535181311" datatype="html">
                 <source>IRL</source>
@@ -692,21 +710,6 @@
             <trans-unit id="6779466566977517049" datatype="html">
                 <source>Disponibilités du jour</source>
             </trans-unit>
-            <trans-unit id="2782513365381709549" datatype="html">
-                <source>Immunisés</source>
-            </trans-unit>
-            <trans-unit id="8664804111267568290" datatype="html">
-                <source>
-                    <x id="PH" equiv-text="nb"/>
-                    potions bues
-                </source>
-            </trans-unit>
-            <trans-unit id="1590090738705851179" datatype="html">
-                <source>
-                    <x id="PH" equiv-text="nb"/>
-                    potion bue
-                </source>
-            </trans-unit>
             <trans-unit id="5491081266313732174" datatype="html">
                 <source>Filtres</source>
             </trans-unit>
@@ -733,9 +736,6 @@
             </trans-unit>
             <trans-unit id="8992030650489163883" datatype="html">
                 <source>Actions quotidiennes</source>
-            </trans-unit>
-            <trans-unit id="402438736568564848" datatype="html">
-                <source>Bain — coché : oui · décoché : non · indéterminé : tous</source>
             </trans-unit>
             <trans-unit id="6311249165811246372" datatype="html">
                 <source>Bain</source>
@@ -776,6 +776,9 @@
             <trans-unit id="8948278701313201115" datatype="html">
                 <source>Derniers mots :</source>
             </trans-unit>
+            <trans-unit id="8948895320444851787" datatype="html">
+                <source>Ménage</source>
+            </trans-unit>
             <trans-unit id="7797012355083019611" datatype="html">
                 <source>Message à la ville :</source>
             </trans-unit>
@@ -790,9 +793,6 @@
             </trans-unit>
             <trans-unit id="2205827814755156780" datatype="html">
                 <source>Dernières mises à jour</source>
-            </trans-unit>
-            <trans-unit id="1172116262798727159" datatype="html">
-                <source>Jamais</source>
             </trans-unit>
             <trans-unit id="4739884131356753082" datatype="html">
                 <source>Ajouter aux états</source>
@@ -814,9 +814,6 @@
             </trans-unit>
             <trans-unit id="5932960630557670586" datatype="html">
                 <source>Immunisé</source>
-            </trans-unit>
-            <trans-unit id="5119195508169296698" datatype="html">
-                <source>Bain pris</source>
             </trans-unit>
             <trans-unit id="5833055296319952035" datatype="html">
                 <source>Métier</source>
@@ -848,12 +845,6 @@
             <trans-unit id="6115106109338430553" datatype="html">
                 <source>Chamanique</source>
             </trans-unit>
-            <trans-unit id="416778454872588748" datatype="html">
-                <source>Pas de bain</source>
-            </trans-unit>
-            <trans-unit id="2438672752074875472" datatype="html">
-                <source>Mode liste</source>
-            </trans-unit>
             <trans-unit id="1199075748231436486" datatype="html">
                 <source>Identifiant MyHordes</source>
             </trans-unit>
@@ -862,12 +853,6 @@
             </trans-unit>
             <trans-unit id="8895761088455718364" datatype="html">
                 <source>Fouilles</source>
-            </trans-unit>
-            <trans-unit id="2987911084088408899" datatype="html">
-                <source>Bains</source>
-            </trans-unit>
-            <trans-unit id="5343881027002333937" datatype="html">
-                <source>Immunités</source>
             </trans-unit>
             <trans-unit id="6351937635910938762" datatype="html">
                 <source>Disponibilités</source>
@@ -939,11 +924,17 @@
             <trans-unit id="7180575964287205441" datatype="html">
                 <source>Oui</source>
             </trans-unit>
+            <trans-unit id="7186662439143171626" datatype="html">
+                <source>Abandonnée</source>
+            </trans-unit>
             <trans-unit id="4709450557795328287" datatype="html">
                 <source>Non</source>
             </trans-unit>
             <trans-unit id="6799332973355663459" datatype="html">
                 <source>Ajouter une place</source>
+            </trans-unit>
+            <trans-unit id="493101002815827702" datatype="html">
+                <source>Actions héroïques</source>
             </trans-unit>
             <trans-unit id="4937605142880264151" datatype="html">
                 <source>Consignes de l&apos;expédition</source>
@@ -1015,6 +1006,9 @@
             <trans-unit id="2933259550931667836" datatype="html">
                 <source>Relevés des métiers</source>
             </trans-unit>
+            <trans-unit id="2946654520146782781" datatype="html">
+                <source>Aucun score pour l&apos;instant.</source>
+            </trans-unit>
             <trans-unit id="8174236246751730214" datatype="html">
                 <source>Abondance (fouineur)</source>
             </trans-unit>
@@ -1030,6 +1024,9 @@
             <trans-unit id="1074754885650626073" datatype="html">
                 <source>2 – Zone peu fouillée</source>
             </trans-unit>
+            <trans-unit id="5822621800437511210" datatype="html">
+                <source>Joueur</source>
+            </trans-unit>
             <trans-unit id="5826413858405522799" datatype="html">
                 <source>3 – Zone abondante</source>
             </trans-unit>
@@ -1041,6 +1038,9 @@
             </trans-unit>
             <trans-unit id="4741517700695762920" datatype="html">
                 <source>1 – Zone partiellement explorée</source>
+            </trans-unit>
+            <trans-unit id="4756133357181766101" datatype="html">
+                <source>Mes parties</source>
             </trans-unit>
             <trans-unit id="42397383054553721" datatype="html">
                 <source>2 – Zone explorée</source>
@@ -1099,6 +1099,9 @@
             <trans-unit id="2012623995194870112" datatype="html">
                 <source>Cellule</source>
             </trans-unit>
+            <trans-unit id="4563940927762956956" datatype="html">
+                <source>Ne nécessite rien de spécial</source>
+            </trans-unit>
             <trans-unit id="4574043683605876869" datatype="html">
                 <source>Bâtiment</source>
             </trans-unit>
@@ -1122,6 +1125,9 @@
             </trans-unit>
             <trans-unit id="1639488378691279565" datatype="html">
                 <source>Décharge</source>
+            </trans-unit>
+            <trans-unit id="1639616087451032547" datatype="html">
+                <source>Meilleurs scores</source>
             </trans-unit>
             <trans-unit id="5557109916159305360" datatype="html">
                 <source>Fouilles restantes</source>
@@ -1149,6 +1155,9 @@
             </trans-unit>
             <trans-unit id="6117782295216095698" datatype="html">
                 <source>Ajouter une zone</source>
+            </trans-unit>
+            <trans-unit id="6129258837637103160" datatype="html">
+                <source>Agrandir le zoom</source>
             </trans-unit>
             <trans-unit id="1779552786277618671" datatype="html">
                 <source>Distance</source>
@@ -1316,8 +1325,17 @@
             <trans-unit id="485694852414197759" datatype="html">
                 <source>Ont été pris</source>
             </trans-unit>
+            <trans-unit id="4861115589470766196" datatype="html">
+                <source>Douche</source>
+            </trans-unit>
             <trans-unit id="8073013514222699302" datatype="html">
                 <source>Ont été donnés</source>
+            </trans-unit>
+            <trans-unit id="2456477142464580022" datatype="html">
+                <source>Gagnée</source>
+            </trans-unit>
+            <trans-unit id="2464570349751973023" datatype="html">
+                <source>Chantier temporaire</source>
             </trans-unit>
             <trans-unit id="2472506129070031683" datatype="html">
                 <source>Ont contribué</source>
@@ -1333,6 +1351,9 @@
                     <x id="PH" equiv-text="index + 1"/>
                 </source>
             </trans-unit>
+            <trans-unit id="2354670428052590180" datatype="html">
+                <source>Aucune partie jouée pour l&apos;instant.</source>
+            </trans-unit>
             <trans-unit id="2365273625237440349" datatype="html">
                 <source>Activité</source>
             </trans-unit>
@@ -1345,11 +1366,17 @@
             <trans-unit id="224561442713301160" datatype="html">
                 <source>Ont joué</source>
             </trans-unit>
+            <trans-unit id="6644537022376016073" datatype="html">
+                <source>Quitter le plein écran</source>
+            </trans-unit>
             <trans-unit id="6645156447857379979" datatype="html">
                 <source>N&apos;ont pas joué</source>
             </trans-unit>
             <trans-unit id="974287372292560425" datatype="html">
                 <source>Dés / Cartes / Ballon</source>
+            </trans-unit>
+            <trans-unit id="974732083306088859" datatype="html">
+                <source>Actions quotidiennes</source>
             </trans-unit>
             <trans-unit id="6948592133758825600" datatype="html">
                 <source>Dés</source>
@@ -1411,11 +1438,17 @@
             <trans-unit id="866656223631702865" datatype="html">
                 <source>Estimations</source>
             </trans-unit>
+            <trans-unit id="1713271461473302108" datatype="html">
+                <source>Mode</source>
+            </trans-unit>
             <trans-unit id="1713820069440865328" datatype="html">
                 <source>Scrutateur</source>
             </trans-unit>
             <trans-unit id="7730918363143562137" datatype="html">
                 <source>Registre</source>
+            </trans-unit>
+            <trans-unit id="773527048551115074" datatype="html">
+                <source>Mode de jeu</source>
             </trans-unit>
             <trans-unit id="469180229084386389" datatype="html">
                 <source>Mode observateur</source>
@@ -1491,6 +1524,9 @@
             </trans-unit>
             <trans-unit id="604478767521887364" datatype="html">
                 <source>Non-Encombrants</source>
+            </trans-unit>
+            <trans-unit id="6051346468409623514" datatype="html">
+                <source>Peut être ouvert avec</source>
             </trans-unit>
             <trans-unit id="3837919746131358209" datatype="html">
                 <source>Ne pas rapporter</source>
@@ -1609,6 +1645,9 @@
             <trans-unit id="2287398703048181232" datatype="html">
                 <source>Camping</source>
             </trans-unit>
+            <trans-unit id="2292584256714443853" datatype="html">
+                <source>Perdue</source>
+            </trans-unit>
             <trans-unit id="8628521144156217897" datatype="html">
                 <source>Chances de survie</source>
             </trans-unit>
@@ -1660,6 +1699,9 @@
             <trans-unit id="6672144649038755717" datatype="html">
                 <source>Mini-Jeux</source>
             </trans-unit>
+            <trans-unit id="668387861187046971" datatype="html">
+                <source>Classement des joueurs</source>
+            </trans-unit>
             <trans-unit id="7207482748149833374" datatype="html">
                 <source>Ville observée</source>
             </trans-unit>
@@ -1674,6 +1716,9 @@
             </trans-unit>
             <trans-unit id="3079822284604019418" datatype="html">
                 <source>Merci aussi à Bigonoud, qui a accepté de mettre les mains dans le code pour nous aider au développement.</source>
+            </trans-unit>
+            <trans-unit id="3080483882937310852" datatype="html">
+                <source>Normal</source>
             </trans-unit>
             <trans-unit id="7508106374158857656" datatype="html">
                 <source>Merci à CrazyUnicorn, qui nous fait profiter de ses talents pour l&apos;ergonomie du site.</source>
@@ -1696,6 +1741,9 @@
             </trans-unit>
             <trans-unit id="826911519411311233" datatype="html">
                 <source>Dans ma ville</source>
+            </trans-unit>
+            <trans-unit id="6485992728192281912" datatype="html">
+                <source>Améliorations</source>
             </trans-unit>
             <trans-unit id="6487260431971357562" datatype="html">
                 <source>Bonus en équivalent PA</source>
@@ -1760,6 +1808,9 @@
             </trans-unit>
             <trans-unit id="1759876158817324985" datatype="html">
                 <source>Nombre d&apos;améliorations simples faites sur la case</source>
+            </trans-unit>
+            <trans-unit id="1563883498133119332" datatype="html">
+                <source>Permet d&apos;ouvrir</source>
             </trans-unit>
             <trans-unit id="1569331568164081073" datatype="html">
                 <source>Nombre d&apos;objets de défense installés sur la case</source>
@@ -1892,6 +1943,9 @@
             <trans-unit id="1355112096350536441" datatype="html">
                 <source>ignorée (porte ouverte)</source>
             </trans-unit>
+            <trans-unit id="1361291709482825788" datatype="html">
+                <source>États</source>
+            </trans-unit>
             <trans-unit id="5676596107664961045" datatype="html">
                 <source>Veilleurs</source>
             </trans-unit>
@@ -1956,6 +2010,9 @@
             </trans-unit>
             <trans-unit id="1813807202051655406" datatype="html">
                 <source>Scénario favorable</source>
+            </trans-unit>
+            <trans-unit id="181574438587688914" datatype="html">
+                <source>Plein écran</source>
             </trans-unit>
             <trans-unit id="8744947662445627502" datatype="html">
                 <source>Scénario défavorable</source>
@@ -2055,6 +2112,9 @@
             </trans-unit>
             <trans-unit id="7620507202018349855" datatype="html">
                 <source>Affichage des tooltips détaillés</source>
+            </trans-unit>
+            <trans-unit id="7631405440758027758" datatype="html">
+                <source>Temps</source>
             </trans-unit>
             <trans-unit id="5795663998729072574" datatype="html">
                 <source>Modifie les tooltips natifs de l&apos;application pour afficher en plus la liste des recettes dans lesquelles l&apos;objet survolé
@@ -2340,17 +2400,6 @@
                     Une fois copié, il suffit de le coller dans le champ dédié sur le site de MyHordes Optimizer et de valider.
                 </source>
             </trans-unit>
-            <trans-unit id="5969611646055214898" datatype="html">
-                <source>Les coûts indiqués valent pour les modes de ville habituels. En Pandémonium, de nombreux chantiers demandent des ressources différentes
-                    — cette page ne les reflète pas encore.
-                </source>
-            </trans-unit>
-            <trans-unit id="6176448974516496512" datatype="html">
-                <source>Chantier temporaire : il disparaît au bout d’un moment</source>
-            </trans-unit>
-            <trans-unit id="4629279155621024298" datatype="html">
-                <source>Peut être détruit par l’attaque</source>
-            </trans-unit>
             <trans-unit id="6290924823055556031" datatype="html">
                 <source>Aucun chantier ne correspond à cette recherche.</source>
             </trans-unit>
@@ -2425,6 +2474,9 @@
             <trans-unit id="5910955281519564678" datatype="html">
                 <source>Attaque théorique</source>
             </trans-unit>
+            <trans-unit id="2155832126259145609" datatype="html">
+                <source>s</source>
+            </trans-unit>
             <trans-unit id="2156842490958660553" datatype="html">
                 <source>Minimum théorique</source>
             </trans-unit>
@@ -2448,6 +2500,9 @@
             </trans-unit>
             <trans-unit id="4045290552180803882" datatype="html">
                 <source>Jours validés</source>
+            </trans-unit>
+            <trans-unit id="4056324809886473355" datatype="html">
+                <source>Réduire le zoom</source>
             </trans-unit>
             <trans-unit id="19231624547333208" datatype="html">
                 <source>Points d&apos;âmes gagnés</source>
