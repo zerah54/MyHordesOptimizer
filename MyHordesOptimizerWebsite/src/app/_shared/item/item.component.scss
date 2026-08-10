@@ -75,6 +75,16 @@
                 img {
                     margin-right: 0.5em;
                 }
+
+                .opener-relation {
+                    display: flex;
+                    align-items: center;
+                    flex-wrap: wrap;
+
+                    span {
+                        margin-right: 0.5em;
+                    }
+                }
             }
         }
 

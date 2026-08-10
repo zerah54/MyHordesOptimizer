@@ -73,43 +73,9 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
             var townDetails = updateRequestDto.TownDetails;
             var tasks = new List<Task>();
 
-            // Le client envoie toujours le mapId (jamais le townId stable attribué par l'import global) :
-            // on résout une fois ici et on réutilise cette valeur dans toutes les tâches parallèles.
-            // Ce préalable, comme le LastUpdateInfo, n'est lu que par des unités MyHordes Optimizer :
-            // son échec ne doit donc faire tomber que MHO, pas Gest'Hordes ni Fata Morgana.
-            var resolvedTownId = 0;
-            LastUpdateInfo newLastUpdate = null;
-            var mhoPreambleFailed = false;
-            if (plan.NeedsTownId)
-            {
-                try
-                {
-                    using (var resolveScope = ServiceScopeFactory.CreateScope())
-                    {
-                        resolvedTownId = resolveScope.ServiceProvider.GetRequiredService<MhoContext>().ResolveTownId(townDetails.TownId);
-                    }
-                    if (plan.NeedsLastUpdateInfo)
-                    {
-                        using var scope = ServiceScopeFactory.CreateScope();
-                        var dbContext = scope.ServiceProvider.GetRequiredService<MhoContext>();
-                        newLastUpdate = dbContext.LastUpdateInfos.Update(Mapper.Map<LastUpdateInfo>(UserInfoProvider.GenerateLastUpdateInfo(), opt => opt.SetDbContext(dbContext))).Entity;
-                        dbContext.SaveChanges();
-                    }
-                }
-                catch (Exception e)
-                {
-                    // Changement de comportement par rapport à l'ancienne route (avant cette refonte) :
-                    // une exception ici remontait alors non attrapée jusqu'au contrôleur (HTTP 500).
-                    // Désormais elle est rattrapée, et l'ancienne route répond 200 avec un statut
-                    // d'erreur porté par MapResponseDto.MhoApiStatus.
-                    Logger.LogWarning($"Exception pendant le préalable MHO : {e} => {updateRequestDto.ToJson()}");
-                    sink.FailAllPending(ExternalToolUpdateUnits.Map, e.Message, ExternalToolId.MyHordesOptimizer);
-                    response.MapResponseDto.MhoApiStatus = e.Message;
-                    mhoPreambleFailed = true;
-                }
-            }
-
-            #region Maps
+            // BBH, Fata et GH ne lisent ni le townId résolu ni le LastUpdateInfo MHO (préambule
+            // ci-dessous) : elles démarrent donc immédiatement, sans attendre les deux allers-retours
+            // DB qui ne concernent que MyHordes Optimizer.
             if (plan.Bbh)
             {
                 var bbhTask = Task.Run(() =>
@@ -161,6 +127,122 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                 });
                 tasks.Add(fataTask);
             }
+            if (plan.GhMap)
+            {
+                var ghTask = Task.Run(() =>
+                {
+                    var ghFailed = false;
+                    try
+                    {
+                        GestHordesRepository.Update();
+                    }
+                    catch (WebApiException e)
+                    {
+                        Logger.LogWarning($"Exception pendant la maj api GH :  {e} => {updateRequestDto.ToJson()}");
+                        response.MapResponseDto.GestHordesApiStatus = $"{e.Message} : {e.Response}";
+                        sink.Failed(ExternalToolId.GestHordes, ExternalToolUpdateUnits.Map, $"{e.Message} : {e.Response}");
+                        ghFailed = true;
+                    }
+                    catch (Exception e)
+                    {
+                        Logger.LogWarning($"Exception pendant la maj api GH :  {e} => {updateRequestDto.ToJson()}");
+                        response.MapResponseDto.GestHordesApiStatus = e.Message;
+                        sink.Failed(ExternalToolId.GestHordes, ExternalToolUpdateUnits.Map, e.Message);
+                        ghFailed = true;
+                    }
+
+                    if (UpdateRequestMapToolsToUpdateDetailsDto.IsCell(updateRequestDto.Map.ToolsToUpdate.IsGestHordes))
+                    {
+                        try
+                        {
+                            var cell = updateRequestDto.Map.Cell;
+                            var realX = updateRequestDto.TownDetails.TownX + cell.X;
+                            var realY = updateRequestDto.TownDetails.TownY - cell.Y;
+                            if (townDetails.IsChaos || cell.DeadZombies > 0)
+                            {
+
+                                if (cell.Objects != null && townDetails.IsChaos)
+                                {
+                                    var request = Mapper.Map<GestHordesMajCaseRequestDto>(updateRequestDto);
+                                    GestHordesRepository.UpdateCellItem(request);
+                                }
+
+                                if (cell.DeadZombies > 0)
+                                {
+                                    var request = Mapper.Map<GestHordesMajCaseZombiesDto>(updateRequestDto);
+                                    GestHordesRepository.UpdateCellZombies(request);
+                                }
+                            }
+                        }
+                        catch (WebApiException e)
+                        {
+                            Logger.LogWarning($"Exception pendant la maj cell GH : {e} => {updateRequestDto.ToJson()}");
+                            response.MapResponseDto.GestHordesCellsStatus = $"{e.Message} : {e.Response}";
+                            // L'appel API ci-dessus a pu déjà échouer, sur la même unité GhMap : dans ce cas
+                            // AddError ajoute ce message sans redécompter l'unité (déjà décomptée par le
+                            // premier Failed). Sinon (API réussie), c'est le premier échec de l'unité : il
+                            // doit la décompter via Failed, sans quoi son PendingUnits ne retombe jamais à 0.
+                            if (ghFailed) sink.AddError(ExternalToolId.GestHordes, ExternalToolUpdateUnits.Map, $"{e.Message} : {e.Response}");
+                            else sink.Failed(ExternalToolId.GestHordes, ExternalToolUpdateUnits.Map, $"{e.Message} : {e.Response}");
+                            ghFailed = true;
+                        }
+                        catch (Exception e)
+                        {
+                            Logger.LogWarning($"Exception pendant la maj cell GH : {e} => {updateRequestDto.ToJson()}");
+                            response.MapResponseDto.GestHordesCellsStatus = e.Message;
+                            if (ghFailed) sink.AddError(ExternalToolId.GestHordes, ExternalToolUpdateUnits.Map, e.Message);
+                            else sink.Failed(ExternalToolId.GestHordes, ExternalToolUpdateUnits.Map, e.Message);
+                            ghFailed = true;
+                        }
+                    }
+
+                    // Une seule fin pour une seule unité : sans ce garde-fou, un envoi réussi après un envoi
+                    // en échec redonnerait une notification de succès sur une unité déjà close.
+                    if (!ghFailed)
+                    {
+                        sink.Succeeded(ExternalToolId.GestHordes, ExternalToolUpdateUnits.Map);
+                    }
+                });
+                tasks.Add(ghTask);
+            }
+
+            // Le client envoie toujours le mapId (jamais le townId stable attribué par l'import global) :
+            // on résout une fois ici et on réutilise cette valeur dans toutes les tâches parallèles.
+            // Ce préalable, comme le LastUpdateInfo, n'est lu que par des unités MyHordes Optimizer :
+            // son échec ne doit donc faire tomber que MHO, pas Gest'Hordes ni Fata Morgana.
+            var resolvedTownId = 0;
+            LastUpdateInfo newLastUpdate = null;
+            var mhoPreambleFailed = false;
+            if (plan.NeedsTownId)
+            {
+                try
+                {
+                    using (var resolveScope = ServiceScopeFactory.CreateScope())
+                    {
+                        resolvedTownId = resolveScope.ServiceProvider.GetRequiredService<MhoContext>().ResolveTownId(townDetails.TownId);
+                    }
+                    if (plan.NeedsLastUpdateInfo)
+                    {
+                        using var scope = ServiceScopeFactory.CreateScope();
+                        var dbContext = scope.ServiceProvider.GetRequiredService<MhoContext>();
+                        newLastUpdate = dbContext.LastUpdateInfos.Update(Mapper.Map<LastUpdateInfo>(UserInfoProvider.GenerateLastUpdateInfo(), opt => opt.SetDbContext(dbContext))).Entity;
+                        dbContext.SaveChanges();
+                    }
+                }
+                catch (Exception e)
+                {
+                    // Changement de comportement par rapport à l'ancienne route (avant cette refonte) :
+                    // une exception ici remontait alors non attrapée jusqu'au contrôleur (HTTP 500).
+                    // Désormais elle est rattrapée, et l'ancienne route répond 200 avec un statut
+                    // d'erreur porté par MapResponseDto.MhoApiStatus.
+                    Logger.LogWarning($"Exception pendant le préalable MHO : {e} => {updateRequestDto.ToJson()}");
+                    sink.FailAllPending(ExternalToolUpdateUnits.Map, e.Message, ExternalToolId.MyHordesOptimizer);
+                    response.MapResponseDto.MhoApiStatus = e.Message;
+                    mhoPreambleFailed = true;
+                }
+            }
+
+            #region Maps
             if (plan.MhoMap && !mhoPreambleFailed)
             {
                 var mhoTask = Task.Run(() =>
@@ -383,84 +465,6 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                     }
                 });
                 tasks.Add(mhoTask);
-            }
-            if (plan.GhMap)
-            {
-                var ghTask = Task.Run(() =>
-                {
-                    var ghFailed = false;
-                    try
-                    {
-                        GestHordesRepository.Update();
-                    }
-                    catch (WebApiException e)
-                    {
-                        Logger.LogWarning($"Exception pendant la maj api GH :  {e} => {updateRequestDto.ToJson()}");
-                        response.MapResponseDto.GestHordesApiStatus = $"{e.Message} : {e.Response}";
-                        sink.Failed(ExternalToolId.GestHordes, ExternalToolUpdateUnits.Map, $"{e.Message} : {e.Response}");
-                        ghFailed = true;
-                    }
-                    catch (Exception e)
-                    {
-                        Logger.LogWarning($"Exception pendant la maj api GH :  {e} => {updateRequestDto.ToJson()}");
-                        response.MapResponseDto.GestHordesApiStatus = e.Message;
-                        sink.Failed(ExternalToolId.GestHordes, ExternalToolUpdateUnits.Map, e.Message);
-                        ghFailed = true;
-                    }
-
-                    if (UpdateRequestMapToolsToUpdateDetailsDto.IsCell(updateRequestDto.Map.ToolsToUpdate.IsGestHordes))
-                    {
-                        try
-                        {
-                            var cell = updateRequestDto.Map.Cell;
-                            var realX = updateRequestDto.TownDetails.TownX + cell.X;
-                            var realY = updateRequestDto.TownDetails.TownY - cell.Y;
-                            if (townDetails.IsChaos || cell.DeadZombies > 0)
-                            {
-
-                                if (cell.Objects != null && townDetails.IsChaos)
-                                {
-                                    var request = Mapper.Map<GestHordesMajCaseRequestDto>(updateRequestDto);
-                                    GestHordesRepository.UpdateCellItem(request);
-                                }
-
-                                if (cell.DeadZombies > 0)
-                                {
-                                    var request = Mapper.Map<GestHordesMajCaseZombiesDto>(updateRequestDto);
-                                    GestHordesRepository.UpdateCellZombies(request);
-                                }
-                            }
-                        }
-                        catch (WebApiException e)
-                        {
-                            Logger.LogWarning($"Exception pendant la maj cell GH : {e} => {updateRequestDto.ToJson()}");
-                            response.MapResponseDto.GestHordesCellsStatus = $"{e.Message} : {e.Response}";
-                            // L'appel API ci-dessus a pu déjà échouer, sur la même unité GhMap : dans ce cas
-                            // AddError ajoute ce message sans redécompter l'unité (déjà décomptée par le
-                            // premier Failed). Sinon (API réussie), c'est le premier échec de l'unité : il
-                            // doit la décompter via Failed, sans quoi son PendingUnits ne retombe jamais à 0.
-                            if (ghFailed) sink.AddError(ExternalToolId.GestHordes, ExternalToolUpdateUnits.Map, $"{e.Message} : {e.Response}");
-                            else sink.Failed(ExternalToolId.GestHordes, ExternalToolUpdateUnits.Map, $"{e.Message} : {e.Response}");
-                            ghFailed = true;
-                        }
-                        catch (Exception e)
-                        {
-                            Logger.LogWarning($"Exception pendant la maj cell GH : {e} => {updateRequestDto.ToJson()}");
-                            response.MapResponseDto.GestHordesCellsStatus = e.Message;
-                            if (ghFailed) sink.AddError(ExternalToolId.GestHordes, ExternalToolUpdateUnits.Map, e.Message);
-                            else sink.Failed(ExternalToolId.GestHordes, ExternalToolUpdateUnits.Map, e.Message);
-                            ghFailed = true;
-                        }
-                    }
-
-                    // Une seule fin pour une seule unité : sans ce garde-fou, un envoi réussi après un envoi
-                    // en échec redonnerait une notification de succès sur une unité déjà close.
-                    if (!ghFailed)
-                    {
-                        sink.Succeeded(ExternalToolId.GestHordes, ExternalToolUpdateUnits.Map);
-                    }
-                });
-                tasks.Add(ghTask);
             }
             #endregion
 

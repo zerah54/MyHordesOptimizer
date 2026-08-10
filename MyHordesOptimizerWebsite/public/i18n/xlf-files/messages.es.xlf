@@ -1029,9 +1029,8 @@
                        equiv-text="environment.website_url"/>
                     my-town/expeditions]ce lien[/link]
                 </source>
-                <target state="new">Ce message a été généré à partir du site MyHordes Optimizer. Vous pouvez retrouver les expéditions en suivant [link=
-                    <x id="PH" equiv-text="environment.website_url"/>
-                    my-town/expeditions]ce lien[/link]
+                <target state="new">Ce message a été généré à partir du site MyHordes Optimizer. Vous pouvez retrouver les expéditions en suivant [link=<x
+                    id="PH" equiv-text="environment.website_url"/>my-town/expeditions]ce lien[/link]
                 </target>
             </trans-unit>
             <trans-unit id="7845138276293360211" datatype="html">
@@ -1804,10 +1803,6 @@
                 <source>Non-Encombrants</source>
                 <target state="needs-translation">Non-Encombrants</target>
             </trans-unit>
-            <trans-unit id="6051346468409623514" datatype="html">
-                <source>Peut être ouvert avec</source>
-                <target state="new">Peut être ouvert avec</target>
-            </trans-unit>
             <trans-unit id="3837919746131358209" datatype="html">
                 <source>Ne pas rapporter</source>
                 <target state="needs-translation">Ne pas rapporter</target>
@@ -1859,7 +1854,8 @@
                     my-town/wishlist]ce lien[/link]
                 </source>
                 <target state="new">Cette liste a été générée à partir du site MyHordes Optimizer. Vous pouvez la retrouver en suivant [link=
-                    <x id="PH" equiv-text="environment.website_url"/>
+                    <x id="PH"
+                       equiv-text="environment.website_url"/>
                     my-town/wishlist]ce lien[/link]
                 </target>
             </trans-unit>
@@ -2017,9 +2013,11 @@
                     <x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/>
                 </source>
                 <target state="new">Ce site n&apos;est pas affilié à 
-                    <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;https://motion-twin.com/fr/&quot; target=&quot;_blank&quot;&gt;"/>
+                    <x id="START_LINK" ctype="x-a"
+                       equiv-text="&lt;a href=&quot;https://motion-twin.com/fr/&quot; target=&quot;_blank&quot;&gt;"/>
                     Motion Twin<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/> ou à 
-                    <x id="START_LINK_1" equiv-text="&lt;a href=&quot;https://myhord.es&quot; target=&quot;_blank&quot;&gt;"/>
+                    <x id="START_LINK_1"
+                       equiv-text="&lt;a href=&quot;https://myhord.es&quot; target=&quot;_blank&quot;&gt;"/>
                     MyHordes
                     <x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/>
                 </target>
@@ -2035,9 +2033,11 @@
                     <x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/>
                 </source>
                 <target state="new">Certains éléments graphiques appartiennent à 
-                    <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;https://motion-twin.com/fr/&quot; target=&quot;_blank&quot;&gt;"/>
+                    <x id="START_LINK" ctype="x-a"
+                       equiv-text="&lt;a href=&quot;https://motion-twin.com/fr/&quot; target=&quot;_blank&quot;&gt;"/>
                     Motion Twin<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/> ou à 
-                    <x id="START_LINK_1" equiv-text="&lt;a href=&quot;https://myhord.es&quot; target=&quot;_blank&quot;&gt;"/>
+                    <x id="START_LINK_1"
+                       equiv-text="&lt;a href=&quot;https://myhord.es&quot; target=&quot;_blank&quot;&gt;"/>
                     MyHordes
                     <x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/>
                 </target>
@@ -2271,6 +2271,10 @@
                 <source>Script / Extension</source>
                 <target state="needs-translation">Script / Extension</target>
             </trans-unit>
+            <trans-unit id="630855146056144323" datatype="html">
+                <source>Ouvert par</source>
+                <target state="new">Ouvert par</target>
+            </trans-unit>
             <trans-unit id="7419787782755641631" datatype="html">
                 <source>Installation</source>
                 <target state="needs-translation">Installation</target>
@@ -2458,10 +2462,6 @@
             <trans-unit id="1759876158817324985" datatype="html">
                 <source>Nombre d&apos;améliorations simples faites sur la case</source>
                 <target state="needs-translation">Nombre d&apos;améliorations simples faites sur la case</target>
-            </trans-unit>
-            <trans-unit id="1563883498133119332" datatype="html">
-                <source>Permet d&apos;ouvrir</source>
-                <target state="new">Permet d&apos;ouvrir</target>
             </trans-unit>
             <trans-unit id="1569331568164081073" datatype="html">
                 <source>Nombre d&apos;objets de défense installés sur la case</source>
@@ -2672,6 +2672,10 @@
             <trans-unit id="7745390044882644493" datatype="html">
                 <source>Simulation 1</source>
                 <target state="needs-translation">Simulation 1</target>
+            </trans-unit>
+            <trans-unit id="4624097725363515773" datatype="html">
+                <source>Ouvre</source>
+                <target state="new">Ouvre</target>
             </trans-unit>
             <trans-unit id="4635453384629622126" datatype="html">
                 <source>Simulation</source>
