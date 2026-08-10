@@ -27,8 +27,7 @@
                     points d&apos;action aux citoyens ayant l&apos;état ivre ou l&apos;état drogué
                 </source>
         <target state="final">Devuelve un punto a los puntos de acción a cualquiera en la ciudad de su límite máximo de puntos de acción. Devuelve
-                    dos
-                    puntos de acción a los ciudadanos que hayan estado bajo los efectos del alcohol o de droga
+                    dos puntos de acción a los ciudadanos que hayan estado bajo los efectos del alcohol o de droga
                 </target>
       </trans-unit>
       <trans-unit id="5265432085520184033" datatype="html" approved="yes">
@@ -255,6 +254,10 @@
         <source>Peut être empoisonné</source>
         <target state="needs-translation">Peut être empoisonné</target>
       </trans-unit>
+      <trans-unit id="7070563539639146322" datatype="html">
+        <source>Peut être endommagé par l’attaque</source>
+        <target state="needs-translation">Peut être endommagé par l’attaque</target>
+      </trans-unit>
       <trans-unit id="7070606596322847118" datatype="html">
         <source>Peut être cuisiné</source>
         <target state="needs-translation">Peut être cuisiné</target>
@@ -279,6 +282,10 @@
         <source>Objet de défense</source>
         <target state="needs-translation">Objet de défense</target>
       </trans-unit>
+      <trans-unit id="2026109244028945943" datatype="html">
+        <source>Vous n&apos;êtes pas connecté(e) — vos scores ne seront pas enregistrés.</source>
+        <target state="needs-translation">Vous n'êtes pas connecté(e) — vos scores ne seront pas enregistrés.</target>
+      </trans-unit>
       <trans-unit id="7152806231676044539" datatype="html">
         <source>Animal</source>
         <target state="needs-translation">Animal</target>
@@ -290,6 +297,11 @@
       <trans-unit id="2646799191669721083" datatype="html">
         <source>Chaman</source>
         <target state="needs-translation">Chaman</target>
+      </trans-unit>
+      <trans-unit id="265989447881349012" datatype="html">
+        <source>Pas de classement public pour la taille Personnalisée — retrouve tes parties dans l&apos;onglet &quot;Mes parties&quot;.</source>
+        <target state="translated">Pas de classement public pour la taille Personnalisée — retrouve tes parties dans l'onglet "Mes parties".
+                </target>
       </trans-unit>
       <trans-unit id="788292028813273366" datatype="html">
         <source>Guide de l’Outre-Monde</source>
@@ -350,6 +362,10 @@
       <trans-unit id="5126997801267803550" datatype="html">
         <source>La fouille a bien été mise à jour</source>
         <target state="needs-translation">La fouille a bien été mise à jour</target>
+      </trans-unit>
+      <trans-unit id="5136231281217932237" datatype="html">
+        <source>En cours</source>
+        <target state="needs-translation">En cours</target>
       </trans-unit>
       <trans-unit id="5937107716887714291" datatype="html">
         <source>La cellule a bien été modifiée</source>
@@ -460,6 +476,10 @@
         <source>Supprimer</source>
         <target state="needs-translation">Supprimer</target>
       </trans-unit>
+      <trans-unit id="4242937041384260306" datatype="html">
+        <source>Classement</source>
+        <target state="needs-translation">Classement</target>
+      </trans-unit>
       <trans-unit id="4247263368529700262" datatype="html">
         <source>Confirmer</source>
         <target state="needs-translation">Confirmer</target>
@@ -500,8 +520,8 @@
         <source>Mis à jour par <x id="INTERPOLATION" equiv-text="{{ _lastUpdateInfo.username }}"/> 
                     <x id="INTERPOLATION_1" equiv-text="{{ _lastUpdateInfo.update_time.fromNow() }}"/>
                 </source>
-        <target state="needs-translation">Mis à jour par <x id="INTERPOLATION" equiv-text="{{ _lastUpdateInfo.username }}"/> 
-                    <x id="INTERPOLATION_1" equiv-text="{{ _lastUpdateInfo.update_time.fromNow() }}"/>
+        <target state="translated">Mis à jour par <x id="INTERPOLATION" equiv-text="{{ lastUpdateInfo.username }}"/> 
+                    <x id="INTERPOLATION_1" equiv-text="{{ lastUpdateInfo.update_time.fromNow() }}"/>
                 </target>
       </trans-unit>
       <trans-unit id="3130710248919896495" datatype="html">
@@ -513,9 +533,9 @@
                     <x id="INTERPOLATION_1" equiv-text="{{_lastUpdateInfo?.update_time?.fromNow()}}"/>
                      (<x id="INTERPOLATION_2" equiv-text="{{_lastUpdateInfo?.update_time?.toDate() | date:&apos;medium&apos;}}"/>)
                 </source>
-        <target state="needs-translation">Mis à jour par <x id="INTERPOLATION" equiv-text="{{_lastUpdateInfo?.username}}"/> 
-                    <x id="INTERPOLATION_1" equiv-text="{{_lastUpdateInfo?.update_time?.fromNow()}}"/>
-                     (<x id="INTERPOLATION_2" equiv-text="{{_lastUpdateInfo?.update_time?.toDate() | date:'medium'}}"/>)
+        <target state="translated">Mis à jour par <x id="INTERPOLATION" equiv-text="{{lastUpdateInfo?.username}}"/> 
+                    <x id="INTERPOLATION_1" equiv-text="{{lastUpdateInfo?.update_time?.fromNow()}}"/>
+                     (<x id="INTERPOLATION_2" equiv-text="{{lastUpdateInfo?.update_time?.toDate() | date:'medium'}}"/>)
                 </target>
       </trans-unit>
       <trans-unit id="5829380065548494521" datatype="html">
@@ -587,9 +607,8 @@
         <target state="translated">Importe les données des villes depuis l'API MyHordes (
                     <x id="START_TAG_CODE" ctype="x-code" equiv-text="&lt;code&gt;"/>
                     /json/towns<x id="CLOSE_TAG_CODE" ctype="x-code" equiv-text="&lt;/code&gt;"/>). Laisse le filtre vide pour toutes les saisons, ou
-                    sélectionne
-                    une saison spécifique. MyHordes ne renvoie que 50 villes par requête et limite la clé à 150 requêtes par heure : une saison ancienne s'importe
-                    en plusieurs passes, à reprendre d'une heure sur l'autre.
+                    sélectionne une saison spécifique. MyHordes ne renvoie que 50 villes par requête et limite la clé à 150 requêtes par heure : une saison
+                    ancienne s'importe en plusieurs passes, à reprendre d'une heure sur l'autre.
                 </target>
       </trans-unit>
       <trans-unit id="2735775440803933212" datatype="html">
@@ -611,6 +630,10 @@
       <trans-unit id="6791169760263814863" datatype="html">
         <source>Reprendre</source>
         <target state="needs-translation">Reprendre</target>
+      </trans-unit>
+      <trans-unit id="1467566692562963830" datatype="html">
+        <source>Réessayer</source>
+        <target state="needs-translation">Réessayer</target>
       </trans-unit>
       <trans-unit id="1467983175316497492" datatype="html">
         <source>Importer les villes</source>
@@ -647,10 +670,6 @@
       <trans-unit id="1087900872515566478" datatype="html">
         <source>Objets</source>
         <target state="needs-translation">Objets</target>
-      </trans-unit>
-      <trans-unit id="2634218306005917247" datatype="html">
-        <source>Ruines</source>
-        <target state="needs-translation">Ruines</target>
       </trans-unit>
       <trans-unit id="4354226191914852265" datatype="html">
         <source>Pictos</source>
@@ -820,6 +839,10 @@
                     pictos restants
                 </target>
       </trans-unit>
+      <trans-unit id="8899726745077474249" datatype="html">
+        <source>Défi du jour</source>
+        <target state="needs-translation">Défi du jour</target>
+      </trans-unit>
       <trans-unit id="8988298967814910334" datatype="html">
         <source>Coups :</source>
         <target state="needs-translation">Coups :</target>
@@ -844,10 +867,6 @@
         <source>Thème Windows</source>
         <target state="needs-translation">Thème Windows</target>
       </trans-unit>
-      <trans-unit id="1819215007804875232" datatype="html">
-        <source>Seed</source>
-        <target state="needs-translation">Seed</target>
-      </trans-unit>
       <trans-unit id="4719813675126368011" datatype="html">
         <source>Facile</source>
         <target state="needs-translation">Facile</target>
@@ -871,6 +890,10 @@
       <trans-unit id="219073679209014363" datatype="html">
         <source>Personnalisé</source>
         <target state="needs-translation">Personnalisé</target>
+      </trans-unit>
+      <trans-unit id="2195772151215033521" datatype="html">
+        <source>Impossible de démarrer la partie.</source>
+        <target state="needs-translation">Impossible de démarrer la partie.</target>
       </trans-unit>
       <trans-unit id="7514759768535181311" datatype="html">
         <source>IRL</source>
@@ -943,28 +966,6 @@
         <source>Disponibilités du jour</source>
         <target state="needs-translation">Disponibilités du jour</target>
       </trans-unit>
-      <trans-unit id="2782513365381709549" datatype="html">
-        <source>Immunisés</source>
-        <target state="needs-translation">Immunisés</target>
-      </trans-unit>
-      <trans-unit id="8664804111267568290" datatype="html">
-        <source><x id="PH" equiv-text="nb"/>
-                    potions bues
-                </source>
-        <target state="needs-translation">
-                    <x id="PH" equiv-text="nb"/>
-                    potions bues
-                </target>
-      </trans-unit>
-      <trans-unit id="1590090738705851179" datatype="html">
-        <source><x id="PH" equiv-text="nb"/>
-                    potion bue
-                </source>
-        <target state="needs-translation">
-                    <x id="PH" equiv-text="nb"/>
-                    potion bue
-                </target>
-      </trans-unit>
       <trans-unit id="5491081266313732174" datatype="html">
         <source>Filtres</source>
         <target state="needs-translation">Filtres</target>
@@ -1000,10 +1001,6 @@
       <trans-unit id="8992030650489163883" datatype="html">
         <source>Actions quotidiennes</source>
         <target state="needs-translation">Actions quotidiennes</target>
-      </trans-unit>
-      <trans-unit id="402438736568564848" datatype="html">
-        <source>Bain — coché : oui · décoché : non · indéterminé : tous</source>
-        <target state="needs-translation">Bain — coché : oui · décoché : non · indéterminé : tous</target>
       </trans-unit>
       <trans-unit id="6311249165811246372" datatype="html">
         <source>Bain</source>
@@ -1057,6 +1054,10 @@
         <source>Derniers mots :</source>
         <target state="needs-translation">Derniers mots :</target>
       </trans-unit>
+      <trans-unit id="8948895320444851787" datatype="html">
+        <source>Ménage</source>
+        <target state="needs-translation">Ménage</target>
+      </trans-unit>
       <trans-unit id="7797012355083019611" datatype="html">
         <source>Message à la ville :</source>
         <target state="needs-translation">Message à la ville :</target>
@@ -1076,10 +1077,6 @@
       <trans-unit id="2205827814755156780" datatype="html">
         <source>Dernières mises à jour</source>
         <target state="needs-translation">Dernières mises à jour</target>
-      </trans-unit>
-      <trans-unit id="1172116262798727159" datatype="html">
-        <source>Jamais</source>
-        <target state="needs-translation">Jamais</target>
       </trans-unit>
       <trans-unit id="4739884131356753082" datatype="html">
         <source>Ajouter aux états</source>
@@ -1108,10 +1105,6 @@
       <trans-unit id="5932960630557670586" datatype="html">
         <source>Immunisé</source>
         <target state="needs-translation">Immunisé</target>
-      </trans-unit>
-      <trans-unit id="5119195508169296698" datatype="html">
-        <source>Bain pris</source>
-        <target state="needs-translation">Bain pris</target>
       </trans-unit>
       <trans-unit id="5833055296319952035" datatype="html">
         <source>Métier</source>
@@ -1153,14 +1146,6 @@
         <source>Chamanique</source>
         <target state="needs-translation">Chamanique</target>
       </trans-unit>
-      <trans-unit id="416778454872588748" datatype="html">
-        <source>Pas de bain</source>
-        <target state="needs-translation">Pas de bain</target>
-      </trans-unit>
-      <trans-unit id="2438672752074875472" datatype="html">
-        <source>Mode liste</source>
-        <target state="needs-translation">Mode liste</target>
-      </trans-unit>
       <trans-unit id="1199075748231436486" datatype="html">
         <source>Identifiant MyHordes</source>
         <target state="needs-translation">Identifiant MyHordes</target>
@@ -1172,14 +1157,6 @@
       <trans-unit id="8895761088455718364" datatype="html">
         <source>Fouilles</source>
         <target state="needs-translation">Fouilles</target>
-      </trans-unit>
-      <trans-unit id="2987911084088408899" datatype="html">
-        <source>Bains</source>
-        <target state="needs-translation">Bains</target>
-      </trans-unit>
-      <trans-unit id="5343881027002333937" datatype="html">
-        <source>Immunités</source>
-        <target state="needs-translation">Immunités</target>
       </trans-unit>
       <trans-unit id="6351937635910938762" datatype="html">
         <source>Disponibilités</source>
@@ -1275,6 +1252,10 @@
         <source>Oui</source>
         <target state="needs-translation">Oui</target>
       </trans-unit>
+      <trans-unit id="7186662439143171626" datatype="html">
+        <source>Abandonnée</source>
+        <target state="needs-translation">Abandonnée</target>
+      </trans-unit>
       <trans-unit id="4709450557795328287" datatype="html">
         <source>Non</source>
         <target state="needs-translation">Non</target>
@@ -1282,6 +1263,10 @@
       <trans-unit id="6799332973355663459" datatype="html">
         <source>Ajouter une place</source>
         <target state="needs-translation">Ajouter une place</target>
+      </trans-unit>
+      <trans-unit id="493101002815827702" datatype="html">
+        <source>Actions héroïques</source>
+        <target state="needs-translation">Actions héroïques</target>
       </trans-unit>
       <trans-unit id="4937605142880264151" datatype="html">
         <source>Consignes de l&apos;expédition</source>
@@ -1381,6 +1366,10 @@
         <source>Relevés des métiers</source>
         <target state="needs-translation">Relevés des métiers</target>
       </trans-unit>
+      <trans-unit id="2946654520146782781" datatype="html">
+        <source>Aucun score pour l&apos;instant.</source>
+        <target state="needs-translation">Aucun score pour l'instant.</target>
+      </trans-unit>
       <trans-unit id="8174236246751730214" datatype="html">
         <source>Abondance (fouineur)</source>
         <target state="needs-translation">Abondance (fouineur)</target>
@@ -1401,6 +1390,10 @@
         <source>2 – Zone peu fouillée</source>
         <target state="needs-translation">2 – Zone peu fouillée</target>
       </trans-unit>
+      <trans-unit id="5822621800437511210" datatype="html">
+        <source>Joueur</source>
+        <target state="needs-translation">Joueur</target>
+      </trans-unit>
       <trans-unit id="5826413858405522799" datatype="html">
         <source>3 – Zone abondante</source>
         <target state="needs-translation">3 – Zone abondante</target>
@@ -1416,6 +1409,10 @@
       <trans-unit id="4741517700695762920" datatype="html">
         <source>1 – Zone partiellement explorée</source>
         <target state="needs-translation">1 – Zone partiellement explorée</target>
+      </trans-unit>
+      <trans-unit id="4756133357181766101" datatype="html">
+        <source>Mes parties</source>
+        <target state="needs-translation">Mes parties</target>
       </trans-unit>
       <trans-unit id="42397383054553721" datatype="html">
         <source>2 – Zone explorée</source>
@@ -1493,6 +1490,10 @@
         <source>Cellule</source>
         <target state="needs-translation">Cellule</target>
       </trans-unit>
+      <trans-unit id="4563940927762956956" datatype="html">
+        <source>Ne nécessite rien de spécial</source>
+        <target state="needs-translation">Ne nécessite rien de spécial</target>
+      </trans-unit>
       <trans-unit id="4574043683605876869" datatype="html">
         <source>Bâtiment</source>
         <target state="needs-translation">Bâtiment</target>
@@ -1524,6 +1525,10 @@
       <trans-unit id="1639488378691279565" datatype="html">
         <source>Décharge</source>
         <target state="needs-translation">Décharge</target>
+      </trans-unit>
+      <trans-unit id="1639616087451032547" datatype="html">
+        <source>Meilleurs scores</source>
+        <target state="needs-translation">Meilleurs scores</target>
       </trans-unit>
       <trans-unit id="5557109916159305360" datatype="html">
         <source>Fouilles restantes</source>
@@ -1560,6 +1565,10 @@
       <trans-unit id="6117782295216095698" datatype="html">
         <source>Ajouter une zone</source>
         <target state="needs-translation">Ajouter une zone</target>
+      </trans-unit>
+      <trans-unit id="6129258837637103160" datatype="html">
+        <source>Agrandir le zoom</source>
+        <target state="needs-translation">Agrandir le zoom</target>
       </trans-unit>
       <trans-unit id="1779552786277618671" datatype="html">
         <source>Distance</source>
@@ -1644,8 +1653,7 @@
                     %, calculée en recoupant la TDG du jour avec le planificateur de la veille
                 </source>
         <target state="translated">À cocher si la gazette du jour affiné annonce l'explosion des feux d'artifice : l'attaque réelle est réduite
-                    de
-                    13 à 16 %, calculée en recoupant la TDG du jour avec le planificateur de la veille
+                    de 13 à 16 %, calculée en recoupant la TDG du jour avec le planificateur de la veille
                 </target>
       </trans-unit>
       <trans-unit id="4389720435684617288" datatype="html">
@@ -1802,9 +1810,21 @@
         <source>Ont été pris</source>
         <target state="needs-translation">Ont été pris</target>
       </trans-unit>
+      <trans-unit id="4861115589470766196" datatype="html">
+        <source>Douche</source>
+        <target state="needs-translation">Douche</target>
+      </trans-unit>
       <trans-unit id="8073013514222699302" datatype="html">
         <source>Ont été donnés</source>
         <target state="needs-translation">Ont été donnés</target>
+      </trans-unit>
+      <trans-unit id="2456477142464580022" datatype="html">
+        <source>Gagnée</source>
+        <target state="needs-translation">Gagnée</target>
+      </trans-unit>
+      <trans-unit id="2464570349751973023" datatype="html">
+        <source>Chantier temporaire</source>
+        <target state="needs-translation">Chantier temporaire</target>
       </trans-unit>
       <trans-unit id="2472506129070031683" datatype="html">
         <source>Ont contribué</source>
@@ -1826,6 +1846,10 @@
                     <x id="PH" equiv-text="index + 1"/>
                 </target>
       </trans-unit>
+      <trans-unit id="2354670428052590180" datatype="html">
+        <source>Aucune partie jouée pour l&apos;instant.</source>
+        <target state="needs-translation">Aucune partie jouée pour l'instant.</target>
+      </trans-unit>
       <trans-unit id="2365273625237440349" datatype="html">
         <source>Activité</source>
         <target state="needs-translation">Activité</target>
@@ -1842,6 +1866,10 @@
         <source>Ont joué</source>
         <target state="needs-translation">Ont joué</target>
       </trans-unit>
+      <trans-unit id="6644537022376016073" datatype="html">
+        <source>Quitter le plein écran</source>
+        <target state="needs-translation">Quitter le plein écran</target>
+      </trans-unit>
       <trans-unit id="6645156447857379979" datatype="html">
         <source>N&apos;ont pas joué</source>
         <target state="needs-translation">N'ont pas joué</target>
@@ -1849,6 +1877,10 @@
       <trans-unit id="974287372292560425" datatype="html">
         <source>Dés / Cartes / Ballon</source>
         <target state="needs-translation">Dés / Cartes / Ballon</target>
+      </trans-unit>
+      <trans-unit id="974732083306088859" datatype="html">
+        <source>Actions quotidiennes</source>
+        <target state="needs-translation">Actions quotidiennes</target>
       </trans-unit>
       <trans-unit id="6948592133758825600" datatype="html">
         <source>Dés</source>
@@ -1930,6 +1962,10 @@
         <source>Estimations</source>
         <target state="needs-translation">Estimations</target>
       </trans-unit>
+      <trans-unit id="1713271461473302108" datatype="html">
+        <source>Mode</source>
+        <target state="needs-translation">Mode</target>
+      </trans-unit>
       <trans-unit id="1713820069440865328" datatype="html">
         <source>Scrutateur</source>
         <target state="needs-translation">Scrutateur</target>
@@ -1937,6 +1973,10 @@
       <trans-unit id="7730918363143562137" datatype="html">
         <source>Registre</source>
         <target state="needs-translation">Registre</target>
+      </trans-unit>
+      <trans-unit id="773527048551115074" datatype="html">
+        <source>Mode de jeu</source>
+        <target state="needs-translation">Mode de jeu</target>
       </trans-unit>
       <trans-unit id="469180229084386389" datatype="html">
         <source>Mode observateur</source>
@@ -2037,6 +2077,10 @@
       <trans-unit id="604478767521887364" datatype="html">
         <source>Non-Encombrants</source>
         <target state="needs-translation">Non-Encombrants</target>
+      </trans-unit>
+      <trans-unit id="6051346468409623514" datatype="html">
+        <source>Peut être ouvert avec</source>
+        <target state="needs-translation">Peut être ouvert avec</target>
       </trans-unit>
       <trans-unit id="3837919746131358209" datatype="html">
         <source>Ne pas rapporter</source>
@@ -2200,6 +2244,10 @@
         <source>Camping</source>
         <target state="needs-translation">Camping</target>
       </trans-unit>
+      <trans-unit id="2292584256714443853" datatype="html">
+        <source>Perdue</source>
+        <target state="needs-translation">Perdue</target>
+      </trans-unit>
       <trans-unit id="8628521144156217897" datatype="html">
         <source>Chances de survie</source>
         <target state="needs-translation">Chances de survie</target>
@@ -2268,6 +2316,10 @@
         <source>Mini-Jeux</source>
         <target state="needs-translation">Mini-Jeux</target>
       </trans-unit>
+      <trans-unit id="668387861187046971" datatype="html">
+        <source>Classement des joueurs</source>
+        <target state="needs-translation">Classement des joueurs</target>
+      </trans-unit>
       <trans-unit id="7207482748149833374" datatype="html">
         <source>Ville observée</source>
         <target state="needs-translation">Ville observée</target>
@@ -2287,6 +2339,10 @@
       <trans-unit id="3079822284604019418" datatype="html">
         <source>Merci aussi à Bigonoud, qui a accepté de mettre les mains dans le code pour nous aider au développement.</source>
         <target state="needs-translation">Merci aussi à Bigonoud, qui a accepté de mettre les mains dans le code pour nous aider au développement.</target>
+      </trans-unit>
+      <trans-unit id="3080483882937310852" datatype="html">
+        <source>Normal</source>
+        <target state="needs-translation">Normal</target>
       </trans-unit>
       <trans-unit id="7508106374158857656" datatype="html">
         <source>Merci à CrazyUnicorn, qui nous fait profiter de ses talents pour l&apos;ergonomie du site.</source>
@@ -2319,6 +2375,10 @@
       <trans-unit id="826911519411311233" datatype="html">
         <source>Dans ma ville</source>
         <target state="needs-translation">Dans ma ville</target>
+      </trans-unit>
+      <trans-unit id="6485992728192281912" datatype="html">
+        <source>Améliorations</source>
+        <target state="needs-translation">Améliorations</target>
       </trans-unit>
       <trans-unit id="6487260431971357562" datatype="html">
         <source>Bonus en équivalent PA</source>
@@ -2407,6 +2467,10 @@
       <trans-unit id="1759876158817324985" datatype="html">
         <source>Nombre d&apos;améliorations simples faites sur la case</source>
         <target state="needs-translation">Nombre d'améliorations simples faites sur la case</target>
+      </trans-unit>
+      <trans-unit id="1563883498133119332" datatype="html">
+        <source>Permet d&apos;ouvrir</source>
+        <target state="needs-translation">Permet d'ouvrir</target>
       </trans-unit>
       <trans-unit id="1569331568164081073" datatype="html">
         <source>Nombre d&apos;objets de défense installés sur la case</source>
@@ -2585,6 +2649,10 @@
         <source>ignorée (porte ouverte)</source>
         <target state="needs-translation">ignorée (porte ouverte)</target>
       </trans-unit>
+      <trans-unit id="1361291709482825788" datatype="html">
+        <source>États</source>
+        <target state="needs-translation">États</target>
+      </trans-unit>
       <trans-unit id="5676596107664961045" datatype="html">
         <source>Veilleurs</source>
         <target state="needs-translation">Veilleurs</target>
@@ -2674,6 +2742,10 @@
         <source>Scénario favorable</source>
         <target state="needs-translation">Scénario favorable</target>
       </trans-unit>
+      <trans-unit id="181574438587688914" datatype="html">
+        <source>Plein écran</source>
+        <target state="needs-translation">Plein écran</target>
+      </trans-unit>
       <trans-unit id="8744947662445627502" datatype="html">
         <source>Scénario défavorable</source>
         <target state="needs-translation">Scénario défavorable</target>
@@ -2723,8 +2795,7 @@
                     du bot&lt;/a&gt;
                 </source>
         <target state="translated">&lt;a href="https://discord.com/oauth2/authorize?client_id=1140035117746765914" target="_blank"&gt;lien
-                    d'installation
-                    du bot&lt;/a&gt;
+                    d'installation du bot&lt;/a&gt;
                 </target>
       </trans-unit>
       <trans-unit id="5042676445872680046" datatype="html">
@@ -2738,8 +2809,7 @@
                     et choisissez &lt;strong&gt;Ajouter à mes applications&lt;/strong&gt;.
                 </source>
         <target state="translated">En l'installant en tant qu'application, vous pourrez utiliser les commandes du bot partout sur Discord (en
-                    messages
-                    privés, dans des groupes, ou sur des serveurs où le bot n'est pas présent).&lt;br&gt;&lt;br&gt;Cliquez sur le
+                    messages privés, dans des groupes, ou sur des serveurs où le bot n'est pas présent).&lt;br&gt;&lt;br&gt;Cliquez sur le
                     <x id="PH" equiv-text="this.download_link"/>
                     et choisissez &lt;strong&gt;Ajouter à mes applications&lt;/strong&gt;.
                 </target>
@@ -2821,6 +2891,10 @@
       <trans-unit id="7620507202018349855" datatype="html">
         <source>Affichage des tooltips détaillés</source>
         <target state="needs-translation">Affichage des tooltips détaillés</target>
+      </trans-unit>
+      <trans-unit id="7631405440758027758" datatype="html">
+        <source>Temps</source>
+        <target state="needs-translation">Temps</target>
       </trans-unit>
       <trans-unit id="5795663998729072574" datatype="html">
         <source>Modifie les tooltips natifs de l&apos;application pour afficher en plus la liste des recettes dans lesquelles l&apos;objet survolé
@@ -3127,9 +3201,9 @@
                     Tampermonkey ou Violentmonkey. Ensuite, il suffit de cliquer sur le<x id="PH" equiv-text="this.download_link"/>, qui lancera la procédure d&apos;installation.
                     Enfin, il faudra confirmer dans la page qui se sera ouverte.
                 </source>
-        <target state="needs-translation">Il faut d'abord installer l'application de gestion des scripts de votre choix. Il en existe plusieurs, comme par exemple
-                    Tampermonkey ou Violentmonkey. Ensuite, il suffit de cliquer sur le<x id="PH" equiv-text="this.download_link"/>, qui lancera la procédure d'installation.
-                    Enfin, il faudra confirmer dans la page qui se sera ouverte.
+        <target state="translated">Il faut d'abord installer l'application de gestion des scripts de votre choix. Il en existe plusieurs, comme par
+                    exemple Tampermonkey ou Violentmonkey. Ensuite, il suffit de cliquer sur le<x id="PH" equiv-text="this.download_link"/>, qui lancera la
+                    procédure d'installation. Enfin, il faudra confirmer dans la page qui se sera ouverte.
                 </target>
       </trans-unit>
       <trans-unit id="4519018646004234371" datatype="html">
@@ -3171,36 +3245,27 @@
                     sur &quot;Userscripts&quot; ;&lt;/li&gt; &lt;li&gt;Vérifier que &quot;MyHordes Optimizer&quot; est bien activé.&lt;/li&gt; &lt;/ul&gt;
                 </source>
         <target state="translated">&lt;ul&gt; &lt;li&gt;Télécharger l’application "UserScripts" ;&lt;/li&gt; &lt;li&gt;Ouvrir l'application
-                    "Raccourcis"
-                    ;&lt;/li&gt; &lt;li&gt;Appuyer sur le bouton "+" en haut à droite pour créer un nouveau raccourci ;&lt;/li&gt; &lt;li&gt;Rechercher
-                    l'action
-                    "Obtenir le contenu de l'URL" et l'ajouter ;&lt;/li&gt; &lt;li&gt;Rechercher l'action "Enregister le fichier"
-                    et l'ajouter ;&lt;/li&gt; &lt;li&gt;Configurer l'action "Obtenir le contenu de l'URL" en modifiant la valeur du
-                    paramètre "URL" par la valeur "Entrée de raccourci" ;&lt;/li&gt; &lt;li&gt;Configurer l'action "Recevoir l'entrée"
-                    en modifiant la valeur du premier paramètre "Images et 18 de plus" par la valeur "URL" uniquement ;&lt;/li&gt; &lt;li&gt;Configurer
-                    l'action "Recevoir l'entrée" en modifiant la valeur du second paramètre "Nulle part" par la valeur "Dans
-                    la
-                    feuille de partage" ;&lt;/li&gt; &lt;li&gt;Terminer la création du raccourci en appuyant sur le bouton "OK" en haut à droite
-                    ;&lt;/li&gt;
-                    &lt;li&gt;Enregistrer le fichier disponible sur le
+                    "Raccourcis" ;&lt;/li&gt; &lt;li&gt;Appuyer sur le bouton "+" en haut à droite pour créer un nouveau raccourci ;&lt;/li&gt;
+                    &lt;li&gt;Rechercher l'action "Obtenir le contenu de l'URL" et l'ajouter ;&lt;/li&gt; &lt;li&gt;Rechercher l'action
+                    "Enregister le fichier" et l'ajouter ;&lt;/li&gt; &lt;li&gt;Configurer l'action "Obtenir le contenu de l'URL"
+                    en modifiant la valeur du paramètre "URL" par la valeur "Entrée de raccourci" ;&lt;/li&gt; &lt;li&gt;Configurer l'action
+                    "Recevoir l'entrée" en modifiant la valeur du premier paramètre "Images et 18 de plus" par la valeur "URL"
+                    uniquement ;&lt;/li&gt; &lt;li&gt;Configurer l'action "Recevoir l'entrée" en modifiant la valeur du second paramètre
+                    "Nulle part" par la valeur "Dans la feuille de partage" ;&lt;/li&gt; &lt;li&gt;Terminer la création du raccourci en
+                    appuyant sur le bouton "OK" en haut à droite ;&lt;/li&gt; &lt;li&gt;Enregistrer le fichier disponible sur le
                     <x id="PH" equiv-text="this.download_link"/>
                     via un appui long sur le lien, en sélectionnant "Partager..." puis l'action "Enregister le fichier" ;&lt;/li&gt;
-                    &lt;li&gt;Autoriser
-                    l'action "Enregistrer le fichier" à l'envoyer 1 élement de l'app Safari vers "github.com" ;&lt;/li&gt;
-                    &lt;li&gt;Sélectionner
-                    l'onglet "Explorer", choisir l'emplacement "Sur mon iPhone", sélectionner le dossier "Userscripts"
-                    puis
-                    valider appuyant sur le bouton "Ouvrir" en haut à droite ;&lt;/li&gt; &lt;li&gt;Ouvrir l'application "Fichiers" ;&lt;/li&gt;
-                    &lt;li&gt;Retourner dans le dossier "Userscripts" ("Explorer" &gt; "Sur mon iPhone" &gt; "Userscripts")
-                    ;&lt;/li&gt; &lt;li&gt;Appuyer sur le bouton "..." en haut à droite et sélectionner "Options de présentation" ;&lt;/li&gt;
-                    &lt;li&gt;Activer l'option avancée "Afficher toutes les extensions de fichiers" ;&lt;/li&gt; &lt;li&gt;Renommer le fichier
-                    "my_hordes_optimizer.user.txt"
-                    en "my_hoydes_optimizer.user.js" ;&lt;/li&gt; &lt;li&gt;Confirmer le remplacement de l'extension via le choix "Utiliser
-                    ".js ;&lt;/li&gt; &lt;li&gt;Aller sur Safari ;&lt;/li&gt; &lt;li&gt;Appuyer sur le "Aa" dans la barre de recherche ;&lt;/li&gt;
-                    &lt;li&gt;Cliquer sur "Gérer les extensions" ;&lt;/li&gt; &lt;li&gt;Activer "Userscripts" ;&lt;/li&gt; &lt;li&gt;Appuyer
-                    sur
-                    le "Aa" dans la barre de recherche ;&lt;/li&gt; &lt;li&gt;Cliquer sur "Userscripts" ;&lt;/li&gt; &lt;li&gt;Vérifier que
-                    "MyHordes Optimizer" est bien activé.&lt;/li&gt; &lt;/ul&gt;
+                    &lt;li&gt;Autoriser l'action "Enregistrer le fichier" à l'envoyer 1 élement de l'app Safari vers "github.com"
+                    ;&lt;/li&gt; &lt;li&gt;Sélectionner l'onglet "Explorer", choisir l'emplacement "Sur mon iPhone", sélectionner
+                    le dossier "Userscripts" puis valider appuyant sur le bouton "Ouvrir" en haut à droite ;&lt;/li&gt; &lt;li&gt;Ouvrir l'application
+                    "Fichiers" ;&lt;/li&gt; &lt;li&gt;Retourner dans le dossier "Userscripts" ("Explorer" &gt; "Sur mon
+                    iPhone" &gt; "Userscripts") ;&lt;/li&gt; &lt;li&gt;Appuyer sur le bouton "..." en haut à droite et sélectionner
+                    "Options de présentation" ;&lt;/li&gt; &lt;li&gt;Activer l'option avancée "Afficher toutes les extensions de fichiers"
+                    ;&lt;/li&gt; &lt;li&gt;Renommer le fichier "my_hordes_optimizer.user.txt" en "my_hoydes_optimizer.user.js" ;&lt;/li&gt;
+                    &lt;li&gt;Confirmer le remplacement de l'extension via le choix "Utiliser ".js ;&lt;/li&gt; &lt;li&gt;Aller sur Safari ;&lt;/li&gt;
+                    &lt;li&gt;Appuyer sur le "Aa" dans la barre de recherche ;&lt;/li&gt; &lt;li&gt;Cliquer sur "Gérer les extensions" ;&lt;/li&gt;
+                    &lt;li&gt;Activer "Userscripts" ;&lt;/li&gt; &lt;li&gt;Appuyer sur le "Aa" dans la barre de recherche ;&lt;/li&gt; &lt;li&gt;Cliquer
+                    sur "Userscripts" ;&lt;/li&gt; &lt;li&gt;Vérifier que "MyHordes Optimizer" est bien activé.&lt;/li&gt; &lt;/ul&gt;
                 </target>
       </trans-unit>
       <trans-unit id="3369809985401596025" datatype="html">
@@ -3288,22 +3353,6 @@
         <target state="needs-translation">L'identifiant externe pour les applications se trouve sur le site de MyHordes, dans la page de votre âme, onglet "Avancé".
                     Une fois copié, il suffit de le coller dans le champ dédié sur le site de MyHordes Optimizer et de valider.
                 </target>
-      </trans-unit>
-      <trans-unit id="5969611646055214898" datatype="html">
-        <source>Les coûts indiqués valent pour les modes de ville habituels. En Pandémonium, de nombreux chantiers demandent des ressources différentes
-                    — cette page ne les reflète pas encore.
-                </source>
-        <target state="translated">Les coûts indiqués valent pour les modes de ville habituels. En Pandémonium, de nombreux chantiers demandent des ressources
-                    différentes — cette page ne les reflète pas encore.
-                </target>
-      </trans-unit>
-      <trans-unit id="6176448974516496512" datatype="html">
-        <source>Chantier temporaire : il disparaît au bout d’un moment</source>
-        <target state="needs-translation">Chantier temporaire : il disparaît au bout d’un moment</target>
-      </trans-unit>
-      <trans-unit id="4629279155621024298" datatype="html">
-        <source>Peut être détruit par l’attaque</source>
-        <target state="needs-translation">Peut être détruit par l’attaque</target>
       </trans-unit>
       <trans-unit id="6290924823055556031" datatype="html">
         <source>Aucun chantier ne correspond à cette recherche.</source>
@@ -3406,6 +3455,10 @@
         <source>Attaque théorique</source>
         <target state="needs-translation">Attaque théorique</target>
       </trans-unit>
+      <trans-unit id="2155832126259145609" datatype="html">
+        <source>s</source>
+        <target state="needs-translation">s</target>
+      </trans-unit>
       <trans-unit id="2156842490958660553" datatype="html">
         <source>Minimum théorique</source>
         <target state="needs-translation">Minimum théorique</target>
@@ -3437,6 +3490,10 @@
       <trans-unit id="4045290552180803882" datatype="html">
         <source>Jours validés</source>
         <target state="needs-translation">Jours validés</target>
+      </trans-unit>
+      <trans-unit id="4056324809886473355" datatype="html">
+        <source>Réduire le zoom</source>
+        <target state="needs-translation">Réduire le zoom</target>
       </trans-unit>
       <trans-unit id="19231624547333208" datatype="html">
         <source>Points d&apos;âmes gagnés</source>
