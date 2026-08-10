@@ -26,8 +26,8 @@ import { StandardColumn } from '../../../_abstract_model/interfaces';
 import { ApiService } from '../../../_abstract_model/services/api.service';
 import { TownService } from '../../../_abstract_model/services/town.service';
 import { Imports, ListForAddRemove } from '../../../_abstract_model/types/_types';
-import { CitizenInfo } from '../../../_abstract_model/types/citizen-info.class';
 import { Citizen } from '../../../_abstract_model/types/citizen.class';
+import { CitizenInfo } from '../../../_abstract_model/types/citizen-info.class';
 import { DailyAction } from '../../../_abstract_model/types/daily-action.class';
 import { HeroicActionsWithValue } from '../../../_abstract_model/types/heroic-actions.class';
 import { HomeWithValue } from '../../../_abstract_model/types/home.class';
@@ -54,7 +54,7 @@ import { TypeRowPipe } from './type-row.pipe';
 
 const angular_common: Imports = [CommonModule, FormsModule];
 const components: Imports = [AvatarComponent, CitizenInfoComponent, CompactStepperComponent, CompactToggleComponent, DeferredCellComponent, LastUpdateComponent, ListElementAddRemoveComponent, SelectComponent];
-const pipes: Imports = [DailyActionForDayPipe, ColumnIdPipe, TypeRowPipe];
+const pipes: Imports = [ColumnIdPipe, TypeRowPipe];
 const material_modules: Imports = [MatBadgeModule, MatButtonModule, MatButtonToggleModule, MatCheckboxModule, MatDialogModule, MatFormFieldModule, MatIconModule, MatMenuModule, MatSidenavModule, MatSortModule, MatTableModule, MatTooltipModule];
 
 /** Une source de mise à jour d'un citoyen (libellé + info), pour le détail des dernières MàJ. */

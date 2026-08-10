@@ -48,6 +48,22 @@ namespace MyHordesOptimizerApi.Repository.Impl
             return response;
         }
 
+        /// <summary>
+        /// Variante de <see cref="GetMe"/> réservée au chemin de mise à jour des outils externes
+        /// (<c>ExternalToolsService</c>) : ne demande que ce que ce chemin consomme ou a explicitement
+        /// prévu de consommer (chantiers/bâtiments/gazette/défense/améliorations/expéditions, en
+        /// attente de leurs propres chantiers). Exclut notamment `citizens`, `cadavers` et `bank` —
+        /// non lus ici (seul <see cref="GetMe"/>/login les persiste) — ainsi que `playedMaps`, `rewards`,
+        /// `isGhost`, `twinId`, `locale`, `hard`/`custom` (redondants avec `type`), `conspiracy`,
+        /// `bonusPts`, `date`, `estimations`/`estimationsNext` : aucun n'est utilisé ni prévu ici.
+        /// </summary>
+        public MyHordesUserDetailsDto GetMapForToolsUpdate()
+        {
+            var url = GenerateUrl(EndpointMe);
+            url = AddParameterToQuery(url, _parameterFields, "id,name,mapId,map.fields(wid,hei,days,zones.fields(x,y,nvt,tag,danger,details.fields(z,h,dried),items.fields(uid,id,count,broken),building.fields(type,dig,camped,dried)),city.fields(name,type,water,x,y,door,chaos,devast,chantiers.fields(id,icon,name,pa,maxLife,votes,breakable,def,resources.fields(amount,rsc.fields(id,name)),actions,hasLevels),buildings.fields(id,name,life,maxLife,breakable,def,hasUpgrade,rarity,temporary,parent,actions,hasLevels),news.fields(z,def,content,regenDir,water),defense.fields(total,base,buildings,upgrades,items,itemsMul,citizenHomes,citizenGuardians,watchmen,souls,temp,cadavers,guardiansInfos.fields(gardians,def),bonus),upgrades.fields(total,list.fields(name,level,update,buildingId))),expeditions.fields(name,author.fields(id),length,points.fields(x,y)),season,phase,language,shaman,guide,cata)");
+            return base.Get<MyHordesUserDetailsDto>(url);
+        }
+
         // Référentiel complet des pictos. Dictionnaire indexé par le NOM du prototype (« r_ripflash_#00 »),
         // pas par son id. Seule source de `community`, absent du champ `rewards` des joueurs.
         public Dictionary<string, MyHordesApiPictoDto> GetPictos()

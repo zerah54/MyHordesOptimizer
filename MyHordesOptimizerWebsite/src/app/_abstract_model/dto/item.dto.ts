@@ -1,5 +1,6 @@
 import { I18nLabels } from '../types/_types';
 import { CategoryDTO } from './category.dto';
+import { ItemSummaryDTO } from './item-summary.dto';
 import { RecipeDTO } from './recipe.dto';
 
 export interface ItemDTO {
@@ -17,6 +18,10 @@ export interface ItemDTO {
     properties: string[];
     actions: string[];
     recipes: RecipeDTO[];
+    /** Objets permettant d'ouvrir celui-ci. `null` si ce n'est pas un contenant. */
+    openedWith: ItemSummaryDTO[] | null;
+    /** Contenants que cet objet permet d'ouvrir. */
+    opens: ItemSummaryDTO[];
     bankCount: number;
     wishListCount: number;
     dropRateNotPraf: number;

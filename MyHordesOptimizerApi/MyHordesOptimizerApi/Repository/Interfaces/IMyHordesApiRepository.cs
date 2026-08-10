@@ -11,6 +11,7 @@ namespace MyHordesOptimizerApi.Repository.Interfaces
     {
         Dictionary<string, MyHordesItem> GetItems();
         MyHordesUserDetailsDto GetMe();
+        MyHordesUserDetailsDto GetMapForToolsUpdate();
         MyHordesUserDetailsDto GetUserPictos(int userId);
         List<MyHordesUserDto> GetUsersIdentity(List<int> ids);
         Dictionary<string, MyHordesApiPictoDto> GetPictos();

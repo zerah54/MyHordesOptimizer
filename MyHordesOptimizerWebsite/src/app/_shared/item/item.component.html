@@ -54,6 +54,30 @@
                         }
                     }
 
+                    @if (item().opened_with !== null) {
+                        <mat-divider></mat-divider>
+                        @if (item().opened_with!.length > 0) {
+                            <ul class="opener-relation">
+                                <ng-container i18n>Peut être ouvert avec</ng-container>
+                                @for (opener of item().opened_with!; track opener.uid) {
+                                    <li><img [ngSrc]="HORDES_IMG_REPO + opener.img" width="16" height="16">{{ opener.label[locale] }}</li>
+                                }
+                            </ul>
+                        } @else {
+                            <div i18n>Ne nécessite rien de spécial</div>
+                        }
+                    }
+
+                    @if (item().opens.length > 0) {
+                        <mat-divider></mat-divider>
+                        <ul class="opener-relation">
+                            <ng-container i18n>Permet d'ouvrir</ng-container>
+                            @for (box of item().opens; track box.uid) {
+                                <li><img [ngSrc]="HORDES_IMG_REPO + box.img" width="16" height="16">{{ box.label[locale] }}</li>
+                            }
+                        </ul>
+                    }
+
                     @if (item().deco || item().guard || item().is_heaver) {
                         <mat-divider></mat-divider>
                         @if (item().deco) {

@@ -98,6 +98,10 @@ public partial class MapCell
     [Column("idScoutEstimationLastUpdateInfo", TypeName = "int(11)")]
     public int? IdScoutEstimationLastUpdateInfo { get; set; }
 
+    /// <summary>Référence du marqueur posé sur la case (<c>ZoneTag::getRef()</c> côté MyHordes). Null si aucun marqueur.</summary>
+    [Column("tag", TypeName = "int(11)")]
+    public int? Tag { get; set; }
+
     [ForeignKey("IdLastUpdateInfo")]
     [InverseProperty("MapCells")]
     public virtual LastUpdateInfo? IdLastUpdateInfoNavigation { get; set; }

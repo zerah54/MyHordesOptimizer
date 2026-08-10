@@ -24,6 +24,16 @@ namespace MyHordesOptimizerApi.Dtos.MyHordes.MyHordesOptimizer
 
         public IEnumerable<string> Properties { get; set; }
         public IEnumerable<string> Actions { get; set; }
+
+        /// <summary>
+        /// Objets permettant d'ouvrir celui-ci. <c>null</c> si ce n'est pas un contenant, liste
+        /// vide si contenant sans outil requis, liste peuplée sinon.
+        /// </summary>
+        public List<ItemSummaryDto> OpenedWith { get; set; }
+
+        /// <summary>Contenants que cet objet permet d'ouvrir. Vide s'il n'en ouvre aucun.</summary>
+        public List<ItemSummaryDto> Opens { get; set; } = new List<ItemSummaryDto>();
+
         public int WishListCount { get; set; }
         public int BankCount { get; set; }
 

@@ -20,12 +20,10 @@ import { TownContextService } from '../../../_core/services/town-context.service
 import { getTown } from '../../../_core/utilities/localstorage.util';
 import { AvatarComponent } from '../../../_shared/avatar/avatar.component';
 import { CompactToggleComponent } from '../../../_shared/compact-toggle/compact-toggle.component';
-import { HeaderWithSelectFilterComponent } from '../../../_shared/lists/header-with-select-filter/header-with-select-filter.component';
-import { DailyActionForDayPipe } from '../daily-action-for-day.pipe';
 
 const angular_common: Imports = [CommonModule, FormsModule];
-const components: Imports = [AvatarComponent, CompactToggleComponent, HeaderWithSelectFilterComponent];
-const pipes: Imports = [DailyActionForDayPipe, ColumnIdPipe];
+const components: Imports = [AvatarComponent, CompactToggleComponent];
+const pipes: Imports = [ColumnIdPipe];
 const material_modules: Imports = [MatCheckboxModule, MatSortModule, MatTableModule];
 
 @Component({

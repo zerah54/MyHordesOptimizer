@@ -24,12 +24,10 @@
             </trans-unit>
             <trans-unit id="7387625377210660866" datatype="html" approved="yes">
                 <source>Rend un point d&apos;action à toute personne en ville, dans la limite du nombre maximum de point d&apos;action de chacun. Rend deux
-                    points d&apos;action
-                    aux citoyens ayant l&apos;état ivre ou l&apos;état drogué
+                    points d&apos;action aux citoyens ayant l&apos;état ivre ou l&apos;état drogué
                 </source>
                 <target state="translated">Devuelve un punto a los puntos de acción a cualquiera en la ciudad de su límite máximo de puntos de acción. Devuelve
-                    dos
-                    puntos de acción a los ciudadanos que hayan estado bajo los efectos del alcohol o de droga
+                    dos puntos de acción a los ciudadanos que hayan estado bajo los efectos del alcohol o de droga
                 </target>
             </trans-unit>
             <trans-unit id="5265432085520184033" datatype="html" approved="yes">
@@ -256,6 +254,10 @@
                 <source>Peut être empoisonné</source>
                 <target state="needs-translation">Peut être empoisonné</target>
             </trans-unit>
+            <trans-unit id="7070563539639146322" datatype="html">
+                <source>Peut être endommagé par l’attaque</source>
+                <target state="new">Peut être endommagé par l’attaque</target>
+            </trans-unit>
             <trans-unit id="7070606596322847118" datatype="html">
                 <source>Peut être cuisiné</source>
                 <target state="needs-translation">Peut être cuisiné</target>
@@ -280,6 +282,10 @@
                 <source>Objet de défense</source>
                 <target state="needs-translation">Objet de défense</target>
             </trans-unit>
+            <trans-unit id="2026109244028945943" datatype="html">
+                <source>Vous n&apos;êtes pas connecté(e) — vos scores ne seront pas enregistrés.</source>
+                <target state="new">Vous n&apos;êtes pas connecté(e) — vos scores ne seront pas enregistrés.</target>
+            </trans-unit>
             <trans-unit id="7152806231676044539" datatype="html">
                 <source>Animal</source>
                 <target state="needs-translation">Animal</target>
@@ -291,6 +297,11 @@
             <trans-unit id="2646799191669721083" datatype="html">
                 <source>Chaman</source>
                 <target state="new">Chaman</target>
+            </trans-unit>
+            <trans-unit id="265989447881349012" datatype="html">
+                <source>Pas de classement public pour la taille Personnalisée — retrouve tes parties dans l&apos;onglet &quot;Mes parties&quot;.</source>
+                <target state="new">Pas de classement public pour la taille Personnalisée — retrouve tes parties dans l&apos;onglet &quot;Mes parties&quot;.
+                </target>
             </trans-unit>
             <trans-unit id="788292028813273366" datatype="html">
                 <source>Guide de l’Outre-Monde</source>
@@ -364,6 +375,10 @@
                 <source>La fouille a bien été mise à jour</source>
                 <target state="needs-translation">La fouille a bien été mise à jour</target>
             </trans-unit>
+            <trans-unit id="5136231281217932237" datatype="html">
+                <source>En cours</source>
+                <target state="new">En cours</target>
+            </trans-unit>
             <trans-unit id="5937107716887714291" datatype="html">
                 <source>La cellule a bien été modifiée</source>
                 <target state="needs-translation">La cellule a bien été modifiée</target>
@@ -434,10 +449,6 @@
                 <source>Thème Windows</source>
                 <target state="new">Thème Windows</target>
             </trans-unit>
-            <trans-unit id="1819215007804875232" datatype="html">
-                <source>Seed</source>
-                <target state="new">Seed</target>
-            </trans-unit>
             <trans-unit id="4719813675126368011" datatype="html">
                 <source>Facile</source>
                 <target state="needs-translation">Facile</target>
@@ -461,6 +472,10 @@
             <trans-unit id="219073679209014363" datatype="html">
                 <source>Personnalisé</source>
                 <target state="needs-translation">Personnalisé</target>
+            </trans-unit>
+            <trans-unit id="2195772151215033521" datatype="html">
+                <source>Impossible de démarrer la partie.</source>
+                <target state="new">Impossible de démarrer la partie.</target>
             </trans-unit>
             <trans-unit id="7514759768535181311" datatype="html">
                 <source>IRL</source>
@@ -538,30 +553,6 @@
                 <source>Disponibilités du jour</source>
                 <target state="needs-translation">Disponibilités du jour</target>
             </trans-unit>
-            <trans-unit id="2782513365381709549" datatype="html">
-                <source>Immunisés</source>
-                <target state="needs-translation">Immunisés</target>
-            </trans-unit>
-            <trans-unit id="8664804111267568290" datatype="html">
-                <source>
-                    <x id="PH" equiv-text="nb"/>
-                    potions bues
-                </source>
-                <target state="needs-translation">
-                    <x id="PH" equiv-text="nb"/>
-                    potions bues
-                </target>
-            </trans-unit>
-            <trans-unit id="1590090738705851179" datatype="html">
-                <source>
-                    <x id="PH" equiv-text="nb"/>
-                    potion bue
-                </source>
-                <target state="needs-translation">
-                    <x id="PH" equiv-text="nb"/>
-                    potion bue
-                </target>
-            </trans-unit>
             <trans-unit id="5491081266313732174" datatype="html">
                 <source>Filtres</source>
                 <target state="new">Filtres</target>
@@ -606,10 +597,6 @@
                 <source>Vider le sac</source>
                 <target state="needs-translation">Vider le sac</target>
             </trans-unit>
-            <trans-unit id="5119195508169296698" datatype="html">
-                <source>Bain pris</source>
-                <target state="needs-translation">Bain pris</target>
-            </trans-unit>
             <trans-unit id="1654995770303703868" datatype="html">
                 <source>Potions bues</source>
                 <target state="needs-translation">Potions bues</target>
@@ -625,10 +612,6 @@
             <trans-unit id="8992030650489163883" datatype="html">
                 <source>Actions quotidiennes</source>
                 <target state="new">Actions quotidiennes</target>
-            </trans-unit>
-            <trans-unit id="402438736568564848" datatype="html">
-                <source>Bain — coché : oui · décoché : non · indéterminé : tous</source>
-                <target state="new">Bain — coché : oui · décoché : non · indéterminé : tous</target>
             </trans-unit>
             <trans-unit id="6311249165811246372" datatype="html">
                 <source>Bain</source>
@@ -694,14 +677,6 @@
                 <source>Aucune entrée trouvée</source>
                 <target state="new">Aucune entrée trouvée</target>
             </trans-unit>
-            <trans-unit id="416778454872588748" datatype="html">
-                <source>Pas de bain</source>
-                <target state="needs-translation">Pas de bain</target>
-            </trans-unit>
-            <trans-unit id="2438672752074875472" datatype="html">
-                <source>Mode liste</source>
-                <target state="needs-translation">Mode liste</target>
-            </trans-unit>
             <trans-unit id="3907766170797643122" datatype="html">
                 <source>Pseudo</source>
                 <target state="needs-translation">Pseudo</target>
@@ -725,14 +700,6 @@
             <trans-unit id="8895761088455718364" datatype="html">
                 <source>Fouilles</source>
                 <target state="needs-translation">Fouilles</target>
-            </trans-unit>
-            <trans-unit id="2987911084088408899" datatype="html">
-                <source>Bains</source>
-                <target state="needs-translation">Bains</target>
-            </trans-unit>
-            <trans-unit id="5343881027002333937" datatype="html">
-                <source>Immunités</source>
-                <target state="needs-translation">Immunités</target>
             </trans-unit>
             <trans-unit id="6351937635910938762" datatype="html">
                 <source>Disponibilités</source>
@@ -872,6 +839,10 @@
                     pictos restants
                 </target>
             </trans-unit>
+            <trans-unit id="8899726745077474249" datatype="html">
+                <source>Défi du jour</source>
+                <target state="new">Défi du jour</target>
+            </trans-unit>
             <trans-unit id="8988298967814910334" datatype="html">
                 <source>Coups :</source>
                 <target state="new">Coups :</target>
@@ -919,7 +890,7 @@
             <trans-unit id="6664444658010754432" datatype="html">
                 <source>Partie<x id="INTERPOLATION" equiv-text="{{ expedition_part_index + 1 }}"/> : 
                 </source>
-                <target state="needs-translation">Partie<x id="INTERPOLATION" equiv-text="{{ expedition_part_index + 1 }}"/> : 
+                <target state="new">Partie<x id="INTERPOLATION" equiv-text="{{ expedition_part_index + 1 }}"/> : 
                 </target>
             </trans-unit>
             <trans-unit id="6655777237474004024" datatype="html">
@@ -990,6 +961,10 @@
                 <source>Oui</source>
                 <target state="needs-translation">Oui</target>
             </trans-unit>
+            <trans-unit id="7186662439143171626" datatype="html">
+                <source>Abandonnée</source>
+                <target state="new">Abandonnée</target>
+            </trans-unit>
             <trans-unit id="4709450557795328287" datatype="html">
                 <source>Non</source>
                 <target state="needs-translation">Non</target>
@@ -997,6 +972,10 @@
             <trans-unit id="6799332973355663459" datatype="html">
                 <source>Ajouter une place</source>
                 <target state="needs-translation">Ajouter une place</target>
+            </trans-unit>
+            <trans-unit id="493101002815827702" datatype="html">
+                <source>Actions héroïques</source>
+                <target state="new">Actions héroïques</target>
             </trans-unit>
             <trans-unit id="4937605142880264151" datatype="html">
                 <source>Consignes de l&apos;expédition</source>
@@ -1013,6 +992,10 @@
             <trans-unit id="1753191297685148420" datatype="html">
                 <source>Ajouter un membre à l&apos;expédition</source>
                 <target state="needs-translation">Ajouter un membre à l&apos;expédition</target>
+            </trans-unit>
+            <trans-unit id="4242937041384260306" datatype="html">
+                <source>Classement</source>
+                <target state="new">Classement</target>
             </trans-unit>
             <trans-unit id="4247263368529700262" datatype="html">
                 <source>Confirmer</source>
@@ -1046,8 +1029,7 @@
                        equiv-text="environment.website_url"/>
                     my-town/expeditions]ce lien[/link]
                 </source>
-                <target state="needs-translation">Ce message a été généré à partir du site MyHordes Optimizer. Vous pouvez retrouver les expéditions en suivant
-                    [link=
+                <target state="new">Ce message a été généré à partir du site MyHordes Optimizer. Vous pouvez retrouver les expéditions en suivant [link=
                     <x id="PH" equiv-text="environment.website_url"/>
                     my-town/expeditions]ce lien[/link]
                 </target>
@@ -1102,6 +1084,10 @@
                 <source>Relevés des métiers</source>
                 <target state="new">Relevés des métiers</target>
             </trans-unit>
+            <trans-unit id="2946654520146782781" datatype="html">
+                <source>Aucun score pour l&apos;instant.</source>
+                <target state="new">Aucun score pour l&apos;instant.</target>
+            </trans-unit>
             <trans-unit id="8174236246751730214" datatype="html">
                 <source>Abondance (fouineur)</source>
                 <target state="new">Abondance (fouineur)</target>
@@ -1122,6 +1108,10 @@
                 <source>2 – Zone peu fouillée</source>
                 <target state="new">2 – Zone peu fouillée</target>
             </trans-unit>
+            <trans-unit id="5822621800437511210" datatype="html">
+                <source>Joueur</source>
+                <target state="new">Joueur</target>
+            </trans-unit>
             <trans-unit id="5826413858405522799" datatype="html">
                 <source>3 – Zone abondante</source>
                 <target state="new">3 – Zone abondante</target>
@@ -1137,6 +1127,10 @@
             <trans-unit id="4741517700695762920" datatype="html">
                 <source>1 – Zone partiellement explorée</source>
                 <target state="new">1 – Zone partiellement explorée</target>
+            </trans-unit>
+            <trans-unit id="4756133357181766101" datatype="html">
+                <source>Mes parties</source>
+                <target state="new">Mes parties</target>
             </trans-unit>
             <trans-unit id="42397383054553721" datatype="html">
                 <source>2 – Zone explorée</source>
@@ -1222,6 +1216,10 @@
                 <source>Cellule</source>
                 <target state="needs-translation">Cellule</target>
             </trans-unit>
+            <trans-unit id="4563940927762956956" datatype="html">
+                <source>Ne nécessite rien de spécial</source>
+                <target state="new">Ne nécessite rien de spécial</target>
+            </trans-unit>
             <trans-unit id="4574043683605876869" datatype="html">
                 <source>Bâtiment</source>
                 <target state="needs-translation">Bâtiment</target>
@@ -1254,6 +1252,10 @@
                 <source>Décharge</source>
                 <target state="needs-translation">Décharge</target>
             </trans-unit>
+            <trans-unit id="1639616087451032547" datatype="html">
+                <source>Meilleurs scores</source>
+                <target state="new">Meilleurs scores</target>
+            </trans-unit>
             <trans-unit id="5557109916159305360" datatype="html">
                 <source>Fouilles restantes</source>
                 <target state="needs-translation">Fouilles restantes</target>
@@ -1285,6 +1287,10 @@
             <trans-unit id="6117782295216095698" datatype="html">
                 <source>Ajouter une zone</source>
                 <target state="needs-translation">Ajouter une zone</target>
+            </trans-unit>
+            <trans-unit id="6129258837637103160" datatype="html">
+                <source>Agrandir le zoom</source>
+                <target state="new">Agrandir le zoom</target>
             </trans-unit>
             <trans-unit id="1779552786277618671" datatype="html">
                 <source>Distance</source>
@@ -1370,12 +1376,10 @@
             </trans-unit>
             <trans-unit id="8463002573183220544" datatype="html">
                 <source>À cocher si la gazette du jour affiné annonce l&apos;explosion des feux d&apos;artifice : l&apos;attaque réelle est réduite de 13 à 16
-                    %,
-                    calculée en recoupant la TDG du jour avec le planificateur de la veille
+                    %, calculée en recoupant la TDG du jour avec le planificateur de la veille
                 </source>
                 <target state="new">À cocher si la gazette du jour affiné annonce l&apos;explosion des feux d&apos;artifice : l&apos;attaque réelle est réduite
-                    de
-                    13 à 16 %, calculée en recoupant la TDG du jour avec le planificateur de la veille
+                    de 13 à 16 %, calculée en recoupant la TDG du jour avec le planificateur de la veille
                 </target>
             </trans-unit>
             <trans-unit id="4389720435684617288" datatype="html">
@@ -1509,7 +1513,7 @@
                     <x id="PH" equiv-text="day"/>
                     - Min
                 </source>
-                <target state="needs-translation">Répartition des valeurs possibles J
+                <target state="new">Répartition des valeurs possibles J
                     <x id="PH" equiv-text="day"/>
                     - Min
                 </target>
@@ -1519,7 +1523,7 @@
                     <x id="PH" equiv-text="day"/>
                     - Max
                 </source>
-                <target state="needs-translation">Répartition des valeurs possibles J
+                <target state="new">Répartition des valeurs possibles J
                     <x id="PH" equiv-text="day"/>
                     - Max
                 </target>
@@ -1532,9 +1536,21 @@
                 <source>Ont été pris</source>
                 <target state="needs-translation">Ont été pris</target>
             </trans-unit>
+            <trans-unit id="4861115589470766196" datatype="html">
+                <source>Douche</source>
+                <target state="new">Douche</target>
+            </trans-unit>
             <trans-unit id="8073013514222699302" datatype="html">
                 <source>Ont été donnés</source>
                 <target state="needs-translation">Ont été donnés</target>
+            </trans-unit>
+            <trans-unit id="2456477142464580022" datatype="html">
+                <source>Gagnée</source>
+                <target state="new">Gagnée</target>
+            </trans-unit>
+            <trans-unit id="2464570349751973023" datatype="html">
+                <source>Chantier temporaire</source>
+                <target state="new">Chantier temporaire</target>
             </trans-unit>
             <trans-unit id="2472506129070031683" datatype="html">
                 <source>Ont contribué</source>
@@ -1552,9 +1568,13 @@
                 <source>Sortie n°
                     <x id="PH" equiv-text="index + 1"/>
                 </source>
-                <target state="needs-translation">Sortie n°
+                <target state="new">Sortie n°
                     <x id="PH" equiv-text="index + 1"/>
                 </target>
+            </trans-unit>
+            <trans-unit id="2354670428052590180" datatype="html">
+                <source>Aucune partie jouée pour l&apos;instant.</source>
+                <target state="new">Aucune partie jouée pour l&apos;instant.</target>
             </trans-unit>
             <trans-unit id="2365273625237440349" datatype="html">
                 <source>Activité</source>
@@ -1572,6 +1592,10 @@
                 <source>Ont joué</source>
                 <target state="needs-translation">Ont joué</target>
             </trans-unit>
+            <trans-unit id="6644537022376016073" datatype="html">
+                <source>Quitter le plein écran</source>
+                <target state="new">Quitter le plein écran</target>
+            </trans-unit>
             <trans-unit id="6645156447857379979" datatype="html">
                 <source>N&apos;ont pas joué</source>
                 <target state="needs-translation">N&apos;ont pas joué</target>
@@ -1579,6 +1603,10 @@
             <trans-unit id="974287372292560425" datatype="html">
                 <source>Dés / Cartes / Ballon</source>
                 <target state="needs-translation">Dés / Cartes / Ballon</target>
+            </trans-unit>
+            <trans-unit id="974732083306088859" datatype="html">
+                <source>Actions quotidiennes</source>
+                <target state="new">Actions quotidiennes</target>
             </trans-unit>
             <trans-unit id="6948592133758825600" datatype="html">
                 <source>Dés</source>
@@ -1664,6 +1692,10 @@
                 <source>Estimations</source>
                 <target state="needs-translation">Estimations</target>
             </trans-unit>
+            <trans-unit id="1713271461473302108" datatype="html">
+                <source>Mode</source>
+                <target state="new">Mode</target>
+            </trans-unit>
             <trans-unit id="1713820069440865328" datatype="html">
                 <source>Scrutateur</source>
                 <target state="needs-translation">Scrutateur</target>
@@ -1671,6 +1703,10 @@
             <trans-unit id="7730918363143562137" datatype="html">
                 <source>Registre</source>
                 <target state="needs-translation">Registre</target>
+            </trans-unit>
+            <trans-unit id="773527048551115074" datatype="html">
+                <source>Mode de jeu</source>
+                <target state="new">Mode de jeu</target>
             </trans-unit>
             <trans-unit id="469180229084386389" datatype="html">
                 <source>Mode observateur</source>
@@ -1768,6 +1804,10 @@
                 <source>Non-Encombrants</source>
                 <target state="needs-translation">Non-Encombrants</target>
             </trans-unit>
+            <trans-unit id="6051346468409623514" datatype="html">
+                <source>Peut être ouvert avec</source>
+                <target state="new">Peut être ouvert avec</target>
+            </trans-unit>
             <trans-unit id="3837919746131358209" datatype="html">
                 <source>Ne pas rapporter</source>
                 <target state="needs-translation">Ne pas rapporter</target>
@@ -1783,6 +1823,10 @@
             <trans-unit id="8948278701313201115" datatype="html">
                 <source>Derniers mots :</source>
                 <target state="new">Derniers mots :</target>
+            </trans-unit>
+            <trans-unit id="8948895320444851787" datatype="html">
+                <source>Ménage</source>
+                <target state="new">Ménage</target>
             </trans-unit>
             <trans-unit id="7797012355083019611" datatype="html">
                 <source>Message à la ville :</source>
@@ -1804,10 +1848,6 @@
                 <source>Dernières mises à jour</source>
                 <target state="new">Dernières mises à jour</target>
             </trans-unit>
-            <trans-unit id="1172116262798727159" datatype="html">
-                <source>Jamais</source>
-                <target state="new">Jamais</target>
-            </trans-unit>
             <trans-unit id="7323484701723320483" datatype="html">
                 <source>par</source>
                 <target state="needs-translation">par</target>
@@ -1818,7 +1858,7 @@
                        equiv-text="environment.website_url"/>
                     my-town/wishlist]ce lien[/link]
                 </source>
-                <target state="needs-translation">Cette liste a été générée à partir du site MyHordes Optimizer. Vous pouvez la retrouver en suivant [link=
+                <target state="new">Cette liste a été générée à partir du site MyHordes Optimizer. Vous pouvez la retrouver en suivant [link=
                     <x id="PH" equiv-text="environment.website_url"/>
                     my-town/wishlist]ce lien[/link]
                 </target>
@@ -1923,7 +1963,7 @@
                 <source>Mis à jour par <x id="INTERPOLATION" equiv-text="{{ _lastUpdateInfo.username }}"/> 
                     <x id="INTERPOLATION_1" equiv-text="{{ _lastUpdateInfo.update_time.fromNow() }}"/>
                 </source>
-                <target state="needs-translation">Mis à jour par <x id="INTERPOLATION" equiv-text="{{ lastUpdateInfo.username }}"/> 
+                <target state="new">Mis à jour par <x id="INTERPOLATION" equiv-text="{{ lastUpdateInfo.username }}"/> 
                     <x id="INTERPOLATION_1" equiv-text="{{ lastUpdateInfo.update_time.fromNow() }}"/>
                 </target>
             </trans-unit>
@@ -1937,7 +1977,7 @@
                        equiv-text="{{_lastUpdateInfo?.update_time?.fromNow()}}"/>
                      (<x id="INTERPOLATION_2" equiv-text="{{_lastUpdateInfo?.update_time?.toDate() | date:&apos;medium&apos;}}"/>)
                 </source>
-                <target state="needs-translation">Mis à jour par <x id="INTERPOLATION" equiv-text="{{lastUpdateInfo?.username}}"/> 
+                <target state="new">Mis à jour par <x id="INTERPOLATION" equiv-text="{{lastUpdateInfo?.username}}"/> 
                     <x id="INTERPOLATION_1" equiv-text="{{lastUpdateInfo?.update_time?.fromNow()}}"/>
                      (<x id="INTERPOLATION_2" equiv-text="{{lastUpdateInfo?.update_time?.toDate() | date:&apos;medium&apos;}}"/>)
                 </target>
@@ -1967,20 +2007,19 @@
                 <target state="needs-translation">Remerciements</target>
             </trans-unit>
             <trans-unit id="5186837657495593523" datatype="html">
-                <source>Ce site n&apos;est pas affilié à <x id="START_LINK" ctype="x-a"
-                                                            equiv-text="&lt;a href=&quot;https://motion-twin.com/fr/&quot; target=&quot;_blank&quot;&gt;"/>
-                    Motion Twin
-                    <x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/> ou à 
+                <source>Ce site n&apos;est pas affilié à 
+                    <x id="START_LINK" ctype="x-a"
+                       equiv-text="&lt;a href=&quot;https://motion-twin.com/fr/&quot; target=&quot;_blank&quot;&gt;"/>
+                    Motion Twin<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/> ou à 
                     <x id="START_LINK_1"
                        equiv-text="&lt;a href=&quot;https://myhord.es&quot; target=&quot;_blank&quot;&gt;"/>
                     MyHordes
                     <x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/>
                 </source>
-                <target state="needs-translation">Ce site n&apos;est pas affilié à 
+                <target state="new">Ce site n&apos;est pas affilié à 
                     <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;https://motion-twin.com/fr/&quot; target=&quot;_blank&quot;&gt;"/>
                     Motion Twin<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/> ou à 
-                    <x id="START_LINK_1"
-                       equiv-text="&lt;a href=&quot;https://myhord.es&quot; target=&quot;_blank&quot;&gt;"/>
+                    <x id="START_LINK_1" equiv-text="&lt;a href=&quot;https://myhord.es&quot; target=&quot;_blank&quot;&gt;"/>
                     MyHordes
                     <x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/>
                 </target>
@@ -1995,11 +2034,10 @@
                     MyHordes
                     <x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/>
                 </source>
-                <target state="needs-translation">Certains éléments graphiques appartiennent à 
+                <target state="new">Certains éléments graphiques appartiennent à 
                     <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;https://motion-twin.com/fr/&quot; target=&quot;_blank&quot;&gt;"/>
                     Motion Twin<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/> ou à 
-                    <x id="START_LINK_1"
-                       equiv-text="&lt;a href=&quot;https://myhord.es&quot; target=&quot;_blank&quot;&gt;"/>
+                    <x id="START_LINK_1" equiv-text="&lt;a href=&quot;https://myhord.es&quot; target=&quot;_blank&quot;&gt;"/>
                     MyHordes
                     <x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/>
                 </target>
@@ -2086,18 +2124,15 @@
             </trans-unit>
             <trans-unit id="8236139938978891028" datatype="html">
                 <source>Importe les données des villes depuis l&apos;API MyHordes (<x id="START_TAG_CODE" ctype="x-code" equiv-text="&lt;code&gt;"/>/json/towns
-                    <x
-                        id="CLOSE_TAG_CODE" ctype="x-code" equiv-text="&lt;/code&gt;"/>). Laisse le filtre vide pour toutes les saisons, ou sélectionne une
-                    saison
-                    spécifique. MyHordes ne renvoie que 50 villes par requête et limite la clé à 150 requêtes par heure : une saison ancienne s&apos;importe en
-                    plusieurs passes, à reprendre d&apos;une heure sur l&apos;autre.
+                    <x id="CLOSE_TAG_CODE" ctype="x-code" equiv-text="&lt;/code&gt;"/>). Laisse le filtre vide pour toutes les saisons, ou sélectionne une
+                    saison spécifique. MyHordes ne renvoie que 50 villes par requête et limite la clé à 150 requêtes par heure : une saison ancienne s&apos;importe
+                    en plusieurs passes, à reprendre d&apos;une heure sur l&apos;autre.
                 </source>
                 <target state="new">Importe les données des villes depuis l&apos;API MyHordes (
                     <x id="START_TAG_CODE" ctype="x-code" equiv-text="&lt;code&gt;"/>
                     /json/towns<x id="CLOSE_TAG_CODE" ctype="x-code" equiv-text="&lt;/code&gt;"/>). Laisse le filtre vide pour toutes les saisons, ou
-                    sélectionne
-                    une saison spécifique. MyHordes ne renvoie que 50 villes par requête et limite la clé à 150 requêtes par heure : une saison ancienne s&apos;importe
-                    en plusieurs passes, à reprendre d&apos;une heure sur l&apos;autre.
+                    sélectionne une saison spécifique. MyHordes ne renvoie que 50 villes par requête et limite la clé à 150 requêtes par heure : une saison
+                    ancienne s&apos;importe en plusieurs passes, à reprendre d&apos;une heure sur l&apos;autre.
                 </target>
             </trans-unit>
             <trans-unit id="2735775440803933212" datatype="html">
@@ -2119,6 +2154,10 @@
             <trans-unit id="6791169760263814863" datatype="html">
                 <source>Reprendre</source>
                 <target state="new">Reprendre</target>
+            </trans-unit>
+            <trans-unit id="1467566692562963830" datatype="html">
+                <source>Réessayer</source>
+                <target state="new">Réessayer</target>
             </trans-unit>
             <trans-unit id="1467983175316497492" datatype="html">
                 <source>Importer les villes</source>
@@ -2156,6 +2195,10 @@
                 <source>Camping</source>
                 <target state="needs-translation">Camping</target>
             </trans-unit>
+            <trans-unit id="2292584256714443853" datatype="html">
+                <source>Perdue</source>
+                <target state="new">Perdue</target>
+            </trans-unit>
             <trans-unit id="8628521144156217897" datatype="html">
                 <source>Chances de survie</source>
                 <target state="needs-translation">Chances de survie</target>
@@ -2171,10 +2214,6 @@
             <trans-unit id="1087900872515566478" datatype="html">
                 <source>Objets</source>
                 <target state="needs-translation">Objets</target>
-            </trans-unit>
-            <trans-unit id="2634218306005917247" datatype="html">
-                <source>Ruines</source>
-                <target state="new">Ruines</target>
             </trans-unit>
             <trans-unit id="4354226191914852265" datatype="html">
                 <source>Pictos</source>
@@ -2264,6 +2303,10 @@
                 <source>Mini-Jeux</source>
                 <target state="new">Mini-Jeux</target>
             </trans-unit>
+            <trans-unit id="668387861187046971" datatype="html">
+                <source>Classement des joueurs</source>
+                <target state="new">Classement des joueurs</target>
+            </trans-unit>
             <trans-unit id="7207482748149833374" datatype="html">
                 <source>Ville observée</source>
                 <target state="new">Ville observée</target>
@@ -2279,14 +2322,17 @@
             <trans-unit id="5344623683730509987" datatype="html">
                 <source>Un grand merci à Renack, sans qui ni le script ni le site n&apos;existeraient puisqu&apos;il a fait tout le backend !</source>
                 <target state="needs-translation">Un grand merci à Renack, sans qui ni le script ni le site n&apos;existeraient puisqu&apos;il a fait tout le
-                    backend
-                    !
+                    backend !
                 </target>
             </trans-unit>
             <trans-unit id="3079822284604019418" datatype="html">
                 <source>Merci aussi à Bigonoud, qui a accepté de mettre les mains dans le code pour nous aider au développement.</source>
                 <target state="needs-translation">Merci aussi à Bigonoud, qui a accepté de mettre les mains dans le code pour nous aider au développement.
                 </target>
+            </trans-unit>
+            <trans-unit id="3080483882937310852" datatype="html">
+                <source>Normal</source>
+                <target state="new">Normal</target>
             </trans-unit>
             <trans-unit id="7508106374158857656" datatype="html">
                 <source>Merci à CrazyUnicorn, qui nous fait profiter de ses talents pour l&apos;ergonomie du site.</source>
@@ -2298,8 +2344,7 @@
             </trans-unit>
             <trans-unit id="4780379749037907519" datatype="html">
                 <source>Merci à Argo qui a assuré à la perfection - assistée de Katt - le rôle de responsable des relations avec l&apos;équipe de développement
-                    du
-                    jeu, et sans qui l&apos;idée de faire du script un site ne serait pas née.
+                    du jeu, et sans qui l&apos;idée de faire du script un site ne serait pas née.
                 </source>
                 <target state="needs-translation">Merci à Argo qui a assuré à la perfection - assistée de Katt - le rôle de responsable des relations avec l&apos;équipe
                     de développement du jeu, et sans qui l&apos;idée de faire du script un site ne serait pas née.
@@ -2307,8 +2352,7 @@
             </trans-unit>
             <trans-unit id="1639188178441316344" datatype="html">
                 <source>Merci enfin à aracime, notre plus grand et notre meilleur supporter, mais aussi à tous les membres du Théâtre Implacable qui ont testé
-                    et nous
-                    ont fait leurs retours sur les fonctionnalités.
+                    et nous ont fait leurs retours sur les fonctionnalités.
                 </source>
                 <target state="needs-translation">Merci enfin à aracime, notre plus grand et notre meilleur supporter, mais aussi à tous les membres du Théâtre
                     Implacable qui ont testé et nous ont fait leurs retours sur les fonctionnalités.
@@ -2321,6 +2365,10 @@
             <trans-unit id="826911519411311233" datatype="html">
                 <source>Dans ma ville</source>
                 <target state="needs-translation">Dans ma ville</target>
+            </trans-unit>
+            <trans-unit id="6485992728192281912" datatype="html">
+                <source>Améliorations</source>
+                <target state="new">Améliorations</target>
             </trans-unit>
             <trans-unit id="6487260431971357562" datatype="html">
                 <source>Bonus en équivalent PA</source>
@@ -2340,7 +2388,7 @@
                     <x id="INTERPOLATION_1" equiv-text="{{ bonus.zombie_vest | campingDisplayBonus:display_bonus_ap:locale }}"/> par zombie au lieu de <x
                         id="INTERPOLATION_2" equiv-text="{{ bonus.zombie_no_vest | campingDisplayBonus:display_bonus_ap:locale }}"/>)
                 </source>
-                <target state="translated">(
+                <target state="new">(
                     <x id="INTERPOLATION" equiv-text="{{ bonus_string }}"/>
                     <x id="INTERPOLATION_1" equiv-text="{{ bonus.zombie_vest | campingDisplayBonus:display_bonus_ap:locale }}"/> par zombie au lieu de 
                     <x id="INTERPOLATION_2" equiv-text="{{ bonus.zombie_no_vest | campingDisplayBonus:display_bonus_ap:locale }}"/>
@@ -2410,6 +2458,10 @@
             <trans-unit id="1759876158817324985" datatype="html">
                 <source>Nombre d&apos;améliorations simples faites sur la case</source>
                 <target state="needs-translation">Nombre d&apos;améliorations simples faites sur la case</target>
+            </trans-unit>
+            <trans-unit id="1563883498133119332" datatype="html">
+                <source>Permet d&apos;ouvrir</source>
+                <target state="new">Permet d&apos;ouvrir</target>
             </trans-unit>
             <trans-unit id="1569331568164081073" datatype="html">
                 <source>Nombre d&apos;objets de défense installés sur la case</source>
@@ -2543,8 +2595,7 @@
             </trans-unit>
             <trans-unit id="2076980873101550953" datatype="html">
                 <source>Nombre d&apos;habitations par niveau. Sert à déterminer le tercile utilisé dans le calcul des zombies actifs. Le total doit correspondre
-                    au
-                    nombre de citoyens.
+                    au nombre de citoyens.
                 </source>
                 <target state="new">Nombre d&apos;habitations par niveau. Sert à déterminer le tercile utilisé dans le calcul des zombies actifs. Le total doit
                     correspondre au nombre de citoyens.
@@ -2589,6 +2640,10 @@
             <trans-unit id="1355112096350536441" datatype="html">
                 <source>ignorée (porte ouverte)</source>
                 <target state="new">ignorée (porte ouverte)</target>
+            </trans-unit>
+            <trans-unit id="1361291709482825788" datatype="html">
+                <source>États</source>
+                <target state="new">États</target>
             </trans-unit>
             <trans-unit id="5676596107664961045" datatype="html">
                 <source>Veilleurs</source>
@@ -2638,14 +2693,12 @@
                 <source>Dans l&apos;interface, vous pouvez cocher l&apos;option &quot;Demander confirmation avant de quitter la page&quot;, ce qui activera la
                     fonctionnalité. Une fois activée, si vous êtes dans le désert et que votre attente d&apos;escorte n&apos;est pas activée, ou si vous n&apos;avez
                     pas relâché votre escorte, alors au moment de fermer la fenêtre ou l&apos;onglet vous verrez apparaitre un avertissement demandant de
-                    confirmer
-                    votre action.
+                    confirmer votre action.
                 </source>
                 <target state="needs-translation">Dans l&apos;interface, vous pouvez cocher l&apos;option &quot;Demander confirmation avant de quitter la page&quot;,
                     ce qui activera la fonctionnalité. Une fois activée, si vous êtes dans le désert et que votre attente d&apos;escorte n&apos;est pas activée,
-                    ou si
-                    vous n&apos;avez pas relâché votre escorte, alors au moment de fermer la fenêtre ou l&apos;onglet vous verrez apparaitre un avertissement
-                    demandant de confirmer votre action.
+                    ou si vous n&apos;avez pas relâché votre escorte, alors au moment de fermer la fenêtre ou l&apos;onglet vous verrez apparaitre un
+                    avertissement demandant de confirmer votre action.
                 </target>
             </trans-unit>
             <trans-unit id="4945794230367496950" datatype="html">
@@ -2655,16 +2708,12 @@
             <trans-unit id="6792041599839954174" datatype="html">
                 <source>Dans l&apos;interface, vous pouvez cocher l&apos;option &quot;Me notifier si je suis inactif depuis 5 minutes sur la page&quot;, ce qui
                     activera la fonctionnalité. Une fois activée, si vous êtes dans le désert et que votre attente d&apos;escorte n&apos;est pas activée, ou si
-                    vous n&apos;avez
-                    pas relâché votre escorte, alors au bout de 5 minutes sans actios sur la page une notification de navigateur vous avertira.
+                    vous n&apos;avez pas relâché votre escorte, alors au bout de 5 minutes sans actios sur la page une notification de navigateur vous avertira.
                 </source>
                 <target state="needs-translation">Dans l&apos;interface, vous pouvez cocher l&apos;option &quot;Me notifier si je suis inactif depuis 5 minutes
-                    sur la
-                    page&quot;, ce qui activera la fonctionnalité. Une fois activée, si vous êtes dans le désert et que votre attente d&apos;escorte n&apos;est
-                    pas
-                    activée, ou si vous n&apos;avez pas relâché votre escorte, alors au bout de 5 minutes sans actios sur la page une notification de navigateur
-                    vous
-                    avertira.
+                    sur la page&quot;, ce qui activera la fonctionnalité. Une fois activée, si vous êtes dans le désert et que votre attente d&apos;escorte n&apos;est
+                    pas activée, ou si vous n&apos;avez pas relâché votre escorte, alors au bout de 5 minutes sans actios sur la page une notification de
+                    navigateur vous avertira.
                 </target>
             </trans-unit>
             <trans-unit id="2315492892193612031" datatype="html">
@@ -2676,8 +2725,8 @@
                     secondes avant la fin de votre fouille à condition que votre navigateur soit toujours ouvert sur la page du désert.
                 </source>
                 <target state="needs-translation">Si vous cochez l&apos;option &quot;Me notifier à la fin de la fouille&quot;, vous recevrez une notification de
-                    votre
-                    navigateur quelques secondes avant la fin de votre fouille à condition que votre navigateur soit toujours ouvert sur la page du désert.
+                    votre navigateur quelques secondes avant la fin de votre fouille à condition que votre navigateur soit toujours ouvert sur la page du
+                    désert.
                 </target>
             </trans-unit>
             <trans-unit id="276294021269970234" datatype="html">
@@ -2686,12 +2735,10 @@
             </trans-unit>
             <trans-unit id="2181607041018842906" datatype="html">
                 <source>Si vous cochez l&apos;option &quot;Me notifier si je reçois un nouveau message&quot;, vous recevrez une notification de votre navigateur
-                    lors
-                    d&apos;un changement dans votre compteur de messages reçus.
+                    lors d&apos;un changement dans votre compteur de messages reçus.
                 </source>
                 <target state="needs-translation">Si vous cochez l&apos;option &quot;Me notifier si je reçois un nouveau message&quot;, vous recevrez une
-                    notification
-                    de votre navigateur lors d&apos;un changement dans votre compteur de messages reçus.
+                    notification de votre navigateur lors d&apos;un changement dans votre compteur de messages reçus.
                 </target>
             </trans-unit>
             <trans-unit id="6182420806915713502" datatype="html">
@@ -2707,8 +2754,7 @@
                     du bot&lt;/a&gt;
                 </source>
                 <target state="new">&lt;a href=&quot;https://discord.com/oauth2/authorize?client_id=1140035117746765914&quot; target=&quot;_blank&quot;&gt;lien
-                    d&apos;installation
-                    du bot&lt;/a&gt;
+                    d&apos;installation du bot&lt;/a&gt;
                 </target>
             </trans-unit>
             <trans-unit id="5042676445872680046" datatype="html">
@@ -2717,14 +2763,12 @@
             </trans-unit>
             <trans-unit id="4607540554184893453" datatype="html">
                 <source>En l&apos;installant en tant qu&apos;application, vous pourrez utiliser les commandes du bot partout sur Discord (en messages privés,
-                    dans
-                    des groupes, ou sur des serveurs où le bot n&apos;est pas présent).&lt;br&gt;&lt;br&gt;Cliquez sur le
+                    dans des groupes, ou sur des serveurs où le bot n&apos;est pas présent).&lt;br&gt;&lt;br&gt;Cliquez sur le
                     <x id="PH" equiv-text="this.download_link"/>
                     et choisissez &lt;strong&gt;Ajouter à mes applications&lt;/strong&gt;.
                 </source>
                 <target state="new">En l&apos;installant en tant qu&apos;application, vous pourrez utiliser les commandes du bot partout sur Discord (en
-                    messages
-                    privés, dans des groupes, ou sur des serveurs où le bot n&apos;est pas présent).&lt;br&gt;&lt;br&gt;Cliquez sur le
+                    messages privés, dans des groupes, ou sur des serveurs où le bot n&apos;est pas présent).&lt;br&gt;&lt;br&gt;Cliquez sur le
                     <x id="PH" equiv-text="this.download_link"/>
                     et choisissez &lt;strong&gt;Ajouter à mes applications&lt;/strong&gt;.
                 </target>
@@ -2749,14 +2793,17 @@
                 <source>Affichage des tooltips détaillés</source>
                 <target state="needs-translation">Affichage des tooltips détaillés</target>
             </trans-unit>
+            <trans-unit id="7631405440758027758" datatype="html">
+                <source>Temps</source>
+                <target state="new">Temps</target>
+            </trans-unit>
             <trans-unit id="5795663998729072574" datatype="html">
                 <source>Modifie les tooltips natifs de l&apos;application pour afficher en plus la liste des recettes dans lesquelles l&apos;objet survolé
-                    apparait
-                    ainsi que quelques informations complémentaires (nombre de points d&apos;action rendus par un aliment par exemple).
+                    apparait ainsi que quelques informations complémentaires (nombre de points d&apos;action rendus par un aliment par exemple).
                 </source>
                 <target state="needs-translation">Modifie les tooltips natifs de l&apos;application pour afficher en plus la liste des recettes dans lesquelles
-                    l&apos;objet
-                    survolé apparait ainsi que quelques informations complémentaires (nombre de points d&apos;action rendus par un aliment par exemple).
+                    l&apos;objet survolé apparait ainsi que quelques informations complémentaires (nombre de points d&apos;action rendus par un aliment par
+                    exemple).
                 </target>
             </trans-unit>
             <trans-unit id="4983139637604038278" datatype="html">
@@ -2766,14 +2813,11 @@
             <trans-unit id="4909203228847004040" datatype="html">
                 <source>Dans l&apos;interface, vous pouvez cocher le bouton &quot;Navigation rapide vers le chantier recommandé&quot;, ce qui activera la
                     fonctionnalité de navigation rapide. Il s&apos;agit simplement, lorsqu&apos;il existe un chantier recommandé, de pouvoir cliquer dessus pour
-                    être
-                    automatiquement redirigé vers la ligne du chantier dans la liste.
+                    être automatiquement redirigé vers la ligne du chantier dans la liste.
                 </source>
                 <target state="needs-translation">Dans l&apos;interface, vous pouvez cocher le bouton &quot;Navigation rapide vers le chantier recommandé&quot;,
-                    ce
-                    qui activera la fonctionnalité de navigation rapide. Il s&apos;agit simplement, lorsqu&apos;il existe un chantier recommandé, de pouvoir
-                    cliquer
-                    dessus pour être automatiquement redirigé vers la ligne du chantier dans la liste.
+                    ce qui activera la fonctionnalité de navigation rapide. Il s&apos;agit simplement, lorsqu&apos;il existe un chantier recommandé, de pouvoir
+                    cliquer dessus pour être automatiquement redirigé vers la ligne du chantier dans la liste.
                 </target>
             </trans-unit>
             <trans-unit id="766908157360687970" datatype="html">
@@ -2782,14 +2826,12 @@
             </trans-unit>
             <trans-unit id="2719168518138811288" datatype="html">
                 <source>En cochant cette option, vous pourrez choisir des champs de recherches à afficher dans votre interface. Sont actuellement disponibles :
-                    un
-                    champ de recherche sur la liste des chantiers, un champ de recherche dans les destinataires d&apos;un message dans sa maison, un champ de
+                    un champ de recherche sur la liste des chantiers, un champ de recherche dans les destinataires d&apos;un message dans sa maison, un champ de
                     recherche sur les entrées du registre.
                 </source>
                 <target state="needs-translation">En cochant cette option, vous pourrez choisir des champs de recherches à afficher dans votre interface. Sont
                     actuellement disponibles : un champ de recherche sur la liste des chantiers, un champ de recherche dans les destinataires d&apos;un message
-                    dans
-                    sa maison, un champ de recherche sur les entrées du registre.
+                    dans sa maison, un champ de recherche sur les entrées du registre.
                 </target>
             </trans-unit>
             <trans-unit id="1707430487871050147" datatype="html">
@@ -2799,21 +2841,15 @@
             <trans-unit id="6585471270280067151" datatype="html">
                 <source>En cochant cette option, la liste de courses apparaitra lorsque vous vous trouverez dans le desert ou dans l&apos;atelier. Cette liste
                     contient des informations de priorité, de quantité en banque, de quantité dans les sacs, de quantité totale requise, et de quantité
-                    manquante.
-                    &lt;br /&gt;&lt;br /&gt; La liste de courses dans l&apos;atelier ne présentera que les éléments pouvant obtenus à l&apos;atelier. Celle dans
-                    le
-                    désert affichera tous les éléments sans distinction. &lt;br /&gt;&lt;br /&gt; Dans le désert, les objets dans le sac ou au sol également
-                    présents
-                    dans la liste de course se verront attribuer une bordure dont la couleur indique la priorité de l&apos;élément.
+                    manquante. &lt;br /&gt;&lt;br /&gt; La liste de courses dans l&apos;atelier ne présentera que les éléments pouvant obtenus à l&apos;atelier.
+                    Celle dans le désert affichera tous les éléments sans distinction. &lt;br /&gt;&lt;br /&gt; Dans le désert, les objets dans le sac ou au sol
+                    également présents dans la liste de course se verront attribuer une bordure dont la couleur indique la priorité de l&apos;élément.
                 </source>
                 <target state="needs-translation">En cochant cette option, la liste de courses apparaitra lorsque vous vous trouverez dans le desert ou dans l&apos;atelier.
                     Cette liste contient des informations de priorité, de quantité en banque, de quantité dans les sacs, de quantité totale requise, et de
-                    quantité
-                    manquante. &lt;br /&gt;&lt;br /&gt; La liste de courses dans l&apos;atelier ne présentera que les éléments pouvant obtenus à l&apos;atelier.
-                    Celle
-                    dans le désert affichera tous les éléments sans distinction. &lt;br /&gt;&lt;br /&gt; Dans le désert, les objets dans le sac ou au sol
-                    également
-                    présents dans la liste de course se verront attribuer une bordure dont la couleur indique la priorité de l&apos;élément.
+                    quantité manquante. &lt;br /&gt;&lt;br /&gt; La liste de courses dans l&apos;atelier ne présentera que les éléments pouvant obtenus à l&apos;atelier.
+                    Celle dans le désert affichera tous les éléments sans distinction. &lt;br /&gt;&lt;br /&gt; Dans le désert, les objets dans le sac ou au sol
+                    également présents dans la liste de course se verront attribuer une bordure dont la couleur indique la priorité de l&apos;élément.
                 </target>
             </trans-unit>
             <trans-unit id="4423220166056863975" datatype="html">
@@ -2822,14 +2858,11 @@
             </trans-unit>
             <trans-unit id="7274539193871812426" datatype="html">
                 <source>En cochant cette option, un nouvel encart apparaitra sous la carte dans l&apos;Outre-Monde. Il compte le nombre de zombies qui ont été
-                    tués
-                    sur la case depuis la dernière attaque, et calcule le nombre de zombies qui vont mourir de désespoir lors de la prochaine attaque.
+                    tués sur la case depuis la dernière attaque, et calcule le nombre de zombies qui vont mourir de désespoir lors de la prochaine attaque.
                 </source>
                 <target state="needs-translation">En cochant cette option, un nouvel encart apparaitra sous la carte dans l&apos;Outre-Monde. Il compte le
-                    nombre de
-                    zombies qui ont été tués sur la case depuis la dernière attaque, et calcule le nombre de zombies qui vont mourir de désespoir lors de la
-                    prochaine
-                    attaque.
+                    nombre de zombies qui ont été tués sur la case depuis la dernière attaque, et calcule le nombre de zombies qui vont mourir de désespoir lors
+                    de la prochaine attaque.
                 </target>
             </trans-unit>
             <trans-unit id="6560590152891649669" datatype="html">
@@ -2839,13 +2872,11 @@
             <trans-unit id="2308604582849473977" datatype="html">
                 <source>En cochant cette option, un outil de traduction s&apos;affichera dans l&apos;interface. Vous pourrez désormais sélectionner une langue d&apos;origine,
                     puis saisir le texte à rechercher dans les autres langues. Le texte doit impérativement être un texte de MyHordes, puisque nous allons en
-                    chercher
-                    la traduction dans les fichiers de traduction du jeu.
+                    chercher la traduction dans les fichiers de traduction du jeu.
                 </source>
                 <target state="needs-translation">En cochant cette option, un outil de traduction s&apos;affichera dans l&apos;interface. Vous pourrez désormais
                     sélectionner une langue d&apos;origine, puis saisir le texte à rechercher dans les autres langues. Le texte doit impérativement être un
-                    texte de
-                    MyHordes, puisque nous allons en chercher la traduction dans les fichiers de traduction du jeu.
+                    texte de MyHordes, puisque nous allons en chercher la traduction dans les fichiers de traduction du jeu.
                 </target>
             </trans-unit>
             <trans-unit id="1297848596101851474" datatype="html">
@@ -2854,12 +2885,10 @@
             </trans-unit>
             <trans-unit id="3348452797437339338" datatype="html">
                 <source>En pandémonium, les chantiers subissent des dégats lors de l&apos;attaque. Cette option va montrer combien de pa manquent pour que le
-                    chantier
-                    ne risque pas d&apos;être détruit lors de la prochaine attaque.
+                    chantier ne risque pas d&apos;être détruit lors de la prochaine attaque.
                 </source>
                 <target state="needs-translation">En pandémonium, les chantiers subissent des dégats lors de l&apos;attaque. Cette option va montrer combien de
-                    pa
-                    manquent pour que le chantier ne risque pas d&apos;être détruit lors de la prochaine attaque.
+                    pa manquent pour que le chantier ne risque pas d&apos;être détruit lors de la prochaine attaque.
                 </target>
             </trans-unit>
             <trans-unit id="7507912867004115839" datatype="html">
@@ -2868,15 +2897,12 @@
             </trans-unit>
             <trans-unit id="6315178546308171300" datatype="html">
                 <source>En cochant cette option, vous verrez apparaitre un nouvel encart dans les informations du secteur de votre case. Cet encart vous
-                    permettra de
-                    saisir diverses informations pour calculer vos chances de survie sur cette case. Certaines informations, comme par exemple le type de ville,
-                    ne
-                    sont pas visibles car elles sont déjà pré-renseignées et tiennent compte de votre ville actuelle.
+                    permettra de saisir diverses informations pour calculer vos chances de survie sur cette case. Certaines informations, comme par exemple le
+                    type de ville, ne sont pas visibles car elles sont déjà pré-renseignées et tiennent compte de votre ville actuelle.
                 </source>
                 <target state="needs-translation">En cochant cette option, vous verrez apparaitre un nouvel encart dans les informations du secteur de votre
-                    case. Cet
-                    encart vous permettra de saisir diverses informations pour calculer vos chances de survie sur cette case. Certaines informations, comme par
-                    exemple le type de ville, ne sont pas visibles car elles sont déjà pré-renseignées et tiennent compte de votre ville actuelle.
+                    case. Cet encart vous permettra de saisir diverses informations pour calculer vos chances de survie sur cette case. Certaines informations,
+                    comme par exemple le type de ville, ne sont pas visibles car elles sont déjà pré-renseignées et tiennent compte de votre ville actuelle.
                 </target>
             </trans-unit>
             <trans-unit id="5457236869945529467" datatype="html">
@@ -2885,12 +2911,10 @@
             </trans-unit>
             <trans-unit id="2973411733509838510" datatype="html">
                 <source>Sur la carte du site de MyHordes Optimizer, vous pouvez saisir des notes sur chaque case. Quand cette option est cochée, la note
-                    associée s&apos;affiche
-                    sur votre case quand vous vous déplacez dans l&apos;Outre-Monde.
+                    associée s&apos;affiche sur votre case quand vous vous déplacez dans l&apos;Outre-Monde.
                 </source>
                 <target state="needs-translation">Sur la carte du site de MyHordes Optimizer, vous pouvez saisir des notes sur chaque case. Quand cette option
-                    est
-                    cochée, la note associée s&apos;affiche sur votre case quand vous vous déplacez dans l&apos;Outre-Monde.
+                    est cochée, la note associée s&apos;affiche sur votre case quand vous vous déplacez dans l&apos;Outre-Monde.
                 </target>
             </trans-unit>
             <trans-unit id="3270416149746032956" datatype="html">
@@ -2899,12 +2923,10 @@
             </trans-unit>
             <trans-unit id="2873411537721466808" datatype="html">
                 <source>Quand cette option est cochée, un nouvel encart apparait sur la page de la tour de guet, permettant de consulter, enregistrer et copier
-                    les
-                    valeurs des estimations.
+                    les valeurs des estimations.
                 </source>
                 <target state="needs-translation">Quand cette option est cochée, un nouvel encart apparait sur la page de la tour de guet, permettant de
-                    consulter,
-                    enregistrer et copier les valeurs des estimations.
+                    consulter, enregistrer et copier les valeurs des estimations.
                 </target>
             </trans-unit>
             <trans-unit id="7074994221428603078" datatype="html">
@@ -2913,7 +2935,8 @@
             </trans-unit>
             <trans-unit id="591360380545013114" datatype="html">
                 <source>Quand cette option est cochée, sur chaque regitre un bouton est ajouté permettant d&apos;en copier le contenu.</source>
-                <target state="needs-translation">Quand cette option est cochée, sur chaque regitre un bouton est ajouté permettant d&apos;en copier le contenu.
+                <target state="needs-translation">Quand cette option est cochée, sur chaque regitre un bouton est ajouté permettant d&apos;en copier le
+                    contenu.
                 </target>
             </trans-unit>
             <trans-unit id="520449169409459621" datatype="html">
@@ -2922,15 +2945,12 @@
             </trans-unit>
             <trans-unit id="7180506722526896911" datatype="html">
                 <source>Quand cette option est cochée, un compteur qui liste vos prises en banque est ajouté aux pages de banque et puits. Le compteur dans
-                    MyHordes
-                    tient compte des minutes &quot;glissantes&quot;, il suffit donc d&apos;attendre qu&apos;une ligne disparaisse pour pouvoir prendre de
-                    nouveau un
-                    objet en banque.
+                    MyHordes tient compte des minutes &quot;glissantes&quot;, il suffit donc d&apos;attendre qu&apos;une ligne disparaisse pour pouvoir prendre
+                    de nouveau un objet en banque.
                 </source>
                 <target state="needs-translation">Quand cette option est cochée, un compteur qui liste vos prises en banque est ajouté aux pages de banque et
-                    puits.
-                    Le compteur dans MyHordes tient compte des minutes &quot;glissantes&quot;, il suffit donc d&apos;attendre qu&apos;une ligne disparaisse pour
-                    pouvoir prendre de nouveau un objet en banque.
+                    puits. Le compteur dans MyHordes tient compte des minutes &quot;glissantes&quot;, il suffit donc d&apos;attendre qu&apos;une ligne
+                    disparaisse pour pouvoir prendre de nouveau un objet en banque.
                 </target>
             </trans-unit>
             <trans-unit id="7972524927973029550" datatype="html">
@@ -2939,8 +2959,7 @@
             </trans-unit>
             <trans-unit id="3972328085780533772" datatype="html">
                 <source>Quand cette option est cochée, au chargement d&apos;une case dans l&apos;Outre-Monde un clic sur le bouton d&apos;ouverture du sac sera
-                    simulé
-                    pour que votre sac soit ouvert par défaut.
+                    simulé pour que votre sac soit ouvert par défaut.
                 </source>
                 <target state="needs-translation">Quand cette option est cochée, au chargement d&apos;une case dans l&apos;Outre-Monde un clic sur le bouton d&apos;ouverture
                     du sac sera simulé pour que votre sac soit ouvert par défaut.
@@ -2952,12 +2971,10 @@
             </trans-unit>
             <trans-unit id="943685066173622187" datatype="html">
                 <source>En cochant cette option, deux autres options représentant les options d&apos;escorte dans l&apos;Outre-Monde seront disponibles. Vous
-                    pourrez
-                    ainsi choisir quelles options vous voulez voir cochées ou non par défaut quand vous activez votre escorte.
+                    pourrez ainsi choisir quelles options vous voulez voir cochées ou non par défaut quand vous activez votre escorte.
                 </source>
                 <target state="needs-translation">En cochant cette option, deux autres options représentant les options d&apos;escorte dans l&apos;Outre-Monde
-                    seront
-                    disponibles. Vous pourrez ainsi choisir quelles options vous voulez voir cochées ou non par défaut quand vous activez votre escorte.
+                    seront disponibles. Vous pourrez ainsi choisir quelles options vous voulez voir cochées ou non par défaut quand vous activez votre escorte.
                 </target>
             </trans-unit>
             <trans-unit id="8248895111587460156" datatype="html">
@@ -2966,95 +2983,75 @@
             </trans-unit>
             <trans-unit id="2917108141392126070" datatype="html">
                 <source>Une des fonctionnalités du script est de permettre la mise à jour de plusieurs outils externes en un seul clic depuis le site de
-                    MyHordes.
-                    Pour ce faire, il faut activer les options associées dans la liste des options de MyHordes Optimizer. Si vous avez l&apos;un des outils en
-                    question ouvert dans votre navigateur, alors la prochaine fois que vous naviguerez vers son onglet celui-ci sera automatiquement rafraîchi.
+                    MyHordes. Pour ce faire, il faut activer les options associées dans la liste des options de MyHordes Optimizer. Si vous avez l&apos;un des
+                    outils en question ouvert dans votre navigateur, alors la prochaine fois que vous naviguerez vers son onglet celui-ci sera automatiquement
+                    rafraîchi.
                 </source>
                 <target state="needs-translation">Une des fonctionnalités du script est de permettre la mise à jour de plusieurs outils externes en un seul clic
                     depuis le site de MyHordes. Pour ce faire, il faut activer les options associées dans la liste des options de MyHordes Optimizer. Si vous
-                    avez l&apos;un
-                    des outils en question ouvert dans votre navigateur, alors la prochaine fois que vous naviguerez vers son onglet celui-ci sera
-                    automatiquement
-                    rafraîchi.
+                    avez l&apos;un des outils en question ouvert dans votre navigateur, alors la prochaine fois que vous naviguerez vers son onglet celui-ci
+                    sera automatiquement rafraîchi.
                 </target>
             </trans-unit>
             <trans-unit id="6242771464223017856" datatype="html">
                 <source>En cochant l&apos;option &quot;Mettre à jour MyHordesOptimizer&quot;, quand vous cliquerez sur le bouton &quot;Mettre à jour les outils
                     externes&quot;, la mise à jour de MyHordes Optimizer se fera automatiquement. Vous rendez également accessibles d&apos;autres options de
-                    mise à
-                    jour avancées. &lt;ul&gt; &lt;li&gt;&lt;strong&gt;Nombre de zombies tués :&lt;/strong&gt; Enregistre le nombre de zombies tués sur la case&lt;/li&gt;
-                    &lt;li&gt;&lt;strong&gt;Mise à jour en ville dévastée :&lt;/strong&gt; Lorsque la ville est dévastée, récupère les informations sur la case
-                    pour
-                    les envoyer à MyHordes Optimizer.&lt;/li&gt; &lt;li&gt;&lt;strong&gt;Actions héroïques :&lt;/strong&gt; Enregistre les actions héroïques
-                    disponibles / utilisées&lt;/li&gt; &lt;li&gt;&lt;strong&gt;Améliorations de la maison :&lt;/strong&gt; Enregistre les informations
-                    concernant
-                    votre maison&lt;/li&gt; &lt;li&gt;&lt;strong&gt;Détail de mon sac et de ceux de mon escorte :&lt;/strong&gt; Enregistre le contenu de votre
-                    sac
-                    ainsi que ceux de vos escortés&lt;/li&gt; &lt;li&gt;&lt;strong&gt;États :&lt;/strong&gt; Enregistre vos différents états (rassasié, soif,
-                    etc...
-                    Attention : n&apos;enregistre pas l&apos;état goule)&lt;/li&gt; &lt;li&gt;&lt;strong&gt;Entregistrer les fouilles réussies :&lt;/strong&gt;
-                    Enregistre les fouilles réussies pour restituer des statistiques sur les fouilles dans une carte dédiée&lt;/li&gt; &lt;/ul&gt;
+                    mise à jour avancées. &lt;ul&gt; &lt;li&gt;&lt;strong&gt;Nombre de zombies tués :&lt;/strong&gt; Enregistre le nombre de zombies tués sur la
+                    case&lt;/li&gt; &lt;li&gt;&lt;strong&gt;Mise à jour en ville dévastée :&lt;/strong&gt; Lorsque la ville est dévastée, récupère les
+                    informations sur la case pour les envoyer à MyHordes Optimizer.&lt;/li&gt; &lt;li&gt;&lt;strong&gt;Actions héroïques :&lt;/strong&gt;
+                    Enregistre les actions héroïques disponibles / utilisées&lt;/li&gt; &lt;li&gt;&lt;strong&gt;Améliorations de la maison :&lt;/strong&gt;
+                    Enregistre les informations concernant votre maison&lt;/li&gt; &lt;li&gt;&lt;strong&gt;Détail de mon sac et de ceux de mon escorte :&lt;/strong&gt;
+                    Enregistre le contenu de votre sac ainsi que ceux de vos escortés&lt;/li&gt; &lt;li&gt;&lt;strong&gt;États :&lt;/strong&gt; Enregistre vos
+                    différents états (rassasié, soif, etc... Attention : n&apos;enregistre pas l&apos;état goule)&lt;/li&gt; &lt;li&gt;&lt;strong&gt;Entregistrer
+                    les fouilles réussies :&lt;/strong&gt; Enregistre les fouilles réussies pour restituer des statistiques sur les fouilles dans une carte
+                    dédiée&lt;/li&gt; &lt;/ul&gt;
                 </source>
                 <target state="needs-translation">En cochant l&apos;option &quot;Mettre à jour MyHordesOptimizer&quot;, quand vous cliquerez sur le bouton
-                    &quot;Mettre
-                    à jour les outils externes&quot;, la mise à jour de MyHordes Optimizer se fera automatiquement. Vous rendez également accessibles d&apos;autres
-                    options de mise à jour avancées. &lt;ul&gt; &lt;li&gt;&lt;strong&gt;Nombre de zombies tués :&lt;/strong&gt; Enregistre le nombre de zombies
-                    tués
-                    sur la case&lt;/li&gt; &lt;li&gt;&lt;strong&gt;Mise à jour en ville dévastée :&lt;/strong&gt; Lorsque la ville est dévastée, récupère les
-                    informations sur la case pour les envoyer à MyHordes Optimizer.&lt;/li&gt; &lt;li&gt;&lt;strong&gt;Actions héroïques :&lt;/strong&gt;
-                    Enregistre
-                    les actions héroïques disponibles / utilisées&lt;/li&gt; &lt;li&gt;&lt;strong&gt;Améliorations de la maison :&lt;/strong&gt; Enregistre les
-                    informations concernant votre maison&lt;/li&gt; &lt;li&gt;&lt;strong&gt;Détail de mon sac et de ceux de mon escorte :&lt;/strong&gt;
-                    Enregistre le
-                    contenu de votre sac ainsi que ceux de vos escortés&lt;/li&gt; &lt;li&gt;&lt;strong&gt;États :&lt;/strong&gt; Enregistre vos différents
-                    états
-                    (rassasié, soif, etc... Attention : n&apos;enregistre pas l&apos;état goule)&lt;/li&gt; &lt;li&gt;&lt;strong&gt;Entregistrer les fouilles
-                    réussies
-                    :&lt;/strong&gt; Enregistre les fouilles réussies pour restituer des statistiques sur les fouilles dans une carte dédiée&lt;/li&gt; &lt;/ul&gt;
+                    &quot;Mettre à jour les outils externes&quot;, la mise à jour de MyHordes Optimizer se fera automatiquement. Vous rendez également
+                    accessibles d&apos;autres options de mise à jour avancées. &lt;ul&gt; &lt;li&gt;&lt;strong&gt;Nombre de zombies tués :&lt;/strong&gt;
+                    Enregistre le nombre de zombies tués sur la case&lt;/li&gt; &lt;li&gt;&lt;strong&gt;Mise à jour en ville dévastée :&lt;/strong&gt; Lorsque
+                    la ville est dévastée, récupère les informations sur la case pour les envoyer à MyHordes Optimizer.&lt;/li&gt; &lt;li&gt;&lt;strong&gt;Actions
+                    héroïques :&lt;/strong&gt; Enregistre les actions héroïques disponibles / utilisées&lt;/li&gt; &lt;li&gt;&lt;strong&gt;Améliorations de la
+                    maison :&lt;/strong&gt; Enregistre les informations concernant votre maison&lt;/li&gt; &lt;li&gt;&lt;strong&gt;Détail de mon sac et de ceux
+                    de mon escorte :&lt;/strong&gt; Enregistre le contenu de votre sac ainsi que ceux de vos escortés&lt;/li&gt; &lt;li&gt;&lt;strong&gt;États :&lt;/strong&gt;
+                    Enregistre vos différents états (rassasié, soif, etc... Attention : n&apos;enregistre pas l&apos;état goule)&lt;/li&gt; &lt;li&gt;&lt;strong&gt;Entregistrer
+                    les fouilles réussies :&lt;/strong&gt; Enregistre les fouilles réussies pour restituer des statistiques sur les fouilles dans une carte
+                    dédiée&lt;/li&gt; &lt;/ul&gt;
                 </target>
             </trans-unit>
             <trans-unit id="4415272569817655484" datatype="html">
                 <source>En cochant l&apos;option &quot;Mettre à jour Gest&apos;Hordes&quot;, quand vous cliquerez sur le bouton &quot;Mettre à jour les outils
                     externes&quot;, la mise à jour de Gest&apos;Hordes se fera automatiquement. Vous rendez également accessibles d&apos;autres options de mise
-                    à jour
-                    avancées. &lt;ul&gt; &lt;li&gt;&lt;strong&gt;Nombre de zombies tués :&lt;/strong&gt; Enregistre le nombre de zombies tués sur la case&lt;/li&gt;
+                    à jour avancées. &lt;ul&gt; &lt;li&gt;&lt;strong&gt;Nombre de zombies tués :&lt;/strong&gt; Enregistre le nombre de zombies tués sur la case&lt;/li&gt;
                     &lt;li&gt;&lt;strong&gt;Mise à jour en ville dévastée :&lt;/strong&gt; Lorsque la ville est dévastée, récupère les informations sur la case
-                    pour
-                    les envoyer à Gest&apos;Hordes.&lt;/li&gt; &lt;li&gt;&lt;strong&gt;Actions héroïques :&lt;/strong&gt; Enregistre les actions héroïques
-                    disponibles
-                    / utilisées&lt;/li&gt; &lt;li&gt;&lt;strong&gt;Améliorations de la maison :&lt;/strong&gt; Enregistre les informations concernant votre
-                    maison&lt;/li&gt;
-                    &lt;li&gt;&lt;strong&gt;États :&lt;/strong&gt; Enregistre l&apos;état clair&lt;/li&gt; &lt;/ul&gt;
+                    pour les envoyer à Gest&apos;Hordes.&lt;/li&gt; &lt;li&gt;&lt;strong&gt;Actions héroïques :&lt;/strong&gt; Enregistre les actions héroïques
+                    disponibles / utilisées&lt;/li&gt; &lt;li&gt;&lt;strong&gt;Améliorations de la maison :&lt;/strong&gt; Enregistre les informations
+                    concernant votre maison&lt;/li&gt; &lt;li&gt;&lt;strong&gt;États :&lt;/strong&gt; Enregistre l&apos;état clair&lt;/li&gt; &lt;/ul&gt;
                 </source>
                 <target state="needs-translation">En cochant l&apos;option &quot;Mettre à jour Gest&apos;Hordes&quot;, quand vous cliquerez sur le bouton &quot;Mettre
                     à jour les outils externes&quot;, la mise à jour de Gest&apos;Hordes se fera automatiquement. Vous rendez également accessibles d&apos;autres
                     options de mise à jour avancées. &lt;ul&gt; &lt;li&gt;&lt;strong&gt;Nombre de zombies tués :&lt;/strong&gt; Enregistre le nombre de zombies
-                    tués
-                    sur la case&lt;/li&gt; &lt;li&gt;&lt;strong&gt;Mise à jour en ville dévastée :&lt;/strong&gt; Lorsque la ville est dévastée, récupère les
-                    informations sur la case pour les envoyer à Gest&apos;Hordes.&lt;/li&gt; &lt;li&gt;&lt;strong&gt;Actions héroïques :&lt;/strong&gt;
-                    Enregistre les
-                    actions héroïques disponibles / utilisées&lt;/li&gt; &lt;li&gt;&lt;strong&gt;Améliorations de la maison :&lt;/strong&gt; Enregistre les
-                    informations concernant votre maison&lt;/li&gt; &lt;li&gt;&lt;strong&gt;États :&lt;/strong&gt; Enregistre l&apos;état clair&lt;/li&gt; &lt;/ul&gt;
+                    tués sur la case&lt;/li&gt; &lt;li&gt;&lt;strong&gt;Mise à jour en ville dévastée :&lt;/strong&gt; Lorsque la ville est dévastée, récupère
+                    les informations sur la case pour les envoyer à Gest&apos;Hordes.&lt;/li&gt; &lt;li&gt;&lt;strong&gt;Actions héroïques :&lt;/strong&gt;
+                    Enregistre les actions héroïques disponibles / utilisées&lt;/li&gt; &lt;li&gt;&lt;strong&gt;Améliorations de la maison :&lt;/strong&gt;
+                    Enregistre les informations concernant votre maison&lt;/li&gt; &lt;li&gt;&lt;strong&gt;États :&lt;/strong&gt; Enregistre l&apos;état clair&lt;/li&gt;
+                    &lt;/ul&gt;
                 </target>
             </trans-unit>
             <trans-unit id="6260241287022545999" datatype="html">
                 <source>En cochant l&apos;option &quot;Mettre à jour BigBroth&apos;Hordes&quot;, quand vous cliquerez sur le bouton &quot;Mettre à jour les
-                    outils
-                    externes&quot;, la mise à jour de BigBroth&apos;Hordes se fera automatiquement.
+                    outils externes&quot;, la mise à jour de BigBroth&apos;Hordes se fera automatiquement.
                 </source>
                 <target state="needs-translation">En cochant l&apos;option &quot;Mettre à jour BigBroth&apos;Hordes&quot;, quand vous cliquerez sur le bouton
-                    &quot;Mettre
-                    à jour les outils externes&quot;, la mise à jour de BigBroth&apos;Hordes se fera automatiquement.
+                    &quot;Mettre à jour les outils externes&quot;, la mise à jour de BigBroth&apos;Hordes se fera automatiquement.
                 </target>
             </trans-unit>
             <trans-unit id="4368997949772733392" datatype="html">
                 <source>En cochant l&apos;option &quot;Mettre à jour Fata Morgana&quot;, quand vous cliquerez sur le bouton &quot;Mettre à jour les outils
-                    externes&quot;,
-                    la mise à jour de Fata Morgana se fera automatiquement.
+                    externes&quot;, la mise à jour de Fata Morgana se fera automatiquement.
                 </source>
                 <target state="needs-translation">En cochant l&apos;option &quot;Mettre à jour Fata Morgana&quot;, quand vous cliquerez sur le bouton &quot;Mettre
-                    à
-                    jour les outils externes&quot;, la mise à jour de Fata Morgana se fera automatiquement.
+                    à jour les outils externes&quot;, la mise à jour de Fata Morgana se fera automatiquement.
                 </target>
             </trans-unit>
             <trans-unit id="8653823422692107742" datatype="html">
@@ -3063,28 +3060,20 @@
             </trans-unit>
             <trans-unit id="2813621706949242739" datatype="html">
                 <source>Depuis l&apos;interface, vous pouvez cocher une option permettant d&apos;afficher des cartes directement dans MyHordes. Une fois cette
-                    option
-                    cochée, vous trouverez dans les différents outils externes des boutons pour &quot;copier&quot; une carte, que ce soit une carte de la ville
-                    ou une
-                    carte de ruine. Une fois la carte copiée, il suffit de retourner dans MyHordes et de cliquer sur l&apos;icône de carte pour pouvoir
-                    consulter la
-                    carte dans une fenêtre qui peut être déplacée et redimensionnée. &lt;br /&gt;&lt;br /&gt; Pour les cartes de BBH et de GH, vous pourrez voir
-                    votre
-                    emplacement sur la carte. La visibilité des expéditions n&apos;est pas encore prise en compte. &lt;br /&gt;&lt;br /&gt; Pour la carte de la
-                    ruine,
-                    vous pouvez simuler votre emplacement en cliquant sur une des cases, ce qui fait se déplacer un point sur la carte.
+                    option cochée, vous trouverez dans les différents outils externes des boutons pour &quot;copier&quot; une carte, que ce soit une carte de la
+                    ville ou une carte de ruine. Une fois la carte copiée, il suffit de retourner dans MyHordes et de cliquer sur l&apos;icône de carte pour
+                    pouvoir consulter la carte dans une fenêtre qui peut être déplacée et redimensionnée. &lt;br /&gt;&lt;br /&gt; Pour les cartes de BBH et de
+                    GH, vous pourrez voir votre emplacement sur la carte. La visibilité des expéditions n&apos;est pas encore prise en compte. &lt;br /&gt;&lt;br
+                    /&gt; Pour la carte de la ruine, vous pouvez simuler votre emplacement en cliquant sur une des cases, ce qui fait se déplacer un point sur
+                    la carte.
                 </source>
                 <target state="needs-translation">Depuis l&apos;interface, vous pouvez cocher une option permettant d&apos;afficher des cartes directement dans
                     MyHordes. Une fois cette option cochée, vous trouverez dans les différents outils externes des boutons pour &quot;copier&quot; une carte,
-                    que ce
-                    soit une carte de la ville ou une carte de ruine. Une fois la carte copiée, il suffit de retourner dans MyHordes et de cliquer sur l&apos;icône
-                    de
-                    carte pour pouvoir consulter la carte dans une fenêtre qui peut être déplacée et redimensionnée. &lt;br /&gt;&lt;br /&gt; Pour les cartes de
-                    BBH
-                    et de GH, vous pourrez voir votre emplacement sur la carte. La visibilité des expéditions n&apos;est pas encore prise en compte. &lt;br /&gt;&lt;br
-                    /&gt; Pour la carte de la ruine, vous pouvez simuler votre emplacement en cliquant sur une des cases, ce qui fait se déplacer un point sur
-                    la
-                    carte.
+                    que ce soit une carte de la ville ou une carte de ruine. Une fois la carte copiée, il suffit de retourner dans MyHordes et de cliquer sur l&apos;icône
+                    de carte pour pouvoir consulter la carte dans une fenêtre qui peut être déplacée et redimensionnée. &lt;br /&gt;&lt;br /&gt; Pour les cartes
+                    de BBH et de GH, vous pourrez voir votre emplacement sur la carte. La visibilité des expéditions n&apos;est pas encore prise en compte. &lt;br
+                    /&gt;&lt;br /&gt; Pour la carte de la ruine, vous pouvez simuler votre emplacement en cliquant sur une des cases, ce qui fait se déplacer un
+                    point sur la carte.
                 </target>
             </trans-unit>
             <trans-unit id="4837569632527779523" datatype="html">
@@ -3118,27 +3107,22 @@
                     Tampermonkey ou Violentmonkey. Ensuite, il suffit de cliquer sur le<x id="PH" equiv-text="this.download_link"/>, qui lancera la procédure d&apos;installation.
                     Enfin, il faudra confirmer dans la page qui se sera ouverte.
                 </source>
-                <target state="needs-translation">Il faut d&apos;abord installer l&apos;application de gestion des scripts de votre choix. Il en existe
-                    plusieurs,
-                    comme par exemple Tampermonkey ou Violentmonkey. Ensuite, il suffit de cliquer sur le<x id="PH" equiv-text="this.download_link"/>, qui
-                    lancera la
+                <target state="new">Il faut d&apos;abord installer l&apos;application de gestion des scripts de votre choix. Il en existe plusieurs, comme par
+                    exemple Tampermonkey ou Violentmonkey. Ensuite, il suffit de cliquer sur le<x id="PH" equiv-text="this.download_link"/>, qui lancera la
                     procédure d&apos;installation. Enfin, il faudra confirmer dans la page qui se sera ouverte.
                 </target>
             </trans-unit>
             <trans-unit id="4519018646004234371" datatype="html">
                 <source>&lt;ul&gt; &lt;li&gt;Installer un navigateur acceptant les extensions, tel que Kiwi Browser ou Firefox ;&lt;/li&gt; &lt;li&gt;Rechercher
-                    l&apos;extension
-                    de gestion des scripts de votre choix dans la barre de recherche de ce navigateur. Il en existe plusieurs, comme par exemple Tampermonkey ou
-                    Violentmonkey ;&lt;/li&gt; &lt;li&gt;Installer l&apos;extension pour Chrome ;&lt;/li&gt; &lt;li&gt;Cliquer sur le
+                    l&apos;extension de gestion des scripts de votre choix dans la barre de recherche de ce navigateur. Il en existe plusieurs, comme par
+                    exemple Tampermonkey ou Violentmonkey ;&lt;/li&gt; &lt;li&gt;Installer l&apos;extension pour Chrome ;&lt;/li&gt; &lt;li&gt;Cliquer sur le
                     <x id="PH" equiv-text="this.download_link"/>
                     ;&lt;/li&gt; &lt;li&gt;Confirmer l&apos;installation dans la page qui se sera ouverte.&lt;/li&gt; &lt;/ul&gt;
                 </source>
                 <target state="needs-translation">&lt;ul&gt; &lt;li&gt;Installer un navigateur acceptant les extensions, tel que Kiwi Browser ou Firefox ;&lt;/li&gt;
                     &lt;li&gt;Rechercher l&apos;extension de gestion des scripts de votre choix dans la barre de recherche de ce navigateur. Il en existe
-                    plusieurs,
-                    comme par exemple Tampermonkey ou Violentmonkey ;&lt;/li&gt; &lt;li&gt;Installer l&apos;extension pour Chrome ;&lt;/li&gt; &lt;li&gt;Cliquer
-                    sur
-                    le
+                    plusieurs, comme par exemple Tampermonkey ou Violentmonkey ;&lt;/li&gt; &lt;li&gt;Installer l&apos;extension pour Chrome ;&lt;/li&gt; &lt;li&gt;Cliquer
+                    sur le
                     <x id="PH" equiv-text="this.download_link"/>
                     ;&lt;/li&gt; &lt;li&gt;Confirmer l&apos;installation dans la page qui se sera ouverte.&lt;/li&gt; &lt;/ul&gt;
                 </target>
@@ -3146,66 +3130,49 @@
             <trans-unit id="8274520613163415161" datatype="html">
                 <source>&lt;ul&gt; &lt;li&gt;Télécharger l’application &quot;UserScripts&quot; ;&lt;/li&gt; &lt;li&gt;Ouvrir l&apos;application &quot;Raccourcis&quot;
                     ;&lt;/li&gt; &lt;li&gt;Appuyer sur le bouton &quot;+&quot; en haut à droite pour créer un nouveau raccourci ;&lt;/li&gt; &lt;li&gt;Rechercher
-                    l&apos;action
-                    &quot;Obtenir le contenu de l&apos;URL&quot; et l&apos;ajouter ;&lt;/li&gt; &lt;li&gt;Rechercher l&apos;action &quot;Enregister le fichier&quot;
-                    et l&apos;ajouter ;&lt;/li&gt; &lt;li&gt;Configurer l&apos;action &quot;Obtenir le contenu de l&apos;URL&quot; en modifiant la valeur du
-                    paramètre &quot;URL&quot; par la valeur &quot;Entrée de raccourci&quot; ;&lt;/li&gt; &lt;li&gt;Configurer l&apos;action &quot;Recevoir l&apos;entrée&quot;
-                    en modifiant la valeur du premier paramètre &quot;Images et 18 de plus&quot; par la valeur &quot;URL&quot; uniquement ;&lt;/li&gt; &lt;li&gt;Configurer
-                    l&apos;action &quot;Recevoir l&apos;entrée&quot; en modifiant la valeur du second paramètre &quot;Nulle part&quot; par la valeur &quot;Dans
-                    la
-                    feuille de partage&quot; ;&lt;/li&gt; &lt;li&gt;Terminer la création du raccourci en appuyant sur le bouton &quot;OK&quot; en haut à droite
-                    ;&lt;/li&gt;
-                    &lt;li&gt;Enregistrer le fichier disponible sur le
+                    l&apos;action &quot;Obtenir le contenu de l&apos;URL&quot; et l&apos;ajouter ;&lt;/li&gt; &lt;li&gt;Rechercher l&apos;action &quot;Enregister
+                    le fichier&quot; et l&apos;ajouter ;&lt;/li&gt; &lt;li&gt;Configurer l&apos;action &quot;Obtenir le contenu de l&apos;URL&quot; en modifiant
+                    la valeur du paramètre &quot;URL&quot; par la valeur &quot;Entrée de raccourci&quot; ;&lt;/li&gt; &lt;li&gt;Configurer l&apos;action &quot;Recevoir
+                    l&apos;entrée&quot; en modifiant la valeur du premier paramètre &quot;Images et 18 de plus&quot; par la valeur &quot;URL&quot; uniquement ;&lt;/li&gt;
+                    &lt;li&gt;Configurer l&apos;action &quot;Recevoir l&apos;entrée&quot; en modifiant la valeur du second paramètre &quot;Nulle part&quot; par
+                    la valeur &quot;Dans la feuille de partage&quot; ;&lt;/li&gt; &lt;li&gt;Terminer la création du raccourci en appuyant sur le bouton &quot;OK&quot;
+                    en haut à droite ;&lt;/li&gt; &lt;li&gt;Enregistrer le fichier disponible sur le
                     <x id="PH" equiv-text="this.download_link"/>
                     via un appui long sur le lien, en sélectionnant &quot;Partager...&quot; puis l&apos;action &quot;Enregister le fichier&quot; ;&lt;/li&gt;
-                    &lt;li&gt;Autoriser
-                    l&apos;action &quot;Enregistrer le fichier&quot; à l&apos;envoyer 1 élement de l&apos;app Safari vers &quot;github.com&quot; ;&lt;/li&gt;
-                    &lt;li&gt;Sélectionner
-                    l&apos;onglet &quot;Explorer&quot;, choisir l&apos;emplacement &quot;Sur mon iPhone&quot;, sélectionner le dossier &quot;Userscripts&quot;
-                    puis
-                    valider appuyant sur le bouton &quot;Ouvrir&quot; en haut à droite ;&lt;/li&gt; &lt;li&gt;Ouvrir l&apos;application &quot;Fichiers&quot; ;&lt;/li&gt;
-                    &lt;li&gt;Retourner dans le dossier &quot;Userscripts&quot; (&quot;Explorer&quot; &gt; &quot;Sur mon iPhone&quot; &gt; &quot;Userscripts&quot;)
-                    ;&lt;/li&gt; &lt;li&gt;Appuyer sur le bouton &quot;...&quot; en haut à droite et sélectionner &quot;Options de présentation&quot; ;&lt;/li&gt;
-                    &lt;li&gt;Activer l&apos;option avancée &quot;Afficher toutes les extensions de fichiers&quot; ;&lt;/li&gt; &lt;li&gt;Renommer le fichier
-                    &quot;my_hordes_optimizer.user.txt&quot;
-                    en &quot;my_hoydes_optimizer.user.js&quot; ;&lt;/li&gt; &lt;li&gt;Confirmer le remplacement de l&apos;extension via le choix &quot;Utiliser
-                    &quot;.js ;&lt;/li&gt; &lt;li&gt;Aller sur Safari ;&lt;/li&gt; &lt;li&gt;Appuyer sur le &quot;Aa&quot; dans la barre de recherche ;&lt;/li&gt;
-                    &lt;li&gt;Cliquer sur &quot;Gérer les extensions&quot; ;&lt;/li&gt; &lt;li&gt;Activer &quot;Userscripts&quot; ;&lt;/li&gt; &lt;li&gt;Appuyer
-                    sur
-                    le &quot;Aa&quot; dans la barre de recherche ;&lt;/li&gt; &lt;li&gt;Cliquer sur &quot;Userscripts&quot; ;&lt;/li&gt; &lt;li&gt;Vérifier que
-                    &quot;MyHordes Optimizer&quot; est bien activé.&lt;/li&gt; &lt;/ul&gt;
+                    &lt;li&gt;Autoriser l&apos;action &quot;Enregistrer le fichier&quot; à l&apos;envoyer 1 élement de l&apos;app Safari vers &quot;github.com&quot;
+                    ;&lt;/li&gt; &lt;li&gt;Sélectionner l&apos;onglet &quot;Explorer&quot;, choisir l&apos;emplacement &quot;Sur mon iPhone&quot;, sélectionner
+                    le dossier &quot;Userscripts&quot; puis valider appuyant sur le bouton &quot;Ouvrir&quot; en haut à droite ;&lt;/li&gt; &lt;li&gt;Ouvrir l&apos;application
+                    &quot;Fichiers&quot; ;&lt;/li&gt; &lt;li&gt;Retourner dans le dossier &quot;Userscripts&quot; (&quot;Explorer&quot; &gt; &quot;Sur mon
+                    iPhone&quot; &gt; &quot;Userscripts&quot;) ;&lt;/li&gt; &lt;li&gt;Appuyer sur le bouton &quot;...&quot; en haut à droite et sélectionner
+                    &quot;Options de présentation&quot; ;&lt;/li&gt; &lt;li&gt;Activer l&apos;option avancée &quot;Afficher toutes les extensions de fichiers&quot;
+                    ;&lt;/li&gt; &lt;li&gt;Renommer le fichier &quot;my_hordes_optimizer.user.txt&quot; en &quot;my_hoydes_optimizer.user.js&quot; ;&lt;/li&gt;
+                    &lt;li&gt;Confirmer le remplacement de l&apos;extension via le choix &quot;Utiliser &quot;.js ;&lt;/li&gt; &lt;li&gt;Aller sur Safari ;&lt;/li&gt;
+                    &lt;li&gt;Appuyer sur le &quot;Aa&quot; dans la barre de recherche ;&lt;/li&gt; &lt;li&gt;Cliquer sur &quot;Gérer les extensions&quot; ;&lt;/li&gt;
+                    &lt;li&gt;Activer &quot;Userscripts&quot; ;&lt;/li&gt; &lt;li&gt;Appuyer sur le &quot;Aa&quot; dans la barre de recherche ;&lt;/li&gt; &lt;li&gt;Cliquer
+                    sur &quot;Userscripts&quot; ;&lt;/li&gt; &lt;li&gt;Vérifier que &quot;MyHordes Optimizer&quot; est bien activé.&lt;/li&gt; &lt;/ul&gt;
                 </source>
                 <target state="new">&lt;ul&gt; &lt;li&gt;Télécharger l’application &quot;UserScripts&quot; ;&lt;/li&gt; &lt;li&gt;Ouvrir l&apos;application
-                    &quot;Raccourcis&quot;
-                    ;&lt;/li&gt; &lt;li&gt;Appuyer sur le bouton &quot;+&quot; en haut à droite pour créer un nouveau raccourci ;&lt;/li&gt; &lt;li&gt;Rechercher
-                    l&apos;action
-                    &quot;Obtenir le contenu de l&apos;URL&quot; et l&apos;ajouter ;&lt;/li&gt; &lt;li&gt;Rechercher l&apos;action &quot;Enregister le fichier&quot;
-                    et l&apos;ajouter ;&lt;/li&gt; &lt;li&gt;Configurer l&apos;action &quot;Obtenir le contenu de l&apos;URL&quot; en modifiant la valeur du
-                    paramètre &quot;URL&quot; par la valeur &quot;Entrée de raccourci&quot; ;&lt;/li&gt; &lt;li&gt;Configurer l&apos;action &quot;Recevoir l&apos;entrée&quot;
-                    en modifiant la valeur du premier paramètre &quot;Images et 18 de plus&quot; par la valeur &quot;URL&quot; uniquement ;&lt;/li&gt; &lt;li&gt;Configurer
-                    l&apos;action &quot;Recevoir l&apos;entrée&quot; en modifiant la valeur du second paramètre &quot;Nulle part&quot; par la valeur &quot;Dans
-                    la
-                    feuille de partage&quot; ;&lt;/li&gt; &lt;li&gt;Terminer la création du raccourci en appuyant sur le bouton &quot;OK&quot; en haut à droite
-                    ;&lt;/li&gt;
-                    &lt;li&gt;Enregistrer le fichier disponible sur le
+                    &quot;Raccourcis&quot; ;&lt;/li&gt; &lt;li&gt;Appuyer sur le bouton &quot;+&quot; en haut à droite pour créer un nouveau raccourci ;&lt;/li&gt;
+                    &lt;li&gt;Rechercher l&apos;action &quot;Obtenir le contenu de l&apos;URL&quot; et l&apos;ajouter ;&lt;/li&gt; &lt;li&gt;Rechercher l&apos;action
+                    &quot;Enregister le fichier&quot; et l&apos;ajouter ;&lt;/li&gt; &lt;li&gt;Configurer l&apos;action &quot;Obtenir le contenu de l&apos;URL&quot;
+                    en modifiant la valeur du paramètre &quot;URL&quot; par la valeur &quot;Entrée de raccourci&quot; ;&lt;/li&gt; &lt;li&gt;Configurer l&apos;action
+                    &quot;Recevoir l&apos;entrée&quot; en modifiant la valeur du premier paramètre &quot;Images et 18 de plus&quot; par la valeur &quot;URL&quot;
+                    uniquement ;&lt;/li&gt; &lt;li&gt;Configurer l&apos;action &quot;Recevoir l&apos;entrée&quot; en modifiant la valeur du second paramètre
+                    &quot;Nulle part&quot; par la valeur &quot;Dans la feuille de partage&quot; ;&lt;/li&gt; &lt;li&gt;Terminer la création du raccourci en
+                    appuyant sur le bouton &quot;OK&quot; en haut à droite ;&lt;/li&gt; &lt;li&gt;Enregistrer le fichier disponible sur le
                     <x id="PH" equiv-text="this.download_link"/>
                     via un appui long sur le lien, en sélectionnant &quot;Partager...&quot; puis l&apos;action &quot;Enregister le fichier&quot; ;&lt;/li&gt;
-                    &lt;li&gt;Autoriser
-                    l&apos;action &quot;Enregistrer le fichier&quot; à l&apos;envoyer 1 élement de l&apos;app Safari vers &quot;github.com&quot; ;&lt;/li&gt;
-                    &lt;li&gt;Sélectionner
-                    l&apos;onglet &quot;Explorer&quot;, choisir l&apos;emplacement &quot;Sur mon iPhone&quot;, sélectionner le dossier &quot;Userscripts&quot;
-                    puis
-                    valider appuyant sur le bouton &quot;Ouvrir&quot; en haut à droite ;&lt;/li&gt; &lt;li&gt;Ouvrir l&apos;application &quot;Fichiers&quot; ;&lt;/li&gt;
-                    &lt;li&gt;Retourner dans le dossier &quot;Userscripts&quot; (&quot;Explorer&quot; &gt; &quot;Sur mon iPhone&quot; &gt; &quot;Userscripts&quot;)
-                    ;&lt;/li&gt; &lt;li&gt;Appuyer sur le bouton &quot;...&quot; en haut à droite et sélectionner &quot;Options de présentation&quot; ;&lt;/li&gt;
-                    &lt;li&gt;Activer l&apos;option avancée &quot;Afficher toutes les extensions de fichiers&quot; ;&lt;/li&gt; &lt;li&gt;Renommer le fichier
-                    &quot;my_hordes_optimizer.user.txt&quot;
-                    en &quot;my_hoydes_optimizer.user.js&quot; ;&lt;/li&gt; &lt;li&gt;Confirmer le remplacement de l&apos;extension via le choix &quot;Utiliser
-                    &quot;.js ;&lt;/li&gt; &lt;li&gt;Aller sur Safari ;&lt;/li&gt; &lt;li&gt;Appuyer sur le &quot;Aa&quot; dans la barre de recherche ;&lt;/li&gt;
-                    &lt;li&gt;Cliquer sur &quot;Gérer les extensions&quot; ;&lt;/li&gt; &lt;li&gt;Activer &quot;Userscripts&quot; ;&lt;/li&gt; &lt;li&gt;Appuyer
-                    sur
-                    le &quot;Aa&quot; dans la barre de recherche ;&lt;/li&gt; &lt;li&gt;Cliquer sur &quot;Userscripts&quot; ;&lt;/li&gt; &lt;li&gt;Vérifier que
-                    &quot;MyHordes Optimizer&quot; est bien activé.&lt;/li&gt; &lt;/ul&gt;
+                    &lt;li&gt;Autoriser l&apos;action &quot;Enregistrer le fichier&quot; à l&apos;envoyer 1 élement de l&apos;app Safari vers &quot;github.com&quot;
+                    ;&lt;/li&gt; &lt;li&gt;Sélectionner l&apos;onglet &quot;Explorer&quot;, choisir l&apos;emplacement &quot;Sur mon iPhone&quot;, sélectionner
+                    le dossier &quot;Userscripts&quot; puis valider appuyant sur le bouton &quot;Ouvrir&quot; en haut à droite ;&lt;/li&gt; &lt;li&gt;Ouvrir l&apos;application
+                    &quot;Fichiers&quot; ;&lt;/li&gt; &lt;li&gt;Retourner dans le dossier &quot;Userscripts&quot; (&quot;Explorer&quot; &gt; &quot;Sur mon
+                    iPhone&quot; &gt; &quot;Userscripts&quot;) ;&lt;/li&gt; &lt;li&gt;Appuyer sur le bouton &quot;...&quot; en haut à droite et sélectionner
+                    &quot;Options de présentation&quot; ;&lt;/li&gt; &lt;li&gt;Activer l&apos;option avancée &quot;Afficher toutes les extensions de fichiers&quot;
+                    ;&lt;/li&gt; &lt;li&gt;Renommer le fichier &quot;my_hordes_optimizer.user.txt&quot; en &quot;my_hoydes_optimizer.user.js&quot; ;&lt;/li&gt;
+                    &lt;li&gt;Confirmer le remplacement de l&apos;extension via le choix &quot;Utiliser &quot;.js ;&lt;/li&gt; &lt;li&gt;Aller sur Safari ;&lt;/li&gt;
+                    &lt;li&gt;Appuyer sur le &quot;Aa&quot; dans la barre de recherche ;&lt;/li&gt; &lt;li&gt;Cliquer sur &quot;Gérer les extensions&quot; ;&lt;/li&gt;
+                    &lt;li&gt;Activer &quot;Userscripts&quot; ;&lt;/li&gt; &lt;li&gt;Appuyer sur le &quot;Aa&quot; dans la barre de recherche ;&lt;/li&gt; &lt;li&gt;Cliquer
+                    sur &quot;Userscripts&quot; ;&lt;/li&gt; &lt;li&gt;Vérifier que &quot;MyHordes Optimizer&quot; est bien activé.&lt;/li&gt; &lt;/ul&gt;
                 </target>
             </trans-unit>
             <trans-unit id="3369809985401596025" datatype="html">
@@ -3223,32 +3190,27 @@
                     MyHordes. Au survol, une fenêtre s&apos;affiche, donnant accès aux options du script ainsi qu&apos;à certaines de ses fonctionnalités.
                 </source>
                 <target state="needs-translation">Une fois le script installé, il faudra rafraîchir la page du jeu. Vous verrez alors apparaitre un nouveau
-                    bouton en
-                    haut de votre page MyHordes. Au survol, une fenêtre s&apos;affiche, donnant accès aux options du script ainsi qu&apos;à certaines de ses
-                    fonctionnalités.
+                    bouton en haut de votre page MyHordes. Au survol, une fenêtre s&apos;affiche, donnant accès aux options du script ainsi qu&apos;à certaines
+                    de ses fonctionnalités.
                 </target>
             </trans-unit>
             <trans-unit id="5406368064653547314" datatype="html">
                 <source>Une fois l&apos;extension installée, il faudra rafraîchir la page du jeu. Vous verrez alors apparaitre un nouveau bouton en haut de
-                    votre page
-                    MyHordes. Au survol, une fenêtre s&apos;affiche, donnant accès aux options du script ainsi qu&apos;à certaines de ses fonctionnalités.
+                    votre page MyHordes. Au survol, une fenêtre s&apos;affiche, donnant accès aux options du script ainsi qu&apos;à certaines de ses
+                    fonctionnalités.
                 </source>
                 <target state="needs-translation">Une fois l&apos;extension installée, il faudra rafraîchir la page du jeu. Vous verrez alors apparaitre un
-                    nouveau
-                    bouton en haut de votre page MyHordes. Au survol, une fenêtre s&apos;affiche, donnant accès aux options du script ainsi qu&apos;à certaines
-                    de ses
-                    fonctionnalités.
+                    nouveau bouton en haut de votre page MyHordes. Au survol, une fenêtre s&apos;affiche, donnant accès aux options du script ainsi qu&apos;à
+                    certaines de ses fonctionnalités.
                 </target>
             </trans-unit>
             <trans-unit id="317837542560103324" datatype="html">
                 <source>Affiche la liste des objets de la banque et leur quantité.&lt;br /&gt;&lt;br /&gt; Si vous êtes incarnés, les objets qui ne sont pas
-                    dans la
-                    liste de courses sont suivis d&apos;un bouton présentant un caddie. Un clic sur ce bouton les ajoute à la liste de courses.
+                    dans la liste de courses sont suivis d&apos;un bouton présentant un caddie. Un clic sur ce bouton les ajoute à la liste de courses.
                 </source>
                 <target state="needs-translation">Affiche la liste des objets de la banque et leur quantité.&lt;br /&gt;&lt;br /&gt; Si vous êtes incarnés, les
-                    objets
-                    qui ne sont pas dans la liste de courses sont suivis d&apos;un bouton présentant un caddie. Un clic sur ce bouton les ajoute à la liste de
-                    courses.
+                    objets qui ne sont pas dans la liste de courses sont suivis d&apos;un bouton présentant un caddie. Un clic sur ce bouton les ajoute à la
+                    liste de courses.
                 </target>
             </trans-unit>
             <trans-unit id="3388979422666988091" datatype="html">
@@ -3257,15 +3219,12 @@
             </trans-unit>
             <trans-unit id="8845542294305545291" datatype="html">
                 <source>Affiche la liste de tous les objets existant dans MyHordes (ainsi que des informations complémentaires à leur sujet).&lt;br /&gt;&lt;br
-                    /&gt;
-                    Si vous êtes incarné, les objets qui ne sont pas dans la liste de courses sont suivis d&apos;un bouton présentant un caddie. Un clic sur ce
-                    bouton
-                    les ajoute à la liste de courses.
+                    /&gt; Si vous êtes incarné, les objets qui ne sont pas dans la liste de courses sont suivis d&apos;un bouton présentant un caddie. Un clic
+                    sur ce bouton les ajoute à la liste de courses.
                 </source>
                 <target state="needs-translation">Affiche la liste de tous les objets existant dans MyHordes (ainsi que des informations complémentaires à leur
                     sujet).&lt;br /&gt;&lt;br /&gt; Si vous êtes incarné, les objets qui ne sont pas dans la liste de courses sont suivis d&apos;un bouton
-                    présentant
-                    un caddie. Un clic sur ce bouton les ajoute à la liste de courses.
+                    présentant un caddie. Un clic sur ce bouton les ajoute à la liste de courses.
                 </target>
             </trans-unit>
             <trans-unit id="6739215722471437099" datatype="html">
@@ -3280,8 +3239,7 @@
             </trans-unit>
             <trans-unit id="6025454850778679368" datatype="html">
                 <source>Affiche la liste de tous les bâtiments existant dans le jeu, leur distance de la ville, ainsi que la liste des objets qu&apos;on peut
-                    obtenir
-                    en les fouillant et leurs probabilités d&apos;obtention.
+                    obtenir en les fouillant et leurs probabilités d&apos;obtention.
                 </source>
                 <target state="needs-translation">Affiche la liste de tous les bâtiments existant dans le jeu, leur distance de la ville, ainsi que la liste des
                     objets qu&apos;on peut obtenir en les fouillant et leurs probabilités d&apos;obtention.
@@ -3301,29 +3259,11 @@
             </trans-unit>
             <trans-unit id="720951074500366028" datatype="html">
                 <source>L&apos;identifiant externe pour les applications se trouve sur le site de MyHordes, dans la page de votre âme, onglet &quot;Avancé&quot;.
-                    Une
-                    fois copié, il suffit de le coller dans le champ dédié sur le site de MyHordes Optimizer et de valider.
+                    Une fois copié, il suffit de le coller dans le champ dédié sur le site de MyHordes Optimizer et de valider.
                 </source>
                 <target state="needs-translation">L&apos;identifiant externe pour les applications se trouve sur le site de MyHordes, dans la page de votre âme,
                     onglet &quot;Avancé&quot;. Une fois copié, il suffit de le coller dans le champ dédié sur le site de MyHordes Optimizer et de valider.
                 </target>
-            </trans-unit>
-            <trans-unit id="5969611646055214898" datatype="html">
-                <source>Les coûts indiqués valent pour les modes de ville habituels. En Pandémonium, de nombreux chantiers demandent des ressources différentes
-                    —
-                    cette page ne les reflète pas encore.
-                </source>
-                <target state="new">Les coûts indiqués valent pour les modes de ville habituels. En Pandémonium, de nombreux chantiers demandent des ressources
-                    différentes — cette page ne les reflète pas encore.
-                </target>
-            </trans-unit>
-            <trans-unit id="6176448974516496512" datatype="html">
-                <source>Chantier temporaire : il disparaît au bout d’un moment</source>
-                <target state="new">Chantier temporaire : il disparaît au bout d’un moment</target>
-            </trans-unit>
-            <trans-unit id="4629279155621024298" datatype="html">
-                <source>Peut être détruit par l’attaque</source>
-                <target state="new">Peut être détruit par l’attaque</target>
             </trans-unit>
             <trans-unit id="6290924823055556031" datatype="html">
                 <source>Aucun chantier ne correspond à cette recherche.</source>
@@ -3427,6 +3367,10 @@
                 <source>Attaque théorique</source>
                 <target state="needs-translation">Attaque théorique</target>
             </trans-unit>
+            <trans-unit id="2155832126259145609" datatype="html">
+                <source>s</source>
+                <target state="new">s</target>
+            </trans-unit>
             <trans-unit id="2156842490958660553" datatype="html">
                 <source>Minimum théorique</source>
                 <target state="needs-translation">Minimum théorique</target>
@@ -3524,6 +3468,10 @@
                 <source>Scénario favorable</source>
                 <target state="new">Scénario favorable</target>
             </trans-unit>
+            <trans-unit id="181574438587688914" datatype="html">
+                <source>Plein écran</source>
+                <target state="new">Plein écran</target>
+            </trans-unit>
             <trans-unit id="8744947662445627502" datatype="html">
                 <source>Scénario défavorable</source>
                 <target state="new">Scénario défavorable</target>
@@ -3547,6 +3495,10 @@
             <trans-unit id="4045290552180803882" datatype="html">
                 <source>Jours validés</source>
                 <target state="needs-translation">Jours validés</target>
+            </trans-unit>
+            <trans-unit id="4056324809886473355" datatype="html">
+                <source>Réduire le zoom</source>
+                <target state="new">Réduire le zoom</target>
             </trans-unit>
             <trans-unit id="19231624547333208" datatype="html">
                 <source>Points d&apos;âmes gagnés</source>

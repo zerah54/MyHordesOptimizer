@@ -52,6 +52,14 @@ namespace MyHordesOptimizerApi.Repository.Impl
             return dico;
         }
 
+        public Dictionary<string, MyHordesActionsCodeModel> GetActions()
+        {
+            var path = "Data/Items/actions.json";
+            var json = File.ReadAllText(path);
+            var dico = json.FromJson<Dictionary<string, MyHordesActionsCodeModel>>();
+            return dico;
+        }
+
         public Dictionary<string, Dictionary<string, dynamic[]>> GetItemsDropRates()
         {
             var path = "Data/Items/find.json";

@@ -4,6 +4,7 @@ import { Property } from '../enum/property.enum';
 import { CommonModel, dtoToModelArray, modelToDtoArray } from './_common.class';
 import { I18nLabels } from './_types';
 import { Category } from './category.class';
+import { ItemSummary } from './item-summary.class';
 import { Recipe } from './recipe.class';
 
 export class Item extends CommonModel<ItemDTO> {
@@ -21,6 +22,10 @@ export class Item extends CommonModel<ItemDTO> {
     public properties: Property[] = [];
     public actions: Action[] = [];
     public recipes: Recipe[] = [];
+    /** Objets permettant d'ouvrir celui-ci. `null` si ce n'est pas un contenant. */
+    public opened_with: ItemSummary[] | null = null;
+    /** Contenants que cet objet permet d'ouvrir. */
+    public opens: ItemSummary[] = [];
     public bank_count!: number;
     public wishlist_count!: number;
     public drop_rate_not_praf!: number;
@@ -46,6 +51,8 @@ export class Item extends CommonModel<ItemDTO> {
             label: this.label,
             properties: this.properties ? this.properties.filter((property: Property) => property).map((property: Property) => property?.key) : [],
             recipes: modelToDtoArray(this.recipes),
+            openedWith: this.opened_with ? modelToDtoArray(this.opened_with) : null,
+            opens: modelToDtoArray(this.opens),
             wishListCount: this.wishlist_count,
             id: this.id,
             uid: this.uid,
@@ -71,6 +78,8 @@ export class Item extends CommonModel<ItemDTO> {
             this.label = dto.label;
             this.properties = dto.properties ? <Property[]>dto.properties.map((property: string) => Property.getByKey(property)) : [];
             this.recipes = dtoToModelArray(Recipe, dto.recipes);
+            this.opened_with = dto.openedWith ? dtoToModelArray(ItemSummary, dto.openedWith) : null;
+            this.opens = dtoToModelArray(ItemSummary, dto.opens);
             this.wishlist_count = dto.wishListCount;
             this.uid = dto.uid;
             this.id = dto.id;

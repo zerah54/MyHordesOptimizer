@@ -171,7 +171,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                         var dbContext = scope.ServiceProvider.GetRequiredService<MhoContext>();
                         using var transaction = dbContext.Database.BeginTransaction();
 
-                        var me = MyHordesApiRepository.GetMe();
+                        var me = MyHordesApiRepository.GetMapForToolsUpdate();
                         var zones = me.Map.Zones;
                         var listCells = new List<MapCell>();
                         var listCellItems = new List<MapCellItem>();
@@ -275,7 +275,8 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                                 IsRuinDryed = zone.Building?.Dried,
                                 NbRuinDig = zone.Building?.Dig,
                                 AveragePotentialRemainingDig = averagePotentialRemainingDig,
-                                MaxPotentialRemainingDig = maxPotentialRemainingDig
+                                MaxPotentialRemainingDig = maxPotentialRemainingDig,
+                                Tag = zone.Tag
                             };
                             if (zone.Items != null)
                             {
