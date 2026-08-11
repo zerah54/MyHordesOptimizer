@@ -1,5 +1,8 @@
 :host {
-    display: block;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
 }
 
 .observer-banner {
@@ -11,6 +14,7 @@
     color: var(--mat-sys-on-secondary-container);
     border-radius: 4px;
     margin-bottom: 8px;
+    flex-shrink: 0;
 
     &__label {
         font-weight: 600;

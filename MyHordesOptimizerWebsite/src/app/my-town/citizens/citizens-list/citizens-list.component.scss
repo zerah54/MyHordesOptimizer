@@ -125,11 +125,20 @@
         height: 100%;
         overflow: auto;
 
+        // Bloc vivants : borné à 100% de la hauteur visible, pour que la liste des morts (juste après,
+        // dans le flux) reste hors champ tant que .table-scroll n'a pas fini son propre scroll interne.
+        .alive-block {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
         .citizens-list-toolbar {
             display: flex;
             align-items: center;
             gap: 0.5em;
             padding: 0.5em;
+            flex-shrink: 0;
             // Le badge du bouton Filtres dépasse en haut à droite : ne pas le rogner.
             overflow: visible;
 
@@ -158,15 +167,27 @@
             }
         }
 
-        // Conteneur à défilement horizontal : indispensable au mode étendu (une colonne par champ).
+        // Scroll interne de la liste vivants (lignes + défilement horizontal en mode étendu).
+        // flex:1 + min-height:0 : sans min-height:0 un enfant flex garde min-height:auto et grandit
+        // avec son contenu au lieu de scroller.
         .table-scroll {
             width: 100%;
-            overflow-x: auto;
+            flex: 1;
+            min-height: 0;
+            overflow: auto;
 
             &.columns table {
                 width: auto;
                 min-width: 100%;
             }
+        }
+
+        // Scroll interne de la liste morts : bornée à la hauteur dispo, jamais plus. Comme .alive-block
+        // est aussi bornée à 100%, l'extérieur (.mho-citizens-list) épuise son propre scroll exactement
+        // quand cette liste occupe tout le viewport — la molette bascule alors naturellement en interne.
+        .dead-table-scroll {
+            max-height: 100%;
+            overflow: auto;
         }
 
         table {
