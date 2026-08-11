@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using MyHordesOptimizerApi.Configuration.Interfaces;
+using MyHordesOptimizerApi.Data.Items;
 using MyHordesOptimizerApi.Dtos.MyHordes;
 using MyHordesOptimizerApi.Dtos.MyHordes.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
@@ -100,7 +101,7 @@ namespace MyHordesOptimizerApi.Services.Impl
                 Logger.LogDebug("GetItem({@townId}) FetchInDb in {@ElapsedMilliseconds} ms", townId, sw.ElapsedMilliseconds);
                 sw.Restart();
                 var itemsDto = Mapper.Map<List<ItemDto>>(items);
-                ItemOpenerResolver.PopulateOpenerRelations(itemsDto, itemsDto, GetActionMetaByName());
+                ItemOpenerResolver.PopulateOpenerRelations(itemsDto, itemsDto, GetActionsByName());
                 Logger.LogDebug("GetItem({@townId}) Mapper in {@ElapsedMilliseconds} ms", townId, sw.ElapsedMilliseconds);
                 sw.Stop();
                 return itemsDto;
@@ -131,7 +132,7 @@ namespace MyHordesOptimizerApi.Services.Impl
                 Logger.LogDebug("GetItem() FetchInDb in {@ElapsedMilliseconds} ms", sw.ElapsedMilliseconds);
                 sw.Restart();
                 var itemsDto = Mapper.Map<List<ItemDto>>(items);
-                ItemOpenerResolver.PopulateOpenerRelations(itemsDto, itemsDto, GetActionMetaByName());
+                ItemOpenerResolver.PopulateOpenerRelations(itemsDto, itemsDto, GetActionsByName());
                 Logger.LogDebug("GetItem() Mapper in {@ElapsedMilliseconds} ms", sw.ElapsedMilliseconds);
                 sw.Stop();
                 return itemsDto;
@@ -139,16 +140,16 @@ namespace MyHordesOptimizerApi.Services.Impl
         }
 
         /// <summary>
-        /// Meta de chaque action ("have_can_opener"...), tel qu'extrait de <c>actions.json</c> —
-        /// seule donnée dont <see cref="MappingProfiles.Items.ItemOpenerResolver"/> a besoin.
-        /// Mis en cache : le fichier ne change qu'au déploiement, pas à chaque appel de <see cref="GetItems"/>.
+        /// Meta et result de chaque action, tel qu'extrait de <c>actions.json</c> — dont
+        /// <see cref="MappingProfiles.Items.ItemOpenerResolver"/> a besoin pour dériver l'outil
+        /// requis, le coût et la chance de réussite d'une ouverture. Mis en cache : le fichier ne
+        /// change qu'au déploiement, pas à chaque appel de <see cref="GetItems"/>.
         /// </summary>
-        private static Dictionary<string, IEnumerable<string>> _actionMetaByNameCache;
+        private static Dictionary<string, MyHordesActionsCodeModel> _actionsByNameCache;
 
-        private Dictionary<string, IEnumerable<string>> GetActionMetaByName()
+        private Dictionary<string, MyHordesActionsCodeModel> GetActionsByName()
         {
-            return _actionMetaByNameCache ??= MyHordesCodeRepository.GetActions()
-                .ToDictionary(kvp => kvp.Key, kvp => (IEnumerable<string>)kvp.Value.Meta);
+            return _actionsByNameCache ??= MyHordesCodeRepository.GetActions();
         }
 
         /// <summary>
@@ -1292,7 +1293,7 @@ namespace MyHordesOptimizerApi.Services.Impl
             var dtos = Mapper.Map<List<StackableItemDto>>(townBankItemsLastUpdated);
             // Catalogue COMPLET en référence, pas seulement le contenu de cette banque : sinon un
             // ouvre-boîte absent de la banque ferait passer une boîte pour « sans outil requis ».
-            ItemOpenerResolver.PopulateOpenerRelations(dtos.Select(dto => dto.Item).ToList(), GetItemCatalogForOpenerRelations(), GetActionMetaByName());
+            ItemOpenerResolver.PopulateOpenerRelations(dtos.Select(dto => dto.Item).ToList(), GetItemCatalogForOpenerRelations(), GetActionsByName());
             LastUpdateInfoDto lastUpdateDto = null;
             if (townModel.TownBankItems.Any())
             {

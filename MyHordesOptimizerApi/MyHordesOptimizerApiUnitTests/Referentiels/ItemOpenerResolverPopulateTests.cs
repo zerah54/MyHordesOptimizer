@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using FluentAssertions;
+using MyHordesOptimizerApi.Data.Items;
 using MyHordesOptimizerApi.Dtos.MyHordes.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
 using MyHordesOptimizerApi.MappingProfiles.Items;
@@ -25,13 +26,18 @@ namespace MyHordesOptimizerApiUnitTests.Referentiels
             };
         }
 
-        private static readonly Dictionary<string, IEnumerable<string>> ActionMeta = new()
+        private static MyHordesActionsCodeModel ActionModel(IEnumerable<string> meta)
         {
-            { "open_foodbox", new[] { "not_profession_tech", "have_parcel_opener" } },
-            { "open_toolbox", new[] { "not_profession_tech", "have_box_opener" } },
-            { "open_metalbox", new[] { "not_profession_tech", "have_can_opener" } },
-            { "open_matbox1", new[] { "is_not_wounded_hands" } },
-            { "throw_b_knife", new string[0] }
+            return new MyHordesActionsCodeModel { Meta = meta.ToList() };
+        }
+
+        private static readonly Dictionary<string, MyHordesActionsCodeModel> ActionMeta = new()
+        {
+            { "open_foodbox", ActionModel(new[] { "not_profession_tech", "have_parcel_opener" }) },
+            { "open_toolbox", ActionModel(new[] { "not_profession_tech", "have_box_opener" }) },
+            { "open_metalbox", ActionModel(new[] { "not_profession_tech", "have_can_opener" }) },
+            { "open_matbox1", ActionModel(new[] { "is_not_wounded_hands" }) },
+            { "throw_b_knife", ActionModel(new string[0]) }
         };
 
         [Fact]

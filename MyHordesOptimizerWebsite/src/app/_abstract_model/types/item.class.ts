@@ -26,6 +26,12 @@ export class Item extends CommonModel<ItemDTO> {
     public opened_with: ItemSummary[] | null = null;
     /** Contenants que cet objet permet d'ouvrir. */
     public opens: ItemSummary[] = [];
+    /** Coût en PA d'une tentative d'ouverture sans outil, pour un contenant à risque d'échec. */
+    public open_ap_cost: number | null = null;
+    /** Chance de réussite (0..1) associée à `open_ap_cost`. */
+    public open_success_rate: number | null = null;
+    /** Coût en PC de l'alternative réservée au métier Technicien à l'outil requis, si elle existe. */
+    public technician_open_cp_cost: number | null = null;
     public bank_count!: number;
     public wishlist_count!: number;
     public drop_rate_not_praf!: number;
@@ -53,6 +59,9 @@ export class Item extends CommonModel<ItemDTO> {
             recipes: modelToDtoArray(this.recipes),
             openedWith: this.opened_with ? modelToDtoArray(this.opened_with) : null,
             opens: modelToDtoArray(this.opens),
+            openApCost: this.open_ap_cost,
+            openSuccessRate: this.open_success_rate,
+            technicianOpenCpCost: this.technician_open_cp_cost,
             wishListCount: this.wishlist_count,
             id: this.id,
             uid: this.uid,
@@ -80,6 +89,9 @@ export class Item extends CommonModel<ItemDTO> {
             this.recipes = dtoToModelArray(Recipe, dto.recipes);
             this.opened_with = dto.openedWith ? dtoToModelArray(ItemSummary, dto.openedWith) : null;
             this.opens = dtoToModelArray(ItemSummary, dto.opens);
+            this.open_ap_cost = dto.openApCost ?? null;
+            this.open_success_rate = dto.openSuccessRate ?? null;
+            this.technician_open_cp_cost = dto.technicianOpenCpCost ?? null;
             this.wishlist_count = dto.wishListCount;
             this.uid = dto.uid;
             this.id = dto.id;

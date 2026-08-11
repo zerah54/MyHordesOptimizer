@@ -8,6 +8,7 @@ function buildDto(overrides: Partial<ItemDTO>): ItemDTO {
         deco: 0, isHeaver: false, guard: 0,
         properties: [], actions: [], recipes: [],
         openedWith: null, opens: [],
+        openApCost: null, openSuccessRate: null, technicianOpenCpCost: null,
         bankCount: 0, wishListCount: 0, dropRateNotPraf: 0, dropRatePraf: 0,
         ...overrides
     };
@@ -53,5 +54,28 @@ describe('Item', (): void => {
         }));
 
         expect(item.modelToDto().openedWith?.map((summary) => summary.uid)).toEqual(['parcel_tool_#00']);
+    });
+
+    it('maps the open cost and success rate when the container has no tool but a risk of failure', (): void => {
+        const item: Item = new Item(buildDto({ openApCost: 1, openSuccessRate: 0.05 }));
+
+        expect(item.open_ap_cost).toBe(1);
+        expect(item.open_success_rate).toBe(0.05);
+    });
+
+    it('maps the technician CP alternative cost', (): void => {
+        const item: Item = new Item(buildDto({ technicianOpenCpCost: 1 }));
+
+        expect(item.technician_open_cp_cost).toBe(1);
+    });
+
+    it('round-trips the open cost fields through modelToDto', (): void => {
+        const item: Item = new Item(buildDto({ openApCost: 1, openSuccessRate: 0.05, technicianOpenCpCost: 1 }));
+
+        const dto: ItemDTO = item.modelToDto();
+
+        expect(dto.openApCost).toBe(1);
+        expect(dto.openSuccessRate).toBe(0.05);
+        expect(dto.technicianOpenCpCost).toBe(1);
     });
 });

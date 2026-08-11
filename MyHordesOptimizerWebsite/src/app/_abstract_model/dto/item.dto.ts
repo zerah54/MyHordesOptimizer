@@ -22,6 +22,12 @@ export interface ItemDTO {
     openedWith: ItemSummaryDTO[] | null;
     /** Contenants que cet objet permet d'ouvrir. */
     opens: ItemSummaryDTO[];
+    /** Coût en PA d'une tentative d'ouverture sans outil, pour un contenant à risque d'échec. */
+    openApCost: number | null;
+    /** Chance de réussite (0..1) associée à `openApCost`. */
+    openSuccessRate: number | null;
+    /** Coût en PC de l'alternative réservée au métier Technicien à l'outil requis, si elle existe. */
+    technicianOpenCpCost: number | null;
     bankCount: number;
     wishListCount: number;
     dropRateNotPraf: number;

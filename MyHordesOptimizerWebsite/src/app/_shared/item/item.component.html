@@ -63,8 +63,31 @@
                                     <img [ngSrc]="HORDES_IMG_REPO + opener.img" width="16" height="16" [title]="opener.label[locale]">
                                 }
                             </div>
-                        } @else {
-                            <div i18n>Ne nécessite rien de spécial</div>
+                        }
+                        @if (item().technician_open_cp_cost !== null) {
+                            <div class="opener-relation">
+                                @if (item().opened_with!.length > 0) {
+                                    <ng-container i18n>ou</ng-container>
+                                } @else {
+                                    <ng-container i18n>Alternative Technicien</ng-container>
+                                }
+                                {{ item().technician_open_cp_cost }}
+                                <mho-icon-cp></mho-icon-cp>
+                            </div>
+                        }
+                        @if (item().open_ap_cost !== null) {
+                            <div class="opener-relation">
+                                <ng-container i18n>Ouverture</ng-container>
+                                :
+                                {{ item().open_ap_cost }}
+                                <mho-icon-ap></mho-icon-ap>
+                                @if (item().open_success_rate !== null) {
+                                    - {{ item().open_success_rate! * 100 | number:'1.0-2':locale }}%
+                                }
+                            </div>
+                        }
+                        @if (item().opened_with!.length === 0 && item().technician_open_cp_cost === null && item().open_ap_cost === null) {
+                            <div i18n>Peut être ouvert gratuitement</div>
                         }
                     }
 

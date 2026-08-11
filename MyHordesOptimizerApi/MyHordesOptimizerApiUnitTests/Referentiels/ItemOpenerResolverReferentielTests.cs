@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using FluentAssertions;
+using MyHordesOptimizerApi.Data.Items;
 using MyHordesOptimizerApi.Dtos.MyHordes.MyHordesOptimizer;
 using MyHordesOptimizerApi.MappingProfiles.Items;
 
@@ -18,16 +19,21 @@ namespace MyHordesOptimizerApiUnitTests.Referentiels
             return new ItemWithoutRecipeDto { Uid = uid, Img = uid + ".gif", Properties = properties, Actions = actions };
         }
 
-        private static readonly Dictionary<string, IEnumerable<string>> ActionMeta = new()
+        private static MyHordesActionsCodeModel ActionModel(IEnumerable<string> meta)
         {
-            { "can", new[] { "not_profession_tech", "have_can_opener", "is_not_wounded_hands" } },
-            { "open_metalbox", new[] { "not_profession_tech", "have_can_opener", "is_not_wounded_hands" } },
-            { "open_metalbox2", new[] { "not_profession_tech", "have_can_opener", "is_not_wounded_hands" } },
-            { "open_catbox", new[] { "not_profession_tech", "have_can_opener", "is_not_wounded_hands" } },
-            { "open_toolbox", new[] { "not_profession_tech", "have_box_opener", "is_not_wounded_hands" } },
-            { "open_foodbox", new[] { "not_profession_tech", "have_parcel_opener", "is_not_wounded_hands" } },
-            { "open_safe", new[] { "min_1_ap", "not_tired", "is_not_wounded_hands" } },
-            { "open_doggybag", new[] { "is_not_wounded_hands" } }
+            return new MyHordesActionsCodeModel { Meta = meta.ToList() };
+        }
+
+        private static readonly Dictionary<string, MyHordesActionsCodeModel> ActionMeta = new()
+        {
+            { "can", ActionModel(new[] { "not_profession_tech", "have_can_opener", "is_not_wounded_hands" }) },
+            { "open_metalbox", ActionModel(new[] { "not_profession_tech", "have_can_opener", "is_not_wounded_hands" }) },
+            { "open_metalbox2", ActionModel(new[] { "not_profession_tech", "have_can_opener", "is_not_wounded_hands" }) },
+            { "open_catbox", ActionModel(new[] { "not_profession_tech", "have_can_opener", "is_not_wounded_hands" }) },
+            { "open_toolbox", ActionModel(new[] { "not_profession_tech", "have_box_opener", "is_not_wounded_hands" }) },
+            { "open_foodbox", ActionModel(new[] { "not_profession_tech", "have_parcel_opener", "is_not_wounded_hands" }) },
+            { "open_safe", ActionModel(new[] { "min_1_ap", "not_tired", "is_not_wounded_hands" }) },
+            { "open_doggybag", ActionModel(new[] { "is_not_wounded_hands" }) }
         };
 
         private static List<ItemWithoutRecipeDto> BuildCatalogue()

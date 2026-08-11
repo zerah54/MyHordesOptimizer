@@ -34,6 +34,22 @@ namespace MyHordesOptimizerApi.Dtos.MyHordes.MyHordesOptimizer
         /// <summary>Contenants que cet objet permet d'ouvrir. Vide s'il n'en ouvre aucun.</summary>
         public List<ItemSummaryDto> Opens { get; set; } = new List<ItemSummaryDto>();
 
+        /// <summary>
+        /// Coût en PA d'une tentative d'ouverture sans outil, quand le contenant a un risque
+        /// d'échec (ex. coffre-fort, coffre d'architecte scellé). <c>null</c> si l'ouverture ne
+        /// coûte rien ou nécessite un outil.
+        /// </summary>
+        public int? OpenApCost { get; set; }
+
+        /// <summary>Chance de réussite (0..1) associée à <see cref="OpenApCost"/>.</summary>
+        public double? OpenSuccessRate { get; set; }
+
+        /// <summary>
+        /// Coût en PC de l'alternative réservée au métier Technicien à l'outil requis, si elle
+        /// existe (ex. ouvrir une conserve sans ouvre-boîte). <c>null</c> sinon.
+        /// </summary>
+        public int? TechnicianOpenCpCost { get; set; }
+
         public int WishListCount { get; set; }
         public int BankCount { get; set; }
 

@@ -12,10 +12,12 @@ import { Item } from '../../_abstract_model/types/item.class';
 import { TownDetails } from '../../_abstract_model/types/town-details.class';
 import { ItemImgPipe } from '../../_core/pipes/item-img.pipe';
 import { getTown } from '../../_core/utilities/localstorage.util';
+import { IconApComponent } from '../icon-ap/icon-ap.component';
+import { IconCpComponent } from '../icon-cp/icon-cp.component';
 import { RecipeComponent } from '../recipe/recipe.component';
 
 const angular_common: Imports = [CommonModule, NgOptimizedImage];
-const components: Imports = [RecipeComponent];
+const components: Imports = [RecipeComponent, IconApComponent, IconCpComponent];
 const pipes: Imports = [DecimalPipe, ItemImgPipe];
 const material_modules: Imports = [MatButtonModule, MatDividerModule];
 

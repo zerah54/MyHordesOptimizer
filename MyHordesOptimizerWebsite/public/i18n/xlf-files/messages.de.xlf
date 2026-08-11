@@ -1215,10 +1215,6 @@
                 <source>Cellule</source>
                 <target state="final">Zone</target>
             </trans-unit>
-            <trans-unit id="4563940927762956956" datatype="html">
-                <source>Ne nécessite rien de spécial</source>
-                <target state="new">Ne nécessite rien de spécial</target>
-            </trans-unit>
             <trans-unit id="4574043683605876869" datatype="html" approved="yes">
                 <source>Bâtiment</source>
                 <target state="final">Gebäude</target>
@@ -1446,6 +1442,10 @@
                     <x id="PH" equiv-text="moment.duration(eta_s, &apos;seconds&apos;).humanize()"/>
                     restant(es)
                 </target>
+            </trans-unit>
+            <trans-unit id="1534155701917252037" datatype="html">
+                <source>ou</source>
+                <target state="new">ou</target>
             </trans-unit>
             <trans-unit id="153729686624987145" datatype="html">
                 <source>estimation du temps...</source>
@@ -1690,6 +1690,10 @@
             <trans-unit id="866656223631702865" datatype="html" approved="yes">
                 <source>Estimations</source>
                 <target state="final">Abschätzung</target>
+            </trans-unit>
+            <trans-unit id="8672934759729899866" datatype="html">
+                <source>Peut être ouvert gratuitement</source>
+                <target state="new">Peut être ouvert gratuitement</target>
             </trans-unit>
             <trans-unit id="1713271461473302108" datatype="html">
                 <source>Mode</source>
@@ -3418,6 +3422,10 @@
             <trans-unit id="5314277499008020931" datatype="html">
                 <source>Favorable / défavorable</source>
                 <target state="new">Favorable / défavorable</target>
+            </trans-unit>
+            <trans-unit id="3991806597650889528" datatype="html">
+                <source>Ouverture</source>
+                <target state="new">Ouverture</target>
             </trans-unit>
             <trans-unit id="3994739349195120829" datatype="html">
                 <source>Zombies actifs (attaquants)</source>

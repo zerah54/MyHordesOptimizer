@@ -1099,9 +1099,6 @@
             <trans-unit id="2012623995194870112" datatype="html">
                 <source>Cellule</source>
             </trans-unit>
-            <trans-unit id="4563940927762956956" datatype="html">
-                <source>Ne nécessite rien de spécial</source>
-            </trans-unit>
             <trans-unit id="4574043683605876869" datatype="html">
                 <source>Bâtiment</source>
             </trans-unit>
@@ -1267,6 +1264,9 @@
                     <x id="PH" equiv-text="moment.duration(eta_s, &apos;seconds&apos;).humanize()"/>
                     restant(es)
                 </source>
+            </trans-unit>
+            <trans-unit id="1534155701917252037" datatype="html">
+                <source>ou</source>
             </trans-unit>
             <trans-unit id="153729686624987145" datatype="html">
                 <source>estimation du temps...</source>
@@ -1437,6 +1437,9 @@
             </trans-unit>
             <trans-unit id="866656223631702865" datatype="html">
                 <source>Estimations</source>
+            </trans-unit>
+            <trans-unit id="8672934759729899866" datatype="html">
+                <source>Peut être ouvert gratuitement</source>
             </trans-unit>
             <trans-unit id="1713271461473302108" datatype="html">
                 <source>Mode</source>
@@ -1974,6 +1977,9 @@
             </trans-unit>
             <trans-unit id="5314277499008020931" datatype="html">
                 <source>Favorable / défavorable</source>
+            </trans-unit>
+            <trans-unit id="3991806597650889528" datatype="html">
+                <source>Ouverture</source>
             </trans-unit>
             <trans-unit id="3994739349195120829" datatype="html">
                 <source>Zombies actifs (attaquants)</source>
