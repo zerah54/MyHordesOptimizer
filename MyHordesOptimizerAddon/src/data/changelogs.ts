@@ -1,4 +1,7 @@
 export const changelogs: Record<string, string> = {
+    '1.1.57': `
+        [Correction] La note sur un joueur pouvait échouer quand ce joueur était dans la même ville que vous
+        `,
     '1.1.56': `
         [Correction] Affichage des notes
         `,

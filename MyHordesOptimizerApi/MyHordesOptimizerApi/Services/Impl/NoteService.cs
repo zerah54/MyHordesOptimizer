@@ -116,6 +116,11 @@ public class NoteService : INoteService
             throw new MhoTechnicalException("Impossible de mettre une note sur soi-même.");
         }
 
+        if (!_dbContext.Users.Any(u => u.IdUser == targetUserId))
+        {
+            throw new MhoTechnicalException($"L'utilisateur cible {targetUserId} n'existe pas.");
+        }
+
         var existing = _dbContext.UserNotes
             .SingleOrDefault(n => n.IdUserAuthor == authorUserId && n.IdUserTarget == targetUserId && n.IdTown == townId);
 

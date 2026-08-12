@@ -17,6 +17,7 @@ import { UserPictosDTO } from '../_abstract_model/dto/user-picto.dto';
 import { NoteService } from '../_abstract_model/services/note.service';
 import { UserAccountService } from '../_abstract_model/services/user-account.service';
 import { Imports } from '../_abstract_model/types/_types';
+import { getUserId } from '../_core/utilities/localstorage.util';
 import { NoteDialogComponent, NoteDialogData } from '../_shared/note-dialog/note-dialog.component';
 import { NoteIconComponent } from '../_shared/note-icon/note-icon.component';
 
@@ -121,6 +122,11 @@ export class ProfileComponent implements OnInit {
                     .pipe(takeUntilDestroyed(this.destroy_ref))
                     .subscribe(() => this.note.set(content));
             });
+    }
+
+    /** Une note n'a de sens que sur le profil d'un autre joueur (l'API refuse la note sur soi-même). */
+    protected isSelf(): boolean {
+        return this.profile()?.id === getUserId();
     }
 
     protected getAvatarUrl(avatar: string | null): string | null {

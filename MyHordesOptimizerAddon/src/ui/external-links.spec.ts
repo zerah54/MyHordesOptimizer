@@ -50,6 +50,21 @@ describe('addExternalLinksToProfiles', () => {
         expect(links[0].href).toBe(`${mh_optimizer_site_url}/profile/456`);
     });
 
+    it('extracts the user id from the profile link, not from the home-visit link that can precede it in the same town', () => {
+        document.body.innerHTML = `
+            <div id="user-tooltip">
+                <a class="link" x-ajax-href="/town/visit/999"></a>
+                <a class="link" x-ajax-href="/soul/456"></a>
+                <hr class="dashed">
+            </div>
+        `;
+
+        addExternalLinksToProfiles();
+
+        const links: NodeListOf<HTMLAnchorElement> = document.querySelectorAll('.mho-link-blocks a.link-block');
+        expect(links[0].href).toBe(`${mh_optimizer_site_url}/profile/456`);
+    });
+
     it('wraps the links block with a dashed separator before and after', () => {
         document.body.innerHTML = `
             <div id="user-tooltip">

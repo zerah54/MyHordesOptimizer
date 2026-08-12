@@ -278,6 +278,23 @@ describe('displayUserGlobalNote', () => {
         expect((document.querySelector('.mho-user-note-block .mho-note-text') as HTMLElement)?.innerText).toBe('payeur fiable');
     });
 
+    it('extracts the user id from the profile link, not from the home-visit link that can precede it in the same town', () => {
+        document.body.innerHTML = `
+            <div id="user-tooltip">
+                <span class="link" x-ajax-href="/town/visit/999"></span>
+                <span class="link" x-ajax-href="/soul/456"></span>
+                <hr class="dashed">
+            </div>
+        `;
+        state.user_notes = {};
+        vi.spyOn(window, 'prompt').mockReturnValue('payeur fiable');
+
+        displayUserGlobalNote();
+        (document.querySelector('.mho-note-icon') as HTMLElement).click();
+
+        expect(upsertUserNoteMock).toHaveBeenCalledWith(456, 'payeur fiable');
+    });
+
     it('saves the note for that user when confirmed', () => {
         document.body.innerHTML = `
             <div id="user-tooltip">

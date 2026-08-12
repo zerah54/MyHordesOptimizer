@@ -211,7 +211,8 @@ export function displayUserGlobalNote(): void {
     /** ponytail: pas de garde anti-réutilisation de nœud ici, comme addExternalLinksToProfiles */
     if (existing) return;
 
-    const link_element: HTMLElement | null = user_tooltip.querySelector('.link[x-ajax-href]');
+    /** Le tooltip peut aussi contenir un lien « Voir la maison » avant celui-ci (même ville, même zone) : son x-ajax-href porte l'id du Citizen, pas celui du User. */
+    const link_element: HTMLElement | null = user_tooltip.querySelector('.link[x-ajax-href*="/soul/"]');
     const user_id_raw: string | null | undefined = link_element?.getAttribute('x-ajax-href')?.replace(/\D/g, '');
     if (!user_id_raw) return;
     const user_id: number = +user_id_raw;

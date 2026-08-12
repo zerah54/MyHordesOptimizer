@@ -20,7 +20,8 @@ export function addExternalLinksToProfiles() {
     if (state.mho_parameters.display_external_links && !mho_link_block) {
         const user_tooltip = document.querySelector('#user-tooltip');
         if (user_tooltip) {
-            const user_id = user_tooltip.querySelector('[x-ajax-href]')?.getAttribute('x-ajax-href')?.replace(/\D/g, '');
+            /** Le tooltip peut aussi contenir un lien « Voir la maison » avant celui-ci (même ville, même zone) : son x-ajax-href porte l'id du Citizen, pas celui du User. */
+            const user_id = user_tooltip.querySelector('[x-ajax-href*="/soul/"]')?.getAttribute('x-ajax-href')?.replace(/\D/g, '');
             if (!user_id) return;
             const link_color = window.getComputedStyle(user_tooltip.querySelector('.link')).getPropertyValue('color');
 
