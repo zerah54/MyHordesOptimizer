@@ -2160,7 +2160,7 @@
         <target state="final">Diese Seite kein Teil von 
                     <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;https://motion-twin.com/fr/&quot; target=&quot;_blank&quot;&gt;"/>
                     Motion Twin<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/> oder 
-                    <x id="START_LINK_1" equiv-text="&lt;a href=&quot;https://myhord.es&quot; target=&quot;_blank&quot;&gt;"/>
+                    <x id="START_LINK_1" equiv-text="&lt;a                 href=&quot;https://myhord.es&quot; target=&quot;_blank&quot;&gt;"/>
                     MyHordes
                     <x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/>
                 </target>
@@ -2176,7 +2176,7 @@
         <target state="final">Einige grafische Elemente gehören zu 
                     <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;https://motion-twin.com/fr/&quot; target=&quot;_blank&quot;&gt;"/>
                     Motion Twin<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/> oder 
-                    <x id="START_LINK_1" equiv-text="&lt;a href=&quot;https://myhord.es&quot; target=&quot;_blank&quot;&gt;"/>
+                    <x id="START_LINK_1" equiv-text="&lt;a                 href=&quot;https://myhord.es&quot; target=&quot;_blank&quot;&gt;"/>
                     MyHordes
                     <x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/>
                 </target>
@@ -2417,7 +2417,7 @@
         <target state="final">(
                     <x id="INTERPOLATION" equiv-text="{{ bonus_string }}"/>
                     <x id="INTERPOLATION_1" equiv-text="{{ bonus.zombie_vest | campingDisplayBonus:display_bonus_ap:locale }}"/> pro Zombie statt 
-                    <x id="INTERPOLATION_2" equiv-text="{{ bonus.zombie_no_vest | campingDisplayBonus:display_bonus_ap:locale }}"/>
+                    <x id="INTERPOLATION_2" equiv-text="{{                                         bonus.zombie_no_vest | campingDisplayBonus:display_bonus_ap:locale                                     }}"/>
                     )
                 </target>
       </trans-unit>
@@ -2865,10 +2865,11 @@
                     pas relâché votre escorte, alors au moment de fermer la fenêtre ou l&apos;onglet vous verrez apparaitre un avertissement demandant de
                     confirmer votre action.
                 </source>
-        <target state="final">In der Benutzeroberfläche können Sie die Option "Vor dem Verlassen der Seite um Bestätigung bitten"
-                    aktivieren, wodurch die Funktion aktiviert wird. Wenn die Funktion aktiviert ist und Sie sich in der Wüste befinden und Ihre Eskorte nicht
-                    aktiviert ist oder Sie Ihre Eskorte nicht losgelassen haben, erscheint beim Schließen des Fensters oder Tabs eine Warnung, in der Sie
-                    aufgefordert werden, Ihre Aktion zu bestätigen.
+        <target state="final">In der Benutzeroberfläche können Sie die Option "Vor dem Verlassen der Seite um Bestätigung bitten" aktivieren,
+                    wodurch die
+                    Funktion aktiviert wird.
+                    Wenn die Funktion aktiviert ist und Sie sich in der Wüste befinden und Ihre Eskorte nicht aktiviert ist oder Sie Ihre Eskorte nicht
+                    losgelassen haben, erscheint beim Schließen des Fensters oder Tabs eine Warnung, in der Sie aufgefordert werden, Ihre Aktion zu bestätigen.
                 </target>
       </trans-unit>
       <trans-unit id="4945794230367496950" datatype="html" approved="yes">
@@ -2880,9 +2881,11 @@
                     activera la fonctionnalité. Une fois activée, si vous êtes dans le désert et que votre attente d&apos;escorte n&apos;est pas activée, ou si
                     vous n&apos;avez pas relâché votre escorte, alors au bout de 5 minutes sans actios sur la page une notification de navigateur vous avertira.
                 </source>
-        <target state="final">In der Benutzeroberfläche können Sie die Option "Mich benachrichtigen, wenn ich 5 Minuten lang inaktiv auf der
-                    Seite bin" ankreuzen, wodurch die Funktion aktiviert wird. Wenn Sie sich in der Wüste befinden und Ihre Eskorte nicht aktiviert ist
-                    oder Sie Ihre Eskorte nicht losgelassen haben, werden Sie nach 5 Minuten ohne Aktivität auf der Seite von Ihrem Browser benachrichtigt.
+        <target state="final">In der Benutzeroberfläche können Sie die Option "Mich benachrichtigen, wenn ich 5 Minuten lang inaktiv auf der Seite
+                    bin"
+                    ankreuzen, wodurch die Funktion aktiviert wird.
+                    Wenn Sie sich in der Wüste befinden und Ihre Eskorte nicht aktiviert ist oder Sie Ihre Eskorte nicht losgelassen haben, werden Sie nach 5
+                    Minuten ohne Aktivität auf der Seite von Ihrem Browser benachrichtigt.
                 </target>
       </trans-unit>
       <trans-unit id="2315492892193612031" datatype="html" approved="yes">
@@ -2934,9 +2937,11 @@
                     fonctionnalité de navigation rapide. Il s&apos;agit simplement, lorsqu&apos;il existe un chantier recommandé, de pouvoir cliquer dessus pour
                     être automatiquement redirigé vers la ligne du chantier dans la liste.
                 </source>
-        <target state="final">In der Benutzeroberfläche kannst du die Einstellung "Schnellnavigation zur empfohlenen Konstruktion"
-                    anhaken, wodurch die Funktion der Schnellnavigation aktiviert wird. Wenn die Funktion aktiviert ist, und es eine empfohlene Baustelle gibt,
-                    kannst du auf die Empfehlung klicken, um automatisch zu der Zeile mit der Konstruktion in der Liste weitergeleitet zu werden.
+        <target state="final">In der Benutzeroberfläche kannst du die Einstellung "Schnellnavigation zur empfohlenen Konstruktion" anhaken, wodurch
+                    die
+                    Funktion der Schnellnavigation aktiviert wird.
+                    Wenn die Funktion aktiviert ist, und es eine empfohlene Baustelle gibt, kannst du auf die Empfehlung klicken, um automatisch zu der Zeile
+                    mit der Konstruktion in der Liste weitergeleitet zu werden.
                 </target>
       </trans-unit>
       <trans-unit id="766908157360687970" datatype="html" approved="yes">
@@ -2965,11 +2970,15 @@
                     également présents dans la liste de course se verront attribuer une bordure dont la couleur indique la priorité de l&apos;élément.
                 </source>
         <target state="final">Wenn du diese Option ankreuzt, wird die Einkaufsliste angezeigt, wenn du dich in der Wüste oder in der Werkstatt
-                    befindest. Diese Liste enthält Informationen über die Priorität, die Menge in der Bank, die Menge in den Rucksächen, die benötigte
-                    Gesamtmenge und die fehlende Menge. &lt;br /&gt;&lt;br /&gt; Die Einkaufsliste in der Werkstatt zeigt nur die Dinge an, die in der Werkstatt
-                    erzeugt werden können. Die in der Wüste zeigt alle Elemente ohne Einschränkung an. &lt;br /&gt;&lt;br /&gt; In der Wüste werden Gegenstände
-                    in dem Rucksack oder auf dem Boden, die auch auf der Einkaufsliste stehen, mit einem Rand versehen, dessen Farbe die Priorität des
-                    Gegenstands angibt.
+                    befindest.
+                    Diese Liste enthält Informationen über die Priorität, die Menge in der Bank, die Menge in den Rucksächen, die benötigte Gesamtmenge und die
+                    fehlende Menge.
+                    &lt;br /&gt;&lt;br /&gt;
+                    Die Einkaufsliste in der Werkstatt zeigt nur die Dinge an, die in der Werkstatt erzeugt werden können.
+                    Die in der Wüste zeigt alle Elemente ohne Einschränkung an.
+                    &lt;br /&gt;&lt;br /&gt;
+                    In der Wüste werden Gegenstände in dem Rucksack oder auf dem Boden, die auch auf der Einkaufsliste stehen, mit einem Rand versehen, dessen
+                    Farbe die Priorität des Gegenstands angibt.
                 </target>
       </trans-unit>
       <trans-unit id="4423220166056863975" datatype="html" approved="yes">
@@ -2980,9 +2989,9 @@
         <source>En cochant cette option, un nouvel encart apparaitra sous la carte dans l&apos;Outre-Monde. Il compte le nombre de zombies qui ont été
                     tués sur la case depuis la dernière attaque, et calcule le nombre de zombies qui vont mourir de désespoir lors de la prochaine attaque.
                 </source>
-        <target state="final">Wenn du diese Option ankreuzt, erscheint unter der Karte in der Außenwelt ein neuer Kasten. Er zählt die Anzahl der
-                    Zombies, die seit dem letzten Angriff auf dem Feld getötet wurden, und berechnet die Anzahl der Zombies, die beim nächsten Angriff an
-                    Abwanderung sterben werden.
+        <target state="final">Wenn du diese Option ankreuzt, erscheint unter der Karte in der Außenwelt ein neuer Kasten.
+                    Er zählt die Anzahl der Zombies, die seit dem letzten Angriff auf dem Feld getötet wurden, und berechnet die Anzahl der Zombies, die beim
+                    nächsten Angriff an Abwanderung sterben werden.
                 </target>
       </trans-unit>
       <trans-unit id="6560590152891649669" datatype="html" approved="yes">
@@ -2994,9 +3003,9 @@
                     puis saisir le texte à rechercher dans les autres langues. Le texte doit impérativement être un texte de MyHordes, puisque nous allons en
                     chercher la traduction dans les fichiers de traduction du jeu.
                 </source>
-        <target state="final">Wenn du diese Option ankreuzt, wird ein Übersetzungstool auf der Benutzeroberfläche angezeigt. Du kannst nun eine
-                    Quellsprache auswählen und dann den Text eingeben, nach dem in den anderen Sprachen gesucht werden soll. Der Text muss unbedingt ein Text
-                    aus MyHordes sein, da die Übersetzung in den Übersetzungsdateien des Spiels gesucht wird.
+        <target state="final">Wenn du diese Option ankreuzt, wird ein Übersetzungstool auf der Benutzeroberfläche angezeigt.
+                    Du kannst nun eine Quellsprache auswählen und dann den Text eingeben, nach dem in den anderen Sprachen gesucht werden soll.
+                    Der Text muss unbedingt ein Text aus MyHordes sein, da die Übersetzung in den Übersetzungsdateien des Spiels gesucht wird.
                 </target>
       </trans-unit>
       <trans-unit id="1297848596101851474" datatype="html" approved="yes">
@@ -3007,8 +3016,8 @@
         <source>En pandémonium, les chantiers subissent des dégats lors de l&apos;attaque. Cette option va montrer combien de pa manquent pour que le
                     chantier ne risque pas d&apos;être détruit lors de la prochaine attaque.
                 </source>
-        <target state="final">In Pandämonium nehmen die Konstruktionen beim Angriff Schaden. Diese Option wird zeigen, wie viele AP fehlen, damit
-                    die Konstruktion nicht Gefahr läuft, beim nächsten Angriff zerstört zu werden.
+        <target state="final">In Pandämonium nehmen die Konstruktionen beim Angriff Schaden.
+                    Diese Option wird zeigen, wie viele AP fehlen, damit die Konstruktion nicht Gefahr läuft, beim nächsten Angriff zerstört zu werden.
                 </target>
       </trans-unit>
       <trans-unit id="7507912867004115839" datatype="html" approved="yes">
@@ -3020,9 +3029,10 @@
                     permettra de saisir diverses informations pour calculer vos chances de survie sur cette case. Certaines informations, comme par exemple le
                     type de ville, ne sont pas visibles car elles sont déjà pré-renseignées et tiennent compte de votre ville actuelle.
                 </source>
-        <target state="final">Wenn du diese Option anklickst, erscheint eine neue Box in den Sektorinformationen deines Feldes. In diese Box kannst
-                    du verschiedene Informationen eingeben, um deine Überlebenschancen in dieser Zone zu berechnen. Einige Informationen, wie z. B. der
-                    Stadttyp, sind nicht sichtbar, da sie bereits voreingetragen sind und deine aktuelle Stadt berücksichtigen.
+        <target state="final">Wenn du diese Option anklickst, erscheint eine neue Box in den Sektorinformationen deines Feldes.
+                    In diese Box kannst du verschiedene Informationen eingeben, um deine Überlebenschancen in dieser Zone zu berechnen.
+                    Einige Informationen, wie z. B. der Stadttyp, sind nicht sichtbar, da sie bereits voreingetragen sind und deine aktuelle Stadt
+                    berücksichtigen.
                 </target>
       </trans-unit>
       <trans-unit id="5457236869945529467" datatype="html" approved="yes">
@@ -3033,8 +3043,8 @@
         <source>Sur la carte du site de MyHordes Optimizer, vous pouvez saisir des notes sur chaque case. Quand cette option est cochée, la note
                     associée s&apos;affiche sur votre case quand vous vous déplacez dans l&apos;Outre-Monde.
                 </source>
-        <target state="final">Auf der Sitemap von MyHordes Optimizer kannst du für jede Zone eine Notiz eingeben. Wenn diese Option angekreuzt ist,
-                    wird die zugehörige Notiz auf deiner Zone angezeigt, wenn du dich in der Außenwelt bewegst.
+        <target state="final">Auf der Sitemap von MyHordes Optimizer kannst du für jede Zone eine Notiz eingeben.
+                    Wenn diese Option angekreuzt ist, wird die zugehörige Notiz auf deiner Zone angezeigt, wenn du dich in der Außenwelt bewegst.
                 </target>
       </trans-unit>
       <trans-unit id="3270416149746032956" datatype="html" approved="yes">
@@ -3069,8 +3079,9 @@
                     de nouveau un objet en banque.
                 </source>
         <target state="final">Wenn diese Option aktiviert ist, wird ein Zähler zu den Bank- und Brunnenseiten hinzugefügt, der deine Bankentnahmen
-                    auflistet. Der Zähler in MyHordes berücksichtigt "gleitende" Minuten, du musst also nur warten, bis eine Zeile verschwindet, um
-                    wieder einen Gegenstand aus der Bank nehmen zu können.
+                    auflistet.
+                    Der Zähler in MyHordes berücksichtigt "gleitende" Minuten, du musst also nur warten, bis eine Zeile verschwindet, um wieder einen Gegenstand
+                    aus der Bank nehmen zu können.
                 </target>
       </trans-unit>
       <trans-unit id="7972524927973029550" datatype="html" approved="yes">
@@ -3094,8 +3105,8 @@
                     pourrez ainsi choisir quelles options vous voulez voir cochées ou non par défaut quand vous activez votre escorte.
                 </source>
         <target state="final">Wenn du diese Option aktivierst, werden zwei weitere Optionen verfügbar, welche die Optionen für die Eskorte in der
-                    Außenwelt darstellen. So kannst du auswählen, welche Optionen standardmäßig aktiviert oder deaktiviert sein sollen, wenn du deine Eskorte
-                    aktivierst.
+                    Außenwelt darstellen.
+                    So kannst du auswählen, welche Optionen standardmäßig aktiviert oder deaktiviert sein sollen, wenn du deine Eskorte aktivierst.
                 </target>
       </trans-unit>
       <trans-unit id="8248895111587460156" datatype="html" approved="yes">
@@ -3109,9 +3120,10 @@
                     rafraîchi.
                 </source>
         <target state="final">Eine der Funktionen des Skripts besteht darin, dass mehrere externe Anwendungen mit einem Klick von der
-                    MyHordes-Website aus aktualisiert werden können. Dazu musst du die zugehörigen Optionen in der Einstellungsliste des MyHordes Optimizer
-                    aktivieren. Wenn du eine der entsprechenden Anwendungen in deinem Browser geöffnet hast, dann wird das nächste Mal, wenn du zu dessem Tab
-                    navigierst, dieser automatisch aktualisiert.
+                    MyHordes-Website
+                    aus aktualisiert werden können. Dazu musst du die zugehörigen Optionen in der Einstellungsliste des MyHordes Optimizer aktivieren.
+                    Wenn du eine der entsprechenden Anwendungen in deinem Browser geöffnet hast, dann wird das nächste Mal, wenn du zu dessem Tab navigierst,
+                    dieser automatisch aktualisiert.
                 </target>
       </trans-unit>
       <trans-unit id="6242771464223017856" datatype="html" approved="yes">
@@ -3127,17 +3139,28 @@
                     les fouilles réussies :&lt;/strong&gt; Enregistre les fouilles réussies pour restituer des statistiques sur les fouilles dans une carte
                     dédiée&lt;/li&gt; &lt;/ul&gt;
                 </source>
-        <target state="final">Wenn du die Option "MyHordesOptimizer aktualisieren" ankreuzt, wird MyHordes Optimizer automatisch
-                    aktualisiert, wenn du auf die Schaltfläche "Externe Tools aktualisieren" klickst. Das macht auch andere erweiterte
-                    Aktualisierungsoptionen zugänglich. &lt;ul&gt; &lt;li&gt;&lt;strong&gt;Anzahl der getöteten Zombies:&lt;/strong&gt; Speichert die Anzahl der
-                    getöteten Zombies auf der Zone&lt;/li&gt; &lt;li&gt;&lt;strong&gt;Aktualisierung in zerstörter Stadt:&lt;/strong&gt; Wenn die Stadt zerstört
-                    ist, werden Informationen aus der Zone abgerufen, um sie an MyHordes Optimizer zu senden.&lt;/li&gt; &lt;li&gt;&lt;strong&gt;Heldentaten:&lt;/strong&gt;
-                    Speichert die verfügbaren / verwendeten Heldentaten&lt;/li&gt; &lt;li&gt;&lt;strong&gt;Hausverbesserungen:&lt;/strong&gt; Speichert
-                    Informationen über dein Haus&lt;/li&gt; &lt;li&gt;&lt;strong&gt;Details zu meinem Rucksack und den Rucksäcken meiner Eskorte:&lt;/strong&gt;
-                    Speichert den Inhalt deines Rucksacks und den Inhalt der Rucksäcke deiner Eskorte&lt;/li&gt; &lt;li&gt;&lt;strong&gt;Status:&lt;/strong&gt;
-                    Speichert deine verschiedenen Statuswerte (satt, durstig, etc... Achtung: Speichert nicht den Ghul-Status)&lt;/li&gt; &lt;li&gt;&lt;strong&gt;Erfolgreiche
-                    Grabungen aufzeichnen:&lt;/strong&gt; Zeichnet erfolgreiche Grabungen auf, um Statistiken über die Grabungen in einer speziellen Karte
-                    wiederzugeben&lt;/li&gt;&lt;/ul&gt;
+        <target state="final">
+                    Wenn du die Option "MyHordesOptimizer aktualisieren" ankreuzt, wird MyHordes Optimizer automatisch aktualisiert, wenn du auf die
+                    Schaltfläche "Externe Tools aktualisieren" klickst.
+                    Das macht auch andere erweiterte Aktualisierungsoptionen zugänglich.
+                    &lt;ul&gt;
+                    &lt;li&gt;&lt;strong&gt;Anzahl der getöteten Zombies:&lt;/strong&gt; Speichert die Anzahl der getöteten Zombies auf der Zone&lt;/li&gt;
+                    &lt;li&gt;&lt;strong&gt;Aktualisierung in zerstörter Stadt:&lt;/strong&gt; Wenn die Stadt zerstört ist, werden Informationen aus der Zone
+                    abgerufen,
+                    um sie
+                    an MyHordes Optimizer zu senden.&lt;/li&gt;
+                    &lt;li&gt;&lt;strong&gt;Heldentaten:&lt;/strong&gt; Speichert die verfügbaren / verwendeten Heldentaten&lt;/li&gt;
+                    &lt;li&gt;&lt;strong&gt;Hausverbesserungen:&lt;/strong&gt; Speichert Informationen über dein Haus&lt;/li&gt;
+                    &lt;li&gt;&lt;strong&gt;Details zu meinem Rucksack und den Rucksäcken meiner Eskorte:&lt;/strong&gt; Speichert den Inhalt deines Rucksacks
+                    und den
+                    Inhalt
+                    der Rucksäcke deiner Eskorte&lt;/li&gt;
+                    &lt;li&gt;&lt;strong&gt;Status:&lt;/strong&gt; Speichert deine verschiedenen Statuswerte (satt, durstig, etc... Achtung: Speichert nicht den
+                    Ghul-Status)&lt;/li&gt;
+                    &lt;li&gt;&lt;strong&gt;Erfolgreiche Grabungen aufzeichnen:&lt;/strong&gt; Zeichnet erfolgreiche Grabungen auf, um Statistiken über die
+                    Grabungen in
+                    einer
+                    speziellen Karte wiederzugeben&lt;/li&gt;&lt;/ul&gt;
                 </target>
       </trans-unit>
       <trans-unit id="4415272569817655484" datatype="html" approved="yes">
@@ -3149,13 +3172,18 @@
                     disponibles / utilisées&lt;/li&gt; &lt;li&gt;&lt;strong&gt;Améliorations de la maison :&lt;/strong&gt; Enregistre les informations
                     concernant votre maison&lt;/li&gt; &lt;li&gt;&lt;strong&gt;États :&lt;/strong&gt; Enregistre l&apos;état clair&lt;/li&gt; &lt;/ul&gt;
                 </source>
-        <target state="final">Wenn du die Option "Gest'Hordes aktualisieren" ankreuzt, wird Gest'Hordes automatisch
-                    aktualisiert, wenn du auf die Schaltfläche "Externe Tools aktualisieren" klickst. Das macht auch andere Aktualisierungsoptionen
-                    zugänglich. &lt;ul&gt; &lt;li&gt;&lt;strong&gt;Anzahl der getöteten Zombies :&lt;/strong&gt; Zeichnet die Anzahl der getöteten Zombies auf
-                    der Zone auf&lt;/li&gt; &lt;li&gt;&lt;strong&gt;Update in zerstörter Stadt :&lt;/strong&gt;Wenn die Stadt zerstört ist, werden die
-                    Zoneninformationen gesammelt, um sie an Gest'Hordes zu schicken.&lt;/li&gt; &lt;li&gt;&lt;strong&gt;Heldentaten :&lt;/strong&gt;
-                    Zeichnet verfügbare / verwendete Heldentaten auf&lt;/li&gt; &lt;li&gt;&lt;strong&gt;Hausverbesserungen :&lt;/strong&gt; Speichert
-                    Informationen über dein Haus&lt;/li&gt; &lt;li&gt;&lt;strong&gt;Status :&lt;/strong&gt; Speichert die aktuellen Statuswerte&lt;/li&gt; &lt;/ul&gt;
+        <target state="final">Wenn du die Option "Gest'Hordes aktualisieren" ankreuzt, wird Gest'Hordes automatisch aktualisiert, wenn du auf die
+                    Schaltfläche "Externe Tools aktualisieren" klickst.
+                    Das macht auch andere Aktualisierungsoptionen zugänglich.
+                    &lt;ul&gt;
+                    &lt;li&gt;&lt;strong&gt;Anzahl der getöteten Zombies :&lt;/strong&gt; Zeichnet die Anzahl der getöteten Zombies auf der Zone auf&lt;/li&gt;
+                    &lt;li&gt;&lt;strong&gt;Update in zerstörter Stadt :&lt;/strong&gt;Wenn die Stadt zerstört ist, werden die Zoneninformationen gesammelt, um
+                    sie an
+                    Gest'Hordes zu schicken.&lt;/li&gt;
+                    &lt;li&gt;&lt;strong&gt;Heldentaten :&lt;/strong&gt; Zeichnet verfügbare / verwendete Heldentaten auf&lt;/li&gt;
+                    &lt;li&gt;&lt;strong&gt;Hausverbesserungen :&lt;/strong&gt; Speichert Informationen über dein Haus&lt;/li&gt;
+                    &lt;li&gt;&lt;strong&gt;Status :&lt;/strong&gt; Speichert die aktuellen Statuswerte&lt;/li&gt;
+                    &lt;/ul&gt;
                 </target>
       </trans-unit>
       <trans-unit id="6260241287022545999" datatype="html" approved="yes">
@@ -3187,13 +3215,16 @@
                     /&gt; Pour la carte de la ruine, vous pouvez simuler votre emplacement en cliquant sur une des cases, ce qui fait se déplacer un point sur
                     la carte.
                 </source>
-        <target state="final">In der Benutzeroberfläche kannst du eine Option ankreuzen, mit der Karten direkt in MyHordes angezeigt werden können.
+        <target state="final">
+                    In der Benutzeroberfläche kannst du eine Option ankreuzen, mit der Karten direkt in MyHordes angezeigt werden können.
                     Sobald du diese Option angekreuzt hast, findest du in den verschiedenen externen Tools Schaltflächen, mit denen du eine Karte "kopieren"
                     kannst, sei es eine Stadtkarte oder eine Ruinenkarte. Sobald du die Karte kopiert hast, musst du nur zu MyHordes zurückkehren und auf das
-                    Kartensymbol klicken, um die Karte in einem Fenster betrachten zu können, welches verschoben und in der Größe verändert werden kann. &lt;br
-                    /&gt;&lt;br /&gt; Bei den Karten von BBH und GH kannst du deinen Standort auf der Karte sehen. Die Anzeige von Expeditionen wird noch nicht
-                    unterstützt. &lt;br /&gt;&lt;br /&gt; Auf der Ruinenkarte kannst du deinen Standort simulieren, indem du auf eine der Zonen klickst,
-                    woraufhin sich ein Punkt auf der Karte bewegt.
+                    Kartensymbol klicken, um die Karte in einem Fenster betrachten zu können, welches verschoben und in der Größe verändert werden kann.
+                    &lt;br /&gt;&lt;br /&gt;
+                    Bei den Karten von BBH und GH kannst du deinen Standort auf der Karte sehen. Die Anzeige von Expeditionen wird noch nicht unterstützt.
+                    &lt;br /&gt;&lt;br /&gt;
+                    Auf der Ruinenkarte kannst du deinen Standort simulieren, indem du auf eine der Zonen klickst, woraufhin sich ein Punkt auf der Karte
+                    bewegt.
                 </target>
       </trans-unit>
       <trans-unit id="4837569632527779523" datatype="html" approved="yes">
@@ -3239,11 +3270,17 @@
                     <x id="PH" equiv-text="this.download_link"/>
                     ;&lt;/li&gt; &lt;li&gt;Confirmer l&apos;installation dans la page qui se sera ouverte.&lt;/li&gt; &lt;/ul&gt;
                 </source>
-        <target state="final">&lt;ul&gt; &lt;li&gt;Installiere einen Browser, welcher Erweiterungen akzeptiert, wie z. B. Kiwi Browser oder Firefox
-                    ;&lt;/li&gt; &lt;li&gt;Öffne in der Symbolleiste des Browsers die Skripting-Erweiterung deiner Wahl. Es gibt mehrere davon, z. B.
-                    Tampermonkey oder Violentmonkey ;&lt;/li&gt; &lt;li&gt;Installiere die Erweiterung für Chrome ;&lt;/li&gt; &lt;li&gt;Klicke auf den
+        <target state="final">&lt;ul&gt;
+                    &lt;li&gt;Installiere einen Browser, welcher Erweiterungen akzeptiert, wie z. B. Kiwi Browser oder Firefox ;&lt;/li&gt;
+                    &lt;li&gt;Öffne in der Symbolleiste des Browsers die Skripting-Erweiterung deiner Wahl. Es gibt mehrere davon, z. B. Tampermonkey oder
+                    Violentmonkey
+                    ;&lt;/li&gt;
+                    &lt;li&gt;Installiere die Erweiterung für Chrome ;&lt;/li&gt;
+                    &lt;li&gt;Klicke auf den
                     <x id="PH" equiv-text="this.download_link"/>
-                    ;&lt;/li&gt; &lt;li&gt;Bestätige die Installation auf der Seite, die sich geöffnet hat.&lt;/li&gt; &lt;/ul&gt;
+                    ;&lt;/li&gt;
+                    &lt;li&gt;Bestätige die Installation auf der Seite, die sich geöffnet hat.&lt;/li&gt;
+                    &lt;/ul&gt;
                 </target>
       </trans-unit>
       <trans-unit id="8274520613163415161" datatype="html">
@@ -3327,9 +3364,9 @@
         <source>Affiche la liste des objets de la banque et leur quantité.&lt;br /&gt;&lt;br /&gt; Si vous êtes incarnés, les objets qui ne sont pas
                     dans la liste de courses sont suivis d&apos;un bouton présentant un caddie. Un clic sur ce bouton les ajoute à la liste de courses.
                 </source>
-        <target state="final">Zeigt eine Liste der Gegenstände in der Bank und deren Menge an.&lt;br /&gt;&lt;br /&gt; Wenn du eingeloggt bist,
-                    folgt auf Gegenstände, die nicht auf der Einkaufsliste stehen, eine Schaltfläche, die einen Einkaufswagen zeigt. Ein Klick auf diese
-                    Schaltfläche fügt sie der Einkaufsliste hinzu.
+        <target state="final">Zeigt eine Liste der Gegenstände in der Bank und deren Menge an.&lt;br /&gt;&lt;br /&gt;
+                    Wenn du eingeloggt bist, folgt auf Gegenstände, die nicht auf der Einkaufsliste stehen, eine Schaltfläche, die einen Einkaufswagen zeigt.
+                    Ein Klick auf diese Schaltfläche fügt sie der Einkaufsliste hinzu.
                 </target>
       </trans-unit>
       <trans-unit id="3388979422666988091" datatype="html" approved="yes">
@@ -3342,8 +3379,9 @@
                     sur ce bouton les ajoute à la liste de courses.
                 </source>
         <target state="final">Zeigt eine Liste aller in MyHordes existierenden Gegenstände an (sowie weitere Informationen über sie).&lt;br /&gt;&lt;br
-                    /&gt; Wenn du eingeloggt bist, wird hinter Gegenständen, die sich nicht auf der Einkaufsliste befinden, eine Schaltfläche mit einem
-                    Einkaufswagen angezeigt. Ein Klick auf diese Schaltfläche fügt sie der Einkaufsliste hinzu.
+                    /&gt;
+                    Wenn du eingeloggt bist, wird hinter Gegenständen, die sich nicht auf der Einkaufsliste befinden, eine Schaltfläche mit einem Einkaufswagen
+                    angezeigt. Ein Klick auf diese Schaltfläche fügt sie der Einkaufsliste hinzu.
                 </target>
       </trans-unit>
       <trans-unit id="6739215722471437099" datatype="html" approved="yes">
