@@ -1,5 +1,6 @@
 using AutoMapper;
 using FluentAssertions;
+using Microsoft.Extensions.Logging.Abstractions;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Buildings;
 using MyHordesOptimizerApi.MappingProfiles.Buildings;
 using MyHordesOptimizerApi.Models;
@@ -12,7 +13,7 @@ namespace MyHordesOptimizerApiUnitTests.Buildings
     {
         private static IMapper CreerMapper()
         {
-            var configuration = new MapperConfiguration(cfg => cfg.AddProfile<BuildingMappingProfile>());
+            var configuration = new MapperConfiguration(cfg => cfg.AddProfile<BuildingMappingProfile>(), NullLoggerFactory.Instance);
             return configuration.CreateMapper();
         }
 
