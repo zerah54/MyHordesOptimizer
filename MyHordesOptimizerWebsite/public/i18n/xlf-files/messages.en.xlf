@@ -2414,7 +2414,7 @@
         <target state="translated">(
                     <x id="INTERPOLATION" equiv-text="{{ bonus_string }}"/>
                     <x id="INTERPOLATION_1" equiv-text="{{ bonus.zombie_vest | campingDisplayBonus:display_bonus_ap:locale }}"/> par zombie au lieu de 
-                    <x id="INTERPOLATION_2" equiv-text="{{ bonus.zombie_no_vest | campingDisplayBonus:display_bonus_ap:locale }}"/>
+                    <x id="INTERPOLATION_2" equiv-text="{{                                         bonus.zombie_no_vest | campingDisplayBonus:display_bonus_ap:locale                                     }}"/>
                     )
                 </target>
       </trans-unit>
@@ -3231,11 +3231,16 @@
                     <x id="PH" equiv-text="this.download_link"/>
                     ;&lt;/li&gt; &lt;li&gt;Confirmer l&apos;installation dans la page qui se sera ouverte.&lt;/li&gt; &lt;/ul&gt;
                 </source>
-        <target state="final">&lt;ul&gt; &lt;li&gt;Install a browser that accepts extensions, such as Kiwi Browser or Firefox;&lt;/li&gt; &lt;li&gt;Search
-                    for the script management extension of your choice in the search bar of the chosen browser. There are several options, such as Tampermonkey
-                    or Violentmonkey;&lt;/li&gt; &lt;li&gt;Install the extension for Chrome;&lt;/li&gt; &lt;li&gt;Click on the
+        <target state="final">&lt;ul&gt;
+                    &lt;li&gt;Install a browser that accepts extensions, such as Kiwi Browser or Firefox;&lt;/li&gt;
+                    &lt;li&gt;Search for the script management extension of your choice in the search bar of the chosen browser.
+                    There are several options, such as Tampermonkey or Violentmonkey;&lt;/li&gt;
+                    &lt;li&gt;Install the extension for Chrome;&lt;/li&gt;
+                    &lt;li&gt;Click on the
                     <x id="PH" equiv-text="this.download_link"/>
-                    ;&lt;/li&gt; &lt;li&gt;Confirm the installation in the page that will open.&lt;/li&gt; &lt;/ul&gt;
+                    ;&lt;/li&gt;
+                    &lt;li&gt;Confirm the installation in the page that will open.&lt;/li&gt;
+                    &lt;/ul&gt;
                 </target>
       </trans-unit>
       <trans-unit id="8274520613163415161" datatype="html">
@@ -3317,8 +3322,9 @@
         <source>Affiche la liste des objets de la banque et leur quantité.&lt;br /&gt;&lt;br /&gt; Si vous êtes incarnés, les objets qui ne sont pas
                     dans la liste de courses sont suivis d&apos;un bouton présentant un caddie. Un clic sur ce bouton les ajoute à la liste de courses.
                 </source>
-        <target state="final">Displays a list of items in the bank and their quantity.&lt;br /&gt;&lt;br /&gt; If you are incarnated, items that
-                    are not on the shopping list are followed by a button with a shopping cart. Clicking this button adds them to the shopping list.
+        <target state="final">Displays a list of items in the bank and their quantity.&lt;br /&gt;&lt;br /&gt;
+                    If you are incarnated, items that are not on the shopping list are followed by a button with a shopping cart. Clicking this button adds them
+                    to the shopping list.
                 </target>
       </trans-unit>
       <trans-unit id="3388979422666988091" datatype="html" approved="yes">
@@ -3330,8 +3336,10 @@
                     /&gt; Si vous êtes incarné, les objets qui ne sont pas dans la liste de courses sont suivis d&apos;un bouton présentant un caddie. Un clic
                     sur ce bouton les ajoute à la liste de courses.
                 </source>
-        <target state="final">Displays a list of all items in MyHordes (along with additional information about them). &lt;br /&gt;&lt;br /&gt; If
-                    you are incarnated, items that are not in the shopping list will have a shopping cart button next to them. Clicking this button will add
+        <target state="final">Displays a list of all items in MyHordes (along with additional information about them).
+                    &lt;br /&gt;&lt;br
+                    /&gt;
+                    If you are incarnated, items that are not in the shopping list will have a shopping cart button next to them. Clicking this button will add
                     them to the shopping list.
                 </target>
       </trans-unit>
