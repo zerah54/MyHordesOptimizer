@@ -493,15 +493,21 @@
                 <source>Aucun picto à afficher.</source>
                 <target state="new">Aucun picto à afficher.</target>
             </trans-unit>
-            <trans-unit id="783657405301461061" datatype="html">
-                <source>
-                    <x id="INTERPOLATION" equiv-text="{{ picto.count }}"/>
-                    au total
-                </source>
-                <target state="new">
-                    <x id="INTERPOLATION" equiv-text="{{ picto.count }}"/>
-                    au total
-                </target>
+            <trans-unit id="8616134483369123816" datatype="html">
+                <source>Citoyen :</source>
+                <target state="new">Citoyen :</target>
+            </trans-unit>
+            <trans-unit id="377373638454048817" datatype="html">
+                <source>Total ville :</source>
+                <target state="new">Total ville :</target>
+            </trans-unit>
+            <trans-unit id="1066863741460846913" datatype="html">
+                <source>Total utilisateur :</source>
+                <target state="new">Total utilisateur :</target>
+            </trans-unit>
+            <trans-unit id="1737276409111424339" datatype="html">
+                <source>Total utilisateur : non importé</source>
+                <target state="new">Total utilisateur : non importé</target>
             </trans-unit>
             <trans-unit id="7491144287113751802" datatype="html">
                 <source>Affichage condensé</source>
@@ -1886,6 +1892,10 @@
             <trans-unit id="9108259229885711862" datatype="html">
                 <source>Importer mes données</source>
                 <target state="new">Importer mes données</target>
+            </trans-unit>
+            <trans-unit id="5913328570719280455" datatype="html">
+                <source>Importer les données</source>
+                <target state="new">Importer les données</target>
             </trans-unit>
             <trans-unit id="5376760805134026394" datatype="html">
                 <source>Utilisateur introuvable.</source>

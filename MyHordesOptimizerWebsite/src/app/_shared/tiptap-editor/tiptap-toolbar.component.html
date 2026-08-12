@@ -1,0 +1,166 @@
+<div class="mho-tiptap-toolbar">
+    <div class="mho-tiptap-toolbar-group">
+        <button type="button" data-action="bold" (click)="toggleBold()" [class.active]="editor().isActive('bold')" aria-label="Gras" i18n-aria-label>
+            <mat-icon>format_bold</mat-icon>
+        </button>
+        <button type="button" data-action="italic" (click)="toggleItalic()" [class.active]="editor().isActive('italic')" aria-label="Italique" i18n-aria-label>
+            <mat-icon>format_italic</mat-icon>
+        </button>
+        <button type="button" data-action="underline" (click)="toggleUnderline()" [class.active]="editor().isActive('underline')" aria-label="Souligne"
+                i18n-aria-label>
+            <mat-icon>format_underlined</mat-icon>
+        </button>
+        <button type="button" data-action="strike" (click)="toggleStrike()" [class.active]="editor().isActive('strike')" aria-label="Barre" i18n-aria-label>
+            <mat-icon>format_strikethrough</mat-icon>
+        </button>
+    </div>
+
+    <div class="mho-tiptap-toolbar-divider"></div>
+
+    <div class="mho-tiptap-toolbar-group">
+        <mat-select data-action="heading" (selectionChange)="onHeadingChange($event.value)" value="0" [panelWidth]="null" panelClass="mho-tiptap-select-panel"
+                    aria-label="Titre"
+                    i18n-aria-label>
+            <mat-option value="0" i18n>Normal</mat-option>
+            @for (level of headingLevels; track level) {
+                <mat-option [value]="level" [style.font-size.em]="headingPreviewEm(level)" [style.font-weight]="700">
+                    Titre {{ level }}
+                </mat-option>
+            }
+        </mat-select>
+        <mat-select data-action="fontSize" (selectionChange)="onFontSizeChange($event.value)" value="" [panelWidth]="null" panelClass="mho-tiptap-select-panel"
+                    aria-label="Taille de police"
+                    i18n-aria-label>
+            <mat-option value="" i18n>Normal</mat-option>
+            @for (size of fontSizes; track size) {
+                <mat-option [value]="size" [style.font-size.px]="size">{{ size }}</mat-option>
+            }
+        </mat-select>
+    </div>
+
+    <div class="mho-tiptap-toolbar-divider"></div>
+
+    <div class="mho-tiptap-toolbar-group">
+        <button type="button" data-action="align-left" (click)="setAlign('left')" [class.active]="editor().isActive({ textAlign: 'left' })"
+                aria-label="Aligner a gauche" i18n-aria-label>
+            <mat-icon>format_align_left</mat-icon>
+        </button>
+        <button type="button" data-action="align-center" (click)="setAlign('center')" [class.active]="editor().isActive({ textAlign: 'center' })"
+                aria-label="Centrer" i18n-aria-label>
+            <mat-icon>format_align_center</mat-icon>
+        </button>
+        <button type="button" data-action="align-right" (click)="setAlign('right')" [class.active]="editor().isActive({ textAlign: 'right' })"
+                aria-label="Aligner a droite" i18n-aria-label>
+            <mat-icon>format_align_right</mat-icon>
+        </button>
+        <button type="button" data-action="align-justify" (click)="setAlign('justify')" [class.active]="editor().isActive({ textAlign: 'justify' })"
+                aria-label="Justifier" i18n-aria-label>
+            <mat-icon>format_align_justify</mat-icon>
+        </button>
+    </div>
+
+    <div class="mho-tiptap-toolbar-divider"></div>
+
+    <div class="mho-tiptap-toolbar-group">
+        <button type="button" data-action="bulletList" (click)="toggleBulletList()" [class.active]="editor().isActive('bulletList')" aria-label="Liste a puces"
+                i18n-aria-label>
+            <mat-icon>format_list_bulleted</mat-icon>
+        </button>
+        <button type="button" data-action="orderedList" (click)="toggleOrderedList()" [class.active]="editor().isActive('orderedList')"
+                aria-label="Liste numerotee" i18n-aria-label>
+            <mat-icon>format_list_numbered</mat-icon>
+        </button>
+        <button type="button" data-action="taskList" (click)="toggleTaskList()" [class.active]="editor().isActive('taskList')" aria-label="Liste de taches"
+                i18n-aria-label>
+            <mat-icon>checklist</mat-icon>
+        </button>
+    </div>
+
+    <div class="mho-tiptap-toolbar-divider"></div>
+
+    <div class="mho-tiptap-toolbar-group">
+        <label class="mho-tiptap-color-btn" aria-label="Couleur du texte" i18n-aria-label>
+            <mat-icon>format_color_text</mat-icon>
+            <input type="color" data-action="text-color" (input)="onTextColorChange($event)" title="Couleur du texte" i18n-title>
+        </label>
+        <label class="mho-tiptap-color-btn" aria-label="Couleur de surlignage" i18n-aria-label>
+            <mat-icon>ink_highlighter</mat-icon>
+            <input type="color" data-action="highlight-color" (input)="onHighlightColorChange($event)" title="Couleur de surlignage" i18n-title>
+        </label>
+    </div>
+
+    <div class="mho-tiptap-toolbar-divider"></div>
+
+    <div class="mho-tiptap-toolbar-group">
+        <button type="button" data-action="link" (click)="setLink()" [class.active]="editor().isActive('link')" aria-label="Lien" i18n-aria-label>
+            <mat-icon>link</mat-icon>
+        </button>
+        <button type="button" data-action="codeBlock" (click)="toggleCodeBlock()" [class.active]="editor().isActive('codeBlock')" aria-label="Bloc de code"
+                i18n-aria-label>
+            <mat-icon>code</mat-icon>
+        </button>
+        <button type="button" data-action="blockquote" (click)="toggleBlockquote()" [class.active]="editor().isActive('blockquote')" aria-label="Citation"
+                i18n-aria-label>
+            <mat-icon>format_quote</mat-icon>
+        </button>
+        <button type="button" data-action="horizontalRule" (click)="insertHorizontalRule()" aria-label="Ligne horizontale" i18n-aria-label>
+            <mat-icon>horizontal_rule</mat-icon>
+        </button>
+        <button type="button" data-action="insertTable" (click)="insertTable()" aria-label="Tableau" i18n-aria-label>
+            <mat-icon>table</mat-icon>
+        </button>
+        <button type="button" data-action="emote" [matMenuTriggerFor]="emoteMenu" aria-label="Emoticone" i18n-aria-label>
+            <mat-icon>mood</mat-icon>
+        </button>
+    </div>
+
+    <mat-menu #emoteMenu="matMenu" class="mho-tiptap-emote-menu">
+        <mat-tab-group (click)="$event.stopPropagation()">
+            <mat-tab label="Émoticônes" i18n-label>
+                <div class="items">
+                    @for (emote of emotes; track emote.tag) {
+                        <img [src]="emote.src" [alt]="emote.tag" [title]="emote.tag" [attr.data-emote]="emote.tag" (click)="insertEmote(emote)">
+                    }
+                </div>
+            </mat-tab>
+            <mat-tab label="Icônes MyHordes" i18n-label>
+                <div class="items">
+                    @for (icon of defaultIcons; track icon.tag) {
+                        <img [src]="icon.src" [alt]="icon.tag" [title]="icon.tag" [attr.data-emote]="icon.tag" (click)="insertEmote(icon)">
+                    }
+                </div>
+            </mat-tab>
+            <mat-tab label="Emojis" i18n-label>
+                @for (group of unicodeEmojiGroups; track group.title) {
+                    <h4>{{ group.title }}</h4>
+                    <div class="items emoji-items">
+                        @for (emoji of group.emojis; track emoji.char) {
+                            <button type="button" [title]="emoji.label" [attr.aria-label]="emoji.label" [attr.data-emoji]="emoji.char"
+                                    (click)="insertUnicodeEmoji(emoji)">{{ emoji.char }}
+                            </button>
+                        }
+                    </div>
+                }
+            </mat-tab>
+            <mat-tab label="Objets" i18n-label>
+                <div (keydown)="$event.stopPropagation()">
+                    <mho-filter (filterChange)="onItemFilterChange($event)"></mho-filter>
+                </div>
+                <div class="items">
+                    @for (item of filteredItems(); track item.uid) {
+                        <img [src]="HORDES_IMG_REPO + item.img" [alt]="item.label[locale]" [title]="item.label[locale]"
+                             [attr.data-item]="item.uid" (click)="insertItem(item, HORDES_IMG_REPO + item.img)">
+                    }
+                </div>
+            </mat-tab>
+        </mat-tab-group>
+    </mat-menu>
+
+    <div class="mho-tiptap-toolbar-divider"></div>
+
+    <div class="mho-tiptap-toolbar-group">
+        <button type="button" data-action="clearFormat" (click)="clearFormat()" aria-label="Effacer la mise en forme" i18n-aria-label>
+            <mat-icon>format_clear</mat-icon>
+        </button>
+    </div>
+</div>

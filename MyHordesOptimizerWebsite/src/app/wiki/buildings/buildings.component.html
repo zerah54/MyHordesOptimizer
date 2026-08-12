@@ -33,7 +33,7 @@
                             @if (row.children.length > 0) {
                                 <button (click)="toggle(row)" [attr.aria-expanded]="!isCollapsed(row)"
                                         mat-icon-button type="button">
-                                    <mat-icon fontSet="material-symbols-outlined">
+                                    <mat-icon>
                                         {{ isCollapsed(row) ? 'chevron_right' : 'expand_more' }}
                                     </mat-icon>
                                 </button>

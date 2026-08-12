@@ -3,6 +3,7 @@ import { ApplicationConfig, ErrorHandler, importProvidersFrom, inject, LOCALE_ID
 import { initializeApp, provideFirebaseApp } from '@angular/fire/app';
 import { AngularFireModule } from '@angular/fire/compat';
 import { AngularFireAnalyticsModule } from '@angular/fire/compat/analytics';
+import { MAT_ICON_DEFAULT_OPTIONS, MatIconDefaultOptions } from '@angular/material/icon';
 import { MatPaginatorIntl } from '@angular/material/paginator';
 import { provideMomentDateAdapter } from '@angular/material-moment-adapter';
 import { BrowserModule } from '@angular/platform-browser';
@@ -49,6 +50,10 @@ export const appConfig: ApplicationConfig = {
             deps: [Router],
         },
         { provide: MatPaginatorIntl, useClass: MhoPaginatorIntl },
+        {
+            provide: MAT_ICON_DEFAULT_OPTIONS,
+            useValue: { fontSet: 'material-symbols-outlined' } as MatIconDefaultOptions
+        },
 
     ]
 

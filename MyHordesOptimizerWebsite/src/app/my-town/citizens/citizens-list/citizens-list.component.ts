@@ -1,5 +1,17 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, DestroyRef, effect, EventEmitter, inject, OnInit, Signal, signal, viewChild, WritableSignal } from '@angular/core';
+import {
+    Component,
+    computed,
+    DestroyRef,
+    effect,
+    EventEmitter,
+    inject,
+    OnInit,
+    Signal,
+    signal,
+    viewChild,
+    WritableSignal
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { MatBadgeModule } from '@angular/material/badge';
@@ -14,9 +26,11 @@ import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatSort, MatSortModule, SortDirection } from '@angular/material/sort';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { Router } from '@angular/router';
 import moment from 'moment';
 
 import { CITIZENS_LIST_DISPLAY_MODE_KEY, HORDES_IMG_REPO } from '../../../_abstract_model/const';
+import { NoteDTO } from '../../../_abstract_model/dto/note.dto';
 import { DailyActionEnum } from '../../../_abstract_model/enum/daily-action.enum';
 import { HeroicActionEnum } from '../../../_abstract_model/enum/heroic-action.enum';
 import { HomeEnum } from '../../../_abstract_model/enum/home.enum';
@@ -24,8 +38,9 @@ import { JobEnum } from '../../../_abstract_model/enum/job.enum';
 import { StatusEnum } from '../../../_abstract_model/enum/status.enum';
 import { StandardColumn } from '../../../_abstract_model/interfaces';
 import { ApiService } from '../../../_abstract_model/services/api.service';
+import { NoteService } from '../../../_abstract_model/services/note.service';
 import { TownService } from '../../../_abstract_model/services/town.service';
-import { Imports, ListForAddRemove } from '../../../_abstract_model/types/_types';
+import { Dictionary, Imports, ListForAddRemove } from '../../../_abstract_model/types/_types';
 import { Citizen } from '../../../_abstract_model/types/citizen.class';
 import { CitizenInfo } from '../../../_abstract_model/types/citizen-info.class';
 import { DailyAction } from '../../../_abstract_model/types/daily-action.class';
@@ -46,14 +61,21 @@ import { CompactStepperComponent } from '../../../_shared/compact-stepper/compac
 import { CompactToggleComponent } from '../../../_shared/compact-toggle/compact-toggle.component';
 import { DeferredCellComponent } from '../../../_shared/deferred-cell/deferred-cell.component';
 import { LastUpdateComponent } from '../../../_shared/last-update/last-update.component';
-import { ListElementAddRemoveComponent } from '../../../_shared/list-elements-add-remove/list-element-add-remove.component';
+import {
+    ListElementAddRemoveComponent
+} from '../../../_shared/list-elements-add-remove/list-element-add-remove.component';
+import { NoteDialogComponent, NoteDialogData } from '../../../_shared/note-dialog/note-dialog.component';
+import { NoteIconComponent } from '../../../_shared/note-icon/note-icon.component';
 import { SelectComponent } from '../../../_shared/select/select.component';
-import { CitizenPictosDialogComponent, CitizenPictosDialogData } from '../citizen-pictos-dialog/citizen-pictos-dialog.component';
+import {
+    CitizenPictosDialogComponent,
+    CitizenPictosDialogData
+} from '../citizen-pictos-dialog/citizen-pictos-dialog.component';
 import { DailyActionForDayPipe } from '../daily-action-for-day.pipe';
 import { TypeRowPipe } from './type-row.pipe';
 
 const angular_common: Imports = [CommonModule, FormsModule];
-const components: Imports = [AvatarComponent, CitizenInfoComponent, CompactStepperComponent, CompactToggleComponent, DeferredCellComponent, LastUpdateComponent, ListElementAddRemoveComponent, SelectComponent];
+const components: Imports = [AvatarComponent, CitizenInfoComponent, CompactStepperComponent, CompactToggleComponent, DeferredCellComponent, LastUpdateComponent, ListElementAddRemoveComponent, NoteDialogComponent, NoteIconComponent, SelectComponent];
 const pipes: Imports = [ColumnIdPipe, TypeRowPipe];
 const material_modules: Imports = [MatBadgeModule, MatButtonModule, MatButtonToggleModule, MatCheckboxModule, MatDialogModule, MatFormFieldModule, MatIconModule, MatMenuModule, MatSidenavModule, MatSortModule, MatTableModule, MatTooltipModule];
 
@@ -151,6 +173,7 @@ export class CitizensListComponent implements OnInit {
     ];
     /** Citoyen dont le menu de détail des mises à jour est ouvert (menu partagé). */
     protected readonly menu_row: WritableSignal<Citizen | null> = signal<Citizen | null>(null);
+    protected readonly citizenNotes: WritableSignal<Dictionary<NoteDTO>> = signal({});
     /** Ouverture de la sidenav de filtres. */
     protected readonly filters_open: WritableSignal<boolean> = signal<boolean>(false);
     /** Colonne de tri active (vide = aucun tri). */
@@ -167,6 +190,7 @@ export class CitizensListComponent implements OnInit {
         { id: 'soul_points', header: $localize`Points d’âme`, class: 'center' },
         { id: 'death_messages', header: $localize`Messages`, class: '' },
         { id: 'pictos', header: $localize`Pictos`, class: 'center' },
+        { id: 'note', header: $localize`Note`, class: 'center' },
     ];
     protected readonly all_status: StatusEnum[] = StatusEnum.getAllValues();
     /** La liste des listes disponibles dans le sac */
@@ -198,6 +222,8 @@ export class CitizensListComponent implements OnInit {
     private readonly destroy_ref: DestroyRef = inject(DestroyRef);
     private readonly dialog: MatDialog = inject(MatDialog);
     private readonly clipboard: ClipboardService = inject(ClipboardService);
+    private readonly note_service: NoteService = inject(NoteService);
+    private readonly router: Router = inject(Router);
     /** Pipe pur réutilisé pour le tri de la colonne bain. */
     private readonly daily_action_pipe: DailyActionForDayPipe = new DailyActionForDayPipe();
 
@@ -249,6 +275,13 @@ export class CitizensListComponent implements OnInit {
             });
 
         this.getCitizens();
+
+        const town_id: number | undefined = getTown()?.town_id;
+        if (town_id) {
+            this.note_service.getMyCitizenNotes(town_id)
+                .pipe(takeUntilDestroyed(this.destroy_ref))
+                .subscribe((notes: Dictionary<NoteDTO>) => this.citizenNotes.set(notes));
+        }
     }
 
     /** Change le mode d'affichage et le persiste. */
@@ -420,6 +453,27 @@ export class CitizensListComponent implements OnInit {
             townId: town_id
         };
         this.dialog.open(CitizenPictosDialogComponent, { data: data });
+    }
+
+    /** Ouvre la page de profil du citoyen. */
+    protected goToProfile(userId: number): void {
+        this.router.navigate(['/profile', userId]);
+    }
+
+    /** Ouvre l'édition de la note privée de l'appelant sur ce citoyen dans la ville en cours. */
+    protected openNote(citizen: Citizen): void {
+        const town_id: number | undefined = getTown()?.town_id;
+        if (!town_id) return;
+        const data: NoteDialogData = { initialContent: this.citizenNotes()[citizen.id]?.note ?? null };
+        this.dialog.open(NoteDialogComponent, { data })
+            .afterClosed()
+            .pipe(takeUntilDestroyed(this.destroy_ref))
+            .subscribe((content: string | undefined) => {
+                if (content === undefined) return;
+                this.note_service.saveCitizenNote(citizen.id, town_id, content)
+                    .pipe(takeUntilDestroyed(this.destroy_ref))
+                    .subscribe(() => this.citizenNotes.update((notes) => ({ ...notes, [citizen.id]: { note: content } })));
+            });
     }
 
     /**

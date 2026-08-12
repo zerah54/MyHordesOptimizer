@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, input,InputSignal, Signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, InputSignal, Signal } from '@angular/core';
 import { MatTooltipModule } from '@angular/material/tooltip';
 
 import { HORDES_IMG_REPO } from '../../_abstract_model/const';
@@ -26,4 +26,22 @@ export class PictosListComponent {
     protected readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
 
     protected readonly is_empty: Signal<boolean> = computed(() => this.pictos().length === 0);
+
+    /** Texte du tooltip : description seule hors contexte ville, détails complets (nom + compteurs) en contexte ville. */
+    protected getTooltip(picto: UserPicto): string {
+        if (!this.showTotal()) return picto.getDescription();
+
+        const userTotal: string = picto.count !== null
+            ? $localize`Total utilisateur : ${picto.count}`
+            : $localize`Total utilisateur : non importé`;
+
+        return [
+            picto.getLabel(),
+            picto.getDescription(),
+            '',
+            $localize`Citoyen : ${picto.count_in_town ?? 0}`,
+            $localize`Total ville : ${picto.town_total_count ?? 0}`,
+            userTotal
+        ].join('\n');
+    }
 }

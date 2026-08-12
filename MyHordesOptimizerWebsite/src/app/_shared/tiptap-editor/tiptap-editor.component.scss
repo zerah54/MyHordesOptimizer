@@ -1,0 +1,73 @@
+:host {
+    display: contents;
+
+    ::ng-deep .ProseMirror {
+        p.is-editor-empty:first-child::before {
+            content: attr(data-placeholder);
+            color: var(--mat-sys-outline);
+            float: left;
+            height: 0;
+            pointer-events: none;
+        }
+
+        ::selection {
+            background-color: var(--mat-sys-secondary-container);
+            color: var(--mat-sys-on-secondary-container);
+        }
+
+        img.mho-tiptap-emote {
+            vertical-align: middle;
+        }
+
+        blockquote {
+            margin: 0;
+            padding-left: .75rem;
+            border-left: 3px solid var(--mat-sys-outline);
+            color: var(--mat-sys-on-surface-variant);
+            font-style: italic;
+        }
+
+        table {
+            border-collapse: collapse;
+            table-layout: fixed;
+            width: 100%;
+
+            td, th {
+                position: relative;
+                min-width: 1em;
+                padding: 6px 8px;
+                border: 1px solid var(--mat-sys-outline-variant);
+            }
+
+            th {
+                background-color: var(--mat-sys-surface-container-high);
+                font-weight: bold;
+                text-align: left;
+            }
+
+            .selectedCell::after {
+                position: absolute;
+                inset: 0;
+                z-index: 2;
+                content: "";
+                background-color: var(--mat-sys-secondary-container);
+                opacity: .5;
+                pointer-events: none;
+            }
+
+            .column-resize-handle {
+                position: absolute;
+                top: 0;
+                right: -2px;
+                bottom: -2px;
+                width: 4px;
+                background-color: var(--mat-sys-tertiary);
+                pointer-events: none;
+            }
+
+            p {
+                margin: 0;
+            }
+        }
+    }
+}

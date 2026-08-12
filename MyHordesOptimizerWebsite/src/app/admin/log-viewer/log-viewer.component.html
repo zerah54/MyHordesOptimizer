@@ -11,11 +11,11 @@
 
         <mat-form-field appearance="outline" class="field--search" subscriptSizing="dynamic">
             <mat-label i18n>Rechercher</mat-label>
-            <mat-icon fontSet="material-symbols-outlined" matPrefix>search</mat-icon>
+            <mat-icon matPrefix>search</mat-icon>
             <input matInput formControlName="search"/>
             @if (filtersForm.controls.search.value) {
                 <button matIconSuffix mat-icon-button (click)="filtersForm.controls.search.setValue('')">
-                    <mat-icon fontSet="material-symbols-outlined">close</mat-icon>
+                    <mat-icon>close</mat-icon>
                 </button>
             }
         </mat-form-field>
@@ -28,7 +28,7 @@
                 <td mat-cell *matCellDef="let row" class="cell--stacktrace">
                     @if (row.stackTrace || row.body) {
                         <button mat-icon-button>
-                            <mat-icon fontSet="material-symbols-outlined" [style.color]="getLevelBgColor(row.level)">
+                            <mat-icon [style.color]="getLevelBgColor(row.level)">
                                 {{ expandedRow() === row ? 'expand_less' : 'expand_more' }}
                             </mat-icon>
                         </button>
@@ -57,7 +57,7 @@
                                         </mat-chip>
 
                                         <mat-icon (click)="$event.stopPropagation(); filtersForm.controls.level.setValue(null);"
-                                                  fontSet="material-symbols-outlined">close
+                                        >close
                                         </mat-icon>
                                     </div>
                                 </mat-select-trigger>
@@ -91,7 +91,7 @@
                         <input matInput formControlName="correlationId"/>
                         @if (filtersForm.controls.correlationId.value) {
                             <button matIconSuffix mat-icon-button (click)="filtersForm.controls.correlationId.setValue('')">
-                                <mat-icon fontSet="material-symbols-outlined">close</mat-icon>
+                                <mat-icon>close</mat-icon>
                             </button>
                         }
                     </mat-form-field>
@@ -188,7 +188,7 @@
 
         @if (!loading() && entries().length === 0) {
             <div class="log-viewer__empty">
-                <mat-icon fontSet="material-symbols-outlined">inbox</mat-icon>
+                <mat-icon>inbox</mat-icon>
                 <ng-container i18n>Aucune entrée trouvée</ng-container>
             </div>
         }

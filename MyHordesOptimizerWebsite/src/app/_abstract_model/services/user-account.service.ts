@@ -26,7 +26,7 @@ export class UserAccountService extends GlobalService {
         if (query.name) {
             params = params.set('name', query.name);
         }
-        if (query.sharedWithPlayerId !== null) {
+        if (query.sharedWithPlayerId !== null && query.sharedWithPlayerId !== undefined) {
             params = params.set('sharedWithPlayerId', String(query.sharedWithPlayerId));
         }
 

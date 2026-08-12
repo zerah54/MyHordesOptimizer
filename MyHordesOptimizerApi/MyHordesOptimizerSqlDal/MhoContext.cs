@@ -115,6 +115,10 @@ public partial class MhoContext : DbContext
 
     public virtual DbSet<TownCitizenPicto> TownCitizenPictos { get; set; }
 
+    public virtual DbSet<TownNote> TownNotes { get; set; }
+
+    public virtual DbSet<UserNote> UserNotes { get; set; }
+
     public virtual DbSet<WishlistCategorie> WishlistCategories { get; set; }
 
     public virtual DbSet<MinesweeperGame> MinesweeperGames { get; set; }

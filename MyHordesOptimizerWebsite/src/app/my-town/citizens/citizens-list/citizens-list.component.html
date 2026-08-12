@@ -9,7 +9,7 @@
                     <span class="spacer"></span>
                     <button (click)="resetFilters()" i18n mat-button type="button">Réinitialiser</button>
                     <button (click)="filters_open.set(false)" aria-label="Fermer" i18n-aria-label mat-icon-button type="button">
-                        <mat-icon fontSet="material-symbols-outlined">close</mat-icon>
+                        <mat-icon>close</mat-icon>
                     </button>
                 </div>
 
@@ -156,11 +156,11 @@
                         <div class="citizens-list-toolbar">
                             <mat-button-toggle-group (change)="changeDisplayMode($event.value)" [value]="display_mode()" hideSingleSelectionIndicator>
                                 <mat-button-toggle i18n-matTooltip matTooltip="Vue groupée par type" value="grouped">
-                                    <mat-icon fontSet="material-symbols-outlined">view_agenda</mat-icon>
+                                    <mat-icon>view_agenda</mat-icon>
                                     <span i18n>Groupé</span>
                                 </mat-button-toggle>
                                 <mat-button-toggle i18n-matTooltip matTooltip="Vue en colonnes : une par champ" value="columns">
-                                    <mat-icon fontSet="material-symbols-outlined">grid_on</mat-icon>
+                                    <mat-icon>grid_on</mat-icon>
                                     <span i18n>Colonnes</span>
                                 </mat-button-toggle>
                             </mat-button-toggle-group>
@@ -170,19 +170,19 @@
                             <button [matMenuTriggerFor]="copyMenu" aria-label="Copier la liste des citoyens" i18n-aria-label
                                     i18n-matTooltip mat-icon-button
                                     matTooltip="Copier la liste des citoyens" type="button">
-                                <mat-icon fontSet="material-symbols-outlined">content_copy</mat-icon>
+                                <mat-icon>content_copy</mat-icon>
                             </button>
 
                             <button [matMenuTriggerFor]="sortMenu" mat-stroked-button type="button">
                                 <mat-icon
-                                    fontSet="material-symbols-outlined">{{ activeSortLabel() ? (sort_direction() === 'asc' ? 'arrow_upward' : 'arrow_downward') : 'sort' }}
+                                >{{ activeSortLabel() ? (sort_direction() === 'asc' ? 'arrow_upward' : 'arrow_downward') : 'sort' }}
                                 </mat-icon>
                                 <span>{{ activeSortLabel() ?? sort_button_label }}</span>
                             </button>
                             <button (click)="toggleFilters()" [matBadgeHidden]="activeFilterCount() === 0" [matBadge]="activeFilterCount()"
                                     class="filters-button"
                                     mat-stroked-button type="button">
-                                <mat-icon fontSet="material-symbols-outlined">filter_alt</mat-icon>
+                                <mat-icon>filter_alt</mat-icon>
                                 <span i18n>Filtres</span>
                             </button>
                         </div>
@@ -260,7 +260,7 @@
 
                                 <ng-container matColumnDef="etats">
                                     <th *matHeaderCellDef class="field-col" mat-header-cell>
-                                        <mat-icon class="col-header-icon" fontSet="material-symbols-outlined"
+                                        <mat-icon class="col-header-icon"
                                                   i18n-matTooltip matTooltip="États">label
                                         </mat-icon>
                                     </th>
@@ -320,7 +320,7 @@
 
                                 <ng-container matColumnDef="last_update">
                                     <th *matHeaderCellDef class="field-col" mat-header-cell>
-                                        <mat-icon class="col-header-icon" fontSet="material-symbols-outlined"
+                                        <mat-icon class="col-header-icon"
                                                   i18n-matTooltip matTooltip="Dernière mise à jour">update
                                         </mat-icon>
                                     </th>
@@ -355,8 +355,10 @@
                                             @if (untyped_row | typeRow; as row) {
                                                 @switch (column.id) {
                                                     @case ('avatar_name') {
-                                                        <mho-avatar [src]="row.avatar"></mho-avatar>
-                                                        <div>{{ row.name }}</div>
+                                                        <div (click)="goToProfile(row.id)" class="citizen-cell">
+                                                            <mho-avatar [src]="row.avatar"></mho-avatar>
+                                                            <div>{{ row.name }}</div>
+                                                        </div>
                                                     }
                                                     @case ('cause_of_death') {
                                                         @if (row.cadaver?.cause_of_death; as cause) {
@@ -395,8 +397,11 @@
                                                         <button (click)="openPictos(row)" aria-label="Voir les pictos obtenus dans cette ville" i18n-aria-label
                                                                 i18n-matTooltip mat-icon-button
                                                                 matTooltip="Voir les pictos obtenus dans cette ville" type="button">
-                                                            <mat-icon fontSet="material-symbols-outlined">emoji_events</mat-icon>
+                                                            <mat-icon>emoji_events</mat-icon>
                                                         </button>
+                                                    }
+                                                    @case ('note') {
+                                                        <mho-note-icon [note]="citizenNotes()[row.id]?.note ?? null" (clicked)="openNote(row)"/>
                                                     }
                                                 }
                                             }
@@ -432,7 +437,7 @@
         <button (click)="sortBy(field.id)" mat-menu-item type="button">
             <span>{{ field.label }}</span>
             @if (sort_field() === field.id) {
-                <mat-icon fontSet="material-symbols-outlined">{{ sort_direction() === 'asc' ? 'arrow_upward' : 'arrow_downward' }}</mat-icon>
+                <mat-icon>{{ sort_direction() === 'asc' ? 'arrow_upward' : 'arrow_downward' }}</mat-icon>
             }
         </button>
     }
@@ -456,7 +461,7 @@
 <!-- ============ Templates de cellules ============ -->
 
 <ng-template #citizenCell let-row>
-    <div class="citizen-cell">
+    <div (click)="goToProfile(row.id)" class="citizen-cell">
         @if (display_mode() === 'grouped') {
             <mho-avatar [src]="row.avatar"></mho-avatar>
         }

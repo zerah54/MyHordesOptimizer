@@ -27,7 +27,7 @@ export class GlobalService {
         return this.http.post<T>(url, params, { responseType: 'json', headers: headers, context: context });
     }
 
-    protected put<T>(url: string, body: unknown): Observable<HttpResponse<T>> {
+    protected put<T>(url: string, body: unknown, params?: HttpParams): Observable<HttpResponse<T>> {
         const headers: HttpHeaders = new HttpHeaders().set('Content-Type', 'application/json');
         return this.http.put<T>(
             url,
@@ -35,7 +35,8 @@ export class GlobalService {
             {
                 responseType: 'json',
                 headers: headers,
-                observe: 'response'
+                observe: 'response',
+                params
             });
     }
 

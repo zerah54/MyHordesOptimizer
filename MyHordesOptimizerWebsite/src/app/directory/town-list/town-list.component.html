@@ -8,7 +8,7 @@
                     {{ getComboLabel(combo) }}
                     @if (combo.isFinished) {
                         <mat-icon class="season-finished-icon"
-                                  fontSet="material-symbols-outlined"
+
                                   i18n-matTooltip matTooltip="Saison terminée">lock
                         </mat-icon>
                     }
@@ -31,7 +31,7 @@
                         <mat-spinner diameter="18"/>
                     } @else {
                         <ng-container>
-                            <mat-icon fontSet="material-symbols-outlined">delete</mat-icon>
+                            <mat-icon>delete</mat-icon>
                             <ng-container i18n>Supprimer la sélection</ng-container>
                         </ng-container>
                     }
@@ -61,7 +61,7 @@
                             <input formControlName="id" matInput/>
                             @if (filtersForm.controls['id'].value) {
                                 <button (click)="filtersForm.controls['id'].setValue(''); $event.stopPropagation()" mat-icon-button matIconSuffix>
-                                    <mat-icon fontSet="material-symbols-outlined">close</mat-icon>
+                                    <mat-icon>close</mat-icon>
                                 </button>
                             }
                         </mat-form-field>
@@ -78,7 +78,7 @@
                             <input formControlName="name" matInput/>
                             @if (filtersForm.controls['name'].value) {
                                 <button (click)="filtersForm.controls['name'].setValue(''); $event.stopPropagation()" mat-icon-button matIconSuffix>
-                                    <mat-icon fontSet="material-symbols-outlined">close</mat-icon>
+                                    <mat-icon>close</mat-icon>
                                 </button>
                             }
                         </mat-form-field>
@@ -162,7 +162,7 @@
                                  class="cell--citizens"
                                  matTooltipClass="citizens-tooltip">
                                 @if (row.citizens.length > 0) {
-                                    <mat-icon fontSet="material-symbols-outlined">group</mat-icon>
+                                    <mat-icon>group</mat-icon>
                                     <span>{{ row.citizens.length }}</span>
                                 } @else {
                                     <span>—</span>
@@ -200,6 +200,34 @@
                     </td>
                 </ng-container>
 
+                <ng-container matColumnDef="noteTown">
+                    <th *matHeaderCellDef mat-header-cell>
+                        @if (isOtherProfile()) {
+                            <ng-container i18n>Note de ville</ng-container>
+                        } @else {
+                            <ng-container i18n>Note</ng-container>
+                        }
+                    </th>
+                    <td (click)="$event.stopPropagation()" *matCellDef="let row" mat-cell>
+                        <mho-deferred-cell>
+                            @if (row.mapId !== null && hasParticipated(row)) {
+                                <mho-note-icon [note]="townNotes()[row.mapId]?.note ?? null" (clicked)="openTownNote(row.mapId)"/>
+                            }
+                        </mho-deferred-cell>
+                    </td>
+                </ng-container>
+
+                <ng-container matColumnDef="noteCitizen">
+                    <th *matHeaderCellDef i18n mat-header-cell>Note de citoyen</th>
+                    <td (click)="$event.stopPropagation()" *matCellDef="let row" mat-cell>
+                        <mho-deferred-cell>
+                            @if (row.mapId !== null && hasParticipated(row)) {
+                                <mho-note-icon [note]="citizenNotes()[row.mapId]?.note ?? null" (clicked)="openCitizenNote(row.mapId)"/>
+                            }
+                        </mho-deferred-cell>
+                    </td>
+                </ng-container>
+
                 <ng-container matColumnDef="actions">
                     <th *matHeaderCellDef i18n mat-header-cell>Actions</th>
                     <td (click)="$event.stopPropagation()" *matCellDef="let row" mat-cell>
@@ -213,16 +241,16 @@
                                 @if (importingIds().has(row.id)) {
                                     <mat-spinner diameter="20"/>
                                 } @else {
-                                    <mat-icon fontSet="material-symbols-outlined">download</mat-icon>
+                                    <mat-icon>download</mat-icon>
                                 }
                             </button>
                             @if (importResults()[row.id] === 'success') {
-                                <mat-icon class="result-icon result-icon--success" fontSet="material-symbols-outlined"
+                                <mat-icon class="result-icon result-icon--success"
                                           i18n-matTooltip matTooltip="Import réussi">check_circle
                                 </mat-icon>
                             }
                             @if (importResults()[row.id] === 'error') {
-                                <mat-icon class="result-icon result-icon--error" fontSet="material-symbols-outlined"
+                                <mat-icon class="result-icon result-icon--error"
                                           i18n-matTooltip matTooltip="Erreur lors de l'import">error
                                 </mat-icon>
                             }
@@ -235,7 +263,7 @@
                                 @if (deletingIds().has(row.id)) {
                                     <mat-spinner diameter="20"/>
                                 } @else {
-                                    <mat-icon fontSet="material-symbols-outlined">delete</mat-icon>
+                                    <mat-icon>delete</mat-icon>
                                 }
                             </button>
                         </div>
@@ -251,7 +279,7 @@
 
             @if (!loading() && towns().length === 0) {
                 <div class="town-list__empty">
-                    <mat-icon fontSet="material-symbols-outlined">location_city</mat-icon>
+                    <mat-icon>location_city</mat-icon>
                     <ng-container i18n>Aucune ville trouvée</ng-container>
                 </div>
             }

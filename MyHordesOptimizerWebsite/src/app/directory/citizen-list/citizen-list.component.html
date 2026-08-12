@@ -19,14 +19,18 @@
                             @if (filtersForm.controls['name'].value) {
                                 <button (click)="filtersForm.controls['name'].setValue(''); $event.stopPropagation()" mat-icon-button
                                         matIconSuffix>
-                                    <mat-icon fontSet="material-symbols-outlined">close</mat-icon>
+                                    <mat-icon>close</mat-icon>
                                 </button>
                             }
                         </mat-form-field>
                     </th>
                     <td *matCellDef="let row" mat-cell>
-                        <mho-avatar [src]="row.avatar" rounded></mho-avatar>
-                        <span class="citizen-name">{{ row.name }}</span>
+                        <div class="citizen-cell">
+                            <div class="citizen-avatar">
+                                <mho-avatar [src]="row.avatar" rounded></mho-avatar>
+                            </div>
+                            <span class="citizen-name">{{ row.name }}</span>
+                        </div>
                     </td>
                 </ng-container>
 
@@ -63,8 +67,17 @@
                     </td>
                 </ng-container>
 
-                <tr *matHeaderRowDef="displayedColumns; sticky: true" mat-header-row></tr>
-                <tr (click)="onRowClick(row)" *matRowDef="let row; columns: displayedColumns"
+                <ng-container matColumnDef="note">
+                    <th *matHeaderCellDef i18n mat-header-cell>Note</th>
+                    <td (click)="$event.stopPropagation()" *matCellDef="let row" mat-cell>
+                        @if (row.id !== myUserId) {
+                            <mho-note-icon [note]="userNotes()[row.id]?.note ?? null" (clicked)="openUserNote(row.id)"/>
+                        }
+                    </td>
+                </ng-container>
+
+                <tr *matHeaderRowDef="displayedColumns(); sticky: true" mat-header-row></tr>
+                <tr (click)="onRowClick(row)" *matRowDef="let row; columns: displayedColumns()"
                     class="clickable-row"
                     mat-row></tr>
 
@@ -72,7 +85,7 @@
 
             @if (!loading() && citizens().length === 0) {
                 <div class="citizen-list__empty">
-                    <mat-icon fontSet="material-symbols-outlined">group</mat-icon>
+                    <mat-icon>group</mat-icon>
                     <ng-container i18n>Aucun citoyen trouvé</ng-container>
                 </div>
             }

@@ -20,6 +20,7 @@ import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
@@ -33,22 +34,26 @@ import { Router } from '@angular/router';
 import { catchError, debounceTime, EMPTY, finalize, forkJoin, of } from 'rxjs';
 
 import { HORDES_IMG_REPO } from '../../_abstract_model/const';
+import { NoteDTO } from '../../_abstract_model/dto/note.dto';
 import { SeasonPhaseDTO } from '../../_abstract_model/dto/season-phase.dto';
 import { TownListQuery } from '../../_abstract_model/dto/town-list-page.dto';
 import { AdminService } from '../../_abstract_model/services/admin.service';
+import { NoteService } from '../../_abstract_model/services/note.service';
 import { TownService } from '../../_abstract_model/services/town.service';
-import { Imports, TownState, TownTypeId } from '../../_abstract_model/types/_types';
+import { Dictionary, Imports, TownState, TownTypeId } from '../../_abstract_model/types/_types';
 import { TownListItem, TownListPageResult, TownPublicCitizen } from '../../_abstract_model/types/town-list-item.model';
-import { getTown } from '../../_core/utilities/localstorage.util';
+import { getTown, getUserId } from '../../_core/utilities/localstorage.util';
 import { DeferredCellComponent } from '../../_shared/deferred-cell/deferred-cell.component';
+import { NoteDialogComponent, NoteDialogData } from '../../_shared/note-dialog/note-dialog.component';
+import { NoteIconComponent } from '../../_shared/note-icon/note-icon.component';
 
 const angular_common: Imports = [CommonModule, ReactiveFormsModule];
-const components: Imports = [DeferredCellComponent];
+const components: Imports = [DeferredCellComponent, NoteIconComponent, NoteDialogComponent];
 const pipes: Imports = [];
 const material_modules: Imports = [
     MatTableModule, MatSortModule, MatIconModule, MatButtonModule, MatProgressSpinnerModule,
     MatTooltipModule, MatCardModule, MatFormFieldModule, MatPaginatorModule,
-    MatSelectModule, MatInputModule, MatCheckboxModule
+    MatSelectModule, MatInputModule, MatCheckboxModule, MatDialogModule
 ];
 
 @Component({
@@ -65,11 +70,22 @@ export class TownListComponent implements OnInit, AfterViewInit {
     // Jeton de rechargement externe : incrémenté par le parent (import du profil) pour forcer un
     // reload sans changer les filtres. Sa valeur importe peu, seule sa variation déclenche le reload.
     public readonly reloadToken: InputSignal<number> = input<number>(0);
+    // Consultation du profil d'un AUTRE joueur : deux notes distinctes ont un sens (la nôtre sur la
+    // ville, et la nôtre sur ce citoyen précis). Sur notre propre profil ou l'Annuaire général, seule
+    // la note de ville existe.
+    protected readonly isOtherProfile: Signal<boolean> = computed(() => {
+        const id: number | undefined = this.playerId();
+        return id !== undefined && id !== this.myUserId;
+    });
     protected readonly displayedColumns: Signal<string[]> = computed(() => {
-        const cols: string[] = ['id', 'language', 'name', 'size', 'type', 'score', 'citizens', 'state'];
+        const noteCols: string[] = this.isOtherProfile() ? ['noteTown', 'noteCitizen'] : ['noteTown'];
+        const cols: string[] = ['id', 'language', 'name', 'size', 'type', 'score', 'citizens', 'state', ...noteCols];
         return this.isAdmin() ? ['select', ...cols, 'actions'] : cols;
     });
     protected readonly towns: WritableSignal<TownListItem[]> = signal<TownListItem[]>([]);
+    protected readonly townNotes: WritableSignal<Dictionary<NoteDTO>> = signal({});
+    // Notes-citoyen de l'appelant sur le joueur consulté, seulement peuplées quand isOtherProfile().
+    protected readonly citizenNotes: WritableSignal<Dictionary<NoteDTO>> = signal({});
     protected readonly totalCount: WritableSignal<number> = signal(0);
     protected readonly pageIndex: WritableSignal<number> = signal(0);
     protected readonly pageSize: WritableSignal<number> = signal(50);
@@ -123,6 +139,8 @@ export class TownListComponent implements OnInit, AfterViewInit {
     };
     private readonly townService: TownService = inject(TownService);
     private readonly adminService: AdminService = inject(AdminService);
+    private readonly noteService: NoteService = inject(NoteService);
+    private readonly dialog: MatDialog = inject(MatDialog);
     private readonly router: Router = inject(Router);
     private readonly destroy_ref: DestroyRef = inject(DestroyRef);
     @ViewChild(MatSort) private matSort!: MatSort;
@@ -133,6 +151,7 @@ export class TownListComponent implements OnInit, AfterViewInit {
     private readonly typeFilter: WritableSignal<TownTypeId[]> = signal([]);
     private readonly languageFilter: WritableSignal<string[]> = signal([]);
     private readonly stateFilter: WritableSignal<TownState[]> = signal([]);
+    private readonly myUserId: number | null = getUserId();
     private readonly languageFlagMap: Record<string, string> = {
         fr: '🇫🇷',
         en: '🇬🇧',
@@ -189,6 +208,18 @@ export class TownListComponent implements OnInit, AfterViewInit {
         this.filtersForm.controls['state'].valueChanges
             .pipe(takeUntilDestroyed(this.destroy_ref))
             .subscribe((v: TownState[] | null) => { this.stateFilter.set(v ?? []); this.resetAndReload(); });
+
+        // Note de ville : toujours la nôtre sur la ville (Annuaire, notre profil ou celui d'autrui).
+        // Note de citoyen : seulement en consultant le profil d'un AUTRE joueur (isOtherProfile).
+        this.noteService.getMyTownNotes()
+            .pipe(takeUntilDestroyed(this.destroy_ref))
+            .subscribe((notes: Dictionary<NoteDTO>) => this.townNotes.set(notes));
+
+        if (this.isOtherProfile()) {
+            this.noteService.getMyCitizenNotesForUser(this.playerId()!)
+                .pipe(takeUntilDestroyed(this.destroy_ref))
+                .subscribe((notes: Dictionary<NoteDTO>) => this.citizenNotes.set(notes));
+        }
     }
 
     public ngAfterViewInit(): void {
@@ -274,6 +305,41 @@ export class TownListComponent implements OnInit, AfterViewInit {
                 this.importResults.update((r) => ({ ...r, [townId]: 'success' }));
                 this.reload();
             });
+    }
+
+    /** Ouvre l'édition de la note-ville de l'appelant sur cette ville, puis la persiste si modifiée. */
+    protected openTownNote(mapId: number): void {
+        const data: NoteDialogData = { initialContent: this.townNotes()[mapId]?.note ?? null };
+        this.dialog.open(NoteDialogComponent, { data })
+            .afterClosed()
+            .pipe(takeUntilDestroyed(this.destroy_ref))
+            .subscribe((content: string | undefined) => {
+                if (content === undefined) return;
+                this.noteService.saveTownNote(mapId, content)
+                    .pipe(takeUntilDestroyed(this.destroy_ref))
+                    .subscribe(() => this.townNotes.update((notes) => ({ ...notes, [mapId]: { note: content } })));
+            });
+    }
+
+    /** Ouvre l'édition de la note-citoyen de l'appelant sur le joueur consulté, pour cette ville. */
+    protected openCitizenNote(mapId: number): void {
+        const playerId: number | undefined = this.playerId();
+        if (playerId === undefined) return;
+        const data: NoteDialogData = { initialContent: this.citizenNotes()[mapId]?.note ?? null };
+        this.dialog.open(NoteDialogComponent, { data })
+            .afterClosed()
+            .pipe(takeUntilDestroyed(this.destroy_ref))
+            .subscribe((content: string | undefined) => {
+                if (content === undefined) return;
+                this.noteService.saveCitizenNote(playerId, mapId, content)
+                    .pipe(takeUntilDestroyed(this.destroy_ref))
+                    .subscribe(() => this.citizenNotes.update((notes) => ({ ...notes, [mapId]: { note: content } })));
+            });
+    }
+
+    /** Note ville/citoyen : n'ont de sens que sur une ville où l'appelant a lui-même été citoyen. */
+    protected hasParticipated(row: TownListItem): boolean {
+        return row.citizens.some((c: TownPublicCitizen) => c.id === this.myUserId);
     }
 
     protected getCitizensTooltip(citizens: TownPublicCitizen[]): string {

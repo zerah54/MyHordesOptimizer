@@ -3,7 +3,7 @@
         <ng-container i18n>Chances de survie</ng-container>
 
         <button mat-icon-button type="button" (click)="createSimulation()" matTooltip="Ajouter une simulation" i18n-matTooltip>
-            <mat-icon fontSet="material-symbols-outlined">add</mat-icon>
+            <mat-icon>add</mat-icon>
         </button>
     </mat-card-title>
 
@@ -26,20 +26,20 @@
                             <mat-form-field class="short-bottom">
                                 <input matInput [(ngModel)]="simulation.title">
                                 <button mat-icon-button type="button" matSuffix (click)="simulation.editing_title = !simulation.editing_title">
-                                    <mat-icon fontSet="material-symbols-outlined">done</mat-icon>
+                                    <mat-icon>done</mat-icon>
                                 </button>
                             </mat-form-field>
                         }
                         <button mat-icon-button type="button" (click)="simulation.show_detail = !simulation.show_detail">
                             @if (simulation.show_detail) {
-                                <mat-icon fontSet="material-symbols-outlined">visibility</mat-icon>
+                                <mat-icon>visibility</mat-icon>
                             } @else {
-                                <mat-icon fontSet="material-symbols-outlined">visibility_off</mat-icon>
+                                <mat-icon>visibility_off</mat-icon>
                             }
                         </button>
                         @if (simulation.show_detail) {
                             <button mat-icon-button type="button" (click)="deleteSimulation(i)">
-                                <mat-icon fontSet="material-symbols-outlined">delete</mat-icon>
+                                <mat-icon>delete</mat-icon>
                             </button>
                         }
                     </div>

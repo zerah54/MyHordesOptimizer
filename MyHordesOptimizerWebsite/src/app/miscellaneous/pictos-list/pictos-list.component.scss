@@ -24,6 +24,15 @@
             border-color: var(--mat-sys-tertiary);
         }
     }
+
+    &--compact {
+        grid-template-columns: repeat(auto-fill, minmax(64px, 1fr));
+
+        .pictos-list__item {
+            justify-content: center;
+            padding: 4px;
+        }
+    }
 }
 
 .picto {
@@ -43,8 +52,19 @@
         font-weight: 500;
     }
 
+    &__totals {
+        flex: none;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+    }
+
     &__total {
         font-size: 0.75rem;
         color: var(--mat-sys-on-surface-variant);
+
+        &--unknown {
+            font-style: italic;
+        }
     }
 }

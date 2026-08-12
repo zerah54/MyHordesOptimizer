@@ -1,0 +1,10 @@
+<div mat-dialog-title i18n>Note</div>
+<mat-dialog-content>
+    <mat-form-field appearance="outline" class="mho-note-field">
+        <textarea matInput [(ngModel)]="content"></textarea>
+    </mat-form-field>
+</mat-dialog-content>
+<div mat-dialog-actions [align]="'end'">
+    <button mat-button type="button" mat-dialog-close i18n>Annuler</button>
+    <button mat-raised-button type="button" color="accent" [mat-dialog-close]="content" i18n>Enregistrer</button>
+</div>

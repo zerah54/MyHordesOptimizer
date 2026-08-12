@@ -226,6 +226,7 @@ builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
 builder.Services.AddScoped<IExpeditionService, ExpeditionService>();
 builder.Services.AddScoped<ITownService, TownService>();
 builder.Services.AddScoped<IUserAccountService, UserAccountService>();
+builder.Services.AddScoped<INoteService, NoteService>();
 
 // Add the discord client to services
 builder.Services.AddSingleton(new DiscordSocketClient(new DiscordSocketConfig

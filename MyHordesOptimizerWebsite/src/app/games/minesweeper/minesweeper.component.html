@@ -5,7 +5,7 @@
     }
     <div class="actions">
         <button mat-icon-button type="button" (click)="openLeaderboard()" matTooltip="Classement" i18n-matTooltip>
-            <mat-icon fontSet="material-symbols-outlined">trophy</mat-icon>
+            <mat-icon>trophy</mat-icon>
         </button>
         @if (false) {
             <mat-slide-toggle
@@ -23,22 +23,22 @@
             </mat-button-toggle>
         </mat-button-toggle-group>
         <button mat-stroked-button [matMenuTriggerFor]="difficultyMenu">
-            <mat-icon fontSet="material-symbols-outlined">expand_more</mat-icon>
-            <mat-icon fontSet="material-symbols-outlined">settings</mat-icon>
+            <mat-icon>expand_more</mat-icon>
+            <mat-icon>settings</mat-icon>
             {{ selected_size().label }}
         </button>
         <mat-menu #difficultyMenu="matMenu" xPosition="before">
             @for (size of sizes_list(); track size.id) {
                 @if (size.id !== 'custom') {
                     <button mat-menu-item [disabled]="isAlreadyPlayedToday(size.id)" (click)="resetGame(size)">
-                        <mat-icon fontSet="material-symbols-outlined">
+                        <mat-icon>
                             {{ selected_size().id === size.id ? 'check' : (isAlreadyPlayedToday(size.id) ? 'block' : '') }}
                         </mat-icon>
                         {{ size.label }}
                     </button>
                 } @else if (game_mode() === 'normal') {
                     <button mat-menu-item (click)="resetGame(size); $event.stopImmediatePropagation();">
-                        <mat-icon fontSet="material-symbols-outlined">{{ selected_size().id === 'custom' ? 'check' : '' }}</mat-icon>
+                        <mat-icon>{{ selected_size().id === 'custom' ? 'check' : '' }}</mat-icon>
                         {{ size.label }}
                     </button>
                     @if (selected_size().id === 'custom') {
@@ -46,19 +46,19 @@
                              (click)="$event.stopImmediatePropagation();">
                             <mat-form-field subscriptSizing="dynamic" appearance="outline" style="width: 100px">
                                 <mat-label>
-                                    <mat-icon fontSet="material-symbols-outlined">arrow_range</mat-icon>
+                                    <mat-icon>arrow_range</mat-icon>
                                 </mat-label>
                                 <input matInput type="number" [ngModel]="selected_size().width" (ngModelChange)="resetGame({width: $event})">
                             </mat-form-field>
                             <mat-form-field subscriptSizing="dynamic" appearance="outline" style="width: 100px">
                                 <mat-label>
-                                    <mat-icon fontSet="material-symbols-outlined">height</mat-icon>
+                                    <mat-icon>height</mat-icon>
                                 </mat-label>
                                 <input matInput type="number" [ngModel]="selected_size().height" (ngModelChange)="resetGame({height: $event})">
                             </mat-form-field>
                             <mat-form-field subscriptSizing="dynamic" appearance="outline" style="width: 100px">
                                 <mat-label>
-                                    <mat-icon fontSet="material-symbols-outlined">bomb</mat-icon>
+                                    <mat-icon>bomb</mat-icon>
                                 </mat-label>
                                 <input matInput type="number" [ngModel]="selected_size().mines" (ngModelChange)="resetGame({mines: $event})">
                             </mat-form-field>
@@ -86,19 +86,19 @@
                         <div class="zoom-controls">
                             <button mat-icon-button type="button" [disabled]="zoom_level() <= 100" (click)="decreaseZoom()" matTooltip="Réduire le zoom"
                                     i18n-matTooltip>
-                                <mat-icon fontSet="material-symbols-outlined">remove</mat-icon>
+                                <mat-icon>remove</mat-icon>
                             </button>
                             <button mat-icon-button type="button" (click)="increaseZoom()" matTooltip="Agrandir le zoom" i18n-matTooltip>
-                                <mat-icon fontSet="material-symbols-outlined">add</mat-icon>
+                                <mat-icon>add</mat-icon>
                             </button>
                         </div>
                         @if (is_fullscreen()) {
                             <button mat-icon-button type="button" (click)="closeFullscreen()" matTooltip="Quitter le plein écran" i18n-matTooltip>
-                                <mat-icon fontSet="material-symbols-outlined">fullscreen_exit</mat-icon>
+                                <mat-icon>fullscreen_exit</mat-icon>
                             </button>
                         } @else {
                             <button mat-icon-button type="button" (click)="openFullscreen()" matTooltip="Plein écran" i18n-matTooltip>
-                                <mat-icon fontSet="material-symbols-outlined">fullscreen</mat-icon>
+                                <mat-icon>fullscreen</mat-icon>
                             </button>
                         }
                     </div>
@@ -190,15 +190,15 @@
                 </mat-button-toggle>
             </mat-button-toggle-group>
             <button mat-stroked-button [matMenuTriggerFor]="leaderboardSizeMenu">
-                <mat-icon fontSet="material-symbols-outlined">expand_more</mat-icon>
-                <mat-icon fontSet="material-symbols-outlined">settings</mat-icon>
+                <mat-icon>expand_more</mat-icon>
+                <mat-icon>settings</mat-icon>
                 {{ leaderboardSizeLabel() }}
             </button>
             <mat-menu #leaderboardSizeMenu="matMenu" xPosition="before">
                 @for (size of sizes_list(); track size.id) {
                     @if (size.id !== 'custom') {
                         <button mat-menu-item (click)="leaderboard_size_id.set(size.id)">
-                            <mat-icon fontSet="material-symbols-outlined">{{ leaderboard_size_id() === size.id ? 'check' : '' }}</mat-icon>
+                            <mat-icon>{{ leaderboard_size_id() === size.id ? 'check' : '' }}</mat-icon>
                             {{ size.label }}
                         </button>
                     }

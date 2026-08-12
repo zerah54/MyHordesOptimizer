@@ -2,7 +2,7 @@
     <mat-card-title i18n>Carte des fouilles</mat-card-title>
     <div>
         <button mat-icon-button type="button" (click)="sidenav.toggle()">
-            <mat-icon fontSet="material-symbols-outlined">settings</mat-icon>
+            <mat-icon>settings</mat-icon>
         </button>
     </div>
 </mat-card-header>
@@ -53,7 +53,7 @@
                 <h2 i18n>Afficher les zones en distance</h2>
                 <div class="dist-zones">
                     <button mat-button type="button" [matMenuTriggerFor]="addZone">
-                        <mat-icon fontSet="material-symbols-outlined">add</mat-icon>
+                        <mat-icon>add</mat-icon>
                         <ng-container i18n>Ajouter une zone</ng-container>
                     </button>
                     <mat-menu #addZone="matMenu">
@@ -79,7 +79,7 @@
                         @for (option of options.distances; track option) {
                             <mat-list-item>
                                 <button mat-icon-button type="button" matListItemIcon (click)="removeDistanceFromList(option)">
-                                    <mat-icon fontSet="material-symbols-outlined">delete</mat-icon>
+                                    <mat-icon>delete</mat-icon>
                                 </button>
                                 <div matListItemTitle>{{ option.value }}&nbsp;{{ option.unit }}</div>
                                 @if (option.unit === 'pa') {

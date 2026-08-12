@@ -1,6 +1,7 @@
 import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideRouter, Router } from '@angular/router';
 
 import { DailyActionEnum } from '../../../_abstract_model/enum/daily-action.enum';
 import { Citizen } from '../../../_abstract_model/types/citizen.class';
@@ -16,6 +17,7 @@ interface TestableComponent {
     citizenBoolValue(citizen: Citizen, id: string): boolean | null;
     getDailyAction(citizen: Citizen, action: DailyActionEnum): { element: DailyActionEnum; value: boolean };
     saveDailyAction(actionKey: string, checked: boolean, citizenId: number): void;
+    goToProfile(userId: number): void;
 }
 
 describe('CitizensListComponent', (): void => {
@@ -26,7 +28,7 @@ describe('CitizensListComponent', (): void => {
     beforeEach(async (): Promise<void> => {
         await TestBed.configureTestingModule({
             imports: [CitizensListComponent],
-            providers: [provideHttpClient(), provideHttpClientTesting()]
+            providers: [provideHttpClient(), provideHttpClientTesting(), provideRouter([])]
         }).compileComponents();
 
         fixture = TestBed.createComponent(CitizensListComponent);
@@ -87,5 +89,24 @@ describe('CitizensListComponent', (): void => {
         testable.citizen_list = { data: [citizen] };
 
         expect((): void => testable.saveDailyAction?.('home_shower', true, 42)).not.toThrow();
+    });
+
+    // openNote lit getTown() (localStorage) en interne, comme openPictos : sans ville courante en
+    // environnement de test, il ressort tôt sans ouvrir de dialog — smoke-test au même niveau que
+    // saveDailyAction ci-dessus, pas une vérification du contenu de la modale.
+    it('openNote does not throw when called with a citizen', (): void => {
+        const citizen: Citizen = new Citizen();
+        citizen.id = 42;
+
+        expect((): void => (component as unknown as { openNote(c: Citizen): void }).openNote(citizen)).not.toThrow();
+    });
+
+    it('goToProfile navigates to the profile page of the citizen', (): void => {
+        const router: Router = TestBed.inject(Router);
+        const navigateSpy: jasmine.Spy = spyOn(router, 'navigate');
+
+        testable.goToProfile(42);
+
+        expect(navigateSpy).toHaveBeenCalledWith(['/profile', 42]);
     });
 });

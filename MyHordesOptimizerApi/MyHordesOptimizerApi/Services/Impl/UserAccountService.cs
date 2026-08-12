@@ -163,8 +163,18 @@ public class UserAccountService : IUserAccountService
                 .ToDictionary(townPicto => townPicto.IdPicto, townPicto => townPicto.Count)
             : new Dictionary<int, int>();
 
+        // Tous les citoyens de la ville, celui consulté inclus : distinct de countInTownByPictoId,
+        // qui ne porte que sur lui.
+        var townTotalByPictoId = resolvedTownId.HasValue
+            ? DbContext.TownCitizenPictos
+                .Where(townPicto => townPicto.IdTown == resolvedTownId.Value)
+                .GroupBy(townPicto => townPicto.IdPicto)
+                .ToDictionary(group => group.Key, group => group.Sum(townPicto => townPicto.Count))
+            : new Dictionary<int, int>();
+
         // Une ville peut contenir un picto absent du total (total jamais importé) et le total peut
-        // contenir des pictos gagnés dans des villes qu'on n'a jamais vues : on part de l'union.
+        // contenir des pictos gagnés dans des villes qu'on n'a jamais vues : on n'affiche que les
+        // pictos de la question posée (ville si townId, sinon total), pas leur union.
         var pictoIds = townId.HasValue
             ? countInTownByPictoId.Keys.ToList()
             : totalByPictoId.Keys.ToList();
@@ -191,9 +201,12 @@ public class UserAccountService : IUserAccountService
                     { "es", picto.DescEs },
                     { "de", picto.DescDe }
                 },
-                Count = totalByPictoId.TryGetValue(picto.IdPicto, out var total) ? total : 0,
+                Count = totalByPictoId.TryGetValue(picto.IdPicto, out var total) ? total : (int?)null,
                 CountInTown = townId.HasValue
                     ? countInTownByPictoId.TryGetValue(picto.IdPicto, out var inTown) ? inTown : 0
+                    : null,
+                TownTotalCount = townId.HasValue
+                    ? townTotalByPictoId.TryGetValue(picto.IdPicto, out var townTotal) ? townTotal : 0
                     : null
             })
             .OrderByDescending(picto => townId.HasValue ? picto.CountInTown : picto.Count)

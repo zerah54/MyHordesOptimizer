@@ -1,0 +1,6 @@
+<div class="mho-tiptap-editor">
+    @if (editor(); as editorInstance) {
+        <mho-tiptap-toolbar [editor]="editorInstance"/>
+    }
+    <div #editorHost class="mho-tiptap-content"></div>
+</div>

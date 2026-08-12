@@ -4,13 +4,13 @@
             <img class="header-icon" [src]="HORDES_IMG_REPO + headerImg()" [alt]="headerTooltip() || header()"
                  [matTooltip]="headerTooltip() || ''">
         } @else if (headerIconName()) {
-            <mat-icon class="header-icon" fontSet="material-symbols-outlined" [matTooltip]="headerTooltip() || ''">{{ headerIconName() }}</mat-icon>
+            <mat-icon class="header-icon" [matTooltip]="headerTooltip() || ''">{{ headerIconName() }}</mat-icon>
         } @else {
             {{ header() }}
         }
 
         @if (!visible && filterValue() === null) {
-            <mat-icon fontSet="material-symbols-outlined" class="open-menu-icon"
+            <mat-icon class="open-menu-icon"
                       (click)="$event.preventDefault(); $event.stopPropagation(); displayFilter()">
                 filter_alt
             </mat-icon>

@@ -668,11 +668,17 @@
             <trans-unit id="7334403395400981068" datatype="html">
                 <source>Aucun picto à afficher.</source>
             </trans-unit>
-            <trans-unit id="783657405301461061" datatype="html">
-                <source>
-                    <x id="INTERPOLATION" equiv-text="{{ picto.count }}"/>
-                    au total
-                </source>
+            <trans-unit id="8616134483369123816" datatype="html">
+                <source>Citoyen :</source>
+            </trans-unit>
+            <trans-unit id="377373638454048817" datatype="html">
+                <source>Total ville :</source>
+            </trans-unit>
+            <trans-unit id="1066863741460846913" datatype="html">
+                <source>Total utilisateur :</source>
+            </trans-unit>
+            <trans-unit id="1737276409111424339" datatype="html">
+                <source>Total utilisateur : non importé</source>
             </trans-unit>
             <trans-unit id="7491144287113751802" datatype="html">
                 <source>Affichage condensé</source>
@@ -1557,6 +1563,9 @@
             </trans-unit>
             <trans-unit id="9108259229885711862" datatype="html">
                 <source>Importer mes données</source>
+            </trans-unit>
+            <trans-unit id="5913328570719280455" datatype="html">
+                <source>Importer les données</source>
             </trans-unit>
             <trans-unit id="5376760805134026394" datatype="html">
                 <source>Utilisateur introuvable.</source>

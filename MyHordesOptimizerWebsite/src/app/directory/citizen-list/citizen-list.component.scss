@@ -30,10 +30,21 @@
         width: 100%;
     }
 
-    .avatar_name {
+    .citizen-cell {
         display: flex;
         align-items: center;
         gap: 0.5em;
+    }
+
+    // Cadre fixe requis : mho-avatar redimensionne par transform, pas par sa boîte de layout
+    // (voir minesweeper-leaderboard .player-avatar), sinon sa boîte 100px pousse le nom.
+    .citizen-avatar {
+        position: relative;
+        width: 25px;
+        height: 25px;
+        overflow: hidden;
+        border-radius: 50%;
+        flex-shrink: 0;
     }
 
     .citizen-name {

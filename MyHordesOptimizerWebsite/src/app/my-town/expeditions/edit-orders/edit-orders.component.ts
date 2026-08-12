@@ -1,5 +1,6 @@
 import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
 import { Component, inject } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatCheckboxModule } from '@angular/material/checkbox';
@@ -9,10 +10,10 @@ import { MatIconModule } from '@angular/material/icon';
 
 import { Imports } from '../../../_abstract_model/types/_types';
 import { ExpeditionOrder } from '../../../_abstract_model/types/expedition-order.class';
-import { EditorComponent } from '../../../_shared/editor/editor.component';
+import { TiptapEditorComponent } from '../../../_shared/tiptap-editor/tiptap-editor.component';
 
-const angular_common: Imports = [];
-const components: Imports = [EditorComponent];
+const angular_common: Imports = [FormsModule];
+const components: Imports = [TiptapEditorComponent];
 const pipes: Imports = [];
 const material_modules: Imports = [DragDropModule, MatButtonModule, MatButtonToggleModule, MatCheckboxModule, MatDialogModule, MatDividerModule, MatIconModule];
 

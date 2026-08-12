@@ -24,15 +24,15 @@
 
         @if (adminService.isAdmin()) {
             <button mat-button type="button" routerLinkActive="link-selected" [routerLink]="['/admin']">
-                <mat-icon fontSet="material-symbols-outlined">lock</mat-icon>
+                <mat-icon>lock</mat-icon>
                 <ng-container i18n>Administration</ng-container>
             </button>
         }
         @if (site_language) {
             <button mat-button type="button" [matMenuTriggerFor]="languageMenu">
-                <mat-icon fontSet="material-symbols-outlined">language</mat-icon>
+                <mat-icon>language</mat-icon>
                 {{ site_language.label }}
-                <mat-icon fontSet="material-symbols-outlined">arrow_drop_down</mat-icon>
+                <mat-icon>arrow_drop_down</mat-icon>
             </button>
             <mat-menu #languageMenu="matMenu">
                 @for (language of language_list; track language.code) {
@@ -44,9 +44,9 @@
             </mat-menu>
         }
         <button mat-button type="button" [matMenuTriggerFor]="themeMenu">
-            <mat-icon fontSet="material-symbols-outlined">palette</mat-icon>
+            <mat-icon>palette</mat-icon>
             {{ selected_theme?.label }}
-            <mat-icon fontSet="material-symbols-outlined">arrow_drop_down</mat-icon>
+            <mat-icon>arrow_drop_down</mat-icon>
         </button>
         <mat-menu #themeMenu="matMenu">
             @for (theme of themes; track theme.class) {
@@ -75,7 +75,7 @@
            (click)="route.expanded = !route.expanded; toggleDisplayChildren(route)" [class]="`lvl-${route.lvl}`">
             <div>
                 @if (route.children && route.children.length > 0) {
-                    <mat-icon fontSet="material-symbols-outlined">{{ route.expanded ? 'expand_more' : 'chevron_right' }}</mat-icon>
+                    <mat-icon>{{ route.expanded ? 'expand_more' : 'chevron_right' }}</mat-icon>
                 }
                 {{ resolveLabel(route) }}
                 @if (route.spoil) {

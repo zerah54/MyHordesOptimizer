@@ -2,13 +2,13 @@
     <mat-card-title>
         <ng-container i18n>Liste de courses</ng-container>
         <button mat-icon-button type="button" matTooltip="Copier au format forum" i18n-matTooltip (click)="shareWishlistForum()">
-            <mat-icon fontSet="material-symbols-outlined">share</mat-icon>
+            <mat-icon>share</mat-icon>
         </button>
     </mat-card-title>
 
     <div class="actions">
         <button mat-icon-button type="button" [matMenuTriggerFor]="shareMenu" matTooltip="Import / Export" i18n-matTooltip>
-            <mat-icon fontSet="material-symbols-outlined">import_export</mat-icon>
+            <mat-icon>import_export</mat-icon>
         </button>
         @if (!is_readonly()) {
             <mat-slide-toggle [(ngModel)]="edition_mode" (ngModelChange)="changeEditionMode()" i18n>Mode édition</mat-slide-toggle>
@@ -87,7 +87,7 @@
                                                  (mousedown)="drag_disabled.set(false)"
                                                  (mouseup)="drag_disabled.set(true)"
                                                  class="dragdrop-indicator">
-                                                <mat-icon fontSet="material-symbols-outlined">drag_indicator</mat-icon>
+                                                <mat-icon>drag_indicator</mat-icon>
                                             </div>
                                         }
                                         @case ('name') {
@@ -179,7 +179,7 @@
                                                 @if (edition_mode()) {
                                                     <mat-checkbox [(ngModel)]="row.should_signal" (ngModelChange)="triggerSave()"></mat-checkbox>
                                                 } @else if (row.should_signal) {
-                                                    <mat-icon fontSet="material-symbols-outlined" matTooltip="Objet à signaler" i18n-matTooltip>
+                                                    <mat-icon matTooltip="Objet à signaler" i18n-matTooltip>
                                                         speaker_notes
                                                     </mat-icon>
                                                 }
@@ -209,7 +209,7 @@
                                         }
                                         @case ('delete') {
                                             <button mat-icon-button type="button" (click)="remove(row)">
-                                                <mat-icon fontSet="material-symbols-outlined">close</mat-icon>
+                                                <mat-icon>close</mat-icon>
                                             </button>
                                         }
                                     }

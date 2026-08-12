@@ -8,7 +8,9 @@
         ],
         "types": [
             "jasmine",
-            "@angular/localize"
+            "node",
+            "@angular/localize",
+            "@webgpu/types"
         ]
     },
     "include": [

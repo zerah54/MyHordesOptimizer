@@ -72,12 +72,21 @@ public class UserPictoDto
     public Dictionary<string, string?> Description { get; set; } = new();
     public bool Rare { get; set; }
 
-    /// <summary>Nombre total obtenu par le joueur, toutes villes confondues.</summary>
-    public int Count { get; set; }
+    /// <summary>
+    /// Nombre total obtenu par le joueur, toutes villes confondues. Null quand le joueur n'a
+    /// jamais lancé l'import de son profil : ce n'est pas un zéro, mais l'absence de la donnée.
+    /// </summary>
+    public int? Count { get; set; }
 
     /// <summary>
-    /// Nombre obtenu dans la ville demandée. Null quand aucune ville n'est demandée : ce n'est
-    /// pas un zéro, mais l'absence de la question.
+    /// Nombre obtenu dans la ville demandée par le citoyen consulté. Null quand aucune ville n'est
+    /// demandée : ce n'est pas un zéro, mais l'absence de la question.
     /// </summary>
     public int? CountInTown { get; set; }
+
+    /// <summary>
+    /// Nombre obtenu dans la ville demandée par l'ensemble de ses citoyens (celui consulté inclus).
+    /// Même règle de nullabilité que <see cref="CountInTown"/>.
+    /// </summary>
+    public int? TownTotalCount { get; set; }
 }

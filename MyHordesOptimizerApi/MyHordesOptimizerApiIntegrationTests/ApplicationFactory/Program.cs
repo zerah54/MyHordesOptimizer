@@ -47,6 +47,12 @@ builder.Services.AddSingleton<IMyHordesApiConfiguration, MyHordesOptimizerApi.Co
 builder.Services.AddScoped<IMyHordesApiRepository, MyHordesApiRepository>();
 builder.Services.AddScoped<ITownService, TownService>();
 
+// Requis par UserAccountServiceTests (Services.Impl.UserAccountService).
+builder.Services.AddScoped<IUserAccountService, UserAccountService>();
+
+// Requis par NoteServiceTests (Services.Impl.NoteService).
+builder.Services.AddScoped<INoteService, NoteService>();
+
 var app = builder.Build();
 app.UseHttpsRedirection();
 app.UseAuthorization();

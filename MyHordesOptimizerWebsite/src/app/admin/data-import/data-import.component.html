@@ -13,18 +13,18 @@
                     <mat-spinner diameter="20"/>
                 } @else {
                     <ng-container>
-                        <mat-icon fontSet="material-symbols-outlined">download</mat-icon>
+                        <mat-icon>download</mat-icon>
                         <ng-container i18n>Importer toutes les données</ng-container>
                     </ng-container>
                 }
             </button>
             @if (getImportResult('all') === 'success') {
-                <mat-icon class="result-icon success" fontSet="material-symbols-outlined"
+                <mat-icon class="result-icon success"
                           matTooltip="Import réussi" i18n-matTooltip>check_circle
                 </mat-icon>
             }
             @if (getImportResult('all') === 'error') {
-                <mat-icon class="result-icon error" fontSet="material-symbols-outlined"
+                <mat-icon class="result-icon error"
                           [matTooltip]="importState('all')?.error ?? 'Erreur lors de l\'import'">error
                 </mat-icon>
             }
@@ -55,18 +55,18 @@
                             <mat-spinner diameter="18"/>
                         } @else {
                             <ng-container>
-                                <mat-icon fontSet="material-symbols-outlined">{{ action.icon }}</mat-icon>
+                                <mat-icon>{{ action.icon }}</mat-icon>
                                 {{ action.label }}
                             </ng-container>
                         }
                     </button>
                     @if (getResult(action.key) === 'success') {
-                        <mat-icon class="result-icon success" fontSet="material-symbols-outlined"
+                        <mat-icon class="result-icon success"
                                   matTooltip="Import réussi" i18n-matTooltip>check_circle
                         </mat-icon>
                     }
                     @if (getResult(action.key) === 'error') {
-                        <mat-icon class="result-icon error" fontSet="material-symbols-outlined"
+                        <mat-icon class="result-icon error"
                                   matTooltip="Erreur lors de l'import" i18n-matTooltip>error
                         </mat-icon>
                     }
@@ -94,9 +94,9 @@
                         <mat-option [value]="season.id">
                             S{{ season.id }}
                             @if (season.isFinished) {
-                                <mat-icon fontSet="material-symbols-outlined"
-                                          class="season-finished-icon"
-                                          matTooltip="Saison terminée" i18n-matTooltip>lock
+                                <mat-icon
+                                    class="season-finished-icon"
+                                    matTooltip="Saison terminée" i18n-matTooltip>lock
                                 </mat-icon>
                             }
                         </mat-option>
@@ -115,18 +115,18 @@
                     <mat-spinner diameter="20"/>
                 } @else {
                     <ng-container>
-                        <mat-icon fontSet="material-symbols-outlined">location_city</mat-icon>
+                        <mat-icon>location_city</mat-icon>
                         <ng-container i18n>Importer les villes</ng-container>
                     </ng-container>
                 }
             </button>
             @if (getImportResult('towns') === 'success') {
-                <mat-icon class="result-icon success" fontSet="material-symbols-outlined"
+                <mat-icon class="result-icon success"
                           matTooltip="Import réussi" i18n-matTooltip>check_circle
                 </mat-icon>
             }
             @if (getImportResult('towns') === 'error') {
-                <mat-icon class="result-icon error" fontSet="material-symbols-outlined"
+                <mat-icon class="result-icon error"
                           [matTooltip]="importState('towns')?.error ?? 'Erreur lors de l\'import'">error
                 </mat-icon>
             }
@@ -143,7 +143,7 @@
         }
         @if (!isImportLoading('towns') && importState('towns')?.warning; as warning) {
             <p class="import-warning">
-                <mat-icon fontSet="material-symbols-outlined">hourglass_top</mat-icon>
+                <mat-icon>hourglass_top</mat-icon>
                 {{ warning }}
             </p>
         }
@@ -166,24 +166,24 @@
                                     <mat-spinner diameter="18"/>
                                 } @else if (season.isFinished) {
                                     <ng-container>
-                                        <mat-icon fontSet="material-symbols-outlined">lock</mat-icon>
+                                        <mat-icon>lock</mat-icon>
                                         <span>S{{ season.id }}</span>
                                     </ng-container>
                                 } @else {
                                     <ng-container>
-                                        <mat-icon fontSet="material-symbols-outlined">lock_open</mat-icon>
+                                        <mat-icon>lock_open</mat-icon>
                                         <span>S{{ season.id }}</span>
                                     </ng-container>
                                 }
                             </button>
                             @if (getFinishResult(season.id) === 'success') {
-                                <mat-icon class="result-icon success" fontSet="material-symbols-outlined"
+                                <mat-icon class="result-icon success"
                                           [matTooltip]="season.isFinished ? 'Saison marquée terminée' : 'Saison marquée non terminée'"
                                           i18n-matTooltip>check_circle
                                 </mat-icon>
                             }
                             @if (getFinishResult(season.id) === 'error') {
-                                <mat-icon class="result-icon error" fontSet="material-symbols-outlined"
+                                <mat-icon class="result-icon error"
                                           matTooltip="Erreur" i18n-matTooltip>error
                                 </mat-icon>
                             }

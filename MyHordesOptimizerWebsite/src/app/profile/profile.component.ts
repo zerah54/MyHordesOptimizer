@@ -3,6 +3,7 @@ import { ChangeDetectionStrategy, Component, DestroyRef, inject, OnInit, signal,
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTabsModule } from '@angular/material/tabs';
@@ -10,15 +11,19 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { ActivatedRoute, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 
 import { environment } from '../../environments/environment';
+import { NoteDTO } from '../_abstract_model/dto/note.dto';
 import { UserAccountPublicDTO } from '../_abstract_model/dto/user-account.dto';
 import { UserPictosDTO } from '../_abstract_model/dto/user-picto.dto';
+import { NoteService } from '../_abstract_model/services/note.service';
 import { UserAccountService } from '../_abstract_model/services/user-account.service';
 import { Imports } from '../_abstract_model/types/_types';
+import { NoteDialogComponent, NoteDialogData } from '../_shared/note-dialog/note-dialog.component';
+import { NoteIconComponent } from '../_shared/note-icon/note-icon.component';
 
 const angular_common: Imports = [CommonModule, RouterLink, RouterLinkActive, RouterOutlet];
-const components: Imports = [];
+const components: Imports = [NoteDialogComponent, NoteIconComponent];
 const pipes: Imports = [];
-const material_modules: Imports = [MatButtonModule, MatCardModule, MatIconModule, MatProgressSpinnerModule, MatTabsModule, MatTooltipModule];
+const material_modules: Imports = [MatButtonModule, MatCardModule, MatDialogModule, MatIconModule, MatProgressSpinnerModule, MatTabsModule, MatTooltipModule];
 
 @Component({
     selector: 'mho-profile',
@@ -35,6 +40,7 @@ export class ProfileComponent implements OnInit {
      */
     public readonly reloadToken: WritableSignal<number> = signal<number>(0);
     protected readonly profile: WritableSignal<UserAccountPublicDTO | null> = signal<UserAccountPublicDTO | null>(null);
+    protected readonly note: WritableSignal<string | null> = signal<string | null>(null);
     protected readonly loading: WritableSignal<boolean> = signal<boolean>(true);
     protected readonly error: WritableSignal<boolean> = signal<boolean>(false);
     /** Date du dernier import MyHordes (pictos + villes), affichée par le bouton de l'en-tête. */
@@ -52,6 +58,8 @@ export class ProfileComponent implements OnInit {
     ];
     private readonly route: ActivatedRoute = inject(ActivatedRoute);
     private readonly service: UserAccountService = inject(UserAccountService);
+    private readonly noteService: NoteService = inject(NoteService);
+    private readonly dialog: MatDialog = inject(MatDialog);
     private readonly destroy_ref: DestroyRef = inject(DestroyRef);
     private readonly myhordes_url: string = environment.myhordes_url;
 
@@ -64,6 +72,10 @@ export class ProfileComponent implements OnInit {
                     this.profile.set(dto);
                     this.importedAt.set(dto.importedAt);
                     this.loading.set(false);
+
+                    this.noteService.getUserNote(user_id)
+                        .pipe(takeUntilDestroyed(this.destroy_ref))
+                        .subscribe((noteDto: NoteDTO) => this.note.set(noteDto.note));
                 },
                 error: () => {
                     this.error.set(true);
@@ -92,6 +104,22 @@ export class ProfileComponent implements OnInit {
                 error: () => {
                     this.importing.set(false);
                 }
+            });
+    }
+
+    /** Ouvre l'édition de la note privée globale de l'appelant sur ce joueur. */
+    protected openNote(): void {
+        const p: UserAccountPublicDTO | null = this.profile();
+        if (!p) return;
+        const data: NoteDialogData = { initialContent: this.note() };
+        this.dialog.open(NoteDialogComponent, { data })
+            .afterClosed()
+            .pipe(takeUntilDestroyed(this.destroy_ref))
+            .subscribe((content: string | undefined) => {
+                if (content === undefined) return;
+                this.noteService.saveUserNote(p.id, content)
+                    .pipe(takeUntilDestroyed(this.destroy_ref))
+                    .subscribe(() => this.note.set(content));
             });
     }
 

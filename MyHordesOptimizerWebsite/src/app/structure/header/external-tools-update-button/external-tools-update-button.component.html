@@ -2,11 +2,11 @@
     @if (isCompact()) {
         <button mat-icon-button type="button" [color]="'accent'" (click)="update()"
                 matTooltip="Mettre à jour les outils externes" i18n-matTooltip="@@mho_external_tools_update_label">
-            <mat-icon fontSet="material-symbols-outlined">send</mat-icon>
+            <mat-icon>send</mat-icon>
         </button>
     } @else {
         <button mat-button type="button" [color]="'accent'" (click)="update()">
-            <mat-icon fontSet="material-symbols-outlined">send</mat-icon>
+            <mat-icon>send</mat-icon>
             <ng-container i18n="@@mho_external_tools_update_label">Mettre à jour les outils externes</ng-container>
         </button>
     }

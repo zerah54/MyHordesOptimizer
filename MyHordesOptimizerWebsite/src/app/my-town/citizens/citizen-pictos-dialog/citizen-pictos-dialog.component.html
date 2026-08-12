@@ -11,5 +11,22 @@
     }
 </div>
 <div mat-dialog-actions>
+    @if (is_logged_in) {
+        <button class="citizen-pictos__import" mat-stroked-button type="button"
+                (click)="triggerImport()" [disabled]="importing()">
+            @if (importing()) {
+                <mat-spinner diameter="18"/>
+            } @else {
+                <span class="citizen-pictos__import-label">
+                    <mat-icon>refresh</mat-icon>
+                    @if (importedAt(); as importedAt) {
+                        <ng-container i18n>À jour au {{ importedAt | date:'short' }}</ng-container>
+                    } @else {
+                        <ng-container i18n>Importer les données</ng-container>
+                    }
+                </span>
+            }
+        </button>
+    }
     <button mat-button type="button" [mat-dialog-close]="true" cdkFocusInitial i18n>Fermer</button>
 </div>

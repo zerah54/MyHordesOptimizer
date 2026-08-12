@@ -10,8 +10,10 @@ export class UserPicto extends CommonModel<UserPictoDTO> {
     private label?: Dictionary<string>;
     private description?: Dictionary<string>;
     public rare!: boolean;
-    public count!: number;
+    /** Null si le joueur n'a jamais lancé l'import de son profil. */
+    public count!: number | null;
     public count_in_town?: number | null;
+    public town_total_count?: number | null;
 
     public constructor(dto?: UserPictoDTO) {
         super();
@@ -27,6 +29,7 @@ export class UserPicto extends CommonModel<UserPictoDTO> {
             rare: this.rare,
             count: this.count,
             countInTown: this.count_in_town,
+            townTotalCount: this.town_total_count,
         };
     }
 
@@ -49,6 +52,7 @@ export class UserPicto extends CommonModel<UserPictoDTO> {
             this.rare = dto.rare;
             this.count = dto.count;
             this.count_in_town = dto.countInTown;
+            this.town_total_count = dto.townTotalCount;
         }
     }
 
