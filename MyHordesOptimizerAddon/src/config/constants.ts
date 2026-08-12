@@ -62,7 +62,10 @@ export const mho_hidden_class = 'mho-hidden';
 export const hordes_img_url = '/build/images/';
 export const repo_img_url = 'https://myhordes-optimizer.web.app/img/';
 export const repo_img_hordes_url = repo_img_url + 'hordes_img/';
+export const chrome_web_store_url = 'https://chromewebstore.google.com/detail/myhordes-optimizer/jolghobcgphmgaiachbipnpiimmgknno';
+export const firefox_amo_url = 'https://addons.mozilla.org/fr/firefox/addon/mho-addon';
 
+export const mh_optimizer_site_url = 'https://myhordes-optimizer.web.app';
 export const mh_optimizer_icon = 'https://myhordes-optimizer.web.app/img/logo/logo_mho_64x64_outlined.png';
 /** Variante 16x16 : à utiliser telle quelle plutôt que de redimensionner l'icône 64x64 en CSS */
 export const mh_optimizer_icon_16x16: string = repo_img_url + 'logo/logo_mho_16x16.png';
@@ -96,6 +99,7 @@ export const mho_display_translate_input_id = 'mho-display-translate-input';
 export const mho_watchtower_estim_id = 'mho-watchtower-estim';
 export const mho_anti_abuse_counter_id = 'mho-anti-abuse-counter';
 export const mho_town_external_links_id = 'mho-town-external-links';
+export const mho_town_note_id = 'mho-town-note';
 export const mho_copy_logs_id = 'mho-copy-logs';
 export const mho_forum_styles_modal_id = 'mho-forum-styles-modal';
 export const mho_double_install_banner_id = 'mho-double-install-banner';

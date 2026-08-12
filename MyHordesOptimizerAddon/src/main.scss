@@ -429,6 +429,28 @@ div.tooltip.item:has(table.recipes) > div:first-of-type {
     border: 1px dashed #ddab76;
 }
 
+.mho-advanced-tooltip .mho-opener-relation-row {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.25em;
+}
+
+.mho-advanced-tooltip .mho-opener-relation {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.25em;
+}
+
+.mho-advanced-tooltip .mho-opener-relation > .item {
+    background-color: #524053;
+    padding: 0.5em;
+    border-radius: 0.25em;
+    display: flex;
+    align-items: center;
+}
+
 div.tooltip.item:has(table.recipes) {
     min-width: 250px !important;
     max-width: 400px !important;
@@ -1527,6 +1549,44 @@ body.mho-spoiler-pin-enabled .forum-post-content .spoiler {
             filter: drop-shadow(0 0 4px rgba(0, 0, 0, 0.6));
             pointer-events: none;
         }
+    }
+}
+
+.mho-note-icon {
+    width: 14px;
+    height: 14px;
+    cursor: pointer;
+    vertical-align: middle;
+    opacity: 1;
+    transition: opacity .15s;
+
+    &.mho-note-icon-empty {
+        opacity: 0.35;
+    }
+
+    &:hover {
+        opacity: 0.8;
+    }
+}
+
+.mho-citizen-note-icon {
+    margin-left: 0.4em;
+}
+
+.mho-note-block {
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
+    margin-top: 0.5em;
+}
+
+.mho-note-text {
+    flex: 1;
+
+    &.mho-note-text-empty {
+        opacity: 0.5;
+        font-style: italic;
+        font-size: 12px;
     }
 }
 

@@ -1,4 +1,12 @@
 export const changelogs: Record<string, string> = {
+    '1.1.55': `
+        [Nouveauté] Ajout de notes personnelles sur les villes, les citoyens d'une ville et les joueurs, via une icône crayon (fenêtre du citoyen, liste des citoyens, page de ville)
+        [Nouveauté] Affichage dans les tooltips du coût / de la chance d'ouverture des contenants à risque (boîtes, coffres...) ainsi que de l'outil requis pour les ouvrir
+        [Nouveauté] Ajout de liens vers la page du joueur et de la page de ville sur MyHordes Optimizer, depuis la bulle du citoyen et le bloc d'outils externes
+        [Nouveauté] Notification lorsqu'une mise à jour du script ou de l'extension est disponible, et lorsqu'une mise à jour vient d'être appliquée
+
+        [Correction] Le bloc "Bâtiment" des informations complémentaires sur la case ne s'affichait pas toujours, et pouvait conserver les informations de l'ancien bâtiment en quittant sa case
+    `,
     '1.1.54': `
         [Nouveauté] Nouvelle options de lecture du forum : afficher les vidéos (youtube) directement dans les posts (pour d'autres providers, contactez moi)
         [Nouveauté] Nouvelle option pour mettre à jour les actions quotidiennes dans MHO. L'envoi de l'information du bain est déplacée dedans, avec le rangement et le nettoyage des vêtements qui font leur apparition

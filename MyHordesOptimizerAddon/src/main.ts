@@ -24,6 +24,7 @@ import { isDoubleInstall } from './utils/double-install-guard';
 import { initOptionsWithLoginNeeded, initOptionsWithoutLoginNeeded } from './utils/fetch';
 import { getTownClockSignature, shouldRefreshMe } from './utils/page';
 import { getStorageItem, setStorageItem } from './utils/storage';
+import { notifyJustUpdated } from './utils/update-notifications';
 import { isNewVersion, toggleNewChangelog } from './utils/version';
 
 ///////////////////////////
@@ -148,6 +149,7 @@ import { isNewVersion, toggleNewChangelog } from './utils/version';
         /** Vérifie si la version est nouvelle ou non */
         const version: string | undefined = await getStorageItem(mho_version_key);
         toggleNewChangelog(isNewVersion(version));
+        notifyJustUpdated(version);
 
         createStyles();
         createOptimizerBtn();

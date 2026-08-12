@@ -473,6 +473,21 @@ export const params_categories: ParamCategory[] = [
                     es: 'Predicciones para acampar en la información del área'
                 },
             },
+            {
+                id: 'display_notes',
+                label: {
+                    en: 'Private notes on towns and players',
+                    fr: 'Notes privées sur les villes et les joueurs',
+                    de: 'Private Notizen zu Städten und Spielern',
+                    es: 'Notas privadas sobre pueblos y jugadores'
+                },
+                help: {
+                    en: 'Add a note on a town, on a citizen for that town, or globally on a player. Only visible to you.',
+                    fr: 'Ajoute une note sur une ville, sur un citoyen pour cette ville, ou globalement sur un joueur. Visible uniquement par vous.',
+                    de: 'Fügt eine Notiz zu einer Stadt, zu einem Bürger für diese Stadt oder allgemein zu einem Spieler hinzu. Nur für Sie sichtbar.',
+                    es: 'Añade una nota sobre un pueblo, sobre un ciudadano para ese pueblo, o globalmente sobre un jugador. Solo visible para ti.'
+                },
+            },
         ]
     },
     {

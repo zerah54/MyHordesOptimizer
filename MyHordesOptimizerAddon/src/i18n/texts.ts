@@ -1,5 +1,4 @@
 import type { I18nLabel } from '../types';
-import { getScriptInfo } from '../utils/version';
 
 ////////////////
 // Les textes //
@@ -53,6 +52,60 @@ export const texts = {
         fr: 'Mettre à jour les outils externes',
         de: 'Externe Tools Aktualisieren',
         es: 'Actualizar aplicaciones externas'
+    },
+    update_available_toast_script: {
+        en: 'A new version of the script is available. Click here to update.',
+        fr: 'Une nouvelle version du script est disponible. Cliquez ici pour la mettre à jour.',
+        de: 'Eine neue Version des Skripts ist verfügbar. Klicken Sie hier, um zu aktualisieren.',
+        es: 'Hay una nueva versión del script disponible. Haga clic aquí para actualizarla.'
+    },
+    update_available_toast_chrome: {
+        en: 'A new version of the extension is available. Click here to check and update.',
+        fr: 'Une nouvelle version de l\'extension est disponible. Cliquez ici pour vérifier et mettre à jour.',
+        de: 'Eine neue Version der Erweiterung ist verfügbar. Klicken Sie hier, um zu prüfen und zu aktualisieren.',
+        es: 'Hay una nueva versión de la extensión disponible. Haga clic aquí para comprobar y actualizar.'
+    },
+    update_available_toast_firefox: {
+        en: 'A new version of the extension is available. Click here to open the extension page.',
+        fr: 'Une nouvelle version de l\'extension est disponible. Cliquez ici pour ouvrir la page de l\'extension.',
+        de: 'Eine neue Version der Erweiterung ist verfügbar. Klicken Sie hier, um die Erweiterungsseite zu öffnen.',
+        es: 'Hay una nueva versión de la extensión disponible. Haga clic aquí para abrir la página de la extensión.'
+    },
+    update_checking_toast: {
+        en: 'Checking for an update...',
+        fr: 'Vérification de la disponibilité d\'une mise à jour...',
+        de: 'Suche nach einem Update...',
+        es: 'Buscando una actualización...'
+    },
+    update_not_yet_on_store_toast: {
+        en: 'The update is not yet available on the store. Try again later.',
+        fr: 'La mise à jour n\'est pas encore disponible sur le store. Réessayez plus tard.',
+        de: 'Das Update ist im Store noch nicht verfügbar. Versuchen Sie es später erneut.',
+        es: 'La actualización aún no está disponible en la tienda. Inténtalo de nuevo más tarde.'
+    },
+    update_check_unknown_toast: {
+        en: 'Unable to check right now. Try again later.',
+        fr: 'Impossible de vérifier pour le moment. Réessayez plus tard.',
+        de: 'Überprüfung derzeit nicht möglich. Versuchen Sie es später erneut.',
+        es: 'No se puede comprobar en este momento. Inténtalo de nuevo más tarde.'
+    },
+    update_throttled_toast: {
+        en: 'Too many recent checks. Try again later.',
+        fr: 'Trop de vérifications récentes. Réessayez plus tard.',
+        de: 'Zu viele kürzliche Überprüfungen. Versuchen Sie es später erneut.',
+        es: 'Demasiadas comprobaciones recientes. Inténtalo de nuevo más tarde.'
+    },
+    update_ready_refresh_toast: {
+        en: 'Update ready: refresh the game page to apply it.',
+        fr: 'Mise à jour prête : rafraîchissez la page du jeu pour l\'appliquer.',
+        de: 'Update bereit: aktualisieren Sie die Spielseite, um es anzuwenden.',
+        es: 'Actualización lista: actualice la página del juego para aplicarla.'
+    },
+    just_updated_toast: {
+        en: 'MyHordes Optimizer has just been updated to version $version$. Click here to see what\'s new.',
+        fr: 'MyHordes Optimizer vient d\'être mis à jour vers la version $version$. Cliquez ici pour voir les nouveautés.',
+        de: 'MyHordes Optimizer wurde gerade auf Version $version$ aktualisiert. Klicken Sie hier, um die Neuigkeiten zu sehen.',
+        es: 'MyHordes Optimizer se acaba de actualizar a la versión $version$. Haga clic aquí para ver las novedades.'
     },
     update_external_tools_pending_btn_label: {
         en: 'Updating...',
@@ -377,6 +430,18 @@ export const texts = {
         fr: 'Pas de note pour cette case',
         de: 'Keine Hinweis für diese Box',
         es: 'No hay nota para esta caja'
+    },
+    note_label: {
+        en: 'Note',
+        fr: 'Note',
+        de: 'Notiz',
+        es: 'Nota'
+    },
+    note_empty: {
+        en: 'No note',
+        fr: 'Aucune note',
+        de: 'Keine Notiz',
+        es: 'Sin nota'
     },
     ruin_dried: {
         en: 'The ruin is empty',
@@ -1000,10 +1065,16 @@ export const api_texts = {
         es: 'Tu script no está actualizado (su versión: $your_version$ / versión más reciente: $recent_version$).<br /><br />Es posible que algunas funciones no funcionen.<br /><br />Actualice el script para que ya no vea este error.'
     },
     update_script: {
-        en: `To update your script, you can use your extension's update functionality or <a target="_blank" href="${getScriptInfo().updateURL}" style="text-decoration: underline;"><i >click on this link</i></a>, then refresh the game page.`,
-        fr: `Pour mettre votre script à jour, vous pouvez utiliser la fonctionnalité de mise à jour de votre extension ou <a target="_blank" href="${getScriptInfo().updateURL}" style="text-decoration: underline;"><i>cliquer sur ce lien</i></a>, puis rafraîchir la page du jeu.`,
-        de: `Um Ihr Skript zu aktualisieren, können Sie die Aktualisierungsfunktion Ihrer Erweiterung verwenden oder <a target="_blank" href="${getScriptInfo().updateURL}" style="text-decoration: underline;"><i >auf diesen Link klicken</ i></a>, dann aktualisiere die Spieleseite.`,
-        es: `Para actualizar su secuencia de comandos, puede utilizar la función de actualización de su extensión o <a target="_blank" href="${getScriptInfo().updateURL}" style="text-decoration: underline;"><i >haga clic en este enlace</ i></a>, luego actualiza la página del juego.`
+        en: 'To update your script, you can use your extension\'s update functionality or <a target="_blank" href="$update_url$" style="text-decoration: underline;"><i >click on this link</i></a>, then refresh the game page.',
+        fr: 'Pour mettre votre script à jour, vous pouvez utiliser la fonctionnalité de mise à jour de votre extension ou <a target="_blank" href="$update_url$" style="text-decoration: underline;"><i>cliquer sur ce lien</i></a>, puis rafraîchir la page du jeu.',
+        de: 'Um Ihr Skript zu aktualisieren, können Sie die Aktualisierungsfunktion Ihrer Erweiterung verwenden oder <a target="_blank" href="$update_url$" style="text-decoration: underline;"><i >auf diesen Link klicken</ i></a>, dann aktualisiere die Spieleseite.',
+        es: 'Para actualizar su secuencia de comandos, puede utilizar la función de actualización de su extensión o <a target="_blank" href="$update_url$" style="text-decoration: underline;"><i >haga clic en este enlace</ i></a>, luego actualiza la página del juego.'
+    },
+    update_script_via_menu: {
+        en: 'To update your extension, open the addon menu and use the "Update available" entry, or wait: it installs automatically.',
+        fr: 'Pour mettre à jour votre extension, ouvrez le menu de l\'addon et utilisez l\'entrée « Mise à jour disponible », ou patientez : elle s\'installe automatiquement.',
+        de: 'Um Ihre Erweiterung zu aktualisieren, öffnen Sie das Add-on-Menü und verwenden Sie den Eintrag „Update verfügbar“, oder warten Sie: sie installiert sich automatisch.',
+        es: 'Para actualizar tu extensión, abre el menú del addon y utiliza la entrada "Actualización disponible", o espera: se instala automáticamente.'
     },
     error_discord: {
         en: 'If the error persists, please let us know on <a href="https://discord.gg/ZQH7ZPWcCm">Discord</a>.',
@@ -1175,3 +1246,36 @@ export const wishlist_headers: { label: I18nLabel; id: string }[] = [
         id: 'delete'
     },
 ];
+
+export const opener_relation_texts = {
+    opened_with: {
+        en: 'Opened by',
+        fr: 'Ouvert par',
+        de: 'Geöffnet von',
+        es: 'Abierto por'
+    },
+    free_to_open: {
+        en: 'Can be opened for free',
+        fr: 'Peut être ouvert gratuitement',
+        de: 'Kann kostenlos geöffnet werden',
+        es: 'Se puede abrir gratis'
+    },
+    open_cost: {
+        en: 'Opening',
+        fr: 'Ouverture',
+        de: 'Öffnen',
+        es: 'Apertura'
+    },
+    technician_alternative: {
+        en: 'or',
+        fr: 'ou',
+        de: 'oder',
+        es: 'o'
+    },
+    opens: {
+        en: 'Opens',
+        fr: 'Ouvre',
+        de: 'Öffnet',
+        es: 'Abre'
+    }
+};

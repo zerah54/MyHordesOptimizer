@@ -15,7 +15,7 @@ export function convertResponsePromiseToError(response: any): Promise<any> {
     });
 }
 
-export function getErrorFromApi(error) {
+export function getErrorFromApi(error): string | undefined {
     if (error.name !== 'AbortError' && error.name !== 'TypeError') {
         let error_text = '';
         error_text += `
@@ -23,7 +23,7 @@ export function getErrorFromApi(error) {
             <br />`;
         if (!isScriptVersionLastVersion()) {
             error_text += `<div><small>${getI18N(api_texts.error_version).replace('$your_version$', getScriptInfo().version).replace('$recent_version$', state.parameters?.find((param) => param.name === 'ScriptVersion')?.value)}</small></div>`;
-            error_text += `<small>${getI18N(api_texts.update_script)}</small>`;
+            error_text += `<small>${isScript() ? getI18N(api_texts.update_script).replace('$update_url$', getScriptInfo().updateURL ?? '') : getI18N(api_texts.update_script_via_menu)}</small>`;
         }
         error_text += `<div><small>${getI18N(api_texts.error_discord)}</small><div>`;
         return error_text;
@@ -31,9 +31,9 @@ export function getErrorFromApi(error) {
 }
 
 export function isScriptVersionLastVersion() {
-    if (!isScript()) return true;
-
     const current_script_version = getScriptInfo().version;
+    if (!current_script_version) return true;
+
     const base_script_version = state.parameters?.find((param) => param.name === 'ScriptVersion')?.value;
     if (!base_script_version) return true;
 
@@ -41,13 +41,16 @@ export function isScriptVersionLastVersion() {
     const splitted_current = current_script_version.match(comparison_regex);
     const splitted_base = base_script_version.match(comparison_regex);
 
-    return splitted_base.every((part, index) => {
-        const is_ok = !splitted_current[index] || splitted_current[index] >= part;
-        if (!is_ok) {
+    for (let index = 0; index < splitted_base.length; index++) {
+        const current_part = Number(splitted_current[index] ?? 0);
+        const base_part = Number(splitted_base[index]);
+        if (current_part > base_part) return true;
+        if (current_part < base_part) {
             toggleNewVersion(true);
+            return false;
         }
-        return is_ok;
-    });
+    }
+    return true;
 }
 
 export function isNewVersion(version) {
@@ -143,6 +146,7 @@ export function getScriptInfo() {
         }
     }
 
+    return {};
 }
 
 export function getChangelog(): string {

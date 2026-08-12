@@ -1,11 +1,11 @@
-import { gm_mh_external_app_id_key, mho_version_key, repo_img_url } from '../config/constants';
+import { firefox_amo_url, gm_mh_external_app_id_key, repo_img_url } from '../config/constants';
 import { texts } from '../i18n/texts';
 import { state } from '../state';
 import type { InformationDefinition } from '../types';
-import { showChangelogModal } from '../ui/window';
 import { getI18N } from '../utils/i18n';
-import { getStorageItem, setStorageItem } from '../utils/storage';
-import { getChangelog, getScriptInfo, isNewVersion, isScript, isScriptVersionLastVersion, toggleNewChangelog } from '../utils/version';
+import { setStorageItem } from '../utils/storage';
+import { openChangelogAndMarkSeen, triggerChromeUpdateCheck } from '../utils/update-notifications';
+import { getOrigin, getScriptInfo, isScript, isScriptVersionLastVersion } from '../utils/version';
 
 export const informations: InformationDefinition[] = [
     {
@@ -17,19 +17,7 @@ export const informations: InformationDefinition[] = [
             es: `Notas de la versión ${getScriptInfo().version}`
         },
         src: undefined,
-        action: () => {
-            getStorageItem(mho_version_key).then((version) => {
-                if (isNewVersion(version)) {
-                    showChangelogModal(getChangelog(), () => {
-                        version[getScriptInfo().version] = true;
-                        toggleNewChangelog(false);
-                        setStorageItem(mho_version_key, version);
-                    });
-                } else {
-                    showChangelogModal(getChangelog());
-                }
-            });
-        },
+        action: () => openChangelogAndMarkSeen(),
         img: 'emotes/rptext.gif'
     },
     {
@@ -40,10 +28,10 @@ export const informations: InformationDefinition[] = [
             de: 'Update verfügbar',
             es: 'Actualización disponible'
         },
-        src: isScript() ? getScriptInfo().updateURL : undefined,
-        action: undefined,
+        src: isScript() ? getScriptInfo().updateURL : (getOrigin() === 'firefox' ? firefox_amo_url : undefined),
+        action: getOrigin() === 'chrome' ? (): void => triggerChromeUpdateCheck() : undefined,
         img: 'icons/small_news.gif',
-        display: () => isScript() && !isScriptVersionLastVersion()
+        display: () => !isScriptVersionLastVersion()
     },
     {
         id: 'discord-url-id',

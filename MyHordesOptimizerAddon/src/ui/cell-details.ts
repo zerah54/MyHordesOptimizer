@@ -12,6 +12,73 @@ import { unwatchRendered, watchMap } from '../utils/render-watch';
 let is_loading_map: boolean = false;
 let is_loading_ruins: boolean = false;
 
+const cell_informations_content_id: string = 'cell-informations-content';
+
+/**
+ * Crée une sous-section (titre + zone de contenu) dans le conteneur donné.
+ * @param container Élément dans lequel insérer la sous-section
+ * @param id Identifiant DOM de la sous-section, réutilisé en suffixe pour le titre et le contenu
+ * @param title Libellé affiché en titre de la sous-section
+ */
+function createSubBlock(container: Element, id: string, title: string): void {
+    const sub_block: HTMLDivElement = document.createElement('div');
+    sub_block.id = id;
+    container.appendChild(sub_block);
+
+    const sub_block_header: HTMLHeadingElement = document.createElement('h5');
+    sub_block_header.id = id + '-header';
+    sub_block_header.style.marginTop = '0';
+    sub_block_header.style.borderBottomWidth = '1px';
+    sub_block_header.style.fontWeight = 'normal';
+    sub_block_header.innerText = title;
+    sub_block.appendChild(sub_block_header);
+
+    const sub_block_content: HTMLDivElement = document.createElement('div');
+    sub_block_content.id = id + '-content';
+    sub_block.appendChild(sub_block_content);
+}
+
+/**
+ * Crée la sous-section « Bâtiment » si la case courante a un bâtiment identifié et que la
+ * sous-section n'existe pas déjà. Appelée à chaque rendu (pas seulement à la création du
+ * bloc) pour rester correcte même si `idRuin` n'était pas encore connu au premier appel.
+ * @param cell_informations Conteneur racine du bloc d'informations complémentaires
+ * @param id_ruin Identifiant du bâtiment sur la case courante, `null`/`undefined` si aucun
+ */
+export function ensureRuinSubBlock(cell_informations: Element, id_ruin: number | null | undefined): void {
+    if (id_ruin === null || id_ruin === undefined || cell_informations.querySelector('#cell-ruin')) {
+        return;
+    }
+
+    const content: Element | null = cell_informations.querySelector('#' + cell_informations_content_id);
+    if (!content) {
+        return;
+    }
+
+    createSubBlock(content, 'cell-ruin', getI18N(texts.ruin_state_header));
+}
+
+/**
+ * Vide le contenu de la sous-section « Bâtiment » quand la case courante n'a pas (ou plus)
+ * de ruine : sans ça, les informations de la dernière ruine visitée restent affichées en
+ * quittant sa case, `insertRuinDigs` ne faisant rien tant qu'aucune ruine n'est trouvée.
+ * @param cell_informations Conteneur racine du bloc d'informations complémentaires
+ * @param id_ruin Identifiant du bâtiment sur la case courante, `null`/`undefined` si aucun
+ * @returns `true` si le contenu a été vidé (aucune ruine sur la case courante)
+ */
+export function clearRuinSubBlockIfNoRuin(cell_informations: Element, id_ruin: number | null | undefined): boolean {
+    if (id_ruin !== null && id_ruin !== undefined && id_ruin > 0) {
+        return false;
+    }
+
+    const content: Element | null = cell_informations.querySelector('#cell-ruin-content');
+    if (content) {
+        content.innerHTML = '';
+    }
+
+    return true;
+}
+
 export function displayCellDetailsOnPage() {
     if (!state.mho_parameters.display_more_informations_from_mho || !pageIsDesert()) {
         /** Hors désert ou option décochée : plus rien à afficher, on arrête d'écouter la carte */
@@ -99,37 +166,25 @@ export function displayCellDetailsOnPage() {
         });
 
         const cell_informations_content = document.createElement('div');
+        cell_informations_content.id = cell_informations_content_id;
         cell_informations_content.style.display = 'flex';
         cell_informations_content.style.flexDirection = 'column';
         cell_informations_content.style.gap = '0.5em';
         cell_informations_div.appendChild(cell_informations_content);
 
-        const createSubBlock = (id, title) => {
-            const sub_block = document.createElement('div');
-            sub_block.id = id;
-            cell_informations_content.appendChild(sub_block);
-
-            const sub_block_header = document.createElement('h5');
-            sub_block_header.id = id + '-header';
-            sub_block_header.style.marginTop = '0';
-            sub_block_header.style.borderBottomWidth = '1px';
-            sub_block_header.style.fontWeight = 'normal';
-            sub_block_header.innerText = title;
-            sub_block.appendChild(sub_block_header);
-
-            const sub_block_content = document.createElement('div');
-            sub_block_content.id = id + '-content';
-            sub_block.appendChild(sub_block_content);
-        };
-
         map_box.parentElement.parentElement.appendChild(cell_informations);
 
-        createSubBlock('cell-note', getI18N(texts.note));
-        createSubBlock('cell-digs', getI18N(texts.digs_state_header));
-        if (state.current_cell.idRuin !== null && state.current_cell.idRuin !== undefined) {
-            createSubBlock('cell-ruin', getI18N(texts.ruin_state_header));
-        }
+        createSubBlock(cell_informations_content, 'cell-note', getI18N(texts.note));
+        createSubBlock(cell_informations_content, 'cell-digs', getI18N(texts.digs_state_header));
     }
+
+    /**
+     * La sous-section « Bâtiment » dépend de la case courante (`idRuin`), qui peut ne pas
+     * être connue au tout premier appel (la position `.current-location` n'est pas encore
+     * rendue par React) : on la (re)vérifie à chaque appel plutôt qu'une seule fois à la
+     * création du bloc, sous peine de ne plus jamais l'afficher pour le reste de la session.
+     */
+    ensureRuinSubBlock(cell_informations, state.current_cell.idRuin);
 
     const insertCellNote = (cell) => {
         if (cell_informations.querySelector('#cell-note-content')) {
@@ -149,34 +204,36 @@ export function displayCellDetailsOnPage() {
     };
 
     const insertRuinDigs = () => {
-        if (state.current_cell.idRuin !== null && state.current_cell.idRuin !== undefined && state.current_cell.idRuin > 0) {
-            /** Les ruines suivent le même chargement conditionnel que la carte : on les récupère à la demande */
-            if (!state.ruins?.length) {
-                if (!is_loading_ruins) {
-                    is_loading_ruins = true;
-                    getRuins()
-                        .then(() => insertRuinDigs())
-                        .catch(() => undefined)
-                        .finally(() => is_loading_ruins = false);
-                }
-                return;
+        if (clearRuinSubBlockIfNoRuin(cell_informations, state.current_cell.idRuin)) {
+            return;
+        }
+
+        /** Les ruines suivent le même chargement conditionnel que la carte : on les récupère à la demande */
+        if (!state.ruins?.length) {
+            if (!is_loading_ruins) {
+                is_loading_ruins = true;
+                getRuins()
+                    .then(() => insertRuinDigs())
+                    .catch(() => undefined)
+                    .finally(() => is_loading_ruins = false);
             }
-            const current_ruin = state.ruins.find((ruin) => ruin.id === state.current_cell.idRuin);
-            const empty_text = `<div style="opacity: 0.5; font-style: italic; font-size: 12px;">${getI18N(texts.ruin_dried)}</div>`;
-            const complete_text = `<div>${getI18N(texts.ruin_not_dried)}</div>`;
-            let ruin_drops = '';
-            if (current_ruin && (current_ruin.explorable || !state.current_cell.isRuinDryed)) {
-                ruin_drops += '<div style="display: flex; flex-direction: row; gap: 0.5em; flex-wrap: wrap; font-size: 12px;">';
-                if (current_ruin?.drops) {
-                    current_ruin.drops.forEach((drop) => {
-                        ruin_drops += `<span style="display: flex; flex-direction: column; align-items: center;"><img src="${repo_img_hordes_url}/${drop.item.img}">${Math.round(drop.probability * 100 * 10) / 10}%</span>`;
-                    });
-                }
+            return;
+        }
+        const current_ruin = state.ruins.find((ruin) => ruin.id === state.current_cell.idRuin);
+        const empty_text = `<div style="opacity: 0.5; font-style: italic; font-size: 12px;">${getI18N(texts.ruin_dried)}</div>`;
+        const complete_text = `<div>${getI18N(texts.ruin_not_dried)}</div>`;
+        let ruin_drops = '';
+        if (current_ruin && (current_ruin.explorable || !state.current_cell.isRuinDryed)) {
+            ruin_drops += '<div style="display: flex; flex-direction: row; gap: 0.5em; flex-wrap: wrap; font-size: 12px;">';
+            if (current_ruin?.drops) {
+                current_ruin.drops.forEach((drop) => {
+                    ruin_drops += `<span style="display: flex; flex-direction: column; align-items: center;"><img src="${repo_img_hordes_url}/${drop.item.img}">${Math.round(drop.probability * 100 * 10) / 10}%</span>`;
+                });
             }
-            ruin_drops += '</div>';
-            if (cell_informations.querySelector('#cell-ruin-content')) {
-                cell_informations.querySelector('#cell-ruin-content').innerHTML = (!current_ruin?.explorable ? (state.current_cell.isRuinDryed ? empty_text : complete_text) : '') + ruin_drops;
-            }
+        }
+        ruin_drops += '</div>';
+        if (cell_informations.querySelector('#cell-ruin-content')) {
+            cell_informations.querySelector('#cell-ruin-content').innerHTML = (!current_ruin?.explorable ? (state.current_cell.isRuinDryed ? empty_text : complete_text) : '') + ruin_drops;
         }
     };
 

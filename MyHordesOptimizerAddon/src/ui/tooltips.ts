@@ -1,9 +1,10 @@
 import { lang, repo_img_hordes_url, supported_languages } from '../config/constants';
-import { status_texts, wishlist_depot, wishlist_headers } from '../i18n/texts';
+import { opener_relation_texts, status_texts, wishlist_depot, wishlist_headers } from '../i18n/texts';
 import { state } from '../state';
 import type { WishlistItem } from '../types';
 import { getI18N } from '../utils/i18n';
 import { getFixedImagePath, getTooltipItem } from '../utils/item-lookup';
+import { getOpenedWithRowElement, getOpenerRelationElement } from './opener-relation';
 import { getRecipeElement } from './recipes';
 import { getWishlistForZone } from './wishlist';
 
@@ -261,6 +262,9 @@ export function createAdvancedProperties(content, item, tooltip) {
     }
     content.innerHtml = '';
 
+    const has_opener_relation: boolean = (item.openedWith !== undefined && item.openedWith !== null)
+        || (item.opens && item.opens.length > 0);
+
     if (tooltip && state.mho_parameters.enhanced_tooltips_item_quantities) {
         const stock_div: HTMLDivElement = document.createElement('div');
         content.appendChild(stock_div);
@@ -302,14 +306,29 @@ export function createAdvancedProperties(content, item, tooltip) {
         content.appendChild(item_translations);
     }
 
-    if ((!item_deco || item.deco === 0) && !item.properties && !item.actions && item.recipes.length === 0) return;
+    if ((!item_deco || item.deco === 0) && !item.properties && !item.actions && item.recipes.length === 0 && !has_opener_relation) return;
 
     if (item_deco && item.deco > 0) {
         const text = item_deco.innerText.replace(/ \(.*\)*/, '');
         item_deco.innerHTML = `<span>${text} <em>( +${item.deco} )</em></span>`;
     }
 
-    if (!item.properties && !item.actions && item.recipes.length === 0) return;
+    if (!item.properties && !item.actions && item.recipes.length === 0 && !has_opener_relation) return;
+
+    if (state.mho_parameters.enhanced_tooltips_item_properties && item.openedWith !== undefined && item.openedWith !== null) {
+        const isTechnician: boolean = state.mh_user?.jobDetails?.uid === 'tech';
+        content.appendChild(getOpenedWithRowElement(item.openedWith, item.openApCost, item.openSuccessRate, item.technicianOpenCpCost, isTechnician));
+    }
+
+    if (state.mho_parameters.enhanced_tooltips_item_properties && item.opens && item.opens.length > 0) {
+        const item_opens: HTMLDivElement = document.createElement('div');
+        item_opens.classList.add('mho-opener-relation-row');
+        content.appendChild(item_opens);
+        const header: HTMLSpanElement = document.createElement('span');
+        header.innerText = getI18N(opener_relation_texts.opens) + ' ';
+        item_opens.appendChild(header);
+        item_opens.appendChild(getOpenerRelationElement(item.opens));
+    }
 
     if (state.mho_parameters.enhanced_tooltips_item_properties && item.properties) {
         const item_properties: HTMLDivElement = document.createElement('div');

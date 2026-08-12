@@ -222,7 +222,7 @@ export function createOptimizerButtonContent() {
             information_link.href = information.src;
             information_link.target = '_blank';
 
-            if (!information.src) {
+            if (!information.src && information.action) {
                 information_link.addEventListener('click', (event) => {
                     event.preventDefault();
                     information.action();

@@ -23,9 +23,8 @@ export function addSuccess(message) {
 }
 
 
-/** Affiche une notification de warning */
-
-export function addWarning(message) {
+/** Affiche une notification de warning, avec une action optionnelle exécutée avant la fermeture */
+export function addWarning(message: string, onClick?: () => void): void {
     const notifications = document.getElementById('notifications');
     if (!notifications) return;
 
@@ -34,11 +33,14 @@ export function addWarning(message) {
     notification.innerText = `${getScriptInfo().name} : ${message}`;
     notifications?.appendChild(notification);
     notification.addEventListener('click', () => {
+        onClick?.();
         notification.remove();
     });
-    setTimeout(() => {
-        notification.remove();
-    }, 5000);
+    if (!onClick) {
+        setTimeout(() => {
+            notification.remove();
+        }, 5000);
+    }
 }
 
 /** Affiche une notification d'erreur */

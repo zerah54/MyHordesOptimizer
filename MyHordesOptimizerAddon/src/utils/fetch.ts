@@ -18,6 +18,7 @@ import {
 } from '../ui/forum';
 import { styleForumThreadTitles } from '../ui/forum-styles';
 import { displayGhoulVoracityPercent } from '../ui/ghoul';
+import { displayCitizenNoteIcons, displayTownNote, displayUserGlobalNote } from '../ui/notes';
 import { addCopyRegistryButton } from '../ui/registry';
 import { displayMinApOnBuildings, displaySearchFields } from '../ui/search-fields';
 import { sortCitizenList, sortDumpList, sortNightwatchList, sortOmniscienceList, sortTrapList } from '../ui/sort-lists';
@@ -54,7 +55,11 @@ export function initOptionsWithLoginNeeded(): void {
         createExpeditionsBtn,
         displayEstimationsOnWatchtower,
         /** Se cale elle-même sur le rendu de la carte : plus besoin de la retarder */
-        displayCellDetailsOnPage
+        displayCellDetailsOnPage,
+        /** Nécessitent le bearer (endpoints /Note [Authorize]), contrairement au reste des options sans connexion */
+        displayTownNote,
+        displayCitizenNoteIcons,
+        displayUserGlobalNote
     ].forEach(runSafely);
 }
 

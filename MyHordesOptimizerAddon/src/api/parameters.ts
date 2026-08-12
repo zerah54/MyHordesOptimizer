@@ -1,6 +1,7 @@
 import { state } from '../state';
 import { fetcherWithoutBearer } from '../utils/fetch';
 import { addError } from '../utils/notifications';
+import { notifyUpdateAvailable } from '../utils/update-notifications';
 import { convertResponsePromiseToError, isScriptVersionLastVersion } from '../utils/version';
 
 export function getParameters() {
@@ -15,7 +16,9 @@ export function getParameters() {
             })
             .then((response) => {
                 state.parameters = response;
-                isScriptVersionLastVersion();
+                if (!isScriptVersionLastVersion()) {
+                    notifyUpdateAvailable();
+                }
                 resolve();
             })
             .catch((error) => {

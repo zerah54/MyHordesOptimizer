@@ -3,6 +3,8 @@ import {
     fata_morgana_url,
     gest_hordes_url,
     mh_optimizer_icon,
+    mh_optimizer_icon_16x16,
+    mh_optimizer_site_url,
     mho_town_external_links_id,
     repo_img_hordes_url,
     repo_img_url
@@ -38,6 +40,26 @@ export function addExternalLinksToProfiles() {
             new_part_title.style.textAlign = 'left';
             new_part_title.style.color = link_color;
             new_part.appendChild(new_part_title);
+
+            const mho_profile_link = document.createElement('a');
+            mho_profile_link.classList.add('link-block');
+            mho_profile_link.href = `${mh_optimizer_site_url}/profile/${user_id}`;
+            new_part.appendChild(mho_profile_link);
+
+            mho_profile_link.addEventListener('click', () => user_tooltip.remove());
+
+            const mho_profile_img = document.createElement('img');
+            mho_profile_img.src = mh_optimizer_icon_16x16;
+            mho_profile_link.appendChild(mho_profile_img);
+
+            const mho_profile_br = document.createElement('br');
+            mho_profile_link.appendChild(mho_profile_br);
+
+            const mho_profile_title = document.createElement('text');
+            mho_profile_title.innerText = 'MyHordes\nOptimizer';
+            mho_profile_link.appendChild(mho_profile_title);
+
+            new_part.appendChild(document.createTextNode(' '));
 
             const bbh_link = document.createElement('a');
             bbh_link.classList.add('link-block');
@@ -79,9 +101,9 @@ export function addExternalLinksToProfiles() {
 
             new_part.appendChild(document.createTextNode('\u00A0'));
 
-            const empty_link = document.createElement('div');
-            empty_link.classList.add('link-block', 'empty');
-            new_part.appendChild(empty_link);
+            // const empty_link = document.createElement('div');
+            // empty_link.classList.add('link-block', 'empty');
+            // new_part.appendChild(empty_link);
         }
     } else if (!state.mho_parameters.display_external_links && mho_link_block) {
         mho_link_block.remove();
@@ -147,24 +169,29 @@ export function addExternalLinksToTowns(): void {
 }
 
 interface ExternalToolLinkDefinition {
-    readonly icon_file_name: string;
+    readonly icon_src: string;
     readonly label: string;
     readonly build_url: (town_id: string) => string;
 }
 
 const external_tool_links: readonly ExternalToolLinkDefinition[] = [
+    {
+        icon_src: mh_optimizer_icon_16x16,
+        label: 'MyHordes\nOptimizer',
+        build_url: (town_id: string): string => `${mh_optimizer_site_url}/town/${town_id}`,
+    },
     // {
-    //     icon_file_name: 'bbh.gif',
+    //     icon_src: `${repo_img_url}external-tools/bbh.gif`,
     //     label: `BigBroth'\nHordes`,
     //     build_url: (town_id: string): string => `${big_broth_hordes_url}/?cid=5-${town_id}`,
     // },
     {
-        icon_file_name: 'gh.gif',
+        icon_src: `${repo_img_url}external-tools/gh.gif`,
         label: 'Gest\'\nHordes',
         build_url: (town_id: string): string => `${gest_hordes_url}/carte/${town_id}`,
     },
     {
-        icon_file_name: 'fata.gif',
+        icon_src: `${repo_img_url}external-tools/fata.gif`,
         label: 'Fata\nMorgana',
         build_url: (town_id: string): string => `${fata_morgana_url}/spy/town/${town_id}`,
     },
@@ -180,7 +207,7 @@ function createExternalLinksButtons(town_id: string): HTMLButtonElement[] {
         link.onclick = (): Window | null => window.open(tool_link.build_url(town_id), '_blank');
 
         const img: HTMLImageElement = document.createElement('img');
-        img.src = `${repo_img_url}external-tools/${tool_link.icon_file_name}`;
+        img.src = tool_link.icon_src;
         link.appendChild(img);
 
         const title: HTMLElement = document.createElement('text');

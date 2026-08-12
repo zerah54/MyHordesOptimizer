@@ -24,8 +24,26 @@ export interface MhoItem {
     isHeaver?: boolean;
     isCum?: boolean;
     isProtected?: boolean;
+    /** Objets permettant d'ouvrir celui-ci. `null` si ce n'est pas un contenant. */
+    openedWith?: MhoItemSummary[] | null;
+    /** Contenants que cet objet permet d'ouvrir. */
+    opens?: MhoItemSummary[];
+    /** Coût en PA d'une tentative d'ouverture sans outil, pour un contenant à risque d'échec (ex. coffre-fort). */
+    openApCost?: number | null;
+    /** Chance de réussite (0..1) associée à `openApCost`. */
+    openSuccessRate?: number | null;
+    /** Coût en PC de l'alternative réservée au métier Technicien à l'outil requis, si elle existe. */
+    technicianOpenCpCost?: number | null;
 
     [key: string]: any;
+}
+
+/** Représentation minimale d'un objet dans une relation objet↔objet (ex. boîtes/ouvre-boîtes). */
+export interface MhoItemSummary {
+    uid: string;
+    img: string;
+    imgBroken?: string | null;
+    label: I18nLabel;
 }
 
 export interface MhoItemProperty {
@@ -125,6 +143,12 @@ export interface WishlistItem {
 export interface ApiWishlist {
     wishList?: WishlistItem[];
     lastUpdateInfo?: { updateTime: string; userName: string };
+}
+
+/** Note privée de l'utilisateur sur une ville, un citoyen (pour une ville) ou un joueur */
+export interface NoteDto {
+    note?: string;
+    updatedAt?: string;
 }
 
 export interface BankItem {
@@ -314,6 +338,14 @@ export interface MhoState {
     map: ApiMap | undefined;
     current_cell: any | undefined;
     my_expeditions: ApiExpedition[] | undefined;
+    /** Notes de ville de l'appelant, indexées par mapId */
+    town_notes: Record<number, NoteDto> | undefined;
+    /** Notes globales de l'appelant sur des joueurs, indexées par userId */
+    user_notes: Record<number, NoteDto> | undefined;
+    /** Notes de l'appelant sur les citoyens de la ville actuellement affichée, indexées par userId */
+    citizen_notes: Record<number, NoteDto> | undefined;
+    /** mapId de la ville couverte par `citizen_notes`, pour invalider le cache en changeant de ville */
+    citizen_notes_map_id: number | undefined;
     tooltips_observer: MutationObserver | undefined;
     loading_area_observer: MutationObserver | undefined;
     bank_observer: MutationObserver | undefined;
