@@ -11,9 +11,9 @@ import {
 } from '../config/constants';
 import { texts } from '../i18n/texts';
 import { state } from '../state';
+import { ensureDashedSeparatorAfter } from '../utils/dom';
 import { getI18N } from '../utils/i18n';
 import { pageIsTownHistory, pageIsWelcome } from '../utils/page';
-import { getScriptInfo } from '../utils/version';
 
 export function addExternalLinksToProfiles() {
     const mho_link_block = document.querySelector('.mho-link-blocks');
@@ -22,17 +22,27 @@ export function addExternalLinksToProfiles() {
         if (user_tooltip) {
             const user_id = user_tooltip.querySelector('[x-ajax-href]')?.getAttribute('x-ajax-href')?.replace(/\D/g, '');
             if (!user_id) return;
-            const dash_separators = user_tooltip.querySelectorAll('hr.dashed');
-            const last_separator = Array.from(dash_separators).pop();
             const link_color = window.getComputedStyle(user_tooltip.querySelector('.link')).getPropertyValue('color');
-
-            const new_separator = document.createElement('hr');
-            new_separator.classList.add('dashed');
-            last_separator.parentNode.insertBefore(new_separator, last_separator.nextSibling);
 
             const new_part = document.createElement('div');
             new_part.classList.add('link-blocks', 'mho-link-blocks');
-            last_separator.parentNode.insertBefore(new_part, last_separator.nextSibling);
+
+            /**
+             * La note globale s'affiche toujours après les liens. Comme displayUserGlobalNote()
+             * s'exécute avant addExternalLinksToProfiles() (cf. initOptionsWithLoginNeeded), le
+             * bloc note peut déjà être présent : on insère alors les liens juste avant lui plutôt
+             * qu'à la fin du tooltip.
+             */
+            const note_block = user_tooltip.querySelector('.mho-user-note-block');
+            if (note_block) {
+                note_block.insertAdjacentElement('beforebegin', new_part);
+            } else {
+                const dash_separators = user_tooltip.querySelectorAll('hr.dashed');
+                const last_separator = Array.from(dash_separators).pop();
+                const separator = ensureDashedSeparatorAfter(last_separator);
+                separator.insertAdjacentElement('afterend', new_part);
+            }
+            ensureDashedSeparatorAfter(new_part);
 
             const new_part_title = document.createElement('div');
             new_part_title.innerHTML = `<img src="${mh_optimizer_icon}" style="width: 16px; margin-right: 0.5em;">${getI18N(texts.external_profiles)}`;
@@ -106,6 +116,9 @@ export function addExternalLinksToProfiles() {
             // new_part.appendChild(empty_link);
         }
     } else if (!state.mho_parameters.display_external_links && mho_link_block) {
+        /** Le séparateur juste après le bloc est toujours le nôtre (créé par ensureDashedSeparatorAfter à la construction) */
+        const trailing_separator: Element | null = mho_link_block.nextElementSibling;
+        if (trailing_separator?.tagName === 'HR') trailing_separator.remove();
         mho_link_block.remove();
     }
 }
@@ -151,7 +164,7 @@ export function addExternalLinksToTowns(): void {
     updater_title.appendChild(btns_title_mho_img);
 
     const btns_title_text: HTMLElement = document.createElement('text');
-    btns_title_text.innerText = getScriptInfo().name;
+    btns_title_text.innerText = getI18N(texts.external_links) ?? '';
     updater_title.appendChild(btns_title_text);
 
     mho_block.appendChild(updater_title);

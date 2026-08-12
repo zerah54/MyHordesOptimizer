@@ -1574,14 +1574,40 @@ body.mho-spoiler-pin-enabled .forum-post-content .spoiler {
 }
 
 .mho-note-block {
+    margin-top: 0.5em;
+    text-align: left;
+}
+
+.mho-note-header {
     display: flex;
     align-items: center;
-    gap: 0.5em;
-    margin-top: 0.5em;
+    gap: 0.4em;
+    margin-bottom: 0.3em;
+    opacity: 0.85;
+
+    .mho-note-header-icon {
+        width: 16px;
+        height: 16px;
+    }
+
+    .mho-note-icon {
+        margin-left: auto;
+    }
+
+    &.mho-note-header-prominent {
+        margin: 0 0 0.5em;
+        gap: 0.5em;
+        opacity: 1;
+
+        .mho-note-header-icon {
+            width: 24px;
+            height: 24px;
+        }
+    }
 }
 
 .mho-note-text {
-    flex: 1;
+    display: block;
 
     &.mho-note-text-empty {
         opacity: 0.5;

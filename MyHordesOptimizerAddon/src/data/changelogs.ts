@@ -1,4 +1,7 @@
 export const changelogs: Record<string, string> = {
+    '1.1.56': `
+        [Correction] Affichage des notes
+        `,
     '1.1.55': `
         [Nouveauté] Ajout de notes personnelles sur les villes, les citoyens d'une ville et les joueurs, via une icône crayon (fenêtre du citoyen, liste des citoyens, page de ville)
         [Nouveauté] Affichage dans les tooltips du coût / de la chance d'ouverture des contenants à risque (boîtes, coffres...) ainsi que de l'outil requis pour les ouvrir

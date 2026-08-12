@@ -1,13 +1,15 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { mh_optimizer_site_url } from '../config/constants';
+import { texts } from '../i18n/texts';
 import { state } from '../state';
+import { getI18N } from '../utils/i18n';
 import { addExternalLinksColumnToWelcomeTowns, addExternalLinksToProfiles, addExternalLinksToTowns } from './external-links';
 
 /**
- * `texts.ts` et `external-links.ts` appellent `getScriptInfo()` : en environnement Tampermonkey
+ * `../utils/version` est importé transitivement par ce module : en environnement Tampermonkey
  * réel, `GM_info`/`browser`/`chrome` existent toujours. En jsdom (Vitest), aucun des trois n'est
- * défini, ce qui fait planter l'appel.
+ * défini, ce qui fait planter l'import si `getScriptInfo()` n'est pas mocké.
  */
 vi.mock('../utils/version', () => ({
     convertResponsePromiseToError: (): Promise<never> => Promise.reject(new Error('mock: not used by this spec')),
@@ -47,6 +49,39 @@ describe('addExternalLinksToProfiles', () => {
         expect(links.length).toBe(3);
         expect(links[0].href).toBe(`${mh_optimizer_site_url}/profile/456`);
     });
+
+    it('wraps the links block with a dashed separator before and after', () => {
+        document.body.innerHTML = `
+            <div id="user-tooltip">
+                <a class="link" x-ajax-href="/soul/456"></a>
+                <hr class="dashed">
+            </div>
+        `;
+
+        addExternalLinksToProfiles();
+
+        const link_block: Element | null = document.querySelector('.mho-link-blocks');
+        expect(link_block?.previousElementSibling?.tagName).toBe('HR');
+        expect(link_block?.nextElementSibling?.tagName).toBe('HR');
+    });
+
+    it('removes its two separators when the option is turned off, without touching the rest of the tooltip', () => {
+        document.body.innerHTML = `
+            <div id="user-tooltip">
+                <a class="link" x-ajax-href="/soul/456"></a>
+                <hr class="dashed">
+                <div class="after-hr">reste du tooltip natif</div>
+            </div>
+        `;
+        addExternalLinksToProfiles();
+
+        state.mho_parameters.display_external_links = false;
+        addExternalLinksToProfiles();
+
+        expect(document.querySelector('.mho-link-blocks')).toBeNull();
+        expect(document.querySelectorAll('hr.dashed').length).toBe(1);
+        expect(document.querySelector('.after-hr')).not.toBeNull();
+    });
 });
 
 describe('addExternalLinksToTowns', () => {
@@ -67,6 +102,18 @@ describe('addExternalLinksToTowns', () => {
 
         buttons[0].click();
         expect(open_spy).toHaveBeenCalledWith(`${mh_optimizer_site_url}/town/789`, '_blank');
+    });
+
+    it('titles the block with the external links label, not the script name', () => {
+        document.body.innerHTML = `
+            <div class="view-town" data-town-id="789">
+                <div class="row"><button></button></div>
+            </div>
+        `;
+
+        addExternalLinksToTowns();
+
+        expect((document.querySelector('#mho-town-external-links h5 text') as HTMLElement | null)?.innerText).toBe(getI18N(texts.external_links));
     });
 });
 

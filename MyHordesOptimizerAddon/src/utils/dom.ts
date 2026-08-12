@@ -1,6 +1,25 @@
 import { texts } from '../i18n/texts';
 import { getI18N } from './i18n';
 
+/**
+ * Retourne le hr.dashed à utiliser comme séparateur juste avant d'insérer du contenu après `anchor`,
+ * sans jamais en empiler un second. `anchor` lui-même en tient déjà lieu s'il en est un ; sinon un
+ * hr.dashed existant juste après lui est réutilisé ; sinon un nouveau est créé. Plusieurs
+ * fonctionnalités indépendantes (liens externes, note) ajoutent chacune leur propre section au même
+ * tooltip MyHordes, sans se coordonner entre elles.
+ */
+export function ensureDashedSeparatorAfter(anchor: Element): Element {
+    if (anchor.tagName === 'HR' && anchor.classList.contains('dashed')) return anchor;
+
+    const next: Element | null = anchor.nextElementSibling;
+    if (next?.tagName === 'HR' && next.classList.contains('dashed')) return next;
+
+    const separator: HTMLHRElement = document.createElement('hr');
+    separator.classList.add('dashed');
+    anchor.insertAdjacentElement('afterend', separator);
+    return separator;
+}
+
 export function createSelectWithSearch() {
 
     const select_complete = document.createElement('div');
