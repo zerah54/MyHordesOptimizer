@@ -455,6 +455,13 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                                         Count = item.Count,
                                         IdItem = cleItem,
                                         IsBroken = item.Broken,
+                                        // IdCell à jour dès la construction : le RemoveRange ci-dessous lit cette
+                                        // valeur en mémoire (LINQ-to-Objects) avant tout AddRange/SaveChanges, donc
+                                        // avant que EF ne résolve la FK depuis IdCellNavigation. Sans elle, le filtre
+                                        // de suppression des anciennes lignes tombe à 0 pour toutes les cases connues
+                                        // et ne supprime jamais rien, laissant les lignes persistantes d'une synchro à
+                                        // l'autre percuter la clé primaire (idCell, idItem, isBroken) au prochain insert.
+                                        IdCell = cellModel.IdCell,
                                         IdCellNavigation = cellModel
                                     };
                                     listCellItems.Add(cellItem);
