@@ -1,5 +1,5 @@
 import { CommonModule, NgOptimizedImage } from '@angular/common';
-import { ChangeDetectionStrategy, Component, DestroyRef, inject, model, ModelSignal, OnInit, Signal, signal,WritableSignal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, model, ModelSignal, OnInit, Signal, signal, WritableSignal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -50,6 +50,7 @@ import { SelectComponent } from '../../_shared/select/select.component';
 import { CitizensForExpePipe, FormatPreRegisteredPipe, SomeHeroicActionNeededPipe } from './citizens-for-expe.pipe';
 import { EditOrdersComponent, EditOrdersData } from './edit-orders/edit-orders.component';
 import { EditPositionsComponent, EditPositionsData } from './edit-positions/edit-positions.component';
+import { isDayEditable } from './expeditions.utils';
 import { TotalPdcPipe } from './total-pdc.pipe';
 
 const angular_common: Imports = [CommonModule, FormsModule, NgOptimizedImage];
@@ -67,14 +68,13 @@ const material_modules: Imports = [MatButtonModule, MatCardModule, MatCheckboxMo
 export class ExpeditionsComponent implements OnInit {
 
     protected readonly HORDES_IMG_REPO: Signal<string> = signal(HORDES_IMG_REPO);
-    protected readonly current_day: Signal<number> = signal(getTown()?.day || 1);
     protected readonly me: Signal<Me | null> = signal(getUser());
     /** La liste des actions héroïques */
     protected all_heroics: Signal<HeroicActionEnum[]> = signal((<HeroicActionEnum[]>HeroicActionEnum.getAllValues())
         .filter((action: HeroicActionEnum) => action.value.count_in_daily && action.value.action !== ''));
 
     public edition_mode: ModelSignal<boolean> = model(JSON.parse(localStorage.getItem(EXPEDITIONS_EDITION_MODE_KEY) || 'false'));
-    public selected_tab_index: ModelSignal<number> = model(this.current_day() - 1);
+    public selected_tab_index: ModelSignal<number> = model(this.currentDay() - 1);
 
     protected all_citizens: WritableSignal<Citizen[]> = signal([]);
     protected all_citizens_job: WritableSignal<JobEnum[]> = signal([]);
@@ -128,6 +128,7 @@ export class ExpeditionsComponent implements OnInit {
 
         const existing_expeditions: Expedition[] = await firstValueFrom(this.expedition_service.getExpeditions(this.selected_tab_index() + 1));
         this.expeditions.set([...existing_expeditions]);
+        this.updateEditableForIndex(this.selected_tab_index());
 
         // Mode observateur : pas de synchro temps réel (le hub est scopé à la ville du token,
         // pas à la ville observée) et aucune édition possible.
@@ -140,6 +141,16 @@ export class ExpeditionsComponent implements OnInit {
         this.subscribeToRealtimeExpeditions();
     }
 
+    /** Jour actuel de la ville, lu à la demande (jamais figé) pour ne pas désynchroniser le verrou de jour. */
+    protected currentDay(): number {
+        return getTown()?.day || 1;
+    }
+
+    /** Un onglet n'est éditable que si son jour n'est pas déjà passé pour la ville. */
+    private updateEditableForIndex(tab_index: number): void {
+        this.editable.set(!this.is_readonly() && isDayEditable(tab_index + 1, this.currentDay()));
+    }
+
     private subscribeToRealtimeExpeditions(): void {
         this.realtime_expeditions_service.expedition_updated$
             .pipe(takeUntilDestroyed(this.destroy_ref))
@@ -148,8 +159,9 @@ export class ExpeditionsComponent implements OnInit {
                     const expedition_to_update: number = current_expeditions
                         .findIndex((_expedition_to_update: Expedition) => _expedition_to_update.id === expedition.id);
                     if (expedition_to_update < 0) {
+                        // La partie par défaut est créée côté serveur (SaveExpeditionAsync) : pas besoin
+                        // de la redemander ici, elle arrive déjà dans expedition.parts.
                         current_expeditions.push(expedition);
-                        this.addNewExpeditionPart(expedition);
                     } else {
                         current_expeditions[expedition_to_update] = expedition;
                     }
@@ -194,13 +206,13 @@ export class ExpeditionsComponent implements OnInit {
                     const part_to_update: number = current_expedition.parts
                         .findIndex((_part_to_update: ExpeditionPart) => _part_to_update.id === expedition_part.id);
                     if (part_to_update < 0) {
+                        // Le membre par défaut de la première partie est créé côté serveur
+                        // (SaveExpeditionPartAsync) : pas besoin de le redemander ici.
                         current_expedition.parts.push(expedition_part);
                         if (current_expedition.parts.length > 1) {
                             current_expedition.parts[0].citizens.forEach((existing_citizen: CitizenExpedition) => {
                                 this.addNewMemberToPart(expedition_part, existing_citizen);
                             });
-                        } else {
-                            this.addNewMemberToPart(expedition_part);
                         }
                     } else {
                         current_expedition.parts[part_to_update] = expedition_part;
@@ -437,9 +449,10 @@ export class ExpeditionsComponent implements OnInit {
                     current_expeditions.forEach((current_expedition: Expedition) => {
                         current_expedition.parts.forEach((current_expedition_part: ExpeditionPart) => {
                             current_expedition_part.citizens.forEach((current_expedition_citizen: CitizenExpedition) => {
+                                // Le sac de remplacement est créé côté serveur (DeleteExpeditionBag) et
+                                // arrive via ExpeditionBagUpdated : pas besoin de le redemander ici.
                                 if (bag_id === current_expedition_citizen.bag.bag_id) {
                                     current_expedition_citizen.bag = new CitizenExpeditionBag();
-                                    this.saveBag(current_expedition_citizen);
                                 }
                             });
                         });
@@ -471,7 +484,7 @@ export class ExpeditionsComponent implements OnInit {
     protected async changeTab(event: MatTabChangeEvent): Promise<void> {
         const existing_expeditions: Expedition[] = await firstValueFrom(this.expedition_service.getExpeditions(this.selected_tab_index() + 1));
         this.expeditions.set([...existing_expeditions]);
-        this.editable.set(!this.is_readonly() && event.index >= this.current_day() - 1);
+        this.updateEditableForIndex(event.index);
     }
 
     protected changeExpeditionState(expedition: Expedition, event: boolean): void {
@@ -486,12 +499,19 @@ export class ExpeditionsComponent implements OnInit {
 
     protected addNewMemberToExpedition(expedition: Expedition, citizen_to_copy?: CitizenExpedition): void {
         expedition.parts.forEach(async (expedition_part: ExpeditionPart) => {
-            await this.realtime_expeditions_service.updateExpeditionCitizen(expedition_part, new CitizenExpedition(citizen_to_copy?.modelToDto()));
+            await this.realtime_expeditions_service.updateExpeditionCitizen(expedition_part, this.cloneCitizenForCopy(citizen_to_copy));
         });
     }
 
     protected async addNewMemberToPart(expedition_part: ExpeditionPart, citizen_to_copy?: CitizenExpedition): Promise<void> {
-        await this.realtime_expeditions_service.updateExpeditionCitizen(expedition_part, new CitizenExpedition(citizen_to_copy?.modelToDto()));
+        await this.realtime_expeditions_service.updateExpeditionCitizen(expedition_part, this.cloneCitizenForCopy(citizen_to_copy));
+    }
+
+    /** modelToDto() renvoie l'id du citoyen copié : sans le retirer, la "copie" met à jour l'original au lieu d'en créer un nouveau. */
+    private cloneCitizenForCopy(citizen_to_copy?: CitizenExpedition): CitizenExpedition {
+        const clone = new CitizenExpedition(citizen_to_copy?.modelToDto());
+        clone.id = undefined;
+        return clone;
     }
 
     protected async addNewExpedition(): Promise<void> {

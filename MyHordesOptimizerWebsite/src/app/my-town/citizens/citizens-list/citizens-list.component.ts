@@ -1,17 +1,5 @@
 import { CommonModule } from '@angular/common';
-import {
-    Component,
-    computed,
-    DestroyRef,
-    effect,
-    EventEmitter,
-    inject,
-    OnInit,
-    Signal,
-    signal,
-    viewChild,
-    WritableSignal
-} from '@angular/core';
+import { Component, computed, DestroyRef, effect, EventEmitter, inject, OnInit, Signal, signal, viewChild, WritableSignal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { MatBadgeModule } from '@angular/material/badge';
@@ -61,21 +49,16 @@ import { CompactStepperComponent } from '../../../_shared/compact-stepper/compac
 import { CompactToggleComponent } from '../../../_shared/compact-toggle/compact-toggle.component';
 import { DeferredCellComponent } from '../../../_shared/deferred-cell/deferred-cell.component';
 import { LastUpdateComponent } from '../../../_shared/last-update/last-update.component';
-import {
-    ListElementAddRemoveComponent
-} from '../../../_shared/list-elements-add-remove/list-element-add-remove.component';
+import { ListElementAddRemoveComponent } from '../../../_shared/list-elements-add-remove/list-element-add-remove.component';
 import { NoteDialogComponent, NoteDialogData } from '../../../_shared/note-dialog/note-dialog.component';
 import { NoteIconComponent } from '../../../_shared/note-icon/note-icon.component';
 import { SelectComponent } from '../../../_shared/select/select.component';
-import {
-    CitizenPictosDialogComponent,
-    CitizenPictosDialogData
-} from '../citizen-pictos-dialog/citizen-pictos-dialog.component';
+import { CitizenPictosDialogComponent, CitizenPictosDialogData } from '../citizen-pictos-dialog/citizen-pictos-dialog.component';
 import { DailyActionForDayPipe } from '../daily-action-for-day.pipe';
 import { TypeRowPipe } from './type-row.pipe';
 
 const angular_common: Imports = [CommonModule, FormsModule];
-const components: Imports = [AvatarComponent, CitizenInfoComponent, CompactStepperComponent, CompactToggleComponent, DeferredCellComponent, LastUpdateComponent, ListElementAddRemoveComponent, NoteDialogComponent, NoteIconComponent, SelectComponent];
+const components: Imports = [AvatarComponent, CitizenInfoComponent, CompactStepperComponent, CompactToggleComponent, DeferredCellComponent, LastUpdateComponent, ListElementAddRemoveComponent, NoteIconComponent, SelectComponent];
 const pipes: Imports = [ColumnIdPipe, TypeRowPipe];
 const material_modules: Imports = [MatBadgeModule, MatButtonModule, MatButtonToggleModule, MatCheckboxModule, MatDialogModule, MatFormFieldModule, MatIconModule, MatMenuModule, MatSidenavModule, MatSortModule, MatTableModule, MatTooltipModule];
 

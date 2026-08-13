@@ -17,7 +17,7 @@
 <mat-card-content class="mho-expeditions">
     @if (all_citizens().length > 0 && all_items().length > 0) {
         <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start" [(selectedIndex)]="selected_tab_index" (selectedTabChange)="changeTab($event)">
-            @for (day of [].constructor(current_day() + 1); track day_index; let day_index = $index) {
+            @for (day of [].constructor(currentDay() + 1); track day_index; let day_index = $index) {
                 <mat-tab label="Jour {{day_index + 1}}" i18n-label>
                     <ng-template matTabContent>
                         <div class="container">
@@ -48,7 +48,7 @@
                                         </div>
                                     </div>
                                     <div class="right-actions">
-                                        @if (day_index + 1 >= this.current_day()) {
+                                        @if (day_index + 1 >= this.currentDay()) {
                                             <button mat-icon-button type="button" [matMenuTriggerFor]="manageExpeditions">
                                                 <mat-icon>more_vert</mat-icon>
                                             </button>

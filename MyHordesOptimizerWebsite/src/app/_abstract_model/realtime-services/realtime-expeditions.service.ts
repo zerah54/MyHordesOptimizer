@@ -211,7 +211,7 @@ export class RealtimeExpeditionsService extends RealtimeGlobalService {
     }
 
     public async deleteExpeditionBag(bag: CitizenExpeditionBag): Promise<void> {
-        console.log('send', 'SaveExpeditionBag', bag.bag_id);
-        await this.invokeHub('SaveExpeditionBag', bag.bag_id);
+        console.log('send', 'DeleteExpeditionBag', bag.bag_id);
+        await this.invokeHub('DeleteExpeditionBag', bag.bag_id);
     }
 }

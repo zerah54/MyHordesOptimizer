@@ -70,6 +70,9 @@ builder.Services.AddScoped<IGestHordesRepository, GestHordesRepository>();
 builder.Services.AddSingleton<TownSyncLock>();
 builder.Services.AddScoped<IExternalToolsService, ExternalToolsService>();
 
+// Requis par ExpeditionServiceDayLockTests (Services.Impl.ExpeditionService).
+builder.Services.AddScoped<IExpeditionService, ExpeditionService>();
+
 var app = builder.Build();
 app.UseHttpsRedirection();
 app.UseAuthorization();

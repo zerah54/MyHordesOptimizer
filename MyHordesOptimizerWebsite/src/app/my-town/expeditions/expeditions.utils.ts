@@ -4,6 +4,11 @@ import { Expedition } from '../../_abstract_model/types/expedition.class';
 import { ExpeditionPart } from '../../_abstract_model/types/expedition-part.class';
 import { getCitizenFromId } from '../../_core/utilities/citizen.util';
 
+/** Un jour antérieur au jour actuel de la ville est verrouillé ; le jour actuel et les suivants sont modifiables. */
+export function isDayEditable(day: number, currentDay: number): boolean {
+    return day >= currentDay;
+}
+
 export function getPreRegistered(expeditions: Expedition[], all_citizen: Citizen[]): Citizen[] {
     const pre_registered: Citizen[] = [];
     expeditions?.forEach((expedition: Expedition) => {

@@ -42,26 +42,19 @@ namespace MyHordesOptimizerApi.Hubs
             Logger.LogDebug("[{@connectionId}] User {@userId} from town {@townId} joined hub", connectionId, userId, townId);
             _townIdBySocketToken.TryAdd(connectionId, townId);
             await Groups.AddToGroupAsync(connectionId, townId.ToString());
-            _connectedUsersByTownByConnexionId.TryGetValue(townId, out var usersIdByConnexionId);
-            List<int> usersId = new();
-            if (usersIdByConnexionId is null)
-            {
-                usersIdByConnexionId = new ConcurrentDictionary<string, int>();
-            }
-            usersId.Add(userId);
+            var usersIdByConnexionId = _connectedUsersByTownByConnexionId.GetOrAdd(townId, _ => new ConcurrentDictionary<string, int>());
             usersIdByConnexionId.TryAdd(connectionId, userId);
             Logger.LogDebug("[{@connectionId}] User {@userId} added to list of connected users", connectionId, userId);
             var connectedUserOnTownAsJson = usersIdByConnexionId.Values.ToList().Distinct().ToJson();
             await Clients.Group(townId.ToString()).SendAsync(ExpeditionsHubEvent.UserJoined.GetDescription(), connectedUserOnTownAsJson);
             Logger.LogDebug("[{@connectionId}] Sent to Group({@townId}) UserJoined : {@connectedUserOnTownAsJson}", connectionId, townId, connectedUserOnTownAsJson);
-            _connectedUsersByTownByConnexionId[townId] = usersIdByConnexionId;
             await base.OnConnectedAsync();
         }
 
         public override async Task OnDisconnectedAsync(Exception? exception)
         {
             var connectionId = Context.ConnectionId;
-            if (_townIdBySocketToken.TryGetValue(connectionId, out var townId))
+            if (_townIdBySocketToken.TryRemove(connectionId, out var townId))
             {
                 var userId = UserInfoProvider.UserId;
                 Logger.LogDebug("[{@connectionId}] {@userId} Disconnected", connectionId, userId);
@@ -74,6 +67,10 @@ namespace MyHordesOptimizerApi.Hubs
                     var connectedUserOnTownAsJson = connectedUserOnTown.ToJson();
                     await Clients.Group(townId.ToString()).SendAsync(ExpeditionsHubEvent.UserLeft.GetDescription(), connectedUserOnTownAsJson);
                     Logger.LogDebug("[{@connectionId}] Sent to Group({@townId}) UserLeft : {@connectedUserOnTownAsJson}", connectionId, townId, connectedUserOnTownAsJson);
+                }
+                if (usersId.IsEmpty)
+                {
+                    _connectedUsersByTownByConnexionId.TryRemove(townId, out _);
                 }
             }
             await base.OnDisconnectedAsync(exception);
@@ -224,10 +221,15 @@ namespace MyHordesOptimizerApi.Hubs
         {
             var userId = UserInfoProvider.UserId;
             Logger.LogDebug("{@userId} DeleteExpeditionBag {@bagId}", userId, bagId);
-            ExpeditionService.DeleteExpeditionBag(bagId);
+            var replacementBags = ExpeditionService.DeleteExpeditionBag(bagId);
             var townId = UserInfoProvider.TownDetail.TownId;
             await Clients.Group(townId.ToString()).SendAsync(ExpeditionsHubEvent.ExpeditionBagDeleted.GetDescription(), bagId);
             Logger.LogDebug("Sent to Group({@townId}) ExpeditionBagDeleted: {@bagId}", townId, bagId);
+            foreach (var replacementBag in replacementBags)
+            {
+                await Clients.Group(townId.ToString()).SendAsync(ExpeditionsHubEvent.ExpeditionBagUpdated.GetDescription(), replacementBag);
+                Logger.LogDebug("Sent to Group({@townId}) ExpeditionBagUpdated: {@replacementBag}", townId, replacementBag.ToJson());
+            }
         }
     }
 

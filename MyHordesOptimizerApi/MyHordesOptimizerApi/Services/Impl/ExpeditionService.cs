@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Expeditions;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Expeditions.Request;
+using MyHordesOptimizerApi.Exceptions;
 using MyHordesOptimizerApi.Extensions;
 using MyHordesOptimizerApi.Extensions.Models.Expeditions;
 using MyHordesOptimizerApi.Models;
@@ -47,6 +48,7 @@ namespace MyHordesOptimizerApi.Services.Impl
         public async Task<ExpeditionDto> SaveExpeditionAsync(ExpeditionRequestDto expeditionDto, int idTown, int day)
         {
             idTown = DbContext.ResolveTownId(idTown);
+            EnsureDayIsEditable(idTown, day);
             await Lock.WaitAsync();
             try
             {
@@ -98,10 +100,18 @@ namespace MyHordesOptimizerApi.Services.Impl
                 }
                 else
                 {
-                    // Create
-                    var newEntity = DbContext.Add(expeditionModel);
+                    // Create : une partie par défaut est créée ici (et non côté front en réaction au
+                    // broadcast) pour n'être créée qu'une seule fois, quel que soit le nombre de clients
+                    // connectés à la ville au moment de la création.
+                    var newEntity = DbContext.Add(expeditionModel).Entity;
                     DbContext.SaveChanges();
-                    result = Mapper.Map<ExpeditionDto>(newEntity.Entity);
+                    DbContext.Add(new ExpeditionPart { IdExpedition = newEntity.IdExpedition, Position = 0 });
+                    DbContext.SaveChanges();
+                    var expeditionWithDefaultPart = DbContext.Expeditions
+                        .Where(expedition => expedition.IdExpedition == newEntity.IdExpedition)
+                        .IncludeAll()
+                        .Single();
+                    result = Mapper.Map<ExpeditionDto>(expeditionWithDefaultPart);
                 }
                 DbContext.SaveChanges();
                 transaction.Commit();
@@ -142,6 +152,10 @@ namespace MyHordesOptimizerApi.Services.Impl
         public void DeleteExpedition(int expeditionId)
         {
             var expedition = DbContext.Expeditions.Single(expedition => expedition.IdExpedition == expeditionId);
+            if (expedition.IdTown.HasValue)
+            {
+                EnsureDayIsEditable(expedition.IdTown.Value, expedition.Day);
+            }
             DbContext.Remove(expedition);
             DbContext.SaveChanges();
         }
@@ -149,6 +163,7 @@ namespace MyHordesOptimizerApi.Services.Impl
         public async Task<List<ExpeditionDto>> CopyExpeditionsAsync(int townId, int fromDay, int targetDay)
         {
             townId = DbContext.ResolveTownId(townId);
+            EnsureDayIsEditable(townId, targetDay);
             await Lock.WaitAsync();
             try
             {
@@ -408,6 +423,10 @@ namespace MyHordesOptimizerApi.Services.Impl
 
         public async Task<ExpeditionCitizenDto> SaveExpeditionCitizenAsync(int expeditionPartId, ExpeditionCitizenRequestDto expeditionCitizen)
         {
+            if (!expeditionCitizen.Id.HasValue)
+            {
+                EnsurePartDayIsEditable(expeditionPartId);
+            }
             await Lock.WaitAsync();
             try
             {
@@ -424,6 +443,12 @@ namespace MyHordesOptimizerApi.Services.Impl
                     var expeditionCitizenFromDb = DbContext.ExpeditionCitizens.Where(citizen => citizen.IdExpeditionCitizen == expeditionCitizen.Id.Value)
                         .IncludeAll()
                         .Single();
+
+                    var existingExpedition = expeditionCitizenFromDb.IdExpeditionPartNavigation?.IdExpeditionNavigation;
+                    if (existingExpedition is not null && existingExpedition.IdTown.HasValue)
+                    {
+                        EnsureDayIsEditable(existingExpedition.IdTown.Value, existingExpedition.Day);
+                    }
 
                     var orderFromDb = expeditionCitizenFromDb.ExpeditionOrders;
                     var orderFromDto = expeditionCitizenModel.ExpeditionOrders;
@@ -466,6 +491,10 @@ namespace MyHordesOptimizerApi.Services.Impl
         public void DeleteExpeditionCitizen(int expeditionCitizenId)
         {
             var expeditionCitizen = DbContext.ExpeditionCitizens.Single(expedition => expedition.IdExpeditionCitizen == expeditionCitizenId);
+            if (expeditionCitizen.IdExpeditionPart.HasValue)
+            {
+                EnsurePartDayIsEditable(expeditionCitizen.IdExpeditionPart.Value);
+            }
             DbContext.Remove(expeditionCitizen);
             DbContext.SaveChanges();
         }
@@ -476,6 +505,7 @@ namespace MyHordesOptimizerApi.Services.Impl
 
         public async Task<ExpeditionPartDto> SaveExpeditionPartAsync(int expeditionId, ExpeditionPartRequestDto expeditionPart)
         {
+            EnsureExpeditionDayIsEditable(expeditionId);
             await Lock.WaitAsync();
             try
             {
@@ -517,10 +547,28 @@ namespace MyHordesOptimizerApi.Services.Impl
                 }
                 else
                 {
-                    // Create
-                    var newEntity = DbContext.Add(expeditionPartModel);
+                    // Create : un membre par défaut est créé ici (et non côté front en réaction au
+                    // broadcast) quand c'est la première partie de l'expédition, pour n'être créé qu'une
+                    // seule fois, quel que soit le nombre de clients connectés à la ville.
+                    var newEntity = DbContext.Add(expeditionPartModel).Entity;
                     DbContext.SaveChanges();
-                    result = Mapper.Map<ExpeditionPartDto>(newEntity.Entity);
+                    var isFirstPart = DbContext.ExpeditionParts.Count(part => part.IdExpedition == expeditionId) == 1;
+                    if (isFirstPart)
+                    {
+                        DbContext.Add(new ExpeditionCitizen { IdExpeditionPart = newEntity.IdExpeditionPart, IdExpeditionBagNavigation = new ExpeditionBag() });
+                        DbContext.SaveChanges();
+                    }
+                    var expeditionPartWithDefaultCitizen = DbContext.ExpeditionParts
+                        .Where(part => part.IdExpeditionPart == newEntity.IdExpeditionPart)
+                        .Include(part => part.IdExpeditionOrders)
+                        .Include(part => part.ExpeditionCitizens)
+                            .ThenInclude(citizen => citizen.ExpeditionOrders)
+                        .Include(part => part.ExpeditionCitizens)
+                            .ThenInclude(citizen => citizen.IdExpeditionBagNavigation)
+                                .ThenInclude(bag => bag.ExpeditionBagItems)
+                                    .ThenInclude(bagItem => bagItem.IdItemNavigation)
+                        .Single();
+                    result = Mapper.Map<ExpeditionPartDto>(expeditionPartWithDefaultCitizen);
                 }
                 transaction.Commit();
                 return result;
@@ -538,6 +586,10 @@ namespace MyHordesOptimizerApi.Services.Impl
         public void DeleteExpeditionPart(int expeditionPartId)
         {
             var expeditionPart = DbContext.ExpeditionParts.Single(part => part.IdExpeditionPart == expeditionPartId);
+            if (expeditionPart.IdExpedition.HasValue)
+            {
+                EnsureExpeditionDayIsEditable(expeditionPart.IdExpedition.Value);
+            }
             DbContext.Remove(expeditionPart);
             DbContext.SaveChanges();
         }
@@ -548,6 +600,7 @@ namespace MyHordesOptimizerApi.Services.Impl
 
         public async Task<List<ExpeditionOrderDto>> SaveCitizenOrdersAsync(int expeditionCitizenId, List<ExpeditionOrderDto> expeditionOrder)
         {
+            EnsureCitizenDayIsEditable(expeditionCitizenId);
             await Lock.WaitAsync();
             try
             {
@@ -606,6 +659,7 @@ namespace MyHordesOptimizerApi.Services.Impl
 
         public async Task<List<ExpeditionOrderDto>> SavePartOrdersAsync(int expeditionPartId, List<ExpeditionOrderDto> expeditionOrder)
         {
+            EnsurePartDayIsEditable(expeditionPartId);
             await Lock.WaitAsync();
             try
             {
@@ -660,7 +714,14 @@ namespace MyHordesOptimizerApi.Services.Impl
 
         public void DeleteExpeditionOrder(int expeditionOrderId)
         {
-            var expeditionOrder = DbContext.ExpeditionOrders.Single(order => order.IdExpeditionOrder == expeditionOrderId);
+            var expeditionOrder = DbContext.ExpeditionOrders
+                .Include(order => order.IdExpeditionCitizenNavigation)
+                    .ThenInclude(citizen => citizen.IdExpeditionPartNavigation)
+                        .ThenInclude(part => part.IdExpeditionNavigation)
+                .Include(order => order.IdExpeditionParts)
+                    .ThenInclude(part => part.IdExpeditionNavigation)
+                .Single(order => order.IdExpeditionOrder == expeditionOrderId);
+            EnsureOrderDayIsEditable(expeditionOrder);
             DbContext.Remove(expeditionOrder);
             DbContext.SaveChanges();
         }
@@ -674,6 +735,7 @@ namespace MyHordesOptimizerApi.Services.Impl
                 .Include(order => order.IdExpeditionParts)
                     .ThenInclude(part => part.IdExpeditionNavigation)
                 .Single(order => order.IdExpeditionOrder == expeditionOrderDto.Id.Value);
+            EnsureOrderDayIsEditable(expeditionOrderModel);
             var modelFromDto = Mapper.Map<ExpeditionOrder>(expeditionOrderDto);
             expeditionOrderModel.UpdateAllButKeysProperties(modelFromDto, ignoreNull: true);
             DbContext.Update(expeditionOrderModel);
@@ -687,10 +749,13 @@ namespace MyHordesOptimizerApi.Services.Impl
         #region Bags
         public ExpeditionBagDto UpdateExpeditionBag(int citizenId, ExpeditionBagRequestDto expeditionBagDto)
         {
+            EnsureCitizenDayIsEditable(citizenId);
             using var transaction = DbContext.Database.BeginTransaction(); ;
             var expeditionBagModel = Mapper.Map<ExpeditionBag>(expeditionBagDto);
             ExpeditionBagDto result;
-            var expeditionCitizen = DbContext.ExpeditionCitizens.Single(citizen => citizen.IdExpeditionCitizen == citizenId);
+            var expeditionCitizen = DbContext.ExpeditionCitizens
+                .Include(citizen => citizen.IdExpeditionPartNavigation)
+                .Single(citizen => citizen.IdExpeditionCitizen == citizenId);
             if (expeditionBagDto.Id.HasValue)
             {
                 // Si l'id du sac du citizen a changer, on delete l'ancien sac
@@ -698,26 +763,33 @@ namespace MyHordesOptimizerApi.Services.Impl
                 {
                     DbContext.Remove(DbContext.ExpeditionBags.Single(expeditionBag => expeditionBag.IdExpeditionBag == expeditionBagDto.Id));
                 }
-                // UpdateAsync 
+                // UpdateAsync : UpdateAllButKeysProperties recopie aussi les navigations (à leur valeur par
+                // défaut côté DTO), il faut restaurer ExpeditionCitizens sous peine de l'écraser et
+                // d'orpheliner le citoyen (ExpeditionCitizen_ibfk_4 est ON DELETE CASCADE).
                 var expeditionBagFromDb = DbContext.GetExpeditionBag(expeditionBagDto.Id.Value);
+                var citizensInBag = expeditionBagFromDb.ExpeditionCitizens;
                 expeditionBagFromDb.UpdateAllButKeysProperties(expeditionBagModel);
+                expeditionBagFromDb.ExpeditionCitizens = citizensInBag;
                 DbContext.Update(expeditionBagFromDb);
                 expeditionCitizen.IdExpeditionBagNavigation = expeditionBagFromDb;
                 DbContext.SaveChanges();
                 var updatedExpeditionBag = DbContext.GetExpeditionBag(expeditionBagDto.Id.Value);
-                result = Mapper.Map<ExpeditionBagDto>(expeditionBagFromDb);
+                result = Mapper.Map<ExpeditionBagDto>(updatedExpeditionBag);
             }
             else
             {
-                // Si y'a déjà un bag, on remove
-                if (expeditionCitizen.IdExpeditionBag != null)
-                {
-                    DbContext.Remove(DbContext.ExpeditionBags.Single(expeditionBag => expeditionBag.IdExpeditionBag == expeditionCitizen.IdExpeditionBag));
-                }
-                // Create
+                // Create : on repointe d'abord le citoyen sur le nouveau sac avant de supprimer l'ancien,
+                // car ExpeditionCitizen_ibfk_4 est ON DELETE CASCADE (supprimer le sac pendant qu'il est
+                // encore référencé supprimerait le citoyen).
+                var oldBagId = expeditionCitizen.IdExpeditionBag;
                 var newEntity = DbContext.Add(expeditionBagModel).Entity;
                 expeditionCitizen.IdExpeditionBagNavigation = newEntity;
                 DbContext.SaveChanges();
+                if (oldBagId != null)
+                {
+                    DbContext.Remove(DbContext.ExpeditionBags.Single(expeditionBag => expeditionBag.IdExpeditionBag == oldBagId));
+                    DbContext.SaveChanges();
+                }
                 var newEntityWithDependance = DbContext.GetExpeditionBag(newEntity.IdExpeditionBag);
                 result = Mapper.Map<ExpeditionBagDto>(newEntityWithDependance);
             }
@@ -725,13 +797,116 @@ namespace MyHordesOptimizerApi.Services.Impl
             return result;
         }
 
-        public void DeleteExpeditionBag(int bagId)
+        public List<ExpeditionBagDto> DeleteExpeditionBag(int bagId)
         {
-            var expeditionBag = DbContext.ExpeditionBags.Single(bag => bag.IdExpeditionBag == bagId);
+            var expeditionBag = DbContext.ExpeditionBags
+                .Include(bag => bag.ExpeditionCitizens)
+                .Single(bag => bag.IdExpeditionBag == bagId);
+            foreach (var citizen in expeditionBag.ExpeditionCitizens)
+            {
+                EnsureCitizenDayIsEditable(citizen.IdExpeditionCitizen);
+            }
+            var citizenIds = expeditionBag.ExpeditionCitizens.Select(citizen => citizen.IdExpeditionCitizen).ToList();
+            // On détache d'abord les citoyens du sac : ExpeditionCitizen_ibfk_4 est ON DELETE CASCADE,
+            // les supprimer avec le sac encore référencé supprimerait aussi les citoyens.
+            foreach (var citizen in expeditionBag.ExpeditionCitizens)
+            {
+                citizen.IdExpeditionBag = null;
+            }
+            DbContext.SaveChanges();
             DbContext.Remove(expeditionBag);
             DbContext.SaveChanges();
+
+            // Chaque citoyen qui avait ce sac reçoit un sac vide de remplacement, créé une seule fois côté
+            // serveur (et non par chaque client connecté à la ville qui recevait l'événement de suppression).
+            var replacementBags = new List<ExpeditionBagDto>();
+            foreach (var citizenId in citizenIds)
+            {
+                var citizen = DbContext.ExpeditionCitizens.Single(c => c.IdExpeditionCitizen == citizenId);
+                var newBag = DbContext.Add(new ExpeditionBag()).Entity;
+                citizen.IdExpeditionBagNavigation = newBag;
+                DbContext.SaveChanges();
+                replacementBags.Add(Mapper.Map<ExpeditionBagDto>(DbContext.GetExpeditionBag(newBag.IdExpeditionBag)));
+            }
+            return replacementBags;
         }
 
         #endregion
+
+        /// <summary>Rejette toute écriture sur un jour antérieur au jour actuel de la ville.</summary>
+        private void EnsureDayIsEditable(int townId, int? day)
+        {
+            var townDay = DbContext.Towns.Where(town => town.IdTown == townId).Select(town => town.Day).Single();
+            if (ExpeditionDayLock.IsLocked(day, townDay))
+            {
+                throw new MhoTechnicalException("Cette expédition appartient à un jour déjà passé et ne peut plus être modifiée.");
+            }
+        }
+
+        /// <summary>Rejette toute écriture sur une expédition dont le jour est déjà passé.</summary>
+        private void EnsureExpeditionDayIsEditable(int expeditionId)
+        {
+            var expedition = DbContext.Expeditions
+                .Where(expedition => expedition.IdExpedition == expeditionId)
+                .Select(expedition => new { expedition.IdTown, expedition.Day })
+                .Single();
+            if (expedition.IdTown.HasValue)
+            {
+                EnsureDayIsEditable(expedition.IdTown.Value, expedition.Day);
+            }
+        }
+
+        /// <summary>Rejette toute écriture sur une partie d'expédition dont le jour est déjà passé.</summary>
+        private void EnsurePartDayIsEditable(int expeditionPartId)
+        {
+            var expeditionId = DbContext.ExpeditionParts
+                .Where(part => part.IdExpeditionPart == expeditionPartId)
+                .Select(part => part.IdExpedition)
+                .Single();
+            if (expeditionId.HasValue)
+            {
+                EnsureExpeditionDayIsEditable(expeditionId.Value);
+            }
+        }
+
+        /// <summary>Rejette toute écriture sur un citoyen d'expédition dont le jour est déjà passé.</summary>
+        private void EnsureCitizenDayIsEditable(int expeditionCitizenId)
+        {
+            var expeditionPartId = DbContext.ExpeditionCitizens
+                .Where(citizen => citizen.IdExpeditionCitizen == expeditionCitizenId)
+                .Select(citizen => citizen.IdExpeditionPart)
+                .Single();
+            if (expeditionPartId.HasValue)
+            {
+                EnsurePartDayIsEditable(expeditionPartId.Value);
+            }
+        }
+
+        /// <summary>
+        /// Rejette toute écriture sur une commande dont le jour est déjà passé. Une commande appartient
+        /// soit à un citoyen, soit directement à une ou plusieurs parties (cf. ExpeditionMappingProfiles).
+        /// </summary>
+        private void EnsureOrderDayIsEditable(ExpeditionOrder order)
+        {
+            if (order.IdExpeditionCitizenNavigation is not null)
+            {
+                var expedition = order.IdExpeditionCitizenNavigation.IdExpeditionPartNavigation?.IdExpeditionNavigation;
+                if (expedition is not null && expedition.IdTown.HasValue)
+                {
+                    EnsureDayIsEditable(expedition.IdTown.Value, expedition.Day);
+                }
+            }
+            else
+            {
+                foreach (var part in order.IdExpeditionParts)
+                {
+                    var expedition = part.IdExpeditionNavigation;
+                    if (expedition is not null && expedition.IdTown.HasValue)
+                    {
+                        EnsureDayIsEditable(expedition.IdTown.Value, expedition.Day);
+                    }
+                }
+            }
+        }
     }
 }

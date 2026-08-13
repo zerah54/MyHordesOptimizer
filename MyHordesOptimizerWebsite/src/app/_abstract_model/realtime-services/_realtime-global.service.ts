@@ -1,4 +1,4 @@
-import { inject,Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import * as signalR from '@microsoft/signalr';
 import { IHttpConnectionOptions } from '@microsoft/signalr';
 
@@ -55,12 +55,18 @@ export abstract class RealtimeGlobalService {
     }
 
     protected async invokeHub(methodName: string, ...args: unknown[]): Promise<void> {
-        if (this.hubConnection.state === 'Disconnected') {
-            this.startConnexion().then(async () => {
-                await this.hubConnection.invoke(methodName, ...args);
-            });
-        } else {
-            await this.hubConnection.invoke(methodName, ...args);
+        while (this.hubConnection.state !== 'Connected') {
+            if (this.hubConnection.state === 'Disconnected') {
+                await this.startConnexion();
+            } else {
+                // 'Connecting' ou 'Reconnecting' : invoke() lève si on l'appelle hors de l'état 'Connected'.
+                await this.sleep(100);
+            }
         }
+        await this.hubConnection.invoke(methodName, ...args);
+    }
+
+    private sleep(ms: number): Promise<void> {
+        return new Promise((resolve) => setTimeout(resolve, ms));
     }
 }

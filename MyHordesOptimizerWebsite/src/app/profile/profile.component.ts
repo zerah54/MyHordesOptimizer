@@ -22,7 +22,7 @@ import { NoteDialogComponent, NoteDialogData } from '../_shared/note-dialog/note
 import { NoteIconComponent } from '../_shared/note-icon/note-icon.component';
 
 const angular_common: Imports = [CommonModule, RouterLink, RouterLinkActive, RouterOutlet];
-const components: Imports = [NoteDialogComponent, NoteIconComponent];
+const components: Imports = [NoteIconComponent];
 const pipes: Imports = [];
 const material_modules: Imports = [MatButtonModule, MatCardModule, MatDialogModule, MatIconModule, MatProgressSpinnerModule, MatTabsModule, MatTooltipModule];
 
