@@ -4,6 +4,7 @@ using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools;
 using MyHordesOptimizerApi.Models.ExternalTools;
 using MyHordesOptimizerApi.Providers.Interfaces;
 using MyHordesOptimizerApi.Services.Interfaces.ExternalTools;
+using Serilog.Context;
 using System;
 using System.Threading.Tasks;
 
@@ -39,7 +40,8 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
         /// le nom d'utilisateur, posé par JwtActionFilter, serait sinon perdu et écrit à null dans
         /// LastUpdateInfo.
         /// </summary>
-        public ExternalToolsUpdateJobState TryStart(int userId, string userKey, string userName, UpdateRequestDto request)
+        public ExternalToolsUpdateJobState TryStart(int userId, string userKey, string userName, UpdateRequestDto request,
+            string mhoOrigin, string mhoAddonVersion, string correlationId)
         {
             var progress = _store.TryReserve(userId);
             if (progress == null)
@@ -59,16 +61,28 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                 throw;
             }
 
-            _ = Task.Run(() => RunAsync(progress, userId, userKey, userName, request));
+            _ = Task.Run(() => RunAsync(progress, userId, userKey, userName, request, mhoOrigin, mhoAddonVersion, correlationId));
             return progress.Snapshot();
         }
 
+        /// <summary>
+        /// MhoOrigin/MhoAddonVersion/CorrelationId sont capturés ici pour la même raison que
+        /// userName ci-dessus : les enrichers Serilog qui les lisent normalement (MyHordesOptimizerEnricher,
+        /// WithCorrelationId) lisent le HttpContext de la requête, qui n'existe plus une fois qu'on est
+        /// dans ce Task.Run détaché. On les repousse donc nous-mêmes dans le LogContext.
+        /// </summary>
         private async Task RunAsync(ExternalToolsUpdateProgress progress,
             int userId,
             string userKey,
             string userName,
-            UpdateRequestDto request)
+            UpdateRequestDto request,
+            string mhoOrigin,
+            string mhoAddonVersion,
+            string correlationId)
         {
+            using var _1 = LogContext.PushProperty("MhoOrigin", mhoOrigin);
+            using var _2 = LogContext.PushProperty("MhoAddonVersion", mhoAddonVersion);
+            using var _3 = LogContext.PushProperty("CorrelationId", correlationId);
             try
             {
                 using var scope = _scopeFactory.CreateScope();

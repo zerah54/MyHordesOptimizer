@@ -28,14 +28,17 @@ namespace MyHordesOptimizerApi.Controllers
     {
         protected IExternalToolsService ExternalToolsService { get; private set; }
         protected ExternalToolsUpdateJobRunner UpdateJobRunner { get; private set; }
+        protected IMhoHeadersProvider MhoHeadersProvider { get; private set; }
 
         public ExternalToolsController(ILogger<ExternalToolsController> logger,
             IUserInfoProvider userKeyProvider,
             IExternalToolsService externalToolsService,
-            ExternalToolsUpdateJobRunner externalToolsUpdateJobRunner) : base(logger, userKeyProvider)
+            ExternalToolsUpdateJobRunner externalToolsUpdateJobRunner,
+            IMhoHeadersProvider mhoHeadersProvider) : base(logger, userKeyProvider)
         {
             ExternalToolsService = externalToolsService;
             UpdateJobRunner = externalToolsUpdateJobRunner;
+            MhoHeadersProvider = mhoHeadersProvider;
         }
 
         /// <summary>Contrôles communs aux deux routes de mise à jour. Null si la requête est valide.</summary>
@@ -89,7 +92,8 @@ namespace MyHordesOptimizerApi.Controllers
             UserInfoProvider.UserKey = userKey;
             UserInfoProvider.UserId = userId;
 
-            var state = UpdateJobRunner.TryStart(userId, userKey, UserInfoProvider.UserName, updateRequestDto);
+            var state = UpdateJobRunner.TryStart(userId, userKey, UserInfoProvider.UserName, updateRequestDto,
+                MhoHeadersProvider.MhoOrigin, MhoHeadersProvider.MhoAddonVersion, HttpContext.TraceIdentifier);
             if (state == null)
             {
                 // Double clic ou second onglet : le client suit le lancement déjà en cours.
