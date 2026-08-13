@@ -24,6 +24,7 @@ using MyHordesOptimizerApi.Models.ExternalTools.GestHordes;
 using MyHordesOptimizerApi.Providers.Interfaces;
 using MyHordesOptimizerApi.Repository.Interfaces;
 using MyHordesOptimizerApi.Repository.Interfaces.ExternalTools;
+using MyHordesOptimizerApi.Services.Impl.Locking;
 using MyHordesOptimizerApi.Services.Interfaces.ExternalTools;
 using Newtonsoft.Json.Linq;
 using System;
@@ -44,6 +45,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
         protected IMapper Mapper { get; private set; }
         protected IUserInfoProvider UserInfoProvider { get; private set; }
         protected IServiceScopeFactory ServiceScopeFactory { get; private set; }
+        protected TownSyncLock TownSyncLock { get; private set; }
 
 
         public ExternalToolsService(ILogger<ExternalToolsService> logger,
@@ -53,7 +55,8 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
             IMapper mapper,
             IUserInfoProvider userInfoProvider,
             IServiceScopeFactory serviceScopeFactory,
-            IMyHordesApiRepository myHordesApiRepository)
+            IMyHordesApiRepository myHordesApiRepository,
+            TownSyncLock townSyncLock)
         {
             Logger = logger;
             BigBrothHordesRepository = bigBrothHordesRepository;
@@ -63,6 +66,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
             UserInfoProvider = userInfoProvider;
             ServiceScopeFactory = serviceScopeFactory;
             MyHordesApiRepository = myHordesApiRepository;
+            TownSyncLock = townSyncLock;
         }
 
         public async Task<UpdateResponseDto> UpdateExternalsTools(UpdateRequestDto updateRequestDto, IExternalToolsProgressSink sink = null)
@@ -243,17 +247,27 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
             }
 
             #region Maps
+            // Référencée par les tâches Bags/Citizen/Digs ci-dessous : elles écrivent les mêmes
+            // lignes (TownCitizens, MapCells/MapCellDigs) que mhoTask et doivent attendre sa fin
+            // avant de démarrer, sans quoi leur résultat dépend de l'ordre d'exécution des tâches.
+            Task mhoTask = null;
             if (plan.MhoMap && !mhoPreambleFailed)
             {
-                var mhoTask = Task.Run(() =>
+                mhoTask = Task.Run(async () =>
                 {
                     try
                     {
+                        var me = MyHordesApiRepository.GetMapForToolsUpdate();
+
+                        // Même clé que le login (GetSimpleMeAsync) : le mapId, jamais le townId
+                        // résolu. Sans cet alignement, ce chemin et le login verrouillent deux
+                        // sémaphores différents pour la même ville et ne s'excluent pas mutuellement.
+                        await using var townLock = await TownSyncLock.AcquireTownAsync(-townDetails.TownId);
+
                         using var scope = ServiceScopeFactory.CreateScope();
                         var dbContext = scope.ServiceProvider.GetRequiredService<MhoContext>();
                         using var transaction = dbContext.Database.BeginTransaction();
 
-                        var me = MyHordesApiRepository.GetMapForToolsUpdate();
                         var zones = me.Map.Zones;
                         var listCells = new List<MapCell>();
                         var listCellItems = new List<MapCellItem>();
@@ -261,7 +275,10 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
 
                         var townId = resolvedTownId;
 
-                        var townEntity = dbContext.Towns.Find(townId);
+                        var townEntity = dbContext.Towns
+                            .Include(town => town.TownCitizens)
+                            .Include(town => town.TownCadavers)
+                            .FirstOrDefault(town => town.IdTown == townId);
                         if (townEntity != null)
                         {
                             // Mise à jour centralisée : on exploite tout le /json/me déjà payé
@@ -277,6 +294,62 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                             // Garde-fou : le joueur qui met à jour est dans cette ville, elle ne peut pas être terminée
                             townEntity.IsFinished = false;
                             dbContext.Update(townEntity);
+
+                            // Citoyens, cadavres et banque : jusqu'ici seul le login (GetSimpleMeAsync)
+                            // les persistait, ce chemin les laissait périmer entre deux connexions.
+                            foreach (var myHordeCitizen in me.Map.Citizens ?? new List<MyHordesUserDto>())
+                            {
+                                var mappedCitizen = Mapper.Map<TownCitizen>(myHordeCitizen, opt => opt.SetDbContext(dbContext));
+                                var existingCitizen = townEntity.TownCitizens.FirstOrDefault(citizen => citizen.IdUser == mappedCitizen.IdUser);
+                                if (existingCitizen == null)
+                                {
+                                    mappedCitizen.IdTown = townId;
+                                    mappedCitizen.IdLastUpdateInfo = newLastUpdate.IdLastUpdateInfo;
+                                    dbContext.Add(mappedCitizen);
+                                }
+                                else
+                                {
+                                    existingCitizen.UpdateAllButKeysProperties(mappedCitizen, ignoreNull: true);
+                                    existingCitizen.IdLastUpdateInfo = newLastUpdate.IdLastUpdateInfo;
+                                }
+                            }
+                            // Les citoyens passés côté cadavres ne sont plus listés dans map.citizens :
+                            // on marque leur ligne comme morte au lieu de la perdre (même logique que le login).
+                            foreach (var myHordeCadaver in (me.Map.Cadavers ?? new List<MyHordesCitizenRankingDto>()).Where(cadaver => cadaver.Id.HasValue))
+                            {
+                                var mappedCadaver = Mapper.Map<TownCadaver>(myHordeCadaver, opt => opt.SetDbContext(dbContext));
+                                var deadCitizen = townEntity.TownCitizens.FirstOrDefault(citizen => citizen.IdUser == mappedCadaver.IdUser);
+                                if (deadCitizen != null)
+                                {
+                                    deadCitizen.Dead = true;
+                                }
+                                var existingCadaver = townEntity.TownCadavers.FirstOrDefault(cadaver => cadaver.IdUser == mappedCadaver.IdUser);
+                                if (existingCadaver == null)
+                                {
+                                    mappedCadaver.IdTown = townId;
+                                    mappedCadaver.IdLastUpdateInfo = newLastUpdate.IdLastUpdateInfo;
+                                    dbContext.Add(mappedCadaver);
+                                }
+                                else
+                                {
+                                    existingCadaver.UpdateAllButKeysProperties(mappedCadaver, ignoreNull: true);
+                                }
+                            }
+                            // Banque : nouvelle photo à chaque MAJ, comme le login (pas de suppression
+                            // des anciennes lignes, la lecture se fait sur le dernier IdLastUpdateInfo).
+                            if (me.Map.City?.Bank != null)
+                            {
+                                var mappedBankItems = me.Map.City.Bank
+                                    .Select(item => Mapper.Map<TownBankItem>(item, opt => opt.SetDbContext(dbContext)))
+                                    .Where(item => item.IdItemNavigation != null)
+                                    .ToList();
+                                foreach (var item in mappedBankItems)
+                                {
+                                    item.IdTown = townId;
+                                    item.IdLastUpdateInfo = newLastUpdate.IdLastUpdateInfo;
+                                }
+                                dbContext.AddRange(mappedBankItems);
+                            }
                         }
 
                         var zoneItemX = -1;
@@ -471,10 +544,16 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
             #region Bag
             if (plan.MhoBags && !mhoPreambleFailed)
             {
-                var mHOBagTask = Task.Run(() =>
+                var mHOBagTask = Task.Run(async () =>
                 {
                     try
                     {
+                        // mhoTask écrit aussi TownCitizens pour cette ville : on attend sa fin avant
+                        // d'y toucher, puis on prend le même verrou pour s'exclure d'un autre joueur
+                        // de la même ville en train de faire la même mise à jour.
+                        if (mhoTask != null) await mhoTask;
+                        await using var townLock = await TownSyncLock.AcquireTownAsync(-townDetails.TownId);
+
                         UpdateBags(resolvedTownId, updateRequestDto.Bags.Contents);
                         sink.Succeeded(ExternalToolId.MyHordesOptimizer, ExternalToolUpdateUnits.Bags);
                     }
@@ -555,10 +634,16 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
 
                 if (plan.MhoCitizen && !mhoPreambleFailed)
                 {
-                    var mHOCitizenDetailTask = Task.Run(() =>
+                    var mHOCitizenDetailTask = Task.Run(async () =>
                     {
                         try
                         {
+                            // mhoTask écrit aussi la ligne TownCitizens du joueur courant : on attend
+                            // sa fin, puis on prend le même verrou par ville qu'elle (autre joueur de
+                            // la même ville en train de synchroniser en parallèle).
+                            if (mhoTask != null) await mhoTask;
+                            await using var townLock = await TownSyncLock.AcquireTownAsync(-townDetails.TownId);
+
                             using var scope = ServiceScopeFactory.CreateScope();
                             var dbContext = scope.ServiceProvider.GetRequiredService<MhoContext>();
                             using var transaction = dbContext.Database.BeginTransaction();
@@ -634,11 +719,18 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
 
             if (plan.MhoDigs && !mhoPreambleFailed)
             {
-                var digsTask = Task.Run(() =>
+                var digsTask = Task.Run(async () =>
                 {
                     var successedDig = updateRequestDto.SuccessedDig;
                     try
                     {
+                        // mhoTask vide MapCellDigs pour toutes les cases de la carte reçue avant d'y
+                        // réinsérer : sans cet ordre, une exécution concurrente peut effacer la ligne
+                        // que digsTask vient d'écrire. On attend sa fin, puis on prend le même verrou
+                        // par ville (autre joueur de la même ville en train de synchroniser).
+                        if (mhoTask != null) await mhoTask;
+                        await using var townLock = await TownSyncLock.AcquireTownAsync(-townDetails.TownId);
+
                         using var scope = ServiceScopeFactory.CreateScope();
                         var dbContext = scope.ServiceProvider.GetRequiredService<MhoContext>();
                         using var transaction = dbContext.Database.BeginTransaction();

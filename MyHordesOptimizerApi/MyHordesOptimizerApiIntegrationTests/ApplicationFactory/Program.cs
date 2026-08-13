@@ -1,14 +1,21 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using MyHordesOptimizerApi;
+using MyHordesOptimizerApi.Configuration.Impl.ExternalTools;
 using MyHordesOptimizerApi.Configuration.Interfaces;
+using MyHordesOptimizerApi.Configuration.Interfaces.ExternalTools;
 using MyHordesOptimizerApi.Controllers.ActionFillters;
 using MyHordesOptimizerApi.Providers.Impl;
 using MyHordesOptimizerApi.Providers.Interfaces;
 using MyHordesOptimizerApi.Repository.Impl;
+using MyHordesOptimizerApi.Repository.Impl.ExternalTools;
 using MyHordesOptimizerApi.Repository.Interfaces;
+using MyHordesOptimizerApi.Repository.Interfaces.ExternalTools;
 using MyHordesOptimizerApi.Services.Impl;
+using MyHordesOptimizerApi.Services.Impl.ExternalTools;
+using MyHordesOptimizerApi.Services.Impl.Locking;
 using MyHordesOptimizerApi.Services.Interfaces;
+using MyHordesOptimizerApi.Services.Interfaces.ExternalTools;
 using MyHordesOptimizerApiIntegrationTests.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -52,6 +59,16 @@ builder.Services.AddScoped<IUserAccountService, UserAccountService>();
 
 // Requis par NoteServiceTests (Services.Impl.NoteService).
 builder.Services.AddScoped<INoteService, NoteService>();
+
+// Requis par ExternalToolsServiceLockingTests (Services.Impl.ExternalTools.ExternalToolsService).
+builder.Services.AddSingleton<IGestHordesConfiguration, GestHordesConfiguration>();
+builder.Services.AddSingleton<IBigBrothHordesConfiguration, BigBrothHordesConfiguration>();
+builder.Services.AddSingleton<IFataMorganaConfiguration, FataMorganaConfiguration>();
+builder.Services.AddScoped<IBigBrothHordesRepository, BigBrothHordesRepository>();
+builder.Services.AddScoped<IFataMorganaRepository, FataMorganaRepository>();
+builder.Services.AddScoped<IGestHordesRepository, GestHordesRepository>();
+builder.Services.AddSingleton<TownSyncLock>();
+builder.Services.AddScoped<IExternalToolsService, ExternalToolsService>();
 
 var app = builder.Build();
 app.UseHttpsRedirection();

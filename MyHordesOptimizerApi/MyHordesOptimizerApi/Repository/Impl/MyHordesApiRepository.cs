@@ -52,15 +52,22 @@ namespace MyHordesOptimizerApi.Repository.Impl
         /// Variante de <see cref="GetMe"/> réservée au chemin de mise à jour des outils externes
         /// (<c>ExternalToolsService</c>) : ne demande que ce que ce chemin consomme ou a explicitement
         /// prévu de consommer (chantiers/bâtiments/gazette/défense/améliorations/expéditions, en
-        /// attente de leurs propres chantiers). Exclut notamment `citizens`, `cadavers` et `bank` —
-        /// non lus ici (seul <see cref="GetMe"/>/login les persiste) — ainsi que `playedMaps`, `rewards`,
-        /// `isGhost`, `twinId`, `locale`, `hard`/`custom` (redondants avec `type`), `conspiracy`,
-        /// `bonusPts`, `date`, `estimations`/`estimationsNext` : aucun n'est utilisé ni prévu ici.
+        /// attente de leurs propres chantiers). Exclut `playedMaps`, `rewards`, `isGhost`, `twinId`,
+        /// `locale`, `hard`/`custom` (redondants avec `type`), `conspiracy`, `bonusPts`, `date`,
+        /// `estimations`/`estimationsNext` : aucun n'est utilisé ni prévu ici.
+        /// <para>
+        /// `citizens`, `cadavers` et `bank` sont demandés — chacun réduit au sous-ensemble de champs
+        /// que <c>ExternalToolsService</c> persiste réellement (voir <c>TownMappingProfile</c>) — pour
+        /// que ce chemin rafraîchisse ces trois-là comme le fait le login, plutôt que de laisser
+        /// citoyens/cadavres/banque périmer entre deux connexions. `cleanup` et `rewards` des cadavres
+        /// restent hors périmètre : le premier n'est pas encore branché côté modèle, le second
+        /// alimente les pictos, gérés par le login via sa propre tâche de fond throttlée.
+        /// </para>
         /// </summary>
         public MyHordesUserDetailsDto GetMapForToolsUpdate()
         {
             var url = GenerateUrl(EndpointMe);
-            url = AddParameterToQuery(url, _parameterFields, "id,name,mapId,map.fields(wid,hei,days,zones.fields(x,y,nvt,tag,danger,details.fields(z,h,dried),items.fields(uid,id,count,broken),building.fields(type,dig,camped,dried)),city.fields(name,type,water,x,y,door,chaos,devast,chantiers.fields(id,icon,name,pa,maxLife,votes,breakable,def,resources.fields(amount,rsc.fields(id,name)),actions,hasLevels),buildings.fields(id,name,life,maxLife,breakable,def,hasUpgrade,rarity,temporary,parent,actions,hasLevels),news.fields(z,def,content,regenDir,water),defense.fields(total,base,buildings,upgrades,items,itemsMul,citizenHomes,citizenGuardians,watchmen,souls,temp,cadavers,guardiansInfos.fields(gardians,def),bonus),upgrades.fields(total,list.fields(name,level,update,buildingId))),expeditions.fields(name,author.fields(id),length,points.fields(x,y)),season,phase,language,shaman,guide,cata)");
+            url = AddParameterToQuery(url, _parameterFields, "id,name,mapId,map.fields(wid,hei,days,zones.fields(x,y,nvt,tag,danger,details.fields(z,h,dried),items.fields(uid,id,count,broken),building.fields(type,dig,camped,dried)),citizens.fields(id,name,avatar,homeMessage,baseDef,ban,job.fields(uid,name),dead,x,y),city.fields(name,type,water,x,y,door,chaos,devast,chantiers.fields(id,icon,name,pa,maxLife,votes,breakable,def,resources.fields(amount,rsc.fields(id,name)),actions,hasLevels),buildings.fields(id,name,life,maxLife,breakable,def,hasUpgrade,rarity,temporary,parent,actions,hasLevels),news.fields(z,def,content,regenDir,water),defense.fields(total,base,buildings,upgrades,items,itemsMul,citizenHomes,citizenGuardians,watchmen,souls,temp,cadavers,guardiansInfos.fields(gardians,def),bonus),upgrades.fields(total,list.fields(name,level,update,buildingId)),bank.fields(id,count,broken)),cadavers.fields(id,name,avatar,survival,dtype,comment,msg,sp),expeditions.fields(name,author.fields(id),length,points.fields(x,y)),season,phase,language,shaman,guide,cata)");
             return base.Get<MyHordesUserDetailsDto>(url);
         }
 
