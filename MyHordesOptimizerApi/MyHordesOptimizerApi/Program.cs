@@ -161,6 +161,7 @@ builder.Services.AddControllers(config =>
 builder.Services.AddAutoMapper(opt =>
 {
     opt.AllowNullDestinationValues = true;
+    opt.LicenseKey = builder.Configuration["AutoMapper:LicenseKey"];
 }, Assembly.GetAssembly(typeof(Program)));
 
 builder.Services.AddSignalR(options =>
