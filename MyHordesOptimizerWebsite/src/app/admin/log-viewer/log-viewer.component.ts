@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, DestroyRef, inject, OnInit, signal,WritableSignal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, OnInit, signal, WritableSignal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -43,7 +43,7 @@ export class LogViewerComponent implements OnInit {
     private readonly destroy_ref: DestroyRef = inject(DestroyRef);
 
     protected readonly logLevels: LogLevel[] = LOG_LEVELS;
-    protected readonly displayedColumns: string[] = ['stacktrace', 'timestamp', 'level', 'mhoOrigin', 'mhoAddonVersion', 'request', 'correlationId', 'sourceContext', 'message' ];
+    protected readonly displayedColumns: string[] = ['stacktrace', 'timestamp', 'level', 'mhoOrigin', 'mhoAddonVersion', 'request', 'correlationId', 'sourceContext', 'actionId', 'message' ];
 
     protected entries: WritableSignal<LogEntry[]> = signal<LogEntry[]>([]);
     protected totalCount: WritableSignal<number> = signal(0);

@@ -8,6 +8,7 @@ export interface LogEntry {
     level: LogLevel;
     sourceContext: string;
     eventId: string;
+    actionId?: string;
     message: string;
     stackTrace?: string;
     mhoOrigin: string;

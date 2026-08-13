@@ -11,7 +11,7 @@ namespace MyHordesOptimizerApi.Services.Impl
     public class AdminService
     {
         private static readonly Regex LogLineRegex = new(
-            @"^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{3} [+-]\d{2}:\d{2}) <(\d+) - (\d+)>\s+(\S*)\s+\[(\w+)\] ==([^=]*) - ([^=]*)== \[([^\]]*)\] \[([^\]]*)\] \[([^\]]*)\] (.*)$",
+            @"^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{3} [+-]\d{2}:\d{2}) <(\d+) - (\d+)>\s+(\S*)\s+\[(\w+)\] ==([^=]*) - ([^=]*)== \[([^\]]*)\] \[([^\]]*)\] \[([^\]]*)\] \[([^\]]*)\] (.*)$",
             RegexOptions.Compiled
         );
 
@@ -133,7 +133,8 @@ namespace MyHordesOptimizerApi.Services.Impl
                 MhoAddonVersion = NullIfEmpty(CleanHeaderValue(match.Groups[7].Value.Trim())),
                 SourceContext = match.Groups[9].Value,
                 EventId = match.Groups[10].Value,
-                Message = match.Groups[11].Value
+                ActionId = NullIfEmpty(match.Groups[11].Value),
+                Message = match.Groups[12].Value
             };
             ParseRequestSection(match.Groups[8].Value, entry);
             return entry;

@@ -127,6 +127,13 @@
                 </td>
             </ng-container>
 
+            <ng-container matColumnDef="actionId">
+                <th mat-header-cell *matHeaderCellDef>Action Id</th>
+                <td mat-cell *matCellDef="let row" class="cell--mho" [matTooltip]="row.actionId">
+                    {{ row.actionId ?? '—' }}
+                </td>
+            </ng-container>
+
             <ng-container matColumnDef="request">
                 <th mat-header-cell *matHeaderCellDef>Request</th>
                 <td mat-cell *matCellDef="let row" class="cell--request">
