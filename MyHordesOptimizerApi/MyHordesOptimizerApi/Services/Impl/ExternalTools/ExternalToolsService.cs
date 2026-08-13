@@ -409,7 +409,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                                     type = null;
                                 }
                             }
-                            var cellModel = allCell.FirstOrDefault(cell => cell.X == zone.X
+                            var existingCellModel = allCell.FirstOrDefault(cell => cell.X == zone.X
                                                                   && cell.Y == zone.Y);
                             var cell = new MapCell()
                             {
@@ -433,6 +433,9 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                                 MaxPotentialRemainingDig = maxPotentialRemainingDig,
                                 Tag = zone.Tag
                             };
+                            // Une case jamais vue en base (existingCellModel null) n'a pas encore d'IdCell :
+                            // on référence `cell` en attendant l'insertion.
+                            var cellModel = existingCellModel ?? cell;
                             if (zone.Items != null)
                             {
                                 zoneItemX = zone.X.Value;
@@ -457,8 +460,15 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                                     listCellItems.Add(cellItem);
                                 }
                             }
-                            cellModel.UpdateAllButKeysProperties(cell, ignoreNull: true);
-                            listCells.Add(cellModel);
+                            if (existingCellModel != null)
+                            {
+                                existingCellModel.UpdateAllButKeysProperties(cell, ignoreNull: true);
+                                listCells.Add(existingCellModel);
+                            }
+                            else
+                            {
+                                listCells.Add(cell);
+                            }
                         }
                         if (UpdateRequestMapToolsToUpdateDetailsDto.IsCell(updateRequestDto.Map.ToolsToUpdate.IsMyHordesOptimizer) && updateRequestDto.Map.Cell != null)
                         {
