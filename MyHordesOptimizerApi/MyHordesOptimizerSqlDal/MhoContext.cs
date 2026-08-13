@@ -143,9 +143,9 @@ public partial class MhoContext : DbContext
 
         modelBuilder.Entity<BagItem>(entity =>
         {
-            entity.HasKey(e => new { e.IdBag, e.IdItem })
+            entity.HasKey(e => new { e.IdBag, e.IdItem, e.IsBroken })
                 .HasName("PRIMARY")
-                .HasAnnotation("MySql:IndexPrefixLength", new[] { 0, 0 });
+                .HasAnnotation("MySql:IndexPrefixLength", new[] { 0, 0, 0 });
 
             entity.Property(e => e.IsBroken).HasDefaultValueSql("b'0'");
 

@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace MyHordesOptimizerApi.Models;
 
-[PrimaryKey("IdBag", "IdItem")]
+[PrimaryKey("IdBag", "IdItem", "IsBroken")]
 [Table("BagItem")]
 [Index("IdItem", Name = "idItem")]
 public partial class BagItem
@@ -22,6 +22,7 @@ public partial class BagItem
     [Column("count", TypeName = "int(11)")]
     public int? Count { get; set; }
 
+    [Key]
     [Required]
     [Column("isBroken")]
     public bool? IsBroken { get; set; }
