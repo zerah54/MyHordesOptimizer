@@ -534,6 +534,10 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                         if (zoneItemX != -1 && zoneItemY != -1)
                         {
                             dbContext.MapCellItems.RemoveRange(dbContext.MapCellItems.Where(cellItem => listCellItems.Select(x => x.IdCell).Contains(cellItem.IdCell)));
+                            // SaveChanges séparé : sans ça, EF peut émettre l'INSERT avant le DELETE
+                            // dans le même batch (aucune dépendance entre les deux entités), ce qui
+                            // percute la même clé primaire (idCell, idItem, isBroken).
+                            dbContext.SaveChanges();
                             dbContext.MapCellItems.AddRange(listCellItems);
                         }
                         dbContext.SaveChanges();
