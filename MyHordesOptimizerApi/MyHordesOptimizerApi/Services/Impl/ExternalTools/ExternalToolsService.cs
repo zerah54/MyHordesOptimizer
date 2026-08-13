@@ -455,7 +455,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                                         Count = item.Count,
                                         IdItem = cleItem,
                                         IsBroken = item.Broken,
-                                        IdCell = cellModel.IdCell
+                                        IdCellNavigation = cellModel
                                     };
                                     listCellItems.Add(cellItem);
                                 }
