@@ -1,5 +1,17 @@
 import { CommonModule } from '@angular/common';
-import { AfterViewInit, ChangeDetectionStrategy, Component, computed, DestroyRef, inject, OnInit, Signal, signal,ViewChild, WritableSignal } from '@angular/core';
+import {
+    AfterViewInit,
+    ChangeDetectionStrategy,
+    Component,
+    computed,
+    DestroyRef,
+    inject,
+    OnInit,
+    Signal,
+    signal,
+    ViewChild,
+    WritableSignal
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
@@ -26,7 +38,7 @@ import { NoteDialogComponent, NoteDialogData } from '../../_shared/note-dialog/n
 import { NoteIconComponent } from '../../_shared/note-icon/note-icon.component';
 
 const angular_common: Imports = [CommonModule, ReactiveFormsModule];
-const components: Imports = [AvatarComponent, NoteIconComponent, NoteDialogComponent];
+const components: Imports = [AvatarComponent, NoteIconComponent];
 const pipes: Imports = [];
 const material_modules: Imports = [
     MatTableModule, MatSortModule, MatIconModule, MatProgressSpinnerModule,

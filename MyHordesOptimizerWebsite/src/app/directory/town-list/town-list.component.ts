@@ -48,7 +48,7 @@ import { NoteDialogComponent, NoteDialogData } from '../../_shared/note-dialog/n
 import { NoteIconComponent } from '../../_shared/note-icon/note-icon.component';
 
 const angular_common: Imports = [CommonModule, ReactiveFormsModule];
-const components: Imports = [DeferredCellComponent, NoteIconComponent, NoteDialogComponent];
+const components: Imports = [DeferredCellComponent, NoteIconComponent];
 const pipes: Imports = [];
 const material_modules: Imports = [
     MatTableModule, MatSortModule, MatIconModule, MatButtonModule, MatProgressSpinnerModule,
