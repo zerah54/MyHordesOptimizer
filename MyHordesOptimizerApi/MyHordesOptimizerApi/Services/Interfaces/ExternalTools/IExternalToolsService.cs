@@ -20,6 +20,7 @@ namespace MyHordesOptimizerApi.Services.Interfaces.ExternalTools
         Task<UpdateResponseDto> UpdateExternalsTools(UpdateRequestDto updateRequestDto, IExternalToolsProgressSink sink = null);
         List<CaseGH> UpdateGHZoneRegen(UpdateZoneRegenDto requestDto);
         LastUpdateInfoDto UpdateCitizenBag(int townId, int userId, List<UpdateObjectDto> bag);
+        LastUpdateInfoDto UpdateCitizenChest(int townId, int userId, List<UpdateObjectDto> chest);
         LastUpdateInfoDto UpdateCitizenHome(int townId, int userId, CitizenHomeValueDto homeDetails);
         LastUpdateInfoDto UpdateCitizenStatus(int townId, int userId, List<string> status);
         LastUpdateInfoDto UpdateCitizenHeroicActions(int townId, int userId, CitizenActionsHeroicValue actionHeroics);

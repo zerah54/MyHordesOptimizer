@@ -43,7 +43,8 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
 
             var mhoCitizen = dto.Amelios?.ToolsToUpdate.IsMyHordesOptimizer == true
                              || dto.HeroicActions?.ToolsToUpdate.IsMyHordesOptimizer == true
-                             || dto.Status?.ToolsToUpdate.IsMyHordesOptimizer == true;
+                             || dto.Status?.ToolsToUpdate.IsMyHordesOptimizer == true
+                             || dto.Chest?.ToolsToUpdate.IsMyHordesOptimizer == true;
             var ghCitizen = dto.Amelios?.ToolsToUpdate.IsGestHordes == true
                             || dto.HeroicActions?.ToolsToUpdate.IsGestHordes == true
                             || dto.Status?.ToolsToUpdate.IsGestHordes == true;

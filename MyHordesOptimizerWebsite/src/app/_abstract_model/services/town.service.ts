@@ -286,6 +286,20 @@ export class TownService extends GlobalService {
         });
     }
 
+    public updateChest(citizen: Citizen): Observable<UpdateInfo> {
+        return new Observable((sub: Subscriber<UpdateInfo>) => {
+            super.post<UpdateInfoDTO>(this.API_URL + `/ExternalTools/Chest?townId=${getTown()?.town_id}&userId=${getUserId()}`, JSON.stringify(citizen.toCitizenChestDto()))
+                .subscribe({
+                    next: (response: UpdateInfoDTO) => {
+                        sub.next(new UpdateInfo(response));
+                    },
+                    error: (error: HttpErrorResponse) => {
+                        sub.error(error);
+                    }
+                });
+        });
+    }
+
     public updateStatus(citizen: Citizen): Observable<UpdateInfo> {
         return new Observable((sub: Subscriber<UpdateInfo>) => {
             super.post<UpdateInfoDTO>(this.API_URL + `/ExternalTools/Status?townId=${getTown()?.town_id}&userId=${getUserId()}`, JSON.stringify(citizen.toCitizenStatusDto()))

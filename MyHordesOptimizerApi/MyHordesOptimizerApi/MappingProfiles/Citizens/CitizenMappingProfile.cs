@@ -27,12 +27,14 @@ namespace MyHordesOptimizerApi.MappingProfiles.Citizens
                 .ForMember(dto => dto.ActionsHeroic, opt => opt.MapFrom(model => model))
                 .ForMember(dto => dto.Avatar, opt => opt.MapFrom(model => model.IdUserNavigation.Avatar))
                 .ForMember(dto => dto.Bag, opt => opt.MapFrom(model => model.IdBagNavigation))
+                .ForMember(dto => dto.Chest, opt => opt.MapFrom(model => model.IdChestNavigation))
                 .ForMember(dto => dto.DailyActions, opt => opt.MapFrom(model => model.IdTownNavigation.TownCitizenDailyActions.Where(townDailyAction => townDailyAction.IdUser == model.IdUser)))
                 .ForMember(dto => dto.Cadaver, opt => opt.Ignore()) // ??
                 .ForMember(dto => dto.ChamanicDetail, opt => opt.MapFrom(model => model))
                 .ForMember(dto => dto.Dead, opt => opt.MapFrom(model => model.Dead))
                 .ForMember(dto => dto.Home, opt => opt.MapFrom(model => model))
                 .ForMember(dto => dto.HomeMessage, opt => opt.MapFrom(model => model.HomeMessage))
+                .ForMember(dto => dto.HouseDefense, opt => opt.MapFrom(model => model.HouseDefense))
                 .ForMember(dto => dto.Id, opt => opt.MapFrom(model => model.IdUser))
                 .ForMember(dto => dto.IsShunned, opt => opt.MapFrom(model => model.IsShunned))
                 .ForMember(dto => dto.JobName, opt => opt.MapFrom(model => model.JobName))
@@ -84,6 +86,17 @@ namespace MyHordesOptimizerApi.MappingProfiles.Citizens
                 .ForMember(model => model.IdLastUpdateInfo, opt => opt.Ignore())
                 .ForMember(model => model.IdLastUpdateInfoNavigation, opt => opt.MapFrom(dto => dto.LastUpdateInfo))
                 .ForMember(model => model.IdBag, opt => opt.MapFrom(dto => dto.IdBag));
+
+            CreateMap<Chest, BagDto>()
+                .ForMember(dto => dto.Items, opt => opt.MapFrom(model => model.ChestItems))
+                .ForMember(dto => dto.LastUpdateInfo, opt => opt.MapFrom(model => model.IdLastUpdateInfoNavigation))
+                .ForMember(dto => dto.IdBag, opt => opt.MapFrom(model => model.IdChest));
+
+            CreateMap<ChestItem, StackableItemDto>()
+                .ForMember(dest => dest.Count, opt => opt.MapFrom(src => src.Count))
+                .ForMember(dest => dest.IsBroken, opt => opt.MapFrom(src => src.IsBroken))
+                .ForMember(dest => dest.Item, opt => opt.MapFrom(src => src.IdItemNavigation))
+                .ForMember(dest => dest.WishListCount, opt => opt.Ignore());
 
             CreateMap<TownCitizen, CitizenHomeValueDto>()
                 .ForMember(dest => dest.ChestLevel, opt => opt.MapFrom(src => src.ChestLevel))

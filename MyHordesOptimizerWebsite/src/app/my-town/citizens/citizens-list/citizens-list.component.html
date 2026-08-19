@@ -258,6 +258,16 @@
                                     </td>
                                 </ng-container>
 
+                                <ng-container matColumnDef="coffre">
+                                    <th *matHeaderCellDef class="field-col" mat-header-cell>
+                                        <img [src]="HORDES_IMG_REPO + 'item/item_chest.gif'" alt="Coffre"
+                                             class="col-header-icon" i18n-alt i18n-matTooltip matTooltip="Coffre">
+                                    </th>
+                                    <td *matCellDef="let row" class="group-cell" mat-cell>
+                                        <mho-deferred-cell [content]="coffreContent" [context]="{ $implicit: row }"></mho-deferred-cell>
+                                    </td>
+                                </ng-container>
+
                                 <ng-container matColumnDef="etats">
                                     <th *matHeaderCellDef class="field-col" mat-header-cell>
                                         <mat-icon class="col-header-icon"
@@ -484,11 +494,12 @@
     }
 </ng-template>
 
-<!-- Groupe compact États + Sac empilés (potions + immunité = colonne chamanique dédiée) -->
+<!-- Groupe compact États + Sac + Coffre empilés (potions + immunité = colonne chamanique dédiée) -->
 <ng-template #etatsSacGroup let-row>
     <div class="group-stack">
         <ng-container [ngTemplateOutletContext]="{ $implicit: row }" [ngTemplateOutlet]="etatsContent"></ng-container>
         <ng-container [ngTemplateOutletContext]="{ $implicit: row }" [ngTemplateOutlet]="sacContent"></ng-container>
+        <ng-container [ngTemplateOutletContext]="{ $implicit: row }" [ngTemplateOutlet]="coffreContent"></ng-container>
     </div>
 </ng-template>
 
@@ -549,6 +560,23 @@
             i18n-label
             i18n-removeLabel label="Sac"
             removeLabel="Retirer du sac">
+        </mho-list-element-add-remove>
+    </div>
+</ng-template>
+
+<ng-template #coffreContent let-row>
+    <div class="chest">
+        <mho-list-element-add-remove
+            (add)="addChestItem(row.id, +$event)"
+            (empty)="emptyChest(row.id)"
+            (remove)="removeChestItem(row.id, +$event)" [currentList]="row.chest?.items || []"
+            [lists]="chest_lists"
+            [readonly]="is_readonly()" addLabel="Ajouter au coffre"
+            emptyLabel="Vider le coffre"
+            i18n-addLabel i18n-emptyLabel
+            i18n-label
+            i18n-removeLabel label="Coffre"
+            removeLabel="Retirer du coffre">
         </mho-list-element-add-remove>
     </div>
 </ng-template>

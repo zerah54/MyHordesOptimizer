@@ -23,6 +23,10 @@ public partial class MhoContext : DbContext
 
     public virtual DbSet<Building> Buildings { get; set; }
 
+    public virtual DbSet<Chest> Chests { get; set; }
+
+    public virtual DbSet<ChestItem> ChestItems { get; set; }
+
     public virtual DbSet<BuildingAvailability> BuildingAvailabilities { get; set; }
 
     public virtual DbSet<BuildingRessource> BuildingRessources { get; set; }
@@ -156,6 +160,30 @@ public partial class MhoContext : DbContext
             entity.HasOne(d => d.IdItemNavigation).WithMany(p => p.BagItems)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("BagItem_ibfk_1");
+        });
+
+        modelBuilder.Entity<Chest>(entity =>
+        {
+            entity.HasKey(e => e.IdChest).HasName("PRIMARY");
+
+            entity.HasOne(d => d.IdLastUpdateInfoNavigation).WithMany(p => p.Chests).HasConstraintName("ChestItem_fk_lastupdate");
+        });
+
+        modelBuilder.Entity<ChestItem>(entity =>
+        {
+            entity.HasKey(e => new { e.IdChest, e.IdItem, e.IsBroken })
+                .HasName("PRIMARY")
+                .HasAnnotation("MySql:IndexPrefixLength", new[] { 0, 0, 0 });
+
+            entity.Property(e => e.IsBroken).HasDefaultValueSql("b'0'");
+
+            entity.HasOne(d => d.IdChestNavigation).WithMany(p => p.ChestItems)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("ChestItem_fk_chest");
+
+            entity.HasOne(d => d.IdItemNavigation).WithMany(p => p.ChestItems)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("ChestItem_fk_item");
         });
 
         modelBuilder.Entity<Building>(entity =>
@@ -661,6 +689,10 @@ public partial class MhoContext : DbContext
             entity.Property(e => e.RestLevel).HasDefaultValueSql("-1");
 
             entity.HasOne(d => d.IdBagNavigation).WithMany(p => p.TownCitizens).HasConstraintName("TownCitizen_ibfk_4");
+
+            entity.HasOne(d => d.IdChestNavigation).WithMany(p => p.TownCitizens).HasConstraintName("TownCitizen_fk_chest");
+
+            entity.HasOne(d => d.IdLastUpdateInfoChestNavigation).WithMany(p => p.TownCitizenIdLastUpdateInfoChestNavigations).HasConstraintName("TownCitizen_fk_chest_lastupdate");
 
             entity.HasOne(d => d.IdLastUpdateChamanicNavigation).WithMany(p => p.TownCitizenIdLastUpdateChamanicNavigations).HasConstraintName("TownCitizen_fk_last_update_chamanic");
 

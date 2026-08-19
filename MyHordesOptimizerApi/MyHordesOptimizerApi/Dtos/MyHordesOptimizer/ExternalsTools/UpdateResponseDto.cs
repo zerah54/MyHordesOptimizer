@@ -1,4 +1,5 @@
 ﻿using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.Bags;
+using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.Chest;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.HeroicAction;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.Home;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.Map;
@@ -10,6 +11,7 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools
     {
         public UpdateMapResponseDto MapResponseDto { get; set; }
         public BagsResponseDto BagsResponseDto { get; set; }
+        public ChestResponseDto ChestResponseDto { get; set; }
         public HeroicActionsResponseDto HeroicActionsResponseDto { get; set; }
         public HomeResponseDto HomeResponseDto { get; set; }
         public StatusResponseDto StatusResponseDto { get; set; }
@@ -19,6 +21,7 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools
         {
             MapResponseDto = new UpdateMapResponseDto(updateRequestDto);
             BagsResponseDto = new BagsResponseDto(updateRequestDto);
+            ChestResponseDto = new ChestResponseDto(updateRequestDto);
             HeroicActionsResponseDto = new HeroicActionsResponseDto(updateRequestDto);
             HomeResponseDto = new HomeResponseDto(updateRequestDto);
             StatusResponseDto = new StatusResponseDto(updateRequestDto);

@@ -54,6 +54,7 @@ namespace MyHordesOptimizerApiUnitTests.ExternalTools
 
             public List<CaseGH> UpdateGHZoneRegen(UpdateZoneRegenDto requestDto) => throw new NotSupportedException();
             public LastUpdateInfoDto UpdateCitizenBag(int townId, int userId, List<UpdateObjectDto> bag) => throw new NotSupportedException();
+            public LastUpdateInfoDto UpdateCitizenChest(int townId, int userId, List<UpdateObjectDto> chest) => throw new NotSupportedException();
             public LastUpdateInfoDto UpdateCitizenHome(int townId, int userId, MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Citizens.CitizenHomeValueDto homeDetails) => throw new NotSupportedException();
             public LastUpdateInfoDto UpdateCitizenStatus(int townId, int userId, List<string> status) => throw new NotSupportedException();
             public LastUpdateInfoDto UpdateCitizenHeroicActions(int townId, int userId, MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Citizens.CitizenActionsHeroicValue actionHeroics) => throw new NotSupportedException();

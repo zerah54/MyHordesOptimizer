@@ -1,4 +1,5 @@
 ﻿using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.Bags;
+using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.Chest;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.Digs;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.HeroicAction;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.Home;
@@ -20,6 +21,8 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools
         public UpdateHeroicActionsDto? HeroicActions { get; set; }
         [JsonProperty("amelios")]
         public UpdateHomeDto? Amelios { get; set; }
+        [JsonProperty("chest")]
+        public Chest.UpdateChestDto? Chest { get; set; }
         [JsonProperty("status")]
         public UpdateStatusDto? Status { get; set; }
         [JsonProperty("successedDig")]

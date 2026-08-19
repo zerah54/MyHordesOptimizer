@@ -24,6 +24,9 @@ public partial class LastUpdateInfo
     public virtual ICollection<Bag> Bags { get; set; } = new List<Bag>();
 
     [InverseProperty("IdLastUpdateInfoNavigation")]
+    public virtual ICollection<Chest> Chests { get; set; } = new List<Chest>();
+
+    [InverseProperty("IdLastUpdateInfoNavigation")]
     public virtual ICollection<Expedition> Expeditions { get; set; } = new List<Expedition>();
 
     [ForeignKey("IdUser")]
@@ -59,6 +62,9 @@ public partial class LastUpdateInfo
 
     [InverseProperty("IdLastUpdateInfoHomeNavigation")]
     public virtual ICollection<TownCitizen> TownCitizenIdLastUpdateInfoHomeNavigations { get; set; } = new List<TownCitizen>();
+
+    [InverseProperty("IdLastUpdateInfoChestNavigation")]
+    public virtual ICollection<TownCitizen> TownCitizenIdLastUpdateInfoChestNavigations { get; set; } = new List<TownCitizen>();
 
     [InverseProperty("IdLastUpdateInfoNavigation")]
     public virtual ICollection<TownCitizen> TownCitizenIdLastUpdateInfoNavigations { get; set; } = new List<TownCitizen>();

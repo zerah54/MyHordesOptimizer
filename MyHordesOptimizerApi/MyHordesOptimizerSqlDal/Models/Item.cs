@@ -129,6 +129,9 @@ public partial class Item
     public virtual ICollection<BagItem> BagItems { get; set; } = new List<BagItem>();
 
     [InverseProperty("IdItemNavigation")]
+    public virtual ICollection<ChestItem> ChestItems { get; set; } = new List<ChestItem>();
+
+    [InverseProperty("IdItemNavigation")]
     public virtual ICollection<BuildingRessource> BuildingRessources { get; set; } = new List<BuildingRessource>();
 
     [InverseProperty("IdItemNavigation")]

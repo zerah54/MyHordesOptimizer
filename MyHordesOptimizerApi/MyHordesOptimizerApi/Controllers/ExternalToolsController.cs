@@ -4,6 +4,7 @@ using MyHordesOptimizerApi.Controllers.Abstract;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.Bags;
+using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.Chest;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.GestHordes;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.HeroicAction;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.Home;
@@ -137,6 +138,15 @@ namespace MyHordesOptimizerApi.Controllers
         {
             UserInfoProvider.UserId = userId;
             var lastUpdateInfo = ExternalToolsService.UpdateCitizenBag(townId, request.UserId, request.Objects);
+            return Ok(lastUpdateInfo);
+        }
+
+        [HttpPost]
+        [Route("Chest")]
+        public ActionResult<LastUpdateInfoDto> UpdateCitizenChest([FromQuery] int townId, [FromQuery] int userId, [FromBody] UpdateSingleChestDto request)
+        {
+            UserInfoProvider.UserId = userId;
+            var lastUpdateInfo = ExternalToolsService.UpdateCitizenChest(townId, request.UserId, request.Objects);
             return Ok(lastUpdateInfo);
         }
 

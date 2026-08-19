@@ -35,11 +35,15 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Citizens
 
         public int Y { get; set; }
 
+        /// <summary>Défense apportée par la maison seule (<c>baseDef</c> MyHordes), hors job/objets/actions héroïques.</summary>
+        public int? HouseDefense { get; set; }
+
         #endregion
 
         public int NombreJourHero { get; set; }
 
         public BagDto Bag { get; set; }
+        public BagDto Chest { get; set; }
         public CitizenHomeDto Home { get; set; }
         public CitizenStatusDto Status { get; set; }
         public CitizenActionsHeroic ActionsHeroic { get; set; }

@@ -1,4 +1,7 @@
 export const changelogs: Record<string, string> = {
+    '1.1.58': `
+        [Nouveauté] Nouvelle option pour envoyer le contenu de son coffre à MHO lors d'une mise à jour des outils externes depuis sa maison
+        `,
     '1.1.57': `
         [Correction] La note sur un joueur pouvait échouer quand ce joueur était dans la même ville que vous
         `,

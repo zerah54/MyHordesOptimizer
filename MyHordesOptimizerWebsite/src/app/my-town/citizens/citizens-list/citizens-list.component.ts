@@ -178,6 +178,8 @@ export class CitizensListComponent implements OnInit {
     protected readonly all_status: StatusEnum[] = StatusEnum.getAllValues();
     /** La liste des listes disponibles dans le sac */
     protected bag_lists: ListForAddRemove[] = [];
+    /** La liste des listes disponibles dans le coffre */
+    protected chest_lists: ListForAddRemove[] = [];
     /** La liste des listes disponibles dans les status */
     protected readonly status_lists: ListForAddRemove[] = [
         { label: $localize`Tous`, list: this.all_status }
@@ -187,7 +189,7 @@ export class CitizensListComponent implements OnInit {
     private readonly grouped_columns: string[] = ['avatar_name', 'etats_sac', 'immune', 'daily_actions', 'heroic_actions', 'home', 'last_update'];
     /** Colonnes affichées en mode « colonnes » (une par champ). */
     private readonly per_field_columns: string[] = [
-        'job', 'town_roles', 'avatar_name', 'sac', 'etats', 'immune',
+        'job', 'town_roles', 'avatar_name', 'sac', 'coffre', 'etats', 'immune',
         ...this.daily_action_keys.map((action: DailyActionEnum): string => 'daily_' + action.key),
         ...this.heroic_actions_all.map((action: HeroicActionEnum): string => 'heroic_' + action.key),
         ...this.home_all.map((home: HomeEnum): string => 'home_' + home.key),
@@ -252,6 +254,9 @@ export class CitizensListComponent implements OnInit {
                 next: (items: Item[]) => {
                     this.all_items = items;
                     this.bag_lists = [
+                        { label: $localize`Tous`, list: this.all_items }
+                    ];
+                    this.chest_lists = [
                         { label: $localize`Tous`, list: this.all_items }
                     ];
                 }
@@ -532,6 +537,82 @@ export class CitizensListComponent implements OnInit {
                         if (citizen.bag) {
                             citizen.bag.update_info.username = getUser()?.username;
                             citizen.bag.update_info.update_time = update_info.update_time;
+                        }
+                        if (citizen.id === this.me?.id) this.town_service.publishMyCitizen(citizen);
+                    }
+                });
+        }
+    }
+
+    /**
+     * Si l'item est déjà dans le coffre, on fait +1.
+     * Sinon on rajoute l'item au coffre.
+     */
+    protected addChestItem(citizen_id: number, item_id: number): void {
+        const citizen: Citizen | undefined = this.citizen_list.data.find((citizen: Citizen) => citizen.id === citizen_id);
+        if (citizen && citizen.chest) {
+            citizen.chest.items.push(<Item>this.all_items.find((item: Item) => item.id === item_id));
+
+            this.town_service
+                .updateChest(citizen)
+                .pipe(takeUntilDestroyed(this.destroy_ref))
+                .subscribe({
+                    next: (update_info: UpdateInfo): void => {
+                        if (citizen.chest) {
+                            // Coffre potentiellement jamais synchronisé côté serveur avant ce premier appel (contrairement au sac) : update_info peut être absent.
+                            citizen.chest.update_info ??= new UpdateInfo();
+                            citizen.chest.update_info.username = getUser()?.username;
+                            citizen.chest.update_info.update_time = update_info.update_time;
+                        }
+                        if (citizen.id === this.me?.id) this.town_service.publishMyCitizen(citizen);
+                    }
+                });
+        }
+    }
+
+    /**
+     * On retire 1 au compteur de l'item du coffre.
+     * Si l'item tombe à 0, on le retire de la liste.
+     */
+    protected removeChestItem(citizen_id: number, item_id: number): void {
+        const citizen: Citizen | undefined = this.citizen_list.data.find((citizen: Citizen) => citizen.id === citizen_id);
+        if (citizen && citizen.chest) {
+            const item_in_datasource_index: number | undefined = citizen.chest.items.findIndex((item_in_chest: Item) => item_in_chest.id === item_id);
+            if (item_in_datasource_index !== undefined && item_in_datasource_index !== null && item_in_datasource_index > -1) {
+                citizen.chest.items.splice(item_in_datasource_index, 1);
+            }
+            this.town_service
+                .updateChest(citizen)
+                .pipe(takeUntilDestroyed(this.destroy_ref))
+                .subscribe({
+                    next: (update_info: UpdateInfo) => {
+                        if (citizen.chest) {
+                            // Coffre potentiellement jamais synchronisé côté serveur avant ce premier appel (contrairement au sac) : update_info peut être absent.
+                            citizen.chest.update_info ??= new UpdateInfo();
+                            citizen.chest.update_info.username = getUser()?.username;
+                            citizen.chest.update_info.update_time = update_info.update_time;
+                        }
+                        if (citizen.id === this.me?.id) this.town_service.publishMyCitizen(citizen);
+                    }
+                });
+        }
+    }
+
+    /** On vide complètement le coffre. */
+    protected emptyChest(citizen_id: number): void {
+        const citizen: Citizen | undefined = this.citizen_list.data.find((citizen: Citizen) => citizen.id === citizen_id);
+        if (citizen && citizen.chest) {
+            citizen.chest.items = [];
+            this.town_service
+                .updateChest(citizen)
+                .pipe(takeUntilDestroyed(this.destroy_ref))
+                .subscribe({
+                    next: (update_info: UpdateInfo) => {
+                        if (citizen.chest) {
+                            // Coffre potentiellement jamais synchronisé côté serveur avant ce premier appel (contrairement au sac) : update_info peut être absent.
+                            citizen.chest.update_info ??= new UpdateInfo();
+                            citizen.chest.update_info.username = getUser()?.username;
+                            citizen.chest.update_info.update_time = update_info.update_time;
                         }
                         if (citizen.id === this.me?.id) this.town_service.publishMyCitizen(citizen);
                     }

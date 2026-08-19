@@ -1,11 +1,13 @@
 import { provideHttpClient } from '@angular/common/http';
-import { provideHttpClientTesting } from '@angular/common/http/testing';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
 
 import { DailyActionEnum } from '../../../_abstract_model/enum/daily-action.enum';
+import { Bag } from '../../../_abstract_model/types/bag.class';
 import { Citizen } from '../../../_abstract_model/types/citizen.class';
 import { DailyAction } from '../../../_abstract_model/types/daily-action.class';
+import { Item } from '../../../_abstract_model/types/item.class';
 import { UpdateInfo } from '../../../_abstract_model/types/update-info.class';
 import { CitizensListComponent } from './citizens-list.component';
 
@@ -18,6 +20,9 @@ interface TestableComponent {
     getDailyAction(citizen: Citizen, action: DailyActionEnum): { element: DailyActionEnum; value: boolean };
     saveDailyAction(actionKey: string, checked: boolean, citizenId: number): void;
     goToProfile(userId: number): void;
+    addChestItem(citizen_id: number, item_id: number): void;
+    removeChestItem(citizen_id: number, item_id: number): void;
+    emptyChest(citizen_id: number): void;
 }
 
 describe('CitizensListComponent', (): void => {
@@ -108,5 +113,34 @@ describe('CitizensListComponent', (): void => {
         testable.goToProfile(42);
 
         expect(navigateSpy).toHaveBeenCalledWith(['/profile', 42]);
+    });
+
+    // Un coffre jamais synchronisé côté serveur n'a pas de update_info (contrairement au sac,
+    // toujours présent en pratique) : ce cas doit être géré sans lancer d'exception.
+    it('addChestItem pushes the item and does not throw', (): void => {
+        const citizen: Citizen = new Citizen();
+        citizen.id = 42;
+        citizen.chest = new Bag();
+        testable.citizen_list = { data: [citizen] };
+        (component as unknown as { all_items: Item[] }).all_items = [Object.assign(new Item(), { id: 5 })];
+        const httpMock: HttpTestingController = TestBed.inject(HttpTestingController);
+
+        expect((): void => testable.addChestItem(42, 5)).not.toThrow();
+
+        httpMock.expectOne((request) => request.url.includes('/ExternalTools/Chest')).flush({});
+    });
+
+    it('emptyChest clears the chest items and does not throw', (): void => {
+        const citizen: Citizen = new Citizen();
+        citizen.id = 42;
+        citizen.chest = new Bag();
+        citizen.chest.items = [Object.assign(new Item(), { id: 5 })];
+        testable.citizen_list = { data: [citizen] };
+        const httpMock: HttpTestingController = TestBed.inject(HttpTestingController);
+
+        expect((): void => testable.emptyChest(42)).not.toThrow();
+
+        httpMock.expectOne((request) => request.url.includes('/ExternalTools/Chest')).flush({});
+        expect(citizen.chest.items).toEqual([]);
     });
 });

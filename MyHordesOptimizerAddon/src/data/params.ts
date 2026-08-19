@@ -91,15 +91,15 @@ export const params_categories: ParamCategory[] = [
                                     es: 'Detalles de mi mochila y las de mi escolta'
                                 },
                             },
-                            // {
-                            //     id: `update_mho_chest`,
-                            //     label: {
-                            //         en: `Items in my chest`,
-                            //         fr: `Contenu de mon coffre`,
-                            //         de: `Gegenstände in meiner Truhe`,
-                            //         es: `Contenido de mi baúl`
-                            //     },
-                            // },
+                            {
+                                id: 'update_mho_chest',
+                                label: {
+                                    en: 'Items in my chest',
+                                    fr: 'Contenu de mon coffre',
+                                    de: 'Gegenstände in meiner Truhe',
+                                    es: 'Contenido de mi baúl'
+                                },
+                            },
                             {
                                 id: 'update_mho_status',
                                 label: {

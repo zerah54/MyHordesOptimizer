@@ -18,6 +18,12 @@
             display: block;
             margin-bottom: 1em;
             opacity: 0.85;
+
+            &.devastated-note {
+                color: variables.$tertiary;
+                opacity: 1;
+                font-weight: 600;
+            }
         }
 
         .layout {
@@ -110,14 +116,13 @@
                 }
 
                 tr.key {
-                    font-weight: 700;
-
                     th,
                     td {
                         background-color: variables.$item_color;
                     }
 
                     th {
+                        font-weight: 700;
                         border-top-left-radius: 0.25em;
                         border-bottom-left-radius: 0.25em;
                     }
@@ -137,6 +142,15 @@
                     opacity: 0.7;
                     font-weight: 400;
                     font-size: 0.9em;
+                }
+
+                .sub-line {
+                    display: block;
+                    margin-top: 0.15em;
+                    font-style: italic;
+                    font-size: 0.8em;
+                    font-weight: 400;
+                    opacity: 0.75;
                 }
             }
 
@@ -166,8 +180,27 @@
 
                     tr.dies {
                         color: variables.$tertiary;
-                        font-weight: 600;
                     }
+                }
+            }
+
+            &.histogram .bar-row {
+                display: flex;
+                align-items: center;
+                justify-content: flex-end;
+                gap: 0.5em;
+
+                .pct {
+                    white-space: nowrap;
+                }
+
+                .bar {
+                    display: block;
+                    height: 0.6em;
+                    min-width: 2px;
+                    max-width: 4em;
+                    border-radius: 2px;
+                    background-color: variables.$primary;
                 }
             }
         }

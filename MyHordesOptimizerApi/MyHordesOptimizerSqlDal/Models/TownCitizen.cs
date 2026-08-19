@@ -10,6 +10,8 @@ namespace MyHordesOptimizerApi.Models;
 [Table("TownCitizen")]
 [Index("IdLastUpdateChamanic", Name = "TownCitizen_fk_last_update_chamanic")]
 [Index("IdBag", Name = "idBag")]
+[Index("IdChest", Name = "idChest")]
+[Index("IdLastUpdateInfoChest", Name = "idLastUpdateInfoChest")]
 [Index("IdLastUpdateInfo", Name = "idLastUpdateInfo")]
 [Index("IdLastUpdateInfoGhoulStatus", Name = "idLastUpdateInfoGhoulStatus")]
 [Index("IdLastUpdateInfoHeroicAction", Name = "idLastUpdateInfoHeroicAction")]
@@ -71,6 +73,12 @@ public partial class TownCitizen
 
     [Column("idBag", TypeName = "int(11)")]
     public int? IdBag { get; set; }
+
+    [Column("idChest", TypeName = "int(11)")]
+    public int? IdChest { get; set; }
+
+    [Column("idLastUpdateInfoChest", TypeName = "int(11)")]
+    public int? IdLastUpdateInfoChest { get; set; }
 
     [Column("hasRescue")]
     public bool? HasRescue { get; set; }
@@ -229,6 +237,14 @@ public partial class TownCitizen
     [ForeignKey("IdBag")]
     [InverseProperty("TownCitizens")]
     public virtual Bag? IdBagNavigation { get; set; }
+
+    [ForeignKey("IdChest")]
+    [InverseProperty("TownCitizens")]
+    public virtual Chest? IdChestNavigation { get; set; }
+
+    [ForeignKey("IdLastUpdateInfoChest")]
+    [InverseProperty("TownCitizenIdLastUpdateInfoChestNavigations")]
+    public virtual LastUpdateInfo? IdLastUpdateInfoChestNavigation { get; set; }
 
     [ForeignKey("IdLastUpdateChamanic")]
     [InverseProperty("TownCitizenIdLastUpdateChamanicNavigations")]

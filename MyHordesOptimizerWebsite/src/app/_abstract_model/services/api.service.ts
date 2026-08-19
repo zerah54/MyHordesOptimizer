@@ -39,6 +39,7 @@ export class ApiService extends GlobalService {
             const saved_items: Item[] = getItemsWithExpirationDate();
             if (saved_items && saved_items.length > 0 && !force) {
                 sub.next(saved_items);
+                sub.complete();
             } else {
                 super.get<ItemDTO[]>(`${this.API_URL}/Fetcher/items?${getTown()?.town_id ? 'townId=' + getTown()?.town_id : ''}`)
                     .subscribe({
@@ -46,6 +47,7 @@ export class ApiService extends GlobalService {
                             const items: Item[] = dtoToModelArray(Item, response.body).filter((item: Item) => item.id !== 302);
                             setItemsWithExpirationDate(items);
                             sub.next(items);
+                            sub.complete();
                         },
                         error: (error: HttpErrorResponse) => {
                             sub.error(error);

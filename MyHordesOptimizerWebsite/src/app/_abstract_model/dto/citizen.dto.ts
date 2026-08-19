@@ -20,6 +20,8 @@ export interface CitizenDTO {
     nombreJourHero?: number;
     x?: number;
     y?: number;
+    /** Défense apportée par la maison seule (`baseDef` MyHordes), hors job/objets/actions héroïques. */
+    houseDefense?: number;
     bag?: BagDTO;
     chest?: BagDTO;
     home?: HomeDTO;

@@ -292,8 +292,10 @@ export function updateExternalTools(on_progress?: (state: ExternalToolsUpdateJob
 
             const chest_elements = Array.from(document.querySelector('.inventory.chest')?.querySelectorAll('li.item:not(.locked)') || []).map((chest_item) => {
                 const item = getItemFromImg(chest_item.querySelector('img')?.src);
-                return { id: item.id, isBroken: chest_item.classList.contains('broken') };
-            });
+                if (item) {
+                    return { id: item.id, isBroken: chest_item.classList.contains('broken') };
+                }
+            }).filter((chest_element) => chest_element);
 
             data.chest.contents = convertListOfSingleObjectsIntoListOfCountedObjects(chest_elements);
         }

@@ -23,6 +23,8 @@ export class Citizen extends CommonModel<CitizenDTO> {
     /** Rôles de ville portés. Une liste : un citoyen peut en cumuler plusieurs. */
     public town_roles: TownRoleEnum[] = [];
     public name!: string;
+    /** Défense apportée par la maison seule (`baseDef` MyHordes), hors job/objets/actions héroïques. */
+    public house_defense?: number;
     public bag?: Bag;
     public status?: Status;
     public home?: Home;
@@ -34,7 +36,7 @@ export class Citizen extends CommonModel<CitizenDTO> {
     private nombre_jour_hero?: number;
     private x?: number;
     private y?: number;
-    private chest?: Bag;
+    public chest?: Bag;
 
     public constructor(dto?: CitizenDTO) {
         super();
@@ -54,6 +56,7 @@ export class Citizen extends CommonModel<CitizenDTO> {
             nombreJourHero: this.nombre_jour_hero,
             x: this.x,
             y: this.y,
+            houseDefense: this.house_defense,
             name: this.name,
             bag: this.bag?.modelToDto(),
             chest: this.chest?.modelToDto(),
@@ -70,6 +73,19 @@ export class Citizen extends CommonModel<CitizenDTO> {
         return {
             userId: this.id,
             objects: this.bag?.modelToDto().items.map((item: ItemCountDTO) => {
+                return {
+                    count: item.count,
+                    id: item.item.id,
+                    isBroken: item.isBroken
+                };
+            }) || [],
+        };
+    }
+
+    public toCitizenChestDto(): { userId: number, objects: ShortItemCountDTO[] } {
+        return {
+            userId: this.id,
+            objects: this.chest?.modelToDto().items.map((item: ItemCountDTO) => {
                 return {
                     count: item.count,
                     id: item.item.id,
@@ -122,6 +138,7 @@ export class Citizen extends CommonModel<CitizenDTO> {
             this.nombre_jour_hero = dto.nombreJourHero;
             this.x = dto.x;
             this.y = dto.y;
+            this.house_defense = dto.houseDefense;
             this.name = dto.name;
             this.bag = new Bag(dto.bag);
             this.chest = new Bag(dto.chest);

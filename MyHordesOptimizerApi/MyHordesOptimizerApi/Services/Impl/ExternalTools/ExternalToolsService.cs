@@ -617,6 +617,14 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                     }
                 }
 
+                var patchChestMho = false;
+                List<UpdateObjectDto> chestItemsToApply = null;
+                if (updateRequestDto.Chest != null && updateRequestDto.Chest.ToolsToUpdate.IsMyHordesOptimizer)
+                {
+                    chestItemsToApply = updateRequestDto.Chest.Contents;
+                    patchChestMho = true;
+                }
+
                 var patchHeroicActionMho = false;
                 var patchHeroicActionGh = false;
                 if (updateRequestDto.HeroicActions != null)
@@ -680,8 +688,15 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                             {
                                 townCitizenDetail.IdLastUpdateInfoHeroicAction = newLastUpdate.IdLastUpdateInfo;
                             }
-                            var citizenDetail = dbContext.TownCitizens.Single(citizen => citizen.IdTown == townCitizenDetail.IdTown && citizen.IdUser == townCitizenDetail.IdUser);
+                            var citizenDetail = dbContext.TownCitizens
+                                .Include(x => x.IdChestNavigation)
+                                .ThenInclude(x => x.ChestItems)
+                                .Single(citizen => citizen.IdTown == townCitizenDetail.IdTown && citizen.IdUser == townCitizenDetail.IdUser);
                             citizenDetail.UpdateAllButKeysProperties(townCitizenDetail, ignoreNull: true);
+                            if (patchChestMho)
+                            {
+                                ReplaceChestItems(dbContext, citizenDetail, chestItemsToApply, newLastUpdate.IdLastUpdateInfo);
+                            }
                             dbContext.Update(citizenDetail);
                             dbContext.SaveChanges();
                             transaction.Commit();
@@ -693,6 +708,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                             response.HeroicActionsResponseDto.MhoStatus = e.Message;
                             response.StatusResponseDto.MhoStatus = e.Message;
                             response.HomeResponseDto.MhoStatus = e.Message;
+                            response.ChestResponseDto.MhoStatus = e.Message;
                             sink.Failed(ExternalToolId.MyHordesOptimizer, ExternalToolUpdateUnits.Citizen, e.Message);
                         }
                     });
@@ -1124,6 +1140,59 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
         }
 
         #endregion
+
+        /// <summary>Vide puis recrée les ChestItem d'un citoyen déjà chargé (avec IdChestNavigation.ChestItems inclus). Partagé entre UpdateCitizenChest et le flux combiné addon.</summary>
+        private void ReplaceChestItems(MhoContext dbContext, TownCitizen citizen, List<UpdateObjectDto> items, int lastUpdateInfoId)
+        {
+            if (citizen.IdChestNavigation is not null)
+            {
+                dbContext.ChestItems.RemoveRange(citizen.IdChestNavigation.ChestItems);
+                citizen.IdChestNavigation.ChestItems.Clear();
+            }
+            else
+            {
+                var newChest = dbContext.Add(new Chest()).Entity;
+                dbContext.SaveChanges();
+                citizen.IdChestNavigation = newChest;
+                citizen.IdChest = newChest.IdChest;
+            }
+            foreach (var item in items)
+            {
+                var chestItem = dbContext.Add(new ChestItem()
+                {
+                    Count = item.Count,
+                    IdItem = item.Id,
+                    IsBroken = item.IsBroken,
+                    IdChest = citizen.IdChest.Value
+                }).Entity;
+                dbContext.SaveChanges();
+                citizen.IdChestNavigation.ChestItems.Add(chestItem);
+            }
+            citizen.IdChestNavigation.IdLastUpdateInfo = lastUpdateInfoId;
+            citizen.IdLastUpdateInfoChest = lastUpdateInfoId;
+            dbContext.SaveChanges();
+        }
+
+        public LastUpdateInfoDto UpdateCitizenChest(int townId, int userId, List<UpdateObjectDto> chest)
+        {
+            using var scope = ServiceScopeFactory.CreateScope();
+            var dbContext = scope.ServiceProvider.GetRequiredService<MhoContext>();
+            townId = dbContext.ResolveTownId(townId);
+            using var transaction = dbContext.Database.BeginTransaction();
+            LastUpdateInfoDto lastUpdateInfoDto = UserInfoProvider.GenerateLastUpdateInfo();
+            var newLastUpdate = dbContext.LastUpdateInfos.Update(Mapper.Map<LastUpdateInfo>(lastUpdateInfoDto, opt => opt.SetDbContext(dbContext))).Entity;
+            dbContext.SaveChanges();
+
+            var citizen = dbContext.TownCitizens
+                .Include(x => x.IdChestNavigation)
+                .ThenInclude(chestNav => chestNav.ChestItems)
+                .Single(x => x.IdTown == townId && x.IdUser == userId);
+
+            ReplaceChestItems(dbContext, citizen, chest, newLastUpdate.IdLastUpdateInfo);
+
+            transaction.Commit();
+            return lastUpdateInfoDto;
+        }
 
         public LastUpdateInfoDto UpdateCitizenHome(int townId, int userId, CitizenHomeValueDto homeDetails)
         {
