@@ -1,6 +1,6 @@
 import { ItemDTO } from '../dto/item.dto';
 import { ItemCountDTO } from '../dto/item-count.dto';
-import { RecipeDTO } from '../dto/recipe.dto';
+import { RecipeDTO, RecipeType } from '../dto/recipe.dto';
 import { CommonModel, dtoToModelArray, modelToDtoArray } from './_common.class';
 import { I18nLabels } from './_types';
 import { Item } from './item.class';
@@ -13,7 +13,7 @@ export class Recipe extends CommonModel<RecipeDTO> {
     public result!: RecipeResultItem[];
     public provoking?: Item;
     private actions!: I18nLabels;
-    private type!: 'WORKSHOP' | 'MANUAL_ANYWHERE' | 'WORKSHOP_SHAMAN';
+    public type!: RecipeType;
     private stealthy?: boolean;
 
     public constructor(dto?: RecipeDTO) {

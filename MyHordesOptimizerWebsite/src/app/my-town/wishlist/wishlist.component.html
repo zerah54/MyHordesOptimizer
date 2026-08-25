@@ -55,7 +55,7 @@
                 }
             </div>
             <div class="mat-elevation-z8" style="flex: 1">
-                <table mat-table [dataSource]="datasource"
+                <table #table mat-table [dataSource]="datasource"
                        [trackBy]="trackByWishlistItem"
                        cdkDropList
                        cdkDropListLockAxis="y"
@@ -79,7 +79,7 @@
                                 }
                             </th>
 
-                            <td mat-cell *matCellDef="let row">
+                            <td mat-cell *matCellDef="let row; table: table">
                                 <mho-deferred-cell>
                                     @switch (column.id) {
                                         @case ('sort') {

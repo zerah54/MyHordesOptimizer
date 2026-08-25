@@ -14,7 +14,7 @@
 <mat-card-content class="mho-ruins">
     @if (ruins) {
         <div class="mat-elevation-z8">
-            <table mat-table [dataSource]="datasource" matSort matSortActive="label" matSortDisableClear matSortDirection="asc">
+            <table #table mat-table [dataSource]="datasource" matSort matSortActive="label" matSortDisableClear matSortDirection="asc">
 
                 @for (column of columns; track column.id) {
                     <ng-container [matColumnDef]="column.id" [sticky]="column.sticky || false">
@@ -60,17 +60,17 @@
                                 }
                             </th>
                         }
-                        <td mat-cell *matCellDef="let row" [class]="column.id">
+                        <td mat-cell *matCellDef="let row; table: table" [class]="column.id">
                             @switch (column.id) {
                                 @case ('label') {
-                                    <img [src]="HORDES_IMG_REPO + 'ruin/' + row.img + '.gif'">
+                                    <img [src]="HORDES_IMG_REPO + row.formatted_img">
                                     <!-- La description tient dans une infobulle : en colonne, elle
                                          mangeait toute la largeur du tableau. -->
-                                    <div [matTooltip]="row.description[locale]">{{ row[column.id][locale] }}</div>
+                                    <div [matTooltip]="row.description[locale]">{{ row.label[locale] }}</div>
                                 }
                                 @case ('drops') {
                                     <div class="drops-list">
-                                        @for (drop of row[column.id]; track drop) {
+                                        @for (drop of row.drops; track drop) {
                                             <div [title]="drop.item.label[locale]">
                                                 <img [ngSrc]="HORDES_IMG_REPO + drop.item.img" width="16" height="16">
                                                 <div>{{ (drop.probability * 100) | number:'1.1-1':locale }}%</div>
@@ -85,7 +85,7 @@
                                     {{ row.capacity }}
                                 }
                                 @default {
-                                    {{ row[column.id] }}km
+                                    {{ $any(row)[column.id] }}km
                                 }
                             }
                         </td>

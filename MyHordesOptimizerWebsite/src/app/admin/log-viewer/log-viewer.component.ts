@@ -20,6 +20,7 @@ import { catchError, debounceTime, EMPTY, Observable, Subject, switchMap } from 
 import { LogViewerService } from '../../_abstract_model/services/log-viewer.service';
 import { Imports, LogLevel } from '../../_abstract_model/types/_types';
 import { LogEntry, LogPageResult } from '../../_abstract_model/types/log-viewer.model';
+import { TypedCellDefDirective } from '../../_core/directives/typed-cell-def.directive';
 import { HighlightJsonPipe } from '../../_core/pipes/highlight-json.pipe';
 
 const LOG_LEVELS: LogLevel[] = ['Verbose', 'Debug', 'Information', 'Warning', 'Error', 'Fatal'];
@@ -27,13 +28,14 @@ const LOG_LEVELS: LogLevel[] = ['Verbose', 'Debug', 'Information', 'Warning', 'E
 const angular_common: Imports = [CommonModule,
                                  ReactiveFormsModule,];
 const components: Imports = [];
+const directives: Imports = [TypedCellDefDirective];
 const pipes: Imports = [HighlightJsonPipe];
 const material_modules: Imports = [MatTableModule, MatPaginatorModule, MatFormFieldModule, MatInputModule, MatSelectModule, MatDatepickerModule,
                                    MatIconModule, MatButtonModule, MatProgressSpinnerModule, MatTooltipModule, MatChipsModule, MatDividerModule];
 
 @Component({
     selector: 'mho-log-viewer',
-    imports: [...angular_common, ...components, ...material_modules, ...pipes],
+    imports: [...angular_common, ...components, ...directives, ...material_modules, ...pipes],
     changeDetection: ChangeDetectionStrategy.OnPush,
     templateUrl: './log-viewer.component.html',
     styleUrl: './log-viewer.component.scss',

@@ -40,7 +40,7 @@
         }
 
         <div class="town-list__table-wrapper">
-            <table [dataSource]="towns()" [trackBy]="trackById" class="town-table" mat-table matSort matSortActive="id" matSortDirection="desc">
+            <table #table [dataSource]="towns()" [trackBy]="trackById" class="town-table" mat-table matSort matSortActive="id" matSortDirection="desc">
 
                 <ng-container matColumnDef="select" sticky>
                     <th *matHeaderCellDef mat-header-cell>
@@ -48,7 +48,7 @@
                                       [checked]="allSelected()"
                                       [indeterminate]="someSelected()"/>
                     </th>
-                    <td (click)="$event.stopPropagation()" *matCellDef="let row" mat-cell>
+                    <td (click)="$event.stopPropagation()" *matCellDef="let row; table: table" mat-cell>
                         <mat-checkbox (change)="toggleSelection(row.id)"
                                       [checked]="selectedIds().has(row.id)"/>
                     </td>
@@ -66,7 +66,7 @@
                             }
                         </mat-form-field>
                     </th>
-                    <td *matCellDef="let row" mat-cell>
+                    <td *matCellDef="let row; table: table" mat-cell>
                         <mho-deferred-cell>{{ row.mapId ?? row.id }}</mho-deferred-cell>
                     </td>
                 </ng-container>
@@ -83,14 +83,14 @@
                             }
                         </mat-form-field>
                     </th>
-                    <td *matCellDef="let row" mat-cell>
+                    <td *matCellDef="let row; table: table" mat-cell>
                         <mho-deferred-cell>{{ row.name ?? '—' }}</mho-deferred-cell>
                     </td>
                 </ng-container>
 
                 <ng-container matColumnDef="size">
                     <th *matHeaderCellDef disableClear i18n mat-header-cell mat-sort-header="size">Taille</th>
-                    <td *matCellDef="let row" mat-cell>
+                    <td *matCellDef="let row; table: table" mat-cell>
                         <mho-deferred-cell>{{ (row.width && row.height) ? (row.width + ' × ' + row.height) : '—' }}</mho-deferred-cell>
                     </td>
                 </ng-container>
@@ -113,7 +113,7 @@
                             </mat-select>
                         </mat-form-field>
                     </th>
-                    <td *matCellDef="let row" mat-cell>
+                    <td *matCellDef="let row; table: table" mat-cell>
                         <mho-deferred-cell>
                             @if (row.townType) {
                                 <img [src]="HORDES_IMG_REPO + typeImgMap[row.townType]" [title]="row.townType" height="16" width="16"/>
@@ -140,7 +140,7 @@
                             </mat-select>
                         </mat-form-field>
                     </th>
-                    <td *matCellDef="let row" class="cell--flag" mat-cell>
+                    <td *matCellDef="let row; table: table" class="cell--flag" mat-cell>
                         <mho-deferred-cell>
                             <span [matTooltip]="row.language ?? ''" class="flag">{{ getLanguageFlag(row.language) }}</span>
                         </mho-deferred-cell>
@@ -149,14 +149,14 @@
 
                 <ng-container matColumnDef="score">
                     <th *matHeaderCellDef disableClear i18n mat-header-cell mat-sort-header="score">Score</th>
-                    <td *matCellDef="let row" mat-cell>
+                    <td *matCellDef="let row; table: table" mat-cell>
                         <mho-deferred-cell>{{ row.score !== null ? row.score : '—' }}</mho-deferred-cell>
                     </td>
                 </ng-container>
 
                 <ng-container matColumnDef="citizens">
                     <th *matHeaderCellDef disableClear i18n mat-header-cell mat-sort-header="citizens">Citoyens</th>
-                    <td *matCellDef="let row" mat-cell>
+                    <td *matCellDef="let row; table: table" mat-cell>
                         <mho-deferred-cell>
                             <div [matTooltip]="getCitizensTooltip(row.citizens)"
                                  class="cell--citizens"
@@ -190,7 +190,7 @@
                             </mat-select>
                         </mat-form-field>
                     </th>
-                    <td *matCellDef="let row" mat-cell>
+                    <td *matCellDef="let row; table: table" mat-cell>
                         <mho-deferred-cell>
                             <div class="state-cell">
                                 @let state = getTownState(row);
@@ -208,7 +208,7 @@
                             <ng-container i18n>Note</ng-container>
                         }
                     </th>
-                    <td (click)="$event.stopPropagation()" *matCellDef="let row" mat-cell>
+                    <td (click)="$event.stopPropagation()" *matCellDef="let row; table: table" mat-cell>
                         <mho-deferred-cell>
                             @if (row.mapId !== null && hasParticipated(row)) {
                                 <mho-note-icon [note]="townNotes()[row.mapId]?.note ?? null" (clicked)="openTownNote(row.mapId)"/>
@@ -219,7 +219,7 @@
 
                 <ng-container matColumnDef="noteCitizen">
                     <th *matHeaderCellDef i18n mat-header-cell>Note de citoyen</th>
-                    <td (click)="$event.stopPropagation()" *matCellDef="let row" mat-cell>
+                    <td (click)="$event.stopPropagation()" *matCellDef="let row; table: table" mat-cell>
                         <mho-deferred-cell>
                             @if (row.mapId !== null && hasParticipated(row)) {
                                 <mho-note-icon [note]="citizenNotes()[row.mapId]?.note ?? null" (clicked)="openCitizenNote(row.mapId)"/>
@@ -230,7 +230,7 @@
 
                 <ng-container matColumnDef="actions">
                     <th *matHeaderCellDef i18n mat-header-cell>Actions</th>
-                    <td (click)="$event.stopPropagation()" *matCellDef="let row" mat-cell>
+                    <td (click)="$event.stopPropagation()" *matCellDef="let row; table: table" mat-cell>
                         <div class="cell--actions">
                             <button (click)="importTown(row.id)"
                                     [disabled]="importingIds().has(row.id)"

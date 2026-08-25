@@ -12,7 +12,7 @@
 
 <mat-card-content class="mho-buildings">
     <div class="mat-elevation-z8 table-scroll">
-        <table [dataSource]="datasource" mat-table>
+        <table #table [dataSource]="datasource" mat-table>
 
             <!-- Nom : icône du chantier + libellé, avec l'indentation qui porte la hiérarchie -->
             <ng-container matColumnDef="label" sticky>
@@ -21,7 +21,7 @@
                                                    (filterValueChange)="filters_change.next()">
                     </mho-header-with-string-filter>
                 </th>
-                <td *matCellDef="let row" mat-cell>
+                <td *matCellDef="let row; table: table" mat-cell>
                     <div [class.is-root]="row.depth === 0" class="label-cell">
                         <!-- Un trait vertical par niveau d'ancêtre : c'est lui qui rattache
                              visuellement une évolution à son chantier parent. L'indentation seule
@@ -54,12 +54,12 @@
                 <th *matHeaderCellDef mat-header-cell class="center">
                     <mho-icon-ap></mho-icon-ap>
                 </th>
-                <td *matCellDef="let row" mat-cell class="center">{{ costFor(row, plansLusFor(row)).ap }}</td>
+                <td *matCellDef="let row; table: table" mat-cell class="center">{{ costFor(row, plansLusFor(row)).ap }}</td>
             </ng-container>
 
             <ng-container matColumnDef="defence">
                 <th *matHeaderCellDef mat-header-cell class="center">{{ headerOf('defence') }}</th>
-                <td *matCellDef="let row" mat-cell class="center">
+                <td *matCellDef="let row; table: table" mat-cell class="center">
                     @if (row.defence > 0) {
                         {{ row.defence }}
                     }
@@ -68,7 +68,7 @@
 
             <ng-container matColumnDef="max_life">
                 <th *matHeaderCellDef mat-header-cell class="center">{{ headerOf('max_life') }}</th>
-                <td *matCellDef="let row" mat-cell class="center">
+                <td *matCellDef="let row; table: table" mat-cell class="center">
                     @if (row.max_life > 0) {
                         {{ row.max_life }}
                     }
@@ -81,7 +81,7 @@
                  de la rareté EFFECTIVE (celle réellement requise à la lecture d'un plan). -->
             <ng-container matColumnDef="rarity">
                 <th *matHeaderCellDef mat-header-cell class="center">{{ headerOf('rarity') }}</th>
-                <td *matCellDef="let row" mat-cell class="center">
+                <td *matCellDef="let row; table: table" mat-cell class="center">
                     @if (hard_mode && row.has_hard_mode) {
                         <mho-compact-stepper
                             (valueChange)="setPlansLus(row, $event)"
@@ -108,7 +108,7 @@
 
             <ng-container matColumnDef="flags">
                 <th *matHeaderCellDef mat-header-cell class="center">{{ headerOf('flags') }}</th>
-                <td *matCellDef="let row" mat-cell class="center">
+                <td *matCellDef="let row; table: table" mat-cell class="center">
                     <div class="flags">
                         @if (row.temporary) {
                             <img [src]="HORDES_IMG_REPO + 'icons/small_warning.gif'" alt="" class="flag-icon"
@@ -124,7 +124,7 @@
 
             <ng-container matColumnDef="resources">
                 <th *matHeaderCellDef mat-header-cell>{{ headerOf('resources') }}</th>
-                <td *matCellDef="let row" mat-cell>
+                <td *matCellDef="let row; table: table" mat-cell>
                     <ul class="resources">
                         @for (resource of costFor(row, plansLusFor(row)).resources; track resource.item_id) {
                             <li [matTooltip]="resource.label[locale]">

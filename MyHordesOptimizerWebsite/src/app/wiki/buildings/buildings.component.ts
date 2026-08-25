@@ -20,6 +20,7 @@ import { ApiService } from '../../_abstract_model/services/api.service';
 import { Imports, TownTypeId } from '../../_abstract_model/types/_types';
 import { Building, BuildingResource } from '../../_abstract_model/types/building.class';
 import { TownDetails } from '../../_abstract_model/types/town-details.class';
+import { TypedCellDefDirective } from '../../_core/directives/typed-cell-def.directive';
 import { getTown } from '../../_core/utilities/localstorage.util';
 import { normalizeString } from '../../_core/utilities/string.utils';
 import { CompactStepperComponent } from '../../_shared/compact-stepper/compact-stepper.component';
@@ -28,13 +29,14 @@ import { HeaderWithStringFilterComponent } from '../../_shared/lists/header-with
 
 const angular_common: Imports = [CommonModule, FormsModule];
 const components: Imports = [CompactStepperComponent, HeaderWithStringFilterComponent, IconApComponent];
+const directives: Imports = [TypedCellDefDirective];
 const material_modules: Imports = [MatButtonModule, MatButtonToggleModule, MatCardModule, MatIconModule, MatTableModule, MatTooltipModule];
 
 @Component({
     selector: 'mho-wiki-buildings',
     templateUrl: './buildings.component.html',
     styleUrls: ['./buildings.component.scss'],
-    imports: [...angular_common, ...components, ...material_modules]
+    imports: [...angular_common, ...components, ...directives, ...material_modules]
 })
 export class BuildingsComponent implements OnInit {
 

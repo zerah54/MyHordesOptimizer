@@ -10,9 +10,10 @@ import { StandardColumn } from '../../../_abstract_model/interfaces';
 import { DigsService } from '../../../_abstract_model/services/digs.service';
 import { TownService } from '../../../_abstract_model/services/town.service';
 import { Imports } from '../../../_abstract_model/types/_types';
-import { CitizenInfo } from '../../../_abstract_model/types/citizen-info.class';
 import { Citizen } from '../../../_abstract_model/types/citizen.class';
+import { CitizenInfo } from '../../../_abstract_model/types/citizen-info.class';
 import { Dig } from '../../../_abstract_model/types/dig.class';
+import { TypedCellDefDirective } from '../../../_core/directives/typed-cell-def.directive';
 import { ColumnIdPipe } from '../../../_core/pipes/column-id.pipe';
 import { getTown } from '../../../_core/utilities/localstorage.util';
 import { AvatarComponent } from '../../../_shared/avatar/avatar.component';
@@ -25,6 +26,7 @@ import { HeaderWithSelectFilterComponent } from '../../../_shared/lists/header-w
 
 const angular_common: Imports = [CommonModule];
 const components: Imports = [AvatarComponent, DigComponent, HeaderWithNumberPreviousNextFilterComponent, HeaderWithSelectFilterComponent, CitizenInfoComponent];
+const directives: Imports = [TypedCellDefDirective];
 const pipes: Imports = [ColumnIdPipe];
 const material_modules: Imports = [MatSortModule, MatTableModule];
 
@@ -33,7 +35,7 @@ const material_modules: Imports = [MatSortModule, MatTableModule];
     selector: 'mho-citizens-digs',
     templateUrl: './citizens-digs.component.html',
     styleUrls: ['./citizens-digs.component.scss'],
-    imports: [...angular_common, ...components, ...material_modules, ...pipes]
+    imports: [...angular_common, ...components, ...directives, ...material_modules, ...pipes]
 })
 export class CitizensDigsComponent implements OnInit {
 

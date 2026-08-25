@@ -17,9 +17,10 @@ import { StandardColumn } from '../../_abstract_model/interfaces';
 import { ApiService } from '../../_abstract_model/services/api.service';
 import { TownService } from '../../_abstract_model/services/town.service';
 import { Imports } from '../../_abstract_model/types/_types';
-import { RuinItem } from '../../_abstract_model/types/ruin-item.class';
 import { Ruin } from '../../_abstract_model/types/ruin.class';
+import { RuinItem } from '../../_abstract_model/types/ruin-item.class';
 import { TownDetails } from '../../_abstract_model/types/town-details.class';
+import { TypedCellDefDirective } from '../../_core/directives/typed-cell-def.directive';
 import { ColumnIdPipe } from '../../_core/pipes/column-id.pipe';
 import { getTown } from '../../_core/utilities/localstorage.util';
 import { normalizeString } from '../../_core/utilities/string.utils';
@@ -29,6 +30,7 @@ import { HeaderWithStringFilterComponent } from '../../_shared/lists/header-with
 
 const angular_common: Imports = [CommonModule, FormsModule, NgOptimizedImage];
 const components: Imports = [HeaderWithStringFilterComponent, HeaderWithNumberFilterComponent, HeaderWithSelectFilterComponent];
+const directives: Imports = [TypedCellDefDirective];
 const pipes: Imports = [DecimalPipe, ColumnIdPipe];
 const material_modules: Imports = [MatButtonModule, MatCardModule, MatIconModule, MatMenuModule, MatSlideToggleModule, MatSortModule, MatTableModule, MatTooltipModule];
 
@@ -36,7 +38,7 @@ const material_modules: Imports = [MatButtonModule, MatCardModule, MatIconModule
     selector: 'mho-ruins',
     templateUrl: './ruins.component.html',
     styleUrls: ['./ruins.component.scss'],
-    imports: [...angular_common, ...components, ...material_modules, ...pipes]
+    imports: [...angular_common, ...components, ...directives, ...material_modules, ...pipes]
 })
 export class RuinsComponent implements OnInit {
 

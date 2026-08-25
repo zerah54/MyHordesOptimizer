@@ -7,7 +7,7 @@
     <div class="citizen-list">
 
         <div class="citizen-list__table-wrapper">
-            <table [dataSource]="citizens()" [trackBy]="trackById" class="citizen-table" mat-table matSort
+            <table #table [dataSource]="citizens()" [trackBy]="trackById" class="citizen-table" mat-table matSort
                    matSortActive="nbTownsPlayed" matSortDirection="desc">
 
                 <ng-container matColumnDef="avatar_name" sticky>
@@ -24,7 +24,7 @@
                             }
                         </mat-form-field>
                     </th>
-                    <td *matCellDef="let row" mat-cell>
+                    <td *matCellDef="let row; table: table" mat-cell>
                         <div class="citizen-cell">
                             <div class="citizen-avatar">
                                 <mho-avatar [src]="row.avatar" rounded></mho-avatar>
@@ -36,14 +36,14 @@
 
                 <ng-container matColumnDef="nbTownsPlayed">
                     <th *matHeaderCellDef disableClear i18n mat-header-cell mat-sort-header="nbTownsPlayed">Villes</th>
-                    <td *matCellDef="let row" mat-cell>{{ row.nbTownsPlayed }}</td>
+                    <td *matCellDef="let row; table: table" mat-cell>{{ row.nbTownsPlayed }}</td>
                 </ng-container>
 
                 <ng-container matColumnDef="bestSurvival">
                     <th *matHeaderCellDef disableClear i18n mat-header-cell mat-sort-header="bestSurvival">
                         Meilleure survie
                     </th>
-                    <td *matCellDef="let row" mat-cell>
+                    <td *matCellDef="let row; table: table" mat-cell>
                         @if (row.bestSurvival !== null) {
                             <ng-container i18n>Jour {{ row.bestSurvival }}</ng-container>
                         } @else {
@@ -55,7 +55,7 @@
                 <ng-container matColumnDef="lastTown">
                     <th *matHeaderCellDef disableClear i18n mat-header-cell mat-sort-header="lastTown">Dernière ville
                     </th>
-                    <td *matCellDef="let row" mat-cell>
+                    <td *matCellDef="let row; table: table" mat-cell>
                         @if (row.lastTownId !== null) {
                             <span>{{ row.lastTownName }}</span>
                             @if (row.lastTownSeason !== null) {
@@ -69,7 +69,7 @@
 
                 <ng-container matColumnDef="note">
                     <th *matHeaderCellDef i18n mat-header-cell>Note</th>
-                    <td (click)="$event.stopPropagation()" *matCellDef="let row" mat-cell>
+                    <td (click)="$event.stopPropagation()" *matCellDef="let row; table: table" mat-cell>
                         @if (row.id !== myUserId) {
                             <mho-note-icon [note]="userNotes()[row.id]?.note ?? null" (clicked)="openUserNote(row.id)"/>
                         }

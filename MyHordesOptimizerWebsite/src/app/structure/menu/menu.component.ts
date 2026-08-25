@@ -96,6 +96,7 @@ export class MenuComponent implements OnInit {
                 { label: $localize`Camping`, path: 'tools/camping', displayed: true, lvl: 1, authorized: (): boolean => true, spoil: false },
                 { label: $localize`Chances de survie`, path: 'tools/probabilities', displayed: true, lvl: 1, authorized: (): boolean => true, spoil: false },
                 { label: $localize`Simulateur de débordement`, path: 'tools/overflow', displayed: true, lvl: 1, authorized: (): boolean => true, spoil: false },
+                { label: $localize`Gestionnaire d'état`, path: 'tools/state-manager', displayed: true, lvl: 1, authorized: (): boolean => true, spoil: false },
             ], spoil: false
         },
         {

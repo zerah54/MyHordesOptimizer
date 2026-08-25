@@ -32,6 +32,7 @@ import { NoteService } from '../../_abstract_model/services/note.service';
 import { UserAccountService } from '../../_abstract_model/services/user-account.service';
 import { Dictionary, Imports } from '../../_abstract_model/types/_types';
 import { CitizenListItem, CitizenListPageResult } from '../../_abstract_model/types/citizen-list-item.model';
+import { TypedCellDefDirective } from '../../_core/directives/typed-cell-def.directive';
 import { getUserId } from '../../_core/utilities/localstorage.util';
 import { AvatarComponent } from '../../_shared/avatar/avatar.component';
 import { NoteDialogComponent, NoteDialogData } from '../../_shared/note-dialog/note-dialog.component';
@@ -39,6 +40,7 @@ import { NoteIconComponent } from '../../_shared/note-icon/note-icon.component';
 
 const angular_common: Imports = [CommonModule, ReactiveFormsModule];
 const components: Imports = [AvatarComponent, NoteIconComponent];
+const directives: Imports = [TypedCellDefDirective];
 const pipes: Imports = [];
 const material_modules: Imports = [
     MatTableModule, MatSortModule, MatIconModule, MatProgressSpinnerModule,
@@ -47,7 +49,7 @@ const material_modules: Imports = [
 
 @Component({
     selector: 'mho-citizen-list',
-    imports: [...angular_common, ...components, ...material_modules, ...pipes],
+    imports: [...angular_common, ...components, ...directives, ...material_modules, ...pipes],
     changeDetection: ChangeDetectionStrategy.OnPush,
     templateUrl: './citizen-list.component.html',
     styleUrl: './citizen-list.component.scss',

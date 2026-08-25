@@ -1,5 +1,5 @@
 import { CommonModule, DecimalPipe, NgOptimizedImage } from '@angular/common';
-import { Component, DestroyRef, inject,OnInit } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatCardModule } from '@angular/material/card';
 import { MatSortModule } from '@angular/material/sort';
@@ -13,12 +13,14 @@ import { Imports } from '../../_abstract_model/types/_types';
 import { Item } from '../../_abstract_model/types/item.class';
 import { Recipe } from '../../_abstract_model/types/recipe.class';
 import { RecipeResultItem } from '../../_abstract_model/types/recipe-result-item.class';
+import { TypedCellDefDirective } from '../../_core/directives/typed-cell-def.directive';
 import { ColumnIdPipe } from '../../_core/pipes/column-id.pipe';
 import { normalizeString } from '../../_core/utilities/string.utils';
 import { FilterFieldComponent } from '../../_shared/filter-field/filter-field.component';
 
 const angular_common: Imports = [CommonModule, NgOptimizedImage];
 const components: Imports = [FilterFieldComponent];
+const directives: Imports = [TypedCellDefDirective];
 const pipes: Imports = [DecimalPipe, ColumnIdPipe];
 const material_modules: Imports = [MatCardModule, MatSortModule, MatTableModule];
 
@@ -26,7 +28,7 @@ const material_modules: Imports = [MatCardModule, MatSortModule, MatTableModule]
     selector: 'mho-recipes',
     templateUrl: './recipes.component.html',
     styleUrls: ['./recipes.component.scss'],
-    imports: [...angular_common, ...components, ...material_modules, ...pipes]
+    imports: [...angular_common, ...components, ...directives, ...material_modules, ...pipes]
 })
 export class RecipesComponent implements OnInit {
 

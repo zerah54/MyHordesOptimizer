@@ -9,15 +9,15 @@
             </div>
         </div>
         <div class="mat-elevation-z8">
-            <table [dataSource]="datasource" mat-table matSort>
+            <table #table [dataSource]="datasource" mat-table matSort>
                 @for (column of columns; track column.id) {
                     <ng-container [matColumnDef]="column.id" [sticky]="column.sticky || false">
                         <th *matHeaderCellDef mat-header-cell>{{ column.header }}</th>
-                        <td *matCellDef="let row" mat-cell>
+                        <td *matCellDef="let row; table: table" mat-cell>
                             @switch (column.id) {
                                 @case ('type') {
                                     <div>
-                                        @switch (row[column.id]) {
+                                        @switch (row.type) {
                                             @case ('Recipe::ManualAnywhere') {
                                                 <img [ngSrc]="HORDES_IMG_REPO + 'log/citizen.gif'" height="16" width="16"/>
                                                 <ng-container i18n>Action de citoyen</ng-container>
@@ -46,8 +46,8 @@
                                     </div>
                                 }
                                 @case ('components') {
-                                    @for (component of row[column.id]; track component) {
-                                        <div [class.provoking]="component.id === row['provoking']?.id"><img [ngSrc]="HORDES_IMG_REPO + component.img"
+                                    @for (component of row.components; track component) {
+                                        <div [class.provoking]="component.id === row.provoking?.id"><img [ngSrc]="HORDES_IMG_REPO + component.img"
                                                                                                             height="16"
                                                                                                             width="16"/>{{ component.label[locale] }}
                                         </div>
@@ -57,7 +57,7 @@
                                     <img [ngSrc]="HORDES_IMG_REPO + 'icons/small_move.gif'" height="16" width="16"/>
                                 }
                                 @case ('result') {
-                                    @for (result of row[column.id]; track result) {
+                                    @for (result of row.result; track result) {
                                         <div>
                                             <img [ngSrc]="HORDES_IMG_REPO + result.item.img" height="16" width="16"/>
                                             {{ result.item.label[locale] }}

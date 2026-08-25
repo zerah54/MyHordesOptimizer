@@ -94,9 +94,17 @@
                 <source>Nord-Ouest</source>
                 <target state="final">North-West</target>
             </trans-unit>
+            <trans-unit id="6766603078997972998" datatype="html">
+                <source>Vider le coffre</source>
+                <target state="new">Vider le coffre</target>
+            </trans-unit>
             <trans-unit id="6770677036624635211" datatype="html" approved="yes">
                 <source>Sauvetage</source>
                 <target state="final">Rescue</target>
+            </trans-unit>
+            <trans-unit id="6772056774013442345" datatype="html">
+                <source>Fatigué(e)</source>
+                <target state="new">Fatigué(e)</target>
             </trans-unit>
             <trans-unit id="3165188886740707100" datatype="html" approved="yes">
                 <source>Appareil Photo d&apos;Avant-Guerre</source>
@@ -138,6 +146,10 @@
                 <source>Alarme rudimentaire</source>
                 <target state="final">Rudimentary Alarm</target>
             </trans-unit>
+            <trans-unit id="2048726759928310673" datatype="html">
+                <source>Blessure - Main</source>
+                <target state="new">Blessure - Main</target>
+            </trans-unit>
             <trans-unit id="4998798069806963460" datatype="html" approved="yes">
                 <source>Rangements</source>
                 <target state="final">Storage</target>
@@ -149,6 +161,18 @@
             <trans-unit id="8213871008620391117" datatype="html" approved="yes">
                 <source>Renforts</source>
                 <target state="final">Reinforcements</target>
+            </trans-unit>
+            <trans-unit id="1269834001108396073" datatype="html">
+                <source>La dévastation force la porte ouverte depuis longtemps</source>
+                <target state="new">La dévastation force la porte ouverte depuis longtemps</target>
+            </trans-unit>
+            <trans-unit id="1271571042538445343" datatype="html">
+                <source>Citoyen :
+                    <x id="PH" equiv-text="picto.count_in_town ?? 0"/>
+                </source>
+                <target state="new">Citoyen :
+                    <x id="PH" equiv-text="picto.count_in_town ?? 0"/>
+                </target>
             </trans-unit>
             <trans-unit id="1272594810711653844" datatype="html" approved="yes">
                 <source>Cuisine</source>
@@ -174,9 +198,17 @@
                 <source>Habitant</source>
                 <target state="final">Resident</target>
             </trans-unit>
+            <trans-unit id="8998140217207259342" datatype="html">
+                <source>Rassasié(e)</source>
+                <target state="new">Rassasié(e)</target>
+            </trans-unit>
             <trans-unit id="8999093564615496242" datatype="html" approved="yes">
                 <source>Fouineur</source>
                 <target state="final">Scavenger</target>
+            </trans-unit>
+            <trans-unit id="8999496267122555044" datatype="html">
+                <source>Hydraté</source>
+                <target state="new">Hydraté</target>
             </trans-unit>
             <trans-unit id="5692239162610982878" datatype="html" approved="yes">
                 <source>Éclaireur</source>
@@ -186,9 +218,21 @@
                 <source>Gardien</source>
                 <target state="final">Guardian</target>
             </trans-unit>
+            <trans-unit id="6213711165555577245" datatype="html">
+                <source>Mort</source>
+                <target state="new">Mort</target>
+            </trans-unit>
             <trans-unit id="6227779130323052819" datatype="html" approved="yes">
                 <source>Ermite</source>
                 <target state="final">Survivalist</target>
+            </trans-unit>
+            <trans-unit id="6518032478600962138" datatype="html">
+                <source>Titre</source>
+                <target state="new">Titre</target>
+            </trans-unit>
+            <trans-unit id="6518726292784305506" datatype="html">
+                <source>Retirer du coffre</source>
+                <target state="new">Retirer du coffre</target>
             </trans-unit>
             <trans-unit id="6520359063458937943" datatype="html" approved="yes">
                 <source>Apprivoiseur</source>
@@ -206,6 +250,10 @@
                 <source>Sécurise le coffre dans lequel il se trouve</source>
                 <target state="final">Protects the home in which it is located</target>
             </trans-unit>
+            <trans-unit id="8301182187014583237" datatype="html">
+                <source>Morts</source>
+                <target state="new">Morts</target>
+            </trans-unit>
             <trans-unit id="8327474089390088254" datatype="html" approved="yes">
                 <source>Peut être trouvé empoisonné</source>
                 <target state="final">Can be found poisoned</target>
@@ -217,6 +265,10 @@
             <trans-unit id="4473485791956023608" datatype="html" approved="yes">
                 <source>Trouvaille améliorée</source>
                 <target state="final">Lucky find</target>
+            </trans-unit>
+            <trans-unit id="447877790312840617" datatype="html">
+                <source>Coffre</source>
+                <target state="new">Coffre</target>
             </trans-unit>
             <trans-unit id="5692845604197038843" datatype="html" approved="yes">
                 <source>Perdu en cas de bannissement</source>
@@ -278,6 +330,10 @@
                 <source>Ressource</source>
                 <target state="final">Resource</target>
             </trans-unit>
+            <trans-unit id="2016057704918163359" datatype="html">
+                <source>Anti-blessure</source>
+                <target state="new">Anti-blessure</target>
+            </trans-unit>
             <trans-unit id="2016944012945209299" datatype="html" approved="yes">
                 <source>Objet de défense</source>
                 <target state="final">Defense Object</target>
@@ -322,6 +378,10 @@
             <trans-unit id="7651090437124612338" datatype="html" approved="yes">
                 <source>Appâts odorants</source>
                 <target state="final">Smelly bait</target>
+            </trans-unit>
+            <trans-unit id="7659914592468009285" datatype="html">
+                <source>Ligne horizontale</source>
+                <target state="new">Ligne horizontale</target>
             </trans-unit>
             <trans-unit id="2537395172119379784" datatype="html">
                 <source>Déchardes de bois</source>
@@ -445,6 +505,10 @@
                 <source>Démineur</source>
                 <target state="final">Minesweeper</target>
             </trans-unit>
+            <trans-unit id="6466285442381999468" datatype="html">
+                <source>Gestionnaire d&apos;état</source>
+                <target state="new">Gestionnaire d&apos;état</target>
+            </trans-unit>
             <trans-unit id="7710093706339223473" datatype="html">
                 <source>Thème Windows</source>
                 <target state="new">Thème Windows</target>
@@ -457,6 +521,14 @@
                 <source>Moyen</source>
                 <target state="final">Medium</target>
             </trans-unit>
+            <trans-unit id="7831615079320449369" datatype="html">
+                <source>Historique</source>
+                <target state="new">Historique</target>
+            </trans-unit>
+            <trans-unit id="783832405190995337" datatype="html">
+                <source>Note de ville</source>
+                <target state="new">Note de ville</target>
+            </trans-unit>
             <trans-unit id="7839898456487639610" datatype="html" approved="yes">
                 <source>Difficile</source>
                 <target state="final">Hard</target>
@@ -464,6 +536,10 @@
             <trans-unit id="7287607689388981179" datatype="html" approved="yes">
                 <source>Expert</source>
                 <target state="final">Expert</target>
+            </trans-unit>
+            <trans-unit id="7299849936272637676" datatype="html">
+                <source>Séquence</source>
+                <target state="new">Séquence</target>
             </trans-unit>
             <trans-unit id="4839761962295378240" datatype="html" approved="yes">
                 <source>Impossible</source>
@@ -485,6 +561,10 @@
                 <source>Villes</source>
                 <target state="needs-translation">Villes</target>
             </trans-unit>
+            <trans-unit id="995792786870686349" datatype="html">
+                <source>Emojis</source>
+                <target state="new">Emojis</target>
+            </trans-unit>
             <trans-unit id="7522974210957794701" datatype="html">
                 <source>Divers</source>
                 <target state="needs-translation">Divers</target>
@@ -492,18 +572,6 @@
             <trans-unit id="7334403395400981068" datatype="html">
                 <source>Aucun picto à afficher.</source>
                 <target state="new">Aucun picto à afficher.</target>
-            </trans-unit>
-            <trans-unit id="8616134483369123816" datatype="html">
-                <source>Citoyen :</source>
-                <target state="new">Citoyen :</target>
-            </trans-unit>
-            <trans-unit id="377373638454048817" datatype="html">
-                <source>Total ville :</source>
-                <target state="new">Total ville :</target>
-            </trans-unit>
-            <trans-unit id="1066863741460846913" datatype="html">
-                <source>Total utilisateur :</source>
-                <target state="new">Total utilisateur :</target>
             </trans-unit>
             <trans-unit id="1737276409111424339" datatype="html">
                 <source>Total utilisateur : non importé</source>
@@ -574,6 +642,14 @@
             <trans-unit id="7945783910888141498" datatype="html" approved="yes">
                 <source>États</source>
                 <target state="final">Status</target>
+            </trans-unit>
+            <trans-unit id="7948382981236915344" datatype="html">
+                <source>Icônes MyHordes</source>
+                <target state="new">Icônes MyHordes</target>
+            </trans-unit>
+            <trans-unit id="794846713726296087" datatype="html">
+                <source>Alternative Technicien</source>
+                <target state="new">Alternative Technicien</target>
             </trans-unit>
             <trans-unit id="4739884131356753082" datatype="html">
                 <source>Ajouter aux états</source>
@@ -691,6 +767,14 @@
                 <source>Meilleure survie</source>
                 <target state="new">Meilleure survie</target>
             </trans-unit>
+            <trans-unit id="1190504220509127147" datatype="html">
+                <source>Citoyen
+                    <x id="PH" equiv-text="i + 1"/>
+                </source>
+                <target state="new">Citoyen
+                    <x id="PH" equiv-text="i + 1"/>
+                </target>
+            </trans-unit>
             <trans-unit id="1199075748231436486" datatype="html" approved="yes">
                 <source>Identifiant MyHordes</source>
                 <target state="final">MyHordes identifier</target>
@@ -710,6 +794,10 @@
             <trans-unit id="6351937635910938762" datatype="html" approved="yes">
                 <source>Disponibilités</source>
                 <target state="final">Availabilities</target>
+            </trans-unit>
+            <trans-unit id="6352596107300820129" datatype="html">
+                <source>Clean</source>
+                <target state="new">Clean</target>
             </trans-unit>
             <trans-unit id="3069404814865522603" datatype="html" approved="yes">
                 <source>Consignes</source>
@@ -794,6 +882,10 @@
             <trans-unit id="5363451304863092478" datatype="html">
                 <source>Nom</source>
                 <target state="new">Nom</target>
+            </trans-unit>
+            <trans-unit id="5366910513642532377" datatype="html">
+                <source>Couleur de surlignage</source>
+                <target state="new">Couleur de surlignage</target>
             </trans-unit>
             <trans-unit id="5572282995600701765" datatype="html">
                 <source>Taille</source>
@@ -899,9 +991,17 @@
                 <target state="new">Part<x id="INTERPOLATION" equiv-text="{{ expedition_part_index + 1 }}"/>: 
                 </target>
             </trans-unit>
+            <trans-unit id="6666833560603751554" datatype="html">
+                <source>Drogué(e)</source>
+                <target state="new">Drogué(e)</target>
+            </trans-unit>
             <trans-unit id="6655777237474004024" datatype="html" approved="yes">
                 <source>Nom du tracé</source>
                 <target state="final">Route name</target>
+            </trans-unit>
+            <trans-unit id="876089507211524600" datatype="html">
+                <source>Aligner a droite</source>
+                <target state="new">Aligner a droite</target>
             </trans-unit>
             <trans-unit id="8773315027797338734" datatype="html" approved="yes">
                 <source>Supprimer la partie</source>
@@ -958,6 +1058,10 @@
             <trans-unit id="2086288790931147290" datatype="html" approved="yes">
                 <source>Supprimer la place</source>
                 <target state="final">Remove spot</target>
+            </trans-unit>
+            <trans-unit id="2088460061889087003" datatype="html">
+                <source>Ramasse un objet de défense de zone</source>
+                <target state="new">Ramasse un objet de défense de zone</target>
             </trans-unit>
             <trans-unit id="874439683153048888" datatype="html">
                 <source>M&apos;inscrire ici</source>
@@ -1089,6 +1193,10 @@
                 <source>Relevés des métiers</source>
                 <target state="new">Relevés des métiers</target>
             </trans-unit>
+            <trans-unit id="2945451507056484680" datatype="html">
+                <source>Barre</source>
+                <target state="new">Barre</target>
+            </trans-unit>
             <trans-unit id="2946654520146782781" datatype="html">
                 <source>Aucun score pour l&apos;instant.</source>
                 <target state="new">Aucun score pour l&apos;instant.</target>
@@ -1129,6 +1237,10 @@
                 <source>0 – Zone peu explorée</source>
                 <target state="new">0 – Zone peu explorée</target>
             </trans-unit>
+            <trans-unit id="5723536799759201212" datatype="html">
+                <source>Bloc de code</source>
+                <target state="new">Bloc de code</target>
+            </trans-unit>
             <trans-unit id="4741517700695762920" datatype="html">
                 <source>1 – Zone partiellement explorée</source>
                 <target state="new">1 – Zone partiellement explorée</target>
@@ -1153,6 +1265,10 @@
                 <source>Non renseigné</source>
                 <target state="new">Non renseigné</target>
             </trans-unit>
+            <trans-unit id="423140332313216663" datatype="html">
+                <source>Défense par citoyen</source>
+                <target state="new">Défense par citoyen</target>
+            </trans-unit>
             <trans-unit id="4234537858833273511" datatype="html">
                 <source>Case épuisée</source>
                 <target state="new">Case épuisée</target>
@@ -1172,6 +1288,18 @@
             <trans-unit id="8529616953243398296" datatype="html" approved="yes">
                 <source>Ajouter un objet</source>
                 <target state="final">Add item</target>
+            </trans-unit>
+            <trans-unit id="853518071026302177" datatype="html">
+                <source>Gras</source>
+                <target state="new">Gras</target>
+            </trans-unit>
+            <trans-unit id="8614140963090846044" datatype="html">
+                <source>Clair(e)</source>
+                <target state="new">Clair(e)</target>
+            </trans-unit>
+            <trans-unit id="861902441700018514" datatype="html">
+                <source>Dépendant(e)</source>
+                <target state="new">Dépendant(e)</target>
             </trans-unit>
             <trans-unit id="8620934575209945498" datatype="html" approved="yes">
                 <source>Supprimer un objet</source>
@@ -1193,6 +1321,10 @@
                 <source>Fouilles totales</source>
                 <target state="final">Total excavations</target>
             </trans-unit>
+            <trans-unit id="8187599789219630729" datatype="html">
+                <source>Blessure - Pied</source>
+                <target state="new">Blessure - Pied</target>
+            </trans-unit>
             <trans-unit id="3182705520281939075" datatype="html" approved="yes">
                 <source>Bonus en camping</source>
                 <target state="final">Camping bonus</target>
@@ -1201,6 +1333,10 @@
                 <source>Bâtiment vide</source>
                 <target state="final">Empty ruin</target>
             </trans-unit>
+            <trans-unit id="269922828560404168" datatype="html">
+                <source>PDC :</source>
+                <target state="new">PDC :</target>
+            </trans-unit>
             <trans-unit id="7969447827855107408" datatype="html">
                 <source>Plans inhabituels sortis</source>
                 <target state="needs-translation">Plans inhabituels sortis</target>
@@ -1208,6 +1344,10 @@
             <trans-unit id="5407619717083968805" datatype="html">
                 <source>Plans rares sortis</source>
                 <target state="needs-translation">Plans rares sortis</target>
+            </trans-unit>
+            <trans-unit id="1164864082665777289" datatype="html">
+                <source>Baskets</source>
+                <target state="new">Baskets</target>
             </trans-unit>
             <trans-unit id="1165067646815460527" datatype="html">
                 <source>Plans très rares sortis</source>
@@ -1265,9 +1405,26 @@
                 <source>Maximum</source>
                 <target state="final">Maximum</target>
             </trans-unit>
+            <trans-unit id="4198364704934437210" datatype="html">
+                <source>Objet de défense de zone</source>
+                <target state="new">Objet de défense de zone</target>
+            </trans-unit>
+            <trans-unit id="3924643420964256932" datatype="html">
+                <source>État actuel</source>
+                <target state="new">État actuel</target>
+            </trans-unit>
             <trans-unit id="392591506297072679" datatype="html" approved="yes">
                 <source>Mode d&apos;affichage</source>
                 <target state="final">Display mode</target>
+            </trans-unit>
+            <trans-unit id="3926113908909885977" datatype="html">
+                <source>La dévastation force : porte ouverte depuis longtemps (+25) et tous les logements au niveau 0 (facteur de zombies actifs). La défense
+                    personnelle n&apos;est pas remise à 0 : seule sa part liée au logement l&apos;est, le reste (métier héroïque, améliorations, objets) survit.
+                </source>
+                <target state="new">La dévastation force : porte ouverte depuis longtemps (+25) et tous les logements au niveau 0 (facteur de zombies actifs).
+                    La défense personnelle n&apos;est pas remise à 0 : seule sa part liée au logement l&apos;est, le reste (métier héroïque, améliorations,
+                    objets) survit.
+                </target>
             </trans-unit>
             <trans-unit id="267923422419323222" datatype="html" approved="yes">
                 <source>Nombre d&apos;objets</source>
@@ -1276,6 +1433,10 @@
             <trans-unit id="8364958810283495875" datatype="html">
                 <source>Défense apportée</source>
                 <target state="needs-translation">Défense apportée</target>
+            </trans-unit>
+            <trans-unit id="9121495428675729635" datatype="html">
+                <source>Monter à vélo</source>
+                <target state="new">Monter à vélo</target>
             </trans-unit>
             <trans-unit id="9122415907873847234" datatype="html">
                 <source>Afficher les zones du scrutateur</source>
@@ -1316,6 +1477,10 @@
             <trans-unit id="70397346439942337" datatype="html" approved="yes">
                 <source>Ajouter</source>
                 <target state="final">Add</target>
+            </trans-unit>
+            <trans-unit id="7041926404469417166" datatype="html">
+                <source>Émoticônes</source>
+                <target state="new">Émoticônes</target>
             </trans-unit>
             <trans-unit id="6713347271514219101" datatype="html" approved="yes">
                 <source>Aller simple</source>
@@ -1383,6 +1548,10 @@
                     de 13 à 16 %, calculée en recoupant la TDG du jour avec le planificateur de la veille
                 </target>
             </trans-unit>
+            <trans-unit id="4388879716045736175" datatype="html">
+                <source>Note</source>
+                <target state="new">Note</target>
+            </trans-unit>
             <trans-unit id="4389720435684617288" datatype="html">
                 <source>Feux d&apos;artifice explosés</source>
                 <target state="new">Feux d&apos;artifice explosés</target>
@@ -1418,6 +1587,14 @@
             <trans-unit id="5928971148307390010" datatype="html">
                 <source>Réduction feux d&apos;artifice estimée</source>
                 <target state="new">Réduction feux d&apos;artifice estimée</target>
+            </trans-unit>
+            <trans-unit id="6880130371070591431" datatype="html">
+                <source>Total ville :
+                    <x id="PH" equiv-text="picto.town_total_count ?? 0"/>
+                </source>
+                <target state="new">Total ville :
+                    <x id="PH" equiv-text="picto.town_total_count ?? 0"/>
+                </target>
             </trans-unit>
             <trans-unit id="6885177837465778840" datatype="html">
                 <source>Plage possiblement incomplète, saisissez plus de paliers</source>
@@ -1489,6 +1666,10 @@
                 <source>Estimation enregistrée - Min</source>
                 <target state="new">Estimation enregistrée - Min</target>
             </trans-unit>
+            <trans-unit id="6388052032876059142" datatype="html">
+                <source>Liste a puces</source>
+                <target state="new">Liste a puces</target>
+            </trans-unit>
             <trans-unit id="6393752548675760940" datatype="html">
                 <source>Estimation enregistrée - Max</source>
                 <target state="new">Estimation enregistrée - Max</target>
@@ -1533,6 +1714,10 @@
                     - Max
                 </target>
             </trans-unit>
+            <trans-unit id="7544149270654743875" datatype="html">
+                <source>Liste numerotee</source>
+                <target state="new">Liste numerotee</target>
+            </trans-unit>
             <trans-unit id="7546052101299540869" datatype="html" approved="yes">
                 <source>Afficher uniquement la différence</source>
                 <target state="final">Display only the differences</target>
@@ -1545,9 +1730,17 @@
                 <source>Douche</source>
                 <target state="new">Douche</target>
             </trans-unit>
+            <trans-unit id="4861874001990569865" datatype="html">
+                <source>Gueule de bois</source>
+                <target state="new">Gueule de bois</target>
+            </trans-unit>
             <trans-unit id="8073013514222699302" datatype="html" approved="yes">
                 <source>Ont été donnés</source>
                 <target state="final">Have been given</target>
+            </trans-unit>
+            <trans-unit id="2451656483824020015" datatype="html">
+                <source>Citation</source>
+                <target state="new">Citation</target>
             </trans-unit>
             <trans-unit id="2456477142464580022" datatype="html">
                 <source>Gagnée</source>
@@ -1560,6 +1753,10 @@
             <trans-unit id="2472506129070031683" datatype="html" approved="yes">
                 <source>Ont contribué</source>
                 <target state="final">Contributed</target>
+            </trans-unit>
+            <trans-unit id="2488959838994742036" datatype="html">
+                <source>Convalescent(e)</source>
+                <target state="new">Convalescent(e)</target>
             </trans-unit>
             <trans-unit id="3582169410393783519" datatype="html" approved="yes">
                 <source>N&apos;ont pas contribué</source>
@@ -1576,6 +1773,10 @@
                 <target state="new">Sortie n°
                     <x id="PH" equiv-text="index + 1"/>
                 </target>
+            </trans-unit>
+            <trans-unit id="235465632587818354" datatype="html">
+                <source>Ajouter au coffre</source>
+                <target state="new">Ajouter au coffre</target>
             </trans-unit>
             <trans-unit id="2354670428052590180" datatype="html">
                 <source>Aucune partie jouée pour l&apos;instant.</source>
@@ -1617,6 +1818,10 @@
                 <source>Dés</source>
                 <target state="final">Dice</target>
             </trans-unit>
+            <trans-unit id="787782299397948132" datatype="html">
+                <source>État de départ</source>
+                <target state="new">État de départ</target>
+            </trans-unit>
             <trans-unit id="7878035239350200830" datatype="html" approved="yes">
                 <source>Cartes</source>
                 <target state="final">Cards</target>
@@ -1645,9 +1850,17 @@
                 <source>Entrées / Sorties</source>
                 <target state="needs-translation">Entrées / Sorties</target>
             </trans-unit>
+            <trans-unit id="1010971657496305969" datatype="html">
+                <source>Blessé (PA max réduit)</source>
+                <target state="new">Blessé (PA max réduit)</target>
+            </trans-unit>
             <trans-unit id="1032727218264502196" datatype="html" approved="yes">
                 <source>Téléscope</source>
                 <target state="final">Telescope</target>
+            </trans-unit>
+            <trans-unit id="1036250733909211239" datatype="html">
+                <source>Citoyens dans la zone</source>
+                <target state="new">Citoyens dans la zone</target>
             </trans-unit>
             <trans-unit id="6523739183800669938" datatype="html">
                 <source>Utilisation des chantiers</source>
@@ -1676,6 +1889,21 @@
             <trans-unit id="3877095303685712752" datatype="html" approved="yes">
                 <source>Taux</source>
                 <target state="final">Percentage</target>
+            </trans-unit>
+            <trans-unit id="3878491236440094358" datatype="html">
+                <source>Au moins 1 survivant :<x id="INTERPOLATION" equiv-text="{{ scenario.survivor_at_least_one * 100 | number:&apos;1.0-5&apos;:locale }}"/>%
+                    <x id="START_BLOCK_IF" equiv-text="@if (!bounds_saturated) {"/>
+                    (<x id="INTERPOLATION_1" equiv-text="{{ ((favorable?.survivor_at_least_one ?? 0) * 100) | number:&apos;1.0-1&apos;:locale }}"/>% –<x
+                        id="INTERPOLATION_2" equiv-text="{{ ((defavorable?.survivor_at_least_one ?? 0) * 100) | number:&apos;1.0-1&apos;:locale }}"/>%)
+                    <x id="CLOSE_BLOCK_IF" equiv-text="}"/>
+                </source>
+                <target state="new">Au moins 1 survivant :<x id="INTERPOLATION"
+                                                             equiv-text="{{ scenario.survivor_at_least_one * 100 | number:&apos;1.0-5&apos;:locale }}"/>%
+                    <x id="START_BLOCK_IF" equiv-text="@if (!bounds_saturated) {"/>
+                    (<x id="INTERPOLATION_1" equiv-text="{{ ((favorable?.survivor_at_least_one ?? 0) * 100) | number:&apos;1.0-1&apos;:locale }}"/>% –<x
+                        id="INTERPOLATION_2" equiv-text="{{ ((defavorable?.survivor_at_least_one ?? 0) * 100) | number:&apos;1.0-1&apos;:locale }}"/>%)
+                    <x id="CLOSE_BLOCK_IF" equiv-text="}"/>
+                </target>
             </trans-unit>
             <trans-unit id="9104606150638849284" datatype="html" approved="yes">
                 <source>Direction des regénérations</source>
@@ -1717,6 +1945,18 @@
                 <source>Mode de jeu</source>
                 <target state="new">Mode de jeu</target>
             </trans-unit>
+            <trans-unit id="7738666527469252015" datatype="html">
+                <source>Compétence héroïque « Contrôle de zone » (bonus de base)</source>
+                <target state="new">Compétence héroïque « Contrôle de zone » (bonus de base)</target>
+            </trans-unit>
+            <trans-unit id="4683438757534251641" datatype="html">
+                <source>Répartition finale</source>
+                <target state="new">Répartition finale</target>
+            </trans-unit>
+            <trans-unit id="4690623246987977773" datatype="html">
+                <source>Déshydraté(e)</source>
+                <target state="new">Déshydraté(e)</target>
+            </trans-unit>
             <trans-unit id="469180229084386389" datatype="html">
                 <source>Mode observateur</source>
                 <target state="new">Mode observateur</target>
@@ -1745,9 +1985,17 @@
                 <source>Zone à appliquer pour l&apos;ajout</source>
                 <target state="new">Zone à appliquer pour l&apos;ajout</target>
             </trans-unit>
+            <trans-unit id="5250911974693889016" datatype="html">
+                <source>Par défense</source>
+                <target state="new">Par défense</target>
+            </trans-unit>
             <trans-unit id="1229846018197621216" datatype="html">
                 <source>Objet encombrant</source>
                 <target state="needs-translation">Objet encombrant</target>
+            </trans-unit>
+            <trans-unit id="1848814508781605397" datatype="html">
+                <source>Souligne</source>
+                <target state="new">Souligne</target>
             </trans-unit>
             <trans-unit id="1852619184802693518" datatype="html">
                 <source>Objet à signaler</source>
@@ -1780,6 +2028,10 @@
             <trans-unit id="5281938868222344363" datatype="html" approved="yes">
                 <source>Quantité manquante</source>
                 <target state="final">Missing quantity</target>
+            </trans-unit>
+            <trans-unit id="5283487673687902822" datatype="html">
+                <source>Anti-soif</source>
+                <target state="new">Anti-soif</target>
             </trans-unit>
             <trans-unit id="542725519312506171" datatype="html" approved="yes">
                 <source>Signaler</source>
@@ -1912,6 +2164,10 @@
                 <source>N</source>
                 <target state="final">N</target>
             </trans-unit>
+            <trans-unit id="2998892720244037165" datatype="html">
+                <source>Ramasser un objet de défense de zone</source>
+                <target state="new">Ramasser un objet de défense de zone</target>
+            </trans-unit>
             <trans-unit id="2566834560864089198" datatype="html" approved="yes">
                 <source>E</source>
                 <target state="final">E</target>
@@ -1944,6 +2200,10 @@
                 <source>Êtes-vous sûr de vouloir supprimer cette fouille ?</source>
                 <target state="needs-translation">Êtes-vous sûr de vouloir supprimer cette fouille ?</target>
             </trans-unit>
+            <trans-unit id="6731910389144222119" datatype="html">
+                <source>Blessure - Tête</source>
+                <target state="new">Blessure - Tête</target>
+            </trans-unit>
             <trans-unit id="673430564078029527" datatype="html" approved="yes">
                 <source>Filtrer</source>
                 <target state="final">Filter</target>
@@ -1952,9 +2212,25 @@
                 <source>Cassé</source>
                 <target state="final">Broken</target>
             </trans-unit>
+            <trans-unit id="6905954919631695645" datatype="html">
+                <source>Le débordement plafonne déjà l&apos;attaque au facteur minimum : le tirage du facteur ne change plus rien ici, favorable et défavorable
+                    sont identiques au réaliste. Détail ci-dessous sans fourchette.
+                </source>
+                <target state="new">Le débordement plafonne déjà l&apos;attaque au facteur minimum : le tirage du facteur ne change plus rien ici, favorable et
+                    défavorable sont identiques au réaliste. Détail ci-dessous sans fourchette.
+                </target>
+            </trans-unit>
             <trans-unit id="6906288566408280890" datatype="html" approved="yes">
                 <source>Taux d&apos;obtention en cas de fouille réussie sur une zone praf</source>
                 <target state="final">Rates of successful excavation on depleted area</target>
+            </trans-unit>
+            <trans-unit id="6915017092560181799" datatype="html">
+                <source>Liste de taches</source>
+                <target state="new">Liste de taches</target>
+            </trans-unit>
+            <trans-unit id="6916259089174820361" datatype="html">
+                <source>Campeur/Campeuse avisé(e)</source>
+                <target state="new">Campeur/Campeuse avisé(e)</target>
             </trans-unit>
             <trans-unit id="5983300914001148035" datatype="html">
                 <source>Taux d&apos;obtention en cas de fouille réussie sur une zone non-praf</source>
@@ -2015,6 +2291,10 @@
                 <source>Remerciements</source>
                 <target state="final">Special Thanks</target>
             </trans-unit>
+            <trans-unit id="3288823150837483175" datatype="html">
+                <source>Couleur du texte</source>
+                <target state="new">Couleur du texte</target>
+            </trans-unit>
             <trans-unit id="5186837657495593523" datatype="html">
                 <source>Ce site n&apos;est pas affilié à 
                     <x id="START_LINK" ctype="x-a"
@@ -2034,6 +2314,14 @@
                     MyHordes
                     <x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/>
                 </target>
+            </trans-unit>
+            <trans-unit id="2390777307787612036" datatype="html">
+                <source>Descendre du vélo</source>
+                <target state="new">Descendre du vélo</target>
+            </trans-unit>
+            <trans-unit id="2392539426181676286" datatype="html">
+                <source>Défense de maison par défaut</source>
+                <target state="new">Défense de maison par défaut</target>
             </trans-unit>
             <trans-unit id="239352375316430833" datatype="html">
                 <source>Certains éléments graphiques appartiennent à 
@@ -2058,6 +2346,10 @@
             <trans-unit id="7919452934138804929" datatype="html" approved="yes">
                 <source>Se connecter</source>
                 <target state="final">Log in</target>
+            </trans-unit>
+            <trans-unit id="79247053454792171" datatype="html">
+                <source>Ville dévastée : tous les logements sont ramenés au niveau 0 (Lit de camp), ce champ est ignoré.</source>
+                <target state="new">Ville dévastée : tous les logements sont ramenés au niveau 0 (Lit de camp), ce champ est ignoré.</target>
             </trans-unit>
             <trans-unit id="6636912229609448537" datatype="html" approved="yes">
                 <source>Utilisateur inconnu</source>
@@ -2087,6 +2379,10 @@
                 <source>Par défaut</source>
                 <target state="final">Default</target>
             </trans-unit>
+            <trans-unit id="5784023628268896817" datatype="html">
+                <source>Tableau</source>
+                <target state="new">Tableau</target>
+            </trans-unit>
             <trans-unit id="5786363460327756403" datatype="html" approved="yes">
                 <source>Rose</source>
                 <target state="final">Pink</target>
@@ -2095,9 +2391,21 @@
                 <source>Brun</source>
                 <target state="final">Brown</target>
             </trans-unit>
+            <trans-unit id="3611732553361660128" datatype="html">
+                <source>PDC :
+                    <x id="INTERPOLATION" equiv-text="{{ row.pdc }}"/>
+                </source>
+                <target state="new">PDC :
+                    <x id="INTERPOLATION" equiv-text="{{ row.pdc }}"/>
+                </target>
+            </trans-unit>
             <trans-unit id="3621697250116009829" datatype="html">
                 <source>Revenir à ma ville</source>
                 <target state="new">Revenir à ma ville</target>
+            </trans-unit>
+            <trans-unit id="362332546387219562" datatype="html">
+                <source>Immunisé(e)</source>
+                <target state="new">Immunisé(e)</target>
             </trans-unit>
             <trans-unit id="6038281835621310494" datatype="html" approved="yes">
                 <source>Outils</source>
@@ -2131,6 +2439,10 @@
                 <source>Erreur lors de l&apos;import</source>
                 <target state="new">Erreur lors de l&apos;import</target>
             </trans-unit>
+            <trans-unit id="300198309511639809" datatype="html">
+                <source>Italique</source>
+                <target state="new">Italique</target>
+            </trans-unit>
             <trans-unit id="3007172383130908272" datatype="html">
                 <source>Villes des saisons passées</source>
                 <target state="new">Villes des saisons passées</target>
@@ -2160,6 +2472,10 @@
                 <source>Saison terminée</source>
                 <target state="new">Saison terminée</target>
             </trans-unit>
+            <trans-unit id="9174020949248195496" datatype="html">
+                <source>PDC</source>
+                <target state="new">PDC</target>
+            </trans-unit>
             <trans-unit id="6872015512509288445" datatype="html">
                 <source>Reprend là où le quota avait interrompu la passe précédente. Décoche pour réimporter des villes déjà connues.</source>
                 <target state="new">Reprend là où le quota avait interrompu la passe précédente. Décoche pour réimporter des villes déjà connues.</target>
@@ -2175,6 +2491,18 @@
             <trans-unit id="1467983175316497492" datatype="html">
                 <source>Importer les villes</source>
                 <target state="new">Importer les villes</target>
+            </trans-unit>
+            <trans-unit id="1468385396955247623" datatype="html">
+                <source>Défense personnelle de chaque citoyen ciblable, pré-remplie avec la valeur par défaut (et les noms de vos citoyens en mode « Ma ville
+                    »), modifiable individuellement.
+                </source>
+                <target state="new">Défense personnelle de chaque citoyen ciblable, pré-remplie avec la valeur par défaut (et les noms de vos citoyens en mode «
+                    Ma ville »), modifiable individuellement.
+                </target>
+            </trans-unit>
+            <trans-unit id="1485869061689177726" datatype="html">
+                <source>Vélo</source>
+                <target state="new">Vélo</target>
             </trans-unit>
             <trans-unit id="5573336475658537601" datatype="html">
                 <source>Marquer une saison comme terminée</source>
@@ -2204,6 +2532,10 @@
                 <source>Catégories</source>
                 <target state="new">Catégories</target>
             </trans-unit>
+            <trans-unit id="7868632341076973356" datatype="html">
+                <source>Probabilité au moins</source>
+                <target state="new">Probabilité au moins</target>
+            </trans-unit>
             <trans-unit id="2287398703048181232" datatype="html" approved="yes">
                 <source>Camping</source>
                 <target state="final">Camping</target>
@@ -2211,6 +2543,10 @@
             <trans-unit id="2292584256714443853" datatype="html">
                 <source>Perdue</source>
                 <target state="new">Perdue</target>
+            </trans-unit>
+            <trans-unit id="8628198843764595469" datatype="html">
+                <source>Survivants</source>
+                <target state="new">Survivants</target>
             </trans-unit>
             <trans-unit id="8628521144156217897" datatype="html" approved="yes">
                 <source>Chances de survie</source>
@@ -2228,6 +2564,10 @@
                 <source>Objets</source>
                 <target state="final">Items</target>
             </trans-unit>
+            <trans-unit id="1089007407228529037" datatype="html">
+                <source>Blessure - Œil</source>
+                <target state="new">Blessure - Œil</target>
+            </trans-unit>
             <trans-unit id="4354226191914852265" datatype="html">
                 <source>Pictos</source>
                 <target state="new">Pictos</target>
@@ -2240,9 +2580,17 @@
                 <source>Pouvoirs</source>
                 <target state="final">Skills</target>
             </trans-unit>
+            <trans-unit id="8819132666607255721" datatype="html">
+                <source>Points d&apos;action disponibles</source>
+                <target state="new">Points d&apos;action disponibles</target>
+            </trans-unit>
             <trans-unit id="8819719048481824214" datatype="html" approved="yes">
                 <source>Bâtiments</source>
                 <target state="final">Ruins</target>
+            </trans-unit>
+            <trans-unit id="8415875870300524706" datatype="html">
+                <source>Lien</source>
+                <target state="new">Lien</target>
             </trans-unit>
             <trans-unit id="8437925216003659459" datatype="html">
                 <source>Causes de mort</source>
@@ -2251,6 +2599,10 @@
             <trans-unit id="5693898841183433316" datatype="html">
                 <source>Types de nettoyage</source>
                 <target state="new">Types de nettoyage</target>
+            </trans-unit>
+            <trans-unit id="5699727622825203342" datatype="html">
+                <source>Justifier</source>
+                <target state="new">Justifier</target>
             </trans-unit>
             <trans-unit id="2676457458178911802" datatype="html">
                 <source>Catégories de liste de souhaits</source>
@@ -2280,6 +2632,14 @@
                 <source>Tutoriels</source>
                 <target state="final">Tutorials</target>
             </trans-unit>
+            <trans-unit id="5222230073969796438" datatype="html">
+                <source>Le détail ci-dessous simule le facteur comme en jeu (retiré à chaque nuit). Entre parenthèses : deux simulations séparées à facteur figé
+                    au minimum et au maximum, pour isoler le hasard de répartition entre citoyens.
+                </source>
+                <target state="new">Le détail ci-dessous simule le facteur comme en jeu (retiré à chaque nuit). Entre parenthèses : deux simulations séparées à
+                    facteur figé au minimum et au maximum, pour isoler le hasard de répartition entre citoyens.
+                </target>
+            </trans-unit>
             <trans-unit id="6304154521414539936" datatype="html" approved="yes">
                 <source>Script / Extension</source>
                 <target state="final">Script / Extension</target>
@@ -2308,9 +2668,25 @@
                 <source>Site</source>
                 <target state="final">Website</target>
             </trans-unit>
+            <trans-unit id="3798070165070620146" datatype="html">
+                <source>Guide</source>
+                <target state="new">Guide</target>
+            </trans-unit>
+            <trans-unit id="3549884673093564156" datatype="html">
+                <source>Pas soif</source>
+                <target state="new">Pas soif</target>
+            </trans-unit>
             <trans-unit id="3556482685302387015" datatype="html" approved="yes">
                 <source>Première utilisation</source>
                 <target state="final">First visit</target>
+            </trans-unit>
+            <trans-unit id="3092290656638730311" datatype="html">
+                <source>Total utilisateur :
+                    <x id="PH" equiv-text="picto.count"/>
+                </source>
+                <target state="new">Total utilisateur :
+                    <x id="PH" equiv-text="picto.count"/>
+                </target>
             </trans-unit>
             <trans-unit id="3098981611680291534" datatype="html" approved="yes">
                 <source>Bot Discord</source>
@@ -2319,6 +2695,10 @@
             <trans-unit id="6672144649038755717" datatype="html">
                 <source>Mini-Jeux</source>
                 <target state="new">Mini-Jeux</target>
+            </trans-unit>
+            <trans-unit id="6677945310831125995" datatype="html">
+                <source>Hydraté(e)</source>
+                <target state="new">Hydraté(e)</target>
             </trans-unit>
             <trans-unit id="668387861187046971" datatype="html">
                 <source>Classement des joueurs</source>
@@ -2364,6 +2744,10 @@
                 <target state="needs-translation">Merci à Argo qui a assuré à la perfection - assistée de Katt - le rôle de responsable des relations avec l&apos;équipe
                     de développement du jeu, et sans qui l&apos;idée de faire du script un site ne serait pas née.
                 </target>
+            </trans-unit>
+            <trans-unit id="1637633335638507705" datatype="html">
+                <source>Déplacement</source>
+                <target state="new">Déplacement</target>
             </trans-unit>
             <trans-unit id="1639188178441316344" datatype="html">
                 <source>Merci enfin à aracime, notre plus grand et notre meilleur supporter, mais aussi à tous les membres du Théâtre Implacable qui ont testé
@@ -2426,6 +2810,10 @@
                 <source>Nombre de campings déjà effectués</source>
                 <target state="final">Number of times camped</target>
             </trans-unit>
+            <trans-unit id="3237092555407906237" datatype="html">
+                <source>Ivre</source>
+                <target state="new">Ivre</target>
+            </trans-unit>
             <trans-unit id="3915433859665099927" datatype="html" approved="yes">
                 <source>Nombre de pelures de peau et de toiles de tentes dans le sac</source>
                 <target state="final">Number of camping aids on the rucksack</target>
@@ -2433,6 +2821,10 @@
             <trans-unit id="560884417072143682" datatype="html" approved="yes">
                 <source>La ville</source>
                 <target state="final">Town</target>
+            </trans-unit>
+            <trans-unit id="5618287776451565416" datatype="html">
+                <source>Équipement</source>
+                <target state="new">Équipement</target>
             </trans-unit>
             <trans-unit id="2205198219410592279" datatype="html" approved="yes">
                 <source>Type de ville</source>
@@ -2520,6 +2912,10 @@
                 <source>La liste est impactée par la distance choisie</source>
                 <target state="needs-translation">La liste est impactée par la distance choisie</target>
             </trans-unit>
+            <trans-unit id="4077451925170155790" datatype="html">
+                <source>Déplacement (Zone 3km)</source>
+                <target state="new">Déplacement (Zone 3km)</target>
+            </trans-unit>
             <trans-unit id="5726959518724330123" datatype="html" approved="yes">
                 <source>Il faut en soustraire 3 après chaque attaque</source>
                 <target state="final">Subtract 3 after each attack</target>
@@ -2572,6 +2968,10 @@
                 <source>État de la porte</source>
                 <target state="new">État de la porte</target>
             </trans-unit>
+            <trans-unit id="2050475074867925102" datatype="html">
+                <source>Ajouter une note</source>
+                <target state="new">Ajouter une note</target>
+            </trans-unit>
             <trans-unit id="2052953702599122786" datatype="html">
                 <source>Fermée</source>
                 <target state="new">Fermée</target>
@@ -2584,13 +2984,13 @@
                 <source>Ouverte (≥ 30 min)</source>
                 <target state="new">Ouverte (≥ 30 min)</target>
             </trans-unit>
-            <trans-unit id="2535238856321591681" datatype="html">
-                <source>Détermine le nombre de citoyens ciblés</source>
-                <target state="new">Détermine le nombre de citoyens ciblés</target>
-            </trans-unit>
             <trans-unit id="2038992439757340075" datatype="html">
                 <source>Citoyens vivants en ville</source>
                 <target state="new">Citoyens vivants en ville</target>
+            </trans-unit>
+            <trans-unit id="5431997792330966741" datatype="html">
+                <source>Ajoutez une étape à la séquence pour voir la trace.</source>
+                <target state="new">Ajoutez une étape à la séquence pour voir la trace.</target>
             </trans-unit>
             <trans-unit id="5438409221885173808" datatype="html">
                 <source>Population de la ville</source>
@@ -2612,7 +3012,7 @@
                     correspondre au nombre de citoyens.
                 </target>
             </trans-unit>
-            <trans-unit id="8538918839705198292" datatype="html">
+            <trans-unit id="1829565820083732582" datatype="html">
                 <source>Ville en chaos</source>
                 <target state="new">Ville en chaos</target>
             </trans-unit>
@@ -2620,13 +3020,9 @@
                 <source>Répartition</source>
                 <target state="new">Répartition</target>
             </trans-unit>
-            <trans-unit id="7074536048147162297" datatype="html">
-                <source>Défense de maison de référence</source>
-                <target state="new">Défense de maison de référence</target>
-            </trans-unit>
-            <trans-unit id="6404028151121511565" datatype="html">
-                <source>Un citoyen meurt si les zombies reçus dépassent sa défense</source>
-                <target state="new">Un citoyen meurt si les zombies reçus dépassent sa défense</target>
+            <trans-unit id="928726635862596808" datatype="html">
+                <source>Centrer</source>
+                <target state="new">Centrer</target>
             </trans-unit>
             <trans-unit id="8873057759661090080" datatype="html">
                 <source>Nombre de simulations</source>
@@ -2640,9 +3036,9 @@
                 <source>Déroulé de l&apos;attaque</source>
                 <target state="new">Déroulé de l&apos;attaque</target>
             </trans-unit>
-            <trans-unit id="6651703555999102039" datatype="html">
-                <source>1. Ce qui entre en ville</source>
-                <target state="new">1. Ce qui entre en ville</target>
+            <trans-unit id="6498344886129719228" datatype="html">
+                <source>Ce qui entre en ville</source>
+                <target state="new">Ce qui entre en ville</target>
             </trans-unit>
             <trans-unit id="4642464488615806449" datatype="html">
                 <source>Attaque estimée</source>
@@ -2660,6 +3056,14 @@
                 <source>Veilleurs</source>
                 <target state="new">Veilleurs</target>
             </trans-unit>
+            <trans-unit id="900015739683288246" datatype="html">
+                <source>Note de citoyen</source>
+                <target state="new">Note de citoyen</target>
+            </trans-unit>
+            <trans-unit id="9001751695114701168" datatype="html">
+                <source>— Mort</source>
+                <target state="new">— Mort</target>
+            </trans-unit>
             <trans-unit id="9012164453173268999" datatype="html">
                 <source>Ajouter une simulation</source>
                 <target state="needs-translation">Ajouter une simulation</target>
@@ -2676,6 +3080,10 @@
                 <source>Nombre de morts</source>
                 <target state="final">Number of deaths</target>
             </trans-unit>
+            <trans-unit id="7896686114184610460" datatype="html">
+                <source>Aligner a gauche</source>
+                <target state="new">Aligner a gauche</target>
+            </trans-unit>
             <trans-unit id="8007458421319879300" datatype="html" approved="yes">
                 <source>Probabilité</source>
                 <target state="final">Probability</target>
@@ -2683,6 +3091,14 @@
             <trans-unit id="7745390044882644493" datatype="html" approved="yes">
                 <source>Simulation 1</source>
                 <target state="final">Simulation 1</target>
+            </trans-unit>
+            <trans-unit id="7757642408966950527" datatype="html">
+                <source>Points d&apos;exploration disponibles</source>
+                <target state="new">Points d&apos;exploration disponibles</target>
+            </trans-unit>
+            <trans-unit id="7764772924749928084" datatype="html">
+                <source>Vaincre la mort</source>
+                <target state="new">Vaincre la mort</target>
             </trans-unit>
             <trans-unit id="4624097725363515773" datatype="html">
                 <source>Ouvre</source>
@@ -2699,6 +3115,14 @@
             <trans-unit id="8564269404291712463" datatype="html">
                 <source>Le texte a bien été copié</source>
                 <target state="needs-translation">Le texte a bien été copié</target>
+            </trans-unit>
+            <trans-unit id="8583345730754863690" datatype="html">
+                <source>La dévastation implique toujours le chaos en jeu</source>
+                <target state="new">La dévastation implique toujours le chaos en jeu</target>
+            </trans-unit>
+            <trans-unit id="8856181074841372570" datatype="html">
+                <source>Emoticone</source>
+                <target state="new">Emoticone</target>
             </trans-unit>
             <trans-unit id="8862266483474333992" datatype="html">
                 <source>Avertissement en cas de fermeture de la page</source>
@@ -2775,6 +3199,10 @@
                 <source>En tant qu&apos;application (Recommandé)</source>
                 <target state="new">En tant qu&apos;application (Recommandé)</target>
             </trans-unit>
+            <trans-unit id="5098096530802962989" datatype="html">
+                <source>Probabilité exacte</source>
+                <target state="new">Probabilité exacte</target>
+            </trans-unit>
             <trans-unit id="4607540554184893453" datatype="html">
                 <source>En l&apos;installant en tant qu&apos;application, vous pourrez utiliser les commandes du bot partout sur Discord (en messages privés,
                     dans des groupes, ou sur des serveurs où le bot n&apos;est pas présent).&lt;br&gt;&lt;br&gt;Cliquez sur le
@@ -2810,6 +3238,10 @@
             <trans-unit id="7631405440758027758" datatype="html">
                 <source>Temps</source>
                 <target state="new">Temps</target>
+            </trans-unit>
+            <trans-unit id="7633234991118987386" datatype="html">
+                <source>Blessure - Jambe</source>
+                <target state="new">Blessure - Jambe</target>
             </trans-unit>
             <trans-unit id="5795663998729072574" datatype="html">
                 <source>Modifie les tooltips natifs de l&apos;application pour afficher en plus la liste des recettes dans lesquelles l&apos;objet survolé
@@ -2866,9 +3298,39 @@
                     également présents dans la liste de course se verront attribuer une bordure dont la couleur indique la priorité de l&apos;élément.
                 </target>
             </trans-unit>
+            <trans-unit id="6587759628378513879" datatype="html">
+                <source>Bouclier équipé</source>
+                <target state="new">Bouclier équipé</target>
+            </trans-unit>
+            <trans-unit id="4422529925541866305" datatype="html">
+                <source>
+                    <x id="PH" equiv-text="this.formatPercent(this.factor_min)"/>
+                    –
+                    <x id="PH_1" equiv-text="this.formatPercent(this.factor_max)"/>
+                    de l&apos;attaque
+                    <x id="PH_2" equiv-text="this.formatPercent(overflow_min)"/>
+                    –
+                    <x id="PH_3" equiv-text="this.formatPercent(overflow_max)"/>
+                    du débordement
+                </source>
+                <target state="new">
+                    <x id="PH" equiv-text="this.formatPercent(this.factor_min)"/>
+                    –
+                    <x id="PH_1" equiv-text="this.formatPercent(this.factor_max)"/>
+                    de l&apos;attaque
+                    <x id="PH_2" equiv-text="this.formatPercent(overflow_min)"/>
+                    –
+                    <x id="PH_3" equiv-text="this.formatPercent(overflow_max)"/>
+                    du débordement
+                </target>
+            </trans-unit>
             <trans-unit id="4423220166056863975" datatype="html" approved="yes">
                 <source>Affichage du nombre de zombies tués sur la case</source>
                 <target state="final">Display the number of zombies killed on the square</target>
+            </trans-unit>
+            <trans-unit id="7274167604200090151" datatype="html">
+                <source>Soif</source>
+                <target state="new">Soif</target>
             </trans-unit>
             <trans-unit id="7274539193871812426" datatype="html">
                 <source>En cochant cette option, un nouvel encart apparaitra sous la carte dans l&apos;Outre-Monde. Il compte le nombre de zombies qui ont été
@@ -2943,6 +3405,10 @@
                     consulter, enregistrer et copier les valeurs des estimations.
                 </target>
             </trans-unit>
+            <trans-unit id="7074677909247111177" datatype="html">
+                <source>Hydratation</source>
+                <target state="new">Hydratation</target>
+            </trans-unit>
             <trans-unit id="7074994221428603078" datatype="html">
                 <source>Ajoute un bouton permettant de copier le contenu du registre</source>
                 <target state="needs-translation">Ajoute un bouton permettant de copier le contenu du registre</target>
@@ -2957,6 +3423,10 @@
                 <source>Affiche un compteur pour gérer l&apos;anti-abus</source>
                 <target state="needs-translation">Affiche un compteur pour gérer l&apos;anti-abus</target>
             </trans-unit>
+            <trans-unit id="5209342669951226392" datatype="html">
+                <source>Zombies actifs</source>
+                <target state="new">Zombies actifs</target>
+            </trans-unit>
             <trans-unit id="7180506722526896911" datatype="html">
                 <source>Quand cette option est cochée, un compteur qui liste vos prises en banque est ajouté aux pages de banque et puits. Le compteur dans
                     MyHordes tient compte des minutes &quot;glissantes&quot;, il suffit donc d&apos;attendre qu&apos;une ligne disparaisse pour pouvoir prendre
@@ -2970,6 +3440,10 @@
             <trans-unit id="7972524927973029550" datatype="html">
                 <source>Ouvre automatiquement le menu &quot;Utiliser un objet de mon sac&quot;</source>
                 <target state="needs-translation">Ouvre automatiquement le menu &quot;Utiliser un objet de mon sac&quot;</target>
+            </trans-unit>
+            <trans-unit id="3960240249403805893" datatype="html">
+                <source>Infecté(e)</source>
+                <target state="new">Infecté(e)</target>
             </trans-unit>
             <trans-unit id="3972328085780533772" datatype="html">
                 <source>Quand cette option est cochée, au chargement d&apos;une case dans l&apos;Outre-Monde un clic sur le bouton d&apos;ouverture du sac sera
@@ -2990,6 +3464,10 @@
                 <target state="needs-translation">En cochant cette option, deux autres options représentant les options d&apos;escorte dans l&apos;Outre-Monde
                     seront disponibles. Vous pourrez ainsi choisir quelles options vous voulez voir cochées ou non par défaut quand vous activez votre escorte.
                 </target>
+            </trans-unit>
+            <trans-unit id="952241786827641678" datatype="html">
+                <source>Voir la note</source>
+                <target state="new">Voir la note</target>
             </trans-unit>
             <trans-unit id="8248895111587460156" datatype="html" approved="yes">
                 <source>Outils externes</source>
@@ -3032,6 +3510,10 @@
                     les fouilles réussies :&lt;/strong&gt; Enregistre les fouilles réussies pour restituer des statistiques sur les fouilles dans une carte
                     dédiée&lt;/li&gt; &lt;/ul&gt;
                 </target>
+            </trans-unit>
+            <trans-unit id="4414670864448586892" datatype="html">
+                <source>Terrorisé(e)</source>
+                <target state="new">Terrorisé(e)</target>
             </trans-unit>
             <trans-unit id="4415272569817655484" datatype="html">
                 <source>En cochant l&apos;option &quot;Mettre à jour Gest&apos;Hordes&quot;, quand vous cliquerez sur le bouton &quot;Mettre à jour les outils
@@ -3126,6 +3608,14 @@
                     you will need to confirm on the page that will open.
                 </target>
             </trans-unit>
+            <trans-unit id="3331463637798407886" datatype="html">
+                <source>Effacer la mise en forme</source>
+                <target state="new">Effacer la mise en forme</target>
+            </trans-unit>
+            <trans-unit id="3337048783141467469" datatype="html">
+                <source>Un citoyen meurt si les zombies reçus dépassent sa défense. Pré-remplit les lignes ci-dessous</source>
+                <target state="new">Un citoyen meurt si les zombies reçus dépassent sa défense. Pré-remplit les lignes ci-dessous</target>
+            </trans-unit>
             <trans-unit id="4519018646004234371" datatype="html" approved="yes">
                 <source>&lt;ul&gt; &lt;li&gt;Installer un navigateur acceptant les extensions, tel que Kiwi Browser ou Firefox ;&lt;/li&gt; &lt;li&gt;Rechercher
                     l&apos;extension de gestion des scripts de votre choix dans la barre de recherche de ce navigateur. Il en existe plusieurs, comme par
@@ -3187,6 +3677,10 @@
                     &lt;li&gt;Activer &quot;Userscripts&quot; ;&lt;/li&gt; &lt;li&gt;Appuyer sur le &quot;Aa&quot; dans la barre de recherche ;&lt;/li&gt; &lt;li&gt;Cliquer
                     sur &quot;Userscripts&quot; ;&lt;/li&gt; &lt;li&gt;Vérifier que &quot;MyHordes Optimizer&quot; est bien activé.&lt;/li&gt; &lt;/ul&gt;
                 </target>
+            </trans-unit>
+            <trans-unit id="3361462310519210007" datatype="html">
+                <source>Sac vide.</source>
+                <target state="new">Sac vide.</target>
             </trans-unit>
             <trans-unit id="3369809985401596025" datatype="html" approved="yes">
                 <source>Rendez-vous sur la
@@ -3293,6 +3787,10 @@
                 <source>Points de vie</source>
                 <target state="new">Points de vie</target>
             </trans-unit>
+            <trans-unit id="5489968893403305908" datatype="html">
+                <source>Sobre</source>
+                <target state="new">Sobre</target>
+            </trans-unit>
             <trans-unit id="5605123772636494177" datatype="html">
                 <source>Plan</source>
                 <target state="new">Plan</target>
@@ -3322,6 +3820,10 @@
             <trans-unit id="814524093468498547" datatype="html" approved="yes">
                 <source>Pouvoir</source>
                 <target state="final">Power</target>
+            </trans-unit>
+            <trans-unit id="8153056867666007896" datatype="html">
+                <source>Blessure - Bras</source>
+                <target state="new">Blessure - Bras</target>
             </trans-unit>
             <trans-unit id="7031255060364978694" datatype="html" approved="yes">
                 <source>Jours héros nécessaires</source>
@@ -3400,37 +3902,13 @@
                 <target state="new">Aucun débordement : les défenses et les veilleurs absorbent toute l&apos;attaque, aucune maison n&apos;est attaquée.
                 </target>
             </trans-unit>
-            <trans-unit id="8497197236435173952" datatype="html">
-                <source>2. Ce qui frappe les maisons</source>
-                <target state="new">2. Ce qui frappe les maisons</target>
-            </trans-unit>
-            <trans-unit id="3910675228661999153" datatype="html">
-                <source>Une partie seulement du débordement est « active » (le facteur ci-dessous), puis elle est répartie aléatoirement entre les citoyens
-                    ciblés.
-                </source>
-                <target state="new">Une partie seulement du débordement est « active » (le facteur ci-dessous), puis elle est répartie aléatoirement entre les
-                    citoyens ciblés.
-                </target>
-            </trans-unit>
-            <trans-unit id="5283788631485775034" datatype="html">
-                <source>Facteur de zombies actifs</source>
-                <target state="new">Facteur de zombies actifs</target>
+            <trans-unit id="4992284663790689893" datatype="html">
+                <source>Ce qui frappe les maisons</source>
+                <target state="new">Ce qui frappe les maisons</target>
             </trans-unit>
             <trans-unit id="4600150865988679417" datatype="html">
                 <source>Citoyens ciblés</source>
                 <target state="new">Citoyens ciblés</target>
-            </trans-unit>
-            <trans-unit id="350344702425382260" datatype="html">
-                <source>Mode d&apos;affichage des résultats</source>
-                <target state="new">Mode d&apos;affichage des résultats</target>
-            </trans-unit>
-            <trans-unit id="5365943831747253176" datatype="html">
-                <source>Réaliste</source>
-                <target state="new">Réaliste</target>
-            </trans-unit>
-            <trans-unit id="5314277499008020931" datatype="html">
-                <source>Favorable / défavorable</source>
-                <target state="new">Favorable / défavorable</target>
             </trans-unit>
             <trans-unit id="3991806597650889528" datatype="html">
                 <source>Ouverture</source>
@@ -3576,6 +4054,10 @@
                 <source>Type de recette</source>
                 <target state="final">Type of recipe</target>
             </trans-unit>
+            <trans-unit id="8933714635688229524" datatype="html">
+                <source>Désaltéré(e)</source>
+                <target state="new">Désaltéré(e)</target>
+            </trans-unit>
             <trans-unit id="227324654937703789" datatype="html" approved="yes">
                 <source>Composants</source>
                 <target state="final">Components</target>
@@ -3583,6 +4065,10 @@
             <trans-unit id="4280305830543989718" datatype="html" approved="yes">
                 <source>Nom du bâtiment</source>
                 <target state="final">Ruin name</target>
+            </trans-unit>
+            <trans-unit id="4281881265102804112" datatype="html">
+                <source>Taille de police</source>
+                <target state="new">Taille de police</target>
             </trans-unit>
             <trans-unit id="7533053521139949104" datatype="html" approved="yes">
                 <source>Distance minimum</source>

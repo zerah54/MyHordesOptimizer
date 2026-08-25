@@ -10,6 +10,7 @@ import { StandardColumn } from '../../../_abstract_model/interfaces';
 import { TownStatisticsService } from '../../../_abstract_model/services/town-statistics.service';
 import { Imports } from '../../../_abstract_model/types/_types';
 import { Regen } from '../../../_abstract_model/types/regen.class';
+import { TypedCellDefDirective } from '../../../_core/directives/typed-cell-def.directive';
 import { ColumnIdPipe } from '../../../_core/pipes/column-id.pipe';
 import { groupBy } from '../../../_core/utilities/array.util';
 
@@ -17,6 +18,7 @@ import { groupBy } from '../../../_core/utilities/array.util';
 
 const angular_common: Imports = [CommonModule];
 const components: Imports = [];
+const directives: Imports = [TypedCellDefDirective];
 const pipes: Imports = [ColumnIdPipe];
 const material_modules: Imports = [MatSortModule, MatTableModule];
 
@@ -24,7 +26,7 @@ const material_modules: Imports = [MatSortModule, MatTableModule];
     selector: 'mho-scrutateur',
     templateUrl: './scrutateur.component.html',
     styleUrls: ['./scrutateur.component.scss'],
-    imports: [...angular_common, ...components, ...material_modules, ...pipes]
+    imports: [...angular_common, ...components, ...directives, ...material_modules, ...pipes]
 })
 export class ScrutateurComponent implements OnInit {
 

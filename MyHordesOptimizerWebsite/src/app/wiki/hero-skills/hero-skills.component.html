@@ -8,9 +8,9 @@
                 <mat-expansion-panel-header>
                     <mat-panel-title>{{ skill_class.name[locale] }}</mat-panel-title>
                 </mat-expansion-panel-header>
-                <table mat-table [dataSource]="skill_class.levels">
+                <table #table mat-table [dataSource]="skill_class.levels">
                     <ng-container matColumnDef="name">
-                        <td mat-cell *matCellDef="let element">
+                        <td mat-cell *matCellDef="let element; table: table">
                             <div>{{ element.name[locale] }}</div>
                             @if (element.pointsNeeded) {
                                 <div>
@@ -20,7 +20,7 @@
                         </td>
                     </ng-container>
                     <ng-container matColumnDef="description">
-                        <td mat-cell *matCellDef="let element">
+                        <td mat-cell *matCellDef="let element; table: table">
                             @for (skill of element.skills; track $index) {
                                 <div class="skill-row">
                                     <img [ngSrc]="HORDES_IMG_REPO + 'emotes/middot.gif'" width="16" height="16">{{ skill[locale] }}

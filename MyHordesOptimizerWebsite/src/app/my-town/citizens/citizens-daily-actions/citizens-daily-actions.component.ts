@@ -15,6 +15,7 @@ import { Imports } from '../../../_abstract_model/types/_types';
 import { Citizen } from '../../../_abstract_model/types/citizen.class';
 import { CitizenInfo } from '../../../_abstract_model/types/citizen-info.class';
 import { DailyAction } from '../../../_abstract_model/types/daily-action.class';
+import { TypedCellDefDirective } from '../../../_core/directives/typed-cell-def.directive';
 import { ColumnIdPipe } from '../../../_core/pipes/column-id.pipe';
 import { TownContextService } from '../../../_core/services/town-context.service';
 import { getTown } from '../../../_core/utilities/localstorage.util';
@@ -23,6 +24,7 @@ import { CompactToggleComponent } from '../../../_shared/compact-toggle/compact-
 
 const angular_common: Imports = [CommonModule, FormsModule];
 const components: Imports = [AvatarComponent, CompactToggleComponent];
+const directives: Imports = [TypedCellDefDirective];
 const pipes: Imports = [ColumnIdPipe];
 const material_modules: Imports = [MatCheckboxModule, MatSortModule, MatTableModule];
 
@@ -30,7 +32,7 @@ const material_modules: Imports = [MatCheckboxModule, MatSortModule, MatTableMod
     selector: 'mho-citizens-daily-actions',
     templateUrl: './citizens-daily-actions.component.html',
     styleUrls: ['./citizens-daily-actions.component.scss'],
-    imports: [...angular_common, ...components, ...material_modules, ...pipes]
+    imports: [...angular_common, ...components, ...directives, ...material_modules, ...pipes]
 })
 export class CitizensDailyActionsComponent implements OnInit {
 

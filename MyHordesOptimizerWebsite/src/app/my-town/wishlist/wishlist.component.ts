@@ -45,6 +45,7 @@ import { Imports } from '../../_abstract_model/types/_types';
 import { Item } from '../../_abstract_model/types/item.class';
 import { WishlistInfo } from '../../_abstract_model/types/wishlist-info.class';
 import { WishlistItem } from '../../_abstract_model/types/wishlist-item.class';
+import { TypedCellDefDirective } from '../../_core/directives/typed-cell-def.directive';
 import { ColumnIdPipe } from '../../_core/pipes/column-id.pipe';
 import { ClipboardService } from '../../_core/services/clipboard.service';
 import { TownContextService } from '../../_core/services/town-context.service';
@@ -58,6 +59,7 @@ import { ItemAlreadyInListPipe } from './item-already-in-list.pipe';
 
 const angular_common: Imports = [CommonModule, FormsModule, NgOptimizedImage];
 const components: Imports = [DeferredCellComponent, HeaderWithStringFilterComponent, LastUpdateComponent, SelectComponent];
+const directives: Imports = [TypedCellDefDirective];
 const pipes: Imports = [ColumnIdPipe, IsItemDisplayedPipe];
 const material_modules: Imports = [DragDropModule, MatButtonModule, MatCardModule, MatCheckboxModule, MatFormFieldModule, MatIconModule, MatInputModule, MatMenuModule, MatOptionModule, MatSelectModule, MatSlideToggleModule, MatTableModule, MatTooltipModule];
 
@@ -66,7 +68,7 @@ const material_modules: Imports = [DragDropModule, MatButtonModule, MatCardModul
     templateUrl: './wishlist.component.html',
     styleUrls: ['./wishlist.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush,
-    imports: [...angular_common, ...components, ...material_modules, ...pipes, ItemAlreadyInListPipe]
+    imports: [...angular_common, ...components, ...directives, ...material_modules, ...pipes, ItemAlreadyInListPipe]
 })
 export class WishlistComponent implements OnInit {
     public readonly table: Signal<MatTable<WishlistItem> | undefined> = viewChild(MatTable);

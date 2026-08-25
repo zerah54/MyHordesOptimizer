@@ -38,6 +38,7 @@ import { Item } from '../../../_abstract_model/types/item.class';
 import { Me } from '../../../_abstract_model/types/me.class';
 import { isHouseLevelEditable } from '../../../_abstract_model/types/town-details.class';
 import { UpdateInfo } from '../../../_abstract_model/types/update-info.class';
+import { TypedCellDefDirective } from '../../../_core/directives/typed-cell-def.directive';
 import { ColumnIdPipe } from '../../../_core/pipes/column-id.pipe';
 import { ClipboardService } from '../../../_core/services/clipboard.service';
 import { TownContextService } from '../../../_core/services/town-context.service';
@@ -55,11 +56,11 @@ import { NoteIconComponent } from '../../../_shared/note-icon/note-icon.componen
 import { SelectComponent } from '../../../_shared/select/select.component';
 import { CitizenPictosDialogComponent, CitizenPictosDialogData } from '../citizen-pictos-dialog/citizen-pictos-dialog.component';
 import { DailyActionForDayPipe } from '../daily-action-for-day.pipe';
-import { TypeRowPipe } from './type-row.pipe';
 
 const angular_common: Imports = [CommonModule, FormsModule];
 const components: Imports = [AvatarComponent, CitizenInfoComponent, CompactStepperComponent, CompactToggleComponent, DeferredCellComponent, LastUpdateComponent, ListElementAddRemoveComponent, NoteIconComponent, SelectComponent];
-const pipes: Imports = [ColumnIdPipe, TypeRowPipe];
+const directives: Imports = [TypedCellDefDirective];
+const pipes: Imports = [ColumnIdPipe];
 const material_modules: Imports = [MatBadgeModule, MatButtonModule, MatButtonToggleModule, MatCheckboxModule, MatDialogModule, MatFormFieldModule, MatIconModule, MatMenuModule, MatSidenavModule, MatSortModule, MatTableModule, MatTooltipModule];
 
 /** Une source de mise à jour d'un citoyen (libellé + info), pour le détail des dernières MàJ. */
@@ -82,7 +83,7 @@ const IMMUNE_SORT_FACTOR: number = 1_000_000;
     selector: 'mho-citizens-list',
     templateUrl: './citizens-list.component.html',
     styleUrls: ['./citizens-list.component.scss'],
-    imports: [...angular_common, ...components, ...material_modules, ...pipes]
+    imports: [...angular_common, ...components, ...directives, ...material_modules, ...pipes]
 })
 export class CitizensListComponent implements OnInit {
 

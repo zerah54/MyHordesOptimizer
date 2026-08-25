@@ -9,10 +9,12 @@ import moment from 'moment';
 import { HORDES_IMG_REPO } from '../../_abstract_model/const';
 import { StandardColumn } from '../../_abstract_model/interfaces';
 import { I18nLabels, Imports } from '../../_abstract_model/types/_types';
-import { private_town_params,PrivateTownParamOptions, PrivateTownParams } from './private-towns-params.const';
+import { TypedCellDefDirective } from '../../_core/directives/typed-cell-def.directive';
+import { private_town_params, PrivateTownParamOptions, PrivateTownParams } from './private-towns-params.const';
 
 const angular_common: Imports = [CommonModule, NgOptimizedImage];
 const components: Imports = [];
+const directives: Imports = [TypedCellDefDirective];
 const pipes: Imports = [];
 const material_modules: Imports = [MatCardModule, MatTableModule, MatIconModule, MatTooltipModule];
 
@@ -20,7 +22,7 @@ const material_modules: Imports = [MatCardModule, MatTableModule, MatIconModule,
     selector: 'mho-private-towns',
     templateUrl: './private-towns.component.html',
     styleUrls: ['./private-towns.component.scss'],
-    imports: [...angular_common, ...components, ...material_modules, ...pipes]
+    imports: [...angular_common, ...components, ...directives, ...material_modules, ...pipes]
 })
 export class PrivateTownsComponent implements OnInit {
 

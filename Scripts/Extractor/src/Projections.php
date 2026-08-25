@@ -57,6 +57,7 @@ final class Projections
             new Projection('Items/item-actions.json', 'myhordes.fixtures.actions', 'items'),
             new Projection('Items/items-nightwatch.json', 'myhordes.fixtures.actions', 'items_nw'),
             new Projection('Items/meta-results.json', 'myhordes.fixtures.actions', 'meta_results'),
+            new Projection('Citizens/status.json', 'myhordes.fixtures.citizen.status'),
             new Projection('Heroes/specials.json', 'myhordes.fixtures.actions', 'specials'),
 
             new Projection(
