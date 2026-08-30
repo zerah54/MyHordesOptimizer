@@ -1,4 +1,9 @@
 export const changelogs: Record<string, string> = {
+    '1.1.59': `
+        [Nouveauté] Les tooltips avancés affichent désormais l'effet catapulte réel des objets (objet ou transformation obtenue à l'impact, zombies tués ou répulsion, zone d'effet), en remplacement de l'ancien indicateur "objet fragile"
+
+        [Correction] Message plus clair invitant à recharger la page quand la version du script/de l'extension ne peut pas être lue, au lieu d'un message d'erreur incomplet
+        `,
     '1.1.58': `
         [Nouveauté] Nouvelle option pour envoyer le contenu de son coffre à MHO lors d'une mise à jour des outils externes depuis sa maison
         `,

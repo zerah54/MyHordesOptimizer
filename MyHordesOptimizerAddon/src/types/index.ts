@@ -13,6 +13,7 @@ export type I18nLabel = Record<Lang, string>;
 export interface MhoItem {
     id: number;
     img: string;
+    imgBroken?: string | null;
     label: I18nLabel;
     description?: I18nLabel;
     category?: { id: string; label: I18nLabel };
@@ -34,6 +35,8 @@ export interface MhoItem {
     openSuccessRate?: number | null;
     /** Coût en PC de l'alternative réservée au métier Technicien à l'outil requis, si elle existe. */
     technicianOpenCpCost?: number | null;
+    /** Effet catapulte réel de l'objet. `null`/absent si l'objet n'est pas catapultable. */
+    catapultEffect?: MhoCatapultEffect | null;
 
     [key: string]: any;
 }
@@ -44,6 +47,19 @@ export interface MhoItemSummary {
     img: string;
     imgBroken?: string | null;
     label: I18nLabel;
+}
+
+/** Effet catapulte réel d'un objet — remplace l'ancienne propriété booléenne `fragile`. */
+export interface MhoCatapultEffect {
+    fate: 'Intact' | 'Broken' | 'Transformed' | 'Destroyed';
+    /** Renseigné seulement si `fate` vaut `'Transformed'`. */
+    morphTarget?: MhoItemSummary | null;
+    killMin?: number | null;
+    killMax?: number | null;
+    /** Renseigné seulement pour une variante de répulsion sans mise à mort. */
+    repelSeconds?: number | null;
+    /** Renseigné si `killMin` ou `repelSeconds` l'est. */
+    radius?: 'Target' | 'Cross' | 'Square' | null;
 }
 
 export interface MhoItemProperty {

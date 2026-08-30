@@ -21,7 +21,9 @@ export function getErrorFromApi(error): string | undefined {
         error_text += `
             <div>${getI18N(api_texts.error).replace('$error$', (error.status ?? '') + (error.status !== 500 && error.status !== 502 && error.status !== 504 ? ' - ' + (error.message ?? error.name ?? error.statusText) : ''))}</div>
             <br />`;
-        if (!isScriptVersionLastVersion()) {
+        if (!getScriptInfo().version) {
+            error_text += `<div><small>${getI18N(api_texts.error_version_unavailable)}</small></div>`;
+        } else if (!isScriptVersionLastVersion()) {
             error_text += `<div><small>${getI18N(api_texts.error_version).replace('$your_version$', getScriptInfo().version).replace('$recent_version$', state.parameters?.find((param) => param.name === 'ScriptVersion')?.value)}</small></div>`;
             error_text += `<small>${isScript() ? getI18N(api_texts.update_script).replace('$update_url$', getScriptInfo().updateURL ?? '') : getI18N(api_texts.update_script_via_menu)}</small>`;
         }
@@ -146,7 +148,7 @@ export function getScriptInfo() {
         }
     }
 
-    return {};
+    return { name: 'MHO Addon' };
 }
 
 export function getChangelog(): string {

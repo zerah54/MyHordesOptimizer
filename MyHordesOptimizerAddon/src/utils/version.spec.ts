@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { state } from '../state';
-import { getErrorFromApi, isScriptVersionLastVersion } from './version';
+import { getErrorFromApi, getScriptInfo, isScriptVersionLastVersion } from './version';
 
 afterEach(() => {
     vi.unstubAllGlobals();
@@ -64,6 +64,12 @@ describe('isScriptVersionLastVersion', () => {
     });
 });
 
+describe('getScriptInfo', () => {
+    it('falls back to a default name when no origin resolves script info (extension context invalidated)', () => {
+        expect(getScriptInfo()).toEqual({ name: 'MHO Addon' });
+    });
+});
+
 describe('getErrorFromApi', () => {
     it('links directly to updateURL on script origin when the version is outdated', () => {
         vi.stubGlobal('GM_info', { script: { version: '1.0.0', name: 'MyHordes Optimizer', updateURL: 'https://example.test/script.user.js' } });
@@ -83,5 +89,11 @@ describe('getErrorFromApi', () => {
         const html: string = getErrorFromApi({ name: 'Error', status: 500 } as unknown as Error);
 
         expect(html).not.toContain('href="undefined"');
+    });
+
+    it('shows reload guidance instead of an undefined version when script info is unavailable', () => {
+        const html: string = getErrorFromApi({ name: 'Error', status: 500 } as unknown as Error);
+
+        expect(html).not.toContain('undefined');
     });
 });

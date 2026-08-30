@@ -4,6 +4,7 @@ import { state } from '../state';
 import type { WishlistItem } from '../types';
 import { getI18N } from '../utils/i18n';
 import { getFixedImagePath, getTooltipItem } from '../utils/item-lookup';
+import { getCatapultEffectElement } from './catapult-effect';
 import { getOpenedWithRowElement, getOpenerRelationElement } from './opener-relation';
 import { getRecipeElement } from './recipes';
 import { getWishlistForZone } from './wishlist';
@@ -285,12 +286,12 @@ export function createAdvancedProperties(content, item, tooltip) {
         if (item_in_wishlist?.item.wishListCount > 0) {
             const wishlist_wanted_div: HTMLDivElement = document.createElement('div');
             wishlist_wanted_div.style.width = 'calc(50% - 0.5em)';
-            wishlist_wanted_div.innerText = getI18N(wishlist_headers[5].label) + ' : ' + item_in_wishlist.item.wishListCount;
+            wishlist_wanted_div.innerText = getI18N(wishlist_headers.find((header) => header.id === 'bank_needed').label) + ' : ' + item_in_wishlist.item.wishListCount;
             stock_div.appendChild(wishlist_wanted_div);
 
             const wishlist_depot_div: HTMLDivElement = document.createElement('div');
             wishlist_depot_div.style.width = 'calc(50% - 0.5em)';
-            wishlist_depot_div.innerText = getI18N(wishlist_headers[2].label) + ' : ' + getI18N(wishlist_depot.find((depot) => item_in_wishlist.depot === depot.value).label);
+            wishlist_depot_div.innerText = getI18N(wishlist_headers.find((header) => header.id === 'depot').label) + ' : ' + getI18N(wishlist_depot.find((depot) => item_in_wishlist.depot === depot.value).label);
             stock_div.appendChild(wishlist_depot_div);
         }
     }
@@ -306,14 +307,53 @@ export function createAdvancedProperties(content, item, tooltip) {
         content.appendChild(item_translations);
     }
 
-    if ((!item_deco || item.deco === 0) && !item.properties && !item.actions && item.recipes.length === 0 && !has_opener_relation) return;
+    if ((!item_deco || item.deco === 0) && !item.properties && !item.actions && item.recipes.length === 0 && !has_opener_relation && !item.catapultEffect) return;
 
     if (item_deco && item.deco > 0) {
         const text = item_deco.innerText.replace(/ \(.*\)*/, '');
         item_deco.innerHTML = `<span>${text} <em>( +${item.deco} )</em></span>`;
     }
 
-    if (!item.properties && !item.actions && item.recipes.length === 0 && !has_opener_relation) return;
+    if (!item.properties && !item.actions && item.recipes.length === 0 && !has_opener_relation && !item.catapultEffect) return;
+
+    const will_render_opener: boolean = state.mho_parameters.enhanced_tooltips_item_properties && has_opener_relation;
+    const will_render_recipes: boolean = state.mho_parameters.enhanced_tooltips_item_recipes && item.recipes.length > 0;
+
+    let catapult_effect_element: HTMLDivElement | null = null;
+    if (state.mho_parameters.enhanced_tooltips_item_properties && item.catapultEffect) {
+        catapult_effect_element = getCatapultEffectElement(item);
+    }
+
+    let leading_section: HTMLElement | null = null;
+
+    if (state.mho_parameters.enhanced_tooltips_item_properties && item.properties) {
+        const item_properties: HTMLDivElement = document.createElement('div');
+        content.appendChild(item_properties);
+        item.properties.forEach((property) => {
+            item_properties.appendChild(displayPropertiesOrActions(property, item));
+        });
+        leading_section = item_properties;
+    }
+
+    if (state.mho_parameters.enhanced_tooltips_item_actions && item.actions) {
+        const item_actions: HTMLDivElement = document.createElement('div');
+        content.appendChild(item_actions);
+        item.actions.forEach((action) => {
+            item_actions.appendChild(displayPropertiesOrActions(action, item));
+        });
+        leading_section = item_actions;
+    }
+
+    if (leading_section && (catapult_effect_element || will_render_opener || will_render_recipes)) {
+        leading_section.classList.add('mho-trailing-section-gap');
+    }
+
+    if (catapult_effect_element) {
+        content.appendChild(catapult_effect_element);
+        if (will_render_opener || will_render_recipes) {
+            content.appendChild(createSectionDivider());
+        }
+    }
 
     if (state.mho_parameters.enhanced_tooltips_item_properties && item.openedWith !== undefined && item.openedWith !== null) {
         const isTechnician: boolean = state.mh_user?.jobDetails?.uid === 'tech';
@@ -330,23 +370,11 @@ export function createAdvancedProperties(content, item, tooltip) {
         item_opens.appendChild(getOpenerRelationElement(item.opens));
     }
 
-    if (state.mho_parameters.enhanced_tooltips_item_properties && item.properties) {
-        const item_properties: HTMLDivElement = document.createElement('div');
-        content.appendChild(item_properties);
-        item.properties.forEach((property) => {
-            item_properties.appendChild(displayPropertiesOrActions(property, item));
-        });
+    if (will_render_opener && will_render_recipes) {
+        content.appendChild(createSectionDivider());
     }
 
-    if (state.mho_parameters.enhanced_tooltips_item_actions && item.actions) {
-        const item_actions: HTMLDivElement = document.createElement('div');
-        content.appendChild(item_actions);
-        item.actions.forEach((action) => {
-            item_actions.appendChild(displayPropertiesOrActions(action, item));
-        });
-    }
-
-    if (state.mho_parameters.enhanced_tooltips_item_recipes && item.recipes.length > 0) {
+    if (will_render_recipes) {
         const item_recipes: HTMLTableElement = document.createElement('table');
         item_recipes.classList.add('recipes');
         content.appendChild(item_recipes);
@@ -354,6 +382,13 @@ export function createAdvancedProperties(content, item, tooltip) {
             item_recipes.appendChild(getRecipeElement(recipe));
         });
     }
+}
+
+/** Séparateur visuel entre deux sections d'informations avancées, même style que celui entre lignes de recette */
+function createSectionDivider(): HTMLDivElement {
+    const divider: HTMLDivElement = document.createElement('div');
+    divider.classList.add('mho-section-divider');
+    return divider;
 }
 
 
@@ -593,10 +628,6 @@ export function displayPropertiesOrActions(property_or_action, hovered_item) {
         case 'wagging_flag':
             item_action.classList.add('mho-item-tag-no-img');
             item_action.innerText = 'Attire 2.5% des zombies du débordement';
-            break;
-        case 'fragile':
-            item_action.classList.add('mho-item-tag-no-img');
-            item_action.innerText = 'Se casse en cas d\'envoi par catapulte';
             break;
         case 'esc_fixed':
             item_action.classList.add('mho-item-tag-no-img');

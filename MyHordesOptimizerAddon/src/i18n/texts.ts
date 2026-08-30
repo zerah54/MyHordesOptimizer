@@ -1064,6 +1064,12 @@ export const api_texts = {
         de: 'Ihr Skript ist nicht aktuell (Ihre Version: $your_version$ / aktuellste Version: $recent_version$).<br /><br />Einige Funktionen funktionieren möglicherweise nicht.<br /><br />Aktualisieren Sie das Skript, damit dieser Fehler nicht mehr angezeigt wird.',
         es: 'Tu script no está actualizado (su versión: $your_version$ / versión más reciente: $recent_version$).<br /><br />Es posible que algunas funciones no funcionen.<br /><br />Actualice el script para que ya no vea este error.'
     },
+    error_version_unavailable: {
+        en: 'Unable to read the extension version: reload the page (the extension may have just been updated).',
+        fr: 'Impossible de lire la version de l\'extension : rechargez la page (l\'extension a peut-être été mise à jour).',
+        de: 'Die Erweiterungsversion konnte nicht gelesen werden: Laden Sie die Seite neu (die Erweiterung wurde möglicherweise gerade aktualisiert).',
+        es: 'No se puede leer la versión de la extensión: recargue la página (es posible que la extensión se acabe de actualizar).'
+    },
     update_script: {
         en: 'To update your script, you can use your extension\'s update functionality or <a target="_blank" href="$update_url$" style="text-decoration: underline;"><i >click on this link</i></a>, then refresh the game page.',
         fr: 'Pour mettre votre script à jour, vous pouvez utiliser la fonctionnalité de mise à jour de votre extension ou <a target="_blank" href="$update_url$" style="text-decoration: underline;"><i>cliquer sur ce lien</i></a>, puis rafraîchir la page du jeu.',
@@ -1277,5 +1283,32 @@ export const opener_relation_texts = {
         fr: 'Ouvre',
         de: 'Öffnet',
         es: 'Abre'
+    }
+};
+
+export const catapult_effect_texts = {
+    repel: {
+        en: 'Repels zombies for $minutes$ minutes',
+        fr: 'Repousse les zombies pendant $minutes$ minutes',
+        de: 'Vertreibt Zombies für $minutes$ Minuten',
+        es: 'Repele a los zombis durante $minutes$ minutos'
+    },
+    radius_target: {
+        en: 'on the targeted zone',
+        fr: 'sur la zone visée',
+        de: 'auf der Zielzone',
+        es: 'en la zona objetivo'
+    },
+    radius_cross: {
+        en: 'on the targeted zone and its neighbors',
+        fr: 'sur la zone visée et les cases adjacentes',
+        de: 'auf der Zielzone und den angrenzenden Feldern',
+        es: 'en la zona objetivo y las casillas adyacentes'
+    },
+    radius_square: {
+        en: 'in a 3×3 area',
+        fr: 'dans un rayon de 3×3 cases',
+        de: 'in einem Bereich von 3×3 Feldern',
+        es: 'en un área de 3×3 casillas'
     }
 };
