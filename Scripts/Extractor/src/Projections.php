@@ -55,6 +55,7 @@ final class Projections
 
             new Projection('Items/actions.json', 'myhordes.fixtures.actions', 'actions'),
             new Projection('Items/item-actions.json', 'myhordes.fixtures.actions', 'items'),
+            new Projection('Items/item-catapult.json', 'myhordes.fixtures.actions', 'items_cata'),
             new Projection('Items/items-nightwatch.json', 'myhordes.fixtures.actions', 'items_nw'),
             new Projection('Items/meta-results.json', 'myhordes.fixtures.actions', 'meta_results'),
             new Projection('Citizens/status.json', 'myhordes.fixtures.citizen.status'),
@@ -70,16 +71,7 @@ final class Projections
                 )
             ),
 
-            new Projection(
-                'Items/item-properties.json',
-                'myhordes.fixtures.items.properties',
-                null,
-                static fn(array $proprietes, array $brut): array => self::ajouterFragile(
-                    $proprietes,
-                    self::auxiliaire($brut, 'myhordes.fixtures.actions', 'items_cata'),
-                    self::auxiliaire($brut, 'myhordes.fixtures.actions', 'actions')
-                )
-            ),
+            new Projection('Items/item-properties.json', 'myhordes.fixtures.items.properties'),
 
             new Projection(
                 'CauseOfDeath/cause-of-death.json',
@@ -313,38 +305,6 @@ final class Projections
         }
 
         return $pouvoirs;
-    }
-
-    /**
-     * La propriété `fragile` — « se casse en cas d'envoi par catapulte » — n'est plus une liste
-     * écrite à la main : un objet est fragile dès lors que le résultat de son effet de catapulte
-     * ne contient pas `morph_cata_fine`, c'est-à-dire qu'il n'arrive pas intact.
-     *
-     * @param array<string, list<string>> $proprietes
-     * @param array<string, string> $itemsCata objet → nom de l'effet de catapulte
-     * @param array<string, array<string, mixed>> $actions
-     * @return array<string, list<string>>
-     */
-    private static function ajouterFragile(array $proprietes, array $itemsCata, array $actions): array
-    {
-        foreach ($itemsCata as $objet => $effet) {
-            // Surtout PAS de `?? []` ici : un effet inconnu donnerait un résultat vide, donc sans
-            // `morph_cata_fine`, donc l'objet serait marqué fragile. Une absence deviendrait une
-            // affirmation. On échoue bruyamment à la place.
-            if (!isset($actions[$effet]['result'])) {
-                throw new RuntimeException(
-                    "L'effet de catapulte « $effet » de l'objet « $objet » n'a aucun résultat défini."
-                );
-            }
-
-            if (in_array('morph_cata_fine', $actions[$effet]['result'], true)) {
-                continue;
-            }
-
-            $proprietes[$objet] = [...($proprietes[$objet] ?? []), 'fragile'];
-        }
-
-        return $proprietes;
     }
 
     /**

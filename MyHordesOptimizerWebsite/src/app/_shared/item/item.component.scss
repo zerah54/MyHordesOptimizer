@@ -96,5 +96,15 @@
             }
         }
 
+        .catapult-effect {
+            display: flex;
+            align-items: center;
+            gap: 0.5em;
+
+            .catapult-result.broken img {
+                border: 1px dashed red;
+            }
+        }
+
     }
 }

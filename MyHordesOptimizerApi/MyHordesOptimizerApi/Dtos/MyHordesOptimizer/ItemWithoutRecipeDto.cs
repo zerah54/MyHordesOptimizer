@@ -50,6 +50,9 @@ namespace MyHordesOptimizerApi.Dtos.MyHordes.MyHordesOptimizer
         /// </summary>
         public int? TechnicianOpenCpCost { get; set; }
 
+        /// <summary>Effet catapulte réel de l'objet. <c>null</c> si l'objet n'est pas catapultable.</summary>
+        public CatapultEffectDto CatapultEffect { get; set; }
+
         public int WishListCount { get; set; }
         public int BankCount { get; set; }
 

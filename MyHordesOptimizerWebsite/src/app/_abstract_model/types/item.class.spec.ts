@@ -9,6 +9,7 @@ function buildDto(overrides: Partial<ItemDTO>): ItemDTO {
         properties: [], actions: [], recipes: [],
         openedWith: null, opens: [],
         openApCost: null, openSuccessRate: null, technicianOpenCpCost: null,
+        catapultEffect: null,
         bankCount: 0, wishListCount: 0, dropRateNotPraf: 0, dropRatePraf: 0,
         ...overrides
     };

@@ -11,6 +11,7 @@ namespace MyHordesOptimizerApi.Services.Interfaces
     public interface IMyHordesFetcherService
     {
         IEnumerable<ItemDto> GetItems(int? townId);
+        IEnumerable<string> GetItemUidsWithCitizenStateImpact();
         Task<SimpleMeDto> GetSimpleMeAsync();
         IEnumerable<HeroSkillDto> GetHeroSkills();
         IEnumerable<CauseOfDeathDto> GetCausesOfDeath();

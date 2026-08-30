@@ -1,0 +1,247 @@
+<mat-card-header class="mho-state-manager-header">
+    <mat-card-title i18n>Gestionnaire d'état</mat-card-title>
+</mat-card-header>
+
+<mat-card-content class="mho-state-manager">
+    <div class="states-cards">
+        <h3 i18n>État de départ</h3>
+        <div class="states-cards-origine">
+            <div class="states-cards-origine-content">
+                <mho-list-element-add-remove
+                    (add)="addToBag(+$event)"
+                    (empty)="emptyBagContent()"
+                    (remove)="removeFromBag(+$event)"
+                    [currentList]="starting_bag"
+                    [lists]="bag_lists"
+                    addLabel="Ajouter au sac" i18n-addLabel
+                    emptyLabel="Vider le sac" i18n-emptyLabel
+                    i18n-label
+                    i18n-removeLabel
+                    label="Sac"
+                    removeLabel="Retirer du sac"/>
+            </div>
+            <div class="states-cards-origine-content">
+                <mho-compact-stepper
+                    (valueChange)="ap = $event; compute()"
+                    [icon]="ap_icon"
+                    [min]="0"
+                    [value]="ap"
+                    label="Points d'action disponibles" i18n-label/>
+                <mho-compact-stepper
+                    (valueChange)="sp = $event; compute()"
+                    [icon]="ep_icon"
+                    [min]="0"
+                    [value]="sp"
+                    label="Points d'exploration disponibles" i18n-label/>
+            </div>
+
+            <div class="toggle-categories">
+                <div class="status-toggle-group">
+                    <mho-compact-toggle icon="emotes/smile.gif" [label]="not_thirsty_label"
+                                        [value]="hydration_status === 'hydrated'"
+                                        (valueChange)="setHydration('hydrated', $event); compute()"/>
+                    @for (status of hydration_options; track status.key) {
+                        <mho-compact-toggle [icon]="status.img" [label]="status.label"
+                                            [value]="hydration_status === status.key"
+                                            (valueChange)="setHydration(status.key, $event); compute()"/>
+                    }
+                </div>
+
+                <div class="status-toggle-group">
+                    <mho-compact-toggle icon="emotes/wound.gif" label="Blessé (PA max réduit)" i18n-label
+                                        [value]="wounded" (valueChange)="wounded = $event; compute()"/>
+                    <mho-compact-toggle icon="roles/ghoul.gif" label="Est une goule" i18n-label
+                                        [value]="is_role_ghoul" (valueChange)="is_role_ghoul = $event; compute()"/>
+                    @for (status of party_options; track status.key) {
+                        <mho-compact-toggle [icon]="status.img" [label]="status.label"
+                                            [value]="party_statuses.includes(status.key)"
+                                            (valueChange)="toggleMultiStatus(party_statuses, status.key, $event); compute()"/>
+                    }
+                    @for (status of condition_options; track status.key) {
+                        <mho-compact-toggle [icon]="status.img" [label]="status.label"
+                                            [value]="condition_statuses.includes(status.key)"
+                                            (valueChange)="toggleMultiStatus(condition_statuses, status.key, $event); compute()"/>
+                    }
+                </div>
+
+                <div class="status-toggle-group">
+                    <mho-compact-toggle icon="emotes/proscout.gif" label="Éclaireur" i18n-label
+                                        [value]="is_eclaireur" (valueChange)="is_eclaireur = $event; compute()"/>
+                    <mho-compact-toggle [icon]="bike_icon" label="Vélo" i18n-label
+                                        [value]="has_bike" (valueChange)="has_bike = $event; compute()"/>
+                    <mho-compact-toggle [icon]="shoe_icon" label="Baskets" i18n-label
+                                        [value]="has_shoes" (valueChange)="has_shoes = $event; compute()"/>
+                </div>
+
+                <div class="status-toggle-group">
+                    <mho-compact-toggle [icon]="shield_icon" label="Bouclier équipé" i18n-label
+                                        [value]="has_shield" (valueChange)="has_shield = $event; compute()"/>
+                    <mho-compact-toggle [icon]="defence_cp_icon" label="Objet de défense de zone" i18n-label
+                                        [value]="has_defence_cp_item" (valueChange)="has_defence_cp_item = $event; compute()"/>
+                    <mho-compact-toggle [icon]="clean_perk_icon" label="Clean" i18n-label
+                                        [value]="has_clean_pdc_perk" (valueChange)="has_clean_pdc_perk = $event; compute()"/>
+                    <mho-compact-toggle [icon]="hydrated_perk_icon" label="Hydraté" i18n-label
+                                        [value]="has_hydrated_pdc_perk" (valueChange)="has_hydrated_pdc_perk = $event; compute()"/>
+                    <mho-compact-toggle [icon]="sober_perk_icon" label="Sobre" i18n-label
+                                        [value]="has_sober_pdc_perk" (valueChange)="has_sober_pdc_perk = $event; compute()"/>
+                    <mho-compact-toggle icon="professions/basic.gif" label="Habitant (pas héros)" i18n-label
+                                        [value]="!has_base_zone_control_perk" (valueChange)="has_base_zone_control_perk = !$event; compute()"/>
+                </div>
+
+                <div class="status-toggle-group">
+                    <mho-compact-toggle icon="roles/guide.gif" label="Guide" i18n-label
+                                        [value]="is_guide" (valueChange)="is_guide = $event; compute()"/>
+                    @if (is_guide) {
+                        <mho-compact-stepper
+                            (valueChange)="zone_citizen_count = $event; compute()"
+                            [min]="0"
+                            [value]="zone_citizen_count"
+                            icon="roles/guide.gif"
+                            label="Citoyens dans la zone" i18n-label/>
+                    }
+                </div>
+            </div>
+
+            @if (ranked_orders.length > 0) {
+                <hr class="section-separator"/>
+                <div class="ranked-orders-section">
+                    <h4 i18n>Ordres de consommation possibles (du meilleur au pire)</h4>
+                    <div class="ranked-orders">
+                        @for (candidate of ranked_orders; track $index) {
+                            <div class="ranked-order">
+                                @for (item of candidate.items; track $index) {
+                                    <img [src]="HORDES_IMG_REPO + item.img" [matTooltip]="item.label[locale] ?? item.label['en']" alt="">
+                                }
+                                <mat-icon class="ranked-order-arrow" matTooltip="État final résultant" i18n-matTooltip>arrow_forward</mat-icon>
+                                <span class="ranked-order-total-distance" matTooltip="PA totaux parcourus" i18n-matTooltip>{{ candidate.total_distance }}
+                                    <mho-icon-ap/></span>
+                                <span class="ranked-order-final">
+                                    @if (candidate.final_state.is_dead) {
+                                        <img [src]="HORDES_IMG_REPO + 'emotes/death.gif'" matTooltip="Mort" i18n-matTooltip alt="">
+                                    } @else {
+                                        @for (status of candidate.final_state.statuses; track status) {
+                                            <img [src]="HORDES_IMG_REPO + 'status/status_' + status + '.gif'" [matTooltip]="statusLabel(status)" alt="">
+                                        } @empty {
+                                            <span class="ranked-order-final-empty" i18n>Aucun statut</span>
+                                        }
+                                    }
+                                </span>
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+
+    <div class="states-cards">
+        <h3 i18n>Séquence</h3>
+        <div class="states-cards-sequence">
+            <div class="step-actions">
+                <button mat-stroked-button type="button" (click)="addMoveStep(true)" [disabled]="!canMove()">
+                    <mho-icon-ap/>
+                    <span i18n>Déplacement (Zone 3km)</span>
+                </button>
+                <button mat-stroked-button type="button" (click)="addMoveStep(false)" [disabled]="!canMove()">
+                    <mho-icon-ep/>
+                    <span i18n>Déplacement</span>
+                </button>
+                <button mat-stroked-button type="button" (click)="addEquipShoesStep()" [disabled]="!canEquipShoes()" i18n>Baskets</button>
+                <button mat-stroked-button type="button" (click)="addMountBikeStep()" [disabled]="!canMountBike()" i18n>Monter à vélo</button>
+                <button mat-stroked-button type="button" (click)="addDismountBikeStep()" [disabled]="!canDismountBike()" i18n>Descendre du vélo</button>
+                <button mat-stroked-button type="button" (click)="addPickupDefenceCpItemStep()" [disabled]="!canPickupDefenceCpItem()" i18n>Ramasser un objet de
+                    défense de zone
+                </button>
+                <button mat-stroked-button type="button" (click)="addBecomeGhoulStep()" [disabled]="!canBecomeGhoul()" i18n>Se transformer en goule</button>
+            </div>
+            <div class="bag-actions">
+                @for (item of orderedRemainingBag(); track $index) {
+                    <img [src]="HORDES_IMG_REPO + item.img" [matTooltip]="item.label[locale] ?? item.label['en']" alt="" (click)="useItem(item)">
+                } @empty {
+                    <p i18n>Sac vide.</p>
+                }
+            </div>
+            <ol class="step-list">
+                @for (entry of steps; track $index) {
+                    <li>
+                        {{ entry.label }}
+                        <button mat-icon-button type="button" (click)="removeStep($index)">
+                            <mat-icon>close</mat-icon>
+                        </button>
+                    </li>
+                }
+            </ol>
+
+            <hr class="section-separator"/>
+
+            <h3 i18n>État actuel</h3>
+            <div class="states-cards-current">
+                <h4>
+                    {{ currentState().ap }}
+                    <mho-icon-ap/>
+                    &nbsp;
+                    {{ currentState().sp }}
+                    <mho-icon-ep/>
+                    &nbsp;
+                    <span i18n>PDC :</span> {{ currentState().pdc }}
+                </h4>
+                <!-- ponytail: statuts affichés sous l'avatar, pas encore superposés dessus (pas de coordonnées d'ancrage par statut) -->
+                <div class="citizen-avatar">
+                    <img [src]="HORDES_IMG_REPO + 'professions/select/pipWelcome.gif'" alt="">
+                </div>
+                <div class="current-statuses">
+                    @for (status of currentState().statuses; track status) {
+                        <img [src]="HORDES_IMG_REPO + 'status/status_' + status + '.gif'" [matTooltip]="statusLabel(status)" alt="">
+                    }
+                    @if (currentState().is_dead) {
+                        <img [src]="HORDES_IMG_REPO + 'emotes/death.gif'" matTooltip="Mort" i18n-matTooltip alt="">
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="states-cards">
+        <h3 i18n>Historique</h3>
+        <div class="states-cards-historique">
+            @if (rows.length === 0) {
+                <p i18n>Ajoutez une étape à la séquence pour voir la trace.</p>
+            } @else {
+                <mat-list>
+                    <mat-divider/>
+                    @for (row of rows; track $index) {
+                        <mat-list-item>
+                            <div class="ligne-historique-action">
+                                @if (row.item) {
+                                    <img [src]="HORDES_IMG_REPO + row.item.img" alt="">
+                                } @else if (row.is_move && row.is_near_zone) {
+                                    <mho-icon-ap/>
+                                } @else if (row.is_move) {
+                                    <mho-icon-ep/>
+                                }
+                                <span style="flex:1">{{ row.label }}</span>
+                            </div>
+                        </mat-list-item>
+                        <mat-divider/>
+                        <mat-list-item>
+                            <div class="ligne-historique-etat" matListItemLine>
+                                <span class="delta">{{ row.ap_delta >= 0 ? '+' : '' }}{{ row.ap_delta }}
+                                    <mho-icon-ap/></span>
+                                <span class="delta">{{ row.sp_delta >= 0 ? '+' : '' }}{{ row.sp_delta }}
+                                    <mho-icon-ep/></span>
+                                <span class="delta" i18n>PDC : {{ row.pdc }}</span>
+                                @for (status of row.added_statuses; track status) {
+                                    <img [src]="HORDES_IMG_REPO + 'status/status_' + status + '.gif'" [matTooltip]="statusLabel(status)" alt="">
+                                }
+                                @if (row.state.is_dead) {
+                                    <img [src]="HORDES_IMG_REPO + 'emotes/death.gif'" matTooltip="Mort" i18n-matTooltip alt="">
+                                }
+                            </div>
+                        </mat-list-item>
+                        <mat-divider/>
+                    }
+                </mat-list>
+            }
+        </div>
+    </div>
+</mat-card-content>

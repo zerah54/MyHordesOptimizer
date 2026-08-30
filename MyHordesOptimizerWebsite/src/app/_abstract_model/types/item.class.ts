@@ -3,6 +3,7 @@ import { Action } from '../enum/action.enum';
 import { Property } from '../enum/property.enum';
 import { CommonModel, dtoToModelArray, modelToDtoArray } from './_common.class';
 import { I18nLabels } from './_types';
+import { CatapultEffect } from './catapult-effect.class';
 import { Category } from './category.class';
 import { ItemSummary } from './item-summary.class';
 import { Recipe } from './recipe.class';
@@ -32,6 +33,8 @@ export class Item extends CommonModel<ItemDTO> {
     public open_success_rate: number | null = null;
     /** Coût en PC de l'alternative réservée au métier Technicien à l'outil requis, si elle existe. */
     public technician_open_cp_cost: number | null = null;
+    /** Effet catapulte réel de l'objet. `null` si l'objet n'est pas catapultable. */
+    public catapult_effect: CatapultEffect | null = null;
     public bank_count!: number;
     public wishlist_count!: number;
     public drop_rate_not_praf!: number;
@@ -62,6 +65,7 @@ export class Item extends CommonModel<ItemDTO> {
             openApCost: this.open_ap_cost,
             openSuccessRate: this.open_success_rate,
             technicianOpenCpCost: this.technician_open_cp_cost,
+            catapultEffect: this.catapult_effect ? this.catapult_effect.modelToDto() : null,
             wishListCount: this.wishlist_count,
             id: this.id,
             uid: this.uid,
@@ -92,6 +96,7 @@ export class Item extends CommonModel<ItemDTO> {
             this.open_ap_cost = dto.openApCost ?? null;
             this.open_success_rate = dto.openSuccessRate ?? null;
             this.technician_open_cp_cost = dto.technicianOpenCpCost ?? null;
+            this.catapult_effect = dto.catapultEffect ? new CatapultEffect(dto.catapultEffect) : null;
             this.wishlist_count = dto.wishListCount;
             this.uid = dto.uid;
             this.id = dto.id;

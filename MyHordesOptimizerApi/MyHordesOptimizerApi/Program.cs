@@ -223,6 +223,9 @@ builder.Services.AddScoped<IMyHordesOptimizerParametersService, MyHordesOptimize
 builder.Services.AddScoped<IMyHordesOptimizerMapService, MyHordesOptimizerMapService>();
 builder.Services.AddScoped<IMyHordesOptimizerEstimationService, MyHordesOptimizerEstimationService>();
 builder.Services.AddScoped<ICampingService, CampingService>();
+builder.Services.AddScoped<ICitizenItemActionsProvider, CitizenItemActionsProvider>();
+builder.Services.AddScoped<ICitizenDayStateEngine, CitizenDayStateEngine>();
+builder.Services.AddScoped<ICitizenStateOrderRankingEngine, CitizenStateOrderRankingEngine>();
 builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
 builder.Services.AddScoped<IExpeditionService, ExpeditionService>();
 builder.Services.AddScoped<ITownService, TownService>();

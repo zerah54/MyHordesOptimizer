@@ -1,4 +1,5 @@
 import { I18nLabels } from '../types/_types';
+import { CatapultEffectDTO } from './catapult-effect.dto';
 import { CategoryDTO } from './category.dto';
 import { ItemSummaryDTO } from './item-summary.dto';
 import { RecipeDTO } from './recipe.dto';
@@ -28,6 +29,8 @@ export interface ItemDTO {
     openSuccessRate: number | null;
     /** Coût en PC de l'alternative réservée au métier Technicien à l'outil requis, si elle existe. */
     technicianOpenCpCost: number | null;
+    /** Effet catapulte réel de l'objet. `null` si l'objet n'est pas catapultable. */
+    catapultEffect: CatapultEffectDTO | null;
     bankCount: number;
     wishListCount: number;
     dropRateNotPraf: number;

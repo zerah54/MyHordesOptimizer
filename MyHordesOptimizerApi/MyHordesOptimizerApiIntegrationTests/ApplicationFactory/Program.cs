@@ -73,6 +73,14 @@ builder.Services.AddScoped<IExternalToolsService, ExternalToolsService>();
 // Requis par ExpeditionServiceDayLockTests (Services.Impl.ExpeditionService).
 builder.Services.AddScoped<IExpeditionService, ExpeditionService>();
 
+// Requis par CitizenStateControllerTests (Controllers.CitizenStateController).
+builder.Services.AddSingleton<IMyHordesCodeRepository, MyHordesCodeRepository>();
+builder.Services.AddScoped<ICitizenItemActionsProvider, CitizenItemActionsProvider>();
+builder.Services.AddScoped<ICitizenDayStateEngine, CitizenDayStateEngine>();
+builder.Services.AddScoped<ICitizenStateOrderRankingEngine, CitizenStateOrderRankingEngine>();
+builder.Services.AddSingleton<IMyHordesScrutateurConfiguration, MyHordesOptimizerApi.Configuration.Impl.MyHordesScrutateurConfiguration>();
+builder.Services.AddScoped<IMyHordesFetcherService, MyHordesFetcherService>();
+
 var app = builder.Build();
 app.UseHttpsRedirection();
 app.UseAuthorization();

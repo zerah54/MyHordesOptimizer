@@ -102,6 +102,7 @@ namespace MyHordesOptimizerApi.Services.Impl
                 sw.Restart();
                 var itemsDto = Mapper.Map<List<ItemDto>>(items);
                 ItemOpenerResolver.PopulateOpenerRelations(itemsDto, itemsDto, GetActionsByName());
+                ItemCatapultEffectResolver.PopulateCatapultEffects(itemsDto, itemsDto, GetItemsCatapultByUid(), GetActionsByName(), GetMetaResultsByName());
                 Logger.LogDebug("GetItem({@townId}) Mapper in {@ElapsedMilliseconds} ms", townId, sw.ElapsedMilliseconds);
                 sw.Stop();
                 return itemsDto;
@@ -133,6 +134,7 @@ namespace MyHordesOptimizerApi.Services.Impl
                 sw.Restart();
                 var itemsDto = Mapper.Map<List<ItemDto>>(items);
                 ItemOpenerResolver.PopulateOpenerRelations(itemsDto, itemsDto, GetActionsByName());
+                ItemCatapultEffectResolver.PopulateCatapultEffects(itemsDto, itemsDto, GetItemsCatapultByUid(), GetActionsByName(), GetMetaResultsByName());
                 Logger.LogDebug("GetItem() Mapper in {@ElapsedMilliseconds} ms", sw.ElapsedMilliseconds);
                 sw.Stop();
                 return itemsDto;
@@ -153,6 +155,30 @@ namespace MyHordesOptimizerApi.Services.Impl
         }
 
         /// <summary>
+        /// Atomes d'effet de chaque résultat d'action, tel qu'extrait de <c>meta-results.json</c> —
+        /// dont <see cref="MappingProfiles.Items.ItemStateImpactResolver"/> a besoin. Mis en cache
+        /// pour la même raison que <see cref="_actionsByNameCache"/>.
+        /// </summary>
+        private static Dictionary<string, MyHordesMetaResultCodeModel> _metaResultsByNameCache;
+
+        private Dictionary<string, MyHordesMetaResultCodeModel> GetMetaResultsByName()
+        {
+            return _metaResultsByNameCache ??= MyHordesCodeRepository.GetMetaResults();
+        }
+
+        /// <summary>
+        /// Nom de l'action catapulte de chaque objet, tel qu'extrait de <c>item-catapult.json</c> —
+        /// dont <see cref="MappingProfiles.Items.ItemCatapultEffectResolver"/> a besoin. Mis en
+        /// cache pour la même raison que <see cref="_actionsByNameCache"/>.
+        /// </summary>
+        private static Dictionary<string, string> _itemsCatapultByUidCache;
+
+        private Dictionary<string, string> GetItemsCatapultByUid()
+        {
+            return _itemsCatapultByUidCache ??= MyHordesCodeRepository.GetItemsCatapult();
+        }
+
+        /// <summary>
         /// Catalogue complet (sans recettes/banque/wishlist) utilisé comme référence par
         /// <see cref="MappingProfiles.Items.ItemOpenerResolver"/> quand le lot à enrichir n'est
         /// qu'un sous-ensemble des objets (ex. la banque d'une ville).
@@ -167,6 +193,17 @@ namespace MyHordesOptimizerApi.Services.Impl
                 .AsSplitQuery()
                 .ToList();
             return Mapper.Map<List<ItemWithoutRecipeDto>>(items);
+        }
+
+        /// <summary>
+        /// Uids des objets dont la consommation affecte les PA/PE ou les statuts d'un citoyen —
+        /// dérivé des actions, pas une liste codée en dur. Sert au simulateur PA/PE pour filtrer
+        /// son catalogue sans polluer <see cref="ItemDto"/> d'un champ propre à cet outil.
+        /// </summary>
+        public IEnumerable<string> GetItemUidsWithCitizenStateImpact()
+        {
+            return ItemStateImpactResolver.GetImpactfulItemUids(
+                GetItemCatalogForOpenerRelations(), GetActionsByName(), GetMetaResultsByName());
         }
 
         /// <summary>
@@ -1294,6 +1331,7 @@ namespace MyHordesOptimizerApi.Services.Impl
             // Catalogue COMPLET en référence, pas seulement le contenu de cette banque : sinon un
             // ouvre-boîte absent de la banque ferait passer une boîte pour « sans outil requis ».
             ItemOpenerResolver.PopulateOpenerRelations(dtos.Select(dto => dto.Item).ToList(), GetItemCatalogForOpenerRelations(), GetActionsByName());
+            ItemCatapultEffectResolver.PopulateCatapultEffects(dtos.Select(dto => dto.Item).ToList(), GetItemCatalogForOpenerRelations(), GetItemsCatapultByUid(), GetActionsByName(), GetMetaResultsByName());
             LastUpdateInfoDto lastUpdateDto = null;
             if (townModel.TownBankItems.Any())
             {

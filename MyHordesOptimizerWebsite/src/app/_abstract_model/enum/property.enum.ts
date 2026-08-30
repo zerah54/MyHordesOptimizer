@@ -21,9 +21,6 @@ const NW_SHOOTING_KEY: string = 'nw_shooting';
 const CAN_POISON_KEY: string = 'can_poison';
 const CAN_COOK_KEY: string = 'can_cook';
 
-/** Catapulte */
-const FRAGILE_KEY: string = 'fragile';
-
 /** Catégories */
 const FOOD_KEY: string = 'food';
 const DRUG_KEY: string = 'drug';
@@ -53,9 +50,6 @@ const NW_SHOOTING_DATA: PropertyData = {
     category: 'nightwatch',
     img: ''
 };
-
-/** Catapulte */
-const FRAGILE_DATA: PropertyData = { label: $localize`Se brise en cas d'envoi par catapulte`, category: 'catapult', img: '' };
 
 /** Modifications possibles */
 const CAN_POISON_DATA: PropertyData = { label: $localize`Peut être empoisonné`, category: 'modification', img: '' };
@@ -88,9 +82,6 @@ export class Property extends CommonEnum {
     public static NW_TREBUCHET: Property = new Property(NW_TREBUCHET_KEY, NW_TREBUCHET_DATA);
     public static NW_SHOOTING: Property = new Property(NW_SHOOTING_KEY, NW_SHOOTING_DATA);
 
-    /** Catapulte */
-    public static FRAGILE: Property = new Property(FRAGILE_KEY, FRAGILE_DATA);
-    
     /** Modifications possibles */
     public static CAN_POISON: Property = new Property(CAN_POISON_KEY, CAN_POISON_DATA);
     public static CAN_COOK: Property = new Property(CAN_COOK_KEY, CAN_COOK_DATA);

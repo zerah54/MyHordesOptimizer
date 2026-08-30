@@ -101,6 +101,45 @@
                         </div>
                     }
 
+                    @if (item().catapult_effect && (item().catapult_effect!.fate !== 'Intact' || item().catapult_effect!.kill_min !== null || item().catapult_effect!.repel_seconds !== null)) {
+                        <mat-divider></mat-divider>
+                        <div class="catapult-effect">
+                            <img [ngSrc]="HORDES_IMG_REPO + 'roles/cata.gif'" width="16" height="16">
+                            <img [ngSrc]="HORDES_IMG_REPO + 'emotes/arrowright.gif'" width="16" height="16">
+                            @if (item().catapult_effect!.fate === 'Broken') {
+                                <span class="catapult-result broken">
+                                    <img [ngSrc]="HORDES_IMG_REPO + (item() | itemImg:true)" width="16" height="16" [title]="item().label[locale]">
+                                </span>
+                            } @else if (item().catapult_effect!.fate === 'Transformed' && item().catapult_effect!.morph_target) {
+                                <span class="catapult-result">
+                                    <img [ngSrc]="HORDES_IMG_REPO + item().catapult_effect!.morph_target!.img" width="16" height="16"
+                                         [title]="item().catapult_effect!.morph_target!.label[locale]">
+                                </span>
+                            } @else if (item().catapult_effect!.fate === 'Intact') {
+                                <span class="catapult-result">
+                                    <img [ngSrc]="HORDES_IMG_REPO + item().img" width="16" height="16" [title]="item().label[locale]">
+                                </span>
+                            }
+                            @if (item().catapult_effect!.repel_seconds !== null) {
+                                <span>
+                                    <ng-container i18n>Repousse les zombies pendant</ng-container>
+                                    {{ item().catapult_effect!.repel_seconds! / 60 }}
+                                    <ng-container i18n>minutes</ng-container>
+                                </span>
+                            } @else if (item().catapult_effect!.kill_min !== null) {
+                                <img [ngSrc]="HORDES_IMG_REPO + 'icons/small_zombie.gif'" width="16" height="16">
+                                <span>{{ item().catapult_effect!.kill_min }}-{{ item().catapult_effect!.kill_max }}</span>
+                            }
+                            @if (item().catapult_effect!.radius === 'Cross') {
+                                <span i18n>sur la zone visée et les cases adjacentes</span>
+                            } @else if (item().catapult_effect!.radius === 'Square') {
+                                <span i18n>dans un rayon de 3×3 cases</span>
+                            } @else if (item().catapult_effect!.kill_min !== null || item().catapult_effect!.repel_seconds !== null) {
+                                <span i18n>sur la zone visée</span>
+                            }
+                        </div>
+                    }
+
                     @if (item().deco || item().guard || item().is_heaver) {
                         <mat-divider></mat-divider>
                         @if (item().deco) {

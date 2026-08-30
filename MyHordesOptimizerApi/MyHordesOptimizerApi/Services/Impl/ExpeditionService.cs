@@ -423,10 +423,10 @@ namespace MyHordesOptimizerApi.Services.Impl
 
         public async Task<ExpeditionCitizenDto> SaveExpeditionCitizenAsync(int expeditionPartId, ExpeditionCitizenRequestDto expeditionCitizen)
         {
-            if (!expeditionCitizen.Id.HasValue)
-            {
-                EnsurePartDayIsEditable(expeditionPartId);
-            }
+            // Vérifié pour la création ET le déplacement (expeditionPartId = partie CIBLE dans les deux cas) :
+            // sans ce garde-fou côté cible, un déplacement pourrait affecter un citoyen à une partie dont
+            // le jour est déjà verrouillé.
+            EnsurePartDayIsEditable(expeditionPartId);
             await Lock.WaitAsync();
             try
             {
@@ -454,10 +454,14 @@ namespace MyHordesOptimizerApi.Services.Impl
                     var orderFromDto = expeditionCitizenModel.ExpeditionOrders;
                     DbContext.Patch(orderFromDb, orderFromDto);
 
-                    var part = expeditionCitizenFromDb.IdExpeditionPartNavigation;
+                    // UpdateAllButKeysProperties nullifie la navigation IdExpeditionPartNavigation (copiée
+                    // depuis expeditionCitizenModel, qui n'en porte pas), ce qui efface aussi la FK. On la
+                    // restaure explicitement vers la PARTIE CIBLE (expeditionPartId) pour permettre un
+                    // déplacement de citoyen entre parties — restaurer l'ancienne partie annulerait le move.
+                    var targetPart = DbContext.ExpeditionParts.Single(part => part.IdExpeditionPart == expeditionPartId);
                     expeditionCitizenFromDb.UpdateAllButKeysProperties(expeditionCitizenModel);
-                    expeditionCitizenFromDb.IdExpeditionPartNavigation = part;
-                    expeditionCitizenFromDb.IdExpeditionPart = part.IdExpeditionPart;
+                    expeditionCitizenFromDb.IdExpeditionPartNavigation = targetPart;
+                    expeditionCitizenFromDb.IdExpeditionPart = targetPart.IdExpeditionPart;
                     DbContext.SaveChanges();
                     result = Mapper.Map<ExpeditionCitizenDto>(expeditionCitizenFromDb);
                 }

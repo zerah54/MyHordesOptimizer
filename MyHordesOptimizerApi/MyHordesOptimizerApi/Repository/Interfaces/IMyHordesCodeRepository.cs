@@ -1,4 +1,5 @@
 ﻿using MyHordesOptimizerApi.Data.CauseOfDeath;
+using MyHordesOptimizerApi.Data.Citizens;
 using MyHordesOptimizerApi.Data.Heroes;
 using MyHordesOptimizerApi.Data.Items;
 using MyHordesOptimizerApi.Data.Ruins;
@@ -17,6 +18,7 @@ namespace MyHordesOptimizerApi.Repository.Interfaces
         List<MyHordesCategoryCodeModel> GetCategories();
         Dictionary<string, List<string>> GetItemsProperties();
         Dictionary<string, List<string>> GetItemsActions();
+        Dictionary<string, string> GetItemsCatapult();
         Dictionary<string, MyHordesActionsCodeModel> GetActions();
         Dictionary<string, Dictionary<string, dynamic[]>> GetItemsDropRates();
         List<MyHordesHerosCapacitiesCodeModel> GetHeroCapacities();
@@ -31,5 +33,7 @@ namespace MyHordesOptimizerApi.Repository.Interfaces
         Dictionary<string, BuildingHardResourcesCodeModel> GetBuildingHardResources();
         Dictionary<string, Dictionary<string, string>> GetBuildingAvailability();
         Dictionary<string, JobCodeModel> GetJobs();
+        Dictionary<string, MyHordesCitizenStatusCodeModel> GetCitizenStatuses();
+        Dictionary<string, MyHordesMetaResultCodeModel> GetMetaResults();
     }
 }

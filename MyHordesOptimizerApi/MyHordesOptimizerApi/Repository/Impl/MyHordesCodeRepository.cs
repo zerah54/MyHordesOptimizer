@@ -1,4 +1,5 @@
 ﻿using MyHordesOptimizerApi.Data.CauseOfDeath;
+using MyHordesOptimizerApi.Data.Citizens;
 using MyHordesOptimizerApi.Data.Heroes;
 using MyHordesOptimizerApi.Data.Items;
 using MyHordesOptimizerApi.Data.Ruins;
@@ -52,11 +53,35 @@ namespace MyHordesOptimizerApi.Repository.Impl
             return dico;
         }
 
+        public Dictionary<string, string> GetItemsCatapult()
+        {
+            var path = "Data/Items/item-catapult.json";
+            var json = File.ReadAllText(path);
+            var dico = json.FromJson<Dictionary<string, string>>();
+            return dico;
+        }
+
         public Dictionary<string, MyHordesActionsCodeModel> GetActions()
         {
             var path = "Data/Items/actions.json";
             var json = File.ReadAllText(path);
             var dico = json.FromJson<Dictionary<string, MyHordesActionsCodeModel>>();
+            return dico;
+        }
+
+        public Dictionary<string, MyHordesCitizenStatusCodeModel> GetCitizenStatuses()
+        {
+            var path = "Data/Citizens/status.json";
+            var json = File.ReadAllText(path);
+            var dico = json.FromJson<Dictionary<string, MyHordesCitizenStatusCodeModel>>();
+            return dico;
+        }
+
+        public Dictionary<string, MyHordesMetaResultCodeModel> GetMetaResults()
+        {
+            var path = "Data/Items/meta-results.json";
+            var json = File.ReadAllText(path);
+            var dico = json.FromJson<Dictionary<string, MyHordesMetaResultCodeModel>>();
             return dico;
         }
 

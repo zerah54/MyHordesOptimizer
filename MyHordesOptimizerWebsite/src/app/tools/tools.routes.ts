@@ -3,6 +3,7 @@ import { Route } from '@angular/router';
 import { CampingComponent } from './camping/camping.component';
 import { OverflowComponent } from './overflow/overflow.component';
 import { ProbabilitiesComponent } from './probabilities/probabilities.component';
+import { StateManagerComponent } from './state-manager/state-manager.component';
 
 export default [
     { path: '', redirectTo: 'camping', pathMatch: 'full' },
@@ -16,5 +17,10 @@ export default [
         path: 'overflow',
         component: OverflowComponent,
         title: 'MyHordes Optimizer' + ' - ' + $localize`Outils` + ' - ' + $localize`Simulateur de débordement`
+    },
+    {
+        path: 'state-manager',
+        component: StateManagerComponent,
+        title: 'MyHordes Optimizer' + ' - ' + $localize`Outils` + ' - ' + $localize`Gestionnaire d'état`
     },
 ] satisfies Route[];

@@ -1,4 +1,5 @@
 using FluentAssertions;
+using MyHordesOptimizerApi.Data.Items;
 using MyHordesOptimizerApi.Repository.Impl;
 using Xunit;
 
@@ -19,6 +20,29 @@ namespace MyHordesOptimizerApiUnitTests.Repository
             var actions = repository.GetActions();
 
             actions.Should().NotBeEmpty();
+        }
+
+        [Fact]
+        public void GetCitizenStatuses_SurLeFichierReel_ContientThirst2()
+        {
+            var repository = new MyHordesCodeRepository();
+
+            var statuses = repository.GetCitizenStatuses();
+
+            statuses.Should().ContainKey("thirst2");
+            statuses["thirst2"].NwDef.Should().Be(-10);
+            statuses["thirst2"].NwDeath.Should().Be(0.03);
+        }
+
+        [Fact]
+        public void GetMetaResults_SurLeFichierReel_NeLeveAucuneExceptionEtContientEatAp6()
+        {
+            var repository = new MyHordesCodeRepository();
+
+            var results = repository.GetMetaResults();
+
+            results.Should().ContainKey("eat_ap6");
+            results["eat_ap6"].AtomList.Should().Contain(a => a.IsStatusEffect());
         }
     }
 }
