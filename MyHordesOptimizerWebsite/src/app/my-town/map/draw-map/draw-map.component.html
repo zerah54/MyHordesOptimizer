@@ -1,21 +1,21 @@
-@if (complete_map) {
+@if (complete_map(); as complete_map) {
     <table class="mho-draw-map">
         <thead>
         <ng-container *ngTemplateOutlet="firstLastRow; context: {$implicit: true}"></ng-container>
         </thead>
         <tbody>
-            @for (row of drawed_map; track row; let row_index = $index) {
+            @for (row of drawed_map(); track row; let row_index = $index) {
                 <tr>
-                    <mho-map-border vertical [myCell]="my_cell" [hoveredCell]="hovered_cell"
+                    <mho-map-border vertical [myCell]="my_cell()" [hoveredCell]="hovered_cell"
                                     [index]="+complete_map.town_y - row_index"></mho-map-border>
                     @for (cell of row; track cell.cell_id; let cell_index = $index) {
                         <mho-map-cell [cell]="cell"
-                                      (cellChange)="drawed_map[row_index][cell_index] = $event" [allItems]="allItems()" [allRuins]="allRuins()"
-                                      [allCitizens]="allCitizens()" [options]="options()" [drawedMap]="drawed_map"
+                                      (cellChange)="drawed_map()[row_index][cell_index] = $event" [allItems]="allItems()" [allRuins]="allRuins()"
+                                      [allCitizens]="allCitizens()" [options]="options()" [drawedMap]="drawed_map()"
                                       (currentHoveredCellChange)="hovered_cell = $event">
                         </mho-map-cell>
                     }
-                    <mho-map-border vertical [myCell]="my_cell" [hoveredCell]="hovered_cell"
+                    <mho-map-border vertical [myCell]="my_cell()" [hoveredCell]="hovered_cell"
                                     [index]="+complete_map.town_y - row_index"></mho-map-border>
                 </tr>
             }
@@ -26,12 +26,12 @@
 
         <ng-template #firstLastRow let-first>
             <tr [class.first]="first" [class.last]="!first">
-                <mho-map-border vertical horizontal [myCell]="my_cell" [hoveredCell]="hovered_cell"></mho-map-border>
-                @for (x of x_row; track x) {
-                    <mho-map-border horizontal [index]="x" [myCell]="my_cell"
+                <mho-map-border vertical horizontal [myCell]="my_cell()" [hoveredCell]="hovered_cell"></mho-map-border>
+                @for (x of x_row(); track x) {
+                    <mho-map-border horizontal [index]="x" [myCell]="my_cell()"
                                     [hoveredCell]="hovered_cell"></mho-map-border>
                 }
-                <mho-map-border vertical horizontal [myCell]="my_cell" [hoveredCell]="hovered_cell"></mho-map-border>
+                <mho-map-border vertical horizontal [myCell]="my_cell()" [hoveredCell]="hovered_cell"></mho-map-border>
             </tr>
         </ng-template>
     </table>

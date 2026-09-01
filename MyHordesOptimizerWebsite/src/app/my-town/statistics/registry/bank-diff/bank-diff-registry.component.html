@@ -1,6 +1,6 @@
 <div class="bank-diff">
     <mat-slide-toggle #diffToggle i18n>Afficher uniquement la différence</mat-slide-toggle>
-    @if (entries | bankCleanEntries:give_keywords:completeCitizenList():completeItemsList():diffToggle.checked; as cleanEntries) {
+    @if (entries() | bankCleanEntries:give_keywords:completeCitizenList():completeItemsList():diffToggle.checked; as cleanEntries) {
         <div>
             @let taken_entries = cleanEntries | bankDiff:'take';
             @let gifted_entries = cleanEntries | bankDiff:'gift';

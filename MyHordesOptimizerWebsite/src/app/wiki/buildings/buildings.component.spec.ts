@@ -1,5 +1,7 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { of } from 'rxjs';
+import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
+import { By } from '@angular/platform-browser';
+import moment from 'moment';
+import { of, Subject } from 'rxjs';
 
 import { ApiService } from '../../_abstract_model/services/api.service';
 import { Building } from '../../_abstract_model/types/building.class';
@@ -188,6 +190,88 @@ describe('BuildingsComponent', (): void => {
         component['roots'] = [visible, hidden];
         component['refresh']();
 
-        expect(component['datasource'].data).toEqual([visible]);
+        expect(component['rows']()).toEqual([visible]);
+    });
+});
+
+describe('BuildingsComponent - ngOnInit wiring', (): void => {
+    let fixture: ComponentFixture<BuildingsComponent>;
+    let component: BuildingsComponent;
+    let buildings_subject: Subject<Building[]>;
+
+    function makeBuilding(id: number, parent_id: number | null, label: string, display_order: number): Building {
+        const building: Building = new Building();
+        building.id = id;
+        building.uid = `b${id}`;
+        building.parent_id = parent_id;
+        building.label = { [moment.locale()]: label };
+        building.description = { [moment.locale()]: '' };
+        building.img = 'building.gif';
+        building.display_order = display_order;
+        return building;
+    }
+
+    beforeEach(async (): Promise<void> => {
+        buildings_subject = new Subject<Building[]>();
+        await TestBed.configureTestingModule({
+            imports: [BuildingsComponent],
+            providers: [{ provide: ApiService, useValue: { getBuildings: (): unknown => buildings_subject.asObservable() } }]
+        }).compileComponents();
+
+        fixture = TestBed.createComponent(BuildingsComponent);
+        component = fixture.componentInstance;
+        fixture.detectChanges();
+    });
+
+    it('builds the tree from the flat API response and populates rows depth-first', (): void => {
+        const root_a: Building = makeBuilding(1, null, 'Chantier A', 1);
+        const child_a1: Building = makeBuilding(2, 1, 'Évolution A1', 1);
+        const root_b: Building = makeBuilding(3, null, 'Chantier B', 2);
+        buildings_subject.next([root_b, child_a1, root_a]);
+        fixture.detectChanges();
+
+        expect(component['rows']().map((b: Building): number => b.id)).toEqual([1, 2, 3]);
+    });
+
+    it('toggle collapses a branch out of rows, and expands it back', (): void => {
+        const root_a: Building = makeBuilding(1, null, 'Chantier A', 1);
+        const child_a1: Building = makeBuilding(2, 1, 'Évolution A1', 1);
+        buildings_subject.next([root_a, child_a1]);
+        fixture.detectChanges();
+        expect(component['rows']().map((b: Building): number => b.id)).toEqual([1, 2]);
+
+        component['toggle'](root_a);
+        expect(component['rows']().map((b: Building): number => b.id)).toEqual([1]);
+
+        component['toggle'](root_a);
+        expect(component['rows']().map((b: Building): number => b.id)).toEqual([1, 2]);
+    });
+
+    it('debounces the label filter by 200ms before narrowing rows', fakeAsync((): void => {
+        const root_a: Building = makeBuilding(1, null, 'Chantier A', 1);
+        const root_b: Building = makeBuilding(2, null, 'Chantier B', 2);
+        buildings_subject.next([root_a, root_b]);
+        fixture.detectChanges();
+        expect(component['rows']().length).toBe(2);
+
+        component['filters'].label = 'chantier a';
+        component['filters_change'].next();
+        expect(component['rows']().length).toBe(2);
+
+        tick(199);
+        expect(component['rows']().length).toBe(2);
+
+        tick(1);
+        expect(component['rows']().map((b: Building): number => b.id)).toEqual([1]);
+    }));
+
+    it('re-renders the table rows once the API responds', (): void => {
+        const root_a: Building = makeBuilding(1, null, 'Chantier A', 1);
+        buildings_subject.next([root_a]);
+        fixture.detectChanges();
+
+        const rendered_rows = fixture.debugElement.queryAll(By.css('tr[mat-row]'));
+        expect(rendered_rows.length).toBe(1);
+        expect(fixture.debugElement.nativeElement.textContent).toContain('Chantier A');
     });
 });

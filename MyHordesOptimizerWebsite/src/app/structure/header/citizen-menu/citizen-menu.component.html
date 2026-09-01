@@ -1,4 +1,4 @@
-@if (citizen) {
+@if (citizen(); as citizen) {
     <div mat-menu-item class="pseudo" disabled>
         <div>
             <mho-avatar [src]="citizen.avatar"></mho-avatar>
@@ -52,7 +52,7 @@
               class="mho-menu-citizen-details bag">
         <div (click)="$event.stopPropagation()">
             <mho-list-element-add-remove [currentList]="citizen.bag?.items || []" label="Sac" i18n-label
-                                         [lists]="bag_lists"
+                                         [lists]="bag_lists()"
                                          addLabel="Ajouter au sac" i18n-addLabel
                                          (add)="addItem(+$event)"
                                          removeLabel="Retirer du sac" i18n-removeLabel

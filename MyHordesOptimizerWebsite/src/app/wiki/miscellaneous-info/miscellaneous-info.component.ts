@@ -1,5 +1,5 @@
 import { CommonModule, formatNumber } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatDialog } from '@angular/material/dialog';
@@ -26,7 +26,8 @@ const material_modules: Imports = [MatButtonModule, MatCardModule, MatIconModule
     selector: 'mho-miscellaneous-info',
     templateUrl: './miscellaneous-info.component.html',
     styleUrls: ['./miscellaneous-info.component.scss'],
-    imports: [...angular_common, ...components, ...material_modules, ...pipes]
+    imports: [...angular_common, ...components, ...material_modules, ...pipes],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class MiscellaneousInfoComponent {
     private readonly dialog: MatDialog = inject(MatDialog);

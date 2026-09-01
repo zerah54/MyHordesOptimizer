@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
 
@@ -14,7 +14,8 @@ const material_modules: Imports = [MatButtonModule, MatDialogModule];
     selector: 'mho-confirm-dialog',
     templateUrl: './confirm-dialog.component.html',
     styleUrls: ['./confirm-dialog.component.scss'],
-    imports: [...angular_common, ...components, ...material_modules, ...pipes]
+    imports: [...angular_common, ...components, ...material_modules, ...pipes],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ConfirmDialogComponent {
     protected data: ConfirmDialogData = inject<ConfirmDialogData>(MAT_DIALOG_DATA);

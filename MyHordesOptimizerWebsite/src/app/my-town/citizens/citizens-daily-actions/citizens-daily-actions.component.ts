@@ -1,5 +1,17 @@
 import { CommonModule } from '@angular/common';
-import { Component, DestroyRef, effect, inject, OnInit, Signal, viewChild } from '@angular/core';
+import {
+    ChangeDetectionStrategy,
+    ChangeDetectorRef,
+    Component,
+    DestroyRef,
+    effect,
+    inject,
+    OnInit,
+    Signal,
+    signal,
+    viewChild,
+    WritableSignal
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { MatCheckboxModule } from '@angular/material/checkbox';
@@ -32,6 +44,7 @@ const material_modules: Imports = [MatCheckboxModule, MatSortModule, MatTableMod
     selector: 'mho-citizens-daily-actions',
     templateUrl: './citizens-daily-actions.component.html',
     styleUrls: ['./citizens-daily-actions.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [...angular_common, ...components, ...directives, ...material_modules, ...pipes]
 })
 export class CitizensDailyActionsComponent implements OnInit {
@@ -39,7 +52,8 @@ export class CitizensDailyActionsComponent implements OnInit {
     private readonly sort: Signal<MatSort | undefined> = viewChild(MatSort);
     public readonly table: Signal<MatTable<Citizen> | undefined> = viewChild(MatTable);
 
-    protected citizen_info!: CitizenInfo;
+    /** Signal : réassigné depuis le subscribe de getCitizens() et lu par le template (gate du tableau). */
+    protected readonly citizen_info: WritableSignal<CitizenInfo | undefined> = signal(undefined);
     protected datasource: MatTableDataSource<Citizen> = new MatTableDataSource();
     public readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
     public readonly locale: string = moment.locale();
@@ -59,6 +73,7 @@ export class CitizensDailyActionsComponent implements OnInit {
 
     private readonly town_service: TownService = inject(TownService);
     private readonly destroy_ref: DestroyRef = inject(DestroyRef);
+    private readonly change_detector_ref: ChangeDetectorRef = inject(ChangeDetectorRef);
 
     public constructor() {
         // Le tableau (donc MatSort) n'existe qu'une fois citizen_info chargé (@if côté template) :
@@ -91,6 +106,15 @@ export class CitizensDailyActionsComponent implements OnInit {
                             day, actionKey,
                             lastUpdateInfo: { updateTime: new Date(), userId: '', userName: '', userKey: '' }
                         }));
+                        // Le citoyen muté reste la même référence dans datasource.data : CdkTable met
+                        // en cache ses wrappers de ligne par référence de donnée et les réutilise tels
+                        // quels (voir citizens-list.component.ts::refreshCitizenLists pour le détail
+                        // vérifié dans @angular/cdk/fesm2022/table.mjs) — réassigner `datasource.data`
+                        // avec les mêmes références ne déclenche donc rien. `markForCheck()` sur CE
+                        // composant ne marque pas non plus `CdkTable` (un descendant, jamais atteint).
+                        // Seul `detectChanges()` force la revérification de la cellule compact-toggle
+                        // pour un citoyen qui n'est pas "moi".
+                        this.change_detector_ref.detectChanges();
                     }
                 });
         } else {
@@ -101,6 +125,7 @@ export class CitizensDailyActionsComponent implements OnInit {
                     next: () => {
                         const index: number = citizen.daily_actions.findIndex((action: DailyAction) => action.day === day && action.action_key === actionKey);
                         if (index > -1) citizen.daily_actions.splice(index, 1);
+                        this.change_detector_ref.detectChanges();
                     }
                 });
         }
@@ -112,7 +137,7 @@ export class CitizensDailyActionsComponent implements OnInit {
             .pipe(takeUntilDestroyed(this.destroy_ref))
             .subscribe({
                 next: (citizen_info: CitizenInfo) => {
-                    this.citizen_info = citizen_info;
+                    this.citizen_info.set(citizen_info);
                     this.datasource.data = [...citizen_info.citizens];
                 }
             });

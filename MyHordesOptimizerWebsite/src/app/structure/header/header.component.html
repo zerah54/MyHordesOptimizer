@@ -3,31 +3,41 @@
         <mat-icon>menu</mat-icon>
     </button>
     <img [ngSrc]="'img/logo/logo_mho_64x64.png'" height="48" width="48" priority>
-    <div class="title">{{ is_gt_xs ? 'MyHordes Optimizer' : 'MHO' }}</div>
+    <div class="title">{{ is_gt_xs() ? 'MyHordes Optimizer' : 'MHO' }}</div>
     <span class="spacer"></span>
-    @if (saved_external_app_id && is_in_town) {
-        <mho-external-tools-update-button [isCompact]="!is_gt_xs"/>
+    @if (saved_external_app_id() && is_in_town()) {
+        <mho-external-tools-update-button [isCompact]="!is_gt_xs()"/>
     }
 
     @if (is_dev) {
         <button mat-button type="button" class="profil-button" [matMenuTriggerFor]="userMenu">
-            @if (saved_external_app_id === null || saved_external_app_id === undefined || saved_external_app_id === '') {
+            @if (saved_external_app_id() === null || saved_external_app_id() === undefined || saved_external_app_id() === '') {
                 <ng-container i18n>Se connecter</ng-container>
-            } @else if (me && me.username && me.username !== '') {
-                {{ me.username }}
+            } @else if (me()) {
+                @if (me()!.username && me()!.username !== '') {
+                    {{ me()!.username }}
+                } @else {
+                    <ng-container i18n>Utilisateur inconnu</ng-container>
+                }
             } @else {
                 <ng-container i18n>Utilisateur inconnu</ng-container>
             }
         </button>
     } @else {
-        @if (saved_external_app_id === null || saved_external_app_id === undefined || saved_external_app_id === '') {
+        @if (saved_external_app_id() === null || saved_external_app_id() === undefined || saved_external_app_id() === '') {
             <a mat-button type="button" class="profil-button" [href]="myhordes_url + 'jx/disclaimer/' + myhordes_app_id">
                 <ng-container i18n>Se connecter</ng-container>
             </a>
-        } @else if (me && me.username && me.username !== '') {
-            <button mat-button type="button" class="profil-button" [matMenuTriggerFor]="userMenu">
-                {{ me.username }}
-            </button>
+        } @else if (me()) {
+            @if (me()!.username && me()!.username !== '') {
+                <button mat-button type="button" class="profil-button" [matMenuTriggerFor]="userMenu">
+                    {{ me()!.username }}
+                </button>
+            } @else {
+                <button mat-button type="button" class="profil-button" [matMenuTriggerFor]="userMenu">
+                    <ng-container i18n>Utilisateur inconnu</ng-container>
+                </button>
+            }
         } @else {
             <button mat-button type="button" class="profil-button" [matMenuTriggerFor]="userMenu">
                 <ng-container i18n>Utilisateur inconnu</ng-container>
@@ -36,12 +46,13 @@
     }
 
     <mat-menu #userMenu="matMenu">
-        @if (!saved_external_app_id) {
+        @if (!saved_external_app_id()) {
             <div mat-menu-item (click)="$event.stopPropagation()">
                 <mat-form-field subscriptSizing="dynamic" class="external-app-id-input">
                     <mat-label i18n>Identifiant d'app externe</mat-label>
-                    <input matInput type="text" placeholder="Identifiant externe pour les app" i18n-placeholder [(ngModel)]="external_app_id_field_value">
-                    <button matSuffix mat-icon-button type="button" (click)="saveExternalAppId();" [disabled]="!external_app_id_field_value">
+                    <input matInput type="text" placeholder="Identifiant externe pour les app" i18n-placeholder
+                           [ngModel]="external_app_id_field_value()" (ngModelChange)="external_app_id_field_value.set($event)">
+                    <button matSuffix mat-icon-button type="button" (click)="saveExternalAppId();" [disabled]="!external_app_id_field_value()">
                         <mat-icon>check</mat-icon>
                     </button>
                 </mat-form-field>
@@ -52,11 +63,13 @@
                  Sans lui, ce premier item devient « Mon compte » (après tout le bloc citoyen), ce qui
                  décale tous les sous-menus de plusieurs centaines de pixels. -->
             <button mat-menu-item disabled style="display: none" tabindex="-1"></button>
-            @if (me && me.town_details.town_id) {
-                <mho-header-citizen-menu></mho-header-citizen-menu>
-            }
-            @if (me && me.id) {
-                <a mat-menu-item [routerLink]="['/profile', me.id]" i18n>Mon compte</a>
+            @if (me(); as me) {
+                @if (me.town_details.town_id) {
+                    <mho-header-citizen-menu></mho-header-citizen-menu>
+                }
+                @if (me.id) {
+                    <a mat-menu-item [routerLink]="['/profile', me.id]" i18n>Mon compte</a>
+                }
             }
             <div mat-menu-item (click)="disconnect()" i18n>Déconnexion</div>
         }

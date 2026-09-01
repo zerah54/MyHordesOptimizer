@@ -1,5 +1,5 @@
 import { CommonModule, NgOptimizedImage } from '@angular/common';
-import { Component, input, InputSignal, output, OutputEmitterRef } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input, InputSignal, output, OutputEmitterRef } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
@@ -24,6 +24,7 @@ const material_modules: Imports = [MatButtonModule, MatIconModule, MatListModule
     selector: 'mho-map-update-citizens',
     templateUrl: './map-update-citizens.component.html',
     styleUrls: ['./map-update-citizens.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class MapUpdateCitizensComponent {
@@ -39,8 +40,7 @@ export class MapUpdateCitizensComponent {
     protected readonly locale: string = moment.locale();
 
     protected addCitizen(citizen: Citizen): void {
-        const new_citizens: Citizen[] = this.citizens();
-        new_citizens.push(citizen);
+        const new_citizens: Citizen[] = [...this.citizens(), citizen];
         new_citizens.sort((citizen_a: Citizen, citizen_b: Citizen) => citizen_a.name.toLocaleLowerCase().localeCompare(citizen_b.name.toLocaleLowerCase()));
         this.citizensChange.emit(new_citizens);
     }

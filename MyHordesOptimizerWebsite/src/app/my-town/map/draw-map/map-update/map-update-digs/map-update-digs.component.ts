@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, input, InputSignal, output, OutputEmitterRef } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input, InputSignal, output, OutputEmitterRef } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -31,6 +31,7 @@ const material_modules: Imports = [MatButtonModule, MatFormFieldModule, MatIconM
     selector: 'mho-map-update-digs',
     templateUrl: './map-update-digs.component.html',
     styleUrls: ['./map-update-digs.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class MapUpdateDigsComponent {

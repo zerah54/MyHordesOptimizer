@@ -1,6 +1,6 @@
 <div class="telescope">
-    @let citizens_taken = entries | citizenTakeTelescope:completeCitizenList():'taken';
-    @let citizens_not_taken = entries | citizenTakeTelescope:completeCitizenList():'not-taken';
+    @let citizens_taken = entries() | citizenTakeTelescope:completeCitizenList():'taken';
+    @let citizens_not_taken = entries() | citizenTakeTelescope:completeCitizenList():'not-taken';
     <div class="taken">
         <h4>
             <ng-container i18n>Ont pris le télescope</ng-container>

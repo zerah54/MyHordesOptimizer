@@ -17,7 +17,8 @@
     </div>
 </mat-card-header>
 <mat-card-content class="mho-camping">
-    @if (configuration_form && bonus) {
+    @if (configuration_form(); as configuration_form) {
+        @if (bonus(); as bonus) {
         <form [formGroup]="configuration_form">
             <div class="camping-params">
                 <div>
@@ -120,7 +121,7 @@
 
                         <mat-form-field appearance="outline" class="short-bottom">
                             <mat-label i18n>Bâtiment</mat-label>
-                            <mho-select [formControlName]="'ruin'" [options]="(in_town_camping ? town_ruins : ruins) | filterRuinsByKm:townDistance.value"
+                            <mho-select [formControlName]="'ruin'" [options]="(in_town_camping ? town_ruins() : ruins()) | filterRuinsByKm:townDistance.value"
                                         [bindLabel]="'label.' + locale" [bindIcon]="'formatted_img'" [moreInfo]="getMoreRuinInfoFn" searchable>
                             </mho-select>
                             <mat-icon matSuffix [matTooltip]="help_ruins" style="vertical-align: middle"
@@ -194,21 +195,24 @@
             </ng-template>
 
             <ng-template #campingResult>
-                @if (camping_result && camping_result.label) {
-                    <h3>
-                        <ng-container i18n>Résultat</ng-container>&nbsp;:&nbsp;
-                    </h3>
-                    <div>
-                        <ng-container i18n>Chances de survie&nbsp;:&nbsp;</ng-container>
-                        {{ camping_result.bounded_probability | number:'1.0-2':locale }}%&nbsp;
-                        @if (camping_result.probability !== camping_result.bounded_probability || display_bonus_ap) {
-                            ({{ camping_result.probability | campingDisplayBonus:display_bonus_ap:locale }})&nbsp;
-                        }
-                    </div>
-                    <small>{{ camping_result.label[locale] }}</small>
+                @if (camping_result(); as camping_result) {
+                    @if (camping_result.label) {
+                        <h3>
+                            <ng-container i18n>Résultat</ng-container>&nbsp;:&nbsp;
+                        </h3>
+                        <div>
+                            <ng-container i18n>Chances de survie&nbsp;:&nbsp;</ng-container>
+                            {{ camping_result.bounded_probability | number:'1.0-2':locale }}%&nbsp;
+                            @if (camping_result.probability !== camping_result.bounded_probability || display_bonus_ap) {
+                                ({{ camping_result.probability | campingDisplayBonus:display_bonus_ap:locale }})&nbsp;
+                            }
+                        </div>
+                        <small>{{ camping_result.label[locale] }}</small>
+                    }
                 }
             </ng-template>
 
         </form>
+        }
     }
 </mat-card-content>

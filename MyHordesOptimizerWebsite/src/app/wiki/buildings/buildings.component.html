@@ -12,7 +12,7 @@
 
 <mat-card-content class="mho-buildings">
     <div class="mat-elevation-z8 table-scroll">
-        <table #table [dataSource]="datasource" mat-table>
+        <table #table [dataSource]="rows()" mat-table>
 
             <!-- Nom : icône du chantier + libellé, avec l'indentation qui porte la hiérarchie -->
             <ng-container matColumnDef="label" sticky>

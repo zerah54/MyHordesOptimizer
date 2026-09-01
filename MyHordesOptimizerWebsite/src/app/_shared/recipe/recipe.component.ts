@@ -1,5 +1,5 @@
 import { CommonModule, DecimalPipe, NgOptimizedImage } from '@angular/common';
-import { Component, input,InputSignal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input, InputSignal } from '@angular/core';
 import moment from 'moment';
 
 import { HORDES_IMG_REPO } from '../../_abstract_model/const';
@@ -15,7 +15,8 @@ const material_modules: Imports = [];
     selector: 'mho-recipe',
     templateUrl: './recipe.component.html',
     styleUrls: ['./recipe.component.scss'],
-    imports: [...angular_common, ...components, ...material_modules, ...pipes]
+    imports: [...angular_common, ...components, ...material_modules, ...pipes],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class RecipeComponent {
 

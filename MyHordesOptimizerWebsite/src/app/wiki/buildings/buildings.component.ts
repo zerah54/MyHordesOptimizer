@@ -1,12 +1,12 @@
 import { CommonModule } from '@angular/common';
-import { Component, DestroyRef, inject, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, OnInit, signal, WritableSignal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
-import { MatTableDataSource, MatTableModule } from '@angular/material/table';
+import { MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import moment from 'moment';
 import { Subject } from 'rxjs';
@@ -36,7 +36,8 @@ const material_modules: Imports = [MatButtonModule, MatButtonToggleModule, MatCa
     selector: 'mho-wiki-buildings',
     templateUrl: './buildings.component.html',
     styleUrls: ['./buildings.component.scss'],
-    imports: [...angular_common, ...components, ...directives, ...material_modules]
+    imports: [...angular_common, ...components, ...directives, ...material_modules],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class BuildingsComponent implements OnInit {
 
@@ -77,7 +78,8 @@ export class BuildingsComponent implements OnInit {
         return this.columns.map((column: StandardColumn): string => column.id);
     }
 
-    protected datasource: MatTableDataSource<Building> = new MatTableDataSource<Building>();
+    /** Lignes affichées (arbre aplati, replis et recherche appliqués). */
+    protected readonly rows: WritableSignal<Building[]> = signal([]);
     protected filters: { label: string } = { label: '' };
     protected filters_change: Subject<void> = new Subject<void>();
 
@@ -273,14 +275,14 @@ export class BuildingsComponent implements OnInit {
      */
     private refresh(): void {
         const needle: string = normalizeString(this.filters.label ?? '').trim();
-        const rows: Building[] = [];
+        const flattened: Building[] = [];
         const flatten = (list: Building[]): void => {
             list.forEach((building: Building): void => {
                 if (!this.matchesBranch(building, needle)) {
                     return;
                 }
                 if (this.availabilityStatus(building) !== 'Disabled') {
-                    rows.push(building);
+                    flattened.push(building);
                 }
                 // Une recherche en cours ignore les replis : masquer un résultat trouvé n'aurait
                 // aucun sens.
@@ -290,7 +292,7 @@ export class BuildingsComponent implements OnInit {
             });
         };
         flatten(this.roots);
-        this.datasource.data = rows;
+        this.rows.set(flattened);
     }
 
     /** Le chantier ou l'une de ses évolutions correspond-il à la recherche ? */

@@ -12,7 +12,7 @@ import {
     OnInit,
     Signal,
     signal,
-    ViewChild,
+    viewChild,
     WritableSignal
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -145,7 +145,7 @@ export class TownListComponent implements OnInit, AfterViewInit {
     private readonly dialog: MatDialog = inject(MatDialog);
     private readonly router: Router = inject(Router);
     private readonly destroy_ref: DestroyRef = inject(DestroyRef);
-    @ViewChild(MatSort) private matSort!: MatSort;
+    private readonly matSort: Signal<MatSort> = viewChild.required(MatSort);
     private readonly sortState: WritableSignal<{ active: string; direction: SortDirection }> =
         signal({ active: 'id', direction: 'desc' as SortDirection });
     private readonly nameFilter: WritableSignal<string> = signal('');
@@ -225,7 +225,7 @@ export class TownListComponent implements OnInit, AfterViewInit {
     }
 
     public ngAfterViewInit(): void {
-        this.matSort.sortChange
+        this.matSort().sortChange
             .pipe(takeUntilDestroyed(this.destroy_ref))
             .subscribe((change: Sort) => {
                 this.sortState.set({ active: change.active, direction: change.direction });

@@ -1,4 +1,4 @@
-import { Component, ElementRef, Input, input, InputSignal, Signal, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, ElementRef, input, InputSignal, Signal, viewChild } from '@angular/core';
 import { Scale, TooltipItem } from 'chart.js';
 import Chart from 'chart.js/auto';
 import moment from 'moment';
@@ -11,6 +11,7 @@ import { CitizenInfo } from '../../../../_abstract_model/types/citizen-info.clas
     selector: 'mho-registry-doors',
     templateUrl: './doors-registry.component.html',
     styleUrls: ['./doors-registry.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DoorsRegistryComponent {
 
@@ -18,28 +19,32 @@ export class DoorsRegistryComponent {
 
     public completeCitizenList: InputSignal<CitizenInfo> = input.required();
     public displayPseudo: InputSignal<DisplayPseudoMode> = input.required();
-
-    // TODO: Skipped for migration because:
-    //  Accessor inputs cannot be migrated as they are too complex.
-    @Input({ required: true }) public set registry(registry: Entry[] | undefined) {
-        if (registry) {
-            this.entries = registry.filter((entry: Entry) => {
-                return this.doors_entering_keywords.some((doors_entering: string): boolean => entry.entry?.indexOf(' ' + doors_entering) > -1)
-                    || this.doors_leaving_keywords.some((doors_leaving: string): boolean => entry.entry?.indexOf(' ' + doors_leaving) > -1);
-            });
-            setTimeout(() => {
-                this.createDoorsCanvas();
-            });
-        } else {
-            this.entries = [];
-        }
-    }
+    public registry: InputSignal<Entry[] | undefined> = input.required();
 
     private entries: Entry[] = [];
     public doors_chart!: Chart<'bar'>;
 
     private readonly doors_leaving_keywords: string[] = ['a quitté la ville', 'left', 'verlassen', 'ha salido del'];
     private readonly doors_entering_keywords: string[] = ['est de retour en ville', 'entered', 'betreten', 'está de vuelta en el'];
+
+    public constructor() {
+        // Reproduit l'ancien setter `@Input({required:true}) set registry` : ne réagit qu'à
+        // `registry`, garde le même setTimeout (même timing que l'original).
+        effect((): void => {
+            const registry: Entry[] | undefined = this.registry();
+            if (registry) {
+                this.entries = registry.filter((entry: Entry) => {
+                    return this.doors_entering_keywords.some((doors_entering: string): boolean => entry.entry?.indexOf(' ' + doors_entering) > -1)
+                        || this.doors_leaving_keywords.some((doors_leaving: string): boolean => entry.entry?.indexOf(' ' + doors_leaving) > -1);
+                });
+                setTimeout(() => {
+                    this.createDoorsCanvas();
+                });
+            } else {
+                this.entries = [];
+            }
+        });
+    }
 
     private createDoorsCanvas(): void {
         const polar_ctx: CanvasRenderingContext2D = this.doors_canvas().nativeElement.getContext('2d');

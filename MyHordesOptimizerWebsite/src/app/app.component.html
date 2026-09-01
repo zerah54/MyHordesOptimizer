@@ -30,12 +30,12 @@
     }
 
     <mat-sidenav-container #sidenavContainer class="mho-container">
-        <mat-sidenav #sidenav [mode]="is_gt_xs ? 'side' : 'over'" [opened]="is_gt_xs">
+        <mat-sidenav #sidenav [mode]="is_gt_xs() ? 'side' : 'over'" [opened]="is_gt_xs()">
             <mho-menu [sidenavContainer]="sidenavContainer"></mho-menu>
         </mat-sidenav>
         <mat-sidenav-content class="mho-content">
             <mat-card>
-                @if (ready) {
+                @if (ready()) {
                     <router-outlet></router-outlet>
                 }
             </mat-card>
@@ -44,7 +44,7 @@
 
     <mho-footer #footer></mho-footer>
 
-    @if (is_loading) {
+    @if (is_loading()) {
         <div class="mho-loading">
             @switch (theme) {
                 @case ('halloween') {

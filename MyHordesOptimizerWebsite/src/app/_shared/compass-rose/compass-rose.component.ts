@@ -1,7 +1,7 @@
-import { booleanAttribute, Component, input, InputSignal, InputSignalWithTransform, output,OutputEmitterRef } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, Component, input, InputSignal, InputSignalWithTransform, output, OutputEmitterRef } from '@angular/core';
 
 import { Dictionary, Imports } from '../../_abstract_model/types/_types';
-import { areAllDirectionsSelected,AreAllDirectionsSelectedPipe, IsDirectionSelectedPipe } from './is-scrut-direction-selected.pipe';
+import { areAllDirectionsSelected, AreAllDirectionsSelectedPipe, IsDirectionSelectedPipe } from './is-scrut-direction-selected.pipe';
 
 const angular_common: Imports = [];
 const components: Imports = [];
@@ -13,6 +13,7 @@ const material_modules: Imports = [];
     templateUrl: './compass-rose.component.html',
     styleUrls: ['./compass-rose.component.scss'],
     imports: [...angular_common, ...components, ...material_modules, ...pipes],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CompassRoseComponent {
 

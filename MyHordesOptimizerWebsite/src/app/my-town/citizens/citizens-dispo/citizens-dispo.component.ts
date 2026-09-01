@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, DestroyRef, effect, EventEmitter, inject, OnInit, Signal, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, effect, EventEmitter, inject, OnInit, Signal, signal, viewChild, WritableSignal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatTable, MatTableDataSource, MatTableModule } from '@angular/material/table';
@@ -33,6 +33,7 @@ const material_modules: Imports = [MatSortModule, MatTableModule];
     selector: 'mho-citizens-dispo',
     templateUrl: './citizens-dispo.component.html',
     styleUrls: ['./citizens-dispo.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [...angular_common, ...components, ...directives, ...material_modules, ...pipes]
 })
 export class CitizensDispoComponent implements OnInit {
@@ -40,8 +41,8 @@ export class CitizensDispoComponent implements OnInit {
     private readonly sort: Signal<MatSort | undefined> = viewChild(MatSort);
     public readonly table: Signal<MatTable<DispoByCitizen> | undefined> = viewChild(MatTable);
 
-    /** La liste des citoyens */
-    protected citizen_info!: CitizenInfo;
+    /** La liste des citoyens. Signal : réassigné depuis le subscribe de getCitizens() et lu par le template. */
+    protected readonly citizen_info: WritableSignal<CitizenInfo | undefined> = signal(undefined);
     /** La datasource pour le tableau */
     protected datasource: MatTableDataSource<DispoByCitizen> = new MatTableDataSource();
     /** Le dossier dans lequel sont stockées les images */
@@ -101,7 +102,7 @@ export class CitizensDispoComponent implements OnInit {
             .pipe(takeUntilDestroyed(this.destroy_ref))
             .subscribe((citizen_info: CitizenInfo) => {
                 citizen_info.citizens = citizen_info.citizens.filter((citizen: Citizen) => !citizen.is_dead);
-                this.citizen_info = citizen_info;
+                this.citizen_info.set(citizen_info);
             });
     }
 }

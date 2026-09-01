@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, OnDestroy, OnInit, signal,WritableSignal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, OnDestroy, OnInit, signal, WritableSignal } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { Title } from '@angular/platform-browser';
@@ -21,7 +21,8 @@ const material_modules: Imports = [MatIconModule, MatProgressSpinnerModule];
     selector: 'mho-town-observer',
     templateUrl: './town-observer.component.html',
     styleUrls: ['./town-observer.component.scss'],
-    imports: [...angular_common, ...material_modules]
+    imports: [...angular_common, ...material_modules],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TownObserverComponent implements OnInit, OnDestroy {
 

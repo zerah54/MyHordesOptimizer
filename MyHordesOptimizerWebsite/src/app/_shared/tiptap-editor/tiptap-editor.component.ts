@@ -4,9 +4,10 @@ import {
     ChangeDetectionStrategy,
     Component,
     ElementRef,
-    HostBinding,
     inject,
     Input,
+    input,
+    InputSignal,
     OnDestroy,
     SecurityContext,
     Signal,
@@ -38,6 +39,9 @@ import { TiptapToolbarComponent } from './tiptap-toolbar.component';
     providers: [
         { provide: MatFormFieldControl, useExisting: TiptapEditorComponent }
     ],
+    host: {
+        '[class.floating]': 'shouldLabelFloat'
+    },
     imports: [TiptapToolbarComponent],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
@@ -47,7 +51,15 @@ export class TiptapEditorComponent implements ControlValueAccessor, AfterViewIni
     public stateChanges: Subject<void> = new Subject<void>();
     public value: string = '';
     public id!: string;
-    @Input() public placeholder: string = '';
+    // Alias + getter imposés par le contrat `MatFormFieldControl`, qui attend une propriété
+    // `string` là où `input()` produit un `InputSignal` (TS2416).
+    // eslint-disable-next-line @angular-eslint/no-input-rename -- l'alias conserve le nom attendu par MatFormFieldControl
+    protected readonly _placeholder: InputSignal<string> = input<string>('', { alias: 'placeholder' });
+
+    public get placeholder(): string {
+        return this._placeholder();
+    }
+
     public focused: boolean = false;
     public empty: boolean = true;
     public controlType?: string;
@@ -72,13 +84,16 @@ export class TiptapEditorComponent implements ControlValueAccessor, AfterViewIni
         }
     }
 
-    @HostBinding('class.floating')
     public get shouldLabelFloat(): boolean {
         return true;
     }
 
     private _required: boolean = false;
 
+    // `required` et `disabled` restent des `@Input()` : leurs setters synchrones portent
+    // des effets de bord (`stateChanges.next()`, `editor().setEditable()`) qu'un `input()`
+    // ne rejouerait que via un `effect()` asynchrone (même contrat `MatFormFieldControl`
+    // que select.component.ts, cf. ruling task 2).
     @Input()
     public get required(): boolean {
         return this._required;

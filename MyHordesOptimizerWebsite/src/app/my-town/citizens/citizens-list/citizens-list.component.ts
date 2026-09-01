@@ -1,5 +1,19 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, DestroyRef, effect, EventEmitter, inject, OnInit, Signal, signal, viewChild, WritableSignal } from '@angular/core';
+import {
+    ChangeDetectionStrategy,
+    ChangeDetectorRef,
+    Component,
+    computed,
+    DestroyRef,
+    effect,
+    EventEmitter,
+    inject,
+    OnInit,
+    Signal,
+    signal,
+    viewChild,
+    WritableSignal
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { MatBadgeModule } from '@angular/material/badge';
@@ -83,14 +97,19 @@ const IMMUNE_SORT_FACTOR: number = 1_000_000;
     selector: 'mho-citizens-list',
     templateUrl: './citizens-list.component.html',
     styleUrls: ['./citizens-list.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [...angular_common, ...components, ...directives, ...material_modules, ...pipes]
 })
 export class CitizensListComponent implements OnInit {
 
-    /** La liste des citoyens en vie */
-    protected alive_citizen_info!: CitizenInfo;
-    /** La liste des citoyens morts */
-    protected dead_citizen_info!: CitizenInfo;
+    /**
+     * La liste des citoyens en vie / morts. Signaux : gate le `@if` racine du template et sont
+     * réassignés depuis le subscribe de getCitizens() — un champ simple ne marquerait pas la vue
+     * pour vérification sous OnPush (le tableau mat-table n'existe pas encore à ce moment-là pour
+     * se re-marquer lui-même via son propre ChangeDetectorRef).
+     */
+    protected readonly alive_citizen_info: WritableSignal<CitizenInfo | undefined> = signal(undefined);
+    protected readonly dead_citizen_info: WritableSignal<CitizenInfo | undefined> = signal(undefined);
     /** La datasource pour le tableau */
     protected citizen_list: MatTableDataSource<Citizen> = new MatTableDataSource();
     /** La datasource des citoyens morts */
@@ -210,6 +229,7 @@ export class CitizensListComponent implements OnInit {
     private readonly clipboard: ClipboardService = inject(ClipboardService);
     private readonly note_service: NoteService = inject(NoteService);
     private readonly router: Router = inject(Router);
+    private readonly change_detector_ref: ChangeDetectorRef = inject(ChangeDetectorRef);
     /** Pipe pur réutilisé pour le tri de la colonne bain. */
     private readonly daily_action_pipe: DailyActionForDayPipe = new DailyActionForDayPipe();
 
@@ -466,6 +486,31 @@ export class CitizensListComponent implements OnInit {
     }
 
     /**
+     * Force la revérification des cellules après la mutation d'un champ imbriqué d'un `Citizen`
+     * déjà présent dans `citizen_list.data`.
+     *
+     * `citizen_list.data = [...citizen_list.data]` (même sans trackBy) NE SUFFIT PAS ici : CdkTable
+     * met en cache ses wrappers `RenderRow` par référence de donnée (`_cachedRenderRowsMap`, clé =
+     * l'objet `Citizen`) et les réutilise tels quels tant que cette référence ne change pas — hérité
+     * de `getCitizens()` où la même écriture "marche" uniquement parce que c'est un passage de tableau
+     * VIDE à PEUPLÉ (toutes les lignes sont des insertions, qui appellent bien `markForCheck()` en
+     * interne) ; ici les citoyens sont mutés EN PLACE, la référence ne change jamais, `renderRows()`
+     * ne détecte donc aucun changement structurel et retourne tôt SANS jamais appeler
+     * `ChangeDetectorRef.markForCheck()` (vérifié en lisant `@angular/cdk/fesm2022/table.mjs`).
+     * `ChangeDetectorRef.markForCheck()` sur CE composant ne suffit pas non plus : il ne marque que
+     * CitizensListComponent et ses ANCÊTRES (jamais ses descendants), donc jamais `CdkTable` — un
+     * composant `OnPush` descendant qui n'est pas lui-même marqué dirty n'est jamais visité, quel
+     * que soit l'état de son parent (vérifié dans `debug_node-*.mjs` : `detectChangesInView` ne
+     * descend dans les enfants d'une vue que si CETTE vue a son propre flag Dirty/CheckAlways/
+     * HasChildViewsToRefresh). Seul `ChangeDetectorRef.detectChanges()` force une revérification
+     * synchrone et inconditionnelle de tout le sous-arbre (CdkTable + mho-deferred-cell), en
+     * ignorant leur propre stratégie OnPush — le mécanisme correct pour ce cas précis.
+     */
+    private refreshCitizenLists(): void {
+        this.change_detector_ref.detectChanges();
+    }
+
+    /**
      * Si l'item est déjà dans la liste, on fait +1
      * Sinon on rajoute l'item à la liste
      *
@@ -475,7 +520,7 @@ export class CitizensListComponent implements OnInit {
     protected addItem(citizen_id: number, item_id: number): void {
         const citizen: Citizen | undefined = this.citizen_list.data.find((citizen: Citizen) => citizen.id === citizen_id);
         if (citizen && citizen.bag) {
-            citizen.bag.items.push(<Item>this.all_items.find((item: Item) => item.id === item_id));
+            citizen.bag.items = [...citizen.bag.items, <Item>this.all_items.find((item: Item) => item.id === item_id)];
 
             this.town_service
                 .updateBag(citizen)
@@ -487,6 +532,7 @@ export class CitizensListComponent implements OnInit {
                             citizen.bag.update_info.update_time = update_info.update_time;
                         }
                         if (citizen.id === this.me?.id) this.town_service.publishMyCitizen(citizen);
+                        this.refreshCitizenLists();
                     }
                 });
         }
@@ -504,7 +550,7 @@ export class CitizensListComponent implements OnInit {
         if (citizen && citizen.bag) {
             const item_in_datasource_index: number | undefined = citizen.bag.items.findIndex((item_in_bag: Item) => item_in_bag.id === item_id);
             if (item_in_datasource_index !== undefined && item_in_datasource_index !== null && item_in_datasource_index > -1) {
-                citizen.bag.items.splice(item_in_datasource_index, 1);
+                citizen.bag.items = citizen.bag.items.filter((_: Item, index: number): boolean => index !== item_in_datasource_index);
             }
             this.town_service
                 .updateBag(citizen)
@@ -516,6 +562,7 @@ export class CitizensListComponent implements OnInit {
                             citizen.bag.update_info.update_time = update_info.update_time;
                         }
                         if (citizen.id === this.me?.id) this.town_service.publishMyCitizen(citizen);
+                        this.refreshCitizenLists();
                     }
                 });
         }
@@ -540,6 +587,7 @@ export class CitizensListComponent implements OnInit {
                             citizen.bag.update_info.update_time = update_info.update_time;
                         }
                         if (citizen.id === this.me?.id) this.town_service.publishMyCitizen(citizen);
+                        this.refreshCitizenLists();
                     }
                 });
         }
@@ -552,7 +600,7 @@ export class CitizensListComponent implements OnInit {
     protected addChestItem(citizen_id: number, item_id: number): void {
         const citizen: Citizen | undefined = this.citizen_list.data.find((citizen: Citizen) => citizen.id === citizen_id);
         if (citizen && citizen.chest) {
-            citizen.chest.items.push(<Item>this.all_items.find((item: Item) => item.id === item_id));
+            citizen.chest.items = [...citizen.chest.items, <Item>this.all_items.find((item: Item) => item.id === item_id)];
 
             this.town_service
                 .updateChest(citizen)
@@ -566,6 +614,7 @@ export class CitizensListComponent implements OnInit {
                             citizen.chest.update_info.update_time = update_info.update_time;
                         }
                         if (citizen.id === this.me?.id) this.town_service.publishMyCitizen(citizen);
+                        this.refreshCitizenLists();
                     }
                 });
         }
@@ -580,7 +629,7 @@ export class CitizensListComponent implements OnInit {
         if (citizen && citizen.chest) {
             const item_in_datasource_index: number | undefined = citizen.chest.items.findIndex((item_in_chest: Item) => item_in_chest.id === item_id);
             if (item_in_datasource_index !== undefined && item_in_datasource_index !== null && item_in_datasource_index > -1) {
-                citizen.chest.items.splice(item_in_datasource_index, 1);
+                citizen.chest.items = citizen.chest.items.filter((_: Item, index: number): boolean => index !== item_in_datasource_index);
             }
             this.town_service
                 .updateChest(citizen)
@@ -594,6 +643,7 @@ export class CitizensListComponent implements OnInit {
                             citizen.chest.update_info.update_time = update_info.update_time;
                         }
                         if (citizen.id === this.me?.id) this.town_service.publishMyCitizen(citizen);
+                        this.refreshCitizenLists();
                     }
                 });
         }
@@ -616,6 +666,7 @@ export class CitizensListComponent implements OnInit {
                             citizen.chest.update_info.update_time = update_info.update_time;
                         }
                         if (citizen.id === this.me?.id) this.town_service.publishMyCitizen(citizen);
+                        this.refreshCitizenLists();
                     }
                 });
         }
@@ -630,7 +681,7 @@ export class CitizensListComponent implements OnInit {
     protected addStatus(citizen_id: number, status_key: string): void {
         const citizen: Citizen | undefined = this.citizen_list.data.find((citizen: Citizen) => citizen.id === citizen_id);
         if (citizen && citizen.status) {
-            citizen.status.icons.push(<StatusEnum>this.all_status.find((status: StatusEnum) => status?.key === status_key));
+            citizen.status.icons = [...citizen.status.icons, <StatusEnum>this.all_status.find((status: StatusEnum) => status?.key === status_key)];
 
             this.town_service
                 .updateStatus(citizen)
@@ -642,6 +693,7 @@ export class CitizensListComponent implements OnInit {
                             citizen.status.update_info.update_time = update_info.update_time;
                         }
                         if (citizen.id === this.me?.id) this.town_service.publishMyCitizen(citizen);
+                        this.refreshCitizenLists();
                     }
                 });
         }
@@ -658,7 +710,7 @@ export class CitizensListComponent implements OnInit {
         if (citizen && citizen.status) {
             const existing_status_index: number | undefined = citizen.status.icons.findIndex((status: StatusEnum) => status?.key === status_key);
             if (existing_status_index !== undefined && existing_status_index !== null && existing_status_index > -1) {
-                citizen.status.icons.splice(existing_status_index, 1);
+                citizen.status.icons = citizen.status.icons.filter((_: StatusEnum, index: number): boolean => index !== existing_status_index);
             }
             this.town_service
                 .updateStatus(citizen)
@@ -670,6 +722,7 @@ export class CitizensListComponent implements OnInit {
                             citizen.status.update_info.update_time = update_info.update_time;
                         }
                         if (citizen.id === this.me?.id) this.town_service.publishMyCitizen(citizen);
+                        this.refreshCitizenLists();
                     }
                 });
         }
@@ -694,6 +747,7 @@ export class CitizensListComponent implements OnInit {
                             citizen.status.update_info.update_time = update_info.update_time;
                         }
                         if (citizen.id === this.me?.id) this.town_service.publishMyCitizen(citizen);
+                        this.refreshCitizenLists();
                     }
                 });
         }
@@ -723,10 +777,12 @@ export class CitizensListComponent implements OnInit {
                             citizen.home.update_info.update_time = update_info.update_time;
                         }
                         if (citizen.id === this.me?.id) this.town_service.publishMyCitizen(citizen);
+                        this.refreshCitizenLists();
                     },
                     error: () => {
                         element.value = old_element_value;
                         this.buildValueOptions();
+                        this.refreshCitizenLists();
                     }
                 });
         }
@@ -756,10 +812,12 @@ export class CitizensListComponent implements OnInit {
                             citizen.heroic_actions.update_info.update_time = update_info.update_time;
                         }
                         if (citizen.id === this.me?.id) this.town_service.publishMyCitizen(citizen);
+                        this.refreshCitizenLists();
                     },
                     error: () => {
                         element.value = old_element_value;
                         this.buildValueOptions();
+                        this.refreshCitizenLists();
                     }
                 });
         }
@@ -789,6 +847,7 @@ export class CitizensListComponent implements OnInit {
                             lastUpdateInfo: { updateTime: new Date(), userId: '', userName: '', userKey: '' }
                         }));
                         if (citizen.id === this.me?.id) this.town_service.publishMyCitizen(citizen);
+                        this.refreshCitizenLists();
                     }
                 });
         } else {
@@ -800,6 +859,7 @@ export class CitizensListComponent implements OnInit {
                         const index: number = citizen.daily_actions.findIndex((action: DailyAction) => action.day === this.current_day && action.action_key === actionKey);
                         if (index > -1) citizen.daily_actions.splice(index, 1);
                         if (citizen.id === this.me?.id) this.town_service.publishMyCitizen(citizen);
+                        this.refreshCitizenLists();
                     }
                 });
         }
@@ -828,6 +888,7 @@ export class CitizensListComponent implements OnInit {
                         citizen.chamanic_detail.update_info.update_time = update_info.update_time;
                     }
                     if (citizen.id === this.me?.id) this.town_service.publishMyCitizen(citizen);
+                    this.refreshCitizenLists();
                 }
             });
     }
@@ -990,7 +1051,7 @@ export class CitizensListComponent implements OnInit {
                 next: (citizen_info: CitizenInfo) => {
                     const alive_citizen_info: CitizenInfo = Object.assign({}, citizen_info);
                     alive_citizen_info.citizens = alive_citizen_info.citizens.filter((citizen: Citizen) => !citizen.is_dead);
-                    this.alive_citizen_info = alive_citizen_info;
+                    this.alive_citizen_info.set(alive_citizen_info);
                     this.citizen_list.data = [...alive_citizen_info.citizens];
                     this.buildValueOptions();
 
@@ -1001,7 +1062,7 @@ export class CitizensListComponent implements OnInit {
                     // Les morts sont affichés directement depuis les objets Citizen : l'API ne renvoie pas
                     // d'objet `cadaver` distinct (le filtre `&& citizen.cadaver` masquait donc tous les morts).
                     dead_citizen_info.citizens = dead_citizen_info.citizens.filter((citizen: Citizen) => citizen.is_dead);
-                    this.dead_citizen_info = dead_citizen_info;
+                    this.dead_citizen_info.set(dead_citizen_info);
                     this.dead_citizen_list.data = [...dead_citizen_info.citizens];
                 }
             });

@@ -1,6 +1,6 @@
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { CommonModule } from '@angular/common';
-import { Component, DestroyRef, HostListener, inject,OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, OnInit, signal, WritableSignal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -40,18 +40,23 @@ const material_modules: Imports = [MatButtonModule, MatCardModule, MatCheckboxMo
     selector: 'mho-map',
     templateUrl: './map.component.html',
     styleUrls: ['./map.component.scss'],
+    host: {
+        '(window:resize)': 'onResize()'
+    },
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [...angular_common, ...components, ...directives, ...material_modules, ...pipes]
 })
 export class MapComponent implements OnInit {
     private readonly breakpoint_observer: BreakpointObserver = inject(BreakpointObserver);
 
+    // Signaux (pas de simples champs) : réassignés depuis les subscribe() asynchrones de ngOnInit et
+    // lus par le propre template (passés à mho-draw-map) — un champ simple ne marquerait pas la vue.
     /** La carte de la ville */
-    protected map!: Town;
-    protected all_ruins!: Ruin[];
-    protected all_items!: Item[];
-    protected all_citizens!: Citizen[];
+    protected readonly map: WritableSignal<Town | undefined> = signal(undefined);
+    protected readonly all_ruins: WritableSignal<Ruin[] | undefined> = signal(undefined);
+    protected readonly all_items: WritableSignal<Item[] | undefined> = signal(undefined);
+    protected readonly all_citizens: WritableSignal<Citizen[] | undefined> = signal(undefined);
 
-    protected options!: MapOptions;
     protected readonly is_dev: boolean = !environment.production;
 
     protected new_distance_option: Distance = {
@@ -59,7 +64,8 @@ export class MapComponent implements OnInit {
         unit: 'km'
     };
 
-    protected is_gt_xs: boolean = this.breakpoint_observer.isMatched(BREAKPOINTS['gt-xs']);
+    /** Signal : réassigné depuis onResize() (HostListener migré), lu par le propre template. */
+    protected readonly is_gt_xs: WritableSignal<boolean> = signal(this.breakpoint_observer.isMatched(BREAKPOINTS['gt-xs']));
 
     private readonly default_options: MapOptions = {
         map_type: 'digs',
@@ -69,13 +75,17 @@ export class MapComponent implements OnInit {
         distances: []
     };
 
+    /** Toujours défini (contrairement à map/all_ruins/all_items/all_citizens) : initialisé de façon
+     * synchrone dans ngOnInit, avant le premier rendu — pas besoin d'un type `| undefined`. */
+    protected readonly options: WritableSignal<MapOptions> = signal(this.default_options);
+
     private readonly api_service: ApiService = inject(ApiService);
     private readonly town_service: TownService = inject(TownService);
     private readonly destroy_ref: DestroyRef = inject(DestroyRef);
 
-    @HostListener('window:resize', ['$event'])
-    public onResize(): void {
-        this.is_gt_xs = this.breakpoint_observer.isMatched(BREAKPOINTS['gt-xs']);
+    /** Migré depuis `@HostListener('window:resize')` vers `host: {}` (voir décorateur ci-dessus). */
+    protected onResize(): void {
+        this.is_gt_xs.set(this.breakpoint_observer.isMatched(BREAKPOINTS['gt-xs']));
     }
 
     public ngOnInit(): void {
@@ -84,7 +94,7 @@ export class MapComponent implements OnInit {
             .pipe(takeUntilDestroyed(this.destroy_ref))
             .subscribe({
                 next: (map: Town) => {
-                    this.map = map;
+                    this.map.set(map);
                 }
             });
         this.api_service
@@ -92,7 +102,7 @@ export class MapComponent implements OnInit {
             .pipe(takeUntilDestroyed(this.destroy_ref))
             .subscribe({
                 next: (ruins: Ruin[]) => {
-                    this.all_ruins = ruins;
+                    this.all_ruins.set(ruins);
                 }
             });
         this.api_service
@@ -100,7 +110,7 @@ export class MapComponent implements OnInit {
             .pipe(takeUntilDestroyed(this.destroy_ref))
             .subscribe({
                 next: (items: Item[]) => {
-                    this.all_items = items;
+                    this.all_items.set(items);
                 }
             });
         this.town_service
@@ -108,11 +118,11 @@ export class MapComponent implements OnInit {
             .pipe(takeUntilDestroyed(this.destroy_ref))
             .subscribe({
                 next: (citizens: CitizenInfo): void => {
-                    this.all_citizens = citizens.citizens;
+                    this.all_citizens.set(citizens.citizens);
                 }
             });
 
-        this.options = JSON.parse(localStorage.getItem('MAP_OPTIONS') || JSON.stringify(this.default_options));
+        this.options.set(JSON.parse(localStorage.getItem('MAP_OPTIONS') || JSON.stringify(this.default_options)));
         this.checkIfAllOptionsExist();
     }
 
@@ -124,7 +134,7 @@ export class MapComponent implements OnInit {
             this.new_distance_option.round_trip = undefined;
         }
 
-        const current_distances: Distance[] = [...this.options.distances];
+        const current_distances: Distance[] = [...this.options().distances];
 
         const already_exists: boolean = [...current_distances].some((distance: Distance) => {
             return distance.unit === this.new_distance_option.unit
@@ -144,7 +154,7 @@ export class MapComponent implements OnInit {
 
     protected removeDistanceFromList(distance_to_remove: Distance): void {
 
-        const current_distances: Distance[] = [...this.options.distances];
+        const current_distances: Distance[] = [...this.options().distances];
 
         const index: number = current_distances.findIndex((distance: Distance) => {
             return distance.unit === distance_to_remove.unit
@@ -162,15 +172,15 @@ export class MapComponent implements OnInit {
     }
 
     protected changeOptions<T>(key: string, value: T): void {
-        (<{ [key: string]: unknown }><unknown>this.options)[key] = value;
+        (<{ [key: string]: unknown }><unknown>this.options())[key] = value;
         setTimeout(() => {
-            this.options = { ...this.options };
-            localStorage.setItem('MAP_OPTIONS', JSON.stringify(this.options));
+            this.options.set({ ...this.options() });
+            localStorage.setItem('MAP_OPTIONS', JSON.stringify(this.options()));
         });
     }
 
     private checkIfAllOptionsExist(): void {
-        const options_keys: string[] = Object.keys(this.options);
+        const options_keys: string[] = Object.keys(this.options());
         const default_options_keys: string[] = Object.keys(this.default_options);
 
         default_options_keys.forEach((default_option_key: string) => {

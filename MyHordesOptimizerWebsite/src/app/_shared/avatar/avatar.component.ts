@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { booleanAttribute, Component, computed, input,InputSignal, InputSignalWithTransform, Signal } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, Component, computed, input, InputSignal, InputSignalWithTransform, Signal } from '@angular/core';
 
 import { environment } from '../../../environments/environment';
 import { Imports } from '../../_abstract_model/types/_types';
@@ -13,7 +13,8 @@ const material_modules: Imports = [];
     selector: 'mho-avatar',
     templateUrl: './avatar.component.html',
     styleUrls: ['./avatar.component.scss'],
-    imports: [...angular_common, ...components, ...material_modules, ...pipes]
+    imports: [...angular_common, ...components, ...material_modules, ...pipes],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AvatarComponent {
 

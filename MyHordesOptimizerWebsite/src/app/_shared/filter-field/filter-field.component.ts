@@ -1,4 +1,4 @@
-import { Component, output,OutputEmitterRef } from '@angular/core';
+import { ChangeDetectionStrategy, Component, output, OutputEmitterRef } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -14,7 +14,8 @@ const material_modules: Imports = [MatFormFieldModule, MatInputModule];
     selector: 'mho-filter',
     templateUrl: './filter-field.component.html',
     styleUrls: ['./filter-field.component.scss'],
-    imports: [...angular_common, ...components, ...material_modules, ...pipes]
+    imports: [...angular_common, ...components, ...material_modules, ...pipes],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class FilterFieldComponent {
 

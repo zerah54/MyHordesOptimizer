@@ -1,5 +1,5 @@
 import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
-import { Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
@@ -21,6 +21,7 @@ const material_modules: Imports = [DragDropModule, MatButtonModule, MatButtonTog
     selector: 'mho-expeditions-edit-orders',
     templateUrl: './edit-orders.component.html',
     styleUrls: ['./edit-orders.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class EditOrdersComponent {
@@ -36,15 +37,17 @@ export class EditOrdersComponent {
     protected addOrder(): void {
         const order: ExpeditionOrder = new ExpeditionOrder();
         order.type = 'checkbox';
-        this.orders.push(order);
+        this.orders = [...this.orders, order];
     }
 
     protected drop(event: CdkDragDrop<string[]>): void {
-        moveItemInArray(this.orders, event.previousIndex, event.currentIndex);
+        const orders: ExpeditionOrder[] = [...this.orders];
+        moveItemInArray(orders, event.previousIndex, event.currentIndex);
+        this.orders = orders;
     }
 
     protected deleteOrder(index: number): void {
-        this.orders.splice(index, 1);
+        this.orders = this.orders.filter((_: ExpeditionOrder, i: number): boolean => i !== index);
     }
 }
 

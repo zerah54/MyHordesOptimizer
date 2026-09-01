@@ -1,5 +1,5 @@
 import { CommonModule, NgOptimizedImage, NgTemplateOutlet } from '@angular/common';
-import { Component, Input, input,InputSignal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, input, InputSignal, signal, WritableSignal } from '@angular/core';
 import { MatTabChangeEvent, MatTabsModule } from '@angular/material/tabs';
 
 import { HORDES_IMG_REPO } from '../../../../_abstract_model/const';
@@ -19,25 +19,16 @@ const material_modules: Imports = [MatTabsModule];
     selector: 'mho-registry-buildings',
     templateUrl: './buildings-registry.component.html',
     styleUrls: ['./buildings-registry.component.scss'],
-    imports: [...angular_common, ...components, ...material_modules, ...pipes]
+    imports: [...angular_common, ...components, ...material_modules, ...pipes],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class BuildingsRegistryComponent {
 
     public completeCitizenList: InputSignal<CitizenInfo> = input.required();
     public displayPseudo: InputSignal<DisplayPseudoMode> = input.required();
+    public registry: InputSignal<Entry[] | undefined> = input.required();
 
-    // TODO: Skipped for migration because:
-    //  Accessor inputs cannot be migrated as they are too complex.
-    @Input({ required: true }) public set registry(registry: Entry[] | undefined) {
-        if (registry) {
-            this.entries = registry;
-            this.filterEntriesByType(registry);
-        } else {
-            this.entries = [];
-        }
-    }
-
-    protected entries_by_type: Entry[] = [];
+    protected readonly entries_by_type: WritableSignal<Entry[]> = signal([]);
     private building_type!: BuildingType;
 
     protected readonly tabs: BuldingTab[] = [
@@ -60,6 +51,19 @@ export class BuildingsRegistryComponent {
     private readonly dump_keywords: string[] = ['la décharge', 'in der Müllhalde', 'at the dump', 'el vertedero'];
     private readonly vet_keywords: string[] = ['a attiré', 'in die Stadt gelockt', 'lured', 'atrajo a', 'hat vergeblich', 'a tenté d\'attirer', 'tried to lure', 'pero sin éxito'];
 
+    public constructor() {
+        // Reproduit l'ancien setter `@Input({required:true}) set registry` : ne réagit
+        // qu'à `registry`, aucun autre signal lu dans le corps synchrone de l'effect.
+        effect((): void => {
+            const registry: Entry[] | undefined = this.registry();
+            if (registry) {
+                this.entries = registry;
+                this.filterEntriesByType(registry);
+            } else {
+                this.entries = [];
+            }
+        });
+    }
 
     protected changeBuildingTab(event: MatTabChangeEvent): void {
         this.building_type = <BuildingType>event.tab.labelClass;
@@ -70,13 +74,13 @@ export class BuildingsRegistryComponent {
 
     private filterEntriesByType(entries: Entry[]): void {
         if (this.building_type === 'dump') {
-            this.entries_by_type = entries.filter((entry: Entry) => {
+            this.entries_by_type.set(entries.filter((entry: Entry) => {
                 return this.dump_keywords.some((dump_keyword: string): boolean => entryHasKeyword(entry, dump_keyword));
-            });
+            }));
         } else {
-            this.entries_by_type = entries.filter((entry: Entry) => {
+            this.entries_by_type.set(entries.filter((entry: Entry) => {
                 return this.vet_keywords.some((vet_keyword: string): boolean => entryHasKeyword(entry, vet_keyword));
-            });
+            }));
         }
     }
 

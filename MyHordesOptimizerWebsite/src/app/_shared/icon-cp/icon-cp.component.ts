@@ -1,5 +1,5 @@
 import { CommonModule, NgOptimizedImage } from '@angular/common';
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import moment from 'moment';
 
 import { HORDES_IMG_REPO } from '../../_abstract_model/const';
@@ -14,7 +14,8 @@ const material_modules: Imports = [];
     selector: 'mho-icon-cp',
     templateUrl: './icon-cp.component.html',
     styleUrls: ['./icon-cp.component.scss'],
-    imports: [...angular_common, ...components, ...material_modules, ...pipes]
+    imports: [...angular_common, ...components, ...material_modules, ...pipes],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class IconCpComponent {
 

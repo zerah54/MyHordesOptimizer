@@ -1,5 +1,5 @@
 import { CommonModule, NgOptimizedImage } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
@@ -22,7 +22,8 @@ const material_modules: Imports = [MatCardModule, MatTableModule, MatIconModule,
     selector: 'mho-private-towns',
     templateUrl: './private-towns.component.html',
     styleUrls: ['./private-towns.component.scss'],
-    imports: [...angular_common, ...components, ...directives, ...material_modules, ...pipes]
+    imports: [...angular_common, ...components, ...directives, ...material_modules, ...pipes],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class PrivateTownsComponent implements OnInit {
 

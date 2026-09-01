@@ -1,5 +1,16 @@
 import { CommonModule, DecimalPipe, NgOptimizedImage } from '@angular/common';
-import { booleanAttribute, Component, DestroyRef, inject, input, InputSignalWithTransform, model, ModelSignal, OnInit } from '@angular/core';
+import {
+    booleanAttribute,
+    ChangeDetectionStrategy,
+    Component,
+    DestroyRef,
+    inject,
+    input,
+    InputSignalWithTransform,
+    model,
+    ModelSignal,
+    OnInit
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDividerModule } from '@angular/material/divider';
@@ -25,6 +36,7 @@ const material_modules: Imports = [MatButtonModule, MatDividerModule];
     selector: 'mho-item',
     templateUrl: './item.component.html',
     styleUrls: ['./item.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class ItemComponent implements OnInit {
@@ -56,9 +68,15 @@ export class ItemComponent implements OnInit {
         this.wishlist_services.addItemToWishlist(item, 0)
             .pipe(takeUntilDestroyed(this.destroy_ref))
             .subscribe(() => {
-                const new_item: Item = this.item();
-                new_item.wishlist_count = 1;
-                this.item.set(new_item);
+                // Mutation en place D'ABORD : préserve le partage de référence avec le tableau
+                // canonique du parent (bank.component.ts/items.component.ts filtrent via `.filter()`,
+                // qui conserve les références d'objet — un clone déconnecté désynchroniserait un
+                // refiltrage ultérieur). `.set()` d'un clone ENSUITE : sous OnPush, `set()` ignore une
+                // valeur `Object.is`-égale à l'actuelle, il faut donc une nouvelle référence pour que
+                // le signal notifie son propre template.
+                const current_item: Item = this.item();
+                current_item.wishlist_count = 1;
+                this.item.set(Object.assign(new Item(), current_item));
             });
     }
 

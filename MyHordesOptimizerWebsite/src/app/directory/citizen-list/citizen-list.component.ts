@@ -9,7 +9,7 @@ import {
     OnInit,
     Signal,
     signal,
-    ViewChild,
+    viewChild,
     WritableSignal
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -68,7 +68,7 @@ export class CitizenListComponent implements OnInit, AfterViewInit {
         return this.myUserId !== null ? [...cols, 'note'] : cols;
     });
 
-    @ViewChild(MatSort) private matSort!: MatSort;
+    private readonly matSort: Signal<MatSort> = viewChild.required(MatSort);
 
     protected readonly citizens: WritableSignal<CitizenListItem[]> = signal<CitizenListItem[]>([]);
     protected readonly userNotes: WritableSignal<Dictionary<NoteDTO>> = signal({});
@@ -106,7 +106,7 @@ export class CitizenListComponent implements OnInit, AfterViewInit {
     }
 
     public ngAfterViewInit(): void {
-        this.matSort.sortChange
+        this.matSort().sortChange
             .pipe(takeUntilDestroyed(this.destroy_ref))
             .subscribe((change: { active: string; direction: SortDirection }) => {
                 this.sortState.set({ active: change.active, direction: change.direction });

@@ -2,7 +2,7 @@
     <mat-card-title i18n>Recettes</mat-card-title>
 </mat-card-header>
 <mat-card-content class="mho-recipes">
-    @if (recipes) {
+    @if (recipes()) {
         <div>
             <div class="table-filters">
                 <mho-filter (filterChange)="applyFilter($event)"></mho-filter>

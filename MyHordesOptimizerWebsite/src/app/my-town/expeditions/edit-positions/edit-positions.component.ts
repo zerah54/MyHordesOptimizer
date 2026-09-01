@@ -1,5 +1,5 @@
 import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
-import { Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatCheckboxModule } from '@angular/material/checkbox';
@@ -19,6 +19,7 @@ const material_modules: Imports = [DragDropModule, MatButtonModule, MatButtonTog
     selector: 'mho-expeditions-edit-positions',
     templateUrl: './edit-positions.component.html',
     styleUrls: ['./edit-positions.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class EditPositionsComponent {

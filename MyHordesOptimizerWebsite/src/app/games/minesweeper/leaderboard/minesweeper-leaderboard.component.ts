@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, inject, input, InputSignal, OnChanges, signal, SimpleChanges, WritableSignal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, inject, input, InputSignal, signal, untracked, WritableSignal } from '@angular/core';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { finalize } from 'rxjs';
@@ -22,7 +22,7 @@ const material_modules: Imports = [MatPaginatorModule, MatProgressSpinnerModule]
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [...angular_common, ...components, ...pipes, ...material_modules]
 })
-export class MinesweeperLeaderboardComponent implements OnChanges {
+export class MinesweeperLeaderboardComponent {
     public sizeId: InputSignal<string> = input.required();
     public mode: InputSignal<'normal' | 'daily'> = input.required();
     // Une vue par onglet parent (Meilleurs scores / Classement des joueurs) : chaque onglet instancie
@@ -39,15 +39,23 @@ export class MinesweeperLeaderboardComponent implements OnChanges {
     private readonly loadingController: DelayedLoadingController = createDelayedLoadingController((loading: boolean) => this.loading.set(loading));
     protected readonly myRank: WritableSignal<MinesweeperLeaderboardEntry | null | undefined> = signal(undefined);
 
-    public ngOnChanges(changes: SimpleChanges): void {
-        // `sizeId`/`mode`/`view` sont des inputs requis : ngOnChanges se déclenche toujours dès la
-        // création du composant (firstChange = true), pas besoin d'un ngOnInit séparé pour le chargement
-        // initial. "custom" n'a pas de classement public (rejeté 400 par le serveur) : ne pas appeler l'API.
-        if ((changes['sizeId'] || changes['mode']) && this.sizeId() !== 'custom') {
-            this.pageIndex.set(0);
-            this.reload();
-            this.reloadMyRank();
-        }
+    public constructor() {
+        // `effect()` s'exécute toujours une première fois à la création (équivalent du firstChange de
+        // l'ancien ngOnChanges), puis à chaque changement de sizeId/mode — dépendances lues ICI, hors
+        // `untracked()`. `reload()`/`reloadMyRank()` lisent aussi `view`/`pageIndex` : sans `untracked()`,
+        // l'effect deviendrait à tort dépendant d'eux (view seul, ou une pagination, redéclencherait le
+        // rechargement et reviendrait sur la page 1), ce que l'ancien ngOnChanges ne faisait pas.
+        effect(() => {
+            const sizeId: string = this.sizeId();
+            this.mode();
+            untracked(() => {
+                if (sizeId !== 'custom') {
+                    this.pageIndex.set(0);
+                    this.reload();
+                    this.reloadMyRank();
+                }
+            });
+        });
     }
 
     protected isCustomSize(): boolean {

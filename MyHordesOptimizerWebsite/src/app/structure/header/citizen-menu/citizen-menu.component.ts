@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, OnInit, Signal, signal, viewChild, WritableSignal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatMenuModule, MatMenuTrigger } from '@angular/material/menu';
@@ -36,13 +36,18 @@ const material_modules: Imports = [MatDividerModule, MatMenuModule, MatTooltipMo
     selector: 'mho-header-citizen-menu',
     templateUrl: './citizen-menu.component.html',
     styleUrls: ['./citizen-menu.component.scss'],
-    imports: [...angular_common, ...components, ...material_modules, ...pipes]
+    imports: [...angular_common, ...components, ...material_modules, ...pipes],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CitizenMenuComponent implements OnInit {
 
-    protected citizen!: Citizen;
+    /** Citoyen courant : republié sur `myCitizen$` par ce composant lui-même après chaque mutation
+     *  (voir {@link ngOnInit}), donc réémis avec la MÊME référence — un simple `.set()` de cette
+     *  référence serait ignoré (`Object.is`-égal) sous OnPush. Le clonage à la réception (voir
+     *  {@link ngOnInit}) garantit la notification à chaque publication, propre ou externe. */
+    protected readonly citizen: WritableSignal<Citizen | undefined> = signal(undefined);
     /** La liste des listes disponibles dans le sac */
-    protected bag_lists: ListForAddRemove[] = [];
+    protected readonly bag_lists: WritableSignal<ListForAddRemove[]> = signal([]);
     protected readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
     private readonly me: Me | null = getUser();
     private readonly current_day: number = getTown()?.day || 1;
@@ -58,18 +63,23 @@ export class CitizenMenuComponent implements OnInit {
     private readonly destroy_ref: DestroyRef = inject(DestroyRef);
     private readonly town_service: TownService = inject(TownService);
 
-    @ViewChild('statusTrigger') private status_trigger?: MatMenuTrigger;
-    @ViewChild('bagTrigger') private bag_trigger?: MatMenuTrigger;
-    @ViewChild('dailyActionsTrigger') private daily_actions_trigger?: MatMenuTrigger;
-    @ViewChild('heroicActionsTrigger') private heroic_actions_trigger?: MatMenuTrigger;
-    @ViewChild('homeTrigger') private home_trigger?: MatMenuTrigger;
+    // Les 5 déclencheurs de sous-menus sont tous dans le même bloc `@if (citizen(); as citizen)` du
+    // template : la référence n'existe qu'une fois le citoyen chargé, jamais `.required()`.
+    private readonly status_trigger: Signal<MatMenuTrigger | undefined> = viewChild<MatMenuTrigger>('statusTrigger');
+    private readonly bag_trigger: Signal<MatMenuTrigger | undefined> = viewChild<MatMenuTrigger>('bagTrigger');
+    private readonly daily_actions_trigger: Signal<MatMenuTrigger | undefined> = viewChild<MatMenuTrigger>('dailyActionsTrigger');
+    private readonly heroic_actions_trigger: Signal<MatMenuTrigger | undefined> = viewChild<MatMenuTrigger>('heroicActionsTrigger');
+    private readonly home_trigger: Signal<MatMenuTrigger | undefined> = viewChild<MatMenuTrigger>('homeTrigger');
 
     public ngOnInit(): void {
         this.town_service.myCitizen$
             .pipe(takeUntilDestroyed(this.destroy_ref))
             .subscribe({
                 next: (citizen: Citizen | null) => {
-                    if (citizen) this.citizen = citizen;
+                    // Clone systématique : `citizen` peut être la référence déjà tenue par ce signal
+                    // (republiée par ce composant après une mutation locale), auquel cas `.set()` seul
+                    // serait ignoré sous OnPush (Object.is-égal).
+                    if (citizen) this.citizen.set(Object.assign(new Citizen(), citizen));
                 }
             });
 
@@ -90,9 +100,9 @@ export class CitizenMenuComponent implements OnInit {
             .subscribe({
                 next: (items: Item[]) => {
                     this.all_items = items;
-                    this.bag_lists = [
+                    this.bag_lists.set([
                         { label: $localize`Tous`, list: this.all_items }
-                    ];
+                    ]);
                 }
             });
     }
@@ -109,11 +119,11 @@ export class CitizenMenuComponent implements OnInit {
 
     /** Ferme les sous-menus autres que celui qui vient de s'ouvrir (un seul ouvert à la fois). */
     protected closeOtherMenus(opened: 'status' | 'bag' | 'dailyActions' | 'heroicActions' | 'home'): void {
-        if (opened !== 'status') this.status_trigger?.closeMenu();
-        if (opened !== 'bag') this.bag_trigger?.closeMenu();
-        if (opened !== 'dailyActions') this.daily_actions_trigger?.closeMenu();
-        if (opened !== 'heroicActions') this.heroic_actions_trigger?.closeMenu();
-        if (opened !== 'home') this.home_trigger?.closeMenu();
+        if (opened !== 'status') this.status_trigger()?.closeMenu();
+        if (opened !== 'bag') this.bag_trigger()?.closeMenu();
+        if (opened !== 'dailyActions') this.daily_actions_trigger()?.closeMenu();
+        if (opened !== 'heroicActions') this.heroic_actions_trigger()?.closeMenu();
+        if (opened !== 'home') this.home_trigger()?.closeMenu();
     }
 
     /**
@@ -123,19 +133,23 @@ export class CitizenMenuComponent implements OnInit {
      * @param {number} item_id
      */
     protected addItem(item_id: number): void {
-        if (this.citizen && this.citizen.bag) {
-            this.citizen.bag.items.push(<Item>this.all_items.find((item: Item) => item.id === item_id));
+        const citizen: Citizen | undefined = this.citizen();
+        if (citizen && citizen.bag) {
+            // Réassignation immuable : `[currentList]="citizen.bag?.items"` alimente l'input signal
+            // (`input.required()`) de `mho-list-element-add-remove`, un composant OnPush — un `.push()`
+            // en place laisserait la référence inchangée et l'input ne se mettrait jamais à jour.
+            citizen.bag.items = [...citizen.bag.items, <Item>this.all_items.find((item: Item) => item.id === item_id)];
 
             this.town_service
-                .updateBag(this.citizen)
+                .updateBag(citizen)
                 .pipe(takeUntilDestroyed(this.destroy_ref))
                 .subscribe({
                     next: (update_info: UpdateInfo): void => {
-                        if (this.citizen.bag) {
-                            this.citizen.bag.update_info.username = getUser()?.username;
-                            this.citizen.bag.update_info.update_time = update_info.update_time;
+                        if (citizen.bag) {
+                            citizen.bag.update_info.username = getUser()?.username;
+                            citizen.bag.update_info.update_time = update_info.update_time;
                         }
-                        this.town_service.publishMyCitizen(this.citizen);
+                        this.town_service.publishMyCitizen(citizen);
                     }
                 });
         }
@@ -148,21 +162,22 @@ export class CitizenMenuComponent implements OnInit {
      * @param {number} item_id
      */
     protected removeItem(item_id: number): void {
-        if (this.citizen && this.citizen.bag) {
-            const item_in_datasource_index: number | undefined = this.citizen.bag.items.findIndex((item_in_bag: Item) => item_in_bag.id === item_id);
+        const citizen: Citizen | undefined = this.citizen();
+        if (citizen && citizen.bag) {
+            const item_in_datasource_index: number | undefined = citizen.bag.items.findIndex((item_in_bag: Item) => item_in_bag.id === item_id);
             if (item_in_datasource_index !== undefined && item_in_datasource_index !== null && item_in_datasource_index > -1) {
-                this.citizen.bag.items.splice(item_in_datasource_index, 1);
+                citizen.bag.items = citizen.bag.items.filter((_: Item, index: number) => index !== item_in_datasource_index);
             }
             this.town_service
-                .updateBag(this.citizen)
+                .updateBag(citizen)
                 .pipe(takeUntilDestroyed(this.destroy_ref))
                 .subscribe({
                     next: (update_info: UpdateInfo) => {
-                        if (this.citizen.bag) {
-                            this.citizen.bag.update_info.username = getUser()?.username;
-                            this.citizen.bag.update_info.update_time = update_info.update_time;
+                        if (citizen.bag) {
+                            citizen.bag.update_info.username = getUser()?.username;
+                            citizen.bag.update_info.update_time = update_info.update_time;
                         }
-                        this.town_service.publishMyCitizen(this.citizen);
+                        this.town_service.publishMyCitizen(citizen);
                     }
                 });
         }
@@ -170,18 +185,19 @@ export class CitizenMenuComponent implements OnInit {
 
     /** On vide complètement le sac */
     protected emptyBag(): void {
-        if (this.citizen && this.citizen.bag) {
-            this.citizen.bag.items = [];
+        const citizen: Citizen | undefined = this.citizen();
+        if (citizen && citizen.bag) {
+            citizen.bag.items = [];
             this.town_service
-                .updateBag(this.citizen)
+                .updateBag(citizen)
                 .pipe(takeUntilDestroyed(this.destroy_ref))
                 .subscribe({
                     next: (update_info: UpdateInfo) => {
-                        if (this.citizen.bag) {
-                            this.citizen.bag.update_info.username = getUser()?.username;
-                            this.citizen.bag.update_info.update_time = update_info.update_time;
+                        if (citizen.bag) {
+                            citizen.bag.update_info.username = getUser()?.username;
+                            citizen.bag.update_info.update_time = update_info.update_time;
                         }
-                        this.town_service.publishMyCitizen(this.citizen);
+                        this.town_service.publishMyCitizen(citizen);
                     }
                 });
         }
@@ -193,19 +209,20 @@ export class CitizenMenuComponent implements OnInit {
      * @param {string} status_key
      */
     protected addStatus(status_key: string): void {
-        if (this.citizen && this.citizen.status) {
-            this.citizen.status.icons.push(<StatusEnum>this.all_status.find((status: StatusEnum) => status.key === status_key));
+        const citizen: Citizen | undefined = this.citizen();
+        if (citizen && citizen.status) {
+            citizen.status.icons = [...citizen.status.icons, <StatusEnum>this.all_status.find((status: StatusEnum) => status.key === status_key)];
 
             this.town_service
-                .updateStatus(this.citizen)
+                .updateStatus(citizen)
                 .pipe(takeUntilDestroyed(this.destroy_ref))
                 .subscribe({
                     next: (update_info: UpdateInfo) => {
-                        if (this.citizen.status) {
-                            this.citizen.status.update_info.username = getUser()?.username;
-                            this.citizen.status.update_info.update_time = update_info.update_time;
+                        if (citizen.status) {
+                            citizen.status.update_info.username = getUser()?.username;
+                            citizen.status.update_info.update_time = update_info.update_time;
                         }
-                        this.town_service.publishMyCitizen(this.citizen);
+                        this.town_service.publishMyCitizen(citizen);
                     }
                 });
         }
@@ -217,21 +234,22 @@ export class CitizenMenuComponent implements OnInit {
      * @param {string} status_key
      */
     protected removeStatus(status_key: string): void {
-        if (this.citizen && this.citizen.status) {
-            const existing_status_index: number | undefined = this.citizen.status.icons.findIndex((status: StatusEnum) => status.key === status_key);
+        const citizen: Citizen | undefined = this.citizen();
+        if (citizen && citizen.status) {
+            const existing_status_index: number | undefined = citizen.status.icons.findIndex((status: StatusEnum) => status.key === status_key);
             if (existing_status_index !== undefined && existing_status_index !== null && existing_status_index > -1) {
-                this.citizen.status.icons.splice(existing_status_index, 1);
+                citizen.status.icons = citizen.status.icons.filter((_: StatusEnum, index: number) => index !== existing_status_index);
             }
             this.town_service
-                .updateStatus(this.citizen)
+                .updateStatus(citizen)
                 .pipe(takeUntilDestroyed(this.destroy_ref))
                 .subscribe({
                     next: (update_info: UpdateInfo) => {
-                        if (this.citizen.status) {
-                            this.citizen.status.update_info.username = getUser()?.username;
-                            this.citizen.status.update_info.update_time = update_info.update_time;
+                        if (citizen.status) {
+                            citizen.status.update_info.username = getUser()?.username;
+                            citizen.status.update_info.update_time = update_info.update_time;
                         }
-                        this.town_service.publishMyCitizen(this.citizen);
+                        this.town_service.publishMyCitizen(citizen);
                     }
                 });
         }
@@ -239,18 +257,19 @@ export class CitizenMenuComponent implements OnInit {
 
     /** On vide complètement les statuts */
     protected emptyStatus(): void {
-        if (this.citizen && this.citizen.status) {
-            this.citizen.status.icons = [];
+        const citizen: Citizen | undefined = this.citizen();
+        if (citizen && citizen.status) {
+            citizen.status.icons = [];
             this.town_service
-                .updateStatus(this.citizen)
+                .updateStatus(citizen)
                 .pipe(takeUntilDestroyed(this.destroy_ref))
                 .subscribe({
                     next: (update_info: UpdateInfo) => {
-                        if (this.citizen.status) {
-                            this.citizen.status.update_info.username = getUser()?.username;
-                            this.citizen.status.update_info.update_time = update_info.update_time;
+                        if (citizen.status) {
+                            citizen.status.update_info.username = getUser()?.username;
+                            citizen.status.update_info.update_time = update_info.update_time;
                         }
-                        this.town_service.publishMyCitizen(this.citizen);
+                        this.town_service.publishMyCitizen(citizen);
                     }
                 });
         }
@@ -260,31 +279,32 @@ export class CitizenMenuComponent implements OnInit {
 
     /** L'action donnée a-t-elle déjà été faite aujourd'hui ? */
     protected isDailyActionDone(actionKey: string): boolean {
-        return this.citizen.daily_actions.some((action: DailyAction) => action.day === this.current_day && action.action_key === actionKey && !!action.update_info);
+        return this.citizen()!.daily_actions.some((action: DailyAction) => action.day === this.current_day && action.action_key === actionKey && !!action.update_info);
     }
 
     /** Prend ou retire une action quotidienne du jour. */
     protected saveDailyAction(actionKey: string, checked: boolean): void {
+        const citizen: Citizen = this.citizen()!;
         if (checked) {
             this.town_service
-                .addDailyAction(this.citizen, actionKey)
+                .addDailyAction(citizen, actionKey)
                 .subscribe({
                     next: () => {
-                        this.citizen.daily_actions.push(new DailyAction({
+                        citizen.daily_actions = [...citizen.daily_actions, new DailyAction({
                             day: this.current_day, actionKey,
                             lastUpdateInfo: { updateTime: new Date(), userId: getUser()?.id?.toString() ?? '', userName: getUser()?.username ?? '', userKey: '' }
-                        }));
-                        this.town_service.publishMyCitizen(this.citizen);
+                        })];
+                        this.town_service.publishMyCitizen(citizen);
                     }
                 });
         } else {
             this.town_service
-                .removeDailyAction(this.citizen, actionKey)
+                .removeDailyAction(citizen, actionKey)
                 .subscribe({
                     next: () => {
-                        const index: number = this.citizen.daily_actions.findIndex((action: DailyAction) => action.day === this.current_day && action.action_key === actionKey);
-                        if (index > -1) this.citizen.daily_actions.splice(index, 1);
-                        this.town_service.publishMyCitizen(this.citizen);
+                        const index: number = citizen.daily_actions.findIndex((action: DailyAction) => action.day === this.current_day && action.action_key === actionKey);
+                        if (index > -1) citizen.daily_actions = citizen.daily_actions.filter((_: DailyAction, i: number) => i !== index);
+                        this.town_service.publishMyCitizen(citizen);
                     }
                 });
         }
@@ -292,26 +312,27 @@ export class CitizenMenuComponent implements OnInit {
 
     /** Met à jour le nombre de potions chamaniques bues (stepper). */
     protected changePotions(value: number): void {
-        this.citizen.chamanic_detail.nb_potion_shaman = value;
+        this.citizen()!.chamanic_detail.nb_potion_shaman = value;
         this.saveChamanicDetails();
     }
 
     /** Met à jour l'immunité à l'âme (toggle). */
     protected changeImmune(immune: boolean): void {
-        this.citizen.chamanic_detail.is_immune_to_soul = immune;
+        this.citizen()!.chamanic_detail.is_immune_to_soul = immune;
         this.saveChamanicDetails();
     }
 
     private saveChamanicDetails(): void {
+        const citizen: Citizen = this.citizen()!;
         this.town_service
-            .saveChamanicDetails(this.citizen)
+            .saveChamanicDetails(citizen)
             .subscribe({
                 next: (update_info: UpdateInfo) => {
-                    if (this.citizen.chamanic_detail) {
-                        this.citizen.chamanic_detail.update_info.username = getUser()?.username;
-                        this.citizen.chamanic_detail.update_info.update_time = update_info.update_time;
+                    if (citizen.chamanic_detail) {
+                        citizen.chamanic_detail.update_info.username = getUser()?.username;
+                        citizen.chamanic_detail.update_info.update_time = update_info.update_time;
                     }
-                    this.town_service.publishMyCitizen(this.citizen);
+                    this.town_service.publishMyCitizen(citizen);
                 }
             });
     }
@@ -334,20 +355,24 @@ export class CitizenMenuComponent implements OnInit {
         const old_element_value: boolean | number = element.value;
         element.value = value;
 
-        if (this.citizen && this.citizen.home !== undefined) {
+        const citizen: Citizen | undefined = this.citizen();
+        if (citizen && citizen.home !== undefined) {
             this.town_service
-                .updateHome(this.citizen)
+                .updateHome(citizen)
                 .pipe(takeUntilDestroyed(this.destroy_ref))
                 .subscribe({
                     next: (update_info: UpdateInfo) => {
-                        if (this.citizen.home) {
-                            this.citizen.home.update_info.username = getUser()?.username;
-                            this.citizen.home.update_info.update_time = update_info.update_time;
+                        if (citizen.home) {
+                            citizen.home.update_info.username = getUser()?.username;
+                            citizen.home.update_info.update_time = update_info.update_time;
                         }
-                        this.town_service.publishMyCitizen(this.citizen);
+                        this.town_service.publishMyCitizen(citizen);
                     },
                     error: () => {
                         element.value = old_element_value;
+                        // Rollback asynchrone sans événement déclencheur ni publishMyCitizen : sous
+                        // OnPush, rien d'autre ne marque cette vue à revérifier — notification explicite.
+                        this.citizen.set(Object.assign(new Citizen(), citizen));
                     }
                 });
         }
@@ -363,20 +388,24 @@ export class CitizenMenuComponent implements OnInit {
         const old_element_value: boolean | number = element.value;
         element.value = value;
 
-        if (this.citizen && this.citizen.heroic_actions) {
+        const citizen: Citizen | undefined = this.citizen();
+        if (citizen && citizen.heroic_actions) {
             this.town_service
-                .updateHeroicActions(this.citizen)
+                .updateHeroicActions(citizen)
                 .pipe(takeUntilDestroyed(this.destroy_ref))
                 .subscribe({
                     next: (update_info: UpdateInfo) => {
-                        if (this.citizen.heroic_actions) {
-                            this.citizen.heroic_actions.update_info.username = getUser()?.username;
-                            this.citizen.heroic_actions.update_info.update_time = update_info.update_time;
+                        if (citizen.heroic_actions) {
+                            citizen.heroic_actions.update_info.username = getUser()?.username;
+                            citizen.heroic_actions.update_info.update_time = update_info.update_time;
                         }
-                        this.town_service.publishMyCitizen(this.citizen);
+                        this.town_service.publishMyCitizen(citizen);
                     },
                     error: () => {
                         element.value = old_element_value;
+                        // Rollback asynchrone sans événement déclencheur ni publishMyCitizen : sous
+                        // OnPush, rien d'autre ne marque cette vue à revérifier — notification explicite.
+                        this.citizen.set(Object.assign(new Citizen(), citizen));
                     }
                 });
         }

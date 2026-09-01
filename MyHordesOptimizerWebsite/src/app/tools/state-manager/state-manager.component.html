@@ -12,7 +12,7 @@
                     (empty)="emptyBagContent()"
                     (remove)="removeFromBag(+$event)"
                     [currentList]="starting_bag"
-                    [lists]="bag_lists"
+                    [lists]="bag_lists()"
                     addLabel="Ajouter au sac" i18n-addLabel
                     emptyLabel="Vider le sac" i18n-emptyLabel
                     i18n-label
@@ -67,16 +67,16 @@
                 <div class="status-toggle-group">
                     <mho-compact-toggle icon="emotes/proscout.gif" label="Éclaireur" i18n-label
                                         [value]="is_eclaireur" (valueChange)="is_eclaireur = $event; compute()"/>
-                    <mho-compact-toggle [icon]="bike_icon" label="Vélo" i18n-label
+                    <mho-compact-toggle [icon]="bike_icon()" label="Vélo" i18n-label
                                         [value]="has_bike" (valueChange)="has_bike = $event; compute()"/>
-                    <mho-compact-toggle [icon]="shoe_icon" label="Baskets" i18n-label
+                    <mho-compact-toggle [icon]="shoe_icon()" label="Baskets" i18n-label
                                         [value]="has_shoes" (valueChange)="has_shoes = $event; compute()"/>
                 </div>
 
                 <div class="status-toggle-group">
                     <mho-compact-toggle [icon]="shield_icon" label="Bouclier équipé" i18n-label
                                         [value]="has_shield" (valueChange)="has_shield = $event; compute()"/>
-                    <mho-compact-toggle [icon]="defence_cp_icon" label="Objet de défense de zone" i18n-label
+                    <mho-compact-toggle [icon]="defence_cp_icon()" label="Objet de défense de zone" i18n-label
                                         [value]="has_defence_cp_item" (valueChange)="has_defence_cp_item = $event; compute()"/>
                     <mho-compact-toggle [icon]="clean_perk_icon" label="Clean" i18n-label
                                         [value]="has_clean_pdc_perk" (valueChange)="has_clean_pdc_perk = $event; compute()"/>
@@ -102,12 +102,12 @@
                 </div>
             </div>
 
-            @if (ranked_orders.length > 0) {
+            @if (ranked_orders().length > 0) {
                 <hr class="section-separator"/>
                 <div class="ranked-orders-section">
                     <h4 i18n>Ordres de consommation possibles (du meilleur au pire)</h4>
                     <div class="ranked-orders">
-                        @for (candidate of ranked_orders; track $index) {
+                        @for (candidate of ranked_orders(); track $index) {
                             <div class="ranked-order">
                                 @for (item of candidate.items; track $index) {
                                     <img [src]="HORDES_IMG_REPO + item.img" [matTooltip]="item.label[locale] ?? item.label['en']" alt="">
@@ -204,12 +204,12 @@
     <div class="states-cards">
         <h3 i18n>Historique</h3>
         <div class="states-cards-historique">
-            @if (rows.length === 0) {
+            @if (rows().length === 0) {
                 <p i18n>Ajoutez une étape à la séquence pour voir la trace.</p>
             } @else {
                 <mat-list>
                     <mat-divider/>
-                    @for (row of rows; track $index) {
+                    @for (row of rows(); track $index) {
                         <mat-list-item>
                             <div class="ligne-historique-action">
                                 @if (row.item) {

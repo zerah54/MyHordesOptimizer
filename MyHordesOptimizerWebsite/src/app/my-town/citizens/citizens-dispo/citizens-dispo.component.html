@@ -1,4 +1,4 @@
-@if (citizen_info) {
+@if (citizen_info(); as citizen_info) {
     <div class="mho-citizens-dispo">
         <table #mat_table mat-table [dataSource]="datasource" matSort>
 

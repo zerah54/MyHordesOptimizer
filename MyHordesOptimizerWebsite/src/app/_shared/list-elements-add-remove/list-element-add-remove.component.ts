@@ -1,5 +1,5 @@
 import { CommonModule, NgOptimizedImage, NgTemplateOutlet } from '@angular/common';
-import { booleanAttribute, Component, input, InputSignal, InputSignalWithTransform, output,OutputEmitterRef } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, Component, input, InputSignal, InputSignalWithTransform, output, OutputEmitterRef } from '@angular/core';
 import { MatMenuModule } from '@angular/material/menu';
 import moment from 'moment';
 
@@ -22,7 +22,8 @@ const material_modules: Imports = [MatMenuModule];
     selector: 'mho-list-element-add-remove',
     templateUrl: './list-element-add-remove.component.html',
     styleUrls: ['./list-element-add-remove.component.scss'],
-    imports: [...angular_common, ...components, ...material_modules, ...pipes]
+    imports: [...angular_common, ...components, ...material_modules, ...pipes],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ListElementAddRemoveComponent {
 

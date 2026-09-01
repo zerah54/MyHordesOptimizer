@@ -5,19 +5,19 @@ import {
     ChangeDetectionStrategy,
     Component,
     ElementRef,
-    HostBinding,
     inject,
     Input,
     input,
     InputSignal,
     InputSignalWithTransform,
+    linkedSignal,
     OnDestroy,
     output,
     OutputEmitterRef,
     Signal,
-    signal,
     viewChild,
-    WritableSignal } from '@angular/core';
+    WritableSignal
+} from '@angular/core';
 import { AbstractControl, ControlValueAccessor, NgControl, UntypedFormControl, ValidationErrors, Validator, Validators } from '@angular/forms';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatOption, MatOptionModule } from '@angular/material/core';
@@ -51,6 +51,9 @@ const material_modules: Imports = [MatChipsModule, MatDividerModule, MatFormFiel
             useExisting: SelectComponent
         }
     ],
+    host: {
+        '[class.floating]': 'floating'
+    },
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
@@ -62,7 +65,7 @@ export class SelectComponent<T> implements ControlValueAccessor, Validator, MatF
 
     private static nextId: number = 0;
 
-    @HostBinding('class.floating') public floating: boolean = this.shouldLabelFloat;
+    public floating: boolean = this.shouldLabelFloat;
 
     // get reference to the input element
     public select: Signal<MatSelect | undefined> = viewChild(MatSelect);
@@ -84,20 +87,24 @@ export class SelectComponent<T> implements ControlValueAccessor, Validator, MatF
     /** Doit-on afficher sous forme de chips les différentes valeurs ? Fonctionne uniquement si "multiple" */
     public chips: InputSignalWithTransform<boolean, unknown> = input(false, { transform: booleanAttribute });
 
-    // TODO: Skipped for migration because:
-    //  Accessor inputs cannot be migrated as they are too complex.
-    @Input() public set options(options: (T | string)[]) {
-        this.displayed_options.set(options);
-        this.complete_options.set(options);
+    public options: InputSignal<(T | string)[]> = input<(T | string)[]>([]);
+
+    /**
+     * Alias + getter imposés par le contrat `MatFormFieldControl`, qui attend une propriété `string`
+     * là où `input()` produit un `InputSignal` (TS2416) ; le champ support est `protected` et non
+     * `private` car le compilateur Angular refuse un `input()` sur un membre privé (NG1053).
+     */
+    // eslint-disable-next-line @angular-eslint/no-input-rename -- l'alias conserve le nom attendu par MatFormFieldControl
+    protected readonly _userAriaDescribedBy: InputSignal<string | undefined> = input<string | undefined>(undefined, { alias: 'userAriaDescribedBy' });
+
+    public get userAriaDescribedBy(): string | undefined {
+        return this._userAriaDescribedBy();
     }
 
-    // TODO: Skipped for migration because:
-    //  This input overrides a field from a superclass, while the superclass field
-    //  is not migrated.
-    @Input() public userAriaDescribedBy!: string;
-
-    // TODO: Skipped for migration because:
-    //  Accessor inputs cannot be migrated as they are too complex.
+    // `placeholder`, `required` et `disabled` restent des `@Input()` : leurs setters
+    // synchrones portent des effets de bord (`stateChanges.next()`, et `form_control`
+    // activé/désactivé pour `disabled`) qu'un `input()` ne rejouerait que via un
+    // `effect()` asynchrone. Ne concerne pas `userAriaDescribedBy`, simple champ de lecture.
     @Input() public get placeholder(): string {
         return this._placeholder;
     }
@@ -107,8 +114,6 @@ export class SelectComponent<T> implements ControlValueAccessor, Validator, MatF
         this.stateChanges.next();
     }
 
-    // TODO: Skipped for migration because:
-    //  Accessor inputs cannot be migrated as they are too complex.
     @Input() public get required(): boolean {
         return this._required;
     }
@@ -118,8 +123,6 @@ export class SelectComponent<T> implements ControlValueAccessor, Validator, MatF
         this.stateChanges.next();
     }
 
-    // TODO: Skipped for migration because:
-    //  Accessor inputs cannot be migrated as they are too complex.
     @Input() public get disabled(): boolean {
         return this._disabled;
     }
@@ -140,7 +143,7 @@ export class SelectComponent<T> implements ControlValueAccessor, Validator, MatF
 
     public id: string = `mho-select-${SelectComponent.nextId++}`;
 
-    protected displayed_options: WritableSignal<(T | string)[]> = signal([]);
+    protected displayed_options: WritableSignal<(T | string)[]> = linkedSignal((): (T | string)[] => this.options());
 
     public stateChanges: Subject<void> = new Subject<void>();
     public controlType?: string | undefined;
@@ -150,7 +153,7 @@ export class SelectComponent<T> implements ControlValueAccessor, Validator, MatF
 
     public readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
 
-    protected complete_options: WritableSignal<(T | string)[]> = signal([]);
+    protected complete_options: Signal<(T | string)[]> = this.options;
     //The internal data model for form control value access
     private innerValue: T | string | T[] | string[] | undefined = undefined;
     /** errors for the form control will be stored in this array */

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, DestroyRef, effect, EventEmitter, inject, OnInit, Signal, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, effect, EventEmitter, inject, OnInit, Signal, signal, viewChild, WritableSignal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatTable, MatTableDataSource, MatTableModule } from '@angular/material/table';
@@ -35,6 +35,7 @@ const material_modules: Imports = [MatSortModule, MatTableModule];
     selector: 'mho-citizens-digs',
     templateUrl: './citizens-digs.component.html',
     styleUrls: ['./citizens-digs.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [...angular_common, ...components, ...directives, ...material_modules, ...pipes]
 })
 export class CitizensDigsComponent implements OnInit {
@@ -42,8 +43,8 @@ export class CitizensDigsComponent implements OnInit {
     private readonly sort: Signal<MatSort | undefined> = viewChild(MatSort);
     public readonly table: Signal<MatTable<DigsByCitizen> | undefined> = viewChild(MatTable);
 
-    /** La liste des citoyens */
-    protected citizen_info!: CitizenInfo;
+    /** La liste des citoyens. Signal : réassigné depuis le subscribe de getCitizens() et lu par le template. */
+    protected readonly citizen_info: WritableSignal<CitizenInfo | undefined> = signal(undefined);
     /** La liste des fouilles */
     private digs!: Dig[];
     /** La datasource pour le tableau */
@@ -145,9 +146,10 @@ export class CitizensDigsComponent implements OnInit {
     }
 
     private createDigsByCitizenAndDay(): void {
-        if (this.digs && this.citizen_info) {
+        const citizen_info: CitizenInfo | undefined = this.citizen_info();
+        if (this.digs && citizen_info) {
 
-            this.datasource.data = [...this.citizen_info.citizens.map((citizen: Citizen) => {
+            this.datasource.data = [...citizen_info.citizens.map((citizen: Citizen) => {
                 return {
                     citizen: citizen,
                     digs: this.digs.filter((dig: Dig) => dig.digger_id === citizen.id && dig.day === this.filters.selected_day)
@@ -163,7 +165,7 @@ export class CitizensDigsComponent implements OnInit {
             .subscribe({
                 next: (citizen_info: CitizenInfo) => {
                     citizen_info.citizens = citizen_info.citizens.filter((citizen: Citizen) => !citizen.is_dead);
-                    this.citizen_info = citizen_info;
+                    this.citizen_info.set(citizen_info);
                     this.createDigsByCitizenAndDay();
                 }
             });

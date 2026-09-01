@@ -1,5 +1,5 @@
 import { CommonModule, DecimalPipe, NgOptimizedImage } from '@angular/common';
-import { Component, DestroyRef, inject, input, InputSignal, OnInit, output,OutputEmitterRef } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, input, InputSignal, OnInit, output, OutputEmitterRef } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatCheckboxModule } from '@angular/material/checkbox';
@@ -24,6 +24,7 @@ const material_modules: Imports = [MatCheckboxModule, MatDividerModule, MatFormF
     selector: 'mho-map-update-ruin',
     templateUrl: './map-update-ruin.component.html',
     styleUrls: ['./map-update-ruin.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class MapUpdateRuinComponent implements OnInit {

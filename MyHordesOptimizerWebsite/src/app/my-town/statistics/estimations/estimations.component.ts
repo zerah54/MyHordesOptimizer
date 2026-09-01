@@ -50,13 +50,26 @@ export class EstimationsComponent implements OnInit {
     /** Mode observateur : masque la sauvegarde et verrouille la saisie. */
     protected readonly is_readonly: Signal<boolean> = inject(TownContextService).isReadonly;
     protected selected_day: number = this.current_day;
-    protected estimations!: Estimations;
-    /** La datasource pour le tableau */
+    /** Chargée de façon asynchrone (ngOnInit) et lue par le template sous OnPush : signal. */
+    protected readonly estimations: WritableSignal<Estimations | undefined> = signal<Estimations | undefined>(undefined);
+    /** La datasource pour le tableau (jamais alimentée : `[dataSource]` absent du template, champ mort). */
     protected datasource: MatTableDataSource<Regen> = new MatTableDataSource();
     protected today_offset_mode!: boolean;
     protected tomorrow_offset_mode!: boolean;
-    protected today_calculated_attack!: EstimationsResult | null;
-    protected tomorrow_calculated_attack!: EstimationsResult | null;
+    protected readonly today_calculated_attack: WritableSignal<EstimationsResult | null> = signal<EstimationsResult | null>(null);
+    protected readonly tomorrow_calculated_attack: WritableSignal<EstimationsResult | null> = signal<EstimationsResult | null>(null);
+    /** Affinage GPU : jour en cours de scan (null si aucun) et progression 0..100. */
+    protected readonly refining_day: WritableSignal<number | null> = signal<number | null>(null);
+    protected readonly refine_progress: WritableSignal<number> = signal<number>(0);
+    /** Indicateurs « ça tourne » (purement affichage, n'influencent pas le calcul). */
+    protected readonly refine_elapsed_label: WritableSignal<string> = signal<string>('');
+    protected readonly refine_eta_label: WritableSignal<string> = signal<string>('');
+    /**
+     * Jours attaqués (D) pour lesquels la gazette annonce l'explosion des feux d'artifice : l'attaque
+     * réelle est réduite de 13 à 16 %, et les paliers planif(D−1) — pré-explosion — sont utilisés comme
+     * contrainte indépendante de la TDG(D) post-explosion pour resserrer la plage et la réduction.
+     */
+    private readonly fireworks_days: Set<number> = new Set<number>();
     protected step?: number = 0;
     private today_estim_chart!: Chart<'line'>;
     private today_offset_chart!: Chart<'bar'>;

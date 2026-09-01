@@ -1,5 +1,5 @@
 import { CommonModule, NgOptimizedImage, NgTemplateOutlet } from '@angular/common';
-import { Component, computed, Input, input, InputSignal, Signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, input, InputSignal, Signal, signal, untracked, WritableSignal } from '@angular/core';
 import { MatTabChangeEvent, MatTabsModule } from '@angular/material/tabs';
 
 import { HORDES_IMG_REPO } from '../../../../_abstract_model/const';
@@ -21,26 +21,17 @@ const material_modules: Imports = [MatTabsModule];
     selector: 'mho-registry-dice-cards',
     templateUrl: './plays-registry.component.html',
     styleUrls: ['./plays-registry.component.scss'],
-    imports: [...angular_common, ...components, ...material_modules, ...pipes,]
+    imports: [...angular_common, ...components, ...material_modules, ...pipes,],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class PlaysRegistryComponent {
 
     public completeCitizenList: InputSignal<CitizenInfo> = input.required();
     public completeItemsList: InputSignal<Item[]> = input.required();
     public displayPseudo: InputSignal<DisplayPseudoMode> = input.required();
+    public registry: InputSignal<Entry[] | undefined> = input.required();
 
-    // TODO: Skipped for migration because:
-    //  Accessor inputs cannot be migrated as they are too complex.
-    @Input({ required: true }) public set registry(registry: Entry[] | undefined) {
-        if (registry) {
-            this.entries = registry;
-            this.filterEntriesByType(registry);
-        } else {
-            this.entries = [];
-        }
-    }
-
-    protected entries_by_type: Entry[] = [];
+    protected readonly entries_by_type: WritableSignal<Entry[]> = signal([]);
     private play_type!: PlayType;
 
     protected readonly tabs: GameTab[] = [
@@ -74,6 +65,24 @@ export class PlaysRegistryComponent {
     private readonly cards_item: Signal<Item> = computed(() => this.completeItemsList()?.find((item: Item) => item.img.indexOf('item_cards') > -1) as Item);
     private readonly soccer_item: Signal<Item> = computed(() => this.completeItemsList()?.find((item: Item) => item.img.indexOf('item_soccer') > -1) as Item);
 
+    public constructor() {
+        // Reproduit l'ancien setter `@Input({required:true}) set registry` : ne réagit
+        // qu'à `registry`. `filterEntriesByType` lit completeItemsList()/completeCitizenList()
+        // (via cards_item()/dices_item()/soccer_item()) — `untracked()` empêche ces lectures de
+        // devenir des dépendances de l'effect, l'ancien setter ne réagissait qu'à `registry`
+        // (même divergence que Task 7 flag/telescope-registry, même remède).
+        effect((): void => {
+            const registry: Entry[] | undefined = this.registry();
+            untracked((): void => {
+                if (registry) {
+                    this.entries = registry;
+                    this.filterEntriesByType(registry);
+                } else {
+                    this.entries = [];
+                }
+            });
+        });
+    }
 
     protected changePlaysTab(event: MatTabChangeEvent): void {
         this.play_type = <PlayType>event.tab.labelClass;
@@ -84,17 +93,17 @@ export class PlaysRegistryComponent {
 
     private filterEntriesByType(entries: Entry[]): void {
         if (this.play_type === 'card') {
-            this.entries_by_type = entries.filter((entry: Entry) => {
+            this.entries_by_type.set(entries.filter((entry: Entry) => {
                 return Object.values(this.cards_item()?.label).some((label: string): boolean => entryHasKeyword(entry, label));
-            });
+            }));
         } else if (this.play_type === 'dice') {
-            this.entries_by_type = entries.filter((entry: Entry) => {
+            this.entries_by_type.set(entries.filter((entry: Entry) => {
                 return Object.values(this.dices_item()?.label).some((label: string): boolean => entryHasKeyword(entry, label));
-            });
+            }));
         } else if (this.play_type === 'soccer') {
-            this.entries_by_type = entries.filter((entry: Entry) => {
+            this.entries_by_type.set(entries.filter((entry: Entry) => {
                 return Object.values(this.soccer_item()?.label).some((label: string): boolean => entryHasKeyword(entry, label));
-            });
+            }));
         } else {
             const card_entries: Entry[] = entries.filter((entry: Entry) => {
                 return Object.values(this.cards_item()?.label).some((label: string): boolean => entryHasKeyword(entry, label));
@@ -105,7 +114,7 @@ export class PlaysRegistryComponent {
             const soccer_entries: Entry[] = entries.filter((entry: Entry) => {
                 return Object.values(this.soccer_item()?.label).some((label: string): boolean => entryHasKeyword(entry, label));
             });
-            this.entries_by_type = entries.filter((entry: Entry) => {
+            this.entries_by_type.set(entries.filter((entry: Entry) => {
                 const is_card_keyword: boolean = Object.values(this.cards_item()?.label).some((label: string): boolean => entryHasKeyword(entry, label));
                 const is_dice_keyword: boolean = Object.values(this.dices_item()?.label).some((label: string): boolean => entryHasKeyword(entry, label));
                 const is_soccer_keyword: boolean = Object.values(this.soccer_item()?.label).some((label: string): boolean => entryHasKeyword(entry, label));
@@ -134,7 +143,7 @@ export class PlaysRegistryComponent {
                     has_pendant = false;
                 }
                 return (is_dice_keyword || is_card_keyword || is_soccer_keyword) && has_pendant;
-            });
+            }));
         }
     }
 

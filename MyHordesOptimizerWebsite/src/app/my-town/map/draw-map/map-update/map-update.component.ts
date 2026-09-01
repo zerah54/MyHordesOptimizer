@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, DestroyRef, inject,OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, OnInit, signal, WritableSignal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -32,14 +32,23 @@ const material_modules: Imports = [MatButtonModule, MatDialogModule, MatFormFiel
     selector: 'mho-map-update',
     templateUrl: './map-update.component.html',
     styleUrls: ['./map-update.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class MapUpdateComponent implements OnInit {
     protected readonly data: MapUpdateData = inject<MapUpdateData>(MAT_DIALOG_DATA);
 
-    /** La cellule potentiellement modifiée */
+    /** La cellule potentiellement modifiée. Mutée uniquement depuis des événements du propre
+     * template (two-way binding des sous-panneaux, ngModel) : reste un champ simple. */
     protected cell: Cell;
-    protected digs!: Dig[];
+    /** Signal : réassigné depuis le subscribe de getDigs() (async) et lu par le propre template. */
+    protected readonly digs: WritableSignal<Dig[] | undefined> = signal(undefined);
+
+    /** Miroir signal de `data.cell` : `data.cell` (objet injecté, pas un signal) est réassigné de
+     * façon asynchrone dans saveCell() — sans ce miroir, les boutons [mat-dialog-close] resteraient
+     * sur la valeur d'avant sauvegarde sous OnPush (la vue n'est marquée dirty par aucun événement
+     * au moment de cette réassignation). */
+    protected readonly dialog_close_cell: WritableSignal<Cell> = signal(this.data.cell);
 
     protected readonly locale: string = moment.locale();
 
@@ -57,7 +66,7 @@ export class MapUpdateComponent implements OnInit {
             .pipe(takeUntilDestroyed(this.destroy_ref))
             .subscribe({
                 next: (digs: Dig[]): void => {
-                    this.digs = digs.filter((dig: Dig) => dig.x === this.cell.displayed_x && dig.y === this.cell.displayed_y);
+                    this.digs.set(digs.filter((dig: Dig) => dig.x === this.cell.displayed_x && dig.y === this.cell.displayed_y));
                 }
             });
     }
@@ -69,11 +78,13 @@ export class MapUpdateComponent implements OnInit {
             .subscribe({
                 next: (): void => {
                     this.data.cell = new Cell({ ...this.cell.modelToDto() });
+                    this.dialog_close_cell.set(this.data.cell);
                 }
             });
-        if (this.digs?.length > 0) {
+        const current_digs: Dig[] | undefined = this.digs();
+        if (current_digs && current_digs.length > 0) {
             this.digs_service
-                .updateDig(this.digs)
+                .updateDig(current_digs)
                 .pipe(takeUntilDestroyed(this.destroy_ref))
                 .subscribe();
         }

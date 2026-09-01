@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, input, InputSignal, output, OutputEmitterRef, Signal, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, input, InputSignal, output, OutputEmitterRef, Signal, viewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
@@ -16,6 +16,7 @@ const material_modules: Imports = [MatFormFieldModule, MatIconModule, MatInputMo
     selector: 'mho-header-with-string-filter',
     templateUrl: './header-with-string-filter.component.html',
     styleUrls: ['./header-with-string-filter.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class HeaderWithStringFilterComponent {

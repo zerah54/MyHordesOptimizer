@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
@@ -14,7 +14,8 @@ const material_modules: Imports = [MatButtonModule, MatDialogModule, MatIconModu
     selector: 'mho-thanks',
     templateUrl: './thanks.component.html',
     styleUrls: ['./thanks.component.scss'],
-    imports: [...angular_common, ...components, ...material_modules, ...pipes]
+    imports: [...angular_common, ...components, ...material_modules, ...pipes],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ThanksComponent {
 

@@ -1,5 +1,5 @@
 import { CommonModule, NgOptimizedImage } from '@angular/common';
-import { Component, Input, input,InputSignal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, InputSignal, Signal } from '@angular/core';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import moment from 'moment';
 
@@ -20,28 +20,26 @@ const material_modules: Imports = [MatSlideToggleModule];
     selector: 'mho-registry-bank-diff',
     templateUrl: './bank-diff-registry.component.html',
     styleUrls: ['./bank-diff-registry.component.scss'],
-    imports: [...angular_common, ...components, ...material_modules, ...pipes]
+    imports: [...angular_common, ...components, ...material_modules, ...pipes],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class BankDiffRegistryComponent {
 
     public completeCitizenList: InputSignal<CitizenInfo> = input.required();
     public displayPseudo: InputSignal<DisplayPseudoMode> = input.required();
     public completeItemsList: InputSignal<Item[]> = input.required();
+    public registry: InputSignal<Entry[] | undefined> = input.required();
 
-    // TODO: Skipped for migration because:
-    //  Accessor inputs cannot be migrated as they are too complex.
-    @Input({ required: true }) public set registry(registry: Entry[] | undefined) {
-        if (registry) {
-            this.entries = registry.filter((entry: Entry) => {
-                return this.give_keywords.some((give_keyword: string): boolean => entry.entry?.indexOf(' ' + give_keyword + ' ') > -1 || entry.entry?.indexOf(' ' + give_keyword + ':') > -1)
-                    || this.take_keywords.some((take_keyword: string): boolean => entry.entry?.indexOf(' ' + take_keyword + ' ') > -1 || entry.entry?.indexOf(' ' + take_keyword + ':') > -1);
-            });
-        } else {
-            this.entries = [];
+    protected readonly entries: Signal<Entry[]> = computed((): Entry[] => {
+        const registry: Entry[] | undefined = this.registry();
+        if (!registry) {
+            return [];
         }
-    }
-
-    protected entries: Entry[] = [];
+        return registry.filter((entry: Entry) => {
+            return this.give_keywords.some((give_keyword: string): boolean => entry.entry?.indexOf(' ' + give_keyword + ' ') > -1 || entry.entry?.indexOf(' ' + give_keyword + ':') > -1)
+                || this.take_keywords.some((take_keyword: string): boolean => entry.entry?.indexOf(' ' + take_keyword + ' ') > -1 || entry.entry?.indexOf(' ' + take_keyword + ':') > -1);
+        });
+    });
 
     /** La locale */
     protected readonly locale: string = moment.locale();

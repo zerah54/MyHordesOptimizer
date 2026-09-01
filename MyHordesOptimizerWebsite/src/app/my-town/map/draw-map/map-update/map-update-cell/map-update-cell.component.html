@@ -3,7 +3,7 @@
         <div class="content">
             <div class="zombies">
                 <mat-form-field class="zombies-here">
-                    <img [ngSrc]="HORDES_IMG_REPO + 'icons/small_zombie.gif'" width="16" height="16">
+                    <img matPrefix [ngSrc]="HORDES_IMG_REPO + 'icons/small_zombie.gif'" width="16" height="16">
                     <input matInput formControlName="nb_zombies">
                 </mat-form-field>
                 <mat-form-field class="killed-zombies">
@@ -88,7 +88,7 @@
             <div class="items">
                 @for (item of cell().items; track item.item_id) {
                     <div>
-                        @if (item | itemDetails:all_items; as complete_item) {
+                        @if (item | itemDetails:all_items(); as complete_item) {
                             <img [ngSrc]="HORDES_IMG_REPO + (complete_item | itemImg:item.is_broken)" [class.broken]="item.is_broken" width="16" height="16">
                         }
                         <span class="item-quantity">{{ item.count }}</span>
@@ -133,7 +133,7 @@
         </mat-form-field>
     </div>
     <div class="items">
-        @for (item of all_items; track item) {
+        @for (item of all_items(); track item) {
             @if (searchItem.value === '' || $any(item.label[$any(locale)] ? item.label[$any(locale)] : item.label).toLowerCase().indexOf(searchItem.value.toLowerCase()) > -1) {
                 <img [ngSrc]="HORDES_IMG_REPO + item.img" (click)="addItem(cell(), item.id)"
                      [title]="$any(item.label[$any(locale)] ? item.label[$any(locale)] : item.label)" width="16" height="16">
@@ -149,7 +149,7 @@
         </mat-form-field>
     </div>
     <div class="items">
-        @for (item of (cell().items | arrayItemDetails:all_items); track item) {
+        @for (item of (cell().items | arrayItemDetails:all_items()); track item) {
             @if (searchItem.value === '' || $any(item.label[$any(locale)] ? item.label[$any(locale)] : item.label).toLowerCase().indexOf(searchItem.value.toLowerCase()) > -1) {
                 <img [ngSrc]="HORDES_IMG_REPO + item.img" (click)="removeItem(cell(), item.id)"
                      [title]="$any(item.label[$any(locale)] ? item.label[$any(locale)] : item.label)" width="16" height="16">

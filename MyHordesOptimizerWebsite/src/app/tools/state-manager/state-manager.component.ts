@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, DestroyRef, inject, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, OnInit, signal, WritableSignal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -15,9 +15,9 @@ import { StatusEnum } from '../../_abstract_model/enum/status.enum';
 import { ApiService } from '../../_abstract_model/services/api.service';
 import { CitizenDayStateService } from '../../_abstract_model/services/citizen-day-state.service';
 import { Imports, ListForAddRemove } from '../../_abstract_model/types/_types';
+import { CitizenState } from '../../_abstract_model/types/citizen-state.class';
 import { CitizenStateStep } from '../../_abstract_model/types/citizen-state-step.class';
 import { CitizenStateTrace } from '../../_abstract_model/types/citizen-state-trace.class';
-import { CitizenState } from '../../_abstract_model/types/citizen-state.class';
 import { Item } from '../../_abstract_model/types/item.class';
 import { RankedOrder } from '../../_abstract_model/types/ranked-order.class';
 import { CompactStepperComponent } from '../../_shared/compact-stepper/compact-stepper.component';
@@ -75,24 +75,28 @@ interface TraceRow {
     selector: 'mho-state-manager',
     templateUrl: './state-manager.component.html',
     styleUrls: ['./state-manager.component.scss'],
-    imports: [...angular_common, ...components, ...material_modules]
+    imports: [...angular_common, ...components, ...material_modules],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class StateManagerComponent implements OnInit {
     private readonly api: ApiService = inject(ApiService);
     private readonly state_service: CitizenDayStateService = inject(CitizenDayStateService);
     private readonly destroy_ref: DestroyRef = inject(DestroyRef);
 
+    /** La liste complète des items impactants — jamais lue par le propre template, reste un champ simple. */
     protected items: Item[] = [];
-    /** Groupe unique proposé par le sac (`mho-list-element-add-remove`) pour ajouter un objet au sac de départ. */
-    protected bag_lists: ListForAddRemove[] = [];
+    /** Groupe unique proposé par le sac (`mho-list-element-add-remove`) pour ajouter un objet au sac de départ.
+     *  Signal : peuplé depuis le forkJoin de {@link ngOnInit} (asynchrone), lu par le propre template. */
+    protected readonly bag_lists: WritableSignal<ListForAddRemove[]> = signal([]);
     protected readonly locale: string = moment.locale();
     protected readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
     protected readonly ap_icon: string = 'icons/ap_small' + (this.locale === 'de' ? '' : '_' + this.locale) + '.gif';
     protected readonly ep_icon: string = 'icons/sp_small' + (this.locale === 'de' ? '' : '_' + this.locale) + '.gif';
-    /** Icônes des objets `bike_#00`/`shoe_#00`/`car_door_#00`, peuplées en {@link ngOnInit} depuis la liste complète des items. */
-    protected bike_icon: string = '';
-    protected shoe_icon: string = '';
-    protected defence_cp_icon: string = '';
+    /** Icônes des objets `bike_#00`/`shoe_#00`/`car_door_#00`, peuplées en {@link ngOnInit} depuis la liste complète des items.
+     *  Signaux : voir {@link bag_lists}. */
+    protected readonly bike_icon: WritableSignal<string> = signal('');
+    protected readonly shoe_icon: WritableSignal<string> = signal('');
+    protected readonly defence_cp_icon: WritableSignal<string> = signal('');
     /** Seul objet du jeu taggé `defence_cp` (voir CitizenPdcRules côté API) — car_door_#00. */
     private static readonly DEFENCE_CP_ITEM_UID: string = 'car_door_#00';
     protected readonly shield_icon: string = 'item/item_shield.gif';
@@ -132,15 +136,19 @@ export class StateManagerComponent implements OnInit {
     /** Objets emportés au départ — se vide au fil des étapes jouées, voir {@link remainingBag}. */
     protected starting_bag: Item[] = [];
     protected steps: StepEntry[] = [];
-    /** Ordre du meilleur candidat (1er classé), selon l'état courant — pilote {@link orderedRemainingBag}. */
-    protected best_order: Item[] = [];
-    /** Tous les ordres de consommation distincts du sac, du plus optimisé au pire — aperçu en lecture seule. */
-    protected ranked_orders: RankedOrderView[] = [];
+    /** Ordre du meilleur candidat (1er classé), selon l'état courant — pilote {@link orderedRemainingBag}.
+     *  Signal : peuplé depuis le switchMap de {@link ngOnInit} (asynchrone), lu par le propre template. */
+    protected readonly best_order: WritableSignal<Item[]> = signal([]);
+    /** Tous les ordres de consommation distincts du sac, du plus optimisé au pire — aperçu en lecture seule.
+     *  Signal : voir {@link best_order}. */
+    protected readonly ranked_orders: WritableSignal<RankedOrderView[]> = signal([]);
 
     // --- Résultat ---
-    protected rows: TraceRow[] = [];
-    /** État de départ tel que renvoyé par le serveur (PDC calculé) — voir {@link currentState}. Absent tant qu'aucun appel n'a abouti. */
-    protected computed_starting_state?: CitizenState;
+    /** Signal : peuplé depuis le .subscribe() de {@link compute} (asynchrone), lu par le propre template. */
+    protected readonly rows: WritableSignal<TraceRow[]> = signal([]);
+    /** État de départ tel que renvoyé par le serveur (PDC calculé) — voir {@link currentState}. Absent tant qu'aucun appel n'a abouti.
+     *  Signal : voir {@link rows}. */
+    protected readonly computed_starting_state: WritableSignal<CitizenState | undefined> = signal(undefined);
 
     // Déclencheur de {@link updateRanking}, passé par switchMap : sans ça, deux appels successifs
     // (ex. toggle rapide d'un perk PDC) peuvent résoudre dans le désordre et la réponse la plus
@@ -153,13 +161,14 @@ export class StateManagerComponent implements OnInit {
                 trigger.item_ids.length === 0 ? of([]) : this.state_service.rankOrders(trigger.state, trigger.item_ids)),
             takeUntilDestroyed(this.destroy_ref),
         ).subscribe((orders: RankedOrder[]) => {
-            this.ranked_orders = orders.map((candidate: RankedOrder) => ({
+            const ranked_orders: RankedOrderView[] = orders.map((candidate: RankedOrder) => ({
                 items: this.resolveOrder(candidate.order, this.starting_bag),
                 tier: StateManagerComponent.TIER_LABELS[candidate.tier] ?? candidate.tier,
                 total_distance: candidate.total_distance,
                 final_state: candidate.final_state,
             }));
-            this.best_order = this.ranked_orders[0]?.items ?? [];
+            this.ranked_orders.set(ranked_orders);
+            this.best_order.set(ranked_orders[0]?.items ?? []);
         });
 
         forkJoin({
@@ -170,10 +179,10 @@ export class StateManagerComponent implements OnInit {
             .subscribe(({ items, impactful_uids }: { items: Item[]; impactful_uids: string[] }) => {
                 const impactful_uid_set: Set<string> = new Set(impactful_uids);
                 this.items = items.filter((item: Item) => impactful_uid_set.has(item.uid));
-                this.bag_lists = [{ label: $localize`Objets`, list: this.items }];
-                this.bike_icon = items.find((item: Item) => item.uid === 'bike_#00')?.img ?? '';
-                this.shoe_icon = items.find((item: Item) => item.uid === 'shoe_#00')?.img ?? '';
-                this.defence_cp_icon = items.find((item: Item) => item.uid === StateManagerComponent.DEFENCE_CP_ITEM_UID)?.img ?? '';
+                this.bag_lists.set([{ label: $localize`Objets`, list: this.items }]);
+                this.bike_icon.set(items.find((item: Item) => item.uid === 'bike_#00')?.img ?? '');
+                this.shoe_icon.set(items.find((item: Item) => item.uid === 'shoe_#00')?.img ?? '');
+                this.defence_cp_icon.set(items.find((item: Item) => item.uid === StateManagerComponent.DEFENCE_CP_ITEM_UID)?.img ?? '');
                 this.updateRanking();
             });
 
@@ -186,7 +195,10 @@ export class StateManagerComponent implements OnInit {
     protected addToBag(item_id: number): void {
         const item: Item | undefined = this.items.find((item: Item) => item.id === item_id);
         if (item) {
-            this.starting_bag.push(item);
+            // Réassignation immuable : `[currentList]="starting_bag"` alimente l'input signal
+            // (`input.required()`) de `mho-list-element-add-remove`, un composant OnPush — un `.push()`
+            // en place laisserait la référence inchangée et l'input ne se mettrait jamais à jour.
+            this.starting_bag = [...this.starting_bag, item];
             this.updateRanking();
         }
     }
@@ -195,7 +207,7 @@ export class StateManagerComponent implements OnInit {
     protected removeFromBag(item_id: number): void {
         const index: number = this.starting_bag.findIndex((item: Item) => item.id === item_id);
         if (index > -1) {
-            this.starting_bag.splice(index, 1);
+            this.starting_bag = this.starting_bag.filter((_: Item, i: number) => i !== index);
             this.updateRanking();
         }
     }
@@ -209,7 +221,7 @@ export class StateManagerComponent implements OnInit {
     /** {@link remainingBag} trié selon {@link best_order} (retombe sur l'ordre d'ajout tant que le classement n'est pas encore à jour). */
     protected orderedRemainingBag(): Item[] {
         const remaining: Item[] = this.remainingBag();
-        const rank: Map<number, number> = new Map(this.best_order.map((item: Item, index: number) => [item.id, index]));
+        const rank: Map<number, number> = new Map(this.best_order().map((item: Item, index: number) => [item.id, index]));
         return [...remaining].sort((a: Item, b: Item) => (rank.get(a.id) ?? Infinity) - (rank.get(b.id) ?? Infinity));
     }
 
@@ -376,13 +388,14 @@ export class StateManagerComponent implements OnInit {
 
     /** État courant : dernière étape de la trace, sinon l'état de départ calculé côté serveur (PDC inclus) une fois {@link compute} passé, sinon l'état brut. */
     protected currentState(): CitizenState {
-        if (this.rows.length > 0) return this.rows[this.rows.length - 1].state;
+        const rows: TraceRow[] = this.rows();
+        if (rows.length > 0) return rows[rows.length - 1].state;
         return this.startingState();
     }
 
     /** État de départ calculé côté serveur (PDC inclus) une fois {@link compute} passé, sinon l'état brut — jamais affecté par la séquence jouée. */
     private startingState(): CitizenState {
-        return this.computed_starting_state ?? this.buildStartingState();
+        return this.computed_starting_state() ?? this.buildStartingState();
     }
 
     /** Résout une liste d'ids (avec doublons éventuels) en objets du sac fourni, dans l'ordre donné. */
@@ -414,9 +427,9 @@ export class StateManagerComponent implements OnInit {
         this.state_service.simulate(starting_state, this.steps.map((entry: StepEntry) => entry.step))
             .pipe(takeUntilDestroyed(this.destroy_ref))
             .subscribe((trace: CitizenStateTrace) => {
-                this.computed_starting_state = trace.starting_state;
+                this.computed_starting_state.set(trace.starting_state);
                 let previous: CitizenState = trace.starting_state;
-                this.rows = trace.steps.map((result, index) => {
+                this.rows.set(trace.steps.map((result, index) => {
                     const entry: StepEntry | undefined = this.steps[index];
                     const state: CitizenState = result.state_after;
                     const row: TraceRow = {
@@ -432,7 +445,7 @@ export class StateManagerComponent implements OnInit {
                     };
                     previous = state;
                     return row;
-                });
+                }));
                 this.updateRanking();
             });
     }

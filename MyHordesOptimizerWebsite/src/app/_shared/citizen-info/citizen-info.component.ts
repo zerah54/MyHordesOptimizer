@@ -1,5 +1,5 @@
 import { CommonModule, NgOptimizedImage } from '@angular/common';
-import { booleanAttribute, Component, input,InputSignal, InputSignalWithTransform } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, Component, input, InputSignal, InputSignalWithTransform } from '@angular/core';
 import moment from 'moment';
 
 import { HORDES_IMG_REPO } from '../../_abstract_model/const';
@@ -16,7 +16,8 @@ const material_modules: Imports = [];
     selector: 'mho-citizen-info',
     templateUrl: './citizen-info.component.html',
     styleUrls: ['./citizen-info.component.scss'],
-    imports: [...angular_common, ...components, ...material_modules, ...pipes]
+    imports: [...angular_common, ...components, ...material_modules, ...pipes],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CitizenInfoComponent {
 

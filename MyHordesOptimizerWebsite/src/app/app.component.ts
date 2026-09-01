@@ -1,8 +1,8 @@
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { OverlayContainer } from '@angular/cdk/overlay';
 import { CommonModule, NgOptimizedImage } from '@angular/common';
-import { Component, DestroyRef, HostListener, inject, LOCALE_ID, OnInit, Signal, viewChild } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, LOCALE_ID, OnInit, Signal, signal, viewChild, WritableSignal } from '@angular/core';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { MatCardModule } from '@angular/material/card';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSidenavContainer, MatSidenavModule } from '@angular/material/sidenav';
@@ -27,6 +27,10 @@ const material_modules: Imports = [MatCardModule, MatProgressSpinnerModule, MatS
     selector: 'mho-root',
     templateUrl: './app.component.html',
     styleUrls: ['./app.component.scss'],
+    host: {
+        '(window:resize)': 'onResize()'
+    },
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class AppComponent implements OnInit {
@@ -38,18 +42,18 @@ export class AppComponent implements OnInit {
 
     private readonly sidenav_container: Signal<MatSidenavContainer> = viewChild.required<MatSidenavContainer>('sidenavContainer');
 
-    protected is_gt_xs: boolean = this.breakpoint_observer.isMatched(BREAKPOINTS['gt-xs']);
-    protected is_loading: boolean = false;
-    protected ready: boolean = false;
+    protected readonly is_gt_xs: WritableSignal<boolean> = signal(this.breakpoint_observer.isMatched(BREAKPOINTS['gt-xs']));
+    private loading_service: LoadingOverlayService = inject(LoadingOverlayService);
+    protected readonly is_loading: Signal<boolean> = toSignal(this.loading_service.is_loading_obs, { initialValue: false });
+    protected readonly ready: WritableSignal<boolean> = signal(false);
     protected readonly theme: string | null = localStorage.getItem('theme');
 
-    private loading_service: LoadingOverlayService = inject(LoadingOverlayService);
     private authentication_api: AuthenticationService = inject(AuthenticationService);
     private readonly destroy_ref: DestroyRef = inject(DestroyRef);
 
-    @HostListener('window:resize', ['$event'])
-    public onResize(): void {
-        this.is_gt_xs = this.breakpoint_observer.isMatched(BREAKPOINTS['gt-xs']);
+    /** Migré depuis `@HostListener('window:resize')` vers `host: {}` (voir décorateur ci-dessus). */
+    protected onResize(): void {
+        this.is_gt_xs.set(this.breakpoint_observer.isMatched(BREAKPOINTS['gt-xs']));
     }
 
     public constructor() {
@@ -58,16 +62,8 @@ export class AppComponent implements OnInit {
 
     public ngOnInit(): void {
 
-        this.loading_service.is_loading_obs
-            .pipe(takeUntilDestroyed(this.destroy_ref))
-            .subscribe({
-                next: (is_loading: boolean) => {
-                    this.is_loading = is_loading;
-                }
-            });
-
         this.router.events.subscribe(() => {
-            if (!this.is_gt_xs) {
+            if (!this.is_gt_xs()) {
                 this.sidenav_container().close();
             }
         });
@@ -81,13 +77,13 @@ export class AppComponent implements OnInit {
             .pipe(takeUntilDestroyed(this.destroy_ref))
             .subscribe({
                 next: () => {
-                    this.ready = true;
+                    this.ready.set(true);
                 },
                 error: () => {
-                    this.ready = true;
+                    this.ready.set(true);
                 },
                 complete: () => {
-                    this.ready = true;
+                    this.ready.set(true);
                 }
             });
     }

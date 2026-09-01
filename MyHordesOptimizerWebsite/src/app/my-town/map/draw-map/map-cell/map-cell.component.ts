@@ -1,6 +1,6 @@
 import { animate, style, transition, trigger } from '@angular/animations';
 import { CommonModule, DecimalPipe, NgOptimizedImage } from '@angular/common';
-import { Component, DestroyRef, inject, input, InputSignal, output,OutputEmitterRef } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, input, InputSignal, output, OutputEmitterRef } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatDialog } from '@angular/material/dialog';
 import moment from 'moment';
@@ -46,6 +46,7 @@ const material_modules: Imports = [];
             ])
         ])
     ],
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [...angular_common, ...components, ...material_modules, ...pipes, MapCellTooltipDirective]
 })
 export class MapCellComponent {

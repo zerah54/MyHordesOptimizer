@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, Input, input,InputSignal, Signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, InputSignal, Signal, untracked } from '@angular/core';
 import { MatDividerModule } from '@angular/material/divider';
 
 import { DisplayPseudoMode, Entry } from '../../../../_abstract_model/interfaces';
@@ -19,34 +19,28 @@ const material_modules: Imports = [MatDividerModule];
     selector: 'mho-registry-flag',
     templateUrl: './flag-registry.component.html',
     styleUrls: ['./flag-registry.component.scss'],
-    imports: [...angular_common, ...components, ...material_modules, ...pipes]
+    imports: [...angular_common, ...components, ...material_modules, ...pipes],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class FlagRegistryComponent {
 
     public completeCitizenList: InputSignal<CitizenInfo> = input.required();
     public completeItemsList: InputSignal<Item[]> = input.required();
     public displayPseudo: InputSignal<DisplayPseudoMode> = input.required();
-
-    // TODO: Skipped for migration because:
-    //  Accessor inputs cannot be migrated as they are too complex.
-    @Input({ required: true }) public set registry(registry: Entry[] | undefined) {
-        if (registry) {
-            this.entries = registry;
-            this.filterEntries(registry);
-        } else {
-            this.entries = [];
-        }
-    }
-
-    protected entries: Entry[] = [];
+    public registry: InputSignal<Entry[] | undefined> = input.required();
 
     private readonly flag_item: Signal<Item> = computed(() => this.completeItemsList()?.find((item: Item) => item.img.indexOf('item_flag') > -1) as Item);
 
-    private filterEntries(entries: Entry[]): void {
-        this.entries = entries.filter((entry: Entry) => {
-            return Object.values(this.flag_item()?.label).some((label: string): boolean => entryHasKeyword(entry, label));
+    protected readonly entries: Signal<Entry[]> = computed((): Entry[] => {
+        const registry: Entry[] | undefined = this.registry();
+        if (!registry) {
+            return [];
+        }
+        const flag_item: Item = untracked(this.flag_item);
+        return registry.filter((entry: Entry) => {
+            return Object.values(flag_item?.label).some((label: string): boolean => entryHasKeyword(entry, label));
         });
-    }
+    });
 }
 
 

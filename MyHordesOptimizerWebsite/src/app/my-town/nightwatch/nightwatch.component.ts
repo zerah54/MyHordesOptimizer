@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 
 import { Imports } from '../../_abstract_model/types/_types';
@@ -12,6 +12,7 @@ const material_modules: Imports = [MatCardModule];
     selector: 'mho-nightwatch',
     templateUrl: './nightwatch.component.html',
     styleUrls: ['./nightwatch.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class NightwatchComponent {

@@ -1,4 +1,4 @@
-@for (rations of entries | well:completeCitizenList(); track rations) {
+@for (rations of entries() | well:completeCitizenList(); track rations) {
     <div class="well">
         <h4 class="rations">{{ rations.rations }} {rations.rations, plural, =0 {ration prise} =1 {ration prise} other {rations prises}}
             ({{ rations.citizen.length }})</h4>

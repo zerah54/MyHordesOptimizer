@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, input, InputSignal, output, OutputEmitterRef, Signal, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input, InputSignal, output, OutputEmitterRef, Signal, signal, viewChild, WritableSignal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
@@ -18,6 +18,7 @@ const material_modules: Imports = [MatFormFieldModule, MatIconModule, MatTooltip
     selector: 'mho-header-with-select-filter',
     templateUrl: './header-with-select-filter.component.html',
     styleUrls: ['./header-with-select-filter.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class HeaderWithSelectFilterComponent<T> {
@@ -44,23 +45,25 @@ export class HeaderWithSelectFilterComponent<T> {
 
     protected readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
 
-    public visible: boolean = false;
+    // Signal (pas un simple champ) : muté depuis le setTimeout de checkVisibility() et lu par le
+    // template sous OnPush — un champ muté depuis un setTimeout ne marque pas la vue pour vérification.
+    protected readonly visible: WritableSignal<boolean> = signal(false);
 
     /** Affiche le filtre */
-    public displayFilter(): void {
-        this.visible = true;
+    protected displayFilter(): void {
+        this.visible.set(true);
         setTimeout(() => {
             this.filter().select()?.open();
         });
     }
 
     /** Vérifie si le filtre doit toujours être affiché */
-    public checkVisibility(): void {
+    protected checkVisibility(): void {
         setTimeout(() => {
             if (this.filter().select()?.panelOpen) {
-                this.visible = true;
+                this.visible.set(true);
             } else {
-                this.visible = this.filterValue() !== null && this.filterValue() !== undefined && this.filterValue().length > 0;
+                this.visible.set(this.filterValue() !== null && this.filterValue() !== undefined && this.filterValue().length > 0);
             }
         });
     }

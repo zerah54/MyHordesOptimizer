@@ -1,5 +1,17 @@
 import { CommonModule, NgOptimizedImage } from '@angular/common';
-import { Component, DestroyRef, inject, Input, input, InputSignal, output,OutputEmitterRef } from '@angular/core';
+import {
+    ChangeDetectionStrategy,
+    Component,
+    DestroyRef,
+    effect,
+    inject,
+    input,
+    InputSignal,
+    output,
+    OutputEmitterRef,
+    signal,
+    WritableSignal
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -24,6 +36,7 @@ const material_modules: Imports = [MatButtonModule, MatDividerModule, MatTooltip
     selector: 'mho-dig',
     templateUrl: './dig.component.html',
     styleUrls: ['./dig.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class DigComponent {
@@ -33,34 +46,40 @@ export class DigComponent {
     public citizen: InputSignal<Citizen> = input.required();
     public day: InputSignal<number> = input.required();
     public digsMode: InputSignal<'creation' | 'update' | 'registry'> = input.required();
-
-    // TODO: Skipped for migration because:
-    //  Accessor inputs cannot be migrated as they are too complex.
-    @Input({ required: true }) public set dig(dig: Dig | undefined) {
-        setTimeout(() => {
-            if (this.digsMode() === 'registry') {
-                this.updated_dig = dig;
-            } else {
-                this.updated_dig = undefined;
-            }
-
-            if (dig) {
-                this.current_dig = dig;
-            } else {
-                this.current_dig = new Dig();
-            }
-        });
-
-    }
+    public dig: InputSignal<Dig | undefined> = input.required();
 
     public deletedDig: OutputEmitterRef<Dig> = output();
     public updatedDig: OutputEmitterRef<Dig[]> = output();
 
-    protected current_dig!: Dig;
-    protected updated_dig?: Dig;
+    // Signaux (pas de simples champs) : mutés depuis le setTimeout ci-dessous et lus par le
+    // template sous OnPush — un champ muté depuis un effect()/setTimeout ne marque pas la vue
+    // pour vérification.
+    protected readonly current_dig: WritableSignal<Dig | undefined> = signal(undefined);
+    protected readonly updated_dig: WritableSignal<Dig | undefined> = signal(undefined);
 
     private readonly digs_api: DigsService = inject(DigsService);
     private readonly destroy_ref: DestroyRef = inject(DestroyRef);
+
+    public constructor() {
+        // Reproduit l'ancien setter `@Input({required:true}) set dig` : ne réagit qu'à `dig`, et
+        // garde le même setTimeout (même délai/timing que l'original, pas juste la même logique).
+        effect((): void => {
+            const dig: Dig | undefined = this.dig();
+            setTimeout(() => {
+                if (this.digsMode() === 'registry') {
+                    this.updated_dig.set(dig);
+                } else {
+                    this.updated_dig.set(undefined);
+                }
+
+                if (dig) {
+                    this.current_dig.set(dig);
+                } else {
+                    this.current_dig.set(new Dig());
+                }
+            });
+        });
+    }
 
     /** Le dossier dans lequel sont stockées les images */
     protected HORDES_IMG_REPO: string = HORDES_IMG_REPO;
@@ -88,11 +107,11 @@ export class DigComponent {
 
 
     protected changeDigToUpdate(citizen: Citizen, dig?: Dig): void {
-        this.updated_dig = undefined;
+        this.updated_dig.set(undefined);
         if (dig) {
-            this.updated_dig = new Dig(dig.modelToDto());
+            this.updated_dig.set(new Dig(dig.modelToDto()));
         } else {
-            this.updated_dig = new Dig({
+            this.updated_dig.set(new Dig({
                 cellId: undefined,
                 day: this.day(),
                 diggerId: citizen.id,
@@ -101,18 +120,19 @@ export class DigComponent {
                 nbTotalDig: 0,
                 x: getTown()?.town_x || 0,
                 y: getTown()?.town_y || 0
-            });
+            }));
         }
     }
 
     protected updateDig(): void {
-        if (this.updated_dig) {
-            this.digs_api.updateDig([this.updated_dig])
+        const updated_dig: Dig | undefined = this.updated_dig();
+        if (updated_dig) {
+            this.digs_api.updateDig([updated_dig])
                 .pipe(takeUntilDestroyed(this.destroy_ref))
                 .subscribe((new_digs: Dig[]) => {
                     this.updatedDig.emit(new_digs);
                     if (this.digsMode() !== 'registry') {
-                        this.updated_dig = undefined;
+                        this.updated_dig.set(undefined);
                     }
                 });
         }

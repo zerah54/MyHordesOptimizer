@@ -1,5 +1,5 @@
 import { CommonModule, DecimalPipe, NgOptimizedImage } from '@angular/common';
-import { Component, DestroyRef, EventEmitter, inject, OnInit, Signal, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, EventEmitter, inject, OnInit, Signal, signal, viewChild, WritableSignal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -38,7 +38,8 @@ const material_modules: Imports = [MatButtonModule, MatCardModule, MatIconModule
     selector: 'mho-ruins',
     templateUrl: './ruins.component.html',
     styleUrls: ['./ruins.component.scss'],
-    imports: [...angular_common, ...components, ...directives, ...material_modules, ...pipes]
+    imports: [...angular_common, ...components, ...directives, ...material_modules, ...pipes],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class RuinsComponent implements OnInit {
 
@@ -49,13 +50,13 @@ export class RuinsComponent implements OnInit {
     /** La ville actuelle */
     protected readonly town: TownDetails | null = getTown();
     /** La liste des bâtiments du jeu */
-    protected ruins!: Ruin[];
+    protected readonly ruins: WritableSignal<Ruin[] | undefined> = signal(undefined);
     /** La liste des bâtiments de la ville */
-    protected town_ruins!: Ruin[];
+    protected readonly town_ruins: WritableSignal<Ruin[]> = signal([]);
     /** La liste des objets du jeu */
-    protected items: RuinItem[] = [];
+    protected readonly items: WritableSignal<RuinItem[]> = signal([]);
     /** La datasource pour le tableau */
-    protected datasource: MatTableDataSource<Ruin> = new MatTableDataSource();
+    protected readonly datasource: WritableSignal<MatTableDataSource<Ruin>> = signal(new MatTableDataSource());
     /** La liste des colonnes */
     protected readonly columns: RuinColumns[] = [
         { id: 'label', header: $localize`Nom du bâtiment`, sortable: true, sticky: true },
@@ -84,26 +85,27 @@ export class RuinsComponent implements OnInit {
             .pipe(takeUntilDestroyed(this.destroy_ref))
             .subscribe({
                 next: (ruins: Ruin[]) => {
-                    this.ruins = ruins;
+                    this.ruins.set(ruins);
                     getTown();
                     this.ruins_filters_change
                         .pipe(takeUntilDestroyed(this.destroy_ref))
                         .subscribe(() => {
-                            this.datasource.filter = JSON.stringify(this.ruins_filters);
+                            this.datasource().filter = JSON.stringify(this.ruins_filters);
                         });
 
-                    this.items = [];
-                    this.ruins.forEach((ruin: Ruin) => {
+                    const items: RuinItem[] = [];
+                    ruins.forEach((ruin: Ruin) => {
                         ruin.drops.forEach((ruin_item: RuinItem) => {
-                            if (!this.items.some((item: RuinItem) => item.item.id === ruin_item.item.id)) {
-                                this.items.push(ruin_item);
+                            if (!items.some((item: RuinItem) => item.item.id === ruin_item.item.id)) {
+                                items.push(ruin_item);
                             }
                         });
                     });
+                    this.items.set(items);
 
-                    this.datasource = new MatTableDataSource(this.ruins);
-                    this.datasource.filterPredicate = this.customFilter.bind(this);
-                    this.datasource.sortingDataAccessor = (item: Ruin, property: string): string | number => {
+                    const new_datasource: MatTableDataSource<Ruin> = new MatTableDataSource(ruins);
+                    new_datasource.filterPredicate = this.customFilter.bind(this);
+                    new_datasource.sortingDataAccessor = (item: Ruin, property: string): string | number => {
                         switch (property) {
                             case 'label':
                                 return item.label[this.locale];
@@ -111,8 +113,9 @@ export class RuinsComponent implements OnInit {
                                 return <string>item[property as keyof Ruin];
                         }
                     };
+                    this.datasource.set(new_datasource);
                     setTimeout(() => {
-                        this.datasource.sort = this.sort();
+                        this.datasource().sort = this.sort();
                     });
                 }
             });
@@ -122,10 +125,15 @@ export class RuinsComponent implements OnInit {
                 .pipe(takeUntilDestroyed(this.destroy_ref))
                 .subscribe({
                     next: (town_ruins: Ruin[]) => {
-                        this.town_ruins = town_ruins;
+                        this.town_ruins.set(town_ruins);
                     }
                 });
         }
+    }
+
+    /** Bascule la datasource entre les ruines du jeu et celles de la ville active. */
+    protected applyInsideTownFilter(): void {
+        this.datasource().data = this.ruins_filters.inside_town ? this.town_ruins() : (this.ruins() ?? []);
     }
 
     private customFilter(data: Ruin, filter: string): boolean {

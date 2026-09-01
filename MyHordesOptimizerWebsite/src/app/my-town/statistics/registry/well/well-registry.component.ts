@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, input,InputSignal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, InputSignal, Signal } from '@angular/core';
 import { MatDividerModule } from '@angular/material/divider';
 
 import { DisplayPseudoMode, Entry } from '../../../../_abstract_model/interfaces';
@@ -17,26 +17,24 @@ const material_modules: Imports = [MatDividerModule];
     selector: 'mho-registry-well',
     templateUrl: './well-registry.component.html',
     styleUrls: ['./well-registry.component.scss'],
-    imports: [...angular_common, ...components, ...material_modules, ...pipes]
+    imports: [...angular_common, ...components, ...material_modules, ...pipes],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class WellRegistryComponent {
 
     public completeCitizenList: InputSignal<CitizenInfo> = input.required();
     public displayPseudo: InputSignal<DisplayPseudoMode> = input.required();
+    public registry: InputSignal<Entry[] | undefined> = input.required();
 
-    // TODO: Skipped for migration because:
-    //  Accessor inputs cannot be migrated as they are too complex.
-    @Input({ required: true }) public set registry(registry: Entry[] | undefined) {
-        if (registry) {
-            this.entries = registry.filter((entry: Entry) => {
-                return this.well_keywords.some((well_keywords: string): boolean => entry.entry?.indexOf(' ' + well_keywords + ' ') > -1);
-            });
-        } else {
-            this.entries = [];
+    protected readonly entries: Signal<Entry[]> = computed((): Entry[] => {
+        const registry: Entry[] | undefined = this.registry();
+        if (!registry) {
+            return [];
         }
-    }
-
-    protected entries: Entry[] = [];
+        return registry.filter((entry: Entry) => {
+            return this.well_keywords.some((well_keywords: string): boolean => entry.entry?.indexOf(' ' + well_keywords + ' ') > -1);
+        });
+    });
 
     private readonly well_keywords: string[] = [
         'a pris une ration', 'hat eine Ration Wasser genommen', 'has taken a ration', 'ha tomado una ración',

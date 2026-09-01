@@ -1,5 +1,5 @@
 import { CommonModule, NgTemplateOutlet } from '@angular/common';
-import { Component, DOCUMENT, inject, LOCALE_ID, model, ModelSignal, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DOCUMENT, inject, LOCALE_ID, model, ModelSignal, OnInit, signal, WritableSignal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
@@ -28,7 +28,8 @@ const material_modules: Imports = [MatButtonModule, MatDividerModule, MatIconMod
     selector: 'mho-menu',
     templateUrl: './menu.component.html',
     styleUrls: ['./menu.component.scss'],
-    imports: [...angular_common, ...components, ...material_modules, ...pipes]
+    imports: [...angular_common, ...components, ...material_modules, ...pipes],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class MenuComponent implements OnInit {
     public sidenavContainer: ModelSignal<MatSidenavContainer> = model.required();
@@ -38,7 +39,11 @@ export class MenuComponent implements OnInit {
         { label: $localize`Rose`, class: 'pink' },
         { label: $localize`Brun`, class: 'brown' },
     ];
-    protected selected_theme: Theme | undefined = this.themes.find((theme: Theme) => theme.class === localStorage.getItem('theme'));
+    /** Signal : réassigné depuis un `setTimeout()` en production (voir {@link defineThemes},
+     *  {@link useEventTheme}) une fois le thème vacances passé, lu par le propre template. */
+    protected readonly selected_theme: WritableSignal<Theme | undefined> = signal(
+        this.themes.find((theme: Theme) => theme.class === localStorage.getItem('theme'))
+    );
     /** La liste des langues disponibles */
     protected language_list: Language[] = [
         { code: 'en', label: 'English' },
@@ -255,10 +260,10 @@ export class MenuComponent implements OnInit {
     }
 
     protected changeTheme(new_theme: Theme): void {
-        this.selected_theme = new_theme;
+        this.selected_theme.set(new_theme);
         localStorage.setItem('theme', new_theme.class);
         setTimeout(() => {
-            this.document.location.reload();
+            this.reloadPage();
         });
     }
 
@@ -271,8 +276,14 @@ export class MenuComponent implements OnInit {
         this.site_language = new_language;
         localStorage.setItem('mho-locale', new_language.code);
         setTimeout(() => {
-            this.document.location.reload();
+            this.reloadPage();
         });
+    }
+
+    /** Extrait pour rester substituable en test (`location.reload` n'est ni espionnable ni redéfinissable
+     *  sous Chrome Headless). */
+    private reloadPage(): void {
+        this.document.location.reload();
     }
 
     /** Résout le lien d'une entrée en tenant compte du contexte d'observation. */
@@ -330,7 +341,7 @@ export class MenuComponent implements OnInit {
                 this.themes.splice(0, 1);
                 this.useEventTheme();
             }
-        } else if (this.isNothing() && (this.selected_theme?.class === 'noel' || !this.selected_theme)) {
+        } else if (this.isNothing() && (this.selected_theme()?.class === 'noel' || !this.selected_theme())) {
             setTimeout(() => {
                 this.changeTheme(this.themes[0]);
             });
@@ -343,15 +354,15 @@ export class MenuComponent implements OnInit {
                 this.themes.splice(0, 1);
                 this.useEventTheme();
             }
-        } else if (this.isNothing() && (this.selected_theme?.class === 'halloween' || !this.selected_theme)) {
+        } else if (this.isNothing() && (this.selected_theme()?.class === 'halloween' || !this.selected_theme())) {
             setTimeout(() => {
                 this.changeTheme(this.themes[0]);
             });
         }
 
 
-        this.selected_theme = this.themes.find((theme: Theme) => theme.class === localStorage.getItem('theme'))
-            || this.themes.find((theme: Theme) => theme.class === '');
+        this.selected_theme.set(this.themes.find((theme: Theme) => theme.class === localStorage.getItem('theme'))
+            || this.themes.find((theme: Theme) => theme.class === ''));
 
 
         this.charts_theming_service.defineColorsWithTheme();
@@ -372,8 +383,8 @@ export class MenuComponent implements OnInit {
     }
 
     private useEventTheme(): void {
-        this.selected_theme = this.themes.find((theme: Theme) => theme.class === localStorage.getItem('theme'));
-        if (this.selected_theme?.class === '' || !this.selected_theme) {
+        this.selected_theme.set(this.themes.find((theme: Theme) => theme.class === localStorage.getItem('theme')));
+        if (this.selected_theme()?.class === '' || !this.selected_theme()) {
             setTimeout(() => {
                 this.changeTheme(this.themes[this.themes.length - 1]);
             });

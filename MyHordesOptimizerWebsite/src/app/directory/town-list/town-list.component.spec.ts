@@ -5,15 +5,18 @@ import { of } from 'rxjs';
 
 import { USER_KEY } from '../../_abstract_model/const';
 import { NoteDTO } from '../../_abstract_model/dto/note.dto';
+import { TownListQuery } from '../../_abstract_model/dto/town-list-page.dto';
 import { NoteService } from '../../_abstract_model/services/note.service';
+import { TownService } from '../../_abstract_model/services/town.service';
 import { Dictionary } from '../../_abstract_model/types/_types';
-import { TownListItem, TownPublicCitizen } from '../../_abstract_model/types/town-list-item.model';
+import { TownListItem, TownListPageResult, TownPublicCitizen } from '../../_abstract_model/types/town-list-item.model';
 import { TownListComponent } from './town-list.component';
 
 interface TestableComponent {
     townNotes: { (): Dictionary<NoteDTO> };
     citizenNotes: { (): Dictionary<NoteDTO> };
     hasParticipated(row: TownListItem): boolean;
+    onPageChange(event: { pageIndex: number; pageSize: number }): void;
 }
 
 function town(citizens: TownPublicCitizen[]): TownListItem {
@@ -95,5 +98,64 @@ describe('TownListComponent notes', (): void => {
         expect(testable.hasParticipated(town([{ id: 1, name: 'Me', deathTypeId: null }]))).toBeTrue();
         expect(testable.hasParticipated(town([{ id: 2, name: 'Other', deathTypeId: null }]))).toBeFalse();
         expect(testable.hasParticipated(town([]))).toBeFalse();
+    });
+});
+
+describe('TownListComponent tri et pagination', (): void => {
+    let fixture: ComponentFixture<TownListComponent>;
+    let testable: TestableComponent;
+    let townService: jasmine.SpyObj<TownService>;
+    const emptyResult: TownListPageResult = { items: [], totalCount: 0, availableTypes: [], availableLanguages: [] };
+
+    beforeEach(async (): Promise<void> => {
+        townService = jasmine.createSpyObj<TownService>('TownService', ['getSeasonPhases', 'getTownsPaged']);
+        townService.getSeasonPhases.and.returnValue(of([]));
+        townService.getTownsPaged.and.returnValue(of(emptyResult));
+        const noteService: jasmine.SpyObj<NoteService> = jasmine.createSpyObj<NoteService>(
+            'NoteService', ['getMyTownNotes', 'saveTownNote', 'getMyCitizenNotesForUser', 'saveCitizenNote']
+        );
+        noteService.getMyTownNotes.and.returnValue(of({}));
+
+        await TestBed.configureTestingModule({
+            imports: [TownListComponent],
+            providers: [
+                provideHttpClient(), provideHttpClientTesting(),
+                { provide: TownService, useValue: townService },
+                { provide: NoteService, useValue: noteService }
+            ]
+        }).compileComponents();
+
+        fixture = TestBed.createComponent(TownListComponent);
+        testable = fixture.componentInstance as unknown as TestableComponent;
+        fixture.detectChanges();
+    });
+
+    it('charge avec le tri par défaut (id desc, page 1)', (): void => {
+        expect(townService.getTownsPaged).toHaveBeenCalledWith(jasmine.objectContaining({
+            page: 1, pageSize: 50, sortColumn: 'id', sortDirection: 'desc'
+        } as Partial<TownListQuery>));
+    });
+
+    it('un changement de page recharge avec les nouveaux paramètres', (): void => {
+        townService.getTownsPaged.calls.reset();
+
+        testable.onPageChange({ pageIndex: 2, pageSize: 100 });
+
+        expect(townService.getTownsPaged).toHaveBeenCalledWith(jasmine.objectContaining({
+            page: 3, pageSize: 100
+        } as Partial<TownListQuery>));
+    });
+
+    it('trier sur une nouvelle colonne réinitialise la page et recharge avec ce tri', (): void => {
+        testable.onPageChange({ pageIndex: 2, pageSize: 50 });
+        townService.getTownsPaged.calls.reset();
+
+        const nameHeader: HTMLElement = fixture.nativeElement.querySelector('th[mat-sort-header="name"]');
+        nameHeader.click();
+        fixture.detectChanges();
+
+        expect(townService.getTownsPaged).toHaveBeenCalledWith(jasmine.objectContaining({
+            page: 1, sortColumn: 'name', sortDirection: 'asc'
+        } as Partial<TownListQuery>));
     });
 });

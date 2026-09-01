@@ -9,7 +9,7 @@
         }
         <small>&nbsp;[{{ cell.displayed_x }} ; {{ cell.displayed_y }}]</small>
     </h1>
-    <button mat-icon-button type="button" [mat-dialog-close]="data.cell">
+    <button mat-icon-button type="button" [mat-dialog-close]="dialog_close_cell()">
         <mat-icon>close</mat-icon>
     </button>
 </div>
@@ -44,7 +44,7 @@
         }
         @if (!cell.is_town) {
             <mat-tab label="Fouilles" i18n-label>
-                <mho-map-update-digs [cell]="cell" [allCitizens]="data.all_citizens" [(digs)]="digs">
+                <mho-map-update-digs [cell]="cell" [allCitizens]="data.all_citizens" [digs]="digs()!" (digsChange)="digs.set($event)">
                 </mho-map-update-digs>
             </mat-tab>
         }
@@ -52,6 +52,6 @@
 </div>
 
 <div mat-dialog-actions [align]="'end'">
-    <button mat-button type="reset" [color]="'accent'" [mat-dialog-close]="data.cell">Fermer</button>
+    <button mat-button type="reset" [color]="'accent'" [mat-dialog-close]="dialog_close_cell()">Fermer</button>
     <button mat-raised-button type="button" [color]="'accent'" (click)="saveCell()">Enregistrer</button>
 </div>

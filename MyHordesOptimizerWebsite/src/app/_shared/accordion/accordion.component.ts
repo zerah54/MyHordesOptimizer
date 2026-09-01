@@ -1,6 +1,6 @@
 import { CdkAccordionModule } from '@angular/cdk/accordion';
 import { CommonModule } from '@angular/common';
-import { Component, input,InputSignal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input, InputSignal } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 
 import { Imports } from '../../_abstract_model/types/_types';
@@ -14,7 +14,8 @@ const material_modules: Imports = [CdkAccordionModule, MatIconModule];
     selector: 'mho-accordion',
     templateUrl: './accordion.component.html',
     styleUrls: ['./accordion.component.scss'],
-    imports: [...angular_common, ...components, ...material_modules, ...pipes]
+    imports: [...angular_common, ...components, ...material_modules, ...pipes],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AccordionComponent {
 

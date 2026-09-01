@@ -4,14 +4,13 @@ import { CommonModule } from '@angular/common';
 import {
     ChangeDetectionStrategy,
     Component,
-    HostListener,
     inject,
     OnDestroy,
     OnInit,
     Signal,
     signal,
     TemplateRef,
-    ViewChild,
+    viewChild,
     ViewContainerRef,
     WritableSignal
 } from '@angular/core';
@@ -54,6 +53,10 @@ const material_modules: Imports = [MatButtonModule, MatButtonToggleModule, MatCa
     selector: 'mho-minesweeper',
     templateUrl: 'minesweeper.component.html',
     styleUrls: ['minesweeper.component.scss'],
+    host: {
+        '(window:keydown.escape)': 'onEscapeKey()',
+        '(window:mouseup)': 'onWindowMouseUp()'
+    },
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [...angular_common, ...components, ...material_modules, ...pipes, CounterFromDatePipe, DiffBetweenDatesPipe]
 })
@@ -102,8 +105,8 @@ export class MinesweeperComponent implements OnInit, OnDestroy {
         Math.max(100, Number(localStorage.getItem(MINESWEEPER_ZOOM_KEY)) || 100)
     );
 
-    @ViewChild('boardAndControlsTemplate') private boardAndControlsTemplate!: TemplateRef<unknown>;
-    @ViewChild('leaderboardTemplate') private leaderboardTemplate!: TemplateRef<unknown>;
+    private readonly boardAndControlsTemplate: Signal<TemplateRef<unknown>> = viewChild.required('boardAndControlsTemplate');
+    private readonly leaderboardTemplate: Signal<TemplateRef<unknown>> = viewChild.required('leaderboardTemplate');
     private readonly dialog: MatDialog = inject(MatDialog);
     private readonly overlay: Overlay = inject(Overlay);
     private readonly viewContainerRef: ViewContainerRef = inject(ViewContainerRef);
@@ -188,7 +191,7 @@ export class MinesweeperComponent implements OnInit, OnDestroy {
             width: '100vw',
             height: '100vh'
         });
-        this.fullscreenOverlayRef.attach(new TemplatePortal(this.boardAndControlsTemplate, this.viewContainerRef));
+        this.fullscreenOverlayRef.attach(new TemplatePortal(this.boardAndControlsTemplate(), this.viewContainerRef));
     }
 
     protected closeFullscreen(): void {
@@ -197,7 +200,6 @@ export class MinesweeperComponent implements OnInit, OnDestroy {
         this.is_fullscreen.set(false);
     }
 
-    @HostListener('window:keydown.escape')
     protected onEscapeKey(): void {
         if (this.is_fullscreen()) {
             this.closeFullscreen();
@@ -208,7 +210,7 @@ export class MinesweeperComponent implements OnInit, OnDestroy {
         this.leaderboard_size_id.set(this.selected_size().id);
         this.leaderboard_mode.set(this.game_mode());
         this.dialog.open<MinesweeperLeaderboardDialogComponent, MinesweeperLeaderboardDialogData>(MinesweeperLeaderboardDialogComponent, {
-            data: { template: this.leaderboardTemplate },
+            data: { template: this.leaderboardTemplate() },
             width: '700px',
             maxWidth: '95vw'
         });
@@ -513,7 +515,6 @@ export class MinesweeperComponent implements OnInit, OnDestroy {
         this.pressCell(i, j);
     }
 
-    @HostListener('window:mouseup')
     protected onWindowMouseUp(): void {
         // Écouteur global plutôt que sur chaque case : le relâchement peut survenir n'importe où
         // (hors du plateau) si la souris a été déplacée pendant l'appui.

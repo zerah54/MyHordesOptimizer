@@ -1,5 +1,5 @@
 import { CommonModule, NgOptimizedImage } from '@angular/common';
-import { Component, input, InputSignal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input, InputSignal } from '@angular/core';
 import { MatDividerModule } from '@angular/material/divider';
 import moment from 'moment';
 
@@ -27,6 +27,7 @@ const material_modules: Imports = [MatDividerModule];
     selector: 'mho-map-cell-details',
     templateUrl: './map-cell-details.component.html',
     styleUrls: ['./map-cell-details.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class MapCellDetailsComponent {
@@ -37,7 +38,7 @@ export class MapCellDetailsComponent {
     public allCitizens: InputSignal<Citizen[]> = input.required();
     public allItems: InputSignal<Item[]> = input.required();
 
-    private readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
-    private readonly locale: string = moment.locale();
+    protected readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
+    protected readonly locale: string = moment.locale();
 
 }

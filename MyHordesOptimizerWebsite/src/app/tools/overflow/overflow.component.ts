@@ -1,5 +1,5 @@
 import { CommonModule, DecimalPipe } from '@angular/common';
-import { Component, DestroyRef, inject, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, OnInit, signal, WritableSignal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -118,7 +118,8 @@ export interface ScenarioResult {
     selector: 'mho-overflow',
     templateUrl: './overflow.component.html',
     styleUrls: ['./overflow.component.scss'],
-    imports: [...angular_common, ...material_modules, ...pipes]
+    imports: [...angular_common, ...material_modules, ...pipes],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class OverflowComponent implements OnInit {
 
@@ -128,8 +129,9 @@ export class OverflowComponent implements OnInit {
     /** Mode « Ma ville » (valeurs pré-remplies et verrouillées) vs « Hors ville » (tout manuel). */
     protected in_town: boolean = !!this.my_town;
     // --- Chaîne d'attaque ---
-    /** Attaque estimée (nombre de zombies, après facteur d'âmes rouges). */
-    protected attack: number = 500;
+    /** Attaque estimée (nombre de zombies, après facteur d'âmes rouges). Signal : réassignée depuis
+     *  {@link applyTownValues} (forkJoin asynchrone), lue par le propre template. */
+    protected readonly attack: WritableSignal<number> = signal(500);
     /** Défense totale de la ville (telle qu'affichée en jeu). */
     protected town_defense: number = 300;
     /** État de la porte au moment de l'attaque. */
@@ -139,12 +141,12 @@ export class OverflowComponent implements OnInit {
     // --- Contexte ville (pour le facteur de zombies actifs et le ciblage) ---
     /** Jour d'attaque (détermine le nombre de citoyens ciblés). */
     protected day: number = 1;
-    /** Nombre de citoyens vivants et présents en ville (cibles potentielles). */
-    protected nb_alive: number = 40;
+    /** Nombre de citoyens vivants et présents en ville (cibles potentielles). Signal : voir {@link attack}. */
+    protected readonly nb_alive: WritableSignal<number> = signal(40);
     /** Population de la ville (nombre de places, dénominateur du facteur actif). */
     protected population: number = 40;
-    /** Nombre d'habitations par niveau (index = niveau, 0 = Lit de camp ... 8 = Château). */
-    protected house_counts: number[] = new Array(HOUSE_LEVEL_COUNT).fill(0);
+    /** Nombre d'habitations par niveau (index = niveau, 0 = Lit de camp ... 8 = Château). Signal : voir {@link attack}. */
+    protected readonly house_counts: WritableSignal<number[]> = signal(new Array(HOUSE_LEVEL_COUNT).fill(0));
     /** Libellés des paliers d'habitation, dans la langue courante. */
     protected readonly house_labels: string[] = (HomeEnum.HOUSE_LEVEL.value.house_options ?? [])
         .map((labels: I18nLabels) => (<Record<string, string>><unknown>labels)[this.locale] ?? labels['en']);
@@ -157,22 +159,23 @@ export class OverflowComponent implements OnInit {
     protected iterations: number = 10000;
     /** Affichage de la répartition finale : nombre de morts ou de survivants (même distribution, lue dans l'autre sens). */
     protected histogram_view: 'deaths' | 'survivors' = 'deaths';
-    protected overflow_after_watch: number = 0;
-    protected targeted_count: number = 0;
-    protected factor_min: number = 0;
-    protected factor_max: number = 0;
+    // --- Résultats de compute(), tous mutés depuis un .subscribe() (debounce ou forkJoin) : signaux. ---
+    protected readonly overflow_after_watch: WritableSignal<number> = signal(0);
+    protected readonly targeted_count: WritableSignal<number> = signal(0);
+    private factor_min: number = 0;
+    private factor_max: number = 0;
     /** Nombre de zombies actifs (bornes), déduit du facteur et plafonné par le débordement. */
-    protected active_zombies_min: number = 0;
-    protected active_zombies_max: number = 0;
+    protected readonly active_zombies_min: WritableSignal<number> = signal(0);
+    protected readonly active_zombies_max: WritableSignal<number> = signal(0);
     /** Vrai si le débordement plafonne déjà l'attaque au minimum du facteur : favorable et défavorable sont alors identiques. */
-    protected bounds_saturated: boolean = false;
+    protected readonly bounds_saturated: WritableSignal<boolean> = signal(false);
     /** Défense personnelle éditable par citoyen ciblable, pré-remplie avec {@link home_defense}. */
-    protected citizen_defenses: CitizenDefenseRow[] = [];
+    protected readonly citizen_defenses: WritableSignal<CitizenDefenseRow[]> = signal([]);
     /** Scénario détaillé (facteur retiré à chaque itération), affiché avec le détail complet (rangs, citoyens, histogramme). */
-    protected scenarios: ScenarioResult[] = [];
+    protected readonly scenarios: WritableSignal<ScenarioResult[]> = signal([]);
     /** Bornes encadrantes (facteur figé à 45 % / 55 %), affichées en complément du réaliste sans onglet séparé. */
-    protected favorable: ScenarioResult | null = null;
-    protected defavorable: ScenarioResult | null = null;
+    protected readonly favorable: WritableSignal<ScenarioResult | null> = signal(null);
+    protected readonly defavorable: WritableSignal<ScenarioResult | null> = signal(null);
     private readonly town_statistics_service: TownStatisticsService = inject(TownStatisticsService);
     private readonly town_service: TownService = inject(TownService);
     private readonly destroy_ref: DestroyRef = inject(DestroyRef);
@@ -223,7 +226,15 @@ export class OverflowComponent implements OnInit {
 
     /** Nombre total d'habitations renseignées (pour vérifier qu'aucune n'est oubliée ou comptée deux fois). */
     protected totalHouses(): number {
-        return this.house_counts.reduce((a: number, b: number) => a + b, 0);
+        return this.house_counts().reduce((a: number, b: number) => a + b, 0);
+    }
+
+    /** Met à jour le nombre d'habitations d'un niveau donné (réassignation immuable du tableau signal). */
+    protected setHouseCount(level: number, value: number): void {
+        const counts: number[] = [...this.house_counts()];
+        counts[level] = value;
+        this.house_counts.set(counts);
+        this.scheduleCompute();
     }
 
     /**
@@ -231,7 +242,7 @@ export class OverflowComponent implements OnInit {
      * attaque → défenses ville → veilleurs → zombies actifs → répartition dans les maisons.
      */
     protected compute(): void {
-        const attack: number = Math.max(0, Math.round(this.attack));
+        const attack: number = Math.max(0, Math.round(this.attack()));
         // La dévastation force la porte ouverte (TownHandler::devastateTown) ; passé la nuit même,
         // elle est toujours ouverte depuis plus de 30 min (aucun code ne la referme jamais).
         const door_open: boolean = this.devastated || this.door_state !== 'closed';
@@ -243,13 +254,14 @@ export class OverflowComponent implements OnInit {
             : Math.max(0, attack - Math.max(0, this.town_defense));
 
         // 2. Veilleurs : leur défense de veille collective est soustraite.
-        this.overflow_after_watch = Math.max(0, this.overflow_after_defense - Math.max(0, this.watch_defense));
+        const overflow_after_watch: number = Math.max(0, this.overflow_after_defense - Math.max(0, this.watch_defense));
+        this.overflow_after_watch.set(overflow_after_watch);
 
         // 3. Nombre de citoyens ciblés : croît avec le jour, plafonné par la population vivante.
-        this.targeted_count = Math.min(
+        this.targeted_count.set(Math.min(
             10 + 2 * Math.floor(Math.max(0, this.day - 10) / 2),
-            Math.max(0, Math.ceil(this.nb_alive))
-        );
+            Math.max(0, Math.ceil(this.nb_alive()))
+        ));
 
         // 3 bis. Niveau d'habitation au tercile. La dévastation ramène tous les logements au niveau 0
         // (CitizenHomePrototype lv0 = défense 0), donc le tercile aussi.
@@ -261,29 +273,32 @@ export class OverflowComponent implements OnInit {
         // 4. Facteur de zombies actifs (base tirée entre 45 et 55 en jeu).
         this.factor_min = this.activeFactor(45, door_open, door_long);
         this.factor_max = this.activeFactor(55, door_open, door_long);
-        this.active_zombies_min = Math.min(Math.round(attack * this.factor_min), this.overflow_after_watch);
-        this.active_zombies_max = Math.min(Math.round(attack * this.factor_max), this.overflow_after_watch);
+        const active_zombies_min: number = Math.min(Math.round(attack * this.factor_min), overflow_after_watch);
+        const active_zombies_max: number = Math.min(Math.round(attack * this.factor_max), overflow_after_watch);
+        this.active_zombies_min.set(active_zombies_min);
+        this.active_zombies_max.set(active_zombies_max);
         // Si le minimum atteint déjà le débordement, le maximum aussi (monotone) : le facteur ne change plus rien,
         // favorable/défavorable/réaliste finissent avec la même attaque servie.
-        this.bounds_saturated = this.active_zombies_min >= this.overflow_after_watch;
+        this.bounds_saturated.set(active_zombies_min >= overflow_after_watch);
 
         // Scénario détaillé : le facteur est retiré aléatoirement (45–55, un entier comme mt_rand en jeu) à chaque itération.
-        this.scenarios = [
+        this.scenarios.set([
             this.runScenario(
                 $localize`Distribution réaliste`,
                 () => this.activeFactor(this.drawFactorBase(), door_open, door_long),
                 attack
             )
-        ];
+        ]);
         // Bornes encadrantes : facteur figé au minimum (45) et au maximum (55), calculées à côté (pas de bascule).
-        this.favorable = this.runScenario($localize`Scénario favorable`, () => this.factor_min, attack);
-        this.defavorable = this.runScenario($localize`Scénario défavorable`, () => this.factor_max, attack);
+        this.favorable.set(this.runScenario($localize`Scénario favorable`, () => this.factor_min, attack));
+        this.defavorable.set(this.runScenario($localize`Scénario défavorable`, () => this.factor_max, attack));
     }
 
     /** Détail du facteur de zombies actifs (% de l'attaque et % du débordement réellement servi), pour affichage au survol. */
     protected activeZombiesTooltip(): string {
-        const overflow_min: number = this.overflow_after_watch > 0 ? this.active_zombies_min / this.overflow_after_watch : 0;
-        const overflow_max: number = this.overflow_after_watch > 0 ? this.active_zombies_max / this.overflow_after_watch : 0;
+        const overflow_after_watch: number = this.overflow_after_watch();
+        const overflow_min: number = overflow_after_watch > 0 ? this.active_zombies_min() / overflow_after_watch : 0;
+        const overflow_max: number = overflow_after_watch > 0 ? this.active_zombies_max() / overflow_after_watch : 0;
         return $localize`${this.formatPercent(this.factor_min)} – ${this.formatPercent(this.factor_max)} de l'attaque
 ${this.formatPercent(overflow_min)} – ${this.formatPercent(overflow_max)} du débordement`;
     }
@@ -310,7 +325,7 @@ ${this.formatPercent(overflow_min)} – ${this.formatPercent(overflow_max)} du d
             .pipe(takeUntilDestroyed(this.destroy_ref))
             .subscribe(({ attack, citizens: citizensInfo }: { attack: EstimationsResult | null; citizens: CitizenInfo | null }) => {
                 if (attack?.result?.max) {
-                    this.attack = attack.result.max;
+                    this.attack.set(attack.result.max);
                 }
                 if (citizensInfo) {
                     const counts: number[] = new Array(HOUSE_LEVEL_COUNT).fill(0);
@@ -325,9 +340,9 @@ ${this.formatPercent(overflow_min)} – ${this.formatPercent(overflow_max)} du d
                             counts[level]++;
                         }
                     }
-                    this.house_counts = counts;
+                    this.house_counts.set(counts);
                     this.known_citizens = citizens;
-                    this.nb_alive = citizens.length;
+                    this.nb_alive.set(citizens.length);
                 }
                 this.compute();
             });
@@ -350,7 +365,7 @@ ${this.formatPercent(overflow_min)} – ${this.formatPercent(overflow_max)} du d
     private activeFactor(base: number, door_open: boolean, door_long: boolean): number {
         const door_bonus: number = !door_open ? 0 : door_long ? 25 : 10;
         const population: number = Math.max(1, this.population);
-        const citizen_factor: number = (Math.max(15, this.nb_alive) + Math.max(0, this.habitation_level) * 2) / population;
+        const citizen_factor: number = (Math.max(15, this.nb_alive()) + Math.max(0, this.habitation_level) * 2) / population;
         const extra: number = (this.chaos ? 10 : 0) + (this.devastated ? 10 : 0);
         const level: number = (base + door_bonus) * citizen_factor + extra;
         return Math.max(0, Math.min(level / 100, 1));
@@ -366,25 +381,26 @@ ${this.formatPercent(overflow_min)} – ${this.formatPercent(overflow_max)} du d
      * complète avec le nom réel (mode « Ma ville ») ou générique et la défense par défaut ({@link home_defense}).
      */
     private syncCitizenDefenses(): void {
-        const count: number = Math.max(0, Math.ceil(this.nb_alive));
-        if (this.citizen_defenses.length > count) {
-            this.citizen_defenses = this.citizen_defenses.slice(0, count);
-        } else if (this.citizen_defenses.length < count) {
+        const count: number = Math.max(0, Math.ceil(this.nb_alive()));
+        let citizen_defenses: CitizenDefenseRow[] = this.citizen_defenses();
+        if (citizen_defenses.length > count) {
+            citizen_defenses = citizen_defenses.slice(0, count);
+        } else if (citizen_defenses.length < count) {
             const additions: CitizenDefenseRow[] = [];
-            for (let i: number = this.citizen_defenses.length; i < count; i++) {
+            for (let i: number = citizen_defenses.length; i < count; i++) {
                 additions.push({
                     label: this.known_citizens[i]?.name ?? $localize`Citoyen ${i + 1}`,
                     named: !!this.known_citizens[i],
                     defense: this.known_citizens[i] ? computeReconstructedHomeDefense(this.known_citizens[i]) : this.home_defense
                 });
             }
-            this.citizen_defenses = this.citizen_defenses.concat(additions);
+            citizen_defenses = citizen_defenses.concat(additions);
         }
         // Le libellé n'est jamais saisi par l'utilisateur : on le réaligne toujours sur le nom connu.
-        this.citizen_defenses = this.citizen_defenses.map((row: CitizenDefenseRow, i: number) => {
+        this.citizen_defenses.set(citizen_defenses.map((row: CitizenDefenseRow, i: number) => {
             const known_name: string | undefined = this.known_citizens[i]?.name;
             return known_name ? { ...row, label: known_name, named: true } : { ...row, named: false };
-        });
+        }));
     }
 
     /**
@@ -401,14 +417,15 @@ ${this.formatPercent(overflow_min)} – ${this.formatPercent(overflow_max)} du d
         let highest_present: number = 0;
         let tercile: number = 0;
         let at_least: number = total; // nombre de citoyens de niveau >= au niveau courant
-        for (let level: number = 0; level < this.house_counts.length; level++) {
-            if (this.house_counts[level] > 0) {
+        const house_counts: number[] = this.house_counts();
+        for (let level: number = 0; level < house_counts.length; level++) {
+            if (house_counts[level] > 0) {
                 highest_present = level;
             }
             if (at_least >= threshold) {
                 tercile = level;
             }
-            at_least -= this.house_counts[level];
+            at_least -= house_counts[level];
         }
         return tercile > 0 ? tercile : highest_present;
     }
@@ -418,12 +435,14 @@ ${this.formatPercent(overflow_min)} – ${this.formatPercent(overflow_max)} du d
      *        (constant en mode bornes, retiré aléatoirement en mode réaliste)
      */
     private runScenario(label: string, sampleFactor: () => number, attack: number): ScenarioResult {
-        const n: number = this.targeted_count;
-        const pool_size: number = this.citizen_defenses.length;
+        const n: number = this.targeted_count();
+        const citizen_defenses: CitizenDefenseRow[] = this.citizen_defenses();
+        const pool_size: number = citizen_defenses.length;
         const iterations: number = Math.max(100, Math.round(this.iterations));
-        const citizen_thresholds: number[] = this.citizen_defenses.map((row: CitizenDefenseRow) => Math.max(0, row.defense));
+        const citizen_thresholds: number[] = citizen_defenses.map((row: CitizenDefenseRow) => Math.max(0, row.defense));
+        const overflow_after_watch: number = this.overflow_after_watch();
 
-        if (this.overflow_after_watch <= 0 || n <= 0 || pool_size <= 0) {
+        if (overflow_after_watch <= 0 || n <= 0 || pool_size <= 0) {
             return {
                 label, factor: 0, max_active: 0, attacking: 0, ranks: [], citizens: [], defense_groups: [],
                 death_histogram: [], survivor_histogram: [],
@@ -448,7 +467,7 @@ ${this.formatPercent(overflow_min)} – ${this.formatPercent(overflow_max)} du d
 
         for (let iter: number = 0; iter < iterations; iter++) {
             const factor: number = sampleFactor();
-            const attacking: number = Math.min(Math.round(attack * factor), this.overflow_after_watch);
+            const attacking: number = Math.min(Math.round(attack * factor), overflow_after_watch);
             factor_sum += factor;
             attackings.push(attacking);
 
@@ -508,7 +527,7 @@ ${this.formatPercent(overflow_min)} – ${this.formatPercent(overflow_max)} du d
             };
         });
 
-        const citizens: CitizenStat[] = this.citizen_defenses.map((row: CitizenDefenseRow, index: number) => ({
+        const citizens: CitizenStat[] = citizen_defenses.map((row: CitizenDefenseRow, index: number) => ({
             label: row.label,
             named: row.named,
             defense: citizen_thresholds[index],

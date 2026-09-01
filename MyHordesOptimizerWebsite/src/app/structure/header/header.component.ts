@@ -1,6 +1,6 @@
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { CommonModule, NgOptimizedImage } from '@angular/common';
-import { Component, DestroyRef, HostListener, inject, OnInit, output, OutputEmitterRef } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, OnInit, output, OutputEmitterRef, signal, WritableSignal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -34,7 +34,11 @@ const material_modules: Imports = [MatButtonModule, MatDividerModule, MatFormFie
     selector: 'mho-header',
     templateUrl: './header.component.html',
     styleUrls: ['./header.component.scss'],
-    imports: [...angular_common, ...components, ...material_modules, ...pipes]
+    imports: [...angular_common, ...components, ...material_modules, ...pipes],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    host: {
+        '(window:resize)': 'onResize()'
+    }
 })
 export class HeaderComponent implements OnInit {
     public readonly router: Router = inject(Router);
@@ -46,27 +50,27 @@ export class HeaderComponent implements OnInit {
     public title: string = '';
 
     /** La valeur du champ d'identifiant d'app externe */
-    protected external_app_id_field_value: string | null = null;
+    protected readonly external_app_id_field_value: WritableSignal<string | null> = signal(null);
     /** L'idendifiant d'app externe si il existe */
-    protected saved_external_app_id: string | null = getExternalAppId();
+    protected readonly saved_external_app_id: WritableSignal<string | null> = signal(getExternalAppId());
     /** Les informations de l'utilisateur */
-    protected me: Me | null = getUser();
+    protected readonly me: WritableSignal<Me | null> = signal(getUser());
     protected readonly is_dev: boolean = !environment.production;
     protected readonly myhordes_url: string = environment.myhordes_url;
     protected readonly myhordes_app_id: number = environment.myhordes_app_id;
 
-    protected is_in_town: boolean = !!getTown()?.town_id;
+    protected readonly is_in_town: WritableSignal<boolean> = signal(!!getTown()?.town_id);
 
-    protected is_gt_xs: boolean = this.breakpoint_observer.isMatched(BREAKPOINTS['gt-xs']);
+    protected readonly is_gt_xs: WritableSignal<boolean> = signal(this.breakpoint_observer.isMatched(BREAKPOINTS['gt-xs']));
 
     private readonly title_service: Title = inject(Title);
     private readonly authentication_api: AuthenticationService = inject(AuthenticationService);
     private readonly header_service: HeaderService = inject(HeaderService);
     private readonly destroy_ref: DestroyRef = inject(DestroyRef);
 
-    @HostListener('window:resize', ['$event'])
-    public onResize(): void {
-        this.is_gt_xs = this.breakpoint_observer.isMatched(BREAKPOINTS['gt-xs']);
+    /** Migré depuis `@HostListener('window:resize')` vers `host: {}` (voir décorateur ci-dessus). */
+    protected onResize(): void {
+        this.is_gt_xs.set(this.breakpoint_observer.isMatched(BREAKPOINTS['gt-xs']));
     }
 
     public constructor() {
@@ -77,8 +81,8 @@ export class HeaderComponent implements OnInit {
         this.header_service.token_obs
             .pipe(skip(1))
             .subscribe((token: string | null) => {
-                if (this.external_app_id_field_value !== token) {
-                    this.external_app_id_field_value = token;
+                if (this.external_app_id_field_value() !== token) {
+                    this.external_app_id_field_value.set(token);
                     this.saveExternalAppId();
                 }
             });
@@ -86,7 +90,7 @@ export class HeaderComponent implements OnInit {
 
     /** Enregistre le nouvel id d'app externe */
     protected saveExternalAppId(): void {
-        setExternalAppId(this.external_app_id_field_value);
+        setExternalAppId(this.external_app_id_field_value());
         this.updateMe();
     }
 
@@ -94,18 +98,24 @@ export class HeaderComponent implements OnInit {
     protected disconnect(): void {
         setExternalAppId(null);
         setTokenWithMeWithExpirationDate();
-        location.reload();
+        this.reloadPage();
     }
 
     private updateMe(): void {
         this.authentication_api.getMe(true)
             .pipe(takeUntilDestroyed(this.destroy_ref))
             .subscribe(() => {
-                this.me = getUser();
-                this.external_app_id_field_value = null;
-                this.saved_external_app_id = getExternalAppId();
-                this.is_in_town = !!getTown()?.town_id;
-                location.reload();
+                this.me.set(getUser());
+                this.external_app_id_field_value.set(null);
+                this.saved_external_app_id.set(getExternalAppId());
+                this.is_in_town.set(!!getTown()?.town_id);
+                this.reloadPage();
             });
+    }
+
+    /** Extrait de `disconnect`/`updateMe` pour rester substituable en test (`location.reload` n'est ni
+     *  espionnable ni redéfinissable sous Chrome Headless). */
+    private reloadPage(): void {
+        location.reload();
     }
 }

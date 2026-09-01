@@ -100,4 +100,72 @@ describe('TiptapEditorComponent', (): void => {
         const editable: HTMLElement | null = fixture.nativeElement.querySelector('.ProseMirror p');
         expect(editable?.getAttribute('data-placeholder')).toBeFalsy();
     });
+
+    it('always exposes the floating host class', async (): Promise<void> => {
+        await setup();
+
+        expect(component.shouldLabelFloat).toBeTrue();
+        expect(fixture.nativeElement.classList.contains('floating')).toBeTrue();
+    });
+
+    it('coerces required to a boolean and emits a state change', async (): Promise<void> => {
+        await setup();
+        let emissionCount: number = 0;
+        component.stateChanges.subscribe((): number => emissionCount++);
+
+        component.required = 'true' as unknown as boolean;
+
+        expect(component.required).toBeTrue();
+        expect(emissionCount).toBe(1);
+    });
+
+    it('coerces disabled to a boolean, updates editor editability and emits a state change', async (): Promise<void> => {
+        await setup();
+        let emissionCount: number = 0;
+        component.stateChanges.subscribe((): number => emissionCount++);
+        const editor: Editor | undefined = (component as unknown as { editor: () => Editor | undefined }).editor();
+
+        component.disabled = 'true' as unknown as boolean;
+
+        expect(component.disabled).toBeTrue();
+        expect(editor?.isEditable).toBeFalse();
+        expect(emissionCount).toBeGreaterThanOrEqual(1);
+    });
+
+    it('creates the editor as non-editable when disabled is set before render', async (): Promise<void> => {
+        await TestBed.configureTestingModule({
+            imports: [TiptapEditorComponent],
+            providers: [{ provide: ApiService, useValue: { getItems: (): unknown => of([]) } }]
+        }).compileComponents();
+        fixture = TestBed.createComponent(TiptapEditorComponent);
+        component = fixture.componentInstance;
+        component.disabled = true;
+
+        fixture.detectChanges();
+
+        const editor: Editor | undefined = (component as unknown as { editor: () => Editor | undefined }).editor();
+        expect(editor?.isEditable).toBeFalse();
+    });
+
+    it('sets aria-describedby on the editable element', async (): Promise<void> => {
+        await setup();
+
+        component.setDescribedByIds(['hint-1', 'error-2']);
+
+        const editable: HTMLElement | null = fixture.nativeElement.querySelector('.ProseMirror');
+        expect(editable?.getAttribute('aria-describedby')).toBe('hint-1 error-2');
+    });
+
+    it('destroys the editor and completes stateChanges on ngOnDestroy', async (): Promise<void> => {
+        await setup();
+        const editor: Editor | undefined = (component as unknown as { editor: () => Editor | undefined }).editor();
+        const destroySpy: jasmine.Spy = spyOn(editor as Editor, 'destroy').and.callThrough();
+        let completed: boolean = false;
+        component.stateChanges.subscribe({ complete: (): boolean => completed = true });
+
+        component.ngOnDestroy();
+
+        expect(destroySpy).toHaveBeenCalled();
+        expect(completed).toBeTrue();
+    });
 });

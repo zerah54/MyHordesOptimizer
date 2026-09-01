@@ -1,5 +1,5 @@
 import { CommonModule, NgOptimizedImage } from '@angular/common';
-import { Component, DestroyRef, inject, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, OnInit } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatCardModule } from '@angular/material/card';
 import { MatExpansionModule } from '@angular/material/expansion';
@@ -25,7 +25,8 @@ const material_modules: Imports = [MatCardModule, MatSortModule, MatTableModule,
     selector: 'mho-hero-skills',
     templateUrl: './hero-skills.component.html',
     styleUrls: ['./hero-skills.component.scss'],
-    imports: [...angular_common, ...components, ...directives, ...material_modules, ...pipes]
+    imports: [...angular_common, ...components, ...directives, ...material_modules, ...pipes],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class HeroSkillsComponent implements OnInit {
 

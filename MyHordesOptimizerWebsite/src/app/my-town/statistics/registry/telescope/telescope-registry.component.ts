@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, Input, input,InputSignal, Signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, InputSignal, Signal, untracked } from '@angular/core';
 import { MatDividerModule } from '@angular/material/divider';
 
 import { DisplayPseudoMode, Entry } from '../../../../_abstract_model/interfaces';
@@ -19,29 +19,28 @@ const material_modules: Imports = [MatDividerModule];
     selector: 'mho-registry-telescope',
     templateUrl: './telescope-registry.component.html',
     styleUrls: ['./telescope-registry.component.scss'],
-    imports: [...angular_common, ...components, ...material_modules, ...pipes]
+    imports: [...angular_common, ...components, ...material_modules, ...pipes],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TelescopeRegistryComponent {
 
     public completeCitizenList: InputSignal<CitizenInfo> = input.required();
     public completeItemsList: InputSignal<Item[]> = input.required();
     public displayPseudo: InputSignal<DisplayPseudoMode> = input.required();
-
-    // TODO: Skipped for migration because:
-    //  Accessor inputs cannot be migrated as they are too complex.
-    @Input({ required: true }) public set registry(registry: Entry[] | undefined) {
-        if (registry) {
-            this.entries = registry.filter((entry: Entry) => {
-                return Object.values(this.telescope_item()?.label).some((label: string): boolean => entryHasKeyword(entry, label));
-            });
-        } else {
-            this.entries = [];
-        }
-    }
-
-    protected entries: Entry[] = [];
+    public registry: InputSignal<Entry[] | undefined> = input.required();
 
     private readonly telescope_item: Signal<Item> = computed(() => this.completeItemsList()?.find((item: Item) => item.img.indexOf('item_scope') > -1) as Item);
+
+    protected readonly entries: Signal<Entry[]> = computed((): Entry[] => {
+        const registry: Entry[] | undefined = this.registry();
+        if (!registry) {
+            return [];
+        }
+        const telescope_item: Item = untracked(this.telescope_item);
+        return registry.filter((entry: Entry) => {
+            return Object.values(telescope_item?.label).some((label: string): boolean => entryHasKeyword(entry, label));
+        });
+    });
 
 }
 

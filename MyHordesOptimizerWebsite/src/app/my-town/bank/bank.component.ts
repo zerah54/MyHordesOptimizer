@@ -1,5 +1,5 @@
 import { CommonModule, NgOptimizedImage } from '@angular/common';
-import { Component, DestroyRef, inject, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, OnInit, signal, WritableSignal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
@@ -31,12 +31,13 @@ const material_modules: Imports = [MatCardModule, MatFormFieldModule, MatSlideTo
     selector: 'mho-bank',
     templateUrl: './bank.component.html',
     styleUrls: ['./bank.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class BankComponent implements OnInit {
 
-    /** Les objets affichés par le filtre */
-    protected displayed_bank_items!: Item[];
+    /** Les objets affichés par le filtre. Signal : réassigné depuis le subscribe de getBank() et lu par le template. */
+    protected readonly displayed_bank_items: WritableSignal<Item[] | undefined> = signal(undefined);
     /** L'objet dont le détail est affiché */
     protected detailed_item!: Item;
     /** Le champ de filtre sur les objets */
@@ -71,21 +72,22 @@ export class BankComponent implements OnInit {
                                     return 1;
                                 }
                             });
-                        this.displayed_bank_items = [...this.bank.items];
+                        this.displayed_bank_items.set([...this.bank.items]);
                     }
                 }
             });
     }
 
     protected applyFilters(): void {
+        let filtered: Item[];
         if (this.filter_value !== null && this.filter_value !== undefined && this.filter_value !== '') {
-            this.displayed_bank_items = [...this.bank.items.filter((bank_item: Item) => normalizeString(bank_item.label[this.locale]).indexOf(normalizeString(this.filter_value)) > -1)];
+            filtered = [...this.bank.items.filter((bank_item: Item) => normalizeString(bank_item.label[this.locale]).indexOf(normalizeString(this.filter_value)) > -1)];
         } else {
-            this.displayed_bank_items = [...this.bank.items];
+            filtered = [...this.bank.items];
         }
 
         if (this.select_value && this.select_value.length > 0) {
-            this.displayed_bank_items = this.displayed_bank_items.filter((item: Item) => {
+            filtered = filtered.filter((item: Item) => {
                 const item_actions_and_properties: (Action | Property)[] = [
                     ...item.actions.filter((action: Action) => action),
                     ...item.properties.filter((property: Property) => property)
@@ -97,6 +99,7 @@ export class BankComponent implements OnInit {
                 return item_has_action_or_property || item_has_key;
             });
         }
+        this.displayed_bank_items.set(filtered);
     }
 
     /**

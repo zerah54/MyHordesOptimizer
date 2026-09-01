@@ -1,5 +1,5 @@
-import { CommonModule, DecimalPipe, formatNumber,Location, NgOptimizedImage, NgTemplateOutlet } from '@angular/common';
-import { Component, DestroyRef, DOCUMENT, inject,OnInit } from '@angular/core';
+import { CommonModule, DecimalPipe, formatNumber, Location, NgOptimizedImage, NgTemplateOutlet } from '@angular/common';
+import { ChangeDetectionStrategy, Component, DestroyRef, DOCUMENT, inject, OnInit, signal, WritableSignal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -41,7 +41,8 @@ const material_modules: Imports = [MatButtonModule, MatButtonToggleModule, MatCa
     selector: 'mho-camping',
     templateUrl: './camping.component.html',
     styleUrls: ['./camping.component.scss'],
-    imports: [...angular_common, ...components, ...material_modules, ...pipes]
+    imports: [...angular_common, ...components, ...material_modules, ...pipes],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CampingComponent implements OnInit {
     private readonly fb: UntypedFormBuilder = inject(UntypedFormBuilder);
@@ -52,8 +53,11 @@ export class CampingComponent implements OnInit {
     private readonly location: Location = inject(Location);
     private readonly document: Document = inject<Document>(DOCUMENT);
 
-    protected ruins: Ruin[] = [];
-    protected town_ruins: Ruin[] = [];
+    // Chaîne asynchrone entière (queryParams -> getRuins -> getBonus -> [getTownRuins] -> form ->
+    // calculateCamping) : tous les champs qu'elle alimente et que le propre template lit doivent être
+    // des signaux (mutation depuis .subscribe(), jamais reflétée sous OnPush sinon).
+    protected readonly ruins: WritableSignal<Ruin[]> = signal([]);
+    protected readonly town_ruins: WritableSignal<Ruin[]> = signal([]);
     protected town: TownDetails | null = getTown();
     protected and_amelio: boolean = true;
     protected display_bonus_ap: boolean = false;
@@ -64,11 +68,10 @@ export class CampingComponent implements OnInit {
         { id: 'PANDE', label: $localize`Pandémonium`, bonus: 0 }
     ];
 
-    protected bonus!: CampingBonus;
+    protected readonly bonus: WritableSignal<CampingBonus | undefined> = signal(undefined);
 
-    protected configuration_form!: UntypedFormGroup;
-    // public configuration_form!: ModelFormGroup<CampingParameters>;
-    protected camping_result!: CampingOdds;
+    protected readonly configuration_form: WritableSignal<UntypedFormGroup | undefined> = signal(undefined);
+    protected readonly camping_result: WritableSignal<CampingOdds | undefined> = signal(undefined);
     /** Le dossier dans lequel sont stockées les images */
     protected readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
     protected readonly locale: string = moment.locale();
@@ -106,26 +109,26 @@ export class CampingComponent implements OnInit {
                         this.camping_service.getBonus()
                             .pipe(takeUntilDestroyed(this.destroy_ref))
                             .subscribe((bonus: CampingBonus) => {
-                                this.bonus = bonus;
+                                this.bonus.set(bonus);
 
                                 if (this.town) {
                                     this.town_service
                                         .getTownRuins()
                                         .pipe(takeUntilDestroyed(this.destroy_ref))
                                         .subscribe((town_ruins: Ruin[]) => {
-                                            this.town_ruins = [this.no_ruin].concat([...town_ruins]);
+                                            this.town_ruins.set([this.no_ruin].concat([...town_ruins]));
                                         });
                                 }
 
-                                this.no_ruin.camping = this.bonus.desert_bonus;
-                                this.ruins = [this.no_ruin].concat([...ruins]);
+                                this.no_ruin.camping = bonus.desert_bonus;
+                                this.ruins.set([this.no_ruin].concat([...ruins]));
 
                                 const pande_town: TownType = <TownType>this.town_types.find((town_type: TownType) => town_type.id === 'PANDE');
-                                pande_town.bonus = this.bonus.pande;
+                                pande_town.bonus = bonus.pande;
 
                                 const init_form: Record<string, unknown> | undefined = this.convertEasyReadableToForm(params);
 
-                                this.configuration_form = this.fb.group(init_form ? init_form : {
+                                const configuration_form: UntypedFormGroup = this.fb.group(init_form ? init_form : {
                                     town: [{
                                         value: <TownType>this.town_types.find((town_type: TownType) => this.town && this.in_town_camping ? town_type.id === (<TownDetails>this.town).town_type : town_type.id === 'RNE'),
                                         disabled: false
@@ -152,9 +155,10 @@ export class CampingComponent implements OnInit {
                                     ruin: [{ value: this.no_ruin, disabled: false }],
                                     bury_count: [{ value: 0, disabled: false }],
                                 });
+                                this.configuration_form.set(configuration_form);
                                 this.calculateCamping();
 
-                                this.configuration_form.valueChanges
+                                configuration_form.valueChanges
                                     .pipe(takeUntilDestroyed(this.destroy_ref))
                                     .subscribe(() => {
                                         this.calculateCamping();
@@ -181,7 +185,7 @@ export class CampingComponent implements OnInit {
             if (ruin.id === -1000) {
                 capacity = '';
             } else if (ruin.id === -1) {
-                capacity = formatNumber(Math.max(0, Math.min(3, Math.floor((+this.configuration_form.get('bury_count')?.value || 0) / 3))), this.locale, '1.0-0');
+                capacity = formatNumber(Math.max(0, Math.min(3, Math.floor((+this.configuration_form()!.get('bury_count')?.value || 0) / 3))), this.locale, '1.0-0');
             } else {
                 capacity = formatNumber(ruin.capacity || 0, this.locale, '1.0-0');
             }
@@ -207,18 +211,18 @@ export class CampingComponent implements OnInit {
     }
 
     protected calculateCrowdChance(value: number): number {
-        return this.bonus.crowd_chances[Math.min(this.bonus.crowd_chances.length - 1, value)];
+        return this.bonus()!.crowd_chances[Math.min(this.bonus()!.crowd_chances.length - 1, value)];
     }
 
     protected calculateDistanceChance(value: number): number {
-        return this.bonus.dist_chances[Math.min(this.bonus.dist_chances.length - 1, value)];
+        return this.bonus()!.dist_chances[Math.min(this.bonus()!.dist_chances.length - 1, value)];
     }
 
     protected changeBonusMode(display_bonus_ap: boolean): void {
         if (display_bonus_ap) {
-            this.configuration_form.get('complete_improve')?.setValue(+this.configuration_form.get('complete_improve')?.value / 5);
+            this.configuration_form()!.get('complete_improve')?.setValue(+this.configuration_form()!.get('complete_improve')?.value / 5);
         } else {
-            this.configuration_form.get('complete_improve')?.setValue(+this.configuration_form.get('complete_improve')?.value * 5);
+            this.configuration_form()!.get('complete_improve')?.setValue(+this.configuration_form()!.get('complete_improve')?.value * 5);
         }
     }
 
@@ -227,15 +231,15 @@ export class CampingComponent implements OnInit {
         let chance: number[];
         if (pande) {
             if (pro_camper) {
-                chance = this.bonus.panda_pro_camper_by_already_camped;
+                chance = this.bonus()!.panda_pro_camper_by_already_camped;
             } else {
-                chance = this.bonus.panda_no_pro_camper_by_already_camped;
+                chance = this.bonus()!.panda_no_pro_camper_by_already_camped;
             }
         } else {
             if (pro_camper) {
-                chance = this.bonus.normal_pro_camper_by_already_camped;
+                chance = this.bonus()!.normal_pro_camper_by_already_camped;
             } else {
-                chance = this.bonus.normal_no_pro_camper_by_already_camped;
+                chance = this.bonus()!.normal_no_pro_camper_by_already_camped;
             }
         }
 
@@ -243,8 +247,8 @@ export class CampingComponent implements OnInit {
     }
 
     protected changeInTownMode(): void {
-        const town_type_control: FormControl<TownType> = <FormControl>this.configuration_form.get('town');
-        const devastated_control: FormControl<boolean> = <FormControl>this.configuration_form.get('devastated');
+        const town_type_control: FormControl<TownType> = <FormControl>this.configuration_form()!.get('town');
+        const devastated_control: FormControl<boolean> = <FormControl>this.configuration_form()!.get('devastated');
         if (this.in_town_camping && this.town) {
 
             const current_town: TownDetails = this.town;
@@ -269,15 +273,15 @@ export class CampingComponent implements OnInit {
              * Nombre d'améliorations simples sur la case
              * @see ActionDataService.php : 'improve'
              */
-            total_improve = this.calculateObjectsFromTotal().improve + this.configuration_form.get('improve')?.value;
+            total_improve = this.calculateObjectsFromTotal().improve + this.configuration_form()!.get('improve')?.value;
 
             /**
              * Nombre d'objets de défense installés sur la case
              * @see ActionDataService.php ('cm_campsite_improve')
              */
-            total_object_improve = this.calculateObjectsFromTotal().improve_objects + this.configuration_form.get('object_improve')?.value;
+            total_object_improve = this.calculateObjectsFromTotal().improve_objects + this.configuration_form()!.get('object_improve')?.value;
         } else {
-            if (+this.configuration_form.get('complete_improve')?.value > 0) {
+            if (+this.configuration_form()!.get('complete_improve')?.value > 0) {
                 /**
                  * Nombre d'améliorations simples sur la case
                  * @see ActionDataService.php : 'improve'
@@ -294,46 +298,46 @@ export class CampingComponent implements OnInit {
                  * Nombre d'améliorations simples sur la case
                  * @see ActionDataService.php : 'improve'
                  */
-                total_improve = +this.configuration_form.get('improve')?.value;
+                total_improve = +this.configuration_form()!.get('improve')?.value;
 
                 /**
                  * Nombre d'objets de défense installés sur la case
                  * @see ActionDataService.php : 'cm_campsite_improve'
                  */
-                total_object_improve = +this.configuration_form.get('object_improve')?.value;
+                total_object_improve = +this.configuration_form()!.get('object_improve')?.value;
             }
         }
 
         const camping_parameters: CampingParameters = new CampingParameters({
-            townType: this.configuration_form.get('town')?.value.id,
-            job: (<JobEnum>this.configuration_form.get('job')?.value).value.id,
-            distance: this.configuration_form.get('distance')?.value ?? 0,
-            campings: this.configuration_form.get('campings')?.value ?? 0,
-            proCamper: this.configuration_form.get('pro')?.value,
-            hiddenCampers: this.configuration_form.get('hidden_campers')?.value,
-            objects: this.configuration_form.get('objects')?.value ?? 0,
-            vest: this.configuration_form.get('vest')?.value ?? 0,
-            tomb: this.configuration_form.get('tomb')?.value ?? 0,
-            r4: this.configuration_form.get('r4')?.value ?? 0,
-            zombies: this.configuration_form.get('zombies')?.value ?? 0,
-            night: this.configuration_form.get('night')?.value,
-            devastated: this.configuration_form.get('devastated')?.value,
-            phare: this.configuration_form.get('phare')?.value,
+            townType: this.configuration_form()!.get('town')?.value.id,
+            job: (<JobEnum>this.configuration_form()!.get('job')?.value).value.id,
+            distance: this.configuration_form()!.get('distance')?.value ?? 0,
+            campings: this.configuration_form()!.get('campings')?.value ?? 0,
+            proCamper: this.configuration_form()!.get('pro')?.value,
+            hiddenCampers: this.configuration_form()!.get('hidden_campers')?.value,
+            objects: this.configuration_form()!.get('objects')?.value ?? 0,
+            vest: this.configuration_form()!.get('vest')?.value ?? 0,
+            tomb: this.configuration_form()!.get('tomb')?.value ?? 0,
+            r4: this.configuration_form()!.get('r4')?.value ?? 0,
+            zombies: this.configuration_form()!.get('zombies')?.value ?? 0,
+            night: this.configuration_form()!.get('night')?.value,
+            devastated: this.configuration_form()!.get('devastated')?.value,
+            phare: this.configuration_form()!.get('phare')?.value,
             improve: total_improve ?? 0,
             objectImprove: total_object_improve ?? 0,
-            ruinBonus: (<Ruin>this.configuration_form.get('ruin')?.value).camping ?? 0,
-            ruinCapacity: this.configuration_form.get('ruin')?.value.capacity ?? 100,
-            ruinBuryCount: (<Ruin>this.configuration_form.get('ruin')?.value).id === -1 ? this.configuration_form.get('bury_count')?.value : 0,
+            ruinBonus: (<Ruin>this.configuration_form()!.get('ruin')?.value).camping ?? 0,
+            ruinCapacity: this.configuration_form()!.get('ruin')?.value.capacity ?? 100,
+            ruinBuryCount: (<Ruin>this.configuration_form()!.get('ruin')?.value).id === -1 ? this.configuration_form()!.get('bury_count')?.value : 0,
         });
         this.camping_service.calculateCamping(camping_parameters).subscribe((camping_result: CampingOdds) => {
-            this.camping_result = camping_result;
+            this.camping_result.set(camping_result);
         });
     }
 
     private convertFormToEasyReadable(): string {
         let url_string: string = '';
-        for (const key in this.configuration_form.value) {
-            const element: string | number | boolean | TownType | JobEnum = this.configuration_form.value[key];
+        for (const key in this.configuration_form()!.value) {
+            const element: string | number | boolean | TownType | JobEnum = this.configuration_form()!.value[key];
             if (element !== null && element !== undefined && element !== '') {
                 if (typeof element === 'string' || typeof element === 'number' || typeof element === 'boolean') {
                     url_string += `&${key}=${element.toString()}`;
@@ -362,7 +366,7 @@ export class CampingComponent implements OnInit {
                         init_form[key] = [this.town_types.find((town_type: TownType) => town_type.id.toString() === params[key].toString())];
                         break;
                     case 'ruin':
-                        init_form[key] = [this.ruins.find((ruin: Ruin) => ruin.id.toString() === params[key].toString())];
+                        init_form[key] = [this.ruins().find((ruin: Ruin) => ruin.id.toString() === params[key].toString())];
                         break;
                     case 'job':
                         init_form[key] = [this.jobs.find((job: JobEnum) => job.value.id.toString() === params[key].toString())];
@@ -383,15 +387,15 @@ export class CampingComponent implements OnInit {
     }
 
     private calculateObjectsFromTotal(): { improve: number, improve_objects: number } {
-        const complete_improve: number = this.configuration_form.get('complete_improve')?.value;
-        for (let i: number = 0; i <= Math.floor(complete_improve); i += (this.display_bonus_ap ? 1 : this.bonus.improve)) {
-            const tested_improve_objects: number = (complete_improve * 100 - i * 100) / 100 / (this.display_bonus_ap ? (this.bonus.object_improve / this.bonus.improve) : this.bonus.object_improve);
+        const complete_improve: number = this.configuration_form()!.get('complete_improve')?.value;
+        for (let i: number = 0; i <= Math.floor(complete_improve); i += (this.display_bonus_ap ? 1 : this.bonus()!.improve)) {
+            const tested_improve_objects: number = (complete_improve * 100 - i * 100) / 100 / (this.display_bonus_ap ? (this.bonus()!.object_improve / this.bonus()!.improve) : this.bonus()!.object_improve);
             if (Number.isInteger(tested_improve_objects)) {
-                const improve: number = complete_improve - (tested_improve_objects * (this.display_bonus_ap ? (this.bonus.object_improve / this.bonus.improve) : this.bonus.object_improve));
-                return { improve: improve / (this.display_bonus_ap ? 1 : this.bonus.improve), improve_objects: tested_improve_objects };
+                const improve: number = complete_improve - (tested_improve_objects * (this.display_bonus_ap ? (this.bonus()!.object_improve / this.bonus()!.improve) : this.bonus()!.object_improve));
+                return { improve: improve / (this.display_bonus_ap ? 1 : this.bonus()!.improve), improve_objects: tested_improve_objects };
             }
         }
-        return { improve: Math.round(complete_improve / (this.display_bonus_ap ? 1 : this.bonus.improve)), improve_objects: 0 };
+        return { improve: Math.round(complete_improve / (this.display_bonus_ap ? 1 : this.bonus()!.improve)), improve_objects: 0 };
     }
 }
 

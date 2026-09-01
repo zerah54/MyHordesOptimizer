@@ -1,5 +1,5 @@
 import { CdkDragRelease, DragDropModule } from '@angular/cdk/drag-drop';
-import { Component, ElementRef, OnInit, Signal, viewChildren } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, OnInit, Signal, signal, viewChildren, WritableSignal } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { HORDES_IMG_REPO } from 'src/app/_abstract_model/const';
 import { Imports } from 'src/app/_abstract_model/types/_types';
@@ -16,18 +16,25 @@ const material_modules: Imports = [ MatCardModule, DragDropModule ];
     selector: 'mho-368-pictos',
     templateUrl: '368-pictos.component.html',
     styleUrls: [ '368-pictos.component.scss' ],
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [ ...angular_common, ...components, ...material_modules, ...pipes ]
 })
 export class PictosGameComponent implements OnInit {
 
-    protected board: (PictosGameCell | undefined)[][] = [];
-    protected pictos_rescued: number = 0;
+    // Signaux (pas de simples champs) : mutés depuis setInterval/setTimeout et lus par le template
+    // sous OnPush — un champ muté depuis un callback asynchrone ne marque pas la vue pour vérification.
+    protected readonly board: WritableSignal<(PictosGameCell | undefined)[][]> = signal([]);
+    protected readonly pictos_rescued: WritableSignal<number> = signal(0);
+    protected readonly current_lot: WritableSignal<[ PictosGameCell, PictosGameCell ] | []> = signal([]);
+    protected readonly is_lot_horizontal: WritableSignal<boolean> = signal(true); // Determines if the current lot is horizontal or vertical
+    protected readonly game_over: WritableSignal<boolean> = signal(true);
+    protected readonly time_spent: WritableSignal<number> = signal(0); // Time in seconds
+
+    // attempts/highlighted_cells restent de simples champs : mutés uniquement de façon synchrone
+    // depuis un événement du propre template du composant (click, cdkDragMoved/Released/Started),
+    // ce qui marque déjà la vue pour vérification sans passer par un signal.
     protected attempts: number = 0;
-    protected current_lot: [ PictosGameCell, PictosGameCell ] | [] = [];
-    protected is_lot_horizontal: boolean = true; // Determines if the current lot is horizontal or vertical
     protected highlighted_cells: [ { row: number, col: number; }, { row: number, col: number; } ] | [] = [];
-    protected game_over: boolean = true;
-    protected time_spent: number = 0; // Time in seconds
     protected HORDES_IMG_REPO: string = HORDES_IMG_REPO; // Path to the folder where images are stored
     protected readonly pictos_to_rescue: number = 368; // Total number of pictos to rescue
     private cells: Signal<readonly ElementRef<HTMLDivElement>[]> = viewChildren('cellDiv', { read: ElementRef });
@@ -45,43 +52,42 @@ export class PictosGameComponent implements OnInit {
     }
 
     protected init(): void {
-        this.board = Array.from({ length: 6 }, () => Array(6).fill(undefined));
-        this.pictos_rescued = 0;
+        this.board.set(Array.from({ length: 6 }, () => Array(6).fill(undefined)));
+        this.pictos_rescued.set(0);
         this.attempts = 0;
-        this.current_lot = [];
-        this.time_spent = 0;
-        this.game_over = false;
+        this.current_lot.set([]);
+        this.time_spent.set(0);
+        this.game_over.set(false);
 
         this.interval = setInterval(() => {
-            this.time_spent += 1;
+            this.time_spent.update((time_spent: number) => time_spent + 1);
         }, 1000);
 
         this.generateNewLot();
     }
 
     protected onCellClick(row: number, col: number): void {
-        if (this.current_lot?.length === 2 && !this.game_over) {
-            if (this.is_lot_horizontal) {
+        if (this.current_lot()?.length === 2 && !this.game_over()) {
+            if (this.is_lot_horizontal()) {
                 // Try to place horizontally
                 if (this.canBePlacedHorizontally(row, col)) {
-                    this.board[ row ][ col ] = this.current_lot[ 0 ];
-                    this.board[ row ][ col + 1 ] = this.current_lot[ 1 ];
+                    this.setCell(row, col, this.current_lot()[ 0 ]);
+                    this.setCell(row, col + 1, this.current_lot()[ 1 ]);
                 } else {
                     return;
                 }
             } else {
                 // Try to place vertically
                 if (this.canBePlacedVertically(row, col)) {
-                    this.board[ row ][ col ] = this.current_lot[ 0 ];
-                    this.board[ row + 1 ][ col ] = this.current_lot[ 1 ];
+                    this.setCell(row, col, this.current_lot()[ 0 ]);
+                    this.setCell(row + 1, col, this.current_lot()[ 1 ]);
                 } else {
                     return;
                 }
             }
             this.attempts++;
             setTimeout(() => {
-                this.checkAndRemoveGroups();
-                this.generateNewLot();
+                this.generateNewLotAfterRemoval(this.checkAndRemoveGroups());
             });
         }
     }
@@ -109,7 +115,7 @@ export class PictosGameComponent implements OnInit {
             // Si il y a superposition, on vérifie si il est déjà dans la liste des cellules mises en surbrillance
             if (cell_is_in_highlighted_index > -1) return;
 
-            if (this.is_lot_horizontal) {
+            if (this.is_lot_horizontal()) {
                 if (!this.canBePlacedHorizontally(x, y)) return;
                 this.highlighted_cells = [ { row: x, col: y }, { row: x, col: y + 1 } ];
             } else {
@@ -139,16 +145,16 @@ export class PictosGameComponent implements OnInit {
             const x: number = +(overlap.nativeElement.getAttribute('x') || 0);
             const y: number = +(overlap.nativeElement.getAttribute('y') || 0);
 
-            if (this.is_lot_horizontal) {
+            if (this.is_lot_horizontal()) {
                 if (this.canBePlacedHorizontally(x, y)) {
-                    this.board[ x ][ y ] = this.current_lot[ 0 ];
-                    this.board[ x ][ y + 1 ] = this.current_lot[ 1 ];
+                    this.setCell(x, y, this.current_lot()[ 0 ]);
+                    this.setCell(x, y + 1, this.current_lot()[ 1 ]);
                     placed = true;
                 }
             } else {
                 if (this.canBePlacedVertically(x, y)) {
-                    this.board[ x ][ y ] = this.current_lot[ 0 ];
-                    this.board[ x + 1 ][ y ] = this.current_lot[ 1 ];
+                    this.setCell(x, y, this.current_lot()[ 0 ]);
+                    this.setCell(x + 1, y, this.current_lot()[ 1 ]);
                     placed = true;
                 }
             }
@@ -157,20 +163,29 @@ export class PictosGameComponent implements OnInit {
         if (placed) {
             this.attempts++;
             this.highlighted_cells = [];
-            this.checkAndRemoveGroups();
-            this.generateNewLot();
+            this.generateNewLotAfterRemoval(this.checkAndRemoveGroups());
         }
 
         /** Doit être replacé à sa position initiale */
         event.source._dragRef.reset();
     }
 
+    /** Réassignation immuable d'une case du plateau : un signal muté en place ne notifierait pas ses consommateurs. */
+    private setCell(row: number, col: number, value: PictosGameCell | undefined): void {
+        this.board.update((current: (PictosGameCell | undefined)[][]) => {
+            const next: (PictosGameCell | undefined)[][] = [ ...current ];
+            next[ row ] = [ ...next[ row ] ];
+            next[ row ][ col ] = value;
+            return next;
+        });
+    }
+
     private generateNewLot(): void {
-        this.current_lot = [
+        this.current_lot.set([
             { ...this.picto[ Math.floor(Math.random() * this.picto.length) ] },
             { ...this.picto[ Math.floor(Math.random() * this.picto.length) ] }
-        ];
-        this.is_lot_horizontal = Math.random() > 0.5; // Randomly decide if the lot is horizontal or vertical
+        ]);
+        this.is_lot_horizontal.set(Math.random() > 0.5); // Randomly decide if the lot is horizontal or vertical
 
         if (!this.canPlaceLot()) {
             this.endGame();
@@ -178,11 +193,12 @@ export class PictosGameComponent implements OnInit {
     }
 
     private canPlaceLot(): boolean {
-        if (this.is_lot_horizontal) {
+        const board: (PictosGameCell | undefined)[][] = this.board();
+        if (this.is_lot_horizontal()) {
             // Check if the current lot can be placed horizontally
             for (let i: number = 0; i < 6; i++) {
                 for (let j: number = 0; j < 5; j++) {
-                    if (this.board[ i ][ j ] === undefined && this.board[ i ][ j + 1 ] === undefined) {
+                    if (board[ i ][ j ] === undefined && board[ i ][ j + 1 ] === undefined) {
                         return true;
                     }
                 }
@@ -191,7 +207,7 @@ export class PictosGameComponent implements OnInit {
             // Check if the current lot can be placed vertically
             for (let j: number = 0; j < 6; j++) {
                 for (let i: number = 0; i < 5; i++) {
-                    if (this.board[ i ][ j ] === undefined && this.board[ i + 1 ][ j ] === undefined) {
+                    if (board[ i ][ j ] === undefined && board[ i + 1 ][ j ] === undefined) {
                         return true;
                     }
                 }
@@ -201,17 +217,32 @@ export class PictosGameComponent implements OnInit {
         return false;
     }
 
-    private checkAndRemoveGroups(): void {
+    /**
+     * Génère le prochain lot une fois les cases retirées lors du dernier match effectivement vidées
+     * (250ms) : `canPlaceLot()` doit voir un plateau à jour, pas un plateau encore encombré par des
+     * cases marquées `to_remove` mais pas encore `undefined` — sinon la partie peut se terminer à
+     * tort alors qu'il restait de la place.
+     */
+    private generateNewLotAfterRemoval(had_removals: boolean): void {
+        if (had_removals) {
+            setTimeout(() => this.generateNewLot(), 250);
+        } else {
+            this.generateNewLot();
+        }
+    }
+
+    private checkAndRemoveGroups(): boolean {
         const to_remove: { row: number, col: number, picto: number | undefined; }[] = [];
+        const board: (PictosGameCell | undefined)[][] = this.board();
 
         // Mark horizontal groups
         for (let i: number = 0; i < 6; i++) {
             let count: number = 1;
             for (let j: number = 0; j < 6; j++) {
-                if (this.board[ i ][ j ] !== undefined) {
+                if (board[ i ][ j ] !== undefined) {
                     count = 1;
-                    const current_picto: number | undefined = this.board[ i ][ j ]?.id;
-                    while (j + 1 < 6 && this.board[ i ][ j + 1 ]?.id === current_picto) {
+                    const current_picto: number | undefined = board[ i ][ j ]?.id;
+                    while (j + 1 < 6 && board[ i ][ j + 1 ]?.id === current_picto) {
                         count++;
                         j++;
                     }
@@ -228,10 +259,10 @@ export class PictosGameComponent implements OnInit {
         for (let j: number = 0; j < 6; j++) {
             let count: number = 1;
             for (let i: number = 0; i < 6; i++) {
-                if (this.board[ i ][ j ] !== undefined) {
+                if (board[ i ][ j ] !== undefined) {
                     count = 1;
-                    const current_picto: number | undefined = this.board[ i ][ j ]?.id;
-                    while (i + 1 < 6 && this.board[ i + 1 ][ j ]?.id === current_picto) {
+                    const current_picto: number | undefined = board[ i ][ j ]?.id;
+                    while (i + 1 < 6 && board[ i + 1 ][ j ]?.id === current_picto) {
                         count++;
                         i++;
                     }
@@ -246,23 +277,29 @@ export class PictosGameComponent implements OnInit {
 
         // Remove marked cells
         to_remove.forEach((cell: { row: number, col: number; }) => {
-            if (this.board[ cell.row ][ cell.col ]) {
-                (<PictosGameCell> this.board[ cell.row ][ cell.col ]).to_remove = true;
+            // Relecture volontaire de `this.board()` (pas de la capture `board` ci-dessus) : préserve
+            // le comportement hérité où une case appartenant à la fois à un groupe horizontal ET
+            // vertical est traitée deux fois (double incrément de pictos_rescued, non corrigé ici).
+            const current_cell: PictosGameCell | undefined = this.board()[ cell.row ][ cell.col ];
+            if (current_cell) {
+                this.setCell(cell.row, cell.col, { ...current_cell, to_remove: true });
             }
-            this.pictos_rescued++;
+            this.pictos_rescued.update((pictos_rescued: number) => pictos_rescued + 1);
             setTimeout(() => {
-                this.board[ cell.row ][ cell.col ] = undefined;
+                this.setCell(cell.row, cell.col, undefined);
             }, 250);
         });
 
-        if (this.pictos_rescued >= this.pictos_to_rescue) {
+        if (this.pictos_rescued() >= this.pictos_to_rescue) {
             this.endGame();
             alert('Congratulations!');
         }
+
+        return to_remove.length > 0;
     }
 
     private endGame(): void {
-        this.game_over = true;
+        this.game_over.set(true);
 
         // Stop the timer if no valid moves are left
         if (this.interval) {
@@ -271,11 +308,13 @@ export class PictosGameComponent implements OnInit {
     }
 
     private canBePlacedHorizontally(row: number, col: number): boolean {
-        return col + 1 < 6 && this.board[ row ][ col ] === undefined && this.board[ row ][ col + 1 ] === undefined;
+        const board: (PictosGameCell | undefined)[][] = this.board();
+        return col + 1 < 6 && board[ row ][ col ] === undefined && board[ row ][ col + 1 ] === undefined;
     }
 
     private canBePlacedVertically(row: number, col: number): boolean {
-        return row + 1 < 6 && this.board[ row ][ col ] === undefined && this.board[ row + 1 ][ col ] === undefined;
+        const board: (PictosGameCell | undefined)[][] = this.board();
+        return row + 1 < 6 && board[ row ][ col ] === undefined && board[ row + 1 ][ col ] === undefined;
     }
 
     private areElementsOverlappingMoreThan50Percent(element1: HTMLDivElement, element2: HTMLDivElement): boolean {

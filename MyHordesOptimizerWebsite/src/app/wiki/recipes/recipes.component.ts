@@ -1,5 +1,5 @@
 import { CommonModule, DecimalPipe, NgOptimizedImage } from '@angular/common';
-import { Component, DestroyRef, inject, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, OnInit, signal, WritableSignal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatCardModule } from '@angular/material/card';
 import { MatSortModule } from '@angular/material/sort';
@@ -28,11 +28,12 @@ const material_modules: Imports = [MatCardModule, MatSortModule, MatTableModule]
     selector: 'mho-recipes',
     templateUrl: './recipes.component.html',
     styleUrls: ['./recipes.component.scss'],
-    imports: [...angular_common, ...components, ...directives, ...material_modules, ...pipes]
+    imports: [...angular_common, ...components, ...directives, ...material_modules, ...pipes],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class RecipesComponent implements OnInit {
 
-    protected recipes: Recipe[] = [];
+    protected readonly recipes: WritableSignal<Recipe[]> = signal([]);
     /** La datasource pour le tableau */
     protected datasource: MatTableDataSource<Recipe> = new MatTableDataSource();
 
@@ -56,7 +57,7 @@ export class RecipesComponent implements OnInit {
         this.api.getRecipes()
             .pipe(takeUntilDestroyed(this.destroy_ref))
             .subscribe((recipes: Recipe[]): void => {
-                this.recipes = recipes;
+                this.recipes.set(recipes);
                 this.datasource.data = [...recipes];
                 this.datasource.filterPredicate = this.customFilter;
             });

@@ -1,5 +1,5 @@
 import { CommonModule, DecimalPipe } from '@angular/common';
-import { AfterViewInit, Component } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, Component, signal, WritableSignal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -20,21 +20,28 @@ const material_modules: Imports = [MatButtonModule, MatCardModule, MatFormFieldM
     selector: 'mho-probabilities',
     templateUrl: './probabilities.component.html',
     styleUrls: ['./probabilities.component.scss'],
-    imports: [...angular_common, ...components, ...material_modules, ...pipes]
+    imports: [...angular_common, ...components, ...material_modules, ...pipes],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ProbabilitiesComponent implements AfterViewInit {
 
-    protected simulations: Simulation[] = [
+    /** Signal : {@link ngAfterViewInit} s'exécute APRÈS la première évaluation du template
+     *  (executeTemplate précède les hooks de vue) — sans signal, la simulation initiale calculée
+     *  là resterait invisible sous OnPush (aucun événement ne marque la vue à revérifier). */
+    protected readonly simulations: WritableSignal<Simulation[]> = signal([
         { nb_people: 1, current_chances: [0], result_probabilities: [], title: $localize`Simulation 1`, editing_title: false, show_detail: true }
-    ];
+    ]);
 
     protected default_value: number = 0;
     protected readonly locale: string = moment.locale();
 
     public ngAfterViewInit(): void {
-        this.simulations.forEach((simulation: Simulation) => {
+        this.simulations().forEach((simulation: Simulation) => {
             this.convertFieldsToChances(simulation);
         });
+        // Nouvelle référence de tableau pour notifier : les simulations elles-mêmes sont mutées en
+        // place ci-dessus, seul le sommet (le tableau) doit changer pour que le signal se déclenche.
+        this.simulations.set([...this.simulations()]);
     }
 
     protected createSimulation(): void {
@@ -42,16 +49,16 @@ export class ProbabilitiesComponent implements AfterViewInit {
             nb_people: 1,
             current_chances: [0],
             result_probabilities: [],
-            title: $localize`Simulation` + ' ' + (this.simulations.length + 1),
+            title: $localize`Simulation` + ' ' + (this.simulations().length + 1),
             editing_title: false,
             show_detail: true
         };
-        this.simulations.push(new_simulation);
+        this.simulations.set([...this.simulations(), new_simulation]);
         this.calculateProbabilities(new_simulation);
     }
 
     protected deleteSimulation(index: number): void {
-        this.simulations.splice(index, 1);
+        this.simulations.set(this.simulations().filter((_: Simulation, i: number) => i !== index));
     }
 
     protected convertFieldsToChances(simulation: Simulation): void {

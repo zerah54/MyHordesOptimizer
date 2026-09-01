@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, input, InputSignal, output, OutputEmitterRef } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input, InputSignal, output, OutputEmitterRef } from '@angular/core';
 import { MatButtonToggleChange, MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
@@ -19,7 +19,8 @@ const material_modules: Imports = [MatButtonToggleModule, MatIconModule, MatTool
     selector: 'mho-header-with-toggle',
     templateUrl: './header-with-toggle.component.html',
     styleUrls: ['./header-with-toggle.component.scss'],
-    imports: [...angular_common, ...material_modules]
+    imports: [...angular_common, ...material_modules],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class HeaderWithToggleComponent {
 

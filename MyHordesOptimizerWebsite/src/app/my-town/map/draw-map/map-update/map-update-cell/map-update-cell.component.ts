@@ -1,5 +1,17 @@
 import { CommonModule, NgOptimizedImage } from '@angular/common';
-import { Component, DestroyRef, inject, input, InputSignal, OnInit, output, OutputEmitterRef } from '@angular/core';
+import {
+    ChangeDetectionStrategy,
+    Component,
+    DestroyRef,
+    inject,
+    input,
+    InputSignal,
+    OnInit,
+    output,
+    OutputEmitterRef,
+    signal,
+    WritableSignal
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatCheckboxModule } from '@angular/material/checkbox';
@@ -33,13 +45,15 @@ const material_modules: Imports = [MatCheckboxModule, MatDividerModule, MatFormF
     selector: 'mho-map-update-cell',
     templateUrl: './map-update-cell.component.html',
     styleUrls: ['./map-update-cell.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class MapUpdateCellComponent implements OnInit {
     public citizens: InputSignal<Citizen[]> = input.required();
     public cell: InputSignal<Cell> = input.required();
     public cellChange: OutputEmitterRef<Cell> = output();
-    protected all_items: Item[] = [];
+    /** Signal : réassigné depuis le subscribe de getItems() (async) et lu par le propre template. */
+    protected readonly all_items: WritableSignal<Item[]> = signal([]);
     protected cell_form!: FormGroup;
     /** Les quatre directions accessibles, dans l'ordre d'affichage du radar */
     protected readonly directions: RadarDirection[] = [
@@ -72,7 +86,7 @@ export class MapUpdateCellComponent implements OnInit {
         this.api.getItems()
             .pipe(takeUntilDestroyed(this.destroy_ref))
             .subscribe((all_items: Item[]) => {
-                this.all_items = all_items;
+                this.all_items.set(all_items);
             });
 
         this.cell_form = this.fb.group({
@@ -82,14 +96,14 @@ export class MapUpdateCellComponent implements OnInit {
             items: [this.cell().items],
             scav_zone_level: [this.cell().scav_zone_level],
             scout_zone_level: [this.cell().scout_zone_level],
-            scav_north: [null],
-            scav_south: [null],
-            scav_east: [null],
-            scav_west: [null],
-            scout_north: [null],
-            scout_south: [null],
-            scout_east: [null],
-            scout_west: [null],
+            scav_north: [this.cell().scav_next_cells?.north ?? null],
+            scav_south: [this.cell().scav_next_cells?.south ?? null],
+            scav_east: [this.cell().scav_next_cells?.east ?? null],
+            scav_west: [this.cell().scav_next_cells?.west ?? null],
+            scout_north: [this.cell().scout_next_cells?.north ?? null],
+            scout_south: [this.cell().scout_next_cells?.south ?? null],
+            scout_east: [this.cell().scout_next_cells?.east ?? null],
+            scout_west: [this.cell().scout_next_cells?.west ?? null],
         });
 
         this.cell_form.valueChanges
@@ -127,7 +141,7 @@ export class MapUpdateCellComponent implements OnInit {
             if (item_in_list_index !== undefined && item_in_list_index !== null && item_in_list_index > -1) {
                 cell.items[item_in_list_index].count++;
             } else {
-                const item: Item = <Item>this.all_items.find((item: Item) => item.id === item_id);
+                const item: Item = <Item>this.all_items().find((item: Item) => item.id === item_id);
                 const short_item: ItemCountShort = new ItemCountShort({
                     isBroken: !!item.is_broken,
                     count: 1,

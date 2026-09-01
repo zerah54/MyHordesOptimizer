@@ -14,7 +14,7 @@
 </mat-card-header>
 <mat-card-content>
     <div class="mho-probabilities">
-        @for (simulation of simulations; track simulation; let i = $index) {
+        @for (simulation of simulations(); track simulation; let i = $index) {
             <div>
                 <div class="header">
                     <div>

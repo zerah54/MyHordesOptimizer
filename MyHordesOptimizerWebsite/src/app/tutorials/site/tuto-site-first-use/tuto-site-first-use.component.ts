@@ -1,4 +1,4 @@
-import { Component, DOCUMENT, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DOCUMENT, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
@@ -17,7 +17,8 @@ const material_modules: Imports = [MatButtonModule, MatCardModule, MatIconModule
     selector: 'mho-tuto-site-first-use',
     templateUrl: './tuto-site-first-use.component.html',
     styleUrls: ['./tuto-site-first-use.component.scss'],
-    imports: [...angular_common, ...components, ...material_modules, ...pipes]
+    imports: [...angular_common, ...components, ...material_modules, ...pipes],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TutoSiteFirstUseComponent {
     private readonly clipboard: ClipboardService = inject(ClipboardService);

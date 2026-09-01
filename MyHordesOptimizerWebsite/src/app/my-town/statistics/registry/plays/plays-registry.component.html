@@ -10,8 +10,8 @@
     }
 </mat-tab-group>
 <ng-template #template>
-    @let citizens_played = entries_by_type | isCitizenInEntries:completeCitizenList();
-    @let citizens_not_played = entries_by_type | isCitizenInEntries:completeCitizenList():true;
+    @let citizens_played = entries_by_type() | isCitizenInEntries:completeCitizenList();
+    @let citizens_not_played = entries_by_type() | isCitizenInEntries:completeCitizenList():true;
     <div class="plays-dices-cards">
         <div class="citizen-plays">
             <h4>

@@ -1,4 +1,4 @@
-import { Component, DOCUMENT, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DOCUMENT, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
@@ -19,6 +19,7 @@ const material_modules: Imports = [MatButtonModule, MatCardModule, MatIconModule
     templateUrl: './tuto-script-wiki.component.html',
     styleUrls: ['./tuto-script-wiki.component.scss'],
     imports: [...angular_common, ...components, ...material_modules, ...pipes],
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TutoScriptWikiComponent {
     private readonly clipboard: ClipboardService = inject(ClipboardService);

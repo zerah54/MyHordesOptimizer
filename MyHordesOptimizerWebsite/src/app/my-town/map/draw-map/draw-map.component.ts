@@ -1,5 +1,5 @@
 import { CommonModule, NgTemplateOutlet } from '@angular/common';
-import { Component, Input, input,InputSignal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, input, InputSignal, signal, WritableSignal } from '@angular/core';
 
 import { Imports } from '../../../_abstract_model/types/_types';
 import { Cell } from '../../../_abstract_model/types/cell.class';
@@ -22,6 +22,7 @@ const material_modules: Imports = [];
     selector: 'mho-draw-map',
     templateUrl: './draw-map.component.html',
     styleUrls: ['./draw-map.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class DrawMapComponent {
@@ -30,40 +31,45 @@ export class DrawMapComponent {
     public allItems: InputSignal<Item[]> = input.required();
     public allCitizens: InputSignal<Citizen[]> = input.required();
     public options: InputSignal<MapOptions> = input.required();
+    public map: InputSignal<Town> = input.required();
 
-    // TODO: Skipped for migration because:
-    //  Accessor inputs cannot be migrated as they are too complex.
-    @Input() public set map(map: Town) {
-        if (map) {
-            this.complete_map = map;
-            this.x_row = Array.from({ length: map?.map_width }, (_: unknown, i: number) => i - +map.town_x);
-            const rows: Cell[][] = groupBy(map?.cells || [], (cell: Cell) => cell.y);
+    // Signaux (pas de simples champs) : lus par le template sous OnPush, un `effect()` qui les
+    // muterait comme de simples champs ne marquerait pas la vue pour vérification.
+    protected readonly x_row: WritableSignal<number[]> = signal([]);
+    protected readonly complete_map: WritableSignal<Town | undefined> = signal(undefined);
+    protected readonly my_cell: WritableSignal<Cell | undefined> = signal(undefined);
+    protected readonly drawed_map: WritableSignal<Cell[][]> = signal([]);
+    protected hovered_cell: Cell | undefined;
 
-            rows.forEach((row: Cell[]) => {
-                row.sort((cell_a: Cell, cell_b: Cell) => {
-                    if (cell_a.x < cell_b.x) return -1;
-                    if (cell_a.x > cell_b.x) return 1;
+    public constructor() {
+        // Reproduit l'ancien setter `@Input() set map` : ne réagit qu'à `map`, ignore une valeur
+        // absente/falsy exactement comme le faisait le `if (map)` du setter.
+        effect((): void => {
+            const map: Town = this.map();
+            if (map) {
+                this.complete_map.set(map);
+                this.x_row.set(Array.from({ length: map?.map_width }, (_: unknown, i: number) => i - +map.town_x));
+                const rows: Cell[][] = groupBy(map?.cells || [], (cell: Cell) => cell.y);
+
+                rows.forEach((row: Cell[]) => {
+                    row.sort((cell_a: Cell, cell_b: Cell) => {
+                        if (cell_a.x < cell_b.x) return -1;
+                        if (cell_a.x > cell_b.x) return 1;
+                        return 0;
+                    });
+                });
+
+                rows.sort((row_a: Cell[], row_b: Cell[]) => {
+                    if (row_a[0].y < row_b[0].y) return -1;
+                    if (row_a[0].y > row_b[0].y) return 1;
                     return 0;
                 });
-            });
 
-            rows.sort((row_a: Cell[], row_b: Cell[]) => {
-                if (row_a[0].y < row_b[0].y) return -1;
-                if (row_a[0].y > row_b[0].y) return 1;
-                return 0;
-            });
+                this.my_cell.set(map.cells.find((cell: Cell) => cell.citizens.some((citizen: Citizen) => citizen.id === getUserId())));
 
-            this.my_cell = map.cells.find((cell: Cell) => cell.citizens.some((citizen: Citizen) => citizen.id === getUserId()));
-
-            this.drawed_map = rows;
-        }
+                this.drawed_map.set(rows);
+            }
+        });
     }
-
-    protected x_row: number[] = [];
-
-    protected complete_map!: Town;
-    protected my_cell: Cell | undefined;
-    protected hovered_cell: Cell | undefined;
-    protected drawed_map: Cell[][] = [];
 
 }

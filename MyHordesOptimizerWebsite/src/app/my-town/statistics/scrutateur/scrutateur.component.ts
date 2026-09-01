@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, DestroyRef, ElementRef, inject, OnInit, Signal, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, ElementRef, inject, OnInit, Signal, viewChild } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatSortModule } from '@angular/material/sort';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
@@ -26,7 +26,8 @@ const material_modules: Imports = [MatSortModule, MatTableModule];
     selector: 'mho-scrutateur',
     templateUrl: './scrutateur.component.html',
     styleUrls: ['./scrutateur.component.scss'],
-    imports: [...angular_common, ...components, ...directives, ...material_modules, ...pipes]
+    imports: [...angular_common, ...components, ...directives, ...material_modules, ...pipes],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ScrutateurComponent implements OnInit {
 

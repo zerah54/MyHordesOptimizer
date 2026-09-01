@@ -1,5 +1,5 @@
 import { CommonModule, NgOptimizedImage } from '@angular/common';
-import { Component, input, InputSignal, output, OutputEmitterRef, Signal, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input, InputSignal, output, OutputEmitterRef, Signal, viewChild } from '@angular/core';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatMenu, MatMenuModule } from '@angular/material/menu';
@@ -19,6 +19,7 @@ const material_modules: Imports = [MatFormFieldModule, MatInputModule, MatMenuMo
     styleUrls: ['./menu-remove.component.scss'],
     exportAs: 'menuRemove',
     imports: [...angular_common, ...components, ...material_modules, ...pipes],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class MenuRemoveComponent {
 

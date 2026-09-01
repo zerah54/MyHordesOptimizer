@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, DestroyRef, inject,OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, OnInit, signal, WritableSignal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
@@ -26,14 +26,15 @@ const material_modules: Imports = [MatCardModule, MatFormFieldModule];
     selector: 'mho-items',
     templateUrl: './items.component.html',
     styleUrls: ['./items.component.scss'],
-    imports: [...angular_common, ...components, ...material_modules, ...pipes]
+    imports: [...angular_common, ...components, ...material_modules, ...pipes],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ItemsComponent implements OnInit {
 
     /** La liste des objets du jeu */
     private items!: Item[];
 
-    protected displayed_items!: Item[];
+    protected readonly displayed_items: WritableSignal<Item[] | undefined> = signal(undefined);
 
     protected readonly locale: string = moment.locale();
 
@@ -59,20 +60,21 @@ export class ItemsComponent implements OnInit {
                         if (item_a.category.ordering > item_b.category.ordering) return 1;
                         return 0;
                     });
-                    this.displayed_items = [...this.items];
+                    this.displayed_items.set([...this.items]);
                 }
             });
     }
 
     protected applyFilters(): void {
+        let filtered: Item[];
         if (this.filter_value !== null && this.filter_value !== undefined && this.filter_value !== '') {
-            this.displayed_items = [...this.items.filter((item: Item) => normalizeString(item.label[this.locale]).indexOf(normalizeString(this.filter_value)) > -1)];
+            filtered = this.items.filter((item: Item) => normalizeString(item.label[this.locale]).indexOf(normalizeString(this.filter_value)) > -1);
         } else {
-            this.displayed_items = [...this.items];
+            filtered = [...this.items];
         }
 
         if (this.select_value && this.select_value.length > 0) {
-            this.displayed_items = this.displayed_items.filter((item: Item) => {
+            filtered = filtered.filter((item: Item) => {
                 const item_actions_and_properties: (Action | Property)[] = [
                     ...item.actions.filter((action: Action) => action),
                     ...item.properties?.filter((property: Property) => property)
@@ -84,5 +86,6 @@ export class ItemsComponent implements OnInit {
                 return item_has_action_or_property || item_has_key;
             });
         }
+        this.displayed_items.set(filtered);
     }
 }

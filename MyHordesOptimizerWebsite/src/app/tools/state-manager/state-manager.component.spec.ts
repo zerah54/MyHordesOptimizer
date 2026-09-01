@@ -87,16 +87,16 @@ describe('StateManagerComponent', (): void => {
 
         component['addMoveStep'](true);
 
-        expect(component['rows'].length).toBe(1);
-        expect(component['rows'][0].state.ap).toBe(5);
+        expect(component['rows']().length).toBe(1);
+        expect(component['rows']()[0].state.ap).toBe(5);
     });
 
     it('compute appelle simulate même sans étape, pour calculer le PDC de départ, et vide la trace', (): void => {
-        component['rows'] = <never>[{ label: 'x', state: {} }];
+        component['rows'].set(<never>[{ label: 'x', state: {} }]);
 
         component['compute']();
 
-        expect(component['rows'].length).toBe(0);
+        expect(component['rows']().length).toBe(0);
         expect(state_service.simulate).toHaveBeenCalledTimes(1);
         expect(state_service.simulate.calls.mostRecent().args[1]).toEqual([]);
     });
@@ -184,7 +184,7 @@ describe('StateManagerComponent', (): void => {
         component['addToBag'](1);
         component['addToBag'](2);
 
-        expect(component['best_order']).toEqual([item2, item1]);
+        expect(component['best_order']()).toEqual([item2, item1]);
     });
 
     it('une réponse rankOrders tardive n\'écrase pas une réponse plus récente (switchMap)', (): void => {
@@ -203,7 +203,7 @@ describe('StateManagerComponent', (): void => {
         fresh$.next([new RankedOrder({ order: [2, 1], tier: 'none', tierReachedAtDistance: null, totalDistance: 6, finalState: final_state })]);
         stale$.next([new RankedOrder({ order: [1], tier: 'none', tierReachedAtDistance: null, totalDistance: 6, finalState: final_state })]);
 
-        expect(component['best_order']).toEqual([item2, item1]);
+        expect(component['best_order']()).toEqual([item2, item1]);
     });
 
     it('useItem consomme un objet du sac restant mais le classement reste basé sur le sac de départ complet', (): void => {
@@ -222,7 +222,7 @@ describe('StateManagerComponent', (): void => {
 
         expect(state_service.rankOrders).toHaveBeenCalledTimes(1);
         expect(state_service.rankOrders.calls.mostRecent().args[1]).toEqual([1]);
-        expect(component['best_order']).toEqual([item]);
+        expect(component['best_order']()).toEqual([item]);
     });
 
     it('sac vide : pas d\'appel réseau, best_order/ranked_orders restent vides', (): void => {
@@ -231,8 +231,8 @@ describe('StateManagerComponent', (): void => {
         component['emptyBagContent']();
 
         expect(state_service.rankOrders).not.toHaveBeenCalled();
-        expect(component['best_order']).toEqual([]);
-        expect(component['ranked_orders']).toEqual([]);
+        expect(component['best_order']()).toEqual([]);
+        expect(component['ranked_orders']()).toEqual([]);
     });
 
     it('ranked_orders résout chaque candidat en objets et conserve son état final et son tier', (): void => {
@@ -252,10 +252,10 @@ describe('StateManagerComponent', (): void => {
         component['addToBag'](1);
         component['addToBag'](2);
 
-        expect(component['ranked_orders'].length).toBe(1);
-        expect(component['ranked_orders'][0].tier).toBe('Soif');
-        expect(component['ranked_orders'][0].items).toEqual([item2, item1]);
-        expect(component['ranked_orders'][0].final_state.ap).toBe(final_state.ap);
+        expect(component['ranked_orders']().length).toBe(1);
+        expect(component['ranked_orders']()[0].tier).toBe('Soif');
+        expect(component['ranked_orders']()[0].items).toEqual([item2, item1]);
+        expect(component['ranked_orders']()[0].final_state.ap).toBe(final_state.ap);
     });
 
     it('addMountBikeStep puis addDismountBikeStep : monter à vélo redevient impossible', (): void => {
@@ -383,7 +383,7 @@ describe('StateManagerComponent', (): void => {
         const item1: Item = buildItem(1, 'water_#00');
         const item2: Item = buildItem(2, 'bandage_#00');
         component['starting_bag'] = [item1, item2];
-        component['best_order'] = [item2, item1];
+        component['best_order'].set([item2, item1]);
 
         expect(component['orderedRemainingBag']()).toEqual([item2, item1]);
     });
@@ -392,7 +392,7 @@ describe('StateManagerComponent', (): void => {
         const item1: Item = buildItem(1, 'water_#00');
         const item2: Item = buildItem(2, 'bandage_#00');
         component['starting_bag'] = [item1, item2];
-        component['best_order'] = [];
+        component['best_order'].set([]);
 
         expect(component['orderedRemainingBag']()).toEqual([item1, item2]);
     });
@@ -411,6 +411,29 @@ describe('StateManagerComponent', (): void => {
 
         component['addMoveStep'](true);
 
-        expect(component['rows'][0].pdc).toBe(9);
+        expect(component['rows']()[0].pdc).toBe(9);
+    });
+
+    // Régression OnPush (Task 14) : starting_bag alimente `[currentList]` de
+    // `mho-list-element-add-remove` (input signal, composant OnPush) — une mutation en place
+    // (.push()/.splice()) laisserait la référence inchangée et l'input ne se mettrait jamais à jour.
+    it('addToBag réassigne starting_bag immuablement', (): void => {
+        const item: Item = buildItem(1, 'water_#00');
+        component['items'] = [item];
+        const original: Item[] = component['starting_bag'];
+
+        component['addToBag'](1);
+
+        expect(component['starting_bag']).not.toBe(original);
+    });
+
+    it('removeFromBag réassigne starting_bag immuablement', (): void => {
+        const item: Item = buildItem(1, 'water_#00');
+        component['starting_bag'] = [item, item];
+        const original: Item[] = component['starting_bag'];
+
+        component['removeFromBag'](1);
+
+        expect(component['starting_bag']).not.toBe(original);
     });
 });

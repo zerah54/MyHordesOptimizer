@@ -89,7 +89,7 @@ describe('OverflowComponent', (): void => {
     });
 
     it('l\'infobulle des zombies actifs donne le facteur (% de l\'attaque) et le % du débordement réellement servi', (): void => {
-        component['attack'] = 1000;
+        component['attack'].set(1000);
         component['town_defense'] = 300;
         component['watch_defense'] = 0;
         component['door_state'] = 'closed';
@@ -104,7 +104,7 @@ describe('OverflowComponent', (): void => {
     });
 
     it('débordement plafonné : bounds_saturated est vrai et les fourchettes favorable/défavorable sont masquées (réaliste seul, pas de "hors bornes")', (): void => {
-        component['attack'] = 100000;
+        component['attack'].set(100000);
         component['town_defense'] = 99900;
         component['watch_defense'] = 0;
         component['door_state'] = 'closed';
@@ -112,8 +112,8 @@ describe('OverflowComponent', (): void => {
         component['compute']();
         fixture.detectChanges();
 
-        expect(component['active_zombies_min']).toBe(component['active_zombies_max']);
-        expect(component['bounds_saturated']).toBeTrue();
+        expect(component['active_zombies_min']()).toBe(component['active_zombies_max']());
+        expect(component['bounds_saturated']()).toBeTrue();
 
         const attacking_cell: string = fixture.debugElement
             .queryAll(By.css('table.summary'))[2].queryAll(By.css('td'))[0].nativeElement.textContent;
@@ -126,8 +126,8 @@ describe('OverflowComponent', (): void => {
         component['compute']();
         fixture.detectChanges();
 
-        expect(component['active_zombies_min']).toBeLessThan(component['active_zombies_max']);
-        expect(component['bounds_saturated']).toBeFalse();
+        expect(component['active_zombies_min']()).toBeLessThan(component['active_zombies_max']());
+        expect(component['bounds_saturated']()).toBeFalse();
 
         const attacking_cell: string = fixture.debugElement
             .queryAll(By.css('table.summary'))[2].queryAll(By.css('td'))[0].nativeElement.textContent;
@@ -139,18 +139,18 @@ describe('OverflowComponent', (): void => {
         component['iterations'] = 500;
         component['compute']();
 
-        const scenario: ScenarioResult = component['scenarios'][0];
+        const scenario: ScenarioResult = component['scenarios']()[0];
         expect(scenario.survivor_at_least_one).toBe(0);
     });
 
     it('défense par défaut énorme : personne ne meurt jamais (histogramme à 0 mort = 100%)', (): void => {
         component['home_defense'] = 999999;
-        component['citizen_defenses'] = component['citizen_defenses']
-            .map((row) => ({ ...row, defense: 999999 }));
+        component['citizen_defenses'].set(component['citizen_defenses']()
+            .map((row) => ({ ...row, defense: 999999 })));
         component['iterations'] = 500;
         component['compute']();
 
-        const scenario: ScenarioResult = component['scenarios'][0];
+        const scenario: ScenarioResult = component['scenarios']()[0];
         expect(scenario.death_histogram[0].probability).toBe(1);
         expect(scenario.death_histogram[0].at_least_probability).toBe(1);
     });
@@ -166,7 +166,7 @@ describe('OverflowComponent', (): void => {
     });
 
     it('dévastée ramène le niveau d\'habitation à 0 quel que soit house_counts', (): void => {
-        component['house_counts'] = [0, 0, 0, 40, 0, 0, 0, 0, 0];
+        component['house_counts'].set([0, 0, 0, 40, 0, 0, 0, 0, 0]);
         component['devastated'] = false;
         component['compute']();
         expect(component['habitation_level']).toBe(3);
@@ -177,18 +177,18 @@ describe('OverflowComponent', (): void => {
     });
 
     it('dévastée NE force PAS la défense personnelle à 0 : seule la part liée au logement l\'est, le reste (métier, objets) compte toujours', (): void => {
-        component['nb_alive'] = 2;
+        component['nb_alive'].set(2);
         component['day'] = 1;
         component['iterations'] = 500;
         component['compute']();
-        component['citizen_defenses'][0].defense = 999999;
-        component['citizen_defenses'][1].defense = 999999;
+        component['citizen_defenses']()[0].defense = 999999;
+        component['citizen_defenses']()[1].defense = 999999;
         component['home_defense'] = 999999;
         component['devastated'] = true;
 
         component['compute']();
 
-        const scenario: ScenarioResult = component['scenarios'][0];
+        const scenario: ScenarioResult = component['scenarios']()[0];
         expect(scenario.citizens[0].death_probability).toBe(0);
         expect(scenario.citizens[1].death_probability).toBe(0);
     });
@@ -197,7 +197,7 @@ describe('OverflowComponent', (): void => {
         component['iterations'] = 500;
         component['compute']();
 
-        const scenario: ScenarioResult = component['scenarios'][0];
+        const scenario: ScenarioResult = component['scenarios']()[0];
         const n: number = scenario.death_histogram.length - 1;
 
         for (let k: number = 0; k <= n; k++) {
@@ -211,15 +211,15 @@ describe('OverflowComponent', (): void => {
         component['compute']();
         fixture.detectChanges();
 
-        expect(component['favorable']).not.toBeNull();
-        expect(component['defavorable']).not.toBeNull();
-        expect(component['favorable']?.attacking).toBeLessThanOrEqual(component['defavorable']?.attacking ?? 0);
+        expect(component['favorable']()).not.toBeNull();
+        expect(component['defavorable']()).not.toBeNull();
+        expect(component['favorable']()?.attacking).toBeLessThanOrEqual(component['defavorable']()?.attacking ?? 0);
         expect(fixture.debugElement.queryAll(By.css('mat-button-toggle')).map((el: DebugElement) => el.nativeElement.textContent.trim()))
             .not.toContain('Favorable / défavorable');
 
         const attacking_cell: string = fixture.debugElement.queryAll(By.css('table.summary'))[2].nativeElement.textContent;
-        expect(attacking_cell).toContain(String(component['favorable']?.attacking));
-        expect(attacking_cell).toContain(String(component['defavorable']?.attacking));
+        expect(attacking_cell).toContain(String(component['favorable']()?.attacking));
+        expect(attacking_cell).toContain(String(component['defavorable']()?.attacking));
     });
 
     it('la colonne "Zombies (moyenne)" du tableau par rang n\'affiche pas favorable/défavorable (redondant avec Min-Max)', (): void => {
@@ -237,17 +237,17 @@ describe('OverflowComponent', (): void => {
     it('une valeur constante (min = max) n\'affiche qu\'un seul nombre, sans répéter la fourchette', (): void => {
         // Attaque très supérieure au débordement (100) : le facteur ne change plus rien, l'attaque
         // servie est toujours plafonnée à 100. Avec 1 seul citoyen ciblé, son résultat est déterministe.
-        component['attack'] = 100000;
+        component['attack'].set(100000);
         component['town_defense'] = 99900;
         component['watch_defense'] = 0;
         component['door_state'] = 'closed';
-        component['nb_alive'] = 1;
+        component['nb_alive'].set(1);
         component['day'] = 1;
         component['iterations'] = 200;
         component['compute']();
         fixture.detectChanges();
 
-        const scenario: ScenarioResult = component['scenarios'][0];
+        const scenario: ScenarioResult = component['scenarios']()[0];
         expect(scenario.ranks[0].min).toBe(scenario.ranks[0].max);
         expect(scenario.ranks[0].p5).toBe(scenario.ranks[0].p95);
 
@@ -280,32 +280,32 @@ describe('OverflowComponent', (): void => {
     });
 
     it('défense par citoyen : un citoyen à défense énorme ne meurt jamais, même si tous sont ciblés', (): void => {
-        component['nb_alive'] = 2;
+        component['nb_alive'].set(2);
         component['day'] = 1;
         component['iterations'] = 500;
         component['compute']();
 
-        component['citizen_defenses'][0].defense = 0;
-        component['citizen_defenses'][1].defense = 999999;
+        component['citizen_defenses']()[0].defense = 0;
+        component['citizen_defenses']()[1].defense = 999999;
         component['compute']();
 
-        const scenario: ScenarioResult = component['scenarios'][0];
+        const scenario: ScenarioResult = component['scenarios']()[0];
         expect(scenario.citizens[1].death_probability).toBe(0);
         expect(scenario.citizens[0].death_probability).toBeGreaterThan(0.5);
     });
 
     it('table "Par défense" : deux citoyens à la même défense sont regroupés, proba moyenne des deux', (): void => {
-        component['nb_alive'] = 3;
+        component['nb_alive'].set(3);
         component['day'] = 1;
         component['iterations'] = 500;
         component['compute']();
 
-        component['citizen_defenses'][0].defense = 10;
-        component['citizen_defenses'][1].defense = 10;
-        component['citizen_defenses'][2].defense = 999999;
+        component['citizen_defenses']()[0].defense = 10;
+        component['citizen_defenses']()[1].defense = 10;
+        component['citizen_defenses']()[2].defense = 999999;
         component['compute']();
 
-        const scenario: ScenarioResult = component['scenarios'][0];
+        const scenario: ScenarioResult = component['scenarios']()[0];
         expect(scenario.defense_groups.length).toBe(2);
 
         const shared: { defense: number; count: number } | undefined = scenario.defense_groups.find((g) => g.defense === 10);
@@ -318,7 +318,7 @@ describe('OverflowComponent', (): void => {
         component['iterations'] = 200;
         component['compute']();
 
-        const scenario: ScenarioResult = component['scenarios'][0];
+        const scenario: ScenarioResult = component['scenarios']()[0];
         expect(scenario.defense_groups.every((g) => g.names.length === 0)).toBeTrue();
     });
 
@@ -348,7 +348,7 @@ describe('OverflowComponent', (): void => {
         town_component['iterations'] = 200;
         town_component['compute']();
 
-        const scenario: ScenarioResult = town_component['scenarios'][0];
+        const scenario: ScenarioResult = town_component['scenarios']()[0];
         const group: { names: string[] } | undefined = scenario.defense_groups.find((g) => g.names.length > 0);
         expect(group?.names).toEqual(['Alice']);
     });
@@ -388,6 +388,35 @@ describe('OverflowComponent', (): void => {
         town_fixture.detectChanges();
 
         // 10 (houseDefense) + 3 (bonus héroïque Gardien : +2 métier +1) + 6 (renfort <=6, direct).
-        expect(town_component['citizen_defenses'][0].defense).toBe(19);
+        expect(town_component['citizen_defenses']()[0].defense).toBe(19);
+    });
+
+    // Régression OnPush (Task 14) : compute() est déclenché par un debounceTime() asynchrone
+    // (scheduleCompute) — sans signal, la vue resterait figée sur le résultat précédent.
+    it('scheduleCompute debounce un recalcul asynchrone (résultat reflété après le délai)', (done: DoneFn): void => {
+        component['attack'].set(700);
+        component['scheduleCompute']();
+        component['scheduleCompute']();
+
+        setTimeout((): void => {
+            expect(component['overflow_after_watch']()).toBe(400);
+            done();
+        }, 500);
+    });
+
+    // Régression OnPush (Task 14) : house_counts est un signal alimenté par un input indexé
+    // ([$index]) — setHouseCount doit réassigner le tableau immuablement (pas de .push()/mutation
+    // en place) pour que le binding se mette à jour, puis planifier un recalcul.
+    it('setHouseCount réassigne house_counts immuablement et planifie un recalcul', (done: DoneFn): void => {
+        const original: number[] = component['house_counts']();
+
+        component['setHouseCount'](2, 5);
+
+        expect(component['house_counts']()).not.toBe(original);
+        expect(component['house_counts']()[2]).toBe(5);
+        setTimeout((): void => {
+            expect(component['overflow_after_watch']()).toBe(200);
+            done();
+        }, 500);
     });
 });

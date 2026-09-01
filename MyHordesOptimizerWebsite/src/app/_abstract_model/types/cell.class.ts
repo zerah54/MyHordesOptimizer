@@ -121,7 +121,7 @@ export class Cell extends CommonModel<CellDTO> {
             scoutZoneLevel: this.scout_zone_level,
             scavNextCells: this.scav_next_cells,
             scoutNextCells: this.scout_next_cells,
-            nbZombie: this.nb_hero || 0,
+            nbZombie: this.nb_zombie || 0,
             nbZombieKilled: this.nb_zombie_killed || 0,
             isRuinCamped: this.is_ruin_camped,
             items: modelToDtoArray(this.items),

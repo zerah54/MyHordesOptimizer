@@ -1,4 +1,4 @@
-@if (citizen_info) {
+@if (citizen_info()) {
     <div class="mho-citizens-daily-actions">
         <table #mat_table mat-table [dataSource]="datasource" matSort>
             @for (column of columns; track column.id) {

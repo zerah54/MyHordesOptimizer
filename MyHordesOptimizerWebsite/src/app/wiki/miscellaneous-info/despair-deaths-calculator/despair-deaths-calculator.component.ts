@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialogModule } from '@angular/material/dialog';
@@ -20,6 +20,7 @@ const material_modules: Imports = [MatButtonModule, MatDialogModule, MatFormFiel
     templateUrl: './despair-deaths-calculator.component.html',
     styleUrls: ['./despair-deaths-calculator.component.scss'],
     imports: [...angular_common, ...components, ...material_modules, ...pipes],
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DespairDeathsCalculatorComponent {
 

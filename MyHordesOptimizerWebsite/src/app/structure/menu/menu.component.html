@@ -6,7 +6,7 @@
         }
     </mat-list>
     <div class="actions">
-        @if (selected_theme?.class === 'halloween') {
+        @if (selected_theme()?.class === 'halloween') {
             <div class="pumpkin-container">
                 <div class="pumpkin">
                     <div class="texture"></div>
@@ -45,13 +45,13 @@
         }
         <button mat-button type="button" [matMenuTriggerFor]="themeMenu">
             <mat-icon>palette</mat-icon>
-            {{ selected_theme?.label }}
+            {{ selected_theme()?.label }}
             <mat-icon>arrow_drop_down</mat-icon>
         </button>
         <mat-menu #themeMenu="matMenu">
             @for (theme of themes; track theme.class) {
-                <div mat-menu-item [disabled]="theme.class === selected_theme?.class"
-                     [class.warn-color]="theme.class === selected_theme?.class" (click)="changeTheme(theme)">
+                <div mat-menu-item [disabled]="theme.class === selected_theme()?.class"
+                     [class.warn-color]="theme.class === selected_theme()?.class" (click)="changeTheme(theme)">
                     {{ theme.label }}
                 </div>
             }

@@ -5,16 +5,16 @@
     @if (town) {
         <div class="actions">
             <mat-slide-toggle [(ngModel)]="ruins_filters.inside_town"
-                              (ngModelChange)="ruins_filters.inside_town ? datasource.data = town_ruins : datasource.data = ruins">
+                              (ngModelChange)="applyInsideTownFilter()">
                 <ng-container i18n>Dans ma ville</ng-container>
             </mat-slide-toggle>
         </div>
     }
 </mat-card-header>
 <mat-card-content class="mho-ruins">
-    @if (ruins) {
+    @if (ruins()) {
         <div class="mat-elevation-z8">
-            <table #table mat-table [dataSource]="datasource" matSort matSortActive="label" matSortDisableClear matSortDirection="asc">
+            <table #table mat-table [dataSource]="datasource()" matSort matSortActive="label" matSortDisableClear matSortDirection="asc">
 
                 @for (column of columns; track column.id) {
                     <ng-container [matColumnDef]="column.id" [sticky]="column.sticky || false">
@@ -53,7 +53,7 @@
                                         <mho-header-with-select-filter [header]="column.header"
                                                                        [(filterValue)]="ruins_filters.objects"
                                                                        (filterValueChange)="ruins_filters_change.next()"
-                                                                       [options]="items"
+                                                                       [options]="items()"
                                                                        [bindLabel]="'item.label.' + locale">
                                         </mho-header-with-select-filter>
                                     }

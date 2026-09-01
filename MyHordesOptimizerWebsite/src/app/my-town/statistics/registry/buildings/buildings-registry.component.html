@@ -10,8 +10,8 @@
     }
 </mat-tab-group>
 <ng-template #template let-tab>
-    @let citizens_contribute = entries_by_type | isCitizenInEntries:completeCitizenList();
-    @let citizens_didnt_contribute = entries_by_type | isCitizenInEntries:completeCitizenList():true;
+    @let citizens_contribute = entries_by_type() | isCitizenInEntries:completeCitizenList();
+    @let citizens_didnt_contribute = entries_by_type() | isCitizenInEntries:completeCitizenList():true;
     <div class="contributions">
         <div class="citizen-contribute">
             <h4>

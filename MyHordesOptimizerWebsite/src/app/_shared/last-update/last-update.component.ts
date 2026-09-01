@@ -1,5 +1,5 @@
 import { CommonModule, DatePipe, NgOptimizedImage, NgTemplateOutlet } from '@angular/common';
-import { booleanAttribute, Component, input, InputSignal, InputSignalWithTransform } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, Component, input, InputSignal, InputSignalWithTransform } from '@angular/core';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import moment, { Moment } from 'moment';
 
@@ -15,7 +15,8 @@ const material_modules: Imports = [MatTooltipModule];
     selector: 'mho-last-update',
     templateUrl: './last-update.component.html',
     styleUrls: ['./last-update.component.scss'],
-    imports: [...angular_common, ...components, ...material_modules, ...pipes]
+    imports: [...angular_common, ...components, ...material_modules, ...pipes],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class LastUpdateComponent {
 
