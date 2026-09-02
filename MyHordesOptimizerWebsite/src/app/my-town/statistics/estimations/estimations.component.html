@@ -79,13 +79,13 @@
                 <mat-expansion-panel (opened)="setStep(0)" [expanded]="step === 0" class="mat-elevation-z8">
                     <mat-expansion-panel-header>
                         <mat-panel-title i18n>Attaque du jour (J{{ selected_day }})</mat-panel-title>
-                        @if (today_calculated_attack) {
+                        @if (today_calculated_attack(); as today_result) {
                             <mat-panel-description>
                                 <small>
                                     <ng-container i18n>Attaque J{{ selected_day }} calculée</ng-container>
                                     &nbsp;:&nbsp;
-                                    <span style="white-space: nowrap">[{{ today_calculated_attack.result.min }}&nbsp;-&nbsp;
-                                        {{ today_calculated_attack.result.max }}]</span>
+                                    <span style="white-space: nowrap">[{{ today_result.result.min }}&nbsp;-&nbsp;
+                                        {{ today_result.result.max }}]</span>
                                 </small>
                             </mat-panel-description>
                         }
@@ -104,13 +104,13 @@
                 <mat-expansion-panel (opened)="setStep(1)" [expanded]="step === 1" class="mat-elevation-z8">
                     <mat-expansion-panel-header>
                         <mat-panel-title i18n>Attaque du lendemain (J{{ selected_day + 1 }})</mat-panel-title>
-                        @if (tomorrow_calculated_attack) {
+                        @if (tomorrow_calculated_attack(); as tomorrow_result) {
                             <mat-panel-description>
                                 <small>
                                     <ng-container i18n>Attaque J{{ selected_day + 1 }} calculée</ng-container>
                                     &nbsp;:&nbsp;
-                                    <span style="white-space: nowrap">[{{ tomorrow_calculated_attack.result.min }}&nbsp;-&nbsp;
-                                        {{ tomorrow_calculated_attack.result.max }}]</span>
+                                    <span style="white-space: nowrap">[{{ tomorrow_result.result.min }}&nbsp;-&nbsp;
+                                        {{ tomorrow_result.result.max }}]</span>
                                 </small>
                             </mat-panel-description>
                         }

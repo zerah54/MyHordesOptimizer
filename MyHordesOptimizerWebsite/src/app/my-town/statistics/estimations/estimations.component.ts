@@ -37,7 +37,11 @@ const material_modules: Imports = [MatButtonModule, MatExpansionModule, MatFormF
     selector: 'mho-estimations',
     templateUrl: './estimations.component.html',
     styleUrls: ['./estimations.component.scss'],
-    imports: [...angular_common, ...components, ...material_modules, ...pipes, MatSlideToggle]
+    imports: [...angular_common, ...components, ...material_modules, ...pipes],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    host: {
+        '(window:resize)': 'onResize()'
+    }
 })
 export class EstimationsComponent implements OnInit {
     protected readonly tdg_values: number[] = TDG_VALUES;
@@ -55,6 +59,10 @@ export class EstimationsComponent implements OnInit {
     protected readonly today_calculated_attack: WritableSignal<EstimationsResult | null> = signal<EstimationsResult | null>(null);
     protected readonly tomorrow_calculated_attack: WritableSignal<EstimationsResult | null> = signal<EstimationsResult | null>(null);
     protected step?: number = 0;
+    private readonly today_estim_canvas: Signal<ElementRef> = viewChild.required<ElementRef>('todayEstimCanvas');
+    private readonly today_offset_canvas: Signal<ElementRef> = viewChild.required<ElementRef>('todayOffsetCanvas');
+    private readonly tomorrow_estim_canvas: Signal<ElementRef> = viewChild.required<ElementRef>('tomorrowEstimCanvas');
+    private readonly tomorrow_offset_canvas: Signal<ElementRef> = viewChild.required<ElementRef>('tomorrowOffsetCanvas');
     private today_estim_chart!: Chart<'line'>;
     private today_offset_chart!: Chart<'bar'>;
     private tomorrow_estim_chart!: Chart<'line'>;
@@ -63,8 +71,7 @@ export class EstimationsComponent implements OnInit {
     private readonly clipboard: ClipboardService = inject(ClipboardService);
     private town_statistics_service: TownStatisticsService = inject(TownStatisticsService);
 
-    @HostListener('window:resize', ['$event'])
-    onResize(): void {
+    public onResize(): void {
         if (this.today_estim_chart) {
             this.today_estim_chart.resize();
         }
@@ -86,7 +93,7 @@ export class EstimationsComponent implements OnInit {
     /** Enregistre les estimations saisies */
     protected saveEstimations(): void {
         this.town_statistics_service
-            .saveEstimations(this.estimations)
+            .saveEstimations(this.estimations()!)
             .subscribe(() => {
                 this.getEstimations();
             });
@@ -97,12 +104,12 @@ export class EstimationsComponent implements OnInit {
             .getEstimations(this.selected_day)
             .subscribe({
                 next: (estimations: Estimations) => {
-                    this.estimations = estimations;
+                    this.estimations.set(estimations);
                     this.town_statistics_service
                         .getAttackCalculation(this.selected_day, false)
                         .subscribe({
                             next: (result: EstimationsResult) => {
-                                this.today_calculated_attack = result;
+                                this.today_calculated_attack.set(result);
                                 this.defineTodayCanvas();
                             }
                         });
@@ -110,7 +117,7 @@ export class EstimationsComponent implements OnInit {
                         .getAttackCalculation(this.selected_day + 1, false)
                         .subscribe({
                             next: (result: EstimationsResult) => {
-                                this.tomorrow_calculated_attack = result;
+                                this.tomorrow_calculated_attack.set(result);
                                 this.defineTomorrowCanvas();
                             }
                         });
@@ -156,7 +163,7 @@ export class EstimationsComponent implements OnInit {
 
         /** Ajout des valeurs du jour */
         TDG_VALUES.forEach((value_key: number) => {
-            const value: MinMax = this.estimations.estim['_' + value_key];
+            const value: MinMax = this.estimations()!.estim['_' + value_key];
             if (value && (value.min || value.max)) {
                 text += `[b][${value_key}%][/b] ${value.min || '?'} - ${value.max || '?'} :zombie:\n`;
             }
@@ -169,7 +176,7 @@ export class EstimationsComponent implements OnInit {
 
         /** Ajout des valeurs du lendemain */
         PLANIF_VALUES.forEach((value_key: number) => {
-            const value: MinMax = this.estimations.planif['_' + value_key];
+            const value: MinMax = this.estimations()!.planif['_' + value_key];
             if (value && (value.min || value.max)) {
                 text += `[b][${value_key}%][/b] ${value.min || '?'} - ${value.max || '?'} :zombie:\n`;
             }

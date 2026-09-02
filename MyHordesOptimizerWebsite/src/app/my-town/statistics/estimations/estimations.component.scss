@@ -57,3 +57,38 @@
         }
     }
 }
+
+.refine {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 0;
+    flex-wrap: wrap;
+
+    &__spin {
+        flex: 0 0 auto;
+    }
+
+    &__bar {
+        flex: 1 1 140px;
+        min-width: 120px;
+    }
+
+    &__pct {
+        font-variant-numeric: tabular-nums;
+        min-width: 3em;
+        text-align: right;
+    }
+
+    &__stats {
+        flex: 1 0 100%;
+        color: var(--mat-sys-on-surface-variant);
+        font-variant-numeric: tabular-nums;
+    }
+
+    &__msg {
+        flex: 1 0 100%;
+        color: var(--mat-sys-on-surface-variant);
+        white-space: pre-line;
+    }
+}
