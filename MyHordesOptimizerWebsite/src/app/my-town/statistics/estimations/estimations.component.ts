@@ -1,12 +1,12 @@
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, HostListener, inject, OnInit, Signal, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, inject, OnInit, Signal, signal, viewChild, WritableSignal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
-import { MatSlideToggle } from '@angular/material/slide-toggle';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { ChartConfiguration, ChartDataset, ChartEvent, LegendElement, LegendItem } from 'chart.js';
@@ -31,7 +31,7 @@ import {
 const angular_common: Imports = [CommonModule, FormsModule];
 const components: Imports = [HeaderWithNumberPreviousNextFilterComponent];
 const pipes: Imports = [];
-const material_modules: Imports = [MatButtonModule, MatExpansionModule, MatFormFieldModule, MatIconModule, MatInputModule, MatTooltipModule];
+const material_modules: Imports = [MatButtonModule, MatExpansionModule, MatFormFieldModule, MatIconModule, MatInputModule, MatTooltipModule, MatSlideToggleModule];
 
 @Component({
     selector: 'mho-estimations',
@@ -40,10 +40,6 @@ const material_modules: Imports = [MatButtonModule, MatExpansionModule, MatFormF
     imports: [...angular_common, ...components, ...material_modules, ...pipes, MatSlideToggle]
 })
 export class EstimationsComponent implements OnInit {
-    protected readonly today_estim_canvas: Signal<ElementRef> = viewChild.required<ElementRef>('todayEstimCanvas');
-    protected readonly today_offset_canvas: Signal<ElementRef> = viewChild.required<ElementRef>('todayOffsetCanvas');
-    protected readonly tomorrow_estim_canvas: Signal<ElementRef> = viewChild.required<ElementRef>('tomorrowEstimCanvas');
-    protected readonly tomorrow_offset_canvas: Signal<ElementRef> = viewChild.required<ElementRef>('tomorrowOffsetCanvas');
     protected readonly tdg_values: number[] = TDG_VALUES;
     protected readonly planif_values: number[] = PLANIF_VALUES;
     protected readonly current_day: number = getTown()?.day || 1;
@@ -52,24 +48,12 @@ export class EstimationsComponent implements OnInit {
     protected selected_day: number = this.current_day;
     /** Chargée de façon asynchrone (ngOnInit) et lue par le template sous OnPush : signal. */
     protected readonly estimations: WritableSignal<Estimations | undefined> = signal<Estimations | undefined>(undefined);
-    /** La datasource pour le tableau (jamais alimentée : `[dataSource]` absent du template, champ mort). */
+    /** La datasource pour le tableau */
     protected datasource: MatTableDataSource<Regen> = new MatTableDataSource();
     protected today_offset_mode!: boolean;
     protected tomorrow_offset_mode!: boolean;
     protected readonly today_calculated_attack: WritableSignal<EstimationsResult | null> = signal<EstimationsResult | null>(null);
     protected readonly tomorrow_calculated_attack: WritableSignal<EstimationsResult | null> = signal<EstimationsResult | null>(null);
-    /** Affinage GPU : jour en cours de scan (null si aucun) et progression 0..100. */
-    protected readonly refining_day: WritableSignal<number | null> = signal<number | null>(null);
-    protected readonly refine_progress: WritableSignal<number> = signal<number>(0);
-    /** Indicateurs « ça tourne » (purement affichage, n'influencent pas le calcul). */
-    protected readonly refine_elapsed_label: WritableSignal<string> = signal<string>('');
-    protected readonly refine_eta_label: WritableSignal<string> = signal<string>('');
-    /**
-     * Jours attaqués (D) pour lesquels la gazette annonce l'explosion des feux d'artifice : l'attaque
-     * réelle est réduite de 13 à 16 %, et les paliers planif(D−1) — pré-explosion — sont utilisés comme
-     * contrainte indépendante de la TDG(D) post-explosion pour resserrer la plage et la réduction.
-     */
-    private readonly fireworks_days: Set<number> = new Set<number>();
     protected step?: number = 0;
     private today_estim_chart!: Chart<'line'>;
     private today_offset_chart!: Chart<'bar'>;
@@ -138,46 +122,6 @@ export class EstimationsComponent implements OnInit {
         this.step = step;
     }
 
-    protected defineTodayCanvas(): void {
-        const today_estim_canvas = this.today_estim_canvas();
-        if (today_estim_canvas) {
-            if (this.today_estim_chart) {
-                this.today_estim_chart.destroy();
-            }
-            const today_estim_ctx: CanvasRenderingContext2D = today_estim_canvas.nativeElement.getContext('2d');
-            this.today_estim_chart = new Chart<'line'>(today_estim_ctx, this.getEstimConfig(this.selected_day, TDG_VALUES, this.estimations.estim, this.today_calculated_attack?.result));
-        }
-
-        const today_offset_canvas = this.today_offset_canvas();
-        if (today_offset_canvas) {
-            if (this.today_offset_chart) {
-                this.today_offset_chart.destroy();
-            }
-            const today_offset_ctx: CanvasRenderingContext2D = today_offset_canvas.nativeElement.getContext('2d');
-            this.today_offset_chart = new Chart<'bar'>(today_offset_ctx, this.getOffsetConfig(this.selected_day, this.today_calculated_attack?.min_list, this.today_calculated_attack?.max_list));
-        }
-    }
-
-    protected defineTomorrowCanvas(): void {
-        const tomorrow_estim_canvas = this.tomorrow_estim_canvas();
-        if (tomorrow_estim_canvas) {
-            if (this.tomorrow_estim_chart) {
-                this.tomorrow_estim_chart.destroy();
-            }
-            const tomorrow_estim_ctx: CanvasRenderingContext2D = tomorrow_estim_canvas.nativeElement.getContext('2d');
-            this.tomorrow_estim_chart = new Chart<'line'>(tomorrow_estim_ctx, this.getEstimConfig(this.selected_day + 1, PLANIF_VALUES, this.estimations.planif, this.tomorrow_calculated_attack?.result));
-        }
-
-        const tomorrow_offset_canvas = this.tomorrow_offset_canvas();
-        if (tomorrow_offset_canvas) {
-            if (this.tomorrow_offset_chart) {
-                this.tomorrow_offset_chart.destroy();
-            }
-            const tomorrow_offset_ctx: CanvasRenderingContext2D = tomorrow_offset_canvas.nativeElement.getContext('2d');
-            this.tomorrow_offset_chart = new Chart<'bar'>(tomorrow_offset_ctx, this.getOffsetConfig(this.selected_day + 1, this.tomorrow_calculated_attack?.min_list, this.tomorrow_calculated_attack?.max_list));
-        }
-    }
-
     protected pasteFromMH(paste_event: ClipboardEvent, min_max: MinMax, min: boolean): void {
         paste_event.preventDefault();
         const value: string | undefined = paste_event.clipboardData?.getData('Text');
@@ -236,6 +180,46 @@ export class EstimationsComponent implements OnInit {
 
         this.clipboard.copy(text, $localize`La liste a bien été copiée au format forum`);
 
+    }
+
+    private defineTodayCanvas(): void {
+        const today_estim_canvas: ElementRef = this.today_estim_canvas();
+        if (today_estim_canvas) {
+            if (this.today_estim_chart) {
+                this.today_estim_chart.destroy();
+            }
+            const today_estim_ctx: CanvasRenderingContext2D = today_estim_canvas.nativeElement.getContext('2d');
+            this.today_estim_chart = new Chart<'line'>(today_estim_ctx, this.getEstimConfig(this.selected_day, TDG_VALUES, this.estimations()!.estim, this.today_calculated_attack()?.result));
+        }
+
+        const today_offset_canvas: ElementRef = this.today_offset_canvas();
+        if (today_offset_canvas) {
+            if (this.today_offset_chart) {
+                this.today_offset_chart.destroy();
+            }
+            const today_offset_ctx: CanvasRenderingContext2D = today_offset_canvas.nativeElement.getContext('2d');
+            this.today_offset_chart = new Chart<'bar'>(today_offset_ctx, this.getOffsetConfig(this.selected_day, this.today_calculated_attack()?.min_list, this.today_calculated_attack()?.max_list));
+        }
+    }
+
+    private defineTomorrowCanvas(): void {
+        const tomorrow_estim_canvas: ElementRef = this.tomorrow_estim_canvas();
+        if (tomorrow_estim_canvas) {
+            if (this.tomorrow_estim_chart) {
+                this.tomorrow_estim_chart.destroy();
+            }
+            const tomorrow_estim_ctx: CanvasRenderingContext2D = tomorrow_estim_canvas.nativeElement.getContext('2d');
+            this.tomorrow_estim_chart = new Chart<'line'>(tomorrow_estim_ctx, this.getEstimConfig(this.selected_day + 1, PLANIF_VALUES, this.estimations()!.planif, this.tomorrow_calculated_attack()?.result));
+        }
+
+        const tomorrow_offset_canvas: ElementRef = this.tomorrow_offset_canvas();
+        if (tomorrow_offset_canvas) {
+            if (this.tomorrow_offset_chart) {
+                this.tomorrow_offset_chart.destroy();
+            }
+            const tomorrow_offset_ctx: CanvasRenderingContext2D = tomorrow_offset_canvas.nativeElement.getContext('2d');
+            this.tomorrow_offset_chart = new Chart<'bar'>(tomorrow_offset_ctx, this.getOffsetConfig(this.selected_day + 1, this.tomorrow_calculated_attack()?.min_list, this.tomorrow_calculated_attack()?.max_list));
+        }
     }
 
     private clickOnLegendItem(_event: ChartEvent, legendItem: LegendItem, legend: LegendElement<'line'>): void {
