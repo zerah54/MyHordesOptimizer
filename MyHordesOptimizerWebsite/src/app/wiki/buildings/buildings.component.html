@@ -77,20 +77,26 @@
 
             <!-- Rareté : une icône de plan, rien quand le chantier n'en demande pas, et un point
                  d'interrogation VISIBLE si le niveau sort de ceux qu'on connaît. En Pandémonium,
-                 fusionnée avec « Plans lus » : le stepper remplace l'icône statique, avec l'icône
-                 de la rareté EFFECTIVE (celle réellement requise à la lecture d'un plan). -->
+                 fusionnée avec « Plans lus » : le stepper remplace l'icône statique. Tout est déjà
+                 construit en Pandémonium, la rareté de CONSTRUCTION (hors Pandémonium) n'y a donc
+                 aucun sens — un chantier sans mécanique de palier y affiche un tiret, jamais
+                 l'icône/le "?" de la rareté de base (voir usefulPlanReadings()). -->
             <ng-container matColumnDef="rarity">
                 <th *matHeaderCellDef mat-header-cell class="center">{{ headerOf('rarity') }}</th>
                 <td *matCellDef="let row; table: table" mat-cell class="center">
-                    @if (hard_mode && row.has_hard_mode && usefulPlanReadings(row) > 0) {
-                        <mho-compact-stepper
-                            (valueChange)="setPlansLus(row, $event)"
-                            [icon]="stepperIcon(row)"
-                            [max]="usefulPlanReadings(row)" [min]="0"
-                            [value]="plansLusFor(row)"
-                            i18n-label
-                            label="Plan">
-                        </mho-compact-stepper>
+                    @if (hard_mode) {
+                        @if (row.has_hard_mode && usefulPlanReadings(row) > 0) {
+                            <mho-compact-stepper
+                                (valueChange)="setPlansLus(row, $event)"
+                                [icon]="stepperIcon(row)"
+                                [max]="usefulPlanReadings(row)" [min]="0"
+                                [value]="plansLusFor(row)"
+                                i18n-label
+                                label="Plan">
+                            </mho-compact-stepper>
+                        } @else {
+                            <span class="dash">—</span>
+                        }
                     } @else {
                         @if (row.blueprint; as blueprint) {
                             @if (blueprint.value.img) {

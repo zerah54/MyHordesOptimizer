@@ -340,4 +340,18 @@ describe('BuildingsComponent - ngOnInit wiring', (): void => {
         expect(rendered_rows.length).toBe(1);
         expect(fixture.debugElement.nativeElement.textContent).toContain('Chantier A');
     });
+
+    it('shows a dash in Pandémonium for a building without a hard-mode plan mechanic, never the base-game blueprint icon', (): void => {
+        component['hard_mode'] = true;
+        const root_a: Building = makeBuilding(1, null, 'Chantier A', 1);
+        root_a.has_hard_mode = false;
+        root_a.rarity = 3;
+        buildings_subject.next([root_a]);
+        fixture.detectChanges();
+
+        const rarity_cell = fixture.debugElement.queryAll(By.css('td[mat-cell]'))[4];
+        expect(rarity_cell.nativeElement.textContent.trim()).toBe('—');
+        expect(rarity_cell.query(By.css('img'))).toBeNull();
+        expect(rarity_cell.query(By.css('mho-compact-stepper'))).toBeNull();
+    });
 });
