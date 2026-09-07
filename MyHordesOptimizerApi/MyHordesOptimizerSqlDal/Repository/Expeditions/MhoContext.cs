@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using MyHordesOptimizerApi.Models;
+using System.Threading.Tasks;
 
 namespace MyHordesOptimizerApi
 {
@@ -12,8 +13,25 @@ namespace MyHordesOptimizerApi
                              .ThenInclude(bagItem => bagItem.IdItemNavigation)
                          .Include(bag => bag.ExpeditionCitizens)
                              .ThenInclude(citizen => citizen.IdExpeditionPartNavigation)
-                                .ThenInclude(part => part.IdExpeditionNavigation)                             
+                                .ThenInclude(part => part.IdExpeditionNavigation)
                          .Single();
+        }
+
+        /// <summary>
+        /// Équivalent async de <see cref="GetExpeditionBag"/>, pour les appels faits sous un verrou
+        /// (dans une méthode async déjà entrée dans son <c>await using townLock</c>) : un
+        /// <c>Single()</c> synchrone y immobiliserait un thread du pool pendant l'I/O au lieu de le
+        /// libérer.
+        /// </summary>
+        public async Task<ExpeditionBag> GetExpeditionBagAsync(int idExpeditionBag)
+        {
+            return await ExpeditionBags.Where(bag => bag.IdExpeditionBag == idExpeditionBag)
+                         .Include(bag => bag.ExpeditionBagItems)
+                             .ThenInclude(bagItem => bagItem.IdItemNavigation)
+                         .Include(bag => bag.ExpeditionCitizens)
+                             .ThenInclude(citizen => citizen.IdExpeditionPartNavigation)
+                                .ThenInclude(part => part.IdExpeditionNavigation)
+                         .SingleAsync();
         }
 
         public IQueryable<Expedition> GetTownExpeditionsByDay(int townId, int day)

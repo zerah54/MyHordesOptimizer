@@ -211,7 +211,7 @@ namespace MyHordesOptimizerApi.Hubs
             var userId = UserInfoProvider.UserId;
             Logger.LogDebug("{@userId} SaveExpeditionBag {@citizenId} : {@expeditionBagDtoAsJson}", userId, citizenId, expeditionBagDtoAsJson);
             var expeditionBagDto = expeditionBagDtoAsJson.FromJson<ExpeditionBagRequestDto>();
-            var updatedDto = ExpeditionService.UpdateExpeditionBag(citizenId, expeditionBagDto);
+            var updatedDto = await ExpeditionService.UpdateExpeditionBag(citizenId, expeditionBagDto);
             var townId = UserInfoProvider.TownDetail.TownId;
             await Clients.Group(townId.ToString()).SendAsync(ExpeditionsHubEvent.ExpeditionBagUpdated.GetDescription(), updatedDto);
             Logger.LogDebug("Sent to Group({@townId}) ExpeditionBagUpdated: {@updatedDto}", townId, updatedDto.ToJson());

@@ -53,7 +53,18 @@ namespace MyHordesOptimizerApi.Controllers
         [Route("Leaderboard/Me")]
         public async Task<ActionResult<MinesweeperLeaderboardEntryDto?>> GetMyRank(string sizeId, string mode = "normal")
         {
-            return await _minesweeperService.GetMyRankAsync(sizeId, mode);
+            var rank = await _minesweeperService.GetMyRankAsync(sizeId, mode);
+            if (rank == null)
+            {
+                // ActionResult<T> avec une valeur null passe par HttpNoContentOutputFormatter, qui la
+                // transforme en 204 quel que soit le status code voulu (Ok(null) y compris — ce
+                // formatter écrase le status code dans WriteResponseBodyAsync). ContentResult écrit le
+                // corps littéral avec un 200 explicite et contourne la négociation de formatters pour
+                // ce seul cas ; le cas non-null reste sur Ok(...), donc sur le même chemin de
+                // sérialisation JSON (casse, convertisseurs JsonOptions) qu'avant ce fix.
+                return Content("null", "application/json");
+            }
+            return Ok(rank);
         }
 
         [HttpGet]

@@ -26,6 +26,8 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Security.Cryptography;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -221,6 +223,9 @@ namespace MyHordesOptimizerApi.Services.Impl
             sw.Start();
             var myHordeMeResponse = MyHordesJsonApiRepository.GetMe();
             Logger.LogDebug($"GetSimpleMeAsync MyHordesJsonApiRepository.GetMe() après {sw.Elapsed} ms");
+            // userKey ET identité MyHordes vérifiés ensemble par l'appel ci-dessus : c'est le seul
+            // endroit sûr pour alimenter le repli 429/503 de AuthenticationController (voir C2).
+            RememberUserKeyToUserId(UserInfoProvider.UserKey, myHordeMeResponse.Id.Value);
             var townSynchronized = false;
             if (myHordeMeResponse.Map != null) // Si l'utilisateur est en ville
             {
@@ -521,6 +526,91 @@ namespace MyHordesOptimizerApi.Services.Impl
             // ImportUserPictos (page profil), dont le playedMaps est un sur-ensemble strict.
 
             return Mapper.Map<SimpleMeDto>(myHordeMeResponse);
+        }
+
+        /// <summary>
+        /// Résolution userId depuis un userKey, alimentée uniquement par <see cref="GetSimpleMeAsync"/>
+        /// (userKey ET identité MyHordes vérifiés ensemble dans le même appel). Sert de repli 429/503
+        /// à AuthenticationController — jamais de valeur fournie par le client (voir C2). Clé = hash
+        /// du userKey, jamais le userKey en clair (SHA256 suffit, ce n'est pas un stockage de mot de
+        /// passe, juste éviter de le traîner inutilement en mémoire).
+        /// </summary>
+        /// <remarks>
+        /// ponytail: en mémoire, jamais purgée — une entrée par userKey distinct vu depuis le dernier
+        /// redémarrage. Volume borné par le nombre de clés MyHordes actives, pas un souci en pratique ;
+        /// passer à une entrée avec expiration si ça devait un jour grossir sans borne.
+        /// </remarks>
+        private static readonly ConcurrentDictionary<string, int> UserIdByUserKeyHash = new();
+
+        private static string HashUserKey(string userKey)
+        {
+            var hash = SHA256.HashData(Encoding.UTF8.GetBytes(userKey));
+            return Convert.ToHexString(hash);
+        }
+
+        private void RememberUserKeyToUserId(string userKey, int userId)
+        {
+            UserIdByUserKeyHash[HashUserKey(userKey)] = userId;
+        }
+
+        public SimpleMeDto BuildSimpleMeFromDbByUserKey(string userKey)
+        {
+            if (!UserIdByUserKeyHash.TryGetValue(HashUserKey(userKey), out var userId))
+            {
+                return null;
+            }
+            return BuildSimpleMeFromDb(userId);
+        }
+
+        private SimpleMeDto BuildSimpleMeFromDb(int userId)
+        {
+            var user = DbContext.Users.AsNoTracking().FirstOrDefault(u => u.IdUser == userId);
+            if (user == null)
+            {
+                return null;
+            }
+
+            var citizen = DbContext.TownCitizens.AsNoTracking()
+                .Include(c => c.IdTownNavigation)
+                .FirstOrDefault(c => c.IdUser == userId && !c.IdTownNavigation.IsFinished);
+            if (citizen == null)
+            {
+                return null;
+            }
+
+            var town = citizen.IdTownNavigation;
+
+            // IdTown peut être une clé locale provisoire (-mapId, voir HasTownIdCollision) tant que
+            // la ville n'a pas de MapId MyHordes synchronisé. L'exposer comme TownId confondrait les
+            // deux pour TOUS les consommateurs, qui le lisent comme un vrai MapId (piège
+            // IdTown/MapId documenté). Repli impossible dans ce cas : null, comme "rien en BDD" —
+            // AuthenticationController rethrow l'exception 429/503 d'origine.
+            if (town.MapId == null)
+            {
+                return null;
+            }
+
+            return new SimpleMeDto
+            {
+                Id = user.IdUser,
+                UserName = user.Name,
+                Avatar = user.Avatar,
+                TownDetails = new SimpleMeTownDetailDto
+                {
+                    TownId = town.MapId.Value,
+                    TownX = town.X,
+                    TownY = town.Y,
+                    TownMaxX = town.Width,
+                    TownMaxY = town.Height,
+                    IsChaos = town.IsChaos,
+                    IsDevaste = town.IsDevasted,
+                    TownType = town.TownTypeId.HasValue ? ((TownType)town.TownTypeId.Value).ToString() : null,
+                    Day = town.Day,
+                    HasExternalApi = town.HasExternalApi
+                }
+                // JobDetails laissé à son défaut (Uid/Id/Label/Description vides) : voir commentaire
+                // sur l'interface, non consommé par le front.
+            };
         }
 
         /// <summary>
@@ -1223,6 +1313,10 @@ namespace MyHordesOptimizerApi.Services.Impl
             try
             {
                 var myHordeMeResponse = MyHordesJsonApiRepository.GetMe();
+                // Même clé que le login et le flux ExternalTools (-mapId, jamais le townId résolu) :
+                // sans cet alignement, cette écriture et une synchro concurrente de la même ville
+                // verrouilleraient deux sémaphores différents et ne s'excluraient pas.
+                using var townLock = TownSyncLock.AcquireTownBlocking(-myHordeMeResponse.MapId.Value);
                 // Enregistrer en base
                 using var transaction = DbContext.Database.BeginTransaction();
                 var newLastUpdate = DbContext.LastUpdateInfos.Update(Mapper.Map<LastUpdateInfo>(UserInfoProvider.GenerateLastUpdateInfo())).Entity;
@@ -1493,6 +1587,9 @@ namespace MyHordesOptimizerApi.Services.Impl
 
         public List<MyHordesOptimizerMapDigDto> CreateOrUpdateMapDigs(int townId, int userId, List<MyHordesOptimizerMapDigDto> requests)
         {
+            // Verrou tenu avant le check-then-act Any()/AddRange-UpdateRange plus bas (même risque
+            // que dans TownService.AddCitizenDailyAction). Clé = mapId brut, jamais le townId résolu.
+            using var townLock = TownSyncLock.AcquireTownBlocking(-townId);
             townId = DbContext.ResolveTownId(townId);
             using var transaction = DbContext.Database.BeginTransaction();
             var newLastUpdate = DbContext.LastUpdateInfos.Update(Mapper.Map<LastUpdateInfo>(UserInfoProvider.GenerateLastUpdateInfo(), opt => opt.SetDbContext(DbContext)));

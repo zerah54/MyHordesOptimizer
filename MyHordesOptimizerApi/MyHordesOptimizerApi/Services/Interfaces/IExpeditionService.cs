@@ -27,7 +27,7 @@ namespace MyHordesOptimizerApi.Services.Interfaces
         void DeleteExpeditionOrder(int expeditionOrderId);
 
         ExpeditionOrderDto UpdateExpeditionOrder(ExpeditionOrderDto expeditionOrderDto);
-        ExpeditionBagDto UpdateExpeditionBag(int citizenId, ExpeditionBagRequestDto expeditionBagDto);
+        Task<ExpeditionBagDto> UpdateExpeditionBag(int citizenId, ExpeditionBagRequestDto expeditionBagDto);
         List<ExpeditionBagDto> DeleteExpeditionBag(int bagId);
     }
 }

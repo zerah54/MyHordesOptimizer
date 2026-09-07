@@ -1,3 +1,4 @@
+using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Authentication;
 using MyHordesOptimizerApi.Models.ExternalTools;
 using MyHordesOptimizerApi.Services.Interfaces.ExternalTools;
 using System;
@@ -26,6 +27,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
         private readonly Dictionary<ExternalToolId, ToolProgress> _tools = new();
         private bool _isRunning = true;
         private DateTime? _finishedAt;
+        private AuthenticationResponseDto _renewedToken;
 
         public ExternalToolsUpdateProgress(DateTime startedAt)
         {
@@ -131,6 +133,14 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
             }
         }
 
+        public void SetRenewedToken(AuthenticationResponseDto token)
+        {
+            lock (_lock)
+            {
+                _renewedToken = token;
+            }
+        }
+
         public void Complete(DateTime finishedAt)
         {
             lock (_lock)
@@ -150,6 +160,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                     IsRunning = _isRunning,
                     StartedAt = StartedAt,
                     FinishedAt = _finishedAt,
+                    RenewedToken = _renewedToken,
                     Tools = _tools.Select(entry => new ExternalToolUpdateState
                     {
                         Tool = entry.Key.ToContractId(),

@@ -95,7 +95,7 @@ namespace MyHordesOptimizerApiUnitTests.ExternalTools
                 provider.GetRequiredService<IServiceScopeFactory>(),
                 NullLogger<ExternalToolsUpdateJobRunner>.Instance);
 
-            runner.TryStart(userId: 42, userKey: "key", userName: "Zerah", BuildRequest(),
+            runner.TryStart(userId: 42, userKey: "key", userName: "Zerah", townDetail: null, BuildRequest(),
                 mhoOrigin: "mho-addon", mhoAddonVersion: "1.2.3", correlationId: "corr-abc");
 
             await externalToolsService.Logged.WaitAsync(TimeSpan.FromSeconds(2));

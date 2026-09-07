@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using MyHordesOptimizerApi.Attributes;
 using MyHordesOptimizerApi.Controllers.Abstract;
 using MyHordesOptimizerApi.Providers.Interfaces;
+using MyHordesOptimizerApi.Services.Caching;
 using MyHordesOptimizerApi.Services.Interfaces.Import;
 using System.Threading.Tasks;
 
@@ -14,18 +16,32 @@ namespace MyHordesOptimizerApi.Controllers
     public class MyHordesDataImportController : AbstractMyHordesOptimizerControllerBase
     {
         protected IMyHordesImportService MyHordesImportService { get; private set; }
+        private readonly IMemoryCache _cache;
+
         public MyHordesDataImportController(ILogger<AbstractMyHordesOptimizerControllerBase> logger,
             IUserInfoProvider userKeyProvider,
-            IMyHordesImportService myHordesImportService) : base(logger, userKeyProvider)
+            IMyHordesImportService myHordesImportService,
+            IMemoryCache cache) : base(logger, userKeyProvider)
         {
             MyHordesImportService = myHordesImportService;
+            _cache = cache;
         }
 
         [HttpPost]
         [Route("HeroSkill")]
         public async Task<ActionResult> ImportHeroSkill()
         {
-            await MyHordesImportService.ImportHeroSkill();
+            try
+            {
+                await MyHordesImportService.ImportHeroSkill();
+            }
+            finally
+            {
+                // Invalidation en finally, pas seulement en cas de succès : un import qui plante après
+                // avoir déjà committé une partie des lignes laisserait sinon le cache périmé sans TTL
+                // pour le rattraper.
+                _cache.Remove(ReferentialCacheKeys.HeroSkills);
+            }
             return Ok();
         }
 
@@ -33,7 +49,14 @@ namespace MyHordesOptimizerApi.Controllers
         [Route("CauseOfDeath")]
         public async Task<ActionResult> ImportCauseOfDeath()
         {
-            await MyHordesImportService.ImportCauseOfDeath();
+            try
+            {
+                await MyHordesImportService.ImportCauseOfDeath();
+            }
+            finally
+            {
+                _cache.Remove(ReferentialCacheKeys.CausesOfDeath);
+            }
             return Ok();
         }
 
@@ -41,7 +64,14 @@ namespace MyHordesOptimizerApi.Controllers
         [Route("CleanUpType")]
         public ActionResult ImportCleanUpType()
         {
-            MyHordesImportService.ImportCleanUpTypes();
+            try
+            {
+                MyHordesImportService.ImportCleanUpTypes();
+            }
+            finally
+            {
+                _cache.Remove(ReferentialCacheKeys.CleanUpTypes);
+            }
             return Ok();
         }
 
@@ -55,7 +85,17 @@ namespace MyHordesOptimizerApi.Controllers
             }
 
             UserInfoProvider.UserKey = userKey;
-            await MyHordesImportService.ImportItemsAsync();
+            try
+            {
+                await MyHordesImportService.ImportItemsAsync();
+            }
+            finally
+            {
+                _cache.Remove(ReferentialCacheKeys.Items);
+                // Les recettes sont importées avec les items (même méthode de service) : voir
+                // MyHordesImportService.ImportItemsAsync.
+                _cache.Remove(ReferentialCacheKeys.Recipes);
+            }
             return Ok();
         }
 
@@ -68,7 +108,14 @@ namespace MyHordesOptimizerApi.Controllers
                 return BadRequest($"{nameof(userKey)} cannot be empty");
             }
             UserInfoProvider.UserKey = userKey;
-            MyHordesImportService.ImportRuins();
+            try
+            {
+                MyHordesImportService.ImportRuins();
+            }
+            finally
+            {
+                _cache.Remove(ReferentialCacheKeys.Ruins);
+            }
             return Ok();
         }
 
@@ -103,7 +150,17 @@ namespace MyHordesOptimizerApi.Controllers
                 return BadRequest($"{nameof(userKey)} cannot be empty");
             }
             UserInfoProvider.UserKey = userKey;
-            await MyHordesImportService.ImportAllAsync();
+            try
+            {
+                await MyHordesImportService.ImportAllAsync();
+            }
+            finally
+            {
+                // ImportAllAsync ré-exécute chaque import individuel au niveau service (voir
+                // MyHordesImportService.ImportAllAsync) : toutes les clés du groupe A doivent être
+                // invalidées, y compris si un import intermédiaire a échoué en cours de route.
+                InvalidateAllReferentialCaches();
+            }
             return Ok();
         }
 
@@ -111,7 +168,14 @@ namespace MyHordesOptimizerApi.Controllers
         [Route("WishlistCategories")]
         public ActionResult ImportWishlistCategorie()
         {
-            MyHordesImportService.ImportWishlistCategorie();
+            try
+            {
+                MyHordesImportService.ImportWishlistCategorie();
+            }
+            finally
+            {
+                _cache.Remove(ReferentialCacheKeys.WishListCategories);
+            }
             return Ok();
         }
 
@@ -119,7 +183,14 @@ namespace MyHordesOptimizerApi.Controllers
         [Route("DefaultWishlist")]
         public ActionResult ImportDefaultWishlist()
         {
-            MyHordesImportService.ImportDefaultWishlists();
+            try
+            {
+                MyHordesImportService.ImportDefaultWishlists();
+            }
+            finally
+            {
+                _cache.Remove(ReferentialCacheKeys.WishListTemplates);
+            }
             return Ok();
         }
 
@@ -133,8 +204,33 @@ namespace MyHordesOptimizerApi.Controllers
                 return BadRequest($"{nameof(userKey)} is required");
             }
             UserInfoProvider.UserKey = userKey;
-            await MyHordesImportService.ImportBuildingAsync();
+            try
+            {
+                await MyHordesImportService.ImportBuildingAsync();
+            }
+            finally
+            {
+                _cache.Remove(ReferentialCacheKeys.Buildings);
+            }
             return Ok();
+        }
+
+        /// <summary>
+        /// Invalide tout le groupe A (référentiels à invalidation manuelle) après un import global :
+        /// <see cref="IMyHordesImportService.ImportAllAsync"/> ré-exécute chaque import individuel au
+        /// niveau service, en contournant les actions ci-dessus.
+        /// </summary>
+        private void InvalidateAllReferentialCaches()
+        {
+            _cache.Remove(ReferentialCacheKeys.Items);
+            _cache.Remove(ReferentialCacheKeys.Recipes);
+            _cache.Remove(ReferentialCacheKeys.Ruins);
+            _cache.Remove(ReferentialCacheKeys.Buildings);
+            _cache.Remove(ReferentialCacheKeys.HeroSkills);
+            _cache.Remove(ReferentialCacheKeys.CausesOfDeath);
+            _cache.Remove(ReferentialCacheKeys.CleanUpTypes);
+            _cache.Remove(ReferentialCacheKeys.WishListCategories);
+            _cache.Remove(ReferentialCacheKeys.WishListTemplates);
         }
 
         [HttpPost]

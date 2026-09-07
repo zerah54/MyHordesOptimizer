@@ -1,3 +1,4 @@
+using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Authentication;
 using System;
 using System.Collections.Generic;
 
@@ -91,6 +92,7 @@ namespace MyHordesOptimizerApi.Models.ExternalTools
         public bool IsRunning { get; set; }
         public DateTime? StartedAt { get; set; }
         public DateTime? FinishedAt { get; set; }
+        public AuthenticationResponseDto RenewedToken { get; set; }
         public List<ExternalToolUpdateState> Tools { get; set; } = new();
     }
 }

@@ -13,6 +13,7 @@ using MyHordesOptimizerApi.Models;
 using MyHordesOptimizerApi.Models.Translation;
 using MyHordesOptimizerApi.Models.Import;
 using MyHordesOptimizerApi.Repository.Interfaces;
+using MyHordesOptimizerApi.Services.Impl.Locking;
 using MyHordesOptimizerApi.Services.Interfaces.Import;
 using MyHordesOptimizerApi.Services.Interfaces.Translations;
 using Newtonsoft.Json.Linq;
@@ -37,6 +38,8 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
 
         protected readonly ILogger<MyHordesImportService> Logger;
         protected MhoContext DbContext { get; set; }
+        protected TownSyncLock TownSyncLock { get; set; }
+        protected ReferentialImportLock ReferentialImportLock { get; set; }
 
         // Clés d'avancement propres à l'import des villes, que le front traduit en libellé
         public const string TownsImportStep = "towns";
@@ -51,7 +54,9 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
             ITranslationService translationService,
             IMapper mapper,
             ILogger<MyHordesImportService> logger,
-            MhoContext dbContext)
+            MhoContext dbContext,
+            TownSyncLock townSyncLock,
+            ReferentialImportLock referentialImportLock)
         {
             ServiceScopeFactory = serviceScopeFactory;
             WebApiRepository = webApiRepository;
@@ -62,6 +67,8 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
             Mapper = mapper;
             Logger = logger;
             DbContext = dbContext;
+            TownSyncLock = townSyncLock;
+            ReferentialImportLock = referentialImportLock;
         }
 
 
@@ -182,15 +189,6 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
 
         public async Task ImportItemsAsync()
         {
-            using var transaction = DbContext.Database.BeginTransaction();
-
-            DbContext.Database.ExecuteSqlRaw("DELETE FROM ItemProperty");
-            DbContext.Database.ExecuteSqlRaw("DELETE FROM BuildingRessources");
-            DbContext.Database.ExecuteSqlRaw("DELETE FROM RecipeItemComponent");
-            DbContext.Database.ExecuteSqlRaw("DELETE FROM ItemAction");
-            DbContext.Database.ExecuteSqlRaw("DELETE FROM RecipeItemResult");
-            DbContext.Database.ExecuteSqlRaw("DELETE FROM RuinItemDrop");
-
             // Récupération des items
             var myHordesItems = MyHordesApiRepository.GetItems();
 
@@ -234,105 +232,22 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
                 {
                     item.DropRateNotPraf = 0;
                 }
-            }); 
+            });
 
-            // Rapprochement sur le UID, jamais sur l'identifiant de MyHordes : celui-ci est un
-            // auto-incrément de fixtures, qui change d'une instance du jeu à l'autre. Les objets
-            // n'avaient pas encore divergé (383 sur 383 alignés le 2026-07-27), mais rien ne
-            // garantissait qu'ils ne divergeraient pas — et un objet est référencé par la banque,
-            // les sacs, les listes de courses et la carte.
-            //
-            // Plus aucune suppression : un objet retiré du jeu est marqué obsolète et sa ligne
-            // conservée, sans quoi tout l'historique qui le référence tomberait avec lui.
-            var modelesParUid = mhoItems
-                .Where(item => !string.IsNullOrEmpty(item.Uid))
-                .ToDictionary(item => item.Uid!, StringComparer.Ordinal);
-            var existingItems = DbContext.Items.ToList();
             var sourceItems = myHordesItems
                 .Where(entry => entry.Value.Id.HasValue)
                 .Select(entry => (Uid: entry.Key, MhId: entry.Value.Id!.Value))
                 .ToList();
-            var rapprochementItems = ReferentialReconciler.Reconcile(existingItems, sourceItems, item => item.Uid);
+            var modelesParUid = mhoItems
+                .Where(item => !string.IsNullOrEmpty(item.Uid))
+                .ToDictionary(item => item.Uid!, StringComparer.Ordinal);
 
-            foreach (var (existant, nouveauMhId) in rapprochementItems.AMettreAJour)
-            {
-                var modele = modelesParUid[existant.Uid!];
-                existant.UpdateAllButKeysProperties(modele);
-                existant.MhId = nouveauMhId;
-                existant.IsObsolete = false;
-                DbContext.Update(existant);
-            }
-
-            // La clé d'un objet nouveau est attribuée par MHO. Ne JAMAIS reprendre mhId : ce serait
-            // exactement l'erreur que ce découplage corrige.
-            var prochaineCleItem = existingItems.Count == 0 ? 1 : existingItems.Max(item => item.IdItem) + 1;
-            foreach (var (uid, mhId) in rapprochementItems.ACreer)
-            {
-                var modele = modelesParUid[uid];
-                modele.IdItem = prochaineCleItem++;
-                modele.MhId = mhId;
-                DbContext.Items.Add(modele);
-                Logger.LogInformation("ImportItems : nouvel objet « {Uid} » (mhId {MhId}) créé sous la clé {Cle}.",
-                    uid, mhId, modele.IdItem);
-            }
-
-            foreach (var disparu in rapprochementItems.ARendreObsoletes)
-            {
-                disparu.IsObsolete = true;
-                DbContext.Update(disparu);
-                Logger.LogInformation("ImportItems : « {Uid} » n'existe plus chez MyHordes, marqué obsolète.",
-                    disparu.Uid);
-            }
-
-            foreach (var sansIdentite in rapprochementItems.SansIdentite)
-            {
-                Logger.LogWarning("ImportItems : objet {Cle} sans uid, non rapprochable — laissé en l'état.",
-                    sansIdentite.IdItem);
-            }
-
-            DbContext.SaveChanges();
-            // Rechargé depuis la BASE : c'est de là que viennent les clés que les tables de liaison
-            // (propriétés, actions, recettes) doivent référencer. Les modèles transitoires, eux,
-            // n'ont plus de clé — le mapping ne l'attribue plus.
-            existingItems = DbContext.Items.ToList();
-
-            // Récupération des properties
+            // Récupération des properties et actions : ces jeux de données ne dépendent d'aucun
+            // résultat de la BDD (seule leur exploitation plus bas en a besoin, une fois les clés
+            // attribuées par le rapprochement). Les préparer ici, avant l'ouverture de la
+            // transaction, évite de retenir des verrous MySQL le temps de ces lectures.
             var codeItemsProperty = MyHordesCodeRepository.GetItemsProperties();
-
-            var itemByProperty = new Dictionary<string, List<Item>>();
-            foreach (var kvp in codeItemsProperty)
-            {
-                var itemUid = kvp.Key;
-                var properties = kvp.Value;
-                foreach (var prop in properties)
-                {
-                    Func<Item, bool> predicate = item => item.Uid == itemUid;
-                    PopulateMapFromSourceBasedOnPredicate(map: itemByProperty, src: existingItems, key: prop, predicate: predicate);
-                }
-            }
-            var propertiesFromDb = DbContext.Properties.ToList();
-            var updatedProperties = itemByProperty.Select(kvp => new Property() { Name = kvp.Key, IdItems = kvp.Value }).ToList();
-            var propertyComparer = EqualityComparerFactory.Create<Property>(prop => prop.Name.GetHashCode(), (a, b) => a.Name == b.Name);
-            DbContext.Patch(propertiesFromDb, updatedProperties, propertyComparer);
-
-            // Récupération des actions
             var codeItemsActions = MyHordesCodeRepository.GetItemsActions();
-
-            var itemByAction = new Dictionary<string, List<Item>>();
-            foreach (var kvp in codeItemsActions)
-            {
-                var itemUid = kvp.Key;
-                var actions = kvp.Value;
-                foreach (var action in actions)
-                {
-                    Func<Item, bool> predicate = item => item.Uid == itemUid;
-                    PopulateMapFromSourceBasedOnPredicate(map: itemByAction, src: existingItems, key: action, predicate: predicate);
-                }
-            }
-            var actionsFromDb = DbContext.Actions.ToList();
-            var updatedActions = itemByAction.Select(kvp => new Action() { Name = kvp.Key, IdItems = kvp.Value }).ToList();
-            var actionComparer = EqualityComparerFactory.Create<Action>(action => action.Name.GetHashCode(), (a, b) => a.Name == b.Name);
-            DbContext.Patch(actionsFromDb, updatedActions, actionComparer);
 
             //Récupération des recipes
             var codeItemRecipes = MyHordesCodeRepository.GetRecipes();
@@ -349,91 +264,203 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
                     recipe.ActionEs = Traduire(translations, "es", recipe.ActionDe);
                 }
             }
-            var recipesFromDb = DbContext.Recipes.ToList();
-            var recipeComparer = EqualityComparerFactory.Create<Recipe>(recipe => recipe.Name.GetHashCode(), (a, b) => a.Name == b.Name);
 
-            foreach (var recipe in mhoRecipes)
+            // À partir d'ici, plus aucun appel réseau ni traduction : la transaction ne couvre
+            // que des opérations EF Core pures (DELETE bruts, Add/Update/SaveChanges), pour ne
+            // pas retenir de verrous MySQL sur ces tables référentielles pendant les allers-
+            // retours ci-dessus. C'est pour la même raison que ReferentialImportLock (verrou
+            // PROCESS, distinct du verrou MySQL) est acquis ici et non en tête de méthode.
+            //
+            // ReferentialImportLock, et non TownSyncLock : ces tables n'ont pas d'IdTown, un verrou
+            // par ville ne coordonnerait rien. Sans lui, deux imports concurrents verrouillaient ces
+            // tables côté MySQL dans un ordre non garanti — risque de deadlock.
+            await ReferentialImportLock.WaitAsync();
+            try
             {
-                var source = codeItemRecipes.FirstOrDefault(kvp => kvp.Key == recipe.Name);
-                var uidProvoquant = source.Value?.Provoking;
-                // Sans la garde, un `Provoking` absent ferait chercher un objet d'uid null : la
-                // recette hériterait alors du premier objet sans uid au lieu de n'en avoir aucun.
-                var provoquant = string.IsNullOrEmpty(uidProvoquant)
-                    ? null
-                    : existingItems.SingleOrDefault(item => item.Uid == uidProvoquant);
-                recipe.ProvokingItemId = provoquant?.IdItem;
-                // La NAVIGATION doit être renseignée en même temps que la clé étrangère. `Patch`
-                // recopie l'une et l'autre sur l'entité suivie ; si la navigation vaut null alors
-                // qu'EF l'avait résolue au chargement, il en conclut que la relation est rompue et
-                // remet la clé étrangère à null — écrasant celle qu'on vient d'affecter. Cela
-                // faisait osciller `provoking` d'un import à l'autre : renseigné, vide, renseigné.
-                recipe.ProvokingItemNavigation = provoquant;
-            }
+                using var transaction = DbContext.Database.BeginTransaction();
 
+                DbContext.Database.ExecuteSqlRaw("DELETE FROM ItemProperty");
+                DbContext.Database.ExecuteSqlRaw("DELETE FROM BuildingRessources");
+                DbContext.Database.ExecuteSqlRaw("DELETE FROM RecipeItemComponent");
+                DbContext.Database.ExecuteSqlRaw("DELETE FROM ItemAction");
+                DbContext.Database.ExecuteSqlRaw("DELETE FROM RecipeItemResult");
+                DbContext.Database.ExecuteSqlRaw("DELETE FROM RuinItemDrop");
 
-            DbContext.Patch(recipesFromDb, mhoRecipes, recipeComparer);
+                // Rapprochement sur le UID, jamais sur l'identifiant de MyHordes : celui-ci est un
+                // auto-incrément de fixtures, qui change d'une instance du jeu à l'autre. Les objets
+                // n'avaient pas encore divergé (383 sur 383 alignés le 2026-07-27), mais rien ne
+                // garantissait qu'ils ne divergeraient pas — et un objet est référencé par la banque,
+                // les sacs, les listes de courses et la carte.
+                //
+                // Plus aucune suppression : un objet retiré du jeu est marqué obsolète et sa ligne
+                // conservée, sans quoi tout l'historique qui le référence tomberait avec lui.
+                var existingItems = DbContext.Items.ToList();
+                var rapprochementItems = ReferentialReconciler.Reconcile(existingItems, sourceItems, item => item.Uid);
 
-            foreach (var kvp in codeItemRecipes)
-            {
-                var recipeName = kvp.Key;
-                var componentUids = kvp.Value.In;
-                var grouping = componentUids.GroupBy(x => x).Select(x => new { Count = x.Count(), Uid = x.Key });
-                foreach (var group in grouping) // On add les recipes components
+                foreach (var (existant, nouveauMhId) in rapprochementItems.AMettreAJour)
                 {
-                    var newRecipeComponent = new RecipeItemComponent()
-                    {
-                        Count = group.Count,
-                        IdItemNavigation = existingItems.Single(item => item.Uid == group.Uid),
-                        RecipeName = recipeName
-                    };
-                    DbContext.Add(newRecipeComponent);
+                    var modele = modelesParUid[existant.Uid!];
+                    existant.UpdateAllButKeysProperties(modele);
+                    existant.MhId = nouveauMhId;
+                    existant.IsObsolete = false;
+                    DbContext.Update(existant);
                 }
-                try // On add les recipes results
+
+                // La clé d'un objet nouveau est attribuée par MHO. Ne JAMAIS reprendre mhId : ce serait
+                // exactement l'erreur que ce découplage corrige.
+                var prochaineCleItem = existingItems.Count == 0 ? 1 : existingItems.Max(item => item.IdItem) + 1;
+                foreach (var (uid, mhId) in rapprochementItems.ACreer)
                 {
-                    // Les clés se lisent sur `existingItems`, rechargé depuis la base, et non sur
-                    // les modèles issus du mapping : ceux-ci ne portent plus de clé, MHO l'attribue
-                    // au rapprochement. Les y chercher donnerait 0 sur chaque résultat de recette.
-                    var resultsObjects = kvp.Value.Out;
-                    var results = new List<RecipeItemResult>();
-                    var totalWeight = 0;
-                    foreach (var @object in resultsObjects)
+                    var modele = modelesParUid[uid];
+                    modele.IdItem = prochaineCleItem++;
+                    modele.MhId = mhId;
+                    DbContext.Items.Add(modele);
+                    Logger.LogInformation("ImportItems : nouvel objet « {Uid} » (mhId {MhId}) créé sous la clé {Cle}.",
+                        uid, mhId, modele.IdItem);
+                }
+
+                foreach (var disparu in rapprochementItems.ARendreObsoletes)
+                {
+                    disparu.IsObsolete = true;
+                    DbContext.Update(disparu);
+                    Logger.LogInformation("ImportItems : « {Uid} » n'existe plus chez MyHordes, marqué obsolète.",
+                        disparu.Uid);
+                }
+
+                foreach (var sansIdentite in rapprochementItems.SansIdentite)
+                {
+                    Logger.LogWarning("ImportItems : objet {Cle} sans uid, non rapprochable — laissé en l'état.",
+                        sansIdentite.IdItem);
+                }
+
+                DbContext.SaveChanges();
+                // Rechargé depuis la BASE : c'est de là que viennent les clés que les tables de liaison
+                // (propriétés, actions, recettes) doivent référencer. Les modèles transitoires, eux,
+                // n'ont plus de clé — le mapping ne l'attribue plus.
+                existingItems = DbContext.Items.ToList();
+
+                var itemByProperty = new Dictionary<string, List<Item>>();
+                foreach (var kvp in codeItemsProperty)
+                {
+                    var itemUid = kvp.Key;
+                    var properties = kvp.Value;
+                    foreach (var prop in properties)
                     {
-                        if (@object is string)
-                        {
-                            var uid = @object as string;
-                            results.Add(new RecipeItemResult()
-                            {
-                                IdItem = existingItems.Where(i => i.Uid == uid).Select(i => i.IdItem).First(),
-                                Probability = 1,
-                                Weight = 0,
-                                RecipeName = recipeName
-                            });
-                        }
-                        else if (@object is JArray)
-                        {
-                            var jArray = @object as JArray;
-                            var uid = jArray.First().Value<string>();
-                            var weight = jArray.Last().Value<int>();
-                            totalWeight += weight;
-                            results.Add(new RecipeItemResult()
-                            {
-                                IdItem = existingItems.Where(i => i.Uid == uid).Select(i => i.IdItem).First(),
-                                Weight = weight,
-                                RecipeName = recipeName
-                            });
-                        }
+                        Func<Item, bool> predicate = item => item.Uid == itemUid;
+                        PopulateMapFromSourceBasedOnPredicate(map: itemByProperty, src: existingItems, key: prop, predicate: predicate);
                     }
-                    results.ForEach(x => { if (x.Probability != 1) x.Probability = (float)x.Weight / totalWeight; });
-                    //MyHordesOptimizerRepository.PatchRecipeResults(results);
-                    DbContext.RecipeItemResults.AddRange(results);
                 }
-                catch (Exception e)
+                var propertiesFromDb = DbContext.Properties.ToList();
+                var updatedProperties = itemByProperty.Select(kvp => new Property() { Name = kvp.Key, IdItems = kvp.Value }).ToList();
+                var propertyComparer = EqualityComparerFactory.Create<Property>(prop => prop.Name.GetHashCode(), (a, b) => a.Name == b.Name);
+                DbContext.Patch(propertiesFromDb, updatedProperties, propertyComparer);
+
+                var itemByAction = new Dictionary<string, List<Item>>();
+                foreach (var kvp in codeItemsActions)
                 {
-                    Logger.LogError(e, $"Erreur lors de l'enregistrement des réulstats de la recette {recipeName}");
+                    var itemUid = kvp.Key;
+                    var actions = kvp.Value;
+                    foreach (var action in actions)
+                    {
+                        Func<Item, bool> predicate = item => item.Uid == itemUid;
+                        PopulateMapFromSourceBasedOnPredicate(map: itemByAction, src: existingItems, key: action, predicate: predicate);
+                    }
                 }
+                var actionsFromDb = DbContext.Actions.ToList();
+                var updatedActions = itemByAction.Select(kvp => new Action() { Name = kvp.Key, IdItems = kvp.Value }).ToList();
+                var actionComparer = EqualityComparerFactory.Create<Action>(action => action.Name.GetHashCode(), (a, b) => a.Name == b.Name);
+                DbContext.Patch(actionsFromDb, updatedActions, actionComparer);
+
+                var recipesFromDb = DbContext.Recipes.ToList();
+                var recipeComparer = EqualityComparerFactory.Create<Recipe>(recipe => recipe.Name.GetHashCode(), (a, b) => a.Name == b.Name);
+
+                foreach (var recipe in mhoRecipes)
+                {
+                    var source = codeItemRecipes.FirstOrDefault(kvp => kvp.Key == recipe.Name);
+                    var uidProvoquant = source.Value?.Provoking;
+                    // Sans la garde, un `Provoking` absent ferait chercher un objet d'uid null : la
+                    // recette hériterait alors du premier objet sans uid au lieu de n'en avoir aucun.
+                    var provoquant = string.IsNullOrEmpty(uidProvoquant)
+                        ? null
+                        : existingItems.SingleOrDefault(item => item.Uid == uidProvoquant);
+                    recipe.ProvokingItemId = provoquant?.IdItem;
+                    // La NAVIGATION doit être renseignée en même temps que la clé étrangère. `Patch`
+                    // recopie l'une et l'autre sur l'entité suivie ; si la navigation vaut null alors
+                    // qu'EF l'avait résolue au chargement, il en conclut que la relation est rompue et
+                    // remet la clé étrangère à null — écrasant celle qu'on vient d'affecter. Cela
+                    // faisait osciller `provoking` d'un import à l'autre : renseigné, vide, renseigné.
+                    recipe.ProvokingItemNavigation = provoquant;
+                }
+
+
+                DbContext.Patch(recipesFromDb, mhoRecipes, recipeComparer);
+
+                foreach (var kvp in codeItemRecipes)
+                {
+                    var recipeName = kvp.Key;
+                    var componentUids = kvp.Value.In;
+                    var grouping = componentUids.GroupBy(x => x).Select(x => new { Count = x.Count(), Uid = x.Key });
+                    foreach (var group in grouping) // On add les recipes components
+                    {
+                        var newRecipeComponent = new RecipeItemComponent()
+                        {
+                            Count = group.Count,
+                            IdItemNavigation = existingItems.Single(item => item.Uid == group.Uid),
+                            RecipeName = recipeName
+                        };
+                        DbContext.Add(newRecipeComponent);
+                    }
+                    try // On add les recipes results
+                    {
+                        // Les clés se lisent sur `existingItems`, rechargé depuis la base, et non sur
+                        // les modèles issus du mapping : ceux-ci ne portent plus de clé, MHO l'attribue
+                        // au rapprochement. Les y chercher donnerait 0 sur chaque résultat de recette.
+                        var resultsObjects = kvp.Value.Out;
+                        var results = new List<RecipeItemResult>();
+                        var totalWeight = 0;
+                        foreach (var @object in resultsObjects)
+                        {
+                            if (@object is string)
+                            {
+                                var uid = @object as string;
+                                results.Add(new RecipeItemResult()
+                                {
+                                    IdItem = existingItems.Where(i => i.Uid == uid).Select(i => i.IdItem).First(),
+                                    Probability = 1,
+                                    Weight = 0,
+                                    RecipeName = recipeName
+                                });
+                            }
+                            else if (@object is JArray)
+                            {
+                                var jArray = @object as JArray;
+                                var uid = jArray.First().Value<string>();
+                                var weight = jArray.Last().Value<int>();
+                                totalWeight += weight;
+                                results.Add(new RecipeItemResult()
+                                {
+                                    IdItem = existingItems.Where(i => i.Uid == uid).Select(i => i.IdItem).First(),
+                                    Weight = weight,
+                                    RecipeName = recipeName
+                                });
+                            }
+                        }
+                        results.ForEach(x => { if (x.Probability != 1) x.Probability = (float)x.Weight / totalWeight; });
+                        //MyHordesOptimizerRepository.PatchRecipeResults(results);
+                        DbContext.RecipeItemResults.AddRange(results);
+                    }
+                    catch (Exception e)
+                    {
+                        Logger.LogError(e, $"Erreur lors de l'enregistrement des réulstats de la recette {recipeName}");
+                    }
+                }
+                DbContext.SaveChanges();
+                transaction.Commit();
             }
-            DbContext.SaveChanges();
-            transaction.Commit();
+            finally
+            {
+                ReferentialImportLock.Release();
+            }
         }
 
         private static void PopulateMapFromSourceBasedOnPredicate<T>(Dictionary<string, List<T>> map, List<T> src, string key, Func<T, bool> predicate) where T : class
@@ -456,6 +483,23 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
         #region Building
 
         public async Task ImportBuildingAsync()
+        {
+            // Écrit BuildingRessources, une des tables globales sans IdTown que ImportItemsAsync vide
+            // par DELETE FROM : même ReferentialImportLock, sans quoi les deux imports peuvent se
+            // marcher dessus s'ils sont déclenchés en parallèle (voir MyHordesDataImportController /
+            // AdminController, qui exposent les deux indépendamment).
+            await ReferentialImportLock.WaitAsync();
+            try
+            {
+                await ImportBuildingWithinLockAsync();
+            }
+            finally
+            {
+                ReferentialImportLock.Release();
+            }
+        }
+
+        private async Task ImportBuildingWithinLockAsync()
         {
             var buildingsDto = await MyHordesApiRepository.GetBuildingAsync();
             var buildingCodes = MyHordesCodeRepository.GetBuildings();
@@ -920,6 +964,24 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
 
         public void ImportRuins()
         {
+            // Écrit RuinItemDrop, une des tables globales sans IdTown que ImportItemsAsync vide par
+            // DELETE FROM : même ReferentialImportLock. Méthode synchrone (comme le reste de
+            // l'interface d'import) : bloquer le thread appelant le temps de l'acquisition est sans
+            // risque de deadlock, absence de SynchronizationContext sous Kestrel (même principe que
+            // TownSyncLockSyncExtensions.AcquireTownBlocking).
+            ReferentialImportLock.WaitAsync().GetAwaiter().GetResult();
+            try
+            {
+                ImportRuinsWithinLock();
+            }
+            finally
+            {
+                ReferentialImportLock.Release();
+            }
+        }
+
+        private void ImportRuinsWithinLock()
+        {
             var ruinsFromMyHordes = MyHordesApiRepository.GetRuins();
             var ruinModels = Mapper.Map<List<Ruin>>(ruinsFromMyHordes);
 
@@ -1051,7 +1113,7 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
             {
                 if (ruinsFromCode.TryGetValue(ruinModel.Img, out var ruinFromCode))
                 {
-                    if(ruinFromCode.Constructions is not null && clesParImg.TryGetValue(ruinModel.Img, out var cleRuine))
+                    if (ruinFromCode.Constructions is not null && clesParImg.TryGetValue(ruinModel.Img, out var cleRuine))
                     {
                         foreach (var buildingId in ruinFromCode.Constructions)
                         {
@@ -1099,6 +1161,24 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
         #region Wishlist
 
         public void ImportWishlistCategorie()
+        {
+            // Écrit WishlistCategorie.IdItems, une table de jonction globale sans IdTown : même
+            // ReferentialImportLock que les autres imports référentiels. Méthode synchrone (comme
+            // le reste de l'interface d'import) : bloquer le thread appelant le temps de
+            // l'acquisition est sans risque de deadlock, absence de SynchronizationContext sous
+            // Kestrel (même principe que TownSyncLockSyncExtensions.AcquireTownBlocking).
+            ReferentialImportLock.WaitAsync().GetAwaiter().GetResult();
+            try
+            {
+                ImportWishlistCategorieWithinLock();
+            }
+            finally
+            {
+                ReferentialImportLock.Release();
+            }
+        }
+
+        private void ImportWishlistCategorieWithinLock()
         {
             var wishlistCategories = MyHordesCodeRepository.GetWishlistItemCategories();
             var models = Mapper.Map<List<WishlistCategorie>>(wishlistCategories, opt => opt.SetDbContext(DbContext));
@@ -1350,6 +1430,22 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
 
         private void MigrateTownId(int oldIdTown, MyHordesTownDetailsDto dto)
         {
+            // Deux clés de verrou distinctes sont en jeu :
+            // - oldIdTown vaut déjà -mapId (calculé par l'appelant, cf. ImportTownsAsync/
+            //   ImportSingleTownAsync) : c'est la clé de la famille synchro/login sur cette ville,
+            //   PAS -oldIdTown qui vaudrait +mapId et n'exclurait personne.
+            // - -dto.Id protège le nouvel IdTown interne (ex. contre TownService.DeleteTown, qui
+            //   verrouille sur l'IdTown interne d'une ville admin).
+            // Ordre déterministe (plus petit en premier) pour ne jamais interbloquer une migration/
+            // suppression concurrente qui verrouillerait ces deux mêmes clés en sens inverse.
+            var keyA = oldIdTown;
+            var keyB = -dto.Id!.Value;
+            var lowKey = Math.Min(keyA, keyB);
+            var highKey = Math.Max(keyA, keyB);
+
+            using var lowLock = TownSyncLock.AcquireTownBlocking(lowKey);
+            using var highLock = highKey != lowKey ? TownSyncLock.AcquireTownBlocking(highKey) : null;
+
             // Flush les changements EF en attente avant de passer en SQL brut
             DbContext.SaveChanges();
             DbContext.ChangeTracker.Clear();

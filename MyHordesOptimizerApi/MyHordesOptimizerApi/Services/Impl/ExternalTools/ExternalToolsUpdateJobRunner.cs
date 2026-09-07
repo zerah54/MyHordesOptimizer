@@ -1,5 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools;
 using MyHordesOptimizerApi.Models.ExternalTools;
 using MyHordesOptimizerApi.Providers.Interfaces;
@@ -38,10 +39,12 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
         /// donc déjà tous les outils sollicités, en « pending ».
         /// Le contexte utilisateur est capturé ici — le scope de fond n'a aucune requête HTTP, et
         /// le nom d'utilisateur, posé par JwtActionFilter, serait sinon perdu et écrit à null dans
-        /// LastUpdateInfo.
+        /// LastUpdateInfo. TownDetail (le claim JWT courant) est capturé pour la même raison : sans
+        /// lui, la détection de dérive de ville du scope de fond compare toujours à null et réémet un
+        /// token à chaque appel au lieu de seulement en cas de dérive réelle (voir I2).
         /// </summary>
-        public ExternalToolsUpdateJobState TryStart(int userId, string userKey, string userName, UpdateRequestDto request,
-            string mhoOrigin, string mhoAddonVersion, string correlationId)
+        public ExternalToolsUpdateJobState TryStart(int userId, string userKey, string userName, SimpleMeTownDetailDto townDetail,
+            UpdateRequestDto request, string mhoOrigin, string mhoAddonVersion, string correlationId)
         {
             var progress = _store.TryReserve(userId);
             if (progress == null)
@@ -61,7 +64,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                 throw;
             }
 
-            _ = Task.Run(() => RunAsync(progress, userId, userKey, userName, request, mhoOrigin, mhoAddonVersion, correlationId));
+            _ = Task.Run(() => RunAsync(progress, userId, userKey, userName, townDetail, request, mhoOrigin, mhoAddonVersion, correlationId));
             return progress.Snapshot();
         }
 
@@ -75,6 +78,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
             int userId,
             string userKey,
             string userName,
+            SimpleMeTownDetailDto townDetail,
             UpdateRequestDto request,
             string mhoOrigin,
             string mhoAddonVersion,
@@ -91,6 +95,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                 userInfoProvider.UserId = userId;
                 userInfoProvider.UserKey = userKey;
                 userInfoProvider.UserName = userName;
+                userInfoProvider.TownDetail = townDetail;
 
                 var externalToolsService = scope.ServiceProvider.GetRequiredService<IExternalToolsService>();
                 await externalToolsService.UpdateExternalsTools(request, progress);

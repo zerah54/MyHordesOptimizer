@@ -1,12 +1,15 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using MyHordesOptimizerApi.Controllers.Abstract;
+using MyHordesOptimizerApi.Controllers.ActionFillters;
 using MyHordesOptimizerApi.Dtos.MyHordes.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Citizens;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Map;
 using MyHordesOptimizerApi.Providers.Interfaces;
+using MyHordesOptimizerApi.Services.Caching;
 using MyHordesOptimizerApi.Services.Interfaces;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,12 +22,15 @@ namespace MyHordesOptimizerApi.Controllers
     public class FetcherController : AbstractMyHordesOptimizerControllerBase
     {
         private readonly IMyHordesFetcherService _myHordesFetcherService;
+        private readonly IMemoryCache _cache;
 
         public FetcherController(ILogger<FetcherController> logger,
             IMyHordesFetcherService myHordesFetcherService,
-            IUserInfoProvider userKeyProvider) : base(logger, userKeyProvider)
+            IUserInfoProvider userKeyProvider,
+            IMemoryCache cache) : base(logger, userKeyProvider)
         {
             _myHordesFetcherService = myHordesFetcherService;
+            _cache = cache;
         }
 
 
@@ -32,6 +38,14 @@ namespace MyHordesOptimizerApi.Controllers
         [Route("Items")]
         public ActionResult<IEnumerable<ItemDto>> GetItems(int? townId)
         {
+            // Le catalogue statique n'est mis en cache que sans townId : avec townId, la réponse
+            // mélange le catalogue avec la banque/wishlist de la ville, volatiles.
+            if (!townId.HasValue)
+            {
+                return _cache.GetOrCreate(ReferentialCacheKeys.Items,
+                    _ => _myHordesFetcherService.GetItems(null).ToList());
+            }
+
             var items = _myHordesFetcherService.GetItems(townId).ToList();
             return items;
         }
@@ -40,7 +54,8 @@ namespace MyHordesOptimizerApi.Controllers
         [Route("HeroSkills")]
         public ActionResult<IEnumerable<HeroSkillDto>> GetHeroSkills()
         {
-            var heroSkills = _myHordesFetcherService.GetHeroSkills().ToList();
+            var heroSkills = _cache.GetOrCreate(ReferentialCacheKeys.HeroSkills,
+                _ => _myHordesFetcherService.GetHeroSkills().ToList());
             return heroSkills;
         }
 
@@ -48,7 +63,8 @@ namespace MyHordesOptimizerApi.Controllers
         [Route("CausesOfDeath")]
         public ActionResult<IEnumerable<CauseOfDeathDto>> GetCausesOfDeath()
         {
-            var causesOfDeath = _myHordesFetcherService.GetCausesOfDeath().ToList();
+            var causesOfDeath = _cache.GetOrCreate(ReferentialCacheKeys.CausesOfDeath,
+                _ => _myHordesFetcherService.GetCausesOfDeath().ToList());
             return causesOfDeath;
         }
 
@@ -56,7 +72,8 @@ namespace MyHordesOptimizerApi.Controllers
         [Route("CleanUpTypes")]
         public ActionResult<IEnumerable<CleanUpTypeDto>> GetCleanUpTypes()
         {
-            var cleanUpTypes = _myHordesFetcherService.GetCleanUpTypes().ToList();
+            var cleanUpTypes = _cache.GetOrCreate(ReferentialCacheKeys.CleanUpTypes,
+                _ => _myHordesFetcherService.GetCleanUpTypes().ToList());
             return cleanUpTypes;
         }
 
@@ -64,13 +81,15 @@ namespace MyHordesOptimizerApi.Controllers
         [Route("Recipes")]
         public ActionResult<IEnumerable<ItemRecipeDto>> GetRecipes()
         {
-            var recipes = _myHordesFetcherService.GetRecipes().ToList();
+            var recipes = _cache.GetOrCreate(ReferentialCacheKeys.Recipes,
+                _ => _myHordesFetcherService.GetRecipes().ToList());
             return recipes;
         }
 
         [HttpGet]
         [Route("Bank")]
         [Authorize]
+        [TypeFilter(typeof(ETagCacheFilter), Arguments = new object[] { ETagResource.Bank, "townId" })]
         public ActionResult<BankLastUpdateDto> GetBank(int? townId)
         {
             // Avec townId : lecture pure en base (mode observateur), sans synchro MyHordes
@@ -83,6 +102,7 @@ namespace MyHordesOptimizerApi.Controllers
 
         [HttpGet]
         [Route("Citizens")]
+        [TypeFilter(typeof(ETagCacheFilter), Arguments = new object[] { ETagResource.Citizens, "townId" })]
         public ActionResult<CitizensLastUpdateDto> GetCitizens(int? townId, int? userId)
         {
             if (!townId.HasValue)
@@ -104,6 +124,13 @@ namespace MyHordesOptimizerApi.Controllers
         [Route("Ruins")]
         public ActionResult<IEnumerable<MyHordesOptimizerRuinDto>> GetRuins(int? townId)
         {
+            // Comme GetItems : avec townId, la réponse inclut les cases de carte de la ville, volatiles.
+            if (!townId.HasValue)
+            {
+                return _cache.GetOrCreate(ReferentialCacheKeys.Ruins,
+                    _ => _myHordesFetcherService.GetRuins(null).ToList());
+            }
+
             var ruins = _myHordesFetcherService.GetRuins(townId).ToList();
             return ruins;
         }
@@ -116,11 +143,13 @@ namespace MyHordesOptimizerApi.Controllers
         [Route("Buildings")]
         public ActionResult<IEnumerable<BuildingDto>> GetBuildings()
         {
-            return _myHordesFetcherService.GetBuildings().ToList();
+            return _cache.GetOrCreate(ReferentialCacheKeys.Buildings,
+                _ => _myHordesFetcherService.GetBuildings().ToList());
         }
 
         [HttpGet]
         [Route("Map")]
+        [TypeFilter(typeof(ETagCacheFilter), Arguments = new object[] { ETagResource.Map, "townId" })]
         public ActionResult<MyHordesOptimizerMapDto> GetMap(int? townId)
         {
             if (!townId.HasValue)
@@ -134,6 +163,7 @@ namespace MyHordesOptimizerApi.Controllers
 
         [HttpGet]
         [Route("MapDigs")]
+        [TypeFilter(typeof(ETagCacheFilter), Arguments = new object[] { ETagResource.MapDigs, "townId" })]
         public ActionResult<IEnumerable<MyHordesOptimizerMapDigDto>> GetMapDigs(int? townId)
         {
             if (!townId.HasValue)

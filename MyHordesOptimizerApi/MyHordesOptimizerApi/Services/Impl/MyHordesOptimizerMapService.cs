@@ -7,6 +7,7 @@ using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Map;
 using MyHordesOptimizerApi.Extensions;
 using MyHordesOptimizerApi.Models;
 using MyHordesOptimizerApi.Providers.Interfaces;
+using MyHordesOptimizerApi.Services.Impl.Locking;
 using MyHordesOptimizerApi.Services.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -21,22 +22,26 @@ namespace MyHordesOptimizerApi.Services.Impl
         protected IMapper Mapper { get; private set; }
         protected IUserInfoProvider UserInfoProvider { get; private set; }
         protected MhoContext DbContext { get; init; }
+        protected TownSyncLock TownSyncLock { get; init; }
 
         public MyHordesOptimizerMapService(ILogger<MyHordesOptimizerMapService> logger,
             IServiceScopeFactory serviceScopeFactory,
             IMapper mapper,
             IUserInfoProvider userInfoProvider,
-            MhoContext dbContext)
+            MhoContext dbContext,
+            TownSyncLock townSyncLock)
         {
             Logger = logger;
             ServiceScopeFactory = serviceScopeFactory;
             Mapper = mapper;
             UserInfoProvider = userInfoProvider;
             DbContext = dbContext;
+            TownSyncLock = townSyncLock;
         }
 
         public LastUpdateInfoDto UpdateCell(int townId, MyHordesOptimizerCellUpdateDto updateRequest)
         {
+            using var townLock = TownSyncLock.AcquireTownBlocking(-townId);
             townId = DbContext.ResolveTownId(townId);
             using var transaction = DbContext.Database.BeginTransaction();
             LastUpdateInfoDto lastUpdateInfoDto = UserInfoProvider.GenerateLastUpdateInfo();

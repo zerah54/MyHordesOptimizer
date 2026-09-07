@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.AspNetCore.DataProtection;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using MyHordesOptimizerApi.Configuration.Interfaces;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
@@ -21,12 +22,19 @@ namespace MyHordesOptimizerApi.Services.Impl
         protected IAuthenticationConfiguration Configuration { get; set; }
         protected IMyHordesFetcherService MyHordesFetcherService { get; set; }
 
-        public AuthenticationService(ILogger<AuthenticationService> logger, IMyHordesApiRepository myHordesJsonApiRepository, IAuthenticationConfiguration configuration, IMyHordesFetcherService myHordesFetcherService)
+        // Purpose dédié (voir MhoClaimsType.UserKeyProtectorPurpose) : le claim MHO_UserKey porte la
+        // clé d'application MyHordes de l'utilisateur, en clair sinon décodable par quiconque
+        // intercepte le JWT (JWT = signé, pas chiffré). IDataProtector.Protect/Unprotect chiffrent ce
+        // claim indépendamment d'autres usages futurs de Data Protection dans ce projet.
+        protected IDataProtector UserKeyProtector { get; set; }
+
+        public AuthenticationService(ILogger<AuthenticationService> logger, IMyHordesApiRepository myHordesJsonApiRepository, IAuthenticationConfiguration configuration, IMyHordesFetcherService myHordesFetcherService, IDataProtectionProvider dataProtectionProvider)
         {
             Logger = logger;
             MyHordesJsonApiRepository = myHordesJsonApiRepository;
             Configuration = configuration;
             MyHordesFetcherService = myHordesFetcherService;
+            UserKeyProtector = dataProtectionProvider.CreateProtector(MhoClaimsType.UserKeyProtectorPurpose);
         }
 
         public TokenDto CreateToken(SimpleMeDto me, string userKey)
@@ -40,7 +48,7 @@ namespace MyHordesOptimizerApi.Services.Impl
                   new Claim(ClaimTypes.Upn, me.Id.ToString()),
                   new Claim(ClaimTypes.Name, me.UserName),
                   new Claim(MhoClaimsType.Town, me.TownDetails.ToJson()),
-                  new Claim(MhoClaimsType.UserKey, userKey)
+                  new Claim(MhoClaimsType.UserKey, UserKeyProtector.Protect(userKey))
                 }),
                 Expires = DateTime.UtcNow.AddMinutes(Configuration.JwtValideTimeInMinute),
                 Issuer = Configuration.JwtIssuer,
@@ -64,5 +72,9 @@ namespace MyHordesOptimizerApi.Services.Impl
     {
         public const string Town = "MHO_Town";
         public const string UserKey = "MHO_UserKey";
+
+        // Versionné (".v1") pour pouvoir faire évoluer ce chiffrement indépendamment d'autres
+        // usages futurs de Data Protection dans ce projet.
+        public const string UserKeyProtectorPurpose = "MHO.JwtUserKey.v1";
     }
 }

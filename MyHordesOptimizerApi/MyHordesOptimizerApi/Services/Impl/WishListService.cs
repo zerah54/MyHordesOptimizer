@@ -7,6 +7,7 @@ using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.WishList;
 using MyHordesOptimizerApi.Models;
 using MyHordesOptimizerApi.Providers.Interfaces;
 using MyHordesOptimizerApi.Repository.Interfaces;
+using MyHordesOptimizerApi.Services.Impl.Locking;
 using MyHordesOptimizerApi.Services.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -23,13 +24,15 @@ namespace MyHordesOptimizerApi.Services.Impl
         protected IServiceScopeFactory ServiceScopeFactory { get; private set; }
         protected IMapper Mapper { get; set; }
         protected MhoContext DbContext { get; init; }
+        protected TownSyncLock TownSyncLock { get; init; }
 
         public WishListService(ILogger<MyHordesFetcherService> logger,
             IUserInfoProvider userInfoProvider,
             IMyHordesApiRepository myHordesJsonApiRepository,
             IServiceScopeFactory serviceScopeFactory,
             IMapper mapper,
-            MhoContext context)
+            MhoContext context,
+            TownSyncLock townSyncLock)
         {
             Logger = logger;
             UserInfoProvider = userInfoProvider;
@@ -37,6 +40,7 @@ namespace MyHordesOptimizerApi.Services.Impl
             ServiceScopeFactory = serviceScopeFactory;
             Mapper = mapper;
             DbContext = context;
+            TownSyncLock = townSyncLock;
         }
 
         public WishListLastUpdateDto GetWishList(int townId)
@@ -114,6 +118,10 @@ namespace MyHordesOptimizerApi.Services.Impl
 
         public WishListLastUpdateDto PutWishList(int townId, int userId, List<WishListPutResquestDto> wishListPutRequest)
         {
+            // Clé de verrou = mapId brut, jamais le townId résolu (cf. commentaire sur MhoContext.ResolveTownId
+            // et le verrou de synchro/login sur -mapId) : sans ça, une synchro concurrente sur la même ville
+            // verrouillerait un sémaphore différent et ne s'excluerait pas de cette écriture.
+            using var townLock = TownSyncLock.AcquireTownBlocking(-townId);
             townId = DbContext.ResolveTownId(townId);
             var items = Mapper.Map<List<TownWishListItem>>(wishListPutRequest);
             using var transaction = DbContext.Database.BeginTransaction();
@@ -133,6 +141,7 @@ namespace MyHordesOptimizerApi.Services.Impl
 
         public WishListLastUpdateDto CreateFromTemplate(int townId, int userId, int templateId)
         {
+            using var townLock = TownSyncLock.AcquireTownBlocking(-townId);
             townId = DbContext.ResolveTownId(townId);
             using var transaction = DbContext.Database.BeginTransaction();
             DbContext.TownWishListItems.RemoveRange(DbContext.TownWishListItems.Where(townWishListItem => townWishListItem.IdTown == townId));
@@ -154,6 +163,7 @@ namespace MyHordesOptimizerApi.Services.Impl
 
         public void AddItemToWishList(int townId, int userId, int itemId, int zoneXPa)
         {
+            using var townLock = TownSyncLock.AcquireTownBlocking(-townId);
             townId = DbContext.ResolveTownId(townId);
             using var transaction = DbContext.Database.BeginTransaction();
             var town = DbContext.Towns

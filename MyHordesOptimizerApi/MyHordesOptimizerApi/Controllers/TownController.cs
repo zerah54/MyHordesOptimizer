@@ -1,11 +1,14 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using MyHordesOptimizerApi.Controllers.Abstract;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Citizens;
 using MyHordesOptimizerApi.Providers.Interfaces;
+using MyHordesOptimizerApi.Services.Caching;
 using MyHordesOptimizerApi.Services.Interfaces;
+using System;
 using System.Collections.Generic;
 
 namespace MyHordesOptimizerApi.Controllers
@@ -14,12 +17,23 @@ namespace MyHordesOptimizerApi.Controllers
     [Authorize]
     public class TownController : AbstractMyHordesOptimizerControllerBase
     {
+        // Groupe B (voir chantier cache référentiels) : l'ensemble saisons/phases est dérivé de
+        // Towns, écrite en continu, donc pas de point d'invalidation précis pour CE côté-là — TTL en
+        // filet de sécurité. Mais IsFinished (AdminController.FinishSeason/UnfinishSeason) est lui un
+        // point d'écriture identifiable : voir l'invalidation précise là-bas, la clé est donc partagée
+        // via ReferentialCacheKeys plutôt que locale.
+        private static readonly TimeSpan CacheTtl = TimeSpan.FromHours(4);
+
         protected ITownService TownService { get; init; }
+        private readonly IMemoryCache _cache;
+
         public TownController(ILogger<AbstractMyHordesOptimizerControllerBase> logger,
             IUserInfoProvider userInfoProvider,
-            ITownService townService) : base(logger, userInfoProvider)
+            ITownService townService,
+            IMemoryCache cache) : base(logger, userInfoProvider)
         {
             TownService = townService;
+            _cache = cache;
         }
 
         [HttpGet]
@@ -93,7 +107,11 @@ namespace MyHordesOptimizerApi.Controllers
         [Route("seasons")]
         public ActionResult<List<SeasonDto>> GetSeasons()
         {
-            var seasons = TownService.GetSeasons();
+            var seasons = _cache.GetOrCreate(ReferentialCacheKeys.Seasons, entry =>
+            {
+                entry.SetAbsoluteExpiration(CacheTtl);
+                return TownService.GetSeasons();
+            });
             return Ok(seasons);
         }
 
@@ -101,7 +119,11 @@ namespace MyHordesOptimizerApi.Controllers
         [Route("season-phases")]
         public ActionResult<List<SeasonPhaseDto>> GetSeasonPhases()
         {
-            var seasonPhases = TownService.GetSeasonPhases();
+            var seasonPhases = _cache.GetOrCreate(ReferentialCacheKeys.SeasonPhases, entry =>
+            {
+                entry.SetAbsoluteExpiration(CacheTtl);
+                return TownService.GetSeasonPhases();
+            });
             return Ok(seasonPhases);
         }
     }

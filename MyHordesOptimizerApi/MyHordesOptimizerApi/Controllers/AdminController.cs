@@ -1,11 +1,13 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using MyHordesOptimizerApi.Attributes;
 using MyHordesOptimizerApi.Exceptions;
 using MyHordesOptimizerApi.Models.Import;
 using MyHordesOptimizerApi.Models.Logs;
 using MyHordesOptimizerApi.Providers.Interfaces;
+using MyHordesOptimizerApi.Services.Caching;
 using MyHordesOptimizerApi.Services.Impl;
 using MyHordesOptimizerApi.Services.Impl.Import;
 using MyHordesOptimizerApi.Services.Interfaces;
@@ -26,6 +28,7 @@ namespace MyHordesOptimizerApi.Controllers
         private readonly IMyHordesImportService _importService;
         private readonly ITownService _townService;
         private readonly ImportJobRunner _importJobRunner;
+        private readonly IMemoryCache _cache;
         private readonly int[] _adminUserIds;
 
         public AdminController(
@@ -34,13 +37,15 @@ namespace MyHordesOptimizerApi.Controllers
             IMyHordesImportService importService,
             ITownService townService,
             ImportJobRunner importJobRunner,
-            IConfiguration configuration)
+            IConfiguration configuration,
+            IMemoryCache cache)
         {
             _adminService = adminService;
             _userInfoProvider = userInfoProvider;
             _importService = importService;
             _townService = townService;
             _importJobRunner = importJobRunner;
+            _cache = cache;
             _adminUserIds = configuration.GetSection("Admin:UserIds").Get<int[]>() ?? [];
         }
 
@@ -74,7 +79,20 @@ namespace MyHordesOptimizerApi.Controllers
         [AdminOnly]
         public ActionResult<ImportJobState> ImportAll()
         {
-            return StartImportJob(ImportJobKeys.All, (service, onStep) => service.ImportAllAsync(onStep));
+            // ImportAllAsync ré-exécute chaque import individuel au niveau service, en contournant les
+            // actions ci-dessous : le groupe A doit être invalidé en bloc une fois le job terminé, y
+            // compris s'il a échoué en cours de route (finally, pas seulement en cas de succès).
+            return StartImportJob(ImportJobKeys.All, async (service, onStep) =>
+            {
+                try
+                {
+                    await service.ImportAllAsync(onStep);
+                }
+                finally
+                {
+                    InvalidateAllReferentialCaches();
+                }
+            });
         }
 
         [HttpGet("import/{job}/status")]
@@ -90,7 +108,14 @@ namespace MyHordesOptimizerApi.Controllers
         [AdminOnly]
         public async Task<ActionResult> ImportHeroSkills()
         {
-            await _importService.ImportHeroSkill();
+            try
+            {
+                await _importService.ImportHeroSkill();
+            }
+            finally
+            {
+                _cache.Remove(ReferentialCacheKeys.HeroSkills);
+            }
             return Ok();
         }
 
@@ -99,7 +124,14 @@ namespace MyHordesOptimizerApi.Controllers
         [AdminOnly]
         public async Task<ActionResult> ImportCausesOfDeath()
         {
-            await _importService.ImportCauseOfDeath();
+            try
+            {
+                await _importService.ImportCauseOfDeath();
+            }
+            finally
+            {
+                _cache.Remove(ReferentialCacheKeys.CausesOfDeath);
+            }
             return Ok();
         }
 
@@ -108,7 +140,14 @@ namespace MyHordesOptimizerApi.Controllers
         [AdminOnly]
         public ActionResult ImportCleanupTypes()
         {
-            _importService.ImportCleanUpTypes();
+            try
+            {
+                _importService.ImportCleanUpTypes();
+            }
+            finally
+            {
+                _cache.Remove(ReferentialCacheKeys.CleanUpTypes);
+            }
             return Ok();
         }
 
@@ -117,7 +156,16 @@ namespace MyHordesOptimizerApi.Controllers
         [AdminOnly]
         public async Task<ActionResult> ImportItems()
         {
-            await _importService.ImportItemsAsync();
+            try
+            {
+                await _importService.ImportItemsAsync();
+            }
+            finally
+            {
+                _cache.Remove(ReferentialCacheKeys.Items);
+                // Les recettes sont importées avec les items (même méthode de service).
+                _cache.Remove(ReferentialCacheKeys.Recipes);
+            }
             return Ok();
         }
 
@@ -126,7 +174,14 @@ namespace MyHordesOptimizerApi.Controllers
         [AdminOnly]
         public ActionResult ImportRuins()
         {
-            _importService.ImportRuins();
+            try
+            {
+                _importService.ImportRuins();
+            }
+            finally
+            {
+                _cache.Remove(ReferentialCacheKeys.Ruins);
+            }
             return Ok();
         }
 
@@ -153,7 +208,14 @@ namespace MyHordesOptimizerApi.Controllers
         [AdminOnly]
         public ActionResult ImportWishlistCategories()
         {
-            _importService.ImportWishlistCategorie();
+            try
+            {
+                _importService.ImportWishlistCategorie();
+            }
+            finally
+            {
+                _cache.Remove(ReferentialCacheKeys.WishListCategories);
+            }
             return Ok();
         }
 
@@ -162,7 +224,14 @@ namespace MyHordesOptimizerApi.Controllers
         [AdminOnly]
         public ActionResult ImportDefaultWishlists()
         {
-            _importService.ImportDefaultWishlists();
+            try
+            {
+                _importService.ImportDefaultWishlists();
+            }
+            finally
+            {
+                _cache.Remove(ReferentialCacheKeys.WishListTemplates);
+            }
             return Ok();
         }
 
@@ -171,7 +240,14 @@ namespace MyHordesOptimizerApi.Controllers
         [AdminOnly]
         public async Task<ActionResult> ImportBuildings()
         {
-            await _importService.ImportBuildingAsync();
+            try
+            {
+                await _importService.ImportBuildingAsync();
+            }
+            finally
+            {
+                _cache.Remove(ReferentialCacheKeys.Buildings);
+            }
             return Ok();
         }
 
@@ -195,6 +271,23 @@ namespace MyHordesOptimizerApi.Controllers
         public ActionResult<ImportJobState> ImportTowns([FromQuery] int? season = null, [FromQuery] bool resume = false)
         {
             return StartImportJob(ImportJobKeys.Towns, (service, onStep) => service.ImportTownsAsync(season, resume, onStep));
+        }
+
+        /// <summary>
+        /// Invalide tout le groupe A (référentiels à invalidation manuelle, voir
+        /// <see cref="ReferentialCacheKeys"/>) après un import global lancé depuis l'admin.
+        /// </summary>
+        private void InvalidateAllReferentialCaches()
+        {
+            _cache.Remove(ReferentialCacheKeys.Items);
+            _cache.Remove(ReferentialCacheKeys.Recipes);
+            _cache.Remove(ReferentialCacheKeys.Ruins);
+            _cache.Remove(ReferentialCacheKeys.Buildings);
+            _cache.Remove(ReferentialCacheKeys.HeroSkills);
+            _cache.Remove(ReferentialCacheKeys.CausesOfDeath);
+            _cache.Remove(ReferentialCacheKeys.CleanUpTypes);
+            _cache.Remove(ReferentialCacheKeys.WishListCategories);
+            _cache.Remove(ReferentialCacheKeys.WishListTemplates);
         }
 
         private ActionResult<ImportJobState> StartImportJob(string job, Func<IMyHordesImportService, Action<ImportStepProgress>, Task> work)
@@ -313,7 +406,18 @@ namespace MyHordesOptimizerApi.Controllers
         [AdminOnly]
         public ActionResult FinishSeason([FromRoute] int season)
         {
-            _townService.FinishSeason(season);
+            // Contrairement au reste du groupe B (dérivé de Towns, sans point d'écriture unique),
+            // IsFinished (Season(Dto|Phase)Dto) a ici un point d'écriture identifiable : autant
+            // l'invalider précisément plutôt que de laisser jusqu'à 4h de TTL s'écouler.
+            try
+            {
+                _townService.FinishSeason(season);
+            }
+            finally
+            {
+                _cache.Remove(ReferentialCacheKeys.Seasons);
+                _cache.Remove(ReferentialCacheKeys.SeasonPhases);
+            }
             return Ok();
         }
 
@@ -322,7 +426,15 @@ namespace MyHordesOptimizerApi.Controllers
         [AdminOnly]
         public ActionResult UnfinishSeason([FromRoute] int season)
         {
-            _townService.UnfinishSeason(season);
+            try
+            {
+                _townService.UnfinishSeason(season);
+            }
+            finally
+            {
+                _cache.Remove(ReferentialCacheKeys.Seasons);
+                _cache.Remove(ReferentialCacheKeys.SeasonPhases);
+            }
             return Ok();
         }
 

@@ -12,6 +12,7 @@ using MyHordesOptimizerApi.Dtos.MyHordes.Building;
 using MyHordesOptimizerApi.Dtos.MyHordes.Items;
 using MyHordesOptimizerApi.Dtos.MyHordes.Town;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools;
+using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.Bags;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.Digs;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.Map;
 using MyHordesOptimizerApi.Models;
@@ -134,6 +135,51 @@ namespace MyHordesOptimizerApiIntegrationTests.Services
             await updateTask;
 
             context.MapCellDigs.AsNoTracking().Any(dig => dig.IdUser == userId).Should().BeTrue();
+        }
+
+        /// <summary>
+        /// UpdateCitizenBag (méthode standalone) n'acquérait aucun TownSyncLock. IdTown != MapId
+        /// délibérément : le verrou doit porter sur le mapId brut, jamais sur le townId résolu (même
+        /// convention que le flux combiné ci-dessus, qui verrouille -townDetails.TownId) — un verrou
+        /// pris sur la mauvaise clé laisserait ce test passer sans jamais bloquer.
+        /// </summary>
+        [Fact]
+        public async Task UpdateCitizenBag_MemeVilleIdTownDifferentDuMapId_AttendLaLiberationDuVerrouSurMapId()
+        {
+            var scope = _factory.Services.CreateScope();
+            var context = scope.ServiceProvider.GetRequiredService<MhoContext>();
+            var service = scope.ServiceProvider.GetRequiredService<IExternalToolsService>();
+            var townSyncLock = scope.ServiceProvider.GetRequiredService<TownSyncLock>();
+
+            var suffix = Guid.NewGuid().ToString("N").Substring(0, 8);
+            var random = new Random();
+            var internalTownId = random.Next(1, int.MaxValue);
+            var mapId = random.Next(1, int.MaxValue);
+            var userId = random.Next(1, int.MaxValue);
+
+            context.Towns.Add(new Town { IdTown = internalTownId, Name = "test-town-" + suffix, MapId = mapId });
+            context.Users.Add(new User { IdUser = userId, Name = "test-user-" + suffix });
+            context.SaveChanges();
+            var lastUpdateInfo = new LastUpdateInfo { DateUpdate = DateTime.UtcNow };
+            context.LastUpdateInfos.Add(lastUpdateInfo);
+            context.SaveChanges();
+            context.TownCitizens.Add(new TownCitizen { IdTown = internalTownId, IdUser = userId, IdLastUpdateInfo = lastUpdateInfo.IdLastUpdateInfo });
+            context.SaveChanges();
+
+            var externalLock = await townSyncLock.AcquireTownAsync(-mapId);
+            var bagTask = Task.Run(() => service.UpdateCitizenBag(mapId, userId, new List<UpdateObjectDto>()));
+
+            // Course contre un délai généreux plutôt que "délai fixe court puis assertion instantanée" :
+            // un process froid (première requête MySQL contre le serveur distant partagé) peut dépasser
+            // largement 300 ms sans aucun bug de verrou, ce qui rendrait ce test vert à tort.
+            var winner = await Task.WhenAny(bagTask, Task.Delay(TimeSpan.FromSeconds(2)));
+            winner.Should().NotBeSameAs(bagTask, "l'écriture du sac ne doit pas se terminer tant que le verrou externe sur -mapId est tenu");
+            context.TownCitizens.AsNoTracking().Single(c => c.IdTown == internalTownId && c.IdUser == userId).IdBag.Should().BeNull();
+
+            await externalLock.DisposeAsync();
+            await bagTask;
+
+            context.TownCitizens.AsNoTracking().Single(c => c.IdTown == internalTownId && c.IdUser == userId).IdBag.Should().NotBeNull();
         }
 
         /// <summary>

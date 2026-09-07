@@ -8,6 +8,7 @@ using MyHordesOptimizerApi.Extensions;
 using MyHordesOptimizerApi.Models;
 using MyHordesOptimizerApi.Providers.Interfaces;
 using MyHordesOptimizerApi.Repository.Interfaces;
+using MyHordesOptimizerApi.Services.Impl.Locking;
 using MyHordesOptimizerApi.Services.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -22,18 +23,21 @@ namespace MyHordesOptimizerApi.Services.Impl
         protected IUserInfoProvider UserInfoProvider { get; init; }
         protected MhoContext DbContext { get; init; }
         protected IMyHordesApiRepository MyHordesApiRepository { get; init; }
+        protected TownSyncLock TownSyncLock { get; init; }
 
         public TownService(ILogger<TownService> logger,
             IMapper mapper,
             IUserInfoProvider userInfoProvider,
             MhoContext dbContext,
-            IMyHordesApiRepository myHordesApiRepository)
+            IMyHordesApiRepository myHordesApiRepository,
+            TownSyncLock townSyncLock)
         {
             Logger = logger;
             Mapper = mapper;
             UserInfoProvider = userInfoProvider;
             DbContext = dbContext;
             MyHordesApiRepository = myHordesApiRepository;
+            TownSyncLock = townSyncLock;
         }
 
         public CitizenDto GetTownCitizen(int townId, int userId)
@@ -77,6 +81,11 @@ namespace MyHordesOptimizerApi.Services.Impl
 
         public LastUpdateInfoDto AddCitizenDailyAction(int townId, int userId, string actionKey, int day)
         {
+            // Verrou tenu dès la lecture, pas seulement autour de BeginTransaction : sans ça, deux
+            // appels concurrents peuvent tous deux lire dailyAction == null avant que l'un des deux
+            // ne pose le verrou, et le second tente ensuite un INSERT en double une fois le premier
+            // relâché.
+            using var townLock = TownSyncLock.AcquireTownBlocking(-townId);
             townId = DbContext.ResolveTownId(townId);
             var dailyAction = DbContext.TownCitizenDailyActions
                 .Where(townDailyAction => townDailyAction.IdTown == townId)
@@ -134,6 +143,7 @@ namespace MyHordesOptimizerApi.Services.Impl
 
         public LastUpdateInfoDto UpdateCitizenChamanicDetail(int townId, int userId, CitizenChamanicDetailDto chamanicDetailDto)
         {
+            using var townLock = TownSyncLock.AcquireTownBlocking(-townId);
             townId = DbContext.ResolveTownId(townId);
             var citizen = DbContext.TownCitizens.Where(townCitizen => townCitizen.IdTown == townId)
                  .Where(townCitizen => townCitizen.IdUser == userId)
@@ -213,6 +223,23 @@ namespace MyHordesOptimizerApi.Services.Impl
 
         public void DeleteTown(int townId)
         {
+            // townId ici est l'IdTown interne (l'admin liste les villes par GetTowns(), qui expose
+            // Id = town.IdTown, jamais MapId) : une famille de clé différente de -mapId utilisée par
+            // les flux de synchro/login. On verrouille les DEUX — l'IdTown interne ET le MapId de la
+            // ville si connu — pour empêcher une synchro concurrente d'écrire dans une ville en cours
+            // de suppression, dans un ordre déterministe pour ne jamais interbloquer une autre
+            // suppression/migration concurrente.
+            var mapId = DbContext.Towns.Where(t => t.IdTown == townId).Select(t => (int?)t.MapId).FirstOrDefault();
+            var lockKeys = new List<int> { -townId };
+            if (mapId.HasValue && -mapId.Value != -townId)
+            {
+                lockKeys.Add(-mapId.Value);
+            }
+            lockKeys.Sort();
+
+            using var firstLock = TownSyncLock.AcquireTownBlocking(lockKeys[0]);
+            using var secondLock = lockKeys.Count > 1 ? TownSyncLock.AcquireTownBlocking(lockKeys[1]) : null;
+
             using var transaction = DbContext.Database.BeginTransaction();
             DbContext.Database.ExecuteSqlRaw("SET FOREIGN_KEY_CHECKS = 0");
 

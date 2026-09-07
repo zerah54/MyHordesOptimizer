@@ -7,6 +7,7 @@ using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Estimations;
 using MyHordesOptimizerApi.Extensions;
 using MyHordesOptimizerApi.Models;
 using MyHordesOptimizerApi.Providers.Interfaces;
+using MyHordesOptimizerApi.Services.Impl.Locking;
 using MyHordesOptimizerApi.Services.Interfaces.Estimations;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,22 +21,29 @@ namespace MyHordesOptimizerApi.Services.Impl.Estimations
         protected ILogger<MyHordesOptimizerEstimationService> Logger { get; private set; }
         protected IMapper Mapper { get; private set; }
         protected MhoContext DbContext { get; set; }
+        protected TownSyncLock TownSyncLock { get; set; }
 
         public MyHordesOptimizerEstimationService(IServiceScopeFactory serviceScopeFactory,
             IUserInfoProvider userInfoProvider,
             ILogger<MyHordesOptimizerEstimationService> logger,
             IMapper mapper,
-            MhoContext dbContext)
+            MhoContext dbContext,
+            TownSyncLock townSyncLock)
         {
             ServiceScopeFactory = serviceScopeFactory;
             UserInfoProvider = userInfoProvider;
             Logger = logger;
             Mapper = mapper;
             DbContext = dbContext;
+            TownSyncLock = townSyncLock;
         }
 
         public void UpdateEstimations(int townId, EstimationRequestDto request)
         {
+            // Verrou tenu avant le check-then-act estimations.Any()/AddRange plus bas : sans lui,
+            // deux appels concurrents peuvent tous deux voir la liste vide et faire un AddRange
+            // chacun (doublons), au lieu de passer proprement par la branche UpdateNoNullProperties.
+            using var townLock = TownSyncLock.AcquireTownBlocking(-townId);
             townId = DbContext.ResolveTownId(townId);
             using var transaction = DbContext.Database.BeginTransaction();
             var newLastUpdate = DbContext.LastUpdateInfos.Update(Mapper.Map<LastUpdateInfo>(UserInfoProvider.GenerateLastUpdateInfo(), opt => opt.SetDbContext(DbContext)));

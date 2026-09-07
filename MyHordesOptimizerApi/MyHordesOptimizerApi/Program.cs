@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpLogging;
 using Microsoft.AspNetCore.RateLimiting;
+using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -96,6 +97,17 @@ builder.Services.AddSwaggerGen(c =>
 });
 
 builder.Services.AddCors();
+// EnableForHttps=true : l'API n'est jamais servie qu'en HTTPS en prod, aucune compensation par
+// reverse proxy n'est en place (updateProd.sh est hors dépôt, traité comme absent).
+builder.Services.AddResponseCompression(options =>
+{
+    options.Providers.Add<BrotliCompressionProvider>();
+    options.Providers.Add<GzipCompressionProvider>();
+    options.EnableForHttps = true;
+});
+// Cache mémoire des référentiels quasi-statiques (Fetcher/Parameters/WishList) : voir
+// Services/Caching/ReferentialCacheKeys.cs pour les clés et leur invalidation.
+builder.Services.AddMemoryCache();
 builder.Host.UseSerilog((_, services, configuration) =>
                 configuration.ReadFrom.Configuration(builder.Configuration)
                              .Enrich.With(services.GetService<MyHordesOptimizerEnricher>()!));
@@ -213,6 +225,9 @@ builder.Services.AddSingleton<ImportJobRunner>();
 builder.Services.AddSingleton<ExternalToolsUpdateJobRunner>();
 // Verrou d'écriture des villes : forcément un singleton, il n'a de sens que partagé par tous.
 builder.Services.AddSingleton<TownSyncLock>();
+// Verrou des imports référentiels globaux (tables sans IdTown) : distinct de TownSyncLock, singleton
+// pour la même raison.
+builder.Services.AddSingleton<ReferentialImportLock>();
 builder.Services.AddScoped<IWishListService, WishListService>();
 builder.Services.AddSingleton<IMinesweeperBoardGenerator, MinesweeperBoardGenerator>();
 builder.Services.AddScoped<IMinesweeperService, MinesweeperService>();
@@ -231,6 +246,7 @@ builder.Services.AddScoped<IExpeditionService, ExpeditionService>();
 builder.Services.AddScoped<ITownService, TownService>();
 builder.Services.AddScoped<IUserAccountService, UserAccountService>();
 builder.Services.AddScoped<INoteService, NoteService>();
+builder.Services.AddScoped<IETagVersionService, ETagVersionService>();
 
 // Add the discord client to services
 builder.Services.AddSingleton(new DiscordSocketClient(new DiscordSocketConfig
@@ -264,6 +280,10 @@ builder.Services.AddHttpLogging(logging =>
 
 builder.Services.AddBearerAuthentication(builder.Configuration);
 
+// Chiffre le claim JWT MHO_UserKey (AuthenticationService/JwtActionFilter/JwtHubFilter) : un JWT
+// n'est signé, pas chiffré, son payload serait sinon lisible en clair par quiconque l'intercepte.
+builder.Services.AddDataProtection();
+
 builder.Services.AddRateLimiter(options =>
 {
     options.AddConcurrencyLimiter(policyName: "MhoInRice", limiterOptions =>
@@ -275,6 +295,10 @@ builder.Services.AddRateLimiter(options =>
 });
 
 var app = builder.Build();
+
+// Tout premier middleware du pipeline : doit envelopper toute réponse, y compris celles produites
+// par les middlewares ajoutés plus loin (Swagger, HttpLogging, etc.).
+app.UseResponseCompression();
 
 if (app.Environment.IsDevelopment())
 {

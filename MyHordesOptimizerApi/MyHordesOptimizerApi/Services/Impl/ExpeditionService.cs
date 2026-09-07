@@ -12,119 +12,112 @@ using MyHordesOptimizerApi.Models;
 using MyHordesOptimizerApi.Models.Expeditions;
 using MyHordesOptimizerApi.Providers.Interfaces;
 using MyHordesOptimizerApi.Repository.Expeditions;
+using MyHordesOptimizerApi.Services.Impl.Locking;
 using MyHordesOptimizerApi.Services.Interfaces;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace MyHordesOptimizerApi.Services.Impl
 {
     public class ExpeditionService : IExpeditionService
     {
-        public static SemaphoreSlim Lock = new SemaphoreSlim(1);
         protected IServiceScopeFactory ServiceScopeFactory { get; private set; }
         protected IMapper Mapper { get; private set; }
         protected IUserInfoProvider UserInfoProvider { get; private set; }
         protected ILogger<ExpeditionService> Logger { get; private set; }
         protected MhoContext DbContext { get; init; }
+        protected TownSyncLock TownSyncLock { get; private set; }
 
         public ExpeditionService(IServiceScopeFactory serviceScopeFactory,
             IMapper mapper,
             IUserInfoProvider userInfoProvider,
             ILogger<ExpeditionService> logger,
-            MhoContext dbContext)
+            MhoContext dbContext,
+            TownSyncLock townSyncLock)
         {
             ServiceScopeFactory = serviceScopeFactory;
             Mapper = mapper;
             UserInfoProvider = userInfoProvider;
             Logger = logger;
             DbContext = dbContext;
+            TownSyncLock = townSyncLock;
         }
 
         #region Expeditions
 
         public async Task<ExpeditionDto> SaveExpeditionAsync(ExpeditionRequestDto expeditionDto, int idTown, int day)
         {
+            // Verrou pris sur le mapId brut AVANT résolution (même convention que WishListService/TownService) :
+            // sur une ville déjà synchronisée, verrouiller après résolution prendrait -IdTown, jamais exclusif
+            // avec une synchro/login concurrente qui verrouille -MapId.
+            await using var townLock = await TownSyncLock.AcquireTownAsync(-idTown);
             idTown = DbContext.ResolveTownId(idTown);
             EnsureDayIsEditable(idTown, day);
-            await Lock.WaitAsync();
-            try
+            await using var transaction = await DbContext.Database.BeginTransactionAsync();
+            LastUpdateInfoDto lastUpdateInfoDto = UserInfoProvider.GenerateLastUpdateInfo();
+            var newLastUpdate = DbContext.LastUpdateInfos.Update(Mapper.Map<LastUpdateInfo>(lastUpdateInfoDto, opt => opt.SetDbContext(DbContext))).Entity;
+            await DbContext.SaveChangesAsync();
+            var expeditionModel = Mapper.Map<Expedition>(expeditionDto, opt => opt.SetDbContext(DbContext));
+            expeditionModel.IdLastUpdateInfo = newLastUpdate.IdLastUpdateInfo;
+            expeditionModel.Day = day;
+            expeditionModel.IdTown = idTown;
+            ExpeditionDto result;
+            if (expeditionDto.Id.HasValue)
             {
-                using var transaction = DbContext.Database.BeginTransaction();
-                LastUpdateInfoDto lastUpdateInfoDto = UserInfoProvider.GenerateLastUpdateInfo();
-                var newLastUpdate = DbContext.LastUpdateInfos.Update(Mapper.Map<LastUpdateInfo>(lastUpdateInfoDto, opt => opt.SetDbContext(DbContext))).Entity;
-                DbContext.SaveChanges();
-                var expeditionModel = Mapper.Map<Expedition>(expeditionDto, opt => opt.SetDbContext(DbContext));
-                expeditionModel.IdLastUpdateInfo = newLastUpdate.IdLastUpdateInfo;
-                expeditionModel.Day = day;
-                expeditionModel.IdTown = idTown;
-                ExpeditionDto result;
-                if (expeditionDto.Id.HasValue)
-                {
-                    // UpdateAsync
-                    var modelFromDb = DbContext.Expeditions
-                        .Where(expedition => expedition.IdExpedition == expeditionDto.Id)
-                        .Include(expedition => expedition.ExpeditionParts)
-                            .ThenInclude(part => part.IdExpeditionOrders)
-                        .Include(expedition => expedition.ExpeditionParts)
-                            .ThenInclude(part => part.ExpeditionCitizens)
-                                .ThenInclude(expeditionCitizen => expeditionCitizen.IdExpeditionBagNavigation)
-                                    .ThenInclude(bag => bag.ExpeditionBagItems)
-                                        .ThenInclude(bagItem => bagItem.IdItemNavigation)
-                        .Include(expedition => expedition.ExpeditionParts)
-                            .ThenInclude(part => part.ExpeditionCitizens)
-                                .ThenInclude(expeditionCitizen => expeditionCitizen.ExpeditionOrders)
-                        .Single();
+                // UpdateAsync
+                var modelFromDb = await DbContext.Expeditions
+                    .Where(expedition => expedition.IdExpedition == expeditionDto.Id)
+                    .Include(expedition => expedition.ExpeditionParts)
+                        .ThenInclude(part => part.IdExpeditionOrders)
+                    .Include(expedition => expedition.ExpeditionParts)
+                        .ThenInclude(part => part.ExpeditionCitizens)
+                            .ThenInclude(expeditionCitizen => expeditionCitizen.IdExpeditionBagNavigation)
+                                .ThenInclude(bag => bag.ExpeditionBagItems)
+                                    .ThenInclude(bagItem => bagItem.IdItemNavigation)
+                    .Include(expedition => expedition.ExpeditionParts)
+                        .ThenInclude(part => part.ExpeditionCitizens)
+                            .ThenInclude(expeditionCitizen => expeditionCitizen.ExpeditionOrders)
+                    .SingleAsync();
 
-                    // On récupère les collections de la db
-                    var expeditionsOrderFromDb = modelFromDb.ExpeditionParts.SelectMany(part => part.IdExpeditionOrders).ToList();
-                    expeditionsOrderFromDb.AddRange(modelFromDb.ExpeditionParts.SelectMany(part => part.ExpeditionCitizens.SelectMany(citizen => citizen.ExpeditionOrders)));
-                    var partFromDb = modelFromDb.ExpeditionParts;
-                    var citizenFromDb = modelFromDb.ExpeditionParts.SelectMany(part => part.ExpeditionCitizens).ToList();
-                    // On récupère les mêmes collection du model a update
-                    var expeditionsOrderFromDto = expeditionModel.ExpeditionParts.SelectMany(part => part.IdExpeditionOrders).ToList();
-                    expeditionsOrderFromDto.AddRange(expeditionModel.ExpeditionParts.SelectMany(part => part.ExpeditionCitizens.SelectMany(citizen => citizen.ExpeditionOrders)));
-                    var partFromDto = expeditionModel.ExpeditionParts;
-                    var citizenFromDto = expeditionModel.ExpeditionParts.SelectMany(part => part.ExpeditionCitizens).ToList();
-                    // On patch les collections
-                    DbContext.Patch(expeditionsOrderFromDb, expeditionsOrderFromDto);
-                    DbContext.Patch(partFromDb, partFromDto);
-                    DbContext.Patch(citizenFromDb, citizenFromDto);
+                // On récupère les collections de la db
+                var expeditionsOrderFromDb = modelFromDb.ExpeditionParts.SelectMany(part => part.IdExpeditionOrders).ToList();
+                expeditionsOrderFromDb.AddRange(modelFromDb.ExpeditionParts.SelectMany(part => part.ExpeditionCitizens.SelectMany(citizen => citizen.ExpeditionOrders)));
+                var partFromDb = modelFromDb.ExpeditionParts;
+                var citizenFromDb = modelFromDb.ExpeditionParts.SelectMany(part => part.ExpeditionCitizens).ToList();
+                // On récupère les mêmes collection du model a update
+                var expeditionsOrderFromDto = expeditionModel.ExpeditionParts.SelectMany(part => part.IdExpeditionOrders).ToList();
+                expeditionsOrderFromDto.AddRange(expeditionModel.ExpeditionParts.SelectMany(part => part.ExpeditionCitizens.SelectMany(citizen => citizen.ExpeditionOrders)));
+                var partFromDto = expeditionModel.ExpeditionParts;
+                var citizenFromDto = expeditionModel.ExpeditionParts.SelectMany(part => part.ExpeditionCitizens).ToList();
+                // On patch les collections
+                await DbContext.PatchAsync(expeditionsOrderFromDb, expeditionsOrderFromDto);
+                await DbContext.PatchAsync(partFromDb, partFromDto);
+                await DbContext.PatchAsync(citizenFromDb, citizenFromDto);
 
-                    modelFromDb.UpdateAllButKeysProperties(expeditionModel);
-                    DbContext.Update(modelFromDb);
-                    DbContext.SaveChanges();
-                    result = Mapper.Map<ExpeditionDto>(modelFromDb);
-                }
-                else
-                {
-                    // Create : une partie par défaut est créée ici (et non côté front en réaction au
-                    // broadcast) pour n'être créée qu'une seule fois, quel que soit le nombre de clients
-                    // connectés à la ville au moment de la création.
-                    var newEntity = DbContext.Add(expeditionModel).Entity;
-                    DbContext.SaveChanges();
-                    DbContext.Add(new ExpeditionPart { IdExpedition = newEntity.IdExpedition, Position = 0 });
-                    DbContext.SaveChanges();
-                    var expeditionWithDefaultPart = DbContext.Expeditions
-                        .Where(expedition => expedition.IdExpedition == newEntity.IdExpedition)
-                        .IncludeAll()
-                        .Single();
-                    result = Mapper.Map<ExpeditionDto>(expeditionWithDefaultPart);
-                }
-                DbContext.SaveChanges();
-                transaction.Commit();
-                return result;
+                modelFromDb.UpdateAllButKeysProperties(expeditionModel);
+                DbContext.Update(modelFromDb);
+                await DbContext.SaveChangesAsync();
+                result = Mapper.Map<ExpeditionDto>(modelFromDb);
             }
-            catch (System.Exception)
+            else
             {
-                throw;
+                // Create : une partie par défaut est créée ici (et non côté front en réaction au
+                // broadcast) pour n'être créée qu'une seule fois, quel que soit le nombre de clients
+                // connectés à la ville au moment de la création.
+                var newEntity = DbContext.Add(expeditionModel).Entity;
+                await DbContext.SaveChangesAsync();
+                DbContext.Add(new ExpeditionPart { IdExpedition = newEntity.IdExpedition, Position = 0 });
+                await DbContext.SaveChangesAsync();
+                var expeditionWithDefaultPart = await DbContext.Expeditions
+                    .Where(expedition => expedition.IdExpedition == newEntity.IdExpedition)
+                    .IncludeAll()
+                    .SingleAsync();
+                result = Mapper.Map<ExpeditionDto>(expeditionWithDefaultPart);
             }
-            finally
-            {
-                Lock.Release();
-            }
+            await DbContext.SaveChangesAsync();
+            await transaction.CommitAsync();
+            return result;
         }
 
         public List<ExpeditionDto> GetExpeditionsByDay(int townId, int day)
@@ -162,55 +155,44 @@ namespace MyHordesOptimizerApi.Services.Impl
 
         public async Task<List<ExpeditionDto>> CopyExpeditionsAsync(int townId, int fromDay, int targetDay)
         {
+            // Cf. SaveExpeditionAsync : verrou sur le mapId brut AVANT résolution.
+            await using var townLock = await TownSyncLock.AcquireTownAsync(-townId);
             townId = DbContext.ResolveTownId(townId);
             EnsureDayIsEditable(townId, targetDay);
-            await Lock.WaitAsync();
-            try
-            {
-                using var transaction = DbContext.Database.BeginTransaction();
-                LastUpdateInfoDto lastUpdateInfoDto = UserInfoProvider.GenerateLastUpdateInfo();
-                var newLastUpdate = DbContext.LastUpdateInfos.Update(Mapper.Map<LastUpdateInfo>(lastUpdateInfoDto, opt => opt.SetDbContext(DbContext))).Entity;
-                DbContext.SaveChanges();
-                var modelsFromDb = DbContext.Expeditions
-                               .Where(expedition => expedition.IdTown == townId && expedition.Day == fromDay)
-                               .Include(expedition => expedition.ExpeditionParts)
-                                   .ThenInclude(part => part.IdExpeditionOrders)
-                               .Include(expedition => expedition.ExpeditionParts)
-                                   .ThenInclude(part => part.ExpeditionCitizens)
-                                       .ThenInclude(expeditionCitizen => expeditionCitizen.IdExpeditionBagNavigation)
-                                           .ThenInclude(bag => bag.ExpeditionBagItems)
-                                                .ThenInclude(bagItem => bagItem.IdItemNavigation)
-                               .Include(expedition => expedition.ExpeditionParts)
-                                   .ThenInclude(part => part.ExpeditionCitizens)
-                                       .ThenInclude(expeditionCitizen => expeditionCitizen.ExpeditionOrders)
-                               .ToList();
+            await using var transaction = await DbContext.Database.BeginTransactionAsync();
+            LastUpdateInfoDto lastUpdateInfoDto = UserInfoProvider.GenerateLastUpdateInfo();
+            var newLastUpdate = DbContext.LastUpdateInfos.Update(Mapper.Map<LastUpdateInfo>(lastUpdateInfoDto, opt => opt.SetDbContext(DbContext))).Entity;
+            await DbContext.SaveChangesAsync();
+            var modelsFromDb = await DbContext.Expeditions
+                           .Where(expedition => expedition.IdTown == townId && expedition.Day == fromDay)
+                           .Include(expedition => expedition.ExpeditionParts)
+                               .ThenInclude(part => part.IdExpeditionOrders)
+                           .Include(expedition => expedition.ExpeditionParts)
+                               .ThenInclude(part => part.ExpeditionCitizens)
+                                   .ThenInclude(expeditionCitizen => expeditionCitizen.IdExpeditionBagNavigation)
+                                       .ThenInclude(bag => bag.ExpeditionBagItems)
+                                            .ThenInclude(bagItem => bagItem.IdItemNavigation)
+                           .Include(expedition => expedition.ExpeditionParts)
+                               .ThenInclude(part => part.ExpeditionCitizens)
+                                   .ThenInclude(expeditionCitizen => expeditionCitizen.ExpeditionOrders)
+                           .ToListAsync();
 
-                var existingExpeditionToDelete = DbContext.Expeditions.Where(expedition => expedition.IdTown == townId && expedition.Day == targetDay);
-                DbContext.RemoveRange(existingExpeditionToDelete);
-                var newExpeditions = new List<Expedition>();
-                foreach (var modelFromDb in modelsFromDb)
-                {
-                    var newExpedtion = modelFromDb.Copy();
-                    newExpedtion.IdLastUpdateInfo = newLastUpdate.IdLastUpdateInfo;
-                    newExpedtion.Day = targetDay;
-                    newExpedtion.State = ExpeditionConstants.ExpeditionStateStop;
-                    var updatedNewExpedition = DbContext.Add(newExpedtion).Entity;
-                    DbContext.SaveChanges();
-                    newExpeditions.Add(updatedNewExpedition);
-                }
-                DbContext.SaveChanges();
-                transaction.Commit();
-                var returnedDto = Mapper.Map<List<ExpeditionDto>>(newExpeditions);
-                return returnedDto;
-            }
-            catch (Exception)
+            var existingExpeditionToDelete = DbContext.Expeditions.Where(expedition => expedition.IdTown == townId && expedition.Day == targetDay);
+            DbContext.RemoveRange(existingExpeditionToDelete);
+            var newExpeditions = new List<Expedition>();
+            foreach (var modelFromDb in modelsFromDb)
             {
-                throw;
+                var newExpedtion = modelFromDb.Copy();
+                newExpedtion.IdLastUpdateInfo = newLastUpdate.IdLastUpdateInfo;
+                newExpedtion.Day = targetDay;
+                newExpedtion.State = ExpeditionConstants.ExpeditionStateStop;
+                var updatedNewExpedition = DbContext.Add(newExpedtion).Entity;
+                newExpeditions.Add(updatedNewExpedition);
             }
-            finally
-            {
-                Lock.Release();
-            }
+            await DbContext.SaveChangesAsync();
+            await transaction.CommitAsync();
+            var returnedDto = Mapper.Map<List<ExpeditionDto>>(newExpeditions);
+            return returnedDto;
         }
 
         public ExpeditionInhorenceModel ValidateExpeditions(int townId, int day)
@@ -426,70 +408,59 @@ namespace MyHordesOptimizerApi.Services.Impl
             // Vérifié pour la création ET le déplacement (expeditionPartId = partie CIBLE dans les deux cas) :
             // sans ce garde-fou côté cible, un déplacement pourrait affecter un citoyen à une partie dont
             // le jour est déjà verrouillé.
-            EnsurePartDayIsEditable(expeditionPartId);
-            await Lock.WaitAsync();
-            try
+            var townLockKey = EnsurePartDayIsEditable(expeditionPartId);
+            await using var townLock = await TownSyncLock.AcquireTownAsync(townLockKey);
+            await using var transaction = await DbContext.Database.BeginTransactionAsync();
+            LastUpdateInfoDto lastUpdateInfoDto = UserInfoProvider.GenerateLastUpdateInfo();
+            var newLastUpdate = DbContext.LastUpdateInfos.Update(Mapper.Map<LastUpdateInfo>(lastUpdateInfoDto, opt => opt.SetDbContext(DbContext))).Entity;
+            await DbContext.SaveChangesAsync();
+            var expeditionCitizenModel = Mapper.Map<ExpeditionCitizen>(expeditionCitizen, opt => opt.SetDbContext(DbContext));
+            expeditionCitizenModel.IdExpeditionPart = expeditionPartId;
+            ExpeditionCitizenDto result;
+            if (expeditionCitizen.Id.HasValue)
             {
-                using var transaction = DbContext.Database.BeginTransaction();
-                LastUpdateInfoDto lastUpdateInfoDto = UserInfoProvider.GenerateLastUpdateInfo();
-                var newLastUpdate = DbContext.LastUpdateInfos.Update(Mapper.Map<LastUpdateInfo>(lastUpdateInfoDto, opt => opt.SetDbContext(DbContext))).Entity;
-                DbContext.SaveChanges();
-                var expeditionCitizenModel = Mapper.Map<ExpeditionCitizen>(expeditionCitizen, opt => opt.SetDbContext(DbContext));
-                expeditionCitizenModel.IdExpeditionPart = expeditionPartId;
-                ExpeditionCitizenDto result;
-                if (expeditionCitizen.Id.HasValue)
+                // UpdateAsync
+                var expeditionCitizenFromDb = await DbContext.ExpeditionCitizens.Where(citizen => citizen.IdExpeditionCitizen == expeditionCitizen.Id.Value)
+                    .IncludeAll()
+                    .SingleAsync();
+
+                var existingExpedition = expeditionCitizenFromDb.IdExpeditionPartNavigation?.IdExpeditionNavigation;
+                if (existingExpedition is not null && existingExpedition.IdTown.HasValue)
                 {
-                    // UpdateAsync
-                    var expeditionCitizenFromDb = DbContext.ExpeditionCitizens.Where(citizen => citizen.IdExpeditionCitizen == expeditionCitizen.Id.Value)
-                        .IncludeAll()
-                        .Single();
-
-                    var existingExpedition = expeditionCitizenFromDb.IdExpeditionPartNavigation?.IdExpeditionNavigation;
-                    if (existingExpedition is not null && existingExpedition.IdTown.HasValue)
-                    {
-                        EnsureDayIsEditable(existingExpedition.IdTown.Value, existingExpedition.Day);
-                    }
-
-                    var orderFromDb = expeditionCitizenFromDb.ExpeditionOrders;
-                    var orderFromDto = expeditionCitizenModel.ExpeditionOrders;
-                    DbContext.Patch(orderFromDb, orderFromDto);
-
-                    // UpdateAllButKeysProperties nullifie la navigation IdExpeditionPartNavigation (copiée
-                    // depuis expeditionCitizenModel, qui n'en porte pas), ce qui efface aussi la FK. On la
-                    // restaure explicitement vers la PARTIE CIBLE (expeditionPartId) pour permettre un
-                    // déplacement de citoyen entre parties — restaurer l'ancienne partie annulerait le move.
-                    var targetPart = DbContext.ExpeditionParts.Single(part => part.IdExpeditionPart == expeditionPartId);
-                    expeditionCitizenFromDb.UpdateAllButKeysProperties(expeditionCitizenModel);
-                    expeditionCitizenFromDb.IdExpeditionPartNavigation = targetPart;
-                    expeditionCitizenFromDb.IdExpeditionPart = targetPart.IdExpeditionPart;
-                    DbContext.SaveChanges();
-                    result = Mapper.Map<ExpeditionCitizenDto>(expeditionCitizenFromDb);
+                    await EnsureDayIsEditableAsync(existingExpedition.IdTown.Value, existingExpedition.Day);
                 }
-                else
+
+                var orderFromDb = expeditionCitizenFromDb.ExpeditionOrders;
+                var orderFromDto = expeditionCitizenModel.ExpeditionOrders;
+                await DbContext.PatchAsync(orderFromDb, orderFromDto);
+
+                // UpdateAllButKeysProperties nullifie la navigation IdExpeditionPartNavigation (copiée
+                // depuis expeditionCitizenModel, qui n'en porte pas), ce qui efface aussi la FK. On la
+                // restaure explicitement vers la PARTIE CIBLE (expeditionPartId) pour permettre un
+                // déplacement de citoyen entre parties — restaurer l'ancienne partie annulerait le move.
+                var targetPart = await DbContext.ExpeditionParts.SingleAsync(part => part.IdExpeditionPart == expeditionPartId);
+                expeditionCitizenFromDb.UpdateAllButKeysProperties(expeditionCitizenModel);
+                expeditionCitizenFromDb.IdExpeditionPartNavigation = targetPart;
+                expeditionCitizenFromDb.IdExpeditionPart = targetPart.IdExpeditionPart;
+                await DbContext.SaveChangesAsync();
+                result = Mapper.Map<ExpeditionCitizenDto>(expeditionCitizenFromDb);
+            }
+            else
+            {
+                // Create
+                if (expeditionCitizenModel.IdExpeditionBagNavigation is null)
                 {
-                    // Create
-                    if (expeditionCitizenModel.IdExpeditionBagNavigation is null)
-                    {
-                        expeditionCitizenModel.IdExpeditionBagNavigation = new ExpeditionBag();
-                    }
-                    var newEntity = DbContext.Add(expeditionCitizenModel).Entity;
-                    DbContext.SaveChanges();
-                    var expeditionCitizenFromDb = DbContext.ExpeditionCitizens.Where(citizen => citizen.IdExpeditionCitizen == newEntity.IdExpeditionCitizen)
-                      .IncludeAll()
-                      .Single();
-                    result = Mapper.Map<ExpeditionCitizenDto>(expeditionCitizenFromDb);
+                    expeditionCitizenModel.IdExpeditionBagNavigation = new ExpeditionBag();
                 }
-                transaction.Commit();
-                return result;
+                var newEntity = DbContext.Add(expeditionCitizenModel).Entity;
+                await DbContext.SaveChangesAsync();
+                var expeditionCitizenFromDb = await DbContext.ExpeditionCitizens.Where(citizen => citizen.IdExpeditionCitizen == newEntity.IdExpeditionCitizen)
+                  .IncludeAll()
+                  .SingleAsync();
+                result = Mapper.Map<ExpeditionCitizenDto>(expeditionCitizenFromDb);
             }
-            catch (Exception)
-            {
-                throw;
-            }
-            finally
-            {
-                Lock.Release();
-            }
+            await transaction.CommitAsync();
+            return result;
         }
 
         public void DeleteExpeditionCitizen(int expeditionCitizenId)
@@ -509,82 +480,71 @@ namespace MyHordesOptimizerApi.Services.Impl
 
         public async Task<ExpeditionPartDto> SaveExpeditionPartAsync(int expeditionId, ExpeditionPartRequestDto expeditionPart)
         {
-            EnsureExpeditionDayIsEditable(expeditionId);
-            await Lock.WaitAsync();
-            try
+            var townLockKey = EnsureExpeditionDayIsEditable(expeditionId);
+            await using var townLock = await TownSyncLock.AcquireTownAsync(townLockKey);
+            await using var transaction = await DbContext.Database.BeginTransactionAsync();
+            LastUpdateInfoDto lastUpdateInfoDto = UserInfoProvider.GenerateLastUpdateInfo();
+            var newLastUpdate = DbContext.LastUpdateInfos.Update(Mapper.Map<LastUpdateInfo>(lastUpdateInfoDto, opt => opt.SetDbContext(DbContext))).Entity;
+            await DbContext.SaveChangesAsync();
+            var expeditionPartModel = Mapper.Map<ExpeditionPart>(expeditionPart, opt => opt.SetDbContext(DbContext));
+            expeditionPartModel.IdExpedition = expeditionId;
+            ExpeditionPartDto result;
+            if (expeditionPart.Id.HasValue)
             {
-                using var transaction = DbContext.Database.BeginTransaction();
-                LastUpdateInfoDto lastUpdateInfoDto = UserInfoProvider.GenerateLastUpdateInfo();
-                var newLastUpdate = DbContext.LastUpdateInfos.Update(Mapper.Map<LastUpdateInfo>(lastUpdateInfoDto, opt => opt.SetDbContext(DbContext))).Entity;
-                DbContext.SaveChanges();
-                var expeditionPartModel = Mapper.Map<ExpeditionPart>(expeditionPart, opt => opt.SetDbContext(DbContext));
-                expeditionPartModel.IdExpedition = expeditionId;
-                ExpeditionPartDto result;
-                if (expeditionPart.Id.HasValue)
-                {
-                    // UpdateAsync
-                    var expeditionPartFromDb = DbContext.ExpeditionParts.Where(part => part.IdExpeditionPart == expeditionPart.Id.Value)
-                        .Include(part => part.IdExpeditionOrders)
-                        .Include(part => part.ExpeditionCitizens)
-                            .ThenInclude(citizen => citizen.ExpeditionOrders)
-                        .Include(part => part.ExpeditionCitizens)
-                            .ThenInclude(citizen => citizen.IdExpeditionBagNavigation)
-                                .ThenInclude(bag => bag.ExpeditionBagItems)
-                                    .ThenInclude(bagItem => bagItem.IdItemNavigation)
-                        .Single();
+                // UpdateAsync
+                var expeditionPartFromDb = await DbContext.ExpeditionParts.Where(part => part.IdExpeditionPart == expeditionPart.Id.Value)
+                    .Include(part => part.IdExpeditionOrders)
+                    .Include(part => part.ExpeditionCitizens)
+                        .ThenInclude(citizen => citizen.ExpeditionOrders)
+                    .Include(part => part.ExpeditionCitizens)
+                        .ThenInclude(citizen => citizen.IdExpeditionBagNavigation)
+                            .ThenInclude(bag => bag.ExpeditionBagItems)
+                                .ThenInclude(bagItem => bagItem.IdItemNavigation)
+                    .SingleAsync();
 
-                    // On récupère les collections de la db
-                    var orderFromDb = expeditionPartFromDb.IdExpeditionOrders.ToList();
-                    orderFromDb.AddRange(expeditionPartFromDb.ExpeditionCitizens.SelectMany(citizen => citizen.ExpeditionOrders));
-                    var citizenFromDb = expeditionPartFromDb.ExpeditionCitizens;
-                    // On récupère les mêmes collection du model a update
-                    var orderFromModel = expeditionPartModel.IdExpeditionOrders.ToList();
-                    orderFromModel.AddRange(expeditionPartModel.ExpeditionCitizens.SelectMany(citizen => citizen.ExpeditionOrders));
-                    var citizenFromModel = expeditionPartModel.ExpeditionCitizens;
-                    // On patch les collections
-                    DbContext.Patch(orderFromDb, orderFromModel);
-                    DbContext.Patch(citizenFromDb, citizenFromModel);
+                // On récupère les collections de la db
+                var orderFromDb = expeditionPartFromDb.IdExpeditionOrders.ToList();
+                orderFromDb.AddRange(expeditionPartFromDb.ExpeditionCitizens.SelectMany(citizen => citizen.ExpeditionOrders));
+                var citizenFromDb = expeditionPartFromDb.ExpeditionCitizens;
+                // On récupère les mêmes collection du model a update
+                var orderFromModel = expeditionPartModel.IdExpeditionOrders.ToList();
+                orderFromModel.AddRange(expeditionPartModel.ExpeditionCitizens.SelectMany(citizen => citizen.ExpeditionOrders));
+                var citizenFromModel = expeditionPartModel.ExpeditionCitizens;
+                // On patch les collections
+                await DbContext.PatchAsync(orderFromDb, orderFromModel);
+                await DbContext.PatchAsync(citizenFromDb, citizenFromModel);
 
-                    expeditionPartFromDb.UpdateAllButKeysProperties(expeditionPartModel);
-                    DbContext.SaveChanges();
-                    result = Mapper.Map<ExpeditionPartDto>(expeditionPartFromDb);
-                }
-                else
+                expeditionPartFromDb.UpdateAllButKeysProperties(expeditionPartModel);
+                await DbContext.SaveChangesAsync();
+                result = Mapper.Map<ExpeditionPartDto>(expeditionPartFromDb);
+            }
+            else
+            {
+                // Create : un membre par défaut est créé ici (et non côté front en réaction au
+                // broadcast) quand c'est la première partie de l'expédition, pour n'être créé qu'une
+                // seule fois, quel que soit le nombre de clients connectés à la ville.
+                var newEntity = DbContext.Add(expeditionPartModel).Entity;
+                await DbContext.SaveChangesAsync();
+                var isFirstPart = await DbContext.ExpeditionParts.CountAsync(part => part.IdExpedition == expeditionId) == 1;
+                if (isFirstPart)
                 {
-                    // Create : un membre par défaut est créé ici (et non côté front en réaction au
-                    // broadcast) quand c'est la première partie de l'expédition, pour n'être créé qu'une
-                    // seule fois, quel que soit le nombre de clients connectés à la ville.
-                    var newEntity = DbContext.Add(expeditionPartModel).Entity;
-                    DbContext.SaveChanges();
-                    var isFirstPart = DbContext.ExpeditionParts.Count(part => part.IdExpedition == expeditionId) == 1;
-                    if (isFirstPart)
-                    {
-                        DbContext.Add(new ExpeditionCitizen { IdExpeditionPart = newEntity.IdExpeditionPart, IdExpeditionBagNavigation = new ExpeditionBag() });
-                        DbContext.SaveChanges();
-                    }
-                    var expeditionPartWithDefaultCitizen = DbContext.ExpeditionParts
-                        .Where(part => part.IdExpeditionPart == newEntity.IdExpeditionPart)
-                        .Include(part => part.IdExpeditionOrders)
-                        .Include(part => part.ExpeditionCitizens)
-                            .ThenInclude(citizen => citizen.ExpeditionOrders)
-                        .Include(part => part.ExpeditionCitizens)
-                            .ThenInclude(citizen => citizen.IdExpeditionBagNavigation)
-                                .ThenInclude(bag => bag.ExpeditionBagItems)
-                                    .ThenInclude(bagItem => bagItem.IdItemNavigation)
-                        .Single();
-                    result = Mapper.Map<ExpeditionPartDto>(expeditionPartWithDefaultCitizen);
+                    DbContext.Add(new ExpeditionCitizen { IdExpeditionPart = newEntity.IdExpeditionPart, IdExpeditionBagNavigation = new ExpeditionBag() });
+                    await DbContext.SaveChangesAsync();
                 }
-                transaction.Commit();
-                return result;
+                var expeditionPartWithDefaultCitizen = await DbContext.ExpeditionParts
+                    .Where(part => part.IdExpeditionPart == newEntity.IdExpeditionPart)
+                    .Include(part => part.IdExpeditionOrders)
+                    .Include(part => part.ExpeditionCitizens)
+                        .ThenInclude(citizen => citizen.ExpeditionOrders)
+                    .Include(part => part.ExpeditionCitizens)
+                        .ThenInclude(citizen => citizen.IdExpeditionBagNavigation)
+                            .ThenInclude(bag => bag.ExpeditionBagItems)
+                                .ThenInclude(bagItem => bagItem.IdItemNavigation)
+                    .SingleAsync();
+                result = Mapper.Map<ExpeditionPartDto>(expeditionPartWithDefaultCitizen);
             }
-            catch (System.Exception)
-            {
-                throw;
-            }
-            finally
-            {
-                Lock.Release();
-            }
+            await transaction.CommitAsync();
+            return result;
         }
 
         public void DeleteExpeditionPart(int expeditionPartId)
@@ -604,116 +564,97 @@ namespace MyHordesOptimizerApi.Services.Impl
 
         public async Task<List<ExpeditionOrderDto>> SaveCitizenOrdersAsync(int expeditionCitizenId, List<ExpeditionOrderDto> expeditionOrder)
         {
-            EnsureCitizenDayIsEditable(expeditionCitizenId);
-            await Lock.WaitAsync();
-            try
+            var townLockKey = EnsureCitizenDayIsEditable(expeditionCitizenId);
+            await using var townLock = await TownSyncLock.AcquireTownAsync(townLockKey);
+            await using var transaction = await DbContext.Database.BeginTransactionAsync();
+            LastUpdateInfoDto lastUpdateInfoDto = UserInfoProvider.GenerateLastUpdateInfo();
+            var newLastUpdate = DbContext.LastUpdateInfos.Update(Mapper.Map<LastUpdateInfo>(lastUpdateInfoDto, opt => opt.SetDbContext(DbContext))).Entity;
+            await DbContext.SaveChangesAsync();
+            var expeditionCitizen = await DbContext.ExpeditionCitizens
+                .Where(citizen => citizen.IdExpeditionCitizen == expeditionCitizenId)
+                .Include(citizen => citizen.ExpeditionOrders)
+                .Include(citizen => citizen.IdExpeditionPartNavigation)
+                .SingleAsync();
+            var toAdd = expeditionOrder.Where(orderDto => orderDto.Id is null);
+            var toUpdate = expeditionOrder.Where(orderDto => orderDto.Id is not null).ToList();
+            var orderModels = new List<ExpeditionOrder>();
+            foreach (var orderDto in toAdd)
             {
-                using var transaction = DbContext.Database.BeginTransaction();
-                LastUpdateInfoDto lastUpdateInfoDto = UserInfoProvider.GenerateLastUpdateInfo();
-                var newLastUpdate = DbContext.LastUpdateInfos.Update(Mapper.Map<LastUpdateInfo>(lastUpdateInfoDto, opt => opt.SetDbContext(DbContext))).Entity;
-                DbContext.SaveChanges();
-                var expeditionCitizen = DbContext.ExpeditionCitizens
-                    .Where(citizen => citizen.IdExpeditionCitizen == expeditionCitizenId)
-                    .Include(citizen => citizen.ExpeditionOrders)
-                    .Include(citizen => citizen.IdExpeditionPartNavigation)
-                    .Single();
-                var toAdd = expeditionOrder.Where(orderDto => orderDto.Id is null);
-                var toUpdate = expeditionOrder.Where(orderDto => orderDto.Id is not null);
-                var orderModels = new List<ExpeditionOrder>();
-                foreach (var orderDto in toAdd)
-                {
-                    var orderModel = Mapper.Map<ExpeditionOrder>(orderDto);
-                    orderModel.IdExpeditionCitizen = expeditionCitizenId;
-                    // Create
-                    var newEntity = DbContext.Add(orderModel);
-                    DbContext.SaveChanges();
-                    var result = newEntity.Entity;
-                    orderModels.Add(result);
-                }
-                foreach (var orderDto in toUpdate)
-                {
-                    // UpdateAsync
-                    var expeditionOrderFromDb = DbContext.ExpeditionOrders
-                        .Where(order => order.IdExpeditionOrder == orderDto.Id)
-                        .Single();
-                    var orderModel = Mapper.Map<ExpeditionOrder>(orderDto);
-                    orderModel.IdExpeditionCitizen = expeditionCitizenId;
-                    orderModel.IdExpeditionCitizenNavigation = expeditionCitizen;
-                    expeditionOrderFromDb.UpdateAllButKeysProperties(orderModel);
-                    DbContext.SaveChanges();
-                    orderModels.Add(expeditionOrderFromDb);
-                }
-                var orderFromDb = expeditionCitizen.ExpeditionOrders.ToList();
-                var toRemove = orderFromDb.Except(orderModels, EqualityComparerFactory.CreateDefault<ExpeditionOrder>());
-                DbContext.RemoveRange(toRemove);
-                DbContext.SaveChanges();
-                transaction.Commit();
-                var results = Mapper.Map<List<ExpeditionOrderDto>>(orderModels);
-                return results;
+                var orderModel = Mapper.Map<ExpeditionOrder>(orderDto);
+                orderModel.IdExpeditionCitizen = expeditionCitizenId;
+                // Create
+                var newEntity = DbContext.Add(orderModel);
+                orderModels.Add(newEntity.Entity);
             }
-            catch (Exception)
+            // Chargement groupé (1 requête) au lieu d'un .Single() par commande à mettre à jour.
+            var toUpdateIds = toUpdate.Select(orderDto => orderDto.Id!.Value).ToList();
+            var ordersFromDb = await DbContext.ExpeditionOrders
+                .Where(order => toUpdateIds.Contains(order.IdExpeditionOrder))
+                .ToListAsync();
+            foreach (var orderDto in toUpdate)
             {
-                throw;
+                // UpdateAsync
+                var expeditionOrderFromDb = ordersFromDb.Single(order => order.IdExpeditionOrder == orderDto.Id);
+                var orderModel = Mapper.Map<ExpeditionOrder>(orderDto);
+                orderModel.IdExpeditionCitizen = expeditionCitizenId;
+                orderModel.IdExpeditionCitizenNavigation = expeditionCitizen;
+                expeditionOrderFromDb.UpdateAllButKeysProperties(orderModel);
+                orderModels.Add(expeditionOrderFromDb);
             }
-            finally
-            {
-                Lock.Release();
-            }
+            var orderFromDb = expeditionCitizen.ExpeditionOrders.ToList();
+            var toRemove = orderFromDb.Except(orderModels, EqualityComparerFactory.CreateDefault<ExpeditionOrder>());
+            DbContext.RemoveRange(toRemove);
+            // Un seul aller-retour BDD pour tous les ajouts, mises à jour et suppressions du lot.
+            await DbContext.SaveChangesAsync();
+            await transaction.CommitAsync();
+            var results = Mapper.Map<List<ExpeditionOrderDto>>(orderModels);
+            return results;
         }
 
         public async Task<List<ExpeditionOrderDto>> SavePartOrdersAsync(int expeditionPartId, List<ExpeditionOrderDto> expeditionOrder)
         {
-            EnsurePartDayIsEditable(expeditionPartId);
-            await Lock.WaitAsync();
-            try
+            var townLockKey = EnsurePartDayIsEditable(expeditionPartId);
+            await using var townLock = await TownSyncLock.AcquireTownAsync(townLockKey);
+            await using var transaction = await DbContext.Database.BeginTransactionAsync();
+            LastUpdateInfoDto lastUpdateInfoDto = UserInfoProvider.GenerateLastUpdateInfo();
+            var newLastUpdate = DbContext.LastUpdateInfos.Update(Mapper.Map<LastUpdateInfo>(lastUpdateInfoDto, opt => opt.SetDbContext(DbContext))).Entity;
+            await DbContext.SaveChangesAsync();
+            var expeditionPart = await DbContext.ExpeditionParts
+                .Where(part => part.IdExpeditionPart == expeditionPartId)
+                .Include(part => part.IdExpeditionOrders)
+                .SingleAsync();
+            var initialOrderFromDb = expeditionPart.IdExpeditionOrders.ToList();
+            var toAdd = expeditionOrder.Where(orderDto => orderDto.Id is null);
+            var toUpdate = expeditionOrder.Where(orderDto => orderDto.Id is not null).ToList();
+            var orderModels = new List<ExpeditionOrder>();
+            foreach (var orderDto in toAdd)
             {
-                using var transaction = DbContext.Database.BeginTransaction();
-                LastUpdateInfoDto lastUpdateInfoDto = UserInfoProvider.GenerateLastUpdateInfo();
-                var newLastUpdate = DbContext.LastUpdateInfos.Update(Mapper.Map<LastUpdateInfo>(lastUpdateInfoDto, opt => opt.SetDbContext(DbContext))).Entity;
-                DbContext.SaveChanges();
-                var expeditionPart = DbContext.ExpeditionParts
-                    .Where(part => part.IdExpeditionPart == expeditionPartId)
-                    .Include(part => part.IdExpeditionOrders)
-                    .Single();
-                var initialOrderFromDb = expeditionPart.IdExpeditionOrders.ToList();
-                var toAdd = expeditionOrder.Where(orderDto => orderDto.Id is null);
-                var toUpdate = expeditionOrder.Where(orderDto => orderDto.Id is not null);
-                var orderModels = new List<ExpeditionOrder>();
-                foreach (var orderDto in toAdd)
-                {
-                    var orderModel = Mapper.Map<ExpeditionOrder>(orderDto);
-                    // Create
-                    var newEntity = DbContext.Add(orderModel);
-                    DbContext.SaveChanges();
-                    var result = newEntity.Entity;
-                    orderModels.Add(result);
-                }
-                foreach (var orderDto in toUpdate)
-                {
-                    // UpdateAsync
-                    var expeditionOrderFromDb = DbContext.ExpeditionOrders.Where(order => order.IdExpeditionOrder == orderDto.Id)
-                        .Single();
-                    var orderModel = Mapper.Map<ExpeditionOrder>(orderDto);
-                    expeditionOrderFromDb.UpdateAllButKeysProperties(orderModel);
-                    DbContext.SaveChanges();
-                    orderModels.Add(expeditionOrderFromDb);
-                }
-                var toRemove = initialOrderFromDb.Except(orderModels, EqualityComparerFactory.CreateDefault<ExpeditionOrder>());
-                DbContext.RemoveRange(toRemove);
-                expeditionPart.IdExpeditionOrders = orderModels;
-                DbContext.SaveChanges();
-                transaction.Commit();
-                var results = Mapper.Map<List<ExpeditionOrderDto>>(orderModels);
-                return results;
+                var orderModel = Mapper.Map<ExpeditionOrder>(orderDto);
+                // Create
+                var newEntity = DbContext.Add(orderModel);
+                orderModels.Add(newEntity.Entity);
             }
-            catch (Exception)
+            // Chargement groupé (1 requête) au lieu d'un .Single() par commande à mettre à jour.
+            var toUpdateIds = toUpdate.Select(orderDto => orderDto.Id!.Value).ToList();
+            var ordersFromDb = await DbContext.ExpeditionOrders
+                .Where(order => toUpdateIds.Contains(order.IdExpeditionOrder))
+                .ToListAsync();
+            foreach (var orderDto in toUpdate)
             {
-                throw;
+                // UpdateAsync
+                var expeditionOrderFromDb = ordersFromDb.Single(order => order.IdExpeditionOrder == orderDto.Id);
+                var orderModel = Mapper.Map<ExpeditionOrder>(orderDto);
+                expeditionOrderFromDb.UpdateAllButKeysProperties(orderModel);
+                orderModels.Add(expeditionOrderFromDb);
             }
-            finally
-            {
-                Lock.Release();
-            }
+            var toRemove = initialOrderFromDb.Except(orderModels, EqualityComparerFactory.CreateDefault<ExpeditionOrder>());
+            DbContext.RemoveRange(toRemove);
+            expeditionPart.IdExpeditionOrders = orderModels;
+            // Un seul aller-retour BDD pour tous les ajouts, mises à jour et suppressions du lot.
+            await DbContext.SaveChangesAsync();
+            await transaction.CommitAsync();
+            var results = Mapper.Map<List<ExpeditionOrderDto>>(orderModels);
+            return results;
         }
 
         public void DeleteExpeditionOrder(int expeditionOrderId)
@@ -751,33 +692,34 @@ namespace MyHordesOptimizerApi.Services.Impl
         #endregion
 
         #region Bags
-        public ExpeditionBagDto UpdateExpeditionBag(int citizenId, ExpeditionBagRequestDto expeditionBagDto)
+        public async Task<ExpeditionBagDto> UpdateExpeditionBag(int citizenId, ExpeditionBagRequestDto expeditionBagDto)
         {
-            EnsureCitizenDayIsEditable(citizenId);
-            using var transaction = DbContext.Database.BeginTransaction(); ;
+            var townLockKey = EnsureCitizenDayIsEditable(citizenId);
+            await using var townLock = await TownSyncLock.AcquireTownAsync(townLockKey);
+            await using var transaction = await DbContext.Database.BeginTransactionAsync();
             var expeditionBagModel = Mapper.Map<ExpeditionBag>(expeditionBagDto);
             ExpeditionBagDto result;
-            var expeditionCitizen = DbContext.ExpeditionCitizens
+            var expeditionCitizen = await DbContext.ExpeditionCitizens
                 .Include(citizen => citizen.IdExpeditionPartNavigation)
-                .Single(citizen => citizen.IdExpeditionCitizen == citizenId);
+                .SingleAsync(citizen => citizen.IdExpeditionCitizen == citizenId);
             if (expeditionBagDto.Id.HasValue)
             {
                 // Si l'id du sac du citizen a changer, on delete l'ancien sac
                 if (expeditionCitizen.IdExpeditionBag != expeditionBagDto.Id)
                 {
-                    DbContext.Remove(DbContext.ExpeditionBags.Single(expeditionBag => expeditionBag.IdExpeditionBag == expeditionBagDto.Id));
+                    DbContext.Remove(await DbContext.ExpeditionBags.SingleAsync(expeditionBag => expeditionBag.IdExpeditionBag == expeditionBagDto.Id));
                 }
                 // UpdateAsync : UpdateAllButKeysProperties recopie aussi les navigations (à leur valeur par
                 // défaut côté DTO), il faut restaurer ExpeditionCitizens sous peine de l'écraser et
                 // d'orpheliner le citoyen (ExpeditionCitizen_ibfk_4 est ON DELETE CASCADE).
-                var expeditionBagFromDb = DbContext.GetExpeditionBag(expeditionBagDto.Id.Value);
+                var expeditionBagFromDb = await DbContext.GetExpeditionBagAsync(expeditionBagDto.Id.Value);
                 var citizensInBag = expeditionBagFromDb.ExpeditionCitizens;
                 expeditionBagFromDb.UpdateAllButKeysProperties(expeditionBagModel);
                 expeditionBagFromDb.ExpeditionCitizens = citizensInBag;
                 DbContext.Update(expeditionBagFromDb);
                 expeditionCitizen.IdExpeditionBagNavigation = expeditionBagFromDb;
-                DbContext.SaveChanges();
-                var updatedExpeditionBag = DbContext.GetExpeditionBag(expeditionBagDto.Id.Value);
+                await DbContext.SaveChangesAsync();
+                var updatedExpeditionBag = await DbContext.GetExpeditionBagAsync(expeditionBagDto.Id.Value);
                 result = Mapper.Map<ExpeditionBagDto>(updatedExpeditionBag);
             }
             else
@@ -788,16 +730,16 @@ namespace MyHordesOptimizerApi.Services.Impl
                 var oldBagId = expeditionCitizen.IdExpeditionBag;
                 var newEntity = DbContext.Add(expeditionBagModel).Entity;
                 expeditionCitizen.IdExpeditionBagNavigation = newEntity;
-                DbContext.SaveChanges();
+                await DbContext.SaveChangesAsync();
                 if (oldBagId != null)
                 {
-                    DbContext.Remove(DbContext.ExpeditionBags.Single(expeditionBag => expeditionBag.IdExpeditionBag == oldBagId));
-                    DbContext.SaveChanges();
+                    DbContext.Remove(await DbContext.ExpeditionBags.SingleAsync(expeditionBag => expeditionBag.IdExpeditionBag == oldBagId));
+                    await DbContext.SaveChangesAsync();
                 }
-                var newEntityWithDependance = DbContext.GetExpeditionBag(newEntity.IdExpeditionBag);
+                var newEntityWithDependance = await DbContext.GetExpeditionBagAsync(newEntity.IdExpeditionBag);
                 result = Mapper.Map<ExpeditionBagDto>(newEntityWithDependance);
             }
-            transaction.Commit();
+            await transaction.CommitAsync();
             return result;
         }
 
@@ -841,49 +783,142 @@ namespace MyHordesOptimizerApi.Services.Impl
         private void EnsureDayIsEditable(int townId, int? day)
         {
             var townDay = DbContext.Towns.Where(town => town.IdTown == townId).Select(town => town.Day).Single();
+            ThrowIfDayLocked(day, townDay);
+        }
+
+        /// <summary>
+        /// Équivalent async d'<see cref="EnsureDayIsEditable"/>, pour les appels faits sous le verrou par
+        /// ville (dans une méthode async déjà entrée dans son <c>await using townLock</c>) : un appel
+        /// synchrone y immobiliserait un thread du pool pendant l'I/O au lieu de le libérer.
+        /// </summary>
+        private async Task EnsureDayIsEditableAsync(int townId, int? day)
+        {
+            var townDay = await DbContext.Towns.Where(town => town.IdTown == townId).Select(town => town.Day).SingleAsync();
+            ThrowIfDayLocked(day, townDay);
+        }
+
+        /// <summary>Lève si le jour est verrouillé. Factorisé pour éviter de dupliquer le message d'erreur.</summary>
+        private static void ThrowIfDayLocked(int? day, int townDay)
+        {
             if (ExpeditionDayLock.IsLocked(day, townDay))
             {
                 throw new MhoTechnicalException("Cette expédition appartient à un jour déjà passé et ne peut plus être modifiée.");
             }
         }
 
-        /// <summary>Rejette toute écriture sur une expédition dont le jour est déjà passé.</summary>
-        private void EnsureExpeditionDayIsEditable(int expeditionId)
+        /// <summary>
+        /// Rejette toute écriture sur une expédition dont le jour est déjà passé. Requête projetée unique
+        /// (expédition + ville en un aller-retour) au lieu de deux SELECT séquentiels. Retourne la clé de
+        /// verrou TownSyncLock (cf. <see cref="ComputeTownLockKey"/>), réutilisée par les appelants pour
+        /// l'acquisition du verrou par ville.
+        /// </summary>
+        private int EnsureExpeditionDayIsEditable(int expeditionId)
         {
             var expedition = DbContext.Expeditions
                 .Where(expedition => expedition.IdExpedition == expeditionId)
-                .Select(expedition => new { expedition.IdTown, expedition.Day })
+                .Select(expedition => new
+                {
+                    expedition.IdTown,
+                    expedition.Day,
+                    // Town.Day est non-nullable : sans le cast, EF plante (Nullable object must have a
+                    // value) dès que IdTownNavigation n'a pas de correspondance (IdTown null notamment).
+                    TownDay = expedition.IdTownNavigation != null ? (int?)expedition.IdTownNavigation.Day : null,
+                    // Même navigation déjà jointe pour TownDay : ajouter MapId à la projection ne coûte
+                    // aucun aller-retour BDD supplémentaire.
+                    MapId = expedition.IdTownNavigation != null ? expedition.IdTownNavigation.MapId : null
+                })
                 .Single();
-            if (expedition.IdTown.HasValue)
+            if (expedition.TownDay.HasValue)
             {
-                EnsureDayIsEditable(expedition.IdTown.Value, expedition.Day);
+                ThrowIfDayLocked(expedition.Day, expedition.TownDay.Value);
             }
+            return ComputeTownLockKey(expedition.IdTown, expedition.MapId);
         }
 
-        /// <summary>Rejette toute écriture sur une partie d'expédition dont le jour est déjà passé.</summary>
-        private void EnsurePartDayIsEditable(int expeditionPartId)
+        /// <summary>
+        /// Rejette toute écriture sur une partie d'expédition dont le jour est déjà passé. Requête projetée
+        /// unique (partie + expédition + ville) au lieu de trois SELECT séquentiels. Retourne la clé de
+        /// verrou TownSyncLock (cf. <see cref="ComputeTownLockKey"/>), réutilisée par les appelants pour
+        /// l'acquisition du verrou par ville.
+        /// </summary>
+        private int EnsurePartDayIsEditable(int expeditionPartId)
         {
-            var expeditionId = DbContext.ExpeditionParts
+            var part = DbContext.ExpeditionParts
                 .Where(part => part.IdExpeditionPart == expeditionPartId)
-                .Select(part => part.IdExpedition)
+                .Select(part => new
+                {
+                    IdTown = part.IdExpeditionNavigation.IdTown,
+                    Day = part.IdExpeditionNavigation.Day,
+                    // Town.Day est non-nullable : sans le cast, EF plante dès que la chaîne FK ne mène
+                    // à aucune ville (expédition sans IdTown, notamment).
+                    TownDay = part.IdExpeditionNavigation.IdTownNavigation != null ? (int?)part.IdExpeditionNavigation.IdTownNavigation.Day : null,
+                    MapId = part.IdExpeditionNavigation.IdTownNavigation != null ? part.IdExpeditionNavigation.IdTownNavigation.MapId : null
+                })
                 .Single();
-            if (expeditionId.HasValue)
+            if (part.TownDay.HasValue)
             {
-                EnsureExpeditionDayIsEditable(expeditionId.Value);
+                ThrowIfDayLocked(part.Day, part.TownDay.Value);
             }
+            return ComputeTownLockKey(part.IdTown, part.MapId);
         }
 
-        /// <summary>Rejette toute écriture sur un citoyen d'expédition dont le jour est déjà passé.</summary>
-        private void EnsureCitizenDayIsEditable(int expeditionCitizenId)
+        /// <summary>
+        /// Rejette toute écriture sur un citoyen d'expédition dont le jour est déjà passé. Requête projetée
+        /// unique (citoyen + partie + expédition + ville) au lieu de quatre SELECT séquentiels. Retourne la
+        /// clé de verrou TownSyncLock (cf. <see cref="ComputeTownLockKey"/>), réutilisée par les appelants
+        /// pour l'acquisition du verrou par ville.
+        /// </summary>
+        private int EnsureCitizenDayIsEditable(int expeditionCitizenId)
         {
-            var expeditionPartId = DbContext.ExpeditionCitizens
+            var citizen = DbContext.ExpeditionCitizens
                 .Where(citizen => citizen.IdExpeditionCitizen == expeditionCitizenId)
-                .Select(citizen => citizen.IdExpeditionPart)
+                .Select(citizen => new
+                {
+                    IdTown = citizen.IdExpeditionPartNavigation.IdExpeditionNavigation.IdTown,
+                    Day = citizen.IdExpeditionPartNavigation.IdExpeditionNavigation.Day,
+                    // Town.Day est non-nullable : sans le cast, EF plante dès que la chaîne FK ne mène
+                    // à aucune ville (expédition sans IdTown, notamment).
+                    TownDay = citizen.IdExpeditionPartNavigation.IdExpeditionNavigation.IdTownNavigation != null
+                        ? (int?)citizen.IdExpeditionPartNavigation.IdExpeditionNavigation.IdTownNavigation.Day
+                        : null,
+                    MapId = citizen.IdExpeditionPartNavigation.IdExpeditionNavigation.IdTownNavigation != null
+                        ? citizen.IdExpeditionPartNavigation.IdExpeditionNavigation.IdTownNavigation.MapId
+                        : null
+                })
                 .Single();
-            if (expeditionPartId.HasValue)
+            if (citizen.TownDay.HasValue)
             {
-                EnsurePartDayIsEditable(expeditionPartId.Value);
+                ThrowIfDayLocked(citizen.Day, citizen.TownDay.Value);
             }
+            return ComputeTownLockKey(citizen.IdTown, citizen.MapId);
+        }
+
+        /// <summary>
+        /// Calcule la clé de verrou TownSyncLock (convention mapId brut négatif, même famille que
+        /// MyHordesFetcherService/ExternalToolsService/WishListService/TownService) à partir d'un townId
+        /// DÉJÀ résolu façon <see cref="MhoContext.ResolveTownId"/> (positif si synchronisé, -mapId si
+        /// provisoire) et du MapId joint dans la même requête pour une ville synchronisée.
+        /// </summary>
+        private static int ComputeTownLockKey(int? resolvedIdTown, int? mapId)
+        {
+            if (!resolvedIdTown.HasValue)
+            {
+                // Chaîne FK cassée (expédition/partie/citoyen sans ville) : clé partagée 0, comportement
+                // inchangé par rapport à l'ancien -(idTown ?? 0).
+                return 0;
+            }
+            if (resolvedIdTown.Value < 0)
+            {
+                // Ville provisoire : resolvedIdTown vaut déjà -mapId (cf. ResolveTownId), ne pas le
+                // négater une seconde fois sous peine de retomber sur +mapId.
+                return resolvedIdTown.Value;
+            }
+            // Ville synchronisée : verrouiller sur le mapId brut, jamais sur l'IdTown interne résolu,
+            // pour s'exclure mutuellement avec une synchro/login concurrente sur la même ville.
+            // Repli dégradé sur -resolvedIdTown si MapId est inconnu (ne devrait pas arriver en pratique
+            // pour une ville synchronisée) : ne s'exclut pas avec la famille synchro/login, mais reste
+            // préférable à planter.
+            return mapId.HasValue ? -mapId.Value : -resolvedIdTown.Value;
         }
 
         /// <summary>

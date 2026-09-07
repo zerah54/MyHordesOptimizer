@@ -45,9 +45,9 @@ namespace MyHordesOptimizerApiIntegrationTests.Services
             var expedition = await NewService().SaveExpeditionAsync(new ExpeditionRequestDto { PartsId = new List<int>() }, townId, 5);
             var part = await NewService().SaveExpeditionPartAsync(expedition.Id!.Value, new ExpeditionPartRequestDto { OrdersId = new List<int>(), CitizensId = new List<int>() });
             var citizen = await NewService().SaveExpeditionCitizenAsync(part.Id!.Value, new ExpeditionCitizenRequestDto { OrdersId = new List<int>() });
-            var created = NewService().UpdateExpeditionBag(citizen.Id!.Value, new ExpeditionBagRequestDto { Items = new List<ExpeditionBagItemRequestDto>() });
+            var created = await NewService().UpdateExpeditionBag(citizen.Id!.Value, new ExpeditionBagRequestDto { Items = new List<ExpeditionBagItemRequestDto>() });
 
-            var updated = NewService().UpdateExpeditionBag(citizen.Id!.Value, new ExpeditionBagRequestDto { Id = created.Id, Items = new List<ExpeditionBagItemRequestDto>() });
+            var updated = await NewService().UpdateExpeditionBag(citizen.Id!.Value, new ExpeditionBagRequestDto { Id = created.Id, Items = new List<ExpeditionBagItemRequestDto>() });
 
             updated.ExpeditionsPartId.Should().Contain(part.Id!.Value);
         }
@@ -59,7 +59,7 @@ namespace MyHordesOptimizerApiIntegrationTests.Services
             var expedition = await NewService().SaveExpeditionAsync(new ExpeditionRequestDto { PartsId = new List<int>() }, townId, 5);
             var part = await NewService().SaveExpeditionPartAsync(expedition.Id!.Value, new ExpeditionPartRequestDto { OrdersId = new List<int>(), CitizensId = new List<int>() });
             var citizen = await NewService().SaveExpeditionCitizenAsync(part.Id!.Value, new ExpeditionCitizenRequestDto { OrdersId = new List<int>() });
-            var bag = NewService().UpdateExpeditionBag(citizen.Id!.Value, new ExpeditionBagRequestDto { Items = new List<ExpeditionBagItemRequestDto>() });
+            var bag = await NewService().UpdateExpeditionBag(citizen.Id!.Value, new ExpeditionBagRequestDto { Items = new List<ExpeditionBagItemRequestDto>() });
 
             NewService().DeleteExpeditionBag(bag.Id!.Value);
 
@@ -75,7 +75,7 @@ namespace MyHordesOptimizerApiIntegrationTests.Services
             var expedition = await NewService().SaveExpeditionAsync(new ExpeditionRequestDto { PartsId = new List<int>() }, townId, 5);
             var part = await NewService().SaveExpeditionPartAsync(expedition.Id!.Value, new ExpeditionPartRequestDto { OrdersId = new List<int>(), CitizensId = new List<int>() });
             var citizen = await NewService().SaveExpeditionCitizenAsync(part.Id!.Value, new ExpeditionCitizenRequestDto { OrdersId = new List<int>() });
-            var bag = NewService().UpdateExpeditionBag(citizen.Id!.Value, new ExpeditionBagRequestDto { Items = new List<ExpeditionBagItemRequestDto>() });
+            var bag = await NewService().UpdateExpeditionBag(citizen.Id!.Value, new ExpeditionBagRequestDto { Items = new List<ExpeditionBagItemRequestDto>() });
 
             var replacementBags = NewService().DeleteExpeditionBag(bag.Id!.Value);
 

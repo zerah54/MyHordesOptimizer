@@ -154,4 +154,31 @@ namespace MyHordesOptimizerApi.Services.Impl.Locking
             }
         }
     }
+
+    /// <summary>
+    /// Pont synchrone pour les nombreuses méthodes d'écriture de ce dépôt qui ne sont pas async.
+    /// Sans SynchronizationContext sous Kestrel, bloquer le thread appelant le temps de l'acquisition
+    /// est sans risque de deadlock (même principe que <c>ReadAsStringAsync().Result</c>, déjà utilisé
+    /// ailleurs dans le dépôt pour adapter une API async à un appelant synchrone).
+    /// </summary>
+    /// <remarks>
+    /// ponytail : le thread reste bloqué pendant toute l'attente (y compris le temps d'un import
+    /// global sous <see cref="TownSyncLock.AcquireAllTownsAsync"/>). Passer ces méthodes en async de
+    /// bout en bout (interfaces + contrôleurs) si la pression sur le thread pool le justifie un jour.
+    /// </remarks>
+    public static class TownSyncLockSyncExtensions
+    {
+        public static IDisposable AcquireTownBlocking(this TownSyncLock townSyncLock, int townId)
+        {
+            var townLock = townSyncLock.AcquireTownAsync(townId).GetAwaiter().GetResult();
+            return new BlockingReleaser(townLock);
+        }
+
+        private sealed class BlockingReleaser : IDisposable
+        {
+            private readonly IAsyncDisposable _inner;
+            public BlockingReleaser(IAsyncDisposable inner) => _inner = inner;
+            public void Dispose() => _inner.DisposeAsync().GetAwaiter().GetResult();
+        }
+    }
 }

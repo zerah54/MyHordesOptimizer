@@ -10,14 +10,17 @@ namespace MyHordesOptimizerApi.Repository.Expeditions
             return query
                 .Include(expedition => expedition.ExpeditionParts)
                     .ThenInclude(part => part.IdExpeditionOrders)
+                .AsSplitQuery()
                 .Include(expedition => expedition.ExpeditionParts)
                     .ThenInclude(part => part.ExpeditionCitizens)
                         .ThenInclude(expeditionCitizen => expeditionCitizen.IdExpeditionBagNavigation)
                             .ThenInclude(bag => bag.ExpeditionBagItems)
                                 .ThenInclude(bagItem => bagItem.IdItemNavigation)
+                .AsSplitQuery()
                 .Include(expedition => expedition.ExpeditionParts)
                     .ThenInclude(part => part.ExpeditionCitizens)
-                        .ThenInclude(expeditionCitizen => expeditionCitizen.ExpeditionOrders);
+                        .ThenInclude(expeditionCitizen => expeditionCitizen.ExpeditionOrders)
+                .AsSplitQuery();
         }
 
         public static IQueryable<ExpeditionCitizen> IncludeAll(this IQueryable<ExpeditionCitizen> query)

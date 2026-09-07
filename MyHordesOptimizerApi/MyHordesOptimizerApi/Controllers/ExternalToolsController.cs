@@ -42,6 +42,31 @@ namespace MyHordesOptimizerApi.Controllers
             MhoHeadersProvider = mhoHeadersProvider;
         }
 
+        /// <summary>
+        /// 403 si le userId de la query ne correspond pas au claim JWT courant (UserInfoProvider.UserId,
+        /// peuplé par JwtActionFilter sur toute requête portant un Bearer valide), ou si aucun Bearer
+        /// n'est présent. Sans cette garde, connaître le userId d'un tiers (public, annuaire) suffisait
+        /// à lire l'avancement de sa mise à jour — et le JWT 14 jours qu'elle peut porter.
+        /// <para>
+        /// Vérifie aussi que le userKey de la query correspond au claim JWT courant
+        /// (UserInfoProvider.UserKey, même origine). Sans ça, un attaquant avec SON PROPRE JWT valide
+        /// pouvait soumettre le userKey d'un tiers : la synchro tournerait avec les données du tiers
+        /// mais écrites sous l'identité de l'attaquant (IdUser), une salissure de données.
+        /// </para>
+        /// </summary>
+        private ActionResult ValidateAuthenticatedUser(int userId, string userKey)
+        {
+            if (UserInfoProvider.UserId == 0 || UserInfoProvider.UserId != userId)
+            {
+                return Forbid();
+            }
+            if (UserInfoProvider.UserKey != userKey)
+            {
+                return Forbid();
+            }
+            return null;
+        }
+
         /// <summary>Contrôles communs aux deux routes de mise à jour. Null si la requête est valide.</summary>
         private ActionResult ValidateUpdateRequest(string userKey, UpdateRequestDto updateRequestDto)
         {
@@ -68,6 +93,12 @@ namespace MyHordesOptimizerApi.Controllers
         [Route("Update")]
         public async Task<ActionResult<UpdateResponseDto>> UpdateExternalsTools(string userKey, int userId, [FromBody] UpdateRequestDto updateRequestDto)
         {
+            var forbidden = ValidateAuthenticatedUser(userId, userKey);
+            if (forbidden != null)
+            {
+                return forbidden;
+            }
+
             var invalid = ValidateUpdateRequest(userKey, updateRequestDto);
             if (invalid != null)
             {
@@ -84,6 +115,12 @@ namespace MyHordesOptimizerApi.Controllers
         [Route("Update/Start")]
         public ActionResult<ExternalToolsUpdateJobState> StartUpdateExternalsTools(string userKey, int userId, [FromBody] UpdateRequestDto updateRequestDto)
         {
+            var forbidden = ValidateAuthenticatedUser(userId, userKey);
+            if (forbidden != null)
+            {
+                return forbidden;
+            }
+
             var invalid = ValidateUpdateRequest(userKey, updateRequestDto);
             if (invalid != null)
             {
@@ -93,7 +130,7 @@ namespace MyHordesOptimizerApi.Controllers
             UserInfoProvider.UserKey = userKey;
             UserInfoProvider.UserId = userId;
 
-            var state = UpdateJobRunner.TryStart(userId, userKey, UserInfoProvider.UserName, updateRequestDto,
+            var state = UpdateJobRunner.TryStart(userId, userKey, UserInfoProvider.UserName, UserInfoProvider.TownDetail, updateRequestDto,
                 MhoHeadersProvider.MhoOrigin, MhoHeadersProvider.MhoAddonVersion, HttpContext.TraceIdentifier);
             if (state == null)
             {
@@ -107,6 +144,12 @@ namespace MyHordesOptimizerApi.Controllers
         [Route("Update/Status")]
         public ActionResult<ExternalToolsUpdateJobState> GetUpdateExternalsToolsStatus(string userKey, int userId)
         {
+            var forbidden = ValidateAuthenticatedUser(userId, userKey);
+            if (forbidden != null)
+            {
+                return forbidden;
+            }
+
             if (string.IsNullOrWhiteSpace(userKey))
             {
                 return BadRequest($"{nameof(userKey)} cannot be empty");

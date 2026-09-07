@@ -1,3 +1,4 @@
+using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Authentication;
 using MyHordesOptimizerApi.Models.ExternalTools;
 
 namespace MyHordesOptimizerApi.Services.Interfaces.ExternalTools
@@ -27,6 +28,10 @@ namespace MyHordesOptimizerApi.Services.Interfaces.ExternalTools
         /// remontée jusqu'au runner.
         /// </summary>
         void FailAllPending(string unit, string message, ExternalToolId? onlyTool = null);
+
+        /// <summary>Renseigné quand le TownId frais reçu de MyHordes diverge du claim JWT courant : le
+        /// client doit remplacer son token en cache par celui-ci.</summary>
+        void SetRenewedToken(AuthenticationResponseDto token);
     }
 
     /// <summary>
@@ -58,6 +63,10 @@ namespace MyHordesOptimizerApi.Services.Interfaces.ExternalTools
         }
 
         public void FailAllPending(string unit, string message, ExternalToolId? onlyTool = null)
+        {
+        }
+
+        public void SetRenewedToken(AuthenticationResponseDto token)
         {
         }
     }

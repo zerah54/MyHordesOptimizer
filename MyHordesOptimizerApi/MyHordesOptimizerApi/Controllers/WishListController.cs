@@ -1,9 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using MyHordesOptimizerApi.Controllers.Abstract;
+using MyHordesOptimizerApi.Controllers.ActionFillters;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.WishList;
 using MyHordesOptimizerApi.Providers.Interfaces;
+using MyHordesOptimizerApi.Services.Caching;
 using MyHordesOptimizerApi.Services.Interfaces;
 using System.Collections.Generic;
 
@@ -14,15 +17,19 @@ namespace MyHordesOptimizerApi.Controllers
     public class WishListController : AbstractMyHordesOptimizerControllerBase
     {
         private readonly IWishListService _wishListService;
+        private readonly IMemoryCache _cache;
 
         public WishListController(ILogger<AbstractMyHordesOptimizerControllerBase> logger,
             IUserInfoProvider userKeyProvider,
-            IWishListService wishListService) : base(logger, userKeyProvider)
+            IWishListService wishListService,
+            IMemoryCache cache) : base(logger, userKeyProvider)
         {
             _wishListService = wishListService;
+            _cache = cache;
         }
 
         [HttpGet]
+        [TypeFilter(typeof(ETagCacheFilter), Arguments = new object[] { ETagResource.WishList, "townId" })]
         public ActionResult<WishListLastUpdateDto> GetWishList(int townId)
         {
             var wishList = _wishListService.GetWishList(townId);
@@ -64,7 +71,8 @@ namespace MyHordesOptimizerApi.Controllers
         [Route("Categories")]
         public ActionResult<List<WishlistCategorieDto>> GetWishListCategories()
         {
-            var categories = _wishListService.GetWishListCategories();
+            var categories = _cache.GetOrCreate(ReferentialCacheKeys.WishListCategories,
+                _ => _wishListService.GetWishListCategories());
             return categories;
         }
 
@@ -72,7 +80,8 @@ namespace MyHordesOptimizerApi.Controllers
         [Route("Templates")]
         public ActionResult<List<WishlistTemplateDto>> GetWishListTemplates()
         {
-            var templates = _wishListService.GetWishListTemplates();
+            var templates = _cache.GetOrCreate(ReferentialCacheKeys.WishListTemplates,
+                _ => _wishListService.GetWishListTemplates());
             return templates;
         }
 

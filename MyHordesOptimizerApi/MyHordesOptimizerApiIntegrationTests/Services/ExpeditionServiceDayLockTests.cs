@@ -264,9 +264,9 @@ namespace MyHordesOptimizerApiIntegrationTests.Services
             var citizenId = await NewCitizen(townId, expeditionDay: 4);
             SetTownDay(townId, 5);
 
-            System.Action act = () => NewService().UpdateExpeditionBag(citizenId, new ExpeditionBagRequestDto { Items = new List<ExpeditionBagItemRequestDto>() });
+            Func<Task> act = () => NewService().UpdateExpeditionBag(citizenId, new ExpeditionBagRequestDto { Items = new List<ExpeditionBagItemRequestDto>() });
 
-            act.Should().Throw<MhoTechnicalException>();
+            await act.Should().ThrowAsync<MhoTechnicalException>();
         }
 
         /// <summary>
@@ -297,6 +297,75 @@ namespace MyHordesOptimizerApiIntegrationTests.Services
             System.Action act = () => NewService().DeleteExpeditionBag(bagId);
 
             act.Should().Throw<MhoTechnicalException>();
+        }
+
+        /// <summary>
+        /// Chaîne FK cassée (IdTown null) : les requêtes projetées d'Ensure*DayIsEditable doivent sauter la
+        /// validation silencieusement, pas planter. Avant fix (revue P3, finding critique), la projection
+        /// de Town.Day (non-nullable) via une navigation absente levait InvalidOperationException
+        /// ("Nullable object must have a value") au lieu de laisser passer l'écriture comme le faisait
+        /// l'ancien code (garde sur IdTown.HasValue).
+        /// </summary>
+        private int NewExpeditionWithoutTown()
+        {
+            var scope = _factory.Services.CreateScope();
+            var context = scope.ServiceProvider.GetRequiredService<MhoContext>();
+            var expedition = new Expedition { IdTown = null, Day = 5, Position = 0 };
+            context.Expeditions.Add(expedition);
+            context.SaveChanges();
+            return expedition.IdExpedition;
+        }
+
+        private int NewPartWithoutTown()
+        {
+            var expeditionId = NewExpeditionWithoutTown();
+            var scope = _factory.Services.CreateScope();
+            var context = scope.ServiceProvider.GetRequiredService<MhoContext>();
+            var part = new ExpeditionPart { IdExpedition = expeditionId, Position = 0 };
+            context.ExpeditionParts.Add(part);
+            context.SaveChanges();
+            return part.IdExpeditionPart;
+        }
+
+        private int NewCitizenWithoutTown()
+        {
+            var partId = NewPartWithoutTown();
+            var scope = _factory.Services.CreateScope();
+            var context = scope.ServiceProvider.GetRequiredService<MhoContext>();
+            var citizen = new ExpeditionCitizen { IdExpeditionPart = partId, IdExpeditionBagNavigation = new ExpeditionBag() };
+            context.ExpeditionCitizens.Add(citizen);
+            context.SaveChanges();
+            return citizen.IdExpeditionCitizen;
+        }
+
+        [Fact]
+        public async Task SaveExpeditionPartAsync_ExpeditionSansVille_NAJetteAucuneException()
+        {
+            var expeditionId = NewExpeditionWithoutTown();
+
+            var result = await NewService().SaveExpeditionPartAsync(expeditionId, new ExpeditionPartRequestDto { OrdersId = new List<int>(), CitizensId = new List<int>() });
+
+            result.Should().NotBeNull();
+        }
+
+        [Fact]
+        public async Task SaveExpeditionCitizenAsync_PartieSansVille_NAJetteAucuneException()
+        {
+            var partId = NewPartWithoutTown();
+
+            var result = await NewService().SaveExpeditionCitizenAsync(partId, new ExpeditionCitizenRequestDto { OrdersId = new List<int>() });
+
+            result.Should().NotBeNull();
+        }
+
+        [Fact]
+        public async Task SaveCitizenOrdersAsync_CitoyenSansVille_NAJetteAucuneException()
+        {
+            var citizenId = NewCitizenWithoutTown();
+
+            var result = await NewService().SaveCitizenOrdersAsync(citizenId, new List<ExpeditionOrderDto>());
+
+            result.Should().NotBeNull();
         }
     }
 }

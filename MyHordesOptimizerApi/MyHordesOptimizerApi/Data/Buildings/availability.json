@@ -293,5 +293,209 @@
     },
     "small_balloon_#00": {
         "PANDE": "unlocked"
+    },
+  "item_plate_#00": {
+    "PANDE": "disabled"
+  },
+  "item_plate_#01": {
+    "PANDE": "disabled"
+  },
+  "item_plate_#04": {
+    "PANDE": "disabled"
+  },
+  "item_plate_#05": {
+    "PANDE": "disabled"
+  },
+  "small_wallimprove_#02": {
+    "PANDE": "disabled"
+  },
+  "small_grater_#00": {
+    "PANDE": "disabled"
+  },
+  "small_fence_#00": {
+    "PANDE": "disabled"
+  },
+  "small_fence_#01": {
+    "PANDE": "disabled"
+  },
+  "small_wallimprove_#03": {
+    "PANDE": "disabled"
+  },
+  "item_plate_#08": {
+    "PANDE": "disabled"
+  },
+  "item_plate_#09": {
+    "PANDE": "disabled"
+  },
+  "item_jerrycan_#01": {
+    "PANDE": "disabled"
+  },
+  "item_digger_#00": {
+    "PANDE": "disabled"
+  },
+  "small_water_#01": {
+    "PANDE": "disabled"
+  },
+  "small_shower_#00": {
+    "PANDE": "disabled"
+  },
+  "small_shower_#01": {
+    "PANDE": "disabled"
+  },
+  "small_shower_#02": {
+    "PANDE": "disabled"
+  },
+  "small_rocketperf_#00": {
+    "PANDE": "disabled"
+  },
+  "small_waterdetect_#00": {
+    "PANDE": "disabled"
+  },
+  "small_dig_#00": {
+    "PANDE": "disabled"
+  },
+  "small_canon_#00": {
+    "PANDE": "disabled"
+  },
+  "small_canon_#01": {
+    "PANDE": "disabled"
+  },
+  "small_canon_#02": {
+    "PANDE": "disabled"
+  },
+  "small_canon_#03": {
+    "PANDE": "disabled"
+  },
+  "item_wood_beam_#00": {
+    "PANDE": "disabled"
+  },
+  "small_saw_#00": {
+    "PANDE": "disabled"
+  },
+  "small_refine_#01": {
+    "PANDE": "disabled"
+  },
+  "small_eastercross_#00": {
+    "PANDE": "disabled"
+  },
+  "small_slaughterhouse_#00": {
+    "PANDE": "disabled"
+  },
+  "item_shield_#00": {
+    "PANDE": "disabled"
+  },
+  "small_cafet_#00": {
+    "PANDE": "disabled"
+  },
+  "small_cafet_#01": {
+    "PANDE": "disabled"
+  },
+  "item_acid_#00": {
+    "PANDE": "disabled"
+  },
+  "small_chicken_#00": {
+    "PANDE": "disabled"
+  },
+  "small_strategy_#00": {
+    "PANDE": "disabled"
+  },
+  "small_strategy_#01": {
+    "PANDE": "disabled"
+  },
+  "item_courroie_#01": {
+    "PANDE": "disabled"
+  },
+  "item_tagger_#01": {
+    "PANDE": "disabled"
+  },
+  "small_tourello_#00": {
+    "PANDE": "disabled"
+  },
+  "small_catapult3_#00": {
+    "PANDE": "disabled"
+  },
+  "small_ikea_#00": {
+    "PANDE": "disabled"
+  },
+  "small_moving_#00": {
+    "PANDE": "disabled"
+  },
+  "small_falsecity_#00": {
+    "PANDE": "disabled"
+  },
+  "small_scarecrow_#00": {
+    "PANDE": "disabled"
+  },
+  "small_trash_#00": {
+    "PANDE": "disabled"
+  },
+  "small_trash_#06": {
+    "PANDE": "disabled"
+  },
+  "small_trashclean_#00": {
+    "PANDE": "disabled"
+  },
+  "small_score_#00": {
+    "PANDE": "disabled"
+  },
+  "small_court_#00": {
+    "PANDE": "disabled"
+  },
+  "small_slave_#00": {
+    "PANDE": "disabled"
+  },
+  "small_derrick_#01": {
+    "PANDE": "disabled"
+  },
+  "small_cinema_#00": {
+    "PANDE": "disabled"
+  },
+  "small_rocket_#00": {
+    "PANDE": "disabled"
+  },
+  "small_redemption_#00": {
+    "PANDE": "disabled"
+  },
+  "small_door_closed_#01": {
+    "PANDE": "disabled"
+  },
+  "small_door_closed_#02": {
+    "PANDE": "disabled"
+  },
+  "item_plate_#11": {
+    "PANDE": "disabled"
+  },
+  "small_ventilation_#00": {
+    "PANDE": "disabled"
+  },
+  "item_boomfruit_#00": {
+    "PANDE": "disabled"
+  },
+  "item_pumpkin_raw_#00": {
+    "PANDE": "disabled"
+  },
+  "item_pet_pig_#00": {
+    "PANDE": "disabled"
+  },
+  "small_grinder2_#00": {
+    "PANDE": "disabled"
+  },
+  "small_animfence_#00": {
+    "PANDE": "disabled"
+  },
+  "small_sewers_#00": {
+    "PANDE": "disabled"
+  },
+  "small_underground_#00": {
+    "PANDE": "disabled"
+  },
+  "small_urban_#00": {
+    "PANDE": "disabled"
+  },
+  "small_coffin_#00": {
+    "PANDE": "disabled"
+  },
+  "small_pool_#00": {
+    "PANDE": "disabled"
     }
 }

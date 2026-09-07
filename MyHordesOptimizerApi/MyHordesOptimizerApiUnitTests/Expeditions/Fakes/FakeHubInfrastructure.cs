@@ -17,14 +17,15 @@ namespace MyHordesOptimizerApiUnitTests.Expeditions.Fakes
     /// <summary>Fake minimal de HubCallerContext, seule ConnectionId est utilisée par ExpeditionsHub.</summary>
     public class FakeHubCallerContext : HubCallerContext
     {
-        public FakeHubCallerContext(string connectionId)
+        public FakeHubCallerContext(string connectionId, ClaimsPrincipal? user = null)
         {
             ConnectionId = connectionId;
+            User = user;
         }
 
         public override string ConnectionId { get; }
         public override string? UserIdentifier => null;
-        public override ClaimsPrincipal? User => null;
+        public override ClaimsPrincipal? User { get; }
         public override IDictionary<object, object?> Items { get; } = new Dictionary<object, object?>();
         public override IFeatureCollection Features => throw new NotSupportedException();
         public override CancellationToken ConnectionAborted => CancellationToken.None;
@@ -89,7 +90,7 @@ namespace MyHordesOptimizerApiUnitTests.Expeditions.Fakes
         public Task<List<ExpeditionOrderDto>> SavePartOrdersAsync(int expeditionPartId, List<ExpeditionOrderDto> expeditionOrder) => throw new NotSupportedException();
         public void DeleteExpeditionOrder(int expeditionOrderId) => throw new NotSupportedException();
         public ExpeditionOrderDto UpdateExpeditionOrder(ExpeditionOrderDto expeditionOrderDto) => throw new NotSupportedException();
-        public ExpeditionBagDto UpdateExpeditionBag(int citizenId, ExpeditionBagRequestDto expeditionBagDto) => throw new NotSupportedException();
+        public Task<ExpeditionBagDto> UpdateExpeditionBag(int citizenId, ExpeditionBagRequestDto expeditionBagDto) => throw new NotSupportedException();
         public List<ExpeditionBagDto> DeleteExpeditionBag(int bagId) => throw new NotSupportedException();
     }
 }

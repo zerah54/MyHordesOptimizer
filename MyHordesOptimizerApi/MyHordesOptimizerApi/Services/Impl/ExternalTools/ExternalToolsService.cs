@@ -7,6 +7,7 @@ using MyHordesOptimizerApi.Dtos.ExternalTools.GestHordes.Citizen;
 using MyHordesOptimizerApi.Dtos.ExternalTools.GestHordes.MajCase;
 using MyHordesOptimizerApi.Dtos.MyHordes;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
+using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Authentication;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Citizens;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.Bags;
@@ -27,6 +28,7 @@ using MyHordesOptimizerApi.Repository.Interfaces.ExternalTools;
 using MyHordesOptimizerApi.Services.Impl.Locking;
 using MyHordesOptimizerApi.Services.Interfaces.ExternalTools;
 using Newtonsoft.Json.Linq;
+using IAuthenticationService = MyHordesOptimizerApi.Services.Interfaces.IAuthenticationService;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -46,7 +48,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
         protected IUserInfoProvider UserInfoProvider { get; private set; }
         protected IServiceScopeFactory ServiceScopeFactory { get; private set; }
         protected TownSyncLock TownSyncLock { get; private set; }
-
+        protected IAuthenticationService AuthenticationService { get; private set; }
 
         public ExternalToolsService(ILogger<ExternalToolsService> logger,
             IBigBrothHordesRepository bigBrothHordesRepository,
@@ -56,7 +58,8 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
             IUserInfoProvider userInfoProvider,
             IServiceScopeFactory serviceScopeFactory,
             IMyHordesApiRepository myHordesApiRepository,
-            TownSyncLock townSyncLock)
+            TownSyncLock townSyncLock,
+            IAuthenticationService authenticationService)
         {
             Logger = logger;
             BigBrothHordesRepository = bigBrothHordesRepository;
@@ -67,6 +70,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
             ServiceScopeFactory = serviceScopeFactory;
             MyHordesApiRepository = myHordesApiRepository;
             TownSyncLock = townSyncLock;
+            AuthenticationService = authenticationService;
         }
 
         public async Task<UpdateResponseDto> UpdateExternalsTools(UpdateRequestDto updateRequestDto, IExternalToolsProgressSink sink = null)
@@ -258,6 +262,13 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                     try
                     {
                         var me = MyHordesApiRepository.GetMapForToolsUpdate();
+
+                        if (me.MapId.HasValue && me.MapId.Value != UserInfoProvider.TownDetail?.TownId)
+                        {
+                            var simpleMe = Mapper.Map<SimpleMeDto>(me);
+                            var renewedToken = AuthenticationService.CreateToken(simpleMe, UserInfoProvider.UserKey);
+                            sink.SetRenewedToken(new AuthenticationResponseDto { SimpleMe = simpleMe, Token = renewedToken });
+                        }
 
                         // Même clé que le login (GetSimpleMeAsync) : le mapId, jamais le townId
                         // résolu. Sans cet alignement, ce chemin et le login verrouillent deux
@@ -1097,6 +1108,9 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
 
         public LastUpdateInfoDto UpdateCitizenBag(int townId, int userId, List<UpdateObjectDto> bag)
         {
+            // Même clé que le flux combiné (-mapId, mHOBagTask écrit les mêmes BagItems) : sans cet
+            // alignement, les deux chemins se marcheraient dessus sans jamais s'exclure.
+            using var townLock = TownSyncLock.AcquireTownBlocking(-townId);
             using var scope = ServiceScopeFactory.CreateScope();
             var dbContext = scope.ServiceProvider.GetRequiredService<MhoContext>();
             townId = dbContext.ResolveTownId(townId);
@@ -1175,6 +1189,8 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
 
         public LastUpdateInfoDto UpdateCitizenChest(int townId, int userId, List<UpdateObjectDto> chest)
         {
+            // Même clé que le flux combiné (-mapId, mHOCitizenDetailTask appelle aussi ReplaceChestItems).
+            using var townLock = TownSyncLock.AcquireTownBlocking(-townId);
             using var scope = ServiceScopeFactory.CreateScope();
             var dbContext = scope.ServiceProvider.GetRequiredService<MhoContext>();
             townId = dbContext.ResolveTownId(townId);
@@ -1196,6 +1212,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
 
         public LastUpdateInfoDto UpdateCitizenHome(int townId, int userId, CitizenHomeValueDto homeDetails)
         {
+            using var townLock = TownSyncLock.AcquireTownBlocking(-townId);
             using var scope = ServiceScopeFactory.CreateScope();
             var dbContext = scope.ServiceProvider.GetRequiredService<MhoContext>();
             townId = dbContext.ResolveTownId(townId);
@@ -1218,6 +1235,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
 
         public LastUpdateInfoDto UpdateCitizenStatus(int townId, int userId, List<string> status)
         {
+            using var townLock = TownSyncLock.AcquireTownBlocking(-townId);
             using var scope = ServiceScopeFactory.CreateScope();
             var dbContext = scope.ServiceProvider.GetRequiredService<MhoContext>();
             townId = dbContext.ResolveTownId(townId);
@@ -1345,6 +1363,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
 
         public LastUpdateInfoDto UpdateGhoulStatus(int townId, int userId, UpdateGhoulStatusDto request)
         {
+            using var townLock = TownSyncLock.AcquireTownBlocking(-townId);
             using var scope = ServiceScopeFactory.CreateScope();
             var dbContext = scope.ServiceProvider.GetRequiredService<MhoContext>();
             townId = dbContext.ResolveTownId(townId);
@@ -1369,6 +1388,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
 
         public LastUpdateInfoDto UpdateCitizenHeroicActions(int townId, int userId, CitizenActionsHeroicValue actionHeroics)
         {
+            using var townLock = TownSyncLock.AcquireTownBlocking(-townId);
             using var scope = ServiceScopeFactory.CreateScope();
             var dbContext = scope.ServiceProvider.GetRequiredService<MhoContext>();
             townId = dbContext.ResolveTownId(townId);

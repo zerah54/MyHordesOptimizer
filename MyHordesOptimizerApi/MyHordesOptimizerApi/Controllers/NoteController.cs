@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using MyHordesOptimizerApi.Controllers.Abstract;
+using MyHordesOptimizerApi.Controllers.ActionFillters;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Note;
 using MyHordesOptimizerApi.Providers.Interfaces;
 using MyHordesOptimizerApi.Services.Interfaces;
@@ -24,6 +25,7 @@ public class NoteController : AbstractMyHordesOptimizerControllerBase
 
     [HttpGet]
     [Route("town/mine")]
+    [TypeFilter(typeof(ETagCacheFilter), Arguments = new object[] { ETagResource.NoteMyTown, "" })]
     public ActionResult<Dictionary<int, NoteDto>> GetMyTownNotes()
         => Ok(_noteService.GetMyTownNotes(UserInfoProvider.UserId));
 
@@ -37,11 +39,13 @@ public class NoteController : AbstractMyHordesOptimizerControllerBase
 
     [HttpGet]
     [Route("user/mine")]
+    [TypeFilter(typeof(ETagCacheFilter), Arguments = new object[] { ETagResource.NoteMyUser, "" })]
     public ActionResult<Dictionary<int, NoteDto>> GetMyUserNotes()
         => Ok(_noteService.GetMyUserNotes(UserInfoProvider.UserId));
 
     [HttpGet]
     [Route("user/{userId:int}")]
+    [TypeFilter(typeof(ETagCacheFilter), Arguments = new object[] { ETagResource.NoteUser, "userId" })]
     public ActionResult<NoteDto> GetUserNote([FromRoute] int userId)
         => Ok(_noteService.GetUserNote(UserInfoProvider.UserId, userId));
 
@@ -55,11 +59,13 @@ public class NoteController : AbstractMyHordesOptimizerControllerBase
 
     [HttpGet]
     [Route("citizen/mine")]
+    [TypeFilter(typeof(ETagCacheFilter), Arguments = new object[] { ETagResource.NoteMyCitizen, "townId" })]
     public ActionResult<Dictionary<int, NoteDto>> GetMyCitizenNotes([FromQuery] int townId)
         => Ok(_noteService.GetMyCitizenNotes(UserInfoProvider.UserId, townId));
 
     [HttpGet]
     [Route("citizen/{userId:int}/mine")]
+    [TypeFilter(typeof(ETagCacheFilter), Arguments = new object[] { ETagResource.NoteMyCitizenForUser, "userId" })]
     public ActionResult<Dictionary<int, NoteDto>> GetMyCitizenNotesForUser([FromRoute] int userId)
         => Ok(_noteService.GetMyCitizenNotesForUser(UserInfoProvider.UserId, userId));
 

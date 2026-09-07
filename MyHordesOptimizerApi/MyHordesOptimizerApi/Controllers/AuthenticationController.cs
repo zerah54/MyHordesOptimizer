@@ -2,9 +2,12 @@
 using Microsoft.Extensions.Logging;
 using MyHordesOptimizerApi.Attributes;
 using MyHordesOptimizerApi.Controllers.Abstract;
+using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Authentication;
+using MyHordesOptimizerApi.Exceptions;
 using MyHordesOptimizerApi.Providers.Interfaces;
 using MyHordesOptimizerApi.Services.Interfaces;
+using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -36,7 +39,22 @@ namespace MyHordesOptimizerApi.Controllers
                 return BadRequest($"{nameof(userKey)} cannot be empty");
             }
             UserInfoProvider.UserKey = userKey;
-            var simpleMe = await _myHordesFetcherService.GetSimpleMeAsync();
+            SimpleMeDto simpleMe;
+            try
+            {
+                simpleMe = await _myHordesFetcherService.GetSimpleMeAsync();
+            }
+            catch (MyHordesApiException e) when (e.StatusCode is HttpStatusCode.TooManyRequests or HttpStatusCode.ServiceUnavailable)
+            {
+                // Résolution SERVEUR uniquement, depuis le userKey SOUMIS dans cette requête (jamais
+                // une valeur fournie par le client — voir C2, revue finale du chantier). Rien en cache
+                // pour ce userKey (premier appel de la session, ou clé jamais vue) : rien à servir.
+                simpleMe = _myHordesFetcherService.BuildSimpleMeFromDbByUserKey(userKey);
+                if (simpleMe == null)
+                {
+                    throw;
+                }
+            }
             var token = _authenticationService.CreateToken(simpleMe, userKey);
             return new AuthenticationResponseDto()
             {
