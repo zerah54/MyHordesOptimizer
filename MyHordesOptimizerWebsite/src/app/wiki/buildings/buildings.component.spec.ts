@@ -4,7 +4,7 @@ import moment from 'moment';
 import { of, Subject } from 'rxjs';
 
 import { ApiService } from '../../_abstract_model/services/api.service';
-import { Building } from '../../_abstract_model/types/building.class';
+import { Building, BuildingResource } from '../../_abstract_model/types/building.class';
 import { BuildingsComponent } from './buildings.component';
 
 describe('BuildingsComponent', (): void => {
@@ -98,12 +98,78 @@ describe('BuildingsComponent', (): void => {
         expect(component['stepperIcon'](building)).toBe('item/item_bplan_r.gif');
     });
 
-    it('stepperIcon falls back to the generic plan icon when neither yields an image', (): void => {
+    it('stepperIcon returns no icon for rarity 0 (constructible sans plan), even with no named override', (): void => {
         const building: Building = new Building();
         building.rarity = 0;
         building.hard_blueprint_level = null;
 
+        expect(component['stepperIcon'](building)).toBe('');
+    });
+
+    it('stepperIcon falls back to the generic plan icon only when the level is genuinely unknown', (): void => {
+        const building: Building = new Building();
+        building.rarity = 99;
+        building.hard_blueprint_level = null;
+
         expect(component['stepperIcon'](building)).toBe('item/item_bplan_c.gif');
+    });
+
+    it('usefulPlanReadings is 0 outside hard mode support', (): void => {
+        const building: Building = new Building();
+        building.has_hard_mode = false;
+
+        expect(component['usefulPlanReadings'](building)).toBe(0);
+    });
+
+    it('usefulPlanReadings is 0 when tier0 and tier1 are strictly identical (muraille standard)', (): void => {
+        const building: Building = new Building();
+        building.has_hard_mode = true;
+        building.tier0_ap = 25;
+        building.tier1_ap = 25;
+        building.tier2_ap = 25;
+        const resource: BuildingResource = new BuildingResource();
+        resource.item_id = 1;
+        resource.count = 5;
+        building.tier0_resources = [resource];
+        building.tier1_resources = [resource];
+
+        expect(component['usefulPlanReadings'](building)).toBe(0);
+    });
+
+    it('usefulPlanReadings is 1 when only the first reading changes the resources (portail)', (): void => {
+        const building: Building = new Building();
+        building.has_hard_mode = true;
+        building.tier0_ap = 15;
+        building.tier1_ap = 15;
+        building.tier2_ap = 15;
+        const metal: BuildingResource = new BuildingResource();
+        metal.item_id = 1;
+        metal.count = 2;
+        const plate: BuildingResource = new BuildingResource();
+        plate.item_id = 2;
+        plate.count = 1;
+        building.tier0_resources = [metal, plate];
+        building.tier1_resources = [metal];
+
+        expect(component['usefulPlanReadings'](building)).toBe(1);
+    });
+
+    it('usefulPlanReadings is 2 when the second reading further reduces the AP (muraille évolutive)', (): void => {
+        const building: Building = new Building();
+        building.has_hard_mode = true;
+        building.tier0_ap = 40;
+        building.tier1_ap = 40;
+        building.tier2_ap = 28;
+        const hard: BuildingResource = new BuildingResource();
+        hard.item_id = 1;
+        hard.count = 6;
+        const easy: BuildingResource = new BuildingResource();
+        easy.item_id = 1;
+        easy.count = 1;
+        building.tier0_resources = [hard];
+        building.tier1_resources = [easy];
+
+        expect(component['usefulPlanReadings'](building)).toBe(2);
     });
 
     it('showsBreakableFlag is false outside Pandémonium for an ordinary breakable building', (): void => {

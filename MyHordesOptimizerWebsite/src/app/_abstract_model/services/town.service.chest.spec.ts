@@ -2,7 +2,7 @@ import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 
-import { TOWN_KEY } from '../const';
+import { setTown } from '../../_core/utilities/localstorage.util';
 import { Citizen } from '../types/citizen.class';
 import { TownService } from './town.service';
 
@@ -11,7 +11,7 @@ describe('TownService — updateChest', (): void => {
     let httpMock: HttpTestingController;
 
     beforeEach((): void => {
-        localStorage.removeItem(TOWN_KEY);
+        setTown(null);
         TestBed.configureTestingModule({
             providers: [provideHttpClient(), provideHttpClientTesting()]
         });

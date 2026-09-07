@@ -6,6 +6,7 @@ import { of } from 'rxjs';
 
 import { AdminService } from '../../_abstract_model/services/admin.service';
 import { TownContextService } from '../../_core/services/town-context.service';
+import { setTown, setUser } from '../../_core/utilities/localstorage.util';
 import { MenuComponent } from './menu.component';
 
 interface SidenavLink {
@@ -48,6 +49,8 @@ describe('MenuComponent', (): void => {
 
     beforeEach(async (): Promise<void> => {
         localStorage.clear();
+        setUser(null);
+        setTown(null);
         // `changeTheme`/`changeLanguage`/`resizeSidenav` planifient un `setTimeout` : avec un timer réel,
         // le callback peut s'exécuter après le teardown Jasmine (spies restaurés) et déclencher un vrai
         // rechargement de page pendant un AUTRE test. Horloge falsifiée pour rester synchrone.
@@ -72,6 +75,8 @@ describe('MenuComponent', (): void => {
         jasmine.clock().tick(1);
         jasmine.clock().uninstall();
         localStorage.clear();
+        setUser(null);
+        setTown(null);
     });
 
     describe('changeTheme', (): void => {

@@ -51,8 +51,9 @@ export class BuildingsComponent implements OnInit {
     private readonly plansLus: Map<number, 0 | 1 | 2> = new Map<number, 0 | 1 | 2>();
 
     /**
-     * Icône du plan par défaut : repli quand ni la rareté effective ni la rareté de base n'ont
-     * d'icône propre (rareté 0 = constructible sans plan, ou niveau inconnu).
+     * Icône du plan par défaut : repli UNIQUEMENT quand le niveau de rareté (effectif ou de base)
+     * est authentiquement inconnu (absent de BlueprintEnum). Une rareté 0 (« constructible sans
+     * plan ») n'y retombe PAS : voir BlueprintEnum.NONE et stepperIcon().
      */
     private static readonly DEFAULT_PLAN_ICON: string = 'item/item_bplan_c.gif';
 
@@ -177,12 +178,44 @@ export class BuildingsComponent implements OnInit {
 
     /**
      * Icône du stepper fusionnant les colonnes « Plan »/« Plans lus » en Pandémonium : la rareté
-     * effective (chantier nommément overridé dans rules.yml) prime sur la rareté de base, elle-même
-     * repliée sur l'icône générique si aucune des deux n'en a une (rareté 0, ou niveau inconnu).
+     * effective (chantier nommément overridé dans rules.yml) prime sur la rareté de base. Une
+     * rareté 0 (« constructible sans plan ») n'a PAS d'icône par conception (voir BlueprintEnum.NONE)
+     * : ce n'est pas la même chose qu'un niveau inconnu, qui seul retombe sur l'icône générique.
      */
     protected stepperIcon(building: Building): string {
         const effective_rarity: number = building.hard_blueprint_level ?? building.rarity;
-        return BlueprintEnum.fromRarity(effective_rarity)?.value.img ?? BuildingsComponent.DEFAULT_PLAN_ICON;
+        const blueprint: BlueprintEnum | undefined = BlueprintEnum.fromRarity(effective_rarity);
+        return blueprint ? (blueprint.value.img ?? '') : BuildingsComponent.DEFAULT_PLAN_ICON;
+    }
+
+    /**
+     * Nombre de lectures de plan qui changent réellement quelque chose pour ce chantier, en
+     * Pandémonium (0 à 2). Les ressources du palier 2 sont toujours celles du palier 1 (voir
+     * BuildingDto.Tier2Resources) : seul le PA peut encore varier à la 2ᵉ lecture.
+     */
+    protected usefulPlanReadings(building: Building): 0 | 1 | 2 {
+        if (!building.has_hard_mode) {
+            return 0;
+        }
+        const first_reading_helps: boolean = building.tier0_ap !== building.tier1_ap
+            || !BuildingsComponent.sameResources(building.tier0_resources, building.tier1_resources);
+        if (!first_reading_helps) {
+            return 0;
+        }
+        return building.tier1_ap !== building.tier2_ap ? 2 : 1;
+    }
+
+    /** Deux jeux de ressources sont égaux si mêmes objets aux mêmes quantités, ordre indifférent. */
+    private static sameResources(a: BuildingResource[], b: BuildingResource[]): boolean {
+        if (a.length !== b.length) {
+            return false;
+        }
+        const countsOf = (resources: BuildingResource[]): Map<number, number> =>
+            new Map(resources.map((resource: BuildingResource): [number, number] => [resource.item_id, resource.count]));
+        const counts_a: Map<number, number> = countsOf(a);
+        const counts_b: Map<number, number> = countsOf(b);
+        return counts_a.size === counts_b.size
+            && Array.from(counts_a.entries()).every(([item_id, count]: [number, number]): boolean => counts_b.get(item_id) === count);
     }
 
     /**

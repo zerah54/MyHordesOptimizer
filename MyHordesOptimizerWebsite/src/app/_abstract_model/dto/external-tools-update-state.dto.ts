@@ -1,3 +1,5 @@
+import { TokenWithMeDTO } from './token-with-me.dto';
+
 export type ExternalToolId = 'myHordesOptimizer' | 'gestHordes' | 'fataMorgana' | 'bigBrothHordes';
 
 export type ExternalToolUpdateStatus = 'pending' | 'success' | 'error';
@@ -19,4 +21,5 @@ export interface ExternalToolsUpdateJobStateDTO {
     startedAt: string | null;
     finishedAt: string | null;
     tools: ExternalToolUpdateStateDTO[];
+    renewedToken?: TokenWithMeDTO;
 }

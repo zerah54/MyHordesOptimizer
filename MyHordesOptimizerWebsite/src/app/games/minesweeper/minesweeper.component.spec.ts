@@ -3,9 +3,10 @@ import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { of } from 'rxjs';
-
-import { USER_KEY } from '../../_abstract_model/const';
 import { MinesweeperGameCompleted, MinesweeperGameStarted, MinesweeperService } from '../../_abstract_model/services/minesweeper.service';
+
+import { Me } from '../../_abstract_model/types/me.class';
+import { setUser } from '../../_core/utilities/localstorage.util';
 import { MinesweeperLeaderboardDialogComponent } from './leaderboard-dialog/minesweeper-leaderboard-dialog.component';
 import { MinesweeperComponent } from './minesweeper.component';
 
@@ -77,18 +78,19 @@ describe('MinesweeperComponent', (): void => {
     }
 
     afterEach((): void => {
-        localStorage.removeItem(USER_KEY);
+        setUser(null);
         document.querySelectorAll('.cdk-overlay-container').forEach((el: Element) => el.remove());
     });
 
     describe('rendu', (): void => {
         it('affiche l\'avertissement invité quand personne n\'est connecté', async (): Promise<void> => {
+            setUser(null);
             await setup();
             expect(fixture.nativeElement.querySelector('.guest-warning')).not.toBeNull();
         });
 
         it('masque l\'avertissement invité une fois connecté', async (): Promise<void> => {
-            localStorage.setItem(USER_KEY, JSON.stringify({ id: 1 }));
+            setUser(Object.assign(new Me(), { id: 1 }));
             await setup();
             expect(fixture.nativeElement.querySelector('.guest-warning')).toBeNull();
         });

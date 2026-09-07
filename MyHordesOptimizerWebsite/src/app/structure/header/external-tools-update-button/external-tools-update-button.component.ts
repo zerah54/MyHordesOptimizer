@@ -14,7 +14,9 @@ import {
 } from '../../../_abstract_model/dto/external-tools-update-state.dto';
 import { TownService } from '../../../_abstract_model/services/town.service';
 import { Imports } from '../../../_abstract_model/types/_types';
+import { TokenWithMe } from '../../../_abstract_model/types/token-with-me.class';
 import { SnackbarService } from '../../../_core/services/snackbar.service';
+import { setTokenWithMeWithExpirationDate, setTown, setUser } from '../../../_core/utilities/localstorage.util';
 
 interface ToolDisplay {
     id: ExternalToolId;
@@ -95,6 +97,12 @@ export class ExternalToolsUpdateButtonComponent {
                 next: (state: ExternalToolsUpdateJobStateDTO) => {
                     this.is_running = state.isRunning;
                     this.tools_state.set(state.tools ?? []);
+                    if (state.renewedToken) {
+                        const renewed: TokenWithMe = new TokenWithMe(state.renewedToken);
+                        setTokenWithMeWithExpirationDate(renewed);
+                        setUser(renewed.simple_me);
+                        setTown(renewed.simple_me.town_details);
+                    }
                 },
                 error: () => {
                     this.is_running = false;

@@ -12,6 +12,8 @@ import { NoteService } from '../../_abstract_model/services/note.service';
 import { UserAccountService } from '../../_abstract_model/services/user-account.service';
 import { Dictionary } from '../../_abstract_model/types/_types';
 import { CitizenListItem, CitizenListPageResult } from '../../_abstract_model/types/citizen-list-item.model';
+import { Me } from '../../_abstract_model/types/me.class';
+import { setUser } from '../../_core/utilities/localstorage.util';
 import { CitizenListComponent } from './citizen-list.component';
 
 interface TestableComponent {
@@ -61,11 +63,11 @@ describe('CitizenListComponent', (): void => {
 
     describe('connecté', (): void => {
         beforeEach(async (): Promise<void> => {
-            localStorage.setItem('user', JSON.stringify({ id: 5 }));
+            setUser(Object.assign(new Me(), { id: 5 }));
             await setup();
         });
 
-        afterEach((): void => localStorage.removeItem('user'));
+        afterEach((): void => setUser(null));
 
         it('navigue vers /profile/:id au clic sur une ligne', (): void => {
             const navigateSpy = spyOn(router, 'navigate');
@@ -85,7 +87,7 @@ describe('CitizenListComponent', (): void => {
 
     describe('non connecté', (): void => {
         beforeEach(async (): Promise<void> => {
-            localStorage.removeItem('user');
+            setUser(null);
             await setup();
         });
 
@@ -208,11 +210,11 @@ describe('CitizenListComponent', (): void => {
 
     describe('note privée', (): void => {
         beforeEach(async (): Promise<void> => {
-            localStorage.setItem('user', JSON.stringify({ id: 5 }));
+            setUser(Object.assign(new Me(), { id: 5 }));
             await setup();
         });
 
-        afterEach((): void => localStorage.removeItem('user'));
+        afterEach((): void => setUser(null));
 
         it('sauvegarde la note saisie dans le dialogue et met à jour le signal', (): void => {
             const dialog: MatDialog = fixture.debugElement.injector.get(MatDialog);

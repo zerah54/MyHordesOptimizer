@@ -1,12 +1,14 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MAT_ICON_DEFAULT_OPTIONS, MatIconDefaultOptions } from '@angular/material/icon';
 import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { Observable, of, throwError } from 'rxjs';
 
-import { USER_KEY } from '../../../_abstract_model/const';
 import { UserPictosDTO } from '../../../_abstract_model/dto/user-picto.dto';
 import { UserAccountService } from '../../../_abstract_model/services/user-account.service';
+import { Me } from '../../../_abstract_model/types/me.class';
 import { UserPicto } from '../../../_abstract_model/types/user-picto.class';
+import { setUser } from '../../../_core/utilities/localstorage.util';
 import { CitizenPictosDialogComponent, CitizenPictosDialogData } from './citizen-pictos-dialog.component';
 
 interface TestableComponent {
@@ -36,7 +38,11 @@ describe('CitizenPictosDialogComponent', (): void => {
                 {
                     provide: UserAccountService,
                     useValue: { getPictos: getPictosSpy, importUserData: importUserDataSpy }
-                }
+                },
+                {
+                    provide: MAT_ICON_DEFAULT_OPTIONS,
+                    useValue: { fontSet: 'material-symbols-outlined' } as MatIconDefaultOptions
+                },
             ]
         });
 
@@ -46,25 +52,27 @@ describe('CitizenPictosDialogComponent', (): void => {
     }
 
     afterEach((): void => {
-        localStorage.removeItem(USER_KEY);
+        setUser(null);
     });
 
     it('hides the import button for a visitor who is not logged in', (): void => {
-        localStorage.removeItem(USER_KEY);
+        setUser(null);
         configure({ historyImportedAt: null, pictos: [] });
 
         expect(fixture.nativeElement.querySelector('.citizen-pictos__import')).toBeNull();
     });
 
     it('shows the import button for a logged-in visitor', (): void => {
-        localStorage.setItem(USER_KEY, JSON.stringify({ id: 1 }));
+        setUser(null);
+        setUser(Object.assign(new Me(), { id: 1 }));
         configure({ historyImportedAt: null, pictos: [] });
 
         expect(fixture.nativeElement.querySelector('.citizen-pictos__import')).not.toBeNull();
     });
 
     it('uses the material-symbols-outlined font for the refresh icon (the only font loaded by the app)', (): void => {
-        localStorage.setItem(USER_KEY, JSON.stringify({ id: 1 }));
+        setUser(null);
+        setUser(Object.assign(new Me(), { id: 1 }));
         configure({ historyImportedAt: null, pictos: [] });
 
         const icon: Element | null = fixture.nativeElement.querySelector('.citizen-pictos__import mat-icon');
@@ -72,7 +80,8 @@ describe('CitizenPictosDialogComponent', (): void => {
     });
 
     it('loads pictos and the last import date on init', (): void => {
-        localStorage.setItem(USER_KEY, JSON.stringify({ id: 1 }));
+        setUser(null);
+        setUser(Object.assign(new Me(), { id: 1 }));
         configure({ historyImportedAt: '2026-08-01T00:00:00Z', pictos: [{ id: 1, rare: false, count: 3 }] });
 
         expect(testable.pictos().length).toBe(1);
@@ -80,7 +89,8 @@ describe('CitizenPictosDialogComponent', (): void => {
     });
 
     it('reloads pictos and the import date after a successful import', (): void => {
-        localStorage.setItem(USER_KEY, JSON.stringify({ id: 1 }));
+        setUser(null);
+        setUser(Object.assign(new Me(), { id: 1 }));
         configure({ historyImportedAt: null, pictos: [] });
         const refreshed: UserPictosDTO = {
             historyImportedAt: '2026-08-11T12:00:00Z',
@@ -99,7 +109,8 @@ describe('CitizenPictosDialogComponent', (): void => {
     });
 
     it('stops the spinner without changing data when the import fails (e.g. 429)', (): void => {
-        localStorage.setItem(USER_KEY, JSON.stringify({ id: 1 }));
+        setUser(null);
+        setUser(Object.assign(new Me(), { id: 1 }));
         configure({ historyImportedAt: null, pictos: [] });
         importUserDataSpy.and.returnValue(throwError((): Error => new Error('429')));
 
@@ -111,7 +122,8 @@ describe('CitizenPictosDialogComponent', (): void => {
     });
 
     it('ignores a second triggerImport call while one is already in flight', (): void => {
-        localStorage.setItem(USER_KEY, JSON.stringify({ id: 1 }));
+        setUser(null);
+        setUser(Object.assign(new Me(), { id: 1 }));
         configure({ historyImportedAt: null, pictos: [] });
         importUserDataSpy.and.returnValue(new Observable<UserPictosDTO>());
 

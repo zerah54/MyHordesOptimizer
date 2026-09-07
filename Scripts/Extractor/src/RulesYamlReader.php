@@ -31,8 +31,18 @@ final class RulesYamlReader
         'disabled_buildings' => 'disabled',
     ];
 
-    /** @return array<string, array<string, string>> */
-    public function disponibilite(string $cheminRulesYaml): array
+    /**
+     * @param list<string> $catalogueUids Tous les uids de chantiers connus. En mode `improve`
+     *     (Pandémonium), sert à marquer `disabled` ceux absents de `initial_buildings` ∪
+     *     `unlocked_buildings` : dans ce mode les chantiers sont pré-peuplés à la création de la
+     *     ville (`InitializeTownBuildingsAction.php`), ces listes sont donc l'inventaire complet de
+     *     ce qui existe — pas un déblocage initial parmi un catalogue par ailleurs atteignable. En
+     *     mode `unlock` (défaut hors Pandémonium), l'absence de liste signifie « pas encore trouvé
+     *     par plan » et reste ignorée, tout le catalogue étant éligible à la découverte
+     *     (`ProcessTownEffect.php`, `findProspectivePrototypes`).
+     * @return array<string, array<string, string>>
+     */
+    public function disponibilite(string $cheminRulesYaml, array $catalogueUids = []): array
     {
         $regles = $this->regles($cheminRulesYaml);
         $defaut = $regles['default'] ?? throw new RuntimeException("Bloc « default » absent de $cheminRulesYaml.");
@@ -44,6 +54,7 @@ final class RulesYamlReader
                 throw new RuntimeException("Bloc « $cleMode » absent de $cheminRulesYaml.");
             }
 
+            $disponiblesParListe = [];
             foreach (self::LISTES as $cleListe => $statut) {
                 $base = $defaut[$cleListe] ?? [];
                 $donnee = $regles[$cleMode][$cleListe] ?? null;
@@ -51,6 +62,22 @@ final class RulesYamlReader
 
                 foreach ($liste as $uid) {
                     $parUid[$uid][$townType] = $statut;
+                }
+
+                if ($cleListe !== 'disabled_buildings') {
+                    $disponiblesParListe = array_merge($disponiblesParListe, $liste);
+                }
+            }
+
+            $modeAmeliorationSeule = ($regles[$cleMode]['features']['blueprint_mode']
+                    ?? $defaut['features']['blueprint_mode']
+                    ?? 'unlock') === 'improve';
+
+            if ($modeAmeliorationSeule) {
+                foreach ($catalogueUids as $uid) {
+                    if (!in_array($uid, $disponiblesParListe, true)) {
+                        $parUid[$uid][$townType] = 'disabled';
+                    }
                 }
             }
         }

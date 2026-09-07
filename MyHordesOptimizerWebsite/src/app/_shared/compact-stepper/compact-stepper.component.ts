@@ -32,8 +32,11 @@ const material_modules: Imports = [MatIconModule, MatTooltipModule];
     imports: [...angular_common, ...material_modules]
 })
 export class CompactStepperComponent {
-    /** Chemin de l'icône relatif à HORDES_IMG_REPO (peut dépendre de la valeur, ex habitation). */
-    public readonly icon: InputSignal<string> = input.required<string>();
+    /**
+     * Chemin de l'icône relatif à HORDES_IMG_REPO (peut dépendre de la valeur, ex habitation).
+     * Vide = pas d'icône propre (ex : palier Pandémonium sans plan associé).
+     */
+    public readonly icon: InputSignal<string> = input<string>('');
     /** Libellé affiché en tooltip au survol. */
     public readonly label: InputSignal<string> = input.required<string>();
     /** Valeur courante. */

@@ -4,8 +4,8 @@ import { MatDialog } from '@angular/material/dialog';
 import { By } from '@angular/platform-browser';
 import { Router } from '@angular/router';
 
-import { TOWN_KEY } from '../../_abstract_model/const';
 import { TownDetails } from '../../_abstract_model/types/town-details.class';
+import { setTown } from '../../_core/utilities/localstorage.util';
 import { DespairDeathsCalculatorComponent } from './despair-deaths-calculator/despair-deaths-calculator.component';
 import { MiscellaneousInfoComponent } from './miscellaneous-info.component';
 
@@ -42,11 +42,11 @@ describe('MiscellaneousInfoComponent', (): void => {
     }
 
     beforeEach((): void => {
-        localStorage.removeItem(TOWN_KEY);
+        setTown(null);
     });
 
     afterEach((): void => {
-        localStorage.removeItem(TOWN_KEY);
+        setTown(null);
     });
 
     it('renders the six wiki cards, in order', (): void => {
@@ -123,14 +123,14 @@ describe('MiscellaneousInfoComponent', (): void => {
         createComponent();
         expect(component['my_town']).toBeNull();
 
-        localStorage.setItem(TOWN_KEY, JSON.stringify({ day: 7, town_type: 'RE' }));
+        setTown(Object.assign(new TownDetails(), { day: 7, town_type: 'RE' }));
         createComponent();
 
         expect((component['my_town'] as TownDetails).day).toBe(7);
     });
 
     it('highlights the row matching the active town\'s day, only in tables that opted into highlight_day', (): void => {
-        localStorage.setItem(TOWN_KEY, JSON.stringify({ day: 7, town_type: 'RE' }));
+        setTown(Object.assign(new TownDetails(), { day: 7, town_type: 'RE' }));
         createComponent();
 
         const attack_table: DebugElement = cards()[1];

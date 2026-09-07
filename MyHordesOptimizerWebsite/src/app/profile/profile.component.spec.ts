@@ -1,6 +1,7 @@
 import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { MAT_ICON_DEFAULT_OPTIONS, MatIconDefaultOptions } from '@angular/material/icon';
 import { ActivatedRoute } from '@angular/router';
 import { of } from 'rxjs';
 
@@ -31,6 +32,10 @@ describe('ProfileComponent notes', (): void => {
                 { provide: NoteService, useValue: noteService },
                 { provide: UserAccountService, useValue: userAccountService },
                 { provide: ActivatedRoute, useValue: { snapshot: { paramMap: { get: (): string => '5' } } } },
+                {
+                    provide: MAT_ICON_DEFAULT_OPTIONS,
+                    useValue: { fontSet: 'material-symbols-outlined' } as MatIconDefaultOptions
+                },
             ]
         }).compileComponents();
 

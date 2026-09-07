@@ -3,13 +3,14 @@ import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { of } from 'rxjs';
 
-import { USER_KEY } from '../../_abstract_model/const';
 import { NoteDTO } from '../../_abstract_model/dto/note.dto';
 import { TownListQuery } from '../../_abstract_model/dto/town-list-page.dto';
 import { NoteService } from '../../_abstract_model/services/note.service';
 import { TownService } from '../../_abstract_model/services/town.service';
 import { Dictionary } from '../../_abstract_model/types/_types';
+import { Me } from '../../_abstract_model/types/me.class';
 import { TownListItem, TownListPageResult, TownPublicCitizen } from '../../_abstract_model/types/town-list-item.model';
+import { setUser } from '../../_core/utilities/localstorage.util';
 import { TownListComponent } from './town-list.component';
 
 interface TestableComponent {
@@ -46,7 +47,7 @@ describe('TownListComponent notes', (): void => {
     });
 
     afterEach((): void => {
-        localStorage.removeItem(USER_KEY);
+        setUser(null);
     });
 
     // myUserId est lu depuis localStorage à la construction du composant : le login doit être posé
@@ -66,7 +67,7 @@ describe('TownListComponent notes', (): void => {
     });
 
     it('loads only town notes (not citizen notes) on one\'s own profile', (): void => {
-        localStorage.setItem(USER_KEY, JSON.stringify({ id: 42 }));
+        setUser(Object.assign(new Me(), { id: 42 }));
         createComponent();
         fixture.componentRef.setInput('playerId', 42);
 
@@ -78,7 +79,7 @@ describe('TownListComponent notes', (): void => {
     });
 
     it('loads both town notes and citizen notes on another player\'s profile', (): void => {
-        localStorage.setItem(USER_KEY, JSON.stringify({ id: 1 }));
+        setUser(Object.assign(new Me(), { id: 1 }));
         createComponent();
         fixture.componentRef.setInput('playerId', 42);
 
@@ -91,7 +92,7 @@ describe('TownListComponent notes', (): void => {
     });
 
     it('flags a town as participated only when the logged-in user is among its citizens', (): void => {
-        localStorage.setItem(USER_KEY, JSON.stringify({ id: 1 }));
+        setUser(Object.assign(new Me(), { id: 1 }));
         createComponent();
         fixture.detectChanges();
 

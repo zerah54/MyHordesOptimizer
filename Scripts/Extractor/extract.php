@@ -62,7 +62,8 @@ try {
     echo '→ Lecture de rules.yml (disponibilité + overrides de rareté)…', PHP_EOL;
     $rulesYaml = new RulesYamlReader();
     $cheminRules = $source . '/config/app/rules.yml';
-    $brut['mho.buildings.availability'] = $rulesYaml->disponibilite($cheminRules);
+    $catalogueBuildingUids = array_keys($brut['myhordes.fixtures.buildings'] ?? []);
+    $brut['mho.buildings.availability'] = $rulesYaml->disponibilite($cheminRules, $catalogueBuildingUids);
     $brut['mho.buildings.rarity_overrides'] = $rulesYaml->overridesRarete($cheminRules);
 
     if ($rawOnly) {

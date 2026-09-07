@@ -4,7 +4,8 @@ import { DebugElement } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 
-import { TOWN_KEY } from '../../_abstract_model/const';
+import { TownDetails } from '../../_abstract_model/types/town-details.class';
+import { setTown } from '../../_core/utilities/localstorage.util';
 import { OverflowComponent, ScenarioResult } from './overflow.component';
 
 describe('OverflowComponent', (): void => {
@@ -12,7 +13,7 @@ describe('OverflowComponent', (): void => {
     let component: OverflowComponent;
 
     beforeEach((): void => {
-        localStorage.removeItem(TOWN_KEY);
+        setTown(null);
         TestBed.configureTestingModule({
             imports: [OverflowComponent],
             providers: [provideHttpClient(), provideHttpClientTesting()]
@@ -323,7 +324,7 @@ describe('OverflowComponent', (): void => {
     });
 
     it('table "Par défense" : en mode "Ma ville", le groupe liste les noms des citoyens qui le composent', (): void => {
-        localStorage.setItem(TOWN_KEY, JSON.stringify({
+        setTown(Object.assign(new TownDetails(), {
             town_id: 1, town_x: 0, town_y: 0, town_max_x: 40, town_max_y: 40,
             is_chaos: false, is_devaste: false, day: 5, town_type: 'primary', has_external_api: null
         }));
@@ -354,7 +355,7 @@ describe('OverflowComponent', (): void => {
     });
 
     it('en mode "Ma ville", préremplit la défense d\'un citoyen avec la valeur reconstruite (baseDef + renfort/clôture), pas seulement baseDef', (): void => {
-        localStorage.setItem(TOWN_KEY, JSON.stringify({
+        setTown(Object.assign(new TownDetails(), {
             town_id: 1, town_x: 0, town_y: 0, town_max_x: 40, town_max_y: 40,
             is_chaos: false, is_devaste: false, day: 5, town_type: 'primary', has_external_api: null
         }));

@@ -1,6 +1,6 @@
 import { HttpErrorResponse, HttpEvent, HttpHandlerFn, HttpRequest } from '@angular/common/http';
 import { inject } from '@angular/core';
-import { catchError, Observable, retry, throwError } from 'rxjs';
+import { catchError, Observable, throwError } from 'rxjs';
 
 import { AuthenticationService } from '../../_abstract_model/services/authentication.service';
 import { BYPASS_ERROR } from './http-context-tokens';
@@ -32,9 +32,7 @@ function handleError(error: HttpErrorResponse, snackbar: SnackbarService, authen
         /** A client-side or network error occurred. Handle it accordingly. */
         console.error(`Erreur ${error.status} du client ou de réseau : \n`, error.error);
     } else if (error.status === 401) {
-        authentication_service.getMe(true).subscribe(() => {
-            return retry(1);
-        });
+        authentication_service.getMe().subscribe();
     } else {
         /**
          * The backend returned an unsuccessful response code.

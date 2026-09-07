@@ -6,7 +6,7 @@ import { of } from 'rxjs';
 
 import { AuthenticationService } from '../../_abstract_model/services/authentication.service';
 import { Me } from '../../_abstract_model/types/me.class';
-import { setUser } from '../../_core/utilities/localstorage.util';
+import { setTown, setUser } from '../../_core/utilities/localstorage.util';
 import { HeaderComponent } from './header.component';
 import { HeaderService } from './header.service';
 
@@ -32,6 +32,8 @@ describe('HeaderComponent', (): void => {
 
     beforeEach(async (): Promise<void> => {
         localStorage.clear();
+        setUser(null);
+        setTown(null);
         await TestBed.configureTestingModule({
             imports: [HeaderComponent],
             providers: [provideHttpClient(), provideHttpClientTesting()]
@@ -47,6 +49,8 @@ describe('HeaderComponent', (): void => {
 
     afterEach((): void => {
         localStorage.clear();
+        setUser(null);
+        setTown(null);
     });
 
     it('onResize updates is_gt_xs from the breakpoint observer', (): void => {

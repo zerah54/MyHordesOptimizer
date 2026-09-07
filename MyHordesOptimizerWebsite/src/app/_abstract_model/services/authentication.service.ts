@@ -2,13 +2,7 @@ import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, Subscriber } from 'rxjs';
 
-import {
-    getExternalAppId,
-    getTokenWithMeWithExpirationDate,
-    setTokenWithMeWithExpirationDate,
-    setTown,
-    setUser
-} from '../../_core/utilities/localstorage.util';
+import { getExternalAppId, setTokenWithMeWithExpirationDate, setTown, setUser } from '../../_core/utilities/localstorage.util';
 import { TokenWithMeDTO } from '../dto/token-with-me.dto';
 import { Me } from '../types/me.class';
 import { TokenWithMe } from '../types/token-with-me.class';
@@ -18,23 +12,17 @@ import { GlobalService } from './_global.service';
 @Injectable({ providedIn: 'root' })
 export class AuthenticationService extends GlobalService {
 
-    public getMe(force?: boolean): Observable<Me | null> {
+    public getMe(): Observable<Me | null> {
         return new Observable((sub: Subscriber<Me | null>) => {
             if (getExternalAppId()) {
-                const saved_me: Me | undefined = getTokenWithMeWithExpirationDate()?.simple_me;
-                if (saved_me && !force) {
-                    sub.next(saved_me);
-                } else {
-                    this.getToken().subscribe({
-                        next: (token: TokenWithMe) => {
-                            sub.next(token.simple_me);
-                        },
-                        error: (err: HttpErrorResponse) => {
-                            sub.error(err);
-                        }
-                    });
-                }
-
+                this.getToken().subscribe({
+                    next: (token: TokenWithMe) => {
+                        sub.next(token.simple_me);
+                    },
+                    error: (err: HttpErrorResponse) => {
+                        sub.error(err);
+                    }
+                });
             } else {
                 setUser(null);
                 setTown(null);

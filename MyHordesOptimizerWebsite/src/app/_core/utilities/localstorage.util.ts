@@ -1,7 +1,7 @@
 import { Moment } from 'moment';
 import moment from 'moment-timezone';
 
-import { BANK_KEY, EXTERNAL_APP_ID_KEY, ITEMS_KEY, RUINS_KEY, TOKEN_KEY, TOWN_KEY, USER_KEY } from '../../_abstract_model/const';
+import { BANK_KEY, EXTERNAL_APP_ID_KEY, ITEMS_KEY, RUINS_KEY, TOKEN_KEY } from '../../_abstract_model/const';
 import { BankInfoDTO } from '../../_abstract_model/dto/bank-info.dto';
 import { ItemDTO } from '../../_abstract_model/dto/item.dto';
 import { RuinDTO } from '../../_abstract_model/dto/ruin.dto';
@@ -15,13 +15,17 @@ import { TokenWithMe } from '../../_abstract_model/types/token-with-me.class';
 import { TownDetails } from '../../_abstract_model/types/town-details.class';
 import { isValidToken } from './token.util';
 
+/** État de session en mémoire : dérivé de la dernière réponse de /Authentication/Token, remis à
+ * zéro à chaque rechargement de page — jamais persisté, sur le même principe que `observed_town`
+ * ci-dessous. */
+let current_me: Me | null = null;
+
 export function setUser(user: Me | null): void {
-    localStorage.setItem(USER_KEY, user ? JSON.stringify(user) : '');
+    current_me = user;
 }
 
 export function getUser(): Me | null {
-    const user: string | null = localStorage.getItem(USER_KEY);
-    return user ? JSON.parse(user) : null;
+    return current_me;
 }
 
 export function getUserId(): number | null {
@@ -44,16 +48,17 @@ export function setObservedTown(town: TownDetails | null): void {
     observed_town = town;
 }
 
+let current_town: TownDetails | null = null;
+
 export function getTown(): TownDetails | null {
     if (observed_town) {
         return observed_town;
     }
-    const town: string | null = localStorage.getItem(TOWN_KEY);
-    return town ? JSON.parse(town) : null;
+    return current_town;
 }
 
 export function setTown(town: TownDetails | null): void {
-    localStorage.setItem(TOWN_KEY, town ? JSON.stringify(town) : '');
+    current_town = town;
 }
 
 export function getItemsWithExpirationDate(): Item[] {

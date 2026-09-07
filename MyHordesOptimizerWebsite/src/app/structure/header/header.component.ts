@@ -102,7 +102,7 @@ export class HeaderComponent implements OnInit {
     }
 
     private updateMe(): void {
-        this.authentication_api.getMe(true)
+        this.authentication_api.getMe()
             .pipe(takeUntilDestroyed(this.destroy_ref))
             .subscribe(() => {
                 this.me.set(getUser());

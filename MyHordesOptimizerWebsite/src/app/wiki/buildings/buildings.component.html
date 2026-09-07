@@ -82,11 +82,11 @@
             <ng-container matColumnDef="rarity">
                 <th *matHeaderCellDef mat-header-cell class="center">{{ headerOf('rarity') }}</th>
                 <td *matCellDef="let row; table: table" mat-cell class="center">
-                    @if (hard_mode && row.has_hard_mode) {
+                    @if (hard_mode && row.has_hard_mode && usefulPlanReadings(row) > 0) {
                         <mho-compact-stepper
                             (valueChange)="setPlansLus(row, $event)"
                             [icon]="stepperIcon(row)"
-                            [max]="2" [min]="0"
+                            [max]="usefulPlanReadings(row)" [min]="0"
                             [value]="plansLusFor(row)"
                             i18n-label
                             label="Plan">
