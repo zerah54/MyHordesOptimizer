@@ -205,6 +205,33 @@ export class BuildingsComponent implements OnInit {
     }
 
     /**
+     * Coche/décoche du tout-cocher de l'en-tête. Porte sur TOUS les chantiers disponibles dans
+     * le mode actif, repliés compris — la case ne dépend pas de ce qui est actuellement déplié à
+     * l'écran. Un chantier indisponible dans le mode courant (Disabled) ne compte pas : impossible
+     * à cocher, il ne doit pas empêcher la case de passer « tout coché ».
+     */
+    protected isAllSelected(): boolean {
+        const available: Building[] = this.availableBuildings();
+        return available.length > 0 && available.every((building: Building): boolean => this.isSelected(building));
+    }
+
+    /** État intermédiaire du tout-cocher : au moins un chantier coché, mais pas tous. */
+    protected isSomeSelected(): boolean {
+        return this.selected.size > 0 && !this.isAllSelected();
+    }
+
+    /** Tout coche si tout n'est pas déjà coché, sinon tout décoche. */
+    protected toggleSelectAll(): void {
+        if (this.isAllSelected()) {
+            this.selected.clear();
+        } else {
+            this.availableBuildings().forEach((building: Building): void => {
+                this.selected.add(building.id);
+            });
+        }
+    }
+
+    /**
      * Totaux du récapitulatif : PA et ressources cumulés sur les chantiers cochés, chacun à son
      * propre palier de plan sélectionné (comme la colonne Ressources par ligne). Ressources
      * fusionnées par objet, quantités additionnées.
@@ -255,6 +282,11 @@ export class BuildingsComponent implements OnInit {
     private deselectWithDescendants(building: Building): void {
         this.selected.delete(building.id);
         building.children.forEach((child: Building): void => this.deselectWithDescendants(child));
+    }
+
+    /** Chantiers disponibles dans le mode actif, tous confondus (repliés compris). */
+    private availableBuildings(): Building[] {
+        return Array.from(this.by_id.values()).filter((building: Building): boolean => this.availabilityStatus(building) !== 'Disabled');
     }
 
     /** Retire de la sélection les chantiers devenus indisponibles dans le mode actif. */

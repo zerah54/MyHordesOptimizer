@@ -16,9 +16,15 @@
 
             <!-- Sélection : coche un chantier pour le récapitulatif du bas de page. Cocher une
                  évolution coche aussi ses ancêtres (on ne peut pas la construire sans eux) ;
-                 décocher un chantier décoche aussi ses évolutions. -->
+                 décocher un chantier décoche aussi ses évolutions. Le tout-cocher de l'en-tête
+                 porte sur TOUS les chantiers disponibles dans le mode actif, repliés compris. -->
             <ng-container matColumnDef="select" sticky>
-                <th *matHeaderCellDef mat-header-cell class="center"></th>
+                <th *matHeaderCellDef mat-header-cell class="center">
+                    <span (click)="toggleSelectAll()" class="select-control"
+                          i18n-matTooltip matTooltip="Tout cocher / tout décocher">
+                        <mat-checkbox [checked]="isAllSelected()" [indeterminate]="isSomeSelected()" disableRipple></mat-checkbox>
+                    </span>
+                </th>
                 <td *matCellDef="let row; table: table" mat-cell class="center">
                     <span (click)="toggleSelected(row)" class="select-control">
                         <mat-checkbox [checked]="isSelected(row)" disableRipple></mat-checkbox>

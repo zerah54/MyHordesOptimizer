@@ -1,5 +1,6 @@
 import { DebugElement } from '@angular/core';
 import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
+import { MatCheckbox } from '@angular/material/checkbox';
 import { By } from '@angular/platform-browser';
 import moment from 'moment';
 import { of, Subject } from 'rxjs';
@@ -397,6 +398,115 @@ describe('BuildingsComponent', (): void => {
         expect(component['hasSelection']()).toBe(true);
     });
 
+    it('isAllSelected is false when nothing is selected', (): void => {
+        const a: Building = new Building();
+        a.id = 1;
+        a.parent_id = null;
+        a.children = [];
+        component['by_id'] = new Map([[1, a]]);
+
+        expect(component['isAllSelected']()).toBe(false);
+    });
+
+    it('isAllSelected is false with an empty referential (nothing to select)', (): void => {
+        component['by_id'] = new Map();
+
+        expect(component['isAllSelected']()).toBe(false);
+    });
+
+    it('isAllSelected is true once every available building is selected, collapsed ones included', (): void => {
+        const a: Building = new Building();
+        a.id = 1;
+        a.parent_id = null;
+        a.children = [];
+        const b: Building = new Building();
+        b.id = 2;
+        b.parent_id = null;
+        b.children = [];
+        component['by_id'] = new Map([[1, a], [2, b]]);
+
+        component['toggleSelected'](a);
+        expect(component['isAllSelected']()).toBe(false);
+
+        component['toggleSelected'](b);
+        expect(component['isAllSelected']()).toBe(true);
+    });
+
+    it('isAllSelected ignores buildings disabled in the current mode', (): void => {
+        component['hard_mode'] = true;
+        const available: Building = new Building();
+        available.id = 1;
+        available.parent_id = null;
+        available.children = [];
+        const disabled: Building = new Building();
+        disabled.id = 2;
+        disabled.parent_id = null;
+        disabled.children = [];
+        disabled.availability = { PANDE: 'Disabled' };
+        component['by_id'] = new Map([[1, available], [2, disabled]]);
+
+        component['toggleSelected'](available);
+
+        expect(component['isAllSelected']()).toBe(true);
+    });
+
+    it('isSomeSelected is true only strictly between none and all selected', (): void => {
+        const a: Building = new Building();
+        a.id = 1;
+        a.parent_id = null;
+        a.children = [];
+        const b: Building = new Building();
+        b.id = 2;
+        b.parent_id = null;
+        b.children = [];
+        component['by_id'] = new Map([[1, a], [2, b]]);
+
+        expect(component['isSomeSelected']()).toBe(false);
+
+        component['toggleSelected'](a);
+        expect(component['isSomeSelected']()).toBe(true);
+
+        component['toggleSelected'](b);
+        expect(component['isSomeSelected']()).toBe(false);
+    });
+
+    it('toggleSelectAll selects every available building, disabled-in-mode ones excluded, when not all are selected', (): void => {
+        component['hard_mode'] = true;
+        const available: Building = new Building();
+        available.id = 1;
+        available.parent_id = null;
+        available.children = [];
+        const disabled: Building = new Building();
+        disabled.id = 2;
+        disabled.parent_id = null;
+        disabled.children = [];
+        disabled.availability = { PANDE: 'Disabled' };
+        component['by_id'] = new Map([[1, available], [2, disabled]]);
+
+        component['toggleSelectAll']();
+
+        expect(component['isSelected'](available)).toBe(true);
+        expect(component['isSelected'](disabled)).toBe(false);
+    });
+
+    it('toggleSelectAll clears the selection when everything available is already selected', (): void => {
+        const a: Building = new Building();
+        a.id = 1;
+        a.parent_id = null;
+        a.children = [];
+        const b: Building = new Building();
+        b.id = 2;
+        b.parent_id = null;
+        b.children = [];
+        component['by_id'] = new Map([[1, a], [2, b]]);
+        component['toggleSelectAll']();
+        expect(component['isAllSelected']()).toBe(true);
+
+        component['toggleSelectAll']();
+
+        expect(component['hasSelection']()).toBe(false);
+    });
+
     it('pruneSelectionForAvailability removes selected buildings disabled in the current mode', (): void => {
         component['hard_mode'] = true;
         const kept: Building = new Building();
@@ -612,7 +722,7 @@ describe('BuildingsComponent - ngOnInit wiring', (): void => {
 
         expect(fixture.debugElement.query(By.css('.selection-summary'))).toBeNull();
 
-        const select_control: DebugElement = fixture.debugElement.query(By.css('.select-control'));
+        const select_control: DebugElement = fixture.debugElement.query(By.css('td .select-control'));
         select_control.nativeElement.click();
         fixture.detectChanges();
 
@@ -624,7 +734,7 @@ describe('BuildingsComponent - ngOnInit wiring', (): void => {
         buildings_subject.next([root_a]);
         fixture.detectChanges();
 
-        const select_control: DebugElement = fixture.debugElement.query(By.css('.select-control'));
+        const select_control: DebugElement = fixture.debugElement.query(By.css('td .select-control'));
         select_control.nativeElement.click();
         fixture.detectChanges();
 
@@ -645,7 +755,7 @@ describe('BuildingsComponent - ngOnInit wiring', (): void => {
         buildings_subject.next([root_a]);
         fixture.detectChanges();
 
-        const select_control: DebugElement = fixture.debugElement.query(By.css('.select-control'));
+        const select_control: DebugElement = fixture.debugElement.query(By.css('td .select-control'));
         select_control.nativeElement.click();
         fixture.detectChanges();
 
@@ -661,12 +771,49 @@ describe('BuildingsComponent - ngOnInit wiring', (): void => {
         buildings_subject.next([root_a]);
         fixture.detectChanges();
 
-        const select_control: DebugElement = fixture.debugElement.query(By.css('.select-control'));
+        const select_control: DebugElement = fixture.debugElement.query(By.css('td .select-control'));
         select_control.nativeElement.click();
         fixture.detectChanges();
         select_control.nativeElement.click();
         fixture.detectChanges();
 
         expect(fixture.debugElement.query(By.css('.selection-summary'))).toBeNull();
+    });
+
+    it('the header select-all checkbox selects every building, including ones collapsed out of view', (): void => {
+        const root_a: Building = makeBuilding(1, null, 'Chantier A', 1);
+        const child_a1: Building = makeBuilding(2, 1, 'Évolution A1', 1);
+        buildings_subject.next([root_a, child_a1]);
+        fixture.detectChanges();
+
+        component['toggle'](root_a);
+        fixture.detectChanges();
+        expect(component['rows']().map((b: Building): number => b.id)).toEqual([1]);
+
+        const header_select_control: DebugElement = fixture.debugElement.query(By.css('th .select-control'));
+        header_select_control.nativeElement.click();
+        fixture.detectChanges();
+
+        expect(component['isSelected'](root_a)).toBe(true);
+        expect(component['isSelected'](child_a1)).toBe(true);
+
+        const header_checkbox: DebugElement = fixture.debugElement.query(By.css('th')).query(By.directive(MatCheckbox));
+        expect((header_checkbox.componentInstance as MatCheckbox).checked).toBe(true);
+    });
+
+    it('the header select-all checkbox deselects everything when everything is already selected', (): void => {
+        const root_a: Building = makeBuilding(1, null, 'Chantier A', 1);
+        buildings_subject.next([root_a]);
+        fixture.detectChanges();
+
+        const header_select_control: DebugElement = fixture.debugElement.query(By.css('th .select-control'));
+        header_select_control.nativeElement.click();
+        fixture.detectChanges();
+        expect(component['isSelected'](root_a)).toBe(true);
+
+        header_select_control.nativeElement.click();
+        fixture.detectChanges();
+
+        expect(component['isSelected'](root_a)).toBe(false);
     });
 });
