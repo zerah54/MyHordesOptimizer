@@ -34,7 +34,7 @@ namespace MyHordesOptimizerApiIntegrationTests.ApplicationFactory
                 });
         }
 
-        protected override async ValueTask DisposeAsync()
+        public override async ValueTask DisposeAsync()
         {
             await _cleanupInterceptor.CleanupAsync(async () =>
             {
