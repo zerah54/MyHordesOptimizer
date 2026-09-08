@@ -72,7 +72,7 @@ namespace MyHordesOptimizerApiIntegrationTests.Services
             while (finalState.IsRunning && DateTime.UtcNow - started < TimeSpan.FromSeconds(5))
             {
                 await Task.Delay(50);
-                finalState = runner.GetState(userId);
+                finalState = runner.GetState(state.JobId, userId);
             }
             return finalState;
         }

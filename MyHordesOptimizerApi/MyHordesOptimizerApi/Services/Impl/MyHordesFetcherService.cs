@@ -711,11 +711,17 @@ namespace MyHordesOptimizerApi.Services.Impl
         /// </summary>
         private void QueuePictosImportInBackground(int userId)
         {
+            // Capturé ici, dans le scope requête où JwtActionFilter/GetToken l'a déjà posé : le nouveau
+            // scope de fond a son propre IUserInfoProvider vide, sinon GenerateUrl y enverrait un
+            // userkey= vide et MyHordes rejetterait l'appel en invalid_userkey (voir ExternalToolsUpdateJobRunner
+            // pour le même besoin de capture).
+            var userKey = UserInfoProvider.UserKey;
             _ = Task.Run(async () =>
             {
                 try
                 {
                     using var scope = ServiceScopeFactory.CreateScope();
+                    scope.ServiceProvider.GetRequiredService<IUserInfoProvider>().UserKey = userKey;
                     var fetcherService = scope.ServiceProvider.GetRequiredService<IMyHordesFetcherService>();
                     await fetcherService.ImportUserPictosAsync(userId);
                 }

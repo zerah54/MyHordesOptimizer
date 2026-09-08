@@ -52,10 +52,15 @@ namespace MyHordesOptimizerApi.Controllers
             {
                 return BadRequest($"{nameof(userKey)} cannot be empty");
             }
-            if (!_tokenRateLimiter.TryAcquire(userKey))
-            {
-                return StatusCode((int)HttpStatusCode.TooManyRequests);
-            }
+            // Retiré temporairement (incident prod 2026-09-09) : l'addon appelle cette route à chaque
+            // chargement de page, sans throttle client (voir token.ts, authenticateOnScriptLoad) — un
+            // quota par userKey de 10/60min y était systématiquement atteint en quelques minutes de jeu
+            // et bloquait tout le monde sans retour possible avant la fin de la fenêtre. À refaire
+            // partitionné autrement (IP, ou échecs seulement) avant de le remettre.
+            // if (!_tokenRateLimiter.TryAcquire(userKey))
+            // {
+            //     return StatusCode((int)HttpStatusCode.TooManyRequests);
+            // }
             UserInfoProvider.UserKey = userKey;
             SimpleMeDto simpleMe;
             try

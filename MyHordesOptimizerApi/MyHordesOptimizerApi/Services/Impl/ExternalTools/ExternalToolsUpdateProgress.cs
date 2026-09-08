@@ -29,13 +29,16 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
         private DateTime? _finishedAt;
         private AuthenticationResponseDto _renewedToken;
 
-        public ExternalToolsUpdateProgress(DateTime startedAt)
+        public ExternalToolsUpdateProgress(int userId, DateTime startedAt)
         {
             JobId = Guid.NewGuid();
+            UserId = userId;
             StartedAt = startedAt;
         }
 
         public Guid JobId { get; }
+
+        public int UserId { get; }
 
         public DateTime StartedAt { get; }
 

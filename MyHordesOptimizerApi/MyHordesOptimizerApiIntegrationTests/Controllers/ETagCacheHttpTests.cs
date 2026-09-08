@@ -1,6 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -25,34 +23,13 @@ namespace MyHordesOptimizerApiIntegrationTests.Controllers
     /// n'a pas de dépendance sur IMyHordesFetcherService), et IMyHordesFetcherService remplacé par un
     /// mock Moq pour prouver littéralement qu'un 304 n'appelle jamais le service métier.
     /// </summary>
-    public class ETagCacheHttpTests : IClassFixture<MyHordesOptimizerApplicationFactory>, IDisposable
+    public class ETagCacheHttpTests : IClassFixture<MyHordesOptimizerApplicationFactory>
     {
         private readonly MyHordesOptimizerApplicationFactory _factory;
-        private readonly List<(int MapId, int ItemId, int LastUpdateId)> _seeded = new();
 
         public ETagCacheHttpTests(MyHordesOptimizerApplicationFactory factory)
         {
             _factory = factory;
-        }
-
-        /// <summary>
-        /// SeedTownWithBank écrit dans la vraie base de dev (MHO_BETA, partagée) — sans ce nettoyage,
-        /// chaque exécution locale de ces tests y laisse une Town + un Item orphelins pour toujours.
-        /// Constaté le 2026-09-09 : 3601 items fantômes accumulés, label/description null, qui
-        /// plantaient wiki/items en dev (ItemsGroupByCategoryPipe.transform sur label null).
-        /// </summary>
-        public void Dispose()
-        {
-            using var scope = _factory.Services.CreateScope();
-            var context = scope.ServiceProvider.GetRequiredService<MhoContext>();
-            foreach (var (mapId, itemId, lastUpdateId) in _seeded)
-            {
-                context.TownBankItems.RemoveRange(context.TownBankItems.Where(tbi => tbi.IdTown == mapId));
-                context.Towns.RemoveRange(context.Towns.Where(t => t.IdTown == mapId));
-                context.Items.RemoveRange(context.Items.Where(i => i.IdItem == itemId));
-                context.LastUpdateInfos.RemoveRange(context.LastUpdateInfos.Where(l => l.IdLastUpdateInfo == lastUpdateId));
-            }
-            context.SaveChanges();
         }
 
         private string CreateBearerFor(int userId)
@@ -79,7 +56,6 @@ namespace MyHordesOptimizerApiIntegrationTests.Controllers
             context.SaveChanges();
             context.TownBankItems.Add(new TownBankItem { IdTown = mapId, IdItem = item.IdItem, IdLastUpdateInfo = lastUpdate.IdLastUpdateInfo, IsBroken = false, Count = 1 });
             context.SaveChanges();
-            _seeded.Add((mapId, item.IdItem, lastUpdate.IdLastUpdateInfo));
             return mapId;
         }
 

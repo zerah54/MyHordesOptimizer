@@ -138,17 +138,12 @@ namespace MyHordesOptimizerApi.Controllers
 
             var state = UpdateJobRunner.TryStart(userId, userKey, UserInfoProvider.UserName, UserInfoProvider.TownDetail, updateRequestDto,
                 MhoHeadersProvider.MhoOrigin, MhoHeadersProvider.MhoAddonVersion, HttpContext.TraceIdentifier);
-            if (state == null)
-            {
-                // Double clic ou second onglet : le client suit le lancement déjà en cours.
-                return Conflict(UpdateJobRunner.GetState(userId));
-            }
             return Accepted(state);
         }
 
         [HttpGet]
         [Route("Update/Status")]
-        public ActionResult<ExternalToolsUpdateJobState> GetUpdateExternalsToolsStatus(string userKey, int userId)
+        public ActionResult<ExternalToolsUpdateJobState> GetUpdateExternalsToolsStatus(string userKey, int userId, Guid jobId)
         {
             var forbidden = ValidateAuthenticatedUser(userId, userKey);
             if (forbidden != null)
@@ -160,7 +155,7 @@ namespace MyHordesOptimizerApi.Controllers
             {
                 return BadRequest($"{nameof(userKey)} cannot be empty");
             }
-            return Ok(UpdateJobRunner.GetState(userId));
+            return Ok(UpdateJobRunner.GetState(jobId, userId));
         }
 
         [HttpPost]

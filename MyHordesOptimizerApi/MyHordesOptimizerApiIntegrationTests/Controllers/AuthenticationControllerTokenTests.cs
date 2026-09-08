@@ -92,7 +92,7 @@ namespace MyHordesOptimizerApiIntegrationTests.Controllers
             body["token"]!["accessToken"]!.Value<string>().Should().NotBeNullOrEmpty();
         }
 
-        [Fact]
+        [Fact(Skip = "Rate limiter désactivé côté contrôleur (incident prod 2026-09-09, cf. AuthenticationController.GetToken) : partitionné par userKey, il bloquait tout appel légitime répété de l'addon (un appel /Token par chargement de page, non throttlé côté client). À réactiver une fois repartitionné (IP, ou échecs seulement).")]
         public async Task GetToken_DepasseLaLimiteParUserKey_Renvoie429()
         {
             var suffix = Guid.NewGuid().ToString("N").Substring(0, 8);
@@ -110,7 +110,7 @@ namespace MyHordesOptimizerApiIntegrationTests.Controllers
             third.StatusCode.Should().Be(HttpStatusCode.TooManyRequests);
         }
 
-        [Fact]
+        [Fact(Skip = "Rate limiter désactivé côté contrôleur (incident prod 2026-09-09) : voir GetToken_DepasseLaLimiteParUserKey_Renvoie429.")]
         public async Task RateLimit_PartageEntreGetEtPost_PourLeMemeUserKey()
         {
             var suffix = Guid.NewGuid().ToString("N").Substring(0, 8);
@@ -127,7 +127,7 @@ namespace MyHordesOptimizerApiIntegrationTests.Controllers
             thirdResponse.StatusCode.Should().Be(HttpStatusCode.TooManyRequests);
         }
 
-        [Fact]
+        [Fact(Skip = "Rate limiter désactivé côté contrôleur (incident prod 2026-09-09) : voir GetToken_DepasseLaLimiteParUserKey_Renvoie429.")]
         public async Task RateLimit_UserKeyDifferents_ChacunAvecSaPropreLimite()
         {
             var suffix = Guid.NewGuid().ToString("N").Substring(0, 8);

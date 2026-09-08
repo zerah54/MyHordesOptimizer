@@ -28,15 +28,17 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
             _logger = logger;
         }
 
-        public ExternalToolsUpdateJobState GetState(int userId)
+        public ExternalToolsUpdateJobState GetState(Guid jobId, int userId)
         {
-            return _store.GetState(userId);
+            return _store.GetState(jobId, userId);
         }
 
         /// <summary>
-        /// Démarre une mise à jour en tâche de fond. Retourne null si une mise à jour du même joueur
-        /// est déjà en cours. Les unités sont déclarées de façon synchrone : l'état retourné porte
-        /// donc déjà tous les outils sollicités, en « pending ».
+        /// Démarre une mise à jour en tâche de fond, identifiée par le JobId de l'état retourné.
+        /// Plusieurs lancements du même joueur peuvent tourner en parallèle (voir
+        /// <see cref="ExternalToolsUpdateJobStore"/>) : le client suit chacun via son propre JobId.
+        /// Les unités sont déclarées de façon synchrone : l'état retourné porte donc déjà tous les
+        /// outils sollicités, en « pending ».
         /// Le contexte utilisateur est capturé ici — le scope de fond n'a aucune requête HTTP, et
         /// le nom d'utilisateur, posé par JwtActionFilter, serait sinon perdu et écrit à null dans
         /// LastUpdateInfo. TownDetail (le claim JWT courant) est capturé pour la même raison : sans
@@ -46,11 +48,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
         public ExternalToolsUpdateJobState TryStart(int userId, string userKey, string userName, SimpleMeTownDetailDto townDetail,
             UpdateRequestDto request, string mhoOrigin, string mhoAddonVersion, string correlationId)
         {
-            var progress = _store.TryReserve(userId);
-            if (progress == null)
-            {
-                return null;
-            }
+            var progress = _store.Reserve(userId);
 
             try
             {

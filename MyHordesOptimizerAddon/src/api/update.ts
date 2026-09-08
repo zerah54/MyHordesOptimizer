@@ -564,9 +564,7 @@ export function updateExternalTools(on_progress?: (state: ExternalToolsUpdateJob
             }
         })
             .then((response: Response) => {
-                // 409 : une mise à jour du même joueur tourne déjà (second onglet, double clic).
-                // Le corps porte l'état de ce lancement, on le suit au lieu de le signaler.
-                if (response.status === 200 || response.status === 202 || response.status === 409) {
+                if (response.status === 200 || response.status === 202) {
                     return response.json();
                 }
                 return convertResponsePromiseToError(response);
@@ -619,7 +617,7 @@ async function followUpdateJob(initial_state: ExternalToolsUpdateJobState, on_pr
 
         let next_state: ExternalToolsUpdateJobState;
         try {
-            const response: Response = await fetcher(state.api_url + '/externaltools/update/status?userKey=' + state.external_app_id + '&userId=' + state.mh_user.id);
+            const response: Response = await fetcher(state.api_url + '/externaltools/update/status?userKey=' + state.external_app_id + '&userId=' + state.mh_user.id + '&jobId=' + current_state.jobId);
             if (response.status !== 200) {
                 continue;
             }

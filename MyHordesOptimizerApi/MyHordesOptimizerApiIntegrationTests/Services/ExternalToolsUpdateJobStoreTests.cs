@@ -15,53 +15,36 @@ namespace MyHordesOptimizerApiIntegrationTests.Services
         }
 
         [Fact]
-        public void TryReserve_SurUnJoueurLibre_RendUnLancement()
+        public void Reserve_SurUnJoueurLibre_RendUnLancement()
         {
-            NewStore().TryReserve(42).Should().NotBeNull();
+            NewStore().Reserve(42).Should().NotBeNull();
         }
 
         [Fact]
-        public void TryReserve_PendantQuUnLancementTourne_EstRefuse()
+        public void Reserve_PendantQuUnLancementTourne_EnDemarreUnSecondAvecUnJobIdDistinct()
         {
             var store = NewStore();
-            store.TryReserve(42);
+            var first = store.Reserve(42);
 
-            store.TryReserve(42).Should().BeNull();
+            var second = store.Reserve(42);
+
+            second.Should().NotBeNull();
+            second.JobId.Should().NotBe(first.JobId);
         }
 
         [Fact]
-        public void TryReserve_PourUnAutreJoueur_EstAccepte()
+        public void Reserve_PourUnAutreJoueur_EstAccepte()
         {
             var store = NewStore();
-            store.TryReserve(42);
+            store.Reserve(42);
 
-            store.TryReserve(43).Should().NotBeNull();
+            store.Reserve(43).Should().NotBeNull();
         }
 
         [Fact]
-        public void TryReserve_ApresLaFinDuPrecedent_EstAccepte()
+        public void GetState_SurUnJobIdInconnu_RendUnEtatVideEtNonEnCours()
         {
-            var store = NewStore();
-            var first = store.TryReserve(42);
-            first.Complete(_now);
-
-            store.TryReserve(42).Should().NotBeNull();
-        }
-
-        [Fact]
-        public void TryReserve_SurUnLancementBloqueDepuisPlusDeCinqMinutes_EstAccepte()
-        {
-            var store = NewStore();
-            store.TryReserve(42);
-            _now = _now.Add(ExternalToolsUpdateJobStore.StaleAfter).AddSeconds(1);
-
-            store.TryReserve(42).Should().NotBeNull();
-        }
-
-        [Fact]
-        public void GetState_SurUnJoueurInconnu_RendUnEtatVideEtNonEnCours()
-        {
-            var state = NewStore().GetState(42);
+            var state = NewStore().GetState(Guid.NewGuid(), 42);
 
             state.JobId.Should().Be(Guid.Empty);
             state.IsRunning.Should().BeFalse();
@@ -69,27 +52,59 @@ namespace MyHordesOptimizerApiIntegrationTests.Services
         }
 
         [Fact]
+        public void GetState_SurLeJobIdDunAutreJoueur_RendUnEtatVide()
+        {
+            var store = NewStore();
+            var progress = store.Reserve(42);
+
+            store.GetState(progress.JobId, 43).JobId.Should().Be(Guid.Empty);
+        }
+
+        [Fact]
         public void GetState_RendLEtatDuLancementEnCours()
         {
             var store = NewStore();
-            var progress = store.TryReserve(42);
+            var progress = store.Reserve(42);
             progress.Declare(ExternalToolId.FataMorgana, ExternalToolUpdateUnits.Map);
 
-            var state = store.GetState(42);
+            var state = store.GetState(progress.JobId, 42);
 
             state.JobId.Should().Be(progress.JobId);
             state.Tools.Should().ContainSingle();
         }
 
         [Fact]
+        public void GetState_SurDeuxLancementsDuMemeJoueur_SuitChacunIndependamment()
+        {
+            var store = NewStore();
+            var first = store.Reserve(42);
+            var second = store.Reserve(42);
+            first.Declare(ExternalToolId.MyHordesOptimizer, ExternalToolUpdateUnits.Digs);
+            second.Declare(ExternalToolId.GestHordes, ExternalToolUpdateUnits.Map);
+
+            store.GetState(first.JobId, 42).Tools.Should().ContainSingle(tool => tool.Tool == ExternalToolId.MyHordesOptimizer.ToContractId());
+            store.GetState(second.JobId, 42).Tools.Should().ContainSingle(tool => tool.Tool == ExternalToolId.GestHordes.ToContractId());
+        }
+
+        [Fact]
         public void GetState_ApresLaDureeDeConservation_OublieLeLancementTermine()
         {
             var store = NewStore();
-            var progress = store.TryReserve(42);
+            var progress = store.Reserve(42);
             progress.Complete(_now);
             _now = _now.Add(ExternalToolsUpdateJobStore.RetainFinishedFor).AddSeconds(1);
 
-            store.GetState(42).JobId.Should().Be(Guid.Empty);
+            store.GetState(progress.JobId, 42).JobId.Should().Be(Guid.Empty);
+        }
+
+        [Fact]
+        public void GetState_SurUnLancementBloqueDepuisPlusDeCinqMinutes_EstPurge()
+        {
+            var store = NewStore();
+            var progress = store.Reserve(42);
+            _now = _now.Add(ExternalToolsUpdateJobStore.StaleAfter).AddSeconds(1);
+
+            store.GetState(progress.JobId, 42).JobId.Should().Be(Guid.Empty);
         }
     }
 }
