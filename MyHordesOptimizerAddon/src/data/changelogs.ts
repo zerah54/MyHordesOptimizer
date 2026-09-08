@@ -1,4 +1,8 @@
 export const changelogs: Record<string, string> = {
+    '1.1.60': `
+        [Amélioration] Dans l'effet catapulte affiché en tooltip, un objet qui disparaît sans laisser de trace montre désormais sa propre icône en très faible opacité, au lieu de ne rien afficher
+        [Amélioration] Performances et fiabilité globales du serveur (mise en cache, compression, sécurisation des échanges)
+        `,
     '1.1.59': `
         [Nouveauté] Les tooltips avancés affichent désormais l'effet catapulte réel des objets (objet ou transformation obtenue à l'impact, zombies tués ou répulsion, zone d'effet), en remplacement de l'ancien indicateur "objet fragile"
 

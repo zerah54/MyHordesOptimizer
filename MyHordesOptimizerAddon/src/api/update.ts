@@ -1,5 +1,6 @@
-import { hordes_img_url, lang } from '../config/constants';
+import { hordes_img_url, lang, mho_token_key } from '../config/constants';
 import { state } from '../state';
+import type { ApiToken } from '../types';
 import { detectDailyActionDone } from '../utils/daily-action-detection';
 import { fetcher } from '../utils/fetch';
 import { getI18N } from '../utils/i18n';
@@ -8,6 +9,7 @@ import { fixMhCompiledImg } from '../utils/misc';
 import { addError, normalizeString } from '../utils/notifications';
 import { pageIsAmelio, pageIsDesert, pageIsDoors, pageIsHouse } from '../utils/page';
 import { getCurrentPosition } from '../utils/position';
+import { setStorageItem } from '../utils/storage';
 import { convertResponsePromiseToError } from '../utils/version';
 import { saveDailyAction } from './daily-actions';
 import { getMap } from './map';
@@ -28,6 +30,23 @@ export interface ExternalToolsUpdateJobState {
     jobId: string;
     isRunning: boolean;
     tools: ExternalToolUpdateState[];
+    renewedToken?: ApiToken;
+}
+
+/**
+ * Range le token renouvelé par le job dans l'état partagé et le persiste, comme le fait
+ * déjà `requestToken` (`api/token.ts`). Le job peut détecter une dérive de ville à tout
+ * moment de son exécution, pas seulement à la fin : appelée à la fois sur la réponse
+ * initiale et sur chaque état reçu par le polling.
+ */
+function applyRenewedTokenIfPresent(job_state: ExternalToolsUpdateJobState): void {
+    if (!job_state.renewedToken?.simpleMe) {
+        return;
+    }
+    state.token = job_state.renewedToken;
+    state.mh_user = job_state.renewedToken.simpleMe;
+    /** `mh_user` (donnée de jeu) n'est plus persisté, contrairement au token (credential) — cf. bootstrap.ts */
+    setStorageItem(mho_token_key, state.token);
 }
 
 /** Identifiant rendu par le serveur quand aucun lancement n'est connu pour ce joueur */
@@ -553,6 +572,7 @@ export function updateExternalTools(on_progress?: (state: ExternalToolsUpdateJob
                 return convertResponsePromiseToError(response);
             })
             .then((initial_state: ExternalToolsUpdateJobState) => {
+                applyRenewedTokenIfPresent(initial_state);
                 if (on_progress) {
                     on_progress(initial_state);
                 }
@@ -617,6 +637,7 @@ async function followUpdateJob(initial_state: ExternalToolsUpdateJobState, on_pr
         }
 
         current_state = next_state;
+        applyRenewedTokenIfPresent(current_state);
         if (on_progress) {
             on_progress(current_state);
         }

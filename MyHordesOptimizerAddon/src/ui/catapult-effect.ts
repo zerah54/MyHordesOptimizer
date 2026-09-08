@@ -7,18 +7,21 @@ interface ResultItem {
     img: string;
     title: string;
     broken: boolean;
+    vanished: boolean;
 }
 
-/** Icône de l'objet qui atterrit après l'impact : lui-même (cassé ou non) ou l'objet obtenu par transformation. `null` si rien ne reste. */
+/** Icône de l'objet qui atterrit après l'impact : lui-même (cassé ou non), l'objet obtenu par transformation, ou lui-même en transparence s'il disparaît sans laisser de trace. */
 function resolveResultItem(effect: MhoCatapultEffect, item: MhoItem): ResultItem | null {
-    if (effect.fate === 'Destroyed') return null;
+    if (effect.fate === 'Destroyed') {
+        return { img: item.img, title: getI18N(item.label) ?? '', broken: false, vanished: true };
+    }
     if (effect.fate === 'Transformed' && effect.morphTarget) {
-        return { img: effect.morphTarget.img, title: getI18N(effect.morphTarget.label) ?? '', broken: false };
+        return { img: effect.morphTarget.img, title: getI18N(effect.morphTarget.label) ?? '', broken: false, vanished: false };
     }
     if (effect.fate === 'Broken') {
-        return { img: item.imgBroken ?? item.img, title: getI18N(item.label) ?? '', broken: true };
+        return { img: item.imgBroken ?? item.img, title: getI18N(item.label) ?? '', broken: true, vanished: false };
     }
-    return { img: item.img, title: getI18N(item.label) ?? '', broken: false };
+    return { img: item.img, title: getI18N(item.label) ?? '', broken: false, vanished: false };
 }
 
 /**
@@ -55,6 +58,9 @@ export function getCatapultEffectElement(item: MhoItem): HTMLDivElement | null {
         img.title = result_item.title;
         if (result_item.broken) {
             img.style.border = '1px dashed red';
+        }
+        if (result_item.vanished) {
+            img.style.opacity = '0.2';
         }
         badge.appendChild(img);
         row.appendChild(badge);

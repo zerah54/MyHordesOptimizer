@@ -38,7 +38,6 @@ const local_storage_prefix: string = is_mh_local ? 'local_' : '';
 
 /** Les paramètres d'affichage restent communs : les retrouver identiques en local est un confort, pas un risque */
 export const mho_parameters_key = 'MHO_parameters';
-export const mh_user_key = `MHO_${local_storage_prefix}mh_user`;
 export const mho_map_key = `MHO_${local_storage_prefix}map`;
 export const mho_token_key = `MHO_${local_storage_prefix}token`;
 export const mho_blacklist_key = 'MHO_blacklist';

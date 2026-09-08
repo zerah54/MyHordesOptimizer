@@ -46,6 +46,10 @@ export function addItemToWishlist(item) {
             })
             .then((response) => {
                 item.wishListCount = 1;
+                // Rafraîchit state.wishlist (source suivie par le rendu de l'onglet "items" et par les
+                // infobulles) : sans cela, un ajout fait via un objet différent de celui déjà tracké
+                // (ex. bouton de l'onglet banque vs onglet items) laisse ces consommateurs périmés.
+                getWishlist();
                 resolve(item);
                 addSuccess(getI18N(api_texts.add_to_wishlist_success));
             })

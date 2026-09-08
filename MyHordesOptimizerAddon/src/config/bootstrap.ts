@@ -1,9 +1,10 @@
 import { state } from '../state';
 import { getStorageItem } from '../utils/storage';
-import { gm_mh_external_app_id_key, is_mh_beta, is_mh_local, mh_user_key, mho_parameters_key, mho_token_key } from './constants';
+import { gm_mh_external_app_id_key, is_mh_beta, is_mh_local, mho_parameters_key, mho_token_key } from './constants';
 
 // Runs once at script load: resolves environment URLs and restores
-// persisted state (parameters, cached user/token) from storage.
+// persisted state (parameters, token, app id) from storage. `mh_user` (game
+// data, not a credential) is deliberately excluded — see comment below.
 // La promesse doit être attendue avant toute initialisation : de nombreuses
 // fonctions déréférencent directement `state.mho_parameters`.
 export async function bootstrap(): Promise<void> {
@@ -28,15 +29,18 @@ export async function bootstrap(): Promise<void> {
     // Valeur par défaut immédiate : le reste du script suppose l'objet toujours défini
     state.mho_parameters = {};
 
-    const [params, user, app_id, saved_token] = await Promise.all([
+    const [params, app_id, saved_token] = await Promise.all([
         getStorageItem(mho_parameters_key),
-        getStorageItem(mh_user_key),
         getStorageItem(gm_mh_external_app_id_key),
         getStorageItem(mho_token_key)
     ]);
 
     state.mho_parameters = params || {};
-    state.mh_user = user;
+    /**
+     * `mh_user` (identité + ville) est une donnée de jeu, pas un credential : elle n'est plus
+     * persistée (cf. `api/token.ts`/`api/update.ts`) et reste `undefined` ici. Elle n'est
+     * peuplée que par un `getToken()` frais, après résolution — jamais depuis le stockage.
+     */
     state.external_app_id = app_id;
     state.token = saved_token;
 }

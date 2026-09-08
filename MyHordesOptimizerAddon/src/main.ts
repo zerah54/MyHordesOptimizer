@@ -1,6 +1,6 @@
 import { getApiKey } from './api/api-key';
 import { getParameters } from './api/parameters';
-import { getToken } from './api/token';
+import { authenticateOnScriptLoad, getToken } from './api/token';
 import { bootstrap } from './config/bootstrap';
 import {
     big_broth_hordes_url,
@@ -300,7 +300,7 @@ import { isNewVersion, toggleNewChangelog } from './utils/version';
         try {
             await getParameters();
             await getApiKey();
-            await getToken();
+            await authenticateOnScriptLoad();
         } catch (error) {
             console.error('MHO - initialisation connectée en échec', error);
         }

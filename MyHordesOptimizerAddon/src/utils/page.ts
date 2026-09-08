@@ -164,6 +164,9 @@ export function shouldRefreshMe(): boolean {
     const game_clock = document.querySelector('.game-clock[data-town-id]');
     if (!game_clock) return false;
 
+    /** Rien à comparer sans donnée utilisateur en cache (pas encore de getToken() résolu) : par sécurité, on force le rafraîchissement */
+    if (!state.mh_user) return true;
+
     const current_town_id = game_clock?.getAttribute('data-town-id');
     if (isNaN(current_town_id as any) && +state.mh_user.townDetails?.townId === 0) return false;
     if (+current_town_id !== +(state.mh_user.townDetails?.townId ?? 0)) return true;

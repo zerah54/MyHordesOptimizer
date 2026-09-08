@@ -1,4 +1,4 @@
-import { getToken } from '../api/token';
+import { getToken, isTokenRequestInFlight } from '../api/token';
 import { state } from '../state';
 import { displayAntiAbuseCounter } from '../ui/anti-abuse';
 import { freezeAvatarsAnimations } from '../ui/avatars';
@@ -106,21 +106,32 @@ export function initOptionsWithoutLoginNeeded(): void {
 }
 
 
-export function updateFetchRequestOptions(options?: any) {
+/**
+ * `isValidToken()` redevient faux à chaque changement de jour/ville (`shouldRefreshMe()`), pas
+ * seulement à l'expiration du JWT : un cas routinier, pas un cas limite. Il faut donc attendre
+ * `getToken()` avant de construire les headers, sinon `fetch()` capture un objet `headers` sans
+ * `Authorization` avant que la promesse de renouvellement ne se résolve.
+ *
+ * `isTokenRequestInFlight()` évite un blocage circulaire : `getToken()` charge lui-même objets/
+ * liste de courses/carte/ruines une fois le token reçu (`tokenReceived()`, `api/token.ts`), et ces
+ * chargements passent par `fetcher()`. Si `isValidToken()` reste faux juste après ce renouvellement
+ * (horloge du jeu incomplète, cf. `shouldRefreshMe()`), un appel imbriqué qui attendrait
+ * `getToken()` réattendrait la même promesse en cours — qui ne se résout qu'une fois ces
+ * chargements terminés. Un appel imbriqué part donc sans Bearer plutôt que de bloquer
+ * indéfiniment ; c'est déjà le comportement observé avant ce correctif pour tout appel.
+ */
+export async function updateFetchRequestOptions(options?: any): Promise<any> {
     const update = { ...options };
     update.headers = {
         ...update.headers,
         'Mho-Origin': 'mho-addon',
         'Mho-Addon-Version': getScriptInfo().version,
     };
+    if (!isValidToken() && !isTokenRequestInFlight()) {
+        await getToken();
+    }
     if (isValidToken()) {
         update.headers.Authorization = `Bearer ${state.token.token.accessToken?.toString()}`;
-    } else {
-        getToken().then(() => {
-            if (isValidToken()) {
-                update.headers.Authorization = `Bearer ${state.token.token.accessToken?.toString()}`;
-            }
-        });
     }
     return update;
 }
@@ -137,8 +148,8 @@ export function updateFetchRequestOptionsWithoutBearer(options?: any) {
 }
 
 
-export function fetcher(url: string, options?: any) {
-    return fetch(url, updateFetchRequestOptions(options));
+export async function fetcher(url: string, options?: any): Promise<Response> {
+    return fetch(url, await updateFetchRequestOptions(options));
 }
 
 

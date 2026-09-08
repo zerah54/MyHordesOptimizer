@@ -95,22 +95,26 @@ export function displayCellDetailsOnPage() {
      */
     watchMap('cell-details', displayCellDetailsOnPage);
 
-    let cell = getCellDetailsByPosition();
+    /**
+     * `getMap()` n'a pas de garde de cache : sans réappel régulier, les cases affichées
+     * restent celles du tout premier chargement pour le reste de la session (nos
+     * déplacements, les fouilles/explorations d'autrui). On la recharge donc à chaque
+     * rendu de la carte plutôt qu'une seule fois, sur le même modèle que
+     * getCitizens()/getBank(). `is_loading_map` ne borne que les rendus concurrents
+     * pendant un chargement en cours, pas les rendus successifs dans le temps — le
+     * rendu courant s'affiche avec les données déjà en main, et se rejoue une fois
+     * la réponse arrivée.
+     */
+    if (!is_loading_map && state.mh_user?.townDetails?.townId) {
+        is_loading_map = true;
+        getMap()
+            .then(() => displayCellDetailsOnPage())
+            .catch(() => undefined)
+            .finally(() => is_loading_map = false);
+    }
 
+    let cell = getCellDetailsByPosition();
     if (!cell) {
-        /**
-         * La carte n'est chargée qu'au moment de la récupération du token, et
-         * uniquement si l'on se trouve déjà dans le désert : en navigation SPA
-         * depuis la ville elle manque. On la charge alors à la demande.
-         */
-        if (!state.map?.cells?.length && !is_loading_map) {
-            is_loading_map = true;
-            getMap()
-                .then(() => displayCellDetailsOnPage())
-                .catch(() => undefined)
-                .finally(() => is_loading_map = false);
-            return;
-        }
         return;
     }
 

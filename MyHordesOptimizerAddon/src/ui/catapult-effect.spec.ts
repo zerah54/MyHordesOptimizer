@@ -61,11 +61,14 @@ describe('getCatapultEffectElement', () => {
         expect(result_badge.style.border).toBe('1px dashed red');
     });
 
-    it('n\'affiche aucun objet obtenu pour un objet détruit', () => {
+    it('affiche l\'icône de l\'objet en très faible opacité pour un objet détruit (disparu sans trace)', () => {
         const effect: MhoCatapultEffect = { fate: 'Destroyed' };
         const el = getCatapultEffectElement(baseItem({ catapultEffect: effect }));
 
-        expect(el!.querySelector('.item')).toBeNull();
+        const result_badge = el!.querySelector('.item img') as HTMLImageElement;
+        expect(result_badge).not.toBeNull();
+        expect(result_badge.src).toContain('item/item_wood2.gif');
+        expect(result_badge.style.opacity).toBe('0.2');
     });
 
     it('affiche l\'icône zombie avec la plage de kills, et le rayon à côté', () => {

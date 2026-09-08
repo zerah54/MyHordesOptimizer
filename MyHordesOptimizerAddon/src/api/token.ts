@@ -1,4 +1,4 @@
-import { mh_user_key, mho_token_key } from '../config/constants';
+import { mho_token_key } from '../config/constants';
 import { state } from '../state';
 import { fetcherWithoutBearer } from '../utils/fetch';
 import { isValidToken } from '../utils/misc';
@@ -46,6 +46,28 @@ export function getToken(force?: boolean, stop?: boolean): Promise<void> {
         });
 
     return in_flight_token_promise;
+}
+
+/**
+ * Authentification au chargement du script (spec cycle de vie de session §3) : appel
+ * systématique, jamais throttlé par le token en cache — contrairement au renouvellement
+ * opportuniste de `fetcher()` (`utils/fetch.ts`, `getToken()` non forcé). Extraite hors de
+ * `main.ts` (IIFE top-level, non testable directement) pour que ce câblage précis reste
+ * protégé par un test unitaire (`token.spec.ts`).
+ */
+export function authenticateOnScriptLoad(): Promise<void> {
+    return getToken(true);
+}
+
+/**
+ * True tant qu'une authentification est en cours. `fetcher()` (`utils/fetch.ts`) s'en sert pour
+ * ne pas attendre `getToken()` quand l'appel vient d'un chargement imbriqué déclenché par
+ * `tokenReceived()` (`getItems`/`getWishlist`/`getRuins`/`getMap`, tous passent par `fetcher()`) :
+ * `in_flight_token_promise` ne se résout qu'une fois ces chargements terminés
+ * (`settleAfterTokenReceived`), donc l'attendre depuis l'un d'eux créerait un blocage circulaire.
+ */
+export function isTokenRequestInFlight(): boolean {
+    return !!in_flight_token_promise;
 }
 
 /**
@@ -105,7 +127,7 @@ function requestToken(force?: boolean, stop?: boolean): Promise<void> {
                         if (!state.mh_user || state.mh_user.id === 0 && state.mh_user.townDetails?.townId === 0) {
                             (state.mh_user as any) = '';
                         }
-                        setStorageItem(mh_user_key, state.mh_user);
+                        /** `mh_user` (donnée de jeu) n'est plus persisté, contrairement au token (credential) — cf. bootstrap.ts */
                         setStorageItem(mho_token_key, state.token);
 
                         settleAfterTokenReceived(tokenReceived(), resolve);

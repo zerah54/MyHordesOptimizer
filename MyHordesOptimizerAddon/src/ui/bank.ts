@@ -15,6 +15,16 @@ export function displayBank(tab_id) {
 }
 
 /**
+ * Un item du catalogue ("items") est déjà dans la liste de courses si `state.wishlist` le
+ * référence par id. `state.wishlist` est rafraîchi à chaque ajout (`addItemToWishlist`), au
+ * contraire de `item.wishListCount` sur `state.items`, qui ne l'est qu'au chargement complet
+ * du token — d'où l'usage de cette source pour l'onglet catalogue plutôt que ce champ figé.
+ */
+function isAlreadyInWishlist(item): boolean {
+    return !!state.wishlist?.wishList?.some((wishlist_item) => wishlist_item.item.id === item.id);
+}
+
+/**
  * Affiche la liste des objets
  * @param filtered_items
  * @param {string} tab_id l'onglet dans lequel on se trouve
@@ -47,7 +57,9 @@ export function displayItems(filtered_items, tab_id) {
         item_title_container.setAttribute('style', 'flex: 1; cursor: pointer;');
         item_title_and_add_container.appendChild(item_title_container);
 
-        if ((tab_id === 'bank' || tab_id === 'items') && item.wishListCount === 0 && state.mh_user.townDetails?.townId) {
+        const item_already_in_wishlist: boolean = tab_id === 'items' ? isAlreadyInWishlist(item) : item.wishListCount > 0;
+
+        if ((tab_id === 'bank' || tab_id === 'items') && !item_already_in_wishlist && state.mh_user.townDetails?.townId) {
             const item_add_to_wishlist = document.createElement('div');
             item_add_to_wishlist.classList.add('add-to-wishlist');
             item_title_and_add_container.appendChild(item_add_to_wishlist);

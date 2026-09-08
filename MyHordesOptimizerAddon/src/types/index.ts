@@ -107,6 +107,7 @@ export interface MhoRecipe {
 // ---------------------------------------------------------------------
 export interface ApiToken {
     token?: { accessToken?: string; validTo?: string };
+    simpleMe?: ApiMhUser;
 
     [key: string]: any;
 }
