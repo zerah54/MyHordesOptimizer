@@ -112,12 +112,24 @@
         }
     }
 
+    // Hors de .table-scroll (voir le gabarit) : occupe toute la largeur de la carte, ne défile
+    // pas avec le tableau, et n'est jamais contraint par une largeur de colonne.
     .selection-summary {
         display: flex;
         flex-wrap: wrap;
         align-items: center;
+        flex: 0 0 auto;
         gap: 1.5em;
-        padding: 0.5em 1em;
+        padding: 0.6em 1em;
+        border-top: 1px solid var(--mat-sys-outline-variant);
+        background: var(--mat-sys-surface-container-high);
+
+        // Contrairement aux ressources d'une ligne du tableau, pas de hauteur de ligne à
+        // préserver ici : autant les laisser passer à la ligne plutôt que dépasser la carte.
+        .resources {
+            flex-wrap: wrap;
+            white-space: normal;
+        }
     }
 
     .resources {

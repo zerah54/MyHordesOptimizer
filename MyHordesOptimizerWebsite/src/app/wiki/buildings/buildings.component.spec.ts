@@ -605,23 +605,35 @@ describe('BuildingsComponent - ngOnInit wiring', (): void => {
         expect(rarity_cell.query(By.css('mho-compact-stepper'))).toBeNull();
     });
 
-    it('the selection footer is hidden until at least one chantier is selected', (): void => {
+    it('the selection summary is absent from the DOM until at least one chantier is selected', (): void => {
         const root_a: Building = makeBuilding(1, null, 'Chantier A', 1);
         buildings_subject.next([root_a]);
         fixture.detectChanges();
 
-        let footer_row: DebugElement = fixture.debugElement.query(By.css('tr[mat-footer-row]'));
-        expect(footer_row.nativeElement.hidden).toBe(true);
+        expect(fixture.debugElement.query(By.css('.selection-summary'))).toBeNull();
 
         const select_control: DebugElement = fixture.debugElement.query(By.css('.select-control'));
         select_control.nativeElement.click();
         fixture.detectChanges();
 
-        footer_row = fixture.debugElement.query(By.css('tr[mat-footer-row]'));
-        expect(footer_row.nativeElement.hidden).toBe(false);
+        expect(fixture.debugElement.query(By.css('.selection-summary'))).not.toBeNull();
     });
 
-    it('the selection footer shows the count, total AP and merged resources for selected chantiers', (): void => {
+    it('the selection summary is not nested inside the table, so it never inherits a column width', (): void => {
+        const root_a: Building = makeBuilding(1, null, 'Chantier A', 1);
+        buildings_subject.next([root_a]);
+        fixture.detectChanges();
+
+        const select_control: DebugElement = fixture.debugElement.query(By.css('.select-control'));
+        select_control.nativeElement.click();
+        fixture.detectChanges();
+
+        const summary: DebugElement = fixture.debugElement.query(By.css('.selection-summary'));
+        expect(summary.query(By.css('table'))).toBeNull();
+        expect(summary.nativeElement.closest('table')).toBeNull();
+    });
+
+    it('the selection summary shows the count, total AP and merged resources for selected chantiers', (): void => {
         const root_a: Building = makeBuilding(1, null, 'Chantier A', 1);
         root_a.pa = 42;
         const metal: BuildingResource = new BuildingResource();
@@ -637,14 +649,14 @@ describe('BuildingsComponent - ngOnInit wiring', (): void => {
         select_control.nativeElement.click();
         fixture.detectChanges();
 
-        const footer_cell: DebugElement = fixture.debugElement.query(By.css('td[mat-footer-cell]'));
-        expect(footer_cell.nativeElement.textContent).toContain('1');
-        expect(footer_cell.nativeElement.textContent).toContain('42');
-        expect(footer_cell.nativeElement.textContent).toContain('7');
-        expect(footer_cell.query(By.css('.resources img'))?.nativeElement.getAttribute('src')).toContain('metal.gif');
+        const summary: DebugElement = fixture.debugElement.query(By.css('.selection-summary'));
+        expect(summary.nativeElement.textContent).toContain('1');
+        expect(summary.nativeElement.textContent).toContain('42');
+        expect(summary.nativeElement.textContent).toContain('7');
+        expect(summary.query(By.css('.resources img'))?.nativeElement.getAttribute('src')).toContain('metal.gif');
     });
 
-    it('unchecking the only selected chantier hides the footer again', (): void => {
+    it('unchecking the only selected chantier removes the selection summary again', (): void => {
         const root_a: Building = makeBuilding(1, null, 'Chantier A', 1);
         buildings_subject.next([root_a]);
         fixture.detectChanges();
@@ -655,7 +667,6 @@ describe('BuildingsComponent - ngOnInit wiring', (): void => {
         select_control.nativeElement.click();
         fixture.detectChanges();
 
-        const footer_row: DebugElement = fixture.debugElement.query(By.css('tr[mat-footer-row]'));
-        expect(footer_row.nativeElement.hidden).toBe(true);
+        expect(fixture.debugElement.query(By.css('.selection-summary'))).toBeNull();
     });
 });
