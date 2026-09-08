@@ -11,6 +11,7 @@ using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Map;
 using MyHordesOptimizerApi.Providers.Interfaces;
 using MyHordesOptimizerApi.Services.Caching;
 using MyHordesOptimizerApi.Services.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Buildings;
@@ -23,6 +24,10 @@ namespace MyHordesOptimizerApi.Controllers
     {
         private readonly IMyHordesFetcherService _myHordesFetcherService;
         private readonly IMemoryCache _cache;
+
+        // Filet de sécurité en plus de l'invalidation manuelle (import/admin) : si un snapshot
+        // mauvais est mis en cache, il s'auto-corrige sans attendre un réimport ou un redémarrage.
+        private static readonly TimeSpan ItemsCacheTtl = TimeSpan.FromHours(4);
 
         public FetcherController(ILogger<FetcherController> logger,
             IMyHordesFetcherService myHordesFetcherService,
@@ -42,8 +47,11 @@ namespace MyHordesOptimizerApi.Controllers
             // mélange le catalogue avec la banque/wishlist de la ville, volatiles.
             if (!townId.HasValue)
             {
-                return _cache.GetOrCreate(ReferentialCacheKeys.Items,
-                    _ => _myHordesFetcherService.GetItems(null).ToList());
+                return _cache.GetOrCreate(ReferentialCacheKeys.Items, entry =>
+                {
+                    entry.SetAbsoluteExpiration(ItemsCacheTtl);
+                    return _myHordesFetcherService.GetItems(null).ToList();
+                });
             }
 
             var items = _myHordesFetcherService.GetItems(townId).ToList();

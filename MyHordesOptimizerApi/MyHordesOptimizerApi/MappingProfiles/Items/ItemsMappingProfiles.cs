@@ -113,10 +113,10 @@ namespace MyHordesOptimizerApi.MappingProfiles.Items
                 .ForMember(dest => dest.BagItems, opt => opt.Ignore())
                 .ForMember(dest => dest.Deco, opt => opt.MapFrom(src => src.Value.Deco))
                 .ForMember(dest => dest.DefaultWishlistItems, opt => opt.Ignore())
-                .ForMember(dest => dest.DescriptionDe, opt => opt.MapFrom(src => src.Value.Description["de"]))
-                .ForMember(dest => dest.DescriptionEn, opt => opt.MapFrom(src => src.Value.Description["en"]))
-                .ForMember(dest => dest.DescriptionEs, opt => opt.MapFrom(src => src.Value.Description["es"]))
-                .ForMember(dest => dest.DescriptionFr, opt => opt.MapFrom(src => src.Value.Description["fr"]))
+                .ForMember(dest => dest.DescriptionDe, opt => opt.MapFrom(src => LabelOrGerman(src.Value.Description, "de")))
+                .ForMember(dest => dest.DescriptionEn, opt => opt.MapFrom(src => LabelOrGerman(src.Value.Description, "en")))
+                .ForMember(dest => dest.DescriptionEs, opt => opt.MapFrom(src => LabelOrGerman(src.Value.Description, "es")))
+                .ForMember(dest => dest.DescriptionFr, opt => opt.MapFrom(src => LabelOrGerman(src.Value.Description, "fr")))
                 .ForMember(dest => dest.DropRateNotPraf, opt => opt.Ignore())
                 .ForMember(dest => dest.DropRatePraf, opt => opt.Ignore())
                 .ForMember(dest => dest.Guard, opt => opt.MapFrom(src => src.Value.Guard))
@@ -139,10 +139,10 @@ namespace MyHordesOptimizerApi.MappingProfiles.Items
                 // de détail, et garde l'icône normale dans ses listes.
                 .ForMember(dest => dest.ImgBroken, opt => opt.MapFrom(src => SansEmpreinte(src.Value.ImgBroken)))
                 .ForMember(dest => dest.IsHeaver, opt => opt.MapFrom(src => src.Value.Heavy))
-                .ForMember(dest => dest.LabelDe, opt => opt.MapFrom(src => src.Value.Label["de"]))
-                .ForMember(dest => dest.LabelEn, opt => opt.MapFrom(src => src.Value.Label["en"]))
-                .ForMember(dest => dest.LabelEs, opt => opt.MapFrom(src => src.Value.Label["es"]))
-                .ForMember(dest => dest.LabelFr, opt => opt.MapFrom(src => src.Value.Label["fr"]))
+                .ForMember(dest => dest.LabelDe, opt => opt.MapFrom(src => LabelOrGerman(src.Value.Label, "de")))
+                .ForMember(dest => dest.LabelEn, opt => opt.MapFrom(src => LabelOrGerman(src.Value.Label, "en")))
+                .ForMember(dest => dest.LabelEs, opt => opt.MapFrom(src => LabelOrGerman(src.Value.Label, "es")))
+                .ForMember(dest => dest.LabelFr, opt => opt.MapFrom(src => LabelOrGerman(src.Value.Label, "fr")))
                 .ForMember(dest => dest.MapCellItems, opt => opt.Ignore())
                 .ForMember(dest => dest.PropertyNames, opt => opt.Ignore())
                 .ForMember(dest => dest.RecipeItemComponents, opt => opt.Ignore())
@@ -165,6 +165,18 @@ namespace MyHordesOptimizerApi.MappingProfiles.Items
         private static string SansEmpreinte(string chemin)
         {
             return chemin == null ? null : Regex.Replace(chemin, @"(.*)\.(.*)\.(.*)", "$1.$3");
+        }
+
+        /// <summary>
+        /// MyHordes peut renvoyer une locale absente ou nulle pour un objet qui vient d'être ajouté
+        /// au jeu et pas encore traduit partout. Repli sur l'allemand (langue source du jeu) plutôt
+        /// que de laisser passer null, qui fait planter le tri des libellés côté front.
+        /// </summary>
+        private static string LabelOrGerman(IDictionary<string, string> labels, string locale)
+        {
+            if (labels == null) return null;
+            if (labels.TryGetValue(locale, out var value) && value != null) return value;
+            return labels.TryGetValue("de", out var german) ? german : null;
         }
     }
 }
