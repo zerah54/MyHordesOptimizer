@@ -3,7 +3,7 @@
         <ng-container i18n>Chantiers</ng-container>
     </mat-card-title>
     <div class="actions">
-        <mat-button-toggle-group [(ngModel)]="hard_mode" i18n-aria-label aria-label="Mode de jeu">
+        <mat-button-toggle-group (ngModelChange)="onModeChange($event)" [ngModel]="hard_mode" i18n-aria-label aria-label="Mode de jeu">
             <mat-button-toggle [value]="false" i18n>Normal</mat-button-toggle>
             <mat-button-toggle [value]="true" i18n>Pandémonium</mat-button-toggle>
         </mat-button-toggle-group>
@@ -13,6 +13,18 @@
 <mat-card-content class="mho-buildings">
     <div class="mat-elevation-z8 table-scroll">
         <table #table [dataSource]="rows()" mat-table>
+
+            <!-- Sélection : coche un chantier pour le récapitulatif du bas de page. Cocher une
+                 évolution coche aussi ses ancêtres (on ne peut pas la construire sans eux) ;
+                 décocher un chantier décoche aussi ses évolutions. -->
+            <ng-container matColumnDef="select" sticky>
+                <th *matHeaderCellDef mat-header-cell class="center"></th>
+                <td *matCellDef="let row; table: table" mat-cell class="center">
+                    <span (click)="toggleSelected(row)" class="select-control">
+                        <mat-checkbox [checked]="isSelected(row)" disableRipple></mat-checkbox>
+                    </span>
+                </td>
+            </ng-container>
 
             <!-- Nom : icône du chantier + libellé, avec l'indentation qui porte la hiérarchie -->
             <ng-container matColumnDef="label" sticky>
@@ -80,12 +92,14 @@
                  fusionnée avec « Plans lus » : le stepper remplace l'icône statique. Tout est déjà
                  construit en Pandémonium, la rareté de CONSTRUCTION (hors Pandémonium) n'y a donc
                  aucun sens — un chantier sans mécanique de palier y affiche un tiret, jamais
-                 l'icône/le "?" de la rareté de base (voir usefulPlanReadings()). -->
+                 l'icône/le "?" de la rareté de base (voir usefulPlanReadings()). Un chantier dont
+                 le palier n'est jamais atteignable en jeu (voir hasReachablePlanLevel()) affiche
+                 aussi un tiret : un stepper sans plan associé n'aurait aucun sens. -->
             <ng-container matColumnDef="rarity">
                 <th *matHeaderCellDef mat-header-cell class="center">{{ headerOf('rarity') }}</th>
                 <td *matCellDef="let row; table: table" mat-cell class="center">
                     @if (hard_mode) {
-                        @if (row.has_hard_mode && usefulPlanReadings(row) > 0) {
+                        @if (row.has_hard_mode && usefulPlanReadings(row) > 0 && hasReachablePlanLevel(row)) {
                             <mho-compact-stepper
                                 (valueChange)="setPlansLus(row, $event)"
                                 [icon]="stepperIcon(row)"
@@ -142,8 +156,33 @@
                 </td>
             </ng-container>
 
+            <!-- Récapitulatif de la sélection : une colonne dédiée à la ligne de pied, absente
+                 des colonnes de données — elle n'apparaît que dans ce footer, jamais masquée par
+                 son contenu (une ligne vide serait quand même visible). -->
+            <ng-container matColumnDef="summary">
+                <td *matFooterCellDef [attr.colspan]="displayed_columns.length" class="selection-summary" mat-footer-cell>
+                    <span class="count">
+                        {{ selectedTotals().count }}
+                        <ng-container i18n>{selectedTotals().count, plural, =1 {chantier sélectionné} other {chantiers sélectionnés}}</ng-container>
+                    </span>
+                    <span class="ap">
+                        <mho-icon-ap></mho-icon-ap>
+                        {{ selectedTotals().ap }}
+                    </span>
+                    <ul class="resources">
+                        @for (resource of selectedTotals().resources; track resource.item_id) {
+                            <li [matTooltip]="resource.label[locale]">
+                                <img [alt]="resource.label[locale]" [src]="HORDES_IMG_REPO + resource.img">
+                                <span>×{{ resource.count }}</span>
+                            </li>
+                        }
+                    </ul>
+                </td>
+            </ng-container>
+
             <tr *matHeaderRowDef="displayed_columns; sticky: true" mat-header-row></tr>
             <tr *matRowDef="let row; columns: displayed_columns;" mat-row></tr>
+            <tr *matFooterRowDef="['summary']; sticky: true" [hidden]="!hasSelection()" mat-footer-row></tr>
 
             <tr *matNoDataRow class="mat-row">
                 <td [attr.colspan]="displayed_columns.length" class="mat-cell" i18n>

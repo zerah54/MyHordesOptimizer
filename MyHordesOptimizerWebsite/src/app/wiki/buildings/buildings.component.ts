@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatCardModule } from '@angular/material/card';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
@@ -30,7 +31,7 @@ import { HeaderWithStringFilterComponent } from '../../_shared/lists/header-with
 const angular_common: Imports = [CommonModule, FormsModule];
 const components: Imports = [CompactStepperComponent, HeaderWithStringFilterComponent, IconApComponent];
 const directives: Imports = [TypedCellDefDirective];
-const material_modules: Imports = [MatButtonModule, MatButtonToggleModule, MatCardModule, MatIconModule, MatTableModule, MatTooltipModule];
+const material_modules: Imports = [MatButtonModule, MatButtonToggleModule, MatCardModule, MatCheckboxModule, MatIconModule, MatTableModule, MatTooltipModule];
 
 @Component({
     selector: 'mho-wiki-buildings',
@@ -66,6 +67,7 @@ export class BuildingsComponent implements OnInit {
     private static readonly ALWAYS_BREAKABLE_UIDS: ReadonlySet<string> = new Set(['small_arma_#00', 'small_fireworks_#00']);
 
     protected readonly columns: StandardColumn[] = [
+        { id: 'select', header: '', class: 'center' },
         { id: 'label', header: $localize`Nom du chantier`, class: '' },
         { id: 'pa', header: $localize`Points d’action`, class: 'center' },
         { id: 'defence', header: $localize`Défense`, class: 'center' },
@@ -95,6 +97,9 @@ export class BuildingsComponent implements OnInit {
      * ouvre nœud par nœud.
      */
     private readonly collapsed: Set<number> = new Set<number>();
+
+    /** Chantiers cochés pour le récapitulatif du bas de page, par identifiant. */
+    private readonly selected: Set<number> = new Set<number>();
 
     private readonly api: ApiService = inject(ApiService);
     private readonly destroy_ref: DestroyRef = inject(DestroyRef);
@@ -176,6 +181,92 @@ export class BuildingsComponent implements OnInit {
         this.plansLus.set(building.id, value as 0 | 1 | 2);
     }
 
+    /** Un chantier est-il coché pour le récapitulatif du bas de page ? */
+    protected isSelected(building: Building): boolean {
+        return this.selected.has(building.id);
+    }
+
+    /**
+     * Coche ou décoche un chantier. Cocher une évolution coche aussi tout ce dont elle dépend
+     * (ses ancêtres) : on ne peut pas la construire sans eux. Décocher fait l'inverse — décoche
+     * aussi ses évolutions (descendants), qui n'auraient plus de sens sans lui.
+     */
+    protected toggleSelected(building: Building): void {
+        if (this.selected.has(building.id)) {
+            this.deselectWithDescendants(building);
+        } else {
+            this.selectWithAncestors(building);
+        }
+    }
+
+    /** Un chantier au moins est sélectionné : le récapitulatif du bas de page doit s'afficher. */
+    protected hasSelection(): boolean {
+        return this.selected.size > 0;
+    }
+
+    /**
+     * Totaux du récapitulatif : PA et ressources cumulés sur les chantiers cochés, chacun à son
+     * propre palier de plan sélectionné (comme la colonne Ressources par ligne). Ressources
+     * fusionnées par objet, quantités additionnées.
+     */
+    protected selectedTotals(): { count: number; ap: number; resources: BuildingResource[] } {
+        const resources_by_item: Map<number, BuildingResource> = new Map<number, BuildingResource>();
+        let ap: number = 0;
+        this.selected.forEach((id: number): void => {
+            const building: Building | undefined = this.by_id.get(id);
+            if (!building) {
+                return;
+            }
+            const cost: { ap: number | null; resources: BuildingResource[] } = this.costFor(building, this.plansLusFor(building));
+            ap += cost.ap ?? 0;
+            cost.resources.forEach((resource: BuildingResource): void => {
+                const existing: BuildingResource | undefined = resources_by_item.get(resource.item_id);
+                if (existing) {
+                    existing.count += resource.count;
+                } else {
+                    const clone: BuildingResource = new BuildingResource();
+                    clone.item_id = resource.item_id;
+                    clone.uid = resource.uid;
+                    clone.img = resource.img;
+                    clone.label = resource.label;
+                    clone.count = resource.count;
+                    resources_by_item.set(resource.item_id, clone);
+                }
+            });
+        });
+        return { count: this.selected.size, ap, resources: Array.from(resources_by_item.values()) };
+    }
+
+    /** Changement de mode Normal/Pandémonium : purge la sélection des chantiers devenus indisponibles. */
+    protected onModeChange(hard_mode: boolean): void {
+        this.hard_mode = hard_mode;
+        this.pruneSelectionForAvailability();
+        this.refresh();
+    }
+
+    private selectWithAncestors(building: Building): void {
+        this.selected.add(building.id);
+        const parent: Building | undefined = building.parent_id === null ? undefined : this.by_id.get(building.parent_id);
+        if (parent) {
+            this.selectWithAncestors(parent);
+        }
+    }
+
+    private deselectWithDescendants(building: Building): void {
+        this.selected.delete(building.id);
+        building.children.forEach((child: Building): void => this.deselectWithDescendants(child));
+    }
+
+    /** Retire de la sélection les chantiers devenus indisponibles dans le mode actif. */
+    private pruneSelectionForAvailability(): void {
+        Array.from(this.selected).forEach((id: number): void => {
+            const building: Building | undefined = this.by_id.get(id);
+            if (building && this.availabilityStatus(building) === 'Disabled') {
+                this.selected.delete(id);
+            }
+        });
+    }
+
     /**
      * Icône du stepper fusionnant les colonnes « Plan »/« Plans lus » en Pandémonium : la rareté
      * effective (chantier nommément overridé dans rules.yml) prime sur la rareté de base. Une
@@ -203,6 +294,18 @@ export class BuildingsComponent implements OnInit {
             return 0;
         }
         return building.tier1_ap !== building.tier2_ap ? 2 : 1;
+    }
+
+    /**
+     * Un chantier de rareté 0 SANS override nommé reçoit en Pandémonium une rareté effective
+     * synthétique (`'0>': 5` dans rules.yml), qui ne sert qu'au calcul du facteur de réduction —
+     * ce n'est pas un vrai niveau de plan. Aucun objet du jeu ne lit un plan de type 5
+     * (seuls 1 à 4 existent, voir `ActionEffectProvider::unlockBlueprint`) : le palier Hard est
+     * alors définitivement bloqué, aucune lecture ne peut jamais le faire progresser. Un stepper
+     * y serait mensonger — voir `showsPlanStepper()`.
+     */
+    protected hasReachablePlanLevel(building: Building): boolean {
+        return building.hard_blueprint_level !== null || building.rarity > 0;
     }
 
     /** Deux jeux de ressources sont égaux si mêmes objets aux mêmes quantités, ordre indifférent. */

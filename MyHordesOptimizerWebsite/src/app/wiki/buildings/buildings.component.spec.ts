@@ -1,3 +1,4 @@
+import { DebugElement } from '@angular/core';
 import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import moment from 'moment';
@@ -172,6 +173,30 @@ describe('BuildingsComponent', (): void => {
         expect(component['usefulPlanReadings'](building)).toBe(2);
     });
 
+    it('hasReachablePlanLevel is false for a rarity-0 building with no named override (Portail)', (): void => {
+        const building: Building = new Building();
+        building.rarity = 0;
+        building.hard_blueprint_level = null;
+
+        expect(component['hasReachablePlanLevel'](building)).toBe(false);
+    });
+
+    it('hasReachablePlanLevel is true for a rarity-0 building with a named override', (): void => {
+        const building: Building = new Building();
+        building.rarity = 0;
+        building.hard_blueprint_level = 1;
+
+        expect(component['hasReachablePlanLevel'](building)).toBe(true);
+    });
+
+    it('hasReachablePlanLevel is true for a building whose base rarity is already non-zero', (): void => {
+        const building: Building = new Building();
+        building.rarity = 3;
+        building.hard_blueprint_level = null;
+
+        expect(component['hasReachablePlanLevel'](building)).toBe(true);
+    });
+
     it('showsBreakableFlag is false outside Pandémonium for an ordinary breakable building', (): void => {
         component['hard_mode'] = false;
         const building: Building = new Building();
@@ -258,6 +283,204 @@ describe('BuildingsComponent', (): void => {
 
         expect(component['rows']()).toEqual([visible]);
     });
+
+    it('isSelected is false for a building never toggled', (): void => {
+        const building: Building = new Building();
+        building.id = 1;
+
+        expect(component['isSelected'](building)).toBe(false);
+    });
+
+    it('toggleSelected selects then deselects a leaf building with no relatives', (): void => {
+        const building: Building = new Building();
+        building.id = 1;
+        building.parent_id = null;
+        building.children = [];
+        component['by_id'] = new Map([[1, building]]);
+
+        component['toggleSelected'](building);
+        expect(component['isSelected'](building)).toBe(true);
+
+        component['toggleSelected'](building);
+        expect(component['isSelected'](building)).toBe(false);
+    });
+
+    it('selecting a building also selects its ancestors up to the root', (): void => {
+        const root: Building = new Building();
+        root.id = 1;
+        root.parent_id = null;
+        const middle: Building = new Building();
+        middle.id = 2;
+        middle.parent_id = 1;
+        const leaf: Building = new Building();
+        leaf.id = 3;
+        leaf.parent_id = 2;
+        root.children = [middle];
+        middle.children = [leaf];
+        leaf.children = [];
+        component['by_id'] = new Map([[1, root], [2, middle], [3, leaf]]);
+
+        component['toggleSelected'](leaf);
+
+        expect(component['isSelected'](leaf)).toBe(true);
+        expect(component['isSelected'](middle)).toBe(true);
+        expect(component['isSelected'](root)).toBe(true);
+    });
+
+    it('selecting a building does not select its descendants', (): void => {
+        const root: Building = new Building();
+        root.id = 1;
+        root.parent_id = null;
+        const child: Building = new Building();
+        child.id = 2;
+        child.parent_id = 1;
+        child.children = [];
+        root.children = [child];
+        component['by_id'] = new Map([[1, root], [2, child]]);
+
+        component['toggleSelected'](root);
+
+        expect(component['isSelected'](root)).toBe(true);
+        expect(component['isSelected'](child)).toBe(false);
+    });
+
+    it('deselecting a building also deselects its descendants', (): void => {
+        const root: Building = new Building();
+        root.id = 1;
+        root.parent_id = null;
+        const child: Building = new Building();
+        child.id = 2;
+        child.parent_id = 1;
+        child.children = [];
+        root.children = [child];
+        component['by_id'] = new Map([[1, root], [2, child]]);
+
+        component['toggleSelected'](child);
+        expect(component['isSelected'](root)).toBe(true);
+        expect(component['isSelected'](child)).toBe(true);
+
+        component['toggleSelected'](root);
+
+        expect(component['isSelected'](root)).toBe(false);
+        expect(component['isSelected'](child)).toBe(false);
+    });
+
+    it('deselecting a leaf building does not affect its ancestors', (): void => {
+        const root: Building = new Building();
+        root.id = 1;
+        root.parent_id = null;
+        const child: Building = new Building();
+        child.id = 2;
+        child.parent_id = 1;
+        child.children = [];
+        root.children = [child];
+        component['by_id'] = new Map([[1, root], [2, child]]);
+
+        component['toggleSelected'](child);
+        component['toggleSelected'](child);
+
+        expect(component['isSelected'](child)).toBe(false);
+        expect(component['isSelected'](root)).toBe(true);
+    });
+
+    it('hasSelection reflects whether anything is currently selected', (): void => {
+        const building: Building = new Building();
+        building.id = 1;
+        building.parent_id = null;
+        building.children = [];
+        component['by_id'] = new Map([[1, building]]);
+
+        expect(component['hasSelection']()).toBe(false);
+
+        component['toggleSelected'](building);
+
+        expect(component['hasSelection']()).toBe(true);
+    });
+
+    it('pruneSelectionForAvailability removes selected buildings disabled in the current mode', (): void => {
+        component['hard_mode'] = true;
+        const kept: Building = new Building();
+        kept.id = 1;
+        kept.parent_id = null;
+        kept.children = [];
+        const removed: Building = new Building();
+        removed.id = 2;
+        removed.parent_id = null;
+        removed.children = [];
+        removed.availability = { PANDE: 'Disabled' };
+        component['by_id'] = new Map([[1, kept], [2, removed]]);
+        component['toggleSelected'](kept);
+        component['toggleSelected'](removed);
+
+        component['pruneSelectionForAvailability']();
+
+        expect(component['isSelected'](kept)).toBe(true);
+        expect(component['isSelected'](removed)).toBe(false);
+    });
+
+    it('selectedTotals aggregates AP and merges resources by item across selected buildings, each at its own chosen tier', (): void => {
+        component['hard_mode'] = true;
+        const a: Building = new Building();
+        a.id = 1;
+        a.parent_id = null;
+        a.children = [];
+        a.has_hard_mode = true;
+        a.tier0_ap = 25;
+        a.tier1_ap = 20;
+        a.tier2_ap = 13;
+        const metal: BuildingResource = new BuildingResource();
+        metal.item_id = 1;
+        metal.count = 5;
+        const plate: BuildingResource = new BuildingResource();
+        plate.item_id = 2;
+        plate.count = 1;
+        a.tier0_resources = [metal, plate];
+        a.tier1_resources = [metal];
+
+        const b: Building = new Building();
+        b.id = 2;
+        b.parent_id = null;
+        b.children = [];
+        b.pa = 10;
+        const metal_b: BuildingResource = new BuildingResource();
+        metal_b.item_id = 1;
+        metal_b.count = 3;
+        b.resources = [metal_b];
+
+        component['by_id'] = new Map([[1, a], [2, b]]);
+        component['toggleSelected'](a);
+        component['toggleSelected'](b);
+        component['setPlansLus'](a, 2);
+
+        const totals: { count: number; ap: number; resources: BuildingResource[] } = component['selectedTotals']();
+
+        expect(totals.count).toBe(2);
+        expect(totals.ap).toBe(13 + 10);
+        expect(totals.resources.find((r: BuildingResource): boolean => r.item_id === 1)?.count).toBe(8);
+        expect(totals.resources.find((r: BuildingResource): boolean => r.item_id === 2)).toBeUndefined();
+    });
+
+    it('onModeChange switches the mode and prunes selected buildings disabled in the new mode', (): void => {
+        const kept: Building = new Building();
+        kept.id = 1;
+        kept.parent_id = null;
+        kept.children = [];
+        const removed: Building = new Building();
+        removed.id = 2;
+        removed.parent_id = null;
+        removed.children = [];
+        removed.availability = { PANDE: 'Disabled' };
+        component['by_id'] = new Map([[1, kept], [2, removed]]);
+        component['roots'] = [kept, removed];
+        component['toggleSelected'](kept);
+        component['toggleSelected'](removed);
+
+        component['onModeChange'](true);
+
+        expect(component['hard_mode']).toBe(true);
+        expect(component['isSelected'](kept)).toBe(true);
+        expect(component['isSelected'](removed)).toBe(false);
+    });
 });
 
 describe('BuildingsComponent - ngOnInit wiring', (): void => {
@@ -336,9 +559,36 @@ describe('BuildingsComponent - ngOnInit wiring', (): void => {
         buildings_subject.next([root_a]);
         fixture.detectChanges();
 
-        const rendered_rows = fixture.debugElement.queryAll(By.css('tr[mat-row]'));
+        const rendered_rows: DebugElement[] = fixture.debugElement.queryAll(By.css('tr[mat-row]'));
         expect(rendered_rows.length).toBe(1);
         expect(fixture.debugElement.nativeElement.textContent).toContain('Chantier A');
+    });
+
+    it('shows a dash in Pandémonium for a hard-mode building whose plan level is never reachable in game (Portail)', (): void => {
+        component['hard_mode'] = true;
+        const root_a: Building = makeBuilding(1, null, 'Portail', 1);
+        root_a.has_hard_mode = true;
+        root_a.rarity = 0;
+        root_a.hard_blueprint_level = null;
+        root_a.tier0_ap = 15;
+        root_a.tier1_ap = 15;
+        root_a.tier2_ap = 15;
+        const hard: BuildingResource = new BuildingResource();
+        hard.item_id = 1;
+        hard.count = 2;
+        hard.label = { [moment.locale()]: 'Métal' };
+        const plate: BuildingResource = new BuildingResource();
+        plate.item_id = 2;
+        plate.count = 1;
+        plate.label = { [moment.locale()]: 'Plaque' };
+        root_a.tier0_resources = [hard, plate];
+        root_a.tier1_resources = [hard];
+        buildings_subject.next([root_a]);
+        fixture.detectChanges();
+
+        const rarity_cell: DebugElement = fixture.debugElement.queryAll(By.css('td[mat-cell]'))[5];
+        expect(rarity_cell.nativeElement.textContent.trim()).toBe('—');
+        expect(rarity_cell.query(By.css('mho-compact-stepper'))).toBeNull();
     });
 
     it('shows a dash in Pandémonium for a building without a hard-mode plan mechanic, never the base-game blueprint icon', (): void => {
@@ -349,9 +599,63 @@ describe('BuildingsComponent - ngOnInit wiring', (): void => {
         buildings_subject.next([root_a]);
         fixture.detectChanges();
 
-        const rarity_cell = fixture.debugElement.queryAll(By.css('td[mat-cell]'))[4];
+        const rarity_cell: DebugElement = fixture.debugElement.queryAll(By.css('td[mat-cell]'))[5];
         expect(rarity_cell.nativeElement.textContent.trim()).toBe('—');
         expect(rarity_cell.query(By.css('img'))).toBeNull();
         expect(rarity_cell.query(By.css('mho-compact-stepper'))).toBeNull();
+    });
+
+    it('the selection footer is hidden until at least one chantier is selected', (): void => {
+        const root_a: Building = makeBuilding(1, null, 'Chantier A', 1);
+        buildings_subject.next([root_a]);
+        fixture.detectChanges();
+
+        let footer_row: DebugElement = fixture.debugElement.query(By.css('tr[mat-footer-row]'));
+        expect(footer_row.nativeElement.hidden).toBe(true);
+
+        const select_control: DebugElement = fixture.debugElement.query(By.css('.select-control'));
+        select_control.nativeElement.click();
+        fixture.detectChanges();
+
+        footer_row = fixture.debugElement.query(By.css('tr[mat-footer-row]'));
+        expect(footer_row.nativeElement.hidden).toBe(false);
+    });
+
+    it('the selection footer shows the count, total AP and merged resources for selected chantiers', (): void => {
+        const root_a: Building = makeBuilding(1, null, 'Chantier A', 1);
+        root_a.pa = 42;
+        const metal: BuildingResource = new BuildingResource();
+        metal.item_id = 1;
+        metal.count = 7;
+        metal.label = { [moment.locale()]: 'Métal' };
+        metal.img = 'metal.gif';
+        root_a.resources = [metal];
+        buildings_subject.next([root_a]);
+        fixture.detectChanges();
+
+        const select_control: DebugElement = fixture.debugElement.query(By.css('.select-control'));
+        select_control.nativeElement.click();
+        fixture.detectChanges();
+
+        const footer_cell: DebugElement = fixture.debugElement.query(By.css('td[mat-footer-cell]'));
+        expect(footer_cell.nativeElement.textContent).toContain('1');
+        expect(footer_cell.nativeElement.textContent).toContain('42');
+        expect(footer_cell.nativeElement.textContent).toContain('7');
+        expect(footer_cell.query(By.css('.resources img'))?.nativeElement.getAttribute('src')).toContain('metal.gif');
+    });
+
+    it('unchecking the only selected chantier hides the footer again', (): void => {
+        const root_a: Building = makeBuilding(1, null, 'Chantier A', 1);
+        buildings_subject.next([root_a]);
+        fixture.detectChanges();
+
+        const select_control: DebugElement = fixture.debugElement.query(By.css('.select-control'));
+        select_control.nativeElement.click();
+        fixture.detectChanges();
+        select_control.nativeElement.click();
+        fixture.detectChanges();
+
+        const footer_row: DebugElement = fixture.debugElement.query(By.css('tr[mat-footer-row]'));
+        expect(footer_row.nativeElement.hidden).toBe(true);
     });
 });
