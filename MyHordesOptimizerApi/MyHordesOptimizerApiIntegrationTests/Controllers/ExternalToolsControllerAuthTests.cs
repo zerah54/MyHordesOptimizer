@@ -72,7 +72,6 @@ namespace MyHordesOptimizerApiIntegrationTests.Controllers
         [Theory]
         [InlineData("GET", "/ExternalTools/Update/Status")]
         [InlineData("POST", "/ExternalTools/Update/Start")]
-        [InlineData("POST", "/ExternalTools/Update")]
         public async Task SansBearer_Renvoie403(string method, string route)
         {
             var userId = new Random().Next(1, int.MaxValue);
@@ -86,7 +85,6 @@ namespace MyHordesOptimizerApiIntegrationTests.Controllers
         [Theory]
         [InlineData("GET", "/ExternalTools/Update/Status")]
         [InlineData("POST", "/ExternalTools/Update/Start")]
-        [InlineData("POST", "/ExternalTools/Update")]
         public async Task BearerDunAutreUtilisateur_Renvoie403(string method, string route)
         {
             var random = new Random();
@@ -125,7 +123,6 @@ namespace MyHordesOptimizerApiIntegrationTests.Controllers
         [Theory]
         [InlineData("GET", "/ExternalTools/Update/Status")]
         [InlineData("POST", "/ExternalTools/Update/Start")]
-        [InlineData("POST", "/ExternalTools/Update")]
         public async Task BearerValideDeSoiMemeMaisUserKeyDunTiers_Renvoie403(string method, string route)
         {
             var attackerId = new Random().Next(1, int.MaxValue);

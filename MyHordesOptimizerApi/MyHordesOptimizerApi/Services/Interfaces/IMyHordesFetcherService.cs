@@ -26,6 +26,15 @@ namespace MyHordesOptimizerApi.Services.Interfaces
         /// jobDetails).
         /// </summary>
         SimpleMeDto BuildSimpleMeFromDbByUserKey(string userKey);
+
+        /// <summary>
+        /// Vérifie que userKey appartient bien à userId, sans exiger de JWT. Réutilise le cache
+        /// hash(userKey) → userId déjà alimenté par tout login/sync réussi (voir RememberUserKeyToUserId) :
+        /// clé connue → comparaison directe, zéro appel MyHordes. Clé inconnue → un seul appel
+        /// GetMeIdentity() pour amorcer le cache, jamais revu ensuite pour cette clé.
+        /// </summary>
+        bool VerifyUserKeyOwnership(string userKey, int userId);
+
         IEnumerable<HeroSkillDto> GetHeroSkills();
         IEnumerable<CauseOfDeathDto> GetCausesOfDeath();
         IEnumerable<CleanUpTypeDto> GetCleanUpTypes();

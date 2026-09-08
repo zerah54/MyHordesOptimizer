@@ -274,7 +274,7 @@ export class TownService extends GlobalService {
 
     public updateBag(citizen: Citizen): Observable<UpdateInfo> {
         return new Observable((sub: Subscriber<UpdateInfo>) => {
-            super.post<UpdateInfoDTO>(this.API_URL + `/ExternalTools/Bag?townId=${getTown()?.town_id}&userId=${getUserId()}`, JSON.stringify(citizen.toCitizenBagDto()))
+            super.post<UpdateInfoDTO>(this.API_URL + `/ExternalTools/Bag?townId=${getTown()?.town_id}`, JSON.stringify(citizen.toCitizenBagDto()))
                 .subscribe({
                     next: (response: UpdateInfoDTO) => {
                         sub.next(new UpdateInfo(response));
@@ -288,7 +288,7 @@ export class TownService extends GlobalService {
 
     public updateChest(citizen: Citizen): Observable<UpdateInfo> {
         return new Observable((sub: Subscriber<UpdateInfo>) => {
-            super.post<UpdateInfoDTO>(this.API_URL + `/ExternalTools/Chest?townId=${getTown()?.town_id}&userId=${getUserId()}`, JSON.stringify(citizen.toCitizenChestDto()))
+            super.post<UpdateInfoDTO>(this.API_URL + `/ExternalTools/Chest?townId=${getTown()?.town_id}`, JSON.stringify(citizen.toCitizenChestDto()))
                 .subscribe({
                     next: (response: UpdateInfoDTO) => {
                         sub.next(new UpdateInfo(response));
@@ -302,7 +302,7 @@ export class TownService extends GlobalService {
 
     public updateStatus(citizen: Citizen): Observable<UpdateInfo> {
         return new Observable((sub: Subscriber<UpdateInfo>) => {
-            super.post<UpdateInfoDTO>(this.API_URL + `/ExternalTools/Status?townId=${getTown()?.town_id}&userId=${getUserId()}`, JSON.stringify(citizen.toCitizenStatusDto()))
+            super.post<UpdateInfoDTO>(this.API_URL + `/ExternalTools/Status?townId=${getTown()?.town_id}`, JSON.stringify(citizen.toCitizenStatusDto()))
                 .subscribe({
                     next: (response: UpdateInfoDTO) => {
                         sub.next(new UpdateInfo(response));
@@ -316,7 +316,7 @@ export class TownService extends GlobalService {
 
     public updateHome(citizen: Citizen): Observable<UpdateInfo> {
         return new Observable((sub: Subscriber<UpdateInfo>) => {
-            super.post<UpdateInfoDTO>(this.API_URL + `/ExternalTools/home?townId=${getTown()?.town_id}&userId=${getUserId()}`, JSON.stringify(citizen.toCitizenHomeDto()))
+            super.post<UpdateInfoDTO>(this.API_URL + `/ExternalTools/home?townId=${getTown()?.town_id}`, JSON.stringify(citizen.toCitizenHomeDto()))
                 .subscribe({
                     next: (response: UpdateInfoDTO) => {
                         sub.next(new UpdateInfo(response));
@@ -330,7 +330,7 @@ export class TownService extends GlobalService {
 
     public updateHeroicActions(citizen: Citizen): Observable<UpdateInfo> {
         return new Observable((sub: Subscriber<UpdateInfo>) => {
-            super.post<UpdateInfoDTO>(this.API_URL + `/ExternalTools/HeroicActions?townId=${getTown()?.town_id}&userId=${getUserId()}`, JSON.stringify(citizen.toCitizenHeroicActionsDto()))
+            super.post<UpdateInfoDTO>(this.API_URL + `/ExternalTools/HeroicActions?townId=${getTown()?.town_id}`, JSON.stringify(citizen.toCitizenHeroicActionsDto()))
                 .subscribe({
                     next: (response: UpdateInfoDTO) => {
                         sub.next(new UpdateInfo(response));

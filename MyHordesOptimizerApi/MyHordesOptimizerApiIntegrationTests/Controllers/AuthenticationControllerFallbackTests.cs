@@ -60,6 +60,7 @@ namespace MyHordesOptimizerApiIntegrationTests.Controllers
 
             public Dictionary<string, MyHordesItem> GetItems() => new();
             public MyHordesUserDetailsDto GetMapForToolsUpdate() => throw new NotSupportedException();
+            public MyHordesUserDetailsDto GetMeIdentity() => new() { Id = _userId };
             public MyHordesUserDetailsDto GetUserPictos(int userId) => throw new NotSupportedException();
             public List<MyHordesUserDto> GetUsersIdentity(List<int> ids) => new();
             public Dictionary<string, MyHordesApiPictoDto> GetPictos() => new();

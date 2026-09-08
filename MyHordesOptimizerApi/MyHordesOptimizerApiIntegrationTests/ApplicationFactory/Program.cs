@@ -128,6 +128,8 @@ builder.Services.AddScoped<IMyHordesFetcherService, MyHordesFetcherService>();
 // Requis par AuthenticationControllerFallbackTests (Controllers.AuthenticationController).
 builder.Services.AddSingleton<IAuthenticationConfiguration, MyHordesOptimizerApi.Configuration.Impl.AuthenticationConfiguration>();
 builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
+builder.Services.AddSingleton<MyHordesOptimizerApi.Configuration.Interfaces.ITokenRateLimitConfiguration, MyHordesOptimizerApi.Configuration.Impl.TokenRateLimitConfiguration>();
+builder.Services.AddSingleton<MyHordesOptimizerApi.Services.Interfaces.ITokenRateLimiter, MyHordesOptimizerApi.Services.Impl.TokenRateLimiter>();
 
 // Requis par ExternalToolsControllerAuthTests / ExternalToolsUpdateJobRunnerTownDriftTests
 // (Controllers.ExternalToolsController) : le contrôleur résout ces deux services directement,

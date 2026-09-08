@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -58,9 +60,39 @@ namespace MyHordesOptimizerApi.Services.Impl.Locking
         }
 
         /// <summary>
-        /// Réserve l'écriture sur l'ensemble des villes, pour un traitement qui en touche plusieurs
-        /// (import de l'historique d'un joueur). Attend que toutes les synchronisations en cours
-        /// soient terminées et empêche les suivantes de démarrer.
+        /// Réserve l'écriture sur un ensemble précis de villes (import de l'historique d'un joueur :
+        /// touche plusieurs villes, mais toujours les mêmes, connues à l'avance). Trie et déduplique
+        /// avant d'acquérir chaque verrou de ville un par un via <see cref="AcquireTownAsync"/> : l'ordre
+        /// fixe est ce qui exclut l'interblocage entre deux appels concurrents aux ensembles qui se
+        /// chevauchent, sans bloquer les villes hors de cet ensemble comme le ferait
+        /// <see cref="AcquireAllTownsAsync"/>.
+        /// </summary>
+        public async Task<IAsyncDisposable> AcquireTownsAsync(IEnumerable<int> townIds)
+        {
+            var sortedIds = townIds.Distinct().OrderBy(id => id).ToList();
+            var acquired = new List<IAsyncDisposable>(sortedIds.Count);
+            try
+            {
+                foreach (var townId in sortedIds)
+                {
+                    acquired.Add(await AcquireTownAsync(townId));
+                }
+            }
+            catch
+            {
+                for (var i = acquired.Count - 1; i >= 0; i--)
+                {
+                    await acquired[i].DisposeAsync();
+                }
+                throw;
+            }
+            return new MultiReleaser(acquired);
+        }
+
+        /// <summary>
+        /// Réserve l'écriture sur l'ensemble des villes, pour un traitement qui touche un ensemble de
+        /// villes trop large ou inconnu à l'avance pour <see cref="AcquireTownsAsync"/>. Attend que
+        /// toutes les synchronisations en cours soient terminées et empêche les suivantes de démarrer.
         /// </summary>
         public async Task<IAsyncDisposable> AcquireAllTownsAsync()
         {
@@ -151,6 +183,30 @@ namespace MyHordesOptimizerApi.Services.Impl.Locking
                 }
                 _townGate.Release();
                 await _owner.ReleaseSharedAsync();
+            }
+        }
+
+        private sealed class MultiReleaser : IAsyncDisposable
+        {
+            private readonly List<IAsyncDisposable> _locks;
+            private bool _released;
+
+            public MultiReleaser(List<IAsyncDisposable> locks)
+            {
+                _locks = locks;
+            }
+
+            public async ValueTask DisposeAsync()
+            {
+                if (_released)
+                {
+                    return;
+                }
+                _released = true;
+                for (var i = _locks.Count - 1; i >= 0; i--)
+                {
+                    await _locks[i].DisposeAsync();
+                }
             }
         }
     }

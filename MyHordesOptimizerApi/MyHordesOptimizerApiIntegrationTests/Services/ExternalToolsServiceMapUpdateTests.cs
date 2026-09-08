@@ -105,6 +105,7 @@ namespace MyHordesOptimizerApiIntegrationTests.Services
 
             public Dictionary<string, MyHordesItem> GetItems() => throw new NotImplementedException();
             public MyHordesUserDetailsDto GetMe() => throw new NotImplementedException();
+            public MyHordesUserDetailsDto GetMeIdentity() => throw new NotImplementedException();
             public MyHordesUserDetailsDto GetUserPictos(int userId) => throw new NotImplementedException();
             public List<MyHordesUserDto> GetUsersIdentity(List<int> ids) => throw new NotImplementedException();
             public Dictionary<string, MyHordesApiPictoDto> GetPictos() => throw new NotImplementedException();

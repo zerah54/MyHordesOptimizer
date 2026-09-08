@@ -1,9 +1,6 @@
 ﻿using AutoMapper;
-using Microsoft.EntityFrameworkCore;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
-using MyHordesOptimizerApi.Extensions;
 using MyHordesOptimizerApi.Models;
-using System.Linq;
 
 namespace MyHordesOptimizerApi.MappingProfiles
 {
@@ -15,8 +12,12 @@ namespace MyHordesOptimizerApi.MappingProfiles
                 .ForMember(model => model.DateUpdate, opt => opt.MapFrom(src => src.UpdateTime))
                 .ForMember(model => model.Expeditions, opt => opt.Ignore())
                 .ForMember(model => model.IdLastUpdateInfo, opt => opt.Ignore())
-                .ForMember(model => model.IdUser, opt => opt.Ignore())
-                .ForMember(model => model.IdUserNavigation, opt => opt.MapFrom(src => src))
+                // IdUser directement depuis le DTO (toujours renseigné par GenerateLastUpdateInfo) :
+                // mapper IdUserNavigation créerait un User quasi-vide (seuls IdUser/Name sont connus
+                // du DTO), qu'Update() attacherait en Modified sur TOUTES ses colonnes, écrasant
+                // avatar/stats/dates d'import déjà en base (lost update).
+                .ForMember(model => model.IdUser, opt => opt.MapFrom(src => src.UserId))
+                .ForMember(model => model.IdUserNavigation, opt => opt.Ignore())
                 .ForMember(model => model.MapCellDigs, opt => opt.Ignore())
                 .ForMember(model => model.MapCells, opt => opt.Ignore())
                 .ForMember(model => model.TownBankItems, opt => opt.Ignore())
@@ -32,27 +33,6 @@ namespace MyHordesOptimizerApi.MappingProfiles
                 .ForMember(dto => dto.UserId, opt => opt.MapFrom(model => model.IdUser))
                 .ForMember(dto => dto.UserName, opt => opt.MapFrom(model => model.IdUserNavigation.Name))
                 .ForMember(dto => dto.UpdateTime, opt => opt.MapFrom(model => model.DateUpdate));
-
-            CreateMap<LastUpdateInfoDto, User>()
-                .ForMember(user => user.ExpeditionCitizens, opt => opt.Ignore())
-                .ForMember(user => user.IdUser, opt => opt.MapFrom(src => src.UserId))
-                .ForMember(user => user.LastUpdateInfos, opt => opt.Ignore())
-                .ForMember(user => user.MapCellDigs, opt => opt.Ignore())
-                .ForMember(user => user.Name, opt => opt.MapFrom((dto, model, srcMember, context) =>
-                {
-                    var name = dto.UserName;
-                    if (string.IsNullOrEmpty(name))
-                    {
-                        var dbContext = context.GetDbContext();
-                        var user = dbContext.Users.AsNoTracking()
-                        .First(x => x.IdUser == dto.UserId);
-                        name = user.Name;
-                    }
-                    return name;
-                }))
-                .ForMember(user => user.TownCadavers, opt => opt.Ignore())
-                .ForMember(user => user.TownCitizens, opt => opt.Ignore())
-                .ForMember(user => user.WishlistCategories, opt => opt.Ignore());
         }
     }
 }

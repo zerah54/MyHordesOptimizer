@@ -345,7 +345,12 @@ namespace MyHordesOptimizerApi.Services.Impl
                         // vaut une colonne vide qu'une langue fausse.
                         // Garde-fou : le citoyen connecté est dans cette ville, elle ne peut pas être terminée
                         existingTown.IsFinished = false;
-                        DbContext.Update(existingTown);
+                        // Pas de DbContext.Update(existingTown) ici : l'entité est déjà trackée (chargée via
+                        // FirstOrDefault ci-dessus), EF détecte déjà ses changements de propriétés. Update()
+                        // sur un graphe force TOUTE entité atteignable (dont les User rattachés via la fixup
+                        // TownCitizen.IdUserNavigation) à l'état Modified, ce qui écrase leurs colonnes avec
+                        // les valeurs en mémoire — potentiellement obsolètes si une autre tâche (ex. l'import
+                        // pictos en fond) a modifié ce User entre son chargement et ce SaveChanges (lost update).
                         // On ajoute une nouvelle banque avec un nouveau lastupdate
                         DbContext.AddRange(bankItems);
                         // On maj les citoyens en place, sans jamais supprimer de ligne :
@@ -512,6 +517,13 @@ namespace MyHordesOptimizerApi.Services.Impl
                 }
                 Logger.LogDebug($"GetSimpleMeAsync Lock released {sw.Elapsed} ms");
             }
+            else if (DbContext.Users.Any(u => u.IdUser == myHordeMeResponse.Id.Value))
+            {
+                // Hors ville : rien d'autre à synchroniser ici, mais c'est le bon moment pour rafraîchir
+                // pictos/playedMaps (throttlé 24h dans ImportUserPictosAsync) — ce joueur vient
+                // probablement de terminer une vie, son historique a de bonnes chances d'avoir changé.
+                QueuePictosImportInBackground(myHordeMeResponse.Id.Value);
+            }
 
             // Pictos gagnés par les morts dans cette ville. Aucune requête MyHordes supplémentaire
             // (les données sont déjà dans la réponse ci-dessus), mais un volume d'écritures qui n'a
@@ -520,10 +532,14 @@ namespace MyHordesOptimizerApi.Services.Impl
             if (townSynchronized)
             {
                 QueueCadaverPictosUpsert(-myHordeMeResponse.MapId.Value, myHordeMeResponse.Map.Cadavers);
-            }
 
-            // L'historique des villes jouées n'est plus importé ici : il est alimenté par
-            // ImportUserPictos (page profil), dont le playedMaps est un sur-ensemble strict.
+                // Pareil pour pictos/playedMaps. Pas de garde "nouvelle ville pour ce citoyen" ici :
+                // map.citizens liste TOUS les citoyens de la ville, donc la ligne TownCitizen d'un
+                // joueur peut déjà exister sans qu'il ait lui-même synchronisé (créée par la synchro
+                // d'un AUTRE citoyen — voir MyHordeCitizenToUserValueResolver). Le throttle 24h déjà
+                // dans ImportUserPictosAsync (PictosHistoryImportedAt) est le seul signal fiable.
+                QueuePictosImportInBackground(myHordeMeResponse.Id.Value);
+            }
 
             return Mapper.Map<SimpleMeDto>(myHordeMeResponse);
         }
@@ -551,6 +567,18 @@ namespace MyHordesOptimizerApi.Services.Impl
         private void RememberUserKeyToUserId(string userKey, int userId)
         {
             UserIdByUserKeyHash[HashUserKey(userKey)] = userId;
+        }
+
+        public bool VerifyUserKeyOwnership(string userKey, int userId)
+        {
+            var hash = HashUserKey(userKey);
+            if (UserIdByUserKeyHash.TryGetValue(hash, out var knownUserId))
+            {
+                return knownUserId == userId;
+            }
+            var identity = MyHordesJsonApiRepository.GetMeIdentity();
+            RememberUserKeyToUserId(userKey, identity.Id.Value);
+            return identity.Id.Value == userId;
         }
 
         public SimpleMeDto BuildSimpleMeFromDbByUserKey(string userKey)
@@ -671,6 +699,29 @@ namespace MyHordesOptimizerApi.Services.Impl
                 catch (Exception ex)
                 {
                     Logger.LogWarning(ex, "GetSimpleMeAsync: échec de la mise à jour des pictos des cadavers de la ville {TownId}", townId);
+                }
+            });
+        }
+
+        /// <summary>
+        /// Déclenche ImportUserPictosAsync hors du cycle de vie de la requête HTTP. Scope dédié pour
+        /// la même raison que <see cref="QueueCadaverPictosUpsert"/> : le DbContext de la requête est
+        /// libéré dès la réponse envoyée. ImportUserPictosAsync gère lui-même son propre throttle
+        /// (24h) et son propre verrou (villes de l'historique du joueur) : rien à dupliquer ici.
+        /// </summary>
+        private void QueuePictosImportInBackground(int userId)
+        {
+            _ = Task.Run(async () =>
+            {
+                try
+                {
+                    using var scope = ServiceScopeFactory.CreateScope();
+                    var fetcherService = scope.ServiceProvider.GetRequiredService<IMyHordesFetcherService>();
+                    await fetcherService.ImportUserPictosAsync(userId);
+                }
+                catch (Exception ex)
+                {
+                    Logger.LogWarning(ex, "GetSimpleMeAsync: échec de l'import automatique des pictos/playedMaps pour {UserId}", userId);
                 }
             });
         }
@@ -872,11 +923,17 @@ namespace MyHordesOptimizerApi.Services.Impl
             var response = MyHordesJsonApiRepository.GetUserPictos(userId);
 
             // L'import crée / met à jour des lignes Town, comme la synchronisation de ville : sans ce
-            // verrou, deux écritures concurrentes sur la même ville se marcheraient dessus. Il touche
-            // TOUTES les villes jouées, il ne peut donc pas se contenter du verrou de l'une d'elles :
-            // il prend le verrou global en exclusif. Uniquement ici, une fois l'appel réseau terminé —
-            // le tenir pendant les ~15 s de la requête bloquerait toutes les synchronisations pour rien.
-            await using (await TownSyncLock.AcquireAllTownsAsync())
+            // verrou, deux écritures concurrentes sur la même ville se marcheraient dessus. L'ensemble
+            // des villes touchées (l'historique de CE joueur) est connu à l'avance : un verrou ciblé sur
+            // ces villes suffit, pas besoin du verrou global qui bloquerait toutes les autres synchros
+            // du serveur pendant l'import. ResolveTownId (pas -mapId brut) : une ville de l'historique
+            // déjà migrée par un import de saison a un IdTown stable, différent de -mapId.
+            var townIds = (response.PlayedMaps ?? new List<MyHordesCitizenRankingDto>())
+                .Where(played => played.MapId.HasValue)
+                .Select(played => DbContext.ResolveTownId(played.MapId.Value))
+                .Distinct()
+                .ToList();
+            await using (await TownSyncLock.AcquireTownsAsync(townIds))
             {
                 PersistUserPictos(response, userId);
             }

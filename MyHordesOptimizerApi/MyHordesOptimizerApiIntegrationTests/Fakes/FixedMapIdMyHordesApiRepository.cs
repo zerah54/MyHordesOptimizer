@@ -25,6 +25,7 @@ namespace MyHordesOptimizerApiIntegrationTests.Fakes
         public Dictionary<string, MyHordesItem> GetItems() => new();
         public MyHordesUserDetailsDto GetMe() => Build();
         public MyHordesUserDetailsDto GetMapForToolsUpdate() => Build();
+        public MyHordesUserDetailsDto GetMeIdentity() => Build();
         public MyHordesUserDetailsDto GetUserPictos(int userId) => Build();
         public List<MyHordesUserDto> GetUsersIdentity(List<int> ids) => new();
         public Dictionary<string, MyHordesApiPictoDto> GetPictos() => new();

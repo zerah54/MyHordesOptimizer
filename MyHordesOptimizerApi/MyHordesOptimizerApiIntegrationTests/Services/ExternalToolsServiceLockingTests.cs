@@ -138,6 +138,69 @@ namespace MyHordesOptimizerApiIntegrationTests.Services
         }
 
         /// <summary>
+        /// Régression : mhoTask videait TOUS les MapCellDig des cases reçues avant que digsTask
+        /// n'y réinsère uniquement l'entrée du citoyen courant — la fouille d'un autre citoyen sur
+        /// la même case/jour disparaissait à chaque MAJ (perte silencieuse, aucune exception).
+        /// </summary>
+        [Fact]
+        public async Task UpdateExternalsTools_MapEtDigsEnsemble_ConserveLaFouilleDunAutreCitoyen()
+        {
+            var fakeRepo = new ValidMapResponseMyHordesApiRepository();
+            using var factory = _factory.WithWebHostBuilder(builder =>
+            {
+                builder.ConfigureTestServices(services =>
+                {
+                    services.AddScoped<IMyHordesApiRepository>(_ => fakeRepo);
+                });
+            });
+
+            var scope = factory.Services.CreateScope();
+            var context = scope.ServiceProvider.GetRequiredService<MhoContext>();
+            var service = scope.ServiceProvider.GetRequiredService<IExternalToolsService>();
+
+            var (townId, userId) = SeedTownUserAndCell(context);
+            var cell = context.MapCells.Single(c => c.IdTown == townId && c.X == TownX && c.Y == TownY);
+
+            var otherUserId = new Random().Next(1, int.MaxValue);
+            context.Users.Add(new User { IdUser = otherUserId, Name = "test-user-other-" + Guid.NewGuid().ToString("N").Substring(0, 8) });
+            context.MapCellDigs.Add(new MapCellDig { IdCell = cell.IdCell, IdUser = otherUserId, Day = 5, NbSucces = 2, NbTotalDig = 3 });
+            context.SaveChanges();
+
+            var request = BuildDigsRequest(townId, userId, mhoMapEnabled: true);
+
+            await service.UpdateExternalsTools(request);
+
+            context.MapCellDigs.AsNoTracking().Any(dig => dig.IdCell == cell.IdCell && dig.IdUser == otherUserId)
+                .Should().BeTrue("la fouille d'un autre citoyen sur la même case/jour ne doit pas être effacée par la MAJ carte");
+            context.MapCellDigs.AsNoTracking().Any(dig => dig.IdCell == cell.IdCell && dig.IdUser == userId)
+                .Should().BeTrue("la fouille du citoyen courant doit toujours être écrite");
+        }
+
+        private sealed class ValidMapResponseMyHordesApiRepository : IMyHordesApiRepository
+        {
+            public MyHordesUserDetailsDto GetMapForToolsUpdate() => new()
+            {
+                Map = new MyHordesMap
+                {
+                    City = new MyHordesCity { X = TownX, Y = TownY },
+                    Zones = new List<MyHordesZone> { new() { X = TownX, Y = TownY } }
+                }
+            };
+
+            public Dictionary<string, MyHordesItem> GetItems() => throw new NotImplementedException();
+            public MyHordesUserDetailsDto GetMe() => throw new NotImplementedException();
+            public MyHordesUserDetailsDto GetMeIdentity() => throw new NotImplementedException();
+            public MyHordesUserDetailsDto GetUserPictos(int userId) => throw new NotImplementedException();
+            public List<MyHordesUserDto> GetUsersIdentity(List<int> ids) => throw new NotImplementedException();
+            public Dictionary<string, MyHordesApiPictoDto> GetPictos() => throw new NotImplementedException();
+            public Dictionary<string, MyHordesApiRuinDto> GetRuins() => throw new NotImplementedException();
+            public Task<Dictionary<string, MyHordesApiBuildingDto>> GetBuildingAsync() => throw new NotImplementedException();
+            public List<int> GetTownList(int? season = null) => throw new NotImplementedException();
+            public List<MyHordesTownDetailsDto> GetTownDetails(List<int> ids) => throw new NotImplementedException();
+            public MyHordesMap GetMapDetails(int mapId) => throw new NotImplementedException();
+        }
+
+        /// <summary>
         /// UpdateCitizenBag (méthode standalone) n'acquérait aucun TownSyncLock. IdTown != MapId
         /// délibérément : le verrou doit porter sur le mapId brut, jamais sur le townId résolu (même
         /// convention que le flux combiné ci-dessus, qui verrouille -townDetails.TownId) — un verrou
@@ -201,6 +264,7 @@ namespace MyHordesOptimizerApiIntegrationTests.Services
 
             public Dictionary<string, MyHordesItem> GetItems() => throw new NotImplementedException();
             public MyHordesUserDetailsDto GetMe() => throw new NotImplementedException();
+            public MyHordesUserDetailsDto GetMeIdentity() => throw new NotImplementedException();
             public MyHordesUserDetailsDto GetUserPictos(int userId) => throw new NotImplementedException();
             public List<MyHordesUserDto> GetUsersIdentity(List<int> ids) => throw new NotImplementedException();
             public Dictionary<string, MyHordesApiPictoDto> GetPictos() => throw new NotImplementedException();

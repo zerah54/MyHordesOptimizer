@@ -548,7 +548,9 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                                 }
                             }
                         }
-                        dbContext.MapCellDigs.RemoveRange(dbContext.MapCellDigs.Where(dig => listCells.Select(x => x.IdCell).Contains(dig.IdCell)));
+                        // Ne plus vider les MapCellDig ici : digsTask (voir plus bas) fait déjà l'upsert
+                        // exact par (case, citoyen, jour). Ce RemoveRange sur toute la grille effaçait la
+                        // fouille des AUTRES citoyens à chaque MAJ carte, sans exception ni log.
                         if (zoneItemX != -1 && zoneItemY != -1)
                         {
                             dbContext.MapCellItems.RemoveRange(dbContext.MapCellItems.Where(cellItem => listCellItems.Select(x => x.IdCell).Contains(cellItem.IdCell)));

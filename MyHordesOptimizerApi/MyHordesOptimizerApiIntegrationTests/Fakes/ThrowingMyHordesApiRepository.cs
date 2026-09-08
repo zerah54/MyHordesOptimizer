@@ -25,6 +25,7 @@ namespace MyHordesOptimizerApiIntegrationTests.Fakes
         public Dictionary<string, MyHordesItem> GetItems() => new();
         public MyHordesUserDetailsDto GetMe() => throw new MyHordesApiException(_message, _statusCode);
         public MyHordesUserDetailsDto GetMapForToolsUpdate() => throw new MyHordesApiException(_message, _statusCode);
+        public MyHordesUserDetailsDto GetMeIdentity() => throw new MyHordesApiException(_message, _statusCode);
         public MyHordesUserDetailsDto GetUserPictos(int userId) => throw new MyHordesApiException(_message, _statusCode);
         public List<MyHordesUserDto> GetUsersIdentity(List<int> ids) => new();
         public Dictionary<string, MyHordesApiPictoDto> GetPictos() => new();

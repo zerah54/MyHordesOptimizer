@@ -198,6 +198,7 @@ builder.Services.AddTransient<IMyHordesOptimizerSqlConfiguration, MyHordesOptimi
 builder.Services.AddSingleton<IMyHordesScrutateurConfiguration, MyHordesScrutateurConfiguration>();
 builder.Services.AddSingleton<IDiscordBotConfiguration, DiscordBotConfiguration>();
 builder.Services.AddSingleton<IAuthenticationConfiguration, AuthenticationConfiguration>();
+builder.Services.AddSingleton<ITokenRateLimitConfiguration, TokenRateLimitConfiguration>();
 
 builder.Services.AddSingleton<IMyHordesOptimizerFirebaseConfiguration, MyHordesOptimizerFirebaseConfiguration>();
 
@@ -242,6 +243,8 @@ builder.Services.AddScoped<ICitizenItemActionsProvider, CitizenItemActionsProvid
 builder.Services.AddScoped<ICitizenDayStateEngine, CitizenDayStateEngine>();
 builder.Services.AddScoped<ICitizenStateOrderRankingEngine, CitizenStateOrderRankingEngine>();
 builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
+// Singleton : le compteur par userKey doit survivre à la requête et être partagé entre GET/POST Token.
+builder.Services.AddSingleton<ITokenRateLimiter, TokenRateLimiter>();
 builder.Services.AddScoped<IExpeditionService, ExpeditionService>();
 builder.Services.AddScoped<ITownService, TownService>();
 builder.Services.AddScoped<IUserAccountService, UserAccountService>();

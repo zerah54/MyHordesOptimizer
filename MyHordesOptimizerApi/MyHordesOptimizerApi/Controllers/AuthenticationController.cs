@@ -19,16 +19,30 @@ namespace MyHordesOptimizerApi.Controllers
     {
         private readonly IAuthenticationService _authenticationService;
         private readonly IMyHordesFetcherService _myHordesFetcherService;
+        private readonly ITokenRateLimiter _tokenRateLimiter;
 
         public AuthenticationController(ILogger<FetcherController> logger,
             IAuthenticationService authenticationService,
             IMyHordesFetcherService myHordesFetcherService,
+            ITokenRateLimiter tokenRateLimiter,
             IUserInfoProvider userKeyProvider) : base(logger, userKeyProvider)
         {
             _authenticationService = authenticationService;
             _myHordesFetcherService = myHordesFetcherService;
+            _tokenRateLimiter = tokenRateLimiter;
         }
 
+        /// <summary>
+        /// POST équivalent de <see cref="GetToken"/> : le GET expose userKey en clair dans la query
+        /// string (logs d'accès, historique navigateur, Referer), un anti-pattern pour un secret. Le
+        /// GET reste disponible pour compat avec les scripts tiers déjà en place.
+        /// </summary>
+        [HttpPost]
+        [Route("Token")]
+        public Task<ActionResult<AuthenticationResponseDto>> PostToken([FromBody] TokenRequestDto request)
+        {
+            return GetToken(request?.UserKey);
+        }
 
         [HttpGet]
         [Route("Token")]
@@ -37,6 +51,10 @@ namespace MyHordesOptimizerApi.Controllers
             if (string.IsNullOrWhiteSpace(userKey))
             {
                 return BadRequest($"{nameof(userKey)} cannot be empty");
+            }
+            if (!_tokenRateLimiter.TryAcquire(userKey))
+            {
+                return StatusCode((int)HttpStatusCode.TooManyRequests);
             }
             UserInfoProvider.UserKey = userKey;
             SimpleMeDto simpleMe;

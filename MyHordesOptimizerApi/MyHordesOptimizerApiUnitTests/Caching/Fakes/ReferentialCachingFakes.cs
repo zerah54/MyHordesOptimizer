@@ -70,6 +70,7 @@ namespace MyHordesOptimizerApiUnitTests.Caching.Fakes
         public IEnumerable<string> GetItemUidsWithCitizenStateImpact() => throw new NotSupportedException();
         public Task<SimpleMeDto> GetSimpleMeAsync() => throw new NotSupportedException();
         public SimpleMeDto BuildSimpleMeFromDbByUserKey(string userKey) => throw new NotSupportedException();
+        public bool VerifyUserKeyOwnership(string userKey, int userId) => throw new NotSupportedException();
         public BankLastUpdateDto GetBank() => throw new NotSupportedException();
         public BankLastUpdateDto GetBank(int townId) => throw new NotSupportedException();
         public Task<bool> ImportUserPictosAsync(int userId) => throw new NotSupportedException();

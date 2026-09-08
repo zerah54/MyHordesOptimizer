@@ -56,6 +56,7 @@ namespace MyHordesOptimizerApiUnitTests.Referentiels
 
             public MyHordesUserDetailsDto GetMe() => throw new NotSupportedException();
             public MyHordesUserDetailsDto GetMapForToolsUpdate() => throw new NotSupportedException();
+            public MyHordesUserDetailsDto GetMeIdentity() => throw new NotSupportedException();
             public MyHordesUserDetailsDto GetUserPictos(int userId) => throw new NotSupportedException();
             public List<MyHordesUserDto> GetUsersIdentity(List<int> ids) => throw new NotSupportedException();
             public Dictionary<string, MyHordesApiPictoDto> GetPictos() => throw new NotSupportedException();

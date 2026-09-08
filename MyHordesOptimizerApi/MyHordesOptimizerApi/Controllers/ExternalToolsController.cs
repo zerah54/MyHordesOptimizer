@@ -15,6 +15,7 @@ using MyHordesOptimizerApi.Models.ExternalTools;
 using MyHordesOptimizerApi.Models.ExternalTools.GestHordes;
 using MyHordesOptimizerApi.Providers.Interfaces;
 using MyHordesOptimizerApi.Services.Impl.ExternalTools;
+using MyHordesOptimizerApi.Services.Interfaces;
 using MyHordesOptimizerApi.Services.Interfaces.ExternalTools;
 using Newtonsoft.Json.Linq;
 using System;
@@ -30,22 +31,28 @@ namespace MyHordesOptimizerApi.Controllers
         protected IExternalToolsService ExternalToolsService { get; private set; }
         protected ExternalToolsUpdateJobRunner UpdateJobRunner { get; private set; }
         protected IMhoHeadersProvider MhoHeadersProvider { get; private set; }
+        protected IMyHordesFetcherService MyHordesFetcherService { get; private set; }
 
         public ExternalToolsController(ILogger<ExternalToolsController> logger,
             IUserInfoProvider userKeyProvider,
             IExternalToolsService externalToolsService,
             ExternalToolsUpdateJobRunner externalToolsUpdateJobRunner,
-            IMhoHeadersProvider mhoHeadersProvider) : base(logger, userKeyProvider)
+            IMhoHeadersProvider mhoHeadersProvider,
+            IMyHordesFetcherService myHordesFetcherService) : base(logger, userKeyProvider)
         {
             ExternalToolsService = externalToolsService;
             UpdateJobRunner = externalToolsUpdateJobRunner;
             MhoHeadersProvider = mhoHeadersProvider;
+            MyHordesFetcherService = myHordesFetcherService;
         }
 
         /// <summary>
         /// 403 si le userId de la query ne correspond pas au claim JWT courant (UserInfoProvider.UserId,
         /// peuplé par JwtActionFilter sur toute requête portant un Bearer valide), ou si aucun Bearer
-        /// n'est présent. Sans cette garde, connaître le userId d'un tiers (public, annuaire) suffisait
+        /// n'est présent. Réservée à Update/Status et Update/Start : Update (sans JWT, scripts tiers)
+        /// utilise VerifyUserKeyOwnership à la place — voir docs/superpowers/specs/2026-09-08-
+        /// externaltools-update-userkey-ownership-design.md.
+        /// Sans cette garde, connaître le userId d'un tiers (public, annuaire) suffisait
         /// à lire l'avancement de sa mise à jour — et le JWT 14 jours qu'elle peut porter.
         /// <para>
         /// Vérifie aussi que le userKey de la query correspond au claim JWT courant
@@ -93,12 +100,6 @@ namespace MyHordesOptimizerApi.Controllers
         [Route("Update")]
         public async Task<ActionResult<UpdateResponseDto>> UpdateExternalsTools(string userKey, int userId, [FromBody] UpdateRequestDto updateRequestDto)
         {
-            var forbidden = ValidateAuthenticatedUser(userId, userKey);
-            if (forbidden != null)
-            {
-                return forbidden;
-            }
-
             var invalid = ValidateUpdateRequest(userKey, updateRequestDto);
             if (invalid != null)
             {
@@ -106,6 +107,11 @@ namespace MyHordesOptimizerApi.Controllers
             }
 
             UserInfoProvider.UserKey = userKey;
+            if (!MyHordesFetcherService.VerifyUserKeyOwnership(userKey, userId))
+            {
+                return Forbid();
+            }
+
             UserInfoProvider.UserId = userId;
             var response = await ExternalToolsService.UpdateExternalsTools(updateRequestDto);
             return Ok(response);
@@ -177,55 +183,49 @@ namespace MyHordesOptimizerApi.Controllers
 
         [HttpPost]
         [Route("Bag")]
-        public ActionResult<LastUpdateInfoDto> UpdateCitizenBag([FromQuery] int townId, [FromQuery] int userId, [FromBody] UpdateSingleBagDto request)
+        public ActionResult<LastUpdateInfoDto> UpdateCitizenBag([FromQuery] int townId, [FromBody] UpdateSingleBagDto request)
         {
-            UserInfoProvider.UserId = userId;
             var lastUpdateInfo = ExternalToolsService.UpdateCitizenBag(townId, request.UserId, request.Objects);
             return Ok(lastUpdateInfo);
         }
 
         [HttpPost]
         [Route("Chest")]
-        public ActionResult<LastUpdateInfoDto> UpdateCitizenChest([FromQuery] int townId, [FromQuery] int userId, [FromBody] UpdateSingleChestDto request)
+        public ActionResult<LastUpdateInfoDto> UpdateCitizenChest([FromQuery] int townId, [FromBody] UpdateSingleChestDto request)
         {
-            UserInfoProvider.UserId = userId;
             var lastUpdateInfo = ExternalToolsService.UpdateCitizenChest(townId, request.UserId, request.Objects);
             return Ok(lastUpdateInfo);
         }
 
         [HttpPost]
         [Route("Status")]
-        public ActionResult<LastUpdateInfoDto> UpdateCitizenStatus([FromQuery] int townId, [FromQuery] int userId, [FromBody] UpdateSingleStatusDto request)
+        public ActionResult<LastUpdateInfoDto> UpdateCitizenStatus([FromQuery] int townId, [FromBody] UpdateSingleStatusDto request)
         {
-            UserInfoProvider.UserId = userId;
             var lastUpdateInfo = ExternalToolsService.UpdateCitizenStatus(townId, request.UserId, request.Status);
             return Ok(lastUpdateInfo);
         }
 
         [HttpPost]
         [Route("HeroicActions")]
-        public ActionResult<LastUpdateInfoDto> UpdateCitizenHeroicActions([FromQuery] int townId, [FromQuery] int userId, [FromBody] UpdateSingleHeroicActionsDto request)
+        public ActionResult<LastUpdateInfoDto> UpdateCitizenHeroicActions([FromQuery] int townId, [FromBody] UpdateSingleHeroicActionsDto request)
         {
-            UserInfoProvider.UserId = userId;
             var lastUpdateInfo = ExternalToolsService.UpdateCitizenHeroicActions(townId, request.UserId, request.HeroicActions);
             return Ok(lastUpdateInfo);
         }
 
         [HttpPost]
         [Route("Home")]
-        public ActionResult<LastUpdateInfoDto> UpdateCitizenHome([FromQuery] int townId, [FromQuery] int userId, [FromBody] UpdateSingleHomeDto request)
+        public ActionResult<LastUpdateInfoDto> UpdateCitizenHome([FromQuery] int townId, [FromBody] UpdateSingleHomeDto request)
         {
-            UserInfoProvider.UserId = userId;
             var lastUpdateInfo = ExternalToolsService.UpdateCitizenHome(townId, request.UserId, request.Home);
             return Ok(lastUpdateInfo);
         }
 
         [HttpPost]
         [Route("Ghoul")]
-        public ActionResult<LastUpdateInfoDto> UpdateGhoulStatus([FromQuery] int townId, [FromQuery] int userId, [FromBody] UpdateGhoulStatusDto request)
+        public ActionResult<LastUpdateInfoDto> UpdateGhoulStatus([FromQuery] int townId, [FromBody] UpdateGhoulStatusDto request)
         {
-            UserInfoProvider.UserId = userId;
-            var lastUpdateInfo = ExternalToolsService.UpdateGhoulStatus(townId, userId, request);
+            var lastUpdateInfo = ExternalToolsService.UpdateGhoulStatus(townId, UserInfoProvider.UserId, request);
             return Ok(lastUpdateInfo);
         }
     }
