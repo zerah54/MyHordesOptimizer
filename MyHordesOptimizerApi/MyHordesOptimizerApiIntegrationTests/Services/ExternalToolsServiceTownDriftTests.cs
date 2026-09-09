@@ -74,7 +74,7 @@ namespace MyHordesOptimizerApiIntegrationTests.Services
                 TownDetails = new UpdateTownDetailsDto { TownId = oldTownId, TownX = 0, TownY = 0, IsChaos = false }
             };
 
-            var sink = new ExternalToolsUpdateProgress(DateTime.UtcNow);
+            var sink = new ExternalToolsUpdateProgress(userId, DateTime.UtcNow);
             await service.UpdateExternalsTools(request, sink);
 
             var state = sink.Snapshot();
@@ -136,7 +136,7 @@ namespace MyHordesOptimizerApiIntegrationTests.Services
                 TownDetails = new UpdateTownDetailsDto { TownId = townId, TownX = 0, TownY = 0, IsChaos = false }
             };
 
-            var sink = new ExternalToolsUpdateProgress(DateTime.UtcNow);
+            var sink = new ExternalToolsUpdateProgress(userId, DateTime.UtcNow);
             await service.UpdateExternalsTools(request, sink);
 
             var state = sink.Snapshot();

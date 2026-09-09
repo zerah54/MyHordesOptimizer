@@ -10,7 +10,7 @@ namespace MyHordesOptimizerApiIntegrationTests.Services
     {
         private static ExternalToolsUpdateProgress NewProgress()
         {
-            return new ExternalToolsUpdateProgress(new DateTime(2026, 7, 29, 12, 0, 0, DateTimeKind.Utc));
+            return new ExternalToolsUpdateProgress(1, new DateTime(2026, 7, 29, 12, 0, 0, DateTimeKind.Utc));
         }
 
         private static ExternalToolUpdateState ToolOf(ExternalToolsUpdateJobState state, ExternalToolId tool)
