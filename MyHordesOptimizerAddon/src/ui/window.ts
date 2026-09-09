@@ -1,5 +1,5 @@
-import { mh_optimizer_map_window_id, mh_optimizer_window_id, repo_img_hordes_url } from '../config/constants';
-import { changelogs } from '../data/changelogs';
+import { lang, mh_optimizer_map_window_id, mh_optimizer_window_id, repo_img_hordes_url } from '../config/constants';
+import { getChangelogTable } from '../data/changelogs';
 import { tabs_list } from '../data/tabs';
 import { state } from '../state';
 import { getI18N } from '../utils/i18n';
@@ -338,7 +338,7 @@ export function showChangelogModal(content: string, onConfirm?: () => void): voi
 
     // Lien pour afficher l'historique complet des versions passées
     const current_version: string = getScriptInfo().version;
-    const older_versions = Object.entries(changelogs).filter(([v]) => v !== current_version);
+    const older_versions = Object.entries(getChangelogTable(lang)).filter(([v]) => v !== current_version);
 
     if (older_versions.length > 0) {
         const history_toggle = document.createElement('span');

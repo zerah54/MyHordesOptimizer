@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { getToken, isTokenRequestInFlight } from '../api/token';
 import { state } from '../state';
-import { fetcher } from './fetch';
+import { fetch_timeout_ms, fetcher, fetcherWithoutBearer } from './fetch';
 
 vi.mock('../api/token', () => ({ getToken: vi.fn(), isTokenRequestInFlight: vi.fn() }));
 
@@ -29,7 +29,15 @@ beforeEach(() => {
 
 afterEach(() => {
     vi.unstubAllGlobals();
+    vi.useRealTimers();
 });
+
+/** Simule le comportement de fetch() : rejette dès que son AbortSignal se déclenche, sinon ne répond jamais. */
+function neverSettlingFetchMock(): ReturnType<typeof vi.fn> {
+    return vi.fn((_url: string, options?: { signal?: AbortSignal }) => new Promise<Response>((_resolve, reject) => {
+        options?.signal?.addEventListener('abort', () => reject(new DOMException('Aborted', 'AbortError')));
+    }));
+}
 
 /**
  * C1 (revue finale du chantier cycle de vie de session) : isValidToken() redevient faux à chaque
@@ -105,5 +113,37 @@ describe('fetcher', () => {
         const fetchMock = fetch as unknown as ReturnType<typeof vi.fn>;
         const options = fetchMock.mock.calls[0][1];
         expect(options.headers.Authorization).toBeUndefined();
+    });
+
+    /**
+     * Incident : bouton MHO (`ui/update-button.ts`) resté bloqué sur "…" indéfiniment, y compris
+     * au-delà du plafond de 2 minutes de `followUpdateJob` — plafond vérifié seulement entre deux
+     * itérations, jamais à l'intérieur d'un `await fetcher(...)` qui ne se résout jamais. Sans
+     * timeout ici, une requête qui ne répond jamais (lenteur serveur, connexion qui traîne) fige
+     * la boucle pour de bon (signalé sur Discord le 2026-09-09). Ce timeout est le seul point par
+     * lequel passent tous les appelants (POST initial ET polling `/status`).
+     */
+    it('abandonne une requête qui ne répond jamais, au lieu de rester bloquée indéfiniment', async () => {
+        vi.useFakeTimers();
+        vi.stubGlobal('fetch', neverSettlingFetchMock());
+
+        const fetcher_promise = fetcher('https://api.test/x');
+        const assertion = expect(fetcher_promise).rejects.toThrow();
+        await vi.advanceTimersByTimeAsync(fetch_timeout_ms);
+
+        await assertion;
+    });
+});
+
+describe('fetcherWithoutBearer', () => {
+    it('abandonne une requête qui ne répond jamais, au lieu de rester bloquée indéfiniment (même garde-fou que fetcher)', async () => {
+        vi.useFakeTimers();
+        vi.stubGlobal('fetch', neverSettlingFetchMock());
+
+        const fetcher_promise = fetcherWithoutBearer('https://api.test/x');
+        const assertion = expect(fetcher_promise).rejects.toThrow();
+        await vi.advanceTimersByTimeAsync(fetch_timeout_ms);
+
+        await assertion;
     });
 });

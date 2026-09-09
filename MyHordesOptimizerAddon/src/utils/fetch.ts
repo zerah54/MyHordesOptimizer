@@ -148,13 +148,29 @@ export function updateFetchRequestOptionsWithoutBearer(options?: any) {
 }
 
 
+/**
+ * Délai au-delà duquel une requête sans réponse est abandonnée plutôt que laissée en attente pour
+ * toujours. Sans lui, une requête qui ne répond jamais (lenteur serveur, connexion qui traîne) fige
+ * indéfiniment tout code qui l'attend — y compris une boucle de polling bornée en apparence, dont le
+ * plafond n'est vérifié qu'entre deux itérations, jamais à l'intérieur d'un `await` qui ne se résout
+ * jamais (bouton MHO resté bloqué sur "…", signalé sur Discord le 2026-09-09).
+ */
+export const fetch_timeout_ms: number = 30000;
+
+function fetchWithTimeout(url: string, options?: any): Promise<Response> {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), fetch_timeout_ms);
+    return fetch(url, { ...options, signal: controller.signal })
+        .finally(() => clearTimeout(timeout));
+}
+
 export async function fetcher(url: string, options?: any): Promise<Response> {
-    return fetch(url, await updateFetchRequestOptions(options));
+    return fetchWithTimeout(url, await updateFetchRequestOptions(options));
 }
 
 
 export function fetcherWithoutBearer(url: string, options?: any) {
-    return fetch(url, updateFetchRequestOptionsWithoutBearer(options));
+    return fetchWithTimeout(url, updateFetchRequestOptionsWithoutBearer(options));
 }
 
 /**

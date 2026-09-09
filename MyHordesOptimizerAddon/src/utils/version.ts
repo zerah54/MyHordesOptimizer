@@ -1,5 +1,5 @@
-import { mho_version_key } from '../config/constants';
-import { changelogs } from '../data/changelogs';
+import { lang, mho_version_key } from '../config/constants';
+import { getChangelogTable } from '../data/changelogs';
 import { api_texts } from '../i18n/texts';
 import { state } from '../state';
 import { getI18N } from './i18n';
@@ -153,7 +153,7 @@ export function getScriptInfo() {
 
 export function getChangelog(): string {
     const version: string = getScriptInfo().version;
-    const content: string = changelogs[version] ?? 'Aucune note de version disponible pour cette mise à jour.';
+    const content: string = getChangelogTable(lang)[version] ?? 'Aucune note de version disponible pour cette mise à jour.';
     return `${getScriptInfo().name} : Changelog pour la version ${version}
         ${content}`;
 }

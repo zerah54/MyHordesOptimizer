@@ -23,11 +23,24 @@ let in_flight_token_promise: Promise<void> | undefined;
 let in_flight_is_forced: boolean = false;
 
 /**
+ * Après un 429 MyHordes ("Quota dépassé..."), aucune nouvelle tentative avant cette échéance.
+ * MyHordes n'étant pas une SPA, `authenticateOnScriptLoad()` force un appel à chaque page : sans
+ * cette mémoire, un déplacement rapide (désert) retente le quota déjà dépassé plusieurs fois par
+ * seconde et l'empêche de jamais se libérer (incident prod du 2026-09-09).
+ */
+let token_retry_cooldown_until: number = 0;
+const token_failure_cooldown_ms: number = 60000;
+
+/**
  * Récupère le token, en réutilisant l'authentification déjà en cours s'il y en a une.
  * @param {boolean} force   Ignore le token en cache et en redemande un nouveau
  * @param {boolean} stop    Interdit la seconde tentative après récupération de la clé d'app
  */
 export function getToken(force?: boolean, stop?: boolean): Promise<void> {
+    if (Date.now() < token_retry_cooldown_until) {
+        return Promise.resolve();
+    }
+
     if (in_flight_token_promise) {
         /**
          * Un appel forcé exige des données fraîches : s'il survient derrière un appel non
@@ -133,6 +146,9 @@ function requestToken(force?: boolean, stop?: boolean): Promise<void> {
                         settleAfterTokenReceived(tokenReceived(), resolve);
                     })
                     .catch((error) => {
+                        if (error.status === 429) {
+                            token_retry_cooldown_until = Date.now() + token_failure_cooldown_ms;
+                        }
                         if (error.status === 400 && !stop) {
                             /** Si on a une erreur 400 ça peut être parce que la clé d'app n'est pas bonne : on tente de récupérer la clé d'app une seule et unique fois pour essayer de rendre ça transparent pour l'utilisateur */
                             state.external_app_id = undefined;

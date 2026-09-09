@@ -99,6 +99,76 @@ describe('getToken(true) : bootstrap systématique (chantier cycle de vie de ses
     });
 });
 
+describe('getToken(true) : cooldown après un 429 (incident prod 2026-09-09)', () => {
+    /**
+     * `authenticateOnScriptLoad()` force un appel réseau à CHAQUE chargement de page (MyHordes
+     * n'étant pas une SPA, un déplacement dans le désert en enchaîne plusieurs par seconde). Sans
+     * mémoire d'un échec récent, chaque nouvelle page retente aussitôt un quota MyHordes déjà
+     * dépassé (429, « Tout devrait fonctionner de nouveau d'ici quelques minutes ») : le quota ne
+     * peut plus jamais se libérer. Cf. AuthenticationController.cs (rate-limiter serveur désactivé
+     * le jour même pour la raison inverse : il bloquait tout le monde sans distinction).
+     */
+    function jsonOrTextResponse(status: number, body: string): Response {
+        return { status, json: () => Promise.reject(new Error('not json')), text: () => Promise.resolve(body) } as unknown as Response;
+    }
+
+    /**
+     * Horloge figée à une petite valeur (et non l'heure réelle) : le cooldown posé pendant ce test
+     * (quelques dizaines de secondes après epoch) reste ainsi sans effet sur les tests suivants,
+     * qui tournent en horloge réelle bien après 1970 — pas besoin d'exposer de reset pour cela.
+     */
+    it('ne rappelle pas /Authentication/Token juste après un 429 : la page suivante ne doit pas retenter aussitôt', async () => {
+        vi.useFakeTimers();
+        vi.setSystemTime(0);
+        try {
+            const fetchMock = vi.fn().mockImplementation((url: string) => {
+                if (url.includes('/Authentication/Token')) {
+                    return Promise.resolve(jsonOrTextResponse(429, 'Quota dépassé. Tout devrait fonctionner de nouveau d\'ici quelques minutes.'));
+                }
+                return Promise.reject(new Error(`unexpected fetch: ${url}`));
+            });
+            vi.stubGlobal('fetch', fetchMock);
+
+            await getToken(true);
+            const callsAfterFirstFailure: number = fetchMock.mock.calls.filter(([url]: [string]) => url.includes('/Authentication/Token')).length;
+            expect(callsAfterFirstFailure).toBe(1);
+
+            // Chargement de page suivant, quelques centaines de ms plus tard : toujours en cooldown.
+            vi.advanceTimersByTime(500);
+            await getToken(true);
+            const callsAfterSecondAttempt: number = fetchMock.mock.calls.filter(([url]: [string]) => url.includes('/Authentication/Token')).length;
+            expect(callsAfterSecondAttempt).toBe(1);
+        } finally {
+            vi.useRealTimers();
+        }
+    });
+
+    it('retente après l\'expiration du cooldown', async () => {
+        vi.useFakeTimers();
+        // Loin après le cooldown (60s) posé par le test précédent : `token_retry_cooldown_until`
+        // n'est pas réinitialisé entre les tests (état module), cette base l'ignore de fait.
+        vi.setSystemTime(1_000_000);
+        try {
+            const fetchMock = vi.fn().mockImplementation((url: string) => {
+                if (url.includes('/Authentication/Token')) {
+                    return Promise.resolve(jsonOrTextResponse(429, 'Quota dépassé.'));
+                }
+                return Promise.reject(new Error(`unexpected fetch: ${url}`));
+            });
+            vi.stubGlobal('fetch', fetchMock);
+
+            await getToken(true);
+            vi.advanceTimersByTime(65000);
+            await getToken(true);
+
+            const callCount: number = fetchMock.mock.calls.filter(([url]: [string]) => url.includes('/Authentication/Token')).length;
+            expect(callCount).toBe(2);
+        } finally {
+            vi.useRealTimers();
+        }
+    });
+});
+
 describe('getToken() / fetcher() : pas de blocage circulaire', () => {
     it('un appel fetcher() imbriqué (getItems() dans tokenReceived()) se termine même quand isValidToken() reste faux après le renouvellement', async () => {
         const fetchMock = vi.fn().mockImplementation((url: string) => {
