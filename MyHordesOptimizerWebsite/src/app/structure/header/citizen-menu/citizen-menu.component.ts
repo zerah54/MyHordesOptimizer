@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, inject, OnInit, Signal, signal, viewChild, WritableSignal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, DestroyRef, inject, OnInit, Signal, signal, viewChild, WritableSignal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatMenuModule, MatMenuTrigger } from '@angular/material/menu';
@@ -20,7 +20,7 @@ import { Me } from '../../../_abstract_model/types/me.class';
 import { isHouseLevelEditable } from '../../../_abstract_model/types/town-details.class';
 import { UpdateInfo } from '../../../_abstract_model/types/update-info.class';
 import { getHeroicIcon, getHomeIcon } from '../../../_core/utilities/citizen.util';
-import { getTown, getUser } from '../../../_core/utilities/localstorage.util';
+import { getTown, getUser, town, user } from '../../../_core/utilities/localstorage.util';
 import { AvatarComponent } from '../../../_shared/avatar/avatar.component';
 import { CitizenInfoComponent } from '../../../_shared/citizen-info/citizen-info.component';
 import { CompactStepperComponent } from '../../../_shared/compact-stepper/compact-stepper.component';
@@ -49,8 +49,8 @@ export class CitizenMenuComponent implements OnInit {
     /** La liste des listes disponibles dans le sac */
     protected readonly bag_lists: WritableSignal<ListForAddRemove[]> = signal([]);
     protected readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
-    private readonly me: Me | null = getUser();
-    private readonly current_day: number = getTown()?.day || 1;
+    private readonly me: Signal<Me | null> = user;
+    private readonly current_day: Signal<number> = computed(() => town()?.day || 1);
     /** La liste complète des items */
     private all_items: Item[] = [];
     /** La liste complète des statuts */
@@ -83,9 +83,9 @@ export class CitizenMenuComponent implements OnInit {
                 }
             });
 
-        if (this.me) {
+        if (this.me()) {
             this.town_service
-                .getCitizen(this.me.id)
+                .getCitizen(this.me()!.id)
                 .pipe(takeUntilDestroyed(this.destroy_ref))
                 .subscribe({
                     next: (citizen: Citizen) => {
@@ -279,7 +279,7 @@ export class CitizenMenuComponent implements OnInit {
 
     /** L'action donnée a-t-elle déjà été faite aujourd'hui ? */
     protected isDailyActionDone(actionKey: string): boolean {
-        return this.citizen()!.daily_actions.some((action: DailyAction) => action.day === this.current_day && action.action_key === actionKey && !!action.update_info);
+        return this.citizen()!.daily_actions.some((action: DailyAction) => action.day === this.current_day() && action.action_key === actionKey && !!action.update_info);
     }
 
     /** Prend ou retire une action quotidienne du jour. */
@@ -291,7 +291,7 @@ export class CitizenMenuComponent implements OnInit {
                 .subscribe({
                     next: () => {
                         citizen.daily_actions = [...citizen.daily_actions, new DailyAction({
-                            day: this.current_day, actionKey,
+                            day: this.current_day(), actionKey,
                             lastUpdateInfo: { updateTime: new Date(), userId: getUser()?.id?.toString() ?? '', userName: getUser()?.username ?? '', userKey: '' }
                         })];
                         this.town_service.publishMyCitizen(citizen);
@@ -302,7 +302,7 @@ export class CitizenMenuComponent implements OnInit {
                 .removeDailyAction(citizen, actionKey)
                 .subscribe({
                     next: () => {
-                        const index: number = citizen.daily_actions.findIndex((action: DailyAction) => action.day === this.current_day && action.action_key === actionKey);
+                        const index: number = citizen.daily_actions.findIndex((action: DailyAction) => action.day === this.current_day() && action.action_key === actionKey);
                         if (index > -1) citizen.daily_actions = citizen.daily_actions.filter((_: DailyAction, i: number) => i !== index);
                         this.town_service.publishMyCitizen(citizen);
                     }

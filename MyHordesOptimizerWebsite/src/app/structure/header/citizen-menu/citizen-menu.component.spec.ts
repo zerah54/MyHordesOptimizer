@@ -20,7 +20,7 @@ import { CitizenMenuComponent } from './citizen-menu.component';
 
 interface TestableComponent {
     citizen: { (): Citizen | undefined; set(value: Citizen | undefined): void };
-    current_day: number;
+    current_day: { (): number };
     all_items: Item[];
     bag_lists: { (): ListForAddRemove[]; set(value: ListForAddRemove[]): void };
     status_trigger: () => MatMenuTrigger | undefined;
@@ -91,7 +91,7 @@ describe('CitizenMenuComponent', (): void => {
 
     it('isDailyActionDone returns true when a matching action exists for today', (): void => {
         const shower: DailyAction = new DailyAction();
-        shower.day = testable.current_day;
+        shower.day = testable.current_day();
         shower.action_key = 'home_shower';
         shower.update_info = new UpdateInfo();
         testable.citizen()!.daily_actions = [shower];
@@ -244,7 +244,7 @@ describe('CitizenMenuComponent', (): void => {
 
         it('removes the matching daily action once the server confirms', (): void => {
             const shower: DailyAction = new DailyAction();
-            shower.day = testable.current_day;
+            shower.day = testable.current_day();
             shower.action_key = 'home_shower';
             testable.citizen()!.daily_actions = [shower];
             spyOn(townService, 'removeDailyAction').and.returnValue(of(undefined));

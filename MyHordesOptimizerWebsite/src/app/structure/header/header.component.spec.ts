@@ -90,6 +90,21 @@ describe('HeaderComponent', (): void => {
         });
     });
 
+    describe('mise à jour externe de "me"', (): void => {
+        // Reproduit AppComponent.ngOnInit() : son propre appel à getMe() résout après la
+        // construction du header et appelle setUser() en dehors de tout flux du header
+        // (saveExternalAppId/disconnect). Le header doit refléter ce changement sans action locale.
+        it('reflète un utilisateur défini après la construction, sans passer par saveExternalAppId', (): void => {
+            fixture.detectChanges();
+            const me: Me = new Me();
+            me.username = 'Bob';
+
+            setUser(me);
+
+            expect(testable.me()?.username).toBe('Bob');
+        });
+    });
+
     describe('saveExternalAppId', (): void => {
         it('persists the field value and refreshes "me" once the server responds', (): void => {
             const me: Me = new Me();

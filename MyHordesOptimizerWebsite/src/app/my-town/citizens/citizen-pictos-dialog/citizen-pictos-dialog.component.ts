@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, DestroyRef, inject, OnInit, signal, WritableSignal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, DestroyRef, inject, OnInit, Signal, signal, WritableSignal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
@@ -11,7 +11,7 @@ import { UserPictoDTO, UserPictosDTO } from '../../../_abstract_model/dto/user-p
 import { UserAccountService } from '../../../_abstract_model/services/user-account.service';
 import { Imports } from '../../../_abstract_model/types/_types';
 import { UserPicto } from '../../../_abstract_model/types/user-picto.class';
-import { getUser } from '../../../_core/utilities/localstorage.util';
+import { user } from '../../../_core/utilities/localstorage.util';
 import { PictosListComponent } from '../../../miscellaneous/pictos-list/pictos-list.component';
 
 const angular_common: Imports = [CommonModule];
@@ -44,7 +44,7 @@ export class CitizenPictosDialogComponent implements OnInit {
     protected importedAt: WritableSignal<string | null> = signal<string | null>(null);
     protected importing: WritableSignal<boolean> = signal<boolean>(false);
     /** L'import nécessite une session MHO (clé MyHordes de l'appelant) : masqué pour un visiteur anonyme, sinon un clic échouerait en 401 sans rien expliquer. */
-    protected readonly is_logged_in: boolean = !!getUser();
+    protected readonly is_logged_in: Signal<boolean> = computed(() => !!user());
 
     public ngOnInit(): void {
         this.service.getPictos(this.data.userId, this.data.townId)

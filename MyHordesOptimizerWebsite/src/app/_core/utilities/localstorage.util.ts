@@ -1,3 +1,4 @@
+import { computed, Signal, signal, WritableSignal } from '@angular/core';
 import { Moment } from 'moment';
 import moment from 'moment-timezone';
 
@@ -17,16 +18,22 @@ import { isValidToken } from './token.util';
 
 /** État de session en mémoire : dérivé de la dernière réponse de /Authentication/Token, remis à
  * zéro à chaque rechargement de page — jamais persisté, sur le même principe que `observed_town`
- * ci-dessous. */
-let current_me: Me | null = null;
+ * ci-dessous. Signal (et non simple variable) pour que les consommateurs construits avant la
+ * résolution du getMe() initial (ex. HeaderComponent, rendu hors du garde `@if (ready())`) se
+ * resynchronisent automatiquement au lieu de rester figés sur leur valeur de construction. */
+const current_me: WritableSignal<Me | null> = signal(null);
 
 export function setUser(user: Me | null): void {
-    current_me = user;
+    current_me.set(user);
 }
 
 export function getUser(): Me | null {
-    return current_me;
+    return current_me();
 }
+
+/** Signal en lecture seule pour les composants qui doivent refléter les changements d'utilisateur
+ * sans les recopier dans un signal local figé à la construction. */
+export const user: Signal<Me | null> = current_me.asReadonly();
 
 export function getUserId(): number | null {
     const user_id: number | undefined = getUser()?.id;
@@ -42,24 +49,25 @@ export function setExternalAppId(id: string | null): void {
 }
 
 /** Ville observée (mode observateur) : quand définie, elle remplace la ville du localStorage pour tous les consommateurs de getTown(). Gérée exclusivement par TownContextService. */
-let observed_town: TownDetails | null = null;
+const observed_town: WritableSignal<TownDetails | null> = signal(null);
 
 export function setObservedTown(town: TownDetails | null): void {
-    observed_town = town;
+    observed_town.set(town);
 }
 
-let current_town: TownDetails | null = null;
+const current_town: WritableSignal<TownDetails | null> = signal(null);
 
 export function getTown(): TownDetails | null {
-    if (observed_town) {
-        return observed_town;
-    }
-    return current_town;
+    return observed_town() ?? current_town();
 }
 
 export function setTown(town: TownDetails | null): void {
-    current_town = town;
+    current_town.set(town);
 }
+
+/** Signal en lecture seule, même principe que {@link user} : reflète `observed_town`/`current_town`
+ * sans recopie figée à la construction. */
+export const town: Signal<TownDetails | null> = computed(() => observed_town() ?? current_town());
 
 export function getItemsWithExpirationDate(): Item[] {
     const local_storage: string | null = localStorage.getItem(ITEMS_KEY) || '';

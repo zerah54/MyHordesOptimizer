@@ -40,7 +40,7 @@ import { JobFromIdPipe } from '../../_core/pipes/job-from-id.pipe';
 import { ClipboardService } from '../../_core/services/clipboard.service';
 import { TownContextService } from '../../_core/services/town-context.service';
 import { getCitizenFromId } from '../../_core/utilities/citizen.util';
-import { getTown, getUser } from '../../_core/utilities/localstorage.util';
+import { getTown, user } from '../../_core/utilities/localstorage.util';
 import { ActiveCitizensComponent } from '../../_shared/active-citizens/active-citizens.component';
 import { CompassRoseComponent } from '../../_shared/compass-rose/compass-rose.component';
 import { ConfirmDialogComponent, ConfirmDialogData } from '../../_shared/confirm-dialog/confirm-dialog.component';
@@ -68,7 +68,7 @@ const material_modules: Imports = [MatButtonModule, MatCardModule, MatCheckboxMo
 export class ExpeditionsComponent implements OnInit {
 
     protected readonly HORDES_IMG_REPO: Signal<string> = signal(HORDES_IMG_REPO);
-    protected readonly me: Signal<Me | null> = signal(getUser());
+    protected readonly me: Signal<Me | null> = user;
     /** La liste des actions héroïques */
     protected all_heroics: Signal<HeroicActionEnum[]> = signal((<HeroicActionEnum[]>HeroicActionEnum.getAllValues())
         .filter((action: HeroicActionEnum) => action.value.count_in_daily && action.value.action !== ''));

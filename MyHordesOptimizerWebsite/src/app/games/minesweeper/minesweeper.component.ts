@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import {
     ChangeDetectionStrategy,
     Component,
+    computed,
     inject,
     OnDestroy,
     OnInit,
@@ -39,7 +40,7 @@ import {
 import { Imports } from '../../_abstract_model/types/_types';
 import { CounterFromDatePipe, DiffBetweenDatesPipe } from '../../_core/utilities/date.util';
 import { createDelayedLoadingController, DelayedLoadingController } from '../../_core/utilities/delayed-loading.util';
-import { getUser } from '../../_core/utilities/localstorage.util';
+import { user } from '../../_core/utilities/localstorage.util';
 import { MinesweeperHistoryComponent } from './game-history/minesweeper-history.component';
 import { MinesweeperLeaderboardComponent } from './leaderboard/minesweeper-leaderboard.component';
 import { MinesweeperLeaderboardDialogComponent, MinesweeperLeaderboardDialogData } from './leaderboard-dialog/minesweeper-leaderboard-dialog.component';
@@ -75,7 +76,7 @@ export class MinesweeperComponent implements OnInit, OnDestroy {
     private current_game_id: WritableSignal<number | undefined> = signal(undefined);
 
     protected readonly game_mode: WritableSignal<'normal' | 'daily'> = signal('normal');
-    protected readonly is_guest: Signal<boolean> = signal(!getUser());
+    protected readonly is_guest: Signal<boolean> = computed(() => !user());
     protected readonly challenges_today: WritableSignal<MinesweeperChallengeStatus[]> = signal([]);
     private timer_started_by_server: WritableSignal<boolean> = signal(true);
     private long_press_timeout: ReturnType<typeof setTimeout> | undefined;

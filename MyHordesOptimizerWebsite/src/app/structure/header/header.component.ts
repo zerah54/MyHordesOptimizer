@@ -1,6 +1,18 @@
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { CommonModule, NgOptimizedImage } from '@angular/common';
-import { ChangeDetectionStrategy, Component, DestroyRef, inject, OnInit, output, OutputEmitterRef, signal, WritableSignal } from '@angular/core';
+import {
+    ChangeDetectionStrategy,
+    Component,
+    computed,
+    DestroyRef,
+    inject,
+    OnInit,
+    output,
+    OutputEmitterRef,
+    Signal,
+    signal,
+    WritableSignal
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -20,7 +32,7 @@ import { BREAKPOINTS } from '../../_abstract_model/const';
 import { AuthenticationService } from '../../_abstract_model/services/authentication.service';
 import { Imports } from '../../_abstract_model/types/_types';
 import { Me } from '../../_abstract_model/types/me.class';
-import { getExternalAppId, getTown, getUser, setExternalAppId, setTokenWithMeWithExpirationDate } from '../../_core/utilities/localstorage.util';
+import { getExternalAppId, setExternalAppId, setTokenWithMeWithExpirationDate, town, user } from '../../_core/utilities/localstorage.util';
 import { CitizenMenuComponent } from './citizen-menu/citizen-menu.component';
 import { ExternalToolsUpdateButtonComponent } from './external-tools-update-button/external-tools-update-button.component';
 import { HeaderService } from './header.service';
@@ -53,13 +65,16 @@ export class HeaderComponent implements OnInit {
     protected readonly external_app_id_field_value: WritableSignal<string | null> = signal(null);
     /** L'idendifiant d'app externe si il existe */
     protected readonly saved_external_app_id: WritableSignal<string | null> = signal(getExternalAppId());
-    /** Les informations de l'utilisateur */
-    protected readonly me: WritableSignal<Me | null> = signal(getUser());
+    /** Les informations de l'utilisateur : signal partagé (voir localstorage.util.ts), pas une copie
+     *  figée à la construction — le header est rendu avant la résolution du getMe() initial
+     *  d'AppComponent et doit se resynchroniser tout seul quand celui-ci aboutit. */
+    protected readonly me: Signal<Me | null> = user;
     protected readonly is_dev: boolean = !environment.production;
     protected readonly myhordes_url: string = environment.myhordes_url;
     protected readonly myhordes_app_id: number = environment.myhordes_app_id;
 
-    protected readonly is_in_town: WritableSignal<boolean> = signal(!!getTown()?.town_id);
+    /** Réactif au même titre que `me` : voir son commentaire ci-dessus. */
+    protected readonly is_in_town: Signal<boolean> = computed(() => !!town()?.town_id);
 
     protected readonly is_gt_xs: WritableSignal<boolean> = signal(this.breakpoint_observer.isMatched(BREAKPOINTS['gt-xs']));
 
@@ -105,10 +120,8 @@ export class HeaderComponent implements OnInit {
         this.authentication_api.getMe()
             .pipe(takeUntilDestroyed(this.destroy_ref))
             .subscribe(() => {
-                this.me.set(getUser());
                 this.external_app_id_field_value.set(null);
                 this.saved_external_app_id.set(getExternalAppId());
-                this.is_in_town.set(!!getTown()?.town_id);
                 this.reloadPage();
             });
     }

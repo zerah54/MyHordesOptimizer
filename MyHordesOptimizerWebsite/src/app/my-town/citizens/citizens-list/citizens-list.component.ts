@@ -57,7 +57,7 @@ import { ColumnIdPipe } from '../../../_core/pipes/column-id.pipe';
 import { ClipboardService } from '../../../_core/services/clipboard.service';
 import { TownContextService } from '../../../_core/services/town-context.service';
 import { getHeroicIcon, getHomeIcon } from '../../../_core/utilities/citizen.util';
-import { getTown, getUser } from '../../../_core/utilities/localstorage.util';
+import { getTown, getUser, user } from '../../../_core/utilities/localstorage.util';
 import { AvatarComponent } from '../../../_shared/avatar/avatar.component';
 import { CitizenInfoComponent } from '../../../_shared/citizen-info/citizen-info.component';
 import { CompactStepperComponent } from '../../../_shared/compact-stepper/compact-stepper.component';
@@ -223,7 +223,7 @@ export class CitizensListComponent implements OnInit {
     private update_menu_close_timer: ReturnType<typeof setTimeout> | null = null;
     private readonly api_service: ApiService = inject(ApiService);
     private readonly town_service: TownService = inject(TownService);
-    private readonly me: Me | null = getUser();
+    private readonly me: Signal<Me | null> = user;
     private readonly destroy_ref: DestroyRef = inject(DestroyRef);
     private readonly dialog: MatDialog = inject(MatDialog);
     private readonly clipboard: ClipboardService = inject(ClipboardService);
@@ -531,7 +531,7 @@ export class CitizensListComponent implements OnInit {
                             citizen.bag.update_info.username = getUser()?.username;
                             citizen.bag.update_info.update_time = update_info.update_time;
                         }
-                        if (citizen.id === this.me?.id) this.town_service.publishMyCitizen(citizen);
+                        if (citizen.id === this.me()?.id) this.town_service.publishMyCitizen(citizen);
                         this.refreshCitizenLists();
                     }
                 });
@@ -561,7 +561,7 @@ export class CitizensListComponent implements OnInit {
                             citizen.bag.update_info.username = getUser()?.username;
                             citizen.bag.update_info.update_time = update_info.update_time;
                         }
-                        if (citizen.id === this.me?.id) this.town_service.publishMyCitizen(citizen);
+                        if (citizen.id === this.me()?.id) this.town_service.publishMyCitizen(citizen);
                         this.refreshCitizenLists();
                     }
                 });
@@ -586,7 +586,7 @@ export class CitizensListComponent implements OnInit {
                             citizen.bag.update_info.username = getUser()?.username;
                             citizen.bag.update_info.update_time = update_info.update_time;
                         }
-                        if (citizen.id === this.me?.id) this.town_service.publishMyCitizen(citizen);
+                        if (citizen.id === this.me()?.id) this.town_service.publishMyCitizen(citizen);
                         this.refreshCitizenLists();
                     }
                 });
@@ -613,7 +613,7 @@ export class CitizensListComponent implements OnInit {
                             citizen.chest.update_info.username = getUser()?.username;
                             citizen.chest.update_info.update_time = update_info.update_time;
                         }
-                        if (citizen.id === this.me?.id) this.town_service.publishMyCitizen(citizen);
+                        if (citizen.id === this.me()?.id) this.town_service.publishMyCitizen(citizen);
                         this.refreshCitizenLists();
                     }
                 });
@@ -642,7 +642,7 @@ export class CitizensListComponent implements OnInit {
                             citizen.chest.update_info.username = getUser()?.username;
                             citizen.chest.update_info.update_time = update_info.update_time;
                         }
-                        if (citizen.id === this.me?.id) this.town_service.publishMyCitizen(citizen);
+                        if (citizen.id === this.me()?.id) this.town_service.publishMyCitizen(citizen);
                         this.refreshCitizenLists();
                     }
                 });
@@ -665,7 +665,7 @@ export class CitizensListComponent implements OnInit {
                             citizen.chest.update_info.username = getUser()?.username;
                             citizen.chest.update_info.update_time = update_info.update_time;
                         }
-                        if (citizen.id === this.me?.id) this.town_service.publishMyCitizen(citizen);
+                        if (citizen.id === this.me()?.id) this.town_service.publishMyCitizen(citizen);
                         this.refreshCitizenLists();
                     }
                 });
@@ -692,7 +692,7 @@ export class CitizensListComponent implements OnInit {
                             citizen.status.update_info.username = getUser()?.username;
                             citizen.status.update_info.update_time = update_info.update_time;
                         }
-                        if (citizen.id === this.me?.id) this.town_service.publishMyCitizen(citizen);
+                        if (citizen.id === this.me()?.id) this.town_service.publishMyCitizen(citizen);
                         this.refreshCitizenLists();
                     }
                 });
@@ -721,7 +721,7 @@ export class CitizensListComponent implements OnInit {
                             citizen.status.update_info.username = getUser()?.username;
                             citizen.status.update_info.update_time = update_info.update_time;
                         }
-                        if (citizen.id === this.me?.id) this.town_service.publishMyCitizen(citizen);
+                        if (citizen.id === this.me()?.id) this.town_service.publishMyCitizen(citizen);
                         this.refreshCitizenLists();
                     }
                 });
@@ -746,7 +746,7 @@ export class CitizensListComponent implements OnInit {
                             citizen.status.update_info.username = getUser()?.username;
                             citizen.status.update_info.update_time = update_info.update_time;
                         }
-                        if (citizen.id === this.me?.id) this.town_service.publishMyCitizen(citizen);
+                        if (citizen.id === this.me()?.id) this.town_service.publishMyCitizen(citizen);
                         this.refreshCitizenLists();
                     }
                 });
@@ -776,7 +776,7 @@ export class CitizensListComponent implements OnInit {
                             citizen.home.update_info.username = getUser()?.username;
                             citizen.home.update_info.update_time = update_info.update_time;
                         }
-                        if (citizen.id === this.me?.id) this.town_service.publishMyCitizen(citizen);
+                        if (citizen.id === this.me()?.id) this.town_service.publishMyCitizen(citizen);
                         this.refreshCitizenLists();
                     },
                     error: () => {
@@ -811,7 +811,7 @@ export class CitizensListComponent implements OnInit {
                             citizen.heroic_actions.update_info.username = getUser()?.username;
                             citizen.heroic_actions.update_info.update_time = update_info.update_time;
                         }
-                        if (citizen.id === this.me?.id) this.town_service.publishMyCitizen(citizen);
+                        if (citizen.id === this.me()?.id) this.town_service.publishMyCitizen(citizen);
                         this.refreshCitizenLists();
                     },
                     error: () => {
@@ -846,7 +846,7 @@ export class CitizensListComponent implements OnInit {
                             day: this.current_day, actionKey,
                             lastUpdateInfo: { updateTime: new Date(), userId: '', userName: '', userKey: '' }
                         }));
-                        if (citizen.id === this.me?.id) this.town_service.publishMyCitizen(citizen);
+                        if (citizen.id === this.me()?.id) this.town_service.publishMyCitizen(citizen);
                         this.refreshCitizenLists();
                     }
                 });
@@ -858,7 +858,7 @@ export class CitizensListComponent implements OnInit {
                     next: () => {
                         const index: number = citizen.daily_actions.findIndex((action: DailyAction) => action.day === this.current_day && action.action_key === actionKey);
                         if (index > -1) citizen.daily_actions.splice(index, 1);
-                        if (citizen.id === this.me?.id) this.town_service.publishMyCitizen(citizen);
+                        if (citizen.id === this.me()?.id) this.town_service.publishMyCitizen(citizen);
                         this.refreshCitizenLists();
                     }
                 });
@@ -887,7 +887,7 @@ export class CitizensListComponent implements OnInit {
                         citizen.chamanic_detail.update_info.username = getUser()?.username;
                         citizen.chamanic_detail.update_info.update_time = update_info.update_time;
                     }
-                    if (citizen.id === this.me?.id) this.town_service.publishMyCitizen(citizen);
+                    if (citizen.id === this.me()?.id) this.town_service.publishMyCitizen(citizen);
                     this.refreshCitizenLists();
                 }
             });
@@ -1055,7 +1055,7 @@ export class CitizensListComponent implements OnInit {
                     this.citizen_list.data = [...alive_citizen_info.citizens];
                     this.buildValueOptions();
 
-                    const my_citizen: Citizen | undefined = alive_citizen_info.citizens.find((citizen: Citizen) => citizen.id === this.me?.id);
+                    const my_citizen: Citizen | undefined = alive_citizen_info.citizens.find((citizen: Citizen) => citizen.id === this.me()?.id);
                     if (my_citizen) this.town_service.publishMyCitizen(my_citizen);
 
                     const dead_citizen_info: CitizenInfo = Object.assign({}, citizen_info);
