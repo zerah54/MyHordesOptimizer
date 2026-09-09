@@ -97,14 +97,19 @@ namespace MyHordesOptimizerApiIntegrationTests.Services
             store.GetState(progress.JobId, 42).JobId.Should().Be(Guid.Empty);
         }
 
+        /// <summary>
+        /// GestHordes/FataMorgana peuvent rester en vol plusieurs minutes (constaté en prod le
+        /// 2026-09-09) : la tâche de fond continue et finit par appeler Complete(), mais si le
+        /// registre a déjà oublié le job, ce succès devient invisible pour toujours côté client.
+        /// </summary>
         [Fact]
-        public void GetState_SurUnLancementBloqueDepuisPlusDeCinqMinutes_EstPurge()
+        public void GetState_SurUnLancementEncoreEnCoursApresCinqMinutes_RestConsultable()
         {
             var store = NewStore();
             var progress = store.Reserve(42);
-            _now = _now.Add(ExternalToolsUpdateJobStore.StaleAfter).AddSeconds(1);
+            _now = _now.AddMinutes(6);
 
-            store.GetState(progress.JobId, 42).JobId.Should().Be(Guid.Empty);
+            store.GetState(progress.JobId, 42).JobId.Should().Be(progress.JobId);
         }
     }
 }

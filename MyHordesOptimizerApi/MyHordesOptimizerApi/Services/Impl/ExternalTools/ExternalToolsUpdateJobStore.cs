@@ -14,12 +14,6 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
     /// </summary>
     public class ExternalToolsUpdateJobStore
     {
-        /// <summary>
-        /// Au-delà, un lancement encore « en cours » est tenu pour abandonné (tâche de fond plantée
-        /// avant d'appeler Complete) et purgé du registre au lieu de s'y accumuler indéfiniment.
-        /// </summary>
-        public static readonly TimeSpan StaleAfter = TimeSpan.FromMinutes(5);
-
         /// <summary>Durée pendant laquelle l'issue d'un lancement terminé reste consultable.</summary>
         public static readonly TimeSpan RetainFinishedFor = TimeSpan.FromMinutes(10);
 
@@ -70,12 +64,20 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
             }
         }
 
+        /// <summary>
+        /// Ne purge que les lancements TERMINÉS depuis trop longtemps. Un lancement encore
+        /// `IsRunning`, même après plusieurs minutes, n'est jamais purgé ici : GestHordes/FataMorgana
+        /// peuvent rester en vol longtemps (constaté en prod le 2026-09-09), la tâche de fond continue
+        /// et finit par appeler Complete() quoi qu'il arrive (`finally` dans
+        /// <see cref="ExternalToolsUpdateJobRunner"/>) — le purger avant rendrait ce succès invisible
+        /// pour toujours côté client. Un vrai crash process vide de toute façon tout ce registre en
+        /// mémoire au redémarrage, donc rien ne s'accumule indéfiniment pour de vrai.
+        /// </summary>
         private void PurgeExpired()
         {
             var now = _now();
             var expired = _progressByJobId
-                .Where(entry => (!entry.Value.IsRunning && entry.Value.FinishedAt.HasValue && now - entry.Value.FinishedAt.Value > RetainFinishedFor)
-                                || (entry.Value.IsRunning && now - entry.Value.StartedAt > StaleAfter))
+                .Where(entry => !entry.Value.IsRunning && entry.Value.FinishedAt.HasValue && now - entry.Value.FinishedAt.Value > RetainFinishedFor)
                 .Select(entry => entry.Key)
                 .ToList();
             foreach (var jobId in expired)

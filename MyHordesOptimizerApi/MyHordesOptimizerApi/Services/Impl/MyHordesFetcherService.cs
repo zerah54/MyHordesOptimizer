@@ -908,42 +908,83 @@ namespace MyHordesOptimizerApi.Services.Impl
         // intenable. Les pictos ne bougeant qu'en fin de ville, un jour de fraîcheur suffit.
         private static readonly TimeSpan PictosImportMinimumInterval = TimeSpan.FromHours(24);
 
+        // Le throttle 24h ci-dessous est un check-then-act : sans verrou, deux imports démarrés à
+        // quelques secondes d'intervalle (deux requêtes de connexion concurrentes du même joueur) lisent
+        // tous les deux "pas encore fait" avant que le premier n'écrive PictosHistoryImportedAt à la
+        // toute fin, et appellent MyHordes en double (observé en prod le 2026-09-09). Clé = userId,
+        // jamais retirée : même justification que TownSyncLock._townGates.
+        private static readonly ConcurrentDictionary<int, SemaphoreSlim> PictosImportGates = new();
+
+        // PictosHistoryImportedAt n'est écrit qu'à la fin d'un import RÉUSSI : un échec (quota MyHordes
+        // atteint) ne le touche jamais, et sans mémoire séparée de cet échec, un joueur hors ville
+        // (GetSimpleMeAsync le retente à chaque connexion) rappelle MyHordes en boucle sans jamais
+        // laisser le quota se libérer (observé en prod le 2026-09-09). Clé = userId, jamais retirée :
+        // même justification que PictosImportGates ci-dessus.
+        private static readonly ConcurrentDictionary<int, DateTime> LastPictosImportFailureAt = new();
+        private static readonly TimeSpan PictosImportFailureCooldown = TimeSpan.FromMinutes(5);
+
         /// <summary>
         /// Importe le total des pictos d'un joueur et le détail de son historique par ville, en un
-        /// seul appel MyHordes. Renvoie false sans rien faire si l'import est déjà récent.
+        /// seul appel MyHordes. Renvoie false sans rien faire si l'import est déjà récent, ou si une
+        /// tentative a échoué il y a moins de <see cref="PictosImportFailureCooldown"/>.
         /// </summary>
         public async Task<bool> ImportUserPictosAsync(int userId)
         {
-            var user = DbContext.Users.FirstOrDefault(u => u.IdUser == userId);
-            if (user == null)
+            var gate = PictosImportGates.GetOrAdd(userId, _ => new SemaphoreSlim(1, 1));
+            await gate.WaitAsync();
+            try
             {
-                throw new MhoTechnicalException($"Utilisateur introuvable : {userId}");
-            }
-            if (user.PictosHistoryImportedAt.HasValue
-                && DateTime.UtcNow - user.PictosHistoryImportedAt.Value < PictosImportMinimumInterval)
-            {
-                Logger.LogDebug("ImportUserPictos: import ignoré pour {UserId}, déjà fait le {Date}", userId, user.PictosHistoryImportedAt);
-                return false;
-            }
+                var user = DbContext.Users.FirstOrDefault(u => u.IdUser == userId);
+                if (user == null)
+                {
+                    throw new MhoTechnicalException($"Utilisateur introuvable : {userId}");
+                }
+                if (user.PictosHistoryImportedAt.HasValue
+                    && DateTime.UtcNow - user.PictosHistoryImportedAt.Value < PictosImportMinimumInterval)
+                {
+                    Logger.LogDebug("ImportUserPictos: import ignoré pour {UserId}, déjà fait le {Date}", userId, user.PictosHistoryImportedAt);
+                    return false;
+                }
+                if (LastPictosImportFailureAt.TryGetValue(userId, out var lastFailure)
+                    && DateTime.UtcNow - lastFailure < PictosImportFailureCooldown)
+                {
+                    Logger.LogDebug("ImportUserPictos: import ignoré pour {UserId}, échec récent le {Date}", userId, lastFailure);
+                    return false;
+                }
 
-            var response = MyHordesJsonApiRepository.GetUserPictos(userId);
+                MyHordesUserDetailsDto response;
+                try
+                {
+                    response = MyHordesJsonApiRepository.GetUserPictos(userId);
+                }
+                catch
+                {
+                    LastPictosImportFailureAt[userId] = DateTime.UtcNow;
+                    throw;
+                }
 
-            // L'import crée / met à jour des lignes Town, comme la synchronisation de ville : sans ce
-            // verrou, deux écritures concurrentes sur la même ville se marcheraient dessus. L'ensemble
-            // des villes touchées (l'historique de CE joueur) est connu à l'avance : un verrou ciblé sur
-            // ces villes suffit, pas besoin du verrou global qui bloquerait toutes les autres synchros
-            // du serveur pendant l'import. ResolveTownId (pas -mapId brut) : une ville de l'historique
-            // déjà migrée par un import de saison a un IdTown stable, différent de -mapId.
-            var townIds = (response.PlayedMaps ?? new List<MyHordesCitizenRankingDto>())
-                .Where(played => played.MapId.HasValue)
-                .Select(played => DbContext.ResolveTownId(played.MapId.Value))
-                .Distinct()
-                .ToList();
-            await using (await TownSyncLock.AcquireTownsAsync(townIds))
-            {
-                PersistUserPictos(response, userId);
+                // L'import crée / met à jour des lignes Town, comme la synchronisation de ville : sans
+                // ce verrou, deux écritures concurrentes sur la même ville se marcheraient dessus.
+                // L'ensemble des villes touchées (l'historique de CE joueur) est connu à l'avance : un
+                // verrou ciblé sur ces villes suffit, pas besoin du verrou global qui bloquerait toutes
+                // les autres synchros du serveur pendant l'import. ResolveTownId (pas -mapId brut) :
+                // une ville de l'historique déjà migrée par un import de saison a un IdTown stable,
+                // différent de -mapId.
+                var townIds = (response.PlayedMaps ?? new List<MyHordesCitizenRankingDto>())
+                    .Where(played => played.MapId.HasValue)
+                    .Select(played => DbContext.ResolveTownId(played.MapId.Value))
+                    .Distinct()
+                    .ToList();
+                await using (await TownSyncLock.AcquireTownsAsync(townIds))
+                {
+                    PersistUserPictos(response, userId);
+                }
+                return true;
             }
-            return true;
+            finally
+            {
+                gate.Release();
+            }
         }
 
         private void PersistUserPictos(MyHordesUserDetailsDto response, int userId)
