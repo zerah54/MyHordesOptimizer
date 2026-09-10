@@ -1067,6 +1067,25 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
 
         #region Bags
 
+        /// <summary>Écarte les objets dont l'IdItem n'existe pas dans le référentiel local (icône non résolue côté addon, référentiel pas à jour...), en journalisant chacun pour diagnostic immédiat plutôt que de laisser la violation de clé étrangère faire échouer tout le SaveChanges.</summary>
+        private List<UpdateObjectDto> FilterKnownItems(HashSet<int> validItemIds, List<UpdateObjectDto> items, string context, int townId, int userId)
+        {
+            var known = new List<UpdateObjectDto>();
+            foreach (var item in items)
+            {
+                if (validItemIds.Contains(item.Id))
+                {
+                    known.Add(item);
+                }
+                else
+                {
+                    Logger.LogWarning("{Context} : objet {IdItem} inconnu (ville {TownId}, utilisateur {UserId}), ignoré.",
+                        context, item.Id, townId, userId);
+                }
+            }
+            return known;
+        }
+
         private void UpdateBags(int townId, List<UpdateBagsContentsDto> bags)
         {
             if (bags != null)
@@ -1076,6 +1095,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                 using var transaction = dbContext.Database.BeginTransaction();
                 var newLastUpdate = dbContext.LastUpdateInfos.Update(Mapper.Map<LastUpdateInfo>(UserInfoProvider.GenerateLastUpdateInfo(), opt => opt.SetDbContext(dbContext))).Entity;
                 dbContext.SaveChanges();
+                var validItemIds = dbContext.Items.Select(i => i.IdItem).ToHashSet();
 
                 foreach (var bag in bags)
                 {
@@ -1092,7 +1112,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                     }
                     dbContext.BagItems.RemoveRange(citizen.IdBagNavigation.BagItems);
                     citizen.IdBagNavigation.BagItems.Clear();
-                    foreach (var item in bag.Objects)
+                    foreach (var item in FilterKnownItems(validItemIds, bag.Objects, "UpdateBags", townId, bag.UserId))
                     {
                         citizen.IdBagNavigation.BagItems.Add(new BagItem()
                         {
@@ -1137,7 +1157,8 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                 citizen.IdBagNavigation = newBag;
                 citizen.IdBag = newBag.IdBag;
             }
-            foreach (var item in bag)
+            var validItemIds = dbContext.Items.Select(i => i.IdItem).ToHashSet();
+            foreach (var item in FilterKnownItems(validItemIds, bag, "UpdateCitizenBag", townId, userId))
             {
                 var bagItem = dbContext.Add(new BagItem()
                 {
@@ -1172,7 +1193,8 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                 citizen.IdChestNavigation = newChest;
                 citizen.IdChest = newChest.IdChest;
             }
-            foreach (var item in items)
+            var validItemIds = dbContext.Items.Select(i => i.IdItem).ToHashSet();
+            foreach (var item in FilterKnownItems(validItemIds, items, "ReplaceChestItems", citizen.IdTown, citizen.IdUser))
             {
                 var chestItem = dbContext.Add(new ChestItem()
                 {

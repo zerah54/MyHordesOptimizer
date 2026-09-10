@@ -130,6 +130,35 @@ namespace MyHordesOptimizerApiIntegrationTests.Services
         }
 
         [Fact]
+        public void UpdateCitizenChest_ObjetInconnu_IgnoreLObjetEtConserveLesAutres()
+        {
+            // Reproduit l'incident du 2026-09-10 : l'addon envoie un IdItem absent du
+            // référentiel local (icône non résolue côté client). Avant ce test, ça faisait
+            // planter tout le SaveChanges sur une violation de clé étrangère.
+            var scope = _factory.Services.CreateScope();
+            var context = scope.ServiceProvider.GetRequiredService<MhoContext>();
+            var (townId, userId) = SeedTownAndCitizen(context);
+            var knownItem = context.Items.First();
+            var unknownItemId = context.Items.Max(i => i.IdItem) + 1;
+            var service = scope.ServiceProvider.GetRequiredService<IExternalToolsService>();
+
+            service.UpdateCitizenChest(townId, userId, new List<UpdateObjectDto>
+            {
+                new UpdateObjectDto { Id = knownItem.IdItem, Count = 3, IsBroken = false },
+                new UpdateObjectDto { Id = unknownItemId, Count = 1, IsBroken = false }
+            });
+
+            var reloadedScope = _factory.Services.CreateScope();
+            var reloadedContext = reloadedScope.ServiceProvider.GetRequiredService<MhoContext>();
+            var citizen = reloadedContext.TownCitizens
+                .Include(c => c.IdChestNavigation)
+                .ThenInclude(c => c.ChestItems)
+                .Single(c => c.IdTown == townId && c.IdUser == userId);
+
+            citizen.IdChestNavigation!.ChestItems.Should().ContainSingle(ci => ci.IdItem == knownItem.IdItem && ci.Count == 3);
+        }
+
+        [Fact]
         public async System.Threading.Tasks.Task UpdateExternalsTools_AvecChestActive_RemplaceLeContenuDuCoffre()
         {
             var scope = _factory.Services.CreateScope();
