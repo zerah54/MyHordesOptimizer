@@ -403,6 +403,106 @@
             }
         }
     }
+
+    // ---- Mode observateur : cartes légères (lecture seule) ----
+    .mho-citizens-list-light {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5em;
+        padding: 0.5em;
+        overflow: auto;
+        height: 100%;
+
+        .citizens-light-section h3 {
+            margin: 0 0 0.5em;
+            opacity: 0.7;
+            font-weight: 600;
+        }
+
+        .citizen-light-cards {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75em;
+        }
+
+        .citizen-light-card {
+            display: flex;
+            align-items: center;
+            gap: 0.6em;
+            padding: 0.5em 0.75em;
+            border: 1px solid var(--mat-sys-outline-variant);
+            border-radius: 8px;
+            flex: 1 1 260px;
+            height: 92px;
+            overflow: hidden;
+        }
+
+        .citizen-light-info {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25em;
+            min-width: 0;
+            flex: 1 1 auto;
+        }
+
+        // Conteneurs en ligne (flex) : text-overflow n'a pas d'effet sur un flex container lui-même,
+        // il faut l'appliquer à l'élément texte qui déborde (name / death-label), avec min-width:0
+        // sur lui ET son ancêtre flex pour qu'il accepte de rétrécir au lieu de pousser la carte.
+        .citizen-light-line1 {
+            display: flex;
+            align-items: center;
+            gap: 0.35em;
+            font-weight: 600;
+            min-width: 0;
+
+            .name {
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                min-width: 0;
+            }
+
+            .job-cell-icon,
+            .town-role-icon {
+                display: inline-block;
+                vertical-align: middle;
+                flex-shrink: 0;
+            }
+
+            .death-day {
+                font-size: 0.75em;
+                font-weight: 400;
+                opacity: 0.7;
+                flex-shrink: 0;
+            }
+        }
+
+        .citizen-light-line2 {
+            display: flex;
+            align-items: center;
+            gap: 0.35em;
+            min-width: 0;
+
+            .death-label {
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                min-width: 0;
+            }
+        }
+
+        .town-message {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            font-size: 0.85em;
+
+            .label {
+                font-weight: bold;
+                opacity: 0.8;
+            }
+        }
+    }
 }
 
 // max-width par défaut de mat-menu (280px) trop étroit pour une ligne "Label : Mis à jour par <pseudo> <durée>".

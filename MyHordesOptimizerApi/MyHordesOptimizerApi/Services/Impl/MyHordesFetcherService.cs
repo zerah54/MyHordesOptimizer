@@ -8,6 +8,7 @@ using MyHordesOptimizerApi.Data.Items;
 using MyHordesOptimizerApi.Dtos.MyHordes;
 using MyHordesOptimizerApi.Dtos.MyHordes.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
+using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Bag;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Buildings;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Citizens;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Map;
@@ -1564,7 +1565,52 @@ namespace MyHordesOptimizerApi.Services.Impl
                     citizen.Cadaver = Mapper.Map<CadaverDto>(cadaverModel);
                 }
             }
+
+            // Le demandeur n'est ni citoyen vivant ni citoyen mort (TownCitizen.Dead reste true pour
+            // les morts) de cette ville : on ne lui doit que l'identité affichable, pas le contenu
+            // (sac, coffre, états, actions, points d'âme...) des autres joueurs.
+            if (models.All(citizen => citizen.IdUser != UserInfoProvider.UserId))
+            {
+                foreach (var citizen in dtos.Citizens)
+                {
+                    ReduceToMinimalCitizen(citizen);
+                }
+            }
+
             return dtos;
+        }
+
+        /// <summary>
+        /// Retaille un CitizenDto déjà mappé pour un demandeur extérieur à la ville : garde l'identité
+        /// affichable (nom, avatar, métier, rôles de ville, niveau de maison) et, pour un mort, la cause
+        /// du décès et le message laissé à la ville. Retire tout le reste (sac, coffre, états, actions
+        /// quotidiennes/héroïques, chamanique, position, message privé de décès, points d'âme...).
+        /// </summary>
+        private static void ReduceToMinimalCitizen(CitizenDto citizen)
+        {
+            citizen.HomeMessage = null;
+            citizen.X = 0;
+            citizen.Y = 0;
+            citizen.HouseDefense = null;
+            citizen.NombreJourHero = 0;
+            citizen.IsShunned = false;
+            citizen.Bag = new BagDto();
+            citizen.Chest = null;
+            citizen.Status = null;
+            citizen.ActionsHeroic = null;
+            citizen.ChamanicDetail = null;
+            citizen.DailyActions = new List<DailyActionDto>();
+
+            if (citizen.Home?.Content != null)
+            {
+                citizen.Home.Content = new CitizenHomeValueDto { HouseLevel = citizen.Home.Content.HouseLevel };
+            }
+
+            // Survival gardé bien que non affiché en carte légère : c'est le jour de mort (absolu,
+            // partagé par toute la ville) sur lequel le front trie les morts (plus récent d'abord).
+            citizen.Cadaver = citizen.Dead
+                ? new CadaverDto { CauseOfDeath = citizen.Cadaver?.CauseOfDeath, TownMsg = citizen.Cadaver?.TownMsg, Survival = citizen.Cadaver?.Survival ?? 0 }
+                : new CadaverDto();
         }
 
         /// <summary>

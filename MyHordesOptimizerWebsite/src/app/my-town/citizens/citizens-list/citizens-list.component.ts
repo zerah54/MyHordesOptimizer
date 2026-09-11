@@ -407,6 +407,11 @@ export class CitizensListComponent implements OnInit {
         return citizen.home?.content?.find((content: HomeWithValue): boolean => content.element?.key === home.key);
     }
 
+    /** Niveau de maison d'un citoyen (mode observateur : seul champ maison encore affiché). */
+    protected houseLevelOf(citizen: Citizen): HomeWithValue | undefined {
+        return this.getHomeUpgrade(citizen, HomeEnum.HOUSE_LEVEL);
+    }
+
     /**
      * Icône d'une amélioration. L'habitation n'a pas d'icône fixe (`img` vide) : son visuel dépend du
      * niveau, d'où l'image `home_lv{niveau}.gif`. Un niveau négatif (-1 = non défini) retombe sur le
@@ -1061,7 +1066,11 @@ export class CitizensListComponent implements OnInit {
                     const dead_citizen_info: CitizenInfo = Object.assign({}, citizen_info);
                     // Les morts sont affichés directement depuis les objets Citizen : l'API ne renvoie pas
                     // d'objet `cadaver` distinct (le filtre `&& citizen.cadaver` masquait donc tous les morts).
-                    dead_citizen_info.citizens = dead_citizen_info.citizens.filter((citizen: Citizen) => citizen.is_dead);
+                    // Tri mort la plus récente en premier : `survival` est le jour (absolu, partagé par
+                    // toute la ville) où le citoyen est mort, pas un compteur relatif par joueur.
+                    dead_citizen_info.citizens = dead_citizen_info.citizens
+                        .filter((citizen: Citizen) => citizen.is_dead)
+                        .sort((a: Citizen, b: Citizen) => (b.cadaver?.survival ?? -1) - (a.cadaver?.survival ?? -1));
                     this.dead_citizen_info.set(dead_citizen_info);
                     this.dead_citizen_list.data = [...dead_citizen_info.citizens];
                 }

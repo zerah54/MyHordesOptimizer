@@ -6,6 +6,7 @@ import { provideRouter, Router } from '@angular/router';
 import { of } from 'rxjs';
 
 import { DailyActionEnum } from '../../../_abstract_model/enum/daily-action.enum';
+import { HomeEnum } from '../../../_abstract_model/enum/home.enum';
 import { StatusEnum } from '../../../_abstract_model/enum/status.enum';
 import { TownService } from '../../../_abstract_model/services/town.service';
 import { Bag } from '../../../_abstract_model/types/bag.class';
@@ -13,9 +14,12 @@ import { ChamanicDetail } from '../../../_abstract_model/types/chamanic-detail.c
 import { Citizen } from '../../../_abstract_model/types/citizen.class';
 import { CitizenInfo } from '../../../_abstract_model/types/citizen-info.class';
 import { DailyAction } from '../../../_abstract_model/types/daily-action.class';
+import { Home, HomeWithValue } from '../../../_abstract_model/types/home.class';
 import { Item } from '../../../_abstract_model/types/item.class';
 import { Status } from '../../../_abstract_model/types/status.class';
+import { TownDetails } from '../../../_abstract_model/types/town-details.class';
 import { UpdateInfo } from '../../../_abstract_model/types/update-info.class';
+import { TownContextService } from '../../../_core/services/town-context.service';
 import { CitizensListComponent } from './citizens-list.component';
 
 interface TestableComponent {
@@ -251,5 +255,43 @@ describe('CitizensListComponent', (): void => {
 
         httpMock.expectOne((request) => request.url.includes('/ExternalTools/Chest')).flush({});
         expect(citizen.chest.items).toEqual([]);
+    });
+
+    it('houseLevelOf resolves the HOUSE_LEVEL home entry of a citizen', (): void => {
+        const citizen: Citizen = new Citizen();
+        citizen.home = new Home();
+        citizen.home.content = [<HomeWithValue>{ element: HomeEnum.HOUSE_LEVEL, value: 3 }];
+
+        const result: HomeWithValue | undefined =
+            (component as unknown as { houseLevelOf(c: Citizen): HomeWithValue | undefined }).houseLevelOf(citizen);
+
+        expect(result?.value).toBe(3);
+    });
+
+    describe('mode observateur (is_readonly)', (): void => {
+        it('renders the light card view, not the heavy table, when the town is observed read-only', (): void => {
+            TestBed.inject(TownContextService).setObservedTown(new TownDetails());
+            const info: CitizenInfo = new CitizenInfo();
+            info.citizens = [makeCitizen(1, 'Alice')];
+            spyOn(TestBed.inject(TownService), 'getCitizens').and.returnValue(of(info));
+
+            fixture.detectChanges();
+
+            const el: HTMLElement = fixture.nativeElement;
+            expect(el.querySelector('.mho-citizens-list-light')).toBeTruthy();
+            expect(el.querySelector('mat-sidenav-container')).toBeFalsy();
+        });
+
+        it('renders the heavy table, not the light card view, when the town is not observed', (): void => {
+            const info: CitizenInfo = new CitizenInfo();
+            info.citizens = [makeCitizen(1, 'Alice')];
+            spyOn(TestBed.inject(TownService), 'getCitizens').and.returnValue(of(info));
+
+            fixture.detectChanges();
+
+            const el: HTMLElement = fixture.nativeElement;
+            expect(el.querySelector('mat-sidenav-container')).toBeTruthy();
+            expect(el.querySelector('.mho-citizens-list-light')).toBeFalsy();
+        });
     });
 });

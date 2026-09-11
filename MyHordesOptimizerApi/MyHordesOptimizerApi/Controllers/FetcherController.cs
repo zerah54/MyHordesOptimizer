@@ -123,7 +123,14 @@ namespace MyHordesOptimizerApi.Controllers
                 return BadRequest($"{nameof(userId)} cannot be empty");
             }
 
-            UserInfoProvider.UserId = userId.Value;
+            // userId de query non écrasé sur UserInfoProvider.UserId (posé par le JWT via JwtActionFilter,
+            // global sur tous les contrôleurs) : sans ce garde, un userId de query usurpé faisait passer
+            // pour "membre de la ville" (voir MyHordesFetcherService.GetCitizens) un demandeur qui ne l'est pas.
+            if (UserInfoProvider.UserId == 0 || UserInfoProvider.UserId != userId.Value)
+            {
+                return Forbid();
+            }
+
             var citizens = _myHordesFetcherService.GetCitizens(townId.Value);
             return citizens;
         }
