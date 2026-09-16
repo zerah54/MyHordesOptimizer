@@ -359,6 +359,56 @@ namespace MyHordesOptimizerApiUnitTests.Citoyens
         }
 
         [Fact]
+        public void Simulate_SecondSouffleNiveau0_RendLesBonnesValeursEtPurgeLaFatigue()
+        {
+            // Niveau 0 ("Endurant" Débutant) : 3 PA, 1 PE — CitizenPointRules.GetSecondWindBonus.
+            var engine = CreateEngine(new Dictionary<int, string[]>());
+            var start = new CitizenState { Ap = 0, Sp = 0, Statuses = new HashSet<string> { "tired" } };
+
+            var trace = engine.Simulate(start, new List<CitizenStateStep> { new SecondWindStep { Level = 0 } });
+
+            trace.Steps[0].StateAfter.Ap.Should().Be(3);
+            trace.Steps[0].StateAfter.Sp.Should().Be(1);
+            trace.Steps[0].StateAfter.Statuses.Should().NotContain("tired");
+        }
+
+        [Fact]
+        public void Simulate_SecondSouffleNiveau3_MeilleurBonus()
+        {
+            var engine = CreateEngine(new Dictionary<int, string[]>());
+            var start = new CitizenState { Ap = 0, Sp = 0 };
+
+            var trace = engine.Simulate(start, new List<CitizenStateStep> { new SecondWindStep { Level = 3 } });
+
+            trace.Steps[0].StateAfter.Ap.Should().Be(4);
+            trace.Steps[0].StateAfter.Sp.Should().Be(6);
+        }
+
+        [Fact]
+        public void Simulate_SecondSouffle_ApPlafonneAuMaxSansDepasser()
+        {
+            var engine = CreateEngine(new Dictionary<int, string[]>());
+            var start = new CitizenState { Ap = 5, Sp = 0, Wounded = false }; // MaxAp = 6
+
+            var trace = engine.Simulate(start, new List<CitizenStateStep> { new SecondWindStep { Level = 3 } }); // bonus AP = 4
+
+            trace.Steps[0].StateAfter.Ap.Should().Be(6); // pas 9 : exceedMax=0 pour le PA
+        }
+
+        [Fact]
+        public void Simulate_SecondSouffle_PeDepasseLeMaxNormalDuCitoyen()
+        {
+            // Citoyen sans éclaireur/vélo/baskets : MaxSp = 0. Le PE doit quand même monter au bonus du
+            // niveau (exceedMax=bonus côté jeu, c'est ce qui purge la fatigue au-delà du plafond normal).
+            var engine = CreateEngine(new Dictionary<int, string[]>());
+            var start = new CitizenState { Ap = 0, Sp = 0, IsEclaireur = false, HasBike = false, HasShoes = false };
+
+            var trace = engine.Simulate(start, new List<CitizenStateStep> { new SecondWindStep { Level = 3 } }); // bonus PE = 6
+
+            trace.Steps[0].StateAfter.Sp.Should().Be(6);
+        }
+
+        [Fact]
         public void Simulate_ItemInconnu_NeFaitRienEtNePlantePas()
         {
             var engine = CreateEngine(new Dictionary<int, string[]>());

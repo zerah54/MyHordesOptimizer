@@ -5,5 +5,7 @@ export interface RankedOrderDTO {
     tier: string;
     tierReachedAtDistance: number | null;
     totalDistance: number;
+    totalAp: number;
+    totalSp: number;
     finalState: CitizenStateDTO;
 }

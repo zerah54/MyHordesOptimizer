@@ -13,6 +13,10 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.CitizenState
 
         public int TotalDistance { get; set; }
 
+        public int TotalAp { get; set; }
+
+        public int TotalSp { get; set; }
+
         public CitizenStateDto FinalState { get; set; } = null!;
     }
 }

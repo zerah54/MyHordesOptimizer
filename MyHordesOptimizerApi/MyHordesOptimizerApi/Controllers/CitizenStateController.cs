@@ -65,6 +65,8 @@ namespace MyHordesOptimizerApi.Controllers
                 Tier = r.Tier.ToString().ToLowerInvariant(),
                 TierReachedAtDistance = r.TierReachedAtDistance,
                 TotalDistance = r.TotalDistance,
+                TotalAp = r.TotalAp,
+                TotalSp = r.TotalSp,
                 FinalState = ToDto(r.FinalState),
             }).ToList());
         }
@@ -100,6 +102,7 @@ namespace MyHordesOptimizerApi.Controllers
             "dismount_bike" => new DismountBikeStep(),
             "pickup_defence_cp_item" => new PickupDefenceCpItemStep(),
             "become_ghoul" => new BecomeGhoulStep(),
+            "second_wind" when dto.Level is >= 0 and <= 3 => new SecondWindStep { Level = dto.Level.Value },
             _ => null,
         };
 

@@ -175,7 +175,7 @@ describe('StateManagerComponent', (): void => {
         const item2: Item = buildItem(2, 'bandage_#00');
         state_service.rankOrders.and.returnValue(of<RankedOrder[]>([
             new RankedOrder({
-                order: [2, 1], tier: 'none', tierReachedAtDistance: null, totalDistance: 6,
+                order: [2, 1], tier: 'none', tierReachedAtDistance: null, totalDistance: 6, totalAp: 6, totalSp: 0,
                 finalState: { ap: 6, sp: 0, wounded: false, isEclaireur: false, hasBike: false, hasShoes: false, walkingDistance: 0, isDead: false, statuses: [] }
             })
         ]));
@@ -200,8 +200,8 @@ describe('StateManagerComponent', (): void => {
         component['addToBag'](2); // 2e appel réseau -> fresh$, doit annuler l'abonnement à stale$
 
         // La réponse la plus récente arrive en premier ; la réponse obsolète répond après.
-        fresh$.next([new RankedOrder({ order: [2, 1], tier: 'none', tierReachedAtDistance: null, totalDistance: 6, finalState: final_state })]);
-        stale$.next([new RankedOrder({ order: [1], tier: 'none', tierReachedAtDistance: null, totalDistance: 6, finalState: final_state })]);
+        fresh$.next([new RankedOrder({ order: [2, 1], tier: 'none', tierReachedAtDistance: null, totalDistance: 6, totalAp: 6, totalSp: 0, finalState: final_state })]);
+        stale$.next([new RankedOrder({ order: [1], tier: 'none', tierReachedAtDistance: null, totalDistance: 6, totalAp: 6, totalSp: 0, finalState: final_state })]);
 
         expect(component['best_order']()).toEqual([item2, item1]);
     });
@@ -210,7 +210,7 @@ describe('StateManagerComponent', (): void => {
         const item: Item = buildItem(1, 'water_#00');
         state_service.rankOrders.and.returnValue(of<RankedOrder[]>([
             new RankedOrder({
-                order: [1], tier: 'none', tierReachedAtDistance: null, totalDistance: 6,
+                order: [1], tier: 'none', tierReachedAtDistance: null, totalDistance: 6, totalAp: 6, totalSp: 0,
                 finalState: { ap: 6, sp: 0, wounded: false, isEclaireur: false, hasBike: false, hasShoes: false, walkingDistance: 0, isDead: false, statuses: [] }
             })
         ]));
@@ -243,7 +243,7 @@ describe('StateManagerComponent', (): void => {
         });
         state_service.rankOrders.and.returnValue(of<RankedOrder[]>([
             new RankedOrder({
-                order: [2, 1], tier: 'thirsty', tierReachedAtDistance: 11, totalDistance: 11, // clé stable renvoyée par l'API, traduite par le composant
+                order: [2, 1], tier: 'thirsty', tierReachedAtDistance: 11, totalDistance: 11, totalAp: 6, totalSp: 5, // clé stable renvoyée par l'API, traduite par le composant
                 finalState: { ap: 5, sp: 0, wounded: false, isEclaireur: false, hasBike: false, hasShoes: false, walkingDistance: 0, isDead: false, statuses: [] }
             })
         ]));
@@ -256,6 +256,8 @@ describe('StateManagerComponent', (): void => {
         expect(component['ranked_orders']()[0].tier).toBe('Soif');
         expect(component['ranked_orders']()[0].items).toEqual([item2, item1]);
         expect(component['ranked_orders']()[0].final_state.ap).toBe(final_state.ap);
+        expect(component['ranked_orders']()[0].total_ap).toBe(6);
+        expect(component['ranked_orders']()[0].total_sp).toBe(5);
     });
 
     it('addMountBikeStep puis addDismountBikeStep : monter à vélo redevient impossible', (): void => {
@@ -340,6 +342,17 @@ describe('StateManagerComponent', (): void => {
         component['is_role_ghoul'] = true;
 
         expect(component['canBecomeGhoul']()).toBeFalse();
+    });
+
+    it('addSecondWindStep : n\'est possible qu\'une fois, avec le niveau sélectionné', (): void => {
+        component['second_wind_level'] = 2;
+        expect(component['canUseSecondWind']()).toBeTrue();
+
+        component['addSecondWindStep']();
+
+        expect(component['canUseSecondWind']()).toBeFalse();
+        expect(component['steps'][0].step.type).toBe('second_wind');
+        expect(component['steps'][0].step.level).toBe(2);
     });
 
     it('buildStartingState injecte un statut de blessure quand wounded est coché', (): void => {

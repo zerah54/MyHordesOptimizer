@@ -3,8 +3,8 @@ import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { of } from 'rxjs';
-import { MinesweeperGameCompleted, MinesweeperGameStarted, MinesweeperService } from '../../_abstract_model/services/minesweeper.service';
 
+import { MinesweeperGameCompleted, MinesweeperGameStarted, MinesweeperService } from '../../_abstract_model/services/minesweeper.service';
 import { Me } from '../../_abstract_model/types/me.class';
 import { setUser } from '../../_core/utilities/localstorage.util';
 import { MinesweeperLeaderboardDialogComponent } from './leaderboard-dialog/minesweeper-leaderboard-dialog.component';
@@ -25,6 +25,7 @@ interface TestableComponent {
     is_fullscreen: { (): boolean };
     selected_size: { (): { id: string; label: string } };
     game_mode: { (): 'normal' | 'daily' };
+    daily_challenge_pending_start: { (): boolean };
     leaderboard_size_id: { (): string };
     leaderboard_mode: { (): 'normal' | 'daily' };
     revealCell(i: number, j: number): void;
@@ -32,6 +33,8 @@ interface TestableComponent {
     onCellMouseDown(i: number, j: number, event: MouseEvent): void;
     onCellMouseEnter(i: number, j: number): void;
     switchMode(mode: 'normal' | 'daily'): void;
+    startDailyChallenge(): void;
+    isAlreadyPlayedToday(sizeId: string): boolean;
     openFullscreen(): void;
     closeFullscreen(): void;
     openLeaderboard(): void;
@@ -138,13 +141,35 @@ describe('MinesweeperComponent', (): void => {
             expect(minesweeperService.completeGame).toHaveBeenCalledWith(1, 'won');
         });
 
-        it('bascule en mode défi du jour et démarre une partie serveur dédiée', (): void => {
+        it('bascule en mode défi du jour sans démarrer de partie tant que le joueur n\'a pas confirmé', (): void => {
             minesweeperService.createGame.and.returnValue(of(startedBoard([0, 0, 0, 0])));
 
             testable.switchMode('daily');
 
             expect(testable.game_mode()).toBe('daily');
+            expect(testable.daily_challenge_pending_start()).toBeTrue();
+            expect(minesweeperService.createGame).not.toHaveBeenCalled();
+        });
+
+        it('démarre la partie serveur du défi du jour uniquement après confirmation explicite', (): void => {
+            minesweeperService.createGame.and.returnValue(of(startedBoard([0, 0, 0, 0])));
+            testable.switchMode('daily');
+
+            testable.startDailyChallenge();
+
+            expect(testable.daily_challenge_pending_start()).toBeFalse();
             expect(minesweeperService.createGame).toHaveBeenCalledWith(jasmine.objectContaining({ mode: 'daily' }));
+        });
+
+        it('empêche de refaire le défi du jour déjà tenté à cette difficulté', (): void => {
+            minesweeperService.getChallengesToday.and.returnValue(of([{ sizeId: 'medium', alreadyPlayedToday: true }]));
+            minesweeperService.createGame.and.returnValue(of(startedBoard([0, 0, 0, 0])));
+
+            testable.switchMode('daily');
+
+            expect(testable.isAlreadyPlayedToday('medium')).toBeTrue();
+            expect(testable.daily_challenge_pending_start()).toBeTrue();
+            expect(minesweeperService.createGame).not.toHaveBeenCalled();
         });
     });
 

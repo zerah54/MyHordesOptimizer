@@ -45,6 +45,7 @@ namespace MyHordesOptimizerApi.Services.Impl
                     DismountBikeStep => ApplyDismountBike(current, metaResults),
                     PickupDefenceCpItemStep => ApplyPickupDefenceCpItem(current),
                     BecomeGhoulStep => ApplyBecomeGhoul(current),
+                    SecondWindStep secondWindStep => ApplySecondWind(current, secondWindStep),
                     _ => throw new NotSupportedException($"Type d'étape non supporté : {step.GetType().Name}")
                 };
 
@@ -222,6 +223,18 @@ namespace MyHordesOptimizerApi.Services.Impl
         {
             state.IsRoleGhoul = true;
             return "Devient une goule";
+        }
+
+        // Source: ActionEffectProvider.php "just_ap_sw" — AP plafonné à MaxAp (exceedMax:0), PE autorisé
+        // à dépasser MaxSp (exceedMax:spBonus) : c'est ce dépassement qui purge la fatigue (Extension Max
+        // côté jeu), pas un effet de statut séparé — SyncTired le reflète simplement une fois l'AP à jour.
+        private string ApplySecondWind(CitizenState state, SecondWindStep step)
+        {
+            var (apBonus, spBonus) = CitizenPointRules.GetSecondWindBonus(step.Level);
+            ApplyPointEffect(state, PointType.Ap, RelativeMaxPoint.Absolute, apBonus, capAt: null, exceedMax: 0);
+            ApplyPointEffect(state, PointType.Sp, RelativeMaxPoint.Absolute, spBonus, capAt: null, exceedMax: spBonus);
+            CitizenStatusCascadeRules.SyncTired(state.Statuses, state.Ap);
+            return "Second Souffle";
         }
 
         private void ApplyNamedMetaResult(CitizenState state, Dictionary<string, MyHordesMetaResultCodeModel> metaResults, string key)

@@ -9,6 +9,8 @@ export class RankedOrder extends CommonModel<RankedOrderDTO> {
     public tier: string = '';
     public tier_reached_at_distance: number | null = null;
     public total_distance: number = 0;
+    public total_ap: number = 0;
+    public total_sp: number = 0;
     public final_state!: CitizenState;
 
     public constructor(dto?: RankedOrderDTO) {
@@ -22,6 +24,8 @@ export class RankedOrder extends CommonModel<RankedOrderDTO> {
             tier: this.tier,
             tierReachedAtDistance: this.tier_reached_at_distance,
             totalDistance: this.total_distance,
+            totalAp: this.total_ap,
+            totalSp: this.total_sp,
             finalState: this.final_state.modelToDto(),
         };
     }
@@ -32,6 +36,8 @@ export class RankedOrder extends CommonModel<RankedOrderDTO> {
             this.tier = dto.tier;
             this.tier_reached_at_distance = dto.tierReachedAtDistance;
             this.total_distance = dto.totalDistance;
+            this.total_ap = dto.totalAp;
+            this.total_sp = dto.totalSp;
             this.final_state = new CitizenState(dto.finalState);
         }
     }

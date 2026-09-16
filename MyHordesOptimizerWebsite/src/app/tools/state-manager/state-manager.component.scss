@@ -74,12 +74,18 @@
                     opacity: 0.6;
                 }
 
-                .ranked-order-total-distance {
+                .ranked-order-totals {
                     display: flex;
                     align-items: center;
-                    gap: 0.15em;
+                    gap: 0.5em;
                     font-size: 0.85em;
                     opacity: 0.8;
+
+                    .ranked-order-total {
+                        display: flex;
+                        align-items: center;
+                        gap: 0.15em;
+                    }
                 }
 
                 .ranked-order-final {

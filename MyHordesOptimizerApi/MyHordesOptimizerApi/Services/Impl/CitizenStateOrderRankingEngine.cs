@@ -67,8 +67,12 @@ namespace MyHordesOptimizerApi.Services.Impl
                     ? woundItems.Concat(freePermutation).ToList()
                     : freePermutation.Concat(woundItems).ToList();
 
-                var (tier, tierDistance, totalDistance, finalState) = SimulateOrder(order, profiles, startingState);
-                results.Add(new RankedOrder { Order = order, Tier = tier, TierReachedAtDistance = tierDistance, TotalDistance = totalDistance, FinalState = finalState });
+                var (tier, tierDistance, totalDistance, totalAp, totalSp, finalState) = SimulateOrder(order, profiles, startingState);
+                results.Add(new RankedOrder
+                {
+                    Order = order, Tier = tier, TierReachedAtDistance = tierDistance, TotalDistance = totalDistance,
+                    TotalAp = totalAp, TotalSp = totalSp, FinalState = finalState,
+                });
             }
 
             return results
@@ -114,7 +118,7 @@ namespace MyHordesOptimizerApi.Services.Impl
             return result;
         }
 
-        private enum ConsumableGate { None, WoundItem, Alcohol, Drug, Food, Drink }
+        private enum ConsumableGate { None, WoundItem, Alcohol, Drug, Food, Drink, WorsensThirst }
 
         private class ConsumableProfile
         {
@@ -135,6 +139,7 @@ namespace MyHordesOptimizerApi.Services.Impl
             var isDrug = false;
             var isFood = false;
             var isDrink = false;
+            var isWorsensThirst = false;
 
             foreach (var actionName in ItemActionsProvider.GetActionNames(itemId))
             {
@@ -157,6 +162,9 @@ namespace MyHordesOptimizerApi.Services.Impl
                     if (key == "inflict_wound") profile.InflictsWound = true;
                     if (key == "heal_wound") profile.HasHeal = true;
                     if (key == "drink_ap_1") isDrink = true;
+                    // Quantum ("get_thristy"/"get_dehydrated") : aggrave la soif au lieu de la calmer —
+                    // sans ce gate, elle tombait dans ConsumableGate.None et l'effet était ignoré.
+                    if (key == "get_thristy" || key == "get_dehydrated") isWorsensThirst = true;
 
                     if (!metaResults.TryGetValue(key, out var metaResult)) continue;
                     foreach (var atom in metaResult.AtomList)
@@ -180,16 +188,21 @@ namespace MyHordesOptimizerApi.Services.Impl
                 : isDrug ? ConsumableGate.Drug
                 : isFood ? ConsumableGate.Food
                 : isDrink ? ConsumableGate.Drink
+                : isWorsensThirst ? ConsumableGate.WorsensThirst
                 : ConsumableGate.None;
 
             return profile;
         }
 
-        private (CitizenStateSeverityTier Tier, int? TierReachedAtDistance, int TotalDistance, CitizenState FinalState) SimulateOrder(
+        private (CitizenStateSeverityTier Tier, int? TierReachedAtDistance, int TotalDistance, int TotalAp, int TotalSp, CitizenState FinalState) SimulateOrder(
             List<int> order, Dictionary<int, ConsumableProfile> profiles, CitizenState startingState)
         {
             var distanceCounter = 0;
             var cumulativeDistance = 0;
+            // PA/PE dépensés (départ + gains des consommables), affichés séparément à côté du total —
+            // apTotal+spTotal == cumulativeDistance par construction (WalkDistance ne fait qu'agréger les deux).
+            var apTotal = startingState.Ap;
+            var spTotal = startingState.Sp;
             var thirstLevel = startingState.Statuses.Contains("thirst2") ? 2 : startingState.Statuses.Contains("thirst1") ? 1 : 0;
             var thirstChangedAt = 0;
             var hasEatenToday = startingState.Statuses.Contains("haseaten");
@@ -305,6 +318,18 @@ namespace MyHordesOptimizerApi.Services.Impl
                         apGain = profile.ApValue;
                         spGain = profile.SpValue;
                         break;
+                    case ConsumableGate.WorsensThirst:
+                        // Pas de gate "une fois par jour" ni de reset_thirst_counter : contrairement à
+                        // l'eau, la Quantum n'étanche jamais — elle aggrave d'un palier à chaque prise,
+                        // plafonné à Dehydrated (jamais de mort directe par ce biais, cf. get_dehydrated).
+                        apGain = profile.ApValue;
+                        spGain = profile.SpValue;
+                        if (thirstLevel < 2)
+                        {
+                            thirstLevel++;
+                            thirstChangedAt = cumulativeDistance;
+                        }
+                        break;
                 }
 
                 if (profile.HasHeal && wounded)
@@ -318,6 +343,8 @@ namespace MyHordesOptimizerApi.Services.Impl
                     woundChangedAt = cumulativeDistance;
                 }
 
+                apTotal += apGain;
+                spTotal += spGain;
                 WalkDistance(apGain + spGain);
             }
 
@@ -349,7 +376,7 @@ namespace MyHordesOptimizerApi.Services.Impl
                 Statuses = BuildFinalStatuses(startingState, thirstLevel, hasEatenToday, hasDrankToday, wounded, drunk, everDrugged, addicted),
             };
 
-            return (tier, tierDistance, cumulativeDistance, finalState);
+            return (tier, tierDistance, cumulativeDistance, apTotal, spTotal, finalState);
         }
 
         private static HashSet<string> BuildFinalStatuses(CitizenState startingState, int thirstLevel,

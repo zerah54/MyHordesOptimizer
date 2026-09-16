@@ -42,6 +42,19 @@ namespace MyHordesOptimizerApi.MappingProfiles.Wishlists
                         && citizen.IdBagNavigation.BagItems.Any(bagItem => bagItem.IdItem == src.IdItem))
                     .Select(citizen => citizen.IdUserNavigation.Name)
                     .ToList()))
+               .ForMember(dest => dest.ChestCount, opt => opt.MapFrom(src => src.IdTownNavigation.TownCitizens
+                    .Where(citizen => citizen.Dead != true && citizen.IdChestNavigation != null)
+                    .SelectMany(citizen => citizen.IdChestNavigation.ChestItems)
+                    .Where(chestItem => chestItem.IdItem == src.IdItem)
+                    .Sum(chestItem => chestItem.Count)))
+               .ForMember(dest => dest.ChestCitizens, opt => opt.MapFrom(src => src.IdTownNavigation.TownCitizens
+                    .Where(citizen => citizen.Dead != true && citizen.IdChestNavigation != null
+                        && citizen.IdChestNavigation.ChestItems.Any(chestItem => chestItem.IdItem == src.IdItem))
+                    .Select(citizen => citizen.IdUserNavigation.Name)
+                    .ToList()))
+               .ForMember(dest => dest.MapCellItemCount, opt => opt.MapFrom(src => src.IdItemNavigation.MapCellItems
+                    .Where(mapCellItem => mapCellItem.IdCellNavigation.IdTown == src.IdTown)
+                    .Sum(mapCellItem => mapCellItem.Count)))
                .ForMember(dest => dest.IsWorkshop, opt => opt.Ignore())
                .ForMember(dest => dest.Item, opt => opt.MapFrom(src => src.IdItemNavigation));
 

@@ -55,6 +55,12 @@ namespace MyHordesOptimizerApi.Dtos.MyHordes.MyHordesOptimizer
 
         public int WishListCount { get; set; }
         public int BankCount { get; set; }
+        /// <summary>Quantité totale dans les sacs des citoyens vivants de la ville.</summary>
+        public int BagCount { get; set; }
+        /// <summary>Quantité totale dans les coffres des citoyens vivants de la ville.</summary>
+        public int ChestCount { get; set; }
+        /// <summary>Quantité posée sur les cases de la carte (toutes cases de la ville confondues).</summary>
+        public int MapCellItemCount { get; set; }
 
         public double DropRatePraf { get; set; }
         public double DropRateNotPraf { get; set; }

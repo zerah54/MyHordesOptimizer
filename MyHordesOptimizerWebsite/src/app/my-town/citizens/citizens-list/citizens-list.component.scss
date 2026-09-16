@@ -179,6 +179,13 @@
             &.columns table {
                 width: auto;
                 min-width: 100%;
+
+                // Sépare visuellement les catégories du mode groupé (identité / sac / immunité /
+                // actions quotidiennes / actions héroïques / améliorations / dernière MàJ).
+                th.category-start,
+                td.category-start {
+                    border-left: 1px solid var(--mat-sys-outline-variant);
+                }
             }
         }
 

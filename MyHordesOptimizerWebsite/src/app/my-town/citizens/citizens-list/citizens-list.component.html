@@ -330,11 +330,11 @@
                                     <!-- ============ Mode colonnes : une colonne par champ ============ -->
 
                                     <ng-container matColumnDef="sac">
-                                        <th *matHeaderCellDef class="field-col" mat-header-cell>
+                                        <th *matHeaderCellDef class="field-col category-start" mat-header-cell>
                                             <img [src]="HORDES_IMG_REPO + 'item/item_bag.gif'" alt="Sac"
                                                  class="col-header-icon" i18n-alt i18n-matTooltip matTooltip="Sac">
                                         </th>
-                                        <td *matCellDef="let row; table: table" class="group-cell" mat-cell>
+                                        <td *matCellDef="let row; table: table" class="group-cell category-start" mat-cell>
                                             <mho-deferred-cell [content]="sacContent" [context]="{ $implicit: row }"></mho-deferred-cell>
                                         </td>
                                     </ng-container>
@@ -361,48 +361,48 @@
                                     </ng-container>
 
                                     <ng-container matColumnDef="immune">
-                                        <th *matHeaderCellDef class="field-col" mat-header-cell>
+                                        <th *matHeaderCellDef class="field-col category-start" mat-header-cell>
                                             <img [src]="HORDES_IMG_REPO + 'item/item_potion.gif'" alt="Potions / Immunité"
                                                  class="col-header-icon" i18n-alt i18n-matTooltip matTooltip="Potions / Immunité">
                                         </th>
-                                        <td *matCellDef="let row; table: table" class="group-cell" mat-cell>
+                                        <td *matCellDef="let row; table: table" class="group-cell category-start" mat-cell>
                                             <mho-deferred-cell [content]="chamanicCell" [context]="{ $implicit: row }"></mho-deferred-cell>
                                         </td>
                                     </ng-container>
 
-                                    @for (action of daily_action_keys; track action.key) {
+                                    @for (action of daily_action_keys; track action.key; let first = $first) {
                                         <ng-container [matColumnDef]="'daily_' + action.key">
-                                            <th *matHeaderCellDef class="field-col" mat-header-cell>
+                                            <th *matHeaderCellDef [class.category-start]="first" class="field-col" mat-header-cell>
                                                 <img [alt]="action.getLabel()" [matTooltip]="action.getLabel()"
                                                      [src]="HORDES_IMG_REPO + action.value.img" class="col-header-icon">
                                             </th>
-                                            <td *matCellDef="let row; table: table" class="field-col" mat-cell>
+                                            <td *matCellDef="let row; table: table" [class.category-start]="first" class="field-col" mat-cell>
                                                 <mho-deferred-cell [content]="dailyActionCell"
                                                                    [context]="{ $implicit: getDailyAction(row, action), citizenId: row.id }"></mho-deferred-cell>
                                             </td>
                                         </ng-container>
                                     }
 
-                                    @for (action of heroic_actions_all; track action.key) {
+                                    @for (action of heroic_actions_all; track action.key; let first = $first) {
                                         <ng-container [matColumnDef]="'heroic_' + action.key">
-                                            <th *matHeaderCellDef class="field-col" mat-header-cell>
+                                            <th *matHeaderCellDef [class.category-start]="first" class="field-col" mat-header-cell>
                                                 <img [alt]="action.getLabel()" [matTooltip]="action.getLabel()"
                                                      [src]="HORDES_IMG_REPO + action.value.img" class="col-header-icon">
                                             </th>
-                                            <td *matCellDef="let row; table: table" class="field-col" mat-cell>
+                                            <td *matCellDef="let row; table: table" [class.category-start]="first" class="field-col" mat-cell>
                                                 <mho-deferred-cell [content]="heroicCell"
                                                                    [context]="{ $implicit: getHeroicAction(row, action), citizenId: row.id }"></mho-deferred-cell>
                                             </td>
                                         </ng-container>
                                     }
 
-                                    @for (home of home_all; track home.key) {
+                                    @for (home of home_all; track home.key; let first = $first) {
                                         <ng-container [matColumnDef]="'home_' + home.key">
-                                            <th *matHeaderCellDef class="field-col" mat-header-cell>
+                                            <th *matHeaderCellDef [class.category-start]="first" class="field-col" mat-header-cell>
                                                 <img [alt]="home.getLabel()" [matTooltip]="home.getLabel()"
                                                      [src]="HORDES_IMG_REPO + homeHeaderIcon(home)" class="col-header-icon">
                                             </th>
-                                            <td *matCellDef="let row; table: table" class="field-col" mat-cell>
+                                            <td *matCellDef="let row; table: table" [class.category-start]="first" class="field-col" mat-cell>
                                                 <mho-deferred-cell [content]="homeCell"
                                                                    [context]="{ $implicit: getHomeUpgrade(row, home), citizenId: row.id }"></mho-deferred-cell>
                                             </td>
@@ -410,12 +410,12 @@
                                     }
 
                                     <ng-container matColumnDef="last_update">
-                                        <th *matHeaderCellDef class="field-col" mat-header-cell>
+                                        <th *matHeaderCellDef class="field-col category-start" mat-header-cell>
                                             <mat-icon class="col-header-icon"
                                                       i18n-matTooltip matTooltip="Dernière mise à jour">update
                                             </mat-icon>
                                         </th>
-                                        <td *matCellDef="let row; table: table" class="field-col" mat-cell>
+                                        <td *matCellDef="let row; table: table" class="field-col category-start" mat-cell>
                                             <mho-deferred-cell [content]="lastUpdateCell" [context]="{ $implicit: row }"></mho-deferred-cell>
                                         </td>
                                     </ng-container>

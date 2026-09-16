@@ -4,8 +4,8 @@ const const_ratio_base: number = 0.5;
 const const_ratio_low: number = 0.75;
 const conf_attack_by_mode: Record<TownTypeId, number> = {
     RE: 1.1,
-    PANDE: 3.1,
-    RNE: const_ratio_low,
+    PANDE: 1.1,
+    RNE: 1.1,
     CUSTOM: 1.1
 };
 

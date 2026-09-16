@@ -76,6 +76,8 @@ export class MinesweeperComponent implements OnInit, OnDestroy {
     private current_game_id: WritableSignal<number | undefined> = signal(undefined);
 
     protected readonly game_mode: WritableSignal<'normal' | 'daily'> = signal('normal');
+    /** Défi du jour sélectionné mais pas encore démarré (grille non chargée tant que le joueur n'a pas cliqué sur "Commencer"). */
+    protected readonly daily_challenge_pending_start: WritableSignal<boolean> = signal(false);
     protected readonly is_guest: Signal<boolean> = computed(() => !user());
     protected readonly challenges_today: WritableSignal<MinesweeperChallengeStatus[]> = signal([]);
     private timer_started_by_server: WritableSignal<boolean> = signal(true);
@@ -158,6 +160,10 @@ export class MinesweeperComponent implements OnInit, OnDestroy {
 
     protected switchMode(mode: 'normal' | 'daily'): void {
         this.game_mode.set(mode);
+        if (mode === 'daily') {
+            // État "déjà joué aujourd'hui" à jour avant d'afficher la porte de confirmation du défi.
+            this.refreshChallengesToday();
+        }
         // Le défi du jour n'existe pas en taille Personnalisée (rejeté par le serveur) : si le joueur
         // y bascule alors que "Personnalisé" était sélectionné, revenir sur la taille par défaut évite
         // une erreur immédiate et bloquante.
@@ -346,6 +352,9 @@ export class MinesweeperComponent implements OnInit, OnDestroy {
                 if (completed.elapsedMs !== null && start) {
                     this.end_time.set(start.clone().add(completed.elapsedMs, 'milliseconds'));
                 }
+                if (this.game_mode() === 'daily') {
+                    this.refreshChallengesToday();
+                }
             }
         });
     }
@@ -383,9 +392,13 @@ export class MinesweeperComponent implements OnInit, OnDestroy {
         this.end_time.set(undefined);
         this.timer_started_by_server.set(true);
 
-        if (this.game_mode() === 'daily') {
-            this.loadDailyBoard();
-        }
+        this.daily_challenge_pending_start.set(this.game_mode() === 'daily');
+    }
+
+    /** Démarre le défi du jour après confirmation explicite du joueur (bouton "Commencer") : charge la grille depuis le serveur. */
+    protected startDailyChallenge(): void {
+        this.daily_challenge_pending_start.set(false);
+        this.loadDailyBoard();
     }
 
     private loadDailyBoard(): void {

@@ -43,7 +43,7 @@
                         <mat-form-field subscriptSizing="dynamic" appearance="outline">
                             <mat-label i18n>Zone à appliquer pour l'ajout</mat-label>
                             <input matInput type="number" [ngModel]="current_zone_xp_pa_add_item()" (ngModelChange)="current_zone_xp_pa_add_item.set($event)">
-                            <span matSuffix (click)="current_zone_xp_pa_add_item.set(0)">∞</span>
+                            <mat-icon matSuffix (click)="current_zone_xp_pa_add_item.set(0)">all_inclusive</mat-icon>
                         </mat-form-field>
                     } @else {
                         <mat-checkbox
@@ -91,12 +91,12 @@
                                             </div>
                                         }
                                         @case ('name') {
-                                            <div>
+                                            <div class="name-container">
                                                 @if (row | itemAlreadyInList:wishlist_info()?.wishlist_items) {
-                                                    <img [ngSrc]="HORDES_IMG_REPO + 'emotes/warning.gif'" width="16" height="16">
+                                                    <img [ngSrc]="HORDES_IMG_REPO + 'emotes/warning.gif'" width="16" height="16">&nbsp;
                                                 }
-                                                <img [ngSrc]="HORDES_IMG_REPO + row.item.img" width="16" height="16">
-                                                <span>{{ row.item.label[locale] }}</span>
+                                                <img [ngSrc]="HORDES_IMG_REPO + row.item.img" width="16"
+                                                     height="16">&nbsp;<span>{{ row.item.label[locale] }}</span>
                                             </div>
                                         }
                                         @case ('heaver') {
@@ -134,13 +134,27 @@
                                                 }
                                             </span>
                                         }
+                                        @case ('chest_count') {
+                                            <span class="bag-count-cell">
+                                                {{ row.chest_count }}
+                                                @if (row.chest_count > 0 && row.chest_citizens.length > 0) {
+                                                    <img [ngSrc]="HORDES_IMG_REPO + 'item/item_chest.gif'" width="16" height="16"
+                                                         class="bag-citizens-icon"
+                                                         [matTooltip]="getChestCitizensTooltip(row)"
+                                                         matTooltipClass="citizens-tooltip">
+                                                }
+                                            </span>
+                                        }
+                                        @case ('map_cell_item_count') {
+                                            {{ row.map_cell_item_count }}
+                                        }
                                         @case ('count') {
                                             @if (row.depot.value.count >= -1) {
                                                 @if (edition_mode()) {
                                                     @if (row.count >= 0) {
                                                         <mat-form-field subscriptSizing="dynamic" class="count" appearance="outline">
                                                             <input matInput type="number" [(ngModel)]="row.count" (ngModelChange)="triggerSave()" min="0">
-                                                            <span matSuffix (click)="row.count = -1; triggerSave()">∞</span>
+                                                            <mat-icon matSuffix (click)="row.count = -1; triggerSave()">all_inclusive</mat-icon>
                                                         </mat-form-field>
                                                     } @else {
                                                         <mat-checkbox [checked]="row.count < 0 || row.count === null || row.count === undefined"
@@ -191,7 +205,7 @@
                                                     <mat-form-field subscriptSizing="dynamic" class="zone_x_pa" appearance="outline">
                                                         <input matInput type="number" [ngModel]="row.zone_x_pa" (ngModelChange)="changeZoneXPa(row, $event)"
                                                                min="0">
-                                                        <span matSuffix (click)="changeZoneXPa(row, 0)">∞</span>
+                                                        <mat-icon matSuffix (click)="changeZoneXPa(row, 0)">all_inclusive</mat-icon>
                                                     </mat-form-field>
                                                 } @else {
                                                     <mat-checkbox [checked]="row.zone_x_pa <= 0 || row.zone_x_pa === null || row.zone_x_pa === undefined"

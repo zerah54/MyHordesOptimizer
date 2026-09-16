@@ -39,4 +39,14 @@ namespace MyHordesOptimizerApi.Models.CitizenState
     public class BecomeGhoulStep : CitizenStateStep
     {
     }
+
+    /// <summary>
+    /// Second Souffle (action héroïque "hero_sw") — 4 niveaux de l'arbre Endurant, valeurs absolues
+    /// (pas cumulatives) : 0=(3 PA,1 PE) / 1=(3 PA,3 PE) / 2=(4 PA,4 PE) / 3=(4 PA,6 PE). Variante
+    /// historique (6 PA, 0 PE, débloquée à 151 pts sans arbre) hors périmètre — voir CitizenPointRules.
+    /// </summary>
+    public class SecondWindStep : CitizenStateStep
+    {
+        public int Level { get; set; }
+    }
 }

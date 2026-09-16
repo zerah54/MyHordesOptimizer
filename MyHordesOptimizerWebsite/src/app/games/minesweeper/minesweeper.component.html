@@ -72,7 +72,19 @@
 
 <mat-card-content class="mho-minesweeper">
     <ng-template #boardAndControlsTemplate>
-        @if (board_error()) {
+        @if (game_mode() === 'daily' && daily_challenge_pending_start()) {
+            <div class="minesweeper-daily-gate">
+                @if (isAlreadyPlayedToday(selected_size().id)) {
+                    <p i18n>Vous avez déjà tenté le défi du jour à cette difficulté aujourd'hui. Revenez demain pour un nouveau défi.</p>
+                } @else {
+                    <p i18n>Le défi du jour démarre dès que vous cliquez sur "Commencer". Attention : en cas de fermeture ou d'actualisation de la page, la
+                        partie ne pourra pas être reprise.</p>
+                    <button mat-raised-button color="primary" type="button" (click)="startDailyChallenge()">
+                        <ng-container i18n>Commencer</ng-container>
+                    </button>
+                }
+            </div>
+        } @else if (board_error()) {
             <div class="minesweeper-error">
                 <p i18n>Impossible de démarrer la partie.</p>
                 <button mat-stroked-button (click)="resetGame()">

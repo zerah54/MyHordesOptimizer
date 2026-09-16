@@ -106,6 +106,7 @@ namespace MyHordesOptimizerApi.Services.Impl
                 var itemsDto = Mapper.Map<List<ItemDto>>(items);
                 ItemOpenerResolver.PopulateOpenerRelations(itemsDto, itemsDto, GetActionsByName());
                 ItemCatapultEffectResolver.PopulateCatapultEffects(itemsDto, itemsDto, GetItemsCatapultByUid(), GetActionsByName(), GetMetaResultsByName());
+                PopulateBagChestMapCellCounts(itemsDto, townId.Value);
                 Logger.LogDebug("GetItem({@townId}) Mapper in {@ElapsedMilliseconds} ms", townId, sw.ElapsedMilliseconds);
                 sw.Stop();
                 return itemsDto;
@@ -179,6 +180,39 @@ namespace MyHordesOptimizerApi.Services.Impl
         private Dictionary<string, string> GetItemsCatapultByUid()
         {
             return _itemsCatapultByUidCache ??= MyHordesCodeRepository.GetItemsCatapult();
+        }
+
+        /// <summary>
+        /// Sacs/coffres/carte : agrégés via 3 requêtes group-by dédiées plutôt qu'un Include filtré
+        /// par objet (comme pour <c>BankCount</c>) — sur ~400 objets du catalogue, une sous-requête
+        /// corrélée par objet coûterait bien plus qu'un scan group-by unique par table.
+        /// </summary>
+        private void PopulateBagChestMapCellCounts(List<ItemDto> itemsDto, int townId)
+        {
+            var bagCounts = DbContext.BagItems
+                .Where(bagItem => bagItem.IdBagNavigation.TownCitizens.Any(citizen => citizen.IdTown == townId && citizen.Dead != true))
+                .GroupBy(bagItem => bagItem.IdItem)
+                .Select(g => new { IdItem = g.Key, Count = g.Sum(bagItem => bagItem.Count ?? 0) })
+                .ToDictionary(g => g.IdItem, g => g.Count);
+
+            var chestCounts = DbContext.ChestItems
+                .Where(chestItem => chestItem.IdChestNavigation.TownCitizens.Any(citizen => citizen.IdTown == townId && citizen.Dead != true))
+                .GroupBy(chestItem => chestItem.IdItem)
+                .Select(g => new { IdItem = g.Key, Count = g.Sum(chestItem => chestItem.Count ?? 0) })
+                .ToDictionary(g => g.IdItem, g => g.Count);
+
+            var mapCellCounts = DbContext.MapCellItems
+                .Where(mapCellItem => mapCellItem.IdCellNavigation.IdTown == townId)
+                .GroupBy(mapCellItem => mapCellItem.IdItem)
+                .Select(g => new { IdItem = g.Key, Count = g.Sum(mapCellItem => mapCellItem.Count ?? 0) })
+                .ToDictionary(g => g.IdItem, g => g.Count);
+
+            foreach (var itemDto in itemsDto)
+            {
+                itemDto.BagCount = bagCounts.GetValueOrDefault(itemDto.Id);
+                itemDto.ChestCount = chestCounts.GetValueOrDefault(itemDto.Id);
+                itemDto.MapCellItemCount = mapCellCounts.GetValueOrDefault(itemDto.Id);
+            }
         }
 
         /// <summary>

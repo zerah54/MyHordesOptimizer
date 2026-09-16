@@ -33,6 +33,13 @@
                     [min]="0"
                     [value]="sp"
                     label="Points d'exploration disponibles" i18n-label/>
+                <mho-compact-stepper
+                    (valueChange)="second_wind_level = $event"
+                    icon="heroskill/small_pa.gif"
+                    [min]="0"
+                    [max]="3"
+                    [value]="second_wind_level"
+                    label="Niveau Second Souffle" i18n-label/>
             </div>
 
             <div class="toggle-categories">
@@ -113,8 +120,13 @@
                                     <img [src]="HORDES_IMG_REPO + item.img" [matTooltip]="item.label[locale] ?? item.label['en']" alt="">
                                 }
                                 <mat-icon class="ranked-order-arrow" matTooltip="État final résultant" i18n-matTooltip>arrow_forward</mat-icon>
-                                <span class="ranked-order-total-distance" matTooltip="PA totaux parcourus" i18n-matTooltip>{{ candidate.total_distance }}
-                                    <mho-icon-ap/></span>
+                                <span class="ranked-order-totals">
+                                    <span class="ranked-order-total" matTooltip="PA dépensés" i18n-matTooltip>{{ candidate.total_ap }}
+                                        <mho-icon-ap/></span>
+                                    <span class="ranked-order-total" matTooltip="PE dépensés" i18n-matTooltip>{{ candidate.total_sp }}
+                                        <mho-icon-ep/></span>
+                                    <span class="ranked-order-total-sum" i18n>Total : {{ candidate.total_distance }}</span>
+                                </span>
                                 <span class="ranked-order-final">
                                     @if (candidate.final_state.is_dead) {
                                         <img [src]="HORDES_IMG_REPO + 'emotes/death.gif'" matTooltip="Mort" i18n-matTooltip alt="">
@@ -153,6 +165,7 @@
                     défense de zone
                 </button>
                 <button mat-stroked-button type="button" (click)="addBecomeGhoulStep()" [disabled]="!canBecomeGhoul()" i18n>Se transformer en goule</button>
+                <button mat-stroked-button type="button" (click)="addSecondWindStep()" [disabled]="!canUseSecondWind()" i18n>Second Souffle</button>
             </div>
             <div class="bag-actions">
                 @for (item of orderedRemainingBag(); track $index) {

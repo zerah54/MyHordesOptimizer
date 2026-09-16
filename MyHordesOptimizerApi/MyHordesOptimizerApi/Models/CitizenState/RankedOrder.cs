@@ -18,6 +18,12 @@ namespace MyHordesOptimizerApi.Models.CitizenState
         /// <summary>Distance nominale cumulée totale parcourue par cet ordre — arrêtée à la mort si <see cref="Tier"/> == Dead.</summary>
         public int TotalDistance { get; set; }
 
+        /// <summary>PA dépensés (départ + gains des consommables) — TotalAp+TotalSp == TotalDistance.</summary>
+        public int TotalAp { get; set; }
+
+        /// <summary>PE dépensés (départ + gains des consommables) — TotalAp+TotalSp == TotalDistance.</summary>
+        public int TotalSp { get; set; }
+
         public CitizenState FinalState { get; set; } = null!;
     }
 }

@@ -86,6 +86,8 @@ export class WishlistComponent implements OnInit {
         { id: 'zone_x_pa', header: $localize`Zone en PA` },
         { id: 'bank_count', header: $localize`Banque` },
         { id: 'bag_count', header: $localize`Sacs` },
+        { id: 'chest_count', header: $localize`Coffres` },
+        { id: 'map_cell_item_count', header: $localize`Carte` },
         { id: 'count', header: $localize`Stock souhaité` },
         { id: 'needed', header: $localize`Quantité manquante` },
         { id: 'should_signal', header: $localize`Signaler` },
@@ -199,6 +201,11 @@ export class WishlistComponent implements OnInit {
     /** Construit le contenu du tooltip listant les citoyens dont le sac contient l'objet (un pseudo par ligne). */
     protected getBagCitizensTooltip(row: WishlistItem): string {
         return row.bag_citizens.join('\n');
+    }
+
+    /** Construit le contenu du tooltip listant les citoyens dont le coffre contient l'objet (un pseudo par ligne). */
+    protected getChestCitizensTooltip(row: WishlistItem): string {
+        return row.chest_citizens.join('\n');
     }
 
     protected changeZoneXPa(item: WishlistItem, new_zone: number): void {

@@ -49,6 +49,8 @@ interface RankedOrderView {
     items: Item[];
     tier: string;
     total_distance: number;
+    total_ap: number;
+    total_sp: number;
     final_state: CitizenState;
 }
 
@@ -126,6 +128,8 @@ export class StateManagerComponent implements OnInit {
     protected has_sober_pdc_perk: boolean = false;
     protected has_base_zone_control_perk: boolean = true;
     protected is_role_ghoul: boolean = false;
+    /** Niveau du Second Souffle (0-3, arbre Endurant) — voir {@link addSecondWindStep}. */
+    protected second_wind_level: number = 0;
     /** Option de base du groupe hydratation : absence de soif, distincte du statut buff "Hydraté" (voir status_hydrated.gif). */
     protected readonly not_thirsty_label: string = $localize`Pas soif`;
     protected readonly clean_perk_icon: string = StatusEnum.CLEAN.img;
@@ -165,6 +169,8 @@ export class StateManagerComponent implements OnInit {
                 items: this.resolveOrder(candidate.order, this.starting_bag),
                 tier: StateManagerComponent.TIER_LABELS[candidate.tier] ?? candidate.tier,
                 total_distance: candidate.total_distance,
+                total_ap: candidate.total_ap,
+                total_sp: candidate.total_sp,
                 final_state: candidate.final_state,
             }));
             this.ranked_orders.set(ranked_orders);
@@ -287,6 +293,15 @@ export class StateManagerComponent implements OnInit {
         this.compute();
     }
 
+    /** Ajoute une étape « Second Souffle » (niveau {@link second_wind_level}) et relance aussitôt le calcul. */
+    protected addSecondWindStep(): void {
+        this.steps.push({
+            step: CitizenStateStep.secondWind(this.second_wind_level),
+            label: $localize`Second Souffle (niveau ${this.second_wind_level + 1}:level:)`,
+        });
+        this.compute();
+    }
+
     /** Vrai si l'objet de défense de zone n'est pas déjà signalé en possession, d'après l'état de départ et la séquence jouée. */
     protected canPickupDefenceCpItem(): boolean {
         return !this.currentEquipment().has_defence_cp_item;
@@ -295,6 +310,11 @@ export class StateManagerComponent implements OnInit {
     /** Vrai si le citoyen n'est pas déjà une goule, d'après l'état de départ et la séquence jouée : on ne se goulifie qu'une fois. */
     protected canBecomeGhoul(): boolean {
         return !this.currentEquipment().is_role_ghoul;
+    }
+
+    /** Vrai si le Second Souffle n'a pas déjà été joué dans la séquence : une seule action héroïque par jour. */
+    protected canUseSecondWind(): boolean {
+        return !this.steps.some((entry: StepEntry) => entry.step.type === 'second_wind');
     }
 
     /** Vrai si un déplacement est encore jouable : il reste des PA/PE, ou un objet du sac peut en restituer. */

@@ -23,6 +23,7 @@ namespace MyHordesOptimizerApiUnitTests.Citoyens
         private const int WoundItemId = 5; // "emt" (sport-élec) : +MaxAp, inflict_wound
         private const int AlcoholItemId = 6; // "alcohol" : plancher MaxAp+0, inflige "drunk"
         private const int WeakFoodItemId = 7; // "eat_5ap" : plancher MaxAp-2, moins bon que eat_7ap
+        private const int QuantumItemId = 8; // "drink_quantum_1/2/3" : aggrave la soif au lieu de désaltérer
 
         private static ICitizenStateOrderRankingEngine CreateEngine(Dictionary<int, string[]> itemActions) =>
             new CitizenStateOrderRankingEngine(new MyHordesCodeRepository(), new FakeItemActionsProvider(itemActions));
@@ -95,6 +96,71 @@ namespace MyHordesOptimizerApiUnitTests.Citoyens
             var ranked = engine.RankOrders(start, new List<int> { DrugItemId, DrugItemId, FoodItemId, AlcoholItemId });
 
             ranked.Should().OnlyContain(r => r.Tier == CitizenStateSeverityTier.Dead);
+        }
+
+        [Fact]
+        public void RankOrders_Quantum_DepuisPasSoif_AtteintTierSoif()
+        {
+            // Bug signalé : la Quantum (drink_quantum_1/2/3) aggrave la soif d'un palier (get_thristy/
+            // get_dehydrated) au lieu de la calmer — non modélisé si elle tombe dans ConsumableGate.None.
+            var engine = CreateEngine(new Dictionary<int, string[]>
+            {
+                [QuantumItemId] = new[] { "drink_quantum_1", "drink_quantum_2", "drink_quantum_3" },
+            });
+            var start = new CitizenState { Ap = 0, Sp = 0, Statuses = new HashSet<string>() };
+
+            var ranked = engine.RankOrders(start, new List<int> { QuantumItemId });
+
+            ranked.Should().HaveCount(1);
+            ranked[0].Tier.Should().Be(CitizenStateSeverityTier.Thirsty);
+            ranked[0].FinalState.Statuses.Should().Contain("thirst1");
+        }
+
+        [Fact]
+        public void RankOrders_Quantum_DepuisSoif_AtteintTierDeshydrate()
+        {
+            var engine = CreateEngine(new Dictionary<int, string[]>
+            {
+                [QuantumItemId] = new[] { "drink_quantum_1", "drink_quantum_2", "drink_quantum_3" },
+            });
+            var start = new CitizenState { Ap = 0, Sp = 0, Statuses = new HashSet<string> { "thirst1" } };
+
+            var ranked = engine.RankOrders(start, new List<int> { QuantumItemId });
+
+            ranked.Should().HaveCount(1);
+            ranked[0].Tier.Should().Be(CitizenStateSeverityTier.Dehydrated);
+            ranked[0].FinalState.Statuses.Should().Contain("thirst2");
+        }
+
+        [Fact]
+        public void RankOrders_Quantum_DepuisDeshydrate_RestreDeshydrateSansMourir()
+        {
+            var engine = CreateEngine(new Dictionary<int, string[]>
+            {
+                [QuantumItemId] = new[] { "drink_quantum_1", "drink_quantum_2", "drink_quantum_3" },
+            });
+            var start = new CitizenState { Ap = 0, Sp = 0, Statuses = new HashSet<string> { "thirst2" } };
+
+            var ranked = engine.RankOrders(start, new List<int> { QuantumItemId });
+
+            ranked[0].Tier.Should().Be(CitizenStateSeverityTier.Dehydrated);
+            ranked[0].FinalState.IsDead.Should().BeFalse();
+        }
+
+        [Fact]
+        public void RankOrders_Repas_SepareLesPaEtPeDansLeTotal()
+        {
+            // TotalAp/TotalSp exposent la répartition PA/PE du total déjà affiché (colonne "Ordres de
+            // consommation possibles") — TotalAp+TotalSp doit toujours valoir TotalDistance.
+            var engine = CreateEngine(new Dictionary<int, string[]> { [FoodItemId] = new[] { "eat_7ap" } });
+            var start = new CitizenState { Ap = 0, Sp = 0, Statuses = new HashSet<string>() };
+
+            var ranked = engine.RankOrders(start, new List<int> { FoodItemId });
+
+            ranked.Should().HaveCount(1);
+            ranked[0].TotalAp.Should().Be(7); // 0 (départ) + plancher MaxAp+1
+            ranked[0].TotalSp.Should().Be(0);
+            (ranked[0].TotalAp + ranked[0].TotalSp).Should().Be(ranked[0].TotalDistance);
         }
 
         [Fact]

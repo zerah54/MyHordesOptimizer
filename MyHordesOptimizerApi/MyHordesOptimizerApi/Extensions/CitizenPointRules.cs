@@ -20,6 +20,14 @@ namespace MyHordesOptimizerApi.Extensions
         public static int GetMaxSp(bool isEclaireur, bool hasBike, bool hasShoes) =>
             (isEclaireur ? 2 : 0) + (hasBike ? 2 : 0) + (hasShoes ? 1 : 0);
 
+        // Source: HeroSkillDataService.php, arbre "Endurant" (super_enduring_0..3) — valeurs ABSOLUES
+        // par niveau (pas cumulatives, CitizenProperties::merge n'entre pas en jeu puisqu'un citoyen n'a
+        // jamais qu'un seul niveau actif de l'arbre à la fois). Variante historique (6 PA, 0 PE,
+        // débloquée à 151 pts sans arbre) hors périmètre.
+        private static readonly (int Ap, int Sp)[] SecondWindLevels = { (3, 1), (3, 3), (4, 4), (4, 6) };
+
+        public static (int Ap, int Sp) GetSecondWindBonus(int level) => SecondWindLevels[level];
+
         // Source: ProcessStatusEffect::__invoke (ProcessStatusEffect.php:132-145) +
         // CitizenHandler::setAP (:449-461)
         public static int ApplyPointEffect(

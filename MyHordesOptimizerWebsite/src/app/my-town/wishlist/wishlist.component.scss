@@ -7,6 +7,8 @@
         @include mat.form-field-overrides((
             container-height: 32px,
             container-vertical-padding: 4px,
+            filled-with-label-container-padding-top: 4px,
+            filled-with-label-container-padding-bottom: 4px,
         ));
     }
 
@@ -37,13 +39,13 @@
             flex-direction: column;
             height: 100%;
 
-        .table-headers {
-            display: flex;
-            flex-direction: row;
-            align-items: center;
-            justify-content: flex-start;
-            gap: 1em;
-        }
+            .table-headers {
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+                justify-content: flex-start;
+                gap: 1em;
+            }
 
             table {
                 width: 100%;
@@ -74,23 +76,24 @@
                     > td, > th {
 
                         &.mat-column-name {
-                            > div {
-                                flex-wrap: nowrap;
-                                display: flex;
-                                align-items: center;
-                                gap: 0.5em;
-
+                            ::ng-deep {
+                                .name-container {
+                                    flex-wrap: nowrap;
+                                    display: flex;
+                                    align-items: center;
+                                    gap: 0.25em;
+                                }
                             }
                         }
 
-                    &.mat-column-count, &.mat-column-zone_x_pa {
-                        .mat-mdc-form-field-icon-suffix {
-                            span {
-                                padding-right: 0.5em;
-                                cursor: pointer;
+                        &.mat-column-count, &.mat-column-zone_x_pa {
+                            .mat-mdc-form-field-icon-suffix {
+                                span {
+                                    padding-right: 0.5em;
+                                    cursor: pointer;
+                                }
                             }
                         }
-                    }
 
                         &.mat-column-should_signal {
                             .mat-icon {

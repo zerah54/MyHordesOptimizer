@@ -2,9 +2,10 @@ import { CitizenStateStepDTO } from '../dto/citizen-state-step.dto';
 import { CommonModel } from './_common.class';
 
 export class CitizenStateStep extends CommonModel<CitizenStateStepDTO> {
-    public type: 'item' | 'move' | 'equip_shoes' | 'mount_bike' | 'dismount_bike' | 'pickup_defence_cp_item' | 'become_ghoul' = 'item';
+    public type: 'item' | 'move' | 'equip_shoes' | 'mount_bike' | 'dismount_bike' | 'pickup_defence_cp_item' | 'become_ghoul' | 'second_wind' = 'item';
     public item_id?: number;
     public is_near_zone?: boolean;
+    public level?: number;
 
     public constructor(dto?: CitizenStateStepDTO) {
         super();
@@ -62,8 +63,16 @@ export class CitizenStateStep extends CommonModel<CitizenStateStepDTO> {
         return step;
     }
 
+    /** Étape « Second Souffle » (action héroïque, arbre Endurant) — level : 0 à 3. */
+    public static secondWind(level: number): CitizenStateStep {
+        const step: CitizenStateStep = new CitizenStateStep();
+        step.type = 'second_wind';
+        step.level = level;
+        return step;
+    }
+
     public modelToDto(): CitizenStateStepDTO {
-        return { type: this.type, itemId: this.item_id, isNearZone: this.is_near_zone };
+        return { type: this.type, itemId: this.item_id, isNearZone: this.is_near_zone, level: this.level };
     }
 
     protected dtoToModel(dto?: CitizenStateStepDTO): void {
@@ -71,6 +80,7 @@ export class CitizenStateStep extends CommonModel<CitizenStateStepDTO> {
             this.type = dto.type;
             this.item_id = dto.itemId;
             this.is_near_zone = dto.isNearZone;
+            this.level = dto.level;
         }
     }
 }
