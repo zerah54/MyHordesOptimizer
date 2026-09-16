@@ -4,7 +4,7 @@ import type { ApiToken } from '../types';
 import { detectDailyActionDone } from '../utils/daily-action-detection';
 import { fetcher } from '../utils/fetch';
 import { getI18N } from '../utils/i18n';
-import { getItemFromImg } from '../utils/item-lookup';
+import { resolveInventoryObjects } from '../utils/item-lookup';
 import { fixMhCompiledImg } from '../utils/misc';
 import { addError, normalizeString } from '../utils/notifications';
 import { pageIsAmelio, pageIsDesert, pageIsDoors, pageIsHouse } from '../utils/page';
@@ -119,10 +119,7 @@ export function updateExternalTools(on_progress?: (state: ExternalToolsUpdateJob
                 data.map.toolsToUpdate.isFataMorgana = 'cell';
             }
 
-            const objects = Array.from(document.querySelector('.inventory.desert')?.querySelectorAll('li.item') || []).map((desert_item) => {
-                const item = getItemFromImg(desert_item.querySelector('img')?.src);
-                return { id: item?.id, isBroken: desert_item.classList.contains('broken') };
-            });
+            const objects = resolveInventoryObjects(Array.from(document.querySelector('.inventory.desert')?.querySelectorAll('li.item') || []));
 
             const content = {
                 x: +position[0],
@@ -265,12 +262,7 @@ export function updateExternalTools(on_progress?: (state: ExternalToolsUpdateJob
             };
 
             const rucksacks = [];
-            const my_rusksack = Array.from(document.querySelector('.inventory.rucksack')?.querySelectorAll('li.item:not(.locked)') || []).map((rucksack_item) => {
-                const item = getItemFromImg(rucksack_item.querySelector('img')?.src);
-                if (item) {
-                    return { id: item.id, isBroken: rucksack_item.classList.contains('broken') };
-                }
-            });
+            const my_rusksack = resolveInventoryObjects(Array.from(document.querySelector('.inventory.rucksack')?.querySelectorAll('li.item:not(.locked)') || []));
 
             rucksacks.push({
                 userId: mh_user.id,
@@ -281,10 +273,7 @@ export function updateExternalTools(on_progress?: (state: ExternalToolsUpdateJob
                 const escorts = Array.from(document.querySelectorAll('.beyond-escort-on:not(.beyond-escort-on-all)') || []);
                 escorts.forEach((escort) => {
                     const escort_id = +escort.querySelector('span.username')?.getAttribute('x-user-id');
-                    const escort_rucksack = Array.from(escort.querySelector('.inventory.rucksack-escort')?.querySelectorAll('li.item:not(.locked):not(.plus)') || []).map((rucksack_item) => {
-                        const item = getItemFromImg(rucksack_item.querySelector('img')?.src);
-                        return { id: item?.id, isBroken: rucksack_item.classList.contains('broken') };
-                    });
+                    const escort_rucksack = resolveInventoryObjects(Array.from(escort.querySelector('.inventory.rucksack-escort')?.querySelectorAll('li.item:not(.locked):not(.plus)') || []));
 
                     rucksacks.push({
                         userId: escort_id,
@@ -309,12 +298,7 @@ export function updateExternalTools(on_progress?: (state: ExternalToolsUpdateJob
                 isMyHordesOptimizer: mho_parameters && mho_parameters.update_mho_chest
             };
 
-            const chest_elements = Array.from(document.querySelector('.inventory.chest')?.querySelectorAll('li.item:not(.locked)') || []).map((chest_item) => {
-                const item = getItemFromImg(chest_item.querySelector('img')?.src);
-                if (item) {
-                    return { id: item.id, isBroken: chest_item.classList.contains('broken') };
-                }
-            }).filter((chest_element) => chest_element);
+            const chest_elements = resolveInventoryObjects(Array.from(document.querySelector('.inventory.chest')?.querySelectorAll('li.item:not(.locked)') || []));
 
             data.chest.contents = convertListOfSingleObjectsIntoListOfCountedObjects(chest_elements);
         }
@@ -546,7 +530,7 @@ export function updateExternalTools(on_progress?: (state: ExternalToolsUpdateJob
 
             /** Tour des gardiens */
 
-            /** Coin sieste */
+            await saveDailyAction('home_rest', detectDailyActionDone('rest'));
 
             /** Galerie des fouineurs */
 

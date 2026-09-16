@@ -27,7 +27,6 @@ export const state: MhoState = {
     citizen_notes_map_id: undefined,
     tooltips_observer: undefined,
     loading_area_observer: undefined,
-    bank_observer: undefined,
     anti_abuse_controller: undefined,
 
     ///////////////////

@@ -154,6 +154,13 @@ export function getTownClockSignature(): string | undefined {
     return `${game_clock.getAttribute('data-town-id')}|${day?.textContent?.trim() ?? ''}`;
 }
 
+/** @return {number | null}    le jour de ville actuel lu dans l'horloge du jeu, `null` si elle n'est pas dans le DOM */
+export function getCurrentTownDay(): number | null {
+    const day: Element | null = document.querySelector('.game-clock .day-number');
+    const match: RegExpMatchArray | null = day ? (day.textContent ?? '').match(/\d+/) : null;
+    return match ? +match[0] : null;
+}
+
 /** @return {boolean}    on doit refresh le user actuel si le jour de la ville est différent du jour précédent */
 export function shouldRefreshMe(): boolean {
     // Si on est pendant l'attaque, on ne fait rien

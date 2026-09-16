@@ -1345,8 +1345,8 @@ div.item-tag.mho-item-tag-no-img {
     gap: 0.5em;
 }
 
-// Le trait sépare les deux blocs, y compris quand ils passent à la ligne
-.mho-forum-styles-words-field {
+// Le trait sépare les blocs de critères entre eux, y compris quand ils passent à la ligne
+.mho-forum-styles-criteria-field {
     border-left: 1px solid rgba(240, 215, 158, 0.3);
     flex: 1;
     min-width: 180px;
@@ -1388,9 +1388,32 @@ div.item-tag.mho-item-tag-no-img {
     display: block;
 }
 
-.mho-forum-styles-words {
+.mho-forum-styles-regex {
     margin: 0;
     width: 100%;
+}
+
+// L'aide reste à côté du libellé, l'un et l'autre au-dessus du champ ;
+// .mho-filter-label force width: 100% !important, à annuler ici pour laisser
+// de la place au bouton sur la même ligne (sinon il déborde du cadre)
+.mho-forum-styles-regex-label-row {
+    align-items: center;
+    display: flex;
+    gap: 0.35em;
+
+    .mho-filter-label {
+        width: auto !important;
+    }
+
+    // Le tooltip du bouton d'aide est posé en position: absolute + width: 250px en style
+    // inline (createHelpButton, ui/params.ts) : sur un cadre étroit (petit écran, colonne
+    // repliée) il déborde du viewport. .mho-filter-field (son ancêtre positionné) sert de
+    // repère : le forcer en left/right: 0 le borne à sa largeur, jamais au-delà.
+    .tooltip.help {
+        left: 0 !important;
+        right: 0 !important;
+        width: auto !important;
+    }
 }
 
 .mho-forum-styles-warning {

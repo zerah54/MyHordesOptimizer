@@ -479,6 +479,12 @@ export const texts = {
         de: 'Limit erreicht: Die nächste Entnahme löst das Missbrauchssystem aus',
         es: 'Límite alcanzado: la próxima toma activará el sistema anti-abuso'
     },
+    anti_abuse_uncertain_take: {
+        en: 'Uncertain take: several items appeared at once, unable to tell which one',
+        fr: 'Prise incertaine : plusieurs objets sont apparus en même temps, impossible de savoir lequel',
+        de: 'Unsichere Entnahme: mehrere Gegenstände sind gleichzeitig aufgetaucht, nicht zu bestimmen welcher',
+        es: 'Toma incierta: aparecieron varios objetos a la vez, imposible saber cuál'
+    },
     warn_missing_logs_title: {
         en: 'Warning: Missing searches data',
         fr: 'Attention : Données de fouilles manquantes',
@@ -701,17 +707,23 @@ export const texts = {
         de: 'Tags',
         es: 'Etiquetas'
     },
-    forum_styles_words: {
-        en: 'Words in the title',
-        fr: 'Mots du titre',
-        de: 'Wörter im Titel',
-        es: 'Palabras del título'
+    forum_styles_regex: {
+        en: 'Words or regex in the title',
+        fr: 'Mots ou regex sur le titre',
+        de: 'Wörter oder Regex im Titel',
+        es: 'Palabras o regex en el título'
     },
-    forum_styles_words_placeholder: {
-        en: 'words separated by commas',
-        fr: 'mots séparés par des virgules',
-        de: 'durch Kommas getrennte Wörter',
-        es: 'palabras separadas por comas'
+    forum_styles_regex_placeholder: {
+        en: 'words or regex separated by commas',
+        fr: 'mots ou regex séparés par des virgules',
+        de: 'Wörter oder Regex durch Kommas getrennt',
+        es: 'palabras o regex separados por comas'
+    },
+    forum_styles_regex_help: {
+        en: 'A plain word is enough, searched as-is in the title. Entries are separated by commas.<br /><br /><strong>.</strong> = any character<br /><strong>*</strong> = 0 or more of what precedes<br /><strong>+</strong> = 1 or more of what precedes<br /><strong>?</strong> = makes what precedes optional<br /><strong>^</strong> = start of the title<br /><strong>$</strong> = end of the title<br /><strong>|</strong> = or, between two patterns<br /><strong>\\d</strong> = a digit<br /><strong>\\w</strong> = a letter, digit or _<br /><strong>%DAY%</strong> = current town day<br /><br />( ) [ ] { } are literal, no need to escape them. One match anywhere in the title is enough, case is ignored.',
+        fr: 'Un simple mot suffit, il est recherché tel quel dans le titre. Les entrées sont séparées par des virgules.<br /><br /><strong>.</strong> = un caractère quelconque<br /><strong>*</strong> = 0 ou plusieurs fois ce qui précède<br /><strong>+</strong> = 1 ou plusieurs fois ce qui précède<br /><strong>?</strong> = rend optionnel ce qui précède<br /><strong>^</strong> = début du titre<br /><strong>$</strong> = fin du titre<br /><strong>|</strong> = ou, entre deux motifs<br /><strong>\\d</strong> = un chiffre<br /><strong>\\w</strong> = une lettre, un chiffre ou _<br /><strong>%DAY%</strong> = jour de ville actuel<br /><br />( ) [ ] { } sont littéraux, pas besoin de les échapper. Une seule correspondance dans le titre suffit, la casse n’est pas prise en compte.',
+        de: 'Ein einfaches Wort genügt, es wird so wie geschrieben im Titel gesucht. Einträge werden durch Kommas getrennt.<br /><br /><strong>.</strong> = ein beliebiges Zeichen<br /><strong>*</strong> = 0 oder mehr Mal das Vorhergehende<br /><strong>+</strong> = 1 oder mehr Mal das Vorhergehende<br /><strong>?</strong> = macht das Vorhergehende optional<br /><strong>^</strong> = Anfang des Titels<br /><strong>$</strong> = Ende des Titels<br /><strong>|</strong> = oder, zwischen zwei Mustern<br /><strong>\\d</strong> = eine Ziffer<br /><strong>\\w</strong> = ein Buchstabe, eine Ziffer oder _<br /><strong>%DAY%</strong> = aktueller Stadttag<br /><br />( ) [ ] { } sind wörtlich, kein Escaping nötig. Eine Übereinstimmung irgendwo im Titel genügt, Groß-/Kleinschreibung wird ignoriert.',
+        es: 'Basta una palabra simple, se busca tal cual en el título. Las entradas se separan por comas.<br /><br /><strong>.</strong> = cualquier carácter<br /><strong>*</strong> = 0 o más veces lo anterior<br /><strong>+</strong> = 1 o más veces lo anterior<br /><strong>?</strong> = hace opcional lo anterior<br /><strong>^</strong> = inicio del título<br /><strong>$</strong> = fin del título<br /><strong>|</strong> = o, entre dos patrones<br /><strong>\\d</strong> = un dígito<br /><strong>\\w</strong> = una letra, dígito o _<br /><strong>%DAY%</strong> = día actual de la ciudad<br /><br />( ) [ ] { } son literales, no hace falta escaparlos. Basta una coincidencia en cualquier parte del título, no se distingue mayúsculas/minúsculas.'
     },
     forum_styles_no_criteria: {
         en: 'Without any criterion, this rule applies to no thread.',
@@ -1192,7 +1204,7 @@ export const wishlist_title: I18nLabel = {
     es: 'Lista de deseos'
 };
 
-export const wishlist_headers: { label: I18nLabel; id: string }[] = [
+export const wishlist_headers: { label: I18nLabel; id: string; class_width: string }[] = [
     {
         label: {
             en: 'Item',
@@ -1200,7 +1212,8 @@ export const wishlist_headers: { label: I18nLabel; id: string }[] = [
             de: 'Gegenstand',
             es: 'Objeto'
         },
-        id: 'label'
+        id: 'label',
+        class_width: 'rw-5'
     },
     {
         label: {
@@ -1209,7 +1222,8 @@ export const wishlist_headers: { label: I18nLabel; id: string }[] = [
             de: 'Ort',
             es: 'Depósito'
         },
-        id: 'depot'
+        id: 'depot',
+        class_width: 'rw-3'
     },
     {
         label: {
@@ -1218,7 +1232,8 @@ export const wishlist_headers: { label: I18nLabel; id: string }[] = [
             de: 'In der Bank',
             es: 'En el almacén'
         },
-        id: 'bank_count'
+        id: 'bank_count',
+        class_width: 'rw-1'
     },
     {
         label: {
@@ -1227,30 +1242,49 @@ export const wishlist_headers: { label: I18nLabel; id: string }[] = [
             de: 'In den Rucksäcken',
             es: 'En las mochilas'
         },
-        id: 'bag_count'
+        id: 'bag_count',
+        class_width: 'rw-1'
     },
     {
         label: {
-            en: 'Desired stock',
-            fr: 'Stock souhaité',
-            de: 'Gewünschter Bestand',
-            es: 'Cantidad deseada'
+            en: 'In chests',
+            fr: 'En coffres',
+            de: 'In den Truhen',
+            es: 'En los cofres'
         },
-        id: 'bank_needed'
+        id: 'chest_count',
+        class_width: 'rw-1'
     },
     {
         label: {
-            en: 'Missing quantity',
-            fr: 'Quantité manquante',
-            de: 'Fehlende Menge',
-            es: 'Cantidad necesaria'
+            en: 'On the map',
+            fr: 'Sur la carte',
+            de: 'Auf der Karte',
+            es: 'En el mapa'
         },
-        id: 'diff'
+        id: 'map_cell_item_count',
+        class_width: 'rw-1'
     },
     {
-        label: { en: '', fr: '', es: '', de: '' },
-        id: 'delete'
+        label: {
+            en: 'Desired',
+            fr: 'Souhaité',
+            de: 'Gewünschter',
+            es: 'Deseada'
+        },
+        id: 'bank_needed',
+        class_width: 'rw-2'
     },
+    {
+        label: {
+            en: 'Missing',
+            fr: 'Manquant',
+            de: 'Fehlen',
+            es: 'Necesario'
+        },
+        id: 'diff',
+        class_width: 'rw-2'
+    }
 ];
 
 export const opener_relation_texts = {

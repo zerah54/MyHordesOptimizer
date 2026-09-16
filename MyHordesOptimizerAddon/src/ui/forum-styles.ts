@@ -4,7 +4,7 @@ import { state } from '../state';
 import type { ForumThreadStyle, ForumThreadStyleRule, ForumThreadTag } from '../types';
 import { cancelWaitForElement, waitForElement } from '../utils/dom-wait';
 import { getI18N } from '../utils/i18n';
-import { pageIsForum } from '../utils/page';
+import { getCurrentTownDay, pageIsForum } from '../utils/page';
 import { getStorageItem, setStorageItem } from '../utils/storage';
 
 /** Classe posée sur le span créé autour du texte du titre, pour pouvoir le styler sans toucher aux tags et icônes */
@@ -75,16 +75,32 @@ export function parseForumThreadStyleRules(value: string): ForumThreadStyleRule[
 }
 
 /**
+ * Échappe les métacaractères regex autres que les groupements `( ) [ ] { }`, déjà rendus
+ * littéraux par `escapeGroupingChars()` au moment du filtrage : un ancien mot ne doit matcher
+ * que lui-même, comme avec l'ancienne recherche par sous-chaîne.
+ */
+function escapeLegacyWordAsRegex(word: string): string {
+    return word.replace(/[.*+?^$|\\]/g, '\\$&');
+}
+
+/**
  * Complète une règle éventuellement partielle (stockage écrit par une version
  * antérieure de l'addon, ou altéré) pour garantir la forme attendue.
+ * Migre l'ancien champ `words` (recherche par sous-chaîne) vers `regex` si ce dernier est absent,
+ * pour ne pas effacer les critères déjà enregistrés par les utilisateurs à la mise à jour 1.1.62.
  */
-function sanitizeRule(rule: Partial<ForumThreadStyleRule>): ForumThreadStyleRule {
+function sanitizeRule(rule: Partial<ForumThreadStyleRule> & { words?: unknown }): ForumThreadStyleRule {
     const style: Partial<ForumThreadStyle> = rule?.style ?? {};
+    const regex: string[] = Array.isArray(rule?.regex)
+        ? rule.regex.map((pattern: string) => `${pattern}`.trim()).filter((pattern: string) => pattern !== '')
+        : Array.isArray(rule?.words)
+            ? rule.words.map((word: string) => escapeLegacyWordAsRegex(`${word}`.trim())).filter((word: string) => word !== '')
+            : [];
     return {
         id: rule?.id ?? `rule_${Date.now()}_${Math.floor(Math.random() * 10000)}`,
         enabled: rule?.enabled !== false,
         tags: Array.isArray(rule?.tags) ? rule.tags.filter((tag: string) => !!tag) : [],
-        words: Array.isArray(rule?.words) ? rule.words.map((word: string) => `${word}`.trim()).filter((word: string) => word !== '') : [],
+        regex,
         style: {
             color: style.color ?? null,
             background: style.background ?? null,
@@ -168,19 +184,45 @@ function resolveTagName(row: HTMLElement, label_to_name: Map<string, string>): s
     return by_color?.name ?? null;
 }
 
+/**
+ * Remplace `%DAY%` par le jour de ville actuel dans un motif de regex.
+ * @return {string | null}    le motif résolu, ou `null` si `%DAY%` est demandé sans jour connu
+ */
+function resolveRegexPattern(pattern: string, day: number | null): string | null {
+    if (!pattern.includes('%DAY%')) return pattern;
+    if (day === null) return null;
+    return pattern.split('%DAY%').join(`${day}`);
+}
+
+/**
+ * `(` `)` `[` `]` `{` `}` sont peu connus des joueurs non techniques comme syntaxe de regex :
+ * on les rend littéraux pour qu'ils soient utilisables sans échappement.
+ */
+function escapeGroupingChars(pattern: string): string {
+    return pattern.replace(/[()[\]{}]/g, '\\$&');
+}
+
 /** Une règle s'applique si tous ses critères renseignés sont satisfaits ; une règle sans critère ne cible rien */
-function ruleMatches(rule: ForumThreadStyleRule, tag_name: string | null, title: string): boolean {
+function ruleMatches(rule: ForumThreadStyleRule, tag_name: string | null, title: string, day: number | null): boolean {
     if (!rule.enabled) return false;
 
     const has_tags: boolean = rule.tags.length > 0;
-    const has_words: boolean = rule.words.length > 0;
-    if (!has_tags && !has_words) return false;
+    const has_regex: boolean = rule.regex.length > 0;
+    if (!has_tags && !has_regex) return false;
 
     if (has_tags && (!tag_name || !rule.tags.includes(tag_name))) return false;
 
-    if (has_words) {
-        const normalized_title: string = normalizeForumText(title);
-        if (!rule.words.some((word: string) => normalized_title.includes(normalizeForumText(word)))) return false;
+    if (has_regex) {
+        const matches_regex: boolean = rule.regex.some((pattern: string) => {
+            const resolved: string | null = resolveRegexPattern(pattern, day);
+            if (resolved === null) return false;
+            try {
+                return new RegExp(escapeGroupingChars(resolved), 'i').test(title);
+            } catch {
+                return false;
+            }
+        });
+        if (!matches_regex) return false;
     }
 
     return true;
@@ -298,6 +340,7 @@ export function applyForumThreadStyles(rules: ForumThreadStyleRule[]): void {
     if (rows.length === 0) return;
 
     const label_to_name: Map<string, string> = buildTagLabelMap();
+    const day: number | null = getCurrentTownDay();
 
     rows.forEach((row: HTMLElement) => {
         resetRow(row);
@@ -308,7 +351,7 @@ export function applyForumThreadStyles(rules: ForumThreadStyleRule[]): void {
         const tag_name: string | null = resolveTagName(row, label_to_name);
         const title: string = title_element.textContent ?? '';
         const matching: ForumThreadStyle[] = rules
-            .filter((rule: ForumThreadStyleRule) => ruleMatches(rule, tag_name, title))
+            .filter((rule: ForumThreadStyleRule) => ruleMatches(rule, tag_name, title, day))
             .map((rule: ForumThreadStyleRule) => rule.style);
 
         if (matching.length === 0) return;

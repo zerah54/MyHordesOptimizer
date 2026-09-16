@@ -37,6 +37,12 @@ export interface MhoItem {
     technicianOpenCpCost?: number | null;
     /** Effet catapulte réel de l'objet. `null`/absent si l'objet n'est pas catapultable. */
     catapultEffect?: MhoCatapultEffect | null;
+    /** Quantité totale dans les sacs des citoyens vivants de la ville. */
+    bagCount?: number;
+    /** Quantité totale dans les coffres des citoyens vivants de la ville. */
+    chestCount?: number;
+    /** Quantité posée sur les cases de la carte (toutes cases de la ville confondues). */
+    mapCellItemCount?: number;
 
     [key: string]: any;
 }
@@ -150,6 +156,12 @@ export interface WishlistItem {
     count: number;
     bankCount: number;
     bagCount: number;
+    /** Quantité totale dans les coffres des citoyens vivants de la ville. */
+    chestCount: number;
+    /** Pseudos des citoyens vivants dont le coffre contient l'objet. */
+    chestCitizens: string[];
+    /** Quantité posée sur les cases de la carte (toutes cases de la ville confondues). */
+    mapCellItemCount: number;
     depot: number;
     priority: number;
     zoneXPa: number;
@@ -285,8 +297,13 @@ export interface ForumThreadStyleRule {
     enabled: boolean;
     /** Noms techniques des tags concernés (`rp`, `help`, ...) ; vide = pas de critère de tag */
     tags: string[];
-    /** Mots devant apparaître dans le titre (insensible à la casse et aux accents) ; vide = pas de critère de mot */
-    words: string[];
+    /**
+     * Mots ou expressions régulières testés sur le titre brut (insensible à la casse, une seule
+     * correspondance suffit) ; vide = pas de critère de mot/regex. `(` `)` `[` `]` `{` `}` y sont
+     * littéraux (pas d'échappement nécessaire) et `%DAY%` est remplacé par le jour de ville actuel
+     * avant compilation, pour des règles qui suivent le jour en cours (ex. `Jour %DAY%`).
+     */
+    regex: string[];
     style: ForumThreadStyle;
 }
 
@@ -365,7 +382,6 @@ export interface MhoState {
     citizen_notes_map_id: number | undefined;
     tooltips_observer: MutationObserver | undefined;
     loading_area_observer: MutationObserver | undefined;
-    bank_observer: MutationObserver | undefined;
     anti_abuse_controller: AbortController | undefined;
     is_refresh_wishlist: boolean | undefined;
     has_new_changelog: boolean;

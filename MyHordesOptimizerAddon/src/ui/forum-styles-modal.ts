@@ -15,6 +15,7 @@ import {
     saveForumThreadStyleRules,
     serializeForumThreadStyleRules
 } from './forum-styles';
+import { createHelpButton } from './params';
 
 /** La couleur des tags que MyHordes laisse sans couleur propre (`00000030` côté fixtures) */
 const default_tag_color: string = 'rgba(0, 0, 0, 0.19)';
@@ -184,7 +185,7 @@ export function openForumThreadStylesModal(): void {
 
 /** Copie profonde d'une règle, pour ne pas modifier le cache tant que rien n'est enregistré */
 function cloneRule(rule: ForumThreadStyleRule): ForumThreadStyleRule {
-    return { ...rule, tags: [...rule.tags], words: [...rule.words], style: { ...rule.style } };
+    return { ...rule, tags: [...rule.tags], regex: [...rule.regex], style: { ...rule.style } };
 }
 
 /**
@@ -256,7 +257,7 @@ function createRuleBlock(
     });
     actions.appendChild(delete_button);
 
-    // ── Critères : tags et mots ─────────────────────────────────────────────
+    // ── Critères : tags et mots/regex ────────────────────────────────────────
     const criteria: HTMLElement = document.createElement('div');
     criteria.classList.add('mho-forum-styles-criteria');
     block.appendChild(criteria);
@@ -318,25 +319,30 @@ function createRuleBlock(
 
     renderSelectedTags();
 
-    const words_field: HTMLElement = document.createElement('div');
-    words_field.classList.add('mho-filter-field', 'mho-forum-styles-words-field');
-    criteria.appendChild(words_field);
+    const regex_field: HTMLElement = document.createElement('div');
+    regex_field.classList.add('mho-filter-field', 'mho-forum-styles-criteria-field');
+    criteria.appendChild(regex_field);
 
-    const words_label: HTMLLabelElement = document.createElement('label');
-    words_label.classList.add('mho-filter-label');
-    words_label.innerText = getI18N(texts.forum_styles_words);
-    words_field.appendChild(words_label);
+    const regex_label_row: HTMLElement = document.createElement('div');
+    regex_label_row.classList.add('mho-forum-styles-regex-label-row');
+    regex_field.appendChild(regex_label_row);
 
-    const words_input: HTMLInputElement = document.createElement('input');
-    words_input.type = 'text';
-    words_input.classList.add('mho-input', 'mho-forum-styles-words');
-    words_input.placeholder = getI18N(texts.forum_styles_words_placeholder);
-    words_input.value = rule.words.join(', ');
-    words_input.addEventListener('input', () => {
-        rule.words = words_input.value.split(',').map((word: string) => word.trim()).filter((word: string) => word !== '');
+    const regex_label: HTMLLabelElement = document.createElement('label');
+    regex_label.classList.add('mho-filter-label');
+    regex_label.innerText = getI18N(texts.forum_styles_regex);
+    regex_label_row.appendChild(regex_label);
+    regex_label_row.appendChild(createHelpButton(getI18N(texts.forum_styles_regex_help)));
+
+    const regex_input: HTMLInputElement = document.createElement('input');
+    regex_input.type = 'text';
+    regex_input.classList.add('mho-input', 'mho-forum-styles-regex');
+    regex_input.placeholder = getI18N(texts.forum_styles_regex_placeholder);
+    regex_input.value = rule.regex.join(', ');
+    regex_input.addEventListener('input', () => {
+        rule.regex = regex_input.value.split(',').map((pattern: string) => pattern.trim()).filter((pattern: string) => pattern !== '');
         updateCriteriaWarning();
     });
-    words_field.appendChild(words_input);
+    regex_field.appendChild(regex_input);
 
     const warning: HTMLElement = document.createElement('div');
     warning.classList.add('mho-forum-styles-warning');
@@ -344,7 +350,7 @@ function createRuleBlock(
     block.appendChild(warning);
 
     function updateCriteriaWarning(): void {
-        warning.style.display = rule.tags.length === 0 && rule.words.length === 0 ? 'block' : 'none';
+        warning.style.display = rule.tags.length === 0 && rule.regex.length === 0 ? 'block' : 'none';
     }
 
     updateCriteriaWarning();

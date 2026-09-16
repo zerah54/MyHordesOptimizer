@@ -1,4 +1,11 @@
 export const changelogs: Record<string, string> = {
+    '1.1.62': `
+        [Novedad] Los tooltips avanzados y la lista de la compra ahora muestran también la cantidad en cofres y en el mapa, además del almacén y las mochilas
+        [Novedad] El filtro de temas del foro acepta expresiones regulares además de palabras simples, con un botón de ayuda y el patrón %DAY% para el día de ciudad actual
+        [Novedad] El descanso (rincón de la siesta) ahora se registra como acción diaria, igual que el baño, el guardado y la limpieza
+
+        [Corrección] El contador anti-abuso del almacén podía pasar por alto o contar mal una toma de la mochila; ahora se basa en las señales del juego en lugar de un retraso fijo
+        `,
     '1.1.61': `
         [Mejora] El registro de cambios ya está disponible en los 4 idiomas del script (francés, inglés, alemán, español)
 

@@ -133,6 +133,15 @@ export function displayCampingPredict(): void {
 
 /** Construit le calculateur dans le bloc de campement fourni */
 function buildCampingPredict(zone_camp: Element): void {
+    /**
+     * `displayCampingPredict` fait partie des options « sans connexion » (rejouées à chaque
+     * navigation, avant même le premier `getToken()`). `state.mh_user` reste `undefined` tant
+     * que ce premier appel n'a pas résolu : construire ici planterait sur `.townDetails`. On
+     * ne construit rien pour l'instant, le rejeu suivant de `initOptionsWithoutLoginNeeded`
+     * retentera avec un `state.mh_user` déjà résolu.
+     */
+    if (!state.mh_user) return;
+
     camping_predict_building = true;
 
     getRuins()

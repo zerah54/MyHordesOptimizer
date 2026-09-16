@@ -1,7 +1,7 @@
 import { lang, repo_img_hordes_url, supported_languages } from '../config/constants';
 import { opener_relation_texts, status_texts, wishlist_depot, wishlist_headers } from '../i18n/texts';
 import { state } from '../state';
-import type { WishlistItem } from '../types';
+import type { I18nLabel, WishlistItem } from '../types';
 import { getI18N } from '../utils/i18n';
 import { getFixedImagePath, getTooltipItem } from '../utils/item-lookup';
 import { getCatapultEffectElement } from './catapult-effect';
@@ -256,6 +256,84 @@ export function initTooltipFreezeOnShift() {
 }
 
 
+/**
+ * Couleur de fond du badge dépôt, une par destination (cf. `wishlist_depot`) — réutilise des
+ * couleurs déjà en place ailleurs dans le jeu/l'addon plutôt que d'en inventer de nouvelles :
+ * marron des tags de traduction (`.brown-tag`), bleu clair des items (`@myhordes-blue-color`),
+ * bleu foncé des tags de propriétés/actions (`.item-tag` natif).
+ */
+function getDepotPillColor(depotValue: number): string {
+    switch (depotValue) {
+        case -1000: return '#022142'; // Ne pas ramener
+        case 1: return '#3b3249'; // Zone de rapatriement
+        case -1: return '#5c564b'; // Non défini
+        default: return '#5c2b20'; // Banque
+    }
+}
+
+/** Bandeau "Stock souhaité : X — [Dépôt]" affiché quand l'objet est dans la wishlist de la zone. */
+function createWishlistGoalRow(item_in_wishlist: WishlistItem): HTMLDivElement {
+    const goal_row: HTMLDivElement = document.createElement('div');
+    goal_row.classList.add('mho-wishlist-goal');
+    goal_row.style.display = 'flex';
+    goal_row.style.alignItems = 'center';
+    goal_row.style.justifyContent = 'space-between';
+    goal_row.style.gap = '0.5em';
+    goal_row.style.marginBottom = '0.35em';
+
+    const wanted: HTMLSpanElement = document.createElement('span');
+    wanted.innerText = getI18N(wishlist_headers.find((header: { label: I18nLabel; id: string }) => header.id === 'bank_needed').label) + ' : ' + (item_in_wishlist.count < 0 ? '∞' : item_in_wishlist.count);
+    goal_row.appendChild(wanted);
+
+    const depot: HTMLSpanElement = document.createElement('span');
+    depot.innerText = getI18N(wishlist_depot.find((d) => item_in_wishlist.depot === d.value).label);
+    depot.style.backgroundColor = getDepotPillColor(item_in_wishlist.depot);
+    depot.style.color = '#f0d79e';
+    depot.style.borderRadius = '999px';
+    depot.style.padding = '0.1em 0.6em';
+    depot.style.fontSize = '0.85em';
+    goal_row.appendChild(depot);
+
+    return goal_row;
+}
+
+/** Chip icône titrée + valeur, pour un emplacement de stock (banque, carte, sacs, coffres). */
+function createStockChip(headerId: string, iconPath: string, value: number): HTMLSpanElement {
+    const chip: HTMLSpanElement = document.createElement('span');
+    chip.style.display = 'inline-flex';
+    chip.style.alignItems = 'center';
+    chip.style.gap = '0.25em';
+
+    const icon: HTMLImageElement = document.createElement('img');
+    icon.src = repo_img_hordes_url + iconPath;
+    icon.width = 16;
+    icon.height = 16;
+    icon.title = getI18N(wishlist_headers.find((header: { label: I18nLabel; id: string }) => header.id === headerId).label);
+    chip.appendChild(icon);
+
+    const value_span: HTMLSpanElement = document.createElement('span');
+    value_span.innerText = String(value);
+    chip.appendChild(value_span);
+
+    return chip;
+}
+
+/** Ligne compacte des 4 emplacements de stock (banque, carte, sacs, coffres). */
+function createStockChipsRow(item): HTMLDivElement {
+    const chips_row: HTMLDivElement = document.createElement('div');
+    chips_row.classList.add('mho-stock-chips');
+    chips_row.style.display = 'flex';
+    chips_row.style.flexWrap = 'wrap';
+    chips_row.style.gap = '0.6em';
+
+    chips_row.appendChild(createStockChip('bank_count', 'item/item_safe.gif', item.bankCount ?? 0));
+    chips_row.appendChild(createStockChip('map_cell_item_count', 'icons/item_map.gif', item.mapCellItemCount ?? 0));
+    chips_row.appendChild(createStockChip('bag_count', 'item/item_bag.gif', item.bagCount ?? 0));
+    chips_row.appendChild(createStockChip('chest_count', 'item/item_chest.gif', item.chestCount ?? 0));
+
+    return chips_row;
+}
+
 export function createAdvancedProperties(content, item, tooltip) {
     let item_deco;
     if (tooltip) {
@@ -269,31 +347,19 @@ export function createAdvancedProperties(content, item, tooltip) {
     if (tooltip && state.mho_parameters.enhanced_tooltips_item_quantities) {
         const stock_div: HTMLDivElement = document.createElement('div');
         content.appendChild(stock_div);
-        stock_div.style.display = 'flex';
-        stock_div.style.flexWrap = 'wrap';
-        stock_div.style.justifyContent = 'space-between';
-        stock_div.style.columnGap = '1em';
+        stock_div.style.marginTop = '0.35em';
         stock_div.style.borderBottom = '1px solid white';
-
-        const bank_div: HTMLDivElement = document.createElement('div');
-        bank_div.style.width = 'calc(50% - 0.5em)';
-        bank_div.innerText = getI18N(wishlist_headers.find((header) => header.id === 'bank_count').label) + ' : ' + item.bankCount;
-        stock_div.appendChild(bank_div);
+        stock_div.style.paddingBottom = '0.35em';
+        stock_div.style.marginBottom = '0.35em';
 
         const wishlist_for_zone: WishlistItem[] = getWishlistForZone();
         const item_in_wishlist: WishlistItem = wishlist_for_zone?.find((iwfz) => item.id === iwfz.item.id);
 
-        if (item_in_wishlist?.item.wishListCount > 0) {
-            const wishlist_wanted_div: HTMLDivElement = document.createElement('div');
-            wishlist_wanted_div.style.width = 'calc(50% - 0.5em)';
-            wishlist_wanted_div.innerText = getI18N(wishlist_headers.find((header) => header.id === 'bank_needed').label) + ' : ' + item_in_wishlist.item.wishListCount;
-            stock_div.appendChild(wishlist_wanted_div);
-
-            const wishlist_depot_div: HTMLDivElement = document.createElement('div');
-            wishlist_depot_div.style.width = 'calc(50% - 0.5em)';
-            wishlist_depot_div.innerText = getI18N(wishlist_headers.find((header) => header.id === 'depot').label) + ' : ' + getI18N(wishlist_depot.find((depot) => item_in_wishlist.depot === depot.value).label);
-            stock_div.appendChild(wishlist_depot_div);
+        if (item_in_wishlist !== undefined) {
+            stock_div.appendChild(createWishlistGoalRow(item_in_wishlist));
         }
+
+        stock_div.appendChild(createStockChipsRow(item));
     }
 
     if (state.mho_parameters.enhanced_tooltips_item_translations) {

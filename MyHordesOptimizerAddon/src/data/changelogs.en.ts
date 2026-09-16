@@ -1,4 +1,11 @@
 export const changelogs: Record<string, string> = {
+    '1.1.62': `
+        [New] Advanced tooltips and the shopping list now also show the quantity in chests and on the map, in addition to the bank and bags
+        [New] The forum thread filter now accepts regular expressions in addition to plain words, with a help button and the %DAY% pattern to target the current town day
+        [New] Rest (nap corner) is now tracked as a daily action, same as bathing, storing and cleaning
+
+        [Fix] The bank anti-abuse counter could miss or miscount a take from the bag; it now relies on the game's own signals instead of a fixed delay
+        `,
     '1.1.61': `
         [Improvement] The changelog is now available in the script's 4 languages (French, English, German, Spanish)
 

@@ -1,16 +1,11 @@
 import { lang, mh_optimizer_icon, mho_anti_abuse_counter_id, mho_anti_abuse_key, repo_img_hordes_url } from '../config/constants';
 import { texts } from '../i18n/texts';
 import { state } from '../state';
+import type { MhoItem } from '../types';
 import { getI18N } from '../utils/i18n';
 import { getItemFromImg } from '../utils/item-lookup';
 import { pageIsBank, pageIsWell } from '../utils/page';
 import { getStorageItem, setStorageItem } from '../utils/storage';
-
-// Local helper: TypeScript's arrFrom(any) sometimes infers element type
-// 'unknown' rather than 'any' when the source isn't a statically-typed
-// iterable. This explicit-any wrapper avoids that, matching the original
-// untyped JS behaviour (no behaviour change, pure typing aid).
-const arrFrom = (x: any): any[] => Array.from(x);
 
 /** Posée sur la cellule du forum (banque, desktop) pour l'empiler en flex vertical avec le compteur */
 const mho_bank_forum_cell_class: string = 'mho-bank-forum-cell';
@@ -264,76 +259,265 @@ export function displayAntiAbuseCounter(): void {
         refreshTakeStatus();
 
         if (pageIsBank()) {
-            const bank: Element | null = document.querySelector('#bank-inventory');
-            let old_bag: NodeListOf<Element> | undefined;
+            const bank_inventory: HTMLElement | null = document.getElementById('bank-inventory');
+            const rucksack_id: string | undefined = bank_inventory?.dataset.inventoryAId;
+            const bank_id: string | undefined = bank_inventory?.dataset.inventoryBId;
 
-            bank!.addEventListener('click', (event: Event) => {
-                event.stopPropagation();
-                const target: HTMLElement = event.target as HTMLElement;
-                const valid_tags: string[] = ['li', 'span', 'img'];
-                if (!valid_tags.includes(target.nodeName.toLowerCase())) return;
-                if (target.classList.length > 0 && !target.classList.contains('item') && !target.classList.contains('item-icon')) return;
+            /** Métadonnées de la requête de transfert (décidées par le clic, jamais le contenu de la réponse serveur) */
+            interface ItemTransferDetail {
+                from: number;
+                to: number;
+                direction: string;
+            }
 
-                const rucksack: Element | null = document.querySelector('#bank-inventory ul.rucksack');
-                if (!rucksack) return;
+            interface TrackedBagItem {
+                /** Clé de comparaison stable : `src` brut de l'icône, résolu en `MhoItem` seulement au moment d'enregistrer (le référentiel `state.items` peut ne pas être prêt au premier relevé) */
+                img_src: string;
+                broken: boolean;
+            }
 
-                old_bag = document.querySelectorAll('#bank-inventory ul.rucksack li.item');
-                const old_bag_items: any[] = arrFrom(old_bag).map(
-                    (item_in_old_bag: Element) => getItemFromImg((item_in_old_bag.querySelector('img') as HTMLImageElement).src)
-                );
+            /** `.locked` n'exclut PAS ici : posée sur TOUT le sac (pas juste les essentiels) tant qu'une requête de transfert est en cours côté jeu (`props.bag.locked`) — l'exclure viderait le sac pendant la fenêtre du contrôle */
+            /** Chaque objet du sac perso reste sa propre ligne (`Item::count` toujours à 1) : la fusion en pastille à badge n'existe que banque/bâtiment (`InventoryHandler::forceMoveItem`, jeu) */
+            const readTrackedBagItems = (): TrackedBagItem[] => Array.from(
+                document.querySelectorAll('#bank-inventory ul.rucksack li.item')
+            ).map((element: Element) => ({
+                img_src: (element.querySelector('img') as HTMLImageElement | null)?.src ?? '',
+                broken: element.classList.contains('broken')
+            })).filter((entry: TrackedBagItem): boolean => entry.img_src !== '');
 
-                state.bank_observer?.disconnect();
+            /** Nombre d'entrées par icône (chaque entrée = un `<li>` séparé, jamais un compte empilé) */
+            const sumByImgSrc = (items: TrackedBagItem[]): Map<string, number> => {
+                const totals: Map<string, number> = new Map<string, number>();
+                items.forEach((item: TrackedBagItem) => totals.set(item.img_src, (totals.get(item.img_src) ?? 0) + 1));
+                return totals;
+            };
 
-                let observer: MutationObserver;
-                const callback = (_mutationsList: MutationRecord[]): void => {
-                    observer.disconnect();
-                    state.bank_observer = undefined;
+            let known_items: TrackedBagItem[] = readTrackedBagItems();
 
-                    setTimeout(() => {
-                        const new_bag: NodeListOf<Element> = document.querySelectorAll('#bank-inventory ul.rucksack li.item');
-                        if ((old_bag?.length ?? 0) < new_bag.length) {
-                            getStorageItem(mho_anti_abuse_key).then((stored_values: any) => {
-                                if (!stored_values) {
-                                    stored_values = [];
-                                }
-                                const new_bag_items: any[] = arrFrom(new_bag).map(
-                                    (item_in_new_bag: Element) => getItemFromImg((item_in_new_bag.querySelector('img') as HTMLImageElement).src)
-                                );
-                                new_bag_items.forEach((new_bag_item: any, index: number) => {
-                                    const old_item_index: number = old_bag_items.findIndex(
-                                        (old_bag_item: any) => old_bag_item.id === new_bag_item.id
-                                    );
-                                    if (old_item_index > -1) {
-                                        old_bag_items.splice(old_item_index, 1);
-                                    } else {
-                                        const counter_value: any = {
-                                            item: {
-                                                item: new_bag_item,
-                                                broken: (new_bag[index] as HTMLElement).classList.contains('broken')
-                                            },
-                                            take_at: Date.now() + 2500
-                                        };
-                                        stored_values.push(counter_value);
-                                        counter_values.push(counter_value);
+            /** Liste du sac et données d'affichage (icône/nom, le « vault » du jeu) chargent en ASYNCHRONE indépendant : un objet sans vault se rend en pastille vide sans `<img>` (`<li class="item locked pending"/>`), invisible ici — `vaultUpdate` (`storage: 'items'`) signale une arrivée, on ne renonce qu'après un silence prolongé */
+            let last_vault_activity: number = Date.now();
+            document.documentElement.addEventListener('vaultUpdate', (event: Event) => {
+                const detail: { storage?: string } | undefined = (event as CustomEvent).detail;
+                if (detail?.storage === 'items') {
+                    last_vault_activity = Date.now();
+                }
+            }, { signal: state.anti_abuse_controller.signal });
 
-                                        const new_mho_anti_abuse_counter: Element | null = document.querySelector(`#${mho_anti_abuse_counter_id}`);
-                                        if (new_mho_anti_abuse_counter) {
-                                            define_row(counter_value, new_mho_anti_abuse_counter.querySelector('.mho-anti-abuse-counter-content'));
-                                        }
-                                    }
-                                });
-                                setStorageItem(mho_anti_abuse_key, stored_values);
-                                old_bag = new_bag;
-                            });
-                        } else {
-                            old_bag = undefined;
+            /** Réessaie tant qu'il reste des `<li>` sans icône résolue et que du vault continue d'arriver (silence max `max_idle_ms` avant d'abandonner) */
+            const readSettledBagItems = (onReady: (items: TrackedBagItem[]) => void, max_idle_ms: number = 8000): void => {
+                /** Au moins une frame d'attente : le signal déclencheur part avant que React ait committé son rendu */
+                requestAnimationFrame(() => {
+                    const raw_li_count: number = document.querySelectorAll('#bank-inventory ul.rucksack li.item').length;
+                    const current: TrackedBagItem[] = readTrackedBagItems();
+
+                    if (raw_li_count > current.length && (Date.now() - last_vault_activity) < max_idle_ms) {
+                        readSettledBagItems(onReady, max_idle_ms);
+                        return;
+                    }
+                    onReady(current);
+                });
+            };
+
+            /** Objet fictif affiché quand la prise est confirmée mais l'objet réellement pris est ambigu */
+            const uncertain_item: MhoItem = { id: -1, img: 'icons/small_warning.gif', label: texts.anti_abuse_uncertain_take } as MhoItem;
+
+            /** Un seul aller-retour de stockage pour toutes les prises du passage : un cycle par objet raterait celles lancées avant qu'une écriture concurrente n'ait committé */
+            const recordTakes = (entries: { item: MhoItem, broken: boolean }[]): void => {
+                if (entries.length === 0) return;
+
+                getStorageItem(mho_anti_abuse_key).then((stored_values: any) => {
+                    if (!stored_values) {
+                        stored_values = [];
+                    }
+                    entries.forEach(({ item, broken }: { item: MhoItem, broken: boolean }) => {
+                        const counter_value: any = {
+                            item: { item, broken },
+                            take_at: Date.now() + 2500
+                        };
+                        stored_values.push(counter_value);
+                        counter_values.push(counter_value);
+
+                        const new_mho_anti_abuse_counter: Element | null = document.querySelector(`#${mho_anti_abuse_counter_id}`);
+                        if (new_mho_anti_abuse_counter) {
+                            define_row(counter_value, new_mho_anti_abuse_counter.querySelector('.mho-anti-abuse-counter-content'));
                         }
-                    }, 100);
+                    });
+                    setStorageItem(mho_anti_abuse_key, stored_values);
+                });
+            };
+
+            /** Regroupe les signaux rapprochés (clics rapides) : évite qu'un second transfert confirmé soit perdu, déjà « consommé » par la vérification du premier */
+            let pending_transfer_count: number = 0;
+            let check_scheduled: boolean = false;
+
+            /**
+             * Établit/resynchronise `known_items`, revérifié une fois stabilisé au cas où un vrai
+             * transfert aurait démarré entre-temps (laissé à `scheduleCheck` plutôt que fausser son delta).
+             * `expect_mutation` : un dépôt déclenche `sig-inventory-bag-loaded` avant son propre
+             * commit React — lire tout de suite garderait l'objet déposé dans la référence.
+             */
+            const resyncBaseline = (expect_mutation: boolean = false): void => {
+                if (pending_transfer_count !== 0 || check_scheduled) return;
+
+                const finish = (): void => {
+                    readSettledBagItems((current: TrackedBagItem[]) => {
+                        if (pending_transfer_count !== 0 || check_scheduled) return;
+                        known_items = current;
+                    });
                 };
 
-                observer = new MutationObserver(callback);
-                state.bank_observer = observer;
-                observer.observe(rucksack, { childList: true, subtree: true, attributes: false });
+                if (!expect_mutation) {
+                    finish();
+                    return;
+                }
+
+                const rucksack_el: Element | null = document.querySelector('#bank-inventory ul.rucksack');
+                let settled: boolean = false;
+                const proceed = (): void => {
+                    if (settled) return;
+                    settled = true;
+                    observer.disconnect();
+                    clearTimeout(fallback_timer);
+                    finish();
+                };
+                const observer: MutationObserver = new MutationObserver(() => proceed());
+                if (rucksack_el) {
+                    observer.observe(rucksack_el, { childList: true, subtree: true });
+                }
+                const fallback_timer: ReturnType<typeof setTimeout> = setTimeout(() => proceed(), 500);
+            };
+            resyncBaseline();
+
+            const scheduleCheck = (): void => {
+                if (check_scheduled) return;
+                check_scheduled = true;
+
+                /**
+                 * `sig-item-transfer` part avant le commit React (`emitSignal` précède `setInventoryA`)
+                 * : un `MutationObserver` attend une mutation RÉELLE du sac plutôt qu'un délai estimé.
+                 * Mais ni un dépôt concurrent (retrait sur `ul.rucksack`) ni `#notifications`
+                 * (mutée SYNCHRONE par `$.html.message`, souvent avant le sac) ne prouvent que la
+                 * prise attendue est arrivée — seul un gain réel vs `known_items` (`hasGainedSomething`,
+                 * le test que fait de toute façon `processCheck`) le prouve ; sinon, court répit
+                 * (`settle_grace_frames`) puis refus confirmé. Le filet 3s ne sert qu'aux cas hors norme.
+                 */
+                const settle_grace_frames: number = 5;
+                const rucksack_el: Element | null = document.querySelector('#bank-inventory ul.rucksack');
+                const notifications_el: Element | null = document.getElementById('notifications');
+                let settled: boolean = false;
+                let grace_armed: boolean = false;
+
+                /** Un `<li>` de plus qu'au démarrage est un gain probable même si son vault n'a pas résolu (invisible de `readTrackedBagItems`) — `readSettledBagItems` patientera pour l'icône, pas cette fonction */
+                const baseline_raw_li_count: number = document.querySelectorAll('#bank-inventory ul.rucksack li.item').length;
+                const hasGainedSomething = (): boolean => {
+                    const raw_li_count: number = document.querySelectorAll('#bank-inventory ul.rucksack li.item').length;
+                    if (raw_li_count > baseline_raw_li_count) return true;
+
+                    const current_totals: Map<string, number> = sumByImgSrc(readTrackedBagItems());
+                    const known_totals: Map<string, number> = sumByImgSrc(known_items);
+                    for (const [img_src, count] of current_totals) {
+                        if (count > (known_totals.get(img_src) ?? 0)) return true;
+                    }
+                    return false;
+                };
+
+                const proceed = (reason: string): void => {
+                    if (settled) return;
+                    settled = true;
+                    observer.disconnect();
+                    clearTimeout(fallback_timer);
+
+                    readSettledBagItems(processCheck);
+                };
+
+                const armGrace = (): void => {
+                    if (grace_armed) return;
+                    grace_armed = true;
+                    let frames_left: number = settle_grace_frames;
+                    const tick = (): void => {
+                        if (settled) return;
+                        if (hasGainedSomething()) {
+                            proceed('grace-gain');
+                            return;
+                        }
+                        if (frames_left <= 0) {
+                            proceed('grace-exhausted');
+                            return;
+                        }
+                        frames_left--;
+                        requestAnimationFrame(tick);
+                    };
+                    requestAnimationFrame(tick);
+                };
+
+                const observer: MutationObserver = new MutationObserver(() => {
+                    if (hasGainedSomething()) {
+                        proceed('mutation-gain');
+                    } else {
+                        armGrace();
+                    }
+                });
+                if (rucksack_el) {
+                    observer.observe(rucksack_el, { childList: true, subtree: true });
+                }
+                if (notifications_el) {
+                    observer.observe(notifications_el, { childList: true });
+                }
+                const fallback_timer: ReturnType<typeof setTimeout> = setTimeout(() => proceed('fallback-3s'), 3000);
+
+                /** `confirmed_transfers` n'est capturé qu'une fois stabilisé : un signal arrivant pendant l'attente doit rester compté, pas perdu par une capture trop tôt */
+                const processCheck = (current_items: TrackedBagItem[]): void => {
+                    const confirmed_transfers: number = pending_transfer_count;
+                    pending_transfer_count = 0;
+
+                    /** Diff par nombre d'entrées par icône (deux objets identiques = deux `<li>` séparés) ; résolution en `MhoItem` seulement une fois qu'il y a bien quelque chose à enregistrer */
+                    const known_totals: Map<string, number> = sumByImgSrc(known_items);
+                    const current_totals: Map<string, number> = sumByImgSrc(current_items);
+
+                    const newly_appeared: { item: MhoItem, broken: boolean }[] = [];
+                    let newly_appeared_total: number = 0;
+                    current_totals.forEach((current_count: number, img_src: string) => {
+                        const delta: number = current_count - (known_totals.get(img_src) ?? 0);
+                        if (delta > 0) {
+                            newly_appeared_total += delta;
+                            const resolved: MhoItem | undefined = getItemFromImg(img_src);
+                            const broken: boolean = current_items.find((item: TrackedBagItem) => item.img_src === img_src)?.broken ?? false;
+                            for (let i: number = 0; i < delta; i++) {
+                                newly_appeared.push(
+                                    resolved
+                                        ? { item: resolved, broken }
+                                        : { item: uncertain_item, broken: false }
+                                );
+                            }
+                        }
+                    });
+
+                    /** Un signal confirmé prouve une tentative, pas un succès — au-delà du nombre confirmé, impossible de savoir lesquels sont réels : on compte des prises incertaines plutôt que sous-estimer la limite */
+                    if (newly_appeared_total <= confirmed_transfers) {
+                        recordTakes(newly_appeared);
+                    } else {
+                        recordTakes(Array.from({ length: confirmed_transfers }, () => ({ item: uncertain_item, broken: false })));
+                    }
+                    known_items = current_items;
+                    /** `resyncBaseline` reste exclu tant que ce contrôle n'est pas terminé, sous peine de resynchroniser sur un état intermédiaire */
+                    check_scheduled = false;
+                };
+            };
+
+            /** `sig-item-transfer` (module Signal du jeu) : sert seulement à savoir QUAND revérifier, jamais à lire le contenu de la réponse serveur */
+            document.documentElement.addEventListener('sig-item-transfer', (event: Event) => {
+                const detail: ItemTransferDetail | undefined = (event as CustomEvent).detail;
+                if (!detail || detail.direction !== 'up' || String(detail.from) !== bank_id || String(detail.to) !== rucksack_id) return;
+
+                pending_transfer_count++;
+                scheduleCheck();
+            }, { signal: state.anti_abuse_controller.signal });
+
+            /** `sig-inventory-bag-loaded` : resynchronise `known_items` hors prise en cours (émis pour dépôt ET prise) — `expect_mutation: true` attend le retrait réel avant de lire */
+            document.documentElement.addEventListener('sig-inventory-bag-loaded', (event: Event) => {
+                const detail: { id: number } | undefined = (event as CustomEvent).detail;
+                if (!detail || String(detail.id) !== rucksack_id) return;
+                resyncBaseline(true);
             }, { signal: state.anti_abuse_controller.signal });
 
         } else if (pageIsWell()) {

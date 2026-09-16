@@ -110,71 +110,80 @@ export function createEmptyForumThreadStyleRule(id: string): ForumThreadStyleRul
         id: id,
         enabled: true,
         tags: [],
-        words: [],
+        regex: [],
         style: { ...empty_forum_thread_style }
     };
 }
 
 /**
- * Les règles livrées par défaut : elles ne portent que sur les tags, donc
- * elles fonctionnent quelle que soit la langue du joueur.
+ * Les règles livrées par défaut portent sur les tags (indépendants de la langue du joueur),
+ * à l'exception de `default_day` : ses préfixes `J`/`D`/`T` couvrent respectivement le français
+ * (Jour), l'anglais/l'espagnol (Day/Día) et l'allemand (Tag), donc elle reste aussi
+ * multilingue malgré le critère textuel.
  */
 export function getDefaultForumThreadStyleRules(): ForumThreadStyleRule[] {
     return [
         {
+            id: 'default_day',
+            enabled: true,
+            tags: [],
+            regex: ['[J%DAY%]', '[D%DAY%]', '[T%DAY%]'],
+            style: { ...empty_forum_thread_style, color: '#f0d79e', prefix: '📅' }
+        },
+        {
             id: 'default_official',
             enabled: true,
             tags: ['official'],
-            words: [],
+            regex: [],
             style: { ...empty_forum_thread_style, background: '#63181b', border: '#aa0000' }
         },
         {
             id: 'default_update',
             enabled: true,
             tags: ['update', 'dsc_update'],
-            words: [],
+            regex: [],
             style: { ...empty_forum_thread_style, color: '#9db4ff', border: '#3d405b', prefix: '📢' }
         },
         {
             id: 'default_help',
             enabled: true,
             tags: ['help'],
-            words: [],
+            regex: [],
             style: { ...empty_forum_thread_style, color: '#ff8fb3', prefix: '❓' }
         },
         {
             id: 'default_event',
             enabled: true,
             tags: ['event'],
-            words: [],
+            regex: [],
             style: { ...empty_forum_thread_style, color: '#7fd8bd', prefix: '🎉' }
         },
         {
             id: 'default_orga',
             enabled: true,
             tags: ['dsc_orga'],
-            words: [],
+            regex: [],
             style: { ...empty_forum_thread_style, color: '#ffa94d', background: '#5f371d' }
         },
         {
             id: 'default_guide',
             enabled: true,
             tags: ['dsc_guide'],
-            words: [],
+            regex: [],
             style: { ...empty_forum_thread_style, color: '#c9a9ff', prefix: '📖' }
         },
         {
             id: 'default_rp',
             enabled: true,
             tags: ['rp'],
-            words: [],
+            regex: [],
             style: { ...empty_forum_thread_style, color: '#d4a373' }
         },
         {
             id: 'default_flood',
             enabled: true,
             tags: ['dsc_flood'],
-            words: [],
+            regex: [],
             style: { ...empty_forum_thread_style, opacity: 55, size: 90 }
         }
     ];

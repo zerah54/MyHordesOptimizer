@@ -37,7 +37,7 @@ describe('displayItems — onglet "items" (catalogue)', () => {
         const item = itemFixture();
         state.items = [item];
         state.wishlist = {
-            wishList: [{ item: { id: 42 } as any, count: 1, bankCount: 0, bagCount: 0, depot: 0, priority: 0, zoneXPa: 0, isWorkshop: false, shouldSignal: false }]
+            wishList: [{ item: { id: 42 } as any, count: 1, bankCount: 0, bagCount: 0, chestCount: 0, chestCitizens: [], mapCellItemCount: 0, depot: 0, priority: 0, zoneXPa: 0, isWorkshop: false, shouldSignal: false }]
         };
 
         displayItems(state.items, 'items');

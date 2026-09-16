@@ -1,4 +1,12 @@
 export const changelogs: Record<string, string> = {
+    '1.1.62': `
+        [Nouveauté] Les tooltips avancés et la liste de courses affichent désormais aussi la quantité en coffres et sur la carte, en plus de la banque et des sacs
+        [Nouveauté] Le filtre de sujets du forum accepte des expressions régulières en plus des mots simples, avec un bouton d'aide et le motif %DAY% pour cibler le jour de ville en cours
+        [Nouveauté] Le repos (coin sieste) est désormais suivi comme action quotidienne, au même titre que le bain, le rangement et le ménage
+        [Nouveauté] Nouvelle règle de mise en forme du forum activée par défaut : préfixe calendrier sur les sujets "J", "D" ou "T" suivi du jour de ville courant (bilans quotidiens)
+
+        [Correction] Le compteur anti-abus de la banque pouvait rater ou mal compter une prise dans le sac ; il se base désormais sur les signaux du jeu plutôt que sur un délai fixe
+        `,
     '1.1.61': `
         [Amélioration] Le changelog est désormais disponible dans les 4 langues du script (français, anglais, allemand, espagnol)
 

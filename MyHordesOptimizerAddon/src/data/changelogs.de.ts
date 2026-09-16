@@ -1,4 +1,11 @@
 export const changelogs: Record<string, string> = {
+    '1.1.62': `
+        [Neu] Die erweiterten Tooltips und die Einkaufsliste zeigen jetzt zusätzlich zur Bank und den Rucksäcken auch die Menge in Truhen und auf der Karte an
+        [Neu] Der Forumsthemen-Filter akzeptiert jetzt auch reguläre Ausdrücke statt nur einfacher Wörter, mit Hilfe-Button und dem Muster %DAY% für den aktuellen Stadttag
+        [Neu] Ausruhen (Nickerchen-Ecke) wird jetzt als tägliche Aktion erfasst, genau wie Baden, Aufräumen und Putzen
+
+        [Korrektur] Der Anti-Missbrauch-Zähler der Bank konnte eine Entnahme aus dem Rucksack übersehen oder falsch zählen; er stützt sich jetzt auf die Signale des Spiels statt auf eine feste Verzögerung
+        `,
     '1.1.61': `
         [Verbesserung] Das Änderungsprotokoll ist jetzt in den 4 Sprachen des Skripts verfügbar (Französisch, Englisch, Deutsch, Spanisch)
 

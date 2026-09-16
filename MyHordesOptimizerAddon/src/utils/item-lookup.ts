@@ -72,11 +72,40 @@ export function getFixedImagePath(img_src) {
         .replace('.b.', '.');
 }
 
-export function getItemFromImg(img_src) {
+export function getItemFromImg(img_src: string | undefined): MhoItem | undefined {
     if (img_src) {
-        const img_path = getFixedImagePath(img_src);
-        return getItemsByImg().get(img_path);
+        const img_path: string | undefined = getFixedImagePath(img_src);
+        const item: MhoItem | undefined = img_path ? getItemsByImg().get(img_path) : undefined;
+        // Le référentiel doit être chargé pour qu'une absence de correspondance soit significative,
+        // sinon tout appel avant le premier chargement journaliserait un faux positif.
+        if (!item && img_path && state.items?.length) {
+            console.warn(`[MyHordesOptimizer] Objet inconnu : image "${img_path}" (source : "${img_src}") absente du référentiel local.`);
+        }
+        return item;
     }
+}
+
+/** Objet d'inventaire prêt à être envoyé au back (voir `UpdateObjectDto` côté API). */
+export interface ResolvedInventoryObject {
+    id: number;
+    isBroken: boolean;
+}
+
+/**
+ * Résout une liste d'éléments `li.item` du DOM en objets connus du référentiel local.
+ * Un élément dont l'icône ne correspond à aucun objet est écarté (avertissement déjà émis par `getItemFromImg`)
+ * plutôt que transmis avec un id manquant.
+ */
+export function resolveInventoryObjects(elements: Element[]): ResolvedInventoryObject[] {
+    const resolved: ResolvedInventoryObject[] = [];
+    for (const element of elements) {
+        const img: HTMLImageElement | null = element.querySelector('img');
+        const item: MhoItem | undefined = getItemFromImg(img?.src);
+        if (item) {
+            resolved.push({ id: item.id, isBroken: element.classList.contains('broken') });
+        }
+    }
+    return resolved;
 }
 
 export function getStatusFromImg(img_src) {

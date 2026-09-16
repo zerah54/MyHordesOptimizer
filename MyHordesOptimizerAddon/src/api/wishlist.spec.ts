@@ -28,7 +28,7 @@ describe('addItemToWishlist', () => {
     it('refetches state.wishlist after a successful add, so an addition made through a different item reference than the one tracked in state.items/state.wishlist is still reflected', async () => {
         const posted_item = { id: 42, wishListCount: 0 };
         const server_wishlist_after_add = {
-            wishList: [{ item: { id: 42 }, count: 1, bankCount: 0, bagCount: 0, depot: 0, priority: 0, zoneXPa: 0, isWorkshop: false, shouldSignal: false }]
+            wishList: [{ item: { id: 42 }, count: 1, bankCount: 0, bagCount: 0, chestCount: 0, chestCitizens: [], mapCellItemCount: 0, depot: 0, priority: 0, zoneXPa: 0, isWorkshop: false, shouldSignal: false }]
         };
 
         fetcherMock.mockImplementation((_url: string, options?: { method?: string }) => {

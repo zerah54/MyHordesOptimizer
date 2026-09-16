@@ -25,6 +25,29 @@ const wishlist_signals: string[] = ['sig-inventory-bag-loaded', 'sig-inventory-c
 /** Les écouteurs de signaux ne doivent être posés qu'une fois pour toute la durée de vie de la page */
 let wishlist_signals_bound: boolean = false;
 
+/** Icônes du jeu associées aux en-têtes de la liste de courses (mêmes chemins que les chips de tooltip). */
+const wishlist_header_icons: Record<string, string> = {
+    bank_count: 'item/item_safe.gif',
+    bag_count: 'item/item_bag.gif',
+    chest_count: 'item/item_chest.gif',
+    map_cell_item_count: 'icons/item_map.gif',
+};
+
+/** Contenu de chaque colonne de données, indexé sur l'`id` de `wishlist_headers` */
+const wishlist_cell_renderers: Record<string, (item: WishlistItem) => string> = {
+    label: (item: WishlistItem): string =>
+        `<img src="${repo_img_hordes_url + item.item.img}" style="margin-right: 5px" /><span class="small">${getI18N(item.item.label)}</span>`,
+    depot: (item: WishlistItem): string =>
+        `<span class="small">${getI18N(wishlist_depot.find((depot) => item.depot === depot.value).label)}</span>`,
+    bank_count: (item: WishlistItem): string => `<span class="small">${item.bankCount ?? 0}</span>`,
+    bag_count: (item: WishlistItem): string => `<span class="small">${item.bagCount ?? 0}</span>`,
+    chest_count: (item: WishlistItem): string => `<span class="small">${item.chestCount ?? 0}</span>`,
+    map_cell_item_count: (item: WishlistItem): string => `<span class="small">${item.mapCellItemCount ?? 0}</span>`,
+    bank_needed: (item: WishlistItem): string => `<span class="small">${item.count >= 0 ? item.count : '∞'}</span>`,
+    diff: (item: WishlistItem): string =>
+        `<span class="small">${item.count >= 0 ? (item.count - (item.bankCount ?? 0) - (item.bagCount ?? 0)) : '∞'}</span>`,
+};
+
 /** Repose la section et les priorités */
 function refreshWishlistDisplay(): void {
     displayWishlistInApp();
@@ -62,10 +85,23 @@ function bindWishlistSignals(): void {
  */
 function buildContentSignature(is_workshop: boolean, list_to_display: WishlistItem[]): string {
     const rows: string[] = list_to_display
-        .map((item: WishlistItem) => `${item.item.id}/${item.depot}/${item.bankCount}/${item.bagCount}/${item.count}`)
+        .map((item: WishlistItem) => `${item.item.id}/${item.depot}/${item.bankCount}/${item.bagCount}/${item.chestCount}/${item.mapCellItemCount}/${item.count}`)
         .sort();
 
     return `${is_workshop ? 'w' : 'd'}|${rows.join(';')}`;
+}
+
+/**
+ * Identifiants des objets non équipés présents sur la case. Un objet verrouillé (`.locked`,
+ * donc équipé) est ignoré sauf s'il en existe aussi une version non équipée sur la case.
+ */
+export function getItemIdsInCell(): Set<number> {
+    return new Set<number>(
+        Array.from(document.querySelectorAll('.inventory li.item:not(.locked) img'))
+            .map((item_element: HTMLImageElement) => getItemFromImg(item_element.src))
+            .filter((item_in_cell: MhoItem | undefined) => !!item_in_cell)
+            .map((item_in_cell: MhoItem) => item_in_cell.id)
+    );
 }
 
 /** Affiche la liste de courses dans le désert et l'atelier */
@@ -111,14 +147,7 @@ export function displayWishlistInApp() {
          * on le résout une seule fois, sous forme d'ensemble d'identifiants, plutôt qu'à
          * chaque passage dans le prédicat de filtrage.
          */
-        const item_ids_in_cell: Set<number> = is_workshop
-            ? new Set<number>()
-            : new Set<number>(
-                Array.from(document.querySelectorAll('.inventory li.item img'))
-                    .map((item_element: HTMLImageElement) => getItemFromImg(item_element.src))
-                    .filter((item_in_cell: MhoItem | undefined) => !!item_in_cell)
-                    .map((item_in_cell: MhoItem) => item_in_cell.id)
-            );
+        const item_ids_in_cell: Set<number> = is_workshop ? new Set<number>() : getItemIdsInCell();
 
         const list_to_display: WishlistItem[] = used_wishlist.filter((item: WishlistItem) => {
             if (is_workshop) {
@@ -183,12 +212,16 @@ export function displayWishlistInApp() {
             list.appendChild(list_header);
 
             wishlist_headers
-                .filter((header_cell_item) => header_cell_item.id !== 'delete')
                 .forEach((header_cell_item) => {
                     const header_cell: HTMLDivElement = document.createElement('div');
-                    header_cell.classList.add('padded', 'cell');
-                    header_cell.classList.add(header_cell_item.id === 'label' ? 'rw-5' : (header_cell_item.id === 'depot' ? 'rw-3' : 'rw-2'));
-                    header_cell.innerText = getI18N(header_cell_item.label);
+                    header_cell.classList.add('padded', 'cell', header_cell_item.class_width);
+
+                    const icon_path: string | undefined = wishlist_header_icons[header_cell_item.id];
+                    if (icon_path) {
+                        header_cell.innerHTML = `<img src="${repo_img_hordes_url + icon_path}" width="16" height="16" title="${getI18N(header_cell_item.label)}" />`;
+                    } else {
+                        header_cell.innerText = getI18N(header_cell_item.label);
+                    }
                     list_header.appendChild(header_cell);
                 });
 
@@ -198,35 +231,13 @@ export function displayWishlistInApp() {
                     list_item.classList.add('row-flex');
                     list.appendChild(list_item);
 
-                    const title: HTMLDivElement = document.createElement('div');
-                    title.classList.add('padded', 'cell', 'rw-5');
-                    title.innerHTML = `<img src="${repo_img_hordes_url + item.item.img}" style="margin-right: 5px" /><span class="small">${getI18N(item.item.label)}</span>`;
-                    list_item.appendChild(title);
-
-                    const item_depot: HTMLSpanElement = document.createElement('span');
-                    item_depot.classList.add('padded', 'cell', 'rw-3');
-                    item_depot.innerHTML = `<span class="small">${getI18N(wishlist_depot.find((depot) => item.depot === depot.value).label)}</span>`;
-                    list_item.appendChild(item_depot);
-
-                    const bank_count: HTMLSpanElement = document.createElement('span');
-                    bank_count.classList.add('padded', 'cell', 'rw-2');
-                    bank_count.innerHTML = `<span class="small">${item.bankCount}</span>`;
-                    list_item.appendChild(bank_count);
-
-                    const bag_count: HTMLSpanElement = document.createElement('span');
-                    bag_count.classList.add('padded', 'cell', 'rw-2');
-                    bag_count.innerHTML = `<span class="small">${item.bagCount}</span>`;
-                    list_item.appendChild(bag_count);
-
-                    const bank_need: HTMLSpanElement = document.createElement('span');
-                    bank_need.classList.add('padded', 'cell', 'rw-2');
-                    bank_need.innerHTML = `<span class="small">${item.count >= 0 ? item.count : '∞'}</span>`;
-                    list_item.appendChild(bank_need);
-
-                    const needed: HTMLSpanElement = document.createElement('span');
-                    needed.classList.add('padded', 'cell', 'rw-2');
-                    needed.innerHTML = `<span class="small">${item.count >= 0 ? (item.count - item.bankCount - item.bagCount) : '∞'}</span>`;
-                    list_item.appendChild(needed);
+                    wishlist_headers
+                        .forEach((header_cell_item) => {
+                            const data_cell: HTMLDivElement = document.createElement('div');
+                            data_cell.classList.add('padded', 'cell', header_cell_item.class_width);
+                            data_cell.innerHTML = wishlist_cell_renderers[header_cell_item.id](item);
+                            list_item.appendChild(data_cell);
+                        });
                 });
 
 
