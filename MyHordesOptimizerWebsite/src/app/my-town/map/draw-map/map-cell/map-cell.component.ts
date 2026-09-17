@@ -1,4 +1,3 @@
-import { animate, style, transition, trigger } from '@angular/animations';
 import { CommonModule, DecimalPipe, NgOptimizedImage } from '@angular/common';
 import { ChangeDetectionStrategy, Component, DestroyRef, inject, input, InputSignal, output, OutputEmitterRef } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -34,18 +33,6 @@ const material_modules: Imports = [];
     selector: 'mho-map-cell',
     templateUrl: './map-cell.component.html',
     styleUrls: ['./map-cell.component.scss', '../draw-map.component.scss'],
-    animations: [
-        trigger('toggleCurrentCell', [
-            transition(':enter', [
-                style({ opacity: 0, display: 'inline' }),
-                animate('500ms ease-out', style({ opacity: 1 }))
-            ]),
-            transition(':leave', [
-                style({ opacity: 1, display: 'inline' }),
-                animate('500ms ease-in', style({ opacity: 0 }))
-            ])
-        ])
-    ],
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [...angular_common, ...components, ...material_modules, ...pipes, MapCellTooltipDirective]
 })

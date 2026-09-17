@@ -1,22 +1,24 @@
-import { DebugElement } from '@angular/core';
+import { ANIMATION_MODULE_TYPE, DebugElement } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatMenuTrigger } from '@angular/material/menu';
 import { By } from '@angular/platform-browser';
-import { provideNoopAnimations } from '@angular/platform-browser/animations';
+import type { MockedObject } from 'vitest';
 
 import { ClipboardService } from '../../../_core/services/clipboard.service';
 import { TutoScriptInstallationComponent } from './tuto-script-installation.component';
 
 describe('TutoScriptInstallationComponent', (): void => {
     let fixture: ComponentFixture<TutoScriptInstallationComponent>;
-    let clipboard: jasmine.SpyObj<ClipboardService>;
+    let clipboard: MockedObject<ClipboardService>;
 
     beforeEach(async (): Promise<void> => {
-        clipboard = jasmine.createSpyObj<ClipboardService>('ClipboardService', ['copy']);
+        clipboard = {
+            copy: vi.fn().mockName('ClipboardService.copy')
+        } as unknown as MockedObject<ClipboardService>;
 
         await TestBed.configureTestingModule({
             imports: [TutoScriptInstallationComponent],
-            providers: [{ provide: ClipboardService, useValue: clipboard }, provideNoopAnimations()]
+            providers: [{ provide: ClipboardService, useValue: clipboard }, { provide: ANIMATION_MODULE_TYPE, useValue: 'NoopAnimations' }]
         }).compileComponents();
         fixture = TestBed.createComponent(TutoScriptInstallationComponent);
         fixture.detectChanges();
@@ -63,14 +65,16 @@ describe('TutoScriptInstallationComponent', (): void => {
     it('copies the current page URL when "Copier l\'URL" is clicked', (): void => {
         clickMenuItem('Copier l\'URL');
 
-        expect(clipboard.copy).toHaveBeenCalledOnceWith(document.location.href, 'Le lien a bien été copié');
+        expect(clipboard.copy).toHaveBeenCalledTimes(1);
+
+        expect(clipboard.copy).toHaveBeenCalledWith(document.location.href, 'Le lien a bien été copié');
     });
 
     it('copies a forum-formatted summary with extension items first, then the script items, separated by {hr}', (): void => {
         clickMenuItem('Copier au format forum');
 
         expect(clipboard.copy).toHaveBeenCalledTimes(1);
-        const text: string = clipboard.copy.calls.mostRecent().args[0] as string;
+        const text: string = vi.mocked(clipboard.copy).mock.lastCall![0] as string;
 
         expect(text.startsWith('[b][big]Script / Extension[/big][/b]{hr}')).toBe(true);
         expect((text.match(/{hr}/g) ?? []).length).toBe(2);

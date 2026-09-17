@@ -371,7 +371,8 @@ export class WishlistComponent implements OnInit {
         workbook.Sheets[$localize`Liste de courses`] = data;
 
         const u8: Uint8Array = write(workbook, { type: 'buffer', bookType: 'xlsx' });
-        const blob: Blob = new Blob([u8], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+        /** xlsx.write() ne produit jamais de buffer partagé */
+        const blob: Blob = new Blob([u8 as Uint8Array<ArrayBuffer>], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
         const url: string = URL.createObjectURL(blob);
         const hidden_link: HTMLAnchorElement = this.document.createElement('a');
         this.document.body.appendChild(hidden_link);

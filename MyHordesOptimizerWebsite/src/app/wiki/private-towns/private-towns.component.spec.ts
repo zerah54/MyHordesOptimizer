@@ -90,8 +90,8 @@ describe('PrivateTownsComponent', (): void => {
         // "Mode nuit" a disabled_rne=true au niveau paramètre ; son option "Étendu" a disabled_rne=false au niveau option
         const target_param: PrivateTownParams = private_town_params.find((p: PrivateTownParams) => p.name['fr'] === 'Mode nuit')!;
         const target_option: PrivateTownParamOptions = target_param.options.find((o: PrivateTownParamOptions) => o.name['fr'] === 'Étendu')!;
-        expect(target_option.disabled_rne).toBeFalse();
-        expect(target_param.disabled_rne).toBeTrue();
+        expect(target_option.disabled_rne).toBe(false);
+        expect(target_param.disabled_rne).toBe(true);
 
         const row_index: number = findRowIndex('Mode nuit', 'Étendu');
         const cell: DebugElement = rows()[row_index].query(By.css('td.mat-column-default_rne'));

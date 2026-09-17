@@ -24,6 +24,7 @@ export class FilterFieldComponent {
     protected filter_value: string = '';
 
     protected applyFilter(value: string): void {
+        this.filter_value = value;
         this.filterChange.emit(value);
     }
 }

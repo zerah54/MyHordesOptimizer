@@ -1,4 +1,4 @@
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withXhr } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
@@ -15,10 +15,18 @@ import { DrawMapComponent } from './draw-map.component';
 import { MapCellComponent } from './map-cell/map-cell.component';
 
 interface TestableComponent {
-    complete_map: { (): Town | undefined };
-    my_cell: { (): Cell | undefined };
-    drawed_map: { (): Cell[][] };
-    x_row: { (): number[] };
+    complete_map: {
+        (): Town | undefined;
+    };
+    my_cell: {
+        (): Cell | undefined;
+    };
+    drawed_map: {
+        (): Cell[][];
+    };
+    x_row: {
+        (): number[];
+    };
 }
 
 function newTown(overrides: Partial<Town> = {}): Town {
@@ -57,7 +65,7 @@ describe('DrawMapComponent', (): void => {
         setUser(null);
         await TestBed.configureTestingModule({
             imports: [DrawMapComponent],
-            providers: [provideHttpClient(), provideHttpClientTesting()]
+            providers: [provideHttpClient(withXhr()), provideHttpClientTesting()]
         }).compileComponents();
         fixture = TestBed.createComponent(DrawMapComponent);
         testable = fixture.componentInstance as unknown as TestableComponent;

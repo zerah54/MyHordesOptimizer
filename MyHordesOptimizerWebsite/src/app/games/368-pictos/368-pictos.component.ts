@@ -1,10 +1,10 @@
 import { CdkDragRelease, DragDropModule } from '@angular/cdk/drag-drop';
 import { ChangeDetectionStrategy, Component, ElementRef, OnInit, Signal, signal, viewChildren, WritableSignal } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
-import { HORDES_IMG_REPO } from 'src/app/_abstract_model/const';
-import { Imports } from 'src/app/_abstract_model/types/_types';
-import { MaxPipe } from 'src/app/_core/pipes/number.pipe';
 
+import { HORDES_IMG_REPO } from '../../_abstract_model/const';
+import { Imports } from '../../_abstract_model/types/_types';
+import { MaxPipe } from '../../_core/pipes/number.pipe';
 import { PictosHighlightedCell } from './368-pictos-highlighted-cell.pipe';
 
 const angular_common: Imports = [];

@@ -1,16 +1,22 @@
+import 'moment/locale/de';
+import 'moment/locale/en-gb';
+import 'moment/locale/es';
+import 'moment/locale/fr';
+
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import moment from 'moment';
 
 import { Cell } from '../../../../_abstract_model/types/cell.class';
 import { Citizen } from '../../../../_abstract_model/types/citizen.class';
-import { Item } from '../../../../_abstract_model/types/item.class';
 import { ItemCountShort } from '../../../../_abstract_model/types/item-count-short.class';
+import { Item } from '../../../../_abstract_model/types/item.class';
 import { Ruin } from '../../../../_abstract_model/types/ruin.class';
 import { MapCellDetailsComponent } from './map-cell-details.component';
 
 function text(root: HTMLElement, selector: string): string {
     const el: HTMLElement | null = root.querySelector(selector);
-    if (!el) throw new Error(`element not found: ${selector}`);
+    if (!el)
+        throw new Error(`element not found: ${selector}`);
     return el.textContent ?? '';
 }
 
@@ -30,12 +36,18 @@ function newCell(overrides: Partial<Cell> = {}): Cell {
     return cell;
 }
 
-/** Un `<td>` réellement attaché au document, requis par les pipes de positionnement (offsetParent). */
+/**
+ * Un `<td>` réellement attaché au document, requis par les pipes de positionnement (offsetParent).
+ * jsdom ne calcule aucun layout réel : offsetParent reste toujours null, même attaché au DOM
+ * (contrairement à un vrai navigateur où la table en `position: relative` en ferait l'offsetParent).
+ * On le stub pour reproduire ce que la vraie table en production forcerait via CSS.
+ */
 function newCellHtml(): HTMLTableCellElement {
     const table: HTMLTableElement = document.createElement('table');
     const row: HTMLTableRowElement = table.insertRow();
     const cellHtml: HTMLTableCellElement = row.insertCell();
     document.body.appendChild(table);
+    Object.defineProperty(cellHtml, 'offsetParent', { get: (): HTMLTableElement => table, configurable: true });
     return cellHtml;
 }
 

@@ -1,4 +1,4 @@
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withXhr } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { of } from 'rxjs';
@@ -23,7 +23,7 @@ describe('CitizensDispoComponent', (): void => {
     beforeEach(async (): Promise<void> => {
         await TestBed.configureTestingModule({
             imports: [CitizensDispoComponent],
-            providers: [provideHttpClient(), provideHttpClientTesting()]
+            providers: [provideHttpClient(withXhr()), provideHttpClientTesting()]
         }).compileComponents();
 
         townService = TestBed.inject(TownService);
@@ -31,7 +31,7 @@ describe('CitizensDispoComponent', (): void => {
     });
 
     it('renders nothing before citizen_info has loaded', (): void => {
-        spyOn(townService, 'getCitizens').and.returnValue(of());
+        vi.spyOn(townService, 'getCitizens').mockReturnValue(of());
         fixture.detectChanges();
 
         expect(fixture.nativeElement.querySelector('table')).toBeNull();
@@ -40,7 +40,7 @@ describe('CitizensDispoComponent', (): void => {
     it('renders the table with the citizen filter options once getCitizens() resolves', (): void => {
         const info: CitizenInfo = new CitizenInfo();
         info.citizens = [makeCitizen(1, 'Alice'), makeCitizen(2, 'Bob')];
-        spyOn(townService, 'getCitizens').and.returnValue(of(info));
+        vi.spyOn(townService, 'getCitizens').mockReturnValue(of(info));
 
         fixture.detectChanges();
 

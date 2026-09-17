@@ -1,14 +1,18 @@
+import type { Mock } from 'vitest';
+
 import { CitizenExpedition } from '../../_abstract_model/types/citizen-expedition.class';
 import { ExpeditionPart } from '../../_abstract_model/types/expedition-part.class';
 import { ExpeditionsComponent } from './expeditions.component';
 
 describe('ExpeditionsComponent', () => {
     let component: ExpeditionsComponent;
-    let realtime_expeditions_service: { updateExpeditionCitizen: jasmine.Spy };
+    let realtime_expeditions_service: {
+        updateExpeditionCitizen: Mock;
+    };
 
     beforeEach(() => {
         component = Object.create(ExpeditionsComponent.prototype);
-        realtime_expeditions_service = { updateExpeditionCitizen: jasmine.createSpy('updateExpeditionCitizen').and.returnValue(Promise.resolve()) };
+        realtime_expeditions_service = { updateExpeditionCitizen: vi.fn().mockReturnValue(Promise.resolve()) };
         (component as any).realtime_expeditions_service = realtime_expeditions_service;
     });
 
@@ -21,9 +25,9 @@ describe('ExpeditionsComponent', () => {
 
             await (component as any).addNewMemberToPart(part, existing_citizen);
 
-            const sent_citizen: CitizenExpedition = realtime_expeditions_service.updateExpeditionCitizen.calls.mostRecent().args[1];
+            const sent_citizen: CitizenExpedition = vi.mocked(realtime_expeditions_service.updateExpeditionCitizen).mock.lastCall![1];
             expect(sent_citizen.id).toBeUndefined();
-            expect(sent_citizen.preinscrit).toBeTrue();
+            expect(sent_citizen.preinscrit).toBe(true);
         });
     });
 
@@ -36,7 +40,7 @@ describe('ExpeditionsComponent', () => {
 
             (component as any).addNewMemberToExpedition(expedition, existing_citizen);
 
-            const sent_citizen: CitizenExpedition = realtime_expeditions_service.updateExpeditionCitizen.calls.mostRecent().args[1];
+            const sent_citizen: CitizenExpedition = vi.mocked(realtime_expeditions_service.updateExpeditionCitizen).mock.lastCall![1];
             expect(sent_citizen.id).toBeUndefined();
         });
     });

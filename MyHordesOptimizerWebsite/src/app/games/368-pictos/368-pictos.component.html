@@ -17,7 +17,8 @@
                             [attr.y]="colIndex"
                             (click)="onCellClick(rowIndex, colIndex)">
                             @if (cell) {
-                                <img [src]="HORDES_IMG_REPO + cell?.img" [alt]="cell?.img" [class.to-remove]="cell?.to_remove"/>
+                                <img [src]="HORDES_IMG_REPO + $safeNavigationMigration(cell?.img)" [alt]="$safeNavigationMigration(cell?.img)"
+                                     [class.to-remove]="cell?.to_remove"/>
                             }
                         </div>
                     }
@@ -43,15 +44,15 @@
                 </div>
             </div>
         } @else {
-            <div class="score">
-                <div>
-                    <ng-container i18n>Coups&nbsp;:</ng-container>&nbsp;{{ attempts }}
-                </div>
-                <div>
-                    <ng-container i18n>Temps&nbsp;:</ng-container>&nbsp;{{ time_spent() }}
-                </div>
+        <div class="score">
+            <div>
+                <ng-container i18n>Coups&nbsp;:</ng-container>&nbsp;{{ attempts }}
             </div>
-            <button (click)="init()" i18n>Nouvelle partie</button>
-        }
+            <div>
+                <ng-container i18n>Temps&nbsp;:</ng-container>&nbsp;{{ time_spent() }}
+            </div>
+        </div>
+        <button (click)="init()" i18n>Nouvelle partie</button>
+    }
     </div>
 </mat-card-content>

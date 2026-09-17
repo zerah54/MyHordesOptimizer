@@ -36,153 +36,133 @@
                                 <ng-container i18n>Taux d'obtention en cas de fouille réussie sur une zone praf</ng-container>
                                 {{ item().drop_rate_praf * 100 | number:'1.0-2':locale }}%
                             </div>
-                        }
-                        @if (item().drop_rate_not_praf > 0) {
+                        } @if (item().drop_rate_not_praf > 0) {
                             <div>
                                 <ng-container i18n>Taux d'obtention en cas de fouille réussie sur une zone non-praf</ng-container>
                                 {{ item().drop_rate_not_praf * 100 | number:'1.0-2':locale }}%
                             </div>
                         }
-                    }
-
-                    @if (item().recipes.length > 0) {
-                        <mat-divider></mat-divider>
-                        @for (recipe of item().recipes; track recipe.name) {
-                            <div>
-                                <mho-recipe [recipe]="recipe"></mho-recipe>
-                            </div>
-                        }
-                    }
-
-                    @if (item().opened_with !== null) {
-                        <mat-divider></mat-divider>
-                        @if (item().opened_with!.length > 0) {
-                            <div class="opener-relation">
-                                <span i18n>Ouvert par</span>
-                                @for (opener of item().opened_with!; track opener.uid) {
-                                    <img [ngSrc]="HORDES_IMG_REPO + opener.img" width="16" height="16" [title]="opener.label[locale]">
-                                }
-                            </div>
-                        }
-                        @if (item().technician_open_cp_cost !== null) {
-                            <div class="opener-relation">
-                                @if (item().opened_with!.length > 0) {
-                                    <ng-container i18n>ou</ng-container>
-                                } @else {
-                                    <ng-container i18n>Alternative Technicien</ng-container>
-                                }
-                                {{ item().technician_open_cp_cost }}
-                                <mho-icon-cp></mho-icon-cp>
-                            </div>
-                        }
-                        @if (item().open_ap_cost !== null) {
-                            <div class="opener-relation">
-                                <ng-container i18n>Ouverture</ng-container>
-                                :
-                                {{ item().open_ap_cost }}
-                                <mho-icon-ap></mho-icon-ap>
-                                @if (item().open_success_rate !== null) {
-                                    - {{ item().open_success_rate! * 100 | number:'1.0-2':locale }}%
-                                }
-                            </div>
-                        }
-                        @if (item().opened_with!.length === 0 && item().technician_open_cp_cost === null && item().open_ap_cost === null) {
-                            <div i18n>Peut être ouvert gratuitement</div>
-                        }
-                    }
-
-                    @if (item().opens.length > 0) {
-                        <mat-divider></mat-divider>
-                        <div class="opener-relation">
-                            <span i18n>Ouvre</span>
-                            @for (box of item().opens; track box.uid) {
-                                <img [ngSrc]="HORDES_IMG_REPO + box.img" width="16" height="16" [title]="box.label[locale]">
-                            }
+                    } @if (item().recipes.length > 0) {
+                    <mat-divider></mat-divider>
+                    @for (recipe of item().recipes; track recipe.name) {
+                        <div>
+                            <mho-recipe [recipe]="recipe"></mho-recipe>
                         </div>
                     }
-
-                    @if (item().catapult_effect && (item().catapult_effect!.fate !== 'Intact' || item().catapult_effect!.kill_min !== null || item().catapult_effect!.repel_seconds !== null)) {
-                        <mat-divider></mat-divider>
-                        <div class="catapult-effect">
-                            <img [ngSrc]="HORDES_IMG_REPO + 'roles/cata.gif'" width="16" height="16">
-                            <img [ngSrc]="HORDES_IMG_REPO + 'emotes/arrowright.gif'" width="16" height="16">
-                            @if (item().catapult_effect!.fate === 'Broken') {
-                                <span class="catapult-result broken">
+                } @if (item().opened_with !== null) {
+                    <mat-divider></mat-divider>
+                    @if (item().opened_with!.length > 0) {
+                        <div class="opener-relation">
+                            <span i18n>Ouvert par</span>
+                            @for (opener of item().opened_with!; track opener.uid) {
+                                <img [ngSrc]="HORDES_IMG_REPO + opener.img" width="16" height="16" [title]="opener.label[locale]">
+                            }
+                        </div>
+                    } @if (item().technician_open_cp_cost !== null) {
+                        <div class="opener-relation">
+                            @if (item().opened_with!.length > 0) {
+                                <ng-container i18n>ou</ng-container>
+                            } @else {
+                            <ng-container i18n>Alternative Technicien</ng-container>
+                        }
+                            {{ item().technician_open_cp_cost }}
+                            <mho-icon-cp></mho-icon-cp>
+                        </div>
+                    } @if (item().open_ap_cost !== null) {
+                        <div class="opener-relation">
+                            <ng-container i18n>Ouverture</ng-container>
+                            :
+                            {{ item().open_ap_cost }}
+                            <mho-icon-ap></mho-icon-ap>
+                            @if (item().open_success_rate !== null) {
+                                - {{ item().open_success_rate! * 100 | number:'1.0-2':locale }}%
+                            }
+                        </div>
+                    } @if (item().opened_with!.length === 0 && item().technician_open_cp_cost === null && item().open_ap_cost === null) {
+                        <div i18n>Peut être ouvert gratuitement</div>
+                    }
+                } @if (item().opens.length > 0) {
+                    <mat-divider></mat-divider>
+                    <div class="opener-relation">
+                        <span i18n>Ouvre</span>
+                        @for (box of item().opens; track box.uid) {
+                            <img [ngSrc]="HORDES_IMG_REPO + box.img" width="16" height="16" [title]="box.label[locale]">
+                        }
+                    </div>
+                } @if (item().catapult_effect && (item().catapult_effect!.fate !== 'Intact' || item().catapult_effect!.kill_min !== null || item().catapult_effect!.repel_seconds !== null)) {
+                    <mat-divider></mat-divider>
+                    <div class="catapult-effect">
+                        <img [ngSrc]="HORDES_IMG_REPO + 'roles/cata.gif'" width="16" height="16">
+                        <img [ngSrc]="HORDES_IMG_REPO + 'emotes/arrowright.gif'" width="16" height="16">
+                        @if (item().catapult_effect!.fate === 'Broken') {
+                            <span class="catapult-result broken">
                                     <img [ngSrc]="HORDES_IMG_REPO + (item() | itemImg:true)" width="16" height="16" [title]="item().label[locale]">
                                 </span>
-                            } @else if (item().catapult_effect!.fate === 'Transformed' && item().catapult_effect!.morph_target) {
-                                <span class="catapult-result">
+                        } @else if (item().catapult_effect!.fate === 'Transformed' && item().catapult_effect!.morph_target) {
+                        <span class="catapult-result">
                                     <img [ngSrc]="HORDES_IMG_REPO + item().catapult_effect!.morph_target!.img" width="16" height="16"
                                          [title]="item().catapult_effect!.morph_target!.label[locale]">
                                 </span>
-                            } @else if (item().catapult_effect!.fate === 'Intact') {
-                                <span class="catapult-result">
+                    } @else if (item().catapult_effect!.fate === 'Intact') {
+                        <span class="catapult-result">
                                     <img [ngSrc]="HORDES_IMG_REPO + item().img" width="16" height="16" [title]="item().label[locale]">
                                 </span>
-                            }
-                            @if (item().catapult_effect!.repel_seconds !== null) {
-                                <span>
+                    } @if (item().catapult_effect!.repel_seconds !== null) {
+                        <span>
                                     <ng-container i18n>Repousse les zombies pendant</ng-container>
-                                    {{ item().catapult_effect!.repel_seconds! / 60 }}
-                                    <ng-container i18n>minutes</ng-container>
+                            {{ item().catapult_effect!.repel_seconds! / 60 }}
+                            <ng-container i18n>minutes</ng-container>
                                 </span>
-                            } @else if (item().catapult_effect!.kill_min !== null) {
-                                <img [ngSrc]="HORDES_IMG_REPO + 'icons/small_zombie.gif'" width="16" height="16">
-                                <span>{{ item().catapult_effect!.kill_min }}-{{ item().catapult_effect!.kill_max }}</span>
-                            }
-                            @if (item().catapult_effect!.radius === 'Cross') {
-                                <span i18n>sur la zone visée et les cases adjacentes</span>
-                            } @else if (item().catapult_effect!.radius === 'Square') {
-                                <span i18n>dans un rayon de 3×3 cases</span>
-                            } @else if (item().catapult_effect!.kill_min !== null || item().catapult_effect!.repel_seconds !== null) {
-                                <span i18n>sur la zone visée</span>
+                    } @else if (item().catapult_effect!.kill_min !== null) {
+                        <img [ngSrc]="HORDES_IMG_REPO + 'icons/small_zombie.gif'" width="16" height="16">
+                        <span>{{ item().catapult_effect!.kill_min }}-{{ item().catapult_effect!.kill_max }}</span>
+                    } @if (item().catapult_effect!.radius === 'Cross') {
+                        <span i18n>sur la zone visée et les cases adjacentes</span>
+                    } @else if (item().catapult_effect!.radius === 'Square') {
+                        <span i18n>dans un rayon de 3×3 cases</span>
+                    } @else if (item().catapult_effect!.kill_min !== null || item().catapult_effect!.repel_seconds !== null) {
+                        <span i18n>sur la zone visée</span>
+                    }
+                    </div>
+                } @if (item().deco || item().guard || item().is_heaver) {
+                    <mat-divider></mat-divider>
+                    @if (item().deco) {
+                        <div>
+                            <!--                    <img [ngSrc]="HORDES_IMG_REPO + property.value.img" width="16" height="16">-->
+                            <ng-container i18n>Objet de décoration</ng-container>&nbsp;(+{{ item().deco }})
+                        </div>
+                    } @if (item().guard) {
+                        <div>
+                            <!--                    <img [ngSrc]="HORDES_IMG_REPO + property.value.img" width="16" height="16">-->
+                            <ng-container i18n>Arme de veille</ng-container>&nbsp;(+{{ item().guard }})
+                        </div>
+                    } @if (item().is_heaver) {
+                        <div>
+                            <!--                    <img [ngSrc]="HORDES_IMG_REPO + property.value.img" width="16" height="16">-->
+                            <ng-container i18n>Objet encombrant</ng-container>
+                        </div>
+                    }
+                } @if (item().properties && item().properties.length > 0) {
+                    <mat-divider></mat-divider>
+                    @for (property of item().properties; track $index) {
+                        <div>
+                            @if (property?.value?.img && property?.value?.img !== '') {
+                                <img [ngSrc]="HORDES_IMG_REPO + $safeNavigationMigration(property?.value?.img)" width="16"
+                                     height="16">{{ property?.value?.label }}
                             }
                         </div>
                     }
-
-                    @if (item().deco || item().guard || item().is_heaver) {
-                        <mat-divider></mat-divider>
-                        @if (item().deco) {
-                            <div>
-                                <!--                    <img [ngSrc]="HORDES_IMG_REPO + property.value.img" width="16" height="16">-->
-                                <ng-container i18n>Objet de décoration</ng-container>&nbsp;(+{{ item().deco }})
-                            </div>
-                        }
-                        @if (item().guard) {
-                            <div>
-                                <!--                    <img [ngSrc]="HORDES_IMG_REPO + property.value.img" width="16" height="16">-->
-                                <ng-container i18n>Arme de veille</ng-container>&nbsp;(+{{ item().guard }})
-                            </div>
-                        }
-                        @if (item().is_heaver) {
-                            <div>
-                                <!--                    <img [ngSrc]="HORDES_IMG_REPO + property.value.img" width="16" height="16">-->
-                                <ng-container i18n>Objet encombrant</ng-container>
-                            </div>
-                        }
+                } @if (item().actions && item().actions.length > 0) {
+                    <mat-divider></mat-divider>
+                    @for (action of item().actions; track $index) {
+                        <div>
+                            @if (action?.value?.img && action?.value?.img !== '') {
+                                <img [ngSrc]="HORDES_IMG_REPO + $safeNavigationMigration(action?.value?.img)" width="16"
+                                     height="16">{{ action?.value?.label }}
+                            }
+                        </div>
                     }
-
-                    @if (item().properties && item().properties.length > 0) {
-                        <mat-divider></mat-divider>
-                        @for (property of item().properties; track $index) {
-                            <div>
-                                @if (property?.value?.img && property?.value?.img !== '') {
-                                    <img [ngSrc]="HORDES_IMG_REPO + property?.value?.img" width="16" height="16">{{ property?.value?.label }}
-                                }
-                            </div>
-                        }
-                    }
-
-                    @if (item().actions && item().actions.length > 0) {
-                        <mat-divider></mat-divider>
-                        @for (action of item().actions; track $index) {
-                            <div>
-                                @if (action?.value?.img && action?.value?.img !== '') {
-                                    <img [ngSrc]="HORDES_IMG_REPO + action?.value?.img" width="16" height="16">{{ action?.value?.label }}
-                                }
-                            </div>
-                        }
-                    }
+                }
                 </div>
             }
         </div>

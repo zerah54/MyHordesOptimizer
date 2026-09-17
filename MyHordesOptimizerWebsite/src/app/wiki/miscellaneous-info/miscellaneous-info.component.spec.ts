@@ -3,6 +3,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatDialog } from '@angular/material/dialog';
 import { By } from '@angular/platform-browser';
 import { Router } from '@angular/router';
+import type { MockedObject } from 'vitest';
 
 import { TownDetails } from '../../_abstract_model/types/town-details.class';
 import { setTown } from '../../_core/utilities/localstorage.util';
@@ -12,14 +13,18 @@ import { MiscellaneousInfoComponent } from './miscellaneous-info.component';
 describe('MiscellaneousInfoComponent', (): void => {
     let fixture: ComponentFixture<MiscellaneousInfoComponent>;
     let component: MiscellaneousInfoComponent;
-    let dialog: jasmine.SpyObj<MatDialog>;
-    let router: jasmine.SpyObj<Router>;
+    let dialog: MockedObject<MatDialog>;
+    let router: MockedObject<Router>;
 
     /** Crée le composant après que le localStorage ait été positionné (my_town est lu à la construction). */
     function createComponent(): void {
         TestBed.resetTestingModule();
-        dialog = jasmine.createSpyObj<MatDialog>('MatDialog', ['open']);
-        router = jasmine.createSpyObj<Router>('Router', ['navigate']);
+        dialog = {
+            open: vi.fn().mockName('MatDialog.open')
+        } as unknown as MockedObject<MatDialog>;
+        router = {
+            navigate: vi.fn().mockName('Router.navigate')
+        } as unknown as MockedObject<Router>;
         TestBed.configureTestingModule({
             imports: [MiscellaneousInfoComponent],
             providers: [
@@ -77,7 +82,9 @@ describe('MiscellaneousInfoComponent', (): void => {
 
         cards()[0].query(By.css('button[mat-icon-button]')).nativeElement.click();
 
-        expect(dialog.open).toHaveBeenCalledOnceWith(DespairDeathsCalculatorComponent);
+        expect(dialog.open).toHaveBeenCalledTimes(1);
+
+        expect(dialog.open).toHaveBeenCalledWith(DespairDeathsCalculatorComponent);
     });
 
     it('navigates to the overflow tool when the overflow calculate button is clicked', (): void => {
@@ -85,7 +92,9 @@ describe('MiscellaneousInfoComponent', (): void => {
 
         cards()[2].query(By.css('button[mat-icon-button]')).nativeElement.click();
 
-        expect(router.navigate).toHaveBeenCalledOnceWith(['tools', 'overflow']);
+        expect(router.navigate).toHaveBeenCalledTimes(1);
+
+        expect(router.navigate).toHaveBeenCalledWith(['tools', 'overflow']);
     });
 
     it('computes will_dead_zombies as floor(max(0, (nb_killed_zombies - 1) / 2)) in the despair-deaths table', (): void => {
@@ -135,12 +144,12 @@ describe('MiscellaneousInfoComponent', (): void => {
 
         const attack_table: DebugElement = cards()[1];
         const attack_rows: DebugElement[] = attack_table.queryAll(By.css('tr.mat-mdc-row'));
-        expect(attack_rows[6].nativeElement.classList.contains('today')).toBeTrue();
-        expect(attack_rows[0].nativeElement.classList.contains('today')).toBeFalse();
+        expect(attack_rows[6].nativeElement.classList.contains('today')).toBe(true);
+        expect(attack_rows[0].nativeElement.classList.contains('today')).toBe(false);
 
         const despair_table: DebugElement = cards()[0];
         const despair_rows: DebugElement[] = despair_table.queryAll(By.css('tr.mat-mdc-row'));
-        expect(despair_rows.some((row: DebugElement) => row.nativeElement.classList.contains('today'))).toBeFalse();
+        expect(despair_rows.some((row: DebugElement) => row.nativeElement.classList.contains('today'))).toBe(false);
     });
 
     it('highlights no row in any table when there is no active town', (): void => {
@@ -149,6 +158,6 @@ describe('MiscellaneousInfoComponent', (): void => {
         const attack_table: DebugElement = cards()[1];
         const attack_rows: DebugElement[] = attack_table.queryAll(By.css('tr.mat-mdc-row'));
 
-        expect(attack_rows.some((row: DebugElement) => row.nativeElement.classList.contains('today'))).toBeFalse();
+        expect(attack_rows.some((row: DebugElement) => row.nativeElement.classList.contains('today'))).toBe(false);
     });
 });

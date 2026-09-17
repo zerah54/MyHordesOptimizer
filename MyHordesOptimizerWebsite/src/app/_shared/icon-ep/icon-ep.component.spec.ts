@@ -1,3 +1,8 @@
+import 'moment/locale/de';
+import 'moment/locale/en-gb';
+import 'moment/locale/es';
+import 'moment/locale/fr';
+
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import moment from 'moment';

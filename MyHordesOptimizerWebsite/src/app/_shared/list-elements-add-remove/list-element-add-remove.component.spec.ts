@@ -1,7 +1,7 @@
+import { ANIMATION_MODULE_TYPE } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatMenuTrigger } from '@angular/material/menu';
 import { By } from '@angular/platform-browser';
-import { provideNoopAnimations } from '@angular/platform-browser/animations';
 
 import { HORDES_IMG_REPO } from '../../_abstract_model/const';
 import { Property } from '../../_abstract_model/enum/property.enum';
@@ -31,10 +31,12 @@ describe('ListElementAddRemoveComponent', (): void => {
     beforeEach(async (): Promise<void> => {
         await TestBed.configureTestingModule({
             imports: [ListElementAddRemoveComponent],
-            providers: [provideNoopAnimations()]
+            providers: [{ provide: ANIMATION_MODULE_TYPE, useValue: 'NoopAnimations' }]
         }).compileComponents();
         fixture = TestBed.createComponent(ListElementAddRemoveComponent);
-        locale = (fixture.componentInstance as unknown as { locale: string }).locale;
+        locale = (fixture.componentInstance as unknown as {
+            locale: string;
+        }).locale;
     });
 
     /** Pose les entrées requises avec des valeurs neutres, complétées par `overrides`. */
@@ -54,8 +56,10 @@ describe('ListElementAddRemoveComponent', (): void => {
         fixture.componentRef.setInput('addLabel', overrides.addLabel ?? 'Ajouter');
         fixture.componentRef.setInput('removeLabel', overrides.removeLabel ?? 'Retirer');
         fixture.componentRef.setInput('emptyLabel', overrides.emptyLabel ?? 'Vider');
-        if (overrides.readonly !== undefined) fixture.componentRef.setInput('readonly', overrides.readonly);
-        if (overrides.cls !== undefined) fixture.componentRef.setInput('class', overrides.cls);
+        if (overrides.readonly !== undefined)
+            fixture.componentRef.setInput('readonly', overrides.readonly);
+        if (overrides.cls !== undefined)
+            fixture.componentRef.setInput('class', overrides.cls);
     }
 
     it('renders one image per element of currentList, with its src and title', (): void => {

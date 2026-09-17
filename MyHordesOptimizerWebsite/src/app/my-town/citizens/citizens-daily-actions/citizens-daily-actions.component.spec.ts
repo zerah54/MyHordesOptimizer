@@ -1,4 +1,4 @@
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withXhr } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { ChangeDetectorRef } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
@@ -26,7 +26,7 @@ describe('CitizensDailyActionsComponent', (): void => {
     beforeEach(async (): Promise<void> => {
         await TestBed.configureTestingModule({
             imports: [CitizensDailyActionsComponent],
-            providers: [provideHttpClient(), provideHttpClientTesting()]
+            providers: [provideHttpClient(withXhr()), provideHttpClientTesting()]
         }).compileComponents();
 
         fixture = TestBed.createComponent(CitizensDailyActionsComponent);
@@ -45,7 +45,7 @@ describe('CitizensDailyActionsComponent', (): void => {
 
     describe('rendering after getCitizens() resolves', (): void => {
         it('renders nothing before citizen_info has loaded', (): void => {
-            spyOn(townService, 'getCitizens').and.returnValue(of());
+            vi.spyOn(townService, 'getCitizens').mockReturnValue(of());
             fixture.detectChanges();
 
             expect(fixture.nativeElement.querySelector('table')).toBeNull();
@@ -54,7 +54,7 @@ describe('CitizensDailyActionsComponent', (): void => {
         it('renders one row per citizen once getCitizens() resolves (citizen_info + datasource.data)', (): void => {
             const info: CitizenInfo = new CitizenInfo();
             info.citizens = [makeCitizen(1, 'Alice'), makeCitizen(2, 'Bob')];
-            spyOn(townService, 'getCitizens').and.returnValue(of(info));
+            vi.spyOn(townService, 'getCitizens').mockReturnValue(of(info));
 
             fixture.detectChanges();
 
@@ -72,7 +72,7 @@ describe('CitizensDailyActionsComponent', (): void => {
     it('saveDailyAction forces a synchronous refresh after the HTTP call resolves', (): void => {
         const citizen: Citizen = makeCitizen(42, 'Alice');
         const httpMock: HttpTestingController = TestBed.inject(HttpTestingController);
-        const refreshSpy: jasmine.Spy = spyOn(testable.change_detector_ref, 'detectChanges');
+        const refreshSpy = vi.spyOn(testable.change_detector_ref, 'detectChanges');
 
         testable.saveDailyAction(citizen, 'home_shower', true, 5);
         httpMock.expectOne((request) => request.url.includes('/dailyAction/')).flush({});

@@ -7,14 +7,21 @@
             "node_modules"
         ],
         "types": [
-            "jasmine",
+            "vitest/globals",
             "node",
-            "@angular/localize",
-            "@webgpu/types"
+            "@angular/localize"
         ]
     },
     "include": [
         "**/*.spec.ts",
         "**/*.d.ts"
-    ]
+    ],
+    "angularCompilerOptions": {
+      "extendedDiagnostics": {
+        "checks": {
+          "nullishCoalescingNotNullable": "suppress",
+          "optionalChainNotNullable": "suppress"
+        }
+      }
+    }
 }

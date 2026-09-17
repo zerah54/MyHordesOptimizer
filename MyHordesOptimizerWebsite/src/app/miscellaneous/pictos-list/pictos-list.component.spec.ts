@@ -1,7 +1,7 @@
+import { ANIMATION_MODULE_TYPE } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatTooltip } from '@angular/material/tooltip';
 import { By } from '@angular/platform-browser';
-import { provideNoopAnimations } from '@angular/platform-browser/animations';
 
 import { UserPictoDTO } from '../../_abstract_model/dto/user-picto.dto';
 import { UserPicto } from '../../_abstract_model/types/user-picto.class';
@@ -21,7 +21,9 @@ function tooltipMessage(fixture: ComponentFixture<PictosListComponent>): string 
     return fixture.debugElement.query(By.directive(MatTooltip)).injector.get(MatTooltip).message;
 }
 
-function tooltipClass(fixture: ComponentFixture<PictosListComponent>): string | string[] | Set<string> | { [key: string]: unknown } {
+function tooltipClass(fixture: ComponentFixture<PictosListComponent>): string | string[] | Set<string> | {
+    [key: string]: unknown;
+} {
     return fixture.debugElement.query(By.directive(MatTooltip)).injector.get(MatTooltip).tooltipClass ?? '';
 }
 
@@ -31,7 +33,7 @@ describe('PictosListComponent', (): void => {
     beforeEach(async (): Promise<void> => {
         await TestBed.configureTestingModule({
             imports: [PictosListComponent],
-            providers: [provideNoopAnimations()]
+            providers: [{ provide: ANIMATION_MODULE_TYPE, useValue: 'NoopAnimations' }]
         }).compileComponents();
 
         fixture = TestBed.createComponent(PictosListComponent);

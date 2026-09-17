@@ -1,4 +1,4 @@
-import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { HeaderWithNumberPreviousNextFilterComponent } from './header-with-number-previous-next-filter.component';
 
@@ -16,6 +16,11 @@ describe('HeaderWithNumberPreviousNextFilterComponent', () => {
         fixture.componentRef.setInput('header', 'Jour');
         fixture.componentRef.setInput('min', 1);
         fixture.componentRef.setInput('max', 5);
+        vi.useFakeTimers();
+    });
+
+    afterEach(() => {
+        vi.useRealTimers();
     });
 
     it('ngOnInit masque le filtre (icône visible) si filterValue est null/undefined', () => {
@@ -26,18 +31,18 @@ describe('HeaderWithNumberPreviousNextFilterComponent', () => {
         expect(fixture.nativeElement.querySelector('input')).toBeNull();
     });
 
-    it('ngOnInit affiche directement le filtre avec la valeur si filterValue est renseigné', fakeAsync(() => {
+    it('ngOnInit affiche directement le filtre avec la valeur si filterValue est renseigné', async () => {
         fixture.componentRef.setInput('filterValue', 3);
         fixture.detectChanges();
-        tick(); // vidange la microtâche interne de NgModel qui pousse la valeur vers le DOM
+        await vi.advanceTimersByTimeAsync(0); // vidange la microtâche interne de NgModel qui pousse la valeur vers le DOM
 
         expect(fixture.nativeElement.querySelector('.open-menu-icon')).toBeNull();
         const input: HTMLInputElement = fixture.nativeElement.querySelector('input');
         expect(input).toBeTruthy();
         expect(input.value).toBe('3');
-    }));
+    });
 
-    it('caractérise un bug hérité : #filter est absent du template (seul cet input matInput n\'a pas de référence #filter, contrairement aux 3 composants jumeaux) — le setTimeout de focus lève NG0951 dès qu\'on ouvre le filtre', fakeAsync(() => {
+    it('caractérise un bug hérité : #filter est absent du template (seul cet input matInput n\'a pas de référence #filter, contrairement aux 3 composants jumeaux) — le setTimeout de focus lève NG0951 dès qu\'on ouvre le filtre', async () => {
         fixture.componentRef.setInput('filterValue', null);
         fixture.detectChanges();
 
@@ -46,8 +51,8 @@ describe('HeaderWithNumberPreviousNextFilterComponent', () => {
         fixture.detectChanges();
 
         expect(fixture.nativeElement.querySelector('input')).toBeTruthy();
-        expect(() => tick()).toThrow(); // NG0951 : `viewChild.required('filter')` ne résout jamais
-    }));
+        await expect(vi.advanceTimersByTimeAsync(0)).rejects.toThrow(); // NG0951 : `viewChild.required('filter')` ne résout jamais
+    });
 
     it('les boutons précédent/suivant émettent filterValueChange et se désactivent aux bornes', () => {
         fixture.componentRef.setInput('filterValue', 1);
@@ -57,8 +62,8 @@ describe('HeaderWithNumberPreviousNextFilterComponent', () => {
         component.filterValueChange.subscribe((v: number) => emitted.push(v));
 
         const buttons: NodeListOf<HTMLButtonElement> = fixture.nativeElement.querySelectorAll('button');
-        expect(buttons[0].disabled).toBeTrue(); // "précédent" désactivé à min
-        expect(buttons[1].disabled).toBeFalse();
+        expect(buttons[0].disabled).toBe(true); // "précédent" désactivé à min
+        expect(buttons[1].disabled).toBe(false);
 
         buttons[1].click();
         expect(emitted).toEqual([2]);

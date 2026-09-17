@@ -13,7 +13,10 @@ interface Simulation {
 }
 
 interface TestableComponent {
-    simulations: { (): Simulation[]; set(value: Simulation[]): void };
+    simulations: {
+        (): Simulation[];
+        set(value: Simulation[]): void;
+    };
     default_value: number;
     ngAfterViewInit(): void;
     createSimulation(): void;

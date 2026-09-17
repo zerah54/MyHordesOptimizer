@@ -1,15 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { By } from '@angular/platform-browser';
+import type { Mock } from 'vitest';
 
 import { ConfirmDialogComponent, ConfirmDialogData } from './confirm-dialog.component';
 
 describe('ConfirmDialogComponent', (): void => {
     let fixture: ComponentFixture<ConfirmDialogComponent>;
-    let dialogRef: { close: jasmine.Spy };
+    let dialogRef: {
+        close: Mock;
+    };
 
     async function setup(data: ConfirmDialogData): Promise<void> {
-        dialogRef = { close: jasmine.createSpy('close') };
+        dialogRef = { close: vi.fn() };
         await TestBed.configureTestingModule({
             imports: [ConfirmDialogComponent],
             providers: [

@@ -1,7 +1,7 @@
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withXhr } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
+import { ANIMATION_MODULE_TYPE } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import moment from 'moment';
 
 import { Cell } from '../../../../../_abstract_model/types/cell.class';
@@ -49,7 +49,7 @@ describe('MapUpdateRuinComponent', (): void => {
         setTown(null);
         await TestBed.configureTestingModule({
             imports: [MapUpdateRuinComponent],
-            providers: [provideHttpClient(), provideHttpClientTesting(), provideNoopAnimations()]
+            providers: [provideHttpClient(withXhr()), provideHttpClientTesting(), { provide: ANIMATION_MODULE_TYPE, useValue: 'NoopAnimations' }]
         }).compileComponents();
         fixture = TestBed.createComponent(MapUpdateRuinComponent);
     });

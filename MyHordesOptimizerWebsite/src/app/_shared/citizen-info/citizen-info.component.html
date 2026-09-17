@@ -1,7 +1,7 @@
 <div class="mho-citizen-info">
     @if (citizen()) {
         @if (displayJob() && citizen().job?.value?.img) {
-            <img [ngSrc]="HORDES_IMG_REPO + citizen().job?.value?.img" width="16" height="16">
+            <img [ngSrc]="HORDES_IMG_REPO + $safeNavigationMigration(citizen().job?.value?.img)" width="16" height="16">
         }
         {{ displayPseudoMode() === 'simple' ? citizen().name : citizen().getTag() }}
         @if (displayShunStatus() && citizen().is_shunned) {

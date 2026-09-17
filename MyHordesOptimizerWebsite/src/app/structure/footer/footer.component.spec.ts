@@ -2,6 +2,7 @@ import { DebugElement } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatDialog } from '@angular/material/dialog';
 import { By } from '@angular/platform-browser';
+import type { MockedObject } from 'vitest';
 
 import { environment } from '../../../environments/environment';
 import { ThanksComponent } from '../../thanks/thanks.component';
@@ -9,10 +10,12 @@ import { FooterComponent } from './footer.component';
 
 describe('FooterComponent', (): void => {
     let fixture: ComponentFixture<FooterComponent>;
-    let dialog: jasmine.SpyObj<MatDialog>;
+    let dialog: MockedObject<MatDialog>;
 
     beforeEach(async (): Promise<void> => {
-        dialog = jasmine.createSpyObj<MatDialog>('MatDialog', ['open']);
+        dialog = {
+            open: vi.fn().mockName('MatDialog.open')
+        } as unknown as MockedObject<MatDialog>;
 
         await TestBed.configureTestingModule({
             imports: [FooterComponent],
@@ -34,6 +37,8 @@ describe('FooterComponent', (): void => {
 
         thanksLink?.click();
 
-        expect(dialog.open).toHaveBeenCalledOnceWith(ThanksComponent, { width: '50%', minWidth: '250px' });
+        expect(dialog.open).toHaveBeenCalledTimes(1);
+
+        expect(dialog.open).toHaveBeenCalledWith(ThanksComponent, { width: '50%', minWidth: '250px' });
     });
 });

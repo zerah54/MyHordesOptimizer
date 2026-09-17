@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { DataView } from 'vis-data/peer';
+import { setupVitestCanvasMock } from 'vitest-canvas-mock';
 
 import { SelectComponent } from '../../_shared/select/select.component';
 import { IrlComponent } from './irl.component';
@@ -17,6 +18,7 @@ describe('IrlComponent', (): void => {
     let component: IrlComponent;
 
     beforeEach(async (): Promise<void> => {
+        setupVitestCanvasMock();
         await TestBed.configureTestingModule({
             imports: [IrlComponent]
         }).compileComponents();
@@ -36,15 +38,21 @@ describe('IrlComponent', (): void => {
     });
 
     function nodesView(): DataView<IrlNodeForTest> {
-        return (component as unknown as { nodes_view: DataView<IrlNodeForTest> }).nodes_view;
+        return (component as unknown as {
+            nodes_view: DataView<IrlNodeForTest>;
+        }).nodes_view;
     }
 
     function setSelectedTowns(selected: IrlTowns[]): void {
-        (component as unknown as { selected_towns: IrlTowns[] }).selected_towns = selected;
+        (component as unknown as {
+            selected_towns: IrlTowns[];
+        }).selected_towns = selected;
     }
 
     function getSelectedTowns(): IrlTowns[] {
-        return (component as unknown as { selected_towns: IrlTowns[] }).selected_towns;
+        return (component as unknown as {
+            selected_towns: IrlTowns[];
+        }).selected_towns;
     }
 
     it('initializes without throwing and renders the graph canvas inside #hordiens', (): void => {
@@ -53,7 +61,9 @@ describe('IrlComponent', (): void => {
     });
 
     it('exposes the fixed towns list as select options', (): void => {
-        expect((component as unknown as { towns: IrlTowns[] }).towns).toEqual(towns);
+        expect((component as unknown as {
+            towns: IrlTowns[];
+        }).towns).toEqual(towns);
     });
 
     it('selects all towns by default (a copy, not the const array itself)', (): void => {
@@ -66,8 +76,8 @@ describe('IrlComponent', (): void => {
         const select: SelectComponent<IrlTowns> = fixture.debugElement.query(By.directive(SelectComponent)).componentInstance;
         expect(select.options()).toBe(towns);
         expect(select.bindLabel()).toBe('label');
-        expect(select.multiple()).toBeTrue();
-        expect(select.searchable()).toBeTrue();
+        expect(select.multiple()).toBe(true);
+        expect(select.searchable()).toBe(true);
     });
 
     it('includes every person as a node when all towns are selected', (): void => {

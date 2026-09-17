@@ -1,8 +1,9 @@
 import { BreakpointObserver } from '@angular/cdk/layout';
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withXhr } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { of } from 'rxjs';
+import type { MockInstance } from 'vitest';
 
 import { AuthenticationService } from '../../_abstract_model/services/authentication.service';
 import { Me } from '../../_abstract_model/types/me.class';
@@ -11,11 +12,22 @@ import { HeaderComponent } from './header.component';
 import { HeaderService } from './header.service';
 
 interface TestableComponent {
-    is_gt_xs: { (): boolean };
-    me: { (): Me | null };
-    external_app_id_field_value: { (): string | null; set(value: string | null): void };
-    saved_external_app_id: { (): string | null };
-    is_in_town: { (): boolean };
+    is_gt_xs: {
+        (): boolean;
+    };
+    me: {
+        (): Me | null;
+    };
+    external_app_id_field_value: {
+        (): string | null;
+        set(value: string | null): void;
+    };
+    saved_external_app_id: {
+        (): string | null;
+    };
+    is_in_town: {
+        (): boolean;
+    };
     onResize(): void;
     saveExternalAppId(): void;
     disconnect(): void;
@@ -28,7 +40,7 @@ describe('HeaderComponent', (): void => {
     let testable: TestableComponent;
     let headerService: HeaderService;
     let authenticationService: AuthenticationService;
-    let reloadSpy: jasmine.Spy;
+    let reloadSpy: MockInstance<() => void>;
 
     beforeEach(async (): Promise<void> => {
         localStorage.clear();
@@ -36,7 +48,7 @@ describe('HeaderComponent', (): void => {
         setTown(null);
         await TestBed.configureTestingModule({
             imports: [HeaderComponent],
-            providers: [provideHttpClient(), provideHttpClientTesting()]
+            providers: [provideHttpClient(withXhr()), provideHttpClientTesting()]
         }).compileComponents();
 
         fixture = TestBed.createComponent(HeaderComponent);
@@ -44,7 +56,7 @@ describe('HeaderComponent', (): void => {
         testable = component as unknown as TestableComponent;
         headerService = TestBed.inject(HeaderService);
         authenticationService = TestBed.inject(AuthenticationService);
-        reloadSpy = spyOn(testable, 'reloadPage' as never);
+        reloadSpy = vi.spyOn(testable, 'reloadPage' as never);
     });
 
     afterEach((): void => {
@@ -58,7 +70,7 @@ describe('HeaderComponent', (): void => {
         // Discriminant : isMatched() renvoie systématiquement la même valeur en environnement de
         // test (pas de simulation de changement de viewport) — sans cet espion, l'assertion serait
         // vraie même si onResize() ne faisait rien.
-        spyOn(TestBed.inject(BreakpointObserver), 'isMatched').and.returnValue(!before);
+        vi.spyOn(TestBed.inject(BreakpointObserver), 'isMatched').mockReturnValue(!before);
 
         testable.onResize();
 
@@ -70,7 +82,7 @@ describe('HeaderComponent', (): void => {
         // le champ à null (synchronement ici, of() émettant immédiatement) : c'est le comportement
         // existant, pas une régression — on vérifie donc la persistance et le déclenchement du refresh.
         it('persists a token pushed after the initial value and refreshes "me"', (): void => {
-            spyOn(authenticationService, 'getMe').and.returnValue(of(null));
+            vi.spyOn(authenticationService, 'getMe').mockReturnValue(of(null));
             fixture.detectChanges();
 
             headerService.setToken('EXTERNAL-ID');
@@ -80,7 +92,7 @@ describe('HeaderComponent', (): void => {
         });
 
         it('ignores a token identical to the current field value', (): void => {
-            spyOn(authenticationService, 'getMe').and.returnValue(of(null));
+            vi.spyOn(authenticationService, 'getMe').mockReturnValue(of(null));
             fixture.detectChanges();
             testable.external_app_id_field_value.set('SAME');
 
@@ -111,7 +123,7 @@ describe('HeaderComponent', (): void => {
             me.username = 'Alice';
             // La vraie AuthenticationService.getMe() écrit l'utilisateur en localStorage avant d'émettre
             // (voir getUser() appelé par updateMe()) : le mock doit reproduire cet effet de bord.
-            spyOn(authenticationService, 'getMe').and.callFake(() => {
+            vi.spyOn(authenticationService, 'getMe').mockImplementation(() => {
                 setUser(me);
                 return of(me);
             });
@@ -125,7 +137,7 @@ describe('HeaderComponent', (): void => {
         });
 
         it('resets the field value once "me" is refreshed', (): void => {
-            spyOn(authenticationService, 'getMe').and.returnValue(of(null));
+            vi.spyOn(authenticationService, 'getMe').mockReturnValue(of(null));
             testable.external_app_id_field_value.set('NEW-ID');
 
             testable.saveExternalAppId();

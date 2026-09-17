@@ -40,7 +40,9 @@ describe('RecipeComponent', (): void => {
             imports: [RecipeComponent]
         }).compileComponents();
         fixture = TestBed.createComponent(RecipeComponent);
-        locale = (fixture.componentInstance as unknown as { locale: string }).locale;
+        locale = (fixture.componentInstance as unknown as {
+            locale: string;
+        }).locale;
     });
 
     it('renders one component entry (icon + label) per item of recipe().components', (): void => {
@@ -63,8 +65,8 @@ describe('RecipeComponent', (): void => {
         fixture.detectChanges();
 
         const items: HTMLLIElement[] = fixture.debugElement.queryAll(By.css('.components li')).map((debugElement) => debugElement.nativeElement);
-        expect(items[0].classList.contains('provoking')).toBeFalse();
-        expect(items[1].classList.contains('provoking')).toBeTrue();
+        expect(items[0].classList.contains('provoking')).toBe(false);
+        expect(items[1].classList.contains('provoking')).toBe(true);
     });
 
     it('marks no component as provoking when recipe().provoking is undefined', (): void => {

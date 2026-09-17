@@ -1,7 +1,7 @@
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withXhr } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
+import { ANIMATION_MODULE_TYPE } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import moment from 'moment';
 import { of } from 'rxjs';
 
@@ -44,13 +44,13 @@ describe('MapUpdateCellComponent', (): void => {
     beforeEach(async (): Promise<void> => {
         await TestBed.configureTestingModule({
             imports: [MapUpdateCellComponent],
-            providers: [provideHttpClient(), provideHttpClientTesting(), provideNoopAnimations()]
+            providers: [provideHttpClient(withXhr()), provideHttpClientTesting(), { provide: ANIMATION_MODULE_TYPE, useValue: 'NoopAnimations' }]
         }).compileComponents();
         apiService = TestBed.inject(ApiService);
     });
 
     function create(items: Item[] = [newItem(1, 'Pelle'), newItem(2, 'Pioche')]): void {
-        spyOn(apiService, 'getItems').and.returnValue(of(items));
+        vi.spyOn(apiService, 'getItems').mockReturnValue(of(items));
         fixture = TestBed.createComponent(MapUpdateCellComponent);
         fixture.componentRef.setInput('cell', newCell());
         fixture.componentRef.setInput('citizens', []);
@@ -83,7 +83,9 @@ describe('MapUpdateCellComponent', (): void => {
         fixture.componentRef.setInput('cell', cell);
         fixture.detectChanges();
 
-        (<{ addItem(cell: Cell, item_id: number): void }>(<unknown>fixture.componentInstance)).addItem(cell, 1);
+        (<{
+            addItem(cell: Cell, item_id: number): void;
+        }>(<unknown>fixture.componentInstance)).addItem(cell, 1);
 
         expect(cell.items.length).toBe(1);
         expect(cell.items[0].count).toBe(2);
@@ -96,7 +98,9 @@ describe('MapUpdateCellComponent', (): void => {
         fixture.componentRef.setInput('cell', cell);
         fixture.detectChanges();
 
-        (<{ addItem(cell: Cell, item_id: number): void }>(<unknown>fixture.componentInstance)).addItem(cell, 1);
+        (<{
+            addItem(cell: Cell, item_id: number): void;
+        }>(<unknown>fixture.componentInstance)).addItem(cell, 1);
 
         expect(cell.items.length).toBe(1);
         expect(cell.items[0].item_id).toBe(1);
@@ -109,10 +113,14 @@ describe('MapUpdateCellComponent', (): void => {
         fixture.componentRef.setInput('cell', cell);
         fixture.detectChanges();
 
-        (<{ removeItem(cell: Cell, item_id: number): void }>(<unknown>fixture.componentInstance)).removeItem(cell, 1);
+        (<{
+            removeItem(cell: Cell, item_id: number): void;
+        }>(<unknown>fixture.componentInstance)).removeItem(cell, 1);
         expect(cell.items[0].count).toBe(1);
 
-        (<{ removeItem(cell: Cell, item_id: number): void }>(<unknown>fixture.componentInstance)).removeItem(cell, 1);
+        (<{
+            removeItem(cell: Cell, item_id: number): void;
+        }>(<unknown>fixture.componentInstance)).removeItem(cell, 1);
         expect(cell.items.length).toBe(0);
     });
 
@@ -122,7 +130,9 @@ describe('MapUpdateCellComponent', (): void => {
         fixture.componentRef.setInput('cell', cell);
         fixture.detectChanges();
 
-        (<{ emptyItems(cell: Cell): void }>(<unknown>fixture.componentInstance)).emptyItems(cell);
+        (<{
+            emptyItems(cell: Cell): void;
+        }>(<unknown>fixture.componentInstance)).emptyItems(cell);
 
         expect(cell.items.length).toBe(0);
     });

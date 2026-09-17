@@ -1,6 +1,6 @@
-import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
+import { ANIMATION_MODULE_TYPE } from '@angular/core';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
-import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import moment from 'moment';
 import { Subject } from 'rxjs';
 
@@ -52,14 +52,18 @@ describe('RuinsComponent', (): void => {
         await TestBed.configureTestingModule({
             imports: [RuinsComponent],
             providers: [
-                provideNoopAnimations(),
+                { provide: ANIMATION_MODULE_TYPE, useValue: 'NoopAnimations' },
                 { provide: ApiService, useValue: { getRuins: (): unknown => ruins_subject.asObservable() } },
                 { provide: TownService, useValue: { getTownRuins: (): unknown => town_ruins_subject.asObservable() } }
             ]
         }).compileComponents();
+        vi.useFakeTimers();
     });
 
-    afterEach((): void => setTown(null));
+    afterEach((): void => {
+        setTown(null);
+        vi.useRealTimers();
+    });
 
     it('renders nothing until the ruins have arrived', (): void => {
         createComponent();
@@ -68,19 +72,19 @@ describe('RuinsComponent', (): void => {
         expect(fixture.debugElement.query(By.css('table'))).toBeNull();
     });
 
-    it('renders one row per ruin once the API responds', fakeAsync((): void => {
+    it('renders one row per ruin once the API responds', async (): Promise<void> => {
         createComponent();
         fixture.detectChanges();
 
         ruins_subject.next([makeRuin(1, 'Cimetière'), makeRuin(2, 'Usine')]);
         fixture.detectChanges();
-        tick();
+        await vi.advanceTimersByTimeAsync(0);
 
         const rows = fixture.debugElement.queryAll(By.css('tr[mat-row]'));
         expect(rows.length).toBe(2);
-    }));
+    });
 
-    it('deduplicates dropped items across ruins into `items`', fakeAsync((): void => {
+    it('deduplicates dropped items across ruins into `items`', async (): Promise<void> => {
         createComponent();
         fixture.detectChanges();
 
@@ -94,21 +98,21 @@ describe('RuinsComponent', (): void => {
 
         ruins_subject.next([ruin_a, ruin_b]);
         fixture.detectChanges();
-        tick();
+        await vi.advanceTimersByTimeAsync(0);
 
         expect(component['items']().length).toBe(2);
-    }));
+    });
 
-    it('resolves matSort onto the datasource shortly after the ruins arrive', fakeAsync((): void => {
+    it('resolves matSort onto the datasource shortly after the ruins arrive', async (): Promise<void> => {
         createComponent();
         fixture.detectChanges();
 
         ruins_subject.next([makeRuin(1, 'Cimetière')]);
         fixture.detectChanges();
-        tick();
+        await vi.advanceTimersByTimeAsync(0);
 
         expect(component['datasource']().sort).toBeTruthy();
-    }));
+    });
 
     it('customFilter matches a ruin by label, distance bounds, or dropped object', (): void => {
         createComponent();
@@ -132,7 +136,7 @@ describe('RuinsComponent', (): void => {
             setTown(Object.assign(new TownDetails(), { town_id: 1, town_type: 'RNE' }));
         });
 
-        it('switches the table between game ruins and the town ruins on toggle', fakeAsync((): void => {
+        it('switches the table between game ruins and the town ruins on toggle', async (): Promise<void> => {
             createComponent();
             fixture.detectChanges();
 
@@ -140,7 +144,7 @@ describe('RuinsComponent', (): void => {
             const town_ruin: Ruin = makeRuin(2, 'Usine de la ville');
             ruins_subject.next([game_ruin]);
             fixture.detectChanges();
-            tick();
+            await vi.advanceTimersByTimeAsync(0);
             town_ruins_subject.next([town_ruin]);
             fixture.detectChanges();
 
@@ -150,7 +154,7 @@ describe('RuinsComponent', (): void => {
             component['applyInsideTownFilter']();
 
             expect(component['datasource']().data).toEqual([town_ruin]);
-        }));
+        });
 
         it('renders the "Dans ma ville" toggle only when a town is active', (): void => {
             createComponent();

@@ -1,4 +1,4 @@
-import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { HeaderWithNumberFilterComponent } from './header-with-number-filter.component';
 
@@ -23,6 +23,11 @@ describe('HeaderWithNumberFilterComponent', () => {
         fixture.componentRef.setInput('header', 'Jour');
         fixture.componentRef.setInput('filterValue', '');
         fixture.detectChanges();
+        vi.useFakeTimers();
+    });
+
+    afterEach(() => {
+        vi.useRealTimers();
     });
 
     it('affiche l\'en-tête et l\'icône pour ouvrir le filtre, le champ masqué', () => {
@@ -31,21 +36,21 @@ describe('HeaderWithNumberFilterComponent', () => {
         expect(fixture.nativeElement.querySelector('input')).toBeNull();
     });
 
-    it('affiche le champ de saisie et lui donne le focus après clic sur l\'icône', fakeAsync(() => {
+    it('affiche le champ de saisie et lui donne le focus après clic sur l\'icône', async () => {
         openFilter();
 
         const input: HTMLInputElement = fixture.nativeElement.querySelector('input');
         expect(input).toBeTruthy();
         expect(fixture.nativeElement.querySelector('.open-menu-icon')).toBeNull();
 
-        tick(); // vidange le setTimeout qui donne le focus au champ
+        await vi.advanceTimersByTimeAsync(0); // vidange le setTimeout qui donne le focus au champ
         expect(document.activeElement).toBe(input);
-    }));
+    });
 
-    it('émet filterValueChange à la saisie', fakeAsync(() => {
+    it('émet filterValueChange à la saisie', async () => {
         fixture.componentRef.setInput('filterValue', 5);
         openFilter();
-        tick();
+        await vi.advanceTimersByTimeAsync(0);
 
         const emitted: (number | string)[] = [];
         component.filterValueChange.subscribe((v: number | string) => emitted.push(v));
@@ -56,11 +61,11 @@ describe('HeaderWithNumberFilterComponent', () => {
         fixture.detectChanges();
 
         expect(emitted).toEqual(['7']);
-    }));
+    });
 
-    it('focusout masque à nouveau le champ si filterValue est vide', fakeAsync(() => {
+    it('focusout masque à nouveau le champ si filterValue est vide', async () => {
         openFilter();
-        tick();
+        await vi.advanceTimersByTimeAsync(0);
 
         fixture.componentRef.setInput('filterValue', '');
         fixture.detectChanges();
@@ -68,11 +73,11 @@ describe('HeaderWithNumberFilterComponent', () => {
         fixture.detectChanges();
 
         expect(fixture.nativeElement.querySelector('input')).toBeNull();
-    }));
+    });
 
-    it('focusout garde le champ affiché si filterValue est renseigné', fakeAsync(() => {
+    it('focusout garde le champ affiché si filterValue est renseigné', async () => {
         openFilter();
-        tick();
+        await vi.advanceTimersByTimeAsync(0);
 
         fixture.componentRef.setInput('filterValue', 3);
         fixture.detectChanges();
@@ -80,5 +85,5 @@ describe('HeaderWithNumberFilterComponent', () => {
         fixture.detectChanges();
 
         expect(fixture.nativeElement.querySelector('input')).toBeTruthy();
-    }));
+    });
 });

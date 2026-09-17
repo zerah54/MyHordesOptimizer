@@ -1,8 +1,9 @@
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withXhr } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { of } from 'rxjs';
+import type { MockedObject } from 'vitest';
 
 import { MinesweeperGameCompleted, MinesweeperGameStarted, MinesweeperService } from '../../_abstract_model/services/minesweeper.service';
 import { Me } from '../../_abstract_model/types/me.class';
@@ -19,15 +20,36 @@ interface Cell {
 }
 
 interface TestableComponent {
-    board: { (): Cell[][] };
-    game_over: { (): boolean };
-    remaining_mines: { (): number };
-    is_fullscreen: { (): boolean };
-    selected_size: { (): { id: string; label: string } };
-    game_mode: { (): 'normal' | 'daily' };
-    daily_challenge_pending_start: { (): boolean };
-    leaderboard_size_id: { (): string };
-    leaderboard_mode: { (): 'normal' | 'daily' };
+    board: {
+        (): Cell[][];
+    };
+    game_over: {
+        (): boolean;
+    };
+    remaining_mines: {
+        (): number;
+    };
+    is_fullscreen: {
+        (): boolean;
+    };
+    selected_size: {
+        (): {
+            id: string;
+            label: string;
+        };
+    };
+    game_mode: {
+        (): 'normal' | 'daily';
+    };
+    daily_challenge_pending_start: {
+        (): boolean;
+    };
+    leaderboard_size_id: {
+        (): string;
+    };
+    leaderboard_mode: {
+        (): 'normal' | 'daily';
+    };
     revealCell(i: number, j: number): void;
     cycleMarker(i: number, j: number): void;
     onCellMouseDown(i: number, j: number, event: MouseEvent): void;
@@ -58,19 +80,22 @@ function startedBoard(mines: number[]): MinesweeperGameStarted {
 describe('MinesweeperComponent', (): void => {
     let fixture: ComponentFixture<MinesweeperComponent>;
     let testable: TestableComponent;
-    let minesweeperService: jasmine.SpyObj<MinesweeperService>;
+    let minesweeperService: MockedObject<MinesweeperService>;
 
     async function setup(): Promise<void> {
-        minesweeperService = jasmine.createSpyObj<MinesweeperService>(
-            'MinesweeperService', ['createGame', 'startGame', 'completeGame', 'getChallengesToday']
-        );
-        minesweeperService.getChallengesToday.and.returnValue(of([]));
-        minesweeperService.completeGame.and.returnValue(of({ outcome: 'won', elapsedMs: null } as MinesweeperGameCompleted));
+        minesweeperService = {
+            createGame: vi.fn().mockName('MinesweeperService.createGame'),
+            startGame: vi.fn().mockName('MinesweeperService.startGame'),
+            completeGame: vi.fn().mockName('MinesweeperService.completeGame'),
+            getChallengesToday: vi.fn().mockName('MinesweeperService.getChallengesToday')
+        } as unknown as MockedObject<MinesweeperService>;
+        minesweeperService.getChallengesToday.mockReturnValue(of([]));
+        minesweeperService.completeGame.mockReturnValue(of({ outcome: 'won', elapsedMs: null } as MinesweeperGameCompleted));
 
         await TestBed.configureTestingModule({
             imports: [MinesweeperComponent],
             providers: [
-                provideHttpClient(), provideHttpClientTesting(),
+                provideHttpClient(withXhr()), provideHttpClientTesting(),
                 { provide: MinesweeperService, useValue: minesweeperService }
             ]
         }).compileComponents();
@@ -111,64 +136,64 @@ describe('MinesweeperComponent', (): void => {
         beforeEach(async (): Promise<void> => await setup());
 
         it('démarre une partie serveur au premier clic puis révèle la cellule', (): void => {
-            minesweeperService.createGame.and.returnValue(of(startedBoard([0, 0, 0, 0])));
+            minesweeperService.createGame.mockReturnValue(of(startedBoard([0, 0, 0, 0])));
 
             testable.revealCell(0, 0);
 
-            expect(minesweeperService.createGame).toHaveBeenCalledWith(jasmine.objectContaining({
+            expect(minesweeperService.createGame).toHaveBeenCalledWith(expect.objectContaining({
                 sizeId: 'medium', mode: 'normal', firstClickX: 0, firstClickY: 0
             }));
             expect(testable.board().length).toBe(2);
-            expect(testable.board()[0][0].is_revealed).toBeTrue();
+            expect(testable.board()[0][0].is_revealed).toBe(true);
         });
 
         it('perd la partie et la signale au serveur en cliquant sur une mine', (): void => {
-            minesweeperService.createGame.and.returnValue(of(startedBoard([1, 0, 0, 0])));
+            minesweeperService.createGame.mockReturnValue(of(startedBoard([1, 0, 0, 0])));
 
             testable.revealCell(0, 0);
 
-            expect(testable.game_over()).toBeTrue();
+            expect(testable.game_over()).toBe(true);
             expect(minesweeperService.completeGame).toHaveBeenCalledWith(1, 'lost');
         });
 
         it('gagne la partie en révélant toutes les cases sans mine', (): void => {
-            minesweeperService.createGame.and.returnValue(of(startedBoard([0, 0, 0, 0])));
+            minesweeperService.createGame.mockReturnValue(of(startedBoard([0, 0, 0, 0])));
 
             testable.revealCell(0, 0);
 
-            expect(testable.game_over()).toBeTrue();
+            expect(testable.game_over()).toBe(true);
             expect(testable.remaining_mines()).toBe(0);
             expect(minesweeperService.completeGame).toHaveBeenCalledWith(1, 'won');
         });
 
         it('bascule en mode défi du jour sans démarrer de partie tant que le joueur n\'a pas confirmé', (): void => {
-            minesweeperService.createGame.and.returnValue(of(startedBoard([0, 0, 0, 0])));
+            minesweeperService.createGame.mockReturnValue(of(startedBoard([0, 0, 0, 0])));
 
             testable.switchMode('daily');
 
             expect(testable.game_mode()).toBe('daily');
-            expect(testable.daily_challenge_pending_start()).toBeTrue();
+            expect(testable.daily_challenge_pending_start()).toBe(true);
             expect(minesweeperService.createGame).not.toHaveBeenCalled();
         });
 
         it('démarre la partie serveur du défi du jour uniquement après confirmation explicite', (): void => {
-            minesweeperService.createGame.and.returnValue(of(startedBoard([0, 0, 0, 0])));
+            minesweeperService.createGame.mockReturnValue(of(startedBoard([0, 0, 0, 0])));
             testable.switchMode('daily');
 
             testable.startDailyChallenge();
 
-            expect(testable.daily_challenge_pending_start()).toBeFalse();
-            expect(minesweeperService.createGame).toHaveBeenCalledWith(jasmine.objectContaining({ mode: 'daily' }));
+            expect(testable.daily_challenge_pending_start()).toBe(false);
+            expect(minesweeperService.createGame).toHaveBeenCalledWith(expect.objectContaining({ mode: 'daily' }));
         });
 
         it('empêche de refaire le défi du jour déjà tenté à cette difficulté', (): void => {
-            minesweeperService.getChallengesToday.and.returnValue(of([{ sizeId: 'medium', alreadyPlayedToday: true }]));
-            minesweeperService.createGame.and.returnValue(of(startedBoard([0, 0, 0, 0])));
+            minesweeperService.getChallengesToday.mockReturnValue(of([{ sizeId: 'medium', alreadyPlayedToday: true }]));
+            minesweeperService.createGame.mockReturnValue(of(startedBoard([0, 0, 0, 0])));
 
             testable.switchMode('daily');
 
-            expect(testable.isAlreadyPlayedToday('medium')).toBeTrue();
-            expect(testable.daily_challenge_pending_start()).toBeTrue();
+            expect(testable.isAlreadyPlayedToday('medium')).toBe(true);
+            expect(testable.daily_challenge_pending_start()).toBe(true);
             expect(minesweeperService.createGame).not.toHaveBeenCalled();
         });
     });
@@ -180,16 +205,16 @@ describe('MinesweeperComponent', (): void => {
             expect(testable.remaining_mines()).toBe(40);
 
             testable.cycleMarker(0, 0);
-            expect(testable.board()[0][0].is_flagged).toBeTrue();
+            expect(testable.board()[0][0].is_flagged).toBe(true);
             expect(testable.remaining_mines()).toBe(39);
 
             testable.cycleMarker(0, 0);
-            expect(testable.board()[0][0].is_flagged).toBeFalse();
-            expect(testable.board()[0][0].is_questioned).toBeTrue();
+            expect(testable.board()[0][0].is_flagged).toBe(false);
+            expect(testable.board()[0][0].is_questioned).toBe(true);
             expect(testable.remaining_mines()).toBe(40);
 
             testable.cycleMarker(0, 0);
-            expect(testable.board()[0][0].is_questioned).toBeFalse();
+            expect(testable.board()[0][0].is_questioned).toBe(false);
         });
     });
 
@@ -198,19 +223,19 @@ describe('MinesweeperComponent', (): void => {
 
         it('quitte le plein écran sur Échap', (): void => {
             testable.openFullscreen();
-            expect(testable.is_fullscreen()).toBeTrue();
+            expect(testable.is_fullscreen()).toBe(true);
 
             window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
 
-            expect(testable.is_fullscreen()).toBeFalse();
+            expect(testable.is_fullscreen()).toBe(false);
         });
 
         it('n\'a aucun effet hors plein écran', (): void => {
-            expect(testable.is_fullscreen()).toBeFalse();
+            expect(testable.is_fullscreen()).toBe(false);
 
             window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
 
-            expect(testable.is_fullscreen()).toBeFalse();
+            expect(testable.is_fullscreen()).toBe(false);
         });
     });
 
@@ -220,12 +245,12 @@ describe('MinesweeperComponent', (): void => {
         it('arrête le survol-appui en cours dès le relâchement du bouton, où que ce soit sur la fenêtre', (): void => {
             testable.onCellMouseDown(0, 0, { button: 0 } as MouseEvent);
             testable.onCellMouseEnter(0, 1);
-            expect(testable.board()[0][1].is_highlighted).toBeTrue();
+            expect(testable.board()[0][1].is_highlighted).toBe(true);
 
             window.dispatchEvent(new MouseEvent('mouseup'));
 
             testable.onCellMouseEnter(1, 1);
-            expect(testable.board()[1][1].is_highlighted).toBeFalse();
+            expect(testable.board()[1][1].is_highlighted).toBe(false);
         });
     });
 
@@ -249,12 +274,12 @@ describe('MinesweeperComponent', (): void => {
 
         it('ouvre la modale de classement avec le template et la difficulté courante', (): void => {
             const dialog: MatDialog = fixture.debugElement.injector.get(MatDialog);
-            const openSpy: jasmine.Spy = spyOn(dialog, 'open').and.returnValue({} as MatDialogRef<unknown>);
+            const openSpy = vi.spyOn(dialog, 'open').mockReturnValue({} as MatDialogRef<unknown>);
 
             testable.openLeaderboard();
 
-            expect(openSpy).toHaveBeenCalledWith(MinesweeperLeaderboardDialogComponent, jasmine.objectContaining({
-                data: jasmine.objectContaining({ template: jasmine.anything() })
+            expect(openSpy).toHaveBeenCalledWith(MinesweeperLeaderboardDialogComponent, expect.objectContaining({
+                data: expect.objectContaining({ template: expect.anything() })
             }));
             expect(testable.leaderboard_size_id()).toBe(testable.selected_size().id);
             expect(testable.leaderboard_mode()).toBe(testable.game_mode());

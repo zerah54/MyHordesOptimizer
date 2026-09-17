@@ -1,7 +1,7 @@
+import { ANIMATION_MODULE_TYPE } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatTooltip } from '@angular/material/tooltip';
 import { By } from '@angular/platform-browser';
-import { provideNoopAnimations } from '@angular/platform-browser/animations';
 
 import { NoteIconComponent } from './note-icon.component';
 
@@ -15,7 +15,7 @@ describe('NoteIconComponent', (): void => {
     beforeEach(async (): Promise<void> => {
         await TestBed.configureTestingModule({
             imports: [NoteIconComponent],
-            providers: [provideNoopAnimations()]
+            providers: [{ provide: ANIMATION_MODULE_TYPE, useValue: 'NoopAnimations' }]
         }).compileComponents();
         fixture = TestBed.createComponent(NoteIconComponent);
     });

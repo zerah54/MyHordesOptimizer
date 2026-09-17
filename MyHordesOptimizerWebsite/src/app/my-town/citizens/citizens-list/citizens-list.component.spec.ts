@@ -1,4 +1,4 @@
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withXhr } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { ChangeDetectorRef } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
@@ -24,15 +24,25 @@ import { CitizensListComponent } from './citizens-list.component';
 
 interface TestableComponent {
     current_day: number;
-    citizen_list: { data: Citizen[] };
-    dead_citizen_list: { data: Citizen[] };
+    citizen_list: {
+        data: Citizen[];
+    };
+    dead_citizen_list: {
+        data: Citizen[];
+    };
     alive_citizen_info: (() => CitizenInfo | undefined) | CitizenInfo | undefined;
     dead_citizen_info: (() => CitizenInfo | undefined) | CitizenInfo | undefined;
     getCitizens(): void;
-    lastUpdates(citizen: Citizen): { label: string; info: UpdateInfo | undefined; }[];
+    lastUpdates(citizen: Citizen): {
+        label: string;
+        info: UpdateInfo | undefined;
+    }[];
     sortValue(citizen: Citizen, id: string): string | number;
     citizenBoolValue(citizen: Citizen, id: string): boolean | null;
-    getDailyAction(citizen: Citizen, action: DailyActionEnum): { element: DailyActionEnum; value: boolean };
+    getDailyAction(citizen: Citizen, action: DailyActionEnum): {
+        element: DailyActionEnum;
+        value: boolean;
+    };
     saveDailyAction(actionKey: string, checked: boolean, citizenId: number): void;
     goToProfile(userId: number): void;
     addChestItem(citizen_id: number, item_id: number): void;
@@ -55,7 +65,7 @@ describe('CitizensListComponent', (): void => {
     beforeEach(async (): Promise<void> => {
         await TestBed.configureTestingModule({
             imports: [CitizensListComponent],
-            providers: [provideHttpClient(), provideHttpClientTesting(), provideRouter([])]
+            providers: [provideHttpClient(withXhr()), provideHttpClientTesting(), provideRouter([])]
         }).compileComponents();
 
         fixture = TestBed.createComponent(CitizensListComponent);
@@ -76,7 +86,7 @@ describe('CitizensListComponent', (): void => {
         it('splits the resolved citizens between alive_citizen_info and dead_citizen_info', (): void => {
             const info: CitizenInfo = new CitizenInfo();
             info.citizens = [makeCitizen(1, 'Alice'), makeCitizen(2, 'Bob', true)];
-            spyOn(TestBed.inject(TownService), 'getCitizens').and.returnValue(of(info));
+            vi.spyOn(TestBed.inject(TownService), 'getCitizens').mockReturnValue(of(info));
 
             testable.getCitizens();
 
@@ -87,7 +97,7 @@ describe('CitizensListComponent', (): void => {
         });
 
         it('alive_citizen_info/dead_citizen_info stay unset before getCitizens() resolves', (): void => {
-            spyOn(TestBed.inject(TownService), 'getCitizens').and.returnValue(of());
+            vi.spyOn(TestBed.inject(TownService), 'getCitizens').mockReturnValue(of());
 
             testable.getCitizens();
 
@@ -109,9 +119,17 @@ describe('CitizensListComponent', (): void => {
     it('lastUpdates reads the bath entry from daily_actions', (): void => {
         const citizen: Citizen = citizenWithBathToday();
 
-        const entries: { label: string; info: UpdateInfo | undefined; }[] = testable.lastUpdates(citizen);
-        const bath_entry: { label: string; info: UpdateInfo | undefined; } | undefined =
-            entries.find((entry: { label: string; info: UpdateInfo | undefined; }) => entry.info === citizen.daily_actions[0].update_info);
+        const entries: {
+            label: string;
+            info: UpdateInfo | undefined;
+        }[] = testable.lastUpdates(citizen);
+        const bath_entry: {
+            label: string;
+            info: UpdateInfo | undefined;
+        } | undefined = entries.find((entry: {
+            label: string;
+            info: UpdateInfo | undefined;
+        }) => entry.info === citizen.daily_actions[0].update_info);
 
         expect(bath_entry).toBeTruthy();
     });
@@ -136,7 +154,10 @@ describe('CitizensListComponent', (): void => {
     });
 
     it('getDailyAction resolves the current boolean value for a citizen/action pair', (): void => {
-        const result: { element: DailyActionEnum; value: boolean } = testable.getDailyAction(citizenWithBathToday(), DailyActionEnum.HOME_POOL);
+        const result: {
+            element: DailyActionEnum;
+            value: boolean;
+        } = testable.getDailyAction(citizenWithBathToday(), DailyActionEnum.HOME_POOL);
 
         expect(result.element).toBe(DailyActionEnum.HOME_POOL);
         expect(result.value).toBe(true);
@@ -163,7 +184,7 @@ describe('CitizensListComponent', (): void => {
         citizen.daily_actions = [];
         testable.citizen_list = { data: [citizen] };
         const httpMock: HttpTestingController = TestBed.inject(HttpTestingController);
-        const refreshSpy: jasmine.Spy = spyOn(testable.change_detector_ref, 'detectChanges');
+        const refreshSpy = vi.spyOn(testable.change_detector_ref, 'detectChanges');
 
         testable.saveDailyAction('home_shower', true, 42);
         httpMock.expectOne((request) => request.url.includes('/dailyAction/')).flush({});
@@ -180,7 +201,7 @@ describe('CitizensListComponent', (): void => {
         citizen.status.update_info = new UpdateInfo();
         testable.citizen_list = { data: [citizen] };
         const httpMock: HttpTestingController = TestBed.inject(HttpTestingController);
-        const refreshSpy: jasmine.Spy = spyOn(testable.change_detector_ref, 'detectChanges');
+        const refreshSpy = vi.spyOn(testable.change_detector_ref, 'detectChanges');
 
         testable.addStatus(42, StatusEnum.CLEAN.key);
         httpMock.expectOne((request) => request.url.includes('/ExternalTools/Status')).flush({});
@@ -200,9 +221,11 @@ describe('CitizensListComponent', (): void => {
         citizen.chamanic_detail.update_info = new UpdateInfo();
         testable.citizen_list = { data: [citizen] };
         const httpMock: HttpTestingController = TestBed.inject(HttpTestingController);
-        const refreshSpy: jasmine.Spy = spyOn(testable.change_detector_ref, 'detectChanges');
+        const refreshSpy = vi.spyOn(testable.change_detector_ref, 'detectChanges');
 
-        (component as unknown as { changePotions(c: Citizen, value: number): void }).changePotions(citizen, 3);
+        (component as unknown as {
+            changePotions(c: Citizen, value: number): void;
+        }).changePotions(citizen, 3);
         httpMock.expectOne((request) => request.url.includes('/chamanicDetail')).flush({});
 
         expect(refreshSpy).toHaveBeenCalled();
@@ -216,12 +239,14 @@ describe('CitizensListComponent', (): void => {
         const citizen: Citizen = new Citizen();
         citizen.id = 42;
 
-        expect((): void => (component as unknown as { openNote(c: Citizen): void }).openNote(citizen)).not.toThrow();
+        expect((): void => (component as unknown as {
+            openNote(c: Citizen): void;
+        }).openNote(citizen)).not.toThrow();
     });
 
     it('goToProfile navigates to the profile page of the citizen', (): void => {
         const router: Router = TestBed.inject(Router);
-        const navigateSpy: jasmine.Spy = spyOn(router, 'navigate');
+        const navigateSpy = vi.spyOn(router, 'navigate');
 
         testable.goToProfile(42);
 
@@ -235,7 +260,9 @@ describe('CitizensListComponent', (): void => {
         citizen.id = 42;
         citizen.chest = new Bag();
         testable.citizen_list = { data: [citizen] };
-        (component as unknown as { all_items: Item[] }).all_items = [Object.assign(new Item(), { id: 5 })];
+        (component as unknown as {
+            all_items: Item[];
+        }).all_items = [Object.assign(new Item(), { id: 5 })];
         const httpMock: HttpTestingController = TestBed.inject(HttpTestingController);
 
         expect((): void => testable.addChestItem(42, 5)).not.toThrow();
@@ -262,8 +289,9 @@ describe('CitizensListComponent', (): void => {
         citizen.home = new Home();
         citizen.home.content = [<HomeWithValue>{ element: HomeEnum.HOUSE_LEVEL, value: 3 }];
 
-        const result: HomeWithValue | undefined =
-            (component as unknown as { houseLevelOf(c: Citizen): HomeWithValue | undefined }).houseLevelOf(citizen);
+        const result: HomeWithValue | undefined = (component as unknown as {
+            houseLevelOf(c: Citizen): HomeWithValue | undefined;
+        }).houseLevelOf(citizen);
 
         expect(result?.value).toBe(3);
     });
@@ -273,7 +301,7 @@ describe('CitizensListComponent', (): void => {
             TestBed.inject(TownContextService).setObservedTown(new TownDetails());
             const info: CitizenInfo = new CitizenInfo();
             info.citizens = [makeCitizen(1, 'Alice')];
-            spyOn(TestBed.inject(TownService), 'getCitizens').and.returnValue(of(info));
+            vi.spyOn(TestBed.inject(TownService), 'getCitizens').mockReturnValue(of(info));
 
             fixture.detectChanges();
 
@@ -285,7 +313,7 @@ describe('CitizensListComponent', (): void => {
         it('renders the heavy table, not the light card view, when the town is not observed', (): void => {
             const info: CitizenInfo = new CitizenInfo();
             info.citizens = [makeCitizen(1, 'Alice')];
-            spyOn(TestBed.inject(TownService), 'getCitizens').and.returnValue(of(info));
+            vi.spyOn(TestBed.inject(TownService), 'getCitizens').mockReturnValue(of(info));
 
             fixture.detectChanges();
 

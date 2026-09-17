@@ -1,8 +1,9 @@
+import { ANIMATION_MODULE_TYPE } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MAT_ICON_DEFAULT_OPTIONS, MatIconDefaultOptions } from '@angular/material/icon';
-import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { Observable, of, throwError } from 'rxjs';
+import type { Mock } from 'vitest';
 
 import { UserPictosDTO } from '../../../_abstract_model/dto/user-picto.dto';
 import { UserAccountService } from '../../../_abstract_model/services/user-account.service';
@@ -21,19 +22,19 @@ interface TestableComponent {
 describe('CitizenPictosDialogComponent', (): void => {
     let fixture: ComponentFixture<CitizenPictosDialogComponent>;
     let testable: TestableComponent;
-    let getPictosSpy: jasmine.Spy;
-    let importUserDataSpy: jasmine.Spy;
+    let getPictosSpy: Mock;
+    let importUserDataSpy: Mock;
 
     const dialogData: CitizenPictosDialogData = { userId: 42, citizenName: 'Bob', townId: 7 };
 
     function configure(initial: UserPictosDTO): void {
-        getPictosSpy = jasmine.createSpy('getPictos').and.returnValue(of(initial));
-        importUserDataSpy = jasmine.createSpy('importUserData');
+        getPictosSpy = vi.fn().mockReturnValue(of(initial));
+        importUserDataSpy = vi.fn();
 
         TestBed.configureTestingModule({
             imports: [CitizenPictosDialogComponent],
             providers: [
-                provideNoopAnimations(),
+                { provide: ANIMATION_MODULE_TYPE, useValue: 'NoopAnimations' },
                 { provide: MAT_DIALOG_DATA, useValue: dialogData },
                 {
                     provide: UserAccountService,
@@ -96,8 +97,8 @@ describe('CitizenPictosDialogComponent', (): void => {
             historyImportedAt: '2026-08-11T12:00:00Z',
             pictos: [{ id: 1, rare: false, count: 5, countInTown: 5 }]
         };
-        importUserDataSpy.and.returnValue(of({ historyImportedAt: '2026-08-11T12:00:00Z', pictos: [] }));
-        getPictosSpy.and.returnValue(of(refreshed));
+        importUserDataSpy.mockReturnValue(of({ historyImportedAt: '2026-08-11T12:00:00Z', pictos: [] }));
+        getPictosSpy.mockReturnValue(of(refreshed));
 
         testable.triggerImport();
 
@@ -112,7 +113,7 @@ describe('CitizenPictosDialogComponent', (): void => {
         setUser(null);
         setUser(Object.assign(new Me(), { id: 1 }));
         configure({ historyImportedAt: null, pictos: [] });
-        importUserDataSpy.and.returnValue(throwError((): Error => new Error('429')));
+        importUserDataSpy.mockReturnValue(throwError((): Error => new Error('429')));
 
         testable.triggerImport();
 
@@ -125,7 +126,7 @@ describe('CitizenPictosDialogComponent', (): void => {
         setUser(null);
         setUser(Object.assign(new Me(), { id: 1 }));
         configure({ historyImportedAt: null, pictos: [] });
-        importUserDataSpy.and.returnValue(new Observable<UserPictosDTO>());
+        importUserDataSpy.mockReturnValue(new Observable<UserPictosDTO>());
 
         testable.triggerImport();
         testable.triggerImport();

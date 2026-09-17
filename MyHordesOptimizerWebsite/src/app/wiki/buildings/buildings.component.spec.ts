@@ -1,5 +1,5 @@
 import { DebugElement } from '@angular/core';
-import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatCheckbox } from '@angular/material/checkbox';
 import { By } from '@angular/platform-browser';
 import moment from 'moment';
@@ -562,7 +562,11 @@ describe('BuildingsComponent', (): void => {
         component['toggleSelected'](b);
         component['setPlansLus'](a, 2);
 
-        const totals: { count: number; ap: number; resources: BuildingResource[] } = component['selectedTotals']();
+        const totals: {
+            count: number;
+            ap: number;
+            resources: BuildingResource[];
+        } = component['selectedTotals']();
 
         expect(totals.count).toBe(2);
         expect(totals.ap).toBe(13 + 10);
@@ -620,6 +624,11 @@ describe('BuildingsComponent - ngOnInit wiring', (): void => {
         fixture = TestBed.createComponent(BuildingsComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
+        vi.useFakeTimers();
+    });
+
+    afterEach((): void => {
+        vi.useRealTimers();
     });
 
     it('builds the tree from the flat API response and populates rows depth-first', (): void => {
@@ -646,7 +655,7 @@ describe('BuildingsComponent - ngOnInit wiring', (): void => {
         expect(component['rows']().map((b: Building): number => b.id)).toEqual([1, 2]);
     });
 
-    it('debounces the label filter by 200ms before narrowing rows', fakeAsync((): void => {
+    it('debounces the label filter by 200ms before narrowing rows', async (): Promise<void> => {
         const root_a: Building = makeBuilding(1, null, 'Chantier A', 1);
         const root_b: Building = makeBuilding(2, null, 'Chantier B', 2);
         buildings_subject.next([root_a, root_b]);
@@ -657,12 +666,12 @@ describe('BuildingsComponent - ngOnInit wiring', (): void => {
         component['filters_change'].next();
         expect(component['rows']().length).toBe(2);
 
-        tick(199);
+        await vi.advanceTimersByTimeAsync(199);
         expect(component['rows']().length).toBe(2);
 
-        tick(1);
+        await vi.advanceTimersByTimeAsync(1);
         expect(component['rows']().map((b: Building): number => b.id)).toEqual([1]);
-    }));
+    });
 
     it('re-renders the table rows once the API responds', (): void => {
         const root_a: Building = makeBuilding(1, null, 'Chantier A', 1);

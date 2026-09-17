@@ -1,6 +1,6 @@
-import { HttpRequest, provideHttpClient } from '@angular/common/http';
+import { HttpRequest, provideHttpClient, withXhr } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting, TestRequest } from '@angular/common/http/testing';
-import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { Observable, of } from 'rxjs';
 
@@ -46,33 +46,35 @@ describe('DigComponent', () => {
     beforeEach(async () => {
         await TestBed.configureTestingModule({
             imports: [DigComponent],
-            providers: [provideHttpClient(), provideHttpClientTesting()]
+            providers: [provideHttpClient(withXhr()), provideHttpClientTesting()]
         }).compileComponents();
 
         fixture = TestBed.createComponent(DigComponent);
         component = fixture.componentInstance;
         httpMock = TestBed.inject(HttpTestingController);
         // Le snackbar réel nécessite un provider d'animations non fourni ici — hors périmètre de ce composant.
-        spyOn(TestBed.inject(SnackbarService), 'successSnackbar');
+        vi.spyOn(TestBed.inject(SnackbarService), 'successSnackbar');
+        vi.useFakeTimers();
     });
 
     afterEach(() => {
         httpMock.verify();
+        vi.useRealTimers();
     });
 
-    it('n\'affiche rien tant que le setTimeout (effet du setter dig) n\'a pas été vidangé', fakeAsync(() => {
+    it('n\'affiche rien tant que le setTimeout (effet du setter dig) n\'a pas été vidangé', async () => {
         setup('update', makeDig());
         fixture.detectChanges();
 
         expect(fixture.nativeElement.querySelector('.dig')).toBeNull();
 
-        tick();
-    }));
+        await vi.advanceTimersByTimeAsync(0);
+    });
 
-    it('mode update : affiche la position et le décompte de la fouille existante après vidange du setTimeout', fakeAsync(() => {
+    it('mode update : affiche la position et le décompte de la fouille existante après vidange du setTimeout', async () => {
         setup('update', makeDig({ x: 7, y: 8, nb_success: 2, nb_total_dig: 5 }));
         fixture.detectChanges();
-        tick();
+        await vi.advanceTimersByTimeAsync(0);
         fixture.detectChanges();
 
         const text: string = fixture.nativeElement.textContent;
@@ -80,25 +82,25 @@ describe('DigComponent', () => {
         expect(text).toContain('2');
         expect(text).toContain('5');
         expect(fixture.nativeElement.querySelector('.values input')).toBeNull();
-    }));
+    });
 
-    it('mode registry : préremplit updated_dig avec la fouille reçue, sans clic', fakeAsync(() => {
+    it('mode registry : préremplit updated_dig avec la fouille reçue, sans clic', async () => {
         setup('registry', makeDig({ x: 1, y: 2 }));
         fixture.detectChanges();
-        tick();
+        await vi.advanceTimersByTimeAsync(0);
         fixture.detectChanges();
-        tick(); // vidange la microtâche interne de NgModel qui pousse la valeur vers le DOM
+        await vi.advanceTimersByTimeAsync(0); // vidange la microtâche interne de NgModel qui pousse la valeur vers le DOM
 
         const inputs: NodeListOf<HTMLInputElement> = fixture.nativeElement.querySelectorAll('.positions input');
         expect(inputs.length).toBe(2);
         expect(inputs[0].value).toBe('1');
         expect(inputs[1].value).toBe('2');
-    }));
+    });
 
-    it('mode creation sans fouille : affiche le bouton d\'ajout, puis bascule vers le formulaire après clic', fakeAsync(() => {
+    it('mode creation sans fouille : affiche le bouton d\'ajout, puis bascule vers le formulaire après clic', async () => {
         setup('creation', undefined);
         fixture.detectChanges();
-        tick();
+        await vi.advanceTimersByTimeAsync(0);
         fixture.detectChanges();
 
         expect(fixture.nativeElement.querySelector('.values')).toBeNull();
@@ -109,30 +111,34 @@ describe('DigComponent', () => {
         fixture.detectChanges();
 
         expect(fixture.nativeElement.querySelector('.values')).toBeTruthy();
-    }));
+    });
 
-    it('changeDigToUpdate sans fouille construit une nouvelle fouille à partir du citoyen/jour courants', fakeAsync(() => {
+    it('changeDigToUpdate sans fouille construit une nouvelle fouille à partir du citoyen/jour courants', async () => {
         const citizen: Citizen = makeCitizen(42, 'Alice');
         setup('creation', undefined, citizen);
         fixture.detectChanges();
-        tick();
+        await vi.advanceTimersByTimeAsync(0);
 
-        (component as unknown as { changeDigToUpdate(citizen: Citizen, dig?: Dig): void }).changeDigToUpdate(citizen);
+        (component as unknown as {
+            changeDigToUpdate(citizen: Citizen, dig?: Dig): void;
+        }).changeDigToUpdate(citizen);
         fixture.detectChanges();
-        tick(); // vidange la microtâche interne de NgModel qui pousse la valeur vers le DOM
+        await vi.advanceTimersByTimeAsync(0); // vidange la microtâche interne de NgModel qui pousse la valeur vers le DOM
 
         const inputs: NodeListOf<HTMLInputElement> = fixture.nativeElement.querySelectorAll('.values input');
         expect(inputs[0].value).toBe('0');
         expect(inputs[1].value).toBe('0');
-    }));
+    });
 
-    it('le bouton d\'annulation vide updated_dig hors mode registry', fakeAsync(() => {
+    it('le bouton d\'annulation vide updated_dig hors mode registry', async () => {
         setup('update', makeDig());
         fixture.detectChanges();
-        tick();
+        await vi.advanceTimersByTimeAsync(0);
         fixture.detectChanges();
 
-        (component as unknown as { changeDigToUpdate(citizen: Citizen, dig?: Dig): void })
+        (component as unknown as {
+            changeDigToUpdate(citizen: Citizen, dig?: Dig): void;
+        })
             .changeDigToUpdate(component.citizen(), makeDig());
         fixture.detectChanges();
         expect(fixture.nativeElement.querySelector('.values')).toBeTruthy();
@@ -144,15 +150,17 @@ describe('DigComponent', () => {
         // En mode 'update', vider updated_dig fait retomber sur la variante lecture seule (elle aussi
         // dans un <div class="values">) : seule la disparition des <input> distingue les deux états.
         expect(fixture.nativeElement.querySelector('.values input')).toBeNull();
-    }));
+    });
 
-    it('updateDig envoie la fouille modifiée, émet updatedDig et vide updated_dig (mode update)', fakeAsync(() => {
+    it('updateDig envoie la fouille modifiée, émet updatedDig et vide updated_dig (mode update)', async () => {
         setup('update', makeDig());
         fixture.detectChanges();
-        tick();
+        await vi.advanceTimersByTimeAsync(0);
         fixture.detectChanges();
 
-        (component as unknown as { changeDigToUpdate(citizen: Citizen, dig?: Dig): void })
+        (component as unknown as {
+            changeDigToUpdate(citizen: Citizen, dig?: Dig): void;
+        })
             .changeDigToUpdate(component.citizen(), makeDig());
         fixture.detectChanges();
 
@@ -168,12 +176,12 @@ describe('DigComponent', () => {
 
         expect(emitted.length).toBe(1);
         expect(fixture.nativeElement.querySelector('.values input')).toBeNull();
-    }));
+    });
 
-    it('updateDig conserve updated_dig en mode registry après enregistrement', fakeAsync(() => {
+    it('updateDig conserve updated_dig en mode registry après enregistrement', async () => {
         setup('registry', makeDig());
         fixture.detectChanges();
-        tick();
+        await vi.advanceTimersByTimeAsync(0);
         fixture.detectChanges();
 
         const save_button: HTMLButtonElement = fixture.nativeElement.querySelectorAll('.actions button')[0];
@@ -184,17 +192,17 @@ describe('DigComponent', () => {
         fixture.detectChanges();
 
         expect(fixture.nativeElement.querySelector('.values')).toBeTruthy();
-    }));
+    });
 
-    it('deleteDig, après confirmation, envoie la suppression et émet deletedDig', fakeAsync(() => {
+    it('deleteDig, après confirmation, envoie la suppression et émet deletedDig', async () => {
         const dig: Dig = makeDig();
         setup('update', dig);
         fixture.detectChanges();
-        tick();
+        await vi.advanceTimersByTimeAsync(0);
         fixture.detectChanges();
 
         const dialog: MatDialog = TestBed.inject(MatDialog);
-        spyOn(dialog, 'open').and.returnValue({ afterClosed: (): Observable<boolean> => of(true) } as unknown as MatDialogRef<unknown>);
+        vi.spyOn(dialog, 'open').mockReturnValue({ afterClosed: (): Observable<boolean> => of(true) } as unknown as MatDialogRef<unknown>);
 
         const emitted: Dig[] = [];
         component.deletedDig.subscribe((d: Dig) => emitted.push(d));
@@ -207,16 +215,16 @@ describe('DigComponent', () => {
 
         expect(emitted.length).toBe(1);
         expect(emitted[0]).toBe(dig);
-    }));
+    });
 
-    it('deleteDig n\'envoie rien si la confirmation est refusée', fakeAsync(() => {
+    it('deleteDig n\'envoie rien si la confirmation est refusée', async () => {
         setup('update', makeDig());
         fixture.detectChanges();
-        tick();
+        await vi.advanceTimersByTimeAsync(0);
         fixture.detectChanges();
 
         const dialog: MatDialog = TestBed.inject(MatDialog);
-        spyOn(dialog, 'open').and.returnValue({ afterClosed: (): Observable<boolean> => of(false) } as unknown as MatDialogRef<unknown>);
+        vi.spyOn(dialog, 'open').mockReturnValue({ afterClosed: (): Observable<boolean> => of(false) } as unknown as MatDialogRef<unknown>);
 
         const emitted: Dig[] = [];
         component.deletedDig.subscribe((d: Dig) => emitted.push(d));
@@ -226,5 +234,5 @@ describe('DigComponent', () => {
 
         httpMock.expectNone((r: HttpRequest<unknown>) => r.urlWithParams.startsWith(`${environment.api_url}/Fetcher/MapDigs`) && r.method === 'DELETE');
         expect(emitted.length).toBe(0);
-    }));
+    });
 });

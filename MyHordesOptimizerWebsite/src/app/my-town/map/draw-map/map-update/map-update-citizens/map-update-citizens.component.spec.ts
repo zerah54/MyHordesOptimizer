@@ -1,7 +1,7 @@
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withXhr } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
+import { ANIMATION_MODULE_TYPE } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { provideNoopAnimations } from '@angular/platform-browser/animations';
 
 import { Citizen } from '../../../../../_abstract_model/types/citizen.class';
 import { MapUpdateCitizensComponent } from './map-update-citizens.component';
@@ -21,7 +21,7 @@ describe('MapUpdateCitizensComponent', (): void => {
     beforeEach(async (): Promise<void> => {
         await TestBed.configureTestingModule({
             imports: [MapUpdateCitizensComponent],
-            providers: [provideHttpClient(), provideHttpClientTesting(), provideNoopAnimations()]
+            providers: [provideHttpClient(withXhr()), provideHttpClientTesting(), { provide: ANIMATION_MODULE_TYPE, useValue: 'NoopAnimations' }]
         }).compileComponents();
         fixture = TestBed.createComponent(MapUpdateCitizensComponent);
     });
@@ -66,7 +66,9 @@ describe('MapUpdateCitizensComponent', (): void => {
         const emitted: Citizen[][] = [];
         fixture.componentInstance.citizensChange.subscribe((value: Citizen[]) => emitted.push(value));
 
-        (<{ addCitizen(citizen: Citizen): void }>(<unknown>fixture.componentInstance)).addCitizen(newCitizen(1, 'Alice'));
+        (<{
+            addCitizen(citizen: Citizen): void;
+        }>(<unknown>fixture.componentInstance)).addCitizen(newCitizen(1, 'Alice'));
 
         expect(original.length).toBe(1); // le tableau reçu en entrée n'est pas muté en place
         expect(emitted.length).toBe(1);

@@ -1,8 +1,8 @@
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withXhr } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
+import { ANIMATION_MODULE_TYPE } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
-import { provideNoopAnimations } from '@angular/platform-browser/animations';
 
 import { Citizen } from '../../../../_abstract_model/types/citizen.class';
 import { CitizenInfo } from '../../../../_abstract_model/types/citizen-info.class';
@@ -12,8 +12,12 @@ import { setTown } from '../../../../_core/utilities/localstorage.util';
 import { DigsRegistryComponent } from './digs-registry.component';
 
 interface TestableComponent {
-    digs: { (): Dig[] };
-    current_day: { (): number };
+    digs: {
+        (): Dig[];
+    };
+    current_day: {
+        (): number;
+    };
     addCitizen(citizen: Citizen): void;
 }
 
@@ -35,7 +39,7 @@ describe('DigsRegistryComponent', (): void => {
 
         await TestBed.configureTestingModule({
             imports: [DigsRegistryComponent],
-            providers: [provideHttpClient(), provideHttpClientTesting(), provideNoopAnimations()]
+            providers: [provideHttpClient(withXhr()), provideHttpClientTesting(), { provide: ANIMATION_MODULE_TYPE, useValue: 'NoopAnimations' }]
         }).compileComponents();
 
         fixture = TestBed.createComponent(DigsRegistryComponent);

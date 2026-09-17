@@ -1,4 +1,4 @@
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withXhr } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 
@@ -16,7 +16,7 @@ describe('CitizenDayStateService', (): void => {
 
     beforeEach((): void => {
         TestBed.configureTestingModule({
-            providers: [provideHttpClient(), provideHttpClientTesting()]
+            providers: [provideHttpClient(withXhr()), provideHttpClientTesting()]
         });
         service = TestBed.inject(CitizenDayStateService);
         httpMock = TestBed.inject(HttpTestingController);
@@ -71,7 +71,7 @@ describe('CitizenDayStateService', (): void => {
             steps: []
         });
 
-        expect(completed).toBeTrue();
+        expect(completed).toBe(true);
     });
 
     it('getItemsWithStateImpact GET /CitizenState/ItemsWithStateImpact et renvoie les uids', (): void => {
@@ -127,6 +127,6 @@ describe('CitizenDayStateService', (): void => {
         expect(result?.[1]?.tier_reached_at_distance).toBe(11);
         expect(result?.[1]?.total_distance).toBe(11);
         expect(result?.[1]?.final_state.ap).toBe(6);
-        expect(completed).toBeTrue();
+        expect(completed).toBe(true);
     });
 });

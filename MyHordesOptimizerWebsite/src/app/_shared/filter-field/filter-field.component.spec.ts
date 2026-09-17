@@ -42,8 +42,13 @@ describe('FilterFieldComponent', (): void => {
         expect(emitted).toBe('abc');
     });
 
-    it('keeps the typed text visible after the change detection pass that follows the keystroke', (): void => {
+    // NgModel._updateValue() écrit la valeur DOM dans une micro-tâche (resolvedPromise.then()),
+    // pas synchrone à l'intérieur de detectChanges() : sans la vidanger ici, elle reste en
+    // attente et s'exécute pendant l'événement de frappe suivant, écrasant la saisie avec
+    // l'ancienne valeur (vue au moment de ce premier detectChanges).
+    it('keeps the typed text visible after the change detection pass that follows the keystroke', async (): Promise<void> => {
         fixture.detectChanges();
+        await Promise.resolve();
 
         typeInFilter(fixture, 'abc');
 

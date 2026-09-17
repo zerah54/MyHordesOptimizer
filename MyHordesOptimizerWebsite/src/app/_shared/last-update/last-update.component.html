@@ -1,46 +1,42 @@
 <div class="mho-last-update" [class.align-right]="alignRight()">
-    @let _lastUpdateInfo = lastUpdateInfo();
-    @if (_lastUpdateInfo && _lastUpdateInfo.update_time) {
-        <small>
-            @let _thresholds = thresholds();
-            @if (_thresholds) {
-                @let diff = moment.diff(_lastUpdateInfo.update_time, 'minutes');
-                @if (diff <= _thresholds[0]) {
-                    <ng-container *ngTemplateOutlet="img; context: {$implicit: 1}"></ng-container>
-                } @else if (diff <= _thresholds[1]) {
-                    <ng-container *ngTemplateOutlet="img; context: {$implicit: 2}"></ng-container>
-                } @else if (diff <= _thresholds[2]) {
-                    <ng-container *ngTemplateOutlet="img; context: {$implicit: 3}"></ng-container>
-                } @else if (diff <= _thresholds[3]) {
-                    <ng-container *ngTemplateOutlet="img; context: {$implicit: 4}"></ng-container>
-                } @else {
-                    <ng-container *ngTemplateOutlet="img; context: {$implicit: 5}"></ng-container>
-                }
-            }
-            @if (!hideDetails()) {
-                <span i18n>Mis à jour par&nbsp;{{ _lastUpdateInfo.username }}&nbsp;{{ _lastUpdateInfo.update_time.fromNow() }}</span>
-            }
-        </small>
-    } @else {
-        <small>
-            @if (noTooltip()) {
-                <img [ngSrc]="'img/time-ago/no_update.svg'" width="24" height="24">
-            } @else {
-                <img [ngSrc]="'img/time-ago/no_update.svg'" matTooltip="Jamais mis à jour" i18n-matTooltip width="24" height="24">
-            }
-            @if (!hideDetails()) {
-                <span i18n>Jamais mis à jour</span>
-            }
-        </small>
+    @let _lastUpdateInfo = lastUpdateInfo(); @if (_lastUpdateInfo && _lastUpdateInfo.update_time) {
+    <small>
+        @let _thresholds = thresholds(); @if (_thresholds) {
+        @let diff = moment.diff(_lastUpdateInfo.update_time, 'minutes'); @if (diff <= _thresholds[0]) {
+            <ng-container *ngTemplateOutlet="img; context: {$implicit: 1}"></ng-container>
+        } @else if (diff <= _thresholds[1]) {
+            <ng-container *ngTemplateOutlet="img; context: {$implicit: 2}"></ng-container>
+        } @else if (diff <= _thresholds[2]) {
+            <ng-container *ngTemplateOutlet="img; context: {$implicit: 3}"></ng-container>
+        } @else if (diff <= _thresholds[3]) {
+            <ng-container *ngTemplateOutlet="img; context: {$implicit: 4}"></ng-container>
+        } @else {
+            <ng-container *ngTemplateOutlet="img; context: {$implicit: 5}"></ng-container>
+        }
+    } @if (!hideDetails()) {
+        <span i18n>Mis à jour par&nbsp;{{ _lastUpdateInfo.username }}&nbsp;{{ _lastUpdateInfo.update_time.fromNow() }}</span>
     }
+    </small>
+} @else {
+    <small>
+        @if (noTooltip()) {
+            <img [ngSrc]="'img/time-ago/no_update.svg'" width="24" height="24">
+        } @else {
+        <img [ngSrc]="'img/time-ago/no_update.svg'" matTooltip="Jamais mis à jour" i18n-matTooltip width="24" height="24">
+    } @if (!hideDetails()) {
+        <span i18n>Jamais mis à jour</span>
+    }
+    </small>
+}
     <ng-template #img let-img_to_use>
         @if (hideDetails() && !noTooltip()) {
             <img [ngSrc]="'img/time-ago/time_ago_' + img_to_use + '.svg'"
-                 matTooltip="Mis à jour par&nbsp;{{_lastUpdateInfo?.username}}&nbsp;{{_lastUpdateInfo?.update_time?.fromNow()}}&nbsp;({{_lastUpdateInfo?.update_time?.toDate() | date:'medium'}})"
+                 matTooltip="Mis à jour par&nbsp;{{_lastUpdateInfo?.username}}&nbsp;{{_lastUpdateInfo?.update_time?.fromNow()}}&nbsp;({{$safeNavigationMigration(_lastUpdateInfo?.update_time?.toDate()) | date:'medium'}})"
                  i18n-matTooltip width="24" height="24">
         } @else {
-            <img [ngSrc]="'img/time-ago/time_ago_' + img_to_use + '.svg'"
-                 [matTooltip]="noTooltip() ? '' : ((_lastUpdateInfo?.update_time?.toDate() | date:'medium') || '')" width="24" height="24">
-        }
+        <img [ngSrc]="'img/time-ago/time_ago_' + img_to_use + '.svg'"
+             [matTooltip]="noTooltip() ? '' : (($safeNavigationMigration(_lastUpdateInfo?.update_time?.toDate()) | date:'medium') || '')" width="24"
+             height="24">
+    }
     </ng-template>
 </div>

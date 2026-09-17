@@ -1,4 +1,4 @@
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withXhr } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatSidenavContainer } from '@angular/material/sidenav';
@@ -28,13 +28,24 @@ interface Theme {
 }
 
 interface TestableComponent {
-    selected_theme: { (): Theme | undefined };
-    site_language: { code: string; label: string; default?: boolean } | undefined;
+    selected_theme: {
+        (): Theme | undefined;
+    };
+    site_language: {
+        code: string;
+        label: string;
+        default?: boolean;
+    } | undefined;
     routes: SidenavLink[];
-    sidenavContainer: { set(value: MatSidenavContainer): void };
+    sidenavContainer: {
+        set(value: MatSidenavContainer): void;
+    };
     ngOnInit(): void;
     changeTheme(theme: Theme): void;
-    changeLanguage(language: { code: string; label: string }): void;
+    changeLanguage(language: {
+        code: string;
+        label: string;
+    }): void;
     toggleDisplayChildren(route: SidenavLink): void;
     resolvePath(route: SidenavLink): string | undefined;
     resolveLabel(route: SidenavLink): string;
@@ -54,10 +65,10 @@ describe('MenuComponent', (): void => {
         // `changeTheme`/`changeLanguage`/`resizeSidenav` planifient un `setTimeout` : avec un timer réel,
         // le callback peut s'exécuter après le teardown Jasmine (spies restaurés) et déclencher un vrai
         // rechargement de page pendant un AUTRE test. Horloge falsifiée pour rester synchrone.
-        jasmine.clock().install();
+        vi.useFakeTimers();
         await TestBed.configureTestingModule({
             imports: [MenuComponent],
-            providers: [provideHttpClient(), provideHttpClientTesting()]
+            providers: [provideHttpClient(withXhr()), provideHttpClientTesting()]
         }).compileComponents();
 
         fixture = TestBed.createComponent(MenuComponent);
@@ -65,15 +76,15 @@ describe('MenuComponent', (): void => {
         testable = component as unknown as TestableComponent;
         testable.sidenavContainer.set({ autosize: false } as unknown as MatSidenavContainer);
         townContext = TestBed.inject(TownContextService);
-        spyOn(TestBed.inject(AdminService), 'checkIsAdmin').and.returnValue(of(false));
+        vi.spyOn(TestBed.inject(AdminService), 'checkIsAdmin').mockReturnValue(of(false));
         // `changeTheme`/`changeLanguage` planifient `this.document.location.reload()` : `location.reload`
         // n'est ni espionnable ni redéfinissable sous Chrome Headless (voir header.component.spec.ts).
-        spyOn(testable, 'reloadPage' as never);
+        vi.spyOn(testable, 'reloadPage' as never);
     });
 
     afterEach((): void => {
-        jasmine.clock().tick(1);
-        jasmine.clock().uninstall();
+        vi.advanceTimersByTime(1);
+        vi.useRealTimers();
         localStorage.clear();
         setUser(null);
         setTown(null);
@@ -84,7 +95,7 @@ describe('MenuComponent', (): void => {
             const theme: Theme = { label: 'Rose', class: 'pink' };
 
             testable.changeTheme(theme);
-            jasmine.clock().tick(1);
+            vi.advanceTimersByTime(1);
 
             expect(testable.selected_theme()).toBe(theme);
             expect(localStorage.getItem('theme')).toBe('pink');
@@ -94,10 +105,13 @@ describe('MenuComponent', (): void => {
 
     describe('changeLanguage', (): void => {
         it('sets the selected language and persists the choice', (): void => {
-            const language: { code: string; label: string } = { code: 'de', label: 'Deutsch' };
+            const language: {
+                code: string;
+                label: string;
+            } = { code: 'de', label: 'Deutsch' };
 
             testable.changeLanguage(language);
-            jasmine.clock().tick(1);
+            vi.advanceTimersByTime(1);
 
             expect(testable.site_language).toBe(language as never);
             expect(localStorage.getItem('mho-locale')).toBe('de');
@@ -115,7 +129,7 @@ describe('MenuComponent', (): void => {
             const route: SidenavLink = { label: 'r', displayed: true, expanded: true, authorized: (): boolean => true, spoil: false, children: [child] };
 
             testable.toggleDisplayChildren(route);
-            jasmine.clock().tick(1);
+            vi.advanceTimersByTime(1);
 
             expect(child.displayed).toBe(true);
             expect(grandchild.displayed).toBe(false);
@@ -131,7 +145,7 @@ describe('MenuComponent', (): void => {
 
     describe('resolvePath', (): void => {
         it('returns the town-relative path for a townSuffix route, prefixed by "my-town" outside observer mode', (): void => {
-            spyOn(townContext, 'observedTown').and.returnValue(null);
+            vi.spyOn(townContext, 'observedTown').mockReturnValue(null);
             const route: SidenavLink = { label: 'Banque', townSuffix: 'bank', displayed: true, authorized: (): boolean => true, spoil: false };
 
             expect(testable.resolvePath(route)).toBe('my-town/bank');
@@ -146,15 +160,15 @@ describe('MenuComponent', (): void => {
 
     describe('resolveLabel', (): void => {
         it('returns the plain label when not observing a town', (): void => {
-            spyOn(townContext, 'isReadonly').and.returnValue(false);
+            vi.spyOn(townContext, 'isReadonly').mockReturnValue(false);
             const route: SidenavLink = { label: 'Ma ville', isTownRoot: true, displayed: true, authorized: (): boolean => true, spoil: false };
 
             expect(testable.resolveLabel(route)).toBe('Ma ville');
         });
 
         it('returns the observed town name when in observer mode for the town-root route', (): void => {
-            spyOn(townContext, 'isReadonly').and.returnValue(true);
-            spyOn(townContext, 'observedTownName').and.returnValue('Ville-Test');
+            vi.spyOn(townContext, 'isReadonly').mockReturnValue(true);
+            vi.spyOn(townContext, 'observedTownName').mockReturnValue('Ville-Test');
             const route: SidenavLink = { label: 'Ma ville', isTownRoot: true, displayed: true, authorized: (): boolean => true, spoil: false };
 
             expect(testable.resolveLabel(route)).toBe('Ville-Test');

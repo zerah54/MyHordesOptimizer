@@ -1,7 +1,8 @@
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withXhr } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { of, Subject } from 'rxjs';
+import type { MockedObject } from 'vitest';
 
 import { ApiService } from '../../_abstract_model/services/api.service';
 import { CitizenDayStateService } from '../../_abstract_model/services/citizen-day-state.service';
@@ -23,35 +24,39 @@ function buildItem(id: number, uid: string): Item {
 describe('StateManagerComponent', (): void => {
     let fixture: ComponentFixture<StateManagerComponent>;
     let component: StateManagerComponent;
-    let state_service: jasmine.SpyObj<CitizenDayStateService>;
+    let state_service: MockedObject<CitizenDayStateService>;
 
     beforeEach((): void => {
-        state_service = jasmine.createSpyObj('CitizenDayStateService', ['simulate', 'getItemsWithStateImpact', 'rankOrders']);
-        state_service.simulate.and.returnValue(of(new CitizenStateTrace({
+        state_service = {
+            simulate: vi.fn().mockName('CitizenDayStateService.simulate'),
+            getItemsWithStateImpact: vi.fn().mockName('CitizenDayStateService.getItemsWithStateImpact'),
+            rankOrders: vi.fn().mockName('CitizenDayStateService.rankOrders')
+        } as unknown as MockedObject<CitizenDayStateService>;
+        state_service.simulate.mockReturnValue(of(new CitizenStateTrace({
             startingState: { ap: 6, sp: 0, wounded: false, isEclaireur: false, hasBike: false, hasShoes: false, walkingDistance: 0, isDead: false, statuses: [] },
             steps: []
         })));
-        state_service.getItemsWithStateImpact.and.returnValue(of<string[]>([]));
-        state_service.rankOrders.and.returnValue(of<RankedOrder[]>([]));
+        state_service.getItemsWithStateImpact.mockReturnValue(of<string[]>([]));
+        state_service.rankOrders.mockReturnValue(of<RankedOrder[]>([]));
 
         TestBed.configureTestingModule({
             imports: [StateManagerComponent],
             providers: [
-                provideHttpClient(),
+                provideHttpClient(withXhr()),
                 provideHttpClientTesting(),
                 { provide: CitizenDayStateService, useValue: state_service }
             ]
         });
 
-        spyOn(TestBed.inject(ApiService), 'getItems').and.returnValue(of<Item[]>([]));
+        vi.spyOn(TestBed.inject(ApiService), 'getItems').mockReturnValue(of<Item[]>([]));
 
         fixture = TestBed.createComponent(StateManagerComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
 
         // ngOnInit appelle compute() (calcul du PDC de départ) : on repart d'un compteur à zéro pour chaque test.
-        state_service.simulate.calls.reset();
-        state_service.rankOrders.calls.reset();
+        state_service.simulate.mockClear();
+        state_service.rankOrders.mockClear();
     });
 
     it('addMoveStep ajoute une étape et déclenche aussitôt le calcul (pas de bouton "Simuler")', (): void => {
@@ -59,19 +64,19 @@ describe('StateManagerComponent', (): void => {
 
         expect(component['steps'].length).toBe(1);
         expect(component['steps'][0].step.type).toBe('move');
-        expect(component['steps'][0].step.is_near_zone).toBeTrue();
+        expect(component['steps'][0].step.is_near_zone).toBe(true);
         expect(state_service.simulate).toHaveBeenCalledTimes(1);
     });
 
     it('removeStep retire l\'étape à l\'index donné et déclenche aussitôt le calcul', (): void => {
         component['addMoveStep'](true);
         component['addMoveStep'](false);
-        state_service.simulate.calls.reset();
+        state_service.simulate.mockClear();
 
         component['removeStep'](0);
 
         expect(component['steps'].length).toBe(1);
-        expect(component['steps'][0].step.is_near_zone).toBeFalse();
+        expect(component['steps'][0].step.is_near_zone).toBe(false);
         expect(state_service.simulate).toHaveBeenCalledTimes(1);
     });
 
@@ -80,7 +85,7 @@ describe('StateManagerComponent', (): void => {
             description: 'Déplacement (zone proche)',
             stateAfter: { ap: 5, sp: 0, wounded: false, isEclaireur: false, hasBike: false, hasShoes: false, walkingDistance: 1, isDead: false, statuses: [] }
         });
-        state_service.simulate.and.returnValue(of(new CitizenStateTrace({
+        state_service.simulate.mockReturnValue(of(new CitizenStateTrace({
             startingState: { ap: 6, sp: 0, wounded: false, isEclaireur: false, hasBike: false, hasShoes: false, walkingDistance: 0, isDead: false, statuses: [] },
             steps: [result.modelToDto()]
         })));
@@ -98,11 +103,11 @@ describe('StateManagerComponent', (): void => {
 
         expect(component['rows']().length).toBe(0);
         expect(state_service.simulate).toHaveBeenCalledTimes(1);
-        expect(state_service.simulate.calls.mostRecent().args[1]).toEqual([]);
+        expect(vi.mocked(state_service.simulate).mock.lastCall![1]).toEqual([]);
     });
 
     it('compute calcule un pdc de départ non nul (serveur), reflété par currentState avant toute étape', (): void => {
-        state_service.simulate.and.returnValue(of(new CitizenStateTrace({
+        state_service.simulate.mockReturnValue(of(new CitizenStateTrace({
             startingState: { ap: 6, sp: 0, wounded: false, isEclaireur: false, hasBike: false, hasShoes: false, walkingDistance: 0, isDead: false, statuses: [], pdc: 4 },
             steps: []
         })));
@@ -167,13 +172,13 @@ describe('StateManagerComponent', (): void => {
         component['addToBag'](1);
 
         expect(state_service.rankOrders).toHaveBeenCalledTimes(1);
-        expect(state_service.rankOrders.calls.mostRecent().args[1]).toEqual([1]);
+        expect(vi.mocked(state_service.rankOrders).mock.lastCall![1]).toEqual([1]);
     });
 
     it('best_order est peuplé selon le 1er candidat renvoyé par le service, doublons gérés', (): void => {
         const item1: Item = buildItem(1, 'water_#00');
         const item2: Item = buildItem(2, 'bandage_#00');
-        state_service.rankOrders.and.returnValue(of<RankedOrder[]>([
+        state_service.rankOrders.mockReturnValue(of<RankedOrder[]>([
             new RankedOrder({
                 order: [2, 1], tier: 'none', tierReachedAtDistance: null, totalDistance: 6, totalAp: 6, totalSp: 0,
                 finalState: { ap: 6, sp: 0, wounded: false, isEclaireur: false, hasBike: false, hasShoes: false, walkingDistance: 0, isDead: false, statuses: [] }
@@ -192,7 +197,7 @@ describe('StateManagerComponent', (): void => {
         const item2: Item = buildItem(2, 'bandage_#00');
         const stale$: Subject<RankedOrder[]> = new Subject<RankedOrder[]>();
         const fresh$: Subject<RankedOrder[]> = new Subject<RankedOrder[]>();
-        state_service.rankOrders.and.returnValues(stale$, fresh$);
+        state_service.rankOrders.mockReturnValueOnce(stale$).mockReturnValueOnce(fresh$);
         component['items'] = [item1, item2];
         const final_state = { ap: 6, sp: 0, wounded: false, isEclaireur: false, hasBike: false, hasShoes: false, walkingDistance: 0, isDead: false, statuses: [] };
 
@@ -208,7 +213,7 @@ describe('StateManagerComponent', (): void => {
 
     it('useItem consomme un objet du sac restant mais le classement reste basé sur le sac de départ complet', (): void => {
         const item: Item = buildItem(1, 'water_#00');
-        state_service.rankOrders.and.returnValue(of<RankedOrder[]>([
+        state_service.rankOrders.mockReturnValue(of<RankedOrder[]>([
             new RankedOrder({
                 order: [1], tier: 'none', tierReachedAtDistance: null, totalDistance: 6, totalAp: 6, totalSp: 0,
                 finalState: { ap: 6, sp: 0, wounded: false, isEclaireur: false, hasBike: false, hasShoes: false, walkingDistance: 0, isDead: false, statuses: [] }
@@ -216,17 +221,17 @@ describe('StateManagerComponent', (): void => {
         ]));
         component['items'] = [item];
         component['addToBag'](1);
-        state_service.rankOrders.calls.reset();
+        state_service.rankOrders.mockClear();
 
         component['useItem'](item);
 
         expect(state_service.rankOrders).toHaveBeenCalledTimes(1);
-        expect(state_service.rankOrders.calls.mostRecent().args[1]).toEqual([1]);
+        expect(vi.mocked(state_service.rankOrders).mock.lastCall![1]).toEqual([1]);
         expect(component['best_order']()).toEqual([item]);
     });
 
     it('sac vide : pas d\'appel réseau, best_order/ranked_orders restent vides', (): void => {
-        state_service.rankOrders.calls.reset();
+        state_service.rankOrders.mockClear();
 
         component['emptyBagContent']();
 
@@ -241,7 +246,7 @@ describe('StateManagerComponent', (): void => {
         const final_state: CitizenState = new CitizenState({
             ap: 5, sp: 0, wounded: false, isEclaireur: false, hasBike: false, hasShoes: false, walkingDistance: 0, isDead: false, statuses: []
         });
-        state_service.rankOrders.and.returnValue(of<RankedOrder[]>([
+        state_service.rankOrders.mockReturnValue(of<RankedOrder[]>([
             new RankedOrder({
                 order: [2, 1], tier: 'thirsty', tierReachedAtDistance: 11, totalDistance: 11, totalAp: 6, totalSp: 5, // clé stable renvoyée par l'API, traduite par le composant
                 finalState: { ap: 5, sp: 0, wounded: false, isEclaireur: false, hasBike: false, hasShoes: false, walkingDistance: 0, isDead: false, statuses: [] }
@@ -261,26 +266,26 @@ describe('StateManagerComponent', (): void => {
     });
 
     it('addMountBikeStep puis addDismountBikeStep : monter à vélo redevient impossible', (): void => {
-        expect(component['canMountBike']()).toBeTrue();
-        expect(component['canDismountBike']()).toBeFalse();
+        expect(component['canMountBike']()).toBe(true);
+        expect(component['canDismountBike']()).toBe(false);
 
         component['addMountBikeStep']();
-        expect(component['canMountBike']()).toBeFalse();
-        expect(component['canDismountBike']()).toBeTrue();
+        expect(component['canMountBike']()).toBe(false);
+        expect(component['canDismountBike']()).toBe(true);
 
         component['addDismountBikeStep']();
-        expect(component['canDismountBike']()).toBeFalse();
-        expect(component['canMountBike']()).toBeFalse(); // vélo déjà utilisé aujourd'hui, pas de remontée
+        expect(component['canDismountBike']()).toBe(false);
+        expect(component['canMountBike']()).toBe(false); // vélo déjà utilisé aujourd'hui, pas de remontée
 
         expect(component['steps'].map((entry) => entry.step.type)).toEqual(['mount_bike', 'dismount_bike']);
     });
 
     it('addEquipShoesStep : chausser les baskets n\'est possible qu\'une fois', (): void => {
-        expect(component['canEquipShoes']()).toBeTrue();
+        expect(component['canEquipShoes']()).toBe(true);
 
         component['addEquipShoesStep']();
 
-        expect(component['canEquipShoes']()).toBeFalse();
+        expect(component['canEquipShoes']()).toBe(false);
         expect(component['steps'][0].step.type).toBe('equip_shoes');
         expect(state_service.simulate).toHaveBeenCalledTimes(1);
     });
@@ -288,13 +293,13 @@ describe('StateManagerComponent', (): void => {
     it('has_bike initial à true : vélo déjà utilisé aujourd\'hui, remonter impossible après être descendu', (): void => {
         component['has_bike'] = true;
 
-        expect(component['canMountBike']()).toBeFalse();
-        expect(component['canDismountBike']()).toBeTrue();
+        expect(component['canMountBike']()).toBe(false);
+        expect(component['canDismountBike']()).toBe(true);
 
         component['addDismountBikeStep']();
 
-        expect(component['canMountBike']()).toBeFalse();
-        expect(component['canDismountBike']()).toBeFalse();
+        expect(component['canMountBike']()).toBe(false);
+        expect(component['canDismountBike']()).toBe(false);
     });
 
     it('buildStartingState transmet les champs PDC au service', (): void => {
@@ -309,15 +314,15 @@ describe('StateManagerComponent', (): void => {
 
         component['addMoveStep'](true);
 
-        const sent_state = state_service.simulate.calls.mostRecent().args[0];
-        expect(sent_state.has_shield).toBeTrue();
-        expect(sent_state.has_defence_cp_item).toBeTrue();
-        expect(sent_state.is_guide).toBeTrue();
+        const sent_state = vi.mocked(state_service.simulate).mock.lastCall![0];
+        expect(sent_state.has_shield).toBe(true);
+        expect(sent_state.has_defence_cp_item).toBe(true);
+        expect(sent_state.is_guide).toBe(true);
         expect(sent_state.zone_citizen_count).toBe(4);
-        expect(sent_state.has_clean_pdc_perk).toBeTrue();
-        expect(sent_state.has_hydrated_pdc_perk).toBeTrue();
-        expect(sent_state.has_sober_pdc_perk).toBeTrue();
-        expect(sent_state.has_base_zone_control_perk).toBeTrue();
+        expect(sent_state.has_clean_pdc_perk).toBe(true);
+        expect(sent_state.has_hydrated_pdc_perk).toBe(true);
+        expect(sent_state.has_sober_pdc_perk).toBe(true);
+        expect(sent_state.has_base_zone_control_perk).toBe(true);
     });
 
     it('buildStartingState transmet is_role_ghoul au service', (): void => {
@@ -325,32 +330,32 @@ describe('StateManagerComponent', (): void => {
 
         component['addMoveStep'](true);
 
-        const sent_state = state_service.simulate.calls.mostRecent().args[0];
-        expect(sent_state.is_role_ghoul).toBeTrue();
+        const sent_state = vi.mocked(state_service.simulate).mock.lastCall![0];
+        expect(sent_state.is_role_ghoul).toBe(true);
     });
 
     it('addBecomeGhoulStep : se goulifier n\'est possible qu\'une fois', (): void => {
-        expect(component['canBecomeGhoul']()).toBeTrue();
+        expect(component['canBecomeGhoul']()).toBe(true);
 
         component['addBecomeGhoulStep']();
 
-        expect(component['canBecomeGhoul']()).toBeFalse();
+        expect(component['canBecomeGhoul']()).toBe(false);
         expect(component['steps'][0].step.type).toBe('become_ghoul');
     });
 
     it('is_role_ghoul initial à true : se goulifier est déjà impossible', (): void => {
         component['is_role_ghoul'] = true;
 
-        expect(component['canBecomeGhoul']()).toBeFalse();
+        expect(component['canBecomeGhoul']()).toBe(false);
     });
 
     it('addSecondWindStep : n\'est possible qu\'une fois, avec le niveau sélectionné', (): void => {
         component['second_wind_level'] = 2;
-        expect(component['canUseSecondWind']()).toBeTrue();
+        expect(component['canUseSecondWind']()).toBe(true);
 
         component['addSecondWindStep']();
 
-        expect(component['canUseSecondWind']()).toBeFalse();
+        expect(component['canUseSecondWind']()).toBe(false);
         expect(component['steps'][0].step.type).toBe('second_wind');
         expect(component['steps'][0].step.level).toBe(2);
     });
@@ -360,24 +365,24 @@ describe('StateManagerComponent', (): void => {
 
         component['addMoveStep'](true);
 
-        const sent_state = state_service.simulate.calls.mostRecent().args[0];
+        const sent_state = vi.mocked(state_service.simulate).mock.lastCall![0];
         expect(sent_state.statuses).toContain('wound1');
         expect(sent_state.statuses).not.toContain('tg_meta_wound'); // tag interne sans icône, redondant (Remove purge toute la famille)
     });
 
     it('addPickupDefenceCpItemStep ajoute l\'étape et rend le ramassage indisponible ensuite', (): void => {
-        expect(component['canPickupDefenceCpItem']()).toBeTrue();
+        expect(component['canPickupDefenceCpItem']()).toBe(true);
 
         component['addPickupDefenceCpItemStep']();
 
         expect(component['steps'][0].step.type).toBe('pickup_defence_cp_item');
-        expect(component['canPickupDefenceCpItem']()).toBeFalse();
+        expect(component['canPickupDefenceCpItem']()).toBe(false);
     });
 
     it('canMove est faux à 0 PA/0 PE sans objet en sac, vrai si le sac contient un objet', (): void => {
         // compute() explicite : reflète le binding réel du stepper ((valueChange)="ap = $event; compute()"),
         // currentState() lit computed_starting_state (calculé serveur) et non les champs bruts.
-        state_service.simulate.and.returnValue(of(new CitizenStateTrace({
+        state_service.simulate.mockReturnValue(of(new CitizenStateTrace({
             startingState: { ap: 0, sp: 0, wounded: false, isEclaireur: false, hasBike: false, hasShoes: false, walkingDistance: 0, isDead: false, statuses: [] },
             steps: []
         })));
@@ -385,11 +390,11 @@ describe('StateManagerComponent', (): void => {
         component['sp'] = 0;
         component['compute']();
 
-        expect(component['canMove']()).toBeFalse();
+        expect(component['canMove']()).toBe(false);
 
         component['starting_bag'] = [buildItem(1, 'water_#00')];
 
-        expect(component['canMove']()).toBeTrue();
+        expect(component['canMove']()).toBe(true);
     });
 
     it('orderedRemainingBag trie le sac restant selon best_order', (): void => {
@@ -414,7 +419,7 @@ describe('StateManagerComponent', (): void => {
         // pdc est calculé côté serveur, jamais renvoyé par CitizenState.modelToDto() (voir sa
         // doc) : on passe donc le DTO brut attendu de la réponse HTTP directement, sans repasser
         // par CitizenStateStepResult.modelToDto() qui perdrait le champ.
-        state_service.simulate.and.returnValue(of(new CitizenStateTrace({
+        state_service.simulate.mockReturnValue(of(new CitizenStateTrace({
             startingState: { ap: 6, sp: 0, wounded: false, isEclaireur: false, hasBike: false, hasShoes: false, walkingDistance: 0, isDead: false, statuses: [], pdc: 2 },
             steps: [{
                 description: 'Déplacement (zone proche)',

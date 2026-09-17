@@ -19,8 +19,12 @@ function pointer(fixture: ComponentFixture<CompassRoseComponent>, cssClass: stri
     return fixture.debugElement.query(By.css(`.${cssClass}`)).nativeElement;
 }
 
-function captureEmission(fixture: ComponentFixture<CompassRoseComponent>): { value: Dictionary<boolean> | undefined } {
-    const captured: { value: Dictionary<boolean> | undefined } = { value: undefined };
+function captureEmission(fixture: ComponentFixture<CompassRoseComponent>): {
+    value: Dictionary<boolean> | undefined;
+} {
+    const captured: {
+        value: Dictionary<boolean> | undefined;
+    } = { value: undefined };
     fixture.componentInstance.selectedScrutZoneChange.subscribe((value: Dictionary<boolean>): void => { captured.value = value; });
     return captured;
 }

@@ -29,6 +29,6 @@ describe('ThanksComponent', (): void => {
     it('has a close button wired to mat-dialog-close', (): void => {
         const closeButton: HTMLButtonElement = fixture.debugElement.query(By.css('.close-button')).nativeElement;
 
-        expect(closeButton.hasAttribute('mat-dialog-close')).toBeTrue();
+        expect(closeButton.hasAttribute('mat-dialog-close')).toBe(true);
     });
 });

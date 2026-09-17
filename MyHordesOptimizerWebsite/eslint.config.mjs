@@ -1,100 +1,81 @@
-import path from "node:path";
-import {fileURLToPath} from "node:url";
-import js from "@eslint/js";
-import {FlatCompat} from "@eslint/eslintrc";
+import eslint from "@eslint/js";
 import simpleImportSort from "eslint-plugin-simple-import-sort";
+import tseslint from "typescript-eslint";
+import angular from "angular-eslint";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const compat = new FlatCompat({
-    baseDirectory: __dirname,
-    recommendedConfig: js.configs.recommended,
-    allConfig: js.configs.all
-});
-
-export default [{
-    ignores: ["projects/**/*", "*/**/test.ts", "*/**/typings.d.ts"],
-}, ...compat.extends(
-    "eslint:recommended",
-    "plugin:@typescript-eslint/recommended",
-    "plugin:@angular-eslint/recommended",
-    "plugin:@angular-eslint/template/process-inline-templates",
-).map(config => ({
-    ...config,
-    files: ["**/*.ts"],
-})), {
-    files: ["**/*.ts"],
-
-    plugins: {
-        "simple-import-sort": simpleImportSort,
+export default tseslint.config(
+    {
+        ignores: ["projects/**/*", "*/**/test.ts", "*/**/typings.d.ts"],
     },
+    {
+        files: ["**/*.ts"],
+        extends: [
+            eslint.configs.recommended,
+            ...tseslint.configs.recommended,
+            ...angular.configs.tsRecommended,
+        ],
+        processor: angular.processInlineTemplates,
+        plugins: {
+            "simple-import-sort": simpleImportSort,
+        },
+        rules: {
+            "@angular-eslint/use-lifecycle-interface": "error",
 
-    languageOptions: {
-        ecmaVersion: 5,
-        sourceType: "script",
+            "@angular-eslint/component-selector": ["error", {
+                prefix: "mho",
+                style: "kebab-case",
+                type: "element",
+            }],
 
-        parserOptions: {
-            project: ["tsconfig.json"],
-            createDefaultProgram: true,
+            "@angular-eslint/directive-selector": ["error", {
+                prefix: "mho",
+                style: "camelCase",
+                type: "attribute",
+            }],
+
+            indent: ["error", 4, {
+                SwitchCase: 1,
+                FunctionDeclaration: {
+                    parameters: 'first'
+                },
+                FunctionExpression: {
+                    parameters: 'first'
+                },
+                CallExpression: {
+                    arguments: 'first'
+                },
+                ArrayExpression: 'first',
+                ObjectExpression: 'first',
+                ImportDeclaration: 'first'
+            }],
+            semi: ["warn", "always"],
+            quotes: ["warn", "single"],
+            "simple-import-sort/imports": "error",
+            "object-curly-spacing": ["warn", "always"],
+            eqeqeq: ["error", "always"],
+            "@typescript-eslint/no-inferrable-types": "off",
+            "@typescript-eslint/explicit-function-return-type": "error",
+            "@typescript-eslint/explicit-member-accessibility": "error",
+
+            "@typescript-eslint/typedef": ["error", {
+                arrayDestructuring: true,
+                arrowParameter: true,
+                memberVariableDeclaration: true,
+                objectDestructuring: true,
+                parameter: true,
+                propertyDeclaration: true,
+                variableDeclaration: true,
+                variableDeclarationIgnoreFunction: true,
+            }],
+
+            "@typescript-eslint/array-type": "warn"
         },
     },
-
-    rules: {
-        "@angular-eslint/use-lifecycle-interface": "error",
-
-        "@angular-eslint/component-selector": ["error", {
-            prefix: "mho",
-            style: "kebab-case",
-            type: "element",
-        }],
-
-        "@angular-eslint/directive-selector": ["error", {
-            prefix: "mho",
-            style: "camelCase",
-            type: "attribute",
-        }],
-
-        indent: ["error", 4, {
-            SwitchCase: 1,
-            FunctionDeclaration: {
-                parameters: 'first'
-            },
-            FunctionExpression: {
-                parameters: 'first'
-            },
-            CallExpression: {
-                arguments: 'first'
-            },
-            ArrayExpression: 'first',
-            ObjectExpression: 'first',
-            ImportDeclaration: 'first'
-        }],
-        semi: ["warn", "always"],
-        quotes: ["warn", "single"],
-        "simple-import-sort/imports": "error",
-        "object-curly-spacing": ["warn", "always"],
-        eqeqeq: ["error", "always"],
-        "@typescript-eslint/no-inferrable-types": "off",
-        "@typescript-eslint/explicit-function-return-type": "error",
-        "@typescript-eslint/explicit-member-accessibility": "error",
-
-        "@typescript-eslint/typedef": ["error", {
-            arrayDestructuring: true,
-            arrowParameter: true,
-            memberVariableDeclaration: true,
-            objectDestructuring: true,
-            parameter: true,
-            propertyDeclaration: true,
-            variableDeclaration: true,
-            variableDeclarationIgnoreFunction: true,
-        }],
-
-        "@typescript-eslint/array-type": "warn"
+    {
+        files: ["**/*.html"],
+        extends: [
+            ...angular.configs.templateRecommended,
+        ],
+        rules: {},
     },
-}, ...compat.extends("plugin:@angular-eslint/template/recommended").map(config => ({
-    ...config,
-    files: ["**/*.html"],
-})), {
-    files: ["**/*.html"],
-    rules: {},
-}];
+);

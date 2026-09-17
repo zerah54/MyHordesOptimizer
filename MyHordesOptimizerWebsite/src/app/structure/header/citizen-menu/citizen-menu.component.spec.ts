@@ -1,8 +1,9 @@
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withXhr } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatMenuTrigger } from '@angular/material/menu';
 import { of, throwError } from 'rxjs';
+import type { MockedObject } from 'vitest';
 
 import { StatusEnum } from '../../../_abstract_model/enum/status.enum';
 import { ApiService } from '../../../_abstract_model/services/api.service';
@@ -19,10 +20,18 @@ import { UpdateInfo } from '../../../_abstract_model/types/update-info.class';
 import { CitizenMenuComponent } from './citizen-menu.component';
 
 interface TestableComponent {
-    citizen: { (): Citizen | undefined; set(value: Citizen | undefined): void };
-    current_day: { (): number };
+    citizen: {
+        (): Citizen | undefined;
+        set(value: Citizen | undefined): void;
+    };
+    current_day: {
+        (): number;
+    };
     all_items: Item[];
-    bag_lists: { (): ListForAddRemove[]; set(value: ListForAddRemove[]): void };
+    bag_lists: {
+        (): ListForAddRemove[];
+        set(value: ListForAddRemove[]): void;
+    };
     status_trigger: () => MatMenuTrigger | undefined;
     bag_trigger: () => MatMenuTrigger | undefined;
     daily_actions_trigger: () => MatMenuTrigger | undefined;
@@ -73,7 +82,7 @@ describe('CitizenMenuComponent', (): void => {
     beforeEach(async (): Promise<void> => {
         await TestBed.configureTestingModule({
             imports: [CitizenMenuComponent],
-            providers: [provideHttpClient(), provideHttpClientTesting()]
+            providers: [provideHttpClient(withXhr()), provideHttpClientTesting()]
         }).compileComponents();
 
         fixture = TestBed.createComponent(CitizenMenuComponent);
@@ -121,7 +130,7 @@ describe('CitizenMenuComponent', (): void => {
 
         it('loads items and builds a single "all items" bag list', (): void => {
             const items: Item[] = [makeItem(1), makeItem(2)];
-            spyOn(apiService, 'getItems').and.returnValue(of(items));
+            vi.spyOn(apiService, 'getItems').mockReturnValue(of(items));
 
             fixture.detectChanges();
 
@@ -132,11 +141,21 @@ describe('CitizenMenuComponent', (): void => {
 
     describe('closeOtherMenus', (): void => {
         it('closes every trigger except the one that just opened', (): void => {
-            const status_trigger: jasmine.SpyObj<MatMenuTrigger> = jasmine.createSpyObj('MatMenuTrigger', ['closeMenu']);
-            const bag_trigger: jasmine.SpyObj<MatMenuTrigger> = jasmine.createSpyObj('MatMenuTrigger', ['closeMenu']);
-            const daily_actions_trigger: jasmine.SpyObj<MatMenuTrigger> = jasmine.createSpyObj('MatMenuTrigger', ['closeMenu']);
-            const heroic_actions_trigger: jasmine.SpyObj<MatMenuTrigger> = jasmine.createSpyObj('MatMenuTrigger', ['closeMenu']);
-            const home_trigger: jasmine.SpyObj<MatMenuTrigger> = jasmine.createSpyObj('MatMenuTrigger', ['closeMenu']);
+            const status_trigger: MockedObject<MatMenuTrigger> = {
+                closeMenu: vi.fn().mockName('MatMenuTrigger.closeMenu')
+            } as unknown as MockedObject<MatMenuTrigger>;
+            const bag_trigger: MockedObject<MatMenuTrigger> = {
+                closeMenu: vi.fn().mockName('MatMenuTrigger.closeMenu')
+            } as unknown as MockedObject<MatMenuTrigger>;
+            const daily_actions_trigger: MockedObject<MatMenuTrigger> = {
+                closeMenu: vi.fn().mockName('MatMenuTrigger.closeMenu')
+            } as unknown as MockedObject<MatMenuTrigger>;
+            const heroic_actions_trigger: MockedObject<MatMenuTrigger> = {
+                closeMenu: vi.fn().mockName('MatMenuTrigger.closeMenu')
+            } as unknown as MockedObject<MatMenuTrigger>;
+            const home_trigger: MockedObject<MatMenuTrigger> = {
+                closeMenu: vi.fn().mockName('MatMenuTrigger.closeMenu')
+            } as unknown as MockedObject<MatMenuTrigger>;
             // Les viewChild() sont des signaux en lecture seule : on remplace la fonction elle-même,
             // comme le ferait la vue une fois la référence résolue.
             testable.status_trigger = (): MatMenuTrigger => status_trigger;
@@ -157,8 +176,8 @@ describe('CitizenMenuComponent', (): void => {
 
     describe('bag mutations', (): void => {
         it('addItem adds the item to the bag and persists it', (): void => {
-            spyOn(townService, 'updateBag').and.returnValue(of(new UpdateInfo()));
-            spyOn(townService, 'publishMyCitizen');
+            vi.spyOn(townService, 'updateBag').mockReturnValue(of(new UpdateInfo()));
+            vi.spyOn(townService, 'publishMyCitizen');
 
             testable.addItem(10);
 
@@ -170,8 +189,8 @@ describe('CitizenMenuComponent', (): void => {
 
         it('addItem reassigns bag.items immutably (child OnPush input notification)', (): void => {
             const original_items: Item[] = testable.citizen()!.bag!.items;
-            spyOn(townService, 'updateBag').and.returnValue(of(new UpdateInfo()));
-            spyOn(townService, 'publishMyCitizen');
+            vi.spyOn(townService, 'updateBag').mockReturnValue(of(new UpdateInfo()));
+            vi.spyOn(townService, 'publishMyCitizen');
 
             testable.addItem(10);
 
@@ -180,8 +199,8 @@ describe('CitizenMenuComponent', (): void => {
 
         it('removeItem removes the matching item from the bag and persists it', (): void => {
             testable.citizen()!.bag!.items = [makeItem(10), makeItem(20)];
-            spyOn(townService, 'updateBag').and.returnValue(of(new UpdateInfo()));
-            spyOn(townService, 'publishMyCitizen');
+            vi.spyOn(townService, 'updateBag').mockReturnValue(of(new UpdateInfo()));
+            vi.spyOn(townService, 'publishMyCitizen');
 
             testable.removeItem(10);
 
@@ -190,8 +209,8 @@ describe('CitizenMenuComponent', (): void => {
 
         it('emptyBag clears the bag and persists it', (): void => {
             testable.citizen()!.bag!.items = [makeItem(10)];
-            spyOn(townService, 'updateBag').and.returnValue(of(new UpdateInfo()));
-            spyOn(townService, 'publishMyCitizen');
+            vi.spyOn(townService, 'updateBag').mockReturnValue(of(new UpdateInfo()));
+            vi.spyOn(townService, 'publishMyCitizen');
 
             testable.emptyBag();
 
@@ -201,8 +220,8 @@ describe('CitizenMenuComponent', (): void => {
 
     describe('status mutations', (): void => {
         it('addStatus adds the status and persists it', (): void => {
-            spyOn(townService, 'updateStatus').and.returnValue(of(new UpdateInfo()));
-            spyOn(townService, 'publishMyCitizen');
+            vi.spyOn(townService, 'updateStatus').mockReturnValue(of(new UpdateInfo()));
+            vi.spyOn(townService, 'publishMyCitizen');
 
             testable.addStatus(StatusEnum.TIRED.key);
 
@@ -212,8 +231,8 @@ describe('CitizenMenuComponent', (): void => {
 
         it('removeStatus removes the matching status and persists it', (): void => {
             testable.citizen()!.status!.icons = [StatusEnum.TIRED];
-            spyOn(townService, 'updateStatus').and.returnValue(of(new UpdateInfo()));
-            spyOn(townService, 'publishMyCitizen');
+            vi.spyOn(townService, 'updateStatus').mockReturnValue(of(new UpdateInfo()));
+            vi.spyOn(townService, 'publishMyCitizen');
 
             testable.removeStatus(StatusEnum.TIRED.key);
 
@@ -222,8 +241,8 @@ describe('CitizenMenuComponent', (): void => {
 
         it('emptyStatus clears the statuses and persists them', (): void => {
             testable.citizen()!.status!.icons = [StatusEnum.TIRED];
-            spyOn(townService, 'updateStatus').and.returnValue(of(new UpdateInfo()));
-            spyOn(townService, 'publishMyCitizen');
+            vi.spyOn(townService, 'updateStatus').mockReturnValue(of(new UpdateInfo()));
+            vi.spyOn(townService, 'publishMyCitizen');
 
             testable.emptyStatus();
 
@@ -233,8 +252,8 @@ describe('CitizenMenuComponent', (): void => {
 
     describe('saveDailyAction', (): void => {
         it('adds a daily action once the server confirms', (): void => {
-            spyOn(townService, 'addDailyAction').and.returnValue(of(new UpdateInfo()));
-            spyOn(townService, 'publishMyCitizen');
+            vi.spyOn(townService, 'addDailyAction').mockReturnValue(of(new UpdateInfo()));
+            vi.spyOn(townService, 'publishMyCitizen');
 
             testable.saveDailyAction('home_shower', true);
 
@@ -247,8 +266,8 @@ describe('CitizenMenuComponent', (): void => {
             shower.day = testable.current_day();
             shower.action_key = 'home_shower';
             testable.citizen()!.daily_actions = [shower];
-            spyOn(townService, 'removeDailyAction').and.returnValue(of(undefined));
-            spyOn(townService, 'publishMyCitizen');
+            vi.spyOn(townService, 'removeDailyAction').mockReturnValue(of(undefined));
+            vi.spyOn(townService, 'publishMyCitizen');
 
             testable.saveDailyAction('home_shower', false);
 
@@ -258,8 +277,8 @@ describe('CitizenMenuComponent', (): void => {
 
     describe('chamanic details', (): void => {
         it('changePotions updates the potion count and persists it', (): void => {
-            spyOn(townService, 'saveChamanicDetails').and.returnValue(of(new UpdateInfo()));
-            spyOn(townService, 'publishMyCitizen');
+            vi.spyOn(townService, 'saveChamanicDetails').mockReturnValue(of(new UpdateInfo()));
+            vi.spyOn(townService, 'publishMyCitizen');
 
             testable.changePotions(3);
 
@@ -268,8 +287,8 @@ describe('CitizenMenuComponent', (): void => {
         });
 
         it('changeImmune updates the immunity flag and persists it', (): void => {
-            spyOn(townService, 'saveChamanicDetails').and.returnValue(of(new UpdateInfo()));
-            spyOn(townService, 'publishMyCitizen');
+            vi.spyOn(townService, 'saveChamanicDetails').mockReturnValue(of(new UpdateInfo()));
+            vi.spyOn(townService, 'publishMyCitizen');
 
             testable.changeImmune(true);
 
@@ -281,8 +300,8 @@ describe('CitizenMenuComponent', (): void => {
         it('sets the new value optimistically and persists it', (): void => {
             testable.citizen()!.home = { content: [], update_info: new UpdateInfo() } as never;
             const element: HomeWithValue = { value: 1, element: { key: 'x' } } as unknown as HomeWithValue;
-            spyOn(townService, 'updateHome').and.returnValue(of(new UpdateInfo()));
-            spyOn(townService, 'publishMyCitizen');
+            vi.spyOn(townService, 'updateHome').mockReturnValue(of(new UpdateInfo()));
+            vi.spyOn(townService, 'publishMyCitizen');
 
             testable.updateHome(element, 5);
 
@@ -293,7 +312,7 @@ describe('CitizenMenuComponent', (): void => {
             testable.citizen()!.home = { content: [], update_info: new UpdateInfo() } as never;
             const element: HomeWithValue = { value: 1, element: { key: 'x' } } as unknown as HomeWithValue;
             const citizen_before: Citizen = testable.citizen()!;
-            spyOn(townService, 'updateHome').and.returnValue(throwError(() => new Error('fail')));
+            vi.spyOn(townService, 'updateHome').mockReturnValue(throwError(() => new Error('fail')));
 
             testable.updateHome(element, 5);
 
@@ -306,8 +325,8 @@ describe('CitizenMenuComponent', (): void => {
         it('sets the new value optimistically and persists it', (): void => {
             testable.citizen()!.heroic_actions = { content: [], update_info: new UpdateInfo() } as never;
             const element: HeroicActionsWithValue = { value: 0, element: { value: { max_lvl: 1 } } } as unknown as HeroicActionsWithValue;
-            spyOn(townService, 'updateHeroicActions').and.returnValue(of(new UpdateInfo()));
-            spyOn(townService, 'publishMyCitizen');
+            vi.spyOn(townService, 'updateHeroicActions').mockReturnValue(of(new UpdateInfo()));
+            vi.spyOn(townService, 'publishMyCitizen');
 
             testable.updateActions(element, 1);
 
@@ -318,7 +337,7 @@ describe('CitizenMenuComponent', (): void => {
             testable.citizen()!.heroic_actions = { content: [], update_info: new UpdateInfo() } as never;
             const element: HeroicActionsWithValue = { value: 0, element: { value: { max_lvl: 1 } } } as unknown as HeroicActionsWithValue;
             const citizen_before: Citizen = testable.citizen()!;
-            spyOn(townService, 'updateHeroicActions').and.returnValue(throwError(() => new Error('fail')));
+            vi.spyOn(townService, 'updateHeroicActions').mockReturnValue(throwError(() => new Error('fail')));
 
             testable.updateActions(element, 1);
 

@@ -1,7 +1,8 @@
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withXhr } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
-import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { of } from 'rxjs';
+import type { Mock } from 'vitest';
 
 import { DigsService } from '../../../_abstract_model/services/digs.service';
 import { TownService } from '../../../_abstract_model/services/town.service';
@@ -26,17 +27,22 @@ describe('CitizensDigsComponent', (): void => {
     beforeEach(async (): Promise<void> => {
         await TestBed.configureTestingModule({
             imports: [CitizensDigsComponent],
-            providers: [provideHttpClient(), provideHttpClientTesting()]
+            providers: [provideHttpClient(withXhr()), provideHttpClientTesting()]
         }).compileComponents();
 
         townService = TestBed.inject(TownService);
         digsService = TestBed.inject(DigsService);
-        spyOn(digsService, 'getDigs').and.returnValue(of([]));
+        vi.spyOn(digsService, 'getDigs').mockReturnValue(of([]));
         fixture = TestBed.createComponent(CitizensDigsComponent);
+        vi.useFakeTimers();
+    });
+
+    afterEach((): void => {
+        vi.useRealTimers();
     });
 
     it('renders nothing before citizen_info has loaded', (): void => {
-        spyOn(townService, 'getCitizens').and.returnValue(of());
+        vi.spyOn(townService, 'getCitizens').mockReturnValue(of());
         fixture.detectChanges();
 
         expect(fixture.nativeElement.querySelector('table')).toBeNull();
@@ -45,7 +51,7 @@ describe('CitizensDigsComponent', (): void => {
     it('renders one row per living citizen once getCitizens() resolves (citizen_info + datasource.data)', (): void => {
         const info: CitizenInfo = new CitizenInfo();
         info.citizens = [makeCitizen(1, 'Alice'), makeCitizen(2, 'Bob')];
-        spyOn(townService, 'getCitizens').and.returnValue(of(info));
+        vi.spyOn(townService, 'getCitizens').mockReturnValue(of(info));
 
         fixture.detectChanges();
 
@@ -55,23 +61,25 @@ describe('CitizensDigsComponent', (): void => {
         expect(fixture.nativeElement.textContent).toContain('Bob');
     });
 
-    it('renders digs for the current day, once both getCitizens() and getDigs() resolve', fakeAsync((): void => {
+    it('renders digs for the current day, once both getCitizens() and getDigs() resolve', async (): Promise<void> => {
         const citizen: Citizen = makeCitizen(1, 'Alice');
         const info: CitizenInfo = new CitizenInfo();
         info.citizens = [citizen];
-        spyOn(townService, 'getCitizens').and.returnValue(of(info));
+        vi.spyOn(townService, 'getCitizens').mockReturnValue(of(info));
 
         const dig: Dig = new Dig();
         dig.digger_id = 1;
-        dig.day = (fixture.componentInstance as unknown as { current_day: number }).current_day;
+        dig.day = (fixture.componentInstance as unknown as {
+            current_day: number;
+        }).current_day;
         dig.x = 3;
         dig.y = 4;
-        (digsService.getDigs as jasmine.Spy).and.returnValue(of([dig]));
+        (digsService.getDigs as Mock).mockReturnValue(of([dig]));
 
         fixture.detectChanges();
-        tick();
+        await vi.advanceTimersByTimeAsync(0);
         fixture.detectChanges();
 
         expect(fixture.nativeElement.textContent).toContain('3/4');
-    }));
+    });
 });

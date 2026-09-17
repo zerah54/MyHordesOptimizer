@@ -92,7 +92,7 @@
                                         }
                                         @case ('name') {
                                             <div class="name-container">
-                                                @if (row | itemAlreadyInList:wishlist_info()?.wishlist_items) {
+                                                @if (row | itemAlreadyInList:$safeNavigationMigration(wishlist_info()?.wishlist_items)) {
                                                     <img [ngSrc]="HORDES_IMG_REPO + 'emotes/warning.gif'" width="16" height="16">&nbsp;
                                                 }
                                                 <img [ngSrc]="HORDES_IMG_REPO + row.item.img" width="16"

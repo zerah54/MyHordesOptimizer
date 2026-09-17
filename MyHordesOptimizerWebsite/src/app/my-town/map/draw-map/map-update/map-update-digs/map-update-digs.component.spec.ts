@@ -1,7 +1,7 @@
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withXhr } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
+import { ANIMATION_MODULE_TYPE } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { provideNoopAnimations } from '@angular/platform-browser/animations';
 
 import { Cell } from '../../../../../_abstract_model/types/cell.class';
 import { Citizen } from '../../../../../_abstract_model/types/citizen.class';
@@ -29,7 +29,7 @@ describe('MapUpdateDigsComponent', (): void => {
         setTown(null);
         await TestBed.configureTestingModule({
             imports: [MapUpdateDigsComponent],
-            providers: [provideHttpClient(), provideHttpClientTesting(), provideNoopAnimations()]
+            providers: [provideHttpClient(withXhr()), provideHttpClientTesting(), { provide: ANIMATION_MODULE_TYPE, useValue: 'NoopAnimations' }]
         }).compileComponents();
         fixture = TestBed.createComponent(MapUpdateDigsComponent);
         fixture.componentRef.setInput('cell', Object.assign(new Cell(), { displayed_x: 0, displayed_y: 0 }));
@@ -69,7 +69,9 @@ describe('MapUpdateDigsComponent', (): void => {
         const emitted: Dig[][] = [];
         fixture.componentInstance.digsChange.subscribe((value: Dig[]) => emitted.push(value));
 
-        (<{ addCitizen(citizen: Citizen): void }>(<unknown>fixture.componentInstance)).addCitizen(newCitizen(2, 'Bob'));
+        (<{
+            addCitizen(citizen: Citizen): void;
+        }>(<unknown>fixture.componentInstance)).addCitizen(newCitizen(2, 'Bob'));
 
         expect(original.length).toBe(1);
         expect(emitted.length).toBe(1);
@@ -96,6 +98,8 @@ describe('MapUpdateDigsComponent', (): void => {
         fixture.componentRef.setInput('digs', []);
         fixture.detectChanges();
 
-        expect((<{ current_day: number }>(<unknown>fixture.componentInstance)).current_day).toBe(1);
+        expect((<{
+            current_day: number;
+        }>(<unknown>fixture.componentInstance)).current_day).toBe(1);
     });
 });

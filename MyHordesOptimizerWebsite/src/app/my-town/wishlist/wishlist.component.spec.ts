@@ -1,4 +1,4 @@
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withXhr } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
@@ -9,7 +9,9 @@ import { WishlistInfo } from '../../_abstract_model/types/wishlist-info.class';
 import { WishlistComponent } from './wishlist.component';
 
 interface TestableComponent {
-    wishlist_info: { set(value: WishlistInfo): void };
+    wishlist_info: {
+        set(value: WishlistInfo): void;
+    };
 }
 
 function buildItemDto(overrides: Partial<WishlistItemDTO['item']> = {}): WishlistItemDTO['item'] {
@@ -41,7 +43,7 @@ describe('WishlistComponent', (): void => {
     beforeEach(async (): Promise<void> => {
         await TestBed.configureTestingModule({
             imports: [WishlistComponent],
-            providers: [provideHttpClient(), provideHttpClientTesting(), provideRouter([])]
+            providers: [provideHttpClient(withXhr()), provideHttpClientTesting(), provideRouter([])]
         }).compileComponents();
 
         fixture = TestBed.createComponent(WishlistComponent);

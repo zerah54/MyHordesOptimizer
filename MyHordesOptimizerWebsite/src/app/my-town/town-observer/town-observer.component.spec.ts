@@ -1,9 +1,10 @@
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withXhr } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Title } from '@angular/platform-browser';
 import { ActivatedRoute, convertToParamMap, ParamMap, Router } from '@angular/router';
 import { of, Subject, throwError } from 'rxjs';
+import type { MockedObject } from 'vitest';
 
 import { TownService } from '../../_abstract_model/services/town.service';
 import { Town } from '../../_abstract_model/types/town.class';
@@ -14,9 +15,9 @@ import { TownObserverComponent } from './town-observer.component';
 
 describe('TownObserverComponent', (): void => {
     let fixture: ComponentFixture<TownObserverComponent>;
-    let townService: jasmine.SpyObj<TownService>;
-    let router: jasmine.SpyObj<Router>;
-    let snackbar: jasmine.SpyObj<SnackbarService>;
+    let townService: MockedObject<TownService>;
+    let router: MockedObject<Router>;
+    let snackbar: MockedObject<SnackbarService>;
     let paramMap$: Subject<ParamMap>;
 
     function makeMap(overrides: Partial<Town> = {}): Town {
@@ -40,18 +41,27 @@ describe('TownObserverComponent', (): void => {
 
     beforeEach(async (): Promise<void> => {
         paramMap$ = new Subject<ParamMap>();
-        townService = jasmine.createSpyObj<TownService>('TownService', ['getMap', 'getTownsPaged']);
-        router = jasmine.createSpyObj<Router>('Router', ['navigate']);
-        snackbar = jasmine.createSpyObj<SnackbarService>('SnackbarService', ['errorSnackbar']);
+        townService = {
+            getMap: vi.fn().mockName('TownService.getMap'),
+            getTownsPaged: vi.fn().mockName('TownService.getTownsPaged')
+        } as unknown as MockedObject<TownService>;
+        router = {
+            navigate: vi.fn().mockName('Router.navigate')
+        } as unknown as MockedObject<Router>;
+        snackbar = {
+            errorSnackbar: vi.fn().mockName('SnackbarService.errorSnackbar')
+        } as unknown as MockedObject<SnackbarService>;
 
         await TestBed.configureTestingModule({
             imports: [TownObserverComponent],
             providers: [
-                provideHttpClient(), provideHttpClientTesting(),
+                provideHttpClient(withXhr()), provideHttpClientTesting(),
                 { provide: TownService, useValue: townService },
                 { provide: Router, useValue: router },
                 { provide: SnackbarService, useValue: snackbar },
-                { provide: Title, useValue: jasmine.createSpyObj<Title>('Title', ['setTitle']) },
+                { provide: Title, useValue: {
+                    setTitle: vi.fn().mockName('Title.setTitle')
+                } },
                 { provide: ActivatedRoute, useValue: { paramMap: paramMap$.asObservable() } }
             ]
         }).compileComponents();
@@ -61,8 +71,8 @@ describe('TownObserverComponent', (): void => {
     });
 
     it('shows the loading spinner and hides the router-outlet before the context is ready', (): void => {
-        townService.getMap.and.returnValue(of());
-        townService.getTownsPaged.and.returnValue(of());
+        townService.getMap.mockReturnValue(of());
+        townService.getTownsPaged.mockReturnValue(of());
         fixture.detectChanges();
         paramMap$.next(convertToParamMap({ mapId: '42' }));
         fixture.detectChanges();
@@ -72,8 +82,8 @@ describe('TownObserverComponent', (): void => {
     });
 
     it('renders the town name/day banner and the router-outlet once map + page have resolved', (): void => {
-        townService.getMap.and.returnValue(of(makeMap({ day: 7 })));
-        townService.getTownsPaged.and.returnValue(of(makePage([makeItem({ mapId: 42, name: 'Ma ville' })])));
+        townService.getMap.mockReturnValue(of(makeMap({ day: 7 })));
+        townService.getTownsPaged.mockReturnValue(of(makePage([makeItem({ mapId: 42, name: 'Ma ville' })])));
         fixture.detectChanges();
         paramMap$.next(convertToParamMap({ mapId: '42' }));
         fixture.detectChanges();
@@ -94,8 +104,8 @@ describe('TownObserverComponent', (): void => {
     });
 
     it('redirects to the town list when the loaded page has no matching town', (): void => {
-        townService.getMap.and.returnValue(of(makeMap()));
-        townService.getTownsPaged.and.returnValue(of(makePage([makeItem({ mapId: 99 })])));
+        townService.getMap.mockReturnValue(of(makeMap()));
+        townService.getTownsPaged.mockReturnValue(of(makePage([makeItem({ mapId: 99 })])));
         fixture.detectChanges();
         paramMap$.next(convertToParamMap({ mapId: '42' }));
         fixture.detectChanges();
@@ -104,8 +114,8 @@ describe('TownObserverComponent', (): void => {
     });
 
     it('redirects to the town list on load error', (): void => {
-        townService.getMap.and.returnValue(of(makeMap()));
-        townService.getTownsPaged.and.returnValue(throwError((): Error => new Error('boom')));
+        townService.getMap.mockReturnValue(of(makeMap()));
+        townService.getTownsPaged.mockReturnValue(throwError((): Error => new Error('boom')));
         fixture.detectChanges();
         paramMap$.next(convertToParamMap({ mapId: '42' }));
         fixture.detectChanges();
@@ -114,13 +124,13 @@ describe('TownObserverComponent', (): void => {
     });
 
     it('ignores a repeated paramMap emission for the same mapId', (): void => {
-        townService.getMap.and.returnValue(of(makeMap()));
-        townService.getTownsPaged.and.returnValue(of(makePage([makeItem({ mapId: 42 })])));
+        townService.getMap.mockReturnValue(of(makeMap()));
+        townService.getTownsPaged.mockReturnValue(of(makePage([makeItem({ mapId: 42 })])));
         fixture.detectChanges();
         paramMap$.next(convertToParamMap({ mapId: '42' }));
         fixture.detectChanges();
 
-        townService.getMap.calls.reset();
+        townService.getMap.mockClear();
         paramMap$.next(convertToParamMap({ mapId: '42' }));
         fixture.detectChanges();
 

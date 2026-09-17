@@ -1,5 +1,5 @@
 import { CdkTable } from '@angular/cdk/table';
-import { Component, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ViewChild } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatTableModule } from '@angular/material/table';
 
@@ -18,11 +18,13 @@ interface Row {
             <tr *matRowDef="let row; columns: ['label']" mat-row></tr>
         </table>
     `,
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [MatTableModule, TypedCellDefDirective],
 })
 class HostComponent {
     public rows: Row[] = [{ label: 'a' }];
-    @ViewChild(CdkTable) public table!: CdkTable<Row>;
+    @ViewChild(CdkTable)
+    public table!: CdkTable<Row>;
 }
 
 describe('TypedCellDefDirective', () => {

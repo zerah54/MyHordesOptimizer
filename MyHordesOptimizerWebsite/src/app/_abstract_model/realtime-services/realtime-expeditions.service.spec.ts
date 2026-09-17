@@ -6,7 +6,7 @@ describe('RealtimeExpeditionsService', () => {
 
     beforeEach(() => {
         service = Object.create(RealtimeExpeditionsService.prototype);
-        spyOn<any>(service, 'invokeHub').and.returnValue(Promise.resolve());
+        vi.spyOn(service as any, 'invokeHub').mockReturnValue(Promise.resolve());
     });
 
     describe('deleteExpeditionBag', () => {

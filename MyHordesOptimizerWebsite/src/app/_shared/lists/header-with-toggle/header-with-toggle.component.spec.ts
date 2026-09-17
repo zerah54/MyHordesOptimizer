@@ -1,7 +1,7 @@
+import { ANIMATION_MODULE_TYPE } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatTooltip } from '@angular/material/tooltip';
 import { By } from '@angular/platform-browser';
-import { provideNoopAnimations } from '@angular/platform-browser/animations';
 
 import { HORDES_IMG_REPO } from '../../../_abstract_model/const';
 import { HeaderWithToggleComponent } from './header-with-toggle.component';
@@ -12,7 +12,7 @@ describe('HeaderWithToggleComponent', (): void => {
     beforeEach(async (): Promise<void> => {
         await TestBed.configureTestingModule({
             imports: [HeaderWithToggleComponent],
-            providers: [provideNoopAnimations()]
+            providers: [{ provide: ANIMATION_MODULE_TYPE, useValue: 'NoopAnimations' }]
         }).compileComponents();
         fixture = TestBed.createComponent(HeaderWithToggleComponent);
         fixture.componentRef.setInput('filterValue', null);
@@ -112,7 +112,7 @@ describe('HeaderWithToggleComponent', (): void => {
 
     it('stops propagation of the filter icon click', (): void => {
         fixture.detectChanges();
-        const parentClickSpy = jasmine.createSpy('parentClick');
+        const parentClickSpy = vi.fn();
         fixture.nativeElement.addEventListener('click', parentClickSpy);
 
         fixture.debugElement.query(By.css('.open-menu-icon')).nativeElement.click();

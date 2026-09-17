@@ -1,8 +1,8 @@
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withXhr } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
+import { ANIMATION_MODULE_TYPE } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
-import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import moment from 'moment';
 import { Subject } from 'rxjs';
 
@@ -33,9 +33,9 @@ describe('ItemsComponent', (): void => {
         await TestBed.configureTestingModule({
             imports: [ItemsComponent],
             providers: [
-                provideHttpClient(),
+                provideHttpClient(withXhr()),
                 provideHttpClientTesting(),
-                provideNoopAnimations(),
+                { provide: ANIMATION_MODULE_TYPE, useValue: 'NoopAnimations' },
                 { provide: ApiService, useValue: { getItems: (): unknown => items_subject.asObservable() } }
             ]
         }).compileComponents();

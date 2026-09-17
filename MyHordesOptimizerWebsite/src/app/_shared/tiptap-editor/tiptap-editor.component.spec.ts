@@ -35,7 +35,9 @@ describe('TiptapEditorComponent', (): void => {
         await setup();
         const emitted: string[] = [];
         component.registerOnChange((value: string): number => emitted.push(value));
-        const editor: Editor | undefined = (component as unknown as { editor: () => Editor | undefined }).editor();
+        const editor: Editor | undefined = (component as unknown as {
+            editor: () => Editor | undefined;
+        }).editor();
 
         editor?.commands.setContent('<p>changed</p>');
 
@@ -47,7 +49,7 @@ describe('TiptapEditorComponent', (): void => {
 
         component.writeValue('');
 
-        expect(component.empty).toBeTrue();
+        expect(component.empty).toBe(true);
     });
 
     it('reports empty as false once content is written', async (): Promise<void> => {
@@ -55,30 +57,31 @@ describe('TiptapEditorComponent', (): void => {
 
         component.writeValue('<p>hello</p>');
 
-        expect(component.empty).toBeFalse();
+        expect(component.empty).toBe(false);
     });
 
     it('focuses the underlying editor on container click', async (): Promise<void> => {
         await setup();
-        const focusSpy: jasmine.Spy = spyOn(HTMLElement.prototype, 'focus');
+        const focusSpy = vi.spyOn(HTMLElement.prototype, 'focus');
 
         component.onContainerClick();
         await new Promise<void>((resolve: () => void): void => { requestAnimationFrame(resolve); });
 
         const editable: HTMLElement | null = fixture.nativeElement.querySelector('.ProseMirror');
         expect(editable).not.toBeNull();
-        expect(focusSpy.calls.mostRecent().object).toBe(editable as HTMLElement);
+        expect(focusSpy.mock.contexts.at(-1)).toBe(editable as HTMLElement);
     });
 
     it('does not steal focus from the toolbar when a container click originates there', async (): Promise<void> => {
         await setup();
-        const focusSpy: jasmine.Spy = spyOn(HTMLElement.prototype, 'focus');
+        const editor: Editor = (component as unknown as { editor: () => Editor }).editor();
+        const focusCommandSpy = vi.spyOn(editor.commands, 'focus');
         const toolbarSelect: HTMLElement | null = fixture.nativeElement.querySelector('[data-action="heading"]');
         expect(toolbarSelect).not.toBeNull();
 
         component.onContainerClick({ target: toolbarSelect } as unknown as MouseEvent);
 
-        expect(focusSpy).not.toHaveBeenCalled();
+        expect(focusCommandSpy).not.toHaveBeenCalled();
     });
 
     it('renders the toolbar once the editor is ready', async (): Promise<void> => {
@@ -104,8 +107,8 @@ describe('TiptapEditorComponent', (): void => {
     it('always exposes the floating host class', async (): Promise<void> => {
         await setup();
 
-        expect(component.shouldLabelFloat).toBeTrue();
-        expect(fixture.nativeElement.classList.contains('floating')).toBeTrue();
+        expect(component.shouldLabelFloat).toBe(true);
+        expect(fixture.nativeElement.classList.contains('floating')).toBe(true);
     });
 
     it('coerces required to a boolean and emits a state change', async (): Promise<void> => {
@@ -115,7 +118,7 @@ describe('TiptapEditorComponent', (): void => {
 
         component.required = 'true' as unknown as boolean;
 
-        expect(component.required).toBeTrue();
+        expect(component.required).toBe(true);
         expect(emissionCount).toBe(1);
     });
 
@@ -123,12 +126,14 @@ describe('TiptapEditorComponent', (): void => {
         await setup();
         let emissionCount: number = 0;
         component.stateChanges.subscribe((): number => emissionCount++);
-        const editor: Editor | undefined = (component as unknown as { editor: () => Editor | undefined }).editor();
+        const editor: Editor | undefined = (component as unknown as {
+            editor: () => Editor | undefined;
+        }).editor();
 
         component.disabled = 'true' as unknown as boolean;
 
-        expect(component.disabled).toBeTrue();
-        expect(editor?.isEditable).toBeFalse();
+        expect(component.disabled).toBe(true);
+        expect(editor?.isEditable).toBe(false);
         expect(emissionCount).toBeGreaterThanOrEqual(1);
     });
 
@@ -143,8 +148,10 @@ describe('TiptapEditorComponent', (): void => {
 
         fixture.detectChanges();
 
-        const editor: Editor | undefined = (component as unknown as { editor: () => Editor | undefined }).editor();
-        expect(editor?.isEditable).toBeFalse();
+        const editor: Editor | undefined = (component as unknown as {
+            editor: () => Editor | undefined;
+        }).editor();
+        expect(editor?.isEditable).toBe(false);
     });
 
     it('sets aria-describedby on the editable element', async (): Promise<void> => {
@@ -158,14 +165,16 @@ describe('TiptapEditorComponent', (): void => {
 
     it('destroys the editor and completes stateChanges on ngOnDestroy', async (): Promise<void> => {
         await setup();
-        const editor: Editor | undefined = (component as unknown as { editor: () => Editor | undefined }).editor();
-        const destroySpy: jasmine.Spy = spyOn(editor as Editor, 'destroy').and.callThrough();
+        const editor: Editor | undefined = (component as unknown as {
+            editor: () => Editor | undefined;
+        }).editor();
+        const destroySpy = vi.spyOn(editor as Editor, 'destroy');
         let completed: boolean = false;
         component.stateChanges.subscribe({ complete: (): boolean => completed = true });
 
         component.ngOnDestroy();
 
         expect(destroySpy).toHaveBeenCalled();
-        expect(completed).toBeTrue();
+        expect(completed).toBe(true);
     });
 });

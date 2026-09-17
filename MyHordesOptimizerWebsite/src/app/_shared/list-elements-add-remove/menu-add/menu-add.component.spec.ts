@@ -1,8 +1,7 @@
-import { Component } from '@angular/core';
+import { ANIMATION_MODULE_TYPE, ChangeDetectionStrategy, Component } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatMenuModule, MatMenuTrigger } from '@angular/material/menu';
 import { By } from '@angular/platform-browser';
-import { provideNoopAnimations } from '@angular/platform-browser/animations';
 
 import { StatusEnum } from '../../../_abstract_model/enum/status.enum';
 import { ListForAddRemove } from '../../../_abstract_model/types/_types';
@@ -13,6 +12,7 @@ import { MenuAddComponent } from './menu-add.component';
 /** Hôte minimal : reproduit le déclenchement `matMenuTriggerFor`/`matMenuTriggerData` réel de `list-element-add-remove`. */
 @Component({
     imports: [MenuAddComponent, MatMenuModule],
+    changeDetection: ChangeDetectionStrategy.OnPush,
     template: `
         <div class="opener" [matMenuTriggerFor]="menuAdd.menu()" [matMenuTriggerData]="{lists: lists, menuLabel: menuLabel}"></div>
         <mho-menu-add #menuAdd="menuAdd" (add)="added.push($event)"></mho-menu-add>
@@ -49,11 +49,13 @@ describe('MenuAddComponent', (): void => {
     beforeEach(async (): Promise<void> => {
         await TestBed.configureTestingModule({
             imports: [MenuAddHostComponent],
-            providers: [provideNoopAnimations()]
+            providers: [{ provide: ANIMATION_MODULE_TYPE, useValue: 'NoopAnimations' }]
         }).compileComponents();
         fixture = TestBed.createComponent(MenuAddHostComponent);
         const menuAddDebugElement = fixture.debugElement.query(By.directive(MenuAddComponent));
-        locale = (menuAddDebugElement.componentInstance as unknown as { locale: string }).locale;
+        locale = (menuAddDebugElement.componentInstance as unknown as {
+            locale: string;
+        }).locale;
     });
 
     afterEach((): void => {

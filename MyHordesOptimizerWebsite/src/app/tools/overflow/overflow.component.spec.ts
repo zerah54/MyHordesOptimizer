@@ -1,8 +1,9 @@
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withXhr } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting, TestRequest } from '@angular/common/http/testing';
 import { DebugElement } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
+import type { Mock } from 'vitest';
 
 import { TownDetails } from '../../_abstract_model/types/town-details.class';
 import { setTown } from '../../_core/utilities/localstorage.util';
@@ -16,7 +17,7 @@ describe('OverflowComponent', (): void => {
         setTown(null);
         TestBed.configureTestingModule({
             imports: [OverflowComponent],
-            providers: [provideHttpClient(), provideHttpClientTesting()]
+            providers: [provideHttpClient(withXhr()), provideHttpClientTesting()]
         });
         fixture = TestBed.createComponent(OverflowComponent);
         component = fixture.componentInstance;
@@ -41,8 +42,7 @@ describe('OverflowComponent', (): void => {
         const door_group: DebugElement = fixture.debugElement.queryAll(By.css('mat-button-toggle-group'))[0];
         const open_toggle_button: HTMLButtonElement = door_group.queryAll(By.css('mat-button-toggle'))[1]
             .query(By.css('button')).nativeElement;
-        const overflow_cell = (): string | null =>
-            fixture.debugElement.query(By.css('table.chain .key td')).nativeElement.textContent;
+        const overflow_cell = (): string | null => fixture.debugElement.query(By.css('table.chain .key td')).nativeElement.textContent;
 
         expect(overflow_cell()?.trim()).toBe('200');
 
@@ -60,19 +60,19 @@ describe('OverflowComponent', (): void => {
         devastated_input.click();
         fixture.detectChanges();
 
-        expect(component['chaos']).toBeTrue();
-        expect(chaos_input.disabled).toBeTrue();
+        expect(component['chaos']).toBe(true);
+        expect(chaos_input.disabled).toBe(true);
         // Porte fermée à l'écran, mais dévastée force +25 (ouverte ≥30 min) : (45+25)*1+20=90, (55+25)*1+20=100
         expect(component['activeZombiesTooltip']()).toContain('90%');
         expect(component['activeZombiesTooltip']()).toContain('100%');
     });
 
     it('le facteur réaliste est tiré comme un entier 45-55 (mt_rand), jamais une valeur fractionnaire', (): void => {
-        spyOn(Math, 'random').and.returnValue(0.999999);
+        vi.spyOn(Math, 'random').mockReturnValue(0.999999);
 
         expect(component['drawFactorBase']()).toBe(55);
 
-        (<jasmine.Spy>Math.random).and.returnValue(0);
+        (<Mock>Math.random).mockReturnValue(0);
 
         expect(component['drawFactorBase']()).toBe(45);
     });
@@ -114,7 +114,7 @@ describe('OverflowComponent', (): void => {
         fixture.detectChanges();
 
         expect(component['active_zombies_min']()).toBe(component['active_zombies_max']());
-        expect(component['bounds_saturated']()).toBeTrue();
+        expect(component['bounds_saturated']()).toBe(true);
 
         const attacking_cell: string = fixture.debugElement
             .queryAll(By.css('table.summary'))[2].queryAll(By.css('td'))[0].nativeElement.textContent;
@@ -128,7 +128,7 @@ describe('OverflowComponent', (): void => {
         fixture.detectChanges();
 
         expect(component['active_zombies_min']()).toBeLessThan(component['active_zombies_max']());
-        expect(component['bounds_saturated']()).toBeFalse();
+        expect(component['bounds_saturated']()).toBe(false);
 
         const attacking_cell: string = fixture.debugElement
             .queryAll(By.css('table.summary'))[2].queryAll(By.css('td'))[0].nativeElement.textContent;
@@ -309,9 +309,15 @@ describe('OverflowComponent', (): void => {
         const scenario: ScenarioResult = component['scenarios']()[0];
         expect(scenario.defense_groups.length).toBe(2);
 
-        const shared: { defense: number; count: number } | undefined = scenario.defense_groups.find((g) => g.defense === 10);
+        const shared: {
+            defense: number;
+            count: number;
+        } | undefined = scenario.defense_groups.find((g) => g.defense === 10);
         expect(shared?.count).toBe(2);
-        const solo: { defense: number; count: number } | undefined = scenario.defense_groups.find((g) => g.defense === 999999);
+        const solo: {
+            defense: number;
+            count: number;
+        } | undefined = scenario.defense_groups.find((g) => g.defense === 999999);
         expect(solo?.count).toBe(1);
     });
 
@@ -320,7 +326,7 @@ describe('OverflowComponent', (): void => {
         component['compute']();
 
         const scenario: ScenarioResult = component['scenarios']()[0];
-        expect(scenario.defense_groups.every((g) => g.names.length === 0)).toBeTrue();
+        expect(scenario.defense_groups.every((g) => g.names.length === 0)).toBe(true);
     });
 
     it('table "Par défense" : en mode "Ma ville", le groupe liste les noms des citoyens qui le composent', (): void => {
@@ -350,7 +356,9 @@ describe('OverflowComponent', (): void => {
         town_component['compute']();
 
         const scenario: ScenarioResult = town_component['scenarios']()[0];
-        const group: { names: string[] } | undefined = scenario.defense_groups.find((g) => g.names.length > 0);
+        const group: {
+            names: string[];
+        } | undefined = scenario.defense_groups.find((g) => g.names.length > 0);
         expect(group?.names).toEqual(['Alice']);
     });
 
@@ -394,21 +402,20 @@ describe('OverflowComponent', (): void => {
 
     // Régression OnPush (Task 14) : compute() est déclenché par un debounceTime() asynchrone
     // (scheduleCompute) — sans signal, la vue resterait figée sur le résultat précédent.
-    it('scheduleCompute debounce un recalcul asynchrone (résultat reflété après le délai)', (done: DoneFn): void => {
+    it('scheduleCompute debounce un recalcul asynchrone (résultat reflété après le délai)', async (): Promise<void> => {
         component['attack'].set(700);
         component['scheduleCompute']();
         component['scheduleCompute']();
 
-        setTimeout((): void => {
-            expect(component['overflow_after_watch']()).toBe(400);
-            done();
-        }, 500);
+        await new Promise<void>((resolve: () => void): void => { setTimeout(resolve, 500); });
+
+        expect(component['overflow_after_watch']()).toBe(400);
     });
 
     // Régression OnPush (Task 14) : house_counts est un signal alimenté par un input indexé
     // ([$index]) — setHouseCount doit réassigner le tableau immuablement (pas de .push()/mutation
     // en place) pour que le binding se mette à jour, puis planifier un recalcul.
-    it('setHouseCount réassigne house_counts immuablement et planifie un recalcul', (done: DoneFn): void => {
+    it('setHouseCount réassigne house_counts immuablement et planifie un recalcul', async (): Promise<void> => {
         const original: number[] = component['house_counts']();
 
         component['setHouseCount'](2, 5);
@@ -417,7 +424,7 @@ describe('OverflowComponent', (): void => {
         expect(component['house_counts']()[2]).toBe(5);
         setTimeout((): void => {
             expect(component['overflow_after_watch']()).toBe(200);
-            done();
+
         }, 500);
     });
 });

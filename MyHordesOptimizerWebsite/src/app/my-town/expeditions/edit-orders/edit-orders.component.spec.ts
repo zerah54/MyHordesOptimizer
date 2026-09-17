@@ -1,8 +1,8 @@
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withXhr } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
-import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
+import { ANIMATION_MODULE_TYPE } from '@angular/core';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { provideNoopAnimations } from '@angular/platform-browser/animations';
 
 import { ExpeditionOrder } from '../../../_abstract_model/types/expedition-order.class';
 import { EditOrdersComponent, EditOrdersData } from './edit-orders.component';
@@ -14,8 +14,8 @@ describe('EditOrdersComponent', (): void => {
         TestBed.configureTestingModule({
             imports: [EditOrdersComponent],
             providers: [
-                provideNoopAnimations(),
-                provideHttpClient(),
+                { provide: ANIMATION_MODULE_TYPE, useValue: 'NoopAnimations' },
+                provideHttpClient(withXhr()),
                 provideHttpClientTesting(),
                 { provide: MAT_DIALOG_DATA, useValue: data }
             ]
@@ -25,18 +25,23 @@ describe('EditOrdersComponent', (): void => {
         fixture.detectChanges();
     }
 
-    it('renders a tiptap editor bound to the order text instead of angular-editor', fakeAsync((): void => {
+    afterEach((): void => {
+        vi.useRealTimers();
+    });
+
+    it('renders a tiptap editor bound to the order text instead of angular-editor', async (): Promise<void> => {
+        vi.useFakeTimers();
         const order: ExpeditionOrder = new ExpeditionOrder();
         order.type = 'text';
         order.text = '<p>hello</p>';
         configure({ orders: [order] });
-        tick();
+        await vi.advanceTimersByTimeAsync(0);
         fixture.detectChanges();
 
         expect(fixture.nativeElement.querySelector('angular-editor')).toBeNull();
         const editable: HTMLElement | null = fixture.nativeElement.querySelector('.ProseMirror');
         expect(editable?.textContent).toBe('hello');
-    }));
+    });
 
     describe('addOrder / deleteOrder / drop (mutation manuelle de orders)', (): void => {
         function rowCount(): number {
@@ -76,10 +81,14 @@ describe('EditOrdersComponent', (): void => {
             second.text = 'second';
             configure({ orders: [first, second] });
 
-            (fixture.componentInstance as unknown as { drop(event: unknown): void }).drop({ previousIndex: 0, currentIndex: 1 });
+            (fixture.componentInstance as unknown as {
+                drop(event: unknown): void;
+            }).drop({ previousIndex: 0, currentIndex: 1 });
             fixture.detectChanges();
 
-            const orders: ExpeditionOrder[] = (fixture.componentInstance as unknown as { orders: ExpeditionOrder[] }).orders;
+            const orders: ExpeditionOrder[] = (fixture.componentInstance as unknown as {
+                orders: ExpeditionOrder[];
+            }).orders;
             expect(orders.map((o: ExpeditionOrder) => o.text)).toEqual(['second', 'first']);
             expect(orders.length).toBe(2);
         });

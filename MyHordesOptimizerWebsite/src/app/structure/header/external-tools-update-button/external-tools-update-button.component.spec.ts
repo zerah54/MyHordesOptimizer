@@ -1,4 +1,4 @@
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withXhr } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { of } from 'rxjs';
@@ -26,7 +26,7 @@ describe('ExternalToolsUpdateButtonComponent', (): void => {
 
         await TestBed.configureTestingModule({
             imports: [ExternalToolsUpdateButtonComponent],
-            providers: [provideHttpClient(), provideHttpClientTesting()]
+            providers: [provideHttpClient(withXhr()), provideHttpClientTesting()]
         }).compileComponents();
 
         fixture = TestBed.createComponent(ExternalToolsUpdateButtonComponent);
@@ -41,8 +41,8 @@ describe('ExternalToolsUpdateButtonComponent', (): void => {
             simpleMe: { id: 1, userName: 'Alice', avatar: null, townDetails: { townId: 42, townX: 0, townY: 0, townMaxX: 40, townMaxY: 40, isChaos: false, isDevaste: false, townType: 'RE', day: 3, hasExternalApi: null } }
         };
         const state: ExternalToolsUpdateJobStateDTO = { jobId: 'x', isRunning: false, startedAt: null, finishedAt: null, tools: [], renewedToken: renewed_token };
-        spyOn(town_service, 'updateExternalTools').and.returnValue(of(state));
-        spyOn(town_service, 'refreshMyCitizen');
+        vi.spyOn(town_service, 'updateExternalTools').mockReturnValue(of(state));
+        vi.spyOn(town_service, 'refreshMyCitizen');
 
         testable.update();
 
@@ -53,8 +53,8 @@ describe('ExternalToolsUpdateButtonComponent', (): void => {
 
     it('ne touche pas au token quand aucune dérive n\'est détectée', (): void => {
         const state: ExternalToolsUpdateJobStateDTO = { jobId: 'x', isRunning: false, startedAt: null, finishedAt: null, tools: [] };
-        spyOn(town_service, 'updateExternalTools').and.returnValue(of(state));
-        spyOn(town_service, 'refreshMyCitizen');
+        vi.spyOn(town_service, 'updateExternalTools').mockReturnValue(of(state));
+        vi.spyOn(town_service, 'refreshMyCitizen');
 
         testable.update();
 

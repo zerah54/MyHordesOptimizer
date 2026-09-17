@@ -1,9 +1,10 @@
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withXhr } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MAT_ICON_DEFAULT_OPTIONS, MatIconDefaultOptions } from '@angular/material/icon';
 import { ActivatedRoute } from '@angular/router';
 import { of } from 'rxjs';
+import type { MockedObject } from 'vitest';
 
 import { NoteDTO } from '../_abstract_model/dto/note.dto';
 import { UserAccountPublicDTO } from '../_abstract_model/dto/user-account.dto';
@@ -12,23 +13,30 @@ import { UserAccountService } from '../_abstract_model/services/user-account.ser
 import { ProfileComponent } from './profile.component';
 
 interface TestableComponent {
-    note: { (): string | null };
+    note: {
+        (): string | null;
+    };
 }
 
 describe('ProfileComponent notes', (): void => {
     let fixture: ComponentFixture<ProfileComponent>;
-    let noteService: jasmine.SpyObj<NoteService>;
+    let noteService: MockedObject<NoteService>;
 
     beforeEach(async (): Promise<void> => {
-        noteService = jasmine.createSpyObj<NoteService>('NoteService', ['getUserNote', 'saveUserNote']);
-        noteService.getUserNote.and.returnValue(of({ note: '<p>global</p>' } as NoteDTO));
-        const userAccountService: jasmine.SpyObj<UserAccountService> = jasmine.createSpyObj<UserAccountService>('UserAccountService', ['getPublicProfile']);
-        userAccountService.getPublicProfile.and.returnValue(of({ id: 5, userName: 'Zerah', avatar: null } as UserAccountPublicDTO));
+        noteService = {
+            getUserNote: vi.fn().mockName('NoteService.getUserNote'),
+            saveUserNote: vi.fn().mockName('NoteService.saveUserNote')
+        } as unknown as MockedObject<NoteService>;
+        noteService.getUserNote.mockReturnValue(of({ note: '<p>global</p>' } as NoteDTO));
+        const userAccountService: MockedObject<UserAccountService> = {
+            getPublicProfile: vi.fn().mockName('UserAccountService.getPublicProfile')
+        } as unknown as MockedObject<UserAccountService>;
+        userAccountService.getPublicProfile.mockReturnValue(of({ id: 5, userName: 'Zerah', avatar: null } as UserAccountPublicDTO));
 
         await TestBed.configureTestingModule({
             imports: [ProfileComponent],
             providers: [
-                provideHttpClient(), provideHttpClientTesting(),
+                provideHttpClient(withXhr()), provideHttpClientTesting(),
                 { provide: NoteService, useValue: noteService },
                 { provide: UserAccountService, useValue: userAccountService },
                 { provide: ActivatedRoute, useValue: { snapshot: { paramMap: { get: (): string => '5' } } } },

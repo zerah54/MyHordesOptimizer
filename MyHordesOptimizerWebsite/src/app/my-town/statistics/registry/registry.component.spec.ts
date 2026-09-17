@@ -1,9 +1,10 @@
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withXhr } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { DebugElement } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { of } from 'rxjs';
+import type { MockedObject } from 'vitest';
 
 import { ApiService } from '../../../_abstract_model/services/api.service';
 import { TownService } from '../../../_abstract_model/services/town.service';
@@ -35,19 +36,23 @@ function typeIntoTextarea(fixture: ComponentFixture<RegistryComponent>, text: st
 
 describe('RegistryComponent', (): void => {
     let fixture: ComponentFixture<RegistryComponent>;
-    let townService: jasmine.SpyObj<TownService>;
-    let apiService: jasmine.SpyObj<ApiService>;
+    let townService: MockedObject<TownService>;
+    let apiService: MockedObject<ApiService>;
 
     beforeEach(async (): Promise<void> => {
-        townService = jasmine.createSpyObj<TownService>('TownService', ['getCitizens']);
-        apiService = jasmine.createSpyObj<ApiService>('ApiService', ['getItems']);
-        townService.getCitizens.and.returnValue(of(citizenInfo([newCitizen('Bob', 1)])));
-        apiService.getItems.and.returnValue(of([new Item()]));
+        townService = {
+            getCitizens: vi.fn().mockName('TownService.getCitizens')
+        } as unknown as MockedObject<TownService>;
+        apiService = {
+            getItems: vi.fn().mockName('ApiService.getItems')
+        } as unknown as MockedObject<ApiService>;
+        townService.getCitizens.mockReturnValue(of(citizenInfo([newCitizen('Bob', 1)])));
+        apiService.getItems.mockReturnValue(of([new Item()]));
 
         await TestBed.configureTestingModule({
             imports: [RegistryComponent],
             providers: [
-                provideHttpClient(), provideHttpClientTesting(),
+                provideHttpClient(withXhr()), provideHttpClientTesting(),
                 { provide: TownService, useValue: townService },
                 { provide: ApiService, useValue: apiService }
             ]

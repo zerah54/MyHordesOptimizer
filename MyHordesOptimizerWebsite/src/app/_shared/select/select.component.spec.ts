@@ -1,15 +1,15 @@
-import { Component } from '@angular/core';
+import { ANIMATION_MODULE_TYPE, ChangeDetectionStrategy, Component } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { UntypedFormControl } from '@angular/forms';
 import { MatSelect } from '@angular/material/select';
 import { By } from '@angular/platform-browser';
-import { provideNoopAnimations } from '@angular/platform-browser/animations';
 
 import { SelectComponent } from './select.component';
 
 /** Hôte minimal : `[class]` posé sur la balise cohabite avec le binding de classe hôte du composant. */
 @Component({
     imports: [SelectComponent],
+    changeDetection: ChangeDetectionStrategy.OnPush,
     template: '<mho-select [class]="panel_class" [options]="options"></mho-select>'
 })
 class SelectHostComponent {
@@ -18,7 +18,10 @@ class SelectHostComponent {
 }
 
 /** Valeurs limites acceptées par `coerceBooleanProperty` : `value != null && `${value}` !== 'false'`. */
-const BOOLEAN_COERCION_CASES: [unknown, boolean][] = [
+const BOOLEAN_COERCION_CASES: [
+    unknown,
+    boolean
+][] = [
     [true, true],
     [false, false],
     ['', true],
@@ -54,7 +57,7 @@ describe('SelectComponent', (): void => {
     beforeEach(async (): Promise<void> => {
         await TestBed.configureTestingModule({
             imports: [SelectComponent],
-            providers: [provideNoopAnimations()]
+            providers: [{ provide: ANIMATION_MODULE_TYPE, useValue: 'NoopAnimations' }]
         }).compileComponents();
         fixture = TestBed.createComponent<SelectComponent<string>>(SelectComponent);
     });
@@ -161,11 +164,13 @@ describe('SelectComponent', (): void => {
     it('coerce les valeurs limites de `required` via coerceBooleanProperty', (): void => {
         fixture.detectChanges();
 
-        BOOLEAN_COERCION_CASES.forEach(([raw_value, expected]: [unknown, boolean]): void => {
+        BOOLEAN_COERCION_CASES.forEach(([raw_value, expected]: [
+            unknown,
+            boolean
+        ]): void => {
             fixture.componentRef.setInput('required', raw_value);
 
-            expect(fixture.componentInstance.required)
-                .withContext(`required = ${JSON.stringify(raw_value)}`).toBe(expected);
+            expect(fixture.componentInstance.required, `required = ${JSON.stringify(raw_value)}`).toBe(expected);
         });
     });
 
@@ -174,13 +179,14 @@ describe('SelectComponent', (): void => {
         fixture.componentRef.setInput('form_control', control);
         fixture.detectChanges();
 
-        BOOLEAN_COERCION_CASES.forEach(([raw_value, expected]: [unknown, boolean]): void => {
+        BOOLEAN_COERCION_CASES.forEach(([raw_value, expected]: [
+            unknown,
+            boolean
+        ]): void => {
             fixture.componentRef.setInput('disabled', raw_value);
 
-            expect(fixture.componentInstance.disabled)
-                .withContext(`disabled = ${JSON.stringify(raw_value)}`).toBe(expected);
-            expect(control.disabled)
-                .withContext(`form_control désactivé pour disabled = ${JSON.stringify(raw_value)}`).toBe(expected);
+            expect(fixture.componentInstance.disabled, `disabled = ${JSON.stringify(raw_value)}`).toBe(expected);
+            expect(control.disabled, `form_control désactivé pour disabled = ${JSON.stringify(raw_value)}`).toBe(expected);
         });
     });
 
@@ -201,13 +207,13 @@ describe('SelectComponent', (): void => {
         });
 
         fixture.componentRef.setInput('placeholder', 'Choisir');
-        expect(emissions).withContext('après placeholder').toBe(1);
+        expect(emissions, 'après placeholder').toBe(1);
 
         fixture.componentRef.setInput('required', true);
-        expect(emissions).withContext('après required').toBe(2);
+        expect(emissions, 'après required').toBe(2);
 
         fixture.componentRef.setInput('disabled', true);
-        expect(emissions).withContext('après disabled').toBe(3);
+        expect(emissions, 'après disabled').toBe(3);
     });
 
     it('n\'émet pas sur `stateChanges` pour `userAriaDescribedBy`, qui n\'a pas de setter', (): void => {

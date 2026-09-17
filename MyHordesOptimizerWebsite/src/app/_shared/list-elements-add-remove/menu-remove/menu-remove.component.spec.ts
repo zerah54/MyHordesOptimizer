@@ -1,8 +1,7 @@
-import { Component } from '@angular/core';
+import { ANIMATION_MODULE_TYPE, ChangeDetectionStrategy, Component } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatMenuModule, MatMenuTrigger } from '@angular/material/menu';
 import { By } from '@angular/platform-browser';
-import { provideNoopAnimations } from '@angular/platform-browser/animations';
 
 import { StatusEnum } from '../../../_abstract_model/enum/status.enum';
 import { Item } from '../../../_abstract_model/types/item.class';
@@ -11,6 +10,7 @@ import { MenuRemoveComponent } from './menu-remove.component';
 /** Hôte minimal : reproduit le déclenchement `matMenuTriggerFor`/`matMenuTriggerData` réel de `list-element-add-remove`. */
 @Component({
     imports: [MenuRemoveComponent, MatMenuModule],
+    changeDetection: ChangeDetectionStrategy.OnPush,
     template: `
         <div class="opener" [matMenuTriggerFor]="menuRemove.menu()"
              [matMenuTriggerData]="{list: list, menuLabel: menuLabel, emptyLabel: emptyLabel}"></div>
@@ -41,11 +41,13 @@ describe('MenuRemoveComponent', (): void => {
     beforeEach(async (): Promise<void> => {
         await TestBed.configureTestingModule({
             imports: [MenuRemoveHostComponent],
-            providers: [provideNoopAnimations()]
+            providers: [{ provide: ANIMATION_MODULE_TYPE, useValue: 'NoopAnimations' }]
         }).compileComponents();
         fixture = TestBed.createComponent(MenuRemoveHostComponent);
         const menuRemoveDebugElement = fixture.debugElement.query(By.directive(MenuRemoveComponent));
-        locale = (menuRemoveDebugElement.componentInstance as unknown as { locale: string }).locale;
+        locale = (menuRemoveDebugElement.componentInstance as unknown as {
+            locale: string;
+        }).locale;
     });
 
     afterEach((): void => {
@@ -118,7 +120,7 @@ describe('MenuRemoveComponent', (): void => {
         emptyEntry.dispatchEvent(new MouseEvent('click', { bubbles: true }));
         fixture.detectChanges();
 
-        expect(fixture.componentInstance.emptied).toBeTrue();
+        expect(fixture.componentInstance.emptied).toBe(true);
     });
 
     it('renders StatusEnum elements the same way as items', (): void => {

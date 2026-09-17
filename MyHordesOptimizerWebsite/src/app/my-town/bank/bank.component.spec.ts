@@ -1,7 +1,7 @@
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withXhr } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
+import { ANIMATION_MODULE_TYPE } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import moment from 'moment';
 import { of } from 'rxjs';
 
@@ -29,7 +29,7 @@ describe('BankComponent', (): void => {
     beforeEach(async (): Promise<void> => {
         await TestBed.configureTestingModule({
             imports: [BankComponent],
-            providers: [provideHttpClient(), provideHttpClientTesting(), provideNoopAnimations()]
+            providers: [provideHttpClient(withXhr()), provideHttpClientTesting(), { provide: ANIMATION_MODULE_TYPE, useValue: 'NoopAnimations' }]
         }).compileComponents();
 
         townService = TestBed.inject(TownService);
@@ -39,12 +39,12 @@ describe('BankComponent', (): void => {
     function flushBank(items: Item[]): void {
         const bank: BankInfo = new BankInfo();
         bank.items = items;
-        spyOn(townService, 'getBank').and.returnValue(of(bank));
+        vi.spyOn(townService, 'getBank').mockReturnValue(of(bank));
         fixture.detectChanges();
     }
 
     it('renders nothing until the bank has loaded', (): void => {
-        spyOn(townService, 'getBank').and.returnValue(of());
+        vi.spyOn(townService, 'getBank').mockReturnValue(of());
         fixture.detectChanges();
 
         expect(fixture.nativeElement.querySelector('.mho-bank .filter')).toBeNull();
@@ -60,8 +60,13 @@ describe('BankComponent', (): void => {
     it('applyFilters narrows displayed_bank_items by the typed filter text', (): void => {
         flushBank([makeItem(1, 'Pelle'), makeItem(2, 'Pioche')]);
 
-        (fixture.componentInstance as unknown as { filter_value: string; applyFilters(): void }).filter_value = 'pelle';
-        (fixture.componentInstance as unknown as { applyFilters(): void }).applyFilters();
+        (fixture.componentInstance as unknown as {
+            filter_value: string;
+            applyFilters(): void;
+        }).filter_value = 'pelle';
+        (fixture.componentInstance as unknown as {
+            applyFilters(): void;
+        }).applyFilters();
         fixture.detectChanges();
 
         expect(fixture.nativeElement.querySelectorAll('mho-item').length).toBe(1);

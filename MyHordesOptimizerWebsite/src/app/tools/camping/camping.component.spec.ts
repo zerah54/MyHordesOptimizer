@@ -1,4 +1,4 @@
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withXhr } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
@@ -14,11 +14,23 @@ import { ClipboardService } from '../../_core/services/clipboard.service';
 import { CampingComponent } from './camping.component';
 
 interface TestableComponent {
-    ruins: { (): Ruin[] };
-    town_ruins: { (): Ruin[] };
-    bonus: { (): CampingBonus | undefined; set(value: CampingBonus | undefined): void };
-    configuration_form: { (): UntypedFormGroup | undefined; set(value: UntypedFormGroup | undefined): void };
-    camping_result: { (): CampingOdds | undefined };
+    ruins: {
+        (): Ruin[];
+    };
+    town_ruins: {
+        (): Ruin[];
+    };
+    bonus: {
+        (): CampingBonus | undefined;
+        set(value: CampingBonus | undefined): void;
+    };
+    configuration_form: {
+        (): UntypedFormGroup | undefined;
+        set(value: UntypedFormGroup | undefined): void;
+    };
+    camping_result: {
+        (): CampingOdds | undefined;
+    };
     and_amelio: boolean;
     display_bonus_ap: boolean;
     calculateCrowdChance(value: number): number;
@@ -85,7 +97,7 @@ describe('CampingComponent', (): void => {
         await TestBed.configureTestingModule({
             imports: [CampingComponent],
             providers: [
-                provideHttpClient(), provideHttpClientTesting(), provideRouter([]),
+                provideHttpClient(withXhr()), provideHttpClientTesting(), provideRouter([]),
                 { provide: ActivatedRoute, useValue: { queryParams: of({}) } }
             ]
         }).compileComponents();
@@ -100,9 +112,9 @@ describe('CampingComponent', (): void => {
 
     describe('ngOnInit', (): void => {
         it('resolves the async chain (ruins, bonus, form, camping result) and builds the form', (): void => {
-            spyOn(apiService, 'getRuins').and.returnValue(of([makeRuin(2), makeRuin(3)]));
-            spyOn(campingService, 'getBonus').and.returnValue(of(makeBonus()));
-            spyOn(campingService, 'calculateCamping').and.returnValue(of(Object.assign(new CampingOdds(), { probability: 42, bounded_probability: 42, label: { fr: 'x' } })));
+            vi.spyOn(apiService, 'getRuins').mockReturnValue(of([makeRuin(2), makeRuin(3)]));
+            vi.spyOn(campingService, 'getBonus').mockReturnValue(of(makeBonus()));
+            vi.spyOn(campingService, 'calculateCamping').mockReturnValue(of(Object.assign(new CampingOdds(), { probability: 42, bounded_probability: 42, label: { fr: 'x' } })));
 
             fixture.detectChanges();
 
@@ -155,9 +167,7 @@ describe('CampingComponent', (): void => {
         it('computes camping_result from the current form values', (): void => {
             testable.bonus.set(makeBonus());
             testable.configuration_form.set(buildFormGroup());
-            spyOn(campingService, 'calculateCamping').and.returnValue(
-                of(Object.assign(new CampingOdds(), { probability: 77, bounded_probability: 77, label: { fr: 'y' } }))
-            );
+            vi.spyOn(campingService, 'calculateCamping').mockReturnValue(of(Object.assign(new CampingOdds(), { probability: 77, bounded_probability: 77, label: { fr: 'y' } })));
 
             testable.calculateCamping();
 
@@ -168,8 +178,13 @@ describe('CampingComponent', (): void => {
     describe('changeInTownMode', (): void => {
         it('locks the town type and devastated controls to the town values when entering "in town" mode', (): void => {
             testable.configuration_form.set(buildFormGroup());
-            (component as unknown as { town: unknown; in_town_camping: boolean }).town = { town_type: 'PANDE', is_devaste: true };
-            (component as unknown as { in_town_camping: boolean }).in_town_camping = true;
+            (component as unknown as {
+                town: unknown;
+                in_town_camping: boolean;
+            }).town = { town_type: 'PANDE', is_devaste: true };
+            (component as unknown as {
+                in_town_camping: boolean;
+            }).in_town_camping = true;
 
             testable.changeInTownMode();
 
@@ -183,12 +198,12 @@ describe('CampingComponent', (): void => {
         it('copies a link containing the current form as query params', (): void => {
             testable.configuration_form.set(buildFormGroup());
             const clipboard: ClipboardService = TestBed.inject(ClipboardService);
-            const copySpy: jasmine.Spy = spyOn(clipboard, 'copy');
+            const copySpy = vi.spyOn(clipboard, 'copy');
 
             testable.shareCamping();
 
             expect(copySpy).toHaveBeenCalled();
-            expect(copySpy.calls.mostRecent().args[0]).toContain('?');
+            expect(vi.mocked(copySpy).mock.lastCall![0]).toContain('?');
         });
     });
 });

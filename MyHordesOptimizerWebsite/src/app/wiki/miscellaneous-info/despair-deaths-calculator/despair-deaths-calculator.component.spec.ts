@@ -11,7 +11,7 @@ describe('DespairDeathsCalculatorComponent', (): void => {
     beforeEach(async (): Promise<void> => {
         await TestBed.configureTestingModule({
             imports: [DespairDeathsCalculatorComponent],
-            providers: [{ provide: MatDialogRef, useValue: { close: jasmine.createSpy('close') } }]
+            providers: [{ provide: MatDialogRef, useValue: { close: vi.fn() } }]
         }).compileComponents();
 
         fixture = TestBed.createComponent(DespairDeathsCalculatorComponent);

@@ -29,9 +29,7 @@
                             }
                         </span>
                     @if (value && clearable()) {
-                        <i class="fal fa-close" style="margin-right: 1em"
-                           (click)="$event.stopPropagation(); value = []; writeValue([])">
-                        </i>
+                        <mat-icon style="margin-right: 1em" (click)="$event.stopPropagation(); value = []; writeValue([])">close</mat-icon>
                     }
                 </div>
             }

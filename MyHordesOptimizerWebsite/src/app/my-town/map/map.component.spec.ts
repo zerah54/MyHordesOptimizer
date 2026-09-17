@@ -1,10 +1,10 @@
 import { BreakpointObserver } from '@angular/cdk/layout';
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withXhr } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
-import { Component, input, InputSignal } from '@angular/core';
-import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
-import { provideNoopAnimations } from '@angular/platform-browser/animations';
+import { ANIMATION_MODULE_TYPE, ChangeDetectionStrategy, Component, input, InputSignal } from '@angular/core';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { of } from 'rxjs';
+import type { Mock } from 'vitest';
 
 import { ApiService } from '../../_abstract_model/services/api.service';
 import { TownService } from '../../_abstract_model/services/town.service';
@@ -17,7 +17,8 @@ import { DrawMapComponent } from './draw-map/draw-map.component';
 import { MapComponent, MapOptions } from './map.component';
 
 /** Remplace mho-draw-map : capture les entrées reçues sans instancier la grille de carte réelle (MatDialog/TownContextService). */
-@Component({ selector: 'mho-draw-map', template: '', standalone: true })
+@Component({ selector: 'mho-draw-map', template: '', changeDetection: ChangeDetectionStrategy.OnPush,
+             standalone: true })
 class DrawMapStubComponent {
     public readonly map: InputSignal<Town | undefined> = input();
     public readonly allItems: InputSignal<Item[] | undefined> = input();
@@ -46,7 +47,7 @@ describe('MapComponent', (): void => {
 
         await TestBed.configureTestingModule({
             imports: [MapComponent],
-            providers: [provideHttpClient(), provideHttpClientTesting(), provideNoopAnimations()]
+            providers: [provideHttpClient(withXhr()), provideHttpClientTesting(), { provide: ANIMATION_MODULE_TYPE, useValue: 'NoopAnimations' }]
         })
             .overrideComponent(MapComponent, {
                 remove: { imports: [DrawMapComponent] },
@@ -57,16 +58,29 @@ describe('MapComponent', (): void => {
         apiService = TestBed.inject(ApiService);
         townService = TestBed.inject(TownService);
         breakpointObserver = TestBed.inject(BreakpointObserver);
+        // jsdom n'implémente pas ResizeObserver (contrairement à Chrome sous Karma) : mhoScrollAura
+        // (utilisé par ce template) en a besoin dans ngAfterViewInit, sans quoi la création du
+        // composant lève systématiquement une ReferenceError, y compris hors de tout test fakeAsync.
+        vi.stubGlobal('ResizeObserver', class {
+            public observe(): void {}
+            public unobserve(): void {}
+            public disconnect(): void {}
+        });
+        vi.useFakeTimers();
     });
 
-    afterEach((): void => localStorage.removeItem('MAP_OPTIONS'));
+    afterEach((): void => {
+        localStorage.removeItem('MAP_OPTIONS');
+        vi.useRealTimers();
+        vi.unstubAllGlobals();
+    });
 
     function create(is_gt_xs: boolean = true): void {
-        spyOn(breakpointObserver, 'isMatched').and.returnValue(is_gt_xs);
-        spyOn(townService, 'getMap').and.returnValue(of());
-        spyOn(apiService, 'getRuins').and.returnValue(of());
-        spyOn(apiService, 'getItems').and.returnValue(of());
-        spyOn(townService, 'getCitizens').and.returnValue(of());
+        vi.spyOn(breakpointObserver, 'isMatched').mockReturnValue(is_gt_xs);
+        vi.spyOn(townService, 'getMap').mockReturnValue(of());
+        vi.spyOn(apiService, 'getRuins').mockReturnValue(of());
+        vi.spyOn(apiService, 'getItems').mockReturnValue(of());
+        vi.spyOn(townService, 'getCitizens').mockReturnValue(of());
         fixture = TestBed.createComponent(MapComponent);
     }
 
@@ -95,10 +109,10 @@ describe('MapComponent', (): void => {
         const citizen_info: CitizenInfo = new CitizenInfo();
         citizen_info.citizens = [new Citizen()];
 
-        (townService.getMap as jasmine.Spy).and.returnValue(of(town));
-        (apiService.getRuins as jasmine.Spy).and.returnValue(of(ruins));
-        (apiService.getItems as jasmine.Spy).and.returnValue(of(items));
-        (townService.getCitizens as jasmine.Spy).and.returnValue(of(citizen_info));
+        (townService.getMap as Mock).mockReturnValue(of(town));
+        (apiService.getRuins as Mock).mockReturnValue(of(ruins));
+        (apiService.getItems as Mock).mockReturnValue(of(items));
+        (townService.getCitizens as Mock).mockReturnValue(of(citizen_info));
         fixture = TestBed.createComponent(MapComponent);
         fixture.detectChanges();
 
@@ -122,13 +136,13 @@ describe('MapComponent', (): void => {
         fixture.detectChanges();
         expect(fixture.nativeElement.querySelector('mat-sidenav').classList).toContain('mat-drawer-side');
 
-        (breakpointObserver.isMatched as jasmine.Spy).and.returnValue(false);
+        (breakpointObserver.isMatched as Mock).mockReturnValue(false);
         window.dispatchEvent(new Event('resize'));
         fixture.detectChanges();
         expect(fixture.nativeElement.querySelector('mat-sidenav').classList).toContain('mat-drawer-over');
     });
 
-    it('changeOptions() updates the highlighted chip and persists to localStorage', (done: DoneFn): void => {
+    it('changeOptions() updates the highlighted chip and persists to localStorage', async (): Promise<void> => {
         create();
         fixture.detectChanges();
 
@@ -142,7 +156,7 @@ describe('MapComponent', (): void => {
         setTimeout((): void => {
             const stored: MapOptions = JSON.parse(localStorage.getItem('MAP_OPTIONS') as string);
             expect(stored.map_type).toBe('danger');
-            done();
+
         });
     });
 
@@ -156,48 +170,62 @@ describe('MapComponent', (): void => {
         expect(stub.options()?.distances).toEqual([]);
     });
 
-    it('addDistanceToList() adds a new distance option and renders it in the list, ignoring an exact duplicate', fakeAsync((): void => {
+    it('addDistanceToList() adds a new distance option and renders it in the list, ignoring an exact duplicate', async (): Promise<void> => {
         create();
         fixture.detectChanges();
 
-        const testable: { new_distance_option: { value: number; unit: 'km' | 'pa'; round_trip?: boolean }; addDistanceToList(): void } =
-            fixture.componentInstance as unknown as typeof testable;
+        const testable: {
+            new_distance_option: {
+                value: number;
+                unit: 'km' | 'pa';
+                round_trip?: boolean;
+            };
+            addDistanceToList(): void;
+        } = fixture.componentInstance as unknown as typeof testable;
         testable.new_distance_option.value = 5;
         testable.new_distance_option.unit = 'km';
         testable.addDistanceToList();
-        tick();
+        await vi.advanceTimersByTimeAsync(0);
         fixture.detectChanges();
 
         expect(fixture.nativeElement.querySelectorAll('mat-list-item').length).toBe(1);
         expect(fixture.nativeElement.querySelector('mat-list-item [matListItemTitle]').textContent).toContain('5');
 
         testable.addDistanceToList();
-        tick();
+        await vi.advanceTimersByTimeAsync(0);
         fixture.detectChanges();
 
         expect(fixture.nativeElement.querySelectorAll('mat-list-item').length).toBe(1);
-    }));
+    });
 
-    it('removeDistanceFromList() removes a matching distance option from the list', fakeAsync((): void => {
+    it('removeDistanceFromList() removes a matching distance option from the list', async (): Promise<void> => {
         create();
         fixture.detectChanges();
 
         const testable: {
-            new_distance_option: { value: number; unit: 'km' | 'pa'; round_trip?: boolean };
+            new_distance_option: {
+                value: number;
+                unit: 'km' | 'pa';
+                round_trip?: boolean;
+            };
             addDistanceToList(): void;
-            removeDistanceFromList(distance: { value: number; unit: 'km' | 'pa'; round_trip?: boolean }): void;
+            removeDistanceFromList(distance: {
+                value: number;
+                unit: 'km' | 'pa';
+                round_trip?: boolean;
+            }): void;
         } = fixture.componentInstance as unknown as typeof testable;
         testable.new_distance_option.value = 5;
         testable.new_distance_option.unit = 'km';
         testable.addDistanceToList();
-        tick();
+        await vi.advanceTimersByTimeAsync(0);
         fixture.detectChanges();
         expect(fixture.nativeElement.querySelectorAll('mat-list-item').length).toBe(1);
 
         testable.removeDistanceFromList({ value: 5, unit: 'km' });
-        tick();
+        await vi.advanceTimersByTimeAsync(0);
         fixture.detectChanges();
 
         expect(fixture.nativeElement.querySelectorAll('mat-list-item').length).toBe(0);
-    }));
+    });
 });

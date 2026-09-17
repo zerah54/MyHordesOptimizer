@@ -1,6 +1,6 @@
-import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
+import { ANIMATION_MODULE_TYPE } from '@angular/core';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatTabChangeEvent } from '@angular/material/tabs';
-import { provideNoopAnimations } from '@angular/platform-browser/animations';
 
 import { Entry } from '../../../../_abstract_model/interfaces';
 import { Citizen } from '../../../../_abstract_model/types/citizen.class';
@@ -9,7 +9,9 @@ import { Item } from '../../../../_abstract_model/types/item.class';
 import { PlaysRegistryComponent } from './plays-registry.component';
 
 interface TestableComponent {
-    entries_by_type: { (): Entry[] };
+    entries_by_type: {
+        (): Entry[];
+    };
     changePlaysTab(event: MatTabChangeEvent): void;
 }
 
@@ -44,7 +46,7 @@ describe('PlaysRegistryComponent', (): void => {
     beforeEach(async (): Promise<void> => {
         await TestBed.configureTestingModule({
             imports: [PlaysRegistryComponent],
-            providers: [provideNoopAnimations()]
+            providers: [{ provide: ANIMATION_MODULE_TYPE, useValue: 'NoopAnimations' }]
         }).compileComponents();
 
         fixture = TestBed.createComponent(PlaysRegistryComponent);
@@ -54,6 +56,11 @@ describe('PlaysRegistryComponent', (): void => {
         ]);
         fixture.componentRef.setInput('displayPseudo', 'simple');
         fixture.componentRef.setInput('registry', registry);
+        vi.useFakeTimers();
+    });
+
+    afterEach((): void => {
+        vi.useRealTimers();
     });
 
     it('filters by "has a pendant" (dice+card same citizen) by default, no tab selected yet', (): void => {
@@ -74,36 +81,36 @@ describe('PlaysRegistryComponent', (): void => {
         expect((fixture.componentInstance as unknown as TestableComponent).entries_by_type()).toBe(before);
     });
 
-    it('shows only dice entries when the "dice" tab is selected', fakeAsync((): void => {
+    it('shows only dice entries when the "dice" tab is selected', async (): Promise<void> => {
         fixture.detectChanges();
 
         (fixture.componentInstance as unknown as TestableComponent).changePlaysTab(makeTabEvent('dice'));
-        tick();
+        await vi.advanceTimersByTimeAsync(0);
 
         const entries: Entry[] = (fixture.componentInstance as unknown as TestableComponent).entries_by_type();
         expect(entries.length).toBe(2);
         expect(entries.every((entry: Entry): boolean => entry.entry.includes('dés'))).toBe(true);
-    }));
+    });
 
-    it('shows only card entries when the "card" tab is selected', fakeAsync((): void => {
+    it('shows only card entries when the "card" tab is selected', async (): Promise<void> => {
         fixture.detectChanges();
 
         (fixture.componentInstance as unknown as TestableComponent).changePlaysTab(makeTabEvent('card'));
-        tick();
+        await vi.advanceTimersByTimeAsync(0);
 
         const entries: Entry[] = (fixture.componentInstance as unknown as TestableComponent).entries_by_type();
         expect(entries.length).toBe(1);
         expect(entries[0].entry).toContain('cartes');
-    }));
+    });
 
-    it('shows no entries when the "soccer" tab is selected (no matching entry)', fakeAsync((): void => {
+    it('shows no entries when the "soccer" tab is selected (no matching entry)', async (): Promise<void> => {
         fixture.detectChanges();
 
         (fixture.componentInstance as unknown as TestableComponent).changePlaysTab(makeTabEvent('soccer'));
-        tick();
+        await vi.advanceTimersByTimeAsync(0);
 
         expect((fixture.componentInstance as unknown as TestableComponent).entries_by_type().length).toBe(0);
-    }));
+    });
 
     it('renders citizen-info entries for the active tab', (): void => {
         fixture.detectChanges();

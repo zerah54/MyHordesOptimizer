@@ -1,7 +1,8 @@
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withXhr } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { of } from 'rxjs';
+import type { MockedObject } from 'vitest';
 
 import { NoteDTO } from '../../_abstract_model/dto/note.dto';
 import { TownListQuery } from '../../_abstract_model/dto/town-list-page.dto';
@@ -14,10 +15,17 @@ import { setUser } from '../../_core/utilities/localstorage.util';
 import { TownListComponent } from './town-list.component';
 
 interface TestableComponent {
-    townNotes: { (): Dictionary<NoteDTO> };
-    citizenNotes: { (): Dictionary<NoteDTO> };
+    townNotes: {
+        (): Dictionary<NoteDTO>;
+    };
+    citizenNotes: {
+        (): Dictionary<NoteDTO>;
+    };
     hasParticipated(row: TownListItem): boolean;
-    onPageChange(event: { pageIndex: number; pageSize: number }): void;
+    onPageChange(event: {
+        pageIndex: number;
+        pageSize: number;
+    }): void;
 }
 
 function town(citizens: TownPublicCitizen[]): TownListItem {
@@ -31,18 +39,21 @@ function town(citizens: TownPublicCitizen[]): TownListItem {
 describe('TownListComponent notes', (): void => {
     let fixture: ComponentFixture<TownListComponent>;
     let testable: TestableComponent;
-    let noteService: jasmine.SpyObj<NoteService>;
+    let noteService: MockedObject<NoteService>;
 
     beforeEach(async (): Promise<void> => {
-        noteService = jasmine.createSpyObj<NoteService>(
-            'NoteService', ['getMyTownNotes', 'saveTownNote', 'getMyCitizenNotesForUser', 'saveCitizenNote']
-        );
-        noteService.getMyTownNotes.and.returnValue(of({ 12: { note: '<p>hello</p>' } as NoteDTO }));
-        noteService.getMyCitizenNotesForUser.and.returnValue(of({ 12: { note: '<p>citizen note</p>' } as NoteDTO }));
+        noteService = {
+            getMyTownNotes: vi.fn().mockName('NoteService.getMyTownNotes'),
+            saveTownNote: vi.fn().mockName('NoteService.saveTownNote'),
+            getMyCitizenNotesForUser: vi.fn().mockName('NoteService.getMyCitizenNotesForUser'),
+            saveCitizenNote: vi.fn().mockName('NoteService.saveCitizenNote')
+        } as unknown as MockedObject<NoteService>;
+        noteService.getMyTownNotes.mockReturnValue(of({ 12: { note: '<p>hello</p>' } as NoteDTO }));
+        noteService.getMyCitizenNotesForUser.mockReturnValue(of({ 12: { note: '<p>citizen note</p>' } as NoteDTO }));
 
         await TestBed.configureTestingModule({
             imports: [TownListComponent],
-            providers: [provideHttpClient(), provideHttpClientTesting(), { provide: NoteService, useValue: noteService }]
+            providers: [provideHttpClient(withXhr()), provideHttpClientTesting(), { provide: NoteService, useValue: noteService }]
         }).compileComponents();
     });
 
@@ -86,7 +97,8 @@ describe('TownListComponent notes', (): void => {
         fixture.detectChanges();
 
         expect(noteService.getMyTownNotes).toHaveBeenCalledTimes(1);
-        expect(noteService.getMyCitizenNotesForUser).toHaveBeenCalledOnceWith(42);
+        expect(noteService.getMyCitizenNotesForUser).toHaveBeenCalledTimes(1);
+        expect(noteService.getMyCitizenNotesForUser).toHaveBeenCalledWith(42);
         expect(testable.townNotes()[12].note).toBe('<p>hello</p>');
         expect(testable.citizenNotes()[12].note).toBe('<p>citizen note</p>');
     });
@@ -96,31 +108,37 @@ describe('TownListComponent notes', (): void => {
         createComponent();
         fixture.detectChanges();
 
-        expect(testable.hasParticipated(town([{ id: 1, name: 'Me', deathTypeId: null }]))).toBeTrue();
-        expect(testable.hasParticipated(town([{ id: 2, name: 'Other', deathTypeId: null }]))).toBeFalse();
-        expect(testable.hasParticipated(town([]))).toBeFalse();
+        expect(testable.hasParticipated(town([{ id: 1, name: 'Me', deathTypeId: null }]))).toBe(true);
+        expect(testable.hasParticipated(town([{ id: 2, name: 'Other', deathTypeId: null }]))).toBe(false);
+        expect(testable.hasParticipated(town([]))).toBe(false);
     });
 });
 
 describe('TownListComponent tri et pagination', (): void => {
     let fixture: ComponentFixture<TownListComponent>;
     let testable: TestableComponent;
-    let townService: jasmine.SpyObj<TownService>;
+    let townService: MockedObject<TownService>;
     const emptyResult: TownListPageResult = { items: [], totalCount: 0, availableTypes: [], availableLanguages: [] };
 
     beforeEach(async (): Promise<void> => {
-        townService = jasmine.createSpyObj<TownService>('TownService', ['getSeasonPhases', 'getTownsPaged']);
-        townService.getSeasonPhases.and.returnValue(of([]));
-        townService.getTownsPaged.and.returnValue(of(emptyResult));
-        const noteService: jasmine.SpyObj<NoteService> = jasmine.createSpyObj<NoteService>(
-            'NoteService', ['getMyTownNotes', 'saveTownNote', 'getMyCitizenNotesForUser', 'saveCitizenNote']
-        );
-        noteService.getMyTownNotes.and.returnValue(of({}));
+        townService = {
+            getSeasonPhases: vi.fn().mockName('TownService.getSeasonPhases'),
+            getTownsPaged: vi.fn().mockName('TownService.getTownsPaged')
+        } as unknown as MockedObject<TownService>;
+        townService.getSeasonPhases.mockReturnValue(of([]));
+        townService.getTownsPaged.mockReturnValue(of(emptyResult));
+        const noteService: MockedObject<NoteService> = {
+            getMyTownNotes: vi.fn().mockName('NoteService.getMyTownNotes'),
+            saveTownNote: vi.fn().mockName('NoteService.saveTownNote'),
+            getMyCitizenNotesForUser: vi.fn().mockName('NoteService.getMyCitizenNotesForUser'),
+            saveCitizenNote: vi.fn().mockName('NoteService.saveCitizenNote')
+        } as unknown as MockedObject<NoteService>;
+        noteService.getMyTownNotes.mockReturnValue(of({}));
 
         await TestBed.configureTestingModule({
             imports: [TownListComponent],
             providers: [
-                provideHttpClient(), provideHttpClientTesting(),
+                provideHttpClient(withXhr()), provideHttpClientTesting(),
                 { provide: TownService, useValue: townService },
                 { provide: NoteService, useValue: noteService }
             ]
@@ -132,30 +150,30 @@ describe('TownListComponent tri et pagination', (): void => {
     });
 
     it('charge avec le tri par défaut (id desc, page 1)', (): void => {
-        expect(townService.getTownsPaged).toHaveBeenCalledWith(jasmine.objectContaining({
+        expect(townService.getTownsPaged).toHaveBeenCalledWith(expect.objectContaining({
             page: 1, pageSize: 50, sortColumn: 'id', sortDirection: 'desc'
         } as Partial<TownListQuery>));
     });
 
     it('un changement de page recharge avec les nouveaux paramètres', (): void => {
-        townService.getTownsPaged.calls.reset();
+        townService.getTownsPaged.mockClear();
 
         testable.onPageChange({ pageIndex: 2, pageSize: 100 });
 
-        expect(townService.getTownsPaged).toHaveBeenCalledWith(jasmine.objectContaining({
+        expect(townService.getTownsPaged).toHaveBeenCalledWith(expect.objectContaining({
             page: 3, pageSize: 100
         } as Partial<TownListQuery>));
     });
 
     it('trier sur une nouvelle colonne réinitialise la page et recharge avec ce tri', (): void => {
         testable.onPageChange({ pageIndex: 2, pageSize: 50 });
-        townService.getTownsPaged.calls.reset();
+        townService.getTownsPaged.mockClear();
 
         const nameHeader: HTMLElement = fixture.nativeElement.querySelector('th[mat-sort-header="name"]');
         nameHeader.click();
         fixture.detectChanges();
 
-        expect(townService.getTownsPaged).toHaveBeenCalledWith(jasmine.objectContaining({
+        expect(townService.getTownsPaged).toHaveBeenCalledWith(expect.objectContaining({
             page: 1, sortColumn: 'name', sortDirection: 'asc'
         } as Partial<TownListQuery>));
     });

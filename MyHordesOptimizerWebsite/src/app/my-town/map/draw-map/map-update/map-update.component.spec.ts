@@ -1,12 +1,12 @@
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withXhr } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
-import { Component, input, InputSignal, output, OutputEmitterRef } from '@angular/core';
-import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
+import { ANIMATION_MODULE_TYPE, ChangeDetectionStrategy, Component, input, InputSignal, output, OutputEmitterRef } from '@angular/core';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MAT_DIALOG_DATA, MatDialogClose } from '@angular/material/dialog';
 import { By } from '@angular/platform-browser';
-import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import moment from 'moment';
 import { delay, of } from 'rxjs';
+import type { Mock } from 'vitest';
 
 import { DigsService } from '../../../../_abstract_model/services/digs.service';
 import { TownService } from '../../../../_abstract_model/services/town.service';
@@ -22,7 +22,8 @@ import { MapUpdateDigsComponent } from './map-update-digs/map-update-digs.compon
 import { MapUpdateRuinComponent } from './map-update-ruin/map-update-ruin.component';
 
 /** Remplace mho-map-update-cell : capture les entrées et permet de simuler cellChange sans monter le vrai formulaire réactif. */
-@Component({ selector: 'mho-map-update-cell', template: '', standalone: true })
+@Component({ selector: 'mho-map-update-cell', template: '', changeDetection: ChangeDetectionStrategy.OnPush,
+             standalone: true })
 class MapUpdateCellStubComponent {
     public readonly cell: InputSignal<Cell> = input.required();
     public readonly citizens: InputSignal<Citizen[]> = input.required();
@@ -30,7 +31,8 @@ class MapUpdateCellStubComponent {
 }
 
 /** Remplace mho-map-update-ruin. */
-@Component({ selector: 'mho-map-update-ruin', template: '', standalone: true })
+@Component({ selector: 'mho-map-update-ruin', template: '', changeDetection: ChangeDetectionStrategy.OnPush,
+             standalone: true })
 class MapUpdateRuinStubComponent {
     public readonly ruin: InputSignal<Ruin> = input.required();
     public readonly allRuins: InputSignal<Ruin[]> = input.required();
@@ -39,7 +41,8 @@ class MapUpdateRuinStubComponent {
 }
 
 /** Remplace mho-map-update-citizens. */
-@Component({ selector: 'mho-map-update-citizens', template: '', standalone: true })
+@Component({ selector: 'mho-map-update-citizens', template: '', changeDetection: ChangeDetectionStrategy.OnPush,
+             standalone: true })
 class MapUpdateCitizensStubComponent {
     public readonly citizens: InputSignal<Citizen[]> = input.required();
     public readonly allCitizens: InputSignal<Citizen[]> = input.required();
@@ -47,7 +50,8 @@ class MapUpdateCitizensStubComponent {
 }
 
 /** Remplace mho-map-update-digs. */
-@Component({ selector: 'mho-map-update-digs', template: '', standalone: true })
+@Component({ selector: 'mho-map-update-digs', template: '', changeDetection: ChangeDetectionStrategy.OnPush,
+             standalone: true })
 class MapUpdateDigsStubComponent {
     public readonly cell: InputSignal<Cell> = input.required();
     public readonly allCitizens: InputSignal<Citizen[]> = input.required();
@@ -96,11 +100,16 @@ describe('MapUpdateComponent', (): void => {
     beforeEach((): void => {
         TestBed.configureTestingModule({
             imports: [MapUpdateComponent],
-            providers: [provideHttpClient(), provideHttpClientTesting(), provideNoopAnimations()]
+            providers: [provideHttpClient(withXhr()), provideHttpClientTesting(), { provide: ANIMATION_MODULE_TYPE, useValue: 'NoopAnimations' }]
         }).overrideComponent(MapUpdateComponent, {
             remove: { imports: [MapUpdateCellComponent, MapUpdateRuinComponent, MapUpdateCitizensComponent, MapUpdateDigsComponent] },
             add: { imports: [MapUpdateCellStubComponent, MapUpdateRuinStubComponent, MapUpdateCitizensStubComponent, MapUpdateDigsStubComponent] }
         });
+        vi.useFakeTimers();
+    });
+
+    afterEach((): void => {
+        vi.useRealTimers();
     });
 
     /** Instancie le composant avec les data du dialogue ; getDigs() renvoie [] par défaut (surchargeable avant detectChanges()). */
@@ -108,7 +117,7 @@ describe('MapUpdateComponent', (): void => {
         TestBed.overrideProvider(MAT_DIALOG_DATA, { useValue: data });
         digsService = TestBed.inject(DigsService);
         townService = TestBed.inject(TownService);
-        spyOn(digsService, 'getDigs').and.returnValue(of([]));
+        vi.spyOn(digsService, 'getDigs').mockReturnValue(of([]));
         fixture = TestBed.createComponent(MapUpdateComponent);
     }
 
@@ -181,7 +190,7 @@ describe('MapUpdateComponent', (): void => {
     it('getDigs() is filtered to this cell\'s coordinates and fed to the Fouilles tab via digs()', (): void => {
         const cell: Cell = newCell({ displayed_x: 3, displayed_y: 4 });
         create({ cell, all_citizens: [], all_ruins: [] });
-        (digsService.getDigs as jasmine.Spy).and.returnValue(of([
+        (digsService.getDigs as Mock).mockReturnValue(of([
             newDig({ x: 3, y: 4, digger_id: 1 }),
             newDig({ x: 9, y: 9, digger_id: 2 })
         ]));
@@ -222,30 +231,32 @@ describe('MapUpdateComponent', (): void => {
 
         // (citizensChange)="cell.citizens = $event" écrit sur `this.cell` (le clone local édité par le
         // dialogue), pas sur `data.cell` (`cell`, la variable locale du test) : ce sont deux objets distincts.
-        const internalCell: Cell = (<{ cell: Cell }>(<unknown>fixture.componentInstance)).cell;
+        const internalCell: Cell = (<{
+            cell: Cell;
+        }>(<unknown>fixture.componentInstance)).cell;
         expect(internalCell.citizens.length).toBe(2);
     });
 
     it('saveCell() calls TownService.saveCell() and DigsService.updateDig() when there are digs for this cell', (): void => {
         const cell: Cell = newCell({ displayed_x: 1, displayed_y: 2 });
         create({ cell, all_citizens: [], all_ruins: [] });
-        (digsService.getDigs as jasmine.Spy).and.returnValue(of([newDig({ x: 1, y: 2, digger_id: 5 })]));
-        spyOn(townService, 'saveCell').and.returnValue(of(newCell({ displayed_x: 1, displayed_y: 2, nb_zombie: 9 })));
-        spyOn(digsService, 'updateDig').and.returnValue(of([]));
+        (digsService.getDigs as Mock).mockReturnValue(of([newDig({ x: 1, y: 2, digger_id: 5 })]));
+        vi.spyOn(townService, 'saveCell').mockReturnValue(of(newCell({ displayed_x: 1, displayed_y: 2, nb_zombie: 9 })));
+        vi.spyOn(digsService, 'updateDig').mockReturnValue(of([]));
         fixture.detectChanges();
 
         fixture.nativeElement.querySelector('button[mat-raised-button]').dispatchEvent(new MouseEvent('click'));
         fixture.detectChanges();
 
-        expect(townService.saveCell).toHaveBeenCalledWith(jasmine.objectContaining({ displayed_x: 1, displayed_y: 2 }));
-        expect(digsService.updateDig).toHaveBeenCalledWith([jasmine.objectContaining({ digger_id: 5 })]);
+        expect(townService.saveCell).toHaveBeenCalledWith(expect.objectContaining({ displayed_x: 1, displayed_y: 2 }));
+        expect(digsService.updateDig).toHaveBeenCalledWith([expect.objectContaining({ digger_id: 5 })]);
     });
 
     it('saveCell() does not call updateDig() when there are no digs for this cell', (): void => {
         const cell: Cell = newCell();
         create({ cell, all_citizens: [], all_ruins: [] });
-        spyOn(townService, 'saveCell').and.returnValue(of(newCell()));
-        spyOn(digsService, 'updateDig').and.returnValue(of([]));
+        vi.spyOn(townService, 'saveCell').mockReturnValue(of(newCell()));
+        vi.spyOn(digsService, 'updateDig').mockReturnValue(of([]));
         fixture.detectChanges();
 
         fixture.nativeElement.querySelector('button[mat-raised-button]').dispatchEvent(new MouseEvent('click'));
@@ -254,7 +265,7 @@ describe('MapUpdateComponent', (): void => {
         expect(digsService.updateDig).not.toHaveBeenCalled();
     });
 
-    it('after a successful save, both mat-dialog-close bindings reflect the latest locally-edited cell rather than the stale pre-save data.cell (OnPush staleness guard)', fakeAsync((): void => {
+    it('after a successful save, both mat-dialog-close bindings reflect the latest locally-edited cell rather than the stale pre-save data.cell (OnPush staleness guard)', async (): Promise<void> => {
         const original: Cell = newCell({ displayed_x: 1, displayed_y: 2, nb_zombie: 0 });
         create({ cell: original, all_citizens: [], all_ruins: [] });
         // saveCell() ignore la valeur renvoyée par l'observable (next: () => {...}, sans paramètre) : seul
@@ -272,7 +283,7 @@ describe('MapUpdateComponent', (): void => {
         // — cf. la ruling déjà actée au ledger (Task 6 : « un test unitaire ne peut pas trancher cette
         // question »). Justification du correctif : lecture du mécanisme interne (MatDialogClose.dialogResult
         // mis à jour uniquement par le binding, pas par une notification indépendante), pas ce test.
-        spyOn(townService, 'saveCell').and.returnValue(of(newCell()).pipe(delay(1)));
+        vi.spyOn(townService, 'saveCell').mockReturnValue(of(newCell()).pipe(delay(1)));
         fixture.detectChanges();
 
         const cellStub: MapUpdateCellStubComponent = fixture.debugElement.query((de) => de.componentInstance instanceof MapUpdateCellStubComponent).componentInstance;
@@ -282,7 +293,7 @@ describe('MapUpdateComponent', (): void => {
         fixture.nativeElement.querySelector('button[mat-raised-button]').dispatchEvent(new MouseEvent('click'));
         fixture.detectChanges();
 
-        tick(1); // la réponse HTTP arrive maintenant, hors de tout contexte d'événement du template
+        await vi.advanceTimersByTimeAsync(1); // la réponse HTTP arrive maintenant, hors de tout contexte d'événement du template
         fixture.detectChanges();
 
         const closeDirectives: MatDialogClose[] = fixture.debugElement.queryAll(By.directive(MatDialogClose))
@@ -292,7 +303,7 @@ describe('MapUpdateComponent', (): void => {
             expect(directive.dialogResult).not.toBe(original);
             expect((<Cell>directive.dialogResult).nb_zombie).toBe(7);
         });
-    }));
+    });
 
     it('before any save, both mat-dialog-close bindings return the original data.cell', (): void => {
         const original: Cell = newCell({ displayed_x: 1, displayed_y: 2 });

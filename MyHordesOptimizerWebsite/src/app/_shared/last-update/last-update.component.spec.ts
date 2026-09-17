@@ -94,7 +94,12 @@ describe('LastUpdateComponent', (): void => {
     });
 
     describe('threshold-based icon selection', (): void => {
-        const thresholds: [number, number, number, number] = [5, 15, 30, 60];
+        const thresholds: [
+            number,
+            number,
+            number,
+            number
+        ] = [5, 15, 30, 60];
 
         it('uses icon 1 when the update is within the first threshold', (): void => {
             fixture.componentRef.setInput('lastUpdateInfo', createUpdateInfo(2));
@@ -143,7 +148,12 @@ describe('LastUpdateComponent', (): void => {
     });
 
     describe('icon tooltip content', (): void => {
-        const thresholds: [number, number, number, number] = [5, 15, 30, 60];
+        const thresholds: [
+            number,
+            number,
+            number,
+            number
+        ] = [5, 15, 30, 60];
 
         it('shows only the formatted date on the icon tooltip when the detail text is already visible', (): void => {
             fixture.componentRef.setInput('lastUpdateInfo', createUpdateInfo(2, 'Alice'));
@@ -182,7 +192,7 @@ describe('LastUpdateComponent', (): void => {
         fixture.detectChanges();
 
         const host: HTMLElement = fixture.debugElement.query(By.css('.mho-last-update')).nativeElement;
-        expect(host.classList.contains('align-right')).toBeFalse();
+        expect(host.classList.contains('align-right')).toBe(false);
     });
 
     it('applies the align-right class when alignRight is true', (): void => {
@@ -191,6 +201,6 @@ describe('LastUpdateComponent', (): void => {
         fixture.detectChanges();
 
         const host: HTMLElement = fixture.debugElement.query(By.css('.mho-last-update')).nativeElement;
-        expect(host.classList.contains('align-right')).toBeTrue();
+        expect(host.classList.contains('align-right')).toBe(true);
     });
 });

@@ -1,12 +1,10 @@
 // eslint-disable-next-line @typescript-eslint/triple-slash-reference
 /// <reference types="@angular/localize" />
 
-import '@angular/localize/init';
-import 'zone.js';
-import 'moment/dist/locale/de';
-import 'moment/dist/locale/en-gb';
-import 'moment/dist/locale/es';
-import 'moment/dist/locale/fr';
+import 'moment/locale/de';
+import 'moment/locale/en-gb';
+import 'moment/locale/es';
+import 'moment/locale/fr';
 
 import { registerLocaleData } from '@angular/common';
 import localeDE from '@angular/common/locales/de';

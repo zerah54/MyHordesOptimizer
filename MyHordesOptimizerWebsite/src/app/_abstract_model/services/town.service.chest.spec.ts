@@ -1,4 +1,4 @@
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withXhr } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 
@@ -13,7 +13,7 @@ describe('TownService — updateChest', (): void => {
     beforeEach((): void => {
         setTown(null);
         TestBed.configureTestingModule({
-            providers: [provideHttpClient(), provideHttpClientTesting()]
+            providers: [provideHttpClient(withXhr()), provideHttpClientTesting()]
         });
         service = TestBed.inject(TownService);
         httpMock = TestBed.inject(HttpTestingController);

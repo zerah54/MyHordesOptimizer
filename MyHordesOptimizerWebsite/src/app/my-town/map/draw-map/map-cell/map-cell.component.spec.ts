@@ -1,8 +1,8 @@
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withXhr } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
+import { ANIMATION_MODULE_TYPE } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatDialog } from '@angular/material/dialog';
-import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { of } from 'rxjs';
 
 import { Cell } from '../../../../_abstract_model/types/cell.class';
@@ -68,7 +68,7 @@ describe('MapCellComponent', (): void => {
     beforeEach(async (): Promise<void> => {
         await TestBed.configureTestingModule({
             imports: [MapCellComponent],
-            providers: [provideHttpClient(), provideHttpClientTesting(), provideNoopAnimations()]
+            providers: [provideHttpClient(withXhr()), provideHttpClientTesting(), { provide: ANIMATION_MODULE_TYPE, useValue: 'NoopAnimations' }]
         }).compileComponents();
         fixture = TestBed.createComponent(MapCellComponent);
     });
@@ -150,7 +150,7 @@ describe('MapCellComponent', (): void => {
 
         const dialog: MatDialog = TestBed.inject(MatDialog);
         const replacement: Cell = newCell({ nb_zombie: 5 });
-        spyOn(dialog, 'open').and.returnValue(<never>{ afterClosed: () => of(replacement) });
+        vi.spyOn(dialog, 'open').mockReturnValue(<never>{ afterClosed: () => of(replacement) });
 
         const emitted: Cell[] = [];
         fixture.componentInstance.cellChange.subscribe((value: Cell) => emitted.push(value));
@@ -158,8 +158,8 @@ describe('MapCellComponent', (): void => {
         const td: HTMLElement = fixture.nativeElement.querySelector('td.map-cell');
         td.dispatchEvent(new MouseEvent('click'));
 
-        expect(dialog.open).toHaveBeenCalledWith(MapUpdateComponent, jasmine.objectContaining({
-            data: jasmine.objectContaining({ cell })
+        expect(dialog.open).toHaveBeenCalledWith(MapUpdateComponent, expect.objectContaining({
+            data: expect.objectContaining({ cell })
         }));
         expect(emitted).toEqual([replacement]);
     });
@@ -169,7 +169,7 @@ describe('MapCellComponent', (): void => {
         fixture.detectChanges();
 
         const dialog: MatDialog = TestBed.inject(MatDialog);
-        spyOn(dialog, 'open').and.returnValue(<never>{ afterClosed: () => of(undefined) });
+        vi.spyOn(dialog, 'open').mockReturnValue(<never>{ afterClosed: () => of(undefined) });
 
         const emitted: Cell[] = [];
         fixture.componentInstance.cellChange.subscribe((value: Cell) => emitted.push(value));
@@ -185,7 +185,7 @@ describe('MapCellComponent', (): void => {
 
         TestBed.inject(TownContextService).setObservedTown(new TownDetails());
         const dialog: MatDialog = TestBed.inject(MatDialog);
-        spyOn(dialog, 'open');
+        vi.spyOn(dialog, 'open');
 
         fixture.nativeElement.querySelector('td.map-cell').dispatchEvent(new MouseEvent('click'));
 

@@ -25,7 +25,11 @@ describe('computeReconstructedHomeDefense', (): void => {
         if (overrides.has_fence !== undefined) {
             content.push({ element: HomeEnum.HAS_FENCE, value: overrides.has_fence });
         }
-        (citizen as unknown as { home: { content: HomeWithValue[] } }).home = { content };
+        (citizen as unknown as {
+            home: {
+                content: HomeWithValue[];
+            };
+        }).home = { content };
         if (overrides.chest_items) {
             const chest: Bag = new Bag();
             chest.items = overrides.chest_items;

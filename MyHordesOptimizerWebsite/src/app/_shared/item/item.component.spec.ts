@@ -1,4 +1,4 @@
-import { HttpRequest, provideHttpClient } from '@angular/common/http';
+import { HttpRequest, provideHttpClient, withXhr } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting, TestRequest } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
@@ -16,7 +16,7 @@ describe('ItemComponent — effet catapulte', () => {
     beforeEach(async () => {
         await TestBed.configureTestingModule({
             imports: [ItemComponent],
-            providers: [provideHttpClient(), provideHttpClientTesting()]
+            providers: [provideHttpClient(withXhr()), provideHttpClientTesting()]
         }).compileComponents();
         fixture = TestBed.createComponent(ItemComponent);
         component = fixture.componentInstance;
@@ -51,7 +51,9 @@ describe('ItemComponent — effet catapulte', () => {
     });
 
     it('affiche l\'objet transformé (icône + title), sans bordure cassée', () => {
-        const locale: string = (component as unknown as { locale: string }).locale;
+        const locale: string = (component as unknown as {
+            locale: string;
+        }).locale;
         const morph_target = new ItemSummary();
         morph_target.uid = 'metal_bad_#00';
         morph_target.img = 'item/item_metal_bad.gif';
@@ -127,15 +129,17 @@ describe('ItemComponent — ajout à la liste de souhaits', () => {
     beforeEach(async () => {
         await TestBed.configureTestingModule({
             imports: [ItemComponent],
-            providers: [provideHttpClient(), provideHttpClientTesting()]
+            providers: [provideHttpClient(withXhr()), provideHttpClientTesting()]
         }).compileComponents();
 
         fixture = TestBed.createComponent(ItemComponent);
         component = fixture.componentInstance;
         httpMock = TestBed.inject(HttpTestingController);
         // Le snackbar réel nécessite un provider d'animations non fourni ici — hors périmètre de ce composant.
-        spyOn(TestBed.inject(SnackbarService), 'successSnackbar');
-        (component as unknown as { town: TownDetails | null }).town = { town_id: 12 } as unknown as TownDetails;
+        vi.spyOn(TestBed.inject(SnackbarService), 'successSnackbar');
+        (component as unknown as {
+            town: TownDetails | null;
+        }).town = { town_id: 12 } as unknown as TownDetails;
     });
 
     afterEach(() => {
