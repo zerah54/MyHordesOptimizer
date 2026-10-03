@@ -1,9 +1,11 @@
 <div class="mho-estimations">
     <div class="header">
-        <mho-header-with-number-previous-next-filter [(filterValue)]="selected_day" (filterValueChange)="getEstimations()" [max]="current_day"
-                                                     [min]="1" class="previous-next">
-        </mho-header-with-number-previous-next-filter>
+        <mho-compact-stepper label="Jour" i18n-label prefix="J" [value]="selected_day" [min]="1" [max]="current_day"
+                             (valueChange)="selected_day = $event; getEstimations()"></mho-compact-stepper>
         <div class="actions">
+            <mat-slide-toggle class="souls-toggle" [ngModel]="souls_mode()" (ngModelChange)="setSoulsMode($event)">
+                <ng-container i18n>Mode âmes</ng-container>
+            </mat-slide-toggle>
             <button (click)="shareEstimsForum()" i18n-matTooltip mat-icon-button matTooltip="Copier au format forum" type="button">
                 <mat-icon>share</mat-icon>
             </button>
@@ -12,120 +14,273 @@
             }
         </div>
     </div>
+
     @if (estimations(); as estimations_value) {
-        <div class="tables">
-            <table>
-                <caption i18n>Attaque du jour (J{{ selected_day }})</caption>
-                <tr>
-                    <th i18n>Qualité</th>
-                    <th i18n>Min</th>
-                    <th i18n>Max</th>
-                </tr>
-                @for (percent of tdg_values; track percent) {
-                    <tr>
-                        <th>{{ percent }}%</th>
-                        <td>
-                            <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                                <input (paste)="pasteFromMH($event, estimations_value.estim['_' + percent], true)"
-                                       [(ngModel)]="estimations_value.estim['_' + percent].min"
-                                       [min]="0" [readonly]="is_readonly()" matInput
-                                       type="text">
-                            </mat-form-field>
-                        </td>
-                        <td>
-                            <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                                <input (paste)="pasteFromMH($event, estimations_value.estim['_' + percent], false)"
-                                       [(ngModel)]="estimations_value.estim['_' + percent].max"
-                                       [min]="0" [readonly]="is_readonly()" matInput
-                                       type="text">
-                            </mat-form-field>
-                        </td>
-                    </tr>
-                }
-            </table>
-            <table>
-                <caption i18n>Attaque du lendemain (J{{ selected_day + 1 }})</caption>
-                <tr>
-                    <th i18n>Qualité</th>
-                    <th i18n>Min</th>
-                    <th i18n>Max</th>
-                </tr>
-                @for (percent of planif_values; track percent) {
-                    <tr>
-                        <th>{{ percent }}%</th>
-                        <td>
-                            <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                                <input (paste)="pasteFromMH($event, estimations_value.planif['_' + percent], true)"
-                                       [(ngModel)]="estimations_value.planif['_' + percent].min" [min]="0" [readonly]="is_readonly()" matInput
-                                       type="text">
-                            </mat-form-field>
-                        </td>
-                        <td>
-                            <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                                <input (paste)="pasteFromMH($event, estimations_value.planif['_' + percent], false)"
-                                       [(ngModel)]="estimations_value.planif['_' + percent].max" [min]="0" [readonly]="is_readonly()" matInput
-                                       type="text">
-                            </mat-form-field>
-                        </td>
-                    </tr>
-                }
-            </table>
-            <!--        <div class="canvas">-->
-            <!--            <canvas #todayCanvas></canvas>-->
-            <!--            <canvas #tomorrowCanvas></canvas>-->
-            <!--        </div>-->
+        <div class="content">
 
-            <mat-accordion class="canvas">
-                <mat-expansion-panel (opened)="setStep(0)" [expanded]="step === 0" class="mat-elevation-z8">
-                    <mat-expansion-panel-header>
-                        <mat-panel-title i18n>Attaque du jour (J{{ selected_day }})</mat-panel-title>
-                        @if (today_calculated_attack(); as today_result) {
-                            <mat-panel-description>
-                                <small>
-                                    <ng-container i18n>Attaque J{{ selected_day }} calculée</ng-container>
-                                    &nbsp;:&nbsp;
-                                    <span style="white-space: nowrap">[{{ today_result.result.min }}&nbsp;-&nbsp;
-                                        {{ today_result.result.max }}]</span>
-                                </small>
-                            </mat-panel-description>
-                        }
-                    </mat-expansion-panel-header>
-                    <div style="position: relative; height: 400px;">
-                        <div class="toggler">
-                            <mat-slide-toggle [(ngModel)]="today_offset_mode">
-                                <ng-container i18n>Répartition des valeurs</ng-container>
-                            </mat-slide-toggle>
-                        </div>
-                        <canvas #todayEstimCanvas [style.display]="today_offset_mode ? 'none' : undefined"></canvas>
-                        <canvas #todayOffsetCanvas [style.display]="today_offset_mode ? undefined : 'none'"></canvas>
+            <section class="mho-card estim-card">
+                <div class="mho-card-header">
+                    <div class="card-heading">
+                        <span class="mho-card-title" i18n>Attaque du jour</span>
+                        <span class="card-sub" i18n>Tour de guet · J{{ selected_day }}</span>
                     </div>
-                </mat-expansion-panel>
+                    @if (souls_mode() && !is_readonly()) {
+                        <div class="spa-level">
+                            <mho-compact-stepper i18n-label label="Niveau SPA" icon="building/item_soul_blue_static.gif" noTooltip
+                                                 [value]="spaLevel(selected_day, 'estim')" [min]="0" [max]="max_spa_level"
+                                                 (valueChange)="setSpaLevel(selected_day, 'estim', $event)"></mho-compact-stepper>
+                        </div>
+                    }
+                </div>
+                <div class="estim-scroll">
+                    <table class="estim-table">
+                        <caption class="mho-visually-hidden" i18n>Attaque du jour (J{{ selected_day }})</caption>
+                        <thead>
+                        <tr>
+                            <th scope="col" i18n>Qualité</th>
+                            <th scope="col" i18n>Min</th>
+                            <th scope="col" i18n>Max</th>
+                            @if (souls_mode() && !is_readonly()) {
+                                <th scope="col" i18n>Âmes</th>
+                            }
+                        </tr>
+                        </thead>
+                        <tbody>
+                            @for (percent of tdg_values; track percent) {
+                                <tr>
+                                    <th scope="row">{{ percent }}%</th>
+                                    <td>
+                                        <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                                            <input (paste)="pasteFromMH($event, estimations_value.estim['_' + percent], true)"
+                                                   [(ngModel)]="estimations_value.estim['_' + percent].min"
+                                                   [min]="0" [readonly]="is_readonly()" matInput type="text"
+                                                   i18n-aria-label [attr.aria-label]="'Minimum à ' + percent + ' %'">
+                                        </mat-form-field>
+                                    </td>
+                                    <td>
+                                        <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                                            <input (paste)="pasteFromMH($event, estimations_value.estim['_' + percent], false)"
+                                                   [(ngModel)]="estimations_value.estim['_' + percent].max"
+                                                   [min]="0" [readonly]="is_readonly()" matInput type="text"
+                                                   i18n-aria-label [attr.aria-label]="'Maximum à ' + percent + ' %'">
+                                        </mat-form-field>
+                                    </td>
+                                    @if (souls_mode() && !is_readonly()) {
+                                        <td>
+                                            <mho-compact-stepper i18n-label label="Âmes rouges" icon="item/item_soul_red.gif" noTooltip
+                                                                 [value]="rowSouls(selected_day, 'estim', percent)" [min]="0" [max]="max_souls"
+                                                                 (valueChange)="setRowSouls(selected_day, 'estim', percent, $event)"></mho-compact-stepper>
+                                        </td>
+                                    }
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </section>
 
-                <mat-expansion-panel (opened)="setStep(1)" [expanded]="step === 1" class="mat-elevation-z8">
-                    <mat-expansion-panel-header>
-                        <mat-panel-title i18n>Attaque du lendemain (J{{ selected_day + 1 }})</mat-panel-title>
-                        @if (tomorrow_calculated_attack(); as tomorrow_result) {
-                            <mat-panel-description>
-                                <small>
-                                    <ng-container i18n>Attaque J{{ selected_day + 1 }} calculée</ng-container>
-                                    &nbsp;:&nbsp;
-                                    <span style="white-space: nowrap">[{{ tomorrow_result.result.min }}&nbsp;-&nbsp;
-                                        {{ tomorrow_result.result.max }}]</span>
-                                </small>
-                            </mat-panel-description>
-                        }
-                    </mat-expansion-panel-header>
-                    <div style="position: relative; height: 400px;">
-                        <div class="toggler">
-                            <mat-slide-toggle [(ngModel)]="tomorrow_offset_mode">
-                                <ng-container i18n>Répartition des valeurs</ng-container>
-                            </mat-slide-toggle>
-                        </div>
-                        <canvas #tomorrowEstimCanvas [style.display]="tomorrow_offset_mode ? 'none' : undefined"></canvas>
-                        <canvas #tomorrowOffsetCanvas [style.display]="tomorrow_offset_mode ? undefined : 'none'"></canvas>
+            <section class="mho-card estim-card">
+                <div class="mho-card-header">
+                    <div class="card-heading">
+                        <span class="mho-card-title" i18n>Attaque du lendemain</span>
+                        <span class="card-sub" i18n>Planificateur · J{{ selected_day + 1 }}</span>
                     </div>
-                </mat-expansion-panel>
-            </mat-accordion>
+                    @if (souls_mode() && !is_readonly()) {
+                        <div class="spa-level">
+                            <mho-compact-stepper i18n-label label="Niveau SPA" icon="building/item_soul_blue_static.gif" noTooltip
+                                                 [value]="spaLevel(selected_day, 'planif')" [min]="0" [max]="max_spa_level"
+                                                 (valueChange)="setSpaLevel(selected_day, 'planif', $event)"></mho-compact-stepper>
+                        </div>
+                    }
+                </div>
+                <div class="estim-scroll">
+                    <table class="estim-table">
+                        <caption class="mho-visually-hidden" i18n>Attaque du lendemain (J{{ selected_day + 1 }})</caption>
+                        <thead>
+                        <tr>
+                            <th scope="col" i18n>Qualité</th>
+                            <th scope="col" i18n>Min</th>
+                            <th scope="col" i18n>Max</th>
+                            @if (souls_mode() && !is_readonly()) {
+                                <th scope="col" i18n>Âmes</th>
+                            }
+                        </tr>
+                        </thead>
+                        <tbody>
+                            @for (percent of planif_values; track percent) {
+                                <tr>
+                                    <th scope="row">{{ percent }}%</th>
+                                    <td>
+                                        <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                                            <input (paste)="pasteFromMH($event, estimations_value.planif['_' + percent], true)"
+                                                   [(ngModel)]="estimations_value.planif['_' + percent].min"
+                                                   [min]="0" [readonly]="is_readonly()" matInput type="text"
+                                                   i18n-aria-label [attr.aria-label]="'Minimum à ' + percent + ' %'">
+                                        </mat-form-field>
+                                    </td>
+                                    <td>
+                                        <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                                            <input (paste)="pasteFromMH($event, estimations_value.planif['_' + percent], false)"
+                                                   [(ngModel)]="estimations_value.planif['_' + percent].max"
+                                                   [min]="0" [readonly]="is_readonly()" matInput type="text"
+                                                   i18n-aria-label [attr.aria-label]="'Maximum à ' + percent + ' %'">
+                                        </mat-form-field>
+                                    </td>
+                                    @if (souls_mode() && !is_readonly()) {
+                                        <td>
+                                            <mho-compact-stepper i18n-label label="Âmes rouges" icon="item/item_soul_red.gif" noTooltip
+                                                                 [value]="rowSouls(selected_day, 'planif', percent)" [min]="0" [max]="max_souls"
+                                                                 (valueChange)="setRowSouls(selected_day, 'planif', percent, $event)"></mho-compact-stepper>
+                                        </td>
+                                    }
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <div class="day-column">
+
+                <mat-button-toggle-group class="day-switch" [value]="chart_day()" (change)="selectChartDay($event.value)"
+                                         hideSingleSelectionIndicator aria-label="Jour affiché" i18n-aria-label>
+                    <mat-button-toggle value="today">J{{ selected_day }}</mat-button-toggle>
+                    <mat-button-toggle value="tomorrow">J{{ selected_day + 1 }}</mat-button-toggle>
+                </mat-button-toggle-group>
+
+                <section class="mho-card kpi-card">
+                    <div class="kpi-main">
+                        <div class="kpi-text">
+                            <span class="mho-kpi-label" i18n>Attaque calculée · J{{ chartDay() }}</span>
+                            @if (chartAttack(); as attack) {
+                                <span
+                                    class="mho-kpi">{{ attack.result.min | number:'1.0-0':locale }}&nbsp;–&nbsp;{{ attack.result.max | number:'1.0-0':locale }}</span>
+                            } @else {
+                                <span class="mho-kpi no-value" i18n-title title="Saisissez au moins une estimation pour obtenir un calcul">—</span>
+                            }
+                            @if (attackGauge(); as gauge) {
+                                <span class="kpi-sub">
+                                    @if (gauge.likely_is_average) {
+                                        <ng-container i18n>Moyenne</ng-container>
+                                    } @else {
+                                        <ng-container i18n>Plus probable</ng-container>
+                                    }
+                                    <strong class="mho-num">{{ gauge.likely | number:'1.0-0':locale }}</strong>
+                                    ·
+                                    <ng-container i18n>théorique</ng-container>
+                                    <span class="mho-num">{{ gauge.low | number:'1.0-0':locale }}&nbsp;–&nbsp;{{ gauge.high | number:'1.0-0':locale }}</span>
+                                </span>
+                            }
+                        </div>
+                        <span class="mho-well kpi-icon">
+                            <img [src]="HORDES_IMG_REPO + 'icons/small_zombie.gif'" alt="" aria-hidden="true">
+                        </span>
+                    </div>
+
+                    @if (souls_mode() && !is_readonly()) {
+                        <div class="kpi-souls">
+                            <span class="mho-kpi-label" i18n>Âmes à l'attaque</span>
+                            <mho-compact-stepper i18n-label label="Âmes rouges à l'attaque" icon="item/item_soul_red.gif" noTooltip
+                                                 [value]="attackSouls(chartDay())" [min]="0" [max]="max_souls"
+                                                 (valueChange)="setAttackSouls(chartDay(), $event)"></mho-compact-stepper>
+                        </div>
+                        <div class="kpi-spa-level">
+                            <span class="mho-kpi-label" i18n>Niveau SPA à l'attaque</span>
+                            <mho-compact-stepper i18n-label label="Niveau SPA à l'attaque" icon="building/item_soul_blue_static.gif" noTooltip
+                                                 [value]="attackSpaLevel(chartDay())" [min]="0" [max]="max_spa_level"
+                                                 (valueChange)="setAttackSpaLevel(chartDay(), $event)"></mho-compact-stepper>
+                        </div>
+                    }
+
+                    @if (attackGauge(); as gauge) {
+                        <div class="kpi-gauge" role="img"
+                             [attr.aria-label]="'Plage calculée de ' + gauge.min + ' à ' + gauge.max + ', dans un possible du jour allant de ' + gauge.low + ' à ' + gauge.high">
+                            <span class="track"></span>
+                            <span class="range" [style.left.%]="gauge.left" [style.width.%]="gauge.width"></span>
+                            <span class="likely" [style.left.%]="gauge.likely_left"></span>
+                            <!-- Affinage abouti : deux repères pour ses bornes, qui se lisent par-dessus
+                                 la plage calculée sans la remplacer. -->
+                            @if (gauge.refined_min_left !== null) {
+                                <span class="refined" [style.left.%]="gauge.refined_min_left"
+                                      i18n-title title="Minimum affiné"></span>
+                            }
+                            @if (gauge.refined_max_left !== null) {
+                                <span class="refined" [style.left.%]="gauge.refined_max_left"
+                                      i18n-title title="Maximum affiné"></span>
+                            }
+                        </div>
+                        <div class="kpi-scale">
+                            <span class="mho-num">{{ gauge.low | number:'1.0-0':locale }}</span>
+                            <span class="mho-num">{{ gauge.high | number:'1.0-0':locale }}</span>
+                        </div>
+                    }
+
+                    @if (!is_readonly()) {
+                        <mat-checkbox [ngModel]="isFireworksDay(chartDay())" (ngModelChange)="setFireworksDay(chartDay(), $event)"
+                                      [disabled]="refining_day() !== null" class="refine__fireworks"
+                                      i18n-matTooltip
+                                      matTooltip="À cocher si la gazette du jour affiné annonce l'explosion des feux d'artifice : l'attaque réelle est réduite de 13 à 16 %, calculée en recoupant la TDG du jour avec le planificateur de la veille">
+                            <ng-container i18n>Feux d'artifice explosés</ng-container>
+                        </mat-checkbox>
+                    }
+
+                    @if (canRefine()) {
+                        <div class="refine">
+                            @if (refining_day() === chartDay()) {
+                                <mat-progress-spinner [diameter]="18" [strokeWidth]="2" class="refine__spin" mode="indeterminate"/>
+                                <mat-progress-bar [value]="refine_progress()" class="refine__bar" mode="determinate"/>
+                                <span class="refine__pct">{{ refine_progress() }}%</span>
+                                <button (click)="cancelRefine()" i18n-matTooltip mat-icon-button matTooltip="Annuler l'affinage en cours" type="button">
+                                    <mat-icon>close</mat-icon>
+                                </button>
+                                <small class="refine__stats">
+                                    <span i18n>Calcul en cours</span> · {{ refine_elapsed_label() }} · {{ refine_eta_label() }}
+                                </small>
+                            } @else {
+                                <span class="refine__spacer"></span>
+                                <button (click)="refine(chartDay())" [disabled]="refining_day() !== null || hasUnsavedEstimations()"
+                                        mat-stroked-button type="button">
+                                    <mat-icon>bolt</mat-icon>
+                                    <span i18n i18n-matTooltip
+                                          matTooltip="Le calcul utilise votre carte graphique ; le résultat est partagé avec votre ville">Affiner</span>
+                                </button>
+                                @if (hasUnsavedEstimations()) {
+                                    <small class="refine__msg" i18n>Enregistrez vos estimations pour pouvoir affiner</small>
+                                }
+                            }
+                            @if (refining_day() !== null && refining_day() !== chartDay()) {
+                                <small class="refine__msg" i18n>Affinage en cours sur J{{ refining_day() }}.</small>
+                            }
+                            @if (refineMessageFor(chartDay()) && refining_day() !== chartDay()) {
+                                <small class="refine__msg">{{ refineMessageFor(chartDay()) }}</small>
+                            }
+                        </div>
+                    }
+                    @if (refineStatusFor(chartDay()); as status) {
+                        <small class="refine__status">{{ status }}</small>
+                    }
+                </section>
+
+                <section class="mho-card chart-card">
+                    <div class="mho-card-header">
+                        <span class="mho-card-title" style="flex-grow: 1;" i18n>Répartition de l'attaque J{{ chartDay() }}</span>
+                        <mat-slide-toggle [ngModel]="offsetMode()" (ngModelChange)="setOffsetMode($event)">
+                            <ng-container i18n>Répartition des valeurs</ng-container>
+                        </mat-slide-toggle>
+                    </div>
+                    <div class="charts">
+                        <div class="chart" [style.display]="chart_day() === 'today' ? undefined : 'none'">
+                            <canvas #todayEstimCanvas [style.display]="today_offset_mode ? 'none' : undefined"></canvas>
+                            <canvas #todayOffsetCanvas [style.display]="today_offset_mode ? undefined : 'none'"></canvas>
+                        </div>
+                        <div class="chart" [style.display]="chart_day() === 'tomorrow' ? undefined : 'none'">
+                            <canvas #tomorrowEstimCanvas [style.display]="tomorrow_offset_mode ? 'none' : undefined"></canvas>
+                            <canvas #tomorrowOffsetCanvas [style.display]="tomorrow_offset_mode ? undefined : 'none'"></canvas>
+                        </div>
+                    </div>
+                </section>
+
+            </div>
         </div>
     }
 </div>
