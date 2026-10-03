@@ -1,5 +1,6 @@
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.Map;
 using MyHordesOptimizerApi.Models;
+using MyHordesOptimizerApi.Services.Impl.Maps;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -42,8 +43,13 @@ namespace MyHordesOptimizerApi.Extensions
         /// exprimée en coordonnées absolues de la base.
         /// </summary>
         /// <param name="townCells">Toutes les cases de la ville, suivies par le contexte.</param>
+        /// <param name="observations">Observations de la mise à jour en cours : les relevés du Fouineur en sont.</param>
+        /// <param name="scavZoneLevel">Niveau d'abondance de la case courante : <c>null</c> s'il n'a pas été relevé À L'INSTANT
+        /// (une valeur ressaisie à l'identique ramènerait les fouilles restantes dans une fourchette périmée).</param>
         /// <param name="lastUpdateInfoId">Identifiant de mise à jour à porter sur les estimations d'Éclaireur.</param>
-        public static void ApplyJobRadars(this IEnumerable<MapCell> townCells,
+        /// <returns>La fourchette de fouilles restantes imposée à la case courante, <c>null</c> si aucune.</returns>
+        public static DigBounds? ApplyJobRadars(this IEnumerable<MapCell> townCells,
+            DigObservations observations,
             int x,
             int y,
             int? scavZoneLevel,
@@ -56,45 +62,55 @@ namespace MyHordesOptimizerApi.Extensions
 
             MapCell? FindCell(int cellX, int cellY) => cells.FirstOrDefault(cell => cell.X == cellX && cell.Y == cellY);
 
-            ApplyCurrentCell(FindCell(x, y), scavZoneLevel, scoutZoneLevel);
+            var currentCellBounds = ApplyCurrentCell(observations, FindCell(x, y), scavZoneLevel, scoutZoneLevel);
 
             // Le nord de la carte correspond aux ordonnées décroissantes en base
             // (cf. MapMappingProfile : displayY = town.Y - cell.Y)
-            ApplyScavRadar(FindCell(x, y - 1), scavNextCells?.North);
-            ApplyScavRadar(FindCell(x, y + 1), scavNextCells?.South);
-            ApplyScavRadar(FindCell(x + 1, y), scavNextCells?.East);
-            ApplyScavRadar(FindCell(x - 1, y), scavNextCells?.West);
+            ApplyScavRadar(observations, FindCell(x, y - 1), scavNextCells?.North);
+            ApplyScavRadar(observations, FindCell(x, y + 1), scavNextCells?.South);
+            ApplyScavRadar(observations, FindCell(x + 1, y), scavNextCells?.East);
+            ApplyScavRadar(observations, FindCell(x - 1, y), scavNextCells?.West);
 
             ApplyScoutRadar(FindCell(x, y - 1), scoutNextCells?.North, lastUpdateInfoId);
             ApplyScoutRadar(FindCell(x, y + 1), scoutNextCells?.South, lastUpdateInfoId);
             ApplyScoutRadar(FindCell(x + 1, y), scoutNextCells?.East, lastUpdateInfoId);
             ApplyScoutRadar(FindCell(x - 1, y), scoutNextCells?.West, lastUpdateInfoId);
+
+            return currentCellBounds;
         }
 
-        private static void ApplyCurrentCell(MapCell? cell, int? scavZoneLevel, int? scoutZoneLevel)
+        private static DigBounds? ApplyCurrentCell(DigObservations observations, MapCell? cell, int? scavZoneLevel, int? scoutZoneLevel)
         {
             if (cell == null)
             {
-                return;
+                return null;
             }
+            DigBounds? bounds = null;
             if (scavZoneLevel.HasValue)
             {
-                cell.ScavZoneLevel = scavZoneLevel.Value;
-                // Le niveau d'abondance est une information certaine sur la zone :
-                // 0 correspond exactement à l'état « zone épuisée » du jeu.
-                SetDryed(cell, scavZoneLevel.Value == 0);
+                // Le niveau d'abondance est une information certaine sur la quantité : les fouilles
+                // restantes sont ramenées dans sa fourchette (0 : zone épuisée). Ignoré s'il contredit
+                // l'état natif, plus récent que la page.
+                var scavBounds = DigBounds.ForScavLevel(scavZoneLevel.Value);
+                if (observations.Observe(cell, scavBounds))
+                {
+                    cell.ScavZoneLevel = scavZoneLevel.Value;
+                    bounds = scavBounds;
+                }
             }
             if (scoutZoneLevel.HasValue)
             {
                 cell.ScoutZoneLevel = scoutZoneLevel.Value;
             }
+            return bounds;
         }
 
         /// <summary>
         /// Radar du Fouineur : <paramref name="isDepleted"/> vaut true quand la case voisine
-        /// n'offre plus rien à fouiller.
+        /// n'offre plus rien à fouiller. Il ne dit rien de la quantité, seulement « vide ou non »
+        /// (<c>RenderMapAction</c> : <c>digs > 0 || ruinDigs > 0</c>).
         /// </summary>
-        private static void ApplyScavRadar(MapCell? cell, bool? isDepleted)
+        private static void ApplyScavRadar(DigObservations observations, MapCell? cell, bool? isDepleted)
         {
             if (cell == null || !isDepleted.HasValue)
             {
@@ -103,7 +119,7 @@ namespace MyHordesOptimizerApi.Extensions
             if (isDepleted.Value)
             {
                 // Plus rien à fouiller : la zone et, le cas échéant, le bâtiment sont épuisés
-                SetDryed(cell, true);
+                observations.Observe(cell, DigBounds.Depleted);
                 if (cell.IdRuin.HasValue)
                 {
                     cell.IsRuinDryed = true;
@@ -111,7 +127,7 @@ namespace MyHordesOptimizerApi.Extensions
             }
             else if (!cell.IdRuin.HasValue)
             {
-                SetDryed(cell, false);
+                observations.Observe(cell, DigBounds.NotDepleted);
             }
             // Case avec bâtiment dont le radar signale qu'il reste quelque chose : impossible
             // de savoir si cela concerne la zone ou le bâtiment, on ne touche donc à rien.
@@ -130,16 +146,6 @@ namespace MyHordesOptimizerApi.Extensions
             }
             cell.ScoutEstimationZombie = estimation.Value;
             cell.IdScoutEstimationLastUpdateInfo = lastUpdateInfoId;
-        }
-
-        private static void SetDryed(MapCell cell, bool isDryed)
-        {
-            cell.IsDryed = isDryed;
-            if (isDryed)
-            {
-                cell.AveragePotentialRemainingDig = 0;
-                cell.MaxPotentialRemainingDig = 0;
-            }
         }
     }
 }

@@ -1,5 +1,5 @@
 @if (url(); as avatarUrl) {
     <picture class="mho-avatar" [class.rounded]="rounded()">
-        <img [src]="avatarUrl" alt=""/>
+        <img [src]="avatarUrl" alt="" (error)="onError()"/>
     </picture>
 }

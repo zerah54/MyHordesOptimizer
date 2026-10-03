@@ -1,0 +1,140 @@
+using MyHordesOptimizerApi.DiscordBot.Enums;
+
+namespace MyHordesOptimizerApi.DiscordBot.Localization
+{
+    public sealed partial class BotTexts
+    {
+        /// <summary>Allemand : tutoiement, comme le jeu. Noms d'objets et de bâtiments du jeu.</summary>
+        public static readonly BotTexts De = new BotTexts
+        {
+            Locale = Locales.De,
+
+            GenericError = error => $"Ein Fehler ist aufgetreten\n```{error}```",
+            CommandFailed = reason => $"Ein Fehler ist aufgetreten: {reason}",
+
+            AntiAbuseResetMessage = "Der Anti-Missbrauchs-Zähler wurde zurückgesetzt!",
+            AntiAbuseStarted = target => $"Der Anti-Missbrauchs-Zähler läuft! Du wirst {target} in 15 Minuten benachrichtigt.",
+            TimerScheduled = target => $"Dein Zähler wurde gestellt! Du wirst {target} benachrichtigt.",
+            TimerNotCreated = "Der Zähler konnte nicht erstellt werden.",
+            TimerCreationError = error => $"Beim Erstellen des Zählers ist ein Fehler aufgetreten\n```{error}```",
+            TimerReasonEmpty = "Der Grund darf nicht leer sein.",
+            TimerReasonTooLong = max => $"Der Grund darf höchstens {max} Zeichen lang sein.",
+            TimerTooMany = (count, max) => $"Du hast bereits {count} laufende Zähler, das Maximum ist {max}.",
+            TimerReasonField = "Grund",
+            TimerExpirationField = "Ablauf",
+            TimerDurationFormatHelp = "Erwartetes Format: 1Y 2M 7D 1h 25m 12s (Y Jahre, M Monate, D Tage, h Stunden, m Minuten, s Sekunden).",
+            TimerDurationUnreadable = "Unlesbare Dauer.",
+            TimerDurationRepeatedUnit = unit => $"Die Einheit „{unit}“ kommt mehrmals vor.",
+            TimerDurationTooLong = "Die Dauer ist zu lang.",
+            TimerDurationNotPositive = "Die Dauer muss größer als null sein.",
+            TimerSentLate = dueUnixSeconds => $"-# Geplant für <t:{dueUnixSeconds}:f>, verspätet gesendet.",
+            TimerTargetHere = "hier",
+            TimerTargetHerePrivate = "hier, mit einer Nachricht, die nur du sehen kannst",
+            TimerTargetDirectMessage = "per Direktnachricht",
+            TimerTargetDirectMessageFallback = "per Direktnachricht (der Bot kann hier nicht schreiben)",
+
+            AttackEstimationsTitle = day => $"Schätzungen für Tag {day}",
+            AttackCalculated = (day, min, max) => $"*Berechneter Angriff T{day}*: {min} - {max}",
+            AttackPlannerField = day => $"Rechenmaschine T{day}",
+            AttackEstimationField = day => $"Schätzung T{day}",
+            AttackSentByDirectMessage = "Schätzungen per Direktnachricht gesendet",
+            AttackError = error => $"Beim Abrufen der Schätzungen ist ein Fehler aufgetreten\n```{error}```",
+
+            InstructionsDraftNotFound = "Der Entwurf der Anweisungen wurde nicht gefunden: Starte den Befehl /anweisungen erneut.",
+            InstructionsMaxSections = "Abschnitt kann nicht hinzugefügt werden: Discord erlaubt höchstens 25 Abschnitte pro Nachricht.",
+            InstructionsAddTitle = "Titel hinzufügen",
+            InstructionsUpdateTitle = "Titel bearbeiten",
+            InstructionsAddDescription = "Beschreibung hinzufügen",
+            InstructionsUpdateDescription = "Beschreibung bearbeiten",
+            InstructionsAddSection = "Abschnitt hinzufügen",
+            InstructionsAddSectionLimitReached = "Abschnitt hinzufügen (Limit erreicht)",
+            InstructionsPublish = "Anweisungen veröffentlichen",
+            InstructionsPublishError = error => $"Die Anweisungen konnten nicht veröffentlicht werden\n```{error}```",
+            InstructionsTitleEmpty = "Der Titel darf nicht leer sein.",
+            InstructionsDescriptionEmpty = "Die Beschreibung darf nicht leer sein.",
+            InstructionsSectionEmpty = "Titel und Inhalt eines Abschnitts dürfen nicht leer sein.",
+            InstructionsTooLong = (length, max) => $"Änderung abgelehnt: Die Anweisungen hätten {length} Zeichen, mehr als das Discord-Limit "
+                                                   + $"von {max} (Titel, Beschreibung und Abschnitte eingeschlossen).",
+            InstructionsFull = (element, max) => $"{element} kann nicht hinzugefügt werden: Die Anweisungen haben das Discord-Limit von "
+                                                 + $"{max} Zeichen erreicht (Titel, Beschreibung und Abschnitte eingeschlossen).",
+            InstructionsElementTitle = "Ein Titel",
+            InstructionsElementDescription = "Eine Beschreibung",
+            InstructionsElementSection = "Ein Abschnitt",
+            InstructionsTitleLabel = "Titel",
+            InstructionsDescriptionLabel = "Beschreibung",
+            InstructionsSectionTitleLabel = "Titel des Abschnitts",
+            InstructionsSectionContentLabel = "Inhalt des Abschnitts",
+
+            FeedbackSuggestionModalTitle = "Vorschlag senden",
+            FeedbackSuggestionTitleLabel = "Titel des Vorschlags",
+            FeedbackSuggestionDetailsLabel = "Details des Vorschlags",
+            FeedbackSuggestionPosted = "Der Vorschlag wurde veröffentlicht",
+            FeedbackBugModalTitle = "Fehler melden",
+            FeedbackBugTitleLabel = "Titel des Fehlers",
+            FeedbackBugDetailsLabel = "Details des Fehlers",
+            FeedbackBugPosted = "Der Fehler wurde gemeldet",
+
+            FaqGoToWebsite = "Zur Website",
+            FaqGoToTutorial = "Zum Tutorial",
+            FaqChromeExtension = "Chrome-Erweiterung",
+            FaqFirefoxExtension = "Firefox-Erweiterung",
+            FaqInstallScript = "Skript installieren",
+            FaqGhoulTitle = "Chancen, ein Ghul zu werden",
+            FaqMseTitle = "Wirkungen eines Etikettenlosen Medikaments",
+            FaqValueLine = (label, percent) => $"{label}: {percent} %",
+            ItemMeatyBone = "Knochen mit Fleisch",
+            ItemFleshroomPuree = "Aasbeerenbrei",
+            ItemHumanFlesh = "Menschenfleisch",
+            ItemTravellersCorpse = "Leiche eines Reisenden",
+            FaqMseGivesAp = actionPoints => $"Gibt {actionPoints} AP",
+            FaqMseGivesApAndAddiction = actionPoints => $"Gibt {actionPoints} AP + Abhängigkeit",
+            FaqMseTerrorises = "Versetzt in Angststarre",
+            FaqMseNoEffect = "Keine Wirkung",
+            FaqCampingTitle = "Überlebenschancen beim Campen",
+            CheatBold = "fett",
+            CheatItalic = "kursiv",
+            CheatUnderline = "unterstrichen",
+            CheatStrikethrough = "durchgestrichen",
+            CheatSpoiler = "Spoiler",
+            CheatCode = "Codeblock",
+            CheatQuote = "Zitat",
+            CheatMultilineCode = "Codeblock\nüber mehrere Zeilen",
+            CheatMultilineQuote = "Zitat\nüber mehrere Zeilen",
+            CheatMaskedLink = "Maskierter Link",
+            CheatBigTitle = "Große Überschrift",
+            CheatMediumTitle = "Mittlere Überschrift",
+            CheatSmallTitle = "Kleine Überschrift",
+            CheatSmallText = "Kleiner Text",
+            CheatBulletList = "Aufzählung",
+            CheatOrderedList = "Nummerierte Liste",
+            CheatLevel = level => $"Ebene {level}",
+            CheatSpacesHint = "(jedes ⋅ steht für ein Leerzeichen)",
+
+            GlossaryNoMatch = searchValue => $"Keine Treffer für {searchValue} gefunden",
+
+            RecipeError = error => $"Beim Abrufen des Gegenstands ist ein Fehler aufgetreten\n```{error}```",
+            RecipeNoResult = "Kein Ergebnis gefunden",
+            RecipeTruncated = count => count > 1
+                ? $"Ergebnisse gekürzt: {count} Rezepte nicht angezeigt"
+                : $"Ergebnisse gekürzt: {count} Rezept nicht angezeigt",
+            RecipeComponents = "Zutaten",
+            RecipeResults = "Ergebnisse",
+
+            TranslateSearchExpired = "Diese Suche ist abgelaufen: Starte den Befehl /übersetzen erneut, um ihre Ergebnisse zu durchblättern.",
+            TranslateSentByDirectMessage = "Die Übersetzungen werden per Direktnachricht gesendet",
+            TranslateNoResult = searchValue => $"Keine Übersetzung für {searchValue} gefunden",
+            TranslateError = error => $"Beim Abrufen der Übersetzungen ist ein Fehler aufgetreten\n```{error}```",
+            TranslatePrevious = "Zurück",
+            TranslateNext = "Weiter",
+
+            PlayRock = "Stein",
+            PlayPaper = "Papier",
+            PlayScissors = "Schere",
+            PlayHeads = "Kopf",
+            PlayTails = "Zahl",
+            PlayCardRanks = new[] { "Ass", "König", "Dame", "Bube", "10", "9", "8", "7", "6", "5", "4", "3", "2" },
+            PlayCardSuits = new[] { "Herz", "Kreuz", "Karo", "Pik" },
+            PlayCard = (rank, suit) => $"{suit} {rank}"
+        };
+    }
+}

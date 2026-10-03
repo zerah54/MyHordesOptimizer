@@ -1,27 +1,44 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, DestroyRef, inject, OnInit, signal, WritableSignal } from '@angular/core';
+import {
+    afterNextRender,
+    ChangeDetectionStrategy,
+    Component,
+    DestroyRef,
+    ElementRef,
+    inject,
+    Injector,
+    OnInit,
+    Signal,
+    signal,
+    WritableSignal
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
-import { MatCardModule } from '@angular/material/card';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { Router } from '@angular/router';
 import moment from 'moment';
 import { Subject } from 'rxjs';
-import { debounceTime } from 'rxjs/operators';
+import { debounceTime, finalize } from 'rxjs/operators';
 
 import { HORDES_IMG_REPO } from '../../_abstract_model/const';
 import { BuildingAvailabilityStatusDTO } from '../../_abstract_model/dto/building.dto';
 import { BlueprintEnum } from '../../_abstract_model/enum/blueprint.enum';
 import { StandardColumn } from '../../_abstract_model/interfaces';
 import { ApiService } from '../../_abstract_model/services/api.service';
+import { WishlistService } from '../../_abstract_model/services/wishlist.service';
 import { Imports, TownTypeId } from '../../_abstract_model/types/_types';
 import { Building, BuildingResource } from '../../_abstract_model/types/building.class';
 import { TownDetails } from '../../_abstract_model/types/town-details.class';
+import { WishlistInfo } from '../../_abstract_model/types/wishlist-info.class';
+import { WishlistItem } from '../../_abstract_model/types/wishlist-item.class';
 import { TypedCellDefDirective } from '../../_core/directives/typed-cell-def.directive';
+import { TownContextService } from '../../_core/services/town-context.service';
+import { DEEP_LINK_PARAMS, deepLinkTargets } from '../../_core/utilities/deep-link.util';
 import { getTown } from '../../_core/utilities/localstorage.util';
 import { normalizeString } from '../../_core/utilities/string.utils';
 import { CompactStepperComponent } from '../../_shared/compact-stepper/compact-stepper.component';
@@ -31,7 +48,7 @@ import { HeaderWithStringFilterComponent } from '../../_shared/lists/header-with
 const angular_common: Imports = [CommonModule, FormsModule];
 const components: Imports = [CompactStepperComponent, HeaderWithStringFilterComponent, IconApComponent];
 const directives: Imports = [TypedCellDefDirective];
-const material_modules: Imports = [MatButtonModule, MatButtonToggleModule, MatCardModule, MatCheckboxModule, MatIconModule, MatTableModule, MatTooltipModule];
+const material_modules: Imports = [MatButtonModule, MatButtonToggleModule, MatCheckboxModule, MatIconModule, MatTableModule, MatTooltipModule];
 
 @Component({
     selector: 'mho-wiki-buildings',
@@ -101,13 +118,38 @@ export class BuildingsComponent implements OnInit {
     /** Chantiers cochés pour le récapitulatif du bas de page, par identifiant. */
     private readonly selected: Set<number> = new Set<number>();
 
+    /**
+     * Objets déjà inscrits à la liste de courses de la ville, toutes zones confondues. `null` hors
+     * ville ou en mode observateur : l'envoi n'est alors pas proposé.
+     */
+    protected readonly wishlist_item_ids: WritableSignal<ReadonlySet<number> | null> = signal(null);
+    /** Envoi en cours : le bouton est désactivé, un second clic enverrait deux écritures. */
+    protected readonly sending_to_wishlist: WritableSignal<boolean> = signal(false);
+
+    /** Chantier désigné par un lien profond (`?building=`, recherche globale) : sa ligne est surlignée. */
+    protected readonly targeted_id: WritableSignal<number | null> = signal(null);
+    /** Chantier demandé, en attente du catalogue. */
+    private requested_building_id: number | null = null;
+
     private readonly api: ApiService = inject(ApiService);
+    private readonly wishlist_service: WishlistService = inject(WishlistService);
+    private readonly is_readonly: Signal<boolean> = inject(TownContextService).isReadonly;
     private readonly destroy_ref: DestroyRef = inject(DestroyRef);
+    private readonly router: Router = inject(Router);
+    private readonly host: ElementRef<HTMLElement> = inject(ElementRef);
+    private readonly injector: Injector = inject(Injector);
 
     public ngOnInit(): void {
         this.filters_change
             .pipe(debounceTime(200), takeUntilDestroyed(this.destroy_ref))
             .subscribe({ next: (): void => this.refresh() });
+
+        deepLinkTargets(this.router, DEEP_LINK_PARAMS.building)
+            .pipe(takeUntilDestroyed(this.destroy_ref))
+            .subscribe((id: number): void => {
+                this.requested_building_id = id;
+                this.revealRequestedBuilding();
+            });
 
         this.api.getBuildings()
             .pipe(takeUntilDestroyed(this.destroy_ref))
@@ -115,8 +157,17 @@ export class BuildingsComponent implements OnInit {
                 next: (buildings: Building[]): void => {
                     this.roots = this.buildTree(buildings);
                     this.refresh();
+                    this.revealRequestedBuilding();
                 }
             });
+
+        if (this.town && !this.is_readonly()) {
+            this.wishlist_service.getWishlist()
+                .pipe(takeUntilDestroyed(this.destroy_ref))
+                .subscribe({
+                    next: (info: WishlistInfo): void => this.wishlist_item_ids.set(BuildingsComponent.itemIdsOf(info))
+                });
+        }
     }
 
     protected isCollapsed(building: Building): boolean {
@@ -264,6 +315,36 @@ export class BuildingsComponent implements OnInit {
         return { count: this.selected.size, ap, resources: Array.from(resources_by_item.values()) };
     }
 
+    /**
+     * Ressources du récapitulatif absentes de la liste de courses. Vide tant que la liste n'est pas
+     * connue (hors ville, mode observateur) : le bouton d'envoi n'apparaît alors pas.
+     */
+    protected missingFromWishlist(resources: BuildingResource[]): BuildingResource[] {
+        const in_list: ReadonlySet<number> | null = this.wishlist_item_ids();
+        if (!in_list) {
+            return [];
+        }
+        return resources.filter((resource: BuildingResource): boolean => !in_list.has(resource.item_id));
+    }
+
+    /** Inscrit à la liste de courses les ressources qui n'y sont pas encore, en zone ∞ et en quantité ∞. */
+    protected sendToWishlist(resources: BuildingResource[]): void {
+        if (resources.length === 0 || this.sending_to_wishlist()) {
+            return;
+        }
+        this.sending_to_wishlist.set(true);
+        this.wishlist_service.addMissingItems(resources.map((resource: BuildingResource): number => resource.item_id))
+            .pipe(
+                finalize((): void => this.sending_to_wishlist.set(false)),
+                takeUntilDestroyed(this.destroy_ref)
+            )
+            .subscribe({
+                next: (info: WishlistInfo): void => this.wishlist_item_ids.set(BuildingsComponent.itemIdsOf(info)),
+                // L'intercepteur HTTP a déjà notifié l'échec ; le bouton redevient cliquable (finalize).
+                error: (): void => undefined
+            });
+    }
+
     /** Changement de mode Normal/Pandémonium : purge la sélection des chantiers devenus indisponibles. */
     protected onModeChange(hard_mode: boolean): void {
         this.hard_mode = hard_mode;
@@ -285,6 +366,10 @@ export class BuildingsComponent implements OnInit {
     }
 
     /** Chantiers disponibles dans le mode actif, tous confondus (repliés compris). */
+    private static itemIdsOf(info: WishlistInfo): ReadonlySet<number> {
+        return new Set((info.wishlist_items ?? []).map((wishlist_item: WishlistItem): number => wishlist_item.item.id));
+    }
+
     private availableBuildings(): Building[] {
         return Array.from(this.by_id.values()).filter((building: Building): boolean => this.availabilityStatus(building) !== 'Disabled');
     }
@@ -389,7 +474,12 @@ export class BuildingsComponent implements OnInit {
      * TownType (RNE/RE/CUSTOM peuvent différer), donc sans ville active on ne filtre pas.
      */
     protected availabilityStatus(building: Building): BuildingAvailabilityStatusDTO | null {
-        const town_type: TownTypeId | null = this.hard_mode ? 'PANDE' : (this.town?.town_type ?? null);
+        return this.availabilityIn(building, this.hard_mode);
+    }
+
+    /** {@link availabilityStatus} pour une position donnée du sélecteur Normal / Pandémonium. */
+    private availabilityIn(building: Building, hard_mode: boolean): BuildingAvailabilityStatusDTO | null {
+        const town_type: TownTypeId | null = hard_mode ? 'PANDE' : (this.town?.town_type ?? null);
         if (!town_type) {
             return null;
         }
@@ -476,5 +566,48 @@ export class BuildingsComponent implements OnInit {
 
     private nameOf(building: Building): string {
         return building.label?.[this.locale] ?? building.uid ?? '';
+    }
+
+    /**
+     * Montre le chantier demandé par un lien profond (`/wiki/buildings?building=42`) : sa branche
+     * est dépliée, une recherche qui l'exclurait est levée, et le mode bascule s'il n'existe que
+     * dans l'autre (un chantier indisponible est omis du tableau). Sa ligne est ensuite surlignée
+     * et amenée à l'écran.
+     */
+    private revealRequestedBuilding(): void {
+        if (this.requested_building_id === null || this.by_id.size === 0) {
+            return;
+        }
+        const building: Building | undefined = this.by_id.get(this.requested_building_id);
+        this.requested_building_id = null;
+        if (!building) {
+            return;
+        }
+        if (this.availabilityStatus(building) === 'Disabled') {
+            if (this.availabilityIn(building, !this.hard_mode) === 'Disabled') {
+                return;
+            }
+            this.hard_mode = !this.hard_mode;
+            this.pruneSelectionForAvailability();
+        }
+        if (!this.matchesBranch(building, normalizeString(this.filters.label ?? '').trim())) {
+            this.filters.label = '';
+        }
+        // Déplie toute la branche ascendante. L'ensemble des nœuds vus borne la remontée si la
+        // donnée venait à contenir un cycle.
+        const visited: Set<number> = new Set<number>();
+        let parent_id: number | null = building.parent_id;
+        while (parent_id !== null && !visited.has(parent_id)) {
+            visited.add(parent_id);
+            this.collapsed.delete(parent_id);
+            parent_id = this.by_id.get(parent_id)?.parent_id ?? null;
+        }
+        this.targeted_id.set(building.id);
+        this.refresh();
+        afterNextRender({
+            read: (): void => {
+                this.host.nativeElement.querySelector<HTMLElement>('tr.mho-row-targeted')?.scrollIntoView?.({ block: 'center' });
+            }
+        }, { injector: this.injector });
     }
 }

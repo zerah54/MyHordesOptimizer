@@ -67,7 +67,7 @@
       }
     },
     "camping-phrases": {
-      "name": "camping-cätze",
+      "name": "camping-sätze",
       "description": "Die verschiedenen Formulierungen beim Campen, je nach tatsächlichen Überlebenschancen",
       "private-msg": {
         "name": "private-nachricht",
@@ -144,7 +144,7 @@
     "description": "Machen Sie Ihre Anweisungen deutlich sichtbar und länger"
   },
   "suggestion": {
-    "name": "anweisungen",
+    "name": "vorschlag",
     "description": "Posten Sie einen Vorschlag in unserem Vorschlagsfeld"
   },
   "bug": {
@@ -155,7 +155,7 @@
     "name": "attacke",
     "description": "Tools zur Angriffsschätzung",
     "get": {
-      "name": "erholen",
+      "name": "abrufen",
       "description": "Ruft die berechnete Schätzung und die gespeicherte Liste der Schätzungen für Tag und Stadt ab",
       "town-id": {
         "name": "stadt-id",
@@ -163,7 +163,7 @@
       },
       "day": {
         "name": "tag",
-        "description": "Der Tag, für den Sie den Kostenvoranschlag wünschen"
+        "description": "Der Tag, für den Sie die Schätzung wünschen"
       },
       "private-msg": {
         "name": "private-nachricht",

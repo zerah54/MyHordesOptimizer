@@ -1,4 +1,3 @@
-@use 'variables';
 
 :host {
     display: contents;
@@ -20,10 +19,125 @@
             opacity: 0.85;
 
             &.devastated-note {
-                color: variables.$tertiary;
+                color: var(--mho-accent);
                 opacity: 1;
                 font-weight: 600;
             }
+        }
+
+        /* L'accent ne sert plus qu'ici. Il servait auparavant à cinq choses à la fois —
+           intitulés d'étape, lignes clés, fond du tableau des rangs, citoyens condamnés, barres
+           d'histogramme — et à force de tout souligner il ne soulignait plus rien. */
+        .kpis {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            margin-bottom: 1em;
+
+            .kpi {
+                display: flex;
+                flex-direction: column;
+                gap: 2px;
+                padding: 10px 12px;
+                border: 1px solid var(--mho-line);
+                border-radius: var(--mho-radius-m);
+                background: var(--mho-surface-2);
+
+                .kpi-value {
+                    font-family: var(--mho-font-display);
+                    font-size: 24px;
+                    font-weight: 700;
+                    line-height: 1.1;
+                    color: var(--mho-accent);
+                    font-variant-numeric: tabular-nums;
+                }
+
+                .kpi-sub {
+                    font-size: 11.5px;
+                    color: var(--mho-text-muted);
+                }
+            }
+        }
+
+        /* Les deux blocs de saisie les plus lourds — neuf niveaux d'habitation, quarante défenses
+           personnelles — se replient sur un résumé. On les remplit une fois, on les relit rarement. */
+        .input-panel {
+            display: block;
+            margin: 0.75em 0;
+            background: var(--mho-surface);
+            border: 1px solid var(--mho-line);
+            box-shadow: none;
+
+            .intro {
+                margin-bottom: 0.75em;
+            }
+        }
+
+        /* Material donne une hauteur fixe à l'en-tête et une base nulle à la description : dans la
+           colonne de saisie, étroite, la description se retrouvait réduite à sa largeur minimale,
+           repliée sur trois lignes et rognée par l'en-tête. Elle garde désormais sa largeur
+           naturelle, et c'est l'en-tête qui passe sur deux lignes quand la place manque. */
+        .input-panel mat-expansion-panel-header,
+        .detail mat-expansion-panel-header {
+            box-sizing: border-box;
+            height: auto;
+            min-height: 48px;
+            padding-block: 6px;
+        }
+
+        ::ng-deep .input-panel .mat-expansion-panel-header .mat-content,
+        ::ng-deep .detail .mat-expansion-panel-header .mat-content {
+            flex-wrap: wrap;
+            align-items: center;
+            row-gap: 2px;
+        }
+
+        ::ng-deep .input-panel .mat-expansion-panel-header-title,
+        ::ng-deep .detail .mat-expansion-panel-header-title {
+            flex: 1 1 auto;
+            min-width: 0;
+        }
+
+        ::ng-deep .input-panel .mat-expansion-panel-header-description,
+        ::ng-deep .detail .mat-expansion-panel-header-description {
+            display: flex;
+            align-items: center;
+            gap: 0.35em;
+            color: var(--mho-text-muted);
+            font-size: 12px;
+            margin-right: 0.5em;
+
+            /* Le total des habitations doit correspondre au nombre de citoyens : l'écart se voit
+               sans ouvrir le panneau. */
+            &.mismatch {
+                color: var(--mho-warning);
+                font-weight: 600;
+            }
+        }
+
+        /* Résumé chiffré de la saisie : court, il tient sur une ligne. */
+        ::ng-deep .input-panel .mat-expansion-panel-header-description {
+            flex: 0 1 auto;
+            white-space: nowrap;
+        }
+
+        /* Phrase d'explication des résultats : elle s'enroule, mais sur une vraie largeur — jamais
+           réduite au mot le plus long. */
+        ::ng-deep .detail .mat-expansion-panel-header-description {
+            flex: 1 1 14em;
+            line-height: 1.3;
+        }
+
+        .detail {
+            display: block;
+            margin-top: 0.75em;
+
+            .mat-expansion-panel {
+                background: var(--mho-surface);
+                border: 1px solid var(--mho-line);
+                box-shadow: none;
+            }
+
         }
 
         .layout {
@@ -50,6 +164,10 @@
         .fields {
             display: flex;
             flex-wrap: wrap;
+            /* Sans `flex-start`, chaque champ s'étire à la hauteur du plus haut de sa ligne — et
+               depuis que les consignes ont une hauteur libre (`subscriptSizing="dynamic"`), un
+               champ à consigne courte voyait son cadre s'allonger pour suivre son voisin. */
+            align-items: flex-start;
             gap: 0.75em;
 
             mat-form-field {
@@ -118,7 +236,7 @@
                 tr.key {
                     th,
                     td {
-                        background-color: variables.$item_color;
+                        background-color: var(--mho-accent-soft);
                     }
 
                     th {
@@ -160,13 +278,13 @@
             }
 
             &.ranks {
-                border: 1px solid variables.$primary;
+                border: 1px solid var(--mho-line);
                 border-radius: 0.25em;
-                background-color: variables.$item_color;
+                background-color: var(--mho-surface-2);
 
                 thead th {
                     text-align: center;
-                    border-bottom: 1px solid variables.$primary;
+                    border-bottom: 1px solid var(--mho-line);
                 }
 
                 tbody {
@@ -178,8 +296,15 @@
                         text-align: right;
                     }
 
+                    /* Statut, pas accent — et jamais la couleur seule. Le second repère est porté par
+                       l'en-tête de ligne (la position) : les cellules de données, elles, ne passent
+                       jamais en gras (voir le spec « les cellules de données (td) ne sont pas en gras »). */
                     tr.dies {
-                        color: variables.$tertiary;
+                        color: var(--mho-danger);
+
+                        th {
+                            font-weight: 700;
+                        }
                     }
                 }
             }
@@ -200,7 +325,7 @@
                     min-width: 2px;
                     max-width: 4em;
                     border-radius: 2px;
-                    background-color: variables.$primary;
+                    background-color: var(--mho-chart-1);
                 }
             }
         }
@@ -211,7 +336,7 @@
             text-transform: uppercase;
             font-size: 0.8em;
             letter-spacing: 0.03em;
-            color: variables.$primary;
+            color: var(--mho-text-muted);
         }
 
         .step-caption {
@@ -224,7 +349,7 @@
             margin-top: 1em;
             padding: 0.75em;
             border-radius: 0.25em;
-            background-color: variables.$item_color;
+            background-color: var(--mho-accent-soft);
         }
 
         .scenario {

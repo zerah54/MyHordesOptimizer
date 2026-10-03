@@ -1,4 +1,3 @@
-@use 'variables';
 
 :host {
     display: contents;
@@ -27,12 +26,13 @@
         gap: 0.5em;
 
         .day {
-            background-color: rgba(0, 0, 0, 0.2);
+            background-color: var(--mho-surface-2);
+            border: 1px solid var(--mho-line);
             padding: 0.5em;
             border-radius: 0.5em;
 
             .day-label {
-                background-color: rgba(0, 0, 0, 0.2);
+                background-color: var(--mho-surface-3);
                 padding: 0.5em;
                 border-radius: 0.5em;
                 text-align: center;

@@ -73,4 +73,17 @@ describe('RecipesComponent', (): void => {
         expect(fixture.debugElement.nativeElement.textContent).toContain('Clou');
         expect(fixture.debugElement.nativeElement.textContent).not.toContain('Planche');
     });
+
+    it('renders each copy of a duplicated provoking component on its own line', (): void => {
+        const recipe: Recipe = makeRecipe('Bois', 'Planche');
+        recipe.components = [makeItem(1, 'Bois'), makeItem(1, 'Bois')];
+        recipe.provoking = makeItem(1, 'Bois');
+        recipes_subject.next([recipe]);
+        fixture.detectChanges();
+
+        const provoking: HTMLElement[] = fixture.debugElement.queryAll(By.css('td div.provoking')).map((debug_element) => debug_element.nativeElement);
+        expect(provoking.length).toBe(2);
+        // jsdom ne calcule pas la mise en page : un affichage `inline-*` mettrait les deux copies côte à côte.
+        provoking.forEach((element: HTMLElement) => expect(getComputedStyle(element).display).not.toMatch(/^inline/));
+    });
 });

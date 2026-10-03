@@ -42,7 +42,7 @@ describe('CitizenPictosDialogComponent', (): void => {
                 },
                 {
                     provide: MAT_ICON_DEFAULT_OPTIONS,
-                    useValue: { fontSet: 'material-symbols-outlined' } as MatIconDefaultOptions
+                    useValue: { fontSet: 'material-symbols-rounded' } as MatIconDefaultOptions
                 },
             ]
         });
@@ -71,13 +71,13 @@ describe('CitizenPictosDialogComponent', (): void => {
         expect(fixture.nativeElement.querySelector('.citizen-pictos__import')).not.toBeNull();
     });
 
-    it('uses the material-symbols-outlined font for the refresh icon (the only font loaded by the app)', (): void => {
+    it('uses the material-symbols-rounded font for the refresh icon (the only font loaded by the app)', (): void => {
         setUser(null);
         setUser(Object.assign(new Me(), { id: 1 }));
         configure({ historyImportedAt: null, pictos: [] });
 
         const icon: Element | null = fixture.nativeElement.querySelector('.citizen-pictos__import mat-icon');
-        expect(icon?.classList.contains('material-symbols-outlined')).toBe(true);
+        expect(icon?.classList.contains('material-symbols-rounded')).toBe(true);
     });
 
     it('loads pictos and the last import date on init', (): void => {

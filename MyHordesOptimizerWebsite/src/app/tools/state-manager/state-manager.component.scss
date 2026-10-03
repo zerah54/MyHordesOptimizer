@@ -1,4 +1,3 @@
-@use 'variables';
 
 :host {
     display: contents;
@@ -27,14 +26,39 @@
             display: flex;
             flex-direction: column;
             gap: 0.75em;
-            border: 1px solid variables.$primary;
+            border: 1px solid var(--mho-line);
             border-radius: 0.5em;
-            background-color: variables.$item_color;
+            /* Les trois colonnes étaient toutes sur `--mho-accent-soft` : l'accent servait de fond
+               générique, tout était mis en avant, donc plus rien ne ressortait. Ce sont des cartes,
+               elles prennent la surface des cartes. */
+            background-color: var(--mho-surface);
             padding: 1em;
 
-            h3, h4 {
+            /* Intitulé de colonne : même traitement que les en-têtes de carte du reste du site,
+               pour qu'on reconnaisse le patron plutôt qu'un titre centré isolé. */
+            h3 {
+                margin: 0 0 0.25em;
+                padding-bottom: 0.5em;
+                border-bottom: 1px solid var(--mho-line);
+                font-family: var(--mho-font-display);
+                font-size: 15px;
+                font-weight: 600;
+                text-align: center;
+            }
+
+            h4 {
                 text-align: center;
                 margin: 0;
+                font-size: 12.5px;
+                font-weight: 600;
+                color: var(--mho-text-muted);
+            }
+
+            /* Seul l'intitulé reste fixe : le contenu défile dans la colonne au lieu de la déborder. */
+            > :not(h3) {
+                flex: 1 1 auto;
+                min-height: 0;
+                overflow-y: auto;
             }
 
             .status-toggle-group {
@@ -44,21 +68,15 @@
             }
 
             .ranked-orders-section {
-                flex: 1;
-                min-height: 0;
                 display: flex;
                 flex-direction: column;
-                overflow: hidden;
             }
 
             .ranked-orders {
-                flex: 1;
-                min-height: 0;
                 display: flex;
                 flex-direction: column;
                 gap: 0.75em;
                 margin-top: 0.5em;
-                overflow-y: auto;
             }
 
             .ranked-order {
@@ -103,8 +121,6 @@
         }
 
         .states-cards-origine {
-            flex: 1;
-            min-height: 0;
             display: flex;
             flex-direction: column;
             gap: 0.75rem;
@@ -127,7 +143,7 @@
         .section-separator {
             width: 100%;
             border: none;
-            border-top: 1px solid variables.$primary;
+            border-top: 1px solid var(--mho-line);
             opacity: 0.4;
             margin: 1em 0;
         }
@@ -142,7 +158,8 @@
                 flex-wrap: wrap;
                 align-items: center;
                 gap: 0.35em;
-                background-color: variables.$item_color;
+                background-color: var(--mho-surface-2);
+                border: 1px solid var(--mho-line);
                 border-radius: 0.25em;
                 padding: 0.5em;
 
@@ -179,9 +196,9 @@
 
             .citizen-avatar {
                 position: relative;
-                border: 1px solid variables.$primary;
+                border: 1px solid var(--mho-well-line);
                 border-radius: 0.5em;
-                background-color: variables.$item_color;
+                background-color: var(--mho-well);
                 padding: 0.5em;
 
                 img {

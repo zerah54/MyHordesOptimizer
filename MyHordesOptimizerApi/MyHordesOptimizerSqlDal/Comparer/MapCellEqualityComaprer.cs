@@ -11,6 +11,8 @@ namespace MyHordesOptimizerApi.Comparer
                  && x.DangerLevel == y.DangerLevel
                  && x.IdRuin == y.IdRuin
                  && x.IsDryed == y.IsDryed
+                 && x.IsExcavated == y.IsExcavated
+                 && x.DigsObservedDay == y.DigsObservedDay
                  && x.IsNeverVisited == y.IsNeverVisited
                  && x.MaxPotentialRemainingDig == y.MaxPotentialRemainingDig
                  && x.NbHero == y.NbHero

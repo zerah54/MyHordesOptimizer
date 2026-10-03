@@ -23,7 +23,22 @@ import { xliffToJson } from './xliff-to-json';
 
 Sentry.init({
     dsn: 'https://61d309773a068eb1aeaaae0e3fe39f23@o4506962035539968.ingest.us.sentry.io/4506962042224640',
-    integrations: [],
+    // Comportement de la v10 : la v11 collecte tout, joint des stack traces synthétiques et ne renouvelle plus la session par navigation.
+    attachStacktrace: false,
+    dataCollection: {
+        userInfo: false,
+        cookies: false,
+        httpHeaders: {
+            request: { deny: ['forwarded', '-ip', 'remote-', 'via', '-user'] },
+            response: { deny: ['forwarded', '-ip', 'remote-', 'via', '-user'] },
+        },
+        httpBodies: [],
+        urlQueryParams: { deny: ['forwarded', '-ip', 'remote-', 'via', '-user'] },
+        genAI: { inputs: false, outputs: false },
+        databaseQueryData: false,
+        graphQL: { document: false, variables: false },
+    },
+    integrations: [Sentry.browserSessionIntegration({ lifecycle: 'route' })],
 });
 
 registerLocaleData(localeDE);

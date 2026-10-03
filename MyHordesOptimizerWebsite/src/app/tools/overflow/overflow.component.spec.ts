@@ -1,10 +1,11 @@
-import { provideHttpClient, withXhr } from '@angular/common/http';
+import { HttpRequest, provideHttpClient, withXhr } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting, TestRequest } from '@angular/common/http/testing';
 import { DebugElement } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import type { Mock } from 'vitest';
 
+import { RefinementViewDTO } from '../../_abstract_model/dto/refinement.dto';
 import { TownDetails } from '../../_abstract_model/types/town-details.class';
 import { setTown } from '../../_core/utilities/localstorage.util';
 import { OverflowComponent, ScenarioResult } from './overflow.component';
@@ -350,6 +351,8 @@ describe('OverflowComponent', (): void => {
         });
         const attack_req: TestRequest = http_mock.expectOne((req) => req.url.includes('/attaqueEstimation/AttackCalculation'));
         attack_req.flush(null, { status: 500, statusText: 'Server Error' });
+        http_mock.expectOne((req: HttpRequest<unknown>): boolean => req.url.includes('/AttaqueEstimation/Refinement/'))
+            .flush(null, { status: 500, statusText: 'Server Error' });
 
         town_fixture.detectChanges();
         town_component['iterations'] = 200;
@@ -393,11 +396,55 @@ describe('OverflowComponent', (): void => {
         // Estimation d'attaque non pertinente ici : erreur volontaire, absorbée par le catchError(() => of(null)) du composant.
         const attack_req: TestRequest = http_mock.expectOne((req) => req.url.includes('/attaqueEstimation/AttackCalculation'));
         attack_req.flush(null, { status: 500, statusText: 'Server Error' });
+        http_mock.expectOne((req: HttpRequest<unknown>): boolean => req.url.includes('/AttaqueEstimation/Refinement/'))
+            .flush(null, { status: 500, statusText: 'Server Error' });
 
         town_fixture.detectChanges();
 
         // 10 (houseDefense) + 3 (bonus héroïque Gardien : +2 métier +1) + 6 (renfort <=6, direct).
         expect(town_component['citizen_defenses']()[0].defense).toBe(19);
+    });
+
+    describe('attaque préremplie en mode "Ma ville"', (): void => {
+        /**
+         * Crée le composant en mode « Ma ville » (jour 5) et répond aux trois requêtes de préremplissage.
+         * @param estimation_max max de l'attaque estimée
+         * @param refinement affinage partagé du jour 5
+         */
+        const createInTown = (estimation_max: number, refinement: RefinementViewDTO): OverflowComponent => {
+            setTown(Object.assign(new TownDetails(), {
+                town_id: 1, town_x: 0, town_y: 0, town_max_x: 40, town_max_y: 40,
+                is_chaos: false, is_devaste: false, day: 5, town_type: 'primary', has_external_api: null
+            }));
+            const town_fixture: ComponentFixture<OverflowComponent> = TestBed.createComponent(OverflowComponent);
+            town_fixture.detectChanges();
+
+            const http_mock: HttpTestingController = TestBed.inject(HttpTestingController);
+            http_mock.expectOne((req: HttpRequest<unknown>): boolean => req.url.includes('/Fetcher/citizens')).flush({ citizens: {}, lastUpdateInfo: {} });
+            http_mock.expectOne((req: HttpRequest<unknown>): boolean => req.url.includes('/attaqueEstimation/AttackCalculation'))
+                .flush({ result: { min: 3500, max: estimation_max }, minList: [], maxList: [] });
+            http_mock.expectOne((req: HttpRequest<unknown>): boolean => req.url.includes('/AttaqueEstimation/Refinement/5')).flush(refinement);
+
+            return town_fixture.componentInstance;
+        };
+
+        it('reprend le max de l\'affinage valide plutôt que celui de l\'estimation', (): void => {
+            const town_component: OverflowComponent = createInTown(4000, {
+                status: 'Valid', attackMin: 3736, attackMax: 3757, reductionMin: null, reductionMax: null,
+                noCompatibleConfiguration: false, lastUpdateInfo: null
+            });
+
+            expect(town_component['attack']()).toBe(3757);
+        });
+
+        it('garde le max de l\'estimation quand l\'affinage n\'est plus valide', (): void => {
+            const town_component: OverflowComponent = createInTown(4000, {
+                status: 'Invalid', attackMin: null, attackMax: null, reductionMin: null, reductionMax: null,
+                noCompatibleConfiguration: false, lastUpdateInfo: null
+            });
+
+            expect(town_component['attack']()).toBe(4000);
+        });
     });
 
     // Régression OnPush (Task 14) : compute() est déclenché par un debounceTime() asynchrone
@@ -426,5 +473,23 @@ describe('OverflowComponent', (): void => {
             expect(component['overflow_after_watch']()).toBe(200);
 
         }, 500);
+    });
+
+    it('la défense par défaut suit les lignes génériques restées à l\'ancienne valeur, et elles seules', (): void => {
+        component['home_defense'] = 0;
+        component['citizen_defenses'].set([
+            { label: 'Citoyen 1', named: false, defense: 0 },
+            { label: 'Citoyen 2', named: false, defense: 12 },
+            { label: 'Zerah', named: true, defense: 0 }
+        ]);
+
+        component['changeHomeDefense'](5);
+
+        expect(component['home_defense']).toBe(5);
+        expect(component['citizen_defenses']().map((row: { defense: number }): number => row.defense)).toEqual([5, 12, 0]);
+
+        // Champ vidé : rien n'est réécrit
+        component['changeHomeDefense'](null);
+        expect(component['citizen_defenses']().map((row: { defense: number }): number => row.defense)).toEqual([5, 12, 0]);
     });
 });

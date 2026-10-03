@@ -4,11 +4,12 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { ActivatedRoute, provideRouter } from '@angular/router';
 import { of } from 'rxjs';
+import type { MockInstance } from 'vitest';
 
 import { ApiService } from '../../_abstract_model/services/api.service';
 import { CampingService } from '../../_abstract_model/services/camping.service';
 import { CampingBonus } from '../../_abstract_model/types/camping-bonus.class';
-import { CampingOdds } from '../../_abstract_model/types/camping-odds.class';
+import { CampingFactor, CampingOdds } from '../../_abstract_model/types/camping-odds.class';
 import { Ruin } from '../../_abstract_model/types/ruin.class';
 import { ClipboardService } from '../../_core/services/clipboard.service';
 import { CampingComponent } from './camping.component';
@@ -30,6 +31,10 @@ interface TestableComponent {
     };
     camping_result: {
         (): CampingOdds | undefined;
+        set(value: CampingOdds | undefined): void;
+    };
+    result_details: {
+        (): { key: string; label: string; value: number; share: number }[];
     };
     and_amelio: boolean;
     display_bonus_ap: boolean;
@@ -194,11 +199,51 @@ describe('CampingComponent', (): void => {
         });
     });
 
+    describe('result_details', (): void => {
+        function oddsWith(details: CampingFactor[]): CampingOdds {
+            return Object.assign(new CampingOdds(), { probability: 0, bounded_probability: 0, label: { fr: 'x' }, details });
+        }
+
+        it('keeps the non-zero factors, in form order, each bar relative to the strongest one', (): void => {
+            testable.camping_result.set(oddsWith([
+                { key: 'night', value: -10 },
+                { key: 'previous', value: 20 },
+                { key: 'tomb', value: 0 },
+                { key: 'distance', value: 5 }
+            ]));
+
+            expect(testable.result_details().map((line: { key: string }): string => line.key)).toEqual(['previous', 'distance', 'night']);
+            expect(testable.result_details().map((line: { share: number }): number => line.share)).toEqual([100, 25, 50]);
+        });
+
+        it('lists a factor unknown to the page last, under its raw key', (): void => {
+            testable.camping_result.set(oddsWith([
+                { key: 'newFactor', value: 3 },
+                { key: 'night', value: -10 }
+            ]));
+
+            expect(testable.result_details().map((line: { key: string }): string => line.key)).toEqual(['night', 'newFactor']);
+            expect(testable.result_details()[1].label).toBe('newFactor');
+        });
+
+        it('is empty when the API does not send the breakdown', (): void => {
+            testable.camping_result.set(new CampingOdds({ probability: 12, boundedProbability: 12, label: { fr: 'x' } }));
+
+            expect(testable.result_details()).toEqual([]);
+        });
+
+        it('reads the breakdown from the API response', (): void => {
+            const odds: CampingOdds = new CampingOdds({ probability: 15, boundedProbability: 15, label: { fr: 'x' }, details: { previous: 20, night: -5 } });
+
+            expect(odds.details).toEqual([{ key: 'previous', value: 20 }, { key: 'night', value: -5 }]);
+        });
+    });
+
     describe('shareCamping', (): void => {
         it('copies a link containing the current form as query params', (): void => {
             testable.configuration_form.set(buildFormGroup());
             const clipboard: ClipboardService = TestBed.inject(ClipboardService);
-            const copySpy = vi.spyOn(clipboard, 'copy');
+            const copySpy: MockInstance<ClipboardService['copy']> = vi.spyOn(clipboard, 'copy');
 
             testable.shareCamping();
 

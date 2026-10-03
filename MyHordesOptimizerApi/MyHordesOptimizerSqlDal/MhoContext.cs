@@ -107,6 +107,10 @@ public partial class MhoContext : DbContext
 
     public virtual DbSet<TownEstimation> TownEstimations { get; set; }
 
+    public virtual DbSet<TownAttackSetting> TownAttackSettings { get; set; }
+
+    public virtual DbSet<TownAttackRefinement> TownAttackRefinements { get; set; }
+
     public virtual DbSet<TownWishListItem> TownWishListItems { get; set; }
 
     public virtual DbSet<Season> Seasons { get; set; }
@@ -126,6 +130,8 @@ public partial class MhoContext : DbContext
     public virtual DbSet<WishlistCategorie> WishlistCategories { get; set; }
 
     public virtual DbSet<MinesweeperGame> MinesweeperGames { get; set; }
+
+    public virtual DbSet<DiscordTimer> DiscordTimers { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

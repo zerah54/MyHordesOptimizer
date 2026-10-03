@@ -1,11 +1,12 @@
-import { ChangeDetectionStrategy, Component, effect, ElementRef, input, InputSignal, Signal, viewChild } from '@angular/core';
-import { Scale, TooltipItem } from 'chart.js';
+import { ChangeDetectionStrategy, Component, effect, ElementRef, inject, input, InputSignal, Signal, viewChild } from '@angular/core';
+import { ChartDataset, Scale, TooltipItem } from 'chart.js';
 import Chart from 'chart.js/auto';
 import moment from 'moment';
 
 import { DisplayPseudoMode, Entry } from '../../../../_abstract_model/interfaces';
 import { Citizen } from '../../../../_abstract_model/types/citizen.class';
 import { CitizenInfo } from '../../../../_abstract_model/types/citizen-info.class';
+import { ChartsThemingService } from '../../../../_core/services/charts-theming.service';
 
 @Component({
     selector: 'mho-registry-doors',
@@ -16,6 +17,7 @@ import { CitizenInfo } from '../../../../_abstract_model/types/citizen-info.clas
 export class DoorsRegistryComponent {
 
     private readonly doors_canvas: Signal<ElementRef> = viewChild.required<ElementRef>('doorsCanvas');
+    private readonly charts_theming: ChartsThemingService = inject(ChartsThemingService);
 
     public completeCitizenList: InputSignal<CitizenInfo> = input.required();
     public displayPseudo: InputSignal<DisplayPseudoMode> = input.required();
@@ -53,10 +55,13 @@ export class DoorsRegistryComponent {
             data: {
                 labels: this.completeCitizenList().citizens.map((citizen: Citizen) => citizen.name),
                 datasets: this.convertDoorsAccessToDatasets(this.doorsAccessTransformation())
-                    .map((doors_access_for_citizen: ([number, number] | null)[], index: number) => {
+                    .map((doors_access_for_citizen: ([number, number] | null)[], index: number): ChartDataset<'bar'> => {
                         return {
                             label: $localize`Sortie n°${index + 1}`,
                             data: doors_access_for_citizen,
+                            // Les sorties d'un même citoyen forment une suite : une teinte unique,
+                            // de plus en plus pâle, dit l'ordre — huit couleurs le masqueraient.
+                            backgroundColor: this.charts_theming.seriesFill(0, Math.max(0.3, 1 - index * 0.22)),
                             borderSkipped: false,
                             minBarLength: 1
                         };
@@ -73,7 +78,7 @@ export class DoorsRegistryComponent {
                     },
                     tooltip: {
                         callbacks: {
-                            label: (tooltip_item: TooltipItem<'bar'>) => (moment((<number[]>tooltip_item.raw)[0]).format('k:mm').replace('24:00', '0:00') + ' - ' + moment((<number[]>tooltip_item.raw)[1]).format('k:mm').replace('24:00', '0:00')),
+                            label: (tooltip_item: TooltipItem<'bar'>): string => (moment((<number[]>tooltip_item.raw)[0]).format('k:mm').replace('24:00', '0:00') + ' - ' + moment((<number[]>tooltip_item.raw)[1]).format('k:mm').replace('24:00', '0:00')),
                         },
                         position: 'nearest'
                     }

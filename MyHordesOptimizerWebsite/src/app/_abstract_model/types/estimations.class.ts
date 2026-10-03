@@ -7,6 +7,12 @@ import { Dictionary } from './_types';
 export class Estimations extends CommonModel<EstimationsDTO> {
     public estim!: Dictionary<MinMax>;
     public planif!: Dictionary<MinMax>;
+    /** Âmes par palier de la tour (clé = %). */
+    public estim_souls!: Dictionary<number>;
+    /** Âmes par palier du planificateur (clé = %). */
+    public planif_souls!: Dictionary<number>;
+    public estim_spa_level!: number;
+    public planif_spa_level!: number;
     private day!: number;
 
 
@@ -17,7 +23,11 @@ export class Estimations extends CommonModel<EstimationsDTO> {
 
     public override modelToDto(): EstimationsDTO {
         const estimation: EstimationsDTO = {
-            day: this.day
+            day: this.day,
+            estimSouls: this.estim_souls,
+            planifSouls: this.planif_souls,
+            estimSpaLevel: this.estim_spa_level,
+            planifSpaLevel: this.planif_spa_level
         };
 
         const filtered_estim: Dictionary<MinMax> = {};
@@ -69,6 +79,10 @@ export class Estimations extends CommonModel<EstimationsDTO> {
             this.planif = this.emptyValuesForPlanif;
             this.day = 0;
         }
+        this.estim_souls = dto?.estimSouls ?? {};
+        this.planif_souls = dto?.planifSouls ?? {};
+        this.estim_spa_level = dto?.estimSpaLevel ?? 0;
+        this.planif_spa_level = dto?.planifSpaLevel ?? 0;
     }
 
     private get emptyValuesForEstim(): Dictionary<MinMax> {

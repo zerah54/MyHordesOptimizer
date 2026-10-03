@@ -14,6 +14,10 @@
                         <ng-container i18n>Désert</ng-container>
                     }
                 </h1>
+                <button mat-icon-button type="button" class="close" (click)="closed.emit()"
+                        aria-label="Fermer le détail de la zone" i18n-aria-label>
+                    <mat-icon>close</mat-icon>
+                </button>
             </div>
             <div class="coords-distance">
                 <span class="cords">[{{ cell().displayed_x }}&nbsp;;&nbsp;{{ cell().displayed_y }}]</span>
@@ -70,5 +74,11 @@
         <div class="last-update">
             <mho-last-update [lastUpdateInfo]="cell().update_info"></mho-last-update>
         </div>
+        @if (canUpdate()) {
+            <button mat-flat-button type="button" class="update-cell" (click)="updateRequested.emit()">
+                <mat-icon>edit_location_alt</mat-icon>
+                <ng-container i18n>Mettre à jour la zone</ng-container>
+            </button>
+        }
     </div>
 }

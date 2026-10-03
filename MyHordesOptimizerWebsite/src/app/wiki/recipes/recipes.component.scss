@@ -2,8 +2,12 @@
     display: contents;
 
     .mho-recipes {
+        /* La page n'est plus une `mat-card-content` : c'est le panneau d'onglets du wiki qui
+           lui donne sa hauteur, et les blocs internes en `flex: 1; overflow: auto` en dépendent. */
         display: flex;
         flex-direction: column;
+        height: 100%;
+        min-height: 0;
 
         table {
             width: 100%;
@@ -17,16 +21,45 @@
                 vertical-align: middle;
             }
 
+            /* La flèche de transformation n'est qu'un repère : elle ne doit pas prendre la
+               largeur d'une vraie colonne. */
+            .mat-column-transformation {
+                width: 32px;
+                text-align: center;
+            }
+
             td {
                 div {
 
+                    /* Composant déclencheur : contour ET fond teinté ET gras. Le tiret hérité de
+                       la couleur du texte se confondait avec les autres composants.
+                       `flex` + `fit-content` et non `inline-flex`, sinon un composant en double reste sur la même ligne. */
                     &.provoking {
-                        border: 1px dashed;
-                        padding: 0 0.5em 0 0;
+                        display: flex;
+                        width: fit-content;
+                        align-items: center;
+                        gap: 0.35em;
+                        padding: 1px 7px 1px 4px;
+                        border: 1px solid var(--mho-accent);
+                        border-radius: 999px;
+                        background: var(--mho-accent-soft);
+                        color: var(--mho-on-accent-soft);
+                        font-weight: 600;
                     }
 
                     > img {
                         margin-right: 0.5em;
+                    }
+
+                    /* Probabilité : une pilule, pas une parenthèse noyée dans le libellé. */
+                    > small {
+                        margin-left: 0.4em;
+                        padding: 1px 6px;
+                        border-radius: 999px;
+                        background: var(--mho-surface-3);
+                        color: var(--mho-text-muted);
+                        font-size: 11px;
+                        font-variant-numeric: tabular-nums;
                     }
                 }
             }

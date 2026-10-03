@@ -1,9 +1,14 @@
-@use 'variables';
 
 :host {
     display: contents;
 
     .mho-private-towns {
+        /* La page n'est plus une `mat-card-content` : c'est le panneau d'onglets du wiki qui
+           lui donne sa hauteur, et les blocs internes en `flex: 1; overflow: auto` en dépendent. */
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        min-height: 0;
 
         table {
             height: 100%;

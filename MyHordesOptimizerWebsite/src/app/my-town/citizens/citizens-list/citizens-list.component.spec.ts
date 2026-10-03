@@ -1,9 +1,10 @@
-import { provideHttpClient, withXhr } from '@angular/common/http';
+import { HttpRequest, provideHttpClient, withXhr } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { ChangeDetectorRef } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
 import { of } from 'rxjs';
+import type { MockInstance } from 'vitest';
 
 import { DailyActionEnum } from '../../../_abstract_model/enum/daily-action.enum';
 import { HomeEnum } from '../../../_abstract_model/enum/home.enum';
@@ -184,10 +185,10 @@ describe('CitizensListComponent', (): void => {
         citizen.daily_actions = [];
         testable.citizen_list = { data: [citizen] };
         const httpMock: HttpTestingController = TestBed.inject(HttpTestingController);
-        const refreshSpy = vi.spyOn(testable.change_detector_ref, 'detectChanges');
+        const refreshSpy: MockInstance<() => void> = vi.spyOn(testable.change_detector_ref, 'detectChanges');
 
         testable.saveDailyAction('home_shower', true, 42);
-        httpMock.expectOne((request) => request.url.includes('/dailyAction/')).flush({});
+        httpMock.expectOne((request: HttpRequest<unknown>): boolean => request.url.includes('/dailyAction/')).flush({});
 
         expect(refreshSpy).toHaveBeenCalled();
         expect(citizen.daily_actions.length).toBe(1);
@@ -201,10 +202,10 @@ describe('CitizensListComponent', (): void => {
         citizen.status.update_info = new UpdateInfo();
         testable.citizen_list = { data: [citizen] };
         const httpMock: HttpTestingController = TestBed.inject(HttpTestingController);
-        const refreshSpy = vi.spyOn(testable.change_detector_ref, 'detectChanges');
+        const refreshSpy: MockInstance<() => void> = vi.spyOn(testable.change_detector_ref, 'detectChanges');
 
         testable.addStatus(42, StatusEnum.CLEAN.key);
-        httpMock.expectOne((request) => request.url.includes('/ExternalTools/Status')).flush({});
+        httpMock.expectOne((request: HttpRequest<unknown>): boolean => request.url.includes('/ExternalTools/Status')).flush({});
 
         expect(refreshSpy).toHaveBeenCalled();
         // Réassignation immuable (pas de .push() en place) : cf. correction Task 11.
@@ -221,12 +222,12 @@ describe('CitizensListComponent', (): void => {
         citizen.chamanic_detail.update_info = new UpdateInfo();
         testable.citizen_list = { data: [citizen] };
         const httpMock: HttpTestingController = TestBed.inject(HttpTestingController);
-        const refreshSpy = vi.spyOn(testable.change_detector_ref, 'detectChanges');
+        const refreshSpy: MockInstance<() => void> = vi.spyOn(testable.change_detector_ref, 'detectChanges');
 
         (component as unknown as {
             changePotions(c: Citizen, value: number): void;
         }).changePotions(citizen, 3);
-        httpMock.expectOne((request) => request.url.includes('/chamanicDetail')).flush({});
+        httpMock.expectOne((request: HttpRequest<unknown>): boolean => request.url.includes('/chamanicDetail')).flush({});
 
         expect(refreshSpy).toHaveBeenCalled();
         expect(citizen.chamanic_detail.nb_potion_shaman).toBe(3);
@@ -246,7 +247,7 @@ describe('CitizensListComponent', (): void => {
 
     it('goToProfile navigates to the profile page of the citizen', (): void => {
         const router: Router = TestBed.inject(Router);
-        const navigateSpy = vi.spyOn(router, 'navigate');
+        const navigateSpy: MockInstance<Router['navigate']> = vi.spyOn(router, 'navigate');
 
         testable.goToProfile(42);
 
@@ -267,7 +268,7 @@ describe('CitizensListComponent', (): void => {
 
         expect((): void => testable.addChestItem(42, 5)).not.toThrow();
 
-        httpMock.expectOne((request) => request.url.includes('/ExternalTools/Chest')).flush({});
+        httpMock.expectOne((request: HttpRequest<unknown>): boolean => request.url.includes('/ExternalTools/Chest')).flush({});
     });
 
     it('emptyChest clears the chest items and does not throw', (): void => {
@@ -280,7 +281,7 @@ describe('CitizensListComponent', (): void => {
 
         expect((): void => testable.emptyChest(42)).not.toThrow();
 
-        httpMock.expectOne((request) => request.url.includes('/ExternalTools/Chest')).flush({});
+        httpMock.expectOne((request: HttpRequest<unknown>): boolean => request.url.includes('/ExternalTools/Chest')).flush({});
         expect(citizen.chest.items).toEqual([]);
     });
 
@@ -297,6 +298,11 @@ describe('CitizensListComponent', (): void => {
     });
 
     describe('mode observateur (is_readonly)', (): void => {
+        // La ville observée vit dans un signal de module : sans remise à zéro, elle fuit vers les specs suivantes.
+        afterEach((): void => {
+            TestBed.inject(TownContextService).clear();
+        });
+
         it('renders the light card view, not the heavy table, when the town is observed read-only', (): void => {
             TestBed.inject(TownContextService).setObservedTown(new TownDetails());
             const info: CitizenInfo = new CitizenInfo();
@@ -321,5 +327,62 @@ describe('CitizensListComponent', (): void => {
             expect(el.querySelector('mat-sidenav-container')).toBeTruthy();
             expect(el.querySelector('.mho-citizens-list-light')).toBeFalsy();
         });
+    });
+});
+
+describe('CitizensListComponent - lien profond (?citizen=)', (): void => {
+    let component: CitizensListComponent;
+    let fixture: ComponentFixture<CitizensListComponent>;
+
+    function makeCitizen(id: number, name: string, is_dead: boolean = false): Citizen {
+        const citizen: Citizen = new Citizen();
+        citizen.id = id;
+        citizen.name = name;
+        citizen.is_dead = is_dead;
+        citizen.daily_actions = [];
+        return citizen;
+    }
+
+    function filteredIds(): number[] {
+        return component['citizen_list'].filteredData.map((citizen: Citizen): number => citizen.id);
+    }
+
+    beforeEach(async (): Promise<void> => {
+        await TestBed.configureTestingModule({
+            imports: [CitizensListComponent],
+            providers: [provideHttpClient(withXhr()), provideHttpClientTesting(), provideRouter([])]
+        }).compileComponents();
+
+        const info: CitizenInfo = new CitizenInfo();
+        info.citizens = [makeCitizen(1, 'Alice'), makeCitizen(2, 'Bob'), makeCitizen(3, 'Carole', true)];
+        vi.spyOn(TestBed.inject(TownService), 'getCitizens').mockReturnValue(of(info));
+        fixture = TestBed.createComponent(CitizensListComponent);
+        component = fixture.componentInstance;
+        // Sans rendu : le tableau et ses cellules différées (IntersectionObserver) n'existent pas
+        // sous jsdom. ngOnInit suffit à brancher filtres, lien profond et chargement.
+        component.ngOnInit();
+    });
+
+    it('highlights the requested citizen, lifting a filter that hides it', async (): Promise<void> => {
+        component['citizen_filters'] = [component['citizen_list'].data[0]];
+        component['applyCitizenFilters']();
+        expect(filteredIds()).toEqual([1]);
+
+        await TestBed.inject(Router).navigateByUrl('/?citizen=2');
+
+        expect(component['targeted_citizen_id']()).toBe(2);
+        expect(filteredIds()).toEqual([1, 2]);
+    });
+
+    it('highlights a dead citizen too', async (): Promise<void> => {
+        await TestBed.inject(Router).navigateByUrl('/?citizen=3');
+
+        expect(component['targeted_citizen_id']()).toBe(3);
+    });
+
+    it('ignores a citizen who is not in the town', async (): Promise<void> => {
+        await TestBed.inject(Router).navigateByUrl('/?citizen=99');
+
+        expect(component['targeted_citizen_id']()).toBeNull();
     });
 });

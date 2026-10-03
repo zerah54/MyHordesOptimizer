@@ -1,13 +1,27 @@
-import { DebugElement } from '@angular/core';
+import { DebugElement, signal, WritableSignal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatCheckbox } from '@angular/material/checkbox';
 import { By } from '@angular/platform-browser';
+import { provideRouter, Router } from '@angular/router';
 import moment from 'moment';
-import { of, Subject } from 'rxjs';
+import { Observable, of, Subject } from 'rxjs';
+import type { Mock } from 'vitest';
 
 import { ApiService } from '../../_abstract_model/services/api.service';
+import { WishlistService } from '../../_abstract_model/services/wishlist.service';
 import { Building, BuildingResource } from '../../_abstract_model/types/building.class';
+import { Item } from '../../_abstract_model/types/item.class';
+import { TownDetails } from '../../_abstract_model/types/town-details.class';
+import { WishlistInfo } from '../../_abstract_model/types/wishlist-info.class';
+import { WishlistItem } from '../../_abstract_model/types/wishlist-item.class';
+import { TownContextService } from '../../_core/services/town-context.service';
 import { BuildingsComponent } from './buildings.component';
+
+/** Liste de courses factice : la page ne la lit qu'avec une ville active, absente de ces tests. */
+const WISHLIST_SERVICE_STUB: Partial<WishlistService> = {
+    getWishlist: (): Observable<WishlistInfo> => of(new WishlistInfo()),
+    addMissingItems: (): Observable<WishlistInfo> => of(new WishlistInfo())
+};
 
 describe('BuildingsComponent', (): void => {
     let fixture: ComponentFixture<BuildingsComponent>;
@@ -16,7 +30,10 @@ describe('BuildingsComponent', (): void => {
     beforeEach(async (): Promise<void> => {
         await TestBed.configureTestingModule({
             imports: [BuildingsComponent],
-            providers: [{ provide: ApiService, useValue: { getBuildings: (): unknown => of([]) } }]
+            providers: [
+                { provide: ApiService, useValue: { getBuildings: (): unknown => of([]) } },
+                { provide: WishlistService, useValue: WISHLIST_SERVICE_STUB }
+            ]
         }).compileComponents();
 
         fixture = TestBed.createComponent(BuildingsComponent);
@@ -618,7 +635,10 @@ describe('BuildingsComponent - ngOnInit wiring', (): void => {
         buildings_subject = new Subject<Building[]>();
         await TestBed.configureTestingModule({
             imports: [BuildingsComponent],
-            providers: [{ provide: ApiService, useValue: { getBuildings: (): unknown => buildings_subject.asObservable() } }]
+            providers: [
+                { provide: ApiService, useValue: { getBuildings: (): unknown => buildings_subject.asObservable() } },
+                { provide: WishlistService, useValue: WISHLIST_SERVICE_STUB }
+            ]
         }).compileComponents();
 
         fixture = TestBed.createComponent(BuildingsComponent);
@@ -824,5 +844,288 @@ describe('BuildingsComponent - ngOnInit wiring', (): void => {
         fixture.detectChanges();
 
         expect(component['isSelected'](root_a)).toBe(false);
+    });
+});
+
+describe('BuildingsComponent - envoi à la liste de courses', (): void => {
+    let fixture: ComponentFixture<BuildingsComponent>;
+    let component: BuildingsComponent;
+    let buildings_subject: Subject<Building[]>;
+    let wishlist_subject: Subject<WishlistInfo>;
+    let add_subject: Subject<WishlistInfo>;
+    let get_wishlist: Mock<() => Observable<WishlistInfo>>;
+    let add_missing_items: Mock<(item_ids: readonly number[]) => Observable<WishlistInfo>>;
+    let is_readonly: WritableSignal<boolean>;
+
+    const TOWN: TownDetails = Object.assign(new TownDetails(), { town_id: 1 });
+
+    function wishlistOf(item_ids: number[]): WishlistInfo {
+        const info: WishlistInfo = new WishlistInfo();
+        info.wishlist_items = item_ids.map((item_id: number): WishlistItem => {
+            const wishlist_item: WishlistItem = new WishlistItem();
+            wishlist_item.item = new Item();
+            wishlist_item.item.id = item_id;
+            return wishlist_item;
+        });
+        return info;
+    }
+
+    function resource(item_id: number): BuildingResource {
+        const building_resource: BuildingResource = new BuildingResource();
+        building_resource.item_id = item_id;
+        building_resource.count = 1;
+        building_resource.label = { [moment.locale()]: `Objet ${item_id}` };
+        building_resource.img = `item_${item_id}.gif`;
+        return building_resource;
+    }
+
+    async function setup(town: TownDetails | null): Promise<void> {
+        await TestBed.configureTestingModule({
+            imports: [BuildingsComponent],
+            providers: [
+                { provide: ApiService, useValue: { getBuildings: (): Observable<Building[]> => buildings_subject.asObservable() } },
+                { provide: WishlistService, useValue: { getWishlist: get_wishlist, addMissingItems: add_missing_items } },
+                { provide: TownContextService, useValue: { isReadonly: is_readonly } }
+            ]
+        }).compileComponents();
+
+        fixture = TestBed.createComponent(BuildingsComponent);
+        component = fixture.componentInstance;
+        component['town'] = town;
+        fixture.detectChanges();
+    }
+
+    /** Charge un chantier portant ces ressources et le coche : le récapitulatif s'affiche. */
+    function selectBuildingWith(resources: BuildingResource[]): void {
+        const building: Building = new Building();
+        building.id = 1;
+        building.uid = 'b1';
+        building.parent_id = null;
+        building.label = { [moment.locale()]: 'Chantier' };
+        building.description = { [moment.locale()]: '' };
+        building.img = 'building.gif';
+        building.display_order = 1;
+        building.resources = resources;
+        buildings_subject.next([building]);
+        fixture.detectChanges();
+
+        fixture.debugElement.query(By.css('td .select-control')).nativeElement.click();
+        fixture.detectChanges();
+    }
+
+    function sendButton(): DebugElement | null {
+        return fixture.debugElement.query(By.css('.send-to-wishlist'));
+    }
+
+    beforeEach((): void => {
+        buildings_subject = new Subject<Building[]>();
+        wishlist_subject = new Subject<WishlistInfo>();
+        add_subject = new Subject<WishlistInfo>();
+        get_wishlist = vi.fn<() => Observable<WishlistInfo>>().mockReturnValue(wishlist_subject.asObservable());
+        add_missing_items = vi.fn<(item_ids: readonly number[]) => Observable<WishlistInfo>>().mockReturnValue(add_subject.asObservable());
+        is_readonly = signal(false);
+    });
+
+    it('does not read the wishlist without an active town, and offers no send button', async (): Promise<void> => {
+        await setup(null);
+        selectBuildingWith([resource(1)]);
+
+        expect(get_wishlist).not.toHaveBeenCalled();
+        expect(sendButton()).toBeNull();
+    });
+
+    it('does not read the wishlist in observer mode, and offers no send button', async (): Promise<void> => {
+        is_readonly.set(true);
+        await setup(TOWN);
+        selectBuildingWith([resource(1)]);
+
+        expect(get_wishlist).not.toHaveBeenCalled();
+        expect(sendButton()).toBeNull();
+    });
+
+    it('offers no send button while the wishlist is still loading', async (): Promise<void> => {
+        await setup(TOWN);
+        selectBuildingWith([resource(1)]);
+
+        expect(get_wishlist).toHaveBeenCalledTimes(1);
+        expect(sendButton()).toBeNull();
+    });
+
+    it('offers no send button when every resource is already in the wishlist, whatever its zone', async (): Promise<void> => {
+        await setup(TOWN);
+        wishlist_subject.next(wishlistOf([1, 2]));
+        selectBuildingWith([resource(1), resource(2)]);
+
+        expect(sendButton()).toBeNull();
+    });
+
+    it('sends only the missing resources, then hides the button once the wishlist holds them all', async (): Promise<void> => {
+        await setup(TOWN);
+        wishlist_subject.next(wishlistOf([1]));
+        selectBuildingWith([resource(1), resource(2), resource(3)]);
+
+        sendButton()!.nativeElement.click();
+        fixture.detectChanges();
+
+        expect(add_missing_items).toHaveBeenCalledWith([2, 3]);
+
+        add_subject.next(wishlistOf([1, 2, 3]));
+        fixture.detectChanges();
+
+        expect(sendButton()).toBeNull();
+    });
+
+    it('disables the button and ignores a second click while a send is in flight', async (): Promise<void> => {
+        await setup(TOWN);
+        wishlist_subject.next(wishlistOf([]));
+        selectBuildingWith([resource(1)]);
+
+        sendButton()!.nativeElement.click();
+        fixture.detectChanges();
+        sendButton()!.nativeElement.click();
+        fixture.detectChanges();
+
+        expect(add_missing_items).toHaveBeenCalledTimes(1);
+        expect(sendButton()!.nativeElement.disabled).toBe(true);
+    });
+
+    it('re-enables the button when the send fails, the resources still being missing', async (): Promise<void> => {
+        await setup(TOWN);
+        wishlist_subject.next(wishlistOf([]));
+        selectBuildingWith([resource(1)]);
+
+        sendButton()!.nativeElement.click();
+        fixture.detectChanges();
+        add_subject.error(new Error('API indisponible'));
+        fixture.detectChanges();
+
+        expect(sendButton()!.nativeElement.disabled).toBe(false);
+    });
+});
+
+describe('BuildingsComponent - lien profond (?building=) et lignes', (): void => {
+    let fixture: ComponentFixture<BuildingsComponent>;
+    let component: BuildingsComponent;
+    let buildings_subject: Subject<Building[]>;
+
+    function makeBuilding(id: number, parent_id: number | null, label: string): Building {
+        const building: Building = new Building();
+        building.id = id;
+        building.uid = `b${id}`;
+        building.parent_id = parent_id;
+        building.label = { [moment.locale()]: label };
+        building.description = { [moment.locale()]: '' };
+        building.img = 'building.gif';
+        building.display_order = id;
+        return building;
+    }
+
+    function rowIds(): number[] {
+        return component['rows']().map((building: Building): number => building.id);
+    }
+
+    function targetedRows(): DebugElement[] {
+        return fixture.debugElement.queryAll(By.css('tr.mho-row-targeted'));
+    }
+
+    async function follow(url: string): Promise<void> {
+        await TestBed.inject(Router).navigateByUrl(url);
+        fixture.detectChanges();
+    }
+
+    beforeEach(async (): Promise<void> => {
+        buildings_subject = new Subject<Building[]>();
+        await TestBed.configureTestingModule({
+            imports: [BuildingsComponent],
+            providers: [
+                provideRouter([]),
+                { provide: ApiService, useValue: { getBuildings: (): Observable<Building[]> => buildings_subject.asObservable() } },
+                { provide: WishlistService, useValue: WISHLIST_SERVICE_STUB }
+            ]
+        }).compileComponents();
+
+        fixture = TestBed.createComponent(BuildingsComponent);
+        component = fixture.componentInstance;
+        fixture.detectChanges();
+    });
+
+    it('unfolds the branch of the requested building and highlights its row', async (): Promise<void> => {
+        const root: Building = makeBuilding(1, null, 'Muraille');
+        buildings_subject.next([root, makeBuilding(2, 1, 'Grand fossé'), makeBuilding(3, 2, 'Douves')]);
+        component['toggle'](root);
+        fixture.detectChanges();
+        expect(rowIds()).toEqual([1]);
+
+        await follow('/?building=3');
+
+        expect(rowIds()).toEqual([1, 2, 3]);
+        expect(targetedRows().length).toBe(1);
+        expect(targetedRows()[0].nativeElement.textContent).toContain('Douves');
+    });
+
+    it('waits for the catalogue when the link is followed first', async (): Promise<void> => {
+        await follow('/?building=2');
+
+        buildings_subject.next([makeBuilding(1, null, 'Muraille'), makeBuilding(2, null, 'Atelier')]);
+        fixture.detectChanges();
+
+        expect(targetedRows()[0].nativeElement.textContent).toContain('Atelier');
+    });
+
+    it('lifts a name search that would hide the requested building', async (): Promise<void> => {
+        buildings_subject.next([makeBuilding(1, null, 'Muraille'), makeBuilding(2, null, 'Atelier')]);
+        component['filters'].label = 'muraille';
+        component['refresh']();
+        expect(rowIds()).toEqual([1]);
+
+        await follow('/?building=2');
+
+        expect(component['filters'].label).toBe('');
+        expect(rowIds()).toEqual([1, 2]);
+    });
+
+    it('switches to the game mode in which the requested building exists', async (): Promise<void> => {
+        component['hard_mode'] = true;
+        const normal_only: Building = makeBuilding(1, null, 'Chantier normal');
+        normal_only.availability = { PANDE: 'Disabled' };
+        buildings_subject.next([normal_only]);
+        expect(rowIds()).toEqual([]);
+
+        await follow('/?building=1');
+
+        expect(component['hard_mode']).toBe(false);
+        expect(rowIds()).toEqual([1]);
+    });
+
+    it('ignores an unknown building', async (): Promise<void> => {
+        buildings_subject.next([makeBuilding(1, null, 'Muraille')]);
+
+        await follow('/?building=99');
+
+        expect(targetedRows()).toEqual([]);
+    });
+
+    it('tints the checked rows (accent-soft), and only them', (): void => {
+        buildings_subject.next([makeBuilding(1, null, 'Muraille'), makeBuilding(2, null, 'Atelier')]);
+        fixture.detectChanges();
+
+        fixture.debugElement.queryAll(By.css('td .select-control'))[1].nativeElement.click();
+        fixture.detectChanges();
+
+        const rows: DebugElement[] = fixture.debugElement.queryAll(By.css('tr[mat-row]'));
+        expect(rows.map((row: DebugElement): boolean => row.nativeElement.classList.contains('mho-row-selected'))).toEqual([false, true]);
+    });
+
+    it('keeps the selection and name columns sticky', async (): Promise<void> => {
+        buildings_subject.next([makeBuilding(1, null, 'Muraille')]);
+        fixture.detectChanges();
+        // Les classes collantes sont posées après rendu (`afterNextRender` du CDK).
+        await fixture.whenStable();
+
+        const cells: DebugElement[] = fixture.debugElement.queryAll(By.css('tr[mat-row] td'));
+        // `mat-mdc-table-sticky` : c'est la classe que vise `tables.scss` pour rendre ces cellules opaques.
+        expect(cells[0].nativeElement.classList).toContain('mat-mdc-table-sticky');
+        expect(cells[1].nativeElement.classList).toContain('mat-mdc-table-sticky');
+        expect(cells[2].nativeElement.classList).not.toContain('mat-mdc-table-sticky');
     });
 });

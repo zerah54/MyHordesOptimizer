@@ -4,7 +4,7 @@ import { MAT_ICON_DEFAULT_OPTIONS, MatIconDefaultOptions } from '@angular/materi
 import { MatPaginatorIntl } from '@angular/material/paginator';
 import { provideMomentDateAdapter } from '@angular/material-moment-adapter';
 import { BrowserModule } from '@angular/platform-browser';
-import { provideRouter, Router, withRouterConfig } from '@angular/router';
+import { provideRouter, Router, RouteReuseStrategy, withRouterConfig } from '@angular/router';
 import * as Sentry from '@sentry/angular';
 import { initializeApp } from 'firebase/app';
 
@@ -15,6 +15,7 @@ import { AnalyticsService } from './_core/services/analytics.service';
 import { errorInterceptor } from './_core/services/errors-interceptor.service';
 import { headersInterceptor } from './_core/services/headers-interceptor.service';
 import { loadingInterceptor } from './_core/services/loading-interceptor.service';
+import { ReloadableRouteReuseStrategy } from './_core/services/page-reload.service';
 import { ROUTES, ROUTES_OPTIONS } from './routes';
 
 const angular_modules: Modules = [BrowserModule];
@@ -26,6 +27,8 @@ export const appConfig: ApplicationConfig = {
             ROUTES,
             withRouterConfig(ROUTES_OPTIONS),
         ),
+        // Réutilisation des routes par défaut, sauf rechargement demandé de la page (PageReloadService)
+        { provide: RouteReuseStrategy, useExisting: ReloadableRouteReuseStrategy },
         importProvidersFrom(...angular_modules),
         provideAppInitializer(() => inject(AnalyticsService).init(initializeApp(environment.firebase_config))),
         provideHttpClient(withXhr(), withInterceptors([headersInterceptor, loadingInterceptor, errorInterceptor])),
@@ -46,7 +49,7 @@ export const appConfig: ApplicationConfig = {
         { provide: MatPaginatorIntl, useClass: MhoPaginatorIntl },
         {
             provide: MAT_ICON_DEFAULT_OPTIONS,
-            useValue: { fontSet: 'material-symbols-outlined' } as MatIconDefaultOptions
+            useValue: { fontSet: 'material-symbols-rounded' } as MatIconDefaultOptions
         },
 
     ]

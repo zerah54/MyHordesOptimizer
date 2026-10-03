@@ -12,6 +12,7 @@ import { Imports } from '../../../_abstract_model/types/_types';
 import { Regen } from '../../../_abstract_model/types/regen.class';
 import { TypedCellDefDirective } from '../../../_core/directives/typed-cell-def.directive';
 import { ColumnIdPipe } from '../../../_core/pipes/column-id.pipe';
+import { ChartsThemingService } from '../../../_core/services/charts-theming.service';
 import { groupBy } from '../../../_core/utilities/array.util';
 
 // import ChartDataLabels, { Context } from 'chartjs-plugin-datalabels';
@@ -53,6 +54,7 @@ export class ScrutateurComponent implements OnInit {
 
     private town_statistics_service: TownStatisticsService = inject(TownStatisticsService);
     private readonly destroy_ref: DestroyRef = inject(DestroyRef);
+    private readonly charts_theming: ChartsThemingService = inject(ChartsThemingService);
 
     public ngOnInit(): void {
         this.town_statistics_service
@@ -76,7 +78,12 @@ export class ScrutateurComponent implements OnInit {
                     data: {
                         labels: this.all_zones_regen.map((zone: Direction) => zone.getLabel()),
                         datasets: [{
-                            data: polar_data
+                            data: polar_data,
+                            // Une seule teinte : ici la grandeur se lit au rayon, l'identité au
+                            // libellé de secteur. Huit couleurs coloreraient le rang, pas le sens.
+                            backgroundColor: this.charts_theming.seriesFill(0, 0.55),
+                            borderColor: this.charts_theming.series(0),
+                            borderWidth: 1
                         }]
                     },
                     options: {
@@ -121,7 +128,11 @@ export class ScrutateurComponent implements OnInit {
                     data: {
                         labels: [$localize`Droite`, $localize`Diagonale`],
                         datasets: [{
-                            data: pie_data
+                            data: pie_data,
+                            backgroundColor: [this.charts_theming.series(0), this.charts_theming.series(1)],
+                            // Filet à la couleur du fond : les deux parts se touchent, il les sépare.
+                            borderColor: this.charts_theming.color('surface'),
+                            borderWidth: 2
                         }]
                     },
                     // plugins: [ChartDataLabels],

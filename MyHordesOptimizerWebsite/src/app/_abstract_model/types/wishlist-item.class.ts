@@ -1,3 +1,4 @@
+import { ShortWishlistItemDTO } from '../dto/short-wishlist-item.dto';
 import { WishlistItemDTO } from '../dto/wishlist-item.dto';
 import { WishlistDepot } from '../enum/wishlist-depot.enum';
 import { CommonModel } from './_common.class';
@@ -37,6 +38,18 @@ export class WishlistItem extends CommonModel<WishlistItemDTO> {
             chestCount: this.chest_count,
             chestCitizens: this.chest_citizens,
             mapCellItemCount: this.map_cell_item_count,
+            zoneXPa: this.zone_x_pa,
+            shouldSignal: this.should_signal
+        };
+    }
+
+    /** Forme attendue par l'écriture de la liste (PUT) : l'objet par son seul identifiant. */
+    public toShortDto(): ShortWishlistItemDTO {
+        return {
+            id: this.item.id,
+            priority: this.priority,
+            count: this.count,
+            depot: this.depot.value.count,
             zoneXPa: this.zone_x_pa,
             shouldSignal: this.should_signal
         };

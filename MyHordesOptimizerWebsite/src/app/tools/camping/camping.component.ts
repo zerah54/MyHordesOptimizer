@@ -1,5 +1,5 @@
 import { CommonModule, DecimalPipe, formatNumber, Location, NgOptimizedImage, NgTemplateOutlet } from '@angular/common';
-import { ChangeDetectionStrategy, Component, DestroyRef, DOCUMENT, inject, OnInit, signal, WritableSignal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, DestroyRef, DOCUMENT, inject, OnInit, Signal, signal, WritableSignal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -22,7 +22,7 @@ import { CampingService } from '../../_abstract_model/services/camping.service';
 import { TownService } from '../../_abstract_model/services/town.service';
 import { Imports, TownTypeId } from '../../_abstract_model/types/_types';
 import { CampingBonus } from '../../_abstract_model/types/camping-bonus.class';
-import { CampingOdds } from '../../_abstract_model/types/camping-odds.class';
+import { CampingFactor, CampingOdds } from '../../_abstract_model/types/camping-odds.class';
 import { CampingParameters } from '../../_abstract_model/types/camping-parameters.class';
 import { Ruin } from '../../_abstract_model/types/ruin.class';
 import { TownDetails } from '../../_abstract_model/types/town-details.class';
@@ -72,6 +72,29 @@ export class CampingComponent implements OnInit {
 
     protected readonly configuration_form: WritableSignal<UntypedFormGroup | undefined> = signal(undefined);
     protected readonly camping_result: WritableSignal<CampingOdds | undefined> = signal(undefined);
+    /**
+     * Détail du calcul : les facteurs non nuls, dans l'ordre du formulaire, chacun avec sa part
+     * rapportée au plus fort (en valeur absolue) pour la barre. Vide si l'API ne renvoie pas le
+     * détail : la section n'est alors pas affichée.
+     */
+    protected readonly result_details: Signal<CampingFactorLine[]> = computed((): CampingFactorLine[] => {
+        const factors: CampingFactor[] = (this.camping_result()?.details ?? [])
+            .filter((factor: CampingFactor): boolean => factor.value !== 0);
+        const strongest: number = Math.max(0, ...factors.map((factor: CampingFactor): number => Math.abs(factor.value)));
+        const order: string[] = [...this.factor_labels.keys()];
+        const rank: (key: string) => number = (key: string): number => {
+            const index: number = order.indexOf(key);
+            return index === -1 ? order.length : index;
+        };
+        return factors
+            .map((factor: CampingFactor): CampingFactorLine => ({
+                key: factor.key,
+                label: this.factor_labels.get(factor.key) ?? factor.key,
+                value: factor.value,
+                share: strongest > 0 ? Math.abs(factor.value) / strongest * 100 : 0
+            }))
+            .sort((line_a: CampingFactorLine, line_b: CampingFactorLine): number => rank(line_a.key) - rank(line_b.key));
+    });
     /** Le dossier dans lequel sont stockées les images */
     protected readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
     protected readonly locale: string = moment.locale();
@@ -81,6 +104,25 @@ export class CampingComponent implements OnInit {
     protected readonly bonus_string: string = $localize`Bonus : `;
     // eslint-disable-next-line no-irregular-whitespace
     private readonly capacity_string: string = $localize`Capacité : `;
+
+    /**
+     * Libellés des clés du détail renvoyé par l'API, dans l'ordre des cartes du formulaire
+     * (citoyen, bâtiment, ville). Une clé inconnue s'affiche en dernier, sous son nom brut.
+     */
+    private readonly factor_labels: ReadonlyMap<string, string> = new Map<string, string>([
+        ['previous', $localize`Campings déjà effectués`],
+        ['campItems', $localize`Pelures de peau et toiles de tente`],
+        ['tomb', $localize`Tombe`],
+        ['distance', $localize`Distance de la ville`],
+        ['zoneBuilding', $localize`Bâtiment`],
+        ['zombies', $localize`Zombies sur la case`],
+        ['campers', $localize`Campeurs déjà cachés`],
+        ['zone', $localize`Améliorations de la case`],
+        ['town', $localize`Type de ville`],
+        ['night', $localize`Nuit`],
+        ['devastated', $localize`Ville dévastée`],
+        ['lighthouse', $localize`Phare`]
+    ]);
 
     protected readonly jobs: JobEnum[] = JobEnum.getAllValues();
     protected readonly JOB_SCOUT: JobEnum = JobEnum.SCOUT;
@@ -403,6 +445,16 @@ interface TownType {
     id: TownTypeId;
     label: string;
     bonus: number;
+}
+
+/** Ligne du détail du calcul. */
+interface CampingFactorLine {
+    key: string;
+    label: string;
+    /** Contribution signée, en points de pourcentage. */
+    value: number;
+    /** Largeur de la barre, en % du facteur le plus fort. */
+    share: number;
 }
 
 export type ModelFormGroup<T> = FormGroup<{

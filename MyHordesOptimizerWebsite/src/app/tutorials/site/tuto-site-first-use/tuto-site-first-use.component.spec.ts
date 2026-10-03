@@ -43,14 +43,25 @@ describe('TutoSiteFirstUseComponent', (): void => {
         expect((titleEl.childNodes[0].textContent as string).trim()).toBe('Première utilisation du site');
     });
 
-    it('renders the two explanation paragraphs, in order', (): void => {
-        const paragraphs: DebugElement[] = fixture.debugElement.queryAll(By.css('mat-card-content p'));
+    it('explains the sign-in flow as three ordered steps, between a lead and a closing note', (): void => {
+        const lead: HTMLElement = fixture.debugElement.query(By.css('.first-use .lead')).nativeElement;
+        const steps: DebugElement[] = fixture.debugElement.queryAll(By.css('.first-use ol.steps > li.step'));
+        const note: HTMLElement = fixture.debugElement.query(By.css('.first-use .note')).nativeElement;
 
-        expect(paragraphs.length).toBe(2);
-        expect((paragraphs[0].nativeElement.textContent as string).trim()).toBe('Lors de votre première utilisation du site vous n\'aurez pas accès aux pages sous le menu "Ma ville". '
-            + 'En effet, il faut au préalable renseigner son identifiant externe pour les applications, en haut à droite de la page.');
-        expect((paragraphs[1].nativeElement.textContent as string).trim()).toBe('L\'identifiant externe pour les applications se trouve sur le site de MyHordes, dans la page de votre âme, onglet "Avancé". '
-            + 'Une fois copié, il suffit de le coller dans le champ dédié sur le site de MyHordes Optimizer et de valider.');
+        expect((lead.textContent as string).trim()).toBe('Les pages du menu "Ma ville" ne s\'ouvrent qu\'une fois le site relié à votre compte MyHordes. '
+            + 'Cela se fait une seule fois, en trois étapes.');
+        expect(steps.map((step: DebugElement): string => (step.query(By.css('.step-title')).nativeElement.textContent as string).trim()))
+            .toEqual(['Cliquez sur "Se connecter"', 'Autorisez MyHordes Optimizer', 'C\'est prêt']);
+        expect(steps.map((step: DebugElement): string => (step.query(By.css('.step-number')).nativeElement.textContent as string).trim()))
+            .toEqual(['1', '2', '3']);
+        expect((note.textContent as string).trim()).toContain('identifiant externe pour les applications');
+    });
+
+    it('no longer describes the manual external-id field as the way in', (): void => {
+        const text: string = (fixture.nativeElement as HTMLElement).textContent ?? '';
+
+        expect(text).not.toContain('champ dédié');
+        expect(text).toContain('Se connecter');
     });
 
     it('copies the current page URL when "Copier l\'URL" is clicked', (): void => {
@@ -61,15 +72,18 @@ describe('TutoSiteFirstUseComponent', (): void => {
         expect(clipboard.copy).toHaveBeenCalledWith(document.location.href, 'Le lien a bien été copié');
     });
 
-    it('copies a forum-formatted summary joining the title and both paragraphs when "Copier au format forum" is clicked', (): void => {
+    it('copies a forum-formatted version with the lead, numbered steps and note when "Copier au format forum" is clicked', (): void => {
         clickMenuItem('Copier au format forum');
 
         expect(clipboard.copy).toHaveBeenCalledTimes(1);
 
         expect(clipboard.copy).toHaveBeenCalledWith('[b][big]Première utilisation du site[/big][/b]\n\n'
-            + 'Lors de votre première utilisation du site vous n\'aurez pas accès aux pages sous le menu "Ma ville". '
-            + 'En effet, il faut au préalable renseigner son identifiant externe pour les applications, en haut à droite de la page.\n\n'
-            + 'L\'identifiant externe pour les applications se trouve sur le site de MyHordes, dans la page de votre âme, onglet "Avancé". '
-            + 'Une fois copié, il suffit de le coller dans le champ dédié sur le site de MyHordes Optimizer et de valider.', 'Le texte a bien été copié');
+            + 'Les pages du menu "Ma ville" ne s\'ouvrent qu\'une fois le site relié à votre compte MyHordes. '
+            + 'Cela se fait une seule fois, en trois étapes.\n\n'
+            + '[b]1. Cliquez sur "Se connecter"[/b]\nLe bouton se trouve en haut à droite de la page.\n\n'
+            + '[b]2. Autorisez MyHordes Optimizer[/b]\nVous êtes envoyé sur MyHordes, qui vous demande d\'autoriser MyHordes Optimizer à lire vos informations de jeu.\n\n'
+            + '[b]3. C\'est prêt[/b]\nVous revenez ici connecté, et le menu "Ma ville" se débloque.\n\n'
+            + '[i]Cette autorisation remplace la saisie manuelle de l\'identifiant externe pour les applications, '
+            + 'qui se trouvait dans la page de votre âme sur MyHordes, onglet "Avancé".[/i]', 'Le texte a bien été copié');
     });
 });

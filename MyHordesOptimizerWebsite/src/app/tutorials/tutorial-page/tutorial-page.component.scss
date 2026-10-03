@@ -1,0 +1,38 @@
+:host {
+    display: contents;
+
+    .mho-tutorial-page {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+
+        p {
+            margin: 0;
+            line-height: 1.55;
+        }
+
+        .lead {
+            font-size: 14px;
+        }
+
+        /* Textes en `[innerHTML]` : leurs liens n'ont pas l'attribut d'encapsulation. */
+        .lead, .intro, .outro {
+            ::ng-deep a {
+                color: var(--mho-accent);
+                text-underline-offset: 2px;
+            }
+        }
+
+        .tutorial-section {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+
+            h2 {
+                margin: 0;
+                font-size: 15px;
+                font-weight: 700;
+            }
+        }
+    }
+}

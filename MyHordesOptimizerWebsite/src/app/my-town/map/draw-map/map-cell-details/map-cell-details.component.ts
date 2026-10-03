@@ -1,6 +1,8 @@
 import { CommonModule, NgOptimizedImage } from '@angular/common';
-import { ChangeDetectionStrategy, Component, input, InputSignal } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, Component, input, InputSignal, InputSignalWithTransform, output, OutputEmitterRef } from '@angular/core';
+import { MatButtonModule } from '@angular/material/button';
 import { MatDividerModule } from '@angular/material/divider';
+import { MatIconModule } from '@angular/material/icon';
 import moment from 'moment';
 
 import { HORDES_IMG_REPO } from '../../../../_abstract_model/const';
@@ -21,7 +23,7 @@ import { RuinInCell } from './ruin-in-cell.pipe';
 const angular_common: Imports = [CommonModule, NgOptimizedImage];
 const components: Imports = [LastUpdateComponent, IconApComponent, CitizenInfoComponent];
 const pipes: Imports = [CellDetailsBottomPipe, CellDetailsLeftPipe, CellDetailsRightPipe, CellDetailsTopPipe, CitizensFromShortPipe, ItemImgPipe, ItemDetailsPipe, RuinInCell];
-const material_modules: Imports = [MatDividerModule];
+const material_modules: Imports = [MatButtonModule, MatDividerModule, MatIconModule];
 
 @Component({
     selector: 'mho-map-cell-details',
@@ -33,10 +35,15 @@ const material_modules: Imports = [MatDividerModule];
 export class MapCellDetailsComponent {
 
     public cell: InputSignal<Cell> = input.required();
-    public cellHtml: InputSignal<HTMLTableCellElement> = input.required();
+    public cellHtml: InputSignal<HTMLElement> = input.required();
     public allRuins: InputSignal<Ruin[]> = input.required();
     public allCitizens: InputSignal<Citizen[]> = input.required();
     public allItems: InputSignal<Item[]> = input.required();
+    /** Mode observateur : la zone reste consultable, mais elle n'est pas modifiable. */
+    public canUpdate: InputSignalWithTransform<boolean, unknown> = input(false, { transform: booleanAttribute });
+
+    public updateRequested: OutputEmitterRef<void> = output();
+    public closed: OutputEmitterRef<void> = output();
 
     protected readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
     protected readonly locale: string = moment.locale();

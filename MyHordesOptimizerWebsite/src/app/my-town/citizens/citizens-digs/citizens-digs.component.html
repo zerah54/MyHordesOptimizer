@@ -36,11 +36,13 @@
                             }
                             @case ('today_digs') {
                                 <div class="digs">
-                                    <mho-dig [dig]="undefined" [citizen]="row.citizen" [day]="current_day"
-                                             [digsMode]="'creation'"
-                                             (deletedDig)="deletedDig($event)" (updatedDig)="updatedDig($event)"></mho-dig>
+                                    @if (!is_readonly()) {
+                                        <mho-dig [dig]="undefined" [citizen]="row.citizen" [day]="filters.selected_day"
+                                                 [digsMode]="'creation'"
+                                                 (deletedDig)="deletedDig($event)" (updatedDig)="updatedDig($event)"></mho-dig>
+                                    }
                                     @for (dig of row.digs; track dig) {
-                                        <mho-dig [dig]="dig" [citizen]="row.citizen"
+                                        <mho-dig [dig]="dig" [citizen]="row.citizen" [readonly]="is_readonly()"
                                                  [day]="current_day" [digsMode]="'update'"
                                                  (deletedDig)="deletedDig($event)" (updatedDig)="updatedDig($event)"></mho-dig>
                                     }

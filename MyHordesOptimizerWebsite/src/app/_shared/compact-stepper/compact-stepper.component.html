@@ -1,4 +1,4 @@
-<div class="compact-stepper" [matTooltip]="label()">
+<div class="compact-stepper" [matTooltip]="label()" [matTooltipDisabled]="noTooltip()">
     @if (icon()) {
         <img class="stepper-icon" [src]="src()" [alt]="label()">
     }

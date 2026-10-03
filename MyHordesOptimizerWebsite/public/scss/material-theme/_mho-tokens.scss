@@ -1,0 +1,315 @@
+@use 'sass:list';
+@use 'sass:map';
+@use '@angular/material' as mat;
+
+/// Jetons de design MHO.
+/// Chaque jeton est un couple (clair, sombre) émis via `light-dark()` : le mode est piloté
+/// uniquement par `color-scheme` sur <html> (`.mode-light`, `.mode-dark`, ou rien = système).
+/// `light-dark()` n'accepte que des couleurs : les ombres utilisent `--mho-shadow-color`.
+
+/// Famille Brun = les couleurs de MyHordes (assets/less/theme.less) :
+///   fond de page #100C0B · panneau #7E4D2A · boîte #693E29 · en-tête de case #5C2B20
+///   bouton #A5381B · texte de bouton #F0D79E · petit texte #DDAB76 · bordure de champ #EFDBA8
+/// Les surfaces sombres reprennent ces teintes, abaissées d'un cran en luminosité : aux valeurs
+/// brutes du jeu, le petit texte #DDAB76 tombe à 3,41:1 sur le panneau (AA en demande 4,5).
+/// Vérifié : blanc ≥ 10,7:1, texte atténué ≥ 4,66:1, accent ≥ 7,6:1 sur chaque surface.
+$brown: (
+    bg: (#F3EADB, #1A0F0A),
+    surface: (#FBF7F0, #5A3020),
+    surface-2: (#FFFDF9, #6B3B27),
+    surface-3: (#F1E6D4, #43231A),
+    nav-bg: (#EEE2CF, #3A1C13),
+    topbar-bg: (#2E1911, #100C0B),
+    topbar-fg: (#F0D79E, #F0D79E),
+    topbar-muted: (#CBB08C, #DDAB76),
+    topbar-chip: (rgba(240, 215, 158, 0.10), rgba(240, 215, 158, 0.08)),
+    topbar-line: (#1F100A, #351A11),
+    topbar-btn-bg: (#F0D79E, #F0D79E),
+    topbar-btn-fg: (#2A160E, #2A160E),
+    // Pastille derrière le logo (violet) : seulement sur une barre où il se fondrait.
+    topbar-logo-bg: (transparent, transparent),
+    line: (#E3D4BD, #7E4D2A),
+    line-strong: (#CDB797, #966437),
+    text: (#2A1710, #FFFFFF),
+    text-muted: (#6E5243, #E1AF7C),
+    accent: (#7A3B1E, #F0D79E),
+    on-accent: (#FFF6E6, #2A160E),
+    accent-soft: (rgba(122, 59, 30, 0.10), rgba(240, 215, 158, 0.14)),
+    on-accent-soft: (#6A3219, #F0D79E),
+    accent-2: (#9E4E1F, #E08A4C),
+    hover: (rgba(42, 23, 16, 0.05), rgba(240, 215, 158, 0.06)),
+    field-bg: (#FFFFFF, #33190F),
+    well: (#F0E4D0, #2E160F),
+    well-line: (rgba(122, 59, 30, 0.16), rgba(240, 215, 158, 0.10)),
+    danger: (#B3261E, #F08C80),
+    success: (#2E7D32, #9AD094),
+    success-soft: (rgba(46, 125, 50, 0.12), rgba(127, 191, 122, 0.18)),
+    warning: (#9A6200, #E7B35A),
+    map-unknown: (#E6DAC6, #4A2617),
+    map-hatch: (rgba(42, 23, 16, 0.08), rgba(240, 215, 158, 0.07)),
+    shadow-color: (rgba(60, 30, 20, 0.16), rgba(0, 0, 0, 0.50)),
+    // Couleur « forte » historique (ex --primary) : toujours lisible sous du texte blanc.
+    brand-strong: (#A5381B, #A5381B),
+    // Rose des vents, dans l'esprit d'avant la refonte : une direction cochée est plus foncée
+    // qu'une direction décochée, jamais l'inverse. Décoché : le texte fondu dans le panneau (82 /
+    // 55 / 30 % en sombre, 30 / 16 / 70 % en clair, pour que la cardinale reste la plus marquée).
+    // Coché : bruns du thème — accent puis barre d'en-tête en clair, puits puis fond de page en
+    // sombre (le seul moyen d'être plus foncé qu'un panneau déjà sombre).
+    compass-off-card: (#BCB4AD, #E1DAD7),
+    compass-off-diag: (#DAD3CC, #B5A29B),
+    compass-off-center: (#695A53, #8C6E63),
+    compass-on-card: (#7A3B1E, #2E160F),
+    compass-on-diag: (#2E1911, #1A0F0A),
+    compass-on-center: (#2E1911, #1A0F0A),
+);
+
+/// Barre rose vif (l'accent du mode clair), un cran plus foncée en sombre, texte blanc.
+/// Vérifié : blanc 7,0:1 (clair) et 9,1:1 (sombre) sur la barre, 5,8:1 et 7,1:1 sur la pastille ;
+/// texte atténué ≥ 4,7:1 sur la pastille ; initiales de l'avatar 7,0:1 et 9,1:1.
+$pink: (
+    bg: (#FBF3F6, #170F13),
+    surface: (#FFFFFF, #21161B),
+    surface-2: (#FFFFFF, #2B1C23),
+    surface-3: (#FBE9F0, #382530),
+    nav-bg: (#F8E8EF, #1C1217),
+    topbar-bg: (#AD1457, #8E1048),
+    topbar-fg: (#FFFFFF, #FFFFFF),
+    topbar-muted: (#FCE4EE, #FCE4EE),
+    topbar-chip: (rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.12)),
+    topbar-line: (#8E1048, #6E0C38),
+    topbar-btn-bg: (#FFFFFF, #FFFFFF),
+    topbar-btn-fg: (#AD1457, #8E1048),
+    topbar-logo-bg: (#FFFFFF, #FFFFFF),
+    line: (#F0DAE3, #3A2A32),
+    line-strong: (#E2BFCD, #54404A),
+    text: (#2A1720, #F8E9EF),
+    text-muted: (#735462, #C7A6B5),
+    accent: (#AD1457, #FF8FB8),
+    on-accent: (#FFFFFF, #3B0B20),
+    accent-soft: (rgba(173, 20, 87, 0.10), rgba(255, 143, 184, 0.14)),
+    on-accent-soft: (#8E1048, #FFB3CF),
+    accent-2: (#C2185B, #FF4F8B),
+    hover: (rgba(173, 20, 87, 0.05), rgba(255, 143, 184, 0.07)),
+    field-bg: (#FFFFFF, #1A1116),
+    well: (#FBEFF4, #150D11),
+    well-line: (rgba(173, 20, 87, 0.12), rgba(255, 143, 184, 0.12)),
+    danger: (#B3261E, #FF8A80),
+    success: (#2E7D32, #81C784),
+    success-soft: (rgba(46, 125, 50, 0.12), rgba(129, 199, 132, 0.18)),
+    warning: (#9A6200, #FFB74D),
+    map-unknown: (#EFE1E7, #2A1C23),
+    map-hatch: (rgba(42, 23, 32, 0.08), rgba(255, 143, 184, 0.06)),
+    shadow-color: (rgba(90, 20, 50, 0.14), rgba(0, 0, 0, 0.55)),
+    brand-strong: (#AD1457, #AD1457),
+    // Rose des vents : décoché calculé comme pour `$brown` ; coché en rose fort (celui de la
+    // barre), et 62 % de ce rose sur les diagonales. Le panneau sombre (#21161B) est déjà presque
+    // noir : le rose coché y reste plus foncé que le gris décoché.
+    compass-off-card: (#BFB9BC, #D1C3C9),
+    compass-off-diag: (#DDDADB, #978A90),
+    compass-off-center: (#6A5D63, #61555B),
+    compass-on-card: (#AD1457, #AD1457),
+    compass-on-diag: (#6B0C36, #6B0C36),
+    compass-on-center: (#6B0C36, #6B0C36),
+);
+
+/// Thèmes saisonniers : mono-mode (Noël clair, Halloween sombre), ThemeService force le
+/// `color-scheme`. Une couleur par jeton, émise par `mono-tokens()`. Passer l'un d'eux en bi-mode
+/// revient à en écrire les paires (clair, sombre) et à le retirer de `FORCED_SCHEMES`.
+/// Vérifié : texte ≥ 13,5:1, texte atténué ≥ 6,3:1, accent ≥ 4,9:1 sur chaque surface ; texte de
+/// la barre ≥ 5,9:1, bouton de la barre ≥ 5,6:1.
+$noel: (
+    bg: #EEF5EE,
+    surface: #FAFDF9,
+    surface-2: #FFFFFF,
+    surface-3: #E3EFE3,
+    nav-bg: #E6F2E6,
+    topbar-bg: #1F5F24,
+    topbar-fg: #FFFFFF,
+    topbar-muted: #CFE8D0,
+    topbar-chip: rgba(255, 255, 255, 0.12),
+    topbar-line: #174A1B,
+    topbar-btn-bg: #C62828,
+    topbar-btn-fg: #FFFFFF,
+    topbar-logo-bg: transparent,
+    line: #D3E4D3,
+    line-strong: #A9C4AA,
+    text: #1A1C19,
+    text-muted: #48594A,
+    // Vert sapin et rouge : l'accent secondaire colore la sélection de la carte et de la rose.
+    accent: #2A7030,
+    on-accent: #FFFFFF,
+    accent-soft: rgba(42, 112, 48, 0.10),
+    on-accent-soft: #1F5F24,
+    accent-2: #C62828,
+    hover: rgba(26, 28, 25, 0.05),
+    field-bg: #FFFFFF,
+    well: #EAF3EA,
+    well-line: rgba(42, 112, 48, 0.16),
+    danger: #B3261E,
+    success: #2A7030,
+    success-soft: rgba(42, 112, 48, 0.12),
+    warning: #8A5700,
+    map-unknown: #E0EBE0,
+    map-hatch: rgba(26, 28, 25, 0.08),
+    shadow-color: rgba(20, 50, 20, 0.14),
+    brand-strong: #C62828,
+    // Rose des vents : cardinales rouges, diagonales vert sapin.
+    compass-off-card: #B7BAB6,
+    compass-off-diag: #D6D9D5,
+    compass-off-center: #5D605C,
+    compass-on-card: #C62828,
+    compass-on-diag: #2A7030,
+    compass-on-center: #1F5F24,
+);
+
+$halloween: (
+    bg: #171717,
+    surface: #242424,
+    surface-2: #2E2E2E,
+    surface-3: #1D1D1D,
+    nav-bg: #121212,
+    topbar-bg: #0B0B0B,
+    topbar-fg: #FF8A50,
+    topbar-muted: #C2ADA3,
+    topbar-chip: rgba(255, 138, 80, 0.10),
+    topbar-line: #1F1F1F,
+    topbar-btn-bg: #FF5722,
+    topbar-btn-fg: #1A0A00,
+    topbar-logo-bg: transparent,
+    line: #3A3A3A,
+    line-strong: #5A5A5A,
+    text: #FFFFFF,
+    text-muted: #C7B8B0,
+    // Orange citrouille et violet.
+    accent: #FF7043,
+    on-accent: #1A0A00,
+    accent-soft: rgba(255, 112, 67, 0.16),
+    on-accent-soft: #FFAB91,
+    accent-2: #B388FF,
+    hover: rgba(255, 112, 67, 0.07),
+    field-bg: #1B1B1B,
+    well: #121212,
+    well-line: rgba(255, 112, 67, 0.12),
+    danger: #FF8A80,
+    success: #81C784,
+    success-soft: rgba(129, 199, 132, 0.18),
+    warning: #FFB74D,
+    map-unknown: #2A2A2A,
+    map-hatch: rgba(255, 112, 67, 0.07),
+    shadow-color: rgba(0, 0, 0, 0.60),
+    brand-strong: #BF360C,
+    // Rose des vents : citrouille.
+    compass-off-card: #D8D8D8,
+    compass-off-diag: #9C9C9C,
+    compass-off-center: #666666,
+    compass-on-card: #BF360C,
+    compass-on-diag: #762107,
+    compass-on-center: #762107,
+);
+
+/// Échelle de la carte : sémantique, identique pour toutes les familles (seul le mode change).
+$map-scale: (
+    map-l0: (#EFB3A8, #8B3A31),
+    map-l1: (#F4CD9C, #8F5A2A),
+    map-l2: (#EEDF98, #6F6127),
+    map-l3: (#B7DBAE, #3F6D3B),
+    map-fg: (#2A1710, #F7EDDA),
+    // Marqueur de bâtiment (carré centré) et encre de ses symboles internes.
+    map-marker: (rgba(42, 23, 16, 0.82), rgba(247, 237, 218, 0.90)),
+    map-marker-ink: (#FFF6E6, #2A1710),
+    // Repères : position en jeu (vert de l'interface carte du jeu) et texte posé sur la couleur de sélection.
+    map-me: (#2F5A06, #D7FF5B),
+    map-sel-fg: (#FFFFFF, #1C110D),
+);
+
+/// Palette catégorielle des graphiques. Indépendante de la famille : une série n'est pas une
+/// teinte de marque, et faire varier ses couleurs avec le thème empêcherait de comparer deux
+/// captures. L'ordre des emplacements est le mécanisme de sécurité daltonisme — il ne change pas.
+/// Validé dans les deux modes : écart minimal entre voisins ΔE 9,1 (clair) et 8,4 (sombre) en
+/// protanopie, ΔE 19,6 / 19,3 en vision normale, contre `#FFFFFF` et contre `#5A3020` (la plus
+/// claire des surfaces sombres, donc la contrainte). Trois emplacements par mode passent sous
+/// 3:1 de contraste : ils ne sont employés que sur des graphiques qui portent une légende **et**
+/// un tableau des mêmes valeurs à côté.
+$chart-scale: (
+    chart-1: (#2A78D6, #3987E5),
+    chart-2: (#EB6834, #D95926),
+    chart-3: (#1BAF7A, #199E70),
+    chart-4: (#EDA100, #C98500),
+    chart-5: (#E87BA4, #D55181),
+    chart-6: (#008300, #008300),
+);
+
+@function _light-dark($pair) {
+    @return light-dark(#{list.nth($pair, 1)}, #{list.nth($pair, 2)});
+}
+
+/// Émet les propriétés `--mho-*` d'une famille.
+@mixin tokens($family) {
+    @each $name, $pair in $family {
+        --mho-#{$name}: #{_light-dark($pair)};
+    }
+}
+
+/// Émet les propriétés `--mho-*` d'une famille mono-mode (une couleur par jeton). Elle doit
+/// couvrir tous les jetons de `$brown`, émis sur <html> : un oubli laisserait passer la couleur
+/// brune sous le thème saisonnier, d'où l'erreur de compilation.
+@mixin mono-tokens($family) {
+    @each $name in map.keys($brown) {
+        @if not map.has-key($family, $name) {
+            @error 'Jeton --mho-#{$name} absent de la famille mono-mode.';
+        }
+    }
+    @each $name, $value in $family {
+        --mho-#{$name}: #{$value};
+    }
+}
+
+@mixin static-tokens() {
+    @each $name, $pair in $map-scale {
+        --mho-#{$name}: #{_light-dark($pair)};
+    }
+    @each $name, $pair in $chart-scale {
+        --mho-#{$name}: #{_light-dark($pair)};
+    }
+    // Pastille « plan à récupérer » : couleurs des icônes item_bplan_u (jaune, < 10 km) / item_bplan_r (bleu, ≥ 10 km).
+    --mho-bp-u: #D4C349;
+    --mho-bp-r: #5D7DC1;
+    --mho-map-sel: var(--mho-accent-2);
+    --mho-radius-s: 6px;
+    --mho-radius-m: 10px;
+    --mho-radius-l: 14px;
+    /* Typographie de MyHordes : Nunito pour les titres, la pile système du jeu pour le texte
+       courant (`Nunito, Century Gothic, Arial, Trebuchet MS, Verdana, Open Sans, sans-serif`).
+       Seul Nunito est chargé en fonte web ; le corps se contente de ce qui est déjà là. */
+    --mho-font-display: 'Nunito', 'Century Gothic', 'Trebuchet MS', sans-serif;
+    --mho-font-body: Arial, 'Trebuchet MS', Verdana, 'Open Sans', sans-serif;
+}
+
+/// Branche les jetons système Material sur les jetons MHO.
+/// À inclure APRÈS chaque `mat.theme()` (même sélecteur) pour garder la main sur les couleurs exactes.
+@mixin material-overrides() {
+    @include mat.theme-overrides((
+        background: var(--mho-bg),
+        on-background: var(--mho-text),
+        surface: var(--mho-bg),
+        on-surface: var(--mho-text),
+        on-surface-variant: var(--mho-text-muted),
+        surface-container-lowest: var(--mho-bg),
+        surface-container-low: var(--mho-surface),
+        surface-container: var(--mho-surface-2),
+        surface-container-high: var(--mho-surface-2),
+        surface-container-highest: var(--mho-surface-3),
+        outline: var(--mho-line-strong),
+        outline-variant: var(--mho-line),
+        primary: var(--mho-accent),
+        on-primary: var(--mho-on-accent),
+        primary-container: var(--mho-accent-soft),
+        on-primary-container: var(--mho-on-accent-soft),
+        secondary-container: var(--mho-accent-soft),
+        on-secondary-container: var(--mho-on-accent-soft),
+        tertiary: var(--mho-accent-2),
+        error: var(--mho-danger),
+        inverse-surface: var(--mho-text),
+        inverse-on-surface: var(--mho-bg),
+    ));
+}

@@ -44,7 +44,7 @@
     },
     "become-ghoul": {
       "name": "devenir-goule",
-      "description": "Différentes méthode pour se transformer en goule",
+      "description": "Différentes méthodes pour se transformer en goule",
       "private-msg": {
         "name": "message-privé",
         "description": "Vrai si le message ne doit pas être vu de tous"
@@ -153,7 +153,7 @@
   },
   "attack": {
     "name": "attaque",
-    "description": "Outils liés à l'estimation de l'ataque",
+    "description": "Outils liés à l'estimation de l'attaque",
     "get": {
       "name": "récupérer",
       "description": "Récupère l'estimation calculée et la liste enregistrée des estimations pour le jour et la ville",

@@ -24,7 +24,7 @@
             @if (itemList | isItems) {
                 @for (category of itemList | itemsGroupByCategory; track category.category.id_category) {
                     <div>
-                        <div>{{ category.category.label[locale] }}</div>
+                        <div>{{ category.category.label | localizedLabel:'Sans catégorie' }}</div>
                         @for (item of category.items; track item) {
                             @if (searchItem.value === '' || $any(item.label[$any(locale)] ? item.label[$any(locale)] : item.label).toLowerCase().indexOf(searchItem.value.toLowerCase()) > -1) {
                                 <img (click)="add.emit(item.id);" [ngSrc]="HORDES_IMG_REPO + item.img" [title]="$any(item.label[$any(locale)] ? (item.label[$any(locale)] || '') : item.label)" height="16"

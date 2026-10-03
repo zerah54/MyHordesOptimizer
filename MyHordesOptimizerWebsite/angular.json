@@ -35,7 +35,9 @@
               }
             ],
             "styles": [
-              "node_modules/material-symbols/index.css",
+              "node_modules/material-symbols/rounded.css",
+              "node_modules/@fontsource/nunito/600.css",
+              "node_modules/@fontsource/nunito/700.css",
               "node_modules/highlight.js/styles/atom-one-dark.min.css",
               "src/styles.scss",
               "public/scss/material-theme/theming.scss"
@@ -154,7 +156,6 @@
           "builder": "ng-extract-i18n-merge:ng-extract-i18n-merge",
           "options": {
             "buildTarget": "MyHordesOptimizerWebsite:build",
-            "builderI18n": "@angular-devkit/build-angular:extract-i18n",
             "format": "xlf",
             "outputPath": ".",
             "sourceFile": "src/i18n/messages.xlf",

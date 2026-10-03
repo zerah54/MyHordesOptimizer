@@ -1,69 +1,99 @@
 <mat-card-header class="mho-probabilities-header">
-    <mat-card-title>
-        <ng-container i18n>Chances de survie</ng-container>
+    <mat-card-title i18n>Chances de survie</mat-card-title>
 
-        <button mat-icon-button type="button" (click)="createSimulation()" matTooltip="Ajouter une simulation" i18n-matTooltip>
+    <div class="actions">
+        <mat-form-field subscriptSizing="dynamic" [appearance]="'outline'" class="default-value">
+            <mat-label i18n>Valeur par défaut</mat-label>
+            <input matInput type="number" [min]="0" [max]="100" [(ngModel)]="default_value">
+        </mat-form-field>
+        <button mat-flat-button type="button" (click)="createSimulation()">
             <mat-icon>add</mat-icon>
+            <ng-container i18n>Ajouter une simulation</ng-container>
         </button>
-    </mat-card-title>
-
-    <mat-form-field subscriptSizing="dynamic" [appearance]="'outline'" class="default-value">
-        <mat-label i18n>Valeur par défaut</mat-label>
-        <input matInput type="number" [min]="0" [max]="100" [(ngModel)]="default_value">
-    </mat-form-field>
+    </div>
 </mat-card-header>
 <mat-card-content>
     <div class="mho-probabilities">
         @for (simulation of simulations(); track simulation; let i = $index) {
-            <div>
-                <div class="header">
-                    <div>
-                        @if (!simulation.editing_title) {
-                            <h3 (click)="simulation.editing_title = !simulation.editing_title">
-                                {{ simulation.title }}
-                            </h3>
-                        } @else {
-                            <mat-form-field class="short-bottom">
-                                <input matInput [(ngModel)]="simulation.title">
-                                <button mat-icon-button type="button" matSuffix (click)="simulation.editing_title = !simulation.editing_title">
-                                    <mat-icon>done</mat-icon>
-                                </button>
-                            </mat-form-field>
-                        }
-                        <button mat-icon-button type="button" (click)="simulation.show_detail = !simulation.show_detail">
-                            @if (simulation.show_detail) {
-                                <mat-icon>visibility</mat-icon>
-                            } @else {
-                                <mat-icon>visibility_off</mat-icon>
-                            }
-                        </button>
-                        @if (simulation.show_detail) {
-                            <button mat-icon-button type="button" (click)="deleteSimulation(i)">
-                                <mat-icon>delete</mat-icon>
+            <section class="simulation">
+
+                <div class="simulation-header">
+                    @if (!simulation.editing_title) {
+                        <h3 class="simulation-title" (click)="simulation.editing_title = true"
+                            i18n-title title="Cliquer pour renommer">{{ simulation.title }}</h3>
+                    } @else {
+                        <mat-form-field class="short-bottom title-field" subscriptSizing="dynamic">
+                            <input matInput [(ngModel)]="simulation.title" i18n-aria-label aria-label="Nom de la simulation">
+                            <button mat-icon-button type="button" matSuffix (click)="simulation.editing_title = false"
+                                    i18n-aria-label aria-label="Valider le nom">
+                                <mat-icon>done</mat-icon>
                             </button>
-                        }
-                    </div>
-                    @if (simulation.show_detail) {
-                        <mat-form-field class="short-bottom">
-                            <mat-label i18n>Nombre de personnes</mat-label>
-                            <input matInput type="number" [(ngModel)]="simulation.nb_people" (ngModelChange)="convertFieldsToChances(simulation)"
-                                   [min]="1" [max]="40">
                         </mat-form-field>
                     }
+                    <span class="spacer"></span>
+                    <button mat-icon-button type="button" (click)="simulation.show_detail = !simulation.show_detail"
+                            [attr.aria-expanded]="simulation.show_detail"
+                            [matTooltip]="simulation.show_detail ? 'Replier la saisie' : 'Ouvrir la saisie'">
+                        <mat-icon>{{ simulation.show_detail ? 'expand_less' : 'expand_more' }}</mat-icon>
+                    </button>
+                    <button mat-icon-button type="button" (click)="deleteSimulation(i)"
+                            matTooltip="Supprimer la simulation" i18n-matTooltip
+                            aria-label="Supprimer la simulation" i18n-aria-label>
+                        <mat-icon>delete</mat-icon>
+                    </button>
                 </div>
+
+                <!-- Le résumé reste visible même quand la saisie est repliée : c'est lui qu'on
+                     vient lire, la saisie n'est qu'un moyen. -->
+                <div class="kpis">
+                    <div class="kpi">
+                        <span class="mho-kpi-label" i18n>Morts en moyenne</span>
+                        <span class="kpi-value">{{ simulation.result_average | number:'1.0-2':locale }}</span>
+                    </div>
+                    <div class="kpi">
+                        <span class="mho-kpi-label" i18n>Survivants en moyenne</span>
+                        <span class="kpi-value">{{ simulation.current_chances.length - (simulation.result_average ?? 0) | number:'1.0-2':locale }}</span>
+                    </div>
+                    <div class="kpi">
+                        <span class="mho-kpi-label" i18n>Issue la plus probable</span>
+                        @if (simulation.result_most_likely !== undefined) {
+                            <span class="kpi-value">
+                                {{ simulation.result_most_likely }}
+                                <small i18n>morts</small>
+                            </span>
+                            <span class="kpi-sub">{{ simulation.result_peak! * 100 | number:'1.0-1':locale }}&nbsp;%</span>
+                        } @else {
+                            <span class="kpi-value">—</span>
+                        }
+                    </div>
+                </div>
+
                 <div class="content">
+                    <!-- Une loi de Poisson binomiale se lit en forme, pas en colonne de nombres :
+                         l'histogramme montre où se concentre le risque. -->
+                    <div class="histogram" role="img"
+                         [attr.aria-label]="'Répartition du nombre de morts, de 0 à ' + simulation.current_chances.length">
+                        @for (probability of simulation.result_probabilities; track $index; let index = $index) {
+                            <div class="bar-slot" [class.peak]="index === simulation.result_most_likely"
+                                 [matTooltip]="index + ' morts : ' + (probability * 100 | number:'1.0-2':locale) + ' %'">
+                                <div class="bar" [style.height.%]="barHeight(probability, simulation.result_peak)"></div>
+                                <span class="bar-label">{{ index }}</span>
+                            </div>
+                        }
+                    </div>
+
                     <div class="results">
                         <table>
                             <thead>
                             <tr>
-                                <th i18n>Nombre de morts</th>
-                                <th i18n>Probabilité</th>
+                                <th scope="col" i18n>Nombre de morts</th>
+                                <th scope="col" i18n>Probabilité</th>
                             </tr>
                             </thead>
                             <tbody>
-                                @for (result of simulation.result_probabilities; track result; let index = $index) {
-                                    <tr>
-                                        <th>{{ index }}</th>
+                                @for (result of simulation.result_probabilities; track $index; let index = $index) {
+                                    <tr [class.peak]="index === simulation.result_most_likely">
+                                        <th scope="row">{{ index }}</th>
                                         <td>{{ result * 100 | number:'1.0-2':locale }}%</td>
                                     </tr>
                                 }
@@ -78,20 +108,44 @@
                             </tfoot>
                         </table>
                     </div>
-                    @if (simulation.show_detail) {
-                        <div class="chances">
-                            @for (people of [].constructor(simulation.nb_people); track people; let i = $index) {
-                                <mat-form-field appearance="outline" class="short-bottom surviving-chance">
-                                    <mat-label i18n>Chances de survie</mat-label>
-                                    <input matInput type="number" (change)="calculateProbabilities(simulation)" [(ngModel)]="simulation.current_chances[i]"
-                                           [min]="0" [max]="100">
-                                    <span matSuffix style="margin-right: 0.5em;">%</span>
-                                </mat-form-field>
-                            }
-                        </div>
-                    }
                 </div>
-            </div>
+
+                @if (simulation.show_detail) {
+                    <div class="chances-block">
+                        <div class="chances-head">
+                            <span class="chances-title" i18n>Chances de survie individuelles</span>
+                            <span class="people-count">{{ simulation.current_chances.length }}</span>
+                        </div>
+                        <!-- Ajouter et retirer se font au même endroit et au même niveau : une
+                             personne par champ, sa croix pour la retirer, un bouton pour en
+                             ajouter une. -->
+                        <div class="chances">
+                            @for (chance of simulation.current_chances; track $index; let index = $index) {
+                                <div class="person">
+                                    <mat-form-field appearance="outline" class="short-bottom surviving-chance" subscriptSizing="dynamic">
+                                        <mat-label i18n>Personne {{ index + 1 }}</mat-label>
+                                        <input matInput type="number" (change)="calculateProbabilities(simulation)"
+                                               [(ngModel)]="simulation.current_chances[index]" [min]="0" [max]="100">
+                                        <span matSuffix class="percent">%</span>
+                                    </mat-form-field>
+                                    <button mat-icon-button type="button" class="remove-person"
+                                            (click)="removePerson(simulation, index)"
+                                            [disabled]="simulation.current_chances.length <= 1"
+                                            [matTooltip]="'Retirer la personne ' + (index + 1)"
+                                            [attr.aria-label]="'Retirer la personne ' + (index + 1)">
+                                        <mat-icon>close</mat-icon>
+                                    </button>
+                                </div>
+                            }
+                            <button mat-stroked-button type="button" class="add-person" (click)="addPerson(simulation)"
+                                    [disabled]="simulation.current_chances.length >= 40">
+                                <mat-icon>person_add</mat-icon>
+                                <ng-container i18n>Ajouter</ng-container>
+                            </button>
+                        </div>
+                    </div>
+                }
+            </section>
         }
     </div>
 </mat-card-content>

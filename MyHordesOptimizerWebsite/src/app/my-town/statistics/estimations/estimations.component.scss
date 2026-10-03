@@ -6,7 +6,9 @@
     .mho-estimations {
         display: flex;
         flex-direction: column;
+        gap: 14px;
         height: 100%;
+        min-height: 0;
 
         .header {
             display: flex;
@@ -14,47 +16,294 @@
             flex-wrap: wrap;
             gap: 0.5em;
             justify-content: space-between;
+            flex-shrink: 0;
 
             .actions {
                 display: flex;
                 align-items: center;
+                gap: 4px;
             }
         }
 
-        .tables {
+        /* Trois colonnes : les deux saisies à gauche, la lecture à droite. La saisie et sa
+           conséquence se regardent, au lieu d'être l'une sous l'autre comme avant.
+           Une grille plutôt qu'un `flex-wrap` : en flex, la colonne de lecture qui passe à la
+           ligne débordait de la hauteur fixée au lieu de faire défiler la zone. */
+        .content {
             flex: 1;
-            display: flex;
-            justify-content: space-around;
-            gap: 0.5em;
-            flex-wrap: wrap;
-            align-items: flex-start;
-            overflow: auto;
+            min-height: 0;
+            display: grid;
+            grid-template-columns: 380px 380px minmax(0, 1fr);
+            align-items: stretch;
+            gap: 18px;
+        }
 
-            table {
-                margin: 0;
+        /* La lecture ne tient plus à côté des deux saisies : elle passe dessous, et la zone
+           défile. */
+        @media (max-width: 1199px) {
+            .content {
+                grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+                grid-auto-rows: min-content;
+                overflow: auto;
 
-                td {
-                    text-align: right;
-
-                    .mat-mdc-form-field {
-                        width: 100px;
-
-                        @include mat.form-field-overrides((
-                            container-height: 32px,
-                            container-vertical-padding: 4px,
-                        ));
-                    }
+                .day-column {
+                    grid-column: 1 / -1;
                 }
             }
+        }
 
-            .toggler {
-                text-align: right;
-            }
-
-            .canvas {
-                flex: 1;
+        @media (max-width: 839px) {
+            .content {
+                grid-template-columns: minmax(0, 1fr);
             }
         }
+    }
+}
+
+.estim-card {
+    /* La largeur vient de la grille ; seul le plancher est ici, pour que les deux champs de
+       100 px et leur colonne Âmes (mode âmes) tiennent sur une ligne sans être coupés par
+       l'`overflow: hidden` ci-dessous. */
+    min-width: 380px;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    overflow: hidden;
+
+    .mho-card-header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 8px;
+    }
+
+    .card-heading {
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+
+        .card-sub {
+            font-size: 12px;
+            color: var(--mho-text-muted);
+        }
+    }
+
+    /* Les deux tableaux n'ont pas le même nombre de lignes (17 et 25) : chacun défile chez lui
+       plutôt que d'allonger la page. */
+    .estim-scroll {
+        flex-grow: 1;
+        min-height: 0;
+        overflow: auto;
+    }
+}
+
+.estim-table {
+    /* Largeur imposée par les colonnes ci-dessous, jamais par le contenu : sans ça, la colonne
+       Âmes (mode âmes) ou le libellé « Qualité » pouvaient forcer la table à dépasser la card,
+       débordement masqué par son `overflow: hidden`. Qualité et Âmes ont une largeur fixe,
+       Min/Max se partagent le reste. */
+    table-layout: fixed;
+    width: 100%;
+    margin: 0;
+    border-collapse: collapse;
+
+    th {
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--mho-text-muted);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    th:first-child, td:first-child {
+        width: 56px;
+    }
+
+    /* N'existe que colonne d'ordre 4 : la colonne Âmes du mode âmes. Sans effet sur Min/Max
+       en mode normal, qui n'ont pas d'enfant en position 4. */
+    th:nth-child(4), td:nth-child(4) {
+        width: 84px;
+    }
+
+    thead th {
+        position: sticky;
+        top: 0;
+        z-index: 1;
+        padding: 6px 10px;
+        text-align: right;
+        background: var(--mho-surface-2);
+
+        &:first-child {
+            text-align: left;
+        }
+    }
+
+    tbody tr {
+        border-bottom: 1px solid var(--mho-line);
+
+        &:last-child {
+            border-bottom: 0;
+        }
+    }
+
+    tbody th {
+        padding-left: 10px;
+        text-align: left;
+        /* Le palier de qualité se lit en colonne : même chasse pour tous les chiffres. */
+        font-variant-numeric: tabular-nums;
+    }
+
+    td {
+        padding: 2px 4px;
+        text-align: right;
+        font-variant-numeric: tabular-nums;
+
+        .mat-mdc-form-field {
+            /* Remplit la colonne (Min/Max se partagent ce que laissent Qualité et Âmes) plutôt
+               qu'une largeur fixe qui pourrait dépasser une colonne devenue plus étroite. */
+            width: 100%;
+
+            @include mat.form-field-overrides((
+                container-height: 32px,
+                container-vertical-padding: 4px,
+            ));
+        }
+    }
+}
+
+.day-column {
+    min-width: 0;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+
+    .day-switch {
+        align-self: flex-start;
+    }
+}
+
+.kpi-card {
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: 16px 18px;
+
+    .kpi-main {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 12px;
+
+        .kpi-text {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            min-width: 0;
+        }
+
+        /* Icône MyHordes : taille native, c'est le puits qui la cadre. */
+        .kpi-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 11px;
+        }
+    }
+
+    /* Pas encore de calcul : un tiret vaut mieux qu'un zéro, qui se lirait comme une valeur. */
+    .mho-kpi.no-value {
+        color: var(--mho-text-muted);
+        cursor: help;
+    }
+
+    .kpi-sub {
+        font-size: 12.5px;
+        color: var(--mho-text-muted);
+
+        .mho-num {
+            margin: 0 2px;
+            color: var(--mho-text);
+        }
+    }
+
+    /* Jauge : le possible du jour (bornes théoriques) donne l'échelle, la plage calculée s'y
+       pose, un trait marque l'attaque la plus probable, et l'affinage ajoute ses deux bornes. */
+    .kpi-gauge {
+        position: relative;
+        height: 22px;
+
+        .track,
+        .range {
+            position: absolute;
+            top: 8px;
+            height: 6px;
+            border-radius: 99px;
+        }
+
+        .track {
+            left: 0;
+            right: 0;
+            background: var(--mho-surface-3);
+        }
+
+        .range {
+            background: var(--mho-accent);
+        }
+
+        .likely {
+            position: absolute;
+            top: 2px;
+            width: 2px;
+            height: 18px;
+            border-radius: 2px;
+            background: var(--mho-text);
+        }
+
+        /* Bornes affinées : plus fines que le repère de l'attaque la plus probable, et d'une
+           autre teinte — elles disent autre chose. */
+        .refined {
+            position: absolute;
+            top: 4px;
+            width: 2px;
+            height: 14px;
+            border-radius: 2px;
+            background: var(--mho-accent-2);
+            box-shadow: 0 0 0 1px var(--mho-surface);
+        }
+    }
+
+    /* Les deux bornes de l'échelle, sous la jauge : sans elles, la position de la plage ne se
+       rapporte à rien. */
+    .kpi-scale {
+        display: flex;
+        justify-content: space-between;
+        margin-top: -6px;
+        font-size: 11px;
+        color: var(--mho-text-muted);
+        font-variant-numeric: tabular-nums;
+    }
+}
+
+.chart-card {
+    flex-grow: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+
+    .charts {
+        flex-grow: 1;
+        min-height: 260px;
+        padding: 12px 14px;
+    }
+
+    .chart {
+        position: relative;
+        height: 100%;
     }
 }
 
@@ -62,7 +311,8 @@
     display: flex;
     align-items: center;
     gap: 8px;
-    padding: 8px 0;
+    padding-top: 12px;
+    border-top: 1px solid var(--mho-line);
     flex-wrap: wrap;
 
     &__spin {
@@ -80,15 +330,32 @@
         text-align: right;
     }
 
+    &__spacer {
+        flex-grow: 1;
+    }
+
     &__stats {
         flex: 1 0 100%;
-        color: var(--mat-sys-on-surface-variant);
+        color: var(--mho-text-muted);
         font-variant-numeric: tabular-nums;
     }
 
     &__msg {
         flex: 1 0 100%;
-        color: var(--mat-sys-on-surface-variant);
+        color: var(--mho-text-muted);
         white-space: pre-line;
     }
+
+    // Enfant direct de la carte (colonne flex), pas de .refine : un flex-basis de 100 % y prendrait toute la hauteur.
+    &__status {
+        color: var(--mho-text-muted);
+        white-space: pre-line;
+    }
+}
+
+.kpi-card .kpi-souls, .kpi-card .kpi-spa-level {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
 }

@@ -9,7 +9,7 @@
     &__empty {
         padding: 16px;
         text-align: center;
-        color: var(--mat-sys-on-surface-variant);
+        color: var(--mho-text-muted);
     }
 
     &__item {
@@ -17,11 +17,14 @@
         align-items: center;
         gap: 8px;
         padding: 6px 8px;
-        border: 1px solid var(--mat-sys-outline-variant);
-        border-radius: 4px;
+        background: var(--mho-surface-2);
+        border: 1px solid var(--mho-line);
+        border-radius: var(--mho-radius-m);
 
+        /* Picto rare : contour accentué ET fond teinté, pour ne pas reposer sur la couleur seule. */
         &--rare {
-            border-color: var(--mat-sys-tertiary);
+            border-color: var(--mho-accent-2);
+            background: var(--mho-accent-soft);
         }
     }
 
@@ -49,7 +52,8 @@
     }
 
     &__count {
-        font-weight: 500;
+        font-weight: 600;
+        font-variant-numeric: tabular-nums;
     }
 
     &__totals {
@@ -61,7 +65,7 @@
 
     &__total {
         font-size: 0.75rem;
-        color: var(--mat-sys-on-surface-variant);
+        color: var(--mho-text-muted);
 
         &--unknown {
             font-style: italic;

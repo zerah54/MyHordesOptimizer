@@ -12,24 +12,24 @@ function cellAt(displayed_x: number, displayed_y: number): Cell {
 
 describe('MapBorderComponent', (): void => {
     let fixture: ComponentFixture<MapBorderComponent>;
-    let th: HTMLElement;
+    let border_cell: HTMLElement;
 
     beforeEach(async (): Promise<void> => {
         await TestBed.configureTestingModule({
             imports: [MapBorderComponent]
         }).compileComponents();
         fixture = TestBed.createComponent(MapBorderComponent);
-        th = fixture.nativeElement.querySelector('th');
+        border_cell = fixture.nativeElement.querySelector('.border-cell');
     });
 
     it('renders with no orientation/state classes and an empty index by default', (): void => {
         fixture.detectChanges();
 
-        expect(th.classList.contains('horizontal')).toBe(false);
-        expect(th.classList.contains('vertical')).toBe(false);
-        expect(th.classList.contains('me')).toBe(false);
-        expect(th.classList.contains('hovered')).toBe(false);
-        expect(th.textContent?.trim()).toBe('');
+        expect(border_cell.classList.contains('horizontal')).toBe(false);
+        expect(border_cell.classList.contains('vertical')).toBe(false);
+        expect(border_cell.classList.contains('me')).toBe(false);
+        expect(border_cell.classList.contains('hovered')).toBe(false);
+        expect(border_cell.textContent?.trim()).toBe('');
     });
 
     it('sets the horizontal/vertical classes from the boolean attributes', (): void => {
@@ -37,15 +37,36 @@ describe('MapBorderComponent', (): void => {
         fixture.componentRef.setInput('vertical', true);
         fixture.detectChanges();
 
-        expect(th.classList.contains('horizontal')).toBe(true);
-        expect(th.classList.contains('vertical')).toBe(true);
+        expect(border_cell.classList.contains('horizontal')).toBe(true);
+        expect(border_cell.classList.contains('vertical')).toBe(true);
+    });
+
+    it('sets the sticky side class from the side input', (): void => {
+        fixture.componentRef.setInput('side', 'right');
+        fixture.detectChanges();
+
+        expect(border_cell.classList.contains('right')).toBe(true);
+        expect(border_cell.classList.contains('left')).toBe(false);
+    });
+
+    it('titles its column by default and its row on the vertical axis only', (): void => {
+        fixture.detectChanges();
+        expect(border_cell.getAttribute('role')).toBe('columnheader');
+
+        fixture.componentRef.setInput('vertical', true);
+        fixture.detectChanges();
+        expect(border_cell.getAttribute('role')).toBe('rowheader');
+
+        fixture.componentRef.setInput('horizontal', true);
+        fixture.detectChanges();
+        expect(border_cell.getAttribute('role')).toBe('columnheader');
     });
 
     it('shows the index as text', (): void => {
         fixture.componentRef.setInput('index', 4);
         fixture.detectChanges();
 
-        expect(th.textContent?.trim()).toBe('4');
+        expect(border_cell.textContent?.trim()).toBe('4');
     });
 
     it('marks the "me" cell on the vertical axis when myCell.displayed_y matches the index', (): void => {
@@ -54,7 +75,7 @@ describe('MapBorderComponent', (): void => {
         fixture.componentRef.setInput('myCell', cellAt(0, 2));
         fixture.detectChanges();
 
-        expect(th.classList.contains('me')).toBe(true);
+        expect(border_cell.classList.contains('me')).toBe(true);
     });
 
     it('marks the "me" cell on the horizontal axis when myCell.displayed_x matches the index', (): void => {
@@ -63,7 +84,7 @@ describe('MapBorderComponent', (): void => {
         fixture.componentRef.setInput('myCell', cellAt(5, 0));
         fixture.detectChanges();
 
-        expect(th.classList.contains('me')).toBe(true);
+        expect(border_cell.classList.contains('me')).toBe(true);
     });
 
     it('does not mark "me" when myCell does not match the index', (): void => {
@@ -72,7 +93,7 @@ describe('MapBorderComponent', (): void => {
         fixture.componentRef.setInput('myCell', cellAt(0, 9));
         fixture.detectChanges();
 
-        expect(th.classList.contains('me')).toBe(false);
+        expect(border_cell.classList.contains('me')).toBe(false);
     });
 
     it('marks "hovered" on the vertical axis when hoveredCell.displayed_y matches the index', (): void => {
@@ -81,7 +102,7 @@ describe('MapBorderComponent', (): void => {
         fixture.componentRef.setInput('hoveredCell', cellAt(0, 2));
         fixture.detectChanges();
 
-        expect(th.classList.contains('hovered')).toBe(true);
+        expect(border_cell.classList.contains('hovered')).toBe(true);
     });
 
     it('marks "hovered" on the horizontal axis when hoveredCell.displayed_x matches the index', (): void => {
@@ -90,7 +111,7 @@ describe('MapBorderComponent', (): void => {
         fixture.componentRef.setInput('hoveredCell', cellAt(5, 0));
         fixture.detectChanges();
 
-        expect(th.classList.contains('hovered')).toBe(true);
+        expect(border_cell.classList.contains('hovered')).toBe(true);
     });
 
     it('unmarks "hovered" once a new hoveredCell stops matching the index', (): void => {
@@ -98,12 +119,12 @@ describe('MapBorderComponent', (): void => {
         fixture.componentRef.setInput('index', 2);
         fixture.componentRef.setInput('hoveredCell', cellAt(0, 2));
         fixture.detectChanges();
-        expect(th.classList.contains('hovered')).toBe(true);
+        expect(border_cell.classList.contains('hovered')).toBe(true);
 
         fixture.componentRef.setInput('hoveredCell', cellAt(0, 9));
         fixture.detectChanges();
 
-        expect(th.classList.contains('hovered')).toBe(false);
+        expect(border_cell.classList.contains('hovered')).toBe(false);
     });
 
     it('characterizes the legacy quirk: once "me" is set it never gets cleared by a later non-matching myCell/index', (): void => {
@@ -111,12 +132,12 @@ describe('MapBorderComponent', (): void => {
         fixture.componentRef.setInput('index', 2);
         fixture.componentRef.setInput('myCell', cellAt(0, 2));
         fixture.detectChanges();
-        expect(th.classList.contains('me')).toBe(true);
+        expect(border_cell.classList.contains('me')).toBe(true);
 
         fixture.componentRef.setInput('index', 9);
         fixture.detectChanges();
 
-        expect(th.classList.contains('me')).toBe(true);
+        expect(border_cell.classList.contains('me')).toBe(true);
     });
 
     it('characterizes the legacy quirk: changing the index alone does not re-evaluate "hovered"', (): void => {
@@ -124,12 +145,12 @@ describe('MapBorderComponent', (): void => {
         fixture.componentRef.setInput('index', 2);
         fixture.componentRef.setInput('hoveredCell', cellAt(0, 2));
         fixture.detectChanges();
-        expect(th.classList.contains('hovered')).toBe(true);
+        expect(border_cell.classList.contains('hovered')).toBe(true);
 
         fixture.componentRef.setInput('index', 9);
         fixture.detectChanges();
 
-        expect(th.classList.contains('hovered')).toBe(true);
-        expect(th.textContent?.trim()).toBe('9');
+        expect(border_cell.classList.contains('hovered')).toBe(true);
+        expect(border_cell.textContent?.trim()).toBe('9');
     });
 });

@@ -2,9 +2,10 @@ import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { ChangeDetectionStrategy, Component, DestroyRef, inject, OnInit, signal, WritableSignal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import moment from 'moment';
 
@@ -17,15 +18,16 @@ import { BankInfo } from '../../_abstract_model/types/bank-info.class';
 import { Item } from '../../_abstract_model/types/item.class';
 import { ItemImgPipe } from '../../_core/pipes/item-img.pipe';
 import { ItemsGroupByCategoryPipe } from '../../_core/pipes/items-group-by-category.pipe';
-import { normalizeString } from '../../_core/utilities/string.utils';
+import { LocalizedLabelPipe } from '../../_core/pipes/localized-label.pipe';
+import { localizedLabel, normalizeString } from '../../_core/utilities/string.utils';
 import { FilterFieldComponent } from '../../_shared/filter-field/filter-field.component';
 import { ItemComponent } from '../../_shared/item/item.component';
 import { SelectComponent } from '../../_shared/select/select.component';
 
 const angular_common: Imports = [CommonModule, FormsModule, NgOptimizedImage];
 const components: Imports = [FilterFieldComponent, ItemComponent, SelectComponent];
-const pipes: Imports = [ItemImgPipe, ItemsGroupByCategoryPipe];
-const material_modules: Imports = [MatCardModule, MatFormFieldModule, MatSlideToggleModule, MatTooltipModule];
+const pipes: Imports = [ItemImgPipe, ItemsGroupByCategoryPipe, LocalizedLabelPipe];
+const material_modules: Imports = [MatButtonToggleModule, MatCardModule, MatFormFieldModule, MatIconModule, MatTooltipModule];
 
 @Component({
     selector: 'mho-bank',
@@ -39,7 +41,7 @@ export class BankComponent implements OnInit {
     /** Les objets affichés par le filtre. Signal : réassigné depuis le subscribe de getBank() et lu par le template. */
     protected readonly displayed_bank_items: WritableSignal<Item[] | undefined> = signal(undefined);
     /** L'objet dont le détail est affiché */
-    protected detailed_item!: Item;
+    protected detailed_item: Item | undefined;
     /** Le champ de filtre sur les objets */
     protected filter_value: string = '';
     /** Le champ de filtres sur les propriétés */
@@ -81,7 +83,7 @@ export class BankComponent implements OnInit {
     protected applyFilters(): void {
         let filtered: Item[];
         if (this.filter_value !== null && this.filter_value !== undefined && this.filter_value !== '') {
-            filtered = [...this.bank.items.filter((bank_item: Item) => normalizeString(bank_item.label[this.locale]).indexOf(normalizeString(this.filter_value)) > -1)];
+            filtered = [...this.bank.items.filter((bank_item: Item) => normalizeString(localizedLabel(bank_item.label, this.locale)).indexOf(normalizeString(this.filter_value)) > -1)];
         } else {
             filtered = [...this.bank.items];
         }

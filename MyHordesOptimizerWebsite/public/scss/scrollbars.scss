@@ -1,5 +1,4 @@
-﻿@use 'variables';
-
+﻿
 * {
     /* Scrollbar size */
     ::-webkit-scrollbar {
@@ -9,7 +8,7 @@
     }
 
     ::-webkit-scrollbar-thumb {
-        background-color: variables.$scrollbar-base-color;
+        background-color: var(--mho-line-strong);
         opacity: 0.25;
         background-clip: padding-box;
         border: 2px solid transparent;
@@ -19,7 +18,7 @@
 
     ::-webkit-scrollbar-thumb:vertical:hover,
     ::-webkit-scrollbar-thumb:horizontal:hover {
-        background-color: variables.$scrollbar-hover-color;
+        background-color: var(--mho-text-muted);
         opacity: 0.5;
         transition: 0.3s;
     }
@@ -31,7 +30,7 @@
 
     ::-webkit-scrollbar-thumb:vertical:active,
     ::-webkit-scrollbar-thumb:horizontal:active {
-        background-color: variables.$scrollbar-active-color;
+        background-color: var(--mho-text);
         opacity: 0.75;
     }
 

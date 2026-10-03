@@ -15,11 +15,8 @@ describe('HeaderWithStringFilterComponent', () => {
         component = fixture.componentInstance;
         fixture.componentRef.setInput('header', 'Nom');
         fixture.componentRef.setInput('filterValue', '');
-        // Pas de detectChanges() ici : certains tests doivent appeler displayFilter() AVANT le tout
-        // premier rendu — le seul moment où un composant OnPush se réévalue inconditionnellement,
-        // contrairement à `displayFilter()` invoqué après coup depuis un test (aucun événement réel
-        // du template ne peut le déclencher ici, cf. bug caractérisé plus bas — donc pas de marquage
-        // automatique OnPush possible pour un appel a posteriori).
+        // Pas de detectChanges() ici : certains tests appellent displayFilter() AVANT le premier
+        // rendu, seul moment où un composant OnPush se réévalue sans événement du template.
         vi.useFakeTimers();
     });
 
@@ -27,11 +24,21 @@ describe('HeaderWithStringFilterComponent', () => {
         vi.useRealTimers();
     });
 
-    it('caractérise un bug hérité : à l\'état initial (masqué), ni l\'icône ni le champ ne sont affichés — le template conditionne l\'icône sur `visible` au lieu de `!visible` (contrairement aux 3 composants jumeaux), la rendant inaccessible au clic depuis l\'état masqué', () => {
+    it('à l\'état initial, affiche l\'icône de filtre et masque le champ', () => {
         fixture.detectChanges();
 
-        expect(fixture.nativeElement.querySelector('.open-menu-icon')).toBeNull();
+        expect(fixture.nativeElement.querySelector('.open-menu-icon')).toBeTruthy();
         expect(fixture.nativeElement.querySelector('input')).toBeNull();
+    });
+
+    it('un clic sur l\'icône affiche le champ à sa place', () => {
+        fixture.detectChanges();
+
+        fixture.nativeElement.querySelector('.open-menu-icon').click();
+        fixture.detectChanges();
+
+        expect(fixture.nativeElement.querySelector('input')).toBeTruthy();
+        expect(fixture.nativeElement.querySelector('.open-menu-icon')).toBeNull();
     });
 
     it('affiche le champ de saisie une fois displayFilter() déclenché, avec la valeur du filtre, et lui donne le focus', async () => {
@@ -43,8 +50,7 @@ describe('HeaderWithStringFilterComponent', () => {
 
         const input: HTMLInputElement = fixture.nativeElement.querySelector('input');
         expect(input).toBeTruthy();
-        // Une fois visible, l'icône réapparaît aussi (même condition bugguée) : caractérisé tel quel.
-        expect(fixture.nativeElement.querySelector('.open-menu-icon')).toBeTruthy();
+        expect(fixture.nativeElement.querySelector('.open-menu-icon')).toBeNull();
 
         await vi.advanceTimersByTimeAsync(0); // vidange le setTimeout qui donne le focus au champ ET la microtâche NgModel
         fixture.detectChanges();

@@ -39,16 +39,18 @@ export class MiscellaneousInfoComponent {
     protected misc: Misc[] = [
         {
             header: $localize`Morts par désespoir`,
+            description: $localize`Selon les zombies tués sur la case depuis la dernière attaque.`,
             highlight_day: false,
             header_action: {
                 icon: 'calculate',
+                label: $localize`Calculateur`,
                 action: (): void => {
                     this.openDespairDeathCalculator();
                 }
             },
             columns: [
-                { id: 'nb_killed_zombies', header: $localize`Zombies morts sur la case depuis la dernière attaque` },
-                { id: 'will_dead_zombies', header: $localize`Zombies qui vont mourir par désespoir` }
+                { id: 'nb_killed_zombies', header: $localize`Zombies tués` },
+                { id: 'will_dead_zombies', header: $localize`Morts de désespoir` }
             ],
             table: new MatTableDataSource(Array.from({ length: 31 }, (_: unknown, i: number): { [key: string]: number | string | null } => {
                 return {
@@ -62,9 +64,9 @@ export class MiscellaneousInfoComponent {
             highlight_day: true,
             columns: [
                 { id: 'day', header: $localize`Jour` },
-                { id: 're_min', header: $localize`Minimum théorique` },
-                { id: 're_max', header: $localize`Maximum théorique` },
-                { id: 're_moy', header: $localize`Moyenne théorique` }
+                { id: 're_min', header: $localize`Minimum` },
+                { id: 're_max', header: $localize`Maximum` },
+                { id: 're_moy', header: $localize`Moyenne` }
             ],
             table: new MatTableDataSource(Array.from({ length: 50 }, (_: unknown, i: number): { [key: string]: number | string | null } => {
                 return {
@@ -79,7 +81,8 @@ export class MiscellaneousInfoComponent {
             header: $localize`Débordement`,
             highlight_day: true,
             header_action: {
-                icon: 'calculate',
+                icon: 'open_in_new',
+                label: $localize`Simulateur`,
                 action: (): void => {
                     this.openOverflowSimulator();
                 }
@@ -97,11 +100,12 @@ export class MiscellaneousInfoComponent {
         },
         {
             header: $localize`Manuel des ermites`,
+            description: $localize`Chances de réussite, selon l'état de la ville.`,
             highlight_day: true,
             columns: [
                 { id: 'day', header: $localize`Jour` },
-                { id: 'success', header: $localize`Chances de réussite du manuel` },
-                { id: 'success_devastated', header: $localize`Chances de réussite du manuel en ville dévastée` },
+                { id: 'success', header: $localize`Normale` },
+                { id: 'success_devastated', header: $localize`Dévastée` },
             ],
             table: new MatTableDataSource(Array.from({ length: 50 }, (_: unknown, i: number): { [key: string]: number | string | null } => {
                 return {
@@ -116,7 +120,7 @@ export class MiscellaneousInfoComponent {
             highlight_day: true,
             columns: [
                 { id: 'day', header: $localize`Jours validés` },
-                { id: 'soul', header: $localize`Points d'âmes gagnés` },
+                { id: 'soul', header: $localize`Points gagnés` },
             ],
             table: new MatTableDataSource(Array.from({ length: 51 }, (_: unknown, i: number): { [key: string]: number | string | null } => {
                 return {
@@ -130,7 +134,7 @@ export class MiscellaneousInfoComponent {
             highlight_day: true,
             columns: [
                 { id: 'day', header: $localize`Jours validés` },
-                { id: 'clean', header: $localize`Points clean gagnés` },
+                { id: 'clean', header: $localize`Points gagnés` },
             ],
             table: new MatTableDataSource(Array.from({ length: 51 }, (_: unknown, i: number): { [key: string]: number | string | null } => {
                 return {

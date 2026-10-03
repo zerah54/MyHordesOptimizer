@@ -3,6 +3,7 @@ using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Estimations;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Map;
 using MyHordesOptimizerApi.Extensions;
 using MyHordesOptimizerApi.Models;
+using MyHordesOptimizerApi.Services.Impl.Estimations;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,6 +22,8 @@ namespace MyHordesOptimizerApi.MappingProfiles.Estimations
                 .ForMember(dest => dest.IdLastUpdateInfo, opt => opt.Ignore())
                 .ForMember(dest => dest.IsPlanif, opt => opt.Ignore())
                 .ForMember(dest => dest.IdTown, opt => opt.Ignore())
+                .ForMember(dest => dest.Souls, opt => opt.Ignore())
+                .ForMember(dest => dest.SpaLevel, opt => opt.Ignore())
                 .ForMember(dest => dest._0min, opt => { opt.MapFrom(src => src._0.Min); opt.Condition(src => src._0 != null); })
                 .ForMember(dest => dest._0max, opt => { opt.MapFrom(src => src._0.Max); opt.Condition(src => src._0 != null); })
                 .ForMember(dest => dest._4min, opt => { opt.MapFrom(src => src._4.Min); opt.Condition(src => src._4 != null); })
@@ -75,7 +78,11 @@ namespace MyHordesOptimizerApi.MappingProfiles.Estimations
             CreateMap<IEnumerable<TownEstimation>, EstimationRequestDto>()
                 .ForMember(dest => dest.Day, opt => opt.MapFrom(src => src.First().Day))
                 .ForMember(dest => dest.Estim, opt => opt.MapFrom(src => src.First(x => !Convert.ToBoolean(x.IsPlanif))))
-                .ForMember(dest => dest.Planif, opt => opt.MapFrom(src => src.First(x => Convert.ToBoolean(x.IsPlanif))));
+                .ForMember(dest => dest.Planif, opt => opt.MapFrom(src => src.First(x => Convert.ToBoolean(x.IsPlanif))))
+                .ForMember(dest => dest.EstimSouls, opt => opt.MapFrom(src => SoulsJson.Parse(src.First(x => !Convert.ToBoolean(x.IsPlanif)).Souls)))
+                .ForMember(dest => dest.PlanifSouls, opt => opt.MapFrom(src => SoulsJson.Parse(src.First(x => Convert.ToBoolean(x.IsPlanif)).Souls)))
+                .ForMember(dest => dest.EstimSpaLevel, opt => opt.MapFrom(src => src.First(x => !Convert.ToBoolean(x.IsPlanif)).SpaLevel ?? 0))
+                .ForMember(dest => dest.PlanifSpaLevel, opt => opt.MapFrom(src => src.First(x => Convert.ToBoolean(x.IsPlanif)).SpaLevel ?? 0));
 
             CreateMap<TownEstimation, EstimationsDto>()
                 .ForMember(dest => dest._0, opt => { opt.MapFrom(src => new EstimationValueDto() { Min = src._0min.Value, Max = src._0max.Value }); opt.PreCondition(src => src._0min.HasValue && src._0min > 0 && src._0max.HasValue && src._0max > 0); })
@@ -139,12 +146,16 @@ namespace MyHordesOptimizerApi.MappingProfiles.Estimations
                 estimationModel.IdTown = context.GetTownId();
                 estimationModel.IdLastUpdateInfo = context.GetLastUpdateInfoId();
                 estimationModel.IsPlanif = false;
+                estimationModel.Souls = request.EstimSouls is null ? null : SoulsJson.Serialize(request.EstimSouls);
+                estimationModel.SpaLevel = request.EstimSpaLevel;
                 results.Add(estimationModel);
                 var planifModel = context.Mapper.Map<TownEstimation>(request.Planif);
                 planifModel.Day = request.Day;
                 planifModel.IdTown = context.GetTownId();
                 planifModel.IdLastUpdateInfo = context.GetLastUpdateInfoId();
                 planifModel.IsPlanif = true;
+                planifModel.Souls = request.PlanifSouls is null ? null : SoulsJson.Serialize(request.PlanifSouls);
+                planifModel.SpaLevel = request.PlanifSpaLevel;
                 results.Add(planifModel);
                 return results;
             }

@@ -32,4 +32,8 @@
     <ProjectReference Include="..\MyHordesOptimizerApi\MyHordesOptimizerApi.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="Estimations\Refinement\refinement-fixtures.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
 </Project>

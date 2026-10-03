@@ -5,11 +5,15 @@
 
     .mho-compass-rose {
 
+        /* Les pointes sont des bordures de 28 × 160 px, tournées : leurs moitiés transparentes
+           débordent de 15 px à droite (et en haut), ce qui faisait défiler le panneau Affichage à
+           l'horizontale. Les parties visibles restent dans les 200 px : on coupe le reste. */
         .compass {
             width: 200px;
             aspect-ratio: 1;
             position: relative;
             margin: 0 auto;
+            overflow: hidden;
         }
 
         .compass-main {

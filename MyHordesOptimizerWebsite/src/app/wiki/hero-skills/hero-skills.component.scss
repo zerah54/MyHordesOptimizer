@@ -1,13 +1,20 @@
-@use 'variables';
 
 :host {
     display: contents;
 
     .mho-hero-skills {
+        /* La page n'est plus une `mat-card-content` : c'est le panneau d'onglets du wiki qui
+           lui donne sa hauteur, et les blocs internes en `flex: 1; overflow: auto` en dépendent. */
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        min-height: 0;
         .content {
 
             .mat-expansion-panel {
-                background-color: variables.$accented-background-color;
+                background-color: var(--mho-surface);
+                border: 1px solid var(--mho-line);
+                box-shadow: none;
 
                 .mat-mdc-table {
                     background-color: transparent;

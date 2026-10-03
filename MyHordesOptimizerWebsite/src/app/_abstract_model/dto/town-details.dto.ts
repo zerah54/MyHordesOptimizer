@@ -2,6 +2,9 @@ import { TownTypeId } from '../types/_types';
 
 export interface TownDetailsDTO {
     townId: number;
+    /** Nom de la ville. Optionnel : absent des réponses d'une API pas encore redéployée, et null
+     *  hors ville. */
+    townName?: string | null;
     townX: number;
     townY: number;
     townMaxX: number;

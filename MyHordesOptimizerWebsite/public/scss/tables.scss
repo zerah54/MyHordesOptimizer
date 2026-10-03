@@ -1,7 +1,110 @@
-@use 'variables';
+/* Tableaux Material : densité et couleurs communes à tout le site.
+   Les pages gardent leurs propres colonnes et leurs propres filtres, seule l'apparence change. */
 
 .mat-elevation-z8 {
     height: 100%;
     width: 100%;
     overflow: auto;
+    /* « mat-elevation-z8 » ne veut plus dire une ombre portée : une carte cerclée suffit. */
+    box-shadow: none !important;
+    border: 1px solid var(--mho-line);
+    border-radius: var(--mho-radius-l);
+    background: var(--mho-surface);
+}
+
+.mat-mdc-table {
+    background: transparent;
+
+    /* Fond de ligne partagé avec les colonnes collantes.
+       Une colonne collante DOIT être opaque, sinon le contenu défile sous elle : elle repeint
+       donc son fond et masquerait le survol de la ligne. En passant par une variable posée sur
+       la ligne, la cellule collante suit l'état de sa ligne sans rien savoir du survol. */
+    --mho-row-bg: var(--mho-surface);
+
+    .mat-mdc-header-row {
+        height: 36px;
+        background: var(--mho-surface-2);
+        --mho-row-bg: var(--mho-surface-2);
+    }
+
+    .mat-mdc-header-cell {
+        padding: 8px 12px;
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--mho-text-muted);
+        white-space: nowrap;
+        border-bottom-color: var(--mho-line);
+    }
+
+    .mat-mdc-row {
+        height: 46px;
+
+        &:hover {
+            /* Teinte opaque : c'est elle que reprennent les colonnes collantes. */
+            --mho-row-bg: var(--mho-surface-2);
+            background: var(--mho-row-bg);
+        }
+    }
+
+    .mat-mdc-cell {
+        padding: 6px 12px;
+        border-bottom-color: var(--mho-line);
+        color: var(--mho-text);
+    }
+
+    /* Les chiffres s'alignent en colonne : indispensable dès qu'on compare des lignes. */
+    .mat-mdc-cell.center,
+    .mat-mdc-header-cell.center {
+        text-align: center;
+        font-variant-numeric: tabular-nums;
+    }
+
+    /* `mat-mdc-table-sticky` et non `mat-table-sticky` : c'est la classe que pose la table MDC.
+       Sous l'ancien nom, la règle ne s'appliquait jamais et les colonnes collantes restaient
+       transparentes (Material leur donne `background: inherit`, et la table est transparente). */
+    .mat-mdc-header-cell.mat-mdc-table-sticky,
+    .mat-mdc-cell.mat-mdc-table-sticky {
+        background: var(--mho-row-bg);
+    }
+
+    /* Ligne cochée : `--mho-accent-soft`. Le jeton est translucide alors qu'une cellule collante
+       doit rester opaque : la teinte est posée en IMAGE par-dessus le fond de chaque cellule,
+       collante (fond de ligne opaque) ou non (fond transparent sur celui de la ligne). Même
+       teinte partout, et rien ne transparaît pendant le défilement horizontal. */
+    .mat-mdc-row.mho-row-selected .mat-mdc-cell,
+    .mat-mdc-row.mho-row-targeted .mat-mdc-cell {
+        background-image: linear-gradient(var(--mho-accent-soft), var(--mho-accent-soft));
+    }
+
+    /* Ligne atteinte par un lien profond (recherche globale, `?building=`…) : un cadre et un
+       liseré d'accent en plus du fond. La couleur seule ne suffit pas, et le cadre la distingue
+       d'une ligne simplement cochée. */
+    .mat-mdc-row.mho-row-targeted .mat-mdc-cell {
+        box-shadow: inset 0 1px 0 var(--mho-accent), inset 0 -1px 0 var(--mho-accent);
+
+        &:first-child {
+            box-shadow: inset 3px 0 0 var(--mho-accent), inset 0 1px 0 var(--mho-accent), inset 0 -1px 0 var(--mho-accent);
+        }
+    }
+
+    .mat-mdc-no-data-row .mat-mdc-cell {
+        padding: 24px 12px;
+        text-align: center;
+        color: var(--mho-text-muted);
+    }
+}
+
+/* Intitulé chapeautant plusieurs colonnes (actions quotidiennes, estimations…). */
+.mho-column-group {
+    display: block;
+    padding-bottom: 5px;
+    border-bottom: 2px solid var(--mho-line-strong);
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--mho-text-muted);
+    text-align: center;
 }

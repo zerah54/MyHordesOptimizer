@@ -2,12 +2,14 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using MyHordesOptimizerApi.Configuration.Interfaces;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Map;
 using MyHordesOptimizerApi.Extensions;
 using MyHordesOptimizerApi.Models;
 using MyHordesOptimizerApi.Providers.Interfaces;
 using MyHordesOptimizerApi.Services.Impl.Locking;
+using MyHordesOptimizerApi.Services.Impl.Maps;
 using MyHordesOptimizerApi.Services.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -23,13 +25,15 @@ namespace MyHordesOptimizerApi.Services.Impl
         protected IUserInfoProvider UserInfoProvider { get; private set; }
         protected MhoContext DbContext { get; init; }
         protected TownSyncLock TownSyncLock { get; init; }
+        protected IMyHordesScrutateurConfiguration MyHordesScrutateurConfiguration { get; init; }
 
         public MyHordesOptimizerMapService(ILogger<MyHordesOptimizerMapService> logger,
             IServiceScopeFactory serviceScopeFactory,
             IMapper mapper,
             IUserInfoProvider userInfoProvider,
             MhoContext dbContext,
-            TownSyncLock townSyncLock)
+            TownSyncLock townSyncLock,
+            IMyHordesScrutateurConfiguration myHordesScrutateurConfiguration)
         {
             Logger = logger;
             ServiceScopeFactory = serviceScopeFactory;
@@ -37,6 +41,7 @@ namespace MyHordesOptimizerApi.Services.Impl
             UserInfoProvider = userInfoProvider;
             DbContext = dbContext;
             TownSyncLock = townSyncLock;
+            MyHordesScrutateurConfiguration = myHordesScrutateurConfiguration;
         }
 
         public LastUpdateInfoDto UpdateCell(int townId, MyHordesOptimizerCellUpdateDto updateRequest)
@@ -51,10 +56,6 @@ namespace MyHordesOptimizerApi.Services.Impl
             var cell = Mapper.Map<MapCell>(updateRequest);
             cell.IdTown = townId;
             cell.IdLastUpdateInfo = newLastUpdate.IdLastUpdateInfo;
-            if (Convert.ToBoolean(cell.IsDryed)) 
-            { 
-                cell.AveragePotentialRemainingDig = 0; cell.MaxPotentialRemainingDig = 0; 
-            }
             var cellItems = Mapper.Map<List<MapCellItem>>(updateRequest.Items);
 
             // Les relevés des métiers portent aussi sur les cases adjacentes : on charge
@@ -66,14 +67,40 @@ namespace MyHordesOptimizerApi.Services.Impl
 
             var cellModel = townCells.Single(cell => cell.X == updateRequest.X && cell.Y == updateRequest.Y);
 
+            // Le formulaire renvoie tout l'état de la case : seul ce qui CHANGE est une observation.
+            // Ressaisir à l'identique « non épuisée » ou un ancien niveau d'abondance ramènerait les
+            // fouilles restantes dans une fourchette périmée.
+            bool wasDryed = cellModel.IsDryed == true;
+            int? previousScavZoneLevel = cellModel.ScavZoneLevel;
+
             DbContext.MapCellItems.RemoveRange(cellModel.MapCellItems);
             DbContext.SaveChanges();
             cellModel.UpdateAllButKeysProperties(cell, ignoreNull: true);
             cellModel.MapCellItems = cellItems;
 
-            townCells.ApplyJobRadars(updateRequest.X,
+            var town = DbContext.Towns.FirstOrDefault(town => town.IdTown == townId);
+            var digObservations = town != null
+                ? DigObservations.ForTown(DbContext, town, town.Day, MyHordesScrutateurConfiguration, () => townCells)
+                : DigObservations.WithoutHistory(MyHordesScrutateurConfiguration);
+
+            // Le formulaire a déjà recopié IsDryed : on le remet à sa valeur d'avant pour que
+            // l'observation parte du vrai état précédent (une case vue vide puis déclarée non vide
+            // prouve une régénération).
+            if (cell.IsDryed == true && !wasDryed)
+            {
+                cellModel.IsDryed = false;
+                digObservations.Observe(cellModel, DigBounds.Depleted);
+            }
+            else if (cell.IsDryed == false && wasDryed)
+            {
+                cellModel.IsDryed = true;
+                digObservations.Observe(cellModel, DigBounds.NotDepleted);
+            }
+
+            townCells.ApplyJobRadars(digObservations,
+                updateRequest.X,
                 updateRequest.Y,
-                updateRequest.ScavZoneLevel,
+                updateRequest.ScavZoneLevel != previousScavZoneLevel ? updateRequest.ScavZoneLevel : null,
                 updateRequest.ScoutZoneLevel,
                 updateRequest.ScavNextCells,
                 updateRequest.ScoutNextCells,

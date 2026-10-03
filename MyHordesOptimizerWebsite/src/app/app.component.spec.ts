@@ -9,7 +9,6 @@ import type { Mock } from 'vitest';
 
 import { LoadingOverlayService } from './_core/services/loading-overlay.service';
 import { AppComponent } from './app.component';
-import { FooterComponent } from './structure/footer/footer.component';
 import { HeaderComponent } from './structure/header/header.component';
 import { MenuComponent } from './structure/menu/menu.component';
 
@@ -18,12 +17,6 @@ import { MenuComponent } from './structure/menu/menu.component';
              standalone: true })
 class HeaderStubComponent {
     public readonly changeSidenavStatus: OutputEmitterRef<void> = output();
-}
-
-/** Remplace mho-footer : évite MatDialog réel. */
-@Component({ selector: 'mho-footer', template: '', changeDetection: ChangeDetectionStrategy.OnPush,
-             standalone: true })
-class FooterStubComponent {
 }
 
 /** Remplace mho-menu : évite AdminService/TownContextService/ChartsThemingService réels. */
@@ -43,8 +36,8 @@ describe('AppComponent', (): void => {
             providers: [provideRouter([]), provideHttpClient(withXhr()), provideHttpClientTesting(), { provide: ANIMATION_MODULE_TYPE, useValue: 'NoopAnimations' }]
         })
             .overrideComponent(AppComponent, {
-                remove: { imports: [HeaderComponent, FooterComponent, MenuComponent] },
-                add: { imports: [HeaderStubComponent, FooterStubComponent, MenuStubComponent] }
+                remove: { imports: [HeaderComponent, MenuComponent] },
+                add: { imports: [HeaderStubComponent, MenuStubComponent] }
             })
             .compileComponents();
 

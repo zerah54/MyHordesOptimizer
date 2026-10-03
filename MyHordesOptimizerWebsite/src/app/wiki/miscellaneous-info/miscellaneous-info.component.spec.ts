@@ -69,10 +69,36 @@ describe('MiscellaneousInfoComponent', (): void => {
         ]);
     });
 
+    it('keeps column headers short, the context going under the title', (): void => {
+        createComponent();
+
+        const headers: string[][] = cards().map((card: DebugElement) =>
+            card.queryAll(By.css('th.mat-mdc-header-cell')).map((th: DebugElement) => th.nativeElement.textContent.trim()));
+        const subtitles: (string | null)[] = cards().map((card: DebugElement) =>
+            card.query(By.css('mat-card-subtitle'))?.nativeElement.textContent.trim() ?? null);
+
+        expect(headers).toEqual([
+            ['Zombies tués', 'Morts de désespoir'],
+            ['Jour', 'Minimum', 'Maximum', 'Moyenne'],
+            ['Jour', 'Citoyens ciblés'],
+            ['Jour', 'Normale', 'Dévastée'],
+            ['Jours validés', 'Points gagnés'],
+            ['Jours validés', 'Points gagnés']
+        ]);
+        expect(subtitles).toEqual([
+            'Selon les zombies tués sur la case depuis la dernière attaque.',
+            null,
+            null,
+            'Chances de réussite, selon l\'état de la ville.',
+            null,
+            null
+        ]);
+    });
+
     it('shows a calculate button only on the cards that declare a header action (despair deaths, overflow)', (): void => {
         createComponent();
 
-        const hasButton: boolean[] = cards().map((card: DebugElement) => card.query(By.css('button[mat-icon-button]')) !== null);
+        const hasButton: boolean[] = cards().map((card: DebugElement) => card.query(By.css('.card-header button')) !== null);
 
         expect(hasButton).toEqual([true, false, true, false, false, false]);
     });
@@ -80,7 +106,7 @@ describe('MiscellaneousInfoComponent', (): void => {
     it('opens the despair-deaths calculator dialog when its calculate button is clicked', (): void => {
         createComponent();
 
-        cards()[0].query(By.css('button[mat-icon-button]')).nativeElement.click();
+        cards()[0].query(By.css('.card-header button')).nativeElement.click();
 
         expect(dialog.open).toHaveBeenCalledTimes(1);
 
@@ -90,7 +116,7 @@ describe('MiscellaneousInfoComponent', (): void => {
     it('navigates to the overflow tool when the overflow calculate button is clicked', (): void => {
         createComponent();
 
-        cards()[2].query(By.css('button[mat-icon-button]')).nativeElement.click();
+        cards()[2].query(By.css('.card-header button')).nativeElement.click();
 
         expect(router.navigate).toHaveBeenCalledTimes(1);
 

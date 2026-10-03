@@ -3,10 +3,11 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ProbabilitiesComponent } from './probabilities.component';
 
 interface Simulation {
-    nb_people: number;
     current_chances: number[];
     result_probabilities: number[];
     result_average?: number;
+    result_most_likely?: number;
+    result_peak?: number;
     title: string;
     editing_title: boolean;
     show_detail: boolean;
@@ -21,8 +22,10 @@ interface TestableComponent {
     ngAfterViewInit(): void;
     createSimulation(): void;
     deleteSimulation(index: number): void;
-    convertFieldsToChances(simulation: Simulation): void;
     calculateProbabilities(simulation: Simulation): void;
+    addPerson(simulation: Simulation): void;
+    removePerson(simulation: Simulation, index: number): void;
+    barHeight(probability: number, peak: number | undefined): number;
 }
 
 describe('ProbabilitiesComponent', (): void => {
@@ -30,8 +33,8 @@ describe('ProbabilitiesComponent', (): void => {
     let fixture: ComponentFixture<ProbabilitiesComponent>;
     let testable: TestableComponent;
 
-    function makeSimulation(nb_people: number, current_chances: number[]): Simulation {
-        return { nb_people, current_chances, result_probabilities: [], title: 't', editing_title: false, show_detail: true };
+    function makeSimulation(current_chances: number[]): Simulation {
+        return { current_chances, result_probabilities: [], title: 't', editing_title: false, show_detail: true };
     }
 
     beforeEach(async (): Promise<void> => {
@@ -46,7 +49,7 @@ describe('ProbabilitiesComponent', (): void => {
 
     describe('calculateProbabilities', (): void => {
         it('gives 100% chance of 0 deaths when the single watcher never dies', (): void => {
-            const simulation: Simulation = makeSimulation(1, [100]);
+            const simulation: Simulation = makeSimulation([100]);
 
             testable.calculateProbabilities(simulation);
 
@@ -55,7 +58,7 @@ describe('ProbabilitiesComponent', (): void => {
         });
 
         it('gives 100% chance of death when the single watcher always dies', (): void => {
-            const simulation: Simulation = makeSimulation(1, [0]);
+            const simulation: Simulation = makeSimulation([0]);
 
             testable.calculateProbabilities(simulation);
 
@@ -64,7 +67,7 @@ describe('ProbabilitiesComponent', (): void => {
         });
 
         it('handles an empty current_chances array', (): void => {
-            const simulation: Simulation = makeSimulation(0, []);
+            const simulation: Simulation = makeSimulation([]);
 
             testable.calculateProbabilities(simulation);
 
@@ -72,22 +75,65 @@ describe('ProbabilitiesComponent', (): void => {
         });
     });
 
-    describe('convertFieldsToChances', (): void => {
-        it('truncates current_chances when nb_people shrinks', (): void => {
-            const simulation: Simulation = makeSimulation(1, [10, 20, 30]);
+    describe('summary', (): void => {
+        it('names the most likely outcome and its weight', (): void => {
+            // Deux personnes à 50 % : 25 % / 50 % / 25 %. Le pic est « 1 mort ».
+            const simulation: Simulation = makeSimulation([50, 50]);
 
-            testable.convertFieldsToChances(simulation);
+            testable.calculateProbabilities(simulation);
 
-            expect(simulation.current_chances).toEqual([10]);
+            expect(simulation.result_most_likely).toBe(1);
+            expect(simulation.result_peak).toBeCloseTo(0.5, 6);
+            expect(simulation.result_average).toBeCloseTo(1, 6);
         });
 
-        it('pads current_chances with the default value when nb_people grows', (): void => {
-            testable.default_value = 42;
-            const simulation: Simulation = makeSimulation(3, [10]);
+        it('scales the histogram against the peak, and keeps near-impossible outcomes visible', (): void => {
+            expect(testable.barHeight(0.5, 0.5)).toBe(100);
+            expect(testable.barHeight(0.25, 0.5)).toBe(50);
+            // Un plancher, sinon une issue quasi impossible disparaîtrait et se lirait comme zéro.
+            expect(testable.barHeight(0.000001, 0.5)).toBe(2);
+            expect(testable.barHeight(0.5, undefined)).toBe(0);
+        });
+    });
 
-            testable.convertFieldsToChances(simulation);
+    describe('addPerson / removePerson', (): void => {
+        it('adds a person with the default chance and recomputes', (): void => {
+            testable.default_value = 60;
+            const simulation: Simulation = makeSimulation([100]);
+            testable.simulations.set([simulation]);
 
-            expect(simulation.current_chances).toEqual([10, 42, 42]);
+            testable.addPerson(simulation);
+
+            expect(simulation.current_chances).toEqual([100, 60]);
+            expect(simulation.result_probabilities.length).toBe(3);
+        });
+
+        it('never goes past the upper bound of the form', (): void => {
+            const simulation: Simulation = makeSimulation(new Array(40).fill(50));
+            testable.simulations.set([simulation]);
+
+            testable.addPerson(simulation);
+
+            expect(simulation.current_chances.length).toBe(40);
+        });
+
+        it('removes the person that was aimed at, not the last one', (): void => {
+            const simulation: Simulation = makeSimulation([10, 20, 30]);
+            testable.simulations.set([simulation]);
+
+            testable.removePerson(simulation, 1);
+
+            expect(simulation.current_chances).toEqual([10, 30]);
+            expect(simulation.result_probabilities.length).toBe(3);
+        });
+
+        it('keeps the last person: a simulation with nobody in it says nothing', (): void => {
+            const simulation: Simulation = makeSimulation([10]);
+            testable.simulations.set([simulation]);
+
+            testable.removePerson(simulation, 0);
+
+            expect(simulation.current_chances).toEqual([10]);
         });
     });
 
@@ -117,7 +163,7 @@ describe('ProbabilitiesComponent', (): void => {
         });
 
         it('removes the simulation at the given index', (): void => {
-            testable.simulations.set([makeSimulation(1, [0]), makeSimulation(1, [100])]);
+            testable.simulations.set([makeSimulation([0]), makeSimulation([100])]);
 
             testable.deleteSimulation(0);
 
@@ -128,7 +174,7 @@ describe('ProbabilitiesComponent', (): void => {
 
     describe('ngAfterViewInit', (): void => {
         it('computes the results for every pre-existing simulation', (): void => {
-            testable.simulations.set([makeSimulation(1, [100])]);
+            testable.simulations.set([makeSimulation([100])]);
 
             testable.ngAfterViewInit();
 

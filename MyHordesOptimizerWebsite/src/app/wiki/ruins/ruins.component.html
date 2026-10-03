@@ -1,17 +1,11 @@
-<mat-card-header class="mho-ruins-header">
-    <mat-card-title>
-        <ng-container i18n>Bâtiments</ng-container>
-    </mat-card-title>
+<div class="mho-ruins">
     @if (town) {
-        <div class="actions">
-            <mat-slide-toggle [(ngModel)]="ruins_filters.inside_town"
-                              (ngModelChange)="applyInsideTownFilter()">
+        <div class="page-toolbar">
+            <mat-slide-toggle [(ngModel)]="ruins_filters.inside_town" (ngModelChange)="applyInsideTownFilter()">
                 <ng-container i18n>Dans ma ville</ng-container>
             </mat-slide-toggle>
         </div>
     }
-</mat-card-header>
-<mat-card-content class="mho-ruins">
     @if (ruins()) {
         <div class="mat-elevation-z8">
             <table #table mat-table [dataSource]="datasource()" matSort matSortActive="label" matSortDisableClear matSortDirection="asc">
@@ -71,10 +65,15 @@
                                 @case ('drops') {
                                     <div class="drops-list">
                                         @for (drop of row.drops; track drop) {
-                                            <div [title]="drop.item.label[locale]">
-                                                <img [ngSrc]="HORDES_IMG_REPO + drop.item.img" width="16" height="16">
-                                                <div>{{ (drop.probability * 100) | number:'1.1-1':locale }}%</div>
-                                            </div>
+                                            <!-- Icône et taux dans la même pastille : côte à côte, ils se lisent
+                                                 comme une valeur ; empilés, la colonne devenait une rangée d'icônes
+                                                 surmontant une rangée de pourcentages nus. -->
+                                            <span class="drop" [matTooltip]="drop.item.label | localizedLabel">
+                                                @if (drop.item | itemImg; as drop_img) {
+                                                    <img [src]="HORDES_IMG_REPO + drop_img" alt="">
+                                                }
+                                                <span class="drop-rate mho-num">{{ (drop.probability * 100) | number:'1.1-1':locale }}%</span>
+                                            </span>
                                         }
                                     </div>
                                 }
@@ -92,8 +91,8 @@
                     </ng-container>
                 }
                 <tr mat-header-row *matHeaderRowDef="columns | ids; sticky: true"></tr>
-                <tr mat-row *matRowDef="let row; columns: columns | ids;"></tr>
+                <tr mat-row *matRowDef="let row; columns: columns | ids;" [class.mho-row-targeted]="row.id === targeted_id()"></tr>
             </table>
         </div>
     }
-</mat-card-content>
+</div>

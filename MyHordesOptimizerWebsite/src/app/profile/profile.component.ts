@@ -10,7 +10,6 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { ActivatedRoute, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 
-import { environment } from '../../environments/environment';
 import { NoteDTO } from '../_abstract_model/dto/note.dto';
 import { UserAccountPublicDTO } from '../_abstract_model/dto/user-account.dto';
 import { UserPictosDTO } from '../_abstract_model/dto/user-picto.dto';
@@ -18,11 +17,12 @@ import { NoteService } from '../_abstract_model/services/note.service';
 import { UserAccountService } from '../_abstract_model/services/user-account.service';
 import { Imports } from '../_abstract_model/types/_types';
 import { getUserId } from '../_core/utilities/localstorage.util';
+import { AvatarComponent } from '../_shared/avatar/avatar.component';
 import { NoteDialogComponent, NoteDialogData } from '../_shared/note-dialog/note-dialog.component';
 import { NoteIconComponent } from '../_shared/note-icon/note-icon.component';
 
 const angular_common: Imports = [CommonModule, RouterLink, RouterLinkActive, RouterOutlet];
-const components: Imports = [NoteIconComponent];
+const components: Imports = [AvatarComponent, NoteIconComponent];
 const pipes: Imports = [];
 const material_modules: Imports = [MatButtonModule, MatCardModule, MatDialogModule, MatIconModule, MatProgressSpinnerModule, MatTabsModule, MatTooltipModule];
 
@@ -62,7 +62,6 @@ export class ProfileComponent implements OnInit {
     private readonly noteService: NoteService = inject(NoteService);
     private readonly dialog: MatDialog = inject(MatDialog);
     private readonly destroy_ref: DestroyRef = inject(DestroyRef);
-    private readonly myhordes_url: string = environment.myhordes_url;
 
     public ngOnInit(): void {
         const user_id: number = Number(this.route.snapshot.paramMap.get('userId'));
@@ -127,12 +126,6 @@ export class ProfileComponent implements OnInit {
     /** Une note n'a de sens que sur le profil d'un autre joueur (l'API refuse la note sur soi-même). */
     protected isSelf(): boolean {
         return this.profile()?.id === getUserId();
-    }
-
-    protected getAvatarUrl(avatar: string | null): string | null {
-        if (!avatar) return null;
-        if (avatar.startsWith('http')) return avatar;
-        return this.myhordes_url.replace(/\/$/, '') + avatar;
     }
 }
 

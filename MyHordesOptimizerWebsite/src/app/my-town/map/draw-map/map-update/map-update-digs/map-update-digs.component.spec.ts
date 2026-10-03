@@ -47,9 +47,10 @@ describe('MapUpdateDigsComponent', (): void => {
         expect(rows[0].textContent).toContain('Alice');
     });
 
-    it('only offers citizens not yet in the dig list to add', (): void => {
+    it('only offers citizens without a dig on the selected day', (): void => {
         fixture.componentRef.setInput('allCitizens', [newCitizen(1, 'Alice'), newCitizen(2, 'Bob')]);
-        fixture.componentRef.setInput('digs', [newDig({ digger_id: 1, digger_name: 'Alice' })]);
+        // Bob a fouillé la case un autre jour : il reste proposé pour ce jour-ci.
+        fixture.componentRef.setInput('digs', [newDig({ digger_id: 1, digger_name: 'Alice' }), newDig({ digger_id: 2, digger_name: 'Bob', day: 2 })]);
         fixture.detectChanges();
 
         fixture.nativeElement.querySelector('thead th button').dispatchEvent(new MouseEvent('click'));
@@ -80,9 +81,11 @@ describe('MapUpdateDigsComponent', (): void => {
         expect(emitted[0][1].day).toBe(1);
     });
 
-    it('removeCitizen() emits digsChange without the matching dig', (): void => {
+    it('removing a row emits digsChange without that dig only, not the citizen\'s other days', (): void => {
         fixture.componentRef.setInput('allCitizens', [newCitizen(1, 'Alice')]);
-        fixture.componentRef.setInput('digs', [newDig({ digger_id: 1, digger_name: 'Alice' })]);
+        const other_day: Dig = newDig({ digger_id: 1, digger_name: 'Alice', day: 2 });
+        const today: Dig = newDig({ digger_id: 1, digger_name: 'Alice', day: 1 });
+        fixture.componentRef.setInput('digs', [other_day, today]);
         fixture.detectChanges();
 
         const emitted: Dig[][] = [];
@@ -90,7 +93,8 @@ describe('MapUpdateDigsComponent', (): void => {
 
         fixture.nativeElement.querySelector('tbody tr .remove button').dispatchEvent(new MouseEvent('click'));
 
-        expect(emitted).toEqual([[]]);
+        expect(emitted.length).toBe(1);
+        expect(emitted[0]).toEqual([other_day]);
     });
 
     it('defaults the current/selected day to 1 when no town is stored', (): void => {

@@ -1,4 +1,3 @@
-@use '../../../../public/scss/variables';
 
 :host {
     display: contents;
@@ -15,11 +14,8 @@
         }
 
         .citizen-avatar {
-            position: relative;
-            width: 25px;
-            height: 25px;
-            overflow: hidden;
-            border-radius: 50%;
+            display: flex;
+            flex-shrink: 0;
         }
     }
 }

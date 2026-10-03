@@ -7,13 +7,9 @@
         <button mat-icon-button type="button" (click)="openLeaderboard()" matTooltip="Classement" i18n-matTooltip>
             <mat-icon>trophy</mat-icon>
         </button>
-        @if (false) {
-            <mat-slide-toggle
-                [checked]="selected_theme() === 'legacy'"
-                (change)="selected_theme.set($event.checked ? 'legacy' : 'myhordes')">
-                <ng-container i18n>Thème Windows</ng-container>
-            </mat-slide-toggle>
-        }
+        <mat-slide-toggle [checked]="selected_theme() === 'legacy'" (change)="changeTheme($event.checked)">
+            <ng-container i18n>Thème Windows</ng-container>
+        </mat-slide-toggle>
         <mat-button-toggle-group class="mode-selector" [value]="game_mode()" (change)="switchMode($event.value)">
             <mat-button-toggle value="normal">
                 <ng-container i18n>Normal</ng-container>
@@ -92,7 +88,8 @@
                 </button>
             </div>
         } @else {
-            <div class="game-container" [class]="selected_theme()" [class.fullscreen]="is_fullscreen()">
+            @let is_legacy = selected_theme() === 'legacy';
+            <div class="game-container" [class]="selected_theme()" [class.fullscreen]="is_fullscreen()" [class.game-ended]="game_over()">
                 <div class="sticky-controls">
                     <div class="board-toolbar">
                         <div class="zoom-controls">
@@ -118,7 +115,11 @@
                         <div class="remain-mines">
                             <div>
                                 @for (digit of formatDigits(remaining_mines(), mine_counter_digits()); track $index) {
-                                    <img [src]="`img/minesweeper/timer_${digit}.png`" draggable="false">
+                                    @if (is_legacy) {
+                                        <img [src]="`img/minesweeper/timer_${digit}.png`" draggable="false">
+                                    } @else {
+                                        <span class="digit">{{ digit }}</span>
+                                    }
                                 }
                             </div>
                         </div>
@@ -133,7 +134,11 @@
                             <div>
                                 @let timer = end_time() ? (start_time() | diffBetweenDates:end_time()) : (start_time() | counterFromDate | async);
                                 @for (digit of formatDigits(timer ?? 0, 3); track $index) {
-                                    <img [src]="`img/minesweeper/timer_${digit}.png`" draggable="false">
+                                    @if (is_legacy) {
+                                        <img [src]="`img/minesweeper/timer_${digit}.png`" draggable="false">
+                                    } @else {
+                                        <span class="digit">{{ digit }}</span>
+                                    }
                                 }
                             </div>
                         </div>
@@ -162,24 +167,26 @@
                                          (touchend)="onCellTouchEnd($event)"
                                          (touchmove)="onCellTouchMove($event)"
                                          (touchcancel)="onCellTouchCancel()">
-                                        @if (cell.is_revealed && cell.adjacent_mines > 0) {
-                                            <img [src]="`img/minesweeper/adjacent_${cell.adjacent_mines}.png`" draggable="false">
-                                        }
-                                        @if (game_over()) {
-                                            @if (cell.is_mine) {
+                                        @if (is_legacy) {
+                                            @if (cell.is_revealed && cell.adjacent_mines > 0) {
+                                                <img [src]="`img/minesweeper/adjacent_${cell.adjacent_mines}.png`" draggable="false">
+                                            }
+                                            @if (game_over()) {
+                                                @if (cell.is_mine) {
+                                                    @if (cell.is_flagged) {
+                                                        <img src="img/minesweeper/bombflagged.png" draggable="false">
+                                                    } @else {
+                                                        <img src="img/minesweeper/bomb.png" draggable="false">
+                                                    }
+                                                } @else if (cell.is_flagged) {
+                                                    <img src="img/minesweeper/nobomb.png" draggable="false">
+                                                }
+                                            } @else {
                                                 @if (cell.is_flagged) {
                                                     <img src="img/minesweeper/bombflagged.png" draggable="false">
-                                                } @else {
-                                                    <img src="img/minesweeper/bomb.png" draggable="false">
+                                                } @else if (cell.is_questioned) {
+                                                    <img src="img/minesweeper/bombquestion.png" draggable="false">
                                                 }
-                                            } @else if (cell.is_flagged) {
-                                                <img src="img/minesweeper/nobomb.png" draggable="false">
-                                            }
-                                        } @else {
-                                            @if (cell.is_flagged) {
-                                                <img src="img/minesweeper/bombflagged.png" draggable="false">
-                                            } @else if (cell.is_questioned) {
-                                                <img src="img/minesweeper/bombquestion.png" draggable="false">
                                             }
                                         }
                                     </div>

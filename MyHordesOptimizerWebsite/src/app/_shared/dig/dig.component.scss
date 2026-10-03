@@ -1,10 +1,9 @@
-@use '../../../../public/scss/variables';
 
 :host {
     display: contents;
 
     .dig {
-        background-color: variables.$item_color;
+        background-color: var(--mho-accent-soft);
         max-width: 150px;
         border-radius: 0.25em;
         padding: 0.5em;

@@ -1,0 +1,140 @@
+using MyHordesOptimizerApi.DiscordBot.Enums;
+
+namespace MyHordesOptimizerApi.DiscordBot.Localization
+{
+    public sealed partial class BotTexts
+    {
+        /// <summary>Espagnol : tutoiement, comme le jeu. Noms d'objets, de bâtiments et « mutante » du jeu.</summary>
+        public static readonly BotTexts Es = new BotTexts
+        {
+            Locale = Locales.Es,
+
+            GenericError = error => $"Se ha producido un error\n```{error}```",
+            CommandFailed = reason => $"Se ha producido un error: {reason}",
+
+            AntiAbuseResetMessage = "¡El contador antiabuso se ha reiniciado!",
+            AntiAbuseStarted = target => $"¡El contador antiabuso se ha iniciado! Se te avisará {target} dentro de 15 minutos.",
+            TimerScheduled = target => $"¡Tu contador se ha programado! Se te avisará {target}.",
+            TimerNotCreated = "No se ha podido crear el contador.",
+            TimerCreationError = error => $"Se ha producido un error al crear el contador\n```{error}```",
+            TimerReasonEmpty = "El motivo no puede estar vacío.",
+            TimerReasonTooLong = max => $"El motivo no puede superar los {max} caracteres.",
+            TimerTooMany = (count, max) => $"Ya tienes {count} contadores en curso; el máximo es {max}.",
+            TimerReasonField = "Motivo",
+            TimerExpirationField = "Vencimiento",
+            TimerDurationFormatHelp = "Formato esperado: 1Y 2M 7D 1h 25m 12s (Y años, M meses, D días, h horas, m minutos, s segundos).",
+            TimerDurationUnreadable = "Duración ilegible.",
+            TimerDurationRepeatedUnit = unit => $"La unidad «{unit}» aparece varias veces.",
+            TimerDurationTooLong = "Duración demasiado larga.",
+            TimerDurationNotPositive = "La duración debe ser mayor que cero.",
+            TimerSentLate = dueUnixSeconds => $"-# Previsto para <t:{dueUnixSeconds}:f>, enviado con retraso.",
+            TimerTargetHere = "aquí",
+            TimerTargetHerePrivate = "aquí, con un mensaje que solo tú puedes ver",
+            TimerTargetDirectMessage = "por mensaje directo",
+            TimerTargetDirectMessageFallback = "por mensaje directo (el bot no puede escribir aquí)",
+
+            AttackEstimationsTitle = day => $"Estimaciones para el día {day}",
+            AttackCalculated = (day, min, max) => $"*Ataque D{day} calculado*: {min} - {max}",
+            AttackPlannerField = day => $"Pronosticador D{day}",
+            AttackEstimationField = day => $"Estimación D{day}",
+            AttackSentByDirectMessage = "Estimaciones enviadas por mensaje directo",
+            AttackError = error => $"Se ha producido un error al obtener las estimaciones\n```{error}```",
+
+            InstructionsDraftNotFound = "No se encuentra el borrador de las instrucciones: vuelve a lanzar el comando /instrucciones.",
+            InstructionsMaxSections = "No se puede añadir una sección: Discord limita un mensaje a 25 secciones.",
+            InstructionsAddTitle = "Añadir un título",
+            InstructionsUpdateTitle = "Editar el título",
+            InstructionsAddDescription = "Añadir una descripción",
+            InstructionsUpdateDescription = "Editar la descripción",
+            InstructionsAddSection = "Añadir una sección",
+            InstructionsAddSectionLimitReached = "Añadir una sección (límite alcanzado)",
+            InstructionsPublish = "Publicar las instrucciones",
+            InstructionsPublishError = error => $"No se han podido publicar las instrucciones\n```{error}```",
+            InstructionsTitleEmpty = "El título no puede estar vacío.",
+            InstructionsDescriptionEmpty = "La descripción no puede estar vacía.",
+            InstructionsSectionEmpty = "El título y el contenido de una sección no pueden estar vacíos.",
+            InstructionsTooLong = (length, max) => $"Cambio rechazado: las instrucciones tendrían {length} caracteres, por encima del límite "
+                                                   + $"de Discord de {max} (título, descripción y secciones incluidos).",
+            InstructionsFull = (element, max) => $"No se puede añadir {element}: las instrucciones han alcanzado el límite de Discord de "
+                                                 + $"{max} caracteres (título, descripción y secciones incluidos).",
+            InstructionsElementTitle = "un título",
+            InstructionsElementDescription = "una descripción",
+            InstructionsElementSection = "una sección",
+            InstructionsTitleLabel = "Título",
+            InstructionsDescriptionLabel = "Descripción",
+            InstructionsSectionTitleLabel = "Título de la sección",
+            InstructionsSectionContentLabel = "Contenido de la sección",
+
+            FeedbackSuggestionModalTitle = "Enviar una sugerencia",
+            FeedbackSuggestionTitleLabel = "Título de la sugerencia",
+            FeedbackSuggestionDetailsLabel = "Detalles de la sugerencia",
+            FeedbackSuggestionPosted = "La sugerencia se ha publicado",
+            FeedbackBugModalTitle = "Informar de un error",
+            FeedbackBugTitleLabel = "Título del error",
+            FeedbackBugDetailsLabel = "Detalles del error",
+            FeedbackBugPosted = "Se ha informado del error",
+
+            FaqGoToWebsite = "Ir al sitio web",
+            FaqGoToTutorial = "Ir al tutorial",
+            FaqChromeExtension = "Extensión de Chrome",
+            FaqFirefoxExtension = "Extensión de Firefox",
+            FaqInstallScript = "Instalar el script",
+            FaqGhoulTitle = "Probabilidades de convertirse en mutante",
+            FaqMseTitle = "Efectos de un Medicamento sin etiqueta",
+            FaqValueLine = (label, percent) => $"{label}: {percent} %",
+            ItemMeatyBone = "Hueso con carne",
+            ItemFleshroomPuree = "Puré de hongos carroñeros",
+            ItemHumanFlesh = "Carne humana",
+            ItemTravellersCorpse = "Cadáver de un viajero",
+            FaqMseGivesAp = actionPoints => $"Da {actionPoints} PA",
+            FaqMseGivesApAndAddiction = actionPoints => $"Da {actionPoints} PA + adicción",
+            FaqMseTerrorises = "Aterroriza",
+            FaqMseNoEffect = "Sin efecto",
+            FaqCampingTitle = "Probabilidades de supervivencia al acampar",
+            CheatBold = "negrita",
+            CheatItalic = "cursiva",
+            CheatUnderline = "subrayado",
+            CheatStrikethrough = "tachado",
+            CheatSpoiler = "spoiler",
+            CheatCode = "bloque de texto",
+            CheatQuote = "cita",
+            CheatMultilineCode = "bloque de texto\nen varias líneas",
+            CheatMultilineQuote = "Cita\nen varias líneas",
+            CheatMaskedLink = "Enlace oculto",
+            CheatBigTitle = "Título grande",
+            CheatMediumTitle = "Título mediano",
+            CheatSmallTitle = "Título pequeño",
+            CheatSmallText = "Texto pequeño",
+            CheatBulletList = "Lista con viñetas",
+            CheatOrderedList = "Lista ordenada",
+            CheatLevel = level => $"Nivel {level}",
+            CheatSpacesHint = "(cada ⋅ representa un espacio)",
+
+            GlossaryNoMatch = searchValue => $"No se ha encontrado ninguna coincidencia para {searchValue}",
+
+            RecipeError = error => $"Se ha producido un error al obtener el objeto\n```{error}```",
+            RecipeNoResult = "No se ha encontrado ningún resultado",
+            RecipeTruncated = count => count > 1
+                ? $"Resultados truncados: {count} recetas no mostradas"
+                : $"Resultados truncados: {count} receta no mostrada",
+            RecipeComponents = "Componentes",
+            RecipeResults = "Resultados",
+
+            TranslateSearchExpired = "Esta búsqueda ha caducado: vuelve a lanzar el comando /traducir para recorrer sus resultados.",
+            TranslateSentByDirectMessage = "Las traducciones se enviarán por mensaje directo",
+            TranslateNoResult = searchValue => $"No se ha encontrado ninguna traducción para {searchValue}",
+            TranslateError = error => $"Se ha producido un error al obtener las traducciones\n```{error}```",
+            TranslatePrevious = "Anterior",
+            TranslateNext = "Siguiente",
+
+            PlayRock = "Piedra",
+            PlayPaper = "Papel",
+            PlayScissors = "Tijera",
+            PlayHeads = "Cara",
+            PlayTails = "Cruz",
+            PlayCardRanks = new[] { "As", "Rey", "Reina", "Jota", "10", "9", "8", "7", "6", "5", "4", "3", "2" },
+            PlayCardSuits = new[] { "Corazones", "Tréboles", "Diamantes", "Picas" },
+            PlayCard = (rank, suit) => $"{rank} de {suit}"
+        };
+    }
+}

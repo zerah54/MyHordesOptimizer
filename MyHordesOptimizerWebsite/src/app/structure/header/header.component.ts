@@ -1,5 +1,5 @@
 import { BreakpointObserver } from '@angular/cdk/layout';
-import { CommonModule, NgOptimizedImage } from '@angular/common';
+import { CommonModule, NgOptimizedImage, NgTemplateOutlet } from '@angular/common';
 import {
     ChangeDetectionStrategy,
     Component,
@@ -29,16 +29,21 @@ import { skip } from 'rxjs';
 
 import { environment } from '../../../environments/environment';
 import { BREAKPOINTS } from '../../_abstract_model/const';
+import { AdminService } from '../../_abstract_model/services/admin.service';
 import { AuthenticationService } from '../../_abstract_model/services/authentication.service';
 import { Imports } from '../../_abstract_model/types/_types';
 import { Me } from '../../_abstract_model/types/me.class';
+import { TownContextService } from '../../_core/services/town-context.service';
 import { getExternalAppId, setExternalAppId, setTokenWithMeWithExpirationDate, town, user } from '../../_core/utilities/localstorage.util';
+import { AvatarComponent } from '../../_shared/avatar/avatar.component';
 import { CitizenMenuComponent } from './citizen-menu/citizen-menu.component';
 import { ExternalToolsUpdateButtonComponent } from './external-tools-update-button/external-tools-update-button.component';
+import { GlobalSearchComponent } from './global-search/global-search.component';
 import { HeaderService } from './header.service';
+import { TownChipComponent } from './town-chip/town-chip.component';
 
-const angular_common: Imports = [CommonModule, NgOptimizedImage, FormsModule];
-const components: Imports = [CitizenMenuComponent, ExternalToolsUpdateButtonComponent];
+const angular_common: Imports = [CommonModule, NgOptimizedImage, NgTemplateOutlet, FormsModule];
+const components: Imports = [AvatarComponent, CitizenMenuComponent, ExternalToolsUpdateButtonComponent, GlobalSearchComponent, TownChipComponent];
 const pipes: Imports = [];
 const material_modules: Imports = [MatButtonModule, MatDividerModule, MatFormFieldModule, MatIconModule, MatInputModule, MatMenuModule, MatToolbarModule, MatTooltipModule, RouterLink];
 
@@ -76,7 +81,20 @@ export class HeaderComponent implements OnInit {
     /** Réactif au même titre que `me` : voir son commentaire ci-dessus. */
     protected readonly is_in_town: Signal<boolean> = computed(() => !!town()?.town_id);
 
-    protected readonly is_gt_xs: WritableSignal<boolean> = signal(this.breakpoint_observer.isMatched(BREAKPOINTS['gt-xs']));
+    private readonly town_context: TownContextService = inject(TownContextService);
+    protected readonly is_readonly: Signal<boolean> = this.town_context.isReadonly;
+
+    /**
+     * Paliers de la barre, sans défilement : sous 1280 px le pseudo (infobulle de l'avatar) et le
+     * type de ville (infobulle de la pastille) partent ; sous 960 px titre « MHO », recherche et
+     * mise à jour en icônes ; sous 600 px la pastille de ville passe dans le menu (CSS) ; sous
+     * 400 px le titre disparaît (CSS).
+     */
+    protected readonly is_gt_md: WritableSignal<boolean> = signal(this.breakpoint_observer.isMatched(BREAKPOINTS['gt-md']));
+    protected readonly is_gt_sm: WritableSignal<boolean> = signal(this.breakpoint_observer.isMatched(BREAKPOINTS['gt-sm']));
+
+    /** L'entrée Administration vit dans le menu utilisateur, et n'apparaît que pour un admin. */
+    protected readonly admin_service: AdminService = inject(AdminService);
 
     private readonly title_service: Title = inject(Title);
     private readonly authentication_api: AuthenticationService = inject(AuthenticationService);
@@ -85,7 +103,8 @@ export class HeaderComponent implements OnInit {
 
     /** Migré depuis `@HostListener('window:resize')` vers `host: {}` (voir décorateur ci-dessus). */
     protected onResize(): void {
-        this.is_gt_xs.set(this.breakpoint_observer.isMatched(BREAKPOINTS['gt-xs']));
+        this.is_gt_md.set(this.breakpoint_observer.isMatched(BREAKPOINTS['gt-md']));
+        this.is_gt_sm.set(this.breakpoint_observer.isMatched(BREAKPOINTS['gt-sm']));
     }
 
     public constructor() {

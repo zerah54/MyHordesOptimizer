@@ -1,0 +1,140 @@
+using MyHordesOptimizerApi.DiscordBot.Enums;
+
+namespace MyHordesOptimizerApi.DiscordBot.Localization
+{
+    public sealed partial class BotTexts
+    {
+        /// <summary>Anglais : aussi la langue par défaut (langue Discord non gérée).</summary>
+        public static readonly BotTexts En = new BotTexts
+        {
+            Locale = Locales.En,
+
+            GenericError = error => $"An error occurred\n```{error}```",
+            CommandFailed = reason => $"An error occurred: {reason}",
+
+            AntiAbuseResetMessage = "The anti-abuse counter has been reset!",
+            AntiAbuseStarted = target => $"The anti-abuse counter has started! You will be notified {target} in 15 minutes.",
+            TimerScheduled = target => $"Your timer has been scheduled! You will be notified {target}.",
+            TimerNotCreated = "The timer could not be created.",
+            TimerCreationError = error => $"An error occurred while creating the timer\n```{error}```",
+            TimerReasonEmpty = "The reason cannot be empty.",
+            TimerReasonTooLong = max => $"The reason cannot exceed {max} characters.",
+            TimerTooMany = (count, max) => $"You already have {count} timers running; the maximum is {max}.",
+            TimerReasonField = "Reason",
+            TimerExpirationField = "Expires",
+            TimerDurationFormatHelp = "Expected format: 1Y 2M 7D 1h 25m 12s (Y years, M months, D days, h hours, m minutes, s seconds).",
+            TimerDurationUnreadable = "Unreadable duration.",
+            TimerDurationRepeatedUnit = unit => $"The unit “{unit}” appears more than once.",
+            TimerDurationTooLong = "Duration too long.",
+            TimerDurationNotPositive = "The duration must be greater than zero.",
+            TimerSentLate = dueUnixSeconds => $"-# Scheduled for <t:{dueUnixSeconds}:f>, sent late.",
+            TimerTargetHere = "here",
+            TimerTargetHerePrivate = "here, in a message only you can see",
+            TimerTargetDirectMessage = "by direct message",
+            TimerTargetDirectMessageFallback = "by direct message (the bot cannot write here)",
+
+            AttackEstimationsTitle = day => $"Estimates for day {day}",
+            AttackCalculated = (day, min, max) => $"*Calculated attack D{day}*: {min} - {max}",
+            AttackPlannerField = day => $"Predictor D{day}",
+            AttackEstimationField = day => $"Estimate D{day}",
+            AttackSentByDirectMessage = "Estimates sent by direct message",
+            AttackError = error => $"An error occurred while retrieving the estimates\n```{error}```",
+
+            InstructionsDraftNotFound = "The instructions draft cannot be found: run the /instructions command again.",
+            InstructionsMaxSections = "Cannot add a section: Discord limits a message to 25 sections.",
+            InstructionsAddTitle = "Add a title",
+            InstructionsUpdateTitle = "Edit the title",
+            InstructionsAddDescription = "Add a description",
+            InstructionsUpdateDescription = "Edit the description",
+            InstructionsAddSection = "Add a section",
+            InstructionsAddSectionLimitReached = "Add a section (limit reached)",
+            InstructionsPublish = "Publish the instructions",
+            InstructionsPublishError = error => $"The instructions could not be published\n```{error}```",
+            InstructionsTitleEmpty = "The title cannot be empty.",
+            InstructionsDescriptionEmpty = "The description cannot be empty.",
+            InstructionsSectionEmpty = "A section's title and content cannot be empty.",
+            InstructionsTooLong = (length, max) => $"Change refused: the instructions would contain {length} characters, above Discord's "
+                                                   + $"limit of {max} (title, description and sections included).",
+            InstructionsFull = (element, max) => $"Cannot add {element}: the instructions have reached Discord's limit of "
+                                                 + $"{max} characters (title, description and sections included).",
+            InstructionsElementTitle = "a title",
+            InstructionsElementDescription = "a description",
+            InstructionsElementSection = "a section",
+            InstructionsTitleLabel = "Title",
+            InstructionsDescriptionLabel = "Description",
+            InstructionsSectionTitleLabel = "Section title",
+            InstructionsSectionContentLabel = "Section content",
+
+            FeedbackSuggestionModalTitle = "Send a suggestion",
+            FeedbackSuggestionTitleLabel = "Suggestion title",
+            FeedbackSuggestionDetailsLabel = "Suggestion details",
+            FeedbackSuggestionPosted = "The suggestion has been posted",
+            FeedbackBugModalTitle = "Report a bug",
+            FeedbackBugTitleLabel = "Bug title",
+            FeedbackBugDetailsLabel = "Bug details",
+            FeedbackBugPosted = "The bug has been reported",
+
+            FaqGoToWebsite = "Go to the website",
+            FaqGoToTutorial = "Go to the tutorial",
+            FaqChromeExtension = "Chrome extension",
+            FaqFirefoxExtension = "Firefox extension",
+            FaqInstallScript = "Install the script",
+            FaqGhoulTitle = "Chances of becoming a ghoul",
+            FaqMseTitle = "Effects of an Unlabelled Drug",
+            FaqValueLine = (label, percent) => $"{label}: {percent}%",
+            ItemMeatyBone = "Meaty Bone",
+            ItemFleshroomPuree = "Fleshroom Puree",
+            ItemHumanFlesh = "Human Flesh",
+            ItemTravellersCorpse = "Traveller's Corpse",
+            FaqMseGivesAp = actionPoints => $"Gives {actionPoints} AP",
+            FaqMseGivesApAndAddiction = actionPoints => $"Gives {actionPoints} AP + addiction",
+            FaqMseTerrorises = "Terrorises",
+            FaqMseNoEffect = "No effect",
+            FaqCampingTitle = "Camping survival chances",
+            CheatBold = "bold",
+            CheatItalic = "italic",
+            CheatUnderline = "underline",
+            CheatStrikethrough = "strikethrough",
+            CheatSpoiler = "spoiler",
+            CheatCode = "inline code",
+            CheatQuote = "quote",
+            CheatMultilineCode = "code block\non several lines",
+            CheatMultilineQuote = "Quote\non several lines",
+            CheatMaskedLink = "Masked link",
+            CheatBigTitle = "Big title",
+            CheatMediumTitle = "Medium title",
+            CheatSmallTitle = "Small title",
+            CheatSmallText = "Small text",
+            CheatBulletList = "Bullet list",
+            CheatOrderedList = "Ordered list",
+            CheatLevel = level => $"Level {level}",
+            CheatSpacesHint = "(each ⋅ stands for a space)",
+
+            GlossaryNoMatch = searchValue => $"No match found for {searchValue}",
+
+            RecipeError = error => $"An error occurred while retrieving the item\n```{error}```",
+            RecipeNoResult = "No result found",
+            RecipeTruncated = count => count > 1
+                ? $"Results truncated: {count} recipes not shown"
+                : $"Results truncated: {count} recipe not shown",
+            RecipeComponents = "Components",
+            RecipeResults = "Results",
+
+            TranslateSearchExpired = "This search has expired: run the /translate command again to browse its results.",
+            TranslateSentByDirectMessage = "The translations will be sent by direct message",
+            TranslateNoResult = searchValue => $"No translation found for {searchValue}",
+            TranslateError = error => $"An error occurred while retrieving the translations\n```{error}```",
+            TranslatePrevious = "Previous",
+            TranslateNext = "Next",
+
+            PlayRock = "Rock",
+            PlayPaper = "Paper",
+            PlayScissors = "Scissors",
+            PlayHeads = "Heads",
+            PlayTails = "Tails",
+            PlayCardRanks = new[] { "Ace", "King", "Queen", "Jack", "10", "9", "8", "7", "6", "5", "4", "3", "2" },
+            PlayCardSuits = new[] { "Hearts", "Clubs", "Diamonds", "Spades" },
+            PlayCard = (rank, suit) => $"{rank} of {suit}"
+        };
+    }
+}

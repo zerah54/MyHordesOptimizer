@@ -1,26 +1,11 @@
-$primary: var(--primary);
-$secondary: var(--secondary);
-$tertiary: var(--tertiary);
+/// Ce fichier ne sert plus qu'à la rose des vents : elle dessine ses pointes avec des `border-color`
+/// à quatre valeurs. Ses six couleurs sont des jetons de chaque famille (`compass-*`, dans
+/// `_mho-tokens.scss`). Le pont vers les anciennes variables (`$primary`, `$item-color`,
+/// `$scrollbar-*`…) a disparu avec ses derniers lecteurs : tout le reste est passé aux jetons `--mho-*`.
+$compass-center-color: var(--mho-compass-off-center);
+$compass-cardinals-color: var(--mho-compass-off-card);
+$compass-ordinals-color: var(--mho-compass-off-diag);
 
-$sidenav_bg_color: var(--sidenav-bg-color);
-$item_color: var(--item-color);
-$map-details-color: var(--map-details-color);
-$card-background-color: var(--card-background-color);
-$switch-selected-accent-icon-color: var(--switch-selected-accent-icon-color);
-
-$compass-center-color: var(--compass-center-color);
-$compass-cardinals-color: var(--compass-cardinals-color);
-$compass-ordinals-color: var(--compass-ordinals-color);
-
-$compass-selected-center-color: var(--compass-selected-center-color);
-$compass-selected-cardinals-color: var(--compass-selected-cardinals-color);
-$compass-selected-ordinals-color: var(--compass-selected-ordinals-color);
-
-$scrollbar-base-color: var(--scrollbar-base-color);
-$scrollbar-hover-color: var(--scrollbar-hover-color);
-$scrollbar-active-color: var(--scrollbar-active-color);
-
-$inactive-chip-base-color: var(--inactive-chip-base-color);
-$img-shadow-color: var(--img-shadow-color);
-
-$accented-background-color: var(--accented-background-color);
+$compass-selected-center-color: var(--mho-compass-on-center);
+$compass-selected-cardinals-color: var(--mho-compass-on-card);
+$compass-selected-ordinals-color: var(--mho-compass-on-diag);

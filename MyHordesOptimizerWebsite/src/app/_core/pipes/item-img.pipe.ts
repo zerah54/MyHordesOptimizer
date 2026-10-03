@@ -21,6 +21,8 @@ export class ItemImgPipe implements PipeTransform {
         if (!item) {
             return '';
         }
-        return is_broken && item.img_broken ? item.img_broken : item.img;
+        // L'import MyHordes peut créer des objets vides, sans icône : mieux vaut ne rien
+        // afficher qu'une image cassée par ligne.
+        return (is_broken && item.img_broken ? item.img_broken : item.img) ?? '';
     }
 }

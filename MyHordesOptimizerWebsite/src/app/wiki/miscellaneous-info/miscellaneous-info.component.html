@@ -1,17 +1,16 @@
-<mat-card-header>
-    <mat-card-title i18n>Informations diverses</mat-card-title>
-</mat-card-header>
-<mat-card-content class="mho-miscellaneous-info">
+<div class="mho-miscellaneous-info">
     <div class="container">
-        @for (misc_card of misc; track misc_card) {
+        @for (misc_card of misc; track misc_card.header) {
             <mat-card class="card">
                 <mat-card-header class="card-header">
-                    <mat-card-title>
-                        {{ misc_card.header }}
-                    </mat-card-title>
+                    <mat-card-title>{{ misc_card.header }}</mat-card-title>
+                    @if (misc_card.description) {
+                        <mat-card-subtitle>{{ misc_card.description }}</mat-card-subtitle>
+                    }
                     @if (misc_card.header_action) {
-                        <button mat-icon-button type="button" (click)="misc_card.header_action.action()">
+                        <button mat-stroked-button type="button" (click)="misc_card.header_action.action()">
                             <mat-icon>{{ misc_card.header_action.icon }}</mat-icon>
+                            {{ misc_card.header_action.label }}
                         </button>
                     }
                 </mat-card-header>
@@ -28,4 +27,4 @@
             </mat-card>
         }
     </div>
-</mat-card-content>
+</div>

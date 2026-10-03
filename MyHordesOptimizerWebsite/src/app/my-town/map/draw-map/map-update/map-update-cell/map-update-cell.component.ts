@@ -34,6 +34,7 @@ import { ArrayItemDetailsPipe } from '../../../../../_core/pipes/array-item-deta
 import { ItemDetailsPipe } from '../../../../../_core/pipes/item-details.pipe';
 import { ItemImgPipe } from '../../../../../_core/pipes/item-img.pipe';
 import { LastUpdateComponent } from '../../../../../_shared/last-update/last-update.component';
+import { DIG_LEVELS, DigLevelInfo } from '../../map-cell/pipes/dig-level.pipe';
 import { ItemsInBagsPipe } from './items-in-bags.pipe';
 
 const angular_common: Imports = [CommonModule, FormsModule, NgOptimizedImage, ReactiveFormsModule];
@@ -62,6 +63,8 @@ export class MapUpdateCellComponent implements OnInit {
         { key: 'east', label: Direction.EAST.getLabel() },
         { key: 'south', label: Direction.SOUTH.getLabel() }
     ];
+    /** Niveaux d'abondance du fouineur, avec les libellés du jeu */
+    protected readonly dig_levels: readonly DigLevelInfo[] = DIG_LEVELS;
     protected readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
     protected readonly locale: string = moment.locale();
     private readonly fb: FormBuilder = inject(FormBuilder);

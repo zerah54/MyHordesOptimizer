@@ -1,7 +1,7 @@
 @if (citizen(); as citizen) {
     <div mat-menu-item class="pseudo" disabled>
         <div>
-            <mho-avatar [src]="citizen.avatar"></mho-avatar>
+            <mho-avatar [size]="40" [src]="citizen.avatar"></mho-avatar>
             <mho-citizen-info displayJob displayShunStatus [displayPseudoMode]="'simple'" [citizen]="citizen"></mho-citizen-info>
         </div>
     </div>

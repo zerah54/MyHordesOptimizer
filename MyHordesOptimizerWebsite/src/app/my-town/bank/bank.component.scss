@@ -1,5 +1,3 @@
-@use 'variables';
-
 :host {
     display: contents;
 
@@ -12,28 +10,61 @@
         display: flex;
         flex-direction: column;
 
-        ul {
-            padding: 0;
-            margin-top: 0;
+        /* Mode détaillé : grille d'objets à gauche, fiche à droite — même maître/détail
+           que le mode condensé. Auparavant, déplier une fiche au milieu de la grille
+           repoussait tous les objets suivants vers le bas. */
+        .detailed {
             flex: 1;
-            overflow: auto;
+            min-height: 0;
+            display: flex;
+            align-items: stretch;
+            gap: 1em;
+
+            > ul {
+                flex: 1;
+                min-width: 0;
+                padding: 0;
+                margin: 0;
+                overflow: auto;
+            }
+
+            > .detail {
+                width: 366px;
+                flex-shrink: 0;
+                overflow: auto;
+            }
 
             .category {
                 > h2 {
                     margin: 0.5em 0;
+                    font-family: var(--mho-font-display);
+                    font-size: 15px;
+                    font-weight: 600;
                 }
 
+                /* Grille plutôt que flex-wrap : des tuiles de largeur égale, alignées en colonnes. */
                 > .items {
-                    display: flex;
-                    flex-wrap: wrap;
-                    gap: 0.25em;
+                    display: grid;
+                    grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+                    gap: 0.5em;
                 }
             }
         }
 
+        .detail-empty {
+            margin: 0;
+            padding: 1.5em 1em;
+            text-align: center;
+            font-size: 13px;
+            color: var(--mho-text-muted);
+        }
+
+        /* `baseline` alignait la ligne de texte du premier champ sur celle du second, dont la
+           structure diffère (un `mho-select` n'a pas d'`input`) : les deux cadres se retrouvaient
+           décalés de 2 px. Même hauteur de champ, alignement au centre. */
         .filter {
             display: flex;
-            align-items: baseline;
+            align-items: center;
             gap: 0.5em;
             flex-wrap: wrap;
 
@@ -51,17 +82,23 @@
             gap: 1em;
 
             .bank {
-                width: 240px;
+                width: 264px;
                 padding: 0.5em;
-                border: 1px solid variables.$item_color;
+                border-radius: var(--mho-radius-m);
+                background: var(--mho-surface-2);
+                border: 1px solid var(--mho-line);
 
+                /* Disposition reprise telle quelle de la banque du jeu : colonne étroite,
+                   petites capitales, icônes à leur taille native. Seules les couleurs changent. */
                 .category {
                     > h2 {
-                        font-size: 10px;
+                        font-size: 10.5px;
                         line-height: 14px;
                         font-weight: 700;
                         margin: 2px;
                         font-variant: small-caps;
+                        letter-spacing: 0.04em;
+                        color: var(--mho-text-muted);
                     }
                 }
 
@@ -82,8 +119,10 @@
                         display: inline-flex;
                         align-items: center;
 
+                        border-radius: 4px;
+
                         &.broken {
-                            border: 1px dotted red;
+                            border: 1px dotted var(--mho-danger);
                         }
 
                         > img {
@@ -97,8 +136,8 @@
                         }
 
                         &:hover {
-                            border-color: variables.$primary;
-                            background-color: variables.$item_color;
+                            border-color: var(--mho-accent);
+                            background-color: var(--mho-accent-soft);
                         }
                     }
                 }

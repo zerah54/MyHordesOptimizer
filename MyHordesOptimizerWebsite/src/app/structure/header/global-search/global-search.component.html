@@ -1,0 +1,142 @@
+@if (compact() && !expanded()) {
+    <button mat-icon-button type="button" class="open-button" (click)="openCompact()"
+            i18n-aria-label aria-label="Rechercher" aria-keyshortcuts="/ Control+K">
+        <mat-icon>search</mat-icon>
+    </button>
+} @else {
+    <div class="field" cdkOverlayOrigin #origin="cdkOverlayOrigin">
+        @if (compact()) {
+            <!-- Petit écran : la barre de recherche recouvre l'en-tête, ce bouton la referme. -->
+            <button type="button" class="field-button" (click)="expanded.set(false)"
+                    i18n-aria-label aria-label="Fermer la recherche">
+                <mat-icon>arrow_back</mat-icon>
+            </button>
+        } @else {
+            <mat-icon class="lead" aria-hidden="true">search</mat-icon>
+        }
+        <input #input class="input" type="text" role="combobox" autocomplete="off" spellcheck="false" enterkeyhint="go"
+               aria-autocomplete="list" aria-haspopup="listbox" aria-keyshortcuts="/ Control+K"
+               i18n-placeholder placeholder="Rechercher…"
+               i18n-aria-label aria-label="Rechercher une page, un objet, un chantier, un bâtiment, un citoyen, un joueur ou une ville"
+               [attr.aria-expanded]="listbox_open()"
+               [attr.aria-controls]="listbox_open() ? listbox_id : null"
+               [attr.aria-activedescendant]="active_id()"
+               [value]="query()"
+               (input)="onInput($event)" (focus)="onFocus()" (blur)="onBlur()" (keydown)="onKeydown($event)">
+        @if (query() !== '') {
+            <!-- mousedown neutralisé : le champ garde le focus, la liste reste ouverte. -->
+            <button type="button" class="field-button" (mousedown)="$event.preventDefault()" (click)="clear()"
+                    i18n-aria-label aria-label="Effacer la recherche">
+                <mat-icon>close</mat-icon>
+            </button>
+        } @else if (!focused() && !compact()) {
+            <kbd class="kbd" aria-hidden="true">/</kbd>
+        }
+    </div>
+
+    <!-- État annoncé aux lecteurs d'écran : le nombre de résultats change à chaque frappe. -->
+    <span class="mho-visually-hidden" role="status">
+        @if (panel_open()) {
+            @if (options_count() > 0) {
+                <ng-container i18n>{options_count(), plural, =1 {1 résultat} other {{{ options_count() }} résultats}}</ng-container>
+            } @else if (!loading() && !directory_loading()) {
+                <ng-container i18n>Aucun résultat</ng-container>
+            }
+        }
+    </span>
+
+    <ng-template cdkConnectedOverlay
+                 [cdkConnectedOverlayOrigin]="origin"
+                 [cdkConnectedOverlayOpen]="panel_open()"
+                 [cdkConnectedOverlayPositions]="positions"
+                 [cdkConnectedOverlayViewportMargin]="8"
+                 [cdkConnectedOverlayDisableClose]="true"
+                 cdkConnectedOverlayPanelClass="mho-global-search-pane">
+        <!-- mousedown neutralisé sur tout le panneau (options, intitulés, barre de défilement) : le
+             champ garde le focus, sans quoi le premier clic fermerait la liste avant d'agir. -->
+        <div class="panel" [class.is-compact]="compact()" (mousedown)="$event.preventDefault()">
+            @if (glossary_notes().length > 0) {
+                <!-- Sigle du glossaire saisi en entier : ses définitions sont aussi cherchées. -->
+                <div class="glossary">
+                    @for (note of glossary_notes(); track note.definition) {
+                        <p class="glossary-note">
+                            <mat-icon aria-hidden="true">menu_book</mat-icon>
+                            <strong>{{ note.word }}</strong>&nbsp;: {{ note.definition }}
+                        </p>
+                    }
+                </div>
+            }
+            @if (options_count() > 0) {
+                <div class="results" role="listbox" [id]="listbox_id" i18n-aria-label aria-label="Résultats de la recherche">
+                    @for (group of groups(); track group.id) {
+                        <div class="group" role="group" [attr.aria-labelledby]="group.header_id">
+                            <div class="group-title" [id]="group.header_id">
+                                <span>{{ group.label }}</span>
+                                @if (group.total > group.shown) {
+                                    @if (group.expandable) {
+                                        <!-- Raccourci à la souris ; au clavier, la ligne « afficher » du groupe fait la même chose. -->
+                                        <span class="count is-link mho-num" aria-hidden="true"
+                                              (click)="expand(group.id)">{{ group.shown }}&nbsp;/&nbsp;{{ group.total }}</span>
+                                    } @else {
+                                        <span class="count mho-num">{{ group.shown }}&nbsp;/&nbsp;{{ group.total }}</span>
+                                    }
+                                }
+                            </div>
+                            @for (option of group.options; track option.key) {
+                                <div class="option" role="option" [id]="option.id"
+                                     [class.is-active]="option.index === active()?.index"
+                                     [class.is-more]="option.kind === 'more'"
+                                     [attr.aria-selected]="option.index === active()?.index"
+                                     (mouseenter)="activate(option.index)" (click)="choose(option)">
+                                    @if (option.kind === 'entry') {
+                                        <span class="well" aria-hidden="true">
+                                            @if (option.entry.avatar) {
+                                                <mho-avatar [src]="option.entry.avatar" [size]="28" rounded></mho-avatar>
+                                            } @else if (option.entry.img) {
+                                                <img [src]="HORDES_IMG_REPO + option.entry.img" alt="">
+                                            } @else {
+                                                <mat-icon>{{ option.entry.symbol }}</mat-icon>
+                                            }
+                                        </span>
+                                        <span class="text">
+                                            <span class="label">{{ option.entry.label }}</span>
+                                            @if (option.entry.context) {
+                                                <span class="context">{{ option.entry.context }}</span>
+                                            }
+                                        </span>
+                                    } @else {
+                                        <span class="well" aria-hidden="true"><mat-icon>expand_more</mat-icon></span>
+                                        <span class="text">
+                                            <span class="label"
+                                                  i18n>{option.count, plural, =1 {Afficher 1 résultat de plus} other {Afficher {{ option.count }} résultats de plus}}</span>
+                                        </span>
+                                    }
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+                @for (truncated of truncated_groups(); track truncated.label) {
+                    <p class="note" i18n>{{ truncated.label }} : {{ truncated.shown }} premiers résultats sur {{ truncated.total }}, précisez la recherche pour
+                        voir les autres.</p>
+                }
+                @if (loading()) {
+                    <p class="note" i18n>Chargement des données…</p>
+                } @else if (directory_loading()) {
+                    <p class="note" i18n>Recherche des joueurs et des villes…</p>
+                }
+            } @else if (loading() || directory_loading()) {
+                <p class="note" i18n>Chargement…</p>
+            } @else {
+                <p class="note">
+                    <ng-container i18n>Aucun résultat pour</ng-container>&nbsp;« {{ query().trim() }} »
+                </p>
+            }
+            <div class="hints" aria-hidden="true">
+                <span><kbd>↑</kbd><kbd>↓</kbd>&nbsp;<ng-container i18n>naviguer</ng-container></span>
+                <span><kbd i18n>Entrée</kbd>&nbsp;<ng-container i18n>ouvrir</ng-container></span>
+                <span><kbd i18n>Échap</kbd>&nbsp;<ng-container i18n>fermer</ng-container></span>
+            </div>
+        </div>
+    </ng-template>
+}

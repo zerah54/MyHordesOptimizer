@@ -1,84 +1,304 @@
-@use 'variables';
-
 :host {
     display: contents;
+
     .mho-probabilities-header {
         display: flex;
         flex-direction: row;
         gap: 1em;
         justify-content: space-between;
         align-items: center;
-    }
 
-    .mho-probabilities {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 2em;
-        justify-content: space-between;
-
-        > div {
-            flex: 1;
-        }
-
-        .header,
-        .chances {
+        .actions {
             display: flex;
             align-items: center;
-            gap: 0.5em;
+            gap: 10px;
         }
+    }
 
-        .header {
+    /* Une carte par simulation : elles se comparent côte à côte, sans se confondre. */
+    .mho-probabilities {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+        align-items: start;
+        gap: 18px;
+    }
 
-            > div {
-                display: flex;
-                align-items: center;
-                gap: 1em;
+    .simulation {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        padding: 12px 16px 16px;
+        background: var(--mho-surface);
+        border: 1px solid var(--mho-line);
+        border-radius: var(--mho-radius-l);
 
-                h3 {
-                    margin: 0;
-                    display: flex;
-                    align-items: center;
-                }
+        .simulation-header {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+
+            .simulation-title {
+                margin: 0;
+                font-family: var(--mho-font-display);
+                font-size: 15px;
+                font-weight: 600;
+                cursor: text;
             }
 
+            .title-field {
+                flex-grow: 1;
+                max-width: 280px;
+            }
+
+            .spacer {
+                flex-grow: 1;
+            }
+        }
+
+        /* Trois chiffres qui répondent à ce qu'on vient chercher, avant le tableau. */
+        .kpis {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 10px;
+
+            .kpi {
+                display: flex;
+                flex-direction: column;
+                gap: 2px;
+                padding: 10px 12px;
+                border-radius: var(--mho-radius-m);
+                background: var(--mho-surface-2);
+                border: 1px solid var(--mho-line);
+
+                .kpi-value {
+                    font-family: var(--mho-font-display);
+                    font-size: 20px;
+                    font-weight: 700;
+                    line-height: 1.1;
+                    font-variant-numeric: tabular-nums;
+
+                    small {
+                        font-family: var(--mho-font-body);
+                        font-size: 12px;
+                        font-weight: 500;
+                        color: var(--mho-text-muted);
+                    }
+                }
+
+                .kpi-sub {
+                    font-size: 12px;
+                    color: var(--mho-text-muted);
+                    font-variant-numeric: tabular-nums;
+                }
+            }
         }
 
         .content {
             display: flex;
-            gap: 0.5em;
-            align-items: baseline;
-
-            .chances {
-                min-width: 100px;
-                justify-content: left;
-                flex: 1;
-                align-items: start;
-                flex-wrap: wrap;
-            }
-
-            .results {
-                border: 1px solid variables.$primary;
-                border-radius: 0.25em;
-                background-color: variables.$item_color;
-            }
+            align-items: stretch;
+            gap: 16px;
         }
 
-        table {
+        /* Histogramme : la forme de la distribution, que la colonne de nombres ne montre pas. */
+        .histogram {
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            gap: 2px;
+            height: 150px;
+            padding-bottom: 16px;
+            position: relative;
 
-            th,
-            td {
-                padding: 0.25em;
-            }
+            .bar-slot {
+                flex: 1 1 0;
+                /* Deux issues seulement (une personne) donneraient deux blocs d'un demi-écran :
+                   la barre se borne, la rangée se centre. */
+                max-width: 56px;
+                min-width: 0;
+                height: 100%;
+                display: flex;
+                flex-direction: column;
+                justify-content: flex-end;
+                position: relative;
 
-            tbody {
-                td {
-                    text-align: right;
+                .bar {
+                    border-radius: 3px 3px 0 0;
+                    background: var(--mho-accent);
+                    opacity: 0.85;
+                }
+
+                /* Issue la plus probable : teinte distincte ET chiffre en gras, pour ne pas
+                   reposer sur la seule couleur. */
+                &.peak .bar {
+                    background: var(--mho-accent-2);
+                    opacity: 1;
+                }
+
+                &.peak .bar-label {
+                    font-weight: 700;
+                    color: var(--mho-text);
+                }
+
+                .bar-label {
+                    position: absolute;
+                    bottom: -16px;
+                    left: 0;
+                    right: 0;
+                    text-align: center;
+                    font-size: 10px;
+                    color: var(--mho-text-muted);
+                    font-variant-numeric: tabular-nums;
+                    overflow: hidden;
                 }
             }
         }
 
-        .mat-mdc-form-field.surviving-chance {
-            width: 175px;
+        .results {
+            flex-shrink: 0;
+            max-height: 220px;
+            overflow: auto;
+            border: 1px solid var(--mho-line);
+            border-radius: var(--mho-radius-m);
+            background-color: var(--mho-surface-2);
+
+            table {
+                border-collapse: collapse;
+
+                th,
+                td {
+                    padding: 3px 10px;
+                    font-variant-numeric: tabular-nums;
+                }
+
+                thead th {
+                    position: sticky;
+                    top: 0;
+                    background: var(--mho-surface-2);
+                    font-size: 11px;
+                    font-weight: 600;
+                    letter-spacing: 0.04em;
+                    text-transform: uppercase;
+                    color: var(--mho-text-muted);
+                    white-space: nowrap;
+                }
+
+                tbody {
+                    td {
+                        text-align: right;
+                    }
+
+                    tr.peak {
+                        background: var(--mho-accent-soft);
+                        font-weight: 700;
+                    }
+                }
+
+                tfoot th {
+                    position: sticky;
+                    bottom: 0;
+                    background: var(--mho-surface-2);
+                    border-top: 1px solid var(--mho-line);
+                    white-space: nowrap;
+                }
+            }
+        }
+
+        .chances-block {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding-top: 12px;
+            border-top: 1px solid var(--mho-line);
+
+            .chances-head {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 10px;
+
+                .chances-title {
+                    font-size: 11px;
+                    font-weight: 700;
+                    letter-spacing: 0.06em;
+                    text-transform: uppercase;
+                    color: var(--mho-text-muted);
+                }
+
+                /* Le nombre de personnes se lit, il ne se saisit plus : on ajoute et on retire
+                   dans la liste elle-même. */
+                .people-count {
+                    font-variant-numeric: tabular-nums;
+                    font-weight: 600;
+                    color: var(--mho-text);
+                }
+            }
+
+            /* Grille auto-ajustée : quarante champs en ligne débordaient, en colonne ils
+               allongeaient la page. */
+            .chances {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(164px, 1fr));
+                gap: 8px;
+                align-items: center;
+
+                .person {
+                    display: flex;
+                    align-items: center;
+                    gap: 2px;
+
+                    .surviving-chance {
+                        flex: 1;
+                        min-width: 0;
+                    }
+
+                    /* Discrète tant qu'on ne la cherche pas : c'est une action destructive posée
+                       à côté de quarante champs. */
+                    .remove-person {
+                        --mdc-icon-button-state-layer-size: 28px;
+
+                        flex-shrink: 0;
+                        width: 28px;
+                        height: 28px;
+                        padding: 0;
+                        opacity: 0.55;
+
+                        .mat-icon {
+                            font-size: 17px;
+                            width: 17px;
+                            height: 17px;
+                        }
+
+                        &:hover:not(:disabled) {
+                            opacity: 1;
+                            color: var(--mho-danger);
+                        }
+                    }
+                }
+
+                .add-person {
+                    height: 40px;
+                }
+            }
+        }
+    }
+
+    /* Sous 900 px, l'histogramme passe au-dessus du tableau : côte à côte, aucun des deux
+       n'est lisible. */
+    @media (max-width: 899px) {
+        .mho-probabilities .simulation {
+            .content {
+                flex-direction: column;
+            }
+
+            .kpis {
+                grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            }
+
+            .results {
+                max-height: 200px;
+            }
         }
     }
 }

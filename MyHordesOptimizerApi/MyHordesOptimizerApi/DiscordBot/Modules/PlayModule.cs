@@ -3,8 +3,8 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Interactions;
+using MyHordesOptimizerApi.DiscordBot.Localization;
 using MyHordesOptimizerApi.DiscordBot.Utility;
-using MyHordesOptimizerApi.Extensions;
 
 namespace MyHordesOptimizerApi.DiscordBot.Modules
 {
@@ -18,7 +18,9 @@ namespace MyHordesOptimizerApi.DiscordBot.Modules
             string text
             )
         {
-            var result = Regex.Replace(text, @"(\{\w+\})", match => GetReplacement(match.ToString()));
+            // Résultats (pierre, pile, cartes) dans la langue de l'auteur de la commande
+            BotTexts texts = Context.Interaction.Texts();
+            var result = Regex.Replace(text, @"(\{\w+\})", match => GetReplacement(match.ToString(), texts));
 
             var embedBuilder = new EmbedBuilder()
                 .WithAuthor(Context.User)
@@ -33,28 +35,23 @@ namespace MyHordesOptimizerApi.DiscordBot.Modules
             return random.Next(1, value + 1).ToString();
         }
 
-        private static string RollPfc()
+        private static string RollPfc(BotTexts texts)
         {
-            var values = Enum.GetValues(typeof(DiscordBotGamesValues.PFC));
-            var random = new Random();
-            var randomValue = values.GetValue(random.Next(values.Length)).ToString();
-            return randomValue;
+            string[] values = { texts.PlayRock, texts.PlayPaper, texts.PlayScissors };
+            return values[Random.Shared.Next(values.Length)];
         }
 
-        private static string RollPf()
+        private static string RollPf(BotTexts texts)
         {
-            var values = Enum.GetValues(typeof(DiscordBotGamesValues.PF));
-            var random = new Random();
-            var randomValue = values.GetValue(random.Next(values.Length)).ToString();
-            return randomValue;
+            return Random.Shared.Next(2) == 0 ? texts.PlayHeads : texts.PlayTails;
         }
 
-        private static string RollCards()
+        /// <summary>Une carte d'un jeu de 52 : valeur et couleur tirées indépendamment, chaque carte est équiprobable.</summary>
+        private static string RollCards(BotTexts texts)
         {
-            var values = Enum.GetValues(typeof(DiscordBotGamesValues.Cards));
-            var random = new Random();
-            var randomValue = values.GetValue(random.Next(values.Length));
-            return ((DiscordBotGamesValues.Cards)randomValue).GetDescription();
+            string rank = texts.PlayCardRanks[Random.Shared.Next(texts.PlayCardRanks.Count)];
+            string suit = texts.PlayCardSuits[Random.Shared.Next(texts.PlayCardSuits.Count)];
+            return texts.PlayCard(rank, suit);
         }
 
         private static string RollLetter()
@@ -81,7 +78,7 @@ namespace MyHordesOptimizerApi.DiscordBot.Modules
             return randomValue.ToLower();
         }
 
-        private static string GetReplacement(string text)
+        private static string GetReplacement(string text, BotTexts texts)
         {
             switch (text.ToLower())
             {
@@ -145,7 +142,7 @@ namespace MyHordesOptimizerApi.DiscordBot.Modules
                 case "{rps}":
                 case "{ssp}":
                 case "{ppt}":
-                    return $" `{RollPfc()}` ";
+                    return $" `{RollPfc(texts)}` ";
                 case "{flip}":
                 case "{coin}":
                 case "{ht}":
@@ -153,14 +150,14 @@ namespace MyHordesOptimizerApi.DiscordBot.Modules
                 case "{mw}":
                 case "{moneda}":
                 case "{zk}":
-                    return $" `{RollPf()}` ";
+                    return $" `{RollPf(texts)}` ";
                 case "{carte}":
                 case "{card}":
                 case "{skat}":
                 case "{blatt}":
                 case "{carta}":
                 case "{karte}":
-                    return $" `{RollCards()}` ";
+                    return $" `{RollCards(texts)}` ";
                 case "{letter}":
                 case "{lettre}":
                 case "{letra}":

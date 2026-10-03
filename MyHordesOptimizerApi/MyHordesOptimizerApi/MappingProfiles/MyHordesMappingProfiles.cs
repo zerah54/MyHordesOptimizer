@@ -34,6 +34,7 @@ namespace MyHordesOptimizerApi.MappingProfiles
 
             CreateMap<MyHordesUserDetailsDto, SimpleMeTownDetailDto>()
                 .ForMember(dest => dest.TownId, opt => { opt.MapFrom(src => src.Map.Id); opt.Condition(src => src.Map != null); })
+                .ForMember(dest => dest.TownName, opt => { opt.MapFrom(src => src.Map.City.Name); opt.Condition(src => src.Map != null && src.Map.City != null); })
                 .ForMember(dest => dest.TownX, opt => { opt.MapFrom(src => src.Map.City.X); opt.Condition(src => src.Map != null && src.Map.City != null); })
                 .ForMember(dest => dest.TownY, opt => { opt.MapFrom(src => src.Map.City.Y); opt.Condition(src => src.Map != null && src.Map.City != null); })
                 .ForMember(dest => dest.TownMaxX, opt => { opt.MapFrom(src => src.Map.Wid); opt.Condition(src => src.Map != null); })

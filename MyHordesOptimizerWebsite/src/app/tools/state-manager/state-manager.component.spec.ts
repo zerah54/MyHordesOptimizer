@@ -379,22 +379,37 @@ describe('StateManagerComponent', (): void => {
         expect(component['canPickupDefenceCpItem']()).toBe(false);
     });
 
-    it('canMove est faux à 0 PA/0 PE sans objet en sac, vrai si le sac contient un objet', (): void => {
-        // compute() explicite : reflète le binding réel du stepper ((valueChange)="ap = $event; compute()"),
-        // currentState() lit computed_starting_state (calculé serveur) et non les champs bruts.
+    /** Fixe les PA/PE du serveur simulé : currentState() lit computed_starting_state, pas les champs bruts ap/sp. */
+    function givenPoints(ap: number, sp: number): void {
         state_service.simulate.mockReturnValue(of(new CitizenStateTrace({
-            startingState: { ap: 0, sp: 0, wounded: false, isEclaireur: false, hasBike: false, hasShoes: false, walkingDistance: 0, isDead: false, statuses: [] },
+            startingState: { ap, sp, wounded: false, isEclaireur: false, hasBike: false, hasShoes: false, walkingDistance: 0, isDead: false, statuses: [] },
             steps: []
         })));
-        component['ap'] = 0;
-        component['sp'] = 0;
+        component['ap'] = ap;
+        component['sp'] = sp;
         component['compute']();
+    }
 
-        expect(component['canMove']()).toBe(false);
-
+    it('canMove est faux à 0 PA/0 PE, même si le sac contient un objet (il faut le consommer d\'abord)', (): void => {
+        givenPoints(0, 0);
         component['starting_bag'] = [buildItem(1, 'water_#00')];
 
-        expect(component['canMove']()).toBe(true);
+        expect(component['canMove'](true)).toBe(false);
+        expect(component['canMove'](false)).toBe(false);
+    });
+
+    it('canMove en zone proche exige des PA : les PE ne se substituent pas (DeductWithFallback plafonne les PA à 0)', (): void => {
+        givenPoints(0, 2);
+
+        expect(component['canMove'](true)).toBe(false);
+        expect(component['canMove'](false)).toBe(true);
+    });
+
+    it('canMove en zone lointaine est vrai avec des PA seuls (repli sur les PA)', (): void => {
+        givenPoints(1, 0);
+
+        expect(component['canMove'](true)).toBe(true);
+        expect(component['canMove'](false)).toBe(true);
     });
 
     it('orderedRemainingBag trie le sac restant selon best_order', (): void => {

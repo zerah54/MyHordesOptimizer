@@ -1,5 +1,3 @@
-@use 'variables';
-
 :host {
     display: contents;
 
@@ -52,8 +50,10 @@
                     .mat-mdc-icon-button {
                         --mat-icon-button-icon-size: 16;
 
+                        /* Bouton actif : fond ET contour, pour ne pas dépendre de la seule couleur. */
                         &.active {
-                            background-color: variables.$item_color;
+                            background-color: var(--mho-accent-soft);
+                            box-shadow: inset 0 0 0 1px var(--mho-accent);
                         }
                     }
                 }

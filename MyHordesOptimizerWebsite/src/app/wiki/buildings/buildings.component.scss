@@ -1,23 +1,15 @@
 :host {
     display: contents;
-
-    .mho-buildings-header {
-        justify-content: space-between;
-
-        .actions {
-            display: flex;
-            flex-direction: row;
-            align-items: center;
-        }
-    }
 }
 
 .mho-buildings {
     // La page occupe la hauteur disponible et ne la dépasse pas : c'est le TABLEAU qui défile,
     // pas la fenêtre. Sans ça, 166 lignes poussent l'en-tête collant hors de vue et la carte
-    // s'étire bien au-delà de l'écran.
+    // s'étire bien au-delà de l'écran. La hauteur vient maintenant du panneau d'onglets du wiki,
+    // la page n'étant plus une `mat-card-content`.
     display: flex;
     flex-direction: column;
+    height: 100%;
     min-height: 0;
 
     .table-scroll {
@@ -30,6 +22,20 @@
         width: 100%;
     }
 
+    // Lignes de 40 px (maquette), contre 46 pour les tableaux du site : 166 lignes à parcourir.
+    // Plus de marge verticale dans les cellules : la hauteur de ligne centre le contenu, et les
+    // traits de rattachement courent d'une ligne à l'autre au lieu de s'arrêter à la marge.
+    // Les colonnes « select » et « label » sont collantes (`sticky` sur leur `matColumnDef`) : leur
+    // fond opaque et la teinte de la ligne cochée viennent de `tables.scss`.
+    .mat-mdc-row {
+        height: 40px;
+    }
+
+    .mat-mdc-cell {
+        padding-top: 0;
+        padding-bottom: 0;
+    }
+
     .center {
         text-align: center;
     }
@@ -38,20 +44,38 @@
         display: flex;
         align-items: center;
         gap: 0.4em;
+        // 40 px moins le filet bas de la cellule : les traits prennent toute la hauteur de la ligne.
+        height: 39px;
     }
 
     // Un trait vertical par niveau d'ancêtre. L'indentation seule ne suffisait pas : sur quatre
-    // niveaux et 166 lignes, on ne voyait plus à quelle branche on appartenait.
+    // niveaux et 166 lignes, on ne voyait plus à quelle branche on appartenait. Gabarit de la
+    // maquette : 14 px par niveau, trait décalé de 6 px.
     .guide {
-        flex: 0 0 1.2em;
+        flex: 0 0 14px;
         align-self: stretch;
-        border-left: 1px solid var(--mat-sys-outline-variant);
+        margin-left: 6px;
+        border-left: 1px solid var(--mho-line-strong);
     }
 
     .toggle {
         // Largeur réservée même sans bouton, sinon les feuilles se décalent par rapport aux nœuds
-        // qui en ont un et la colonne devient illisible.
-        flex: 0 0 2.5em;
+        // qui en ont un et la colonne devient illisible. Bouton ramené à 28 px pour tenir dans
+        // une ligne de 40 px.
+        flex: 0 0 28px;
+        display: grid;
+        place-items: center;
+        --mat-icon-button-state-layer-size: 28px;
+        --mat-icon-button-icon-size: 20px;
+
+        mat-icon {
+            color: var(--mho-text-muted);
+        }
+    }
+
+    // Chantier atteint par la recherche globale : son nom passe en gras, en plus du cadre de ligne.
+    .mho-row-targeted .name {
+        font-weight: 700;
     }
 
     // Les racines ouvrent une branche : elles se détachent pour qu'on repère d'un coup d'œil où
@@ -113,22 +137,34 @@
     }
 
     // Hors de .table-scroll (voir le gabarit) : occupe toute la largeur de la carte, ne défile
-    // pas avec le tableau, et n'est jamais contraint par une largeur de colonne.
+    // pas avec le tableau, et n'est jamais contraint par une largeur de colonne. Une ombre vers
+    // le haut la détache du tableau au lieu du seul filet.
     .selection-summary {
+        box-shadow: 0 -6px 16px -10px var(--mho-shadow-color);
         display: flex;
         flex-wrap: wrap;
         align-items: center;
         flex: 0 0 auto;
         gap: 1.5em;
         padding: 0.6em 1em;
-        border-top: 1px solid var(--mat-sys-outline-variant);
-        background: var(--mat-sys-surface-container-high);
+        border-top: 1px solid var(--mho-line);
+        background: var(--mho-surface-2);
 
         // Contrairement aux ressources d'une ligne du tableau, pas de hauteur de ligne à
         // préserver ici : autant les laisser passer à la ligne plutôt que dépasser la carte.
         .resources {
             flex-wrap: wrap;
             white-space: normal;
+        }
+
+        .send-to-wishlist {
+            margin-left: auto;
+
+            .with-icon {
+                display: inline-flex;
+                align-items: center;
+                gap: 6px;
+            }
         }
     }
 
@@ -157,6 +193,7 @@
     .mho-buildings .guide {
         // Les traits mangeraient toute la largeur sur mobile : on les resserre sans les
         // supprimer, sinon la hiérarchie disparaît complètement.
-        flex-basis: 0.6em;
+        flex-basis: 6px;
+        margin-left: 3px;
     }
 }

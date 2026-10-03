@@ -32,7 +32,7 @@ namespace MyHordesOptimizerApi.Serilog
                 var queryProperty = factory.CreateProperty("Query", query);
                 logEvent.AddPropertyIfAbsent(queryProperty);
 
-                if (logEvent.Level == LogEventLevel.Warning || logEvent.Level == LogEventLevel.Error)
+                if ((logEvent.Level == LogEventLevel.Warning || logEvent.Level == LogEventLevel.Error) && !CarriesSeeds(HttpContextAccessor.HttpContext.Request))
                 {
                     try
                     {
@@ -52,5 +52,9 @@ namespace MyHordesOptimizerApi.Serilog
                 }
             }
         }
+
+        /// <summary>Le corps de POST AttaqueEstimation/Refinement porte des seeds d'estimation : jamais journalisé.</summary>
+        private static bool CarriesSeeds(HttpRequest request) =>
+            HttpMethods.IsPost(request.Method) && request.Path.Value?.Contains("/Refinement", StringComparison.OrdinalIgnoreCase) == true;
     }
 }

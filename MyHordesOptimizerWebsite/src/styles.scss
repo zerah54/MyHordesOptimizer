@@ -1,7 +1,6 @@
-@use 'fonts';
+@use 'components';
 @use 'scrollbars';
 @use 'tables';
-@use 'variables';
 
 * {
     div[data-lastpass-icon-root] {
@@ -17,7 +16,7 @@ body {
 
 body {
     margin: 0;
-    font-family: Roboto, "Helvetica Neue", sans-serif;
+    font-family: var(--mho-font-body);
     overflow: hidden;
     display: flex;
     flex-direction: column;
@@ -28,10 +27,10 @@ body {
 }
 
 a {
-    color: variables.$tertiary;
+    color: var(--mho-accent);
 
     &:hover {
-        color: variables.$secondary;
+        color: var(--mho-accent-2);
     }
 }
 

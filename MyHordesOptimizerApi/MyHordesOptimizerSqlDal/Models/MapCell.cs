@@ -73,9 +73,11 @@ public partial class MapCell
     [Column("nbRuinDig", TypeName = "int(11)")]
     public int? NbRuinDig { get; set; }
 
+    /// <summary>Fouilles restantes, estimation moyenne (voir <c>MapCellDigsExtensions</c>). Le nom date de l'ancien modèle.</summary>
     [Column("averagePotentialRemainingDig")]
     public float? AveragePotentialRemainingDig { get; set; }
 
+    /// <summary>Fouilles restantes, plafond (voir <c>MapCellDigsExtensions</c>). Le nom date de l'ancien modèle.</summary>
     [Column("maxPotentialRemainingDig", TypeName = "int(11)")]
     public int? MaxPotentialRemainingDig { get; set; }
 
@@ -101,6 +103,22 @@ public partial class MapCell
     /// <summary>Référence du marqueur posé sur la case (<c>ZoneTag::getRef()</c> côté MyHordes). Null si aucun marqueur.</summary>
     [Column("tag", TypeName = "int(11)")]
     public int? Tag { get; set; }
+
+    /// <summary>
+    /// Zone excavée par un Fouineur (capacité héroïque, champ <c>exc</c> de MyHordes) : une seule fois
+    /// par zone. <c>null</c> tant que MHO ne l'a pas relevé.
+    /// </summary>
+    [Column("isExcavated")]
+    public bool? IsExcavated { get; set; }
+
+    /// <summary>
+    /// Jour de la dernière observation de l'état de fouille de la zone (état natif, note « zone
+    /// épuisée », relevé du Fouineur, saisie). Avec <see cref="IsDryed"/>, il dit depuis quand la case
+    /// est connue vide : une observation « pas vide » prouve alors une régénération depuis ce jour-là
+    /// (voir <c>DigObservations</c>). <c>null</c> tant qu'aucune observation n'a été faite.
+    /// </summary>
+    [Column("digsObservedDay", TypeName = "int(11)")]
+    public int? DigsObservedDay { get; set; }
 
     [ForeignKey("IdLastUpdateInfo")]
     [InverseProperty("MapCells")]

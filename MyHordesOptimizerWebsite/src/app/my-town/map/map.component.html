@@ -1,47 +1,145 @@
 <mat-card-header class="mho-map-header">
-    <mat-card-title i18n>Carte des fouilles</mat-card-title>
-    <div>
-        <button mat-icon-button type="button" (click)="sidenav.toggle()">
-            <mat-icon>settings</mat-icon>
-        </button>
-    </div>
+    <mat-card-title i18n>Carte</mat-card-title>
 </mat-card-header>
 <mat-card-content class="mho-map">
+
+    <div class="mho-map-toolbar">
+        <div class="mho-map-tools" role="group" aria-label="Zoom et repérage" i18n-aria-label>
+            <button mat-icon-button type="button" (click)="zoomBy(-1)" [disabled]="options().zoom <= zoom_min"
+                    matTooltip="Dézoomer (Ctrl + molette)" i18n-matTooltip aria-label="Dézoomer" i18n-aria-label>
+                <mat-icon>zoom_out</mat-icon>
+            </button>
+            <span class="zoom-value">{{ zoom_percent() }}&nbsp;%</span>
+            <button mat-icon-button type="button" (click)="zoomBy(1)" [disabled]="options().zoom >= zoom_max"
+                    matTooltip="Zoomer (Ctrl + molette)" i18n-matTooltip aria-label="Zoomer" i18n-aria-label>
+                <mat-icon>zoom_in</mat-icon>
+            </button>
+            <button mat-icon-button type="button" (click)="fitZoom()"
+                    matTooltip="Ajuster à l'écran" i18n-matTooltip aria-label="Ajuster à l'écran" i18n-aria-label>
+                <mat-icon>fit_screen</mat-icon>
+            </button>
+            <button mat-icon-button type="button" (click)="goToMyPosition()"
+                    matTooltip="Ma position" i18n-matTooltip aria-label="Ma position" i18n-aria-label>
+                <mat-icon>my_location</mat-icon>
+            </button>
+        </div>
+        <span class="mho-map-hint" i18n>Clic&nbsp;: détail de la zone · Ctrl + molette&nbsp;: zoom · glisser&nbsp;: se déplacer</span>
+        <button mat-button type="button" class="mho-map-settings-toggle" (click)="sidenav.toggle()">
+            <mat-icon>tune</mat-icon>
+            <ng-container i18n>Affichage</ng-container>
+        </button>
+    </div>
+
     <mat-sidenav-container class="mho-map-sidenav-container">
 
-        <mat-sidenav-content class="map-container" mhoScrollAura>
-            <mho-draw-map [map]="map()!" [allItems]="all_items()!" [allRuins]="all_ruins()!" [options]="options()"
-                          [allCitizens]="all_citizens()!"></mho-draw-map>
+        <mat-sidenav-content #mapContainer class="map-container" mhoScrollAura>
+            <mho-draw-map [map]="map()!" [allItems]="all_items()!" [allRuins]="all_ruins()!" [options]="cell_options()"
+                          [zoom]="options().zoom" [allCitizens]="all_citizens()!"></mho-draw-map>
         </mat-sidenav-content>
         <mat-sidenav #sidenav class="map-settings" [position]="'end'" [mode]="is_gt_xs() ? 'side' : 'over'">
-            <h1 i18n>Paramètres</h1>
+            <div class="settings-header">
+                <h1 i18n>Affichage</h1>
+                <button mat-icon-button type="button" (click)="sidenav.close()"
+                        aria-label="Fermer le panneau" i18n-aria-label>
+                    <mat-icon>close</mat-icon>
+                </button>
+            </div>
             <h2 i18n>Type de carte</h2>
-            <mat-chip-listbox>
-                <mat-chip (click)="changeOptions('map_type', 'digs')" [highlighted]="options().map_type === 'digs'" i18n>Fouilles</mat-chip>
-                <mat-chip (click)="changeOptions('map_type', 'danger')" [highlighted]="options().map_type === 'danger'" i18n>Danger</mat-chip>
-                <mat-chip (click)="changeOptions('map_type', 'scout')" [highlighted]="options().map_type === 'scout'" i18n>Exploration</mat-chip>
+            <mat-button-toggle-group class="mho-map-seg" [value]="options().map_type"
+                                     (change)="changeOptions('map_type', $event.value)" hideSingleSelectionIndicator
+                                     aria-label="Type de carte" i18n-aria-label>
+                <mat-button-toggle value="digs" i18n>Fouilles</mat-button-toggle>
+                <mat-button-toggle value="danger" i18n>Danger</mat-button-toggle>
+                <mat-button-toggle value="scout" i18n>Exploration</mat-button-toggle>
                 @if (is_dev) {
-                    <mat-chip (click)="changeOptions('map_type', 'trash')" [highlighted]="options().map_type === 'trash'" i18n>Décharge</mat-chip>
+                    <mat-button-toggle value="trash" i18n>Décharge</mat-button-toggle>
                 }
-            </mat-chip-listbox>
+            </mat-button-toggle-group>
             @if (options().map_type === 'digs') {
                 <div>
                     <h2 i18n>Fouilles restantes</h2>
-                    <mat-chip-listbox>
-                        <mat-chip (click)="changeOptions('dig_mode', 'max')" [highlighted]="options().dig_mode === 'max'" i18n>Maximum</mat-chip>
-                        <mat-chip (click)="changeOptions('dig_mode', 'average')" [highlighted]="options().dig_mode === 'average'" i18n>Moyenne</mat-chip>
-                    </mat-chip-listbox>
+                    <mat-button-toggle-group class="mho-map-seg" [value]="options().dig_mode"
+                                             (change)="changeOptions('dig_mode', $event.value)" hideSingleSelectionIndicator
+                                             aria-label="Fouilles restantes" i18n-aria-label>
+                        <mat-button-toggle value="max" i18n>Maximum</mat-button-toggle>
+                        <mat-button-toggle value="average" i18n>Moyenne</mat-button-toggle>
+                    </mat-button-toggle-group>
                 </div>
+            }
+            <!-- Légende du type affiché, sous ses réglages : mêmes couleurs que les cases. -->
+            @if (legend(); as legend) {
+                <ul class="map-legend" aria-label="Légende" i18n-aria-label>
+                    @for (entry of legend; track entry.swatch) {
+                        <li>
+                            <span class="swatch {{ entry.swatch }}"></span>
+                            <span class="label">{{ entry.label }}</span>
+                            @if (entry.range) {
+                                <span class="range">{{ entry.range }}</span>
+                            }
+                        </li>
+                    }
+                </ul>
+                @if (options().map_type === 'scout') {
+                    <p class="settings-hint" i18n>Niveau relevé par un éclaireur lors d'une mise à jour faite avec l'extension. Plus le secteur est connu, moins
+                        on risque d'être repéré en y entrant.</p>
+                }
             }
             @if (options().map_type === 'trash') {
                 <div>
                     <h2 i18n>Mode d'affichage</h2>
-                    <mat-chip-listbox>
-                        <mat-chip (click)="changeOptions('trash_mode', 'nb')" [highlighted]="options().trash_mode === 'nb'" i18n>Nombre d'objets</mat-chip>
-                        <mat-chip (click)="changeOptions('trash_mode', 'def')" [highlighted]="options().trash_mode === 'def'" i18n>Défense apportée</mat-chip>
-                    </mat-chip-listbox>
+                    <mat-button-toggle-group class="mho-map-seg" [value]="options().trash_mode"
+                                             (change)="changeOptions('trash_mode', $event.value)" hideSingleSelectionIndicator
+                                             aria-label="Mode d'affichage de la décharge" i18n-aria-label>
+                        <mat-button-toggle value="nb" i18n>Nombre d'objets</mat-button-toggle>
+                        <mat-button-toggle value="def" i18n>Défense apportée</mat-button-toggle>
+                    </mat-button-toggle-group>
                 </div>
             }
+            <div>
+                <div class="section-head">
+                    <h2 i18n>Coins des cases</h2>
+                    @if (corners_are_custom()) {
+                        <button mat-button type="button" (click)="resetCorners()" i18n>Réinitialiser</button>
+                    }
+                </div>
+                <!-- Une case en quatre quarts : chaque quart règle le coin où il se trouve. -->
+                <div class="corner-picker" role="group" aria-label="Coins des cases" i18n-aria-label>
+                    @for (field of corner_fields; track field.position) {
+                        @let view = corner_views[current_corners()[field.position]];
+                        <button type="button" class="corner-quarter {{ field.css_class }}" [class.empty]="view.value === 'none'"
+                                [matMenuTriggerFor]="cornerMenu" (click)="editing_corner.set(field.position)"
+                                [attr.aria-label]="field.label + ' : ' + view.label">
+                            @if (view.icon) {
+                                <img class="corner-glyph" [src]="HORDES_IMG_REPO + view.icon" alt="">
+                            } @else if (view.sample) {
+                                <span class="corner-glyph sample" aria-hidden="true">{{ view.sample }}</span>
+                            }
+                            <span class="corner-label">{{ view.label }}</span>
+                        </button>
+                    }
+                </div>
+                <mat-menu #cornerMenu="matMenu">
+                    <ng-template matMenuContent>
+                        @for (view of corner_menu; track view.value) {
+                            <button mat-menu-item type="button" role="menuitemradio" class="corner-option"
+                                    [attr.aria-checked]="current_corners()[editing_corner()] === view.value"
+                                    (click)="changeCorner(editing_corner(), view.value)">
+                                <span class="corner-option-content">
+                                    @if (view.icon) {
+                                        <img class="corner-glyph" [src]="HORDES_IMG_REPO + view.icon" alt="">
+                                    } @else if (view.sample) {
+                                        <span class="corner-glyph sample" aria-hidden="true">{{ view.sample }}</span>
+                                    } @else {
+                                        <span class="corner-glyph" aria-hidden="true"></span>
+                                    }
+                                    {{ view.label }}
+                                </span>
+                            </button>
+                        }
+                    </ng-template>
+                </mat-menu>
+                <p class="settings-hint" i18n>Propre au type de carte affiché. En zoom réduit, seul le coin bas droite reste visible.</p>
+            </div>
             <div>
                 <h2 i18n>Afficher les zones du scrutateur</h2>
                 <div class="scrut-zones">
@@ -98,5 +196,6 @@
             </div>
         </mat-sidenav>
     </mat-sidenav-container>
+
 
 </mat-card-content>

@@ -25,7 +25,9 @@ using MyHordesOptimizerApi.Models.ExternalTools.GestHordes;
 using MyHordesOptimizerApi.Providers.Interfaces;
 using MyHordesOptimizerApi.Repository.Interfaces;
 using MyHordesOptimizerApi.Repository.Interfaces.ExternalTools;
+using MyHordesOptimizerApi.Configuration.Interfaces;
 using MyHordesOptimizerApi.Services.Impl.Locking;
+using MyHordesOptimizerApi.Services.Impl.Maps;
 using MyHordesOptimizerApi.Services.Interfaces.ExternalTools;
 using Newtonsoft.Json.Linq;
 using IAuthenticationService = MyHordesOptimizerApi.Services.Interfaces.IAuthenticationService;
@@ -49,6 +51,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
         protected IServiceScopeFactory ServiceScopeFactory { get; private set; }
         protected TownSyncLock TownSyncLock { get; private set; }
         protected IAuthenticationService AuthenticationService { get; private set; }
+        protected IMyHordesScrutateurConfiguration MyHordesScrutateurConfiguration { get; private set; }
 
         public ExternalToolsService(ILogger<ExternalToolsService> logger,
             IBigBrothHordesRepository bigBrothHordesRepository,
@@ -59,7 +62,8 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
             IServiceScopeFactory serviceScopeFactory,
             IMyHordesApiRepository myHordesApiRepository,
             TownSyncLock townSyncLock,
-            IAuthenticationService authenticationService)
+            IAuthenticationService authenticationService,
+            IMyHordesScrutateurConfiguration myHordesScrutateurConfiguration)
         {
             Logger = logger;
             BigBrothHordesRepository = bigBrothHordesRepository;
@@ -71,6 +75,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
             MyHordesApiRepository = myHordesApiRepository;
             TownSyncLock = townSyncLock;
             AuthenticationService = authenticationService;
+            MyHordesScrutateurConfiguration = myHordesScrutateurConfiguration;
         }
 
         public async Task<UpdateResponseDto> UpdateExternalsTools(UpdateRequestDto updateRequestDto, IExternalToolsProgressSink sink = null)
@@ -255,6 +260,10 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
             // lignes (TownCitizens, MapCells/MapCellDigs) que mhoTask et doivent attendre sa fin
             // avant de démarrer, sans quoi leur résultat dépend de l'ordre d'exécution des tâches.
             Task mhoTask = null;
+            // Fourchettes de fouilles restantes observées pendant cette mise à jour, par case (x, y
+            // absolus). Écrites par mhoTask, relues par digsTask APRÈS l'avoir attendue : une fouille
+            // réussie déjà comprise dans une observation du moment ne doit pas être soustraite deux fois.
+            var observedDigBounds = new Dictionary<(int X, int Y), DigBounds>();
             if (plan.MhoMap && !mhoPreambleFailed)
             {
                 mhoTask = Task.Run(async () =>
@@ -282,7 +291,9 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                         var zones = me.Map.Zones;
                         var listCells = new List<MapCell>();
                         var listCellItems = new List<MapCellItem>();
-                        var driedCell = new List<MapCell>();
+                        // Cases dont le sol est connu à l'instant (API MyHordes ou addon) : leurs objets
+                        // en base sont remplacés, y compris par un sol vide.
+                        var cellsWithKnownFloor = new List<MapCell>();
 
                         var townId = resolvedTownId;
 
@@ -363,10 +374,19 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                             }
                         }
 
-                        var zoneItemX = -1;
-                        var zoneItemY = -1;
                         var allCell = dbContext.MapCells.Where(cell => cell.IdTown == townId)
                                                         .ToList();
+                        // Nuits pas encore traitées : AVANT les observations, qui décrivent l'état d'après la nuit.
+                        if (townEntity != null)
+                        {
+                            DigRegeneration.ApplyPendingNights(dbContext, townEntity, () => allCell, me.Map, MyHordesScrutateurConfiguration);
+                        }
+                        // Observations de l'état de fouille (état natif, note « zone épuisée », relevés du
+                        // Fouineur) : après la régénération, dont elles exploitent l'historique.
+                        int? observationDay = me.Map?.Days ?? townEntity?.Day;
+                        var digObservations = townEntity != null && observationDay.HasValue
+                            ? DigObservations.ForTown(dbContext, townEntity, observationDay.Value, MyHordesScrutateurConfiguration, () => allCell)
+                            : DigObservations.WithoutHistory(MyHordesScrutateurConfiguration);
                         // Les identifiants de ruine et d'objet portés par la carte sont ceux de
                         // MyHordes : ce sont des auto-incréments de fixtures, ils se traduisent en
                         // clés MHO plutôt que de se recopier. Une entrée dont le mhId n'est pas
@@ -396,13 +416,6 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                                 isDried = details.Dried;
                             }
 
-                            int? averagePotentialRemainingDig = null;
-                            int? maxPotentialRemainingDig = null;
-                            if (isDried.HasValue && isDried.Value)
-                            {
-                                averagePotentialRemainingDig = 0;
-                                maxPotentialRemainingDig = 0;
-                            }
                             // Le sentinel négatif (case enterrée) n'est pas un prototype du jeu :
                             // MHO lui réserve la ruine « bâtiment non déterré », de clé négative
                             // elle aussi. Aucune traduction ne doit y toucher.
@@ -432,7 +445,6 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                                 IsVisitedToday = !Convert.ToBoolean(zone.Nvt),
                                 IsNeverVisited = false,
                                 DangerLevel = zone.Danger,
-                                IsDryed = isDried,
                                 IdRuin = type,
                                 NbZombie = nbZombie,
                                 NbZombieKilled = null,
@@ -440,8 +452,6 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                                 IsRuinCamped = zone.Building?.Camped,
                                 IsRuinDryed = zone.Building?.Dried,
                                 NbRuinDig = zone.Building?.Dig,
-                                AveragePotentialRemainingDig = averagePotentialRemainingDig,
-                                MaxPotentialRemainingDig = maxPotentialRemainingDig,
                                 Tag = zone.Tag
                             };
                             // Une case jamais vue en base (existingCellModel null) n'a pas encore d'IdCell :
@@ -449,8 +459,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                             var cellModel = existingCellModel ?? cell;
                             if (zone.Items != null)
                             {
-                                zoneItemX = zone.X.Value;
-                                zoneItemY = zone.Y.Value;
+                                cellsWithKnownFloor.Add(cellModel);
                                 // IdItem est une clé étrangère : un objet sans id n'est pas un objet.
                                 // On l'ignore plutôt que d'inventer un identifiant.
                                 foreach (var item in zone.Items.Where(item => item.Id.HasValue))
@@ -487,6 +496,28 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                             {
                                 listCells.Add(cell);
                             }
+
+                            // Fouilles restantes : l'excavation d'abord, puis l'état natif (case du joueur
+                            // seulement), qui décrit la case après tout ce qui s'y est passé.
+                            if (zone.Exc.HasValue)
+                            {
+                                bool isExcavated = zone.Exc.Value == 1;
+                                // Sur une transition seulement : un premier relevé (null) ne dit pas QUAND
+                                // l'excavation a eu lieu, ses objets ont pu être trouvés depuis.
+                                if (isExcavated && cellModel.IsExcavated == false)
+                                {
+                                    cellModel.ApplyExcavation((MyHordesScrutateurConfiguration.MinItemAdd + MyHordesScrutateurConfiguration.MaxItemAdd) / 2.0,
+                                        MyHordesScrutateurConfiguration.MaxItemAdd,
+                                        MyHordesScrutateurConfiguration.MaxItemPerCell);
+                                }
+                                cellModel.IsExcavated = isExcavated;
+                            }
+                            // État natif (case du joueur) : lu à l'instant par le serveur, donc plus récent que
+                            // la page lue par l'addon. Appliqué après les observations de la page (plus bas).
+                            if (isDried.HasValue)
+                            {
+                                digObservations.ObserveAuthoritative(cellModel, isDried.Value ? DigBounds.Depleted : DigBounds.NotDepleted);
+                            }
                         }
                         if (UpdateRequestMapToolsToUpdateDetailsDto.IsCell(updateRequestDto.Map.ToolsToUpdate.IsMyHordesOptimizer) && updateRequestDto.Map.Cell != null)
                         {
@@ -496,25 +527,58 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
 
                             var cellToUpdate = listCells.Single(cell => cell.X == realX && cell.Y == realY);
 
-                            cellToUpdate.NbZombie = updateCellDto.Zombies;
-                            cellToUpdate.NbZombieKilled = updateCellDto.DeadZombies;
-                            cellToUpdate.IsDryed = updateCellDto.ZoneEmpty;
-
-                            listCellItems.Clear();
-                            var items = Mapper.Map<List<MapCellItem>>(updateCellDto.Objects);
-                            items.ForEach(item => item.IdCell = cellToUpdate.IdCell);
-                            listCellItems.AddRange(items);
+                            // Chaque valeur n'est reportée que si l'addon l'a envoyée : ce bloc sert aussi aux
+                            // zombies tués et aux relevés des métiers, qui n'envoient que leurs propres champs.
+                            // Reportées sans condition, les valeurs absentes effaçaient les zombies, les zombies
+                            // tués, l'état « épuisée » relevé juste avant par l'API, et le sol de la case.
+                            if (updateCellDto.Zombies.HasValue)
+                            {
+                                cellToUpdate.NbZombie = updateCellDto.Zombies;
+                            }
+                            if (updateCellDto.DeadZombies.HasValue)
+                            {
+                                cellToUpdate.NbZombieKilled = updateCellDto.DeadZombies;
+                            }
+                            // Note « zone épuisée » de la page du désert (#mgd-zone-note), affichée à tous
+                            // les métiers dès que la zone est vide : sa présence comme son absence comptent.
+                            if (updateCellDto.ZoneEmpty.HasValue)
+                            {
+                                var bounds = updateCellDto.ZoneEmpty.Value ? DigBounds.Depleted : DigBounds.NotDepleted;
+                                if (digObservations.Observe(cellToUpdate, bounds))
+                                {
+                                    RecordDigBounds(observedDigBounds, realX, realY, bounds);
+                                }
+                            }
+                            if (updateCellDto.Objects != null)
+                            {
+                                // Sol relevé par l'addon (ville en chaos, où l'API n'en donne pas) : il remplace
+                                // celui de la case.
+                                listCellItems.RemoveAll(item => item.IdCellNavigation == cellToUpdate || (cellToUpdate.IdCell != 0 && item.IdCell == cellToUpdate.IdCell));
+                                var items = Mapper.Map<List<MapCellItem>>(updateCellDto.Objects);
+                                items.ForEach(item =>
+                                {
+                                    item.IdCell = cellToUpdate.IdCell;
+                                    item.IdCellNavigation = cellToUpdate;
+                                });
+                                listCellItems.AddRange(items);
+                                cellsWithKnownFloor.Add(cellToUpdate);
+                            }
 
                             // Relevés des métiers Fouineur et Éclaireur : ils portent sur la case
                             // courante et sur les quatre cases adjacentes, d'où l'application sur
                             // l'ensemble des cases de la ville et non sur la seule case courante.
-                            allCell.ApplyJobRadars(realX,
+                            var jobBounds = allCell.ApplyJobRadars(digObservations,
+                                realX,
                                 realY,
                                 updateCellDto.ScavZoneLevel,
                                 updateCellDto.ScoutZoneLvl,
                                 updateCellDto.ScavNextCells,
                                 updateCellDto.ScoutNextCells,
                                 newLastUpdate.IdLastUpdateInfo);
+                            if (jobBounds.HasValue)
+                            {
+                                RecordDigBounds(observedDigBounds, realX, realY, jobBounds.Value);
+                            }
 
                             if (updateCellDto.CitizenId.Any())
                             {
@@ -529,6 +593,10 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                                 }
                                 dbContext.SaveChanges();
                             }
+                        }
+                        foreach (var (observedCell, observedBounds) in digObservations.ApplyAuthoritative())
+                        {
+                            RecordDigBounds(observedDigBounds, observedCell.X, observedCell.Y, observedBounds);
                         }
                         var mapCellEqualityComaprer = new MapCellEqualityComaprer();
                         foreach (var cellToUpdate in listCells)
@@ -551,9 +619,11 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                         // Ne plus vider les MapCellDig ici : digsTask (voir plus bas) fait déjà l'upsert
                         // exact par (case, citoyen, jour). Ce RemoveRange sur toute la grille effaçait la
                         // fouille des AUTRES citoyens à chaque MAJ carte, sans exception ni log.
-                        if (zoneItemX != -1 && zoneItemY != -1)
+                        if (cellsWithKnownFloor.Count > 0)
                         {
-                            dbContext.MapCellItems.RemoveRange(dbContext.MapCellItems.Where(cellItem => listCellItems.Select(x => x.IdCell).Contains(cellItem.IdCell)));
+                            // Par case et non par objet : un sol devenu vide doit aussi effacer les anciens objets.
+                            var knownFloorCellIds = cellsWithKnownFloor.Where(cell => cell.IdCell != 0).Select(cell => cell.IdCell).Distinct().ToList();
+                            dbContext.MapCellItems.RemoveRange(dbContext.MapCellItems.Where(cellItem => knownFloorCellIds.Contains(cellItem.IdCell)));
                             // SaveChanges séparé : sans ça, EF peut émettre l'INSERT avant le DELETE
                             // dans le même batch (aucune dépendance entre les deux entités), ce qui
                             // percute la même clé primaire (idCell, idItem, isBroken).
@@ -790,11 +860,13 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                         var realY = updateRequestDto.TownDetails.TownY - successedDig.Cell.Y;
                         var townId = resolvedTownId;
 
-                        var cellId = dbContext.MapCells.Where(cell => cell.IdTown == townId
+                        var digCell = dbContext.MapCells.Single(cell => cell.IdTown == townId
                                                                          && cell.X == realX
-                                                                         && cell.Y == realY)
-                                                                    .Select(cell => cell.IdCell)
-                                                                    .Single();
+                                                                         && cell.Y == realY);
+                        var cellId = digCell.IdCell;
+                        // Écart avec les fouilles réussies déjà enregistrées pour (case, citoyen, jour) :
+                        // les fouilles restantes en sont nettes, seul l'écart s'y reporte.
+                        int successDelta = 0;
                         foreach (var dig in successedDig.Values)
                         {
                             var cellDigModel = dbContext.MapCellDigs.Where(cellDig => cellDig.IdCellNavigation.IdTown == townId
@@ -803,6 +875,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                                                                            && cellDig.IdCellNavigation.Y == realY
                                                                            && cellDig.IdUser == dig.CitizenId)
                                                                      .FirstOrDefault();
+                            successDelta += dig.SuccessDigs - (cellDigModel?.NbSucces ?? 0);
                             if (cellDigModel == null)
                             {
                                 cellDigModel = new MapCellDig()
@@ -825,6 +898,13 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                                 cellDigModel.IdLastUpdateInfo = newLastUpdate.IdLastUpdateInfo;
                                 dbContext.Update(cellDigModel);
                             }
+                        }
+                        digCell.ApplySuccessfulDigsDelta(successDelta);
+                        // Une observation faite pendant cette même mise à jour (état natif, relevé du
+                        // Fouineur) comprend déjà ces fouilles : elle reste la référence.
+                        if (observedDigBounds.TryGetValue((realX, realY), out var observed))
+                        {
+                            digCell.ClampRemaining(observed);
                         }
                         dbContext.SaveChanges();
                         transaction.Commit();
@@ -1501,5 +1581,14 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
         }
 
         #endregion
+
+        /// <summary>
+        /// Retient la fourchette de fouilles restantes observée pour une case, croisée avec celles déjà
+        /// relevées pendant la même mise à jour (état natif et relevé du Fouineur, par exemple).
+        /// </summary>
+        private static void RecordDigBounds(Dictionary<(int X, int Y), DigBounds> observed, int x, int y, DigBounds bounds)
+        {
+            observed[(x, y)] = observed.TryGetValue((x, y), out var previous) ? previous.Intersect(bounds) : bounds;
+        }
     }
 }

@@ -1,0 +1,15 @@
+:host {
+    display: contents;
+
+    .mho-wiki {
+
+        display: flex;
+        flex-direction: column;
+
+        .wiki-page {
+            flex: 1;
+            min-height: 0;
+            overflow: auto;
+        }
+    }
+}

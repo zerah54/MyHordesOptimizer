@@ -39,6 +39,22 @@
             flex-direction: column;
             height: 100%;
 
+            .duplicate-warning {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                margin: 0 0 8px;
+                padding: 8px 12px;
+                border: 1px solid var(--mho-warning);
+                border-radius: 8px;
+                background: color-mix(in srgb, var(--mho-warning) 10%, transparent);
+
+                mat-icon {
+                    flex-shrink: 0;
+                    color: var(--mho-warning);
+                }
+            }
+
             .table-headers {
                 display: flex;
                 flex-direction: row;

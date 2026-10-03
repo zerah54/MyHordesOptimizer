@@ -5,6 +5,7 @@ import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { of } from 'rxjs';
 import type { MockedObject } from 'vitest';
 
+import { MINESWEEPER_THEME_KEY } from '../../_abstract_model/const';
 import { MinesweeperGameCompleted, MinesweeperGameStarted, MinesweeperService } from '../../_abstract_model/services/minesweeper.service';
 import { Me } from '../../_abstract_model/types/me.class';
 import { setUser } from '../../_core/utilities/localstorage.util';
@@ -31,6 +32,10 @@ interface TestableComponent {
     };
     is_fullscreen: {
         (): boolean;
+    };
+    selected_theme: {
+        (): 'legacy' | 'myhordes';
+        set(value: 'legacy' | 'myhordes'): void;
     };
     selected_size: {
         (): {
@@ -107,6 +112,7 @@ describe('MinesweeperComponent', (): void => {
 
     afterEach((): void => {
         setUser(null);
+        localStorage.removeItem(MINESWEEPER_THEME_KEY);
         document.querySelectorAll('.cdk-overlay-container').forEach((el: Element) => el.remove());
     });
 
@@ -129,6 +135,100 @@ describe('MinesweeperComponent', (): void => {
             expect(testable.remaining_mines()).toBe(40);
             expect(testable.board().length).toBe(16);
             expect(testable.board()[0].length).toBe(16);
+        });
+    });
+
+    describe('thème', (): void => {
+        function texts(selector: string): string {
+            return Array.from(fixture.nativeElement.querySelectorAll(selector) as NodeListOf<HTMLElement>)
+                .map((el: HTMLElement) => el.textContent ?? '').join('');
+        }
+
+        function count(selector: string): number {
+            return fixture.nativeElement.querySelectorAll(selector).length;
+        }
+
+        it('utilise le thème Hordes par défaut', async (): Promise<void> => {
+            await setup();
+            expect(testable.selected_theme()).toBe('myhordes');
+            expect(fixture.nativeElement.querySelector('.game-container').classList.contains('myhordes')).toBe(true);
+        });
+
+        it('restaure le thème mémorisé', async (): Promise<void> => {
+            localStorage.setItem(MINESWEEPER_THEME_KEY, 'legacy');
+            await setup();
+            expect(testable.selected_theme()).toBe('legacy');
+        });
+
+        it('ignore une valeur mémorisée inconnue', async (): Promise<void> => {
+            localStorage.setItem(MINESWEEPER_THEME_KEY, 'inconnu');
+            await setup();
+            expect(testable.selected_theme()).toBe('myhordes');
+        });
+
+        it('mémorise le choix fait avec la bascule "Thème Windows"', async (): Promise<void> => {
+            await setup();
+            const toggle: HTMLButtonElement | null = fixture.nativeElement.querySelector('mat-slide-toggle button[role="switch"]');
+            expect(toggle).not.toBeNull();
+
+            toggle?.click();
+            fixture.detectChanges();
+            expect(testable.selected_theme()).toBe('legacy');
+            expect(localStorage.getItem(MINESWEEPER_THEME_KEY)).toBe('legacy');
+
+            toggle?.click();
+            fixture.detectChanges();
+            expect(testable.selected_theme()).toBe('myhordes');
+            expect(localStorage.getItem(MINESWEEPER_THEME_KEY)).toBe('myhordes');
+        });
+
+        it('thème Hordes : les cases n\'ont aucune <img>, les icônes viennent du CSS', async (): Promise<void> => {
+            await setup();
+            testable.cycleMarker(0, 0);
+            testable.cycleMarker(0, 1);
+            testable.cycleMarker(0, 1);
+            fixture.detectChanges();
+
+            expect(count('.game-board .cell.flagged')).toBe(1);
+            expect(count('.game-board .cell.questioned')).toBe(1);
+            expect(count('.game-board img')).toBe(0);
+        });
+
+        it('thème Hordes : les compteurs sont du texte, sans <img>', async (): Promise<void> => {
+            await setup();
+            expect(count('.remain-mines img, .timer img')).toBe(0);
+            expect(texts('.remain-mines .digit')).toBe('40');
+            expect(texts('.timer .digit')).toBe('000');
+        });
+
+        it('signale le plateau terminé, pour que le CSS masque les « ? » restants', async (): Promise<void> => {
+            await setup();
+            minesweeperService.createGame.mockReturnValue(of(startedBoard([1, 0, 0, 0])));
+            expect(count('.game-container.game-ended')).toBe(0);
+
+            testable.revealCell(0, 0);
+            fixture.detectChanges();
+
+            expect(testable.game_over()).toBe(true);
+            expect(count('.game-container.game-ended')).toBe(1);
+        });
+
+        it('thème Windows : les cases gardent leurs <img>', async (): Promise<void> => {
+            localStorage.setItem(MINESWEEPER_THEME_KEY, 'legacy');
+            await setup();
+            testable.cycleMarker(0, 0);
+            fixture.detectChanges();
+
+            expect(count('.game-board .cell.flagged img[src$="bombflagged.png"]')).toBe(1);
+        });
+
+        it('thème Windows : les compteurs gardent leurs <img>', async (): Promise<void> => {
+            localStorage.setItem(MINESWEEPER_THEME_KEY, 'legacy');
+            await setup();
+
+            expect(count('.remain-mines img')).toBe(2);
+            expect(count('.timer img')).toBe(3);
+            expect(count('.remain-mines .digit, .timer .digit')).toBe(0);
         });
     });
 

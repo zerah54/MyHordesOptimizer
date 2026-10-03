@@ -1,4 +1,5 @@
-@use 'variables';
+@use 'sass:list';
+@use '@angular/material' as mat;
 
 // Aucune règle ci-dessous (sauf :host) n'est imbriquée sous un ancêtre DOM propre à la vue en ligne :
 // le template partagé est aussi projeté en plein écran via un overlay CDK attaché sous <body>, hors
@@ -184,6 +185,18 @@
             border-right: 3px solid $ms-shadow-dark;
         }
 
+        // Le plateau garde son gris fixe dans les deux modes : les jetons du thème (icône en
+        // --mho-text-muted, clair en mode sombre) y donneraient ~1,05:1, d'où des boutons invisibles.
+        .board-toolbar {
+            @include mat.icon-button-overrides((
+                icon-color: $ms-digit-bg,
+                state-layer-color: $ms-digit-bg,
+                ripple-color: rgba($ms-digit-bg, 0.12),
+                disabled-icon-color: rgba($ms-digit-bg, 0.38),
+                disabled-state-layer-color: $ms-digit-bg,
+            ));
+        }
+
         .game-header {
             padding: 6px;
             margin-bottom: 10px;
@@ -244,9 +257,184 @@
         }
     }
 
-    /* Styles pour le thème myhordes */
+    // Thème Hordes : couleurs = jetons --mho-* du thème du site, icônes = images du jeu en CSS pur
+    // (aucune <img> dans les cases). Une icône n'a jamais de taille propre : `background-size: 100%`
+    // la cale sur la case, donc sur le zoom.
     &.myhordes {
+        $hordes-img: '/img/hordes_img';
+        // Teinte du chiffre N (1 à 8) : contraste ≥ 4:1 sur --mho-well dans chaque famille de thème.
+        // Certaines familles ont des teintes voisines (Noël : success = accent) : le chiffre lui-même
+        // reste le repère principal, la couleur un renfort.
+        $digit-tokens: success, accent-2, danger, accent, warning, text-muted, text, text;
 
+        // border-box : max-width:100% inclut bordure et padding, contrairement au thème Windows.
+        box-sizing: border-box;
+        // clip (et non hidden) : arrondit le cadre sans faire de .game-container un conteneur de
+        // défilement, ce qui casserait le `position: sticky` de .sticky-controls.
+        overflow: clip;
+        background-color: var(--mho-surface-3);
+        border: 1px solid var(--mho-line-strong);
+        border-radius: var(--mho-radius-m);
+        padding: 0 8px 8px;
+
+        // Relief des cases et du visage : arête claire / sombre dérivées de leur face, donc de la
+        // famille de thème et du mode.
+        --ms-face: var(--mho-surface-2);
+        --ms-hi: color-mix(in srgb, var(--ms-face), white 55%);
+        --ms-lo: color-mix(in srgb, var(--ms-face), black 45%);
+
+        // Opaque : masque les cellules qui défilent dessous une fois le bloc collant.
+        .sticky-controls {
+            background-color: var(--mho-surface-3);
+            padding-top: 8px;
+        }
+
+        .game-header {
+            margin-bottom: 8px;
+
+            .remain-mines, .timer {
+                flex: 1;
+                display: flex;
+
+                > div {
+                    display: flex;
+                    padding: 0 6px;
+                    background-color: var(--mho-well);
+                    border: 1px solid var(--mho-well-line);
+                    border-radius: var(--mho-radius-s);
+                }
+            }
+
+            .remain-mines {
+                justify-content: flex-start;
+            }
+
+            .timer {
+                justify-content: flex-end;
+            }
+
+            // Boîte de largeur fixe par chiffre : le chrono ne bouge pas à chaque seconde, quelle que
+            // soit la police.
+            .digit {
+                display: inline-block;
+                min-width: 0.75em;
+                text-align: center;
+                font: 700 1.1rem/24px var(--mho-font-display);
+                font-variant-numeric: tabular-nums;
+                color: var(--mho-accent);
+            }
+
+            .state {
+                box-sizing: border-box;
+                cursor: pointer;
+                background-color: var(--ms-face);
+                background-repeat: no-repeat;
+                background-position: center;
+                border: 2px solid;
+                border-color: var(--ms-hi) var(--ms-lo) var(--ms-lo) var(--ms-hi);
+                border-radius: var(--mho-radius-s);
+
+                &:hover {
+                    background-color: color-mix(in srgb, var(--ms-face), var(--mho-accent) 14%);
+                }
+
+                // Enfoncé : biseau inversé.
+                &:active {
+                    border-color: var(--ms-lo) var(--ms-hi) var(--ms-hi) var(--ms-lo);
+                    background-color: color-mix(in srgb, var(--ms-face), black 12%);
+                }
+
+                &.play {
+                    background-image: url(#{$hordes-img}/emotes/smile.gif);
+                }
+
+                &.lose {
+                    background-image: url(#{$hordes-img}/emotes/sad.gif);
+                }
+
+                &.win {
+                    background-image: url(#{$hordes-img}/emotes/goodg.gif);
+                }
+            }
+        }
+
+        .game-board {
+            overflow: hidden;
+            border: 1px solid var(--mho-line-strong);
+            border-radius: var(--mho-radius-s);
+        }
+
+        // Ordre = précédence : plusieurs classes d'état peuvent coexister (une mine interrogée à la
+        // défaite est `questioned` ET `mined`, un faux drapeau `flagged` ET `no-bomb`). À spécificité
+        // égale, la dernière règle gagne : chiffre < ? < drapeau < faux drapeau < mine < mine fatale.
+        //
+        // Relief : biseau en bordure (angles francs, comme le thème Windows). `background-origin:
+        // content-box` cale l'icône à l'intérieur : bordure + padding valent 2px dans tous les états,
+        // d'où une marge et une icône de même taille partout.
+        .cell {
+            background-color: var(--ms-face);
+            background-repeat: no-repeat;
+            background-position: center;
+            background-origin: content-box;
+            background-size: 100% 100%;
+            border: calc(2px * var(--mho-ms-zoom, 1)) solid;
+            border-color: var(--ms-hi) var(--ms-lo) var(--ms-lo) var(--ms-hi);
+
+            // :where() = spécificité nulle : le survol ne l'emporte jamais sur les états ci-dessous.
+            &:where(:not(.revealed):hover) {
+                background-color: color-mix(in srgb, var(--ms-face), var(--mho-accent) 14%);
+            }
+
+            // À plat : case révélée, ou case enfoncée (clic maintenu : elle-même et, sur un chiffre, ses
+            // voisines). Le biseau disparaît, c'est l'effet « bouton appuyé ».
+            &.revealed, &.highlighted, &.no-bomb, &.mined {
+                background-color: var(--mho-well);
+                border: calc(1px * var(--mho-ms-zoom, 1)) solid var(--mho-well-line);
+                padding: calc(1px * var(--mho-ms-zoom, 1));
+            }
+
+            &.highlighted {
+                background-color: color-mix(in srgb, var(--mho-well), var(--mho-accent) 22%);
+            }
+
+            &::after {
+                font: 700 calc(11px * var(--mho-ms-zoom, 1))/1 var(--mho-font-display);
+            }
+
+            @for $i from 1 through 8 {
+                &.revealed-#{$i}::after {
+                    content: '#{$i}';
+                    color: var(--mho-#{list.nth($digit-tokens, $i)});
+                }
+            }
+
+            &.questioned {
+                background-image: url(#{$hordes-img}/icons/small_help.gif);
+            }
+
+            &.flagged {
+                background-image: url(#{$hordes-img}/item/item_flag.gif);
+            }
+
+            &.no-bomb {
+                background-image: url(#{$hordes-img}/icons/small_x.gif);
+            }
+
+            &.mined {
+                background-image: url(#{$hordes-img}/emotes/zombie.gif);
+            }
+
+            &.game-over {
+                background-color: var(--mho-danger);
+                background-image: url(#{$hordes-img}/emotes/death.gif);
+            }
+        }
+
+        // Partie terminée : un « ? » posé sur une case sans mine redevient une case vide (sur une mine,
+        // `.mined` affiche déjà la mine).
+        &.game-ended .cell.questioned:not(.mined) {
+            background-image: none;
+        }
     }
 }
 

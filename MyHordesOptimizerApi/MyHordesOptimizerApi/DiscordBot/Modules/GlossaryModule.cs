@@ -3,6 +3,7 @@ using Discord;
 using Discord.Interactions;
 using Microsoft.Extensions.Logging;
 using MyHordesOptimizerApi.DiscordBot.Enums;
+using MyHordesOptimizerApi.DiscordBot.Localization;
 using MyHordesOptimizerApi.DiscordBot.Utility;
 using MyHordesOptimizerApi.Services.Interfaces;
 
@@ -37,7 +38,7 @@ namespace MyHordesOptimizerApi.DiscordBot.Modules
 
             if (results.Count == 0)
             {
-                await RespondAsync($"Aucune correspondance n'a été trouvée pour {searchValue}", ephemeral: true);
+                await RespondAsync(Context.Interaction.Texts().GlossaryNoMatch(searchValue), ephemeral: true);
             }
             else
             {

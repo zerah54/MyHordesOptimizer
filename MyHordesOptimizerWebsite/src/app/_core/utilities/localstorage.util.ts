@@ -65,6 +65,14 @@ export function setTown(town: TownDetails | null): void {
     current_town.set(town);
 }
 
+/**
+ * Ville du joueur, même quand il en observe une autre. Toute écriture passe par elle : une ville
+ * observée est en lecture seule, et une écriture sur elle y déposerait les données du joueur.
+ */
+export function getOwnTown(): TownDetails | null {
+    return current_town();
+}
+
 /** Signal en lecture seule, même principe que {@link user} : reflète `observed_town`/`current_town`
  * sans recopie figée à la construction. */
 export const town: Signal<TownDetails | null> = computed(() => observed_town() ?? current_town());

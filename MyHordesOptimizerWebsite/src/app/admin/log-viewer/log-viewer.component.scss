@@ -1,243 +1,353 @@
+/* Journal des logs (admin). Couleurs par les jetons du thème (`--mho-*`) : les anciennes teintes
+   Material 2 en dur (#ff9800, #4caf50…) portaient le texte atténué du thème, illisible dessus.
+   Les règles sont au premier niveau, pas sous `:host` : les options du filtre de niveau sont
+   rendues en surcouche, hors de l'hôte, et doivent recevoir les pastilles elles aussi. */
+
+$mono: 'JetBrains Mono', 'Fira Code', ui-monospace, Consolas, monospace;
+
+/* Couleur de chaque niveau, en paires (clair, sombre). La pastille porte un texte de cette couleur
+   sur 12 % de cette couleur mêlée au panneau (clair) ou au puits (sombre) : le panneau brun sombre
+   (#5A3020) est trop clair pour un texte coloré. Vérifié ≥ 5:1 sur les quatre familles, ≥ 4,5:1 au
+   survol (18 %). */
+$log-levels: (
+    verbose: var(--mho-text-muted),
+    debug: light-dark(#1556B0, #90CAF9),
+    information: light-dark(#24692A, #A5D6A7),
+    warning: light-dark(#7F5000, #FFCC80),
+    error: light-dark(#B3261E, #FF9A8F),
+    fatal: light-dark(#7B1FA2, #CE93D8),
+);
+$level-base: light-dark(var(--mho-surface), var(--mho-well));
+
 :host {
     display: contents;
+}
 
-    .log-viewer {
+.log-viewer {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    gap: 8px;
+
+    &__toolbar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        align-items: flex-start;
+        padding-top: 8px;
+    }
+
+    &__table-wrapper {
+        flex: 1;
+        overflow: auto;
+        border: 1px solid var(--mho-line);
+        border-radius: var(--mho-radius-l);
+        background: var(--mho-surface);
+    }
+
+    &__empty {
         display: flex;
         flex-direction: column;
-        height: 100%;
-        gap: 0.5em;
-        font-family: monospace;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 48px;
+        color: var(--mho-text-muted);
 
-        &__toolbar {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.5em;
-            align-items: flex-start;
-            padding-top: 0.5em;
-        }
-
-        &__table-wrapper {
-            flex: 1;
-            overflow: auto;
-            border: 1px solid var(--mat-sys-outline-variant);
-            border-radius: 0.25em;
-        }
-
-        &__empty {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5em;
-            padding: 48px;
-            color: var(--mat-sys-on-surface-variant);
-
-            mat-icon {
-                font-size: 48px;
-                width: 48px;
-                height: 48px;
-            }
+        mat-icon {
+            font-size: 48px;
+            width: 48px;
+            height: 48px;
         }
     }
+}
 
-    .field--date {
-        width: 160px;
+.field--date {
+    width: 160px;
+}
+
+.field--level {
+    width: 170px;
+}
+
+.field--correlation {
+    width: 320px;
+    max-width: 100%;
+}
+
+.field--search {
+    flex: 1 1 220px;
+}
+
+.level-trigger {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 4px;
+
+    mat-icon {
+        width: 18px;
+        height: 18px;
+        font-size: 18px;
+        color: var(--mho-text-muted);
+        cursor: pointer;
+    }
+}
+
+/* Pastille de niveau : lignes, déclencheur et options du filtre. */
+@each $name, $color in $log-levels {
+    .level--#{$name} {
+        --log-level: #{$color};
+    }
+}
+
+.level {
+    display: inline-block;
+    min-width: 6ch;
+    margin: 1px 0;
+    padding: 0 6px;
+    border: 0;
+    border-radius: 999px;
+    background-color: color-mix(in srgb, var(--log-level) 12%, $level-base);
+    color: var(--log-level);
+    font: 600 11px/18px $mono;
+    letter-spacing: 0.04em;
+    text-align: center;
+    vertical-align: top;
+}
+
+button.level {
+    cursor: pointer;
+
+    &:hover {
+        background-color: color-mix(in srgb, var(--log-level) 18%, $level-base);
     }
 
-    .field--search {
-        flex: 1;
+    &:focus-visible {
+        outline: 2px solid var(--log-level);
+        outline-offset: 1px;
     }
+}
 
-    .log-table {
-        width: 100%;
-        font-family: 'JetBrains Mono', 'Fira Code', monospace;
-        font-size: 12px;
-
-
-        .field--level .trigger {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 0.25em;
-            padding-right: 0.5em;
-        }
-
-        .field--level, .field--correlation {
-            padding-top: 0.5em;
-        }
-    }
+/* Tableau : lignes denses, alignées en haut — un message sur plusieurs lignes garde l'heure, le
+   niveau et la source en face de sa première ligne. */
+.log-table {
+    width: 100%;
+    font-size: 13px;
 
     .log-row {
+        height: 32px;
         cursor: default;
-        transition: background-color 0.15s;
 
-        &--clickable {
+        > .mat-mdc-cell {
+            padding: 6px 10px;
+            vertical-align: top;
+            line-height: 20px;
+        }
+
+        > .cell--expand {
+            width: 20px;
+            padding-right: 0;
+        }
+
+        &.log-row--clickable {
             cursor: pointer;
         }
 
-        &--warning {
-            background-color: rgba(255, 152, 0, 0.06);
+        /* Warning et au-delà : liseré de la couleur du niveau (`--log-level`, posé sur la ligne
+           par sa classe `level--…`). */
+        &.log-row--alert > .mat-mdc-cell:first-child {
+            box-shadow: inset 3px 0 0 var(--log-level);
         }
 
-        &--error {
-            background-color: rgba(244, 67, 54, 0.08);
+        &.log-row--expanded {
+            --mho-row-bg: var(--mho-surface-2);
+            background: var(--mho-row-bg);
         }
+    }
 
-        &--expanded {
-            background-color: var(--mat-sys-surface-variant) !important;
-        }
-
-        &:hover {
-            background-color: var(--mat-sys-surface-variant);
-        }
+    .mat-mdc-header-cell.cell--expand {
+        width: 20px;
+        padding-right: 0;
     }
 
     .detail-row {
         height: 0;
 
-        td {
+        > .mat-mdc-cell {
             border: none;
             padding: 0;
         }
     }
+}
 
-    .cell--stacktrace {
-        width: 42px;
-        padding: 0;
+.expand-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    padding: 0;
+    border: 0;
+    border-radius: 4px;
+    background: none;
+    color: var(--mho-text-muted);
+    cursor: pointer;
+
+    mat-icon {
+        width: 20px;
+        height: 20px;
+        font-size: 20px;
     }
 
-    .cell--timestamp {
-        white-space: nowrap;
-        width: 110px;
-        color: var(--mat-sys-on-surface-variant);
+    &:focus-visible {
+        outline: 2px solid var(--mho-accent);
+    }
+}
+
+/* Préfixé par la table : la couleur de texte des cellules (tables.scss) l'emporterait sinon. */
+.log-table .cell--timestamp {
+    white-space: nowrap;
+    color: var(--mho-text-muted);
+    font-family: $mono;
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+}
+
+.cell--level {
+    white-space: nowrap;
+}
+
+.source {
+    display: block;
+    max-width: 220px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: var(--mho-text-muted);
+    font-size: 12px;
+}
+
+/* Le message prend toute la place restante et revient à la ligne : rien n'est tronqué, et une
+   URL sans espace se coupe plutôt que d'élargir le tableau. */
+.cell--message {
+    width: 100%;
+}
+
+.message {
+    color: var(--mho-text);
+    font-family: $mono;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+
+/* Origine, requête, corrélation, action : seulement celles qui existent. */
+.meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    margin-top: 2px;
+    color: var(--mho-text-muted);
+    font: 11.5px/18px $mono;
+}
+
+.meta-item {
+    min-width: 0;
+    overflow-wrap: anywhere;
+
+    & + &::before {
+        content: '·';
+        margin: 0 8px;
+    }
+}
+
+.meta-key {
+    margin-right: 0.4em;
+}
+
+/* Paramètres de requête et identifiants : abrégés, valeur complète en infobulle (et à la copie). */
+.meta-query,
+.meta-id {
+    display: inline-block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    vertical-align: bottom;
+}
+
+.meta-query {
+    max-width: 28ch;
+}
+
+.meta-id {
+    max-width: 9ch;
+}
+
+.meta-link {
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--mho-accent);
+    font: inherit;
+    text-decoration: underline dotted;
+    text-underline-offset: 2px;
+    cursor: pointer;
+
+    &:hover {
+        text-decoration-style: solid;
     }
 
-    .cell--level {
-        white-space: nowrap;
-        width: 110px;
+    &:focus-visible {
+        outline: 2px solid var(--mho-accent);
+        outline-offset: 1px;
     }
+}
 
-    .cell--correlation {
-        white-space: nowrap;
-    }
+.expanded-content {
+    display: flex;
+    flex-direction: column;
+    border-top: 1px solid var(--mho-line);
+}
 
-    .cell--source {
-        width: 200px;
-        max-width: 200px;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        color: var(--mat-sys-on-surface-variant);
-    }
+.request-body {
+    padding: 8px 16px 12px;
+    background: var(--mho-well);
 
-    .cell--message div {
-        display: flex;
-        gap: 0.25em;
-        justify-content: flex-start;
-        align-items: center;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-
-    .message-text {
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        flex: 1;
-    }
-
-    .mat-mdc-chip {
-        cursor: pointer;
+    .section-label {
+        display: block;
+        margin-bottom: 6px;
+        color: var(--mho-text-muted);
+        font-size: 10px;
+        font-weight: 600;
+        letter-spacing: 0.05em;
         text-transform: uppercase;
     }
 
-    .correlation-link {
-        cursor: pointer;
-        text-decoration: underline dotted;
-        color: var(--mat-sys-primary);
-
-        &:hover {
-            text-decoration: underline;
-        }
+    /* Coloration de highlight.js : thème atom-one-dark (angular.json), conçu pour son propre fond
+       sombre. Ses couleurs posées sur un fond clair tombaient sous 3:1 : le bloc garde ce fond
+       dans les deux modes. */
+    pre {
+        margin: 0;
+        padding: 8px 12px;
+        border-radius: var(--mho-radius-m);
+        background: #282C34;
+        color: #ABB2BF;
+        font: 11px/1.6 $mono;
+        white-space: pre-wrap;
+        word-break: break-all;
     }
+}
 
-    .stacktrace {
-        background: var(--mat-sys-surface-container-low);
-        border-top: 1px solid var(--mat-sys-outline-variant);
-        padding: 12px 16px;
-        overflow: auto;
+.stacktrace {
+    padding: 12px 16px;
+    overflow: auto;
+    background: var(--mho-well);
 
-        pre {
-            margin: 0;
-            font-family: 'JetBrains Mono', 'Fira Code', monospace;
-            font-size: 11px;
-            line-height: 1.5;
-            white-space: pre-wrap;
-            word-break: break-all;
-            color: var(--mat-sys-error);
-        }
-    }
-
-    .cell--mho {
-        width: 90px;
-        max-width: 90px;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        font-size: 11px;
-        color: var(--mat-sys-on-surface-variant);
-    }
-
-    .cell--request {
-        max-width: 220px;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        cursor: default;
-    }
-
-    .request-path {
-        font-size: 11px;
-    }
-
-    .request-query {
-        font-size: 10px;
-        color: var(--mat-sys-on-surface-variant);
-        margin-left: 1px;
-    }
-
-    .cell--empty {
-        color: var(--mat-sys-outline);
-    }
-
-    .expanded-content {
-        display: flex;
-        flex-direction: column;
-    }
-
-    .request-body {
-        background: var(--mat-sys-surface-container);
-        border-top: 1px solid var(--mat-sys-outline-variant);
-        padding: 8px 16px 12px;
-
-        .section-label {
-            display: block;
-            font-size: 10px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            color: var(--mat-sys-on-surface-variant);
-            margin-bottom: 6px;
-        }
-
-        pre {
-            margin: 0;
-            font-family: 'JetBrains Mono', 'Fira Code', monospace;
-            font-size: 11px;
-            line-height: 1.6;
-            white-space: pre-wrap;
-            word-break: break-all;
-            background: transparent;
-        }
+    pre {
+        margin: 0;
+        color: var(--mho-danger);
+        font: 11px/1.5 $mono;
+        white-space: pre-wrap;
+        word-break: break-all;
     }
 }

@@ -1,10 +1,19 @@
 @if (item()) {
-    <li [class]="`mho-item ${display_mode}`" [class.force-open]="forceOpen()">
+    <li [class]="`mho-item ${display_mode}`" [class.force-open]="forceOpen()"
+        [class.selectable]="selectable()" [class.selected]="selected()">
         <div [class.broken]="item().is_broken">
-            <div class="title-part" (click)="toggleAdvancedMode()">
+            <!-- Clavier : la zone de titre est actionnable, elle doit donc être atteignable au Tab
+                 et réagir à Entrée / Espace comme un bouton. -->
+            <div class="title-part" role="button" [attr.tabindex]="forceOpen() ? null : 0"
+                 [attr.aria-pressed]="selectable() ? selected() : null"
+                 (click)="toggleAdvancedMode()"
+                 (keydown.enter)="toggleAdvancedMode()"
+                 (keydown.space)="$event.preventDefault(); toggleAdvancedMode()">
                 <div class="item_title">
                     <div class="item_img">
-                        <img [src]="HORDES_IMG_REPO + (item() | itemImg:item().is_broken)">
+                        @if (item() | itemImg:item().is_broken; as item_img) {
+                            <img [src]="HORDES_IMG_REPO + item_img" alt="">
+                        }
                         @if (item().bank_count && item().bank_count > 1) {
                             <span class="item_count">{{ item().bank_count }}</span>
                         }
@@ -29,20 +38,41 @@
                 <div class="advanced-part">
                     <div>{{ item().description[locale] }}</div>
 
-                    @if (item().drop_rate_praf > 0 || item().drop_rate_not_praf > 0) {
-                        <mat-divider></mat-divider>
-                        @if (item().drop_rate_praf > 0) {
-                            <div>
-                                <ng-container i18n>Taux d'obtention en cas de fouille réussie sur une zone praf</ng-container>
-                                {{ item().drop_rate_praf * 100 | number:'1.0-2':locale }}%
+                    <mat-divider></mat-divider>
+                    <div class="dig-chance">
+                        <div class="dig-head">
+                            <span class="dig-section" i18n>Fréquence en fouille</span>
+                            @if (dig_chance(); as dig) {
+                                <span class="dig-band" [class]="dig.band">{{ dig.band_label }}</span>
+                            }
+                        </div>
+                        @if (dig_chance(); as dig) {
+                            <div class="dig-figure">
+                                @if (dig.hits === 1) {
+                                    <ng-container i18n>≈ 1 fouille réussie sur</ng-container>
+                                } @else {
+                                    ≈<strong>{{ dig.hits | number:'1.0-0':locale }}</strong>
+                                    <ng-container i18n>fouilles réussies sur</ng-container>
+                                }
+                                <strong>{{ dig.out_of | number:'1.0-0':locale }}</strong>
                             </div>
-                        } @if (item().drop_rate_not_praf > 0) {
-                            <div>
-                                <ng-container i18n>Taux d'obtention en cas de fouille réussie sur une zone non-praf</ng-container>
-                                {{ item().drop_rate_not_praf * 100 | number:'1.0-2':locale }}%
+                            <div class="dig-bar" role="img"
+                                 [attr.aria-label]="(dig.percent | number:'1.0-2':locale) + ' % par fouille réussie'">
+                                <span [style.width.%]="dig.bar"></span>
                             </div>
+                            <div class="dig-detail">
+                                {{ dig.percent | number:'1.0-2':locale }}%
+                                @if (dig.praf) {
+                                    <ng-container i18n>par fouille réussie sur une zone épuisée</ng-container>
+                                } @else {
+                                    <ng-container i18n>par fouille réussie sur une zone non épuisée</ng-container>
+                                }
+                            </div>
+                        } @else {
+                            <div class="dig-detail" i18n>Introuvable en fouille</div>
                         }
-                    } @if (item().recipes.length > 0) {
+                    </div>
+                    @if (item().recipes.length > 0) {
                     <mat-divider></mat-divider>
                     @for (recipe of item().recipes; track recipe.name) {
                         <div>

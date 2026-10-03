@@ -238,6 +238,7 @@ builder.Services.AddSingleton<IGlossaryService, GlossaryService>();
 builder.Services.AddScoped<IMyHordesOptimizerParametersService, MyHordesOptimizerParametersService>();
 builder.Services.AddScoped<IMyHordesOptimizerMapService, MyHordesOptimizerMapService>();
 builder.Services.AddScoped<IMyHordesOptimizerEstimationService, MyHordesOptimizerEstimationService>();
+builder.Services.AddScoped<IRefinementService, MyHordesOptimizerApi.Services.Impl.Estimations.Refinement.RefinementService>();
 builder.Services.AddScoped<ICampingService, CampingService>();
 builder.Services.AddScoped<ICitizenItemActionsProvider, CitizenItemActionsProvider>();
 builder.Services.AddScoped<ICitizenDayStateEngine, CitizenDayStateEngine>();
@@ -248,6 +249,7 @@ builder.Services.AddSingleton<ITokenRateLimiter, TokenRateLimiter>();
 builder.Services.AddScoped<IExpeditionService, ExpeditionService>();
 builder.Services.AddScoped<ITownService, TownService>();
 builder.Services.AddScoped<IUserAccountService, UserAccountService>();
+builder.Services.AddScoped<IDirectorySearchService, DirectorySearchService>();
 builder.Services.AddScoped<INoteService, NoteService>();
 builder.Services.AddScoped<IETagVersionService, ETagVersionService>();
 
@@ -274,6 +276,10 @@ var jsonLocalizationManager = new JsonLocalizationManager(
 builder.Services.AddSingleton<ILocalizationManager>(jsonLocalizationManager);
 builder.Services.AddHostedService<InteractionHandlingHostedService>();    // Add the slash command handler
 builder.Services.AddHostedService<DiscordStartupHostedService>();         // Add the discord startup service
+// Compteurs /aa et /timer : une seule instance, à la fois service hébergé (boucle d'échéances) et planificateur injecté dans les modules
+builder.Services.AddSingleton<DiscordTimerHostedService>();
+builder.Services.AddSingleton<IDiscordTimerScheduler>(sp => sp.GetRequiredService<DiscordTimerHostedService>());
+builder.Services.AddHostedService(sp => sp.GetRequiredService<DiscordTimerHostedService>());
 builder.Services.AddDbContext<MhoContext>(ServiceLifetime.Transient);
 builder.Services.AddTransient<MyHordesOptimizerEnricher>();
 builder.Services.AddHttpLogging(logging =>
@@ -295,6 +301,7 @@ builder.Services.AddRateLimiter(options =>
          limiterOptions.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
          limiterOptions.QueueLimit = builder.Configuration.GetSection("MhoApiLimit").GetValue<int>("QueueLimit");
      });
+    options.AddRefinementPolicy();
 });
 
 var app = builder.Build();
@@ -336,8 +343,9 @@ app.UseSwaggerUI(c =>
 });
 
 app.UseHttpsRedirection();
-app.UseRateLimiter();
 app.UseRouting();
+// Après le routage : les politiques posées sur une route ([EnableRateLimiting]) lisent son endpoint.
+app.UseRateLimiter();
 
 app.UseAuthentication();
 app.UseAuthorization();

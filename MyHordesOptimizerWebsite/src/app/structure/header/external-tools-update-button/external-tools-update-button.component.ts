@@ -15,6 +15,7 @@ import {
 import { TownService } from '../../../_abstract_model/services/town.service';
 import { Imports } from '../../../_abstract_model/types/_types';
 import { TokenWithMe } from '../../../_abstract_model/types/token-with-me.class';
+import { PageReloadService } from '../../../_core/services/page-reload.service';
 import { SnackbarService } from '../../../_core/services/snackbar.service';
 import { setTokenWithMeWithExpirationDate, setTown, setUser } from '../../../_core/utilities/localstorage.util';
 
@@ -76,10 +77,13 @@ export class ExternalToolsUpdateButtonComponent {
 
     private readonly town_service: TownService = inject(TownService);
     private readonly snackbar: SnackbarService = inject(SnackbarService);
+    private readonly page_reload: PageReloadService = inject(PageReloadService);
     private readonly destroy_ref: DestroyRef = inject(DestroyRef);
     /** Retour au libellé normal après un succès : annulé par un nouveau clic */
     private reset_subscription: Subscription | null = null;
     private is_running: boolean = false;
+    /** La page a déjà été rechargée pour cette mise à jour */
+    private page_reloaded: boolean = false;
 
     protected update(): void {
         if (this.is_running) {
@@ -89,6 +93,7 @@ export class ExternalToolsUpdateButtonComponent {
         this.reset_subscription?.unsubscribe();
         this.reset_subscription = null;
         this.is_running = true;
+        this.page_reloaded = false;
         this.tools_state.set([]);
 
         this.town_service.updateExternalTools()
@@ -103,11 +108,12 @@ export class ExternalToolsUpdateButtonComponent {
                         setUser(renewed.simple_me);
                         setTown(renewed.simple_me.town_details);
                     }
+                    this.reloadPageOnceMhoIsUpToDate(state.tools ?? []);
                 },
                 error: () => {
                     this.is_running = false;
                     this.tools_state.set([]);
-                    this.snackbar.errorSnackbar($localize`:@@mho_external_tools_update_start_failed:La mise à jour des outils externes n'a pas pu être lancée`);
+                    this.snackbar.errorSnackbar($localize`:@@mho_update_start_failed:La mise à jour n'a pas pu être lancée`);
                 },
                 complete: () => this.onFollowEnded()
             });
@@ -141,6 +147,20 @@ export class ExternalToolsUpdateButtonComponent {
         this.reset_subscription = timer(SUCCESS_RESET_MS)
             .pipe(takeUntilDestroyed(this.destroy_ref))
             .subscribe(() => this.tools_state.set([]));
+    }
+
+    /**
+     * Dès que MyHordes Optimizer est à jour, la page affichée est rechargée pour montrer ce qui vient
+     * d'être enregistré. Une seule fois par mise à jour ; les autres outils n'y changent rien.
+     */
+    private reloadPageOnceMhoIsUpToDate(tools: ExternalToolUpdateStateDTO[]): void {
+        if (this.page_reloaded) {
+            return;
+        }
+        if (tools.some((tool: ExternalToolUpdateStateDTO): boolean => tool.tool === 'myHordesOptimizer' && tool.status === 'success')) {
+            this.page_reloaded = true;
+            void this.page_reload.reloadCurrentPage();
+        }
     }
 
     private buildTooltip(name: string, state: ExternalToolUpdateStateDTO): string {

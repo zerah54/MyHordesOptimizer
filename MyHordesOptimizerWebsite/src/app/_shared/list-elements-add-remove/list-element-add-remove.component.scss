@@ -1,10 +1,9 @@
-@use 'variables';
 
 :host {
     display: contents;
 
     .list-element-add-remove {
-        background-color: variables.$item_color;
+        background-color: var(--mho-accent-soft);
         border-radius: 0.25em;
         padding: 0.5em;
         width: 100%;

@@ -1,0 +1,25 @@
+@if (is_in_town() && current_town(); as current_town) {
+    <div class="chip">
+        <span class="summary" [matTooltip]="summary()">
+            @if (town_name(); as town_name) {
+                <span class="town-name">{{ town_name }}</span>
+                <span class="sep"></span>
+            }
+            <span class="day"><ng-container i18n>Jour</ng-container>&nbsp;{{ current_town.day }}</span>
+            @if (town_type_label(); as town_type_label) {
+                <span class="sep type"></span>
+                <span class="dim type">{{ town_type_label }}</span>
+            }
+        </span>
+        <!-- Une ville dévastée est toujours en chaos (MyHordes pose les deux ensemble,
+             `TownHandler::devastateTown`) : « Dévastée » suffit, et laisse la place au reste. -->
+        @if (current_town.is_devaste) {
+            <span class="town-flag devastated" i18n-matTooltip matTooltip="Ville dévastée, donc en chaos" i18n>Dévastée</span>
+        } @else if (current_town.is_chaos) {
+            <span class="town-flag chaos" i18n-matTooltip matTooltip="Ville en chaos" i18n>Chaos</span>
+        }
+        @if (is_readonly()) {
+            <span class="town-flag observed" i18n-matTooltip matTooltip="Vous observez cette ville : aucune modification n'est possible" i18n>Observation</span>
+        }
+    </div>
+}

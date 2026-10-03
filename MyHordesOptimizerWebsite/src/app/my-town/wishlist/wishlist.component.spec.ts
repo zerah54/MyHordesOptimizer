@@ -1,17 +1,23 @@
 import { provideHttpClient, withXhr } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
+import { WritableSignal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
+import { Subject } from 'rxjs';
+import type { MockInstance } from 'vitest';
 
 import { WishlistInfoDTO } from '../../_abstract_model/dto/wishlist-info.dto';
 import { WishlistItemDTO } from '../../_abstract_model/dto/wishlist-item.dto';
 import { WishlistInfo } from '../../_abstract_model/types/wishlist-info.class';
+import { WishlistItem } from '../../_abstract_model/types/wishlist-item.class';
 import { WishlistComponent } from './wishlist.component';
 
 interface TestableComponent {
-    wishlist_info: {
-        set(value: WishlistInfo): void;
-    };
+    wishlist_info: WritableSignal<WishlistInfo | null>;
+    unsaved_duplicates(): string[];
+    auto_save$: Subject<WishlistInfo>;
+    triggerSave(): void;
+    buildExcelRows(items: WishlistItem[]): Record<string, string | number>[];
 }
 
 function buildItemDto(overrides: Partial<WishlistItemDTO['item']> = {}): WishlistItemDTO['item'] {
@@ -35,6 +41,16 @@ function buildDtoWithoutChestAndMapFields(): WishlistItemDTO {
         item: buildItemDto(), priority: 0, depot: 0, shouldSignal: false, zoneXPa: 0
     };
     return dto as WishlistItemDTO;
+}
+
+/** Ligne de liste pour l'objet `id`, dans la zone `zone_x_pa`, avec la quantité souhaitée `count`. */
+function buildRowDto(id: number, zone_x_pa: number, count: number): WishlistItemDTO {
+    const label: string = `Objet ${id}`;
+    return {
+        count, bankCount: 0, bagCount: 0, bagCitizens: [], chestCount: 0, chestCitizens: [], mapCellItemCount: 0,
+        item: buildItemDto({ id, label: { fr: label, en: label, de: label, es: label }, wishListCount: 99 }),
+        priority: 0, depot: 0, shouldSignal: false, zoneXPa: zone_x_pa
+    };
 }
 
 describe('WishlistComponent', (): void => {
@@ -63,5 +79,40 @@ describe('WishlistComponent', (): void => {
         const row_ids: string[] = Array.from(fixture.nativeElement.querySelectorAll('tbody tr:first-child td') as NodeListOf<HTMLElement>).map(columnClass);
 
         expect(row_ids).toEqual(header_ids);
+    });
+
+    it('exporte la quantité souhaitée de chaque ligne, pas le wishlist_count de l\'objet', (): void => {
+        const testable: TestableComponent = fixture.componentInstance as unknown as TestableComponent;
+        const info: WishlistInfo = new WishlistInfo({ wishList: [buildRowDto(1, 0, 5), buildRowDto(1, 3, 2)], lastUpdateInfo: null });
+
+        const quantities: (string | number)[] = testable.buildExcelRows(info.wishlist_items)
+            .map((row: Record<string, string | number>): string | number => row['Quantité souhaitée']);
+
+        expect(quantities).toEqual([5, 2]);
+    });
+
+    it('suspend l\'enregistrement et le signale tant qu\'un objet figure deux fois dans la même zone', (): void => {
+        const testable: TestableComponent = fixture.componentInstance as unknown as TestableComponent;
+        testable.wishlist_info.set(new WishlistInfo({
+            wishList: [buildRowDto(1, 3, 5), buildRowDto(1, 3, 2), buildRowDto(2, 3, 1)],
+            lastUpdateInfo: null
+        }));
+        const next_spy: MockInstance<(value: WishlistInfo) => void> = vi.spyOn(testable.auto_save$, 'next');
+
+        testable.triggerSave();
+        fixture.detectChanges();
+
+        expect(next_spy).not.toHaveBeenCalled();
+        expect(testable.unsaved_duplicates()).toEqual(['Objet 1']);
+        const warning: HTMLElement | null = fixture.nativeElement.querySelector('.duplicate-warning[role="alert"]');
+        expect(warning?.textContent).toContain('Objet 1');
+
+        (testable.wishlist_info() as WishlistInfo).wishlist_items[1].zone_x_pa = 4;
+        testable.triggerSave();
+        fixture.detectChanges();
+
+        expect(next_spy).toHaveBeenCalledTimes(1);
+        expect(testable.unsaved_duplicates()).toEqual([]);
+        expect(fixture.nativeElement.querySelector('.duplicate-warning')).toBeNull();
     });
 });

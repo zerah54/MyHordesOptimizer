@@ -144,20 +144,14 @@
 
             // Couleurs explicites du badge (le variant « accent » donne un fond vide en thème monochrome).
             .filters-button {
-                --mat-badge-background-color: var(--mat-sys-tertiary);
-                --mat-badge-text-color: var(--mat-sys-surface);
+                --mat-badge-background-color: var(--mho-accent);
+                --mat-badge-text-color: var(--mho-on-accent);
             }
 
             .spacer {
                 flex: 1 1 auto;
             }
 
-            mat-button-toggle-group {
-                mat-icon {
-                    margin-right: 0.25em;
-                    vertical-align: middle;
-                }
-            }
 
             // Uniquement les boutons AVEC texte (Trier/Filtres) : espacer l'icône du libellé.
             // Exclut les mat-icon-button (icône seule), qui centrent déjà l'icône via flex.
@@ -184,7 +178,7 @@
                 // actions quotidiennes / actions héroïques / améliorations / dernière MàJ).
                 th.category-start,
                 td.category-start {
-                    border-left: 1px solid var(--mat-sys-outline-variant);
+                    border-left: 1px solid var(--mho-line-strong);
                 }
             }
         }
@@ -204,7 +198,7 @@
             // les colonnes qui défilent derrière en mode étendu.
             th.avatar_name,
             td.avatar_name {
-                background-color: var(--mat-sys-surface-container-low);
+                background-color: var(--mho-row-bg, var(--mho-surface));
             }
 
             th,
@@ -271,7 +265,7 @@
             td.job-col {
                 width: 30px;
                 min-width: 30px;
-                background-color: var(--mat-sys-surface-container-low);
+                background-color: var(--mho-row-bg, var(--mho-surface));
                 text-align: center;
                 padding: 0.25em 0;
 
@@ -288,7 +282,7 @@
             td.town-roles-col {
                 width: 46px;
                 min-width: 46px;
-                background-color: var(--mat-sys-surface-container-low);
+                background-color: var(--mho-row-bg, var(--mho-surface));
                 text-align: center;
                 padding: 0.25em 0;
                 white-space: nowrap;
@@ -314,8 +308,8 @@
                 align-items: center;
                 gap: 2px;
                 padding: 2px 4px;
-                border: 1px solid var(--mat-sys-outline-variant);
-                border-radius: 6px;
+                border: 1px solid var(--mho-line);
+                border-radius: var(--mho-radius-s);
 
                 // Taille d'image NON fixée : sprites pixel art, les redimensionner altère le rendu.
                 img {
@@ -437,11 +431,20 @@
             align-items: center;
             gap: 0.6em;
             padding: 0.5em 0.75em;
-            border: 1px solid var(--mat-sys-outline-variant);
-            border-radius: 8px;
+            border: 1px solid var(--mho-line);
+            border-radius: var(--mho-radius-m);
+            background: var(--mho-surface-2);
             flex: 1 1 260px;
             height: 92px;
             overflow: hidden;
+
+            // Citoyen atteint par la recherche globale : même repère que les lignes de tableau
+            // (`mho-row-targeted`) — fond, cadre et liseré d'accent, jamais la couleur seule.
+            &.is-targeted {
+                border-color: var(--mho-accent);
+                background-image: linear-gradient(var(--mho-accent-soft), var(--mho-accent-soft));
+                box-shadow: inset 3px 0 0 var(--mho-accent);
+            }
         }
 
         .citizen-light-info {

@@ -6,6 +6,7 @@ import { of } from 'rxjs';
 import { ExternalToolsUpdateJobStateDTO } from '../../../_abstract_model/dto/external-tools-update-state.dto';
 import { TokenWithMeDTO } from '../../../_abstract_model/dto/token-with-me.dto';
 import { TownService } from '../../../_abstract_model/services/town.service';
+import { PageReloadService } from '../../../_core/services/page-reload.service';
 import { getTokenWithMeWithExpirationDate, getTown, getUser, setTown, setUser } from '../../../_core/utilities/localstorage.util';
 import { ExternalToolsUpdateButtonComponent } from './external-tools-update-button.component';
 
@@ -61,5 +62,39 @@ describe('ExternalToolsUpdateButtonComponent', (): void => {
         expect(getUser()).toBeNull();
         expect(getTown()).toBeNull();
         expect(getTokenWithMeWithExpirationDate()).toBeNull();
+    });
+
+    it('recharge la page affichée une seule fois, dès que MyHordes Optimizer est à jour', (): void => {
+        const reload: ReturnType<typeof vi.spyOn> = vi.spyOn(TestBed.inject(PageReloadService), 'reloadCurrentPage').mockResolvedValue(true);
+        const pending: ExternalToolsUpdateJobStateDTO = {
+            jobId: 'x', isRunning: true, startedAt: null, finishedAt: null,
+            tools: [{ tool: 'myHordesOptimizer', status: 'pending', errors: [] }, { tool: 'gestHordes', status: 'pending', errors: [] }]
+        };
+        const mho_done: ExternalToolsUpdateJobStateDTO = {
+            ...pending, tools: [{ tool: 'myHordesOptimizer', status: 'success', errors: [] }, { tool: 'gestHordes', status: 'pending', errors: [] }]
+        };
+        const all_done: ExternalToolsUpdateJobStateDTO = {
+            ...pending, isRunning: false, tools: [{ tool: 'myHordesOptimizer', status: 'success', errors: [] }, { tool: 'gestHordes', status: 'success', errors: [] }]
+        };
+        vi.spyOn(town_service, 'updateExternalTools').mockReturnValue(of(pending, mho_done, all_done));
+        vi.spyOn(town_service, 'refreshMyCitizen');
+
+        testable.update();
+
+        expect(reload).toHaveBeenCalledTimes(1);
+    });
+
+    it('ne recharge pas la page si MyHordes Optimizer échoue', (): void => {
+        const reload: ReturnType<typeof vi.spyOn> = vi.spyOn(TestBed.inject(PageReloadService), 'reloadCurrentPage').mockResolvedValue(true);
+        const failed: ExternalToolsUpdateJobStateDTO = {
+            jobId: 'x', isRunning: false, startedAt: null, finishedAt: null,
+            tools: [{ tool: 'myHordesOptimizer', status: 'error', errors: [{ unit: 'job', message: 'boom' }] }]
+        };
+        vi.spyOn(town_service, 'updateExternalTools').mockReturnValue(of(failed));
+        vi.spyOn(town_service, 'refreshMyCitizen');
+
+        testable.update();
+
+        expect(reload).not.toHaveBeenCalled();
     });
 });

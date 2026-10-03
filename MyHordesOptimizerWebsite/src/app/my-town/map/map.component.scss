@@ -1,4 +1,3 @@
-@use 'variables';
 
 :host {
     display: contents;
@@ -6,27 +5,298 @@
     .mho-map-header {
         &.mat-mdc-card-header {
             justify-content: space-between;
-            align-items: baseline;
+            align-items: center;
+        }
+    }
+
+    /* La zone de carte est une carte à part entière : barre d'outils, puis la grille et le
+       panneau d'affichage côte à côte. Sans ce cadre, la grille flottait sur le fond de page
+       et l'espace resté libre sous elle ressemblait à un trou. */
+    .mho-map {
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+        overflow: hidden;
+        background-color: var(--mho-surface);
+        border: 1px solid var(--mho-line);
+        border-radius: var(--mho-radius-l);
+    }
+
+    .mho-map-toolbar {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-shrink: 0;
+        padding: 6px 10px;
+        border-bottom: 1px solid var(--mho-line);
+
+        .mho-map-tools {
+            display: flex;
+            align-items: center;
+            gap: 2px;
+
+            .zoom-value {
+                min-width: 4.5ch;
+                text-align: center;
+                font-size: 12px;
+                font-variant-numeric: tabular-nums;
+                color: var(--mho-text-muted);
+            }
+        }
+
+        /* Les trois gestes de la carte ne s'annoncent nulle part ailleurs. */
+        .mho-map-hint {
+            flex-grow: 1;
+            font-size: 12px;
+            color: var(--mho-text-muted);
+        }
+
+        .mho-map-settings-toggle {
+            flex-shrink: 0;
+        }
+    }
+
+    /* Sous 600 px : cibles de 44 px, et tout ce qui n'est pas une commande disparaît. */
+    @media (max-width: 599px) {
+        .mho-map-toolbar {
+            gap: 4px;
+            padding: 4px 6px;
+
+            .mho-map-hint,
+            .mho-map-tools .zoom-value {
+                display: none;
+            }
+
+            .mho-map-tools {
+                flex-grow: 1;
+
+                .mat-mdc-icon-button {
+                    width: 44px;
+                    height: 44px;
+                    padding: 10px;
+                }
+            }
         }
     }
 
     .mho-map-sidenav-container {
 
-        height: 100%;
-        background-color: variables.$card-background-color;
+        flex-grow: 1;
+        min-height: 0;
+        background-color: var(--mho-surface);
 
         .map-settings {
-            max-width: 250px;
-            padding: 0 1em;
-            background-color: variables.$card-background-color;
+            width: 288px;
+            max-width: 85vw;
+            padding: 0 16px 16px;
+            background-color: var(--mho-surface);
+            border-left: 1px solid var(--mho-line);
 
-            h1 {
-                margin-top: 0;
+            /* En-tête de panneau, calqué sur `.mho-card-header` : le titre ne doit pas peser
+               autant qu'un titre de page. */
+            .settings-header {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                margin: 0 -16px 12px;
+                padding: 6px 8px 6px 16px;
+                border-bottom: 1px solid var(--mho-line);
+
+                h1 {
+                    flex-grow: 1;
+                    margin: 0;
+                    font-family: var(--mho-font-display);
+                    font-size: 15px;
+                    font-weight: 600;
+                }
             }
 
+            /* Choix exclusifs en contrôle segmenté, comme la maquette. Le groupe Material est
+               une rangée : quatre segments ne tiennent pas dans 288 px, d'où la grille — chaque
+               segment garde son propre cadre, sinon les rayons d'angle du groupe ne valent plus
+               rien une fois les boutons répartis sur deux lignes. */
+            .mho-map-seg.mat-button-toggle-group {
+                display: grid;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 6px;
+                border: 0;
+                border-radius: 0;
+
+                .mat-button-toggle {
+                    border: 1px solid var(--mho-line);
+                    border-radius: var(--mho-radius-s);
+                    font-size: 12px;
+                }
+
+                .mat-button-toggle-checked {
+                    border-color: var(--mho-accent);
+                    background-color: var(--mho-accent-soft);
+                    color: var(--mho-on-accent-soft);
+                    font-weight: 600;
+                }
+
+                .mat-button-toggle-label-content {
+                    line-height: 32px;
+                    padding: 0 10px;
+                }
+            }
+
+            /* Intitulés de section : discrets, ils numérotent les réglages sans leur voler
+               la vedette. */
             h2 {
-                margin-top: 0.75em;
-                margin-bottom: 0.5em;
+                margin: 18px 0 8px;
+                font-size: 11px;
+                font-weight: 700;
+                letter-spacing: 0.06em;
+                text-transform: uppercase;
+                color: var(--mho-text-muted);
+            }
+
+            /* Titre de section et action de réinitialisation sur une même ligne. */
+            .section-head {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 8px;
+                min-height: 36px;
+                margin-top: 10px;
+
+                h2 {
+                    margin: 0;
+                }
+            }
+
+            /* Case en quatre quarts : chaque quart s'aligne vers le coin qu'il règle, et le nom du
+               réglage passe sur deux lignes plutôt que d'être tronqué. Fond teinté comme une case de
+               la carte, pour qu'on y lise une case. */
+            .corner-picker {
+                display: grid;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                grid-template-rows: repeat(2, minmax(56px, auto));
+                margin-top: 6px;
+                overflow: hidden;
+                border: 1px solid var(--mho-line-strong);
+                border-radius: var(--mho-radius-m);
+                background-color: color-mix(in srgb, var(--mho-map-l3) 30%, var(--mho-surface));
+
+                .corner-quarter {
+                    display: flex;
+                    gap: 7px;
+                    min-width: 0;
+                    padding: 8px 9px;
+                    border: 0;
+                    background: transparent;
+                    color: var(--mho-text);
+                    font: 500 12.5px/1.25 var(--mho-font-body);
+                    text-align: left;
+                    cursor: pointer;
+
+                    &:hover {
+                        background-color: var(--mho-hover);
+                    }
+
+                    &:focus-visible {
+                        outline: 2px solid var(--mho-accent);
+                        outline-offset: -2px;
+                    }
+
+                    /* Quart dont le menu est ouvert (attribut posé par le déclencheur Material). */
+                    &[aria-expanded='true'] {
+                        background-color: var(--mho-accent-soft);
+                        box-shadow: inset 0 0 0 2px var(--mho-accent);
+                    }
+
+                    &.empty .corner-label {
+                        color: var(--mho-text-muted);
+                    }
+
+                    &.top-left,
+                    &.top-right {
+                        align-items: flex-start;
+                        border-bottom: 1px solid var(--mho-line);
+                    }
+
+                    &.bottom-left,
+                    &.bottom-right {
+                        align-items: flex-end;
+                    }
+
+                    &.top-left,
+                    &.bottom-left {
+                        border-right: 1px solid var(--mho-line);
+                    }
+
+                    &.top-right,
+                    &.bottom-right {
+                        flex-direction: row-reverse;
+                        text-align: right;
+                    }
+                }
+
+                .corner-label {
+                    min-width: 0;
+                    overflow-wrap: anywhere;
+                }
+            }
+
+            /* Légende du type de carte : mêmes couleurs que les cases (map-cell.component.scss). */
+            .map-legend {
+                display: grid;
+                gap: 4px;
+                margin: 10px 0 0;
+                padding: 0;
+                list-style: none;
+                font-size: 12px;
+
+                li {
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                }
+
+                .swatch {
+                    flex: none;
+                    width: 14px;
+                    height: 14px;
+                    border: 1px solid var(--mho-line);
+                    border-radius: 3px;
+
+                    &.level-0 {
+                        background-color: var(--mho-map-l0);
+                    }
+
+                    &.level-1 {
+                        background-color: var(--mho-map-l1);
+                    }
+
+                    &.level-2 {
+                        background-color: var(--mho-map-l2);
+                    }
+
+                    &.level-3 {
+                        background-color: var(--mho-map-l3);
+                    }
+
+                    &.unknown {
+                        background-color: var(--mho-map-unknown);
+                    }
+                }
+
+                .label {
+                    flex: 1;
+                    min-width: 0;
+                }
+
+                .range {
+                    color: var(--mho-text-muted);
+                    font-variant-numeric: tabular-nums;
+                }
+            }
+
+            .settings-hint {
+                margin: 6px 0 0;
+                font-size: 11.5px;
+                color: var(--mho-text-muted);
             }
 
             .scrut-zones {
@@ -43,34 +313,53 @@
         .map-container {
             --mat-sidenav-content-background-color: transparent;
 
+            /* Glisser pour se déplacer : le curseur dit que la carte se prend en main, et la
+               sélection de texte ne doit pas s'inviter pendant le geste. */
+            &.dragging {
+                cursor: grabbing;
+                user-select: none;
+            }
+
             $aura-offset: 5px;
             $aura-blur: 7px;
-            $aura-color: rgba(0, 0, 0, 0.7);
+            /* Jeton de thème plutôt qu'un noir à 70 % : les règles de coordonnées se fondent
+               maintenant dans le panneau, et une ombre dure les cernait en mode clair. */
+            $aura-color: var(--mho-shadow-color);
 
-            ::ng-deep .mho-draw-map .border-cell {
-                box-shadow: var(--cell-me-shadow, 0 0 0 0 transparent),
-                            var(--cell-scroll-shadow, 0 0 0 0 transparent);
-                transition: box-shadow 0.15s ease;
+            /* Étalement et marge de rognage de l'ombre, voir ci-dessous. */
+            $aura-spread: 20px;
+            $aura-reach: $aura-offset + $aura-blur + 4px;
+
+            /* Aura de défilement : une ombre portée sur la règle de coordonnées collée du côté
+               où il reste du contenu masqué (classes posées par mhoScrollAura). La composition
+               avec le repère « ma case » et la coordonnée choisie est assurée dans
+               map-border.component.scss, qui déclare la propriété `box-shadow` de base.
+               Chaque case de la règle porte sa part de l'ombre. Floue de tous côtés, elle
+               débordait aussi sur ses voisines de la règle, et dessinait une couture à chaque
+               case (traits horizontaux sur les colonnes, verticaux sur les rangées). L'ombre est
+               donc élargie (étalement), puis rognée par `clip-path` aux bords de la case, sauf du
+               côté du défilement : les morceaux se raccordent sans couture. Le décalage compense
+               l'étalement, pour que l'ombre dépasse toujours de $aura-offset. Les cases d'angle,
+               dans une rangée ET une colonne, prennent l'ombre de la rangée (sélecteur plus
+               précis). */
+            &.can-scroll-up ::ng-deep .mho-draw-map .axis-row.top .border-cell {
+                --cell-scroll-shadow: 0 #{$aura-offset - $aura-spread} #{$aura-blur} #{$aura-spread} #{$aura-color};
+                clip-path: inset(0 0 -#{$aura-reach} 0);
             }
 
-            ::ng-deep .mho-draw-map .border-cell.me {
-                --cell-me-shadow: inset 0 0 0.25em 2px white;
+            &.can-scroll-down ::ng-deep .mho-draw-map .axis-row.bottom .border-cell {
+                --cell-scroll-shadow: 0 #{$aura-spread - $aura-offset} #{$aura-blur} #{$aura-spread} #{$aura-color};
+                clip-path: inset(-#{$aura-reach} 0 0 0);
             }
 
-            &.can-scroll-up ::ng-deep .mho-draw-map thead .border-cell {
-                --cell-scroll-shadow: 0 #{$aura-offset} #{$aura-blur} 0 #{$aura-color};
+            &.can-scroll-left ::ng-deep .mho-draw-map .border-cell.left {
+                --cell-scroll-shadow: #{$aura-offset - $aura-spread} 0 #{$aura-blur} #{$aura-spread} #{$aura-color};
+                clip-path: inset(0 -#{$aura-reach} 0 0);
             }
 
-            &.can-scroll-down ::ng-deep .mho-draw-map tfoot .border-cell {
-                --cell-scroll-shadow: 0 -#{$aura-offset} #{$aura-blur} 0 #{$aura-color};
-            }
-
-            &.can-scroll-left ::ng-deep .mho-draw-map tbody tr mho-map-border:first-of-type .border-cell {
-                --cell-scroll-shadow: #{$aura-offset} 0 #{$aura-blur} 0 #{$aura-color};
-            }
-
-            &.can-scroll-right ::ng-deep .mho-draw-map tbody tr mho-map-border:last-of-type .border-cell {
-                --cell-scroll-shadow: -#{$aura-offset} 0 #{$aura-blur} 0 #{$aura-color};
+            &.can-scroll-right ::ng-deep .mho-draw-map .border-cell.right {
+                --cell-scroll-shadow: #{$aura-spread - $aura-offset} 0 #{$aura-blur} #{$aura-spread} #{$aura-color};
+                clip-path: inset(0 0 0 -#{$aura-reach});
             }
         }
 
@@ -78,5 +367,46 @@
             overflow-x: hidden;
             overflow-y: auto;
         }
+    }
+}
+
+/* Hors de `:host` : le menu des coins s'affiche dans la couche de superposition, hors de l'hôte.
+   Ces règles restent propres au composant (attribut d'encapsulation du gabarit). */
+
+/* Icône du jeu (taille d'origine) ou exemple de valeur, pour une information sans icône. */
+.corner-glyph {
+    flex: none;
+    justify-self: center;
+
+    &.sample {
+        display: inline-grid;
+        place-items: center;
+        box-sizing: border-box;
+        min-width: 16px;
+        height: 16px;
+        padding: 0 3px;
+        border: 1px solid var(--mho-line-strong);
+        border-radius: 4px;
+        font: 700 10px var(--mho-font-body);
+        font-variant-numeric: tabular-nums;
+    }
+}
+
+/* Une colonne d'icônes de largeur fixe : les libellés restent alignés, quelle que soit la largeur
+   de l'icône du jeu. */
+.corner-option-content {
+    display: grid;
+    grid-template-columns: 22px auto;
+    align-items: center;
+    gap: 10px;
+}
+
+.corner-option[aria-checked='true'] {
+    background-color: var(--mho-accent-soft);
+    color: var(--mho-on-accent-soft);
+
+    /* Sur le contenu : Material fixe la graisse du texte de l'entrée, l'héritage ne passerait pas. */
+    .corner-option-content {
+        font-weight: 600;
     }
 }

@@ -121,23 +121,58 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
         public async Task ImportHeroSkill()
         {
             var codeCapacities = MyHordesCodeRepository.GetHeroCapacities();
-            var capacities = Mapper.Map<List<HeroSkill>>(codeCapacities);
 
             // Traduction
             var translations = await TranslationService.GetTranslations();
-            foreach (var capacitie in capacities)
+            var capacities = new List<HeroSkill>(codeCapacities.Count);
+            foreach (var codeCapacity in codeCapacities)
             {
+                var capacitie = Mapper.Map<HeroSkill>(codeCapacity);
                 capacitie.LabelFr = Traduire(translations, "fr", capacitie.LabelDe);
                 capacitie.LabelEn = Traduire(translations, "en", capacitie.LabelDe);
                 capacitie.LabelEs = Traduire(translations, "es", capacitie.LabelDe);
                 capacitie.DescriptionFr = Traduire(translations, "fr", capacitie.DescriptionDe);
                 capacitie.DescriptionEn = Traduire(translations, "en", capacitie.DescriptionDe);
                 capacitie.DescriptionEs = Traduire(translations, "es", capacitie.DescriptionDe);
+                // Arbre de compétences : groupe et puces se traduisent comme les libellés (même repli sur l'allemand).
+                capacitie.GroupFr = TraduireSiPresent(translations, "fr", capacitie.GroupDe);
+                capacitie.GroupEn = TraduireSiPresent(translations, "en", capacitie.GroupDe);
+                capacitie.GroupEs = TraduireSiPresent(translations, "es", capacitie.GroupDe);
+                capacitie.BulletsFr = TraduirePuces(translations, "fr", codeCapacity.Bullets);
+                capacitie.BulletsEn = TraduirePuces(translations, "en", codeCapacity.Bullets);
+                capacitie.BulletsEs = TraduirePuces(translations, "es", codeCapacity.Bullets);
+                capacities.Add(capacitie);
             }
 
             var heroSkills = DbContext.HeroSkills.ToList();
             var comparer = EqualityComparerFactory.Create<HeroSkill>(heroSkill => heroSkill.Name.GetHashCode(), (a, b) => a.Name == b.Name);
             DbContext.Patch(heroSkills, capacities, comparer);
+        }
+
+        /// <summary>
+        /// <see cref="Traduire"/> pour une valeur facultative : null reste null (compétence hors de l'arbre).
+        /// </summary>
+        private string? TraduireSiPresent(Dictionary<string, List<YmlTranslationFileModel>> translations, string langue, string? cleAllemande)
+        {
+            return cleAllemande is null ? null : Traduire(translations, langue, cleAllemande);
+        }
+
+        /// <summary>
+        /// Traduit chaque puce (avantage d'un niveau de l'arbre) avec <see cref="Traduire"/>, donc avec le même repli
+        /// sur l'allemand, et renvoie le tableau JSON à stocker. Null quand la compétence n'a pas de puces.
+        /// </summary>
+        private string? TraduirePuces(Dictionary<string, List<YmlTranslationFileModel>> translations, string langue, List<string>? puces)
+        {
+            if (puces is null || puces.Count == 0)
+            {
+                return null;
+            }
+            var traductions = new List<string>(puces.Count);
+            foreach (var puce in puces)
+            {
+                traductions.Add(Traduire(translations, langue, puce));
+            }
+            return HeroSkillBullets.Serialize(traductions);
         }
 
         #endregion
@@ -1455,6 +1490,8 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
 
             // Mise à jour de toutes les tables ayant une FK directe sur Town.idTown
             DbContext.Database.ExecuteSqlRaw("UPDATE TownEstimation SET idTown = {0} WHERE idTown = {1}", dto.Id, oldIdTown);
+            DbContext.Database.ExecuteSqlRaw("UPDATE TownAttackSetting SET idTown = {0} WHERE idTown = {1}", dto.Id, oldIdTown);
+            DbContext.Database.ExecuteSqlRaw("UPDATE TownAttackRefinement SET idTown = {0} WHERE idTown = {1}", dto.Id, oldIdTown);
             DbContext.Database.ExecuteSqlRaw("UPDATE TownWishListItem SET idTown = {0} WHERE idTown = {1}", dto.Id, oldIdTown);
             DbContext.Database.ExecuteSqlRaw("UPDATE TownBankItem SET idTown = {0} WHERE idTown = {1}", dto.Id, oldIdTown);
             DbContext.Database.ExecuteSqlRaw("UPDATE TownCitizenDailyAction SET idTown = {0} WHERE idTown = {1}", dto.Id, oldIdTown);

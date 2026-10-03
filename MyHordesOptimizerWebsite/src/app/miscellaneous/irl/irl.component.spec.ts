@@ -1,10 +1,14 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
-import { DataView } from 'vis-data/peer';
+import { DataSet, DataView } from 'vis-data/peer';
+import { Network } from 'vis-network/peer';
 import { setupVitestCanvasMock } from 'vitest-canvas-mock';
 
+import { ChartsThemingService } from '../../_core/services/charts-theming.service';
+import { ThemeService } from '../../_core/services/theme.service';
 import { SelectComponent } from '../../_shared/select/select.component';
 import { IrlComponent } from './irl.component';
+import { IrlLink, links } from './irl-links.const';
 import { IrlPeople, people } from './irl-people.const';
 import { IrlTowns, towns } from './irl-towns.const';
 
@@ -22,6 +26,8 @@ describe('IrlComponent', (): void => {
         await TestBed.configureTestingModule({
             imports: [IrlComponent]
         }).compileComponents();
+        // Jeton → couleur factice reconnaissable : jsdom ne résout pas les variables CSS.
+        vi.spyOn(TestBed.inject(ChartsThemingService), 'token').mockImplementation((name: string): string => `color(${name})`);
         fixture = TestBed.createComponent(IrlComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
@@ -54,6 +60,36 @@ describe('IrlComponent', (): void => {
             selected_towns: IrlTowns[];
         }).selected_towns;
     }
+
+    function edgeColor(index: number): string | undefined {
+        const edges: DataSet<{ id: number; color?: { color?: string } }> = (component as unknown as {
+            edges: DataSet<{ id: number; color?: { color?: string } }>;
+        }).edges;
+        return edges.get(index)?.color?.color;
+    }
+
+    it('colours the links with the theme tokens, never with hard-coded colours', (): void => {
+        const index_of: (type: IrlLink['type']) => number = (type: IrlLink['type']): number => links.findIndex((link: IrlLink): boolean => link.type === type);
+
+        expect(edgeColor(index_of('couple'))).toBe('color(--mho-danger)');
+        expect(edgeColor(index_of('famille'))).toBe('color(--mho-accent-2)');
+        expect(edgeColor(index_of(undefined))).toBe('color(--mho-line-strong)');
+    });
+
+    it('re-reads the tokens and recolours the graph when the theme changes', async (): Promise<void> => {
+        const set_options: ReturnType<typeof vi.spyOn> = vi.spyOn(Network.prototype, 'setOptions');
+        const token: ReturnType<typeof vi.spyOn> = vi.spyOn(TestBed.inject(ChartsThemingService), 'token')
+            .mockImplementation((name: string): string => `light(${name})`);
+
+        TestBed.inject(ThemeService).setMode(TestBed.inject(ThemeService).is_dark() ? 'light' : 'dark');
+        fixture.detectChanges();
+        await Promise.resolve();
+
+        expect(token).toHaveBeenCalledWith('--mho-surface-2');
+        expect(set_options).toHaveBeenCalled();
+        expect(edgeColor(links.findIndex((link: IrlLink): boolean => link.type === 'couple'))).toBe('light(--mho-danger)');
+        localStorage.removeItem('theme-mode');
+    });
 
     it('initializes without throwing and renders the graph canvas inside #hordiens', (): void => {
         const container: HTMLElement = fixture.debugElement.query(By.css('#hordiens')).nativeElement;

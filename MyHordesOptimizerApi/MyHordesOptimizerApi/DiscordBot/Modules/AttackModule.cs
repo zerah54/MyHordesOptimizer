@@ -1,9 +1,12 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Interactions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using MyHordesOptimizerApi.DiscordBot.Localization;
 using MyHordesOptimizerApi.DiscordBot.Utility;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Estimations;
 using MyHordesOptimizerApi.Services.Interfaces.Estimations;
@@ -33,6 +36,7 @@ namespace MyHordesOptimizerApi.DiscordBot.Modules
             [Summary(name: "private-msg", description: "True if the message should not be seen by all")]
             bool privateMsg = false)
         {
+            BotTexts texts = Context.Interaction.Texts();
             try
             {
                 await DeferAsync(ephemeral: privateMsg);
@@ -41,53 +45,19 @@ namespace MyHordesOptimizerApi.DiscordBot.Modules
                 var estimationService = scope.ServiceProvider.GetRequiredService<IMyHordesOptimizerEstimationService>();
 
                 var resultForDay = estimationService.CalculateAttack(townId: townId, dayAttack: day);
-                var resultForDayBeta = estimationService.CalculateAttack(townId: townId, dayAttack: day, beta: true);
-
-                var resultForDayDisplay = $"*Attaque J{day} calculée* : {resultForDay.Result.Min} - {resultForDay.Result.Max}";
-                var resultForDayBetaDisplay = $"*Attaque J{day} calculée (Beta)* : {resultForDayBeta.Result.Min} - {resultForDayBeta.Result.Max}";
 
                 var embedBuilder = new EmbedBuilder()
-                    .WithTitle($"Estimations pour le jour {day}")
-                    .WithDescription($"{resultForDayDisplay}\n{resultForDayBetaDisplay}")
+                    .WithTitle(texts.AttackEstimationsTitle(day))
+                    .WithDescription(texts.AttackCalculated(day, resultForDay.Result.Min, resultForDay.Result.Max))
                     .WithColor(DiscordBotConsts.MhoColorPink);
 
-                var estimationsForDayPlanif = estimationService.GetEstimations(townId: townId, day: day - 1);
-                var estimationsForDayPlanifValues = estimationsForDayPlanif.Planif.GetType().GetProperties();
-                if (estimationsForDayPlanifValues.Length > 0)
-                {
-                    var values = "";
-                    foreach (var tuple in estimationsForDayPlanifValues)
-                    {
-                        var estimationTuple = estimationService.CreateTupleFromValue(tuple.Name, tuple.GetValue(estimationsForDayPlanif.Planif) as EstimationValueDto);
-                        values += estimationTuple.Percent + "% : " + estimationTuple.Min + " - " + estimationTuple.Max + "\n";
-                    }
-                    var estimationsForDayPlanifField = new EmbedFieldBuilder()
-                        .WithName($"Planificateur J{day - 1}")
-                        .WithValue(values)
-                        .WithIsInline(true);
-                    embedBuilder.WithFields(estimationsForDayPlanifField);
-                }
-
-                var estimationsForDayEstim = estimationService.GetEstimations(townId: townId, day: day);
-                var estimationsForDayEstimValues = estimationsForDayEstim.Estim.GetType().GetProperties();
-                if (estimationsForDayEstimValues.Length > 0)
-                {
-                    var values = "";
-                    foreach (var tuple in estimationsForDayEstimValues)
-                    {
-                        var estimationTuple = estimationService.CreateTupleFromValue(tuple.Name, tuple.GetValue(estimationsForDayEstim.Estim) as EstimationValueDto);
-                        values += estimationTuple.Percent + "% : " + estimationTuple.Min + " - " + estimationTuple.Max + "\n";
-                    }
-                    var estimationsForDayEstimField = new EmbedFieldBuilder()
-                        .WithName($"Estimation J{day}")
-                        .WithValue(values)
-                        .WithIsInline(true);
-                    embedBuilder.WithFields(estimationsForDayEstimField);
-                }
+                AddEstimationField(embedBuilder, estimationService, texts.AttackPlannerField(day - 1), estimationService.GetEstimations(townId: townId, day: day - 1).Planif);
+                AddEstimationField(embedBuilder, estimationService, texts.AttackEstimationField(day), estimationService.GetEstimations(townId: townId, day: day).Estim);
 
                 if (privateMsg)
                 {
                     await Context.User.SendMessageAsync(embed: embedBuilder.Build());
+                    await ModifyOriginalResponseAsync(props => { props.Content = texts.AttackSentByDirectMessage; });
                 }
                 else
                 {
@@ -97,7 +67,24 @@ namespace MyHordesOptimizerApi.DiscordBot.Modules
             catch (Exception e)
             {
                 _logger.LogError(e.ToString(), e);
-                await RespondAsync($"Une erreur s'est produite lors de la récupération des estimations\n```{e.Message}```", ephemeral: true);
+                await Context.Interaction.SendEphemeralAsync(texts.AttackError(e.Message), isDeferredEphemeral: privateMsg);
+            }
+        }
+
+        /// <summary>
+        /// Ajoute un champ listant les paliers renseignés (pourcentage : min - max) ; aucun champ si aucun ne l'est.
+        /// </summary>
+        private static void AddEstimationField(EmbedBuilder embedBuilder, IMyHordesOptimizerEstimationService estimationService, string name, EstimationsDto estimations)
+        {
+            IEnumerable<string> lines = typeof(EstimationsDto).GetProperties()
+                .Select(property => estimationService.CreateTupleFromValue(property.Name, property.GetValue(estimations) as EstimationValueDto))
+                .Where(tuple => tuple.Min.HasValue && tuple.Max.HasValue)
+                .Select(tuple => $"{tuple.Percent}% : {tuple.Min} - {tuple.Max}");
+
+            string values = string.Join("\n", lines);
+            if (values.Length > 0)
+            {
+                embedBuilder.AddField(name, values, inline: true);
             }
         }
     }

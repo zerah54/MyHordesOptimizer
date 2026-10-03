@@ -43,6 +43,8 @@ export class MapUpdateComponent implements OnInit {
     protected cell: Cell;
     /** Signal : réassigné depuis le subscribe de getDigs() (async) et lu par le propre template. */
     protected readonly digs: WritableSignal<Dig[] | undefined> = signal(undefined);
+    /** Fouilles telles qu'enregistrées : celles retirées dans l'onglet sont supprimées à l'enregistrement. */
+    private saved_digs: Dig[] = [];
 
     /** Miroir signal de `data.cell` : `data.cell` (objet injecté, pas un signal) est réassigné de
      * façon asynchrone dans saveCell() — sans ce miroir, les boutons [mat-dialog-close] resteraient
@@ -66,7 +68,8 @@ export class MapUpdateComponent implements OnInit {
             .pipe(takeUntilDestroyed(this.destroy_ref))
             .subscribe({
                 next: (digs: Dig[]): void => {
-                    this.digs.set(digs.filter((dig: Dig) => dig.x === this.cell.displayed_x && dig.y === this.cell.displayed_y));
+                    this.saved_digs = digs.filter((dig: Dig) => dig.x === this.cell.displayed_x && dig.y === this.cell.displayed_y);
+                    this.digs.set([...this.saved_digs]);
                 }
             });
     }
@@ -81,13 +84,22 @@ export class MapUpdateComponent implements OnInit {
                     this.dialog_close_cell.set(this.data.cell);
                 }
             });
-        const current_digs: Dig[] | undefined = this.digs();
-        if (current_digs && current_digs.length > 0) {
+        const current_digs: Dig[] = this.digs() ?? [];
+        if (current_digs.length > 0) {
             this.digs_service
                 .updateDig(current_digs)
                 .pipe(takeUntilDestroyed(this.destroy_ref))
                 .subscribe();
         }
+        this.saved_digs
+            .filter((dig: Dig): boolean => !current_digs.includes(dig))
+            .forEach((removed_dig: Dig): void => {
+                this.digs_service
+                    .deleteDig(removed_dig)
+                    .pipe(takeUntilDestroyed(this.destroy_ref))
+                    .subscribe();
+            });
+        this.saved_digs = [...current_digs];
     }
 }
 

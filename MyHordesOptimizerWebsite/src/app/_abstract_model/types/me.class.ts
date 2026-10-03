@@ -5,7 +5,8 @@ import { TownDetails } from './town-details.class';
 export class Me extends CommonModel<MeDTO> {
     public id!: number;
     public username!: string;
-    private avatar!: string | null;
+    /** Chemin de l'avatar MyHordes, relatif ou absolu (voir `mho-avatar`). */
+    public avatar: string | null = null;
     public town_details!: TownDetails;
 
     public constructor(dto?: MeDTO) {

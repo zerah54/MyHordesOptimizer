@@ -1,19 +1,35 @@
-@use '../../../../public/scss/variables';
-
+/* L'avatar est une image de joueur (100 × 100 webp côté MyHordes), pas un sprite du jeu : il se
+   redimensionne sans dommage. Il le fait par sa boîte de layout, pas par `transform` — un élément
+   transformé garde la place de sa taille d'origine, ce qui obligeait chaque appelant à l'enfermer
+   dans un cadre `overflow: hidden` ou à repasser par-dessus en `::ng-deep`.
+   Sans `[size]`, l'image garde sa taille naturelle (100 px), celle des avatars du jeu.
+   Pas d'avatar, pas de boîte : l'hôte porte alors `is-empty` et se replie, comme le faisait le
+   `display: contents` d'avant. Une colonne qui a besoin du créneau dans tous les cas le réserve
+   sur son propre cadre (voir l'annuaire), pas sur l'hôte. */
 :host {
-    display: contents;
+    display: inline-flex;
+    flex: 0 0 auto;
+    width: var(--mho-avatar-size, 100px);
+    height: var(--mho-avatar-size, 100px);
+
+    &.is-empty {
+        display: none;
+    }
 
     .mho-avatar {
-        display: contents;
+        display: block;
+        width: 100%;
+        height: 100%;
 
-        > * {
-            width: 100px;
+        img {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
 
-        &.rounded {
-            > * {
-                transform: scale(0.35) translateX(-110%) translateY(-95%);
-            }
+        &.rounded img {
+            border-radius: 50%;
         }
     }
 }

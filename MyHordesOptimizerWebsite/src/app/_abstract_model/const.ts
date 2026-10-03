@@ -7,6 +7,7 @@ export const WISHLIST_EDITION_MODE_KEY: string = 'wishlist_edition_mode';
 export const EXPEDITIONS_EDITION_MODE_KEY: string = 'expeditions_edition_mode';
 export const CITIZENS_LIST_DISPLAY_MODE_KEY: string = 'citizens_list_display_mode';
 export const MINESWEEPER_ZOOM_KEY: string = 'minesweeper_zoom_level';
+export const MINESWEEPER_THEME_KEY: string = 'minesweeper_theme';
 export const ITEMS_KEY: string = 'all_items';
 export const BANK_KEY: string = 'bank_cache';
 export const RUINS_KEY: string = 'all_ruins';

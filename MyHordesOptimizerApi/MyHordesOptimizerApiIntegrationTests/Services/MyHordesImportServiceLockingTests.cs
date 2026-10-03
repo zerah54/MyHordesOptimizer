@@ -150,6 +150,40 @@ namespace MyHordesOptimizerApiIntegrationTests.Services
             assertContext.Towns.AsNoTracking().Any(t => t.IdTown == -mapIdQ).Should().BeFalse("ligne provisoire B migrée, pas dupliquée");
         }
 
+        [Fact]
+        public async Task ImportSingleTownAsync_MigreLesReglagesEtAffinagesDAttaque()
+        {
+            var suffix = Guid.NewGuid().ToString("N").Substring(0, 8);
+            var random = new Random();
+            var mapId = random.Next(1, int.MaxValue);
+            var newIdTown = random.Next(1, int.MaxValue);
+            var oldIdTown = -mapId;
+
+            var fakeRepo = new SingleTownMigrationRepository(newIdTown, mapId);
+            using var factory = _factory.WithWebHostBuilder(builder =>
+            {
+                builder.ConfigureTestServices(services => services.AddScoped<IMyHordesApiRepository>(_ => fakeRepo));
+            });
+            var scope = factory.Services.CreateScope();
+            var context = scope.ServiceProvider.GetRequiredService<MhoContext>();
+            var importService = scope.ServiceProvider.GetRequiredService<IMyHordesImportService>();
+
+            context.Towns.Add(new Town { IdTown = oldIdTown, Name = "test-town-" + suffix });
+            context.SaveChanges();
+            context.TownAttackSettings.Add(new TownAttackSetting { IdTown = oldIdTown, Day = 4, Souls = 1 });
+            context.TownAttackRefinements.Add(new TownAttackRefinement { IdTown = oldIdTown, Day = 4, Input = "{}", CandidateCount = 0, Status = "Valid", ComputedAt = DateTime.UtcNow });
+            context.SaveChanges();
+
+            await Task.Run(() => importService.ImportSingleTownAsync(mapId));
+
+            context.TownAttackSettings.AsNoTracking().Any(s => s.IdTown == newIdTown && s.Day == 4).Should().BeTrue();
+            context.TownAttackRefinements.AsNoTracking().Any(r => r.IdTown == newIdTown && r.Day == 4).Should().BeTrue();
+
+            // Les lignes ont changé de clé : l'interceptor de nettoyage ne les retrouverait pas.
+            context.TownAttackSettings.Where(s => s.IdTown == newIdTown).ExecuteDelete();
+            context.TownAttackRefinements.Where(r => r.IdTown == newIdTown).ExecuteDelete();
+        }
+
         /// <summary>Sert ImportSingleTownAsync(mapId) : /json/towns renvoie une ville dont l'Id diffère du mapId interrogé, déclenchant la migration. /json/map est ensuite appelé (try/catch qui absorbe l'échec) : on lève simplement, sans conséquence sur le test.</summary>
         private sealed class SingleTownMigrationRepository : IMyHordesApiRepository
         {

@@ -31,10 +31,9 @@
                     <mat-label i18n>Abondance (fouineur)</mat-label>
                     <mat-select formControlName="scav_zone_level">
                         <mat-option [value]="null" i18n>Non renseignée</mat-option>
-                        <mat-option [value]="0" i18n>0 – Zone épuisée</mat-option>
-                        <mat-option [value]="1" i18n>1 – Zone déjà fouillée</mat-option>
-                        <mat-option [value]="2" i18n>2 – Zone peu fouillée</mat-option>
-                        <mat-option [value]="3" i18n>3 – Zone abondante</mat-option>
+                        @for (dig_level of dig_levels; track dig_level.level) {
+                            <mat-option [value]="dig_level.level">{{ dig_level.level }} – {{ dig_level.label }}</mat-option>
+                        }
                     </mat-select>
                 </mat-form-field>
                 <mat-form-field>

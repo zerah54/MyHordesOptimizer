@@ -98,6 +98,8 @@ export class WishlistComponent implements OnInit {
     protected drag_disabled: WritableSignal<boolean> = signal(true);
     protected wishlist_filters: WritableSignal<WishlistFilters> = signal({ items: '', depot: [] });
     protected current_zone_xp_pa_add_item: WritableSignal<number> = signal(0);
+    /** Objets présents deux fois dans une même zone : tant qu'il en reste, la liste n'est pas enregistrée. */
+    protected readonly unsaved_duplicates: WritableSignal<string[]> = signal([]);
     protected datasource: MatTableDataSource<WishlistItem> = new MatTableDataSource();
     protected wishlist_filters_change: EventEmitter<void> = new EventEmitter();
     private readonly clipboard: ClipboardService = inject(ClipboardService);
@@ -213,19 +215,17 @@ export class WishlistComponent implements OnInit {
         this.triggerSave();
     }
 
-    /** Déclenche l'auto-save */
+    /**
+     * Déclenche l'auto-save. Une paire (objet, zone) en double serait refusée par l'API (clé ville, objet, zone) :
+     * l'enregistrement est suspendu et les objets concernés sont signalés jusqu'à correction.
+     */
     protected triggerSave(): void {
         const info: WishlistInfo | null = this.wishlist_info();
         if (!info) return;
 
-        const has_duplicates: boolean = info.wishlist_items.some(
-            (item: WishlistItem, index: number): boolean => info.wishlist_items.some(
-                (other: WishlistItem, other_index: number): boolean =>
-                    index !== other_index && item.item.id === other.item.id && item.zone_x_pa === other.zone_x_pa
-            )
-        );
-
-        if (has_duplicates) return;
+        const duplicates: string[] = this.findDuplicateLabels(info.wishlist_items);
+        this.unsaved_duplicates.set(duplicates);
+        if (duplicates.length > 0) return;
 
         this.auto_save$.next(info);
     }
@@ -236,7 +236,12 @@ export class WishlistComponent implements OnInit {
         if (!info) return;
 
         const updated_items: WishlistItem[] = [...info.wishlist_items];
-        const index: number = updated_items.findIndex((wishlist_item: WishlistItem): boolean => wishlist_item.item.id === row.item.id);
+        // La ligne elle-même, sinon la même paire (objet, zone) : un même objet peut figurer dans
+        // plusieurs zones, retirer la première ligne de cet objet supprimait parfois la mauvaise.
+        const same_row_index: number = updated_items.indexOf(row);
+        const index: number = same_row_index !== -1
+            ? same_row_index
+            : updated_items.findIndex((wishlist_item: WishlistItem): boolean => wishlist_item.item.id === row.item.id && wishlist_item.zone_x_pa === row.zone_x_pa);
         if (index === -1) return;
 
         updated_items.splice(index, 1);
@@ -356,17 +361,7 @@ export class WishlistComponent implements OnInit {
             SheetNames: []
         };
 
-        const simplify_item: { [key: string]: string | number }[] = info.wishlist_items.map((item: WishlistItem): { [key: string]: string | number } => {
-            const final_item: { [key: string]: string | number } = {};
-            final_item[this.excel_headers['id'].label] = item.item.id;
-            final_item[this.excel_headers['name'].label] = item.item.label[this.locale];
-            final_item[this.excel_headers['depot'].label] = item.depot.value.count;
-            final_item[this.excel_headers['zone_x_pa'].label] = item.zone_x_pa;
-            final_item[this.excel_headers['count'].label] = item.item.wishlist_count;
-            return final_item;
-        });
-
-        const data: WorkSheet = utils.json_to_sheet(simplify_item, { cellStyles: true });
+        const data: WorkSheet = utils.json_to_sheet(this.buildExcelRows(info.wishlist_items), { cellStyles: true });
         workbook.SheetNames.push($localize`Liste de courses`);
         workbook.Sheets[$localize`Liste de courses`] = data;
 
@@ -441,6 +436,35 @@ export class WishlistComponent implements OnInit {
             });
     }
 
+    /**
+     * Lignes de l'export Excel, relues telles quelles par {@link importExcel}. La quantité est celle de la ligne
+     * (`count`) : `item.wishlist_count` vient de la première ligne de l'objet dans la ville, quelle que soit sa zone.
+     */
+    protected buildExcelRows(items: WishlistItem[]): ExcelRow[] {
+        return items.map((item: WishlistItem): ExcelRow => ({
+            [this.excel_headers['id'].label]: item.item.id,
+            [this.excel_headers['name'].label]: item.item.label[this.locale],
+            [this.excel_headers['depot'].label]: item.depot.value.count,
+            [this.excel_headers['zone_x_pa'].label]: item.zone_x_pa,
+            [this.excel_headers['count'].label]: item.count
+        }));
+    }
+
+    /** Libellés, sans répétition, des objets présents au moins deux fois dans la même zone. */
+    private findDuplicateLabels(items: WishlistItem[]): string[] {
+        const seen: Set<string> = new Set<string>();
+        const labels: Set<string> = new Set<string>();
+        for (const item of items) {
+            const key: string = `${item.item.id}_${item.zone_x_pa}`;
+            if (seen.has(key)) {
+                labels.add(item.item.label[this.locale]);
+            } else {
+                seen.add(key);
+            }
+        }
+        return [...labels];
+    }
+
     private resetPriorities(array: WishlistItem[]): WishlistItem[] {
         let priority_factor: number = 999;
         array.forEach((item: WishlistItem): void => {
@@ -470,3 +494,5 @@ interface WishlistFilters {
     items: string;
     depot: WishlistDepot[];
 }
+
+type ExcelRow = Record<string, string | number>;

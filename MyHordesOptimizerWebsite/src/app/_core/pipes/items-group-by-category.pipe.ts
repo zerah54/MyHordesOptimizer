@@ -4,7 +4,7 @@ import moment from 'moment';
 import { Category } from '../../_abstract_model/types/category.class';
 import { Item } from '../../_abstract_model/types/item.class';
 import { groupBy } from '../utilities/array.util';
-import { normalizeString } from '../utilities/string.utils';
+import { localizedLabel, normalizeString } from '../utilities/string.utils';
 
 
 @Pipe({
@@ -16,7 +16,8 @@ export class ItemsGroupByCategoryPipe implements PipeTransform {
 
     public transform(items: Item[], order_by?: 'id'): CategoryWithItem[] {
         items = items.sort((item_a: Item, item_b: Item) => {
-            return normalizeString(item_a.label[this.locale]).localeCompare(normalizeString(item_b.label[this.locale]));
+            return normalizeString(localizedLabel(item_a.label, this.locale))
+                .localeCompare(normalizeString(localizedLabel(item_b.label, this.locale)));
         });
         const items_by_categories: Item[][] = groupBy(items, (item: Item) => item.category.id_category);
 
@@ -26,13 +27,20 @@ export class ItemsGroupByCategoryPipe implements PipeTransform {
                 items: items_for_category
             };
         });
-        categories = categories.sort((category_a: CategoryWithItem, category_b: CategoryWithItem) => category_a.category.ordering - category_b.category.ordering);
+        // Une catégorie sans `ordering` donne un NaN qui neutralise la comparaison : le groupe
+        // orphelin restait alors en tête, devant toutes les vraies catégories. Il passe en fin de
+        // liste — il n'est pas masqué pour autant, c'est le symptôme d'objets vides à l'import.
+        categories = categories.sort((category_a: CategoryWithItem, category_b: CategoryWithItem) => {
+            const ordering_a: number = Number.isFinite(category_a.category?.ordering) ? category_a.category.ordering : Number.MAX_SAFE_INTEGER;
+            const ordering_b: number = Number.isFinite(category_b.category?.ordering) ? category_b.category.ordering : Number.MAX_SAFE_INTEGER;
+            return ordering_a - ordering_b;
+        });
 
         if (order_by) {
             categories.forEach((category: CategoryWithItem): void => {
                 category.items
                     .sort((item_a: Item, item_b: Item) => item_a.id - item_b.id)
-                    .sort((item_a: Item, item_b: Item) => item_b.img.localeCompare(item_a.img));
+                    .sort((item_a: Item, item_b: Item) => (item_b.img ?? '').localeCompare(item_a.img ?? ''));
             });
         }
         return categories;

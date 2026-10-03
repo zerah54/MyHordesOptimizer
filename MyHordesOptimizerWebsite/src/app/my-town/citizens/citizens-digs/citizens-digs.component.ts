@@ -15,6 +15,7 @@ import { CitizenInfo } from '../../../_abstract_model/types/citizen-info.class';
 import { Dig } from '../../../_abstract_model/types/dig.class';
 import { TypedCellDefDirective } from '../../../_core/directives/typed-cell-def.directive';
 import { ColumnIdPipe } from '../../../_core/pipes/column-id.pipe';
+import { TownContextService } from '../../../_core/services/town-context.service';
 import { getTown } from '../../../_core/utilities/localstorage.util';
 import { AvatarComponent } from '../../../_shared/avatar/avatar.component';
 import { CitizenInfoComponent } from '../../../_shared/citizen-info/citizen-info.component';
@@ -61,6 +62,8 @@ export class CitizensDigsComponent implements OnInit {
         { id: 'today_digs', header: $localize`Fouilles du jour`, class: '' },
     ];
     protected readonly current_day: number = getTown()?.day || 1;
+    /** Ville observée : les fouilles se consultent sans se modifier. */
+    protected readonly is_readonly: Signal<boolean> = inject(TownContextService).isReadonly;
     protected filters: DigFilter = {
         selected_day: this.current_day,
         citizen: []

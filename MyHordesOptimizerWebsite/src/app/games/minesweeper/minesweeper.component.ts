@@ -29,7 +29,7 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import moment, { Moment } from 'moment';
 
-import { MINESWEEPER_ZOOM_KEY } from '../../_abstract_model/const';
+import { HORDES_IMG_REPO, MINESWEEPER_THEME_KEY, MINESWEEPER_ZOOM_KEY } from '../../_abstract_model/const';
 import {
     MinesweeperChallengeStatus,
     MinesweeperGameCompleted,
@@ -100,7 +100,8 @@ export class MinesweeperComponent implements OnInit, OnDestroy {
     /** Nombre de chiffres du compteur de mines pour la partie en cours (calculé une fois par partie, jamais recalculé en cours de jeu). */
     protected readonly mine_counter_digits: WritableSignal<number> = signal(this.selected_size().mines.toString().length);
 
-    protected selected_theme: WritableSignal<'legacy' | 'myhordes'> = signal('legacy');
+    /** Thème du plateau : `myhordes` (jetons du thème du site, icônes du jeu en CSS pur) ou `legacy` (Windows). Persisté en localStorage. */
+    protected selected_theme: WritableSignal<MinesweeperTheme> = signal(localStorage.getItem(MINESWEEPER_THEME_KEY) === 'legacy' ? 'legacy' : 'myhordes');
     private preloadLinks: WritableSignal<HTMLLinkElement[]> = signal([]);
 
     /** Niveau de zoom des cellules, en pourcentage (100 = taille normale, pas de plafond). Persisté en localStorage. */
@@ -125,11 +126,19 @@ export class MinesweeperComponent implements OnInit, OnDestroy {
         this.resetGame();
         this.refreshChallengesToday();
 
+        // Les icônes du thème Hordes sont des `background-image` CSS, chargés à l'apparition du premier
+        // élément concerné : sans préchargement, le premier drapeau clignoterait. Les deux thèmes sont
+        // préchargés, le joueur pouvant basculer en cours de session.
         const images: string[] = [
             'img/minesweeper/bomb.png', 'img/minesweeper/bombflagged.png', 'img/minesweeper/bombquestion.png', 'img/minesweeper/nobomb.png',
             'img/minesweeper/smile.png', 'img/minesweeper/lose.png', 'img/minesweeper/win.png',
             ...Array.from({ length: 8 }, (_: unknown, i: number) => `img/minesweeper/adjacent_${i + 1}.png`),
             ...Array.from({ length: 10 }, (_: unknown, i: number) => `img/minesweeper/timer_${i}.png`),
+            ...[
+                'item/item_flag.gif', 'icons/small_help.gif', 'icons/small_x.gif',
+                'emotes/zombie.gif', 'emotes/death.gif',
+                'emotes/smile.gif', 'emotes/sad.gif', 'emotes/goodg.gif'
+            ].map((name: string) => HORDES_IMG_REPO + name)
         ];
 
         this.preloadLinks.set(images.map((name: string) => {
@@ -172,6 +181,12 @@ export class MinesweeperComponent implements OnInit, OnDestroy {
         } else {
             this.resetGame();
         }
+    }
+
+    /** Applique le thème du plateau (`legacy` si coché, `myhordes` sinon) et le mémorise en localStorage. */
+    protected changeTheme(legacy: boolean): void {
+        this.selected_theme.set(legacy ? 'legacy' : 'myhordes');
+        localStorage.setItem(MINESWEEPER_THEME_KEY, this.selected_theme());
     }
 
     protected increaseZoom(): void {
@@ -681,6 +696,8 @@ export class MinesweeperComponent implements OnInit, OnDestroy {
     }
 
 }
+
+type MinesweeperTheme = 'legacy' | 'myhordes';
 
 interface Cell {
     is_mine: boolean;

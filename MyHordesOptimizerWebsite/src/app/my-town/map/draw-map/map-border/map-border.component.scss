@@ -1,50 +1,75 @@
-@use 'variables';
-
-$small: 20px;
-$large: 30px;
-
 :host {
     display: contents;
+}
 
-    th.border-cell {
+.border-cell {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 0;
+    padding: 0;
+    overflow: hidden;
+    color: var(--mho-text-muted);
+    font-weight: 500;
+    line-height: 1;
+    /* La graduation suit la taille des cases, bornée : illisible en dessous de 9 px,
+       disproportionnée au-delà de 15 px. */
+    font-size: clamp(9px, calc(var(--mho-cell, 30px) * 0.32), 15px);
+    font-variant-numeric: tabular-nums;
 
-        border: 1px solid variables.$sidenav_bg_color;
-        font-weight: normal;
-        padding: 0;
+    /* Trois ombres composables : le repère « ma case », la coordonnée choisie, et l'aura de
+       défilement posée par mho-map (classes can-scroll-*). Sans cette base commune, chacune
+       écraserait la précédente au lieu de s'y ajouter — une coordonnée peut être à la fois
+       celle du joueur, celle de la case choisie, et sur un bord qui défile. */
+    box-shadow: var(--cell-me-shadow, 0 0 0 0 #0000),
+    var(--cell-sel-shadow, 0 0 0 0 #0000),
+    var(--cell-scroll-shadow, 0 0 0 0 #0000);
+    transition: box-shadow 0.15s ease;
+
+    /* Les règles se fondent dans le panneau : l'ancien `--mho-nav-bg`, presque noir, cerclait
+       la carte d'un cadre épais qui pesait plus que la carte elle-même. */
+    &:not(.hovered) {
+        background-color: var(--mho-surface);
+    }
+
+    /* Coordonnée survolée : c'est elle qui dit où l'on est dans la grille. */
+    &.hovered {
+        background-color: var(--mho-map-sel);
+        color: var(--mho-map-sel-fg);
+        font-weight: 700;
+    }
+
+    /* Coordonnée de la case choisie : pastille cerclée, qui tient même quand le survol est
+       ailleurs — c'est le repère stable, le survol est passager. */
+    &.selected:not(.hovered) {
+        color: var(--mho-map-sel);
+        font-weight: 700;
+        --cell-sel-shadow: inset 0 0 0 2px var(--mho-map-sel);
+    }
+
+    /* Coordonnée de la case où l'on se trouve en jeu : soulignée ET colorée,
+       pour ne pas reposer sur la seule couleur. */
+    &.me {
+        --cell-me-shadow: inset 0 -2px 0 var(--mho-map-me);
+        color: var(--mho-map-me);
+        font-weight: 700;
+    }
+
+    /* Colonnes de coordonnées : elles restent visibles pendant le défilement horizontal.
+       L'ancienne règle posait `left: 0` ET `right: 0` sur la même case : en LTR seul `left`
+       comptait, et la colonne de droite venait se coller au bord gauche. Le côté est
+       maintenant fixé par le parent, qui seul sait de quelle colonne il s'agit. */
+    &.left,
+    &.right {
         position: sticky;
-        z-index: 2;
-        text-align: center;
-        vertical-align: middle;
+        z-index: 3;
+    }
 
-        &:not(.hovered) {
-            background-color: variables.$sidenav_bg_color;
-        }
+    &.left {
+        left: 0;
+    }
 
-        &.hovered {
-            background-color: variables.$primary;
-            color: white;
-        }
-
-        &.me {
-            box-shadow: inset 0 0 0.25em 2px white;
-        }
-
-        &.horizontal:not(.vertical) {
-            width: $large;
-            height: $small;
-        }
-
-        &.vertical:not(.horizontal) {
-            width: $small;
-            height: $large;
-
-            left: 0;
-            right: 0;
-        }
-
-        &.horizontal.vertical {
-            height: $small;
-            width: $small;
-        }
+    &.right {
+        right: 0;
     }
 }

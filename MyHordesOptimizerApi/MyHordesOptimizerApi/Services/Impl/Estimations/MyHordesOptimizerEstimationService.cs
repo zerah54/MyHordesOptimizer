@@ -1,5 +1,6 @@
 ﻿using System;
 using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
@@ -70,13 +71,57 @@ namespace MyHordesOptimizerApi.Services.Impl.Estimations
                 DbContext.AddRange(newEstimations);
             }
             DbContext.SaveChanges();
+            MarkRefinementsStale(townId, request.Day, request.Day + 1);
             transaction.Commit();
+        }
+
+        public AttackSettingsDto GetAttackSettings(int townId, int day)
+        {
+            townId = DbContext.ResolveTownId(townId);
+            var setting = DbContext.TownAttackSettings.AsNoTracking().SingleOrDefault(s => s.IdTown == townId && s.Day == day);
+            return new AttackSettingsDto { Souls = setting?.Souls, SpaLevel = setting?.SpaLevel, Fireworks = setting?.Fireworks ?? false };
+        }
+
+        public AttackSettingsDto GetAttackSettingsWithDefaults(int townId, int day)
+        {
+            var settings = GetAttackSettings(townId, day);
+            (settings.DefaultSouls, settings.DefaultSpaLevel, settings.DefaultFromTdg) = AttackSoulsDefaults.Defaults(GetEstimations(townId, day), GetEstimations(townId, day - 1));
+            return settings;
+        }
+
+        public void UpdateAttackSettings(int townId, int day, AttackSettingsDto settings)
+        {
+            using var townLock = TownSyncLock.AcquireTownBlocking(-townId);
+            townId = DbContext.ResolveTownId(townId);
+            var newLastUpdate = DbContext.LastUpdateInfos.Update(Mapper.Map<LastUpdateInfo>(UserInfoProvider.GenerateLastUpdateInfo(), opt => opt.SetDbContext(DbContext)));
+            DbContext.SaveChanges();
+            var setting = DbContext.TownAttackSettings.SingleOrDefault(s => s.IdTown == townId && s.Day == day);
+            if (setting is null)
+            {
+                setting = new TownAttackSetting { IdTown = townId, Day = day };
+                DbContext.TownAttackSettings.Add(setting);
+            }
+            setting.Souls = settings.Souls;
+            setting.SpaLevel = settings.SpaLevel;
+            setting.Fireworks = settings.Fireworks;
+            setting.IdLastUpdateInfo = newLastUpdate.Entity.IdLastUpdateInfo;
+            DbContext.SaveChanges();
+            MarkRefinementsStale(townId, day);
+        }
+
+        /// <summary>Marque à recalculer les affinages des jours attaqués donnés (tour du jour d → d, planif du jour d → d+1).</summary>
+        private void MarkRefinementsStale(int resolvedTownId, params int[] attackDays)
+        {
+            DbContext.TownAttackRefinements
+                .Where(refinement => refinement.IdTown == resolvedTownId && attackDays.Contains(refinement.Day))
+                .ExecuteUpdate(setters => setters.SetProperty(refinement => refinement.Stale, true));
         }
 
         public EstimationRequestDto GetEstimations(int townId, int day)
         {
             townId = DbContext.ResolveTownId(townId);
-            var models = DbContext.TownEstimations.Where(x => x.Day == day && x.IdTown == townId)
+            // Lecture pure : l'affinage relit sous verrou et doit voir la base, pas des entités déjà suivies.
+            var models = DbContext.TownEstimations.AsNoTracking().Where(x => x.Day == day && x.IdTown == townId)
                 .ToList();
             if (models.Any())
             {
@@ -85,10 +130,7 @@ namespace MyHordesOptimizerApi.Services.Impl.Estimations
             }
             else
             {
-                return new EstimationRequestDto()
-                {
-                    Day = day
-                };
+                return new EstimationRequestDto { Day = day, EstimSouls = new Dictionary<int, int>(), PlanifSouls = new Dictionary<int, int>(), EstimSpaLevel = 0, PlanifSpaLevel = 0 };
             }
         }
 
@@ -110,7 +152,22 @@ namespace MyHordesOptimizerApi.Services.Impl.Estimations
         {
             var estimObj = GetEstimations(townId, dayAttack);
             var planifObj = GetEstimations(townId, dayAttack - 1);
+            var settings = GetAttackSettings(townId, dayAttack);
+            int resolvedTownId = DbContext.ResolveTownId(townId);
+            int? townTypeId = DbContext.Towns.Where(town => town.IdTown == resolvedTownId)
+                .Select(town => town.TownTypeId).FirstOrDefault();
+            var (attackSouls, attackSpaLevel) = AttackSoulsDefaults.Resolve(estimObj, planifObj, settings);
+            var souls = new SoulsScenario(attackSouls, estimObj.EstimSouls ?? new Dictionary<int, int>(), planifObj.PlanifSouls ?? new Dictionary<int, int>(),
+                attackSpaLevel, estimObj.EstimSpaLevel ?? 0, planifObj.PlanifSpaLevel ?? 0);
+            return ComputeAttack(estimObj?.Estim, planifObj?.Planif, dayAttack, difficulty, townTypeId, souls);
+        }
 
+        /// <summary>
+        /// Cœur du solveur, sans accès BDD. <paramref name="estim"/> = tour du jour D, <paramref name="planif"/> = planif D-1
+        /// (même ZombieEstimation, pool agrégé). <paramref name="townTypeId"/> = <see cref="TownType"/> de la ville (null si inconnue).
+        /// </summary>
+        public static EstimationResultDto ComputeAttack(EstimationsDto? estim, EstimationsDto? planif, int dayAttack, AttackDifficulty difficulty, int? townTypeId, SoulsScenario? souls = null)
+        {
             // Pool de contraintes = tour(J) + planificateur(J-1) AGRÉGÉS. Par essence, planif(J-1) renseigne
             // l'attaque du jour J : il lit la MÊME ZombieEstimation (mêmes targetMin/targetMax) que la tour(J),
             // seulement ARRONDIE au bloc (ceil(day/5)*5). Ses lignes sont donc des contraintes VALIDES (juste
@@ -120,8 +177,9 @@ namespace MyHordesOptimizerApi.Services.Impl.Estimations
             // effet). Tour vide → il ne reste que le planif (ancien comportement de secours). Le slot J-1 garantit
             // l'alignement sur le même jour d'attaque : NE PAS agréger un autre jour (ce serait une autre attaque).
             int planifBlocks = (int)(Math.Ceiling(dayAttack / 5.0) * 5);
-            var rows = ExtractRows(estimObj?.Estim, blocks: 1);
-            rows.AddRange(ExtractRows(planifObj?.Planif, blocks: planifBlocks));
+            bool soulMode = souls is not null && !souls.IsNeutral;
+            var rows = ExtractRows(estim, 1, soulMode ? souls!.Estim : null, townTypeId, soulMode ? souls!.EstimSpaLevel : 0);
+            rows.AddRange(ExtractRows(planif, planifBlocks, soulMode ? souls!.Planif : null, townTypeId, soulMode ? souls!.PlanifSpaLevel : 0));
 
             // Difficulté : RNE/RE/PANDE = normal (le champ `hard` de MyHordes = type panda, NORMAL pour
             // l'estimation). Easy/Hard n'existent que sur villes CUSTOM, exposées par aucune API : à forcer
@@ -140,19 +198,24 @@ namespace MyHordesOptimizerApi.Services.Impl.Estimations
             int maxGlobal = (int)Math.Round(ratioMax * Math.Pow(dayAttack * 0.75 + 3.5, 3), MidpointRounding.AwayFromZero);
             double shiftSpan = config.Shift * factor / 100.0;
 
+            // Les cibles, bornes et fenêtres sont en espace de base (avant facteur d'âmes) ; la sortie est convertie en attaque réelle.
+            double attackFactor = soulMode ? RedSoulFactor.Compute(souls!.AtAttack, townTypeId, souls!.AttackSpaLevel) : 1.0;
+            int ToReal(int baseValue) => soulMode ? (int)Math.Round(baseValue * attackFactor, MidpointRounding.AwayFromZero) : baseValue;
+
             var result = new EstimationResultDto();
             result.Result ??= new EstimationValueDto();
 
             if (rows.Count == 0)
             {
                 // Aucune estimation : on ne sait rien de plus que les bornes théoriques du jour.
-                result.Result.Min = minGlobal;
-                result.Result.Max = maxGlobal;
+                result.Result.Min = ToReal(minGlobal);
+                result.Result.Max = ToReal(maxGlobal);
                 return result;
             }
 
-            int lower = rows.Max(row => row.Min);   // borne basse garantie (min de la ligne la plus haute)
-            int upper = rows.Min(row => row.Max);   // borne haute garantie (invariant)
+            // Invariant en base : min_q ≤ round(targetMin·pf) ⇒ targetMin ≥ (min_q−0,5)/pf ; symétrique pour max. À pf = 1 : min et max.
+            int lower = rows.Max(row => (int)Math.Ceiling((row.Min - 0.5) / row.SoulFactor - SoulEps));   // borne basse garantie
+            int upper = rows.Min(row => (int)Math.Floor((row.Max + 0.5) / row.SoulFactor + SoulEps));     // borne haute garantie
 
             // Raffinement RIGOUREUX de la ligne 0 % (planif à 0 citoyen). Une ligne affichée à 0 % ⟺ 0 citoyen
             // (quality = citizen_count/24, round(quality*100)=0 ⟺ 0 citoyen ; si un preset a un cc_offset>0 la
@@ -175,7 +238,7 @@ namespace MyHordesOptimizerApi.Services.Impl.Estimations
             {
                 if (offMinFloor > 0)
                 {
-                    int refinedLower = (int)Math.Ceiling((row.Min - 0.5) / (1.0 - offMinFloor / 100.0));
+                    int refinedLower = (int)Math.Ceiling((row.Min - 0.5) / ((1.0 - offMinFloor / 100.0) * row.SoulFactor));
                     if (refinedLower > lower)
                     {
                         lower = refinedLower;
@@ -183,7 +246,7 @@ namespace MyHordesOptimizerApi.Services.Impl.Estimations
                 }
                 if (offMaxFloor > 0)
                 {
-                    int refinedUpper = (int)Math.Floor((row.Max + 0.5) / (1.0 + offMaxFloor / 100.0));
+                    int refinedUpper = (int)Math.Floor((row.Max + 0.5) / ((1.0 + offMaxFloor / 100.0) * row.SoulFactor));
                     if (refinedUpper > 0 && refinedUpper < upper)
                     {
                         upper = refinedUpper;
@@ -195,8 +258,7 @@ namespace MyHordesOptimizerApi.Services.Impl.Estimations
             // y est un re-tirage uniforme dans la bande et peut atteindre targetMax (donc pas de resserrement).
             if (!config.RerollInBand && shiftSpan > 0)
             {
-                int minWidth = rows.Min(row => row.Max - row.Min);
-                int widthBound = (int)Math.Floor((minWidth + 1) / shiftSpan);
+                int widthBound = rows.Min(row => WidthBound(row, shiftSpan));
                 if (widthBound < upper)
                 {
                     upper = widthBound;
@@ -239,11 +301,9 @@ namespace MyHordesOptimizerApi.Services.Impl.Estimations
                 // Les bandes affichées et l'attaque réelle sont scalées ×soulFactor (âmes rouges) : les
                 // marges du filtre doivent couvrir ce facteur. Cap réel 1.2 (rules) pour RNE/RE ; 666 en
                 // panda ⟹ marge large (s ≤ 5, ~100 âmes) pour PANDE/CUSTOM/type inconnu.
-                int resolvedTownId = DbContext.ResolveTownId(townId);
-                var townTypeId = DbContext.Towns.Where(town => town.IdTown == resolvedTownId)
-                    .Select(town => town.TownTypeId).FirstOrDefault();
                 double soulCap = townTypeId == (int)TownType.RNE || townTypeId == (int)TownType.RE ? 1.2 : 5.0;
-                pairFeasible = ComputeOffsetPairFeasibility(rows, lower, upper, dayAttack, factor, shiftSpan, config, soulCap);
+                // Mode âmes : chaque ligne porte son facteur exact et les cibles sont entières en espace de base, plus de marge soulCap.
+                pairFeasible = ComputeOffsetPairFeasibility(rows, lower, upper, dayAttack, factor, shiftSpan, config, soulMode ? 0.0 : soulCap, soulMode);
                 if (pairFeasible != null)
                 {
                     int feasibleLower = -1, feasibleUpper = -1;
@@ -267,8 +327,8 @@ namespace MyHordesOptimizerApi.Services.Impl.Estimations
                 }
             }
 
-            result.Result.Min = lower;
-            result.Result.Max = upper;
+            result.Result.Min = ToReal(lower);
+            result.Result.Max = ToReal(upper);
 
             // Répartition : CHAQUE valeur de la fenêtre est une attaque possible → au moins une barre.
             // En plus (COMPLÉMENT indicatif), on rehausse les valeurs les plus vraisemblables par le nombre
@@ -279,7 +339,7 @@ namespace MyHordesOptimizerApi.Services.Impl.Estimations
             // remonté par le clamp bornes-du-jour) : le bonus doit se comparer à la vraie bande, pas à la fenêtre.
             int min100 = rows.Max(row => row.Min);     // = max_q(min_q)
             int max100 = rows.Min(row => row.Max);     // = min_q(max_q)
-            bool weightByShift = !config.RerollInBand && shiftSpan > 0;
+            bool weightByShift = !config.RerollInBand && shiftSpan > 0 && !soulMode;
             int shiftSteps = weightByShift ? (int)Math.Round(config.Shift * factor * 100, MidpointRounding.AwayFromZero) : 0;
 
             var distribution = new List<int>();
@@ -307,7 +367,7 @@ namespace MyHordesOptimizerApi.Services.Impl.Estimations
                 }
                 for (int occurrence = 0; occurrence < weight; occurrence++)
                 {
-                    distribution.Add(value);
+                    distribution.Add(ToReal(value));
                 }
             }
 
@@ -324,13 +384,17 @@ namespace MyHordesOptimizerApi.Services.Impl.Estimations
         /// par le filtre de paires, mais conservée pour l'invariant). <see cref="Blocks"/> = arrondi bloc
         /// (1 = tour exacte ; planif = ceil(jourAttaque/5)·5, floor du min / ceil du max).
         /// </summary>
-        private readonly record struct EstimationRow(int Percent, int CitizenCount, int Min, int Max, int Blocks);
+        private readonly record struct EstimationRow(int Percent, int CitizenCount, int Min, int Max, int Blocks, double SoulFactor = 1.0);
 
         /// <summary>Paliers % affichés par la tour/planif, indexés par nombre de citoyens 0..24 (67 ↔ colonne SQL _68).</summary>
         private static readonly int[] BucketPercents = { 0, 4, 8, 13, 17, 21, 25, 29, 33, 38, 42, 46, 50, 54, 58, 63, 67, 71, 75, 79, 83, 88, 92, 96, 100 };
 
-        /// <summary>Lignes (%min-max) effectivement renseignées, triées par % croissant.</summary>
-        private static List<EstimationRow> ExtractRows(EstimationsDto? estim, int blocks)
+        /// <summary>
+        /// Lignes (%min-max) effectivement renseignées, triées par % croissant. `souls` = âmes présentes à la
+        /// lecture de chaque palier (null = aucune). `spaLevel` = niveau SPA en vigueur à cette lecture (0-3),
+        /// commun à toute la famille (le bâtiment ne change pas de niveau entre deux paliers d'une même tour).
+        /// </summary>
+        private static List<EstimationRow> ExtractRows(EstimationsDto? estim, int blocks, IReadOnlyDictionary<int, int>? souls = null, int? townTypeId = null, int spaLevel = 0)
         {
             var rows = new List<EstimationRow>();
             if (estim is null) return rows;
@@ -339,10 +403,22 @@ namespace MyHordesOptimizerApi.Services.Impl.Estimations
                 if (property.GetValue(estim) is not EstimationValueDto value) continue;
                 if (value.Min <= 0 || value.Max <= 0) continue;
                 if (!int.TryParse(property.Name.Replace("_", string.Empty), out int percent)) continue;
-                rows.Add(new EstimationRow(percent, Array.IndexOf(BucketPercents, percent), value.Min, value.Max, blocks));
+                double soulFactor = souls is not null && souls.TryGetValue(percent, out int count)
+                    ? RedSoulFactor.Compute(count, townTypeId, spaLevel)
+                    : 1.0;
+                rows.Add(new EstimationRow(percent, Array.IndexOf(BucketPercents, percent), value.Min, value.Max, blocks, soulFactor));
             }
             return rows.OrderBy(row => row.Percent).ToList();
         }
+
+        /// <summary>
+        /// Majorant de la valeur d'attaque par la largeur de la bande de la ligne. Sans âme : (W+1)/shiftSpan.
+        /// Avec un facteur pf ≠ 1 (deux arrondis non triviaux) : targetMax−targetMin ≤ (W+1)/pf, d'où ((W+1)/pf + 1)/shiftSpan.
+        /// </summary>
+        private static int WidthBound(EstimationRow row, double shiftSpan) =>
+            row.SoulFactor == 1.0
+                ? (int)Math.Floor((row.Max - row.Min + 1) / shiftSpan)
+                : (int)Math.Floor(((row.Max - row.Min + 1) / row.SoulFactor + 1) / shiftSpan + SoulEps);
 
         // ================== Filtre « paires d'offsets » ==================
         // Toutes les conditions ci-dessous sont des SUR-APPROXIMATIONS (conditions nécessaires avec
@@ -352,14 +428,17 @@ namespace MyHordesOptimizerApi.Services.Impl.Estimations
         // 0 exclusion de l'attaque réelle sur 6k énumérations complètes.
 
         private const double PairEps = 1e-9;
+        private const double SoulEps = 1e-9;
 
         /// <summary>
         /// Marque les valeurs de [lower, upper] admettant au moins une combinaison (bande, paire
         /// initiale, trajectoire d'offsets) compatible avec toutes les lignes. Null si inapplicable.
         /// soulCap = majorant du facteur d'âmes rouges (bande et attaque scalées à l'identique).
+        /// exactSouls = mode âmes : chaque ligne porte son facteur exact (<see cref="EstimationRow.SoulFactor"/>),
+        /// les cibles sont entières en espace de base ; soulCap vaut alors 0.
         /// </summary>
         private static bool[] ComputeOffsetPairFeasibility(List<EstimationRow> rows, int lower, int upper,
-            int dayAttack, double factor, double shiftSpan, EstimationSolverConfig config, double soulCap)
+            int dayAttack, double factor, double shiftSpan, EstimationSolverConfig config, double soulCap, bool exactSouls)
         {
             var filterRows = rows.Where(row => row.CitizenCount >= 0).OrderBy(row => row.CitizenCount).ToList();
             if (filterRows.Count == 0)
@@ -404,7 +483,7 @@ namespace MyHordesOptimizerApi.Services.Impl.Estimations
                         allMarked = feasible[value - lower];
                     }
                     if (allMarked) continue;
-                    if (!TryFillRowWindows(filterRows, targetMin, targetMax, windows)) continue;
+                    if (!TryFillRowWindows(filterRows, targetMin, targetMax, windows, exactSouls)) continue;
                     bool anyPair = false;
                     foreach (var (sum, offMin) in pairs)
                     {
@@ -491,16 +570,21 @@ namespace MyHordesOptimizerApi.Services.Impl.Estimations
         /// Le ±0.5 sur targetMin/targetMax = grille entière posée sur la bande SCALÉE (réelle-valuée).
         /// False si une fenêtre est vide (bande impossible, aucune paire à tester).
         /// </summary>
-        private static bool TryFillRowWindows(List<EstimationRow> rows, int targetMin, int targetMax, double[,] windows)
+        private static bool TryFillRowWindows(List<EstimationRow> rows, int targetMin, int targetMax, double[,] windows, bool exactSouls)
         {
             for (int i = 0; i < rows.Count; i++)
             {
                 var row = rows[i];
                 double blocks = row.Blocks;
-                double aLow = 100.0 * (1.0 - (row.Min + blocks - 0.5) / (targetMin - 0.5));
-                double aHigh = 100.0 * (1.0 - (row.Min - 0.5) / (targetMin + 0.5));
-                double bLow = 100.0 * ((row.Max - blocks + 0.5) / (targetMax + 0.5) - 1.0);
-                double bHigh = 100.0 * ((row.Max + 0.5) / (targetMax - 0.5) - 1.0);
+                // Sans mode âmes : ±0,5 sur la cible (grille posée sur la bande scalée). Avec : cibles entières de base, pf exact de la ligne.
+                double minLow = exactSouls ? targetMin * row.SoulFactor : targetMin - 0.5;
+                double minHigh = exactSouls ? targetMin * row.SoulFactor : targetMin + 0.5;
+                double maxLow = exactSouls ? targetMax * row.SoulFactor : targetMax - 0.5;
+                double maxHigh = exactSouls ? targetMax * row.SoulFactor : targetMax + 0.5;
+                double aLow = 100.0 * (1.0 - (row.Min + blocks - 0.5) / minLow);
+                double aHigh = 100.0 * (1.0 - (row.Min - 0.5) / minHigh);
+                double bLow = 100.0 * ((row.Max - blocks + 0.5) / maxHigh - 1.0);
+                double bHigh = 100.0 * ((row.Max + 0.5) / maxLow - 1.0);
                 if (Math.Max(aLow, 0) > aHigh + PairEps || Math.Max(bLow, 0) > bHigh + PairEps)
                 {
                     return false;
@@ -560,7 +644,7 @@ namespace MyHordesOptimizerApi.Services.Impl.Estimations
             return true;
         }
 
-        public EstimationTuple CreateTupleFromValue(string key, EstimationValueDto value)
+        public EstimationTuple CreateTupleFromValue(string key, EstimationValueDto? value)
         {
             if (value != null)
             {

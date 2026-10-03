@@ -1,7 +1,7 @@
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { provideHttpClient, withXhr } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
-import { ANIMATION_MODULE_TYPE, ChangeDetectionStrategy, Component, input, InputSignal } from '@angular/core';
+import { ANIMATION_MODULE_TYPE, ChangeDetectionStrategy, Component, DebugElement, input, InputSignal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { of } from 'rxjs';
 import type { Mock } from 'vitest';
@@ -15,6 +15,7 @@ import { Ruin } from '../../_abstract_model/types/ruin.class';
 import { Town } from '../../_abstract_model/types/town.class';
 import { DrawMapComponent } from './draw-map/draw-map.component';
 import { MapComponent, MapOptions } from './map.component';
+import { DEFAULT_CORNERS } from './map-corners';
 
 /** Remplace mho-draw-map : capture les entrées reçues sans instancier la grille de carte réelle (MatDialog/TownContextService). */
 @Component({ selector: 'mho-draw-map', template: '', changeDetection: ChangeDetectionStrategy.OnPush,
@@ -25,6 +26,7 @@ class DrawMapStubComponent {
     public readonly allRuins: InputSignal<Ruin[] | undefined> = input();
     public readonly allCitizens: InputSignal<Citizen[] | undefined> = input();
     public readonly options: InputSignal<MapOptions | undefined> = input();
+    public readonly zoom: InputSignal<number | undefined> = input();
 }
 
 function newTown(): Town {
@@ -85,7 +87,25 @@ describe('MapComponent', (): void => {
     }
 
     function drawMapStub(): DrawMapStubComponent {
-        return fixture.debugElement.query((de) => de.componentInstance instanceof DrawMapStubComponent).componentInstance;
+        return fixture.debugElement.query((de: DebugElement): boolean => de.componentInstance instanceof DrawMapStubComponent).componentInstance;
+    }
+
+    /** Un segment du contrôle « Type de carte », repéré par son libellé. */
+    function mapTypeToggle(label: string): HTMLElement {
+        const toggles: HTMLElement[] = Array.from(fixture.nativeElement.querySelectorAll('.mho-map-seg mat-button-toggle'));
+        return toggles.find((toggle: HTMLElement): boolean => !!toggle.textContent?.includes(label)) as HTMLElement;
+    }
+
+    function clickMapType(label: string): void {
+        (mapTypeToggle(label).querySelector('button') as HTMLButtonElement).click();
+        fixture.detectChanges();
+    }
+
+    /** Les boutons de zoom sont repérés par le nom de leur icône Material : c'est ce que voit
+     *  l'utilisateur, et cela ne dépend pas de leur position dans la barre d'outils. */
+    function zoomButton(icon: string): HTMLButtonElement {
+        const buttons: HTMLButtonElement[] = Array.from(fixture.nativeElement.querySelectorAll('.mho-map-tools button'));
+        return buttons.find((button: HTMLButtonElement): boolean => button.textContent?.trim() === icon) as HTMLButtonElement;
     }
 
     it('passes undefined map/items/ruins/citizens to draw-map before the API calls resolve', (): void => {
@@ -127,8 +147,7 @@ describe('MapComponent', (): void => {
         create();
         fixture.detectChanges();
 
-        const digsChip: HTMLElement = fixture.nativeElement.querySelectorAll('mat-chip')[0];
-        expect(digsChip.classList).toContain('mat-mdc-chip-highlighted');
+        expect(mapTypeToggle('Fouilles').classList).toContain('mat-button-toggle-checked');
     });
 
     it('renders the sidenav in "side" mode when the gt-xs breakpoint matches, and "over" when it does not', (): void => {
@@ -142,25 +161,54 @@ describe('MapComponent', (): void => {
         expect(fixture.nativeElement.querySelector('mat-sidenav').classList).toContain('mat-drawer-over');
     });
 
-    it('changeOptions() updates the highlighted chip and persists to localStorage', async (): Promise<void> => {
+    it('changeOptions() updates the highlighted chip and persists to localStorage', (): void => {
         create();
         fixture.detectChanges();
 
-        const chips: NodeListOf<HTMLElement> = fixture.nativeElement.querySelectorAll('mat-chip');
-        const dangerChip: HTMLElement = Array.from(chips).find((chip: HTMLElement) => chip.textContent?.includes('Danger')) as HTMLElement;
-        dangerChip.dispatchEvent(new MouseEvent('click'));
-        fixture.detectChanges();
+        clickMapType('Danger');
 
-        expect(dangerChip.classList).toContain('mat-mdc-chip-highlighted');
+        expect(mapTypeToggle('Danger').classList).toContain('mat-button-toggle-checked');
 
-        setTimeout((): void => {
-            const stored: MapOptions = JSON.parse(localStorage.getItem('MAP_OPTIONS') as string);
-            expect(stored.map_type).toBe('danger');
-
-        });
+        const stored: MapOptions = JSON.parse(localStorage.getItem('MAP_OPTIONS') as string);
+        expect(stored.map_type).toBe('danger');
     });
 
-    it('checkIfAllOptionsExist() fills a missing key from a partial localStorage payload with the default value', (): void => {
+    it('changing the map type gives the cells a new options reference, changing only the zoom does not', (): void => {
+        create();
+        fixture.detectChanges();
+
+        const stub: DrawMapStubComponent = drawMapStub();
+        const before: MapOptions | undefined = stub.options();
+
+        zoomButton('zoom_in').click();
+        fixture.detectChanges();
+        expect(stub.zoom()).toBe(34);
+        expect(stub.options()).toBe(before);
+
+        clickMapType('Danger');
+
+        expect(stub.options()).not.toBe(before);
+        expect(stub.options()?.map_type).toBe('danger');
+    });
+
+    it('clamps a stored zoom that is out of range back to the default', (): void => {
+        localStorage.setItem('MAP_OPTIONS', JSON.stringify({ zoom: 500 }));
+        create();
+        fixture.detectChanges();
+
+        expect(drawMapStub().zoom()).toBe(72);
+    });
+
+    it('falls back to the default options when the stored payload is not valid JSON', (): void => {
+        localStorage.setItem('MAP_OPTIONS', 'not json');
+        create();
+        fixture.detectChanges();
+
+        expect(drawMapStub().options()?.map_type).toBe('digs');
+        expect(drawMapStub().zoom()).toBe(30);
+    });
+
+    it('fills a missing key from a partial localStorage payload with the default value', (): void => {
         localStorage.setItem('MAP_OPTIONS', JSON.stringify({ map_type: 'trash' }));
         create();
         fixture.detectChanges();
@@ -168,6 +216,77 @@ describe('MapComponent', (): void => {
         const stub: DrawMapStubComponent = drawMapStub();
         expect(stub.options()?.dig_mode).toBe('average');
         expect(stub.options()?.distances).toEqual([]);
+    });
+
+    it('restores a stored corner layout and fills the corners it does not know with their default', (): void => {
+        localStorage.setItem('MAP_OPTIONS', JSON.stringify({ corners: { digs: { top_left: 'update_age', bottom_right: 'inconnu' } } }));
+        create();
+        fixture.detectChanges();
+
+        const options: MapOptions | undefined = drawMapStub().options();
+        expect(options?.corners.digs.top_left).toBe('update_age');
+        expect(options?.corners.digs.bottom_right).toBe(DEFAULT_CORNERS.digs.bottom_right);
+        expect(options?.corners.danger).toEqual(DEFAULT_CORNERS.danger);
+    });
+
+    it('changeCorner() only changes the layout of the displayed map type, persists it, and resetCorners() restores it', (): void => {
+        create();
+        fixture.detectChanges();
+        const testable: { changeCorner(position: string, info: string): void; resetCorners(): void } =
+            <{ changeCorner(position: string, info: string): void; resetCorners(): void }><unknown>fixture.componentInstance;
+        const before: MapOptions | undefined = drawMapStub().options();
+
+        testable.changeCorner('bottom_left', 'items');
+        fixture.detectChanges();
+
+        const stored: MapOptions = JSON.parse(localStorage.getItem('MAP_OPTIONS') as string);
+        expect(stored.corners.digs.bottom_left).toBe('items');
+        expect(stored.corners.danger).toEqual(DEFAULT_CORNERS.danger);
+        // Les cases doivent être rafraîchies : nouvelle référence d'options.
+        expect(drawMapStub().options()).not.toBe(before);
+
+        testable.resetCorners();
+        fixture.detectChanges();
+
+        expect(drawMapStub().options()?.corners.digs).toEqual(DEFAULT_CORNERS.digs);
+    });
+
+    it('shows the legend of the displayed map type, with the game labels and an unknown entry', (): void => {
+        create();
+        fixture.detectChanges();
+        const labels: () => string[] = (): string[] => Array.from((fixture.nativeElement as HTMLElement).querySelectorAll('.map-legend .label'))
+            .map((label: Element): string => label.textContent?.trim() ?? '');
+
+        expect(labels()).toEqual(['Zone épuisée', 'Zone presque épuisée', 'Zone à moitié vide', 'Zone abondante']);
+
+        clickMapType('Exploration');
+        expect(labels()).toEqual(['Secteur peu connu', 'Secteur partiellement repéré', 'Secteur connu', 'Secteur totalement balisé', 'Niveau inconnu']);
+
+        clickMapType('Danger');
+        expect(labels()).toEqual(['Aucun zombie', 'Zombies isolés', 'Meute de zombies', 'Horde de zombies', 'Pas vue aujourd\'hui']);
+    });
+
+    it('shows each corner setting in its quarter of the cell, and changes it from the quarter menu', (): void => {
+        create();
+        fixture.detectChanges();
+        const quarter: HTMLButtonElement = fixture.nativeElement.querySelector('.corner-quarter.bottom-left');
+
+        expect(quarter.textContent).toContain('Rien');
+        expect(quarter.getAttribute('aria-label')).toBe('Bas gauche : Rien');
+
+        quarter.click();
+        fixture.detectChanges();
+        const options: HTMLElement[] = Array.from(document.querySelectorAll('.corner-option'));
+        const checked: HTMLElement[] = options.filter((option: HTMLElement): boolean => option.getAttribute('aria-checked') === 'true');
+        expect(checked.map((option: HTMLElement): string => option.textContent?.trim() ?? '')).toEqual(['Rien']);
+        // Les tas du bâtiment sont toujours sur son carré : ils ne sont pas proposés.
+        expect(options.some((option: HTMLElement): boolean => !!option.textContent?.includes('Tas du bâtiment'))).toBe(false);
+
+        (options.find((option: HTMLElement): boolean => !!option.textContent?.includes('Objets au sol')) as HTMLElement).click();
+        fixture.detectChanges();
+
+        expect(drawMapStub().options()?.corners.digs.bottom_left).toBe('items');
+        expect(quarter.textContent).toContain('Objets au sol');
     });
 
     it('addDistanceToList() adds a new distance option and renders it in the list, ignoring an exact duplicate', async (): Promise<void> => {

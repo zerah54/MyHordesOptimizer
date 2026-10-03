@@ -8,6 +8,7 @@ using Discord.WebSocket;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using MyHordesOptimizerApi.Configuration.Interfaces;
+using MyHordesOptimizerApi.DiscordBot.Localization;
 using MyHordesOptimizerApi.DiscordBot.Utility;
 
 namespace MyHordesOptimizerApi.DiscordBot.Services
@@ -69,13 +70,14 @@ namespace MyHordesOptimizerApi.DiscordBot.Services
 
                 if (!result.IsSuccess)
                 {
+                    string message = interaction.Texts().CommandFailed(result.ErrorReason);
                     if (interaction.HasResponded)
                     {
-                        await interaction.FollowupAsync($"Une erreur est survenue : {result.ErrorReason}", ephemeral: true);
+                        await interaction.FollowupAsync(message, ephemeral: true);
                     }
                     else
                     {
-                        await interaction.RespondAsync($"Une erreur est survenue : {result.ErrorReason}", ephemeral: true);
+                        await interaction.RespondAsync(message, ephemeral: true);
                     }
                 }
             }

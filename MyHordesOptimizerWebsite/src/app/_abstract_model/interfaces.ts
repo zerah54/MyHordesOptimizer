@@ -27,6 +27,8 @@ export type DisplayPseudoMode = 'simple' | 'id_mh';
 
 export interface Misc {
     header: string;
+    /** Précision sous le titre : ce que les en-têtes de colonne, courts, ne disent pas. */
+    description?: string;
     highlight_day: boolean;
     header_action?: MiscHeaderAction;
     columns: StandardColumn[];
@@ -35,5 +37,7 @@ export interface Misc {
 
 interface MiscHeaderAction {
     icon: string;
+    /** Libellé du bouton : une icône seule ne dit pas ce qu'ouvre l'action. */
+    label: string;
     action: () => void
 }

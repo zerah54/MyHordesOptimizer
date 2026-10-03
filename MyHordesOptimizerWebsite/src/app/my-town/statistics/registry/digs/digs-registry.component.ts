@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, effect, input, InputSignal, signal, untracked, WritableSignal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, inject, input, InputSignal, Signal, signal, untracked, WritableSignal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import moment, { Moment } from 'moment';
@@ -11,6 +11,7 @@ import { Imports } from '../../../../_abstract_model/types/_types';
 import { Citizen } from '../../../../_abstract_model/types/citizen.class';
 import { CitizenInfo } from '../../../../_abstract_model/types/citizen-info.class';
 import { Dig } from '../../../../_abstract_model/types/dig.class';
+import { TownContextService } from '../../../../_core/services/town-context.service';
 import { getTown } from '../../../../_core/utilities/localstorage.util';
 import { DigComponent } from '../../../../_shared/dig/dig.component';
 import { SelectComponent } from '../../../../_shared/select/select.component';
@@ -37,6 +38,8 @@ export class DigsRegistryComponent {
     public entries: Entry[] = [];
     protected readonly digs: WritableSignal<Dig[]> = signal([]);
     protected readonly current_day: WritableSignal<number> = signal(1);
+    /** Ville observée : l'analyse reste possible, l'enregistrement des fouilles non. */
+    protected readonly is_readonly: Signal<boolean> = inject(TownContextService).isReadonly;
 
     /** La locale */
     public readonly locale: string = moment.locale();

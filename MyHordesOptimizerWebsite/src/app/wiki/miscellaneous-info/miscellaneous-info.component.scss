@@ -1,45 +1,90 @@
-@use 'variables';
-
 :host {
     display: contents;
+
     .mho-miscellaneous-info {
+        /* La page n'est plus une `mat-card-content` : c'est le panneau d'onglets du wiki qui
+           lui donne sa hauteur. */
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        min-height: 0;
+        overflow: auto;
+
+        /* Grille qui se remplit toute seule : trois colonnes sur un grand écran, une sur un
+           téléphone, sans point de rupture à maintenir. `space-around` laissait des trous au
+           milieu dès que le nombre de cartes n'était pas un multiple de la ligne. */
         .container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            align-items: start;
+            gap: 16px;
+        }
+
+        .card {
+            /* Chaque carte défile chez elle : les tables font jusqu'à cinquante lignes, et sans
+               ce plafond la page s'étirait sur plusieurs écrans. */
             display: flex;
-            justify-content: space-around;
-            flex-wrap: wrap;
-            gap: 1em;
+            flex-direction: column;
+            max-height: 330px;
+            overflow: hidden;
+            background: var(--mho-surface);
+            border: 1px solid var(--mho-line);
+            border-radius: var(--mho-radius-l);
+            box-shadow: none;
 
-            .card {
-                width: 300px;
-                height: 400px !important;
+            .card-header {
+                flex-shrink: 0;
+                display: flex;
+                flex-direction: row;
+                gap: 0.5em;
+                justify-content: space-between;
+                align-items: center;
+                padding: 10px 14px;
+                border-bottom: 1px solid var(--mho-line);
 
-                .card-header {
-                    font-variant-caps: all-small-caps;
-                    padding-top: 0;
-
-                    display: flex;
-                    flex-direction: row;
-                    gap: 0.5em;
-                    justify-content: space-between;
-                    align-items: baseline;
-
-                    h3 {
-                        margin: 0;
-                        font-weight: bold;
-                    }
+                .mat-mdc-card-title {
+                    font-family: var(--mho-font-display);
+                    font-size: 14px;
+                    font-weight: 600;
                 }
 
-                .content {
-                    .mat-mdc-table {
-                        --mat-table-row-item-container-height: undefined;
-                        --mat-table-header-container-height: undefined;
-                        --mat-table-header-headline-line-height: undefined;
-                        --mat-table-header-headline-size: 0.8em;
+                .mat-mdc-card-subtitle {
+                    margin-top: 2px;
+                    color: var(--mho-text-muted);
+                    font-size: 12px;
+                    line-height: 1.35;
+                }
+            }
 
-                        tr {
-                            &.today {
-                                background-color: rgba(0, 0, 0, 0.1);
-                            }
+            .content {
+                flex-grow: 1;
+                min-height: 0;
+                overflow: auto;
+                padding: 0;
+
+                .mat-mdc-table {
+                    --mat-table-row-item-container-height: undefined;
+                    --mat-table-header-container-height: undefined;
+                    --mat-table-header-headline-line-height: undefined;
+                    --mat-table-header-headline-size: 0.8em;
+
+                    /* Les cartes sont étroites (300 px au moins) : un en-tête trop long pour sa
+                       colonne passe à la ligne plutôt que d'élargir la table — ce qui faisait
+                       défiler la carte et coupait la dernière colonne. Utile surtout pour les
+                       traductions, souvent plus longues. */
+                    .mat-mdc-header-cell {
+                        white-space: normal;
+                        vertical-align: bottom;
+                    }
+
+                    /* Jour de la ville : fond ET barre à gauche. La couleur seule ne suffit pas
+                       à désigner une ligne parmi cinquante. */
+                    tr.today {
+                        background-color: var(--mho-accent-soft);
+                        box-shadow: inset 3px 0 0 var(--mho-accent);
+
+                        .mat-mdc-cell {
+                            font-weight: 600;
                         }
                     }
                 }

@@ -149,10 +149,18 @@ builder.Services.AddSingleton<IMyHordesTranslationsConfiguration>(_ => null!);
 builder.Services.AddSingleton<ITranslationService>(_ => null!);
 builder.Services.AddScoped<IMyHordesImportService, MyHordesImportService>();
 
+// Requis par AttaqueEstimationAccessTests (estimations) et RefinementFlowTests (affinage).
+builder.Services.AddScoped<MyHordesOptimizerApi.Services.Interfaces.Estimations.IMyHordesOptimizerEstimationService, MyHordesOptimizerApi.Services.Impl.Estimations.MyHordesOptimizerEstimationService>();
+builder.Services.AddScoped<MyHordesOptimizerApi.Services.Interfaces.Estimations.IRefinementService, MyHordesOptimizerApi.Services.Impl.Estimations.Refinement.RefinementService>();
+// Requis par RefinementFlowTests (limiteur de POST Refinement, miroir du vrai Program.cs).
+builder.Services.AddRateLimiter(options => options.AddRefinementPolicy());
+
 var app = builder.Build();
 // Tout premier middleware, comme dans le vrai Program.cs.
 app.UseResponseCompression();
 app.UseHttpsRedirection();
+app.UseRouting();
+app.UseRateLimiter();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();

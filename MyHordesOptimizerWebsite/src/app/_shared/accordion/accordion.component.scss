@@ -1,46 +1,109 @@
-@use 'variables';
 
 :host {
     display: contents;
 
     .mho-accordion {
-        display: block;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
         width: 100%;
 
+        /* Chaque entrée est une carte à part entière. Auparavant le seul trait de séparation était
+           un `border: 1px solid var(--mho-accent-soft)` — un accent translucide, donc un filet
+           quasi invisible sur le fond de page, et aucune surface sous le contenu : la liste se
+           lisait comme un bloc de texte continu. */
         .mho-accordion-item {
             display: block;
-            border: solid 1px variables.$item_color;
+            border: 1px solid var(--mho-line);
+            border-radius: var(--mho-radius-m);
+            background: var(--mho-surface);
+            overflow: hidden;
 
             .mho-accordion-item-header {
                 display: flex;
-                align-content: center;
+                align-items: center;
                 justify-content: space-between;
+                gap: 10px;
+                font-family: var(--mho-font-display);
+                font-size: 14.5px;
+                font-weight: 600;
+                line-height: 1.3;
 
                 &:hover {
                     cursor: pointer;
-                    background-color: variables.$item_color;
+                    background-color: var(--mho-hover);
+                }
+
+                .mho-accordion-item-toggler {
+                    flex-shrink: 0;
+                    color: var(--mho-text-muted);
                 }
             }
 
-            &:first-child {
-                border-top-left-radius: 4px;
-                border-top-right-radius: 4px;
+            &.expanded {
+                border-color: var(--mho-line-strong);
+
+                .mho-accordion-item-header {
+                    border-bottom: 1px solid var(--mho-line);
+                    background: var(--mho-surface-2);
+                }
             }
 
-            &:last-child {
-                border-bottom-left-radius: 4px;
-                border-bottom-right-radius: 4px;
+            .mho-accordion-item-header {
+                padding: 10px 12px;
             }
 
-            .mho-accordion-item-header,
+            /* Le contenu arrive en HTML libre (`[innerHTML]`) : il faut border ce qu'il apporte,
+               sinon les marges par défaut des `p` et des listes creusent la carte. Ce HTML ne porte
+               pas l'attribut d'encapsulation du composant : sans `::ng-deep`, aucune de ces règles
+               ne l'atteindrait. */
             .mho-accordion-item-content {
-                padding: 16px;
+                padding: 12px;
+                line-height: 1.55;
             }
 
-        }
+            .mho-accordion-item-content ::ng-deep {
+                > :first-child {
+                    margin-top: 0;
+                }
 
-        .mho-accordion-item + .mho-accordion-item {
-            border-top: none;
+                > :last-child {
+                    margin-bottom: 0;
+                }
+
+                p {
+                    margin: 0 0 0.6em;
+                }
+
+                ul, ol {
+                    margin: 0 0 0.6em;
+                    padding-left: 1.4em;
+                }
+
+                li + li {
+                    margin-top: 0.25em;
+                }
+
+                a {
+                    color: var(--mho-accent);
+                    text-underline-offset: 2px;
+                }
+
+                /* Captures d'écran des tutoriels : elles doivent tenir dans la carte. */
+                img {
+                    max-width: 100%;
+                    height: auto;
+                    border-radius: var(--mho-radius-s);
+                }
+
+                code {
+                    padding: 1px 5px;
+                    border: 1px solid var(--mho-well-line);
+                    border-radius: var(--mho-radius-s);
+                    background: var(--mho-well);
+                    font-size: 0.9em;
+                }
+            }
         }
     }
 }

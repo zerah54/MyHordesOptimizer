@@ -176,6 +176,14 @@ public partial class TownEstimation
     [Column("_100Max", TypeName = "int(11)")]
     public int? _100max { get; set; }
 
+    /// <summary>Âmes rouges présentes à la lecture de chaque palier (JSON clé % → âmes, paliers à 0 omis).</summary>
+    [Column("souls", TypeName = "longtext")]
+    public string? Souls { get; set; }
+
+    /// <summary>Niveau du bâtiment SPA (item_soul_blue_static, 0-3) à la lecture de cette famille.</summary>
+    [Column("spaLevel", TypeName = "int(11)")]
+    public int? SpaLevel { get; set; }
+
     [ForeignKey("IdLastUpdateInfo")]
     [InverseProperty("TownEstimations")]
     public virtual LastUpdateInfo? IdLastUpdateInfoNavigation { get; set; }

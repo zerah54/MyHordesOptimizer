@@ -188,3 +188,57 @@ describe('ItemComponent — ajout à la liste de souhaits', () => {
         expect(component.item()).not.toBe(original_item);
     });
 });
+
+describe('ItemComponent — fréquence en fouille', () => {
+    let fixture: ComponentFixture<ItemComponent>;
+    let component: ItemComponent;
+
+    beforeEach(async () => {
+        await TestBed.configureTestingModule({
+            imports: [ItemComponent],
+            providers: [provideHttpClient(withXhr()), provideHttpClientTesting()]
+        }).compileComponents();
+        fixture = TestBed.createComponent(ItemComponent);
+        component = fixture.componentInstance;
+        fixture.componentRef.setInput('forceOpen', true);
+    });
+
+    function renderDigFigure(drop_rate_not_praf: number, drop_rate_praf: number): { numbers: string[]; text: string } {
+        const item: Item = new Item();
+        item.label = { fr: 'Souche' } as never;
+        item.description = { fr: '' } as never;
+        item.properties = [];
+        item.actions = [];
+        item.recipes = [];
+        item.opens = [];
+        item.opened_with = null;
+        item.drop_rate_not_praf = drop_rate_not_praf;
+        item.drop_rate_praf = drop_rate_praf;
+        component.item.set(item);
+        fixture.detectChanges();
+
+        const figure: HTMLElement = fixture.nativeElement.querySelector('.dig-figure');
+        return {
+            numbers: Array.from(figure.querySelectorAll('strong')).map((strong: Element): string => (strong.textContent ?? '').trim()),
+            text: figure.textContent ?? ''
+        };
+    }
+
+    it('exprime une forte probabilité en fraction plutôt qu\'en « 1 sur N » arrondi (souche praf : 20/32)', () => {
+        const figure: { numbers: string[]; text: string } = renderDigFigure(0, 0.625);
+
+        expect(figure.numbers).toEqual(['5', '8']);
+        expect(figure.text).toContain('fouilles réussies sur');
+    });
+
+    it('exprime le débris praf (12/32) en 3 sur 8', () => {
+        expect(renderDigFigure(0, 0.375).numbers).toEqual(['3', '8']);
+    });
+
+    it('garde « 1 sur N » pour un objet moins courant', () => {
+        const figure: { numbers: string[]; text: string } = renderDigFigure(0.156, 0);
+
+        expect(figure.numbers).toEqual(['6']);
+        expect(figure.text).toContain('1 fouille réussie sur');
+    });
+});

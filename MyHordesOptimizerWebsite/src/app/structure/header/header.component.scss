@@ -3,12 +3,89 @@
 
     .mho-navbar {
 
+        /* Repère de la recherche globale, qui recouvre toute la barre sur petit écran. Pas de
+           défilement : les paliers (voir HeaderComponent) et la pastille de ville, seule à se
+           comprimer, font tenir la barre. */
+        position: relative;
         z-index: 3;
-        overflow-x: auto;
-        overflow-y: hidden;
+        overflow: hidden;
+
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 0 16px 0 10px;
+        background: var(--mho-topbar-bg);
+        color: var(--mho-topbar-fg);
+        border-bottom: 1px solid var(--mho-topbar-line);
+
+        /* Anneau par une ombre : pastille visible sans changer l'empreinte du logo dans la barre. */
+        .logo {
+            flex-shrink: 0;
+            border-radius: 50%;
+            background: var(--mho-topbar-logo-bg);
+            box-shadow: 0 0 0 2px var(--mho-topbar-logo-bg);
+        }
 
         .title {
-            margin-right: 1em;
+            font-family: var(--mho-font-display);
+            font-weight: 700;
+            font-size: 17px;
+            letter-spacing: 0.01em;
+            white-space: nowrap;
+
+            @media (max-width: 399.98px) {
+                display: none;
+            }
+        }
+
+        /* Sous 600 px, la pastille de ville vit en tête du menu (MenuComponent). */
+        mho-town-chip {
+            @media (max-width: 599.98px) {
+                display: none;
+            }
+        }
+
+        /* Seuls la pastille de ville et le champ de recherche (jusqu'à sa largeur minimale, voir
+           GlobalSearchComponent) se compriment : boutons, logo et titre gardent leur taille. */
+        > :not(mho-town-chip, mho-global-search, .spacer) {
+            flex-shrink: 0;
+        }
+
+        .avatar {
+            display: inline-grid;
+            place-items: center;
+            width: 26px;
+            height: 26px;
+            margin-right: 8px;
+            border-radius: 999px;
+            background: var(--mho-topbar-btn-bg);
+            color: var(--mho-topbar-btn-fg);
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        /* Avatar MyHordes : même empreinte que les initiales qu'il remplace, pour que la barre
+           ne bouge pas selon que le joueur en a un ou non. */
+        .avatar-img {
+            margin-right: 8px;
+        }
+
+        .identity {
+            display: inline-flex;
+            align-items: center;
+        }
+
+        /* Sous 1280 px, l'avatar seul : le pseudo passe dans son infobulle. */
+        @media (max-width: 1279.98px) {
+            .username {
+                display: none;
+            }
+
+            .avatar,
+            .avatar-img {
+                margin-right: 0;
+            }
         }
 
         .spacer {

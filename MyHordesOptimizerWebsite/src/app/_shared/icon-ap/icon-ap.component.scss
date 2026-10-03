@@ -1,11 +1,3 @@
-@use '../../../../public/scss/variables';
-
 :host {
     display: contents;
-
-    .mho-avatar {
-        > * {
-            width: 100px;
-        }
-    }
 }

@@ -20,6 +20,7 @@ using MyHordesOptimizerApi.Models;
 using MyHordesOptimizerApi.Providers.Interfaces;
 using MyHordesOptimizerApi.Repository.Interfaces;
 using MyHordesOptimizerApi.Services.Impl.Locking;
+using MyHordesOptimizerApi.Services.Impl.Maps;
 using MyHordesOptimizerApi.Services.Interfaces;
 using Newtonsoft.Json.Linq;
 using System;
@@ -428,122 +429,13 @@ namespace MyHordesOptimizerApi.Services.Impl
                                 existingCadaver.UpdateAllButKeysProperties(cadaver, ignoreNull: true);
                             }
                         }
-                        // On maj les cellsdigs
-                        if (DbContext.MapCellDigUpdates.FirstOrDefault(x => x.IdTown == town.IdTown && x.Day == town.Day) == null) // Si on a déjà fait la maj de la regen, il faut pas la refaire
-                        {
-                            var scrutLevel = 0;
-                            var scrut = myHordeMeResponse.Map.City.Buildings.SingleOrDefault(building => building.Id == MyHordesScrutateurConfiguration.Id);
-                            if (scrut != null && scrut.HasLevels.HasValue)
-                            {
-                                scrutLevel = scrut.HasLevels.Value;
-                            }
-                            var regenChance = MyHordesScrutateurConfiguration.Level0;
-                            switch (scrutLevel)
-                            {
-                                case 0:
-                                    regenChance = MyHordesScrutateurConfiguration.Level0;
-                                    break;
-                                case 1:
-                                    regenChance = MyHordesScrutateurConfiguration.Level1;
-                                    break;
-                                case 2:
-                                    regenChance = MyHordesScrutateurConfiguration.Level2;
-                                    break;
-                                case 3:
-                                    regenChance = MyHordesScrutateurConfiguration.Level3;
-                                    break;
-                                case 4:
-                                    regenChance = MyHordesScrutateurConfiguration.Level4;
-                                    break;
-                                case 5:
-                                    regenChance = MyHordesScrutateurConfiguration.Level5;
-                                    break;
-                            }
-                            var cells = DbContext.MapCells.Where(c => c.IdTown == town.IdTown)
-                                .ToList();
-                            DirectionEnum regen = DirectionEnum.All;
-
-                            // News est désormais typé : le tableau vide renvoyé au jour 1, ou quand la
-                            // gazette ne se rend pas, est traduit en null par EmptyPhpArrayConverter.
-                            var news = myHordeMeResponse.Map.City.News;
-                            if (news != null && news.RegenDir != null)
-                            {
-                                var regenDirLabel = news.RegenDir.De;
-                                regen = regenDirLabel.GetEnumFromDescription<DirectionEnum>();
-                            }
-                            float averageNbOfItemAdded = ((float)MyHordesScrutateurConfiguration.MinItemAdd + ((float)MyHordesScrutateurConfiguration.MaxItemAdd - (float)MyHordesScrutateurConfiguration.MinItemAdd) / (float)2);
-                            var xVille = myHordeMeResponse.Map.City.X.Value;
-                            var yVille = myHordeMeResponse.Map.City.Y.Value;
-                            foreach (var cell in cells)
-                            {
-                                var xFromTown = cell.X - xVille;
-                                var yFromTown = yVille - cell.Y;
-                                if (!(xFromTown == 0 && yFromTown == 0))
-                                {
-                                    if (!cell.NbKm.HasValue)
-                                    {
-                                        cell.NbKm = GetCellDistanceInKm(xFromTown, yFromTown);
-                                    }
-                                    if (!cell.NbPa.HasValue)
-                                    {
-                                        cell.NbPa = GetCellDistanceInActionPoint(xFromTown, yFromTown);
-                                    }
-                                    DirectionEnum cellZone;
-                                    if (cell.ZoneRegen.HasValue)
-                                    {
-                                        cellZone = (DirectionEnum)cell.ZoneRegen.Value;
-                                    }
-                                    else
-                                    {
-                                        cellZone = GetCellZone(xFromTown, yFromTown);
-                                        cell.ZoneRegen = (int)cellZone;
-                                    }
-                                    if (cellZone == regen || regen == DirectionEnum.All)
-                                    {
-                                        var max = cell.MaxPotentialRemainingDig ?? 0;
-                                        var average = cell.AveragePotentialRemainingDig ?? 0;
-                                        if (MyHordesScrutateurConfiguration.MaxItemPerCell == null || max < MyHordesScrutateurConfiguration.MaxItemPerCell)
-                                        {
-                                            var itemToAdd = MyHordesScrutateurConfiguration.MaxItemAdd;
-                                            if (max >= MyHordesScrutateurConfiguration.DigThrottle)
-                                            {
-                                                itemToAdd = Convert.ToInt32(Math.Ceiling(((float)itemToAdd - 1.0) / 2.0));
-                                            }
-                                            if (regen == DirectionEnum.All)
-                                            {
-                                                itemToAdd = 0;
-                                            }
-                                            cell.MaxPotentialRemainingDig = max + itemToAdd;
-                                        }
-
-                                        float averageItemAdd = ((float)regenChance / (float)100) * averageNbOfItemAdded;
-                                        if (MyHordesScrutateurConfiguration.MaxItemPerCell == null || average < MyHordesScrutateurConfiguration.MaxItemPerCell)
-                                        {
-                                            if (average >= MyHordesScrutateurConfiguration.DigThrottle)
-                                            {
-                                                averageItemAdd = ((float)regenChance / (float)100) * (float)Math.Ceiling((averageNbOfItemAdded - 1.0) / 2.0);
-                                            }
-                                            if (regen == DirectionEnum.All)
-                                            {
-                                                averageItemAdd = averageItemAdd / (float)8;
-                                            }
-                                            averageItemAdd = (float)Math.Round(averageItemAdd, 3);
-                                            cell.AveragePotentialRemainingDig = average + averageItemAdd;
-                                        }
-                                    }
-                                }
-                            }
-                            var mapCellDigUpdate = new MapCellDigUpdate()
-                            {
-                                Day = myHordeMeResponse.Map.Days.Value,
-                                IdTown = town.IdTown,
-                                DirectionRegen = (int)regen,
-                                LevelRegen = scrutLevel,
-                                TauxRegen = regenChance
-                            };
-                            DbContext.Add(mapCellDigUpdate);
-                            DbContext.UpdateRange(cells);
-                        }
+                        // Régénération nocturne des zones, pour les nuits pas encore traitées (voir
+                        // DigRegeneration). Les cases ne sont chargées que s'il y a une nuit à appliquer.
+                        DigRegeneration.ApplyPendingNights(DbContext,
+                            existingTown,
+                            () => DbContext.MapCells.Where(cell => cell.IdTown == existingTown.IdTown).ToList(),
+                            myHordeMeResponse.Map,
+                            MyHordesScrutateurConfiguration);
                         DbContext.SaveChanges();
                         Logger.LogDebug($"GetSimpleMeAsync Update de toute la Town après {sw.Elapsed} ms");
                     }
@@ -1786,9 +1678,17 @@ namespace MyHordesOptimizerApi.Services.Impl
             });
             var toAdd = new List<MapCellDig>();
             var toUpdate = new List<MapCellDig>();
+            // Écart de fouilles réussies par case : les fouilles restantes en sont nettes (voir
+            // MapCellDigsExtensions), toute correction doit donc s'y reporter.
+            var successDeltaByCell = new Dictionary<int, int>();
             foreach (var model in models)
             {
-                if (DbContext.MapCellDigs.Any(x => x.IdCell == model.IdCell && x.IdUser == model.IdUser && x.Day == model.Day))
+                // Lecture non suivie : l'entité mise à jour est `model`, une autre instance de même clé.
+                int? previousSuccess = DbContext.MapCellDigs.AsNoTracking()
+                    .Where(x => x.IdCell == model.IdCell && x.IdUser == model.IdUser && x.Day == model.Day)
+                    .Select(x => (int?)(x.NbSucces ?? 0))
+                    .FirstOrDefault();
+                if (previousSuccess.HasValue)
                 {
                     toUpdate.Add(model);
                 }
@@ -1796,9 +1696,12 @@ namespace MyHordesOptimizerApi.Services.Impl
                 {
                     toAdd.Add(model);
                 }
+                int delta = (model.NbSucces ?? 0) - (previousSuccess ?? 0);
+                successDeltaByCell[model.IdCell] = successDeltaByCell.GetValueOrDefault(model.IdCell) + delta;
             }
             DbContext.AddRange(toAdd);
             DbContext.UpdateRange(toUpdate);
+            ApplySuccessDeltas(successDeltaByCell);
             DbContext.SaveChanges();
             transaction.Commit();
 
@@ -1811,7 +1714,22 @@ namespace MyHordesOptimizerApi.Services.Impl
             var models = DbContext.MapCellDigs.Where(x => x.IdCell == idCell && x.IdUser == diggerId && x.Day == day)
                 .ToList();
             DbContext.RemoveRange(models);
+            // Les fouilles réussies supprimées sont rendues à la case (sauf si elle a été vue épuisée).
+            ApplySuccessDeltas(new Dictionary<int, int> { [idCell] = -models.Sum(model => model.NbSucces ?? 0) });
             DbContext.SaveChanges();
+        }
+
+        private void ApplySuccessDeltas(IReadOnlyDictionary<int, int> successDeltaByCell)
+        {
+            var cellIds = successDeltaByCell.Where(entry => entry.Value != 0).Select(entry => entry.Key).ToList();
+            if (cellIds.Count == 0)
+            {
+                return;
+            }
+            foreach (var cell in DbContext.MapCells.Where(cell => cellIds.Contains(cell.IdCell)).ToList())
+            {
+                cell.ApplySuccessfulDigsDelta(successDeltaByCell[cell.IdCell]);
+            }
         }
 
         public IEnumerable<MyHordesOptimizerMapUpdateDto> GetMapUpdates(int townId)
@@ -1844,7 +1762,9 @@ namespace MyHordesOptimizerApi.Services.Impl
                         maxPotentialStartingItemValue = null;
                     }
                     int? zoneRegen = null;
-                    if (xFromTown != 0 && yFromTown != 0)
+                    // Toutes les cases hors ville ont un octant, celles des axes comprises (l'ancienne
+                    // condition `x != 0 && y != 0` les laissait sans octant).
+                    if (!isTown)
                     {
                         zoneRegen = (int)GetCellZone(xFromTown, yFromTown);
                     }
@@ -1878,51 +1798,11 @@ namespace MyHordesOptimizerApi.Services.Impl
 
             return cells;
         }
-        private DirectionEnum GetCellZone(int x, int y)
-        {
-            /** Non implémenté ici
-            // Cas centre
-            if (x == 0 && y == 0)
-                return DirectionEnum.Center;
-            */
+        private DirectionEnum GetCellZone(int x, int y) => ZoneGeometry.Direction(x, y);
 
-            if (x == 0 && y > 0) return DirectionEnum.North;
-            if (x == 0 && y < 0) return DirectionEnum.South;
-            if (x > 0 && y == 0) return DirectionEnum.Est;
-            if (x < 0 && y == 0) return DirectionEnum.West;
+        private int GetCellDistanceInKm(int xRelativeToTown, int yRelativetoTown) => ZoneGeometry.DistanceKm(xRelativeToTown, yRelativetoTown);
 
-            double deg = x != 0 || y != 0
-                ? (180.0 / Math.PI) * Math.Asin(x / Math.Sqrt((double)(x * x + y * y)))
-                : 0.0;
-
-            if (y > 0)
-            {
-                if (deg >= 67.5) return DirectionEnum.Est;
-                if (deg >= 22.5) return DirectionEnum.NorthEst;
-                if (deg >= -22.5) return DirectionEnum.North;
-                if (deg >= -67.5) return DirectionEnum.NorthWest;
-                return DirectionEnum.West;
-            }
-            else
-            {
-                if (deg >= 67.5) return DirectionEnum.Est;
-                if (deg >= 22.5) return DirectionEnum.SouthEst;
-                if (deg >= -22.5) return DirectionEnum.South;
-                if (deg >= -67.5) return DirectionEnum.SouthWest;
-                return DirectionEnum.West;
-            }
-        }
-
-        private int GetCellDistanceInKm(int xRelativeToTown, int yRelativetoTown)
-        {
-            return (int)Math.Round(Math.Sqrt(Math.Pow(xRelativeToTown, 2) + Math.Pow(yRelativetoTown, 2)));
-
-
-        }
-        private int GetCellDistanceInActionPoint(int xRelativeToTown, int yRelativetoTown)
-        {
-            return Math.Abs(xRelativeToTown) + Math.Abs(yRelativetoTown);
-        }
+        private int GetCellDistanceInActionPoint(int xRelativeToTown, int yRelativetoTown) => ZoneGeometry.DistanceAp(xRelativeToTown, yRelativetoTown);
         #endregion
         #endregion
     }

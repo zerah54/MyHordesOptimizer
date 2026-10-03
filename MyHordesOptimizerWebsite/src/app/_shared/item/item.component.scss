@@ -1,5 +1,3 @@
-@use '../../../../public/scss/variables';
-
 :host {
     display: contents;
 
@@ -24,14 +22,110 @@
             margin: 0.5em 0;
         }
 
+        /* Rareté en fouille : un palier nommé, la phrase qu'on retient, une barre à échelle
+           logarithmique, et le pourcentage exact en petit pour qui le veut. */
+        .dig-chance {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+
+            .dig-head {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 8px;
+            }
+
+            .dig-section {
+                font-size: 11px;
+                font-weight: 700;
+                letter-spacing: 0.06em;
+                text-transform: uppercase;
+                color: var(--mho-text-muted);
+            }
+
+            /* Le palier se lit au mot ET à la teinte ; le mot suffit seul. */
+            .dig-band {
+                padding: 1px 8px;
+                border-radius: 999px;
+                font-size: 11px;
+                font-weight: 700;
+                background: var(--mho-surface-3);
+                color: var(--mho-text-muted);
+
+                &.very-common,
+                &.common {
+                    background: var(--mho-accent-soft);
+                    color: var(--mho-on-accent-soft);
+                }
+            }
+
+            .dig-figure {
+                font-size: 13px;
+
+                strong {
+                    font-family: var(--mho-font-display);
+                    font-size: 17px;
+                    font-variant-numeric: tabular-nums;
+                    margin-inline: 4px;
+                }
+            }
+
+            .dig-bar {
+                height: 5px;
+                border-radius: 99px;
+                background: var(--mho-surface-3);
+                overflow: hidden;
+
+                > span {
+                    display: block;
+                    height: 100%;
+                    border-radius: 99px;
+                    background: var(--mho-accent);
+                }
+            }
+
+            .dig-detail {
+                font-size: 11.5px;
+                color: var(--mho-text-muted);
+                font-variant-numeric: tabular-nums;
+            }
+        }
+
         > div {
-            background-color: variables.$item-color;
+            /* `border-box` : avec `width: 100%` et un filet de 1 px, la tuile dépassait de 2 px son
+               conteneur — assez pour faire apparaître un défilement horizontal sous la fiche de la
+               banque. */
+            box-sizing: border-box;
+            background-color: var(--mho-surface-2);
+            border: 1px solid var(--mho-line);
             width: 100%;
             height: 100%;
-            border-radius: 0.25em;
+            border-radius: var(--mho-radius-m);
+        }
+
+        > div:hover {
+            border-color: var(--mho-line-strong);
+        }
+
+        /* Tuile sélectionnable : l'état retenu se voit au contour ET au fond, jamais à la
+           couleur seule, et le focus clavier reste visible. */
+        &.selected > div {
+            border-color: var(--mho-accent);
+            box-shadow: 0 0 0 1px var(--mho-accent);
+            background-color: var(--mho-accent-soft);
+        }
+
+        .title-part:focus-visible {
+            outline: 2px solid var(--mho-accent);
+            outline-offset: -2px;
+            border-radius: var(--mho-radius-m);
+        }
+
+        > div {
 
             .title-part {
-                height: 48px;
+                height: 44px;
                 display: flex;
                 justify-content: space-between;
                 cursor: pointer;
@@ -44,22 +138,37 @@
                     text-overflow: ellipsis;
 
                     .item_img {
-                        min-width: 35px;
-                        padding-right: 0.25em;
-                        display: inline-block;
+                        position: relative;
+                        display: inline-grid;
+                        place-items: center;
+                        width: 34px;
+                        height: 34px;
+                        margin-right: 8px;
+                        border-radius: 8px;
+                        background: var(--mho-well);
+                        box-shadow: inset 0 0 0 1px var(--mho-well-line);
+                        vertical-align: middle;
 
                         img {
                             vertical-align: middle;
                         }
 
+                        /* Quantité : dans le coin du puits, comme l'inventaire du jeu. */
                         .item_count {
-                            vertical-align: sub;
-                            font-size: 0.75em;
+                            position: absolute;
+                            right: 2px;
+                            bottom: 0;
+                            font-size: 10px;
+                            font-weight: 700;
+                            font-variant-numeric: tabular-nums;
+                            line-height: 1;
                         }
                     }
 
                     .item_label {
                         vertical-align: middle;
+                        font-size: 13px;
+                        font-weight: 500;
                     }
                 }
 
@@ -90,9 +199,12 @@
 
         .broken {
             .item_img {
-                img {
-                    border: 1px dashed red;
-                }
+                box-shadow: inset 0 0 0 1px var(--mho-danger);
+                background-image: repeating-linear-gradient(
+                    135deg,
+                    transparent 0 5px,
+                    color-mix(in srgb, var(--mho-danger) 18%, transparent) 5px 6px
+                );
             }
         }
 
@@ -102,7 +214,8 @@
             gap: 0.5em;
 
             .catapult-result.broken img {
-                border: 1px dashed red;
+                outline: 1px dashed var(--mho-danger);
+                outline-offset: 1px;
             }
         }
 

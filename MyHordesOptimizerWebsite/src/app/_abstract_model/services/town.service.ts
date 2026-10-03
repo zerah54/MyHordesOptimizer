@@ -21,7 +21,14 @@ import {
 
 import { SnackbarService } from '../../_core/services/snackbar.service';
 import { TownContextService } from '../../_core/services/town-context.service';
-import { getBankWithExpirationDate, getExternalAppId, getTown, getUserId, setBankWithExpirationDate, } from '../../_core/utilities/localstorage.util';
+import {
+    getBankWithExpirationDate,
+    getExternalAppId,
+    getOwnTown,
+    getTown,
+    getUserId,
+    setBankWithExpirationDate,
+} from '../../_core/utilities/localstorage.util';
 import { BankInfoDTO } from '../dto/bank-info.dto';
 import { CellDTO } from '../dto/cell.dto';
 import { CitizenDTO } from '../dto/citizen.dto';
@@ -43,6 +50,7 @@ import { Citizen } from '../types/citizen.class';
 import { CitizenInfo } from '../types/citizen-info.class';
 import { Ruin } from '../types/ruin.class';
 import { Town } from '../types/town.class';
+import { TownDetails } from '../types/town-details.class';
 import { TownListPageResult } from '../types/town-list-item.model';
 import { UpdateInfo } from '../types/update-info.class';
 import { GlobalService } from './_global.service';
@@ -125,24 +133,30 @@ export class TownService extends GlobalService {
      * travail en tâche de fond : on lance, puis on interroge son état jusqu'à la fin.
      */
     public updateExternalTools(): Observable<ExternalToolsUpdateJobStateDTO> {
+        // Depuis le site, le bouton ne met plus à jour que MyHordes Optimizer. La synchronisation
+        // de Gest'Hordes et Fata Morgana reste le rôle de l'extension, depuis les pages du jeu.
+        // BigBroth'Hordes ne fonctionne plus ; l'outil reste connu au cas où son développeur
+        // reprendrait le projet.
         const tools_to_update: ToolsToUpdate = {
-            // BigBroth'Hordes ne fonctionne plus ; l'outil reste connu au cas où son développeur reprendrait le projet
             isBigBrothHordes: 'none',
-            isFataMorgana: 'api',
-            isGestHordes: 'api',
+            isFataMorgana: 'none',
+            isGestHordes: 'none',
             isMyHordesOptimizer: 'api'
         };
 
+        // Toujours la ville du joueur : c'est elle que l'API MyHordes renvoie pour son compte, même
+        // s'il en observe une autre.
+        const own_town: TownDetails | null = getOwnTown();
         const town_details: {
             townX: number,
             townY: number,
             isChaos: boolean,
             townId: number
         } = {
-            townX: getTown()?.town_x || 0,
-            townY: getTown()?.town_y || 0,
-            isChaos: getTown()?.is_devaste || false,
-            townId: getTown()?.town_id || 0
+            townX: own_town?.town_x || 0,
+            townY: own_town?.town_y || 0,
+            isChaos: own_town?.is_chaos || false,
+            townId: own_town?.town_id || 0
         };
 
         return super.post<ExternalToolsUpdateJobStateDTO>(
@@ -274,7 +288,7 @@ export class TownService extends GlobalService {
 
     public updateBag(citizen: Citizen): Observable<UpdateInfo> {
         return new Observable((sub: Subscriber<UpdateInfo>) => {
-            super.post<UpdateInfoDTO>(this.API_URL + `/ExternalTools/Bag?townId=${getTown()?.town_id}`, JSON.stringify(citizen.toCitizenBagDto()))
+            super.post<UpdateInfoDTO>(this.API_URL + `/ExternalTools/Bag?townId=${getOwnTown()?.town_id}`, JSON.stringify(citizen.toCitizenBagDto()))
                 .subscribe({
                     next: (response: UpdateInfoDTO) => {
                         sub.next(new UpdateInfo(response));
@@ -288,7 +302,7 @@ export class TownService extends GlobalService {
 
     public updateChest(citizen: Citizen): Observable<UpdateInfo> {
         return new Observable((sub: Subscriber<UpdateInfo>) => {
-            super.post<UpdateInfoDTO>(this.API_URL + `/ExternalTools/Chest?townId=${getTown()?.town_id}`, JSON.stringify(citizen.toCitizenChestDto()))
+            super.post<UpdateInfoDTO>(this.API_URL + `/ExternalTools/Chest?townId=${getOwnTown()?.town_id}`, JSON.stringify(citizen.toCitizenChestDto()))
                 .subscribe({
                     next: (response: UpdateInfoDTO) => {
                         sub.next(new UpdateInfo(response));
@@ -302,7 +316,7 @@ export class TownService extends GlobalService {
 
     public updateStatus(citizen: Citizen): Observable<UpdateInfo> {
         return new Observable((sub: Subscriber<UpdateInfo>) => {
-            super.post<UpdateInfoDTO>(this.API_URL + `/ExternalTools/Status?townId=${getTown()?.town_id}`, JSON.stringify(citizen.toCitizenStatusDto()))
+            super.post<UpdateInfoDTO>(this.API_URL + `/ExternalTools/Status?townId=${getOwnTown()?.town_id}`, JSON.stringify(citizen.toCitizenStatusDto()))
                 .subscribe({
                     next: (response: UpdateInfoDTO) => {
                         sub.next(new UpdateInfo(response));
@@ -316,7 +330,7 @@ export class TownService extends GlobalService {
 
     public updateHome(citizen: Citizen): Observable<UpdateInfo> {
         return new Observable((sub: Subscriber<UpdateInfo>) => {
-            super.post<UpdateInfoDTO>(this.API_URL + `/ExternalTools/home?townId=${getTown()?.town_id}`, JSON.stringify(citizen.toCitizenHomeDto()))
+            super.post<UpdateInfoDTO>(this.API_URL + `/ExternalTools/home?townId=${getOwnTown()?.town_id}`, JSON.stringify(citizen.toCitizenHomeDto()))
                 .subscribe({
                     next: (response: UpdateInfoDTO) => {
                         sub.next(new UpdateInfo(response));
@@ -330,7 +344,7 @@ export class TownService extends GlobalService {
 
     public updateHeroicActions(citizen: Citizen): Observable<UpdateInfo> {
         return new Observable((sub: Subscriber<UpdateInfo>) => {
-            super.post<UpdateInfoDTO>(this.API_URL + `/ExternalTools/HeroicActions?townId=${getTown()?.town_id}`, JSON.stringify(citizen.toCitizenHeroicActionsDto()))
+            super.post<UpdateInfoDTO>(this.API_URL + `/ExternalTools/HeroicActions?townId=${getOwnTown()?.town_id}`, JSON.stringify(citizen.toCitizenHeroicActionsDto()))
                 .subscribe({
                     next: (response: UpdateInfoDTO) => {
                         sub.next(new UpdateInfo(response));
@@ -359,7 +373,7 @@ export class TownService extends GlobalService {
 
     public addDailyAction(citizen: Citizen, actionKey: string, day?: number): Observable<UpdateInfo> {
         return new Observable((sub: Subscriber<UpdateInfo>) => {
-            super.post<UpdateInfoDTO>(this.API_URL + `/town/${getTown()?.town_id}/user/${citizen.id}/dailyAction/${actionKey}?day=${day ?? getTown()?.day}`)
+            super.post<UpdateInfoDTO>(this.API_URL + `/town/${getOwnTown()?.town_id}/user/${citizen.id}/dailyAction/${actionKey}?day=${day ?? getOwnTown()?.day}`)
                 .subscribe({
                     next: (update_info: UpdateInfoDTO) => {
                         sub.next(new UpdateInfo(update_info));
@@ -373,7 +387,7 @@ export class TownService extends GlobalService {
 
     public removeDailyAction(citizen: Citizen, actionKey: string, day?: number): Observable<void> {
         return new Observable((sub: Subscriber<void>) => {
-            super.delete(this.API_URL + `/town/${getTown()?.town_id}/user/${citizen.id}/dailyAction/${actionKey}?day=${day ?? getTown()?.day}`)
+            super.delete(this.API_URL + `/town/${getOwnTown()?.town_id}/user/${citizen.id}/dailyAction/${actionKey}?day=${day ?? getOwnTown()?.day}`)
                 .subscribe({
                     next: () => {
                         sub.next();
@@ -387,7 +401,7 @@ export class TownService extends GlobalService {
 
     public saveChamanicDetails(citizen: Citizen): Observable<UpdateInfo> {
         return new Observable((sub: Subscriber<UpdateInfo>) => {
-            super.post<UpdateInfoDTO>(this.API_URL + `/town/${getTown()?.town_id}/user/${citizen.id}/chamanicDetail`, JSON.stringify(citizen.chamanic_detail.modelToDto()))
+            super.post<UpdateInfoDTO>(this.API_URL + `/town/${getOwnTown()?.town_id}/user/${citizen.id}/chamanicDetail`, JSON.stringify(citizen.chamanic_detail.modelToDto()))
                 .subscribe({
                     next: (response: UpdateInfoDTO) => {
                         sub.next(new UpdateInfo(response));

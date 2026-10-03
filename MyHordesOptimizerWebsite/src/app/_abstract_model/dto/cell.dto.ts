@@ -23,6 +23,8 @@ export interface CellDTO {
     totalSucces: number;
     averagePotentialRemainingDig: number;
     maxPotentialRemainingDig: number;
+    /** Zone excavée par un fouineur (capacité héroïque) ; null tant que MHO ne l'a pas relevé. */
+    isExcavated: boolean | null;
     /** Niveau d'abondance de la zone relevé par un fouineur, de 0 (épuisée) à 3 (abondante) */
     scavZoneLevel: number | null;
     /** Niveau d'exploration de la zone relevé par un éclaireur, de 0 à 3 */

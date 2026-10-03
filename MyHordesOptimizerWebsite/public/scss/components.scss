@@ -1,0 +1,257 @@
+/* Classes utilitaires communes, portées de la maquette (préfixe `m-` → `mho-`).
+   Elles vivent ici et non dans un composant : chaque page les emploie directement dans
+   son gabarit, sans avoir à redéclarer les mêmes couleurs et les mêmes rayons. */
+
+/* ---------------------------------------------------------------- surfaces */
+
+.mho-card {
+    background: var(--mho-surface);
+    border: 1px solid var(--mho-line);
+    border-radius: var(--mho-radius-l);
+}
+
+.mho-card-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--mho-line);
+}
+
+.mho-card-title {
+    font-family: var(--mho-font-display);
+    font-weight: 600;
+    font-size: 15px;
+}
+
+/* Puits d'icône : rappelle les cases d'inventaire du jeu.
+   L'icône MyHordes garde sa taille native, c'est le puits qui la cadre. */
+.mho-well {
+    position: relative;
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    background: var(--mho-well);
+    box-shadow: inset 0 0 0 1px var(--mho-well-line);
+
+    &.mho-well--lg {
+        width: 56px;
+        height: 56px;
+        border-radius: 12px;
+    }
+
+    &.mho-well--sm {
+        width: 28px;
+        height: 28px;
+        border-radius: 7px;
+    }
+
+    /* Objet cassé : hachures + liseré, jamais la couleur seule. */
+    &.mho-well--broken {
+        box-shadow: inset 0 0 0 1px var(--mho-danger);
+        background-image: repeating-linear-gradient(
+            135deg,
+            transparent 0 5px,
+            color-mix(in srgb, var(--mho-danger) 18%, transparent) 5px 6px
+        );
+    }
+}
+
+/* ---------------------------------------------------------------- étiquettes */
+
+.mho-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    height: 20px;
+    padding: 0 7px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+    white-space: nowrap;
+
+    &.mho-pill--soft {
+        background: var(--mho-accent-soft);
+        color: var(--mho-on-accent-soft);
+    }
+
+    &.mho-pill--outline {
+        border: 1px solid var(--mho-line-strong);
+        color: var(--mho-text-muted);
+    }
+
+    &.mho-pill--ok {
+        background: var(--mho-success-soft);
+        color: var(--mho-success);
+    }
+
+    &.mho-pill--danger {
+        border: 1px solid var(--mho-danger);
+        color: var(--mho-danger);
+    }
+}
+
+/* ---------------------------------------------------------------- en-tête de page */
+
+.mho-page-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 16px;
+
+    .mho-page-header__actions {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+}
+
+.mho-breadcrumbs {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12.5px;
+    color: var(--mho-text-muted);
+}
+
+.mho-page-meta {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    font-size: 13px;
+    color: var(--mho-text-muted);
+
+    .mho-page-meta__dot {
+        width: 3px;
+        height: 3px;
+        border-radius: 99px;
+        background: currentColor;
+    }
+}
+
+/* ---------------------------------------------------------------- chiffres clés */
+
+.mho-kpi {
+    font-family: var(--mho-font-display);
+    font-size: 26px;
+    font-weight: 700;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+}
+
+.mho-kpi-label {
+    font-size: 11.5px;
+    font-weight: 600;
+    color: var(--mho-text-muted);
+}
+
+/* Jauge : une valeur rapportée à un maximum. */
+.mho-meter {
+    height: 6px;
+    border-radius: 99px;
+    background: var(--mho-surface-3);
+    overflow: hidden;
+
+    > span {
+        display: block;
+        height: 100%;
+        border-radius: 99px;
+        background: var(--mho-accent);
+    }
+}
+
+/* ---------------------------------------------------------------- divers */
+
+.mho-muted {
+    color: var(--mho-text-muted);
+}
+
+/* Chiffres comparés d'une ligne à l'autre : même chasse pour tous. */
+.mho-num {
+    font-variant-numeric: tabular-nums;
+}
+
+/* Liste d'icônes de jeu alignées (rôles, états, sac…). */
+.mho-icons {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+/* ---------------------------------------------------------------- accessibilité */
+
+/* Contenu réservé aux lecteurs d'écran : un intitulé de tableau ou de section qui ferait
+   doublon à l'écran, mais sans lequel la structure n'est plus annoncée. */
+.mho-visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    white-space: nowrap;
+    clip-path: inset(50%);
+}
+
+/* Barre d'actions d'une page : ce qui vivait dans l'en-tête de carte (bascules de mode,
+   filtres globaux) quand chaque page portait son propre en-tête. */
+.mho-page-toolbar,
+.page-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    flex-shrink: 0;
+    margin-bottom: 12px;
+}
+
+/* ---------------------------------------------------------------- bascules */
+
+/* Bascule avec icône : icône et libellé centrés sur une même ligne et espacés par la mise en
+   page. Auparavant chaque page le réglait à sa façon (marge et `vertical-align` sur les
+   Citoyens, rien du tout sur la Banque, où le texte flottait contre l'icône). */
+.mat-button-toggle .mat-button-toggle-label-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    /* Material donne sa hauteur au bouton par la hauteur de ligne du libellé. Un conteneur flex ne
+       crée pas de ligne : sans ce minimum, une bascule à icône seule tombait à la hauteur de
+       l'icône (menu : 29,5 px au lieu de 34, icône collée en haut). */
+    min-height: 1lh;
+}
+
+/* Un libellé flex déplace la ligne de base du bouton : aligné sur elle, il débordait d'un
+   demi-pixel sous la bascule. */
+.mat-button-toggle .mat-button-toggle-button {
+    vertical-align: top;
+}
+
+/* ------------------------------------------------ préfixes et suffixes de champ */
+
+/* Material n'espace que les `mat-icon` placées en préfixe ou en suffixe. Une image de MyHordes
+   ou un texte (« Bonus : 50 % », « % ») y collait au bord du champ ; les pages tentaient de le
+   corriger avec des règles encapsulées qui n'atteignaient pas le conteneur interne de Material.
+   16 px côté bord : le retrait du libellé et des icônes de mho-select. */
+.mat-mdc-form-field-icon-prefix > :is(img, span, small) {
+    margin: 0 4px 0 16px;
+}
+
+.mat-mdc-form-field-icon-suffix > :is(img, span, small) {
+    margin: 0 16px 0 4px;
+}
+
+/* Centrage vertical réel plutôt que sur la ligne de base du texte. */
+.mat-mdc-form-field-icon-prefix > img,
+.mat-mdc-form-field-icon-suffix > img {
+    display: block;
+}
+
+.mat-mdc-form-field-icon-prefix > span,
+.mat-mdc-form-field-icon-suffix > span {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}

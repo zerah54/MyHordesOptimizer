@@ -1,5 +1,3 @@
-@use 'variables';
-
 :host {
     display: contents;
 
@@ -8,54 +6,104 @@
         display: flex;
         flex-direction: column;
         justify-content: space-between;
-        min-width: 200px;
+        width: 248px;
         overflow: hidden;
+        background: var(--mho-nav-bg);
+
+        /* Pastille de ville : dans la barre d'en-tête à partir de 600 px. */
+        mho-town-chip {
+            @media (min-width: 600px) {
+                display: none;
+            }
+        }
 
         .mdc-list {
+            flex: 1;
+            min-height: 0;
             overflow-y: auto;
+            padding: 8px 10px 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
 
-            .mat-mdc-list-item:hover {
-                background-color: rgba(0, 0, 0, 0.2);
-                cursor: pointer;
+            /* Même raison que les entrées : un `mat-divider` de 1 px n'a rien à céder. */
+            mat-divider {
+                flex: 0 0 auto;
             }
 
+            /* Entrée de menu : 34 px, icône puis libellé, l'entrée active en pilule. */
             .mat-mdc-list-item {
+                --mat-list-list-item-leading-space: 10px;
+                --mat-list-list-item-trailing-space: 10px;
+                --mat-list-list-item-one-line-container-height: 34px;
+
+                /* `flex-shrink: 0` obligatoire : dans une colonne flex, les enfants se compriment
+                   AVANT que le `overflow-y: auto` du parent n'entre en jeu. Sans ça, un écran court
+                   — un téléphone — écrase les 22 entrées jusqu'à les rendre illisibles au lieu de
+                   faire défiler la liste. */
+                flex: 0 0 auto;
+                height: 34px;
+                border-radius: 8px;
                 text-decoration: none;
+                font-size: 13.5px;
+                font-weight: 500;
+                color: var(--mho-text);
 
                 div {
                     display: flex;
                     flex-direction: row;
                     justify-content: flex-start;
                     align-items: center;
-                    gap: 0.25em;
+                    gap: 8px;
+                }
+
+                &:hover {
+                    background-color: var(--mho-hover);
+                    cursor: pointer;
                 }
 
                 &.link-selected {
-                    color: variables.$primary !important;
+                    background: var(--mho-accent-soft);
+                    color: var(--mho-on-accent-soft);
+                    font-weight: 600;
                 }
 
+                /* Un seul niveau d'indentation par palier : au-delà, le libellé n'a plus de place. */
                 @for $i from 1 through 10 {
                     &.lvl-#{$i} {
-                        $padding: $i * 2+em;
-                        padding-left: $padding;
-                        // width: calc(100% - $padding);
+                        padding-left: #{8 + $i * 10}px;
                     }
                 }
 
-                .mat-mdc-list-item-unscoped-content {
-                    vertical-align: middle;
+                /* Un groupe (« Ma ville », « Wiki »…) se lit comme un intitulé de section. */
+                &.lvl-0 {
+                    margin-top: 6px;
+                    font-size: 11px;
+                    font-weight: 600;
+                    letter-spacing: 0.08em;
+                    text-transform: uppercase;
+                    color: var(--mho-text-muted);
                 }
 
                 .mat-icon {
                     vertical-align: middle;
+                    flex-shrink: 0;
+                    font-size: 18px;
+                    width: 18px;
+                    height: 18px;
+                    opacity: 0.85;
                 }
             }
-
         }
 
+        /* Pied de menu : thème, mode, langue — et les mentions qui étaient dans le footer. */
         .actions {
+            flex-shrink: 0;
             display: flex;
             flex-direction: column;
+            gap: 6px;
+            padding: 10px 12px 12px;
+            border-top: 1px solid var(--mho-line);
 
             button {
                 text-align: left;
@@ -64,13 +112,50 @@
             }
         }
 
-        .spoil {
-            font-size: 0.5em;
-            padding: 0.5em;
-            border-radius: 1em;
-            background-color: variables.$primary;
-            color: white;
-            line-height: initial;
+        .legal {
+            flex-shrink: 0;
+            font-size: 11.5px;
+            line-height: 1.5;
+            color: var(--mho-text-muted);
+
+            a {
+                color: var(--mho-text-muted);
+                text-decoration: underline;
+                text-underline-offset: 2px;
+            }
+
+            /* L'espace vit dans le texte du séparateur, pas dans une marge : Angular supprime
+               les nœuds de texte blancs entre éléments, et sans lui la ligne de liens n'a aucun
+               point de coupure — elle débordait du menu et le dernier lien était rogné. */
+            .sep {
+                opacity: 0.5;
+            }
         }
+
+        .spoil {
+            flex-shrink: 0;
+            margin-left: auto;
+            padding: 1px 6px;
+            border-radius: 999px;
+            border: 1px solid var(--mho-line-strong);
+            background: var(--mho-surface-3);
+            font-size: 9.5px;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            color: var(--mho-text-muted);
+            line-height: 1.5;
+        }
+    }
+}
+
+/* Bascule Clair / Sombre / Auto : trois icônes, sous le sélecteur de thème. */
+:host .mho-theme-mode {
+    align-self: stretch;
+
+    --mat-button-toggle-height: 34px;
+
+    .mat-button-toggle {
+        flex: 1;
     }
 }

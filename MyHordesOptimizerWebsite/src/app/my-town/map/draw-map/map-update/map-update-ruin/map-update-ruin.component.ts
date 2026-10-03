@@ -64,6 +64,7 @@ export class MapUpdateRuinComponent implements OnInit {
                 new_cell.nb_eruin_blue = +values.nb_eruin_blue;
                 new_cell.nb_eruin_violet = +values.nb_eruin_violet;
                 new_cell.nb_ruin_dig = +values.nb_ruin_dig;
+                new_cell.is_ruin_dryed = !!values.is_ruin_dryed;
                 this.cellChange.emit(new_cell);
             });
     }

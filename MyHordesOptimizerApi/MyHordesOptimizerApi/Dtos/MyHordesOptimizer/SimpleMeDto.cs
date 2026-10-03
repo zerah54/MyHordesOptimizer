@@ -20,6 +20,12 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer
     public class SimpleMeTownDetailDto
     {
         public int TownId { get; set; }
+
+        /// <summary>
+        /// Le nom de la ville. Null hors ville, et pour un joueur interrogé qui n'est pas
+        /// l'appelant (MyHordes ignore alors les sous-champs demandés sur <c>map</c>).
+        /// </summary>
+        public string? TownName { get; set; }
         public int TownX { get; set; }
         public int TownY { get; set; }
         public int TownMaxX { get; set; }

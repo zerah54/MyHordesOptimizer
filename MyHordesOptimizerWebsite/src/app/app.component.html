@@ -1,7 +1,7 @@
-<div class="mho-main" [class]="theme ? theme : ''">
+<div class="mho-main" [class.noel]="family() === 'noel'">
     <mho-header #header (changeSidenavStatus)="sidenav.toggle()"></mho-header>
 
-    @if (theme === 'noel') {
+    @if (family() === 'noel') {
         <ul class="lightrope">
             @for (i of [].constructor(50); track $index) {
                 <li></li>
@@ -9,7 +9,7 @@
         </ul>
     }
 
-    @if (theme === 'halloween') {
+    @if (family() === 'halloween') {
         <div class="web-spider">
             <div class="web">
                 <img [ngSrc]="'img/halloween/spider-web.png'" height="1000" width="1000">
@@ -42,11 +42,9 @@
         </mat-sidenav-content>
     </mat-sidenav-container>
 
-    <mho-footer #footer></mho-footer>
-
     @if (is_loading()) {
         <div class="mho-loading">
-            @switch (theme) {
+            @switch (family()) {
                 @case ('halloween') {
                     <div class="ghost-container">
                         <div class="ghost animate-hover">

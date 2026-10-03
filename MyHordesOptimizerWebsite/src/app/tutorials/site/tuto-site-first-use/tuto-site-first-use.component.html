@@ -10,7 +10,23 @@
         </mat-menu>
     </mat-card-title>
 </mat-card-header>
-<mat-card-content class="mho-tuto-script-first-use">
-    <p>{{ text_1 }}</p>
-    <p>{{ text_2 }}</p>
+<mat-card-content class="mho-tuto-site-first-use">
+    <section class="first-use">
+        <p class="lead">{{ lead }}</p>
+
+        <!-- Trois gestes, dans l'ordre : une liste numérotée les dit mieux que trois paragraphes. -->
+        <ol class="steps">
+            @for (step of steps; track step.title; let index = $index) {
+                <li class="step">
+                    <span class="step-number" aria-hidden="true">{{ index + 1 }}</span>
+                    <div class="step-body">
+                        <span class="step-title">{{ step.title }}</span>
+                        <span class="step-text">{{ step.text }}</span>
+                    </div>
+                </li>
+            }
+        </ol>
+
+        <p class="note">{{ note }}</p>
+    </section>
 </mat-card-content>

@@ -12,7 +12,10 @@ import { HeaderComponent } from './header.component';
 import { HeaderService } from './header.service';
 
 interface TestableComponent {
-    is_gt_xs: {
+    is_gt_sm: {
+        (): boolean;
+    };
+    is_gt_md: {
         (): boolean;
     };
     me: {
@@ -65,8 +68,8 @@ describe('HeaderComponent', (): void => {
         setTown(null);
     });
 
-    it('onResize updates is_gt_xs from the breakpoint observer', (): void => {
-        const before: boolean = testable.is_gt_xs();
+    it('onResize updates is_gt_sm and is_gt_md from the breakpoint observer', (): void => {
+        const before: boolean = testable.is_gt_sm();
         // Discriminant : isMatched() renvoie systématiquement la même valeur en environnement de
         // test (pas de simulation de changement de viewport) — sans cet espion, l'assertion serait
         // vraie même si onResize() ne faisait rien.
@@ -74,7 +77,8 @@ describe('HeaderComponent', (): void => {
 
         testable.onResize();
 
-        expect(testable.is_gt_xs()).toBe(!before);
+        expect(testable.is_gt_sm()).toBe(!before);
+        expect(testable.is_gt_md()).toBe(!before);
     });
 
     describe('ngOnInit / header_service.token_obs', (): void => {

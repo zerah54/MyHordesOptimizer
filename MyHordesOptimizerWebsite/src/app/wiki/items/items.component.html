@@ -1,26 +1,46 @@
-<mat-card-header>
-    <mat-card-title i18n>Objets</mat-card-title>
-</mat-card-header>
-<mat-card-content class="mho-items">
+<div class="mho-items">
     @if (displayed_items(); as displayed_items) {
         <div class="filter">
             <mho-filter (filterChange)="filter_value = $event; applyFilters()"></mho-filter>
-            <mat-form-field class="properties-filter">
+            <mat-form-field class="properties-filter" subscriptSizing="dynamic">
                 <mat-label i18n>Chercher des objets par propriétés</mat-label>
                 <mho-select multiple searchable [options]="options" [bindLabel]="'value.label'" [(ngModel)]="select_value" (filterChange)="applyFilters()" chips></mho-select>
             </mat-form-field>
+            <span class="count">
+                <span class="mho-num">{{ displayed_items.length }}</span>
+                <ng-container i18n>objets</ng-container>
+            </span>
         </div>
-        <ul>
-            @for (category of (displayed_items | itemsGroupByCategory); track $index) {
-                <div class="category">
-                    <h2>{{ category.category.label[locale] }}</h2>
-                    <div class="items">
-                        @for (item of category.items; track $index) {
-                            <mho-item [item]="item"></mho-item>
-                        }
-                    </div>
-                </div>
-            }
-        </ul>
+
+        <div class="master-detail">
+            <ul class="catalog">
+                @for (category of (displayed_items | itemsGroupByCategory); track category.category.id_category) {
+                    <li class="category">
+                        <h2 class="category-title">
+                            <span>{{ category.category.label | localizedLabel:'Sans catégorie' }}</span>
+                            <span class="mho-num count">{{ category.items.length }}</span>
+                            <span class="rule"></span>
+                        </h2>
+                        <div class="items">
+                            @for (item of category.items; track item.id) {
+                                <mho-item [item]="item" selectable [selected]="detailed_item() === item"
+                                          (itemSelected)="detailed_item.set($event)"></mho-item>
+                            }
+                        </div>
+                    </li>
+                }
+                @if (displayed_items.length === 0) {
+                    <li class="no-result" i18n>Aucun objet ne correspond à ce filtre.</li>
+                }
+            </ul>
+
+            <aside class="detail" aria-label="Fiche de l'objet" i18n-aria-label>
+                @if (detailed_item(); as detailed_item) {
+                    <mho-item [item]="detailed_item" forceOpen></mho-item>
+                } @else {
+                    <p class="detail-empty" i18n>Sélectionnez un objet pour afficher sa fiche.</p>
+                }
+            </aside>
+        </div>
     }
-</mat-card-content>
+</div>

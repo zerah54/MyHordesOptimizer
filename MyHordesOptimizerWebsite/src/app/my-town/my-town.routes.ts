@@ -74,7 +74,7 @@ export const MY_TOWN_ROUTES: Route[] = [
     {
         path: 'map',
         component: MapComponent,
-        title: 'MyHordes Optimizer' + ' - ' + $localize`Ma ville` + ' - ' + $localize`Carte des fouilles`,
+        title: 'MyHordes Optimizer' + ' - ' + $localize`Ma ville` + ' - ' + $localize`Carte`,
     },
     {
         path: 'nightwatch',

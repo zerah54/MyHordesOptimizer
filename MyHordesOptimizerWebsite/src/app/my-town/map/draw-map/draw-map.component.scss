@@ -1,31 +1,58 @@
+/* Feuille partagée : elle est aussi listée dans les `styleUrls` de mho-map-cell et de
+   mho-map-border, pour que la base commune `.cell` leur parvienne malgré l'encapsulation.
+   N'y mettre que ce qui vaut pour les trois composants, plus le conteneur de la grille. */
+
 :host {
     display: contents;
+}
 
-    table.mho-draw-map {
-        .cell {
-            display: inline-block;
-            vertical-align: middle;
-            text-align: center;
-        }
+/* Base commune à toutes les cases (coordonnées comme zones) : la taille vient de la piste
+   de grille, jamais du contenu — sans `min-*: 0`, une case refuserait de descendre sous la
+   largeur de son contenu et le zoom arrière désalignerait les colonnes. */
+.cell {
+    min-width: 0;
+    min-height: 0;
+    text-align: center;
+}
 
-        border-spacing: 0;
-        margin: auto;
+.mho-draw-map {
+    /* Taille d'une case, pilotée par le zoom (mho-map) ; la règle de coordonnées suit, bornée
+       pour rester lisible aux deux extrêmes.
+       ⚠ Cette formule est reprise telle quelle dans MapComponent.axisSize() (bouton
+       « Ajuster ») : toute modification doit être reportée des deux côtés. */
+    --mho-cell: 30px;
+    --mho-axis: clamp(16px, calc(var(--mho-cell) * 0.6), 28px);
 
-        tr {
+    display: flex;
+    flex-direction: column;
+    /* Pistes de largeur fixe : la grille ne s'étire pas, elle déborde et se fait défiler. */
+    width: max-content;
+    /* La carte ne touche aucun bord : sans cette marge, la première règle de coordonnées
+       collait au haut du panneau et la grille semblait tronquée. */
+    margin: auto;
+    padding: 14px;
+    /* Repère de positionnement des panneaux posés sur la carte : conserve l'`offsetParent`
+       que fournissait l'ancien <table>. */
+    position: relative;
 
-            white-space: nowrap;
+    .map-row {
+        display: grid;
+        grid-template-columns: var(--mho-map-columns);
+        height: var(--mho-cell);
+        flex-shrink: 0;
 
-            &.first,
-            &.last {
-                position: sticky;
-                z-index: 10;
-            }
+        /* Règles de coordonnées : elles restent visibles pendant le défilement vertical.
+           Le défilement horizontal est pris en charge case par case, dans mho-map-border. */
+        &.axis-row {
+            height: var(--mho-axis);
+            position: sticky;
+            z-index: 4;
 
-            &.first {
+            &.top {
                 top: 0;
             }
 
-            &.last {
+            &.bottom {
                 bottom: 0;
             }
         }

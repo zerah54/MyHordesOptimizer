@@ -62,11 +62,10 @@ export class MapUpdateDigsComponent {
         this.digsChange.emit(digs);
     }
 
-    protected removeCitizen(citizen_id: number): void {
-        const citizen_digs_index: number = this.digs().findIndex((dig: Dig) => dig.digger_id === citizen_id);
-        if (citizen_digs_index > -1) {
-            const digs: Dig[] = [...this.digs()];
-            digs.splice(citizen_digs_index, 1);
+    /** Retire cette fouille-là (ce citoyen, ce jour), et non la première fouille du citoyen. */
+    protected removeDig(dig_to_remove: Dig): void {
+        const digs: Dig[] = this.digs().filter((dig: Dig): boolean => dig !== dig_to_remove);
+        if (digs.length !== this.digs().length) {
             this.digsChange.emit(digs);
         }
     }

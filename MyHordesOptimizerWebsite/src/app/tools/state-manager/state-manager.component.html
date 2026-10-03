@@ -150,11 +150,11 @@
         <h3 i18n>Séquence</h3>
         <div class="states-cards-sequence">
             <div class="step-actions">
-                <button mat-stroked-button type="button" (click)="addMoveStep(true)" [disabled]="!canMove()">
+                <button mat-stroked-button type="button" (click)="addMoveStep(true)" [disabled]="!canMove(true)">
                     <mho-icon-ap/>
                     <span i18n>Déplacement (Zone 3km)</span>
                 </button>
-                <button mat-stroked-button type="button" (click)="addMoveStep(false)" [disabled]="!canMove()">
+                <button mat-stroked-button type="button" (click)="addMoveStep(false)" [disabled]="!canMove(false)">
                     <mho-icon-ep/>
                     <span i18n>Déplacement</span>
                 </button>

@@ -14,6 +14,7 @@ import { ItemImgPipe } from '../../../../_core/pipes/item-img.pipe';
 import { CitizenInfoComponent } from '../../../../_shared/citizen-info/citizen-info.component';
 import { IconApComponent } from '../../../../_shared/icon-ap/icon-ap.component';
 import { LastUpdateComponent } from '../../../../_shared/last-update/last-update.component';
+import { DigLevelLabelPipe } from '../map-cell/pipes/dig-level.pipe';
 import { RuinInCell } from '../map-cell-details/ruin-in-cell.pipe';
 
 @Component({
@@ -23,6 +24,7 @@ import { RuinInCell } from '../map-cell-details/ruin-in-cell.pipe';
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         CitizensFromShortPipe,
+        DigLevelLabelPipe,
         ItemDetailsPipe,
         ItemImgPipe,
         MatDivider,

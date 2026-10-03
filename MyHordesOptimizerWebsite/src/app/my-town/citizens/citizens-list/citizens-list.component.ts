@@ -1,13 +1,16 @@
 import { CommonModule } from '@angular/common';
 import {
+    afterNextRender,
     ChangeDetectionStrategy,
     ChangeDetectorRef,
     Component,
     computed,
     DestroyRef,
     effect,
+    ElementRef,
     EventEmitter,
     inject,
+    Injector,
     OnInit,
     Signal,
     signal,
@@ -57,6 +60,7 @@ import { ColumnIdPipe } from '../../../_core/pipes/column-id.pipe';
 import { ClipboardService } from '../../../_core/services/clipboard.service';
 import { TownContextService } from '../../../_core/services/town-context.service';
 import { getHeroicIcon, getHomeIcon } from '../../../_core/utilities/citizen.util';
+import { DEEP_LINK_PARAMS, deepLinkTargets } from '../../../_core/utilities/deep-link.util';
 import { getTown, getUser, user } from '../../../_core/utilities/localstorage.util';
 import { AvatarComponent } from '../../../_shared/avatar/avatar.component';
 import { CitizenInfoComponent } from '../../../_shared/citizen-info/citizen-info.component';
@@ -176,6 +180,10 @@ export class CitizensListComponent implements OnInit {
     ];
     /** Citoyen dont le menu de détail des mises à jour est ouvert (menu partagé). */
     protected readonly menu_row: WritableSignal<Citizen | null> = signal<Citizen | null>(null);
+    /** Citoyen désigné par un lien profond (`?citizen=`, recherche globale) : sa ligne est surlignée. */
+    protected readonly targeted_citizen_id: WritableSignal<number | null> = signal<number | null>(null);
+    /** Citoyen demandé, en attente de la liste. */
+    private requested_citizen_id: number | null = null;
     protected readonly citizenNotes: WritableSignal<Dictionary<NoteDTO>> = signal({});
     /** Ouverture de la sidenav de filtres. */
     protected readonly filters_open: WritableSignal<boolean> = signal<boolean>(false);
@@ -230,6 +238,8 @@ export class CitizensListComponent implements OnInit {
     private readonly note_service: NoteService = inject(NoteService);
     private readonly router: Router = inject(Router);
     private readonly change_detector_ref: ChangeDetectorRef = inject(ChangeDetectorRef);
+    private readonly host: ElementRef<HTMLElement> = inject(ElementRef);
+    private readonly injector: Injector = inject(Injector);
     /** Pipe pur réutilisé pour le tri de la colonne bain. */
     private readonly daily_action_pipe: DailyActionForDayPipe = new DailyActionForDayPipe();
 
@@ -252,6 +262,13 @@ export class CitizensListComponent implements OnInit {
         this.citizen_filter_change
             .pipe(takeUntilDestroyed(this.destroy_ref))
             .subscribe((): void => this.applyCitizenFilters());
+
+        deepLinkTargets(this.router, DEEP_LINK_PARAMS.citizen)
+            .pipe(takeUntilDestroyed(this.destroy_ref))
+            .subscribe((id: number): void => {
+                this.requested_citizen_id = id;
+                this.revealRequestedCitizen();
+            });
 
         this.town_service.myCitizen$
             .pipe(takeUntilDestroyed(this.destroy_ref))
@@ -486,7 +503,7 @@ export class CitizensListComponent implements OnInit {
                 if (content === undefined) return;
                 this.note_service.saveCitizenNote(citizen.id, town_id, content)
                     .pipe(takeUntilDestroyed(this.destroy_ref))
-                    .subscribe(() => this.citizenNotes.update((notes) => ({ ...notes, [citizen.id]: { note: content } })));
+                    .subscribe(() => this.citizenNotes.update((notes: Dictionary<NoteDTO>): Dictionary<NoteDTO> => ({ ...notes, [citizen.id]: { note: content } })));
             });
     }
 
@@ -1073,7 +1090,35 @@ export class CitizensListComponent implements OnInit {
                         .sort((a: Citizen, b: Citizen) => (b.cadaver?.survival ?? -1) - (a.cadaver?.survival ?? -1));
                     this.dead_citizen_info.set(dead_citizen_info);
                     this.dead_citizen_list.data = [...dead_citizen_info.citizens];
+                    this.revealRequestedCitizen();
                 }
             });
+    }
+
+    /**
+     * Montre le citoyen demandé par un lien profond (`citizens/list?citizen=42`), vivant ou mort :
+     * les filtres qui le masqueraient sont levés, puis sa ligne est surlignée et amenée à l'écran.
+     */
+    private revealRequestedCitizen(): void {
+        if (this.requested_citizen_id === null || !this.alive_citizen_info()) {
+            return;
+        }
+        const requested_id: number = this.requested_citizen_id;
+        this.requested_citizen_id = null;
+        const is_requested: (citizen: Citizen) => boolean = (citizen: Citizen): boolean => citizen.id === requested_id;
+        const is_alive: boolean = this.citizen_list.data.some(is_requested);
+        if (!is_alive && !this.dead_citizen_list.data.some(is_requested)) {
+            return;
+        }
+        if (is_alive && !this.citizen_list.filteredData.some(is_requested)) {
+            this.resetFilters();
+        }
+        this.targeted_citizen_id.set(requested_id);
+        afterNextRender({
+            read: (): void => {
+                // Tableau, ou cartes du mode observateur.
+                this.host.nativeElement.querySelector<HTMLElement>('tr.mho-row-targeted, .citizen-light-card.is-targeted')?.scrollIntoView?.({ block: 'center' });
+            }
+        }, { injector: this.injector });
     }
 }

@@ -1,122 +1,212 @@
 @use '@angular/material' as mat;
 
-@use 'brown-dark-theme';
+@use 'mho-tokens' as tokens;
+// Palettes tonales générées par `ng generate @angular/material:theme-color` (voir plan, étape 1).
+// Le schematic concatène `--directory` et `_theme-colors.scss` : le fichier s'appelle donc
+// `brown_theme-colors.scss`, pas `brown/_theme-colors.scss`.
+@use 'brown_theme-colors' as brown-palettes;
+@use 'pink_theme-colors' as pink-palettes;
+// Thèmes saisonniers, mono-mode : Noël clair, Halloween sombre (jetons `$noel` / `$halloween`).
 @use 'noel-theme';
 @use 'halloween-theme';
-@use 'pink-light-theme';
-
-@use 'variables';
 
 @mixin app-component-overrides() {
     @include mat.toolbar-overrides((
-        container-background-color: var(--mat-sys-primary-container),
-        container-text-color: var(--mat-sys-tertiary),
-        standard-height: 52px
+        container-background-color: var(--mho-topbar-bg),
+        container-text-color: var(--mho-topbar-fg),
+        standard-height: 56px,
     ));
 
-    @include mat.progress-spinner-overrides((
-        active-indicator-color: var(--mat-sys-on-primary-container),
+    @include mat.sidenav-overrides((
+        container-background-color: var(--mho-nav-bg),
+        container-divider-color: var(--mho-line),
+        container-shape: 0,
+        content-background-color: var(--mho-bg),
     ));
 
-    @include mat.menu-overrides((
-        container-color: var(--mat-sys-surface),
+    @include mat.card-overrides((
+        outlined-container-color: var(--mho-surface),
+        outlined-outline-color: var(--mho-line),
+        outlined-container-shape: var(--mho-radius-l),
+        elevated-container-color: var(--mho-surface),
+        elevated-container-shape: var(--mho-radius-l),
+        elevated-container-elevation: none,
+        title-text-font: var(--mho-font-display),
     ));
 
-    @include mat.tooltip-overrides((
-        container-color: var(--mat-sys-primary-container),
-        supporting-text-color: white,
+    @include mat.button-overrides((
+        filled-container-shape: var(--mho-radius-m),
+        outlined-container-shape: var(--mho-radius-m),
+        protected-container-shape: var(--mho-radius-m),
+        text-container-shape: var(--mho-radius-m),
+        tonal-container-shape: var(--mho-radius-m),
+    ));
+
+    @include mat.button-toggle-overrides((
+        shape: var(--mho-radius-m),
+        height: 36px,
+        divider-color: var(--mho-line-strong),
+        background-color: transparent,
+        selected-state-background-color: var(--mho-accent-soft),
+        selected-state-text-color: var(--mho-on-accent-soft),
+    ));
+
+    @include mat.chips-overrides((
+        container-shape-radius: 999px,
+        outline-color: var(--mho-line-strong),
+        elevated-selected-container-color: var(--mho-accent-soft),
+        selected-label-text-color: var(--mho-on-accent-soft),
     ));
 
     @include mat.form-field-overrides((
+        outlined-container-shape: var(--mho-radius-m),
+        filled-container-color: var(--mho-field-bg),
         filled-label-display: block,
-        filled-active-indicator-color: var(--mat-sys-outline),
+        filled-active-indicator-color: var(--mho-line-strong),
     ));
 
     @include mat.tabs-overrides((
-        divider-height: 0,
-        inactive-focus-label-text-color: var(--mat-sys-primary-container),
-        inactive-hover-label-text-color: var(--mat-sys-primary-container),
-        active-label-text-color: var(--mat-sys-primary-container)
+        divider-color: var(--mho-line),
+        divider-height: 1px,
+        active-indicator-color: var(--mho-accent),
+        active-focus-indicator-color: var(--mho-accent),
+        active-hover-indicator-color: var(--mho-accent),
+        active-label-text-color: var(--mho-text),
+        active-focus-label-text-color: var(--mho-text),
+        active-hover-label-text-color: var(--mho-text),
+        inactive-label-text-color: var(--mho-text-muted),
+        inactive-hover-label-text-color: var(--mho-text),
+        inactive-focus-label-text-color: var(--mho-text),
     ));
 
     @include mat.table-overrides((
-        background-color: var(--mat-sys-surface-container-low),
+        background-color: var(--mho-surface),
+        header-headline-color: var(--mho-text-muted),
+        row-item-outline-color: var(--mho-line),
+    ));
+
+    @include mat.menu-overrides((
+        container-color: var(--mho-surface-2),
+        container-shape: var(--mho-radius-l),
+    ));
+
+    @include mat.select-overrides((
+        panel-background-color: var(--mho-surface-2),
+    ));
+
+    @include mat.tooltip-overrides((
+        container-color: var(--mho-text),
+        supporting-text-color: var(--mho-bg),
+        container-shape: 8px,
+    ));
+
+    @include mat.progress-spinner-overrides((
+        active-indicator-color: var(--mho-accent),
     ));
 
     @include mat.checkbox-overrides((
-        selected-checkmark-color: var(--mat-sys-tertiary),
+        selected-icon-color: var(--mho-accent),
+        selected-focus-icon-color: var(--mho-accent),
+        selected-hover-icon-color: var(--mho-accent),
+        selected-checkmark-color: var(--mho-on-accent),
+        unselected-icon-color: var(--mho-line-strong),
+        unselected-hover-icon-color: var(--mho-text-muted),
+        label-text-color: var(--mho-text),
+        label-text-size: 13px,
+        state-layer-size: 34px,
     ));
 
-    --mat-pseudo-checkbox-full-selected-checkmark-color: var(--mat-sys-tertiary);
-    --mat-pseudo-checkbox-minimal-selected-checkmark-color: var(--mat-sys-tertiary);
+    @include mat.slide-toggle-overrides((
+        selected-track-color: var(--mho-accent),
+        selected-focus-track-color: var(--mho-accent),
+        selected-hover-track-color: var(--mho-accent),
+        selected-handle-color: var(--mho-on-accent),
+        selected-focus-handle-color: var(--mho-on-accent),
+        selected-hover-handle-color: var(--mho-on-accent),
+        selected-icon-color: var(--mho-accent),
+        unselected-track-color: var(--mho-surface-3),
+        unselected-handle-color: var(--mho-text-muted),
+        label-text-color: var(--mho-text),
+        label-text-size: 13px,
+    ));
 
-    @include mat.select-overrides((
-        panel-background-color: var(--mat-sys-surface-container-low),
+    @include mat.divider-overrides((
+        color: var(--mho-line),
     ));
 
     @include mat.paginator-overrides((
         container-background-color: transparent,
     ));
-
-    @include mat.button-toggle-overrides((
-        divider-color: variables.$primary,
-        background-color: variables.$card-background-color,
-        height: 42px,
-        selected-state-background-color: variables.$primary,
-        selected-state-text-color: white,
-    ));
-
-    @include mat.button-overrides((
-        protected-label-text-color: var(--mat-button-light-text-label-text-color),
-        outlined-label-text-color: var(--mat-button-light-text-label-text-color),
-        filled-label-text-color: var(--mat-button-dark-text-label-text-color)
-    ))
 }
 
-html:has(.mho-main) {
+html {
+    // « Auto » par défaut : suit le système. ThemeService pose .mode-light / .mode-dark.
+    color-scheme: light dark;
 
-    @include brown-dark-theme.brown-dark-theme();
+    @include mat.theme((
+        color: (
+            primary: brown-palettes.$primary-palette,
+            tertiary: brown-palettes.$tertiary-palette,
+            theme-type: color-scheme,
+        ),
+        typography: (
+            plain-family: Arial,
+            brand-family: 'Nunito',
+        ),
+        density: -2,
+    ));
+    @include tokens.static-tokens();
+    @include tokens.tokens(tokens.$brown);
+    @include tokens.material-overrides();
+    @include app-component-overrides();
 
-    &:has(.pink) {
-        @include pink-light-theme.pink-light-theme();
+    background-color: var(--mho-bg);
+    color: var(--mho-text);
+    font: var(--mat-sys-body-medium);
+
+    &.mode-light {
+        color-scheme: light;
     }
 
-    &:has(.noel) {
+    &.mode-dark {
+        color-scheme: dark;
+    }
+
+    &.theme-pink {
+        @include mat.theme((
+            color: (
+                primary: pink-palettes.$primary-palette,
+                tertiary: pink-palettes.$tertiary-palette,
+                theme-type: color-scheme,
+            ),
+        ));
+        @include tokens.tokens(tokens.$pink);
+        // Ré-inclus : les variables émises par mat.theme() ci-dessus ont une spécificité supérieure.
+        @include tokens.material-overrides();
+    }
+
+    // Thèmes saisonniers mono-mode : `color-scheme` forcé, jetons à une seule valeur.
+    &.theme-noel {
         @include noel-theme.noel-theme();
     }
 
-    &:has(.halloween) {
+    &.theme-halloween {
         @include halloween-theme.halloween-theme();
     }
 
-    @include app-component-overrides();
-
-    background-color: var(--mat-sys-surface);
-    color: var(--mat-sys-on-surface);
-    font: var(--mat-sys-body-medium);
-
-    // Survol des liens du footer : suit --mat-sys-on-surface, qui est déjà adaptatif
-    // (blanc en thème sombre, foncé en thème clair) → plus clair en sombre, plus foncé en clair.
-    --footer-link-hover-color: var(--mat-sys-on-surface);
-
-    .mat-drawer {
-        --mat-sidenav-container-width: auto;
-        --mat-sidenav-content-text-color: var(--font-color);
-    }
-
     .mat-mdc-card {
-        box-shadow: unset;
+        box-shadow: none;
     }
 
     .mat-divider {
         opacity: 0.12;
     }
 
-    //.mat-mdc-standard-chip:not(.mdc-evolution-chip--disabled):not(.mat-mdc-chip-highlighted) {
-    //    --mat-chip-elevated-container-color: #{variables.$inactive-chip-base-color} !important;
-    //}
-    //
-    //.mat-mdc-slide-toggle.mat-accent {
-    //    --mat-slide-toggle-selected-icon-color: #{variables.$switch-selected-accent-icon-color};
-    //}
+    // Le tiroir tire sa largeur de son contenu (le menu), pas d'une largeur Material fixe.
+    .mat-drawer {
+        --mat-sidenav-container-width: auto;
+    }
+
+    // Survol des liens du pied de page, tant que le footer existe (supprimé à l'étape 2).
+    --footer-link-hover-color: var(--mho-text);
 }

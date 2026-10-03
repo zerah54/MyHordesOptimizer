@@ -1,0 +1,174 @@
+{
+  "aa": {
+    "name": "antiabuso",
+    "description": "Inicia un contador de 15 minutos",
+    "private-msg": {
+      "name": "mensaje-privado",
+      "description": "Verdadero si el mensaje no debe ser visto por todos"
+    }
+  },
+  "timer": {
+    "name": "temporizador",
+    "description": "Inicia un contador de duración personalizable (Ejemplo: 1Y 2M 7D 1h 25m 12s)",
+    "time": {
+      "name": "duración",
+      "description": "La duración del contador (Ejemplo: 1Y 2M 7D 1h 25m 12s)"
+    },
+    "reason": {
+      "name": "motivo",
+      "description": "El motivo del contador. Es el mensaje que se enviará al final del contador"
+    },
+    "private-msg": {
+      "name": "mensaje-privado",
+      "description": "Verdadero si el mensaje no debe ser visto por todos"
+    }
+  },
+  "faq": {
+    "name": "faq",
+    "description": "Preguntas frecuentes",
+    "website": {
+      "name": "sitio-web",
+      "description": "La dirección del sitio web",
+      "private-msg": {
+        "name": "mensaje-privado",
+        "description": "Verdadero si el mensaje no debe ser visto por todos"
+      }
+    },
+    "addon": {
+      "name": "addon",
+      "description": "La dirección de la extensión y del script",
+      "private-msg": {
+        "name": "mensaje-privado",
+        "description": "Verdadero si el mensaje no debe ser visto por todos"
+      }
+    },
+    "become-ghoul": {
+      "name": "convertirse-en-ghoul",
+      "description": "Los distintos métodos para convertirse en ghoul",
+      "private-msg": {
+        "name": "mensaje-privado",
+        "description": "Verdadero si el mensaje no debe ser visto por todos"
+      }
+    },
+    "mse": {
+      "name": "resultados-mse",
+      "description": "Los posibles resultados al consumir un Medicamento sin etiqueta",
+      "private-msg": {
+        "name": "mensaje-privado",
+        "description": "Verdadero si el mensaje no debe ser visto por todos"
+      }
+    },
+    "discord-cheat-sheet": {
+      "name": "formato-discord",
+      "description": "Lista de atajos de formato de Discord",
+      "private-msg": {
+        "name": "mensaje-privado",
+        "description": "Verdadero si el mensaje no debe ser visto por todos"
+      }
+    },
+    "camping-phrases": {
+      "name": "frases-de-acampada",
+      "description": "Las frases que se obtienen al acampar según las probabilidades de supervivencia efectivas",
+      "private-msg": {
+        "name": "mensaje-privado",
+        "description": "Verdadero si el mensaje no debe ser visto por todos"
+      },
+      "language": {
+        "name": "idioma",
+        "description": "El idioma del texto de origen"
+      }
+    }
+  },
+  "translate": {
+    "name": "traducir",
+    "description": "Encuentra las equivalencias de los términos de MyHordes en otros idiomas",
+    "language": {
+      "name": "idioma",
+      "description": "El idioma del texto de origen"
+    },
+    "text-to-translate": {
+      "name": "texto-a-traducir",
+      "description": "El texto que se quiere traducir"
+    },
+    "only-exact-match": {
+      "name": "solo-resultados-exactos",
+      "description": "Si es verdadero y hay resultados exactos, solo se devuelven los resultados exactos"
+    },
+    "private-msg": {
+      "name": "mensaje-privado",
+      "description": "Verdadero si el mensaje no debe ser visto por todos"
+    }
+  },
+  "glossary": {
+    "name": "glosario",
+    "description": "Definiciones asociadas a un texto dado",
+    "text": {
+      "name": "texto",
+      "description": "El texto buscado"
+    },
+    "language": {
+      "name": "idioma",
+      "description": "El idioma del texto buscado"
+    },
+    "private-msg": {
+      "name": "mensaje-privado",
+      "description": "Verdadero si el mensaje no debe ser visto por todos"
+    }
+  },
+  "recipe": {
+    "name": "receta",
+    "description": "Encuentra la receta de un objeto y las recetas que llevan a él",
+    "text": {
+      "name": "texto",
+      "description": "El texto buscado"
+    },
+    "language": {
+      "name": "idioma",
+      "description": "El idioma del texto buscado"
+    },
+    "private-msg": {
+      "name": "mensaje-privado",
+      "description": "Verdadero si el mensaje no debe ser visto por todos"
+    }
+  },
+  "play": {
+    "name": "jugar",
+    "description": "Los mismos juegos que en MyHordes, pero en Discord",
+    "text": {
+      "name": "texto",
+      "description": "Usa las mismas palabras clave que en MyHordes. (Ejemplo: {d100}{d20})"
+    }
+  },
+  "instructions": {
+    "name": "instrucciones",
+    "description": "Haz que tus instrucciones sean bien visibles y más largas"
+  },
+  "suggestion": {
+    "name": "sugerencia",
+    "description": "Publicar una sugerencia en nuestro buzón de ideas"
+  },
+  "bug": {
+    "name": "error",
+    "description": "Informar de un error"
+  },
+  "attack": {
+    "name": "ataque",
+    "description": "Herramientas relacionadas con la estimación del ataque",
+    "get": {
+      "name": "obtener",
+      "description": "Obtiene la estimación calculada y las estimaciones guardadas para el día y el pueblo",
+      "town-id": {
+        "name": "id-del-pueblo",
+        "description": "El identificador del pueblo para el que quieres la estimación"
+      },
+      "day": {
+        "name": "día",
+        "description": "El día para el que quieres la estimación"
+      },
+      "private-msg": {
+        "name": "mensaje-privado",
+        "description": "Verdadero si el mensaje no debe ser visto por todos"
+      }
+    }
+  }
+}

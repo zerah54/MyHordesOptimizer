@@ -5,6 +5,7 @@ using Discord.Interactions;
 using Discord.WebSocket;
 using Microsoft.Extensions.Logging;
 using MyHordesOptimizerApi.Configuration.Interfaces;
+using MyHordesOptimizerApi.DiscordBot.Localization;
 
 namespace MyHordesOptimizerApi.DiscordBot.Modules
 {
@@ -30,14 +31,17 @@ namespace MyHordesOptimizerApi.DiscordBot.Modules
         [SlashCommand(name: "suggestion", description: "Post a suggestion in our ideas box")]
         public async Task PostSuggestionAsync()
         {
+            BotTexts texts = Context.Interaction.Texts();
             try
             {
-                await RespondWithModalAsync<SuggestionModal>("suggestion_modal");;
+                await RespondWithModalAsync(BuildModal("suggestion_modal", texts.FeedbackSuggestionModalTitle,
+                    SuggestionModal.TitleInputId, texts.FeedbackSuggestionTitleLabel,
+                    SuggestionModal.DetailsInputId, texts.FeedbackSuggestionDetailsLabel));
             }
             catch (Exception e)
             {
                 _logger.LogError(e.ToString(), e);
-                await RespondAsync($"Une erreur s'est produite\n```{e.Message}```", ephemeral: true);
+                await RespondAsync(texts.GenericError(e.Message), ephemeral: true);
             }
         }
         
@@ -50,20 +54,23 @@ namespace MyHordesOptimizerApi.DiscordBot.Modules
                 .GetForumChannel(_configuration.SuggestionsChannelId)
                 .CreatePostAsync(title: suggestionModal.SuggestionTitle, text: msg);
             var originalResponse = Context.Interaction.GetOriginalResponseAsync();
-            await originalResponse.Result.ModifyAsync(properties => properties.Content = "La suggestion a bien été postée");
+            await originalResponse.Result.ModifyAsync(properties => properties.Content = Context.Interaction.Texts().FeedbackSuggestionPosted);
         }
         
         [SlashCommand(name: "bug", description: "Report a bug")]
         public async Task PostBugAsync()
         {
+            BotTexts texts = Context.Interaction.Texts();
             try
             {
-                await RespondWithModalAsync<BugModal>("bug_modal");;
+                await RespondWithModalAsync(BuildModal("bug_modal", texts.FeedbackBugModalTitle,
+                    BugModal.TitleInputId, texts.FeedbackBugTitleLabel,
+                    BugModal.DetailsInputId, texts.FeedbackBugDetailsLabel));
             }
             catch (Exception e)
             {
                 _logger.LogError(e.ToString(), e);
-                await RespondAsync($"Une erreur s'est produite\n```{e.Message}```", ephemeral: true);
+                await RespondAsync(texts.GenericError(e.Message), ephemeral: true);
             }
         }
         
@@ -76,29 +83,64 @@ namespace MyHordesOptimizerApi.DiscordBot.Modules
                 .GetForumChannel(_configuration.BugsChannelId)
                 .CreatePostAsync(title: bugModal.BugTitle, text: msg);
             var originalResponse = Context.Interaction.GetOriginalResponseAsync();
-            await originalResponse.Result.ModifyAsync(p => p.Content  = "Le bug a bien été signalé");
+            await originalResponse.Result.ModifyAsync(p => p.Content  = Context.Interaction.Texts().FeedbackBugPosted);
+        }
+
+        /// <summary>
+        /// Formulaire titre + détails dans la langue de l'auteur. Les identifiants des champs sont ceux que lisent
+        /// <see cref="SuggestionModal"/> et <see cref="BugModal"/> à la soumission.
+        /// </summary>
+        private static Modal BuildModal(string customId, string title, string titleInputId, string titleLabel, string detailsInputId, string detailsLabel)
+        {
+            return new ModalBuilder()
+                .WithTitle(title)
+                .WithCustomId(customId)
+                .AddTextInput(titleLabel, titleInputId, TextInputStyle.Short, placeholder: titleLabel,
+                    maxLength: FeedbackModalLimits.TitleMaxLength, required: true)
+                .AddTextInput(detailsLabel, detailsInputId, TextInputStyle.Paragraph, placeholder: detailsLabel,
+                    maxLength: FeedbackModalLimits.DetailsMaxLength, required: true)
+                .Build();
         }
     }
-    
+
+    public static class FeedbackModalLimits
+    {
+        public const int TitleMaxLength = 100;
+        public const int DetailsMaxLength = 1750;
+    }
+
+    // Les classes IModal ci-dessous lisent les formulaires soumis (par identifiant de champ). Les formulaires
+    // affichés sont construits par FeedbacksModule.BuildModal, dans la langue de l'auteur.
+
     public class SuggestionModal : IModal
     {
+        public const string TitleInputId = "Titre de la suggestion";
+        public const string DetailsInputId = "Détails de la suggestion";
+
         public string Title => "Envoyer une suggestion";
 
-        [ModalTextInput(placeholder: "Titre de la suggestion",  customId: "Titre de la suggestion", style: TextInputStyle.Short, maxLength: 100)]
+        [InputLabel("Titre de la suggestion")]
+        [ModalTextInput(placeholder: "Titre de la suggestion",  customId: TitleInputId, style: TextInputStyle.Short, maxLength: FeedbackModalLimits.TitleMaxLength)]
         public string SuggestionTitle { get; set; }
 
-        [ModalTextInput(placeholder: "Détails de la suggestion", customId: "Détails de la suggestion", style: TextInputStyle.Paragraph, maxLength: 1750)]
+        [InputLabel("Détails de la suggestion")]
+        [ModalTextInput(placeholder: "Détails de la suggestion", customId: DetailsInputId, style: TextInputStyle.Paragraph, maxLength: FeedbackModalLimits.DetailsMaxLength)]
         public string SuggestionDetails { get; set; }
     }
-    
+
     public class BugModal : IModal
     {
+        public const string TitleInputId = "Titre du bug";
+        public const string DetailsInputId = "Détails de bug";
+
         public string Title => "Signaler un bug";
 
-        [ModalTextInput(placeholder: "Titre du bug",  customId: "Titre du bug", style: TextInputStyle.Short, maxLength: 100)]
+        [InputLabel("Titre du bug")]
+        [ModalTextInput(placeholder: "Titre du bug",  customId: TitleInputId, style: TextInputStyle.Short, maxLength: FeedbackModalLimits.TitleMaxLength)]
         public string BugTitle { get; set; }
 
-        [ModalTextInput(placeholder: "Détails du bug", customId: "Détails de bug", style: TextInputStyle.Paragraph, maxLength: 1750)]
+        [InputLabel("Détails du bug")]
+        [ModalTextInput(placeholder: "Détails du bug", customId: DetailsInputId, style: TextInputStyle.Paragraph, maxLength: FeedbackModalLimits.DetailsMaxLength)]
         public string BugDetails { get; set; }
     }
 }

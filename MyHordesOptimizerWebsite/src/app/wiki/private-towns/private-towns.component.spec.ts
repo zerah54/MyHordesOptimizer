@@ -37,8 +37,9 @@ describe('PrivateTownsComponent', (): void => {
         throw new Error(`Row not found: ${paramName} / ${optionName}`);
     }
 
-    it('shows the "Villes privées" card title', (): void => {
-        expect(fixture.debugElement.query(By.css('mat-card-title')).nativeElement.textContent.trim()).toBe('Villes privées');
+    /** Le titre de page vit désormais dans le shell du wiki : la page ne porte que son tableau. */
+    it('renders its table', (): void => {
+        expect(fixture.debugElement.query(By.css('.mho-private-towns table'))).not.toBeNull();
     });
 
     it('flattens every param option into one row each, on init', (): void => {

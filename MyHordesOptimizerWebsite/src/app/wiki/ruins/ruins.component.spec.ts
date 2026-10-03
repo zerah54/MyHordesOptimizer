@@ -1,6 +1,7 @@
-import { ANIMATION_MODULE_TYPE } from '@angular/core';
+import { ANIMATION_MODULE_TYPE, DebugElement } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
+import { provideRouter, Router } from '@angular/router';
 import moment from 'moment';
 import { Subject } from 'rxjs';
 
@@ -52,6 +53,7 @@ describe('RuinsComponent', (): void => {
         await TestBed.configureTestingModule({
             imports: [RuinsComponent],
             providers: [
+                provideRouter([]),
                 { provide: ANIMATION_MODULE_TYPE, useValue: 'NoopAnimations' },
                 { provide: ApiService, useValue: { getRuins: (): unknown => ruins_subject.asObservable() } },
                 { provide: TownService, useValue: { getTownRuins: (): unknown => town_ruins_subject.asObservable() } }
@@ -80,8 +82,41 @@ describe('RuinsComponent', (): void => {
         fixture.detectChanges();
         await vi.advanceTimersByTimeAsync(0);
 
-        const rows = fixture.debugElement.queryAll(By.css('tr[mat-row]'));
+        const rows: DebugElement[] = fixture.debugElement.queryAll(By.css('tr[mat-row]'));
         expect(rows.length).toBe(2);
+    });
+
+    it('pairs each dropped item with its rate inside a single chip', async (): Promise<void> => {
+        createComponent();
+        fixture.detectChanges();
+
+        const ruin: Ruin = makeRuin(1, 'Cimetière');
+        ruin.drops = [Object.assign(new RuinItem(), { item: makeItem(1, 'Clou'), probability: 0.177 })];
+        ruins_subject.next([ruin]);
+        fixture.detectChanges();
+        await vi.advanceTimersByTimeAsync(0);
+
+        const chips: DebugElement[] = fixture.debugElement.queryAll(By.css('td.drops .drop'));
+        expect(chips.length).toBe(1);
+        expect(chips[0].query(By.css('img'))).not.toBeNull();
+        expect(chips[0].query(By.css('.drop-rate')).nativeElement.textContent.trim()).toContain('17');
+    });
+
+    it('drops the image rather than showing a broken one when the imported item has no icon', async (): Promise<void> => {
+        createComponent();
+        fixture.detectChanges();
+
+        const item: Item = makeItem(1, 'Objet vide');
+        item.img = '';
+        const ruin: Ruin = makeRuin(1, 'Cimetière');
+        ruin.drops = [Object.assign(new RuinItem(), { item, probability: 0.05 })];
+        ruins_subject.next([ruin]);
+        fixture.detectChanges();
+        await vi.advanceTimersByTimeAsync(0);
+
+        const chip: DebugElement = fixture.debugElement.query(By.css('td.drops .drop'));
+        expect(chip.query(By.css('img'))).toBeNull();
+        expect(chip.query(By.css('.drop-rate'))).not.toBeNull();
     });
 
     it('deduplicates dropped items across ruins into `items`', async (): Promise<void> => {
@@ -131,6 +166,23 @@ describe('RuinsComponent', (): void => {
         expect(component['customFilter'](ruin, other_label)).toBe(false);
     });
 
+    it('customFilter requires every filled filter, and any of the chosen objects', (): void => {
+        createComponent();
+        fixture.detectChanges();
+
+        const ruin: Ruin = makeRuin(1, 'Cimetière', 2, 8);
+        ruin.drops = [Object.assign(new RuinItem(), { item: makeItem(1, 'Clou'), probability: 1 })];
+        const clou: RuinItem = Object.assign(new RuinItem(), { item: makeItem(1, 'Clou'), probability: 1 });
+        const vis: RuinItem = Object.assign(new RuinItem(), { item: makeItem(2, 'Vis'), probability: 1 });
+
+        // Le nom correspond mais la distance minimale exclut le bâtiment : un filtre de plus restreint la liste
+        expect(component['customFilter'](ruin, JSON.stringify({ label: 'cime', min_dist: 5, max_dist: '', objects: [] }))).toBe(false);
+        expect(component['customFilter'](ruin, JSON.stringify({ label: 'cime', min_dist: 2, max_dist: 8, objects: [] }))).toBe(true);
+        expect(component['customFilter'](ruin, JSON.stringify({ label: 'cime', min_dist: '', max_dist: 7, objects: [] }))).toBe(false);
+        expect(component['customFilter'](ruin, JSON.stringify({ label: '', min_dist: '', max_dist: '', objects: [vis] }))).toBe(false);
+        expect(component['customFilter'](ruin, JSON.stringify({ label: 'cime', min_dist: '', max_dist: '', objects: [vis, clou] }))).toBe(true);
+    });
+
     describe('with an active town', (): void => {
         beforeEach((): void => {
             setTown(Object.assign(new TownDetails(), { town_id: 1, town_type: 'RNE' }));
@@ -161,6 +213,65 @@ describe('RuinsComponent', (): void => {
             fixture.detectChanges();
 
             expect(fixture.debugElement.query(By.css('mat-slide-toggle'))).not.toBeNull();
+        });
+
+        it('lifts the "Dans ma ville" filter when it hides the ruin named by a deep link', async (): Promise<void> => {
+            createComponent();
+            fixture.detectChanges();
+            ruins_subject.next([makeRuin(1, 'Cimetière'), makeRuin(2, 'Usine')]);
+            fixture.detectChanges();
+            await vi.advanceTimersByTimeAsync(0);
+            town_ruins_subject.next([makeRuin(2, 'Usine')]);
+            component['ruins_filters'].inside_town = true;
+            component['applyInsideTownFilter']();
+
+            await TestBed.inject(Router).navigateByUrl('/?ruin=1');
+            fixture.detectChanges();
+
+            expect(component['ruins_filters'].inside_town).toBe(false);
+            expect(component['datasource']().filteredData.map((ruin: Ruin): number => ruin.id)).toContain(1);
+            expect(component['targeted_id']()).toBe(1);
+        });
+    });
+
+    describe('lien profond (?ruin=)', (): void => {
+        function targetedLabels(): string[] {
+            return fixture.debugElement.queryAll(By.css('tr.mho-row-targeted'))
+                .map((row: DebugElement): string => row.nativeElement.textContent.trim());
+        }
+
+        it('highlights the requested ruin once the table is ready', async (): Promise<void> => {
+            createComponent();
+            fixture.detectChanges();
+            await TestBed.inject(Router).navigateByUrl('/?ruin=2');
+
+            ruins_subject.next([makeRuin(1, 'Cimetière'), makeRuin(2, 'Usine')]);
+            fixture.detectChanges();
+            expect(targetedLabels()).toEqual([]);
+
+            await vi.advanceTimersByTimeAsync(0);
+            fixture.detectChanges();
+
+            expect(targetedLabels().length).toBe(1);
+            expect(targetedLabels()[0]).toContain('Usine');
+        });
+
+        it('lifts a header filter that hides the requested ruin', async (): Promise<void> => {
+            createComponent();
+            fixture.detectChanges();
+            ruins_subject.next([makeRuin(1, 'Cimetière'), makeRuin(2, 'Usine')]);
+            fixture.detectChanges();
+            await vi.advanceTimersByTimeAsync(0);
+            component['ruins_filters'].label = 'cimet';
+            component['ruins_filters_change'].next();
+            expect(component['datasource']().filteredData.length).toBe(1);
+
+            await TestBed.inject(Router).navigateByUrl('/?ruin=2');
+            fixture.detectChanges();
+
+            expect(component['ruins_filters'].label).toBe('');
+            expect(component['datasource']().filteredData.length).toBe(2);
+            expect(targetedLabels()[0]).toContain('Usine');
         });
     });
 });

@@ -7,7 +7,7 @@
                 @if (citizen_list.data.length > 0) {
                     <div class="citizen-light-cards">
                         @for (citizen of citizen_list.data; track citizen.id) {
-                            <div class="citizen-light-card">
+                            <div class="citizen-light-card" [class.is-targeted]="citizen.id === targeted_citizen_id()">
                                 <mho-avatar [src]="citizen.avatar"></mho-avatar>
                                 <div class="citizen-light-info">
                                     <div class="citizen-light-line1">
@@ -43,7 +43,7 @@
                 @if (dead_citizen_list.data.length > 0) {
                     <div class="citizen-light-cards">
                         @for (citizen of dead_citizen_list.data; track citizen.id) {
-                            <div class="citizen-light-card">
+                            <div class="citizen-light-card" [class.is-targeted]="citizen.id === targeted_citizen_id()">
                                 <mho-avatar [src]="citizen.avatar"></mho-avatar>
                                 <div class="citizen-light-info">
                                     <div class="citizen-light-line1">
@@ -421,7 +421,8 @@
                                     </ng-container>
 
                                     <tr *matHeaderRowDef="displayed_columns(); sticky: true" mat-header-row></tr>
-                                    <tr *matRowDef="let row; columns: displayed_columns();" mat-row></tr>
+                                    <tr *matRowDef="let row; columns: displayed_columns();" mat-row
+                                        [class.mho-row-targeted]="row.id === targeted_citizen_id()"></tr>
 
                                     <tr *matNoDataRow class="mat-row">
                                         <td [attr.colspan]="'100%'" class="mat-cell">
@@ -499,7 +500,8 @@
                                     </ng-container>
                                 }
                                 <tr *matHeaderRowDef="dead_citizen_list_columns | ids; sticky: true" mat-header-row></tr>
-                                <tr *matRowDef="let row; columns: dead_citizen_list_columns | ids" mat-row></tr>
+                                <tr *matRowDef="let row; columns: dead_citizen_list_columns | ids" mat-row
+                                    [class.mho-row-targeted]="row.id === targeted_citizen_id()"></tr>
 
                                 <tr *matNoDataRow class="mat-row">
                                     <td [attr.colspan]="'100%'" class="mat-cell">

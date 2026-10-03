@@ -7,19 +7,27 @@ import { MiscellaneousInfoComponent } from './miscellaneous-info/miscellaneous-i
 import { PrivateTownsComponent } from './private-towns/private-towns.component';
 import { RecipesComponent } from './recipes/recipes.component';
 import { RuinsComponent } from './ruins/ruins.component';
+import { WikiComponent } from './wiki.component';
 
+/** Les sept pages sont désormais des enfants de `WikiComponent` : il porte l'en-tête et la
+ *  sous-navigation, elles ne portent plus que leur contenu. */
 export default [
-    { path: '', redirectTo: 'items', pathMatch: 'full' },
     {
-        path: 'miscellaneous-info',
-        component: MiscellaneousInfoComponent,
-        title: 'MyHordes Optimizer' + ' - ' + $localize`Wiki` + ' - ' + $localize`Informations diverses`
-    },
-    { path: 'hero-skills', component: HeroSkillsComponent, title: 'MyHordes Optimizer' + ' - ' + $localize`Wiki` + ' - ' + $localize`Pouvoirs` },
-    { path: 'buildings', component: BuildingsComponent, title: 'MyHordes Optimizer' + ' - ' + $localize`Wiki` + ' - ' + $localize`Chantiers` },
-    { path: 'items', component: ItemsComponent, title: 'MyHordes Optimizer' + ' - ' + $localize`Wiki` + ' - ' + $localize`Objets` },
-    { path: 'recipes', component: RecipesComponent, title: 'MyHordes Optimizer' + ' - ' + $localize`Wiki` + ' - ' + $localize`Recettes` },
-    { path: 'ruins', component: RuinsComponent, title: 'MyHordes Optimizer' + ' - ' + $localize`Wiki` + ' - ' + $localize`Bâtiments` },
-    { path: 'private-towns', component: PrivateTownsComponent, title: 'MyHordes Optimizer' + ' - ' + $localize`Wiki` + ' - ' + $localize`Villes privées` },
+        path: '',
+        component: WikiComponent,
+        children: [
+            { path: '', redirectTo: 'items', pathMatch: 'full' },
+            {
+                path: 'miscellaneous-info',
+                component: MiscellaneousInfoComponent,
+                title: 'MyHordes Optimizer' + ' - ' + $localize`Wiki` + ' - ' + $localize`Informations diverses`
+            },
+            { path: 'hero-skills', component: HeroSkillsComponent, title: 'MyHordes Optimizer' + ' - ' + $localize`Wiki` + ' - ' + $localize`Pouvoirs` },
+            { path: 'buildings', component: BuildingsComponent, title: 'MyHordes Optimizer' + ' - ' + $localize`Wiki` + ' - ' + $localize`Chantiers` },
+            { path: 'items', component: ItemsComponent, title: 'MyHordes Optimizer' + ' - ' + $localize`Wiki` + ' - ' + $localize`Objets` },
+            { path: 'recipes', component: RecipesComponent, title: 'MyHordes Optimizer' + ' - ' + $localize`Wiki` + ' - ' + $localize`Recettes` },
+            { path: 'ruins', component: RuinsComponent, title: 'MyHordes Optimizer' + ' - ' + $localize`Wiki` + ' - ' + $localize`Bâtiments` },
+            { path: 'private-towns', component: PrivateTownsComponent, title: 'MyHordes Optimizer' + ' - ' + $localize`Wiki` + ' - ' + $localize`Villes privées` }
+        ]
+    }
 ] satisfies Route[];
-

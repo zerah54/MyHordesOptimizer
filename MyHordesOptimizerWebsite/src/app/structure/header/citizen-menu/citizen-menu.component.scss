@@ -8,11 +8,6 @@
             align-items: center;
             gap: 0.5em;
         }
-
-        // mho-avatar est fixé à 100px sans input de taille : ::ng-deep + !important pour l'overrider ici.
-        ::ng-deep mho-avatar .mho-avatar > * {
-            width: 40px !important;
-        }
     }
 }
 

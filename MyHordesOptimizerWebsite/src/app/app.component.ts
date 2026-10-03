@@ -1,5 +1,4 @@
 import { BreakpointObserver } from '@angular/cdk/layout';
-import { OverlayContainer } from '@angular/cdk/overlay';
 import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { ChangeDetectionStrategy, Component, DestroyRef, inject, LOCALE_ID, OnInit, Signal, signal, viewChild, WritableSignal } from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
@@ -14,12 +13,12 @@ import { BREAKPOINTS } from './_abstract_model/const';
 import { AuthenticationService } from './_abstract_model/services/authentication.service';
 import { Imports } from './_abstract_model/types/_types';
 import { LoadingOverlayService } from './_core/services/loading-overlay.service';
-import { FooterComponent } from './structure/footer/footer.component';
+import { ThemeFamily, ThemeService } from './_core/services/theme.service';
 import { HeaderComponent } from './structure/header/header.component';
 import { MenuComponent } from './structure/menu/menu.component';
 
 const angular_common: Imports = [CommonModule, NgOptimizedImage, RouterOutlet];
-const components: Imports = [FooterComponent, HeaderComponent, MenuComponent];
+const components: Imports = [HeaderComponent, MenuComponent];
 const pipes: Imports = [];
 const material_modules: Imports = [MatCardModule, MatProgressSpinnerModule, MatSidenavModule];
 
@@ -35,7 +34,6 @@ const material_modules: Imports = [MatCardModule, MatProgressSpinnerModule, MatS
 })
 export class AppComponent implements OnInit {
     private router: Router = inject(Router);
-    private overlay_container: OverlayContainer = inject(OverlayContainer);
     private breakpoint_observer: BreakpointObserver = inject(BreakpointObserver);
     private locale_id: string = inject(LOCALE_ID);
 
@@ -46,7 +44,10 @@ export class AppComponent implements OnInit {
     private loading_service: LoadingOverlayService = inject(LoadingOverlayService);
     protected readonly is_loading: Signal<boolean> = toSignal(this.loading_service.is_loading_obs, { initialValue: false });
     protected readonly ready: WritableSignal<boolean> = signal(false);
-    protected readonly theme: string | null = localStorage.getItem('theme');
+    /** Injecté ici pour que le thème soit posé sur <html> dès le démarrage de l'application. */
+    private readonly theme_service: ThemeService = inject(ThemeService);
+    /** Seuls les décors saisonniers du gabarit (guirlande, araignée, fantôme) en dépendent. */
+    protected readonly family: Signal<ThemeFamily> = this.theme_service.family;
 
     private authentication_api: AuthenticationService = inject(AuthenticationService);
     private readonly destroy_ref: DestroyRef = inject(DestroyRef);
@@ -68,9 +69,6 @@ export class AppComponent implements OnInit {
             }
         });
 
-        if (this.theme) {
-            this.overlay_container.getContainerElement().classList.add(this.theme);
-        }
         this.loaderOnRouting();
 
         this.authentication_api.getMe()

@@ -24,16 +24,7 @@ export class WishlistInfo extends CommonModel<WishlistInfoDTO> {
     public toListItem(): ShortWishlistItemDTO[] {
         return this.wishlist_items
             .filter((wishlist_item: WishlistItem) => wishlist_item.count)
-            .map((wishlist_item: WishlistItem) => {
-                return {
-                    id: wishlist_item.item.id,
-                    priority: wishlist_item.priority,
-                    count: wishlist_item.count,
-                    depot: wishlist_item.depot.value.count,
-                    zoneXPa: wishlist_item.zone_x_pa,
-                    shouldSignal: wishlist_item.should_signal
-                };
-            });
+            .map((wishlist_item: WishlistItem): ShortWishlistItemDTO => wishlist_item.toShortDto());
     }
 
     protected dtoToModel(dto?: WishlistInfoDTO | null): void {

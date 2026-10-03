@@ -28,7 +28,8 @@ namespace MyHordesOptimizerApi.Dtos.MyHordes
         /// <summary>
         /// <c>0</c>/<c>1</c> : case dont le sol a été régénéré par la capacité héroïque Fouineur
         /// (<c>HeroicItemActionListener</c> type 24 → <c>RegenerateZoneAction</c>). Marqueur
-        /// permanent. Jamais demandé aujourd'hui.
+        /// permanent, renvoyé pour toutes les cases découvertes, à tous les joueurs. Demandé par la
+        /// mise à jour des outils (<c>GetMapForToolsUpdate</c>) depuis le 23 septembre 2026.
         /// </summary>
         [JsonProperty("exc")]
         public int? Exc { get; set; }

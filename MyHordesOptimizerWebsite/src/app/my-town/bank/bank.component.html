@@ -1,12 +1,24 @@
 <mat-card-header class="mho-bank-header">
     <mat-card-title i18n>Banque</mat-card-title>
-    <mat-slide-toggle [(ngModel)]="condensed_display" (ngModelChange)="changeCondensedDisplay()" i18n>Affichage condensé</mat-slide-toggle>
+    <!-- Choix exclusif : un groupe de bascules, pas un interrupteur. L'état reste le même
+         booléen `condensed_display`, persisté à l'identique. -->
+    <mat-button-toggle-group [(ngModel)]="condensed_display" (ngModelChange)="changeCondensedDisplay()"
+                             i18n-aria-label aria-label="Affichage de la banque" hideSingleSelectionIndicator>
+        <mat-button-toggle [value]="false">
+            <mat-icon>grid_view</mat-icon>
+            <ng-container i18n>Détaillé</ng-container>
+        </mat-button-toggle>
+        <mat-button-toggle [value]="true">
+            <mat-icon>view_list</mat-icon>
+            <ng-container i18n>Condensé</ng-container>
+        </mat-button-toggle>
+    </mat-button-toggle-group>
 </mat-card-header>
 <mat-card-content class="mho-bank">
     @if (displayed_bank_items(); as displayed_bank_items) {
         <div class="filter">
             <mho-filter (filterChange)="filter_value = $event; applyFilters()"></mho-filter>
-            <mat-form-field class="properties-filter">
+            <mat-form-field class="properties-filter" subscriptSizing="dynamic">
                 <mat-label i18n>Chercher des objets par propriétés</mat-label>
                 <mho-select multiple [options]="options" [bindLabel]="'value.label'" [(ngModel)]="select_value"
                             (filterChange)="applyFilters()" searchable chips>
@@ -14,24 +26,35 @@
             </mat-form-field>
         </div>
         @if (!condensed_display) {
-            <ul>
-                @for (category of (displayed_bank_items | itemsGroupByCategory); track $index) {
-                    <div class="category">
-                        <h2>{{ category.category.label[locale] }}</h2>
-                        <div class="items">
-                            @for (bank_item of category.items; track $index) {
-                                <mho-item [item]="bank_item"></mho-item>
-                            }
+            <div class="detailed">
+                <ul>
+                    @for (category of (displayed_bank_items | itemsGroupByCategory); track $index) {
+                        <div class="category">
+                            <h2>{{ category.category.label | localizedLabel:'Sans catégorie' }}</h2>
+                            <div class="items">
+                                @for (bank_item of category.items; track $index) {
+                                    <mho-item [item]="bank_item" selectable
+                                              [selected]="detailed_item === bank_item"
+                                              (itemSelected)="detailed_item = $event"></mho-item>
+                                }
+                            </div>
                         </div>
-                    </div>
-                }
-            </ul>
+                    }
+                </ul>
+                <div class="detail">
+                    @if (detailed_item) {
+                        <mho-item [item]="detailed_item" forceOpen></mho-item>
+                    } @else {
+                        <p class="detail-empty" i18n>Sélectionnez un objet pour afficher sa fiche.</p>
+                    }
+                </div>
+            </div>
         } @else {
             <div class="condensed">
                 <div class="bank">
                     @for (category of (displayed_bank_items | itemsGroupByCategory:'id'); track $index) {
                         <div class="category">
-                            <h2>{{ category.category.label[locale] }}</h2>
+                            <h2>{{ category.category.label | localizedLabel:'Sans catégorie' }}</h2>
                             <ul class="items">
                                 @for (bank_item of category.items; track $index) {
                                     <li class="item" (click)="detailed_item = bank_item"
@@ -47,7 +70,11 @@
                     }
                 </div>
                 <div class="detail">
-                    <mho-item [item]="detailed_item" forceOpen></mho-item>
+                    @if (detailed_item) {
+                        <mho-item [item]="detailed_item" forceOpen></mho-item>
+                    } @else {
+                        <p class="detail-empty" i18n>Sélectionnez un objet pour afficher sa fiche.</p>
+                    }
                 </div>
             </div>
         }

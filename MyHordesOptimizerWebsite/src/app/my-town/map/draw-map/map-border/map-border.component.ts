@@ -2,16 +2,22 @@ import {
     booleanAttribute,
     ChangeDetectionStrategy,
     Component,
+    computed,
     effect,
     input,
     InputSignal,
     InputSignalWithTransform,
+    Signal,
     signal,
     untracked,
     WritableSignal
 } from '@angular/core';
 
 import { Cell } from '../../../../_abstract_model/types/cell.class';
+
+/** Colonne de coordonnées à laquelle appartient la case : seule celle-ci se colle au bord
+ *  pendant le défilement horizontal. `null` pour les cases de la règle horizontale. */
+export type MapBorderSide = 'left' | 'right';
 
 @Component({
     selector: 'mho-map-border',
@@ -26,6 +32,26 @@ export class MapBorderComponent {
     public index: InputSignal<null | number> = input<null | number>(null);
     public myCell: InputSignal<Cell | undefined> = input<Cell | undefined>(undefined);
     public hoveredCell: InputSignal<Cell | undefined> = input<Cell | undefined>(undefined);
+    public selectedCell: InputSignal<Cell | undefined> = input<Cell | undefined>(undefined);
+    public side: InputSignal<MapBorderSide | null> = input<MapBorderSide | null>(null);
+
+    /** Coordonnée de la case choisie. Contrairement à `my_pos` / `hovered_pos`, qui reproduisent
+     *  les anciens setters `@Input()` et leurs bizarreries, c'est un simple `computed` : il se
+     *  réévalue dès que l'un de ses trois ingrédients change. */
+    protected readonly selected_pos: Signal<boolean> = computed((): boolean => {
+        const selected: Cell | undefined = this.selectedCell();
+        const index: number | null = this.cell_index();
+        if (!selected || index === null) return false;
+        if (this.vertical() && !this.horizontal()) return selected.displayed_y === index;
+        if (this.horizontal() && !this.vertical()) return selected.displayed_x === index;
+        return false;
+    });
+
+    /** Une case de règle verticale titre sa ligne, toutes les autres (règle horizontale et
+     *  coins) titrent leur colonne : la grille ARIA reste complète, sans case muette. */
+    protected readonly aria_role: Signal<string> = computed((): string => {
+        return this.vertical() && !this.horizontal() ? 'rowheader' : 'columnheader';
+    });
 
     // Signaux (pas de simples champs) : lus par le template sous OnPush, ils doivent notifier
     // eux-mêmes leurs consommateurs quand un `effect()` les modifie — un champ muté depuis un effect

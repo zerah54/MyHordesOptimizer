@@ -1,5 +1,6 @@
 import { CommonModule, NgOptimizedImage } from '@angular/common';
 import {
+    booleanAttribute,
     ChangeDetectionStrategy,
     Component,
     DestroyRef,
@@ -7,6 +8,7 @@ import {
     inject,
     input,
     InputSignal,
+    InputSignalWithTransform,
     output,
     OutputEmitterRef,
     signal,
@@ -24,7 +26,6 @@ import { DigsService } from '../../_abstract_model/services/digs.service';
 import { Imports } from '../../_abstract_model/types/_types';
 import { Citizen } from '../../_abstract_model/types/citizen.class';
 import { Dig } from '../../_abstract_model/types/dig.class';
-import { getTown } from '../../_core/utilities/localstorage.util';
 import { ConfirmDialogComponent, ConfirmDialogData } from '../confirm-dialog/confirm-dialog.component';
 
 const angular_common: Imports = [CommonModule, NgOptimizedImage, FormsModule];
@@ -47,6 +48,8 @@ export class DigComponent {
     public day: InputSignal<number> = input.required();
     public digsMode: InputSignal<'creation' | 'update' | 'registry'> = input.required();
     public dig: InputSignal<Dig | undefined> = input.required();
+    /** Lecture seule (ville observée) : ni ajout, ni modification, ni suppression. */
+    public readonly: InputSignalWithTransform<boolean, unknown> = input(false, { transform: booleanAttribute });
 
     public deletedDig: OutputEmitterRef<Dig> = output();
     public updatedDig: OutputEmitterRef<Dig[]> = output();
@@ -118,8 +121,9 @@ export class DigComponent {
                 diggerName: citizen.name,
                 nbSucces: 0,
                 nbTotalDig: 0,
-                x: getTown()?.town_x || 0,
-                y: getTown()?.town_y || 0
+                // Coordonnées affichées, relatives à la ville (0/0) : town_x/town_y sont absolues.
+                x: 0,
+                y: 0
             }));
         }
     }

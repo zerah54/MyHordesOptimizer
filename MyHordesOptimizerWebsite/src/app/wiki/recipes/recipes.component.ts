@@ -1,7 +1,6 @@
 import { CommonModule, DecimalPipe, NgOptimizedImage } from '@angular/common';
 import { ChangeDetectionStrategy, Component, DestroyRef, inject, OnInit, signal, WritableSignal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { MatCardModule } from '@angular/material/card';
 import { MatSortModule } from '@angular/material/sort';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import moment from 'moment';
@@ -22,7 +21,7 @@ const angular_common: Imports = [CommonModule, NgOptimizedImage];
 const components: Imports = [FilterFieldComponent];
 const directives: Imports = [TypedCellDefDirective];
 const pipes: Imports = [DecimalPipe, ColumnIdPipe];
-const material_modules: Imports = [MatCardModule, MatSortModule, MatTableModule];
+const material_modules: Imports = [MatSortModule, MatTableModule];
 
 @Component({
     selector: 'mho-recipes',

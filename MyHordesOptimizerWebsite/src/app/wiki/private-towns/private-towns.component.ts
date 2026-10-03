@@ -1,6 +1,5 @@
 import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
-import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
@@ -16,7 +15,7 @@ const angular_common: Imports = [CommonModule, NgOptimizedImage];
 const components: Imports = [];
 const directives: Imports = [TypedCellDefDirective];
 const pipes: Imports = [];
-const material_modules: Imports = [MatCardModule, MatTableModule, MatIconModule, MatTooltipModule];
+const material_modules: Imports = [MatTableModule, MatIconModule, MatTooltipModule];
 
 @Component({
     selector: 'mho-private-towns',

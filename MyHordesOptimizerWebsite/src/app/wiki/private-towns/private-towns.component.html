@@ -1,7 +1,4 @@
-<mat-card-header>
-    <mat-card-title i18n>Villes privées</mat-card-title>
-</mat-card-header>
-<mat-card-content class="mho-private-towns">
+<div class="mho-private-towns">
     <table #table mat-table [dataSource]="datasource" class="mat-elevation-z8">
         <ng-container matColumnDef="name" sticky>
             <th mat-header-cell *matHeaderCellDef i18n>Paramètre</th>
@@ -58,4 +55,4 @@
         <tr mat-header-row *matHeaderRowDef="displayed_columns; sticky: true"></tr>
         <tr mat-row *matRowDef="let row; columns: displayed_columns;"></tr>
     </table>
-</mat-card-content>
+</div>

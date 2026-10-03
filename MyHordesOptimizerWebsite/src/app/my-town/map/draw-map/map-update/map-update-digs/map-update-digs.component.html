@@ -7,7 +7,7 @@
         <table>
             <thead>
             <th>
-                @if ((allCitizens() | notInListCitizenDig:digs()).length > 0) {
+                @if ((allCitizens() | notInListCitizenDig:digs():selected_day).length > 0) {
                     <button mat-button type="button" [matMenuTriggerFor]="addCitizenMenu">
                         <ng-container i18n>Ajouter un citoyen</ng-container>
                     </button>
@@ -34,7 +34,7 @@
                             </mat-form-field>
                         </td>
                         <td class="remove">
-                            <button mat-icon-button type="button" (click)="removeCitizen(displayed_dig.digger_id)">
+                            <button mat-icon-button type="button" (click)="removeDig(displayed_dig)">
                                 <mat-icon>close</mat-icon>
                             </button>
                         </td>
@@ -45,7 +45,7 @@
 
         <mat-menu #addCitizenMenu="matMenu">
             <mat-list class="mho-add-citizen-list">
-                @for (citizen of (allCitizens() | notInListCitizenDig:digs()); track citizen.id) {
+                @for (citizen of (allCitizens() | notInListCitizenDig:digs():selected_day); track citizen.id) {
                     <mat-list-item (click)="addCitizen(citizen)">
                         <mho-citizen-info displayJob [displayPseudoMode]="'simple'"
                                           [citizen]="citizen"></mho-citizen-info>

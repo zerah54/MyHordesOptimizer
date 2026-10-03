@@ -5,6 +5,7 @@ using MyHordesOptimizerApi.Data.Heroes;
 using MyHordesOptimizerApi.Data.Items;
 using MyHordesOptimizerApi.Data.Wishlist;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Camping;
+using MyHordesOptimizerApi.Extensions.Models;
 using MyHordesOptimizerApi.Models;
 using System.Collections.Generic;
 using System.Linq;
@@ -37,7 +38,18 @@ namespace MyHordesOptimizerApi.MappingProfiles
                 .ForMember(dest => dest.DescriptionDe, opt => opt.MapFrom(src => src.Description))
                 .ForMember(dest => dest.DescriptionFr, opt => opt.Ignore())
                 .ForMember(dest => dest.DescriptionEn, opt => opt.Ignore())
-                .ForMember(dest => dest.DescriptionEs, opt => opt.Ignore());
+                .ForMember(dest => dest.DescriptionEs, opt => opt.Ignore())
+                .ForMember(dest => dest.Legacy, opt => opt.MapFrom(src => src.Legacy))
+                .ForMember(dest => dest.GroupSort, opt => opt.MapFrom(src => src.Sort))
+                .ForMember(dest => dest.Level, opt => opt.MapFrom(src => src.Level))
+                .ForMember(dest => dest.GroupDe, opt => opt.MapFrom(src => src.Group))
+                .ForMember(dest => dest.GroupFr, opt => opt.Ignore())
+                .ForMember(dest => dest.GroupEn, opt => opt.Ignore())
+                .ForMember(dest => dest.GroupEs, opt => opt.Ignore())
+                .ForMember(dest => dest.BulletsDe, opt => opt.MapFrom(src => HeroSkillBullets.Serialize(src.Bullets)))
+                .ForMember(dest => dest.BulletsFr, opt => opt.Ignore())
+                .ForMember(dest => dest.BulletsEn, opt => opt.Ignore())
+                .ForMember(dest => dest.BulletsEs, opt => opt.Ignore());
 
             CreateMap<MyHordesCauseOfDeathModel, CauseOfDeath>()
                 .ForMember(dest => dest.Dtype, opt => opt.MapFrom(src => src.Dtype))

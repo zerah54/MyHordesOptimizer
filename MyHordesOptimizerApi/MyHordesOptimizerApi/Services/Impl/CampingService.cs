@@ -50,8 +50,10 @@ namespace MyHordesOptimizerApi.Services.Impl
 
         private CampingOddsDto GetCampingOdds(CampingParametersDto campingParameters)
         {
-            var probability = GetCampingValues(campingParameters).Sum(chancePair => chancePair.Value);
+            var values = GetCampingValues(campingParameters);
+            var probability = values.Sum(chancePair => chancePair.Value);
             var odds = new CampingOddsDto();
+            odds.Details = values;
             odds.BoundedProbability = Math.Max(0, Math.Min(probability, GetMaxBoundedProbability(campingParameters)));
             odds.Probability = probability;
             odds.Label = CampingResults.Find(result => result.Strict ? odds.BoundedProbability < result.Probability : odds.BoundedProbability <= result.Probability).Label;

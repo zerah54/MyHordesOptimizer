@@ -1,11 +1,12 @@
-import { CommonModule, DecimalPipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, DestroyRef, inject, OnInit, signal, WritableSignal } from '@angular/core';
+import { CommonModule, DecimalPipe, formatNumber } from '@angular/common';
+import { ChangeDetectionStrategy, Component, computed, DestroyRef, inject, OnInit, Signal, signal, WritableSignal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatCardModule } from '@angular/material/card';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatExpansionModule } from '@angular/material/expansion';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
@@ -14,6 +15,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import moment from 'moment';
 import { catchError, debounceTime, forkJoin, of, Subject, take } from 'rxjs';
 
+import { RefinementViewDTO } from '../../_abstract_model/dto/refinement.dto';
 import { HomeEnum } from '../../_abstract_model/enum/home.enum';
 import { TownService } from '../../_abstract_model/services/town.service';
 import { TownStatisticsService } from '../../_abstract_model/services/town-statistics.service';
@@ -36,6 +38,7 @@ const angular_common: Imports = [CommonModule, FormsModule];
 const pipes: Imports = [DecimalPipe];
 const material_modules: Imports = [
     MatButtonModule, MatButtonToggleModule, MatCardModule, MatCheckboxModule,
+    MatExpansionModule,
     MatFormFieldModule, MatIconModule, MatInputModule, MatSlideToggleModule, MatTooltipModule
 ];
 
@@ -176,6 +179,26 @@ export class OverflowComponent implements OnInit {
     /** Bornes encadrantes (facteur figé à 45 % / 55 %), affichées en complément du réaliste sans onglet séparé. */
     protected readonly favorable: WritableSignal<ScenarioResult | null> = signal(null);
     protected readonly defavorable: WritableSignal<ScenarioResult | null> = signal(null);
+    /** Le scénario réaliste, celui dont le bandeau de chiffres clés rend compte. */
+    protected readonly realistic: Signal<ScenarioResult | null> = computed((): ScenarioResult | null => this.scenarios()[0] ?? null);
+    /**
+     * Étendue des défenses personnelles, montrée sur l'en-tête replié du panneau : elle suffit à
+     * voir qu'une valeur est aberrante sans dérouler quarante champs. Mise en forme ici plutôt que
+     * dans le gabarit, où les espaces entre blocs `@if` s'additionnaient en blancs doubles.
+     * `null` tant qu'il n'y a personne — une étendue sur une liste vide ne veut rien dire.
+     */
+    protected readonly defenseRangeLabel: Signal<string | null> = computed((): string | null => {
+        const rows: CitizenDefenseRow[] = this.citizen_defenses();
+        if (rows.length === 0) return null;
+        let min: number = rows[0].defense;
+        let max: number = rows[0].defense;
+        for (const row of rows) {
+            if (row.defense < min) min = row.defense;
+            if (row.defense > max) max = row.defense;
+        }
+        const format: (value: number) => string = (value: number): string => formatNumber(value, this.locale, '1.0-0');
+        return min === max ? format(min) : `${format(min)}–${format(max)}`;
+    });
     private readonly town_statistics_service: TownStatisticsService = inject(TownStatisticsService);
     private readonly town_service: TownService = inject(TownService);
     private readonly destroy_ref: DestroyRef = inject(DestroyRef);
@@ -212,6 +235,20 @@ export class OverflowComponent implements OnInit {
     }
 
     /** Demande un recalcul différé : utilisé par les champs saisis au clavier, où chaque frappe est une valeur intermédiaire. */
+    /**
+     * Nouvelle défense par défaut. Les citoyens génériques qui avaient encore l'ancienne valeur par
+     * défaut la suivent ; une défense saisie à la main, ou reconstituée pour un citoyen connu, reste.
+     */
+    protected changeHomeDefense(value: number | null): void {
+        const previous: number = this.home_defense;
+        this.home_defense = value as number;
+        if (typeof value === 'number' && !Number.isNaN(value) && value !== previous) {
+            this.citizen_defenses.update((rows: CitizenDefenseRow[]): CitizenDefenseRow[] => rows.map((row: CitizenDefenseRow): CitizenDefenseRow =>
+                !row.named && row.defense === previous ? { ...row, defense: value } : row));
+        }
+        this.scheduleCompute();
+    }
+
     protected scheduleCompute(): void {
         this.compute_request.next();
     }
@@ -307,7 +344,7 @@ ${this.formatPercent(overflow_min)} – ${this.formatPercent(overflow_max)} du d
         return `${Math.round(ratio * 1000) / 10}%`;
     }
 
-    /** Reprend les valeurs connues de la ville courante (jour, chaos, dévastation, attaque estimée et habitations). */
+    /** Reprend les valeurs connues de la ville courante (jour, chaos, dévastation, attaque affinée ou estimée et habitations). */
     private applyTownValues(): void {
         const town: TownDetails = <TownDetails>this.my_town;
         this.day = town.day;
@@ -320,11 +357,16 @@ ${this.formatPercent(overflow_min)} – ${this.formatPercent(overflow_max)} du d
             attack: this.town_statistics_service.getAttackCalculation(town.day, false)
                 .pipe(take(1), catchError(() => of(null))),
             citizens: this.town_service.getCitizens()
+                .pipe(take(1), catchError(() => of(null))),
+            refinement: this.town_statistics_service.getRefinement(town.day)
                 .pipe(take(1), catchError(() => of(null)))
         })
             .pipe(takeUntilDestroyed(this.destroy_ref))
-            .subscribe(({ attack, citizens: citizensInfo }: { attack: EstimationsResult | null; citizens: CitizenInfo | null }) => {
-                if (attack?.result?.max) {
+            .subscribe(({ attack, citizens: citizensInfo, refinement }: { attack: EstimationsResult | null; citizens: CitizenInfo | null; refinement: RefinementViewDTO | null }) => {
+                // Le max affiné est la plus basse valeur sûre : il prime sur le max estimé.
+                if (refinement?.status === 'Valid' && refinement.attackMax !== null) {
+                    this.attack.set(refinement.attackMax);
+                } else if (attack?.result?.max) {
                     this.attack.set(attack.result.max);
                 }
                 if (citizensInfo) {

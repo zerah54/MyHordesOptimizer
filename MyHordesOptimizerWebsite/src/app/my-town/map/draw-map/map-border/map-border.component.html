@@ -1,3 +1,5 @@
-<th class="cell border-cell" [class.horizontal]="horizontal()" [class.vertical]="vertical()" [class.me]="my_pos()" [class.hovered]="hovered_pos()">
-    {{ cell_index() }}
-</th>
+<div class="cell border-cell" [attr.role]="aria_role()"
+     [class.horizontal]="horizontal()" [class.vertical]="vertical()"
+     [class.left]="side() === 'left'" [class.right]="side() === 'right'"
+     [class.me]="my_pos()" [class.hovered]="hovered_pos()" [class.selected]="selected_pos()">{{ cell_index() }}
+</div>

@@ -1,310 +1,455 @@
-@use 'variables';
+/* Échelle de la carte : quatre paliers sémantiques, du plus défavorable (l0) au plus
+   favorable (l3). Les valeurs vivent dans `_mho-tokens.scss` et changent avec le mode :
+   les anciennes couleurs (khaki, sandybrown, lightcoral) étaient des teintes claires
+   fixes, éblouissantes sur un fond sombre et impossibles à accorder aux deux familles.
+   Le sens de lecture dépend du type de carte : pour les fouilles et l'exploration,
+   niveau 0 = mauvais ; pour le danger et la décharge, c'est l'inverse. */
+$level-0: var(--mho-map-l0);
+$level-1: var(--mho-map-l1);
+$level-2: var(--mho-map-l2);
+$level-3: var(--mho-map-l3);
 
-$green: #80c27e;
-$yellow: khaki;
-$orange: sandybrown;
-$red: lightcoral;
-
-$empty-color: gray;
+/* Zone connue mais épuisée / jamais visitée. */
+$empty-color: var(--mho-map-hatch);
 
 :host {
     display: contents;
+}
 
-    td.map-cell {
-        height: 30px;
-        width: 30px;
-        border: 1px solid variables.$item_color;
-        padding: 0;
-        position: relative;
-        z-index: 0;
-        cursor: pointer;
-        min-width: 30px;
-        min-height: 30px;
+.map-cell {
+    /* Aucune dimension en dur : la case occupe exactement sa piste de grille, quel que soit
+       le zoom. `overflow: hidden` garde les indicateurs dans la case quand elle rétrécit. */
+    overflow: hidden;
+    /* Séparation entre deux cases : un filet de la couleur du panneau, jamais un trait coloré.
+       Deux cases voisines donnent 2 px, soit l'écart de la maquette — et le filet reste un
+       `border` plutôt qu'un `gap`, pour que les contours de zone (scrutateur, distances) qui
+       s'y posent restent continus d'une case à l'autre. */
+    border: 1px solid var(--mho-surface);
+    padding: 0;
+    position: relative;
+    z-index: 0;
+    cursor: pointer;
 
-        &.scrut-border-left {
-            border-left: 1px solid variables.$primary;
-        }
+    &.scrut-border-left {
+        border-left: 1px solid var(--mho-map-fg);
+    }
 
-        &.scrut-border-right {
-            border-right: 1px solid variables.$primary;
-        }
+    &.scrut-border-right {
+        border-right: 1px solid var(--mho-map-fg);
+    }
 
-        &.scrut-border-top {
-            border-top: 1px solid variables.$primary;
-        }
+    &.scrut-border-top {
+        border-top: 1px solid var(--mho-map-fg);
+    }
 
-        &.scrut-border-bottom {
-            border-bottom: 1px solid variables.$primary;
-        }
+    &.scrut-border-bottom {
+        border-bottom: 1px solid var(--mho-map-fg);
+    }
 
-        > .dist-border-left {
-            border-left: 2px solid white;
-        }
+    /* Anneaux de distance : tiretés, pour ne pas être confondus avec les filets du scrutateur. */
+    > .dist-border-left {
+        border-left: 2px dashed var(--mho-map-fg);
+    }
 
-        > .dist-border-right {
-            border-right: 2px solid white;
-        }
+    > .dist-border-right {
+        border-right: 2px dashed var(--mho-map-fg);
+    }
 
-        > .dist-border-top {
-            border-top: 2px solid white;
-        }
+    > .dist-border-top {
+        border-top: 2px dashed var(--mho-map-fg);
+    }
 
-        > .dist-border-bottom {
-            border-bottom: 2px solid white;
-        }
+    > .dist-border-bottom {
+        border-bottom: 2px dashed var(--mho-map-fg);
+    }
 
-        > .my-cell {
-            box-shadow: inset 0 0 0.25em 2px white;
-        }
+    /* Case où l'on se trouve en jeu : le vert de l'interface carte de MyHordes,
+       doublé d'un liseré sombre pour rester visible sur les quatre couleurs de fond. */
+    > .my-cell {
+        box-shadow: inset 0 0 0 2.5px var(--mho-map-me),
+        inset 0 0 0 3.5px var(--mho-map-marker-ink);
+    }
 
-        > div {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-        }
+    > div {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+    }
 
-        &:not(.town) {
+    &:not(.town) {
 
-            &.alert {
+        &.alert {
 
-                &.never-visited {
-                    background-color: darkslategray;
-                }
-
-                &:not(.never-visited) {
-                    &.visited-today {
-                        &.danger-0 {
-                            background-color: $green;
-                        }
-
-                        &.danger-1 {
-                            background-color: $yellow;
-                        }
-
-                        &.danger-2 {
-                            background-color: $orange;
-                        }
-
-                        &.danger-3 {
-                            background-color: $red;
-                        }
-                    }
-
-                    &:not(.visited-today) {
-                        background-color: gray;
-                    }
-                }
+            &.never-visited {
+                background-color: var(--mho-map-unknown);
             }
 
-            &.digs {
-                &.dig-0 {
-                    background-color: $red;
-                }
-
-                &.dig-1 {
-                    background-color: $orange;
-                }
-
-                &.dig-2 {
-                    background-color: $yellow;
-                }
-
-                &.dig-3 {
-                    background-color: $green;
-                }
-            }
-
-            /** Niveau d'exploration relevé par un éclaireur : plus la zone est explorée,
-                plus le risque d'être repéré en y entrant est faible */
-            &.scout {
-                &.scout-0 {
-                    background-color: $red;
-                }
-
-                &.scout-1 {
-                    background-color: $orange;
-                }
-
-                &.scout-2 {
-                    background-color: $yellow;
-                }
-
-                &.scout-3 {
-                    background-color: $green;
-                }
-            }
-
-            &.trash {
-                &.trash-0 {
-                    background-color: $green;
-                }
-
-                &.trash-1 {
-                    background-color: $yellow;
-                }
-
-                &.trash-2 {
-                    background-color: $orange;
-                }
-
-                &.trash-3 {
-                    background-color: $red;
-                }
-            }
-
-            .content {
-                width: 100%;
-                height: 100%;
-                z-index: 2;
-
-                > div {
-                    position: absolute;
-                    line-height: 10px;
-                    font-size: 10px;
-
-                    &.corner {
-                        display: inline;
-
-                        img {
-                            width: 12px;
-                        }
-
-                        .detail-value {
-                            color: white;
-                            position: absolute;
-                            bottom: -1px;
-                            text-shadow: #000000 1px 1px, #000000 -1px 1px, #000000 -1px -1px, #000000 1px -1px;
-                            font-size: 8px;
-                            right: 6px;
-
-                            /** Valeur issue du radar d'un éclaireur : approximative par nature */
-                            &.estimation {
-                                font-style: italic;
-                            }
-                        }
+            &:not(.never-visited) {
+                &.visited-today {
+                    &.danger-0 {
+                        background-color: $level-3;
                     }
 
-                    &.corner-top-left {
-                        top: 0;
-                        left: 0;
+                    &.danger-1 {
+                        background-color: $level-2;
                     }
 
-                    &.corner-top-right {
-                        top: 0;
-                        right: 0;
+                    &.danger-2 {
+                        background-color: $level-1;
                     }
 
-                    &.corner-bottom-left {
-                        bottom: 0;
-                        left: 0;
+                    &.danger-3 {
+                        background-color: $level-0;
                     }
+                }
 
-                    &.corner-bottom-right {
-                        bottom: 0;
-                        right: 0;
-                    }
+                /* Zone visitée un autre jour : l'information n'est plus fiable. */
+                &:not(.visited-today) {
+                    background-color: var(--mho-map-unknown);
                 }
             }
         }
 
-        &.town {
-            background-color: variables.$primary;
+        &.digs {
+            &.dig-0 {
+                background-color: $level-0;
+            }
 
-            > .town-draw {
-                display: flex;
-                align-items: center;
-                justify-content: center;
+            &.dig-1 {
+                background-color: $level-1;
+            }
+
+            &.dig-2 {
+                background-color: $level-2;
+            }
+
+            &.dig-3 {
+                background-color: $level-3;
             }
         }
 
-        .dried {
-            position: relative;
+        /** Niveau d'exploration relevé par un éclaireur : plus la zone est explorée,
+            plus le risque d'être repéré en y entrant est faible */
+        &.scout {
+            &.scout-0 {
+                background-color: $level-0;
+            }
+
+            &.scout-1 {
+                background-color: $level-1;
+            }
+
+            &.scout-2 {
+                background-color: $level-2;
+            }
+
+            &.scout-3 {
+                background-color: $level-3;
+            }
+
+            &.scout-unknown {
+                background-color: var(--mho-map-unknown);
+            }
+        }
+
+        &.trash {
+            &.trash-0 {
+                background-color: $level-3;
+            }
+
+            &.trash-1 {
+                background-color: $level-2;
+            }
+
+            &.trash-2 {
+                background-color: $level-1;
+            }
+
+            &.trash-3 {
+                background-color: $level-0;
+            }
+        }
+
+        .content {
             width: 100%;
             height: 100%;
-            z-index: 0;
+            z-index: 2;
 
-            background-image: -moz-linear-gradient(45deg, $empty-color 25%, transparent 25%),
-            -moz-linear-gradient(-45deg, $empty-color 25%, transparent 25%),
-            -moz-linear-gradient(45deg, transparent 75%, $empty-color 75%),
-            -moz-linear-gradient(-45deg, transparent 75%, $empty-color 75%);
-            background-image: -webkit-gradient(linear, 0 100%, 100% 0, color-stop(.25, $empty-color), color-stop(.25, transparent)),
-            -webkit-gradient(linear, 0 0, 100% 100%, color-stop(.25, $empty-color), color-stop(.25, transparent)),
-            -webkit-gradient(linear, 0 100%, 100% 0, color-stop(.75, transparent), color-stop(.75, $empty-color)),
-            -webkit-gradient(linear, 0 0, 100% 100%, color-stop(.75, transparent), color-stop(.75, $empty-color));
-            background-image: -webkit-linear-gradient(45deg, $empty-color 25%, transparent 25%),
-            -webkit-linear-gradient(-45deg, $empty-color 25%, transparent 25%),
-            -webkit-linear-gradient(45deg, transparent 75%, $empty-color 75%),
-            -webkit-linear-gradient(-45deg, transparent 75%, $empty-color 75%);
-            background-image: -o-linear-gradient(45deg, $empty-color 25%, transparent 25%),
-            -o-linear-gradient(-45deg, $empty-color 25%, transparent 25%),
-            -o-linear-gradient(45deg, transparent 75%, $empty-color 75%),
-            -o-linear-gradient(-45deg, transparent 75%, $empty-color 75%);
-            background-image: linear-gradient(45deg, $empty-color 25%, transparent 25%),
-            linear-gradient(-45deg, $empty-color 25%, transparent 25%),
-            linear-gradient(45deg, transparent 75%, $empty-color 75%),
-            linear-gradient(-45deg, transparent 75%, $empty-color 75%);
-            -moz-background-size: 2px 2px;
-            background-size: 2px 2px;
-            /* override value for webkit */
-            -webkit-background-size: 2px 2px;
-            background-position: 0 0, 2px 1px, 1px -1px, 0 0;
-        }
+            > div {
+                position: absolute;
+                line-height: 1;
+                font-size: max(8px, calc(var(--mho-cell, 30px) * 0.33));
 
-        .ruin {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1;
+                &.corner {
+                    display: inline;
 
-            > span {
-                width: 65%;
-                height: 65%;
-                background-color: variables.$primary;
-                color: white;
-                display: flex;
-                justify-content: center;
-                align-items: center;
+                    /* Icônes venues de MyHordes : dimensionnées en proportion de la case pour
+                       suivre le zoom, jamais en pixels figés. */
+                    img {
+                        width: calc(var(--mho-cell, 30px) * 0.4);
+                        height: auto;
+                    }
 
-                &.empty-ruin {
-
-                    &::before,
-                    &::after {
+                    .detail-value {
+                        color: var(--mho-map-fg);
                         position: absolute;
-                        content: "";
-                        background: white;
-                        display: block;
-                        width: 2px;
-                        height: 26px;
-                        left: 0;
-                        right: 0;
-                        top: 0;
-                        bottom: 0;
-                        margin: auto;
+                        bottom: -1px;
+                        /* Halo dans la teinte opposée au texte : lisible sur les quatre
+                           couleurs de fond, dans les deux modes. */
+                        text-shadow: var(--mho-map-marker-ink) 1px 1px, var(--mho-map-marker-ink) -1px 1px,
+                        var(--mho-map-marker-ink) -1px -1px, var(--mho-map-marker-ink) 1px -1px;
+                        font-size: max(8px, calc(var(--mho-cell, 30px) * 0.27));
+                        right: calc(var(--mho-cell, 30px) * 0.2);
+                        font-variant-numeric: tabular-nums;
+
+                        /** Valeur issue du radar d'un éclaireur : approximative par nature */
+                        &.estimation {
+                            font-style: italic;
+                        }
+
+                        /* Valeur sans icône (fouilles restantes, ancienneté, décharge) : elle
+                           occupe le coin elle-même, au corps du coin, comme l'indicateur principal
+                           l'a toujours été. */
+                        &.bare {
+                            position: static;
+                            color: inherit;
+                            text-shadow: none;
+                            font-size: inherit;
+                        }
                     }
 
-                    &::before {
-                        -webkit-transform: rotate(-45deg);
-                        transform: rotate(-45deg);
-                    }
-
-                    &::after {
-                        -webkit-transform: rotate(45deg);
-                        transform: rotate(45deg);
+                    /* Hors du coin de l'indicateur principal, une valeur seule prend le corps des
+                       valeurs d'icône : au corps plein, deux coins d'une même ligne se touchaient. */
+                    &:not(.corner-bottom-right) .detail-value.bare {
+                        font-size: max(8px, calc(var(--mho-cell, 30px) * 0.27));
                     }
                 }
 
-                .nb-digs {
-                    position: absolute;
+                &.corner-top-left {
+                    top: 0;
+                    left: 0;
+                }
+
+                &.corner-top-right {
+                    top: 0;
+                    right: 0;
+                }
+
+                &.corner-bottom-left {
                     bottom: 0;
-                    right: 6px;
-                    text-shadow: #000000 1px 1px, #000000 -1px 1px, #000000 -1px -1px, #000000 1px -1px;
-                    font-size: 10px;
+                    left: 0;
+                }
+
+                &.corner-bottom-right {
+                    bottom: 0;
+                    right: 0;
                 }
             }
+        }
+    }
+
+    &.town {
+        background-color: var(--mho-map-marker);
+
+        > .town-draw {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            img {
+                width: calc(var(--mho-cell, 30px) * 0.85);
+                height: auto;
+            }
+        }
+    }
+
+    .dried {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        z-index: 0;
+
+        /* Zone asséchée : hachures fines. Les quatre dégradés à préfixes navigateur
+           (-moz-, -webkit-, -o-) datent de 2012 et ne servent plus aucun navigateur
+           actuel ; une seule trame rayée suffit et suit le jeton de thème. */
+        background-image: repeating-linear-gradient(
+            45deg,
+            $empty-color 0 1px,
+            transparent 1px 4px
+        );
+    }
+
+    .ruin {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1;
+
+        /* Plan encore à récupérer : pastille posée dans le coin du marqueur, quel qu'il soit.
+           Jaune en deçà de 10 km (plan peu commun), bleue au-delà (plan rare) — règle du jeu.
+           Liseré dans l'encre opposée pour rester visible sur les deux marqueurs. */
+        .blueprint {
+            position: absolute;
+            top: -12%;
+            right: -12%;
+            width: 45%;
+            height: 45%;
+            min-width: 4px;
+            min-height: 4px;
+            max-width: 10px;
+            max-height: 10px;
+            border-radius: 50%;
+            box-shadow: 0 0 0 1px var(--mho-map-marker-ink);
+            z-index: 2;
+
+            &.uncommon {
+                background-color: var(--mho-bp-u);
+            }
+
+            &.rare {
+                background-color: var(--mho-bp-r);
+            }
+        }
+
+        /* Tout bâtiment : carré centré, convention de la carte du jeu. */
+        .ruin-square {
+            position: relative;
+            width: 60%;
+            height: 60%;
+            border-radius: 2px;
+            background-color: var(--mho-map-marker);
+            color: var(--mho-map-marker-ink);
+
+            /* Bâtiment vidé : carré creux plutôt que barré d'une croix. À 30 px de case,
+               la croix se confondait avec le contenu ; un carré vide se lit d'un coup
+               d'œil et garde la même empreinte que le carré plein. */
+            &.empty-ruin {
+                background-color: transparent;
+                box-shadow: inset 0 0 0 2px var(--mho-map-marker);
+            }
+        }
+
+        /* Ce qui se pose sur le carré : icône de ruine explorable ou de bâtiment enseveli, ou
+           illustration du bâtiment au palier « détail ». Centré sur la case, au-dessus du carré
+           mais sous la pastille de plan, qui doit rester visible. */
+        .ruin-overlay {
+            position: absolute;
+            inset: 0;
+            z-index: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+
+            /* Plus petite que le carré (60 % de la case) : il doit rester lisible autour. */
+            .ruin-icon {
+                width: calc(var(--mho-cell, 30px) * 0.4);
+                height: auto;
+            }
+
+            /* Épouse l'icône, pour y ancrer le nombre de tas. */
+            .ruin-icon-anchor {
+                position: relative;
+                display: inline-flex;
+            }
+
+            /* Tas à déblayer d'un bâtiment enseveli : chiffre nu en bas à droite de l'icône, comme
+               sur l'ancienne carte. Encre du marqueur cerclée de sa couleur : le chiffre se lit sur
+               le carré comme sur le fond de case qu'il déborde, dans les deux modes. */
+            .ruin-digs {
+                position: absolute;
+                right: -0.35em;
+                bottom: -0.35em;
+                color: var(--mho-map-marker-ink);
+                text-shadow: var(--mho-map-fg) 1px 1px, var(--mho-map-fg) -1px 1px,
+                var(--mho-map-fg) -1px -1px, var(--mho-map-fg) 1px -1px;
+                font-size: max(8px, calc(var(--mho-cell, 30px) * 0.33));
+                line-height: 1;
+                font-variant-numeric: tabular-nums;
+            }
+
+            /* L'illustration garde sa taille native, simplement bornée par la case. */
+            .ruin-illustration {
+                max-width: 100%;
+                max-height: 100%;
+            }
+
+            /* Bâtiment vidé : illustration grisée, comme dans le jeu. */
+            &.empty-ruin .ruin-illustration {
+                filter: grayscale(1);
+                opacity: 0.55;
+            }
+        }
+    }
+
+    /* Croix de repérage : la ligne et la colonne de la case choisie sont éclaircies, pour lire
+       ses coordonnées sans suivre la grille du doigt. Voile posé au-dessus du fond de case,
+       sous les marqueurs. */
+    &.crossed::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        z-index: 3;
+        pointer-events: none;
+        background-color: var(--mho-map-sel);
+        opacity: 0.16;
+    }
+
+    /* Case choisie : anneau extérieur, doublé d'un liseré sombre pour tenir sur les quatre
+       couleurs de fond. Elle ne porte pas le voile de la croix. */
+    &.selected {
+        z-index: 4;
+
+        &::before {
+            opacity: 0;
+        }
+
+        &::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            z-index: 5;
+            pointer-events: none;
+            box-shadow: inset 0 0 0 2px var(--mho-map-sel),
+            inset 0 0 0 3px var(--mho-map-marker-ink);
+        }
+    }
+}
+
+/* Zoom sémantique — la case ne montre que ce qu'elle peut montrer lisiblement.
+   Le palier est posé une seule fois, sur le conteneur de la grille (mho-draw-map) :
+   900 liaisons de classe, une par case, coûteraient bien plus cher. */
+
+/* Palier compact : la place ne suffit plus qu'à l'indicateur principal (coin bas droit)
+   et aux repères de couleur. Les icônes secondaires disparaissent plutôt que de se
+   chevaucher. */
+:host-context(.mho-draw-map.zoom-compact) {
+    .map-cell {
+        .content > div.corner-top-left,
+        .content > div.corner-top-right,
+        .content > div.corner-bottom-left {
+            display: none;
+        }
+
+        .ruin .blueprint {
+            display: none;
+        }
+    }
+}
+
+/* Palier détail : la case est assez grande pour que les valeurs respirent. */
+:host-context(.mho-draw-map.zoom-detail) {
+    .map-cell {
+        .content > div {
+            padding: 2px;
+        }
+
+        .content > div.corner .detail-value {
+            bottom: 1px;
         }
     }
 }

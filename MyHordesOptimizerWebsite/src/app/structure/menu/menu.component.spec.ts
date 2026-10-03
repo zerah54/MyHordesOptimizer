@@ -91,15 +91,17 @@ describe('MenuComponent', (): void => {
     });
 
     describe('changeTheme', (): void => {
-        it('sets the selected theme and persists the choice', (): void => {
+        it('sets the selected theme and persists the choice, without reloading the page', (): void => {
             const theme: Theme = { label: 'Rose', class: 'pink' };
 
             testable.changeTheme(theme);
             vi.advanceTimersByTime(1);
 
-            expect(testable.selected_theme()).toBe(theme);
+            // L'entrée cochée est celle de la liste du menu, pas l'objet passé : on compare la famille.
+            expect(testable.selected_theme()?.class).toBe('pink');
             expect(localStorage.getItem('theme')).toBe('pink');
-            expect(testable.reloadPage).toHaveBeenCalled();
+            // Les couleurs basculent par `color-scheme` / `light-dark()` : plus de rechargement.
+            expect(testable.reloadPage).not.toHaveBeenCalled();
         });
     });
 

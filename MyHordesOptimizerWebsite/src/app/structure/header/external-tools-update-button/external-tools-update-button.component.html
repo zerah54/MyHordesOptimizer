@@ -1,13 +1,15 @@
+<!-- Sans [color] : le bouton prend la couleur de texte de la barre (--mho-topbar-fg). En
+     « accent », il prenait celle de l'accent, illisible sur la barre en mode clair et à Noël. -->
 @if (badges().length === 0) {
     @if (isCompact()) {
-        <button mat-icon-button type="button" [color]="'accent'" (click)="update()"
-                matTooltip="Mettre à jour les outils externes" i18n-matTooltip="@@mho_external_tools_update_label">
+        <button mat-icon-button type="button" (click)="update()"
+                matTooltip="Mettre à jour" i18n-matTooltip="@@mho_update_label">
             <mat-icon>send</mat-icon>
         </button>
     } @else {
-        <button mat-button type="button" [color]="'accent'" (click)="update()">
+        <button mat-button type="button" (click)="update()">
             <mat-icon>send</mat-icon>
-            <ng-container i18n="@@mho_external_tools_update_label">Mettre à jour les outils externes</ng-container>
+            <ng-container i18n="@@mho_update_label">Mettre à jour</ng-container>
         </button>
     }
 } @else {

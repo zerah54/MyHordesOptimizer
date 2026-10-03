@@ -86,4 +86,55 @@ describe('AvatarComponent', (): void => {
 
         expect(picture(fixture)?.classList.contains('rounded')).toBe(true);
     });
+
+    it('leaves the size custom property unset so the stylesheet default applies', (): void => {
+        fixture.componentRef.setInput('src', '/storage/avatar1.png');
+        fixture.detectChanges();
+
+        expect(fixture.nativeElement.style.getPropertyValue('--mho-avatar-size')).toBe('');
+    });
+
+    it('exposes the requested size as a pixel custom property', (): void => {
+        fixture.componentRef.setInput('src', '/storage/avatar1.png');
+        fixture.componentRef.setInput('size', 26);
+        fixture.detectChanges();
+
+        expect(fixture.nativeElement.style.getPropertyValue('--mho-avatar-size')).toBe('26px');
+    });
+
+    it('collapses the host when there is no avatar to show, so no space is reserved', (): void => {
+        fixture.detectChanges();
+
+        expect(fixture.nativeElement.classList.contains('is-empty')).toBe(true);
+    });
+
+    it('does not collapse the host once an avatar is shown', (): void => {
+        fixture.componentRef.setInput('src', '/storage/avatar1.png');
+        fixture.detectChanges();
+
+        expect(fixture.nativeElement.classList.contains('is-empty')).toBe(false);
+    });
+
+    it('drops the broken image and collapses the host when the avatar fails to load', (): void => {
+        fixture.componentRef.setInput('src', 'https://staging.example.com/cdn/avatars/93.webp');
+        fixture.detectChanges();
+
+        img(fixture)?.dispatchEvent(new Event('error'));
+        fixture.detectChanges();
+
+        expect(picture(fixture)).toBeNull();
+        expect(fixture.nativeElement.classList.contains('is-empty')).toBe(true);
+    });
+
+    it('shows the avatar again when src changes after a load failure', (): void => {
+        fixture.componentRef.setInput('src', 'https://staging.example.com/cdn/avatars/93.webp');
+        fixture.detectChanges();
+        img(fixture)?.dispatchEvent(new Event('error'));
+        fixture.detectChanges();
+
+        fixture.componentRef.setInput('src', '/storage/avatar1.png');
+        fixture.detectChanges();
+
+        expect(img(fixture)?.getAttribute('src')).toBe(`${environment.myhordes_url.replace(/\/$/, '')}/storage/avatar1.png`);
+    });
 });

@@ -8,8 +8,8 @@ import moment from 'moment';
 
 import { Cell } from '../../../../_abstract_model/types/cell.class';
 import { Citizen } from '../../../../_abstract_model/types/citizen.class';
-import { ItemCountShort } from '../../../../_abstract_model/types/item-count-short.class';
 import { Item } from '../../../../_abstract_model/types/item.class';
+import { ItemCountShort } from '../../../../_abstract_model/types/item-count-short.class';
 import { Ruin } from '../../../../_abstract_model/types/ruin.class';
 import { MapCellDetailsComponent } from './map-cell-details.component';
 
@@ -37,24 +37,26 @@ function newCell(overrides: Partial<Cell> = {}): Cell {
 }
 
 /**
- * Un `<td>` réellement attaché au document, requis par les pipes de positionnement (offsetParent).
- * jsdom ne calcule aucun layout réel : offsetParent reste toujours null, même attaché au DOM
- * (contrairement à un vrai navigateur où la table en `position: relative` en ferait l'offsetParent).
- * On le stub pour reproduire ce que la vraie table en production forcerait via CSS.
+ * Une case réellement attachée au document, requise par les pipes de positionnement
+ * (offsetParent). jsdom ne calcule aucun layout : offsetParent y reste toujours null, même
+ * attaché au DOM — contrairement à un vrai navigateur, où le conteneur de la grille en
+ * `position: relative` en ferait l'offsetParent. On le simule pour reproduire ce que le CSS
+ * impose en production.
  */
-function newCellHtml(): HTMLTableCellElement {
-    const table: HTMLTableElement = document.createElement('table');
-    const row: HTMLTableRowElement = table.insertRow();
-    const cellHtml: HTMLTableCellElement = row.insertCell();
-    document.body.appendChild(table);
-    Object.defineProperty(cellHtml, 'offsetParent', { get: (): HTMLTableElement => table, configurable: true });
+function newCellHtml(): HTMLElement {
+    const grid: HTMLElement = document.createElement('div');
+    const cellHtml: HTMLElement = document.createElement('div');
+    grid.classList.add('mho-draw-map');
+    grid.appendChild(cellHtml);
+    document.body.appendChild(grid);
+    Object.defineProperty(cellHtml, 'offsetParent', { get: (): HTMLElement => grid, configurable: true });
     return cellHtml;
 }
 
 describe('MapCellDetailsComponent', (): void => {
     let fixture: ComponentFixture<MapCellDetailsComponent>;
     let originalLocale: string;
-    const attachedTables: HTMLTableElement[] = [];
+    const attached_grids: HTMLElement[] = [];
 
     beforeEach(async (): Promise<void> => {
         originalLocale = moment.locale();
@@ -67,11 +69,11 @@ describe('MapCellDetailsComponent', (): void => {
 
     afterEach((): void => {
         moment.locale(originalLocale);
-        attachedTables.forEach((table: HTMLTableElement): void => table.remove());
-        attachedTables.length = 0;
+        attached_grids.forEach((grid: HTMLElement): void => grid.remove());
+        attached_grids.length = 0;
     });
 
-    function setInputs(cell: Cell, cellHtml: HTMLTableCellElement | undefined, allRuins: Ruin[] = [], allCitizens: Citizen[] = [], allItems: Item[] = []): void {
+    function setInputs(cell: Cell, cellHtml: HTMLElement | undefined, allRuins: Ruin[] = [], allCitizens: Citizen[] = [], allItems: Item[] = []): void {
         fixture.componentRef.setInput('cell', cell);
         fixture.componentRef.setInput('cellHtml', cellHtml);
         fixture.componentRef.setInput('allRuins', allRuins);
@@ -80,9 +82,9 @@ describe('MapCellDetailsComponent', (): void => {
         fixture.detectChanges();
     }
 
-    function attachedCellHtml(): HTMLTableCellElement {
-        const cellHtml: HTMLTableCellElement = newCellHtml();
-        attachedTables.push(<HTMLTableElement>cellHtml.closest('table'));
+    function attachedCellHtml(): HTMLElement {
+        const cellHtml: HTMLElement = newCellHtml();
+        attached_grids.push(<HTMLElement>cellHtml.closest('.mho-draw-map'));
         return cellHtml;
     }
 
@@ -96,6 +98,30 @@ describe('MapCellDetailsComponent', (): void => {
         setInputs(newCell(), attachedCellHtml());
 
         expect(fixture.nativeElement.querySelector('.mho-map-cell-detail')).not.toBeNull();
+    });
+
+    it('emits closed when the close button is pressed', (): void => {
+        setInputs(newCell(), attachedCellHtml());
+
+        let closed: number = 0;
+        fixture.componentInstance.closed.subscribe((): number => ++closed);
+        fixture.nativeElement.querySelector('.details-header .close').click();
+
+        expect(closed).toBe(1);
+    });
+
+    it('offers the update action only when the town can be edited', (): void => {
+        setInputs(newCell(), attachedCellHtml());
+        expect(fixture.nativeElement.querySelector('.update-cell')).toBeNull();
+
+        fixture.componentRef.setInput('canUpdate', true);
+        fixture.detectChanges();
+
+        let requested: number = 0;
+        fixture.componentInstance.updateRequested.subscribe((): number => ++requested);
+        fixture.nativeElement.querySelector('.update-cell').click();
+
+        expect(requested).toBe(1);
     });
 
     it('shows the ruin label when the cell sits on a known ruin', (): void => {

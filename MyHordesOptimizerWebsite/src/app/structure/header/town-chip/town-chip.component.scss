@@ -1,0 +1,124 @@
+/* Barre d'en-tête : la pastille est la seule à se comprimer, une fois le champ de recherche à sa
+   largeur minimale. Le nom se tronque d'abord ; au-delà, la pastille coupe sa propre fin plutôt
+   que de pousser le reste de la barre. */
+:host {
+    display: flex;
+    flex: 0 1 auto;
+    min-width: 0;
+}
+
+.chip {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+    height: 32px;
+    padding: 0 12px;
+    overflow: hidden;
+    border-radius: 999px;
+    background: var(--mho-topbar-chip);
+    font-size: 13px;
+    white-space: nowrap;
+}
+
+.summary {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+    overflow: hidden;
+}
+
+.town-name {
+    min-width: 3ch;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-weight: 600;
+}
+
+.day {
+    flex: 0 0 auto;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+}
+
+.dim {
+    color: var(--mho-topbar-muted);
+}
+
+.sep {
+    flex: 0 0 auto;
+    width: 1px;
+    height: 14px;
+    background: currentColor;
+    opacity: 0.25;
+}
+
+/* État de la ville : jamais porté par la couleur seule, le libellé le dit aussi. Chaos et
+   dévastée sur une pastille de surface : l'orange et le rouge restent lisibles quelle que
+   soit la couleur de la barre (rose, brune, verte). */
+.town-flag {
+    flex: 0 0 auto;
+    padding: 1px 8px;
+    border-radius: 999px;
+    border: 1px solid currentColor;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+
+    &.chaos {
+        color: var(--mho-warning);
+        background: var(--mho-surface);
+    }
+
+    &.devastated {
+        color: var(--mho-danger);
+        background: var(--mho-surface);
+    }
+
+    &.observed {
+        color: var(--mho-topbar-muted);
+    }
+}
+
+/* Sous 1280 px, le type quitte la barre : il reste dans l'infobulle. */
+@media (max-width: 1279.98px) {
+    :host(:not(.in-menu)) .type {
+        display: none;
+    }
+}
+
+/* Tête du menu (petit écran) : couleurs du menu, et retour à la ligne plutôt que troncature. */
+:host(.in-menu) {
+    display: block;
+    flex: 0 0 auto;
+    padding: 10px 10px 0;
+
+    .chip {
+        flex-wrap: wrap;
+        row-gap: 6px;
+        height: auto;
+        min-height: 32px;
+        padding: 6px 12px;
+        border-radius: var(--mho-radius-m);
+        background: var(--mho-surface);
+        box-shadow: inset 0 0 0 1px var(--mho-line);
+        color: var(--mho-text);
+        white-space: normal;
+    }
+
+    .summary {
+        flex-wrap: wrap;
+        row-gap: 4px;
+    }
+
+    .town-name {
+        overflow-wrap: anywhere;
+    }
+
+    .dim,
+    .town-flag.observed {
+        color: var(--mho-text-muted);
+    }
+}

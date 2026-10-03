@@ -24,6 +24,8 @@ export class Cell extends CommonModel<CellDTO> {
     public total_success!: number;
     public average_potential_remaining_dig!: number;
     public max_potential_remaining_dig!: number;
+    /** Zone excavée par un fouineur (capacité héroïque) ; null tant que MHO ne l'a pas relevé. */
+    public is_excavated!: boolean | null;
     public update_info!: UpdateInfo;
     public items!: ItemCountShort[];
     public citizens!: Citizen[];
@@ -79,6 +81,7 @@ export class Cell extends CommonModel<CellDTO> {
             totalSucces: this.total_success,
             averagePotentialRemainingDig: this.average_potential_remaining_dig,
             maxPotentialRemainingDig: this.max_potential_remaining_dig,
+            isExcavated: this.is_excavated,
             scavZoneLevel: this.scav_zone_level,
             scoutZoneLevel: this.scout_zone_level,
             scoutEstimationZombie: this.scout_estimation_zombie,
@@ -99,6 +102,17 @@ export class Cell extends CommonModel<CellDTO> {
             displayX: this.displayed_x,
             displayY: this.displayed_y
         };
+    }
+
+    /**
+     * L'API MyHordes envoie ce champ sous le nom `camped`, mais il vaut en réalité
+     * `blueprint == BlueprintFound` (`JSONv1Controller::getBuildingData`) : il dit si le plan
+     * du bâtiment a déjà été récupéré, pas si quelqu'un y campe. Il n'est renseigné que pour la
+     * case où se trouve l'utilisateur. Renommer le champ imposerait de toucher le DTO et l'API ;
+     * cet accès public sous son vrai nom suffit à ne pas propager la confusion.
+     */
+    public get is_blueprint_found(): boolean {
+        return this.is_ruin_camped;
     }
 
     /**
@@ -156,6 +170,7 @@ export class Cell extends CommonModel<CellDTO> {
             this.total_success = dto.totalSucces;
             this.average_potential_remaining_dig = dto.averagePotentialRemainingDig;
             this.max_potential_remaining_dig = dto.maxPotentialRemainingDig;
+            this.is_excavated = dto.isExcavated ?? null;
             this.scav_zone_level = dto.scavZoneLevel;
             this.scout_zone_level = dto.scoutZoneLevel;
             this.scout_estimation_zombie = dto.scoutEstimationZombie;

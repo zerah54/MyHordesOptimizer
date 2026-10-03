@@ -13,6 +13,12 @@ const components: Imports = [];
 const pipes: Imports = [];
 const material_modules: Imports = [MatButtonModule, MatCardModule, MatIconModule, MatMenuModule, MatTooltipModule];
 
+/** Une étape du parcours de connexion. */
+export interface FirstUseStep {
+    title: string;
+    text: string;
+}
+
 @Component({
     selector: 'mho-tuto-site-first-use',
     templateUrl: './tuto-site-first-use.component.html',
@@ -21,13 +27,29 @@ const material_modules: Imports = [MatButtonModule, MatCardModule, MatIconModule
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TutoSiteFirstUseComponent {
-    private readonly clipboard: ClipboardService = inject(ClipboardService);
-    private readonly document: Document = inject<Document>(DOCUMENT);
-
     protected readonly title: string = $localize`Première utilisation du site`;
 
-    protected readonly text_1: string = $localize`Lors de votre première utilisation du site vous n'aurez pas accès aux pages sous le menu "Ma ville". En effet, il faut au préalable renseigner son identifiant externe pour les applications, en haut à droite de la page.`;
-    protected readonly text_2: string = $localize`L'identifiant externe pour les applications se trouve sur le site de MyHordes, dans la page de votre âme, onglet "Avancé". Une fois copié, il suffit de le coller dans le champ dédié sur le site de MyHordes Optimizer et de valider.`;
+    protected readonly lead: string = $localize`Les pages du menu "Ma ville" ne s'ouvrent qu'une fois le site relié à votre compte MyHordes. Cela se fait une seule fois, en trois étapes.`;
+
+    protected readonly steps: FirstUseStep[] = [
+        {
+            title: $localize`Cliquez sur "Se connecter"`,
+            text: $localize`Le bouton se trouve en haut à droite de la page.`
+        },
+        {
+            title: $localize`Autorisez MyHordes Optimizer`,
+            text: $localize`Vous êtes envoyé sur MyHordes, qui vous demande d'autoriser MyHordes Optimizer à lire vos informations de jeu.`
+        },
+        {
+            title: $localize`C'est prêt`,
+            text: $localize`Vous revenez ici connecté, et le menu "Ma ville" se débloque.`
+        }
+    ];
+
+    protected readonly note: string = $localize`Cette autorisation remplace la saisie manuelle de l'identifiant externe pour les applications, qui se trouvait dans la page de votre âme sur MyHordes, onglet "Avancé".`;
+
+    private readonly clipboard: ClipboardService = inject(ClipboardService);
+    private readonly document: Document = inject<Document>(DOCUMENT);
 
     protected copyUrl(): void {
         const url: string = this.document.location.href;
@@ -35,13 +57,11 @@ export class TutoSiteFirstUseComponent {
     }
 
     protected shareForum(): void {
-        let text: string = '';
+        const steps: string = this.steps
+            .map((step: FirstUseStep, index: number): string => `[b]${index + 1}. ${step.title}[/b]\n${step.text}`)
+            .join('\n\n');
 
-        text += `[b][big]${this.title}[/big][/b]`;
-        text += '\n\n';
-        text += this.text_1;
-        text += '\n\n';
-        text += this.text_2;
+        const text: string = `[b][big]${this.title}[/big][/b]\n\n${this.lead}\n\n${steps}\n\n[i]${this.note}[/i]`;
 
         this.clipboard.copy(text, $localize`Le texte a bien été copié`);
     }

@@ -2,38 +2,129 @@
     display: contents;
 
     .mho-items {
-
+        /* La page n'est plus une `mat-card-content` : c'est le panneau d'onglets du wiki qui
+           lui donne sa hauteur, et les blocs internes en `flex: 1; overflow: auto` en dépendent. */
         display: flex;
         flex-direction: column;
+        gap: 12px;
+        height: 100%;
+        min-height: 0;
 
-        ul {
-            padding: 0;
-            margin-top: 0;
-            flex: 1;
-            overflow: auto;
-
-            .category {
-                > h2 {
-                    margin: 0.5em 0;
-                }
-
-                > .items {
-                    display: flex;
-                    flex-wrap: wrap;
-                    gap: 0.25em;
-                }
-            }
-        }
-
+        /* `baseline` alignait la ligne de texte du premier champ sur celle du second, dont la
+           structure diffère (un `mho-select` n'a pas d'`input`) : les deux cadres se retrouvaient
+           décalés de 2 px. Même hauteur de champ, alignement au centre. */
         .filter {
             display: flex;
-            align-items: baseline;
+            align-items: center;
             gap: 0.5em;
             flex-wrap: wrap;
+            flex-shrink: 0;
 
             .properties-filter {
                 flex: 1;
                 min-width: 350px;
+            }
+
+            .count {
+                font-size: 12px;
+                color: var(--mho-text-muted);
+                white-space: nowrap;
+            }
+        }
+
+        /* Catalogue à gauche, fiche à droite : ouvrir un objet ne doit pas pousser les suivants
+           vers le bas, et la fiche a besoin de bien plus de place qu'une tuile. */
+        .master-detail {
+            flex: 1;
+            min-height: 0;
+            display: flex;
+            align-items: stretch;
+            gap: 18px;
+        }
+
+        .catalog {
+            flex: 1;
+            min-width: 0;
+            margin: 0;
+            padding: 0 4px 0 0;
+            list-style: none;
+            overflow: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+
+            .category-title {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                margin: 0 0 8px;
+                font-family: var(--mho-font-display);
+                font-size: 14px;
+                font-weight: 600;
+
+                .count {
+                    font-size: 12px;
+                    font-weight: 600;
+                    color: var(--mho-text-muted);
+                }
+
+                /* Filet de catégorie : sépare sans peser, là où un fond plein aurait concurrencé
+                   les tuiles. */
+                .rule {
+                    flex-grow: 1;
+                    height: 1px;
+                    background: var(--mho-line);
+                }
+            }
+
+            .items {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+                gap: 6px;
+
+                /* Le minimum de 250 px vient de la banque, où la quantité s'ajoute au libellé.
+                   Sans cette remise à zéro, le catalogue retombe à deux colonnes. */
+                ::ng-deep .mho-item.simple {
+                    min-width: 0;
+                }
+            }
+
+            .no-result {
+                padding: 24px 0;
+                text-align: center;
+                color: var(--mho-text-muted);
+            }
+        }
+
+        .detail {
+            width: 366px;
+            flex-shrink: 0;
+            overflow: auto;
+            background: var(--mho-surface);
+            border: 1px solid var(--mho-line);
+            border-radius: var(--mho-radius-l);
+            padding: 12px;
+
+            .detail-empty {
+                margin: 0;
+                padding: 32px 12px;
+                text-align: center;
+                color: var(--mho-text-muted);
+                font-size: 13px;
+            }
+        }
+
+        /* Sous 1100 px la fiche passe sous le catalogue : deux colonnes ne tiennent plus sans
+           écraser les tuiles. */
+        @media (max-width: 1099px) {
+            .master-detail {
+                flex-direction: column;
+            }
+
+            .detail {
+                width: auto;
+                flex-shrink: 1;
+                max-height: 45%;
             }
         }
     }

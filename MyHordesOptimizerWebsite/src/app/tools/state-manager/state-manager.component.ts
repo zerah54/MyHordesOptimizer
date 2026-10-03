@@ -317,10 +317,10 @@ export class StateManagerComponent implements OnInit {
         return !this.steps.some((entry: StepEntry) => entry.step.type === 'second_wind');
     }
 
-    /** Vrai si un déplacement est encore jouable : il reste des PA/PE, ou un objet du sac peut en restituer. */
-    protected canMove(): boolean {
+    /** Vrai si le déplacement est payable : PA seuls en zone proche, PA ou PE (repli sur les PA) en zone lointaine. */
+    protected canMove(is_near_zone: boolean): boolean {
         const state: CitizenState = this.currentState();
-        return state.ap + state.sp > 0 || this.remainingBag().length > 0;
+        return is_near_zone ? state.ap > 0 : state.ap + state.sp > 0;
     }
 
     /** Vrai si le vélo n'a pas encore été utilisé aujourd'hui : ni monté au départ, ni monté puis descendu dans la séquence. */

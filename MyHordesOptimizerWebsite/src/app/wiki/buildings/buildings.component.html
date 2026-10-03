@@ -1,16 +1,10 @@
-<mat-card-header class="mho-buildings-header">
-    <mat-card-title>
-        <ng-container i18n>Chantiers</ng-container>
-    </mat-card-title>
-    <div class="actions">
+<div class="mho-buildings">
+    <div class="page-toolbar">
         <mat-button-toggle-group (ngModelChange)="onModeChange($event)" [ngModel]="hard_mode" i18n-aria-label aria-label="Mode de jeu">
             <mat-button-toggle [value]="false" i18n>Normal</mat-button-toggle>
             <mat-button-toggle [value]="true" i18n>Pandémonium</mat-button-toggle>
         </mat-button-toggle-group>
     </div>
-</mat-card-header>
-
-<mat-card-content class="mho-buildings">
     <div class="mat-elevation-z8 table-scroll">
         <table #table [dataSource]="rows()" mat-table>
 
@@ -163,7 +157,8 @@
             </ng-container>
 
             <tr *matHeaderRowDef="displayed_columns; sticky: true" mat-header-row></tr>
-            <tr *matRowDef="let row; columns: displayed_columns;" mat-row></tr>
+            <tr *matRowDef="let row; columns: displayed_columns;" mat-row
+                [class.mho-row-selected]="isSelected(row)" [class.mho-row-targeted]="row.id === targeted_id()"></tr>
 
             <tr *matNoDataRow class="mat-row">
                 <td [attr.colspan]="displayed_columns.length" class="mat-cell" i18n>
@@ -179,23 +174,37 @@
          largeur. En div sœur de .table-scroll, il prend toute la largeur de la carte et reste fixe
          sous le tableau qui défile, sans toucher à ses colonnes. -->
     @if (hasSelection()) {
+        @let totals = selectedTotals();
+        @let missing = missingFromWishlist(totals.resources);
         <div class="selection-summary">
             <span class="count">
-                {{ selectedTotals().count }}
-                <ng-container i18n>{selectedTotals().count, plural, =1 {chantier sélectionné} other {chantiers sélectionnés}}</ng-container>
+                {{ totals.count }}
+                <ng-container i18n>{totals.count, plural, =1 {chantier sélectionné} other {chantiers sélectionnés}}</ng-container>
             </span>
             <span class="ap">
                 <mho-icon-ap></mho-icon-ap>
-                {{ selectedTotals().ap }}
+                {{ totals.ap }}
             </span>
             <ul class="resources">
-                @for (resource of selectedTotals().resources; track resource.item_id) {
+                @for (resource of totals.resources; track resource.item_id) {
                     <li [matTooltip]="resource.label[locale]">
                         <img [alt]="resource.label[locale]" [src]="HORDES_IMG_REPO + resource.img">
                         <span>×{{ resource.count }}</span>
                     </li>
                 }
             </ul>
+            <!-- Proposé seulement s'il reste des ressources absentes de la liste : celles déjà
+                 inscrites, quelle que soit leur zone, ne sont jamais remplacées. -->
+            @if (missing.length > 0) {
+                <button mat-stroked-button type="button" class="send-to-wishlist" [disabled]="sending_to_wishlist()"
+                        (click)="sendToWishlist(missing)"
+                        i18n-matTooltip matTooltip="Ajoute les ressources absentes de la liste de courses, en zone ∞ et en quantité ∞">
+                    <span class="with-icon">
+                        <img [src]="HORDES_IMG_REPO + 'item/item_cart.gif'" alt="">
+                        <ng-container i18n>Envoyer à la liste de courses</ng-container>
+                    </span>
+                </button>
+            }
         </div>
     }
-</mat-card-content>
+</div>

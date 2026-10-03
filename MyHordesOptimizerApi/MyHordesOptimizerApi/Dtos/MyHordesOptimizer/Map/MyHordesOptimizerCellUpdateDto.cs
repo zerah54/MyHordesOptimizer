@@ -19,6 +19,14 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Map
         [JsonProperty("isRuinCamped")]
         public bool? IsRuinCamped { get; set; }
 
+        /// <summary>Bâtiment vide (plus rien à fouiller dans ses tas), saisi manuellement.</summary>
+        [JsonProperty("isRuinDryed")]
+        public bool? IsRuinDryed { get; set; }
+
+        /// <summary>Nombre de tas d'un bâtiment enseveli, saisi manuellement.</summary>
+        [JsonProperty("nbRuinDig")]
+        public int? NbRuinDig { get; set; }
+
         [JsonProperty("items")]
         public List<UpdateObjectDto> Items { get; set; }
 

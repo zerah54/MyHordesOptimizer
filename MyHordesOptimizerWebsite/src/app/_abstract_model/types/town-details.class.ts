@@ -4,6 +4,8 @@ import { TownTypeId } from './_types';
 
 export class TownDetails extends CommonModel<TownDetailsDTO> {
     public town_id!: number;
+    /** Nom de la ville, tel que MyHordes le donne (`map.city.name`). */
+    public town_name: string | null = null;
     public town_x!: number;
     public town_y!: number;
     public town_max_x!: number;
@@ -23,6 +25,7 @@ export class TownDetails extends CommonModel<TownDetailsDTO> {
     public modelToDto(): TownDetailsDTO {
         return {
             townId: this.town_id,
+            townName: this.town_name,
             townX: this.town_x,
             townY: this.town_y,
             townMaxX: this.town_max_x,
@@ -38,6 +41,7 @@ export class TownDetails extends CommonModel<TownDetailsDTO> {
     protected dtoToModel(dto?: TownDetailsDTO): void {
         if (dto) {
             this.town_id = dto.townId;
+            this.town_name = dto.townName ?? null;
             this.town_x = dto.townX;
             this.town_y = dto.townY;
             this.town_max_x = dto.townMaxX;

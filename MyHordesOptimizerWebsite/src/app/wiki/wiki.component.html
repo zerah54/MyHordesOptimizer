@@ -1,0 +1,10 @@
+<mat-card-header>
+    <mat-card-title>{{ current_label() }}</mat-card-title>
+</mat-card-header>
+<!-- Pas de barre d'onglets : les sept pages sont déjà dans le menu, qui porte en plus les badges
+     « Spoil ». Les deux navigations faisaient doublon. -->
+<mat-card-content class="mho-wiki">
+    <div class="wiki-page">
+        <router-outlet></router-outlet>
+    </div>
+</mat-card-content>

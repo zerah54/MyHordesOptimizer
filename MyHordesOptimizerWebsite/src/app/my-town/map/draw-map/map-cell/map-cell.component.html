@@ -1,52 +1,70 @@
-<td #cellHtml (click)="openCellUpdate()" (mouseenter)="changeCurrentCell(cell())" (mouseleave)="changeCurrentCell(undefined)"
-    [class.alert]="options().map_type === 'danger'"
-    [class.digs]="options().map_type === 'digs'"
-    [class.never-visited]="cell().is_never_visited"
-    [class.scout]="options().map_type === 'scout'"
-    [class.scrut-border-bottom]="cell() | scrutBorderBottom:options():drawedMap()"
-    [class.scrut-border-left]="cell() | scrutBorderLeft:options():drawedMap()"
-    [class.scrut-border-right]="cell() | scrutBorderRight:options():drawedMap()" [class.scrut-border-top]="cell() | scrutBorderTop:options():drawedMap()"
-    [class.town]="cell().is_town"
-    [class.trash]="options().map_type === 'trash'"
-    [class.visited-today]="cell().is_visited_today"
-    [class]="`
-        ${options().map_type === 'danger' ? 'danger-' + cell().danger_level : ''}
-        ${options().map_type === 'digs' ? 'dig-' + (cell() | digLevel:options()) : ''}
-        ${options().map_type === 'trash' ? 'trash-' + ((cell() | trashValue:options():allItems())|trashLevel) : ''}
-        ${options().map_type === 'scout' && cell().scout_zone_level !== null ? 'scout-' + cell().scout_zone_level : ''}
-        ${cell().zone_regen ? cell().zone_regen?.value?.class : ''}
-    `"
-    [mhoMapCellTooltipAllCitizens]="allCitizens()"
-    [mhoMapCellTooltipAllItems]="allItems()"
-    [mhoMapCellTooltipAllRuins]="allRuins()"
-    [mhoMapCellTooltip]="cell()" class="cell map-cell">
+<div #cellHtml role="gridcell" class="cell map-cell" [class]="background_classes()"
+     (click)="selectCell()" (mouseenter)="changeCurrentCell(cell())" (mouseleave)="changeCurrentCell(undefined)"
+     [class.selected]="selected()"
+     [class.crossed]="crossed()"
+     [class.is-me]="is_my_cell()"
+     [class.scrut-border-bottom]="cell() | scrutBorderBottom:options():drawedMap()"
+     [class.scrut-border-left]="cell() | scrutBorderLeft:options():drawedMap()"
+     [class.scrut-border-right]="cell() | scrutBorderRight:options():drawedMap()"
+     [class.scrut-border-top]="cell() | scrutBorderTop:options():drawedMap()"
+     [mhoMapCellTooltipAllCitizens]="allCitizens()"
+     [mhoMapCellTooltipAllItems]="allItems()"
+     [mhoMapCellTooltipAllRuins]="allRuins()"
+     [mhoMapCellTooltip]="cell()">
 
     @if (cell().ruin_id) {
-        <div [class]="'ruin'">
-            <span [class.empty-ruin]="cell().is_ruin_dryed">
-                @if (cell() | isRuin:allRuins()) {
-                    <ng-container>R</ng-container>
-                }
-                @if (cell().nb_ruin_dig) {
-                    <img [ngSrc]="HORDES_IMG_REPO + 'building/small_dig.gif'" height="16" width="16">
-                    <span class="nb-digs">{{ cell().nb_ruin_dig }}</span>
+        <!-- Tout bâtiment a son carré, convention de la carte du jeu. L'icône d'une ruine explorable
+             ou d'un bâtiment enseveli, comme l'illustration au zoom « détail », se pose par-dessus :
+             elle remplaçait le carré, et une case à bâtiment ne se reconnaissait plus d'un coup d'œil. -->
+        <div class="ruin">
+            <span class="ruin-square" [class.empty-ruin]="cell().is_ruin_dryed">
+                @if (blueprint_badge(); as badge) {
+                    <i class="blueprint" [class.uncommon]="badge === 'uncommon'" [class.rare]="badge === 'rare'"
+                       i18n-title title="Plan à récupérer"></i>
                 }
             </span>
+            @switch (ruin_marker()) {
+                @case ('buried') {
+                    <span class="ruin-overlay">
+                        <!-- Tas à déblayer : chiffre nu en bas à droite de l'icône, à tous les paliers de zoom. -->
+                        <span class="ruin-icon-anchor">
+                            <img class="ruin-icon" [src]="HORDES_IMG_REPO + 'building/small_dig.gif'" alt="" i18n-title
+                                 title="Bâtiment enseveli">
+                            @if (ruin_digs(); as ruin_digs) {
+                                <span class="ruin-digs" i18n-title title="Tas à déblayer">{{ ruin_digs }}</span>
+                            }
+                        </span>
+                    </span>
+                }
+                @case ('explorable') {
+                    <span class="ruin-overlay">
+                        <img class="ruin-icon" [src]="HORDES_IMG_REPO + 'icons/small_exploration.gif'" alt="" i18n-title
+                             title="Ruine explorable">
+                    </span>
+                }
+                @default {
+                    @if (ruin_illustration(); as illustration) {
+                        <span class="ruin-overlay" [class.empty-ruin]="cell().is_ruin_dryed">
+                            <img class="ruin-illustration" [src]="HORDES_IMG_REPO + illustration" alt="" loading="lazy">
+                        </span>
+                    }
+                }
+            }
         </div>
     }
 
     @if (cell().is_town) {
-        <div [class]="'town-draw'">
-            <img [ngSrc]="HORDES_IMG_REPO + 'icons/map/map_zone_town.svg'" height="25" width="25">
+        <div class="town-draw">
+            <img [ngSrc]="HORDES_IMG_REPO + 'icons/map/map_zone_town.svg'" height="25" width="25" alt="">
         </div>
     }
 
     @if (cell().is_dryed) {
-        <div [class]="'dried'"></div>
+        <div class="dried"></div>
     }
 
-    @if (cell() | myCell) {
-        <div [class]="'my-cell'"></div>
+    @if (is_my_cell()) {
+        <div class="my-cell"></div>
     }
 
     <div [class.dist-border-bottom]="cell() | distBorderBottom:options():drawedMap()"
@@ -55,58 +73,18 @@
          [class.dist-border-top]="cell() | distBorderTop:options():drawedMap()"></div>
 
     @if (!cell().is_town) {
+        <!-- Coins réglables dans le panneau Affichage, par type de carte (map-corners.ts). -->
         <div class="content">
-            <div class="corner-top-left corner">
-                @if (cell().note) {
-                    <img [ngSrc]="HORDES_IMG_REPO + 'icons/small_talk.gif'" height="12" width="12">
-                }
-            </div>
-            <div class="corner-top-right corner">
-                @if ((cell().citizens && cell().citizens.length > 0) || cell().nb_hero > 0) {
-                    <div>
-                        <img [ngSrc]="HORDES_IMG_REPO + 'log/citizen.gif'" height="12" width="12">
-                        <span class="detail-value">{{ cell().nb_hero }}</span>
-                    </div>
-                }
-            </div>
-            <div class="corner-bottom-left corner">
-                @if (options().map_type === 'danger') {
-                    <div>
-                        <img [ngSrc]="HORDES_IMG_REPO + 'icons/map/map_icon_splatter.png'" height="9" width="12">
-                        <span class="detail-value">{{ cell().nb_zombie_killed || 0 }}</span>
-                    </div>
-                }
-            </div>
-            <div class="corner-bottom-right corner">
-                @if (options().map_type === 'danger') {
-                    <div>
-                        <img [ngSrc]="HORDES_IMG_REPO + 'icons/small_zombie.gif'" height="12" width="12">
-                        @if (cell().hasFresherScoutEstimation()) {
-                            <span class="detail-value estimation"
-                                  i18n-title
-                                  title="Estimation d'un éclaireur : entre {{ cell().scout_estimation_min }} et {{ cell().scout_estimation_max }} zombies">
-                                ≈{{ cell().scout_estimation_zombie }}
-                            </span>
-                        } @else {
-                            <span class="detail-value">{{ cell().nb_zombie || 0 }}</span>
-                        }
-                    </div>
-                }
-                @if (options().map_type === 'digs') {
-                    <div>
-                        {{
-                            ((options().dig_mode === 'max' ? cell().max_potential_remaining_dig :
-                                cell().average_potential_remaining_dig) - cell().total_success) | number:'1.0-0':locale
-                        }}
-                    </div>
-                }
-                @if (options().map_type === 'trash') {
-                    <div>
-                        {{ cell() | trashValue:options():allItems() }}
-                    </div>
-                }
-            </div>
+            @for (corner of corners(); track corner.position) {
+                <div class="corner {{ corner.css_class }}" [attr.title]="corner.title">
+                    @if (corner.icon) {
+                        <img [src]="HORDES_IMG_REPO + corner.icon" alt="">
+                    }
+                    @if (corner.value !== null) {
+                        <span class="detail-value" [class.bare]="!corner.icon" [class.estimation]="corner.estimation">{{ corner.value }}</span>
+                    }
+                </div>
+            }
         </div>
     }
-</td>
-
+</div>

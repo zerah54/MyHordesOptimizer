@@ -23,8 +23,12 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Map
         public bool? IsRuinDryed { get; set; }
         public int? NbRuinDig { get; set; }
         public int? TotalSucces { get; set; }
+        /// <summary>Fouilles restantes, estimation moyenne. Déjà nettes des fouilles réussies : ne plus les soustraire.</summary>
         public double? AveragePotentialRemainingDig { get; set; }
+        /// <summary>Fouilles restantes, plafond. Déjà nettes des fouilles réussies.</summary>
         public int? MaxPotentialRemainingDig { get; set; }
+        /// <summary>Zone excavée par un Fouineur ; <c>null</c> si MHO ne l'a pas encore relevé.</summary>
+        public bool? IsExcavated { get; set; }
         public int NbKm { get; set; }
         public int NbPa { get; set; }
         public string ZoneRegen { get; set; }

@@ -37,5 +37,11 @@ namespace MyHordesOptimizerApi.Configuration.Impl
         public int? MaxItemPerCell => _configuration.GetValue<int?>("MaxItemPerCell");
 
         public int DigThrottle => _configuration.GetValue<int>("DigThrottle");
+
+        // Valeurs de config/app/rules.yml (MyHordes) par défaut : une section « Scrutateur » d'un
+        // autre environnement qui ne les porterait pas ne doit pas les ramener à 0.
+        public int WindDistance => _configuration.GetValue<int>("WindDistance", 2);
+
+        public int WindDistanceSmallMap => _configuration.GetValue<int>("WindDistanceSmallMap", -1);
     }
 }

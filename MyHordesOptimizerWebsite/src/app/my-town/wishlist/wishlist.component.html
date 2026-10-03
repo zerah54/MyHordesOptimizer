@@ -28,6 +28,12 @@
 <mat-card-content class="mho-wishlist">
     @if (wishlist_info()) {
         <div class="table-container">
+            @if (unsaved_duplicates().length > 0) {
+                <p class="duplicate-warning" role="alert">
+                    <mat-icon aria-hidden="true">warning</mat-icon>
+                    <span i18n>Modifications non enregistrées : {{ unsaved_duplicates().join(', ') }} figure deux fois dans la même zone. Changez la zone d'une des lignes ou supprimez-la.</span>
+                </p>
+            }
             <div class="table-headers">
                 @if (edition_mode()) {
                     <mat-form-field subscriptSizing="dynamic">
@@ -93,7 +99,9 @@
                                         @case ('name') {
                                             <div class="name-container">
                                                 @if (row | itemAlreadyInList:$safeNavigationMigration(wishlist_info()?.wishlist_items)) {
-                                                    <img [ngSrc]="HORDES_IMG_REPO + 'emotes/warning.gif'" width="16" height="16">&nbsp;
+                                                    <img [ngSrc]="HORDES_IMG_REPO + 'emotes/warning.gif'" width="16" height="16"
+                                                         matTooltip="Cet objet figure deux fois dans la même zone : la liste n'est pas enregistrée tant que le doublon reste."
+                                                         i18n-matTooltip>&nbsp;
                                                 }
                                                 <img [ngSrc]="HORDES_IMG_REPO + row.item.img" width="16"
                                                      height="16">&nbsp;<span>{{ row.item.label[locale] }}</span>

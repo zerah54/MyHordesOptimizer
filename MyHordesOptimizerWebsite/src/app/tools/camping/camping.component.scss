@@ -1,4 +1,3 @@
-@use 'variables';
 
 :host {
     display: contents;
@@ -15,48 +14,212 @@
     }
 
     .mho-camping {
+
+        /* Saisie à gauche, résultat épinglé à droite : cocher une case et voir l'effet sans
+           faire défiler la page. Le résultat était en bas du formulaire, hors de vue. */
+        .camping-layout {
+            display: flex;
+            align-items: flex-start;
+            gap: 18px;
+        }
+
+        /* Deux colonnes de hauteur comparable : le citoyen et la ville (courtes) empilées,
+           le bâtiment (la plus longue) à côté. Une grille à trois cartes laissait un trou sous
+           la ville, la ligne prenant la hauteur du bâtiment. Sous 616 px, une seule colonne
+           dans l'ordre du DOM : citoyen, ville, bâtiment. */
         .camping-params {
+            flex: 1;
+            min-width: 0;
             display: flex;
             flex-wrap: wrap;
-            column-gap: 1em;
+            align-items: flex-start;
+            gap: 16px;
 
-            > div {
-                flex: 1;
-                min-width: 300px;
+            > .param-stack,
+            > .param-card {
+                flex: 1 1 300px;
+                min-width: 0;
+            }
+        }
 
-                h3 {
-                    margin-bottom: 0.5em;
+        .param-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .param-card {
+            background: var(--mho-surface);
+            border: 1px solid var(--mho-line);
+            border-radius: var(--mho-radius-l);
+            padding: 14px 16px 6px;
+
+            .param-title {
+                margin: 0 0 12px;
+                font-family: var(--mho-font-display);
+                font-size: 14px;
+                font-weight: 600;
+            }
+
+            h3 {
+                margin: 16px 0 8px;
+                font-family: var(--mho-font-display);
+                font-size: 13px;
+                font-weight: 600;
+            }
+
+            .mat-mdc-checkbox {
+                display: block;
+
+                img {
+                    margin-right: 0.5em;
+                    vertical-align: sub;
+                }
+            }
+
+            /* Préfixes et suffixes : espacement commun dans components.scss. */
+            .mat-mdc-form-field {
+                display: block;
+            }
+
+            .or {
+                text-align: center;
+                margin-bottom: 1em;
+            }
+        }
+
+        .result-card {
+            width: 300px;
+            flex-shrink: 0;
+            /* Épinglé : il suit le défilement du formulaire plutôt que de disparaître en haut. */
+            position: sticky;
+            top: 0;
+            display: flex;
+            flex-direction: column;
+            background: var(--mho-surface);
+            border: 1px solid var(--mho-line);
+            border-radius: var(--mho-radius-l);
+
+            .result-header {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 8px;
+                padding: 6px 8px 6px 16px;
+                border-bottom: 1px solid var(--mho-line);
+
+                .result-title {
+                    font-family: var(--mho-font-display);
+                    font-size: 14px;
+                    font-weight: 600;
+                }
+            }
+
+            .result-body {
+                display: flex;
+                flex-direction: column;
+                gap: 8px;
+                padding: 16px;
+
+                .result-raw {
+                    font-size: 12px;
+                    color: var(--mho-text-muted);
+                    font-variant-numeric: tabular-nums;
                 }
 
-                .mat-mdc-checkbox {
-                    display: block;
-
-                    img {
-                        margin-right: 0.5em;
-                        vertical-align: sub;
-                    }
+                /* Le libellé du jeu (« vous êtes bien caché… ») dit ce que le pourcentage vaut. */
+                .result-label {
+                    margin: 4px 0 0;
+                    font-size: 13px;
                 }
 
+                .result-empty {
+                    margin: 0;
+                    color: var(--mho-text-muted);
+                    font-size: 13px;
+                }
 
-                .mat-mdc-form-field {
-                    display: block;
+                /* Une ligne par facteur : libellé et contribution signée, barre dessous. Le signe
+                   est écrit, la couleur ne fait que le redoubler. */
+                .result-details {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 8px;
+                    margin-top: 8px;
+                    padding-top: 12px;
+                    border-top: 1px solid var(--mho-line);
 
-                    .mat-mdc-form-field-icon-prefix {
-                        margin-left: 0.5em;
-                        margin-right: 0.5em;
+                    ul {
+                        display: flex;
+                        flex-direction: column;
+                        gap: 8px;
+                        margin: 0;
+                        padding: 0;
+                        list-style: none;
                     }
 
-                    .mat-mdc-form-field-icon-suffix {
-                        small {
-                            margin-right: 0.5em;
+                    li {
+                        display: grid;
+                        grid-template-columns: minmax(0, 1fr) auto;
+                        column-gap: 8px;
+                        row-gap: 3px;
+                        align-items: baseline;
+                        font-size: 12.5px;
+
+                        .factor-value {
+                            font-weight: 600;
+                            font-variant-numeric: tabular-nums;
+                            color: var(--mho-success);
+                        }
+
+                        .factor-bar {
+                            grid-column: 1 / -1;
+                            height: 4px;
+                            border-radius: 99px;
+                            background: var(--mho-surface-3);
+                            overflow: hidden;
+
+                            > span {
+                                display: block;
+                                height: 100%;
+                                border-radius: 99px;
+                                background: var(--mho-success);
+                            }
+                        }
+
+                        &.is-negative {
+                            .factor-value {
+                                color: var(--mho-danger);
+                            }
+
+                            .factor-bar > span {
+                                background: var(--mho-danger);
+                            }
                         }
                     }
                 }
+            }
 
-                .or {
-                    text-align: center;
-                    margin-bottom: 1em;
+            .result-actions {
+                padding: 12px 16px;
+                border-top: 1px solid var(--mho-line);
+
+                .mat-mdc-button-base {
+                    width: 100%;
                 }
+            }
+        }
+
+        /* Sous 1100 px le résultat repasse sous le formulaire : deux colonnes n'y tiennent plus
+           sans écraser les champs. */
+        @media (max-width: 1099px) {
+            .camping-layout {
+                flex-direction: column;
+            }
+
+            .result-card {
+                width: 100%;
+                position: static;
             }
         }
     }

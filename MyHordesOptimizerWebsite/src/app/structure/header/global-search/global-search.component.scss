@@ -1,0 +1,295 @@
+/* Champ de la barre d'en-tête : pastille sur `--mho-topbar-chip`, comme la pastille de ville. */
+:host {
+    display: flex;
+    align-items: center;
+    /* Prend jusqu'à 300 px avant l'espace libre de la barre (poids de croissance écrasant face à
+       celui de l'espaceur) et ne descend pas sous 160 px : au-delà, c'est la pastille de ville qui
+       se comprime. */
+    flex: 1000 1 160px;
+    min-width: 160px;
+    max-width: 300px;
+}
+
+:host(.is-compact) {
+    flex: 0 0 auto;
+    min-width: 0;
+    max-width: none;
+}
+
+/* Petit écran : le champ recouvre toute la barre (qui porte `position: relative`) le temps de la saisie. */
+:host(.is-expanded) {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    padding: 0 8px;
+    background: var(--mho-topbar-bg);
+}
+
+.open-button {
+    color: var(--mho-topbar-fg);
+}
+
+.field {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    height: 36px;
+    padding: 0 6px 0 10px;
+    border-radius: var(--mho-radius-m);
+    background: var(--mho-topbar-chip);
+    color: var(--mho-topbar-muted);
+
+    /* Anneau de focus sur la pastille entière : le champ lui-même n'a ni bordure ni contour. */
+    &:focus-within {
+        outline: 2px solid var(--mho-topbar-fg);
+        outline-offset: 1px;
+    }
+}
+
+.lead {
+    flex: 0 0 auto;
+    width: 20px;
+    height: 20px;
+    font-size: 20px;
+}
+
+.input {
+    flex: 1 1 auto;
+    min-width: 0;
+    height: 100%;
+    padding: 0;
+    border: 0;
+    outline: 0;
+    background: transparent;
+    color: var(--mho-topbar-fg);
+    font: 400 13px var(--mho-font-body);
+
+    &::placeholder {
+        color: var(--mho-topbar-muted);
+        opacity: 1;
+    }
+}
+
+.field-button {
+    display: grid;
+    place-items: center;
+    flex: 0 0 auto;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border: 0;
+    border-radius: var(--mho-radius-s);
+    background: transparent;
+    color: inherit;
+    cursor: pointer;
+
+    mat-icon {
+        width: 18px;
+        height: 18px;
+        font-size: 18px;
+    }
+
+    &:hover {
+        color: var(--mho-topbar-fg);
+    }
+
+    &:focus-visible {
+        outline: 2px solid var(--mho-topbar-fg);
+    }
+}
+
+.kbd {
+    flex: 0 0 auto;
+    padding: 0 6px;
+    border: 1px solid currentColor;
+    border-radius: 5px;
+    font: 500 11px/16px var(--mho-font-body);
+    opacity: 0.7;
+}
+
+/* ---------------------------------------------------------------- panneau (calque CDK) */
+
+.panel {
+    display: flex;
+    flex-direction: column;
+    width: min(440px, calc(100vw - 16px));
+    max-height: min(70vh, 560px);
+    overflow: hidden;
+    border: 1px solid var(--mho-line-strong);
+    border-radius: var(--mho-radius-m);
+    background: var(--mho-surface-2);
+    color: var(--mho-text);
+    box-shadow: 0 12px 32px -8px var(--mho-shadow-color);
+    font-size: 13px;
+
+    &.is-compact {
+        width: calc(100vw - 16px);
+    }
+}
+
+.results {
+    flex: 1 1 auto;
+    min-height: 0;
+    padding: 4px 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+}
+
+.group + .group {
+    margin-top: 4px;
+    padding-top: 4px;
+    border-top: 1px solid var(--mho-line);
+}
+
+.group-title {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 6px 14px 4px;
+    color: var(--mho-text-muted);
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+
+    /* Compteur cliquable : déplie le groupe (la ligne « afficher » fait de même au clavier). */
+    .count.is-link {
+        cursor: pointer;
+        text-decoration: underline;
+        text-underline-offset: 2px;
+
+        &:hover {
+            color: var(--mho-text);
+        }
+    }
+}
+
+.option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 40px;
+    padding: 4px 14px;
+    cursor: pointer;
+
+    /* Option active : fond ET liseré, jamais la couleur seule. */
+    &.is-active {
+        background: var(--mho-accent-soft);
+        box-shadow: inset 3px 0 0 var(--mho-accent);
+    }
+
+    &.is-more .label {
+        color: var(--mho-text-muted);
+        font-weight: 500;
+    }
+}
+
+/* Puits d'inventaire : l'icône du jeu y garde sa taille native, le puits ne fait que la cadrer. */
+.well {
+    display: grid;
+    place-items: center;
+    flex: 0 0 auto;
+    min-width: 28px;
+    min-height: 28px;
+    border-radius: 7px;
+    background: var(--mho-well);
+    box-shadow: inset 0 0 0 1px var(--mho-well-line);
+
+    img {
+        display: block;
+    }
+
+    mat-icon {
+        width: 18px;
+        height: 18px;
+        font-size: 18px;
+        color: var(--mho-text-muted);
+    }
+}
+
+.text {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.label,
+.context {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.label {
+    font-weight: 600;
+}
+
+.context {
+    color: var(--mho-text-muted);
+    font-size: 11.5px;
+}
+
+/* Définitions du sigle saisi, en tête des résultats. */
+.glossary {
+    padding: 8px 14px;
+    border-bottom: 1px solid var(--mho-line);
+    background: var(--mho-surface);
+}
+
+.glossary-note {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin: 0;
+    color: var(--mho-text-muted);
+    font-size: 12px;
+
+    & + & {
+        margin-top: 2px;
+    }
+
+    mat-icon {
+        flex: 0 0 auto;
+        width: 16px;
+        height: 16px;
+        font-size: 16px;
+    }
+
+    strong {
+        color: var(--mho-text);
+    }
+}
+
+.note {
+    margin: 0;
+    padding: 12px 14px;
+    color: var(--mho-text-muted);
+}
+
+.hints {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 14px;
+    padding: 6px 14px;
+    border-top: 1px solid var(--mho-line);
+    background: var(--mho-surface);
+    color: var(--mho-text-muted);
+    font-size: 11px;
+
+    kbd {
+        margin-right: 2px;
+        padding: 0 5px;
+        border: 1px solid var(--mho-line-strong);
+        border-radius: 4px;
+        background: var(--mho-surface-2);
+        font: 500 10.5px/16px var(--mho-font-body);
+    }
+}
+
+/* Écran tactile ou étroit : pas de clavier physique, les aides n'ont rien à dire. */
+@media (hover: none), (max-width: 599px) {
+    .hints {
+        display: none;
+    }
+}

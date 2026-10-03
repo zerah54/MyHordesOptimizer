@@ -1,7 +1,10 @@
 import { provideHttpClient, withXhr } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
+import { ANIMATION_MODULE_TYPE } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { MatDialog } from '@angular/material/dialog';
 import { By } from '@angular/platform-browser';
+import { of } from 'rxjs';
 
 import { Cell } from '../../../_abstract_model/types/cell.class';
 import { Citizen } from '../../../_abstract_model/types/citizen.class';
@@ -9,10 +12,15 @@ import { Item } from '../../../_abstract_model/types/item.class';
 import { Me } from '../../../_abstract_model/types/me.class';
 import { Ruin } from '../../../_abstract_model/types/ruin.class';
 import { Town } from '../../../_abstract_model/types/town.class';
+import { TownDetails } from '../../../_abstract_model/types/town-details.class';
+import { TownContextService } from '../../../_core/services/town-context.service';
 import { setUser } from '../../../_core/utilities/localstorage.util';
 import { MapOptions } from '../map.component';
+import { CORNERS_VERSION, sanitizeCorners } from '../map-corners';
 import { DrawMapComponent } from './draw-map.component';
 import { MapCellComponent } from './map-cell/map-cell.component';
+import { MapCellDetailsComponent } from './map-cell-details/map-cell-details.component';
+import { MapUpdateComponent } from './map-update/map-update.component';
 
 interface TestableComponent {
     complete_map: {
@@ -54,7 +62,10 @@ const options: MapOptions = {
     dig_mode: 'average',
     trash_mode: 'nb',
     displayed_scrut_zone: {},
-    distances: []
+    distances: [],
+    zoom: 30,
+    corners: sanitizeCorners(undefined),
+    corners_version: CORNERS_VERSION
 };
 
 describe('DrawMapComponent', (): void => {
@@ -65,7 +76,7 @@ describe('DrawMapComponent', (): void => {
         setUser(null);
         await TestBed.configureTestingModule({
             imports: [DrawMapComponent],
-            providers: [provideHttpClient(withXhr()), provideHttpClientTesting()]
+            providers: [provideHttpClient(withXhr()), provideHttpClientTesting(), { provide: ANIMATION_MODULE_TYPE, useValue: 'NoopAnimations' }]
         }).compileComponents();
         fixture = TestBed.createComponent(DrawMapComponent);
         testable = fixture.componentInstance as unknown as TestableComponent;
@@ -73,22 +84,32 @@ describe('DrawMapComponent', (): void => {
         fixture.componentRef.setInput('allItems', <Item[]>[]);
         fixture.componentRef.setInput('allCitizens', <Citizen[]>[]);
         fixture.componentRef.setInput('options', options);
+        fixture.componentRef.setInput('zoom', options.zoom);
     });
 
-    afterEach((): void => setUser(null));
+    afterEach((): void => {
+        setUser(null);
+        TestBed.inject(TownContextService).clear();
+    });
+
+    /** Choisit la première case rendue, comme le ferait un clic. */
+    function clickFirstCell(): void {
+        fixture.nativeElement.querySelector('.map-row:not(.axis-row) mho-map-cell .map-cell').dispatchEvent(new MouseEvent('click'));
+        fixture.detectChanges();
+    }
 
     it('renders nothing while the map is not yet available', (): void => {
         fixture.componentRef.setInput('map', undefined);
         fixture.detectChanges();
 
-        expect(fixture.nativeElement.querySelector('table.mho-draw-map')).toBeNull();
+        expect(fixture.nativeElement.querySelector('.mho-draw-map')).toBeNull();
     });
 
-    it('renders the table once the map is set', (): void => {
+    it('renders the grid once the map is set', (): void => {
         fixture.componentRef.setInput('map', newTown());
         fixture.detectChanges();
 
-        expect(fixture.nativeElement.querySelector('table.mho-draw-map')).not.toBeNull();
+        expect(fixture.nativeElement.querySelector('.mho-draw-map')).not.toBeNull();
         expect(testable.complete_map()?.map_width).toBe(5);
     });
 
@@ -97,7 +118,7 @@ describe('DrawMapComponent', (): void => {
         fixture.detectChanges();
 
         expect(testable.x_row()).toEqual([-2, -1, 0, 1, 2]);
-        const headerBorders: HTMLElement[] = Array.from(fixture.nativeElement.querySelectorAll('thead .border-cell.horizontal:not(.vertical)'));
+        const headerBorders: HTMLElement[] = Array.from(fixture.nativeElement.querySelectorAll('.axis-row.top .border-cell.horizontal:not(.vertical)'));
         expect(headerBorders.length).toBe(5);
         expect(headerBorders.map((el: HTMLElement): string => el.textContent?.trim() ?? '')).toEqual(['-2', '-1', '0', '1', '2']);
     });
@@ -148,28 +169,115 @@ describe('DrawMapComponent', (): void => {
         fixture.componentRef.setInput('map', newTown({ town_x: 2, town_y: 3, map_width: 1, cells: [hoveredCell] }));
         fixture.detectChanges();
 
-        const leftBorder: HTMLElement = fixture.nativeElement.querySelector('tbody tr mho-map-border .border-cell');
+        const leftBorder: HTMLElement = fixture.nativeElement.querySelector('.map-row:not(.axis-row) mho-map-border .border-cell');
         expect(leftBorder.classList.contains('hovered')).toBe(false);
 
-        const cellTd: HTMLElement = fixture.nativeElement.querySelector('tbody mho-map-cell td');
-        cellTd.dispatchEvent(new MouseEvent('mouseenter'));
+        const cell_element: HTMLElement = fixture.nativeElement.querySelector('.map-row:not(.axis-row) mho-map-cell .map-cell');
+        cell_element.dispatchEvent(new MouseEvent('mouseenter'));
         fixture.detectChanges();
 
         expect(leftBorder.classList.contains('hovered')).toBe(true);
     });
 
-    it('replaces the cell in place in drawed_map on the map-cell cellChange event, and re-renders it', (): void => {
+    it('opens the detail panel on the chosen cell, and marks its coordinates on the axes', (): void => {
+        const cell: Cell = newCell(0, 0, { displayed_x: 0, displayed_y: 3 });
+        fixture.componentRef.setInput('map', newTown({ town_x: 2, town_y: 3, map_width: 1, cells: [cell] }));
+        fixture.detectChanges();
+
+        expect(fixture.debugElement.query(By.directive(MapCellDetailsComponent))).toBeNull();
+
+        clickFirstCell();
+
+        const details: MapCellDetailsComponent = fixture.debugElement.query(By.directive(MapCellDetailsComponent)).componentInstance;
+        expect(details.cell()).toBe(cell);
+        expect(fixture.nativeElement.querySelector('.map-cell').classList).toContain('selected');
+        expect(fixture.nativeElement.querySelector('.map-row:not(.axis-row) .border-cell').classList).toContain('selected');
+    });
+
+    it('closes the detail panel when the chosen cell is clicked again', (): void => {
+        fixture.componentRef.setInput('map', newTown({ town_x: 0, map_width: 1, cells: [newCell(0, 0)] }));
+        fixture.detectChanges();
+
+        clickFirstCell();
+        expect(fixture.debugElement.query(By.directive(MapCellDetailsComponent))).not.toBeNull();
+
+        clickFirstCell();
+        expect(fixture.debugElement.query(By.directive(MapCellDetailsComponent))).toBeNull();
+    });
+
+    it('closes the detail panel on its close event', (): void => {
+        fixture.componentRef.setInput('map', newTown({ town_x: 0, map_width: 1, cells: [newCell(0, 0)] }));
+        fixture.detectChanges();
+        clickFirstCell();
+
+        fixture.debugElement.query(By.directive(MapCellDetailsComponent)).triggerEventHandler('closed', undefined);
+        fixture.detectChanges();
+
+        expect(fixture.debugElement.query(By.directive(MapCellDetailsComponent))).toBeNull();
+    });
+
+    it('replaces the chosen cell in drawed_map with the update dialog result, and re-renders it', (): void => {
         const original: Cell = newCell(0, 0, { nb_zombie: 1 });
         fixture.componentRef.setInput('map', newTown({ town_x: 0, map_width: 1, cells: [original] }));
         fixture.detectChanges();
+        clickFirstCell();
 
+        const dialog: MatDialog = TestBed.inject(MatDialog);
         const replacement: Cell = newCell(0, 0, { nb_zombie: 9 });
-        fixture.debugElement.query(By.directive(MapCellComponent)).triggerEventHandler('cellChange', replacement);
+        vi.spyOn(dialog, 'open').mockReturnValue(<never>{ afterClosed: () => of(replacement) });
+
+        fixture.debugElement.query(By.directive(MapCellDetailsComponent)).triggerEventHandler('updateRequested', undefined);
         fixture.detectChanges();
 
+        expect(dialog.open).toHaveBeenCalledWith(MapUpdateComponent, expect.objectContaining({
+            data: expect.objectContaining({ cell: original })
+        }));
         expect(testable.drawed_map()[0][0]).toBe(replacement);
         const rebound: MapCellComponent = fixture.debugElement.query(By.directive(MapCellComponent)).componentInstance;
         expect(rebound.cell()).toBe(replacement);
+    });
+
+    it('leaves drawed_map alone when the update dialog closes without a result', (): void => {
+        const original: Cell = newCell(0, 0, { nb_zombie: 1 });
+        fixture.componentRef.setInput('map', newTown({ town_x: 0, map_width: 1, cells: [original] }));
+        fixture.detectChanges();
+        clickFirstCell();
+
+        const dialog: MatDialog = TestBed.inject(MatDialog);
+        vi.spyOn(dialog, 'open').mockReturnValue(<never>{ afterClosed: () => of(undefined) });
+
+        fixture.debugElement.query(By.directive(MapCellDetailsComponent)).triggerEventHandler('updateRequested', undefined);
+        fixture.detectChanges();
+
+        expect(testable.drawed_map()[0][0]).toBe(original);
+    });
+
+    it('hides the update action and never opens the dialog when the town is observed in readonly mode', (): void => {
+        TestBed.inject(TownContextService).setObservedTown(new TownDetails());
+        fixture.componentRef.setInput('map', newTown({ town_x: 0, map_width: 1, cells: [newCell(0, 0)] }));
+        fixture.detectChanges();
+        clickFirstCell();
+
+        const details: MapCellDetailsComponent = fixture.debugElement.query(By.directive(MapCellDetailsComponent)).componentInstance;
+        expect(details.canUpdate()).toBe(false);
+
+        const dialog: MatDialog = TestBed.inject(MatDialog);
+        vi.spyOn(dialog, 'open');
+        fixture.debugElement.query(By.directive(MapCellDetailsComponent)).triggerEventHandler('updateRequested', undefined);
+
+        expect(dialog.open).not.toHaveBeenCalled();
+    });
+
+    it('drops the chosen cell when a new map is bound', (): void => {
+        fixture.componentRef.setInput('map', newTown({ town_x: 0, map_width: 1, cells: [newCell(0, 0)] }));
+        fixture.detectChanges();
+        clickFirstCell();
+        expect(fixture.debugElement.query(By.directive(MapCellDetailsComponent))).not.toBeNull();
+
+        fixture.componentRef.setInput('map', newTown({ town_x: 0, map_width: 1, cells: [newCell(0, 0, { cell_id: 99 })] }));
+        fixture.detectChanges();
+
+        expect(fixture.debugElement.query(By.directive(MapCellDetailsComponent))).toBeNull();
     });
 
     it('recomputes the map when a new map is bound', (): void => {

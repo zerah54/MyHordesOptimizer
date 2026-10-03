@@ -2,11 +2,19 @@
     <button mat-icon-button type="button" (click)="changeSidenavStatus.emit();">
         <mat-icon>menu</mat-icon>
     </button>
-    <img [ngSrc]="'img/logo/logo_mho_64x64.png'" height="48" width="48" priority>
-    <div class="title">{{ is_gt_xs() ? 'MyHordes Optimizer' : 'MHO' }}</div>
+    <img class="logo" [ngSrc]="'img/logo/logo_mho_64x64.png'" height="30" width="30" priority alt="">
+    <div class="title">{{ is_gt_sm() ? 'MyHordes Optimizer' : 'MHO' }}</div>
+
+    <!-- Pastille de ville, masquée sous 600 px : elle passe alors en tête du menu. -->
+    <mho-town-chip/>
+
     <span class="spacer"></span>
-    @if (saved_external_app_id() && is_in_town()) {
-        <mho-external-tools-update-button [isCompact]="!is_gt_xs()"/>
+    <!-- Recherche globale : pages, objets, chantiers, bâtiments et, en ville, citoyens (`/` ou Ctrl+K).
+         Sous 960 px, une loupe qui ouvre le champ sur toute la barre. -->
+    <mho-global-search [compact]="!is_gt_sm()"/>
+    <!-- Masqué en observation : la mise à jour porte toujours sur la ville du joueur, pas sur celle observée. -->
+    @if (saved_external_app_id() && is_in_town() && !is_readonly()) {
+        <mho-external-tools-update-button [isCompact]="!is_gt_sm()"/>
     }
 
     @if (is_dev) {
@@ -15,7 +23,7 @@
                 <ng-container i18n>Se connecter</ng-container>
             } @else if (me()) {
                 @if (me()!.username && me()!.username !== '') {
-                    {{ me()!.username }}
+                    <ng-container *ngTemplateOutlet="userIdentity"></ng-container>
                 } @else {
                     <ng-container i18n>Utilisateur inconnu</ng-container>
                 }
@@ -31,7 +39,7 @@
         } @else if (me()) {
             @if (me()!.username && me()!.username !== '') {
                 <button mat-button type="button" class="profil-button" [matMenuTriggerFor]="userMenu">
-                    {{ me()!.username }}
+                    <ng-container *ngTemplateOutlet="userIdentity"></ng-container>
                 </button>
             } @else {
                 <button mat-button type="button" class="profil-button" [matMenuTriggerFor]="userMenu">
@@ -71,7 +79,25 @@
                     <a mat-menu-item [routerLink]="['/profile', me.id]" i18n>Mon compte</a>
                 }
             }
+            @if (admin_service.isAdmin()) {
+                <a mat-menu-item [routerLink]="['/admin']" i18n>Administration</a>
+            }
+            <mat-divider></mat-divider>
             <div mat-menu-item (click)="disconnect()" i18n>Déconnexion</div>
         }
     </mat-menu>
+
+    <!-- Identité : l'avatar MyHordes quand le joueur en a un, ses initiales sinon. L'avatar était
+         déjà renvoyé par l'API et stocké, mais `private` dans le modèle : personne ne pouvait le
+         lire. Sous 1280 px, le pseudo quitte la barre pour l'infobulle de l'avatar. -->
+    <ng-template #userIdentity>
+        <span class="identity" [matTooltip]="me()!.username" [matTooltipDisabled]="is_gt_md()">
+            @if (me()!.avatar) {
+                <mho-avatar class="avatar-img" rounded [size]="26" [src]="me()!.avatar ?? undefined"></mho-avatar>
+            } @else {
+                <span class="avatar" aria-hidden="true">{{ me()!.username.slice(0, 2) }}</span>
+            }
+            <span class="username">{{ me()!.username }}</span>
+        </span>
+    </ng-template>
 </mat-toolbar>

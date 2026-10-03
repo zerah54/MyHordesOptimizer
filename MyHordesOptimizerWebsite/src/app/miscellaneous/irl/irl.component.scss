@@ -1,4 +1,3 @@
-@use 'variables';
 
 :host {
     display: contents;
@@ -17,7 +16,11 @@
         #hordiens {
             width: calc(100% - 2px);
             height: calc(100% - 2px);
-            border: 1px solid variables.$accented-background-color;
+            /* Fond de carte sous le canevas transparent : les nœuds (`--mho-surface-2`) s'en détachent. */
+            border: 1px solid var(--mho-line);
+            border-radius: var(--mho-radius-l);
+            background: var(--mho-surface);
+            overflow: hidden;
         }
 
         .filters {

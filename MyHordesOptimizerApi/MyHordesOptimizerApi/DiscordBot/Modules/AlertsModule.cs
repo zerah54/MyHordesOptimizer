@@ -3,20 +3,26 @@ using System.Threading.Tasks;
 using Discord;
 using Discord.Interactions;
 using Microsoft.Extensions.Logging;
+using MyHordesOptimizerApi.DiscordBot.Localization;
+using MyHordesOptimizerApi.DiscordBot.Services;
 using MyHordesOptimizerApi.DiscordBot.Utility;
 
 namespace MyHordesOptimizerApi.DiscordBot.Modules
-{   
+{
 
     [IntegrationType(ApplicationIntegrationType.GuildInstall, ApplicationIntegrationType.UserInstall)]
     [CommandContextType(InteractionContextType.Guild, InteractionContextType.BotDm, InteractionContextType.PrivateChannel)]
     public class AlertsModule : InteractionModuleBase<SocketInteractionContext>
     {
-        private readonly ILogger<AlertsModule> _logger;
+        private static readonly TimeSpan AntiAbuseDuration = TimeSpan.FromMinutes(15);
 
-        public AlertsModule(ILogger<AlertsModule> logger)
+        private readonly ILogger<AlertsModule> _logger;
+        private readonly IDiscordTimerScheduler _timerScheduler;
+
+        public AlertsModule(ILogger<AlertsModule> logger, IDiscordTimerScheduler timerScheduler)
         {
             _logger = logger;
+            _timerScheduler = timerScheduler;
         }
 
         [SlashCommand(name: "aa", description: "Starts a 15 minutes counter")]
@@ -25,120 +31,89 @@ namespace MyHordesOptimizerApi.DiscordBot.Modules
             bool privateMsg = false
             )
         {
+            BotTexts texts = Context.Interaction.Texts();
+            await DeferAsync(ephemeral: true);
             try
             {
-                var msg = "Le compteur anti-abus a été lancé ! Vous serez notifié ";
-                msg += privateMsg ? "par message privé " : "";
-                msg += "dans 15 minutes";
-
-                var now = DateTime.Now;
-                var alert = DateTime.Now
-                    .AddMinutes(15);
-
-
-                var expirationFieldExpiration = new EmbedFieldBuilder();
-                expirationFieldExpiration.Name = "Expiration";
-                expirationFieldExpiration.Value = $"<t:{Math.Floor((alert.ToUniversalTime() - DateTime.UnixEpoch.ToUniversalTime()).TotalSeconds)}:R>";
-                
-                var embedBuilder = new EmbedBuilder()
-                    .WithDescription(msg)
-                    .WithFields(expirationFieldExpiration)
-                    .WithColor(DiscordBotConsts.MhoColorPink);
-                
-                await RespondAsync(embed: embedBuilder.Build(), ephemeral: true);
-                await Task.Delay(alert - now);
-
-                if (privateMsg)
+                DateTime dueAt = DateTime.UtcNow + AntiAbuseDuration;
+                DiscordTimerScheduleResult result = await _timerScheduler.ScheduleAsync(Context.Interaction, dueAt, texts.AntiAbuseResetMessage, privateMsg);
+                if (!result.IsScheduled)
                 {
-                    await FollowupAsync($"{Context.User.Mention} Le compteur anti-abus a été réinitialisé !", ephemeral: true);
+                    await Context.Interaction.SendEphemeralAsync(result.Error ?? texts.TimerNotCreated, isDeferredEphemeral: true);
+                    return;
                 }
-                else
-                {
-                    await FollowupAsync($"{Context.User.Mention} Le compteur anti-abus a été réinitialisé !");
-                }
+
+                string description = texts.AntiAbuseStarted(DiscordTimerRules.DescribeTarget(result.Target, privateMsg, texts));
+                await ModifyOriginalResponseAsync(props => props.Embed = BuildConfirmation(texts, description, dueAt, reason: null));
             }
             catch (Exception e)
             {
-                _logger.LogWarning(e.ToString(), e);
-                await RespondAsync($"Une erreur s'est produite lors de la création du compteur\n```{e.Message}```",
-                    ephemeral: true);
+                _logger.LogWarning(e, "Création du compteur anti-abus impossible");
+                await Context.Interaction.SendEphemeralAsync(texts.TimerCreationError(e.Message), isDeferredEphemeral: true);
             }
         }
 
         [SlashCommand(name: "timer", description: "Launches a custom counter. Example: 1Y 2M 7D 1h 25m 12s")]
         public async Task CounterAsync(
             [Summary(name:"time", description: "The duration of the counter (Example: 1Y 2M 7D 1h 25m 12s)")]
-            string time, 
+            string time,
             [Summary(name:"reason", description: "The reason for the counter. It is this message that will be sent at the end of the counter")]
-            string reason, 
+            [MaxLength(DiscordTimerRules.MaxMessageLength)]
+            string reason,
             [Summary(name:"private-msg", description: "True if the message should not be seen by all")]
             bool privateMsg = false
             )
         {
-            
+            BotTexts texts = Context.Interaction.Texts();
             await DeferAsync(ephemeral: true);
             try
             {
-                var splittedTime = time.Split(" ");
-                
-                var years = Array.Find(splittedTime, (timePart) => timePart.EndsWith("Y"));
-                var months = Array.Find(splittedTime, (timePart) => timePart.EndsWith("M"));
-                var days = Array.Find(splittedTime, (timePart) => timePart.EndsWith("D"));
-                var hours = Array.Find(splittedTime, (timePart) => timePart.EndsWith("h"));
-                var minutes = Array.Find(splittedTime, (timePart) => timePart.EndsWith("m"));
-                var seconds = Array.Find(splittedTime, (timePart) => timePart.EndsWith("s"));
-
-                var yearsInt = years != null ? int.Parse(years.Replace("Y", "")) : 0;
-                var monthsInt = months != null ? int.Parse(months.Replace("M", "")) : 0;
-                var daysInt = days != null ? int.Parse(days.Replace("D", "")) : 0;
-                var hoursInt = hours != null ? int.Parse(hours.Replace("h", "")) : 0;
-                var minutesInt = minutes != null ? int.Parse(minutes.Replace("m", "")) : 0;
-                var secondsInt = seconds != null ? int.Parse(seconds.Replace("s", "")) : 0;
-                
-                var now = DateTime.Now;
-                var alert = DateTime.Now
-                    .AddYears(yearsInt)
-                    .AddMonths(monthsInt)
-                    .AddDays(daysInt)
-                    .AddHours(hoursInt)
-                    .AddMinutes(minutesInt)
-                    .AddSeconds(secondsInt);
-
-                var msg = "Votre compteur a bien été programmé !";
-                msg += privateMsg ? " Vous serez notifié par message privé." : "";
-                
-                var expirationFieldReason = new EmbedFieldBuilder();
-                expirationFieldReason.Name = "Raison";
-                expirationFieldReason.Value = reason;
-
-                var expirationFieldExpiration = new EmbedFieldBuilder();
-                expirationFieldExpiration.Name = "Expiration";
-                expirationFieldExpiration.Value = $"<t:{Math.Floor((alert.ToUniversalTime() - DateTime.UnixEpoch.ToUniversalTime()).TotalSeconds)}:R>";
-
-                var embedBuilder = new EmbedBuilder()
-                    .WithDescription(msg)
-                    .WithFields(expirationFieldReason)
-                    .WithFields(expirationFieldExpiration)
-                    .WithColor(DiscordBotConsts.MhoColorPink);
-                
-                await ModifyOriginalResponseAsync(props => props.Embed = embedBuilder.Build());
-                await Task.Delay(alert - now);
-
-                if (privateMsg)
+                if (!DiscordTimerRules.TryComputeDueAt(time, DateTime.UtcNow, texts, out DateTime dueAt, out string error))
                 {
-                    await FollowupAsync($"{Context.User.Mention} {reason}", ephemeral: true);
+                    await Context.Interaction.SendEphemeralAsync(error, isDeferredEphemeral: true);
+                    return;
                 }
-                else
+                if (string.IsNullOrWhiteSpace(reason))
                 {
-                    await FollowupAsync($"{Context.User.Mention} {reason}");
+                    await Context.Interaction.SendEphemeralAsync(texts.TimerReasonEmpty, isDeferredEphemeral: true);
+                    return;
                 }
+                if (reason.Length > DiscordTimerRules.MaxMessageLength)
+                {
+                    await Context.Interaction.SendEphemeralAsync(texts.TimerReasonTooLong(DiscordTimerRules.MaxMessageLength), isDeferredEphemeral: true);
+                    return;
+                }
+
+                DiscordTimerScheduleResult result = await _timerScheduler.ScheduleAsync(Context.Interaction, dueAt, reason, privateMsg);
+                if (!result.IsScheduled)
+                {
+                    await Context.Interaction.SendEphemeralAsync(result.Error ?? texts.TimerNotCreated, isDeferredEphemeral: true);
+                    return;
+                }
+
+                string description = texts.TimerScheduled(DiscordTimerRules.DescribeTarget(result.Target, privateMsg, texts));
+                await ModifyOriginalResponseAsync(props => props.Embed = BuildConfirmation(texts, description, dueAt, reason));
             }
             catch (Exception e)
             {
-                _logger.LogWarning(e.ToString(), e);
-                await RespondAsync($"Une erreur s'est produite lors de la création du compteur\n```{e.Message}```",
-                    ephemeral: true);
+                _logger.LogWarning(e, "Création du compteur impossible");
+                await Context.Interaction.SendEphemeralAsync(texts.TimerCreationError(e.Message), isDeferredEphemeral: true);
             }
+        }
+
+        private static Embed BuildConfirmation(BotTexts texts, string description, DateTime dueAtUtc, string? reason)
+        {
+            EmbedBuilder embedBuilder = new EmbedBuilder()
+                .WithDescription(description)
+                .WithColor(DiscordBotConsts.MhoColorPink);
+
+            if (reason is not null)
+            {
+                embedBuilder.AddField(texts.TimerReasonField, reason);
+            }
+            embedBuilder.AddField(texts.TimerExpirationField, $"<t:{DiscordTimerRules.ToUnixSeconds(dueAtUtc)}:R>");
+
+            return embedBuilder.Build();
         }
 
         // [SlashCommand("alarm", "Programme une alerte pour une heure donnée")]

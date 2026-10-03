@@ -85,5 +85,26 @@ namespace MyHordesOptimizerApiIntegrationTests.Services
 
             context.Towns.AsNoTracking().Any(t => t.IdTown == townId).Should().BeFalse("la ville doit être supprimée une fois le verrou externe libéré");
         }
+
+        [Fact]
+        public void DeleteTown_SupprimeReglagesEtAffinagesDAttaque()
+        {
+            var (context, service, _, townId, _) = NewFixture(_factory);
+            var lastUpdateInfo = new LastUpdateInfo { DateUpdate = DateTime.UtcNow };
+            context.LastUpdateInfos.Add(lastUpdateInfo);
+            context.SaveChanges();
+            context.TownAttackSettings.Add(new TownAttackSetting { IdTown = townId, Day = 4, Souls = 1, IdLastUpdateInfo = lastUpdateInfo.IdLastUpdateInfo });
+            context.TownAttackRefinements.Add(new TownAttackRefinement
+            {
+                IdTown = townId, Day = 4, Input = "{}", Candidates = new byte[6], CandidateCount = 1, Status = "Valid",
+                IdLastUpdateInfo = lastUpdateInfo.IdLastUpdateInfo, ComputedAt = DateTime.UtcNow
+            });
+            context.SaveChanges();
+
+            service.DeleteTown(townId);
+
+            context.TownAttackSettings.AsNoTracking().Any(s => s.IdTown == townId).Should().BeFalse();
+            context.TownAttackRefinements.AsNoTracking().Any(r => r.IdTown == townId).Should().BeFalse();
+        }
     }
 }
