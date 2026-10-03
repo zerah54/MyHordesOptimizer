@@ -1,4 +1,21 @@
 export const changelogs: Record<string, string> = {
+    '1.1.63': `
+        [Novedad] La torre de vigilancia muestra el rango de ataque refinado compartido por la ciudad, bajo el ataque calculado de hoy y de mañana
+        [Novedad] La calculadora de camping muestra la probabilidad bruta entre paréntesis cuando el tope o el mínimo la han modificado
+        [Novedad] El script funciona en la web de MHO (y su beta) para refrescar su pestaña tras una actualización de las herramientas externas
+
+        [Mejora] Excavaciones exitosas: nuevo cálculo, más fiable, a partir del registro de la zona (ciudadanos que se fueron, registro incompleto, día leído en el reloj del juego, nada enviado durante el ataque, sin doble recuento entre dos envíos)
+        [Mejora] Las excavaciones restantes de una zona ahora las mantiene al día MHO en lugar de deducirse solo de las excavaciones exitosas
+        [Mejora] El botón para copiar el registro está disponible aunque el registro no se muestre completo
+        [Mejora] Traducciones completadas (hallazgos heroicos, notas de versiones anteriores, una opción en alemán) y enlaces corregidos
+
+        [Corrección] La alerta de inactividad sin escolta no funcionaba correctamente tras cualquier actividad en la página
+        [Corrección] La actualización de Fata Morgana en ciudad devastada podía lanzarse fuera de la página del desierto y enviar una zona vacía
+        [Corrección] Los objetos ocultos del cofre ya no se envían con su contenido
+        [Corrección] El guardado de las estimaciones ahora espera la autenticación en lugar de enviarse sin ella
+        [Corrección] Las opciones retiradas del script se eliminan de los ajustes guardados: un antiguo valor marcado seguía activo
+        [Corrección] Las pestañas de BBH, GH, Fata Morgana y MHO ya no se recargan sin motivo la primera vez que vuelves a ellas
+        `,
     '1.1.62': `
         [Novedad] Los tooltips avanzados y la lista de la compra ahora muestran también la cantidad en cofres y en el mapa, además del almacén y las mochilas
         [Novedad] El filtro de temas del foro acepta expresiones regulares además de palabras simples, con un botón de ayuda y el patrón %DAY% para el día de ciudad actual

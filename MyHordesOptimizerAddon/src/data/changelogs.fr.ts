@@ -1,4 +1,15 @@
 export const changelogs: Record<string, string> = {
+    '1.1.63': `
+        [Nouveauté] La tour de guet affiche la plage d'attaque affinée partagée par la ville, sous l'attaque calculée du jour et du lendemain
+        [Nouveauté] Le calculateur de camping affiche la chance brute entre parenthèses quand le plafond ou le plancher l'a modifiée
+
+        [Amélioration] Fouilles réussies : nouveau calcul à partir du registre de la case, plus fiable (citoyens partis, registre incomplet, jour lu sur l'horloge du jeu, rien d'envoyé pendant l'attaque, pas de double comptage d'un envoi à l'autre)
+        [Amélioration] Les fouilles restantes d'une case sont désormais tenues à jour par MHO au lieu d'être déduites des seules fouilles réussies
+
+        [Correction] L'alerte d'inactivité sans escorte ne fonctionnait pas correctement après une activité sur la page
+        [Correction] La mise à jour Fata Morgana en ville dévastée pouvait partir hors de la page du désert et envoyer une case vide
+        [Correction] Les options retirées du script sont purgées des réglages enregistrés : une ancienne valeur cochée restait active
+        `,
     '1.1.62': `
         [Nouveauté] Les tooltips avancés et la liste de courses affichent désormais aussi la quantité en coffres et sur la carte, en plus de la banque et des sacs
         [Nouveauté] Le filtre de sujets du forum accepte des expressions régulières en plus des mots simples, avec un bouton d'aide et le motif %DAY% pour cibler le jour de ville en cours

@@ -119,15 +119,16 @@ export function initOptionsWithoutLoginNeeded(): void {
  * `getToken()` réattendrait la même promesse en cours — qui ne se résout qu'une fois ces
  * chargements terminés. Un appel imbriqué part donc sans Bearer plutôt que de bloquer
  * indéfiniment ; c'est déjà le comportement observé avant ce correctif pour tout appel.
+ * `fetcher_options.wait_for_token` force l'attente du jeton (routes réservées aux citoyens connectés).
  */
-export async function updateFetchRequestOptions(options?: any): Promise<any> {
+export async function updateFetchRequestOptions(options?: any, fetcher_options?: FetcherOptions): Promise<any> {
     const update = { ...options };
     update.headers = {
         ...update.headers,
         'Mho-Origin': 'mho-addon',
         'Mho-Addon-Version': getScriptInfo().version,
     };
-    if (!isValidToken() && !isTokenRequestInFlight()) {
+    if (!isValidToken() && (fetcher_options?.wait_for_token === true || !isTokenRequestInFlight())) {
         await getToken();
     }
     if (isValidToken()) {
@@ -164,8 +165,17 @@ function fetchWithTimeout(url: string, options?: any): Promise<Response> {
         .finally(() => clearTimeout(timeout));
 }
 
-export async function fetcher(url: string, options?: any): Promise<Response> {
-    return fetchWithTimeout(url, await updateFetchRequestOptions(options));
+/**
+ * Options de `fetcher()`. `wait_for_token` : attend un jeton valide même si une authentification est déjà en
+ * cours — réservé aux appels hors de la chaîne `tokenReceived()` (sinon elle s'attendrait elle-même), requis
+ * par les routes réservées aux citoyens connectés.
+ */
+export interface FetcherOptions {
+    wait_for_token?: boolean;
+}
+
+export async function fetcher(url: string, options?: any, fetcher_options?: FetcherOptions): Promise<Response> {
+    return fetchWithTimeout(url, await updateFetchRequestOptions(options, fetcher_options));
 }
 
 

@@ -1,16 +1,18 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { state } from '../state';
-import { getStorageItem } from '../utils/storage';
+import { getStorageItem, setStorageItem } from '../utils/storage';
 import { bootstrap } from './bootstrap';
 import { gm_mh_external_app_id_key, mho_parameters_key, mho_token_key } from './constants';
 
-vi.mock('../utils/storage', () => ({ getStorageItem: vi.fn() }));
+vi.mock('../utils/storage', () => ({ getStorageItem: vi.fn(), setStorageItem: vi.fn(() => Promise.resolve()) }));
 
 const getStorageItemMock = getStorageItem as unknown as ReturnType<typeof vi.fn>;
+const setStorageItemMock: ReturnType<typeof vi.fn> = setStorageItem as unknown as ReturnType<typeof vi.fn>;
 
 beforeEach(() => {
     getStorageItemMock.mockReset();
+    setStorageItemMock.mockClear();
     state.mho_parameters = undefined;
     state.mh_user = undefined;
     state.external_app_id = undefined;
@@ -39,7 +41,7 @@ describe('bootstrap()', () => {
     });
 
     it('restaure toujours les paramètres, le token (credential) et la clé d\'app depuis le stockage', async () => {
-        const params = { display_map: true };
+        const params: Record<string, boolean> = { update_mho: true, update_mho_killed_zombies: false };
         const token = { token: { accessToken: 'abc', validTo: new Date().toISOString() }, simpleMe: { id: 1 } };
         getStorageItemMock.mockImplementation((key: string) => {
             if (key === mho_parameters_key) return Promise.resolve(params);
@@ -53,5 +55,19 @@ describe('bootstrap()', () => {
         expect(state.mho_parameters).toEqual(params);
         expect(state.token).toEqual(token);
         expect(state.external_app_id).toBe('app-id');
+        expect(setStorageItemMock).not.toHaveBeenCalled();
+    });
+
+    /** Une option retirée de `params.ts` n'apparaît plus dans les réglages : restée cochée, elle serait indécochable */
+    it('purge les options qui ne sont plus déclarées, en mémoire et dans le stockage', async () => {
+        getStorageItemMock.mockImplementation((key: string) => {
+            if (key === mho_parameters_key) return Promise.resolve({ update_mho: true, display_map: true, block_users: true });
+            return Promise.resolve(undefined);
+        });
+
+        await bootstrap();
+
+        expect(state.mho_parameters).toEqual({ update_mho: true });
+        expect(setStorageItemMock).toHaveBeenCalledWith(mho_parameters_key, { update_mho: true });
     });
 });

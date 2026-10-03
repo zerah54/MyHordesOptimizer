@@ -1,4 +1,21 @@
 export const changelogs: Record<string, string> = {
+    '1.1.63': `
+        [Neu] Der Wachturm zeigt unter dem berechneten Angriff von heute und morgen die von der Stadt geteilte verfeinerte Angriffsspanne an
+        [Neu] Der Camping-Rechner zeigt die Rohchance in Klammern an, wenn Ober- oder Untergrenze sie verändert haben
+        [Neu] Das Skript läuft auf der MHO-Website (und ihrer Beta), um deren Tab nach einer Aktualisierung der externen Tools neu zu laden
+
+        [Verbesserung] Erfolgreiche Grabungen: neue, zuverlässigere Berechnung anhand des Zonenregisters (abgereiste Bürger, unvollständiges Register, Tag von der Spieluhr gelesen, kein Versand während des Angriffs, keine Doppelzählung zwischen zwei Sendungen)
+        [Verbesserung] Die verbleibenden Grabungen einer Zone werden jetzt von MHO aktuell gehalten, statt nur aus den erfolgreichen Grabungen abgeleitet zu werden
+        [Verbesserung] Der Button zum Kopieren des Registers ist auch verfügbar, wenn das Register nicht vollständig angezeigt wird
+        [Verbesserung] Übersetzungen ergänzt (Heldenfunde, ältere Änderungsprotokolle, eine Option auf Deutsch) und Links korrigiert
+
+        [Korrektur] Die Inaktivitätswarnung ohne Eskorte funktionierte nach einer Aktivität auf der Seite nicht richtig
+        [Korrektur] Die Fata-Morgana-Aktualisierung in einer verwüsteten Stadt konnte außerhalb der Wüstenseite ausgelöst werden und eine leere Zone senden
+        [Korrektur] Versteckte Gegenstände in der Truhe werden nicht mehr mit ihrem Inhalt gesendet
+        [Korrektur] Das Speichern der Schätzungen wartet jetzt auf die Authentifizierung, statt ohne sie abzuschicken
+        [Korrektur] Aus dem Skript entfernte Optionen werden aus den gespeicherten Einstellungen gelöscht: ein alter aktivierter Wert blieb sonst aktiv
+        [Korrektur] Die Tabs von BBH, GH, Fata Morgana und MHO laden beim ersten Zurückkehren nicht mehr unnötig neu
+        `,
     '1.1.62': `
         [Neu] Die erweiterten Tooltips und die Einkaufsliste zeigen jetzt zusätzlich zur Bank und den Rucksäcken auch die Menge in Truhen und auf der Karte an
         [Neu] Der Forumsthemen-Filter akzeptiert jetzt auch reguläre Ausdrücke statt nur einfacher Wörter, mit Hilfe-Button und dem Muster %DAY% für den aktuellen Stadttag

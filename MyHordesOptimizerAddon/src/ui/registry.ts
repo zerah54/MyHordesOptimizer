@@ -7,14 +7,14 @@ import { copyToClipboard } from '../utils/misc';
 export function addCopyRegistryButton() {
     if (state.mho_parameters.copy_registry) {
         const logs = document.querySelector('hordes-log');
-        const logs_complete_links = document.querySelector('log-complete-link');
         const copy_button = document.querySelector(`#${mho_copy_logs_id}`);
 
         const createCopyRegistryButtonContent = (value) => {
             return `<div style="display: flex; gap: 0.5em; align-items: center;"><img src="${mh_optimizer_icon}" style="width: 16px !important;">${value}</div>`;
         };
 
-        if (logs && !copy_button && !logs_complete_links) {
+        /** Affiché même quand le registre est incomplet : la copie porte alors sur les entrées visibles */
+        if (logs && !copy_button) {
             const title = logs.parentElement.previousElementSibling;
             const copy_button = document.createElement('a');
             title.appendChild(copy_button);

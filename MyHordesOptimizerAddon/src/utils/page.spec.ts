@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 
 import { state } from '../state';
-import { shouldRefreshMe } from './page';
+import { isMhoWebsite, shouldRefreshMe } from './page';
 
 beforeEach(() => {
     document.body.innerHTML = '';
@@ -22,5 +22,31 @@ describe('shouldRefreshMe()', () => {
 
         expect(() => shouldRefreshMe()).not.toThrow();
         expect(shouldRefreshMe()).toBe(true);
+    });
+});
+
+describe('isMhoWebsite()', () => {
+    const prod_website: string = 'https://myhordes-optimizer.web.app/';
+
+    it('reconnaît le site de production', () => {
+        expect(isMhoWebsite('https://myhordes-optimizer.web.app/my-town/citizens', prod_website)).toBe(true);
+    });
+
+    /** Sur le site bêta, `state.website` vaut la production : l'URL ne contient pas « staging » */
+    it('reconnaît le site bêta même quand state.website pointe la production', () => {
+        expect(isMhoWebsite('https://myhordes-optimizer-beta.web.app/map', prod_website)).toBe(true);
+    });
+
+    it('reconnaît le site local passé en paramètre', () => {
+        expect(isMhoWebsite('http://localhost:4200/tutorials', 'http://localhost:4200/')).toBe(true);
+    });
+
+    it('compare l\'origine exacte, pas un simple préfixe', () => {
+        expect(isMhoWebsite('https://myhordes-optimizer.web.app.example.com/', prod_website)).toBe(false);
+    });
+
+    it('ignore les autres sites et un website vide', () => {
+        expect(isMhoWebsite('https://myhordes.eu/jx/town/dashboard', prod_website)).toBe(false);
+        expect(isMhoWebsite('https://gesthordes.fr/', '')).toBe(false);
     });
 });

@@ -43,6 +43,8 @@ export const mho_token_key = `MHO_${local_storage_prefix}token`;
 export const mho_blacklist_key = 'MHO_blacklist';
 export const mho_forum_thread_styles_key = 'MHO_forum_thread_styles';
 export const mho_anti_abuse_key = 'MHO_anti_abuse';
+/** Fouilles réussies déjà envoyées ce jour-là, par case et citoyen : l'envoi suivant en garde le maximum */
+export const mho_sent_digs_key: string = `MHO_${local_storage_prefix}sent_digs`;
 export const mho_version_key = 'MHO_version';
 export const gm_mh_external_app_id_key = is_mh_beta ? 'MHO_mh_beta_external_app_id' : `MHO_${local_storage_prefix}mh_external_app_id`;
 
@@ -62,9 +64,10 @@ export const hordes_img_url = '/build/images/';
 export const repo_img_url = 'https://myhordes-optimizer.web.app/img/';
 export const repo_img_hordes_url = repo_img_url + 'hordes_img/';
 export const chrome_web_store_url = 'https://chromewebstore.google.com/detail/myhordes-optimizer/jolghobcgphmgaiachbipnpiimmgknno';
-export const firefox_amo_url = 'https://addons.mozilla.org/fr/firefox/addon/mho-addon';
+export const firefox_amo_url = 'https://addons.mozilla.org/firefox/addon/mho-addon';
 
 export const mh_optimizer_site_url = 'https://myhordes-optimizer.web.app';
+export const mh_optimizer_beta_site_url: string = 'https://myhordes-optimizer-beta.web.app';
 export const mh_optimizer_icon = 'https://myhordes-optimizer.web.app/img/logo/logo_mho_64x64_outlined.png';
 /** Variante 16x16 : à utiliser telle quelle plutôt que de redimensionner l'icône 64x64 en CSS */
 export const mh_optimizer_icon_16x16: string = repo_img_url + 'logo/logo_mho_16x16.png';

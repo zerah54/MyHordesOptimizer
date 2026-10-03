@@ -1,5 +1,5 @@
 import { lang, repo_img_hordes_url, supported_languages } from '../config/constants';
-import { opener_relation_texts, status_texts, wishlist_depot, wishlist_headers } from '../i18n/texts';
+import { opener_relation_texts, status_texts, texts, wishlist_depot, wishlist_headers } from '../i18n/texts';
 import { state } from '../state';
 import type { I18nLabel, WishlistItem } from '../types';
 import { getI18N } from '../utils/i18n';
@@ -555,12 +555,12 @@ export function displayPropertiesOrActions(property_or_action, hovered_item) {
             break;
         case 'hero_find':
             item_action.classList.add('item-tag-hero');
-            item_action.innerText = 'Trouvaille';
+            item_action.innerText = getI18N(texts.hero_find);
             break;
         case 'hero_find_lucky':
             if (!(hovered_item.properties && hovered_item.properties.some((property) => property === 'hero_find')) && !(hovered_item.actions && hovered_item.actions.some((property) => property === 'hero_find'))) {
                 item_action.classList.add('item-tag-hero');
-                item_action.innerText = 'Jolie trouvaille';
+                item_action.innerText = getI18N(texts.hero_find_lucky);
             } else {
                 item_action.classList.remove('item-tag', 'mho-item-tag');
             }
@@ -568,7 +568,7 @@ export function displayPropertiesOrActions(property_or_action, hovered_item) {
         case 'hero_find_lucky2':
             if (!(hovered_item.properties && hovered_item.properties.some((property) => property === 'hero_find_lucky')) && !(hovered_item.actions && hovered_item.actions.some((property) => property === 'hero_find_lucky'))) {
                 item_action.classList.add('item-tag-hero');
-                item_action.innerText = 'Impressionnante trouvaille';
+                item_action.innerText = getI18N(texts.hero_find_lucky2);
             } else {
                 item_action.classList.remove('item-tag', 'mho-item-tag');
             }
@@ -576,7 +576,7 @@ export function displayPropertiesOrActions(property_or_action, hovered_item) {
         case 'hero_find_lucky3':
             if (!(hovered_item.properties && hovered_item.properties.some((property) => property === 'hero_find_lucky2')) && !(hovered_item.actions && hovered_item.actions.some((property) => property === 'hero_find_lucky2'))) {
                 item_action.classList.add('item-tag-hero');
-                item_action.innerText = 'Incroyable trouvaille';
+                item_action.innerText = getI18N(texts.hero_find_lucky3);
             } else {
                 item_action.classList.remove('item-tag', 'mho-item-tag');
             }

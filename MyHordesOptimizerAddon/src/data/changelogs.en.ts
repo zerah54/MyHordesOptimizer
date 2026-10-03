@@ -1,4 +1,21 @@
 export const changelogs: Record<string, string> = {
+    '1.1.63': `
+        [New] The watchtower shows the refined attack range shared by the town, below the calculated attack for today and tomorrow
+        [New] The camping calculator shows the raw chance in parentheses when the cap or the floor changed it
+        [New] The script runs on the MHO website (and its beta) to refresh its tab after an external tools update
+
+        [Improvement] Successful digs: new, more reliable calculation from the zone log (citizens who left, incomplete log, day read from the game clock, nothing sent during the attack, no double counting between two updates)
+        [Improvement] A zone's remaining digs are now kept up to date by MHO instead of being deduced from successful digs only
+        [Improvement] The log copy button is available even when the log is not fully displayed
+        [Improvement] Translations completed (hero finds, older changelogs, one option in German) and links fixed
+
+        [Fix] The inactivity alert without escort did not work properly after any activity on the page
+        [Fix] The Fata Morgana update in a devastated town could run outside the desert page and send an empty zone
+        [Fix] Hidden items in the chest are no longer sent with its contents
+        [Fix] Saving estimations now waits for authentication instead of going out without it
+        [Fix] Options removed from the script are purged from saved settings: an old checked value stayed active
+        [Fix] BBH, GH, Fata Morgana and MHO tabs no longer reload needlessly the first time you come back to them
+        `,
     '1.1.62': `
         [New] Advanced tooltips and the shopping list now also show the quantity in chests and on the map, in addition to the bank and bags
         [New] The forum thread filter now accepts regular expressions in addition to plain words, with a help button and the %DAY% pattern to target the current town day

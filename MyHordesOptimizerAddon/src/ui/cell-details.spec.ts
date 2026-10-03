@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { getMap } from '../api/map';
 import { state } from '../state';
 import { getCellDetailsByPosition } from '../utils/position';
-import { clearRuinSubBlockIfNoRuin, displayCellDetailsOnPage, ensureRuinSubBlock } from './cell-details';
+import { clearRuinSubBlockIfNoRuin, displayCellDetailsOnPage, ensureRuinSubBlock, formatRemainingDigs } from './cell-details';
 
 /**
  * `texts.ts` appelle `getScriptInfo()` au chargement du module pour construire le lien de
@@ -124,6 +124,15 @@ describe('ensureRuinSubBlock', () => {
 
         ensureRuinSubBlock(cell_informations, 42);
         expect(cell_informations.querySelector('#cell-ruin')).not.toBeNull();
+    });
+});
+
+describe('formatRemainingDigs', () => {
+    it('shows the remaining digs kept by MHO, rounded and never negative', () => {
+        expect(formatRemainingDigs(6.4)).toBe(6);
+        expect(formatRemainingDigs(-3)).toBe(0);
+        expect(formatRemainingDigs(null)).toBe(0);
+        expect(formatRemainingDigs(undefined)).toBe(0);
     });
 });
 

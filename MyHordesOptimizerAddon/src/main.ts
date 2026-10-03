@@ -22,7 +22,7 @@ import { createStyles } from './ui/styles';
 import { waitForElement } from './utils/dom-wait';
 import { isDoubleInstall } from './utils/double-install-guard';
 import { initOptionsWithLoginNeeded, initOptionsWithoutLoginNeeded } from './utils/fetch';
-import { getTownClockSignature, shouldRefreshMe } from './utils/page';
+import { getTownClockSignature, isMhoWebsite, shouldRefreshMe } from './utils/page';
 import { getStorageItem, setStorageItem } from './utils/storage';
 import { notifyJustUpdated } from './utils/update-notifications';
 import { isNewVersion, toggleNewChangelog } from './utils/version';
@@ -42,7 +42,9 @@ import { isNewVersion, toggleNewChangelog } from './utils/version';
     // avant toute initialisation : la suite les lit de manière synchrone
     await bootstrap();
 
-    if (document.URL.startsWith(big_broth_hordes_url) || document.URL.startsWith(gest_hordes_url) || document.URL.startsWith(gest_hordes_old_url) || document.URL.startsWith(fata_morgana_url) || document.URL.startsWith(state.website)) {
+    const is_mho_website: boolean = isMhoWebsite(document.URL, state.website);
+
+    if (document.URL.startsWith(big_broth_hordes_url) || document.URL.startsWith(gest_hordes_url) || document.URL.startsWith(gest_hordes_old_url) || document.URL.startsWith(fata_morgana_url) || is_mho_website) {
         let current_key;
         let map_block_id;
         let ruin_block_id;
@@ -71,12 +73,19 @@ import { isNewVersion, toggleNewChangelog } from './utils/version';
             block_copy_map_button = 'modeBar';
             block_copy_ruin_button = 'modeBar';
             source = 'fm';
-        } else if (document.URL.startsWith(state.website)) {
+        } else if (is_mho_website) {
             current_key = gm_mho_updated_key;
             source = 'mho';
         }
 
-        // Si on est sur le site de BBH ou GH ou Fata et que BBH ou GH ou Fata a été mis à jour depuis MyHordes, alors on recharge BBH ou GH ou Fata au moment de revenir sur l'onglet
+        /**
+         * La page vient d'être chargée, elle affiche donc déjà les données à jour : un drapeau posé
+         * avant son chargement la rechargerait sinon au premier retour sur l'onglet, sans raison et
+         * en perdant une éventuelle saisie en cours.
+         */
+        setStorageItem(current_key, false);
+
+        // Si on est sur le site de BBH, GH, Fata ou MHO et qu'il a été mis à jour depuis MyHordes, alors on le recharge au moment de revenir sur l'onglet
         document.addEventListener('visibilitychange', function () {
             getStorageItem(current_key).then((current) => {
                 if (current && !document.hidden) {

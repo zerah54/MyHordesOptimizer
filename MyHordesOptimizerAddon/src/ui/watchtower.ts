@@ -1,4 +1,5 @@
-import { getEstimations, saveEstimations } from '../api/estimations';
+import type { RefinedAttack } from '../api/estimations';
+import { getEstimations, getRefinedAttack, saveEstimations } from '../api/estimations';
 import { mh_optimizer_icon, mho_watchtower_estim_id, repo_img_hordes_url } from '../config/constants';
 import { texts } from '../i18n/texts';
 import { state } from '../state';
@@ -6,6 +7,39 @@ import { getI18N } from '../utils/i18n';
 import { copyToClipboard } from '../utils/misc';
 import { pageIsWatchtower } from '../utils/page';
 import { getScriptInfo } from '../utils/version';
+
+/**
+ * Ligne « Attaque affinée » (plage partagée par la ville), vide sans affinage valide.
+ * @param refined Plage affinée ou null.
+ */
+export function refinedAttackRowHtml(refined: RefinedAttack | null): string {
+    if (refined === null) {
+        return '';
+    }
+    return `<div class="refined-attack" style="display: flex; justify-content: space-between; gap: 1em;"><b>${getI18N(texts.refined_attack)}</b><div><span>${refined.min}</span> - <span>${refined.max}</span></div></div>`;
+}
+
+/** Dernière lecture lancée par conteneur : une réponse plus ancienne arrivée après est ignorée. */
+const latest_refined_reads: WeakMap<Element, number> = new WeakMap<Element, number>();
+
+/**
+ * Ajoute (ou remplace) la plage affinée sous l'attaque calculée de chaque bloc, à l'arrivée de chaque
+ * réponse, sans retarder l'affichage existant.
+ * @param slots Conteneurs des attaques calculées et leur jour attaqué.
+ */
+export function appendRefinedAttacks(slots: { container: Element; day: number }[]): void {
+    slots.forEach((slot: { container: Element; day: number }): void => {
+        const read: number = (latest_refined_reads.get(slot.container) ?? 0) + 1;
+        latest_refined_reads.set(slot.container, read);
+        getRefinedAttack(slot.day).then((refined: RefinedAttack | null): void => {
+            if (latest_refined_reads.get(slot.container) !== read) {
+                return;
+            }
+            slot.container.querySelector('.refined-attack')?.remove();
+            slot.container.insertAdjacentHTML('beforeend', refinedAttackRowHtml(refined));
+        });
+    });
+}
 
 export function displayEstimationsOnWatchtower() {
     if (state.mho_parameters.display_estimations_on_watchtower && pageIsWatchtower()) {
@@ -83,6 +117,7 @@ export function displayEstimationsOnWatchtower() {
                             calc_attack.lastElementChild.innerText = estimations.tomorrow_attack.result.max;
                         }
                     }
+                    appendRefinedAttacks([{ container: calc_block, day: type === 'estim' ? state.mh_user.townDetails?.day : state.mh_user.townDetails?.day + 1 }]);
                 }
             };
 
@@ -320,7 +355,9 @@ export function displayEstimationsOnWatchtower() {
                         const is_new_estimation = current_planif_percent === value && (+saved_estimation?.min !== +estimation?.min || +saved_estimation?.max !== +estimation?.max);
                         value_block.innerHTML = createEstimationRow(value, is_new_estimation, estimation, 'planif');
                     });
+                    appendRefinedAttacks([{ container: planif_values_block_title_calculated, day: state.mh_user.townDetails?.day + 1 }]);
                 }
+                appendRefinedAttacks([{ container: estim_values_block_title_calculated, day: state.mh_user.townDetails?.day }]);
             });
         }
     }

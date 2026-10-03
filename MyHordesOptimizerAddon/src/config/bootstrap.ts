@@ -1,5 +1,7 @@
+import { params_categories } from '../data/params';
 import { state } from '../state';
-import { getStorageItem } from '../utils/storage';
+import { collectParamIds, type PurgedParameters, purgeUnknownParameters } from '../utils/params-purge';
+import { getStorageItem, setStorageItem } from '../utils/storage';
 import { gm_mh_external_app_id_key, is_mh_beta, is_mh_local, mho_parameters_key, mho_token_key } from './constants';
 
 // Runs once at script load: resolves environment URLs and restores
@@ -35,7 +37,16 @@ export async function bootstrap(): Promise<void> {
         getStorageItem(mho_token_key)
     ]);
 
-    state.mho_parameters = params || {};
+    /**
+     * Les options retirées du script sont purgées à chaque démarrage : l'écran de réglages ne les
+     * affiche plus, une ancienne valeur cochée resterait sinon active sans pouvoir être décochée.
+     * L'écriture n'est pas attendue : l'état en mémoire est déjà à jour.
+     */
+    const purged: PurgedParameters = purgeUnknownParameters(params, collectParamIds(params_categories));
+    state.mho_parameters = purged.parameters;
+    if (purged.removed.length > 0) {
+        void setStorageItem(mho_parameters_key, purged.parameters);
+    }
     /**
      * `mh_user` (identité + ville) est une donnée de jeu, pas un credential : elle n'est plus
      * persistée (cf. `api/token.ts`/`api/update.ts`) et reste `undefined` ici. Elle n'est

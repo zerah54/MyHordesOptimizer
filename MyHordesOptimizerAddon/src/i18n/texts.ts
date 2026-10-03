@@ -569,6 +569,12 @@ export const texts = {
         de: 'Berechnet',
         es: 'Calculado'
     },
+    refined_attack: {
+        en: 'Refined',
+        fr: 'Affinée',
+        de: 'Verfeinert',
+        es: 'Refinado'
+    },
     external_profiles: {
         en: 'External profiles',
         fr: 'Profils externes',
@@ -658,6 +664,13 @@ export const texts = {
         fr: 'Calculateur de camping',
         de: 'Campingrechner',
         es: 'Calculadora de camping'
+    },
+    /** Chance de camping avant plafond et plancher */
+    camping_raw_probability: {
+        en: 'raw',
+        fr: 'brut',
+        de: 'roh',
+        es: 'bruto'
     },
     forum_styles_configure: {
         en: 'Configure',
@@ -844,6 +857,36 @@ export const texts = {
         fr: 'Vous avez à la fois le script Tampermonkey et l\'extension navigateur installés. Cela peut provoquer des instabilités. Il est recommandé de privilégier l\'extension navigateur et de désinstaller le script Tampermonkey.',
         de: 'Sie haben sowohl das Tampermonkey-Skript als auch die Browser-Erweiterung installiert. Dies kann zu Instabilität führen. Es wird empfohlen, die Browser-Erweiterung zu behalten und das Tampermonkey-Skript zu deinstallieren.',
         es: 'Tienes instalados tanto el script de Tampermonkey como la extensión del navegador. Esto puede causar inestabilidad. Se recomienda mantener la extensión del navegador y desinstalar el script de Tampermonkey.'
+    },
+    older_changelogs: {
+        en: 'Show older changelogs',
+        fr: 'Voir les notes de versions plus anciennes',
+        de: 'Ältere Changelogs anzeigen',
+        es: 'Ver las notas de versiones anteriores'
+    },
+    hero_find: {
+        en: 'Seeker',
+        fr: 'Trouvaille',
+        de: 'Fund',
+        es: 'Hallazgo'
+    },
+    hero_find_lucky: {
+        en: 'Lucky Find',
+        fr: 'Jolie trouvaille',
+        de: 'Schönes Fundstück',
+        es: 'Hallazgo mejorado'
+    },
+    hero_find_lucky2: {
+        en: 'Impressive Find',
+        fr: 'Impressionnante trouvaille',
+        de: 'Beeindruckendes Fundstück',
+        es: 'Hallazgo perfeccionado'
+    },
+    hero_find_lucky3: {
+        en: 'Incredible Find',
+        fr: 'Incroyable trouvaille',
+        de: 'Erstaunliches Fundstück',
+        es: 'Hallazgo milagroso'
     }
 } satisfies Record<string, I18nLabel>;
 

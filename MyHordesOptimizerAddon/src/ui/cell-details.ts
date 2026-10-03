@@ -79,6 +79,16 @@ export function clearRuinSubBlockIfNoRuin(cell_informations: Element, id_ruin: n
     return true;
 }
 
+/**
+ * Fouilles restantes d'une case, telles que MHO les tient à jour (observations, régénérations,
+ * excavations, fouilles réussies) : elles ne se déduisent plus des fouilles réussies enregistrées.
+ * Arrondies pour l'affichage, jamais négatives.
+ * @param remaining Estimation moyenne ou plafond renvoyé par MHO
+ */
+export function formatRemainingDigs(remaining: number | null | undefined): number {
+    return Math.max(0, Math.round(remaining ?? 0));
+}
+
 export function displayCellDetailsOnPage() {
     if (!state.mho_parameters.display_more_informations_from_mho || !pageIsDesert()) {
         /** Hors désert ou option décochée : plus rien à afficher, on arrête d'écouter la carte */
@@ -201,8 +211,8 @@ export function displayCellDetailsOnPage() {
     const insertCellDigs = (cell) => {
         if (cell_informations.querySelector('#cell-digs-content')) {
             cell_informations.querySelector('#cell-digs-content').innerHTML = `
-                    <div>${getI18N(texts.digs_max)} : ${Math.round(cell.maxPotentialRemainingDig - cell.totalSucces)}</div>
-                    <div>${getI18N(texts.digs_average)} : ${Math.round(cell.averagePotentialRemainingDig - cell.totalSucces)}</div>
+                    <div>${getI18N(texts.digs_max)} : ${formatRemainingDigs(cell.maxPotentialRemainingDig)}</div>
+                    <div>${getI18N(texts.digs_average)} : ${formatRemainingDigs(cell.averagePotentialRemainingDig)}</div>
                 `;
         }
     };

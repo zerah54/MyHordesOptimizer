@@ -115,6 +115,25 @@ describe('fetcher', () => {
         expect(options.headers.Authorization).toBeUndefined();
     });
 
+    it('attend le jeton même pendant une authentification en cours quand wait_for_token est demandé', async (): Promise<void> => {
+        isTokenRequestInFlightMock.mockReturnValue(true);
+        let resolveGetToken: () => void = (): undefined => undefined;
+        getTokenMock.mockImplementation((): Promise<void> => new Promise<void>((resolve: () => void): void => {
+            resolveGetToken = resolve;
+        }));
+        const fetchMock: ReturnType<typeof vi.fn> = fetch as unknown as ReturnType<typeof vi.fn>;
+
+        const fetcher_promise: Promise<Response> = fetcher('https://api.test/x', undefined, { wait_for_token: true });
+        await Promise.resolve();
+        await Promise.resolve();
+        expect(fetchMock).not.toHaveBeenCalled();
+
+        state.token = validToken('awaited-jwt');
+        resolveGetToken();
+        await fetcher_promise;
+        expect(fetchMock.mock.calls[0][1].headers.Authorization).toBe('Bearer awaited-jwt');
+    });
+
     /**
      * Incident : bouton MHO (`ui/update-button.ts`) resté bloqué sur "…" indéfiniment, y compris
      * au-delà du plafond de 2 minutes de `followUpdateJob` — plafond vérifié seulement entre deux

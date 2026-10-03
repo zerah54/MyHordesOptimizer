@@ -49,34 +49,116 @@ export function preventFromLeaving() {
     }
 }
 
-/** Si l'option associée est activée, demande confirmation avant de quitter si les options d'escorte ne sont pas bonnes */
+/** Bouton « Attendre une escorte » : sa présence signifie que l'attente d'escorte n'est pas activée */
+const escort_waiting_button_selector: string = 'button[x-toggle-escort="1"]:not([x-escort-control-endpoint])';
 
-export function alertIfInactiveAndNoEscort() {
-    if (state.mho_parameters.alert_if_no_escort && state.mho_parameters.alert_if_inactive && pageIsDesert()) {
+/** Durée d'inactivité au-delà de laquelle le joueur est prévenu : 5 minutes */
+const inactivity_delay_ms: number = 5 * 60 * 1000;
 
-        const ae_button = document.querySelector('button[x-toggle-escort="1"]:not([x-escort-control-endpoint])');
-        const is_escorting = document.getElementsByClassName('beyond-escort-on')[0];
+/** Évènements considérés comme une activité du joueur sur la page */
+const activity_events: string[] = ['click', 'mousemove', 'keydown', 'touchstart'];
 
-        const notify = () => {
-            createNotification(getI18N(ae_button ? texts.prevent_not_in_ae : texts.escort_not_released));
-        };
+/** Horodatage de la dernière activité du joueur */
+let last_activity_at: number = 0;
 
-        if (ae_button || is_escorting) {
+/** Réveil de vérification de l'inactivité, unique pour toute la page */
+let inactivity_timeout: ReturnType<typeof setTimeout> | undefined;
 
-            const timer = 300000;
+/** L'inactivité en cours a déjà été vérifiée à son échéance : seule une nouvelle activité ouvre une nouvelle période */
+let inactivity_checked: boolean = false;
 
-            let timeout = setTimeout(notify, timer);
+/** Les écouteurs d'activité ne sont posés qu'une fois pour toute la durée de vie de la page */
+let activity_listeners_bound: boolean = false;
 
-            document.addEventListener('click', () => {
-                clearTimeout(timeout);
-                timeout = setTimeout(timeout as any, timer);
-            });
+function isInactivityAlertEnabled(): boolean {
+    return !!(state.mho_parameters?.alert_if_no_escort && state.mho_parameters?.alert_if_inactive) && pageIsDesert();
+}
 
-            document.addEventListener('mousemove', () => {
-                clearTimeout(timeout);
-                timeout = setTimeout(timeout as any, timer);
-            });
-        }
+/**
+ * Avertissement correspondant à l'état d'escorte ACTUEL de la page, ou `undefined` si tout est
+ * en ordre. Évalué au moment de notifier et non à l'initialisation : l'état a pu changer
+ * pendant les 5 minutes d'attente.
+ */
+function getEscortWarning(): string | undefined {
+    if (document.querySelector(escort_waiting_button_selector)) {
+        return getI18N(texts.prevent_not_in_ae);
+    }
+    if (document.querySelector('.beyond-escort-on')) {
+        return getI18N(texts.escort_not_released);
+    }
+    return undefined;
+}
+
+function clearInactivityTimeout(): void {
+    if (inactivity_timeout !== undefined) {
+        clearTimeout(inactivity_timeout);
+        inactivity_timeout = undefined;
+    }
+}
+
+function scheduleInactivityCheck(delay_ms: number): void {
+    clearInactivityTimeout();
+    inactivity_timeout = setTimeout(checkInactivity, delay_ms);
+}
+
+/**
+ * Vérifie l'inactivité à l'échéance. Une activité ne relance pas le minuteur à chaque
+ * mouvement de souris (bien trop fréquent) : elle met seulement à jour `last_activity_at`,
+ * et la vérification se reprogramme ici pour le temps d'inactivité restant.
+ */
+function checkInactivity(): void {
+    inactivity_timeout = undefined;
+    if (!isInactivityAlertEnabled()) return;
+
+    const idle_ms: number = Date.now() - last_activity_at;
+    if (idle_ms < inactivity_delay_ms) {
+        scheduleInactivityCheck(inactivity_delay_ms - idle_ms);
+        return;
+    }
+
+    inactivity_checked = true;
+    const warning: string | undefined = getEscortWarning();
+    if (warning) {
+        createNotification(warning);
+    }
+}
+
+function onUserActivity(): void {
+    last_activity_at = Date.now();
+    if (inactivity_timeout === undefined && isInactivityAlertEnabled()) {
+        inactivity_checked = false;
+        scheduleInactivityCheck(inactivity_delay_ms);
+    }
+}
+
+function bindActivityListenersOnce(): void {
+    if (activity_listeners_bound) return;
+    activity_listeners_bound = true;
+
+    activity_events.forEach((event_name: string): void => {
+        document.addEventListener(event_name, onUserActivity, { capture: true, passive: true });
+    });
+}
+
+/**
+ * Si l'option associée est activée, notifie le joueur resté inactif 5 minutes dans le désert
+ * alors que son attente d'escorte n'est pas activée ou qu'il n'a pas relâché son escorte.
+ *
+ * Rejouée à chaque navigation : un seul minuteur et un seul jeu d'écouteurs existent pour toute
+ * la page, et un rejeu n'interrompt pas la période d'inactivité en cours.
+ */
+export function alertIfInactiveAndNoEscort(): void {
+    if (!isInactivityAlertEnabled()) {
+        clearInactivityTimeout();
+        inactivity_checked = false;
+        return;
+    }
+
+    bindActivityListenersOnce();
+
+    if (inactivity_timeout === undefined && !inactivity_checked) {
+        last_activity_at = Date.now();
+        scheduleInactivityCheck(inactivity_delay_ms);
     }
 }
 

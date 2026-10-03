@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MHO Addon
-// @version      1.1.62
+// @version      1.1.63
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/, rubrique Tutoriels
 // @author       Zerah
 //
@@ -9,7 +9,7 @@
 //
 // @downloadURL  https://github.com/zerah54/MyHordesOptimizer/raw/main/Scripts/Tampermonkey/my_hordes_optimizer.user.js
 // @updateURL    https://github.com/zerah54/MyHordesOptimizer/raw/main/Scripts/Tampermonkey/my_hordes_optimizer.user.js
-// @homepageURL  https://myhordes-optimizer.web.app/tutorials/script/installation
+// @homepageURL  https://myhordes-optimizer.web.app/tutorials/script-extension/installation
 // @supportURL   https://discord.gg/ZQH7ZPWcCm
 //
 // @connect      https://api.myhordesoptimizer.fr/
@@ -24,6 +24,7 @@
 // @match        https://gest-hordes2.eragaming.fr/*
 // @match        https://gesthordes.fr/*
 // @match        https://fatamorgana.md26.eu/*
+// @match        https://myhordes-optimizer.web.app/*
 //
 // @grant        GM.setValue
 // @grant        GM.getValue

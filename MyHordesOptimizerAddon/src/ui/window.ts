@@ -1,6 +1,7 @@
 import { lang, mh_optimizer_map_window_id, mh_optimizer_window_id, repo_img_hordes_url } from '../config/constants';
 import { getChangelogTable } from '../data/changelogs';
 import { tabs_list } from '../data/tabs';
+import { texts } from '../i18n/texts';
 import { state } from '../state';
 import { getI18N } from '../utils/i18n';
 import { getScriptInfo } from '../utils/version';
@@ -343,7 +344,8 @@ export function showChangelogModal(content: string, onConfirm?: () => void): voi
     if (older_versions.length > 0) {
         const history_toggle = document.createElement('span');
         history_toggle.classList.add('mho-changelog-history-toggle');
-        history_toggle.textContent = '▶ Voir les notes de versions plus anciennes';
+        const history_toggle_label: string = getI18N(texts.older_changelogs);
+        history_toggle.textContent = `▶ ${history_toggle_label}`;
 
         const history_section = document.createElement('div');
         history_section.classList.add('mho-changelog-history-section');
@@ -369,7 +371,7 @@ export function showChangelogModal(content: string, onConfirm?: () => void): voi
         history_toggle.addEventListener('click', () => {
             const is_open = history_section.style.display !== 'none';
             history_section.style.display = is_open ? 'none' : 'block';
-            history_toggle.textContent = (is_open ? '▶' : '▼') + ' Voir les notes de versions plus anciennes';
+            history_toggle.textContent = `${is_open ? '▶' : '▼'} ${history_toggle_label}`;
         });
 
         box.appendChild(title);

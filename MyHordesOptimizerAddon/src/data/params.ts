@@ -141,7 +141,7 @@ export const params_categories: ParamCategory[] = [
                                 label: {
                                     en: 'Refresh tab after update',
                                     fr: 'Rafraîchir l\'onglet après la mise à jour',
-                                    de: 'Registerkarte „Aktualisieren“ nach dem Update',
+                                    de: 'Registerkarte nach dem Update aktualisieren',
                                     es: 'Actualizar pestaña después de la actualización'
                                 },
                                 help: {
@@ -244,7 +244,7 @@ export const params_categories: ParamCategory[] = [
                                 label: {
                                     en: 'Refresh tab after update',
                                     fr: 'Rafraîchir l\'onglet après la mise à jour',
-                                    de: 'Registerkarte „Aktualisieren“ nach dem Update',
+                                    de: 'Registerkarte nach dem Update aktualisieren',
                                     es: 'Actualizar pestaña después de la actualización'
                                 },
                                 help: {
@@ -297,7 +297,7 @@ export const params_categories: ParamCategory[] = [
                                 label: {
                                     en: 'Refresh tab after update',
                                     fr: 'Rafraîchir l\'onglet après la mise à jour',
-                                    de: 'Registerkarte „Aktualisieren“ nach dem Update',
+                                    de: 'Registerkarte nach dem Update aktualisieren',
                                     es: 'Actualizar pestaña después de la actualización'
                                 },
                                 help: {

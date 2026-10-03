@@ -1,4 +1,4 @@
-import { btn_id } from '../config/constants';
+import { btn_id, mh_optimizer_beta_site_url, mh_optimizer_site_url } from '../config/constants';
 import { state } from '../state';
 
 /////////////////////////////////////////
@@ -13,6 +13,21 @@ export function getWebsiteLanguage(): string {
 /** @return {boolean}     true if button exists */
 export function buttonOptimizerElement(): HTMLElement {
     return document.getElementById(btn_id);
+}
+
+/**
+ * `state.website` suit l'environnement du JEU (production, staging, local) : il vaut le site de
+ * production sur le site bêta de MHO, qui n'est pas une page staging. Les deux sites publiés sont
+ * donc reconnus en plus de `website`, et la comparaison porte sur l'origine exacte.
+ *
+ * @param {string} url          URL de la page courante
+ * @param {string} website      site MHO de l'environnement courant (`state.website`)
+ * @return {boolean}            true si la page est une page du site MyHordes Optimizer
+ */
+export function isMhoWebsite(url: string, website: string): boolean {
+    const origin: string = new URL(url).origin;
+    return [mh_optimizer_site_url, mh_optimizer_beta_site_url, website]
+        .some((site_url: string) => !!site_url && new URL(site_url).origin === origin);
 }
 
 /** @return {boolean}    true si la page de l'utilisateur est la page de selection de ville */

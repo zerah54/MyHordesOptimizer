@@ -1,16 +1,20 @@
-import { hordes_img_url, lang, mho_token_key } from '../config/constants';
+import { hordes_img_url, lang, mho_sent_digs_key, mho_token_key } from '../config/constants';
 import { state } from '../state';
 import type { ApiToken } from '../types';
 import { detectDailyActionDone } from '../utils/daily-action-detection';
 import { fetcher } from '../utils/fetch';
-import { getI18N } from '../utils/i18n';
 import { resolveInventoryObjects } from '../utils/item-lookup';
 import { fixMhCompiledImg } from '../utils/misc';
-import { addError, normalizeString } from '../utils/notifications';
-import { pageIsAmelio, pageIsDesert, pageIsDoors, pageIsHouse } from '../utils/page';
+import { addError } from '../utils/notifications';
+import { getCurrentTownDay, pageIsAmelio, pageIsDesert, pageIsDoors, pageIsHouse } from '../utils/page';
 import { getCurrentPosition } from '../utils/position';
-import { setStorageItem } from '../utils/storage';
+import { getStorageItem, setStorageItem } from '../utils/storage';
+import type { DigEstimate, SentDigsMemory, SuccessfulDigValue } from '../utils/successful-digs';
+import { isSentDigsMemory, mergeWithSentDigs } from '../utils/successful-digs';
+import type { PageUser } from '../utils/successful-digs-page';
+import { collectSuccessfulDigs } from '../utils/successful-digs-page';
 import { convertResponsePromiseToError } from '../utils/version';
+import { fetchTownCitizenRefs } from './citizens';
 import { saveDailyAction } from './daily-actions';
 import { getMap } from './map';
 import { getWishlist } from './wishlist';
@@ -106,8 +110,13 @@ export function updateExternalTools(on_progress?: (state: ExternalToolsUpdateJob
             citizen_list = [{ id: mh_user.id, userName: mh_user.userName, job: mh_user.jobDetails.uid }];
         }
 
-        // Mise à jour en ville chaos
-        if (pageIsDesert() && (mh_user.townDetails?.isChaos && (mho_parameters.update_gh && mho_parameters.update_gh_devastated) || (mho_parameters.update_mho && mho_parameters.update_mho_devastated)) || (mho_parameters.update_fata && mho_parameters.update_fata_devastated)) {
+        // Mise à jour en ville chaos. Le relevé lit la page du désert (note « zone épuisée », zombies,
+        // sol) : hors de cette page, il enverrait une case vide et « non épuisée ». Le cas Fata Morgana
+        // échappait à `pageIsDesert()`, faute de parenthèses.
+        if (pageIsDesert() && (
+            (mh_user.townDetails?.isChaos && mho_parameters.update_gh && mho_parameters.update_gh_devastated)
+            || (mho_parameters.update_mho && mho_parameters.update_mho_devastated)
+            || (mho_parameters.update_fata && mho_parameters.update_fata_devastated))) {
 
             if (mho_parameters.update_gh && mho_parameters.update_gh_devastated && mh_user.townDetails?.isChaos) {
                 data.map.toolsToUpdate.isGestHordes = 'cell';
@@ -298,7 +307,9 @@ export function updateExternalTools(on_progress?: (state: ExternalToolsUpdateJob
                 isMyHordesOptimizer: mho_parameters && mho_parameters.update_mho_chest
             };
 
-            const chest_elements = resolveInventoryObjects(Array.from(document.querySelector('.inventory.chest')?.querySelectorAll('li.item:not(.locked)') || []));
+            // `.banished_hidden` : stash secret (compétence héroïque Endurant, ChestHiddenStashLimit
+            // côté jeu), visible du propriétaire mais pas des autres citoyens — ne doit pas être relevé.
+            const chest_elements = resolveInventoryObjects(Array.from(document.querySelector('.inventory.chest')?.querySelectorAll('li.item:not(.locked):not(.banished_hidden)') || []));
 
             data.chest.contents = convertListOfSingleObjectsIntoListOfCountedObjects(chest_elements);
         }
@@ -428,90 +439,33 @@ export function updateExternalTools(on_progress?: (state: ExternalToolsUpdateJob
             }
         }
 
-        /** Récupération des fouilles réussies */
-        if (pageIsDesert() && (mho_parameters.update_mho && mho_parameters.update_mho_digs)) {
-            data.successedDig = {};
-            data.successedDig.cell = {
-                day: mh_user.townDetails?.day,
-                x: +position[0],
-                y: +position[1]
-            };
-            data.successedDig.values = [];
-            data.successedDig.toolsToUpdate = {
-                isBigBrothHordes: false,
-                isFataMorgana: false,
-                isGestHordes: false,
-                isMyHordesOptimizer: mho_parameters && mho_parameters.update_mho_digs
-            };
-
-            const logs = Array.from(document.querySelectorAll('div.log-entry'));
-            const arrivals_texts = {
-                de: 'angekommen',
-                en: 'has arrived from the',
-                es: 'ha llegado desde el',
-                fr: 'est arrivé depuis'
-            };
-
-            const arrivals = logs.filter((log) => normalizeString(log.innerText).indexOf(normalizeString(getI18N(arrivals_texts))) > -1).map((log) => {
-                return {
-                    time: log.querySelector('.log-part-time')?.innerText,
-                    citizen: log.querySelector('.log-part-content .container span')?.innerText
+        /** Récupération des fouilles réussies (règles du jeu et hypothèse : utils/successful-digs.ts) */
+        if (pageIsDesert() && (mho_parameters.update_mho && mho_parameters.update_mho_digs) && !document.querySelector('.during-attack')) {
+            // Jour lu sur l'horloge de la page : celui du jeton reste celui de la veille après l'attaque, tant qu'on ne s'est pas reconnecté
+            const dig_day: number | undefined = getCurrentTownDay() ?? mh_user.townDetails?.day;
+            if (dig_day !== undefined) {
+                const dig_x: number = +position[0];
+                const dig_y: number = +position[1];
+                data.successedDig = {
+                    cell: { day: dig_day, x: dig_x, y: dig_y },
+                    values: [],
+                    toolsToUpdate: {
+                        isBigBrothHordes: false,
+                        isFataMorgana: false,
+                        isGestHordes: false,
+                        isMyHordesOptimizer: mho_parameters && mho_parameters.update_mho_digs
+                    }
                 };
-            });
 
-            const now = document.querySelector('.game-clock .town-time')?.innerText;
-            if (now) {
-                citizen_list
-                    .filter((citizen) => { // On ne garde que les citoyens actuellement en train de fouiller
-                        let is_digging = false;
-                        if (citizen.id === mh_user.id) { // Il s'agit de l'utilisateur qui a cliqué sur le bouton
-                            is_digging = document.querySelector('#mgd-digging-note [x-countdown-to]') ? true : false;
-                        } else { // Les autres
-                            is_digging = citizen.row.parentElement.parentElement.parentElement.querySelector('li.status img[src*=small_gather]') ? true : false;
-                        }
-                        return is_digging;
-                    })
-                    .forEach((citizen) => {
-
-                        const failed_texts = {
-                            de: 'durch Graben nichts gefunden...',
-                            en: 'found nothing during their last search...',
-                            es: 'no encontró nada...',
-                            fr: 'rien trouvé...'
-                        };
-                        const failed_digs = Array.from(logs.filter((log) => normalizeString(log.innerText).indexOf(normalizeString(getI18N(failed_texts))) > -1) || []).filter((log) => log.innerText.indexOf(citizen.userName) > -1) || [];
-                        const nb_failed_digs = failed_digs.length;
-
-                        const nb_minutes_for_dig = citizen.job === 'dig' ? 90 : 120; // Une fouille = 2h = 120 minutes pour un tous les métiers, ou 1h30 = 90 minutes pour une pelle
-
-                        const citizen_arrivals = arrivals.filter((arrival) => arrival.citizen === citizen.userName); // Les heures d'arrivées du citoyen sur la case
-
-                        const citizen_last_arrival = citizen_arrivals[0]?.time;
-                        let start_date;
-
-                        if (citizen_last_arrival) { // Si le citoyen a une heure d'arrivée alors on se base sur cette heure comme heure de début de fouilles
-                            start_date = citizen_last_arrival;
-                        } else { // Sinon, on se base sur le cooldown
-                            start_date = nb_failed_digs === 0 ? null : failed_digs[failed_digs.length - 1].querySelector('.log-part-time').innerText;
-                        }
-
-                        let nb_digs;
-                        if (start_date) {
-                            const now_minutes = (+now.split(':')[0] * 60) + (+now.split(':')[1]);
-                            const start_date_minutes = (+start_date.split(':')[0] * 60) + (+start_date.split(':')[1]);
-
-                            const nb_minutes_digging = now_minutes - start_date_minutes; // Le nombre total de minutes passées à fouiller
-                            nb_digs = Math.floor(nb_minutes_digging / nb_minutes_for_dig) + 1;
-
-                        } else {
-                            nb_digs = 1;
-                        }
-                        data.successedDig.values.push({
-                            citizenId: citizen.id,
-                            successDigs: nb_digs - nb_failed_digs,
-                            totalDigs: nb_digs
-                        });
-                    });
+                const page_user: PageUser = { id: mh_user.id, name: mh_user.userName ?? '', job: mh_user.jobDetails?.uid ?? '' };
+                const estimates: DigEstimate[] = await collectSuccessfulDigs(page_user, dig_day, Date.now(), fetchTownCitizenRefs) ?? [];
+                if (estimates.length > 0) {
+                    const stored_memory: unknown = await getStorageItem(mho_sent_digs_key);
+                    const merged: { values: SuccessfulDigValue[]; memory: SentDigsMemory } = mergeWithSentDigs(
+                        estimates, isSentDigsMemory(stored_memory) ? stored_memory : undefined, +(mh_user.townDetails?.townId ?? 0), dig_day, dig_x, dig_y);
+                    data.successedDig.values = merged.values;
+                    await setStorageItem(mho_sent_digs_key, merged.memory);
+                }
             }
         }
 
