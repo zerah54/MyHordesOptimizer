@@ -974,8 +974,8 @@
         <source><x id="INTERPOLATION" equiv-text="{{ [pictos_to_rescue - pictos_rescued, 0] | max }}"/>
                     pictos restants
                 </source>
-        <target state="needs-translation">
-                    <x id="INTERPOLATION" equiv-text="{{ [pictos_to_rescue - pictos_rescued, 0] | max }}"/>
+        <target state="translated">
+                    <x id="INTERPOLATION" equiv-text="{{ [pictos_to_rescue - pictos_rescued(), 0] | max }}"/>
                     pictos restants
                 </target>
       </trans-unit>
