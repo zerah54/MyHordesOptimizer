@@ -37,8 +37,13 @@ describe('route-geometry.util', (): void => {
             expect(routeLinePath(cells, -0.2)).toBe('M0.3 0.3L1.3 0.3L1.3 2.3');
         });
 
-        it('is empty under two cells', (): void => {
-            expect(routeLinePath([{ x: 0, y: 0 }], 0)).toBe('');
+        it('draws a lone cell as a zero-length segment, which the round caps turn into a dot', (): void => {
+            expect(routeLinePath([{ x: 0, y: 0 }], 0)).toBe('M0.5 0.5h0');
+            expect(routeLinePath([{ x: 0, y: 0 }], -0.2)).toBe('M0.3 0.3h0');
+        });
+
+        it('is empty without cells', (): void => {
+            expect(routeLinePath([], 0)).toBe('');
         });
     });
 

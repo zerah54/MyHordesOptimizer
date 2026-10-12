@@ -149,41 +149,37 @@
             /* Assez large pour la liste des tracés : nom, auteur et longueur sur une ligne. */
             width: 320px;
             max-width: 85vw;
-            padding: 0 16px 16px;
             background-color: var(--mho-surface);
             border-left: 1px solid var(--mho-line);
 
             /* En-tête de panneau, calqué sur `.mho-card-header` : le titre ne doit pas peser
-               autant qu'un titre de page. */
+               autant qu'un titre de page. Le padding est porté par le corps, pas par le panneau :
+               des marges négatives dépasseraient du conteneur de défilement de Material. */
             .settings-header {
                 display: flex;
                 align-items: center;
                 gap: 8px;
-                margin: 0 -16px 12px;
+                margin-bottom: 12px;
                 padding: 6px 8px 6px 16px;
                 border-bottom: 1px solid var(--mho-line);
 
-                /* Onglets « Affichage » / « Tracés » en contrôle segmenté. */
-                .side-panel-tabs.mat-button-toggle-group {
+                .side-panel-title {
                     flex-grow: 1;
-                    border: 1px solid var(--mho-line);
-                    border-radius: var(--mho-radius-s);
+                    margin: 0;
+                    font-size: 15px;
+                    font-weight: 600;
+                    letter-spacing: normal;
+                    text-transform: none;
+                    color: var(--mho-text);
+                }
+            }
 
-                    .mat-button-toggle {
-                        flex: 1;
-                        font-size: 13px;
-                    }
+            .settings-body {
+                padding: 0 16px 16px;
 
-                    .mat-button-toggle-checked {
-                        background-color: var(--mho-accent-soft);
-                        color: var(--mho-on-accent-soft);
-                        font-weight: 600;
-                    }
-
-                    .mat-button-toggle-label-content {
-                        line-height: 32px;
-                        padding: 0 10px;
-                    }
+                /* Éditeur de tracé : il gère son propre padding pour que son pied collant touche les bords. */
+                &.flush {
+                    padding: 0;
                 }
             }
 

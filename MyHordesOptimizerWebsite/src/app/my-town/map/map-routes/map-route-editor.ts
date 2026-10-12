@@ -17,7 +17,7 @@ import { cellsByCoordinates } from './map-route-detail';
 import { MapRouteDrawing } from './map-route-views';
 import { MapRoutesStore } from './map-routes.store';
 import { MapRouteKey, mapRouteKey } from './map-routes-display';
-import { distanceInAp, isLoop } from './route-geometry.util';
+import { distanceInAp } from './route-geometry.util';
 import { buildSegments, CellIndex, countFresh, pointKeys, routeCells, RouteSegment, samePoint, segmentPath, splitSegments } from './route-path.util';
 
 /** Longueur maximale du nom d'un tracé (`MapRoutePath.MaxLabelLength` côté API). */
@@ -25,6 +25,12 @@ export const MAP_ROUTE_LABEL_MAX_LENGTH: number = 64;
 
 /** Changements du chemin qu'« Annuler » peut défaire. */
 const MAX_UNDO: number = 100;
+
+/** Départ et chemin tels qu'« Annuler » les rétablit. */
+interface PathSnapshot {
+    readonly start: MapRoutePoint | null;
+    readonly segments: readonly RouteSegment[];
+}
 
 /** Tracé en cours de saisie. */
 export interface MapRouteDraft {
@@ -41,7 +47,8 @@ export interface MapRouteDraft {
     readonly author_id: number | null;
     /** Lié à une partie d'expédition : il reste visible de toute la ville. */
     readonly is_linked: boolean;
-    readonly start: MapRoutePoint;
+    /** `null` : départ pas encore choisi (nouveau tracé). */
+    readonly start: MapRoutePoint | null;
     readonly segments: readonly RouteSegment[];
 }
 
@@ -90,7 +97,7 @@ export class MapRouteEditor {
     /** Écran tactile : case touchée une première fois, en aperçu, validée par un second toucher. */
     private readonly armed: WritableSignal<MapRoutePoint | null> = signal(null);
     /** Chemins précédents, le plus récent en dernier : « Annuler » défait le dernier changement du chemin. */
-    private readonly history: WritableSignal<readonly (readonly RouteSegment[])[]> = signal([]);
+    private readonly history: WritableSignal<readonly PathSnapshot[]> = signal([]);
     /** Brouillon tel qu'au début de la saisie : sans changement, quitter ne demande rien. */
     private initial: MapRouteDraft | null = null;
 
@@ -108,7 +115,7 @@ export class MapRouteEditor {
 
     public readonly cells: Signal<readonly MapRoutePoint[]> = computed((): readonly MapRoutePoint[] => {
         const draft: MapRouteDraft | null = this.draft_state();
-        return draft ? routeCells(draft.start, draft.segments) : [];
+        return draft?.start ? routeCells(draft.start, draft.segments) : [];
     });
 
     public readonly length: Signal<number> = computed((): number => Math.max(0, this.cells().length - 1));
@@ -173,35 +180,32 @@ export class MapRouteEditor {
         if (!draft) return [];
         const drawings: MapRouteDrawing[] = [];
         const cells: readonly MapRoutePoint[] = this.cells();
-        if (cells.length > 1) {
+        if (cells.length > 0) {
             drawings.push({
-                key: 'draft', color: draft.color, cells, lane: 0, dashed: false, emphasized: true, dimmed: false,
-                end: isLoop(cells) ? null : cells[cells.length - 1], label: null
+                key: 'draft', color: draft.color, cells, lane: 0, dashed: false, emphasized: true, dimmed: false, label: null
             });
         }
         const preview: MapRoutePreview | null = this.preview();
         if (preview) {
             drawings.push({
                 key: 'preview', color: draft.color, cells: preview.cells, lane: 0, dashed: true, emphasized: false, dimmed: false,
-                end: null, label: previewLabel(preview)
+                label: previewLabel(preview)
             });
         }
         return drawings;
     });
 
-    /** Carte affichée : ville (départ des nouveaux tracés) et potentiel des cases. */
+    /** Carte affichée : ville (destination du retour) et potentiel des cases. */
     public setMap(town: Town | undefined): void {
         this.town.set(town ? { x: town.town_x, y: town.town_y } : null);
         this.cell_index.set(cellsByCoordinates(town));
     }
 
-    /** Nouveau tracé, au départ de la ville. Sans ville connue, rien ne se passe. */
+    /** Nouveau tracé, sans départ : la première case choisie sur la carte le fixe. */
     public startNew(): void {
-        const town: MapRoutePoint | null = this.town();
-        if (!town) return;
         this.begin({
             id: null, version: null, label: '', color: randomColor(), is_private: false, is_editable_by_all: true,
-            shared_user_ids: [], author_id: null, is_linked: false, start: town, segments: []
+            shared_user_ids: [], author_id: null, is_linked: false, start: null, segments: []
         });
     }
 
@@ -267,10 +271,15 @@ export class MapRouteEditor {
 
     /**
      * Case choisie sur la carte. À la souris, elle devient la prochaine destination. Au toucher, un premier
-     * toucher montre l'aperçu, un second sur la même case la valide.
+     * toucher montre l'aperçu, un second sur la même case la valide. Tant que le départ n'est pas choisi, la case
+     * le devient aussitôt : il n'y a pas encore de chemin à prévisualiser.
      */
     public pick(point: MapRoutePoint, touch: boolean): void {
         if (!this.isEditable()) return;
+        if (this.draft_state()?.start === null) {
+            this.update((draft: MapRouteDraft): MapRouteDraft => ({ ...draft, start: { x: point.x, y: point.y } }));
+            return;
+        }
         const armed: MapRoutePoint | null = this.armed();
         if (touch && !(armed && samePoint(armed, point))) {
             this.armed.set(point);
@@ -285,6 +294,7 @@ export class MapRouteEditor {
         const mode: MapRouteStopMode = this.mode_state();
         const cells: CellIndex = this.cell_index();
         this.updatePath((draft: MapRouteDraft): readonly RouteSegment[] => {
+            if (!draft.start) return draft.segments;
             const route: MapRoutePoint[] = routeCells(draft.start, draft.segments);
             const last: MapRoutePoint = route[route.length - 1];
             if (samePoint(last, point)) return draft.segments;
@@ -301,6 +311,7 @@ export class MapRouteEditor {
     public cutAt(point: MapRoutePoint): void {
         this.armed.set(null);
         this.updatePath((draft: MapRouteDraft): readonly RouteSegment[] => {
+            if (!draft.start) return draft.segments;
             if (samePoint(draft.start, point)) return draft.segments.length ? [] : draft.segments;
             for (let index: number = 0; index < draft.segments.length; index++) {
                 const segment: RouteSegment = draft.segments[index];
@@ -314,34 +325,30 @@ export class MapRouteEditor {
         });
     }
 
-    /** Retour en ville : une dernière destination sur la ville. */
-    public returnToTown(): void {
-        const town: MapRoutePoint | null = this.town();
-        if (town) {
-            this.addStop(town);
-        }
-    }
-
     /** Défait le dernier changement du chemin (ajout, coupe, effacement, recalcul). */
     public undo(): void {
         this.armed.set(null);
-        const history: readonly (readonly RouteSegment[])[] = this.history();
+        const history: readonly PathSnapshot[] = this.history();
         if (history.length === 0 || !this.isEditable()) return;
-        const previous: readonly RouteSegment[] = history[history.length - 1];
+        const previous: PathSnapshot = history[history.length - 1];
         this.history.set(history.slice(0, -1));
-        this.update((draft: MapRouteDraft): MapRouteDraft => ({ ...draft, segments: previous }));
+        this.update((draft: MapRouteDraft): MapRouteDraft => ({ ...draft, start: previous.start, segments: previous.segments }));
     }
 
-    /** Efface toutes les destinations. */
+    /** Efface le départ et toutes les destinations : le départ est à choisir de nouveau. */
     public clear(): void {
         this.armed.set(null);
-        this.updatePath((draft: MapRouteDraft): readonly RouteSegment[] => draft.segments.length ? [] : draft.segments);
+        const draft: MapRouteDraft | null = this.draft_state();
+        if (!draft?.start || !this.isEditable()) return;
+        this.remember(draft);
+        this.update((current: MapRouteDraft): MapRouteDraft => ({ ...current, start: null, segments: [] }));
     }
 
     /** Mêmes destinations, chemin recalculé avec le potentiel du jour. */
     public recalculate(): void {
         const cells: CellIndex = this.cell_index();
         this.updatePath((draft: MapRouteDraft): readonly RouteSegment[] => {
+            if (!draft.start) return draft.segments;
             return buildSegments(draft.start, draft.segments.map((segment: RouteSegment): MapRouteStop => segment.stop), cells);
         });
     }
@@ -414,10 +421,15 @@ export class MapRouteEditor {
         if (!draft || !this.isEditable()) return;
         const segments: readonly RouteSegment[] = change(draft);
         if (segments === draft.segments) return;
-        this.history.update((history: readonly (readonly RouteSegment[])[]): readonly (readonly RouteSegment[])[] => {
-            return [...history.slice(-(MAX_UNDO - 1)), draft.segments];
-        });
+        this.remember(draft);
         this.update((current: MapRouteDraft): MapRouteDraft => ({ ...current, segments }));
+    }
+
+    /** Garde le départ et le chemin actuels pour « Annuler ». */
+    private remember(draft: MapRouteDraft): void {
+        this.history.update((history: readonly PathSnapshot[]): readonly PathSnapshot[] => {
+            return [...history.slice(-(MAX_UNDO - 1)), { start: draft.start, segments: draft.segments }];
+        });
     }
 
     private toRequest(draft: MapRouteDraft): MapRouteRequestDTO {

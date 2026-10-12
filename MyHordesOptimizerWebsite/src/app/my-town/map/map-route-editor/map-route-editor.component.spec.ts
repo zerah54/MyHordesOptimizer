@@ -95,6 +95,12 @@ describe('MapRouteEditorComponent', (): void => {
         editor.setMap(town());
     });
 
+    /** Nouveau tracé dont le départ est posé sur la ville. */
+    function startFromTown(): void {
+        editor.startNew();
+        editor.pick({ x: 2, y: 2 }, false);
+    }
+
     function render(): HTMLElement {
         fixture = TestBed.createComponent(MapRouteEditorComponent);
         fixture.componentRef.setInput('map', town());
@@ -121,7 +127,7 @@ describe('MapRouteEditorComponent', (): void => {
     });
 
     it('lists only the start and the end, not the intermediate clicks', (): void => {
-        editor.startNew();
+        startFromTown();
         editor.pick({ x: 4, y: 2 }, false);
         editor.pick({ x: 4, y: 0 }, false);
         const element: HTMLElement = render();
@@ -155,14 +161,54 @@ describe('MapRouteEditorComponent', (): void => {
     });
 
     it('lists the start alone before any destination', (): void => {
-        editor.startNew();
+        startFromTown();
         const element: HTMLElement = render();
 
         expect(Array.from(element.querySelectorAll('.step .node')).map(text)).toEqual(['D']);
     });
 
-    it('saves only with a name, then reports the saved route', async (): Promise<void> => {
+    it('asks for the start of a new route, listing no step yet', (): void => {
         editor.startNew();
+        const element: HTMLElement = render();
+
+        expect(text(element.querySelector('.step-hint'))).toContain('case de départ');
+        expect(element.querySelectorAll('.step').length).toBe(0);
+        expect((button(element, 'Effacer') as HTMLButtonElement).disabled).toBe(true);
+    });
+
+    it('has no button to return to town: picking the town does it', (): void => {
+        startFromTown();
+        editor.pick({ x: 2, y: 0 }, false);
+        const element: HTMLElement = render();
+
+        expect(button(element, 'Retour en ville')).toBeUndefined();
+
+        editor.pick({ x: 2, y: 2 }, false);
+        fixture.detectChanges();
+
+        expect(text(element.querySelector('.summary'))).toContain('Retour en ville compris');
+    });
+
+    it('clears the start too, so that it can be chosen again', (): void => {
+        startFromTown();
+        const element: HTMLElement = render();
+        const clear: HTMLButtonElement = button(element, 'Effacer') as HTMLButtonElement;
+
+        expect(text(element.querySelector('.step-hint'))).toContain('pour y aller');
+        expect(clear.disabled).toBe(false);
+
+        editor.pick({ x: 2, y: 0 }, false);
+        fixture.detectChanges();
+        clear.click();
+        fixture.detectChanges();
+
+        expect(editor.draft()?.start).toBeNull();
+        expect(text(element.querySelector('.step-hint'))).toContain('case de départ');
+        expect(clear.disabled).toBe(true);
+    });
+
+    it('saves only with a name, then reports the saved route', async (): Promise<void> => {
+        startFromTown();
         editor.pick({ x: 2, y: 0 }, false);
         const element: HTMLElement = render();
         const save: HTMLButtonElement = button(element.querySelector('.editor-footer') as HTMLElement, 'Enregistrer') as HTMLButtonElement;

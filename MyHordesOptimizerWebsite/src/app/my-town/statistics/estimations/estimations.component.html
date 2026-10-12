@@ -193,25 +193,27 @@
                     }
 
                     @if (attackGauge(); as gauge) {
-                        <div class="kpi-gauge" role="img"
-                             [attr.aria-label]="'Plage calculée de ' + gauge.min + ' à ' + gauge.max + ', dans un possible du jour allant de ' + gauge.low + ' à ' + gauge.high">
-                            <span class="track"></span>
-                            <span class="range" [style.left.%]="gauge.left" [style.width.%]="gauge.width"></span>
-                            <span class="likely" [style.left.%]="gauge.likely_left"></span>
-                            <!-- Affinage abouti : deux repères pour ses bornes, qui se lisent par-dessus
-                                 la plage calculée sans la remplacer. -->
-                            @if (gauge.refined_min_left !== null) {
-                                <span class="refined" [style.left.%]="gauge.refined_min_left"
-                                      i18n-title title="Minimum affiné"></span>
-                            }
-                            @if (gauge.refined_max_left !== null) {
-                                <span class="refined" [style.left.%]="gauge.refined_max_left"
-                                      i18n-title title="Maximum affiné"></span>
-                            }
-                        </div>
-                        <div class="kpi-scale">
-                            <span class="mho-num">{{ gauge.low | number:'1.0-0':locale }}</span>
-                            <span class="mho-num">{{ gauge.high | number:'1.0-0':locale }}</span>
+                        <div class="kpi-range">
+                            <div class="kpi-gauge" role="img"
+                                 [attr.aria-label]="'Plage calculée de ' + gauge.min + ' à ' + gauge.max + ', dans un possible du jour allant de ' + gauge.low + ' à ' + gauge.high">
+                                <span class="track"></span>
+                                <span class="range" [style.left.%]="gauge.left" [style.width.%]="gauge.width"></span>
+                                <span class="likely" [style.left.%]="gauge.likely_left"></span>
+                                <!-- Affinage abouti : deux repères pour ses bornes, qui se lisent par-dessus
+                                     la plage calculée sans la remplacer. -->
+                                @if (gauge.refined_min_left !== null) {
+                                    <span class="refined" [style.left.%]="gauge.refined_min_left"
+                                          i18n-title title="Minimum affiné"></span>
+                                }
+                                @if (gauge.refined_max_left !== null) {
+                                    <span class="refined" [style.left.%]="gauge.refined_max_left"
+                                          i18n-title title="Maximum affiné"></span>
+                                }
+                            </div>
+                            <div class="kpi-scale">
+                                <span class="mho-num">{{ gauge.low | number:'1.0-0':locale }}</span>
+                                <span class="mho-num">{{ gauge.high | number:'1.0-0':locale }}</span>
+                            </div>
                         </div>
                     }
 

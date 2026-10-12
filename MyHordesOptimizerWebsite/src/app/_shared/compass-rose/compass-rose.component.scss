@@ -25,10 +25,8 @@
             width: 70%;
             height: 70%;
             position: absolute;
-            top: 50%;
-            left: 50%;
-            margin-top: -35%;
-            margin-left: -35%;
+            inset: 0;
+            margin: auto;
         }
 
         .pointer {

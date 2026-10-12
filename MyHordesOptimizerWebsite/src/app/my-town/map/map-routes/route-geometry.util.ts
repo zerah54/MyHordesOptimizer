@@ -31,7 +31,7 @@ export function expandStops(stops: readonly MapRoutePoint[]): MapRoutePoint[] {
     return cells;
 }
 
-/** Le tracé revient-il à sa case de départ ? Sinon c'est un aller simple, dont on marque l'arrivée. */
+/** Le tracé revient-il à sa case de départ ? Sinon c'est un aller simple. */
 export function isLoop(cells: readonly MapRoutePoint[]): boolean {
     if (cells.length < 2) return false;
     const first: MapRoutePoint = cells[0];
@@ -51,17 +51,20 @@ function svgNumber(value: number): string {
 
 /**
  * Ligne du tracé, en unités de case : le centre de la case (x, y) est en (x + 0,5 ; y + 0,5), décalé de la
- * voie sur les deux axes, ce qui écarte les segments horizontaux comme verticaux sans casser la ligne.
+ * voie sur les deux axes, ce qui écarte les segments horizontaux comme verticaux sans casser la ligne. Une case
+ * seule (départ sans destination) devient un segment de longueur nulle : les bouts ronds en font un point de la
+ * largeur du trait.
  */
 export function routeLinePath(cells: readonly MapRoutePoint[], lane: number): string {
-    if (cells.length < 2) return '';
+    if (cells.length === 0) return '';
     const offset: number = 0.5 + lane;
-    return cells
+    const path: string = cells
         .map((cell: MapRoutePoint, index: number): string => `${index === 0 ? 'M' : 'L'}${svgNumber(cell.x + offset)} ${svgNumber(cell.y + offset)}`)
         .join('');
+    return cells.length === 1 ? `${path}h0` : path;
 }
 
-/** Rond posé sur la case de départ-arrivée d'une boucle ; vide pour un aller simple, dont l'arrivée a son drapeau. */
+/** Rond posé sur la case de départ-arrivée d'une boucle ; vide pour un aller simple. */
 export function routeLoopMarkPath(cells: readonly MapRoutePoint[], lane: number): string {
     if (!isLoop(cells)) return '';
     const radius: string = svgNumber(LOOP_MARK_RADIUS);

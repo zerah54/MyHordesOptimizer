@@ -82,13 +82,11 @@ describe('buildRouteDrawings', (): void => {
         [route(1, 'Boucle'), route(2, 'Aller', [], false)], [gameRoute(9, 'Lac')], TOWN_DAY, DEFAULT_ROUTES_DISPLAY
     );
 
-    it('assigns lanes by id and marks the end of one-way routes only', (): void => {
+    it('assigns lanes by id', (): void => {
         const drawings: MapRouteDrawing[] = buildRouteDrawings(views, null);
 
         expect(drawings.map((drawing: MapRouteDrawing): string => drawing.key)).toEqual(['mho-1', 'mho-2', 'game-9']);
         expect(drawings.map((drawing: MapRouteDrawing): number => drawing.lane)).toEqual([0, -0.2, 0.2]);
-        expect(drawings[0].end).toBeNull();
-        expect(drawings[1].end).toEqual({ x: 3, y: 2 });
         expect(drawings[2].dashed).toBe(true);
         expect(drawings.some((drawing: MapRouteDrawing): boolean => drawing.dimmed)).toBe(false);
     });

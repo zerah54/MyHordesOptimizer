@@ -45,29 +45,6 @@
     }
 }
 
-/* Arrivée d'un aller simple. Taille fixe en pixels, bornée par la case aux zooms les plus faibles. */
-.end-pin {
-    --pin-size: min(18px, calc(var(--mho-cell) * 0.7));
-
-    position: absolute;
-    display: grid;
-    place-items: center;
-    width: var(--pin-size);
-    height: var(--pin-size);
-    transform: translate(-50%, -50%);
-    border-radius: 4px 99px 99px 99px;
-    background: var(--mho-route-color);
-    color: var(--mho-route-on);
-    box-shadow: 0 0 0 2px var(--mho-route-casing);
-
-    .mat-icon {
-        width: auto;
-        height: auto;
-        font-size: calc(var(--pin-size) * 0.7);
-        line-height: 1;
-    }
-}
-
 /* Étiquette d'aperçu de saisie, à droite de la case visée : taille fixe, lisible à tous les zooms. */
 .label-pin {
     position: absolute;

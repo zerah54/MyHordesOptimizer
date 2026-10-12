@@ -70,195 +70,198 @@
         <mat-sidenav #sidenav class="map-settings" [position]="'end'" [mode]="is_gt_xs() ? 'side' : 'over'"
                      (openedChange)="onSidePanelOpenedChange($event)">
             <div class="settings-header">
-                <mat-button-toggle-group class="side-panel-tabs" [value]="side_panel()" (change)="showSidePanel($event.value)"
-                                         hideSingleSelectionIndicator aria-label="Panneau" i18n-aria-label>
-                    <mat-button-toggle value="display" i18n>Affichage</mat-button-toggle>
-                    @if (routes_available()) {
-                        <mat-button-toggle value="routes" i18n>Tracés</mat-button-toggle>
+                <h2 class="side-panel-title">
+                    @if (side_panel() === 'routes') {
+                        <ng-container i18n>Tracés</ng-container>
+                    } @else {
+                        <ng-container i18n>Affichage</ng-container>
                     }
-                </mat-button-toggle-group>
+                </h2>
                 <button mat-icon-button type="button" (click)="sidenav.close()"
                         aria-label="Fermer le panneau" i18n-aria-label>
                     <mat-icon>close</mat-icon>
                 </button>
             </div>
-            @if (side_panel() === 'routes') {
-                @if (route_editing()) {
-                    <mho-map-route-editor [map]="map()" [allRuins]="all_ruins()" [allCitizens]="all_citizens()"
-                                          (closed)="onRouteEditorClosed($event)"></mho-map-route-editor>
+            <div class="settings-body" [class.flush]="side_panel() === 'routes' && route_editing()">
+                @if (side_panel() === 'routes') {
+                    @if (route_editing()) {
+                        <mho-map-route-editor [map]="map()" [allRuins]="all_ruins()" [allCitizens]="all_citizens()"
+                                              (closed)="onRouteEditorClosed($event)"></mho-map-route-editor>
+                    } @else {
+                        <mho-map-routes-panel [views]="route_views()" [status]="routes_status()" [access]="routes_store.access()"
+                                              [selectedKey]="selected_route()" [showPreviousDays]="options().routes.show_previous_days"
+                                              [map]="map()" [allRuins]="all_ruins()" [allCitizens]="all_citizens()"
+                                              [orderCounts]="route_order_counts()"
+                                              (selectedKeyChange)="selected_route.set($event)"
+                                              (visibilityToggled)="toggleRouteVisibility($event)"
+                                              (showAllRequested)="showAllRoutes()"
+                                              (showPreviousDaysChange)="changeShowPreviousDays($event)"
+                                              (personalColorChange)="changePersonalColor($event)"
+                                              (createRequested)="startNewRoute(sidenav)"
+                                              (editRequested)="editRoute($event, sidenav)"
+                                              (deleteRequested)="deleteRoute($event)"
+                                              (commonColorChange)="changeCommonColor($event)"
+                                              (copyRequested)="copyGameRoute($event)"></mho-map-routes-panel>
+                    }
                 } @else {
-                    <mho-map-routes-panel [views]="route_views()" [status]="routes_status()" [access]="routes_store.access()"
-                                          [selectedKey]="selected_route()" [showPreviousDays]="options().routes.show_previous_days"
-                                          [map]="map()" [allRuins]="all_ruins()" [allCitizens]="all_citizens()"
-                                          [orderCounts]="route_order_counts()"
-                                          (selectedKeyChange)="selected_route.set($event)"
-                                          (visibilityToggled)="toggleRouteVisibility($event)"
-                                          (showAllRequested)="showAllRoutes()"
-                                          (showPreviousDaysChange)="changeShowPreviousDays($event)"
-                                          (personalColorChange)="changePersonalColor($event)"
-                                          (createRequested)="startNewRoute(sidenav)"
-                                          (editRequested)="editRoute($event, sidenav)"
-                                          (deleteRequested)="deleteRoute($event)"
-                                          (commonColorChange)="changeCommonColor($event)"
-                                          (copyRequested)="copyGameRoute($event)"></mho-map-routes-panel>
-                }
-            } @else {
-                <h2 i18n>Type de carte</h2>
-                <mat-button-toggle-group class="mho-map-seg" [value]="options().map_type"
-                                         (change)="changeOptions('map_type', $event.value)" hideSingleSelectionIndicator
-                                         aria-label="Type de carte" i18n-aria-label>
-                    <mat-button-toggle value="digs" i18n>Fouilles</mat-button-toggle>
-                    <mat-button-toggle value="danger" i18n>Danger</mat-button-toggle>
-                    <mat-button-toggle value="scout" i18n>Exploration</mat-button-toggle>
-                    @if (is_dev) {
-                        <mat-button-toggle value="trash" i18n>Décharge</mat-button-toggle>
+                    <h2 i18n>Type de carte</h2>
+                    <mat-button-toggle-group class="mho-map-seg" [value]="options().map_type"
+                                             (change)="changeOptions('map_type', $event.value)" hideSingleSelectionIndicator
+                                             aria-label="Type de carte" i18n-aria-label>
+                        <mat-button-toggle value="digs" i18n>Fouilles</mat-button-toggle>
+                        <mat-button-toggle value="danger" i18n>Danger</mat-button-toggle>
+                        <mat-button-toggle value="scout" i18n>Exploration</mat-button-toggle>
+                        @if (is_dev) {
+                            <mat-button-toggle value="trash" i18n>Décharge</mat-button-toggle>
+                        }
+                    </mat-button-toggle-group>
+                    @if (options().map_type === 'digs') {
+                        <div>
+                            <h2 i18n>Fouilles restantes</h2>
+                            <mat-button-toggle-group class="mho-map-seg" [value]="options().dig_mode"
+                                                     (change)="changeOptions('dig_mode', $event.value)" hideSingleSelectionIndicator
+                                                     aria-label="Fouilles restantes" i18n-aria-label>
+                                <mat-button-toggle value="max" i18n>Maximum</mat-button-toggle>
+                                <mat-button-toggle value="average" i18n>Moyenne</mat-button-toggle>
+                            </mat-button-toggle-group>
+                        </div>
                     }
-                </mat-button-toggle-group>
-                @if (options().map_type === 'digs') {
-                    <div>
-                        <h2 i18n>Fouilles restantes</h2>
-                        <mat-button-toggle-group class="mho-map-seg" [value]="options().dig_mode"
-                                                 (change)="changeOptions('dig_mode', $event.value)" hideSingleSelectionIndicator
-                                                 aria-label="Fouilles restantes" i18n-aria-label>
-                            <mat-button-toggle value="max" i18n>Maximum</mat-button-toggle>
-                            <mat-button-toggle value="average" i18n>Moyenne</mat-button-toggle>
-                        </mat-button-toggle-group>
-                    </div>
-                }
-                <!-- Légende du type affiché, sous ses réglages : mêmes couleurs que les cases. -->
-                @if (legend(); as legend) {
-                    <ul class="map-legend" aria-label="Légende" i18n-aria-label>
-                        @for (entry of legend; track entry.swatch) {
-                            <li>
-                                <span class="swatch {{ entry.swatch }}"></span>
-                                <span class="label">{{ entry.label }}</span>
-                                @if (entry.range) {
-                                    <span class="range">{{ entry.range }}</span>
-                                }
-                            </li>
+                    <!-- Légende du type affiché, sous ses réglages : mêmes couleurs que les cases. -->
+                    @if (legend(); as legend) {
+                        <ul class="map-legend" aria-label="Légende" i18n-aria-label>
+                            @for (entry of legend; track entry.swatch) {
+                                <li>
+                                    <span class="swatch {{ entry.swatch }}"></span>
+                                    <span class="label">{{ entry.label }}</span>
+                                    @if (entry.range) {
+                                        <span class="range">{{ entry.range }}</span>
+                                    }
+                                </li>
+                            }
+                        </ul>
+                        @if (options().map_type === 'scout') {
+                            <p class="settings-hint" i18n>Niveau relevé par un éclaireur lors d'une mise à jour faite avec l'extension. Plus le secteur est
+                                connu,
+                                moins
+                                on risque d'être repéré en y entrant.</p>
                         }
-                    </ul>
-                    @if (options().map_type === 'scout') {
-                        <p class="settings-hint" i18n>Niveau relevé par un éclaireur lors d'une mise à jour faite avec l'extension. Plus le secteur est connu,
-                            moins
-                            on risque d'être repéré en y entrant.</p>
                     }
-                }
-                @if (options().map_type === 'trash') {
+                    @if (options().map_type === 'trash') {
+                        <div>
+                            <h2 i18n>Mode d'affichage</h2>
+                            <mat-button-toggle-group class="mho-map-seg" [value]="options().trash_mode"
+                                                     (change)="changeOptions('trash_mode', $event.value)" hideSingleSelectionIndicator
+                                                     aria-label="Mode d'affichage de la décharge" i18n-aria-label>
+                                <mat-button-toggle value="nb" i18n>Nombre d'objets</mat-button-toggle>
+                                <mat-button-toggle value="def" i18n>Défense apportée</mat-button-toggle>
+                            </mat-button-toggle-group>
+                        </div>
+                    }
                     <div>
-                        <h2 i18n>Mode d'affichage</h2>
-                        <mat-button-toggle-group class="mho-map-seg" [value]="options().trash_mode"
-                                                 (change)="changeOptions('trash_mode', $event.value)" hideSingleSelectionIndicator
-                                                 aria-label="Mode d'affichage de la décharge" i18n-aria-label>
-                            <mat-button-toggle value="nb" i18n>Nombre d'objets</mat-button-toggle>
-                            <mat-button-toggle value="def" i18n>Défense apportée</mat-button-toggle>
-                        </mat-button-toggle-group>
-                    </div>
-                }
-                <div>
-                    <div class="section-head">
-                        <h2 i18n>Coins des cases</h2>
-                        @if (corners_are_custom()) {
-                            <button mat-button type="button" (click)="resetCorners()" i18n>Réinitialiser</button>
-                        }
-                    </div>
-                    <!-- Une case en quatre quarts : chaque quart règle le coin où il se trouve. -->
-                    <div class="corner-picker" role="group" aria-label="Coins des cases" i18n-aria-label>
-                        @for (field of corner_fields; track field.position) {
-                            @let view = corner_views[current_corners()[field.position]];
-                            <button type="button" class="corner-quarter {{ field.css_class }}" [class.empty]="view.value === 'none'"
-                                    [matMenuTriggerFor]="cornerMenu" (click)="editing_corner.set(field.position)"
-                                    [attr.aria-label]="field.label + ' : ' + view.label">
-                                @if (view.icon) {
-                                    <img class="corner-glyph" [src]="HORDES_IMG_REPO + view.icon" alt="">
-                                } @else if (view.tone) {
-                                    <span class="corner-glyph age-flag age-{{ view.tone }}" aria-hidden="true"></span>
-                                } @else if (view.sample) {
-                                    <span class="corner-glyph sample" aria-hidden="true">{{ view.sample }}</span>
-                                }
-                                <span class="corner-label">{{ view.label }}</span>
-                            </button>
-                        }
-                    </div>
-                    <mat-menu #cornerMenu="matMenu">
-                        <ng-template matMenuContent>
-                            @for (view of corner_menu; track view.value) {
-                                <button mat-menu-item type="button" role="menuitemradio" class="corner-option"
-                                        [attr.aria-checked]="current_corners()[editing_corner()] === view.value"
-                                        (click)="changeCorner(editing_corner(), view.value)">
-                                    <span class="corner-option-content">
-                                        @if (view.icon) {
-                                            <img class="corner-glyph" [src]="HORDES_IMG_REPO + view.icon" alt="">
-                                        } @else if (view.tone) {
-                                            <span class="corner-glyph age-flag age-{{ view.tone }}" aria-hidden="true"></span>
-                                        } @else if (view.sample) {
-                                            <span class="corner-glyph sample" aria-hidden="true">{{ view.sample }}</span>
-                                        } @else {
-                                            <span class="corner-glyph" aria-hidden="true"></span>
-                                        }
-                                        {{ view.label }}
-                                    </span>
+                        <div class="section-head">
+                            <h2 i18n>Coins des cases</h2>
+                            @if (corners_are_custom()) {
+                                <button mat-button type="button" (click)="resetCorners()" i18n>Réinitialiser</button>
+                            }
+                        </div>
+                        <!-- Une case en quatre quarts : chaque quart règle le coin où il se trouve. -->
+                        <div class="corner-picker" role="group" aria-label="Coins des cases" i18n-aria-label>
+                            @for (field of corner_fields; track field.position) {
+                                @let view = corner_views[current_corners()[field.position]];
+                                <button type="button" class="corner-quarter {{ field.css_class }}" [class.empty]="view.value === 'none'"
+                                        [matMenuTriggerFor]="cornerMenu" (click)="editing_corner.set(field.position)"
+                                        [attr.aria-label]="field.label + ' : ' + view.label">
+                                    @if (view.icon) {
+                                        <img class="corner-glyph" [src]="HORDES_IMG_REPO + view.icon" alt="">
+                                    } @else if (view.tone) {
+                                        <span class="corner-glyph age-flag age-{{ view.tone }}" aria-hidden="true"></span>
+                                    } @else if (view.sample) {
+                                        <span class="corner-glyph sample" aria-hidden="true">{{ view.sample }}</span>
+                                    }
+                                    <span class="corner-label">{{ view.label }}</span>
                                 </button>
                             }
-                        </ng-template>
-                    </mat-menu>
-                    <p class="settings-hint" i18n>Propre au type de carte affiché. En zoom réduit, seul le coin bas droite reste visible.</p>
-                </div>
-                <div>
-                    <h2 i18n>Afficher les zones du scrutateur</h2>
-                    <div class="scrut-zones">
-                        <mho-compass-rose [selectedScrutZone]="options().displayed_scrut_zone"
-                                          (selectedScrutZoneChange)="changeOptions('displayed_scrut_zone', $event)" multiple withDiags></mho-compass-rose>
-                    </div>
-                </div>
-                <div>
-                    <h2 i18n>Afficher les zones en distance</h2>
-                    <div class="dist-zones">
-                        <button mat-button type="button" [matMenuTriggerFor]="addZone">
-                            <mat-icon>add</mat-icon>
-                            <ng-container i18n>Ajouter une zone</ng-container>
-                        </button>
-                        <mat-menu #addZone="matMenu">
-                            <div (click)="$event.stopPropagation()" style="padding: 0.5em">
-                                <div style="display: flex; align-items: center">
-                                    <mat-form-field style="width: calc(100% - 100px)">
-                                        <input matInput [(ngModel)]="new_distance_option.value" placeholder="Distance" i18n-placeholder>
-                                    </mat-form-field>
-                                    <mat-form-field style="width: 100px">
-                                        <mat-select [(ngModel)]="new_distance_option.unit" placeholder="Unité" i18n-placeholder>
-                                            <mat-option [value]="'km'" i18n>km</mat-option>
-                                            <mat-option [value]="'pa'" i18n>PA</mat-option>
-                                        </mat-select>
-                                    </mat-form-field>
-                                </div>
-                                @if (new_distance_option.unit === 'pa') {
-                                    <mat-checkbox [(ngModel)]="new_distance_option.round_trip" i18n>Aller / Retour</mat-checkbox>
-                                }
-                                <button mat-button type="button" (click)="addDistanceToList(); addZone.closed.next('click')" i18n>Ajouter</button>
-                            </div>
-                        </mat-menu>
-                        <mat-list>
-                            @for (option of options().distances; track option) {
-                                <mat-list-item>
-                                    <button mat-icon-button type="button" matListItemIcon (click)="removeDistanceFromList(option)">
-                                        <mat-icon>delete</mat-icon>
-                                    </button>
-                                    <div matListItemTitle>{{ option.value }}&nbsp;{{ option.unit }}</div>
-                                    @if (option.unit === 'pa') {
-                                        <div matListItemLine>
-                                            @if (option.round_trip) {
-                                                <ng-container i18n>Aller / Retour</ng-container>
+                        </div>
+                        <mat-menu #cornerMenu="matMenu">
+                            <ng-template matMenuContent>
+                                @for (view of corner_menu; track view.value) {
+                                    <button mat-menu-item type="button" role="menuitemradio" class="corner-option"
+                                            [attr.aria-checked]="current_corners()[editing_corner()] === view.value"
+                                            (click)="changeCorner(editing_corner(), view.value)">
+                                        <span class="corner-option-content">
+                                            @if (view.icon) {
+                                                <img class="corner-glyph" [src]="HORDES_IMG_REPO + view.icon" alt="">
+                                            } @else if (view.tone) {
+                                                <span class="corner-glyph age-flag age-{{ view.tone }}" aria-hidden="true"></span>
+                                            } @else if (view.sample) {
+                                                <span class="corner-glyph sample" aria-hidden="true">{{ view.sample }}</span>
                                             } @else {
-                                                <ng-container i18n>Aller simple</ng-container>
+                                                <span class="corner-glyph" aria-hidden="true"></span>
                                             }
-                                        </div>
-                                    }
-                                </mat-list-item>
-                            }
-                        </mat-list>
+                                            {{ view.label }}
+                                        </span>
+                                    </button>
+                                }
+                            </ng-template>
+                        </mat-menu>
+                        <p class="settings-hint" i18n>Propre au type de carte affiché. En zoom réduit, seul le coin bas droite reste visible.</p>
                     </div>
-                </div>
-            }
+                    <div>
+                        <h2 i18n>Afficher les zones du scrutateur</h2>
+                        <div class="scrut-zones">
+                            <mho-compass-rose [selectedScrutZone]="options().displayed_scrut_zone"
+                                              (selectedScrutZoneChange)="changeOptions('displayed_scrut_zone', $event)" multiple withDiags></mho-compass-rose>
+                        </div>
+                    </div>
+                    <div>
+                        <h2 i18n>Afficher les zones en distance</h2>
+                        <div class="dist-zones">
+                            <button mat-button type="button" [matMenuTriggerFor]="addZone">
+                                <mat-icon>add</mat-icon>
+                                <ng-container i18n>Ajouter une zone</ng-container>
+                            </button>
+                            <mat-menu #addZone="matMenu">
+                                <div (click)="$event.stopPropagation()" style="padding: 0.5em">
+                                    <div style="display: flex; align-items: center">
+                                        <mat-form-field style="width: calc(100% - 100px)">
+                                            <input matInput [(ngModel)]="new_distance_option.value" placeholder="Distance" i18n-placeholder>
+                                        </mat-form-field>
+                                        <mat-form-field style="width: 100px">
+                                            <mat-select [(ngModel)]="new_distance_option.unit" placeholder="Unité" i18n-placeholder>
+                                                <mat-option [value]="'km'" i18n>km</mat-option>
+                                                <mat-option [value]="'pa'" i18n>PA</mat-option>
+                                            </mat-select>
+                                        </mat-form-field>
+                                    </div>
+                                    @if (new_distance_option.unit === 'pa') {
+                                        <mat-checkbox [(ngModel)]="new_distance_option.round_trip" i18n>Aller / Retour</mat-checkbox>
+                                    }
+                                    <button mat-button type="button" (click)="addDistanceToList(); addZone.closed.next('click')" i18n>Ajouter</button>
+                                </div>
+                            </mat-menu>
+                            <mat-list>
+                                @for (option of options().distances; track option) {
+                                    <mat-list-item>
+                                        <button mat-icon-button type="button" matListItemIcon (click)="removeDistanceFromList(option)">
+                                            <mat-icon>delete</mat-icon>
+                                        </button>
+                                        <div matListItemTitle>{{ option.value }}&nbsp;{{ option.unit }}</div>
+                                        @if (option.unit === 'pa') {
+                                            <div matListItemLine>
+                                                @if (option.round_trip) {
+                                                    <ng-container i18n>Aller / Retour</ng-container>
+                                                } @else {
+                                                    <ng-container i18n>Aller simple</ng-container>
+                                                }
+                                            </div>
+                                        }
+                                    </mat-list-item>
+                                }
+                            </mat-list>
+                        </div>
+                    </div>
+                }
+            </div>
         </mat-sidenav>
     </mat-sidenav-container>
 

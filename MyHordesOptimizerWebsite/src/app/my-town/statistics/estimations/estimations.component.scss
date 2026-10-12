@@ -230,6 +230,13 @@
         }
     }
 
+    /* Jauge et bornes de son échelle, plus serrées entre elles que le reste de la carte. */
+    .kpi-range {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
     /* Jauge : le possible du jour (bornes théoriques) donne l'échelle, la plage calculée s'y
        pose, un trait marque l'attaque la plus probable, et l'affinage ajoute ses deux bornes. */
     .kpi-gauge {
@@ -281,7 +288,6 @@
     .kpi-scale {
         display: flex;
         justify-content: space-between;
-        margin-top: -6px;
         font-size: 11px;
         color: var(--mho-text-muted);
         font-variant-numeric: tabular-nums;

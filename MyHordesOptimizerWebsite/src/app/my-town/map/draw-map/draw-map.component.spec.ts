@@ -319,7 +319,7 @@ describe('DrawMapComponent', (): void => {
         expect(fixture.debugElement.query(By.directive(MapRoutesLayerComponent))).toBeNull();
 
         fixture.componentRef.setInput('routes', [{
-            key: 'mho-1', color: 'teal', cells: [{ x: 0, y: 0 }, { x: 1, y: 0 }], lane: 0, dashed: false, emphasized: false, dimmed: false, end: { x: 1, y: 0 },
+            key: 'mho-1', color: 'teal', cells: [{ x: 0, y: 0 }, { x: 1, y: 0 }], lane: 0, dashed: false, emphasized: false, dimmed: false,
             label: null
         }]);
         fixture.detectChanges();

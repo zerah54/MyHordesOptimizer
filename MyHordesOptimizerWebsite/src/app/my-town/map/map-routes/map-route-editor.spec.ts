@@ -68,20 +68,130 @@ describe('MapRouteEditor', (): void => {
         editor.setMap(town());
     });
 
-    it('starts a new route from the town, visible and editable by the whole town', (): void => {
+    /** Nouveau tracé dont le départ est posé sur la ville. */
+    function startFromTown(): void {
+        editor.startNew();
+        editor.pick({ x: 2, y: 2 }, false);
+    }
+
+    it('starts a new route without a start, visible and editable by the whole town', (): void => {
         editor.startNew();
 
         expect(editor.editing()).toBe(true);
         expect(editor.editing_key()).toBeNull();
-        expect(keys(editor.cells())).toBe('2,2');
+        expect(editor.draft()?.start).toBeNull();
+        expect(editor.cells()).toEqual([]);
         expect(MAP_ROUTE_COLORS).toContain(editor.draft()?.color);
         expect(editor.draft()?.is_private).toBe(false);
         expect(editor.draft()?.is_editable_by_all).toBe(true);
         expect(editor.can_save()).toBe(false);
     });
 
+    describe('choosing the start', (): void => {
+        beforeEach((): void => {
+            editor.startNew();
+        });
+
+        it('takes the first picked cell as the start, the town included', (): void => {
+            editor.pick({ x: 2, y: 2 }, false);
+
+            expect(keys(editor.cells())).toBe('2,2');
+            expect(editor.length()).toBe(0);
+            expect(editor.can_undo()).toBe(false);
+        });
+
+        it('takes the start at the first touch, without arming the cell', (): void => {
+            editor.pick({ x: 3, y: 1 }, true);
+
+            expect(keys(editor.cells())).toBe('3,1');
+            expect(editor.preview()).toBeNull();
+        });
+
+        it('draws the start alone, as a single-cell route', (): void => {
+            editor.pick({ x: 3, y: 1 }, false);
+
+            const draft: MapRouteDrawing | undefined = editor.drawings().find((drawing: MapRouteDrawing): boolean => drawing.key === 'draft');
+            expect(keys(draft?.cells ?? [])).toBe('3,1');
+        });
+
+        it('previews nothing before the start is chosen', (): void => {
+            editor.hover({ x: 3, y: 1 });
+
+            expect(editor.preview()).toBeNull();
+            expect(editor.drawings()).toEqual([]);
+        });
+
+        it('reaches the next destinations from a start that is not the town', (): void => {
+            editor.pick({ x: 3, y: 1 }, false);
+            editor.pick({ x: 4, y: 1 }, false);
+
+            expect(keys(editor.cells())).toBe('3,1 4,1');
+            expect(editor.return_ap()).toBe(3);
+        });
+
+        it('saves the route from a start that is not the town', async (): Promise<void> => {
+            editor.setLabel('Est');
+            editor.pick({ x: 3, y: 1 }, false);
+            editor.pick({ x: 4, y: 1 }, false);
+
+            await editor.save();
+
+            expect(store.saveRoute).toHaveBeenCalledWith(expect.objectContaining({
+                cells: [{ x: 3, y: 1 }, { x: 4, y: 1 }], stops: [{ x: 4, y: 1, mode: 'best' }]
+            }));
+        });
+
+        it('chooses the start again after clearing a route that has no destination', (): void => {
+            editor.pick({ x: 3, y: 1 }, false);
+
+            editor.clear();
+            expect(editor.draft()?.start).toBeNull();
+            expect(editor.cells()).toEqual([]);
+
+            editor.pick({ x: 4, y: 1 }, false);
+            expect(keys(editor.cells())).toBe('4,1');
+        });
+
+        it('forgets the start with the destinations when clearing', (): void => {
+            editor.pick({ x: 3, y: 1 }, false);
+            editor.pick({ x: 4, y: 1 }, false);
+
+            editor.clear();
+
+            expect(editor.draft()?.start).toBeNull();
+            expect(editor.cells()).toEqual([]);
+        });
+
+        it('undoes a clear, start included', (): void => {
+            editor.pick({ x: 3, y: 1 }, false);
+            editor.pick({ x: 4, y: 1 }, false);
+            editor.clear();
+
+            editor.undo();
+            expect(keys(editor.cells())).toBe('3,1 4,1');
+
+            editor.undo();
+            expect(keys(editor.cells())).toBe('3,1');
+
+            editor.clear();
+            editor.undo();
+            expect(keys(editor.cells())).toBe('3,1');
+        });
+
+        it('ignores the actions that need a start while it is missing', (): void => {
+            editor.cutAt({ x: 2, y: 2 });
+            editor.recalculate();
+            editor.clear();
+            editor.undo();
+
+            expect(editor.draft()?.start).toBeNull();
+            expect(editor.cells()).toEqual([]);
+            expect(editor.return_ap()).toBe(0);
+        });
+    });
+
     it('reaches each clicked cell through the best potential, then counts AP and fresh cells', (): void => {
-        editor.startNew();
+        startFromTown();
 
         editor.pick({ x: 3, y: 1 }, false);
 
@@ -93,7 +203,7 @@ describe('MapRouteEditor', (): void => {
     });
 
     it('goes straight in L mode', (): void => {
-        editor.startNew();
+        startFromTown();
         editor.setMode('l');
 
         editor.pick({ x: 3, y: 1 }, false);
@@ -102,7 +212,7 @@ describe('MapRouteEditor', (): void => {
     });
 
     it('previews the next segment under the mouse and labels it', (): void => {
-        editor.startNew();
+        startFromTown();
 
         editor.hover({ x: 3, y: 1 });
 
@@ -115,7 +225,7 @@ describe('MapRouteEditor', (): void => {
     });
 
     it('needs a second touch on the same cell to add it', (): void => {
-        editor.startNew();
+        startFromTown();
 
         editor.pick({ x: 3, y: 1 }, true);
         expect(editor.length()).toBe(0);
@@ -128,15 +238,15 @@ describe('MapRouteEditor', (): void => {
         expect(editor.length()).toBe(3);
     });
 
-    it('undoes, clears and returns to town', (): void => {
-        editor.startNew();
+    it('undoes, clears and returns to town by picking it', (): void => {
+        startFromTown();
         editor.pick({ x: 3, y: 1 }, false);
         editor.pick({ x: 3, y: 0 }, false);
 
         editor.undo();
         expect(keys(editor.cells())).toBe('2,2 2,1 3,1');
 
-        editor.returnToTown();
+        editor.pick({ x: 2, y: 2 }, false);
         expect(keys(editor.cells())).toBe('2,2 2,1 3,1 3,2 2,2');
         expect(editor.return_ap()).toBe(0);
 
@@ -182,7 +292,7 @@ describe('MapRouteEditor', (): void => {
     });
 
     it('saves the route and leaves the editor', async (): Promise<void> => {
-        editor.startNew();
+        startFromTown();
         editor.setLabel('  Nord  ');
         editor.pick({ x: 3, y: 1 }, false);
 
@@ -197,7 +307,7 @@ describe('MapRouteEditor', (): void => {
     });
 
     it('does not save without a name or a destination', async (): Promise<void> => {
-        editor.startNew();
+        startFromTown();
         editor.pick({ x: 3, y: 1 }, false);
 
         expect(await editor.save()).toBeNull();
@@ -206,7 +316,7 @@ describe('MapRouteEditor', (): void => {
 
     it('stays in the editor on a failure', async (): Promise<void> => {
         vi.mocked(store.saveRoute).mockRejectedValue(new Error('500'));
-        editor.startNew();
+        startFromTown();
         editor.setLabel('Nord');
         editor.pick({ x: 3, y: 1 }, false);
 
@@ -266,7 +376,7 @@ describe('MapRouteEditor', (): void => {
 
     describe('cutting and undoing', (): void => {
         beforeEach((): void => {
-            editor.startNew();
+            startFromTown();
             editor.setMode('l');
         });
 
@@ -284,7 +394,7 @@ describe('MapRouteEditor', (): void => {
 
         it('cuts at the first passage, dropping everything after it, a later passage included', (): void => {
             editor.pick({ x: 4, y: 2 }, false);
-            editor.returnToTown();
+            editor.pick({ x: 2, y: 2 }, false);
             editor.pick({ x: 2, y: 0 }, false);
             expect(keys(editor.cells())).toBe('2,2 3,2 4,2 3,2 2,2 2,1 2,0');
 

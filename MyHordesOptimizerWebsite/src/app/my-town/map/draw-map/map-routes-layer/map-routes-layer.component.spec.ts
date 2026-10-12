@@ -12,7 +12,6 @@ function drawing(overrides: Partial<MapRouteDrawing> = {}): MapRouteDrawing {
         dashed: false,
         emphasized: false,
         dimmed: false,
-        end: null,
         label: null,
         ...overrides
     };
@@ -53,12 +52,22 @@ describe('MapRoutesLayerComponent', (): void => {
     it('marks the start of a loop with a circle, not of a one-way route', (): void => {
         const element: HTMLElement = render([
             drawing(),
-            drawing({ key: 'mho-2', cells: [{ x: 0, y: 0 }, { x: 1, y: 0 }], end: { x: 1, y: 0 } })
+            drawing({ key: 'mho-2', cells: [{ x: 0, y: 0 }, { x: 1, y: 0 }] })
         ]);
 
         const groups: SVGGElement[] = Array.from(element.querySelectorAll('g.route'));
         expect(groups[0].querySelector('.loop-mark')?.getAttribute('d')).toBe('M0.34 0.5a0.16 0.16 0 1 0 0.32 0a0.16 0.16 0 1 0 -0.32 0');
         expect(groups[1].querySelector('.loop-mark')).toBeNull();
+    });
+
+    it('draws a lone start cell as a dot as wide as the line, with its casing', (): void => {
+        const element: HTMLElement = render([drawing({ cells: [{ x: 3, y: 1 }], emphasized: true })]);
+
+        const group: SVGGElement = element.querySelector('g.route') as SVGGElement;
+        expect(group.querySelector('.line')?.getAttribute('d')).toBe('M3.5 1.5h0');
+        expect(group.querySelector('.casing')?.getAttribute('d')).toBe('M3.5 1.5h0');
+        expect(group.querySelector('.line')?.getAttribute('stroke-width')).toBe('0.19');
+        expect(group.querySelector('.loop-mark')).toBeNull();
     });
 
     it('thickens the selected route, dims the others and dashes game routes', (): void => {
@@ -72,14 +81,6 @@ describe('MapRoutesLayerComponent', (): void => {
         expect(groups[0].style.opacity).toBe('0.4');
         expect(groups[1].querySelector('.line')?.getAttribute('stroke-dasharray')).toBe('0.3 0.2');
         expect(groups[2].querySelector('.line')?.getAttribute('stroke-width')).toBe('0.19');
-    });
-
-    it('marks the end of one-way routes only', (): void => {
-        const element: HTMLElement = render([drawing(), drawing({ key: 'mho-2', end: { x: 4, y: 2 }, lane: -0.2 })]);
-
-        const pins: HTMLElement[] = Array.from(element.querySelectorAll('.end-pin'));
-        expect(pins.length).toBe(1);
-        expect(pins[0].style.left).toContain('* var(--mho-cell)');
     });
 
     it('labels the last cell of a drawing that has a label', (): void => {

@@ -10,11 +10,6 @@
         </g>
     }
 </svg>
-@for (pin of end_pins(); track pin.key) {
-    <span class="end-pin" [style.left]="pin.left" [style.top]="pin.top" [style.--mho-route-color]="pin.color" [style.opacity]="pin.opacity">
-        <mat-icon>flag</mat-icon>
-    </span>
-}
 @for (pin of label_pins(); track pin.key) {
     <span class="label-pin" [style.left]="pin.left" [style.top]="pin.top" [style.--mho-route-color]="pin.color">{{ pin.text }}</span>
 }

@@ -45,8 +45,6 @@ export interface MapRouteDrawing {
     readonly dashed: boolean;
     readonly emphasized: boolean;
     readonly dimmed: boolean;
-    /** Arrivée d'un aller simple ; `null` pour une boucle. */
-    readonly end: MapRoutePoint | null;
     /** Étiquette posée près de la dernière case (aperçu de saisie : « +3 PA · 2 non épuisées ») ; `null` sinon. */
     readonly label: string | null;
 }
@@ -136,7 +134,6 @@ export function buildRouteDrawings(views: readonly MapRouteView[], selected: Map
         dashed: view.game_route !== null,
         emphasized: view.key === selected,
         dimmed: has_selection && view.key !== selected,
-        end: view.is_loop ? null : view.cells[view.cells.length - 1],
         label: null
     }));
     // Le tracé choisi en dernier : il passe au-dessus des autres.

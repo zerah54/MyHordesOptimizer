@@ -1,207 +1,208 @@
 @if (editor.draft(); as draft) {
     <section class="route-editor" [style.--mho-route-color]="color_var()" aria-label="Saisie du tracé" i18n-aria-label>
-        <div class="editor-head">
-            <mat-icon class="head-icon">route</mat-icon>
-            <h2 class="editor-title">
-                @if (draft.id === null) {
-                    <ng-container i18n>Nouveau tracé</ng-container>
-                } @else {
-                    <ng-container i18n>Modifier le tracé</ng-container>
-                }
-            </h2>
-            <button mat-icon-button type="button" (click)="cancel()" aria-label="Quitter sans enregistrer" i18n-aria-label>
-                <mat-icon>close</mat-icon>
-            </button>
-        </div>
+        <div class="editor-body">
+            <div class="editor-head">
+                <mat-icon class="head-icon">route</mat-icon>
+                <h2 class="editor-title">
+                    @if (draft.id === null) {
+                        <ng-container i18n>Nouveau tracé</ng-container>
+                    } @else {
+                        <ng-container i18n>Modifier le tracé</ng-container>
+                    }
+                </h2>
+                <button mat-icon-button type="button" (click)="cancel()" aria-label="Quitter sans enregistrer" i18n-aria-label>
+                    <mat-icon>close</mat-icon>
+                </button>
+            </div>
 
-        @switch (editor.remote_state()) {
-            @case ('changed') {
-                <div class="editor-alert" role="alert">
-                    <mat-icon>sync_problem</mat-icon>
-                    <span i18n>Ce tracé a été modifié entre-temps par quelqu'un d'autre.</span>
-                    <div class="alert-actions">
-                        <button mat-button type="button" (click)="editor.takeTheirs()" [disabled]="editor.status() === 'saving'" i18n>Reprendre sa version
-                        </button>
-                        <button mat-button type="button" (click)="keepMine()" [disabled]="!editor.can_save()" i18n>Enregistrer la mienne</button>
+            @switch (editor.remote_state()) {
+                @case ('changed') {
+                    <div class="editor-alert" role="alert">
+                        <mat-icon>sync_problem</mat-icon>
+                        <span i18n>Ce tracé a été modifié entre-temps par quelqu'un d'autre.</span>
+                        <div class="alert-actions">
+                            <button mat-button type="button" (click)="editor.takeTheirs()" [disabled]="editor.status() === 'saving'" i18n>Reprendre sa version
+                            </button>
+                            <button mat-button type="button" (click)="keepMine()" [disabled]="!editor.can_save()" i18n>Enregistrer la mienne</button>
+                        </div>
                     </div>
-                </div>
+                }
+                @case ('gone') {
+                    <div class="editor-alert" role="alert">
+                        <mat-icon>delete_sweep</mat-icon>
+                        <span i18n>Ce tracé a été supprimé, ou vous ne le voyez plus : l'enregistrer en créera un nouveau.</span>
+                    </div>
+                }
             }
-            @case ('gone') {
+            @if (editor.status() === 'error') {
                 <div class="editor-alert" role="alert">
-                    <mat-icon>delete_sweep</mat-icon>
-                    <span i18n>Ce tracé a été supprimé, ou vous ne le voyez plus : l'enregistrer en créera un nouveau.</span>
+                    <mat-icon>error</mat-icon>
+                    <span i18n>L'enregistrement a échoué. Réessayez dans un instant.</span>
                 </div>
             }
-        }
-        @if (editor.status() === 'error') {
-            <div class="editor-alert" role="alert">
-                <mat-icon>error</mat-icon>
-                <span i18n>L'enregistrement a échoué. Réessayez dans un instant.</span>
-            </div>
-        }
 
-        <mat-form-field class="name-field" subscriptSizing="dynamic">
-            <mat-label i18n>Nom</mat-label>
-            <input #name matInput type="text" required autocomplete="off" [attr.maxlength]="label_max_length" [value]="draft.label"
-                   (input)="editor.setLabel(name.value)">
-            <mat-hint align="end">{{ draft.label.length }}&nbsp;/&nbsp;{{ label_max_length }}</mat-hint>
-        </mat-form-field>
+            <mat-form-field class="name-field" subscriptSizing="dynamic">
+                <mat-label i18n>Nom</mat-label>
+                <input #name matInput type="text" required autocomplete="off" [attr.maxlength]="label_max_length" [value]="draft.label"
+                       (input)="editor.setLabel(name.value)">
+                <mat-hint align="end">{{ draft.label.length }}&nbsp;/&nbsp;{{ label_max_length }}</mat-hint>
+            </mat-form-field>
 
-        <div class="summary">
-            <span class="total">{{ editor.length() }}</span>
-            <span class="unit" i18n>PA</span>
-            <span class="summary-notes">
-                <span>
-                    @if (editor.fresh() > 1) {
-                        <ng-container i18n>{{ editor.fresh() }} cases non épuisées</ng-container>
-                    } @else {
-                        <ng-container i18n>{{ editor.fresh() }} case non épuisée</ng-container>
-                    }
-                </span>
-                @if (editor.length() > 0) {
+            <div class="summary">
+                <span class="total">{{ editor.length() }}</span>
+                <span class="unit" i18n>PA</span>
+                <span class="summary-notes">
                     <span>
-                        @if (editor.return_ap() === 0) {
-                            <ng-container i18n>Retour en ville compris</ng-container>
+                        @if (editor.fresh() > 1) {
+                            <ng-container i18n>{{ editor.fresh() }} cases non épuisées</ng-container>
                         } @else {
-                            <ng-container i18n>Retour en ville&nbsp;: +{{ editor.return_ap() }}&nbsp;PA</ng-container>
+                            <ng-container i18n>{{ editor.fresh() }} case non épuisée</ng-container>
                         }
                     </span>
-                }
-            </span>
-        </div>
-
-        <h3 class="editor-section" i18n>Chemin entre deux clics</h3>
-        <mat-button-toggle-group class="editor-seg" [value]="editor.mode()" (change)="editor.setMode($event.value)"
-                                 hideSingleSelectionIndicator aria-label="Calcul du chemin" i18n-aria-label>
-            <mat-button-toggle value="best" i18n>Meilleur potentiel</mat-button-toggle>
-            <mat-button-toggle value="l" i18n>Le plus direct (en L)</mat-button-toggle>
-        </mat-button-toggle-group>
-        <p class="editor-hint">
-            @if (editor.mode() === 'best') {
-                <ng-container i18n>Le plus court chemin qui passe par les cases au plus fort potentiel&nbsp;: une case jamais visitée d'abord, puis les
-                    fouilles restantes maximales (régénération comprise), puis les cases les plus loin de la ville. Il ne repasse par une case
-                    déjà sur le tracé que s'il n'a pas d'autre choix.
-                </ng-container>
-            } @else {
-                <ng-container i18n>Horizontal puis vertical, sans tenir compte des fouilles.</ng-container>
-            }
-        </p>
-
-        <h3 class="editor-section" i18n>Destinations</h3>
-        <ol class="steps">
-            @for (step of steps(); track step.key) {
-                <li class="step" [class.off]="step.off">
-                    <span class="node">{{ step.node }}</span>
-                    <span class="where">
-                        <span class="coordinates">{{ step.coordinates }}</span>
-                        <span class="place">{{ step.place }}</span>
-                        @if (step.orders > 0) {
-                            <span class="orders" i18n>{step.orders, plural, =1 {1 consigne} other {{{ step.orders }} consignes}}</span>
-                        }
-                    </span>
-                    @if (step.off) {
-                        <span class="off-pill" i18n>Hors tracé</span>
-                    } @else {
-                        <span class="ap">{{ step.ap }}<small i18n>PA</small></span>
-                    }
-                </li>
-            }
-        </ol>
-        @if (draft.segments.length === 0) {
-            <p class="editor-hint" i18n>Cliquez une case de la carte pour y aller. Sur écran tactile&nbsp;: touchez une case pour voir le chemin, touchez-la
-                une seconde fois pour l'ajouter.</p>
-        } @else {
-            <p class="editor-hint" i18n>Clic droit (ou appui long) sur une case du tracé&nbsp;: tout ce qui suit est retiré.</p>
-        }
-        <div class="step-actions">
-            <button mat-button type="button" (click)="editor.undo()" [disabled]="!editor.can_undo()">
-                <mat-icon>undo</mat-icon>
-                <ng-container i18n>Annuler</ng-container>
-            </button>
-            <button mat-button type="button" (click)="editor.returnToTown()" [disabled]="editor.return_ap() === 0">
-                <mat-icon>home</mat-icon>
-                <ng-container i18n>Retour en ville</ng-container>
-            </button>
-            <button mat-button type="button" (click)="editor.clear()" [disabled]="draft.segments.length === 0" i18n>Effacer</button>
-            @if (draft.id !== null && draft.segments.length > 0) {
-                <button mat-button type="button" (click)="editor.recalculate()"
-                        matTooltip="Mêmes destinations, chemin recalculé avec le potentiel du jour" i18n-matTooltip>
-                    <mat-icon>refresh</mat-icon>
-                    <ng-container i18n>Recalculer le chemin</ng-container>
-                </button>
-            }
-        </div>
-
-        <h3 class="editor-section" i18n>Partage</h3>
-        <span class="field-label" i18n>Visible par</span>
-        <mat-button-toggle-group class="editor-seg" [value]="draft.is_private" (change)="editor.setPrivate($event.value)"
-                                 hideSingleSelectionIndicator aria-label="Visibilité" i18n-aria-label>
-            <mat-button-toggle [value]="false">
-                <mat-icon class="inline-icon">public</mat-icon>
-                <ng-container i18n>Toute la ville</ng-container>
-            </mat-button-toggle>
-            <mat-button-toggle [value]="true" [disabled]="draft.is_linked">
-                <mat-icon class="inline-icon">lock</mat-icon>
-                <ng-container i18n>Privé</ng-container>
-            </mat-button-toggle>
-        </mat-button-toggle-group>
-        @if (draft.is_linked) {
-            <p class="editor-hint" i18n>Lié à une expédition&nbsp;: le tracé reste visible de toute la ville.</p>
-        }
-        @if (draft.is_private) {
-            <span class="field-label" i18n>Citoyens</span>
-            <div class="people">
-                <span class="person you">
-                    {{ author_name() }}
-                    @if (is_author()) {
-                        <ng-container i18n>(vous)</ng-container>
-                    } @else {
-                        <ng-container i18n>(auteur)</ng-container>
+                    @if (editor.length() > 0) {
+                        <span>
+                            @if (editor.return_ap() === 0) {
+                                <ng-container i18n>Retour en ville compris</ng-container>
+                            } @else {
+                                <ng-container i18n>Retour en ville&nbsp;: +{{ editor.return_ap() }}&nbsp;PA</ng-container>
+                            }
+                        </span>
                     }
                 </span>
-                @for (person of shared(); track person.id) {
-                    <span class="person">
-                        {{ person.name }}
-                        <button type="button" class="person-remove" (click)="editor.removeShare(person.id)"
-                                [attr.aria-label]="unshare_label + ' ' + person.name">
-                            <mat-icon>close</mat-icon>
-                        </button>
-                    </span>
-                }
-                <button mat-stroked-button type="button" class="compact" [matMenuTriggerFor]="shareMenu" [disabled]="shareable().length === 0">
-                    <mat-icon>person_add</mat-icon>
-                    <ng-container i18n>Ajouter</ng-container>
-                </button>
             </div>
-            <mat-menu #shareMenu="matMenu">
-                <ng-template matMenuContent>
-                    @for (person of shareable(); track person.id) {
-                        <button mat-menu-item type="button" (click)="editor.addShare(person.id)">{{ person.name }}</button>
-                    }
-                </ng-template>
-            </mat-menu>
-        }
-        <span class="field-label" i18n>Modifiable par</span>
-        <mat-button-toggle-group class="editor-seg" [value]="draft.is_editable_by_all" (change)="editor.setEditableByAll($event.value)"
-                                 hideSingleSelectionIndicator aria-label="Droits de modification" i18n-aria-label>
-            <mat-button-toggle [value]="false">
-                @if (is_author()) {
-                    <ng-container i18n>Moi seul</ng-container>
-                } @else {
-                    <ng-container i18n>Son auteur seul</ng-container>
-                }
-            </mat-button-toggle>
-            <mat-button-toggle [value]="true" i18n>Tous ceux qui le voient</mat-button-toggle>
-        </mat-button-toggle-group>
 
-        @if (linked_parts().length) {
-            <h3 class="editor-section" i18n>Expédition</h3>
-            <ul class="linked-parts">
-                @for (part of linked_parts(); track $index) {
-                    <li>{{ part }}</li>
+            <h3 class="editor-section" i18n>Chemin entre deux clics</h3>
+            <mat-button-toggle-group class="editor-seg" [value]="editor.mode()" (change)="editor.setMode($event.value)"
+                                     hideSingleSelectionIndicator aria-label="Calcul du chemin" i18n-aria-label>
+                <mat-button-toggle value="best" i18n>Meilleur potentiel</mat-button-toggle>
+                <mat-button-toggle value="l" i18n>Le plus direct (en L)</mat-button-toggle>
+            </mat-button-toggle-group>
+            <p class="editor-hint">
+                @if (editor.mode() === 'best') {
+                    <ng-container i18n>Le plus court chemin qui passe par les cases au plus fort potentiel&nbsp;: une case jamais visitée d'abord, puis les
+                        fouilles restantes maximales (régénération comprise), puis les cases les plus loin de la ville. Il ne repasse par une case
+                        déjà sur le tracé que s'il n'a pas d'autre choix.
+                    </ng-container>
+                } @else {
+                    <ng-container i18n>Horizontal puis vertical, sans tenir compte des fouilles.</ng-container>
                 }
-            </ul>
-        }
+            </p>
+
+            <h3 class="editor-section" i18n>Destinations</h3>
+            <ol class="steps">
+                @for (step of steps(); track step.key) {
+                    <li class="step" [class.off]="step.off">
+                        <span class="node">{{ step.node }}</span>
+                        <span class="where">
+                            <span class="coordinates">{{ step.coordinates }}</span>
+                            <span class="place">{{ step.place }}</span>
+                            @if (step.orders > 0) {
+                                <span class="orders" i18n>{step.orders, plural, =1 {1 consigne} other {{{ step.orders }} consignes}}</span>
+                            }
+                        </span>
+                        @if (step.off) {
+                            <span class="off-pill" i18n>Hors tracé</span>
+                        } @else {
+                            <span class="ap">{{ step.ap }}<small i18n>PA</small></span>
+                        }
+                    </li>
+                }
+            </ol>
+            @if (!draft.start) {
+                <p class="editor-hint step-hint" i18n>Cliquez la case de départ du tracé&nbsp;: la ville ou n'importe quelle autre case.</p>
+            } @else if (draft.segments.length === 0) {
+                <p class="editor-hint step-hint" i18n>Cliquez une case de la carte pour y aller. Sur écran tactile&nbsp;: touchez une case pour voir le chemin,
+                    touchez-la
+                    une seconde fois pour l'ajouter.</p>
+            } @else {
+                <p class="editor-hint step-hint" i18n>Clic droit (ou appui long) sur une case du tracé&nbsp;: tout ce qui suit est retiré.</p>
+            }
+            <div class="step-actions">
+                <button mat-button type="button" (click)="editor.undo()" [disabled]="!editor.can_undo()">
+                    <mat-icon>undo</mat-icon>
+                    <ng-container i18n>Annuler</ng-container>
+                </button>
+                <button mat-button type="button" (click)="editor.clear()" [disabled]="!draft.start" i18n>Effacer</button>
+                @if (draft.id !== null && draft.segments.length > 0) {
+                    <button mat-button type="button" (click)="editor.recalculate()"
+                            matTooltip="Mêmes destinations, chemin recalculé avec le potentiel du jour" i18n-matTooltip>
+                        <mat-icon>refresh</mat-icon>
+                        <ng-container i18n>Recalculer le chemin</ng-container>
+                    </button>
+                }
+            </div>
+
+            <h3 class="editor-section" i18n>Partage</h3>
+            <span class="field-label" i18n>Visible par</span>
+            <mat-button-toggle-group class="editor-seg" [value]="draft.is_private" (change)="editor.setPrivate($event.value)"
+                                     hideSingleSelectionIndicator aria-label="Visibilité" i18n-aria-label>
+                <mat-button-toggle [value]="false">
+                    <mat-icon class="inline-icon">public</mat-icon>
+                    <ng-container i18n>Toute la ville</ng-container>
+                </mat-button-toggle>
+                <mat-button-toggle [value]="true" [disabled]="draft.is_linked">
+                    <mat-icon class="inline-icon">lock</mat-icon>
+                    <ng-container i18n>Privé</ng-container>
+                </mat-button-toggle>
+            </mat-button-toggle-group>
+            @if (draft.is_linked) {
+                <p class="editor-hint" i18n>Lié à une expédition&nbsp;: le tracé reste visible de toute la ville.</p>
+            }
+            @if (draft.is_private) {
+                <span class="field-label" i18n>Citoyens</span>
+                <div class="people">
+                    <span class="person you">
+                        {{ author_name() }}
+                        @if (is_author()) {
+                            <ng-container i18n>(vous)</ng-container>
+                        } @else {
+                            <ng-container i18n>(auteur)</ng-container>
+                        }
+                    </span>
+                    @for (person of shared(); track person.id) {
+                        <span class="person">
+                            {{ person.name }}
+                            <button type="button" class="person-remove" (click)="editor.removeShare(person.id)"
+                                    [attr.aria-label]="unshare_label + ' ' + person.name">
+                                <mat-icon>close</mat-icon>
+                            </button>
+                        </span>
+                    }
+                    <button mat-stroked-button type="button" class="compact" [matMenuTriggerFor]="shareMenu" [disabled]="shareable().length === 0">
+                        <mat-icon>person_add</mat-icon>
+                        <ng-container i18n>Ajouter</ng-container>
+                    </button>
+                </div>
+                <mat-menu #shareMenu="matMenu">
+                    <ng-template matMenuContent>
+                        @for (person of shareable(); track person.id) {
+                            <button mat-menu-item type="button" (click)="editor.addShare(person.id)">{{ person.name }}</button>
+                        }
+                    </ng-template>
+                </mat-menu>
+            }
+            <span class="field-label" i18n>Modifiable par</span>
+            <mat-button-toggle-group class="editor-seg" [value]="draft.is_editable_by_all" (change)="editor.setEditableByAll($event.value)"
+                                     hideSingleSelectionIndicator aria-label="Droits de modification" i18n-aria-label>
+                <mat-button-toggle [value]="false">
+                    @if (is_author()) {
+                        <ng-container i18n>Moi seul</ng-container>
+                    } @else {
+                        <ng-container i18n>Son auteur seul</ng-container>
+                    }
+                </mat-button-toggle>
+                <mat-button-toggle [value]="true" i18n>Tous ceux qui le voient</mat-button-toggle>
+            </mat-button-toggle-group>
+
+            @if (linked_parts().length) {
+                <h3 class="editor-section" i18n>Expédition</h3>
+                <ul class="linked-parts">
+                    @for (part of linked_parts(); track $index) {
+                        <li>{{ part }}</li>
+                    }
+                </ul>
+            }
+        </div>
 
         <div class="editor-footer">
             <button mat-button type="button" (click)="cancel()" i18n>Annuler</button>

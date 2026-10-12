@@ -22,29 +22,30 @@ import type { Mock } from 'vitest';
 import { MapRouteDTO, MapRouteRequestDTO } from '../../_abstract_model/dto/map-route.dto';
 import { ApiService } from '../../_abstract_model/services/api.service';
 import { TownService } from '../../_abstract_model/services/town.service';
-import { Citizen } from '../../_abstract_model/types/citizen.class';
 import { CitizenInfo } from '../../_abstract_model/types/citizen-info.class';
-import { Expedition } from '../../_abstract_model/types/expedition.class';
+import { Citizen } from '../../_abstract_model/types/citizen.class';
 import { ExpeditionOrder } from '../../_abstract_model/types/expedition-order.class';
 import { ExpeditionPart } from '../../_abstract_model/types/expedition-part.class';
+import { Expedition } from '../../_abstract_model/types/expedition.class';
 import { Item } from '../../_abstract_model/types/item.class';
-import { MapRoute, MapRoutePoint } from '../../_abstract_model/types/map-route.class';
 import { MapRouteGame } from '../../_abstract_model/types/map-route-game.class';
+import { MapRoute, MapRoutePoint } from '../../_abstract_model/types/map-route.class';
 import { MapRouteAccess } from '../../_abstract_model/types/map-routes.class';
 import { Ruin } from '../../_abstract_model/types/ruin.class';
-import { Town } from '../../_abstract_model/types/town.class';
 import { TownDetails } from '../../_abstract_model/types/town-details.class';
+import { Town } from '../../_abstract_model/types/town.class';
 import { TownContextService } from '../../_core/services/town-context.service';
 import { setTown } from '../../_core/utilities/localstorage.util';
 import { ConfirmDialogComponent } from '../../_shared/confirm-dialog/confirm-dialog.component';
 import { DrawMapComponent, MapCellPick } from './draw-map/draw-map.component';
-import { MapComponent, MapOptions } from './map.component';
 import { DEFAULT_CORNERS } from './map-corners';
 import { DayExpeditionsStore } from './map-orders/day-expeditions.store';
 import { buildCellOrderIndex, CellOrderIndex } from './map-orders/map-cell-orders';
 import { MapOrderBadge } from './map-orders/map-order-badges';
+import { MapRouteEditor } from './map-routes/map-route-editor';
 import { MapRouteDrawing } from './map-routes/map-route-views';
 import { MapRoutesStatus, MapRoutesStore } from './map-routes/map-routes.store';
+import { MapComponent, MapOptions } from './map.component';
 
 /** Remplace mho-draw-map : capture les entrées reçues sans instancier la grille de carte réelle (MatDialog/TownContextService). */
 @Component({ selector: 'mho-draw-map', template: '', changeDetection: ChangeDetectionStrategy.OnPush,
@@ -531,6 +532,21 @@ describe('MapComponent', (): void => {
         expect(drawMapStub().routes().map((drawing: MapRouteDrawing): string => drawing.key)).toEqual(['mho-1']);
     });
 
+    it('the side panel shows a title instead of tabs duplicating the toolbar buttons', async (): Promise<void> => {
+        create();
+        fixture.detectChanges();
+        const title = (): string | undefined => fixture.nativeElement.querySelector('.settings-header .side-panel-title')?.textContent?.trim();
+
+        expect(fixture.nativeElement.querySelector('.side-panel-tabs')).toBeNull();
+        expect(title()).toBe('Affichage');
+
+        toolbarToggle('Tracés').click();
+        await vi.advanceTimersByTimeAsync(0);
+        fixture.detectChanges();
+
+        expect(title()).toBe('Tracés');
+    });
+
     it('hiding a route removes it from the map and persists the setting', async (): Promise<void> => {
         create();
         fixture.detectChanges();
@@ -637,6 +653,7 @@ describe('MapComponent', (): void => {
             expect(fixture.nativeElement.querySelector('mho-map-route-editor')).not.toBeNull();
             expect(fixture.nativeElement.querySelector('.route-edit-banner')).not.toBeNull();
 
+            pick(1, 1);
             pick(2, 1);
             pick(2, 0);
 
@@ -652,6 +669,7 @@ describe('MapComponent', (): void => {
 
         it('cuts the route from a right-click, and Escape brings the cut part back', async (): Promise<void> => {
             await startNewRoute();
+            pick(1, 1);
             pick(2, 1);
             pick(2, 0);
             expect([...drawMapStub().editedCells()]).toEqual(['1,1', '2,1', '2,0']);
@@ -669,15 +687,29 @@ describe('MapComponent', (): void => {
 
         it('previews the segment under the mouse', async (): Promise<void> => {
             await startNewRoute();
+            pick(1, 1);
 
             drawMapStub().cellHovered.emit({ x: 0, y: 0 });
             fixture.detectChanges();
 
-            expect(drawingKeys()).toEqual(['mho-1', 'preview']);
+            expect(drawingKeys()).toEqual(['mho-1', 'draft', 'preview']);
+        });
+
+        it('lets the editor span the full panel width, then restores the panel padding', async (): Promise<void> => {
+            await startNewRoute();
+            const body: HTMLElement = fixture.nativeElement.querySelector('.settings-body');
+
+            expect(body.classList).toContain('flush');
+
+            fixture.debugElement.injector.get(MapRouteEditor).cancel();
+            fixture.detectChanges();
+
+            expect(body.classList).not.toContain('flush');
         });
 
         it('saves the route, then shows its card', async (): Promise<void> => {
             await startNewRoute();
+            pick(1, 1);
             pick(2, 1);
             const name: HTMLInputElement = fixture.nativeElement.querySelector('mho-map-route-editor input');
             name.value = 'Est';

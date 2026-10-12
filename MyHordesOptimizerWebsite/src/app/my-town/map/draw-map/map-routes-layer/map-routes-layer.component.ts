@@ -1,13 +1,9 @@
 import { ChangeDetectionStrategy, Component, computed, input, InputSignal, Signal } from '@angular/core';
-import { MatIconModule } from '@angular/material/icon';
 
-import { Imports } from '../../../../_abstract_model/types/_types';
 import { mapRouteColorVar, MapRoutePoint } from '../../../../_abstract_model/types/map-route.class';
 import { MapOrderBadge } from '../../map-orders/map-order-badges';
 import { MapRouteDrawing, MapRouteDrawingKey } from '../../map-routes/map-route-views';
 import { routeChevronsPath, routeLinePath, routeLoopMarkPath } from '../../map-routes/route-geometry.util';
-
-const material_modules: Imports = [MatIconModule];
 
 /** Épaisseurs en case : la ligne grossit avec le zoom, comme la grille. */
 const LINE_WIDTH: number = 0.16;
@@ -16,8 +12,6 @@ const CASING_EXTRA: number = 0.1;
 const DIMMED_OPACITY: number = 0.4;
 /** Pointillé des itinéraires du jeu. */
 const GAME_DASH: string = '0.3 0.2';
-/** Décalage du repère d'arrivée par rapport au centre de la case, pour ne pas masquer la ligne. */
-const END_PIN_SHIFT: number = 0.16;
 /** Pastilles de consignes : en bas de la case, côte à côte selon la voie du tracé (−0,2, 0, +0,2). */
 const BADGE_LEFT: number = -0.3;
 const BADGE_LANE_SPREAD: number = 1.25;
@@ -33,14 +27,6 @@ interface RoutePaths {
     readonly line_width: number;
     readonly casing_width: number;
     readonly dash: string | null;
-    readonly opacity: number;
-}
-
-interface EndPin {
-    readonly key: MapRouteDrawingKey;
-    readonly color: string;
-    readonly left: string;
-    readonly top: string;
     readonly opacity: number;
 }
 
@@ -76,8 +62,7 @@ interface LabelPin {
         'aria-hidden': 'true',
         '[style.--mho-routes-columns]': 'width()',
         '[style.--mho-routes-rows]': 'height()'
-    },
-    imports: [...material_modules]
+    }
 })
 export class MapRoutesLayerComponent {
     /** Largeur de la carte, en cases. */
@@ -103,18 +88,6 @@ export class MapRoutesLayerComponent {
             dash: drawing.dashed ? GAME_DASH : null,
             opacity: drawing.dimmed ? DIMMED_OPACITY : 1
         };
-    }));
-
-    protected readonly end_pins: Signal<EndPin[]> = computed((): EndPin[] => this.drawings().flatMap((drawing: MapRouteDrawing): EndPin[] => {
-        const end: MapRoutePoint | null = drawing.end;
-        if (!end) return [];
-        return [{
-            key: drawing.key,
-            color: mapRouteColorVar(drawing.color),
-            left: `calc(${end.x + 0.5 + drawing.lane + END_PIN_SHIFT} * var(--mho-cell))`,
-            top: `calc(${end.y + 0.5 + drawing.lane - END_PIN_SHIFT} * var(--mho-cell))`,
-            opacity: drawing.dimmed ? DIMMED_OPACITY : 1
-        }];
     }));
 
     protected readonly badge_pins: Signal<BadgePin[]> = computed((): BadgePin[] => this.badges().map((badge: MapOrderBadge): BadgePin => ({

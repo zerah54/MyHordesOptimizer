@@ -2,10 +2,19 @@
     display: block;
 }
 
+/* Le panneau latéral ne pose pas de padding autour de l'éditeur (`.flush`) : le corps est
+   rembourré ici, le pied collant occupe toute la largeur. */
 .route-editor {
     display: flex;
     flex-direction: column;
+    gap: 14px;
+}
+
+.editor-body {
+    display: flex;
+    flex-direction: column;
     gap: 10px;
+    padding: 0 16px;
 }
 
 .editor-head {
@@ -313,7 +322,6 @@
     display: flex;
     justify-content: space-between;
     gap: 8px;
-    margin: 4px -16px -16px;
     padding: 10px 16px;
     border-top: 1px solid var(--mho-line);
     background: var(--mho-surface);

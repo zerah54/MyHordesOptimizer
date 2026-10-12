@@ -240,9 +240,6 @@ export class ExpeditionRoadbookComponent {
     /** Tracé dessiné dans le repère de la mini-carte (cases décalées du coin du rectangle). */
     private routeDrawing(route: ExpeditionPartRoute, box: MiniMapBox): MapRouteDrawing {
         const shift: (point: MapRoutePoint) => MapRoutePoint = (point: MapRoutePoint): MapRoutePoint => ({ x: point.x - box.min_x, y: point.y - box.min_y });
-        const first: MapRoutePoint = route.cells[0];
-        const last: MapRoutePoint = route.cells[route.cells.length - 1];
-        const is_loop: boolean = first.x === last.x && first.y === last.y;
         return {
             key: mapRouteKey('mho', route.id),
             color: route.color,
@@ -251,7 +248,6 @@ export class ExpeditionRoadbookComponent {
             dashed: false,
             emphasized: true,
             dimmed: false,
-            end: is_loop ? null : shift(last),
             label: null
         };
     }

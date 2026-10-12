@@ -13,7 +13,7 @@ function part(id: number, route_id: number | null, cells: [number, number][]): E
 }
 
 function drawing(key: MapRouteDrawing['key'], lane: number, dimmed: boolean = false): MapRouteDrawing {
-    return { key, color: 'teal', cells: [], lane, dashed: false, emphasized: false, dimmed, end: null, label: null };
+    return { key, color: 'teal', cells: [], lane, dashed: false, emphasized: false, dimmed, label: null };
 }
 
 describe('buildOrderBadges', (): void => {
