@@ -51,6 +51,7 @@ import { ConfirmDialogComponent, ConfirmDialogData } from '../../_shared/confirm
 import { IconApComponent } from '../../_shared/icon-ap/icon-ap.component';
 import { ListElementAddRemoveComponent } from '../../_shared/list-elements-add-remove/list-element-add-remove.component';
 import { SelectComponent } from '../../_shared/select/select.component';
+import { TriStateCheckboxComponent } from '../../_shared/tri-state-checkbox/tri-state-checkbox.component';
 import { MapRoutesStore } from '../map/map-routes/map-routes.store';
 import { CitizensForExpePipe, FormatPreRegisteredPipe, SomeHeroicActionNeededPipe } from './citizens-for-expe.pipe';
 import { EditOrdersComponent, EditOrdersData } from './edit-orders/edit-orders.component';
@@ -65,7 +66,7 @@ import { TotalPdcPipe } from './total-pdc.pipe';
 const angular_common: Imports = [CommonModule, FormsModule, NgOptimizedImage];
 const components: Imports = [
     ActiveCitizensComponent, ExpeditionOrderComponent, ExpeditionPartRouteComponent, ExpeditionRoadbookComponent, IconApComponent, ListElementAddRemoveComponent,
-    SelectComponent
+    SelectComponent, TriStateCheckboxComponent
 ];
 const pipes: Imports = [CitizensForExpePipe, CitizenFromIdPipe, CompassRoseComponent, FormatPreRegisteredPipe, JobFromIdPipe, SomeHeroicActionNeededPipe, TotalPdcPipe];
 const material_modules: Imports = [MatButtonModule, MatCardModule, MatCheckboxModule, MatExpansionModule, MatFormFieldModule, MatIconModule, MatInputModule, MatMenuModule, MatSlideToggleModule, MatTabsModule, MatTooltipModule];
@@ -604,7 +605,7 @@ export class ExpeditionsComponent implements OnInit {
         return generalOrders(orders);
     }
 
-    /** Liée à un tracé, la partie prend la direction de sa première case : la rose des vents ne se choisit plus. */
+    /** Liée à un tracé, la partie prend la direction du premier déplacement de son tracé : la rose des vents ne se choisit plus. */
     protected isDirectionLocked(expedition_part: ExpeditionPart): boolean {
         return expedition_part.map_route_id !== null;
     }
@@ -740,30 +741,8 @@ export class ExpeditionsComponent implements OnInit {
         await this.realtime_expeditions_service.updateExpeditionOrder(updated);
     }
 
-    protected changeThirstyMode(citizen: CitizenExpedition): void {
-        if (this.edition_mode()) {
-            if (citizen.is_preinscrit_soif === null || citizen.is_preinscrit_soif === undefined) {
-                citizen.is_preinscrit_soif = false;
-            } else if (citizen.is_preinscrit_soif) {
-                citizen.is_preinscrit_soif = undefined;
-            } else {
-                citizen.is_preinscrit_soif = true;
-            }
-        } else {
-            citizen.is_thirsty = !citizen.is_thirsty;
-        }
-    }
-
-    protected change7ApMode(citizen: CitizenExpedition): void {
-        if (this.edition_mode()) {
-            if (citizen.starts_7_ap === null || citizen.starts_7_ap === undefined) {
-                citizen.starts_7_ap = false;
-            } else if (citizen.starts_7_ap) {
-                citizen.starts_7_ap = undefined;
-            } else {
-                citizen.starts_7_ap = true;
-            }
-        }
+    protected toggleThirsty(citizen: CitizenExpedition): void {
+        citizen.is_thirsty = !citizen.is_thirsty;
     }
 
     protected async saveCitizen(expedition_part: ExpeditionPart, citizen: CitizenExpedition, expedition_part_index?: number, expedition?: Expedition, citizen_index?: number): Promise<void> {

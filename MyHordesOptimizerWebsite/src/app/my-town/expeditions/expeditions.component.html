@@ -227,14 +227,13 @@
                                                                     </td>
                                                                     <td class="is-thirsty">
                                                                         @if (edition_mode() && editable()) {
-                                                                            <mat-checkbox
-                                                                                [checked]="expedition_citizen.is_preinscrit_soif"
-                                                                                [indeterminate]="expedition_citizen.is_preinscrit_soif === undefined || expedition_citizen.is_preinscrit_soif === null"
-                                                                                (click)="this.changeThirstyMode(expedition_citizen); saveCitizen(expedition_part, expedition_citizen)"></mat-checkbox>
+                                                                            <mho-tri-state-checkbox
+                                                                                [value]="expedition_citizen.is_preinscrit_soif"
+                                                                                (valueChange)="expedition_citizen.is_preinscrit_soif = $event; saveCitizen(expedition_part, expedition_citizen)"/>
                                                                         } @else if (expedition.state === 'ready' && editable()) {
                                                                             <mat-checkbox
                                                                                 [checked]="expedition_citizen.is_thirsty"
-                                                                                (click)="this.changeThirstyMode(expedition_citizen); saveCitizen(expedition_part, expedition_citizen)"></mat-checkbox>
+                                                                                (click)="toggleThirsty(expedition_citizen); saveCitizen(expedition_part, expedition_citizen)"></mat-checkbox>
                                                                         } @else if (expedition_citizen.is_preinscrit_soif !== undefined && expedition_citizen.is_preinscrit_soif !== null) {
                                                                             @if (expedition_citizen.is_preinscrit_soif) {
                                                                                 <ng-container i18n>Oui</ng-container>
@@ -245,9 +244,9 @@
                                                                     </td>
                                                                     <td class="starts-7-ap">
                                                                         @if (edition_mode() && editable()) {
-                                                                            <mat-checkbox [checked]="expedition_citizen.starts_7_ap"
-                                                                                          [indeterminate]="(expedition_citizen.starts_7_ap === undefined || expedition_citizen.starts_7_ap === null) && edition_mode() && editable()"
-                                                                                          (click)="this.change7ApMode(expedition_citizen); saveCitizen(expedition_part, expedition_citizen)"></mat-checkbox>
+                                                                            <mho-tri-state-checkbox
+                                                                                [value]="expedition_citizen.starts_7_ap"
+                                                                                (valueChange)="expedition_citizen.starts_7_ap = $event; saveCitizen(expedition_part, expedition_citizen)"/>
                                                                         } @else if (expedition_citizen.starts_7_ap !== undefined && expedition_citizen.starts_7_ap !== null) {
                                                                             @if (expedition_citizen.starts_7_ap) {
                                                                                 <ng-container i18n>Oui</ng-container>

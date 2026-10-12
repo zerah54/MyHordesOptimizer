@@ -689,7 +689,7 @@ namespace MyHordesOptimizerApi.Services.Impl
                     return null;
                 }
                 var unchangedRoute = await DbContext.MapRoutes.SingleAsync(route => route.IdMapRoute == routeId.Value);
-                await ApplyRouteDirectionAsync(partModel, unchangedRoute, expeditionId);
+                ApplyRouteDirection(partModel, unchangedRoute);
                 return unchangedRoute;
             }
             MapRoute? linkedRoute = null;
@@ -727,7 +727,7 @@ namespace MyHordesOptimizerApi.Services.Impl
                         DbContext.MapRouteShares.Remove(share);
                     }
                 }
-                await ApplyRouteDirectionAsync(partModel, linkedRoute, expeditionId);
+                ApplyRouteDirection(partModel, linkedRoute);
                 linkedRoute.Version++;
                 _mapRouteChanges.Add(new MapRouteChangeDto { Id = linkedRoute.IdMapRoute, Version = linkedRoute.Version });
             }
@@ -738,18 +738,10 @@ namespace MyHordesOptimizerApi.Services.Impl
             return linkedRoute;
         }
 
-        /// <summary>Direction d'une partie liée : celle de la première case de son tracé, quelle que soit celle demandée.</summary>
-        private async Task ApplyRouteDirectionAsync(ExpeditionPart partModel, MapRoute route, int expeditionId)
+        /// <summary>Direction d'une partie liée : celle du premier déplacement de son tracé, quelle que soit celle demandée.</summary>
+        private static void ApplyRouteDirection(ExpeditionPart partModel, MapRoute route)
         {
-            var townPosition = await DbContext.Expeditions.AsNoTracking()
-                .Where(expedition => expedition.IdExpedition == expeditionId && expedition.IdTownNavigation != null)
-                .Select(expedition => new { expedition.IdTownNavigation!.X, expedition.IdTownNavigation.Y })
-                .SingleOrDefaultAsync();
-            if (townPosition is null)
-            {
-                return;
-            }
-            var direction = MapRouteDirection.FirstCell(MapRouteJson.ParsePoints(route.Cells), townPosition.X, townPosition.Y);
+            var direction = MapRouteDirection.FirstCell(MapRouteJson.ParsePoints(route.Cells));
             if (direction.HasValue)
             {
                 partModel.Direction = (int)direction.Value;

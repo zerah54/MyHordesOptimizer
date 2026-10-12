@@ -188,8 +188,8 @@ namespace MyHordesOptimizerApi.Services.Impl.MapRoutes
             {
                 route.Version++;
                 SyncShares(route, sharedUserIds);
-                // La rose des vents d'une partie liée suit la première case de son tracé.
-                var direction = MapRouteDirection.FirstCell(request.Cells, town.X, town.Y);
+                // La rose des vents d'une partie liée suit le premier déplacement de son tracé.
+                var direction = MapRouteDirection.FirstCell(request.Cells);
                 if (direction.HasValue)
                 {
                     foreach (var part in route.ExpeditionParts)

@@ -9,19 +9,19 @@ namespace MyHordesOptimizerApi.Services.Impl.MapRoutes
     public static class MapRouteDirection
     {
         /// <summary>
-        /// Octant (<see cref="ZoneGeometry.Direction"/>) de la première case du tracé hors de la ville ;
-        /// null si le tracé ne quitte pas la ville.
+        /// Octant (<see cref="ZoneGeometry.Direction"/>) du premier déplacement du tracé, de sa première case à la
+        /// première case différente (depuis la ville quand le tracé en part) ; null si le tracé ne se déplace pas.
         /// </summary>
         /// <param name="cells">Cases en coordonnées absolues.</param>
-        /// <param name="townX">Position absolue de la ville (Town.X).</param>
-        /// <param name="townY">Position absolue de la ville (Town.Y).</param>
-        public static DirectionEnum? FirstCell(IEnumerable<MapRoutePointDto> cells, int townX, int townY)
+        public static DirectionEnum? FirstCell(IEnumerable<MapRoutePointDto> cells)
         {
+            MapRoutePointDto? origin = null;
             foreach (var cell in cells)
             {
-                // Coordonnées relatives à la ville, le nord vers les y positifs (cf. DigRegeneration.ApplyNight).
-                var x = cell.X - townX;
-                var y = townY - cell.Y;
+                origin ??= cell;
+                // Le nord vers les y positifs, donc y absolu décroissant (cf. DigRegeneration.ApplyNight).
+                var x = cell.X - origin.X;
+                var y = origin.Y - cell.Y;
                 if (x != 0 || y != 0)
                 {
                     return ZoneGeometry.Direction(x, y);
