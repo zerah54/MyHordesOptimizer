@@ -10,6 +10,7 @@
             <mat-icon>add</mat-icon>
             <ng-container i18n>Ajouter une simulation</ng-container>
         </button>
+        <mho-tool-presets tool="probabilities" [snapshot]="snapshot_provider" (apply)="loadSnapshot($event)"/>
     </div>
 </mat-card-header>
 <mat-card-content>

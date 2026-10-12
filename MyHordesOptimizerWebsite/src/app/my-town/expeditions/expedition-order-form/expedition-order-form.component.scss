@@ -1,0 +1,54 @@
+.order-form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    max-width: 640px;
+}
+
+.kinds {
+    flex-wrap: wrap;
+
+    .kind {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+
+        mat-icon {
+            width: 18px;
+            height: 18px;
+            font-size: 18px;
+        }
+    }
+}
+
+.text-type {
+    align-self: flex-start;
+}
+
+.hint {
+    margin: 0;
+    font-size: 12px;
+    color: var(--mho-text-muted);
+}
+
+.row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+
+    > mat-form-field {
+        flex: 1 1 200px;
+    }
+
+    .quantity-field {
+        flex: 0 0 110px;
+    }
+}
+
+.spacer {
+    flex: 1;
+}
+
+.delete {
+    color: var(--mho-danger);
+}

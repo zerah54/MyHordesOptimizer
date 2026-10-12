@@ -34,6 +34,11 @@ function citizenInfo(citizens: Citizen[]): CitizenInfo {
     return info;
 }
 
+// Charger un fichier de langue de moment en fait la langue globale (effet de bord de defineLocale) : on rend
+// la langue par défaut, sinon elle fuit vers les fichiers de test suivants (Vitest tourne en mode non isolé)
+// et dépend de l'ordre de chargement des modules.
+moment.locale('en');
+
 describe('BankDiffRegistryComponent', (): void => {
     let fixture: ComponentFixture<BankDiffRegistryComponent>;
     let originalLocale: string;

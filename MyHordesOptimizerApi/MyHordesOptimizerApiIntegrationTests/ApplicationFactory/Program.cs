@@ -115,7 +115,16 @@ builder.Services.AddSingleton<ReferentialImportLock>();
 builder.Services.AddScoped<IExternalToolsService, ExternalToolsService>();
 
 // Requis par ExpeditionServiceDayLockTests (Services.Impl.ExpeditionService).
+// Accès toujours accordé : les tests de service (expéditions, ville, outils externes, liste de
+// souhaits, carte) les appellent sans jeton (UserId 0, pas de ville). Le contrôle d'accès est couvert
+// par TownAccessServiceTests, ExpeditionServiceAccessTests et TownWriteAccessHttpTests, qui utilisent
+// le vrai TownAccessService.
+builder.Services.AddScoped<ITownAccessService, MyHordesOptimizerApiIntegrationTests.Fakes.AllowAllTownAccessService>();
 builder.Services.AddScoped<IExpeditionService, ExpeditionService>();
+builder.Services.AddScoped<IMapRouteService, MyHordesOptimizerApi.Services.Impl.MapRoutes.MapRouteService>();
+
+// Requis par TownWriteAccessHttpTests (Controllers.MyHordesOptimizerMapController).
+builder.Services.AddScoped<IMyHordesOptimizerMapService, MyHordesOptimizerMapService>();
 
 // Requis par CitizenStateControllerTests (Controllers.CitizenStateController).
 builder.Services.AddSingleton<IMyHordesCodeRepository, MyHordesCodeRepository>();

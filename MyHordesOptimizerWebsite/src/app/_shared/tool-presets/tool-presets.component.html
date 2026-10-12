@@ -1,0 +1,40 @@
+<button mat-icon-button type="button" class="share" (click)="copyLink()"
+        matTooltip="Copier le lien de cette configuration" i18n-matTooltip
+        aria-label="Copier le lien de cette configuration" i18n-aria-label>
+    <mat-icon>share</mat-icon>
+</button>
+
+<button mat-icon-button type="button" [matMenuTriggerFor]="presets_menu"
+        matTooltip="Configurations enregistrées" i18n-matTooltip
+        aria-label="Configurations enregistrées" i18n-aria-label>
+    <mat-icon>bookmarks</mat-icon>
+</button>
+
+<mat-menu #presets_menu="matMenu" class="mho-tool-presets-menu">
+    <!-- Le menu capte les touches (recherche par initiale) et se ferme au clic : le champ doit les garder pour lui. -->
+    <div class="save" (click)="$event.stopPropagation()" (keydown)="$event.stopPropagation()">
+        <mat-form-field subscriptSizing="dynamic" appearance="outline">
+            <mat-label i18n>Nom de la configuration</mat-label>
+            <input matInput [(ngModel)]="preset_name" [maxlength]="max_name_length" (keydown.enter)="save()">
+        </mat-form-field>
+        <button mat-flat-button type="button" (click)="save()" [disabled]="preset_name.trim() === ''">
+            <mat-icon>save</mat-icon>
+            <ng-container i18n>Enregistrer</ng-container>
+        </button>
+    </div>
+
+    @for (preset of presets(); track preset.name) {
+        <div class="preset">
+            <button mat-menu-item type="button" class="load" (click)="load(preset)">
+                {{ preset.name }}
+            </button>
+            <button mat-icon-button type="button" (click)="remove(preset); $event.stopPropagation()"
+                    matTooltip="Supprimer cette configuration" i18n-matTooltip
+                    aria-label="Supprimer cette configuration" i18n-aria-label>
+                <mat-icon>delete</mat-icon>
+            </button>
+        </div>
+    } @empty {
+        <p class="empty" (click)="$event.stopPropagation()" i18n>Aucune configuration enregistrée</p>
+    }
+</mat-menu>

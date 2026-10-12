@@ -22,8 +22,16 @@ function expedition(id: number, label: string, parts: ExpeditionPart[] = []): Ex
     });
 }
 
-function part(id: number, path: string): ExpeditionPart {
-    return new ExpeditionPart({ id, orders: [], citizens: [], position: id, path });
+function part(id: number, route_label: string): ExpeditionPart {
+    return new ExpeditionPart({
+        id, orders: [], citizens: [], position: id,
+        mapRouteId: id, mapRoute: { id, label: route_label, color: 'blue', cells: [], length: 0, version: 0 }
+    });
+}
+
+/** Libellé d'une ligne de partie, espaces du gabarit réduits. */
+function partRowText(el: Element): string {
+    return (el.textContent ?? '').replace(/\s+/g, ' ').trim();
 }
 
 function dragEvent(previousIndex: number, currentIndex: number): CdkDragDrop<string[]> {
@@ -80,7 +88,7 @@ describe('EditPositionsComponent', (): void => {
         await setup({ expeditions: [expedition(1, 'Nord', [part(1, 'A'), part(2, 'B')])] });
 
         const partRows: Element[] = Array.from<Element>(fixture.nativeElement.querySelectorAll('.part-row-main'));
-        expect(partRows.map((el: Element): string => el.textContent?.trim() ?? '')).toEqual(['A', 'B']);
+        expect(partRows.map(partRowText)).toEqual(['Partie 1 · A', 'Partie 2 · B']);
     });
 
     it('does not render a divider after the last expedition row', async (): Promise<void> => {
@@ -106,6 +114,6 @@ describe('EditPositionsComponent', (): void => {
         fixture.detectChanges();
 
         const partRows: Element[] = Array.from<Element>(fixture.nativeElement.querySelectorAll('.part-row-main'));
-        expect(partRows.map((el: Element): string => el.textContent?.trim() ?? '')).toEqual(['B', 'A']);
+        expect(partRows.map(partRowText)).toEqual(['Partie 1 · B', 'Partie 2 · A']);
     });
 });

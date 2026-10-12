@@ -220,6 +220,31 @@ $map-scale: (
     // Repères : position en jeu (vert de l'interface carte du jeu) et texte posé sur la couleur de sélection.
     map-me: (#2F5A06, #D7FF5B),
     map-sel-fg: (#FFFFFF, #1C110D),
+    // Pastille d'ancienneté de la mise à jour d'une case : feu tricolore fixe (vert, jaune, orange, rouge),
+    // détaché du fond de la case par un liseré `map-marker-ink`.
+    map-age-green: (#2E9D3A, #5FD068),
+    map-age-yellow: (#F2C811, #FFE04D),
+    map-age-orange: (#F57C00, #FF9F43),
+    map-age-red: (#D32F2F, #FF6B5E),
+);
+
+/// Couleurs des tracés d'expédition : clés de la palette de l'API (`MapRoutePalette`), en dehors des
+/// teintes de l'échelle de la carte (rouge, orange, jaune, vert) pour qu'une ligne ne se confonde jamais
+/// avec le fond d'une case. Foncées en clair, claires en sombre. Le liseré (`route-casing`) est de la
+/// couleur opposée : il détache la ligne de tous les fonds ; `route-on` est le texte posé sur une teinte.
+$route-scale: (
+    route-blue: (#2459C9, #7DB0FF),
+    route-violet: (#7A3FC4, #C29BFF),
+    route-magenta: (#B0175E, #FF7DB4),
+    route-teal: (#00727E, #46D6E0),
+    route-brown: (#6B5A4E, #E7D9C3),
+    route-indigo: (#3B37A6, #A9ADFF),
+    route-pink: (#C0398C, #FFB3E3),
+    route-cyan: (#0A6FA8, #8FDDFF),
+    route-slate: (#44546A, #C6D2E2),
+    route-plum: (#6E2A5E, #E6A8DA),
+    route-casing: (#FFFDF9, #1A0F0A),
+    route-on: (#FFFFFF, #1A0F0A),
 );
 
 /// Palette catégorielle des graphiques. Indépendante de la famille : une série n'est pas une
@@ -269,6 +294,9 @@ $chart-scale: (
         --mho-#{$name}: #{_light-dark($pair)};
     }
     @each $name, $pair in $chart-scale {
+        --mho-#{$name}: #{_light-dark($pair)};
+    }
+    @each $name, $pair in $route-scale {
         --mho-#{$name}: #{_light-dark($pair)};
     }
     // Pastille « plan à récupérer » : couleurs des icônes item_bplan_u (jaune, < 10 km) / item_bplan_r (bleu, ≥ 10 km).

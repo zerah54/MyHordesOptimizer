@@ -1,0 +1,63 @@
+:host {
+    display: block;
+    min-width: 0;
+}
+
+.part-route {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+}
+
+.route-field {
+    min-width: 220px;
+}
+
+.route {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+
+    &.readonly {
+        font-weight: 600;
+    }
+
+    &.new mat-icon {
+        margin: 0;
+    }
+
+    .label {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .lock {
+        width: 16px;
+        height: 16px;
+        margin: 0;
+        font-size: 16px;
+        color: var(--mho-text-muted);
+    }
+}
+
+.swatch {
+    flex-shrink: 0;
+    width: 18px;
+    height: 6px;
+    border-radius: 99px;
+    box-shadow: 0 0 0 1px var(--mho-route-casing);
+}
+
+.ap {
+    font-variant-numeric: tabular-nums;
+    font-weight: 700;
+
+    small {
+        margin-left: 2px;
+        font-weight: 400;
+        color: var(--mho-text-muted);
+    }
+}

@@ -159,6 +159,7 @@ namespace MyHordesOptimizerApiIntegrationTests.Services
             var service = scope.ServiceProvider.GetRequiredService<IExternalToolsService>();
 
             var (townId, userId) = SeedTownUserAndCell(context);
+            fakeRepo.MapId = townId;
             var cell = context.MapCells.Single(c => c.IdTown == townId && c.X == TownX && c.Y == TownY);
 
             var otherUserId = new Random().Next(1, int.MaxValue);
@@ -178,8 +179,12 @@ namespace MyHordesOptimizerApiIntegrationTests.Services
 
         private sealed class ValidMapResponseMyHordesApiRepository : IMyHordesApiRepository
         {
+            /// <summary>Ville du joueur selon MyHordes : doit être celle de la requête, sinon la carte est refusée.</summary>
+            public int MapId { get; set; }
+
             public MyHordesUserDetailsDto GetMapForToolsUpdate() => new()
             {
+                MapId = MapId,
                 Map = new MyHordesMap
                 {
                     City = new MyHordesCity { X = TownX, Y = TownY },

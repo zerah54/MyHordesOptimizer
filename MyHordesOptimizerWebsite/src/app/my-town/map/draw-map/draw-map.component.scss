@@ -22,6 +22,8 @@
        « Ajuster ») : toute modification doit être reportée des deux côtés. */
     --mho-cell: 30px;
     --mho-axis: clamp(16px, calc(var(--mho-cell) * 0.6), 28px);
+    /* Retrait de la grille, repris par le calque des tracés pour se poser sur les cases. */
+    --mho-map-padding: 14px;
 
     display: flex;
     flex-direction: column;
@@ -30,10 +32,18 @@
     /* La carte ne touche aucun bord : sans cette marge, la première règle de coordonnées
        collait au haut du panneau et la grille semblait tronquée. */
     margin: auto;
-    padding: 14px;
+    padding: var(--mho-map-padding);
     /* Repère de positionnement des panneaux posés sur la carte : conserve l'`offsetParent`
        que fournissait l'ancien <table>. */
     position: relative;
+
+    /* Mode tracé : un clic choisit une destination. Variable héritée : la case est dans la vue de mho-map-cell. */
+    &.route-editing {
+        --mho-cell-cursor: crosshair;
+        /* Appui long = couper le tracé : ni sélection de texte ni menu natif d'iOS. */
+        -webkit-touch-callout: none;
+        user-select: none;
+    }
 
     .map-row {
         display: grid;

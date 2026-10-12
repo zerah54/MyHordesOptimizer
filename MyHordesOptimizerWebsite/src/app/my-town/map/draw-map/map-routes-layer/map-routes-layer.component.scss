@@ -1,0 +1,110 @@
+/* Posé sur la zone des cases : sous les règles de coordonnées collantes (z-index 3 et 4) et le détail de
+   zone, au-dessus des cases (z-index 0). Les dimensions suivent `--mho-cell`, piloté par le zoom. */
+:host {
+    position: absolute;
+    left: calc(var(--mho-map-padding) + var(--mho-axis));
+    top: calc(var(--mho-map-padding) + var(--mho-axis));
+    z-index: 2;
+    width: calc(var(--mho-routes-columns) * var(--mho-cell));
+    height: calc(var(--mho-routes-rows) * var(--mho-cell));
+    pointer-events: none;
+}
+
+.routes {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+
+    path {
+        fill: none;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+    }
+
+    /* Liseré de la couleur opposée au tracé : il détache la ligne des fonds clairs comme sombres. */
+    .casing {
+        stroke: var(--mho-route-casing);
+    }
+
+    .line {
+        stroke: var(--mho-route-color);
+    }
+
+    .chevrons {
+        stroke: var(--mho-route-casing);
+        stroke-width: 0.05;
+    }
+
+    /* Rond plein cerclé du liseré : se distingue des chevrons, sur les fonds clairs comme sombres. */
+    .loop-mark {
+        fill: var(--mho-route-color);
+        stroke: var(--mho-route-casing);
+        stroke-width: 0.05;
+    }
+}
+
+/* Arrivée d'un aller simple. Taille fixe en pixels, bornée par la case aux zooms les plus faibles. */
+.end-pin {
+    --pin-size: min(18px, calc(var(--mho-cell) * 0.7));
+
+    position: absolute;
+    display: grid;
+    place-items: center;
+    width: var(--pin-size);
+    height: var(--pin-size);
+    transform: translate(-50%, -50%);
+    border-radius: 4px 99px 99px 99px;
+    background: var(--mho-route-color);
+    color: var(--mho-route-on);
+    box-shadow: 0 0 0 2px var(--mho-route-casing);
+
+    .mat-icon {
+        width: auto;
+        height: auto;
+        font-size: calc(var(--pin-size) * 0.7);
+        line-height: 1;
+    }
+}
+
+/* Étiquette d'aperçu de saisie, à droite de la case visée : taille fixe, lisible à tous les zooms. */
+.label-pin {
+    position: absolute;
+    transform: translate(4px, -50%);
+    padding: 1px 6px;
+    border: 2px solid var(--mho-route-color);
+    border-radius: 99px;
+    background: var(--mho-surface);
+    color: var(--mho-text);
+    font: 700 11px/1.4 var(--mho-font-body);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+    box-shadow: 0 1px 3px var(--mho-shadow-color);
+}
+
+/* Nombre de consignes d'une case, en bas de la case, de la couleur du tracé (neutre sans tracé). Bornée par la
+   case aux zooms les plus faibles. */
+.order-badge {
+    --badge-size: min(15px, calc(var(--mho-cell) * 0.45));
+
+    position: absolute;
+    display: grid;
+    place-items: center;
+    min-width: var(--badge-size);
+    height: var(--badge-size);
+    padding: 0 2px;
+    box-sizing: border-box;
+    transform: translate(-50%, -50%);
+    border-radius: 4px;
+    background: var(--mho-route-color);
+    color: var(--mho-route-on);
+    box-shadow: 0 0 0 1.5px var(--mho-route-casing);
+    font: 700 min(9.5px, calc(var(--mho-cell) * 0.3)) / 1 var(--mho-font-body);
+    font-variant-numeric: tabular-nums;
+
+    &.neutral {
+        background: var(--mho-surface-3);
+        color: var(--mho-text);
+    }
+}

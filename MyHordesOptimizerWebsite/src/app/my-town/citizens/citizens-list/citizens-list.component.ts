@@ -45,10 +45,20 @@ import { StandardColumn } from '../../../_abstract_model/interfaces';
 import { ApiService } from '../../../_abstract_model/services/api.service';
 import { NoteService } from '../../../_abstract_model/services/note.service';
 import { TownService } from '../../../_abstract_model/services/town.service';
-import { Dictionary, Imports, ListForAddRemove } from '../../../_abstract_model/types/_types';
+import { Dictionary, I18nLabels, Imports, ListForAddRemove } from '../../../_abstract_model/types/_types';
 import { Citizen } from '../../../_abstract_model/types/citizen.class';
 import { CitizenInfo } from '../../../_abstract_model/types/citizen-info.class';
 import { DailyAction } from '../../../_abstract_model/types/daily-action.class';
+import { HeroSkill } from '../../../_abstract_model/types/hero-skill.class';
+import {
+    HERO_SKILL_FAMILIES,
+    HERO_SKILL_LETTERS,
+    HeroSkillFamily,
+    HeroSkillFamilyInfo,
+    heroSkillLevelName,
+    HeroSkillLevels,
+    MAX_HERO_SKILL_LEVEL
+} from '../../../_abstract_model/types/hero-skill-levels';
 import { HeroicActionsWithValue } from '../../../_abstract_model/types/heroic-actions.class';
 import { HomeWithValue } from '../../../_abstract_model/types/home.class';
 import { Item } from '../../../_abstract_model/types/item.class';
@@ -96,6 +106,16 @@ const byMaxLvlAsc = (a: { value: { max_lvl: number } }, b: { value: { max_lvl: n
 
 /** Poids de l'état « immunisé » dans le tri de la colonne immunité : garantit que l'immunité prime sur le nombre de potions. */
 const IMMUNE_SORT_FACTOR: number = 1_000_000;
+
+/** Identifiant (tri, filtre, colonne du mode colonnes) du nombre de campings. */
+const CAMPING_COUNT_ID: string = 'camping_count';
+/** Préfixe des identifiants des groupes de capacités héroïques (`skill_s`…). */
+const HERO_SKILL_ID_PREFIX: string = 'skill_';
+
+/** Groupe de capacités désigné par un identifiant de colonne `skill_<lettre>`. */
+function heroSkillFamilyOf(id: string): HeroSkillFamily | undefined {
+    return HERO_SKILL_FAMILIES.find((family: HeroSkillFamilyInfo): boolean => HERO_SKILL_ID_PREFIX + family.key === id)?.key;
+}
 
 @Component({
     selector: 'mho-citizens-list',
@@ -178,6 +198,14 @@ export class CitizensListComponent implements OnInit {
             .filter((home: HomeEnum): boolean => home.key !== HomeEnum.HOUSE_LEVEL.key)
             .sort(byMaxLvlAsc)
     ];
+    /** Groupes de capacités héroïques (S, U, P, E, R), saisis à la main. */
+    protected readonly hero_skill_families: readonly HeroSkillFamilyInfo[] = HERO_SKILL_FAMILIES;
+    protected readonly MAX_HERO_SKILL_LEVEL: number = MAX_HERO_SKILL_LEVEL;
+    protected readonly CAMPING_COUNT_ID: string = CAMPING_COUNT_ID;
+    protected readonly HERO_SKILL_ID_PREFIX: string = HERO_SKILL_ID_PREFIX;
+    /** Nom de chaque groupe dans la langue du site ; sa lettre tant que les compétences ne sont pas chargées. */
+    protected readonly hero_skill_group_names: WritableSignal<Readonly<Record<HeroSkillFamily, string>>> = signal(HERO_SKILL_LETTERS);
+    protected readonly camping_count_label: string = $localize`Nombre de campings déjà effectués`;
     /** Citoyen dont le menu de détail des mises à jour est ouvert (menu partagé). */
     protected readonly menu_row: WritableSignal<Citizen | null> = signal<Citizen | null>(null);
     /** Citoyen désigné par un lien profond (`?citizen=`, recherche globale) : sa ligne est surlignée. */
@@ -214,13 +242,15 @@ export class CitizensListComponent implements OnInit {
     ];
     private sort: Signal<MatSort | undefined> = viewChild(MatSort);
     /** Colonnes affichées en mode « groupé » (regroupées par type ; immunité en colonne dédiée pour le tri). */
-    private readonly grouped_columns: string[] = ['avatar_name', 'etats_sac', 'immune', 'daily_actions', 'heroic_actions', 'home', 'last_update'];
+    private readonly grouped_columns: string[] = ['avatar_name', 'etats_sac', 'immune', 'daily_actions', 'heroic_actions', 'home', 'hero_skills', 'camping', 'last_update'];
     /** Colonnes affichées en mode « colonnes » (une par champ). */
     private readonly per_field_columns: string[] = [
         'job', 'town_roles', 'avatar_name', 'sac', 'coffre', 'etats', 'immune',
         ...this.daily_action_keys.map((action: DailyActionEnum): string => 'daily_' + action.key),
         ...this.heroic_actions_all.map((action: HeroicActionEnum): string => 'heroic_' + action.key),
         ...this.home_all.map((home: HomeEnum): string => 'home_' + home.key),
+        ...HERO_SKILL_FAMILIES.map((family: HeroSkillFamilyInfo): string => HERO_SKILL_ID_PREFIX + family.key),
+        CAMPING_COUNT_ID,
         'last_update',
     ];
     /** Colonnes effectivement affichées selon le mode. */
@@ -297,6 +327,16 @@ export class CitizensListComponent implements OnInit {
                     this.chest_lists = [
                         { label: $localize`Tous`, list: this.all_items }
                     ];
+                }
+            });
+
+        this.api_service
+            .getHeroSkill()
+            .pipe(takeUntilDestroyed(this.destroy_ref))
+            .subscribe({
+                next: (skills: HeroSkill[]): void => {
+                    this.hero_skill_group_names.set(this.groupNames(skills));
+                    this.buildSortableFields();
                 }
             });
 
@@ -887,6 +927,69 @@ export class CitizensListComponent implements OnInit {
         }
     }
 
+    /**
+     * Libellé (infobulle) du niveau d'un citoyen dans un groupe de capacités : nom du groupe et du niveau,
+     * « aucun » pour 0, « inconnu » sans saisie.
+     */
+    protected heroSkillLabel(family: HeroSkillFamilyInfo, level: number | null): string {
+        const group: string = this.hero_skill_group_names()[family.key];
+        if (level === null) return $localize`${group}:group: : niveau inconnu`;
+        if (level === 0) return $localize`${group}:group: : aucun niveau`;
+        return `${group} : ${heroSkillLevelName(level - 1)}`;
+    }
+
+    /** Niveau d'un groupe de capacités (stepper : -1 = inconnu). */
+    protected updateHeroSkill(citizen_id: number, family: HeroSkillFamily, value: number): void {
+        const citizen: Citizen | undefined = this.citizen_list.data.find((candidate: Citizen): boolean => candidate.id === citizen_id);
+        if (!citizen) return;
+        const previous: HeroSkillLevels = citizen.hero_skills;
+        citizen.hero_skills = { ...previous, [family]: value < 0 ? null : value };
+        this.buildValueOptions();
+        this.town_service
+            .updateHeroSkills(citizen.id, citizen.hero_skills)
+            .pipe(takeUntilDestroyed(this.destroy_ref))
+            .subscribe({
+                next: (): void => {
+                    if (citizen.id === this.me()?.id) this.town_service.publishMyCitizen(citizen);
+                    this.refreshCitizenLists();
+                },
+                error: (): void => {
+                    citizen.hero_skills = previous;
+                    this.buildValueOptions();
+                    this.refreshCitizenLists();
+                }
+            });
+    }
+
+    /** Nombre de campings déjà effectués (stepper, 0 au minimum). */
+    protected updateCampingCount(citizen_id: number, value: number): void {
+        const citizen: Citizen | undefined = this.citizen_list.data.find((candidate: Citizen): boolean => candidate.id === citizen_id);
+        if (!citizen) return;
+        const previous: number = citizen.camping_count;
+        citizen.camping_count = value;
+        this.buildValueOptions();
+        this.town_service
+            .updateCampingCount(citizen.id, value)
+            .pipe(takeUntilDestroyed(this.destroy_ref))
+            .subscribe({
+                next: (): void => {
+                    if (citizen.id === this.me()?.id) this.town_service.publishMyCitizen(citizen);
+                    this.refreshCitizenLists();
+                },
+                error: (): void => {
+                    citizen.camping_count = previous;
+                    this.buildValueOptions();
+                    this.refreshCitizenLists();
+                }
+            });
+    }
+
+    /** Au moins une valeur saisie pour les capacités ou les campings : leurs filtres ont quelque chose à proposer. */
+    protected hasHeroSkillOrCampingOptions(): boolean {
+        return [CAMPING_COUNT_ID, ...HERO_SKILL_FAMILIES.map((family: HeroSkillFamilyInfo): string => HERO_SKILL_ID_PREFIX + family.key)]
+            .some((id: string): boolean => (this.value_options[id] ?? []).length > 0);
+    }
+
     /** Met à jour le nombre de potions chamaniques bues (stepper). */
     protected changePotions(citizen: Citizen, value: number): void {
         citizen.chamanic_detail.nb_potion_shaman = value;
@@ -973,6 +1076,7 @@ export class CitizensListComponent implements OnInit {
         if (id.startsWith('daily_')) return this.daily_action_pipe.transform(citizen.daily_actions, this.current_day, id.substring('daily_'.length)) ? 1 : 0;
         if (id.startsWith('heroic_')) return this.fieldSortValue(citizen.heroic_actions?.content, id.substring('heroic_'.length));
         if (id.startsWith('home_')) return this.fieldSortValue(citizen.home?.content, id.substring('home_'.length));
+        if (id === CAMPING_COUNT_ID || heroSkillFamilyOf(id)) return this.citizenNumericValue(citizen, id);
         return '';
     }
 
@@ -994,6 +1098,8 @@ export class CitizensListComponent implements OnInit {
     private buildValueOptions(): void {
         const stepper_ids: string[] = [
             'potions',
+            CAMPING_COUNT_ID,
+            ...HERO_SKILL_FAMILIES.map((family: HeroSkillFamilyInfo): string => HERO_SKILL_ID_PREFIX + family.key),
             ...this.heroic_actions_all.filter((action: HeroicActionEnum): boolean => action.value.max_lvl > 1).map((action: HeroicActionEnum): string => 'heroic_' + action.key),
             ...this.home_all.filter((home: HomeEnum): boolean => home.value.max_lvl > 1).map((home: HomeEnum): string => 'home_' + home.key),
         ];
@@ -1016,6 +1122,11 @@ export class CitizensListComponent implements OnInit {
             ...this.daily_action_keys.map((action: DailyActionEnum): { id: string; label: string } => ({ id: 'daily_' + action.key, label: action.getLabel() })),
             ...this.heroic_actions_all.map((action: HeroicActionEnum): { id: string; label: string } => ({ id: 'heroic_' + action.key, label: action.getLabel() })),
             ...this.home_all.map((home: HomeEnum): { id: string; label: string } => ({ id: 'home_' + home.key, label: home.getLabel() })),
+            ...HERO_SKILL_FAMILIES.map((family: HeroSkillFamilyInfo): { id: string; label: string } => ({
+                id: HERO_SKILL_ID_PREFIX + family.key,
+                label: this.hero_skill_group_names()[family.key]
+            })),
+            { id: CAMPING_COUNT_ID, label: $localize`Campings` },
         ];
     }
 
@@ -1032,6 +1143,9 @@ export class CitizensListComponent implements OnInit {
     /** Valeur numérique d'un citoyen pour un champ à valeur (inconnu → -1). */
     private citizenNumericValue(citizen: Citizen, id: string): number {
         if (id === 'potions') return citizen.chamanic_detail?.nb_potion_shaman ?? 0;
+        if (id === CAMPING_COUNT_ID) return citizen.camping_count;
+        const family: HeroSkillFamily | undefined = heroSkillFamilyOf(id);
+        if (family) return citizen.hero_skills[family] ?? -1;
         return id.startsWith('heroic_')
             ? this.fieldSortValue(citizen.heroic_actions?.content, id.substring('heroic_'.length))
             : this.fieldSortValue(citizen.home?.content, id.substring('home_'.length));
@@ -1063,6 +1177,17 @@ export class CitizensListComponent implements OnInit {
         if (active.statusKeys?.length > 0 && !data.status?.icons?.some((status: StatusEnum): boolean => active.statusKeys.includes(status?.key))) return false;
 
         return true;
+    }
+
+    /** Nom de chaque groupe de capacités, lu dans les compétences servies par l'API (sa lettre à défaut). */
+    private groupNames(skills: readonly HeroSkill[]): Record<HeroSkillFamily, string> {
+        const names: Record<HeroSkillFamily, string> = { ...this.hero_skill_group_names() };
+        HERO_SKILL_FAMILIES.forEach((family: HeroSkillFamilyInfo): void => {
+            const group: I18nLabels | null | undefined = skills.find((skill: HeroSkill): boolean => !skill.legacy && skill.group_sort === family.group_sort)?.group;
+            const name: string | undefined = group?.[this.locale] || group?.['de'];
+            if (name) names[family.key] = name;
+        });
+        return names;
     }
 
     private getCitizens(): void {

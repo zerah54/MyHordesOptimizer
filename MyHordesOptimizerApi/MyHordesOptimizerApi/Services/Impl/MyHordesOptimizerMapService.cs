@@ -7,7 +7,9 @@ using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Map;
 using MyHordesOptimizerApi.Extensions;
 using MyHordesOptimizerApi.Models;
+using MyHordesOptimizerApi.Exceptions;
 using MyHordesOptimizerApi.Providers.Interfaces;
+using MyHordesOptimizerApi.Repository.Interfaces;
 using MyHordesOptimizerApi.Services.Impl.Locking;
 using MyHordesOptimizerApi.Services.Impl.Maps;
 using MyHordesOptimizerApi.Services.Interfaces;
@@ -26,6 +28,8 @@ namespace MyHordesOptimizerApi.Services.Impl
         protected MhoContext DbContext { get; init; }
         protected TownSyncLock TownSyncLock { get; init; }
         protected IMyHordesScrutateurConfiguration MyHordesScrutateurConfiguration { get; init; }
+        protected ITownAccessService TownAccessService { get; init; }
+        protected IMyHordesCodeRepository MyHordesCodeRepository { get; init; }
 
         public MyHordesOptimizerMapService(ILogger<MyHordesOptimizerMapService> logger,
             IServiceScopeFactory serviceScopeFactory,
@@ -33,7 +37,9 @@ namespace MyHordesOptimizerApi.Services.Impl
             IUserInfoProvider userInfoProvider,
             MhoContext dbContext,
             TownSyncLock townSyncLock,
-            IMyHordesScrutateurConfiguration myHordesScrutateurConfiguration)
+            IMyHordesScrutateurConfiguration myHordesScrutateurConfiguration,
+            ITownAccessService townAccessService,
+            IMyHordesCodeRepository myHordesCodeRepository)
         {
             Logger = logger;
             ServiceScopeFactory = serviceScopeFactory;
@@ -42,12 +48,16 @@ namespace MyHordesOptimizerApi.Services.Impl
             DbContext = dbContext;
             TownSyncLock = townSyncLock;
             MyHordesScrutateurConfiguration = myHordesScrutateurConfiguration;
+            TownAccessService = townAccessService;
+            MyHordesCodeRepository = myHordesCodeRepository;
         }
 
         public LastUpdateInfoDto UpdateCell(int townId, MyHordesOptimizerCellUpdateDto updateRequest)
         {
             using var townLock = TownSyncLock.AcquireTownBlocking(-townId);
+            var mapId = townId;
             townId = DbContext.ResolveTownId(townId);
+            TownAccessService.EnsureCanWriteTown(townId, mapId);
             using var transaction = DbContext.Database.BeginTransaction();
             LastUpdateInfoDto lastUpdateInfoDto = UserInfoProvider.GenerateLastUpdateInfo();
             var newLastUpdate = DbContext.LastUpdateInfos.Update(Mapper.Map<LastUpdateInfo>(lastUpdateInfoDto, opt => opt.SetDbContext(DbContext))).Entity;
@@ -116,6 +126,35 @@ namespace MyHordesOptimizerApi.Services.Impl
             DbContext.SaveChanges();
             transaction.Commit();
             return lastUpdateInfoDto;
+        }
+
+        /// <summary>
+        /// Saisie de l'aménagement d'une zone pour le camping, datée du jour de la ville. Ne touche pas
+        /// à la fraîcheur de la case (IdLastUpdateInfo) : ce n'est pas un relevé de son contenu.
+        /// </summary>
+        public CampImprovementDto UpdateCampImprovement(int townId, CampImprovementUpdateDto request)
+        {
+            using var townLock = TownSyncLock.AcquireTownBlocking(-townId);
+            var mapId = townId;
+            townId = DbContext.ResolveTownId(townId);
+            TownAccessService.EnsureCanWriteTown(townId, mapId);
+
+            var town = DbContext.Towns.FirstOrDefault(town => town.IdTown == townId)
+                ?? throw new MhoTechnicalException($"Ville {mapId} inconnue.");
+            var cell = DbContext.MapCells.FirstOrDefault(cell => cell.IdTown == townId && cell.X == request.X && cell.Y == request.Y)
+                ?? throw new MhoTechnicalException($"Case [{request.X};{request.Y}] inconnue dans la ville {mapId}.");
+            if (cell.IsTown == true)
+            {
+                throw new MhoTechnicalException("On ne campe pas en ville.");
+            }
+
+            var bonus = MyHordesCodeRepository.GetCampingBonus();
+            var currentLevel = CampImprovement.CurrentLevel(cell.CampImprovementLevel, cell.CampImprovementDay, town.Day);
+            cell.CampImprovementLevel = CampImprovement.Apply(currentLevel, request.Level, request.Improvements, request.DefenseObjects, bonus.Improve, bonus.ObjectImprove);
+            cell.CampImprovementDay = town.Day;
+            DbContext.SaveChanges();
+
+            return new CampImprovementDto { Level = cell.CampImprovementLevel.Value, Day = town.Day };
         }
     }
 }

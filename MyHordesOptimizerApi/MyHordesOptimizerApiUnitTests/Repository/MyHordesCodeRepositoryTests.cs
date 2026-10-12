@@ -1,4 +1,5 @@
 using FluentAssertions;
+using System.Linq;
 using MyHordesOptimizerApi.Data.Items;
 using MyHordesOptimizerApi.Repository.Impl;
 using Xunit;
@@ -43,6 +44,21 @@ namespace MyHordesOptimizerApiUnitTests.Repository
 
             results.Should().ContainKey("eat_ap6");
             results["eat_ap6"].AtomList.Should().Contain(a => a.IsStatusEffect());
+        }
+
+        /// <summary>
+        /// Le jeu traduit les compétences (capacities.json) dans le domaine « game » et les actions héroïques
+        /// (powers.json) dans « items » : l'import doit savoir de quel fichier vient chaque entrée.
+        /// </summary>
+        [Fact]
+        public void GetHeroCapacities_SurLesFichiersReels_PorteLeDomaineDeTraductionDeSonFichier()
+        {
+            var repository = new MyHordesCodeRepository();
+
+            var capacities = repository.GetHeroCapacities().ToDictionary(capacity => capacity.Name);
+
+            capacities["manipulator"].TranslationDomain.Should().Be("game");
+            capacities["hero_generic_find"].TranslationDomain.Should().Be("items");
         }
     }
 }

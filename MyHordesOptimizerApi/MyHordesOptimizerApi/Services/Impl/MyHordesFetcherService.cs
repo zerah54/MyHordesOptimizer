@@ -46,6 +46,7 @@ namespace MyHordesOptimizerApi.Services.Impl
         protected readonly IMapper Mapper;
         protected IUserInfoProvider UserInfoProvider { get; set; }
         protected MhoContext DbContext { get; set; }
+        protected ITownAccessService TownAccessService { get; set; }
 
         public MyHordesFetcherService(ILogger<MyHordesFetcherService> logger,
             IMyHordesApiRepository myHordesJsonApiRepository,
@@ -55,7 +56,8 @@ namespace MyHordesOptimizerApi.Services.Impl
             IUserInfoProvider userInfoProvider,
             IMyHordesScrutateurConfiguration myHordesScrutateurConfiguration,
             TownSyncLock townSyncLock,
-            MhoContext mhoContext)
+            MhoContext mhoContext,
+            ITownAccessService townAccessService)
         {
             TownSyncLock = townSyncLock;
             Logger = logger;
@@ -66,6 +68,7 @@ namespace MyHordesOptimizerApi.Services.Impl
             UserInfoProvider = userInfoProvider;
             MyHordesScrutateurConfiguration = myHordesScrutateurConfiguration;
             DbContext = mhoContext;
+            TownAccessService = townAccessService;
         }
 
         public IEnumerable<ItemDto> GetItems(int? townId)
@@ -1666,7 +1669,9 @@ namespace MyHordesOptimizerApi.Services.Impl
             // Verrou tenu avant le check-then-act Any()/AddRange-UpdateRange plus bas (même risque
             // que dans TownService.AddCitizenDailyAction). Clé = mapId brut, jamais le townId résolu.
             using var townLock = TownSyncLock.AcquireTownBlocking(-townId);
+            var mapId = townId;
             townId = DbContext.ResolveTownId(townId);
+            TownAccessService.EnsureCanWriteTown(townId, mapId);
             using var transaction = DbContext.Database.BeginTransaction();
             var newLastUpdate = DbContext.LastUpdateInfos.Update(Mapper.Map<LastUpdateInfo>(UserInfoProvider.GenerateLastUpdateInfo(), opt => opt.SetDbContext(DbContext)));
             DbContext.SaveChanges();
@@ -1676,6 +1681,13 @@ namespace MyHordesOptimizerApi.Services.Impl
                 opt.SetDbContext(DbContext);
                 opt.SetTownId(townId);
             });
+            // Selon le profil de mapping retenu, la case vient des coordonnées (dans cette ville) ou du
+            // CellId envoyé par le client : on vérifie qu'aucune n'appartient à une autre ville.
+            var cellIds = models.Select(model => model.IdCell).Distinct().ToList();
+            if (DbContext.MapCells.Any(cell => cellIds.Contains(cell.IdCell) && cell.IdTown != townId))
+            {
+                throw new MhoForbiddenException($"Une des cases [{string.Join(", ", cellIds)}] n'appartient pas à la ville {townId}.");
+            }
             var toAdd = new List<MapCellDig>();
             var toUpdate = new List<MapCellDig>();
             // Écart de fouilles réussies par case : les fouilles restantes en sont nettes (voir
@@ -1711,6 +1723,15 @@ namespace MyHordesOptimizerApi.Services.Impl
 
         public void DeleteMapDigs(int idCell, int diggerId, int day)
         {
+            var cellTown = DbContext.MapCells
+                .Where(cell => cell.IdCell == idCell)
+                .Select(cell => new { cell.IdTown, MapId = cell.IdTownNavigation != null ? cell.IdTownNavigation.MapId : null })
+                .SingleOrDefault();
+            if (cellTown?.IdTown is null)
+            {
+                throw new MhoForbiddenException($"La case {idCell} n'est rattachée à aucune ville.");
+            }
+            TownAccessService.EnsureCanWriteTown(cellTown.IdTown.Value, cellTown.MapId);
             var models = DbContext.MapCellDigs.Where(x => x.IdCell == idCell && x.IdUser == diggerId && x.Day == day)
                 .ToList();
             DbContext.RemoveRange(models);

@@ -1,5 +1,6 @@
 @if (complete_map(); as complete_map) {
-    <div #mapGrid class="mho-draw-map" role="grid"
+    <div #mapGrid class="mho-draw-map" role="grid" (pointerdown)="onPointerDown($event)" (contextmenu)="onContextMenu($event)"
+         [class.route-editing]="routeEditing()"
          [class.zoom-compact]="zoom_tier() === 'compact'"
          [class.zoom-detail]="zoom_tier() === 'detail'"
          [style.--mho-cell]="cell_size()"
@@ -21,7 +22,7 @@
                                   [selected]="row_index === selected_row() && cell_index === selected_column()"
                                   [crossed]="row_index === selected_row() || cell_index === selected_column()"
                                   (cellSelected)="selectCell($event, row_index, cell_index)"
-                                  (currentHoveredCellChange)="hovered_cell = $event">
+                                  (currentHoveredCellChange)="onHoveredCell($event)">
                     </mho-map-cell>
                 }
                 <mho-map-border vertical side="right" [myCell]="my_cell()" [hoveredCell]="hovered_cell" [selectedCell]="selected_cell()"
@@ -31,10 +32,15 @@
 
         <ng-container *ngTemplateOutlet="axisRow; context: {$implicit: false}"></ng-container>
 
+        @if (routes().length || orderBadges().length) {
+            <mho-map-routes-layer [width]="x_row().length" [height]="drawed_map().length" [drawings]="routes()"
+                                  [badges]="orderBadges()"></mho-map-routes-layer>
+        }
+
         @if (selected(); as selected) {
-            <mho-map-cell-details [cell]="selected.cell" [cellHtml]="selected.element"
+            <mho-map-cell-details [cell]="selected.cell" [cellHtml]="selected.element" [map]="complete_map"
                                   [allRuins]="allRuins()" [allCitizens]="allCitizens()" [allItems]="allItems()"
-                                  [canUpdate]="!is_readonly()"
+                                  [canUpdate]="!is_readonly()" [canEditOrders]="can_contribute()"
                                   (updateRequested)="openCellUpdate()" (closed)="closeDetail()"></mho-map-cell-details>
         }
 

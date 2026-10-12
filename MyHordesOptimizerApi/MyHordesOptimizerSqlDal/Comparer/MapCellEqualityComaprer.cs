@@ -13,6 +13,8 @@ namespace MyHordesOptimizerApi.Comparer
                  && x.IsDryed == y.IsDryed
                  && x.IsExcavated == y.IsExcavated
                  && x.DigsObservedDay == y.DigsObservedDay
+                 && x.CampImprovementLevel == y.CampImprovementLevel
+                 && x.CampImprovementDay == y.CampImprovementDay
                  && x.IsNeverVisited == y.IsNeverVisited
                  && x.MaxPotentialRemainingDig == y.MaxPotentialRemainingDig
                  && x.NbHero == y.NbHero

@@ -4,6 +4,9 @@
     @if (town_name()) {
         <span class="observer-banner__town">{{ town_name() }}</span>
     }
+    @if (can_contribute_as_former_citizen()) {
+        <span class="observer-banner__former" i18n>Ancienne ville&nbsp;: expéditions, consignes et tracés modifiables</span>
+    }
     @if (town_day() !== null) {
         <span class="observer-banner__day" i18n>Jour {{ town_day() }}</span>
     }

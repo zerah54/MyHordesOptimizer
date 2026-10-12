@@ -35,8 +35,6 @@ public partial class Expedition
 
     [Column("label")]
     [StringLength(255)]
-    [MySqlCharSet("utf8mb3")]
-    [MySqlCollation("utf8mb3_general_ci")]
     public string? Label { get; set; }
 
     [Column("minPdc", TypeName = "int(11)")]

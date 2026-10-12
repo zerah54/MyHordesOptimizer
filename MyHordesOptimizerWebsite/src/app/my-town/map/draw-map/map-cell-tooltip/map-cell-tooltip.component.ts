@@ -14,6 +14,7 @@ import { ItemImgPipe } from '../../../../_core/pipes/item-img.pipe';
 import { CitizenInfoComponent } from '../../../../_shared/citizen-info/citizen-info.component';
 import { IconApComponent } from '../../../../_shared/icon-ap/icon-ap.component';
 import { LastUpdateComponent } from '../../../../_shared/last-update/last-update.component';
+import { MapCellOrdersComponent } from '../../map-orders/map-cell-orders/map-cell-orders.component';
 import { DigLevelLabelPipe } from '../map-cell/pipes/dig-level.pipe';
 import { RuinInCell } from '../map-cell-details/ruin-in-cell.pipe';
 
@@ -33,6 +34,7 @@ import { RuinInCell } from '../map-cell-details/ruin-in-cell.pipe';
         IconApComponent,
         CitizenInfoComponent,
         LastUpdateComponent,
+        MapCellOrdersComponent,
     ],
 })
 export class MapCellTooltipComponent {

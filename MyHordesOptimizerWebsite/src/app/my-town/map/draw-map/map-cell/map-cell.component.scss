@@ -20,30 +20,36 @@ $empty-color: var(--mho-map-hatch);
     /* Aucune dimension en dur : la case occupe exactement sa piste de grille, quel que soit
        le zoom. `overflow: hidden` garde les indicateurs dans la case quand elle rétrécit. */
     overflow: hidden;
-    /* Séparation entre deux cases : un filet de la couleur du panneau, jamais un trait coloré.
-       Deux cases voisines donnent 2 px, soit l'écart de la maquette — et le filet reste un
-       `border` plutôt qu'un `gap`, pour que les contours de zone (scrutateur, distances) qui
-       s'y posent restent continus d'une case à l'autre. */
     border: 1px solid var(--mho-surface);
+    border-radius: 0.5em;
     padding: 0;
     position: relative;
     z-index: 0;
-    cursor: pointer;
+    /* `crosshair` en mode tracé (posé par mho-draw-map). */
+    cursor: var(--mho-cell-cursor, pointer);
 
     &.scrut-border-left {
         border-left: 1px solid var(--mho-map-fg);
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 0;
     }
 
     &.scrut-border-right {
         border-right: 1px solid var(--mho-map-fg);
+        border-top-right-radius: 0;
+        border-bottom-right-radius: 0;
     }
 
     &.scrut-border-top {
         border-top: 1px solid var(--mho-map-fg);
+        border-top-left-radius: 0;
+        border-top-right-radius: 0;
     }
 
     &.scrut-border-bottom {
         border-bottom: 1px solid var(--mho-map-fg);
+        border-bottom-left-radius: 0;
+        border-bottom-right-radius: 0;
     }
 
     /* Anneaux de distance : tiretés, pour ne pas être confondus avec les filets du scrutateur. */
@@ -192,6 +198,35 @@ $empty-color: var(--mho-map-hatch);
                         height: auto;
                     }
 
+                    /* Ancienneté de la mise à jour : triangle collé dans l'angle de la case, proportionnel
+                       à elle. Le liseré est un `drop-shadow` du coin : sur le triangle lui-même, le
+                       `clip-path` le couperait. */
+                    &:has(> .age-flag) {
+                        filter: drop-shadow(0 0 1px var(--mho-map-marker-ink));
+                    }
+
+                    .age-flag {
+                        display: block;
+                        width: calc(var(--mho-cell, 30px) * 0.3);
+                        height: calc(var(--mho-cell, 30px) * 0.3);
+
+                        &.age-green {
+                            background-color: var(--mho-map-age-green);
+                        }
+
+                        &.age-yellow {
+                            background-color: var(--mho-map-age-yellow);
+                        }
+
+                        &.age-orange {
+                            background-color: var(--mho-map-age-orange);
+                        }
+
+                        &.age-red {
+                            background-color: var(--mho-map-age-red);
+                        }
+                    }
+
                     .detail-value {
                         color: var(--mho-map-fg);
                         position: absolute;
@@ -230,21 +265,37 @@ $empty-color: var(--mho-map-hatch);
                 &.corner-top-left {
                     top: 0;
                     left: 0;
+
+                    .age-flag {
+                        clip-path: polygon(0 0, 100% 0, 0 100%);
+                    }
                 }
 
                 &.corner-top-right {
                     top: 0;
                     right: 0;
+
+                    .age-flag {
+                        clip-path: polygon(0 0, 100% 0, 100% 100%);
+                    }
                 }
 
                 &.corner-bottom-left {
                     bottom: 0;
                     left: 0;
+
+                    .age-flag {
+                        clip-path: polygon(0 0, 0 100%, 100% 100%);
+                    }
                 }
 
                 &.corner-bottom-right {
                     bottom: 0;
                     right: 0;
+
+                    .age-flag {
+                        clip-path: polygon(100% 0, 100% 100%, 0 100%);
+                    }
                 }
             }
         }
@@ -444,7 +495,8 @@ $empty-color: var(--mho-map-hatch);
 /* Palier détail : la case est assez grande pour que les valeurs respirent. */
 :host-context(.mho-draw-map.zoom-detail) {
     .map-cell {
-        .content > div {
+        /* Sauf le triangle d'ancienneté : il doit toucher l'angle pour en suivre l'arrondi. */
+        .content > div:not(:has(> .age-flag)) {
             padding: 2px;
         }
 

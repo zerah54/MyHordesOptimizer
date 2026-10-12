@@ -6,5 +6,6 @@ namespace MyHordesOptimizerApi.Services.Interfaces
     public interface IMyHordesOptimizerMapService
     {
         LastUpdateInfoDto UpdateCell(int townId, MyHordesOptimizerCellUpdateDto updateRequest);
+        CampImprovementDto UpdateCampImprovement(int townId, CampImprovementUpdateDto request);
     }
 }

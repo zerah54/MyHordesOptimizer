@@ -300,11 +300,10 @@ namespace MyHordesOptimizerApiIntegrationTests.Services
         }
 
         /// <summary>
-        /// Chaîne FK cassée (IdTown null) : les requêtes projetées d'Ensure*DayIsEditable doivent sauter la
-        /// validation silencieusement, pas planter. Avant fix (revue P3, finding critique), la projection
-        /// de Town.Day (non-nullable) via une navigation absente levait InvalidOperationException
-        /// ("Nullable object must have a value") au lieu de laisser passer l'écriture comme le faisait
-        /// l'ancien code (garde sur IdTown.HasValue).
+        /// Chaîne FK cassée (IdTown null) : les requêtes projetées d'Ensure*Writable ne doivent pas planter
+        /// (avant fix, revue P3, la projection de Town.Day non-nullable via une navigation absente levait
+        /// InvalidOperationException "Nullable object must have a value"). Depuis le contrôle d'accès par
+        /// ville, l'écriture est refusée proprement : aucune ville à laquelle vérifier l'appartenance.
         /// </summary>
         private int NewExpeditionWithoutTown()
         {
@@ -339,33 +338,33 @@ namespace MyHordesOptimizerApiIntegrationTests.Services
         }
 
         [Fact]
-        public async Task SaveExpeditionPartAsync_ExpeditionSansVille_NAJetteAucuneException()
+        public async Task SaveExpeditionPartAsync_ExpeditionSansVille_Refuse()
         {
             var expeditionId = NewExpeditionWithoutTown();
 
-            var result = await NewService().SaveExpeditionPartAsync(expeditionId, new ExpeditionPartRequestDto { OrdersId = new List<int>(), CitizensId = new List<int>() });
+            Func<Task> act = () => NewService().SaveExpeditionPartAsync(expeditionId, new ExpeditionPartRequestDto { OrdersId = new List<int>(), CitizensId = new List<int>() });
 
-            result.Should().NotBeNull();
+            await act.Should().ThrowAsync<MhoForbiddenException>();
         }
 
         [Fact]
-        public async Task SaveExpeditionCitizenAsync_PartieSansVille_NAJetteAucuneException()
+        public async Task SaveExpeditionCitizenAsync_PartieSansVille_Refuse()
         {
             var partId = NewPartWithoutTown();
 
-            var result = await NewService().SaveExpeditionCitizenAsync(partId, new ExpeditionCitizenRequestDto { OrdersId = new List<int>() });
+            Func<Task> act = () => NewService().SaveExpeditionCitizenAsync(partId, new ExpeditionCitizenRequestDto { OrdersId = new List<int>() });
 
-            result.Should().NotBeNull();
+            await act.Should().ThrowAsync<MhoForbiddenException>();
         }
 
         [Fact]
-        public async Task SaveCitizenOrdersAsync_CitoyenSansVille_NAJetteAucuneException()
+        public async Task SaveCitizenOrdersAsync_CitoyenSansVille_Refuse()
         {
             var citizenId = NewCitizenWithoutTown();
 
-            var result = await NewService().SaveCitizenOrdersAsync(citizenId, new List<ExpeditionOrderDto>());
+            Func<Task> act = () => NewService().SaveCitizenOrdersAsync(citizenId, new List<ExpeditionOrderDto>());
 
-            result.Should().NotBeNull();
+            await act.Should().ThrowAsync<MhoForbiddenException>();
         }
     }
 }

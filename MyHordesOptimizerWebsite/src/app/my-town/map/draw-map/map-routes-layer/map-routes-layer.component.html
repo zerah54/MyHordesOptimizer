@@ -1,0 +1,24 @@
+<svg class="routes" [attr.viewBox]="view_box()" preserveAspectRatio="none" focusable="false">
+    @for (route of paths(); track route.key) {
+        <g class="route" [style.--mho-route-color]="route.color" [style.opacity]="route.opacity">
+            <path class="casing" [attr.d]="route.line" [attr.stroke-width]="route.casing_width"></path>
+            <path class="line" [attr.d]="route.line" [attr.stroke-width]="route.line_width" [attr.stroke-dasharray]="route.dash"></path>
+            <path class="chevrons" [attr.d]="route.chevrons"></path>
+            @if (route.loop_mark) {
+                <path class="loop-mark" [attr.d]="route.loop_mark"></path>
+            }
+        </g>
+    }
+</svg>
+@for (pin of end_pins(); track pin.key) {
+    <span class="end-pin" [style.left]="pin.left" [style.top]="pin.top" [style.--mho-route-color]="pin.color" [style.opacity]="pin.opacity">
+        <mat-icon>flag</mat-icon>
+    </span>
+}
+@for (pin of label_pins(); track pin.key) {
+    <span class="label-pin" [style.left]="pin.left" [style.top]="pin.top" [style.--mho-route-color]="pin.color">{{ pin.text }}</span>
+}
+@for (badge of badge_pins(); track badge.key) {
+    <span class="order-badge" [class.neutral]="!badge.color" [style.left]="badge.left" [style.top]="badge.top"
+          [style.--mho-route-color]="badge.color" [style.opacity]="badge.opacity">{{ badge.count }}</span>
+}

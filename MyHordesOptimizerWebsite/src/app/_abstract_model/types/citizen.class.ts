@@ -10,6 +10,7 @@ import { Bag } from './bag.class';
 import { Cadaver } from './cadaver.class';
 import { ChamanicDetail } from './chamanic-detail.class';
 import { DailyAction } from './daily-action.class';
+import { HeroSkillLevels, toHeroSkillLevel } from './hero-skill-levels';
 import { HeroicActions, HeroicActionsWithValue } from './heroic-actions.class';
 import { Home, HomeWithValue } from './home.class';
 import { Status } from './status.class';
@@ -37,6 +38,10 @@ export class Citizen extends CommonModel<CitizenDTO> {
     private x?: number;
     private y?: number;
     public chest?: Bag;
+    /** Campings déjà effectués dans la ville, saisis à la main ; 0 si rien n'est saisi. */
+    public camping_count: number = 0;
+    /** Niveaux des capacités héroïques, saisis à la main. */
+    public hero_skills: HeroSkillLevels = { s: null, u: null, p: null, e: null, r: null };
 
     public constructor(dto?: CitizenDTO) {
         super();
@@ -65,7 +70,9 @@ export class Citizen extends CommonModel<CitizenDTO> {
             actionsHeroic: this.heroic_actions?.modelToDto(),
             dailyActions: this.daily_actions ? modelToDtoArray(this.daily_actions) : [],
             chamanicDetail: this.chamanic_detail.modelToDto(),
-            cadaver: this.cadaver?.modelToDto()
+            cadaver: this.cadaver?.modelToDto(),
+            campingCount: this.camping_count,
+            heroSkills: { ...this.hero_skills }
         };
     }
 
@@ -148,6 +155,14 @@ export class Citizen extends CommonModel<CitizenDTO> {
             this.daily_actions = dtoToModelArray(DailyAction, dto.dailyActions);
             this.chamanic_detail = new ChamanicDetail(dto.chamanicDetail);
             this.cadaver = dto.cadaver ? new Cadaver(dto.cadaver) : undefined;
+            this.camping_count = typeof dto.campingCount === 'number' ? dto.campingCount : 0;
+            this.hero_skills = {
+                s: toHeroSkillLevel(dto.heroSkills?.s),
+                u: toHeroSkillLevel(dto.heroSkills?.u),
+                p: toHeroSkillLevel(dto.heroSkills?.p),
+                e: toHeroSkillLevel(dto.heroSkills?.e),
+                r: toHeroSkillLevel(dto.heroSkills?.r)
+            };
         }
     }
 }

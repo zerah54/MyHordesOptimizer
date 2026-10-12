@@ -12,6 +12,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { Router } from '@angular/router';
 import moment from 'moment';
 import { catchError, debounceTime, forkJoin, of, Subject, take } from 'rxjs';
 
@@ -26,7 +27,10 @@ import { EstimationsResult } from '../../_abstract_model/types/estimations-resul
 import { HomeWithValue } from '../../_abstract_model/types/home.class';
 import { TownDetails } from '../../_abstract_model/types/town-details.class';
 import { computeReconstructedHomeDefense } from '../../_abstract_model/utils/citizen-home-defense.util';
+import { SnackbarService } from '../../_core/services/snackbar.service';
 import { getTown } from '../../_core/utilities/localstorage.util';
+import { decodeSnapshot, toBoundedNumber, TOOL_SNAPSHOT_PARAM } from '../../_core/utilities/tool-snapshot.util';
+import { ToolPresetsComponent } from '../../_shared/tool-presets/tool-presets.component';
 
 /** Nombre de paliers d'habitation dans le jeu (niveaux 0 à 8 : Lit de camp → Château). */
 const HOUSE_LEVEL_COUNT: number = 9;
@@ -34,7 +38,18 @@ const HOUSE_LEVEL_COUNT: number = 9;
 /** Délai d'inactivité avant de relancer la simulation, pour ne pas recalculer à chaque frappe. */
 const COMPUTE_DEBOUNCE_MS: number = 400;
 
+/** Version du format de snapshot ; un snapshot d'une autre version est refusé. */
+const SNAPSHOT_VERSION: number = 1;
+
+/** Bornes d'un snapshot : il vient d'un lien ou d'un preset, donc d'ailleurs que de la saisie bornée par le gabarit. */
+const SNAPSHOT_MAX_VALUE: number = 1_000_000;
+const SNAPSHOT_MAX_CITIZENS: number = 100;
+const SNAPSHOT_MAX_DAY: number = 1000;
+const SNAPSHOT_MAX_ITERATIONS: number = 100_000;
+const MIN_ITERATIONS: number = 100;
+
 const angular_common: Imports = [CommonModule, FormsModule];
+const components: Imports = [ToolPresetsComponent];
 const pipes: Imports = [DecimalPipe];
 const material_modules: Imports = [
     MatButtonModule, MatButtonToggleModule, MatCardModule, MatCheckboxModule,
@@ -43,6 +58,12 @@ const material_modules: Imports = [
 ];
 
 type DoorState = 'closed' | 'open' | 'open_long';
+
+const DOOR_STATES: readonly DoorState[] = ['closed', 'open', 'open_long'];
+
+function isDoorState(value: unknown): value is DoorState {
+    return DOOR_STATES.some((state: DoorState): boolean => state === value);
+}
 
 /** Statistiques agrégées d'un rang (citoyen le plus attaqué = rang 1). */
 interface RankStat {
@@ -121,7 +142,7 @@ export interface ScenarioResult {
     selector: 'mho-overflow',
     templateUrl: './overflow.component.html',
     styleUrls: ['./overflow.component.scss'],
-    imports: [...angular_common, ...material_modules, ...pipes],
+    imports: [...angular_common, ...components, ...material_modules, ...pipes],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class OverflowComponent implements OnInit {
@@ -199,9 +220,13 @@ export class OverflowComponent implements OnInit {
         const format: (value: number) => string = (value: number): string => formatNumber(value, this.locale, '1.0-0');
         return min === max ? format(min) : `${format(min)}–${format(max)}`;
     });
+    /** Fournit {@link toSnapshot} au menu de presets, qui l'appelle à la demande (copie du lien, enregistrement). */
+    protected readonly snapshot_provider: () => Record<string, unknown> = (): Record<string, unknown> => this.toSnapshot();
     private readonly town_statistics_service: TownStatisticsService = inject(TownStatisticsService);
     private readonly town_service: TownService = inject(TownService);
     private readonly destroy_ref: DestroyRef = inject(DestroyRef);
+    private readonly router: Router = inject(Router);
+    private readonly snackbar_service: SnackbarService = inject(SnackbarService);
     /** Niveau d'habitation au tercile, dérivé de house_counts (formule du jeu). */
     private habitation_level: number = 0;
     /** Citoyens vivants connus (mode « Ma ville »), pour étiqueter et pré-remplir {@link citizen_defenses}. */
@@ -218,6 +243,10 @@ export class OverflowComponent implements OnInit {
     }
 
     public ngOnInit(): void {
+        const shared: string | null = this.router.routerState.snapshot.root.queryParamMap.get(TOOL_SNAPSHOT_PARAM);
+        if (shared !== null && this.loadSnapshot(decodeSnapshot(shared))) {
+            return;
+        }
         if (this.in_town && this.my_town) {
             this.applyTownValues();
         } else {
@@ -225,13 +254,84 @@ export class OverflowComponent implements OnInit {
         }
     }
 
-    /** Bascule entre le mode pré-rempli « Ma ville » et le mode manuel « Hors ville ». */
+    /** Configuration saisie, sans les noms de citoyens : de quoi la rejouer via un lien ou un preset. */
+    protected toSnapshot(): Record<string, unknown> {
+        return {
+            v: SNAPSHOT_VERSION,
+            attack: this.attack(),
+            town_defense: this.town_defense,
+            door_state: this.door_state,
+            watch_defense: this.watch_defense,
+            day: this.day,
+            nb_alive: this.nb_alive(),
+            population: this.population,
+            house_counts: [...this.house_counts()],
+            chaos: this.chaos,
+            devastated: this.devastated,
+            home_defense: this.home_defense,
+            iterations: this.iterations,
+            defenses: this.citizen_defenses().map((row: CitizenDefenseRow): number => row.defense)
+        };
+    }
+
+    /**
+     * Remplace la configuration par celle du snapshot et relance la simulation. Le snapshot est une entrée
+     * non fiable : tout est borné, et une valeur absente ou invalide garde la valeur courante.
+     * @returns `false` (état intact) si la version du snapshot n'est pas reconnue
+     */
+    protected applySnapshot(raw: Record<string, unknown>): boolean {
+        if (raw['v'] !== SNAPSHOT_VERSION) {
+            return false;
+        }
+        // Le snapshot ne connaît ni la ville ni ses citoyens : « Ma ville » ne doit ni le recouvrir ni le renommer.
+        this.in_town = false;
+        this.known_citizens = [];
+        this.attack.set(toBoundedNumber(raw['attack'], 0, SNAPSHOT_MAX_VALUE, this.attack()));
+        this.town_defense = toBoundedNumber(raw['town_defense'], 0, SNAPSHOT_MAX_VALUE, this.town_defense);
+        this.door_state = isDoorState(raw['door_state']) ? raw['door_state'] : this.door_state;
+        this.watch_defense = toBoundedNumber(raw['watch_defense'], 0, SNAPSHOT_MAX_VALUE, this.watch_defense);
+        this.day = Math.round(toBoundedNumber(raw['day'], 1, SNAPSHOT_MAX_DAY, this.day));
+        this.nb_alive.set(Math.round(toBoundedNumber(raw['nb_alive'], 1, SNAPSHOT_MAX_CITIZENS, this.nb_alive())));
+        this.population = Math.round(toBoundedNumber(raw['population'], 1, SNAPSHOT_MAX_CITIZENS, this.population));
+        this.house_counts.set(this.parseHouseCounts(raw['house_counts']));
+        this.devastated = raw['devastated'] === true;
+        this.chaos = this.devastated || raw['chaos'] === true;
+        this.home_defense = toBoundedNumber(raw['home_defense'], 0, SNAPSHOT_MAX_VALUE, this.home_defense);
+        this.iterations = Math.round(toBoundedNumber(raw['iterations'], MIN_ITERATIONS, SNAPSHOT_MAX_ITERATIONS, this.iterations));
+        this.citizen_defenses.set(this.parseDefenses(raw['defenses']));
+        this.compute();
+        return true;
+    }
+
+    /** Applique un snapshot venu d'un lien ou d'un preset, et avertit l'utilisateur s'il est illisible ou d'une version inconnue. */
+    protected loadSnapshot(raw: Record<string, unknown> | null): boolean {
+        const applied: boolean = raw !== null && this.applySnapshot(raw);
+        if (!applied) {
+            this.snackbar_service.warningSnackbar($localize`Configuration illisible ou d'une version incompatible.`);
+        }
+        return applied;
+    }
+
+    /** Bascule entre le mode pré-rempli « Ma ville » et le mode manuel « Hors ville » (citoyens génériques à la défense par défaut). */
     protected changeInTownMode(): void {
         if (this.in_town && this.my_town) {
             this.applyTownValues();
         } else {
+            this.known_citizens = [];
+            this.citizen_defenses.set([]);
             this.compute();
         }
+    }
+
+    /** Écrase la défense de chaque citoyen par la défense par défaut. Sans effet si le champ est vidé. */
+    protected applyHomeDefenseToAll(): void {
+        const defense: number = this.home_defense;
+        if (typeof defense !== 'number' || Number.isNaN(defense)) {
+            return;
+        }
+        this.citizen_defenses.update((rows: CitizenDefenseRow[]): CitizenDefenseRow[] =>
+            rows.map((row: CitizenDefenseRow): CitizenDefenseRow => ({ ...row, defense })));
+        this.compute();
     }
 
     /** Demande un recalcul différé : utilisé par les champs saisis au clavier, où chaque frappe est une valeur intermédiaire. */
@@ -251,6 +351,16 @@ export class OverflowComponent implements OnInit {
 
     protected scheduleCompute(): void {
         this.compute_request.next();
+    }
+
+    /**
+     * Écrit la défense du citoyen `index` dans la liste courante, puis planifie un recalcul. Passe par l'index et non par la
+     * ligne du gabarit : un recalcul remplace les lignes, et une frappe traitée avant le rendu suivant viserait une ligne périmée.
+     */
+    protected setCitizenDefense(index: number, value: number | null): void {
+        this.citizen_defenses.update((rows: CitizenDefenseRow[]): CitizenDefenseRow[] =>
+            rows.map((row: CitizenDefenseRow, i: number): CitizenDefenseRow => i === index ? { ...row, defense: value as number } : row));
+        this.scheduleCompute();
     }
 
     /** La dévastation implique toujours le chaos en jeu (TownHandler::devastateTown coche les deux ensemble) : les cases sont donc liées. */
@@ -384,10 +494,35 @@ ${this.formatPercent(overflow_min)} – ${this.formatPercent(overflow_max)} du d
                     }
                     this.house_counts.set(counts);
                     this.known_citizens = citizens;
+                    this.citizen_defenses.set([]);
                     this.nb_alive.set(citizens.length);
                 }
                 this.compute();
             });
+    }
+
+    /** Un effectif par palier ; une liste de mauvaise longueur n'a pas de sens, on repart de zéro. */
+    private parseHouseCounts(raw: unknown): number[] {
+        if (!Array.isArray(raw) || raw.length !== HOUSE_LEVEL_COUNT) {
+            return new Array(HOUSE_LEVEL_COUNT).fill(0);
+        }
+        return raw.map((value: unknown): number => Math.round(toBoundedNumber(value, 0, SNAPSHOT_MAX_CITIZENS, 0)));
+    }
+
+    /** Lignes génériques (jamais nommées) ; la défense par défaut remplace une valeur invalide. {@link syncCitizenDefenses} ajuste ensuite leur nombre. */
+    private parseDefenses(raw: unknown): CitizenDefenseRow[] {
+        if (!Array.isArray(raw)) {
+            return [];
+        }
+        return raw.slice(0, SNAPSHOT_MAX_CITIZENS).map((value: unknown, index: number): CitizenDefenseRow => ({
+            label: this.genericCitizenLabel(index),
+            named: false,
+            defense: toBoundedNumber(value, 0, SNAPSHOT_MAX_VALUE, this.home_defense)
+        }));
+    }
+
+    private genericCitizenLabel(index: number): string {
+        return $localize`Citoyen ${index + 1}`;
     }
 
     /** Niveau d'habitation d'un citoyen, extrait de son foyer (null si inconnu). */
@@ -431,7 +566,7 @@ ${this.formatPercent(overflow_min)} – ${this.formatPercent(overflow_max)} du d
             const additions: CitizenDefenseRow[] = [];
             for (let i: number = citizen_defenses.length; i < count; i++) {
                 additions.push({
-                    label: this.known_citizens[i]?.name ?? $localize`Citoyen ${i + 1}`,
+                    label: this.known_citizens[i]?.name ?? this.genericCitizenLabel(i),
                     named: !!this.known_citizens[i],
                     defense: this.known_citizens[i] ? computeReconstructedHomeDefense(this.known_citizens[i]) : this.home_defense
                 });

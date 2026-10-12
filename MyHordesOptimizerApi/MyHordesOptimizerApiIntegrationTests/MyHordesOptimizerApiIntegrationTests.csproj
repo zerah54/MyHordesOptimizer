@@ -24,6 +24,11 @@
 	<ItemGroup>
 		<PackageReference Include="AutoFixture" Version="4.18.1" />
 		<PackageReference Include="FluentAssertions" Version="6.12.0" />
+		<!-- Versions alignées sur celles que MyHordesOptimizerApi.Design résout (8.0.10), comme dans
+		     MyHordesOptimizerApiUnitTests : sans elles, NuGet unifie sur les 8.0.3 / 8.0.2 de
+		     MyHordesOptimizerSqlDal, et la compilation lève CS1705 contre l'assembly API compilée en 8.0.10. -->
+		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.10" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="8.0.10" />
 		<PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="8.0.3" />
 		<PackageReference Include="Moq" Version="4.20.70" />
 		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />

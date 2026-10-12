@@ -19,7 +19,12 @@ export type CornerInfo =
     | 'distance_km'
     | 'distance_pa'
     | 'update_age'
-    | 'trash';
+    | 'trash'
+    | 'digs_level'
+    | 'scout_level';
+
+/** Couleur de la pastille d'ancienneté : du plus récent (vert) au plus ancien (rouge). */
+export type UpdateAgeTone = 'green' | 'yellow' | 'orange' | 'red';
 
 export type CornerLayout = Record<CornerPosition, CornerInfo>;
 export type CornerLayouts = Record<MapType, CornerLayout>;
@@ -29,6 +34,8 @@ export interface CornerInfoOption {
     label: string;
     /** Exemple de valeur, pour une information sans icône : le coin n'y montre qu'un nombre ou une durée. */
     sample?: string;
+    /** Pastille d'exemple, pour une information que le coin montre sous forme de pastille colorée. */
+    tone?: UpdateAgeTone;
 }
 
 /** Choix tel que le panneau Affichage le présente : libellé, et icône du jeu ou exemple de valeur. */
@@ -56,10 +63,27 @@ export const CORNER_INFO_OPTIONS: readonly CornerInfoOption[] = [
     { value: 'items', label: $localize`Objets au sol` },
     { value: 'distance_km', label: $localize`Distance (km)` },
     { value: 'distance_pa', label: $localize`Distance (PA)` },
-    // Même message que l'ancienneté affichée dans les cases (map-cell) : même traduction.
-    { value: 'update_age', label: $localize`Ancienneté de la mise à jour`, sample: $localize`${5}:hours:h` },
-    { value: 'trash', label: $localize`Valeur de la décharge`, sample: '15' }
+    { value: 'update_age', label: $localize`Ancienneté de la mise à jour`, tone: 'green' },
+    { value: 'trash', label: $localize`Valeur de la décharge`, sample: '15' },
+    { value: 'digs_level', label: $localize`Niveau de fouilles` },
+    { value: 'scout_level', label: $localize`Niveau d'éclaireur` }
 ];
+
+/** Icônes du jeu du niveau de fouilles, de 0 (zone épuisée) à 3 (zone abondante), relatives à HORDES_IMG_REPO. */
+export const DIG_LEVEL_ICONS: readonly string[] = ['icons/Small_broken.gif', 'icons/collec_lv1.gif', 'icons/collec_lv2.gif', 'icons/collec_lv3.gif'];
+
+/** Icônes du jeu du niveau d'éclaireur, de 0 à 3, relatives à HORDES_IMG_REPO. */
+export const SCOUT_LEVEL_ICONS: readonly string[] = ['icons/scout_lv0.gif', 'icons/scout_lv1.gif', 'icons/scout_lv2.gif', 'icons/scout_lv3.gif'];
+
+const DAY_MINUTES: number = 24 * 60;
+
+/** Couleur de la pastille d'une mise à jour vieille de `age_minutes` : vert sous 1 j, jaune sous 2 j, orange sous 3 j, rouge au-delà. */
+export function updateAgeTone(age_minutes: number): UpdateAgeTone {
+    if (age_minutes < DAY_MINUTES) return 'green';
+    if (age_minutes < 2 * DAY_MINUTES) return 'yellow';
+    if (age_minutes < 3 * DAY_MINUTES) return 'orange';
+    return 'red';
+}
 
 /** Icône du jeu de chaque information de coin, relative à HORDES_IMG_REPO. Absente : valeur seule. */
 const CORNER_ICONS: Readonly<Partial<Record<CornerInfo, string>>> = {
@@ -71,7 +95,10 @@ const CORNER_ICONS: Readonly<Partial<Record<CornerInfo, string>>> = {
     digs_success: 'icons/small_gather.gif',
     excavated: 'professions/dig.gif',
     items: 'emotes/bag.gif',
-    distance_km: 'emotes/explo.gif'
+    distance_km: 'emotes/explo.gif',
+    // Icône représentative du choix dans le panneau ; la case montre celle du niveau de la zone.
+    digs_level: 'icons/collec_lv3.gif',
+    scout_level: 'icons/scout_lv3.gif'
 };
 
 /** Icône d'une information de coin, `null` sans icône. Celle des PA porte la lettre de la langue (pas de suffixe en allemand). */

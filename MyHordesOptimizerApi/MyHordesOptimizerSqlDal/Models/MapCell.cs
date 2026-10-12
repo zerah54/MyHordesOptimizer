@@ -120,6 +120,19 @@ public partial class MapCell
     [Column("digsObservedDay", TypeName = "int(11)")]
     public int? DigsObservedDay { get; set; }
 
+    /// <summary>
+    /// Aménagement de la zone pour le camping (<c>improvementLevel</c> de MyHordes) au jour
+    /// <see cref="CampImprovementDay"/> : +5 par amélioration, +9 par objet de défense installé.
+    /// Saisi depuis le site, le niveau courant s'en déduit (voir <c>CampImprovement</c>).
+    /// <c>null</c> tant que rien n'a été saisi.
+    /// </summary>
+    [Column("campImprovementLevel", TypeName = "int(11)")]
+    public int? CampImprovementLevel { get; set; }
+
+    /// <summary>Jour de la saisie de <see cref="CampImprovementLevel"/>.</summary>
+    [Column("campImprovementDay", TypeName = "int(11)")]
+    public int? CampImprovementDay { get; set; }
+
     [ForeignKey("IdLastUpdateInfo")]
     [InverseProperty("MapCells")]
     public virtual LastUpdateInfo? IdLastUpdateInfoNavigation { get; set; }

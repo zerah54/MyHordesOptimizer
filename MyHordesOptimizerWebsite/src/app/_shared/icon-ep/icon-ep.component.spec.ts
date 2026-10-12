@@ -10,6 +10,11 @@ import moment from 'moment';
 import { HORDES_IMG_REPO } from '../../_abstract_model/const';
 import { IconEpComponent } from './icon-ep.component';
 
+// Charger un fichier de langue de moment en fait la langue globale (effet de bord de defineLocale) : on rend
+// la langue par défaut, sinon elle fuit vers les fichiers de test suivants (Vitest tourne en mode non isolé)
+// et dépend de l'ordre de chargement des modules.
+moment.locale('en');
+
 describe('IconEpComponent', (): void => {
     let fixture: ComponentFixture<IconEpComponent>;
     let originalLocale: string;

@@ -1,12 +1,15 @@
 <mat-card-header class="mho-overflow-header">
     <mat-card-title i18n>Simulateur de débordement</mat-card-title>
 
-    @if (my_town) {
-        <mat-slide-toggle [(ngModel)]="in_town" (ngModelChange)="changeInTownMode()"
-                          i18n-matTooltip matTooltip="Reprend le jour, le chaos, la dévastation et l'attaque estimée de votre ville">
-            <ng-container i18n>Ma ville</ng-container>
-        </mat-slide-toggle>
-    }
+    <div class="actions">
+        @if (my_town) {
+            <mat-slide-toggle [(ngModel)]="in_town" (ngModelChange)="changeInTownMode()"
+                              i18n-matTooltip matTooltip="Reprend le jour, le chaos, la dévastation et l'attaque estimée de votre ville">
+                <ng-container i18n>Ma ville</ng-container>
+            </mat-slide-toggle>
+        }
+        <mho-tool-presets tool="overflow" [snapshot]="snapshot_provider" (apply)="loadSnapshot($event)"/>
+    </div>
 </mat-card-header>
 
 <mat-card-content class="mho-overflow">
@@ -118,6 +121,11 @@
                     <input [ngModel]="home_defense" (ngModelChange)="changeHomeDefense($event)" [min]="0" matInput type="number">
                 </mat-form-field>
 
+                <button mat-stroked-button type="button" (click)="applyHomeDefenseToAll()"
+                        i18n-matTooltip matTooltip="Écrase la défense de chaque citoyen, y compris celles saisies à la main">
+                    <ng-container i18n>Appliquer à tous</ng-container>
+                </button>
+
                 <mat-form-field appearance="outline" subscriptSizing="dynamic">
                     <mat-label i18n>Nombre de simulations</mat-label>
                     <input [(ngModel)]="iterations" (ngModelChange)="scheduleCompute()" [min]="100" matInput type="number">
@@ -147,7 +155,7 @@
                     @for (row of citizen_defenses(); track $index) {
                         <mat-form-field appearance="outline" subscriptSizing="dynamic">
                             <mat-label>{{ row.label }}</mat-label>
-                            <input [(ngModel)]="row.defense" (ngModelChange)="scheduleCompute()" [min]="0" matInput type="number">
+                            <input [ngModel]="row.defense" (ngModelChange)="setCitizenDefense($index, $event)" [min]="0" matInput type="number">
                         </mat-form-field>
                     }
                 </div>

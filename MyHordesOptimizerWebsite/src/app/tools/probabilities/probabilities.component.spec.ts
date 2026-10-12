@@ -1,5 +1,12 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { By } from '@angular/platform-browser';
+import { provideRouter } from '@angular/router';
+import { RouterTestingHarness } from '@angular/router/testing';
+import type { MockInstance } from 'vitest';
 
+import { SnackbarService } from '../../_core/services/snackbar.service';
+import { encodeSnapshot, TOOL_SNAPSHOT_PARAM } from '../../_core/utilities/tool-snapshot.util';
+import { ToolPresetsComponent } from '../../_shared/tool-presets/tool-presets.component';
 import { ProbabilitiesComponent } from './probabilities.component';
 
 interface Simulation {
@@ -26,6 +33,9 @@ interface TestableComponent {
     addPerson(simulation: Simulation): void;
     removePerson(simulation: Simulation, index: number): void;
     barHeight(probability: number, peak: number | undefined): number;
+    toSnapshot(): Record<string, unknown>;
+    applySnapshot(raw: Record<string, unknown>): boolean;
+    loadSnapshot(raw: Record<string, unknown> | null): boolean;
 }
 
 describe('ProbabilitiesComponent', (): void => {
@@ -192,5 +202,116 @@ describe('ProbabilitiesComponent', (): void => {
 
             expect(testable.simulations()).not.toBe(original);
         });
+    });
+
+    describe('snapshot', (): void => {
+        it('toSnapshot ne garde que le titre et les chances de chaque simulation', (): void => {
+            testable.simulations.set([
+                { ...makeSimulation([50, 100]), title: 'Veille', result_probabilities: [0.5, 0.5], show_detail: false },
+                { ...makeSimulation([10]), title: 'Nuit' }
+            ]);
+
+            expect(testable.toSnapshot()).toEqual({
+                v: 1,
+                simulations: [{ title: 'Veille', chances: [50, 100] }, { title: 'Nuit', chances: [10] }]
+            });
+        });
+
+        it('applySnapshot remplace les simulations et en calcule les probabilités', (): void => {
+            const applied: boolean = testable.applySnapshot({ v: 1, simulations: [{ title: 'Veille', chances: [100] }] });
+
+            expect(applied).toBe(true);
+            expect(testable.simulations().length).toBe(1);
+            expect(testable.simulations()[0].title).toBe('Veille');
+            expect(testable.simulations()[0].result_probabilities).toEqual([1, 0]);
+            expect(testable.simulations()[0].editing_title).toBe(false);
+        });
+
+        it('applySnapshot restitue ce que toSnapshot a produit', (): void => {
+            const snapshot: Record<string, unknown> = { v: 1, simulations: [{ title: 'A', chances: [20, 80] }, { title: 'B', chances: [55] }] };
+            testable.applySnapshot(snapshot);
+
+            expect(testable.toSnapshot()).toEqual(snapshot);
+        });
+
+        it('applySnapshot ramène les chances hors bornes à 0–100 et ignore ce qui n\'est pas un nombre', (): void => {
+            testable.applySnapshot({ v: 1, simulations: [{ title: 'A', chances: [150, -20, 'x'] }] });
+
+            expect(testable.simulations()[0].current_chances).toEqual([100, 0, 0]);
+        });
+
+        it('applySnapshot borne le nombre de personnes, de simulations et la longueur d\'un titre', (): void => {
+            const simulation: Record<string, unknown> = { title: 'T'.repeat(500), chances: new Array(500).fill(50) };
+            testable.applySnapshot({ v: 1, simulations: new Array(50).fill(simulation) });
+
+            expect(testable.simulations().length).toBe(20);
+            expect(testable.simulations()[0].current_chances.length).toBe(40);
+            expect(testable.simulations()[0].title.length).toBe(60);
+        });
+
+        it('applySnapshot écarte une simulation sans chances et donne un titre par défaut à une simulation sans titre', (): void => {
+            testable.applySnapshot({ v: 1, simulations: [{ title: 'Vide', chances: [] }, { chances: [30] }, 'pas un objet'] });
+
+            expect(testable.simulations().map((simulation: Simulation): string => simulation.title)).toEqual(['Simulation 1']);
+        });
+
+        it('applySnapshot refuse une version inconnue ou une liste sans simulation exploitable, sans toucher à l\'état', (): void => {
+            const original: Simulation[] = testable.simulations();
+
+            expect(testable.applySnapshot({ v: 99, simulations: [{ title: 'A', chances: [50] }] })).toBe(false);
+            expect(testable.applySnapshot({ v: 1, simulations: [] })).toBe(false);
+            expect(testable.applySnapshot({ v: 1 })).toBe(false);
+            expect(testable.simulations()).toBe(original);
+        });
+
+        it('le menu de presets de l\'en-tête fournit la configuration courante et applique le preset choisi', (): void => {
+            fixture.detectChanges();
+            const presets: ToolPresetsComponent = fixture.debugElement.query(By.directive(ToolPresetsComponent)).componentInstance;
+
+            expect(presets.snapshot()()).toEqual(testable.toSnapshot());
+
+            presets.apply.emit({ v: 1, simulations: [{ title: 'Choisie', chances: [60] }] });
+
+            expect(testable.simulations()[0].title).toBe('Choisie');
+        });
+
+        it('loadSnapshot avertit l\'utilisateur quand le snapshot est refusé', (): void => {
+            const warning: MockInstance = vi.spyOn(TestBed.inject(SnackbarService), 'warningSnackbar').mockImplementation((): void => undefined);
+
+            testable.loadSnapshot({ v: 99 });
+
+            expect(warning).toHaveBeenCalledTimes(1);
+        });
+    });
+});
+
+describe('ProbabilitiesComponent — lien partagé', (): void => {
+    let warning: MockInstance;
+
+    beforeEach((): void => {
+        TestBed.configureTestingModule({
+            imports: [ProbabilitiesComponent],
+            providers: [provideRouter([{ path: '', component: ProbabilitiesComponent }])]
+        });
+        warning = vi.spyOn(TestBed.inject(SnackbarService), 'warningSnackbar').mockImplementation((): void => undefined);
+    });
+
+    it('charge les simulations du lien', async (): Promise<void> => {
+        const harness: RouterTestingHarness = await RouterTestingHarness.create();
+        const snapshot: Record<string, unknown> = { v: 1, simulations: [{ title: 'Veille', chances: [100, 50] }, { title: 'Nuit', chances: [10] }] };
+
+        const component: ProbabilitiesComponent = await harness.navigateByUrl(`/?${TOOL_SNAPSHOT_PARAM}=${encodeSnapshot(snapshot)}`, ProbabilitiesComponent);
+
+        expect((component as unknown as TestableComponent).toSnapshot()).toEqual(snapshot);
+        expect(warning).not.toHaveBeenCalled();
+    });
+
+    it('un lien dont le snapshot est illisible avertit et laisse la simulation par défaut', async (): Promise<void> => {
+        const harness: RouterTestingHarness = await RouterTestingHarness.create();
+
+        const component: ProbabilitiesComponent = await harness.navigateByUrl(`/?${TOOL_SNAPSHOT_PARAM}=%25%25%25`, ProbabilitiesComponent);
+
+        expect(warning).toHaveBeenCalledTimes(1);
+        expect((component as unknown as TestableComponent).simulations().length).toBe(1);
     });
 });

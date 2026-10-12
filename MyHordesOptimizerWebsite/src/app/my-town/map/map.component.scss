@@ -53,6 +53,12 @@
 
         .mho-map-settings-toggle {
             flex-shrink: 0;
+
+            /* Onglet ouvert dans le panneau : le bouton reste enfoncé. */
+            &[aria-pressed='true'] {
+                background-color: var(--mho-accent-soft);
+                color: var(--mho-on-accent-soft);
+            }
         }
     }
 
@@ -67,6 +73,26 @@
                 display: none;
             }
 
+            /* Icône seule : le libellé reste lu par les lecteurs d'écran. */
+            .mho-map-settings-toggle {
+                min-width: 44px;
+                height: 44px;
+                padding: 0 10px;
+
+                .mat-icon {
+                    margin: 0;
+                }
+
+                .toggle-label {
+                    position: absolute;
+                    width: 1px;
+                    height: 1px;
+                    overflow: hidden;
+                    clip-path: inset(50%);
+                    white-space: nowrap;
+                }
+            }
+
             .mho-map-tools {
                 flex-grow: 1;
 
@@ -79,6 +105,40 @@
         }
     }
 
+    /* Saisie d'un tracé en cours : rappel du mode, longueur, annulation, et retour au panneau sur mobile. */
+    .route-edit-banner {
+        display: flex;
+        flex-wrap: wrap;
+        flex-shrink: 0;
+        align-items: center;
+        gap: 4px 10px;
+        padding: 4px 10px 4px 14px;
+        border-bottom: 1px solid var(--mho-line);
+        background-color: var(--mho-accent-soft);
+        color: var(--mho-on-accent-soft);
+        font-size: 12.5px;
+
+        .live-dot {
+            flex-shrink: 0;
+            width: 8px;
+            height: 8px;
+            border-radius: 99px;
+            background-color: currentColor;
+        }
+
+        .banner-text {
+            display: flex;
+            flex-wrap: wrap;
+            flex-grow: 1;
+            gap: 0 6px;
+            min-width: 0;
+        }
+
+        .banner-detail {
+            font-variant-numeric: tabular-nums;
+        }
+    }
+
     .mho-map-sidenav-container {
 
         flex-grow: 1;
@@ -86,7 +146,8 @@
         background-color: var(--mho-surface);
 
         .map-settings {
-            width: 288px;
+            /* Assez large pour la liste des tracés : nom, auteur et longueur sur une ligne. */
+            width: 320px;
             max-width: 85vw;
             padding: 0 16px 16px;
             background-color: var(--mho-surface);
@@ -102,12 +163,27 @@
                 padding: 6px 8px 6px 16px;
                 border-bottom: 1px solid var(--mho-line);
 
-                h1 {
+                /* Onglets « Affichage » / « Tracés » en contrôle segmenté. */
+                .side-panel-tabs.mat-button-toggle-group {
                     flex-grow: 1;
-                    margin: 0;
-                    font-family: var(--mho-font-display);
-                    font-size: 15px;
-                    font-weight: 600;
+                    border: 1px solid var(--mho-line);
+                    border-radius: var(--mho-radius-s);
+
+                    .mat-button-toggle {
+                        flex: 1;
+                        font-size: 13px;
+                    }
+
+                    .mat-button-toggle-checked {
+                        background-color: var(--mho-accent-soft);
+                        color: var(--mho-on-accent-soft);
+                        font-weight: 600;
+                    }
+
+                    .mat-button-toggle-label-content {
+                        line-height: 32px;
+                        padding: 0 10px;
+                    }
                 }
             }
 
@@ -389,6 +465,29 @@
         border-radius: 4px;
         font: 700 10px var(--mho-font-body);
         font-variant-numeric: tabular-nums;
+    }
+
+    /* Triangle d'ancienneté de la mise à jour, aux couleurs de la carte (angle bas gauche). */
+    &.age-flag {
+        width: 14px;
+        height: 14px;
+        clip-path: polygon(0 0, 0 100%, 100% 100%);
+
+        &.age-green {
+            background-color: var(--mho-map-age-green);
+        }
+
+        &.age-yellow {
+            background-color: var(--mho-map-age-yellow);
+        }
+
+        &.age-orange {
+            background-color: var(--mho-map-age-orange);
+        }
+
+        &.age-red {
+            background-color: var(--mho-map-age-red);
+        }
     }
 }
 

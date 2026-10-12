@@ -206,6 +206,8 @@ namespace MyHordesOptimizerApiUnitTests.Caching.Fakes
         public TownListPageResultDto GetTowns(TownListQueryDto query) => throw new NotSupportedException();
         public void DeleteTown(int townId) => throw new NotSupportedException();
         public LastUpdateInfoDto UpdateCitizenChamanicDetail(int townId, int userId, CitizenChamanicDetailDto chamanicDetailDto) => throw new NotSupportedException();
+        public void UpdateCitizenCampingCount(int townId, int userId, int campingCount) => throw new NotSupportedException();
+        public void UpdateCitizenHeroSkills(int townId, int userId, CitizenHeroSkillLevelsDto heroSkills) => throw new NotSupportedException();
     }
 
     /// <summary>

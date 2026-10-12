@@ -62,7 +62,14 @@ namespace MyHordesOptimizerApi.MappingProfiles
                 .ForMember(dest => dest.JobUid, opt => opt.MapFrom(src => src.JobUid))
                 .ForMember(dest => dest.JobName, opt => opt.MapFrom(src => src.JobName))
                 .ForMember(dest => dest.Dead, opt => opt.MapFrom(src => src.Dead))
-                .ForMember(dest => dest.IdBag, opt => opt.Ignore());
+                .ForMember(dest => dest.IdBag, opt => opt.Ignore())
+                // Saisis à part (TownService) : jamais recopiés depuis un citoyen relu chez MyHordes
+                .ForMember(dest => dest.CampingCount, opt => opt.Ignore())
+                .ForMember(dest => dest.HeroSkillLevelS, opt => opt.Ignore())
+                .ForMember(dest => dest.HeroSkillLevelU, opt => opt.Ignore())
+                .ForMember(dest => dest.HeroSkillLevelP, opt => opt.Ignore())
+                .ForMember(dest => dest.HeroSkillLevelE, opt => opt.Ignore())
+                .ForMember(dest => dest.HeroSkillLevelR, opt => opt.Ignore());
    
 
             //TownCadaver

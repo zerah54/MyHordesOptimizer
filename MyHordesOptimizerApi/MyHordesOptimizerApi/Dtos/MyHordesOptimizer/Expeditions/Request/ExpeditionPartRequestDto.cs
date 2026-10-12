@@ -8,7 +8,8 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Expeditions.Request
         public List<int>? OrdersId { get; set; }
         public List<int>? CitizensId { get; set; }
         public int Position { get; set; }
-        public string? Path { get; set; }
+        /// <summary>Tracé lié : toujours envoyé (null pour délier), la partie reprend cette valeur.</summary>
+        public int? MapRouteId { get; set; }
         public string? Label { get; set; }
         public string? Direction { get; set; }
     }

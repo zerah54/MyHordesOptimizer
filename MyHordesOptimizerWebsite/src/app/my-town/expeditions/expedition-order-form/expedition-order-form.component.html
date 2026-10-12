@@ -1,0 +1,123 @@
+<h2 mat-dialog-title>
+    @if (data.order) {
+        <ng-container i18n>Consigne sur {{ data.cell_label }}</ng-container>
+    } @else {
+        <ng-container i18n>Nouvelle consigne sur {{ data.cell_label }}</ng-container>
+    }
+</h2>
+<mat-dialog-content class="order-form">
+    <mat-form-field class="owner" subscriptSizing="dynamic">
+        <mat-label i18n>Pour</mat-label>
+        <mat-select [value]="owner_id()" (valueChange)="changeOwner($event)">
+            <mat-option [value]="null" i18n>Toute l'expédition</mat-option>
+            @for (member of data.members; track member.id) {
+                <mat-option [value]="member.id">{{ member.label }}</mat-option>
+            }
+        </mat-select>
+    </mat-form-field>
+
+    <mat-button-toggle-group class="kinds" [value]="kind()" (change)="changeKind($event)" hideSingleSelectionIndicator
+                             aria-label="Type de consigne" i18n-aria-label>
+        @for (option of kinds(); track option.kind) {
+            <mat-button-toggle [value]="option.kind">
+                <span class="kind">
+                    <mat-icon aria-hidden="true">{{ option.icon }}</mat-icon>
+                    {{ option.label }}
+                </span>
+            </mat-button-toggle>
+        }
+    </mat-button-toggle-group>
+
+    @switch (kind()) {
+        @case ('text') {
+            <mat-button-toggle-group class="text-type" [value]="type()" (change)="type.set($event.value)" hideSingleSelectionIndicator
+                                     aria-label="Forme de la consigne" i18n-aria-label>
+                <mat-button-toggle value="checkbox">
+                    <mat-icon>check_box</mat-icon>
+                    <ng-container i18n>À cocher</ng-container>
+                </mat-button-toggle>
+                <mat-button-toggle value="text">
+                    <mat-icon>info</mat-icon>
+                    <ng-container i18n>Information</ng-container>
+                </mat-button-toggle>
+            </mat-button-toggle-group>
+            <mho-tiptap-editor [ngModel]="text()" (ngModelChange)="text.set($event)"></mho-tiptap-editor>
+        }
+        @case ('hero') {
+            <mat-form-field subscriptSizing="dynamic">
+                <mat-label i18n>Action héroïque</mat-label>
+                <mat-select [value]="hero_skill()" (valueChange)="hero_skill.set($event)">
+                    @for (heroic of heroics; track heroic.key) {
+                        <mat-option [value]="heroic.value.action">{{ heroic.value.label }}</mat-option>
+                    }
+                </mat-select>
+            </mat-form-field>
+        }
+        @case ('wait') {
+            <mat-form-field subscriptSizing="dynamic">
+                <mat-label i18n>Qui attendre</mat-label>
+                <mat-select [value]="target_user_id()" (valueChange)="target_user_id.set($event)">
+                    <mat-option [value]="null" i18n>Tout le groupe</mat-option>
+                    @for (member of wait_targets; track member.id) {
+                        <mat-option [value]="member.user_id">{{ member.label }}</mat-option>
+                    }
+                </mat-select>
+            </mat-form-field>
+        }
+        @case ('camp') {
+            <p class="hint" i18n>Les chances de camping de la case s'afficheront avec la consigne dans une prochaine version.</p>
+        }
+    }
+
+    @if (needs_item() || needs_quantity()) {
+        <div class="row">
+            @if (needs_item()) {
+                <mat-form-field class="item-field" subscriptSizing="dynamic">
+                    <mat-label i18n>Objet</mat-label>
+                    <mho-select [options]="kind() === 'use' ? consumables : all_items" [bindLabel]="item_label" [bindValue]="'id'" [bindIcon]="'img'"
+                                [ngModel]="item_id()" (ngModelChange)="changeItem($event)" searchable></mho-select>
+                </mat-form-field>
+            }
+            @if (needs_quantity()) {
+                <mat-form-field class="quantity-field" subscriptSizing="dynamic">
+                    <mat-label>
+                        @if (kind() === 'clear') {
+                            <ng-container i18n>Tas</ng-container>
+                        } @else {
+                            <ng-container i18n>Quantité</ng-container>
+                        }
+                    </mat-label>
+                    <input matInput type="number" [min]="1" [max]="max_quantity" [ngModel]="quantity()" (ngModelChange)="changeQuantity($event)">
+                </mat-form-field>
+            }
+        </div>
+    }
+
+    @if (move_options.length > 0) {
+        <div class="row">
+            <mat-form-field subscriptSizing="dynamic">
+                <mat-label i18n>Case</mat-label>
+                <mat-select [value]="cell_key()" (valueChange)="cell_key.set($event)">
+                    <mat-option [value]="original_cell_key" disabled>{{ data.cell_label }}</mat-option>
+                    @for (option of move_options; track option.key) {
+                        <mat-option [value]="option.key">{{ option.label }}</mat-option>
+                    }
+                </mat-select>
+            </mat-form-field>
+        </div>
+    }
+</mat-dialog-content>
+<mat-dialog-actions [align]="'end'">
+    @if (data.order) {
+        <button mat-button type="button" class="delete" (click)="remove()" i18n>Supprimer</button>
+        <span class="spacer"></span>
+    }
+    <button mat-button type="button" mat-dialog-close i18n>Annuler</button>
+    <button mat-flat-button type="button" [disabled]="!valid()" (click)="save()">
+        @if (data.order) {
+            <ng-container i18n>Enregistrer</ng-container>
+        } @else {
+            <ng-container i18n>Ajouter</ng-container>
+        }
+    </button>
+</mat-dialog-actions>

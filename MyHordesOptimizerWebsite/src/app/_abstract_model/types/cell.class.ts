@@ -51,6 +51,10 @@ export class Cell extends CommonModel<CellDTO> {
     public scout_estimation_max!: number | null;
     /** Fraîcheur propre à l'estimation, à comparer à update_info */
     public scout_estimation_update_info!: UpdateInfo | null;
+    /** Aménagement de la zone pour le camping, au jour de la ville (nuits déjà retirées) ; null si rien n'a été saisi */
+    public camp_improvement_level: number | null = null;
+    /** Jour de la dernière saisie de l'aménagement */
+    public camp_improvement_day: number | null = null;
     /** Radar du fouineur saisi manuellement depuis cette case, jamais renvoyé par l'API */
     public scav_next_cells: ScavNextCellsDTO | null = null;
     /** Radar de l'éclaireur saisi manuellement depuis cette case, jamais renvoyé par l'API */
@@ -100,7 +104,9 @@ export class Cell extends CommonModel<CellDTO> {
             nbERuinYellow: this.nb_eruin_yellow,
             nbERuinViolet: this.nb_eruin_violet,
             displayX: this.displayed_x,
-            displayY: this.displayed_y
+            displayY: this.displayed_y,
+            campImprovementLevel: this.camp_improvement_level,
+            campImprovementDay: this.camp_improvement_day
         };
     }
 
@@ -190,6 +196,8 @@ export class Cell extends CommonModel<CellDTO> {
             this.nb_eruin_blue = dto.nbERuinBlue;
             this.nb_eruin_yellow = dto.nbERuinYellow;
             this.nb_eruin_violet = dto.nbERuinViolet;
+            this.camp_improvement_level = dto.campImprovementLevel ?? null;
+            this.camp_improvement_day = dto.campImprovementDay ?? null;
         }
     }
 

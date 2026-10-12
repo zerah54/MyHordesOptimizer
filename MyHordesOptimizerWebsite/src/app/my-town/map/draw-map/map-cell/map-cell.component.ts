@@ -15,7 +15,7 @@ import {
 } from '@angular/core';
 import moment, { Moment } from 'moment';
 
-import { HORDES_IMG_REPO } from '../../../../_abstract_model/const';
+import { BURIED_RUIN_ID, HORDES_IMG_REPO } from '../../../../_abstract_model/const';
 import { Imports } from '../../../../_abstract_model/types/_types';
 import { Cell } from '../../../../_abstract_model/types/cell.class';
 import { Citizen } from '../../../../_abstract_model/types/citizen.class';
@@ -25,8 +25,19 @@ import { Ruin } from '../../../../_abstract_model/types/ruin.class';
 import { MapCellTooltipDirective } from '../../../../_core/directives/map-cell-tooltip.directive';
 import { getUserId } from '../../../../_core/utilities/localstorage.util';
 import { MapOptions } from '../../map.component';
-import { CORNER_POSITIONS, cornerIcon, CornerInfo, CornerLayout, CornerPosition } from '../../map-corners';
-import { digLevel, remainingDigs } from './pipes/dig-level.pipe';
+import {
+    CORNER_POSITIONS,
+    cornerIcon,
+    CornerInfo,
+    CornerLayout,
+    CornerPosition,
+    DIG_LEVEL_ICONS,
+    SCOUT_LEVEL_ICONS,
+    UpdateAgeTone,
+    updateAgeTone
+} from '../../map-corners';
+import { MAP_LEGENDS, MapLegendEntry } from '../../map-legends';
+import { DIG_LEVELS, digLevel, remainingDigs } from './pipes/dig-level.pipe';
 import { DistBorderBottom, DistBorderLeft, DistBorderRight, DistBorderTop } from './pipes/dist-borders.pipe';
 import { ScrutBorderBottom, ScrutBorderLeft, ScrutBorderRight, ScrutBorderTop } from './pipes/scrut-borders.pipe';
 import { trashLevel } from './pipes/trash-level.pipe';
@@ -38,10 +49,6 @@ const components: Imports = [
     ScrutBorderBottom, ScrutBorderLeft, ScrutBorderRight, ScrutBorderTop];
 const pipes: Imports = [];
 const material_modules: Imports = [];
-
-/** Clé de la ruine sentinelle « Bâtiment non déterré », créée par MHO (voir
- *  `MyHordesImportService` côté API) : tant qu'elle est posée, le bâtiment est enseveli. */
-const BURIED_RUIN_ID: number = -1;
 
 /** Un plan de moins de 10 km est un plan peu commun, au-delà un plan rare — règle du jeu
  *  (`NightlyHandler::getZoneKm() < 10 ? bplan_u : bplan_r`). */
@@ -75,6 +82,8 @@ export interface CellCorner {
     /** Valeur approximative (radar d'un éclaireur) : en italique. */
     estimation: boolean;
     title: string | null;
+    /** Couleur de la pastille d'ancienneté ; `null` pour toute autre information. */
+    tone: UpdateAgeTone | null;
 }
 
 @Component({
@@ -216,7 +225,8 @@ export class MapCellComponent {
             icon: cornerIcon(info, this.locale),
             value: null,
             estimation: false,
-            title: null
+            title: null,
+            tone: null
         };
 
         switch (info) {
@@ -274,14 +284,31 @@ export class MapCellComponent {
                 corner.value = this.format(cell.nb_pa);
                 return corner;
             case 'update_age': {
-                const age: string | null = MapCellComponent.ageLabel(cell.update_info?.update_time);
-                if (age === null) return null;
-                corner.value = age;
+                const age_minutes: number | null = MapCellComponent.ageMinutes(cell.update_info?.update_time);
+                if (age_minutes === null) return null;
+                corner.tone = updateAgeTone(age_minutes);
+                corner.title = $localize`Mise à jour il y a ${MapCellComponent.ageLabel(age_minutes)}:age:`;
                 return corner;
             }
             case 'trash':
                 corner.value = String(trashValue(cell, options, this.allItems()));
                 return corner;
+            case 'digs_level': {
+                // Même niveau que la couleur du fond de la carte des fouilles.
+                const level: number = digLevel(cell, options);
+                corner.icon = DIG_LEVEL_ICONS[level];
+                corner.title = DIG_LEVELS[level].label;
+                return corner;
+            }
+            case 'scout_level': {
+                const level: number | null | undefined = cell.scout_zone_level;
+                if (level === null || level === undefined) return null;
+                const icon: string | undefined = SCOUT_LEVEL_ICONS[level];
+                if (icon === undefined) return null;
+                corner.icon = icon;
+                corner.title = MAP_LEGENDS.scout?.find((entry: MapLegendEntry): boolean => entry.swatch === `level-${level}`)?.label ?? null;
+                return corner;
+            }
         }
     }
 
@@ -289,10 +316,14 @@ export class MapCellComponent {
         return formatNumber(value, this.locale, '1.0-0');
     }
 
-    /** Ancienneté de la dernière mise à jour, au plus court pour tenir dans un coin : « 12m », « 5h », « 3j ». */
-    private static ageLabel(update_time: Moment | undefined): string | null {
+    /** Ancienneté de la dernière mise à jour en minutes, `null` si elle est inconnue. */
+    private static ageMinutes(update_time: Moment | undefined): number | null {
         if (!update_time?.isValid()) return null;
-        const minutes: number = Math.max(0, moment().diff(update_time, 'minutes'));
+        return Math.max(0, moment().diff(update_time, 'minutes'));
+    }
+
+    /** Ancienneté au plus court : « 12m », « 5h », « 3j ». */
+    private static ageLabel(minutes: number): string {
         if (minutes < 60) return $localize`${minutes}:minutes:m`;
         const hours: number = Math.floor(minutes / 60);
         if (hours < 24) return $localize`${hours}:hours:h`;

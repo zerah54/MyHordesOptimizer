@@ -3,11 +3,17 @@ import { HttpTestingController, provideHttpClientTesting, TestRequest } from '@a
 import { DebugElement } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
-import type { Mock } from 'vitest';
+import { provideRouter } from '@angular/router';
+import { RouterTestingHarness } from '@angular/router/testing';
+import type { Mock, MockInstance } from 'vitest';
 
 import { RefinementViewDTO } from '../../_abstract_model/dto/refinement.dto';
+import { Citizen } from '../../_abstract_model/types/citizen.class';
 import { TownDetails } from '../../_abstract_model/types/town-details.class';
+import { SnackbarService } from '../../_core/services/snackbar.service';
 import { setTown } from '../../_core/utilities/localstorage.util';
+import { encodeSnapshot, TOOL_SNAPSHOT_PARAM } from '../../_core/utilities/tool-snapshot.util';
+import { ToolPresetsComponent } from '../../_shared/tool-presets/tool-presets.component';
 import { OverflowComponent, ScenarioResult } from './overflow.component';
 
 describe('OverflowComponent', (): void => {
@@ -491,5 +497,265 @@ describe('OverflowComponent', (): void => {
         // Champ vidé : rien n'est réécrit
         component['changeHomeDefense'](null);
         expect(component['citizen_defenses']().map((row: { defense: number }): number => row.defense)).toEqual([5, 12, 0]);
+    });
+
+    it('« Appliquer à tous » écrase la défense de chaque citoyen, nommé ou non, par la défense par défaut', (): void => {
+        component['nb_alive'].set(2);
+        component['home_defense'] = 60;
+        component['citizen_defenses'].set([
+            { label: 'Citoyen 1', named: false, defense: 3 },
+            { label: 'Zerah', named: true, defense: 19 }
+        ]);
+
+        component['applyHomeDefenseToAll']();
+
+        expect(component['citizen_defenses']().map((row: { defense: number }): number => row.defense)).toEqual([60, 60]);
+    });
+
+    it('« Appliquer à tous » ignore un champ de défense par défaut vidé', (): void => {
+        component['nb_alive'].set(1);
+        component['home_defense'] = null as unknown as number;
+        component['citizen_defenses'].set([{ label: 'Citoyen 1', named: false, defense: 3 }]);
+
+        component['applyHomeDefenseToAll']();
+
+        expect(component['citizen_defenses']()[0].defense).toBe(3);
+    });
+
+    describe('bascule « Ma ville »', (): void => {
+        /** Répond aux trois requêtes de préremplissage « Ma ville » (un citoyen nommé Alice). */
+        const flushTown = (town_fixture: ComponentFixture<OverflowComponent>): void => {
+            const http_mock: HttpTestingController = TestBed.inject(HttpTestingController);
+            http_mock.expectOne((req: HttpRequest<unknown>): boolean => req.url.includes('/Fetcher/citizens')).flush({
+                citizens: { '1': { id: 1, name: 'Alice', dead: false, jobUid: null, houseDefense: 10, home: { content: {} } } },
+                lastUpdateInfo: {}
+            });
+            http_mock.expectOne((req: HttpRequest<unknown>): boolean => req.url.includes('/attaqueEstimation/AttackCalculation'))
+                .flush(null, { status: 500, statusText: 'Server Error' });
+            http_mock.expectOne((req: HttpRequest<unknown>): boolean => req.url.includes('/AttaqueEstimation/Refinement/'))
+                .flush(null, { status: 500, statusText: 'Server Error' });
+            town_fixture.detectChanges();
+        };
+
+        it('décocher repasse sur des citoyens génériques à la défense par défaut', (): void => {
+            setTown(Object.assign(new TownDetails(), {
+                town_id: 1, town_x: 0, town_y: 0, town_max_x: 40, town_max_y: 40,
+                is_chaos: false, is_devaste: false, day: 5, town_type: 'primary', has_external_api: null
+            }));
+            const town_fixture: ComponentFixture<OverflowComponent> = TestBed.createComponent(OverflowComponent);
+            const town_component: OverflowComponent = town_fixture.componentInstance;
+            town_fixture.detectChanges();
+            flushTown(town_fixture);
+            expect(town_component['citizen_defenses']()[0]).toEqual(expect.objectContaining({ label: 'Alice', named: true }));
+
+            town_component['home_defense'] = 60;
+            town_component['in_town'] = false;
+            town_component['changeInTownMode']();
+
+            expect(town_component['citizen_defenses']()).toEqual([{ label: 'Citoyen 1', named: false, defense: 60 }]);
+        });
+
+        it('recocher restitue les noms et les défenses reconstituées, pas celles saisies entre-temps', (): void => {
+            setTown(Object.assign(new TownDetails(), {
+                town_id: 1, town_x: 0, town_y: 0, town_max_x: 40, town_max_y: 40,
+                is_chaos: false, is_devaste: false, day: 5, town_type: 'primary', has_external_api: null
+            }));
+            const town_fixture: ComponentFixture<OverflowComponent> = TestBed.createComponent(OverflowComponent);
+            const town_component: OverflowComponent = town_fixture.componentInstance;
+            town_fixture.detectChanges();
+            flushTown(town_fixture);
+            const reconstructed: number = town_component['citizen_defenses']()[0].defense;
+            town_component['in_town'] = false;
+            town_component['changeInTownMode']();
+            town_component['home_defense'] = reconstructed + 40;
+            town_component['applyHomeDefenseToAll']();
+
+            town_component['in_town'] = true;
+            town_component['changeInTownMode']();
+            flushTown(town_fixture);
+
+            expect(town_component['citizen_defenses']()[0]).toEqual({ label: 'Alice', named: true, defense: reconstructed });
+        });
+    });
+
+    // Un recalcul remplace les objets de ligne ; une frappe traitée avant le rendu suivant (typiquement
+    // mise en file pendant le calcul, qui bloque le fil principal) ne doit pas être écrite dans une ligne périmée.
+    it('une défense saisie juste après un recalcul, avant le rendu suivant, n\'est pas perdue', (): void => {
+        component['nb_alive'].set(3);
+        component['compute']();
+        fixture.detectChanges();
+        const defense_inputs: DebugElement[] = fixture.debugElement
+            .queryAll(By.css('mat-expansion-panel.input-panel'))[1].queryAll(By.css('input[type=number]'));
+
+        component['compute']();
+        const input: HTMLInputElement = defense_inputs[0].nativeElement;
+        input.value = '60';
+        input.dispatchEvent(new Event('input'));
+
+        expect(component['citizen_defenses']()[0].defense).toBe(60);
+    });
+
+    describe('snapshot', (): void => {
+        const house_counts: number[] = [0, 1, 2, 0, 0, 0, 0, 0, 0];
+        const valid_snapshot: Record<string, unknown> = {
+            v: 1, attack: 900, town_defense: 250, door_state: 'open', watch_defense: 40, day: 12, nb_alive: 3, population: 30,
+            house_counts, chaos: true, devastated: false, home_defense: 7, iterations: 500, defenses: [1, 2, 3]
+        };
+
+        it('toSnapshot décrit la configuration saisie, avec les défenses seules (jamais les noms)', (): void => {
+            component['attack'].set(900);
+            component['town_defense'] = 250;
+            component['door_state'] = 'open';
+            component['watch_defense'] = 40;
+            component['day'] = 12;
+            component['nb_alive'].set(2);
+            component['population'] = 30;
+            component['house_counts'].set(house_counts);
+            component['chaos'] = true;
+            component['home_defense'] = 7;
+            component['iterations'] = 500;
+            component['citizen_defenses'].set([
+                { label: 'Alice', named: true, defense: 5 },
+                { label: 'Citoyen 2', named: false, defense: 9 }
+            ]);
+
+            expect(component['toSnapshot']()).toEqual({ ...valid_snapshot, nb_alive: 2, defenses: [5, 9] });
+        });
+
+        it('applySnapshot restitue ce que toSnapshot a produit', (): void => {
+            expect(component['applySnapshot'](valid_snapshot)).toBe(true);
+            const snapshot: Record<string, unknown> = component['toSnapshot']();
+
+            const other_fixture: ComponentFixture<OverflowComponent> = TestBed.createComponent(OverflowComponent);
+            other_fixture.detectChanges();
+            other_fixture.componentInstance['applySnapshot'](snapshot);
+
+            expect(other_fixture.componentInstance['toSnapshot']()).toEqual(valid_snapshot);
+        });
+
+        it('applySnapshot relance la simulation avec les valeurs chargées', (): void => {
+            component['applySnapshot']({ ...valid_snapshot, door_state: 'closed', chaos: false });
+
+            // 900 - 250 de défense de ville - 40 de veille
+            expect(component['overflow_after_watch']()).toBe(610);
+        });
+
+        it('applySnapshot quitte le mode "Ma ville" et oublie les citoyens connus', (): void => {
+            component['in_town'] = true;
+            component['known_citizens'] = <Citizen[]><unknown>[{ name: 'Alice' }];
+
+            component['applySnapshot']({ ...valid_snapshot, nb_alive: 1, defenses: [5] });
+
+            expect(component['in_town']).toBe(false);
+            expect(component['citizen_defenses']()).toEqual([{ label: 'Citoyen 1', named: false, defense: 5 }]);
+        });
+
+        it('applySnapshot ramène les valeurs hors bornes aux bornes et ignore ce qui n\'est pas un nombre', (): void => {
+            component['applySnapshot']({
+                ...valid_snapshot, attack: -5, town_defense: 'x', door_state: 'bogus', watch_defense: 1e12, day: 0,
+                nb_alive: 2, population: 0, iterations: 1e9, house_counts: [1, 2], defenses: [1e12, -3]
+            });
+
+            expect(component['attack']()).toBe(0);
+            expect(component['town_defense']).toBe(300);
+            expect(component['door_state']).toBe('closed');
+            expect(component['watch_defense']).toBe(1_000_000);
+            expect(component['day']).toBe(1);
+            expect(component['population']).toBe(1);
+            expect(component['iterations']).toBe(100_000);
+            expect(component['house_counts']()).toEqual(new Array(9).fill(0));
+            expect(component['citizen_defenses']().map((row: { defense: number }): number => row.defense)).toEqual([1_000_000, 0]);
+        });
+
+        it('applySnapshot borne le nombre de citoyens, même si defenses en contient davantage', (): void => {
+            component['applySnapshot']({ ...valid_snapshot, nb_alive: 1e6, iterations: 100, defenses: new Array(500).fill(3) });
+
+            expect(component['nb_alive']()).toBe(100);
+            expect(component['citizen_defenses']().length).toBe(100);
+        });
+
+        it('applySnapshot complète avec la défense par défaut quand defenses manque', (): void => {
+            component['applySnapshot']({ ...valid_snapshot, nb_alive: 3, home_defense: 4, defenses: undefined });
+
+            expect(component['citizen_defenses']().map((row: { defense: number }): number => row.defense)).toEqual([4, 4, 4]);
+        });
+
+        it('applySnapshot coche aussi le chaos quand la ville est dévastée', (): void => {
+            component['applySnapshot']({ ...valid_snapshot, chaos: false, devastated: true });
+
+            expect(component['devastated']).toBe(true);
+            expect(component['chaos']).toBe(true);
+        });
+
+        it('applySnapshot refuse une version inconnue sans toucher à l\'état', (): void => {
+            expect(component['applySnapshot']({ ...valid_snapshot, v: 99 })).toBe(false);
+
+            expect(component['attack']()).toBe(500);
+        });
+
+        it('le menu de presets de l\'en-tête fournit la configuration courante et applique le preset choisi', (): void => {
+            const presets: ToolPresetsComponent = fixture.debugElement.query(By.directive(ToolPresetsComponent)).componentInstance;
+
+            expect(presets.snapshot()()).toEqual(component['toSnapshot']());
+
+            presets.apply.emit({ ...valid_snapshot, attack: 321 });
+
+            expect(component['attack']()).toBe(321);
+        });
+
+        it('loadSnapshot avertit l\'utilisateur quand le snapshot est refusé', (): void => {
+            const warning: MockInstance = vi.spyOn(TestBed.inject(SnackbarService), 'warningSnackbar').mockImplementation((): void => undefined);
+
+            component['loadSnapshot']({ v: 99 });
+
+            expect(warning).toHaveBeenCalledTimes(1);
+        });
+    });
+});
+
+describe('OverflowComponent — lien partagé', (): void => {
+    const town: TownDetails = Object.assign(new TownDetails(), {
+        town_id: 1, town_x: 0, town_y: 0, town_max_x: 40, town_max_y: 40,
+        is_chaos: false, is_devaste: false, day: 5, town_type: 'primary', has_external_api: null
+    });
+    let warning: MockInstance;
+
+    beforeEach((): void => {
+        setTown(town);
+        TestBed.configureTestingModule({
+            imports: [OverflowComponent],
+            providers: [
+                provideRouter([{ path: '', component: OverflowComponent }]),
+                provideHttpClient(withXhr()), provideHttpClientTesting()
+            ]
+        });
+        warning = vi.spyOn(TestBed.inject(SnackbarService), 'warningSnackbar').mockImplementation((): void => undefined);
+    });
+
+    afterEach((): void => {
+        setTown(null);
+    });
+
+    it('applique le snapshot du lien sans interroger la ville, même pour un joueur qui en a une', async (): Promise<void> => {
+        const harness: RouterTestingHarness = await RouterTestingHarness.create();
+
+        const component: OverflowComponent = await harness.navigateByUrl(
+            `/?${TOOL_SNAPSHOT_PARAM}=${encodeSnapshot({ v: 1, attack: 900, nb_alive: 2, defenses: [4, 5] })}`, OverflowComponent);
+
+        expect(component['in_town']).toBe(false);
+        expect(component['attack']()).toBe(900);
+        expect(component['citizen_defenses']().map((row: { defense: number }): number => row.defense)).toEqual([4, 5]);
+        TestBed.inject(HttpTestingController).expectNone((req: HttpRequest<unknown>): boolean => req.url.includes('/Fetcher/citizens'));
+        expect(warning).not.toHaveBeenCalled();
+    });
+
+    it('un lien dont le snapshot est illisible avertit, puis reprend le comportement normal', async (): Promise<void> => {
+        const harness: RouterTestingHarness = await RouterTestingHarness.create();
+
+        const component: OverflowComponent = await harness.navigateByUrl(`/?${TOOL_SNAPSHOT_PARAM}=%25%25%25`, OverflowComponent);
+
+        expect(warning).toHaveBeenCalledTimes(1);
+        expect(component['in_town']).toBe(true);
+        TestBed.inject(HttpTestingController).expectOne((req: HttpRequest<unknown>): boolean => req.url.includes('/Fetcher/citizens'));
     });
 });

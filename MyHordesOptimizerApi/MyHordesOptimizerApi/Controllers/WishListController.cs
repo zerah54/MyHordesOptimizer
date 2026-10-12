@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using MyHordesOptimizerApi.Controllers.Abstract;
@@ -36,20 +37,25 @@ namespace MyHordesOptimizerApi.Controllers
             return wishList;
         }
 
+        // Écritures : jeton obligatoire, l'auteur de la mise à jour est celui du jeton (le userId encore
+        // envoyé en query par les anciens clients est ignoré) et WishListService vérifie qu'il est
+        // citoyen de la ville.
         [HttpPut]
-        public ActionResult<WishListLastUpdateDto> PutWishList(int townId, int userId, List<WishListPutResquestDto> request)
+        [Authorize]
+        public ActionResult<WishListLastUpdateDto> PutWishList(int townId, List<WishListPutResquestDto> request)
         {
             if (request == null)
             {
                 return BadRequest($"{nameof(request)} cannot be null");
             }
-            var wishList = _wishListService.PutWishList(townId, userId, request);
+            var wishList = _wishListService.PutWishList(townId, UserInfoProvider.UserId, request);
             return Ok(wishList);
         }
 
         [HttpPost]
         [Route("Add/{itemId}")]
-        public ActionResult AddItemToWishList(int? townId, int? itemId, int? userId, int zoneXPa)
+        [Authorize]
+        public ActionResult AddItemToWishList(int? townId, int? itemId, int zoneXPa)
         {
             if (!townId.HasValue)
             {
@@ -59,11 +65,7 @@ namespace MyHordesOptimizerApi.Controllers
             {
                 return BadRequest($"{nameof(itemId)} cannot be null");
             }
-            if (!userId.HasValue)
-            {
-                return BadRequest($"{nameof(userId)} cannot be null");
-            }
-            _wishListService.AddItemToWishList(townId: townId.Value, itemId: itemId.Value, userId: userId.Value, zoneXPa: zoneXPa);
+            _wishListService.AddItemToWishList(townId: townId.Value, itemId: itemId.Value, userId: UserInfoProvider.UserId, zoneXPa: zoneXPa);
             return Ok();
         }
 
@@ -87,21 +89,18 @@ namespace MyHordesOptimizerApi.Controllers
 
         [HttpPost]
         [Route("Template/{templateId}")]
-        public ActionResult<WishListLastUpdateDto> CreateFromTemplate(int? townId, int? userId, int? templateId)
+        [Authorize]
+        public ActionResult<WishListLastUpdateDto> CreateFromTemplate(int? townId, int? templateId)
         {
             if (!townId.HasValue)
             {
                 return BadRequest($"{nameof(townId)} cannot be null");
             }
-            if (!userId.HasValue)
-            {
-                return BadRequest($"{nameof(userId)} cannot be null");
-            }
             if (!templateId.HasValue)
             {
                 return BadRequest($"{nameof(templateId)} cannot be null");
             }
-            var wishList = _wishListService.CreateFromTemplate(townId.Value, userId.Value, templateId.Value);
+            var wishList = _wishListService.CreateFromTemplate(townId.Value, UserInfoProvider.UserId, templateId.Value);
             return wishList;
         }
     }

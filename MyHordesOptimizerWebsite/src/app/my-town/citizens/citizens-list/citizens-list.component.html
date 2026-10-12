@@ -227,6 +227,40 @@
                             }
                         }
                     </section>
+
+                    @if (hasHeroSkillOrCampingOptions()) {
+                        <section class="filters-section toggles">
+                            <h4 i18n>Capacités et camping</h4>
+                            @for (family of hero_skill_families; track family.key) {
+                                @if ((value_options[HERO_SKILL_ID_PREFIX + family.key] || []).length > 0) {
+                                    <div class="filter-row">
+                                        <span [matTooltip]="hero_skill_group_names()[family.key]"
+                                              class="filter-label hero-skill-letter">{{ family.letter }}</span>
+                                        <mat-button-toggle-group (change)="setValueFilter(HERO_SKILL_ID_PREFIX + family.key, $event.value)"
+                                                                 [value]="valueFilter(HERO_SKILL_ID_PREFIX + family.key)" class="value-filter"
+                                                                 hideMultipleSelectionIndicator multiple>
+                                            @for (value of value_options[HERO_SKILL_ID_PREFIX + family.key]; track value) {
+                                                <mat-button-toggle [value]="value">{{ value }}</mat-button-toggle>
+                                            }
+                                        </mat-button-toggle-group>
+                                    </div>
+                                }
+                            }
+                            @if ((value_options[CAMPING_COUNT_ID] || []).length > 0) {
+                                <div class="filter-row">
+                                    <span [matTooltip]="camping_count_label" class="filter-label">
+                                        <img [alt]="camping_count_label" [src]="HORDES_IMG_REPO + 'emotes/sleep.gif'">
+                                    </span>
+                                    <mat-button-toggle-group (change)="setValueFilter(CAMPING_COUNT_ID, $event.value)" [value]="valueFilter(CAMPING_COUNT_ID)"
+                                                             class="value-filter" hideMultipleSelectionIndicator multiple>
+                                        @for (value of value_options[CAMPING_COUNT_ID]; track value) {
+                                            <mat-button-toggle [value]="value">{{ value }}</mat-button-toggle>
+                                        }
+                                    </mat-button-toggle-group>
+                                </div>
+                            }
+                        </section>
+                    }
                 </div>
             </mat-sidenav>
 
@@ -327,6 +361,20 @@
                                         </td>
                                     </ng-container>
 
+                                    <ng-container matColumnDef="hero_skills">
+                                        <th *matHeaderCellDef i18n mat-header-cell>Capacités</th>
+                                        <td *matCellDef="let row; table: table" class="band-cell" mat-cell>
+                                            <mho-deferred-cell [content]="heroSkillsBand" [context]="{ $implicit: row }"></mho-deferred-cell>
+                                        </td>
+                                    </ng-container>
+
+                                    <ng-container matColumnDef="camping">
+                                        <th *matHeaderCellDef i18n mat-header-cell>Camping</th>
+                                        <td *matCellDef="let row; table: table" mat-cell>
+                                            <mho-deferred-cell [content]="campingCountCell" [context]="{ $implicit: row }"></mho-deferred-cell>
+                                        </td>
+                                    </ng-container>
+
                                     <!-- ============ Mode colonnes : une colonne par champ ============ -->
 
                                     <ng-container matColumnDef="sac">
@@ -408,6 +456,27 @@
                                             </td>
                                         </ng-container>
                                     }
+
+                                    @for (family of hero_skill_families; track family.key; let first = $first) {
+                                        <ng-container [matColumnDef]="HERO_SKILL_ID_PREFIX + family.key">
+                                            <th *matHeaderCellDef [class.category-start]="first" class="field-col" mat-header-cell>
+                                                <span [matTooltip]="hero_skill_group_names()[family.key]" class="hero-skill-letter">{{ family.letter }}</span>
+                                            </th>
+                                            <td *matCellDef="let row; table: table" [class.category-start]="first" class="field-col" mat-cell>
+                                                <mho-deferred-cell [content]="heroSkillCell" [context]="{ $implicit: row, family: family }"></mho-deferred-cell>
+                                            </td>
+                                        </ng-container>
+                                    }
+
+                                    <ng-container [matColumnDef]="CAMPING_COUNT_ID">
+                                        <th *matHeaderCellDef class="field-col category-start" mat-header-cell>
+                                            <img [alt]="camping_count_label" [matTooltip]="camping_count_label" [src]="HORDES_IMG_REPO + 'emotes/sleep.gif'"
+                                                 class="col-header-icon">
+                                        </th>
+                                        <td *matCellDef="let row; table: table" class="field-col category-start" mat-cell>
+                                            <mho-deferred-cell [content]="campingCountCell" [context]="{ $implicit: row }"></mho-deferred-cell>
+                                        </td>
+                                    </ng-container>
 
                                     <ng-container matColumnDef="last_update">
                                         <th *matHeaderCellDef class="field-col category-start" mat-header-cell>
@@ -760,6 +829,41 @@
             </mho-compact-stepper>
         }
     }
+</ng-template>
+
+<!-- Capacités héroïques : un niveau par groupe (« ? » = inconnu, 0 = aucun) -->
+<ng-template #heroSkillsBand let-row>
+    <div class="band">
+        @for (family of hero_skill_families; track family.key) {
+            <ng-container [ngTemplateOutletContext]="{ $implicit: row, family: family }" [ngTemplateOutlet]="heroSkillCell"></ng-container>
+        }
+    </div>
+</ng-template>
+
+<ng-template #heroSkillCell let-family="family" let-row>
+    <span class="hero-skill">
+        <span class="hero-skill-letter">{{ family.letter }}</span>
+        <mho-compact-stepper
+            (valueChange)="updateHeroSkill(row.id, family.key, $event)"
+            [disabled]="is_readonly()"
+            [label]="heroSkillLabel(family, row.hero_skills[family.key])"
+            [max]="MAX_HERO_SKILL_LEVEL"
+            [min]="-1"
+            [value]="row.hero_skills[family.key] ?? -1">
+        </mho-compact-stepper>
+    </span>
+</ng-template>
+
+<!-- Campings déjà effectués (0 par défaut) -->
+<ng-template #campingCountCell let-row>
+    <mho-compact-stepper
+        (valueChange)="updateCampingCount(row.id, $event)"
+        [disabled]="is_readonly()"
+        [label]="camping_count_label"
+        [min]="0"
+        [value]="row.camping_count"
+        icon="emotes/sleep.gif">
+    </mho-compact-stepper>
 </ng-template>
 
 <!-- Cellule de fin de ligne : indicateur unique de MàJ, menu de détail au survol -->

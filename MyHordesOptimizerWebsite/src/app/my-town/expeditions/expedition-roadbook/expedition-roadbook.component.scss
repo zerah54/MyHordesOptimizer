@@ -1,0 +1,263 @@
+:host {
+    display: block;
+    min-width: 0;
+}
+
+.roadbook {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 10px 12px;
+    border: 1px solid var(--mho-line);
+    border-left: 3px solid var(--mho-route-color, var(--mho-line-strong));
+    border-radius: var(--mho-radius-m);
+    background: var(--mho-surface);
+}
+
+.roadbook-head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    h3 {
+        margin: 0;
+        font: 700 15px var(--mho-font-display);
+    }
+
+    .summary {
+        flex: 1;
+        min-width: 0;
+        font-size: 12px;
+        color: var(--mho-text-muted);
+    }
+}
+
+.overview {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+/* La mini-carte reprend le calque des tracés de la carte : il se cale sur `--mho-cell` et sur ces deux marges. */
+.mini-map {
+    --mho-map-padding: 0px;
+    --mho-axis: 0px;
+
+    position: relative;
+    display: grid;
+    gap: 0;
+    flex-shrink: 0;
+    border: 1px solid var(--mho-line);
+    background: var(--mho-surface-2);
+
+    &.editable .mini-cell {
+        cursor: pointer;
+
+        &:hover {
+            outline: 1px solid var(--mho-text);
+            outline-offset: -1px;
+        }
+    }
+}
+
+.mini-cell {
+    position: relative;
+    width: var(--mho-cell);
+    height: var(--mho-cell);
+    box-sizing: border-box;
+    border: 1px solid color-mix(in srgb, var(--mho-line) 60%, transparent);
+    background: var(--mho-surface);
+
+    &.unknown {
+        background: repeating-linear-gradient(45deg, var(--mho-surface-2) 0 2px, var(--mho-surface) 2px 4px);
+    }
+
+    &.depleted {
+        background: var(--mho-surface-3);
+    }
+
+    &.town {
+        background: var(--mho-accent);
+    }
+
+    &.building::after,
+    &.buried::after {
+        content: '';
+        position: absolute;
+        inset: 30%;
+        border-radius: 1px;
+        background: var(--mho-text);
+    }
+
+    &.buried::after {
+        background: transparent;
+        border: 1px dashed var(--mho-text);
+    }
+
+    &.off {
+        box-shadow: inset 0 0 0 2px var(--mho-danger);
+    }
+
+    .count {
+        position: absolute;
+        right: -3px;
+        top: -3px;
+        z-index: 3;
+        min-width: 11px;
+        height: 11px;
+        padding: 0 2px;
+        border-radius: 99px;
+        background: var(--mho-text);
+        color: var(--mho-surface);
+        font: 700 8px/11px var(--mho-font-body);
+        text-align: center;
+        pointer-events: none;
+    }
+}
+
+.overview-text {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+    font-size: 12px;
+
+    .hint {
+        font-style: italic;
+    }
+}
+
+.muted {
+    color: var(--mho-text-muted);
+}
+
+.off-route-alert {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 10px;
+    border-radius: var(--mho-radius-m);
+    background: color-mix(in srgb, var(--mho-danger) 14%, transparent);
+    font-size: 13px;
+
+    mat-icon {
+        color: var(--mho-danger);
+    }
+}
+
+.steps {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.step {
+    display: grid;
+    grid-template-columns: 24px minmax(0, 1fr);
+    gap: 8px;
+    padding: 6px 0;
+
+    &:not(:last-child) {
+        border-bottom: 1px solid var(--mho-line);
+    }
+
+    .node {
+        display: grid;
+        place-items: center;
+        width: 22px;
+        height: 22px;
+        border-radius: 99px;
+        background: var(--mho-route-color, var(--mho-line-strong));
+        color: var(--mho-route-on, var(--mho-surface));
+        font: 700 11px var(--mho-font-body);
+    }
+
+    &.off .node {
+        background: var(--mho-danger);
+        color: var(--mho-surface);
+    }
+}
+
+.step-body {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+}
+
+.step-head {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+    min-height: 22px;
+    font-size: 13px;
+
+    .coordinates {
+        font-weight: 700;
+        font-variant-numeric: tabular-nums;
+    }
+
+    .place {
+        color: var(--mho-text-muted);
+    }
+
+    .off-pill {
+        padding: 0 6px;
+        border-radius: 99px;
+        background: color-mix(in srgb, var(--mho-danger) 18%, transparent);
+        font-size: 11.5px;
+    }
+
+    .spacer {
+        flex: 1;
+    }
+
+    .ap {
+        font-weight: 700;
+        font-variant-numeric: tabular-nums;
+
+        small {
+            margin-left: 2px;
+            font-weight: 400;
+            color: var(--mho-text-muted);
+        }
+    }
+}
+
+.order-line {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+
+    .order {
+        flex: 1;
+    }
+
+    .line-action {
+        flex-shrink: 0;
+        width: 32px;
+        height: 32px;
+        padding: 4px;
+
+        mat-icon {
+            font-size: 18px;
+            width: 18px;
+            height: 18px;
+        }
+    }
+}
+
+.add {
+    align-self: flex-start;
+}
+
+.empty {
+    margin: 0;
+    font-size: 13px;
+    color: var(--mho-text-muted);
+}

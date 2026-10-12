@@ -12,6 +12,14 @@ namespace MyHordesOptimizerApi.Extensions.Models.Expeditions
 
             newOrder.Text = source.Text;
             newOrder.Type = source.Type;
+            newOrder.Position = source.Position;
+            newOrder.X = source.X;
+            newOrder.Y = source.Y;
+            newOrder.Kind = source.Kind;
+            newOrder.IdItem = source.IdItem;
+            newOrder.Quantity = source.Quantity;
+            newOrder.HeroSkill = source.HeroSkill;
+            newOrder.IdTargetUser = source.IdTargetUser;
 
             return newOrder;
         }

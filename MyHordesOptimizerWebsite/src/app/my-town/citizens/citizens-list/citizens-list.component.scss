@@ -258,6 +258,19 @@
                 min-width: 160px;
             }
 
+            // Capacités héroïques : la lettre du groupe devant son niveau
+            .hero-skill {
+                display: inline-flex;
+                align-items: center;
+                gap: 2px;
+            }
+
+            .hero-skill-letter {
+                min-width: 1em;
+                font-weight: 700;
+                text-align: center;
+            }
+
             // Colonne métier collante (avant le nom) : icône seule, fond opaque pour le défilement.
             // Largeur FIXE : sinon la colonne rétrécit pendant le defer (placeholder étroit) puis s'élargit
             // au chargement de l'icône → la colonne citoyen (sticky, juste après) se décale horizontalement.

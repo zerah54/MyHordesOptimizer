@@ -113,6 +113,7 @@ namespace MyHordesOptimizerApi.Repository.Impl
 
             foreach(var power in powerDictionnary)
             {
+                power.Value.TranslationDomain = "items";
                 capacitiesDictionnary.Add(power.Key, power.Value);
             }
 

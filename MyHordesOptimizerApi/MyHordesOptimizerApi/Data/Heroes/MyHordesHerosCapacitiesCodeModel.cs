@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
 
 namespace MyHordesOptimizerApi.Data.Heroes
@@ -49,5 +50,20 @@ namespace MyHordesOptimizerApi.Data.Heroes
         /// <summary>Avantages apportés par le niveau, en allemand.</summary>
         [JsonProperty("bullets")]
         public List<string>? Bullets { get; set; }
+
+        /// <summary>
+        /// Propriétés que le niveau donne au citoyen (<c>CitizenProperties</c> de MyHordes), cumulées avec les
+        /// niveaux inférieurs du groupe : <c>features.pro.camper</c>, <c>props.limit.camping.pro</c>…
+        /// </summary>
+        [JsonProperty("citizenProperties")]
+        public Dictionary<string, JToken>? CitizenProperties { get; set; }
+
+        /// <summary>
+        /// Domaine de traduction du jeu (préfixe du fichier yml) dans lequel chercher les libellés :
+        /// « game » pour les compétences, « items » pour les actions héroïques de powers.json.
+        /// Posé par le dépôt, absent du JSON.
+        /// </summary>
+        [JsonIgnore]
+        public string TranslationDomain { get; set; } = "game";
     }
 }

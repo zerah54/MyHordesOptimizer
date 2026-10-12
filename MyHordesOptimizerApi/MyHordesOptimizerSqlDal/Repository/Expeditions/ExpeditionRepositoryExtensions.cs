@@ -20,6 +20,10 @@ namespace MyHordesOptimizerApi.Repository.Expeditions
                 .Include(expedition => expedition.ExpeditionParts)
                     .ThenInclude(part => part.ExpeditionCitizens)
                         .ThenInclude(expeditionCitizen => expeditionCitizen.ExpeditionOrders)
+                .AsSplitQuery()
+                // Tracé lié : résumé dans ExpeditionPartDto.MapRoute.
+                .Include(expedition => expedition.ExpeditionParts)
+                    .ThenInclude(part => part.IdMapRouteNavigation)
                 .AsSplitQuery();
         }
 

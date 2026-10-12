@@ -10,6 +10,7 @@ const HERO_FIND_KEY: string = 'hero_find';
 const IMPOUNDABLE_KEY: string = 'impoundable';
 const PREVENT_NIGHT_KEY: string = 'prevent_night';
 const IS_WATER_KEY: string = 'is_water';
+const CAMP_BONUS_KEY: string = 'camp_bonus';
 
 /** Veille */
 const NW_ARMORY_KEY: string = 'nw_armory';
@@ -40,6 +41,7 @@ const HERO_FIND_DATA: PropertyData = { label: $localize`Trouvaille`, category: '
 const IMPOUNDABLE_DATA: PropertyData = { label: $localize`Perdu en cas de bannissement`, category: '', img: '' };
 const PREVENT_NIGHT_DATA: PropertyData = { label: $localize`Annule le malus de nuit sur la case une fois posé au sol`, category: '', img: '' };
 const IS_WATER_DATA: PropertyData = { label: $localize`Désaltère`, category: '', img: 'status/status_hasdrunk.gif' };
+const CAMP_BONUS_DATA: PropertyData = { label: $localize`Augmente les chances de camping s'il est dans le sac`, category: '', img: '' };
 
 /** Veille */
 const NW_ARMORY_DATA: PropertyData = { label: $localize`Compte dans le calcul du bonus de veille donné par l'armurerie`, category: 'nightwatch', img: '' };
@@ -75,6 +77,7 @@ export class Property extends CommonEnum {
     public static IMPOUNDABLE: Property = new Property(IMPOUNDABLE_KEY, IMPOUNDABLE_DATA);
     public static PREVENT_NIGHT: Property = new Property(PREVENT_NIGHT_KEY, PREVENT_NIGHT_DATA);
     public static IS_WATER: Property = new Property(IS_WATER_KEY, IS_WATER_DATA);
+    public static CAMP_BONUS: Property = new Property(CAMP_BONUS_KEY, CAMP_BONUS_DATA);
 
     /** Veille */
     public static NW_ARMORY: Property = new Property(NW_ARMORY_KEY, NW_ARMORY_DATA);

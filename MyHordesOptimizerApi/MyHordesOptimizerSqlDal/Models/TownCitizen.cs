@@ -234,6 +234,33 @@ public partial class TownCitizen
     [Column("idLastUpdateChamanic", TypeName = "int(11)")]
     public int? IdLastUpdateChamanic { get; set; }
 
+    /// <summary>
+    /// Campings déjà effectués dans la ville. MyHordes ne l'expose pas : saisi à la main.
+    /// <c>null</c> tant que rien n'est saisi, servi comme 0. Reste nullable : les synchros recopient le citoyen
+    /// avec <c>UpdateAllButKeysProperties(..., ignoreNull: true)</c>, un 0 par défaut écraserait la saisie.
+    /// </summary>
+    [Column("campingCount", TypeName = "int(11)")]
+    public int? CampingCount { get; set; }
+
+    /// <summary>
+    /// Niveaux des groupes de capacités héroïques (S, U, P, E, R) : 0 aucun, 1 à 4. Le jeu les fige à
+    /// l'arrivée en ville. Saisis à la main, <c>null</c> si inconnus.
+    /// </summary>
+    [Column("heroSkillLevelS", TypeName = "int(11)")]
+    public int? HeroSkillLevelS { get; set; }
+
+    [Column("heroSkillLevelU", TypeName = "int(11)")]
+    public int? HeroSkillLevelU { get; set; }
+
+    [Column("heroSkillLevelP", TypeName = "int(11)")]
+    public int? HeroSkillLevelP { get; set; }
+
+    [Column("heroSkillLevelE", TypeName = "int(11)")]
+    public int? HeroSkillLevelE { get; set; }
+
+    [Column("heroSkillLevelR", TypeName = "int(11)")]
+    public int? HeroSkillLevelR { get; set; }
+
     [ForeignKey("IdBag")]
     [InverseProperty("TownCitizens")]
     public virtual Bag? IdBagNavigation { get; set; }

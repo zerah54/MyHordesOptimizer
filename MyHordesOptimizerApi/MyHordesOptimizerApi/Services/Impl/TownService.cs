@@ -24,13 +24,15 @@ namespace MyHordesOptimizerApi.Services.Impl
         protected MhoContext DbContext { get; init; }
         protected IMyHordesApiRepository MyHordesApiRepository { get; init; }
         protected TownSyncLock TownSyncLock { get; init; }
+        protected ITownAccessService TownAccessService { get; init; }
 
         public TownService(ILogger<TownService> logger,
             IMapper mapper,
             IUserInfoProvider userInfoProvider,
             MhoContext dbContext,
             IMyHordesApiRepository myHordesApiRepository,
-            TownSyncLock townSyncLock)
+            TownSyncLock townSyncLock,
+            ITownAccessService townAccessService)
         {
             Logger = logger;
             Mapper = mapper;
@@ -38,6 +40,7 @@ namespace MyHordesOptimizerApi.Services.Impl
             DbContext = dbContext;
             MyHordesApiRepository = myHordesApiRepository;
             TownSyncLock = townSyncLock;
+            TownAccessService = townAccessService;
         }
 
         public CitizenDto GetTownCitizen(int townId, int userId)
@@ -86,7 +89,9 @@ namespace MyHordesOptimizerApi.Services.Impl
             // ne pose le verrou, et le second tente ensuite un INSERT en double une fois le premier
             // relâché.
             using var townLock = TownSyncLock.AcquireTownBlocking(-townId);
+            var mapId = townId;
             townId = DbContext.ResolveTownId(townId);
+            TownAccessService.EnsureCanWriteTown(townId, mapId);
             var dailyAction = DbContext.TownCitizenDailyActions
                 .Where(townDailyAction => townDailyAction.IdTown == townId)
                 .Where(townDailyAction => townDailyAction.IdUser == userId)
@@ -126,7 +131,9 @@ namespace MyHordesOptimizerApi.Services.Impl
 
         public CitizenDto DeleteCitizenDailyAction(int townId, int userId, string actionKey, int day)
         {
+            var mapId = townId;
             townId = DbContext.ResolveTownId(townId);
+            TownAccessService.EnsureCanWriteTown(townId, mapId);
             var dailyAction = DbContext.TownCitizenDailyActions
                .Where(townDailyAction => townDailyAction.IdTown == townId)
                .Where(townDailyAction => townDailyAction.IdUser == userId)
@@ -144,7 +151,9 @@ namespace MyHordesOptimizerApi.Services.Impl
         public LastUpdateInfoDto UpdateCitizenChamanicDetail(int townId, int userId, CitizenChamanicDetailDto chamanicDetailDto)
         {
             using var townLock = TownSyncLock.AcquireTownBlocking(-townId);
+            var mapId = townId;
             townId = DbContext.ResolveTownId(townId);
+            TownAccessService.EnsureCanWriteTown(townId, mapId);
             var citizen = DbContext.TownCitizens.Where(townCitizen => townCitizen.IdTown == townId)
                  .Where(townCitizen => townCitizen.IdUser == userId)
                  .Include(townCitizen => townCitizen.IdLastUpdateChamanicNavigation)
@@ -166,6 +175,37 @@ namespace MyHordesOptimizerApi.Services.Impl
             transaction.Commit();
 
             return lastUpdateInfoDto;
+        }
+
+        /// <summary>Campings déjà effectués par un citoyen de la ville, saisis à la main (MyHordes ne l'expose pas).</summary>
+        public void UpdateCitizenCampingCount(int townId, int userId, int campingCount)
+        {
+            using var townLock = TownSyncLock.AcquireTownBlocking(-townId);
+            var citizen = FindWritableCitizen(townId, userId);
+            citizen.CampingCount = campingCount;
+            DbContext.SaveChanges();
+        }
+
+        /// <summary>Niveaux des capacités héroïques d'un citoyen de la ville, saisis à la main (MyHordes ne les expose pas).</summary>
+        public void UpdateCitizenHeroSkills(int townId, int userId, CitizenHeroSkillLevelsDto heroSkills)
+        {
+            using var townLock = TownSyncLock.AcquireTownBlocking(-townId);
+            var citizen = FindWritableCitizen(townId, userId);
+            citizen.HeroSkillLevelS = heroSkills.S;
+            citizen.HeroSkillLevelU = heroSkills.U;
+            citizen.HeroSkillLevelP = heroSkills.P;
+            citizen.HeroSkillLevelE = heroSkills.E;
+            citizen.HeroSkillLevelR = heroSkills.R;
+            DbContext.SaveChanges();
+        }
+
+        /// <summary>Citoyen d'une ville où l'appelant peut écrire (le verrou de la ville est déjà pris).</summary>
+        private TownCitizen FindWritableCitizen(int mapId, int userId)
+        {
+            var townId = DbContext.ResolveTownId(mapId);
+            TownAccessService.EnsureCanWriteTown(townId, mapId);
+            return DbContext.TownCitizens.FirstOrDefault(townCitizen => townCitizen.IdTown == townId && townCitizen.IdUser == userId)
+                ?? throw new MhoTechnicalException($"Le citoyen {userId} n'est pas dans la ville {mapId}.");
         }
 
         public List<SeasonDto> GetSeasons()
@@ -261,6 +301,11 @@ namespace MyHordesOptimizerApi.Services.Impl
             DbContext.Database.ExecuteSqlRaw("DELETE FROM ExpeditionCitizen WHERE idExpeditionPart IN (SELECT idExpeditionPart FROM ExpeditionPart WHERE idExpedition IN (SELECT idExpedition FROM Expedition WHERE idTown = {0}))", townId);
             DbContext.Database.ExecuteSqlRaw("DELETE FROM ExpeditionPart WHERE idExpedition IN (SELECT idExpedition FROM Expedition WHERE idTown = {0})", townId);
             DbContext.Database.ExecuteSqlRaw("DELETE FROM Expedition WHERE idTown = {0}", townId);
+            // Contrôles de clés étrangères désactivés : ni la cascade MapRoute → MapRouteShare ni le
+            // SET NULL de ExpeditionPart.idMapRoute ne jouent, d'où la suppression explicite.
+            DbContext.Database.ExecuteSqlRaw("DELETE FROM MapRouteShare WHERE idMapRoute IN (SELECT idMapRoute FROM MapRoute WHERE idTown = {0})", townId);
+            DbContext.Database.ExecuteSqlRaw("DELETE FROM MapRoute WHERE idTown = {0}", townId);
+            DbContext.Database.ExecuteSqlRaw("DELETE FROM MapRouteGame WHERE idTown = {0}", townId);
             DbContext.Database.ExecuteSqlRaw("DELETE FROM Town WHERE idTown = {0}", townId);
 
             DbContext.Database.ExecuteSqlRaw("SET FOREIGN_KEY_CHECKS = 1");

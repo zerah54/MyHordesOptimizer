@@ -30,8 +30,9 @@ import {
     setBankWithExpirationDate,
 } from '../../_core/utilities/localstorage.util';
 import { BankInfoDTO } from '../dto/bank-info.dto';
+import { CampImprovementDTO, CampImprovementUpdateDTO } from '../dto/camping-group.dto';
 import { CellDTO } from '../dto/cell.dto';
-import { CitizenDTO } from '../dto/citizen.dto';
+import { CitizenDTO, HeroSkillLevelsDTO } from '../dto/citizen.dto';
 import { CitizenInfoDTO } from '../dto/citizen-info.dto';
 import { ExternalToolsUpdateJobStateDTO } from '../dto/external-tools-update-state.dto';
 import { RuinDTO } from '../dto/ruin.dto';
@@ -48,6 +49,7 @@ import { BankInfo } from '../types/bank-info.class';
 import { Cell } from '../types/cell.class';
 import { Citizen } from '../types/citizen.class';
 import { CitizenInfo } from '../types/citizen-info.class';
+import { HeroSkillLevels } from '../types/hero-skill-levels';
 import { Ruin } from '../types/ruin.class';
 import { Town } from '../types/town.class';
 import { TownDetails } from '../types/town-details.class';
@@ -371,6 +373,22 @@ export class TownService extends GlobalService {
         });
     }
 
+    /** Aménagement de la zone pour le camping : ajouts du jour, ou niveau constaté. */
+    public saveCampImprovement(update: CampImprovementUpdateDTO): Observable<CampImprovementDTO> {
+        return new Observable((sub: Subscriber<CampImprovementDTO>) => {
+            super.post<CampImprovementDTO>(this.API_URL + `/Map/Cell/CampImprovement?townId=${getTown()?.town_id}`, JSON.stringify(update))
+                .subscribe({
+                    next: (response: CampImprovementDTO) => {
+                        sub.next(response);
+                        sub.complete();
+                    },
+                    error: (error: HttpErrorResponse) => {
+                        sub.error(error);
+                    }
+                });
+        });
+    }
+
     public addDailyAction(citizen: Citizen, actionKey: string, day?: number): Observable<UpdateInfo> {
         return new Observable((sub: Subscriber<UpdateInfo>) => {
             super.post<UpdateInfoDTO>(this.API_URL + `/town/${getOwnTown()?.town_id}/user/${citizen.id}/dailyAction/${actionKey}?day=${day ?? getOwnTown()?.day}`)
@@ -411,6 +429,19 @@ export class TownService extends GlobalService {
                     }
                 });
         });
+    }
+
+    /** Campings déjà effectués par un citoyen de la ville. */
+    public updateCampingCount(citizen_id: number, camping_count: number): Observable<void> {
+        return super.post<void>(this.API_URL + `/town/${getOwnTown()?.town_id}/user/${citizen_id}/campingCount`, JSON.stringify({ campingCount: camping_count }))
+            .pipe(map((): void => undefined));
+    }
+
+    /** Niveaux des capacités héroïques d'un citoyen de la ville. */
+    public updateHeroSkills(citizen_id: number, levels: HeroSkillLevels): Observable<void> {
+        const dto: HeroSkillLevelsDTO = { s: levels.s, u: levels.u, p: levels.p, e: levels.e, r: levels.r };
+        return super.post<void>(this.API_URL + `/town/${getOwnTown()?.town_id}/user/${citizen_id}/heroSkills`, JSON.stringify(dto))
+            .pipe(map((): void => undefined));
     }
 
     public getSeasons(): Observable<SeasonDTO[]> {

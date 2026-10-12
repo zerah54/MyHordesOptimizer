@@ -11,7 +11,8 @@ namespace MyHordesOptimizerApi.Extensions.Models.Expeditions
         {
             var newPart = new ExpeditionPart();
             newPart.IdExpeditionPart = 0;
-            newPart.Path = null;
+            // Tracé : ExpeditionService.CopyExpeditionsAsync lie la nouvelle partie à une copie du tracé.
+            newPart.IdMapRoute = null;
             newPart.IdExpeditionOrders = new List<ExpeditionOrder>();
             source.IdExpeditionOrders.ToList().ForEach(order => newPart.IdExpeditionOrders.Add(order.Copy()));
             newPart.ExpeditionCitizens = new List<ExpeditionCitizen>();

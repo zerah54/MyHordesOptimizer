@@ -133,6 +133,12 @@ public partial class MhoContext : DbContext
 
     public virtual DbSet<DiscordTimer> DiscordTimers { get; set; }
 
+    public virtual DbSet<MapRoute> MapRoutes { get; set; }
+
+    public virtual DbSet<MapRouteShare> MapRouteShares { get; set; }
+
+    public virtual DbSet<MapRouteGame> MapRouteGames { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder
@@ -361,6 +367,10 @@ public partial class MhoContext : DbContext
             entity.HasOne(d => d.IdExpeditionNavigation).WithMany(p => p.ExpeditionParts)
                 .OnDelete(DeleteBehavior.Cascade)
                 .HasConstraintName("ExpeditionPart_ibfk_1");
+
+            entity.HasOne(d => d.IdMapRouteNavigation).WithMany(p => p.ExpeditionParts)
+                .OnDelete(DeleteBehavior.SetNull)
+                .HasConstraintName("ExpeditionPart_fk_mapRoute");
         });
 
         modelBuilder.Entity<HeroSkill>(entity =>

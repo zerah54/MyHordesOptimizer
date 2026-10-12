@@ -8,6 +8,7 @@ namespace MyHordesOptimizerApi.Models;
 
 [Table("ExpeditionPart")]
 [Index("IdExpedition", Name = "ExpeditionPart_ibfk_1")]
+[Index("IdMapRoute", Name = "ExpeditionPart_fk_mapRoute")]
 public partial class ExpeditionPart
 {
     [Key]
@@ -17,19 +18,19 @@ public partial class ExpeditionPart
     [Column("idExpedition", TypeName = "int(11)")]
     public int? IdExpedition { get; set; }
 
+    /// <summary>
+    /// Tracé lié (FK ON DELETE SET NULL : supprimer le tracé délie la partie, ses consignes restent).
+    /// UpdateAllButKeysProperties recopie cette valeur depuis le modèle mappé du DTO : la requête la porte
+    /// toujours (MapRouteId), et ExpeditionService contrôle tout changement de lien.
+    /// </summary>
+    [Column("idMapRoute", TypeName = "int(11)")]
+    public int? IdMapRoute { get; set; }
+
     [Column(TypeName = "int(11)")]
     public int Position { get; set; }
 
-    [Column("path")]
-    [StringLength(255)]
-    [MySqlCharSet("utf8mb3")]
-    [MySqlCollation("utf8mb3_general_ci")]
-    public string? Path { get; set; }
-
     [Column("label")]
     [StringLength(255)]
-    [MySqlCharSet("utf8mb3")]
-    [MySqlCollation("utf8mb3_general_ci")]
     public string? Label { get; set; }
 
     [Column(TypeName = "int(11)")]
@@ -41,6 +42,10 @@ public partial class ExpeditionPart
     [ForeignKey("IdExpedition")]
     [InverseProperty("ExpeditionParts")]
     public virtual Expedition? IdExpeditionNavigation { get; set; }
+
+    [ForeignKey("IdMapRoute")]
+    [InverseProperty("ExpeditionParts")]
+    public virtual MapRoute? IdMapRouteNavigation { get; set; }
 
     [ForeignKey("IdExpeditionPart")]
     [InverseProperty("IdExpeditionParts")]

@@ -95,6 +95,32 @@ namespace MyHordesOptimizerApi.Controllers
 
         }
 
+        /// <summary>Campings déjà effectués par un citoyen de la ville.</summary>
+        [HttpPost]
+        [Route("{townId}/user/{userId}/campingCount")]
+        public ActionResult UpdateCitizenCampingCount([FromRoute] int townId, [FromRoute] int userId, [FromBody] CitizenCampingCountDto request)
+        {
+            if (request == null || request.CampingCount is < 0 or > CitizenCampingCountDto.MaxCampingCount)
+            {
+                return BadRequest("Invalid camping count");
+            }
+            TownService.UpdateCitizenCampingCount(townId, userId, request.CampingCount);
+            return NoContent();
+        }
+
+        /// <summary>Niveaux des capacités héroïques d'un citoyen de la ville (0 aucun, 1 à 4, <c>null</c> : inconnu).</summary>
+        [HttpPost]
+        [Route("{townId}/user/{userId}/heroSkills")]
+        public ActionResult UpdateCitizenHeroSkills([FromRoute] int townId, [FromRoute] int userId, [FromBody] CitizenHeroSkillLevelsDto request)
+        {
+            if (request == null || !request.IsValid())
+            {
+                return BadRequest("Invalid hero skill levels");
+            }
+            TownService.UpdateCitizenHeroSkills(townId, userId, request);
+            return NoContent();
+        }
+
         [HttpGet]
         [Route("list")]
         public ActionResult<TownListPageResultDto> GetTowns([FromQuery] TownListQueryDto query)

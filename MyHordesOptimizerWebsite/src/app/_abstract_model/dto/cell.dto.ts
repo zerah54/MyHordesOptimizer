@@ -48,6 +48,10 @@ export interface CellDTO {
     nbERuinBlue: number;
     nbERuinYellow: number;
     nbERuinViolet: number;
+    /** Aménagement de la zone pour le camping, au jour de la ville ; absent ou null si rien n'a été saisi. */
+    campImprovementLevel?: number | null;
+    /** Jour de la dernière saisie de l'aménagement. */
+    campImprovementDay?: number | null;
 }
 
 /** Radar du fouineur : true signifie que la case voisine est épuisée */

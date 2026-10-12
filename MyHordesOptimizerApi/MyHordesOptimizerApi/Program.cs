@@ -246,7 +246,9 @@ builder.Services.AddScoped<ICitizenStateOrderRankingEngine, CitizenStateOrderRan
 builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
 // Singleton : le compteur par userKey doit survivre à la requête et être partagé entre GET/POST Token.
 builder.Services.AddSingleton<ITokenRateLimiter, TokenRateLimiter>();
+builder.Services.AddScoped<ITownAccessService, TownAccessService>();
 builder.Services.AddScoped<IExpeditionService, ExpeditionService>();
+builder.Services.AddScoped<IMapRouteService, MyHordesOptimizerApi.Services.Impl.MapRoutes.MapRouteService>();
 builder.Services.AddScoped<ITownService, TownService>();
 builder.Services.AddScoped<IUserAccountService, UserAccountService>();
 builder.Services.AddScoped<IDirectorySearchService, DirectorySearchService>();

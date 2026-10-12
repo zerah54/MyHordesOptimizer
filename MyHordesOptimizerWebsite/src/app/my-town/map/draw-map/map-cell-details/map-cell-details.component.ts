@@ -11,17 +11,20 @@ import { Cell } from '../../../../_abstract_model/types/cell.class';
 import { Citizen } from '../../../../_abstract_model/types/citizen.class';
 import { Item } from '../../../../_abstract_model/types/item.class';
 import { Ruin } from '../../../../_abstract_model/types/ruin.class';
+import { Town } from '../../../../_abstract_model/types/town.class';
 import { CitizensFromShortPipe } from '../../../../_core/pipes/citizens-from-short.pipe';
 import { ItemDetailsPipe } from '../../../../_core/pipes/item-details.pipe';
 import { ItemImgPipe } from '../../../../_core/pipes/item-img.pipe';
 import { CitizenInfoComponent } from '../../../../_shared/citizen-info/citizen-info.component';
 import { IconApComponent } from '../../../../_shared/icon-ap/icon-ap.component';
 import { LastUpdateComponent } from '../../../../_shared/last-update/last-update.component';
+import { MapCellOrdersComponent } from '../../map-orders/map-cell-orders/map-cell-orders.component';
+import { MapCellCampingComponent } from '../map-cell-camping/map-cell-camping.component';
 import { CellDetailsBottomPipe, CellDetailsLeftPipe, CellDetailsRightPipe, CellDetailsTopPipe } from './cell-details-position.pipe';
 import { RuinInCell } from './ruin-in-cell.pipe';
 
 const angular_common: Imports = [CommonModule, NgOptimizedImage];
-const components: Imports = [LastUpdateComponent, IconApComponent, CitizenInfoComponent];
+const components: Imports = [LastUpdateComponent, IconApComponent, CitizenInfoComponent, MapCellCampingComponent, MapCellOrdersComponent];
 const pipes: Imports = [CellDetailsBottomPipe, CellDetailsLeftPipe, CellDetailsRightPipe, CellDetailsTopPipe, CitizensFromShortPipe, ItemImgPipe, ItemDetailsPipe, RuinInCell];
 const material_modules: Imports = [MatButtonModule, MatDividerModule, MatIconModule];
 
@@ -39,8 +42,12 @@ export class MapCellDetailsComponent {
     public allRuins: InputSignal<Ruin[]> = input.required();
     public allCitizens: InputSignal<Citizen[]> = input.required();
     public allItems: InputSignal<Item[]> = input.required();
+    /** Carte de la ville, pour le formulaire d'une consigne sur la case. */
+    public map: InputSignal<Town | undefined> = input<Town | undefined>(undefined);
     /** Mode observateur : la zone reste consultable, mais elle n'est pas modifiable. */
     public canUpdate: InputSignalWithTransform<boolean, unknown> = input(false, { transform: booleanAttribute });
+    /** Consignes de la case modifiables : sa ville, ou une ancienne ville observée (la zone, elle, ne l'est pas). */
+    public canEditOrders: InputSignalWithTransform<boolean, unknown> = input(false, { transform: booleanAttribute });
 
     public updateRequested: OutputEmitterRef<void> = output();
     public closed: OutputEmitterRef<void> = output();

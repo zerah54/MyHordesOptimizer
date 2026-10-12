@@ -7,7 +7,7 @@
         <mho-active-citizens [citizenList]="active_citizens_list()" [completeCitizenList]="all_citizens()"></mho-active-citizens>
     </mat-card-title>
     <div class="actions">
-        @if (!is_readonly()) {
+        @if (can_contribute()) {
             <mat-slide-toggle [(ngModel)]="edition_mode" (ngModelChange)="changeEditionMode()">
                 <ng-container i18n>Mode édition</ng-container>
             </mat-slide-toggle>
@@ -122,19 +122,15 @@
                                                         @if (expedition.parts.length > 1) {
                                                             <span i18n>Partie {{ expedition_part_index + 1 }}&nbsp;:&nbsp;</span>
                                                         }
-                                                        @if (edition_mode() && editable()) {
-                                                            <mat-form-field subscriptSizing="dynamic" [appearance]="'outline'" class="compact-field">
-                                                                <mat-label i18n>Nom du tracé</mat-label>
-                                                                <input matInput type="text" [(ngModel)]="expedition_part.path"
-                                                                       (change)="saveExpeditionPart(expedition, expedition_part)">
-                                                            </mat-form-field>
-                                                        } @else {
-                                                            <span [innerHTML]="expedition_part.path"></span>
-                                                        }
+                                                        <mho-expedition-part-route [part]="expedition_part" [day]="day_index + 1"
+                                                                                   [routes]="routes_store.routes()"
+                                                                                   [editable]="edition_mode() && editable()"
+                                                                                   [canCreate]="!!routes_store.access()?.can_create"
+                                                                                   (routeChange)="changePartRoute(expedition, expedition_part, $event)"></mho-expedition-part-route>
                                                         <div class="expedition-compass">
                                                             <mho-compass-rose [(selectedScrutZone)]="expedition_part.direction"
                                                                               (selectedScrutZoneChange)="saveExpeditionPart(expedition, expedition_part)"
-                                                                              [readonly]="!edition_mode() || !editable()"></mho-compass-rose>
+                                                                              [readonly]="!edition_mode() || !editable() || isDirectionLocked(expedition_part)"></mho-compass-rose>
                                                         </div>
                                                     </div>
                                                     <table class="expedition-table">
@@ -294,7 +290,7 @@
                                                                             <ng-container
                                                                                 *ngTemplateOutlet="displayOrder; context: {$implicit: expedition_citizen.orders}"></ng-container>
                                                                             <button mat-icon-button type="button"
-                                                                                    (click)="openExpeditionOrders(expedition_citizen.orders, expedition_citizen)">
+                                                                                    (click)="openExpeditionOrders(expedition_citizen)">
                                                                                 <mat-icon>edit</mat-icon>
                                                                             </button>
                                                                         } @else {
@@ -337,37 +333,32 @@
                                                             <ng-container i18n>Consignes de l'expédition</ng-container>
                                                             @if (edition_mode() && editable()) {
                                                                 <button mat-icon-button type="button"
-                                                                        (click)="openExpeditionOrders(expedition_part.orders, expedition_part)">
+                                                                        (click)="openExpeditionOrders(expedition_part)">
                                                                     <mat-icon>edit</mat-icon>
                                                                 </button>
                                                             }
                                                         </h3>
                                                         @if (edition_mode() && editable()) {
-                                                            <ng-container
-                                                                *ngTemplateOutlet="displayOrder; context: {$implicit: expedition_part.orders}"></ng-container>
-                                                        } @else {
-                                                            <ng-container
-                                                                *ngTemplateOutlet="displayOrder; context: {$implicit: expedition_part.orders}"></ng-container>
+                                                            <p class="orders-hint" i18n>Valables sur tout le trajet. Une consigne pour une case précise se pose
+                                                                dans la feuille de route.</p>
                                                         }
+                                                        <ng-container
+                                                            *ngTemplateOutlet="displayOrder; context: {$implicit: generalOrdersOf(expedition_part.orders)}"></ng-container>
                                                     </div>
+                                                    @if (showRoadbook(expedition_part)) {
+                                                        <mho-expedition-roadbook class="roadbook" [part]="expedition_part" [map]="map()" [ruins]="all_ruins()"
+                                                                                 [items]="all_items()" [citizens]="all_citizens()"
+                                                                                 [editable]="edition_mode() && editable()" [checkable]="editable()"
+                                                                                 [me]="me()?.id ?? null"></mho-expedition-roadbook>
+                                                    }
                                                 </div>
                                             }
                                             <ng-template #displayOrder let-orders>
                                                 @if (orders.length > 0) {
                                                     @for (order of orders; track order.id) {
-                                                        <div>
-                                                            @switch (order.type) {
-                                                                @case ('text') {
-                                                                    <span [innerHTML]="order.text"></span>
-                                                                }
-                                                                @case ('checkbox') {
-                                                                    <mat-checkbox [checked]="order.is_done" (change)="saveOrder(order, $event)"
-                                                                                  [disabled]="!editable()">
-                                                                        <span [class.checked]="order.is_done" [innerHTML]="order.text"></span>
-                                                                    </mat-checkbox>
-                                                                }
-                                                            }
-                                                        </div>
+                                                        <mho-expedition-order class="order" [order]="order" [items]="all_items()" [citizens]="all_citizens()"
+                                                                              [town]="town_position()" [checkable]="editable()"
+                                                                              (doneChange)="saveOrder(order, $event)"></mho-expedition-order>
                                                     }
                                                 } @else {
                                                     <div class="no-order" i18n>Pas de consigne.</div>

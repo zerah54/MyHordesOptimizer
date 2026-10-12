@@ -21,13 +21,16 @@
 
                     @if (expedition.parts.length > 1) {
                         <div class="part-rows" cdkDropList (cdkDropListDropped)="dropPart($event, expedition)">
-                            @for (part of expedition.parts; track part.id) {
+                            @for (part of expedition.parts; track part.id; let part_index = $index) {
                                 <div class="part-row" cdkDrag cdkDragBoundary=".part-rows" cdkDragLockAxis="y">
                                     <div class="part-row-reorder" cdkDragHandle>
                                         <mat-icon>drag_indicator</mat-icon>
                                     </div>
                                     <div class="part-row-main">
-                                        {{ part.path }}
+                                        <ng-container i18n>Partie {{ part_index + 1 }}</ng-container>
+                                        @if (part.map_route; as route) {
+                                            · {{ route.label }}
+                                        }
                                     </div>
                                 </div>
                             }

@@ -1,4 +1,56 @@
-import { CornerLayouts, DEFAULT_CORNERS, sanitizeCorners } from './map-corners';
+import {
+    CORNER_INFO_OPTIONS,
+    cornerIcon,
+    CornerInfoOption,
+    CornerLayouts,
+    DEFAULT_CORNERS,
+    DIG_LEVEL_ICONS,
+    sanitizeCorners,
+    SCOUT_LEVEL_ICONS,
+    updateAgeTone
+} from './map-corners';
+
+const DAY_MINUTES: number = 24 * 60;
+
+describe('updateAgeTone', (): void => {
+    it('is green under a day, yellow from 1 to under 2 days, orange from 2 to under 3 days, red from 3 days', (): void => {
+        expect(updateAgeTone(0)).toBe('green');
+        expect(updateAgeTone(DAY_MINUTES - 1)).toBe('green');
+        expect(updateAgeTone(DAY_MINUTES)).toBe('yellow');
+        expect(updateAgeTone(2 * DAY_MINUTES - 1)).toBe('yellow');
+        expect(updateAgeTone(2 * DAY_MINUTES)).toBe('orange');
+        expect(updateAgeTone(3 * DAY_MINUTES - 1)).toBe('orange');
+        expect(updateAgeTone(3 * DAY_MINUTES)).toBe('red');
+        expect(updateAgeTone(10 * DAY_MINUTES)).toBe('red');
+    });
+});
+
+describe('level icons', (): void => {
+    it('uses the in-game icons of the dig level, from depleted (0) to abundant (3)', (): void => {
+        expect(DIG_LEVEL_ICONS).toEqual(['icons/Small_broken.gif', 'icons/collec_lv1.gif', 'icons/collec_lv2.gif', 'icons/collec_lv3.gif']);
+    });
+
+    it('uses the in-game icons of the scout level, from 0 to 3', (): void => {
+        expect(SCOUT_LEVEL_ICONS).toEqual(['icons/scout_lv0.gif', 'icons/scout_lv1.gif', 'icons/scout_lv2.gif', 'icons/scout_lv3.gif']);
+    });
+
+    it('offers the dig and scout levels as corner information, each with a representative icon', (): void => {
+        const values: string[] = CORNER_INFO_OPTIONS.map((option: CornerInfoOption): string => option.value);
+
+        expect(values).toContain('digs_level');
+        expect(values).toContain('scout_level');
+        expect(cornerIcon('digs_level', 'fr')).toBe('icons/collec_lv3.gif');
+        expect(cornerIcon('scout_level', 'fr')).toBe('icons/scout_lv3.gif');
+    });
+
+    it('shows the update age as a sample dot rather than a text', (): void => {
+        const age: CornerInfoOption | undefined = CORNER_INFO_OPTIONS.find((option: CornerInfoOption): boolean => option.value === 'update_age');
+
+        expect(age?.tone).toBe('green');
+        expect(age?.sample).toBeUndefined();
+        expect(cornerIcon('update_age', 'fr')).toBeNull();
+    });
+});
 
 describe('sanitizeCorners', (): void => {
     it('returns the default layouts when nothing is stored', (): void => {
@@ -31,6 +83,13 @@ describe('sanitizeCorners', (): void => {
         expect(sanitizeCorners(former, 2).scout.bottom_right).toBe('none');
         // Modifiée avant la version 2, elle l'est aussi.
         expect(sanitizeCorners({ scout: { bottom_right: 'none', top_left: 'items' } }, 1).scout.bottom_right).toBe('none');
+    });
+
+    it('keeps the dig level and scout level choices', (): void => {
+        const layouts: CornerLayouts = sanitizeCorners({ scout: { bottom_left: 'digs_level', bottom_right: 'scout_level' } });
+
+        expect(layouts.scout.bottom_left).toBe('digs_level');
+        expect(layouts.scout.bottom_right).toBe('scout_level');
     });
 
     it('replaces an unknown information with the default of its corner', (): void => {

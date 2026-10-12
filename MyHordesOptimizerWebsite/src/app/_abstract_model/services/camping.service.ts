@@ -3,8 +3,10 @@ import { Injectable } from '@angular/core';
 import { Observable, Subscriber } from 'rxjs';
 
 import { CampingBonusDTO } from '../dto/camping-bonus.dto';
+import { CampingGroupParametersDTO, CampingGroupResultDTO } from '../dto/camping-group.dto';
 import { CampingOddsDTO } from '../dto/camping-odds.dto';
 import { CampingBonus } from '../types/camping-bonus.class';
+import { CampingGroupResult } from '../types/camping-group-result.class';
 import { CampingOdds } from '../types/camping-odds.class';
 import { CampingParameters } from '../types/camping-parameters.class';
 import { GlobalService } from './_global.service';
@@ -19,6 +21,22 @@ export class CampingService extends GlobalService {
                 .subscribe({
                     next: (response: CampingOddsDTO) => {
                         sub.next(new CampingOdds(response));
+                    },
+                    error: (error: HttpErrorResponse) => {
+                        sub.error(error);
+                    }
+                });
+        });
+    }
+
+    /** Chances de plusieurs campeurs d'une même zone dans l'ordre où ils se cachent, et l'ordre conseillé. */
+    public calculateGroup(parameters: CampingGroupParametersDTO): Observable<CampingGroupResult> {
+        return new Observable((sub: Subscriber<CampingGroupResult>) => {
+            super.post<CampingGroupResultDTO>(this.API_URL + '/Camping/CalculateGroup', JSON.stringify(parameters), true)
+                .subscribe({
+                    next: (response: CampingGroupResultDTO) => {
+                        sub.next(new CampingGroupResult(response));
+                        sub.complete();
                     },
                     error: (error: HttpErrorResponse) => {
                         sub.error(error);

@@ -5,14 +5,17 @@ using Microsoft.Extensions.Logging;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Expeditions;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Expeditions.Request;
+using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.MapRoutes;
 using MyHordesOptimizerApi.Exceptions;
 using MyHordesOptimizerApi.Extensions;
 using MyHordesOptimizerApi.Extensions.Models.Expeditions;
+using MyHordesOptimizerApi.Extensions.Models.MapRoutes;
 using MyHordesOptimizerApi.Models;
 using MyHordesOptimizerApi.Models.Expeditions;
 using MyHordesOptimizerApi.Providers.Interfaces;
 using MyHordesOptimizerApi.Repository.Expeditions;
 using MyHordesOptimizerApi.Services.Impl.Locking;
+using MyHordesOptimizerApi.Services.Impl.MapRoutes;
 using MyHordesOptimizerApi.Services.Interfaces;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,13 +31,15 @@ namespace MyHordesOptimizerApi.Services.Impl
         protected ILogger<ExpeditionService> Logger { get; private set; }
         protected MhoContext DbContext { get; init; }
         protected TownSyncLock TownSyncLock { get; private set; }
+        protected ITownAccessService TownAccessService { get; private set; }
 
         public ExpeditionService(IServiceScopeFactory serviceScopeFactory,
             IMapper mapper,
             IUserInfoProvider userInfoProvider,
             ILogger<ExpeditionService> logger,
             MhoContext dbContext,
-            TownSyncLock townSyncLock)
+            TownSyncLock townSyncLock,
+            ITownAccessService townAccessService)
         {
             ServiceScopeFactory = serviceScopeFactory;
             Mapper = mapper;
@@ -42,6 +47,22 @@ namespace MyHordesOptimizerApi.Services.Impl
             Logger = logger;
             DbContext = dbContext;
             TownSyncLock = townSyncLock;
+            TownAccessService = townAccessService;
+        }
+
+        /// <summary>Ville d'une entité visée par une écriture, une fois l'accès vérifié.</summary>
+        /// <param name="IdTown">IdTown résolu (positif, ou -mapId pour une ville provisoire).</param>
+        /// <param name="LockKey">Clé TownSyncLock, cf. <see cref="ComputeTownLockKey"/>.</param>
+        private readonly record struct WritableTown(int IdTown, int LockKey);
+
+        /// <summary>Tracés dont les parties liées ont changé pendant l'écriture en cours (cf. <see cref="TakeMapRouteChanges"/>).</summary>
+        private readonly List<MapRouteChangeDto> _mapRouteChanges = new();
+
+        public IReadOnlyList<MapRouteChangeDto> TakeMapRouteChanges()
+        {
+            var changes = _mapRouteChanges.ToList();
+            _mapRouteChanges.Clear();
+            return changes;
         }
 
         #region Expeditions
@@ -53,7 +74,8 @@ namespace MyHordesOptimizerApi.Services.Impl
             // avec une synchro/login concurrente qui verrouille -MapId.
             await using var townLock = await TownSyncLock.AcquireTownAsync(-idTown);
             idTown = DbContext.ResolveTownId(idTown);
-            EnsureDayIsEditable(idTown, day);
+            await EnsureTownWritableAsync(idTown, day);
+            await EnsurePartsBelongToTownAsync(expeditionDto.PartsId, idTown);
             await using var transaction = await DbContext.Database.BeginTransactionAsync();
             LastUpdateInfoDto lastUpdateInfoDto = UserInfoProvider.GenerateLastUpdateInfo();
             var newLastUpdate = DbContext.LastUpdateInfos.Update(Mapper.Map<LastUpdateInfo>(lastUpdateInfoDto, opt => opt.SetDbContext(DbContext))).Entity;
@@ -65,9 +87,10 @@ namespace MyHordesOptimizerApi.Services.Impl
             ExpeditionDto result;
             if (expeditionDto.Id.HasValue)
             {
-                // UpdateAsync
+                // UpdateAsync : l'expédition doit appartenir à la ville vérifiée, sinon un citoyen de la
+                // ville A pourrait modifier (et rattacher à A) une expédition de la ville B.
                 var modelFromDb = await DbContext.Expeditions
-                    .Where(expedition => expedition.IdExpedition == expeditionDto.Id)
+                    .Where(expedition => expedition.IdExpedition == expeditionDto.Id && expedition.IdTown == idTown)
                     .Include(expedition => expedition.ExpeditionParts)
                         .ThenInclude(part => part.IdExpeditionOrders)
                     .Include(expedition => expedition.ExpeditionParts)
@@ -78,7 +101,14 @@ namespace MyHordesOptimizerApi.Services.Impl
                     .Include(expedition => expedition.ExpeditionParts)
                         .ThenInclude(part => part.ExpeditionCitizens)
                             .ThenInclude(expeditionCitizen => expeditionCitizen.ExpeditionOrders)
-                    .SingleAsync();
+                    .Include(expedition => expedition.ExpeditionParts)
+                        .ThenInclude(part => part.IdMapRouteNavigation)
+                    .AsSplitQuery()
+                    .SingleOrDefaultAsync();
+                if (modelFromDb is null)
+                {
+                    throw new MhoForbiddenException($"L'expédition {expeditionDto.Id} n'appartient pas à la ville {idTown}.");
+                }
 
                 // On récupère les collections de la db
                 var expeditionsOrderFromDb = modelFromDb.ExpeditionParts.SelectMany(part => part.IdExpeditionOrders).ToList();
@@ -120,13 +150,26 @@ namespace MyHordesOptimizerApi.Services.Impl
             return result;
         }
 
-        public List<ExpeditionDto> GetExpeditionsByDay(int townId, int day)
+        public async Task<List<ExpeditionDto>> GetExpeditionsByDayAsync(int townId, int day)
         {
+            var mapId = townId;
             townId = DbContext.ResolveTownId(townId);
-            var models = DbContext.Expeditions.Where(expedition => expedition.IdTown == townId && expedition.Day == day)
+            var models = await DbContext.Expeditions.Where(expedition => expedition.IdTown == townId && expedition.Day == day)
                 .IncludeAll()
-                .ToList();
+                .ToListAsync();
             var dtos = Mapper.Map<List<ExpeditionDto>>(models);
+            // Les tracés sont réservés aux citoyens de la ville (cf. MapRouteService) : un observateur lit les
+            // expéditions sans eux.
+            var parts = dtos.SelectMany(expedition => expedition.Parts ?? new List<ExpeditionPartDto>()).ToList();
+            if (parts.Any(part => part.MapRouteId.HasValue) && !await TownAccessService.CanWriteTownAsync(townId, mapId))
+            {
+                foreach (var part in parts)
+                {
+                    part.MapRouteId = null;
+                    part.MapRoute = null;
+                    part.Path = null;
+                }
+            }
             return dtos;
         }
 
@@ -144,13 +187,16 @@ namespace MyHordesOptimizerApi.Services.Impl
 
         public void DeleteExpedition(int expeditionId)
         {
+            EnsureExpeditionWritable(expeditionId);
             var expedition = DbContext.Expeditions.Single(expedition => expedition.IdExpedition == expeditionId);
-            if (expedition.IdTown.HasValue)
-            {
-                EnsureDayIsEditable(expedition.IdTown.Value, expedition.Day);
-            }
+            var linkedRouteIds = DbContext.ExpeditionParts
+                .Where(part => part.IdExpedition == expeditionId && part.IdMapRoute != null)
+                .Select(part => part.IdMapRoute!.Value)
+                .Distinct()
+                .ToList();
             DbContext.Remove(expedition);
             DbContext.SaveChanges();
+            BumpRouteVersions(linkedRouteIds);
         }
 
         public async Task<List<ExpeditionDto>> CopyExpeditionsAsync(int townId, int fromDay, int targetDay)
@@ -158,7 +204,7 @@ namespace MyHordesOptimizerApi.Services.Impl
             // Cf. SaveExpeditionAsync : verrou sur le mapId brut AVANT résolution.
             await using var townLock = await TownSyncLock.AcquireTownAsync(-townId);
             townId = DbContext.ResolveTownId(townId);
-            EnsureDayIsEditable(townId, targetDay);
+            await EnsureTownWritableAsync(townId, targetDay);
             await using var transaction = await DbContext.Database.BeginTransactionAsync();
             LastUpdateInfoDto lastUpdateInfoDto = UserInfoProvider.GenerateLastUpdateInfo();
             var newLastUpdate = DbContext.LastUpdateInfos.Update(Mapper.Map<LastUpdateInfo>(lastUpdateInfoDto, opt => opt.SetDbContext(DbContext))).Entity;
@@ -175,22 +221,54 @@ namespace MyHordesOptimizerApi.Services.Impl
                            .Include(expedition => expedition.ExpeditionParts)
                                .ThenInclude(part => part.ExpeditionCitizens)
                                    .ThenInclude(expeditionCitizen => expeditionCitizen.ExpeditionOrders)
+                           .Include(expedition => expedition.ExpeditionParts)
+                               .ThenInclude(part => part.IdMapRouteNavigation)
+                                   .ThenInclude(route => route!.MapRouteShares)
+                           .AsSplitQuery()
                            .ToListAsync();
 
+            // Les tracés liés aux expéditions remplacées perdent leurs parties : nouvelle version, diffusée.
+            var unlinkedRouteIds = await DbContext.ExpeditionParts
+                .Where(part => part.IdExpeditionNavigation!.IdTown == townId && part.IdExpeditionNavigation.Day == targetDay && part.IdMapRoute != null)
+                .Select(part => part.IdMapRoute!.Value)
+                .Distinct()
+                .ToListAsync();
             var existingExpeditionToDelete = DbContext.Expeditions.Where(expedition => expedition.IdTown == townId && expedition.Day == targetDay);
             DbContext.RemoveRange(existingExpeditionToDelete);
             var newExpeditions = new List<Expedition>();
+            // Un exemplaire par tracé source, même s'il est lié à plusieurs parties du jour copié.
+            var routeCopies = new Dictionary<int, MapRoute>();
             foreach (var modelFromDb in modelsFromDb)
             {
                 var newExpedtion = modelFromDb.Copy();
                 newExpedtion.IdLastUpdateInfo = newLastUpdate.IdLastUpdateInfo;
                 newExpedtion.Day = targetDay;
                 newExpedtion.State = ExpeditionConstants.ExpeditionStateStop;
+                // Expedition.Copy recopie les parties dans l'ordre de la collection source.
+                var sourceParts = modelFromDb.ExpeditionParts.ToList();
+                var newParts = newExpedtion.ExpeditionParts.ToList();
+                for (var index = 0; index < sourceParts.Count; index++)
+                {
+                    var sourceRoute = sourceParts[index].IdMapRouteNavigation;
+                    if (sourceRoute is null)
+                    {
+                        continue;
+                    }
+                    if (!routeCopies.TryGetValue(sourceRoute.IdMapRoute, out var routeCopy))
+                    {
+                        routeCopy = sourceRoute.Copy();
+                        DbContext.MapRoutes.Add(routeCopy);
+                        routeCopies[sourceRoute.IdMapRoute] = routeCopy;
+                    }
+                    newParts[index].IdMapRouteNavigation = routeCopy;
+                }
                 var updatedNewExpedition = DbContext.Add(newExpedtion).Entity;
                 newExpeditions.Add(updatedNewExpedition);
             }
             await DbContext.SaveChangesAsync();
+            await BumpRouteVersionsAsync(unlinkedRouteIds);
             await transaction.CommitAsync();
+            _mapRouteChanges.AddRange(routeCopies.Values.Select(routeCopy => new MapRouteChangeDto { Id = routeCopy.IdMapRoute, Version = routeCopy.Version }));
             var returnedDto = Mapper.Map<List<ExpeditionDto>>(newExpeditions);
             return returnedDto;
         }
@@ -408,8 +486,10 @@ namespace MyHordesOptimizerApi.Services.Impl
             // Vérifié pour la création ET le déplacement (expeditionPartId = partie CIBLE dans les deux cas) :
             // sans ce garde-fou côté cible, un déplacement pourrait affecter un citoyen à une partie dont
             // le jour est déjà verrouillé.
-            var townLockKey = EnsurePartDayIsEditable(expeditionPartId);
-            await using var townLock = await TownSyncLock.AcquireTownAsync(townLockKey);
+            var targetTown = EnsurePartWritable(expeditionPartId);
+            await using var townLock = await TownSyncLock.AcquireTownAsync(targetTown.LockKey);
+            await EnsureOrdersBelongToTownAsync(expeditionCitizen.OrdersId, targetTown.IdTown);
+            await EnsureBagBelongsToTownAsync(expeditionCitizen.BagId, targetTown.IdTown);
             await using var transaction = await DbContext.Database.BeginTransactionAsync();
             LastUpdateInfoDto lastUpdateInfoDto = UserInfoProvider.GenerateLastUpdateInfo();
             var newLastUpdate = DbContext.LastUpdateInfos.Update(Mapper.Map<LastUpdateInfo>(lastUpdateInfoDto, opt => opt.SetDbContext(DbContext))).Entity;
@@ -424,11 +504,13 @@ namespace MyHordesOptimizerApi.Services.Impl
                     .IncludeAll()
                     .SingleAsync();
 
+                // Déplacement possible entre parties d'une même ville, jamais depuis une autre ville.
                 var existingExpedition = expeditionCitizenFromDb.IdExpeditionPartNavigation?.IdExpeditionNavigation;
-                if (existingExpedition is not null && existingExpedition.IdTown.HasValue)
+                if (existingExpedition is null || existingExpedition.IdTown != targetTown.IdTown)
                 {
-                    await EnsureDayIsEditableAsync(existingExpedition.IdTown.Value, existingExpedition.Day);
+                    throw new MhoForbiddenException($"Le citoyen d'expédition {expeditionCitizen.Id} n'appartient pas à la ville {targetTown.IdTown}.");
                 }
+                await EnsureDayIsEditableAsync(targetTown.IdTown, existingExpedition.Day);
 
                 var orderFromDb = expeditionCitizenFromDb.ExpeditionOrders;
                 var orderFromDto = expeditionCitizenModel.ExpeditionOrders;
@@ -465,11 +547,8 @@ namespace MyHordesOptimizerApi.Services.Impl
 
         public void DeleteExpeditionCitizen(int expeditionCitizenId)
         {
+            EnsureCitizenWritable(expeditionCitizenId);
             var expeditionCitizen = DbContext.ExpeditionCitizens.Single(expedition => expedition.IdExpeditionCitizen == expeditionCitizenId);
-            if (expeditionCitizen.IdExpeditionPart.HasValue)
-            {
-                EnsurePartDayIsEditable(expeditionCitizen.IdExpeditionPart.Value);
-            }
             DbContext.Remove(expeditionCitizen);
             DbContext.SaveChanges();
         }
@@ -480,8 +559,10 @@ namespace MyHordesOptimizerApi.Services.Impl
 
         public async Task<ExpeditionPartDto> SaveExpeditionPartAsync(int expeditionId, ExpeditionPartRequestDto expeditionPart)
         {
-            var townLockKey = EnsureExpeditionDayIsEditable(expeditionId);
-            await using var townLock = await TownSyncLock.AcquireTownAsync(townLockKey);
+            var targetTown = EnsureExpeditionWritable(expeditionId);
+            await using var townLock = await TownSyncLock.AcquireTownAsync(targetTown.LockKey);
+            await EnsureOrdersBelongToTownAsync(expeditionPart.OrdersId, targetTown.IdTown);
+            await EnsureCitizensBelongToTownAsync(expeditionPart.CitizensId, targetTown.IdTown);
             await using var transaction = await DbContext.Database.BeginTransactionAsync();
             LastUpdateInfoDto lastUpdateInfoDto = UserInfoProvider.GenerateLastUpdateInfo();
             var newLastUpdate = DbContext.LastUpdateInfos.Update(Mapper.Map<LastUpdateInfo>(lastUpdateInfoDto, opt => opt.SetDbContext(DbContext))).Entity;
@@ -491,8 +572,10 @@ namespace MyHordesOptimizerApi.Services.Impl
             ExpeditionPartDto result;
             if (expeditionPart.Id.HasValue)
             {
-                // UpdateAsync
-                var expeditionPartFromDb = await DbContext.ExpeditionParts.Where(part => part.IdExpeditionPart == expeditionPart.Id.Value)
+                // UpdateAsync : la partie doit appartenir à la ville vérifiée (UpdateAllButKeysProperties
+                // la rattache ensuite à expeditionId).
+                var expeditionPartFromDb = await DbContext.ExpeditionParts
+                    .Where(part => part.IdExpeditionPart == expeditionPart.Id.Value && part.IdExpeditionNavigation.IdTown == targetTown.IdTown)
                     .Include(part => part.IdExpeditionOrders)
                     .Include(part => part.ExpeditionCitizens)
                         .ThenInclude(citizen => citizen.ExpeditionOrders)
@@ -500,7 +583,12 @@ namespace MyHordesOptimizerApi.Services.Impl
                         .ThenInclude(citizen => citizen.IdExpeditionBagNavigation)
                             .ThenInclude(bag => bag.ExpeditionBagItems)
                                 .ThenInclude(bagItem => bagItem.IdItemNavigation)
-                    .SingleAsync();
+                    .SingleOrDefaultAsync();
+                if (expeditionPartFromDb is null)
+                {
+                    throw new MhoForbiddenException($"La partie d'expédition {expeditionPart.Id} n'appartient pas à la ville {targetTown.IdTown}.");
+                }
+                var linkedRoute = await ApplyRouteLinkAsync(expeditionPartModel, expeditionPartFromDb.IdMapRoute, expeditionId, targetTown);
 
                 // On récupère les collections de la db
                 var orderFromDb = expeditionPartFromDb.IdExpeditionOrders.ToList();
@@ -515,6 +603,10 @@ namespace MyHordesOptimizerApi.Services.Impl
                 await DbContext.PatchAsync(citizenFromDb, citizenFromModel);
 
                 expeditionPartFromDb.UpdateAllButKeysProperties(expeditionPartModel);
+                // UpdateAllButKeysProperties recopie aussi la navigation (null dans le modèle mappé) : clé et
+                // navigation remises d'accord, sans quoi EF pourrait délier la partie.
+                expeditionPartFromDb.IdMapRouteNavigation = linkedRoute;
+                expeditionPartFromDb.IdMapRoute = linkedRoute?.IdMapRoute;
                 await DbContext.SaveChangesAsync();
                 result = Mapper.Map<ExpeditionPartDto>(expeditionPartFromDb);
             }
@@ -523,6 +615,7 @@ namespace MyHordesOptimizerApi.Services.Impl
                 // Create : un membre par défaut est créé ici (et non côté front en réaction au
                 // broadcast) quand c'est la première partie de l'expédition, pour n'être créé qu'une
                 // seule fois, quel que soit le nombre de clients connectés à la ville.
+                expeditionPartModel.IdMapRouteNavigation = await ApplyRouteLinkAsync(expeditionPartModel, previousRouteId: null, expeditionId, targetTown);
                 var newEntity = DbContext.Add(expeditionPartModel).Entity;
                 await DbContext.SaveChangesAsync();
                 var isFirstPart = await DbContext.ExpeditionParts.CountAsync(part => part.IdExpedition == expeditionId) == 1;
@@ -540,6 +633,7 @@ namespace MyHordesOptimizerApi.Services.Impl
                         .ThenInclude(citizen => citizen.IdExpeditionBagNavigation)
                             .ThenInclude(bag => bag.ExpeditionBagItems)
                                 .ThenInclude(bagItem => bagItem.IdItemNavigation)
+                    .Include(part => part.IdMapRouteNavigation)
                     .SingleAsync();
                 result = Mapper.Map<ExpeditionPartDto>(expeditionPartWithDefaultCitizen);
             }
@@ -547,15 +641,155 @@ namespace MyHordesOptimizerApi.Services.Impl
             return result;
         }
 
+        public async Task<List<ExpeditionPartDto>> GetExpeditionPartsAsync(IReadOnlyCollection<int> expeditionPartIds)
+        {
+            var parts = await DbContext.ExpeditionParts.AsNoTracking()
+                .Where(part => expeditionPartIds.Contains(part.IdExpeditionPart))
+                .Include(part => part.IdExpeditionOrders)
+                .Include(part => part.ExpeditionCitizens)
+                    .ThenInclude(citizen => citizen.ExpeditionOrders)
+                .Include(part => part.ExpeditionCitizens)
+                    .ThenInclude(citizen => citizen.IdExpeditionBagNavigation)
+                        .ThenInclude(bag => bag.ExpeditionBagItems)
+                            .ThenInclude(bagItem => bagItem.IdItemNavigation)
+                .Include(part => part.IdMapRouteNavigation)
+                .AsSplitQuery()
+                .ToListAsync();
+            return parts.Select(part => Mapper.Map<ExpeditionPartDto>(part)).ToList();
+        }
+
         public void DeleteExpeditionPart(int expeditionPartId)
         {
+            EnsurePartWritable(expeditionPartId);
             var expeditionPart = DbContext.ExpeditionParts.Single(part => part.IdExpeditionPart == expeditionPartId);
-            if (expeditionPart.IdExpedition.HasValue)
-            {
-                EnsureExpeditionDayIsEditable(expeditionPart.IdExpedition.Value);
-            }
+            var linkedRouteId = expeditionPart.IdMapRoute;
             DbContext.Remove(expeditionPart);
             DbContext.SaveChanges();
+            if (linkedRouteId.HasValue)
+            {
+                BumpRouteVersions(new[] { linkedRouteId.Value });
+            }
+        }
+
+        /// <summary>
+        /// Contrôle le tracé demandé pour une partie (<see cref="ExpeditionPart.IdMapRoute"/> du modèle mappé) et
+        /// applique les effets d'un changement de lien : le tracé doit être de la ville, visible de l'utilisateur
+        /// et lié à aucune partie d'un autre jour (une copie par jour) ; lié, il devient visible de toute la ville
+        /// (seul qui peut le modifier peut lever son caractère privé) et donne sa direction à la partie. L'ancien
+        /// et le nouveau tracé changent de version, diffusée par le hub (<see cref="TakeMapRouteChanges"/>).
+        /// </summary>
+        /// <returns>Le tracé lié, suivi par le contexte ; null si la partie n'en a pas.</returns>
+        private async Task<MapRoute?> ApplyRouteLinkAsync(ExpeditionPart partModel, int? previousRouteId, int expeditionId, WritableTown town)
+        {
+            var routeId = partModel.IdMapRoute;
+            if (routeId == previousRouteId)
+            {
+                if (!routeId.HasValue)
+                {
+                    return null;
+                }
+                var unchangedRoute = await DbContext.MapRoutes.SingleAsync(route => route.IdMapRoute == routeId.Value);
+                await ApplyRouteDirectionAsync(partModel, unchangedRoute, expeditionId);
+                return unchangedRoute;
+            }
+            MapRoute? linkedRoute = null;
+            if (routeId.HasValue)
+            {
+                var userId = UserInfoProvider.UserId;
+                linkedRoute = await DbContext.MapRoutes
+                    .Include(route => route.MapRouteShares)
+                    .Include(route => route.ExpeditionParts)
+                        .ThenInclude(part => part.IdExpeditionNavigation)
+                    .AsSplitQuery()
+                    .SingleOrDefaultAsync(route => route.IdMapRoute == routeId.Value && route.IdTown == town.IdTown);
+                if (linkedRoute is null || !MapRouteRights.IsVisible(linkedRoute, userId))
+                {
+                    throw new MhoForbiddenException($"Le tracé {routeId} n'est pas un tracé de la ville {town.IdTown} visible par l'utilisateur {userId}.");
+                }
+                var expedition = await DbContext.Expeditions
+                    .Where(expedition => expedition.IdExpedition == expeditionId)
+                    .Select(expedition => new { expedition.Day })
+                    .SingleAsync();
+                if (linkedRoute.ExpeditionParts.Any(part => part.IdExpeditionNavigation?.Day != expedition.Day))
+                {
+                    throw new MhoTechnicalException("Ce tracé est déjà lié à une expédition d'un autre jour : importez ce jour pour en avoir une copie.");
+                }
+                if (linkedRoute.IsPrivate)
+                {
+                    if (!MapRouteRights.IsAuthorOrEditableByAll(linkedRoute, userId))
+                    {
+                        throw new MhoForbiddenException($"Lier le tracé privé {routeId} le rend visible de toute la ville : réservé à qui peut le modifier.");
+                    }
+                    linkedRoute.IsPrivate = false;
+                    foreach (var share in linkedRoute.MapRouteShares.ToList())
+                    {
+                        linkedRoute.MapRouteShares.Remove(share);
+                        DbContext.MapRouteShares.Remove(share);
+                    }
+                }
+                await ApplyRouteDirectionAsync(partModel, linkedRoute, expeditionId);
+                linkedRoute.Version++;
+                _mapRouteChanges.Add(new MapRouteChangeDto { Id = linkedRoute.IdMapRoute, Version = linkedRoute.Version });
+            }
+            if (previousRouteId.HasValue)
+            {
+                await BumpRouteVersionsAsync(new[] { previousRouteId.Value });
+            }
+            return linkedRoute;
+        }
+
+        /// <summary>Direction d'une partie liée : celle de la première case de son tracé, quelle que soit celle demandée.</summary>
+        private async Task ApplyRouteDirectionAsync(ExpeditionPart partModel, MapRoute route, int expeditionId)
+        {
+            var townPosition = await DbContext.Expeditions.AsNoTracking()
+                .Where(expedition => expedition.IdExpedition == expeditionId && expedition.IdTownNavigation != null)
+                .Select(expedition => new { expedition.IdTownNavigation!.X, expedition.IdTownNavigation.Y })
+                .SingleOrDefaultAsync();
+            if (townPosition is null)
+            {
+                return;
+            }
+            var direction = MapRouteDirection.FirstCell(MapRouteJson.ParsePoints(route.Cells), townPosition.X, townPosition.Y);
+            if (direction.HasValue)
+            {
+                partModel.Direction = (int)direction.Value;
+            }
+        }
+
+        /// <summary>
+        /// Nouvelle version des tracés dont les parties liées ont changé (incrément atomique en base) : le hub la
+        /// diffuse (MapRouteChanged) et les cartes ouvertes relisent le tracé. Un tracé en cours de saisie ailleurs
+        /// passe en conflit de version, comme pour toute autre modification.
+        /// </summary>
+        private async Task BumpRouteVersionsAsync(IReadOnlyCollection<int> routeIds)
+        {
+            if (routeIds.Count == 0)
+            {
+                return;
+            }
+            await DbContext.MapRoutes
+                .Where(route => routeIds.Contains(route.IdMapRoute))
+                .ExecuteUpdateAsync(setters => setters.SetProperty(route => route.Version, route => route.Version + 1));
+            _mapRouteChanges.AddRange(await DbContext.MapRoutes.AsNoTracking()
+                .Where(route => routeIds.Contains(route.IdMapRoute))
+                .Select(route => new MapRouteChangeDto { Id = route.IdMapRoute, Version = route.Version })
+                .ToListAsync());
+        }
+
+        /// <inheritdoc cref="BumpRouteVersionsAsync"/>
+        private void BumpRouteVersions(IReadOnlyCollection<int> routeIds)
+        {
+            if (routeIds.Count == 0)
+            {
+                return;
+            }
+            DbContext.MapRoutes
+                .Where(route => routeIds.Contains(route.IdMapRoute))
+                .ExecuteUpdate(setters => setters.SetProperty(route => route.Version, route => route.Version + 1));
+            _mapRouteChanges.AddRange(DbContext.MapRoutes.AsNoTracking()
+                .Where(route => routeIds.Contains(route.IdMapRoute))
+                .Select(route => new MapRouteChangeDto { Id = route.IdMapRoute, Version = route.Version })
+                .ToList());
         }
 
         #endregion
@@ -564,8 +798,8 @@ namespace MyHordesOptimizerApi.Services.Impl
 
         public async Task<List<ExpeditionOrderDto>> SaveCitizenOrdersAsync(int expeditionCitizenId, List<ExpeditionOrderDto> expeditionOrder)
         {
-            var townLockKey = EnsureCitizenDayIsEditable(expeditionCitizenId);
-            await using var townLock = await TownSyncLock.AcquireTownAsync(townLockKey);
+            var targetTown = EnsureCitizenWritable(expeditionCitizenId);
+            await using var townLock = await TownSyncLock.AcquireTownAsync(targetTown.LockKey);
             await using var transaction = await DbContext.Database.BeginTransactionAsync();
             LastUpdateInfoDto lastUpdateInfoDto = UserInfoProvider.GenerateLastUpdateInfo();
             var newLastUpdate = DbContext.LastUpdateInfos.Update(Mapper.Map<LastUpdateInfo>(lastUpdateInfoDto, opt => opt.SetDbContext(DbContext))).Entity;
@@ -575,6 +809,10 @@ namespace MyHordesOptimizerApi.Services.Impl
                 .Include(citizen => citizen.ExpeditionOrders)
                 .Include(citizen => citizen.IdExpeditionPartNavigation)
                 .SingleAsync();
+            // Indexé avant les ajouts (la correction de relations d'EF y insérerait les nouvelles consignes).
+            // Seules les consignes de CE citoyen sont modifiables : un identifiant étranger (autre citoyen,
+            // autre ville) serait sinon modifié puis rattaché à ce citoyen.
+            var ordersFromDb = expeditionCitizen.ExpeditionOrders.ToDictionary(order => order.IdExpeditionOrder);
             var toAdd = expeditionOrder.Where(orderDto => orderDto.Id is null);
             var toUpdate = expeditionOrder.Where(orderDto => orderDto.Id is not null).ToList();
             var orderModels = new List<ExpeditionOrder>();
@@ -586,21 +824,20 @@ namespace MyHordesOptimizerApi.Services.Impl
                 var newEntity = DbContext.Add(orderModel);
                 orderModels.Add(newEntity.Entity);
             }
-            // Chargement groupé (1 requête) au lieu d'un .Single() par commande à mettre à jour.
-            var toUpdateIds = toUpdate.Select(orderDto => orderDto.Id!.Value).ToList();
-            var ordersFromDb = await DbContext.ExpeditionOrders
-                .Where(order => toUpdateIds.Contains(order.IdExpeditionOrder))
-                .ToListAsync();
             foreach (var orderDto in toUpdate)
             {
                 // UpdateAsync
-                var expeditionOrderFromDb = ordersFromDb.Single(order => order.IdExpeditionOrder == orderDto.Id);
+                if (!ordersFromDb.TryGetValue(orderDto.Id!.Value, out var expeditionOrderFromDb))
+                {
+                    throw new MhoForbiddenException($"La consigne {orderDto.Id} n'appartient pas au citoyen d'expédition {expeditionCitizenId}.");
+                }
                 var orderModel = Mapper.Map<ExpeditionOrder>(orderDto);
                 orderModel.IdExpeditionCitizen = expeditionCitizenId;
                 orderModel.IdExpeditionCitizenNavigation = expeditionCitizen;
                 expeditionOrderFromDb.UpdateAllButKeysProperties(orderModel);
                 orderModels.Add(expeditionOrderFromDb);
             }
+            await ValidateOrdersAsync(orderModels, targetTown.IdTown);
             var orderFromDb = expeditionCitizen.ExpeditionOrders.ToList();
             var toRemove = orderFromDb.Except(orderModels, EqualityComparerFactory.CreateDefault<ExpeditionOrder>());
             DbContext.RemoveRange(toRemove);
@@ -613,8 +850,8 @@ namespace MyHordesOptimizerApi.Services.Impl
 
         public async Task<List<ExpeditionOrderDto>> SavePartOrdersAsync(int expeditionPartId, List<ExpeditionOrderDto> expeditionOrder)
         {
-            var townLockKey = EnsurePartDayIsEditable(expeditionPartId);
-            await using var townLock = await TownSyncLock.AcquireTownAsync(townLockKey);
+            var targetTown = EnsurePartWritable(expeditionPartId);
+            await using var townLock = await TownSyncLock.AcquireTownAsync(targetTown.LockKey);
             await using var transaction = await DbContext.Database.BeginTransactionAsync();
             LastUpdateInfoDto lastUpdateInfoDto = UserInfoProvider.GenerateLastUpdateInfo();
             var newLastUpdate = DbContext.LastUpdateInfos.Update(Mapper.Map<LastUpdateInfo>(lastUpdateInfoDto, opt => opt.SetDbContext(DbContext))).Entity;
@@ -624,6 +861,9 @@ namespace MyHordesOptimizerApi.Services.Impl
                 .Include(part => part.IdExpeditionOrders)
                 .SingleAsync();
             var initialOrderFromDb = expeditionPart.IdExpeditionOrders.ToList();
+            // Seules les consignes de CETTE partie sont modifiables : un identifiant étranger (autre partie,
+            // autre ville) serait sinon modifié puis rattaché à cette partie.
+            var ordersFromDb = initialOrderFromDb.ToDictionary(order => order.IdExpeditionOrder);
             var toAdd = expeditionOrder.Where(orderDto => orderDto.Id is null);
             var toUpdate = expeditionOrder.Where(orderDto => orderDto.Id is not null).ToList();
             var orderModels = new List<ExpeditionOrder>();
@@ -634,19 +874,18 @@ namespace MyHordesOptimizerApi.Services.Impl
                 var newEntity = DbContext.Add(orderModel);
                 orderModels.Add(newEntity.Entity);
             }
-            // Chargement groupé (1 requête) au lieu d'un .Single() par commande à mettre à jour.
-            var toUpdateIds = toUpdate.Select(orderDto => orderDto.Id!.Value).ToList();
-            var ordersFromDb = await DbContext.ExpeditionOrders
-                .Where(order => toUpdateIds.Contains(order.IdExpeditionOrder))
-                .ToListAsync();
             foreach (var orderDto in toUpdate)
             {
                 // UpdateAsync
-                var expeditionOrderFromDb = ordersFromDb.Single(order => order.IdExpeditionOrder == orderDto.Id);
+                if (!ordersFromDb.TryGetValue(orderDto.Id!.Value, out var expeditionOrderFromDb))
+                {
+                    throw new MhoForbiddenException($"La consigne {orderDto.Id} n'appartient pas à la partie d'expédition {expeditionPartId}.");
+                }
                 var orderModel = Mapper.Map<ExpeditionOrder>(orderDto);
                 expeditionOrderFromDb.UpdateAllButKeysProperties(orderModel);
                 orderModels.Add(expeditionOrderFromDb);
             }
+            await ValidateOrdersAsync(orderModels, targetTown.IdTown);
             var toRemove = initialOrderFromDb.Except(orderModels, EqualityComparerFactory.CreateDefault<ExpeditionOrder>());
             DbContext.RemoveRange(toRemove);
             expeditionPart.IdExpeditionOrders = orderModels;
@@ -666,7 +905,7 @@ namespace MyHordesOptimizerApi.Services.Impl
                 .Include(order => order.IdExpeditionParts)
                     .ThenInclude(part => part.IdExpeditionNavigation)
                 .Single(order => order.IdExpeditionOrder == expeditionOrderId);
-            EnsureOrderDayIsEditable(expeditionOrder);
+            EnsureOrderWritable(expeditionOrder);
             DbContext.Remove(expeditionOrder);
             DbContext.SaveChanges();
         }
@@ -680,8 +919,17 @@ namespace MyHordesOptimizerApi.Services.Impl
                 .Include(order => order.IdExpeditionParts)
                     .ThenInclude(part => part.IdExpeditionNavigation)
                 .Single(order => order.IdExpeditionOrder == expeditionOrderDto.Id.Value);
-            EnsureOrderDayIsEditable(expeditionOrderModel);
+            EnsureOrderWritable(expeditionOrderModel);
             var modelFromDto = Mapper.Map<ExpeditionOrder>(expeditionOrderDto);
+            // Case et type ne changent que par SavePartOrdersAsync / SaveCitizenOrdersAsync, qui les valident :
+            // ici (cocher, texte), ils restent ceux de la base (ignoreNull).
+            modelFromDto.X = null;
+            modelFromDto.Y = null;
+            modelFromDto.Kind = null;
+            modelFromDto.IdItem = null;
+            modelFromDto.Quantity = null;
+            modelFromDto.HeroSkill = null;
+            modelFromDto.IdTargetUser = null;
             expeditionOrderModel.UpdateAllButKeysProperties(modelFromDto, ignoreNull: true);
             DbContext.Update(expeditionOrderModel);
             DbContext.SaveChanges();
@@ -694,8 +942,8 @@ namespace MyHordesOptimizerApi.Services.Impl
         #region Bags
         public async Task<ExpeditionBagDto> UpdateExpeditionBag(int citizenId, ExpeditionBagRequestDto expeditionBagDto)
         {
-            var townLockKey = EnsureCitizenDayIsEditable(citizenId);
-            await using var townLock = await TownSyncLock.AcquireTownAsync(townLockKey);
+            var targetTown = EnsureCitizenWritable(citizenId);
+            await using var townLock = await TownSyncLock.AcquireTownAsync(targetTown.LockKey);
             await using var transaction = await DbContext.Database.BeginTransactionAsync();
             var expeditionBagModel = Mapper.Map<ExpeditionBag>(expeditionBagDto);
             ExpeditionBagDto result;
@@ -707,6 +955,9 @@ namespace MyHordesOptimizerApi.Services.Impl
                 // Si l'id du sac du citizen a changer, on delete l'ancien sac
                 if (expeditionCitizen.IdExpeditionBag != expeditionBagDto.Id)
                 {
+                    // Sac d'un autre citoyen : il doit être de la même ville, sinon il serait modifié puis
+                    // partagé avec ce citoyen.
+                    await EnsureBagBelongsToTownAsync(expeditionBagDto.Id, targetTown.IdTown);
                     DbContext.Remove(await DbContext.ExpeditionBags.SingleAsync(expeditionBag => expeditionBag.IdExpeditionBag == expeditionBagDto.Id));
                 }
                 // UpdateAsync : UpdateAllButKeysProperties recopie aussi les navigations (à leur valeur par
@@ -748,9 +999,14 @@ namespace MyHordesOptimizerApi.Services.Impl
             var expeditionBag = DbContext.ExpeditionBags
                 .Include(bag => bag.ExpeditionCitizens)
                 .Single(bag => bag.IdExpeditionBag == bagId);
+            if (expeditionBag.ExpeditionCitizens.Count == 0)
+            {
+                // Sac orphelin : aucune ville à laquelle vérifier l'appartenance.
+                throw new MhoForbiddenException($"Le sac d'expédition {bagId} n'est rattaché à aucun citoyen.");
+            }
             foreach (var citizen in expeditionBag.ExpeditionCitizens)
             {
-                EnsureCitizenDayIsEditable(citizen.IdExpeditionCitizen);
+                EnsureCitizenWritable(citizen.IdExpeditionCitizen);
             }
             var citizenIds = expeditionBag.ExpeditionCitizens.Select(citizen => citizen.IdExpeditionCitizen).ToList();
             // On détache d'abord les citoyens du sac : ExpeditionCitizen_ibfk_4 est ON DELETE CASCADE,
@@ -779,17 +1035,69 @@ namespace MyHordesOptimizerApi.Services.Impl
 
         #endregion
 
-        /// <summary>Rejette toute écriture sur un jour antérieur au jour actuel de la ville.</summary>
-        private void EnsureDayIsEditable(int townId, int? day)
+        /// <summary>
+        /// Vérifie la forme des consignes (<see cref="ExpeditionOrderRules"/>, case dans la carte de la ville) puis,
+        /// en une requête chacun, que les objets existent et que les citoyens à attendre sont de la ville.
+        /// </summary>
+        private async Task ValidateOrdersAsync(IReadOnlyCollection<ExpeditionOrder> orders, int idTown)
         {
-            var townDay = DbContext.Towns.Where(town => town.IdTown == townId).Select(town => town.Day).Single();
-            ThrowIfDayLocked(day, townDay);
+            if (orders.Count == 0)
+            {
+                return;
+            }
+            var map = await DbContext.Towns
+                .Where(town => town.IdTown == idTown)
+                .Select(town => new { town.Width, town.Height })
+                .SingleAsync();
+            foreach (var order in orders)
+            {
+                ExpeditionOrderRules.Validate(order, map.Width, map.Height);
+            }
+            var itemIds = orders.Where(order => order.IdItem.HasValue).Select(order => order.IdItem!.Value).Distinct().ToList();
+            if (itemIds.Count > 0 && await DbContext.Items.CountAsync(item => itemIds.Contains(item.IdItem)) != itemIds.Count)
+            {
+                throw new MhoTechnicalException("Objet de consigne inconnu.");
+            }
+            var targetUserIds = orders.Where(order => order.IdTargetUser.HasValue).Select(order => order.IdTargetUser!.Value).Distinct().ToList();
+            if (targetUserIds.Count > 0 && await DbContext.CountTownMembersAsync(idTown, targetUserIds) != targetUserIds.Count)
+            {
+                throw new MhoTechnicalException("Le citoyen à attendre n'est pas de la ville.");
+            }
         }
 
         /// <summary>
-        /// Équivalent async d'<see cref="EnsureDayIsEditable"/>, pour les appels faits sous le verrou par
+        /// Rejette l'écriture si l'utilisateur courant n'a pas accès à la ville (cf. <see cref="ITownAccessService"/>)
+        /// ou si le jour est antérieur au jour actuel de la ville. Requête projetée unique (MapId + jour).
+        /// </summary>
+        private void EnsureTownWritable(int townId, int? day)
+        {
+            var town = DbContext.Towns
+                .Where(town => town.IdTown == townId)
+                .Select(town => new { town.MapId, town.Day })
+                .Single();
+            TownAccessService.EnsureCanWriteTown(townId, town.MapId);
+            ThrowIfDayLocked(day, town.Day);
+        }
+
+        /// <summary>
+        /// Équivalent async d'<see cref="EnsureTownWritable"/>, pour les appels faits sous le verrou par
         /// ville (dans une méthode async déjà entrée dans son <c>await using townLock</c>) : un appel
         /// synchrone y immobiliserait un thread du pool pendant l'I/O au lieu de le libérer.
+        /// </summary>
+        private async Task EnsureTownWritableAsync(int townId, int? day)
+        {
+            var town = await DbContext.Towns
+                .Where(town => town.IdTown == townId)
+                .Select(town => new { town.MapId, town.Day })
+                .SingleAsync();
+            await TownAccessService.EnsureCanWriteTownAsync(townId, town.MapId);
+            ThrowIfDayLocked(day, town.Day);
+        }
+
+        /// <summary>
+        /// Rejette toute écriture sur un jour antérieur au jour actuel de la ville, SANS contrôle d'accès :
+        /// réservé aux appels dont la ville a déjà été vérifiée. Async pour la même raison que
+        /// <see cref="EnsureTownWritableAsync"/>.
         /// </summary>
         private async Task EnsureDayIsEditableAsync(int townId, int? day)
         {
@@ -807,12 +1115,11 @@ namespace MyHordesOptimizerApi.Services.Impl
         }
 
         /// <summary>
-        /// Rejette toute écriture sur une expédition dont le jour est déjà passé. Requête projetée unique
-        /// (expédition + ville en un aller-retour) au lieu de deux SELECT séquentiels. Retourne la clé de
-        /// verrou TownSyncLock (cf. <see cref="ComputeTownLockKey"/>), réutilisée par les appelants pour
-        /// l'acquisition du verrou par ville.
+        /// Vérifie qu'une écriture sur l'expédition est permise (ville accessible, jour non passé). Requête
+        /// projetée unique (expédition + ville en un aller-retour) au lieu de deux SELECT séquentiels.
+        /// Retourne la ville et sa clé de verrou TownSyncLock, réutilisées par les appelants.
         /// </summary>
-        private int EnsureExpeditionDayIsEditable(int expeditionId)
+        private WritableTown EnsureExpeditionWritable(int expeditionId)
         {
             var expedition = DbContext.Expeditions
                 .Where(expedition => expedition.IdExpedition == expeditionId)
@@ -828,20 +1135,14 @@ namespace MyHordesOptimizerApi.Services.Impl
                     MapId = expedition.IdTownNavigation != null ? expedition.IdTownNavigation.MapId : null
                 })
                 .Single();
-            if (expedition.TownDay.HasValue)
-            {
-                ThrowIfDayLocked(expedition.Day, expedition.TownDay.Value);
-            }
-            return ComputeTownLockKey(expedition.IdTown, expedition.MapId);
+            return EnsureProjectedTownWritable(expedition.IdTown, expedition.MapId, expedition.Day, expedition.TownDay);
         }
 
         /// <summary>
-        /// Rejette toute écriture sur une partie d'expédition dont le jour est déjà passé. Requête projetée
-        /// unique (partie + expédition + ville) au lieu de trois SELECT séquentiels. Retourne la clé de
-        /// verrou TownSyncLock (cf. <see cref="ComputeTownLockKey"/>), réutilisée par les appelants pour
-        /// l'acquisition du verrou par ville.
+        /// Équivalent d'<see cref="EnsureExpeditionWritable"/> pour une partie d'expédition. Requête projetée
+        /// unique (partie + expédition + ville) au lieu de trois SELECT séquentiels.
         /// </summary>
-        private int EnsurePartDayIsEditable(int expeditionPartId)
+        private WritableTown EnsurePartWritable(int expeditionPartId)
         {
             var part = DbContext.ExpeditionParts
                 .Where(part => part.IdExpeditionPart == expeditionPartId)
@@ -855,20 +1156,14 @@ namespace MyHordesOptimizerApi.Services.Impl
                     MapId = part.IdExpeditionNavigation.IdTownNavigation != null ? part.IdExpeditionNavigation.IdTownNavigation.MapId : null
                 })
                 .Single();
-            if (part.TownDay.HasValue)
-            {
-                ThrowIfDayLocked(part.Day, part.TownDay.Value);
-            }
-            return ComputeTownLockKey(part.IdTown, part.MapId);
+            return EnsureProjectedTownWritable(part.IdTown, part.MapId, part.Day, part.TownDay);
         }
 
         /// <summary>
-        /// Rejette toute écriture sur un citoyen d'expédition dont le jour est déjà passé. Requête projetée
-        /// unique (citoyen + partie + expédition + ville) au lieu de quatre SELECT séquentiels. Retourne la
-        /// clé de verrou TownSyncLock (cf. <see cref="ComputeTownLockKey"/>), réutilisée par les appelants
-        /// pour l'acquisition du verrou par ville.
+        /// Équivalent d'<see cref="EnsureExpeditionWritable"/> pour un citoyen d'expédition. Requête projetée
+        /// unique (citoyen + partie + expédition + ville) au lieu de quatre SELECT séquentiels.
         /// </summary>
-        private int EnsureCitizenDayIsEditable(int expeditionCitizenId)
+        private WritableTown EnsureCitizenWritable(int expeditionCitizenId)
         {
             var citizen = DbContext.ExpeditionCitizens
                 .Where(citizen => citizen.IdExpeditionCitizen == expeditionCitizenId)
@@ -886,11 +1181,22 @@ namespace MyHordesOptimizerApi.Services.Impl
                         : null
                 })
                 .Single();
-            if (citizen.TownDay.HasValue)
+            return EnsureProjectedTownWritable(citizen.IdTown, citizen.MapId, citizen.Day, citizen.TownDay);
+        }
+
+        /// <summary>
+        /// Contrôle commun aux requêtes projetées ci-dessus. Une entité sans ville (chaîne de clés étrangères
+        /// cassée) est refusée : aucun citoyen ne peut en revendiquer l'accès.
+        /// </summary>
+        private WritableTown EnsureProjectedTownWritable(int? idTown, int? mapId, int? day, int? townDay)
+        {
+            if (!idTown.HasValue || !townDay.HasValue)
             {
-                ThrowIfDayLocked(citizen.Day, citizen.TownDay.Value);
+                throw new MhoForbiddenException("Cette expédition n'est rattachée à aucune ville.");
             }
-            return ComputeTownLockKey(citizen.IdTown, citizen.MapId);
+            TownAccessService.EnsureCanWriteTown(idTown.Value, mapId);
+            ThrowIfDayLocked(day, townDay.Value);
+            return new WritableTown(idTown.Value, ComputeTownLockKey(idTown.Value, mapId));
         }
 
         /// <summary>
@@ -899,52 +1205,119 @@ namespace MyHordesOptimizerApi.Services.Impl
         /// DÉJÀ résolu façon <see cref="MhoContext.ResolveTownId"/> (positif si synchronisé, -mapId si
         /// provisoire) et du MapId joint dans la même requête pour une ville synchronisée.
         /// </summary>
-        private static int ComputeTownLockKey(int? resolvedIdTown, int? mapId)
+        private static int ComputeTownLockKey(int resolvedIdTown, int? mapId)
         {
-            if (!resolvedIdTown.HasValue)
-            {
-                // Chaîne FK cassée (expédition/partie/citoyen sans ville) : clé partagée 0, comportement
-                // inchangé par rapport à l'ancien -(idTown ?? 0).
-                return 0;
-            }
-            if (resolvedIdTown.Value < 0)
+            if (resolvedIdTown < 0)
             {
                 // Ville provisoire : resolvedIdTown vaut déjà -mapId (cf. ResolveTownId), ne pas le
                 // négater une seconde fois sous peine de retomber sur +mapId.
-                return resolvedIdTown.Value;
+                return resolvedIdTown;
             }
             // Ville synchronisée : verrouiller sur le mapId brut, jamais sur l'IdTown interne résolu,
             // pour s'exclure mutuellement avec une synchro/login concurrente sur la même ville.
             // Repli dégradé sur -resolvedIdTown si MapId est inconnu (ne devrait pas arriver en pratique
             // pour une ville synchronisée) : ne s'exclut pas avec la famille synchro/login, mais reste
             // préférable à planter.
-            return mapId.HasValue ? -mapId.Value : -resolvedIdTown.Value;
+            return mapId.HasValue ? -mapId.Value : -resolvedIdTown;
         }
 
         /// <summary>
-        /// Rejette toute écriture sur une commande dont le jour est déjà passé. Une commande appartient
-        /// soit à un citoyen, soit directement à une ou plusieurs parties (cf. ExpeditionMappingProfiles).
+        /// Vérifie qu'une écriture sur la consigne est permise. Une consigne appartient soit à un citoyen,
+        /// soit directement à une ou plusieurs parties (cf. ExpeditionMappingProfiles) : chaque expédition
+        /// concernée doit être accessible et de jour non passé. Une consigne sans ville est refusée.
         /// </summary>
-        private void EnsureOrderDayIsEditable(ExpeditionOrder order)
+        private void EnsureOrderWritable(ExpeditionOrder order)
         {
-            if (order.IdExpeditionCitizenNavigation is not null)
+            List<Expedition?> expeditions = order.IdExpeditionCitizenNavigation is not null
+                ? new List<Expedition?> { order.IdExpeditionCitizenNavigation.IdExpeditionPartNavigation?.IdExpeditionNavigation }
+                : order.IdExpeditionParts.Select(part => part.IdExpeditionNavigation).ToList();
+            if (expeditions.Count == 0)
             {
-                var expedition = order.IdExpeditionCitizenNavigation.IdExpeditionPartNavigation?.IdExpeditionNavigation;
-                if (expedition is not null && expedition.IdTown.HasValue)
-                {
-                    EnsureDayIsEditable(expedition.IdTown.Value, expedition.Day);
-                }
+                throw new MhoForbiddenException($"La consigne {order.IdExpeditionOrder} n'est rattachée à aucune expédition.");
             }
-            else
+            foreach (var expedition in expeditions)
             {
-                foreach (var part in order.IdExpeditionParts)
+                if (expedition?.IdTown is null)
                 {
-                    var expedition = part.IdExpeditionNavigation;
-                    if (expedition is not null && expedition.IdTown.HasValue)
-                    {
-                        EnsureDayIsEditable(expedition.IdTown.Value, expedition.Day);
-                    }
+                    throw new MhoForbiddenException($"La consigne {order.IdExpeditionOrder} n'est rattachée à aucune ville.");
                 }
+                EnsureTownWritable(expedition.IdTown.Value, expedition.Day);
+            }
+        }
+
+        /// <summary>
+        /// Les DTO de requête portent des identifiants (parties, citoyens, consignes, sac) que le mapping
+        /// charge tels quels depuis la base puis rattache à l'entité enregistrée : chacun doit appartenir à
+        /// la ville de la cible, sinon une écriture modifierait ou déplacerait les données d'une autre ville.
+        /// Un identifiant inexistant est ignoré ici, comme par le mapping.
+        /// </summary>
+        private async Task EnsurePartsBelongToTownAsync(List<int>? partIds, int idTown)
+        {
+            if (partIds is null || partIds.Count == 0)
+            {
+                return;
+            }
+            var hasForeignPart = await DbContext.ExpeditionParts
+                .AnyAsync(part => partIds.Contains(part.IdExpeditionPart) && part.IdExpeditionNavigation.IdTown != idTown);
+            if (hasForeignPart)
+            {
+                throw new MhoForbiddenException($"Une des parties d'expédition [{string.Join(", ", partIds)}] n'appartient pas à la ville {idTown}.");
+            }
+        }
+
+        /// <inheritdoc cref="EnsurePartsBelongToTownAsync"/>
+        private async Task EnsureCitizensBelongToTownAsync(List<int>? citizenIds, int idTown)
+        {
+            if (citizenIds is null || citizenIds.Count == 0)
+            {
+                return;
+            }
+            var hasForeignCitizen = await DbContext.ExpeditionCitizens
+                .AnyAsync(citizen => citizenIds.Contains(citizen.IdExpeditionCitizen)
+                    && citizen.IdExpeditionPartNavigation.IdExpeditionNavigation.IdTown != idTown);
+            if (hasForeignCitizen)
+            {
+                throw new MhoForbiddenException($"Un des citoyens d'expédition [{string.Join(", ", citizenIds)}] n'appartient pas à la ville {idTown}.");
+            }
+        }
+
+        /// <inheritdoc cref="EnsurePartsBelongToTownAsync"/>
+        private async Task EnsureOrdersBelongToTownAsync(List<int>? orderIds, int idTown)
+        {
+            if (orderIds is null || orderIds.Count == 0)
+            {
+                return;
+            }
+            // Une consigne appartient à des parties (table de liaison) ou à un citoyen : étrangère si ni l'un
+            // ni l'autre n'est de la ville.
+            var hasForeignOrder = await DbContext.ExpeditionOrders
+                .Where(order => orderIds.Contains(order.IdExpeditionOrder))
+                .AnyAsync(order => !order.IdExpeditionParts.Any(part => part.IdExpeditionNavigation.IdTown == idTown)
+                    && order.IdExpeditionCitizenNavigation.IdExpeditionPartNavigation.IdExpeditionNavigation.IdTown != idTown);
+            if (hasForeignOrder)
+            {
+                throw new MhoForbiddenException($"Une des consignes [{string.Join(", ", orderIds)}] n'appartient pas à la ville {idTown}.");
+            }
+        }
+
+        /// <summary>
+        /// Un sac peut être partagé entre citoyens d'expédition (ExpeditionBag.ExpeditionCitizens) : tous
+        /// doivent être de la ville. Un sac sans citoyen, ou inexistant, est refusé faute de ville à vérifier.
+        /// </summary>
+        private async Task EnsureBagBelongsToTownAsync(int? bagId, int idTown)
+        {
+            if (!bagId.HasValue)
+            {
+                return;
+            }
+            var bagTownIds = await DbContext.ExpeditionCitizens
+                .Where(citizen => citizen.IdExpeditionBag == bagId.Value)
+                .Select(citizen => citizen.IdExpeditionPartNavigation.IdExpeditionNavigation.IdTown)
+                .Distinct()
+                .ToListAsync();
+            if (bagTownIds.Count != 1 || bagTownIds[0] != idTown)
+            {
+                throw new MhoForbiddenException($"Le sac d'expédition {bagId} n'appartient pas à la ville {idTown}.");
             }
         }
     }

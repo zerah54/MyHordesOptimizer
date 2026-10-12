@@ -1,0 +1,260 @@
+:host {
+    display: block;
+}
+
+.mho-map-cell-camping {
+    // Le détail de la case est en `pre-wrap` : les retours du gabarit ne doivent pas s'afficher ici
+    white-space: normal;
+
+    .camping-toggle {
+        display: flex;
+        align-items: center;
+        gap: 0.5em;
+        width: 100%;
+        padding: 0.25em 0;
+        border: none;
+        background: transparent;
+        color: inherit;
+        font: inherit;
+        cursor: pointer;
+
+        .camping-title {
+            flex-grow: 1;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .toggle-icon {
+            color: var(--mho-text-muted);
+        }
+    }
+
+    .camping-body {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5em;
+        padding-top: 0.25em;
+    }
+
+    .improvement {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 0.25em 0.5em;
+        min-height: 32px;
+
+        .mat-mdc-icon-button {
+            --mat-icon-button-state-layer-size: 32px;
+            --mat-icon-button-icon-size: 18px;
+        }
+
+        .improvement-day {
+            color: var(--mho-text-muted);
+        }
+
+        .level-input {
+            width: 4.5em;
+        }
+    }
+
+    .improvement-actions,
+    .zone-settings {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 0.25em 0.5em;
+    }
+
+    .improvement-actions img,
+    .zone-settings img {
+        vertical-align: middle;
+        margin-right: 0.25em;
+    }
+
+    .campers {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25em;
+    }
+
+    .add-camper {
+        align-self: flex-start;
+    }
+
+    .hint,
+    .summary {
+        margin: 0;
+    }
+
+    .hint {
+        color: var(--mho-text-muted);
+    }
+
+    .summary {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25em;
+
+        p {
+            margin: 0;
+        }
+
+        .expected {
+            font-weight: 600;
+        }
+
+        .suggestion {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.25em;
+
+            .arrow {
+                margin: 0 0.25em;
+            }
+
+            .suggested-expected {
+                margin-left: 0.25em;
+                color: var(--mho-text-muted);
+            }
+        }
+
+        .optimal {
+            display: flex;
+            align-items: center;
+            gap: 0.25em;
+            color: var(--mho-success);
+        }
+
+        &.pending {
+            color: var(--mho-text-muted);
+        }
+
+        &.error {
+            color: var(--mho-danger);
+        }
+    }
+}
+
+// Lignes des campeurs hors de `.mho-map-cell-camping` : l'aperçu du glisser-déposer est rendu dans le body
+.camper {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25em;
+    padding: 0.25em 0.5em;
+    border: 1px solid var(--mho-line);
+    border-radius: var(--mho-radius-s);
+    background: var(--mho-surface-2);
+}
+
+.camper-main {
+    display: flex;
+    align-items: center;
+    gap: 0.25em;
+
+    // Trois boutons par ligne : ramenés à 28 px pour laisser la place au nom
+    .mat-mdc-icon-button {
+        --mat-icon-button-state-layer-size: 28px;
+        --mat-icon-button-icon-size: 18px;
+        flex-shrink: 0;
+    }
+
+    .drag-handle {
+        color: var(--mho-text-muted);
+        cursor: grab;
+    }
+
+    .rank {
+        min-width: 1.2em;
+        text-align: center;
+        font-variant-numeric: tabular-nums;
+        font-weight: 600;
+    }
+
+    .job {
+        display: inline-flex;
+        padding: 2px;
+        border: none;
+        border-radius: 4px;
+        background: transparent;
+        cursor: pointer;
+
+        &:hover {
+            background: var(--mho-hover);
+        }
+    }
+
+    .name {
+        flex-grow: 1;
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .chance {
+        min-width: 3.5em;
+        text-align: right;
+        font-variant-numeric: tabular-nums;
+        font-weight: 600;
+
+        &.good {
+            color: var(--mho-success);
+        }
+
+        &.medium {
+            color: var(--mho-warning);
+        }
+
+        &.bad {
+            color: var(--mho-danger);
+        }
+    }
+}
+
+.camper-settings {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.25em 0.5em;
+
+    .recluse {
+        display: inline-flex;
+        align-items: center;
+        gap: 2px;
+
+        .recluse-letter {
+            font-weight: 700;
+        }
+    }
+
+    .r4 {
+        padding: 1px 6px;
+        border: none;
+        border-radius: 7px;
+        background: var(--mho-surface-3);
+        color: var(--mho-text-muted);
+        font: inherit;
+        font-size: 0.85em;
+        cursor: pointer;
+        opacity: 0.6;
+
+        &.on {
+            color: var(--mho-text);
+            opacity: 1;
+        }
+    }
+}
+
+// Ligne en cours de glissement : rendue hors du composant par le CDK
+.camper.cdk-drag-preview {
+    box-shadow: 0 6px 16px var(--mho-shadow-color);
+}
+
+.camper.cdk-drag-placeholder {
+    opacity: 0.3;
+}
+
+.campers.cdk-drop-list-dragging .camper:not(.cdk-drag-placeholder) {
+    transition: transform 0.2s ease;
+}

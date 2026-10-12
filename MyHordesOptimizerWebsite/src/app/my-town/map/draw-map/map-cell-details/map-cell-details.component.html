@@ -71,6 +71,13 @@
             </div>
             <mat-divider></mat-divider>
         }
+        @if (!cell().is_town) {
+            <mho-map-cell-camping class="camping" [cell]="cell()" [map]="map()" [allRuins]="allRuins()"
+                                  [allCitizens]="allCitizens()" [canUpdate]="canUpdate()"></mho-map-cell-camping>
+            <mat-divider></mat-divider>
+        }
+        <mho-map-cell-orders class="orders" mode="detail" [cell]="cell()" [map]="map()" [ruins]="allRuins()"
+                             [items]="allItems()" [citizens]="allCitizens()" [editable]="canEditOrders()"></mho-map-cell-orders>
         <div class="last-update">
             <mho-last-update [lastUpdateInfo]="cell().update_info"></mho-last-update>
         </div>

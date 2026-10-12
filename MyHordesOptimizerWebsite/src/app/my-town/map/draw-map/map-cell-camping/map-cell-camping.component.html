@@ -1,0 +1,207 @@
+<section class="mho-map-cell-camping">
+    <button type="button" class="camping-toggle" [attr.aria-expanded]="store.expanded()" (click)="toggleExpanded()">
+        <img [ngSrc]="HORDES_IMG_REPO + 'emotes/sleep.gif'" width="16" height="16" alt="">
+        <span class="camping-title" i18n>Camping</span>
+        <mat-icon class="toggle-icon">{{ store.expanded() ? 'expand_more' : 'chevron_right' }}</mat-icon>
+    </button>
+
+    @if (store.expanded()) {
+        <div class="camping-body">
+            <div class="improvement">
+                <img [ngSrc]="HORDES_IMG_REPO + 'icons/small_refine.gif'" width="16" height="16" alt="">
+                <span i18n>Aménagement de la zone</span>
+                @if (editing_level()) {
+                    <input #levelInput class="level-input" type="number" min="0" [value]="improvement().level ?? 0"
+                           aria-label="Niveau d'aménagement constaté" i18n-aria-label
+                           (keydown.enter)="setLevel(levelInput.value)">
+                    <button mat-icon-button type="button" class="level-save" [disabled]="saving()" (click)="setLevel(levelInput.value)"
+                            aria-label="Enregistrer le niveau" i18n-aria-label>
+                        <mat-icon>check</mat-icon>
+                    </button>
+                    <button mat-icon-button type="button" class="level-cancel" (click)="editing_level.set(false)"
+                            aria-label="Annuler" i18n-aria-label>
+                        <mat-icon>close</mat-icon>
+                    </button>
+                } @else {
+                    <strong class="improvement-level">{{ improvement().level ?? 0 }}</strong>
+                    @if (improvement().day; as day) {
+                        <small class="improvement-day" i18n>(saisi J{{ day }})</small>
+                    }
+                    @if (canUpdate()) {
+                        <button mat-icon-button type="button" class="level-edit" (click)="editing_level.set(true)"
+                                matTooltip="Corriger le niveau constaté" i18n-matTooltip
+                                aria-label="Corriger le niveau constaté" i18n-aria-label>
+                            <mat-icon>edit</mat-icon>
+                        </button>
+                    }
+                }
+            </div>
+            @if (canUpdate() && !editing_level()) {
+                <div class="improvement-actions">
+                    <button mat-stroked-button type="button" class="add-improvement" [disabled]="saving()" (click)="addImprovement(1, 0)">
+                        <img [ngSrc]="HORDES_IMG_REPO + 'icons/small_refine.gif'" width="16" height="16" alt="">
+                        <ng-container i18n>+1 amélioration</ng-container>&nbsp;<small>(+5)</small>
+                    </button>
+                    <button mat-stroked-button type="button" class="add-defense-object" [disabled]="saving()" (click)="addImprovement(0, 1)">
+                        <img [ngSrc]="HORDES_IMG_REPO + 'item/cat_def.gif'" width="16" height="16" alt="">
+                        <ng-container i18n>+1 objet de défense</ng-container>&nbsp;<small>(+9)</small>
+                    </button>
+                </div>
+            }
+
+            <div class="zone-settings">
+                <mat-checkbox class="night" [checked]="store.night()" (change)="store.night.set($event.checked)">
+                    <img [ngSrc]="HORDES_IMG_REPO + 'pictos/r_doutsd.gif'" width="16" height="16" alt="">
+                    <ng-container i18n>Nuit</ng-container>
+                </mat-checkbox>
+                <mat-checkbox class="phare" [checked]="store.phare()" (change)="store.phare.set($event.checked)">
+                    <img [ngSrc]="HORDES_IMG_REPO + 'building/small_lighthouse.gif'" width="16" height="16" alt="">
+                    <ng-container i18n>Phare</ng-container>
+                </mat-checkbox>
+                <mho-compact-stepper class="hidden-campers" icon="emotes/human.gif" [label]="hidden_campers_label"
+                                     [value]="hidden_campers()" (valueChange)="hidden_campers.set($event)"></mho-compact-stepper>
+                <mho-compact-stepper class="zombies" icon="emotes/zombie.gif" [label]="zombies_label"
+                                     [value]="zombies()" (valueChange)="zombies.set($event)"></mho-compact-stepper>
+            </div>
+
+            <div class="campers" cdkDropList (cdkDropListDropped)="drop($event)">
+                @for (row of rows(); track row.camper.key; let index = $index, first = $first, last = $last) {
+                    <div class="camper" cdkDrag cdkDragLockAxis="y" cdkDragBoundary=".campers">
+                        <div class="camper-main">
+                            <mat-icon class="drag-handle" cdkDragHandle>drag_indicator</mat-icon>
+                            <span class="rank">{{ index + 1 }}</span>
+                            <button type="button" class="job" [matMenuTriggerFor]="jobMenu" [matTooltip]="row.camper.job.value.label">
+                                <img [ngSrc]="HORDES_IMG_REPO + row.camper.job.value.img" width="16" height="16" [alt]="row.camper.job.value.label">
+                            </button>
+                            <mat-menu #jobMenu="matMenu">
+                                @for (job of jobs; track job.key) {
+                                    <button mat-menu-item type="button" (click)="updateCamper(row.camper, { job })">
+                                        <img [ngSrc]="HORDES_IMG_REPO + job.value.img" width="16" height="16" alt="">
+                                        {{ job.value.label }}
+                                    </button>
+                                }
+                            </mat-menu>
+                            <span class="name">
+                                @if (row.camper.citizen_id !== null) {
+                                    {{ row.camper.name }}
+                                } @else {
+                                    <ng-container i18n>Profil {{ row.camper.profile_number }}</ng-container>
+                                }
+                            </span>
+                            <span class="chance" [class]="row.chance_class" [matTooltip]="row.odds?.label?.[locale] ?? ''">
+                                @if (row.odds; as odds) {
+                                    {{ odds.bounded_probability }}&nbsp;%
+                                } @else {
+                                    …
+                                }
+                            </span>
+                            <button mat-icon-button type="button" class="move-up" [disabled]="first" (click)="store.move(index, index - 1)"
+                                    aria-label="Se cacher plus tôt" i18n-aria-label>
+                                <mat-icon>arrow_upward</mat-icon>
+                            </button>
+                            <button mat-icon-button type="button" class="move-down" [disabled]="last" (click)="store.move(index, index + 1)"
+                                    aria-label="Se cacher plus tard" i18n-aria-label>
+                                <mat-icon>arrow_downward</mat-icon>
+                            </button>
+                            <button mat-icon-button type="button" class="remove" (click)="store.remove(row.camper.key)"
+                                    aria-label="Retirer le campeur" i18n-aria-label>
+                                <mat-icon>close</mat-icon>
+                            </button>
+                        </div>
+                        <div class="camper-settings">
+                            <mho-compact-stepper class="campings" icon="emotes/sleep.gif" [label]="campings_label" [value]="row.camper.campings"
+                                                 (valueChange)="updateCamper(row.camper, { campings: $event })"></mho-compact-stepper>
+                            <span class="recluse">
+                                <span class="recluse-letter">R</span>
+                                <mho-compact-stepper class="recluse-level" [label]="recluse_label" [min]="-1" [max]="MAX_HERO_SKILL_LEVEL"
+                                                     [value]="row.camper.recluse_level ?? -1"
+                                                     (valueChange)="updateRecluseLevel(row.camper, $event)"></mho-compact-stepper>
+                            </span>
+                            @if (row.camper.recluse_level === null) {
+                                <mho-compact-toggle class="pro-camper" icon="status/status_camper.gif" [label]="pro_camper_label"
+                                                    [value]="row.camper.pro_camper"
+                                                    (valueChange)="updateCamper(row.camper, { pro_camper: $event })"></mho-compact-toggle>
+                            }
+                            <mho-compact-stepper class="objects" icon="emotes/bag.gif" [label]="objects_label" [value]="row.camper.objects"
+                                                 (valueChange)="updateCamper(row.camper, { objects: $event })"></mho-compact-stepper>
+                            <mho-compact-toggle class="tomb" icon="building/small_cemetery.gif" [label]="tomb_label" [value]="row.camper.tomb"
+                                                (valueChange)="updateCamper(row.camper, { tomb: $event })"></mho-compact-toggle>
+                            @if (row.camper.job === JOB_SCOUT) {
+                                <mho-compact-toggle class="vest" icon="emotes/proscout.gif" [label]="vest_label" [value]="row.camper.vest"
+                                                    (valueChange)="updateCamper(row.camper, { vest: $event })"></mho-compact-toggle>
+                            }
+                            @if (row.camper.recluse_level === null) {
+                                <button type="button" class="r4" [class.on]="row.camper.r4" [attr.aria-pressed]="row.camper.r4" [matTooltip]="r4_label"
+                                        (click)="updateCamper(row.camper, { r4: !row.camper.r4 })">
+                                    <ng-container i18n>R4</ng-container>
+                                </button>
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+
+            <button mat-stroked-button type="button" class="add-camper" [matMenuTriggerFor]="addMenu"
+                    [disabled]="store.campers().length >= MAX_CAMPERS">
+                <mat-icon>person_add</mat-icon>
+                <ng-container i18n>Ajouter un campeur</ng-container>
+            </button>
+            <mat-menu #addMenu="matMenu">
+                <button mat-menu-item type="button" class="add-profile" (click)="store.addProfile()">
+                    <mat-icon>tune</mat-icon>
+                    <ng-container i18n>Profil libre</ng-container>
+                </button>
+                @for (citizen of available_citizens(); track citizen.id) {
+                    <button mat-menu-item type="button" class="add-citizen" (click)="store.addCitizen(citizen)">
+                        @if (citizen.job; as job) {
+                            <img [ngSrc]="HORDES_IMG_REPO + job.value.img" width="16" height="16" alt="">
+                        }
+                        {{ citizen.name }}
+                    </button>
+                }
+            </mat-menu>
+
+            @if (rows().length === 0) {
+                <p class="hint" i18n>Ajoutez les campeurs dans l'ordre où ils se cachent pour voir leurs chances.</p>
+            } @else {
+                @if (result(); as result) {
+                    <div class="summary">
+                        <p class="expected" i18n>Survivants attendus : {{ result.expected_survivors | number:'1.0-2' }}</p>
+                        @if (suggested_order(); as suggested_order) {
+                            <div class="suggestion">
+                                <p>
+                                    <ng-container i18n>Ordre conseillé</ng-container>&nbsp;:
+                                    @for (camper of suggested_order; track camper.key; let last_camper = $last) {
+                                        <span class="suggested-camper">
+                                            @if (camper.citizen_id !== null) {
+                                                {{ camper.name }}
+                                            } @else {
+                                                <ng-container i18n>Profil {{ camper.profile_number }}</ng-container>
+                                            }
+                                        </span>
+                                        @if (!last_camper) {
+                                            <span class="arrow">→</span>
+                                        }
+                                    }
+                                    <span class="suggested-expected" i18n>({{ result.best_expected_survivors | number:'1.0-2' }} survivants attendus)</span>
+                                </p>
+                                <button mat-flat-button type="button" class="apply-order" (click)="applySuggestedOrder()">
+                                    <ng-container i18n>Appliquer cet ordre</ng-container>
+                                </button>
+                            </div>
+                        } @else if (rows().length > 1) {
+                            <p class="optimal">
+                                <mat-icon>check</mat-icon>
+                                <ng-container i18n>Cet ordre de cachette est le meilleur.</ng-container>
+                            </p>
+                        }
+                    </div>
+                } @else if (result() === null) {
+                    <p class="summary error" i18n>Le calcul a échoué.</p>
+                } @else {
+                    <p class="summary pending" i18n>Calcul en cours…</p>
+                }
+            }
+        </div>
+    }
+</section>

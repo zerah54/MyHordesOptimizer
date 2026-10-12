@@ -1,0 +1,26 @@
+<div class="order" [class.done]="order().is_done">
+    @if (cell_label(); as cell) {
+        <span class="cell">{{ cell }}</span>
+    }
+    @if (order().type === 'checkbox') {
+        <mat-checkbox class="done-box" [checked]="order().is_done" [disabled]="!checkable()" [aria-label]="view().text"
+                      (change)="onDoneChange($event)"></mat-checkbox>
+    } @else {
+        <span class="bullet" aria-hidden="true">•</span>
+    }
+    @if (view().img; as img) {
+        <img class="icon" [src]="img" alt="" width="16" height="16">
+    } @else if (view().icon; as icon) {
+        <mat-icon class="icon" aria-hidden="true">{{ icon }}</mat-icon>
+    }
+    <span class="text">
+        @if (view().verb; as verb) {
+            <b class="verb">{{ verb }}</b> {{ view().rest }}
+        } @else {
+            <span [innerHTML]="view().html"></span>
+        }
+    </span>
+    @if (scope(); as scope_label) {
+        <span class="scope" [class.me]="scopeIsMe()">{{ scope_label }}</span>
+    }
+</div>

@@ -80,6 +80,9 @@
                     @if (corner.icon) {
                         <img [src]="HORDES_IMG_REPO + corner.icon" alt="">
                     }
+                    @if (corner.tone) {
+                        <span class="age-flag age-{{ corner.tone }}"></span>
+                    }
                     @if (corner.value !== null) {
                         <span class="detail-value" [class.bare]="!corner.icon" [class.estimation]="corner.estimation">{{ corner.value }}</span>
                     }

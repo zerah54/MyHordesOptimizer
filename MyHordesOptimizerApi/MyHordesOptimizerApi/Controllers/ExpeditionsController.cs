@@ -7,6 +7,7 @@ using MyHordesOptimizerApi.Models.Expeditions;
 using MyHordesOptimizerApi.Providers.Interfaces;
 using MyHordesOptimizerApi.Services.Interfaces;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace MyHordesOptimizerApi.Controllers
 {
@@ -24,9 +25,9 @@ namespace MyHordesOptimizerApi.Controllers
 
         [HttpGet]
         [Route("{townId}/{day}")]
-        public ActionResult<List<ExpeditionDto>> GetExpeditions([FromRoute] int townId, [FromRoute] int day)
+        public async Task<ActionResult<List<ExpeditionDto>>> GetExpeditions([FromRoute] int townId, [FromRoute] int day)
         {
-            var expedition = ExpeditionService.GetExpeditionsByDay(townId, day);
+            var expedition = await ExpeditionService.GetExpeditionsByDayAsync(townId, day);
             return Ok(expedition);
         }
 

@@ -32,6 +32,35 @@ public partial class ExpeditionOrder
     [Column("idExpeditionCitizen", TypeName = "int(11)")]
     public int? IdExpeditionCitizen { get; set; }
 
+    /// <summary>Case visée, en coordonnées absolues (comme MapCell.X) ; null avec Y pour une consigne générale.</summary>
+    [Column("x", TypeName = "int(11)")]
+    public int? X { get; set; }
+
+    [Column("y", TypeName = "int(11)")]
+    public int? Y { get; set; }
+
+    /// <summary>Consigne typée (cf. ExpeditionOrderKinds) ; null pour un texte libre.</summary>
+    [Column("kind")]
+    [StringLength(16)]
+    public string? Kind { get; set; }
+
+    /// <summary>Objet à ramasser, déposer ou consommer (FK Item ON DELETE SET NULL).</summary>
+    [Column("idItem", TypeName = "int(11)")]
+    public int? IdItem { get; set; }
+
+    /// <summary>Nombre d'objets (ramasser, déposer) ou de tas (déblayer).</summary>
+    [Column("quantity", TypeName = "int(11)")]
+    public int? Quantity { get; set; }
+
+    /// <summary>Action héroïque, clé de la liste du site (secondwind, hero_generic_rescue…).</summary>
+    [Column("heroSkill")]
+    [StringLength(255)]
+    public string? HeroSkill { get; set; }
+
+    /// <summary>Citoyen à attendre (FK Users ON DELETE SET NULL) ; null avec « wait » : le groupe.</summary>
+    [Column("idTargetUser", TypeName = "int(11)")]
+    public int? IdTargetUser { get; set; }
+
     [ForeignKey("IdExpeditionCitizen")]
     [InverseProperty("ExpeditionOrders")]
     public virtual ExpeditionCitizen? IdExpeditionCitizenNavigation { get; set; }

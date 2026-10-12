@@ -54,7 +54,8 @@ export abstract class RealtimeGlobalService {
             });
     }
 
-    protected async invokeHub(methodName: string, ...args: unknown[]): Promise<void> {
+    /** Appelle une méthode du hub, après (re)connexion si besoin, et renvoie son résultat éventuel. */
+    protected async invokeHub<T = void>(methodName: string, ...args: unknown[]): Promise<T> {
         while (this.hubConnection.state !== 'Connected') {
             if (this.hubConnection.state === 'Disconnected') {
                 await this.startConnexion();
@@ -63,10 +64,10 @@ export abstract class RealtimeGlobalService {
                 await this.sleep(100);
             }
         }
-        await this.hubConnection.invoke(methodName, ...args);
+        return await this.hubConnection.invoke<T>(methodName, ...args);
     }
 
     private sleep(ms: number): Promise<void> {
-        return new Promise((resolve) => setTimeout(resolve, ms));
+        return new Promise((resolve: () => void) => setTimeout(resolve, ms));
     }
 }

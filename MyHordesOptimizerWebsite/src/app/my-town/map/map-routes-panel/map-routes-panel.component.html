@@ -1,0 +1,236 @@
+@switch (status()) {
+    @case ('loaded') {
+        @if (!access()?.is_citizen) {
+            <p class="routes-hint" i18n>Les tracés sont réservés aux citoyens de la ville.</p>
+        } @else {
+            @if (access()?.can_create) {
+                <button mat-flat-button type="button" class="new-route" (click)="createRequested.emit()">
+                    <mat-icon>add</mat-icon>
+                    <ng-container i18n>Nouveau tracé</ng-container>
+                </button>
+            }
+            @if (views().length === 0) {
+                <p class="routes-hint" i18n>Aucun tracé dans cette ville pour l'instant.</p>
+            } @else {
+                @if (has_hidden()) {
+                    <button mat-button type="button" class="show-all" (click)="showAllRequested.emit()">
+                        <mat-icon>visibility</mat-icon>
+                        <ng-container i18n>Tout afficher</ng-container>
+                    </button>
+                }
+
+                @if (today().length) {
+                    <ng-container *ngTemplateOutlet="section; context: { $implicit: today(), title: 'today' }"></ng-container>
+                }
+                @if (free().length) {
+                    <ng-container *ngTemplateOutlet="section; context: { $implicit: free(), title: 'free' }"></ng-container>
+                }
+                @if (previous().length) {
+                    <button mat-button type="button" class="toggle-previous" [attr.aria-expanded]="showPreviousDays()"
+                            (click)="showPreviousDaysChange.emit(!showPreviousDays())">
+                        <mat-icon>history</mat-icon>
+                        @if (showPreviousDays()) {
+                            <ng-container i18n>Masquer les jours précédents</ng-container>
+                        } @else {
+                            <ng-container i18n>Afficher les jours précédents ({{ previous().length }})</ng-container>
+                        }
+                    </button>
+                    @if (showPreviousDays()) {
+                        <ng-container *ngTemplateOutlet="section; context: { $implicit: previous(), title: 'previous' }"></ng-container>
+                    }
+                }
+                @if (game().length) {
+                    <ng-container *ngTemplateOutlet="section; context: { $implicit: game(), title: 'game' }"></ng-container>
+                }
+
+                @if (selected(); as selected) {
+                    @if (detail(); as detail) {
+                        <section class="route-detail" [style.--mho-route-color]="selected.color_var" aria-label="Tracé sélectionné" i18n-aria-label>
+                            <div class="detail-head">
+                                <span class="swatch" [class.dashed]="selected.view.game_route !== null"></span>
+                                <strong class="detail-name">{{ selected.view.label }}</strong>
+                                <button mat-icon-button type="button" (click)="selectedKeyChange.emit(null)"
+                                        aria-label="Fermer la fiche" i18n-aria-label>
+                                    <mat-icon>close</mat-icon>
+                                </button>
+                            </div>
+                            <dl class="detail-fields">
+                                @if (detail.start; as start) {
+                                    <dt i18n>Départ</dt>
+                                    <dd><span class="coordinates">{{ start.coordinates }}</span><span class="muted">{{ start.place }}</span></dd>
+                                }
+                                @if (detail.end; as end) {
+                                    <dt i18n>Arrivée</dt>
+                                    <dd><span class="coordinates">{{ end.coordinates }}</span><span class="muted">{{ end.place }}</span></dd>
+                                }
+                                <dt i18n>Longueur</dt>
+                                <dd><b class="num">{{ selected.view.length }}&nbsp;<ng-container i18n>PA</ng-container>
+                                </b><span class="muted">{{ detail.length_note }}</span></dd>
+                                <dt i18n>Visibilité</dt>
+                                <dd>
+                                    <mat-icon class="inline-icon">{{ detail.is_private ? 'lock' : 'public' }}</mat-icon>
+                                    <span>{{ detail.visibility }}</span></dd>
+                                <dt i18n>Modification</dt>
+                                <dd>{{ detail.edition }}</dd>
+                                <dt i18n>Auteur</dt>
+                                <dd>{{ detail.author }}</dd>
+                                <dt i18n>Couleur</dt>
+                                <dd class="color-field">
+                                    <span class="swatch" [class.dashed]="selected.view.game_route !== null"></span>
+                                    <button mat-stroked-button type="button" class="compact" [matMenuTriggerFor]="colorMenu" i18n>Pour moi seulement</button>
+                                    @if (selected.view.route?.can_edit) {
+                                        <button mat-stroked-button type="button" class="compact" [matMenuTriggerFor]="commonColorMenu" i18n>Changer pour tous
+                                        </button>
+                                    }
+                                </dd>
+                                @if (selected.view.route) {
+                                    <dt i18n>Expédition</dt>
+                                    <dd class="linked-parts">
+                                        @for (part of detail.linked_parts; track $index) {
+                                            <a class="detail-link" routerLink="../expeditions">{{ part }}
+                                                <mat-icon class="inline-icon">chevron_right</mat-icon>
+                                            </a>
+                                        } @empty {
+                                            <span class="muted" i18n>Aucune</span>
+                                        }
+                                    </dd>
+                                }
+                                @if (detail_orders(); as orders) {
+                                    <dt i18n>Consignes</dt>
+                                    <dd>{{ orders }}</dd>
+                                }
+                            </dl>
+                            @if (selected.view.route; as route) {
+                                @if (route.can_edit) {
+                                    <div class="detail-actions">
+                                        <button mat-stroked-button type="button" (click)="editRequested.emit(route)">
+                                            <mat-icon>edit</mat-icon>
+                                            <ng-container i18n>Modifier</ng-container>
+                                        </button>
+                                        <button mat-button type="button" class="danger" (click)="deleteRequested.emit(route)">
+                                            <mat-icon>delete</mat-icon>
+                                            <ng-container i18n>Supprimer</ng-container>
+                                        </button>
+                                    </div>
+                                }
+                            } @else if (selected.view.game_route; as game_route) {
+                                @if (access()?.can_create) {
+                                    <div class="detail-actions">
+                                        <button mat-stroked-button type="button" (click)="copyRequested.emit(game_route)">
+                                            <mat-icon>content_copy</mat-icon>
+                                            <ng-container i18n>Copier dans MHO</ng-container>
+                                        </button>
+                                    </div>
+                                    <p class="detail-hint" i18n>La copie devient un tracé de MyHordes Optimizer : modifiable, liable à une expédition, et gardé
+                                        après la nuit.</p>
+                                }
+                            }
+                            <mat-menu #commonColorMenu="matMenu">
+                                <ng-template matMenuContent>
+                                    @if (selected.view.route; as route) {
+                                        @for (option of color_options; track option.color) {
+                                            <button mat-menu-item type="button" role="menuitemradio" class="color-option"
+                                                    [attr.aria-checked]="route.color === option.color"
+                                                    (click)="commonColorChange.emit({ route, color: option.color })">
+                                                <span class="color-option-content" [style.--mho-route-color]="option.color_var">
+                                                    <span class="swatch"></span>
+                                                    {{ option.label }}
+                                                </span>
+                                            </button>
+                                        }
+                                    }
+                                </ng-template>
+                            </mat-menu>
+                            <mat-menu #colorMenu="matMenu">
+                                <ng-template matMenuContent>
+                                    <button mat-menu-item type="button" role="menuitemradio" class="color-option"
+                                            [attr.aria-checked]="!selected.view.has_personal_color"
+                                            (click)="personalColorChange.emit({ key: selected.view.key, color: null })">
+                                        <span class="color-option-content" [style.--mho-route-color]="selected.common_color_var">
+                                            <span class="swatch"></span>
+                                            <ng-container i18n>Couleur commune</ng-container>
+                                        </span>
+                                    </button>
+                                    @for (option of color_options; track option.color) {
+                                        <button mat-menu-item type="button" role="menuitemradio" class="color-option"
+                                                [attr.aria-checked]="selected.view.has_personal_color && selected.view.color === option.color"
+                                                (click)="personalColorChange.emit({ key: selected.view.key, color: option.color })">
+                                            <span class="color-option-content" [style.--mho-route-color]="option.color_var">
+                                                <span class="swatch"></span>
+                                                {{ option.label }}
+                                            </span>
+                                        </button>
+                                    }
+                                </ng-template>
+                            </mat-menu>
+                        </section>
+                    }
+                }
+            }
+        }
+    }
+    @case ('error') {
+        <p class="routes-hint" i18n>Les tracés n'ont pas pu être chargés.</p>
+    }
+    @default {
+        <p class="routes-hint" i18n>Chargement des tracés…</p>
+    }
+}
+
+<ng-template #section let-items let-title="title">
+    <h2 class="routes-section">
+        @switch (title) {
+            @case ('today') {
+                <ng-container i18n>Expéditions du jour</ng-container>
+            }
+            @case ('free') {
+                <ng-container i18n>Sans expédition</ng-container>
+            }
+            @case ('previous') {
+                <ng-container i18n>Jours précédents</ng-container>
+            }
+            @case ('game') {
+                <ng-container i18n>Créés dans MyHordes</ng-container>
+            }
+        }
+        <span class="count">{{ items.length }}</span>
+        <span class="rule"></span>
+    </h2>
+    @if (title === 'game') {
+        <p class="routes-hint" i18n>Itinéraires tracés en jeu, relus à chaque mise à jour et effacés chaque nuit.</p>
+    }
+    <ul class="routes-list">
+        @for (item of items; track item.view.key) {
+            <li class="route-item" [class.selected]="item.view.key === selectedKey()" [class.off]="item.view.hidden"
+                [style.--mho-route-color]="item.color_var">
+                <button type="button" class="route-main" [attr.aria-pressed]="item.view.key === selectedKey()" (click)="select(item.view.key)">
+                    <span class="swatch" [class.dashed]="item.view.game_route !== null"></span>
+                    <span class="route-text">
+                        <span class="route-name">
+                            <span class="label">{{ item.view.label }}</span>
+                            @if (item.view.route?.is_private) {
+                                <span class="route-flag" [matTooltip]="item.shared_names" [matTooltipDisabled]="!item.shared_count">
+                                    <mat-icon class="inline-icon" aria-label="Privé" i18n-aria-label>lock</mat-icon>
+                                    @if (item.shared_count) {
+                                        <span>{{ item.shared_count }}</span>
+                                    }
+                                </span>
+                            }
+                            @if (item.read_only) {
+                                <span class="route-flag" matTooltip="Lecture seule" i18n-matTooltip>
+                                    <mat-icon class="inline-icon" aria-label="Lecture seule" i18n-aria-label>edit_off</mat-icon>
+                                </span>
+                            }
+                        </span>
+                        <span class="route-sub"><b>{{ item.author }}</b><span class="sep"></span><span class="sub-text">{{ item.subtitle }}</span></span>
+                    </span>
+                    <span class="route-ap">{{ item.view.length }}<small i18n>PA</small></span>
+                </button>
+                <button mat-icon-button type="button" class="eye" (click)="visibilityToggled.emit(item.view.key)"
+                        [attr.aria-label]="(item.view.hidden ? show_label : hide_label) + ' ' + item.view.label">
+                    <mat-icon>{{ item.view.hidden ? 'visibility_off' : 'visibility' }}</mat-icon>
+                </button>
+            </li>
+        }
+    </ul>
+</ng-template>

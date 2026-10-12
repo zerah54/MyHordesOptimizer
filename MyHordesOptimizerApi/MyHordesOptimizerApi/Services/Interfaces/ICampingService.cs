@@ -6,6 +6,7 @@ namespace MyHordesOptimizerApi.Services.Interfaces
     public interface ICampingService
     {
         CampingOddsDto CalculateCamping(CampingParametersDto campingParametersDto);
+        CampingGroupResultDto CalculateGroup(CampingGroupParametersDto group);
         CampingBonusDto GetBonus();
         List<CampingResultDto> GetResults();
     }

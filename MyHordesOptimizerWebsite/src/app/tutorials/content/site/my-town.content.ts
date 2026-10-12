@@ -76,6 +76,27 @@ export const SITE_MY_TOWN: TutorialPage = {
                         </ul>`
                 },
                 {
+                    title: $localize`Tracés`,
+                    content: $localize`<p>Le bouton « Tracés » ouvre la liste des tracés de la ville, réservée à ses citoyens, vivants ou morts (il n'apparaît pas en observant la ville d'un autre) : les tracés de MyHordes Optimizer, rangés par expédition du jour, sans expédition et jours précédents, puis les itinéraires « Créés dans MyHordes » (relus à chaque mise à jour, effacés chaque nuit).</p>
+                        <ul>
+                            <li>l'œil masque ou affiche un tracé sur la carte ; sa couleur se change pour vous seul, ou pour toute la ville avec « Changer pour tous » si vous pouvez le modifier ;</li>
+                            <li>un clic sur un tracé ouvre sa fiche : départ, arrivée, longueur, auteur, visibilité et expéditions qui le suivent ;</li>
+                            <li>sur la fiche d'un itinéraire créé dans MyHordes, « Copier dans MHO » en fait un tracé de MyHordes Optimizer : modifiable, liable à une expédition et gardé après la nuit ;</li>
+                            <li>« Nouveau tracé » : chaque clic sur la carte ajoute une destination, le chemin entre deux clics suit le « Meilleur potentiel » ou « Le plus direct (en L) ». Échap retire la dernière destination ; un clic droit (ou un appui long) sur une case du tracé retire tout ce qui suit ;</li>
+                            <li>donnez-lui un nom et une couleur, choisissez qui le voit et qui peut le modifier, puis « Enregistrer ». Un tracé lié à une expédition reste visible de toute la ville ;</li>
+                            <li>pendant la saisie, la liste des destinations montre aussi les cases à consignes des expéditions du jour qui suivent le tracé, et celles qu'il ne traverse plus (« Hors tracé »).</li>
+                        </ul>`
+                },
+                {
+                    title: $localize`Consignes d'expédition`,
+                    content: $localize`<ul>
+                            <li>une pastille signale les cases qui portent des consignes des expéditions du jour : le nombre de consignes, de la couleur du tracé suivi (grise pour une expédition sans tracé). Elle disparaît avec le tracé quand vous le masquez ;</li>
+                            <li>au survol, l'infobulle montre les consignes qui vous concernent (celles de toute votre expédition et les vôtres), puis résume les autres ;</li>
+                            <li>le détail de la zone (clic) les liste toutes : les vôtres se cochent, chacune se modifie, et « Ajouter une consigne ici » propose les expéditions du jour, celles dont le tracé passe par la case en tête ;</li>
+                            <li>la fiche d'un tracé indique le nombre de consignes posées sur ses cases.</li>
+                        </ul>`
+                },
+                {
                     title: $localize`Mettre à jour une zone`,
                     content: $localize`<p>Un clic sur une case ouvre son détail ; « Mettre à jour la zone » ouvre la fenêtre de saisie :</p>
                         <ul>
@@ -171,11 +192,26 @@ export const SITE_MY_TOWN: TutorialPage = {
                     title: $localize`Organiser (mode édition)`,
                     content: $localize`<ul>
                             <li>« Créer une expédition », avec son nom, les points de contrôle requis et la bascule « Expédition prête » ;</li>
-                            <li>chaque expédition a une ou plusieurs parties (nom du tracé, direction) ; chaque partie a ses places : métier préinscrit, citoyen, soif, départ à 7 PA, points de contrôle, action héroïque, consignes personnelles et sac ;</li>
+                            <li>chaque expédition a une ou plusieurs parties (tracé, direction) ; chaque partie a ses places : métier préinscrit, citoyen, soif, départ à 7 PA, points de contrôle, action héroïque, consignes personnelles et sac ;</li>
                             <li>un citoyen placé dans la première partie est recopié dans les places libres des parties suivantes ;</li>
                             <li>« Consignes de l'expédition » : consignes en texte ou à cocher, réordonnables ;</li>
                             <li>le menu ⋮ permet d'« Importer le jour » (recopier les expéditions d'un jour précédent) et de « Réorganiser » par glisser-déposer.</li>
                         </ul>`
+                },
+                {
+                    title: $localize`Tracé et feuille de route`,
+                    content: $localize`<ul>
+                            <li>en mode édition, la liste « Tracé » de l'en-tête d'une partie la lie à un tracé de la ville (un tracé ne suit les expéditions que d'un seul jour) ; « Nouveau tracé… » ouvre la carte pour le dessiner. Lier un tracé privé le rend visible de toute la ville. La direction de la partie est déduite du tracé ;</li>
+                            <li>« Voir sur la carte » ouvre la carte sur la fiche du tracé lié ;</li>
+                            <li>la feuille de route montre une mini-carte du tracé, puis les cases à consignes dans l'ordre du tracé, avec les PA au premier passage (sans tracé, par distance à la ville) ;</li>
+                            <li>en mode édition, « Consigne sur cette case » ou un clic sur la mini-carte ajoute une consigne sur une case : texte libre, Ramasser, Déposer, Consommer, Déblayer (bâtiment enseveli), Explorer la ruine (ruine explorable), Camper, Action héroïque ou Attendre, pour toute l'expédition ou pour une place ;</li>
+                            <li>une consigne dont la case n'est plus sur le tracé est marquée « Hors tracé » : déplacez-la sur une case du tracé, ou supprimez-la ;</li>
+                            <li>« Importer le jour » recopie aussi les tracés liés : les expéditions importées suivent leurs propres copies.</li>
+                        </ul>`
+                },
+                {
+                    title: $localize`Ancienne ville`,
+                    content: $localize`<p>Mort, ou passé à une autre ville, vous gardez la main sur votre ancienne ville tant qu'elle n'est pas terminée : ouverte depuis l'annuaire des villes, elle s'affiche en observation, mais ses expéditions, leurs consignes (page Expéditions et détail des zones) et ses tracés restent modifiables, en temps réel avec ses citoyens. Le bandeau d'observation le rappelle. Le reste de la ville (citoyens, zones, souhaits…) reste en lecture seule.</p>`
                 }
             ]
         }

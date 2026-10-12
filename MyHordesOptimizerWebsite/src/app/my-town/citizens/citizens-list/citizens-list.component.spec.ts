@@ -1,5 +1,5 @@
 import { HttpRequest, provideHttpClient, withXhr } from '@angular/common/http';
-import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
+import { HttpTestingController, provideHttpClientTesting, TestRequest } from '@angular/common/http/testing';
 import { ChangeDetectorRef } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
@@ -15,6 +15,7 @@ import { ChamanicDetail } from '../../../_abstract_model/types/chamanic-detail.c
 import { Citizen } from '../../../_abstract_model/types/citizen.class';
 import { CitizenInfo } from '../../../_abstract_model/types/citizen-info.class';
 import { DailyAction } from '../../../_abstract_model/types/daily-action.class';
+import { HERO_SKILL_FAMILIES, HeroSkillFamily, HeroSkillFamilyInfo } from '../../../_abstract_model/types/hero-skill-levels';
 import { Home, HomeWithValue } from '../../../_abstract_model/types/home.class';
 import { Item } from '../../../_abstract_model/types/item.class';
 import { Status } from '../../../_abstract_model/types/status.class';
@@ -295,6 +296,98 @@ describe('CitizensListComponent', (): void => {
         }).houseLevelOf(citizen);
 
         expect(result?.value).toBe(3);
+    });
+
+    describe('capacités héroïques et campings (saisis à la main)', (): void => {
+        interface ManualDataComponent {
+            updateHeroSkill(citizen_id: number, family: HeroSkillFamily, value: number): void;
+            updateCampingCount(citizen_id: number, value: number): void;
+            heroSkillLabel(family: HeroSkillFamilyInfo, level: number | null): string;
+        }
+
+        function manual(): ManualDataComponent {
+            return component as unknown as ManualDataComponent;
+        }
+
+        function familyR(): HeroSkillFamilyInfo {
+            return <HeroSkillFamilyInfo>HERO_SKILL_FAMILIES.find((family: HeroSkillFamilyInfo): boolean => family.key === 'r');
+        }
+
+        function citizenWithSkills(): Citizen {
+            const citizen: Citizen = makeCitizen(42, 'Zoe');
+            citizen.hero_skills = { s: 1, u: null, p: 0, e: 4, r: 2 };
+            citizen.camping_count = 3;
+            testable.citizen_list = { data: [citizen] };
+            return citizen;
+        }
+
+        it('enregistre le niveau d\'un groupe avec les quatre autres, « ? » redevenant inconnu', (): void => {
+            const citizen: Citizen = citizenWithSkills();
+            const httpMock: HttpTestingController = TestBed.inject(HttpTestingController);
+
+            manual().updateHeroSkill(42, 'r', 3);
+            const request: TestRequest = httpMock.expectOne((candidate: HttpRequest<unknown>): boolean => candidate.url.includes('/user/42/heroSkills'));
+            expect(JSON.parse(<string>request.request.body)).toEqual({ s: 1, u: null, p: 0, e: 4, r: 3 });
+            request.flush(null);
+
+            manual().updateHeroSkill(42, 's', -1);
+            httpMock.expectOne((candidate: HttpRequest<unknown>): boolean => candidate.url.includes('/heroSkills')).flush(null);
+
+            expect(citizen.hero_skills).toEqual({ s: null, u: null, p: 0, e: 4, r: 3 });
+        });
+
+        it('rétablit le niveau si l\'enregistrement échoue', (): void => {
+            const citizen: Citizen = citizenWithSkills();
+            const httpMock: HttpTestingController = TestBed.inject(HttpTestingController);
+
+            manual().updateHeroSkill(42, 'r', 4);
+            httpMock.expectOne((candidate: HttpRequest<unknown>): boolean => candidate.url.includes('/heroSkills'))
+                .flush('ko', { status: 500, statusText: 'Server Error' });
+
+            expect(citizen.hero_skills.r).toBe(2);
+        });
+
+        it('enregistre le nombre de campings', (): void => {
+            const citizen: Citizen = citizenWithSkills();
+            const httpMock: HttpTestingController = TestBed.inject(HttpTestingController);
+
+            manual().updateCampingCount(42, 0);
+            const request: TestRequest = httpMock.expectOne((candidate: HttpRequest<unknown>): boolean => candidate.url.includes('/user/42/campingCount'));
+            expect(JSON.parse(<string>request.request.body)).toEqual({ campingCount: 0 });
+            request.flush(null);
+
+            expect(citizen.camping_count).toBe(0);
+        });
+
+        it('rétablit les campings si l\'enregistrement échoue', (): void => {
+            const citizen: Citizen = citizenWithSkills();
+            const httpMock: HttpTestingController = TestBed.inject(HttpTestingController);
+
+            manual().updateCampingCount(42, 5);
+            httpMock.expectOne((candidate: HttpRequest<unknown>): boolean => candidate.url.includes('/campingCount'))
+                .flush('ko', { status: 500, statusText: 'Server Error' });
+
+            expect(citizen.camping_count).toBe(3);
+        });
+
+        it('compte 0 camping quand rien n\'est saisi', (): void => {
+            expect(new Citizen().camping_count).toBe(0);
+            expect(testable.sortValue(makeCitizen(43, 'Yan'), 'camping_count')).toBe(0);
+        });
+
+        it('trie sur un groupe (l\'inconnu en dernier) ou les campings', (): void => {
+            const citizen: Citizen = citizenWithSkills();
+
+            expect(testable.sortValue(citizen, 'skill_r')).toBe(2);
+            expect(testable.sortValue(citizen, 'skill_u')).toBe(-1);
+            expect(testable.sortValue(citizen, 'camping_count')).toBe(3);
+        });
+
+        it('décrit le niveau dans l\'infobulle', (): void => {
+            expect(manual().heroSkillLabel(familyR(), null)).toBe('R : niveau inconnu');
+            expect(manual().heroSkillLabel(familyR(), 0)).toBe('R : aucun niveau');
+            expect(manual().heroSkillLabel(familyR(), 2)).toBe('R : Apprenti');
+        });
     });
 
     describe('mode observateur (is_readonly)', (): void => {

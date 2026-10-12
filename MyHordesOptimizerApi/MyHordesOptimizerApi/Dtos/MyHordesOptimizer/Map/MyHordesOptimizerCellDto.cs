@@ -49,6 +49,15 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Map
         /// <summary>Borne haute du nombre réel de zombies déduite de l'estimation.</summary>
         public int? ScoutEstimationMax { get; set; }
 
+        /// <summary>
+        /// Aménagement de la zone pour le camping, au jour de la ville (les nuits écoulées depuis
+        /// la saisie déjà retirées). <c>null</c> si rien n'a été saisi.
+        /// </summary>
+        public int? CampImprovementLevel { get; set; }
+
+        /// <summary>Jour de la dernière saisie de l'aménagement.</summary>
+        public int? CampImprovementDay { get; set; }
+
         public LastUpdateInfoDto? LastUpdateInfo { get; set; }
 
         /// <summary>

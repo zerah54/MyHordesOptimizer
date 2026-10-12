@@ -27,10 +27,12 @@ using MyHordesOptimizerApi.Repository.Interfaces;
 using MyHordesOptimizerApi.Repository.Interfaces.ExternalTools;
 using MyHordesOptimizerApi.Configuration.Interfaces;
 using MyHordesOptimizerApi.Services.Impl.Locking;
+using MyHordesOptimizerApi.Services.Impl.MapRoutes;
 using MyHordesOptimizerApi.Services.Impl.Maps;
 using MyHordesOptimizerApi.Services.Interfaces.ExternalTools;
 using Newtonsoft.Json.Linq;
 using IAuthenticationService = MyHordesOptimizerApi.Services.Interfaces.IAuthenticationService;
+using ITownAccessService = MyHordesOptimizerApi.Services.Interfaces.ITownAccessService;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -52,6 +54,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
         protected TownSyncLock TownSyncLock { get; private set; }
         protected IAuthenticationService AuthenticationService { get; private set; }
         protected IMyHordesScrutateurConfiguration MyHordesScrutateurConfiguration { get; private set; }
+        protected ITownAccessService TownAccessService { get; private set; }
 
         public ExternalToolsService(ILogger<ExternalToolsService> logger,
             IBigBrothHordesRepository bigBrothHordesRepository,
@@ -63,7 +66,8 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
             IMyHordesApiRepository myHordesApiRepository,
             TownSyncLock townSyncLock,
             IAuthenticationService authenticationService,
-            IMyHordesScrutateurConfiguration myHordesScrutateurConfiguration)
+            IMyHordesScrutateurConfiguration myHordesScrutateurConfiguration,
+            ITownAccessService townAccessService)
         {
             Logger = logger;
             BigBrothHordesRepository = bigBrothHordesRepository;
@@ -76,6 +80,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
             TownSyncLock = townSyncLock;
             AuthenticationService = authenticationService;
             MyHordesScrutateurConfiguration = myHordesScrutateurConfiguration;
+            TownAccessService = townAccessService;
         }
 
         public async Task<UpdateResponseDto> UpdateExternalsTools(UpdateRequestDto updateRequestDto, IExternalToolsProgressSink sink = null)
@@ -277,6 +282,16 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                             var simpleMe = Mapper.Map<SimpleMeDto>(me);
                             var renewedToken = AuthenticationService.CreateToken(simpleMe, UserInfoProvider.UserKey);
                             sink.SetRenewedToken(new AuthenticationResponseDto { SimpleMe = simpleMe, Token = renewedToken });
+                        }
+
+                        // La carte et les citoyens viennent de la ville que MyHordes associe à la clé du
+                        // joueur ; la ville écrite est celle envoyée par le client. Elles doivent être la
+                        // même, sinon n'importe qui pourrait écrire sa carte et ses citoyens dans une autre
+                        // ville (et s'y déclarer citoyen). Vérifié APRÈS le renouvellement du jeton : un
+                        // client resté sur son ancienne ville récupère quand même le bon jeton.
+                        if (me.MapId != townDetails.TownId)
+                        {
+                            throw new MhoForbiddenException($"La ville envoyée ({townDetails.TownId}) n'est pas celle du joueur dans MyHordes ({me.MapId?.ToString() ?? "aucune"}).");
                         }
 
                         // Même clé que le login (GetSimpleMeAsync) : le mapId, jamais le townId
@@ -630,6 +645,24 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                             dbContext.SaveChanges();
                             dbContext.MapCellItems.AddRange(listCellItems);
                         }
+                        // Itinéraires créés dans MyHordes : instantané du jour, remplacé en bloc (le jeu les
+                        // efface chaque nuit). Rien n'est touché si MyHordes ne les a pas renvoyés.
+                        if (townEntity != null && observationDay.HasValue && me.Map?.Expeditions != null)
+                        {
+                            var authorIds = me.Map.Expeditions
+                                .Select(expedition => expedition?.Author?.Id)
+                                .Where(authorId => authorId.HasValue)
+                                .Select(authorId => authorId!.Value)
+                                .Distinct()
+                                .ToList();
+                            var knownAuthorIds = dbContext.Users
+                                .Where(user => authorIds.Contains(user.IdUser))
+                                .Select(user => user.IdUser)
+                                .ToHashSet();
+                            dbContext.MapRouteGames.RemoveRange(dbContext.MapRouteGames.Where(gameRoute => gameRoute.IdTown == townId));
+                            dbContext.MapRouteGames.AddRange(MapRouteGames.FromMyHordes(me.Map.Expeditions, townId, observationDay.Value,
+                                townEntity.Width, townEntity.Height, knownAuthorIds, newLastUpdate.IdLastUpdateInfo));
+                        }
                         dbContext.SaveChanges();
                         transaction.Commit();
                         sink.Succeeded(ExternalToolId.MyHordesOptimizer, ExternalToolUpdateUnits.Map);
@@ -656,6 +689,9 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                         // d'y toucher, puis on prend le même verrou pour s'exclure d'un autre joueur
                         // de la même ville en train de faire la même mise à jour.
                         if (mhoTask != null) await mhoTask;
+                        // Après mhoTask : si elle a confirmé la ville auprès de MyHordes, elle y a aussi inscrit le
+                        // joueur (cas d'un jeton resté sur l'ancienne ville). Sinon, il faut en être citoyen.
+                        await TownAccessService.EnsureCanWriteTownAsync(resolvedTownId, townDetails.TownId);
                         await using var townLock = await TownSyncLock.AcquireTownAsync(-townDetails.TownId);
 
                         UpdateBags(resolvedTownId, updateRequestDto.Bags.Contents);
@@ -754,6 +790,9 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                             // sa fin, puis on prend le même verrou par ville qu'elle (autre joueur de
                             // la même ville en train de synchroniser en parallèle).
                             if (mhoTask != null) await mhoTask;
+                            // Après mhoTask : si elle a confirmé la ville auprès de MyHordes, elle y a aussi inscrit le
+                            // joueur (cas d'un jeton resté sur l'ancienne ville). Sinon, il faut en être citoyen.
+                            await TownAccessService.EnsureCanWriteTownAsync(resolvedTownId, townDetails.TownId);
                             await using var townLock = await TownSyncLock.AcquireTownAsync(-townDetails.TownId);
 
                             using var scope = ServiceScopeFactory.CreateScope();
@@ -849,6 +888,9 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                         // que digsTask vient d'écrire. On attend sa fin, puis on prend le même verrou
                         // par ville (autre joueur de la même ville en train de synchroniser).
                         if (mhoTask != null) await mhoTask;
+                        // Après mhoTask : si elle a confirmé la ville auprès de MyHordes, elle y a aussi inscrit le
+                        // joueur (cas d'un jeton resté sur l'ancienne ville). Sinon, il faut en être citoyen.
+                        await TownAccessService.EnsureCanWriteTownAsync(resolvedTownId, townDetails.TownId);
                         await using var townLock = await TownSyncLock.AcquireTownAsync(-townDetails.TownId);
 
                         using var scope = ServiceScopeFactory.CreateScope();
@@ -1215,7 +1257,9 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
             using var townLock = TownSyncLock.AcquireTownBlocking(-townId);
             using var scope = ServiceScopeFactory.CreateScope();
             var dbContext = scope.ServiceProvider.GetRequiredService<MhoContext>();
+            var mapId = townId;
             townId = dbContext.ResolveTownId(townId);
+            TownAccessService.EnsureCanWriteTown(townId, mapId);
             using var transaction = dbContext.Database.BeginTransaction();
             LastUpdateInfoDto lastUpdateInfoDto = UserInfoProvider.GenerateLastUpdateInfo();
             var newLastUpdate = dbContext.LastUpdateInfos.Update(Mapper.Map<LastUpdateInfo>(lastUpdateInfoDto, opt => opt.SetDbContext(dbContext))).Entity;
@@ -1297,7 +1341,9 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
             using var townLock = TownSyncLock.AcquireTownBlocking(-townId);
             using var scope = ServiceScopeFactory.CreateScope();
             var dbContext = scope.ServiceProvider.GetRequiredService<MhoContext>();
+            var mapId = townId;
             townId = dbContext.ResolveTownId(townId);
+            TownAccessService.EnsureCanWriteTown(townId, mapId);
             using var transaction = dbContext.Database.BeginTransaction();
             LastUpdateInfoDto lastUpdateInfoDto = UserInfoProvider.GenerateLastUpdateInfo();
             var newLastUpdate = dbContext.LastUpdateInfos.Update(Mapper.Map<LastUpdateInfo>(lastUpdateInfoDto, opt => opt.SetDbContext(dbContext))).Entity;
@@ -1319,7 +1365,9 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
             using var townLock = TownSyncLock.AcquireTownBlocking(-townId);
             using var scope = ServiceScopeFactory.CreateScope();
             var dbContext = scope.ServiceProvider.GetRequiredService<MhoContext>();
+            var mapId = townId;
             townId = dbContext.ResolveTownId(townId);
+            TownAccessService.EnsureCanWriteTown(townId, mapId);
             using var transaction = dbContext.Database.BeginTransaction();
             LastUpdateInfoDto lastUpdateInfoDto = UserInfoProvider.GenerateLastUpdateInfo();
             var newLastUpdate = dbContext.LastUpdateInfos.Update(Mapper.Map<LastUpdateInfo>(lastUpdateInfoDto, opt => opt.SetDbContext(dbContext))).Entity;
@@ -1342,7 +1390,9 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
             using var townLock = TownSyncLock.AcquireTownBlocking(-townId);
             using var scope = ServiceScopeFactory.CreateScope();
             var dbContext = scope.ServiceProvider.GetRequiredService<MhoContext>();
+            var mapId = townId;
             townId = dbContext.ResolveTownId(townId);
+            TownAccessService.EnsureCanWriteTown(townId, mapId);
             using var transaction = dbContext.Database.BeginTransaction();
             LastUpdateInfoDto lastUpdateInfoDto = UserInfoProvider.GenerateLastUpdateInfo();
             var newLastUpdate = dbContext.LastUpdateInfos.Update(Mapper.Map<LastUpdateInfo>(lastUpdateInfoDto, opt => opt.SetDbContext(dbContext))).Entity;
@@ -1470,7 +1520,9 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
             using var townLock = TownSyncLock.AcquireTownBlocking(-townId);
             using var scope = ServiceScopeFactory.CreateScope();
             var dbContext = scope.ServiceProvider.GetRequiredService<MhoContext>();
+            var mapId = townId;
             townId = dbContext.ResolveTownId(townId);
+            TownAccessService.EnsureCanWriteTown(townId, mapId);
             using var transaction = dbContext.Database.BeginTransaction();
             LastUpdateInfoDto lastUpdateInfoDto = UserInfoProvider.GenerateLastUpdateInfo();
             var newLastUpdate = dbContext.LastUpdateInfos.Update(Mapper.Map<LastUpdateInfo>(lastUpdateInfoDto, opt => opt.SetDbContext(dbContext))).Entity;
@@ -1495,7 +1547,9 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
             using var townLock = TownSyncLock.AcquireTownBlocking(-townId);
             using var scope = ServiceScopeFactory.CreateScope();
             var dbContext = scope.ServiceProvider.GetRequiredService<MhoContext>();
+            var mapId = townId;
             townId = dbContext.ResolveTownId(townId);
+            TownAccessService.EnsureCanWriteTown(townId, mapId);
             using var transaction = dbContext.Database.BeginTransaction();
             LastUpdateInfoDto lastUpdateInfoDto = UserInfoProvider.GenerateLastUpdateInfo();
             var newLastUpdate = dbContext.LastUpdateInfos.Update(Mapper.Map<LastUpdateInfo>(lastUpdateInfoDto, opt => opt.SetDbContext(dbContext))).Entity;

@@ -93,6 +93,7 @@
         </div>
         <mat-divider></mat-divider>
     }
+    <mho-map-cell-orders class="orders" [cell]="cell()" [items]="allItems()" [citizens]="allCitizens()"></mho-map-cell-orders>
     <div class="last-update">
         <mho-last-update [lastUpdateInfo]="cell().update_info"></mho-last-update>
     </div>

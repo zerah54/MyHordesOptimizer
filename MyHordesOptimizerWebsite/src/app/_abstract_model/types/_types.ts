@@ -27,6 +27,9 @@ export type TownPhase = 'ALPHA' | 'BETA' | 'IMPORT' | 'NATIVE';
 
 export type ExpeditionOrderType = 'checkbox' | 'text';
 
+/** Consigne typée (`ExpeditionOrderKinds` côté API) ; une consigne sans type est un texte libre. */
+export type ExpeditionOrderKind = 'pick' | 'drop' | 'use' | 'clear' | 'explore' | 'excavate' | 'camp' | 'hero' | 'wait';
+
 export interface ListForAddRemove {
     label: string;
     list: (Item | StatusEnum)[];

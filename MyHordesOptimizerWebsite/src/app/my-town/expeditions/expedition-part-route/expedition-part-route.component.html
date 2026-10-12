@@ -1,0 +1,48 @@
+<div class="part-route">
+    @if (editable()) {
+        <mat-form-field subscriptSizing="dynamic" [appearance]="'outline'" class="compact-field route-field">
+            <mat-label i18n>Tracé</mat-label>
+            <mat-select [value]="part().map_route_id" (selectionChange)="select($event)">
+                <mat-select-trigger>
+                    @if (linked(); as route) {
+                        <span class="route">
+                            <span class="swatch" [style.background]="linked_color()"></span>
+                            <span class="label">{{ route.label }}</span>
+                            <span class="ap">{{ route.length }}<small>PA</small></span>
+                        </span>
+                    }
+                </mat-select-trigger>
+                <mat-option [value]="null" i18n>Aucun</mat-option>
+                @for (option of options(); track option.id) {
+                    <mat-option [value]="option.id" [disabled]="option.disabled">
+                        <span class="route">
+                            <span class="swatch" [style.background]="option.color"></span>
+                            <span class="label">{{ option.label }}</span>
+                            @if (option.is_private) {
+                                <mat-icon class="lock" aria-label="Privé" i18n-aria-label>lock</mat-icon>
+                            }
+                            <span class="ap">{{ option.length }}<small>PA</small></span>
+                        </span>
+                    </mat-option>
+                }
+                @if (canCreate()) {
+                    <mat-option [value]="new_route">
+                        <span class="route new"><mat-icon>add</mat-icon><ng-container i18n>Nouveau tracé…</ng-container></span>
+                    </mat-option>
+                }
+            </mat-select>
+        </mat-form-field>
+    } @else if (linked(); as route) {
+        <span class="route readonly">
+            <span class="swatch" [style.background]="linked_color()"></span>
+            <span class="label">{{ route.label }}</span>
+            <span class="ap">{{ route.length }}<small>PA</small></span>
+        </span>
+    }
+    @if (linked(); as route) {
+        <a mat-button class="see-on-map" routerLink="../map" [queryParams]="{ route: route.id }">
+            <mat-icon>map</mat-icon>
+            <ng-container i18n>Voir sur la carte</ng-container>
+        </a>
+    }
+</div>

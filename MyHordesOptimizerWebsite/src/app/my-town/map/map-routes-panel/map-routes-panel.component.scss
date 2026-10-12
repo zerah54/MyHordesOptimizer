@@ -1,0 +1,309 @@
+:host {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.routes-hint {
+    margin: 0;
+    font-size: 12px;
+    line-height: 1.45;
+    color: var(--mho-text-muted);
+}
+
+.new-route,
+.show-all,
+.toggle-previous {
+    align-self: flex-start;
+}
+
+/* Intitulé de groupe : petites capitales, compteur et filet jusqu'au bord. */
+.routes-section {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+    font: 600 11px var(--mho-font-body);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--mho-text-muted);
+
+    .count {
+        padding: 0 6px;
+        border-radius: 99px;
+        background: var(--mho-surface-3);
+        letter-spacing: 0;
+    }
+
+    .rule {
+        flex-grow: 1;
+        height: 1px;
+        background: var(--mho-line);
+    }
+}
+
+/* Échantillon de couleur : la ligne et son liseré, comme sur la carte. Pointillé pour un itinéraire du jeu. */
+.swatch {
+    position: relative;
+    flex-shrink: 0;
+    width: 26px;
+    height: 8px;
+    border-radius: 99px;
+    background: var(--mho-route-color);
+    box-shadow: 0 0 0 1.5px var(--mho-route-casing), 0 0 0 2.5px var(--mho-line);
+
+    &.dashed {
+        background: repeating-linear-gradient(90deg, var(--mho-route-color) 0 5px, transparent 5px 8px);
+    }
+}
+
+.routes-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.route-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    border: 1px solid transparent;
+    border-radius: var(--mho-radius-m);
+
+    &:hover {
+        background: var(--mho-hover);
+    }
+
+    &.selected {
+        border-color: var(--mho-line-strong);
+        background: var(--mho-surface-2);
+        box-shadow: inset 3px 0 0 var(--mho-route-color);
+    }
+
+    &.off .route-main {
+        opacity: 0.55;
+    }
+}
+
+.route-main {
+    display: flex;
+    flex-grow: 1;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+    padding: 8px 4px 8px 10px;
+    border: 0;
+    border-radius: var(--mho-radius-m);
+    background: none;
+    color: inherit;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+
+    &:focus-visible {
+        outline: 2px solid var(--mho-accent);
+        outline-offset: -2px;
+    }
+}
+
+.route-text {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    gap: 2px;
+    min-width: 0;
+}
+
+.route-name {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13.5px;
+    font-weight: 600;
+
+    .label {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+}
+
+.route-flag {
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    gap: 2px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--mho-text-muted);
+}
+
+.route-sub {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    overflow: hidden;
+    font-size: 11.5px;
+    color: var(--mho-text-muted);
+    white-space: nowrap;
+
+    b {
+        font-weight: 700;
+        color: var(--mho-text);
+    }
+
+    .sep {
+        flex-shrink: 0;
+        width: 3px;
+        height: 3px;
+        border-radius: 99px;
+        background: currentColor;
+        opacity: 0.7;
+    }
+
+    .sub-text {
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+}
+
+.route-ap {
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: baseline;
+    gap: 2px;
+    font: 700 13px var(--mho-font-body);
+    font-variant-numeric: tabular-nums;
+
+    small {
+        font-size: 10.5px;
+        color: var(--mho-text-muted);
+    }
+}
+
+.inline-icon {
+    width: 14px;
+    height: 14px;
+    font-size: 14px;
+    line-height: 14px;
+}
+
+/* Fiche du tracé choisi */
+.route-detail {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 12px;
+    border: 1px solid var(--mho-line);
+    border-radius: var(--mho-radius-l);
+    background: var(--mho-surface-2);
+}
+
+.detail-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    .detail-name {
+        flex-grow: 1;
+        min-width: 0;
+        overflow-wrap: anywhere;
+        font: 700 15px var(--mho-font-display);
+    }
+}
+
+.detail-fields {
+    display: grid;
+    grid-template-columns: 84px minmax(0, 1fr);
+    align-items: center;
+    gap: 6px 10px;
+    margin: 0;
+    font-size: 12.5px;
+
+    dt {
+        font-size: 11.5px;
+        font-weight: 600;
+        color: var(--mho-text-muted);
+    }
+
+    dd {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 4px 6px;
+        min-width: 0;
+        margin: 0;
+    }
+
+    .coordinates,
+    .num {
+        font-variant-numeric: tabular-nums;
+        font-weight: 600;
+    }
+
+    .muted {
+        color: var(--mho-text-muted);
+    }
+
+    .compact {
+        height: 26px;
+        padding: 0 8px;
+        font-size: 12px;
+    }
+
+    .linked-parts {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
+
+.detail-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    color: var(--mho-accent);
+    font-weight: 600;
+    text-decoration: none;
+
+    &:hover {
+        text-decoration: underline;
+    }
+}
+
+/* Modifier, Supprimer : sous la fiche, le geste destructeur à l'écart. */
+.detail-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 6px;
+
+    .danger {
+        color: var(--mat-sys-error);
+    }
+}
+
+/* Menu des couleurs (affiché dans la couche de superposition, styles propres au composant). */
+.color-option-content {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.color-option[aria-checked='true'] {
+    background-color: var(--mho-accent-soft);
+    color: var(--mho-on-accent-soft);
+
+    .color-option-content {
+        font-weight: 600;
+    }
+}
+
+/* Explication sous « Copier dans MHO ». */
+.detail-hint {
+    margin: 6px 0 0;
+    font-size: 12px;
+    color: var(--mho-text-muted);
+}

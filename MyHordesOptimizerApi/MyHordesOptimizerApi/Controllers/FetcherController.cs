@@ -191,33 +191,34 @@ namespace MyHordesOptimizerApi.Controllers
         }
 
 
+        /// <summary>
+        /// Jeton obligatoire : l'auteur est celui du jeton (le userId de query, autrefois recopié dans
+        /// UserInfoProvider sans vérification, est ignoré), et le service vérifie qu'il est citoyen de la
+        /// ville et que les cases en font partie.
+        /// </summary>
         [HttpPost]
         [Route("MapDigs")]
+        [Authorize]
         public ActionResult<List<MyHordesOptimizerMapDigDto>> CreaterOrUpdateMapDig([FromQuery] int? townId,
-            [FromQuery] int? userId, [FromBody] List<MyHordesOptimizerMapDigDto> requests)
+            [FromBody] List<MyHordesOptimizerMapDigDto> requests)
         {
-            if (!userId.HasValue)
-            {
-                return BadRequest($"{nameof(userId)} cannot be empty");
-            }
-
-            if (!userId.HasValue)
+            if (!townId.HasValue)
             {
                 return BadRequest($"{nameof(townId)} cannot be empty");
             }
 
-            if (requests == null || !requests.Any() || (requests.Any(x => x.CellId == 0) && townId == null))
+            if (requests == null || !requests.Any())
             {
-                return BadRequest($"{nameof(townId)} cannot be empty when no cellId is provided");
+                return BadRequest($"{nameof(requests)} cannot be empty");
             }
 
-            UserInfoProvider.UserId = userId.Value;
-            var dto = _myHordesFetcherService.CreateOrUpdateMapDigs(townId.Value, userId.Value, requests);
+            var dto = _myHordesFetcherService.CreateOrUpdateMapDigs(townId.Value, UserInfoProvider.UserId, requests);
             return Ok(dto);
         }
 
         [HttpDelete]
         [Route("MapDigs")]
+        [Authorize]
         public ActionResult<LastUpdateInfoDto> CreaterOrUpdateMapDig([FromQuery] int? idCell, [FromQuery] int? diggerId,
             [FromQuery] int? day)
         {

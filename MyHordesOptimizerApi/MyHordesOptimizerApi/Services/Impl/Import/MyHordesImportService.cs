@@ -14,6 +14,7 @@ using MyHordesOptimizerApi.Models.Translation;
 using MyHordesOptimizerApi.Models.Import;
 using MyHordesOptimizerApi.Repository.Interfaces;
 using MyHordesOptimizerApi.Services.Impl.Locking;
+using MyHordesOptimizerApi.Services.Impl.Translations;
 using MyHordesOptimizerApi.Services.Interfaces.Import;
 using MyHordesOptimizerApi.Services.Interfaces.Translations;
 using Newtonsoft.Json.Linq;
@@ -128,19 +129,20 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
             foreach (var codeCapacity in codeCapacities)
             {
                 var capacitie = Mapper.Map<HeroSkill>(codeCapacity);
-                capacitie.LabelFr = Traduire(translations, "fr", capacitie.LabelDe);
-                capacitie.LabelEn = Traduire(translations, "en", capacitie.LabelDe);
-                capacitie.LabelEs = Traduire(translations, "es", capacitie.LabelDe);
-                capacitie.DescriptionFr = Traduire(translations, "fr", capacitie.DescriptionDe);
-                capacitie.DescriptionEn = Traduire(translations, "en", capacitie.DescriptionDe);
-                capacitie.DescriptionEs = Traduire(translations, "es", capacitie.DescriptionDe);
+                var domaine = codeCapacity.TranslationDomain;
+                capacitie.LabelFr = Traduire(translations, "fr", capacitie.LabelDe, domaine);
+                capacitie.LabelEn = Traduire(translations, "en", capacitie.LabelDe, domaine);
+                capacitie.LabelEs = Traduire(translations, "es", capacitie.LabelDe, domaine);
+                capacitie.DescriptionFr = Traduire(translations, "fr", capacitie.DescriptionDe, domaine);
+                capacitie.DescriptionEn = Traduire(translations, "en", capacitie.DescriptionDe, domaine);
+                capacitie.DescriptionEs = Traduire(translations, "es", capacitie.DescriptionDe, domaine);
                 // Arbre de compétences : groupe et puces se traduisent comme les libellés (même repli sur l'allemand).
-                capacitie.GroupFr = TraduireSiPresent(translations, "fr", capacitie.GroupDe);
-                capacitie.GroupEn = TraduireSiPresent(translations, "en", capacitie.GroupDe);
-                capacitie.GroupEs = TraduireSiPresent(translations, "es", capacitie.GroupDe);
-                capacitie.BulletsFr = TraduirePuces(translations, "fr", codeCapacity.Bullets);
-                capacitie.BulletsEn = TraduirePuces(translations, "en", codeCapacity.Bullets);
-                capacitie.BulletsEs = TraduirePuces(translations, "es", codeCapacity.Bullets);
+                capacitie.GroupFr = TraduireSiPresent(translations, "fr", capacitie.GroupDe, domaine);
+                capacitie.GroupEn = TraduireSiPresent(translations, "en", capacitie.GroupDe, domaine);
+                capacitie.GroupEs = TraduireSiPresent(translations, "es", capacitie.GroupDe, domaine);
+                capacitie.BulletsFr = TraduirePuces(translations, "fr", codeCapacity.Bullets, domaine);
+                capacitie.BulletsEn = TraduirePuces(translations, "en", codeCapacity.Bullets, domaine);
+                capacitie.BulletsEs = TraduirePuces(translations, "es", codeCapacity.Bullets, domaine);
                 capacities.Add(capacitie);
             }
 
@@ -152,16 +154,16 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
         /// <summary>
         /// <see cref="Traduire"/> pour une valeur facultative : null reste null (compétence hors de l'arbre).
         /// </summary>
-        private string? TraduireSiPresent(Dictionary<string, List<YmlTranslationFileModel>> translations, string langue, string? cleAllemande)
+        private string? TraduireSiPresent(Dictionary<string, List<YmlTranslationFileModel>> translations, string langue, string? cleAllemande, string domaine)
         {
-            return cleAllemande is null ? null : Traduire(translations, langue, cleAllemande);
+            return cleAllemande is null ? null : Traduire(translations, langue, cleAllemande, domaine);
         }
 
         /// <summary>
         /// Traduit chaque puce (avantage d'un niveau de l'arbre) avec <see cref="Traduire"/>, donc avec le même repli
         /// sur l'allemand, et renvoie le tableau JSON à stocker. Null quand la compétence n'a pas de puces.
         /// </summary>
-        private string? TraduirePuces(Dictionary<string, List<YmlTranslationFileModel>> translations, string langue, List<string>? puces)
+        private string? TraduirePuces(Dictionary<string, List<YmlTranslationFileModel>> translations, string langue, List<string>? puces, string domaine)
         {
             if (puces is null || puces.Count == 0)
             {
@@ -170,7 +172,7 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
             var traductions = new List<string>(puces.Count);
             foreach (var puce in puces)
             {
-                traductions.Add(Traduire(translations, langue, puce));
+                traductions.Add(Traduire(translations, langue, puce, domaine));
             }
             return HeroSkillBullets.Serialize(traductions);
         }
@@ -190,12 +192,12 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
             foreach (var causeOfDeath in causesOfDeaths)
             {
 
-                causeOfDeath.LabelFr = Traduire(translations, "fr", causeOfDeath.LabelDe);
-                causeOfDeath.LabelEn = Traduire(translations, "en", causeOfDeath.LabelDe);
-                causeOfDeath.LabelEs = Traduire(translations, "es", causeOfDeath.LabelDe);
-                causeOfDeath.DescriptionFr = Traduire(translations, "fr", causeOfDeath.DescriptionDe);
-                causeOfDeath.DescriptionEn = Traduire(translations, "en", causeOfDeath.DescriptionDe);
-                causeOfDeath.DescriptionEs = Traduire(translations, "es", causeOfDeath.DescriptionDe);
+                causeOfDeath.LabelFr = Traduire(translations, "fr", causeOfDeath.LabelDe, "game");
+                causeOfDeath.LabelEn = Traduire(translations, "en", causeOfDeath.LabelDe, "game");
+                causeOfDeath.LabelEs = Traduire(translations, "es", causeOfDeath.LabelDe, "game");
+                causeOfDeath.DescriptionFr = Traduire(translations, "fr", causeOfDeath.DescriptionDe, "game");
+                causeOfDeath.DescriptionEn = Traduire(translations, "en", causeOfDeath.DescriptionDe, "game");
+                causeOfDeath.DescriptionEs = Traduire(translations, "es", causeOfDeath.DescriptionDe, "game");
             }
 
             var causeOfDeathsFromDb = DbContext.CauseOfDeaths.ToList();
@@ -294,9 +296,9 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
             {
                 if (recipe.ActionDe != null)
                 {
-                    recipe.ActionFr = Traduire(translations, "fr", recipe.ActionDe);
-                    recipe.ActionEn = Traduire(translations, "en", recipe.ActionDe);
-                    recipe.ActionEs = Traduire(translations, "es", recipe.ActionDe);
+                    recipe.ActionFr = Traduire(translations, "fr", recipe.ActionDe, "items");
+                    recipe.ActionEn = Traduire(translations, "en", recipe.ActionDe, "items");
+                    recipe.ActionEs = Traduire(translations, "es", recipe.ActionDe, "items");
                 }
             }
 
@@ -963,26 +965,26 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
         /// chaîne vide, et le log nomme la clé pour qu'on puisse la corriger.
         /// </para>
         /// </remarks>
-        private string Traduire(Dictionary<string, List<YmlTranslationFileModel>> translations, string langue, string cleAllemande)
+        private string Traduire(Dictionary<string, List<YmlTranslationFileModel>> translations, string langue, string cleAllemande, string domaine)
         {
             if (string.IsNullOrEmpty(cleAllemande))
             {
                 return cleAllemande;
             }
-            if (translations == null || !translations.TryGetValue(langue, out var fichiers))
+            if (translations == null || !translations.ContainsKey(langue))
             {
                 Logger.LogWarning("Traduction : langue {Langue} absente des fichiers, « {Cle} » laissée en allemand.",
                     langue, cleAllemande);
                 return cleAllemande;
             }
-            var fichier = fichiers.FirstOrDefault(ymlFileModel => ymlFileModel.Translations.ContainsKey(cleAllemande));
-            if (fichier == null)
+            var traduction = YmlTranslationLookup.Find(translations, langue, cleAllemande, domaine);
+            if (traduction == null)
             {
                 Logger.LogWarning("Traduction : aucune correspondance en {Langue} pour « {Cle} », laissée en allemand.",
                     langue, cleAllemande);
                 return cleAllemande;
             }
-            return MyHordesExtensions.ResolveIcuDefaultForm(fichier.Translations[cleAllemande]);
+            return MyHordesExtensions.ResolveIcuDefaultForm(traduction);
         }
 
         private static void PropagerCleAuxDrops(Ruin ruin)
@@ -1177,13 +1179,13 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
             var codeResult = MyHordesCodeRepository.GetCategories();
             var categories = Mapper.Map<List<Category>>(codeResult);
 
-            // Traduction
+            // Traduction : domaine « items » imposé, « Verteidigung » existe aussi dans buildings (« en défense »).
             var translations = await TranslationService.GetTranslations();
             foreach (var category in categories)
             {
-                category.LabelFr = Traduire(translations, "fr", category.LabelDe);
-                category.LabelEn = Traduire(translations, "en", category.LabelDe);
-                category.LabelEs = Traduire(translations, "es", category.LabelDe);
+                category.LabelFr = Traduire(translations, "fr", category.LabelDe, "items");
+                category.LabelEn = Traduire(translations, "en", category.LabelDe, "items");
+                category.LabelEs = Traduire(translations, "es", category.LabelDe, "items");
             }
 
             var comparer = EqualityComparerFactory.Create<Category>(category => category.Name.GetHashCode(), (a, b) => a.Name == b.Name);
@@ -1500,6 +1502,8 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
             DbContext.Database.ExecuteSqlRaw("UPDATE MapCellDigUpdate SET idTown = {0} WHERE idTown = {1}", dto.Id, oldIdTown);
             DbContext.Database.ExecuteSqlRaw("UPDATE MapCell SET idTown = {0} WHERE idTown = {1}", dto.Id, oldIdTown);
             DbContext.Database.ExecuteSqlRaw("UPDATE Expedition SET idTown = {0} WHERE idTown = {1}", dto.Id, oldIdTown);
+            DbContext.Database.ExecuteSqlRaw("UPDATE MapRoute SET idTown = {0} WHERE idTown = {1}", dto.Id, oldIdTown);
+            DbContext.Database.ExecuteSqlRaw("UPDATE MapRouteGame SET idTown = {0} WHERE idTown = {1}", dto.Id, oldIdTown);
             // La Town elle-même en dernier
             DbContext.Database.ExecuteSqlRaw(
                 "UPDATE Town SET idTown = {0}, mapId = {1} WHERE idTown = {2}",

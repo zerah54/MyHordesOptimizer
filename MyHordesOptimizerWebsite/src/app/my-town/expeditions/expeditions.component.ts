@@ -1,10 +1,10 @@
 import { CommonModule, NgOptimizedImage } from '@angular/common';
-import { ChangeDetectionStrategy, Component, DestroyRef, inject, model, ModelSignal, OnInit, Signal, signal, WritableSignal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, DestroyRef, inject, model, ModelSignal, OnInit, Signal, signal, WritableSignal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
-import { MatCheckboxChange, MatCheckboxModule } from '@angular/material/checkbox';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatDialog } from '@angular/material/dialog';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -20,7 +20,7 @@ import { environment } from '../../../environments/environment';
 import { EXPEDITIONS_EDITION_MODE_KEY, FAVORITE_EXPEDITION_ITEMS_UID, HORDES_IMG_REPO } from '../../_abstract_model/const';
 import { HeroicActionEnum } from '../../_abstract_model/enum/heroic-action.enum';
 import { JobEnum } from '../../_abstract_model/enum/job.enum';
-import { RealtimeExpeditionsService } from '../../_abstract_model/realtime-services/realtime-expeditions.service';
+import { ExpeditionOrdersUpdate, RealtimeExpeditionsService } from '../../_abstract_model/realtime-services/realtime-expeditions.service';
 import { ApiService } from '../../_abstract_model/services/api.service';
 import { ExpeditionService } from '../../_abstract_model/services/expedition.service';
 import { TownService } from '../../_abstract_model/services/town.service';
@@ -34,10 +34,14 @@ import { Expedition } from '../../_abstract_model/types/expedition.class';
 import { ExpeditionOrder } from '../../_abstract_model/types/expedition-order.class';
 import { ExpeditionPart } from '../../_abstract_model/types/expedition-part.class';
 import { Item } from '../../_abstract_model/types/item.class';
+import { MapRoutePoint } from '../../_abstract_model/types/map-route.class';
 import { Me } from '../../_abstract_model/types/me.class';
+import { Ruin } from '../../_abstract_model/types/ruin.class';
+import { Town } from '../../_abstract_model/types/town.class';
 import { CitizenFromIdPipe } from '../../_core/pipes/citizens-from-id.pipe';
 import { JobFromIdPipe } from '../../_core/pipes/job-from-id.pipe';
 import { ClipboardService } from '../../_core/services/clipboard.service';
+import { SnackbarService } from '../../_core/services/snackbar.service';
 import { TownContextService } from '../../_core/services/town-context.service';
 import { getCitizenFromId } from '../../_core/utilities/citizen.util';
 import { getTown, user } from '../../_core/utilities/localstorage.util';
@@ -47,14 +51,22 @@ import { ConfirmDialogComponent, ConfirmDialogData } from '../../_shared/confirm
 import { IconApComponent } from '../../_shared/icon-ap/icon-ap.component';
 import { ListElementAddRemoveComponent } from '../../_shared/list-elements-add-remove/list-element-add-remove.component';
 import { SelectComponent } from '../../_shared/select/select.component';
+import { MapRoutesStore } from '../map/map-routes/map-routes.store';
 import { CitizensForExpePipe, FormatPreRegisteredPipe, SomeHeroicActionNeededPipe } from './citizens-for-expe.pipe';
 import { EditOrdersComponent, EditOrdersData } from './edit-orders/edit-orders.component';
 import { EditPositionsComponent, EditPositionsData } from './edit-positions/edit-positions.component';
+import { ExpeditionOrderComponent } from './expedition-order/expedition-order.component';
+import { cloneOrder, generalOrders, withCellOrders } from './expedition-orders/expedition-orders.util';
+import { ExpeditionPartRouteComponent } from './expedition-part-route/expedition-part-route.component';
+import { ExpeditionRoadbookComponent } from './expedition-roadbook/expedition-roadbook.component';
 import { isDayEditable } from './expeditions.utils';
 import { TotalPdcPipe } from './total-pdc.pipe';
 
 const angular_common: Imports = [CommonModule, FormsModule, NgOptimizedImage];
-const components: Imports = [ActiveCitizensComponent, IconApComponent, ListElementAddRemoveComponent, SelectComponent];
+const components: Imports = [
+    ActiveCitizensComponent, ExpeditionOrderComponent, ExpeditionPartRouteComponent, ExpeditionRoadbookComponent, IconApComponent, ListElementAddRemoveComponent,
+    SelectComponent
+];
 const pipes: Imports = [CitizensForExpePipe, CitizenFromIdPipe, CompassRoseComponent, FormatPreRegisteredPipe, JobFromIdPipe, SomeHeroicActionNeededPipe, TotalPdcPipe];
 const material_modules: Imports = [MatButtonModule, MatCardModule, MatCheckboxModule, MatExpansionModule, MatFormFieldModule, MatIconModule, MatInputModule, MatMenuModule, MatSlideToggleModule, MatTabsModule, MatTooltipModule];
 
@@ -83,6 +95,14 @@ export class ExpeditionsComponent implements OnInit {
     /** La liste des items en banque */
     private bank_items: WritableSignal<Item[]> = signal([]);
     protected expeditions: WritableSignal<Expedition[]> = signal([]);
+    /** Carte de la ville (cases, position de la ville) : feuilles de route et cases des consignes. */
+    protected map: WritableSignal<Town | undefined> = signal(undefined);
+    protected all_ruins: WritableSignal<Ruin[]> = signal([]);
+    /** Position de la ville, pour les coordonnées relatives des consignes par case. */
+    protected town_position: Signal<MapRoutePoint | null> = computed((): MapRoutePoint | null => {
+        const map: Town | undefined = this.map();
+        return map ? { x: map.town_x, y: map.town_y } : null;
+    });
     protected active_citizens_list: WritableSignal<number[]> = signal([]);
     protected editable: WritableSignal<boolean> = signal(true);
 
@@ -93,9 +113,15 @@ export class ExpeditionsComponent implements OnInit {
     private readonly destroy_ref: DestroyRef = inject(DestroyRef);
     private readonly clipboard: ClipboardService = inject(ClipboardService);
     private readonly dialog: MatDialog = inject(MatDialog);
+    private readonly snackbar: SnackbarService = inject(SnackbarService);
+    /** Tracés de la ville, pour le choix du tracé d'une partie (tenus à jour en temps réel). */
+    protected readonly routes_store: MapRoutesStore = inject(MapRoutesStore);
 
-    /** Mode observateur : lecture seule, aucune écriture ni synchro temps réel. */
-    protected readonly is_readonly: Signal<boolean> = inject(TownContextService).isReadonly;
+    /**
+     * Sa ville, ou une ancienne ville observée (le hub la suit alors) : écriture et synchro temps réel. Simple
+     * observateur : lecture seule, sans synchro (le hub suit la ville du jeton, pas la ville observée).
+     */
+    protected readonly can_contribute: Signal<boolean> = inject(TownContextService).canContribute;
 
     public async ngOnInit(): Promise<void> {
         this.town_service
@@ -118,6 +144,30 @@ export class ExpeditionsComponent implements OnInit {
             });
 
         this.town_service
+            .getMap()
+            .pipe(takeUntilDestroyed(this.destroy_ref))
+            .subscribe({
+                next: (map: Town): void => {
+                    this.map.set(map);
+                }
+            });
+
+        this.api_service
+            .getRuins()
+            .pipe(takeUntilDestroyed(this.destroy_ref))
+            .subscribe({
+                next: (ruins: Ruin[]): void => {
+                    this.all_ruins.set(ruins);
+                }
+            });
+
+        // Ville affichée (la sienne, ou celle observée) : un simple observateur n'y reçoit aucun tracé.
+        const map_id: number | undefined = getTown()?.town_id;
+        if (map_id && (this.routes_store.map_id() !== map_id || this.routes_store.status() === 'error')) {
+            this.routes_store.load(map_id);
+        }
+
+        this.town_service
             .getBank()
             .pipe(takeUntilDestroyed(this.destroy_ref))
             .subscribe({
@@ -130,15 +180,32 @@ export class ExpeditionsComponent implements OnInit {
         this.expeditions.set([...existing_expeditions]);
         this.updateEditableForIndex(this.selected_tab_index());
 
-        // Mode observateur : pas de synchro temps réel (le hub est scopé à la ville du token,
-        // pas à la ville observée) et aucune édition possible.
-        if (this.is_readonly()) {
+        // Simple observateur : pas de synchro temps réel (le hub suit la ville du jeton, pas la ville observée)
+        // et aucune édition possible. Une ancienne ville est suivie par le hub (TownObserverComponent).
+        if (!this.can_contribute()) {
             this.edition_mode.set(false);
             this.editable.set(false);
             return;
         }
 
         this.subscribeToRealtimeExpeditions();
+        this.declarePresence();
+    }
+
+    /**
+     * Présent sur les expéditions tant que la page est ouverte : la connexion, partagée avec la carte, n'y suffit pas.
+     * Sans effet si la page est déjà détruite (l'`await` d'`ngOnInit` a pu durer).
+     */
+    private declarePresence(): void {
+        if (this.destroy_ref.destroyed) {
+            return;
+        }
+        this.realtime_expeditions_service.joinPresence()
+            .catch((error: unknown): void => console.warn('JoinPresence', error));
+        this.destroy_ref.onDestroy((): void => {
+            this.realtime_expeditions_service.leavePresence()
+                .catch((error: unknown): void => console.warn('LeavePresence', error));
+        });
     }
 
     /** Jour actuel de la ville, lu à la demande (jamais figé) pour ne pas désynchroniser le verrou de jour. */
@@ -148,7 +215,7 @@ export class ExpeditionsComponent implements OnInit {
 
     /** Un onglet n'est éditable que si son jour n'est pas déjà passé pour la ville. */
     private updateEditableForIndex(tab_index: number): void {
-        this.editable.set(!this.is_readonly() && isDayEditable(tab_index + 1, this.currentDay()));
+        this.editable.set(this.can_contribute() && isDayEditable(tab_index + 1, this.currentDay()));
     }
 
     private subscribeToRealtimeExpeditions(): void {
@@ -264,6 +331,7 @@ export class ExpeditionsComponent implements OnInit {
                     } else {
                         current_expedition_part.citizens[citizen_to_update] = expedition_citizen;
                     }
+                    this.renewPart(current_expedition, current_expedition_part);
                     return [...current_expeditions];
                 });
             });
@@ -273,11 +341,12 @@ export class ExpeditionsComponent implements OnInit {
             .subscribe((expedition_citizen_id: number) => {
                 this.expeditions.update((current_expeditions: Expedition[]) => {
                     current_expeditions.forEach((current_expedition: Expedition) => {
-                        current_expedition.parts.forEach((current_expedition_part: ExpeditionPart) => {
+                        [...current_expedition.parts].forEach((current_expedition_part: ExpeditionPart) => {
                             const citizen_to_delete: number = current_expedition_part.citizens
                                 .findIndex((_citizen_to_delete: CitizenExpedition) => _citizen_to_delete.id === expedition_citizen_id);
                             if (citizen_to_delete > -1) {
                                 current_expedition_part.citizens.splice(citizen_to_delete, 1);
+                                this.renewPart(current_expedition, current_expedition_part);
                             }
                         });
                     });
@@ -285,33 +354,21 @@ export class ExpeditionsComponent implements OnInit {
                 });
             });
 
+        // Les consignes d'une partie ou d'un citoyen arrivent en liste complète, avec leur propriétaire : la liste
+        // est remplacée (une consigne retirée disparaît). Sans propriétaire (ancienne API), elles sont fusionnées.
         this.realtime_expeditions_service.expedition_part_orders_updated$
             .pipe(takeUntilDestroyed(this.destroy_ref))
-            .subscribe((expedition_orders: ExpeditionOrder[]) => {
+            .subscribe((update: ExpeditionOrdersUpdate) => {
                 this.expeditions.update((current_expeditions: Expedition[]) => {
-                    for (const expedition_order of expedition_orders) {
-                        const current_expedition: Expedition | undefined = current_expeditions.find((_current_expedition: Expedition) => {
-                            return _current_expedition.id === expedition_order.expeditions_id;
-                        });
-                        if (!current_expedition) break;
-
-                        const current_expedition_part: ExpeditionPart | undefined = current_expedition.parts.find((_current_expedition_part: ExpeditionPart) => {
-                            return _current_expedition_part.id === expedition_order.expedition_parts_id;
-                        });
-                        if (!current_expedition_part) break;
-
-                        const order_to_update: number = current_expedition_part.orders
-                            .findIndex((_order_to_update: ExpeditionOrder) => _order_to_update.id === expedition_order.id);
-                        if (order_to_update > -1) {
-                            current_expedition_part.orders[order_to_update] = expedition_order;
-                        } else {
-                            current_expedition_part.orders.push(expedition_order);
+                    for (const current_expedition of current_expeditions) {
+                        for (const current_expedition_part of [...current_expedition.parts]) {
+                            const owns: boolean = update.owner_id !== null
+                                ? current_expedition_part.id === update.owner_id
+                                : update.orders.some((order: ExpeditionOrder): boolean => order.expedition_parts_id === current_expedition_part.id && !order.expedition_citizen_id);
+                            if (!owns) continue;
+                            current_expedition_part.orders = this.mergeOrders(current_expedition_part.orders, update);
+                            this.renewPart(current_expedition, current_expedition_part);
                         }
-                        current_expedition_part.orders.sort((order_a: ExpeditionOrder, order_b: ExpeditionOrder) => {
-                            if (order_a.position < order_b.position) return -1;
-                            if (order_a.position > order_b.position) return 1;
-                            return 0;
-                        });
                     }
                     return [...current_expeditions];
                 });
@@ -319,53 +376,27 @@ export class ExpeditionsComponent implements OnInit {
 
         this.realtime_expeditions_service.expedition_citizen_orders_updated$
             .pipe(takeUntilDestroyed(this.destroy_ref))
-            .subscribe((expedition_orders: ExpeditionOrder[]) => {
+            .subscribe((update: ExpeditionOrdersUpdate) => {
                 this.expeditions.update((current_expeditions: Expedition[]) => {
-                    for (const expedition_order of expedition_orders) {
-                        const current_expedition: Expedition | undefined = current_expeditions.find((_current_expedition: Expedition) => {
-                            return _current_expedition.id === expedition_order.expeditions_id;
-                        });
-                        if (!current_expedition) break;
-
-                        const current_expedition_part: ExpeditionPart | undefined = current_expedition.parts.find((_current_expedition_part: ExpeditionPart) => {
-                            return _current_expedition_part.id === expedition_order.expedition_parts_id;
-                        });
-                        if (!current_expedition_part) break;
-
-                        const current_expedition_citizen: CitizenExpedition | undefined = current_expedition_part.citizens
-                            .find((_current_expedition_citizen: CitizenExpedition) => {
-                                return _current_expedition_citizen.id === expedition_order.expedition_citizen_id;
-                            });
-                        if (!current_expedition_citizen) break;
-
-                        const order_to_update: number = current_expedition_citizen.orders
-                            .findIndex((_order_to_update: ExpeditionOrder) => _order_to_update.id === expedition_order.id);
-                        if (order_to_update > -1) {
-                            current_expedition_citizen.orders[order_to_update] = expedition_order;
-                        } else {
-                            current_expedition_citizen.orders.push(expedition_order);
+                    for (const current_expedition of current_expeditions) {
+                        for (const current_expedition_part of [...current_expedition.parts]) {
+                            let changed: boolean = false;
+                            for (const current_expedition_citizen of current_expedition_part.citizens) {
+                                const owns: boolean = update.owner_id !== null
+                                    ? current_expedition_citizen.id === update.owner_id
+                                    : update.orders.some((order: ExpeditionOrder): boolean => order.expedition_citizen_id === current_expedition_citizen.id);
+                                if (!owns) continue;
+                                current_expedition_citizen.orders = this.mergeOrders(current_expedition_citizen.orders, update);
+                                changed = true;
+                            }
+                            if (changed) {
+                                this.renewPart(current_expedition, current_expedition_part);
+                            }
                         }
-                        current_expedition_citizen.orders.sort((order_a: ExpeditionOrder, order_b: ExpeditionOrder) => {
-                            if (order_a.position < order_b.position) return -1;
-                            if (order_a.position > order_b.position) return 1;
-                            return 0;
-                        });
                     }
                     return [...current_expeditions];
                 });
             });
-
-        // // TODO
-        // this.realtime_expeditions_service.expeditionOrderDeleted$
-        //     .pipe(takeUntilDestroyed(this.destroy_ref))
-        //     .subscribe(() => {
-        //     });
-
-        // // TODO
-        // this.realtime_expeditions_service.expeditionOrdersUpdated$
-        //     .pipe(takeUntilDestroyed(this.destroy_ref))
-        //     .subscribe(() => {
-        //     });
 
         this.realtime_expeditions_service.expedition_order_updated$
             .pipe(takeUntilDestroyed(this.destroy_ref))
@@ -385,33 +416,13 @@ export class ExpeditionsComponent implements OnInit {
                         .find((_current_expedition_citizen: CitizenExpedition) => {
                             return _current_expedition_citizen.id === expedition_order.expedition_citizen_id;
                         });
-                    if (!current_expedition_citizen) {
-                        const order_to_update: number = current_expedition_part.orders
-                            .findIndex((_order_to_update: ExpeditionOrder) => _order_to_update.id === expedition_order.id);
-                        if (order_to_update > -1) {
-                            current_expedition_part.orders[order_to_update] = expedition_order;
-                        } else {
-                            current_expedition_part.orders.push(expedition_order);
-                        }
-                        current_expedition_part.orders.sort((order_a: ExpeditionOrder, order_b: ExpeditionOrder) => {
-                            if (order_a.position < order_b.position) return -1;
-                            if (order_a.position > order_b.position) return 1;
-                            return 0;
-                        });
+                    const update: ExpeditionOrdersUpdate = { owner_id: null, orders: [expedition_order] };
+                    if (current_expedition_citizen) {
+                        current_expedition_citizen.orders = this.mergeOrders(current_expedition_citizen.orders, update);
                     } else {
-                        const order_to_update: number = current_expedition_citizen.orders
-                            .findIndex((_order_to_update: ExpeditionOrder) => _order_to_update.id === expedition_order.id);
-                        if (order_to_update > -1) {
-                            current_expedition_citizen.orders[order_to_update] = expedition_order;
-                        } else {
-                            current_expedition_citizen.orders.push(expedition_order);
-                        }
-                        current_expedition_citizen.orders.sort((order_a: ExpeditionOrder, order_b: ExpeditionOrder) => {
-                            if (order_a.position < order_b.position) return -1;
-                            if (order_a.position > order_b.position) return 1;
-                            return 0;
-                        });
+                        current_expedition_part.orders = this.mergeOrders(current_expedition_part.orders, update);
                     }
+                    this.renewPart(current_expedition, current_expedition_part);
                     return [...current_expeditions];
                 });
             });
@@ -509,7 +520,7 @@ export class ExpeditionsComponent implements OnInit {
 
     /** modelToDto() renvoie l'id du citoyen copié : sans le retirer, la "copie" met à jour l'original au lieu d'en créer un nouveau. */
     private cloneCitizenForCopy(citizen_to_copy?: CitizenExpedition): CitizenExpedition {
-        const clone = new CitizenExpedition(citizen_to_copy?.modelToDto());
+        const clone: CitizenExpedition = new CitizenExpedition(citizen_to_copy?.modelToDto());
         clone.id = undefined;
         return clone;
     }
@@ -561,11 +572,15 @@ export class ExpeditionsComponent implements OnInit {
             });
     }
 
-    protected openExpeditionOrders(orders: ExpeditionOrder[], prop: CitizenExpedition | ExpeditionPart): void {
+    /**
+     * Consignes générales (sans case) d'une partie ou d'un citoyen. L'enregistrement remplace toute la liste : les
+     * consignes par case, que la feuille de route gère, sont reprises telles quelles.
+     */
+    protected openExpeditionOrders(prop: CitizenExpedition | ExpeditionPart): void {
         this.dialog
             .open<EditOrdersComponent, EditOrdersData>(EditOrdersComponent, {
                 data: {
-                    orders: orders,
+                    orders: generalOrders(prop.orders),
                     citizen_id: prop instanceof CitizenExpedition ? prop.citizen_id : undefined
                 },
                 width: '80%'
@@ -573,17 +588,42 @@ export class ExpeditionsComponent implements OnInit {
             .afterClosed()
             .subscribe(async (new_orders: ExpeditionOrder[]) => {
                 if (new_orders) {
-                    new_orders.forEach((new_order: ExpeditionOrder, index: number) => {
-                        new_order.position = index;
-                    });
+                    const orders: ExpeditionOrder[] = withCellOrders(new_orders, prop.orders);
                     if (prop instanceof CitizenExpedition) {
-                        await this.realtime_expeditions_service.updateExpeditionCitizenOrders(prop, new_orders);
+                        await this.realtime_expeditions_service.updateExpeditionCitizenOrders(prop, orders);
                     } else {
-                        await this.realtime_expeditions_service.updateExpeditionPartOrders(prop, new_orders);
+                        await this.realtime_expeditions_service.updateExpeditionPartOrders(prop, orders);
                     }
                 }
             });
 
+    }
+
+    /** Consignes générales d'une partie : celles par case sont dans la feuille de route. */
+    protected generalOrdersOf(orders: ExpeditionOrder[] | undefined): ExpeditionOrder[] {
+        return generalOrders(orders);
+    }
+
+    /** Liée à un tracé, la partie prend la direction de sa première case : la rose des vents ne se choisit plus. */
+    protected isDirectionLocked(expedition_part: ExpeditionPart): boolean {
+        return expedition_part.map_route_id !== null;
+    }
+
+    /** Une feuille de route n'a d'intérêt qu'avec un tracé, des consignes par case, ou pour en poser. */
+    protected showRoadbook(part: ExpeditionPart): boolean {
+        if (part.map_route || (this.edition_mode() && this.editable())) return true;
+        return (part.orders ?? []).some((order: ExpeditionOrder): boolean => order.hasCell())
+            || part.citizens.some((citizen: CitizenExpedition): boolean => (citizen.orders ?? []).some((order: ExpeditionOrder): boolean => order.hasCell()));
+    }
+
+    /** Tracé choisi pour une partie : enregistré, la partie (et sa direction) revient par le hub. */
+    protected async changePartRoute(expedition: Expedition, expedition_part: ExpeditionPart, map_route_id: number | null): Promise<void> {
+        const updated: ExpeditionPart = Object.assign(new ExpeditionPart(), expedition_part, { map_route_id });
+        try {
+            await this.realtime_expeditions_service.updateExpeditionPart(expedition, updated);
+        } catch {
+            this.snackbar.errorSnackbar($localize`Le tracé n'a pas pu être lié à la partie.`);
+        }
     }
 
     /**
@@ -693,9 +733,11 @@ export class ExpeditionsComponent implements OnInit {
         await this.realtime_expeditions_service.updateExpeditionPart(expedition, expedition_part);
     }
 
-    protected async saveOrder(order: ExpeditionOrder, change: MatCheckboxChange): Promise<void> {
-        order.is_done = change.checked;
-        await this.realtime_expeditions_service.updateExpeditionOrder(order);
+    /** Consigne cochée ou décochée : la liste se met à jour au retour du hub. */
+    protected async saveOrder(order: ExpeditionOrder, done: boolean): Promise<void> {
+        const updated: ExpeditionOrder = cloneOrder(order);
+        updated.is_done = done;
+        await this.realtime_expeditions_service.updateExpeditionOrder(updated);
     }
 
     protected changeThirstyMode(citizen: CitizenExpedition): void {
@@ -766,7 +808,7 @@ export class ExpeditionsComponent implements OnInit {
             text += `\n[collapse=${expedition.label || expedition_index + 1}]\n`;
             expedition.parts.forEach((part: ExpeditionPart, part_index: number) => {
                 if (expedition.parts.length > 1) {
-                    text += part.path || '';
+                    text += part.map_route?.label || '';
                 }
 
                 part.citizens.forEach((citizen_expedition: CitizenExpedition) => {
@@ -842,6 +884,33 @@ export class ExpeditionsComponent implements OnInit {
             }
         });
         return pre_registered_jobs;
+    }
+
+    /**
+     * Nouvelle référence pour une partie modifiée sur place : la feuille de route et le choix du tracé, à base de
+     * signaux, ne relisent une partie que si sa référence change.
+     */
+    private renewPart(expedition: Expedition, part: ExpeditionPart): void {
+        const index: number = expedition.parts.indexOf(part);
+        if (index > -1) {
+            expedition.parts[index] = Object.assign(new ExpeditionPart(), part);
+        }
+    }
+
+    /** Liste complète reçue avec son propriétaire : elle remplace l'ancienne ; sinon, les consignes reçues sont mises à jour ou ajoutées. */
+    private mergeOrders(current: ExpeditionOrder[] | undefined, update: ExpeditionOrdersUpdate): ExpeditionOrder[] {
+        const orders: ExpeditionOrder[] = update.owner_id !== null ? [...update.orders] : [...(current ?? [])];
+        if (update.owner_id === null) {
+            for (const order of update.orders) {
+                const index: number = orders.findIndex((candidate: ExpeditionOrder): boolean => candidate.id === order.id);
+                if (index > -1) {
+                    orders[index] = order;
+                } else {
+                    orders.push(order);
+                }
+            }
+        }
+        return orders.sort((order_a: ExpeditionOrder, order_b: ExpeditionOrder): number => order_a.position - order_b.position);
     }
 
     private get registered(): Citizen[] {

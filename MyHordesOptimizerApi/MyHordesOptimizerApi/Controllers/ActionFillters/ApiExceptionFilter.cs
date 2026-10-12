@@ -38,6 +38,20 @@ public class ApiExceptionFilter : ExceptionFilterAttribute
             result.StatusCode = (int)HttpStatusCode.FailedDependency;
             context.Result = result;
         }
+        else if (exception is MhoForbiddenException)
+        {
+            Logger.LogWarning(exception.Message);
+            var result = new ObjectResult(exception.Message);
+            result.StatusCode = (int)HttpStatusCode.Forbidden;
+            context.Result = result;
+        }
+        else if (exception is MhoConflictException)
+        {
+            Logger.LogInformation(exception.Message);
+            var result = new ObjectResult(exception.Message);
+            result.StatusCode = (int)HttpStatusCode.Conflict;
+            context.Result = result;
+        }
         else if (exception is MhoFunctionalException)
         {
             Logger.LogInformation(exception.ToString());

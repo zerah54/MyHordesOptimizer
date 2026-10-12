@@ -6,6 +6,15 @@ import { HeroicActionsDTO } from './heroic-actions.dto';
 import { HomeDTO } from './home.dto';
 import { StatusDTO } from './status.dto';
 
+/** Niveaux des capacités héroïques saisis à la main : 0 aucun, 1 à 4 ; null : inconnu. */
+export interface HeroSkillLevelsDTO {
+    s?: number | null;
+    u?: number | null;
+    p?: number | null;
+    e?: number | null;
+    r?: number | null;
+}
+
 export interface CitizenDTO {
     avatar?: string;
     homeMessage?: string;
@@ -30,4 +39,7 @@ export interface CitizenDTO {
     dailyActions: DailyActionDTO[];
     chamanicDetail: ChamanicDetailDTO;
     cadaver?: CadaverDTO;
+    /** Campings déjà effectués dans la ville, saisis à la main ; 0 si rien n'est saisi. */
+    campingCount?: number;
+    heroSkills?: HeroSkillLevelsDTO | null;
 }

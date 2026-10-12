@@ -12,7 +12,12 @@ export const ITEMS_KEY: string = 'all_items';
 export const BANK_KEY: string = 'bank_cache';
 export const RUINS_KEY: string = 'all_ruins';
 export const TOKEN_KEY: string = 'MHO_TOKEN';
+/** Préfixe de la clé `localStorage` des presets d'un outil, suivi de l'identifiant de l'outil. */
+export const TOOL_PRESETS_KEY_PREFIX: string = 'tool_presets_';
 export const HORDES_IMG_REPO: string = 'img/hordes_img/';
+/** Clé de la ruine sentinelle « Bâtiment non déterré », créée par MHO (voir
+ *  `MyHordesImportService` côté API) : tant qu'elle est posée, le bâtiment est enseveli. */
+export const BURIED_RUIN_ID: number = -1;
 
 
 export const BREAKPOINTS: Dictionary<string> = {

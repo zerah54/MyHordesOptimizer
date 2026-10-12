@@ -3,6 +3,8 @@ import 'moment/locale/en-gb';
 import 'moment/locale/es';
 import 'moment/locale/fr';
 
+import { provideHttpClient, withXhr } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import moment from 'moment';
 
@@ -11,6 +13,7 @@ import { Citizen } from '../../../../_abstract_model/types/citizen.class';
 import { Item } from '../../../../_abstract_model/types/item.class';
 import { ItemCountShort } from '../../../../_abstract_model/types/item-count-short.class';
 import { Ruin } from '../../../../_abstract_model/types/ruin.class';
+import { provideMapOrdersTesting } from '../../map-orders/map-orders.testing';
 import { MapCellDetailsComponent } from './map-cell-details.component';
 
 function text(root: HTMLElement, selector: string): string {
@@ -53,6 +56,11 @@ function newCellHtml(): HTMLElement {
     return cellHtml;
 }
 
+// Charger un fichier de langue de moment en fait la langue globale (effet de bord de defineLocale) : on rend
+// la langue par défaut, sinon elle fuit vers les fichiers de test suivants (Vitest tourne en mode non isolé)
+// et dépend de l'ordre de chargement des modules.
+moment.locale('en');
+
 describe('MapCellDetailsComponent', (): void => {
     let fixture: ComponentFixture<MapCellDetailsComponent>;
     let originalLocale: string;
@@ -62,7 +70,8 @@ describe('MapCellDetailsComponent', (): void => {
         originalLocale = moment.locale();
         moment.locale('fr');
         await TestBed.configureTestingModule({
-            imports: [MapCellDetailsComponent]
+            imports: [MapCellDetailsComponent],
+            providers: [provideHttpClient(withXhr()), provideHttpClientTesting(), ...provideMapOrdersTesting()]
         }).compileComponents();
         fixture = TestBed.createComponent(MapCellDetailsComponent);
     });
@@ -213,6 +222,14 @@ describe('MapCellDetailsComponent', (): void => {
         expect(text(items, '.item-quantity').trim()).toBe('3');
         const img: HTMLImageElement | null = items.querySelector('img');
         expect(img?.src).toContain('item42.gif');
+    });
+
+    it('offers the camping section for a desert cell, not for the town', (): void => {
+        setInputs(newCell(), attachedCellHtml());
+        expect(fixture.nativeElement.querySelector('mho-map-cell-camping')).not.toBeNull();
+
+        setInputs(newCell({ is_town: true }), attachedCellHtml());
+        expect(fixture.nativeElement.querySelector('mho-map-cell-camping')).toBeNull();
     });
 
     it('shows the last-update indicator', (): void => {

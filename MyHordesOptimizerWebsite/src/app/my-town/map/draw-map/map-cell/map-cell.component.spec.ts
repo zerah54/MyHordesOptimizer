@@ -13,6 +13,8 @@ import { UpdateInfo } from '../../../../_abstract_model/types/update-info.class'
 import { TownContextService } from '../../../../_core/services/town-context.service';
 import { MapOptions } from '../../map.component';
 import { CornerLayout, CORNERS_VERSION, sanitizeCorners } from '../../map-corners';
+import { provideMapOrdersTesting } from '../../map-orders/map-orders.testing';
+import { DEFAULT_ROUTES_DISPLAY } from '../../map-routes/map-routes-display';
 import { MapCellComponent, MapCellSelection } from './map-cell.component';
 
 function newCell(overrides: Partial<Cell> = {}): Cell {
@@ -63,7 +65,8 @@ const options: MapOptions = {
     distances: [],
     zoom: 30,
     corners: sanitizeCorners(undefined),
-    corners_version: CORNERS_VERSION
+    corners_version: CORNERS_VERSION,
+    routes: DEFAULT_ROUTES_DISPLAY
 };
 
 /** Options dont la disposition des coins du type affiché est remplacée. */
@@ -79,7 +82,10 @@ describe('MapCellComponent', (): void => {
     beforeEach(async (): Promise<void> => {
         await TestBed.configureTestingModule({
             imports: [MapCellComponent],
-            providers: [provideHttpClient(withXhr()), provideHttpClientTesting(), { provide: ANIMATION_MODULE_TYPE, useValue: 'NoopAnimations' }]
+            providers: [
+                provideHttpClient(withXhr()), provideHttpClientTesting(), { provide: ANIMATION_MODULE_TYPE, useValue: 'NoopAnimations' },
+                ...provideMapOrdersTesting()
+            ]
         }).compileComponents();
         fixture = TestBed.createComponent(MapCellComponent);
     });
@@ -326,17 +332,97 @@ describe('MapCellComponent', (): void => {
             expect(corner('corner-top-left')?.textContent?.trim()).toBe('7');
         });
 
-        it('shows the distance in km and in AP, and the age of the last update', (): void => {
-            const update_info: UpdateInfo = new UpdateInfo();
-            update_info.update_time = moment().subtract(3, 'hours');
-            setInputs(newCell({ nb_km: 4, nb_pa: 6, update_info }),
-                      withCorners({ top_left: 'distance_km', top_right: 'distance_pa', bottom_left: 'update_age', bottom_right: 'none' }));
+        it('shows the distance in km and in AP', (): void => {
+            setInputs(newCell({ nb_km: 4, nb_pa: 6 }),
+                      withCorners({ top_left: 'distance_km', top_right: 'distance_pa', bottom_left: 'none', bottom_right: 'none' }));
             fixture.detectChanges();
 
             expect(corner('corner-top-left')?.textContent?.trim()).toBe('4');
             expect(corner('corner-top-right')?.textContent?.trim()).toBe('6');
             expect(corner('corner-top-right')?.querySelector('img')?.src).toContain('icons/ap_small');
-            expect(corner('corner-bottom-left')?.textContent?.trim()).toBe('3h');
+        });
+
+        describe('update age', (): void => {
+            function updatedHoursAgo(hours: number): Cell {
+                const update_info: UpdateInfo = new UpdateInfo();
+                update_info.update_time = moment().subtract(hours, 'hours');
+                return newCell({ update_info });
+            }
+
+            it('is a coloured flag in the corner: green under 1 day, yellow under 2, orange under 3, red beyond', (): void => {
+                const expected: [number, string][] = [[3, 'age-green'], [30, 'age-yellow'], [50, 'age-orange'], [72, 'age-red'], [100, 'age-red']];
+                for (const [hours, css_class] of expected) {
+                    setInputs(updatedHoursAgo(hours), withCorners({ bottom_left: 'update_age' }));
+                    fixture.detectChanges();
+
+                    const flag: HTMLElement | null | undefined = corner('corner-bottom-left')?.querySelector('.age-flag');
+                    expect(flag?.classList, `${hours}h`).toContain(css_class);
+                }
+            });
+
+            it('sits in whichever corner is chosen', (): void => {
+                setInputs(updatedHoursAgo(3), withCorners({ top_right: 'update_age', bottom_right: 'none' }));
+                fixture.detectChanges();
+
+                expect(corner('corner-top-right')?.querySelector('.age-flag')).not.toBeNull();
+            });
+
+            it('carries the exact age in its title instead of a text', (): void => {
+                setInputs(updatedHoursAgo(3), withCorners({ bottom_left: 'update_age' }));
+                fixture.detectChanges();
+
+                expect(corner('corner-bottom-left')?.textContent?.trim()).toBe('');
+                expect(corner('corner-bottom-left')?.getAttribute('title')).toContain('3h');
+            });
+
+            it('renders nothing when the cell has no update time', (): void => {
+                setInputs(newCell(), withCorners({ bottom_left: 'update_age' }));
+                fixture.detectChanges();
+
+                expect(corner('corner-bottom-left')).toBeNull();
+            });
+        });
+
+        describe('dig level', (): void => {
+            it('shows the in-game icon of the level estimated from the remaining digs, with no text', (): void => {
+                const expected: [number, string][] = [[0, 'Small_broken'], [2, 'collec_lv1'], [5, 'collec_lv2'], [7, 'collec_lv3']];
+                for (const [remaining, icon] of expected) {
+                    setInputs(newCell({ average_potential_remaining_dig: remaining }), withCorners({ bottom_left: 'digs_level' }));
+                    fixture.detectChanges();
+
+                    const level: HTMLElement | null = corner('corner-bottom-left');
+                    expect(level?.querySelector('img')?.src, `${remaining}`).toContain(icon);
+                    expect(level?.textContent?.trim()).toBe('');
+                }
+            });
+
+            it('follows the dig mode like the cell colour', (): void => {
+                setInputs(newCell({ average_potential_remaining_dig: 1, max_potential_remaining_dig: 9 }),
+                          withCorners({ bottom_left: 'digs_level' }, { ...options, dig_mode: 'max' }));
+                fixture.detectChanges();
+
+                expect(corner('corner-bottom-left')?.querySelector('img')?.src).toContain('collec_lv3');
+            });
+        });
+
+        describe('scout level', (): void => {
+            it('shows the in-game icon of the level reported by a scout, with no text', (): void => {
+                for (const level of [0, 1, 2, 3]) {
+                    setInputs(newCell({ scout_zone_level: level }), withCorners({ bottom_left: 'scout_level' }));
+                    fixture.detectChanges();
+
+                    const scout: HTMLElement | null = corner('corner-bottom-left');
+                    expect(scout?.querySelector('img')?.src, `${level}`).toContain(`scout_lv${level}.gif`);
+                    expect(scout?.textContent?.trim()).toBe('');
+                }
+            });
+
+            it('renders nothing for a zone no scout has reported', (): void => {
+                setInputs(newCell({ scout_zone_level: null }), withCorners({ bottom_left: 'scout_level' }));
+                fixture.detectChanges();
+
+                expect(corner('corner-bottom-left')).toBeNull();
+            });
         });
 
         it('marks a fresher scout estimation of the zombies as approximate', (): void => {

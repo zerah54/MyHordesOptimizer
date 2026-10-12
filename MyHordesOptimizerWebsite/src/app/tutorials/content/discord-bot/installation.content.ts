@@ -22,7 +22,7 @@ export const DISCORD_BOT_INSTALLATION: TutorialPage = {
                 },
                 {
                     title: $localize`Langues`,
-                    content: $localize`<p>Les commandes portent leur nom en français, en allemand ou en anglais selon la langue de votre Discord (en anglais pour les autres langues). Les réponses du bot sont en français.</p>`
+                    content: $localize`<p>Les commandes portent leur nom en français, en allemand, en espagnol ou en anglais selon la langue de votre Discord (en anglais pour les autres langues).</p>`
                 },
                 {
                     title: $localize`Besoin d'aide ?`,

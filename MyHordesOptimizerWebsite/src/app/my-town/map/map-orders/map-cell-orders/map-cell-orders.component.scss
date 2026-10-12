@@ -1,0 +1,174 @@
+/* L'infobulle et le détail de zone gardent les retours à la ligne de leur texte (pre-wrap) : pas ici. */
+:host {
+    display: block;
+    white-space: normal;
+}
+
+/* Section de l'infobulle ou du détail : séparée de la suite comme les autres sections. */
+.cell-orders {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 0.5em;
+    padding-bottom: 0.5em;
+    border-bottom: 1px solid var(--mho-line);
+}
+
+.section-title {
+    margin: 0;
+    font: 700 10.5px var(--mho-font-body);
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--mho-text-muted);
+}
+
+/* Partie de l'utilisateur : teinte de son tracé, neutre sans tracé. */
+.group {
+    --group-tint: var(--group-color, var(--mho-text-muted));
+
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 6px 8px;
+    border-radius: var(--mho-radius-s);
+    background: color-mix(in srgb, var(--group-tint) 9%, var(--mho-surface-2));
+}
+
+.group-head {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+    font-size: 12px;
+    font-weight: 700;
+
+    .label {
+        flex: 1;
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .count {
+        display: grid;
+        place-items: center;
+        min-width: 16px;
+        height: 16px;
+        padding: 0 3px;
+        border-radius: 4px;
+        background: var(--group-tint);
+        color: var(--mho-route-on);
+        font-size: 10px;
+        font-variant-numeric: tabular-nums;
+    }
+}
+
+.swatch {
+    flex-shrink: 0;
+    width: 18px;
+    height: 6px;
+    border-radius: 99px;
+    background: var(--group-color, var(--mho-text-muted));
+    box-shadow: 0 0 0 1.5px var(--mho-route-casing);
+
+    &.none {
+        background: var(--mho-surface-3);
+    }
+}
+
+.others-summary {
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+    margin: 0;
+    font-size: 11.5px;
+    color: var(--mho-text-muted);
+
+    .mat-icon {
+        flex-shrink: 0;
+        width: 14px;
+        height: 14px;
+        font-size: 14px;
+    }
+}
+
+.line {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    min-width: 0;
+
+    .order {
+        flex: 1;
+        min-width: 0;
+    }
+}
+
+.line-action {
+    flex-shrink: 0;
+    --mat-icon-button-state-layer-size: 28px;
+    --mdc-icon-button-state-layer-size: 28px;
+    width: 28px;
+    height: 28px;
+    padding: 2px;
+
+    .mat-icon {
+        font-size: 18px;
+        width: 18px;
+        height: 18px;
+    }
+}
+
+.others {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.other {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    min-width: 0;
+    font-size: 12px;
+    line-height: 1.35;
+    color: var(--mho-text-muted);
+
+    b {
+        font-weight: 600;
+        color: var(--mho-text);
+    }
+
+    .other-text {
+        flex: 1;
+        min-width: 0;
+        overflow-wrap: anywhere;
+    }
+}
+
+.dot {
+    flex-shrink: 0;
+    width: 8px;
+    height: 8px;
+    border-radius: 99px;
+    background: var(--group-color, var(--mho-text-muted));
+
+    &.none {
+        background: var(--mho-surface-3);
+        box-shadow: inset 0 0 0 1px var(--mho-line-strong);
+    }
+}
+
+.add {
+    align-self: flex-start;
+}
+
+.menu-choice {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}

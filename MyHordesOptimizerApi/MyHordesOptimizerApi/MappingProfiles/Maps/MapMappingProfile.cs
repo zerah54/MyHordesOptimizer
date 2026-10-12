@@ -3,6 +3,7 @@ using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.Bags;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Map;
 using MyHordesOptimizerApi.Extensions;
 using MyHordesOptimizerApi.Models;
+using MyHordesOptimizerApi.Services.Impl.Maps;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,6 +32,9 @@ namespace MyHordesOptimizerApi.MappingProfiles.Maps
 
             CreateMap<MapCell, MyHordesOptimizerCellDto>()
                 .ForMember(dto => dto.AveragePotentialRemainingDig, opt => opt.MapFrom(model => model.AveragePotentialRemainingDig))
+                // Dépend du jour de la ville : calculé par TownToCellsDto
+                .ForMember(dto => dto.CampImprovementLevel, opt => opt.Ignore())
+                .ForMember(dto => dto.CampImprovementDay, opt => opt.MapFrom(model => model.CampImprovementDay))
                 .ForMember(dto => dto.CellId, opt => opt.MapFrom(model => model.IdCell))
                 .ForMember(dto => dto.Citizens, opt => opt.Ignore())
                 .ForMember(dto => dto.DangerLevel, opt => opt.MapFrom(model => model.DangerLevel))
@@ -94,6 +98,9 @@ namespace MyHordesOptimizerApi.MappingProfiles.Maps
 
             CreateMap<MyHordesOptimizerCellUpdateDto, MapCell>()
                .ForMember(dest => dest.AveragePotentialRemainingDig, opt => opt.Ignore())
+               // Saisi à part (MyHordesOptimizerMapService.UpdateCampImprovement)
+               .ForMember(dest => dest.CampImprovementLevel, opt => opt.Ignore())
+               .ForMember(dest => dest.CampImprovementDay, opt => opt.Ignore())
                .ForMember(dest => dest.DangerLevel, opt => opt.Ignore())
                .ForMember(dest => dest.IdLastUpdateInfo, opt => opt.Ignore())
                .ForMember(dest => dest.IdRuin, opt => opt.Ignore())
@@ -151,6 +158,7 @@ namespace MyHordesOptimizerApi.MappingProfiles.Maps
                     cellDto.DisplayX = mapCell.X - town.X;
                     cellDto.DisplayY = town.Y - mapCell.Y;
                     cellDto.TotalSucces = mapCell.MapCellDigs.Where(digs => digs.IdCell == mapCell.IdCell).Sum(digs => digs.NbSucces);
+                    cellDto.CampImprovementLevel = CampImprovement.CurrentLevel(mapCell.CampImprovementLevel, mapCell.CampImprovementDay, town.Day);
                     results.Add(cellDto);
                 }
                 return results;

@@ -27,11 +27,13 @@ namespace MyHordesOptimizerApi.MappingProfiles.Citizens
                 .ForMember(dto => dto.ActionsHeroic, opt => opt.MapFrom(model => model))
                 .ForMember(dto => dto.Avatar, opt => opt.MapFrom(model => model.IdUserNavigation.Avatar))
                 .ForMember(dto => dto.Bag, opt => opt.MapFrom(model => model.IdBagNavigation))
+                .ForMember(dto => dto.CampingCount, opt => opt.MapFrom(model => model.CampingCount ?? 0))
                 .ForMember(dto => dto.Chest, opt => opt.MapFrom(model => model.IdChestNavigation))
                 .ForMember(dto => dto.DailyActions, opt => opt.MapFrom(model => model.IdTownNavigation.TownCitizenDailyActions.Where(townDailyAction => townDailyAction.IdUser == model.IdUser)))
                 .ForMember(dto => dto.Cadaver, opt => opt.Ignore()) // ??
                 .ForMember(dto => dto.ChamanicDetail, opt => opt.MapFrom(model => model))
                 .ForMember(dto => dto.Dead, opt => opt.MapFrom(model => model.Dead))
+                .ForMember(dto => dto.HeroSkills, opt => opt.MapFrom(model => model))
                 .ForMember(dto => dto.Home, opt => opt.MapFrom(model => model))
                 .ForMember(dto => dto.HomeMessage, opt => opt.MapFrom(model => model.HomeMessage))
                 .ForMember(dto => dto.HouseDefense, opt => opt.MapFrom(model => model.HouseDefense))
@@ -58,6 +60,13 @@ namespace MyHordesOptimizerApi.MappingProfiles.Citizens
                 .ForMember(dto => dto.TownMsg, opt => opt.MapFrom(model => model.TownMessage))
                 .ForMember(dto => dto.CauseOfDeath, opt => opt.MapFrom(model => model.CauseOfDeathNavigation))
                 .ForMember(dto => dto.CleanUp, opt => opt.MapFrom(model => model.CleanUpNavigation));
+
+            CreateMap<TownCitizen, CitizenHeroSkillLevelsDto>()
+                .ForMember(dto => dto.S, opt => opt.MapFrom(model => model.HeroSkillLevelS))
+                .ForMember(dto => dto.U, opt => opt.MapFrom(model => model.HeroSkillLevelU))
+                .ForMember(dto => dto.P, opt => opt.MapFrom(model => model.HeroSkillLevelP))
+                .ForMember(dto => dto.E, opt => opt.MapFrom(model => model.HeroSkillLevelE))
+                .ForMember(dto => dto.R, opt => opt.MapFrom(model => model.HeroSkillLevelR));
 
             CreateMap<TownCitizen, CitizenHomeDto>()
                 .ForMember(dest => dest.Content, opt => opt.MapFrom(src => src))

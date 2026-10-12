@@ -5,6 +5,7 @@ using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Expeditions.Request;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Map;
 using MyHordesOptimizerApi.Extensions;
 using MyHordesOptimizerApi.Models;
+using MyHordesOptimizerApi.Services.Impl.MapRoutes;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -47,9 +48,20 @@ namespace MyHordesOptimizerApi.MappingProfiles.Expeditions
                 .ForMember(dto => dto.Label, opt => opt.MapFrom(model => model.Label))
                 .ForMember(dto => dto.Orders, opt => opt.MapFrom(model => model.IdExpeditionOrders))
                 .ForMember(dto => dto.Position, opt => opt.MapFrom(model => model.Position))
-                .ForMember(dto => dto.Path, opt => opt.MapFrom(model => model.Path));
+                // Ancien « Nom du tracé » : le nom du tracé lié, pour les scripts qui l'affichent encore.
+                .ForMember(dto => dto.Path, opt => opt.MapFrom(model => model.IdMapRouteNavigation != null ? model.IdMapRouteNavigation.Label : null))
+                .ForMember(dto => dto.MapRouteId, opt => opt.MapFrom(model => model.IdMapRoute))
+                .ForMember(dto => dto.MapRoute, opt => opt.MapFrom(model => model.IdMapRouteNavigation));
+            CreateMap<MapRoute, ExpeditionPartRouteDto>()
+                .ForMember(dto => dto.Id, opt => opt.MapFrom(model => model.IdMapRoute))
+                .ForMember(dto => dto.Label, opt => opt.MapFrom(model => model.Label))
+                .ForMember(dto => dto.Color, opt => opt.MapFrom(model => model.Color))
+                .ForMember(dto => dto.Cells, opt => opt.MapFrom(model => MapRouteJson.ParsePoints(model.Cells)))
+                .ForMember(dto => dto.Length, opt => opt.MapFrom(model => model.Length))
+                .ForMember(dto => dto.Version, opt => opt.MapFrom(model => model.Version));
             CreateMap<ExpeditionPartRequestDto, ExpeditionPart>()
-                .ForMember(model => model.Path, opt => opt.MapFrom(dto => dto.Path))
+                .ForMember(model => model.IdMapRoute, opt => opt.MapFrom(dto => dto.MapRouteId))
+                .ForMember(model => model.IdMapRouteNavigation, opt => opt.Ignore())
                 .ForMember(model => model.Label, opt => opt.MapFrom(dto => dto.Label))
                 .ForMember(model => model.IdExpeditionPart, opt => opt.Ignore())
                 .ForMember(model => model.IdExpedition, opt => opt.Ignore())
@@ -75,6 +87,13 @@ namespace MyHordesOptimizerApi.MappingProfiles.Expeditions
                 .ForMember(model => model.IsDone, opt => opt.MapFrom(dto => dto.IsDone))
                 .ForMember(model => model.Position, opt => opt.MapFrom(dto => dto.Position))
                 .ForMember(model => model.Type, opt => opt.MapFrom(dto => dto.Type))
+                .ForMember(model => model.X, opt => opt.MapFrom(dto => dto.X))
+                .ForMember(model => model.Y, opt => opt.MapFrom(dto => dto.Y))
+                .ForMember(model => model.Kind, opt => opt.MapFrom(dto => dto.Kind))
+                .ForMember(model => model.IdItem, opt => opt.MapFrom(dto => dto.ItemId))
+                .ForMember(model => model.Quantity, opt => opt.MapFrom(dto => dto.Quantity))
+                .ForMember(model => model.HeroSkill, opt => opt.MapFrom(dto => dto.HeroSkill))
+                .ForMember(model => model.IdTargetUser, opt => opt.MapFrom(dto => dto.TargetUserId))
                 .ForMember(model => model.IdExpeditionCitizen, opt => opt.Ignore())
                 .ForMember(model => model.IdExpeditionCitizenNavigation, opt => opt.Ignore())
                 .ForMember(model => model.IdExpeditionParts, opt => opt.Ignore())
@@ -86,7 +105,14 @@ namespace MyHordesOptimizerApi.MappingProfiles.Expeditions
                 .ForMember(dto => dto.IsDone, opt => opt.MapFrom(model => model.IsDone))
                 .ForMember(dto => dto.Position, opt => opt.MapFrom(model => model.Position))
                 .ForMember(dto => dto.Text, opt => opt.MapFrom(model => model.Text))
-                .ForMember(dto => dto.Type, opt => opt.MapFrom(model => model.Type));
+                .ForMember(dto => dto.Type, opt => opt.MapFrom(model => model.Type))
+                .ForMember(dto => dto.X, opt => opt.MapFrom(model => model.X))
+                .ForMember(dto => dto.Y, opt => opt.MapFrom(model => model.Y))
+                .ForMember(dto => dto.Kind, opt => opt.MapFrom(model => model.Kind))
+                .ForMember(dto => dto.ItemId, opt => opt.MapFrom(model => model.IdItem))
+                .ForMember(dto => dto.Quantity, opt => opt.MapFrom(model => model.Quantity))
+                .ForMember(dto => dto.HeroSkill, opt => opt.MapFrom(model => model.HeroSkill))
+                .ForMember(dto => dto.TargetUserId, opt => opt.MapFrom(model => model.IdTargetUser));
 
             CreateMap<ExpeditionCitizen, ExpeditionCitizenDto>()
                 .ForMember(dto => dto.Id, opt => opt.MapFrom(model => model.IdExpeditionCitizen))

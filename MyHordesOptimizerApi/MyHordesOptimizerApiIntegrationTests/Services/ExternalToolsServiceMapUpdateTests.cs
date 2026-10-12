@@ -67,6 +67,8 @@ namespace MyHordesOptimizerApiIntegrationTests.Services
 
             fakeRepo.Response = new MyHordesUserDetailsDto
             {
+                // Ville du joueur selon MyHordes : doit être celle de la requête, sinon la carte est refusée.
+                MapId = townId,
                 Map = new MyHordesMap
                 {
                     City = new MyHordesCity { X = TownX, Y = TownY },
@@ -95,6 +97,77 @@ namespace MyHordesOptimizerApiIntegrationTests.Services
             context.MapCells.AsNoTracking()
                 .Any(cell => cell.IdTown == townId && cell.X == TownX + 1 && cell.Y == TownY)
                 .Should().BeTrue();
+        }
+
+        /// <summary>Itinéraires créés dans MyHordes : remplacés en bloc par ceux du jour, auteurs connus de MHO gardés.</summary>
+        [Fact]
+        public async Task UpdateExternalsTools_ItinerairesDuJeu_RemplacesParCeuxDuJour()
+        {
+            var fakeRepo = new SingleResponseMyHordesApiRepository();
+            using var factory = _factory.WithWebHostBuilder(builder =>
+            {
+                builder.ConfigureTestServices(services =>
+                {
+                    services.AddScoped<IMyHordesApiRepository>(_ => fakeRepo);
+                });
+            });
+
+            var scope = factory.Services.CreateScope();
+            var context = scope.ServiceProvider.GetRequiredService<MhoContext>();
+            var service = scope.ServiceProvider.GetRequiredService<IExternalToolsService>();
+
+            var townId = SeedTown(context);
+            context.MapRouteGames.Add(new MapRouteGame { IdTown = townId, Day = 2, Label = "hier", Length = 1, Stops = "[[100,100],[100,99]]" });
+            context.SaveChanges();
+
+            fakeRepo.Response = new MyHordesUserDetailsDto
+            {
+                MapId = townId,
+                Map = new MyHordesMap
+                {
+                    Wid = 201,
+                    Hei = 201,
+                    Days = 3,
+                    City = new MyHordesCity { X = TownX, Y = TownY },
+                    Zones = new List<MyHordesZone>(),
+                    Expeditions = new List<MyHordesExpeditionDto>
+                    {
+                        new()
+                        {
+                            Name = "Nord",
+                            Length = 4,
+                            Author = new MyHordesExpeditionAuthorDto { Id = int.MaxValue },
+                            Points = new MyHordesExpeditionPointsDto { X = new List<int> { TownX, TownX, TownX + 2 }, Y = new List<int> { TownY, TownY - 2, TownY - 2 } }
+                        }
+                    }
+                }
+            };
+
+            var request = new UpdateRequestDto
+            {
+                Map = new UpdateRequestMapDto
+                {
+                    ToolsToUpdate = new UpdateRequestMapToolsToUpdateDetailsDto
+                    {
+                        IsMyHordesOptimizer = "api",
+                        IsGestHordes = "none",
+                        IsFataMorgana = "none",
+                        IsBigBrothHordes = "none"
+                    }
+                },
+                TownDetails = new UpdateTownDetailsDto { TownId = townId, TownX = TownX, TownY = TownY, IsChaos = false }
+            };
+
+            var response = await service.UpdateExternalsTools(request);
+
+            response.MapResponseDto.MhoApiStatus.Should().Be(ExternalToolsUpdateResponseType.Ok.GetDescription());
+            var gameRoutes = context.MapRouteGames.AsNoTracking().Where(gameRoute => gameRoute.IdTown == townId).ToList();
+            gameRoutes.Should().ContainSingle();
+            gameRoutes[0].Label.Should().Be("Nord");
+            gameRoutes[0].Day.Should().Be(3);
+            gameRoutes[0].Length.Should().Be(4);
+            gameRoutes[0].IdAuthor.Should().BeNull();
+            gameRoutes[0].Stops.Should().Be("[[100,100],[100,98],[102,98]]");
         }
 
         private sealed class SingleResponseMyHordesApiRepository : IMyHordesApiRepository

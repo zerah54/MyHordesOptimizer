@@ -9,6 +9,7 @@ import { of } from 'rxjs';
 import { Cell } from '../../../_abstract_model/types/cell.class';
 import { Citizen } from '../../../_abstract_model/types/citizen.class';
 import { Item } from '../../../_abstract_model/types/item.class';
+import { MapRoutePoint } from '../../../_abstract_model/types/map-route.class';
 import { Me } from '../../../_abstract_model/types/me.class';
 import { Ruin } from '../../../_abstract_model/types/ruin.class';
 import { Town } from '../../../_abstract_model/types/town.class';
@@ -17,9 +18,12 @@ import { TownContextService } from '../../../_core/services/town-context.service
 import { setUser } from '../../../_core/utilities/localstorage.util';
 import { MapOptions } from '../map.component';
 import { CORNERS_VERSION, sanitizeCorners } from '../map-corners';
-import { DrawMapComponent } from './draw-map.component';
+import { provideMapOrdersTesting } from '../map-orders/map-orders.testing';
+import { DEFAULT_ROUTES_DISPLAY } from '../map-routes/map-routes-display';
+import { DrawMapComponent, MapCellPick } from './draw-map.component';
 import { MapCellComponent } from './map-cell/map-cell.component';
 import { MapCellDetailsComponent } from './map-cell-details/map-cell-details.component';
+import { MapRoutesLayerComponent } from './map-routes-layer/map-routes-layer.component';
 import { MapUpdateComponent } from './map-update/map-update.component';
 
 interface TestableComponent {
@@ -65,7 +69,8 @@ const options: MapOptions = {
     distances: [],
     zoom: 30,
     corners: sanitizeCorners(undefined),
-    corners_version: CORNERS_VERSION
+    corners_version: CORNERS_VERSION,
+    routes: DEFAULT_ROUTES_DISPLAY
 };
 
 describe('DrawMapComponent', (): void => {
@@ -76,7 +81,10 @@ describe('DrawMapComponent', (): void => {
         setUser(null);
         await TestBed.configureTestingModule({
             imports: [DrawMapComponent],
-            providers: [provideHttpClient(withXhr()), provideHttpClientTesting(), { provide: ANIMATION_MODULE_TYPE, useValue: 'NoopAnimations' }]
+            providers: [
+                provideHttpClient(withXhr()), provideHttpClientTesting(), { provide: ANIMATION_MODULE_TYPE, useValue: 'NoopAnimations' },
+                ...provideMapOrdersTesting()
+            ]
         }).compileComponents();
         fixture = TestBed.createComponent(DrawMapComponent);
         testable = fixture.componentInstance as unknown as TestableComponent;
@@ -260,12 +268,26 @@ describe('DrawMapComponent', (): void => {
 
         const details: MapCellDetailsComponent = fixture.debugElement.query(By.directive(MapCellDetailsComponent)).componentInstance;
         expect(details.canUpdate()).toBe(false);
+        expect(details.canEditOrders()).toBe(false);
 
         const dialog: MatDialog = TestBed.inject(MatDialog);
         vi.spyOn(dialog, 'open');
         fixture.debugElement.query(By.directive(MapCellDetailsComponent)).triggerEventHandler('updateRequested', undefined);
 
         expect(dialog.open).not.toHaveBeenCalled();
+    });
+
+    it('lets a former citizen edit the orders of an observed cell, not the cell itself', (): void => {
+        const context: TownContextService = TestBed.inject(TownContextService);
+        context.setObservedTown(new TownDetails());
+        context.setObservedAccess({ is_citizen: true, is_current_town: false, can_create: true });
+        fixture.componentRef.setInput('map', newTown({ town_x: 0, map_width: 1, cells: [newCell(0, 0)] }));
+        fixture.detectChanges();
+        clickFirstCell();
+
+        const details: MapCellDetailsComponent = fixture.debugElement.query(By.directive(MapCellDetailsComponent)).componentInstance;
+        expect(details.canUpdate()).toBe(false);
+        expect(details.canEditOrders()).toBe(true);
     });
 
     it('drops the chosen cell when a new map is bound', (): void => {
@@ -289,5 +311,146 @@ describe('DrawMapComponent', (): void => {
         fixture.detectChanges();
 
         expect(testable.x_row()).toEqual([-1, 0, 1]);
+    });
+
+    it('draws the routes layer over the grid, sized in cells, only when there are routes', (): void => {
+        fixture.componentRef.setInput('map', newTown({ map_width: 2, cells: [newCell(0, 0), newCell(1, 0), newCell(0, 1), newCell(1, 1)] }));
+        fixture.detectChanges();
+        expect(fixture.debugElement.query(By.directive(MapRoutesLayerComponent))).toBeNull();
+
+        fixture.componentRef.setInput('routes', [{
+            key: 'mho-1', color: 'teal', cells: [{ x: 0, y: 0 }, { x: 1, y: 0 }], lane: 0, dashed: false, emphasized: false, dimmed: false, end: { x: 1, y: 0 },
+            label: null
+        }]);
+        fixture.detectChanges();
+
+        const layer: MapRoutesLayerComponent = fixture.debugElement.query(By.directive(MapRoutesLayerComponent)).componentInstance;
+        expect(layer.width()).toBe(2);
+        expect(layer.height()).toBe(2);
+        expect(layer.drawings().length).toBe(1);
+    });
+
+    it('in route mode, reports the clicked and hovered cells instead of opening the detail', (): void => {
+        const picks: MapCellPick[] = [];
+        const hovers: (MapRoutePoint | null)[] = [];
+        fixture.componentInstance.cellPicked.subscribe((pick: MapCellPick): void => {
+            picks.push(pick);
+        });
+        fixture.componentInstance.cellHovered.subscribe((point: MapRoutePoint | null): void => {
+            hovers.push(point);
+        });
+        fixture.componentRef.setInput('map', newTown({ town_x: 0, map_width: 1, cells: [newCell(0, 0)] }));
+        fixture.componentRef.setInput('routeEditing', true);
+        fixture.detectChanges();
+        const cell: HTMLElement = fixture.nativeElement.querySelector('.map-row:not(.axis-row) mho-map-cell .map-cell');
+
+        cell.dispatchEvent(new MouseEvent('mouseenter'));
+        clickFirstCell();
+        cell.dispatchEvent(Object.assign(new Event('pointerdown', { bubbles: true }), { pointerType: 'touch' }));
+        clickFirstCell();
+        cell.dispatchEvent(new MouseEvent('mouseleave'));
+
+        expect(picks).toEqual([{ x: 0, y: 0, touch: false }, { x: 0, y: 0, touch: true }]);
+        expect(hovers).toEqual([{ x: 0, y: 0 }, null]);
+        expect(fixture.debugElement.query(By.directive(MapCellDetailsComponent))).toBeNull();
+        expect(fixture.nativeElement.querySelector('.mho-draw-map').classList).toContain('route-editing');
+    });
+
+    it('closes the open detail when route mode starts', (): void => {
+        fixture.componentRef.setInput('map', newTown({ town_x: 0, map_width: 1, cells: [newCell(0, 0)] }));
+        fixture.detectChanges();
+        clickFirstCell();
+        expect(fixture.debugElement.query(By.directive(MapCellDetailsComponent))).not.toBeNull();
+
+        fixture.componentRef.setInput('routeEditing', true);
+        fixture.detectChanges();
+
+        expect(fixture.debugElement.query(By.directive(MapCellDetailsComponent))).toBeNull();
+    });
+
+    describe('cutting the route being drawn', (): void => {
+        let cuts: MapRoutePoint[];
+        let picks: MapCellPick[];
+
+        beforeEach((): void => {
+            cuts = [];
+            picks = [];
+            fixture.componentInstance.cellCut.subscribe((point: MapRoutePoint): void => {
+                cuts.push(point);
+            });
+            fixture.componentInstance.cellPicked.subscribe((pick: MapCellPick): void => {
+                picks.push(pick);
+            });
+            fixture.componentRef.setInput('map', newTown({ town_x: 0, map_width: 2, cells: [newCell(0, 0), newCell(1, 0)] }));
+            fixture.componentRef.setInput('routeEditing', true);
+            fixture.componentRef.setInput('editedCells', new Set<string>(['0,0']));
+            fixture.detectChanges();
+        });
+
+        afterEach((): void => {
+            vi.useRealTimers();
+        });
+
+        function cellElement(index: number): HTMLElement {
+            return fixture.nativeElement.querySelectorAll('.map-row:not(.axis-row) mho-map-cell .map-cell')[index];
+        }
+
+        function rightClick(index: number): MouseEvent {
+            const event: MouseEvent = new MouseEvent('contextmenu', { bubbles: true, cancelable: true });
+            cellElement(index).dispatchEvent(event);
+            return event;
+        }
+
+        function touch(type: string, index: number, client_x: number = 0): void {
+            cellElement(index).dispatchEvent(Object.assign(new Event(type, { bubbles: true }), {
+                pointerType: 'touch', pointerId: 1, clientX: client_x, clientY: 0
+            }));
+        }
+
+        it('cuts on a right-click on the route, without the browser menu', (): void => {
+            const event: MouseEvent = rightClick(0);
+
+            expect(cuts).toEqual([{ x: 0, y: 0 }]);
+            expect(event.defaultPrevented).toBe(true);
+        });
+
+        it('keeps the browser menu off the route, and outside route input', (): void => {
+            expect(rightClick(1).defaultPrevented).toBe(false);
+
+            fixture.componentRef.setInput('routeEditing', false);
+            fixture.detectChanges();
+
+            expect(rightClick(0).defaultPrevented).toBe(false);
+            expect(cuts).toEqual([]);
+        });
+
+        it('cuts on a long touch, and the release does not add a destination', (): void => {
+            vi.useFakeTimers();
+            touch('pointerdown', 0);
+            vi.advanceTimersByTime(499);
+            expect(cuts).toEqual([]);
+
+            vi.advanceTimersByTime(1);
+            expect(cuts).toEqual([{ x: 0, y: 0 }]);
+
+            cellElement(0).dispatchEvent(new MouseEvent('click'));
+            expect(picks).toEqual([]);
+
+            touch('pointerdown', 0);
+            touch('pointerup', 0);
+            cellElement(0).dispatchEvent(new MouseEvent('click'));
+            expect(picks).toEqual([{ x: 0, y: 0, touch: true }]);
+            expect(cuts.length).toBe(1);
+        });
+
+        it('cancels the long touch when the finger moves, and ignores cells off the route', (): void => {
+            vi.useFakeTimers();
+            touch('pointerdown', 0);
+            touch('pointermove', 0, 20);
+            touch('pointerdown', 1);
+            vi.advanceTimersByTime(1000);
+
+            expect(cuts).toEqual([]);
+        });
     });
 });

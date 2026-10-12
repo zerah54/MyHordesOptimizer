@@ -1,0 +1,97 @@
+@let current = view();
+@let others_count = current.others.length;
+@if (mode() === 'tooltip') {
+    @if (current.count > 0) {
+        <div class="cell-orders">
+            @for (group of current.mine; track group.key) {
+                <section class="group mine" [style.--group-color]="group.color">
+                    <div class="group-head">
+                        <span class="swatch" [class.none]="!group.color"></span>
+                        <span class="label">{{ group.label }}</span>
+                        <span class="count">{{ group.lines.length }}</span>
+                    </div>
+                    @for (line of group.lines; track line.key) {
+                        <mho-expedition-order [order]="line.entry.order" [items]="items()" [citizens]="citizens()"
+                                              [scope]="line.scope" [scopeIsMe]="!!line.scope"></mho-expedition-order>
+                    }
+                </section>
+            }
+            @if (others_count > 0) {
+                <p class="others-summary">
+                    <mat-icon aria-hidden="true">forum</mat-icon>
+                    <span>
+                        @if (current.mine.length > 0) {
+                            <ng-container i18n>{others_count, plural, =1 {+ 1 autre&nbsp;:} other {+ {{ others_count }} autres&nbsp;:}}</ng-container>
+                        } @else {
+                            <ng-container i18n>{others_count, plural, =1 {1 consigne&nbsp;:} other {{{ others_count }} consignes&nbsp;:}}</ng-container>
+                        }
+                        {{ others_names() }}
+                    </span>
+                </p>
+            }
+        </div>
+    }
+} @else if (current.count > 0 || choices().length > 0) {
+    <div class="cell-orders detail">
+        @if (current.mine.length > 0) {
+            <h2 class="section-title" i18n>Mes consignes</h2>
+            @for (group of current.mine; track group.key) {
+                <section class="group mine" [style.--group-color]="group.color">
+                    <div class="group-head">
+                        <span class="swatch" [class.none]="!group.color"></span>
+                        <span class="label">{{ group.label }}</span>
+                    </div>
+                    @for (line of group.lines; track line.key) {
+                        <div class="line">
+                            <mho-expedition-order class="order" [order]="line.entry.order" [items]="items()" [citizens]="citizens()"
+                                                  [scope]="line.scope" [scopeIsMe]="!!line.scope" [checkable]="editable()"
+                                                  (doneChange)="toggleDone(line.entry, $event)"></mho-expedition-order>
+                            @if (editable()) {
+                                <button mat-icon-button type="button" class="line-action" (click)="edit(line.entry)"
+                                        [matTooltip]="edit_label" [attr.aria-label]="edit_label">
+                                    <mat-icon>edit</mat-icon>
+                                </button>
+                            }
+                        </div>
+                    }
+                </section>
+            }
+        }
+        @if (others_count > 0) {
+            <h2 class="section-title" i18n>Autres consignes ici</h2>
+            <ul class="others">
+                @for (other of current.others; track other.key) {
+                    <li class="other" [style.--group-color]="other.color">
+                        <span class="dot" [class.none]="!other.color" aria-hidden="true"></span>
+                        <span class="other-text"><b>{{ other.who }}</b> — {{ other.text }}</span>
+                        @if (editable()) {
+                            <button mat-icon-button type="button" class="line-action" (click)="edit(other.entry)"
+                                    [matTooltip]="edit_label" [attr.aria-label]="edit_label">
+                                <mat-icon>edit</mat-icon>
+                            </button>
+                        }
+                    </li>
+                }
+            </ul>
+        }
+        @let parts = choices();
+        @if (parts.length === 1) {
+            <button mat-stroked-button type="button" class="add" (click)="add(parts[0].part)">
+                <mat-icon>add</mat-icon>
+                <ng-container i18n>Ajouter une consigne ici</ng-container>
+            </button>
+        } @else if (parts.length > 1) {
+            <button mat-stroked-button type="button" class="add" [matMenuTriggerFor]="partsMenu">
+                <mat-icon>add</mat-icon>
+                <ng-container i18n>Ajouter une consigne ici</ng-container>
+            </button>
+            <mat-menu #partsMenu="matMenu">
+                @for (choice of parts; track choice.key) {
+                    <button mat-menu-item type="button" (click)="add(choice.part)" [style.--group-color]="choice.color">
+                        <span class="menu-choice"><span class="swatch" [class.none]="!choice.color"></span>{{ choice.label }}</span>
+                    </button>
+                }
+            </mat-menu>
+        }
+    </div>
+}

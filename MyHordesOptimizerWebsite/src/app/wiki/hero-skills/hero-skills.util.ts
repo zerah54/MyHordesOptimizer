@@ -1,4 +1,5 @@
 import { HeroSkill } from '../../_abstract_model/types/hero-skill.class';
+import { heroSkillLevelName } from '../../_abstract_model/types/hero-skill-levels';
 
 /** Un niveau d'un groupe de compétences, tel qu'affiché. */
 export interface HeroSkillLevelView {
@@ -13,9 +14,6 @@ export interface HeroSkillGroupView {
     readonly name: string;
     readonly levels: readonly HeroSkillLevelView[];
 }
-
-/** Noms des niveaux d'un groupe : ils ne figurent pas dans les données extraites du jeu. */
-const LEVEL_NAMES: readonly string[] = [$localize`Débutant`, $localize`Apprenti`, $localize`Expert`, $localize`Élite`];
 
 /** Langue de repli des textes extraits du jeu : l'allemand, langue de la source MyHordes. */
 const SOURCE_LOCALE: string = 'de';
@@ -38,10 +36,6 @@ export function citizenBaseGroup(): HeroSkillGroupView {
             ]
         }]
     };
-}
-
-function levelName(level: number): string {
-    return LEVEL_NAMES[level] ?? $localize`Niveau ${level + 1}:level:`;
 }
 
 /**
@@ -71,7 +65,7 @@ export function buildHeroSkillTree(skills: readonly HeroSkill[], locale: string)
             levels: [...group.skills]
                 .sort((a: HeroSkill, b: HeroSkill): number => (a.level ?? 0) - (b.level ?? 0))
                 .map((skill: HeroSkill): HeroSkillLevelView => ({
-                    name: levelName(skill.level ?? 0),
+                    name: heroSkillLevelName(skill.level ?? 0),
                     points_needed: skill.days_needed ?? 0,
                     bullets: skill.bullets[locale]?.length ? skill.bullets[locale] : (skill.bullets[SOURCE_LOCALE] ?? [])
                 }))

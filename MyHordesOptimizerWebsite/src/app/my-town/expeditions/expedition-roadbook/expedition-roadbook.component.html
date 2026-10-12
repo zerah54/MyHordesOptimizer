@@ -1,0 +1,90 @@
+<section class="roadbook" [style.--mho-route-color]="route_color()" aria-label="Feuille de route" i18n-aria-label>
+    <header class="roadbook-head">
+        <mat-icon aria-hidden="true">map</mat-icon>
+        <h3 i18n>Feuille de route</h3>
+        <span class="summary">{{ summary() }}</span>
+    </header>
+
+    @if (mini_map(); as mini) {
+        <div class="overview">
+            <div class="mini-map" [class.editable]="editable()" [style.--mho-cell]="mini.cell_size + 'px'"
+                 [style.grid-template-columns]="'repeat(' + mini.box.width + ', ' + mini.cell_size + 'px)'"
+                 (click)="onMiniMapClick($event)" aria-hidden="true">
+                @for (cell of mini.cells; track cell.key) {
+                    <div [class]="cell.classes" [attr.data-cell]="cell.x + ',' + cell.y" [title]="cell.title">
+                        @if (cell.orders > 0) {
+                            <span class="count">{{ cell.orders }}</span>
+                        }
+                    </div>
+                }
+                @if (mini.drawings.length > 0) {
+                    <mho-map-routes-layer [width]="mini.box.width" [height]="mini.box.height" [drawings]="mini.drawings"></mho-map-routes-layer>
+                }
+            </div>
+            <div class="overview-text">
+                @if (route(); as linked) {
+                    <span class="muted" i18n>Tracé</span>
+                    <b>{{ linked.label }}</b>
+                } @else {
+                    <span class="muted" i18n>Sans tracé : les cases sont rangées par distance à la ville.</span>
+                }
+                @if (editable()) {
+                    <span class="muted hint" i18n>Cliquez une case de la mini-carte pour y poser une consigne.</span>
+                }
+            </div>
+        </div>
+    }
+
+    @if (off_route_count() > 0) {
+        <div class="off-route-alert" role="status">
+            <mat-icon aria-hidden="true">warning</mat-icon>
+            <span
+                i18n>{off_route_count(), plural, =1 {1 consigne n'est plus sur le tracé.} other {{{ off_route_count() }} consignes ne sont plus sur le tracé.}}</span>
+        </div>
+    }
+
+    @if (steps().length > 0) {
+        <ol class="steps">
+            @for (step of steps(); track step.key) {
+                <li class="step" [class]="step.node">
+                    <span class="node" aria-hidden="true">{{ step.label }}</span>
+                    <div class="step-body">
+                        <div class="step-head">
+                            <span class="coordinates">{{ step.coordinates }}</span>
+                            <span class="place">{{ step.place }}</span>
+                            @if (step.node === 'off') {
+                                <span class="off-pill" i18n>Hors tracé</span>
+                            }
+                            <span class="spacer"></span>
+                            @if (step.ap !== null) {
+                                <span class="ap">{{ step.ap }}<small>PA</small></span>
+                            }
+                        </div>
+                        @for (line of step.orders; track line.key) {
+                            <div class="order-line">
+                                <mho-expedition-order class="order" [order]="line.owned.order" [items]="items()" [citizens]="citizens()"
+                                                      [scope]="line.scope" [scopeIsMe]="line.is_me" [checkable]="checkable()"
+                                                      (doneChange)="toggleDone(line, $event)"></mho-expedition-order>
+                                @if (editable()) {
+                                    <button mat-icon-button type="button" class="line-action" (click)="editOrder(step, line)"
+                                            [matTooltip]="step.node === 'off' ? move_tooltip : edit_tooltip"
+                                            [attr.aria-label]="step.node === 'off' ? move_tooltip : edit_tooltip">
+                                        <mat-icon>{{ step.node === 'off' ? 'open_with' : 'edit' }}</mat-icon>
+                                    </button>
+                                }
+                            </div>
+                        }
+                        @if (editable() && step.addable) {
+                            <button mat-button type="button" class="add" (click)="addOrder(step)">
+                                <mat-icon>add</mat-icon>
+                                <ng-container i18n>Consigne sur cette case</ng-container>
+                            </button>
+                        }
+                    </div>
+                </li>
+            }
+        </ol>
+    } @else if (!route()) {
+        <p class="empty" i18n>Aucune consigne sur une case.</p>
+    }
+</section>
