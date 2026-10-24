@@ -4,6 +4,7 @@ import { HORDES_IMG_REPO } from '../../_abstract_model/const';
 import { Citizen } from '../../_abstract_model/types/citizen.class';
 import { CitizenExpedition } from '../../_abstract_model/types/citizen-expedition.class';
 import { Expedition } from '../../_abstract_model/types/expedition.class';
+import { meetsRequirements } from './expedition-resources.util';
 import { getPreRegistered } from './expeditions.utils';
 
 
@@ -11,12 +12,11 @@ import { getPreRegistered } from './expeditions.utils';
     name: 'citizensForExpe'
 })
 export class CitizensForExpePipe implements PipeTransform {
-    public transform(all_citizens: Citizen[], expedition_citizen: CitizenExpedition/*, current_expedition: Expedition, all_expeditions: Expedition[]*/): Citizen[] {
-        if (!expedition_citizen.preinscrit_job) return all_citizens;
-
+    /** Citoyens pouvant occuper la place (exigences remplies), plus celui qui l'occupe déjà. */
+    public transform(all_citizens: Citizen[], expedition_citizen: CitizenExpedition, expedition_day: number, current_day: number, scouts_lair_built: boolean/*, current_expedition: Expedition, all_expeditions: Expedition[]*/): Citizen[] {
         return all_citizens.filter((citizen: Citizen): boolean => {
-            if (citizen.is_dead) return false;
-            if (expedition_citizen.preinscrit_job && citizen.job?.key !== expedition_citizen.preinscrit_job) return false;
+            if (citizen.id === expedition_citizen.citizen_id) return true;
+            if (!meetsRequirements(citizen, expedition_citizen, expedition_day, current_day, scouts_lair_built)) return false;
             // const is_already_placed: boolean = all_expeditions
             //     .filter((expedition: Expedition) => {
             //         return expedition.id !== current_expedition.id;

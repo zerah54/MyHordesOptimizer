@@ -56,6 +56,9 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Citizens
         /// <summary>Campings déjà effectués dans la ville, saisis à la main ; 0 si rien n'est saisi.</summary>
         public int CampingCount { get; set; }
 
+        /// <summary>Chaussures équipées, déclarées par le citoyen dans la liste des citoyens ou envoyées par le script ; <c>false</c> si rien n'est déclaré.</summary>
+        public bool ShoesEquipped { get; set; }
+
         /// <summary>Niveaux des capacités héroïques, saisis à la main.</summary>
         public CitizenHeroSkillLevelsDto HeroSkills { get; set; } = new();
 

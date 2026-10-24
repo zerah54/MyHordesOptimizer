@@ -375,6 +375,19 @@
                                         </td>
                                     </ng-container>
 
+                                    <!-- Chaussures équipées : même colonne dans les deux modes -->
+                                    <ng-container [matColumnDef]="SHOES_EQUIPPED_ID">
+                                        <th *matHeaderCellDef class="field-col category-start" mat-header-cell>
+                                            @if (shoe_icon()) {
+                                                <img [alt]="shoes_equipped_label" [matTooltip]="shoes_equipped_label" [src]="HORDES_IMG_REPO + shoe_icon()"
+                                                     class="col-header-icon">
+                                            }
+                                        </th>
+                                        <td *matCellDef="let row; table: table" class="field-col category-start" mat-cell>
+                                            <mho-deferred-cell [content]="shoesEquippedCell" [context]="{ $implicit: row }"></mho-deferred-cell>
+                                        </td>
+                                    </ng-container>
+
                                     <!-- ============ Mode colonnes : une colonne par champ ============ -->
 
                                     <ng-container matColumnDef="sac">
@@ -864,6 +877,18 @@
         [value]="row.camping_count"
         icon="emotes/sleep.gif">
     </mho-compact-stepper>
+</ng-template>
+
+<ng-template #shoesEquippedCell let-row>
+    @if (shoe_icon()) {
+        <mho-compact-toggle
+            (valueChange)="updateShoesEquipped(row.id, $event)"
+            [disabled]="is_readonly()"
+            [icon]="shoe_icon()"
+            [label]="shoes_equipped_label"
+            [value]="row.shoes_equipped">
+        </mho-compact-toggle>
+    }
 </ng-template>
 
 <!-- Cellule de fin de ligne : indicateur unique de MàJ, menu de détail au survol -->

@@ -61,6 +61,15 @@ public partial class ExpeditionOrder
     [Column("idTargetUser", TypeName = "int(11)")]
     public int? IdTargetUser { get; set; }
 
+    /// <summary>Autre expédition du jour à attendre (FK Expedition ON DELETE SET NULL), à la place d'un citoyen.</summary>
+    [Column("idTargetExpedition", TypeName = "int(11)")]
+    public int? IdTargetExpedition { get; set; }
+
+    /// <summary>Précision libre d'une consigne typée, en texte brut.</summary>
+    [Column("note")]
+    [StringLength(255)]
+    public string? Note { get; set; }
+
     [ForeignKey("IdExpeditionCitizen")]
     [InverseProperty("ExpeditionOrders")]
     public virtual ExpeditionCitizen? IdExpeditionCitizenNavigation { get; set; }

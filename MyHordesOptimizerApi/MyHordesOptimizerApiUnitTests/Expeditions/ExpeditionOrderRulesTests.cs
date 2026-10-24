@@ -113,9 +113,47 @@ namespace MyHordesOptimizerApiUnitTests.Expeditions
         }
 
         [Fact]
+        public void Attendre_UneAutreExpedition_Accepte()
+        {
+            Validate(new ExpeditionOrder { Kind = ExpeditionOrderKinds.Wait, IdTargetExpedition = 7 }).Should().NotThrow();
+        }
+
+        [Fact]
+        public void Attendre_UnCitoyenEtUneExpedition_Refuse()
+        {
+            Validate(new ExpeditionOrder { Kind = ExpeditionOrderKinds.Wait, IdTargetUser = 42, IdTargetExpedition = 7 }).Should().Throw<MhoTechnicalException>();
+        }
+
+        [Fact]
         public void TexteLibre_AvecParametreDeConsigneTypee_Refuse()
         {
             Validate(new ExpeditionOrder { Text = "x", IdTargetUser = 42 }).Should().Throw<MhoTechnicalException>();
+            Validate(new ExpeditionOrder { Text = "x", IdTargetExpedition = 7 }).Should().Throw<MhoTechnicalException>();
+        }
+
+        [Fact]
+        public void Explorer_AvecExpeditionAAttendre_Refuse()
+        {
+            Validate(new ExpeditionOrder { Kind = ExpeditionOrderKinds.Explore, IdTargetExpedition = 7 }).Should().Throw<MhoTechnicalException>();
+        }
+
+        [Fact]
+        public void ConsigneTypee_AvecNote_Accepte()
+        {
+            Validate(new ExpeditionOrder { Kind = ExpeditionOrderKinds.Explore, Note = "attendre que X l'ait explorée" }).Should().NotThrow();
+        }
+
+        [Fact]
+        public void TexteLibre_AvecNote_Refuse()
+        {
+            Validate(new ExpeditionOrder { Text = "x", Note = "y" }).Should().Throw<MhoTechnicalException>();
+        }
+
+        [Fact]
+        public void Note_TropLongue_Refuse()
+        {
+            Validate(new ExpeditionOrder { Kind = ExpeditionOrderKinds.Camp, Note = new string('a', ExpeditionOrderRules.MaxNoteLength) }).Should().NotThrow();
+            Validate(new ExpeditionOrder { Kind = ExpeditionOrderKinds.Camp, Note = new string('a', ExpeditionOrderRules.MaxNoteLength + 1) }).Should().Throw<MhoTechnicalException>();
         }
 
         [Fact]

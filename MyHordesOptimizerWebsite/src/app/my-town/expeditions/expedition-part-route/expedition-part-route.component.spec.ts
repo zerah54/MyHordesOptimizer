@@ -6,6 +6,7 @@ import { ActivatedRoute, provideRouter, Router } from '@angular/router';
 import { Observable, of } from 'rxjs';
 
 import { MapRouteDTO, MapRouteLinkedPartDTO } from '../../../_abstract_model/dto/map-route.dto';
+import { ExpeditionOrder } from '../../../_abstract_model/types/expedition-order.class';
 import { ExpeditionPart, ExpeditionPartRoute } from '../../../_abstract_model/types/expedition-part.class';
 import { MapRoute } from '../../../_abstract_model/types/map-route.class';
 import { ExpeditionPartRouteComponent } from './expedition-part-route.component';
@@ -162,6 +163,15 @@ describe('ExpeditionPartRouteComponent', (): void => {
         expect(fixture.nativeElement.querySelector('.readonly .label').textContent).toBe('Boucle sud');
         expect(fixture.nativeElement.querySelector('.readonly .ap').textContent).toContain('2');
         expect(fixture.nativeElement.querySelector('a.see-on-map').getAttribute('href')).toContain('route=9');
+    });
+
+    it('shows the total cost of the part with its detail when a ruin is visited', (): void => {
+        const with_visit: ExpeditionPart = part(LINKED);
+        with_visit.orders = [new ExpeditionOrder({ type: 'checkbox', text: '', isDone: false, position: 0, kind: 'explore', x: 2, y: 3 })];
+
+        render(with_visit);
+
+        expect(fixture.nativeElement.querySelector('.readonly .ap').textContent.trim()).toBe('3 PA (2 + 1)');
     });
 
     it('shows nothing read only without linked route, and the list in edition', (): void => {

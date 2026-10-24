@@ -27,6 +27,9 @@ export type TownPhase = 'ALPHA' | 'BETA' | 'IMPORT' | 'NATIVE';
 
 export type ExpeditionOrderType = 'checkbox' | 'text';
 
+/** Comparaison de l'exigence de PE d'une place : au moins, au plus ou exactement. */
+export type SpRequirementOperator = 'min' | 'max' | 'exact';
+
 /** Consigne typée (`ExpeditionOrderKinds` côté API) ; une consigne sans type est un texte libre. */
 export type ExpeditionOrderKind = 'pick' | 'drop' | 'use' | 'clear' | 'explore' | 'excavate' | 'camp' | 'hero' | 'wait';
 

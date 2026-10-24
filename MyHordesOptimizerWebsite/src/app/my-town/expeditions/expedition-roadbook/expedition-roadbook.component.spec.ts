@@ -11,6 +11,7 @@ import { RealtimeExpeditionsService } from '../../../_abstract_model/realtime-se
 import { Cell } from '../../../_abstract_model/types/cell.class';
 import { Citizen } from '../../../_abstract_model/types/citizen.class';
 import { CitizenExpedition } from '../../../_abstract_model/types/citizen-expedition.class';
+import { Expedition } from '../../../_abstract_model/types/expedition.class';
 import { ExpeditionOrder } from '../../../_abstract_model/types/expedition-order.class';
 import { ExpeditionPart, ExpeditionPartRoute } from '../../../_abstract_model/types/expedition-part.class';
 import { Ruin } from '../../../_abstract_model/types/ruin.class';
@@ -152,7 +153,8 @@ describe('ExpeditionRoadbookComponent', (): void => {
             'A [2 ; 1] Désert 3PA',
             '! [5 ; -5] Hors tracé'
         ]);
-        expect(text(fixture.nativeElement.querySelector('.summary'))).toBe('3 PA · 3 consigne(s) sur 3 case(s)');
+        // Bob visite une ruine : 1 PA de plus que le tracé.
+        expect(text(fixture.nativeElement.querySelector('.summary'))).toBe('4 PA (3 + 1) · 3 consigne(s) sur 3 case(s)');
         expect(text(fixture.nativeElement.querySelector('.off-route-alert'))).toContain('1 consigne n\'est plus sur le tracé.');
     });
 
@@ -160,7 +162,7 @@ describe('ExpeditionRoadbookComponent', (): void => {
         render(part());
 
         const scopes: string[] = Array.from<Element>(fixture.nativeElement.querySelectorAll('.scope')).map(text);
-        expect(scopes).toEqual(['Moi', 'Tous', 'Bob']);
+        expect(scopes).toEqual(['Moi', 'N\'importe qui', 'Bob']);
         expect(fixture.nativeElement.querySelector('.scope.me')).not.toBeNull();
     });
 
@@ -177,7 +179,8 @@ describe('ExpeditionRoadbookComponent', (): void => {
         empty.orders = [order(2, 0, { type: 'text', text: 'Général' })];
         render(empty);
 
-        expect(text(fixture.nativeElement.querySelector('.summary'))).toBe('aucune consigne sur une case');
+        expect(text(fixture.nativeElement.querySelector('.summary'))).toBe('');
+        expect(text(fixture.nativeElement.querySelector('.overview-text'))).not.toContain('Sans tracé');
         expect(text(fixture.nativeElement.querySelector('.empty'))).toBe('Aucune consigne sur une case.');
         // La mini-carte reste, autour de la ville, pour poser une consigne en mode édition.
         expect(fixture.nativeElement.querySelectorAll('.mini-map [data-cell]').length).toBe(9);
@@ -234,6 +237,17 @@ describe('ExpeditionRoadbookComponent', (): void => {
         ]);
     });
 
+    it('offers the other expeditions of the day to wait for, and names the one an order waits for', (): void => {
+        const value: ExpeditionPart = Object.assign(part(), { expedition_id: 1 });
+        value.orders = [order(1, 0, { kind: 'wait', targetExpeditionId: 2, x: 9, y: 7 })];
+        const expeditions: Expedition[] = [Object.assign(new Expedition(), { id: 1, label: 'Ici' }), Object.assign(new Expedition(), { id: 2, label: 'Expé Z' })];
+        render(value, { editable: true, expeditions });
+
+        expect(Array.from<Element>(fixture.nativeElement.querySelectorAll('mho-expedition-order .text')).map(text)).toContain('Attendre Expé Z');
+        (<HTMLElement>fixture.nativeElement.querySelector('[data-cell="9,7"]')).click();
+        expect(formData().expeditions).toEqual([{ id: 2, label: 'Expé Z' }]);
+    });
+
     it('opens the form on the cell clicked on the mini map', (): void => {
         render(part(), { editable: true });
 
@@ -247,7 +261,7 @@ describe('ExpeditionRoadbookComponent', (): void => {
 
     it('saves a new order for the whole expedition at the end of the part list', async (): Promise<void> => {
         render(part(), { editable: true });
-        form_result = { action: 'save', order: order(0, 0, { kind: 'camp', x: 9, y: 6 }), owner_id: null };
+        form_result = { action: 'save', order: order(0, 0, { kind: 'camp', x: 9, y: 6 }), owner_ids: [] };
         (<HTMLButtonElement[]>Array.from(fixture.nativeElement.querySelectorAll('button.add')))[3].click();
         await settle();
 
@@ -261,7 +275,7 @@ describe('ExpeditionRoadbookComponent', (): void => {
         const value: ExpeditionPart = part();
         render(value, { editable: true });
         const edited: ExpeditionOrder = order(3, 0, { kind: 'pick', itemId: 1, quantity: 5, x: 8, y: 7 });
-        form_result = { action: 'save', order: edited, owner_id: 10 };
+        form_result = { action: 'save', order: edited, owner_ids: [10] };
         (<HTMLButtonElement>fixture.nativeElement.querySelector('button.line-action')).click();
         expect(formData().owner_id).toBe(10);
         await settle();
@@ -275,7 +289,7 @@ describe('ExpeditionRoadbookComponent', (): void => {
     it('moves an order to another owner: removed from one list, added as new to the other', async (): Promise<void> => {
         const value: ExpeditionPart = part();
         render(value, { editable: true });
-        form_result = { action: 'save', order: order(3, 0, { kind: 'pick', itemId: 1, quantity: 2, x: 8, y: 7 }), owner_id: null };
+        form_result = { action: 'save', order: order(3, 0, { kind: 'pick', itemId: 1, quantity: 2, x: 8, y: 7 }), owner_ids: [] };
         (<HTMLButtonElement>fixture.nativeElement.querySelector('button.line-action')).click();
         await settle();
 
@@ -309,7 +323,7 @@ describe('ExpeditionRoadbookComponent', (): void => {
     it('warns when the order cannot be saved', async (): Promise<void> => {
         render(part(), { editable: true });
         realtime.updateExpeditionPartOrders.mockRejectedValue(new Error('hub'));
-        form_result = { action: 'save', order: order(0, 0, { kind: 'camp', x: 7, y: 7 }), owner_id: null };
+        form_result = { action: 'save', order: order(0, 0, { kind: 'camp', x: 7, y: 7 }), owner_ids: [] };
         (<HTMLButtonElement>fixture.nativeElement.querySelector('button.add')).click();
         await settle();
 

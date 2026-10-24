@@ -3,7 +3,7 @@ import { HttpTestingController, provideHttpClientTesting, TestRequest } from '@a
 import { ChangeDetectorRef } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
-import { of } from 'rxjs';
+import { of, throwError } from 'rxjs';
 import type { MockInstance } from 'vitest';
 
 import { DailyActionEnum } from '../../../_abstract_model/enum/daily-action.enum';
@@ -387,6 +387,37 @@ describe('CitizensListComponent', (): void => {
             expect(manual().heroSkillLabel(familyR(), null)).toBe('R : niveau inconnu');
             expect(manual().heroSkillLabel(familyR(), 0)).toBe('R : aucun niveau');
             expect(manual().heroSkillLabel(familyR(), 2)).toBe('R : Apprenti');
+        });
+    });
+
+    describe('chaussures équipées', (): void => {
+        function updateShoesEquipped(citizen_id: number, value: boolean): void {
+            (component as unknown as { updateShoesEquipped(citizen_id: number, value: boolean): void }).updateShoesEquipped(citizen_id, value);
+        }
+
+        function citizenWithoutShoes(): Citizen {
+            const citizen: Citizen = makeCitizen(42, 'Zoe');
+            testable.citizen_list = { data: [citizen] };
+            return citizen;
+        }
+
+        it('enregistre les chaussures équipées', (): void => {
+            const citizen: Citizen = citizenWithoutShoes();
+            const spy: MockInstance<TownService['updateShoesEquipped']> = vi.spyOn(TestBed.inject(TownService), 'updateShoesEquipped').mockReturnValue(of(undefined));
+
+            updateShoesEquipped(42, true);
+
+            expect(spy).toHaveBeenCalledWith(42, true);
+            expect(citizen.shoes_equipped).toBe(true);
+        });
+
+        it('rétablit les chaussures si l\'enregistrement échoue', (): void => {
+            const citizen: Citizen = citizenWithoutShoes();
+            vi.spyOn(TestBed.inject(TownService), 'updateShoesEquipped').mockReturnValue(throwError((): Error => new Error('ko')));
+
+            updateShoesEquipped(42, true);
+
+            expect(citizen.shoes_equipped).toBe(false);
         });
     });
 

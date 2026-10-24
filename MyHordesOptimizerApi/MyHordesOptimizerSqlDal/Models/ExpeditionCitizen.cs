@@ -43,6 +43,16 @@ public partial class ExpeditionCitizen
     [Column("nombrePaDepart", TypeName = "int(11)")]
     public int? NombrePaDepart { get; set; }
 
+    [Column("nombrePeDepart", TypeName = "int(11)")]
+    public int? NombrePeDepart { get; set; }
+
+    [Column("nombrePeDepartOperator")]
+    [StringLength(5)]
+    public string? NombrePeDepartOperator { get; set; }
+
+    [Column("isPreinscritChaussures")]
+    public bool? IsPreinscritChaussures { get; set; }
+
     [Column("isThirsty")]
     public bool? IsThirsty { get; set; }
 

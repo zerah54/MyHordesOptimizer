@@ -243,6 +243,14 @@ public partial class TownCitizen
     public int? CampingCount { get; set; }
 
     /// <summary>
+    /// Chaussures équipées (+1 PE de départ), déclarées par le citoyen dans la liste des citoyens ou envoyées par le script.
+    /// <c>null</c> tant que rien n'est déclaré, servi comme <c>false</c>. Reste nullable : les synchros recopient le citoyen
+    /// avec <c>UpdateAllButKeysProperties(..., ignoreNull: true)</c>, un <c>false</c> par défaut écraserait la valeur déclarée.
+    /// </summary>
+    [Column("shoesEquipped")]
+    public bool? ShoesEquipped { get; set; }
+
+    /// <summary>
     /// Niveaux des groupes de capacités héroïques (S, U, P, E, R) : 0 aucun, 1 à 4. Le jeu les fige à
     /// l'arrivée en ville. Saisis à la main, <c>null</c> si inconnus.
     /// </summary>

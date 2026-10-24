@@ -6,15 +6,27 @@
     }
 </h2>
 <mat-dialog-content class="order-form">
-    <mat-form-field class="owner" subscriptSizing="dynamic">
-        <mat-label i18n>Pour</mat-label>
-        <mat-select [value]="owner_id()" (valueChange)="changeOwner($event)">
-            <mat-option [value]="null" i18n>Toute l'expédition</mat-option>
-            @for (member of data.members; track member.id) {
-                <mat-option [value]="member.id">{{ member.label }}</mat-option>
-            }
-        </mat-select>
-    </mat-form-field>
+    @if (data.order) {
+        <mat-form-field class="owner" subscriptSizing="dynamic">
+            <mat-label i18n>Pour</mat-label>
+            <mat-select [value]="owner_ids()[0] ?? null" (valueChange)="changeOwner($event)">
+                <mat-option [value]="null">{{ anyone_label }}</mat-option>
+                @for (member of data.members; track member.id) {
+                    <mat-option [value]="member.id">{{ member.label }}</mat-option>
+                }
+            </mat-select>
+        </mat-form-field>
+    } @else {
+        <mat-form-field class="owner" subscriptSizing="dynamic" floatLabel="always">
+            <mat-label i18n>Pour</mat-label>
+            <mat-select multiple [placeholder]="anyone_label" [value]="owner_ids()" (valueChange)="changeOwners($event)">
+                <mat-option [value]="everyone" i18n>Tout le monde</mat-option>
+                @for (member of data.members; track member.id) {
+                    <mat-option [value]="member.id">{{ member.label }}</mat-option>
+                }
+            </mat-select>
+        </mat-form-field>
+    }
 
     <mat-button-toggle-group class="kinds" [value]="kind()" (change)="changeKind($event)" hideSingleSelectionIndicator
                              aria-label="Type de consigne" i18n-aria-label>
@@ -56,10 +68,21 @@
         @case ('wait') {
             <mat-form-field subscriptSizing="dynamic">
                 <mat-label i18n>Qui attendre</mat-label>
-                <mat-select [value]="target_user_id()" (valueChange)="target_user_id.set($event)">
-                    <mat-option [value]="null" i18n>Tout le groupe</mat-option>
-                    @for (member of wait_targets; track member.id) {
-                        <mat-option [value]="member.user_id">{{ member.label }}</mat-option>
+                <mat-select [value]="wait_target()" (valueChange)="changeWaitTarget($event)">
+                    <mat-option value="group" i18n>Tout le groupe</mat-option>
+                    @if (wait_targets.length > 0) {
+                        <mat-optgroup label="Citoyens" i18n-label>
+                            @for (member of wait_targets; track member.id) {
+                                <mat-option [value]="'user:' + member.user_id">{{ member.label }}</mat-option>
+                            }
+                        </mat-optgroup>
+                    }
+                    @if (data.expeditions.length > 0) {
+                        <mat-optgroup label="Autres expéditions" i18n-label>
+                            @for (expedition of data.expeditions; track expedition.id) {
+                                <mat-option [value]="'expedition:' + expedition.id">{{ expedition.label }}</mat-option>
+                            }
+                        </mat-optgroup>
                     }
                 </mat-select>
             </mat-form-field>
@@ -91,6 +114,13 @@
                 </mat-form-field>
             }
         </div>
+    }
+
+    @if (kind() !== 'text') {
+        <mat-form-field subscriptSizing="dynamic">
+            <mat-label i18n>Note (facultative)</mat-label>
+            <input matInput class="note" [maxlength]="max_note_length" [ngModel]="note()" (ngModelChange)="note.set($event)">
+        </mat-form-field>
     }
 
     @if (move_options.length > 0) {

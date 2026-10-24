@@ -8,6 +8,7 @@ import { RealtimeExpeditionsService } from '../../../_abstract_model/realtime-se
 import { Cell } from '../../../_abstract_model/types/cell.class';
 import { Citizen } from '../../../_abstract_model/types/citizen.class';
 import { CitizenExpedition } from '../../../_abstract_model/types/citizen-expedition.class';
+import { Expedition } from '../../../_abstract_model/types/expedition.class';
 import { ExpeditionOrder } from '../../../_abstract_model/types/expedition-order.class';
 import { ExpeditionPart, ExpeditionPartRoute } from '../../../_abstract_model/types/expedition-part.class';
 import { Item } from '../../../_abstract_model/types/item.class';
@@ -20,11 +21,12 @@ import {
     ExpeditionOrderFormCell,
     ExpeditionOrderFormComponent,
     ExpeditionOrderFormData,
+    ExpeditionOrderFormExpedition,
     ExpeditionOrderFormMember,
     ExpeditionOrderFormResult
 } from '../expedition-order-form/expedition-order-form.component';
 import { canExcavate, cellKey, cloneOrder, ExpeditionOrderOwner, isScavengerPlace, OwnedExpeditionOrder } from './expedition-orders.util';
-import { cellTitle, memberLabel } from './order-labels';
+import { cellTitle, expeditionLabel, memberLabel } from './order-labels';
 
 /** Ce que le formulaire d'une consigne doit savoir de la carte. */
 export interface ExpeditionOrderMapContext {
@@ -34,6 +36,8 @@ export interface ExpeditionOrderMapContext {
     readonly ruins: readonly Ruin[];
     readonly citizens: readonly Citizen[];
     readonly items: readonly Item[];
+    /** Expéditions du jour de la partie : « Attendre » une autre expédition. */
+    readonly expeditions: readonly Expedition[];
 }
 
 /**
@@ -89,32 +93,47 @@ export class ExpeditionOrderEditorService {
             move_targets: existing ? this.moveTargets(part.map_route, cell, context) : [],
             members: this.members(part, context.citizens),
             items: context.items,
+            expeditions: context.expeditions
+                .map((expedition: Expedition, index: number): ExpeditionOrderFormExpedition | null =>
+                    expedition.id === undefined || expedition.id === part.expedition_id ? null : { id: expedition.id, label: expeditionLabel(expedition, index) })
+                .filter((expedition: ExpeditionOrderFormExpedition | null): expedition is ExpeditionOrderFormExpedition => expedition !== null),
             order: existing?.order ?? null,
             owner_id: existing?.owner.kind === 'citizen' ? existing.owner.citizen.id ?? null : null
         };
     }
 
-    /**
-     * Enregistre le résultat du formulaire. Changer de destinataire retire la consigne d'une liste et l'ajoute,
-     * comme nouvelle, à l'autre.
-     */
+    /** Enregistre le formulaire : changer de destinataire retire la consigne d'une liste et l'ajoute, comme nouvelle, à l'autre ; une nouvelle se pose par place sélectionnée (aucune : toute l'expédition). */
     private async apply(part: ExpeditionPart, result: ExpeditionOrderFormResult, existing: OwnedExpeditionOrder | null): Promise<void> {
         if (result.action === 'delete') {
             if (existing) await this.saveOwnerOrders(existing.owner, this.ordersOf(existing.owner).filter((order: ExpeditionOrder): boolean => order.id !== existing.order.id));
             return;
         }
-        const owner: ExpeditionOrderOwner | null = this.ownerOf(part, result.owner_id);
+        if (!existing) {
+            await this.addNew(part, result.owner_ids, result.order);
+            return;
+        }
+        const owner: ExpeditionOrderOwner | null = this.ownerOf(part, result.owner_ids[0] ?? null);
         if (!owner) return;
-        if (existing && this.sameOwner(existing.owner, owner)) {
+        if (this.sameOwner(existing.owner, owner)) {
             await this.saveOwnerOrders(owner, this.ordersOf(owner).map((order: ExpeditionOrder): ExpeditionOrder => order.id === existing.order.id ? result.order : order));
             return;
         }
-        if (existing) {
-            await this.saveOwnerOrders(existing.owner, this.ordersOf(existing.owner).filter((order: ExpeditionOrder): boolean => order.id !== existing.order.id));
-        }
+        await this.saveOwnerOrders(existing.owner, this.ordersOf(existing.owner).filter((order: ExpeditionOrder): boolean => order.id !== existing.order.id));
         const order: ExpeditionOrder = result.order;
         order.id = undefined;
         await this.saveOwnerOrders(owner, [...this.ordersOf(owner), order]);
+    }
+
+    /** Une copie de la consigne par place sélectionnée ; tableau vide : une seule, pour toute l'expédition. */
+    private async addNew(part: ExpeditionPart, owner_ids: readonly number[], order: ExpeditionOrder): Promise<void> {
+        const targets: readonly (number | null)[] = owner_ids.length > 0 ? owner_ids : [null];
+        for (const owner_id of targets) {
+            const owner: ExpeditionOrderOwner | null = this.ownerOf(part, owner_id);
+            if (!owner) continue;
+            const copy: ExpeditionOrder = cloneOrder(order);
+            copy.id = undefined;
+            await this.saveOwnerOrders(owner, [...this.ordersOf(owner), copy]);
+        }
     }
 
     private async saveOwnerOrders(owner: ExpeditionOrderOwner, orders: readonly ExpeditionOrder[]): Promise<void> {

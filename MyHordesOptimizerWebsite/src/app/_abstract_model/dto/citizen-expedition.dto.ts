@@ -1,4 +1,5 @@
-﻿import { CitizenExpeditionBagDTO } from './citizen-expedition-bag.dto';
+﻿import { SpRequirementOperator } from '../types/_types';
+import { CitizenExpeditionBagDTO } from './citizen-expedition-bag.dto';
 import { ExpeditionOrderDTO } from './expedition-order.dto';
 
 export interface CitizenExpeditionDTO {
@@ -15,6 +16,11 @@ export interface CitizenExpeditionDTO {
     pdc: number;
     isThirsty?: boolean;
     nombrePaDepart?: number;
+    /** Exigence de PE au départ ; `null` : aucune. */
+    nombrePeDepart?: number | null;
+    nombrePeDepartOperator?: SpRequirementOperator | null;
+    /** Chaussures exigées (`true`), interdites (`false`) ou indifférentes (`null`). */
+    isPreinscritChaussures?: boolean | null;
 }
 
 export interface CitizenExpeditionShortDTO {
@@ -31,4 +37,7 @@ export interface CitizenExpeditionShortDTO {
     pdc: number;
     isThirsty?: boolean;
     nombrePaDepart?: number;
+    nombrePeDepart?: number | null;
+    nombrePeDepartOperator?: SpRequirementOperator | null;
+    isPreinscritChaussures?: boolean | null;
 }

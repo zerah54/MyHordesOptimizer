@@ -24,8 +24,15 @@ export interface ExpeditionOrderDescription {
     readonly img: string | null;
     /** Pictogramme (Material Icons), à défaut d'image. */
     readonly icon: string | null;
+    /** Précision libre d'une consigne typée, affichée à la suite. */
+    readonly note: string | null;
     /** La consigne en texte brut : libellé accessible, résumés. */
     readonly text: string;
+}
+
+/** Nom d'une expédition du jour : son nom, sinon « Expédition n » selon son rang. */
+export function expeditionLabel(expedition: Expedition, index: number): string {
+    return expedition.label?.trim() || $localize`Expédition ${index + 1}:index:`;
 }
 
 /** Texte brut d'un texte mis en forme par l'éditeur des consignes. */
@@ -33,10 +40,12 @@ export function plainText(html: string | null | undefined): string {
     return (html ?? '').replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
 }
 
-export function describeOrder(order: ExpeditionOrder, items: readonly Item[], citizens: readonly Citizen[], locale: string): ExpeditionOrderDescription {
+/** Ce que dit une consigne ; `expeditions` : celles du jour, pour nommer l'expédition à attendre. */
+export function describeOrder(order: ExpeditionOrder, items: readonly Item[], citizens: readonly Citizen[], locale: string,
+                              expeditions: readonly Expedition[] = []): ExpeditionOrderDescription {
     if (!order.kind) {
         const html: string = order.text ?? '';
-        return { verb: null, rest: '', html, img: null, icon: null, text: plainText(html) };
+        return { verb: null, rest: '', html, img: null, icon: null, note: null, text: plainText(html) };
     }
     const info: ExpeditionOrderKindInfo = EXPEDITION_ORDER_KIND_INFO[order.kind];
     const item: Item | undefined = order.item_id === null ? undefined : items.find((candidate: Item): boolean => candidate.id === order.item_id);
@@ -63,18 +72,28 @@ export function describeOrder(order: ExpeditionOrder, items: readonly Item[], ci
             img = heroic ? HORDES_IMG_REPO + heroic.value.img : null;
             break;
         }
+        case 'explore':
+            rest = $localize`(1 PA)`;
+            break;
         case 'excavate':
             img = HORDES_IMG_REPO + JobEnum.SCAVENGER.value.img;
             break;
         case 'wait':
-            rest = order.target_user_id === null
-                ? $localize`le groupe`
-                : citizens.find((citizen: Citizen): boolean => citizen.id === order.target_user_id)?.name ?? '';
+            if (order.target_expedition_id !== null) {
+                const index: number = expeditions.findIndex((expedition: Expedition): boolean => expedition.id === order.target_expedition_id);
+                rest = index < 0 ? '?' : expeditionLabel(expeditions[index], index);
+            } else {
+                rest = order.target_user_id === null
+                    ? $localize`le groupe`
+                    : citizens.find((citizen: Citizen): boolean => citizen.id === order.target_user_id)?.name ?? '';
+            }
             break;
         default:
             break;
     }
-    return { verb: info.verb, rest, html: null, img, icon: img ? null : info.icon, text: `${info.verb} ${rest}`.trim() };
+    const note: string | null = order.note?.trim() || null;
+    const text: string = `${info.verb} ${rest}`.trim();
+    return { verb: info.verb, rest, html: null, img, icon: img ? null : info.icon, note, text: note ? `${text} — ${note}` : text };
 }
 
 /** Nom d'une place d'expédition : le citoyen placé, sinon « Place n (métier) ». */
@@ -105,11 +124,16 @@ export function cellPlaceLabel(point: MapRoutePoint, place: MapRoutePlace | null
     return cell ? $localize`Désert` : '';
 }
 
-/** « n consigne(s) sur k case(s) », ou « aucune consigne sur une case ». */
+/** Coût d'une partie : « n PA », ou « total PA (tracé + ruines) » avec des visites de ruine. */
+export function partApLabel(route_ap: number, ruin_ap: number): string {
+    return ruin_ap === 0
+        ? $localize`${route_ap}:ap: PA`
+        : $localize`${route_ap + ruin_ap}:total: PA (${route_ap}:route: + ${ruin_ap}:ruins:)`;
+}
+
+/** « n consigne(s) sur k case(s) » ; rien sans consigne. */
 export function orderCountLabel(orders: number, cells: number): string {
-    return orders === 0
-        ? $localize`aucune consigne sur une case`
-        : $localize`${orders}:orders: consigne(s) sur ${cells}:cells: case(s)`;
+    return orders === 0 ? '' : $localize`${orders}:orders: consigne(s) sur ${cells}:cells: case(s)`;
 }
 
 /** « [x ; y] · lieu » d'une case, en coordonnées relatives. */

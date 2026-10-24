@@ -67,10 +67,14 @@ export class MapCellOrdersComponent {
 
     private readonly entries: Signal<readonly CellOrderEntry[]> = computed((): readonly CellOrderEntry[] => cellOrdersAt(this.store.cell_orders(), this.cell()));
 
+    /** Expéditions du jour, pour nommer l'expédition à attendre. */
+    protected readonly expeditions: Signal<readonly Expedition[]> = this.store.expeditions;
+
     protected readonly view: Signal<CellOrdersView> = computed((): CellOrdersView => buildCellOrdersView(this.entries(), {
         user_id: getUserId(),
         citizens: this.citizens(),
         items: this.items(),
+        expeditions: this.expeditions(),
         locale: this.locale
     }));
 
@@ -110,7 +114,8 @@ export class MapCellOrdersComponent {
         cells: cellsByCoordinates(this.map()),
         ruins: this.ruins(),
         citizens: this.citizens(),
-        items: this.items()
+        items: this.items(),
+        expeditions: this.expeditions()
     }));
 
     protected toggleDone(entry: CellOrderEntry, done: boolean): Promise<void> {

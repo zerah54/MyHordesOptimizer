@@ -65,6 +65,7 @@ namespace MyHordesOptimizerApi.MappingProfiles
                 .ForMember(dest => dest.IdBag, opt => opt.Ignore())
                 // Saisis à part (TownService) : jamais recopiés depuis un citoyen relu chez MyHordes
                 .ForMember(dest => dest.CampingCount, opt => opt.Ignore())
+                .ForMember(dest => dest.ShoesEquipped, opt => opt.Ignore())
                 .ForMember(dest => dest.HeroSkillLevelS, opt => opt.Ignore())
                 .ForMember(dest => dest.HeroSkillLevelU, opt => opt.Ignore())
                 .ForMember(dest => dest.HeroSkillLevelP, opt => opt.Ignore())

@@ -25,8 +25,6 @@
                 @if (route(); as linked) {
                     <span class="muted" i18n>Tracé</span>
                     <b>{{ linked.label }}</b>
-                } @else {
-                    <span class="muted" i18n>Sans tracé : les cases sont rangées par distance à la ville.</span>
                 }
                 @if (editable()) {
                     <span class="muted hint" i18n>Cliquez une case de la mini-carte pour y poser une consigne.</span>
@@ -63,7 +61,7 @@
                         @for (line of step.orders; track line.key) {
                             <div class="order-line">
                                 <mho-expedition-order class="order" [order]="line.owned.order" [items]="items()" [citizens]="citizens()"
-                                                      [scope]="line.scope" [scopeIsMe]="line.is_me" [checkable]="checkable()"
+                                                      [expeditions]="expeditions()" [scope]="line.scope" [scopeIsMe]="line.is_me" [checkable]="checkable()"
                                                       (doneChange)="toggleDone(line, $event)"></mho-expedition-order>
                                 @if (editable()) {
                                     <button mat-icon-button type="button" class="line-action" (click)="editOrder(step, line)"

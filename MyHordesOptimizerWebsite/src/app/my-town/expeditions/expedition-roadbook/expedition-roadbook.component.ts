@@ -9,6 +9,7 @@ import { Imports } from '../../../_abstract_model/types/_types';
 import { Cell } from '../../../_abstract_model/types/cell.class';
 import { Citizen } from '../../../_abstract_model/types/citizen.class';
 import { CitizenExpedition } from '../../../_abstract_model/types/citizen-expedition.class';
+import { Expedition } from '../../../_abstract_model/types/expedition.class';
 import { ExpeditionPart, ExpeditionPartRoute } from '../../../_abstract_model/types/expedition-part.class';
 import { Item } from '../../../_abstract_model/types/item.class';
 import { mapRouteColorVar, MapRoutePoint } from '../../../_abstract_model/types/map-route.class';
@@ -20,8 +21,8 @@ import { MapRouteDrawing } from '../../map/map-routes/map-route-views';
 import { mapRouteKey } from '../../map/map-routes/map-routes-display';
 import { ExpeditionOrderComponent } from '../expedition-order/expedition-order.component';
 import { ExpeditionOrderEditorService, ExpeditionOrderMapContext } from '../expedition-orders/expedition-order-editor.service';
-import { cellKey, cellOrdersOf, OwnedExpeditionOrder } from '../expedition-orders/expedition-orders.util';
-import { cellPlaceLabel, memberLabel, orderCountLabel } from '../expedition-orders/order-labels';
+import { cellKey, cellOrdersOf, OwnedExpeditionOrder, ruinVisitAp } from '../expedition-orders/expedition-orders.util';
+import { cellPlaceLabel, memberLabel, orderCountLabel, partApLabel } from '../expedition-orders/order-labels';
 import { buildRoadbook, MiniMapBox, miniMapBox, Roadbook, RoadbookNode, RoadbookStep } from '../expedition-orders/roadbook.util';
 
 const components: Imports = [ExpeditionOrderComponent, MapRoutesLayerComponent];
@@ -89,6 +90,8 @@ export class ExpeditionRoadbookComponent {
     public readonly ruins: InputSignal<readonly Ruin[]> = input<readonly Ruin[]>([]);
     public readonly items: InputSignal<readonly Item[]> = input<readonly Item[]>([]);
     public readonly citizens: InputSignal<readonly Citizen[]> = input<readonly Citizen[]>([]);
+    /** Expéditions du jour de la partie : « Attendre » une autre expédition. */
+    public readonly expeditions: InputSignal<readonly Expedition[]> = input<readonly Expedition[]>([]);
     /** Ajout, modification, déplacement et suppression des consignes (mode édition, jour modifiable). */
     public readonly editable: InputSignal<boolean> = input<boolean>(false);
     /** Cocher une consigne (jour modifiable, citoyen de la ville). */
@@ -103,7 +106,7 @@ export class ExpeditionRoadbookComponent {
         town: this.map(), ruins: this.ruins(), citizens: this.citizens(), locale: this.locale
     }));
     private readonly form_context: Signal<ExpeditionOrderMapContext> = computed((): ExpeditionOrderMapContext => ({
-        map: this.map(), cells: this.cells(), ruins: this.ruins(), citizens: this.citizens(), items: this.items()
+        map: this.map(), cells: this.cells(), ruins: this.ruins(), citizens: this.citizens(), items: this.items(), expeditions: this.expeditions()
     }));
 
     protected readonly town: Signal<MapRoutePoint | null> = computed((): MapRoutePoint | null => {
@@ -182,7 +185,9 @@ export class ExpeditionRoadbookComponent {
         const roadbook: Roadbook | null = this.roadbook();
         const route: ExpeditionPartRoute | null = this.route();
         const orders_text: string = orderCountLabel(roadbook?.order_count ?? 0, roadbook?.cell_count ?? 0);
-        return route ? `${route.length} PA · ${orders_text}` : orders_text;
+        if (!route) return orders_text;
+        const ap_text: string = partApLabel(route.length, ruinVisitAp(this.part()));
+        return orders_text ? `${ap_text} · ${orders_text}` : ap_text;
     });
 
     protected readonly off_route_count: Signal<number> = computed((): number => this.roadbook()?.off_route_count ?? 0);
@@ -213,7 +218,7 @@ export class ExpeditionRoadbookComponent {
     private orderLine(owned: OwnedExpeditionOrder, index: number): OrderLine {
         const key: string = `${owned.owner.kind}-${owned.order.id ?? `new-${index}`}`;
         if (owned.owner.kind === 'part') {
-            return { key, owned, scope: $localize`Tous`, is_me: false };
+            return { key, owned, scope: $localize`N'importe qui`, is_me: false };
         }
         const citizen: CitizenExpedition = owned.owner.citizen;
         const position: number = this.part().citizens.indexOf(citizen);

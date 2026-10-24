@@ -20,6 +20,8 @@ namespace MyHordesOptimizerApi.Extensions.Models.Expeditions
             newOrder.Quantity = source.Quantity;
             newOrder.HeroSkill = source.HeroSkill;
             newOrder.IdTargetUser = source.IdTargetUser;
+            newOrder.IdTargetExpedition = source.IdTargetExpedition;
+            newOrder.Note = source.Note;
 
             return newOrder;
         }

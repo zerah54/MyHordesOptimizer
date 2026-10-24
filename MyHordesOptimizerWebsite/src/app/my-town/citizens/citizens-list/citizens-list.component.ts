@@ -109,10 +109,12 @@ const IMMUNE_SORT_FACTOR: number = 1_000_000;
 
 /** Identifiant (tri, filtre, colonne du mode colonnes) du nombre de campings. */
 const CAMPING_COUNT_ID: string = 'camping_count';
-/** Préfixe des identifiants des groupes de capacités héroïques (`skill_s`…). */
+/** Identifiant de la colonne des chaussures équipées (les deux modes). */
+const SHOES_EQUIPPED_ID: string = 'shoes_equipped';
+/** Préfixe des identifiants des groupes de compétences héroïques (`skill_s`…). */
 const HERO_SKILL_ID_PREFIX: string = 'skill_';
 
-/** Groupe de capacités désigné par un identifiant de colonne `skill_<lettre>`. */
+/** Groupe de compétences désigné par un identifiant de colonne `skill_<lettre>`. */
 function heroSkillFamilyOf(id: string): HeroSkillFamily | undefined {
     return HERO_SKILL_FAMILIES.find((family: HeroSkillFamilyInfo): boolean => HERO_SKILL_ID_PREFIX + family.key === id)?.key;
 }
@@ -198,7 +200,7 @@ export class CitizensListComponent implements OnInit {
             .filter((home: HomeEnum): boolean => home.key !== HomeEnum.HOUSE_LEVEL.key)
             .sort(byMaxLvlAsc)
     ];
-    /** Groupes de capacités héroïques (S, U, P, E, R), saisis à la main. */
+    /** Groupes de compétences héroïques (S, U, P, E, R), saisis à la main. */
     protected readonly hero_skill_families: readonly HeroSkillFamilyInfo[] = HERO_SKILL_FAMILIES;
     protected readonly MAX_HERO_SKILL_LEVEL: number = MAX_HERO_SKILL_LEVEL;
     protected readonly CAMPING_COUNT_ID: string = CAMPING_COUNT_ID;
@@ -206,6 +208,10 @@ export class CitizensListComponent implements OnInit {
     /** Nom de chaque groupe dans la langue du site ; sa lettre tant que les compétences ne sont pas chargées. */
     protected readonly hero_skill_group_names: WritableSignal<Readonly<Record<HeroSkillFamily, string>>> = signal(HERO_SKILL_LETTERS);
     protected readonly camping_count_label: string = $localize`Nombre de campings déjà effectués`;
+    protected readonly shoes_equipped_label: string = $localize`Chaussures équipées`;
+    protected readonly SHOES_EQUIPPED_ID: string = SHOES_EQUIPPED_ID;
+    /** Icône de l'objet « Chaussures de sport usées » (`shoe_#00`), connue au chargement des objets. */
+    protected readonly shoe_icon: WritableSignal<string> = signal('');
     /** Citoyen dont le menu de détail des mises à jour est ouvert (menu partagé). */
     protected readonly menu_row: WritableSignal<Citizen | null> = signal<Citizen | null>(null);
     /** Citoyen désigné par un lien profond (`?citizen=`, recherche globale) : sa ligne est surlignée. */
@@ -242,7 +248,7 @@ export class CitizensListComponent implements OnInit {
     ];
     private sort: Signal<MatSort | undefined> = viewChild(MatSort);
     /** Colonnes affichées en mode « groupé » (regroupées par type ; immunité en colonne dédiée pour le tri). */
-    private readonly grouped_columns: string[] = ['avatar_name', 'etats_sac', 'immune', 'daily_actions', 'heroic_actions', 'home', 'hero_skills', 'camping', 'last_update'];
+    private readonly grouped_columns: string[] = ['avatar_name', 'etats_sac', 'immune', 'daily_actions', 'heroic_actions', 'home', 'hero_skills', 'camping', SHOES_EQUIPPED_ID, 'last_update'];
     /** Colonnes affichées en mode « colonnes » (une par champ). */
     private readonly per_field_columns: string[] = [
         'job', 'town_roles', 'avatar_name', 'sac', 'coffre', 'etats', 'immune',
@@ -251,6 +257,7 @@ export class CitizensListComponent implements OnInit {
         ...this.home_all.map((home: HomeEnum): string => 'home_' + home.key),
         ...HERO_SKILL_FAMILIES.map((family: HeroSkillFamilyInfo): string => HERO_SKILL_ID_PREFIX + family.key),
         CAMPING_COUNT_ID,
+        SHOES_EQUIPPED_ID,
         'last_update',
     ];
     /** Colonnes effectivement affichées selon le mode. */
@@ -321,6 +328,7 @@ export class CitizensListComponent implements OnInit {
             .subscribe({
                 next: (items: Item[]) => {
                     this.all_items = items;
+                    this.shoe_icon.set(items.find((item: Item): boolean => item.uid === 'shoe_#00')?.img ?? '');
                     this.bag_lists = [
                         { label: $localize`Tous`, list: this.all_items }
                     ];
@@ -497,7 +505,7 @@ export class CitizensListComponent implements OnInit {
             { label: $localize`États`, info: citizen.status?.update_info },
             { label: $localize`Sac`, info: citizen.bag?.update_info },
             { label: $localize`Chamanique`, info: citizen.chamanic_detail?.update_info },
-            { label: $localize`Bain`, info: this.daily_action_pipe.transform(citizen.daily_actions, this.current_day, 'home_pool')?.update_info },
+            { label: DailyActionEnum.HOME_POOL.getLabel(), info: this.daily_action_pipe.transform(citizen.daily_actions, this.current_day, 'home_pool')?.update_info },
             { label: $localize`Actions héroïques`, info: citizen.heroic_actions?.update_info },
             { label: $localize`Améliorations`, info: citizen.home?.update_info },
         ];
@@ -928,7 +936,7 @@ export class CitizensListComponent implements OnInit {
     }
 
     /**
-     * Libellé (infobulle) du niveau d'un citoyen dans un groupe de capacités : nom du groupe et du niveau,
+     * Libellé (infobulle) du niveau d'un citoyen dans un groupe de compétences : nom du groupe et du niveau,
      * « aucun » pour 0, « inconnu » sans saisie.
      */
     protected heroSkillLabel(family: HeroSkillFamilyInfo, level: number | null): string {
@@ -938,7 +946,7 @@ export class CitizensListComponent implements OnInit {
         return `${group} : ${heroSkillLevelName(level - 1)}`;
     }
 
-    /** Niveau d'un groupe de capacités (stepper : -1 = inconnu). */
+    /** Niveau d'un groupe de compétences (stepper : -1 = inconnu). */
     protected updateHeroSkill(citizen_id: number, family: HeroSkillFamily, value: number): void {
         const citizen: Citizen | undefined = this.citizen_list.data.find((candidate: Citizen): boolean => candidate.id === citizen_id);
         if (!citizen) return;
@@ -984,7 +992,28 @@ export class CitizensListComponent implements OnInit {
             });
     }
 
-    /** Au moins une valeur saisie pour les capacités ou les campings : leurs filtres ont quelque chose à proposer. */
+    /** Chaussures équipées (déclaration manuelle) ; rétablies si l'enregistrement échoue. */
+    protected updateShoesEquipped(citizen_id: number, value: boolean): void {
+        const citizen: Citizen | undefined = this.citizen_list.data.find((candidate: Citizen): boolean => candidate.id === citizen_id);
+        if (!citizen) return;
+        const previous: boolean = citizen.shoes_equipped;
+        citizen.shoes_equipped = value;
+        this.town_service
+            .updateShoesEquipped(citizen.id, value)
+            .pipe(takeUntilDestroyed(this.destroy_ref))
+            .subscribe({
+                next: (): void => {
+                    if (citizen.id === this.me()?.id) this.town_service.publishMyCitizen(citizen);
+                    this.refreshCitizenLists();
+                },
+                error: (): void => {
+                    citizen.shoes_equipped = previous;
+                    this.refreshCitizenLists();
+                }
+            });
+    }
+
+    /** Au moins une valeur saisie pour les compétences ou les campings : leurs filtres ont quelque chose à proposer. */
     protected hasHeroSkillOrCampingOptions(): boolean {
         return [CAMPING_COUNT_ID, ...HERO_SKILL_FAMILIES.map((family: HeroSkillFamilyInfo): string => HERO_SKILL_ID_PREFIX + family.key)]
             .some((id: string): boolean => (this.value_options[id] ?? []).length > 0);
@@ -1113,23 +1142,6 @@ export class CitizensListComponent implements OnInit {
         });
     }
 
-    /** Construit la liste des champs triables (menu « Trier par »). */
-    private buildSortableFields(): void {
-        this.sortable_fields = [
-            { id: 'avatar_name', label: $localize`Nom` },
-            { id: 'job', label: $localize`Métier` },
-            { id: 'immune', label: $localize`Immunité` },
-            ...this.daily_action_keys.map((action: DailyActionEnum): { id: string; label: string } => ({ id: 'daily_' + action.key, label: action.getLabel() })),
-            ...this.heroic_actions_all.map((action: HeroicActionEnum): { id: string; label: string } => ({ id: 'heroic_' + action.key, label: action.getLabel() })),
-            ...this.home_all.map((home: HomeEnum): { id: string; label: string } => ({ id: 'home_' + home.key, label: home.getLabel() })),
-            ...HERO_SKILL_FAMILIES.map((family: HeroSkillFamilyInfo): { id: string; label: string } => ({
-                id: HERO_SKILL_ID_PREFIX + family.key,
-                label: this.hero_skill_group_names()[family.key]
-            })),
-            { id: CAMPING_COUNT_ID, label: $localize`Campings` },
-        ];
-    }
-
     /** Valeur booléenne d'un citoyen pour une colonne (ou null si inconnue/non applicable). */
     private citizenBoolValue(citizen: Citizen, id: string): boolean | null {
         if (id.startsWith('daily_')) return !!this.daily_action_pipe.transform(citizen.daily_actions, this.current_day, id.substring('daily_'.length));
@@ -1177,6 +1189,23 @@ export class CitizensListComponent implements OnInit {
         if (active.statusKeys?.length > 0 && !data.status?.icons?.some((status: StatusEnum): boolean => active.statusKeys.includes(status?.key))) return false;
 
         return true;
+    }
+
+    /** Construit la liste des champs triables (menu « Trier par »). */
+    private buildSortableFields(): void {
+        this.sortable_fields = [
+            { id: 'avatar_name', label: $localize`Nom` },
+            { id: 'job', label: $localize`Métier` },
+            { id: 'immune', label: $localize`Immunité` },
+            ...this.daily_action_keys.map((action: DailyActionEnum): { id: string; label: string } => ({ id: 'daily_' + action.key, label: action.getLabel() })),
+            ...this.heroic_actions_all.map((action: HeroicActionEnum): { id: string; label: string } => ({ id: 'heroic_' + action.key, label: action.getLabel() })),
+            ...this.home_all.map((home: HomeEnum): { id: string; label: string } => ({ id: 'home_' + home.key, label: home.getLabel() })),
+            ...HERO_SKILL_FAMILIES.map((family: HeroSkillFamilyInfo): { id: string; label: string } => ({
+                id: HERO_SKILL_ID_PREFIX + family.key,
+                label: this.hero_skill_group_names()[family.key]
+            })),
+            { id: CAMPING_COUNT_ID, label: $localize`Campings` },
+        ];
     }
 
     /** Nom de chaque groupe de capacités, lu dans les compétences servies par l'API (sa lettre à défaut). */

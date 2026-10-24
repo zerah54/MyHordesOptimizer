@@ -28,6 +28,7 @@ namespace MyHordesOptimizerApi.MappingProfiles.Citizens
                 .ForMember(dto => dto.Avatar, opt => opt.MapFrom(model => model.IdUserNavigation.Avatar))
                 .ForMember(dto => dto.Bag, opt => opt.MapFrom(model => model.IdBagNavigation))
                 .ForMember(dto => dto.CampingCount, opt => opt.MapFrom(model => model.CampingCount ?? 0))
+                .ForMember(dto => dto.ShoesEquipped, opt => opt.MapFrom(model => model.ShoesEquipped ?? false))
                 .ForMember(dto => dto.Chest, opt => opt.MapFrom(model => model.IdChestNavigation))
                 .ForMember(dto => dto.DailyActions, opt => opt.MapFrom(model => model.IdTownNavigation.TownCitizenDailyActions.Where(townDailyAction => townDailyAction.IdUser == model.IdUser)))
                 .ForMember(dto => dto.Cadaver, opt => opt.Ignore()) // ??

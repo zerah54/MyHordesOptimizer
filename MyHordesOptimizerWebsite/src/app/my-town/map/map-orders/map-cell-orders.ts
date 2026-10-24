@@ -116,6 +116,8 @@ export interface CellOrdersContext {
     readonly user_id: number | null;
     readonly citizens: readonly Citizen[];
     readonly items: readonly Item[];
+    /** Expéditions du jour, pour nommer l'expédition à attendre. */
+    readonly expeditions: readonly Expedition[];
     readonly locale: string;
 }
 
@@ -155,7 +157,7 @@ export function buildCellOrdersView(entries: readonly CellOrderEntry[], context:
             who,
             short: in_part && member_name ? member_name : expedition_name,
             color,
-            text: describeOrder(entry.order, context.items, context.citizens, context.locale).text
+            text: describeOrder(entry.order, context.items, context.citizens, context.locale, context.expeditions).text
         });
     }
     const others_names: string[] = [...new Set<string>(others.map((other: CellOrderOther): string => other.short))];

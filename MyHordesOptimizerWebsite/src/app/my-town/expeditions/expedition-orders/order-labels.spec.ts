@@ -10,7 +10,7 @@ import { ExpeditionOrder } from '../../../_abstract_model/types/expedition-order
 import { ExpeditionPart } from '../../../_abstract_model/types/expedition-part.class';
 import { Item } from '../../../_abstract_model/types/item.class';
 import { Town } from '../../../_abstract_model/types/town.class';
-import { cellPlaceLabel, cellTitle, describeOrder, memberLabel, orderCountLabel, partLabel, plainText } from './order-labels';
+import { cellPlaceLabel, cellTitle, describeOrder, memberLabel, orderCountLabel, partApLabel, partLabel, plainText } from './order-labels';
 
 describe('order-labels', (): void => {
     it('describes a typed order with its verb and parameters', (): void => {
@@ -70,8 +70,38 @@ describe('order-labels', (): void => {
         expect(cellPlaceLabel({ x: 6, y: 5 }, { coordinates: '', place: 'Hôpital' }, cells)).toBe('Hôpital');
     });
 
-    it('counts orders and cells', (): void => {
-        expect(orderCountLabel(0, 0)).toBe('aucune consigne sur une case');
+    it('notes the action point a ruin visit costs', (): void => {
+        const order: ExpeditionOrder = new ExpeditionOrder({ type: 'checkbox', text: '', isDone: false, position: 0, kind: 'explore' });
+
+        expect(describeOrder(order, [], [], moment.locale())).toEqual(expect.objectContaining({ verb: 'Explorer la ruine', rest: '(1 PA)', text: 'Explorer la ruine (1 PA)' }));
+    });
+
+    it('follows a typed order with its note, after a dash', (): void => {
+        const order: ExpeditionOrder = new ExpeditionOrder({ type: 'checkbox', text: '', isDone: false, position: 0, kind: 'explore', note: 'attendre que X l\'ait explorée' });
+
+        expect(describeOrder(order, [], [], moment.locale())).toEqual(expect.objectContaining({
+            rest: '(1 PA)', note: 'attendre que X l\'ait explorée', text: 'Explorer la ruine (1 PA) — attendre que X l\'ait explorée'
+        }));
+    });
+
+    it('waits for another expedition by its name, by its rank without one, and shows a question mark once it is gone', (): void => {
+        const expeditions: Expedition[] = [Object.assign(new Expedition(), { id: 3, label: 'Expé Z' }), Object.assign(new Expedition(), { id: 4, label: ' ' })];
+        const wait: (target: number) => ExpeditionOrder = (target: number): ExpeditionOrder =>
+            new ExpeditionOrder({ type: 'checkbox', text: '', isDone: false, position: 0, kind: 'wait', targetExpeditionId: target });
+
+        expect(describeOrder(wait(3), [], [], moment.locale(), expeditions)).toEqual(expect.objectContaining({ rest: 'Expé Z', note: null, text: 'Attendre Expé Z' }));
+        expect(describeOrder(wait(4), [], [], moment.locale(), expeditions).rest).toBe('Expédition 2');
+        expect(describeOrder(wait(9), [], [], moment.locale(), expeditions).rest).toBe('?');
+    });
+
+    it('counts orders and cells, and says nothing without any', (): void => {
+        expect(orderCountLabel(0, 0)).toBe('');
+        expect(orderCountLabel(3, 2)).toBe('3 consigne(s) sur 2 case(s)');
+    });
+
+    it('gives the cost of a part, detailed when ruins are visited', (): void => {
+        expect(partApLabel(10, 0)).toBe('10 PA');
+        expect(partApLabel(10, 1)).toBe('11 PA (10 + 1)');
         expect(orderCountLabel(3, 2)).toBe('3 consigne(s) sur 2 case(s)');
     });
 });

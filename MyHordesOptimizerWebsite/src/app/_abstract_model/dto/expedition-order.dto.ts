@@ -19,4 +19,8 @@ export interface ExpeditionOrderDTO {
     heroSkill?: string | null;
     /** Citoyen à attendre ; `null` avec « wait » : le groupe. */
     targetUserId?: number | null;
+    /** Autre expédition du jour à attendre, à la place d'un citoyen. */
+    targetExpeditionId?: number | null;
+    /** Précision libre d'une consigne typée, en texte brut. */
+    note?: string | null;
 }

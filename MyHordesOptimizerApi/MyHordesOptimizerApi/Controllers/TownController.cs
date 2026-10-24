@@ -108,6 +108,19 @@ namespace MyHordesOptimizerApi.Controllers
             return NoContent();
         }
 
+        /// <summary>Chaussures équipées d'un citoyen de la ville.</summary>
+        [HttpPost]
+        [Route("{townId}/user/{userId}/shoesEquipped")]
+        public ActionResult UpdateCitizenShoesEquipped([FromRoute] int townId, [FromRoute] int userId, [FromBody] CitizenShoesEquippedDto request)
+        {
+            if (request == null)
+            {
+                return BadRequest("Invalid shoes equipped");
+            }
+            TownService.UpdateCitizenShoesEquipped(townId, userId, request.ShoesEquipped);
+            return NoContent();
+        }
+
         /// <summary>Niveaux des capacités héroïques d'un citoyen de la ville (0 aucun, 1 à 4, <c>null</c> : inconnu).</summary>
         [HttpPost]
         [Route("{townId}/user/{userId}/heroSkills")]

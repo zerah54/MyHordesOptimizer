@@ -6,7 +6,7 @@ import { HeroicActionsDTO } from './heroic-actions.dto';
 import { HomeDTO } from './home.dto';
 import { StatusDTO } from './status.dto';
 
-/** Niveaux des capacités héroïques saisis à la main : 0 aucun, 1 à 4 ; null : inconnu. */
+/** Niveaux des compétences héroïques saisis à la main : 0 aucun, 1 à 4 ; null : inconnu. */
 export interface HeroSkillLevelsDTO {
     s?: number | null;
     u?: number | null;
@@ -41,5 +41,7 @@ export interface CitizenDTO {
     cadaver?: CadaverDTO;
     /** Campings déjà effectués dans la ville, saisis à la main ; 0 si rien n'est saisi. */
     campingCount?: number;
+    /** Chaussures équipées, déclarées par le citoyen dans la liste des citoyens ou envoyées par le script ; `false` si rien n'est déclaré. */
+    shoesEquipped?: boolean;
     heroSkills?: HeroSkillLevelsDTO | null;
 }

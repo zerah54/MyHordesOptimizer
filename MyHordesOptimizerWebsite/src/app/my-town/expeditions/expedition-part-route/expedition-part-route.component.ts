@@ -12,6 +12,8 @@ import { Imports } from '../../../_abstract_model/types/_types';
 import { ExpeditionPart, ExpeditionPartRoute } from '../../../_abstract_model/types/expedition-part.class';
 import { MapRoute, mapRouteColorVar, MapRouteLinkedPart } from '../../../_abstract_model/types/map-route.class';
 import { ConfirmDialogComponent, ConfirmDialogData } from '../../../_shared/confirm-dialog/confirm-dialog.component';
+import { ruinVisitAp } from '../expedition-orders/expedition-orders.util';
+import { partApLabel } from '../expedition-orders/order-labels';
 
 const material_modules: Imports = [MatButtonModule, MatFormFieldModule, MatIconModule, MatSelectModule, MatTooltipModule];
 
@@ -63,6 +65,11 @@ export class ExpeditionPartRouteComponent {
     protected readonly linked_color: Signal<string | null> = computed((): string | null => {
         const linked: ExpeditionPartRoute | null = this.linked();
         return linked ? mapRouteColorVar(linked.color) : null;
+    });
+    /** Coût de la partie sur le tracé lié, visites de ruine comprises. */
+    protected readonly linked_cost: Signal<string> = computed((): string => {
+        const linked: ExpeditionPartRoute | null = this.linked();
+        return linked ? partApLabel(linked.length, ruinVisitAp(this.part())) : '';
     });
 
     protected readonly options: Signal<readonly RouteOption[]> = computed((): readonly RouteOption[] => {

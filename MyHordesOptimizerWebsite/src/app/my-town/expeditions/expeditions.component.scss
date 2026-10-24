@@ -189,7 +189,7 @@
                                             width: 100px;
                                         }
 
-                                        .is-thirsty, .starts-7-ap {
+                                        .is-thirsty, .base-ap, .sp, .shoes {
                                             width: 40px;
                                             text-align: center;
 
@@ -198,13 +198,6 @@
                                                 justify-content: center;
                                             }
                                         }
-
-                                        .starts-7-ap {
-                                            .flex {
-                                                gap: 0;
-                                            }
-                                        }
-
                                         .pdc {
                                             width: 50px;
 
@@ -238,6 +231,25 @@
                                         .job {
                                             text-align: center;
                                         }
+
+                                        .ap-warning {
+                                            color: var(--mho-warning);
+                                            vertical-align: middle;
+                                        }
+
+                                        .sp-operator {
+                                            width: 64px;
+                                        }
+
+                                        .shoes .forbidden {
+                                            opacity: 0.4;
+                                            filter: grayscale(1);
+                                        }
+
+                                        /* Rappel de l'en-tête de colonne, pour l'affichage en carte. */
+                                        .cell-label {
+                                            display: none;
+                                        }
                                     }
 
                                     &.table-header {
@@ -249,6 +261,79 @@
                                                 align-items: center;
                                             }
                                         }
+                                    }
+                                }
+
+                                /* Sous 600 px, chaque place devient une carte : la place, puis ses indicateurs, puis le
+                                   reste en pleine largeur. L'en-tête ne garde que le total des PdC. */
+                                @media (max-width: 599.98px) {
+                                    &, thead, tbody, tfoot {
+                                        display: block;
+                                    }
+
+                                    tr.table-header {
+                                        display: flex;
+                                        align-items: center;
+                                        gap: 0.5em;
+
+                                        > td:not(.pdc) {
+                                            display: none;
+                                        }
+                                    }
+
+                                    tr.citizen {
+                                        display: flex;
+                                        flex-wrap: wrap;
+                                        align-items: center;
+                                        gap: 4px 16px;
+                                        padding: 0.5em 0;
+
+                                        > td, .action, .job, .is-thirsty, .base-ap, .sp, .shoes, .pdc {
+                                            width: auto;
+                                            padding: 0;
+                                        }
+
+                                        .pseudo {
+                                            flex: 1;
+                                            min-width: 0;
+                                        }
+
+                                        .is-thirsty, .base-ap, .sp, .shoes, .pdc, .heroic {
+                                            display: flex;
+                                            align-items: center;
+                                            gap: 4px;
+                                        }
+
+                                        .cell-label {
+                                            display: inline-flex;
+                                            align-items: center;
+                                            color: var(--mho-text-muted);
+                                        }
+
+                                        /* Saut de ligne entre la place et ses indicateurs. */
+                                        &::after {
+                                            content: '';
+                                            flex-basis: 100%;
+                                            order: 1;
+                                        }
+
+                                        .is-thirsty, .base-ap, .sp, .shoes, .pdc {
+                                            order: 2;
+                                        }
+
+                                        .heroic, .citizen-orders, .bag {
+                                            order: 3;
+                                            flex-basis: 100%;
+                                        }
+
+                                        .citizen-orders {
+                                            padding: 0;
+                                        }
+                                    }
+
+                                    .mho-expedition-bag-selector {
+                                        width: auto;
+                                        max-width: 100%;
                                     }
                                 }
                             }

@@ -8,7 +8,7 @@ import { Property } from '../../../_abstract_model/enum/property.enum';
 import { ExpeditionOrderKind, ExpeditionOrderType } from '../../../_abstract_model/types/_types';
 import { ExpeditionOrder } from '../../../_abstract_model/types/expedition-order.class';
 import { Item } from '../../../_abstract_model/types/item.class';
-import { ExpeditionOrderFormComponent, ExpeditionOrderFormData, ExpeditionOrderFormKind, ExpeditionOrderFormResult } from './expedition-order-form.component';
+import { EVERYONE, ExpeditionOrderFormComponent, ExpeditionOrderFormData, ExpeditionOrderFormKind, ExpeditionOrderFormResult } from './expedition-order-form.component';
 
 interface KindOption {
     readonly kind: ExpeditionOrderFormKind;
@@ -27,10 +27,15 @@ interface TestableForm {
     readonly quantity: WritableSignal<number>;
     readonly hero_skill: WritableSignal<string | null>;
     readonly target_user_id: WritableSignal<number | null>;
-    readonly owner_id: WritableSignal<number | null>;
+    readonly target_expedition_id: WritableSignal<number | null>;
+    readonly wait_target: Signal<string>;
+    readonly note: WritableSignal<string>;
+    readonly owner_ids: WritableSignal<readonly number[]>;
     readonly cell_key: WritableSignal<string>;
     changeKind(change: { value: ExpeditionOrderFormKind }): void;
+    changeWaitTarget(key: string): void;
     changeOwner(owner_id: number | null): void;
+    changeOwners(owner_ids: readonly number[]): void;
     changeQuantity(value: number | string | null): void;
     save(): void;
     remove(): void;
@@ -53,6 +58,7 @@ function data(overrides: Partial<ExpeditionOrderFormData> = {}): ExpeditionOrder
             { id: 12, user_id: 43, label: 'Fouine', is_scavenger: true }
         ],
         items: [WATER, PLANK],
+        expeditions: [{ id: 3, label: 'Expé Z' }],
         order: null,
         owner_id: null,
         ...overrides
@@ -154,8 +160,38 @@ describe('ExpeditionOrderFormComponent', (): void => {
 
         form.save();
 
-        expect(result()).toEqual(expect.objectContaining({ action: 'save', owner_id: 12 }));
+        expect(result()).toEqual(expect.objectContaining({ action: 'save', owner_ids: [12] }));
         expect(savedOrder()).toEqual(expect.objectContaining({ kind: 'excavate', item_id: null, quantity: null, hero_skill: null, target_user_id: null }));
+    });
+
+    it('selects several places at once when adding, and saves one owner id per place', (): void => {
+        create(data());
+        form.text.set('<p>Suivre la route</p>');
+        form.changeOwners([10, 12]);
+
+        form.save();
+
+        expect(result()).toEqual(expect.objectContaining({ action: 'save', owner_ids: [10, 12] }));
+    });
+
+    it('selects every place at once, or none when they all already are', (): void => {
+        create(data());
+
+        form.changeOwners([10, EVERYONE]);
+        expect(form.owner_ids()).toEqual([10, 11, 12]);
+
+        form.changeOwners([10, 11, 12, EVERYONE]);
+        expect(form.owner_ids()).toEqual([]);
+    });
+
+    it('offers excavating only when every selected place can, since one copy is shared by all', (): void => {
+        create(data({ can_excavate: true }));
+
+        form.changeOwners([10, 12]);
+        expect(form.kinds().some((option: KindOption): boolean => option.kind === 'excavate')).toBe(false);
+
+        form.changeOwners([12]);
+        expect(form.kinds().some((option: KindOption): boolean => option.kind === 'excavate')).toBe(true);
     });
 
     it('asks for the place before the kind, with no hint about building actions', (): void => {
@@ -236,23 +272,69 @@ describe('ExpeditionOrderFormComponent', (): void => {
     it('returns a new typed order on the cell, without the parameters of other kinds', (): void => {
         create(data());
         form.text.set('ignoré');
-        form.target_user_id.set(42);
+        form.changeWaitTarget('expedition:3');
         form.hero_skill.set('ignoré');
         form.changeKind({ value: 'pick' });
         form.item_id.set(PLANK.id);
         form.changeQuantity(2);
-        form.owner_id.set(10);
+        form.owner_ids.set([10]);
 
         form.save();
 
         const closed: ExpeditionOrderFormResult = result();
-        expect(closed).toEqual(expect.objectContaining({ action: 'save', owner_id: 10 }));
+        expect(closed).toEqual(expect.objectContaining({ action: 'save', owner_ids: [10] }));
         const order: ExpeditionOrder = savedOrder();
         expect(order.id).toBeUndefined();
         expect(order).toEqual(expect.objectContaining({
             type: 'checkbox', text: '', is_done: false, position: 0, x: 5, y: 6,
-            kind: 'pick', item_id: PLANK.id, quantity: 2, hero_skill: null, target_user_id: null
+            kind: 'pick', item_id: PLANK.id, quantity: 2, hero_skill: null, target_user_id: null, target_expedition_id: null, note: null
         }));
+    });
+
+    it('waits for a citizen or for another expedition of the day, never both', (): void => {
+        create(data());
+        form.changeKind({ value: 'wait' });
+        expect(form.wait_target()).toBe('group');
+
+        form.changeWaitTarget('expedition:3');
+        expect(form.wait_target()).toBe('expedition:3');
+        form.save();
+        expect(savedOrder()).toEqual(expect.objectContaining({ kind: 'wait', target_user_id: null, target_expedition_id: 3 }));
+
+        form.changeWaitTarget('user:42');
+        expect(form.target_expedition_id()).toBeNull();
+        expect(form.target_user_id()).toBe(42);
+        form.changeWaitTarget('group');
+        expect(form.wait_target()).toBe('group');
+    });
+
+    it('reads the expedition to wait for and the note of an existing order', (): void => {
+        create(data({ order: typedOrder('wait', { target_expedition_id: 3, note: 'avancer ensemble' }), owner_id: 10 }));
+
+        expect(form.wait_target()).toBe('expedition:3');
+        expect(form.note()).toBe('avancer ensemble');
+    });
+
+    it('saves the trimmed note of a typed order, and no note with a free text', (): void => {
+        create(data());
+        form.changeKind({ value: 'camp' });
+        form.note.set('  attendre X  ');
+        form.save();
+        expect(savedOrder().note).toBe('attendre X');
+
+        TestBed.resetTestingModule();
+        create(data());
+        form.note.set('ignorée');
+        form.text.set('<p>Info</p>');
+        form.save();
+        expect(savedOrder().note).toBeNull();
+    });
+
+    it('shows the note field of a typed order, bounded like the API', (): void => {
+        create(data({ order: typedOrder('camp') }));
+        fixture.detectChanges();
+
+        expect(fixture.nativeElement.querySelector('input.note').getAttribute('maxlength')).toBe('255');
     });
 
     it('returns a free text order with its form', (): void => {
@@ -269,7 +351,7 @@ describe('ExpeditionOrderFormComponent', (): void => {
         const original: ExpeditionOrder = typedOrder('wait', { target_user_id: 42 });
         create(data({ order: original, owner_id: 10 }));
         expect(form.target_user_id()).toBe(42);
-        expect(form.owner_id()).toBe(10);
+        expect(form.owner_ids()).toEqual([10]);
 
         form.target_user_id.set(null);
         form.save();

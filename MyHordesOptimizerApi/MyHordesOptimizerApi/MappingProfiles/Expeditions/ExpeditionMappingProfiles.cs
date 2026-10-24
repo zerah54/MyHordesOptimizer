@@ -94,6 +94,8 @@ namespace MyHordesOptimizerApi.MappingProfiles.Expeditions
                 .ForMember(model => model.Quantity, opt => opt.MapFrom(dto => dto.Quantity))
                 .ForMember(model => model.HeroSkill, opt => opt.MapFrom(dto => dto.HeroSkill))
                 .ForMember(model => model.IdTargetUser, opt => opt.MapFrom(dto => dto.TargetUserId))
+                .ForMember(model => model.IdTargetExpedition, opt => opt.MapFrom(dto => dto.TargetExpeditionId))
+                .ForMember(model => model.Note, opt => opt.MapFrom(dto => string.IsNullOrWhiteSpace(dto.Note) ? null : dto.Note.Trim()))
                 .ForMember(model => model.IdExpeditionCitizen, opt => opt.Ignore())
                 .ForMember(model => model.IdExpeditionCitizenNavigation, opt => opt.Ignore())
                 .ForMember(model => model.IdExpeditionParts, opt => opt.Ignore())
@@ -112,7 +114,10 @@ namespace MyHordesOptimizerApi.MappingProfiles.Expeditions
                 .ForMember(dto => dto.ItemId, opt => opt.MapFrom(model => model.IdItem))
                 .ForMember(dto => dto.Quantity, opt => opt.MapFrom(model => model.Quantity))
                 .ForMember(dto => dto.HeroSkill, opt => opt.MapFrom(model => model.HeroSkill))
-                .ForMember(dto => dto.TargetUserId, opt => opt.MapFrom(model => model.IdTargetUser));
+                .ForMember(dto => dto.TargetUserId, opt => opt.MapFrom(model => model.IdTargetUser))
+                .ForMember(dto => dto.TargetExpeditionId, opt => opt.MapFrom(model => model.IdTargetExpedition))
+                .ForMember(dto => dto.TargetExpeditionLabel, opt => opt.Ignore())
+                .ForMember(dto => dto.Note, opt => opt.MapFrom(model => model.Note));
 
             CreateMap<ExpeditionCitizen, ExpeditionCitizenDto>()
                 .ForMember(dto => dto.Id, opt => opt.MapFrom(model => model.IdExpeditionCitizen))
@@ -127,7 +132,10 @@ namespace MyHordesOptimizerApi.MappingProfiles.Expeditions
                 .ForMember(dto => dto.Preinscrit, opt => opt.MapFrom(model => model.IsPreinscrit))
                 .ForMember(dto => dto.PreinscritHeroicSkillName, opt => opt.MapFrom(model => model.PreinscritHeroic))
                 .ForMember(dto => dto.PreinscritJob, opt => opt.MapFrom(model => model.PreinscritJob))
-                .ForMember(dto => dto.NombrePaDepart, opt => opt.MapFrom(model => model.NombrePaDepart));
+                .ForMember(dto => dto.NombrePaDepart, opt => opt.MapFrom(model => model.NombrePaDepart))
+                .ForMember(dto => dto.NombrePeDepart, opt => opt.MapFrom(model => model.NombrePeDepart))
+                .ForMember(dto => dto.NombrePeDepartOperator, opt => opt.MapFrom(model => model.NombrePeDepartOperator))
+                .ForMember(dto => dto.IsPreinscritChaussures, opt => opt.MapFrom(model => model.IsPreinscritChaussures));
             CreateMap<ExpeditionCitizenRequestDto, ExpeditionCitizen>()
                 .ForMember(model => model.IdExpeditionCitizen, opt => opt.MapFrom(dto => dto.Id))
                 .ForMember(model => model.Pdc, opt => opt.MapFrom(dto => dto.Pdc))
@@ -145,6 +153,9 @@ namespace MyHordesOptimizerApi.MappingProfiles.Expeditions
                 .ForMember(model => model.IsPreinscritSoif, opt => opt.MapFrom(dto => dto.IsPreinscritSoif))
                 .ForMember(model => model.IsThirsty, opt => opt.MapFrom(dto => dto.IsThirsty))
                 .ForMember(model => model.NombrePaDepart, opt => opt.MapFrom(dto => dto.NombrePaDepart))
+                .ForMember(model => model.NombrePeDepart, opt => opt.MapFrom(dto => dto.NombrePeDepart >= 0 ? dto.NombrePeDepart : null))
+                .ForMember(model => model.NombrePeDepartOperator, opt => opt.MapFrom(dto => NormalizeExigencePeOperator(dto.NombrePeDepartOperator)))
+                .ForMember(model => model.IsPreinscritChaussures, opt => opt.MapFrom(dto => dto.IsPreinscritChaussures))
                 .ForMember(model => model.ExpeditionOrders, opt => opt.MapFrom((src, dest, srcMember, context) =>
                 {
                     return context.GetDbContext().ExpeditionOrders.Where(order => src.OrdersId.Contains(order.IdExpeditionOrder)).ToList();
@@ -176,6 +187,12 @@ namespace MyHordesOptimizerApi.MappingProfiles.Expeditions
                 .ForMember(model => model.IdExpeditionBagNavigation, opt => opt.Ignore())
                 .ForMember(model => model.IsBroken, opt => opt.MapFrom(dto => false))
                 .ForMember(model => model.Count, opt => opt.MapFrom(dto => dto.Count));
+        }
+
+        /// <summary>Opérateur d'exigence de PE : min, max ou exact ; null pour toute autre valeur.</summary>
+        private static string? NormalizeExigencePeOperator(string? exigenceOperator)
+        {
+            return exigenceOperator is "min" or "max" or "exact" ? exigenceOperator : null;
         }
 
         private List<int> GetExpeditionPartIdForOrder(ExpeditionOrder model)

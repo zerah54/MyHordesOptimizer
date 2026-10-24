@@ -27,6 +27,7 @@ namespace MyHordesOptimizerApi.Models.Expeditions
     public static class ExpeditionOrderRules
     {
         public const int MaxQuantity = 99;
+        public const int MaxNoteLength = 255;
 
         /// <summary>Actions héroïques proposées : valeurs <c>action</c> de HeroicActionEnum, côté site.</summary>
         public static readonly IReadOnlySet<string> HeroActions = new HashSet<string>(StringComparer.Ordinal)
@@ -47,7 +48,8 @@ namespace MyHordesOptimizerApi.Models.Expeditions
             Item = 1,
             Quantity = 2,
             Hero = 4,
-            Target = 8
+            Target = 8,
+            TargetExpedition = 16
         }
 
         public static void Validate(ExpeditionOrder order, int mapWidth, int mapHeight)
@@ -88,7 +90,11 @@ namespace MyHordesOptimizerApi.Models.Expeditions
                     }
                     break;
                 case ExpeditionOrderKinds.Wait:
-                    Expect(order, required: Params.None, optional: Params.Target);
+                    Expect(order, required: Params.None, optional: Params.Target | Params.TargetExpedition);
+                    if (order.IdTargetUser.HasValue && order.IdTargetExpedition.HasValue)
+                    {
+                        throw new MhoTechnicalException("Une consigne « wait » attend un citoyen ou une expédition, pas les deux.");
+                    }
                     break;
                 default:
                     throw new MhoTechnicalException($"Type de consigne inconnu : {order.Kind}.");
@@ -96,6 +102,17 @@ namespace MyHordesOptimizerApi.Models.Expeditions
             if (order.Quantity.HasValue && (order.Quantity.Value < 1 || order.Quantity.Value > MaxQuantity))
             {
                 throw new MhoTechnicalException($"La quantité d'une consigne va de 1 à {MaxQuantity}.");
+            }
+            if (order.Note is not null)
+            {
+                if (order.Kind is null)
+                {
+                    throw new MhoTechnicalException("Une note précise une consigne typée : un texte libre n'en a pas.");
+                }
+                if (order.Note.Length > MaxNoteLength)
+                {
+                    throw new MhoTechnicalException($"La note d'une consigne fait au plus {MaxNoteLength} caractères.");
+                }
             }
         }
 
@@ -106,6 +123,7 @@ namespace MyHordesOptimizerApi.Models.Expeditions
             if (order.Quantity.HasValue) present |= Params.Quantity;
             if (!string.IsNullOrEmpty(order.HeroSkill)) present |= Params.Hero;
             if (order.IdTargetUser.HasValue) present |= Params.Target;
+            if (order.IdTargetExpedition.HasValue) present |= Params.TargetExpedition;
             var missing = required & ~present;
             var unexpected = present & ~(required | optional);
             if (missing != Params.None || unexpected != Params.None)

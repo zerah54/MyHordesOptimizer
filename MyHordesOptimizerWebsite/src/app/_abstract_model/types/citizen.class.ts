@@ -40,7 +40,9 @@ export class Citizen extends CommonModel<CitizenDTO> {
     public chest?: Bag;
     /** Campings déjà effectués dans la ville, saisis à la main ; 0 si rien n'est saisi. */
     public camping_count: number = 0;
-    /** Niveaux des capacités héroïques, saisis à la main. */
+    /** Chaussures équipées, déclarées par le citoyen dans la liste des citoyens ou envoyées par le script ; `false` si rien n'est déclaré. */
+    public shoes_equipped: boolean = false;
+    /** Niveaux des compétences héroïques, saisis à la main. */
     public hero_skills: HeroSkillLevels = { s: null, u: null, p: null, e: null, r: null };
 
     public constructor(dto?: CitizenDTO) {
@@ -72,6 +74,7 @@ export class Citizen extends CommonModel<CitizenDTO> {
             chamanicDetail: this.chamanic_detail.modelToDto(),
             cadaver: this.cadaver?.modelToDto(),
             campingCount: this.camping_count,
+            shoesEquipped: this.shoes_equipped,
             heroSkills: { ...this.hero_skills }
         };
     }
@@ -156,6 +159,7 @@ export class Citizen extends CommonModel<CitizenDTO> {
             this.chamanic_detail = new ChamanicDetail(dto.chamanicDetail);
             this.cadaver = dto.cadaver ? new Cadaver(dto.cadaver) : undefined;
             this.camping_count = typeof dto.campingCount === 'number' ? dto.campingCount : 0;
+            this.shoes_equipped = dto.shoesEquipped === true;
             this.hero_skills = {
                 s: toHeroSkillLevel(dto.heroSkills?.s),
                 u: toHeroSkillLevel(dto.heroSkills?.u),

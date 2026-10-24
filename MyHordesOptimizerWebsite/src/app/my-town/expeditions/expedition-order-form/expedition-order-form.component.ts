@@ -16,7 +16,9 @@ import { Item } from '../../../_abstract_model/types/item.class';
 import { MapRoutePoint } from '../../../_abstract_model/types/map-route.class';
 import { SelectComponent } from '../../../_shared/select/select.component';
 import { TiptapEditorComponent } from '../../../_shared/tiptap-editor/tiptap-editor.component';
-import { cellKey, cloneOrder, EXPEDITION_ORDER_KIND_INFO, EXPEDITION_ORDER_MAX_QUANTITY, isConsumable } from '../expedition-orders/expedition-orders.util';
+import {
+    cellKey, cloneOrder, EXPEDITION_ORDER_KIND_INFO, EXPEDITION_ORDER_MAX_NOTE_LENGTH, EXPEDITION_ORDER_MAX_QUANTITY, isConsumable
+} from '../expedition-orders/expedition-orders.util';
 
 const angular_common: Imports = [FormsModule];
 const components: Imports = [SelectComponent, TiptapEditorComponent];
@@ -45,6 +47,15 @@ export interface ExpeditionOrderFormMember {
     readonly is_scavenger: boolean;
 }
 
+/** Autre expédition du jour, à attendre. */
+export interface ExpeditionOrderFormExpedition {
+    readonly id: number;
+    readonly label: string;
+}
+
+/** Qui attendre : le groupe, un citoyen (`user:id`) ou une autre expédition (`expedition:id`). */
+type WaitTarget = 'group' | `user:${number}` | `expedition:${number}`;
+
 export interface ExpeditionOrderFormData {
     /** Case de la consigne, en coordonnées absolues. */
     readonly cell: MapRoutePoint;
@@ -59,6 +70,8 @@ export interface ExpeditionOrderFormData {
     readonly move_targets: readonly ExpeditionOrderFormCell[];
     readonly members: readonly ExpeditionOrderFormMember[];
     readonly items: readonly Item[];
+    /** Autres expéditions du jour, à attendre. */
+    readonly expeditions: readonly ExpeditionOrderFormExpedition[];
     /** Consigne à modifier ; `null` pour en ajouter une. */
     readonly order: ExpeditionOrder | null;
     /** Place qui porte la consigne ; `null` : toute l'expédition. */
@@ -66,7 +79,7 @@ export interface ExpeditionOrderFormData {
 }
 
 export type ExpeditionOrderFormResult =
-    | { readonly action: 'save'; readonly order: ExpeditionOrder; readonly owner_id: number | null }
+    | { readonly action: 'save'; readonly order: ExpeditionOrder; readonly owner_ids: readonly number[] }
     | { readonly action: 'delete' };
 
 interface CellOption {
@@ -82,6 +95,9 @@ interface KindOption {
 
 const ALWAYS: readonly ExpeditionOrderKind[] = ['pick', 'drop', 'use', 'camp', 'hero', 'wait'];
 
+/** Option « Tout le monde » de la sélection multiple : sélectionne toutes les places, ou aucune si toutes le sont. */
+export const EVERYONE: number = -1;
+
 /**
  * Ajout ou modification d'une consigne sur une case : type, paramètres, à qui elle s'adresse et, pour une consigne
  * sortie du tracé, sa nouvelle case. La fenêtre renvoie la consigne prête à enregistrer, sans rien enregistrer.
@@ -96,6 +112,7 @@ const ALWAYS: readonly ExpeditionOrderKind[] = ['pick', 'drop', 'use', 'camp', '
 export class ExpeditionOrderFormComponent {
     protected readonly data: ExpeditionOrderFormData = inject<ExpeditionOrderFormData>(MAT_DIALOG_DATA);
     protected readonly max_quantity: number = EXPEDITION_ORDER_MAX_QUANTITY;
+    protected readonly max_note_length: number = EXPEDITION_ORDER_MAX_NOTE_LENGTH;
     protected readonly item_label: string = `label.${moment.locale()}`;
 
     protected readonly heroics: readonly HeroicActionEnum[] = (<HeroicActionEnum[]>HeroicActionEnum.getAllValues())
@@ -114,8 +131,15 @@ export class ExpeditionOrderFormComponent {
     protected readonly quantity: WritableSignal<number>;
     protected readonly hero_skill: WritableSignal<string | null>;
     protected readonly target_user_id: WritableSignal<number | null>;
-    protected readonly owner_id: WritableSignal<number | null>;
+    protected readonly target_expedition_id: WritableSignal<number | null>;
+    /** Précision libre d'une consigne typée. */
+    protected readonly note: WritableSignal<string>;
+    /** Places qui portent la consigne ; tableau vide : toute l'expédition. */
+    protected readonly owner_ids: WritableSignal<readonly number[]>;
     protected readonly cell_key: WritableSignal<string>;
+
+    protected readonly anyone_label: string = $localize`N'importe qui`;
+    protected readonly everyone: number = EVERYONE;
 
     protected readonly kinds: Signal<readonly KindOption[]> = computed((): readonly KindOption[] => {
         const order: ExpeditionOrder | null = this.data.order;
@@ -128,6 +152,13 @@ export class ExpeditionOrderFormComponent {
             { kind: 'text', label: $localize`Texte`, icon: 'notes' },
             ...kinds.map((kind: ExpeditionOrderKind): KindOption => ({ kind, label: EXPEDITION_ORDER_KIND_INFO[kind].verb, icon: EXPEDITION_ORDER_KIND_INFO[kind].icon }))
         ];
+    });
+
+    protected readonly wait_target: Signal<WaitTarget> = computed((): WaitTarget => {
+        const expedition_id: number | null = this.target_expedition_id();
+        if (expedition_id !== null) return `expedition:${expedition_id}`;
+        const user_id: number | null = this.target_user_id();
+        return user_id !== null ? `user:${user_id}` : 'group';
     });
 
     protected readonly needs_item: Signal<boolean> = computed((): boolean => ['pick', 'drop', 'use'].includes(this.kind()));
@@ -158,7 +189,9 @@ export class ExpeditionOrderFormComponent {
         this.quantity = signal(order?.quantity ?? 1);
         this.hero_skill = signal(order?.hero_skill ?? null);
         this.target_user_id = signal(order?.target_user_id ?? null);
-        this.owner_id = signal(this.data.owner_id);
+        this.target_expedition_id = signal(order?.target_expedition_id ?? null);
+        this.note = signal(order?.kind ? order.note ?? '' : '');
+        this.owner_ids = signal(this.data.owner_id !== null ? [this.data.owner_id] : []);
         this.cell_key = signal(this.original_cell_key);
     }
 
@@ -171,12 +204,28 @@ export class ExpeditionOrderFormComponent {
         }
     }
 
-    /** Changer de place retire « Excaver » si la nouvelle place ne peut pas : le type retombe sur « Texte ». */
+    /** Sélection d'une seule place (modification) : retire « Excaver » si la nouvelle place ne peut pas. */
     protected changeOwner(owner_id: number | null): void {
-        this.owner_id.set(owner_id);
+        this.changeOwners(owner_id === null ? [] : [owner_id]);
+    }
+
+    /** Sélection de plusieurs places (ajout) : retire « Excaver » si l'une des places ne peut pas. */
+    protected changeOwners(owner_ids: readonly number[]): void {
+        if (owner_ids.includes(EVERYONE)) {
+            const all: number[] = this.data.members.map((member: ExpeditionOrderFormMember): number => member.id);
+            owner_ids = owner_ids.length > all.length ? [] : all;
+        }
+        this.owner_ids.set(owner_ids);
         if (this.kind() === 'excavate' && !this.kinds().some((option: KindOption): boolean => option.kind === 'excavate')) {
             this.kind.set('text');
         }
+    }
+
+    /** Cible d'attente choisie : un citoyen ou une expédition, aucun des deux pour le groupe. */
+    protected changeWaitTarget(target: WaitTarget): void {
+        const [kind, id]: string[] = target.split(':');
+        this.target_user_id.set(kind === 'user' ? Number(id) : null);
+        this.target_expedition_id.set(kind === 'expedition' ? Number(id) : null);
     }
 
     protected changeItem(item_id: number | null | undefined): void {
@@ -204,16 +253,21 @@ export class ExpeditionOrderFormComponent {
         order.quantity = this.needs_quantity() ? this.quantity() : null;
         order.hero_skill = kind === 'hero' ? this.hero_skill() : null;
         order.target_user_id = kind === 'wait' ? this.target_user_id() : null;
-        this.dialog_ref.close({ action: 'save', order, owner_id: this.owner_id() });
+        order.target_expedition_id = kind === 'wait' ? this.target_expedition_id() : null;
+        order.note = kind === 'text' ? null : this.note().trim() || null;
+        this.dialog_ref.close({ action: 'save', order, owner_ids: this.owner_ids() });
     }
 
     protected remove(): void {
         this.dialog_ref.close({ action: 'delete' });
     }
 
+    /** « Excaver » suppose que chaque place sélectionnée (une copie de la consigne par place) puisse le faire. */
     private canExcavateHere(): boolean {
-        const owner_id: number | null = this.owner_id();
-        return this.data.can_excavate && this.data.members.some((member: ExpeditionOrderFormMember): boolean => member.id === owner_id && member.is_scavenger);
+        const owner_ids: readonly number[] = this.owner_ids();
+        if (!this.data.can_excavate || owner_ids.length === 0) return false;
+        return owner_ids.every((owner_id: number): boolean =>
+            this.data.members.some((member: ExpeditionOrderFormMember): boolean => member.id === owner_id && member.is_scavenger));
     }
 
     private selectedCell(): MapRoutePoint {

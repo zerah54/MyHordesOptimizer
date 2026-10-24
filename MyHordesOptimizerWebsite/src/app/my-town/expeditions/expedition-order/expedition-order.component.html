@@ -16,6 +16,9 @@
     <span class="text">
         @if (view().verb; as verb) {
             <b class="verb">{{ verb }}</b> {{ view().rest }}
+            @if (view().note; as note) {
+                — <i class="note">{{ note }}</i>
+            }
         } @else {
             <span [innerHTML]="view().html"></span>
         }

@@ -135,7 +135,7 @@ namespace MyHordesOptimizerApiIntegrationTests.Controllers
             using var factory = _factory.WithWebHostBuilder(UseRealTownAccess);
             var town = SeedTown(factory);
 
-            var response = await CreateClient(factory, town.OutsiderUserId).PostAsync($"/Map/Cell?townId={town.TownId}&userId={town.AliveUserId}", Json("{\"x\":0,\"y\":0}"));
+            var response = await CreateClient(factory, town.OutsiderUserId).PostAsync($"/Map/Cell?townId={town.TownId}&userId={town.AliveUserId}", Json("{\"x\":0,\"y\":0,\"items\":[],\"citizens\":[]}"));
 
             response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
         }

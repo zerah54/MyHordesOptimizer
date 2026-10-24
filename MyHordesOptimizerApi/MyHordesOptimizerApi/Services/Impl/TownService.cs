@@ -186,6 +186,15 @@ namespace MyHordesOptimizerApi.Services.Impl
             DbContext.SaveChanges();
         }
 
+        /// <summary>Chaussures équipées d'un citoyen de la ville, déclarées par le citoyen dans la liste des citoyens ou envoyées par le script (MyHordes ne l'expose pas).</summary>
+        public void UpdateCitizenShoesEquipped(int townId, int userId, bool shoesEquipped)
+        {
+            using var townLock = TownSyncLock.AcquireTownBlocking(-townId);
+            var citizen = FindWritableCitizen(townId, userId);
+            citizen.ShoesEquipped = shoesEquipped;
+            DbContext.SaveChanges();
+        }
+
         /// <summary>Niveaux des capacités héroïques d'un citoyen de la ville, saisis à la main (MyHordes ne les expose pas).</summary>
         public void UpdateCitizenHeroSkills(int townId, int userId, CitizenHeroSkillLevelsDto heroSkills)
         {

@@ -1,5 +1,5 @@
 import { MapRoutePoint } from '../../../_abstract_model/types/map-route.class';
-import { cellKey, orderCell, OwnedExpeditionOrder } from './expedition-orders.util';
+import { cellKey, firstPassageOf, orderCell, OwnedExpeditionOrder } from './expedition-orders.util';
 
 /** Départ, arrivée, case à consignes sur le tracé (ou sans tracé), case à consignes hors du tracé. */
 export type RoadbookNode = 'start' | 'end' | 'stop' | 'off';
@@ -87,11 +87,7 @@ export function buildRoadbook(route: readonly MapRoutePoint[] | null, orders: re
         return { steps, order_count, cell_count: groups.size, off_route_count: 0 };
     }
 
-    const first_passage: Map<string, number> = new Map<string, number>();
-    route.forEach((cell: MapRoutePoint, index: number): void => {
-        const key: string = cellKey(cell);
-        if (!first_passage.has(key)) first_passage.set(key, index);
-    });
+    const first_passage: Map<string, number> = firstPassageOf(route);
     const start: MapRoutePoint = route[0];
     const end: MapRoutePoint = route[route.length - 1];
     const start_key: string = cellKey(start);

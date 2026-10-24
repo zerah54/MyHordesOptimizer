@@ -437,7 +437,13 @@ export class TownService extends GlobalService {
             .pipe(map((): void => undefined));
     }
 
-    /** Niveaux des capacités héroïques d'un citoyen de la ville. */
+    /** Chaussures équipées (déclaration manuelle) d'un citoyen de la ville. */
+    public updateShoesEquipped(citizen_id: number, shoes_equipped: boolean): Observable<void> {
+        return super.post<void>(this.API_URL + `/town/${getOwnTown()?.town_id}/user/${citizen_id}/shoesEquipped`, JSON.stringify({ shoesEquipped: shoes_equipped }))
+            .pipe(map((): void => undefined));
+    }
+
+    /** Niveaux des compétences héroïques d'un citoyen de la ville. */
     public updateHeroSkills(citizen_id: number, levels: HeroSkillLevels): Observable<void> {
         const dto: HeroSkillLevelsDTO = { s: levels.s, u: levels.u, p: levels.p, e: levels.e, r: levels.r };
         return super.post<void>(this.API_URL + `/town/${getOwnTown()?.town_id}/user/${citizen_id}/heroSkills`, JSON.stringify(dto))

@@ -7,6 +7,7 @@ import { HORDES_IMG_REPO } from '../../../_abstract_model/const';
 import { ExpeditionOrderDTO } from '../../../_abstract_model/dto/expedition-order.dto';
 import { HeroicActionEnum } from '../../../_abstract_model/enum/heroic-action.enum';
 import { Citizen } from '../../../_abstract_model/types/citizen.class';
+import { Expedition } from '../../../_abstract_model/types/expedition.class';
 import { ExpeditionOrder } from '../../../_abstract_model/types/expedition-order.class';
 import { Item } from '../../../_abstract_model/types/item.class';
 import { ExpeditionOrderComponent } from './expedition-order.component';
@@ -54,6 +55,19 @@ describe('ExpeditionOrderComponent', (): void => {
 
         render(order({ kind: 'wait' }));
         expect(text(fixture, '.text')).toContain('le groupe');
+    });
+
+    it('names the expedition to wait for, among those of the day', (): void => {
+        render(order({ kind: 'wait', targetExpeditionId: 3 }), { expeditions: [Object.assign(new Expedition(), { id: 3, label: 'Expé Z' })] });
+
+        expect(text(fixture, '.text')).toBe('Attendre Expé Z');
+    });
+
+    it('follows a typed order with its note in italics, as plain text', (): void => {
+        render(order({ kind: 'explore', note: 'attendre <b>X</b>' }));
+
+        expect(text(fixture, '.text')).toBe('Explorer la ruine (1 PA) — attendre <b>X</b>');
+        expect(text(fixture, '.text i.note')).toBe('attendre <b>X</b>');
     });
 
     it('shows the heroic action picture and label', (): void => {

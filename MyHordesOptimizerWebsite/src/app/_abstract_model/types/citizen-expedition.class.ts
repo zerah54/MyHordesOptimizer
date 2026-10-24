@@ -1,5 +1,6 @@
 ﻿import { CitizenExpeditionDTO, CitizenExpeditionShortDTO } from '../dto/citizen-expedition.dto';
 import { CommonModel, dtoToModelArray, modelToDtoArray } from './_common.class';
+import { SpRequirementOperator } from './_types';
 import { CitizenExpeditionBag } from './citizen-expedition-bag.class';
 import { ExpeditionOrder } from './expedition-order.class';
 
@@ -16,7 +17,14 @@ export class CitizenExpedition extends CommonModel<CitizenExpeditionDTO> {
     public preinscrit_heroic_skill?: string;
     public pdc!: number;
     public is_thirsty?: boolean;
-    public starts_7_ap?: boolean;
+    /** PA au départ ; non renseigné : 6. */
+    public base_ap?: number;
+    /** PE exigés au départ ; non renseigné : aucune exigence. */
+    public required_sp?: number;
+    /** Comparaison de `required_sp` ; non renseigné : au moins. */
+    public required_sp_operator?: SpRequirementOperator;
+    /** `true` : chaussures exigées, `false` : interdites, `undefined` : indifférent. */
+    public requires_shoes?: boolean;
 
     public constructor(dto?: CitizenExpeditionDTO | null) {
         super();
@@ -35,7 +43,10 @@ export class CitizenExpedition extends CommonModel<CitizenExpeditionDTO> {
             preinscritHeroicSkillName: this.preinscrit_heroic_skill,
             pdc: this.pdc,
             isThirsty: this.is_thirsty,
-            nombrePaDepart: this.starts_7_ap ? 7 : 6
+            nombrePaDepart: this.base_ap ?? 6,
+            nombrePeDepart: this.required_sp,
+            nombrePeDepartOperator: this.required_sp_operator,
+            isPreinscritChaussures: this.requires_shoes
         };
     }
 
@@ -53,7 +64,10 @@ export class CitizenExpedition extends CommonModel<CitizenExpeditionDTO> {
             preinscritHeroicSkillName: this.preinscrit_heroic_skill,
             pdc: this.pdc,
             isThirsty: this.is_thirsty,
-            nombrePaDepart: this.starts_7_ap === true ? 7 : (this.starts_7_ap === false ? 6 : undefined)
+            nombrePaDepart: this.base_ap,
+            nombrePeDepart: this.required_sp,
+            nombrePeDepartOperator: this.required_sp_operator,
+            isPreinscritChaussures: this.requires_shoes
         };
     }
 
@@ -74,7 +88,10 @@ export class CitizenExpedition extends CommonModel<CitizenExpeditionDTO> {
             this.preinscrit_heroic_skill = dto.preinscritHeroicSkillName;
             this.pdc = dto.pdc;
             this.is_thirsty = dto.isThirsty;
-            this.starts_7_ap = dto.nombrePaDepart === 7 ? true : (dto.nombrePaDepart === 6 ? false : undefined);
+            this.base_ap = dto.nombrePaDepart ?? undefined;
+            this.required_sp = dto.nombrePeDepart ?? undefined;
+            this.required_sp_operator = dto.nombrePeDepartOperator ?? undefined;
+            this.requires_shoes = dto.isPreinscritChaussures ?? undefined;
             this.expedition_part_id = dto.expeditionPartId;
             this.expedition_id = dto.expeditionId;
         }

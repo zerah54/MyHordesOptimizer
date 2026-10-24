@@ -25,5 +25,14 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Expeditions
 
         /// <summary>Citoyen à attendre ; null avec « wait » : le groupe.</summary>
         public int? TargetUserId { get; set; }
+
+        /// <summary>Autre expédition du jour à attendre, à la place d'un citoyen.</summary>
+        public int? TargetExpeditionId { get; set; }
+
+        /// <summary>Nom de l'expédition à attendre, en lecture seule ; renseigné par GET expeditions/me.</summary>
+        public string? TargetExpeditionLabel { get; set; }
+
+        /// <summary>Précision libre d'une consigne typée, en texte brut.</summary>
+        public string? Note { get; set; }
     }
 }

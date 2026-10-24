@@ -158,6 +158,22 @@ describe('MapCellOrdersComponent', (): void => {
             expect((fixture.nativeElement.querySelector('mat-checkbox input') as HTMLInputElement).disabled).toBe(true);
         });
 
+        it('names the expedition an order waits for, and gives the expeditions of the day to the form', (): void => {
+            const expeditions: Expedition[] = day();
+            const wait: (id: number, target: number) => ExpeditionOrder = (id: number, target: number): ExpeditionOrder =>
+                new ExpeditionOrder({ id, type: 'checkbox', text: '', isDone: false, position: 0, x: 3, y: 4, kind: 'wait', targetExpeditionId: target });
+            expeditions[0].parts[0].orders = [wait(1, 2)];
+            expeditions[1].parts[0].orders = [wait(4, 1)];
+            store.set(expeditions);
+            render({ cell: { x: 3, y: 4 }, mode: 'detail', editable: true });
+
+            expect(Array.from<Element>(fixture.nativeElement.querySelectorAll('mho-expedition-order .text')).map(text)).toContain('Attendre Camping');
+            expect(Array.from<Element>(fixture.nativeElement.querySelectorAll('.other-text')).map(text)).toContain('Camping « Nord » — Attendre Expé 1');
+
+            (fixture.nativeElement.querySelector('.line-action') as HTMLButtonElement).click();
+            expect(editor.edit.mock.calls[0][3].expeditions.map((expedition: Expedition): number | undefined => expedition.id)).toEqual([1, 2]);
+        });
+
         it('shows nothing without orders nor expeditions', (): void => {
             store.set([]);
             render({ cell: { x: 3, y: 4 }, mode: 'detail', editable: true });

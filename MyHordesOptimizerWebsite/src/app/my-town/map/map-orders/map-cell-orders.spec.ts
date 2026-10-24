@@ -56,7 +56,7 @@ describe('map-cell-orders', (): void => {
     });
 
     it('splits what is addressed to the user from the others', (): void => {
-        const view: CellOrdersView = buildCellOrdersView(cellOrdersAt(index, { x: 3, y: 4 }), { user_id: ME, citizens: CITIZENS, items: [], locale: 'fr' });
+        const view: CellOrdersView = buildCellOrdersView(cellOrdersAt(index, { x: 3, y: 4 }), { user_id: ME, citizens: CITIZENS, items: [], expeditions: [], locale: 'fr' });
 
         expect(view.count).toBe(4);
         expect(view.mine.length).toBe(1);
@@ -70,7 +70,7 @@ describe('map-cell-orders', (): void => {
     });
 
     it('treats every order as another one without user, or outside his parts', (): void => {
-        const view: CellOrdersView = buildCellOrdersView(cellOrdersAt(index, { x: 3, y: 4 }), { user_id: null, citizens: CITIZENS, items: [], locale: 'fr' });
+        const view: CellOrdersView = buildCellOrdersView(cellOrdersAt(index, { x: 3, y: 4 }), { user_id: null, citizens: CITIZENS, items: [], expeditions: [], locale: 'fr' });
 
         expect(view.mine).toEqual([]);
         expect(view.others.map((other: { who: string }): string => other.who))

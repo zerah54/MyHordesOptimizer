@@ -151,10 +151,21 @@
                                                                     <img [ngSrc]="HORDES_IMG_REPO() + 'status/status_thirst1.gif'" [height]="16" [width]="16">
                                                                 </div>
                                                             </td>
-                                                            <td class="starts-7-ap">
+                                                            <td class="base-ap" matTooltip="PA de base" i18n-matTooltip>
                                                                 <div class="flex">
-                                                                    7
                                                                     <mho-icon-ap></mho-icon-ap>
+                                                                </div>
+                                                            </td>
+                                                            <td class="sp" matTooltip="PE au départ" i18n-matTooltip>
+                                                                <div class="flex">
+                                                                    <ng-container i18n>PE</ng-container>
+                                                                </div>
+                                                            </td>
+                                                            <td class="shoes" [matTooltip]="shoe_label()">
+                                                                <div class="flex">
+                                                                    @if (shoe_icon()) {
+                                                                        <img [src]="HORDES_IMG_REPO() + shoe_icon()" [alt]="shoe_label()">
+                                                                    }
                                                                 </div>
                                                             </td>
                                                             <td class="pdc">
@@ -207,7 +218,7 @@
                                                                         @if (edition_mode() && editable()) {
                                                                             <mat-form-field subscriptSizing="dynamic" [appearance]="'outline'"
                                                                                             class="compact-field">
-                                                                                <mho-select [options]="all_citizens() | citizensForExpe:expedition_citizen"
+                                                                                <mho-select [options]="all_citizens() | citizensForExpe:expedition_citizen:day_index + 1:currentDay():scouts_lair_built()"
                                                                                             emptyOption
                                                                                             [bindLabel]="'name'"
                                                                                             [bindValue]="'id'"
@@ -216,7 +227,7 @@
                                                                                             (ngModelChange)="expedition_citizen.preinscrit = edition_mode(); saveCitizen(expedition_part, expedition_citizen, expedition_part_index, expedition, citizen_index)"
                                                                                             searchable></mho-select>
                                                                             </mat-form-field>
-                                                                        } @else if (expedition.state === 'ready' && !expedition_citizen.citizen_id && (!expedition_citizen.preinscrit_job || expedition_citizen.preinscrit_job === ($safeNavigationMigration(me()?.id)| citizenFromId:all_citizens())?.job?.key)) {
+                                                                        } @else if (expedition.state === 'ready' && !expedition_citizen.citizen_id && canJoin(expedition_citizen, day_index + 1)) {
                                                                             <button mat-button
                                                                                     (click)="expedition_citizen.citizen_id = me()?.id; saveCitizen(expedition_part, expedition_citizen, expedition_part_index, expedition, citizen_index)">
                                                                                 <ng-container i18n>M'inscrire ici</ng-container>
@@ -224,8 +235,14 @@
                                                                         } @else {
                                                                             {{ expedition_citizen.citizen_id ? (expedition_citizen.citizen_id | citizenFromId:all_citizens())?.name : '' }}
                                                                         }
+                                                                        @if (apWarning(expedition, expedition_part_index, citizen_index, day_index + 1); as ap_check) {
+                                                                            @if (ap_check.short) {
+                                                                                <mat-icon class="ap-warning" [matTooltip]="apWarningLabel(ap_check)">warning</mat-icon>
+                                                                            }
+                                                                        }
                                                                     </td>
                                                                     <td class="is-thirsty">
+                                                                        <img class="cell-label" [src]="HORDES_IMG_REPO() + 'status/status_thirst1.gif'" alt="Soif" i18n-alt>
                                                                         @if (edition_mode() && editable()) {
                                                                             <mho-tri-state-checkbox
                                                                                 [value]="expedition_citizen.is_preinscrit_soif"
@@ -242,20 +259,57 @@
                                                                             }
                                                                         }
                                                                     </td>
-                                                                    <td class="starts-7-ap">
+                                                                    <td class="base-ap">
+                                                                        <span class="cell-label"><mho-icon-ap></mho-icon-ap></span>
+                                                                        @if (edition_mode() && editable()) {
+                                                                            <mho-compact-stepper label="PA de base" i18n-label [min]="0"
+                                                                                                 [value]="expedition_citizen.base_ap ?? 6"
+                                                                                                 (valueChange)="expedition_citizen.base_ap = $event; saveCitizen(expedition_part, expedition_citizen)"></mho-compact-stepper>
+                                                                        } @else {
+                                                                            {{ expedition_citizen.base_ap ?? 6 }}
+                                                                        }
+                                                                    </td>
+                                                                    <td class="sp">
+                                                                        <span class="cell-label"><ng-container i18n>PE</ng-container></span>
+                                                                        @if (edition_mode() && editable()) {
+                                                                            <div class="flex">
+                                                                                <mat-form-field subscriptSizing="dynamic" [appearance]="'outline'"
+                                                                                                class="compact-field sp-operator">
+                                                                                    <mat-select aria-label="Opérateur des PE exigés" i18n-aria-label [panelWidth]="null"
+                                                                                                [value]="expedition_citizen.required_sp !== undefined ? (expedition_citizen.required_sp_operator ?? 'min') : null"
+                                                                                                (selectionChange)="saveSpRequirement(expedition, citizen_index, expedition_citizen.required_sp ?? 0, $event.value)">
+                                                                                        <mat-option [value]="null"><ng-container i18n>Aucune exigence</ng-container></mat-option>
+                                                                                        @for (operator of sp_operators; track operator.value) {
+                                                                                            <mat-option [value]="operator.value">{{ operator.symbol }}</mat-option>
+                                                                                        }
+                                                                                    </mat-select>
+                                                                                </mat-form-field>
+                                                                                <mho-compact-stepper label="PE exigés" i18n-label [min]="0"
+                                                                                                     [value]="expedition_citizen.required_sp ?? 0"
+                                                                                                     (valueChange)="saveSpRequirement(expedition, citizen_index, $event, expedition_citizen.required_sp_operator ?? 'min')"></mho-compact-stepper>
+                                                                            </div>
+                                                                        } @else {
+                                                                            {{ spDisplay(expedition_citizen, day_index + 1) }}
+                                                                        }
+                                                                    </td>
+                                                                    <td class="shoes">
+                                                                        @if (shoe_icon()) {
+                                                                            <img class="cell-label" [src]="HORDES_IMG_REPO() + shoe_icon()" [alt]="shoe_label()">
+                                                                        }
                                                                         @if (edition_mode() && editable()) {
                                                                             <mho-tri-state-checkbox
-                                                                                [value]="expedition_citizen.starts_7_ap"
-                                                                                (valueChange)="expedition_citizen.starts_7_ap = $event; saveCitizen(expedition_part, expedition_citizen)"/>
-                                                                        } @else if (expedition_citizen.starts_7_ap !== undefined && expedition_citizen.starts_7_ap !== null) {
-                                                                            @if (expedition_citizen.starts_7_ap) {
-                                                                                <ng-container i18n>Oui</ng-container>
-                                                                            } @else {
-                                                                                <ng-container i18n>Non</ng-container>
-                                                                            }
+                                                                                [value]="expedition_citizen.requires_shoes"
+                                                                                (valueChange)="saveRequirement(expedition, citizen_index, { requires_shoes: $event })"/>
+                                                                        } @else if (expedition_citizen.requires_shoes === true && shoe_icon()) {
+                                                                            <img [src]="HORDES_IMG_REPO() + shoe_icon()" alt="Chaussures exigées" i18n-alt
+                                                                                 matTooltip="Chaussures exigées" i18n-matTooltip>
+                                                                        } @else if (expedition_citizen.requires_shoes === false && shoe_icon()) {
+                                                                            <img class="forbidden" [src]="HORDES_IMG_REPO() + shoe_icon()" alt="Chaussures interdites" i18n-alt
+                                                                                 matTooltip="Chaussures interdites" i18n-matTooltip>
                                                                         }
                                                                     </td>
                                                                     <td class="pdc">
+                                                                        <img class="cell-label" [src]="HORDES_IMG_REPO() + 'professions/shield.gif'" alt="Points de contrôle" i18n-alt>
                                                                         @if ((edition_mode() || expedition.state === 'ready') && editable()) {
                                                                             <mat-form-field subscriptSizing="dynamic" [appearance]="'outline'"
                                                                                             class="compact-field">
@@ -268,6 +322,7 @@
                                                                     </td>
                                                                     @if ((edition_mode() || (expedition_part.citizens | someHeroicActionNeeded)) && editable()) {
                                                                         <td class="heroic">
+                                                                            <span class="cell-label"><ng-container i18n>Action héroïque</ng-container></span>
                                                                             @if (edition_mode() && editable()) {
                                                                                 <mat-form-field subscriptSizing="dynamic" [appearance]="'outline'"
                                                                                                 class="compact-field">
@@ -287,14 +342,14 @@
                                                                     <td class="citizen-orders">
                                                                         @if (edition_mode() && editable()) {
                                                                             <ng-container
-                                                                                *ngTemplateOutlet="displayOrder; context: {$implicit: expedition_citizen.orders}"></ng-container>
+                                                                                *ngTemplateOutlet="displayOrder; context: {$implicit: citizenOrdersOf(expedition_part, expedition_citizen)}"></ng-container>
                                                                             <button mat-icon-button type="button"
                                                                                     (click)="openExpeditionOrders(expedition_citizen)">
                                                                                 <mat-icon>edit</mat-icon>
                                                                             </button>
                                                                         } @else {
                                                                             <ng-container
-                                                                                *ngTemplateOutlet="displayOrder; context: {$implicit: expedition_citizen.orders}"></ng-container>
+                                                                                *ngTemplateOutlet="displayOrder; context: {$implicit: citizenOrdersOf(expedition_part, expedition_citizen)}"></ng-container>
                                                                         }
                                                                     </td>
                                                                     <td class="bag">
@@ -346,7 +401,7 @@
                                                     </div>
                                                     @if (showRoadbook(expedition_part)) {
                                                         <mho-expedition-roadbook class="roadbook" [part]="expedition_part" [map]="map()" [ruins]="all_ruins()"
-                                                                                 [items]="all_items()" [citizens]="all_citizens()"
+                                                                                 [items]="all_items()" [citizens]="all_citizens()" [expeditions]="expeditions()"
                                                                                  [editable]="edition_mode() && editable()" [checkable]="editable()"
                                                                                  [me]="me()?.id ?? null"></mho-expedition-roadbook>
                                                     }
@@ -356,7 +411,7 @@
                                                 @if (orders.length > 0) {
                                                     @for (order of orders; track order.id) {
                                                         <mho-expedition-order class="order" [order]="order" [items]="all_items()" [citizens]="all_citizens()"
-                                                                              [town]="town_position()" [checkable]="editable()"
+                                                                              [expeditions]="expeditions()" [town]="town_position()" [checkable]="editable()"
                                                                               (doneChange)="saveOrder(order, $event)"></mho-expedition-order>
                                                     }
                                                 } @else {

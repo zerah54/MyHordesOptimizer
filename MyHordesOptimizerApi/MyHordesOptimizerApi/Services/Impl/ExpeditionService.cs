@@ -182,7 +182,59 @@ namespace MyHordesOptimizerApi.Services.Impl
                 .ToList();
 
             var dtos = Mapper.Map<List<ExpeditionDto>>(models);
+            FillTargetExpeditionLabels(dtos);
             return dtos;
+        }
+
+        /// <summary>
+        /// Nom des expéditions attendues par les consignes « wait », pour l'addon qui ne lit que les expéditions de
+        /// l'utilisateur : une requête projetée sur les seules expéditions visées.
+        /// </summary>
+        private void FillTargetExpeditionLabels(List<ExpeditionDto> expeditions)
+        {
+            var orders = expeditions
+                .SelectMany(expedition => expedition.Parts ?? new List<ExpeditionPartDto>())
+                .SelectMany(part => (part.Orders ?? new List<ExpeditionOrderDto>())
+                    .Concat((part.Citizens ?? new List<ExpeditionCitizenDto>()).SelectMany(citizen => citizen.Orders ?? new List<ExpeditionOrderDto>())))
+                .Where(order => order.TargetExpeditionId.HasValue)
+                .ToList();
+            if (orders.Count == 0)
+            {
+                return;
+            }
+            var targetIds = orders.Select(order => order.TargetExpeditionId!.Value).Distinct().ToList();
+            var labels = DbContext.Expeditions
+                .Where(expedition => targetIds.Contains(expedition.IdExpedition))
+                .Select(expedition => new { expedition.IdExpedition, expedition.Label })
+                .ToDictionary(expedition => expedition.IdExpedition, expedition => expedition.Label);
+            foreach (var order in orders)
+            {
+                var label = labels.GetValueOrDefault(order.TargetExpeditionId!.Value);
+                order.TargetExpeditionLabel = string.IsNullOrWhiteSpace(label) ? null : label.Trim();
+            }
+        }
+
+        /// <summary>
+        /// Les consignes copiées attendent encore les expéditions du jour source : elles visent désormais leurs copies
+        /// (copies dans l'ordre des sources, identifiants attribués par le SaveChanges précédent).
+        /// </summary>
+        private async Task RetargetCopiedWaitOrdersAsync(List<Expedition> sources, List<Expedition> copies)
+        {
+            var copyIds = sources.Zip(copies).ToDictionary(pair => pair.First.IdExpedition, pair => pair.Second.IdExpedition);
+            var waitOrders = copies
+                .SelectMany(expedition => expedition.ExpeditionParts)
+                .SelectMany(part => part.IdExpeditionOrders.Concat(part.ExpeditionCitizens.SelectMany(citizen => citizen.ExpeditionOrders)))
+                .Where(order => order.IdTargetExpedition.HasValue)
+                .ToList();
+            if (waitOrders.Count == 0)
+            {
+                return;
+            }
+            foreach (var order in waitOrders)
+            {
+                order.IdTargetExpedition = copyIds.TryGetValue(order.IdTargetExpedition!.Value, out var copyId) ? copyId : null;
+            }
+            await DbContext.SaveChangesAsync();
         }
 
         public void DeleteExpedition(int expeditionId)
@@ -266,6 +318,7 @@ namespace MyHordesOptimizerApi.Services.Impl
                 newExpeditions.Add(updatedNewExpedition);
             }
             await DbContext.SaveChangesAsync();
+            await RetargetCopiedWaitOrdersAsync(modelsFromDb, newExpeditions);
             await BumpRouteVersionsAsync(unlinkedRouteIds);
             await transaction.CommitAsync();
             _mapRouteChanges.AddRange(routeCopies.Values.Select(routeCopy => new MapRouteChangeDto { Id = routeCopy.IdMapRoute, Version = routeCopy.Version }));
@@ -829,7 +882,7 @@ namespace MyHordesOptimizerApi.Services.Impl
                 expeditionOrderFromDb.UpdateAllButKeysProperties(orderModel);
                 orderModels.Add(expeditionOrderFromDb);
             }
-            await ValidateOrdersAsync(orderModels, targetTown.IdTown);
+            await ValidateOrdersAsync(orderModels, targetTown.IdTown, expeditionCitizen.IdExpeditionPartNavigation!.IdExpedition!.Value);
             var orderFromDb = expeditionCitizen.ExpeditionOrders.ToList();
             var toRemove = orderFromDb.Except(orderModels, EqualityComparerFactory.CreateDefault<ExpeditionOrder>());
             DbContext.RemoveRange(toRemove);
@@ -877,7 +930,7 @@ namespace MyHordesOptimizerApi.Services.Impl
                 expeditionOrderFromDb.UpdateAllButKeysProperties(orderModel);
                 orderModels.Add(expeditionOrderFromDb);
             }
-            await ValidateOrdersAsync(orderModels, targetTown.IdTown);
+            await ValidateOrdersAsync(orderModels, targetTown.IdTown, expeditionPart.IdExpedition!.Value);
             var toRemove = initialOrderFromDb.Except(orderModels, EqualityComparerFactory.CreateDefault<ExpeditionOrder>());
             DbContext.RemoveRange(toRemove);
             expeditionPart.IdExpeditionOrders = orderModels;
@@ -922,6 +975,8 @@ namespace MyHordesOptimizerApi.Services.Impl
             modelFromDto.Quantity = null;
             modelFromDto.HeroSkill = null;
             modelFromDto.IdTargetUser = null;
+            modelFromDto.IdTargetExpedition = null;
+            modelFromDto.Note = null;
             expeditionOrderModel.UpdateAllButKeysProperties(modelFromDto, ignoreNull: true);
             DbContext.Update(expeditionOrderModel);
             DbContext.SaveChanges();
@@ -1029,9 +1084,10 @@ namespace MyHordesOptimizerApi.Services.Impl
 
         /// <summary>
         /// Vérifie la forme des consignes (<see cref="ExpeditionOrderRules"/>, case dans la carte de la ville) puis,
-        /// en une requête chacun, que les objets existent et que les citoyens à attendre sont de la ville.
+        /// en une requête chacun, que les objets existent, que les citoyens à attendre sont de la ville et que les
+        /// expéditions à attendre sont d'autres expéditions du même jour (<paramref name="idExpedition"/> : celle des consignes).
         /// </summary>
-        private async Task ValidateOrdersAsync(IReadOnlyCollection<ExpeditionOrder> orders, int idTown)
+        private async Task ValidateOrdersAsync(IReadOnlyCollection<ExpeditionOrder> orders, int idTown, int idExpedition)
         {
             if (orders.Count == 0)
             {
@@ -1054,6 +1110,20 @@ namespace MyHordesOptimizerApi.Services.Impl
             if (targetUserIds.Count > 0 && await DbContext.CountTownMembersAsync(idTown, targetUserIds) != targetUserIds.Count)
             {
                 throw new MhoTechnicalException("Le citoyen à attendre n'est pas de la ville.");
+            }
+            var targetExpeditionIds = orders.Where(order => order.IdTargetExpedition.HasValue).Select(order => order.IdTargetExpedition!.Value).Distinct().ToList();
+            if (targetExpeditionIds.Count > 0)
+            {
+                if (targetExpeditionIds.Contains(idExpedition))
+                {
+                    throw new MhoTechnicalException("Une expédition ne peut pas s'attendre elle-même.");
+                }
+                var day = await DbContext.Expeditions.Where(expedition => expedition.IdExpedition == idExpedition).Select(expedition => expedition.Day).SingleAsync();
+                var sameDay = await DbContext.Expeditions.CountAsync(expedition => targetExpeditionIds.Contains(expedition.IdExpedition) && expedition.IdTown == idTown && expedition.Day == day);
+                if (sameDay != targetExpeditionIds.Count)
+                {
+                    throw new MhoTechnicalException("L'expédition à attendre n'est pas une expédition du même jour de la ville.");
+                }
             }
         }
 

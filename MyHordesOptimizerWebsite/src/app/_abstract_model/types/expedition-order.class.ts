@@ -29,6 +29,10 @@ export class ExpeditionOrder extends CommonModel<ExpeditionOrderDTO> {
     public hero_skill: string | null = null;
     /** Citoyen à attendre ; `null` avec « wait » : le groupe. */
     public target_user_id: number | null = null;
+    /** Autre expédition du jour à attendre, à la place d'un citoyen. */
+    public target_expedition_id: number | null = null;
+    /** Précision libre d'une consigne typée, en texte brut. */
+    public note: string | null = null;
 
     public constructor(dto?: ExpeditionOrderDTO | null) {
         super();
@@ -53,7 +57,9 @@ export class ExpeditionOrder extends CommonModel<ExpeditionOrderDTO> {
             itemId: this.item_id,
             quantity: this.quantity,
             heroSkill: this.hero_skill,
-            targetUserId: this.target_user_id
+            targetUserId: this.target_user_id,
+            targetExpeditionId: this.target_expedition_id,
+            note: this.note
         };
     }
 
@@ -75,6 +81,8 @@ export class ExpeditionOrder extends CommonModel<ExpeditionOrderDTO> {
             this.quantity = dto.quantity ?? null;
             this.hero_skill = dto.heroSkill ?? null;
             this.target_user_id = dto.targetUserId ?? null;
+            this.target_expedition_id = dto.targetExpeditionId ?? null;
+            this.note = dto.note ?? null;
         }
     }
 

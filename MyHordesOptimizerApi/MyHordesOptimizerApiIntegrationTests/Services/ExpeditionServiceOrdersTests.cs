@@ -8,6 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 using MyHordesOptimizerApi;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Expeditions;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Expeditions.Request;
+using MyHordesOptimizerApi.Exceptions;
 using MyHordesOptimizerApi.Models;
 using MyHordesOptimizerApi.Services.Interfaces;
 using MyHordesOptimizerApiIntegrationTests.ApplicationFactory;
@@ -125,6 +126,105 @@ namespace MyHordesOptimizerApiIntegrationTests.Services
             var scope = _factory.Services.CreateScope();
             var context = scope.ServiceProvider.GetRequiredService<MhoContext>();
             context.Expeditions.Count(e => e.IdTown == townId && e.Day == 6).Should().Be(2);
+        }
+
+        private async Task<(int ExpeditionId, int PartId)> NewExpedition(int townId, int day, string? label = null)
+        {
+            var expedition = await NewService().SaveExpeditionAsync(new ExpeditionRequestDto { Label = label, PartsId = new List<int>() }, townId, day);
+            var part = await NewService().SaveExpeditionPartAsync(expedition.Id!.Value, new ExpeditionPartRequestDto { OrdersId = new List<int>(), CitizensId = new List<int>() });
+            return (expedition.Id!.Value, part.Id!.Value);
+        }
+
+        private static List<ExpeditionOrderDto> WaitFor(int expeditionId)
+        {
+            return new List<ExpeditionOrderDto> { new ExpeditionOrderDto { Kind = "wait", TargetExpeditionId = expeditionId, Note = "avancer ensemble" } };
+        }
+
+        [Fact]
+        public async Task SavePartOrdersAsync_AttendreUneAutreExpeditionDuJour_Enregistre()
+        {
+            var townId = NewTown(day: 5);
+            var waited = await NewExpedition(townId, 5);
+            var waiting = await NewExpedition(townId, 5);
+
+            var result = await NewService().SavePartOrdersAsync(waiting.PartId, WaitFor(waited.ExpeditionId));
+
+            result.Single().TargetExpeditionId.Should().Be(waited.ExpeditionId);
+            result.Single().Note.Should().Be("avancer ensemble");
+        }
+
+        [Fact]
+        public async Task SavePartOrdersAsync_AttendreSaPropreExpedition_Refuse()
+        {
+            var townId = NewTown(day: 5);
+            var own = await NewExpedition(townId, 5);
+
+            await FluentActions.Awaiting(() => NewService().SavePartOrdersAsync(own.PartId, WaitFor(own.ExpeditionId)))
+                .Should().ThrowAsync<MhoTechnicalException>();
+        }
+
+        [Fact]
+        public async Task SavePartOrdersAsync_AttendreUneExpeditionDUnAutreJour_Refuse()
+        {
+            var townId = NewTown(day: 5);
+            var nextDay = await NewExpedition(townId, 6);
+            var waiting = await NewExpedition(townId, 5);
+
+            await FluentActions.Awaiting(() => NewService().SavePartOrdersAsync(waiting.PartId, WaitFor(nextDay.ExpeditionId)))
+                .Should().ThrowAsync<MhoTechnicalException>();
+        }
+
+        [Fact]
+        public async Task SaveCitizenOrdersAsync_AttendreSaPropreExpedition_Refuse()
+        {
+            var townId = NewTown(day: 5);
+            var own = await NewExpedition(townId, 5);
+            var citizen = await NewService().SaveExpeditionCitizenAsync(own.PartId, new ExpeditionCitizenRequestDto { OrdersId = new List<int>() });
+
+            await FluentActions.Awaiting(() => NewService().SaveCitizenOrdersAsync(citizen.Id!.Value, WaitFor(own.ExpeditionId)))
+                .Should().ThrowAsync<MhoTechnicalException>();
+        }
+
+        [Fact]
+        public async Task CopyExpeditionsAsync_AttendreUneExpedition_ViseSaCopie()
+        {
+            var townId = NewTown(day: 5);
+            var waited = await NewExpedition(townId, 5, label: "attendue");
+            var waiting = await NewExpedition(townId, 5, label: "qui-attend");
+            var citizen = await NewService().SaveExpeditionCitizenAsync(waiting.PartId, new ExpeditionCitizenRequestDto { OrdersId = new List<int>() });
+            await NewService().SavePartOrdersAsync(waiting.PartId, WaitFor(waited.ExpeditionId));
+            await NewService().SaveCitizenOrdersAsync(citizen.Id!.Value, WaitFor(waited.ExpeditionId));
+
+            await NewService().CopyExpeditionsAsync(townId, fromDay: 5, targetDay: 6);
+
+            var context = _factory.Services.CreateScope().ServiceProvider.GetRequiredService<MhoContext>();
+            var waitedCopy = context.Expeditions.Single(e => e.IdTown == townId && e.Day == 6 && e.Label == "attendue");
+            var copiedOrders = context.ExpeditionOrders
+                .Where(o => o.IdExpeditionParts.Any(p => p.IdExpeditionNavigation!.IdTown == townId && p.IdExpeditionNavigation.Day == 6)
+                    || o.IdExpeditionCitizenNavigation!.IdExpeditionPartNavigation!.IdExpeditionNavigation!.IdTown == townId
+                        && o.IdExpeditionCitizenNavigation.IdExpeditionPartNavigation.IdExpeditionNavigation.Day == 6)
+                .ToList();
+            copiedOrders.Should().HaveCount(2);
+            copiedOrders.Should().OnlyContain(o => o.IdTargetExpedition == waitedCopy.IdExpedition && o.Note == "avancer ensemble");
+        }
+
+        [Fact]
+        public async Task GetUserExpeditionsByDay_AttendreUneExpedition_RenvoieSonNom()
+        {
+            var townId = NewTown(day: 5);
+            var userId = new Random().Next(1, int.MaxValue);
+            var context = _factory.Services.CreateScope().ServiceProvider.GetRequiredService<MhoContext>();
+            context.Users.Add(new User { IdUser = userId, Name = "test-user-" + Guid.NewGuid().ToString("N").Substring(0, 8) });
+            context.SaveChanges();
+            var waited = await NewExpedition(townId, 5, label: "Expé Z");
+            var waiting = await NewExpedition(townId, 5);
+            await NewService().SaveExpeditionCitizenAsync(waiting.PartId, new ExpeditionCitizenRequestDto { IdUser = userId, OrdersId = new List<int>() });
+            await NewService().SavePartOrdersAsync(waiting.PartId, WaitFor(waited.ExpeditionId));
+
+            var expeditions = NewService().GetUserExpeditionsByDay(townId, userId, 5);
+
+            var order = expeditions.Single().Parts!.SelectMany(part => part.Orders ?? new List<ExpeditionOrderDto>()).Single();
+            order.TargetExpeditionLabel.Should().Be("Expé Z");
         }
     }
 }

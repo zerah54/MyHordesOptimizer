@@ -18,6 +18,7 @@ namespace MyHordesOptimizerApi.Services.Interfaces
 
         LastUpdateInfoDto UpdateCitizenChamanicDetail(int townId, int userId, CitizenChamanicDetailDto chamanicDetailDto);
         void UpdateCitizenCampingCount(int townId, int userId, int campingCount);
+        void UpdateCitizenShoesEquipped(int townId, int userId, bool shoesEquipped);
         void UpdateCitizenHeroSkills(int townId, int userId, CitizenHeroSkillLevelsDto heroSkills);
     }
 }
