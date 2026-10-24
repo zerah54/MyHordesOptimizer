@@ -19,7 +19,7 @@ jobs:
       - uses: actions/checkout@main
       - uses: actions/setup-node@main
         with:
-          node-version: '24.15.0'
+          node-version: '24.22.1'
 
       - name: Build app
         run: |

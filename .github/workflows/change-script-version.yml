@@ -1,116 +1,116 @@
 name: (Script) Update Version
 
 on:
-    workflow_dispatch:
-    push:
-        branches:
-            - main
-        paths:
-            - 'Scripts/Tampermonkey/my_hordes_optimizer.user.js'
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - 'Scripts/Tampermonkey/my_hordes_optimizer.user.js'
 
 jobs:
-    script-change-version:
+  script-change-version:
 
-        runs-on: ubuntu-latest
+    runs-on: ubuntu-latest
 
-        steps:
-            -   uses: actions/checkout@v4
+    steps:
+      - uses: actions/checkout@v4
 
-            -   name: Read Script
-                id: read-script
-                run: echo "version_row=$(sed -n 3p ./Scripts/Tampermonkey/my_hordes_optimizer.user.js)" >> $GITHUB_OUTPUT
+      - name: Read Script
+        id: read-script
+        run: echo "version_row=$(sed -n 3p ./Scripts/Tampermonkey/my_hordes_optimizer.user.js)" >> $GITHUB_OUTPUT
 
-            -   name: Match Version
-                uses: actions-ecosystem/action-regex-match@v2
-                id: regex-match
-                with:
-                    text: ${{ steps.read-script.outputs.version_row }}
-                    regex: '@version *(.+)'
+      - name: Match Version
+        uses: actions-ecosystem/action-regex-match@v2
+        id: regex-match
+        with:
+          text: ${{ steps.read-script.outputs.version_row }}
+          regex: '@version *(.+)'
 
-            -   name: Get Script Version
-                id: get-version
-                env:
-                    VERSION: "${{ steps.regex-match.outputs.group1 }}"
-                run: echo "version=$VERSION" >> $GITHUB_OUTPUT
+      - name: Get Script Version
+        id: get-version
+        env:
+          VERSION: "${{ steps.regex-match.outputs.group1 }}"
+        run: echo "version=$VERSION" >> $GITHUB_OUTPUT
 
-            -   name: Save version
-                run: |
-                    curl --request POST \
-                      --url "https://api.myhordesoptimizer.fr/Parameters/Parameters" \
-                      --header "Content-Type: application/json" \
-                      --header "Authorization: Basic ${{secrets.AUTHENTICATION_BASIC}}" \
-                      --data '{"name": "ScriptVersion", "value": "${{ steps.get-version.outputs.version }}"}'
+      - name: Save version
+        run: |
+          curl --request POST \
+            --url "https://api.myhordesoptimizer.fr/Parameters/Parameters" \
+            --header "Content-Type: application/json" \
+            --header "Authorization: Basic ${{secrets.AUTHENTICATION_BASIC}}" \
+            --data '{"name": "ScriptVersion", "value": "${{ steps.get-version.outputs.version }}"}'
 
-    build_extensions:
+  build_extensions:
 
-        runs-on: ubuntu-latest
+    runs-on: ubuntu-latest
 
-        steps:
-            -   uses: actions/checkout@v4
+    steps:
+      - uses: actions/checkout@v4
 
-            -   uses: actions/setup-node@v4
-                with:
-                    node-version: '24.15.0'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.22.1'
 
-            -   name: Generate extension files
-                run: node Scripts/Extensions/convert_script_to_extension.js
+      - name: Generate extension files
+        run: node Scripts/Extensions/convert_script_to_extension.js
 
-            -   name: Upload extensions
-                uses: actions/upload-artifact@v4
-                with:
-                    name: extensions
-                    path: Extensions/
-                    retention-days: 1
-                    if-no-files-found: error
+      - name: Upload extensions
+        uses: actions/upload-artifact@v4
+        with:
+          name: extensions
+          path: Extensions/
+          retention-days: 1
+          if-no-files-found: error
 
-    deploy_chrome_extension:
+  deploy_chrome_extension:
 
-        needs: build_extensions
-        runs-on: ubuntu-latest
+    needs: build_extensions
+    runs-on: ubuntu-latest
 
-        steps:
-            -   name: Download extensions
-                uses: actions/download-artifact@v4
-                with:
-                    name: extensions
-                    path: Extensions
+    steps:
+      - name: Download extensions
+        uses: actions/download-artifact@v4
+        with:
+          name: extensions
+          path: Extensions
 
-            -   name: Zip
-                uses: vimtor/action-zip@v1.1
-                with:
-                    files: Extensions/Chrome/
-                    dest: Chrome.zip
+      - name: Zip
+        uses: vimtor/action-zip@v1.1
+        with:
+          files: Extensions/Chrome/
+          dest: Chrome.zip
 
-            -   name: Publish
-                uses: wdzeng/chrome-extension@v1
-                with:
-                    extension-id: jolghobcgphmgaiachbipnpiimmgknno
-                    zip-path: ${{ github.workspace }}/Chrome.zip
-                    client-id: ${{ secrets.CHROME_EXTENSION_CLIENT_ID }}
-                    client-secret: ${{ secrets.CHROME_EXTENSION_CLIENT_SECRET }}
-                    refresh-token: ${{ secrets.CHROME_EXTENSION_REFRESH_TOKEN }}
+      - name: Publish
+        uses: wdzeng/chrome-extension@v1
+        with:
+          extension-id: jolghobcgphmgaiachbipnpiimmgknno
+          zip-path: ${{ github.workspace }}/Chrome.zip
+          client-id: ${{ secrets.CHROME_EXTENSION_CLIENT_ID }}
+          client-secret: ${{ secrets.CHROME_EXTENSION_CLIENT_SECRET }}
+          refresh-token: ${{ secrets.CHROME_EXTENSION_REFRESH_TOKEN }}
 
-    deploy_firefox_extension:
-        needs: build_extensions
-        runs-on: ubuntu-latest
+  deploy_firefox_extension:
+    needs: build_extensions
+    runs-on: ubuntu-latest
 
-        steps:
-            -   name: Download extensions
-                uses: actions/download-artifact@v4
-                with:
-                    name: extensions
-                    path: Extensions
+    steps:
+      - name: Download extensions
+        uses: actions/download-artifact@v4
+        with:
+          name: extensions
+          path: Extensions
 
-            -   name: Zip
-                uses: vimtor/action-zip@v1.1
-                with:
-                    files: Extensions/Firefox/
-                    dest: Firefox.zip
+      - name: Zip
+        uses: vimtor/action-zip@v1.1
+        with:
+          files: Extensions/Firefox/
+          dest: Firefox.zip
 
-            -   name: Publish
-                uses: wdzeng/firefox-addon@v1
-                with:
-                    addon-guid: '{14876417-17c6-417d-80bb-b18c5b40c366}'
-                    xpi-path: ${{ github.workspace }}/Firefox.zip
-                    jwt-issuer: ${{ secrets.FIREFOX_JWT_ISSUER }}
-                    jwt-secret: ${{ secrets.FIREFOX_JWT_SECRET }}
+      - name: Publish
+        uses: wdzeng/firefox-addon@v1
+        with:
+          addon-guid: '{14876417-17c6-417d-80bb-b18c5b40c366}'
+          xpi-path: ${{ github.workspace }}/Firefox.zip
+          jwt-issuer: ${{ secrets.FIREFOX_JWT_ISSUER }}
+          jwt-secret: ${{ secrets.FIREFOX_JWT_SECRET }}
