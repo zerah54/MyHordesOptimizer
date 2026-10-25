@@ -6,5 +6,6 @@
         public string JwtIssuer { get; }
         public string JwtAudience { get; }
         public int JwtValideTimeInMinute { get; }
+        public string FrontendUrl { get; }
     }
 }

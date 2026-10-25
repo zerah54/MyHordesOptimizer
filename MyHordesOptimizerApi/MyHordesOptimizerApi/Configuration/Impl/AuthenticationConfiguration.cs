@@ -11,6 +11,7 @@ namespace MyHordesOptimizerApi.Configuration.Impl
         public string JwtIssuer => _jwtConfiguration.GetValue<string>("Issuer");
         public string JwtAudience => _jwtConfiguration.GetValue<string>("Audience");
         public int JwtValideTimeInMinute => _jwtConfiguration.GetValue<int>("ValideTimeInMinute");
+        public string FrontendUrl => _configuration.GetValue<string>("FrontendUrl");
 
         public AuthenticationConfiguration(IConfiguration configuration)
         {

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using MyHordesOptimizerApi.Attributes;
+using MyHordesOptimizerApi.Configuration.Interfaces;
 using MyHordesOptimizerApi.Controllers.Abstract;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Authentication;
@@ -20,16 +21,19 @@ namespace MyHordesOptimizerApi.Controllers
         private readonly IAuthenticationService _authenticationService;
         private readonly IMyHordesFetcherService _myHordesFetcherService;
         private readonly ITokenRateLimiter _tokenRateLimiter;
+        private readonly IAuthenticationConfiguration _authenticationConfiguration;
 
         public AuthenticationController(ILogger<FetcherController> logger,
             IAuthenticationService authenticationService,
             IMyHordesFetcherService myHordesFetcherService,
             ITokenRateLimiter tokenRateLimiter,
+            IAuthenticationConfiguration authenticationConfiguration,
             IUserInfoProvider userKeyProvider) : base(logger, userKeyProvider)
         {
             _authenticationService = authenticationService;
             _myHordesFetcherService = myHordesFetcherService;
             _tokenRateLimiter = tokenRateLimiter;
+            _authenticationConfiguration = authenticationConfiguration;
         }
 
         /// <summary>
@@ -96,7 +100,7 @@ namespace MyHordesOptimizerApi.Controllers
                 return BadRequest($"{nameof(key)} cannot be empty");
             }
             
-            return Redirect($"https://myhordes-optimizer.web.app/login?token={key}");
+            return Redirect($"{_authenticationConfiguration.FrontendUrl}/login?token={key}");
         }
     }
 }
