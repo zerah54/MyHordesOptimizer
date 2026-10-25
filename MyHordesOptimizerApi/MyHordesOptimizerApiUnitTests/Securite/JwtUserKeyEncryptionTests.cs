@@ -37,6 +37,7 @@ namespace MyHordesOptimizerApiUnitTests.Securite
             public string JwtIssuer => "mho-unit-tests";
             public string JwtAudience => "mho-unit-tests-audience";
             public int JwtValideTimeInMinute => 20160;
+            public string FrontendUrl => "https://mho-unit-tests.example";
         }
 
         private static AuthenticationService NewAuthenticationService(IDataProtectionProvider dataProtectionProvider)
