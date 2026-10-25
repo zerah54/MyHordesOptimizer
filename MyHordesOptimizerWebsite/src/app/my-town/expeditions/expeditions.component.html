@@ -218,7 +218,7 @@
                                                                         @if (edition_mode() && editable()) {
                                                                             <mat-form-field subscriptSizing="dynamic" [appearance]="'outline'"
                                                                                             class="compact-field">
-                                                                                <mho-select [options]="all_citizens() | citizensForExpe:expedition_citizen:day_index + 1:currentDay():scouts_lair_built()"
+                                                                                <mho-select [options]="all_citizens() | citizensForExpe:expedition_citizen"
                                                                                             emptyOption
                                                                                             [bindLabel]="'name'"
                                                                                             [bindValue]="'id'"
@@ -227,7 +227,7 @@
                                                                                             (ngModelChange)="expedition_citizen.preinscrit = edition_mode(); saveCitizen(expedition_part, expedition_citizen, expedition_part_index, expedition, citizen_index)"
                                                                                             searchable></mho-select>
                                                                             </mat-form-field>
-                                                                        } @else if (expedition.state === 'ready' && !expedition_citizen.citizen_id && canJoin(expedition_citizen, day_index + 1)) {
+                                                                        } @else if (expedition.state === 'ready' && !expedition_citizen.citizen_id && canJoin(expedition_citizen)) {
                                                                             <button mat-button
                                                                                     (click)="expedition_citizen.citizen_id = me()?.id; saveCitizen(expedition_part, expedition_citizen, expedition_part_index, expedition, citizen_index)">
                                                                                 <ng-container i18n>M'inscrire ici</ng-container>
@@ -235,7 +235,7 @@
                                                                         } @else {
                                                                             {{ expedition_citizen.citizen_id ? (expedition_citizen.citizen_id | citizenFromId:all_citizens())?.name : '' }}
                                                                         }
-                                                                        @if (apWarning(expedition, expedition_part_index, citizen_index, day_index + 1); as ap_check) {
+                                                                        @if (apWarning(expedition, expedition_part_index, citizen_index); as ap_check) {
                                                                             @if (ap_check.short) {
                                                                                 <mat-icon class="ap-warning" [matTooltip]="apWarningLabel(ap_check)">warning</mat-icon>
                                                                             }
@@ -289,7 +289,7 @@
                                                                                                      (valueChange)="saveSpRequirement(expedition, citizen_index, $event, expedition_citizen.required_sp_operator ?? 'min')"></mho-compact-stepper>
                                                                             </div>
                                                                         } @else {
-                                                                            {{ spDisplay(expedition_citizen, day_index + 1) }}
+                                                                            {{ spDisplay(expedition_citizen) }}
                                                                         }
                                                                     </td>
                                                                     <td class="shoes">

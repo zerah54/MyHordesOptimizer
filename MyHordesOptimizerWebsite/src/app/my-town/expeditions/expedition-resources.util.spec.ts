@@ -1,81 +1,26 @@
-import { DailyActionEnum } from '../../_abstract_model/enum/daily-action.enum';
 import { JobEnum } from '../../_abstract_model/enum/job.enum';
 import { SpRequirementOperator } from '../../_abstract_model/types/_types';
 import { Citizen } from '../../_abstract_model/types/citizen.class';
 import { CitizenExpedition } from '../../_abstract_model/types/citizen-expedition.class';
-import { DailyAction } from '../../_abstract_model/types/daily-action.class';
 import { MapRoutePoint } from '../../_abstract_model/types/map-route.class';
-import { ApCheck, apCheck, ApLeg, ApResources, meetsRequirements, scoutsLairBuilt, startingSp } from './expedition-resources.util';
+import { ApCheck, apCheck, ApLeg, ApResources, meetsRequirements, startingSp } from './expedition-resources.util';
 
-function citizenWith(extra: Partial<Citizen>, ...actions: [day: number, key: string][]): Citizen {
-    const daily_actions: DailyAction[] = actions.map(
-        ([day, key]: [number, string]): DailyAction => Object.assign(new DailyAction(), { day, action_key: key })
-    );
-    return Object.assign(new Citizen(), { is_dead: false, daily_actions }, extra);
+function citizenWith(extra: Partial<Citizen>): Citizen {
+    return Object.assign(new Citizen(), { is_dead: false }, extra);
 }
 
 describe('expedition-resources.util', (): void => {
-    describe('scoutsLairBuilt', (): void => {
-        it('knows the Scouts Lair only once it is listed as built', (): void => {
-            expect(scoutsLairBuilt(new Set<string>(['small_watchmen_#01']))).toBe(true);
-            expect(scoutsLairBuilt(new Set<string>(['small_watchmen_#00']))).toBe(false);
-        });
-
-        it('assumes nothing is built while the buildings are unknown', (): void => {
-            expect(scoutsLairBuilt(null)).toBe(false);
-        });
-    });
-
     describe('startingSp', (): void => {
-        const crows: [number, string] = [4, DailyActionEnum.HOME_CROWS.key];
-
-        it('gives nothing to a citizen without scout job, shoes or mapping', (): void => {
-            expect(startingSp(citizenWith({}), 5, 5, true)).toBe(0);
+        it('gives nothing to a citizen without scout job nor shoes', (): void => {
+            expect(startingSp(citizenWith({}))).toBe(0);
         });
 
         it('gives 2 to a scout', (): void => {
-            expect(startingSp(citizenWith({ job: JobEnum.SCOUT }), 5, 5, true)).toBe(2);
+            expect(startingSp(citizenWith({ job: JobEnum.SCOUT }))).toBe(2);
         });
 
         it('gives 1 for equipped shoes', (): void => {
-            expect(startingSp(citizenWith({ shoes_equipped: true }), 5, 5, true)).toBe(1);
-        });
-
-        it('gives 2 for a mapping done the day before the expedition', (): void => {
-            expect(startingSp(citizenWith({}, crows), 5, 5, true)).toBe(2);
-        });
-
-        it('gives 4 for the mapping of a scout, on top of the 2 of the job', (): void => {
-            expect(startingSp(citizenWith({ job: JobEnum.SCOUT }, crows), 5, 5, true)).toBe(6);
-        });
-
-        it('counts a mapping recorded the day before, whether the Scouts Lair is known as built or not', (): void => {
-            expect(startingSp(citizenWith({}, crows), 5, 5, false)).toBe(2);
-            expect(startingSp(citizenWith({}, [5, DailyActionEnum.HOME_CROWS.key]), 6, 5, false)).toBe(2);
-            expect(startingSp(citizenWith({}, [5, DailyActionEnum.HOME_CROWS.key]), 6, 5, true)).toBe(2);
-        });
-
-        it('ignores a mapping done two days before', (): void => {
-            expect(startingSp(citizenWith({}, [3, DailyActionEnum.HOME_CROWS.key]), 5, 5, true)).toBe(0);
-        });
-
-        it('ignores another daily action done the day before', (): void => {
-            expect(startingSp(citizenWith({}, [4, DailyActionEnum.HOME_REST.key]), 5, 5, true)).toBe(0);
-        });
-
-        it('assumes the mapping is done for a future expedition when the Scouts Lair is built', (): void => {
-            expect(startingSp(citizenWith({}), 6, 5, true)).toBe(2);
-            expect(startingSp(citizenWith({ job: JobEnum.SCOUT }), 6, 5, true)).toBe(6);
-        });
-
-        it('does not assume the mapping for a future expedition without the Scouts Lair', (): void => {
-            expect(startingSp(citizenWith({}), 6, 5, false)).toBe(0);
-            expect(startingSp(citizenWith({ job: JobEnum.SCOUT }), 6, 5, false)).toBe(2);
-        });
-
-        it('does not assume the mapping for an expedition of the current day, nor count one done on that very day', (): void => {
-            expect(startingSp(citizenWith({}), 5, 5, true)).toBe(0);
-            expect(startingSp(citizenWith({}, [5, DailyActionEnum.HOME_CROWS.key]), 5, 5, true)).toBe(0);
+            expect(startingSp(citizenWith({ shoes_equipped: true }))).toBe(1);
         });
     });
 
@@ -85,7 +30,7 @@ describe('expedition-resources.util', (): void => {
         }
 
         function meets(citizen: Citizen, extra: Partial<CitizenExpedition>): boolean {
-            return meetsRequirements(citizen, place(extra), 5, 5, true);
+            return meetsRequirements(citizen, place(extra));
         }
 
         it('lets any living citizen in a place without requirement', (): void => {
@@ -97,8 +42,8 @@ describe('expedition-resources.util', (): void => {
         });
 
         it('requires at least the SP by default, and for the min operator', (): void => {
-            const three_sp: Citizen = citizenWith({ shoes_equipped: true }, [4, DailyActionEnum.HOME_CROWS.key]);
-            const two_sp: Citizen = citizenWith({}, [4, DailyActionEnum.HOME_CROWS.key]);
+            const three_sp: Citizen = citizenWith({ job: JobEnum.SCOUT, shoes_equipped: true });
+            const two_sp: Citizen = citizenWith({ job: JobEnum.SCOUT });
             const one_sp: Citizen = citizenWith({ shoes_equipped: true });
             expect(meets(two_sp, { required_sp: 2, required_sp_operator: 'min' })).toBe(true);
             expect(meets(three_sp, { required_sp: 2, required_sp_operator: 'min' })).toBe(true);
@@ -110,7 +55,7 @@ describe('expedition-resources.util', (): void => {
 
         it('treats an unexpected operator as min', (): void => {
             const weird: SpRequirementOperator = <SpRequirementOperator><unknown>'weird';
-            const three_sp: Citizen = citizenWith({ shoes_equipped: true }, [4, DailyActionEnum.HOME_CROWS.key]);
+            const three_sp: Citizen = citizenWith({ job: JobEnum.SCOUT, shoes_equipped: true });
             const one_sp: Citizen = citizenWith({ shoes_equipped: true });
             expect(meets(one_sp, { required_sp: 2, required_sp_operator: weird })).toBe(false);
             expect(meets(one_sp, { required_sp: 1, required_sp_operator: weird })).toBe(true);
@@ -118,15 +63,15 @@ describe('expedition-resources.util', (): void => {
         });
 
         it('caps the SP with the max operator', (): void => {
-            const three_sp: Citizen = citizenWith({ shoes_equipped: true }, [4, DailyActionEnum.HOME_CROWS.key]);
-            const two_sp: Citizen = citizenWith({}, [4, DailyActionEnum.HOME_CROWS.key]);
+            const three_sp: Citizen = citizenWith({ job: JobEnum.SCOUT, shoes_equipped: true });
+            const two_sp: Citizen = citizenWith({ job: JobEnum.SCOUT });
             expect(meets(three_sp, { required_sp: 2, required_sp_operator: 'max' })).toBe(false);
             expect(meets(two_sp, { required_sp: 2, required_sp_operator: 'max' })).toBe(true);
         });
 
         it('requires exactly the SP with the exact operator', (): void => {
-            const three_sp: Citizen = citizenWith({ shoes_equipped: true }, [4, DailyActionEnum.HOME_CROWS.key]);
-            const two_sp: Citizen = citizenWith({}, [4, DailyActionEnum.HOME_CROWS.key]);
+            const three_sp: Citizen = citizenWith({ job: JobEnum.SCOUT, shoes_equipped: true });
+            const two_sp: Citizen = citizenWith({ job: JobEnum.SCOUT });
             const one_sp: Citizen = citizenWith({ shoes_equipped: true });
             expect(meets(two_sp, { required_sp: 2, required_sp_operator: 'exact' })).toBe(true);
             expect(meets(three_sp, { required_sp: 2, required_sp_operator: 'exact' })).toBe(false);
@@ -146,11 +91,6 @@ describe('expedition-resources.util', (): void => {
         it('is indifferent to shoes when requires_shoes is not set', (): void => {
             expect(meets(citizenWith({ shoes_equipped: true }), {})).toBe(true);
             expect(meets(citizenWith({ shoes_equipped: false }), {})).toBe(true);
-        });
-
-        it('grants the assumed mapping of a future expedition only when the Scouts Lair is built', (): void => {
-            expect(meetsRequirements(citizenWith({}), place({ required_sp: 2 }), 6, 5, true)).toBe(true);
-            expect(meetsRequirements(citizenWith({}), place({ required_sp: 2 }), 6, 5, false)).toBe(false);
         });
 
         it('refuses a citizen whose job differs from the pre-registered one', (): void => {

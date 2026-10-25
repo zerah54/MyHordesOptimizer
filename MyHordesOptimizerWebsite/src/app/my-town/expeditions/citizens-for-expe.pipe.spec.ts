@@ -21,7 +21,7 @@ describe('CitizensForExpePipe', (): void => {
     it('offers the living citizens for a place without requirement, not the dead ones', (): void => {
         const citizens: Citizen[] = [citizenWith({ id: 1, name: 'alive' }), citizenWith({ id: 2, name: 'dead', is_dead: true })];
 
-        expect(names(pipe.transform(citizens, placeWith({}), 5, 5, true))).toEqual(['alive']);
+        expect(names(pipe.transform(citizens, placeWith({})))).toEqual(['alive']);
     });
 
     it('keeps only the citizens with the pre-registered job', (): void => {
@@ -30,7 +30,7 @@ describe('CitizensForExpePipe', (): void => {
             citizenWith({ id: 2, name: 'guardian', job: JobEnum.GUARDIAN })
         ];
 
-        expect(names(pipe.transform(citizens, placeWith({ preinscrit_job: JobEnum.SCOUT.key }), 5, 5, true))).toEqual(['scout']);
+        expect(names(pipe.transform(citizens, placeWith({ preinscrit_job: JobEnum.SCOUT.key })))).toEqual(['scout']);
     });
 
     it('keeps only the citizens with equipped shoes when the place requires them', (): void => {
@@ -39,7 +39,7 @@ describe('CitizensForExpePipe', (): void => {
             citizenWith({ id: 2, name: 'barefoot', shoes_equipped: false })
         ];
 
-        expect(names(pipe.transform(citizens, placeWith({ requires_shoes: true }), 5, 5, true))).toEqual(['shod']);
+        expect(names(pipe.transform(citizens, placeWith({ requires_shoes: true })))).toEqual(['shod']);
     });
 
     it('keeps only the citizens with enough starting SP when the place requires some', (): void => {
@@ -48,7 +48,7 @@ describe('CitizensForExpePipe', (): void => {
             citizenWith({ id: 2, name: 'plain' })
         ];
 
-        expect(names(pipe.transform(citizens, placeWith({ required_sp: 2 }), 5, 5, true))).toEqual(['scout']);
+        expect(names(pipe.transform(citizens, placeWith({ required_sp: 2 })))).toEqual(['scout']);
     });
 
     it('still offers the citizen already placed, even when he no longer meets the requirements', (): void => {
@@ -60,20 +60,6 @@ describe('CitizensForExpePipe', (): void => {
 
         const place: CitizenExpedition = placeWith({ citizen_id: 1, requires_shoes: true });
 
-        expect(names(pipe.transform(citizens, place, 5, 5, true))).toEqual(['placed', 'shod']);
-    });
-
-    it('takes the day of the expedition into account for the mapping SP', (): void => {
-        const citizens: Citizen[] = [citizenWith({ id: 1, name: 'plain' })];
-        const place: CitizenExpedition = placeWith({ required_sp: 2 });
-
-        expect(names(pipe.transform(citizens, place, 5, 5, true))).toEqual([]);
-        expect(names(pipe.transform(citizens, place, 6, 5, true))).toEqual(['plain']);
-    });
-
-    it('does not assume the mapping of a future expedition without the Scouts Lair', (): void => {
-        const citizens: Citizen[] = [citizenWith({ id: 1, name: 'plain' })];
-
-        expect(names(pipe.transform(citizens, placeWith({ required_sp: 2 }), 6, 5, false))).toEqual([]);
+        expect(names(pipe.transform(citizens, place))).toEqual(['placed', 'shod']);
     });
 });

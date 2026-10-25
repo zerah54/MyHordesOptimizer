@@ -13,10 +13,10 @@ import { getPreRegistered } from './expeditions.utils';
 })
 export class CitizensForExpePipe implements PipeTransform {
     /** Citoyens pouvant occuper la place (exigences remplies), plus celui qui l'occupe déjà. */
-    public transform(all_citizens: Citizen[], expedition_citizen: CitizenExpedition, expedition_day: number, current_day: number, scouts_lair_built: boolean/*, current_expedition: Expedition, all_expeditions: Expedition[]*/): Citizen[] {
+    public transform(all_citizens: Citizen[], expedition_citizen: CitizenExpedition/*, current_expedition: Expedition, all_expeditions: Expedition[]*/): Citizen[] {
         return all_citizens.filter((citizen: Citizen): boolean => {
             if (citizen.id === expedition_citizen.citizen_id) return true;
-            if (!meetsRequirements(citizen, expedition_citizen, expedition_day, current_day, scouts_lair_built)) return false;
+            if (!meetsRequirements(citizen, expedition_citizen)) return false;
             // const is_already_placed: boolean = all_expeditions
             //     .filter((expedition: Expedition) => {
             //         return expedition.id !== current_expedition.id;

@@ -1,6 +1,6 @@
 import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, DestroyRef, inject, model, ModelSignal, OnInit, Signal, signal, WritableSignal } from '@angular/core';
-import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -16,7 +16,7 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatTabChangeEvent, MatTabsModule } from '@angular/material/tabs';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import moment from 'moment';
-import { firstValueFrom, map } from 'rxjs';
+import { firstValueFrom } from 'rxjs';
 
 import { environment } from '../../../environments/environment';
 import { EXPEDITIONS_EDITION_MODE_KEY, FAVORITE_EXPEDITION_ITEMS_UID, HORDES_IMG_REPO } from '../../_abstract_model/const';
@@ -24,7 +24,6 @@ import { HeroicActionEnum } from '../../_abstract_model/enum/heroic-action.enum'
 import { JobEnum } from '../../_abstract_model/enum/job.enum';
 import { ExpeditionOrdersUpdate, RealtimeExpeditionsService } from '../../_abstract_model/realtime-services/realtime-expeditions.service';
 import { ApiService } from '../../_abstract_model/services/api.service';
-import { BuiltBuildingsService } from '../../_abstract_model/services/built-buildings.service';
 import { ExpeditionService } from '../../_abstract_model/services/expedition.service';
 import { TownService } from '../../_abstract_model/services/town.service';
 import { Imports, ListForAddRemove, SpRequirementOperator } from '../../_abstract_model/types/_types';
@@ -65,7 +64,7 @@ import { EditPositionsComponent, EditPositionsData } from './edit-positions/edit
 import { ExpeditionOrderComponent } from './expedition-order/expedition-order.component';
 import { cloneOrder, generalOrders, ruinVisitsOf, sortOrdersByRoute, withCellOrders } from './expedition-orders/expedition-orders.util';
 import { ExpeditionPartRouteComponent } from './expedition-part-route/expedition-part-route.component';
-import { ApCheck, apCheck, ApLeg, meetsRequirements, scoutsLairBuilt, startingSp } from './expedition-resources.util';
+import { ApCheck, apCheck, ApLeg, meetsRequirements, startingSp } from './expedition-resources.util';
 import { ExpeditionRoadbookComponent } from './expedition-roadbook/expedition-roadbook.component';
 import { isDayEditable } from './expeditions.utils';
 import { TotalPdcPipe } from './total-pdc.pipe';
@@ -128,11 +127,6 @@ export class ExpeditionsComponent implements OnInit {
     /** Nom de l'objet « Chaussures de sport usées » (`shoe_#00`) dans la langue du site. */
     protected readonly shoe_label: Signal<string> = computed((): string => localizedLabel(this.all_items().find((item: Item): boolean => item.uid === 'shoe_#00')?.label, moment.locale()));
     protected readonly sp_operators: typeof SP_OPERATORS = SP_OPERATORS;
-    /** Repaire des Éclaireurs construit : sans lui, pas de cartographie supposée pour un jour futur. */
-    protected readonly scouts_lair_built: Signal<boolean> = toSignal(
-        inject(BuiltBuildingsService).builtUids().pipe(map(scoutsLairBuilt)),
-        { initialValue: false }
-    );
     /** PA apportés par un sac, pour l'avertissement de PA. */
     private readonly count_available_ap: CountAvailableApPipe = new CountAvailableApPipe();
 
@@ -244,13 +238,13 @@ export class ExpeditionsComponent implements OnInit {
     }
 
     /** La personne connectée remplit les exigences de la place (faux si elle n'est pas parmi les citoyens). */
-    protected canJoin(place: CitizenExpedition, expedition_day: number): boolean {
+    protected canJoin(place: CitizenExpedition): boolean {
         const citizen: Citizen | undefined = getCitizenFromId(this.all_citizens(), this.me()?.id);
-        return citizen !== undefined && meetsRequirements(citizen, place, expedition_day, this.currentDay(), this.scouts_lair_built());
+        return citizen !== undefined && meetsRequirements(citizen, place);
     }
 
     /** Coût en PA de la place affichée (partie `part_index`, rang `citizen_index`) : sa personne sur ses parties, avec les ressources de sa première place ; place vide : les places vides de ce rang. `null` sans tracé, ou sans personne ni exigence de PE. */
-    protected apWarning(expedition: Expedition, part_index: number, citizen_index: number, expedition_day: number): ApCheck | null {
+    protected apWarning(expedition: Expedition, part_index: number, citizen_index: number): ApCheck | null {
         const town: MapRoutePoint | null = this.town_position();
         const row: CitizenExpedition | undefined = expedition.parts[part_index]?.citizens[citizen_index];
         if (!town || !row || !expedition.parts.some((part: ExpeditionPart): boolean => !!part.map_route)) return null;
@@ -264,7 +258,7 @@ export class ExpeditionsComponent implements OnInit {
         const place: CitizenExpedition = (person_id ? part_places.find((candidate: CitizenExpedition | undefined): boolean => candidate !== undefined) : undefined) ?? row;
 
         const citizen: Citizen | undefined = getCitizenFromId(this.all_citizens(), place.citizen_id);
-        const sp: number | undefined = place.required_sp ?? (citizen ? startingSp(citizen, expedition_day, this.currentDay(), this.scouts_lair_built()) : undefined);
+        const sp: number | undefined = place.required_sp ?? (citizen ? startingSp(citizen) : undefined);
         if (sp === undefined) return null;
 
         const legs: ApLeg[] = expedition.parts.flatMap((part: ExpeditionPart, index: number): ApLeg[] => {
@@ -280,13 +274,13 @@ export class ExpeditionsComponent implements OnInit {
     }
 
     /** PE de la place hors édition : l'exigence et son symbole, sinon les PE calculés de la personne placée. */
-    protected spDisplay(place: CitizenExpedition, expedition_day: number): string {
+    protected spDisplay(place: CitizenExpedition): string {
         if (place.required_sp !== undefined && place.required_sp !== null) {
             const symbol: string = (SP_OPERATORS.find((operator: { value: SpRequirementOperator }): boolean => operator.value === place.required_sp_operator) ?? SP_OPERATORS[0]).symbol;
             return `${symbol} ${place.required_sp}`;
         }
         const citizen: Citizen | undefined = getCitizenFromId(this.all_citizens(), place.citizen_id);
-        return citizen ? `${startingSp(citizen, expedition_day, this.currentDay(), this.scouts_lair_built())}` : '';
+        return citizen ? `${startingSp(citizen)}` : '';
     }
 
     /** Exigence de PE au rang `citizen_index` ; sans opérateur, les places n'en ont plus. */

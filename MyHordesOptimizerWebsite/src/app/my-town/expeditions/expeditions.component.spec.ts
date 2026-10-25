@@ -10,7 +10,6 @@ import type { Mock } from 'vitest';
 import { JobEnum } from '../../_abstract_model/enum/job.enum';
 import { RealtimeExpeditionsService } from '../../_abstract_model/realtime-services/realtime-expeditions.service';
 import { ApiService } from '../../_abstract_model/services/api.service';
-import { BuiltBuildingsService } from '../../_abstract_model/services/built-buildings.service';
 import { ExpeditionService } from '../../_abstract_model/services/expedition.service';
 import { TownService } from '../../_abstract_model/services/town.service';
 import { SpRequirementOperator } from '../../_abstract_model/types/_types';
@@ -56,15 +55,14 @@ interface ComponentInternals {
     isDirectionLocked(expedition_part: ExpeditionPart): boolean;
     me: Signal<Me | null>;
     all_citizens: WritableSignal<Citizen[]>;
-    canJoin(place: CitizenExpedition, expedition_day: number): boolean;
-    scouts_lair_built: Signal<boolean>;
+    canJoin(place: CitizenExpedition): boolean;
     town_position: Signal<MapRoutePoint | null>;
     all_items: WritableSignal<Item[]>;
     bank_items: WritableSignal<Item[]>;
     count_available_ap: { transform: Mock<() => number> };
-    apWarning(expedition: Expedition, part_index: number, citizen_index: number, expedition_day: number): ApCheck | null;
+    apWarning(expedition: Expedition, part_index: number, citizen_index: number): ApCheck | null;
     apWarningLabel(check: ApCheck): string;
-    spDisplay(place: CitizenExpedition, expedition_day: number): string;
+    spDisplay(place: CitizenExpedition): string;
     saveSpRequirement(expedition: Expedition, citizen_index: number, required_sp: number, operator: SpRequirementOperator | null): Promise<void>;
     saveRequirement(expedition: Expedition, citizen_index: number, requirement: Partial<CitizenExpedition>): Promise<void>;
     saveCitizen(expedition_part: ExpeditionPart, citizen: CitizenExpedition, expedition_part_index?: number, expedition?: Expedition, citizen_index?: number): Promise<void>;
@@ -216,7 +214,6 @@ describe('ExpeditionsComponent', () => {
             town.day = 5;
             setTown(town);
             internals.me = signal(Object.assign(new Me(), { id: ME_ID }));
-            internals.scouts_lair_built = signal(true);
         });
 
         afterEach(() => {
@@ -226,52 +223,38 @@ describe('ExpeditionsComponent', () => {
         it('lets the connected citizen join a place without requirement', () => {
             internals.all_citizens = signal([citizenWith({})]);
 
-            expect(internals.canJoin(placeWith({}), 5)).toBe(true);
+            expect(internals.canJoin(placeWith({}))).toBe(true);
         });
 
         it('refuses a citizen without shoes a place which requires them', () => {
             internals.all_citizens = signal([citizenWith({ shoes_equipped: false })]);
 
-            expect(internals.canJoin(placeWith({ requires_shoes: true }), 5)).toBe(false);
+            expect(internals.canJoin(placeWith({ requires_shoes: true }))).toBe(false);
         });
 
         it('lets a citizen with shoes join a place which requires them', () => {
             internals.all_citizens = signal([citizenWith({ shoes_equipped: true })]);
 
-            expect(internals.canJoin(placeWith({ requires_shoes: true }), 5)).toBe(true);
+            expect(internals.canJoin(placeWith({ requires_shoes: true }))).toBe(true);
         });
 
         it('refuses a citizen of another job a place pre-registered for a job', () => {
             internals.all_citizens = signal([citizenWith({ job: JobEnum.GUARDIAN })]);
 
-            expect(internals.canJoin(placeWith({ preinscrit_job: JobEnum.SCOUT.key }), 5)).toBe(false);
-        });
-
-        it('counts the mapping SP of a future expedition', () => {
-            internals.all_citizens = signal([citizenWith({})]);
-
-            expect(internals.canJoin(placeWith({ required_sp: 2 }), 5)).toBe(false);
-            expect(internals.canJoin(placeWith({ required_sp: 2 }), 6)).toBe(true);
-        });
-
-        it('does not count the mapping SP of a future expedition without the Scouts Lair', () => {
-            internals.all_citizens = signal([citizenWith({})]);
-            internals.scouts_lair_built = signal(false);
-
-            expect(internals.canJoin(placeWith({ required_sp: 2 }), 6)).toBe(false);
+            expect(internals.canJoin(placeWith({ preinscrit_job: JobEnum.SCOUT.key }))).toBe(false);
         });
 
         it('refuses when the connected user is not among the citizens', () => {
             internals.all_citizens = signal([citizenWith({ id: 99 })]);
 
-            expect(internals.canJoin(placeWith({}), 5)).toBe(false);
+            expect(internals.canJoin(placeWith({}))).toBe(false);
         });
 
         it('refuses when nobody is connected', () => {
             internals.me = signal(null);
             internals.all_citizens = signal([citizenWith({})]);
 
-            expect(internals.canJoin(placeWith({}), 5)).toBe(false);
+            expect(internals.canJoin(placeWith({}))).toBe(false);
         });
     });
 
@@ -426,7 +409,6 @@ describe('ExpeditionsComponent', () => {
             internals.bank_items = signal([]);
             internals.count_available_ap = { transform: vi.fn().mockReturnValue(0) };
             internals.all_citizens = signal([Object.assign(new Citizen(), { id: CITIZEN_ID, is_dead: false })]);
-            internals.scouts_lair_built = signal(true);
         });
 
         afterEach(() => {
@@ -435,7 +417,7 @@ describe('ExpeditionsComponent', () => {
 
         // 5 km : 3 pas partent à moins de 3 km (PA), 2 à 3 km ou plus (PE).
         it('warns when the route costs more than base AP, bag and SP', () => {
-            const check: ApCheck | null = internals.apWarning(expeditionOf(partWith(routeOut(5), placeWith({ citizen_id: CITIZEN_ID, base_ap: 4 }))), 0, 0, 5);
+            const check: ApCheck | null = internals.apWarning(expeditionOf(partWith(routeOut(5), placeWith({ citizen_id: CITIZEN_ID, base_ap: 4 }))), 0, 0);
 
             expect(check).toEqual({ needed: 5, available: 4, short: true });
         });
@@ -443,7 +425,7 @@ describe('ExpeditionsComponent', () => {
         it('does not warn when the bag covers the missing AP', () => {
             internals.count_available_ap.transform.mockReturnValue(1);
 
-            const check: ApCheck | null = internals.apWarning(expeditionOf(partWith(routeOut(5), placeWith({ citizen_id: CITIZEN_ID, base_ap: 4 }))), 0, 0, 5);
+            const check: ApCheck | null = internals.apWarning(expeditionOf(partWith(routeOut(5), placeWith({ citizen_id: CITIZEN_ID, base_ap: 4 }))), 0, 0);
 
             expect(check?.short).toBe(false);
         });
@@ -452,23 +434,23 @@ describe('ExpeditionsComponent', () => {
             internals.all_citizens.set([Object.assign(new Citizen(), { id: CITIZEN_ID, is_dead: false, shoes_equipped: true })]);
             const explore: ExpeditionOrder = Object.assign(new ExpeditionOrder(), { kind: 'explore' });
 
-            const check: ApCheck | null = internals.apWarning(expeditionOf(partWith(routeOut(5), placeWith({ citizen_id: CITIZEN_ID }), [explore])), 0, 0, 5);
+            const check: ApCheck | null = internals.apWarning(expeditionOf(partWith(routeOut(5), placeWith({ citizen_id: CITIZEN_ID }), [explore])), 0, 0);
 
             expect(check).toEqual({ needed: 5, available: 6, short: false });
         });
 
         it('checks an empty place against its SP requirement', () => {
-            const check: ApCheck | null = internals.apWarning(expeditionOf(partWith(routeOut(5), placeWith({ required_sp: 2 }))), 0, 0, 5);
+            const check: ApCheck | null = internals.apWarning(expeditionOf(partWith(routeOut(5), placeWith({ required_sp: 2 }))), 0, 0);
 
             expect(check?.needed).toBe(3);
         });
 
         it('does not check an empty place without requirement', () => {
-            expect(internals.apWarning(expeditionOf(partWith(routeOut(5), placeWith({}))), 0, 0, 5)).toBeNull();
+            expect(internals.apWarning(expeditionOf(partWith(routeOut(5), placeWith({}))), 0, 0)).toBeNull();
         });
 
         it('does not check an expedition without any route', () => {
-            expect(internals.apWarning(expeditionOf(partWith(null, placeWith({ citizen_id: CITIZEN_ID, base_ap: 0 }))), 0, 0, 5)).toBeNull();
+            expect(internals.apWarning(expeditionOf(partWith(null, placeWith({ citizen_id: CITIZEN_ID, base_ap: 0 }))), 0, 0)).toBeNull();
         });
 
         it('adds the parts up, with the resources of the first part', () => {
@@ -477,8 +459,8 @@ describe('ExpeditionsComponent', () => {
                 partWith(routeOut(2), placeWith({ citizen_id: CITIZEN_ID, base_ap: 99 }))
             );
 
-            expect(internals.apWarning(expedition, 0, 0, 5)).toEqual({ needed: 4, available: 3, short: true });
-            expect(internals.apWarning(expedition, 1, 0, 5)).toEqual({ needed: 4, available: 3, short: true });
+            expect(internals.apWarning(expedition, 0, 0)).toEqual({ needed: 4, available: 3, short: true });
+            expect(internals.apWarning(expedition, 1, 0)).toEqual({ needed: 4, available: 3, short: true });
         });
 
         it('gives each row the check of the person shown on it, whatever her rank in each part', () => {
@@ -494,10 +476,10 @@ describe('ExpeditionsComponent', () => {
             const first_person: ApCheck = { needed: 4, available: 3, short: true };
             const second_person: ApCheck = { needed: 5, available: 10, short: false };
 
-            expect(internals.apWarning(expedition, 0, 0, 5)).toEqual(first_person);
-            expect(internals.apWarning(expedition, 0, 1, 5)).toEqual(second_person);
-            expect(internals.apWarning(expedition, 1, 0, 5)).toEqual(second_person);
-            expect(internals.apWarning(expedition, 1, 1, 5)).toEqual(first_person);
+            expect(internals.apWarning(expedition, 0, 0)).toEqual(first_person);
+            expect(internals.apWarning(expedition, 0, 1)).toEqual(second_person);
+            expect(internals.apWarning(expedition, 1, 0)).toEqual(second_person);
+            expect(internals.apWarning(expedition, 1, 1)).toEqual(first_person);
         });
 
         it('counts, for an empty place, only the parts whose place of the same rank is empty', () => {
@@ -507,7 +489,7 @@ describe('ExpeditionsComponent', () => {
                 partWithPlaces(routeOut(2), placeWith({ citizen_id: CITIZEN_ID }))
             );
 
-            expect(internals.apWarning(expedition, 0, 0, 5)).toEqual({ needed: 2, available: 3, short: false });
+            expect(internals.apWarning(expedition, 0, 0)).toEqual({ needed: 2, available: 3, short: false });
         });
 
         it('follows the person of the first part in each part, whatever its rank there', () => {
@@ -517,7 +499,7 @@ describe('ExpeditionsComponent', () => {
                 partWithPlaces(routeOut(2), placeWith({ citizen_id: 8 }), placeWith({ citizen_id: CITIZEN_ID, orders: [explore] }))
             );
 
-            expect(internals.apWarning(expedition, 0, 0, 5)).toEqual({ needed: 5, available: 6, short: false });
+            expect(internals.apWarning(expedition, 0, 0)).toEqual({ needed: 5, available: 6, short: false });
         });
 
         it('does not count a part where the person of the first part has no place', () => {
@@ -526,7 +508,7 @@ describe('ExpeditionsComponent', () => {
                 partWithPlaces(routeOut(2), placeWith({ citizen_id: 8 }))
             );
 
-            expect(internals.apWarning(expedition, 0, 0, 5)?.needed).toBe(2);
+            expect(internals.apWarning(expedition, 0, 0)?.needed).toBe(2);
         });
 
         it('follows the rank of an empty place of the first part', () => {
@@ -536,15 +518,7 @@ describe('ExpeditionsComponent', () => {
                 partWithPlaces(routeOut(2), placeWith({ orders: [explore] }))
             );
 
-            expect(internals.apWarning(expedition, 0, 0, 5)?.needed).toBe(5);
-        });
-
-        it('counts the mapping SP of a future expedition only with the Scouts Lair', () => {
-            const expedition: Expedition = expeditionOf(partWith(routeOut(5), placeWith({ citizen_id: CITIZEN_ID, base_ap: 4 })));
-
-            expect(internals.apWarning(expedition, 0, 0, 6)?.needed).toBe(3);
-            internals.scouts_lair_built = signal(false);
-            expect(internals.apWarning(expedition, 0, 0, 6)?.needed).toBe(5);
+            expect(internals.apWarning(expedition, 0, 0)?.needed).toBe(5);
         });
 
         it('details the check in the tooltip', () => {
@@ -555,17 +529,11 @@ describe('ExpeditionsComponent', () => {
         });
 
         it('shows the requirement with its symbol, else the SP of the placed citizen', () => {
-            expect(internals.spDisplay(placeWith({ required_sp: 2 }), 5)).toBe('≥ 2');
-            expect(internals.spDisplay(placeWith({ required_sp: 2, required_sp_operator: 'max' }), 5)).toBe('≤ 2');
-            expect(internals.spDisplay(placeWith({ required_sp: 0, required_sp_operator: 'exact' }), 5)).toBe('= 0');
-            expect(internals.spDisplay(placeWith({ citizen_id: CITIZEN_ID }), 6)).toBe('2');
-            expect(internals.spDisplay(placeWith({}), 5)).toBe('');
-        });
-
-        it('shows the SP of the placed citizen without the assumed mapping when the Scouts Lair is not built', () => {
-            internals.scouts_lair_built = signal(false);
-
-            expect(internals.spDisplay(placeWith({ citizen_id: CITIZEN_ID }), 6)).toBe('0');
+            expect(internals.spDisplay(placeWith({ required_sp: 2 }))).toBe('≥ 2');
+            expect(internals.spDisplay(placeWith({ required_sp: 2, required_sp_operator: 'max' }))).toBe('≤ 2');
+            expect(internals.spDisplay(placeWith({ required_sp: 0, required_sp_operator: 'exact' }))).toBe('= 0');
+            expect(internals.spDisplay(placeWith({ citizen_id: CITIZEN_ID }))).toBe('0');
+            expect(internals.spDisplay(placeWith({}))).toBe('');
         });
 
         it('saves the SP requirement, or removes it without operator', async () => {
@@ -647,8 +615,7 @@ describe('ExpeditionsComponent — rendu de l\'avertissement de PA', () => {
             providers: [
                 provideHttpClient(withXhr()), provideHttpClientTesting(), provideRouter([]),
                 { provide: ANIMATION_MODULE_TYPE, useValue: 'NoopAnimations' },
-                { provide: RealtimeExpeditionsService, useValue: realtime },
-                { provide: BuiltBuildingsService, useValue: { builtUids: (): Observable<ReadonlySet<string> | null> => of(null) } }
+                { provide: RealtimeExpeditionsService, useValue: realtime }
             ]
         });
         const town: TownDetails = new TownDetails();
