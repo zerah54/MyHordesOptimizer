@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Discord;
+using Discord.WebSocket;
 using Microsoft.Extensions.Logging;
 
 namespace MyHordesOptimizerApi.DiscordBot.Utility
@@ -15,6 +16,11 @@ namespace MyHordesOptimizerApi.DiscordBot.Utility
                     break;
 
                 case LogSeverity.Info:
+                    logger.LogInformation(msg.ToString());
+                    break;
+
+                // Reconnexion demandée par la gateway : session reprise automatiquement, pas un incident.
+                case LogSeverity.Warning when msg.Exception is GatewayReconnectException:
                     logger.LogInformation(msg.ToString());
                     break;
 
