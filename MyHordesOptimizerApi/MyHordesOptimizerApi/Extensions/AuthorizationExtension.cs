@@ -45,9 +45,14 @@ namespace MyHordesOptimizerApi.Extensions
                     return Task.CompletedTask;
                 },
 
-                // invoked when a request is received
+                // WebSockets/SSE ne peuvent pas porter d'en-tête Authorization côté navigateur : SignalR passe le jeton en query string
                 OnMessageReceived = (context) =>
                 {
+                    var accessToken = context.Request.Query["access_token"];
+                    if (!string.IsNullOrEmpty(accessToken) && context.Request.Path.StartsWithSegments("/hub"))
+                    {
+                        context.Token = accessToken;
+                    }
                     return Task.CompletedTask;
                 },
 
