@@ -1490,20 +1490,18 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
             using var transaction = DbContext.Database.BeginTransaction();
             DbContext.Database.ExecuteSqlRaw("SET FOREIGN_KEY_CHECKS = 0");
 
-            // Mise à jour de toutes les tables ayant une FK directe sur Town.idTown
-            DbContext.Database.ExecuteSqlRaw("UPDATE TownEstimation SET idTown = {0} WHERE idTown = {1}", dto.Id, oldIdTown);
-            DbContext.Database.ExecuteSqlRaw("UPDATE TownAttackSetting SET idTown = {0} WHERE idTown = {1}", dto.Id, oldIdTown);
-            DbContext.Database.ExecuteSqlRaw("UPDATE TownAttackRefinement SET idTown = {0} WHERE idTown = {1}", dto.Id, oldIdTown);
-            DbContext.Database.ExecuteSqlRaw("UPDATE TownWishListItem SET idTown = {0} WHERE idTown = {1}", dto.Id, oldIdTown);
-            DbContext.Database.ExecuteSqlRaw("UPDATE TownBankItem SET idTown = {0} WHERE idTown = {1}", dto.Id, oldIdTown);
-            DbContext.Database.ExecuteSqlRaw("UPDATE TownCitizenDailyAction SET idTown = {0} WHERE idTown = {1}", dto.Id, oldIdTown);
-            DbContext.Database.ExecuteSqlRaw("UPDATE TownCadaver SET idTown = {0} WHERE idTown = {1}", dto.Id, oldIdTown);
-            DbContext.Database.ExecuteSqlRaw("UPDATE TownCitizen SET idTown = {0} WHERE idTown = {1}", dto.Id, oldIdTown);
-            DbContext.Database.ExecuteSqlRaw("UPDATE MapCellDigUpdate SET idTown = {0} WHERE idTown = {1}", dto.Id, oldIdTown);
-            DbContext.Database.ExecuteSqlRaw("UPDATE MapCell SET idTown = {0} WHERE idTown = {1}", dto.Id, oldIdTown);
-            DbContext.Database.ExecuteSqlRaw("UPDATE Expedition SET idTown = {0} WHERE idTown = {1}", dto.Id, oldIdTown);
-            DbContext.Database.ExecuteSqlRaw("UPDATE MapRoute SET idTown = {0} WHERE idTown = {1}", dto.Id, oldIdTown);
-            DbContext.Database.ExecuteSqlRaw("UPDATE MapRouteGame SET idTown = {0} WHERE idTown = {1}", dto.Id, oldIdTown);
+            // Toute table du modèle portant un idTown suit la ville, FK déclarée ou non (TownNote, UserNote) :
+            // une liste codée en dur en oubliait, laissant leurs lignes orphelines sous -mapId.
+            var townScopedTables = DbContext.Model.GetEntityTypes()
+                .Where(entityType => entityType.ClrType != typeof(Town) && entityType.GetTableName() != null)
+                .Select(entityType => (Table: entityType.GetTableName()!, Column: entityType.FindProperty(nameof(Town.IdTown))?.GetColumnName()))
+                .Where(table => table.Column != null)
+                .Distinct();
+            foreach (var (table, column) in townScopedTables)
+            {
+                var sql = $"UPDATE `{table}` SET `{column}` = {{0}} WHERE `{column}` = {{1}}";
+                DbContext.Database.ExecuteSqlRaw(sql, dto.Id, oldIdTown);
+            }
             // La Town elle-même en dernier
             DbContext.Database.ExecuteSqlRaw(
                 "UPDATE Town SET idTown = {0}, mapId = {1} WHERE idTown = {2}",

@@ -2,6 +2,7 @@ import { HttpRequest, provideHttpClient, withXhr } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting, TestRequest } from '@angular/common/http/testing';
 import { ChangeDetectorRef } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { provideRouter, Router } from '@angular/router';
 import { of, throwError } from 'rxjs';
 import type { MockInstance } from 'vitest';
@@ -22,6 +23,7 @@ import { Status } from '../../../_abstract_model/types/status.class';
 import { TownDetails } from '../../../_abstract_model/types/town-details.class';
 import { UpdateInfo } from '../../../_abstract_model/types/update-info.class';
 import { TownContextService } from '../../../_core/services/town-context.service';
+import { CitizenPictosDialogComponent } from '../citizen-pictos-dialog/citizen-pictos-dialog.component';
 import { CitizensListComponent } from './citizens-list.component';
 
 interface TestableComponent {
@@ -450,6 +452,24 @@ describe('CitizensListComponent', (): void => {
             const el: HTMLElement = fixture.nativeElement;
             expect(el.querySelector('mat-sidenav-container')).toBeTruthy();
             expect(el.querySelector('.mho-citizens-list-light')).toBeFalsy();
+        });
+
+        it('opens the pictos of a dead citizen in the observed town', (): void => {
+            const observed: TownDetails = new TownDetails();
+            observed.town_id = 8002;
+            TestBed.inject(TownContextService).setObservedTown(observed);
+            const info: CitizenInfo = new CitizenInfo();
+            info.citizens = [makeCitizen(2, 'Bob', true)];
+            vi.spyOn(TestBed.inject(TownService), 'getCitizens').mockReturnValue(of(info));
+            // MatDialogModule importé par le composant standalone lui fournit sa propre instance : pas celle de TestBed.inject.
+            const open_spy: MockInstance = vi.spyOn(fixture.debugElement.injector.get(MatDialog), 'open').mockReturnValue({} as MatDialogRef<unknown>);
+
+            fixture.detectChanges();
+            const button: HTMLButtonElement | null = (fixture.nativeElement as HTMLElement).querySelector('.citizen-light-card .citizen-light-pictos');
+            expect(button).not.toBeNull();
+            button?.click();
+
+            expect(open_spy).toHaveBeenCalledWith(CitizenPictosDialogComponent, { data: { userId: 2, citizenName: 'Bob', townId: 8002 } });
         });
     });
 });

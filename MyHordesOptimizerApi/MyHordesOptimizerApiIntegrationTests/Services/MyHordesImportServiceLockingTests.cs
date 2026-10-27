@@ -184,6 +184,56 @@ namespace MyHordesOptimizerApiIntegrationTests.Services
             context.TownAttackRefinements.Where(r => r.IdTown == newIdTown).ExecuteDelete();
         }
 
+        /// <summary>
+        /// Tables portant un idTown sans figurer dans la liste codée en dur de MigrateTownId : leurs
+        /// lignes restaient sous -mapId, invisibles une fois la ville migrée (FOREIGN_KEY_CHECKS = 0).
+        /// </summary>
+        [Fact]
+        public async Task ImportSingleTownAsync_MigreLesPictosEtLesNotesDeLaVille()
+        {
+            var suffix = Guid.NewGuid().ToString("N").Substring(0, 8);
+            var random = new Random();
+            var mapId = random.Next(1, int.MaxValue);
+            var newIdTown = random.Next(1, int.MaxValue);
+            var oldIdTown = -mapId;
+
+            var fakeRepo = new SingleTownMigrationRepository(newIdTown, mapId);
+            using var factory = _factory.WithWebHostBuilder(builder =>
+            {
+                builder.ConfigureTestServices(services => services.AddScoped<IMyHordesApiRepository>(_ => fakeRepo));
+            });
+            var scope = factory.Services.CreateScope();
+            var context = scope.ServiceProvider.GetRequiredService<MhoContext>();
+            var importService = scope.ServiceProvider.GetRequiredService<IMyHordesImportService>();
+
+            var user = new User { IdUser = random.Next(1, int.MaxValue), Name = "test-user-" + suffix };
+            var picto = new Picto { IdPicto = random.Next(1, int.MaxValue), Img = "test-" + suffix + ".png" };
+            context.Towns.Add(new Town { IdTown = oldIdTown, Name = "test-town-" + suffix });
+            context.Users.Add(user);
+            context.Pictos.Add(picto);
+            context.SaveChanges();
+            context.TownCitizenPictos.Add(new TownCitizenPicto { IdTown = oldIdTown, IdUser = user.IdUser, IdPicto = picto.IdPicto, Count = 2, LastUpdate = DateTime.UtcNow });
+            context.TownNotes.Add(new TownNote { IdTown = oldIdTown, IdUserAuthor = user.IdUser, Note = "test-" + suffix, UpdatedAt = DateTime.UtcNow });
+            context.UserNotes.Add(new UserNote { IdTown = oldIdTown, IdUserAuthor = user.IdUser, IdUserTarget = user.IdUser, Note = "test-" + suffix, UpdatedAt = DateTime.UtcNow });
+            context.SaveChanges();
+
+            try
+            {
+                await Task.Run(() => importService.ImportSingleTownAsync(mapId));
+
+                context.TownCitizenPictos.AsNoTracking().Any(p => p.IdTown == newIdTown && p.IdUser == user.IdUser).Should().BeTrue();
+                context.TownNotes.AsNoTracking().Any(n => n.IdTown == newIdTown && n.IdUserAuthor == user.IdUser).Should().BeTrue();
+                context.UserNotes.AsNoTracking().Any(n => n.IdTown == newIdTown && n.IdUserAuthor == user.IdUser).Should().BeTrue();
+            }
+            finally
+            {
+                // Lignes déplacées hors de portée de l'interceptor de nettoyage, et FK vers User/Picto.
+                context.TownCitizenPictos.Where(p => p.IdUser == user.IdUser).ExecuteDelete();
+                context.TownNotes.Where(n => n.IdUserAuthor == user.IdUser).ExecuteDelete();
+                context.UserNotes.Where(n => n.IdUserAuthor == user.IdUser).ExecuteDelete();
+            }
+        }
+
         /// <summary>Sert ImportSingleTownAsync(mapId) : /json/towns renvoie une ville dont l'Id diffère du mapId interrogé, déclenchant la migration. /json/map est ensuite appelé (try/catch qui absorbe l'échec) : on lève simplement, sans conséquence sur le test.</summary>
         private sealed class SingleTownMigrationRepository : IMyHordesApiRepository
         {
