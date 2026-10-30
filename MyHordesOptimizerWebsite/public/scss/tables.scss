@@ -2,6 +2,8 @@
    Les pages gardent leurs propres colonnes et leurs propres filtres, seule l'apparence change. */
 
 .mat-elevation-z8 {
+    /* Sinon la bordure s'ajoute aux 100 % et fait défiler le parent de 2 px. */
+    box-sizing: border-box;
     height: 100%;
     width: 100%;
     overflow: auto;
