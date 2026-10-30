@@ -30,80 +30,18 @@
 
         width: 250px;
         aspect-ratio: 5/6;
-        background: $ghostWhite;
-        border-radius: 50% 50% 0 0;
-        box-shadow: 0 5px 40px 0px rgba(255, 255, 255, 0.7);
+        filter: drop-shadow(0 5px 20px rgba(255, 255, 255, 0.7));
         position: relative;
         opacity: .8;
 
-        &:before, &:after {
-            content: "";
-            background: $ghostWhite;
+        /* Silhouette d'un seul tenant : aucun cache peint à la couleur du fond, qui transparaîtrait sur un fond différent. */
+        .body {
             position: absolute;
-            z-index: 10;
-            bottom: -6%;
-            width: 64%;
-            height: 64%;
-            border-radius: 18%;
-        }
-
-        &:before {
-            left: 3px;
-            transform: skew(-34deg) rotate(-23deg);
-        }
-
-        &:after {
-            right: 3px;
-            transform: skew(34deg) rotate(24deg);
-        }
-
-        .bottom-container-left,
-        .bottom-container-right {
-            width: 64%;
-            aspect-ratio: 8/5;
-            overflow: hidden;
-            bottom: -30%;
-            position: absolute;
-            z-index: 20;
-
-            .wave {
-                display: block;
-                position: relative;
-                height: 40%;
-                background: $ghostWhite;
-            }
-
-            .wave:before {
-                content: "";
-                display: block;
-                position: absolute;
-                border-radius: 100%;
-                width: 100%;
-                aspect-ratio: 8/15;
-                background-color: $bodyColor;
-                right: -25%;
-                top: 50%;
-            }
-
-            .wave:after {
-                content: "";
-                display: block;
-                position: absolute;
-                border-radius: 100%;
-                width: 100%;
-                aspect-ratio: 8/15;
-                background-color: $ghostWhite;
-                left: -25%;
-                top: -600%;
-            }
-        }
-
-        .bottom-container-left {
-            transform: rotate(180deg) scaleY(-1);
-        }
-
-        .bottom-container-right {
-            right: 0;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            overflow: visible;
+            fill: $ghostWhite;
         }
 
         .face {
@@ -180,7 +118,7 @@
         50% {
             transform: translatey(-33px);
             opacity: 1;
-            box-shadow: 0 5px 50px 0px rgba(255, 255, 255, 1);
+            filter: drop-shadow(0 5px 25px rgba(255, 255, 255, 1));
         }
         100% {
             transform: translatey(0px);

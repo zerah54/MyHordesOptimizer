@@ -1,5 +1,16 @@
 import { CommonModule, NgOptimizedImage } from '@angular/common';
-import { ChangeDetectionStrategy, Component, input, InputSignal, output, OutputEmitterRef, Signal, viewChild } from '@angular/core';
+import {
+    booleanAttribute,
+    ChangeDetectionStrategy,
+    Component,
+    input,
+    InputSignal,
+    InputSignalWithTransform,
+    output,
+    OutputEmitterRef,
+    Signal,
+    viewChild
+} from '@angular/core';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatMenu, MatMenuModule } from '@angular/material/menu';
@@ -7,7 +18,7 @@ import { MatTabsModule } from '@angular/material/tabs';
 import moment from 'moment';
 
 import { HORDES_IMG_REPO } from '../../../_abstract_model/const';
-import { Imports } from '../../../_abstract_model/types/_types';
+import { Imports, ListForAddRemove } from '../../../_abstract_model/types/_types';
 import { ItemImgPipe } from '../../../_core/pipes/item-img.pipe';
 import { ItemsGroupByCategoryPipe } from '../../../_core/pipes/items-group-by-category.pipe';
 import { LocalizedLabelPipe } from '../../../_core/pipes/localized-label.pipe';
@@ -31,6 +42,10 @@ export class MenuAddComponent {
     public readonly menu: Signal<MatMenu> = viewChild.required(MatMenu);
 
     public class: InputSignal<string> = input('');
+    /** Garde le menu ouvert après un ajout, pour en enchaîner plusieurs */
+    public keepOpen: InputSignalWithTransform<boolean, unknown> = input(false, { transform: booleanAttribute });
+    /** Listes proposées, prioritaires sur celles du `matMenuTriggerData` qui restent figées tant que le menu est ouvert */
+    public lists: InputSignal<ListForAddRemove[] | undefined> = input();
 
     public add: OutputEmitterRef<number | string> = output();
 

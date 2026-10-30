@@ -17,7 +17,7 @@ jobs:
             -   uses: actions/checkout@main
 
             -   name: Set up .NET Core
-                uses: actions/setup-dotnet@v4
+                uses: actions/setup-dotnet@v6
                 with:
                     dotnet-version: '8.0'
 
@@ -32,7 +32,7 @@ jobs:
                     dotnet publish Serilog.Sinks.Discord/Serilog.Sinks.Discord.csproj -c Release -o ./publish/Serilog.Sinks.Discord
 
             -   name: Upload artifact for deployment job
-                uses: actions/upload-artifact@v4
+                uses: actions/upload-artifact@v7
                 with:
                     name: .net-app
                     path: ${{ github.workspace }}\MyHordesOptimizerApi\publish
@@ -49,7 +49,7 @@ jobs:
             -   uses: actions/checkout@main
 
             -   name: Download artifact from build job
-                uses: actions/download-artifact@v4
+                uses: actions/download-artifact@v8
                 with:
                     name: .net-app
                     path: ./publish

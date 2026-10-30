@@ -1,4 +1,4 @@
-import { ANIMATION_MODULE_TYPE, ChangeDetectionStrategy, Component } from '@angular/core';
+import { ANIMATION_MODULE_TYPE, ChangeDetectionStrategy, Component, signal, WritableSignal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatMenuModule, MatMenuTrigger } from '@angular/material/menu';
 import { By } from '@angular/platform-browser';
@@ -15,11 +15,13 @@ import { MenuAddComponent } from './menu-add.component';
     changeDetection: ChangeDetectionStrategy.OnPush,
     template: `
         <div class="opener" [matMenuTriggerFor]="menuAdd.menu()" [matMenuTriggerData]="{lists: lists, menuLabel: menuLabel}"></div>
-        <mho-menu-add #menuAdd="menuAdd" (add)="added.push($event)"></mho-menu-add>
+        <mho-menu-add #menuAdd="menuAdd" [keepOpen]="keepOpen()" [lists]="inputLists()" (add)="added.push($event)"></mho-menu-add>
     `
 })
 class MenuAddHostComponent {
     public lists: ListForAddRemove[] = [];
+    public inputLists: WritableSignal<ListForAddRemove[] | undefined> = signal(undefined);
+    public keepOpen: WritableSignal<boolean> = signal(false);
     public menuLabel: string = 'Ajouter un objet';
     public added: (number | string)[] = [];
 }
@@ -62,13 +64,62 @@ describe('MenuAddComponent', (): void => {
         fixture.destroy();
     });
 
+    /** Déclencheur du mat-menu du composant testé. */
+    function getTrigger(): MatMenuTrigger {
+        return fixture.debugElement.query(By.directive(MatMenuTrigger)).injector.get(MatMenuTrigger);
+    }
+
     /** Ouvre le mat-menu du composant testé et laisse le contenu (`matMenuContent`) se rendre dans l'overlay. */
     function openMenu(): void {
         fixture.detectChanges();
-        const trigger: MatMenuTrigger = fixture.debugElement.query(By.directive(MatMenuTrigger)).injector.get(MatMenuTrigger);
-        trigger.openMenu();
+        getTrigger().openMenu();
         fixture.detectChanges();
     }
+
+    /** Clique sur la première icône proposée par le menu ouvert. */
+    function clickFirstItem(): void {
+        document.querySelector<HTMLImageElement>('.mat-mdc-menu-panel .items img')?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+        fixture.detectChanges();
+    }
+
+    /** Titres des icônes proposées par le menu ouvert. */
+    function displayedTitles(): string[] {
+        return Array.from(document.querySelectorAll<HTMLImageElement>('.mat-mdc-menu-panel .items img')).map((img: HTMLImageElement): string => img.title);
+    }
+
+    it('closes after an item is clicked by default', (): void => {
+        fixture.componentInstance.lists = [{ label: 'Sac', list: [createItem(7, 'Pomme', createCategory(1, 0, 'Nourriture'))] }];
+        openMenu();
+
+        clickFirstItem();
+
+        expect(getTrigger().menuOpen).toBe(false);
+    });
+
+    it('stays open after an item is clicked when keepOpen is set', (): void => {
+        fixture.componentInstance.keepOpen.set(true);
+        fixture.componentInstance.lists = [{ label: 'Sac', list: [createItem(7, 'Pomme', createCategory(1, 0, 'Nourriture'))] }];
+        openMenu();
+
+        clickFirstItem();
+
+        expect(fixture.componentInstance.added).toEqual([7]);
+        expect(getTrigger().menuOpen).toBe(true);
+    });
+
+    it('prefers the lists input over the menu context and follows its changes while open', (): void => {
+        const category: Category = createCategory(1, 0, 'Nourriture');
+        fixture.componentInstance.lists = [{ label: 'Sac', list: [createItem(9, 'Ignoré', category)] }];
+        fixture.componentInstance.inputLists.set([{ label: 'Tous', list: [createItem(1, 'Pomme', category), createItem(2, 'Poire', category)] }]);
+        openMenu();
+
+        expect(displayedTitles()).toEqual(['Poire', 'Pomme']);
+
+        fixture.componentInstance.inputLists.set([{ label: 'Tous', list: [createItem(2, 'Poire', category)] }]);
+        fixture.detectChanges();
+
+        expect(displayedTitles()).toEqual(['Poire']);
+    });
 
     it('shows the search field label from the menu context', (): void => {
         fixture.componentInstance.menuLabel = 'Chercher un objet';

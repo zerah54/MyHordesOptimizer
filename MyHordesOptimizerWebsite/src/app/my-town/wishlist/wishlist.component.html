@@ -25,7 +25,7 @@
     </div>
 
 </mat-card-header>
-<mat-card-content class="mho-wishlist">
+<mat-card-content class="mho-wishlist" cdkScrollable>
     @if (wishlist_info()) {
         <div class="table-container">
             @if (unsaved_duplicates().length > 0) {
@@ -36,15 +36,11 @@
             }
             <div class="table-headers">
                 @if (edition_mode()) {
-                    <mat-form-field subscriptSizing="dynamic">
-                        <mat-label i18n>Ajouter un objet</mat-label>
-                        <mho-select #addItemSelect emptyOption
-                                    placeholder="Ajouter un objet" i18n-placeholder [ngModel]="''"
-                                    (ngModelChange)="addItemToWishlist($any($event))"
-                                    [options]="items() | isItemDisplayed:datasource.data:current_zone_xp_pa_add_item()"
-                                    [bindIcon]="'img'"
-                                    [bindLabel]="'label.' + locale" searchable></mho-select>
-                    </mat-form-field>
+                    <button mat-stroked-button type="button" [matMenuTriggerFor]="addMenu.menu()" [matMenuTriggerData]="{ menuLabel: add_label }">
+                        <mat-icon>add</mat-icon>
+                        <ng-container i18n>Ajouter à la liste de courses</ng-container>
+                    </button>
+                    <mho-menu-add #addMenu="menuAdd" keepOpen [lists]="add_lists()" (add)="addItemToWishlist(+$event)"></mho-menu-add>
                     @if (current_zone_xp_pa_add_item() > 0) {
                         <mat-form-field subscriptSizing="dynamic" appearance="outline">
                             <mat-label i18n>Zone à appliquer pour l'ajout</mat-label>
@@ -67,7 +63,7 @@
                        cdkDropListLockAxis="y"
                        [cdkDropListData]="datasource"
                        (cdkDropListDropped)="sortWishlist($event)"
-                       [cdkDropListDisabled]="drag_disabled()">
+                       [cdkDropListDisabled]="!edition_mode()">
                     @for (column of columns; track column.id) {
                         <ng-container [matColumnDef]="column.id" [sticky]="column.sticky || false">
                             <th mat-header-cell *matHeaderCellDef>
@@ -89,12 +85,14 @@
                                 <mho-deferred-cell>
                                     @switch (column.id) {
                                         @case ('sort') {
-                                            <div cdkDragHandle
-                                                 (mousedown)="drag_disabled.set(false)"
-                                                 (mouseup)="drag_disabled.set(true)"
-                                                 class="dragdrop-indicator">
+                                            <div cdkDragHandle class="dragdrop-indicator">
                                                 <mat-icon>drag_indicator</mat-icon>
                                             </div>
+                                        }
+                                        @case ('select') {
+                                            <mat-checkbox #select_box [checked]="isSelected(row)"
+                                                          (click)="selectRow(row, select_box.checked, $event)"
+                                                          aria-label="Sélectionner l'objet" i18n-aria-label></mat-checkbox>
                                         }
                                         @case ('name') {
                                             <div class="name-container">
@@ -242,7 +240,19 @@
                     <tr mat-header-row *matHeaderRowDef="columns | ids; sticky: true"></tr>
                     <tr mat-row *matRowDef="let row; columns: columns | ids;"
                         [class.fulfilled]="isFulfilled(row)"
-                        cdkDrag [cdkDragData]="row"></tr>
+                        [class.selection-dragged]="dragging_selection() && isSelected(row)"
+                        cdkDrag [cdkDragData]="row"
+                        (cdkDragStarted)="startDrag(row)"
+                        (cdkDragEnded)="dragging_selection.set(false)">
+                        @if (isSelected(row) && selected_count() > 1) {
+                            <ng-template cdkDragPreview>
+                                <div class="multi-drag-preview">
+                                    <mat-icon>drag_indicator</mat-icon>
+                                    {{ selected_count() }}&nbsp;<ng-container i18n>objets</ng-container>
+                                </div>
+                            </ng-template>
+                        }
+                    </tr>
 
                     <tr class="mat-row" *matNoDataRow>
                         <td class="mat-cell" [attr.colspan]="'100%'">

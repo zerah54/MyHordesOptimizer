@@ -2,9 +2,11 @@ import { provideHttpClient, withXhr } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatSidenavContainer } from '@angular/material/sidenav';
+import { provideRouter } from '@angular/router';
 import { of } from 'rxjs';
 
 import { AdminService } from '../../_abstract_model/services/admin.service';
+import { ThemeService } from '../../_core/services/theme.service';
 import { TownContextService } from '../../_core/services/town-context.service';
 import { setTown, setUser } from '../../_core/utilities/localstorage.util';
 import { MenuComponent } from './menu.component';
@@ -68,7 +70,7 @@ describe('MenuComponent', (): void => {
         vi.useFakeTimers();
         await TestBed.configureTestingModule({
             imports: [MenuComponent],
-            providers: [provideHttpClient(withXhr()), provideHttpClientTesting()]
+            providers: [provideHttpClient(withXhr()), provideHttpClientTesting(), provideRouter([])]
         }).compileComponents();
 
         fixture = TestBed.createComponent(MenuComponent);
@@ -102,6 +104,17 @@ describe('MenuComponent', (): void => {
             expect(localStorage.getItem('theme')).toBe('pink');
             // Les couleurs basculent par `color-scheme` / `light-dark()` : plus de rechargement.
             expect(testable.reloadPage).not.toHaveBeenCalled();
+        });
+    });
+
+    describe('pumpkin', (): void => {
+        it('is shown when "Par défaut" resolves to the Halloween theme', (): void => {
+            vi.setSystemTime(new Date(2026, 9, 29));
+            TestBed.inject(ThemeService).setPreference('auto');
+
+            fixture.detectChanges();
+
+            expect((fixture.nativeElement as HTMLElement).querySelector('.pumpkin')).not.toBeNull();
         });
     });
 

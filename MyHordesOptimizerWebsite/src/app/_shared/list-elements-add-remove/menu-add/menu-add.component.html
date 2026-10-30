@@ -1,12 +1,13 @@
 <mat-menu #menuAdd="matMenu" class="mho-menu-add {{class()}}">
-    <ng-template let-lists="lists" let-menuLabel="menuLabel" matMenuContent>
+    <ng-template let-trigger_lists="lists" let-menuLabel="menuLabel" matMenuContent>
+        @let lists = this.lists() ?? trigger_lists;
         <div (click)="$event.stopPropagation()" class="search">
             <mat-form-field style="width: 100%" subscriptSizing="dynamic">
                 <mat-label>{{ menuLabel }}</mat-label>
                 <input #searchItem matInput>
             </mat-form-field>
         </div>
-        <div class="items">
+        <div (click)="keepOpen() && $event.stopPropagation()" class="items">
             @if (lists.length === 1) {
                 <ng-container *ngTemplateOutlet="menuContent; context: {$implicit: lists[0].list}"></ng-container>
             } @else {

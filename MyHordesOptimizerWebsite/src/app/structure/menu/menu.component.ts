@@ -30,8 +30,9 @@ import { environment } from '../../../environments/environment';
 import { Theme } from '../../_abstract_model/interfaces';
 import { AdminService } from '../../_abstract_model/services/admin.service';
 import { Imports } from '../../_abstract_model/types/_types';
-import { ThemeMode, ThemePreference, ThemeService } from '../../_core/services/theme.service';
+import { ThemeFamily, ThemeMode, ThemePreference, ThemeService } from '../../_core/services/theme.service';
 import { TownContextService } from '../../_core/services/town-context.service';
+import { ProgramMenuService } from '../../my-town/program/program-menu.service';
 import { ThanksComponent } from '../../thanks/thanks.component';
 import { TownChipComponent } from '../header/town-chip/town-chip.component';
 import { buildSidenavLinks, resolveSidenavLabel, resolveSidenavPath, SidenavLinks } from './sidenav-links';
@@ -56,6 +57,8 @@ export class MenuComponent implements OnInit {
     private readonly theme_service: ThemeService = inject(ThemeService);
     /** Clair / Sombre / Auto, indépendant de la famille de couleurs. */
     protected readonly theme_mode: Signal<ThemeMode> = this.theme_service.mode;
+    /** Famille appliquée (« Par défaut » résolu) : c'est elle, pas l'entrée cochée, qui décide des décors saisonniers. */
+    protected readonly theme_family: Signal<ThemeFamily> = this.theme_service.family;
     protected themes: Theme[] = [
         { label: $localize`Par défaut`, class: '' },
         { label: $localize`Rose`, class: 'pink' },
