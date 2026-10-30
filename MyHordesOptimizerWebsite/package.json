@@ -2,7 +2,7 @@
   "name": "my-hordes-optimizer-website",
   "version": "0.0.0",
   "engines": {
-    "node": ">=24.15.0",
+    "node": ">=24.22.1",
     "npm": ">=11.12.1"
   },
   "scripts": {

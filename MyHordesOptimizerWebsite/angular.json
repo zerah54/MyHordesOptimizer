@@ -18,7 +18,6 @@
           "builder": "@angular/build:application",
           "options": {
             "sourceMap": true,
-            "preserveSymlinks": true,
             "outputPath": {
               "base": "dist/MyHordesOptimizerWebsite"
             },

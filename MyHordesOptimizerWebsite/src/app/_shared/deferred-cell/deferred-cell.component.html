@@ -1,4 +1,4 @@
-@defer (on viewport) {
+@defer (on viewport; when eager()) {
     @if (content(); as tpl) {
         <ng-container [ngTemplateOutlet]="tpl" [ngTemplateOutletContext]="context()"></ng-container>
     } @else {

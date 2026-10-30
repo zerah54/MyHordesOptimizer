@@ -1,5 +1,5 @@
 import { NgTemplateOutlet } from '@angular/common';
-import { ChangeDetectionStrategy, Component, input, InputSignal, TemplateRef } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, Component, input, InputSignal, InputSignalWithTransform, TemplateRef } from '@angular/core';
 
 import { Imports } from '../../_abstract_model/types/_types';
 
@@ -29,4 +29,6 @@ export class DeferredCellComponent {
     public readonly content: InputSignal<TemplateRef<unknown> | undefined> = input<TemplateRef<unknown> | undefined>(undefined);
     /** Contexte passé au template `content`. */
     public readonly context: InputSignal<object | null> = input<object | null>(null);
+    /** Rend le contenu sans attendre l'entrée à l'écran, pour figer la hauteur des lignes (ex : pendant un drag & drop). */
+    public readonly eager: InputSignalWithTransform<boolean, unknown> = input(false, { transform: booleanAttribute });
 }

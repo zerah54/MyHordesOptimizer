@@ -11,8 +11,8 @@ import { MapCellTooltipComponent } from '../../my-town/map/draw-map/map-cell-too
 @Directive({
     selector: '[mhoMapCellTooltip]',
     host: {
-        '(mouseenter)': 'show()',
-        '(mouseleave)': 'hide()',
+        '(pointerenter)': 'onPointerEnter($event)',
+        '(pointerleave)': 'hide()',
     },
 })
 export class MapCellTooltipDirective implements OnDestroy {
@@ -27,7 +27,7 @@ export class MapCellTooltipDirective implements OnDestroy {
     private overlayPositionBuilder: OverlayPositionBuilder = inject(OverlayPositionBuilder);
     private elementRef: ElementRef = inject(ElementRef);
 
-    public show(): void {
+    private show(): void {
         const positionStrategy: FlexibleConnectedPositionStrategy = this.overlayPositionBuilder
             .flexibleConnectedTo(this.elementRef)
             .withPositions([
@@ -69,6 +69,11 @@ export class MapCellTooltipDirective implements OnDestroy {
         componentRef.instance.allCitizens.set(this.mhoMapCellTooltipAllCitizens());
         componentRef.instance.allItems.set(this.mhoMapCellTooltipAllItems());
         componentRef.instance.allRuins.set(this.mhoMapCellTooltipAllRuins());
+    }
+
+    /** Survol uniquement : au toucher, c'est le panneau de détail de la case qui s'ouvre. */
+    protected onPointerEnter(event: PointerEvent): void {
+        if (event.pointerType !== 'touch') this.show();
     }
 
     public ngOnDestroy(): void {

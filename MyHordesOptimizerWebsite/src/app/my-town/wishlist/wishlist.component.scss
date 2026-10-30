@@ -66,6 +66,11 @@
             table {
                 width: 100%;
 
+                /* Opacité seulement : le CDK a mis en cache la position des lignes au début du drag. */
+                tr.selection-dragged {
+                    opacity: 0.3;
+                }
+
                 tr.fulfilled {
                     --mat-table-row-item-container-height: 28px;
                     opacity: 0.45;
@@ -109,6 +114,13 @@
                                     cursor: pointer;
                                 }
                             }
+                        }
+
+                        /* Largeur du contenu seulement (pas de part de la largeur restante), case collée à la poignée. */
+                        &.mat-column-select {
+                            width: 1px;
+                            padding-left: 0;
+                            padding-right: 4px;
                         }
 
                         &.mat-column-should_signal {
@@ -169,4 +181,15 @@
         }
 
     }
+}
+
+/* Hors :host : l'aperçu de drag est rendu sous <body>. */
+.multi-drag-preview {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 12px;
+    border-radius: 8px;
+    background: var(--mat-sys-surface-container-highest);
+    color: var(--mat-sys-on-surface);
 }

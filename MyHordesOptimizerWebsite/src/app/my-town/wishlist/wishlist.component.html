@@ -25,7 +25,7 @@
     </div>
 
 </mat-card-header>
-<mat-card-content class="mho-wishlist" cdkScrollable>
+<mat-card-content class="mho-wishlist">
     @if (wishlist_info()) {
         <div class="table-container">
             @if (unsaved_duplicates().length > 0) {
@@ -56,7 +56,7 @@
                     }
                 }
             </div>
-            <div class="mat-elevation-z8" style="flex: 1">
+            <div class="mat-elevation-z8" style="flex: 1" cdkScrollable>
                 <table #table mat-table [dataSource]="datasource"
                        [trackBy]="trackByWishlistItem"
                        cdkDropList
@@ -82,7 +82,8 @@
                             </th>
 
                             <td mat-cell *matCellDef="let row; table: table">
-                                <mho-deferred-cell>
+                                <!-- En mode édition, tout est rendu : une cellule qui s'affiche pendant un drag change la hauteur des lignes et fausse la position de dépôt. -->
+                                <mho-deferred-cell [eager]="edition_mode()">
                                     @switch (column.id) {
                                         @case ('sort') {
                                             <div cdkDragHandle class="dragdrop-indicator">
@@ -242,6 +243,7 @@
                         [class.fulfilled]="isFulfilled(row)"
                         [class.selection-dragged]="dragging_selection() && isSelected(row)"
                         cdkDrag [cdkDragData]="row"
+                        cdkDragPreviewContainer="parent"
                         (cdkDragStarted)="startDrag(row)"
                         (cdkDragEnded)="dragging_selection.set(false)">
                         @if (isSelected(row) && selected_count() > 1) {

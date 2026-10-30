@@ -18,6 +18,7 @@ import { ListForAddRemove } from '../../_abstract_model/types/_types';
 import { Item } from '../../_abstract_model/types/item.class';
 import { WishlistInfo } from '../../_abstract_model/types/wishlist-info.class';
 import { WishlistItem } from '../../_abstract_model/types/wishlist-item.class';
+import { DeferredCellComponent } from '../../_shared/deferred-cell/deferred-cell.component';
 import { WishlistComponent } from './wishlist.component';
 
 interface TestableComponent {
@@ -208,7 +209,29 @@ describe('WishlistComponent', (): void => {
 
         it('déclare la zone qui défile au drag & drop, pour qu\'elle défile quand on approche du bord', (): void => {
             const scrollable: DebugElement | null = fixture.debugElement.query(By.directive(CdkScrollable));
-            expect(scrollable?.nativeElement.classList).toContain('mho-wishlist');
+            expect(scrollable?.nativeElement.contains(fixture.nativeElement.querySelector('table'))).toBe(true);
+            expect(scrollable?.nativeElement.classList).toContain('mat-elevation-z8');
+        });
+
+        it('rend toutes les cellules en mode édition, pour que les lignes ne changent plus de hauteur pendant un drag', (): void => {
+            const eagerFlags: () => boolean[] = (): boolean[] => fixture.debugElement.queryAll(By.directive(DeferredCellComponent))
+                .map((cell: DebugElement): boolean => cell.injector.get(DeferredCellComponent).eager());
+
+            expect(eagerFlags().length).toBeGreaterThan(0);
+            expect(eagerFlags().every((eager: boolean): boolean => eager)).toBe(true);
+
+            testable.edition_mode.set(false);
+            fixture.detectChanges();
+
+            expect(eagerFlags().some((eager: boolean): boolean => eager)).toBe(false);
+        });
+
+        it('place l\'aperçu de drag dans le tableau, pour qu\'il garde les styles du composant', (): void => {
+            const containers: unknown[] = fixture.debugElement.queryAll(By.directive(CdkDrag))
+                .map((element: DebugElement): unknown => element.injector.get(CdkDrag).previewContainer);
+
+            expect(containers.length).toBeGreaterThan(0);
+            expect(containers.every((container: unknown): boolean => container === 'parent')).toBe(true);
         });
 
         it('coche puis décoche une plage avec Maj + clic, dans l\'ordre affiché', (): void => {

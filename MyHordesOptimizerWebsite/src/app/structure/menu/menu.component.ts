@@ -32,7 +32,6 @@ import { AdminService } from '../../_abstract_model/services/admin.service';
 import { Imports } from '../../_abstract_model/types/_types';
 import { ThemeFamily, ThemeMode, ThemePreference, ThemeService } from '../../_core/services/theme.service';
 import { TownContextService } from '../../_core/services/town-context.service';
-import { ProgramMenuService } from '../../my-town/program/program-menu.service';
 import { ThanksComponent } from '../../thanks/thanks.component';
 import { TownChipComponent } from '../header/town-chip/town-chip.component';
 import { buildSidenavLinks, resolveSidenavLabel, resolveSidenavPath, SidenavLinks } from './sidenav-links';

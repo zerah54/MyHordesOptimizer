@@ -463,6 +463,30 @@ describe('MapCellComponent', (): void => {
         expect(emitted).toEqual([cell, undefined]);
     });
 
+    it('shows the tooltip on mouse hover and hides it on leave', (): void => {
+        setInputs(newCell());
+        fixture.detectChanges();
+
+        const cell_element: HTMLElement = fixture.nativeElement.querySelector('.map-cell');
+        cell_element.dispatchEvent(new PointerEvent('pointerenter', { pointerType: 'mouse' }));
+        expect(document.querySelector('mho-map-cell-tooltip')).not.toBeNull();
+
+        cell_element.dispatchEvent(new PointerEvent('pointerleave', { pointerType: 'mouse' }));
+        expect(document.querySelector('mho-map-cell-tooltip')).toBeNull();
+    });
+
+    it('does not show the tooltip on a touch tap (the detail panel opens instead)', (): void => {
+        setInputs(newCell());
+        fixture.detectChanges();
+
+        // Séquence d'un toucher : événements pointeur puis événements souris émulés.
+        const cell_element: HTMLElement = fixture.nativeElement.querySelector('.map-cell');
+        cell_element.dispatchEvent(new PointerEvent('pointerenter', { pointerType: 'touch' }));
+        cell_element.dispatchEvent(new MouseEvent('mouseenter'));
+
+        expect(document.querySelector('mho-map-cell-tooltip')).toBeNull();
+    });
+
     it('emits cellSelected with the cell and its element on click', (): void => {
         const cell: Cell = newCell();
         setInputs(cell);
