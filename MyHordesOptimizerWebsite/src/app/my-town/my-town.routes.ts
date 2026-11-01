@@ -33,7 +33,6 @@ export const MY_TOWN_ROUTES: Route[] = [
         path: 'buildings',
         component: BuildingsComponent,
         title: 'MyHordes Optimizer' + ' - ' + $localize`Ma ville` + ' - ' + $localize`Chantiers`,
-        canActivate: [(): boolean => inject(InDevModeGuard).canActivate()]
     },
     {
         path: 'campings',
