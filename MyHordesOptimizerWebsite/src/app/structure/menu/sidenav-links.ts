@@ -56,15 +56,7 @@ export function buildSidenavLinks(town_context: TownContextService, program_menu
                     townSuffix: 'buildings',
                     displayed: true,
                     lvl: 1,
-                    authorized: (): boolean => isInTown() && !environment.production,
-                    spoil: false
-                },
-                {
-                    label: $localize`Mon programme`,
-                    townSuffix: 'program',
-                    displayed: true,
-                    lvl: 1,
-                    authorized: (): boolean => isInTown() && !environment.production && program_menu.visible(),
+                    authorized: (): boolean => isInTown(),
                     spoil: false
                 },
                 {
@@ -81,6 +73,14 @@ export function buildSidenavLinks(town_context: TownContextService, program_menu
                     displayed: true,
                     lvl: 1,
                     authorized: (): boolean => isInTown() && !environment.production,
+                    spoil: false
+                },
+                {
+                    label: $localize`Mon programme`,
+                    townSuffix: 'program',
+                    displayed: true,
+                    lvl: 1,
+                    authorized: (): boolean => isInTown() && !environment.production && program_menu.visible(),
                     spoil: false
                 },
             ], spoil: false
