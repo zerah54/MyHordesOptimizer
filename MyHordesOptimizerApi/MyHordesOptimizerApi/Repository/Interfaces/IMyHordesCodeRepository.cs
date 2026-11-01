@@ -33,6 +33,8 @@ namespace MyHordesOptimizerApi.Repository.Interfaces
         Dictionary<string, BuildingHardResourcesCodeModel> GetBuildingHardResources();
         Dictionary<string, Dictionary<string, string>> GetBuildingAvailability();
         Dictionary<string, JobCodeModel> GetJobs();
+        List<HomeLevelCodeModel> GetHomeLevels();
+        List<HomeUpgradeCodeModel> GetHomeUpgrades();
         Dictionary<string, MyHordesCitizenStatusCodeModel> GetCitizenStatuses();
         Dictionary<string, MyHordesMetaResultCodeModel> GetMetaResults();
     }

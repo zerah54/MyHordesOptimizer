@@ -97,6 +97,18 @@ namespace MyHordesOptimizerApiIntegrationTests.Services
         }
 
         [Fact]
+        public async Task DuplicateExpeditionAsync_LeJourDeLExpeditionEstDevenuPasse_Rejette()
+        {
+            var townId = NewTown(day: 4);
+            var expedition = await NewService().SaveExpeditionAsync(new ExpeditionRequestDto { PartsId = new List<int>() }, townId, 4);
+            SetTownDay(townId, 5);
+
+            Func<Task> act = () => NewService().DuplicateExpeditionAsync(expedition.Id!.Value, null, keepRoute: true, keepGeneralOrders: true, keepRouteOrders: true);
+
+            await act.Should().ThrowAsync<MhoTechnicalException>();
+        }
+
+        [Fact]
         public async Task CopyExpeditionsAsync_JourCibleAnterieurAuJourDeLaVille_Rejette()
         {
             var townId = NewTown(day: 5);

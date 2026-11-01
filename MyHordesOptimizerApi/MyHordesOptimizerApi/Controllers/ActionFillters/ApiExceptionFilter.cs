@@ -22,10 +22,9 @@ public class ApiExceptionFilter : ExceptionFilterAttribute
     public override void OnException(ExceptionContext context)
     {
         var exception = context.Exception;
-        if (exception is MyHordesApiException)
+        if (exception is MyHordesApiException mhException)
         {
             Logger.LogInformation(exception.ToString());
-            var mhException = exception as MyHordesApiException;
             var result = new ObjectResult(exception.Message);
             result.StatusCode = (int)mhException.StatusCode;
             context.Result = result;
@@ -50,6 +49,20 @@ public class ApiExceptionFilter : ExceptionFilterAttribute
             Logger.LogInformation(exception.Message);
             var result = new ObjectResult(exception.Message);
             result.StatusCode = (int)HttpStatusCode.Conflict;
+            context.Result = result;
+        }
+        else if (exception is MhoBadRequestException)
+        {
+            Logger.LogInformation(exception.Message);
+            var result = new ObjectResult(exception.Message);
+            result.StatusCode = (int)HttpStatusCode.BadRequest;
+            context.Result = result;
+        }
+        else if (exception is MhoNotFoundException)
+        {
+            Logger.LogInformation(exception.Message);
+            var result = new ObjectResult(exception.Message);
+            result.StatusCode = (int)HttpStatusCode.NotFound;
             context.Result = result;
         }
         else if (exception is MhoFunctionalException)

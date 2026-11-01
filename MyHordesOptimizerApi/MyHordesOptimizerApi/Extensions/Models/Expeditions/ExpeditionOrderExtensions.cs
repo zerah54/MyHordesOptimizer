@@ -15,6 +15,7 @@ namespace MyHordesOptimizerApi.Extensions.Models.Expeditions
             newOrder.Position = source.Position;
             newOrder.X = source.X;
             newOrder.Y = source.Y;
+            newOrder.Passage = source.Passage;
             newOrder.Kind = source.Kind;
             newOrder.IdItem = source.IdItem;
             newOrder.Quantity = source.Quantity;

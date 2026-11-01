@@ -5,7 +5,7 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer
 {
     public class WishListItemDto
     {
-        public ItemDto Item { get; set; }
+        public ItemDto Item { get; set; } = null!;
         public int Count { get; set; }
         public int BankCount { get; set; }
         public int BagCount { get; set; }

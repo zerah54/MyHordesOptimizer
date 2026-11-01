@@ -23,4 +23,6 @@ export interface ExpeditionOrderDTO {
     targetExpeditionId?: number | null;
     /** Précision libre d'une consigne typée, en texte brut. */
     note?: string | null;
+    /** Passage voulu sur la case (1 = premier) ; `null` : le premier. */
+    passage?: number | null;
 }

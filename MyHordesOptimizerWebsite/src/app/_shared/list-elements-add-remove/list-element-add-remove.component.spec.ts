@@ -184,6 +184,25 @@ describe('ListElementAddRemoveComponent', (): void => {
         expect(menuRemove.class()).toBe('wishlist-menu');
     });
 
+    it('forwards keepOpen and the current lists to menu-add, for a quick add whose choices update while the menu stays open', (): void => {
+        const lists: ListForAddRemove[] = [{ label: 'Sac', list: [createItem(1)] }];
+        setInputs({ lists });
+        fixture.componentRef.setInput('keepOpen', true);
+        fixture.detectChanges();
+
+        const menuAdd: MenuAddComponent = fixture.debugElement.query(By.directive(MenuAddComponent)).componentInstance;
+        expect(menuAdd.keepOpen()).toBe(true);
+        expect(menuAdd.lists()).toBe(lists);
+    });
+
+    it('does not keep menu-add open by default', (): void => {
+        setInputs();
+        fixture.detectChanges();
+
+        const menuAdd: MenuAddComponent = fixture.debugElement.query(By.directive(MenuAddComponent)).componentInstance;
+        expect(menuAdd.keepOpen()).toBe(false);
+    });
+
     it('emits add when menu-add emits add', (): void => {
         setInputs();
         fixture.detectChanges();

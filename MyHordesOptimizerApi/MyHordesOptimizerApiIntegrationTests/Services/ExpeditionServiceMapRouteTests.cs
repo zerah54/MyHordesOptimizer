@@ -359,6 +359,125 @@ namespace MyHordesOptimizerApiIntegrationTests.Services
         }
 
         [Fact]
+        public async Task DuplicateExpeditionAsync_CopieLaStructureSansLesInscrits_EnPreparationEnDernier()
+        {
+            var town = SeedTown();
+            var (expeditionId, partId) = await SeedExpedition(town);
+            await AsAlive(town).SaveExpeditionAsync(new ExpeditionRequestDto { Id = expeditionId, State = "ready", Label = "Nord", MinPdc = 3, Position = 2, PartsId = new List<int> { partId } }, town.TownId, Day);
+            var (lastExpeditionId, lastPartId) = await SeedExpedition(town);
+            await AsAlive(town).SaveExpeditionAsync(new ExpeditionRequestDto { Id = lastExpeditionId, State = "stop", Position = 4, PartsId = new List<int> { lastPartId } }, town.TownId, Day);
+            int itemId;
+            using (var context = NewContext())
+            {
+                itemId = context.Items.First().IdItem;
+            }
+            var citizen = await AsAlive(town).SaveExpeditionCitizenAsync(partId, new ExpeditionCitizenRequestDto { IdUser = town.AliveUserId, Pdc = 2, NombrePeDepart = 3, OrdersId = new List<int>() });
+            await AsAlive(town).UpdateExpeditionBag(citizen.Id!.Value, new ExpeditionBagRequestDto { Items = new List<ExpeditionBagItemRequestDto> { new() { Id = itemId, Count = 2 } } });
+            await AsAlive(town).SaveCitizenOrdersAsync(citizen.Id!.Value, new List<ExpeditionOrderDto> { new() { Type = "checkbox", Text = "perso" } });
+            await AsAlive(town).SavePartOrdersAsync(partId, new List<ExpeditionOrderDto> { new() { Type = "checkbox", Text = "groupe", IsDone = true } });
+
+            var copy = await AsAlive(town).DuplicateExpeditionAsync(expeditionId, "Nord (copie)", keepRoute: true, keepGeneralOrders: true, keepRouteOrders: true);
+
+            copy.Id.Should().NotBe(expeditionId);
+            copy.Label.Should().Be("Nord (copie)");
+            copy.State.Should().Be("stop");
+            copy.MinPdc.Should().Be(3);
+            copy.Position.Should().Be(5);
+            var copiedPart = copy.Parts!.Single();
+            copiedPart.Id.Should().NotBe(partId);
+            var copiedOrder = copiedPart.Orders!.Single();
+            copiedOrder.Text.Should().Be("groupe");
+            copiedOrder.IsDone.Should().BeFalse();
+            var copiedCitizen = copiedPart.Citizens!.Single(place => place.NombrePeDepart == 3);
+            copiedCitizen.IdUser.Should().BeNull();
+            copiedCitizen.Pdc.Should().Be(0);
+            copiedCitizen.Bag!.Items.Single().Count.Should().Be(2);
+            copiedCitizen.Orders!.Single().Text.Should().Be("perso");
+            using (var context = NewContext())
+            {
+                context.Expeditions.Count(expedition => expedition.IdTown == town.TownId && expedition.Day == Day).Should().Be(3);
+                context.ExpeditionCitizens.Single(place => place.IdExpeditionCitizen == citizen.Id).IdUser.Should().Be(town.AliveUserId);
+            }
+        }
+
+        [Fact]
+        public async Task DuplicateExpeditionAsync_PartieLiee_GardeLeMemeTraceEtPublieUneNouvelleVersion()
+        {
+            var town = SeedTown();
+            var routeId = SeedRoute(town.TownId, town.AliveUserId);
+            var (expeditionId, partId) = await SeedExpedition(town);
+            await AsAlive(town).SaveExpeditionPartAsync(expeditionId, PartRequest(partId, routeId));
+            var service = AsAlive(town);
+
+            var copy = await service.DuplicateExpeditionAsync(expeditionId, null, keepRoute: true, keepGeneralOrders: true, keepRouteOrders: true);
+
+            var copiedPart = copy.Parts!.Single();
+            copiedPart.MapRouteId.Should().Be(routeId);
+            copiedPart.MapRoute!.Version.Should().Be(2);
+            copiedPart.Direction.Should().Be(DirectionEnum.North.GetDescription());
+            service.TakeMapRouteChanges().Should().ContainSingle(change => change.Id == routeId && change.Version == 2);
+            LoadRoute(routeId).ExpeditionParts.Select(linked => linked.IdExpeditionPart).Should().BeEquivalentTo(new[] { partId, copiedPart.Id!.Value });
+        }
+
+        [Fact]
+        public async Task DuplicateExpeditionAsync_SansLeTrace_DelieLaCopieEtRetireLesConsignesDeCase()
+        {
+            var town = SeedTown();
+            var (expeditionId, partId, routeId) = await SeedExpeditionWithAllOrders(town);
+            var service = AsAlive(town);
+
+            var copy = await service.DuplicateExpeditionAsync(expeditionId, null, keepRoute: false, keepGeneralOrders: true, keepRouteOrders: true);
+
+            copy.Parts!.Single().MapRouteId.Should().BeNull();
+            OrderTexts(copy).Should().BeEquivalentTo("générale", "perso");
+            service.TakeMapRouteChanges().Should().BeEmpty();
+            LoadRoute(routeId).ExpeditionParts.Select(linked => linked.IdExpeditionPart).Should().Equal(partId);
+        }
+
+        [Fact]
+        public async Task DuplicateExpeditionAsync_SansConsignesGenerales_GardeCellesDuTrace()
+        {
+            var town = SeedTown();
+            var (expeditionId, _, routeId) = await SeedExpeditionWithAllOrders(town);
+
+            var copy = await AsAlive(town).DuplicateExpeditionAsync(expeditionId, null, keepRoute: true, keepGeneralOrders: false, keepRouteOrders: true);
+
+            copy.Parts!.Single().MapRouteId.Should().Be(routeId);
+            OrderTexts(copy).Should().BeEquivalentTo("case", "perso sur case");
+        }
+
+        [Fact]
+        public async Task DuplicateExpeditionAsync_TraceSansSesConsignes_GardeLesGenerales()
+        {
+            var town = SeedTown();
+            var (expeditionId, _, routeId) = await SeedExpeditionWithAllOrders(town);
+
+            var copy = await AsAlive(town).DuplicateExpeditionAsync(expeditionId, null, keepRoute: true, keepGeneralOrders: true, keepRouteOrders: false);
+
+            copy.Parts!.Single().MapRouteId.Should().Be(routeId);
+            OrderTexts(copy).Should().BeEquivalentTo("générale", "perso");
+        }
+
+        /// <summary>Expédition liée à un tracé, avec des consignes générales et de case sur la partie et sur une place.</summary>
+        private async Task<(int ExpeditionId, int PartId, int RouteId)> SeedExpeditionWithAllOrders(SeededTown town)
+        {
+            var routeId = SeedRoute(town.TownId, town.AliveUserId);
+            var (expeditionId, partId) = await SeedExpedition(town);
+            await AsAlive(town).SaveExpeditionPartAsync(expeditionId, PartRequest(partId, routeId));
+            var place = await AsAlive(town).SaveExpeditionCitizenAsync(partId, new ExpeditionCitizenRequestDto { OrdersId = new List<int>() });
+            await AsAlive(town).SaveCitizenOrdersAsync(place.Id!.Value, new List<ExpeditionOrderDto> { new() { Type = "checkbox", Text = "perso" }, new() { Type = "checkbox", Text = "perso sur case", X = 3, Y = 4 } });
+            await AsAlive(town).SavePartOrdersAsync(partId, new List<ExpeditionOrderDto> { new() { Type = "checkbox", Text = "générale" }, new() { Type = "checkbox", Text = "case", X = 3, Y = 4 } });
+            return (expeditionId, partId, routeId);
+        }
+
+        /// <summary>Textes des consignes d'une expédition à une partie, places comprises.</summary>
+        private static IEnumerable<string?> OrderTexts(ExpeditionDto expedition)
+        {
+            var part = expedition.Parts!.Single();
+            return part.Orders!.Concat(part.Citizens!.SelectMany(place => place.Orders!)).Select(order => order.Text);
+        }
+
+        [Fact]
         public async Task SavePartOrdersAsync_ConsigneTypeeSurUneCase_Enregistree()
         {
             var town = SeedTown();

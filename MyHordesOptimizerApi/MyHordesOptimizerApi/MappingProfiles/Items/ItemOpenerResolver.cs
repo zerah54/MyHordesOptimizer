@@ -19,7 +19,7 @@ namespace MyHordesOptimizerApi.MappingProfiles.Items
         private const string HavePrefix = "have_";
         private const string HdSuffix = "_hd";
 
-        public static string ResolveRequiredProperty(IEnumerable<string> actionMeta, IEnumerable<string> knownPropertyNames)
+        public static string? ResolveRequiredProperty(IEnumerable<string>? actionMeta, IEnumerable<string> knownPropertyNames)
         {
             if (actionMeta == null) return null;
 
@@ -52,7 +52,7 @@ namespace MyHordesOptimizerApi.MappingProfiles.Items
         /// <c>group</c> exprimé sous forme de chaîne (référence à un groupe nommé, utilisée
         /// ailleurs dans le jeu) est ignoré : ce n'est pas une chance exploitable ici.
         /// </summary>
-        public static (int? ApCost, int? CpCost, double? SuccessRate) ParseCostAndChance(IEnumerable<object> result)
+        public static (int? ApCost, int? CpCost, double? SuccessRate) ParseCostAndChance(IEnumerable<object>? result)
         {
             if (result == null) return (null, null, null);
 
@@ -155,7 +155,7 @@ namespace MyHordesOptimizerApi.MappingProfiles.Items
                 var openingActions = (item.Actions ?? Enumerable.Empty<string>()).Where(IsOpeningAction).ToList();
                 var requiredProperties = openingActions
                     .Select(action => requiredPropertyByAction.GetValueOrDefault(action))
-                    .Where(property => property != null)
+                    .OfType<string>()
                     .Distinct()
                     .ToList();
 
@@ -169,7 +169,7 @@ namespace MyHordesOptimizerApi.MappingProfiles.Items
                     var toolFreeActionCosts = openingActions
                         .Where(action => requiredPropertyByAction.GetValueOrDefault(action) == null)
                         .Select(action => actionsByName.GetValueOrDefault(action))
-                        .Where(actionModel => actionModel != null)
+                        .OfType<MyHordesActionsCodeModel>()
                         .Select(actionModel => (actionModel, cost: ParseCostAndChance(actionModel.Result)))
                         .ToList();
 
@@ -186,7 +186,7 @@ namespace MyHordesOptimizerApi.MappingProfiles.Items
                 .SelectMany(item => (item.Actions ?? Enumerable.Empty<string>())
                     .Where(IsOpeningAction)
                     .Select(action => requiredPropertyByAction.GetValueOrDefault(action))
-                    .Where(property => property != null)
+                    .OfType<string>()
                     .Distinct()
                     .Select(property => (property, item)))
                 .GroupBy(entry => entry.property, entry => entry.item, StringComparer.Ordinal)

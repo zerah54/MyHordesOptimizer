@@ -60,7 +60,7 @@ namespace MyHordesOptimizerApiIntegrationTests.Services
             var reloadedContext = reloadedScope.ServiceProvider.GetRequiredService<MhoContext>();
             var reloaded = reloadedContext.TownCitizens
                 .Include(c => c.IdChestNavigation)
-                .ThenInclude(c => c.ChestItems)
+                .ThenInclude(c => c!.ChestItems)
                 .Single(c => c.IdTown == townId && c.IdUser == userId);
 
             reloaded.IdChestNavigation.Should().NotBeNull();

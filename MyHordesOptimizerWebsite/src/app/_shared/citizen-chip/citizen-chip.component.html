@@ -1,0 +1,70 @@
+<button type="button" class="chip" cdkOverlayOrigin #origin="cdkOverlayOrigin" aria-haspopup="dialog" [attr.aria-expanded]="open()"
+        (mouseenter)="show()" (mouseleave)="scheduleHide()" (focus)="show()" (blur)="scheduleHide()" (click)="toggle()" (keydown.escape)="hide()">
+    @if (citizen().job; as job) {
+        <img class="job" [src]="HORDES_IMG_REPO + job.value.img" [alt]="job.value.label">
+    }
+    <span class="name">{{ citizen().name }}</span>
+    @if (citizen().is_shunned) {
+        <img class="banned" [src]="HORDES_IMG_REPO + 'icons/banished.gif'" alt="Banni" i18n-alt>
+    }
+</button>
+
+<ng-template cdkConnectedOverlay [cdkConnectedOverlayOrigin]="origin" [cdkConnectedOverlayOpen]="open()" [cdkConnectedOverlayPositions]="positions"
+             (overlayOutsideClick)="hide()" (detach)="hide()" (overlayKeydown)="$event.key === 'Escape' && hide()">
+    <div class="mho-citizen-card" role="dialog" [attr.aria-label]="citizen().name" (mouseenter)="cancelHide()" (mouseleave)="scheduleHide()">
+        <div class="card-header">
+            @if (citizen().job; as job) {
+                <img [src]="HORDES_IMG_REPO + job.value.img" alt="">
+                <span>{{ job.value.label }}</span>
+            }
+            @for (role of citizen().town_roles; track role.key) {
+                <img [src]="HORDES_IMG_REPO + role.value.img" [alt]="role.value.label" [title]="role.value.label">
+            }
+            @if (citizen().is_shunned) {
+                <span class="banned-label" i18n>Banni</span>
+            }
+        </div>
+        <dl>
+            <dt i18n>Habitation</dt>
+            <dd>
+                @if (house(); as house) {
+                    <span class="entry"><img [src]="HORDES_IMG_REPO + house.img" alt="">{{ house.label }}</span>
+                } @else {
+                    <span class="unknown">?</span>
+                }
+            </dd>
+            <dt i18n>Améliorations</dt>
+            <dd>
+                @for (upgrade of upgrades(); track upgrade.label) {
+                    <span class="entry"><img [src]="HORDES_IMG_REPO + upgrade.img" alt="">{{ upgrade.label }}</span>
+                } @empty {
+                    <span class="unknown" i18n>Aucune connue</span>
+                }
+            </dd>
+            <dt i18n>Actions héroïques disponibles</dt>
+            <dd>
+                @for (heroic of heroics(); track heroic.label) {
+                    <span class="entry"><img [src]="HORDES_IMG_REPO + heroic.img" alt="">{{ heroic.label }}</span>
+                } @empty {
+                    <span class="unknown" i18n>Aucun connu</span>
+                }
+            </dd>
+            @if (skills().length > 0) {
+                <dt i18n>Compétences</dt>
+                <dd>
+                    @for (skill of skills(); track skill) {
+                        <span class="entry">{{ skill }}</span>
+                    }
+                </dd>
+            }
+            <dt i18n>Actions du jour</dt>
+            <dd>
+                @for (action of doneActions(); track action.label) {
+                    <span class="entry"><img [src]="HORDES_IMG_REPO + action.img" alt="">{{ action.label }}</span>
+                } @empty {
+                    <span class="unknown" i18n>Aucune enregistrée</span>
+                }
+            </dd>
+        </dl>
+    </div>
+</ng-template>

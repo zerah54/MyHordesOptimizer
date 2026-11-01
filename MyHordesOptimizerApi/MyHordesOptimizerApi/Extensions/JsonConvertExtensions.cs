@@ -15,12 +15,12 @@ namespace MyHordesOptimizerApi.Extensions
         {
             var json = obj.ToJson();
             var jObject = JObject.Parse(json);
-            return jObject.ToObject<Dictionary<string, object>>();
+            return jObject.ToObject<Dictionary<string, object>>()!;
         }
 
         public static T FromJson<T>(this string jsonString)
         {
-            return JsonConvert.DeserializeObject<T>(jsonString);
+            return JsonConvert.DeserializeObject<T>(jsonString)!;
         }
     }
 }

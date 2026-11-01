@@ -1,19 +1,90 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { CdkScrollable } from '@angular/cdk/scrolling';
+import { ChangeDetectionStrategy, Component, computed, inject, Injector, OnInit, Signal, signal, WritableSignal } from '@angular/core';
+import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatIconModule } from '@angular/material/icon';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 import { Imports } from '../../_abstract_model/types/_types';
+import { PlanningBudgetComponent } from './planning/budget/planning-budget.component';
+import { PlanningCard, PlanningCardsComponent } from './planning/cards/planning-cards.component';
+import { CitizenFiltersStore } from './planning/citizen-filters.store';
+import { PlanningDefenseComponent } from './planning/defense/planning-defense.component';
+import { PlanningHeaderComponent } from './planning/header/planning-header.component';
+import { PlanningItemValuesDialogComponent } from './planning/item-values-dialog/planning-item-values-dialog.component';
+import { PlanningKpisComponent } from './planning/kpis/planning-kpis.component';
+import { PlanPool } from './planning/plan.types';
+import { alertAnchor, alertCard, PlanAlert } from './planning/plan-alerts.util';
+import { PlanningStore } from './planning/planning.store';
+import { PlanningProgramComponent } from './planning/program/planning-program.component';
+import { PlanningResourcesComponent } from './planning/resources/planning-resources.component';
+import { PlanningTrackingComponent } from './planning/tracking/planning-tracking.component';
+import { PlanningTreeDrawerComponent, PlanningTreeDrawerData } from './planning/tree-drawer/planning-tree-drawer.component';
 
-const angular_common: Imports = [];
-const components: Imports = [];
-const pipes: Imports = [];
-const material_modules: Imports = [MatCardModule];
+const components: Imports = [
+    PlanningBudgetComponent, PlanningCardsComponent, PlanningDefenseComponent, PlanningHeaderComponent, PlanningKpisComponent, PlanningProgramComponent,
+    PlanningResourcesComponent, PlanningTrackingComponent
+];
+const cdk_modules: Imports = [CdkScrollable];
+const material_modules: Imports = [MatButtonModule, MatCardModule, MatDialogModule, MatIconModule, MatProgressSpinnerModule];
 
+/** Largeur d'écran sous laquelle le tiroir occupe toute la largeur. */
+const NARROW_SCREEN: number = 600;
+
+/** Page de planification des chantiers : en-tête, chiffres épinglés, cartes des sujets avec le contenu du sujet choisi, et tiroir de choix. */
 @Component({
     selector: 'mho-buildings',
     templateUrl: './buildings.component.html',
     styleUrls: ['./buildings.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush,
-    imports: [...angular_common, ...components, ...material_modules, ...pipes]
+    providers: [PlanningStore, CitizenFiltersStore],
+    imports: [...components, ...cdk_modules, ...material_modules]
 })
-export class BuildingsComponent {
+export class BuildingsComponent implements OnInit {
+
+    protected readonly store: PlanningStore = inject(PlanningStore);
+    /** Sujet affiché sous les cartes. */
+    protected readonly card: WritableSignal<PlanningCard> = signal<PlanningCard>('program');
+    /** Alertes du sujet affiché. */
+    protected readonly card_alerts: Signal<PlanAlert[]> = computed((): PlanAlert[] => this.store.alerts().filter((alert: PlanAlert): boolean => alertCard(alert) === this.card()));
+    protected readonly anchor: (alert: PlanAlert) => string | null = alertAnchor;
+
+    private readonly dialog: MatDialog = inject(MatDialog);
+    private readonly injector: Injector = inject(Injector);
+
+    public ngOnInit(): void {
+        this.store.load();
+    }
+
+    /** Ouvre la boîte des valeurs des objets (réglage de la ville). */
+    protected openItemValues(): void {
+        this.dialog.open(PlanningItemValuesDialogComponent, { injector: this.injector, width: '32rem', maxWidth: '95vw' });
+    }
+
+    /**
+     * Ouvre le tiroir de choix des chantiers pour une section, à droite (pleine largeur sur petit écran).
+     * @param {PlanPool} pool Section.
+     */
+    protected openDrawer(pool: PlanPool): void {
+        const narrow: boolean = typeof window !== 'undefined' && window.innerWidth < NARROW_SCREEN;
+        this.dialog.open<PlanningTreeDrawerComponent, PlanningTreeDrawerData>(PlanningTreeDrawerComponent, {
+            data: { pool },
+            injector: this.injector,
+            position: { right: '0', top: '0' },
+            height: '100dvh',
+            width: narrow ? '100vw' : 'min(72vw, 1200px)',
+            maxWidth: '100vw',
+            panelClass: 'mho-side-sheet',
+            backdropClass: 'cdk-overlay-transparent-backdrop'
+        });
+    }
+
+    /**
+     * Amène à un élément du programme.
+     * @param {string} id Identifiant de l'élément.
+     */
+    protected scrollTo(id: string): void {
+        document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
 }

@@ -1,0 +1,177 @@
+:host {
+    display: contents;
+
+    .mho-my-program {
+
+        .loading {
+            display: flex;
+            justify-content: center;
+            padding: 2em;
+        }
+
+        .days {
+            margin-bottom: 0.5em;
+        }
+
+        .summary-strip {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4em;
+            margin-bottom: 0.75em;
+
+            .pill-expedition {
+                background: color-mix(in srgb, var(--mho-accent-2) 20%, transparent);
+            }
+
+            .pill-buildings {
+                background: color-mix(in srgb, var(--mho-accent) 20%, transparent);
+            }
+
+            .pill-open {
+                border: 1px solid var(--mho-warning);
+                color: var(--mho-warning);
+            }
+        }
+
+        // Côte à côte sur ordinateur, empilés sous le seuil de la page Chantiers (600 px).
+        .blocks {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 0.75em;
+            align-items: start;
+
+            @media (max-width: 599.98px) {
+                grid-template-columns: minmax(0, 1fr);
+            }
+
+            .hidden-bar,
+            .block.full-width {
+                grid-column: 1 / -1;
+            }
+        }
+
+        .block,
+        .hidden-bar {
+            --block-color: var(--mho-accent);
+            border: 1px solid var(--mho-line);
+            border-left: 4px solid var(--block-color);
+            border-radius: var(--mho-radius-m);
+            background: var(--mho-surface);
+
+            &.expedition {
+                --block-color: var(--mho-accent-2);
+            }
+        }
+
+        .block {
+            padding: 0.5em 0.75em;
+        }
+
+        .block-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5em;
+
+            mat-icon {
+                color: var(--block-color);
+            }
+
+            h2 {
+                flex: 1;
+                margin: 0;
+            }
+        }
+
+        .hidden-bar {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.5em;
+            padding: 0.25em 0.75em;
+            border-style: dashed;
+            border-left-style: solid;
+            opacity: 0.85;
+
+            mat-icon {
+                color: var(--block-color);
+            }
+
+            .hidden-text {
+                flex: 1;
+            }
+        }
+
+        .not-registered {
+            opacity: 0.85;
+        }
+
+        .not-citizen,
+        .no-plan,
+        .no-evaluation,
+        .nothing,
+        .load-failed,
+        .expeditions-failed {
+            opacity: 0.85;
+        }
+
+        table.summary {
+            border-collapse: collapse;
+            margin: 0.5em 0;
+
+            th,
+            td {
+                padding: 0.25em 0.75em;
+                text-align: left;
+            }
+        }
+
+        .notice {
+            display: flex;
+            align-items: center;
+            gap: 0.5em;
+        }
+
+        .multiline {
+            white-space: pre-line;
+        }
+
+        .vote {
+            display: flex;
+            align-items: center;
+            gap: 0.5em;
+        }
+
+        .checklist {
+            padding-left: 0;
+            list-style: none;
+
+            li {
+                display: flex;
+                align-items: center;
+                gap: 0.2em;
+
+                &.done {
+                    opacity: 0.75;
+                }
+            }
+
+            .detected {
+                font-size: 1.1em;
+                width: 1.1em;
+                height: 1.1em;
+                opacity: 0.7;
+            }
+        }
+
+        .steps {
+            li.instruction,
+            .note {
+                font-style: italic;
+            }
+
+            .note {
+                opacity: 0.8;
+            }
+        }
+    }
+}

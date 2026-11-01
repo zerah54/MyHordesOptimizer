@@ -14,13 +14,11 @@
                                 </mho-header-with-select-filter>
                             }
                             @case ('today_dispo') {
-                                <mho-header-with-number-previous-next-filter class="previous-next"
-                                                                             [header]="column.header"
-                                                                             [(filterValue)]="filters.selected_day"
-                                                                             (filterValueChange)="citizen_filter_change.next()"
-                                                                             [min]="1" [max]="current_day + 1"
-                                                                             displayFirstLast>
-                                </mho-header-with-number-previous-next-filter>
+                                <div class="day-header">
+                                    {{ column.header }}
+                                    <mho-day-selector [days]="lastDay() | daysUpTo" [(value)]="filters.selected_day" [today]="current_day"
+                                                      (valueChange)="citizen_filter_change.next()"></mho-day-selector>
+                                </div>
                             }
                         }
                     </th>

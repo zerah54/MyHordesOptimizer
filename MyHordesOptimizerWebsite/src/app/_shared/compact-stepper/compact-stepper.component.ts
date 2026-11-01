@@ -41,8 +41,6 @@ export class CompactStepperComponent {
     public readonly label: InputSignal<string> = input.required<string>();
     /** Masque le tooltip (le libellé reste en `alt`/`aria-label` de l'icône). */
     public readonly noTooltip: InputSignalWithTransform<boolean, unknown> = input(false, { transform: booleanAttribute });
-    /** Préfixe collé à la valeur affichée (« J » pour un numéro de jour, par exemple). */
-    public readonly prefix: InputSignal<string> = input<string>('');
     /** Valeur courante. */
     public readonly value: InputSignal<number> = input.required<number>();
     /** Borne basse (incluse). */
@@ -57,7 +55,7 @@ export class CompactStepperComponent {
 
     protected readonly src: Signal<string> = computed((): string => HORDES_IMG_REPO + this.icon());
     /** Valeur affichée : `?` quand la valeur est négative (-1 = non définie), sinon le nombre. */
-    protected readonly display: Signal<string> = computed((): string => this.value() < 0 ? '?' : this.prefix() + this.value());
+    protected readonly display: Signal<string> = computed((): string => this.value() < 0 ? '?' : `${this.value()}`);
     protected readonly canDecrement: Signal<boolean> = computed((): boolean => !this.disabled() && this.value() > this.min());
     protected readonly canIncrement: Signal<boolean> = computed((): boolean => {
         const max: number | undefined = this.max();

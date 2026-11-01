@@ -2,11 +2,13 @@ import { provideHttpClient, withXhr } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { ChangeDetectorRef } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { of } from 'rxjs';
+import { Observable, of } from 'rxjs';
 
+import { DailyActionEnum } from '../../../_abstract_model/enum/daily-action.enum';
+import { BuiltBuildingsService } from '../../../_abstract_model/services/built-buildings.service';
 import { TownService } from '../../../_abstract_model/services/town.service';
-import { Citizen } from '../../../_abstract_model/types/citizen.class';
 import { CitizenInfo } from '../../../_abstract_model/types/citizen-info.class';
+import { Citizen } from '../../../_abstract_model/types/citizen.class';
 import { DailyAction } from '../../../_abstract_model/types/daily-action.class';
 import { UpdateInfo } from '../../../_abstract_model/types/update-info.class';
 import { CitizensDailyActionsComponent } from './citizens-daily-actions.component';
@@ -108,5 +110,21 @@ describe('CitizensDailyActionsComponent', (): void => {
         citizen.daily_actions = [shower];
 
         expect(testable.isDailyActionDone(citizen, 'home_shower', 5)).toBe(false);
+    });
+});
+
+describe('CitizensDailyActionsComponent — actions selon les chantiers construits', (): void => {
+    it('masque les actions dont le chantier n\'est pas construit', async (): Promise<void> => {
+        await TestBed.configureTestingModule({
+            imports: [CitizensDailyActionsComponent],
+            providers: [
+                provideHttpClient(withXhr()), provideHttpClientTesting(),
+                { provide: BuiltBuildingsService, useValue: { builtUids: (): Observable<ReadonlySet<string> | null> => of(new Set<string>(['small_watchmen_#01'])) } }
+            ]
+        }).compileComponents();
+        const instance: CitizensDailyActionsComponent = TestBed.createComponent(CitizensDailyActionsComponent).componentInstance;
+
+        expect((instance as unknown as { daily_action_keys: () => DailyActionEnum[] }).daily_action_keys().map((action: DailyActionEnum): string => action.key))
+            .toEqual(['home_clean', 'home_rest', 'home_crows']);
     });
 });

@@ -15,7 +15,7 @@ namespace MyHordesOptimizerApi.Services.Interfaces.Import
         void ImportPictos();
         Task ImportCategoriesAsync();
         Task ImportItemsAsync();
-        Task ImportAllAsync(Action<ImportStepProgress> onStep = null);
+        Task ImportAllAsync(Action<ImportStepProgress>? onStep = null);
         void ImportWishlistCategorie();
         void ImportDefaultWishlists();
         /// <param name="resume">
@@ -23,7 +23,7 @@ namespace MyHordesOptimizerApi.Services.Interfaces.Import
         /// Indispensable pour venir à bout d'une saison ancienne, que le quota MyHordes ne laisse pas
         /// importer en une passe. À laisser à faux pour rafraîchir des villes déjà connues.
         /// </param>
-        Task ImportTownsAsync(int? season = null, bool resume = false, Action<ImportStepProgress> onStep = null);
+        Task ImportTownsAsync(int? season = null, bool resume = false, Action<ImportStepProgress>? onStep = null);
         Task ImportSingleTownAsync(int townId);
         Task RefreshUserNamesAsync(int? limit = null);
         Task RecomputeUserDirectoryStatsAsync();

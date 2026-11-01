@@ -43,11 +43,11 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Translations
 
     public class TranslationKeyDto
     {
-        public string DeString { get; set; }
-        public string Context { get; set; }
+        public string DeString { get; set; } = null!;
+        public string Context { get; set; } = null!;
         public bool IsExactMatch { get; set; }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             return obj is TranslationKeyDto dto &&
                    DeString == dto.DeString &&

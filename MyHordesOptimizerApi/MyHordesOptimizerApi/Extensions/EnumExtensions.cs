@@ -20,13 +20,13 @@ namespace MyHordesOptimizerApi.Extensions
             {
                 throw new ArgumentException("EnumerationValue must be of Enum type", "enumerationValue");
             }
-            string name = Enum.GetName(type, enumerationValue);
+            string? name = Enum.GetName(type, enumerationValue);
             if (name != null)
             {
-                FieldInfo field = type.GetField(name);
+                FieldInfo? field = type.GetField(name);
                 if (field != null)
                 {
-                    DescriptionAttribute attr =
+                    DescriptionAttribute? attr =
                            Attribute.GetCustomAttribute(field,
                              typeof(DescriptionAttribute)) as DescriptionAttribute;
                     if (attr != null)
@@ -35,7 +35,7 @@ namespace MyHordesOptimizerApi.Extensions
                     }
                 }
             }
-            return enumerationValue.ToString();
+            return enumerationValue.ToString()!;
         }
     }
 }

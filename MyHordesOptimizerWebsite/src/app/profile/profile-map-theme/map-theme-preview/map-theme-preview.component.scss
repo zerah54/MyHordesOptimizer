@@ -1,0 +1,150 @@
+:host {
+    display: block;
+    --mho-cell: 56px;
+}
+
+.preview {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(var(--mho-cell), 1fr));
+    gap: 2px;
+    max-width: 480px;
+}
+
+.cell {
+    position: relative;
+    overflow: hidden;
+    aspect-ratio: 1;
+    border: 1px solid var(--mho-surface);
+    border-radius: 0.5em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7em;
+    color: var(--mho-map-fg);
+
+    &.level-0 {
+        background-color: var(--mho-map-l0);
+    }
+
+    &.level-1 {
+        background-color: var(--mho-map-l1);
+    }
+
+    &.level-2 {
+        background-color: var(--mho-map-l2);
+    }
+
+    &.level-3 {
+        background-color: var(--mho-map-l3);
+    }
+
+    &.unknown {
+        background-color: var(--mho-map-unknown);
+    }
+
+    .value.bare {
+        color: var(--mho-map-bare-fg, inherit);
+        font-size: max(8px, calc(var(--mho-cell) * 0.27));
+        font-variant-numeric: tabular-nums;
+    }
+
+    .caption {
+        position: absolute;
+        bottom: 1px;
+        left: 0;
+        right: 0;
+        text-align: center;
+        color: var(--mho-map-bare-fg, var(--mho-text));
+    }
+
+    &.mine {
+        box-shadow: inset 0 0 0 2.5px var(--mho-map-me), inset 0 0 0 3.5px var(--mho-map-marker-ink);
+    }
+
+    .sel-text {
+        position: relative;
+        z-index: 1;
+        padding: 0 0.3em;
+        background-color: var(--mho-map-sel);
+        color: var(--mho-map-sel-fg);
+    }
+
+    &.selected::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        box-shadow: inset 0 0 0 2px var(--mho-map-sel), inset 0 0 0 3px var(--mho-map-marker-ink);
+    }
+
+    .dried {
+        position: absolute;
+        inset: 0;
+        background-image: repeating-linear-gradient(45deg, var(--mho-map-hatch) 0 1px, transparent 1px 4px);
+    }
+
+    .ruin {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        .ruin-square {
+            width: 60%;
+            height: 60%;
+            border-radius: 2px;
+            background-color: var(--mho-map-marker);
+
+            &.empty-ruin {
+                background-color: transparent;
+                box-shadow: inset 0 0 0 2px var(--mho-map-marker);
+            }
+        }
+    }
+
+    .age-flag {
+        position: absolute;
+        width: calc(var(--mho-cell) * 0.3);
+        height: calc(var(--mho-cell) * 0.3);
+
+        &.age-green {
+            background-color: var(--mho-map-age-green);
+        }
+
+        &.age-yellow {
+            background-color: var(--mho-map-age-yellow);
+        }
+
+        &.age-orange {
+            background-color: var(--mho-map-age-orange);
+        }
+
+        &.age-red {
+            background-color: var(--mho-map-age-red);
+        }
+
+        &.corner-top-left {
+            top: 0;
+            left: 0;
+            clip-path: polygon(0 0, 100% 0, 0 100%);
+        }
+
+        &.corner-top-right {
+            top: 0;
+            right: 0;
+            clip-path: polygon(0 0, 100% 0, 100% 100%);
+        }
+
+        &.corner-bottom-left {
+            bottom: 0;
+            left: 0;
+            clip-path: polygon(0 0, 0 100%, 100% 100%);
+        }
+
+        &.corner-bottom-right {
+            bottom: 0;
+            right: 0;
+            clip-path: polygon(100% 0, 100% 100%, 0 100%);
+        }
+    }
+}

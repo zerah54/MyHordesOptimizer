@@ -31,7 +31,7 @@ namespace MyHordesOptimizerApi.Controllers
         {
             var parameters = _cache.GetOrCreate(ReferentialCacheKeys.Parameters,
                 _ => ParametersService.GetParameters().ToList());
-            return parameters;
+            return parameters!;
         }
 
         [HttpPost]

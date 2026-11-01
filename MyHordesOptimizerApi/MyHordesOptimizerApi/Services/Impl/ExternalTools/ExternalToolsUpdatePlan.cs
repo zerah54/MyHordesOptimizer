@@ -15,7 +15,8 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
         bool GhMap,
         bool GhCitizen,
         bool Fata,
-        bool Bbh)
+        bool Bbh,
+        bool Zen)
     {
         /// <summary>ResolveTownId est consommé par les quatre unités MHO.</summary>
         public bool NeedsTownId => MhoMap || MhoBags || MhoCitizen || MhoDigs;
@@ -36,7 +37,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
     {
         public static ExternalToolsUpdateUnitPlan Build(UpdateRequestDto dto)
         {
-            var mho = dto.Map.ToolsToUpdate.IsMyHordesOptimizer;
+            var mho = dto.Map!.ToolsToUpdate.IsMyHordesOptimizer;
             var gh = dto.Map.ToolsToUpdate.IsGestHordes;
             var fata = dto.Map.ToolsToUpdate.IsFataMorgana;
             var bbh = dto.Map.ToolsToUpdate.IsBigBrothHordes;
@@ -57,7 +58,8 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                 GhMap: UpdateRequestMapToolsToUpdateDetailsDto.IsApi(gh) || UpdateRequestMapToolsToUpdateDetailsDto.IsCell(gh),
                 GhCitizen: ghCitizen,
                 Fata: UpdateRequestMapToolsToUpdateDetailsDto.IsApi(fata) || UpdateRequestMapToolsToUpdateDetailsDto.IsCell(fata),
-                Bbh: UpdateRequestMapToolsToUpdateDetailsDto.IsApi(bbh));
+                Bbh: UpdateRequestMapToolsToUpdateDetailsDto.IsApi(bbh),
+                Zen: UpdateRequestMapToolsToUpdateDetailsDto.IsCell(dto.Map.ToolsToUpdate.IsZenHordes!) && dto.Map.ZenHordesCell != null);
         }
 
         public static void Declare(UpdateRequestDto dto, IExternalToolsProgressSink sink)
@@ -71,6 +73,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
             if (plan.GhCitizen) sink.Declare(ExternalToolId.GestHordes, ExternalToolUpdateUnits.Citizen);
             if (plan.Fata) sink.Declare(ExternalToolId.FataMorgana, ExternalToolUpdateUnits.Map);
             if (plan.Bbh) sink.Declare(ExternalToolId.BigBrothHordes, ExternalToolUpdateUnits.Map);
+            if (plan.Zen) sink.Declare(ExternalToolId.ZenHordes, ExternalToolUpdateUnits.Map);
         }
     }
 }

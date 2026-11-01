@@ -8,9 +8,9 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer
     {
         public double Probability { get; set; }
         public int Weight { get; set; }
-        public ItemWithoutRecipeDto Item { get; set; }
+        public ItemWithoutRecipeDto Item { get; set; } = null!;
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             return obj is ItemResultDto result &&
                    EqualityComparer<ItemWithoutRecipeDto>.Default.Equals(Item, result.Item);

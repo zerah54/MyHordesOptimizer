@@ -19,7 +19,7 @@ namespace MyHordesOptimizerApi.MappingProfiles.Buildings
         public BuildingMappingProfile()
         {
             CreateMap<KeyValuePair<string, MyHordesApiBuildingDto>, Building>()
-                .ForMember(model => model.Breakable, opt => opt.MapFrom(dto => dto.Value.Breakable.Value))
+                .ForMember(model => model.Breakable, opt => opt.MapFrom(dto => dto.Value.Breakable!.Value))
                 .ForMember(model => model.BuildingRessources, opt => opt.MapFrom((dto, dest, srcMember, context) =>
                 {
                     // Une ressource sans objet ni quantité n'est pas une ressource : on l'écarte
@@ -32,12 +32,12 @@ namespace MyHordesOptimizerApi.MappingProfiles.Buildings
                         .ToList();
                     return context.Mapper.Map<List<BuildingRessource>>(usableResources);
                 }))
-                .ForMember(model => model.Defence, opt => opt.MapFrom(dto => dto.Value.Def.Value))
-                .ForMember(model => model.DescriptionDe, opt => opt.MapFrom(src => src.Value.Desc["de"]))
-                .ForMember(model => model.DescriptionEn, opt => opt.MapFrom(src => src.Value.Desc["en"]))
-                .ForMember(model => model.DescriptionEs, opt => opt.MapFrom(src => src.Value.Desc["es"]))
-                .ForMember(model => model.DescriptionFr, opt => opt.MapFrom(src => src.Value.Desc["fr"]))
-                .ForMember(model => model.HasUpgrade, opt => opt.MapFrom(dto => dto.Value.HasUpgrade.Value))
+                .ForMember(model => model.Defence, opt => opt.MapFrom(dto => dto.Value.Def!.Value))
+                .ForMember(model => model.DescriptionDe, opt => opt.MapFrom(src => src.Value.Desc!["de"]))
+                .ForMember(model => model.DescriptionEn, opt => opt.MapFrom(src => src.Value.Desc!["en"]))
+                .ForMember(model => model.DescriptionEs, opt => opt.MapFrom(src => src.Value.Desc!["es"]))
+                .ForMember(model => model.DescriptionFr, opt => opt.MapFrom(src => src.Value.Desc!["fr"]))
+                .ForMember(model => model.HasUpgrade, opt => opt.MapFrom(dto => dto.Value.HasUpgrade!.Value))
                 // L'empreinte de build doit sauter : MyHordes renvoie
                 // « building/small_waterhole.467957af.gif », or le dépôt d'images du site ne sert
                 // que « building/small_waterhole.gif ». Sans ce nettoyage l'icône tombe en 404 et
@@ -47,22 +47,22 @@ namespace MyHordesOptimizerApi.MappingProfiles.Buildings
                 // auto-incrément de fixtures, instable d'une instance du jeu à l'autre. Le service
                 // d'import l'attribue après rapprochement sur le uid.
                 .ForMember(model => model.IdBuilding, opt => opt.Ignore())
-                .ForMember(model => model.MhId, opt => opt.MapFrom(dto => dto.Value.Id.Value))
+                .ForMember(model => model.MhId, opt => opt.MapFrom(dto => dto.Value.Id!.Value))
                 .ForMember(model => model.IsObsolete, opt => opt.Ignore())
                 .ForMember(model => model.IdBuildingParent, opt => opt.MapFrom(dto => NoParentToNull(dto.Value.Parent)))
                 .ForMember(model => model.IdBuildingParentNavigation, opt => opt.Ignore())
                 .ForMember(model => model.InverseIdBuildingParentNavigation, opt => opt.Ignore())
-                .ForMember(model => model.LabelDe, opt => opt.MapFrom(src => src.Value.Name["de"]))
-                .ForMember(model => model.LabelEn, opt => opt.MapFrom(src => src.Value.Name["en"]))
-                .ForMember(model => model.LabelEs, opt => opt.MapFrom(src => src.Value.Name["es"]))
-                .ForMember(model => model.LabelFr, opt => opt.MapFrom(src => src.Value.Name["fr"]))
-                .ForMember(model => model.MaxLife, opt => opt.MapFrom(dto => dto.Value.MaxLife.Value))
-                .ForMember(model => model.NbPaRequired, opt => opt.MapFrom(dto => dto.Value.Pa.Value))
-                .ForMember(model => model.Rarity, opt => opt.MapFrom(dto => dto.Value.Rarity.Value))
+                .ForMember(model => model.LabelDe, opt => opt.MapFrom(src => src.Value.Name!["de"]))
+                .ForMember(model => model.LabelEn, opt => opt.MapFrom(src => src.Value.Name!["en"]))
+                .ForMember(model => model.LabelEs, opt => opt.MapFrom(src => src.Value.Name!["es"]))
+                .ForMember(model => model.LabelFr, opt => opt.MapFrom(src => src.Value.Name!["fr"]))
+                .ForMember(model => model.MaxLife, opt => opt.MapFrom(dto => dto.Value.MaxLife!.Value))
+                .ForMember(model => model.NbPaRequired, opt => opt.MapFrom(dto => dto.Value.Pa!.Value))
+                .ForMember(model => model.Rarity, opt => opt.MapFrom(dto => dto.Value.Rarity!.Value))
                 // Rang d'affichage du jeu. `.Value` non explicite ici, contrairement aux autres :
                 // c'est une donnée de confort, une absence n'a pas à faire échouer tout l'import.
                 .ForMember(model => model.DisplayOrder, opt => opt.MapFrom(dto => dto.Value.Order))
-                .ForMember(model => model.Temporary, opt => opt.MapFrom(dto => dto.Value.Temporary.Value))
+                .ForMember(model => model.Temporary, opt => opt.MapFrom(dto => dto.Value.Temporary!.Value))
                 .ForMember(model => model.Uid, opt => opt.MapFrom(dto => dto.Key))
                 .ForMember(model => model.WatchSurvivalBonusUpgradeLevelRequired, opt => opt.Ignore())
                 .ForMember(model => model.BuildingWatchSurvivalBonusJobs, opt => opt.Ignore());
@@ -75,17 +75,17 @@ namespace MyHordesOptimizerApi.MappingProfiles.Buildings
                 .ForMember(dto => dto.Pa, opt => opt.MapFrom(model => model.NbPaRequired))
                 .ForMember(dto => dto.Label, opt => opt.MapFrom(model => new Dictionary<string, string>()
                 {
-                    { "fr", model.LabelFr },
-                    { "en", model.LabelEn },
-                    { "es", model.LabelEs },
-                    { "de", model.LabelDe }
+                    { "fr", model.LabelFr! },
+                    { "en", model.LabelEn! },
+                    { "es", model.LabelEs! },
+                    { "de", model.LabelDe! }
                 }))
                 .ForMember(dto => dto.Description, opt => opt.MapFrom(model => new Dictionary<string, string>()
                 {
-                    { "fr", model.DescriptionFr },
-                    { "en", model.DescriptionEn },
-                    { "es", model.DescriptionEs },
-                    { "de", model.DescriptionDe }
+                    { "fr", model.DescriptionFr! },
+                    { "en", model.DescriptionEn! },
+                    { "es", model.DescriptionEs! },
+                    { "de", model.DescriptionDe! }
                 }))
                 .ForMember(dto => dto.Resources, opt => opt.MapFrom(model =>
                     model.BuildingRessources.Where(resource => resource.ResourceTier == 0)))
@@ -110,17 +110,17 @@ namespace MyHordesOptimizerApi.MappingProfiles.Buildings
                 .ForMember(dto => dto.Img, opt => opt.MapFrom(model => model.IdItemNavigation.Img))
                 .ForMember(dto => dto.Label, opt => opt.MapFrom(model => new Dictionary<string, string>()
                 {
-                    { "fr", model.IdItemNavigation.LabelFr },
-                    { "en", model.IdItemNavigation.LabelEn },
-                    { "es", model.IdItemNavigation.LabelEs },
-                    { "de", model.IdItemNavigation.LabelDe }
+                    { "fr", model.IdItemNavigation.LabelFr! },
+                    { "en", model.IdItemNavigation.LabelEn! },
+                    { "es", model.IdItemNavigation.LabelEs! },
+                    { "de", model.IdItemNavigation.LabelDe! }
                 }));
 
             CreateMap<MyHordesApiBuildingRessource, BuildingRessource>()
-                .ForMember(model => model.Count, opt => opt.MapFrom(dto => dto.Amount.Value))
+                .ForMember(model => model.Count, opt => opt.MapFrom(dto => dto.Amount!.Value))
                 .ForMember(model => model.IdBuilding, opt => opt.Ignore())
                 .ForMember(model => model.IdBuildingNavigation, opt => opt.Ignore())
-                .ForMember(model => model.IdItem, opt => opt.MapFrom(dto => dto.Rsc.Id.Value))
+                .ForMember(model => model.IdItem, opt => opt.MapFrom(dto => dto.Rsc!.Id!.Value))
                 .ForMember(model => model.IdItemNavigation, opt => opt.Ignore());
         }
 

@@ -18,7 +18,7 @@ namespace MyHordesOptimizerApi.Extensions.Models.Expeditions
             newCitizen.NombrePaDepart = source.NombrePaDepart;
             newCitizen.IsPreinscritSoif = source.IsPreinscritSoif;
             newCitizen.IdExpeditionBag = null;
-            newCitizen.IdExpeditionBagNavigation = source.IdExpeditionBagNavigation.Copy();
+            newCitizen.IdExpeditionBagNavigation = source.IdExpeditionBagNavigation!.Copy();
             source.ExpeditionOrders.ToList().ForEach(order => newCitizen.ExpeditionOrders.Add(order.Copy()));
             return newCitizen;
         }

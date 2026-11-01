@@ -1,7 +1,7 @@
 <div class="mho-estimations">
     <div class="header">
-        <mho-compact-stepper label="Jour" i18n-label prefix="J" [value]="selected_day" [min]="1" [max]="current_day"
-                             (valueChange)="selected_day = $event; getEstimations()"></mho-compact-stepper>
+        <mho-day-selector [days]="current_day | daysUpTo" [value]="selected_day" [today]="current_day"
+                          (valueChange)="selected_day = $event; getEstimations()"></mho-day-selector>
         <div class="actions">
             <mat-slide-toggle class="souls-toggle" [ngModel]="souls_mode()" (ngModelChange)="setSoulsMode($event)">
                 <ng-container i18n>Mode âmes</ng-container>

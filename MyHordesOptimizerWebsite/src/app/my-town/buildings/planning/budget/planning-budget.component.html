@@ -1,0 +1,238 @@
+@if (store.draft(); as draft) {
+    <section class="fields">
+        <mat-form-field appearance="outline" subscriptSizing="dynamic">
+            <mat-label i18n>PA de base par citoyen</mat-label>
+            <input matInput type="number" min="0" data-field="default-pa" [ngModel]="draft.basePa" [disabled]="!store.can_edit()"
+                   (ngModelChange)="onDefaultPa($event)">
+        </mat-form-field>
+    </section>
+
+    <h3 i18n>Citoyens</h3>
+    <mho-planning-citizen-filters/>
+    <table class="summary">
+        <thead>
+        <tr>
+            @if (store.can_edit()) {
+                <th class="select">
+                    <mat-checkbox data-field="select-all" [checked]="filters.all_selected()"
+                                  [indeterminate]="filters.selected().size > 0 && !filters.all_selected()"
+                                  (change)="filters.toggleAll()" i18n-aria-label aria-label="Tout sélectionner"/>
+                </th>
+            }
+            <th i18n>Citoyen</th>
+            <th i18n>PA de base</th>
+            <th i18n>Expédition</th>
+            <th i18n>Consignes individuelles</th>
+            <th i18n>Capacité</th>
+        </tr>
+        </thead>
+        <tbody>
+            @for (citizen of shown_citizens(); track citizen.userId) {
+                <tr class="citizen" [attr.data-user]="citizen.userId">
+                    @if (store.can_edit()) {
+                        <td class="select">
+                            <mat-checkbox data-field="select" [checked]="filters.selected().has(citizen.userId)" (change)="filters.toggle(citizen.userId)"
+                                          [aria-label]="citizen.name"/>
+                        </td>
+                    }
+                    <td>
+                        @if (fullCitizen(citizen.userId); as full) {
+                            <mho-citizen-chip [citizen]="full" [day]="store.selected_day()" [actions]="store.displayable_actions()"/>
+                        } @else {
+                            {{ citizen.name }}
+                        }
+                        @if (citizen.banned) {
+                            <span class="badge-banned" i18n>banni</span>
+                        }
+                        @if (citizen.technician) {
+                            <span class="badge-tech" i18n>technicien</span>
+                        }
+                    </td>
+                    <td>
+                        <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                            <input matInput type="number" min="0" data-field="base-pa" [ngModel]="basePa(citizen)" [disabled]="!store.can_edit()"
+                                   (ngModelChange)="onBasePa(citizen.userId, $event)">
+                        </mat-form-field>
+                    </td>
+                    <td class="expedition">{{ expeditionPa(citizen.userId) }}</td>
+                    <td class="tasks">
+                        @for (task of entry(citizen)?.tasks ?? []; track $index; let index = $index) {
+                            <div class="task">
+                                <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                                    <mat-select [value]="task.kind" [disabled]="!store.can_edit()"
+                                                (selectionChange)="setTaskKind(citizen.userId, index, $event.value)">
+                                        <mat-option value="home" i18n>Maison</mat-option>
+                                        <mat-option value="homeUpgrade" i18n>Amélioration de maison</mat-option>
+                                        <mat-option value="action" [disabled]="actionOptions(task).length === 0">
+                                            <ng-container i18n>Action de chantier</ng-container>
+                                        </mat-option>
+                                        <mat-option value="free" i18n>Libre</mat-option>
+                                    </mat-select>
+                                </mat-form-field>
+                                @if (task.kind === 'home') {
+                                    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                                        <mat-select [value]="task.level" [disabled]="!store.can_edit()"
+                                                    (selectionChange)="setTaskLevel(citizen.userId, index, $event.value)">
+                                            @for (home of homeLevels(); track home.level) {
+                                                <mat-option [value]="home.level">{{ home.label }}</mat-option>
+                                            }
+                                        </mat-select>
+                                    </mat-form-field>
+                                } @else if (task.kind === 'action') {
+                                    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                                        <mat-select data-field="task-action" [value]="task.ref" [disabled]="!store.can_edit()"
+                                                    (selectionChange)="setTaskAction(citizen.userId, index, $event.value)">
+                                            @for (action of actionOptions(task); track action.key) {
+                                                <mat-option [value]="action.key">{{ action.getLabel() }}</mat-option>
+                                            } @empty {
+                                                <mat-option disabled i18n>Aucun chantier qui donne une action n'est construit</mat-option>
+                                            }
+                                        </mat-select>
+                                    </mat-form-field>
+                                } @else if (task.kind === 'homeUpgrade' && upgradeOf(task); as upgrade) {
+                                    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                                        <mat-select data-field="task-upgrade" [value]="task.ref" [disabled]="!store.can_edit()"
+                                                    (selectionChange)="setTaskUpgrade(citizen.userId, index, $event.value)">
+                                            @for (option of store.home_upgrades(); track option.key) {
+                                                <mat-option [value]="option.key">{{ option.label }}</mat-option>
+                                            }
+                                        </mat-select>
+                                    </mat-form-field>
+                                    @if (upgrade.max_level > 1) {
+                                        <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                                            <mat-select data-field="task-upgrade-level" [value]="task.level" [disabled]="!store.can_edit()"
+                                                        (selectionChange)="setTaskUpgradeLevel(citizen.userId, index, $event.value)">
+                                                @for (level of upgrade.levels; track level.level) {
+                                                    <mat-option [value]="level.level">
+                                                        <ng-container i18n>niv.</ng-container>
+                                                        {{ level.level }}
+                                                    </mat-option>
+                                                }
+                                            </mat-select>
+                                        </mat-form-field>
+                                    }
+                                } @else {
+                                    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                                        <input matInput type="text" maxlength="64" data-field="task-label" [ngModel]="task.label" [disabled]="!store.can_edit()"
+                                               (ngModelChange)="onTaskLabel(citizen.userId, index, $event)">
+                                    </mat-form-field>
+                                }
+                                <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                                    <input matInput type="number" min="0" data-field="task-pa" [ngModel]="task.pa" [disabled]="!store.can_edit()"
+                                           (ngModelChange)="onTaskPa(citizen.userId, index, $event)">
+                                </mat-form-field>
+                                <button mat-icon-button type="button" data-action="remove-task" [disabled]="!store.can_edit()"
+                                        (click)="removeTask(citizen.userId, index)" i18n-matTooltip matTooltip="Supprimer la consigne">
+                                    <mat-icon>delete</mat-icon>
+                                </button>
+                            </div>
+                        }
+                        <button mat-stroked-button type="button" data-action="add-task" [disabled]="!store.can_edit()" (click)="addTask(citizen.userId)" i18n>
+                            Ajouter une consigne
+                        </button>
+                    </td>
+                    <td class="capacity-cell">
+                        <span class="capacity">{{ capacity(citizen.userId)?.capacity ?? '' }}</span>
+                        @if (capacity(citizen.userId)?.overCommitted) {
+                            <mat-icon class="over-committed" i18n-matTooltip matTooltip="Consignes individuelles et expédition dépassent les PA de base">
+                                warning
+                            </mat-icon>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <h3 i18n>Lignes de la ville</h3>
+    <table class="summary lines">
+        <thead>
+        <tr>
+            <th i18n>Libellé</th>
+            @if (store.banned_pool_shown()) {
+                <th i18n>Poche</th>
+            }
+            <th i18n>PA (±)</th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody>
+            @for (line of draft.townLines; track $index; let index = $index) {
+                <tr class="line">
+                    <td>
+                        <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                            <input matInput type="text" maxlength="64" data-field="line-label" [ngModel]="line.label" [disabled]="!store.can_edit()"
+                                   (ngModelChange)="onLineLabel(index, $event)">
+                        </mat-form-field>
+                    </td>
+                    @if (store.banned_pool_shown()) {
+                        <td>
+                            <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                                <mat-select [value]="line.pool" [disabled]="!store.can_edit()" (selectionChange)="setLinePool(index, $event.value)">
+                                    <mat-option value="banned" i18n>Bannis</mat-option>
+                                    <mat-option value="regular" i18n>Non-bannis</mat-option>
+                                </mat-select>
+                            </mat-form-field>
+                        </td>
+                    }
+                    <td>
+                        <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                            <input matInput type="number" data-field="line-pa" [ngModel]="line.pa" [disabled]="!store.can_edit()"
+                                   (ngModelChange)="onLinePa(index, $event)">
+                        </mat-form-field>
+                    </td>
+                    <td>
+                        <button mat-icon-button type="button" data-action="remove-line" [disabled]="!store.can_edit()" (click)="removeLine(index)"
+                                i18n-matTooltip matTooltip="Supprimer la ligne">
+                            <mat-icon>delete</mat-icon>
+                        </button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <button mat-stroked-button type="button" data-action="add-line" [disabled]="!store.can_edit()" (click)="addLine()" i18n>Ajouter une ligne</button>
+
+    @if (store.evaluation(); as evaluation) {
+        @if (store.banned_pool_shown()) {
+            <h3 i18n>Budget par poche</h3>
+        } @else {
+            <h3 i18n>Budget</h3>
+        }
+        <table class="summary pool-summary">
+            <thead>
+            <tr>
+                @if (store.banned_pool_shown()) {
+                    <th i18n>Poche</th>
+                }
+                <th i18n>Citoyens</th>
+                <th i18n>Lignes ville</th>
+                <th i18n>Budget</th>
+                <th i18n>Coût du programme</th>
+                <th i18n>Reste</th>
+            </tr>
+            </thead>
+            <tbody>
+                @for (pool of store.visible_pools(); track pool) {
+                    @let budget = evaluation.budgets[pool];
+                    <tr [attr.data-pool]="pool">
+                        @if (store.banned_pool_shown()) {
+                            <td>
+                                @if (pool === 'regular') {
+                                    <ng-container i18n>Non-bannis</ng-container>
+                                } @else {
+                                    <ng-container i18n>Bannis</ng-container>
+                                }
+                            </td>
+                        }
+                        <td>{{ budget.citizenCapacity }}</td>
+                        <td>{{ budget.lines }}</td>
+                        <td>{{ budget.budget }}</td>
+                        <td>{{ budget.cost }}</td>
+                        <td class="remaining" [class.negative]="budget.remaining < 0">{{ budget.remaining }}</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+}

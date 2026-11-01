@@ -15,7 +15,7 @@
                             }
                             @default {
                                 <div class="band">
-                                    @for (action of daily_action_keys; track action.key) {
+                                    @for (action of daily_action_keys(); track action.key) {
                                         <mho-compact-toggle
                                             (valueChange)="saveDailyAction(row, action.key, $event, +column.id)"
                                             [disabled]="is_readonly()"

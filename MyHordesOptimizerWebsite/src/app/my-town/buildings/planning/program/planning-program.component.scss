@@ -1,0 +1,172 @@
+:host {
+    display: block;
+
+    .day-instructions mat-form-field {
+        width: 100%;
+    }
+
+    .pool {
+        margin: 1em 0 1.5em;
+    }
+
+    .pool-header {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.5em 1em;
+        margin-bottom: 0.5em;
+
+        h3 {
+            margin: 0;
+        }
+
+        .pool-actions {
+            display: inline-flex;
+            gap: 0.5em;
+            margin-left: auto;
+        }
+    }
+
+    .items {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25em;
+        min-height: 2.5em;
+    }
+
+    .item {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.4em 0.8em;
+        padding: 0.35em 0.5em;
+        border: 1px solid var(--mho-line);
+        border-radius: var(--mho-radius-s);
+        background: var(--mho-surface);
+
+        &.instruction {
+            font-style: italic;
+        }
+    }
+
+    .handle {
+        cursor: grab;
+        opacity: 0.6;
+    }
+
+    .building {
+        display: inline-flex;
+        flex: 1 1 12em;
+        align-items: center;
+        gap: 0.4em;
+        min-width: 0;
+    }
+
+    // Taille NON fixée : sprites pixel art.
+    .building-icon {
+        flex: 0 0 auto;
+    }
+
+    .name {
+        font-weight: 600;
+    }
+
+    .action {
+        display: inline-flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.4em;
+    }
+
+    .number {
+        width: 6.5em;
+    }
+
+    .link {
+        opacity: 0.6;
+    }
+
+    .cost {
+        font-weight: 600;
+        white-space: nowrap;
+    }
+
+    .result {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.2em;
+        white-space: nowrap;
+        opacity: 0.85;
+
+        &[data-done='true'] {
+            color: var(--mho-accent);
+            opacity: 1;
+        }
+    }
+
+    .rate {
+        font-size: 0.85em;
+        opacity: 0.7;
+        white-space: nowrap;
+    }
+
+    .issue {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.2em;
+        color: var(--mho-danger);
+        font-size: 0.85em;
+
+        mat-icon {
+            font-size: 1.1em;
+            width: 1.1em;
+            height: 1.1em;
+        }
+    }
+
+    .row-actions {
+        display: inline-flex;
+        margin-left: auto;
+    }
+
+    .note,
+    .instruction-text {
+        flex: 1 1 100%;
+    }
+
+    .instruction-text {
+        flex-basis: 20em;
+    }
+
+    .new-instruction {
+        width: 100%;
+        margin-top: 0.5em;
+    }
+
+    .badge-locked {
+        padding: 0 0.4em;
+        border: 1px solid currentColor;
+        border-radius: 4px;
+        font-size: 0.8em;
+        opacity: 0.8;
+    }
+
+    .free-threshold {
+        font-size: 0.8em;
+        opacity: 0.8;
+    }
+
+    .empty {
+        opacity: 0.7;
+    }
+
+    .label {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3em;
+    }
+
+    .cdk-drag-placeholder {
+        opacity: 0.3;
+    }
+}

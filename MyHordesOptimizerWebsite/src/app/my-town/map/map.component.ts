@@ -1,4 +1,5 @@
 import { BreakpointObserver } from '@angular/cdk/layout';
+import { CdkConnectedOverlay, CdkOverlayOrigin, ConnectedPosition } from '@angular/cdk/overlay';
 import { CommonModule } from '@angular/common';
 import {
     afterNextRender,
@@ -11,6 +12,7 @@ import {
     ElementRef,
     inject,
     Injector,
+    linkedSignal,
     NgZone,
     OnInit,
     Signal,
@@ -27,23 +29,25 @@ import { MatCardModule } from '@angular/material/card';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatOptionModule } from '@angular/material/core';
 import { MatDialog } from '@angular/material/dialog';
+import { MatDividerModule } from '@angular/material/divider';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
-import { MatListModule } from '@angular/material/list';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSidenav, MatSidenavModule } from '@angular/material/sidenav';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import moment from 'moment';
 
 import { environment } from '../../../environments/environment';
 import { BREAKPOINTS, HORDES_IMG_REPO } from '../../_abstract_model/const';
+import { MapThemeDTO } from '../../_abstract_model/dto/map-theme.dto';
 import { isHubConflictError } from '../../_abstract_model/realtime-services/realtime-expeditions.service';
 import { ApiService } from '../../_abstract_model/services/api.service';
 import { TownService } from '../../_abstract_model/services/town.service';
-import { Dictionary, Imports } from '../../_abstract_model/types/_types';
+import { Dictionary, Imports, ListForAddRemove } from '../../_abstract_model/types/_types';
+import { Cell } from '../../_abstract_model/types/cell.class';
 import { Citizen } from '../../_abstract_model/types/citizen.class';
 import { CitizenInfo } from '../../_abstract_model/types/citizen-info.class';
 import { Item } from '../../_abstract_model/types/item.class';
@@ -52,11 +56,26 @@ import { MapRouteGame } from '../../_abstract_model/types/map-route-game.class';
 import { Ruin } from '../../_abstract_model/types/ruin.class';
 import { Town } from '../../_abstract_model/types/town.class';
 import { ScrollAuraDirective } from '../../_core/directives/scroll-aura.directive';
+import { LocalizedLabelPipe } from '../../_core/pipes/localized-label.pipe';
+import { MapThemeStateService } from '../../_core/services/map-theme-state.service';
 import { SnackbarService } from '../../_core/services/snackbar.service';
 import { TownContextService } from '../../_core/services/town-context.service';
-import { getTown } from '../../_core/utilities/localstorage.util';
+import { getTown, getUserId } from '../../_core/utilities/localstorage.util';
 import { CompassRoseComponent } from '../../_shared/compass-rose/compass-rose.component';
 import { ConfirmDialogComponent, ConfirmDialogData } from '../../_shared/confirm-dialog/confirm-dialog.component';
+import { ListElementAddRemoveComponent } from '../../_shared/list-elements-add-remove/list-element-add-remove.component';
+import {
+    DISTANCE_BORDER_STYLES,
+    DISTANCE_COLORS,
+    DistanceBorderPipe,
+    DistanceBorderStyleOption,
+    DistanceColorOption,
+    distanceFormValue,
+    isCustomDistanceColor,
+    itemsWithUids,
+    ZoneItemCountPipe,
+    ZoneItemsPipe
+} from './distance-zones';
 import { DrawMapComponent, MapCellPick } from './draw-map/draw-map.component';
 import {
     CORNER_INFO_OPTIONS,
@@ -92,11 +111,11 @@ import {
 } from './map-routes/map-routes-display';
 import { MapRouteCommonColor, MapRoutePersonalColor, MapRoutesPanelComponent } from './map-routes-panel/map-routes-panel.component';
 
-const angular_common: Imports = [CommonModule, FormsModule];
-const components: Imports = [CompassRoseComponent, DrawMapComponent, MapRouteEditorComponent, MapRoutesPanelComponent];
+const angular_common: Imports = [CdkConnectedOverlay, CdkOverlayOrigin, CommonModule, FormsModule, RouterLink];
+const components: Imports = [CompassRoseComponent, DrawMapComponent, ListElementAddRemoveComponent, MapRouteEditorComponent, MapRoutesPanelComponent];
 const directives: Imports = [ScrollAuraDirective];
-const pipes: Imports = [];
-const material_modules: Imports = [MatButtonModule, MatButtonToggleModule, MatCardModule, MatCheckboxModule, MatFormFieldModule, MatIconModule, MatInputModule, MatListModule, MatMenuModule, MatOptionModule, MatSelectModule, MatSidenavModule, MatTooltipModule];
+const pipes: Imports = [DistanceBorderPipe, LocalizedLabelPipe, ZoneItemCountPipe, ZoneItemsPipe];
+const material_modules: Imports = [MatButtonModule, MatButtonToggleModule, MatCardModule, MatCheckboxModule, MatDividerModule, MatFormFieldModule, MatIconModule, MatInputModule, MatMenuModule, MatOptionModule, MatSelectModule, MatSidenavModule, MatTooltipModule];
 
 @Component({
     selector: 'mho-map',
@@ -143,10 +162,30 @@ export class MapComponent implements OnInit, AfterViewInit {
     protected readonly zoom_min: number = MapComponent.ZOOM_MIN;
     protected readonly zoom_max: number = MapComponent.ZOOM_MAX;
 
-    protected new_distance_option: Distance = {
-        value: 1,
-        unit: 'km'
-    };
+    protected new_distance_option: Distance = distanceFormValue();
+    /** Zone en cours de modification dans le formulaire, `null` pour un ajout. */
+    protected edited_distance: Distance | null = null;
+    /** La couleur du formulaire est-elle une couleur précise, plutôt qu'une couleur de la palette ? */
+    protected distance_color_is_custom: boolean = false;
+    /** Cases du compteur de zones : `map()` ne voit pas les enregistrements de case, que seule la grille conserve. */
+    protected readonly zone_cells: WritableSignal<Cell[] | undefined> = linkedSignal((): Cell[] | undefined => this.map()?.cells);
+    protected readonly CUSTOM_DISTANCE_COLOR: string = 'custom';
+    protected readonly distance_colors: readonly DistanceColorOption[] = DISTANCE_COLORS;
+    protected readonly distance_border_styles: readonly DistanceBorderStyleOption[] = DISTANCE_BORDER_STYLES;
+    /** Objets à compter du formulaire : en signal, pour que le menu d'ajout rapide suive pendant qu'il reste ouvert. */
+    protected readonly distance_item_uids: WritableSignal<string[]> = signal([]);
+    protected readonly distance_items: Signal<Item[]> = computed((): Item[] => itemsWithUids(this.distance_item_uids(), this.all_items()));
+    /** Zone dont le compteur est survolé : son tooltip affiche les objets comptés. */
+    protected readonly hovered_zone: WritableSignal<Distance | null> = signal(null);
+    protected readonly zone_tooltip_positions: ConnectedPosition[] = [
+        { originX: 'center', originY: 'top', overlayX: 'center', overlayY: 'bottom', offsetY: -4 },
+        { originX: 'center', originY: 'bottom', overlayX: 'center', overlayY: 'top', offsetY: 4 }
+    ];
+    /** Objets proposés par le menu d'ajout rapide : ceux qui ne sont pas encore sélectionnés. */
+    protected readonly distance_item_lists: Signal<ListForAddRemove[]> = computed((): ListForAddRemove[] => {
+        const uids: Set<string> = new Set<string>(this.distance_item_uids());
+        return [{ label: '', list: (this.all_items() ?? []).filter((item: Item): boolean => !uids.has(item.uid)) }];
+    });
 
     /** Signal : réassigné depuis onResize() (HostListener migré), lu par le propre template. */
     protected readonly is_gt_xs: WritableSignal<boolean> = signal(this.breakpoint_observer.isMatched(BREAKPOINTS['gt-xs']));
@@ -267,6 +306,17 @@ export class MapComponent implements OnInit, AfterViewInit {
     protected readonly route_order_counts: Signal<ReadonlyMap<number, RouteOrderCount>> = computed((): ReadonlyMap<number, RouteOrderCount> => {
         return routeOrderCounts(this.day_store.cell_orders());
     });
+
+    private readonly theme_state: MapThemeStateService = inject(MapThemeStateService);
+    /** Choix du sélecteur de thème : « Par défaut », puis les thèmes personnels. */
+    protected readonly theme_choices: Signal<readonly ThemeChoice[]> = computed((): readonly ThemeChoice[] => [
+        { value: null, label: $localize`Par défaut` },
+        ...this.theme_state.themes().map((theme: MapThemeDTO): ThemeChoice => ({ value: theme.id, label: theme.name }))
+    ]);
+    /** Valeur du sélecteur correspondant au thème actif. */
+    protected readonly theme_value: Signal<number | null> = computed((): number | null => this.theme_state.active().themeId);
+    /** Identifiant de l'utilisateur connecté, pour le lien vers la page des thèmes. */
+    protected readonly user_id: Signal<number | null> = computed((): number | null => getUserId());
 
     private readonly map_container: Signal<ElementRef<HTMLElement>> = viewChild.required('mapContainer', { read: ElementRef });
     /** Non requis : les tests remplacent mho-draw-map par une doublure, et la carte doit alors
@@ -515,41 +565,89 @@ export class MapComponent implements OnInit, AfterViewInit {
         this.draw_map()?.scrollToMyCell();
     }
 
-    protected addDistanceToList(): void {
+    /** Reporte une case enregistrée dans les cases du compteur de zones. */
+    protected onCellUpdated(updated: Cell): void {
+        this.zone_cells.update((cells: Cell[] | undefined): Cell[] | undefined => cells?.map((cell: Cell): Cell => {
+            return cell.x === updated.x && cell.y === updated.y ? updated : cell;
+        }));
+    }
 
-        this.new_distance_option.value = +this.new_distance_option.value;
+    /** Ouvre le formulaire de zone vierge. */
+    protected startAddingDistance(): void {
+        this.edited_distance = null;
+        this.new_distance_option = distanceFormValue();
+        this.distance_item_uids.set([]);
+        this.distance_color_is_custom = false;
+    }
+
+    /** Ouvre le formulaire de zone sur une copie de la zone : rien ne change avant validation. */
+    protected startEditingDistance(distance: Distance): void {
+        this.edited_distance = distance;
+        this.new_distance_option = distanceFormValue(distance);
+        this.distance_item_uids.set(distance.item_uids ?? []);
+        this.distance_color_is_custom = isCustomDistanceColor(this.new_distance_option.color);
+    }
+
+    /** Ajoute un objet aux objets à compter du formulaire. */
+    protected addDistanceItem(item_id: number): void {
+        const item: Item | undefined = this.all_items()?.find((candidate: Item): boolean => candidate.id === item_id);
+        if (item) {
+            this.distance_item_uids.update((uids: string[]): string[] => [...uids, item.uid]);
+        }
+    }
+
+    /** Retire un objet des objets à compter du formulaire. */
+    protected removeDistanceItem(item_id: number): void {
+        const item: Item | undefined = this.all_items()?.find((candidate: Item): boolean => candidate.id === item_id);
+        this.distance_item_uids.update((uids: string[]): string[] => uids.filter((uid: string): boolean => uid !== item?.uid));
+    }
+
+    /** Applique le choix de la liste des couleurs ; « Autre » part de la couleur courante si elle est précise. */
+    protected changeDistanceColor(choice: string): void {
+        this.distance_color_is_custom = choice === this.CUSTOM_DISTANCE_COLOR;
+        if (!this.distance_color_is_custom) {
+            this.new_distance_option.color = choice;
+        } else if (!this.new_distance_option.color?.startsWith('#')) {
+            this.new_distance_option.color = '#ffffff';
+        }
+    }
+
+    /** Ajoute la zone du formulaire, ou remplace celle en cours de modification. */
+    protected saveDistance(): void {
+        const saved: Distance = { ...this.new_distance_option, value: +this.new_distance_option.value, item_uids: this.distance_item_uids() };
         /** On nettoie les options impossibles */
-        if (this.new_distance_option.unit === 'km') {
-            this.new_distance_option.round_trip = undefined;
+        if (saved.unit === 'km') {
+            saved.round_trip = undefined;
         }
 
         const current_distances: Distance[] = [...this.options().distances];
+        const edited_index: number = this.edited_distance ? this.findDistanceIndex(current_distances, this.edited_distance) : -1;
+        const same_zone_index: number = this.findDistanceIndex(current_distances, saved);
 
-        const already_exists: boolean = [...current_distances].some((distance: Distance) => {
-            return distance.unit === this.new_distance_option.unit
-                && +distance.value === +this.new_distance_option.value
-                && distance.round_trip === this.new_distance_option.round_trip;
-        });
+        /** Si une autre zone a déjà cette distance, alors on ne change rien */
+        if (same_zone_index >= 0 && same_zone_index !== edited_index) return;
 
-        /** Si il existe une option absolument identique, alors on n'ajoute rien */
-        if (already_exists && current_distances.length > 0) return;
+        if (edited_index >= 0) {
+            current_distances[edited_index] = saved;
+        } else {
+            current_distances.push(saved);
+        }
 
-        /** Sinon, on ajoute à la liste */
-        current_distances.push({ ...this.new_distance_option });
-
-        this.changeOptions('distances', [...current_distances]);
+        this.changeOptions('distances', current_distances);
     }
 
+    /** Supprime la zone ouverte dans le formulaire de modification. */
+    protected removeEditedDistance(): void {
+        if (this.edited_distance) {
+            this.removeDistanceFromList(this.edited_distance);
+        }
+    }
 
     protected removeDistanceFromList(distance_to_remove: Distance): void {
 
         const current_distances: Distance[] = [...this.options().distances];
 
-        const index: number = current_distances.findIndex((distance: Distance) => {
-            return distance.unit === distance_to_remove.unit
-                && +distance.value === +distance_to_remove.value
-                && distance.round_trip === distance_to_remove.round_trip;
-        });
+        const index: number = this.findDistanceIndex(current_distances, distance_to_remove);
 
         /** Si il n'existe pas d'option absolument identique, alors on ne retire rien */
         if (index < 0) return;
@@ -560,6 +658,15 @@ export class MapComponent implements OnInit, AfterViewInit {
         this.changeOptions('distances', current_distances);
     }
 
+    /** Une zone est identifiée par sa distance : l'apparence et les objets peuvent changer. */
+    private findDistanceIndex(distances: Distance[], searched: Distance): number {
+        return distances.findIndex((distance: Distance): boolean => {
+            return distance.unit === searched.unit
+                && +distance.value === +searched.value
+                && distance.round_trip === searched.round_trip;
+        });
+    }
+
     /** Remplace l'objet d'options au lieu de le muter : `cell_options` compare les champs de
      *  l'ancienne et de la nouvelle valeur, une mutation sur place les rendrait identiques et
      *  les cases ne seraient jamais rafraîchies. */
@@ -567,6 +674,11 @@ export class MapComponent implements OnInit, AfterViewInit {
         const next: MapOptions = { ...this.options(), [key]: value };
         this.options.set(next);
         localStorage.setItem(MapComponent.STORAGE_KEY, JSON.stringify(next));
+    }
+
+    /** Active le choix du sélecteur : l'état et la persistance sont ceux du service, pas de MAP_OPTIONS. */
+    protected changeTheme(theme_id: number | null): void {
+        this.theme_state.setActive({ themeId: theme_id });
     }
 
     /** Change l'information d'un coin, pour le type de carte affiché seulement. */
@@ -813,6 +925,11 @@ interface ZoomAnchor {
     y: number;
 }
 
+interface ThemeChoice {
+    value: number | null;
+    label: string;
+}
+
 interface CornerField {
     position: CornerPosition;
     label: string;
@@ -838,8 +955,15 @@ export interface MapOptions {
     routes: MapRoutesDisplay;
 }
 
+export type DistanceBorderStyle = 'dashed' | 'dotted' | 'solid';
+
 export interface Distance {
     value: number;
     unit: 'km' | 'pa';
     round_trip?: boolean;
+    /** Couleur CSS de la bordure ; absente sur les zones enregistrées avant ce réglage. */
+    color?: string;
+    border_style?: DistanceBorderStyle;
+    /** Objets à compter : uid et non id, les ids du jeu pouvant changer entre deux imports. */
+    item_uids?: string[];
 }

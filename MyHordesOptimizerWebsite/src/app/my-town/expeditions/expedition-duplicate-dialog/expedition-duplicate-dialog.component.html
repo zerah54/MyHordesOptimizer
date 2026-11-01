@@ -1,0 +1,25 @@
+<h2 mat-dialog-title i18n>Dupliquer l'expédition</h2>
+<mat-dialog-content>
+    <p i18n>Les places, leurs conditions et leurs sacs sont dupliqués. Les inscrits et préinscrits ne le sont pas.</p>
+    @if (data.hasRoute) {
+        <p>
+            <mat-checkbox data-field="route" [checked]="keep_route()" (change)="keep_route.set($event.checked)" i18n>Dupliquer le tracé</mat-checkbox>
+        </p>
+        @if (keep_route()) {
+            <p>
+                <mat-checkbox data-field="route-orders" [checked]="keep_route_orders()" (change)="keep_route_orders.set($event.checked)" i18n>Dupliquer les
+                    consignes du tracé
+                </mat-checkbox>
+            </p>
+        }
+    }
+    <p>
+        <mat-checkbox data-field="general-orders" [checked]="keep_general_orders()" (change)="keep_general_orders.set($event.checked)" i18n>Dupliquer les
+            consignes générales
+        </mat-checkbox>
+    </p>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+    <button mat-button type="button" mat-dialog-close i18n>Annuler</button>
+    <button mat-flat-button type="button" data-action="confirm" (click)="confirm()" i18n>Dupliquer</button>
+</mat-dialog-actions>

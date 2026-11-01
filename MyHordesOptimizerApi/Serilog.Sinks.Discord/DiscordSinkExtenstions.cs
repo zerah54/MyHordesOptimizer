@@ -10,7 +10,7 @@ namespace Serilog.Sinks.Discord
               this LoggerSinkConfiguration loggerConfiguration,
               UInt64 webhookId,
               string webhookToken,
-              IFormatProvider formatProvider = null,
+              IFormatProvider? formatProvider = null,
               LogEventLevel restrictedToMinimumLevel = LogEventLevel.Verbose)
         {
             return loggerConfiguration.Sink(

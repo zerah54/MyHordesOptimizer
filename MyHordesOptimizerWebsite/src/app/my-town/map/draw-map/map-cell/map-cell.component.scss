@@ -9,7 +9,7 @@ $level-1: var(--mho-map-l1);
 $level-2: var(--mho-map-l2);
 $level-3: var(--mho-map-l3);
 
-/* Zone connue mais épuisée / jamais visitée. */
+/* Zone connue mais épuisée. */
 $empty-color: var(--mho-map-hatch);
 
 :host {
@@ -52,23 +52,6 @@ $empty-color: var(--mho-map-hatch);
         border-bottom-right-radius: 0;
     }
 
-    /* Anneaux de distance : tiretés, pour ne pas être confondus avec les filets du scrutateur. */
-    > .dist-border-left {
-        border-left: 2px dashed var(--mho-map-fg);
-    }
-
-    > .dist-border-right {
-        border-right: 2px dashed var(--mho-map-fg);
-    }
-
-    > .dist-border-top {
-        border-top: 2px dashed var(--mho-map-fg);
-    }
-
-    > .dist-border-bottom {
-        border-bottom: 2px dashed var(--mho-map-fg);
-    }
-
     /* Case où l'on se trouve en jeu : le vert de l'interface carte de MyHordes,
        doublé d'un liseré sombre pour rester visible sur les quatre couleurs de fond. */
     > .my-cell {
@@ -86,35 +69,33 @@ $empty-color: var(--mho-map-hatch);
 
     &:not(.town) {
 
-        &.alert {
+        /* Jamais visitée : couleur du fond de page, quel que soit le type de carte. */
+        &.never-visited {
+            background-color: var(--mho-bg);
+        }
 
-            &.never-visited {
-                background-color: var(--mho-map-unknown);
+        &.alert {
+            &.visited-today {
+                &.danger-0 {
+                    background-color: $level-3;
+                }
+
+                &.danger-1 {
+                    background-color: $level-2;
+                }
+
+                &.danger-2 {
+                    background-color: $level-1;
+                }
+
+                &.danger-3 {
+                    background-color: $level-0;
+                }
             }
 
-            &:not(.never-visited) {
-                &.visited-today {
-                    &.danger-0 {
-                        background-color: $level-3;
-                    }
-
-                    &.danger-1 {
-                        background-color: $level-2;
-                    }
-
-                    &.danger-2 {
-                        background-color: $level-1;
-                    }
-
-                    &.danger-3 {
-                        background-color: $level-0;
-                    }
-                }
-
-                /* Zone visitée un autre jour : l'information n'est plus fiable. */
-                &:not(.visited-today) {
-                    background-color: var(--mho-map-unknown);
-                }
+            /* Zone visitée un autre jour : l'information n'est plus fiable. */
+            &:not(.visited-today) {
+                background-color: var(--mho-map-unknown);
             }
         }
 
@@ -249,7 +230,7 @@ $empty-color: var(--mho-map-hatch);
                            l'a toujours été. */
                         &.bare {
                             position: static;
-                            color: inherit;
+                            color: var(--mho-map-bare-fg, inherit);
                             text-shadow: none;
                             font-size: inherit;
                         }
@@ -322,7 +303,7 @@ $empty-color: var(--mho-map-hatch);
         height: 100%;
         z-index: 0;
 
-        /* Zone asséchée : hachures fines. Les quatre dégradés à préfixes navigateur
+        /* Zone épuisée : hachures fines. Les quatre dégradés à préfixes navigateur
            (-moz-, -webkit-, -o-) datent de 2012 et ne servent plus aucun navigateur
            actuel ; une seule trame rayée suffit et suit le jeton de thème. */
         background-image: repeating-linear-gradient(

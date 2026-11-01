@@ -33,7 +33,7 @@ namespace MyHordesOptimizerApiIntegrationTests.Fakes
         public Task<Dictionary<string, MyHordesApiBuildingDto>> GetBuildingAsync() => Task.FromResult(new Dictionary<string, MyHordesApiBuildingDto>());
         public List<int> GetTownList(int? season = null) => new();
         public List<MyHordesTownDetailsDto> GetTownDetails(List<int> ids) => new();
-        public MyHordesMap GetMapDetails(int mapId) => null;
+        public MyHordesMap GetMapDetails(int mapId) => null!;
 
         private MyHordesUserDetailsDto Build() => new()
         {

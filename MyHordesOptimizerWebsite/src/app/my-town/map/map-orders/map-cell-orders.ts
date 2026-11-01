@@ -4,7 +4,15 @@ import { Expedition } from '../../../_abstract_model/types/expedition.class';
 import { ExpeditionPart } from '../../../_abstract_model/types/expedition-part.class';
 import { Item } from '../../../_abstract_model/types/item.class';
 import { mapRouteColorVar, MapRoutePoint } from '../../../_abstract_model/types/map-route.class';
-import { cellKey, cellOrdersOf, OwnedExpeditionOrder } from '../../expeditions/expedition-orders/expedition-orders.util';
+import {
+    cellKey,
+    cellOrdersOf,
+    OwnedExpeditionOrder,
+    passageLabel,
+    resolvedPassage,
+    resolvedRouteIndex,
+    routeIndexesOf
+} from '../../expeditions/expedition-orders/expedition-orders.util';
 import { describeOrder, memberLabel, partLabel } from '../../expeditions/expedition-orders/order-labels';
 
 /** Consigne par case d'une expédition du jour, avec sa partie et son expédition. */
@@ -18,12 +26,29 @@ export interface CellOrderEntry extends OwnedExpeditionOrder {
 /** Consignes par case (« x,y », coordonnées absolues), dans l'ordre des expéditions, des parties puis des listes. */
 export type CellOrderIndex = ReadonlyMap<string, readonly CellOrderEntry[]>;
 
+/** Consignes par case d'une partie ; avec un tracé, rangées dans l'ordre du tracé (stable), celles hors tracé en dernier. */
+function sortedByRoute(part: ExpeditionPart): OwnedExpeditionOrder[] {
+    const owned: OwnedExpeditionOrder[] = cellOrdersOf(part);
+    const route: readonly MapRoutePoint[] | undefined = part.map_route?.cells;
+    if (!route || route.length === 0) return owned;
+    const rank: (entry: OwnedExpeditionOrder) => number = (entry: OwnedExpeditionOrder): number => resolvedRouteIndex(entry.order, route) ?? Infinity;
+    return owned.sort((a: OwnedExpeditionOrder, b: OwnedExpeditionOrder): number => rank(a) - rank(b));
+}
+
+/** « 1er passage », « 2e passage » quand le tracé de la partie traverse plusieurs fois la case de la consigne ; sinon `null`. */
+function passageLabelOf(entry: CellOrderEntry): string | null {
+    const route: readonly MapRoutePoint[] | undefined = entry.part.map_route?.cells;
+    if (!route || routeIndexesOf(route, { x: <number>entry.order.x, y: <number>entry.order.y }).length < 2) return null;
+    const passage: number | null = resolvedPassage(entry.order, route);
+    return passage === null ? null : passageLabel(passage);
+}
+
 export function buildCellOrderIndex(expeditions: readonly Expedition[]): CellOrderIndex {
     const index: Map<string, CellOrderEntry[]> = new Map<string, CellOrderEntry[]>();
     const sorted: Expedition[] = [...expeditions].sort((a: Expedition, b: Expedition): number => a.position - b.position);
     for (const expedition of sorted) {
         for (const part of expedition.parts) {
-            cellOrdersOf(part).forEach((owned: OwnedExpeditionOrder, rank: number): void => {
+            sortedByRoute(part).forEach((owned: OwnedExpeditionOrder, rank: number): void => {
                 const key: string = cellKey({ x: <number>owned.order.x, y: <number>owned.order.y });
                 const owner_key: string = owned.owner.kind === 'part' ? `p${part.id}` : `c${owned.owner.citizen.id}`;
                 const entry: CellOrderEntry = { ...owned, key: `${owner_key}-${owned.order.id ?? `new${rank}`}`, expedition, part };
@@ -79,6 +104,8 @@ export interface CellOrderLine {
     readonly entry: CellOrderEntry;
     /** « Moi » pour une consigne personnelle ; rien pour une consigne de toute la partie. */
     readonly scope: string | null;
+    /** « 1er passage »… quand le tracé traverse plusieurs fois la case ; sinon `null`. */
+    readonly passage_label: string | null;
 }
 
 /** Partie de l'utilisateur qui a des consignes sur la case, et celles qui s'adressent à lui. */
@@ -101,6 +128,7 @@ export interface CellOrderOther {
     readonly short: string;
     readonly color: string | null;
     readonly text: string;
+    readonly passage_label: string | null;
 }
 
 export interface CellOrdersView {
@@ -143,7 +171,7 @@ export function buildCellOrdersView(entries: readonly CellOrderEntry[], context:
                 target = { group: { key: `p${entry.part.id}`, part: entry.part, label: partLabel(entry.expedition, entry.part, true), color, lines }, lines };
                 groups.set(entry.part, target);
             }
-            target.lines.push({ key: entry.key, entry, scope: personal ? $localize`Moi` : null });
+            target.lines.push({ key: entry.key, entry, scope: personal ? $localize`Moi` : null, passage_label: passageLabelOf(entry) });
             continue;
         }
         const member_name: string | null = personal ? memberLabel(personal, entry.part.citizens.indexOf(personal), context.citizens) : null;
@@ -157,6 +185,7 @@ export function buildCellOrdersView(entries: readonly CellOrderEntry[], context:
             who,
             short: in_part && member_name ? member_name : expedition_name,
             color,
+            passage_label: passageLabelOf(entry),
             text: describeOrder(entry.order, context.items, context.citizens, context.locale, context.expeditions).text
         });
     }

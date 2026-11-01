@@ -8,10 +8,10 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.HeroicActio
     public class ActionHeroicDto
     {
         [JsonProperty("label")]
-        public string Label { get; set; }
+        public string Label { get; set; } = null!;
 
         [JsonProperty("locale")]
-        public string Locale { get; set; }
+        public string Locale { get; set; } = null!;
 
         [JsonProperty("value")]
         public int Value { get; set; }
@@ -101,13 +101,13 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.HeroicActio
         public static bool IsEquivalentToLabel(this ActionHeroicType actionValue, string local, string label)
         {
             var type = typeof(ActionHeroicType);
-            string name = Enum.GetName(type, actionValue);
+            string? name = Enum.GetName(type, actionValue);
             if (name != null)
             {
-                FieldInfo field = type.GetField(name);
+                FieldInfo? field = type.GetField(name);
                 if (field != null)
                 {
-                    Type attrType = null;
+                    Type? attrType = null;
                     switch (local)
                     {
                         case "fr":
@@ -123,7 +123,7 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.HeroicActio
                             attrType = typeof(DeAttribute);
                             break;                     }
                     // Un même membre peut porter plusieurs libellés pour une locale (ex : les 4 niveaux de trouvaille)
-                    return Attribute.GetCustomAttributes(field, attrType)
+                    return Attribute.GetCustomAttributes(field, attrType!)
                         .Cast<LocaleAttribute>()
                         .Any(attr => attr.Name == label);
                 }

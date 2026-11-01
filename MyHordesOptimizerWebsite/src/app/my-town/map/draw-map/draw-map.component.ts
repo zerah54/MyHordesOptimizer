@@ -114,6 +114,8 @@ export class DrawMapComponent {
     public editedCells: InputSignal<ReadonlySet<string>> = input<ReadonlySet<string>>(new Set<string>());
     /** Mode tracé : clic droit ou appui long sur une case du tracé saisi. */
     public cellCut: OutputEmitterRef<MapRoutePoint> = output();
+    /** Case enregistrée depuis l'éditeur de zone. */
+    public cellUpdated: OutputEmitterRef<Cell> = output();
 
     // Signaux (pas de simples champs) : lus par le template sous OnPush, un `effect()` qui les
     // muterait comme de simples champs ne marquerait pas la vue pour vérification.
@@ -317,6 +319,7 @@ export class DrawMapComponent {
                 if (!new_cell) return;
                 this.drawed_map()[selected.row][selected.column] = new_cell;
                 this.selected.set({ ...selected, cell: new_cell });
+                this.cellUpdated.emit(new_cell);
             });
     }
 

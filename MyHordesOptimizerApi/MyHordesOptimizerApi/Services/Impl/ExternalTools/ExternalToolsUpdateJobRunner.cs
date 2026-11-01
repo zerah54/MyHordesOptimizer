@@ -45,8 +45,8 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
         /// lui, la détection de dérive de ville du scope de fond compare toujours à null et réémet un
         /// token à chaque appel au lieu de seulement en cas de dérive réelle (voir I2).
         /// </summary>
-        public ExternalToolsUpdateJobState TryStart(int userId, string userKey, string userName, SimpleMeTownDetailDto townDetail,
-            UpdateRequestDto request, string mhoOrigin, string mhoAddonVersion, string correlationId)
+        public ExternalToolsUpdateJobState TryStart(int userId, string userKey, string? userName, SimpleMeTownDetailDto? townDetail,
+            UpdateRequestDto request, string? mhoOrigin, string? mhoAddonVersion, string correlationId)
         {
             var progress = _store.Reserve(userId);
 
@@ -75,11 +75,11 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
         private async Task RunAsync(ExternalToolsUpdateProgress progress,
             int userId,
             string userKey,
-            string userName,
-            SimpleMeTownDetailDto townDetail,
+            string? userName,
+            SimpleMeTownDetailDto? townDetail,
             UpdateRequestDto request,
-            string mhoOrigin,
-            string mhoAddonVersion,
+            string? mhoOrigin,
+            string? mhoAddonVersion,
             string correlationId)
         {
             using var _1 = LogContext.PushProperty("MhoOrigin", mhoOrigin);

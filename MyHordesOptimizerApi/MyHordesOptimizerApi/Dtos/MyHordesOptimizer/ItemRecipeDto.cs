@@ -5,8 +5,8 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer
 {
     public class ItemRecipeDto
     {
-        public string Name { get; set; }
-        public string Type { get; set; }
+        public string Name { get; set; } = null!;
+        public string Type { get; set; } = null!;
         public List<ItemResultDto> Result { get; set; }
         public List<ItemComponentRecipeDto> Components { get; set; }
         public IDictionary<string, string> Actions { get; set; }

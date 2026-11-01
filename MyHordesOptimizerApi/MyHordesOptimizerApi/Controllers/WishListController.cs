@@ -75,7 +75,7 @@ namespace MyHordesOptimizerApi.Controllers
         {
             var categories = _cache.GetOrCreate(ReferentialCacheKeys.WishListCategories,
                 _ => _wishListService.GetWishListCategories());
-            return categories;
+            return categories!;
         }
 
         [HttpGet]
@@ -84,7 +84,7 @@ namespace MyHordesOptimizerApi.Controllers
         {
             var templates = _cache.GetOrCreate(ReferentialCacheKeys.WishListTemplates,
                 _ => _wishListService.GetWishListTemplates());
-            return templates;
+            return templates!;
         }
 
         [HttpPost]

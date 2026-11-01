@@ -131,3 +131,10 @@ a {
     align-items: flex-start;
     padding: 0 13px;
 }
+
+// Tiroir latéral de la page Chantiers (MatDialog ancré à droite, voir buildings.component.ts, openDrawer()) :
+// global car le panneau du dialog est attaché sous <body>. Angles droits, toute la hauteur.
+.mho-side-sheet {
+    --mat-dialog-container-shape: 0;
+    --mat-dialog-container-max-width: 100vw;
+}

@@ -48,16 +48,11 @@
                 justify-content: space-between;
             }
 
-            .previous-next {
-                .mho-header-with-filter {
-                    display: flex;
-                    gap: 0.5em;
-                    white-space: nowrap;
-
-                    > div {
-                        flex-wrap: nowrap;
-                    }
-                }
+            .day-header {
+                display: flex;
+                align-items: center;
+                gap: 0.5em;
+                white-space: nowrap;
             }
 
         }

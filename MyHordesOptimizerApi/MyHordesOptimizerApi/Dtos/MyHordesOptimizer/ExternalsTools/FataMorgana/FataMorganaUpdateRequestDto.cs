@@ -10,11 +10,11 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.FataMorgana
     {
         [JsonProperty("accessKey")]
         [JsonPropertyName("accessKey")]
-        public string AccessKey { get; set; }
+        public string AccessKey { get; set; } = null!;
 
         [JsonProperty("userKey")]
         [JsonPropertyName("userKey")]
-        public string UserKey { get; set; }
+        public string UserKey { get; set; } = null!;
 
         [JsonProperty("mapId")]
         [JsonPropertyName("mapId")]

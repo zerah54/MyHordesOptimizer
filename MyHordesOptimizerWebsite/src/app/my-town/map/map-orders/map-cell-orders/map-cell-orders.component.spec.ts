@@ -75,7 +75,29 @@ describe('MapCellOrdersComponent', (): void => {
         fixture.detectChanges();
     }
 
+    /** Une partie de l'utilisateur dont le tracé traverse (3, 4) deux fois : une consigne au 1er passage, deux au 2e. */
+    function setRepeatedPassages(): void {
+        const route: ExpeditionPartRoute = { ...NORTH, cells: [{ x: 3, y: 3 }, { x: 3, y: 4 }, { x: 3, y: 5 }, { x: 3, y: 4 }], length: 3 };
+        const orders: ExpeditionOrder[] = [
+            Object.assign(order(1, 'Aller'), { passage: 1 }),
+            Object.assign(order(2, 'Retour'), { passage: 2 }),
+            Object.assign(order(3, 'Retour bis'), { passage: 2 })
+        ];
+        const mine: ExpeditionPart = part(10, orders, [Object.assign(new CitizenExpedition(), { id: 20, citizen_id: ME, orders: [] })], route);
+        store.set([Object.assign(new Expedition(), { id: 1, label: 'Expé 1', position: 0, parts: [mine] })]);
+    }
+
     describe('in the tooltip', (): void => {
+        it('groups the orders under one label per passage', (): void => {
+            setRepeatedPassages();
+
+            render({ cell: { x: 3, y: 4 } });
+
+            const root: HTMLElement = fixture.nativeElement;
+            expect(Array.from(root.querySelectorAll('.passage')).map(text)).toEqual(['1er passage', '2e passage']);
+            expect(root.querySelectorAll('mho-expedition-order').length).toBe(3);
+        });
+
         it('shows the orders addressed to the user, then sums up the others', (): void => {
             render({ cell: { x: 3, y: 4 } });
 
@@ -105,6 +127,17 @@ describe('MapCellOrdersComponent', (): void => {
     });
 
     describe('in the zone detail', (): void => {
+        it('groups the orders under one label per passage, above their lines', (): void => {
+            setRepeatedPassages();
+
+            render({ cell: { x: 3, y: 4 }, mode: 'detail' });
+
+            const root: HTMLElement = fixture.nativeElement;
+            expect(Array.from(root.querySelectorAll('.group .passage')).map(text)).toEqual(['1er passage', '2e passage']);
+            expect(root.querySelectorAll('.line .passage').length).toBe(0);
+            expect(root.querySelectorAll('.line').length).toBe(3);
+        });
+
         it('lists the orders of the user, checkable, and the others with who carries them', (): void => {
             render({ cell: { x: 3, y: 4 }, mode: 'detail', editable: true });
 

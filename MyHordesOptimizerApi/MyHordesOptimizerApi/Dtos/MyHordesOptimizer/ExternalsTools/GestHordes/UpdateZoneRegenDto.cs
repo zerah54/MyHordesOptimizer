@@ -7,7 +7,7 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.GestHordes
     public class UpdateZoneRegenDto
     {
         [JsonProperty("direction")]
-        public string Direction { get; set; }
+        public string Direction { get; set; } = null!;
 
         [JsonProperty("idMap")]
         public int IdMap { get; set; }
@@ -25,11 +25,11 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.GestHordes
         public int TownY { get; set; }
 
         [JsonProperty("PHPSESSID")]
-        public string PHPSESSID { get; set; }
+        public string PHPSESSID { get; set; } = null!;
 
         [JsonProperty("cells")]
-        public List<JsonElement> Cells { get; set; }
+        public List<JsonElement> Cells { get; set; } = null!;
 
-        public List<dynamic> DynamicsCells { get; set; }
+        public List<dynamic> DynamicsCells { get; set; } = null!;
     }
 }

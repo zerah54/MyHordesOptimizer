@@ -1,0 +1,126 @@
+@use '@angular/material' as mat;
+
+// Une seule ligne avec la défense et son formulaire, qui ne passe à la ligne que faute de place.
+:host(.flat) {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.25em 1.5em;
+
+    .defense-fields {
+        gap: 0.5em;
+        margin-top: 0;
+
+        mat-form-field {
+            width: 12rem;
+
+            @include mat.form-field-overrides((
+                container-height: 32px,
+                container-vertical-padding: 4px,
+            ));
+        }
+    }
+}
+
+:host {
+    display: block;
+
+    .kpis {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+        gap: 0.5em;
+    }
+
+    .kpi {
+        display: flex;
+        flex-direction: column;
+        gap: 0.15em;
+        min-width: 0;
+        padding: 0.4em 0.6em;
+        border: 1px solid var(--mho-line-strong);
+        border-radius: var(--mho-radius-m);
+        background: var(--mho-surface);
+        color: inherit;
+        font: inherit;
+        text-align: left;
+    }
+
+    button.kpi {
+        cursor: pointer;
+
+        &:disabled {
+            cursor: default;
+        }
+    }
+
+    .title {
+        font-size: 0.8em;
+        text-transform: uppercase;
+        opacity: 0.75;
+    }
+
+    .value {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25em;
+        font-size: 1.15em;
+
+        &.list {
+            display: block;
+            overflow: hidden;
+            font-size: 0.95em;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+    }
+
+    .sub {
+        display: inline-flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.25em;
+        font-size: 0.85em;
+        opacity: 0.8;
+    }
+
+    .edit {
+        --mat-icon-button-state-layer-size: 28px;
+        --mat-icon-button-icon-size: 18px;
+    }
+
+    .defense[data-state='gap'] .gap,
+    .negative,
+    .missing.ko .value {
+        color: var(--mho-danger);
+        font-weight: 600;
+    }
+
+    .alerts.warn {
+        border-color: var(--mho-accent);
+    }
+
+    // Du texte posé sur le fond : seules les cartes de la page se cliquent.
+    .kpis.flat {
+        display: flex;
+
+        .kpi {
+            flex-flow: row wrap;
+            align-items: center;
+            gap: 0.25em 0.75em;
+            padding: 0;
+            border: 0;
+            background: none;
+        }
+
+        .value {
+            font-size: 1.35em;
+        }
+    }
+
+    .defense-fields {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1em;
+        margin-top: 0.5em;
+    }
+}

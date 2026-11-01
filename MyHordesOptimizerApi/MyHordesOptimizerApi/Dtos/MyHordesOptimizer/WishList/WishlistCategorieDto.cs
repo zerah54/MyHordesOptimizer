@@ -6,7 +6,7 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.WishList
     {
         public int IdCategory { get; set; }
         public int? IdUserAuthor { get; set; }
-        public string Name { get; set; }
+        public string Name { get; set; } = null!;
         public Dictionary<string, string> Labels {get;set;}
         public List<int> Items { get; set; }
 

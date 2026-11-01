@@ -21,9 +21,9 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer
         public bool UseDefaultOffsets { get; set; }
 
         [JsonProperty("offsetsMin")]
-        public List<int> OffsetsMin { get; set; }
+        public List<int> OffsetsMin { get; set; } = null!;
 
         [JsonProperty("offsetsMax")]
-        public List<int> OffsetsMax { get; set; }
+        public List<int> OffsetsMax { get; set; } = null!;
     }
 }

@@ -12,7 +12,7 @@ namespace MyHordesOptimizerApi.Data.Camping
         public bool Strict { get; set; }
 
         [JsonProperty("label")]
-        public IDictionary<string, string> Label { get; set; }
+        public IDictionary<string, string> Label { get; set; } = null!;
 
     }
 }

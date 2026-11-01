@@ -1,10 +1,14 @@
-import { HttpRequest, provideHttpClient, withXhr } from '@angular/common/http';
+import { HttpErrorResponse, HttpRequest, provideHttpClient, withInterceptors, withXhr } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting, TestRequest } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
+import type { Mock } from 'vitest';
 
+import { errorInterceptor } from '../../_core/services/errors-interceptor.service';
+import { SnackbarService } from '../../_core/services/snackbar.service';
 import { setObservedTown, setTown } from '../../_core/utilities/localstorage.util';
 import { RefinementInputDTO } from '../dto/refinement.dto';
 import { TownDetails } from '../types/town-details.class';
+import { AuthenticationService } from './authentication.service';
 import { TownStatisticsService } from './town-statistics.service';
 
 describe('TownStatisticsService', (): void => {
@@ -54,5 +58,35 @@ describe('TownStatisticsService', (): void => {
 
         const request: TestRequest = http_mock.expectOne((candidate: HttpRequest<unknown>): boolean => candidate.url.includes('/AttaqueEstimation/Refinement/17?townId=123'));
         expect(request.request.method).toBe('GET');
+    });
+
+    it('hands the refinement calls the HttpErrorResponse without a snackbar, through the real interceptor', (): void => {
+        const snackbar: { errorSnackbar: Mock } = { errorSnackbar: vi.fn() };
+        TestBed.resetTestingModule();
+        TestBed.configureTestingModule({
+            providers: [
+                provideHttpClient(withXhr(), withInterceptors([errorInterceptor])),
+                provideHttpClientTesting(),
+                { provide: AuthenticationService, useValue: {} },
+                { provide: SnackbarService, useValue: snackbar }
+            ]
+        });
+        service = TestBed.inject(TownStatisticsService);
+        http_mock = TestBed.inject(HttpTestingController);
+        const statuses: number[] = [];
+        const onError = (error: HttpErrorResponse): void => {
+            statuses.push(error.status);
+        };
+        const input: RefinementInputDTO = { observed: [], observedPlanif: null, params: {} as RefinementInputDTO['params'] };
+
+        service.getRefinementInput(16).subscribe({ error: onError });
+        http_mock.expectOne((candidate: HttpRequest<unknown>): boolean => candidate.url.includes('/Refinement/16/input')).flush('vide', { status: 400, statusText: 'Bad Request' });
+        for (const status of [409, 429]) {
+            service.postRefinement(16, input, []).subscribe({ error: onError });
+            http_mock.expectOne((candidate: HttpRequest<unknown>): boolean => candidate.method === 'POST').flush('refus', { status, statusText: 'Refus' });
+        }
+
+        expect(statuses).toEqual([400, 409, 429]);
+        expect(snackbar.errorSnackbar).not.toHaveBeenCalled();
     });
 });

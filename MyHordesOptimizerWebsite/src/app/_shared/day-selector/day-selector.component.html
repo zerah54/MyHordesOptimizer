@@ -1,0 +1,31 @@
+<div class="day-selector">
+    <button mat-icon-button type="button" data-action="previous-day" [disabled]="previous_day() === null" (click)="select(previous_day())"
+            i18n-matTooltip matTooltip="Jour précédent" i18n-aria-label aria-label="Jour précédent">
+        <mat-icon>chevron_left</mat-icon>
+    </button>
+    <button mat-button type="button" class="day" data-action="pick-day" [matMenuTriggerFor]="days_menu" [disabled]="days().length <= 1">
+        <ng-container i18n>J</ng-container>
+        {{ value() }}
+        @if (value() === today()) {
+            <span class="today" i18n>aujourd'hui</span>
+        }
+    </button>
+    <button mat-icon-button type="button" data-action="next-day" [disabled]="next_day() === null" (click)="select(next_day())"
+            i18n-matTooltip matTooltip="Jour suivant" i18n-aria-label aria-label="Jour suivant">
+        <mat-icon>chevron_right</mat-icon>
+    </button>
+</div>
+
+<mat-menu #days_menu="matMenu">
+    <ng-template matMenuContent>
+        @for (day of days(); track day) {
+            <button mat-menu-item type="button" data-action="select-day" [class.selected]="day === value()" (click)="select(day)">
+                <ng-container i18n>J</ng-container>
+                {{ day }}
+                @if (day === today()) {
+                    <span class="today" i18n>aujourd'hui</span>
+                }
+            </button>
+        }
+    </ng-template>
+</mat-menu>

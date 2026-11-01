@@ -17,7 +17,13 @@ import { MapRoutePoint } from '../../../_abstract_model/types/map-route.class';
 import { SelectComponent } from '../../../_shared/select/select.component';
 import { TiptapEditorComponent } from '../../../_shared/tiptap-editor/tiptap-editor.component';
 import {
-    cellKey, cloneOrder, EXPEDITION_ORDER_KIND_INFO, EXPEDITION_ORDER_MAX_NOTE_LENGTH, EXPEDITION_ORDER_MAX_QUANTITY, isConsumable
+    cellKey,
+    cloneOrder,
+    EXPEDITION_ORDER_KIND_INFO,
+    EXPEDITION_ORDER_MAX_NOTE_LENGTH,
+    EXPEDITION_ORDER_MAX_QUANTITY,
+    isConsumable,
+    passageLabel
 } from '../expedition-orders/expedition-orders.util';
 
 const angular_common: Imports = [FormsModule];
@@ -32,7 +38,9 @@ export type ExpeditionOrderFormKind = ExpeditionOrderKind | 'text';
 /** Case proposée pour déplacer une consigne. */
 export interface ExpeditionOrderFormCell {
     readonly cell: MapRoutePoint;
-    /** « [x ; y] · lieu · n PA ». */
+    /** Passage sur la case ; `null` si le tracé ne la traverse qu'une fois. */
+    readonly passage: number | null;
+    /** « [x ; y] · lieu · passage · n PA ». */
     readonly label: string;
 }
 
@@ -68,6 +76,8 @@ export interface ExpeditionOrderFormData {
     readonly can_excavate: boolean;
     /** Cases où déplacer la consigne (celles du tracé) ; vide : la case ne change pas. */
     readonly move_targets: readonly ExpeditionOrderFormCell[];
+    /** Passage de la consigne, ou présélectionné en ajout, si la case est traversée plusieurs fois ; `null` sinon. */
+    readonly passage: number | null;
     readonly members: readonly ExpeditionOrderFormMember[];
     readonly items: readonly Item[];
     /** Autres expéditions du jour, à attendre. */
@@ -85,6 +95,11 @@ export type ExpeditionOrderFormResult =
 interface CellOption {
     readonly key: string;
     readonly label: string;
+}
+
+/** Clé d'une option : la case et son passage. */
+function optionKey(cell: MapRoutePoint, passage: number | null): string {
+    return `${cellKey(cell)}#${passage ?? ''}`;
 }
 
 interface KindOption {
@@ -123,6 +138,8 @@ export class ExpeditionOrderFormComponent {
     /** Case actuelle de la consigne, puis les cases du tracé où la déplacer. */
     protected readonly original_cell_key: string;
     protected readonly move_options: readonly CellOption[];
+    /** Libellé de l'option désactivée de la case actuelle (modification). */
+    protected readonly original_label: string;
 
     protected readonly kind: WritableSignal<ExpeditionOrderFormKind>;
     protected readonly type: WritableSignal<ExpeditionOrderType>;
@@ -179,8 +196,9 @@ export class ExpeditionOrderFormComponent {
         this.all_items = [...this.data.items];
         this.consumables = this.all_items.filter(isConsumable);
         this.wait_targets = this.data.members.filter((member: ExpeditionOrderFormMember): boolean => member.user_id !== null);
-        this.original_cell_key = cellKey(this.data.cell);
-        this.move_options = this.data.move_targets.map((target: ExpeditionOrderFormCell): CellOption => ({ key: cellKey(target.cell), label: target.label }));
+        this.original_cell_key = optionKey(this.data.cell, this.data.passage);
+        this.original_label = this.data.passage === null ? this.data.cell_label : `${this.data.cell_label} · ${passageLabel(this.data.passage)}`;
+        this.move_options = this.data.move_targets.map((target: ExpeditionOrderFormCell): CellOption => ({ key: optionKey(target.cell, target.passage), label: target.label }));
 
         this.kind = signal(order?.kind ?? 'text');
         this.type = signal(order && !order.kind ? order.type : 'checkbox');
@@ -241,13 +259,15 @@ export class ExpeditionOrderFormComponent {
         if (!this.valid()) return;
         const kind: ExpeditionOrderFormKind = this.kind();
         const order: ExpeditionOrder = this.data.order ? cloneOrder(this.data.order) : new ExpeditionOrder();
-        const cell: MapRoutePoint = this.selectedCell();
+        const target: ExpeditionOrderFormCell | undefined = this.selectedTarget();
+        const cell: MapRoutePoint = target?.cell ?? this.data.cell;
         order.type = kind === 'text' ? this.type() : 'checkbox';
         order.text = kind === 'text' ? this.text() : '';
         order.is_done = this.data.order?.is_done ?? false;
         order.position = this.data.order?.position ?? 0;
         order.x = cell.x;
         order.y = cell.y;
+        order.passage = target ? target.passage : this.data.passage ?? this.data.order?.passage ?? null;
         order.kind = kind === 'text' ? null : kind;
         order.item_id = this.needs_item() ? this.item_id() : null;
         order.quantity = this.needs_quantity() ? this.quantity() : null;
@@ -270,8 +290,8 @@ export class ExpeditionOrderFormComponent {
             this.data.members.some((member: ExpeditionOrderFormMember): boolean => member.id === owner_id && member.is_scavenger));
     }
 
-    private selectedCell(): MapRoutePoint {
+    private selectedTarget(): ExpeditionOrderFormCell | undefined {
         const key: string = this.cell_key();
-        return this.data.move_targets.find((target: ExpeditionOrderFormCell): boolean => cellKey(target.cell) === key)?.cell ?? this.data.cell;
+        return this.data.move_targets.find((target: ExpeditionOrderFormCell): boolean => optionKey(target.cell, target.passage) === key);
     }
 }

@@ -33,25 +33,25 @@ namespace MyHordesOptimizerApi.MappingProfiles
                 .ForMember(dest => dest.Avatar, opt => opt.MapFrom(src => src.Avatar));
 
             CreateMap<MyHordesUserDetailsDto, SimpleMeTownDetailDto>()
-                .ForMember(dest => dest.TownId, opt => { opt.MapFrom(src => src.Map.Id); opt.Condition(src => src.Map != null); })
-                .ForMember(dest => dest.TownName, opt => { opt.MapFrom(src => src.Map.City.Name); opt.Condition(src => src.Map != null && src.Map.City != null); })
-                .ForMember(dest => dest.TownX, opt => { opt.MapFrom(src => src.Map.City.X); opt.Condition(src => src.Map != null && src.Map.City != null); })
-                .ForMember(dest => dest.TownY, opt => { opt.MapFrom(src => src.Map.City.Y); opt.Condition(src => src.Map != null && src.Map.City != null); })
-                .ForMember(dest => dest.TownMaxX, opt => { opt.MapFrom(src => src.Map.Wid); opt.Condition(src => src.Map != null); })
-                .ForMember(dest => dest.TownMaxY, opt => { opt.MapFrom(src => src.Map.Hei); opt.Condition(src => src.Map != null); })
-                .ForMember(dest => dest.IsChaos, opt => { opt.MapFrom(src => src.Map.City.Chaos); opt.Condition(src => src.Map != null && src.Map.City != null); })
-                .ForMember(dest => dest.IsDevaste, opt => { opt.MapFrom(src => src.Map.City.Devast); opt.Condition(src => src.Map != null && src.Map.City != null); })
-                .ForMember(dest => dest.TownType, opt => { opt.MapFrom(src => src.Map.GetTownType()); })
-                .ForMember(dest => dest.Day, opt => { opt.MapFrom(src => src.Map.Days); })
+                .ForMember(dest => dest.TownId, opt => { opt.MapFrom(src => src.Map!.Id); opt.Condition(src => src.Map != null); })
+                .ForMember(dest => dest.TownName, opt => { opt.MapFrom(src => src.Map!.City!.Name); opt.Condition(src => src.Map != null && src.Map.City != null); })
+                .ForMember(dest => dest.TownX, opt => { opt.MapFrom(src => src.Map!.City!.X); opt.Condition(src => src.Map != null && src.Map.City != null); })
+                .ForMember(dest => dest.TownY, opt => { opt.MapFrom(src => src.Map!.City!.Y); opt.Condition(src => src.Map != null && src.Map.City != null); })
+                .ForMember(dest => dest.TownMaxX, opt => { opt.MapFrom(src => src.Map!.Wid); opt.Condition(src => src.Map != null); })
+                .ForMember(dest => dest.TownMaxY, opt => { opt.MapFrom(src => src.Map!.Hei); opt.Condition(src => src.Map != null); })
+                .ForMember(dest => dest.IsChaos, opt => { opt.MapFrom(src => src.Map!.City!.Chaos); opt.Condition(src => src.Map != null && src.Map.City != null); })
+                .ForMember(dest => dest.IsDevaste, opt => { opt.MapFrom(src => src.Map!.City!.Devast); opt.Condition(src => src.Map != null && src.Map.City != null); })
+                .ForMember(dest => dest.TownType, opt => { opt.MapFrom(src => src.Map!.GetTownType()); })
+                .ForMember(dest => dest.Day, opt => { opt.MapFrom(src => src.Map!.Days); })
                 // Même règle que l'écriture en base, via le même point : le site et la base doivent
                 // dire la même chose de l'option d'API externe.
                 .ForMember(dest => dest.HasExternalApi, opt => opt.MapFrom(src => TownExtensions.DeduireApiExterne(src.Map)));
 
             CreateMap<MyHordesUserDetailsDto, SimpleMeJobDetailDto>()
-                .ForMember(dest => dest.Id, opt => { opt.MapFrom(src => src.Job.Id); opt.Condition(src => src.Job != null); })
-                .ForMember(dest => dest.Uid, opt => { opt.MapFrom(src => src.Job.Uid); opt.Condition(src => src.Job != null); })
-                .ForMember(dest => dest.Label, opt => { opt.MapFrom(src => src.Job.Name.ToMhoDictionnary()); opt.Condition(src => src.Job != null); })
-                .ForMember(dest => dest.Description, opt => { opt.MapFrom(src => src.Job.Desc.ToMhoDictionnary()); opt.Condition(src => src.Job != null); });
+                .ForMember(dest => dest.Id, opt => { opt.MapFrom(src => src.Job!.Id); opt.Condition(src => src.Job != null); })
+                .ForMember(dest => dest.Uid, opt => { opt.MapFrom(src => src.Job!.Uid); opt.Condition(src => src.Job != null); })
+                .ForMember(dest => dest.Label, opt => { opt.MapFrom(src => src.Job!.Name!.ToMhoDictionnary()); opt.Condition(src => src.Job != null); })
+                .ForMember(dest => dest.Description, opt => { opt.MapFrom(src => src.Job!.Desc!.ToMhoDictionnary()); opt.Condition(src => src.Job != null); });
 
 
             CreateMap<MyHordesItem, UpdateObjectDto>()

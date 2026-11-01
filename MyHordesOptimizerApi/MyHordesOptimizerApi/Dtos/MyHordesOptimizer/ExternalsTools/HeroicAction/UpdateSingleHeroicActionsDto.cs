@@ -9,6 +9,6 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.HeroicActio
         public int UserId { get; set; }
 
         [JsonProperty("heroicActions")]
-        public CitizenActionsHeroicValue HeroicActions { get; set; }
+        public CitizenActionsHeroicValue HeroicActions { get; set; } = null!;
     }
 }

@@ -58,24 +58,24 @@ namespace MyHordesOptimizerApi.DiscordBot.Modules
         {
             var values = Enum.GetValues(typeof(DiscordBotGamesValues.Letters));
             var random = new Random();
-            var randomValue = values.GetValue(random.Next(values.Length)).ToString();
-            return randomValue.ToLower();
+            var randomValue = values.GetValue(random.Next(values.Length))!.ToString();
+            return randomValue!.ToLower();
         }
 
         private static string RollVowel()
         {
             var values = Enum.GetValues(typeof(DiscordBotGamesValues.Vowels));
             var random = new Random();
-            var randomValue = values.GetValue(random.Next(values.Length)).ToString();
-            return randomValue.ToLower();
+            var randomValue = values.GetValue(random.Next(values.Length))!.ToString();
+            return randomValue!.ToLower();
         }
 
         private static string RollConsonant()
         {
             var values = Enum.GetValues(typeof(DiscordBotGamesValues.Consonants));
             var random = new Random();
-            var randomValue = values.GetValue(random.Next(values.Length)).ToString();
-            return randomValue.ToLower();
+            var randomValue = values.GetValue(random.Next(values.Length))!.ToString();
+            return randomValue!.ToLower();
         }
 
         private static string GetReplacement(string text, BotTexts texts)

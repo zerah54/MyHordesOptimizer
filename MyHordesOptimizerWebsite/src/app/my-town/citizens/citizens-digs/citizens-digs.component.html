@@ -13,14 +13,12 @@
                                                                [options]="citizen_info.citizens" [bindLabel]="'name'">
                                 </mho-header-with-select-filter>
                             }
-                            @case ('previous-next') {
-                                <mho-header-with-number-previous-next-filter class="previous-next"
-                                                                             [header]="column.header"
-                                                                             [(filterValue)]="filters.selected_day"
-                                                                             (filterValueChange)="citizen_filter_change.next()"
-                                                                             [min]="1" [max]="current_day"
-                                                                             displayFirstLast>
-                                </mho-header-with-number-previous-next-filter>
+                            @case ('today_digs') {
+                                <div class="day-header">
+                                    {{ column.header }}
+                                    <mho-day-selector [days]="current_day | daysUpTo" [(value)]="filters.selected_day" [today]="current_day"
+                                                      (valueChange)="citizen_filter_change.next()"></mho-day-selector>
+                                </div>
                             }
                         }
                     </th>

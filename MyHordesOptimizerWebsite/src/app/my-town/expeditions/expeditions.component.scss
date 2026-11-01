@@ -1,3 +1,4 @@
+@use '@angular/material' as mat;
 
 :host {
     display: contents;
@@ -14,12 +15,18 @@
 
 
     .mho-expeditions {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
 
         .container {
             display: flex;
             flex-direction: column;
             gap: 0.5em;
-            height: 100%;
+            flex: 1;
+            align-self: stretch;
+            min-height: 0;
+            overflow: auto;
 
             > .header {
                 h2 {
@@ -146,6 +153,12 @@
                                 border-spacing: 0;
                                 border-collapse: collapse;
 
+                                .compact-field {
+                                    @include mat.form-field-overrides((
+                                        container-height: 32px,
+                                        container-vertical-padding: 4px,
+                                    ));
+                                }
 
                                 .mat-mdc-icon-button {
                                     --mat-icon-button-state-layer-size: 36px;
@@ -225,13 +238,31 @@
                                             text-align: center;
                                         }
 
+                                        .pseudo .mat-mdc-form-field {
+                                            flex: 1;
+                                            min-width: 0;
+                                        }
+
                                         .ap-warning {
+                                            flex: none;
                                             color: var(--mho-warning);
-                                            vertical-align: middle;
+                                        }
+
+                                        td.sp > div.flex {
+                                            gap: 2px;
                                         }
 
                                         .sp-operator {
-                                            width: 64px;
+                                            padding: 0 2px;
+                                            border: 0;
+                                            background: none;
+                                            color: var(--mho-text-muted);
+                                            font: inherit;
+                                            cursor: pointer;
+
+                                            &:hover {
+                                                color: inherit;
+                                            }
                                         }
 
                                         .shoes .forbidden {

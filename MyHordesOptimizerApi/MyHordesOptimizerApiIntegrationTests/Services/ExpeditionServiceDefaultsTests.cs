@@ -60,7 +60,7 @@ namespace MyHordesOptimizerApiIntegrationTests.Services
         {
             var townId = NewTown(day: 5);
             var expedition = await NewService().SaveExpeditionAsync(new ExpeditionRequestDto { PartsId = new List<int>() }, townId, 5);
-            var defaultPartId = expedition.Parts.Single().Id!.Value;
+            var defaultPartId = expedition.Parts!.Single().Id!.Value;
             NewService().DeleteExpeditionPart(defaultPartId);
 
             var result = await NewService().SaveExpeditionPartAsync(expedition.Id!.Value, new ExpeditionPartRequestDto { OrdersId = new List<int>(), CitizensId = new List<int>() });

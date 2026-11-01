@@ -159,7 +159,7 @@ namespace MyHordesOptimizerApi.Services.Impl
             odds.Details = values;
             odds.BoundedProbability = Math.Max(0, Math.Min(probability, GetMaxBoundedProbability(campingParameters)));
             odds.Probability = probability;
-            odds.Label = CampingResults.Find(result => result.Strict ? odds.BoundedProbability < result.Probability : odds.BoundedProbability <= result.Probability).Label;
+            odds.Label = CampingResults.Find(result => result.Strict ? odds.BoundedProbability < result.Probability : odds.BoundedProbability <= result.Probability)!.Label;
             return odds;
         }
 

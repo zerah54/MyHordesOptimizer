@@ -24,6 +24,13 @@ namespace MyHordesOptimizerApiUnitTests.MappingProfiles
             dto.TargetExpeditionId.Should().Be(7);
         }
 
+        [Fact]
+        public void Consigne_Passage_AllerRetour()
+        {
+            Mapper.Map<ExpeditionOrder>(new ExpeditionOrderDto { X = 3, Y = 3, Passage = 2 }).Passage.Should().Be(2);
+            Mapper.Map<ExpeditionOrderDto>(new ExpeditionOrder { X = 3, Y = 3, Passage = 2 }).Passage.Should().Be(2);
+        }
+
         [Theory]
         [InlineData(null)]
         [InlineData("")]

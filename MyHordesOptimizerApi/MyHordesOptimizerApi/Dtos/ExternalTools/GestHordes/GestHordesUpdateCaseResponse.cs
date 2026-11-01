@@ -8,9 +8,9 @@ namespace MyHordesOptimizerApi.Dtos.ExternalTools.GestHordes
         public int CodeRetour { get; set; }
 
         [JsonProperty("libRetour")]
-        public string LibRetour { get; set; }
+        public string LibRetour { get; set; } = null!;
 
         [JsonProperty("zoneRetour")]
-        public string ZoneRetour { get; set; }
+        public string ZoneRetour { get; set; } = null!;
     }
 }

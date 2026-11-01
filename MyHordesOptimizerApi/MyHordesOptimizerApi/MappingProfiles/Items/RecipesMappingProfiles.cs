@@ -14,10 +14,10 @@ namespace MyHordesOptimizerApi.MappingProfiles.Items
             CreateMap<Recipe, ItemRecipeDto>()
                  .ForMember(dest => dest.Actions, opt => opt.MapFrom(src => new Dictionary<string, string>()
                 {
-                    { "fr", src.ActionFr },
-                    { "en", src.ActionEn },
-                    { "es", src.ActionEs },
-                    { "de", src.ActionDe }
+                    { "fr", src.ActionFr! },
+                    { "en", src.ActionEn! },
+                    { "es", src.ActionEs! },
+                    { "de", src.ActionDe! }
                 }))
                 .ForMember(dest => dest.Components, opt => opt.MapFrom((src, dest, srcMember, context) => src.RecipeItemComponents.Select(ric => new ItemComponentRecipeDto
                 {
@@ -41,7 +41,7 @@ namespace MyHordesOptimizerApi.MappingProfiles.Items
                     }
                     return results;
                 }))
-                .ForMember(dest => dest.Type, opt => opt.MapFrom<string>(src => src.Type))
+                .ForMember(dest => dest.Type, opt => opt.MapFrom<string?>(src => src.Type))
                 .ForMember(dest => dest.Provoking, opt => opt.MapFrom((src, dest, srcMember, context) =>
                     src.ProvokingItemNavigation != null
                         ? context.Mapper.Map<ItemWithoutRecipeDto>(src.ProvokingItemNavigation)

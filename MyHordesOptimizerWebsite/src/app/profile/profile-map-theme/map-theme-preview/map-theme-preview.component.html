@@ -1,0 +1,41 @@
+<div class="preview">
+    @for (level of levels; track level) {
+        <div class="cell level-{{ level }}">
+            <span class="value"><ng-container i18n>Palier</ng-container>
+                {{ level }}</span>
+        </div>
+    }
+    <div class="cell unknown">
+        <span class="value" i18n>Inconnu</span>
+    </div>
+    <div class="cell level-1">
+        <div class="dried"></div>
+        <span class="caption" i18n>Épuisée</span>
+    </div>
+    <div class="cell level-2">
+        <span class="value bare">12</span>
+        <span class="caption" i18n>Valeur</span>
+    </div>
+    <div class="cell level-2">
+        <div class="ruin"><span class="ruin-square"></span></div>
+        <span class="caption" i18n>Bâtiment</span>
+    </div>
+    <div class="cell level-2">
+        <div class="ruin"><span class="ruin-square empty-ruin"></span></div>
+        <span class="caption" i18n>Vidé</span>
+    </div>
+    <div class="cell level-3 mine">
+        <span class="caption" i18n>Ma position</span>
+    </div>
+    <div class="cell level-3 selected">
+        <span class="caption" i18n>Sélection</span>
+    </div>
+    <div class="cell level-3 selected">
+        <span class="sel-text" i18n>Texte</span>
+    </div>
+    @for (age of ages; track age) {
+        <div class="cell level-3">
+            <span class="age-flag age-{{ age }} corner-{{ corners[$index] }}"></span>
+        </div>
+    }
+</div>

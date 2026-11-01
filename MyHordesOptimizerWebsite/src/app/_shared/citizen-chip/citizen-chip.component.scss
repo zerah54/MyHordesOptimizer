@@ -1,0 +1,78 @@
+:host {
+    display: inline-flex;
+    min-width: 0;
+}
+
+.chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3em;
+    min-width: 0;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: inherit;
+    font: inherit;
+    cursor: help;
+
+    &:focus-visible {
+        outline: 2px solid var(--mho-accent);
+        outline-offset: 2px;
+    }
+}
+
+.name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.mho-citizen-card {
+    max-width: min(22em, calc(100vw - 32px));
+    padding: 0.6em 0.8em;
+    border: 1px solid var(--mho-line);
+    border-radius: var(--mho-radius-s);
+    background: var(--mho-surface);
+    box-shadow: 0 4px 12px rgb(0 0 0 / 35%);
+    font-size: 0.9em;
+
+    .card-header {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.35em;
+        margin-bottom: 0.4em;
+        font-weight: 600;
+    }
+
+    .banned-label {
+        color: var(--mho-danger);
+    }
+
+    dl {
+        margin: 0;
+    }
+
+    dt {
+        margin-top: 0.4em;
+        font-size: 0.85em;
+        opacity: 0.75;
+    }
+
+    dd {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.2em 0.6em;
+        margin: 0;
+    }
+
+    .entry {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25em;
+    }
+
+    .unknown {
+        opacity: 0.6;
+    }
+}

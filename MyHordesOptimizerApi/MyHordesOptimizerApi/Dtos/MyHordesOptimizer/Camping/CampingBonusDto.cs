@@ -36,22 +36,22 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Camping
         public int Devastated { get; set; }
 
         [JsonProperty("distChances")]
-        public List<int> DistChances { get; set; }
+        public List<int> DistChances { get; set; } = null!;
 
         [JsonProperty("crowdChances")]
-        public List<int> CrowdChances { get; set; }
+        public List<int> CrowdChances { get; set; } = null!;
 
         [JsonProperty("pandaProCamperByAlreadyCamped")]
-        public List<int> PandaProCamperByAlreadyCamped { get; set; }
+        public List<int> PandaProCamperByAlreadyCamped { get; set; } = null!;
 
         [JsonProperty("pandaNoProCamperByAlreadyCamped")]
-        public List<int> PandaNoProCamperByAlreadyCamped { get; set; }
+        public List<int> PandaNoProCamperByAlreadyCamped { get; set; } = null!;
 
         [JsonProperty("normalProCamperByAlreadyCamped")]
-        public List<int> NormalProCamperByAlreadyCamped { get; set; }
+        public List<int> NormalProCamperByAlreadyCamped { get; set; } = null!;
 
         [JsonProperty("normalNoProCamperByAlreadyCamped")]
-        public List<int> NormalNoProCamperByAlreadyCamped { get; set; }
+        public List<int> NormalNoProCamperByAlreadyCamped { get; set; } = null!;
 
         [JsonProperty("desertBonus")]
         public int DesertBonus { get; set; }

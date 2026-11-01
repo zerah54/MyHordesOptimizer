@@ -20,24 +20,31 @@ import { Observable, of } from 'rxjs';
 import type { Mock } from 'vitest';
 
 import { MapRouteDTO, MapRouteRequestDTO } from '../../_abstract_model/dto/map-route.dto';
+import { MapThemeActiveDTO, MapThemeDTO } from '../../_abstract_model/dto/map-theme.dto';
 import { ApiService } from '../../_abstract_model/services/api.service';
 import { TownService } from '../../_abstract_model/services/town.service';
-import { CitizenInfo } from '../../_abstract_model/types/citizen-info.class';
+import { Category } from '../../_abstract_model/types/category.class';
+import { Cell } from '../../_abstract_model/types/cell.class';
 import { Citizen } from '../../_abstract_model/types/citizen.class';
+import { CitizenInfo } from '../../_abstract_model/types/citizen-info.class';
+import { Expedition } from '../../_abstract_model/types/expedition.class';
 import { ExpeditionOrder } from '../../_abstract_model/types/expedition-order.class';
 import { ExpeditionPart } from '../../_abstract_model/types/expedition-part.class';
-import { Expedition } from '../../_abstract_model/types/expedition.class';
 import { Item } from '../../_abstract_model/types/item.class';
-import { MapRouteGame } from '../../_abstract_model/types/map-route-game.class';
+import { ItemCountShort } from '../../_abstract_model/types/item-count-short.class';
 import { MapRoute, MapRoutePoint } from '../../_abstract_model/types/map-route.class';
+import { MapRouteGame } from '../../_abstract_model/types/map-route-game.class';
 import { MapRouteAccess } from '../../_abstract_model/types/map-routes.class';
+import { Me } from '../../_abstract_model/types/me.class';
 import { Ruin } from '../../_abstract_model/types/ruin.class';
-import { TownDetails } from '../../_abstract_model/types/town-details.class';
 import { Town } from '../../_abstract_model/types/town.class';
+import { TownDetails } from '../../_abstract_model/types/town-details.class';
+import { MapThemeStateService } from '../../_core/services/map-theme-state.service';
 import { TownContextService } from '../../_core/services/town-context.service';
-import { setTown } from '../../_core/utilities/localstorage.util';
+import { setTown, setUser } from '../../_core/utilities/localstorage.util';
 import { ConfirmDialogComponent } from '../../_shared/confirm-dialog/confirm-dialog.component';
 import { DrawMapComponent, MapCellPick } from './draw-map/draw-map.component';
+import { Distance, MapComponent, MapOptions } from './map.component';
 import { DEFAULT_CORNERS } from './map-corners';
 import { DayExpeditionsStore } from './map-orders/day-expeditions.store';
 import { buildCellOrderIndex, CellOrderIndex } from './map-orders/map-cell-orders';
@@ -45,7 +52,6 @@ import { MapOrderBadge } from './map-orders/map-order-badges';
 import { MapRouteEditor } from './map-routes/map-route-editor';
 import { MapRouteDrawing } from './map-routes/map-route-views';
 import { MapRoutesStatus, MapRoutesStore } from './map-routes/map-routes.store';
-import { MapComponent, MapOptions } from './map.component';
 
 /** Remplace mho-draw-map : capture les entrées reçues sans instancier la grille de carte réelle (MatDialog/TownContextService). */
 @Component({ selector: 'mho-draw-map', template: '', changeDetection: ChangeDetectionStrategy.OnPush,
@@ -64,6 +70,7 @@ class DrawMapStubComponent {
     public readonly cellHovered: OutputEmitterRef<MapRoutePoint | null> = output();
     public readonly editedCells: InputSignal<ReadonlySet<string>> = input<ReadonlySet<string>>(new Set<string>());
     public readonly cellCut: OutputEmitterRef<MapRoutePoint> = output();
+    public readonly cellUpdated: OutputEmitterRef<Cell> = output();
 }
 
 /** Remplace MapRoutesStore : pas de hub SignalR ni d'appel HTTP, des signaux pilotés par le test. */
@@ -121,6 +128,12 @@ function newTown(): Town {
     return town;
 }
 
+class MapThemeStateStub {
+    public readonly themes: WritableSignal<MapThemeDTO[]> = signal<MapThemeDTO[]>([]);
+    public readonly active: WritableSignal<MapThemeActiveDTO> = signal<MapThemeActiveDTO>({ themeId: null });
+    public readonly setActive: Mock = vi.fn();
+}
+
 describe('MapComponent', (): void => {
     let fixture: ComponentFixture<MapComponent>;
     let apiService: ApiService;
@@ -128,11 +141,13 @@ describe('MapComponent', (): void => {
     let breakpointObserver: BreakpointObserver;
     let routesStore: MapRoutesStoreStub;
     let dayStore: DayExpeditionsStoreStub;
+    let themeState: MapThemeStateStub;
 
     beforeEach(async (): Promise<void> => {
         localStorage.removeItem('MAP_OPTIONS');
         routesStore = new MapRoutesStoreStub();
         dayStore = new DayExpeditionsStoreStub();
+        themeState = new MapThemeStateStub();
 
         await TestBed.configureTestingModule({
             imports: [MapComponent],
@@ -142,6 +157,7 @@ describe('MapComponent', (): void => {
                 { provide: ANIMATION_MODULE_TYPE, useValue: 'NoopAnimations' },
                 { provide: MapRoutesStore, useValue: routesStore },
                 { provide: DayExpeditionsStore, useValue: dayStore },
+                { provide: MapThemeStateService, useValue: themeState },
                 provideRouter([])
             ]
         })
@@ -168,6 +184,7 @@ describe('MapComponent', (): void => {
     afterEach((): void => {
         localStorage.removeItem('MAP_OPTIONS');
         setTown(null);
+        setUser(null);
         vi.useRealTimers();
         vi.unstubAllGlobals();
     });
@@ -409,7 +426,7 @@ describe('MapComponent', (): void => {
         expect(quarter.textContent).toContain('Objets au sol');
     });
 
-    it('addDistanceToList() adds a new distance option and renders it in the list, ignoring an exact duplicate', async (): Promise<void> => {
+    it('saveDistance() adds a new distance option and renders it in the list, ignoring an exact duplicate', async (): Promise<void> => {
         create();
         fixture.detectChanges();
 
@@ -419,22 +436,22 @@ describe('MapComponent', (): void => {
                 unit: 'km' | 'pa';
                 round_trip?: boolean;
             };
-            addDistanceToList(): void;
+            saveDistance(): void;
         } = fixture.componentInstance as unknown as typeof testable;
         testable.new_distance_option.value = 5;
         testable.new_distance_option.unit = 'km';
-        testable.addDistanceToList();
+        testable.saveDistance();
         await vi.advanceTimersByTimeAsync(0);
         fixture.detectChanges();
 
-        expect(fixture.nativeElement.querySelectorAll('mat-list-item').length).toBe(1);
-        expect(fixture.nativeElement.querySelector('mat-list-item [matListItemTitle]').textContent).toContain('5');
+        expect(fixture.nativeElement.querySelectorAll('.zone-row').length).toBe(1);
+        expect(fixture.nativeElement.querySelector('.zone-row .zone-title').textContent).toContain('5');
 
-        testable.addDistanceToList();
+        testable.saveDistance();
         await vi.advanceTimersByTimeAsync(0);
         fixture.detectChanges();
 
-        expect(fixture.nativeElement.querySelectorAll('mat-list-item').length).toBe(1);
+        expect(fixture.nativeElement.querySelectorAll('.zone-row').length).toBe(1);
     });
 
     it('removeDistanceFromList() removes a matching distance option from the list', async (): Promise<void> => {
@@ -447,7 +464,7 @@ describe('MapComponent', (): void => {
                 unit: 'km' | 'pa';
                 round_trip?: boolean;
             };
-            addDistanceToList(): void;
+            saveDistance(): void;
             removeDistanceFromList(distance: {
                 value: number;
                 unit: 'km' | 'pa';
@@ -456,16 +473,343 @@ describe('MapComponent', (): void => {
         } = fixture.componentInstance as unknown as typeof testable;
         testable.new_distance_option.value = 5;
         testable.new_distance_option.unit = 'km';
-        testable.addDistanceToList();
+        testable.saveDistance();
         await vi.advanceTimersByTimeAsync(0);
         fixture.detectChanges();
-        expect(fixture.nativeElement.querySelectorAll('mat-list-item').length).toBe(1);
+        expect(fixture.nativeElement.querySelectorAll('.zone-row').length).toBe(1);
 
         testable.removeDistanceFromList({ value: 5, unit: 'km' });
         await vi.advanceTimersByTimeAsync(0);
         fixture.detectChanges();
 
-        expect(fixture.nativeElement.querySelectorAll('mat-list-item').length).toBe(0);
+        expect(fixture.nativeElement.querySelectorAll('.zone-row').length).toBe(0);
+    });
+
+    describe('zones en distance', (): void => {
+        interface DistanceFormTestable {
+            new_distance_option: Distance;
+            distance_item_uids: WritableSignal<string[]>;
+            distance_color_is_custom: boolean;
+            startAddingDistance(): void;
+            startEditingDistance(distance: Distance): void;
+            changeDistanceColor(choice: string): void;
+            saveDistance(): void;
+        }
+
+        function testable(): DistanceFormTestable {
+            return fixture.componentInstance as unknown as DistanceFormTestable;
+        }
+
+        function addZone(value: number, { item_uids = [], ...extra }: Partial<Distance> = {}): void {
+            testable().startAddingDistance();
+            Object.assign(testable().new_distance_option, { value }, extra);
+            testable().distance_item_uids.set(item_uids);
+            testable().saveDistance();
+        }
+
+        function storedDistances(): Distance[] {
+            return (<MapOptions>JSON.parse(localStorage.getItem('MAP_OPTIONS') as string)).distances;
+        }
+
+        async function renderedRows(): Promise<HTMLElement[]> {
+            await vi.advanceTimersByTimeAsync(0);
+            fixture.detectChanges();
+            return Array.from(fixture.nativeElement.querySelectorAll('.dist-zones .zone-row'));
+        }
+
+        beforeEach((): void => {
+            create();
+            fixture.detectChanges();
+        });
+
+        it('enregistre la couleur, le style et les objets choisis', (): void => {
+            addZone(5, { color: '#e0483d', border_style: 'dotted', item_uids: ['water_#00'] });
+
+            expect(storedDistances()).toEqual([
+                { value: 5, unit: 'km', color: '#e0483d', border_style: 'dotted', item_uids: ['water_#00'] }
+            ]);
+        });
+
+        it('modifie une zone sur place, sans en créer une nouvelle ni changer son rang', (): void => {
+            addZone(3);
+            addZone(5);
+
+            testable().startEditingDistance(storedDistances()[0]);
+            expect(testable().new_distance_option.value).toBe(3);
+            testable().new_distance_option.value = 4;
+            testable().new_distance_option.color = '#3b7fd6';
+            testable().saveDistance();
+
+            expect(storedDistances().map((distance: Distance): number => distance.value)).toEqual([4, 5]);
+            expect(storedDistances()[0].color).toBe('#3b7fd6');
+        });
+
+        it('permet de changer la couleur d\'une zone sans changer sa distance', (): void => {
+            addZone(3);
+
+            testable().startEditingDistance(storedDistances()[0]);
+            testable().new_distance_option.color = '#3b7fd6';
+            testable().saveDistance();
+
+            expect(storedDistances().length).toBe(1);
+            expect(storedDistances()[0].color).toBe('#3b7fd6');
+        });
+
+        it('refuse de modifier une zone vers la distance d\'une autre zone', (): void => {
+            addZone(3);
+            addZone(5);
+
+            testable().startEditingDistance(storedDistances()[0]);
+            testable().new_distance_option.value = 5;
+            testable().saveDistance();
+
+            expect(storedDistances().map((distance: Distance): number => distance.value)).toEqual([3, 5]);
+        });
+
+        it('ne touche pas à la zone tant que la modification n\'est pas validée', (): void => {
+            addZone(3, { item_uids: ['water_#00'] });
+
+            testable().startEditingDistance(storedDistances()[0]);
+            testable().new_distance_option.value = 8;
+            testable().distance_item_uids.update((uids: string[]): string[] => [...uids, 'wood_bad_#00']);
+
+            expect(storedDistances()[0].value).toBe(3);
+            expect(storedDistances()[0].item_uids).toEqual(['water_#00']);
+        });
+
+        it('repart d\'un formulaire vierge quand on ajoute une zone après en avoir modifié une', (): void => {
+            addZone(3, { color: '#3b7fd6', border_style: 'solid', item_uids: ['water_#00'] });
+            testable().startEditingDistance(storedDistances()[0]);
+
+            addZone(9);
+
+            expect(storedDistances().length).toBe(2);
+            expect(storedDistances()[1].color).toBe('var(--mho-map-fg)');
+            expect(storedDistances()[1].border_style).toBe('dashed');
+            expect(storedDistances()[1].item_uids).toEqual([]);
+        });
+
+        it('ouvre une zone enregistrée avant cette option avec l\'apparence d\'origine', (): void => {
+            testable().startEditingDistance({ value: 3, unit: 'km' });
+
+            expect(testable().new_distance_option.color).toBe('var(--mho-map-fg)');
+            expect(testable().new_distance_option.border_style).toBe('dashed');
+            expect(testable().distance_color_is_custom).toBe(false);
+        });
+
+        it('reconnaît une couleur précise à la réouverture d\'une zone', (): void => {
+            testable().startEditingDistance({ value: 3, unit: 'km', color: '#123456' });
+
+            expect(testable().distance_color_is_custom).toBe(true);
+        });
+
+        it('« Autre » révèle le choix de couleur précise, une couleur prédéfinie le masque', (): void => {
+            testable().startAddingDistance();
+
+            testable().changeDistanceColor('custom');
+            expect(testable().distance_color_is_custom).toBe(true);
+            expect(testable().new_distance_option.color).toMatch(/^#[0-9a-f]{6}$/);
+
+            testable().changeDistanceColor('#e0483d');
+            expect(testable().distance_color_is_custom).toBe(false);
+            expect(testable().new_distance_option.color).toBe('#e0483d');
+        });
+
+        async function settle(): Promise<void> {
+            fixture.detectChanges();
+            await vi.advanceTimersByTimeAsync(0);
+            fixture.detectChanges();
+            await vi.advanceTimersByTimeAsync(0);
+            fixture.detectChanges();
+        }
+
+        async function openAddForm(): Promise<void> {
+            const add_button: HTMLButtonElement = fixture.nativeElement.querySelector('.dist-zones button');
+            add_button.click();
+            await settle();
+        }
+
+        function waterItem(): Item {
+            const water: Item = new Item();
+            water.id = 1;
+            water.uid = 'water_#00';
+            water.img = 'item/water.gif';
+            water.label = { en: 'Water ration', fr: 'Ration d\'eau' };
+            water.category = Object.assign(new Category(), { id_category: 1, ordering: 1, label: { en: 'Food', fr: 'Nourriture' } });
+            return water;
+        }
+
+        function offeredWater(): HTMLElement | null {
+            return document.querySelector('.mho-menu-add img[title="Water ration"]');
+        }
+
+        function selectedItemIcons(): NodeListOf<HTMLElement> {
+            return document.querySelectorAll('.zone-items .list img');
+        }
+
+        function formButton(label: string): HTMLButtonElement | undefined {
+            return Array.from(document.querySelectorAll<HTMLButtonElement>('.zone-actions button'))
+                .find((button: HTMLButtonElement): boolean => button.textContent?.trim() === label);
+        }
+
+        async function createWithItems(items: Item[]): Promise<void> {
+            (apiService.getItems as Mock).mockReturnValue(of(items));
+            fixture = TestBed.createComponent(MapComponent);
+            await settle();
+        }
+
+        async function pickOption(trigger: HTMLElement, label: string): Promise<void> {
+            trigger.click();
+            fixture.detectChanges();
+            await vi.advanceTimersByTimeAsync(0);
+            fixture.detectChanges();
+            const options: HTMLElement[] = Array.from(document.querySelectorAll('.mat-mdc-select-panel mat-option'));
+            (options.find((option: HTMLElement): boolean => !!option.textContent?.includes(label)) as HTMLElement).click();
+            fixture.detectChanges();
+            await vi.advanceTimersByTimeAsync(0);
+            fixture.detectChanges();
+        }
+
+        it('le trait du formulaire suit le style choisi dans la liste', async (): Promise<void> => {
+            await openAddForm();
+            const style_select: HTMLElement = document.querySelectorAll<HTMLElement>('.zone-appearance .mat-mdc-select-trigger')[1];
+
+            await pickOption(style_select, 'Plein');
+
+            expect((style_select.querySelector('.zone-line') as HTMLElement).style.borderTopStyle).toBe('solid');
+        });
+
+        it('l\'ajout rapide garde le menu ouvert, retire l\'objet des choix et mémorise son uid', async (): Promise<void> => {
+            await createWithItems([waterItem()]);
+            await openAddForm();
+
+            (document.querySelector('.zone-items img[src*="small_more"]') as HTMLElement).click();
+            await settle();
+            (offeredWater() as HTMLElement).click();
+            await settle();
+
+            expect(document.querySelector('.mho-menu-add .items')).not.toBeNull();
+            expect(offeredWater()).toBeNull();
+            expect(selectedItemIcons().length).toBe(1);
+
+            testable().saveDistance();
+
+            expect(storedDistances()[0].item_uids).toEqual(['water_#00']);
+        });
+
+        it('retire un objet des objets à compter via le menu de retrait', async (): Promise<void> => {
+            await createWithItems([waterItem()]);
+            addZone(5, { item_uids: ['water_#00'] });
+            ((await renderedRows())[0].querySelector('button[aria-label="Modifier la zone"]') as HTMLElement).click();
+            await settle();
+
+            (document.querySelector('.zone-items img[src*="small_less"]') as HTMLElement).click();
+            await settle();
+            (document.querySelector('.mho-menu-remove img[title="Water ration"]') as HTMLElement).click();
+            await settle();
+            testable().saveDistance();
+
+            expect(storedDistances()[0].item_uids).toEqual([]);
+        });
+
+        it('rouvre une zone avec ses objets et conserve ceux-ci à l\'enregistrement', async (): Promise<void> => {
+            await createWithItems([waterItem()]);
+            addZone(5, { item_uids: ['water_#00'] });
+            const row: HTMLElement = (await renderedRows())[0];
+
+            (row.querySelector('button[aria-label="Modifier la zone"]') as HTMLElement).click();
+            await settle();
+            expect(selectedItemIcons().length).toBe(1);
+
+            formButton('Modifier')?.click();
+            await settle();
+            expect(storedDistances()[0].item_uids).toEqual(['water_#00']);
+        });
+
+        it('la suppression se fait depuis le formulaire de modification, plus depuis la ligne', async (): Promise<void> => {
+            addZone(5);
+            const row: HTMLElement = (await renderedRows())[0];
+            expect(row.querySelectorAll('button').length).toBe(1);
+
+            (row.querySelector('button[aria-label="Modifier la zone"]') as HTMLElement).click();
+            await settle();
+            formButton('Supprimer')?.click();
+            await settle();
+
+            expect(storedDistances()).toEqual([]);
+            expect((await renderedRows()).length).toBe(0);
+        });
+
+        it('ne propose pas de suppression à l\'ajout d\'une zone', async (): Promise<void> => {
+            await openAddForm();
+
+            expect(formButton('Ajouter')).toBeDefined();
+            expect(formButton('Supprimer')).toBeUndefined();
+        });
+
+        it('montre les icônes des objets comptés au survol du compteur, et les retire ensuite', async (): Promise<void> => {
+            const plank: Item = Object.assign(waterItem(), { id: 2, uid: 'wood_bad_#00', label: { en: 'Twisted plank', fr: 'Planche tordue' } });
+            await createWithItems([waterItem(), plank]);
+            addZone(5, { item_uids: ['water_#00'] });
+            const count: HTMLElement = (await renderedRows())[0].querySelector('.zone-count') as HTMLElement;
+            const icons = (): string[] => Array.from(document.querySelectorAll<HTMLImageElement>('.zone-count-tooltip img'))
+                .map((icon: HTMLImageElement): string => icon.alt);
+            expect(icons()).toEqual([]);
+
+            count.dispatchEvent(new MouseEvent('mouseenter'));
+            await settle();
+            expect(icons()).toEqual(['Water ration']);
+
+            count.dispatchEvent(new MouseEvent('mouseleave'));
+            await settle();
+            expect(icons()).toEqual([]);
+        });
+
+        it('met le compteur à jour quand une case est enregistrée, sans recharger la carte', async (): Promise<void> => {
+            function cellWithWater(count: number): Cell {
+                const cell: Cell = new Cell();
+                cell.x = 1;
+                cell.y = 0;
+                cell.nb_km = 1;
+                cell.nb_pa = 1;
+                const water_count: ItemCountShort = new ItemCountShort();
+                water_count.item_id = 1;
+                water_count.count = count;
+                water_count.is_broken = false;
+                cell.items = [water_count];
+                return cell;
+            }
+            const water: Item = new Item();
+            water.id = 1;
+            water.uid = 'water_#00';
+            water.label = { en: 'Water ration', fr: 'Ration d\'eau' };
+            const town: Town = newTown();
+            town.cells = [cellWithWater(2)];
+            (apiService.getItems as Mock).mockReturnValue(of([water]));
+            (townService.getMap as Mock).mockReturnValue(of(town));
+            (apiService.getRuins as Mock).mockReturnValue(of([new Ruin()]));
+            const citizen_info: CitizenInfo = new CitizenInfo();
+            citizen_info.citizens = [new Citizen()];
+            (townService.getCitizens as Mock).mockReturnValue(of(citizen_info));
+            fixture = TestBed.createComponent(MapComponent);
+            fixture.detectChanges();
+            addZone(1, { item_uids: ['water_#00'] });
+            expect((await renderedRows())[0].querySelector('.zone-count')?.textContent?.trim()).toBe('2');
+
+            drawMapStub().cellUpdated.emit(cellWithWater(7));
+
+            expect((await renderedRows())[0].querySelector('.zone-count')?.textContent?.trim()).toBe('7');
+        });
+
+        it('affiche le compteur seulement sur les zones qui ont des objets sélectionnés', async (): Promise<void> => {
+            addZone(3);
+            addZone(5, { item_uids: ['water_#00'] });
+
+            const rows: HTMLElement[] = await renderedRows();
+
+            expect(rows[0].querySelector('.zone-count')).toBeNull();
+            expect(rows[1].querySelector('.zone-count')?.textContent?.trim()).toBe('0');
+        });
     });
 
     /** Bouton de la barre d'outils, repéré par son libellé. */
@@ -545,6 +889,7 @@ describe('MapComponent', (): void => {
         fixture.detectChanges();
 
         expect(title()).toBe('Tracés');
+        expect(fixture.nativeElement.querySelector('.map-theme-toggle')).toBeNull();
     });
 
     it('hiding a route removes it from the map and persists the setting', async (): Promise<void> => {
@@ -954,6 +1299,82 @@ describe('MapComponent', (): void => {
             await loadRoutes([newRoute(1, 'Nord-Est'), newRoute(2, 'Sud')]);
 
             expect(sidenavOpened()).toBe(false);
+        });
+    });
+    describe('map theme selector', (): void => {
+        function theme(id: number, name: string): MapThemeDTO {
+            return { id, name, colors: {}, updatedAt: '2026-10-30T00:00:00Z' };
+        }
+
+        async function openMenu(): Promise<HTMLElement[]> {
+            (fixture.nativeElement.querySelector('.settings-header .map-theme-toggle') as HTMLElement).click();
+            fixture.detectChanges();
+            await vi.advanceTimersByTimeAsync(0);
+            return Array.from(document.querySelectorAll<HTMLElement>('.map-theme-option'));
+        }
+
+        function optionLabels(options: HTMLElement[]): string[] {
+            return options.map((option: HTMLElement): string => option.querySelector('.map-theme-option-label')?.textContent?.trim() ?? '');
+        }
+
+        function checkedLabels(options: HTMLElement[]): string[] {
+            return optionLabels(options.filter((option: HTMLElement): boolean => option.getAttribute('aria-checked') === 'true'));
+        }
+
+        beforeEach((): void => {
+            themeState.themes.set([theme(5, 'Mon thème')]);
+            create();
+            fixture.detectChanges();
+        });
+
+        it('sits in the panel header behind a palette button, not in the panel body', (): void => {
+            const toggle: HTMLElement = fixture.nativeElement.querySelector('.settings-header .map-theme-toggle');
+            expect(toggle.querySelector('mat-icon')?.textContent?.trim()).toBe('palette');
+            expect(toggle.getAttribute('aria-label')).toBe('Thème de la carte');
+            expect(fixture.nativeElement.querySelector('.settings-body .map-theme-select')).toBeNull();
+        });
+
+        it('offers the default then the personal themes, with no provided scale', async (): Promise<void> => {
+            expect(optionLabels(await openMenu())).toEqual(['Par défaut', 'Mon thème']);
+        });
+
+        it('checks the default theme when none is active', async (): Promise<void> => {
+            expect(checkedLabels(await openMenu())).toEqual(['Par défaut']);
+        });
+
+        it('checks the active theme', async (): Promise<void> => {
+            themeState.active.set({ themeId: 5 });
+            fixture.detectChanges();
+            expect(checkedLabels(await openMenu())).toEqual(['Mon thème']);
+        });
+
+        it('activates a personal theme', async (): Promise<void> => {
+            const options: HTMLElement[] = await openMenu();
+            options[1].click();
+            expect(themeState.setActive).toHaveBeenCalledWith({ themeId: 5 });
+        });
+
+        it('deactivates with "Par défaut"', async (): Promise<void> => {
+            themeState.active.set({ themeId: 5 });
+            fixture.detectChanges();
+            const options: HTMLElement[] = await openMenu();
+            options[0].click();
+            expect(themeState.setActive).toHaveBeenCalledWith({ themeId: null });
+        });
+
+        it('links to the theme page from the menu only when a user is known', async (): Promise<void> => {
+            await openMenu();
+            expect(document.querySelector('.map-theme-link')).toBeNull();
+            setUser(Object.assign(new Me(), { id: 42 }));
+            fixture.detectChanges();
+            await vi.advanceTimersByTimeAsync(0);
+            expect(document.querySelector('.map-theme-link')?.getAttribute('href')).toBe('/profile/42/theme');
+        });
+
+        it('does not write into MAP_OPTIONS', async (): Promise<void> => {
+            const options: HTMLElement[] = await openMenu();
+            options[1].click();
+            expect(localStorage.getItem('MAP_OPTIONS')).toBeNull();
         });
     });
 });

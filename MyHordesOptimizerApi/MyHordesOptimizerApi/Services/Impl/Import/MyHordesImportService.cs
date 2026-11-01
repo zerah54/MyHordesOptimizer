@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Common.Core.Repository.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using MyHordesOptimizerApi.Configuration.Interfaces;
@@ -75,7 +76,7 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
 
         // Les clés d'étape sont celles utilisées par le front pour les imports individuels : elles lui
         // permettent d'afficher le libellé déjà traduit de l'étape en cours.
-        public async Task ImportAllAsync(Action<ImportStepProgress> onStep = null)
+        public async Task ImportAllAsync(Action<ImportStepProgress>? onStep = null)
         {
             var steps = new List<(string Key, Func<Task> Run)>
             {
@@ -238,19 +239,19 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
             var droprates = MyHordesCodeRepository.GetItemsDropRates();
             var listOfPrafDrops = droprates.GetValueOrDefault("empty_dig");
             var totalWeightPraf = 0.0;
-            foreach (var kvp in listOfPrafDrops)
+            foreach (var kvp in listOfPrafDrops!)
             {
                 totalWeightPraf += Convert.ToInt32(kvp.Value[0]);
             }
             var listOfNotPrafDrops = droprates.GetValueOrDefault("base_dig");
             var totalWeightNotPraf = 0.0;
-            foreach (var kvp in listOfNotPrafDrops)
+            foreach (var kvp in listOfNotPrafDrops!)
             {
                 totalWeightNotPraf += Convert.ToInt32(kvp.Value[0]);
             }
             mhoItems.ForEach(item =>
             {
-                if (listOfPrafDrops.TryGetValue(item.Uid, out var dropWeight))
+                if (listOfPrafDrops.TryGetValue(item.Uid!, out var dropWeight))
                 {
                     item.DropRatePraf = Convert.ToSingle(Convert.ToInt32(dropWeight[0]) / totalWeightPraf);
                 }
@@ -261,7 +262,7 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
             });
             mhoItems.ForEach(item =>
             {
-                if (listOfNotPrafDrops.TryGetValue(item.Uid, out var dropWeight))
+                if (listOfNotPrafDrops.TryGetValue(item.Uid!, out var dropWeight))
                 {
                     item.DropRateNotPraf = Convert.ToSingle(Convert.ToInt32(dropWeight[0]) / totalWeightNotPraf);
                 }
@@ -468,9 +469,8 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
                                     RecipeName = recipeName
                                 });
                             }
-                            else if (@object is JArray)
+                            else if (@object is JArray jArray)
                             {
-                                var jArray = @object as JArray;
                                 var uid = jArray.First().Value<string>();
                                 var weight = jArray.Last().Value<int>();
                                 totalWeight += weight;
@@ -482,7 +482,7 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
                                 });
                             }
                         }
-                        results.ForEach(x => { if (x.Probability != 1) x.Probability = (float)x.Weight / totalWeight; });
+                        results.ForEach(x => { if (x.Probability != 1) x.Probability = (float)x.Weight! / totalWeight; });
                         //MyHordesOptimizerRepository.PatchRecipeResults(results);
                         DbContext.RecipeItemResults.AddRange(results);
                     }
@@ -939,7 +939,7 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
             }
         }
 
-        private static string GetLabel(IDictionary<string, string> labels, string language)
+        private static string? GetLabel(IDictionary<string, string>? labels, string language)
         {
             return labels != null && labels.TryGetValue(language, out var label) ? label : null;
         }
@@ -965,7 +965,8 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
         /// chaîne vide, et le log nomme la clé pour qu'on puisse la corriger.
         /// </para>
         /// </remarks>
-        private string Traduire(Dictionary<string, List<YmlTranslationFileModel>> translations, string langue, string cleAllemande, string domaine)
+        [return: NotNullIfNotNull(nameof(cleAllemande))]
+        private string? Traduire(Dictionary<string, List<YmlTranslationFileModel>> translations, string langue, string? cleAllemande, string domaine)
         {
             if (string.IsNullOrEmpty(cleAllemande))
             {
@@ -1027,7 +1028,7 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
 
             foreach (var ruinModel in ruinModels)
             {
-                if (ruinsFromCode.TryGetValue(ruinModel.Img, out var ruinFromCode))
+                if (ruinsFromCode.TryGetValue(ruinModel.Img!, out var ruinFromCode))
                 {
                     var totalWeight = 0;
                     foreach (var drop in ruinFromCode.Drops)
@@ -1148,9 +1149,9 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
             var blueprints = new List<RuinBlueprint>();
             foreach (var ruinModel in ruinModels)
             {
-                if (ruinsFromCode.TryGetValue(ruinModel.Img, out var ruinFromCode))
+                if (ruinsFromCode.TryGetValue(ruinModel.Img!, out var ruinFromCode))
                 {
-                    if (ruinFromCode.Constructions is not null && clesParImg.TryGetValue(ruinModel.Img, out var cleRuine))
+                    if (ruinFromCode.Constructions is not null && clesParImg.TryGetValue(ruinModel.Img!, out var cleRuine))
                     {
                         foreach (var buildingId in ruinFromCode.Constructions)
                         {
@@ -1264,7 +1265,7 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
 
         #region Towns
 
-        public Task ImportTownsAsync(int? season = null, bool resume = false, Action<ImportStepProgress> onStep = null)
+        public Task ImportTownsAsync(int? season = null, bool resume = false, Action<ImportStepProgress>? onStep = null)
         {
             var allMhIds = MyHordesApiRepository.GetTownList(season);
             var listedTowns = allMhIds.Count;
@@ -1336,7 +1337,7 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
                 foreach (var townDto in towns.Where(town => town.Id.HasValue))
                 {
                     var provisionalId = townDto.MapId.HasValue ? -townDto.MapId.Value : (int?)null;
-                    if (bddTownIdSet.Contains(townDto.Id.Value))
+                    if (bddTownIdSet.Contains(townDto.Id!.Value))
                     {
                         // Cas 1 : IdTown correct en BDD → mise à jour classique
                         UpsertTown(townDto);
@@ -1346,7 +1347,7 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
                         // Cas 2 : ligne provisoire (IdTown = -mapId, saison compatible) → migration
                         Logger.LogInformation(
                             "ImportTowns: migration IdTown {OldId} → {NewId} (mapId={MapId})",
-                            provisionalId.Value, townDto.Id.Value, townDto.MapId.Value);
+                            provisionalId.Value, townDto.Id.Value, townDto.MapId!.Value);
                         MigrateTownId(provisionalId.Value, townDto);
                         bddTownIdSet.Remove(provisionalId.Value);
                         bddTownIdsWithoutMapId.Remove(provisionalId.Value);
@@ -1434,7 +1435,7 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
                 // précisément ce que la nullabilité de Id rend maintenant explicite.
                 var identityByUserId = identities
                     .Where(identity => identity.Id.HasValue && identity.Id.Value > 0)
-                    .ToDictionary(identity => identity.Id.Value);
+                    .ToDictionary(identity => identity.Id!.Value);
 
                 var users = DbContext.Users.Where(user => batchIds.Contains(user.IdUser)).ToList();
                 var now = DateTime.UtcNow;
@@ -1615,7 +1616,7 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
 
         private void UpsertTown(MyHordesTownDetailsDto dto)
         {
-            var townId = dto.Id.Value;
+            var townId = dto.Id!.Value;
             var isNew = false;
             var existing = DbContext.Towns.Find(townId);
             if (existing == null)
@@ -1695,7 +1696,7 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
             var existingCadavers = DbContext.TownCadavers
                 .Where(c => c.IdTown == townId)
                 .ToList();
-            LastUpdateInfo lastUpdate = null;
+            LastUpdateInfo? lastUpdate = null;
 
             if (map.Citizens != null)
             {
@@ -1704,7 +1705,7 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
                 {
                     // Citoyens vivants : getCitizensData délègue à getUserData, le nom est le vrai
                     // pseudo du compte (et non l'alias que renverrait getCadaversInformation).
-                    var user = UpsertUser(c.Id.Value, c.Name, c.Avatar, nameIsAuthoritative: true);
+                    var user = UpsertUser(c.Id!.Value, c.Name, c.Avatar, nameIsAuthoritative: true);
                     var citizen = GetOrCreateTownCitizen(townId, user, existingCitizens, ref lastUpdate);
                     citizen.Dead = false;
                     if (!string.IsNullOrEmpty(c.HomeMessage))
@@ -1760,7 +1761,7 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
                 // L'id identifie le joueur : sans lui il n'y a rien à rattacher.
                 foreach (var c in map.Cadavers.Where(cadaver => cadaver.Id.HasValue))
                 {
-                    var user = UpsertUser(c.Id.Value, c.Name, c.Avatar, nameIsAuthoritative: false);
+                    var user = UpsertUser(c.Id!.Value, c.Name, c.Avatar, nameIsAuthoritative: false);
                     var citizen = GetOrCreateTownCitizen(townId, user, existingCitizens, ref lastUpdate);
                     citizen.Dead = true;
                     citizen.NameInTown = c.Name;
@@ -1803,12 +1804,12 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
             var existingCadavers = DbContext.TownCadavers
                 .Where(c => c.IdTown == townId)
                 .ToList();
-            LastUpdateInfo lastUpdate = null;
+            LastUpdateInfo? lastUpdate = null;
 
             foreach (var citizenDto in citizens.Where(citizen => citizen.Id.HasValue))
             {
                 // /json/towns passe par getCadaversInformation : le nom peut être un alias
-                var user = UpsertUser(citizenDto.Id.Value, citizenDto.Name, citizenDto.Avatar, nameIsAuthoritative: false);
+                var user = UpsertUser(citizenDto.Id!.Value, citizenDto.Name, citizenDto.Avatar, nameIsAuthoritative: false);
                 var citizen = GetOrCreateTownCitizen(townId, user, existingCitizens, ref lastUpdate);
                 citizen.NameInTown = citizenDto.Name;
                 var isDead = citizenDto.Dtype.HasValue && citizenDto.Dtype.Value > 0;
@@ -1851,7 +1852,7 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
         /// chemin `getUserData` (/json/me, /json/map citizens) fait autorité sur le pseudo.
         /// L'avatar, lui, est toujours celui du User : il est fiable sur tous les chemins.
         /// </param>
-        private User UpsertUser(int userId, string name, string avatar, bool nameIsAuthoritative)
+        private User UpsertUser(int userId, string? name, string? avatar, bool nameIsAuthoritative)
         {
             // Le tracker d'abord : le même joueur peut apparaître dans plusieurs villes
             // d'un même batch, avant le SaveChanges
@@ -1878,7 +1879,7 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
             return user;
         }
 
-        private TownCitizen GetOrCreateTownCitizen(int townId, User user, List<TownCitizen> existingCitizens, ref LastUpdateInfo lastUpdate)
+        private TownCitizen GetOrCreateTownCitizen(int townId, User user, List<TownCitizen> existingCitizens, ref LastUpdateInfo? lastUpdate)
         {
             var citizen = existingCitizens.FirstOrDefault(c => c.IdUser == user.IdUser);
             if (citizen == null)

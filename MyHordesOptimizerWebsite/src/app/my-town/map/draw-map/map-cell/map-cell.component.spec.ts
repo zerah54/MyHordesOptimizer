@@ -4,17 +4,19 @@ import { ANIMATION_MODULE_TYPE } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import moment from 'moment';
 
+import { Property } from '../../../../_abstract_model/enum/property.enum';
+import { Trash } from '../../../../_abstract_model/enum/trash.enum';
 import { Cell } from '../../../../_abstract_model/types/cell.class';
 import { Citizen } from '../../../../_abstract_model/types/citizen.class';
-import { Item } from '../../../../_abstract_model/types/item.class';
 import { ItemCountShort } from '../../../../_abstract_model/types/item-count-short.class';
+import { Item } from '../../../../_abstract_model/types/item.class';
 import { Ruin } from '../../../../_abstract_model/types/ruin.class';
 import { UpdateInfo } from '../../../../_abstract_model/types/update-info.class';
 import { TownContextService } from '../../../../_core/services/town-context.service';
-import { MapOptions } from '../../map.component';
-import { CornerLayout, CORNERS_VERSION, sanitizeCorners } from '../../map-corners';
+import { CornerLayout, CORNERS_VERSION, MAP_TYPES, sanitizeCorners } from '../../map-corners';
 import { provideMapOrdersTesting } from '../../map-orders/map-orders.testing';
 import { DEFAULT_ROUTES_DISPLAY } from '../../map-routes/map-routes-display';
+import { MapOptions } from '../../map.component';
 import { MapCellComponent, MapCellSelection } from './map-cell.component';
 
 function newCell(overrides: Partial<Cell> = {}): Cell {
@@ -116,6 +118,112 @@ describe('MapCellComponent', (): void => {
 
         const cell_element: HTMLElement = fixture.nativeElement.querySelector('.map-cell');
         expect(cell_element.classList).toContain('digs');
+    });
+
+    it('trace la bordure d\'une zone avec sa couleur et son style, du côté de la case plus éloignée', (): void => {
+        const cell: Cell = newCell({ x: 0, y: 0, nb_km: 5 });
+        setInputs(cell, { ...options, distances: [{ value: 5, unit: 'km', color: '#e0483d', border_style: 'dotted' }] });
+        fixture.componentRef.setInput('drawedMap', [[cell, newCell({ x: 1, y: 0, nb_km: 6 })]]);
+        fixture.detectChanges();
+
+        const ring: HTMLElement = Array.from<HTMLElement>(fixture.nativeElement.querySelectorAll('.map-cell > div'))
+            .find((element: HTMLElement): boolean => element.style.borderRightStyle !== '') as HTMLElement;
+        expect(ring.style.borderRightStyle).toBe('dotted');
+        expect(ring.style.borderRightColor).toBe('rgb(224, 72, 61)');
+        expect(ring.style.borderLeftStyle).toBe('');
+    });
+
+    describe('never visited cell', (): void => {
+        it('has no background colour in any map type', (): void => {
+            for (const map_type of MAP_TYPES) {
+                setInputs(newCell({ is_never_visited: true, danger_level: 3, average_potential_remaining_dig: 7 }), { ...options, map_type });
+                fixture.detectChanges();
+
+                const classes: string[] = Array.from((<HTMLElement>fixture.nativeElement.querySelector('.map-cell')).classList);
+                expect(classes.filter((css_class: string): boolean => /^(alert|danger|digs|dig-|trash|scout)/.test(css_class)), map_type).toEqual([]);
+            }
+        });
+
+        function neverVisitedCorner(css_class: string): HTMLElement | null {
+            return fixture.nativeElement.querySelector(`.content .${css_class}`);
+        }
+
+        it('shows no information that requires having been there, in any map type', (): void => {
+            for (const map_type of MAP_TYPES) {
+                setInputs(newCell({ is_never_visited: true, citizens: [new Citizen()], nb_hero: 2, nb_zombie: 0, total_success: 3, is_excavated: true }),
+                          withCorners({ top_left: 'citizens', top_right: 'control_points', bottom_left: 'zombies', bottom_right: 'zombies_killed' }, { ...options, map_type }));
+                fixture.detectChanges();
+                expect(fixture.nativeElement.querySelectorAll('.content .corner').length, map_type).toBe(0);
+
+                setInputs(newCell({ is_never_visited: true, total_success: 3, is_excavated: true, items: [Object.assign(new ItemCountShort(), { count: 2 })] }),
+                          withCorners({ top_left: 'digs_remaining', top_right: 'digs_success', bottom_left: 'excavated', bottom_right: 'items' }, { ...options, map_type }));
+                fixture.detectChanges();
+                expect(fixture.nativeElement.querySelectorAll('.content .corner').length, map_type).toBe(0);
+
+                setInputs(newCell({ is_never_visited: true, scout_zone_level: 2 }),
+                          withCorners({ top_left: 'digs_level', top_right: 'scout_level', bottom_left: 'trash', bottom_right: 'update_age' }, { ...options, map_type }));
+                fixture.detectChanges();
+                expect(fixture.nativeElement.querySelectorAll('.content .corner').length, map_type).toBe(0);
+            }
+        });
+
+        it('keeps the note and the distances, which do not come from the game', (): void => {
+            for (const map_type of MAP_TYPES) {
+                setInputs(newCell({ is_never_visited: true, note: 'x', nb_km: 4, nb_pa: 6 }),
+                          withCorners({ top_left: 'note', top_right: 'none', bottom_left: 'distance_km', bottom_right: 'distance_pa' }, { ...options, map_type }));
+                fixture.detectChanges();
+
+                expect(neverVisitedCorner('corner-top-left')?.querySelector('img')?.src, map_type).toContain('small_talk');
+                expect(neverVisitedCorner('corner-bottom-left')?.textContent?.trim(), map_type).toBe('4');
+                expect(neverVisitedCorner('corner-bottom-right')?.textContent?.trim(), map_type).toBe('6');
+            }
+        });
+
+        it('keeps the estimation of a scout on a neighbouring cell, even after a later update of the cell', (): void => {
+            const estimation_update: UpdateInfo = new UpdateInfo();
+            estimation_update.update_time = moment().subtract(2, 'hours');
+            const cell_update: UpdateInfo = new UpdateInfo();
+            cell_update.update_time = moment().subtract(1, 'hours');
+            setInputs(newCell({ is_never_visited: true, update_info: cell_update, scout_estimation_zombie: 4, scout_estimation_min: 2,
+                                scout_estimation_max: 6, scout_estimation_update_info: estimation_update }),
+                      withCorners({ bottom_right: 'zombies' }));
+            fixture.detectChanges();
+
+            const value: HTMLElement | null | undefined = neverVisitedCorner('corner-bottom-right')?.querySelector('.detail-value');
+            expect(value?.textContent?.trim()).toBe('≈4');
+            expect(value?.classList).toContain('estimation');
+        });
+
+        it('keeps the depleted marker noted by a scavenger on a neighbouring cell', (): void => {
+            setInputs(newCell({ is_never_visited: true, is_dryed: true }));
+            fixture.detectChanges();
+
+            expect(fixture.nativeElement.querySelector('.dried')).not.toBeNull();
+        });
+
+        it('shows no building', (): void => {
+            setInputs(newCell({ is_never_visited: true, ruin_id: 7 }));
+            fixture.detectChanges();
+
+            expect(fixture.nativeElement.querySelector('.ruin')).toBeNull();
+        });
+
+        it('keeps the town marker', (): void => {
+            setInputs(newCell({ is_never_visited: true, is_town: true }));
+            fixture.detectChanges();
+
+            expect(fixture.nativeElement.querySelector('.map-cell').classList).toContain('town');
+            expect(fixture.nativeElement.querySelector('.town-draw')).not.toBeNull();
+        });
+    });
+
+    it('colours a cell visited on another day as unknown, apart from a never visited one', (): void => {
+        setInputs(newCell({ is_visited_today: false, danger_level: 2 }), { ...options, map_type: 'danger' });
+        fixture.detectChanges();
+
+        const classes: DOMTokenList = fixture.nativeElement.querySelector('.map-cell').classList;
+        expect(classes).toContain('alert');
+        expect(classes).not.toContain('visited-today');
     });
 
     it('shows the town marker when the cell is the town', (): void => {
@@ -305,6 +413,52 @@ describe('MapCellComponent', (): void => {
             fixture.detectChanges();
 
             expect(corner('corner-top-right')).toBeNull();
+        });
+
+        it('hides a zombie count nobody has reported, but keeps a reported 0', (): void => {
+            for (const nb_zombie of [null, undefined]) {
+                setInputs(newCell({ nb_zombie: <number><unknown>nb_zombie }), withCorners({ bottom_right: 'zombies' }));
+                fixture.detectChanges();
+                expect(corner('corner-bottom-right'), `${nb_zombie}`).toBeNull();
+            }
+
+            setInputs(newCell({ nb_zombie: 0 }), withCorners({ bottom_right: 'zombies' }));
+            fixture.detectChanges();
+            expect(corner('corner-bottom-right')?.textContent?.trim()).toBe('0');
+        });
+
+        it('hides the killed zombies while there are none', (): void => {
+            for (const nb_zombie_killed of [null, undefined, 0]) {
+                setInputs(newCell({ nb_zombie_killed: <number><unknown>nb_zombie_killed }), withCorners({ bottom_left: 'zombies_killed' }));
+                fixture.detectChanges();
+                expect(corner('corner-bottom-left'), `${nb_zombie_killed}`).toBeNull();
+            }
+
+            setInputs(newCell({ nb_zombie_killed: 3 }), withCorners({ bottom_left: 'zombies_killed' }));
+            fixture.detectChanges();
+            expect(corner('corner-bottom-left')?.textContent?.trim()).toBe('3');
+        });
+
+        it('hides the dump value of a cell that has nothing for it', (): void => {
+            setInputs(newCell({ items: [] }), withCorners({ top_left: 'trash' }));
+            fixture.detectChanges();
+            expect(corner('corner-top-left')).toBeNull();
+
+            const trashes: Trash[] = Trash.getAllValues();
+            const item: Item = new Item();
+            item.id = 1;
+            item.properties = [<Property>trashes.find((candidate: Trash): boolean => !!candidate.value.property)?.value.property];
+            setInputs(newCell({ items: [Object.assign(new ItemCountShort(), { item_id: 1, count: 2 })] }), withCorners({ top_left: 'trash' }));
+            fixture.componentRef.setInput('allItems', [item]);
+            fixture.detectChanges();
+            expect(corner('corner-top-left')?.textContent?.trim()).toBe('2');
+        });
+
+        it('keeps a remaining digs count of 0: the zone is depleted', (): void => {
+            setInputs(newCell({ average_potential_remaining_dig: 0 }), withCorners({ bottom_right: 'digs_remaining' }));
+            fixture.detectChanges();
+
+            expect(corner('corner-bottom-right')?.textContent?.trim()).toBe('0');
         });
 
         it('never shows negative remaining digs, and colours such a zone as depleted', (): void => {

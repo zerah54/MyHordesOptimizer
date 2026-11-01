@@ -1,7 +1,108 @@
 :host {
     display: contents;
 
+    .mho-buildings-header {
+        justify-content: space-between;
+        margin-bottom: 0.5em;
+
+        .actions {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+        }
+    }
+
     .mho-buildings {
 
+        // Grand écran : seul le contenu de la carte choisie défile, chiffres et cartes restent en place.
+        @media (min-width: 60rem) {
+            display: flex;
+            flex-direction: column;
+
+            > button {
+                align-self: flex-start;
+            }
+        }
+
+        .loading {
+            display: flex;
+            justify-content: center;
+            padding: 2em;
+        }
+
+        .past-day,
+        .no-plan,
+        .no-evaluation,
+        .load-failed {
+            opacity: 0.85;
+        }
+
+        .conflict {
+            display: flex;
+            align-items: center;
+            gap: 0.75em;
+            margin: 0.5em 0;
+            padding: 0.5em 0.75em;
+            border: 1px solid var(--mho-accent);
+            border-radius: 4px;
+        }
+
+        // Les chiffres clés restent visibles pendant qu'on édite le programme.
+        .sticky-kpis {
+            position: sticky;
+            top: 0;
+            z-index: 2;
+            margin: 0.75em 0;
+            padding: 0.25em 0;
+            background: var(--mho-bg);
+        }
+
+        .card-panel {
+            margin-top: 0.5em;
+            padding: 0.75em;
+            border: 1px solid var(--mho-accent);
+            border-radius: var(--mho-radius-m);
+            background: var(--mho-surface);
+
+            // Sous la carte soudée, le coin arrondi dépasserait de son bord droit.
+            @media (min-width: 60rem) {
+                flex: 1;
+                // Sur une fenêtre très basse, le contenu garde une hauteur lisible et c'est la page qui défile.
+                min-height: 16rem;
+                overflow: auto;
+
+                &[data-card='program'] {
+                    border-top-left-radius: 0;
+                }
+
+                &[data-card='defense'] {
+                    border-top-right-radius: 0;
+                }
+            }
+        }
+
+        .panel-alerts {
+            margin: 0 0 0.75em;
+            padding: 0;
+            list-style: none;
+
+            li {
+                display: flex;
+                align-items: center;
+                gap: 0.5em;
+                color: var(--mho-accent);
+            }
+
+            button {
+                padding: 0;
+                border: 0;
+                background: none;
+                color: inherit;
+                font: inherit;
+                text-align: left;
+                text-decoration: underline;
+                cursor: pointer;
+            }
+        }
     }
 }

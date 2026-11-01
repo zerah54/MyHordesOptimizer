@@ -6,9 +6,9 @@ namespace MyHordesOptimizerApi.Configuration.Impl
 {
     public class MyHordesTranslationsConfiguration : IMyHordesTranslationsConfiguration
     {
-        public List<string> Paths => _configuration.GetSection("Paths").Get<List<string>>();
+        public List<string> Paths => _configuration.GetSection("Paths").Get<List<string>>()!;
 
-        public string GitLabProjectId => _configuration.GetValue<string>("GitLabProjectId");
+        public string GitLabProjectId => _configuration.GetValue<string>("GitLabProjectId")!;
 
         private IConfigurationSection _configuration;
 

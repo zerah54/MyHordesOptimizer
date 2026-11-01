@@ -11,7 +11,7 @@ namespace MyHordesOptimizerApi.Dtos.ExternalTools.GestHordes.MajCase
         }
 
         [JsonProperty("userKey")]
-        public string UserKey { get; set; }
+        public string UserKey { get; set; } = null!;
 
         [JsonProperty("idMap")]
         public int IdMap { get; set; }

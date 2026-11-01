@@ -1,0 +1,50 @@
+@if (store.draft(); as draft) {
+    <table class="summary sources">
+        <thead>
+        <tr>
+            <th i18n>Libellé</th>
+            <th i18n>PA</th>
+            <th i18n>Défense</th>
+            <th i18n>Quantité</th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody>
+            @for (source of draft.defenseSources; track $index; let index = $index) {
+                <tr class="source">
+                    <td>
+                        <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                            <input matInput type="text" maxlength="64" data-field="source-label" [ngModel]="source.label" [disabled]="!store.can_edit()"
+                                   (ngModelChange)="onSourceLabel(index, $event)">
+                        </mat-form-field>
+                    </td>
+                    <td>
+                        <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                            <input matInput type="number" min="0" data-field="source-pa" [ngModel]="source.pa" [disabled]="!store.can_edit()"
+                                   (ngModelChange)="onSourceNumber(index, 'pa', $event)">
+                        </mat-form-field>
+                    </td>
+                    <td>
+                        <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                            <input matInput type="number" min="0" data-field="source-def" [ngModel]="source.def" [disabled]="!store.can_edit()"
+                                   (ngModelChange)="onSourceNumber(index, 'def', $event)">
+                        </mat-form-field>
+                    </td>
+                    <td>
+                        <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                            <input matInput type="number" min="0" data-field="source-qty" [ngModel]="source.qty" [disabled]="!store.can_edit()"
+                                   (ngModelChange)="onSourceNumber(index, 'qty', $event)">
+                        </mat-form-field>
+                    </td>
+                    <td>
+                        <button mat-icon-button type="button" data-action="remove-source" [disabled]="!store.can_edit()" (click)="removeSource(index)"
+                                i18n-matTooltip matTooltip="Supprimer la source">
+                            <mat-icon>delete</mat-icon>
+                        </button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <button mat-stroked-button type="button" data-action="add-source" [disabled]="!store.can_edit()" (click)="addSource()" i18n>Ajouter une source</button>
+}

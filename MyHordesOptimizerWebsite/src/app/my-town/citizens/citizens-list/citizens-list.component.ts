@@ -17,7 +17,7 @@ import {
     viewChild,
     WritableSignal
 } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatButtonModule } from '@angular/material/button';
@@ -33,32 +33,35 @@ import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { Router } from '@angular/router';
 import moment from 'moment';
+import { map } from 'rxjs';
 
 import { CITIZENS_LIST_DISPLAY_MODE_KEY, HORDES_IMG_REPO } from '../../../_abstract_model/const';
 import { NoteDTO } from '../../../_abstract_model/dto/note.dto';
-import { DailyActionEnum } from '../../../_abstract_model/enum/daily-action.enum';
+import { DailyActionEnum, displayableDailyActions } from '../../../_abstract_model/enum/daily-action.enum';
 import { HeroicActionEnum } from '../../../_abstract_model/enum/heroic-action.enum';
 import { HomeEnum } from '../../../_abstract_model/enum/home.enum';
 import { JobEnum } from '../../../_abstract_model/enum/job.enum';
 import { StatusEnum } from '../../../_abstract_model/enum/status.enum';
 import { StandardColumn } from '../../../_abstract_model/interfaces';
 import { ApiService } from '../../../_abstract_model/services/api.service';
+import { BuiltBuildingsService } from '../../../_abstract_model/services/built-buildings.service';
 import { NoteService } from '../../../_abstract_model/services/note.service';
 import { TownService } from '../../../_abstract_model/services/town.service';
-import { Dictionary, I18nLabels, Imports, ListForAddRemove } from '../../../_abstract_model/types/_types';
-import { Citizen } from '../../../_abstract_model/types/citizen.class';
+import { Dictionary, Imports, ListForAddRemove } from '../../../_abstract_model/types/_types';
 import { CitizenInfo } from '../../../_abstract_model/types/citizen-info.class';
+import { Citizen } from '../../../_abstract_model/types/citizen.class';
 import { DailyAction } from '../../../_abstract_model/types/daily-action.class';
-import { HeroSkill } from '../../../_abstract_model/types/hero-skill.class';
 import {
     HERO_SKILL_FAMILIES,
     HERO_SKILL_LETTERS,
     HeroSkillFamily,
     HeroSkillFamilyInfo,
+    heroSkillGroupNames,
     heroSkillLevelName,
     HeroSkillLevels,
     MAX_HERO_SKILL_LEVEL
 } from '../../../_abstract_model/types/hero-skill-levels';
+import { HeroSkill } from '../../../_abstract_model/types/hero-skill.class';
 import { HeroicActionsWithValue } from '../../../_abstract_model/types/heroic-actions.class';
 import { HomeWithValue } from '../../../_abstract_model/types/home.class';
 import { Item } from '../../../_abstract_model/types/item.class';
@@ -181,8 +184,11 @@ export class CitizensListComponent implements OnInit {
     protected readonly display_mode: WritableSignal<CitizensDisplayMode> = signal<CitizensDisplayMode>(
         (localStorage.getItem(CITIZENS_LIST_DISPLAY_MODE_KEY) as CitizensDisplayMode | null) ?? 'grouped'
     );
-    /** Toutes les actions quotidiennes possibles : pilotent la bande compacte et les colonnes du mode étendu. */
-    protected readonly daily_action_keys: DailyActionEnum[] = DailyActionEnum.getAllValues<DailyActionEnum>();
+    /** Actions quotidiennes affichables (chantier requis construit) : pilotent la bande compacte, les colonnes et les filtres. */
+    protected readonly daily_action_keys: Signal<DailyActionEnum[]> = toSignal(
+        inject(BuiltBuildingsService).builtUids().pipe(map(displayableDailyActions)),
+        { initialValue: displayableDailyActions(null) }
+    );
     /** Toutes les actions héroïques possibles, ordonnées (booléens puis niveaux) : pilotent les colonnes du mode étendu. */
     protected readonly heroic_actions_all: HeroicActionEnum[] = [...HeroicActionEnum.getAllValues<HeroicActionEnum>()].sort(byMaxLvlAsc);
     /** Toutes les améliorations possibles, ordonnées : pilotent les colonnes du mode étendu. */
@@ -202,7 +208,15 @@ export class CitizensListComponent implements OnInit {
     ];
     /** Groupes de compétences héroïques (S, U, P, E, R), saisis à la main. */
     protected readonly hero_skill_families: readonly HeroSkillFamilyInfo[] = HERO_SKILL_FAMILIES;
-    protected readonly MAX_HERO_SKILL_LEVEL: number = MAX_HERO_SKILL_LEVEL;
+    /** Niveaux proposés au menu d'un groupe (-1 : inconnu), précédés de la valeur affichée dans la cellule. */
+    protected readonly hero_skill_levels: readonly { value: number; label: string }[] = [
+        { value: -1, label: `? – ${$localize`Inconnu`}` },
+        { value: 0, label: `0 – ${$localize`Aucun`}` },
+        ...Array.from({ length: MAX_HERO_SKILL_LEVEL }, (_: unknown, index: number): { value: number; label: string } => ({
+            value: index + 1,
+            label: `${index + 1} – ${heroSkillLevelName(index)}`
+        }))
+    ];
     protected readonly CAMPING_COUNT_ID: string = CAMPING_COUNT_ID;
     protected readonly HERO_SKILL_ID_PREFIX: string = HERO_SKILL_ID_PREFIX;
     /** Nom de chaque groupe dans la langue du site ; sa lettre tant que les compétences ne sont pas chargées. */
@@ -225,8 +239,20 @@ export class CitizensListComponent implements OnInit {
     protected readonly sort_field: WritableSignal<string> = signal<string>('');
     /** Sens du tri actif. */
     protected readonly sort_direction: WritableSignal<SortDirection> = signal<SortDirection>('');
-    /** Champs proposés au menu « Trier par » (construit dans ngOnInit). */
-    protected sortable_fields: { id: string; label: string }[] = [];
+    /** Champs proposés au menu « Trier par ». */
+    protected readonly sortable_fields: Signal<{ id: string; label: string }[]> = computed((): { id: string; label: string }[] => [
+        { id: 'avatar_name', label: $localize`Nom` },
+        { id: 'job', label: $localize`Métier` },
+        { id: 'immune', label: $localize`Immunité` },
+        ...this.daily_action_keys().map((action: DailyActionEnum): { id: string; label: string } => ({ id: 'daily_' + action.key, label: action.getLabel() })),
+        ...this.heroic_actions_all.map((action: HeroicActionEnum): { id: string; label: string } => ({ id: 'heroic_' + action.key, label: action.getLabel() })),
+        ...this.home_all.map((home: HomeEnum): { id: string; label: string } => ({ id: 'home_' + home.key, label: home.getLabel() })),
+        ...HERO_SKILL_FAMILIES.map((family: HeroSkillFamilyInfo): { id: string; label: string } => ({
+            id: HERO_SKILL_ID_PREFIX + family.key,
+            label: this.hero_skill_group_names()[family.key]
+        })),
+        { id: CAMPING_COUNT_ID, label: $localize`Campings` },
+    ]);
     /** La liste des colonnes pour les citoyens morts */
     protected readonly dead_citizen_list_columns: StandardColumn[] = [
         { id: 'avatar_name', header: $localize`Citoyen`, class: 'center', sticky: true },
@@ -250,19 +276,19 @@ export class CitizensListComponent implements OnInit {
     /** Colonnes affichées en mode « groupé » (regroupées par type ; immunité en colonne dédiée pour le tri). */
     private readonly grouped_columns: string[] = ['avatar_name', 'etats_sac', 'immune', 'daily_actions', 'heroic_actions', 'home', 'hero_skills', 'camping', SHOES_EQUIPPED_ID, 'last_update'];
     /** Colonnes affichées en mode « colonnes » (une par champ). */
-    private readonly per_field_columns: string[] = [
+    private readonly per_field_columns: Signal<string[]> = computed((): string[] => [
         'job', 'town_roles', 'avatar_name', 'sac', 'coffre', 'etats', 'immune',
-        ...this.daily_action_keys.map((action: DailyActionEnum): string => 'daily_' + action.key),
+        ...this.daily_action_keys().map((action: DailyActionEnum): string => 'daily_' + action.key),
         ...this.heroic_actions_all.map((action: HeroicActionEnum): string => 'heroic_' + action.key),
         ...this.home_all.map((home: HomeEnum): string => 'home_' + home.key),
         ...HERO_SKILL_FAMILIES.map((family: HeroSkillFamilyInfo): string => HERO_SKILL_ID_PREFIX + family.key),
         CAMPING_COUNT_ID,
         SHOES_EQUIPPED_ID,
         'last_update',
-    ];
+    ]);
     /** Colonnes effectivement affichées selon le mode. */
     protected readonly displayed_columns: Signal<string[]> = computed((): string[] =>
-        this.display_mode() === 'columns' ? this.per_field_columns : this.grouped_columns);
+        this.display_mode() === 'columns' ? this.per_field_columns() : this.grouped_columns);
     /** Déclencheur du menu de MàJ en cours de survol + minuterie de fermeture différée. */
     private update_menu_trigger: MatMenuTrigger | null = null;
     private update_menu_close_timer: ReturnType<typeof setTimeout> | null = null;
@@ -320,7 +346,6 @@ export class CitizensListComponent implements OnInit {
 
         this.citizen_list.filterPredicate = (data: Citizen, filter: string): boolean => this.customFilter(data, filter);
         this.citizen_list.sortingDataAccessor = (citizen: Citizen, id: string): string | number => this.sortValue(citizen, id);
-        this.buildSortableFields();
 
         this.api_service
             .getItems()
@@ -344,7 +369,6 @@ export class CitizensListComponent implements OnInit {
             .subscribe({
                 next: (skills: HeroSkill[]): void => {
                     this.hero_skill_group_names.set(this.groupNames(skills));
-                    this.buildSortableFields();
                 }
             });
 
@@ -406,7 +430,7 @@ export class CitizensListComponent implements OnInit {
     protected activeSortLabel(): string | null {
         const field: string = this.sort_field();
         if (!field) return null;
-        return this.sortable_fields.find((sortable: { id: string; label: string }): boolean => sortable.id === field)?.label ?? null;
+        return this.sortable_fields().find((sortable: { id: string; label: string }): boolean => sortable.id === field)?.label ?? null;
     }
 
     /** Nombre de dimensions de filtre actives (badge du bouton Filtres). */
@@ -946,7 +970,7 @@ export class CitizensListComponent implements OnInit {
         return `${group} : ${heroSkillLevelName(level - 1)}`;
     }
 
-    /** Niveau d'un groupe de compétences (stepper : -1 = inconnu). */
+    /** Niveau d'un groupe de compétences (-1 = inconnu). */
     protected updateHeroSkill(citizen_id: number, family: HeroSkillFamily, value: number): void {
         const citizen: Citizen | undefined = this.citizen_list.data.find((candidate: Citizen): boolean => candidate.id === citizen_id);
         if (!citizen) return;
@@ -1191,32 +1215,9 @@ export class CitizensListComponent implements OnInit {
         return true;
     }
 
-    /** Construit la liste des champs triables (menu « Trier par »). */
-    private buildSortableFields(): void {
-        this.sortable_fields = [
-            { id: 'avatar_name', label: $localize`Nom` },
-            { id: 'job', label: $localize`Métier` },
-            { id: 'immune', label: $localize`Immunité` },
-            ...this.daily_action_keys.map((action: DailyActionEnum): { id: string; label: string } => ({ id: 'daily_' + action.key, label: action.getLabel() })),
-            ...this.heroic_actions_all.map((action: HeroicActionEnum): { id: string; label: string } => ({ id: 'heroic_' + action.key, label: action.getLabel() })),
-            ...this.home_all.map((home: HomeEnum): { id: string; label: string } => ({ id: 'home_' + home.key, label: home.getLabel() })),
-            ...HERO_SKILL_FAMILIES.map((family: HeroSkillFamilyInfo): { id: string; label: string } => ({
-                id: HERO_SKILL_ID_PREFIX + family.key,
-                label: this.hero_skill_group_names()[family.key]
-            })),
-            { id: CAMPING_COUNT_ID, label: $localize`Campings` },
-        ];
-    }
-
-    /** Nom de chaque groupe de capacités, lu dans les compétences servies par l'API (sa lettre à défaut). */
+    /** Nom de chaque groupe de compétences, lu dans les compétences servies par l'API (sa lettre à défaut). */
     private groupNames(skills: readonly HeroSkill[]): Record<HeroSkillFamily, string> {
-        const names: Record<HeroSkillFamily, string> = { ...this.hero_skill_group_names() };
-        HERO_SKILL_FAMILIES.forEach((family: HeroSkillFamilyInfo): void => {
-            const group: I18nLabels | null | undefined = skills.find((skill: HeroSkill): boolean => !skill.legacy && skill.group_sort === family.group_sort)?.group;
-            const name: string | undefined = group?.[this.locale] || group?.['de'];
-            if (name) names[family.key] = name;
-        });
-        return names;
+        return heroSkillGroupNames(skills, this.locale);
     }
 
     private getCitizens(): void {

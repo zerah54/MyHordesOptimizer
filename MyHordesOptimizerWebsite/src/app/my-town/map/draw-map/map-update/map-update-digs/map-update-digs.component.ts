@@ -16,15 +16,14 @@ import { Citizen } from '../../../../../_abstract_model/types/citizen.class';
 import { Dig } from '../../../../../_abstract_model/types/dig.class';
 import { getTown } from '../../../../../_core/utilities/localstorage.util';
 import { CitizenInfoComponent } from '../../../../../_shared/citizen-info/citizen-info.component';
-import {
-    HeaderWithNumberPreviousNextFilterComponent
-} from '../../../../../_shared/lists/header-with-number-previous-next/header-with-number-previous-next-filter.component';
+import { DaySelectorComponent } from '../../../../../_shared/day-selector/day-selector.component';
+import { DaysUpToPipe } from '../../../../../_shared/day-selector/days-up-to.pipe';
 import { DigsPerDayPipe } from './digs-per-day.pipe';
 import { NotInListCitizenDigPipe } from './not-in-list-citizen.pipe';
 
 const angular_common: Imports = [CommonModule, FormsModule];
-const components: Imports = [HeaderWithNumberPreviousNextFilterComponent, CitizenInfoComponent];
-const pipes: Imports = [DigsPerDayPipe, NotInListCitizenDigPipe];
+const components: Imports = [DaySelectorComponent, CitizenInfoComponent];
+const pipes: Imports = [DaysUpToPipe, DigsPerDayPipe, NotInListCitizenDigPipe];
 const material_modules: Imports = [MatButtonModule, MatFormFieldModule, MatIconModule, MatInputModule, MatListModule, MatMenuModule];
 
 @Component({

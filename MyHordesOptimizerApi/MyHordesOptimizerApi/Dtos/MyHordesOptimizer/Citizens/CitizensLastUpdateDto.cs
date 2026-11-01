@@ -4,7 +4,7 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Citizens
 {
     public class CitizensLastUpdateDto
     {
-        public LastUpdateInfoDto LastUpdateInfo { get; set; }
+        public LastUpdateInfoDto LastUpdateInfo { get; set; } = null!;
 
         public List<CitizenDto> Citizens { get; set; }
 

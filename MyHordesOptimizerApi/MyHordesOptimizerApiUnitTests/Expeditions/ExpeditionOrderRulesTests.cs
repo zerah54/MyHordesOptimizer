@@ -157,6 +157,29 @@ namespace MyHordesOptimizerApiUnitTests.Expeditions
         }
 
         [Fact]
+        public void Passage_SansCase_Refuse()
+        {
+            Validate(new ExpeditionOrder { Text = "x", Passage = 2 }).Should().Throw<MhoTechnicalException>();
+        }
+
+        [Theory]
+        [InlineData(0)]
+        [InlineData(-1)]
+        public void Passage_InferieurA1_Refuse(int passage)
+        {
+            Validate(new ExpeditionOrder { Text = "x", X = 3, Y = 3, Passage = passage }).Should().Throw<MhoTechnicalException>();
+        }
+
+        [Theory]
+        [InlineData(null)]
+        [InlineData(1)]
+        [InlineData(99)]
+        public void Passage_SurUneCase_Accepte(int? passage)
+        {
+            Validate(new ExpeditionOrder { Text = "x", X = 3, Y = 3, Passage = passage }).Should().NotThrow();
+        }
+
+        [Fact]
         public void TypeInconnu_Refuse()
         {
             Validate(new ExpeditionOrder { Kind = "dig" }).Should().Throw<MhoTechnicalException>();

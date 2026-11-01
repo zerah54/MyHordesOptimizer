@@ -44,5 +44,5 @@
     }
 </ng-template>
 
-<mho-menu-add #menuAdd="menuAdd" (add)="add.emit($event);" [class]="class()"></mho-menu-add>
+<mho-menu-add #menuAdd="menuAdd" (add)="add.emit($event);" [class]="class()" [keepOpen]="keepOpen()" [lists]="lists()"></mho-menu-add>
 <mho-menu-remove #menuRemove="menuRemove" (remove)="remove.emit($event)" (empty)="empty.emit($event)" [class]="class()"></mho-menu-remove>

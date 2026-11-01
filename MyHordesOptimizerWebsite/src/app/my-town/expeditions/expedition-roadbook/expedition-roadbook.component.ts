@@ -1,6 +1,7 @@
-import { ChangeDetectionStrategy, Component, computed, inject, input, InputSignal, Signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, ElementRef, inject, input, InputSignal, Signal, signal, viewChild, WritableSignal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { MatMenuModule, MatMenuTrigger } from '@angular/material/menu';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import moment from 'moment';
 
@@ -21,12 +22,20 @@ import { MapRouteDrawing } from '../../map/map-routes/map-route-views';
 import { mapRouteKey } from '../../map/map-routes/map-routes-display';
 import { ExpeditionOrderComponent } from '../expedition-order/expedition-order.component';
 import { ExpeditionOrderEditorService, ExpeditionOrderMapContext } from '../expedition-orders/expedition-order-editor.service';
-import { cellKey, cellOrdersOf, OwnedExpeditionOrder, ruinVisitAp } from '../expedition-orders/expedition-orders.util';
+import {
+    cellKey,
+    cellOrdersOf,
+    OwnedExpeditionOrder,
+    passageLabel,
+    routeIndexesOf,
+    ruinVisitAp,
+    ruinVisitsOf
+} from '../expedition-orders/expedition-orders.util';
 import { cellPlaceLabel, memberLabel, orderCountLabel, partApLabel } from '../expedition-orders/order-labels';
 import { buildRoadbook, MiniMapBox, miniMapBox, Roadbook, RoadbookNode, RoadbookStep } from '../expedition-orders/roadbook.util';
 
 const components: Imports = [ExpeditionOrderComponent, MapRoutesLayerComponent];
-const material_modules: Imports = [MatButtonModule, MatIconModule, MatTooltipModule];
+const material_modules: Imports = [MatButtonModule, MatIconModule, MatMenuModule, MatTooltipModule];
 
 /** Taille d'une case de la mini-carte, en pixels : la carte tient dans environ 300 px de côté. */
 const MINI_MAP_SIDE: number = 300;
@@ -48,8 +57,16 @@ interface StepView {
     readonly coordinates: string;
     readonly place: string;
     readonly ap: number | null;
+    readonly passage: number | null;
+    readonly passage_label: string | null;
     readonly orders: readonly OrderLine[];
     readonly addable: boolean;
+}
+
+/** Passage proposé dans le menu d'une case traversée plusieurs fois. */
+interface PassageChoice {
+    readonly passage: number;
+    readonly label: string;
 }
 
 interface MiniCell {
@@ -97,7 +114,28 @@ export class ExpeditionRoadbookComponent {
     /** Cocher une consigne (jour modifiable, citoyen de la ville). */
     public readonly checkable: InputSignal<boolean> = input<boolean>(false);
     public readonly me: InputSignal<number | null> = input<number | null>(null);
+    /** Non nul : seules restent les consignes de la partie et celles des places de ce citoyen. */
+    public readonly onlyUser: InputSignal<number | null> = input<number | null>(null);
 
+    /** Case traversée plusieurs fois dont le menu des passages est ouvert. */
+    private readonly passage_cell: WritableSignal<MapRoutePoint | null> = signal<MapRoutePoint | null>(null);
+    protected readonly passage_choices: Signal<readonly PassageChoice[]> = computed((): readonly PassageChoice[] => {
+        const cell: MapRoutePoint | null = this.passage_cell();
+        return cell ? routeIndexesOf(this.route()?.cells ?? [], cell).map((ap: number, index: number): PassageChoice => ({
+            passage: index + 1, label: `${passageLabel(index + 1)} · ${$localize`${ap}:ap: PA`}`
+        })) : [];
+    });
+    protected readonly passage_title: Signal<string> = computed((): string => {
+        const cell: MapRoutePoint | null = this.passage_cell();
+        const town: MapRoutePoint | null = this.town();
+        if (!cell || !town) return '';
+        const coords: string = `[${cell.x - town.x} ; ${town.y - cell.y}]`;
+        return $localize`Quel passage sur ${coords}:cell: ?`;
+    });
+
+    /** Ancre invisible du menu des passages, placée au point du clic. */
+    private readonly passage_anchor: Signal<ElementRef<HTMLElement> | undefined> = viewChild<ElementRef<HTMLElement>>('passageAnchor');
+    private readonly passage_trigger: Signal<MatMenuTrigger | undefined> = viewChild('passageAnchor', { read: MatMenuTrigger });
     private readonly order_editor: ExpeditionOrderEditorService = inject(ExpeditionOrderEditorService);
     private readonly locale: string = moment.locale();
 
@@ -122,7 +160,12 @@ export class ExpeditionRoadbookComponent {
     protected readonly edit_tooltip: string = $localize`Modifier la consigne`;
     protected readonly move_tooltip: string = $localize`Déplacer ou modifier la consigne`;
 
-    private readonly owned_orders: Signal<OwnedExpeditionOrder[]> = computed((): OwnedExpeditionOrder[] => cellOrdersOf(this.part()));
+    private readonly owned_orders: Signal<OwnedExpeditionOrder[]> = computed((): OwnedExpeditionOrder[] => {
+        const only_user: number | null = this.onlyUser();
+        const owned: OwnedExpeditionOrder[] = cellOrdersOf(this.part());
+        if (only_user === null) return owned;
+        return owned.filter((entry: OwnedExpeditionOrder): boolean => entry.owner.kind === 'part' || entry.owner.citizen.citizen_id === only_user);
+    });
 
     protected readonly roadbook: Signal<Roadbook | null> = computed((): Roadbook | null => {
         const town: MapRoutePoint | null = this.town();
@@ -141,6 +184,8 @@ export class ExpeditionRoadbookComponent {
                 coordinates: place?.coordinates ?? '',
                 place: cellPlaceLabel(step.cell, place, this.cells()),
                 ap: step.ap,
+                passage: step.passage,
+                passage_label: step.passage_label,
                 orders: step.orders.map((owned: OwnedExpeditionOrder, index: number): OrderLine => this.orderLine(owned, index)),
                 addable: step.addable
             };
@@ -186,7 +231,7 @@ export class ExpeditionRoadbookComponent {
         const route: ExpeditionPartRoute | null = this.route();
         const orders_text: string = orderCountLabel(roadbook?.order_count ?? 0, roadbook?.cell_count ?? 0);
         if (!route) return orders_text;
-        const ap_text: string = partApLabel(route.length, ruinVisitAp(this.part()));
+        const ap_text: string = partApLabel(route.length, this.ruinAp());
         return orders_text ? `${ap_text} · ${orders_text}` : ap_text;
     });
 
@@ -199,11 +244,32 @@ export class ExpeditionRoadbookComponent {
         const key: string | undefined = target?.dataset['cell'];
         if (!key) return;
         const [x, y]: number[] = key.split(',').map(Number);
-        void this.order_editor.edit(this.part(), { x, y }, null, this.form_context());
+        const cell: MapRoutePoint = { x, y };
+        if (routeIndexesOf(this.route()?.cells ?? [], cell).length > 1) {
+            this.openPassageMenu(cell, event);
+            return;
+        }
+        void this.order_editor.edit(this.part(), cell, null, this.form_context());
+    }
+
+    /** Ajoute une consigne sur la case du passage choisi dans le menu. */
+    protected choosePassage(passage: number): void {
+        const cell: MapRoutePoint | null = this.passage_cell();
+        if (cell) void this.order_editor.edit(this.part(), cell, null, this.form_context(), passage);
     }
 
     protected addOrder(step: StepView): void {
-        void this.order_editor.edit(this.part(), step.cell, null, this.form_context());
+        void this.order_editor.edit(this.part(), step.cell, null, this.form_context(), step.passage);
+    }
+
+    /** Ouvre le menu des passages de la case au point du clic. */
+    private openPassageMenu(cell: MapRoutePoint, event: MouseEvent): void {
+        const anchor: HTMLElement | undefined = this.passage_anchor()?.nativeElement;
+        if (!anchor) return;
+        this.passage_cell.set(cell);
+        anchor.style.left = `${event.clientX}px`;
+        anchor.style.top = `${event.clientY}px`;
+        this.passage_trigger()?.openMenu();
     }
 
     protected editOrder(step: StepView, line: OrderLine): void {
@@ -213,6 +279,14 @@ export class ExpeditionRoadbookComponent {
 
     protected toggleDone(line: OrderLine, done: boolean): Promise<void> {
         return this.order_editor.toggleDone(line.owned.order, done);
+    }
+
+    /** PA de visite de ruine : ceux de la place du joueur filtré (visites de la partie comprises), sinon ceux de la partie. */
+    private ruinAp(): number {
+        const only_user: number | null = this.onlyUser();
+        if (only_user === null) return ruinVisitAp(this.part());
+        const place: CitizenExpedition | undefined = this.part().citizens.find((citizen: CitizenExpedition): boolean => citizen.citizen_id === only_user);
+        return ruinVisitsOf(this.part(), place ?? Object.assign(new CitizenExpedition(), { orders: [] }));
     }
 
     private orderLine(owned: OwnedExpeditionOrder, index: number): OrderLine {

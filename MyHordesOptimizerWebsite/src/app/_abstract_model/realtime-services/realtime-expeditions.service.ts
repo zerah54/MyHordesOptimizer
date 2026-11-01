@@ -9,6 +9,7 @@ import { ExpeditionOrderDTO } from '../dto/expedition-order.dto';
 import { ExpeditionPartDTO } from '../dto/expedition-part.dto';
 import { MapRouteChangeDTO, MapRouteDTO, MapRouteRequestDTO } from '../dto/map-route.dto';
 import { dtoToModelArray, modelToDtoArray } from '../types/_common.class';
+import { ExpeditionDuplicateChoices } from '../types/_types';
 import { CitizenExpedition } from '../types/citizen-expedition.class';
 import { CitizenExpeditionBag } from '../types/citizen-expedition-bag.class';
 import { Expedition } from '../types/expedition.class';
@@ -272,6 +273,12 @@ export class RealtimeExpeditionsService extends RealtimeGlobalService {
     public async copyExpeditions(from_day: number, to_day: number): Promise<void> {
         console.log('send', 'CopyExpeditions', getTown()?.town_id, from_day, to_day);
         await this.invokeHub('CopyExpeditions', getTown()?.town_id, from_day, to_day);
+    }
+
+    /** Copie une expédition dans son jour : la copie arrive complète par `ExpeditionUpdated`. */
+    public async duplicateExpedition(expedition: Expedition, label: string | null, choices: ExpeditionDuplicateChoices): Promise<void> {
+        console.log('send', 'DuplicateExpedition', expedition.id, label, choices);
+        await this.invokeHub('DuplicateExpedition', expedition.id, label, choices.keepRoute, choices.keepGeneralOrders, choices.keepRouteOrders);
     }
 
     public async updateExpeditionPart(expedition: Expedition, part: ExpeditionPart): Promise<void> {

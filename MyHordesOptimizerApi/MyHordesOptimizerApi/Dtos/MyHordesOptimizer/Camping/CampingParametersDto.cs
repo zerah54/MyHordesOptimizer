@@ -6,7 +6,7 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Camping
     public class CampingParametersDto
     {
         public TownType TownType { get; set; }
-        public string Job { get; set; }
+        public string Job { get; set; } = null!;
         public int Distance { get; set; }
         public int Campings { get; set; }
         public bool ProCamper { get; set; }

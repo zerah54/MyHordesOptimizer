@@ -5,7 +5,7 @@ namespace MyHordesOptimizerApi.Configuration.Impl
 {
     public class MyHordesOptimizerSqlConfiguration : IMyHordesOptimizerSqlConfiguration
     {
-        public string ConnectionString => _configuration.GetValue<string>("ConnectionString");
+        public string ConnectionString => _configuration.GetValue<string>("ConnectionString")!;
 
 
         private IConfigurationSection _configuration;

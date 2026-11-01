@@ -10,8 +10,8 @@ import { StandardColumn } from '../../../_abstract_model/interfaces';
 import { DigsService } from '../../../_abstract_model/services/digs.service';
 import { TownService } from '../../../_abstract_model/services/town.service';
 import { Imports } from '../../../_abstract_model/types/_types';
-import { Citizen } from '../../../_abstract_model/types/citizen.class';
 import { CitizenInfo } from '../../../_abstract_model/types/citizen-info.class';
+import { Citizen } from '../../../_abstract_model/types/citizen.class';
 import { Dig } from '../../../_abstract_model/types/dig.class';
 import { TypedCellDefDirective } from '../../../_core/directives/typed-cell-def.directive';
 import { ColumnIdPipe } from '../../../_core/pipes/column-id.pipe';
@@ -19,16 +19,15 @@ import { TownContextService } from '../../../_core/services/town-context.service
 import { getTown } from '../../../_core/utilities/localstorage.util';
 import { AvatarComponent } from '../../../_shared/avatar/avatar.component';
 import { CitizenInfoComponent } from '../../../_shared/citizen-info/citizen-info.component';
+import { DaySelectorComponent } from '../../../_shared/day-selector/day-selector.component';
+import { DaysUpToPipe } from '../../../_shared/day-selector/days-up-to.pipe';
 import { DigComponent } from '../../../_shared/dig/dig.component';
-import {
-    HeaderWithNumberPreviousNextFilterComponent
-} from '../../../_shared/lists/header-with-number-previous-next/header-with-number-previous-next-filter.component';
 import { HeaderWithSelectFilterComponent } from '../../../_shared/lists/header-with-select-filter/header-with-select-filter.component';
 
 const angular_common: Imports = [CommonModule];
-const components: Imports = [AvatarComponent, DigComponent, HeaderWithNumberPreviousNextFilterComponent, HeaderWithSelectFilterComponent, CitizenInfoComponent];
+const components: Imports = [AvatarComponent, DaySelectorComponent, DigComponent, HeaderWithSelectFilterComponent, CitizenInfoComponent];
 const directives: Imports = [TypedCellDefDirective];
-const pipes: Imports = [ColumnIdPipe];
+const pipes: Imports = [ColumnIdPipe, DaysUpToPipe];
 const material_modules: Imports = [MatSortModule, MatTableModule];
 
 

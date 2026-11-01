@@ -7,7 +7,7 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer
         private DateTime _updateTime;
 
         public int UserId { get; set; }
-        public string UserName { get; set; }
+        public string UserName { get; set; } = null!;
 
         // MySQL ne conserve pas le Kind : une valeur UTC relue via EF revient en Unspecified,
         // que System.Text.Json sérialiserait sans 'Z' (le front l'interpréterait alors comme

@@ -3,7 +3,7 @@ import { inject } from '@angular/core';
 import { Observable } from 'rxjs';
 
 import { environment } from '../../../environments/environment';
-import { BYPASS_ERROR, BYPASS_LOADING } from '../../_core/services/http-context-tokens';
+import { BYPASS_ERROR, BYPASS_LOADING, SILENT_ERROR_STATUS } from '../../_core/services/http-context-tokens';
 
 export class GlobalService {
     protected readonly API_URL: string = environment.api_url;
@@ -27,8 +27,11 @@ export class GlobalService {
         return this.http.post<T>(url, params, { responseType: 'json', headers: headers, context: context });
     }
 
-    protected put<T>(url: string, body: unknown, params?: HttpParams): Observable<HttpResponse<T>> {
+    protected put<T>(url: string, body: unknown, params?: HttpParams, bypass_error?: boolean, silent_status: number | null = null): Observable<HttpResponse<T>> {
         const headers: HttpHeaders = new HttpHeaders().set('Content-Type', 'application/json');
+        const context: HttpContext = new HttpContext()
+            .set(BYPASS_ERROR, !!bypass_error)
+            .set(SILENT_ERROR_STATUS, silent_status);
         return this.http.put<T>(
             url,
             body,
@@ -36,7 +39,8 @@ export class GlobalService {
                 responseType: 'json',
                 headers: headers,
                 observe: 'response',
-                params
+                params,
+                context
             });
     }
 

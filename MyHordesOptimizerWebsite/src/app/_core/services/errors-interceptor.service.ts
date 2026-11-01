@@ -3,7 +3,7 @@ import { inject } from '@angular/core';
 import { catchError, Observable, throwError } from 'rxjs';
 
 import { AuthenticationService } from '../../_abstract_model/services/authentication.service';
-import { BYPASS_ERROR } from './http-context-tokens';
+import { BYPASS_ERROR, SILENT_ERROR_STATUS } from './http-context-tokens';
 import { SnackbarService } from './snackbar.service';
 
 /** Intercepte les appels REST pour afficher un loader */
@@ -12,7 +12,7 @@ export function errorInterceptor(request: HttpRequest<unknown>, next: HttpHandle
     const authentication_service: AuthenticationService = inject(AuthenticationService);
     return next(request)
         .pipe(
-            catchError((error: HttpErrorResponse) => request.context.get(BYPASS_ERROR)
+            catchError((error: HttpErrorResponse) => request.context.get(BYPASS_ERROR) || request.context.get(SILENT_ERROR_STATUS) === error.status
                 ? throwError(() => error)
                 : handleError(error, snackbar, authentication_service))
         );
@@ -49,5 +49,6 @@ function handleError(error: HttpErrorResponse, snackbar: SnackbarService, authen
                 snackbar.errorSnackbar(`Une erreur s'est produite lors de l'appel (Erreur ${error.status})`);
             }
         }
+        return error;
     });
 }

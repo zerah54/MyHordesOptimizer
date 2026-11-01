@@ -1,13 +1,52 @@
+import { DailyActionEnum, displayableDailyActions } from '../../_abstract_model/enum/daily-action.enum';
 import { JobEnum } from '../../_abstract_model/enum/job.enum';
+import { SpRequirementOperator } from '../../_abstract_model/types/_types';
 import { Citizen } from '../../_abstract_model/types/citizen.class';
 import { CitizenExpedition } from '../../_abstract_model/types/citizen-expedition.class';
+import { DailyAction } from '../../_abstract_model/types/daily-action.class';
 import { MapRoutePoint } from '../../_abstract_model/types/map-route.class';
+
+/** Opérateur d'exigence de PE, son symbole et son libellé. */
+export interface SpOperator {
+    readonly value: SpRequirementOperator;
+    readonly symbol: string;
+    readonly label: string;
+}
+
+/** Opérateurs d'exigence de PE, « au moins » (valeur par défaut) en tête. */
+const SP_OPERATORS: readonly SpOperator[] = [
+    { value: 'min', symbol: '≥', label: $localize`PE exigés : au moins` },
+    { value: 'max', symbol: '≤', label: $localize`PE exigés : au plus` },
+    { value: 'exact', symbol: '=', label: $localize`PE exigés : exactement` }
+];
+
+/** Opérateur d'une place ; inconnu : au moins. */
+export function spOperatorOf(place: CitizenExpedition): SpOperator {
+    return SP_OPERATORS.find((operator: SpOperator): boolean => operator.value === place.required_sp_operator) ?? SP_OPERATORS[0];
+}
+
+/** Opérateur suivant celui d'une place, dans l'ordre de SP_OPERATORS. */
+export function nextSpOperator(place: CitizenExpedition): SpRequirementOperator {
+    return SP_OPERATORS[(SP_OPERATORS.indexOf(spOperatorOf(place)) + 1) % SP_OPERATORS.length].value;
+}
+
+/** Exigence de PE d'une place, « ≥ 2 » ; nul sans exigence. */
+export function spRequirementLabel(place: CitizenExpedition): string | null {
+    if (place.required_sp === undefined || place.required_sp === null) return null;
+    return `${spOperatorOf(place).symbol} ${place.required_sp}`;
+}
 
 /** Distance à la ville (en km) à partir de laquelle un déplacement coûte un PE au lieu d'un PA. */
 const SP_MOVE_MIN_KM: number = 3;
 
 /** PE apportés par le métier d'éclaireur. */
 const SCOUT_SP: number = 2;
+
+/** PE apportés par une cartographie à J-1. */
+const MAPPING_SP: number = 2;
+
+/** PE apportés par une cartographie à J-1 pour un éclaireur. */
+const SCOUT_MAPPING_SP: number = 4;
 
 /** PE apportés par des chaussures équipées. */
 const SHOES_SP: number = 1;
@@ -32,16 +71,29 @@ export interface ApCheck {
     readonly short: boolean;
 }
 
-/** PE d'un citoyen au départ de l'expédition : éclaireur, chaussures. */
-export function startingSp(citizen: Citizen): number {
+/** Repaire des Éclaireurs construit, condition de « Cartographier le désert » ; chantiers inconnus : non construits. */
+export function scoutsLairBuilt(built_uids: ReadonlySet<string> | null): boolean {
+    return displayableDailyActions(built_uids).includes(DailyActionEnum.HOME_CROWS);
+}
+
+/** Cartographie faite à J-1 : enregistrée, ou supposée pour une expédition d'un jour futur si le Repaire des Éclaireurs est construit. */
+function hasMapped(citizen: Citizen, expedition_day: number, current_day: number, scouts_lair_built: boolean): boolean {
+    return (scouts_lair_built && expedition_day > current_day)
+        || (citizen.daily_actions ?? []).some((action: DailyAction): boolean =>
+            action.day === expedition_day - 1 && action.action_key === DailyActionEnum.HOME_CROWS.key);
+}
+
+/** PE d'un citoyen au départ de l'expédition : éclaireur, cartographie à J-1, chaussures. */
+export function startingSp(citizen: Citizen, expedition_day: number, current_day: number, scouts_lair_built: boolean): number {
     const is_scout: boolean = citizen.job?.key === JobEnum.SCOUT.key;
     let sp: number = citizen.shoes_equipped ? SHOES_SP : 0;
     if (is_scout) sp += SCOUT_SP;
+    if (hasMapped(citizen, expedition_day, current_day, scouts_lair_built)) sp += is_scout ? SCOUT_MAPPING_SP : MAPPING_SP;
     return sp;
 }
 
 /** Un citoyen vivant satisfait la place : métier préinscrit, PE selon l'opérateur (inconnu : au moins), chaussures. */
-export function meetsRequirements(citizen: Citizen, place: CitizenExpedition): boolean {
+export function meetsRequirements(citizen: Citizen, place: CitizenExpedition, expedition_day: number, current_day: number, scouts_lair_built: boolean): boolean {
     if (citizen.is_dead) return false;
     if (place.preinscrit_job && citizen.job?.key !== place.preinscrit_job) return false;
     if (place.requires_shoes === true && !citizen.shoes_equipped) return false;
@@ -49,7 +101,7 @@ export function meetsRequirements(citizen: Citizen, place: CitizenExpedition): b
 
     const required_sp: number | undefined = place.required_sp;
     if (required_sp === undefined || required_sp === null) return true;
-    const sp: number = startingSp(citizen);
+    const sp: number = startingSp(citizen, expedition_day, current_day, scouts_lair_built);
     switch (place.required_sp_operator) {
         case 'max': return sp <= required_sp;
         case 'exact': return sp === required_sp;

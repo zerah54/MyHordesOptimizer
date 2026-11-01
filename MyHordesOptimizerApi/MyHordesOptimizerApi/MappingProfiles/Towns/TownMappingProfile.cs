@@ -18,39 +18,39 @@ namespace MyHordesOptimizerApi.MappingProfiles.Towns
         public TownMappingProfile()
         {
             CreateMap<MyHordesUserDetailsDto, Town>()
-                .ForMember(dest => dest.Day, opt => opt.MapFrom(src => src.Map.Days))
+                .ForMember(dest => dest.Day, opt => opt.MapFrom(src => src.Map!.Days))
                 .ForMember(dest => dest.Expeditions, opt => opt.Ignore())
-                .ForMember(dest => dest.Height, opt => opt.MapFrom(src => src.Map.Hei))
+                .ForMember(dest => dest.Height, opt => opt.MapFrom(src => src.Map!.Hei))
                 // IdTown provisoire = -mapId : un townId réel (import saison) est toujours positif,
                 // ça garantit qu'une ligne pas encore migrée ne peut jamais entrer en collision avec
                 // une ville déjà connue par son townId stable (mapId recyclé d'une saison à l'autre).
-                .ForMember(dest => dest.IdTown, opt => opt.MapFrom(src => -src.MapId.Value))
+                .ForMember(dest => dest.IdTown, opt => opt.MapFrom(src => -src.MapId!.Value))
                 .ForMember(dest => dest.IdUserWishListUpdater, opt => opt.Ignore())
-                .ForMember(dest => dest.IsChaos, opt => opt.MapFrom(src => src.Map.City.Chaos))
-                .ForMember(dest => dest.IsDevasted, opt => opt.MapFrom(src => src.Map.City.Devast))
-                .ForMember(dest => dest.IsDoorOpen, opt => opt.MapFrom(src => src.Map.City.Door))
+                .ForMember(dest => dest.IsChaos, opt => opt.MapFrom(src => src.Map!.City!.Chaos))
+                .ForMember(dest => dest.IsDevasted, opt => opt.MapFrom(src => src.Map!.City!.Devast))
+                .ForMember(dest => dest.IsDoorOpen, opt => opt.MapFrom(src => src.Map!.City!.Door))
                 // La langue de la ville vient de `map.language`, et de LUI SEUL. Le `locale` du
                 // joueur qui synchronise n'a aucun rapport avec elle : il décrit le joueur, pas la
                 // ville. On l'en déduisait autrefois en supposant les villes ségréguées par langue —
                 // supposition abandonnée, la donnée de l'API étant la seule valable.
-                .ForMember(dest => dest.Language, opt => opt.MapFrom(src => src.Map.Language))
-                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Map.City.Name))
-                .ForMember(dest => dest.Season, opt => opt.MapFrom(src => src.Map.Season))
+                .ForMember(dest => dest.Language, opt => opt.MapFrom(src => src.Map!.Language))
+                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Map!.City!.Name))
+                .ForMember(dest => dest.Season, opt => opt.MapFrom(src => src.Map!.Season))
                 // Ce mapping ne sert qu'à la CRÉATION d'une ville : il n'y a donc rien à effacer,
                 // et les rôles peuvent être écrits sans la garde qu'exige leur mise à jour
                 // (cf. TownExtensions.UpdateRolesFromMapDetails). Sans eux ici, ils n'apparaîtraient
                 // qu'à la synchronisation suivante.
-                .ForMember(dest => dest.IdShaman, opt => opt.MapFrom(src => src.Map.Shaman))
-                .ForMember(dest => dest.IdGuide, opt => opt.MapFrom(src => src.Map.Guide))
-                .ForMember(dest => dest.IdCata, opt => opt.MapFrom(src => src.Map.Cata))
-                .ForMember(dest => dest.TownTypeId, opt => opt.MapFrom(src => (int?)TownExtensions.MapTownType(src.Map.City.Type)))
-                .ForMember(dest => dest.PhaseId, opt => opt.MapFrom(src => (int?)TownExtensions.MapTownPhase(src.Map.Phase)))
+                .ForMember(dest => dest.IdShaman, opt => opt.MapFrom(src => src.Map!.Shaman))
+                .ForMember(dest => dest.IdGuide, opt => opt.MapFrom(src => src.Map!.Guide))
+                .ForMember(dest => dest.IdCata, opt => opt.MapFrom(src => src.Map!.Cata))
+                .ForMember(dest => dest.TownTypeId, opt => opt.MapFrom(src => (int?)TownExtensions.MapTownType(src.Map!.City!.Type)))
+                .ForMember(dest => dest.PhaseId, opt => opt.MapFrom(src => (int?)TownExtensions.MapTownPhase(src.Map!.Phase)))
                 .ForMember(dest => dest.MapCellDigUpdates, opt => opt.Ignore())
                 .ForMember(dest => dest.MapCells, opt => opt.Ignore())
                 .ForMember(dest => dest.TownBankItems, opt => opt.MapFrom((src, dest, srcMember, context) =>
                 {
                     var results = new List<TownBankItem>();
-                    foreach (var myHordesBank in src.Map.City.Bank)
+                    foreach (var myHordesBank in src.Map!.City!.Bank!)
                     {
                         var model = context.Mapper.Map<TownBankItem>(myHordesBank);
                         if (model.IdItemNavigation == null)
@@ -60,9 +60,9 @@ namespace MyHordesOptimizerApi.MappingProfiles.Towns
                             // contrainte de clé étrangère et ferait échouer toute la synchronisation.
                             continue;
                         }
-                        model.IdLastUpdateInfo = src.Map.LastUpdateInfo.IdLastUpdateInfo;
+                        model.IdLastUpdateInfo = src.Map.LastUpdateInfo!.IdLastUpdateInfo;
                         model.IdLastUpdateInfoNavigation = src.Map.LastUpdateInfo;
-                        model.IdTown = -src.MapId.Value;
+                        model.IdTown = -src.MapId!.Value;
                         results.Add(model);
                     }
                     return results;
@@ -70,12 +70,12 @@ namespace MyHordesOptimizerApi.MappingProfiles.Towns
                 .ForMember(dest => dest.TownCitizens, opt => opt.MapFrom((src, dest, srcMember, context) =>
                 {
                     var results = new List<TownCitizen>();
-                    foreach (var myHordeCitizen in src.Map.Citizens)
+                    foreach (var myHordeCitizen in src.Map!.Citizens!)
                     {
                         var model = context.Mapper.Map<TownCitizen>(myHordeCitizen);
-                        model.IdLastUpdateInfo = src.Map.LastUpdateInfo.IdLastUpdateInfo;
+                        model.IdLastUpdateInfo = src.Map.LastUpdateInfo!.IdLastUpdateInfo;
                         model.IdLastUpdateInfoNavigation = src.Map.LastUpdateInfo;
-                        model.IdTown = -src.MapId.Value;
+                        model.IdTown = -src.MapId!.Value;
                         results.Add(model);
                     }
                     return results;
@@ -85,23 +85,23 @@ namespace MyHordesOptimizerApi.MappingProfiles.Towns
                     var results = new List<TownCadaver>();
                     // IdUser est une clé : un cadavre sans id n'identifie personne et ferait
                     // s'effondrer toutes les lignes concernées sur IdUser = 0.
-                    foreach (var myHordeCadaver in src.Map.Cadavers.Where(cadaver => cadaver.Id.HasValue))
+                    foreach (var myHordeCadaver in src.Map!.Cadavers!.Where(cadaver => cadaver.Id.HasValue))
                     {
                         var model = context.Mapper.Map<TownCadaver>(myHordeCadaver);
-                        model.IdLastUpdateInfo = src.Map.LastUpdateInfo.IdLastUpdateInfo;
+                        model.IdLastUpdateInfo = src.Map.LastUpdateInfo!.IdLastUpdateInfo;
                         model.IdLastUpdateInfoNavigation = src.Map.LastUpdateInfo;
-                        model.IdTown = -src.MapId.Value;
+                        model.IdTown = -src.MapId!.Value;
                         results.Add(model);
                     }
                     return results;
                 }))
                 .ForMember(dest => dest.TownEstimations, opt => opt.Ignore())
                 .ForMember(dest => dest.TownWishListItems, opt => opt.Ignore())
-                .ForMember(dest => dest.WaterWell, opt => opt.MapFrom(src => src.Map.City.Water))
-                .ForMember(dest => dest.Width, opt => opt.MapFrom(src => src.Map.Wid))
+                .ForMember(dest => dest.WaterWell, opt => opt.MapFrom(src => src.Map!.City!.Water))
+                .ForMember(dest => dest.Width, opt => opt.MapFrom(src => src.Map!.Wid))
                 .ForMember(dest => dest.WishlistDateUpdate, opt => opt.Ignore())
-                .ForMember(dest => dest.X, opt => opt.MapFrom(src => src.Map.City.X))
-                .ForMember(dest => dest.Y, opt => opt.MapFrom(src => src.Map.City.Y));
+                .ForMember(dest => dest.X, opt => opt.MapFrom(src => src.Map!.City!.X))
+                .ForMember(dest => dest.Y, opt => opt.MapFrom(src => src.Map!.City!.Y));
 
             CreateMap<MyHordesItem, TownBankItem>()
                 .ForMember(dest => dest.Count, opt => opt.MapFrom(src => src.Count))
@@ -175,8 +175,8 @@ namespace MyHordesOptimizerApi.MappingProfiles.Towns
                 .ForMember(dest => dest.IsTerrorised, opt => opt.Ignore())
                 .ForMember(dest => dest.IsThirsty, opt => opt.Ignore())
                 .ForMember(dest => dest.IsTired, opt => opt.Ignore())
-                .ForMember(dest => dest.JobName, opt => opt.MapFrom(src => src.Job.Name))
-                .ForMember(dest => dest.JobUid, opt => opt.MapFrom(src => src.Job.Uid))
+                .ForMember(dest => dest.JobName, opt => opt.MapFrom(src => src.Job!.Name))
+                .ForMember(dest => dest.JobUid, opt => opt.MapFrom(src => src.Job!.Uid))
                 .ForMember(dest => dest.KitchenLevel, opt => opt.Ignore())
                 .ForMember(dest => dest.LaboLevel, opt => opt.Ignore())
                 .ForMember(dest => dest.PositionX, opt => opt.MapFrom(src => src.X))
@@ -212,7 +212,7 @@ namespace MyHordesOptimizerApi.MappingProfiles.Towns
                 .ForMember(model => model.IdLastUpdateInfoNavigation, opt => opt.Ignore())
                 .ForMember(model => model.IdTown, opt => opt.Ignore())
                 .ForMember(model => model.IdTownNavigation, opt => opt.Ignore())
-                .ForMember(model => model.IdUser, opt => opt.MapFrom(dto => dto.Id.Value))
+                .ForMember(model => model.IdUser, opt => opt.MapFrom(dto => dto.Id!.Value))
                 .ForMember(model => model.IdUserNavigation, opt => opt.MapFrom((src, dest, srcMember, context) =>
                 {
                     var dbContext = context.GetDbContext();
@@ -221,8 +221,8 @@ namespace MyHordesOptimizerApi.MappingProfiles.Towns
                     {
                         var user = new User()
                         {
-                            IdUser = src.Id.Value,
-                            Name = src.Name,
+                            IdUser = src.Id!.Value,
+                            Name = src.Name!,
                             Avatar = src.Avatar
                         };
                         dbContext.Add(user);
@@ -268,7 +268,7 @@ namespace MyHordesOptimizerApi.MappingProfiles.Towns
         /// supposer. Un objet dont le <c>mhId</c> n'est pas encore renseigné est lu sous sa clé :
         /// c'est ce qu'elle signifiait avant le découplage.
         /// </remarks>
-        private static Item ResoudreObjet(ResolutionContext context, int? mhId)
+        private static Item? ResoudreObjet(ResolutionContext context, int? mhId)
         {
             if (!mhId.HasValue)
             {

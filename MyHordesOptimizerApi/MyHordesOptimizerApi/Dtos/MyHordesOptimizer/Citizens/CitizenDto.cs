@@ -9,16 +9,16 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Citizens
 
         public int Id { get; set; }
 
-        public string Name { get; set; }
+        public string Name { get; set; } = null!;
 
         public bool Dead { get; set; }
 
-        public string HomeMessage { get; set; }
+        public string? HomeMessage { get; set; }
 
-        public string Avatar { get; set; }
+        public string Avatar { get; set; } = null!;
 
-        public string JobName { get; set; }
-        public string JobUid { get; set; }
+        public string JobName { get; set; } = null!;
+        public string JobUid { get; set; } = null!;
 
         /// <summary>
         /// Rôles de ville portés par ce citoyen, parmi <c>shaman</c>, <c>guide</c> et <c>cata</c> —
@@ -43,13 +43,13 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Citizens
         public int NombreJourHero { get; set; }
 
         public BagDto Bag { get; set; }
-        public BagDto Chest { get; set; }
-        public CitizenHomeDto Home { get; set; }
-        public CitizenStatusDto Status { get; set; }
-        public CitizenActionsHeroic ActionsHeroic { get; set; }
-        public CitizenChamanicDetailDto ChamanicDetail { get; set; }
+        public BagDto? Chest { get; set; }
+        public CitizenHomeDto Home { get; set; } = null!;
+        public CitizenStatusDto? Status { get; set; }
+        public CitizenActionsHeroic? ActionsHeroic { get; set; }
+        public CitizenChamanicDetailDto? ChamanicDetail { get; set; }
         public CadaverDto Cadaver { get; set; }
-        public List<DailyActionDto> DailyActions { get; set; }
+        public List<DailyActionDto> DailyActions { get; set; } = null!;
 
         public bool IsShunned { get; set; }
 

@@ -126,9 +126,15 @@
     @if (move_options.length > 0) {
         <div class="row">
             <mat-form-field subscriptSizing="dynamic">
-                <mat-label i18n>Case</mat-label>
+                @if (data.order) {
+                    <mat-label i18n>Case</mat-label>
+                } @else {
+                    <mat-label i18n>Passage</mat-label>
+                }
                 <mat-select [value]="cell_key()" (valueChange)="cell_key.set($event)">
-                    <mat-option [value]="original_cell_key" disabled>{{ data.cell_label }}</mat-option>
+                    @if (data.order) {
+                        <mat-option [value]="original_cell_key">{{ original_label }}</mat-option>
+                    }
                     @for (option of move_options; track option.key) {
                         <mat-option [value]="option.key">{{ option.label }}</mat-option>
                     }

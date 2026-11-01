@@ -1,0 +1,43 @@
+@if (store.evaluation(); as evaluation) {
+    <h3 i18n>Ressources des chantiers terminés et des maisons</h3>
+    @if (rows().length === 0) {
+        <p class="empty" i18n>Aucune ressource nécessaire pour ce plan.</p>
+    } @else {
+        <table class="summary">
+            <thead>
+            <tr>
+                <th i18n>Ressource</th>
+                <th i18n>Besoin</th>
+                <th i18n>Banque</th>
+                <th i18n>Manque</th>
+            </tr>
+            </thead>
+            <tbody>
+                @for (row of rows(); track row.itemId) {
+                    <tr class="resource" [attr.data-item]="row.itemId" [class.missing]="row.gap > 0">
+                        <td>{{ row.label }}</td>
+                        <td class="need">{{ row.need }}</td>
+                        <td class="stock">{{ row.stock }}</td>
+                        <td class="gap">{{ row.gap }}</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+
+    @if (evaluation.missing.length === 0) {
+        <p class="all-covered" i18n>La banque couvre tous les besoins de ce plan.</p>
+    }
+    <button mat-flat-button type="button" data-action="send" [disabled]="!store.can_edit() || evaluation.missing.length === 0 || sending()" (click)="send()">
+        @if (sending()) {
+            <mat-spinner diameter="20"/>
+        } @else {
+            <span class="label">
+                <mat-icon>playlist_add</mat-icon>
+                <ng-container i18n>Envoyer les manques à la liste de courses</ng-container>
+            </span>
+        }
+    </button>
+} @else {
+    <p class="no-evaluation" i18n>Les ressources ne sont calculées que pour aujourd'hui et les jours à venir.</p>
+}

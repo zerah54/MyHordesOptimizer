@@ -157,7 +157,7 @@ namespace MyHordesOptimizerApi.Services.Impl
             var citizen = DbContext.TownCitizens.Where(townCitizen => townCitizen.IdTown == townId)
                  .Where(townCitizen => townCitizen.IdUser == userId)
                  .Include(townCitizen => townCitizen.IdLastUpdateChamanicNavigation)
-                 .ThenInclude(lastUpdate => lastUpdate.IdUserNavigation)
+                 .ThenInclude(lastUpdate => lastUpdate!.IdUserNavigation)
                  .Single();
             DbContext.ChangeTracker.Clear();
 
@@ -315,6 +315,10 @@ namespace MyHordesOptimizerApi.Services.Impl
             DbContext.Database.ExecuteSqlRaw("DELETE FROM MapRouteShare WHERE idMapRoute IN (SELECT idMapRoute FROM MapRoute WHERE idTown = {0})", townId);
             DbContext.Database.ExecuteSqlRaw("DELETE FROM MapRoute WHERE idTown = {0}", townId);
             DbContext.Database.ExecuteSqlRaw("DELETE FROM MapRouteGame WHERE idTown = {0}", townId);
+            DbContext.Database.ExecuteSqlRaw("DELETE FROM TownBuilding WHERE idTown = {0}", townId);
+            DbContext.Database.ExecuteSqlRaw("DELETE FROM TownDefense WHERE idTown = {0}", townId);
+            DbContext.Database.ExecuteSqlRaw("DELETE FROM TownBuildingPlan WHERE idTown = {0}", townId);
+            DbContext.Database.ExecuteSqlRaw("DELETE FROM TownBuildingPlanSettings WHERE idTown = {0}", townId);
             DbContext.Database.ExecuteSqlRaw("DELETE FROM Town WHERE idTown = {0}", townId);
 
             DbContext.Database.ExecuteSqlRaw("SET FOREIGN_KEY_CHECKS = 1");

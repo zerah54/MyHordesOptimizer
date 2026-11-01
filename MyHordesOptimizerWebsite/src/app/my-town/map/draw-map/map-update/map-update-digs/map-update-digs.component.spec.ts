@@ -6,6 +6,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Cell } from '../../../../../_abstract_model/types/cell.class';
 import { Citizen } from '../../../../../_abstract_model/types/citizen.class';
 import { Dig } from '../../../../../_abstract_model/types/dig.class';
+import { TownDetails } from '../../../../../_abstract_model/types/town-details.class';
 import { setTown } from '../../../../../_core/utilities/localstorage.util';
 import { MapUpdateDigsComponent } from './map-update-digs.component';
 
@@ -45,6 +46,21 @@ describe('MapUpdateDigsComponent', (): void => {
         const rows: NodeListOf<HTMLElement> = fixture.nativeElement.querySelectorAll('tbody tr');
         expect(rows.length).toBe(1);
         expect(rows[0].textContent).toContain('Alice');
+    });
+
+    it('lists the digs of the day picked in the day selector', (): void => {
+        setTown(Object.assign(new TownDetails(), { day: 2 }));
+        fixture = TestBed.createComponent(MapUpdateDigsComponent);
+        fixture.componentRef.setInput('cell', Object.assign(new Cell(), { displayed_x: 0, displayed_y: 0 }));
+        fixture.componentRef.setInput('allCitizens', [newCitizen(1, 'Alice'), newCitizen(2, 'Bob')]);
+        fixture.componentRef.setInput('digs', [newDig({ digger_id: 1, digger_name: 'Alice', day: 2 }), newDig({ digger_id: 2, digger_name: 'Bob', day: 1 })]);
+        fixture.detectChanges();
+        expect(fixture.nativeElement.querySelector('tbody tr').textContent).toContain('Alice');
+
+        fixture.nativeElement.querySelector('button[data-action="previous-day"]').click();
+        fixture.detectChanges();
+
+        expect(fixture.nativeElement.querySelector('tbody tr').textContent).toContain('Bob');
     });
 
     it('only offers citizens without a dig on the selected day', (): void => {

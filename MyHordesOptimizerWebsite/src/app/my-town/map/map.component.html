@@ -65,7 +65,8 @@
             <mho-draw-map [map]="map()!" [allItems]="all_items()!" [allRuins]="all_ruins()!" [options]="cell_options()"
                           [zoom]="options().zoom" [allCitizens]="all_citizens()!" [routes]="route_drawings()" [orderBadges]="order_badges()"
                           [routeEditing]="route_editing()" [editedCells]="route_editor.cell_keys()"
-                          (cellPicked)="onCellPicked($event)" (cellHovered)="onCellHovered($event)" (cellCut)="route_editor.cutAt($event)"></mho-draw-map>
+                          (cellPicked)="onCellPicked($event)" (cellHovered)="onCellHovered($event)" (cellCut)="route_editor.cutAt($event)"
+                          (cellUpdated)="onCellUpdated($event)"></mho-draw-map>
         </mat-sidenav-content>
         <mat-sidenav #sidenav class="map-settings" [position]="'end'" [mode]="is_gt_xs() ? 'side' : 'over'"
                      (openedChange)="onSidePanelOpenedChange($event)">
@@ -77,6 +78,30 @@
                         <ng-container i18n>Affichage</ng-container>
                     }
                 </h2>
+                @if (side_panel() === 'display') {
+                    <button class="map-theme-toggle" mat-icon-button type="button" [matMenuTriggerFor]="themeMenu"
+                            aria-label="Thème de la carte" i18n-aria-label i18n-matTooltip matTooltip="Thème de la carte">
+                        <mat-icon>palette</mat-icon>
+                    </button>
+                    <mat-menu #themeMenu="matMenu">
+                        <ng-template matMenuContent>
+                            @for (choice of theme_choices(); track choice.value) {
+                                <button class="map-theme-option" mat-menu-item type="button" role="menuitemradio"
+                                        [attr.aria-checked]="choice.value === theme_value()" (click)="changeTheme(choice.value)">
+                                    <mat-icon>{{ choice.value === theme_value() ? 'radio_button_checked' : 'radio_button_unchecked' }}</mat-icon>
+                                    <span class="map-theme-option-label">{{ choice.label }}</span>
+                                </button>
+                            }
+                            @if (user_id(); as id) {
+                                <mat-divider></mat-divider>
+                                <a class="map-theme-link" mat-menu-item [routerLink]="['/profile', id, 'theme']">
+                                    <mat-icon>edit</mat-icon>
+                                    <ng-container i18n>Gérer mes thèmes</ng-container>
+                                </a>
+                            }
+                        </ng-template>
+                    </mat-menu>
+                }
                 <button mat-icon-button type="button" (click)="sidenav.close()"
                         aria-label="Fermer le panneau" i18n-aria-label>
                     <mat-icon>close</mat-icon>
@@ -216,38 +241,95 @@
                     <div>
                         <h2 i18n>Afficher les zones en distance</h2>
                         <div class="dist-zones">
-                            <button mat-button type="button" [matMenuTriggerFor]="addZone">
+                            <button mat-button type="button" [matMenuTriggerFor]="addZone" (click)="startAddingDistance()">
                                 <mat-icon>add</mat-icon>
                                 <ng-container i18n>Ajouter une zone</ng-container>
                             </button>
                             <mat-menu #addZone="matMenu">
-                                <div (click)="$event.stopPropagation()" style="padding: 0.5em">
-                                    <div style="display: flex; align-items: center">
-                                        <mat-form-field style="width: calc(100% - 100px)">
-                                            <input matInput [(ngModel)]="new_distance_option.value" placeholder="Distance" i18n-placeholder>
-                                        </mat-form-field>
-                                        <mat-form-field style="width: 100px">
-                                            <mat-select [(ngModel)]="new_distance_option.unit" placeholder="Unité" i18n-placeholder>
-                                                <mat-option [value]="'km'" i18n>km</mat-option>
-                                                <mat-option [value]="'pa'" i18n>PA</mat-option>
-                                            </mat-select>
-                                        </mat-form-field>
+                                <ng-template matMenuContent>
+                                    <div (click)="$event.stopPropagation()" style="padding: 0.5em">
+                                        <div style="display: flex; align-items: center">
+                                            <mat-form-field style="width: calc(100% - 100px)">
+                                                <input matInput [(ngModel)]="new_distance_option.value" placeholder="Distance" i18n-placeholder>
+                                            </mat-form-field>
+                                            <mat-form-field style="width: 100px">
+                                                <mat-select [(ngModel)]="new_distance_option.unit" placeholder="Unité" i18n-placeholder>
+                                                    <mat-option [value]="'km'" i18n>km</mat-option>
+                                                    <mat-option [value]="'pa'" i18n>PA</mat-option>
+                                                </mat-select>
+                                            </mat-form-field>
+                                        </div>
+                                        @if (new_distance_option.unit === 'pa') {
+                                            <mat-checkbox [(ngModel)]="new_distance_option.round_trip" i18n>Aller / Retour</mat-checkbox>
+                                        }
+                                        <div class="zone-appearance">
+                                            <mat-form-field>
+                                                <mat-select #zone_color [ngModel]="distance_color_is_custom ? CUSTOM_DISTANCE_COLOR : new_distance_option.color"
+                                                            (ngModelChange)="changeDistanceColor($event)" placeholder="Couleur" i18n-placeholder>
+                                                    <mat-select-trigger>
+                                                        <span class="zone-swatch" [style.background-color]="new_distance_option.color"></span>
+                                                        {{ zone_color.triggerValue }}
+                                                    </mat-select-trigger>
+                                                    @for (color of distance_colors; track color.value) {
+                                                        <mat-option [value]="color.value">
+                                                            <span class="zone-swatch" [style.background-color]="color.value"></span>
+                                                            {{ color.label }}
+                                                        </mat-option>
+                                                    }
+                                                    <mat-option [value]="CUSTOM_DISTANCE_COLOR" i18n>Autre</mat-option>
+                                                </mat-select>
+                                            </mat-form-field>
+                                            @if (distance_color_is_custom) {
+                                                <input type="color" class="zone-custom-color" [(ngModel)]="new_distance_option.color"
+                                                       aria-label="Couleur précise" i18n-aria-label>
+                                            }
+                                            <mat-form-field>
+                                                <mat-select [(ngModel)]="new_distance_option.border_style" placeholder="Style" i18n-placeholder>
+                                                    <mat-select-trigger>
+                                                        <span class="zone-line" [style.border-top-style]="new_distance_option.border_style"
+                                                              [style.border-top-color]="new_distance_option.color"></span>
+                                                    </mat-select-trigger>
+                                                    @for (border_style of distance_border_styles; track border_style.value) {
+                                                        <mat-option [value]="border_style.value">
+                                                            <span class="zone-line" [style.border-top-style]="border_style.value"></span>
+                                                            {{ border_style.label }}
+                                                        </mat-option>
+                                                    }
+                                                </mat-select>
+                                            </mat-form-field>
+                                        </div>
+                                        <div class="zone-items">
+                                            <div class="zone-detail" i18n>Objets à compter</div>
+                                            <mho-list-element-add-remove label="" keepOpen [currentList]="distance_items()" [lists]="distance_item_lists()"
+                                                                         addLabel="Ajouter aux objets à compter" i18n-addLabel
+                                                                         removeLabel="Retirer des objets à compter" i18n-removeLabel
+                                                                         emptyLabel="Retirer tous les objets" i18n-emptyLabel
+                                                                         (add)="addDistanceItem(+$event)" (remove)="removeDistanceItem(+$event)"
+                                                                         (empty)="distance_item_uids.set([])"></mho-list-element-add-remove>
+                                        </div>
+                                        <div class="zone-actions">
+                                            @if (edited_distance) {
+                                                <button mat-button type="button" (click)="removeEditedDistance(); addZone.closed.next('click')" i18n>Supprimer
+                                                </button>
+                                            }
+                                            <button mat-button type="button" (click)="saveDistance(); addZone.closed.next('click')">
+                                                @if (edited_distance) {
+                                                    <ng-container i18n>Modifier</ng-container>
+                                                } @else {
+                                                    <ng-container i18n>Ajouter</ng-container>
+                                                }
+                                            </button>
+                                        </div>
                                     </div>
-                                    @if (new_distance_option.unit === 'pa') {
-                                        <mat-checkbox [(ngModel)]="new_distance_option.round_trip" i18n>Aller / Retour</mat-checkbox>
-                                    }
-                                    <button mat-button type="button" (click)="addDistanceToList(); addZone.closed.next('click')" i18n>Ajouter</button>
-                                </div>
+                                </ng-template>
                             </mat-menu>
-                            <mat-list>
-                                @for (option of options().distances; track option) {
-                                    <mat-list-item>
-                                        <button mat-icon-button type="button" matListItemIcon (click)="removeDistanceFromList(option)">
-                                            <mat-icon>delete</mat-icon>
-                                        </button>
-                                        <div matListItemTitle>{{ option.value }}&nbsp;{{ option.unit }}</div>
+                            @for (option of options().distances; track option) {
+                                <div class="zone-row">
+                                    <span class="zone-line" [style.border-top]="option | distanceBorder"></span>
+                                    <div class="zone-label">
+                                        <div class="zone-title">{{ option.value }}&nbsp;{{ option.unit }}</div>
                                         @if (option.unit === 'pa') {
-                                            <div matListItemLine>
+                                            <div class="zone-detail">
                                                 @if (option.round_trip) {
                                                     <ng-container i18n>Aller / Retour</ng-container>
                                                 } @else {
@@ -255,9 +337,28 @@
                                                 }
                                             </div>
                                         }
-                                    </mat-list-item>
-                                }
-                            </mat-list>
+                                    </div>
+                                    @if (option.item_uids?.length) {
+                                        <span class="zone-count" cdkOverlayOrigin #zone_count="cdkOverlayOrigin" tabindex="0"
+                                              (mouseenter)="hovered_zone.set(option)" (mouseleave)="hovered_zone.set(null)"
+                                              (focus)="hovered_zone.set(option)"
+                                              (blur)="hovered_zone.set(null)">{{ option | zoneItemCount:zone_cells():all_items() }}</span>
+                                        <ng-template cdkConnectedOverlay [cdkConnectedOverlayOrigin]="zone_count"
+                                                     [cdkConnectedOverlayOpen]="hovered_zone() === option"
+                                                     [cdkConnectedOverlayPositions]="zone_tooltip_positions" [cdkConnectedOverlayViewportMargin]="8">
+                                            <div class="zone-count-tooltip" role="tooltip">
+                                                @for (item of option | zoneItems:all_items(); track item.id) {
+                                                    <img [src]="HORDES_IMG_REPO + item.img" [alt]="item.label | localizedLabel:''">
+                                                }
+                                            </div>
+                                        </ng-template>
+                                    }
+                                    <button mat-icon-button type="button" [matMenuTriggerFor]="addZone" (click)="startEditingDistance(option)"
+                                            aria-label="Modifier la zone" i18n-aria-label>
+                                        <mat-icon>edit</mat-icon>
+                                    </button>
+                                </div>
+                            }
                         </div>
                     </div>
                 }

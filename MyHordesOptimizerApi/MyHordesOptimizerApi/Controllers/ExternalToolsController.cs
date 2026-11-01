@@ -62,7 +62,7 @@ namespace MyHordesOptimizerApi.Controllers
         /// mais écrites sous l'identité de l'attaquant (IdUser), une salissure de données.
         /// </para>
         /// </summary>
-        private ActionResult ValidateAuthenticatedUser(int userId, string userKey)
+        private ActionResult? ValidateAuthenticatedUser(int userId, string userKey)
         {
             if (UserInfoProvider.UserId == 0 || UserInfoProvider.UserId != userId)
             {
@@ -76,7 +76,7 @@ namespace MyHordesOptimizerApi.Controllers
         }
 
         /// <summary>Contrôles communs aux deux routes de mise à jour. Null si la requête est valide.</summary>
-        private ActionResult ValidateUpdateRequest(string userKey, UpdateRequestDto updateRequestDto)
+        private ActionResult? ValidateUpdateRequest(string userKey, UpdateRequestDto updateRequestDto)
         {
             if (string.IsNullOrWhiteSpace(userKey))
             {
@@ -90,7 +90,7 @@ namespace MyHordesOptimizerApi.Controllers
             {
                 return BadRequest($"{nameof(updateRequestDto.TownDetails)} cannot be empty");
             }
-            if (UpdateRequestMapToolsToUpdateDetailsDto.IsCell(updateRequestDto.Map.ToolsToUpdate.IsBigBrothHordes))
+            if (UpdateRequestMapToolsToUpdateDetailsDto.IsCell(updateRequestDto.Map!.ToolsToUpdate.IsBigBrothHordes))
             {
                 return BadRequest($"IsBigBrothHordes ne peut pas avoir une valeur autre que \"api\" ou \"none\"");
             }

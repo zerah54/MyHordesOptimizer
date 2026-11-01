@@ -160,10 +160,10 @@ namespace MyHordesOptimizerApi.Services.Impl.Locking
         private sealed class Releaser : IAsyncDisposable
         {
             private readonly TownSyncLock _owner;
-            private readonly SemaphoreSlim _townGate;
+            private readonly SemaphoreSlim? _townGate;
             private bool _released;
 
-            public Releaser(TownSyncLock owner, SemaphoreSlim townGate)
+            public Releaser(TownSyncLock owner, SemaphoreSlim? townGate)
             {
                 _owner = owner;
                 _townGate = townGate;

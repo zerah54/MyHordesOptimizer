@@ -9,15 +9,16 @@ import { ExpeditionOrderDTO } from '../../../_abstract_model/dto/expedition-orde
 import { JobEnum } from '../../../_abstract_model/enum/job.enum';
 import { RealtimeExpeditionsService } from '../../../_abstract_model/realtime-services/realtime-expeditions.service';
 import { Cell } from '../../../_abstract_model/types/cell.class';
-import { Citizen } from '../../../_abstract_model/types/citizen.class';
 import { CitizenExpedition } from '../../../_abstract_model/types/citizen-expedition.class';
-import { Expedition } from '../../../_abstract_model/types/expedition.class';
+import { Citizen } from '../../../_abstract_model/types/citizen.class';
 import { ExpeditionOrder } from '../../../_abstract_model/types/expedition-order.class';
 import { ExpeditionPart, ExpeditionPartRoute } from '../../../_abstract_model/types/expedition-part.class';
+import { Expedition } from '../../../_abstract_model/types/expedition.class';
 import { Ruin } from '../../../_abstract_model/types/ruin.class';
 import { Town } from '../../../_abstract_model/types/town.class';
 import { SnackbarService } from '../../../_core/services/snackbar.service';
 import { ExpeditionOrderFormComponent, ExpeditionOrderFormData, ExpeditionOrderFormResult } from '../expedition-order-form/expedition-order-form.component';
+import { ExpeditionOrderEditorService } from '../expedition-orders/expedition-order-editor.service';
 import { ExpeditionRoadbookComponent } from './expedition-roadbook.component';
 
 interface DialogStub {
@@ -158,12 +159,50 @@ describe('ExpeditionRoadbookComponent', (): void => {
         expect(text(fixture.nativeElement.querySelector('.off-route-alert'))).toContain('1 consigne n\'est plus sur le tracé.');
     });
 
+    it('shows the passage of a step on a cell crossed twice', (): void => {
+        const back: ExpeditionPartRoute = { ...ROUTE, cells: [{ x: 7, y: 7 }, { x: 8, y: 7 }, { x: 9, y: 7 }, { x: 8, y: 7 }, { x: 8, y: 6 }] };
+        const two_passes: ExpeditionPart = part(back);
+        two_passes.orders = [order(1, 0, { type: 'text', text: 'au retour', x: 8, y: 7, passage: 2 })];
+        two_passes.citizens = [];
+        render(two_passes);
+
+        const heads: string[] = Array.from<Element>(fixture.nativeElement.querySelectorAll('.step-head')).map(text);
+        expect(heads.filter((head: string): boolean => head.includes('2e passage')).length).toBe(1);
+        expect(heads.some((head: string): boolean => head.includes('1er passage'))).toBe(false);
+    });
+
     it('says to whom each order is addressed', (): void => {
         render(part());
 
         const scopes: string[] = Array.from<Element>(fixture.nativeElement.querySelectorAll('.scope')).map(text);
         expect(scopes).toEqual(['Moi', 'N\'importe qui', 'Bob']);
         expect(fixture.nativeElement.querySelector('.scope.me')).not.toBeNull();
+    });
+
+    it('keeps only my orders and the ones for anyone with onlyUser', (): void => {
+        render(part(), { onlyUser: ALICE.id });
+
+        // Départ et arrivée du tracé restent ; la case hors tracé de Bob disparaît.
+        expect(steps()).toEqual(['D [0 ; 0] Ville 0PA', '1 [1 ; 0] Bâtiment enseveli 1PA', '2 [2 ; 0] Hôpital 2PA', 'A [2 ; 1] Désert 3PA']);
+        expect(Array.from<Element>(fixture.nativeElement.querySelectorAll('.scope')).map(text)).toEqual(['Moi', 'N\'importe qui']);
+    });
+
+    it('sums the ruin visit AP of the filtered player only, not the most loaded member', (): void => {
+        const value: ExpeditionPart = part();
+        value.citizens[0].orders = [order(3, 0, { kind: 'explore', x: 9, y: 7 })];
+        value.citizens[1].orders = [3, 4, 5].map((id: number): ExpeditionOrder => order(id, id, { kind: 'explore', x: 9, y: 7 }));
+        render(value, { onlyUser: ALICE.id });
+
+        expect(text(fixture.nativeElement.querySelector('.summary'))).toBe('4 PA (3 + 1) · 2 consigne(s) sur 1 case(s)');
+    });
+
+    it('counts the filtered orders on the mini map', (): void => {
+        render(part(), { onlyUser: BOB.id });
+
+        const cell: (key: string) => HTMLElement = (key: string): HTMLElement => fixture.nativeElement.querySelector(`[data-cell="${key}"]`);
+        expect(cell('8,7').querySelector('.count')).toBeNull();
+        expect(text(cell('9,7').querySelector('.count'))).toBe('1');
+        expect(text(cell('12,12').querySelector('.count'))).toBe('1');
     });
 
     it('without route, ranks the cells by distance to the town', (): void => {
@@ -354,5 +393,94 @@ describe('ExpeditionRoadbookComponent', (): void => {
         (<HTMLElement>fixture.nativeElement.querySelectorAll('mat-checkbox input')[0]).click();
         await settle();
         expect(snackbar.errorSnackbar).toHaveBeenCalledTimes(1);
+    });
+
+    describe('passage choice', (): void => {
+        const LOOP: ExpeditionPartRoute = { ...ROUTE, cells: [{ x: 7, y: 7 }, { x: 10, y: 9 }, { x: 10, y: 8 }, { x: 10, y: 9 }, { x: 7, y: 7 }], length: 4 };
+        let edit: ReturnType<typeof vi.fn>;
+
+        function loopPart(): ExpeditionPart {
+            const value: ExpeditionPart = part(LOOP);
+            value.orders = [order(1, 0, { type: 'text', text: 'au retour', x: 10, y: 9, passage: 2 })];
+            value.citizens = [];
+            return value;
+        }
+
+        function click(cell: string): void {
+            (<HTMLElement>fixture.nativeElement.querySelector(`[data-cell="${cell}"]`)).click();
+            fixture.detectChanges();
+        }
+
+        function menuItems(): string[] {
+            return Array.from<Element>(document.querySelectorAll('.cdk-overlay-container [role="menuitem"]')).map(text);
+        }
+
+        beforeEach((): void => {
+            edit = vi.spyOn(TestBed.inject(ExpeditionOrderEditorService), 'edit').mockResolvedValue(undefined);
+        });
+
+        it('passes the passage of the step to add an order on', (): void => {
+            render(loopPart(), { editable: true });
+
+            (<HTMLButtonElement[]>Array.from(fixture.nativeElement.querySelectorAll('button.add')))[1].click();
+
+            expect(edit.mock.calls[0][1]).toEqual({ x: 10, y: 9 });
+            expect(edit.mock.calls[0][4]).toBe(2);
+        });
+
+        it('passes the last passage of the town when adding on the arrival of a loop', (): void => {
+            render(loopPart(), { editable: true });
+
+            (<HTMLButtonElement[]>Array.from(fixture.nativeElement.querySelectorAll('button.add'))).at(-1)?.click();
+
+            expect(edit.mock.calls[0][1]).toEqual({ x: 7, y: 7 });
+            expect(edit.mock.calls[0][4]).toBe(2);
+        });
+
+        it('opens the editor directly on a cell crossed once', (): void => {
+            render(loopPart(), { editable: true });
+            click('10,8');
+
+            expect(edit).toHaveBeenCalledTimes(1);
+            expect(edit.mock.calls[0][1]).toEqual({ x: 10, y: 8 });
+            expect(menuItems()).toEqual([]);
+        });
+
+        it('opens the editor directly on a cell off the route', (): void => {
+            render(loopPart(), { editable: true });
+            click('9,8');
+
+            expect(edit).toHaveBeenCalledTimes(1);
+            expect(edit.mock.calls[0][1]).toEqual({ x: 9, y: 8 });
+        });
+
+        it('offers the passages of a cell crossed twice instead of opening the editor', (): void => {
+            render(loopPart(), { editable: true });
+            click('10,9');
+
+            expect(edit).not.toHaveBeenCalled();
+            expect(menuItems()).toEqual(['1er passage · 1 PA', '2e passage · 3 PA']);
+            expect(text(document.querySelector('.cdk-overlay-container .passage-menu-title'))).toBe('Quel passage sur [3 ; -2] ?');
+        });
+
+        it('edits on the passage chosen in the menu', (): void => {
+            render(loopPart(), { editable: true });
+            click('10,9');
+            (<HTMLElement>document.querySelectorAll('.cdk-overlay-container [role="menuitem"]')[1]).click();
+
+            expect(edit).toHaveBeenCalledTimes(1);
+            expect(edit.mock.calls[0][1]).toEqual({ x: 10, y: 9 });
+            expect(edit.mock.calls[0][4]).toBe(2);
+        });
+
+        it('does nothing when the menu is closed without a choice', async (): Promise<void> => {
+            render(loopPart(), { editable: true });
+            click('10,9');
+            document.querySelector('.cdk-overlay-backdrop')?.dispatchEvent(new MouseEvent('click'));
+            fixture.detectChanges();
+            await settle();
+
+            expect(edit).not.toHaveBeenCalled();
+        });
     });
 });

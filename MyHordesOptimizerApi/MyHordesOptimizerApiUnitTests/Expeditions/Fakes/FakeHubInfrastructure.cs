@@ -79,10 +79,10 @@ namespace MyHordesOptimizerApiUnitTests.Expeditions.Fakes
 
     public class FakeUserInfoProvider : IUserInfoProvider
     {
-        public string UserKey { get; set; } = string.Empty;
+        public string? UserKey { get; set; } = string.Empty;
         public int UserId { get; set; }
-        public string UserName { get; set; } = string.Empty;
-        public SimpleMeTownDetailDto TownDetail { get; set; } = new();
+        public string? UserName { get; set; } = string.Empty;
+        public SimpleMeTownDetailDto? TownDetail { get; set; } = new();
         public LastUpdateInfoDto GenerateLastUpdateInfo() => throw new NotSupportedException();
     }
 
@@ -100,6 +100,12 @@ namespace MyHordesOptimizerApiUnitTests.Expeditions.Fakes
         public ExpeditionInhorenceModel ValidateExpeditions(int townId, int day) => throw new NotSupportedException();
         public Task<ExpeditionDto> SaveExpeditionAsync(ExpeditionRequestDto expedition, int idTown, int day) => throw new NotSupportedException();
         public Task<List<ExpeditionDto>> CopyExpeditionsAsync(int townId, int fromDay, int targetDay) => throw new NotSupportedException();
+        public (bool KeepRoute, bool KeepGeneralOrders, bool KeepRouteOrders)? DuplicateChoices { get; private set; }
+        public Task<ExpeditionDto> DuplicateExpeditionAsync(int expeditionId, string? label, bool keepRoute, bool keepGeneralOrders, bool keepRouteOrders)
+        {
+            DuplicateChoices = (keepRoute, keepGeneralOrders, keepRouteOrders);
+            return Task.FromResult(new ExpeditionDto { Id = expeditionId + 1, Label = label });
+        }
         public Task<ExpeditionCitizenDto> SaveExpeditionCitizenAsync(int expeditionPartId, ExpeditionCitizenRequestDto expeditionCitizen) => throw new NotSupportedException();
         public void DeleteExpeditionCitizen(int expeditionCitizenId) => throw new NotSupportedException();
         public Task<ExpeditionPartDto> SaveExpeditionPartAsync(int expeditionId, ExpeditionPartRequestDto expeditionPart) => Task.FromResult(new ExpeditionPartDto { Id = expeditionPart.Id, ExpeditionId = expeditionId, MapRouteId = expeditionPart.MapRouteId });

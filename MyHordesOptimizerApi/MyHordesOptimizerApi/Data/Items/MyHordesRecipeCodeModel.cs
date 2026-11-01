@@ -6,29 +6,29 @@ namespace MyHordesOptimizerApi.Data.Items
     public class MyHordesRecipeCodeModel
     {
         [JsonProperty("type")]
-        public string Type { get; set; }
+        public string Type { get; set; } = null!;
 
         [JsonProperty("in")]
-        public List<string> In { get; set; }
+        public List<string> In { get; set; } = null!;
 
         [JsonProperty("out")]
-        public List<object> Out { get; set; }
+        public List<object> Out { get; set; } = null!;
 
         [JsonProperty("action")]
-        public string Action { get; set; }
+        public string Action { get; set; } = null!;
 
         /// <summary>
         /// Message d'erreur forcé : la recette qui en porte un n'assemble jamais rien.
         /// </summary>
         [JsonProperty("error")]
-        public string Error { get; set; }
+        public string Error { get; set; } = null!;
 
         [JsonProperty("picto")]
-        public string Picto { get; set; }
+        public string Picto { get; set; } = null!;
         [JsonProperty("stealthy")]
-        public string Stealthy { get; set; }
+        public string Stealthy { get; set; } = null!;
 
         [JsonProperty("provoking")]
-        public string Provoking { get; set; }
+        public string Provoking { get; set; } = null!;
     }
 }

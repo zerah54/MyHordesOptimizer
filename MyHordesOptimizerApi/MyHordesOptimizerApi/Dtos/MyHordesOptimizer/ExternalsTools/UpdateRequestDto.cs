@@ -16,7 +16,7 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools
         [JsonProperty("bags")]
         public UpdateBagsRequestDto? Bags { get; set; }
         [JsonProperty("townDetails")]
-        public UpdateTownDetailsDto TownDetails { get; set; }
+        public UpdateTownDetailsDto TownDetails { get; set; } = null!;
         [JsonProperty("heroicActions")]
         public UpdateHeroicActionsDto? HeroicActions { get; set; }
         [JsonProperty("amelios")]

@@ -45,12 +45,14 @@ import { TownContextService } from '../../../_core/services/town-context.service
 import { getMaxAttack, getMinAttack, getSoulFactor } from '../../../_core/utilities/estimations.util';
 import { getTown } from '../../../_core/utilities/localstorage.util';
 import { CompactStepperComponent } from '../../../_shared/compact-stepper/compact-stepper.component';
+import { DaySelectorComponent } from '../../../_shared/day-selector/day-selector.component';
+import { DaysUpToPipe } from '../../../_shared/day-selector/days-up-to.pipe';
 import { RefinerParams } from './refiner/attack-model';
 import { AttackRefinerService, RefineResult } from './refiner/attack-refiner.service';
 
 const angular_common: Imports = [CommonModule, FormsModule];
-const components: Imports = [CompactStepperComponent];
-const pipes: Imports = [];
+const components: Imports = [CompactStepperComponent, DaySelectorComponent];
+const pipes: Imports = [DaysUpToPipe];
 const material_modules: Imports = [MatButtonModule, MatButtonToggleModule, MatFormFieldModule, MatIconModule, MatInputModule, MatProgressBarModule, MatProgressSpinnerModule, MatTooltipModule, MatCheckboxModule, MatSlideToggleModule];
 
 /** Le KPI et le graphique portent sur un seul jour attaqué à la fois. */

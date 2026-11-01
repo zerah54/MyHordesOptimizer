@@ -7,14 +7,14 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer
     {
         public int Id { get; set; }
 
-        public MyHordesMap MyHordesMap { get; set; }
+        public MyHordesMap MyHordesMap { get; set; } = null!;
 
-        public CitizensLastUpdateDto Citizens { get; set; }
+        public CitizensLastUpdateDto Citizens { get; set; } = null!;
 
-        public BankLastUpdateDto Bank { get; set; }
+        public BankLastUpdateDto? Bank { get; set; }
 
-        public CadaversLastUpdateDto Cadavers { get; set; }
+        public CadaversLastUpdateDto? Cadavers { get; set; }
 
-        public WishListLastUpdateDto WishList { get; set; }
+        public WishListLastUpdateDto WishList { get; set; } = null!;
     }
 }

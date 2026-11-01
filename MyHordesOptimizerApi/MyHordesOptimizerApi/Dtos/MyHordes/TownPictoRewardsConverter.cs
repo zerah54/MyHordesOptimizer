@@ -21,9 +21,9 @@ namespace MyHordesOptimizerApi.Dtos.MyHordes
     {
         public override bool CanWrite => false;
 
-        public override IDictionary<string, MyHordesTownPictoDto> ReadJson(JsonReader reader,
+        public override IDictionary<string, MyHordesTownPictoDto>? ReadJson(JsonReader reader,
             Type objectType,
-            IDictionary<string, MyHordesTownPictoDto> existingValue,
+            IDictionary<string, MyHordesTownPictoDto>? existingValue,
             bool hasExistingValue,
             JsonSerializer serializer)
         {
@@ -34,7 +34,7 @@ namespace MyHordesOptimizerApi.Dtos.MyHordes
                 // sous la clé vide, où elle écraserait toute autre entrée sans id.
                 return token.ToObject<List<MyHordesTownPictoDto>>(serializer)?
                     .Where(reward => reward.Id.HasValue)
-                    .ToDictionary(reward => reward.Id.Value.ToString(), reward => reward)
+                    .ToDictionary(reward => reward.Id!.Value.ToString(), reward => reward)
                     ?? new Dictionary<string, MyHordesTownPictoDto>();
             }
             if (token.Type == JTokenType.Object)
@@ -45,7 +45,7 @@ namespace MyHordesOptimizerApi.Dtos.MyHordes
         }
 
         public override void WriteJson(JsonWriter writer,
-            IDictionary<string, MyHordesTownPictoDto> value,
+            IDictionary<string, MyHordesTownPictoDto>? value,
             JsonSerializer serializer)
         {
             throw new NotSupportedException();

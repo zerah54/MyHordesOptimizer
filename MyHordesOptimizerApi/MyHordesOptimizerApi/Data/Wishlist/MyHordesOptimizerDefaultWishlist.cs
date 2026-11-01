@@ -9,12 +9,12 @@ namespace MyHordesOptimizerApi.Data.Wishlist
         public int Id { get; set; }
 
         [JsonProperty("name")]
-        public Dictionary<string,string> Name { get; set; }
+        public Dictionary<string,string> Name { get; set; } = null!;
 
         [JsonProperty("items")]
-        public List<MyHordesOptimizerDefaultWishlistItem> Items { get; set; }
+        public List<MyHordesOptimizerDefaultWishlistItem> Items { get; set; } = null!;
 
         [JsonProperty("categories")]
-        public List<MyHordesOptimizerDefaultWishlistCategory> Categories { get; set; }
+        public List<MyHordesOptimizerDefaultWishlistCategory> Categories { get; set; } = null!;
     }
 }

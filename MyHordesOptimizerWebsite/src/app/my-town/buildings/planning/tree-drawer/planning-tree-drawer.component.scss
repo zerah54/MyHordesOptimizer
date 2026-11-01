@@ -1,0 +1,119 @@
+@use 'building-tree';
+
+:host {
+    display: block;
+    height: 100%;
+
+    .drawer {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        min-height: 0;
+        padding: 0.75em 1em;
+        box-sizing: border-box;
+    }
+
+    .drawer-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
+        h2 {
+            margin: 0;
+        }
+    }
+
+    .drawer-kpis {
+        margin: 0.5em 0;
+    }
+
+    .toolbar {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.5em;
+        margin: 0.5em 0;
+
+        .search {
+            flex: 1 1 14em;
+        }
+
+        .on {
+            border-color: var(--mho-accent);
+        }
+    }
+
+    .label {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3em;
+    }
+
+    .table-scroll {
+        flex: 1;
+        min-height: 0;
+        overflow: auto;
+    }
+
+    table.tree {
+        width: 100%;
+        border-collapse: collapse;
+
+        th {
+            position: sticky;
+            top: 0;
+            z-index: 1;
+            padding: 0.3em 0.5em;
+            background: var(--mho-surface);
+            text-align: left;
+            white-space: nowrap;
+        }
+
+        td {
+            padding: 0 0.5em;
+            border-bottom: 1px solid var(--mho-line);
+            white-space: nowrap;
+        }
+
+        tr.building-row {
+            height: 40px;
+
+            &.checked td {
+                background: var(--mho-accent-soft);
+            }
+        }
+
+        .center {
+            text-align: center;
+        }
+    }
+
+    @include building-tree.label-cell;
+    @include building-tree.resources-list;
+
+    .resources li.missing {
+        color: var(--mho-danger);
+        font-weight: 600;
+    }
+
+    .state {
+        font-size: 0.9em;
+
+        &[data-state='locked'] {
+            opacity: 0.6;
+        }
+    }
+
+    .program-tag {
+        margin-right: 0.3em;
+        padding: 0 0.4em;
+        border-radius: var(--mho-radius-s);
+        background: var(--mho-accent-soft);
+        font-size: 0.85em;
+    }
+
+    .dash,
+    .empty {
+        opacity: 0.6;
+    }
+}

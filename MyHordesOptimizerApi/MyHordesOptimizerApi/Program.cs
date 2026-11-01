@@ -193,6 +193,7 @@ builder.Services.AddSingleton<IMyHordesApiConfiguration, MyHordesApiConfiguratio
 builder.Services.AddSingleton<IGestHordesConfiguration, GestHordesConfiguration>();
 builder.Services.AddSingleton<IBigBrothHordesConfiguration, BigBrothHordesConfiguration>();
 builder.Services.AddSingleton<IFataMorganaConfiguration, FataMorganaConfiguration>();
+builder.Services.AddSingleton<IZenHordesConfiguration, ZenHordesConfiguration>();
 builder.Services.AddSingleton<IMyHordesTranslationsConfiguration, MyHordesTranslationsConfiguration>();
 builder.Services.AddTransient<IMyHordesOptimizerSqlConfiguration, MyHordesOptimizerSqlConfiguration>();
 builder.Services.AddSingleton<IMyHordesScrutateurConfiguration, MyHordesScrutateurConfiguration>();
@@ -210,6 +211,7 @@ builder.Services.AddScoped<IMyHordesApiRepository, MyHordesApiRepository>();
 
 builder.Services.AddScoped<IBigBrothHordesRepository, BigBrothHordesRepository>();
 builder.Services.AddScoped<IFataMorganaRepository, FataMorganaRepository>();
+builder.Services.AddScoped<IZenHordesRepository, ZenHordesRepository>();
 builder.Services.AddScoped<IGestHordesRepository, GestHordesRepository>();
 
 builder.Services.AddSingleton<IGlossaryRepository, GlossaryRepository>();
@@ -249,10 +251,13 @@ builder.Services.AddSingleton<ITokenRateLimiter, TokenRateLimiter>();
 builder.Services.AddScoped<ITownAccessService, TownAccessService>();
 builder.Services.AddScoped<IExpeditionService, ExpeditionService>();
 builder.Services.AddScoped<IMapRouteService, MyHordesOptimizerApi.Services.Impl.MapRoutes.MapRouteService>();
+builder.Services.AddScoped<IBuildingPlanService, MyHordesOptimizerApi.Services.Impl.BuildingPlans.BuildingPlanService>();
+builder.Services.AddScoped<IDailyProgramService, MyHordesOptimizerApi.Services.Impl.DailyProgram.DailyProgramService>();
 builder.Services.AddScoped<ITownService, TownService>();
 builder.Services.AddScoped<IUserAccountService, UserAccountService>();
 builder.Services.AddScoped<IDirectorySearchService, DirectorySearchService>();
 builder.Services.AddScoped<INoteService, NoteService>();
+builder.Services.AddScoped<IMapThemeService, MapThemeService>();
 builder.Services.AddScoped<IETagVersionService, ETagVersionService>();
 
 // Add the discord client to services

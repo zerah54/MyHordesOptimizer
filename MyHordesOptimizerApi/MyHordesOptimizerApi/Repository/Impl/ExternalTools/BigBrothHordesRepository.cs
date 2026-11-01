@@ -39,7 +39,7 @@ namespace MyHordesOptimizerApi.Repository.Impl.ExternalTools
 
         protected string GenerateUrl(string endpoint)
         {
-            return AddParameterToQuery($"{BigBrothHordesConfiguration.Url}/{endpoint}", _parameterUserKey, UserKeyProvider.UserKey); 
+            return AddParameterToQuery($"{BigBrothHordesConfiguration.Url}/{endpoint}", _parameterUserKey, UserKeyProvider.UserKey!); 
         }
     }
 }

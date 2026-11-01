@@ -1,0 +1,255 @@
+<mat-card-header class="mho-my-program-header">
+    <mat-card-title i18n>Mon programme</mat-card-title>
+</mat-card-header>
+
+<mat-card-content class="mho-my-program">
+    <!-- Pendant le chargement, le jour reste le jour courant : la fin du chargement y revient de toute façon. -->
+    @if (!store.loading()) {
+        <mho-day-selector class="days" [days]="store.days()" [value]="store.selected_day()" [today]="store.current_day"
+                          (valueChange)="store.selectDay($event)"></mho-day-selector>
+    }
+
+    <!-- Pastilles informatives, non cliquables. -->
+    <div class="summary-strip">
+        @for (mine of my_expeditions(); track mine.expedition.id) {
+            <span class="mho-pill pill-expedition">{{ expeditionName(mine.expedition) }}@if (mine.total > 0) {
+                · {{ mine.done }}/{{ mine.total }}
+                <ng-container i18n>faites</ng-container>
+            }</span>
+            @if (!mine.ready) {
+                <span class="mho-pill mho-pill--outline" i18n>En préparation</span>
+            }
+        } @empty {
+            @for (open of open_expeditions(); track open.expedition.id) {
+                <span class="mho-pill pill-open">
+                    {{ expeditionName(open.expedition) }} : {{ open.places }}
+                    <ng-container i18n>{open.places, plural, =1 {place libre} other {places libres}}</ng-container>
+                </span>
+            }
+        }
+        @if (task_statuses().length > 0) {
+            <span class="mho-pill pill-buildings">{{ tasks_done() }}/{{ task_statuses().length }}
+                <ng-container i18n>consignes individuelles</ng-container></span>
+        }
+    </div>
+
+    <div class="blocks">
+        @if (hidden().expedition) {
+            <div class="hidden-bar expedition">
+                <mat-icon aria-hidden="true">explore</mat-icon>
+                <span class="hidden-text">
+                    <ng-container i18n>Expédition masquée pour J</ng-container>
+                    {{ store.selected_day() }}
+                    @if (expedition_totals().total > 0) {
+                        · {{ expedition_totals().done }}/{{ expedition_totals().total }}
+                        <ng-container i18n>consignes faites</ng-container>
+                    }
+                </span>
+                @if (expedition_totals().draft) {
+                    <span class="mho-pill mho-pill--outline" i18n>En préparation</span>
+                }
+                <button mat-button type="button" data-action="show-expedition" (click)="setBlockHidden('expedition', false)" i18n>Réafficher</button>
+            </div>
+        } @else {
+            <section class="block expedition" [class.full-width]="hidden().buildings">
+                <div class="block-header">
+                    <mat-icon aria-hidden="true">explore</mat-icon>
+                    <h2 i18n>Expédition</h2>
+                    <button mat-button type="button" data-action="hide-expedition" (click)="setBlockHidden('expedition', true)">
+                        <ng-container *ngTemplateOutlet="hideLabel"/>
+                    </button>
+                </div>
+                @if (day_store.status() === 'loaded') {
+                    @for (mine of my_expeditions(); track mine.expedition.id) {
+                        <mho-program-expedition [expedition]="mine" [map]="map()" [ruins]="ruins()" [items]="store.items()" [citizens]="store.citizens_full()"
+                                                [expeditions]="day_store.expeditions()" [checkable]="checkable()" [me]="user_id() ?? 0"
+                                                [day]="store.selected_day()"></mho-program-expedition>
+                    } @empty {
+                        @if (today()) {
+                            <p class="not-registered" i18n>Vous n'êtes inscrit sur aucune expédition aujourd'hui.</p>
+                        } @else {
+                            <p class="not-registered" i18n>Vous n'êtes inscrit sur aucune expédition ce jour-là.</p>
+                        }
+                        @if (open_expeditions().length > 0) {
+                            <ul class="open-expeditions">
+                                @for (open of open_expeditions(); track open.expedition.id) {
+                                    <li>{{ expeditionName(open.expedition) }} : {{ open.places }}
+                                        <ng-container i18n>{open.places, plural, =1 {place libre} other {places libres}}</ng-container>
+                                    </li>
+                                }
+                            </ul>
+                        }
+                        <a mat-stroked-button routerLink="../expeditions" i18n>Voir les expéditions</a>
+                    }
+                } @else if (day_store.status() === 'error') {
+                    <p class="expeditions-failed" i18n>Impossible de charger les expéditions.</p>
+                    <button mat-stroked-button type="button" data-action="retry-expeditions" (click)="retryExpeditions()" i18n>Réessayer</button>
+                } @else {
+                    <div class="loading expeditions-loading">
+                        <mat-spinner diameter="24"/>
+                    </div>
+                }
+            </section>
+        }
+
+        @if (hidden().buildings) {
+            <div class="hidden-bar buildings">
+                <mat-icon aria-hidden="true">construction</mat-icon>
+                <span class="hidden-text"><ng-container i18n>Chantiers masqués pour J</ng-container>
+                    {{ store.selected_day() }}</span>
+                <button mat-button type="button" data-action="show-buildings" (click)="setBlockHidden('buildings', false)" i18n>Réafficher</button>
+            </div>
+        } @else {
+            <section class="block buildings" [class.full-width]="hidden().expedition">
+                <div class="block-header">
+                    <mat-icon aria-hidden="true">construction</mat-icon>
+                    <h2 i18n>Chantiers</h2>
+                    <button mat-button type="button" data-action="hide-buildings" (click)="setBlockHidden('buildings', true)">
+                        <ng-container *ngTemplateOutlet="hideLabel"/>
+                    </button>
+                </div>
+                @if (store.loading()) {
+                    <div class="loading">
+                        <mat-spinner diameter="40"/>
+                    </div>
+                } @else if (store.load_failed()) {
+                    <p class="load-failed" i18n>Impossible de charger les chantiers.</p>
+                    <button mat-stroked-button type="button" data-action="retry" (click)="store.load()" i18n>Réessayer</button>
+                } @else if (!store.is_citizen()) {
+                    <p class="not-citizen" i18n>Vous n'êtes pas citoyen de cette ville.</p>
+                } @else if (store.selected_plan()?.isEffective !== true) {
+                    <p class="no-plan" i18n>Aucun programme effectif pour ce jour.</p>
+                } @else if (store.evaluation() === null) {
+                    @if (past(); as past) {
+                        @if (past.dayInstructions; as instructions) {
+                            <section class="day-instructions">
+                                <h3 i18n>Consignes du jour</h3>
+                                <p class="multiline">{{ instructions }}</p>
+                            </section>
+                        }
+                        @if (past.tasks.length > 0) {
+                            <ng-container [ngTemplateOutlet]="taskList" [ngTemplateOutletContext]="{ $implicit: past.tasks, userId: past.userId }"/>
+                        }
+                        <p class="past-note" i18n>Jour passé : le programme des chantiers n'est plus évalué.</p>
+                    } @else {
+                        <p class="no-evaluation" i18n>Évaluation indisponible.</p>
+                    }
+                } @else if (program(); as program) {
+                    <table class="summary">
+                        <tbody>
+                        <tr>
+                            <th i18n>Capacité sur les chantiers</th>
+                            <td class="capacity">{{ program.capacity.capacity }}</td>
+                            <th i18n>Expédition</th>
+                            <td class="expedition">{{ program.expeditionPa }}</td>
+                        </tr>
+                        </tbody>
+                    </table>
+
+                    @for (notice of program.notices; track notice) {
+                        <p class="notice" role="alert" [attr.data-notice]="notice">
+                            <mat-icon aria-hidden="true">warning</mat-icon>
+                            @switch (notice) {
+                                @case ('pairs') {
+                                    <span i18n>Investissez vos PA par paires de PA pour ne rien perdre.</span>
+                                }
+                                @case ('banned-forbidden') {
+                                    <span i18n>Chantiers interdits aux bannis.</span>
+                                }
+                                @case ('over-committed') {
+                                    <span i18n>Consignes individuelles et expédition au-delà de vos PA de base.</span>
+                                }
+                            }
+                        </p>
+                    }
+
+                    @if (program.dayInstructions; as instructions) {
+                        <section class="day-instructions">
+                            <h3 i18n>Consignes du jour</h3>
+                            <p class="multiline">{{ instructions }}</p>
+                        </section>
+                    }
+
+                    @if (program.voteBuildingId !== null) {
+                        <p class="vote">
+                            <mat-icon aria-hidden="true">how_to_vote</mat-icon>
+                            <ng-container i18n>Évolution votée ce soir</ng-container>
+                            : {{ buildingName(program.voteBuildingId) }}
+                        </p>
+                    }
+
+                    @if (program.tasks.length > 0) {
+                        <ng-container [ngTemplateOutlet]="taskList" [ngTemplateOutletContext]="{ $implicit: program.tasks, userId: program.citizen.userId }"/>
+                    }
+
+                    @if (program.items.length > 0) {
+                        <section class="steps">
+                            <h3 i18n>Programme chantiers dans l'ordre</h3>
+                            <ol>
+                                @for (item of program.items; track $index) {
+                                    @if (item.kind === 'step') {
+                                        <li>
+                                            {{ stepText(item.result) }}
+                                            @if (item.result.step.note) {
+                                                <span class="note">— {{ item.result.step.note }}</span>
+                                            }
+                                        </li>
+                                    } @else {
+                                        <li class="instruction">{{ item.text }}</li>
+                                    }
+                                }
+                            </ol>
+                        </section>
+                    }
+
+                    @if (program.tasks.length === 0 && program.items.length === 0) {
+                        <p class="nothing" i18n>Rien à faire aujourd'hui.</p>
+                    }
+                } @else {
+                    <p class="not-citizen" i18n>Vous n'êtes pas citoyen de cette ville.</p>
+                }
+            </section>
+        }
+    </div>
+</mat-card-content>
+
+<!-- Libellé des boutons de masquage, selon que le jour affiché est le jour courant. -->
+<ng-template #hideLabel>
+    @if (today()) {
+        <ng-container i18n>Masquer pour aujourd'hui</ng-container>
+    } @else {
+        <ng-container i18n>Masquer pour ce jour</ng-container>
+    }
+</ng-template>
+
+<!-- Consignes individuelles du joueur : une case par consigne, état dans task_statuses (même ordre). -->
+<ng-template #taskList let-tasks let-userId="userId">
+    <section class="tasks">
+        <h3 i18n>Consignes individuelles</h3>
+        <ul class="checklist">
+            @for (task of tasks; track task.id ?? $index; let index = $index) {
+                @let status = task_statuses()[index];
+                @if (future()) {
+                    <li>{{ taskText(task) }}@if (task.pa > 0) {
+                        ({{ task.pa }}
+                        <ng-container i18n>PA</ng-container>)
+                    }</li>
+                } @else {
+                    <li [class.done]="status.done">
+                        <mat-checkbox [checked]="status.done"
+                                      [disabled]="!store.can_track() || store.isPending(userId, task) || locked(task, status)"
+                                      (change)="onToggle($event, userId, task, status)">
+                            {{ taskText(task) }}@if (task.pa > 0) {
+                            ({{ task.pa }}
+                            <ng-container i18n>PA</ng-container>)
+                        }
+                        </mat-checkbox>
+                        @if (status.source === 'data') {
+                            <mat-icon class="detected" i18n-matTooltip matTooltip="Relevé dans vos données (liste des citoyens, script)">sync</mat-icon>
+                        }
+                    </li>
+                }
+            }
+        </ul>
+    </section>
+</ng-template>

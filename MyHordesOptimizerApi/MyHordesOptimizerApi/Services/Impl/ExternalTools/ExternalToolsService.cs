@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using MyHordesOptimizerApi.Comparer;
+using MyHordesOptimizerApi.Dtos.ExternalTools.GestHordes;
 using MyHordesOptimizerApi.Dtos.ExternalTools.GestHordes.Citizen;
 using MyHordesOptimizerApi.Dtos.ExternalTools.GestHordes.MajCase;
 using MyHordesOptimizerApi.Dtos.MyHordes;
@@ -16,6 +16,7 @@ using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.GestHordes;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.HeroicAction;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.Map;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.Status;
+using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.ZenHordes;
 using MyHordesOptimizerApi.Exceptions;
 using MyHordesOptimizerApi.Extensions;
 using MyHordesOptimizerApi.Extensions.Models;
@@ -26,6 +27,7 @@ using MyHordesOptimizerApi.Providers.Interfaces;
 using MyHordesOptimizerApi.Repository.Interfaces;
 using MyHordesOptimizerApi.Repository.Interfaces.ExternalTools;
 using MyHordesOptimizerApi.Configuration.Interfaces;
+using MyHordesOptimizerApi.Services.Impl.Buildings;
 using MyHordesOptimizerApi.Services.Impl.Locking;
 using MyHordesOptimizerApi.Services.Impl.MapRoutes;
 using MyHordesOptimizerApi.Services.Impl.Maps;
@@ -46,6 +48,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
         protected ILogger<ExternalToolsService> Logger { get; private set; }
         protected IBigBrothHordesRepository BigBrothHordesRepository { get; private set; }
         protected IFataMorganaRepository FataMorganaRepository { get; private set; }
+        protected IZenHordesRepository ZenHordesRepository { get; private set; }
         protected IGestHordesRepository GestHordesRepository { get; private set; }
         protected IMyHordesApiRepository MyHordesApiRepository { get; private set; }
         protected IMapper Mapper { get; private set; }
@@ -59,6 +62,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
         public ExternalToolsService(ILogger<ExternalToolsService> logger,
             IBigBrothHordesRepository bigBrothHordesRepository,
             IFataMorganaRepository fataMorganaRepository,
+            IZenHordesRepository zenHordesRepository,
             IGestHordesRepository gestHordesRepository,
             IMapper mapper,
             IUserInfoProvider userInfoProvider,
@@ -72,6 +76,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
             Logger = logger;
             BigBrothHordesRepository = bigBrothHordesRepository;
             FataMorganaRepository = fataMorganaRepository;
+            ZenHordesRepository = zenHordesRepository;
             GestHordesRepository = gestHordesRepository;
             Mapper = mapper;
             UserInfoProvider = userInfoProvider;
@@ -83,7 +88,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
             TownAccessService = townAccessService;
         }
 
-        public async Task<UpdateResponseDto> UpdateExternalsTools(UpdateRequestDto updateRequestDto, IExternalToolsProgressSink sink = null)
+        public async Task<UpdateResponseDto> UpdateExternalsTools(UpdateRequestDto updateRequestDto, IExternalToolsProgressSink? sink = null)
         {
             sink ??= NullExternalToolsProgressSink.Instance;
             var plan = ExternalToolsUpdatePlan.Build(updateRequestDto);
@@ -126,7 +131,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                     {
                         var fataRequestDto = Mapper.Map<FataMorganaUpdateRequestDto>(updateRequestDto);
                         fataRequestDto.UserId = UserInfoProvider.UserId;
-                        fataRequestDto.UserKey = UserInfoProvider.UserKey;
+                        fataRequestDto.UserKey = UserInfoProvider.UserKey!;
                         await FataMorganaRepository.UpdateAsync(fataRequestDto);
                         sink.Succeeded(ExternalToolId.FataMorgana, ExternalToolUpdateUnits.Map);
                     }
@@ -145,14 +150,44 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                 });
                 tasks.Add(fataTask);
             }
+            if (plan.Zen)
+            {
+                var zenTask = Task.Run(async () =>
+                {
+                    try
+                    {
+                        var zenRequestDto = Mapper.Map<ZenHordesUpdateRequestDto>(updateRequestDto);
+                        zenRequestDto.UserId = UserInfoProvider.UserId;
+                        zenRequestDto.Key = UserInfoProvider.UserKey!;
+                        await ZenHordesRepository.UpdateAsync(zenRequestDto);
+                        sink.Succeeded(ExternalToolId.ZenHordes, ExternalToolUpdateUnits.Map);
+                    }
+                    catch (WebApiException e)
+                    {
+                        Logger.LogWarning($"Exception pendant la maj ZenHordes : {e} => {updateRequestDto.ToJson()}");
+                        response.MapResponseDto.ZenHordesStatus = $"{e.Message} : {e.Response}";
+                        sink.Failed(ExternalToolId.ZenHordes, ExternalToolUpdateUnits.Map, $"{e.Message} : {e.Response}");
+                    }
+                    catch (Exception e)
+                    {
+                        Logger.LogWarning($"Exception pendant la maj ZenHordes : {e} => {updateRequestDto.ToJson()}");
+                        response.MapResponseDto.ZenHordesStatus = e.Message;
+                        sink.Failed(ExternalToolId.ZenHordes, ExternalToolUpdateUnits.Map, e.Message);
+                    }
+                });
+                tasks.Add(zenTask);
+            }
             if (plan.GhMap)
             {
                 var ghTask = Task.Run(() =>
                 {
                     var ghFailed = false;
+                    var ghCell = GestHordesCellOf(updateRequestDto);
                     try
                     {
-                        GestHordesRepository.Update();
+                        GestHordesRepository.Update(HasJobMarkers(updateRequestDto.Map!.GestHordesCell)
+                            ? Mapper.Map<GestHordesMajScriptRequest>(updateRequestDto)
+                            : null);
                     }
                     catch (WebApiException e)
                     {
@@ -169,23 +204,20 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                         ghFailed = true;
                     }
 
-                    if (UpdateRequestMapToolsToUpdateDetailsDto.IsCell(updateRequestDto.Map.ToolsToUpdate.IsGestHordes))
+                    if (ghCell != null)
                     {
                         try
                         {
-                            var cell = updateRequestDto.Map.Cell;
-                            var realX = updateRequestDto.TownDetails.TownX + cell.X;
-                            var realY = updateRequestDto.TownDetails.TownY - cell.Y;
-                            if (townDetails.IsChaos || cell.DeadZombies > 0)
+                            if (townDetails.IsChaos || ghCell.DeadZombies > 0)
                             {
 
-                                if (cell.Objects != null && townDetails.IsChaos)
+                                if (ghCell.Objects != null && townDetails.IsChaos)
                                 {
                                     var request = Mapper.Map<GestHordesMajCaseRequestDto>(updateRequestDto);
                                     GestHordesRepository.UpdateCellItem(request);
                                 }
 
-                                if (cell.DeadZombies > 0)
+                                if (ghCell.DeadZombies > 0)
                                 {
                                     var request = Mapper.Map<GestHordesMajCaseZombiesDto>(updateRequestDto);
                                     GestHordesRepository.UpdateCellZombies(request);
@@ -229,7 +261,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
             // Ce préalable, comme le LastUpdateInfo, n'est lu que par des unités MyHordes Optimizer :
             // son échec ne doit donc faire tomber que MHO, pas Gest'Hordes ni Fata Morgana.
             var resolvedTownId = 0;
-            LastUpdateInfo newLastUpdate = null;
+            LastUpdateInfo? newLastUpdate = null;
             var mhoPreambleFailed = false;
             if (plan.NeedsTownId)
             {
@@ -264,7 +296,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
             // Référencée par les tâches Bags/Citizen/Digs ci-dessous : elles écrivent les mêmes
             // lignes (TownCitizens, MapCells/MapCellDigs) que mhoTask et doivent attendre sa fin
             // avant de démarrer, sans quoi leur résultat dépend de l'ordre d'exécution des tâches.
-            Task mhoTask = null;
+            Task? mhoTask = null;
             // Fourchettes de fouilles restantes observées pendant cette mise à jour, par case (x, y
             // absolus). Écrites par mhoTask, relues par digsTask APRÈS l'avoir attendue : une fouille
             // réussie déjà comprise dans une observation du moment ne doit pas être soustraite deux fois.
@@ -280,7 +312,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                         if (me.MapId.HasValue && me.MapId.Value != UserInfoProvider.TownDetail?.TownId)
                         {
                             var simpleMe = Mapper.Map<SimpleMeDto>(me);
-                            var renewedToken = AuthenticationService.CreateToken(simpleMe, UserInfoProvider.UserKey);
+                            var renewedToken = AuthenticationService.CreateToken(simpleMe, UserInfoProvider.UserKey!);
                             sink.SetRenewedToken(new AuthenticationResponseDto { SimpleMe = simpleMe, Token = renewedToken });
                         }
 
@@ -303,7 +335,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                         var dbContext = scope.ServiceProvider.GetRequiredService<MhoContext>();
                         using var transaction = dbContext.Database.BeginTransaction();
 
-                        var zones = me.Map.Zones;
+                        var zones = me.Map!.Zones;
                         var listCells = new List<MapCell>();
                         var listCellItems = new List<MapCellItem>();
                         // Cases dont le sol est connu à l'instant (API MyHordes ou addon) : leurs objets
@@ -341,13 +373,13 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                                 if (existingCitizen == null)
                                 {
                                     mappedCitizen.IdTown = townId;
-                                    mappedCitizen.IdLastUpdateInfo = newLastUpdate.IdLastUpdateInfo;
+                                    mappedCitizen.IdLastUpdateInfo = newLastUpdate!.IdLastUpdateInfo;
                                     dbContext.Add(mappedCitizen);
                                 }
                                 else
                                 {
                                     existingCitizen.UpdateAllButKeysProperties(mappedCitizen, ignoreNull: true);
-                                    existingCitizen.IdLastUpdateInfo = newLastUpdate.IdLastUpdateInfo;
+                                    existingCitizen.IdLastUpdateInfo = newLastUpdate!.IdLastUpdateInfo;
                                 }
                             }
                             // Les citoyens passés côté cadavres ne sont plus listés dans map.citizens :
@@ -364,7 +396,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                                 if (existingCadaver == null)
                                 {
                                     mappedCadaver.IdTown = townId;
-                                    mappedCadaver.IdLastUpdateInfo = newLastUpdate.IdLastUpdateInfo;
+                                    mappedCadaver.IdLastUpdateInfo = newLastUpdate!.IdLastUpdateInfo;
                                     dbContext.Add(mappedCadaver);
                                 }
                                 else
@@ -383,10 +415,12 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                                 foreach (var item in mappedBankItems)
                                 {
                                     item.IdTown = townId;
-                                    item.IdLastUpdateInfo = newLastUpdate.IdLastUpdateInfo;
+                                    item.IdLastUpdateInfo = newLastUpdate!.IdLastUpdateInfo;
                                 }
                                 dbContext.AddRange(mappedBankItems);
                             }
+                            TownBuildingSync.Replace(dbContext, townId, newLastUpdate!.IdLastUpdateInfo, me.Map.City, Logger);
+                            TownBuildingSync.ReplaceDefense(dbContext, townId, newLastUpdate.IdLastUpdateInfo, me.Map.City?.Defense);
                         }
 
                         var allCell = dbContext.MapCells.Where(cell => cell.IdTown == townId)
@@ -414,7 +448,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                         // X et Y sont les clés de la case. MyHordes les ajoute d'office, même non
                         // demandés, mais on ne s'appuie pas sur une chaîne `fields=` : sans
                         // coordonnées, la case n'est pas localisable.
-                        foreach (var zone in zones.Where(zone => zone.X.HasValue && zone.Y.HasValue))
+                        foreach (var zone in zones!.Where(zone => zone.X.HasValue && zone.Y.HasValue))
                         {
                             int? nbHero = null;
                             int? nbZombie = null;
@@ -453,10 +487,13 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                             var cell = new MapCell()
                             {
                                 IdTown = townId,
-                                IdLastUpdateInfo = newLastUpdate.IdLastUpdateInfo,
-                                X = zone.X.Value,
-                                Y = zone.Y.Value,
-                                IsTown = zone.X == me.Map.City.X && zone.Y == me.Map.City.Y,
+                                // Seule la case du joueur (la seule dont MyHordes renvoie details.dried) voit
+                                // son contenu relevé : les autres ne reçoivent que les infos globales de la
+                                // carte et gardent leur date (null ignoré par UpdateAllButKeysProperties).
+                                IdLastUpdateInfo = isDried.HasValue ? newLastUpdate!.IdLastUpdateInfo : null,
+                                X = zone.X!.Value,
+                                Y = zone.Y!.Value,
+                                IsTown = zone.X == me.Map!.City!.X && zone.Y == me.Map.City.Y,
                                 IsVisitedToday = !Convert.ToBoolean(zone.Nvt),
                                 IsNeverVisited = false,
                                 DangerLevel = zone.Danger,
@@ -479,7 +516,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                                 // On l'ignore plutôt que d'inventer un identifiant.
                                 foreach (var item in zone.Items.Where(item => item.Id.HasValue))
                                 {
-                                    if (!clesItemParMhId.TryGetValue(item.Id.Value, out var cleItem))
+                                    if (!clesItemParMhId.TryGetValue(item.Id!.Value, out var cleItem))
                                     {
                                         Logger.LogWarning("UpdateMap : objet {MhId} inconnu en {X}/{Y}, ignoré.",
                                             item.Id.Value, zone.X, zone.Y);
@@ -534,13 +571,14 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                                 digObservations.ObserveAuthoritative(cellModel, isDried.Value ? DigBounds.Depleted : DigBounds.NotDepleted);
                             }
                         }
-                        if (UpdateRequestMapToolsToUpdateDetailsDto.IsCell(updateRequestDto.Map.ToolsToUpdate.IsMyHordesOptimizer) && updateRequestDto.Map.Cell != null)
+                        if (UpdateRequestMapToolsToUpdateDetailsDto.IsCell(updateRequestDto.Map!.ToolsToUpdate.IsMyHordesOptimizer) && updateRequestDto.Map.Cell != null)
                         {
                             UpdateCellInfoDto updateCellDto = updateRequestDto.Map.Cell;
                             var realX = updateRequestDto.TownDetails.TownX + updateCellDto.X;
                             var realY = updateRequestDto.TownDetails.TownY - updateCellDto.Y;
 
                             var cellToUpdate = listCells.Single(cell => cell.X == realX && cell.Y == realY);
+                            cellToUpdate.IdLastUpdateInfo = newLastUpdate!.IdLastUpdateInfo;
 
                             // Chaque valeur n'est reportée que si l'addon l'a envoyée : ce bloc sert aussi aux
                             // zombies tués et aux relevés des métiers, qui n'envoient que leurs propres champs.
@@ -589,16 +627,16 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                                 updateCellDto.ScoutZoneLvl,
                                 updateCellDto.ScavNextCells,
                                 updateCellDto.ScoutNextCells,
-                                newLastUpdate.IdLastUpdateInfo);
+                                newLastUpdate!.IdLastUpdateInfo);
                             if (jobBounds.HasValue)
                             {
                                 RecordDigBounds(observedDigBounds, realX, realY, jobBounds.Value);
                             }
 
-                            if (updateCellDto.CitizenId.Any())
+                            if (updateCellDto.CitizenId!.Any())
                             {
                                 var citizenModels = dbContext.TownCitizens.Where(citizen => citizen.IdTown == townId
-                                                                                 && updateCellDto.CitizenId.Contains(citizen.IdUser))
+                                                                                 && updateCellDto.CitizenId!.Contains(citizen.IdUser))
                                                                          .ToList();
                                 foreach (var citizen in citizenModels)
                                 {
@@ -613,23 +651,10 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                         {
                             RecordDigBounds(observedDigBounds, observedCell.X, observedCell.Y, observedBounds);
                         }
-                        var mapCellEqualityComaprer = new MapCellEqualityComaprer();
-                        foreach (var cellToUpdate in listCells)
+                        // Les cases existantes sont suivies par EF et déjà mises à jour : seules les nouvelles sont à ajouter.
+                        foreach (var newCell in listCells.Where(cell => !allCell.Contains(cell)))
                         {
-                            var cellModel = allCell.FirstOrDefault(cell => cell.X == cellToUpdate.X
-                                                                    && cell.Y == cellToUpdate.Y);
-                            if (cellModel == null)
-                            {
-                                dbContext.Add(cellToUpdate);
-                            }
-                            else
-                            {
-                                if (!mapCellEqualityComaprer.Equals(cellModel, cellToUpdate))
-                                {
-                                    cellModel.UpdateAllButKeysProperties(cellToUpdate);
-                                    dbContext.Update(cellModel);
-                                }
-                            }
+                            dbContext.Add(newCell);
                         }
                         // Ne plus vider les MapCellDig ici : digsTask (voir plus bas) fait déjà l'upsert
                         // exact par (case, citoyen, jour). Ce RemoveRange sur toute la grille effaçait la
@@ -661,7 +686,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                                 .ToHashSet();
                             dbContext.MapRouteGames.RemoveRange(dbContext.MapRouteGames.Where(gameRoute => gameRoute.IdTown == townId));
                             dbContext.MapRouteGames.AddRange(MapRouteGames.FromMyHordes(me.Map.Expeditions, townId, observationDay.Value,
-                                townEntity.Width, townEntity.Height, knownAuthorIds, newLastUpdate.IdLastUpdateInfo));
+                                townEntity.Width, townEntity.Height, knownAuthorIds, newLastUpdate!.IdLastUpdateInfo));
                         }
                         dbContext.SaveChanges();
                         transaction.Commit();
@@ -694,7 +719,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                         await TownAccessService.EnsureCanWriteTownAsync(resolvedTownId, townDetails.TownId);
                         await using var townLock = await TownSyncLock.AcquireTownAsync(-townDetails.TownId);
 
-                        UpdateBags(resolvedTownId, updateRequestDto.Bags.Contents);
+                        UpdateBags(resolvedTownId, updateRequestDto.Bags!.Contents);
                         sink.Succeeded(ExternalToolId.MyHordesOptimizer, ExternalToolUpdateUnits.Bags);
                     }
                     catch (Exception e)
@@ -717,7 +742,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                     IdTown = resolvedTownId,
                     IdUser = UserInfoProvider.UserId
                 };
-                var ghUpdateCitizenRequest = new GestHordesMajCitizenRequest(UserInfoProvider.UserId, UserInfoProvider.UserKey);
+                var ghUpdateCitizenRequest = new GestHordesMajCitizenRequest(UserInfoProvider.UserId, UserInfoProvider.UserKey!);
 
                 var patchHomeMho = false;
                 var patchHomeGh = false;
@@ -737,7 +762,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                 }
 
                 var patchChestMho = false;
-                List<UpdateObjectDto> chestItemsToApply = null;
+                List<UpdateObjectDto>? chestItemsToApply = null;
                 if (updateRequestDto.Chest != null && updateRequestDto.Chest.ToolsToUpdate.IsMyHordesOptimizer)
                 {
                     chestItemsToApply = updateRequestDto.Chest.Contents;
@@ -800,24 +825,24 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                             using var transaction = dbContext.Database.BeginTransaction();
                             if (patchHomeMho)
                             {
-                                townCitizenDetail.IdLastUpdateInfoHome = newLastUpdate.IdLastUpdateInfo;
+                                townCitizenDetail.IdLastUpdateInfoHome = newLastUpdate!.IdLastUpdateInfo;
                             }
                             if (patchStatusMho)
                             {
-                                townCitizenDetail.IdLastUpdateInfoStatus = newLastUpdate.IdLastUpdateInfo;
+                                townCitizenDetail.IdLastUpdateInfoStatus = newLastUpdate!.IdLastUpdateInfo;
                             }
                             if (patchHeroicActionMho)
                             {
-                                townCitizenDetail.IdLastUpdateInfoHeroicAction = newLastUpdate.IdLastUpdateInfo;
+                                townCitizenDetail.IdLastUpdateInfoHeroicAction = newLastUpdate!.IdLastUpdateInfo;
                             }
                             var citizenDetail = dbContext.TownCitizens
                                 .Include(x => x.IdChestNavigation)
-                                .ThenInclude(x => x.ChestItems)
+                                .ThenInclude(x => x!.ChestItems)
                                 .Single(citizen => citizen.IdTown == townCitizenDetail.IdTown && citizen.IdUser == townCitizenDetail.IdUser);
                             citizenDetail.UpdateAllButKeysProperties(townCitizenDetail, ignoreNull: true);
                             if (patchChestMho)
                             {
-                                ReplaceChestItems(dbContext, citizenDetail, chestItemsToApply, newLastUpdate.IdLastUpdateInfo);
+                                ReplaceChestItems(dbContext, citizenDetail, chestItemsToApply!, newLastUpdate!.IdLastUpdateInfo);
                             }
                             dbContext.Update(citizenDetail);
                             dbContext.SaveChanges();
@@ -898,7 +923,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                         using var transaction = dbContext.Database.BeginTransaction();
 
                         var cellDigsToUpdate = new List<MapCellDig>();
-                        var realX = updateRequestDto.TownDetails.TownX + successedDig.Cell.X;
+                        var realX = updateRequestDto.TownDetails.TownX + successedDig!.Cell.X;
                         var realY = updateRequestDto.TownDetails.TownY - successedDig.Cell.Y;
                         var townId = resolvedTownId;
 
@@ -927,7 +952,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                                     IdUser = dig.CitizenId,
                                     NbSucces = dig.SuccessDigs,
                                     NbTotalDig = dig.TotalDigs,
-                                    IdLastUpdateInfo = newLastUpdate.IdLastUpdateInfo
+                                    IdLastUpdateInfo = newLastUpdate!.IdLastUpdateInfo
                                 };
                                 dbContext.Add(cellDigModel);
                             }
@@ -937,7 +962,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                                 cellDigModel.IdUser = dig.CitizenId;
                                 cellDigModel.NbSucces = dig.SuccessDigs;
                                 cellDigModel.NbTotalDig = dig.TotalDigs;
-                                cellDigModel.IdLastUpdateInfo = newLastUpdate.IdLastUpdateInfo;
+                                cellDigModel.IdLastUpdateInfo = newLastUpdate!.IdLastUpdateInfo;
                                 dbContext.Update(cellDigModel);
                             }
                         }
@@ -1048,7 +1073,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                 var nbPelle = 0;
                 var idPelle = -1;
                 var idMax = -1;
-                foreach (var key in jObject.Children())
+                foreach (var key in jObject!.Children())
                 {
                     var prop = key as JProperty;
                     if (prop != null && prop.Name.IndexOf("idObjet") > 0)
@@ -1063,7 +1088,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                         if (value.Value<string>() == "5001")
                         {
                             idPelle = idObj;
-                            nbPelle = jObject.Property($"dataObjet[{idPelle}][nbr]").Value.Value<int>();
+                            nbPelle = jObject.Property($"dataObjet[{idPelle}][nbr]")!.Value.Value<int>();
                         }
                     }
                 }
@@ -1084,6 +1109,23 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
         }
 
         #region GH
+
+        /// <summary>
+        /// Case destinée à Gest'Hordes : la sienne, remplie selon ses options. Les addons antérieurs passent GH
+        /// en mode « cell » et ne remplissent que la case partagée (ponytail: repli à retirer quand ils auront disparu).
+        /// </summary>
+        private static UpdateCellInfoDto? GestHordesCellOf(UpdateRequestDto dto)
+        {
+            return dto.Map!.GestHordesCell
+                   ?? (UpdateRequestMapToolsToUpdateDetailsDto.IsCell(dto.Map.ToolsToUpdate.IsGestHordes) ? dto.Map.Cell : null);
+        }
+
+        /// <summary>Vrai si la case porte un relevé de métier, seul contenu de case que /majScript reçoit.</summary>
+        private static bool HasJobMarkers(UpdateCellInfoDto? cell)
+        {
+            return cell != null
+                   && (cell.ScavZoneLevel.HasValue || cell.ScoutZoneLvl.HasValue || cell.ScavNextCells != null || cell.ScoutNextCells != null);
+        }
 
         #region ZoneRegen
 
@@ -1223,7 +1265,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                 {
                     var citizen = dbContext.TownCitizens
                         .Include(x => x.IdBagNavigation)
-                        .ThenInclude(bag => bag.BagItems)
+                        .ThenInclude(bag => bag!.BagItems)
                         .Single(x => x.IdTown == townId && x.IdUser == bag.UserId);
                     if (citizen.IdBagNavigation == null)
                     {
@@ -1267,7 +1309,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
 
             var citizen = dbContext.TownCitizens
                        .Include(x => x.IdBagNavigation)
-                       .ThenInclude(bag => bag.BagItems)
+                       .ThenInclude(bag => bag!.BagItems)
                        .Single(x => x.IdTown == townId && x.IdUser == userId);
             if(citizen.IdBagNavigation is not null)
             {
@@ -1289,7 +1331,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                     Count = item.Count,
                     IdItem = item.Id,
                     IsBroken = item.IsBroken,
-                    IdBag = citizen.IdBag.Value
+                    IdBag = citizen.IdBag!.Value
                 }).Entity;
                 dbContext.SaveChanges();
                 citizen.IdBagNavigation.BagItems.Add(bagItem);
@@ -1325,7 +1367,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                     Count = item.Count,
                     IdItem = item.Id,
                     IsBroken = item.IsBroken,
-                    IdChest = citizen.IdChest.Value
+                    IdChest = citizen.IdChest!.Value
                 }).Entity;
                 dbContext.SaveChanges();
                 citizen.IdChestNavigation.ChestItems.Add(chestItem);
@@ -1351,7 +1393,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
 
             var citizen = dbContext.TownCitizens
                 .Include(x => x.IdChestNavigation)
-                .ThenInclude(chestNav => chestNav.ChestItems)
+                .ThenInclude(chestNav => chestNav!.ChestItems)
                 .Single(x => x.IdTown == townId && x.IdUser == userId);
 
             ReplaceChestItems(dbContext, citizen, chest, newLastUpdate.IdLastUpdateInfo);

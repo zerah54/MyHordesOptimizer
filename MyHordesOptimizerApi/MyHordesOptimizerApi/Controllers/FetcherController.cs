@@ -51,7 +51,7 @@ namespace MyHordesOptimizerApi.Controllers
                 {
                     entry.SetAbsoluteExpiration(ItemsCacheTtl);
                     return _myHordesFetcherService.GetItems(null).ToList();
-                });
+                })!;
             }
 
             var items = _myHordesFetcherService.GetItems(townId).ToList();
@@ -64,7 +64,7 @@ namespace MyHordesOptimizerApi.Controllers
         {
             var heroSkills = _cache.GetOrCreate(ReferentialCacheKeys.HeroSkills,
                 _ => _myHordesFetcherService.GetHeroSkills().ToList());
-            return heroSkills;
+            return heroSkills!;
         }
 
         [HttpGet]
@@ -73,7 +73,7 @@ namespace MyHordesOptimizerApi.Controllers
         {
             var causesOfDeath = _cache.GetOrCreate(ReferentialCacheKeys.CausesOfDeath,
                 _ => _myHordesFetcherService.GetCausesOfDeath().ToList());
-            return causesOfDeath;
+            return causesOfDeath!;
         }
 
         [HttpGet]
@@ -82,7 +82,7 @@ namespace MyHordesOptimizerApi.Controllers
         {
             var cleanUpTypes = _cache.GetOrCreate(ReferentialCacheKeys.CleanUpTypes,
                 _ => _myHordesFetcherService.GetCleanUpTypes().ToList());
-            return cleanUpTypes;
+            return cleanUpTypes!;
         }
 
         [HttpGet]
@@ -91,7 +91,7 @@ namespace MyHordesOptimizerApi.Controllers
         {
             var recipes = _cache.GetOrCreate(ReferentialCacheKeys.Recipes,
                 _ => _myHordesFetcherService.GetRecipes().ToList());
-            return recipes;
+            return recipes!;
         }
 
         [HttpGet]
@@ -143,7 +143,7 @@ namespace MyHordesOptimizerApi.Controllers
             if (!townId.HasValue)
             {
                 return _cache.GetOrCreate(ReferentialCacheKeys.Ruins,
-                    _ => _myHordesFetcherService.GetRuins(null).ToList());
+                    _ => _myHordesFetcherService.GetRuins(null).ToList())!;
             }
 
             var ruins = _myHordesFetcherService.GetRuins(townId).ToList();
@@ -159,7 +159,16 @@ namespace MyHordesOptimizerApi.Controllers
         public ActionResult<IEnumerable<BuildingDto>> GetBuildings()
         {
             return _cache.GetOrCreate(ReferentialCacheKeys.Buildings,
-                _ => _myHordesFetcherService.GetBuildings().ToList());
+                _ => _myHordesFetcherService.GetBuildings().ToList())!;
+        }
+
+        /// <summary>Niveaux de maison et améliorations, statiques (fichiers de l'extracteur).</summary>
+        [HttpGet]
+        [Route("HomeReferential")]
+        public ActionResult<HomeReferentialDto> GetHomeReferential()
+        {
+            return _cache.GetOrCreate(ReferentialCacheKeys.HomeReferential,
+                _ => _myHordesFetcherService.GetHomeReferential())!;
         }
 
         [HttpGet]

@@ -36,13 +36,13 @@ namespace MyHordesOptimizerApiIntegrationTests.Services
             return _factory.Services.CreateScope().ServiceProvider.GetRequiredService<IExpeditionService>();
         }
 
-        private int NewTown(int day)
+        private int NewTown(int day, int mapSize = 0)
         {
             var scope = _factory.Services.CreateScope();
             var context = scope.ServiceProvider.GetRequiredService<MhoContext>();
             var suffix = Guid.NewGuid().ToString("N").Substring(0, 8);
             var town_id = new Random().Next(1, int.MaxValue);
-            context.Towns.Add(new Town { IdTown = town_id, Name = "test-town-" + suffix, MapId = town_id, Day = day });
+            context.Towns.Add(new Town { IdTown = town_id, Name = "test-town-" + suffix, MapId = town_id, Day = day, Width = mapSize, Height = mapSize });
             context.SaveChanges();
             return town_id;
         }
@@ -206,6 +206,62 @@ namespace MyHordesOptimizerApiIntegrationTests.Services
                 .ToList();
             copiedOrders.Should().HaveCount(2);
             copiedOrders.Should().OnlyContain(o => o.IdTargetExpedition == waitedCopy.IdExpedition && o.Note == "avancer ensemble");
+        }
+
+        [Fact]
+        public async Task SavePartOrdersAsync_GardeLePassage()
+        {
+            var townId = NewTown(day: 5, mapSize: 25);
+            var partId = await NewPart(townId, expeditionDay: 5);
+
+            var result = await NewService().SavePartOrdersAsync(partId, new List<ExpeditionOrderDto> { new ExpeditionOrderDto { Text = "x", X = 3, Y = 3, Passage = 2 } });
+
+            result.Single().Passage.Should().Be(2);
+            var context = _factory.Services.CreateScope().ServiceProvider.GetRequiredService<MhoContext>();
+            context.ExpeditionOrders.Single(o => o.IdExpeditionOrder == result.Single().Id!.Value).Passage.Should().Be(2);
+        }
+
+        [Fact]
+        public async Task SavePartOrdersAsync_PassageNul_EffaceLePassageStocke()
+        {
+            var townId = NewTown(day: 5, mapSize: 25);
+            var partId = await NewPart(townId, expeditionDay: 5);
+            var saved = (await NewService().SavePartOrdersAsync(partId, new List<ExpeditionOrderDto> { new ExpeditionOrderDto { Text = "x", X = 3, Y = 3, Passage = 2 } })).Single();
+
+            var result = await NewService().SavePartOrdersAsync(partId, new List<ExpeditionOrderDto> { new ExpeditionOrderDto { Id = saved.Id, Text = "x", X = 3, Y = 3, Passage = null } });
+
+            result.Single().Passage.Should().BeNull();
+            var context = _factory.Services.CreateScope().ServiceProvider.GetRequiredService<MhoContext>();
+            context.ExpeditionOrders.Single(o => o.IdExpeditionOrder == saved.Id!.Value).Passage.Should().BeNull();
+        }
+
+        [Fact]
+        public async Task SaveCitizenOrdersAsync_PassageNul_EffaceLePassageStocke()
+        {
+            var townId = NewTown(day: 5, mapSize: 25);
+            var citizenId = await NewCitizen(townId, expeditionDay: 5);
+            var saved = (await NewService().SaveCitizenOrdersAsync(citizenId, new List<ExpeditionOrderDto> { new ExpeditionOrderDto { Text = "x", X = 3, Y = 3, Passage = 2 } })).Single();
+
+            var result = await NewService().SaveCitizenOrdersAsync(citizenId, new List<ExpeditionOrderDto> { new ExpeditionOrderDto { Id = saved.Id, Text = "x", X = 3, Y = 3, Passage = null } });
+
+            result.Single().Passage.Should().BeNull();
+            var context = _factory.Services.CreateScope().ServiceProvider.GetRequiredService<MhoContext>();
+            context.ExpeditionOrders.Single(o => o.IdExpeditionOrder == saved.Id!.Value).Passage.Should().BeNull();
+        }
+
+        [Fact]
+        public async Task UpdateExpeditionOrder_NeChangePasLePassage()
+        {
+            var townId = NewTown(day: 5, mapSize: 25);
+            var partId = await NewPart(townId, expeditionDay: 5);
+            var saved = (await NewService().SavePartOrdersAsync(partId, new List<ExpeditionOrderDto> { new ExpeditionOrderDto { Text = "x", X = 3, Y = 3, Passage = 2 } })).Single();
+
+            NewService().UpdateExpeditionOrder(new ExpeditionOrderDto { Id = saved.Id, IsDone = true, Passage = 5 });
+
+            var context = _factory.Services.CreateScope().ServiceProvider.GetRequiredService<MhoContext>();
+            var fromDb = context.ExpeditionOrders.Single(o => o.IdExpeditionOrder == saved.Id!.Value);
+            fromDb.IsDone.Should().BeTrue();
+            fromDb.Passage.Should().Be(2);
         }
 
         [Fact]

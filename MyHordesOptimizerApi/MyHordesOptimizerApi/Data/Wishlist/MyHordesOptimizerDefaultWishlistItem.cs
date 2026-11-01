@@ -13,7 +13,7 @@ namespace MyHordesOptimizerApi.Data.Wishlist
         /// fait pointer chaque entrée sur un autre objet, en silence.
         /// </remarks>
         [JsonProperty("uid")]
-        public string Uid { get; set; }
+        public string Uid { get; set; } = null!;
 
         [JsonProperty("count")]
         public int Count { get; set; }

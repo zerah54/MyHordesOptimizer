@@ -74,7 +74,7 @@ namespace MyHordesOptimizerApi.MappingProfiles.Maps
                 .ForMember(dto => dto.TotalSucces, opt => opt.Ignore())
                 .ForMember(dto => dto.X, opt => opt.MapFrom(model => model.X))
                 .ForMember(dto => dto.Y, opt => opt.MapFrom(model => model.Y))
-                .ForMember(dto => dto.ZoneRegen, opt => { opt.MapFrom(src => ((DirectionEnum)src.ZoneRegen.Value).GetDescription()); opt.PreCondition(src => src.ZoneRegen.HasValue); });
+                .ForMember(dto => dto.ZoneRegen, opt => { opt.MapFrom(src => ((DirectionEnum)src.ZoneRegen!.Value).GetDescription()); opt.PreCondition(src => src.ZoneRegen.HasValue); });
 
             CreateMap<Town, List<MyHordesOptimizerMapDigDto>>()
                     .ConvertUsing<TownToMapDigDto>();
@@ -91,7 +91,7 @@ namespace MyHordesOptimizerApi.MappingProfiles.Maps
 
             CreateMap<MapCellDigUpdate, MyHordesOptimizerMapUpdateDto>()
                 .ForMember(dest => dest.Day, opt => opt.MapFrom(src => src.Day))
-                .ForMember(dest => dest.DirectionRegen, opt => opt.MapFrom(src => ((DirectionEnum)src.DirectionRegen).GetDescription()))
+                .ForMember(dest => dest.DirectionRegen, opt => opt.MapFrom(src => ((DirectionEnum)src.DirectionRegen!).GetDescription()))
                 .ForMember(dest => dest.IdTown, opt => opt.MapFrom(src => src.IdTown))
                 .ForMember(dest => dest.LevelRegen, opt => opt.MapFrom(src => src.LevelRegen))
                 .ForMember(dest => dest.TauxRegen, opt => opt.MapFrom(src => src.TauxRegen));
@@ -146,7 +146,7 @@ namespace MyHordesOptimizerApi.MappingProfiles.Maps
                 // que les vivants dont la position est connue
                 var citizenByPosition = town.TownCitizens
                     .Where(townCitizen => townCitizen.Dead != true && townCitizen.PositionX.HasValue && townCitizen.PositionY.HasValue)
-                    .GroupBy(townCitizen => new { X = townCitizen.PositionX.Value, Y = townCitizen.PositionY.Value })
+                    .GroupBy(townCitizen => new { X = townCitizen.PositionX!.Value, Y = townCitizen.PositionY!.Value })
                     .ToDictionary(x => x.Key, x => x.ToList());
                 foreach (var mapCell in town.MapCells)
                 {

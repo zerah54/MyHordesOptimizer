@@ -154,7 +154,7 @@
 
                     <section class="filters-section">
                         <h4 i18n>Actions quotidiennes</h4>
-                        @for (action of daily_action_keys; track action.key) {
+                        @for (action of daily_action_keys(); track action.key) {
                             <div class="filter-row bool-row">
                         <span (click)="cycleBoolFilter('daily_' + action.key)" [matTooltip]="action.getLabel() + bool_filter_hint"
                               class="bool-control">
@@ -235,7 +235,7 @@
 
                     @if (hasHeroSkillOrCampingOptions()) {
                         <section class="filters-section toggles">
-                            <h4 i18n>Capacités et camping</h4>
+                            <h4 i18n>Compétences et camping</h4>
                             @for (family of hero_skill_families; track family.key) {
                                 @if ((value_options[HERO_SKILL_ID_PREFIX + family.key] || []).length > 0) {
                                     <div class="filter-row">
@@ -367,8 +367,8 @@
                                     </ng-container>
 
                                     <ng-container matColumnDef="hero_skills">
-                                        <th *matHeaderCellDef i18n mat-header-cell>Capacités</th>
-                                        <td *matCellDef="let row; table: table" class="band-cell" mat-cell>
+                                        <th *matHeaderCellDef i18n mat-header-cell>Compétences</th>
+                                        <td *matCellDef="let row; table: table" mat-cell>
                                             <mho-deferred-cell [content]="heroSkillsBand" [context]="{ $implicit: row }"></mho-deferred-cell>
                                         </td>
                                     </ng-container>
@@ -436,7 +436,7 @@
                                         </td>
                                     </ng-container>
 
-                                    @for (action of daily_action_keys; track action.key; let first = $first) {
+                                    @for (action of daily_action_keys(); track action.key; let first = $first) {
                                         <ng-container [matColumnDef]="'daily_' + action.key">
                                             <th *matHeaderCellDef [class.category-start]="first" class="field-col" mat-header-cell>
                                                 <img [alt]="action.getLabel()" [matTooltip]="action.getLabel()"
@@ -612,7 +612,7 @@
 
 <!-- ============ Menu « Trier par » ============ -->
 <mat-menu #sortMenu="matMenu">
-    @for (field of sortable_fields; track field.id) {
+    @for (field of sortable_fields(); track field.id) {
         <button (click)="sortBy(field.id)" mat-menu-item type="button">
             <span>{{ field.label }}</span>
             @if (sort_field() === field.id) {
@@ -674,7 +674,7 @@
 
 <ng-template #dailyBand let-row>
     <div class="band">
-        @for (action of daily_action_keys; track action.key) {
+        @for (action of daily_action_keys(); track action.key) {
             <ng-container [ngTemplateOutletContext]="{ $implicit: getDailyAction(row, action), citizenId: row.id }"
                           [ngTemplateOutlet]="dailyActionCell"></ng-container>
         }
@@ -849,9 +849,9 @@
     }
 </ng-template>
 
-<!-- Capacités héroïques : un niveau par groupe (« ? » = inconnu, 0 = aucun) -->
+<!-- Compétences héroïques : un niveau par groupe (« ? » = inconnu, 0 = aucun) -->
 <ng-template #heroSkillsBand let-row>
-    <div class="band">
+    <div class="band hero-skills-band">
         @for (family of hero_skill_families; track family.key) {
             <ng-container [ngTemplateOutletContext]="{ $implicit: row, family: family }" [ngTemplateOutlet]="heroSkillCell"></ng-container>
         }
@@ -859,18 +859,26 @@
 </ng-template>
 
 <ng-template #heroSkillCell let-family="family" let-row>
-    <span class="hero-skill">
+    <button [disabled]="is_readonly()"
+            [matMenuTriggerData]="{ row: row, family: family }"
+            [matMenuTriggerFor]="heroSkillMenu"
+            [matTooltip]="heroSkillLabel(family, row.hero_skills[family.key])"
+            class="hero-skill" type="button">
         <span class="hero-skill-letter">{{ family.letter }}</span>
-        <mho-compact-stepper
-            (valueChange)="updateHeroSkill(row.id, family.key, $event)"
-            [disabled]="is_readonly()"
-            [label]="heroSkillLabel(family, row.hero_skills[family.key])"
-            [max]="MAX_HERO_SKILL_LEVEL"
-            [min]="-1"
-            [value]="row.hero_skills[family.key] ?? -1">
-        </mho-compact-stepper>
-    </span>
+        <span>{{ row.hero_skills[family.key] ?? '?' }}</span>
+    </button>
 </ng-template>
+
+<mat-menu #heroSkillMenu="matMenu">
+    <ng-template let-family="family" let-row="row" matMenuContent>
+        @for (level of hero_skill_levels; track level.value) {
+            <button (click)="updateHeroSkill(row.id, family.key, level.value)"
+                    [disabled]="level.value === (row.hero_skills[family.key] ?? -1)"
+                    mat-menu-item type="button">{{ level.label }}
+            </button>
+        }
+    </ng-template>
+</mat-menu>
 
 <!-- Campings déjà effectués (0 par défaut) -->
 <ng-template #campingCountCell let-row>

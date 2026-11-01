@@ -1,0 +1,16 @@
+:host {
+    display: block;
+
+    table.summary {
+        width: 100%;
+        margin-bottom: 1em;
+        border-collapse: collapse;
+
+        th,
+        td {
+            padding: 0.25em 0.5em;
+            text-align: left;
+            vertical-align: middle;
+        }
+    }
+}

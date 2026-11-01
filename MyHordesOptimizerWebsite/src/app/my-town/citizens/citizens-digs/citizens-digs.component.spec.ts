@@ -9,6 +9,8 @@ import { TownService } from '../../../_abstract_model/services/town.service';
 import { Citizen } from '../../../_abstract_model/types/citizen.class';
 import { CitizenInfo } from '../../../_abstract_model/types/citizen-info.class';
 import { Dig } from '../../../_abstract_model/types/dig.class';
+import { TownDetails } from '../../../_abstract_model/types/town-details.class';
+import { setTown } from '../../../_core/utilities/localstorage.util';
 import { CitizensDigsComponent } from './citizens-digs.component';
 
 describe('CitizensDigsComponent', (): void => {
@@ -38,6 +40,7 @@ describe('CitizensDigsComponent', (): void => {
     });
 
     afterEach((): void => {
+        setTown(null);
         vi.useRealTimers();
     });
 
@@ -76,6 +79,32 @@ describe('CitizensDigsComponent', (): void => {
         dig.y = 4;
         (digsService.getDigs as Mock).mockReturnValue(of([dig]));
 
+        fixture.detectChanges();
+        await vi.advanceTimersByTimeAsync(0);
+        fixture.detectChanges();
+
+        expect(fixture.nativeElement.textContent).toContain('3/4');
+    });
+
+    it('renders the digs of the day picked in the column header', async (): Promise<void> => {
+        setTown(Object.assign(new TownDetails(), { day: 2 }));
+        fixture = TestBed.createComponent(CitizensDigsComponent);
+        const info: CitizenInfo = new CitizenInfo();
+        info.citizens = [makeCitizen(1, 'Alice')];
+        vi.spyOn(townService, 'getCitizens').mockReturnValue(of(info));
+        const dig: Dig = new Dig();
+        dig.digger_id = 1;
+        dig.day = 1;
+        dig.x = 3;
+        dig.y = 4;
+        (digsService.getDigs as Mock).mockReturnValue(of([dig]));
+
+        fixture.detectChanges();
+        await vi.advanceTimersByTimeAsync(0);
+        fixture.detectChanges();
+        expect(fixture.nativeElement.textContent).not.toContain('3/4');
+
+        fixture.nativeElement.querySelector('th button[data-action="previous-day"]').click();
         fixture.detectChanges();
         await vi.advanceTimersByTimeAsync(0);
         fixture.detectChanges();

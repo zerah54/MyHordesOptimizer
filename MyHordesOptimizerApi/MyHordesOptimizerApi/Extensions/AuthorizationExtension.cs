@@ -31,7 +31,7 @@ namespace MyHordesOptimizerApi.Extensions
                 ValidIssuer = issuer,
                 ValidAudiences = [audiences],
                 ValidateIssuerSigningKey = true,
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(secret)),
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(secret!)),
                 ValidateIssuer = true,
                 ValidateAudience = true,
                 ClockSkew = TimeSpan.Zero
@@ -61,8 +61,8 @@ namespace MyHordesOptimizerApi.Extensions
                 {
                     var jwtToken = (JsonWebToken)context.SecurityToken;
 
-                    var clone = context.Principal.Clone();
-                    var newIdentity = (ClaimsIdentity)clone.Identity;
+                    var clone = context.Principal!.Clone();
+                    var newIdentity = (ClaimsIdentity)clone.Identity!;
                     foreach (var tokenClaim in jwtToken.Claims)
                     {
                         newIdentity.AddClaim(tokenClaim);

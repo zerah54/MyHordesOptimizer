@@ -5,18 +5,18 @@ namespace MyHordesOptimizerApi.Data.CauseOfDeath
     public class MyHordesCauseOfDeathModel
     {
         [JsonProperty("dtype")]
-        public string Dtype { get; set; }
+        public string Dtype { get; set; } = null!;
 
         [JsonProperty("ref")]
-        public string Ref { get; set; }
+        public string Ref { get; set; } = null!;
 
         [JsonProperty("label")]
-        public string Label { get; set; }
+        public string Label { get; set; } = null!;
 
         [JsonProperty("desc")]
-        public string Description { get; set; }
+        public string Description { get; set; } = null!;
 
         [JsonProperty("icon")]
-        public string Icon { get; set; }
+        public string Icon { get; set; } = null!;
     }
 }

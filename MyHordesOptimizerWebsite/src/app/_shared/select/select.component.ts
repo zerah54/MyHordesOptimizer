@@ -3,6 +3,7 @@ import { CommonModule, NgOptimizedImage, NgTemplateOutlet } from '@angular/commo
 import {
     booleanAttribute,
     ChangeDetectionStrategy,
+    ChangeDetectorRef,
     Component,
     ElementRef,
     inject,
@@ -62,6 +63,7 @@ export class SelectComponent<T> implements ControlValueAccessor, Validator, MatF
     public validator: Validators | null = inject(Validators, { optional: true, self: true });
     public readonly parent_form_field: MatFormField | null = inject(MatFormField, { optional: true });
     private readonly _elementRef: ElementRef = inject(ElementRef);
+    private readonly change_detector: ChangeDetectorRef = inject(ChangeDetectorRef);
 
     private static nextId: number = 0;
 
@@ -244,11 +246,16 @@ export class SelectComponent<T> implements ControlValueAccessor, Validator, MatF
         })]);
     }
 
+    /** Choix de l'utilisateur : seul cas où le formulaire parent est notifié. */
+    protected selectValue(value: T | string | undefined | T[] | string[]): void {
+        this.onChange(value);
+        this.filterChange.emit(value);
+    }
+
     //From ControlValueAccessor interface
     public writeValue(value: T | string | undefined | T[] | string[]): void {
-        // console.log('value', value)
         this.innerValue = value;
-        this.onChange(value);
+        this.change_detector.markForCheck();
         this.filterChange.emit(value);
     }
 

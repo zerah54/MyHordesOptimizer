@@ -33,6 +33,8 @@ export class ExpeditionOrder extends CommonModel<ExpeditionOrderDTO> {
     public target_expedition_id: number | null = null;
     /** Précision libre d'une consigne typée, en texte brut. */
     public note: string | null = null;
+    /** Passage voulu sur la case (1 = premier) ; `null` : le premier. */
+    public passage: number | null = null;
 
     public constructor(dto?: ExpeditionOrderDTO | null) {
         super();
@@ -59,7 +61,8 @@ export class ExpeditionOrder extends CommonModel<ExpeditionOrderDTO> {
             heroSkill: this.hero_skill,
             targetUserId: this.target_user_id,
             targetExpeditionId: this.target_expedition_id,
-            note: this.note
+            note: this.note,
+            passage: this.passage
         };
     }
 
@@ -83,6 +86,7 @@ export class ExpeditionOrder extends CommonModel<ExpeditionOrderDTO> {
             this.target_user_id = dto.targetUserId ?? null;
             this.target_expedition_id = dto.targetExpeditionId ?? null;
             this.note = dto.note ?? null;
+            this.passage = dto.passage ?? null;
         }
     }
 

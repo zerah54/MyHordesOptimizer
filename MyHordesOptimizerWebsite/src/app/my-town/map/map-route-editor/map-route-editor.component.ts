@@ -13,8 +13,8 @@ import moment from 'moment';
 import { Imports } from '../../../_abstract_model/types/_types';
 import { Cell } from '../../../_abstract_model/types/cell.class';
 import { Citizen } from '../../../_abstract_model/types/citizen.class';
-import { Expedition } from '../../../_abstract_model/types/expedition.class';
 import { ExpeditionPart } from '../../../_abstract_model/types/expedition-part.class';
+import { Expedition } from '../../../_abstract_model/types/expedition.class';
 import { MapRoute, mapRouteColorVar, MapRoutePoint } from '../../../_abstract_model/types/map-route.class';
 import { Ruin } from '../../../_abstract_model/types/ruin.class';
 import { Town } from '../../../_abstract_model/types/town.class';
@@ -39,8 +39,9 @@ interface StepView {
     readonly node: string;
     readonly coordinates: string;
     readonly place: string;
-    /** PA au premier passage ; `null` hors du tracé. */
+    /** PA de ce passage ; `null` hors du tracé. */
     readonly ap: number | null;
+    readonly passage_label: string | null;
     /** Consignes des expéditions du jour qui suivent le tracé. */
     readonly orders: number;
     readonly off: boolean;
@@ -98,7 +99,7 @@ export class MapRouteEditorComponent {
     });
 
     /**
-     * Départ, cases à consignes dans l'ordre du tracé (PA au premier passage), arrivée dès qu'il y a une destination,
+     * Départ, cases à consignes dans l'ordre du tracé (un arrêt par passage), arrivée dès qu'il y a une destination,
      * puis les cases à consignes que le tracé ne traverse plus : les clics intermédiaires n'y figurent pas.
      */
     protected readonly steps: Signal<StepView[]> = computed((): StepView[] => {
@@ -119,6 +120,7 @@ export class MapRouteEditorComponent {
                     coordinates: place?.coordinates ?? '',
                     place: cellPlaceLabel(step.cell, place, cells),
                     ap: step.ap,
+                    passage_label: step.passage_label,
                     orders: step.orders.length,
                     off: step.node === 'off'
                 };

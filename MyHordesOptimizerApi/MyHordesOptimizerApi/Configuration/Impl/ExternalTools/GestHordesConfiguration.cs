@@ -5,15 +5,15 @@ namespace MyHordesOptimizerApi.Configuration.Impl.ExternalTools
 {
     public class GestHordesConfiguration : IGestHordesConfiguration
     {
-        public string Url => _configuration.GetValue<string>("Url");
+        public string Url => _configuration.GetValue<string>("Url")!;
 
-        public string LoginPath => _configuration.GetValue<string>("LoginPath");
+        public string LoginPath => _configuration.GetValue<string>("LoginPath")!;
 
-        public string MajPath => _configuration.GetValue<string>("MajPath");
+        public string MajPath => _configuration.GetValue<string>("MajPath")!;
 
-        public string MajCasePath => _configuration.GetValue<string>("MajCasePath");
-        public string MajZombieTuePath => _configuration.GetValue<string>("MajZombieTuePath");
-        public string MajCitizenPath => _configuration.GetValue<string>("MajCitizenPath");
+        public string MajCasePath => _configuration.GetValue<string>("MajCasePath")!;
+        public string MajZombieTuePath => _configuration.GetValue<string>("MajZombieTuePath")!;
+        public string MajCitizenPath => _configuration.GetValue<string>("MajCitizenPath")!;
 
         private IConfigurationSection _configuration;
 

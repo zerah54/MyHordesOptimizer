@@ -13,7 +13,7 @@ namespace MyHordesOptimizerApi
                              .ThenInclude(bagItem => bagItem.IdItemNavigation)
                          .Include(bag => bag.ExpeditionCitizens)
                              .ThenInclude(citizen => citizen.IdExpeditionPartNavigation)
-                                .ThenInclude(part => part.IdExpeditionNavigation)
+                                .ThenInclude(part => part!.IdExpeditionNavigation)
                          .Single();
         }
 
@@ -30,7 +30,7 @@ namespace MyHordesOptimizerApi
                              .ThenInclude(bagItem => bagItem.IdItemNavigation)
                          .Include(bag => bag.ExpeditionCitizens)
                              .ThenInclude(citizen => citizen.IdExpeditionPartNavigation)
-                                .ThenInclude(part => part.IdExpeditionNavigation)
+                                .ThenInclude(part => part!.IdExpeditionNavigation)
                          .SingleAsync();
         }
 
@@ -42,7 +42,7 @@ namespace MyHordesOptimizerApi
                  .Include(expedition => expedition.ExpeditionParts)
                      .ThenInclude(part => part.ExpeditionCitizens)
                         .ThenInclude(expeditionCitizen => expeditionCitizen.IdExpeditionBagNavigation)
-                          .ThenInclude(bag => bag.ExpeditionBagItems)
+                          .ThenInclude(bag => bag!.ExpeditionBagItems)
                               .ThenInclude(bagItem => bagItem.IdItemNavigation)
                  .Include(expedition => expedition.ExpeditionParts)
                      .ThenInclude(part => part.ExpeditionCitizens)

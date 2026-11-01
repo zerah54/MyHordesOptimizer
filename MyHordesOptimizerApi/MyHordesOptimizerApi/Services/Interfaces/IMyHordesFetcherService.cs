@@ -21,11 +21,10 @@ namespace MyHordesOptimizerApi.Services.Interfaces
         /// session) — il est retrouvé depuis le hash du userKey SOUMIS dans la requête courante, via
         /// une table alimentée à chaque appel réussi de GetSimpleMeAsync. Renvoie null si ce userKey
         /// n'a encore jamais été vu par un appel réussi (ex. premier appel de la session, ou clé
-        /// inconnue). JobDetails (libellés localisés du métier) reste à vide, la BDD ne les stocke
-        /// pas — vérifié sans impact, le front ne les lit nulle part (me.class.ts ne mappe pas
-        /// jobDetails).
+        /// inconnue). JobDetails reste à vide, la BDD ne le stocke pas : l'addon, qui lit
+        /// JobDetails.Uid (métier du joueur), doit traiter un métier vide comme inconnu.
         /// </summary>
-        SimpleMeDto BuildSimpleMeFromDbByUserKey(string userKey);
+        SimpleMeDto? BuildSimpleMeFromDbByUserKey(string userKey);
 
         /// <summary>
         /// Vérifie que userKey appartient bien à userId, sans exiger de JWT. Réutilise le cache
@@ -45,6 +44,9 @@ namespace MyHordesOptimizerApi.Services.Interfaces
         CitizensLastUpdateDto GetCitizens(int townId);
         IEnumerable<MyHordesOptimizerRuinDto> GetRuins(int? townId);
         IEnumerable<BuildingDto> GetBuildings();
+
+        /// <summary>Niveaux de maison et améliorations, statiques (fichiers de l'extracteur).</summary>
+        HomeReferentialDto GetHomeReferential();
         MyHordesOptimizerMapDto GetMap(int townId);
         IEnumerable<MyHordesOptimizerMapDigDto> GetMapDigs(int townId);
         List<MyHordesOptimizerMapDigDto> CreateOrUpdateMapDigs(int townId, int userId, List<MyHordesOptimizerMapDigDto> requests);

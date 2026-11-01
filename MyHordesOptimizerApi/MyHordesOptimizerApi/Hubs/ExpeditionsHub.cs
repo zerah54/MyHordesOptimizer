@@ -228,6 +228,17 @@ namespace MyHordesOptimizerApi.Hubs
             await SendMapRouteChangesAsync(townId);
         }
 
+        public async Task DuplicateExpedition(int expeditionId, string? label, bool keepRoute, bool keepGeneralOrders, bool keepRouteOrders)
+        {
+            var userId = UserInfoProvider.UserId;
+            Logger.LogDebug("{@userId} DuplicateExpedition : {@expeditionId}", userId, expeditionId);
+            var copy = await ExpeditionService.DuplicateExpeditionAsync(expeditionId, label, keepRoute, keepGeneralOrders, keepRouteOrders);
+            var townId = CurrentTownId();
+            await Clients.Group(townId.ToString()).SendAsync(ExpeditionsHubEvent.ExpeditionUpdated.GetDescription(), copy);
+            Logger.LogDebug("Sent to Group({@townId}) ExpeditionUpdated: {@copy}", townId, copy.ToJson());
+            await SendMapRouteChangesAsync(townId);
+        }
+
         public async Task PostExpeditionPart(int expeditionId, string expeditionPartAsJson)
         {
             var userId = UserInfoProvider.UserId;

@@ -5,7 +5,7 @@ namespace MyHordesOptimizerApi.Configuration.Impl.ExternalTools
 {
     public class BigBrothHordesConfiguration : IBigBrothHordesConfiguration
     {
-        public string Url => _configuration.GetValue<string>("Url");
+        public string Url => _configuration.GetValue<string>("Url")!;
         public int SidMyHordes => _configuration.GetValue<int>("SidMyHordes");
         public int SidHordes => _configuration.GetValue<int>("SidHordes");
 

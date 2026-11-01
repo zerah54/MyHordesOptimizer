@@ -9,13 +9,15 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.Map
         public string MhoApiStatus { get; set; }
         public string GestHordesApiStatus { get; set; }
         public string GestHordesCellsStatus { get; set; }
+        public string ZenHordesStatus { get; set; }
 
 
         public UpdateMapResponseDto(UpdateRequestDto updateRequestDto)
         {
-            FataMorganaStatus = !UpdateRequestMapToolsToUpdateDetailsDto.IsNone(updateRequestDto.Map.ToolsToUpdate.IsFataMorgana) ? ExternalToolsUpdateResponseType.Ok.GetDescription() : ExternalToolsUpdateResponseType.NotActivated.GetDescription();
+            FataMorganaStatus = !UpdateRequestMapToolsToUpdateDetailsDto.IsNone(updateRequestDto.Map!.ToolsToUpdate.IsFataMorgana) ? ExternalToolsUpdateResponseType.Ok.GetDescription() : ExternalToolsUpdateResponseType.NotActivated.GetDescription();
             BigBrothHordesStatus = !UpdateRequestMapToolsToUpdateDetailsDto.IsNone(updateRequestDto.Map.ToolsToUpdate.IsBigBrothHordes) ? ExternalToolsUpdateResponseType.Ok.GetDescription() : ExternalToolsUpdateResponseType.NotActivated.GetDescription();
             MhoApiStatus = !UpdateRequestMapToolsToUpdateDetailsDto.IsNone(updateRequestDto.Map.ToolsToUpdate.IsMyHordesOptimizer) ? ExternalToolsUpdateResponseType.Ok.GetDescription() : ExternalToolsUpdateResponseType.NotActivated.GetDescription();
+            ZenHordesStatus = UpdateRequestMapToolsToUpdateDetailsDto.IsCell(updateRequestDto.Map.ToolsToUpdate.IsZenHordes!) ? ExternalToolsUpdateResponseType.Ok.GetDescription() : ExternalToolsUpdateResponseType.NotActivated.GetDescription();
 
             if(UpdateRequestMapToolsToUpdateDetailsDto.IsNone(updateRequestDto.Map.ToolsToUpdate.IsGestHordes))
             {

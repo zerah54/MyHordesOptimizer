@@ -4,8 +4,8 @@ namespace MyHordesOptimizerApi.Providers.Impl
 {
     public class MhoHeadersProvider : IMhoHeadersProvider
     {
-        public string MhoOrigin { get; set; }
-        public string MhoScriptVersion { get; set; }
-        public string MhoAddonVersion { get; set; }
+        public string? MhoOrigin { get; set; }
+        public string? MhoScriptVersion { get; set; }
+        public string? MhoAddonVersion { get; set; }
     }
 }

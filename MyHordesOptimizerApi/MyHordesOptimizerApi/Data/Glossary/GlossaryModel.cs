@@ -4,7 +4,7 @@ namespace MyHordesOptimizerApi.Data.Glossary
 {
     public class GlossaryModel
     {
-        [JsonProperty("word")] public string Word { get; set; }
-        [JsonProperty("definition")] public string Definition { get; set; }
+        [JsonProperty("word")] public string Word { get; set; } = null!;
+        [JsonProperty("definition")] public string Definition { get; set; } = null!;
     }
 }

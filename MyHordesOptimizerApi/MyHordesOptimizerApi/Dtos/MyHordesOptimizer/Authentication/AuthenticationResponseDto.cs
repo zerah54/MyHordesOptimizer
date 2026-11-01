@@ -2,7 +2,7 @@
 {
     public class AuthenticationResponseDto
     {
-        public TokenDto Token { get; set; }
-        public SimpleMeDto SimpleMe { get; set; }
+        public TokenDto Token { get; set; } = null!;
+        public SimpleMeDto SimpleMe { get; set; } = null!;
     }
 }

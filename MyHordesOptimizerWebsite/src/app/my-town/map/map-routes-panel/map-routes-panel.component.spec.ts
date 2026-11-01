@@ -5,13 +5,13 @@ import { provideRouter } from '@angular/router';
 import { MapRouteDTO, MapRouteLinkedPartDTO } from '../../../_abstract_model/dto/map-route.dto';
 import { Cell } from '../../../_abstract_model/types/cell.class';
 import { Citizen } from '../../../_abstract_model/types/citizen.class';
-import { MapRoute } from '../../../_abstract_model/types/map-route.class';
 import { MapRouteGame } from '../../../_abstract_model/types/map-route-game.class';
+import { MapRoute } from '../../../_abstract_model/types/map-route.class';
 import { MapRouteAccess } from '../../../_abstract_model/types/map-routes.class';
 import { Town } from '../../../_abstract_model/types/town.class';
 import { buildRouteViews, MapRouteView } from '../map-routes/map-route-views';
-import { MapRoutesStatus } from '../map-routes/map-routes.store';
 import { DEFAULT_ROUTES_DISPLAY, MapRouteKey, MapRoutesDisplay } from '../map-routes/map-routes-display';
+import { MapRoutesStatus } from '../map-routes/map-routes.store';
 import { MapRouteCommonColor, MapRoutePersonalColor, MapRoutesPanelComponent } from './map-routes-panel.component';
 
 const CITIZEN: MapRouteAccess = { is_citizen: true, is_current_town: true, can_create: true };
@@ -227,24 +227,51 @@ describe('MapRoutesPanelComponent', (): void => {
         expect(card).toContain('Consignes');
     });
 
-    it('picks a personal colour from the menu, or goes back to the common one', async (): Promise<void> => {
-        const element: HTMLElement = render([route(1, 'Libre')], { selected: 'mho-1' });
+    async function openPersonalColorMenu(colors: MapRoutesDisplay['colors']): Promise<{ options: HTMLButtonElement[]; changes: MapRoutePersonalColor[] }> {
+        const element: HTMLElement = render([route(1, 'Libre')], { selected: 'mho-1', display: { ...DEFAULT_ROUTES_DISPLAY, colors } });
         const changes: MapRoutePersonalColor[] = [];
         fixture.componentInstance.personalColorChange.subscribe((change: MapRoutePersonalColor): void => {
             changes.push(change);
         });
-
         (element.querySelector('.color-field button') as HTMLButtonElement).click();
         fixture.detectChanges();
         await fixture.whenStable();
-        const options: HTMLButtonElement[] = Array.from(document.querySelectorAll('.color-option'));
-        (options.find((option: HTMLButtonElement): boolean => !!option.textContent?.includes('Prune')) as HTMLButtonElement).click();
-        (element.querySelector('.color-field button') as HTMLButtonElement).click();
-        fixture.detectChanges();
-        await fixture.whenStable();
-        (Array.from(document.querySelectorAll('.color-option'))[0] as HTMLButtonElement).click();
+        return { options: Array.from(document.querySelectorAll('.color-option')), changes };
+    }
 
-        expect(changes).toEqual([{ key: 'mho-1', color: 'plum' }, { key: 'mho-1', color: null }]);
+    function optionWithText(options: HTMLButtonElement[], label: string): HTMLButtonElement | undefined {
+        return options.find((option: HTMLButtonElement): boolean => !!option.textContent?.includes(label));
+    }
+
+    it('picks a personal colour from the menu', async (): Promise<void> => {
+        const { options, changes } = await openPersonalColorMenu({});
+
+        (optionWithText(options, 'Prune') as HTMLButtonElement).click();
+
+        expect(changes).toEqual([{ key: 'mho-1', color: 'plum' }]);
+    });
+
+    it('goes back to the original colour when a personal one differs from it', async (): Promise<void> => {
+        const { options, changes } = await openPersonalColorMenu({ 'mho-1': 'plum' });
+
+        expect(options[0].textContent).toContain('Couleur d\'origine');
+        expect(optionWithText(options, 'Prune')?.getAttribute('aria-checked')).toBe('true');
+        options[0].click();
+
+        expect(changes).toEqual([{ key: 'mho-1', color: null }]);
+    });
+
+    it('hides the original colour when the route already shows it, and checks it in the palette', async (): Promise<void> => {
+        const { options } = await openPersonalColorMenu({});
+
+        expect(optionWithText(options, 'Couleur d\'origine')).toBeUndefined();
+        expect(optionWithText(options, 'Violet')?.getAttribute('aria-checked')).toBe('true');
+    });
+
+    it('hides the original colour when the personal colour equals it', async (): Promise<void> => {
+        const { options } = await openPersonalColorMenu({ 'mho-1': 'violet' });
+
+        expect(optionWithText(options, 'Couleur d\'origine')).toBeUndefined();
     });
 
     function buttonWithText(root: ParentNode, label: string): HTMLButtonElement | undefined {

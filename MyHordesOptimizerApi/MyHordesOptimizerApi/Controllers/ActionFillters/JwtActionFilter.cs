@@ -35,7 +35,7 @@ namespace MyHordesOptimizerApi.Controllers.ActionFillters
         /// en clair, ou clé de protection différente après un changement de secret de déploiement) est
         /// traité comme "userKey absent" : jamais de repli sur la valeur en clair du claim.
         /// </summary>
-        private string Unprotect(string protectedUserKey)
+        private string? Unprotect(string? protectedUserKey)
         {
             if (string.IsNullOrEmpty(protectedUserKey))
             {

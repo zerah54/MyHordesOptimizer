@@ -50,3 +50,4 @@ export const FAVORITE_EXPEDITION_ITEMS_UID: string[] = ['cart_#00', 'bag_#00', '
                                                         'rhum_#00', 'lpoint_#00', 'lpoint4_#00', 'lpoint3_#00', 'lpoint2_#00', 'lpoint1_#00', 'lilboo_#00', 'dice_#00', 'cards_#00', 'vegetable_#00', 'tekel_#00',
                                                         'pet_cat_#00', 'angryc_#00', 'bandage_#00', 'sport_elec_empty_#00', 'sport_elec_#00', 'maglite_off_#00', 'bumpKey_#00', 'magneticKey_#00',
                                                         'classicKey_#00', 'pocket_belt_#00', 'screw_#00', 'can_opener_#00', 'big_pgun_empty_#00'];
+export const MAP_THEME_CACHE_KEY: string = 'map_theme_cache';

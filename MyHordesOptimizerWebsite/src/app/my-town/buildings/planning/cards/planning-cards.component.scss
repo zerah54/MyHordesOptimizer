@@ -1,0 +1,118 @@
+:host {
+    display: block;
+
+    .cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+        gap: 0.5em;
+    }
+
+    .card {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        gap: 0.1em;
+        min-width: 0;
+        padding: 0.5em 2.25em 0.5em 0.6em;
+        border: 1px solid var(--mho-line-strong);
+        border-radius: var(--mho-radius-m);
+        background: var(--mho-surface);
+        box-shadow: 0 2px 4px rgb(0 0 0 / 45%);
+        color: inherit;
+        font: inherit;
+        text-align: left;
+        cursor: pointer;
+        transition: transform 0.1s;
+
+        &:hover {
+            border-color: var(--mho-accent);
+            transform: translateY(-2px);
+        }
+
+        &:focus-visible {
+            outline: 2px solid var(--mho-accent);
+        }
+
+        &.selected {
+            border-color: var(--mho-accent);
+            box-shadow: none;
+            transform: none;
+
+            .title {
+                color: var(--mho-accent);
+            }
+        }
+    }
+
+    .title {
+        font-weight: 600;
+    }
+
+    .columns {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.25em 1em;
+    }
+
+    .column,
+    .budget {
+        display: flex;
+        flex-direction: column;
+        gap: 0.1em;
+        min-width: 0;
+    }
+
+    .budgets {
+        gap: 0.25em;
+    }
+
+    .value {
+        font-size: 1.15em;
+        font-weight: 700;
+
+        &.ko {
+            color: var(--mho-danger);
+        }
+    }
+
+    .caption {
+        font-size: 0.85em;
+        opacity: 0.8;
+    }
+
+    .alert {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25em;
+        font-size: 0.85em;
+        color: var(--mho-accent);
+
+        mat-icon {
+            width: 1em;
+            height: 1em;
+            font-size: 1em;
+        }
+    }
+
+    .chevron {
+        position: absolute;
+        top: 0.35em;
+        right: 0.25em;
+        opacity: 0.7;
+    }
+
+    // Sur une seule rangée, la carte choisie se soude à la partie affichée en dessous.
+    @media (min-width: 60rem) {
+        .cards {
+            grid-template-columns: repeat(5, minmax(0, 1fr));
+        }
+
+        .card.selected {
+            z-index: 1;
+            margin-bottom: calc(-0.5em - 1px);
+            padding-bottom: calc(1em + 1px);
+            border-bottom-color: var(--mho-surface);
+            border-radius: var(--mho-radius-m) var(--mho-radius-m) 0 0;
+        }
+    }
+}

@@ -10,7 +10,7 @@ namespace MyHordesOptimizerApi.Extensions
             XmlSerializer xmls = new XmlSerializer(typeof(T));
             using (TextReader textReader = new StringReader(xmlString))
             {
-                var generatedType = (T)xmls.Deserialize(textReader);
+                var generatedType = (T)xmls.Deserialize(textReader)!;
                 return generatedType;
             }
         }

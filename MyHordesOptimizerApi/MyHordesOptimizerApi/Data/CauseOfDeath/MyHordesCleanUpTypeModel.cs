@@ -8,9 +8,9 @@ namespace MyHordesOptimizerApi.Data.CauseOfDeath
         public int Id { get; set; }
 
         [JsonProperty("name")]
-        public string Name { get; set; }
+        public string Name { get; set; } = null!;
 
         [JsonProperty("myHordesApiName")]
-        public string MyHordesApiName { get; set; }
+        public string MyHordesApiName { get; set; } = null!;
     }
 }

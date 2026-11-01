@@ -96,7 +96,7 @@ namespace MyHordesOptimizerApi.Services.Impl
                     .Include(expedition => expedition.ExpeditionParts)
                         .ThenInclude(part => part.ExpeditionCitizens)
                             .ThenInclude(expeditionCitizen => expeditionCitizen.IdExpeditionBagNavigation)
-                                .ThenInclude(bag => bag.ExpeditionBagItems)
+                                .ThenInclude(bag => bag!.ExpeditionBagItems)
                                     .ThenInclude(bagItem => bagItem.IdItemNavigation)
                     .Include(expedition => expedition.ExpeditionParts)
                         .ThenInclude(part => part.ExpeditionCitizens)
@@ -251,6 +251,26 @@ namespace MyHordesOptimizerApi.Services.Impl
             BumpRouteVersions(linkedRouteIds);
         }
 
+        /// <summary>Tout ce que <see cref="ExpeditionExtensions.Copy"/> recopie, et les tracés liés.</summary>
+        private static IQueryable<Expedition> IncludeCopiedContent(IQueryable<Expedition> expeditions)
+        {
+            return expeditions
+                .Include(expedition => expedition.ExpeditionParts)
+                    .ThenInclude(part => part.IdExpeditionOrders)
+                .Include(expedition => expedition.ExpeditionParts)
+                    .ThenInclude(part => part.ExpeditionCitizens)
+                        .ThenInclude(expeditionCitizen => expeditionCitizen.IdExpeditionBagNavigation)
+                            .ThenInclude(bag => bag!.ExpeditionBagItems)
+                                .ThenInclude(bagItem => bagItem.IdItemNavigation)
+                .Include(expedition => expedition.ExpeditionParts)
+                    .ThenInclude(part => part.ExpeditionCitizens)
+                        .ThenInclude(expeditionCitizen => expeditionCitizen.ExpeditionOrders)
+                .Include(expedition => expedition.ExpeditionParts)
+                    .ThenInclude(part => part.IdMapRouteNavigation)
+                        .ThenInclude(route => route!.MapRouteShares)
+                .AsSplitQuery();
+        }
+
         public async Task<List<ExpeditionDto>> CopyExpeditionsAsync(int townId, int fromDay, int targetDay)
         {
             // Cf. SaveExpeditionAsync : verrou sur le mapId brut AVANT résolution.
@@ -261,22 +281,8 @@ namespace MyHordesOptimizerApi.Services.Impl
             LastUpdateInfoDto lastUpdateInfoDto = UserInfoProvider.GenerateLastUpdateInfo();
             var newLastUpdate = DbContext.LastUpdateInfos.Update(Mapper.Map<LastUpdateInfo>(lastUpdateInfoDto, opt => opt.SetDbContext(DbContext))).Entity;
             await DbContext.SaveChangesAsync();
-            var modelsFromDb = await DbContext.Expeditions
-                           .Where(expedition => expedition.IdTown == townId && expedition.Day == fromDay)
-                           .Include(expedition => expedition.ExpeditionParts)
-                               .ThenInclude(part => part.IdExpeditionOrders)
-                           .Include(expedition => expedition.ExpeditionParts)
-                               .ThenInclude(part => part.ExpeditionCitizens)
-                                   .ThenInclude(expeditionCitizen => expeditionCitizen.IdExpeditionBagNavigation)
-                                       .ThenInclude(bag => bag.ExpeditionBagItems)
-                                            .ThenInclude(bagItem => bagItem.IdItemNavigation)
-                           .Include(expedition => expedition.ExpeditionParts)
-                               .ThenInclude(part => part.ExpeditionCitizens)
-                                   .ThenInclude(expeditionCitizen => expeditionCitizen.ExpeditionOrders)
-                           .Include(expedition => expedition.ExpeditionParts)
-                               .ThenInclude(part => part.IdMapRouteNavigation)
-                                   .ThenInclude(route => route!.MapRouteShares)
-                           .AsSplitQuery()
+            var modelsFromDb = await IncludeCopiedContent(DbContext.Expeditions
+                           .Where(expedition => expedition.IdTown == townId && expedition.Day == fromDay))
                            .ToListAsync();
 
             // Les tracés liés aux expéditions remplacées perdent leurs parties : nouvelle version, diffusée.
@@ -326,6 +332,48 @@ namespace MyHordesOptimizerApi.Services.Impl
             return returnedDto;
         }
 
+        public async Task<ExpeditionDto> DuplicateExpeditionAsync(int expeditionId, string? label, bool keepRoute, bool keepGeneralOrders, bool keepRouteOrders)
+        {
+            var town = EnsureExpeditionWritable(expeditionId);
+            await using var townLock = await TownSyncLock.AcquireTownAsync(town.LockKey);
+            await using var transaction = await DbContext.Database.BeginTransactionAsync();
+            LastUpdateInfoDto lastUpdateInfoDto = UserInfoProvider.GenerateLastUpdateInfo();
+            var newLastUpdate = DbContext.LastUpdateInfos.Update(Mapper.Map<LastUpdateInfo>(lastUpdateInfoDto, opt => opt.SetDbContext(DbContext))).Entity;
+            await DbContext.SaveChangesAsync();
+            var source = await IncludeCopiedContent(DbContext.Expeditions.Where(expedition => expedition.IdExpedition == expeditionId)).SingleAsync();
+            var lastPosition = await DbContext.Expeditions
+                .Where(expedition => expedition.IdTown == source.IdTown && expedition.Day == source.Day)
+                .MaxAsync(expedition => expedition.Position);
+
+            var copy = source.Copy();
+            copy.IdLastUpdateInfo = newLastUpdate.IdLastUpdateInfo;
+            copy.Label = label;
+            copy.Position = lastPosition + 1;
+            copy.State = ExpeditionConstants.ExpeditionStateStop;
+            bool IsKept(ExpeditionOrder order) => order.X is null ? keepGeneralOrders : keepRoute && keepRouteOrders;
+            // Même jour : la copie suit les mêmes tracés (une copie de tracé par jour, cf. ApplyRouteLinkAsync).
+            foreach (var (sourcePart, newPart) in source.ExpeditionParts.Zip(copy.ExpeditionParts))
+            {
+                newPart.IdMapRouteNavigation = keepRoute ? sourcePart.IdMapRouteNavigation : null;
+                newPart.IdExpeditionOrders = newPart.IdExpeditionOrders.Where(IsKept).ToList();
+                foreach (var place in newPart.ExpeditionCitizens)
+                {
+                    place.ExpeditionOrders = place.ExpeditionOrders.Where(IsKept).ToList();
+                }
+            }
+            var linkedRoutes = copy.ExpeditionParts
+                .Select(part => part.IdMapRouteNavigation)
+                .OfType<MapRoute>()
+                .Distinct()
+                .ToList();
+            linkedRoutes.ForEach(route => route.Version++);
+            DbContext.Add(copy);
+            await DbContext.SaveChangesAsync();
+            await transaction.CommitAsync();
+            _mapRouteChanges.AddRange(linkedRoutes.Select(route => new MapRouteChangeDto { Id = route.IdMapRoute, Version = route.Version }));
+            return Mapper.Map<ExpeditionDto>(copy);
+        }
+
         public ExpeditionInhorenceModel ValidateExpeditions(int townId, int day)
         {
             townId = DbContext.ResolveTownId(townId);
@@ -333,14 +381,14 @@ namespace MyHordesOptimizerApi.Services.Impl
                 .Include(expedition => expedition.ExpeditionParts)
                     .ThenInclude(part => part.ExpeditionCitizens)
                         .ThenInclude(expeditionCitizen => expeditionCitizen.IdExpeditionBagNavigation)
-                            .ThenInclude(bag => bag.ExpeditionBagItems)
+                            .ThenInclude(bag => bag!.ExpeditionBagItems)
                                 .ThenInclude(bagItem => bagItem.IdItemNavigation)
                                     .ThenInclude(item => item.ActionNames)
                                     .AsSplitQuery()
                 .Include(expedition => expedition.ExpeditionParts)
                     .ThenInclude(part => part.ExpeditionCitizens)
                         .ThenInclude(expeditionCitizen => expeditionCitizen.IdExpeditionBagNavigation)
-                            .ThenInclude(bag => bag.ExpeditionBagItems)
+                            .ThenInclude(bag => bag!.ExpeditionBagItems)
                                 .ThenInclude(bagItem => bagItem.IdItemNavigation)
                                     .ThenInclude(item => item.PropertyNames)
                                     .AsSplitQuery()
@@ -628,13 +676,13 @@ namespace MyHordesOptimizerApi.Services.Impl
                 // UpdateAsync : la partie doit appartenir à la ville vérifiée (UpdateAllButKeysProperties
                 // la rattache ensuite à expeditionId).
                 var expeditionPartFromDb = await DbContext.ExpeditionParts
-                    .Where(part => part.IdExpeditionPart == expeditionPart.Id.Value && part.IdExpeditionNavigation.IdTown == targetTown.IdTown)
+                    .Where(part => part.IdExpeditionPart == expeditionPart.Id.Value && part.IdExpeditionNavigation!.IdTown == targetTown.IdTown)
                     .Include(part => part.IdExpeditionOrders)
                     .Include(part => part.ExpeditionCitizens)
                         .ThenInclude(citizen => citizen.ExpeditionOrders)
                     .Include(part => part.ExpeditionCitizens)
                         .ThenInclude(citizen => citizen.IdExpeditionBagNavigation)
-                            .ThenInclude(bag => bag.ExpeditionBagItems)
+                            .ThenInclude(bag => bag!.ExpeditionBagItems)
                                 .ThenInclude(bagItem => bagItem.IdItemNavigation)
                     .SingleOrDefaultAsync();
                 if (expeditionPartFromDb is null)
@@ -684,7 +732,7 @@ namespace MyHordesOptimizerApi.Services.Impl
                         .ThenInclude(citizen => citizen.ExpeditionOrders)
                     .Include(part => part.ExpeditionCitizens)
                         .ThenInclude(citizen => citizen.IdExpeditionBagNavigation)
-                            .ThenInclude(bag => bag.ExpeditionBagItems)
+                            .ThenInclude(bag => bag!.ExpeditionBagItems)
                                 .ThenInclude(bagItem => bagItem.IdItemNavigation)
                     .Include(part => part.IdMapRouteNavigation)
                     .SingleAsync();
@@ -703,7 +751,7 @@ namespace MyHordesOptimizerApi.Services.Impl
                     .ThenInclude(citizen => citizen.ExpeditionOrders)
                 .Include(part => part.ExpeditionCitizens)
                     .ThenInclude(citizen => citizen.IdExpeditionBagNavigation)
-                        .ThenInclude(bag => bag.ExpeditionBagItems)
+                        .ThenInclude(bag => bag!.ExpeditionBagItems)
                             .ThenInclude(bagItem => bagItem.IdItemNavigation)
                 .Include(part => part.IdMapRouteNavigation)
                 .AsSplitQuery()
@@ -945,8 +993,8 @@ namespace MyHordesOptimizerApi.Services.Impl
         {
             var expeditionOrder = DbContext.ExpeditionOrders
                 .Include(order => order.IdExpeditionCitizenNavigation)
-                    .ThenInclude(citizen => citizen.IdExpeditionPartNavigation)
-                        .ThenInclude(part => part.IdExpeditionNavigation)
+                    .ThenInclude(citizen => citizen!.IdExpeditionPartNavigation)
+                        .ThenInclude(part => part!.IdExpeditionNavigation)
                 .Include(order => order.IdExpeditionParts)
                     .ThenInclude(part => part.IdExpeditionNavigation)
                 .Single(order => order.IdExpeditionOrder == expeditionOrderId);
@@ -959,17 +1007,18 @@ namespace MyHordesOptimizerApi.Services.Impl
         {
             var expeditionOrderModel = DbContext.ExpeditionOrders
                 .Include(order => order.IdExpeditionCitizenNavigation)
-                    .ThenInclude(citizen => citizen.IdExpeditionPartNavigation)
-                        .ThenInclude(part => part.IdExpeditionNavigation)
+                    .ThenInclude(citizen => citizen!.IdExpeditionPartNavigation)
+                        .ThenInclude(part => part!.IdExpeditionNavigation)
                 .Include(order => order.IdExpeditionParts)
                     .ThenInclude(part => part.IdExpeditionNavigation)
-                .Single(order => order.IdExpeditionOrder == expeditionOrderDto.Id.Value);
+                .Single(order => order.IdExpeditionOrder == expeditionOrderDto.Id!.Value);
             EnsureOrderWritable(expeditionOrderModel);
             var modelFromDto = Mapper.Map<ExpeditionOrder>(expeditionOrderDto);
             // Case et type ne changent que par SavePartOrdersAsync / SaveCitizenOrdersAsync, qui les valident :
             // ici (cocher, texte), ils restent ceux de la base (ignoreNull).
             modelFromDto.X = null;
             modelFromDto.Y = null;
+            modelFromDto.Passage = null;
             modelFromDto.Kind = null;
             modelFromDto.IdItem = null;
             modelFromDto.Quantity = null;
@@ -1210,7 +1259,7 @@ namespace MyHordesOptimizerApi.Services.Impl
                 .Where(part => part.IdExpeditionPart == expeditionPartId)
                 .Select(part => new
                 {
-                    IdTown = part.IdExpeditionNavigation.IdTown,
+                    IdTown = part.IdExpeditionNavigation!.IdTown,
                     Day = part.IdExpeditionNavigation.Day,
                     // Town.Day est non-nullable : sans le cast, EF plante dès que la chaîne FK ne mène
                     // à aucune ville (expédition sans IdTown, notamment).
@@ -1231,7 +1280,7 @@ namespace MyHordesOptimizerApi.Services.Impl
                 .Where(citizen => citizen.IdExpeditionCitizen == expeditionCitizenId)
                 .Select(citizen => new
                 {
-                    IdTown = citizen.IdExpeditionPartNavigation.IdExpeditionNavigation.IdTown,
+                    IdTown = citizen.IdExpeditionPartNavigation!.IdExpeditionNavigation!.IdTown,
                     Day = citizen.IdExpeditionPartNavigation.IdExpeditionNavigation.Day,
                     // Town.Day est non-nullable : sans le cast, EF plante dès que la chaîne FK ne mène
                     // à aucune ville (expédition sans IdTown, notamment).
@@ -1320,7 +1369,7 @@ namespace MyHordesOptimizerApi.Services.Impl
                 return;
             }
             var hasForeignPart = await DbContext.ExpeditionParts
-                .AnyAsync(part => partIds.Contains(part.IdExpeditionPart) && part.IdExpeditionNavigation.IdTown != idTown);
+                .AnyAsync(part => partIds.Contains(part.IdExpeditionPart) && part.IdExpeditionNavigation!.IdTown != idTown);
             if (hasForeignPart)
             {
                 throw new MhoForbiddenException($"Une des parties d'expédition [{string.Join(", ", partIds)}] n'appartient pas à la ville {idTown}.");
@@ -1336,7 +1385,7 @@ namespace MyHordesOptimizerApi.Services.Impl
             }
             var hasForeignCitizen = await DbContext.ExpeditionCitizens
                 .AnyAsync(citizen => citizenIds.Contains(citizen.IdExpeditionCitizen)
-                    && citizen.IdExpeditionPartNavigation.IdExpeditionNavigation.IdTown != idTown);
+                    && citizen.IdExpeditionPartNavigation!.IdExpeditionNavigation!.IdTown != idTown);
             if (hasForeignCitizen)
             {
                 throw new MhoForbiddenException($"Un des citoyens d'expédition [{string.Join(", ", citizenIds)}] n'appartient pas à la ville {idTown}.");
@@ -1354,8 +1403,8 @@ namespace MyHordesOptimizerApi.Services.Impl
             // ni l'autre n'est de la ville.
             var hasForeignOrder = await DbContext.ExpeditionOrders
                 .Where(order => orderIds.Contains(order.IdExpeditionOrder))
-                .AnyAsync(order => !order.IdExpeditionParts.Any(part => part.IdExpeditionNavigation.IdTown == idTown)
-                    && order.IdExpeditionCitizenNavigation.IdExpeditionPartNavigation.IdExpeditionNavigation.IdTown != idTown);
+                .AnyAsync(order => !order.IdExpeditionParts.Any(part => part.IdExpeditionNavigation!.IdTown == idTown)
+                    && order.IdExpeditionCitizenNavigation!.IdExpeditionPartNavigation!.IdExpeditionNavigation!.IdTown != idTown);
             if (hasForeignOrder)
             {
                 throw new MhoForbiddenException($"Une des consignes [{string.Join(", ", orderIds)}] n'appartient pas à la ville {idTown}.");
@@ -1374,7 +1423,7 @@ namespace MyHordesOptimizerApi.Services.Impl
             }
             var bagTownIds = await DbContext.ExpeditionCitizens
                 .Where(citizen => citizen.IdExpeditionBag == bagId.Value)
-                .Select(citizen => citizen.IdExpeditionPartNavigation.IdExpeditionNavigation.IdTown)
+                .Select(citizen => citizen.IdExpeditionPartNavigation!.IdExpeditionNavigation!.IdTown)
                 .Distinct()
                 .ToListAsync();
             if (bagTownIds.Count != 1 || bagTownIds[0] != idTown)

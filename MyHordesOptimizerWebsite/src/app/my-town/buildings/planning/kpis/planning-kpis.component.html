@@ -1,0 +1,100 @@
+@if (store.evaluation(); as evaluation) {
+    <div class="kpis" [class.flat]="flat()">
+        <div class="kpi defense" [attr.data-state]="defenseState(evaluation)">
+            <span class="title" i18n>Défense</span>
+            <span class="value">
+                <strong>{{ evaluation.projectedDefense }}</strong>
+                <span class="target"> / {{ evaluation.target ?? '—' }}</span>
+            </span>
+            <span class="gap">
+                @switch (defenseState(evaluation)) {
+                    @case ('gap') {
+                        <ng-container i18n>Reste à couvrir</ng-container> {{ defenseAmount(evaluation) }}
+                    }
+                    @case ('surplus') {
+                        <ng-container i18n>Surplus</ng-container> {{ defenseAmount(evaluation) }}
+                    }
+                    @default {
+                        <ng-container i18n>Attaque inconnue</ng-container>
+                    }
+                }
+            </span>
+            <span class="sub">
+                <ng-container i18n>Attaque</ng-container>
+                {{ evaluation.attack ?? '—' }} ·
+                <ng-container i18n>débordement</ng-container>
+                {{ store.draft()?.allowedOverflow ?? 0 }}
+                @if (store.can_edit()) {
+                    <button mat-icon-button type="button" class="edit" data-action="edit-defense" (click)="editing.set(!editing())"
+                            i18n-matTooltip matTooltip="Modifier l'attaque et le débordement autorisé">
+                        <mat-icon>edit</mat-icon>
+                    </button>
+                }
+            </span>
+        </div>
+
+        @if (!flat()) {
+            @if (store.banned_pool_shown()) {
+                <div class="kpi pool" data-pool="banned">
+                    <span class="title" i18n>Bannis</span>
+                    <span class="value"><strong
+                        [class.negative]="evaluation.budgets.banned.remaining < 0">{{ evaluation.budgets.banned.remaining }}</strong></span>
+                    <span class="sub"><ng-container i18n>PA restants sur</ng-container>
+                        {{ evaluation.budgets.banned.budget }}</span>
+                </div>
+            }
+
+            <div class="kpi pool" data-pool="regular">
+                @if (store.banned_pool_shown()) {
+                    <span class="title" i18n>Non-bannis</span>
+                } @else {
+                    <span class="title" i18n>Budget</span>
+                }
+                <span class="value"><strong
+                    [class.negative]="evaluation.budgets.regular.remaining < 0">{{ evaluation.budgets.regular.remaining }}</strong></span>
+                <span class="sub"><ng-container i18n>PA restants sur</ng-container>
+                    {{ evaluation.budgets.regular.budget }}</span>
+            </div>
+
+            <div class="kpi missing" data-action="missing" [class.ko]="evaluation.missing.length > 0">
+                <span class="title" i18n>Manques</span>
+                @if (evaluation.missing.length > 0) {
+                    <span class="value list">{{ missingLabel(evaluation.missing) }}</span>
+                } @else {
+                    <span class="value" i18n>Aucun</span>
+                }
+            </div>
+
+            <button type="button" class="kpi alerts" data-action="alerts" [class.warn]="store.alerts().length > 0" [disabled]="store.alerts().length === 0"
+                    [matMenuTriggerFor]="alerts_menu">
+                <span class="title" i18n>Alertes</span>
+                <span class="value">
+                    @if (store.alerts().length > 0) {
+                        <mat-icon>warning</mat-icon>
+                    }
+                    <strong>{{ store.alerts().length }}</strong>
+                </span>
+            </button>
+        }
+    </div>
+
+    @if (editing() && store.can_edit()) {
+        <div class="defense-fields">
+            <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                <mat-label i18n>Attaque (vide = estimée)</mat-label>
+                <input matInput type="number" min="0" data-field="attack-override" [ngModel]="store.draft()?.attackOverride"
+                       [placeholder]="evaluation.attack === null ? '' : '' + evaluation.attack" (ngModelChange)="onAttack($event)">
+            </mat-form-field>
+            <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                <mat-label i18n>Débordement autorisé</mat-label>
+                <input matInput type="number" min="0" data-field="overflow" [ngModel]="store.draft()?.allowedOverflow" (ngModelChange)="onOverflow($event)">
+            </mat-form-field>
+        </div>
+    }
+
+    <mat-menu #alerts_menu="matMenu">
+        @for (alert of store.alerts(); track $index) {
+            <button mat-menu-item type="button" data-action="alert" (click)="goTo(alert)">{{ alert.text }}</button>
+        }
+    </mat-menu>
+}

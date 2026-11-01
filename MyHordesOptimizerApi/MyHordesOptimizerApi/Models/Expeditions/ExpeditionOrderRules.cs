@@ -62,6 +62,10 @@ namespace MyHordesOptimizerApi.Models.Expeditions
             {
                 throw new MhoTechnicalException($"La case [{order.X};{order.Y}] de la consigne est hors de la carte.");
             }
+            if (order.Passage.HasValue && (!order.X.HasValue || order.Passage.Value < 1))
+            {
+                throw new MhoTechnicalException("Le passage d'une consigne vise une case et commence à 1.");
+            }
             switch (order.Kind)
             {
                 case null:

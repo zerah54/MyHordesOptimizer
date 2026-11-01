@@ -91,7 +91,7 @@ namespace MyHordesOptimizerApiIntegrationTests.ApplicationFactory
                     {
                         var whereClause = string.Join(" AND ", insert.Key.Select((k, i) => $"`{k.Column}` = {{{i}}}"));
                         var parameters = insert.Key.Select(k => k.Value).ToArray();
-                        await context.Database.ExecuteSqlRawAsync($"DELETE FROM `{insert.Table}` WHERE {whereClause}", parameters);
+                        await context.Database.ExecuteSqlRawAsync($"DELETE FROM `{insert.Table}` WHERE {whereClause}", parameters!);
                         madeProgress = true;
                     }
                     catch

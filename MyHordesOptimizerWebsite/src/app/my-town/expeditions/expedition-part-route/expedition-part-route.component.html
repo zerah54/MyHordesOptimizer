@@ -1,6 +1,6 @@
 <div class="part-route">
     @if (editable()) {
-        <mat-form-field subscriptSizing="dynamic" [appearance]="'outline'" class="compact-field route-field">
+        <mat-form-field subscriptSizing="dynamic" [appearance]="'outline'" class="route-field">
             <mat-label i18n>Tracé</mat-label>
             <mat-select [value]="part().map_route_id" (selectionChange)="select($event)">
                 <mat-select-trigger>

@@ -31,7 +31,7 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Map
         public bool? IsExcavated { get; set; }
         public int NbKm { get; set; }
         public int NbPa { get; set; }
-        public string ZoneRegen { get; set; }
+        public string ZoneRegen { get; set; } = null!;
         public string? Note { get; set; }
 
         /// <summary>Niveau d'abondance de la zone (0-3) relevé par un Fouineur. 0 = zone épuisée.</summary>

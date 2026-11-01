@@ -91,6 +91,10 @@ namespace MyHordesOptimizerApiIntegrationTests.Services
                 TownDetails = new UpdateTownDetailsDto { TownId = townId, TownX = TownX, TownY = TownY, IsChaos = false }
             };
 
+            // Jeton déjà aligné sur la ville : pas de dérive, donc pas de renouvellement de jeton (qui exigerait un nom d'utilisateur).
+            var userInfo = scope.ServiceProvider.GetRequiredService<MyHordesOptimizerApi.Providers.Interfaces.IUserInfoProvider>();
+            userInfo.TownDetail = new MyHordesOptimizerApi.Dtos.MyHordesOptimizer.SimpleMeTownDetailDto { TownId = townId };
+
             var response = await service.UpdateExternalsTools(request);
 
             response.MapResponseDto.MhoApiStatus.Should().Be(ExternalToolsUpdateResponseType.Ok.GetDescription());
@@ -158,6 +162,10 @@ namespace MyHordesOptimizerApiIntegrationTests.Services
                 TownDetails = new UpdateTownDetailsDto { TownId = townId, TownX = TownX, TownY = TownY, IsChaos = false }
             };
 
+            // Jeton déjà aligné sur la ville : pas de dérive, donc pas de renouvellement de jeton (qui exigerait un nom d'utilisateur).
+            var userInfo = scope.ServiceProvider.GetRequiredService<MyHordesOptimizerApi.Providers.Interfaces.IUserInfoProvider>();
+            userInfo.TownDetail = new MyHordesOptimizerApi.Dtos.MyHordesOptimizer.SimpleMeTownDetailDto { TownId = townId };
+
             var response = await service.UpdateExternalsTools(request);
 
             response.MapResponseDto.MhoApiStatus.Should().Be(ExternalToolsUpdateResponseType.Ok.GetDescription());
@@ -170,9 +178,106 @@ namespace MyHordesOptimizerApiIntegrationTests.Services
             gameRoutes[0].Stops.Should().Be("[[100,100],[100,98],[102,98]]");
         }
 
+        /// <summary>
+        /// Synchro globale (joueur en ville) : les infos renvoyées pour toute la carte sont reportées,
+        /// mais la case n'est pas datée, son contenu (sol, fouilles) n'ayant pas été relevé.
+        /// </summary>
+        [Fact]
+        public async Task UpdateExternalsTools_CaseOuLeJoueurNEstPas_InfosGlobalesReporteesSansDater()
+        {
+            var (cell, oldLastUpdateId) = await RunMapUpdate(new MyHordesZone { X = TownX + 1, Y = TownY, Danger = 2 }, "api", null);
+
+            cell.DangerLevel.Should().Be(2);
+            cell.IdLastUpdateInfo.Should().Be(oldLastUpdateId);
+        }
+
+        /// <summary>Case du joueur : MyHordes renvoie son état de fouille (details.dried), son contenu est relevé.</summary>
+        [Fact]
+        public async Task UpdateExternalsTools_CaseDuJoueur_EstDatee()
+        {
+            var zone = new MyHordesZone { X = TownX + 1, Y = TownY, Details = new MyHordesDetails { Dried = false } };
+            var (cell, oldLastUpdateId) = await RunMapUpdate(zone, "api", null);
+
+            cell.IdLastUpdateInfo.Should().NotBeNull().And.NotBe(oldLastUpdateId);
+        }
+
+        /// <summary>Case relevée par l'addon (ville en chaos : l'API ne renvoie rien de propre au joueur).</summary>
+        [Fact]
+        public async Task UpdateExternalsTools_CaseReleveeParLAddon_EstDatee()
+        {
+            var addonCell = new UpdateCellInfoDto { X = 1, Y = 0, Zombies = 3, CitizenId = new List<int>() };
+            var (cell, oldLastUpdateId) = await RunMapUpdate(new MyHordesZone { X = TownX + 1, Y = TownY }, "cell", addonCell);
+
+            cell.NbZombie.Should().Be(3);
+            cell.IdLastUpdateInfo.Should().NotBeNull().And.NotBe(oldLastUpdateId);
+        }
+
+        /// <summary>
+        /// Synchronise une ville dont la case de <paramref name="zone"/> existe déjà avec une ancienne
+        /// date de mise à jour, puis relit cette case.
+        /// </summary>
+        private async Task<(MapCell Cell, int OldLastUpdateId)> RunMapUpdate(MyHordesZone zone, string mhoMode, UpdateCellInfoDto? addonCell)
+        {
+            var fakeRepo = new SingleResponseMyHordesApiRepository();
+            using var factory = _factory.WithWebHostBuilder(builder =>
+            {
+                builder.ConfigureTestServices(services =>
+                {
+                    services.AddScoped<IMyHordesApiRepository>(_ => fakeRepo);
+                });
+            });
+
+            var scope = factory.Services.CreateScope();
+            var context = scope.ServiceProvider.GetRequiredService<MhoContext>();
+            var service = scope.ServiceProvider.GetRequiredService<IExternalToolsService>();
+
+            var townId = SeedTown(context);
+            var oldLastUpdate = new LastUpdateInfo { DateUpdate = DateTime.UtcNow.AddDays(-1) };
+            context.LastUpdateInfos.Add(oldLastUpdate);
+            context.SaveChanges();
+            context.MapCells.Add(new MapCell { IdTown = townId, X = zone.X!.Value, Y = zone.Y!.Value, DangerLevel = 0, IdLastUpdateInfo = oldLastUpdate.IdLastUpdateInfo });
+            context.SaveChanges();
+
+            fakeRepo.Response = new MyHordesUserDetailsDto
+            {
+                MapId = townId,
+                Map = new MyHordesMap
+                {
+                    City = new MyHordesCity { X = TownX, Y = TownY },
+                    Zones = new List<MyHordesZone> { zone }
+                }
+            };
+
+            var request = new UpdateRequestDto
+            {
+                Map = new UpdateRequestMapDto
+                {
+                    ToolsToUpdate = new UpdateRequestMapToolsToUpdateDetailsDto
+                    {
+                        IsMyHordesOptimizer = mhoMode,
+                        IsGestHordes = "none",
+                        IsFataMorgana = "none",
+                        IsBigBrothHordes = "none"
+                    },
+                    Cell = addonCell
+                },
+                TownDetails = new UpdateTownDetailsDto { TownId = townId, TownX = TownX, TownY = TownY, IsChaos = addonCell != null }
+            };
+
+            // Jeton déjà aligné sur la ville : pas de dérive, donc pas de renouvellement de jeton (qui exigerait un nom d'utilisateur).
+            var userInfo = scope.ServiceProvider.GetRequiredService<MyHordesOptimizerApi.Providers.Interfaces.IUserInfoProvider>();
+            userInfo.TownDetail = new MyHordesOptimizerApi.Dtos.MyHordesOptimizer.SimpleMeTownDetailDto { TownId = townId };
+
+            var response = await service.UpdateExternalsTools(request);
+
+            response.MapResponseDto.MhoApiStatus.Should().Be(ExternalToolsUpdateResponseType.Ok.GetDescription());
+            var cell = context.MapCells.AsNoTracking().Single(mapCell => mapCell.IdTown == townId && mapCell.X == zone.X && mapCell.Y == zone.Y);
+            return (cell, oldLastUpdate.IdLastUpdateInfo);
+        }
+
         private sealed class SingleResponseMyHordesApiRepository : IMyHordesApiRepository
         {
-            public MyHordesUserDetailsDto Response { get; set; }
+            public MyHordesUserDetailsDto Response { get; set; } = null!;
 
             public MyHordesUserDetailsDto GetMapForToolsUpdate() => Response;
 

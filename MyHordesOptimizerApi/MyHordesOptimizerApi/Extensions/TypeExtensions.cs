@@ -9,15 +9,15 @@ namespace MyHordesOptimizerApi.Extensions
 {
     public static class TypeExtensions
     {
-        public static Dictionary<string, Func<TModel, object>> GetPropertiesInvoker<TModel>(this Type type)
+        public static Dictionary<string, Func<TModel, object?>> GetPropertiesInvoker<TModel>(this Type type)
         {
-            var dico = new Dictionary<string, Func<TModel, object>>();
+            var dico = new Dictionary<string, Func<TModel, object?>>();
             foreach (var propertie in type.GetProperties())
             {
                 var attr = propertie.GetCustomAttributes().FirstOrDefault(attr => attr is ColumnAttribute) as ColumnAttribute;
                 if (attr != null)
                 {
-                    dico.Add(attr.Name, x => propertie.GetValue(x));
+                    dico.Add(attr.Name!, x => propertie.GetValue(x));
                 }
                 else
                 {
@@ -31,7 +31,7 @@ namespace MyHordesOptimizerApi.Extensions
         {
             foreach (var toProp in typeof(T).GetProperties())
             {
-                var fromProp = typeof(T).GetProperty(toProp.Name);
+                var fromProp = typeof(T).GetProperty(toProp.Name)!;
                 var toValue = fromProp.GetValue(objectToCopy, null);
                 if (toValue != null)
                 {
@@ -44,7 +44,7 @@ namespace MyHordesOptimizerApi.Extensions
         {
             foreach (var toProp in typeof(T).GetProperties())
             {
-                var fromProp = typeof(T).GetProperty(toProp.Name);
+                var fromProp = typeof(T).GetProperty(toProp.Name)!;
                 var keyAttr = fromProp.GetCustomAttribute<KeyAttribute>();
                 var inverseAttr = fromProp.GetCustomAttribute<InversePropertyAttribute>();
                 var isInversedPropKey = false;

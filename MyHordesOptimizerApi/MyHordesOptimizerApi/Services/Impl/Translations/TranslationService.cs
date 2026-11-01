@@ -17,7 +17,7 @@ namespace MyHordesOptimizerApi.Services.Impl.Translations
         protected readonly ILogger<TranslationService> Logger;
         protected readonly ITranslastionRepository TranslationRepository;
 
-        protected Dictionary<string, List<YmlTranslationFileModel>> YmlFilesByLocale { get; private set; }
+        protected Dictionary<string, List<YmlTranslationFileModel>> YmlFilesByLocale { get; private set; } = null!;
         private bool _isInit;
         private SemaphoreSlim _initLock;
 
@@ -131,13 +131,13 @@ namespace MyHordesOptimizerApi.Services.Impl.Translations
                         var nameWithoutYml = translationFile.Name.Substring(0, translationFile.Name.LastIndexOf(".")); // Remove .yml
                         var nameWithoutLocal = nameWithoutYml.Substring(0, nameWithoutYml.LastIndexOf(".")); // Puis .{locale}
                         var file = YmlFilesByLocale["fr"].FirstOrDefault(x => x.Name == $"{nameWithoutLocal}.fr.yml");
-                        var translatedFrenchStrings = new List<string>() { file.Translations[deutchString] };
+                        var translatedFrenchStrings = new List<string>() { file!.Translations[deutchString] };
 
                         file = YmlFilesByLocale["es"].FirstOrDefault(x => x.Name == $"{nameWithoutLocal}.es.yml");
-                        var translatedSpanishStrings = new List<string>() { file.Translations[deutchString] };
+                        var translatedSpanishStrings = new List<string>() { file!.Translations[deutchString] };
 
                         file = YmlFilesByLocale["en"].FirstOrDefault(x => x.Name == $"{nameWithoutLocal}.en.yml");
-                        var translatedEnglishStrings = new List<string>() { file.Translations[deutchString] };
+                        var translatedEnglishStrings = new List<string>() { file!.Translations[deutchString] };
 
                         result.AddTranslation(de: deutchString, context: nameWithoutLocal, isExactMatch: isExactMatch, fr: translatedFrenchStrings, es: translatedSpanishStrings, en: translatedEnglishStrings);
                     }
@@ -161,13 +161,13 @@ namespace MyHordesOptimizerApi.Services.Impl.Translations
                         var nameWithoutYml = translationFile.Name.Substring(0, translationFile.Name.LastIndexOf(".")); // Remove .yml
                         var nameWithoutLocal = nameWithoutYml.Substring(0, nameWithoutYml.LastIndexOf(".")); // Puis .{locale}
                         var file = YmlFilesByLocale["fr"].FirstOrDefault(x => x.Name == $"{nameWithoutLocal}.fr.yml");
-                        var translatedFrenchStrings = new List<string>() { file.Translations[deutchString] };
+                        var translatedFrenchStrings = new List<string>() { file!.Translations[deutchString] };
 
                         file = YmlFilesByLocale["es"].FirstOrDefault(x => x.Name == $"{nameWithoutLocal}.es.yml");
-                        var translatedSpanishStrings = new List<string>() { file.Translations[deutchString] };
+                        var translatedSpanishStrings = new List<string>() { file!.Translations[deutchString] };
 
                         file = YmlFilesByLocale["en"].FirstOrDefault(x => x.Name == $"{nameWithoutLocal}.en.yml");
-                        var translatedEnglishStrings = new List<string>() { file.Translations[deutchString] };
+                        var translatedEnglishStrings = new List<string>() { file!.Translations[deutchString] };
 
                         result.AddTranslation(de: deutchString, context: nameWithoutLocal, isExactMatch: isExactMatch, fr: translatedFrenchStrings, es: translatedSpanishStrings, en: translatedEnglishStrings);
                     }

@@ -35,7 +35,7 @@ namespace MyHordesOptimizerApi.Controllers
         [Route("me/{day}")]
         public ActionResult<List<ExpeditionDto>> GetMyExpeditions([FromRoute] int townId, [FromRoute] int day)
         {
-            var expedition = ExpeditionService.GetUserExpeditionsByDay(UserInfoProvider.TownDetail.TownId, UserInfoProvider.UserId, day);
+            var expedition = ExpeditionService.GetUserExpeditionsByDay(UserInfoProvider.TownDetail!.TownId, UserInfoProvider.UserId, day);
             return Ok(expedition);
         }
 

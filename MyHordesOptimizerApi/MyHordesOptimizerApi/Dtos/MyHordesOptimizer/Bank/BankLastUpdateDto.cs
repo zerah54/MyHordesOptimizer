@@ -5,7 +5,7 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer
     public class BankLastUpdateDto
     {
         public List<StackableItemDto> Bank { get; set; }
-        public LastUpdateInfoDto LastUpdateInfo { get; set; }
+        public LastUpdateInfoDto? LastUpdateInfo { get; set; }
 
         public BankLastUpdateDto()
         {

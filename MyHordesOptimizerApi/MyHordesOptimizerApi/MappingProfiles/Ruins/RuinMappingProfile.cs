@@ -17,10 +17,10 @@ namespace MyHordesOptimizerApi.MappingProfiles.Ruins
                  .ForMember(dto => dto.Chance, opt => opt.MapFrom(model => model.Chance))
                  .ForMember(dto => dto.Description, opt => opt.MapFrom(model => new Dictionary<string, string>()
                  {
-                     { "fr", model.DescriptionFr },
-                     { "en", model.DescriptionEn },
-                     { "es", model.DescriptionEs },
-                     { "de", model.DescriptionDe }
+                     { "fr", model.DescriptionFr! },
+                     { "en", model.DescriptionEn! },
+                     { "es", model.DescriptionEs! },
+                     { "de", model.DescriptionDe! }
                  }))
                  .ForMember(dto => dto.Drops, opt => opt.MapFrom(model => model.RuinItemDrops)) // Todo
                  .ForMember(dto => dto.Explorable, opt => opt.MapFrom(model => model.Explorable))
@@ -28,10 +28,10 @@ namespace MyHordesOptimizerApi.MappingProfiles.Ruins
                  .ForMember(dto => dto.Img, opt => opt.MapFrom(model => model.Img))
                  .ForMember(dto => dto.Label, opt => opt.MapFrom(model => new Dictionary<string, string>()
                  {
-                     { "fr", model.LabelFr },
-                     { "en", model.LabelEn },
-                     { "es", model.LabelEs },
-                     { "de", model.LabelDe }
+                     { "fr", model.LabelFr! },
+                     { "en", model.LabelEn! },
+                     { "es", model.LabelEs! },
+                     { "de", model.LabelDe! }
                  }))
                  .ForMember(dto => dto.MaxDist, opt => opt.MapFrom(model => model.MaxDist))
                  .ForMember(dto => dto.MinDist, opt => opt.MapFrom(model => model.MinDist));
@@ -63,10 +63,10 @@ namespace MyHordesOptimizerApi.MappingProfiles.Ruins
                 .ForMember(dest => dest.Camping, opt => opt.Ignore())
                 .ForMember(dest => dest.Capacity, opt => opt.Ignore())
                 .ForMember(dest => dest.Chance, opt => opt.Ignore())
-                .ForMember(dest => dest.DescriptionDe, opt => opt.MapFrom(src => src.Value.Desc["de"]))
-                .ForMember(dest => dest.DescriptionEn, opt => opt.MapFrom(src => src.Value.Desc["en"]))
-                .ForMember(dest => dest.DescriptionEs, opt => opt.MapFrom(src => src.Value.Desc["es"]))
-                .ForMember(dest => dest.DescriptionFr, opt => opt.MapFrom(src => src.Value.Desc["fr"]))
+                .ForMember(dest => dest.DescriptionDe, opt => opt.MapFrom(src => src.Value.Desc!["de"]))
+                .ForMember(dest => dest.DescriptionEn, opt => opt.MapFrom(src => src.Value.Desc!["en"]))
+                .ForMember(dest => dest.DescriptionEs, opt => opt.MapFrom(src => src.Value.Desc!["es"]))
+                .ForMember(dest => dest.DescriptionFr, opt => opt.MapFrom(src => src.Value.Desc!["fr"]))
                 .ForMember(dest => dest.Explorable, opt => opt.MapFrom(src => src.Value.Explorable))
                 // La clé appartient à MHO et n'est PAS celle de MyHordes : celle-ci n'est qu'un
                 // auto-incrément de fixtures, instable d'une instance du jeu à l'autre. Le service
@@ -74,11 +74,11 @@ namespace MyHordesOptimizerApi.MappingProfiles.Ruins
                 .ForMember(dest => dest.IdRuin, opt => opt.Ignore())
                 .ForMember(dest => dest.MhId, opt => opt.MapFrom(src => src.Value.Id))
                 .ForMember(dest => dest.IsObsolete, opt => opt.Ignore())
-                .ForMember(dest => dest.Img, opt => opt.MapFrom(src => GetNameIdFromImg(src.Value.Img)))
-                .ForMember(dest => dest.LabelDe, opt => opt.MapFrom(src => src.Value.Name["de"]))
-                .ForMember(dest => dest.LabelEn, opt => opt.MapFrom(src => src.Value.Name["en"]))
-                .ForMember(dest => dest.LabelEs, opt => opt.MapFrom(src => src.Value.Name["es"]))
-                .ForMember(dest => dest.LabelFr, opt => opt.MapFrom(src => src.Value.Name["fr"]))
+                .ForMember(dest => dest.Img, opt => opt.MapFrom(src => GetNameIdFromImg(src.Value.Img!)))
+                .ForMember(dest => dest.LabelDe, opt => opt.MapFrom(src => src.Value.Name!["de"]))
+                .ForMember(dest => dest.LabelEn, opt => opt.MapFrom(src => src.Value.Name!["en"]))
+                .ForMember(dest => dest.LabelEs, opt => opt.MapFrom(src => src.Value.Name!["es"]))
+                .ForMember(dest => dest.LabelFr, opt => opt.MapFrom(src => src.Value.Name!["fr"]))
                 .ForMember(dest => dest.MapCells, opt => opt.Ignore())
                 .ForMember(dest => dest.MaxDist, opt => opt.Ignore())
                 .ForMember(dest => dest.MinDist, opt => opt.Ignore())

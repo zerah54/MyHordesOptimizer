@@ -26,19 +26,19 @@ namespace MyHordesOptimizerApi.Hubs.HubFilters
         public Task OnConnectedAsync(HubLifetimeContext context, Func<HubLifetimeContext, Task> next)
         {
             SetUserInfoProvider(context?.Context);
-            return next(context);
+            return next(context!);
         }
 
         public Task OnDisconnectedAsync(HubLifetimeContext context, Exception? exception, Func<HubLifetimeContext, Exception?, Task> next)
         {
             SetUserInfoProvider(context?.Context);
-            return next(context, exception);
+            return next(context!, exception);
         }
 
         public ValueTask<object?> InvokeMethodAsync(HubInvocationContext invocationContext, Func<HubInvocationContext, ValueTask<object?>> next)
         {
             SetUserInfoProvider(invocationContext?.Context);
-            return next(invocationContext);
+            return next(invocationContext!);
         }
 
 
@@ -59,7 +59,7 @@ namespace MyHordesOptimizerApi.Hubs.HubFilters
         /// Même traitement que JwtActionFilter.Unprotect : un échec de déchiffrement dégrade
         /// proprement en "userKey absent", jamais en repli sur la valeur en clair du claim.
         /// </summary>
-        private string Unprotect(string protectedUserKey)
+        private string? Unprotect(string? protectedUserKey)
         {
             if (string.IsNullOrEmpty(protectedUserKey))
             {

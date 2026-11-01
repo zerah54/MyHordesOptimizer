@@ -13,10 +13,10 @@ namespace MyHordesOptimizerApi.MappingProfiles.Items
                 .ForMember(dest => dest.IdCategory, opt => opt.MapFrom(src => src.IdCategory))
                 .ForMember(dest => dest.Label, opt => opt.MapFrom(src => new Dictionary<string, string>()
                 {
-                    { "fr", src.LabelFr },
-                    { "en", src.LabelEn },
-                    { "es", src.LabelEs },
-                    { "de", src.LabelDe }
+                    { "fr", src.LabelFr! },
+                    { "en", src.LabelEn! },
+                    { "es", src.LabelEs! },
+                    { "de", src.LabelDe! }
                 }))
                 .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.LabelEn))
                 .ForMember(dest => dest.Ordering, opt => opt.MapFrom(src => src.Ordering));

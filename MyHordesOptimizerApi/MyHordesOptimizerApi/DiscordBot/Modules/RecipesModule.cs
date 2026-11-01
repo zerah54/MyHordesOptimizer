@@ -28,7 +28,7 @@ namespace MyHordesOptimizerApi.DiscordBot.Modules
         private const int TruncationFooterReserve = 100;
 
         private readonly ILogger<RecipesModule> _logger;
-        private readonly IEnumerable<ItemRecipeDto> _recipes;
+        private readonly IEnumerable<ItemRecipeDto>? _recipes;
 
         public RecipesModule(ILogger<RecipesModule> logger, IServiceScopeFactory serviceScopeFactory)
         {
@@ -74,7 +74,7 @@ namespace MyHordesOptimizerApi.DiscordBot.Modules
 
         private List<ItemRecipeDto> GetRecipesFromResultItemName(string searchValue, Locales locale)
         {
-            var filteredRecipes = _recipes
+            var filteredRecipes = _recipes!
                 .Where((recipe) =>
                 {
                     _logger.LogDebug($"RECIPE{recipe}");
@@ -85,7 +85,7 @@ namespace MyHordesOptimizerApi.DiscordBot.Modules
             return filteredRecipes;
         }
 
-        private ItemResultDto GetItemResultFromRecipe(string searchValue, Locales locale, ItemRecipeDto recipe)
+        private ItemResultDto? GetItemResultFromRecipe(string searchValue, Locales locale, ItemRecipeDto recipe)
         {
             return recipe.Result
                 .Find(result =>

@@ -50,7 +50,8 @@ namespace MyHordesOptimizerApi.Controllers.ActionFillters
             // Si l'origine est de confiance, on valide la requête immédiatement sans checker la suite
             if (MhoHeaderProvider.MhoOrigin == IMhoHeadersProvider.Mho_Site_Origin // Website
                 || MhoHeaderProvider.MhoOrigin == IMhoHeadersProvider.Mho_Allowed_Origin // Exceptions
-                || MhoHeaderProvider.MhoOrigin == IMhoHeadersProvider.Mho_ZenHordes_Origin) // ZenHordes
+                || MhoHeaderProvider.MhoOrigin == IMhoHeadersProvider.Mho_ZenHordes_Origin // ZenHordes
+                || MhoHeaderProvider.MhoOrigin == IMhoHeadersProvider.Mho_GhUpdater_Origin) // GH Updater
             {
                 return;
             }
@@ -64,14 +65,14 @@ namespace MyHordesOptimizerApi.Controllers.ActionFillters
             {
                 try
                 {
-                    var incomingAddonVersionMatch = Regex.Matches(addon_version, @"\d+");
+                    var incomingAddonVersionMatch = Regex.Matches(addon_version!, @"\d+");
                     if (incomingAddonVersionMatch.Count != 3)
                     {
                         context.Result = new BadRequestObjectResult($"Mho-Addon-Version should contains 3 digits. Found {addon_version} for Controller {controllerName} and method {methodName}");
                         return;
                     }
 
-                    var incomingVersionVersion = new Version(addon_version);
+                    var incomingVersionVersion = new Version(addon_version!);
                     var expectedVersionVersion = new Version(expectedAddonVersion);
 
                     var result = expectedVersionVersion.CompareTo(incomingVersionVersion);

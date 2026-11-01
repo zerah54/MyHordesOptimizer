@@ -8,10 +8,10 @@ namespace MyHordesOptimizerApi.Dtos.MyHordes.Import.i18n
 	{
 
 		[XmlAttribute(AttributeName = "category", Namespace = "")]
-		public string Category { get; set; }
+		public string Category { get; set; } = null!;
 
 		[XmlText]
-		public string Text { get; set; }
+		public string Text { get; set; } = null!;
 	}
 
 	[XmlRoot(ElementName = "notes", Namespace = "urn:oasis:names:tc:xliff:document:2.0")]
@@ -19,7 +19,7 @@ namespace MyHordesOptimizerApi.Dtos.MyHordes.Import.i18n
 	{
 
 		[XmlElement(ElementName = "note", Namespace = "urn:oasis:names:tc:xliff:document:2.0")]
-		public List<TranslationNote> Note { get; set; }
+		public List<TranslationNote> Note { get; set; } = null!;
 	}
 
 	[XmlRoot(ElementName = "segment", Namespace = "urn:oasis:names:tc:xliff:document:2.0")]
@@ -27,10 +27,10 @@ namespace MyHordesOptimizerApi.Dtos.MyHordes.Import.i18n
 	{
 
 		[XmlElement(ElementName = "source", Namespace = "urn:oasis:names:tc:xliff:document:2.0")]
-		public string Source { get; set; }
+		public string Source { get; set; } = null!;
 
 		[XmlElement(ElementName = "target", Namespace = "urn:oasis:names:tc:xliff:document:2.0")]
-		public string Target { get; set; }
+		public string Target { get; set; } = null!;
 	}
 
 	[XmlRoot(ElementName = "unit", Namespace = "urn:oasis:names:tc:xliff:document:2.0")]
@@ -38,19 +38,19 @@ namespace MyHordesOptimizerApi.Dtos.MyHordes.Import.i18n
 	{
 
 		[XmlElement(ElementName = "notes", Namespace = "urn:oasis:names:tc:xliff:document:2.0")]
-		public TranslationNotes Notes { get; set; }
+		public TranslationNotes Notes { get; set; } = null!;
 
 		[XmlElement(ElementName = "segment", Namespace = "urn:oasis:names:tc:xliff:document:2.0")]
-		public TranslationSegment Segment { get; set; }
+		public TranslationSegment Segment { get; set; } = null!;
 
 		[XmlAttribute(AttributeName = "id", Namespace = "")]
-		public string Id { get; set; }
+		public string Id { get; set; } = null!;
 
 		[XmlText]
-		public string Text { get; set; }
+		public string Text { get; set; } = null!;
 
 		[XmlAttribute(AttributeName = "name", Namespace = "")]
-		public string Name { get; set; }
+		public string Name { get; set; } = null!;
 	}
 
 	[XmlRoot(ElementName = "file", Namespace = "urn:oasis:names:tc:xliff:document:2.0")]
@@ -58,13 +58,13 @@ namespace MyHordesOptimizerApi.Dtos.MyHordes.Import.i18n
 	{
 
 		[XmlElement(ElementName = "unit", Namespace = "urn:oasis:names:tc:xliff:document:2.0")]
-		public List<TranslationUnit> Unit { get; set; }
+		public List<TranslationUnit> Unit { get; set; } = null!;
 
 		[XmlAttribute(AttributeName = "id", Namespace = "")]
-		public string Id { get; set; }
+		public string Id { get; set; } = null!;
 
 		[XmlText]
-		public string Text { get; set; }
+		public string Text { get; set; } = null!;
 	}
 
 	[XmlRoot(ElementName = "xliff", Namespace = "urn:oasis:names:tc:xliff:document:2.0")]
@@ -72,22 +72,22 @@ namespace MyHordesOptimizerApi.Dtos.MyHordes.Import.i18n
 	{
 
 		[XmlElement(ElementName = "file", Namespace = "urn:oasis:names:tc:xliff:document:2.0")]
-		public TranslationFile File { get; set; }
+		public TranslationFile File { get; set; } = null!;
 
 		[XmlAttribute(AttributeName = "xmlns", Namespace = "")]
-		public string Xmlns { get; set; }
+		public string Xmlns { get; set; } = null!;
 
 		[XmlAttribute(AttributeName = "version", Namespace = "")]
 		public double Version { get; set; }
 
 		[XmlAttribute(AttributeName = "srcLang", Namespace = "")]
-		public string SrcLang { get; set; }
+		public string SrcLang { get; set; } = null!;
 
 		[XmlAttribute(AttributeName = "trgLang", Namespace = "")]
-		public string TrgLang { get; set; }
+		public string TrgLang { get; set; } = null!;
 
 		[XmlText]
-		public string Text { get; set; }
+		public string Text { get; set; } = null!;
 	}
 
 }

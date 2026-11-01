@@ -15,10 +15,10 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Buildings
     public class BuildingDto
     {
         public int Id { get; set; }
-        public string Uid { get; set; }
-        public string Img { get; set; }
-        public IDictionary<string, string> Label { get; set; }
-        public IDictionary<string, string> Description { get; set; }
+        public string Uid { get; set; } = null!;
+        public string Img { get; set; } = null!;
+        public IDictionary<string, string> Label { get; set; } = null!;
+        public IDictionary<string, string> Description { get; set; } = null!;
 
         /// <summary>Chantier dont celui-ci est une évolution, ou null s'il est une racine.</summary>
         public int? ParentId { get; set; }
@@ -72,9 +72,9 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Buildings
     public class BuildingResourceDto
     {
         public int ItemId { get; set; }
-        public string Uid { get; set; }
-        public string Img { get; set; }
-        public IDictionary<string, string> Label { get; set; }
+        public string Uid { get; set; } = null!;
+        public string Img { get; set; } = null!;
+        public IDictionary<string, string> Label { get; set; } = null!;
         public int Count { get; set; }
     }
 }

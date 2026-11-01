@@ -9,7 +9,7 @@
     </div>
     <div mat-menu-item #bagTrigger="matMenuTrigger" [matMenuTriggerFor]="bag" [role]="'menuitem'" (menuOpened)="closeOtherMenus('bag')" i18n>Sac</div>
     <div mat-menu-item #dailyActionsTrigger="matMenuTrigger" [matMenuTriggerFor]="dailyActions" [role]="'menuitem'"
-         (menuOpened)="closeOtherMenus('dailyActions')" i18n>Actions quotidiennes
+         (menuOpened)="openDailyActions()" i18n>Actions quotidiennes
     </div>
     <div mat-menu-item #heroicActionsTrigger="matMenuTrigger" [matMenuTriggerFor]="heroicActions" [role]="'menuitem'"
          (menuOpened)="closeOtherMenus('heroicActions')" i18n>Actions héroïques
@@ -65,7 +65,7 @@
     <mat-menu #dailyActions (click)="$event.stopPropagation(); $event.preventDefault()" [xPosition]="'before'" [yPosition]="'below'"
               class="mho-menu-citizen-details daily-actions">
         <div class="band" (click)="$event.stopPropagation();">
-            @for (action of daily_action_keys; track action.key) {
+            @for (action of daily_action_keys(); track action.key) {
                 <mho-compact-toggle
                     (valueChange)="saveDailyAction(action.key, $event)"
                     [icon]="action.value.img"

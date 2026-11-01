@@ -199,6 +199,19 @@ describe('EstimationsComponent', (): void => {
         expect(plainText('.mho-kpi')).toBe('5 – 15');
     });
 
+    it('loads the estimations of the day picked in the day selector, up to the current day', async (): Promise<void> => {
+        await loadEstimations(makeEstimations(), makeAttackResult(5, 15), makeAttackResult(6, 16));
+        const native: HTMLElement = fixture.nativeElement;
+
+        expect(native.querySelector<HTMLButtonElement>('.header button[data-action="next-day"]')?.disabled).toBe(true);
+
+        native.querySelector<HTMLButtonElement>('.header button[data-action="previous-day"]')?.click();
+        fixture.detectChanges();
+
+        expect(townStatisticsService.getEstimations).toHaveBeenLastCalledWith(9);
+        expect(plainText('.header .day')).toBe('J9');
+    });
+
     it('switches the KPI and the chart to the next day, and back', async (): Promise<void> => {
         await loadEstimations(makeEstimations({ estim: { _33: { min: 10, max: 20 } } }), makeAttackResult(5, 15), makeAttackResult(6, 16));
 

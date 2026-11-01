@@ -13,7 +13,7 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer
         public CatapultFate Fate { get; set; }
 
         /// <summary>Renseigné seulement si <see cref="Fate"/> vaut <see cref="CatapultFate.Transformed"/>.</summary>
-        public ItemSummaryDto MorphTarget { get; set; }
+        public ItemSummaryDto MorphTarget { get; set; } = null!;
 
         public int? KillMin { get; set; }
         public int? KillMax { get; set; }

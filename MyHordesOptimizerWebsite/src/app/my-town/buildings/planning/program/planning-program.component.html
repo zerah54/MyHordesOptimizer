@@ -1,0 +1,211 @@
+@if (store.draft(); as draft) {
+    <section class="day-instructions">
+        <mat-form-field appearance="outline" subscriptSizing="dynamic">
+            <mat-label i18n>Consignes du jour</mat-label>
+            <textarea matInput rows="2" maxlength="2000" data-field="instructions" [ngModel]="draft.instructions ?? ''" [disabled]="!store.can_edit()"
+                      (ngModelChange)="onInstructions($event)"></textarea>
+        </mat-form-field>
+    </section>
+
+    <div cdkDropListGroup>
+        @for (pool of store.visible_pools(); track pool) {
+            <section class="pool" [attr.data-pool]="pool" [id]="'plan-section-' + pool">
+                <header class="pool-header">
+                    @if (store.banned_pool_shown()) {
+                        <h3>
+                            @if (pool === 'regular') {
+                                <ng-container i18n>Non-bannis</ng-container>
+                            } @else {
+                                <ng-container i18n>Bannis</ng-container>
+                            }
+                        </h3>
+                    }
+                    @if (pool === 'regular') {
+                        <mat-form-field class="vote" appearance="outline" subscriptSizing="dynamic">
+                            <mat-label i18n>Chantier voté ce soir</mat-label>
+                            <mat-select [value]="draft.eveningVoteBuildingId" [disabled]="!store.can_edit()" (selectionChange)="onVote($event.value)">
+                                <mat-option [value]="null" i18n>Aucun</mat-option>
+                                @for (building of voteOptions(); track building.id) {
+                                    <mat-option [value]="building.id">{{ building.label }}</mat-option>
+                                }
+                            </mat-select>
+                        </mat-form-field>
+                    }
+                    @if (store.can_edit()) {
+                        <span class="pool-actions">
+                            <button mat-stroked-button type="button" data-action="choose" (click)="choose.emit(pool)">
+                                <span class="label"><mat-icon>add</mat-icon><ng-container i18n>Chantiers</ng-container></span>
+                            </button>
+                            <button mat-stroked-button type="button" data-action="add-instruction" (click)="toggleAdding(pool)">
+                                <span class="label"><mat-icon>notes</mat-icon><ng-container i18n>Consigne</ng-container></span>
+                            </button>
+                        </span>
+                    }
+                </header>
+
+                <div class="items" cdkDropList [cdkDropListData]="pool" [cdkDropListDisabled]="!store.can_edit()" (cdkDropListDropped)="onDrop($event)">
+                    @for (item of items(pool); track $index; let index = $index) {
+                        @if (asStep(item); as step) {
+                            @let res = result(pool, index);
+                            <div class="item step" cdkDrag [id]="'plan-item-' + pool + '-' + index" [attr.data-pool]="pool">
+                                @if (store.can_edit()) {
+                                    <mat-icon class="handle" cdkDragHandle i18n-matTooltip matTooltip="Glisser pour réordonner">drag_indicator</mat-icon>
+                                }
+                                <span class="building">
+                                    @if (icon(step.buildingId); as src) {
+                                        <img class="building-icon" [src]="src" alt="">
+                                    }
+                                    <span class="name">{{ label(step.buildingId) }}</span>
+                                    @if (isLocked(step.buildingId)) {
+                                        <span class="badge-locked" i18n i18n-matTooltip matTooltip="Ce chantier n'est pas encore débloqué dans la ville">non débloqué</span>
+                                    }
+                                </span>
+
+                                <span class="action">
+                                    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                                        <mat-select data-field="mode" [value]="modeValue(step)" [disabled]="!store.can_edit()"
+                                                    (selectionChange)="setMode(pool, index, $event.value)">
+                                            @for (option of modeOptions(step); track option.value) {
+                                                <mat-option [value]="option.value" [attr.data-mode]="option.value">{{ option.label }}</mat-option>
+                                            }
+                                        </mat-select>
+                                    </mat-form-field>
+                                    @if (isLeave(step)) {
+                                        @if (step.kind === 'build') {
+                                            <mat-form-field class="number" appearance="outline" subscriptSizing="dynamic">
+                                                <mat-label i18n>PA restants</mat-label>
+                                                <input matInput type="number" min="0" data-field="target" [ngModel]="step.targetRemaining"
+                                                       [disabled]="!store.can_edit()" (ngModelChange)="onTarget(pool, index, $event)">
+                                            </mat-form-field>
+                                        } @else {
+                                            <mat-form-field class="number" appearance="outline" subscriptSizing="dynamic">
+                                                <mat-label i18n>PV visés</mat-label>
+                                                <input matInput type="number" min="0" data-field="target-life" [ngModel]="targetLife(step)"
+                                                       [disabled]="!store.can_edit()" (ngModelChange)="onTargetLife(pool, index, step, $event)">
+                                            </mat-form-field>
+                                            <mat-icon class="link" aria-hidden="true">sync_alt</mat-icon>
+                                            <mat-form-field class="number" appearance="outline" subscriptSizing="dynamic">
+                                                <mat-label i18n>PA</mat-label>
+                                                <input matInput type="number" min="0" data-field="target-pa" [ngModel]="targetPa(step, res)"
+                                                       [disabled]="!store.can_edit() || res === undefined"
+                                                       (ngModelChange)="onTargetPa(pool, index, step, res, $event)">
+                                            </mat-form-field>
+                                        }
+                                    }
+                                    @if (step.kind === 'build') {
+                                        @if (freeThreshold(step.buildingId); as threshold) {
+                                            <span class="free-threshold"><ng-container i18n>Gratuit demain si ≤</ng-container>
+                                                {{ threshold }}
+                                                <ng-container i18n>PA</ng-container></span>
+                                        }
+                                    }
+                                </span>
+
+                                @if (res) {
+                                    <span class="cost">{{ res.paCost }}
+                                        <ng-container i18n>PA</ng-container></span>
+                                    @if (step.kind === 'build') {
+                                        <span class="result" [attr.data-done]="res.completes">
+                                            @if (res.completes) {
+                                                <mat-icon>check</mat-icon>
+                                                <ng-container i18n>terminé</ng-container>
+                                            } @else {
+                                                {{ res.remainingAfter + res.points }} → {{ res.remainingAfter }}
+                                                <ng-container i18n>PA restants</ng-container>
+                                            }
+                                        </span>
+                                    } @else {
+                                        @if (repairLives(step, res); as lives) {
+                                            <span class="result" [attr.data-done]="res.completes" i18n-matTooltip matTooltip="PV avant → après / PV max">
+                                                <ng-container i18n>PV</ng-container>
+                                                {{ lives.before }} → {{ lives.after }} / {{ lives.max }}
+                                            </span>
+                                            <span class="rate">{{ hpPerAp() }}
+                                                <ng-container i18n>PV/PA</ng-container></span>
+                                        }
+                                    }
+                                    @for (issue of res.issues; track issue) {
+                                        <span class="issue" [attr.data-issue]="issue">
+                                            <mat-icon>warning</mat-icon>
+                                            {{ issueLabel(issue) }}
+                                        </span>
+                                    }
+                                }
+
+                                <span class="row-actions">
+                                    @if (store.can_edit()) {
+                                        <button mat-icon-button type="button" data-action="note" (click)="toggleNote(pool, index)"
+                                                i18n-matTooltip matTooltip="Ajouter une note">
+                                            <mat-icon>chat_bubble_outline</mat-icon>
+                                        </button>
+                                        <button mat-icon-button type="button" data-action="item-menu" [matMenuTriggerFor]="item_menu"
+                                                [matMenuTriggerData]="{ pool: pool, index: index }" i18n-matTooltip matTooltip="Actions">
+                                            <mat-icon>more_vert</mat-icon>
+                                        </button>
+                                    }
+                                </span>
+
+                                @if (showsNote(pool, index, step)) {
+                                    <mat-form-field class="note" appearance="outline" subscriptSizing="dynamic">
+                                        <mat-label i18n>Note</mat-label>
+                                        <input matInput type="text" maxlength="200" data-field="note" [ngModel]="step.note ?? ''" [disabled]="!store.can_edit()"
+                                               (ngModelChange)="onNote(pool, index, $event)">
+                                    </mat-form-field>
+                                }
+                            </div>
+                        } @else {
+                            <div class="item instruction" cdkDrag [id]="'plan-item-' + pool + '-' + index" [attr.data-pool]="pool">
+                                @if (store.can_edit()) {
+                                    <mat-icon class="handle" cdkDragHandle i18n-matTooltip matTooltip="Glisser pour réordonner">drag_indicator</mat-icon>
+                                }
+                                <mat-icon class="instruction-icon" aria-hidden="true">notes</mat-icon>
+                                <mat-form-field class="instruction-text" appearance="outline" subscriptSizing="dynamic">
+                                    <input matInput type="text" maxlength="200" data-field="instruction" [ngModel]="$any(item).text"
+                                           [disabled]="!store.can_edit()"
+                                           (ngModelChange)="onInstructionText(pool, index, $event)">
+                                </mat-form-field>
+                                <span class="row-actions">
+                                    @if (store.can_edit()) {
+                                        <button mat-icon-button type="button" data-action="item-menu" [matMenuTriggerFor]="item_menu"
+                                                [matMenuTriggerData]="{ pool: pool, index: index }" i18n-matTooltip matTooltip="Actions">
+                                            <mat-icon>more_vert</mat-icon>
+                                        </button>
+                                    }
+                                </span>
+                            </div>
+                        }
+                    } @empty {
+                        <p class="empty" i18n>Aucune étape.</p>
+                    }
+                </div>
+
+                @if (adding().has(pool) && store.can_edit()) {
+                    <mat-form-field class="new-instruction" appearance="outline" subscriptSizing="dynamic">
+                        <mat-label i18n>Nouvelle consigne (Entrée pour ajouter)</mat-label>
+                        <input matInput #new_instruction type="text" maxlength="200" data-field="new-instruction"
+                               (keydown.enter)="addInstruction(pool, new_instruction)" (keydown.escape)="toggleAdding(pool)">
+                    </mat-form-field>
+                }
+            </section>
+        }
+    </div>
+
+    <mat-menu #item_menu="matMenu">
+        <ng-template matMenuContent let-pool="pool" let-index="index">
+            @if (store.banned_pool_shown()) {
+                <button mat-menu-item type="button" data-action="switch-pool" (click)="switchPool(pool, index)">
+                    <mat-icon>swap_vert</mat-icon>
+                    @if (pool === 'regular') {
+                        <span i18n>Passer chez les bannis</span>
+                    } @else {
+                        <span i18n>Passer chez les non-bannis</span>
+                    }
+                </button>
+            }
+            <button mat-menu-item type="button" data-action="remove" (click)="remove(pool, index)">
+                <mat-icon>delete</mat-icon>
+                <span i18n>Supprimer</span>
+            </button>
+        </ng-template>
+    </mat-menu>
+}

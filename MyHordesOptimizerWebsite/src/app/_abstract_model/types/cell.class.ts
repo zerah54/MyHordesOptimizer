@@ -123,10 +123,12 @@ export class Cell extends CommonModel<CellDTO> {
 
     /**
      * L'estimation d'un éclaireur ne prime sur le nombre de zombies connu que si elle
-     * a été relevée après la dernière mise à jour de la case.
+     * a été relevée après la dernière mise à jour de la case. Sur une case jamais visitée,
+     * aucun nombre n'est connu : elle prime toujours.
      */
     public hasFresherScoutEstimation(): boolean {
         if (this.scout_estimation_zombie === null || this.scout_estimation_zombie === undefined) return false;
+        if (this.is_never_visited) return true;
         if (!this.scout_estimation_update_info?.update_time) return false;
         if (!this.update_info?.update_time) return true;
         return this.scout_estimation_update_info.update_time.isAfter(this.update_info.update_time);

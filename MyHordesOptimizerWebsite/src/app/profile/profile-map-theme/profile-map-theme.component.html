@@ -1,0 +1,79 @@
+<div class="mho-profile-theme">
+    <section class="themes">
+        <h3 i18n>Thèmes de la carte</h3>
+        <ul class="theme-list">
+            @for (row of rows(); track row.key) {
+                <li class="theme-row" [class.active]="row.active">
+                    <span class="theme-name">{{ row.label }}</span>
+                    <span class="theme-actions">
+                        <button class="activate" mat-stroked-button type="button" [disabled]="row.active" (click)="activate(row)">
+                            @if (row.active) {
+                                <ng-container i18n>Actif</ng-container>
+                            } @else {
+                                <ng-container i18n>Activer</ng-container>
+                            }
+                        </button>
+                        @if (row.theme; as theme) {
+                            <button class="edit" mat-icon-button type="button" (click)="openEditor(theme)"
+                                    i18n-matTooltip matTooltip="Renommer et modifier les couleurs">
+                                <mat-icon>edit</mat-icon>
+                            </button>
+                            <button class="delete" mat-icon-button type="button" (click)="remove(theme)"
+                                    i18n-matTooltip matTooltip="Supprimer">
+                                <mat-icon>delete</mat-icon>
+                            </button>
+                        }
+                    </span>
+                </li>
+            }
+        </ul>
+        <button class="create" mat-stroked-button type="button" (click)="create()">
+            <mat-icon>add</mat-icon>
+            <ng-container i18n>Créer un nouveau thème</ng-container>
+        </button>
+    </section>
+
+    @if (editing_id() !== null) {
+        <section class="editor">
+            <div class="editor-header">
+                <mat-form-field class="name-field" appearance="outline" subscriptSizing="dynamic">
+                    <mat-label i18n>Nom du thème</mat-label>
+                    <input class="name-input" matInput type="text" maxlength="64" [formControl]="name_control" (input)="onName($event)"
+                           [errorStateMatcher]="name_matcher">
+                    @if (name_taken()) {
+                        <mat-error i18n>Ce nom est déjà pris.</mat-error>
+                    } @else {
+                        <mat-error i18n>Le nom est obligatoire.</mat-error>
+                    }
+                </mat-form-field>
+                <button class="close" mat-icon-button type="button" (click)="closeEditor()"
+                        i18n-matTooltip matTooltip="Fermer l'éditeur">
+                    <mat-icon>close</mat-icon>
+                </button>
+            </div>
+            <small class="hint" i18n>Les modifications sont enregistrées automatiquement. Une couleur non définie garde la valeur du site.</small>
+
+            <mho-map-theme-preview/>
+
+            @for (group of groups; track group.label) {
+                <fieldset class="group">
+                    <legend>{{ group.label }}</legend>
+                    @for (entry of group.tokens; track entry.token) {
+                        <div class="color">
+                            <label>
+                                <input type="color" [value]="displayed()[entry.token] ?? '#000000'" (input)="onColor(entry.token, $event)">
+                                <span>{{ entry.label }}</span>
+                            </label>
+                            @if (isDefined(entry.token)) {
+                                <button class="reset" mat-icon-button type="button" (click)="resetColor(entry.token)"
+                                        i18n-matTooltip matTooltip="Revenir à la valeur du site">
+                                    <mat-icon>undo</mat-icon>
+                                </button>
+                            }
+                        </div>
+                    }
+                </fieldset>
+            }
+        </section>
+    }
+</div>

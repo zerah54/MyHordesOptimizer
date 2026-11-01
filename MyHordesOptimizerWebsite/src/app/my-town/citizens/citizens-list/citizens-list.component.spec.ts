@@ -1,22 +1,25 @@
 import { HttpRequest, provideHttpClient, withXhr } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting, TestRequest } from '@angular/common/http/testing';
 import { ChangeDetectorRef } from '@angular/core';
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, DeferBlockBehavior, DeferBlockFixture, DeferBlockState, TestBed } from '@angular/core/testing';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { provideRouter, Router } from '@angular/router';
-import { of, throwError } from 'rxjs';
+import { Observable, of, throwError } from 'rxjs';
 import type { MockInstance } from 'vitest';
 
+import { CITIZENS_LIST_DISPLAY_MODE_KEY } from '../../../_abstract_model/const';
 import { DailyActionEnum } from '../../../_abstract_model/enum/daily-action.enum';
 import { HomeEnum } from '../../../_abstract_model/enum/home.enum';
 import { StatusEnum } from '../../../_abstract_model/enum/status.enum';
+import { BuiltBuildingsService } from '../../../_abstract_model/services/built-buildings.service';
 import { TownService } from '../../../_abstract_model/services/town.service';
 import { Bag } from '../../../_abstract_model/types/bag.class';
 import { ChamanicDetail } from '../../../_abstract_model/types/chamanic-detail.class';
-import { Citizen } from '../../../_abstract_model/types/citizen.class';
 import { CitizenInfo } from '../../../_abstract_model/types/citizen-info.class';
+import { Citizen } from '../../../_abstract_model/types/citizen.class';
 import { DailyAction } from '../../../_abstract_model/types/daily-action.class';
 import { HERO_SKILL_FAMILIES, HeroSkillFamily, HeroSkillFamilyInfo } from '../../../_abstract_model/types/hero-skill-levels';
+import { HeroicActions } from '../../../_abstract_model/types/heroic-actions.class';
 import { Home, HomeWithValue } from '../../../_abstract_model/types/home.class';
 import { Item } from '../../../_abstract_model/types/item.class';
 import { Status } from '../../../_abstract_model/types/status.class';
@@ -474,6 +477,124 @@ describe('CitizensListComponent', (): void => {
     });
 });
 
+describe('CitizensListComponent — compétences S, U, P, E, R', (): void => {
+    let fixture: ComponentFixture<CitizensListComponent>;
+
+    /**
+     * Rend la liste pour un citoyen aux niveaux connus, cellules différées comprises.
+     * @returns {Promise<HTMLElement>} Élément racine de la liste.
+     */
+    async function renderList(): Promise<HTMLElement> {
+        await TestBed.configureTestingModule({
+            imports: [CitizensListComponent],
+            providers: [provideHttpClient(withXhr()), provideHttpClientTesting(), provideRouter([])],
+            deferBlockBehavior: DeferBlockBehavior.Manual
+        }).compileComponents();
+        const citizen: Citizen = new Citizen();
+        citizen.id = 42;
+        citizen.name = 'Zoe';
+        citizen.daily_actions = [];
+        citizen.chamanic_detail = new ChamanicDetail();
+        citizen.bag = new Bag();
+        citizen.chest = new Bag();
+        citizen.status = new Status();
+        citizen.home = new Home();
+        citizen.heroic_actions = new HeroicActions();
+        citizen.hero_skills = { s: 1, u: null, p: 0, e: 4, r: 2 };
+        const info: CitizenInfo = new CitizenInfo();
+        info.citizens = [citizen];
+        vi.spyOn(TestBed.inject(TownService), 'getCitizens').mockReturnValue(of(info));
+        fixture = TestBed.createComponent(CitizensListComponent);
+        fixture.detectChanges();
+        const blocks: DeferBlockFixture[] = await fixture.getDeferBlocks();
+        for (const block of blocks) {
+            await block.render(DeferBlockState.Complete);
+        }
+        fixture.detectChanges();
+        return fixture.nativeElement as HTMLElement;
+    }
+
+    /**
+     * Bouton de niveau d'un citoyen dans un groupe.
+     * @param {HTMLElement} root Élément racine de la liste.
+     * @param {string} letter Lettre du groupe.
+     * @returns {HTMLButtonElement} Bouton dont le texte commence par la lettre.
+     */
+    function levelButton(root: HTMLElement, letter: string): HTMLButtonElement {
+        const buttons: HTMLButtonElement[] = Array.from(root.querySelectorAll<HTMLButtonElement>('button.hero-skill'));
+        return <HTMLButtonElement>buttons.find((button: HTMLButtonElement): boolean => button.textContent?.trim().startsWith(letter) === true);
+    }
+
+    /**
+     * Entrées du menu de niveaux ouvert.
+     * @returns {HTMLButtonElement[]} Entrées, dans l'ordre d'affichage.
+     */
+    function menuItems(): HTMLButtonElement[] {
+        return Array.from(document.querySelectorAll<HTMLButtonElement>('.mat-mdc-menu-panel button'));
+    }
+
+    beforeEach((): void => {
+        localStorage.removeItem(CITIZENS_LIST_DISPLAY_MODE_KEY);
+    });
+
+    afterEach((): void => {
+        localStorage.removeItem(CITIZENS_LIST_DISPLAY_MODE_KEY);
+    });
+
+    it('regroupe les cinq groupes dans une seule colonne en mode compact, chacun avec son bouton', async (): Promise<void> => {
+        const root: HTMLElement = await renderList();
+
+        expect(root.querySelector('th .hero-skill-letter')).toBeNull();
+        expect(root.querySelector('.hero-skills-band')?.querySelectorAll('button.hero-skill').length).toBe(5);
+    });
+
+    it('donne une colonne à chaque groupe en mode colonnes', async (): Promise<void> => {
+        localStorage.setItem(CITIZENS_LIST_DISPLAY_MODE_KEY, 'columns');
+        const root: HTMLElement = await renderList();
+
+        const headers: (string | undefined)[] = Array.from(root.querySelectorAll('th .hero-skill-letter'))
+            .map((header: Element): string | undefined => header.textContent?.trim());
+
+        expect(headers).toEqual(['S', 'U', 'P', 'E', 'R']);
+        expect(root.querySelector('.hero-skills-band')).toBeNull();
+    });
+
+    it('affiche la lettre et le niveau, « ? » si inconnu', async (): Promise<void> => {
+        const root: HTMLElement = await renderList();
+
+        expect(levelButton(root, 'S').textContent?.replace(/\s/g, '')).toBe('S1');
+        expect(levelButton(root, 'U').textContent?.replace(/\s/g, '')).toBe('U?');
+    });
+
+    it('liste tous les niveaux au clic, le niveau courant désactivé', async (): Promise<void> => {
+        const root: HTMLElement = await renderList();
+
+        levelButton(root, 'R').click();
+        fixture.detectChanges();
+
+        const items: HTMLButtonElement[] = menuItems();
+        expect(items.map((item: HTMLButtonElement): string | undefined => item.textContent?.trim()))
+            .toEqual(['? – Inconnu', '0 – Aucun', '1 – Débutant', '2 – Apprenti', '3 – Expert', '4 – Élite']);
+        expect(items.map((item: HTMLButtonElement): boolean => item.disabled))
+            .toEqual([false, false, false, true, false, false]);
+    });
+
+    it('enregistre le niveau choisi et met la cellule à jour', async (): Promise<void> => {
+        const root: HTMLElement = await renderList();
+        const httpMock: HttpTestingController = TestBed.inject(HttpTestingController);
+
+        levelButton(root, 'R').click();
+        fixture.detectChanges();
+        menuItems()[4].click();
+
+        const request: TestRequest = httpMock.expectOne((candidate: HttpRequest<unknown>): boolean => candidate.url.includes('/user/42/heroSkills'));
+        expect(JSON.parse(<string>request.request.body)).toEqual({ s: 1, u: null, p: 0, e: 4, r: 3 });
+        request.flush(null);
+
+        expect(levelButton(root, 'R').textContent?.replace(/\s/g, '')).toBe('R3');
+    });
+});
+
 describe('CitizensListComponent - lien profond (?citizen=)', (): void => {
     let component: CitizensListComponent;
     let fixture: ComponentFixture<CitizensListComponent>;
@@ -528,5 +649,32 @@ describe('CitizensListComponent - lien profond (?citizen=)', (): void => {
         await TestBed.inject(Router).navigateByUrl('/?citizen=99');
 
         expect(component['targeted_citizen_id']()).toBeNull();
+    });
+});
+
+describe('CitizensListComponent — actions selon les chantiers construits', (): void => {
+    /**
+     * Crée le composant avec les chantiers construits donnés.
+     * @param {ReadonlySet<string> | null} built Uids construits (nul = inconnu).
+     * @returns {string[]} Clés des actions quotidiennes affichées.
+     */
+    async function displayedActions(built: ReadonlySet<string> | null): Promise<string[]> {
+        await TestBed.configureTestingModule({
+            imports: [CitizensListComponent],
+            providers: [
+                provideHttpClient(withXhr()), provideHttpClientTesting(), provideRouter([]),
+                { provide: BuiltBuildingsService, useValue: { builtUids: (): Observable<ReadonlySet<string> | null> => of(built) } }
+            ]
+        }).compileComponents();
+        const instance: CitizensListComponent = TestBed.createComponent(CitizensListComponent).componentInstance;
+        return (instance as unknown as { daily_action_keys: () => DailyActionEnum[] }).daily_action_keys().map((action: DailyActionEnum): string => action.key);
+    }
+
+    it('masque les actions dont le chantier n\'est pas construit', async (): Promise<void> => {
+        expect(await displayedActions(new Set<string>(['small_gallery_#00']))).toEqual(['home_clean', 'home_rest', 'home_scavenge']);
+    });
+
+    it('n\'affiche que les actions sans chantier si les chantiers sont inconnus', async (): Promise<void> => {
+        expect(await displayedActions(null)).toEqual(['home_clean', 'home_rest']);
     });
 });

@@ -14,7 +14,7 @@ namespace MyHordesOptimizerApi.Repository.Expeditions
                 .Include(expedition => expedition.ExpeditionParts)
                     .ThenInclude(part => part.ExpeditionCitizens)
                         .ThenInclude(expeditionCitizen => expeditionCitizen.IdExpeditionBagNavigation)
-                            .ThenInclude(bag => bag.ExpeditionBagItems)
+                            .ThenInclude(bag => bag!.ExpeditionBagItems)
                                 .ThenInclude(bagItem => bagItem.IdItemNavigation)
                 .AsSplitQuery()
                 .Include(expedition => expedition.ExpeditionParts)
@@ -33,13 +33,13 @@ namespace MyHordesOptimizerApi.Repository.Expeditions
                 .Include(citizen => citizen.ExpeditionOrders)
                 .AsSplitQuery()
                 .Include(citizen => citizen.IdExpeditionBagNavigation)
-                    .ThenInclude(bag => bag.ExpeditionBagItems)
+                    .ThenInclude(bag => bag!.ExpeditionBagItems)
                         .ThenInclude(bagItem => bagItem.IdItemNavigation)
                         .AsSplitQuery()
                 .Include(citizen => citizen.IdUserNavigation)
                 .AsSplitQuery()
                 .Include(citizen => citizen.IdExpeditionPartNavigation)
-                    .ThenInclude(part => part.IdExpeditionNavigation)
+                    .ThenInclude(part => part!.IdExpeditionNavigation)
                 .AsSplitQuery();
         }
     }

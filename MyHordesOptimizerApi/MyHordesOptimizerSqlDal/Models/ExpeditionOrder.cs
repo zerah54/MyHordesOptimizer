@@ -70,6 +70,10 @@ public partial class ExpeditionOrder
     [StringLength(255)]
     public string? Note { get; set; }
 
+    /// <summary>Rang du passage sur la case, à partir de 1 ; null vaut le premier.</summary>
+    [Column("passage", TypeName = "int(11)")]
+    public int? Passage { get; set; }
+
     [ForeignKey("IdExpeditionCitizen")]
     [InverseProperty("ExpeditionOrders")]
     public virtual ExpeditionCitizen? IdExpeditionCitizenNavigation { get; set; }

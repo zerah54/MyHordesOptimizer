@@ -33,6 +33,8 @@ export class ListElementAddRemoveComponent {
     public label: InputSignal<string> = input.required();
     public class: InputSignal<string> = input('');
     public readonly: InputSignalWithTransform<boolean, unknown> = input(false, { transform: booleanAttribute });
+    /** Ajout rapide : le menu d'ajout reste ouvert après un ajout */
+    public keepOpen: InputSignalWithTransform<boolean, unknown> = input(false, { transform: booleanAttribute });
 
     public addLabel: InputSignal<string> = input.required();
     public add: OutputEmitterRef<number | string> = output();

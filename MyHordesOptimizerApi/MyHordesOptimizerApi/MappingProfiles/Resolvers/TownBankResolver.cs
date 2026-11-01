@@ -6,7 +6,7 @@ using MyHordesOptimizerApi.Providers.Interfaces;
 
 namespace MyHordesOptimizerApi.MappingProfiles.Resolvers
 {
-    public class TownBankResolver : IValueResolver<MyHordesMap, TownDto, BankLastUpdateDto>
+    public class TownBankResolver : IValueResolver<MyHordesMap, TownDto, BankLastUpdateDto?>
     {
         protected IServiceScopeFactory ServiceScopeFactory { get; private set; }
 
@@ -20,7 +20,7 @@ namespace MyHordesOptimizerApi.MappingProfiles.Resolvers
             UserInfoProvider = userInfoProvider;
         }
 
-        public BankLastUpdateDto Resolve(MyHordesMap source, TownDto destination, BankLastUpdateDto destMember, ResolutionContext context)
+        public BankLastUpdateDto? Resolve(MyHordesMap source, TownDto destination, BankLastUpdateDto? destMember, ResolutionContext context)
         {
             //var wrapper = new BankLastUpdateDto();
             //var items = MhoRepository.GetItems();

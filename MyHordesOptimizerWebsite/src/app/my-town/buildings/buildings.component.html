@@ -1,9 +1,88 @@
-<mat-card-header>
+<mat-card-header class="mho-buildings-header">
     <mat-card-title i18n>Chantiers</mat-card-title>
+    @if (!store.loading() && !store.load_failed()) {
+        <div class="actions">
+            <button mat-button type="button" data-action="item-values" (click)="openItemValues()">
+                <mat-icon>tune</mat-icon>
+                <ng-container i18n>Valeurs des objets</ng-container>
+            </button>
+        </div>
+    }
 </mat-card-header>
+
 <mat-card-content class="mho-buildings">
-    <!--    <mat-tab-group [mat-stretch-tabs]="false" mat-align-tabs="start">
-        <mat-tab label="Scrutateur" i18n-label>
-        </mat-tab>
-    </mat-tab-group>-->
+    @if (store.loading()) {
+        <div class="loading">
+            <mat-spinner diameter="40"/>
+        </div>
+    } @else if (store.load_failed()) {
+        <p class="load-failed" i18n>Impossible de charger les chantiers.</p>
+        <button mat-stroked-button type="button" data-action="retry" (click)="store.load()" i18n>Réessayer</button>
+    } @else {
+        <mho-planning-header/>
+
+        @if (store.selected_day() < store.current_day) {
+            <p class="past-day" i18n>Jour passé : lecture seule.</p>
+        }
+
+        @if (store.conflict(); as conflict) {
+            <div class="conflict" role="alert">
+                <mat-icon aria-hidden="true">warning</mat-icon>
+                <span>
+                    <ng-container i18n>Cette proposition a été modifiée par</ng-container>
+                    {{ conflict.author ?? '?' }}.
+                    <ng-container i18n>Vos modifications sont conservées ; enregistrer écrasera la version de cette personne.</ng-container>
+                </span>
+                <button mat-button type="button" data-action="dismiss-conflict" (click)="store.dismissConflict()" i18n>Compris</button>
+            </div>
+        }
+
+        @if (store.selected_plan() === null) {
+            <p class="no-plan" i18n>Aucune proposition pour ce jour : créez-en une avec « Proposition ».</p>
+        } @else {
+            <div class="sticky-kpis">
+                <mho-planning-kpis [flat]="true"/>
+            </div>
+
+            @if (store.evaluation() === null && store.selected_day() >= store.current_day) {
+                <p class="no-evaluation" i18n>Évaluation indisponible.</p>
+            }
+
+            <mho-planning-cards [(selected)]="card"/>
+
+            <div class="card-panel" cdkScrollable [attr.data-card]="card()">
+                @if (card_alerts().length > 0) {
+                    <ul class="panel-alerts">
+                        @for (alert of card_alerts(); track $index) {
+                            <li>
+                                <mat-icon aria-hidden="true">warning</mat-icon>
+                                @if (anchor(alert); as id) {
+                                    <button type="button" data-action="alert" (click)="scrollTo(id)">{{ alert.text }}</button>
+                                } @else {
+                                    <span>{{ alert.text }}</span>
+                                }
+                            </li>
+                        }
+                    </ul>
+                }
+                @switch (card()) {
+                    @case ('program') {
+                        <mho-planning-program (choose)="openDrawer($event)"/>
+                    }
+                    @case ('tracking') {
+                        <mho-planning-tracking/>
+                    }
+                    @case ('budget') {
+                        <mho-planning-budget/>
+                    }
+                    @case ('resources') {
+                        <mho-planning-resources/>
+                    }
+                    @case ('defense') {
+                        <mho-planning-defense/>
+                    }
+                }
+            </div>
+        }
+    }
 </mat-card-content>

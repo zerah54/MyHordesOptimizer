@@ -6,30 +6,30 @@ namespace MyHordesOptimizerApi.Dtos.MyHordes.MyHordesOptimizer
 {
     public class ItemWithoutRecipeDto
     {
-        public string Uid { get; set; }
-        public string Img { get; set; }
+        public string Uid { get; set; } = null!;
+        public string Img { get; set; } = null!;
 
         /// <summary>
         /// Icône de l'objet cassé, ou null quand le jeu n'en prévoit pas de distincte — auquel cas
         /// c'est <see cref="Img"/> qui s'affiche. 20 objets sur 383 en ont une.
         /// </summary>
-        public string ImgBroken { get; set; }
-        public IDictionary<string, string> Label { get; set; }
+        public string ImgBroken { get; set; } = null!;
+        public IDictionary<string, string> Label { get; set; } = null!;
         public int Id { get; set; }
-        public CategoryDto Category { get; set; }
+        public CategoryDto Category { get; set; } = null!;
         public int Deco { get; set; }
         public bool IsHeaver { get; set; }
         public int Guard { get; set; }
         public IDictionary<string, string> Description { get; set; }
 
-        public IEnumerable<string> Properties { get; set; }
-        public IEnumerable<string> Actions { get; set; }
+        public IEnumerable<string> Properties { get; set; } = null!;
+        public IEnumerable<string> Actions { get; set; } = null!;
 
         /// <summary>
         /// Objets permettant d'ouvrir celui-ci. <c>null</c> si ce n'est pas un contenant, liste
         /// vide si contenant sans outil requis, liste peuplée sinon.
         /// </summary>
-        public List<ItemSummaryDto> OpenedWith { get; set; }
+        public List<ItemSummaryDto> OpenedWith { get; set; } = null!;
 
         /// <summary>Contenants que cet objet permet d'ouvrir. Vide s'il n'en ouvre aucun.</summary>
         public List<ItemSummaryDto> Opens { get; set; } = new List<ItemSummaryDto>();
@@ -51,7 +51,7 @@ namespace MyHordesOptimizerApi.Dtos.MyHordes.MyHordesOptimizer
         public int? TechnicianOpenCpCost { get; set; }
 
         /// <summary>Effet catapulte réel de l'objet. <c>null</c> si l'objet n'est pas catapultable.</summary>
-        public CatapultEffectDto CatapultEffect { get; set; }
+        public CatapultEffectDto CatapultEffect { get; set; } = null!;
 
         public int WishListCount { get; set; }
         public int BankCount { get; set; }
@@ -70,7 +70,7 @@ namespace MyHordesOptimizerApi.Dtos.MyHordes.MyHordesOptimizer
             Description = new Dictionary<string, string>();
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             return obj is ItemDto item &&
                    Id == item.Id;

@@ -121,11 +121,11 @@ namespace MyHordesOptimizerApi.DiscordBot.Modules
 
         [InputLabel("Titre de la suggestion")]
         [ModalTextInput(placeholder: "Titre de la suggestion",  customId: TitleInputId, style: TextInputStyle.Short, maxLength: FeedbackModalLimits.TitleMaxLength)]
-        public string SuggestionTitle { get; set; }
+        public string SuggestionTitle { get; set; } = null!;
 
         [InputLabel("Détails de la suggestion")]
         [ModalTextInput(placeholder: "Détails de la suggestion", customId: DetailsInputId, style: TextInputStyle.Paragraph, maxLength: FeedbackModalLimits.DetailsMaxLength)]
-        public string SuggestionDetails { get; set; }
+        public string SuggestionDetails { get; set; } = null!;
     }
 
     public class BugModal : IModal
@@ -137,10 +137,10 @@ namespace MyHordesOptimizerApi.DiscordBot.Modules
 
         [InputLabel("Titre du bug")]
         [ModalTextInput(placeholder: "Titre du bug",  customId: TitleInputId, style: TextInputStyle.Short, maxLength: FeedbackModalLimits.TitleMaxLength)]
-        public string BugTitle { get; set; }
+        public string BugTitle { get; set; } = null!;
 
         [InputLabel("Détails du bug")]
         [ModalTextInput(placeholder: "Détails du bug", customId: DetailsInputId, style: TextInputStyle.Paragraph, maxLength: FeedbackModalLimits.DetailsMaxLength)]
-        public string BugDetails { get; set; }
+        public string BugDetails { get; set; } = null!;
     }
 }

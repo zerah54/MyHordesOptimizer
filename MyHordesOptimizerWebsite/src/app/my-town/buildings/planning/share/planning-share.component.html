@@ -1,0 +1,9 @@
+<button mat-icon-button type="button" data-action="share" [matMenuTriggerFor]="menu" [disabled]="entries().length === 0"
+        i18n-matTooltip matTooltip="Copier au format forum">
+    <mat-icon>share</mat-icon>
+</button>
+<mat-menu #menu="matMenu">
+    @for (entry of entries(); track entry.key) {
+        <button mat-menu-item type="button" (click)="copy(entry)">{{ entry.label }}</button>
+    }
+</mat-menu>

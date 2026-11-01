@@ -9,6 +9,6 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.Status
         public int UserId { get; set; }
 
         [JsonProperty("status")]
-        public List<string> Status { get; set; }
+        public List<string> Status { get; set; } = null!;
     }
 }

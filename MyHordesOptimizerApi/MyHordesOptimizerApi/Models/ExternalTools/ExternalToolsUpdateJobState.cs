@@ -9,7 +9,8 @@ namespace MyHordesOptimizerApi.Models.ExternalTools
         MyHordesOptimizer,
         GestHordes,
         FataMorgana,
-        BigBrothHordes
+        BigBrothHordes,
+        ZenHordes
     }
 
     public enum ExternalToolUpdateStatus
@@ -48,6 +49,7 @@ namespace MyHordesOptimizerApi.Models.ExternalTools
                 ExternalToolId.GestHordes => "gestHordes",
                 ExternalToolId.FataMorgana => "fataMorgana",
                 ExternalToolId.BigBrothHordes => "bigBrothHordes",
+                ExternalToolId.ZenHordes => "zenHordes",
                 _ => throw new ArgumentOutOfRangeException(nameof(tool))
             };
         }
@@ -66,14 +68,14 @@ namespace MyHordesOptimizerApi.Models.ExternalTools
 
     public class ExternalToolUpdateError
     {
-        public string Unit { get; set; }
-        public string Message { get; set; }
+        public string Unit { get; set; } = null!;
+        public string Message { get; set; } = null!;
     }
 
     public class ExternalToolUpdateState
     {
-        public string Tool { get; set; }
-        public string Status { get; set; }
+        public string Tool { get; set; } = null!;
+        public string Status { get; set; } = null!;
         public List<ExternalToolUpdateError> Errors { get; set; } = new();
     }
 
@@ -92,7 +94,7 @@ namespace MyHordesOptimizerApi.Models.ExternalTools
         public bool IsRunning { get; set; }
         public DateTime? StartedAt { get; set; }
         public DateTime? FinishedAt { get; set; }
-        public AuthenticationResponseDto RenewedToken { get; set; }
+        public AuthenticationResponseDto? RenewedToken { get; set; }
         public List<ExternalToolUpdateState> Tools { get; set; } = new();
     }
 }

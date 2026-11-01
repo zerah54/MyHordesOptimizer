@@ -28,8 +28,8 @@ namespace MyHordesOptimizerApi.MappingProfiles.Resolvers.MyHordes
             {
                 var user = new User()
                 {
-                    IdUser = source.Id.Value,
-                    Name = source.Name,
+                    IdUser = source.Id!.Value,
+                    Name = source.Name!,
                     Avatar = avatar
                 };
                 dbContext.Add(user);
@@ -46,7 +46,7 @@ namespace MyHordesOptimizerApi.MappingProfiles.Resolvers.MyHordes
                     dbUser.Avatar = avatar;
                 }
             }
-            return dbUser;
+            return dbUser!;
         }
     }
 }

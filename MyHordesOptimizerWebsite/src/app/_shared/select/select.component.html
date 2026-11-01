@@ -1,4 +1,4 @@
-<mat-select class="mho-select" [multiple]="multiple()" [value]="value" (valueChange)="writeValue($event);"
+<mat-select class="mho-select" [multiple]="multiple()" [value]="value" (valueChange)="selectValue($event);"
             [attr.aria-labelledby]="parent_form_field?.getLabelId()"
             (closed)="closed.emit()" [placeholder]="placeholder" [panelClass]="class()">
     @if (multiple()) {
@@ -29,7 +29,7 @@
                             }
                         </span>
                     @if (value && clearable()) {
-                        <mat-icon style="margin-right: 1em" (click)="$event.stopPropagation(); value = []; writeValue([])">close</mat-icon>
+                        <mat-icon style="margin-right: 1em" (click)="$event.stopPropagation(); value = []; selectValue([])">close</mat-icon>
                     }
                 </div>
             }
@@ -46,7 +46,7 @@
             }
             @if (value && clearable()) {
                 <mat-icon matSuffix style="margin-right: 0.5em; position: relative;"
-                          (click)="$event.stopPropagation(); value = undefined; writeValue(undefined)">
+                          (click)="$event.stopPropagation(); value = undefined; selectValue(undefined)">
                     close
                 </mat-icon>
             }

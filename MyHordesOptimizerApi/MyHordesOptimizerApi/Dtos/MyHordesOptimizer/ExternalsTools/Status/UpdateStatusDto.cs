@@ -7,9 +7,9 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.Status
     public class UpdateStatusDto
     {
         [JsonProperty("toolsToUpdate")]
-        public UpdateRequestToolsToUpdateDetailsDto ToolsToUpdate { get; set; }
+        public UpdateRequestToolsToUpdateDetailsDto ToolsToUpdate { get; set; } = null!;
         [JsonProperty("values")]
-        public List<string> Values { get; set; }
+        public List<string> Values { get; set; } = null!;
     }
 
     public enum StatusValue

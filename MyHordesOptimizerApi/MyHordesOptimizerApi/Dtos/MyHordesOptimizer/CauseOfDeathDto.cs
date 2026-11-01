@@ -7,9 +7,9 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer
         public const string DefaultLocale = "de";
 
         public int Dtype { get; set; }
-        public string Ref { get; set; }
+        public string Ref { get; set; } = null!;
         public Dictionary<string, string> Description { get; set; }
-        public string Icon { get; set; }
+        public string Icon { get; set; } = null!;
         public Dictionary<string, string> Label { get; set; }
 
         public CauseOfDeathDto()

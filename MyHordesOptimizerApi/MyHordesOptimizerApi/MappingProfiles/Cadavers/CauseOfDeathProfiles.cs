@@ -15,16 +15,16 @@ namespace MyHordesOptimizerApi.MappingProfiles.Cadavers
                 .ForMember(dest => dest.Icon, opt => opt.MapFrom(src => src.Icon))
                 .ForMember(dest => dest.Description, opt => opt.MapFrom(src => new Dictionary<string, string>() 
                 { 
-                    { "fr", src.DescriptionFr }, 
-                    { "en", src.DescriptionEn },
-                    { "es", src.DescriptionEs }, 
-                    { "de", src.DescriptionDe } 
+                    { "fr", src.DescriptionFr! }, 
+                    { "en", src.DescriptionEn! },
+                    { "es", src.DescriptionEs! }, 
+                    { "de", src.DescriptionDe! } 
                 }))
                 .ForMember(dest => dest.Label, opt => opt.MapFrom(src => new Dictionary<string, string>() { 
-                    { "fr", src.LabelFr },
-                    { "en", src.LabelEn }, 
-                    { "es", src.LabelEs }, 
-                    { "de", src.LabelDe } 
+                    { "fr", src.LabelFr! },
+                    { "en", src.LabelEn! }, 
+                    { "es", src.LabelEs! }, 
+                    { "de", src.LabelDe! } 
                 }));
 
         }

@@ -1,0 +1,55 @@
+:host {
+    display: block;
+
+    .header {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.5em;
+
+        h3 {
+            margin: 0;
+        }
+    }
+
+    .draft-note {
+        opacity: 0.85;
+    }
+
+    .departure,
+    .member {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.25em 1em;
+        margin: 0.5em 0;
+
+        img {
+            vertical-align: middle;
+        }
+
+        .forbidden {
+            opacity: 0.5;
+        }
+    }
+
+    .bag {
+        display: inline-flex;
+        flex-wrap: wrap;
+        gap: 0.25em 0.5em;
+
+        .bag-item.broken img {
+            border: 1px dotted var(--mho-danger);
+        }
+    }
+
+    .mates {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5em;
+    }
+
+    .free {
+        opacity: 0.7;
+    }
+}

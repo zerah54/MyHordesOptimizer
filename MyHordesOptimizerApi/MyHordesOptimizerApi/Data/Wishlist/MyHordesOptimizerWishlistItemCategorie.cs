@@ -9,10 +9,10 @@ namespace MyHordesOptimizerApi.Data.Wishlist
         public int Id { get; set; }
 
         [JsonProperty("name")]
-        public Dictionary<string,string> Name { get; set; }
+        public Dictionary<string,string> Name { get; set; } = null!;
 
         [JsonProperty("items")]
         /// <summary>Identités MyHordes des objets de la catégorie — voir le commentaire ci-dessus.</summary>
-        public List<string> Items { get; set; }
+        public List<string> Items { get; set; } = null!;
     }
 }

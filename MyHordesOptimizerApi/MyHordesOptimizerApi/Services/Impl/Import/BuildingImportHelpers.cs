@@ -24,7 +24,7 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
             int idBuilding,
             BuildingHardResourcesCodeModel hardResources,
             IReadOnlyDictionary<string, int> clesItemParUid,
-            ILogger logger = null)
+            ILogger? logger = null)
         {
             var resultat = new List<BuildingRessource>();
 
@@ -62,7 +62,7 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
         public static List<BuildingAvailability> ConstruireDisponibilite(
             Dictionary<string, Dictionary<string, string>> buildingAvailability,
             IReadOnlyDictionary<string, int> clesParUid,
-            ILogger logger = null)
+            ILogger? logger = null)
         {
             var resultat = new List<BuildingAvailability>();
 

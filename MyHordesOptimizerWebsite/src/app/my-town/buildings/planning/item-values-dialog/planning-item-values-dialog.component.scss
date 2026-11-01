@@ -1,0 +1,22 @@
+:host {
+    display: block;
+
+    table.summary {
+        width: 100%;
+        margin-bottom: 1em;
+        border-collapse: collapse;
+
+        td {
+            padding: 0.25em 0.5em;
+            vertical-align: middle;
+        }
+    }
+
+    .add {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 1em;
+        margin: 0.5em 0;
+    }
+}

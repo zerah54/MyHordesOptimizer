@@ -15,6 +15,7 @@ import { AnalyticsService } from './_core/services/analytics.service';
 import { errorInterceptor } from './_core/services/errors-interceptor.service';
 import { headersInterceptor } from './_core/services/headers-interceptor.service';
 import { loadingInterceptor } from './_core/services/loading-interceptor.service';
+import { MapThemeStateService } from './_core/services/map-theme-state.service';
 import { ReloadableRouteReuseStrategy } from './_core/services/page-reload.service';
 import { ROUTES, ROUTES_OPTIONS } from './routes';
 
@@ -38,6 +39,7 @@ export const appConfig: ApplicationConfig = {
             useFactory: (): string | null => localStorage.getItem('mho-locale') || 'fr'
         },
         provideAppInitializer(() => {inject(Sentry.TraceService);}),
+        provideAppInitializer(() => { inject(MapThemeStateService); }),
         {
             provide: ErrorHandler,
             useValue: Sentry.createErrorHandler(),

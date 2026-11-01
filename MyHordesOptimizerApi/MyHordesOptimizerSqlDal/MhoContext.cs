@@ -127,6 +127,10 @@ public partial class MhoContext : DbContext
 
     public virtual DbSet<UserNote> UserNotes { get; set; }
 
+    public virtual DbSet<UserMapTheme> UserMapThemes { get; set; }
+
+    public virtual DbSet<UserMapThemePreference> UserMapThemePreferences { get; set; }
+
     public virtual DbSet<WishlistCategorie> WishlistCategories { get; set; }
 
     public virtual DbSet<MinesweeperGame> MinesweeperGames { get; set; }
@@ -138,6 +142,14 @@ public partial class MhoContext : DbContext
     public virtual DbSet<MapRouteShare> MapRouteShares { get; set; }
 
     public virtual DbSet<MapRouteGame> MapRouteGames { get; set; }
+
+    public virtual DbSet<TownBuilding> TownBuildings { get; set; }
+
+    public virtual DbSet<TownDefense> TownDefenses { get; set; }
+
+    public virtual DbSet<TownBuildingPlan> TownBuildingPlans { get; set; }
+
+    public virtual DbSet<TownBuildingPlanSettings> TownBuildingPlanSettings { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

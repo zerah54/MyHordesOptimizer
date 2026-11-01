@@ -1,0 +1,84 @@
+<h2 mat-dialog-title i18n>Ajouter une consigne individuelle</h2>
+<mat-dialog-content>
+    <p class="target">
+        <ng-container i18n>Citoyens visés :</ng-container>
+        <strong>{{ data.user_ids.length }}</strong></p>
+    <div class="fields">
+        <mat-form-field appearance="outline" subscriptSizing="dynamic">
+            <mat-label i18n>Type</mat-label>
+            <mat-select data-field="bulk-kind" [value]="kind()" (selectionChange)="setKind($event.value)">
+                <mat-option value="home" i18n>Maison</mat-option>
+                <mat-option value="homeUpgrade" i18n>Amélioration de maison</mat-option>
+                <mat-option value="action" [disabled]="action_options().length === 0">
+                    <ng-container i18n>Action de chantier</ng-container>
+                </mat-option>
+                <mat-option value="free" i18n>Libre</mat-option>
+            </mat-select>
+        </mat-form-field>
+
+        @switch (kind()) {
+            @case ('action') {
+                <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                    <mat-label i18n>Action de chantier</mat-label>
+                    <mat-select data-field="bulk-action" [value]="action_key()" (selectionChange)="action_key.set($event.value)">
+                        @for (action of action_options(); track action.key) {
+                            <mat-option [value]="action.key">{{ action.getLabel() }}</mat-option>
+                        }
+                    </mat-select>
+                </mat-form-field>
+            }
+            @case ('homeUpgrade') {
+                <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                    <mat-label i18n>Amélioration de maison</mat-label>
+                    <mat-select data-field="bulk-upgrade" [value]="upgrade_key()" (selectionChange)="upgrade_key.set($event.value); level.set(null)">
+                        @for (option of store.home_upgrades(); track option.key) {
+                            <mat-option [value]="option.key">{{ option.label }}</mat-option>
+                        }
+                    </mat-select>
+                </mat-form-field>
+                @if (upgrade(); as upgrade) {
+                    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                        <mat-label i18n>Niveau visé</mat-label>
+                        <mat-select data-field="bulk-level" [value]="level()" (selectionChange)="level.set($event.value)">
+                            @for (option of upgrade.levels; track option.level) {
+                                <mat-option [value]="option.level">
+                                    <ng-container i18n>niv.</ng-container>
+                                    {{ option.level }} ({{ option.ap }}
+                                    <ng-container i18n>PA</ng-container>
+                                    )
+                                </mat-option>
+                            }
+                        </mat-select>
+                    </mat-form-field>
+                }
+            }
+            @case ('home') {
+                <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                    <mat-label i18n>Niveau visé</mat-label>
+                    <mat-select data-field="bulk-level" [value]="level()" (selectionChange)="level.set($event.value)">
+                        @for (home of home_levels(); track home.level) {
+                            <mat-option [value]="home.level">{{ home.label }} ({{ home.ap }}
+                                <ng-container i18n>PA</ng-container>
+                                )
+                            </mat-option>
+                        }
+                    </mat-select>
+                </mat-form-field>
+            }
+            @default {
+                <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                    <mat-label i18n>Consigne</mat-label>
+                    <input matInput type="text" maxlength="64" data-field="bulk-label" [value]="label()" (input)="label.set($any($event.target).value)">
+                </mat-form-field>
+                <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                    <mat-label i18n>PA</mat-label>
+                    <input matInput type="number" min="0" data-field="bulk-pa" [value]="pa()" (input)="onPa($any($event.target).value)">
+                </mat-form-field>
+            }
+        }
+    </div>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+    <button mat-button type="button" mat-dialog-close i18n>Annuler</button>
+    <button mat-flat-button type="button" data-action="bulk-confirm" [disabled]="!valid()" (click)="confirm()" i18n>Ajouter</button>
+</mat-dialog-actions>

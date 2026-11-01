@@ -1,6 +1,6 @@
 import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, DestroyRef, inject, model, ModelSignal, OnInit, Signal, signal, WritableSignal } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -11,12 +11,10 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatMenuModule } from '@angular/material/menu';
-import { MatSelectModule } from '@angular/material/select';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
-import { MatTabChangeEvent, MatTabsModule } from '@angular/material/tabs';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import moment from 'moment';
-import { firstValueFrom } from 'rxjs';
+import { firstValueFrom, map } from 'rxjs';
 
 import { environment } from '../../../environments/environment';
 import { EXPEDITIONS_EDITION_MODE_KEY, FAVORITE_EXPEDITION_ITEMS_UID, HORDES_IMG_REPO } from '../../_abstract_model/const';
@@ -24,9 +22,10 @@ import { HeroicActionEnum } from '../../_abstract_model/enum/heroic-action.enum'
 import { JobEnum } from '../../_abstract_model/enum/job.enum';
 import { ExpeditionOrdersUpdate, RealtimeExpeditionsService } from '../../_abstract_model/realtime-services/realtime-expeditions.service';
 import { ApiService } from '../../_abstract_model/services/api.service';
+import { BuiltBuildingsService } from '../../_abstract_model/services/built-buildings.service';
 import { ExpeditionService } from '../../_abstract_model/services/expedition.service';
 import { TownService } from '../../_abstract_model/services/town.service';
-import { Imports, ListForAddRemove, SpRequirementOperator } from '../../_abstract_model/types/_types';
+import { ExpeditionDuplicateChoices, Imports, ListForAddRemove, SpRequirementOperator } from '../../_abstract_model/types/_types';
 import { BankInfo } from '../../_abstract_model/types/bank-info.class';
 import { Citizen } from '../../_abstract_model/types/citizen.class';
 import { CitizenExpedition } from '../../_abstract_model/types/citizen-expedition.class';
@@ -52,6 +51,8 @@ import { ActiveCitizensComponent } from '../../_shared/active-citizens/active-ci
 import { CompactStepperComponent } from '../../_shared/compact-stepper/compact-stepper.component';
 import { CompassRoseComponent } from '../../_shared/compass-rose/compass-rose.component';
 import { ConfirmDialogComponent, ConfirmDialogData } from '../../_shared/confirm-dialog/confirm-dialog.component';
+import { DaySelectorComponent } from '../../_shared/day-selector/day-selector.component';
+import { DaysUpToPipe } from '../../_shared/day-selector/days-up-to.pipe';
 import { IconApComponent } from '../../_shared/icon-ap/icon-ap.component';
 import { CountAvailableApPipe } from '../../_shared/list-elements-add-remove/count-available-ap.pipe';
 import { ListElementAddRemoveComponent } from '../../_shared/list-elements-add-remove/list-element-add-remove.component';
@@ -61,31 +62,36 @@ import { MapRoutesStore } from '../map/map-routes/map-routes.store';
 import { CitizensForExpePipe, FormatPreRegisteredPipe, SomeHeroicActionNeededPipe } from './citizens-for-expe.pipe';
 import { EditOrdersComponent, EditOrdersData } from './edit-orders/edit-orders.component';
 import { EditPositionsComponent, EditPositionsData } from './edit-positions/edit-positions.component';
+import { ExpeditionDuplicateDialogComponent, ExpeditionDuplicateDialogData } from './expedition-duplicate-dialog/expedition-duplicate-dialog.component';
 import { ExpeditionOrderComponent } from './expedition-order/expedition-order.component';
 import { cloneOrder, generalOrders, ruinVisitsOf, sortOrdersByRoute, withCellOrders } from './expedition-orders/expedition-orders.util';
 import { ExpeditionPartRouteComponent } from './expedition-part-route/expedition-part-route.component';
-import { ApCheck, apCheck, ApLeg, meetsRequirements, startingSp } from './expedition-resources.util';
+import {
+    ApCheck,
+    apCheck,
+    ApLeg,
+    meetsRequirements,
+    nextSpOperator,
+    scoutsLairBuilt,
+    SpOperator,
+    spOperatorOf,
+    spRequirementLabel,
+    startingSp
+} from './expedition-resources.util';
 import { ExpeditionRoadbookComponent } from './expedition-roadbook/expedition-roadbook.component';
 import { isDayEditable } from './expeditions.utils';
 import { TotalPdcPipe } from './total-pdc.pipe';
-
-/** Opérateurs d'exigence de PE et leur symbole, « au moins » (valeur par défaut) en tête. */
-const SP_OPERATORS: readonly { readonly value: SpRequirementOperator; readonly symbol: string }[] = [
-    { value: 'min', symbol: '≥' },
-    { value: 'max', symbol: '≤' },
-    { value: 'exact', symbol: '=' }
-];
 
 /** Exigences d'une place, communes aux places de même rang de toutes les parties. */
 type PlaceRequirement = Partial<Pick<CitizenExpedition, 'required_sp' | 'required_sp_operator' | 'requires_shoes'>>;
 
 const angular_common: Imports = [CommonModule, FormsModule, NgOptimizedImage];
 const components: Imports = [
-    ActiveCitizensComponent, CompactStepperComponent, ExpeditionOrderComponent, ExpeditionPartRouteComponent, ExpeditionRoadbookComponent, IconApComponent, ListElementAddRemoveComponent,
+    ActiveCitizensComponent, CompactStepperComponent, DaySelectorComponent, ExpeditionOrderComponent, ExpeditionPartRouteComponent, ExpeditionRoadbookComponent, IconApComponent, ListElementAddRemoveComponent,
     SelectComponent, TriStateCheckboxComponent
 ];
-const pipes: Imports = [CitizensForExpePipe, CitizenFromIdPipe, CompassRoseComponent, FormatPreRegisteredPipe, JobFromIdPipe, SomeHeroicActionNeededPipe, TotalPdcPipe];
-const material_modules: Imports = [MatButtonModule, MatCardModule, MatCheckboxModule, MatExpansionModule, MatFormFieldModule, MatIconModule, MatInputModule, MatMenuModule, MatSelectModule, MatSlideToggleModule, MatTabsModule, MatTooltipModule];
+const pipes: Imports = [CitizensForExpePipe, CitizenFromIdPipe, CompassRoseComponent, DaysUpToPipe, FormatPreRegisteredPipe, JobFromIdPipe, SomeHeroicActionNeededPipe, TotalPdcPipe];
+const material_modules: Imports = [MatButtonModule, MatCardModule, MatCheckboxModule, MatExpansionModule, MatFormFieldModule, MatIconModule, MatInputModule, MatMenuModule, MatSlideToggleModule, MatTooltipModule];
 
 @Component({
     selector: 'mho-expeditions',
@@ -103,7 +109,7 @@ export class ExpeditionsComponent implements OnInit {
         .filter((action: HeroicActionEnum) => action.value.count_in_daily && action.value.action !== ''));
 
     public edition_mode: ModelSignal<boolean> = model(JSON.parse(localStorage.getItem(EXPEDITIONS_EDITION_MODE_KEY) || 'false'));
-    public selected_tab_index: ModelSignal<number> = model(this.currentDay() - 1);
+    protected readonly selected_day: WritableSignal<number> = signal(this.currentDay());
 
     protected all_citizens: WritableSignal<Citizen[]> = signal([]);
     protected all_citizens_job: WritableSignal<JobEnum[]> = signal([]);
@@ -126,7 +132,11 @@ export class ExpeditionsComponent implements OnInit {
     protected readonly shoe_icon: Signal<string> = computed((): string => this.all_items().find((item: Item): boolean => item.uid === 'shoe_#00')?.img ?? '');
     /** Nom de l'objet « Chaussures de sport usées » (`shoe_#00`) dans la langue du site. */
     protected readonly shoe_label: Signal<string> = computed((): string => localizedLabel(this.all_items().find((item: Item): boolean => item.uid === 'shoe_#00')?.label, moment.locale()));
-    protected readonly sp_operators: typeof SP_OPERATORS = SP_OPERATORS;
+    /** Repaire des Éclaireurs construit : sans lui, pas de cartographie supposée pour un jour futur. */
+    protected readonly scouts_lair_built: Signal<boolean> = toSignal(
+        inject(BuiltBuildingsService).builtUids().pipe(map(scoutsLairBuilt)),
+        { initialValue: false }
+    );
     /** PA apportés par un sac, pour l'avertissement de PA. */
     private readonly count_available_ap: CountAvailableApPipe = new CountAvailableApPipe();
 
@@ -200,9 +210,9 @@ export class ExpeditionsComponent implements OnInit {
                 }
             });
 
-        const existing_expeditions: Expedition[] = await firstValueFrom(this.expedition_service.getExpeditions(this.selected_tab_index() + 1));
+        const existing_expeditions: Expedition[] = await firstValueFrom(this.expedition_service.getExpeditions(this.selected_day()));
         this.expeditions.set([...existing_expeditions]);
-        this.updateEditableForIndex(this.selected_tab_index());
+        this.updateEditableForDay(this.selected_day());
 
         // Simple observateur : pas de synchro temps réel (le hub suit la ville du jeton, pas la ville observée)
         // et aucune édition possible. Une ancienne ville est suivie par le hub (TownObserverComponent).
@@ -237,14 +247,19 @@ export class ExpeditionsComponent implements OnInit {
         return getTown()?.day || 1;
     }
 
+    /** Dernier jour proposé : le lendemain du jour affiché, sans limite dans le futur. */
+    protected lastDay(): number {
+        return Math.max(this.currentDay(), this.selected_day()) + 1;
+    }
+
     /** La personne connectée remplit les exigences de la place (faux si elle n'est pas parmi les citoyens). */
-    protected canJoin(place: CitizenExpedition): boolean {
+    protected canJoin(place: CitizenExpedition, expedition_day: number): boolean {
         const citizen: Citizen | undefined = getCitizenFromId(this.all_citizens(), this.me()?.id);
-        return citizen !== undefined && meetsRequirements(citizen, place);
+        return citizen !== undefined && meetsRequirements(citizen, place, expedition_day, this.currentDay(), this.scouts_lair_built());
     }
 
     /** Coût en PA de la place affichée (partie `part_index`, rang `citizen_index`) : sa personne sur ses parties, avec les ressources de sa première place ; place vide : les places vides de ce rang. `null` sans tracé, ou sans personne ni exigence de PE. */
-    protected apWarning(expedition: Expedition, part_index: number, citizen_index: number): ApCheck | null {
+    protected apWarning(expedition: Expedition, part_index: number, citizen_index: number, expedition_day: number): ApCheck | null {
         const town: MapRoutePoint | null = this.town_position();
         const row: CitizenExpedition | undefined = expedition.parts[part_index]?.citizens[citizen_index];
         if (!town || !row || !expedition.parts.some((part: ExpeditionPart): boolean => !!part.map_route)) return null;
@@ -258,7 +273,7 @@ export class ExpeditionsComponent implements OnInit {
         const place: CitizenExpedition = (person_id ? part_places.find((candidate: CitizenExpedition | undefined): boolean => candidate !== undefined) : undefined) ?? row;
 
         const citizen: Citizen | undefined = getCitizenFromId(this.all_citizens(), place.citizen_id);
-        const sp: number | undefined = place.required_sp ?? (citizen ? startingSp(citizen) : undefined);
+        const sp: number | undefined = place.required_sp ?? (citizen ? startingSp(citizen, expedition_day, this.currentDay(), this.scouts_lair_built()) : undefined);
         if (sp === undefined) return null;
 
         const legs: ApLeg[] = expedition.parts.flatMap((part: ExpeditionPart, index: number): ApLeg[] => {
@@ -274,18 +289,27 @@ export class ExpeditionsComponent implements OnInit {
     }
 
     /** PE de la place hors édition : l'exigence et son symbole, sinon les PE calculés de la personne placée. */
-    protected spDisplay(place: CitizenExpedition): string {
-        if (place.required_sp !== undefined && place.required_sp !== null) {
-            const symbol: string = (SP_OPERATORS.find((operator: { value: SpRequirementOperator }): boolean => operator.value === place.required_sp_operator) ?? SP_OPERATORS[0]).symbol;
-            return `${symbol} ${place.required_sp}`;
-        }
+    protected spDisplay(place: CitizenExpedition, expedition_day: number): string {
+        const label: string | null = spRequirementLabel(place);
+        if (label !== null) return label;
         const citizen: Citizen | undefined = getCitizenFromId(this.all_citizens(), place.citizen_id);
-        return citizen ? `${startingSp(citizen)}` : '';
+        return citizen ? `${startingSp(citizen, expedition_day, this.currentDay(), this.scouts_lair_built())}` : '';
     }
 
-    /** Exigence de PE au rang `citizen_index` ; sans opérateur, les places n'en ont plus. */
-    protected async saveSpRequirement(expedition: Expedition, citizen_index: number, required_sp: number, operator: SpRequirementOperator | null): Promise<void> {
-        await this.saveRequirement(expedition, citizen_index, { required_sp: operator === null ? undefined : required_sp, required_sp_operator: operator ?? undefined });
+    /** Opérateur de PE affiché sur une place. */
+    protected spOperator(place: CitizenExpedition): SpOperator {
+        return spOperatorOf(place);
+    }
+
+    /** Passe l'exigence de PE du rang `citizen_index` à l'opérateur suivant. */
+    protected async cycleSpOperator(expedition: Expedition, citizen_index: number, place: CitizenExpedition): Promise<void> {
+        await this.saveSpRequirement(expedition, citizen_index, place.required_sp ?? 0, nextSpOperator(place));
+    }
+
+    /** Exigence de PE au rang `citizen_index` ; « au moins 0 » n'exige rien : les places n'en ont plus et l'avertissement de PA reprend les PE calculés. */
+    protected async saveSpRequirement(expedition: Expedition, citizen_index: number, required_sp: number, operator: SpRequirementOperator): Promise<void> {
+        const no_requirement: boolean = operator === 'min' && required_sp === 0;
+        await this.saveRequirement(expedition, citizen_index, no_requirement ? { required_sp: undefined, required_sp_operator: undefined } : { required_sp, required_sp_operator: operator });
     }
 
     /** Exigence posée au rang `citizen_index` : recopiée sur la place de même rang de chaque partie, enregistrée avec son propre objet. */
@@ -298,9 +322,9 @@ export class ExpeditionsComponent implements OnInit {
         }
     }
 
-    /** Un onglet n'est éditable que si son jour n'est pas déjà passé pour la ville. */
-    private updateEditableForIndex(tab_index: number): void {
-        this.editable.set(this.can_contribute() && isDayEditable(tab_index + 1, this.currentDay()));
+    /** Un jour n'est éditable que s'il n'est pas déjà passé pour la ville. */
+    private updateEditableForDay(day: number): void {
+        this.editable.set(this.can_contribute() && isDayEditable(day, this.currentDay()));
     }
 
     private subscribeToRealtimeExpeditions(): void {
@@ -591,10 +615,18 @@ export class ExpeditionsComponent implements OnInit {
         localStorage.setItem(EXPEDITIONS_EDITION_MODE_KEY, JSON.stringify(this.edition_mode()));
     }
 
-    protected async changeTab(event: MatTabChangeEvent): Promise<void> {
-        const existing_expeditions: Expedition[] = await firstValueFrom(this.expedition_service.getExpeditions(this.selected_tab_index() + 1));
+    /**
+     * Affiche un autre jour ; la réponse d'un jour quitté entre-temps est ignorée.
+     * @param {number} day Jour à afficher.
+     */
+    protected async changeDay(day: number): Promise<void> {
+        this.selected_day.set(day);
+        const existing_expeditions: Expedition[] = await firstValueFrom(this.expedition_service.getExpeditions(day));
+        if (day !== this.selected_day()) {
+            return;
+        }
         this.expeditions.set([...existing_expeditions]);
-        this.updateEditableForIndex(event.index);
+        this.updateEditableForDay(day);
     }
 
     protected changeExpeditionState(expedition: Expedition, event: boolean): void {
@@ -604,7 +636,7 @@ export class ExpeditionsComponent implements OnInit {
 
     /** Importe les expéditions depuis celles du jour sélectionné */
     protected async importExpeditions(day: number): Promise<void> {
-        await this.realtime_expeditions_service.copyExpeditions(day, this.selected_tab_index() + 1);
+        await this.realtime_expeditions_service.copyExpeditions(day, this.selected_day());
     }
 
     protected addNewMemberToExpedition(expedition: Expedition, citizen_to_copy?: CitizenExpedition): void {
@@ -625,7 +657,7 @@ export class ExpeditionsComponent implements OnInit {
     }
 
     protected async addNewExpedition(): Promise<void> {
-        await this.realtime_expeditions_service.updateExpedition(this.selected_tab_index() + 1, new Expedition());
+        await this.realtime_expeditions_service.updateExpedition(this.selected_day(), new Expedition());
     }
 
     protected async addNewExpeditionPart(expedition: Expedition): Promise<void> {
@@ -635,6 +667,23 @@ export class ExpeditionsComponent implements OnInit {
 
     protected async removeCitizenFromPart(citizen: CitizenExpedition): Promise<void> {
         await this.realtime_expeditions_service.deleteExpeditionCitizen(citizen);
+    }
+
+    /** Demande ce que reprend la copie, puis la crée en dernière position : elle arrive par le hub. */
+    protected duplicateExpedition(expedition: Expedition): void {
+        const has_route: boolean = expedition.parts.some((part: ExpeditionPart): boolean => part.map_route_id !== null);
+        this.dialog
+            .open<ExpeditionDuplicateDialogComponent, ExpeditionDuplicateDialogData, ExpeditionDuplicateChoices>(ExpeditionDuplicateDialogComponent, {
+                data: { hasRoute: has_route }
+            })
+            .afterClosed()
+            .pipe(takeUntilDestroyed(this.destroy_ref))
+            .subscribe(async (choices: ExpeditionDuplicateChoices | undefined): Promise<void> => {
+                if (choices) {
+                    const label: string | null = expedition.label ? $localize`${expedition.label}:label: (copie)` : null;
+                    await this.realtime_expeditions_service.duplicateExpedition(expedition, label, choices);
+                }
+            });
     }
 
     protected removeExpedition(expedition: Expedition): void {
@@ -830,7 +879,7 @@ export class ExpeditionsComponent implements OnInit {
     }
 
     protected async saveExpedition(expedition: Expedition): Promise<void> {
-        await this.realtime_expeditions_service.updateExpedition(this.selected_tab_index() + 1, expedition);
+        await this.realtime_expeditions_service.updateExpedition(this.selected_day(), expedition);
     }
 
     protected async saveExpeditionPart(expedition: Expedition, expedition_part: ExpeditionPart): Promise<void> {
@@ -880,7 +929,7 @@ export class ExpeditionsComponent implements OnInit {
     }
 
     protected shareExpeditionForum(): void {
-        let text: string = `[big][b][i]${$localize`Expéditions (J${this.selected_tab_index() + 1})`}[/i][/b][/big]\n`;
+        let text: string = `[big][b][i]${$localize`Expéditions (J${this.selected_day()})`}[/i][/b][/big]\n`;
 
         const pre_registered: Citizen[] = this.registered;
         text += `\n[rp=${$localize`Inscrits`}]\n`;

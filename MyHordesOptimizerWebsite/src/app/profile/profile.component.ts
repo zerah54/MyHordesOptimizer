@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, DestroyRef, inject, OnInit, signal, WritableSignal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, DestroyRef, inject, OnInit, Signal, signal, WritableSignal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -47,16 +47,16 @@ export class ProfileComponent implements OnInit {
     /** Date du dernier import MyHordes (pictos + villes), affichée par le bouton de l'en-tête. */
     protected readonly importedAt: WritableSignal<string | null> = signal<string | null>(null);
     protected readonly importing: WritableSignal<boolean> = signal<boolean>(false);
-    protected readonly links: Link[] = [
-        {
-            label: $localize`Villes`,
-            link: 'towns'
-        },
-        {
-            label: $localize`Pictos`,
-            link: 'pictos'
+    protected readonly links: Signal<Link[]> = computed((): Link[] => {
+        const links: Link[] = [
+            { label: $localize`Villes`, link: 'towns' },
+            { label: $localize`Pictos`, link: 'pictos' }
+        ];
+        if (this.isSelf()) {
+            links.push({ label: $localize`Thème de la carte`, link: 'theme' });
         }
-    ];
+        return links;
+    });
     private readonly route: ActivatedRoute = inject(ActivatedRoute);
     private readonly service: UserAccountService = inject(UserAccountService);
     private readonly noteService: NoteService = inject(NoteService);

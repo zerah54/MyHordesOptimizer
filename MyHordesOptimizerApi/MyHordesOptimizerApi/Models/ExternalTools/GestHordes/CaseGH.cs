@@ -13,9 +13,9 @@ namespace MyHordesOptimizerApi.Models.ExternalTools.GestHordes
             Y = y;
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
-            return GetHashCode() == obj.GetHashCode();
+            return GetHashCode() == obj!.GetHashCode();
         }
 
         public override int GetHashCode()

@@ -10,7 +10,10 @@
                         <span class="label">{{ group.label }}</span>
                         <span class="count">{{ group.lines.length }}</span>
                     </div>
-                    @for (line of group.lines; track line.key) {
+                    @for (line of group.lines; track line.key; let index = $index) {
+                        @if (line.passage_label && (index === 0 || group.lines[index - 1].passage_label !== line.passage_label)) {
+                            <span class="passage">{{ line.passage_label }}</span>
+                        }
                         <mho-expedition-order [order]="line.entry.order" [items]="items()" [citizens]="citizens()"
                                               [expeditions]="expeditions()"
                                               [scope]="line.scope" [scopeIsMe]="!!line.scope"></mho-expedition-order>
@@ -42,7 +45,10 @@
                         <span class="swatch" [class.none]="!group.color"></span>
                         <span class="label">{{ group.label }}</span>
                     </div>
-                    @for (line of group.lines; track line.key) {
+                    @for (line of group.lines; track line.key; let index = $index) {
+                        @if (line.passage_label && (index === 0 || group.lines[index - 1].passage_label !== line.passage_label)) {
+                            <span class="passage">{{ line.passage_label }}</span>
+                        }
                         <div class="line">
                             <mho-expedition-order class="order" [order]="line.entry.order" [items]="items()" [citizens]="citizens()"
                                                   [expeditions]="expeditions()" [scope]="line.scope" [scopeIsMe]="!!line.scope" [checkable]="editable()"
@@ -64,7 +70,9 @@
                 @for (other of current.others; track other.key) {
                     <li class="other" [style.--group-color]="other.color">
                         <span class="dot" [class.none]="!other.color" aria-hidden="true"></span>
-                        <span class="other-text"><b>{{ other.who }}</b> — {{ other.text }}</span>
+                        <span class="other-text"><b>{{ other.who }}</b>@if (other.passage_label) {
+                            ({{ other.passage_label }})
+                        } — {{ other.text }}</span>
                         @if (editable()) {
                             <button mat-icon-button type="button" class="line-action" (click)="edit(other.entry)"
                                     [matTooltip]="edit_label" [attr.aria-label]="edit_label">

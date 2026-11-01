@@ -1,0 +1,154 @@
+<div class="drawer">
+    <header class="drawer-header">
+        <h2>
+            <ng-container i18n>Choisir des chantiers</ng-container>
+            @if (store.banned_pool_shown()) {
+                — {{ poolLabel() }}
+            }
+        </h2>
+        <button mat-icon-button type="button" data-action="close" (click)="close()" i18n-matTooltip matTooltip="Fermer">
+            <mat-icon>close</mat-icon>
+        </button>
+    </header>
+
+    <mho-planning-kpis class="drawer-kpis"/>
+
+    <div class="toolbar">
+        <mat-form-field class="search" appearance="outline" subscriptSizing="dynamic">
+            <mat-icon matPrefix>search</mat-icon>
+            <mat-label i18n>Rechercher</mat-label>
+            <input matInput type="text" data-field="search" [value]="search()" (input)="search.set($any($event.target).value)">
+        </mat-form-field>
+        <button mat-stroked-button type="button" data-action="unlocked-only" [class.on]="unlocked_only()" (click)="unlocked_only.set(!unlocked_only())">
+            <span class="label"><mat-icon>{{ unlocked_only() ? 'check_box' : 'check_box_outline_blank' }}</mat-icon><ng-container
+                i18n>Débloqués seulement</ng-container></span>
+        </button>
+        <button mat-stroked-button type="button" data-action="hide-built" [class.on]="hide_built()" (click)="hide_built.set(!hide_built())">
+            <span class="label"><mat-icon>{{ hide_built() ? 'check_box' : 'check_box_outline_blank' }}</mat-icon><ng-container
+                i18n>Masquer construits</ng-container></span>
+        </button>
+        <mat-button-toggle-group [value]="sort()" (change)="sort.set($event.value)" i18n-aria-label aria-label="Tri">
+            <mat-button-toggle value="tree" data-action="sort-tree" (click)="sort.set('tree')" i18n>Arbre</mat-button-toggle>
+            <mat-button-toggle value="ratio" data-action="sort-ratio" (click)="sort.set('ratio')" i18n>Déf / PA</mat-button-toggle>
+        </mat-button-toggle-group>
+    </div>
+
+    <div class="table-scroll">
+        <table class="tree">
+            <thead>
+            <tr>
+                <th></th>
+                <th i18n>Chantier</th>
+                <th i18n>Ville</th>
+                <th class="center" i18n>PA</th>
+                <th class="center" i18n>Déf</th>
+                <th class="center" i18n>PV</th>
+                @if (hard_mode) {
+                    <th class="center" i18n>Plan</th>
+                }
+                <th i18n>Ressources</th>
+                <th class="center" i18n>Déf/PA</th>
+                <th i18n>Programme</th>
+            </tr>
+            </thead>
+            <tbody>
+                @for (row of rows(); track row.id) {
+                    <tr class="building-row" [attr.data-building]="row.id" [class.checked]="row.checked">
+                        <td class="center">
+                            @if (row.togglable) {
+                                <mat-checkbox data-action="toggle" [checked]="row.checked" [disabled]="!store.can_edit()" (change)="toggle(row)"
+                                              [attr.aria-label]="row.name"/>
+                            }
+                        </td>
+                        <td>
+                            <div class="label-cell" [class.is-root]="row.building.depth === 0 && sort() === 'tree'">
+                                @for (level of depthLevels(row); track $index) {
+                                    <span class="guide"></span>
+                                }
+                                @if (sort() === 'tree') {
+                                    <span class="toggle">
+                                        @if (row.building.children.length > 0) {
+                                            <button mat-icon-button type="button" (click)="toggleBranch(row)" [attr.aria-expanded]="!collapsed().has(row.id)">
+                                                <mat-icon>{{ collapsed().has(row.id) ? 'chevron_right' : 'expand_more' }}</mat-icon>
+                                            </button>
+                                        }
+                                    </span>
+                                }
+                                @if (row.icon) {
+                                    <img class="building-icon" [src]="row.icon" alt="">
+                                }
+                                <span class="name">{{ row.name }}</span>
+                                @if (row.parentName) {
+                                    <span class="parent-hint">← {{ row.parentName }}</span>
+                                }
+                            </div>
+                        </td>
+                        <td>
+                            <span class="state" [attr.data-state]="row.state">
+                                @switch (row.state) {
+                                    @case ('built') {
+                                        <ng-container i18n>construit</ng-container> ·
+                                        <ng-container i18n>PV</ng-container> {{ row.life }} / {{ row.maxLife }}
+                                    }
+                                    @case ('in-progress') {
+                                        <ng-container i18n>reste</ng-container> {{ row.remaining }}
+                                        <ng-container i18n>PA</ng-container>
+                                    }
+                                    @case ('unlocked') {
+                                        <ng-container i18n>débloqué</ng-container>
+                                    }
+                                    @default {
+                                        <ng-container i18n>plan requis</ng-container>
+                                    }
+                                }
+                            </span>
+                        </td>
+                        <td class="center">{{ row.pa ?? '—' }}</td>
+                        <td class="center">
+                            @if (row.building.defence > 0) {
+                                {{ row.building.defence }}
+                            }
+                        </td>
+                        <td class="center">
+                            @if (row.building.max_life > 0) {
+                                {{ row.building.max_life }}
+                            }
+                        </td>
+                        @if (hard_mode) {
+                            <td class="center">
+                                @if (row.tier; as tier) {
+                                    <mho-compact-stepper [value]="tier.value" [min]="0" [max]="tier.max" [icon]="tier.icon" [disabled]="!store.can_edit()"
+                                                         (valueChange)="setTier(row, $event)" i18n-label label="Plans lus estimés"/>
+                                } @else {
+                                    <span class="dash">—</span>
+                                }
+                            </td>
+                        }
+                        <td>
+                            <ul class="resources">
+                                @for (resource of row.resources; track resource.itemId) {
+                                    <li [class.missing]="resource.missing" [matTooltip]="resource.label">
+                                        @if (resource.img) {
+                                            <img [src]="resource.img" [alt]="resource.label">
+                                        }
+                                        <span>×{{ resource.count }}</span>
+                                    </li>
+                                }
+                            </ul>
+                        </td>
+                        <td class="center"><span class="ratio">{{ ratioLabel(row.ratio) }}</span></td>
+                        <td>
+                            @for (tag of row.tags; track $index) {
+                                <span class="program-tag" [matTooltip]="tag.title">{{ tag.text }}</span>
+                            }
+                        </td>
+                    </tr>
+                } @empty {
+                    <tr>
+                        <td [attr.colspan]="hard_mode ? 10 : 9" class="empty" i18n>Aucun chantier ne correspond.</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

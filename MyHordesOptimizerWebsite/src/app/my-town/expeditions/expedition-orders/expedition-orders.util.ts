@@ -109,27 +109,44 @@ export function generalOrders(orders: readonly ExpeditionOrder[] | undefined): E
     return (orders ?? []).filter((order: ExpeditionOrder): boolean => !order.hasCell());
 }
 
-/** Rang de premier passage de chaque case du tracé, par clé de case. */
-export function firstPassageOf(route: readonly MapRoutePoint[]): Map<string, number> {
-    const first_passage: Map<string, number> = new Map<string, number>();
-    route.forEach((cell: MapRoutePoint, index: number): void => {
-        const key: string = cellKey(cell);
-        if (!first_passage.has(key)) first_passage.set(key, index);
+/** Index, dans l'ordre, des occurrences d'une case dans le tracé. */
+export function routeIndexesOf(route: readonly MapRoutePoint[], cell: MapRoutePoint): number[] {
+    const indexes: number[] = [];
+    route.forEach((point: MapRoutePoint, index: number): void => {
+        if (point.x === cell.x && point.y === cell.y) indexes.push(index);
     });
-    return first_passage;
+    return indexes;
+}
+
+/** Passage effectif d'une consigne : celui demandé (1 par défaut), replié sur le dernier passage ; `null` sans case ou hors tracé. */
+export function resolvedPassage(order: ExpeditionOrder, route: readonly MapRoutePoint[]): number | null {
+    const cell: MapRoutePoint | null = orderCell(order);
+    if (!cell) return null;
+    const occurrences: number = routeIndexesOf(route, cell).length;
+    return occurrences === 0 ? null : Math.min(order.passage ?? 1, occurrences);
+}
+
+/** Index du tracé où la consigne s'exécute ; `null` sans case ou hors tracé. */
+export function resolvedRouteIndex(order: ExpeditionOrder, route: readonly MapRoutePoint[]): number | null {
+    const passage: number | null = resolvedPassage(order, route);
+    const cell: MapRoutePoint | null = orderCell(order);
+    return passage === null || !cell ? null : routeIndexesOf(route, cell)[passage - 1];
+}
+
+/** Libellé d'un passage : « 1er passage », « 2e passage ». */
+export function passageLabel(passage: number): string {
+    return passage === 1 ? $localize`1er passage` : $localize`${passage}:passage:e passage`;
 }
 
 /**
- * Consignes rangées dans l'ordre du tracé : d'abord les générales, puis les consignes par case au premier passage
+ * Consignes rangées dans l'ordre du tracé : d'abord les générales, puis les consignes par case à leur passage
  * sur leur case, puis celles hors du tracé ; sans tracé, l'ordre d'origine (ordre de pose) est conservé.
  */
 export function sortOrdersByRoute(orders: readonly ExpeditionOrder[], route: readonly MapRoutePoint[] | null): ExpeditionOrder[] {
     if (!route || route.length === 0) return [...orders];
-    const first_passage: Map<string, number> = firstPassageOf(route);
     const rank: (order: ExpeditionOrder) => number = (order: ExpeditionOrder): number => {
-        const cell: MapRoutePoint | null = orderCell(order);
-        if (!cell) return -1;
-        return first_passage.get(cellKey(cell)) ?? Infinity;
+        if (!order.hasCell()) return -1;
+        return resolvedRouteIndex(order, route) ?? Infinity;
     };
     return [...orders].sort((a: ExpeditionOrder, b: ExpeditionOrder): number => rank(a) - rank(b) || a.position - b.position);
 }

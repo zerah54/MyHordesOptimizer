@@ -1,0 +1,134 @@
+<div class="header">
+    <h3>{{ label() }}</h3>
+    @if (!expedition().ready) {
+        <span class="mho-pill mho-pill--outline" i18n>En préparation</span>
+        <span class="draft-note" i18n>Le programme peut encore changer</span>
+    }
+</div>
+
+<mat-button-toggle-group [value]="view()" (change)="view.set($event.value)" aria-label="Vue" i18n-aria-label hideSingleSelectionIndicator>
+    <mat-button-toggle value="me">
+        <ng-container i18n>Moi</ng-container>
+    </mat-button-toggle>
+    <mat-button-toggle value="team">
+        <ng-container i18n>Toute l'équipe</ng-container>
+    </mat-button-toggle>
+</mat-button-toggle-group>
+
+<ng-template #planned let-place>
+    @if (job(place); as job) {
+        <span class="job"><img [src]="HORDES_IMG_REPO + job.value.img" alt=""> {{ job.value.label }}</span>
+    }
+    @if (skill(place); as skill) {
+        <span class="skill"><img [src]="HORDES_IMG_REPO + skill.value.img" alt=""> {{ skill.getLabel() }}</span>
+    } @else if (place.preinscrit_heroic_skill) {
+        <span class="skill">{{ place.preinscrit_heroic_skill }}</span>
+    }
+    <span class="ap"><ng-container i18n>PA</ng-container>
+        {{ place.base_ap ?? 6 }}</span>
+    @if (spRequirementLabel(place); as sp) {
+        <span class="sp"><ng-container i18n>PE</ng-container>
+            {{ sp }}</span>
+    }
+    @if (place.is_preinscrit_soif !== undefined && place.is_preinscrit_soif !== null) {
+        <span class="thirst">
+            <ng-container i18n>Soif</ng-container>
+            @if (place.is_preinscrit_soif) {
+                <ng-container i18n>Oui</ng-container>
+            } @else {
+                <ng-container i18n>Non</ng-container>
+            }
+        </span>
+    }
+    @if (place.requires_shoes === true) {
+        <span class="shoes">
+            @if (shoe_icon()) {
+                <img [src]="HORDES_IMG_REPO + shoe_icon()" alt="">
+            }
+            <ng-container i18n>Chaussures exigées</ng-container>
+        </span>
+    } @else if (place.requires_shoes === false) {
+        <span class="shoes forbidden">
+            @if (shoe_icon()) {
+                <img [src]="HORDES_IMG_REPO + shoe_icon()" alt="">
+            }
+            <ng-container i18n>Chaussures interdites</ng-container>
+        </span>
+    }
+    @if (bagOf(place); as bag) {
+        @if (bag.length > 0) {
+            <span class="bag">
+                <ng-container i18n>Sac</ng-container>
+                @for (line of bag; track line.key) {
+                    <span class="bag-item" [class.broken]="line.broken">
+                        <img [src]="HORDES_IMG_REPO + (line.item | itemImg:line.broken)" [alt]="itemLabel(line.item)">
+                        ×{{ line.count }}
+                    </span>
+                }
+            </span>
+        }
+    }
+</ng-template>
+
+<ng-template #orders let-list>
+    @for (order of list; track order.id) {
+        <mho-expedition-order class="order" [order]="order" [items]="items()" [citizens]="citizens()" [expeditions]="expeditions()"
+                              [town]="town_position()" [checkable]="checkable()" (doneChange)="toggleDone(order, $event)"></mho-expedition-order>
+    }
+</ng-template>
+
+@if (view() === 'me') {
+    <div class="departure">
+        <ng-container *ngTemplateOutlet="planned; context: { $implicit: expedition().departure }"></ng-container>
+    </div>
+
+    @if (my_general_orders().length > 0) {
+        <h3 i18n>Consignes de l'expédition</h3>
+        <ng-container *ngTemplateOutlet="orders; context: { $implicit: my_general_orders() }"></ng-container>
+    }
+
+    @for (mine of expedition().parts; track mine.part.id) {
+        <mho-expedition-roadbook class="roadbook" [part]="mine.part" [map]="map()" [ruins]="ruins()" [items]="items()" [citizens]="citizens()"
+                                 [expeditions]="expeditions()" [editable]="false" [checkable]="checkable()" [me]="me()"
+                                 [onlyUser]="me()"></mho-expedition-roadbook>
+    }
+
+    @if (mates().length > 0) {
+        <h3 i18n>Coéquipiers</h3>
+        <div class="mates">
+            @for (mate of mates(); track mate.id) {
+                @if (mate.citizen; as citizen) {
+                    <mho-citizen-chip [citizen]="citizen" [day]="day()"></mho-citizen-chip>
+                } @else {
+                    <span class="unknown">{{ mate.label }}</span>
+                }
+            }
+        </div>
+    }
+} @else {
+    @for (part of all_parts(); track part.id) {
+        <mho-expedition-roadbook class="roadbook" [part]="part" [map]="map()" [ruins]="ruins()" [items]="items()" [citizens]="citizens()"
+                                 [expeditions]="expeditions()" [editable]="false" [checkable]="checkable()" [me]="me()"></mho-expedition-roadbook>
+    }
+
+    @if (part_general_orders().length > 0) {
+        <h3 i18n>Consignes de l'expédition</h3>
+        <ng-container *ngTemplateOutlet="orders; context: { $implicit: part_general_orders() }"></ng-container>
+    }
+
+    @for (row of team_rows(); track row.place.id) {
+        <div class="member">
+            @if (row.place.citizen_id) {
+                @if (row.citizen; as citizen) {
+                    <mho-citizen-chip [citizen]="citizen" [day]="day()"></mho-citizen-chip>
+                } @else {
+                    <span class="unknown">{{ row.label }}</span>
+                }
+                <ng-container *ngTemplateOutlet="planned; context: { $implicit: row.departure }"></ng-container>
+                <ng-container *ngTemplateOutlet="orders; context: { $implicit: row.orders }"></ng-container>
+            } @else {
+                <span class="free" i18n>Place libre</span>
+            }
+        </div>
+    }
+}

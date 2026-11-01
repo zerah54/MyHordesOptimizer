@@ -505,3 +505,101 @@
         font-weight: 600;
     }
 }
+
+/* Formulaire de zone : rendu dans l'overlay du menu, hors de :host. */
+.zone-appearance {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    mat-form-field {
+        flex: 1;
+        min-width: 0;
+    }
+
+    /* Le style n'affiche qu'un trait : la place va au libellé de la couleur. */
+    mat-form-field:last-child {
+        flex: 0 0 84px;
+    }
+}
+
+.zone-custom-color {
+    flex: none;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: pointer;
+}
+
+.zone-items {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.zone-detail {
+    font-size: 11.5px;
+    color: var(--mho-text-muted);
+}
+
+.zone-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 40px;
+    padding-left: 8px;
+    --mat-icon-button-state-layer-size: 36px;
+}
+
+.zone-label {
+    flex: 1;
+    min-width: 0;
+}
+
+.zone-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 8px;
+}
+
+.zone-swatch {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    margin-right: 6px;
+    border-radius: 50%;
+    vertical-align: middle;
+    box-shadow: 0 0 0 1px var(--mho-text-muted);
+}
+
+.zone-line {
+    display: inline-block;
+    flex: none;
+    width: 28px;
+    margin-right: 6px;
+    border-top: 2px solid currentColor;
+    vertical-align: middle;
+}
+
+.zone-count-tooltip {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    max-width: 200px;
+    padding: 6px;
+    border: 1px solid var(--mho-line);
+    border-radius: var(--mho-radius-s);
+    background: var(--mho-surface);
+    box-shadow: 0 4px 12px rgb(0 0 0 / 35%);
+    pointer-events: none;
+}
+
+.zone-count {
+    padding: 0 8px;
+    border-radius: 10px;
+    background-color: var(--mho-accent-soft);
+    color: var(--mho-on-accent-soft);
+    font-weight: 600;
+}

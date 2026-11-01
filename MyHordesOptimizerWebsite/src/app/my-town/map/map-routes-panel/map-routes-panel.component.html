@@ -143,17 +143,18 @@
                             </mat-menu>
                             <mat-menu #colorMenu="matMenu">
                                 <ng-template matMenuContent>
-                                    <button mat-menu-item type="button" role="menuitemradio" class="color-option"
-                                            [attr.aria-checked]="!selected.view.has_personal_color"
-                                            (click)="personalColorChange.emit({ key: selected.view.key, color: null })">
-                                        <span class="color-option-content" [style.--mho-route-color]="selected.common_color_var">
-                                            <span class="swatch"></span>
-                                            <ng-container i18n>Couleur commune</ng-container>
-                                        </span>
-                                    </button>
+                                    @if (selected.view.color !== selected.view.common_color) {
+                                        <button mat-menu-item type="button" role="menuitemradio" class="color-option" aria-checked="false"
+                                                (click)="personalColorChange.emit({ key: selected.view.key, color: null })">
+                                            <span class="color-option-content" [style.--mho-route-color]="selected.common_color_var">
+                                                <span class="swatch"></span>
+                                                <ng-container i18n>Couleur d'origine</ng-container>
+                                            </span>
+                                        </button>
+                                    }
                                     @for (option of color_options; track option.color) {
                                         <button mat-menu-item type="button" role="menuitemradio" class="color-option"
-                                                [attr.aria-checked]="selected.view.has_personal_color && selected.view.color === option.color"
+                                                [attr.aria-checked]="selected.view.color === option.color"
                                                 (click)="personalColorChange.emit({ key: selected.view.key, color: option.color })">
                                             <span class="color-option-content" [style.--mho-route-color]="option.color_var">
                                                 <span class="swatch"></span>

@@ -2,11 +2,11 @@ import { TestBed } from '@angular/core/testing';
 import { MatDialog } from '@angular/material/dialog';
 import { of } from 'rxjs';
 
+import { RealtimeExpeditionsService } from '../../../_abstract_model/realtime-services/realtime-expeditions.service';
 import { CitizenExpedition } from '../../../_abstract_model/types/citizen-expedition.class';
 import { Expedition } from '../../../_abstract_model/types/expedition.class';
 import { ExpeditionOrder } from '../../../_abstract_model/types/expedition-order.class';
 import { ExpeditionPart } from '../../../_abstract_model/types/expedition-part.class';
-import { RealtimeExpeditionsService } from '../../../_abstract_model/realtime-services/realtime-expeditions.service';
 import { SnackbarService } from '../../../_core/services/snackbar.service';
 import { ExpeditionOrderFormData, ExpeditionOrderFormResult } from '../expedition-order-form/expedition-order-form.component';
 import { ExpeditionOrderEditorService, ExpeditionOrderMapContext } from './expedition-order-editor.service';
@@ -133,6 +133,20 @@ describe('ExpeditionOrderEditorService', (): void => {
         expect(calls.find(([c]): boolean => c === bob)![1].map((o: ExpeditionOrder): string => o.text)).toEqual(['Après']);
     });
 
+    it('keeps the pass of an order moved to another owner', async (): Promise<void> => {
+        const existing_order: ExpeditionOrder = order({ id: 5, passage: 2 });
+        const alice: CitizenExpedition = citizen(10, [existing_order]);
+        const bob: CitizenExpedition = citizen(12);
+        const expedition_part: ExpeditionPart = part({ citizens: [alice, bob] });
+        const existing: OwnedExpeditionOrder = { order: existing_order, owner: { kind: 'citizen', citizen: alice } };
+        dialogResult = { action: 'save', order: order({ id: 5, passage: 2 }), owner_ids: [12] };
+
+        await open(expedition_part, existing);
+
+        const calls: [CitizenExpedition, ExpeditionOrder[]][] = <[CitizenExpedition, ExpeditionOrder[]][]>updateCitizenOrders.mock.calls;
+        expect(calls.find(([c]: [CitizenExpedition, ExpeditionOrder[]]): boolean => c === bob)![1][0].passage).toBe(2);
+    });
+
     it('deletes an existing order from its owner', async (): Promise<void> => {
         const existing_order: ExpeditionOrder = order({ id: 5 });
         const alice: CitizenExpedition = citizen(10, [existing_order]);
@@ -154,5 +168,76 @@ describe('ExpeditionOrderEditorService', (): void => {
         await open(expedition_part);
 
         expect(errorSnackbar).toHaveBeenCalledTimes(1);
+    });
+
+    describe('passages of a route crossing a cell several times', (): void => {
+        const ROUTE_CELLS: { x: number; y: number }[] = [{ x: 10, y: 10 }, { x: 10, y: 9 }, { x: 10, y: 8 }, { x: 10, y: 9 }, { x: 10, y: 10 }];
+        const route_part: ExpeditionPart = part({ map_route: { id: 1, label: '', color: 'blue', cells: ROUTE_CELLS, length: 4, version: 1 } });
+
+        function formData(): ExpeditionOrderFormData {
+            return dialogOpen.mock.calls[0][1].data;
+        }
+
+        function labels(): string[] {
+            return formData().move_targets.map((target: { label: string }): string => target.label);
+        }
+
+        function existingAt(passage: number | null, x: number = 10, y: number = 9): OwnedExpeditionOrder {
+            return { order: order({ id: 7, x, y, passage }), owner: { kind: 'part', part: route_part } };
+        }
+
+        it('offers both passages of the cell when adding at the second one', async (): Promise<void> => {
+            await service.edit(route_part, { x: 10, y: 9 }, null, CONTEXT, 2);
+
+            expect(formData().passage).toBe(2);
+            expect(formData().move_targets.map((target: { passage: number | null }): number | null => target.passage)).toEqual([1, 2]);
+            expect(labels()[0]).toContain('1er passage');
+            expect(labels()[1]).toContain('2e passage');
+            expect(labels()[0]).toContain('1 PA');
+            expect(labels()[1]).toContain('3 PA');
+        });
+
+        it('defaults to the first passage when adding', async (): Promise<void> => {
+            await service.edit(route_part, { x: 10, y: 9 }, null, CONTEXT);
+
+            expect(formData().passage).toBe(1);
+        });
+
+        it('has no passage for a cell crossed once', async (): Promise<void> => {
+            await service.edit(route_part, { x: 10, y: 8 }, null, CONTEXT);
+
+            expect(formData().passage).toBeNull();
+            expect(formData().move_targets).toEqual([]);
+        });
+
+        it('lists every passage of the route in order when editing, without the current one', async (): Promise<void> => {
+            await service.edit(route_part, { x: 10, y: 9 }, existingAt(2), CONTEXT);
+
+            expect(formData().passage).toBe(2);
+            expect(labels().length).toBe(4);
+            expect(labels()[1]).toContain('1er passage');
+            expect(labels()[1]).toContain('1 PA');
+            expect(labels().some((label: string): boolean => label.includes('3 PA'))).toBe(false);
+            expect(labels()[3]).toContain('4 PA');
+        });
+
+        it('folds a stored passage beyond the route onto the last one', async (): Promise<void> => {
+            await service.edit(route_part, { x: 10, y: 9 }, existingAt(5), CONTEXT);
+
+            expect(formData().passage).toBe(2);
+        });
+
+        it('adds the order for two places at the chosen passage', async (): Promise<void> => {
+            const alice: CitizenExpedition = citizen(10);
+            const bob: CitizenExpedition = citizen(12);
+            const two: ExpeditionPart = part({ citizens: [alice, bob], map_route: route_part.map_route });
+            dialogResult = { action: 'save', order: order({ x: 10, y: 9, passage: 2 }), owner_ids: [10, 12] };
+
+            await service.edit(two, { x: 10, y: 9 }, null, CONTEXT, 2);
+
+            const calls: [CitizenExpedition, ExpeditionOrder[]][] = <[CitizenExpedition, ExpeditionOrder[]][]>updateCitizenOrders.mock.calls;
+            expect(calls.length).toBe(2);
+            calls.forEach(([, orders]: [CitizenExpedition, ExpeditionOrder[]]): void => expect(orders[0].passage).toBe(2));
+        });
     });
 });

@@ -34,7 +34,7 @@ namespace MyHordesOptimizerApi.MappingProfiles.Wishlists
                .ForMember(dest => dest.BankCount, opt => opt.MapFrom(src => src.IdItemNavigation.TownBankItems.Sum(bankItem => bankItem.Count)))
                .ForMember(dest => dest.BagCount, opt => opt.MapFrom(src => src.IdTownNavigation.TownCitizens
                     .Where(citizen => citizen.Dead != true && citizen.IdBagNavigation != null)
-                    .SelectMany(citizen => citizen.IdBagNavigation.BagItems)
+                    .SelectMany(citizen => citizen.IdBagNavigation!.BagItems)
                     .Where(bagItem => bagItem.IdItem == src.IdItem)
                     .Sum(bagItem => bagItem.Count)))
                .ForMember(dest => dest.BagCitizens, opt => opt.MapFrom(src => src.IdTownNavigation.TownCitizens
@@ -44,7 +44,7 @@ namespace MyHordesOptimizerApi.MappingProfiles.Wishlists
                     .ToList()))
                .ForMember(dest => dest.ChestCount, opt => opt.MapFrom(src => src.IdTownNavigation.TownCitizens
                     .Where(citizen => citizen.Dead != true && citizen.IdChestNavigation != null)
-                    .SelectMany(citizen => citizen.IdChestNavigation.ChestItems)
+                    .SelectMany(citizen => citizen.IdChestNavigation!.ChestItems)
                     .Where(chestItem => chestItem.IdItem == src.IdItem)
                     .Sum(chestItem => chestItem.Count)))
                .ForMember(dest => dest.ChestCitizens, opt => opt.MapFrom(src => src.IdTownNavigation.TownCitizens
@@ -80,7 +80,7 @@ namespace MyHordesOptimizerApi.MappingProfiles.Wishlists
                  .ForMember(dest => dest.IdCategory, opt => opt.MapFrom(src => src.IdCategory))
                  .ForMember(dest => dest.IdUserAuthor, opt => opt.MapFrom(src => src.IdUserAuthor))
                  .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
-                 .ForMember(dest => dest.Labels, opt => opt.MapFrom(src => new Dictionary<string, string>() { { "fr", src.LabelFr }, { "en", src.LabelEn }, { "es", src.LabelEs }, { "de", src.LabelDe } }))
+                 .ForMember(dest => dest.Labels, opt => opt.MapFrom(src => new Dictionary<string, string>() { { "fr", src.LabelFr! }, { "en", src.LabelEn! }, { "es", src.LabelEs! }, { "de", src.LabelDe! } }))
                  .ForMember(dest => dest.Items, opt => opt.MapFrom(src => src.IdItems.Select(item => item.IdItem).ToList()));                   
         }
 

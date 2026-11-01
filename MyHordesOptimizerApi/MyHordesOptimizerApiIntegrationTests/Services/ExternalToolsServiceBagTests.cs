@@ -64,7 +64,7 @@ namespace MyHordesOptimizerApiIntegrationTests.Services
             var reloadedContext = reloadedScope.ServiceProvider.GetRequiredService<MhoContext>();
             var citizen = reloadedContext.TownCitizens
                 .Include(c => c.IdBagNavigation)
-                .ThenInclude(b => b.BagItems)
+                .ThenInclude(b => b!.BagItems)
                 .Single(c => c.IdTown == townId && c.IdUser == userId);
 
             citizen.IdBagNavigation!.BagItems.Should().ContainSingle(bi => bi.IdItem == knownItem.IdItem && bi.Count == 3);

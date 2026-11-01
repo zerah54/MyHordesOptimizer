@@ -2,9 +2,9 @@
 {
     public class RuineOptiPathRequestDto
     {
-        public short[][] Map { get; set; }
-        public RuineCellDto[] Doors { get; set; }
-        public RuineCellDto Entrance { get; set; }
+        public short[][] Map { get; set; } = null!;
+        public RuineCellDto[] Doors { get; set; } = null!;
+        public RuineCellDto Entrance { get; set; } = null!;
     }
 
     public class RuineCellDto

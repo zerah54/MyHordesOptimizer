@@ -15,7 +15,7 @@ namespace MyHordesOptimizerApiIntegrationTests.Services
 
         private static ExternalToolUpdateState ToolOf(ExternalToolsUpdateJobState state, ExternalToolId tool)
         {
-            return state.Tools.SingleOrDefault(candidate => candidate.Tool == tool.ToContractId());
+            return state.Tools.SingleOrDefault(candidate => candidate.Tool == tool.ToContractId())!;
         }
 
         [Fact]

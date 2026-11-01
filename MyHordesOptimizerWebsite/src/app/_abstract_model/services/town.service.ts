@@ -389,9 +389,29 @@ export class TownService extends GlobalService {
         });
     }
 
+    /**
+     * Met à jour quelques champs de la maison d'un citoyen ; les champs absents ne sont pas touchés côté API.
+     * @param {number} citizen_id Identifiant du citoyen.
+     * @param {Record<string, number | boolean>} fields Valeurs par clé `HomeEnum`.
+     * @returns {Observable<UpdateInfo>} Information de mise à jour.
+     */
+    public updateHomeFields(citizen_id: number, fields: Record<string, number | boolean>): Observable<UpdateInfo> {
+        return new Observable((sub: Subscriber<UpdateInfo>) => {
+            super.post<UpdateInfoDTO>(this.API_URL + `/ExternalTools/home?townId=${getOwnTown()?.town_id}`, JSON.stringify({ userId: citizen_id, home: fields }))
+                .subscribe({
+                    next: (response: UpdateInfoDTO) => {
+                        sub.next(new UpdateInfo(response));
+                    },
+                    error: (error: HttpErrorResponse) => {
+                        sub.error(error);
+                    }
+                });
+        });
+    }
+
     public addDailyAction(citizen: Citizen, actionKey: string, day?: number): Observable<UpdateInfo> {
         return new Observable((sub: Subscriber<UpdateInfo>) => {
-            super.post<UpdateInfoDTO>(this.API_URL + `/town/${getOwnTown()?.town_id}/user/${citizen.id}/dailyAction/${actionKey}?day=${day ?? getOwnTown()?.day}`)
+            super.post<UpdateInfoDTO>(this.API_URL + `/town/${getOwnTown()?.town_id}/user/${citizen.id}/dailyAction/${encodeURIComponent(actionKey)}?day=${day ?? getOwnTown()?.day}`)
                 .subscribe({
                     next: (update_info: UpdateInfoDTO) => {
                         sub.next(new UpdateInfo(update_info));
@@ -405,7 +425,7 @@ export class TownService extends GlobalService {
 
     public removeDailyAction(citizen: Citizen, actionKey: string, day?: number): Observable<void> {
         return new Observable((sub: Subscriber<void>) => {
-            super.delete(this.API_URL + `/town/${getOwnTown()?.town_id}/user/${citizen.id}/dailyAction/${actionKey}?day=${day ?? getOwnTown()?.day}`)
+            super.delete(this.API_URL + `/town/${getOwnTown()?.town_id}/user/${citizen.id}/dailyAction/${encodeURIComponent(actionKey)}?day=${day ?? getOwnTown()?.day}`)
                 .subscribe({
                     next: () => {
                         sub.next();

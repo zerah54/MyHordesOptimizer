@@ -233,6 +233,10 @@ describe('DrawMapComponent', (): void => {
         const dialog: MatDialog = TestBed.inject(MatDialog);
         const replacement: Cell = newCell(0, 0, { nb_zombie: 9 });
         vi.spyOn(dialog, 'open').mockReturnValue(<never>{ afterClosed: () => of(replacement) });
+        const updated_cells: Cell[] = [];
+        fixture.componentInstance.cellUpdated.subscribe((cell: Cell): void => {
+            updated_cells.push(cell);
+        });
 
         fixture.debugElement.query(By.directive(MapCellDetailsComponent)).triggerEventHandler('updateRequested', undefined);
         fixture.detectChanges();
@@ -241,6 +245,7 @@ describe('DrawMapComponent', (): void => {
             data: expect.objectContaining({ cell: original })
         }));
         expect(testable.drawed_map()[0][0]).toBe(replacement);
+        expect(updated_cells).toEqual([replacement]);
         const rebound: MapCellComponent = fixture.debugElement.query(By.directive(MapCellComponent)).componentInstance;
         expect(rebound.cell()).toBe(replacement);
     });

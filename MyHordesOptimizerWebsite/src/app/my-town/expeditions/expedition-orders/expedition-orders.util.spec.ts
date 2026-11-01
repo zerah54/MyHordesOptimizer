@@ -5,7 +5,22 @@ import { CitizenExpedition } from '../../../_abstract_model/types/citizen-expedi
 import { ExpeditionOrder } from '../../../_abstract_model/types/expedition-order.class';
 import { ExpeditionPart } from '../../../_abstract_model/types/expedition-part.class';
 import { MapRoutePoint } from '../../../_abstract_model/types/map-route.class';
-import { canExcavate, cellOrdersOf, cloneOrder, generalOrders, isScavengerPlace, OwnedExpeditionOrder, ruinVisitAp, ruinVisitsOf, sortOrdersByRoute, withCellOrders } from './expedition-orders.util';
+import {
+    canExcavate,
+    cellOrdersOf,
+    cloneOrder,
+    generalOrders,
+    isScavengerPlace,
+    OwnedExpeditionOrder,
+    passageLabel,
+    resolvedPassage,
+    resolvedRouteIndex,
+    routeIndexesOf,
+    ruinVisitAp,
+    ruinVisitsOf,
+    sortOrdersByRoute,
+    withCellOrders
+} from './expedition-orders.util';
 
 function order(text: string, position: number, cell?: [number, number]): ExpeditionOrder {
     return new ExpeditionOrder({ id: position + 1, type: 'text', text, isDone: false, position, x: cell?.[0] ?? null, y: cell?.[1] ?? null });
@@ -141,6 +156,60 @@ describe('expedition-orders.util', (): void => {
             expect(canExcavate(Object.assign(new Cell(), { is_excavated: false }))).toBe(true);
             expect(canExcavate(Object.assign(new Cell(), { is_excavated: null }))).toBe(true);
             expect(canExcavate(undefined)).toBe(true);
+        });
+    });
+
+    describe('passages', (): void => {
+        const route: MapRoutePoint[] = [{ x: 10, y: 10 }, { x: 10, y: 9 }, { x: 10, y: 8 }, { x: 10, y: 9 }, { x: 10, y: 10 }];
+
+        function at(x: number, y: number, passage: number | null, text: string = 'o'): ExpeditionOrder {
+            return new ExpeditionOrder({ type: 'text', text, isDone: false, position: 0, x, y, passage });
+        }
+
+        it('lists the indexes of the occurrences of a cell', (): void => {
+            expect(routeIndexesOf(route, { x: 10, y: 9 })).toEqual([1, 3]);
+        });
+
+        it('resolves the passage to a route index, falling back to the last passage', (): void => {
+            expect(resolvedRouteIndex(at(10, 9, null), route)).toBe(1);
+            expect(resolvedRouteIndex(at(10, 9, 2), route)).toBe(3);
+            expect(resolvedRouteIndex(at(10, 9, 5), route)).toBe(3);
+            expect(resolvedPassage(at(10, 9, 5), route)).toBe(2);
+            expect(resolvedPassage(at(10, 9, null), route)).toBe(1);
+        });
+
+        it('resolves nothing off the route or without a cell', (): void => {
+            expect(resolvedRouteIndex(at(1, 1, 2), route)).toBeNull();
+            expect(resolvedPassage(at(1, 1, 2), route)).toBeNull();
+            expect(resolvedRouteIndex(order('general', 0), route)).toBeNull();
+        });
+
+        it('does not rewrite the stored passage on fallback', (): void => {
+            const stored: ExpeditionOrder = at(10, 9, 5);
+            resolvedRouteIndex(stored, route);
+            expect(stored.passage).toBe(5);
+        });
+
+        it('keeps the passage through clone and dto', (): void => {
+            expect(cloneOrder(at(10, 9, 2)).passage).toBe(2);
+            expect(new ExpeditionOrder(at(10, 9, 2).modelToDto()).passage).toBe(2);
+            expect(order('a', 0).passage).toBeNull();
+        });
+
+        it('labels a passage', (): void => {
+            expect(passageLabel(1)).toBe('1er passage');
+            expect(passageLabel(2)).toBe('2e passage');
+        });
+
+        it('sorts by resolved route index', (): void => {
+            const out: ExpeditionOrder = at(10, 9, 1, 'out');
+            const back: ExpeditionOrder = at(10, 9, 2, 'back');
+            const town_end: ExpeditionOrder = at(10, 10, 2, 'town_end');
+            const off: ExpeditionOrder = at(1, 1, null, 'off');
+            const general: ExpeditionOrder = order('general', 0);
+
+            expect(sortOrdersByRoute([back, town_end, off, general, out], route).map((item: ExpeditionOrder): string => item.text))
+                .toEqual(['general', 'out', 'back', 'town_end', 'off']);
         });
     });
 

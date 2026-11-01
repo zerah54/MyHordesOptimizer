@@ -8,7 +8,13 @@ import { Property } from '../../../_abstract_model/enum/property.enum';
 import { ExpeditionOrderKind, ExpeditionOrderType } from '../../../_abstract_model/types/_types';
 import { ExpeditionOrder } from '../../../_abstract_model/types/expedition-order.class';
 import { Item } from '../../../_abstract_model/types/item.class';
-import { EVERYONE, ExpeditionOrderFormComponent, ExpeditionOrderFormData, ExpeditionOrderFormKind, ExpeditionOrderFormResult } from './expedition-order-form.component';
+import {
+    EVERYONE,
+    ExpeditionOrderFormComponent,
+    ExpeditionOrderFormData,
+    ExpeditionOrderFormKind,
+    ExpeditionOrderFormResult
+} from './expedition-order-form.component';
 
 interface KindOption {
     readonly kind: ExpeditionOrderFormKind;
@@ -52,6 +58,7 @@ function data(overrides: Partial<ExpeditionOrderFormData> = {}): ExpeditionOrder
         can_explore: false,
         can_excavate: false,
         move_targets: [],
+        passage: null,
         members: [
             { id: 10, user_id: 42, label: 'Alice', is_scavenger: false },
             { id: 11, user_id: null, label: 'Place 2', is_scavenger: false },
@@ -91,6 +98,12 @@ describe('ExpeditionOrderFormComponent', (): void => {
     function result(): ExpeditionOrderFormResult {
         expect(close).toHaveBeenCalledTimes(1);
         return close.mock.calls[0][0];
+    }
+
+    /** Champ de choix de la case ou du passage (le dernier de la zone de contenu). */
+    function moveField(): HTMLElement {
+        const fields: NodeListOf<HTMLElement> = fixture.nativeElement.querySelectorAll('mat-dialog-content mat-form-field');
+        return fields[fields.length - 1];
     }
 
     function savedOrder(): ExpeditionOrder {
@@ -365,14 +378,98 @@ describe('ExpeditionOrderFormComponent', (): void => {
     it('moves the order to another cell of the route', (): void => {
         create(data({
             order: typedOrder('camp'),
-            move_targets: [{ cell: { x: 6, y: 6 }, label: '[2 ; 1]' }, { cell: { x: 7, y: 6 }, label: '[3 ; 1]' }]
+            move_targets: [{ cell: { x: 6, y: 6 }, passage: null, label: '[2 ; 1]' }, { cell: { x: 7, y: 6 }, passage: null, label: '[3 ; 1]' }]
         }));
-        expect(form.cell_key()).toBe('5,6');
+        expect(form.cell_key()).toBe('5,6#');
 
-        form.cell_key.set('7,6');
+        form.cell_key.set('7,6#');
         form.save();
 
-        expect(savedOrder()).toEqual(expect.objectContaining({ x: 7, y: 6 }));
+        expect(savedOrder()).toEqual(expect.objectContaining({ x: 7, y: 6, passage: null }));
+    });
+
+    it('saves the passage of the chosen option', (): void => {
+        create(data({
+            order: typedOrder('camp', { passage: 2 }),
+            passage: 2,
+            move_targets: [{ cell: { x: 5, y: 6 }, passage: 1, label: '1er' }, { cell: { x: 7, y: 6 }, passage: null, label: '[3 ; 1]' }]
+        }));
+        expect(form.cell_key()).toBe('5,6#2');
+
+        form.cell_key.set('5,6#1');
+        form.save();
+        expect(savedOrder()).toEqual(expect.objectContaining({ x: 5, y: 6, passage: 1 }));
+    });
+
+    it('keeps the passage when the option is unchanged', (): void => {
+        create(data({ order: typedOrder('camp', { passage: 2 }), passage: 2 }));
+
+        form.save();
+
+        expect(savedOrder().passage).toBe(2);
+    });
+
+    it('keeps a stored passage the route cannot resolve', (): void => {
+        create(data({ order: typedOrder('camp', { passage: 3 }), passage: null }));
+
+        form.save();
+
+        expect(savedOrder().passage).toBe(3);
+    });
+
+    it('adds an order without passage when the cell is crossed once', (): void => {
+        create(data({ order: null, passage: null }));
+        form.kind.set('camp');
+
+        form.save();
+
+        expect(savedOrder().passage).toBeNull();
+    });
+
+    it('lets the user go back to the current option after choosing another', (): void => {
+        create(data({
+            order: typedOrder('camp'),
+            move_targets: [{ cell: { x: 7, y: 6 }, passage: null, label: '[3 ; 1]' }]
+        }));
+        fixture.detectChanges();
+        moveField().querySelector<HTMLElement>('.mat-mdc-select-trigger')?.click();
+        fixture.detectChanges();
+        const current: HTMLElement | undefined = Array.from(document.querySelectorAll<HTMLElement>('.cdk-overlay-container mat-option'))
+            .find((option: HTMLElement): boolean => option.textContent?.includes('[1 ; 1]') === true);
+        expect(current?.getAttribute('aria-disabled')).toBe('false');
+
+        form.cell_key.set('7,6#');
+        form.cell_key.set('5,6#');
+        form.save();
+
+        expect(savedOrder()).toEqual(expect.objectContaining({ x: 5, y: 6, passage: null }));
+    });
+
+    it('adds an order on the second pass of a crossed cell', (): void => {
+        create(data({
+            order: null,
+            passage: 2,
+            move_targets: [{ cell: { x: 5, y: 6 }, passage: 1, label: '1er' }, { cell: { x: 5, y: 6 }, passage: 2, label: '2e' }]
+        }));
+        form.kind.set('camp');
+        expect(form.cell_key()).toBe('5,6#2');
+
+        form.save();
+
+        expect(savedOrder()).toEqual(expect.objectContaining({ x: 5, y: 6, passage: 2 }));
+    });
+
+    it('labels the choice Passage when adding and Case when editing', (): void => {
+        const targets: ExpeditionOrderFormData['move_targets'] = [{ cell: { x: 7, y: 6 }, passage: null, label: '[3 ; 1]' }];
+        create(data({ order: null, move_targets: targets }));
+        fixture.detectChanges();
+        expect(moveField().textContent).toContain('Passage');
+        fixture.destroy();
+        TestBed.resetTestingModule();
+
+        create(data({ order: typedOrder('camp'), move_targets: targets }));
+        fixture.detectChanges();
+        expect(moveField().textContent).toContain('Case');
     });
 
     it('closes with a deletion request', (): void => {

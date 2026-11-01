@@ -17,7 +17,7 @@ namespace MyHordesOptimizerApi.Services.Interfaces.ExternalTools
         /// Les unités doivent avoir été déclarées auprès du sink (voir ExternalToolsUpdatePlan.Declare)
         /// avant l'appel. La valeur nulle correspond à l'ancienne route, qui ne suit aucun avancement.
         /// </summary>
-        Task<UpdateResponseDto> UpdateExternalsTools(UpdateRequestDto updateRequestDto, IExternalToolsProgressSink sink = null);
+        Task<UpdateResponseDto> UpdateExternalsTools(UpdateRequestDto updateRequestDto, IExternalToolsProgressSink? sink = null);
         List<CaseGH> UpdateGHZoneRegen(UpdateZoneRegenDto requestDto);
         LastUpdateInfoDto UpdateCitizenBag(int townId, int userId, List<UpdateObjectDto> bag);
         LastUpdateInfoDto UpdateCitizenChest(int townId, int userId, List<UpdateObjectDto> chest);

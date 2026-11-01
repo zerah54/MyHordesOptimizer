@@ -1,0 +1,32 @@
+:host {
+    display: block;
+
+    table.summary {
+        width: 100%;
+        margin-bottom: 1em;
+        border-collapse: collapse;
+
+        th,
+        td {
+            padding: 0.25em 0.5em;
+            text-align: left;
+        }
+
+        tr.missing .gap {
+            color: var(--mho-accent);
+            font-weight: 600;
+        }
+    }
+
+    .label {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5em;
+    }
+
+    .empty,
+    .all-covered,
+    .no-evaluation {
+        opacity: 0.8;
+    }
+}

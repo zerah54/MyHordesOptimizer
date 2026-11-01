@@ -3,6 +3,6 @@
     public class GestHordesMajResponse
     {
         public int Retour { get; set; }
-        public string Lib { get; set; }
+        public string Lib { get; set; } = null!;
     }
 }

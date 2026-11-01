@@ -27,17 +27,27 @@ import { debounceTime, finalize } from 'rxjs/operators';
 
 import { HORDES_IMG_REPO } from '../../_abstract_model/const';
 import { BuildingAvailabilityStatusDTO } from '../../_abstract_model/dto/building.dto';
-import { BlueprintEnum } from '../../_abstract_model/enum/blueprint.enum';
 import { StandardColumn } from '../../_abstract_model/interfaces';
 import { ApiService } from '../../_abstract_model/services/api.service';
 import { WishlistService } from '../../_abstract_model/services/wishlist.service';
-import { Imports, TownTypeId } from '../../_abstract_model/types/_types';
+import { Imports } from '../../_abstract_model/types/_types';
 import { Building, BuildingResource } from '../../_abstract_model/types/building.class';
 import { TownDetails } from '../../_abstract_model/types/town-details.class';
 import { WishlistInfo } from '../../_abstract_model/types/wishlist-info.class';
 import { WishlistItem } from '../../_abstract_model/types/wishlist-item.class';
 import { TypedCellDefDirective } from '../../_core/directives/typed-cell-def.directive';
 import { TownContextService } from '../../_core/services/town-context.service';
+import { buildingCost } from '../../_core/utilities/building-cost.util';
+import {
+    availabilityIn,
+    buildBuildingTree,
+    buildingName,
+    flattenBuildingTree,
+    hasReachablePlanLevel,
+    matchesBranch,
+    planStepperIcon,
+    usefulPlanReadings
+} from '../../_core/utilities/building-tree.util';
 import { DEEP_LINK_PARAMS, deepLinkTargets } from '../../_core/utilities/deep-link.util';
 import { getTown } from '../../_core/utilities/localstorage.util';
 import { normalizeString } from '../../_core/utilities/string.utils';
@@ -67,13 +77,6 @@ export class BuildingsComponent implements OnInit {
 
     /** Nombre de plans lus par chantier (0-2), pour prévisualiser le coût au palier correspondant. Absent = 0. */
     private readonly plansLus: Map<number, 0 | 1 | 2> = new Map<number, 0 | 1 | 2>();
-
-    /**
-     * Icône du plan par défaut : repli UNIQUEMENT quand le niveau de rareté (effectif ou de base)
-     * est authentiquement inconnu (absent de BlueprintEnum). Une rareté 0 (« constructible sans
-     * plan ») n'y retombe PAS : voir BlueprintEnum.NONE et stepperIcon().
-     */
-    private static readonly DEFAULT_PLAN_ICON: string = 'item/item_bplan_c.gif';
 
     /**
      * Uids des chantiers destructibles pendant l'attaque en DEHORS de Pandémonium : le réacteur et
@@ -391,9 +394,7 @@ export class BuildingsComponent implements OnInit {
      * : ce n'est pas la même chose qu'un niveau inconnu, qui seul retombe sur l'icône générique.
      */
     protected stepperIcon(building: Building): string {
-        const effective_rarity: number = building.hard_blueprint_level ?? building.rarity;
-        const blueprint: BlueprintEnum | undefined = BlueprintEnum.fromRarity(effective_rarity);
-        return blueprint ? (blueprint.value.img ?? '') : BuildingsComponent.DEFAULT_PLAN_ICON;
+        return planStepperIcon(building);
     }
 
     /**
@@ -402,15 +403,7 @@ export class BuildingsComponent implements OnInit {
      * BuildingDto.Tier2Resources) : seul le PA peut encore varier à la 2ᵉ lecture.
      */
     protected usefulPlanReadings(building: Building): 0 | 1 | 2 {
-        if (!building.has_hard_mode) {
-            return 0;
-        }
-        const first_reading_helps: boolean = building.tier0_ap !== building.tier1_ap
-            || !BuildingsComponent.sameResources(building.tier0_resources, building.tier1_resources);
-        if (!first_reading_helps) {
-            return 0;
-        }
-        return building.tier1_ap !== building.tier2_ap ? 2 : 1;
+        return usefulPlanReadings(building);
     }
 
     /**
@@ -422,20 +415,7 @@ export class BuildingsComponent implements OnInit {
      * y serait mensonger — voir `showsPlanStepper()`.
      */
     protected hasReachablePlanLevel(building: Building): boolean {
-        return building.hard_blueprint_level !== null || building.rarity > 0;
-    }
-
-    /** Deux jeux de ressources sont égaux si mêmes objets aux mêmes quantités, ordre indifférent. */
-    private static sameResources(a: BuildingResource[], b: BuildingResource[]): boolean {
-        if (a.length !== b.length) {
-            return false;
-        }
-        const countsOf = (resources: BuildingResource[]): Map<number, number> =>
-            new Map(resources.map((resource: BuildingResource): [number, number] => [resource.item_id, resource.count]));
-        const counts_a: Map<number, number> = countsOf(a);
-        const counts_b: Map<number, number> = countsOf(b);
-        return counts_a.size === counts_b.size
-            && Array.from(counts_a.entries()).every(([item_id, count]: [number, number]): boolean => counts_b.get(item_id) === count);
+        return hasReachablePlanLevel(building);
     }
 
     /**
@@ -454,17 +434,7 @@ export class BuildingsComponent implements OnInit {
 
     /** Coût d'un chantier au palier demandé. Replie sur le jeu Default hors Pandémonium ou si le chantier n'a pas de jeu Pandémonium. */
     protected costFor(building: Building, tier: 0 | 1 | 2): { ap: number | null; resources: BuildingResource[] } {
-        if (!this.hard_mode || !building.has_hard_mode) {
-            return { ap: building.pa, resources: building.resources };
-        }
-        switch (tier) {
-            case 0:
-                return { ap: building.tier0_ap, resources: building.tier0_resources };
-            case 1:
-                return { ap: building.tier1_ap, resources: building.tier1_resources };
-            case 2:
-                return { ap: building.tier2_ap, resources: building.tier1_resources };
-        }
+        return buildingCost(building, this.hard_mode, tier);
     }
 
     /**
@@ -479,11 +449,7 @@ export class BuildingsComponent implements OnInit {
 
     /** {@link availabilityStatus} pour une position donnée du sélecteur Normal / Pandémonium. */
     private availabilityIn(building: Building, hard_mode: boolean): BuildingAvailabilityStatusDTO | null {
-        const town_type: TownTypeId | null = hard_mode ? 'PANDE' : (this.town?.town_type ?? null);
-        if (!town_type) {
-            return null;
-        }
-        return building.availability[town_type] ?? null;
+        return availabilityIn(building, hard_mode ? 'PANDE' : (this.town?.town_type ?? null));
     }
 
     /**
@@ -495,31 +461,9 @@ export class BuildingsComponent implements OnInit {
      * que de le faire disparaître de la page.
      */
     private buildTree(buildings: Building[]): Building[] {
-        const by_id: Map<number, Building> = new Map(buildings.map((building: Building): [number, Building] => [building.id, building]));
-        this.by_id = by_id;
-        const roots: Building[] = [];
-        buildings.forEach((building: Building): void => {
-            building.children = [];
-        });
-        buildings.forEach((building: Building): void => {
-            const parent: Building | undefined = building.parent_id === null ? undefined : by_id.get(building.parent_id);
-            if (parent) {
-                parent.children.push(building);
-            } else {
-                roots.push(building);
-            }
-        });
-        const sort = (list: Building[], depth: number): void => {
-            list.sort((a: Building, b: Building): number =>
-                (a.display_order ?? 0) - (b.display_order ?? 0)
-                || this.nameOf(a).localeCompare(this.nameOf(b)));
-            list.forEach((building: Building): void => {
-                building.depth = depth;
-                sort(building.children, depth + 1);
-            });
-        };
-        sort(roots, 0);
-        return roots;
+        const tree: { roots: Building[]; by_id: Map<number, Building> } = buildBuildingTree(buildings, this.locale);
+        this.by_id = tree.by_id;
+        return tree.roots;
     }
 
     /**
@@ -532,40 +476,16 @@ export class BuildingsComponent implements OnInit {
      * pas de ligne grisée) : il n'existe pas dans ce mode, ça n'a pas de sens de l'afficher.
      */
     private refresh(): void {
-        const needle: string = normalizeString(this.filters.label ?? '').trim();
-        const flattened: Building[] = [];
-        const flatten = (list: Building[]): void => {
-            list.forEach((building: Building): void => {
-                if (!this.matchesBranch(building, needle)) {
-                    return;
-                }
-                if (this.availabilityStatus(building) !== 'Disabled') {
-                    flattened.push(building);
-                }
-                // Une recherche en cours ignore les replis : masquer un résultat trouvé n'aurait
-                // aucun sens.
-                if (needle.length > 0 || !this.collapsed.has(building.id)) {
-                    flatten(building.children);
-                }
-            });
-        };
-        flatten(this.roots);
-        this.rows.set(flattened);
-    }
-
-    /** Le chantier ou l'une de ses évolutions correspond-il à la recherche ? */
-    private matchesBranch(building: Building, needle: string): boolean {
-        if (needle.length === 0) {
-            return true;
-        }
-        if (normalizeString(this.nameOf(building)).includes(needle)) {
-            return true;
-        }
-        return building.children.some((child: Building): boolean => this.matchesBranch(child, needle));
+        this.rows.set(flattenBuildingTree(this.roots, {
+            collapsed: this.collapsed,
+            filter: this.filters.label ?? '',
+            locale: this.locale,
+            isShown: (building: Building): boolean => this.availabilityStatus(building) !== 'Disabled'
+        }));
     }
 
     private nameOf(building: Building): string {
-        return building.label?.[this.locale] ?? building.uid ?? '';
+        return buildingName(building, this.locale);
     }
 
     /**
@@ -590,7 +510,7 @@ export class BuildingsComponent implements OnInit {
             this.hard_mode = !this.hard_mode;
             this.pruneSelectionForAvailability();
         }
-        if (!this.matchesBranch(building, normalizeString(this.filters.label ?? '').trim())) {
+        if (!matchesBranch(building, normalizeString(this.filters.label ?? '').trim(), this.locale)) {
             this.filters.label = '';
         }
         // Déplie toute la branche ascendante. L'ensemble des nœuds vus borne la remontée si la

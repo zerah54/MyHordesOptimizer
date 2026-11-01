@@ -1,0 +1,106 @@
+@if (store.selected_plan()?.isEffective === false) {
+    <p class="not-effective" role="status">
+        <mat-icon aria-hidden="true">info</mat-icon>
+        <span i18n>Cette proposition n'est pas l'effective : les citoyens lisent la proposition effective du jour.</span>
+    </p>
+}
+
+<mho-planning-citizen-filters>
+    @if (!future()) {
+        <span class="summary">
+            <strong>{{ filters.summary().done }}</strong> / {{ filters.summary().total }}
+            @if (filters.task() === null) {
+                <ng-container i18n>citoyens ont terminé leurs consignes individuelles</ng-container>
+            } @else {
+                <ng-container i18n>citoyens ont fait cette consigne</ng-container>
+            }
+        </span>
+    }
+</mho-planning-citizen-filters>
+
+<table class="tracking">
+    <thead>
+    <tr>
+        @if (store.can_edit()) {
+            <th class="select">
+                <mat-checkbox data-field="select-all" [checked]="filters.all_selected()"
+                              [indeterminate]="filters.selected().size > 0 && !filters.all_selected()"
+                              (change)="filters.toggleAll()" i18n-aria-label aria-label="Tout sélectionner"/>
+            </th>
+        }
+        <th i18n>Citoyen</th>
+        <th i18n>Consignes</th>
+        <th i18n>État</th>
+    </tr>
+    </thead>
+    <tbody>
+        @for (row of filters.shown_rows(); track row.citizen.id) {
+            @let state = shownState(row);
+            <tr class="citizen" [attr.data-user]="row.citizen.id" [attr.data-state]="state" [class.todo]="state === 'todo'">
+                @if (store.can_edit()) {
+                    <td class="select">
+                        <mat-checkbox data-field="select" [checked]="filters.selected().has(row.citizen.id)" (change)="filters.toggle(row.citizen.id)"
+                                      [aria-label]="row.citizen.name"/>
+                    </td>
+                }
+                <td class="who">
+                    <mho-citizen-chip [citizen]="row.citizen" [day]="store.selected_day()" [actions]="store.displayable_actions()"/>
+                </td>
+                <td class="tasks">
+                    <div class="task-list">
+                        @for (entry of row.tasks; track entry.task.id ?? $index) {
+                            @if (future()) {
+                                <span class="task">{{ entry.label }}@if (entry.task.pa > 0) {
+                                    ({{ entry.task.pa }}
+                                    <ng-container i18n>PA</ng-container>)
+                                }</span>
+                            } @else {
+                                <span class="task" [class.done]="entry.status.done" [class.focused]="isFocused(entry)">
+                                <mat-checkbox [checked]="entry.status.done"
+                                              [disabled]="!store.can_track() || store.isPending(row.citizen.id, entry.task) || locked(entry.task, entry.status)"
+                                              (change)="onToggle($event, row.citizen.id, entry)">
+                                    {{ entry.label }}@if (entry.task.pa > 0) {
+                                    ({{ entry.task.pa }}
+                                    <ng-container i18n>PA</ng-container>)
+                                }
+                                </mat-checkbox>
+                                    @if (entry.status.source === 'data') {
+                                        <mat-icon class="detected" i18n-matTooltip matTooltip="Relevé dans les données du citoyen (liste des citoyens, script)">sync</mat-icon>
+                                    }
+                            </span>
+                            }
+                        } @empty {
+                            <span class="empty" i18n>Aucune consigne</span>
+                        }
+                    </div>
+                </td>
+                <td class="state">
+                    @switch (state) {
+                        @case ('done') {
+                            <mat-icon class="state-done" aria-hidden="true">check_circle</mat-icon>
+                            @if (filters.task() === null) {
+                                <ng-container i18n>Terminé</ng-container>
+                            } @else {
+                                <ng-container i18n>Fait</ng-container>
+                            }
+                        }
+                        @case ('todo') {
+                            @if (filters.task() === null) {
+                                {{ row.done_count }}/{{ row.tasks.length }}
+                            } @else {
+                                <ng-container i18n>À faire</ng-container>
+                            }
+                        }
+                        @default {
+                            —
+                        }
+                    }
+                </td>
+            </tr>
+        } @empty {
+            <tr>
+                <td colspan="3" class="empty" i18n>Aucun citoyen ne correspond aux filtres</td>
+            </tr>
+        }
+    </tbody>
+</table>

@@ -12,7 +12,7 @@
      [mhoMapCellTooltipAllRuins]="allRuins()"
      [mhoMapCellTooltip]="cell()">
 
-    @if (cell().ruin_id) {
+    @if (cell().ruin_id && !cell().is_never_visited) {
         <!-- Tout bâtiment a son carré, convention de la carte du jeu. L'icône d'une ruine explorable
              ou d'un bâtiment enseveli, comme l'illustration au zoom « détail », se pose par-dessus :
              elle remplaçait le carré, et une case à bâtiment ne se reconnaissait plus d'un coup d'œil. -->
@@ -67,10 +67,10 @@
         <div class="my-cell"></div>
     }
 
-    <div [class.dist-border-bottom]="cell() | distBorderBottom:options():drawedMap()"
-         [class.dist-border-left]="cell() | distBorderLeft:options():drawedMap()"
-         [class.dist-border-right]="cell() | distBorderRight:options():drawedMap()"
-         [class.dist-border-top]="cell() | distBorderTop:options():drawedMap()"></div>
+    <div [style.border-bottom]="cell() | distBorderBottom:options():drawedMap()"
+         [style.border-left]="cell() | distBorderLeft:options():drawedMap()"
+         [style.border-right]="cell() | distBorderRight:options():drawedMap()"
+         [style.border-top]="cell() | distBorderTop:options():drawedMap()"></div>
 
     @if (!cell().is_town) {
         <!-- Coins réglables dans le panneau Affichage, par type de carte (map-corners.ts). -->

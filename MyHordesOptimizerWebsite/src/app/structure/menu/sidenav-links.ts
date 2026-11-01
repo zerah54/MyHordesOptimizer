@@ -2,6 +2,7 @@ import { environment } from '../../../environments/environment';
 import { TownDetails } from '../../_abstract_model/types/town-details.class';
 import { TownContextService } from '../../_core/services/town-context.service';
 import { getTown, getUser } from '../../_core/utilities/localstorage.util';
+import { ProgramMenuService } from '../../my-town/program/program-menu.service';
 
 /**
  * Entrée du menu latéral.
@@ -32,7 +33,7 @@ export interface SidenavLinks {
  * Une fabrique et non une constante : le menu mute `displayed` et `expanded` sur ses entrées, et
  * la recherche globale ne doit ni voir ces changements ni les provoquer. Chacun a son exemplaire.
  */
-export function buildSidenavLinks(town_context: TownContextService): SidenavLinks[] {
+export function buildSidenavLinks(town_context: TownContextService, program_menu: ProgramMenuService): SidenavLinks[] {
     return [
         {
             label: $localize`Ma ville`, lvl: 0, displayed: true, isTownRoot: true, authorized: (): boolean => isInTown(), expanded: true, children: [
@@ -56,6 +57,14 @@ export function buildSidenavLinks(town_context: TownContextService): SidenavLink
                     displayed: true,
                     lvl: 1,
                     authorized: (): boolean => isInTown() && !environment.production,
+                    spoil: false
+                },
+                {
+                    label: $localize`Mon programme`,
+                    townSuffix: 'program',
+                    displayed: true,
+                    lvl: 1,
+                    authorized: (): boolean => isInTown() && !environment.production && program_menu.visible(),
                     spoil: false
                 },
                 {

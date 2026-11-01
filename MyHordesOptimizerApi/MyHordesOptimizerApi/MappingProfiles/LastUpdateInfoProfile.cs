@@ -31,7 +31,7 @@ namespace MyHordesOptimizerApi.MappingProfiles
 
             CreateMap<LastUpdateInfo, LastUpdateInfoDto>()
                 .ForMember(dto => dto.UserId, opt => opt.MapFrom(model => model.IdUser))
-                .ForMember(dto => dto.UserName, opt => opt.MapFrom(model => model.IdUserNavigation.Name))
+                .ForMember(dto => dto.UserName, opt => opt.MapFrom(model => model.IdUserNavigation!.Name))
                 .ForMember(dto => dto.UpdateTime, opt => opt.MapFrom(model => model.DateUpdate));
         }
     }

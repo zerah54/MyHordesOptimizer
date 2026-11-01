@@ -50,6 +50,9 @@
                         <div class="step-head">
                             <span class="coordinates">{{ step.coordinates }}</span>
                             <span class="place">{{ step.place }}</span>
+                            @if (step.passage_label) {
+                                <span class="passage-pill">{{ step.passage_label }}</span>
+                            }
                             @if (step.node === 'off') {
                                 <span class="off-pill" i18n>Hors tracé</span>
                             }
@@ -86,3 +89,11 @@
         <p class="empty" i18n>Aucune consigne sur une case.</p>
     }
 </section>
+
+<span #passageAnchor class="passage-anchor" [matMenuTriggerFor]="passageMenu"></span>
+<mat-menu #passageMenu="matMenu">
+    <span class="passage-menu-title" role="presentation">{{ passage_title() }}</span>
+    @for (choice of passage_choices(); track choice.passage) {
+        <button mat-menu-item type="button" (click)="choosePassage(choice.passage)">{{ choice.label }}</button>
+    }
+</mat-menu>

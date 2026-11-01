@@ -1,0 +1,17 @@
+:host {
+    display: block;
+
+    .filters {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.5em 1em;
+        margin-bottom: 0.75em;
+    }
+
+    .label {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3em;
+    }
+}

@@ -67,6 +67,8 @@ namespace MyHordesOptimizerApiUnitTests.Caching.Fakes
             return new List<BuildingDto>();
         }
 
+        public HomeReferentialDto GetHomeReferential() => throw new NotSupportedException();
+
         public IEnumerable<string> GetItemUidsWithCitizenStateImpact() => throw new NotSupportedException();
         public Task<SimpleMeDto> GetSimpleMeAsync() => throw new NotSupportedException();
         public SimpleMeDto BuildSimpleMeFromDbByUserKey(string userKey) => throw new NotSupportedException();
@@ -147,10 +149,10 @@ namespace MyHordesOptimizerApiUnitTests.Caching.Fakes
         public void ImportPictos() { }
         public Task ImportCategoriesAsync() => Task.CompletedTask;
         public Task ImportItemsAsync() { ThrowIfConfigured(); return Task.CompletedTask; }
-        public Task ImportAllAsync(Action<ImportStepProgress> onStep = null) { ThrowIfConfigured(); return Task.CompletedTask; }
+        public Task ImportAllAsync(Action<ImportStepProgress>? onStep = null) { ThrowIfConfigured(); return Task.CompletedTask; }
         public void ImportWishlistCategorie() => ThrowIfConfigured();
         public void ImportDefaultWishlists() => ThrowIfConfigured();
-        public Task ImportTownsAsync(int? season = null, bool resume = false, Action<ImportStepProgress> onStep = null) => Task.CompletedTask;
+        public Task ImportTownsAsync(int? season = null, bool resume = false, Action<ImportStepProgress>? onStep = null) => Task.CompletedTask;
         public Task ImportSingleTownAsync(int townId) => Task.CompletedTask;
         public Task RefreshUserNamesAsync(int? limit = null) => Task.CompletedTask;
         public Task RecomputeUserDirectoryStatsAsync() => Task.CompletedTask;

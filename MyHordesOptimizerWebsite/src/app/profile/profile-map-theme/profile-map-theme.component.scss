@@ -1,0 +1,84 @@
+:host {
+    display: block;
+
+    .mho-profile-theme {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 2em;
+        align-items: flex-start;
+        padding-top: 1em;
+
+        .themes,
+        .editor {
+            flex: 1;
+            min-width: 320px;
+        }
+    }
+
+    h3 {
+        margin: 0 0 0.5em;
+    }
+
+    .theme-list {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+
+    .theme-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.5em;
+        padding: 0.25em 0.5em;
+        border-bottom: 1px solid var(--mho-line);
+
+        &.active .theme-name {
+            font-weight: 700;
+        }
+
+        .theme-actions {
+            display: flex;
+            align-items: center;
+            flex-shrink: 0;
+        }
+    }
+
+    .editor-header {
+        display: flex;
+        align-items: center;
+        gap: 0.5em;
+
+        .name-field {
+            flex: 1;
+            min-width: 0;
+        }
+    }
+
+    .hint {
+        display: block;
+        margin: 0.5em 0 1em;
+        opacity: 0.85;
+    }
+
+    .group {
+        margin: 1em 0 0;
+        padding: 0.5em 0.75em;
+        border: 1px solid var(--mho-line);
+        border-radius: var(--mho-radius-m);
+
+        .color {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.5em;
+
+            label {
+                display: flex;
+                align-items: center;
+                gap: 0.75em;
+                cursor: pointer;
+            }
+        }
+    }
+}

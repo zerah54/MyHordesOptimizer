@@ -91,13 +91,13 @@ namespace MyHordesOptimizerApi.Services.Impl
                 .Include(wishlist => wishlist.IdTownNavigation)
                     .ThenInclude(town => town.TownCitizens.Where(townCitizen => townCitizen.IdTown == townId))
                         .ThenInclude(townCitizen => townCitizen.IdBagNavigation)
-                            .ThenInclude(citizenBag => citizenBag.BagItems)
+                            .ThenInclude(citizenBag => citizenBag!.BagItems)
                                 .ThenInclude(bagItem => bagItem.IdItemNavigation)
                                 .AsSplitQuery()
                 .Include(wishlist => wishlist.IdTownNavigation)
                     .ThenInclude(town => town.TownCitizens.Where(townCitizen => townCitizen.IdTown == townId))
                         .ThenInclude(townCitizen => townCitizen.IdChestNavigation)
-                            .ThenInclude(citizenChest => citizenChest.ChestItems)
+                            .ThenInclude(citizenChest => citizenChest!.ChestItems)
                                 .ThenInclude(chestItem => chestItem.IdItemNavigation)
                                 .AsSplitQuery()
                 .Include(wishlist => wishlist.IdTownNavigation)
@@ -115,9 +115,9 @@ namespace MyHordesOptimizerApi.Services.Impl
                 {
                     LastUpdateInfo = new LastUpdateInfoDto()
                     {
-                        UserId = wishListItems.First().IdTownNavigation.IdUserWishListUpdaterNavigation.IdUser,
-                        UserName = wishListItems.First().IdTownNavigation.IdUserWishListUpdaterNavigation.Name,
-                        UpdateTime = wishListItems.First().IdTownNavigation.WishlistDateUpdate.Value
+                        UserId = wishListItems.First().IdTownNavigation.IdUserWishListUpdaterNavigation!.IdUser,
+                        UserName = wishListItems.First().IdTownNavigation.IdUserWishListUpdaterNavigation!.Name,
+                        UpdateTime = wishListItems.First().IdTownNavigation.WishlistDateUpdate!.Value
                     },
                     WishList = itemsDto
                 };
@@ -250,10 +250,10 @@ namespace MyHordesOptimizerApi.Services.Impl
                     IdUserAuthor = group.Key.IdUserAuthor,
                     Labels = new Dictionary<string, string>()
                     {
-                        { "fr", group.Key.LabelFr },
-                        { "en", group.Key.LabelEn },
-                        { "es", group.Key.LabelEs },
-                        { "de", group.Key.LabelDe }
+                        { "fr", group.Key.LabelFr! },
+                        { "en", group.Key.LabelEn! },
+                        { "es", group.Key.LabelEs! },
+                        { "de", group.Key.LabelDe! }
                     },
                     Name = group.Key.Name,
                     Items = Mapper.Map<List<WishListItemDto>>(group.ToList())

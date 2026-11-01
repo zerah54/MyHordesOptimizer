@@ -1,0 +1,38 @@
+<h2 mat-dialog-title i18n>Valeurs des objets en PA</h2>
+<mat-dialog-content>
+    <table class="summary values">
+        <tbody>
+            @for (row of valueRows(); track row.id) {
+                <tr class="value" [attr.data-item]="row.id">
+                    <td>{{ row.label }}</td>
+                    <td>
+                        <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                            <input matInput type="number" min="0" data-field="item-value" [value]="row.value" [disabled]="!store.can_edit_settings()"
+                                   (input)="onItemValue(row.id, $any($event.target).value)">
+                        </mat-form-field>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <div class="add">
+        <mat-form-field appearance="outline" subscriptSizing="dynamic">
+            <mat-label i18n>Ajouter un objet</mat-label>
+            <input matInput #item_name data-field="add-value" list="planning-items" [disabled]="!store.can_edit_settings()"
+                   (keydown.enter)="addValue(item_name)">
+        </mat-form-field>
+        <datalist id="planning-items">
+            @for (item of itemOptions(); track item.id) {
+                <option [value]="itemName(item)"></option>
+            }
+        </datalist>
+        <button mat-stroked-button type="button" data-action="add-value" [disabled]="!store.can_edit_settings()" (click)="addValue(item_name)" i18n>Ajouter
+        </button>
+    </div>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+    <button mat-button type="button" mat-dialog-close i18n>Fermer</button>
+    <button mat-flat-button type="button" data-action="save-values" [disabled]="!store.can_edit_settings()" (click)="saveValues()" i18n>Enregistrer les
+        valeurs
+    </button>
+</mat-dialog-actions>

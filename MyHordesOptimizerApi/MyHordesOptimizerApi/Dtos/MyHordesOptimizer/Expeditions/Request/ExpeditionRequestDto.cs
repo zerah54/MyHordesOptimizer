@@ -5,7 +5,7 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Expeditions.Request
     public class ExpeditionRequestDto
     {
         public int? Id { get; set; }
-        public string State { get; set; }
+        public string State { get; set; } = null!;
         public int Position { get; set; }
         public string? Label { get; set; }
         public int? MinPdc { get; set; }

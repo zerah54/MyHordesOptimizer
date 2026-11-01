@@ -8,13 +8,13 @@ namespace Serilog.Sinks.Discord
 {
     public class DiscordSink : ILogEventSink
     {
-        private readonly IFormatProvider _formatProvider;
+        private readonly IFormatProvider? _formatProvider;
         private readonly ulong _webhookId;
         private readonly string _webhookToken;
         private readonly LogEventLevel _restrictedToMinimumLevel;
 
         public DiscordSink(
-            IFormatProvider formatProvider,
+            IFormatProvider? formatProvider,
             ulong webhookId,
             string webhookToken,
             LogEventLevel restrictedToMinimumLevel = LogEventLevel.Information)

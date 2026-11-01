@@ -155,7 +155,7 @@ namespace MyHordesOptimizerApi.Services.Impl
         /// requis, le coût et la chance de réussite d'une ouverture. Mis en cache : le fichier ne
         /// change qu'au déploiement, pas à chaque appel de <see cref="GetItems"/>.
         /// </summary>
-        private static Dictionary<string, MyHordesActionsCodeModel> _actionsByNameCache;
+        private static Dictionary<string, MyHordesActionsCodeModel>? _actionsByNameCache;
 
         private Dictionary<string, MyHordesActionsCodeModel> GetActionsByName()
         {
@@ -167,7 +167,7 @@ namespace MyHordesOptimizerApi.Services.Impl
         /// dont <see cref="MappingProfiles.Items.ItemStateImpactResolver"/> a besoin. Mis en cache
         /// pour la même raison que <see cref="_actionsByNameCache"/>.
         /// </summary>
-        private static Dictionary<string, MyHordesMetaResultCodeModel> _metaResultsByNameCache;
+        private static Dictionary<string, MyHordesMetaResultCodeModel>? _metaResultsByNameCache;
 
         private Dictionary<string, MyHordesMetaResultCodeModel> GetMetaResultsByName()
         {
@@ -179,7 +179,7 @@ namespace MyHordesOptimizerApi.Services.Impl
         /// dont <see cref="MappingProfiles.Items.ItemCatapultEffectResolver"/> a besoin. Mis en
         /// cache pour la même raison que <see cref="_actionsByNameCache"/>.
         /// </summary>
-        private static Dictionary<string, string> _itemsCatapultByUidCache;
+        private static Dictionary<string, string>? _itemsCatapultByUidCache;
 
         private Dictionary<string, string> GetItemsCatapultByUid()
         {
@@ -264,13 +264,13 @@ namespace MyHordesOptimizerApi.Services.Impl
             Logger.LogDebug($"GetSimpleMeAsync MyHordesJsonApiRepository.GetMe() après {sw.Elapsed} ms");
             // userKey ET identité MyHordes vérifiés ensemble par l'appel ci-dessus : c'est le seul
             // endroit sûr pour alimenter le repli 429/503 de AuthenticationController (voir C2).
-            RememberUserKeyToUserId(UserInfoProvider.UserKey, myHordeMeResponse.Id.Value);
+            RememberUserKeyToUserId(UserInfoProvider.UserKey!, myHordeMeResponse.Id!.Value);
             var townSynchronized = false;
             if (myHordeMeResponse.Map != null) // Si l'utilisateur est en ville
             {
                 Logger.LogDebug("GetSimpleMeAsync Waiting for Lock");
                 // Clé de verrou : l'IdTown provisoire (-mapId) écrit par le mapping ci-dessous.
-                await using var townLock = await TownSyncLock.AcquireTownAsync(-myHordeMeResponse.MapId.Value);
+                await using var townLock = await TownSyncLock.AcquireTownAsync(-myHordeMeResponse.MapId!.Value);
                 Logger.LogDebug($"GetSimpleMeAsync Lock ok après {sw.Elapsed} ms");
                 if (!HasTownIdCollision(myHordeMeResponse))
                 {
@@ -308,11 +308,11 @@ namespace MyHordesOptimizerApi.Services.Impl
                     // (le endpoint /json/towns en bulk ne remonte parfois que des citoyens déjà morts).
                     town.IsFinished = false;
                     var citizens = town.TownCitizens;
-                    town.TownCitizens = null;
+                    town.TownCitizens = null!;
                     var bankItems = town.TownBankItems;
-                    town.TownBankItems = null;
+                    town.TownBankItems = null!;
                     var cadavers = town.TownCadavers;
-                    town.TownCadavers = null;
+                    town.TownCadavers = null!;
                     var existingTown = DbContext.Towns
                         .Include(town => town.TownCitizens)
                         .Include(town => town.TownCadavers)
@@ -355,10 +355,10 @@ namespace MyHordesOptimizerApi.Services.Impl
                             .ToList();
                         DbContext.AddRange(distinctCadavers);
                         // On crée les cells
-                        var cells = CreateCellsForTown(xVille: myHordeMeResponse.Map.City.X.Value,
-                            yVille: myHordeMeResponse.Map.City.Y.Value,
-                            mapWid: myHordeMeResponse.Map.Wid.Value,
-                            mapHei: myHordeMeResponse.Map.Hei.Value,
+                        var cells = CreateCellsForTown(xVille: myHordeMeResponse.Map.City!.X!.Value,
+                            yVille: myHordeMeResponse.Map.City.Y!.Value,
+                            mapWid: myHordeMeResponse.Map.Wid!.Value,
+                            mapHei: myHordeMeResponse.Map.Hei!.Value,
                             townId: town.IdTown,
                             lastUpdate);
                         DbContext.AddRange(cells);
@@ -461,7 +461,7 @@ namespace MyHordesOptimizerApi.Services.Impl
             // qui reprendra le verrou de la ville pour son compte.
             if (townSynchronized)
             {
-                QueueCadaverPictosUpsert(-myHordeMeResponse.MapId.Value, myHordeMeResponse.Map.Cadavers);
+                QueueCadaverPictosUpsert(-myHordeMeResponse.MapId!.Value, myHordeMeResponse.Map!.Cadavers);
 
                 // Pareil pour pictos/playedMaps. Pas de garde "nouvelle ville pour ce citoyen" ici :
                 // map.citizens liste TOUS les citoyens de la ville, donc la ligne TownCitizen d'un
@@ -507,11 +507,11 @@ namespace MyHordesOptimizerApi.Services.Impl
                 return knownUserId == userId;
             }
             var identity = MyHordesJsonApiRepository.GetMeIdentity();
-            RememberUserKeyToUserId(userKey, identity.Id.Value);
+            RememberUserKeyToUserId(userKey, identity.Id!.Value);
             return identity.Id.Value == userId;
         }
 
-        public SimpleMeDto BuildSimpleMeFromDbByUserKey(string userKey)
+        public SimpleMeDto? BuildSimpleMeFromDbByUserKey(string userKey)
         {
             if (!UserIdByUserKeyHash.TryGetValue(HashUserKey(userKey), out var userId))
             {
@@ -520,7 +520,7 @@ namespace MyHordesOptimizerApi.Services.Impl
             return BuildSimpleMeFromDb(userId);
         }
 
-        private SimpleMeDto BuildSimpleMeFromDb(int userId)
+        private SimpleMeDto? BuildSimpleMeFromDb(int userId)
         {
             var user = DbContext.Users.AsNoTracking().FirstOrDefault(u => u.IdUser == userId);
             if (user == null)
@@ -587,7 +587,7 @@ namespace MyHordesOptimizerApi.Services.Impl
         /// Le scope dédié est indispensable : le <see cref="MhoContext"/> de la requête est libéré
         /// dès la réponse envoyée, l'utiliser depuis la tâche de fond lèverait un ObjectDisposed.
         /// </summary>
-        private void QueueCadaverPictosUpsert(int townId, List<MyHordesCitizenRankingDto> cadavers)
+        private void QueueCadaverPictosUpsert(int townId, List<MyHordesCitizenRankingDto>? cadavers)
         {
             if (cadavers == null || cadavers.Count == 0)
             {
@@ -692,7 +692,7 @@ namespace MyHordesOptimizerApi.Services.Impl
         // 4 langues demandées, mais pas `community`, qui reste donc à sa valeur par défaut.
         // Ne couvre que les morts : les pictos d'un survivant ne remontent jamais par cette voie.
         // Le contexte est passé explicitement : l'appelant tourne en tâche de fond, avec le sien.
-        private void UpsertCadaverPictos(MhoContext dbContext, int townId, List<MyHordesCitizenRankingDto> cadavers)
+        private void UpsertCadaverPictos(MhoContext dbContext, int townId, List<MyHordesCitizenRankingDto>? cadavers)
         {
             // L'id du cadavre sert de clé (IdUser) : sans lui la ligne n'identifie personne.
             var cadaversWithPictos = cadavers?
@@ -703,7 +703,7 @@ namespace MyHordesOptimizerApi.Services.Impl
                 return;
             }
 
-            var rewards = cadaversWithPictos.SelectMany(cadaver => cadaver.Rewards.Values).ToList();
+            var rewards = cadaversWithPictos.SelectMany(cadaver => cadaver.Rewards!.Values).ToList();
 
             // Référentiel d'abord : Picto porte la FK de TownCitizenPicto
             var clesPictoParMhId = UpsertPictoReferential(dbContext, rewards);
@@ -718,20 +718,20 @@ namespace MyHordesOptimizerApi.Services.Impl
             {
                 // Une ligne de picto n'a de sens qu'avec son id ET son compteur. Si MyHordes ne les
                 // a pas transmis, on n'écrit rien : ni ligne inventée, ni compteur existant écrasé.
-                foreach (var reward in cadaver.Rewards.Values.Where(reward => reward.Id.HasValue && reward.Number.HasValue))
+                foreach (var reward in cadaver.Rewards!.Values.Where(reward => reward.Id.HasValue && reward.Number.HasValue))
                 {
                     // L'identifiant reçu est celui de MyHordes : il se traduit en clé MHO, il ne se
                     // recopie pas. Le référentiel vient d'être complété, un mhId absent de la
                     // correspondance signalerait un défaut de cet appel — la ligne est écartée
                     // plutôt que rattachée à un picto au hasard.
-                    if (!clesPictoParMhId.TryGetValue(reward.Id.Value, out var clePicto))
+                    if (!clesPictoParMhId.TryGetValue(reward.Id!.Value, out var clePicto))
                     {
                         Logger.LogWarning("UpsertTownCitizenPictos : picto {MhId} non résolu, ligne ignorée.", reward.Id.Value);
                         continue;
                     }
-                    if (existingLines.TryGetValue((cadaver.Id.Value, clePicto), out var existingLine))
+                    if (existingLines.TryGetValue((cadaver.Id!.Value, clePicto), out var existingLine))
                     {
-                        existingLine.Count = reward.Number.Value;
+                        existingLine.Count = reward.Number!.Value;
                         existingLine.LastUpdate = lastUpdate;
                     }
                     else
@@ -741,7 +741,7 @@ namespace MyHordesOptimizerApi.Services.Impl
                             IdTown = townId,
                             IdUser = cadaver.Id.Value,
                             IdPicto = clePicto,
-                            Count = reward.Number.Value,
+                            Count = reward.Number!.Value,
                             LastUpdate = lastUpdate
                         });
                     }
@@ -759,7 +759,7 @@ namespace MyHordesOptimizerApi.Services.Impl
         {
             var modeles = rewards
                 .Where(reward => reward.Id.HasValue)
-                .GroupBy(reward => reward.Id.Value)
+                .GroupBy(reward => reward.Id!.Value)
                 .ToDictionary(group => group.Key, group => group.First());
             return ResoudreClesPictos(dbContext, modeles.Keys, mhId =>
             {
@@ -902,7 +902,7 @@ namespace MyHordesOptimizerApi.Services.Impl
                 // différent de -mapId.
                 var townIds = (response.PlayedMaps ?? new List<MyHordesCitizenRankingDto>())
                     .Where(played => played.MapId.HasValue)
-                    .Select(played => DbContext.ResolveTownId(played.MapId.Value))
+                    .Select(played => DbContext.ResolveTownId(played.MapId!.Value))
                     .Distinct()
                     .ToList();
                 await using (await TownSyncLock.AcquireTownsAsync(townIds))
@@ -940,15 +940,15 @@ namespace MyHordesOptimizerApi.Services.Impl
             // résolution crée au passage les pictos encore inconnus, sous une clé attribuée par MHO.
             var modelesParMhId = rewards
                 .Where(reward => reward.Id.HasValue)
-                .GroupBy(reward => reward.Id.Value)
+                .GroupBy(reward => reward.Id!.Value)
                 .ToDictionary(group => group.Key, group => group.First());
             var describedRewards = pictosByTown
-                .SelectMany(played => played.Rewards.Values)
+                .SelectMany(played => played.Rewards!.Values)
                 .Where(reward => reward.Id.HasValue)
-                .GroupBy(reward => reward.Id.Value)
+                .GroupBy(reward => reward.Id!.Value)
                 .Select(group => group.First())
                 .ToList();
-            var describedParMhId = describedRewards.ToDictionary(reward => reward.Id.Value);
+            var describedParMhId = describedRewards.ToDictionary(reward => reward.Id!.Value);
 
             var clesPictoParMhId = ResoudreClesPictos(DbContext,
                 modelesParMhId.Keys.Concat(describedParMhId.Keys),
@@ -995,7 +995,7 @@ namespace MyHordesOptimizerApi.Services.Impl
             // mise à jour — un total existant ne doit pas être écrasé par une valeur inventée.
             foreach (var reward in rewards.Where(reward => reward.Id.HasValue && reward.Number.HasValue))
             {
-                if (!clesPictoParMhId.TryGetValue(reward.Id.Value, out var clePicto))
+                if (!clesPictoParMhId.TryGetValue(reward.Id!.Value, out var clePicto))
                 {
                     Logger.LogWarning("ImportUserPictos : picto {MhId} non résolu, total ignoré.", reward.Id.Value);
                     continue;
@@ -1007,13 +1007,13 @@ namespace MyHordesOptimizerApi.Services.Impl
                     {
                         IdUser = userId,
                         IdPicto = clePicto,
-                        Count = reward.Number.Value,
+                        Count = reward.Number!.Value,
                         LastUpdate = lastUpdate
                     });
                 }
                 else
                 {
-                    existingTotal.Count = reward.Number.Value;
+                    existingTotal.Count = reward.Number!.Value;
                     existingTotal.LastUpdate = lastUpdate;
                 }
             }
@@ -1022,10 +1022,10 @@ namespace MyHordesOptimizerApi.Services.Impl
             var existingTownPictos = DbContext.TownCitizenPictos.Where(picto => picto.IdUser == userId).ToList();
             foreach (var played in pictosByTown)
             {
-                var townId = DbContext.ResolveTownId(played.MapId.Value);
-                foreach (var reward in played.Rewards.Values.Where(reward => reward.Id.HasValue && reward.Number.HasValue))
+                var townId = DbContext.ResolveTownId(played.MapId!.Value);
+                foreach (var reward in played.Rewards!.Values.Where(reward => reward.Id.HasValue && reward.Number.HasValue))
                 {
-                    if (!clesPictoParMhId.TryGetValue(reward.Id.Value, out var clePicto))
+                    if (!clesPictoParMhId.TryGetValue(reward.Id!.Value, out var clePicto))
                     {
                         Logger.LogWarning("ImportUserPictos : picto {MhId} non résolu, détail par ville ignoré.", reward.Id.Value);
                         continue;
@@ -1038,13 +1038,13 @@ namespace MyHordesOptimizerApi.Services.Impl
                             IdTown = townId,
                             IdUser = userId,
                             IdPicto = clePicto,
-                            Count = reward.Number.Value,
+                            Count = reward.Number!.Value,
                             LastUpdate = lastUpdate
                         });
                     }
                     else
                     {
-                        existingLine.Count = reward.Number.Value;
+                        existingLine.Count = reward.Number!.Value;
                         existingLine.LastUpdate = lastUpdate;
                     }
                 }
@@ -1068,7 +1068,7 @@ namespace MyHordesOptimizerApi.Services.Impl
         // `userId` est le joueur À QUI appartient cet historique : ce n'est pas toujours le joueur
         // connecté (l'import de pictos passe l'historique d'un tiers), et s'y tromper rattacherait
         // les villes d'autrui au compte courant.
-        private void UpsertPlayedMaps(List<MyHordesCitizenRankingDto> playedMaps, int userId)
+        private void UpsertPlayedMaps(List<MyHordesCitizenRankingDto>? playedMaps, int userId)
         {
             if (playedMaps == null || playedMaps.Count == 0)
             {
@@ -1081,7 +1081,7 @@ namespace MyHordesOptimizerApi.Services.Impl
             // L'historique peut compter >100 villes (127 observées en réel) : on charge toutes les lignes
             // candidates en UNE requête (par townId réel via MapId, ou par clé provisoire -mapId) plutôt
             // qu'une requête par entrée.
-            var mapIds = playedMaps.Where(p => p.MapId.HasValue).Select(p => p.MapId.Value).Distinct().ToList();
+            var mapIds = playedMaps.Where(p => p.MapId.HasValue).Select(p => p.MapId!.Value).Distinct().ToList();
             if (mapIds.Count == 0)
             {
                 MarkPlayedMapsImported(userId);
@@ -1174,7 +1174,7 @@ namespace MyHordesOptimizerApi.Services.Impl
                     .Where(c => c.IdUser == userId && townIdList.Contains(c.IdTown))
                     .Select(c => c.IdTown)
                     .ToList());
-                LastUpdateInfo systemLastUpdate = null;
+                LastUpdateInfo? systemLastUpdate = null;
                 foreach (var townId in processedTownIds)
                 {
                     if (alreadyLinked.Contains(townId))
@@ -1350,7 +1350,7 @@ namespace MyHordesOptimizerApi.Services.Impl
                 // Même clé que le login et le flux ExternalTools (-mapId, jamais le townId résolu) :
                 // sans cet alignement, cette écriture et une synchro concurrente de la même ville
                 // verrouilleraient deux sémaphores différents et ne s'excluraient pas.
-                using var townLock = TownSyncLock.AcquireTownBlocking(-myHordeMeResponse.MapId.Value);
+                using var townLock = TownSyncLock.AcquireTownBlocking(-myHordeMeResponse.MapId!.Value);
                 // Enregistrer en base
                 using var transaction = DbContext.Database.BeginTransaction();
                 var newLastUpdate = DbContext.LastUpdateInfos.Update(Mapper.Map<LastUpdateInfo>(UserInfoProvider.GenerateLastUpdateInfo())).Entity;
@@ -1373,7 +1373,7 @@ namespace MyHordesOptimizerApi.Services.Impl
                     .Include(item => item.RecipeItemResults)
                     .ToList();
                 var newTownlastUpdate = DbContext.LastUpdateInfos.First(x => x.IdLastUpdateInfo == newLastUpdate.IdLastUpdateInfo);
-                myHordeMeResponse.Map.LastUpdateInfo = newTownlastUpdate;
+                myHordeMeResponse.Map!.LastUpdateInfo = newTownlastUpdate;
                 var town = Mapper.Map<Town>(myHordeMeResponse, opts => { opts.SetDbContext(DbContext); opts.SetAllItems(allItems); });
                 DbContext.AddRange(town.TownBankItems);
                 DbContext.SaveChanges();
@@ -1385,7 +1385,7 @@ namespace MyHordesOptimizerApi.Services.Impl
                 Logger.LogError(e, $"Erreur lors de l'enregistrement de la bank depuis MH : {e}");
             }
             var townDetail = UserInfoProvider.TownDetail;
-            var townId = DbContext.ResolveTownId(townDetail.TownId);
+            var townId = DbContext.ResolveTownId(townDetail!.TownId);
             return GetBankFromDb(townId, lastUpdateId);
         }
 
@@ -1460,7 +1460,7 @@ namespace MyHordesOptimizerApi.Services.Impl
             // ouvre-boîte absent de la banque ferait passer une boîte pour « sans outil requis ».
             ItemOpenerResolver.PopulateOpenerRelations(dtos.Select(dto => dto.Item).ToList(), GetItemCatalogForOpenerRelations(), GetActionsByName());
             ItemCatapultEffectResolver.PopulateCatapultEffects(dtos.Select(dto => dto.Item).ToList(), GetItemCatalogForOpenerRelations(), GetItemsCatapultByUid(), GetActionsByName(), GetMetaResultsByName());
-            LastUpdateInfoDto lastUpdateDto = null;
+            LastUpdateInfoDto? lastUpdateDto = null;
             if (townModel.TownBankItems.Any())
             {
                 lastUpdateDto = Mapper.Map<LastUpdateInfoDto>(lastUpdate);
@@ -1551,6 +1551,11 @@ namespace MyHordesOptimizerApi.Services.Impl
         /// et suivants) et la disponibilité par TownType — extraits depuis les fixtures et
         /// <c>rules.yml</c> du jeu, aucune API MyHordes ne les expose (chantier du 2026-08-06).
         /// </remarks>
+        public HomeReferentialDto GetHomeReferential()
+        {
+            return Citizens.HomeReferentialMapper.Map(MyHordesCodeRepository.GetHomeLevels(), MyHordesCodeRepository.GetHomeUpgrades());
+        }
+
         public IEnumerable<BuildingDto> GetBuildings()
         {
             var models = DbContext.Buildings
@@ -1572,23 +1577,23 @@ namespace MyHordesOptimizerApi.Services.Impl
                      .Where(cell => cell.IdTown == townId)
                      .Where(cell => cell.IdRuin.HasValue)
                      .Include(mapCell => mapCell.IdRuinNavigation)
-                      .ThenInclude(ruin => ruin.RuinItemDrops)
+                      .ThenInclude(ruin => ruin!.RuinItemDrops)
                        .ThenInclude(itemRuinDrop => itemRuinDrop.IdItemNavigation)
                           .ThenInclude(item => item.ActionNames)
                           .AsSplitQuery()
                      .Include(mapCell => mapCell.IdRuinNavigation)
-                      .ThenInclude(ruin => ruin.RuinItemDrops)
+                      .ThenInclude(ruin => ruin!.RuinItemDrops)
                        .ThenInclude(itemRuinDrop => itemRuinDrop.IdItemNavigation)
                           .ThenInclude(item => item.PropertyNames)
                           .AsSplitQuery()
                      .Include(mapCell => mapCell.IdRuinNavigation)
-                      .ThenInclude(ruin => ruin.RuinItemDrops)
+                      .ThenInclude(ruin => ruin!.RuinItemDrops)
                        .ThenInclude(itemRuinDrop => itemRuinDrop.IdItemNavigation)
                           .ThenInclude(item => item.IdCategoryNavigation)
                           .AsSplitQuery()
                      .Select(cell => cell.IdRuinNavigation)
                      .ToList()
-                     .DistinctBy(ruin => ruin.IdRuin);
+                     .DistinctBy(ruin => ruin!.IdRuin);
                 ;
                 var dtos = Mapper.Map<List<MyHordesOptimizerRuinDto>>(models);
                 return dtos;
@@ -1626,11 +1631,11 @@ namespace MyHordesOptimizerApi.Services.Impl
                         .AsSplitQuery()
                 .Include(town => town.MapCells)
                     .ThenInclude(mapCell => mapCell.IdLastUpdateInfoNavigation)
-                        .ThenInclude(lastUpdate => lastUpdate.IdUserNavigation)
+                        .ThenInclude(lastUpdate => lastUpdate!.IdUserNavigation)
                         .AsSplitQuery()
                 .Include(town => town.MapCells)
                     .ThenInclude(mapCell => mapCell.IdScoutEstimationLastUpdateInfoNavigation)
-                        .ThenInclude(lastUpdate => lastUpdate.IdUserNavigation)
+                        .ThenInclude(lastUpdate => lastUpdate!.IdUserNavigation)
                         .AsSplitQuery()
                 .Include(town => town.TownCitizens)
                     .ThenInclude(townCitizen => townCitizen.IdUserNavigation)
@@ -1656,7 +1661,7 @@ namespace MyHordesOptimizerApi.Services.Impl
                 .Include(town => town.MapCells)
                     .ThenInclude(mapCell => mapCell.MapCellDigs)
                         .ThenInclude(digs => digs.IdLastUpdateInfoNavigation)
-                            .ThenInclude(lastUpdate => lastUpdate.IdUserNavigation)
+                            .ThenInclude(lastUpdate => lastUpdate!.IdUserNavigation)
                             .AsSplitQuery()
                 .AsNoTracking()
                 .First();

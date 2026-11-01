@@ -11,13 +11,13 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer
 
         public int Id { get; set; }
 
-        public IDictionary<string, string> Label { get; set; }
+        public IDictionary<string, string> Label { get; set; } = null!;
 
-        public IDictionary<string, string> Description { get; set; }
+        public IDictionary<string, string> Description { get; set; } = null!;
 
         public bool Explorable { get; set; }
 
-        public string Img { get; set; }
+        public string Img { get; set; } = null!;
 
         #endregion
 

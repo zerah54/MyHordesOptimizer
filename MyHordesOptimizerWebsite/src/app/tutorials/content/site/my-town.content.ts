@@ -97,8 +97,8 @@ export const SITE_MY_TOWN: TutorialPage = {
                         </ul>`
                 },
                 {
-                    title: $localize`Mettre à jour une zone`,
-                    content: $localize`<p>Un clic sur une case ouvre son détail ; « Mettre à jour la zone » ouvre la fenêtre de saisie :</p>
+                    title: $localize`Consulter et mettre à jour une zone`,
+                    content: $localize`<p>Un clic sur une case ouvre son détail ; « Consulter et mettre à jour la zone » ouvre la fenêtre complète de la zone, pour lire ses informations et les modifier :</p>
                         <ul>
                             <li><strong>Cellule</strong> : zombies, zombies tués, « Zone épuisée », relevés des métiers (abondance du fouineur, exploration de l'éclaireur, et leurs radars sur les cases voisines), objets au sol ;</li>
                             <li><strong>Bâtiment</strong> : nombre de tas d'un bâtiment enseveli, « Bâtiment vide », objets trouvables et, pour un bâtiment enseveli, les bâtiments possibles à cette distance ;</li>
@@ -203,7 +203,7 @@ export const SITE_MY_TOWN: TutorialPage = {
                     content: $localize`<ul>
                             <li>en mode édition, la liste « Tracé » de l'en-tête d'une partie la lie à un tracé de la ville (un tracé ne suit les expéditions que d'un seul jour) ; « Nouveau tracé… » ouvre la carte pour le dessiner. Lier un tracé privé le rend visible de toute la ville. La direction de la partie est déduite du tracé ;</li>
                             <li>« Voir sur la carte » ouvre la carte sur la fiche du tracé lié ;</li>
-                            <li>la feuille de route montre une mini-carte du tracé, puis les cases à consignes dans l'ordre du tracé, avec les PA au premier passage (sans tracé, par distance à la ville) ;</li>
+                            <li>la feuille de route montre une mini-carte du tracé, puis les cases à consignes dans l'ordre du tracé, avec les PA de chaque passage (sans tracé, par distance à la ville) ;</li>
                             <li>en mode édition, « Consigne sur cette case » ou un clic sur la mini-carte ajoute une consigne sur une case : texte libre, Ramasser, Déposer, Consommer, Déblayer (bâtiment enseveli), Explorer la ruine (ruine explorable), Camper, Action héroïque ou Attendre, pour toute l'expédition ou pour une place ;</li>
                             <li>une consigne dont la case n'est plus sur le tracé est marquée « Hors tracé » : déplacez-la sur une case du tracé, ou supprimez-la ;</li>
                             <li>« Importer le jour » recopie aussi les tracés liés : les expéditions importées suivent leurs propres copies.</li>

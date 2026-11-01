@@ -294,8 +294,8 @@ namespace MyHordesOptimizerApi.Controllers
         {
             var started = _importJobRunner.TryStart(job,
                 _userInfoProvider.UserId,
-                _userInfoProvider.UserKey,
-                _userInfoProvider.UserName,
+                _userInfoProvider.UserKey!,
+                _userInfoProvider.UserName!,
                 work);
             var state = _importJobRunner.GetState(job);
             return started ? Accepted(state) : Conflict(state);

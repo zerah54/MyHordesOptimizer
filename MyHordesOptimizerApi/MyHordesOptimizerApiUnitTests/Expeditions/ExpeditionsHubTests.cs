@@ -333,6 +333,22 @@ namespace MyHordesOptimizerApiUnitTests.Expeditions
         }
 
         [Fact]
+        public async Task DuplicateExpedition_DiffuseLaCopieEntiereSansEvenementDePartie()
+        {
+            var expeditionService = new FakeExpeditionService();
+            expeditionService.PendingMapRouteChanges.Add(new MapRouteChangeDto { Id = 7, Version = 3 });
+            var clients = new FakeHubCallerClients();
+            var hub = NewHub(userId: 1, townId: 42, Guid.NewGuid().ToString(), expeditionService: expeditionService, clients: clients);
+
+            await hub.DuplicateExpedition(11, "Nord (copie)", keepRoute: true, keepGeneralOrders: false, keepRouteOrders: false);
+
+            expeditionService.DuplicateChoices.Should().Be((true, false, false));
+            clients.Proxy.Sent.Select(sent => sent.Method).Should().Equal("ExpeditionUpdated", "MapRouteChanged");
+            ((ExpeditionDto)clients.Proxy.Sent[0].Args[0]!).Label.Should().Be("Nord (copie)");
+            expeditionService.PendingMapRouteChanges.Should().BeEmpty();
+        }
+
+        [Fact]
         public async Task SaveMapRoute_DiffuseLesPartiesLiees()
         {
             var mapRouteService = new FakeMapRouteService();

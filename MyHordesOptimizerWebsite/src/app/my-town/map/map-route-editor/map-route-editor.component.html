@@ -96,6 +96,9 @@
                         <span class="where">
                             <span class="coordinates">{{ step.coordinates }}</span>
                             <span class="place">{{ step.place }}</span>
+                            @if (step.passage_label) {
+                                <span class="passage-pill">{{ step.passage_label }}</span>
+                            }
                             @if (step.orders > 0) {
                                 <span class="orders" i18n>{step.orders, plural, =1 {1 consigne} other {{{ step.orders }} consignes}}</span>
                             }

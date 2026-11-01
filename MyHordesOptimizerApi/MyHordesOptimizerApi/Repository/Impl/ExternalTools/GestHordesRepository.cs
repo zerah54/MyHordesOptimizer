@@ -46,20 +46,28 @@ namespace MyHordesOptimizerApi.Repository.Impl.ExternalTools
             foreach(var cell in cellToUpdate)
             {
                 var cellAsJObject = cell as JObject;
-                var body = cellAsJObject.ToObject<Dictionary<string, object>>();
+                var body = cellAsJObject!.ToObject<Dictionary<string, object>>();
                 var majResponse = base.Post<GestHordesUpdateCaseResponse>(url: $"{GestHordesConfiguration.Url}/{GestHordesConfiguration.MajCasePath}", body: body, customHeader: majHeaders, mediaTypeIn : "application/x-www-form-urlencoded");
             }
         }
 
-        public void Update()
+        public void Update(GestHordesMajScriptRequest? cell)
         {
-            var majBody = new GestHordesMajRequest()
-            {
-                Key = UserKeyProvider.UserKey
-            };
             var customHeaders = new Dictionary<string, string>() { };
             customHeaders.Add("X-Source", "MyHordes Optimizer");
-            var majResponse = base.Post<GestHordesMajResponse>(url: $"{GestHordesConfiguration.Url}/{GestHordesConfiguration.MajPath}", body: majBody, customHeader: customHeaders, mediaTypeIn : "application/x-www-form-urlencoded");
+            var majUrl = $"{GestHordesConfiguration.Url}/{GestHordesConfiguration.MajPath}";
+            // Gest'Hordes ne lit les relevés de case que dans un corps JSON
+            if (cell != null)
+            {
+                cell.Key = UserKeyProvider.UserKey!;
+                base.Post<GestHordesMajResponse>(url: majUrl, body: cell, customHeader: customHeaders);
+                return;
+            }
+            var majBody = new GestHordesMajRequest()
+            {
+                Key = UserKeyProvider.UserKey!
+            };
+            var majResponse = base.Post<GestHordesMajResponse>(url: majUrl, body: majBody, customHeader: customHeaders, mediaTypeIn : "application/x-www-form-urlencoded");
         }
 
 
@@ -68,13 +76,13 @@ namespace MyHordesOptimizerApi.Repository.Impl.ExternalTools
             var loginUrl = $"{GestHordesConfiguration.Url}/{GestHordesConfiguration.LoginPath}";
             var loginRequestDto = new GestHordesLoginRequest()
             {
-                Key = UserKeyProvider.UserKey
+                Key = UserKeyProvider.UserKey!
             };
 
             var cookieContainer = new CookieContainer();
             var uri = new Uri(loginUrl);
-            string sessid = string.Empty;
-            string rememberMe = string.Empty;
+            string? sessid = string.Empty;
+            string? rememberMe = string.Empty;
             using (var httpClientHandler = new HttpClientHandler
             {
                 CookieContainer = cookieContainer
@@ -112,7 +120,7 @@ namespace MyHordesOptimizerApi.Repository.Impl.ExternalTools
 
         public void UpdateCellItem(GestHordesMajCaseRequestDto request)
         {
-            request.UserKey = UserKeyProvider.UserKey;
+            request.UserKey = UserKeyProvider.UserKey!;
             var majUrl = $"{GestHordesConfiguration.Url}/{GestHordesConfiguration.MajCasePath}";
             var customHeaders = new Dictionary<string, string>() { };
             customHeaders.Add("X-Source", "MyHordes Optimizer");
@@ -121,7 +129,7 @@ namespace MyHordesOptimizerApi.Repository.Impl.ExternalTools
 
         public void UpdateCellZombies(GestHordesMajCaseZombiesDto request)
         {
-            request.UserKey = UserKeyProvider.UserKey;
+            request.UserKey = UserKeyProvider.UserKey!;
             var majUrl = $"{GestHordesConfiguration.Url}/{GestHordesConfiguration.MajZombieTuePath}";
             var customHeaders = new Dictionary<string, string>() { };
             customHeaders.Add("X-Source", "MyHordes Optimizer");

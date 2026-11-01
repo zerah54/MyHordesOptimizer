@@ -13,6 +13,7 @@ import { Item } from '../../../_abstract_model/types/item.class';
 import { Ruin } from '../../../_abstract_model/types/ruin.class';
 import { TownContextService } from '../../../_core/services/town-context.service';
 import { getOwnTown, town } from '../../../_core/utilities/localstorage.util';
+import { ProgramMenuService } from '../../../my-town/program/program-menu.service';
 import { buildSidenavLinks, resolveSidenavLabel, resolveSidenavPath, SidenavLinks, townBasePath } from '../../menu/sidenav-links';
 import {
     buildGlossaryIndex,
@@ -89,7 +90,7 @@ export class GlobalSearchService {
     private readonly locale: string = moment.locale();
 
     /** Exemplaire propre du menu : celui du menu latéral voit ses groupes pliés et dépliés. */
-    private readonly sidenav_links: SidenavLinks[] = buildSidenavLinks(this.town_context);
+    private readonly sidenav_links: SidenavLinks[] = buildSidenavLinks(this.town_context, inject(ProgramMenuService));
 
     private readonly items: WritableSignal<readonly GlobalSearchEntry[]> = signal([]);
     private readonly buildings: WritableSignal<readonly GlobalSearchEntry[]> = signal([]);

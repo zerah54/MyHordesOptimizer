@@ -3,12 +3,14 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatMenuModule, MatMenuTrigger } from '@angular/material/menu';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { take } from 'rxjs';
 
 import { HORDES_IMG_REPO } from '../../../_abstract_model/const';
-import { DailyActionEnum } from '../../../_abstract_model/enum/daily-action.enum';
+import { DailyActionEnum, displayableDailyActions } from '../../../_abstract_model/enum/daily-action.enum';
 import { HomeEnum } from '../../../_abstract_model/enum/home.enum';
 import { StatusEnum } from '../../../_abstract_model/enum/status.enum';
 import { ApiService } from '../../../_abstract_model/services/api.service';
+import { BuiltBuildingsService } from '../../../_abstract_model/services/built-buildings.service';
 import { TownService } from '../../../_abstract_model/services/town.service';
 import { Imports, ListForAddRemove } from '../../../_abstract_model/types/_types';
 import { Citizen } from '../../../_abstract_model/types/citizen.class';
@@ -275,7 +277,17 @@ export class CitizenMenuComponent implements OnInit {
         }
     }
 
-    protected readonly daily_action_keys: DailyActionEnum[] = DailyActionEnum.getAllValues<DailyActionEnum>();
+    /** Actions quotidiennes affichables, filtrées à l'ouverture du sous-menu (pas d'appel à chaque page). */
+    protected readonly daily_action_keys: WritableSignal<DailyActionEnum[]> = signal<DailyActionEnum[]>(displayableDailyActions(null));
+    private readonly built_buildings: BuiltBuildingsService = inject(BuiltBuildingsService);
+
+    /** Ouverture du sous-menu des actions quotidiennes : ferme les autres et ne garde que les actions disponibles. */
+    protected openDailyActions(): void {
+        this.closeOtherMenus('dailyActions');
+        this.built_buildings.builtUids()
+            .pipe(take(1), takeUntilDestroyed(this.destroy_ref))
+            .subscribe((uids: ReadonlySet<string> | null): void => this.daily_action_keys.set(displayableDailyActions(uids)));
+    }
 
     /** L'action donnée a-t-elle déjà été faite aujourd'hui ? */
     protected isDailyActionDone(actionKey: string): boolean {

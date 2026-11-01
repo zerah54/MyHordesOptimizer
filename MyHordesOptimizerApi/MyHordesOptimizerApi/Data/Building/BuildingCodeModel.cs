@@ -12,7 +12,7 @@ namespace MyHordesOptimizerApi.Data.Building
 
         [JsonProperty("watchSurvivalBonusJob")]
         [JsonPropertyName("watchSurvivalBonusJob")]
-        public List<string> WatchSurvivalBonusJob { get; set; }
+        public List<string> WatchSurvivalBonusJob { get; set; } = null!;
 
         [JsonProperty("watchSurvivalBonusUpgradeLevelRequired")]
         [JsonPropertyName("watchSurvivalBonusUpgradeLevelRequired")]

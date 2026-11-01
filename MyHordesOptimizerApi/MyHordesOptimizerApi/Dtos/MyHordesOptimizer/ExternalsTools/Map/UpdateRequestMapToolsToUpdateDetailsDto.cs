@@ -9,13 +9,16 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.Map
         private const string Cell = "cell";
 
         [JsonProperty("IsFataMorgana")]
-        public string IsFataMorgana { get; set; }
+        public string IsFataMorgana { get; set; } = null!;
         [JsonProperty("IsBigBrothHordes")]
-        public string IsBigBrothHordes { get; set; }
+        public string IsBigBrothHordes { get; set; } = null!;
         [JsonProperty("IsGestHordes")]
-        public string IsGestHordes { get; set; }  
+        public string IsGestHordes { get; set; } = null!;
         [JsonProperty("IsMyHordesOptimizer")]
-        public string IsMyHordesOptimizer { get; set; }
+        public string IsMyHordesOptimizer { get; set; } = null!;
+        /// <summary>Absent chez les addons antérieurs à ZenHordes (donc nullable, sinon la validation les refuse). « cell » ou « none » : ZenHordes ne reçoit que ce que l'addon lui destine dans <c>ZenHordesCell</c>.</summary>
+        [JsonProperty("IsZenHordes")]
+        public string? IsZenHordes { get; set; }
 
 
         public static bool IsApi(string param)

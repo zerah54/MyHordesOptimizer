@@ -10,6 +10,8 @@ import { NoteDTO } from '../_abstract_model/dto/note.dto';
 import { UserAccountPublicDTO } from '../_abstract_model/dto/user-account.dto';
 import { NoteService } from '../_abstract_model/services/note.service';
 import { UserAccountService } from '../_abstract_model/services/user-account.service';
+import { Me } from '../_abstract_model/types/me.class';
+import { setUser } from '../_core/utilities/localstorage.util';
 import { ProfileComponent } from './profile.component';
 
 interface TestableComponent {
@@ -59,6 +61,53 @@ describe('ProfileComponent notes', (): void => {
     it('uses the material-symbols-rounded font for the refresh icon (the only font loaded by the app)', (): void => {
         const icon: Element | null = fixture.nativeElement.querySelector('.mho-profile__import mat-icon');
         expect(icon?.classList.contains('material-symbols-rounded')).toBe(true);
+    });
+});
+
+describe('ProfileComponent onglet Thème', (): void => {
+    async function create(viewer_id: number): Promise<ComponentFixture<ProfileComponent>> {
+        setUser({ id: viewer_id } as Me);
+        const noteService: MockedObject<NoteService> = {
+            getUserNote: vi.fn().mockName('NoteService.getUserNote').mockReturnValue(of({ note: null } as NoteDTO))
+        } as unknown as MockedObject<NoteService>;
+        const userAccountService: MockedObject<UserAccountService> = {
+            getPublicProfile: vi.fn().mockName('UserAccountService.getPublicProfile')
+                .mockReturnValue(of({ id: 5, userName: 'Zerah', avatar: null } as UserAccountPublicDTO))
+        } as unknown as MockedObject<UserAccountService>;
+
+        await TestBed.configureTestingModule({
+            imports: [ProfileComponent],
+            providers: [
+                provideHttpClient(withXhr()), provideHttpClientTesting(),
+                { provide: NoteService, useValue: noteService },
+                { provide: UserAccountService, useValue: userAccountService },
+                { provide: ActivatedRoute, useValue: { snapshot: { paramMap: { get: (): string => '5' } } } },
+                { provide: MAT_ICON_DEFAULT_OPTIONS, useValue: { fontSet: 'material-symbols-rounded' } as MatIconDefaultOptions },
+            ]
+        }).compileComponents();
+
+        const fixture: ComponentFixture<ProfileComponent> = TestBed.createComponent(ProfileComponent);
+        fixture.detectChanges();
+        return fixture;
+    }
+
+    function tabLinks(fixture: ComponentFixture<ProfileComponent>): string[] {
+        return Array.from((fixture.nativeElement as HTMLElement).querySelectorAll('a[mat-tab-link]'))
+            .map((a: Element): string => a.textContent?.trim() ?? '');
+    }
+
+    afterEach((): void => setUser(null));
+
+    it('affiche l\'onglet Thème sur son propre profil', async (): Promise<void> => {
+        const fixture: ComponentFixture<ProfileComponent> = await create(5);
+
+        expect(tabLinks(fixture).some((label: string): boolean => label === 'Thème de la carte')).toBe(true);
+    });
+
+    it('n\'affiche pas l\'onglet Thème sur le profil d\'un autre', async (): Promise<void> => {
+        const fixture: ComponentFixture<ProfileComponent> = await create(7);
+
+        expect(tabLinks(fixture).some((label: string): boolean => label === 'Thème de la carte')).toBe(false);
     });
 });
 

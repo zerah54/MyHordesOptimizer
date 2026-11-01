@@ -8,15 +8,15 @@ namespace MyHordesOptimizerApi.Data.Buildings
     {
         [JsonProperty("tier0")]
         [JsonPropertyName("tier0")]
-        public BuildingResourceTierCodeModel Tier0 { get; set; }
+        public BuildingResourceTierCodeModel Tier0 { get; set; } = null!;
 
         [JsonProperty("tier1")]
         [JsonPropertyName("tier1")]
-        public BuildingResourceTierCodeModel Tier1 { get; set; }
+        public BuildingResourceTierCodeModel Tier1 { get; set; } = null!;
 
         [JsonProperty("tier2")]
         [JsonPropertyName("tier2")]
-        public BuildingApOnlyTierCodeModel Tier2 { get; set; }
+        public BuildingApOnlyTierCodeModel Tier2 { get; set; } = null!;
 
         /// <summary>
         /// Rareté effective en Pandémonium, exposée SEULEMENT quand le chantier est nommément
@@ -32,7 +32,7 @@ namespace MyHordesOptimizerApi.Data.Buildings
     {
         [JsonProperty("resources")]
         [JsonPropertyName("resources")]
-        public Dictionary<string, int> Resources { get; set; }
+        public Dictionary<string, int> Resources { get; set; } = null!;
 
         [JsonProperty("ap")]
         [JsonPropertyName("ap")]

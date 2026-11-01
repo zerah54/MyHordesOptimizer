@@ -1,4 +1,6 @@
-/** Groupe de l'arbre des capacités héroïques, désigné par la lettre que les joueurs utilisent (S, U, P, E, R). */
+import { I18nLabels } from './_types';
+
+/** Groupe de l'arbre des compétences héroïques, désigné par la lettre que les joueurs utilisent (S, U, P, E, R). */
 export type HeroSkillFamily = 's' | 'u' | 'p' | 'e' | 'r';
 
 export interface HeroSkillFamilyInfo {
@@ -39,4 +41,39 @@ export function heroSkillLevelName(level: number): string {
 /** Valeur lue de l'API : un niveau entier dans les bornes, sinon inconnu. */
 export function toHeroSkillLevel(value: number | null | undefined): number | null {
     return typeof value === 'number' && Number.isInteger(value) && value >= 0 && value <= MAX_HERO_SKILL_LEVEL ? value : null;
+}
+
+/** Ce qu'il faut d'une compétence du référentiel pour nommer son groupe. */
+export interface HeroSkillGroupSource {
+    readonly legacy: boolean;
+    readonly group: I18nLabels | null;
+    readonly group_sort: number | null;
+}
+
+/**
+ * Nom de chaque groupe, lu dans les compétences actuelles servies par l'API (allemand, puis lettre, à défaut).
+ * @param {readonly HeroSkillGroupSource[]} skills Compétences du référentiel.
+ * @param {string} locale Langue du site.
+ * @returns {Record<HeroSkillFamily, string>} Nom par groupe.
+ */
+export function heroSkillGroupNames(skills: readonly HeroSkillGroupSource[], locale: string): Record<HeroSkillFamily, string> {
+    const names: Record<HeroSkillFamily, string> = { ...HERO_SKILL_LETTERS };
+    HERO_SKILL_FAMILIES.forEach((family: HeroSkillFamilyInfo): void => {
+        const group: I18nLabels | null | undefined = skills.find((skill: HeroSkillGroupSource): boolean => !skill.legacy && skill.group_sort === family.group_sort)?.group;
+        const name: string | undefined = group?.[locale] || group?.['de'];
+        if (name) {
+            names[family.key] = name;
+        }
+    });
+    return names;
+}
+
+/**
+ * Résumé d'un groupe pour un citoyen : nom du groupe et nom du niveau.
+ * @param {string} group Nom du groupe.
+ * @param {number | null} level Niveau (0 : aucun, null : inconnu).
+ * @returns {string | null} Résumé, nul sans niveau connu.
+ */
+export function heroSkillSummary(group: string, level: number | null): string | null {
+    return level === null || level === 0 ? null : `${group} : ${heroSkillLevelName(level - 1)}`;
 }

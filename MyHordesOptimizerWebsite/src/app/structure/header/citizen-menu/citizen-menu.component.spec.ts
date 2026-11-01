@@ -5,8 +5,10 @@ import { MatMenuTrigger } from '@angular/material/menu';
 import { of, throwError } from 'rxjs';
 import type { MockedObject } from 'vitest';
 
+import { DailyActionEnum } from '../../../_abstract_model/enum/daily-action.enum';
 import { StatusEnum } from '../../../_abstract_model/enum/status.enum';
 import { ApiService } from '../../../_abstract_model/services/api.service';
+import { BuiltBuildingsService } from '../../../_abstract_model/services/built-buildings.service';
 import { TownService } from '../../../_abstract_model/services/town.service';
 import { ListForAddRemove } from '../../../_abstract_model/types/_types';
 import { Bag } from '../../../_abstract_model/types/bag.class';
@@ -39,6 +41,8 @@ interface TestableComponent {
     home_trigger: () => MatMenuTrigger | undefined;
     isDailyActionDone(actionKey: string): boolean;
     closeOtherMenus(opened: 'status' | 'bag' | 'dailyActions' | 'heroicActions' | 'home'): void;
+    openDailyActions(): void;
+    daily_action_keys: () => DailyActionEnum[];
     addItem(item_id: number): void;
     removeItem(item_id: number): void;
     emptyBag(): void;
@@ -136,6 +140,19 @@ describe('CitizenMenuComponent', (): void => {
 
             expect(testable.bag_lists().length).toBe(1);
             expect(testable.bag_lists()[0].list).toEqual(items);
+        });
+    });
+
+    describe('actions quotidiennes selon les chantiers construits', (): void => {
+        it('ne charge les chantiers qu\'à l\'ouverture du sous-menu, puis masque les actions non disponibles', (): void => {
+            const built_uids: ReturnType<typeof vi.fn> = vi.spyOn(TestBed.inject(BuiltBuildingsService), 'builtUids')
+                .mockReturnValue(of(new Set<string>(['small_gallery_#00'])));
+            fixture.detectChanges();
+            expect(built_uids).not.toHaveBeenCalled();
+
+            testable.openDailyActions();
+
+            expect(testable.daily_action_keys().map((action: DailyActionEnum): string => action.key)).toEqual(['home_clean', 'home_rest', 'home_scavenge']);
         });
     });
 

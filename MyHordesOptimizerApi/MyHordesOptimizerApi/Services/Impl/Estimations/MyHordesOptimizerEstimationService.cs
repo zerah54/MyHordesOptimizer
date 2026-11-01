@@ -294,7 +294,7 @@ namespace MyHordesOptimizerApi.Services.Impl.Estimations
             // monotonie décroissante PAR CÔTÉ, cônes de décroissance de la somme). Conditions nécessaires
             // uniquement ⟹ la vraie attaque n'est JAMAIS exclue ; le gain vit surtout à J13+ (jusqu'à
             // −65 % de largeur observé). Pas en mode hard (l'attaque re-tirée casse le lien Δ↔V).
-            bool[] pairFeasible = null;
+            bool[]? pairFeasible = null;
             int pairWindowStart = lower;
             if (!config.RerollInBand && shiftSpan > 0 && upper > lower)
             {
@@ -437,7 +437,7 @@ namespace MyHordesOptimizerApi.Services.Impl.Estimations
         /// exactSouls = mode âmes : chaque ligne porte son facteur exact (<see cref="EstimationRow.SoulFactor"/>),
         /// les cibles sont entières en espace de base ; soulCap vaut alors 0.
         /// </summary>
-        private static bool[] ComputeOffsetPairFeasibility(List<EstimationRow> rows, int lower, int upper,
+        private static bool[]? ComputeOffsetPairFeasibility(List<EstimationRow> rows, int lower, int upper,
             int dayAttack, double factor, double shiftSpan, EstimationSolverConfig config, double soulCap, bool exactSouls)
         {
             var filterRows = rows.Where(row => row.CitizenCount >= 0).OrderBy(row => row.CitizenCount).ToList();

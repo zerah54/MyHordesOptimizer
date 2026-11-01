@@ -1,0 +1,21 @@
+:host {
+    display: inline-flex;
+}
+
+.day-selector {
+    display: inline-flex;
+    align-items: center;
+    white-space: nowrap;
+}
+
+.day,
+.selected {
+    font-weight: 600;
+}
+
+.today {
+    margin-left: 0.3em;
+    font-size: 0.85em;
+    font-weight: 400;
+    opacity: 0.7;
+}

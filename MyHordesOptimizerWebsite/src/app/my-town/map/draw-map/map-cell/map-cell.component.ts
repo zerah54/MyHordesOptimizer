@@ -54,6 +54,10 @@ const material_modules: Imports = [];
  *  (`NightlyHandler::getZoneKm() < 10 ? bplan_u : bplan_r`). */
 const UNCOMMON_BLUEPRINT_KM: number = 10;
 
+/** Ce qu'une case jamais visitée peut montrer : ce qui ne demande pas d'y être allé. Pour les
+ *  zombies, seule l'estimation d'un éclaireur voisin. */
+const NEVER_VISITED_CORNERS: ReadonlySet<CornerInfo> = new Set<CornerInfo>(['note', 'distance_km', 'distance_pa', 'zombies']);
+
 const CORNER_CLASSES: Readonly<Record<CornerPosition, string>> = {
     top_left: 'corner-top-left',
     top_right: 'corner-top-right',
@@ -122,6 +126,8 @@ export class MapCellComponent {
         const options: MapOptions = this.options();
         const classes: string[] = [];
 
+        if (cell.is_never_visited && !cell.is_town) return 'never-visited';
+
         switch (options.map_type) {
             case 'danger':
                 classes.push('alert', `danger-${cell.danger_level}`);
@@ -145,7 +151,6 @@ export class MapCellComponent {
         }
 
         if (cell.is_town) classes.push('town');
-        if (cell.is_never_visited) classes.push('never-visited');
         if (cell.is_visited_today) classes.push('visited-today');
 
         const zone_regen_class: string | undefined = cell.zone_regen?.value?.class;
@@ -218,6 +223,7 @@ export class MapCellComponent {
 
     private buildCorner(position: CornerPosition, info: CornerInfo, options: MapOptions): CellCorner | null {
         const cell: Cell = this.cell();
+        if (cell.is_never_visited && !NEVER_VISITED_CORNERS.has(info)) return null;
         const corner: CellCorner = {
             position,
             css_class: CORNER_CLASSES[position],
@@ -252,12 +258,16 @@ export class MapCellComponent {
                     corner.value = `≈${cell.scout_estimation_zombie}`;
                     corner.estimation = true;
                     corner.title = $localize`Estimation d'un éclaireur : entre ${cell.scout_estimation_min}:min: et ${cell.scout_estimation_max}:max: zombies`;
+                } else if (cell.is_never_visited || cell.nb_zombie === null || cell.nb_zombie === undefined) {
+                    return null;
                 } else {
-                    corner.value = this.format(cell.nb_zombie || 0);
+                    // Un 0 reste affiché : relevé, il dit que la case était vide de zombies.
+                    corner.value = this.format(cell.nb_zombie);
                 }
                 return corner;
             case 'zombies_killed':
-                corner.value = this.format(cell.nb_zombie_killed || 0);
+                if (!(cell.nb_zombie_killed > 0)) return null;
+                corner.value = this.format(cell.nb_zombie_killed);
                 return corner;
             case 'digs_remaining':
                 corner.value = this.format(remainingDigs(cell, options));
@@ -290,9 +300,12 @@ export class MapCellComponent {
                 corner.title = $localize`Mise à jour il y a ${MapCellComponent.ageLabel(age_minutes)}:age:`;
                 return corner;
             }
-            case 'trash':
-                corner.value = String(trashValue(cell, options, this.allItems()));
+            case 'trash': {
+                const value: number = trashValue(cell, options, this.allItems());
+                if (value === 0) return null;
+                corner.value = String(value);
                 return corner;
+            }
             case 'digs_level': {
                 // Même niveau que la couleur du fond de la carte des fouilles.
                 const level: number = digLevel(cell, options);

@@ -81,4 +81,46 @@ describe('map-cell-orders', (): void => {
     it('counts the cell orders of the parts that follow each route', (): void => {
         expect([...routeOrderCounts(index)]).toEqual([[5, { orders: 3, cells: 1 }]]);
     });
+    describe('passages', (): void => {
+        const CTX: { user_id: number; citizens: Citizen[]; items: never[]; expeditions: never[]; locale: string } = { user_id: ME, citizens: CITIZENS, items: [], expeditions: [], locale: 'fr' };
+        const LOOP: ExpeditionPartRoute = { ...NORTH, cells: [{ x: 3, y: 4 }, { x: 5, y: 5 }, { x: 3, y: 4 }] };
+        const STRAIGHT: ExpeditionPartRoute = { ...NORTH, cells: [{ x: 3, y: 4 }, { x: 5, y: 5 }] };
+
+        function passageOrder(id: number, text: string, passage: number | null): ExpeditionOrder {
+            return Object.assign(order(id, text), { passage });
+        }
+
+        function loopIndex(route: ExpeditionPartRoute | null): CellOrderIndex {
+            const mine: ExpeditionPart = part(10, [passageOrder(1, 'Second', 2)], [member(20, ME, [passageOrder(2, 'Premier', 1)]), member(21, 8, [passageOrder(3, 'Autre second', 2), passageOrder(4, 'Autre premier', null)])], route);
+            return buildCellOrderIndex([expedition(1, 'Expé 1', 0, [mine])]);
+        }
+
+        it('sorts the orders of a part by passage when the route crosses the cell twice', (): void => {
+            const entries: readonly CellOrderEntry[] = cellOrdersAt(loopIndex(LOOP), { x: 3, y: 4 });
+
+            expect(entries.map((entry: CellOrderEntry): string => entry.order.text)).toEqual(['Premier', 'Autre premier', 'Second', 'Autre second']);
+        });
+
+        it('labels the passages in mine and in others', (): void => {
+            const view: CellOrdersView = buildCellOrdersView(cellOrdersAt(loopIndex(LOOP), { x: 3, y: 4 }), CTX);
+
+            expect(view.mine[0].lines.map((line: { passage_label: string | null }): string | null => line.passage_label)).toEqual(['1er passage', '2e passage']);
+            expect(view.others.map((other: { passage_label: string | null }): string | null => other.passage_label)).toEqual(['1er passage', '2e passage']);
+            const others: CellOrdersView = buildCellOrdersView(cellOrdersAt(loopIndex(LOOP), { x: 3, y: 4 }), { ...CTX, user_id: null });
+            expect(others.others.map((other: { passage_label: string | null }): string | null => other.passage_label)).toEqual(['1er passage', '1er passage', '2e passage', '2e passage']);
+        });
+
+        it('has no label and keeps the order when the cell is crossed once or the part has no route', (): void => {
+            for (const route of [STRAIGHT, null]) {
+                const entries: readonly CellOrderEntry[] = cellOrdersAt(loopIndex(route), { x: 3, y: 4 });
+                expect(entries.map((entry: CellOrderEntry): string => entry.order.text)).toEqual(['Second', 'Premier', 'Autre second', 'Autre premier']);
+                const view: CellOrdersView = buildCellOrdersView(entries, CTX);
+                expect(view.mine[0].lines.every((line: { passage_label: string | null }): boolean => line.passage_label === null)).toBe(true);
+            }
+        });
+
+        it('keeps the order total of the cell', (): void => {
+            expect([...routeOrderCounts(loopIndex(LOOP))]).toEqual([[5, { orders: 4, cells: 1 }]]);
+        });
+    });
 });

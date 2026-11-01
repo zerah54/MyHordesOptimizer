@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Text.RegularExpressions;
 using MyHordesOptimizerApi.Dtos.MyHordes;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
@@ -15,7 +16,8 @@ namespace MyHordesOptimizerApi.Extensions
         /// celle-ci change à chaque déploiement de leur côté.
         /// Un nom déjà dépourvu d'empreinte est renvoyé tel quel.
         /// </summary>
-        public static string RemoveImageFingerprint(string img)
+        [return: NotNullIfNotNull(nameof(img))]
+        public static string? RemoveImageFingerprint(string? img)
         {
             return string.IsNullOrEmpty(img) ? img : Regex.Replace(img, @"(.*)\.(.*)\.(.*)", "$1.$3");
         }
@@ -76,7 +78,8 @@ namespace MyHordesOptimizerApi.Extensions
         /// majorité des libellés sont dans ce cas.
         /// </para>
         /// </remarks>
-        public static string ResolveIcuDefaultForm(string message)
+        [return: NotNullIfNotNull(nameof(message))]
+        public static string? ResolveIcuDefaultForm(string? message)
         {
             if (string.IsNullOrWhiteSpace(message))
             {
@@ -145,7 +148,7 @@ namespace MyHordesOptimizerApi.Extensions
         /// Renvoie le contenu de l'accolade ouverte à <paramref name="ouverture"/>, accolades
         /// internes comprises, ou null si elle n'est jamais refermée.
         /// </summary>
-        private static string ExtraireBlocEquilibre(string texte, int ouverture)
+        private static string? ExtraireBlocEquilibre(string texte, int ouverture)
         {
             var depth = 0;
             for (var i = ouverture; i < texte.Length; i++)
@@ -168,7 +171,7 @@ namespace MyHordesOptimizerApi.Extensions
 
         public static TownType GetTownType(this MyHordesMap map)
         {
-            if (map.City.Hard == true)
+            if (map.City!.Hard == true)
             {
                 return TownType.PANDE;
             }

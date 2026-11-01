@@ -33,6 +33,13 @@ export type SpRequirementOperator = 'min' | 'max' | 'exact';
 /** Consigne typée (`ExpeditionOrderKinds` côté API) ; une consigne sans type est un texte libre. */
 export type ExpeditionOrderKind = 'pick' | 'drop' | 'use' | 'clear' | 'explore' | 'excavate' | 'camp' | 'hero' | 'wait';
 
+/** Ce que la copie d'une expédition reprend, en plus de ses places. */
+export interface ExpeditionDuplicateChoices {
+    keepRoute: boolean;
+    keepGeneralOrders: boolean;
+    keepRouteOrders: boolean;
+}
+
 export interface ListForAddRemove {
     label: string;
     list: (Item | StatusEnum)[];

@@ -13,6 +13,7 @@ import { CitizensListComponent } from './citizens/citizens-list/citizens-list.co
 import { ExpeditionsComponent } from './expeditions/expeditions.component';
 import { MapComponent } from './map/map.component';
 import { NightwatchComponent } from './nightwatch/nightwatch.component';
+import { MyProgramComponent } from './program/my-program.component';
 import { EstimationsComponent } from './statistics/estimations/estimations.component';
 import { RegistryComponent } from './statistics/registry/registry.component';
 import { ScrutateurComponent } from './statistics/scrutateur/scrutateur.component';
@@ -80,6 +81,12 @@ export const MY_TOWN_ROUTES: Route[] = [
         path: 'nightwatch',
         component: NightwatchComponent,
         title: 'MyHordes Optimizer' + ' - ' + $localize`Ma ville` + ' - ' + $localize`Veilles`,
+        canActivate: [(): boolean => inject(InDevModeGuard).canActivate()]
+    },
+    {
+        path: 'program',
+        component: MyProgramComponent,
+        title: 'MyHordes Optimizer' + ' - ' + $localize`Ma ville` + ' - ' + $localize`Mon programme`,
         canActivate: [(): boolean => inject(InDevModeGuard).canActivate()]
     },
     {

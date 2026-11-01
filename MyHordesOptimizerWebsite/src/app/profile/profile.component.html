@@ -40,7 +40,7 @@
         <div class="mho-profile__error" i18n>Utilisateur introuvable.</div>
     } @else if (p) {
         <nav mat-tab-nav-bar [mat-stretch-tabs]="false" mat-align-tabs="start" [tabPanel]="panel">
-            @for (link of links; track link.link) {
+            @for (link of links(); track link.link) {
                 <a mat-tab-link [routerLink]="[link.link]" routerLinkActive #rla="routerLinkActive" [active]="rla.isActive">
                     {{ link.label }}
                 </a>

@@ -58,13 +58,16 @@ namespace MyHordesOptimizerApi.Repository.Abstract
             return url;
         }
 
-        protected override TResult GetResult<TResult>(string mediaTypeOut, string stringResult)
+        protected override TResult GetResult<TResult>(string? mediaTypeOut, string stringResult)
         {
-            dynamic dynamicResult = JsonConvert.DeserializeObject(stringResult);
-            if (dynamicResult != null && ((JToken)dynamicResult).Type == JTokenType.Object &&
+            if (string.IsNullOrWhiteSpace(stringResult) || stringResult.TrimStart().StartsWith("<"))
+                throw new MyHordesApiException(message: "Le site MyHordes est en maintenance.", statusCode: HttpStatusCode.ServiceUnavailable);
+
+            dynamic? dynamicResult = JsonConvert.DeserializeObject(stringResult);
+            if (dynamicResult is not null && ((JToken)dynamicResult).Type == JTokenType.Object &&
                 dynamicResult.ContainsKey("error") != null)
             {
-                var error = dynamicResult.error;
+                var error = dynamicResult!.error;
                 if (error == "nightly_attack")
                     throw new MyHordesApiException(message: "Le site est assiégé par des hordes de zombies !", statusCode: HttpStatusCode.ServiceUnavailable);
                 if (error == "rate_limit_reached")

@@ -1,0 +1,17 @@
+<h2 mat-dialog-title>{{ data.title }}</h2>
+<mat-dialog-content>
+    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+        <mat-label i18n>Nom de la proposition</mat-label>
+        <input matInput type="text" data-field="name" cdkFocusInitial [maxlength]="max_length" [ngModel]="name()" (ngModelChange)="name.set($event)"
+               (keydown.enter)="confirm()">
+    </mat-form-field>
+    @if (data.offerCopy) {
+        <p>
+            <mat-checkbox [checked]="copy()" (change)="copy.set($event.checked)" i18n>Partir d'une copie de la proposition affichée</mat-checkbox>
+        </p>
+    }
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+    <button mat-button type="button" mat-dialog-close i18n>Annuler</button>
+    <button mat-flat-button type="button" data-action="confirm" [disabled]="name().trim() === ''" (click)="confirm()" i18n>Valider</button>
+</mat-dialog-actions>

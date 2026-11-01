@@ -6,7 +6,7 @@ using MyHordesOptimizerApi.Providers.Interfaces;
 
 namespace MyHordesOptimizerApi.MappingProfiles.Resolvers
 {
-    public class TownCadaversResolver : IValueResolver<MyHordesMap, TownDto, CadaversLastUpdateDto>
+    public class TownCadaversResolver : IValueResolver<MyHordesMap, TownDto, CadaversLastUpdateDto?>
     {
         protected IServiceScopeFactory ServiceScopeFactory { get; private set; }
 
@@ -20,7 +20,7 @@ namespace MyHordesOptimizerApi.MappingProfiles.Resolvers
             UserInfoProvider = userInfoProvider;
         }
 
-        public CadaversLastUpdateDto Resolve(MyHordesMap source, TownDto destination, CadaversLastUpdateDto destMember, ResolutionContext context)
+        public CadaversLastUpdateDto? Resolve(MyHordesMap source, TownDto destination, CadaversLastUpdateDto? destMember, ResolutionContext context)
         {
             //var wrapper = new CadaversLastUpdateDto();
             //var cod = MhoRepository.GetCausesOfDeath();

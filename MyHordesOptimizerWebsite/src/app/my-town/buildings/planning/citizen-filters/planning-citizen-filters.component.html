@@ -1,0 +1,64 @@
+<div class="filters">
+    @if (filters.job_options().length > 1) {
+        <mat-button-toggle-group multiple hideMultipleSelectionIndicator data-filter="jobs" [value]="[...filters.jobs()]"
+                                 (change)="filters.onJobs($event.value)"
+                                 i18n-aria-label aria-label="Métiers">
+            @for (job of filters.job_options(); track job.key) {
+                <mat-button-toggle [value]="job.key" [matTooltip]="job.value.label">
+                    <img [src]="HORDES_IMG_REPO + job.value.img" [alt]="job.value.label">
+                </mat-button-toggle>
+            }
+        </mat-button-toggle-group>
+    }
+    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+        <mat-label i18n>Consigne</mat-label>
+        <mat-select data-filter="task" [value]="filters.task()" (selectionChange)="filters.task.set($event.value)">
+            <mat-option [value]="null" i18n>Toutes</mat-option>
+            @for (option of filters.task_options(); track option.key) {
+                <mat-option [value]="option.key">
+                    @switch (option.key) {
+                        @case ('home') {
+                            <ng-container i18n>Maison</ng-container>
+                        }
+                        @case ('homeUpgrade') {
+                            <ng-container i18n>Amélioration de maison</ng-container>
+                        }
+                        @case ('free') {
+                            <ng-container i18n>Libre</ng-container>
+                        }
+                        @default {
+                            {{ option.label }}
+                        }
+                    }
+                </mat-option>
+            }
+        </mat-select>
+    </mat-form-field>
+    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+        <mat-label i18n>État</mat-label>
+        <mat-select data-filter="state" [value]="filters.state()" (selectionChange)="filters.state.set($event.value)">
+            <mat-option value="all" i18n>Tous</mat-option>
+            <mat-option value="todo" i18n>À faire</mat-option>
+            <mat-option value="done" i18n>Terminé</mat-option>
+            <mat-option value="none" i18n>Sans consigne</mat-option>
+        </mat-select>
+    </mat-form-field>
+    @if (filters.has_banned()) {
+        <mat-form-field appearance="outline" subscriptSizing="dynamic">
+            <mat-label i18n>Poche</mat-label>
+            <mat-select data-filter="pool" [value]="filters.pool()" (selectionChange)="filters.pool.set($event.value)">
+                <mat-option value="all" i18n>Toutes</mat-option>
+                <mat-option value="banned" i18n>Bannis</mat-option>
+                <mat-option value="regular" i18n>Non-bannis</mat-option>
+            </mat-select>
+        </mat-form-field>
+    }
+    <button mat-button type="button" data-action="reset-filters" [disabled]="!filters.filtered()" (click)="filters.reset()" i18n>Réinitialiser</button>
+    <button mat-stroked-button type="button" data-action="bulk-add" [disabled]="!store.can_edit() || filters.selected().size === 0" (click)="openBulkAdd()">
+        <span class="label">
+            <mat-icon>group_add</mat-icon>
+            <ng-container i18n>Ajouter une consigne</ng-container>
+        </span>
+    </button>
+    <ng-content/>
+</div>

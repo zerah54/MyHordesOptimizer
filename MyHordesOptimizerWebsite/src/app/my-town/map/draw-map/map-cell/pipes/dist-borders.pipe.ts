@@ -1,6 +1,7 @@
 import { Pipe, PipeTransform } from '@angular/core';
 
 import { Cell } from '../../../../../_abstract_model/types/cell.class';
+import { distanceBorder } from '../../../distance-zones';
 import { Distance, MapOptions } from '../../../map.component';
 
 /**
@@ -8,11 +9,12 @@ import { Distance, MapOptions } from '../../../map.component';
  * dernière case du cercle. Les quatre pipes ne diffèrent que par la voisine considérée ; la règle
  * elle-même était recopiée quatre fois, avec un accès non protégé `drawed_map[y ± 1][x]` qui
  * lève dès qu'une ligne est plus courte que les autres.
+ * @returns la bordure de la première zone concernée, `null` si aucune
  */
-function crossesDistanceRing(cell: Cell, neighbour: Cell | undefined, distances: Distance[]): boolean {
-    if (!neighbour) return false;
+function distanceRingBorder(cell: Cell, neighbour: Cell | undefined, distances: Distance[]): string | null {
+    if (!neighbour) return null;
 
-    return distances.some((distance: Distance): boolean => {
+    const ring: Distance | undefined = distances.find((distance: Distance): boolean => {
         if (distance.unit === 'km') {
             return neighbour.nb_km > cell.nb_km && cell.nb_km === distance.value;
         }
@@ -23,14 +25,15 @@ function crossesDistanceRing(cell: Cell, neighbour: Cell | undefined, distances:
         const half: number = distance.value / 2;
         return neighbour.nb_pa > cell.nb_pa && cell.nb_pa <= half && cell.nb_pa > half - 1;
     });
+    return ring ? distanceBorder(ring) : null;
 }
 
 @Pipe({
     name: 'distBorderLeft'
 })
 export class DistBorderLeft implements PipeTransform {
-    public transform(cell: Cell, options: MapOptions, drawed_map: Cell[][]): boolean {
-        return crossesDistanceRing(cell, drawed_map[cell.y]?.[cell.x - 1], options.distances);
+    public transform(cell: Cell, options: MapOptions, drawed_map: Cell[][]): string | null {
+        return distanceRingBorder(cell, drawed_map[cell.y]?.[cell.x - 1], options.distances);
     }
 }
 
@@ -38,8 +41,8 @@ export class DistBorderLeft implements PipeTransform {
     name: 'distBorderRight'
 })
 export class DistBorderRight implements PipeTransform {
-    public transform(cell: Cell, options: MapOptions, drawed_map: Cell[][]): boolean {
-        return crossesDistanceRing(cell, drawed_map[cell.y]?.[cell.x + 1], options.distances);
+    public transform(cell: Cell, options: MapOptions, drawed_map: Cell[][]): string | null {
+        return distanceRingBorder(cell, drawed_map[cell.y]?.[cell.x + 1], options.distances);
     }
 }
 
@@ -47,8 +50,8 @@ export class DistBorderRight implements PipeTransform {
     name: 'distBorderTop'
 })
 export class DistBorderTop implements PipeTransform {
-    public transform(cell: Cell, options: MapOptions, drawed_map: Cell[][]): boolean {
-        return crossesDistanceRing(cell, drawed_map[cell.y - 1]?.[cell.x], options.distances);
+    public transform(cell: Cell, options: MapOptions, drawed_map: Cell[][]): string | null {
+        return distanceRingBorder(cell, drawed_map[cell.y - 1]?.[cell.x], options.distances);
     }
 }
 
@@ -56,7 +59,7 @@ export class DistBorderTop implements PipeTransform {
     name: 'distBorderBottom'
 })
 export class DistBorderBottom implements PipeTransform {
-    public transform(cell: Cell, options: MapOptions, drawed_map: Cell[][]): boolean {
-        return crossesDistanceRing(cell, drawed_map[cell.y + 1]?.[cell.x], options.distances);
+    public transform(cell: Cell, options: MapOptions, drawed_map: Cell[][]): string | null {
+        return distanceRingBorder(cell, drawed_map[cell.y + 1]?.[cell.x], options.distances);
     }
 }

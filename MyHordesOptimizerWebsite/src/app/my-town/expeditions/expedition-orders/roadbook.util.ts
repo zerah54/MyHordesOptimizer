@@ -1,5 +1,5 @@
 import { MapRoutePoint } from '../../../_abstract_model/types/map-route.class';
-import { cellKey, firstPassageOf, orderCell, OwnedExpeditionOrder } from './expedition-orders.util';
+import { cellKey, orderCell, OwnedExpeditionOrder, passageLabel, resolvedRouteIndex, routeIndexesOf } from './expedition-orders.util';
 
 /** Départ, arrivée, case à consignes sur le tracé (ou sans tracé), case à consignes hors du tracé. */
 export type RoadbookNode = 'start' | 'end' | 'stop' | 'off';
@@ -12,10 +12,14 @@ export interface RoadbookStep {
     readonly label: string;
     /** Case, en coordonnées absolues. */
     readonly cell: MapRoutePoint;
-    /** PA au premier passage sur le tracé, ou depuis la ville sans tracé ; `null` hors du tracé. */
+    /** PA de ce passage sur le tracé, ou depuis la ville sans tracé ; `null` hors du tracé. */
     readonly ap: number | null;
+    /** Rang de l'étape parmi les passages sur sa case ; `null` hors du tracé et sans tracé. */
+    readonly passage: number | null;
+    /** Rang du passage, seulement sur un arrêt dont la case est traversée plusieurs fois. */
+    readonly passage_label: string | null;
     readonly orders: readonly OwnedExpeditionOrder[];
-    /** L'arrivée d'une boucle est la case du départ : ses consignes sont au départ. */
+    /** Faux pour une étape hors tracé et pour l'arrivée d'un tracé d'une seule case. */
     readonly addable: boolean;
 }
 
@@ -62,8 +66,8 @@ function byDistance(keys: Iterable<string>, town: MapRoutePoint): MapRoutePoint[
 }
 
 /**
- * Feuille de route d'une partie : avec un tracé, le départ, les cases à consignes dans l'ordre du tracé (PA au
- * premier passage), l'arrivée, puis les cases à consignes hors du tracé ; sans tracé, les cases à consignes par
+ * Feuille de route d'une partie : avec un tracé, le départ, un arrêt par passage portant des consignes dans l'ordre du tracé (PA du
+ * passage), l'arrivée, puis les cases à consignes hors du tracé ; sans tracé, les cases à consignes par
  * distance à la ville.
  *
  * @param route cases du tracé lié, en coordonnées absolues ; `null` sans tracé
@@ -81,34 +85,53 @@ export function buildRoadbook(route: readonly MapRoutePoint[] | null, orders: re
             label: `${index + 1}`,
             cell,
             ap: distanceInAp(cell, town),
+            passage: null,
+            passage_label: null,
             orders: ordersAt(cellKey(cell)),
             addable: true
         }));
         return { steps, order_count, cell_count: groups.size, off_route_count: 0 };
     }
 
-    const first_passage: Map<string, number> = firstPassageOf(route);
-    const start: MapRoutePoint = route[0];
-    const end: MapRoutePoint = route[route.length - 1];
-    const start_key: string = cellKey(start);
-    const end_key: string = cellKey(end);
-    const is_loop: boolean = start_key === end_key;
+    const by_index: Map<number, OwnedExpeditionOrder[]> = new Map<number, OwnedExpeditionOrder[]>();
+    const off_orders: OwnedExpeditionOrder[] = [];
+    for (const owned of orders) {
+        if (!orderCell(owned.order)) continue;
+        const index: number | null = resolvedRouteIndex(owned.order, route);
+        if (index === null) {
+            off_orders.push(owned);
+        } else {
+            by_index.set(index, [...(by_index.get(index) ?? []), owned]);
+        }
+    }
 
-    const steps: RoadbookStep[] = [{ key: 'start', node: 'start', label: $localize`D`, cell: start, ap: 0, orders: ordersAt(start_key), addable: true }];
-    const on_route: string[] = [...groups.keys()]
-        .filter((key: string): boolean => first_passage.has(key) && key !== start_key && key !== end_key)
-        .sort((a: string, b: string): number => <number>first_passage.get(a) - <number>first_passage.get(b));
-    on_route.forEach((key: string, index: number): void => {
-        steps.push({ key: `stop-${key}`, node: 'stop', label: `${index + 1}`, cell: pointOf(key), ap: <number>first_passage.get(key), orders: ordersAt(key), addable: true });
+    const last: number = route.length - 1;
+    const stepAt: (index: number, node: RoadbookNode, key: string, label: string, labelled: boolean) => RoadbookStep =
+        (index: number, node: RoadbookNode, key: string, label: string, labelled: boolean): RoadbookStep => {
+            const cell: MapRoutePoint = route[index];
+            const indexes: number[] = routeIndexesOf(route, cell);
+            const passage: number = indexes.indexOf(index) + 1;
+            return {
+                key, node, label, cell, ap: index, passage,
+                passage_label: labelled && indexes.length > 1 ? passageLabel(passage) : null,
+                orders: by_index.get(index) ?? [],
+                addable: true
+            };
+        };
+
+    const steps: RoadbookStep[] = [stepAt(0, 'start', 'start', $localize`D`, false)];
+    const stops: number[] = [...by_index.keys()].filter((index: number): boolean => index > 0 && index < last).sort((a: number, b: number): number => a - b);
+    stops.forEach((index: number, rank: number): void => {
+        steps.push(stepAt(index, 'stop', `stop-${index}`, `${rank + 1}`, true));
     });
-    steps.push({ key: 'end', node: 'end', label: $localize`A`, cell: end, ap: route.length - 1, orders: is_loop ? [] : ordersAt(end_key), addable: !is_loop });
+    const arrival: RoadbookStep = stepAt(last, 'end', 'end', $localize`A`, false);
+    steps.push(last === 0 ? { ...arrival, orders: [], addable: false } : arrival);
 
-    const off_route: MapRoutePoint[] = byDistance([...groups.keys()].filter((key: string): boolean => !first_passage.has(key)), town);
     let off_route_count: number = 0;
-    for (const cell of off_route) {
+    for (const cell of byDistance(groupByCell(off_orders).keys(), town)) {
         const cell_orders: readonly OwnedExpeditionOrder[] = ordersAt(cellKey(cell));
         off_route_count += cell_orders.length;
-        steps.push({ key: `off-${cellKey(cell)}`, node: 'off', label: '!', cell, ap: null, orders: cell_orders, addable: false });
+        steps.push({ key: `off-${cellKey(cell)}`, node: 'off', label: '!', cell, ap: null, passage: null, passage_label: null, orders: cell_orders, addable: false });
     }
     return { steps, order_count, cell_count: groups.size, off_route_count };
 }

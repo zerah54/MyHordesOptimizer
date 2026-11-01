@@ -39,10 +39,10 @@ namespace MyHordesOptimizerApi.MappingProfiles.Items
                 .ForMember(dest => dest.Deco, opt => opt.MapFrom(src => src.Deco))
                 .ForMember(dest => dest.Description, opt => opt.MapFrom(src => new Dictionary<string, string>()
                 {
-                    { "fr", src.DescriptionFr },
-                    { "en", src.DescriptionEn },
-                    { "es", src.DescriptionEs },
-                    { "de", src.DescriptionDe }
+                    { "fr", src.DescriptionFr! },
+                    { "en", src.DescriptionEn! },
+                    { "es", src.DescriptionEs! },
+                    { "de", src.DescriptionDe! }
                 }))
                 .ForMember(dest => dest.DropRateNotPraf, opt => opt.MapFrom(src => src.DropRateNotPraf))
                 .ForMember(dest => dest.DropRatePraf, opt => opt.MapFrom(src => src.DropRatePraf))
@@ -53,10 +53,10 @@ namespace MyHordesOptimizerApi.MappingProfiles.Items
                 .ForMember(dest => dest.IsHeaver, opt => opt.MapFrom(src => src.IsHeaver))
                 .ForMember(dest => dest.Label, opt => opt.MapFrom(src => new Dictionary<string, string>()
                 {
-                    { "fr", src.LabelFr },
-                    { "en", src.LabelEn },
-                    { "es", src.LabelEs },
-                    { "de", src.LabelDe }
+                    { "fr", src.LabelFr! },
+                    { "en", src.LabelEn! },
+                    { "es", src.LabelEs! },
+                    { "de", src.LabelDe! }
                 }))
                 .ForMember(dest => dest.Properties, opt => opt.MapFrom(src => src.PropertyNames.Select(prop => prop.Name)))
                 .ForMember(dest => dest.Uid, opt => opt.MapFrom(src => src.Uid))
@@ -121,7 +121,7 @@ namespace MyHordesOptimizerApi.MappingProfiles.Items
                 .ForMember(dest => dest.DropRatePraf, opt => opt.Ignore())
                 .ForMember(dest => dest.Guard, opt => opt.MapFrom(src => src.Value.Guard))
                 .ForMember(dest => dest.IdCategories, opt => opt.Ignore())
-                .ForMember(dest => dest.IdCategory, opt => opt.ConvertUsing<DeutchNameToCategoryIdConverter, string>(src => src.Value.Category["de"]))
+                .ForMember(dest => dest.IdCategory, opt => opt.ConvertUsing<DeutchNameToCategoryIdConverter, string>(src => src.Value.Category!["de"]))
                 .ForMember(dest => dest.IdCategoryNavigation, opt => opt.Ignore())
                 // La clé appartient à MHO et n'est PAS celle de MyHordes : celle-ci n'est qu'un
                 // auto-incrément de fixtures, instable d'une instance du jeu à l'autre. Le service
@@ -129,7 +129,7 @@ namespace MyHordesOptimizerApi.MappingProfiles.Items
                 .ForMember(dest => dest.IdItem, opt => opt.Ignore())
                 // .Value volontairement explicite : si un jour l'appelant cesse de filtrer les
                 // objets sans id, on veut une exception bruyante plutôt qu'un mhId à 0.
-                .ForMember(dest => dest.MhId, opt => opt.MapFrom(src => src.Value.Id.Value))
+                .ForMember(dest => dest.MhId, opt => opt.MapFrom(src => src.Value.Id!.Value))
                 .ForMember(dest => dest.IsObsolete, opt => opt.Ignore())
                 .ForMember(dest => dest.Img, opt => opt.MapFrom(src => SansEmpreinte(src.Value.Img)))
                 // MyHordes n'émet `img_b` que s'il DIFFÈRE de `img`. Son absence signifie donc
@@ -162,7 +162,7 @@ namespace MyHordesOptimizerApi.MappingProfiles.Items
         /// le nom porte un point de plus : <c>item/item_lawn.b.b5d3807d.gif</c> devient
         /// <c>item/item_lawn.b.gif</c>. Le null est rendu tel quel — il porte une information.
         /// </remarks>
-        private static string SansEmpreinte(string chemin)
+        private static string? SansEmpreinte(string? chemin)
         {
             return chemin == null ? null : Regex.Replace(chemin, @"(.*)\.(.*)\.(.*)", "$1.$3");
         }
@@ -172,7 +172,7 @@ namespace MyHordesOptimizerApi.MappingProfiles.Items
         /// au jeu et pas encore traduit partout. Repli sur l'allemand (langue source du jeu) plutôt
         /// que de laisser passer null, qui fait planter le tri des libellés côté front.
         /// </summary>
-        private static string LabelOrGerman(IDictionary<string, string> labels, string locale)
+        private static string? LabelOrGerman(IDictionary<string, string>? labels, string locale)
         {
             if (labels == null) return null;
             if (labels.TryGetValue(locale, out var value) && value != null) return value;

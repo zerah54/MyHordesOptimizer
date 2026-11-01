@@ -5,7 +5,7 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer
     public class WishListLastUpdateDto
     {
         public List<WishListItemDto> WishList { get; set; }
-        public LastUpdateInfoDto LastUpdateInfo { get; set; }
+        public LastUpdateInfoDto LastUpdateInfo { get; set; } = null!;
 
         public WishListLastUpdateDto()
         {

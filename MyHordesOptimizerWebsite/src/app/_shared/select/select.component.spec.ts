@@ -1,6 +1,6 @@
-import { ANIMATION_MODULE_TYPE, ChangeDetectionStrategy, Component } from '@angular/core';
+import { ANIMATION_MODULE_TYPE, ChangeDetectionStrategy, Component, signal, WritableSignal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { UntypedFormControl } from '@angular/forms';
+import { FormsModule, UntypedFormControl } from '@angular/forms';
 import { MatSelect } from '@angular/material/select';
 import { By } from '@angular/platform-browser';
 
@@ -15,6 +15,19 @@ import { SelectComponent } from './select.component';
 class SelectHostComponent {
     public panel_class: string = 'job-select';
     public options: string[] = ['Alpha', 'Beta'];
+}
+
+/** Hôte `ngModel` : relève ce que le select notifie au parent, sans aucune action de l'utilisateur tant qu'un test n'en fait pas. */
+@Component({
+    imports: [FormsModule, SelectComponent],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    template: '<mho-select clearable [options]="options" [ngModel]="value()" (ngModelChange)="changes.push($event)" (filterChange)="filter_changes.push($event)"></mho-select>'
+})
+class SelectModelHostComponent {
+    public readonly options: string[] = ['Alpha', 'Beta'];
+    public readonly value: WritableSignal<string | undefined> = signal('Alpha');
+    public readonly changes: (string | undefined)[] = [];
+    public readonly filter_changes: (string | string[] | undefined)[] = [];
 }
 
 /** Valeurs limites acceptées par `coerceBooleanProperty` : `value != null && `${value}` !== 'false'`. */
@@ -248,5 +261,69 @@ describe('SelectComponent', (): void => {
         expect(select_host.classList.contains('floating')).toBe(false);
 
         host_fixture.destroy();
+    });
+
+    describe('avec ngModel', (): void => {
+        let host_fixture: ComponentFixture<SelectModelHostComponent>;
+
+        /** Texte affiché par le déclencheur du `mat-select`, sans l'icône d'effacement. */
+        function displayedValue(): string {
+            return host_fixture.debugElement.query(By.css('mat-select-trigger span')).nativeElement.textContent.trim();
+        }
+
+        /** Laisse `ngModel` écrire sa valeur (de façon asynchrone) puis rafraîchit la vue. */
+        async function settle(): Promise<void> {
+            host_fixture.detectChanges();
+            await host_fixture.whenStable();
+            host_fixture.detectChanges();
+        }
+
+        beforeEach(async (): Promise<void> => {
+            host_fixture = TestBed.createComponent(SelectModelHostComponent);
+            await settle();
+        });
+
+        afterEach((): void => {
+            host_fixture.destroy();
+        });
+
+        it('affiche la valeur du modèle sans notifier le parent', (): void => {
+            expect(displayedValue()).toBe('Alpha');
+            expect(host_fixture.componentInstance.changes).toEqual([]);
+        });
+
+        it('affiche une nouvelle valeur du modèle sans notifier le parent', async (): Promise<void> => {
+            host_fixture.componentInstance.value.set('Beta');
+            await settle();
+
+            expect(displayedValue()).toBe('Beta');
+            expect(host_fixture.componentInstance.changes).toEqual([]);
+        });
+
+        it('notifie le parent du choix de l\'utilisateur', async (): Promise<void> => {
+            host_fixture.debugElement.query(By.css('.mat-mdc-select-trigger')).nativeElement.click();
+            host_fixture.detectChanges();
+
+            Array.from(document.querySelectorAll<HTMLElement>('mat-option')).find((option: HTMLElement): boolean => option.textContent?.trim() === 'Beta')?.click();
+            await settle();
+
+            expect(host_fixture.componentInstance.changes).toEqual(['Beta']);
+            expect(host_fixture.componentInstance.filter_changes.at(-1)).toBe('Beta');
+            expect(displayedValue()).toBe('Beta');
+        });
+
+        it('notifie le parent de l\'effacement par l\'utilisateur', async (): Promise<void> => {
+            host_fixture.debugElement.query(By.css('.mat-mdc-select-trigger mat-icon')).nativeElement.click();
+            await settle();
+
+            expect(host_fixture.componentInstance.changes).toEqual([undefined]);
+        });
+
+        it('garde `filterChange` à l\'écriture du modèle', async (): Promise<void> => {
+            host_fixture.componentInstance.value.set('Beta');
+            await settle();
+
+            expect(host_fixture.componentInstance.filter_changes.at(-1)).toBe('Beta');
+        });
     });
 });

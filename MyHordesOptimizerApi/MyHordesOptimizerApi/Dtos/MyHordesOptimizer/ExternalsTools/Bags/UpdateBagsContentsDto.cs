@@ -9,6 +9,6 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.Bags
         public int UserId { get; set; }
 
         [JsonProperty("objects")]
-        public List<UpdateObjectDto> Objects { get; set; }
+        public List<UpdateObjectDto> Objects { get; set; } = null!;
     }
 }

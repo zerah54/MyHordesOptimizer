@@ -1,0 +1,84 @@
+// Cellule « nom » de l'arbre des chantiers (wiki et tiroir de la page Chantiers) : icône, traits de rattachement,
+// bouton de repli et rappel du parent, pour des lignes de 40 px.
+@mixin label-cell {
+    .label-cell {
+        display: flex;
+        align-items: center;
+        gap: 0.4em;
+        // 40 px moins le filet bas de la cellule : les traits prennent toute la hauteur de la ligne.
+        height: 39px;
+    }
+
+    // Un trait vertical par niveau d'ancêtre : l'indentation seule ne montre pas la branche sur quatre niveaux.
+    .guide {
+        flex: 0 0 14px;
+        align-self: stretch;
+        margin-left: 6px;
+        border-left: 1px solid var(--mho-line-strong);
+    }
+
+    .toggle {
+        // Largeur réservée même sans bouton, sinon les feuilles se décalent par rapport aux nœuds.
+        flex: 0 0 28px;
+        display: grid;
+        place-items: center;
+        --mat-icon-button-state-layer-size: 28px;
+        --mat-icon-button-icon-size: 20px;
+
+        mat-icon {
+            color: var(--mho-text-muted);
+        }
+    }
+
+    .label-cell.is-root {
+        .name {
+            font-weight: 600;
+        }
+    }
+
+    // Rappel du parent, discret : il complète les traits sans concurrencer le nom.
+    .parent-hint {
+        margin-left: 0.5em;
+        font-size: 0.85em;
+        font-style: italic;
+        opacity: 0.6;
+        white-space: nowrap;
+    }
+
+    // Taille NON fixée sur les icônes : sprites pixel art, les redimensionner altère le rendu.
+    .building-icon {
+        flex: 0 0 auto;
+    }
+
+    .name {
+        white-space: nowrap;
+    }
+
+    @media screen and (max-width: 599px) {
+        .guide {
+            // Les traits mangeraient toute la largeur sur mobile : resserrés sans être supprimés.
+            flex-basis: 6px;
+            margin-left: 3px;
+        }
+    }
+}
+
+// Liste d'icônes de ressources sur une ligne (une ligne de tableau ne doit pas grandir).
+@mixin resources-list {
+    .resources {
+        display: flex;
+        flex-wrap: nowrap;
+        gap: 0.6em;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+        white-space: nowrap;
+
+        li {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.15em;
+            white-space: nowrap;
+        }
+    }
+}

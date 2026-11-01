@@ -13,16 +13,16 @@ namespace MyHordesOptimizerApi.Extensions
             var type = obj.GetType();
             if(typeof(IDictionary<string, object>).IsAssignableFrom(type))
             {
-                var keyValuesPair = new List<KeyValuePair<string, string>>();
-                foreach (var kvp in obj as Dictionary<string, object>)
+                var keyValuesPair = new List<KeyValuePair<string?, string?>>();
+                foreach (var kvp in (obj as Dictionary<string, object>)!)
                 {
-                    keyValuesPair.Add(new KeyValuePair<string, string>(kvp.Key, kvp.Value.ToString()));
+                    keyValuesPair.Add(new KeyValuePair<string?, string?>(kvp.Key, kvp.Value.ToString()));
                 }
                 return new FormUrlEncodedContent(keyValuesPair);
             }
             else
             {
-                var keyValuesPair = new List<KeyValuePair<string, string>>();
+                var keyValuesPair = new List<KeyValuePair<string?, string?>>();
                 foreach (var prop in obj.GetType().GetProperties())
                 {
                     var name = prop.Name;
@@ -40,8 +40,8 @@ namespace MyHordesOptimizerApi.Extensions
                         }
                     }
 
-                    var value = type.GetProperty(prop.Name).GetValue(obj);
-                    keyValuesPair.Add(new KeyValuePair<string, string>(name, value?.ToString()));
+                    var value = type.GetProperty(prop.Name)!.GetValue(obj);
+                    keyValuesPair.Add(new KeyValuePair<string?, string?>(name, value?.ToString()));
                 }
 
 

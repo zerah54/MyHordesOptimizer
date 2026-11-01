@@ -6,11 +6,11 @@ import { firstValueFrom } from 'rxjs';
 import { BURIED_RUIN_ID } from '../../../_abstract_model/const';
 import { RealtimeExpeditionsService } from '../../../_abstract_model/realtime-services/realtime-expeditions.service';
 import { Cell } from '../../../_abstract_model/types/cell.class';
-import { Citizen } from '../../../_abstract_model/types/citizen.class';
 import { CitizenExpedition } from '../../../_abstract_model/types/citizen-expedition.class';
-import { Expedition } from '../../../_abstract_model/types/expedition.class';
+import { Citizen } from '../../../_abstract_model/types/citizen.class';
 import { ExpeditionOrder } from '../../../_abstract_model/types/expedition-order.class';
-import { ExpeditionPart, ExpeditionPartRoute } from '../../../_abstract_model/types/expedition-part.class';
+import { ExpeditionPart } from '../../../_abstract_model/types/expedition-part.class';
+import { Expedition } from '../../../_abstract_model/types/expedition.class';
 import { Item } from '../../../_abstract_model/types/item.class';
 import { MapRoutePoint } from '../../../_abstract_model/types/map-route.class';
 import { Ruin } from '../../../_abstract_model/types/ruin.class';
@@ -25,7 +25,18 @@ import {
     ExpeditionOrderFormMember,
     ExpeditionOrderFormResult
 } from '../expedition-order-form/expedition-order-form.component';
-import { canExcavate, cellKey, cloneOrder, ExpeditionOrderOwner, isScavengerPlace, OwnedExpeditionOrder } from './expedition-orders.util';
+import {
+    canExcavate,
+    cellKey,
+    cloneOrder,
+    ExpeditionOrderOwner,
+    isScavengerPlace,
+    OwnedExpeditionOrder,
+    passageLabel,
+    resolvedPassage,
+    resolvedRouteIndex,
+    routeIndexesOf
+} from './expedition-orders.util';
 import { cellTitle, expeditionLabel, memberLabel } from './order-labels';
 
 /** Ce que le formulaire d'une consigne doit savoir de la carte. */
@@ -54,12 +65,15 @@ export class ExpeditionOrderEditorService {
 
     /**
      * Formulaire d'une consigne sur une case d'une partie (`existing` : `null` pour en ajouter une), puis
-     * enregistrement. Se termine une fois enregistré ou abandonné ; un échec est signalé à l'utilisateur.
+     * enregistrement. `passage` (ajout seulement, `null` : le premier) présélectionne le passage de la case. Se termine une
+     * fois enregistré ou abandonné ; un échec est signalé à l'utilisateur.
      */
-    public async edit(part: ExpeditionPart, cell: MapRoutePoint, existing: OwnedExpeditionOrder | null, context: ExpeditionOrderMapContext): Promise<void> {
+    public async edit(
+        part: ExpeditionPart, cell: MapRoutePoint, existing: OwnedExpeditionOrder | null, context: ExpeditionOrderMapContext, passage: number | null = null
+    ): Promise<void> {
         const result: ExpeditionOrderFormResult | undefined = await firstValueFrom(this.dialog
             .open<ExpeditionOrderFormComponent, ExpeditionOrderFormData, ExpeditionOrderFormResult>(ExpeditionOrderFormComponent, {
-                data: this.formData(part, cell, existing, context),
+                data: this.formData(part, cell, existing, context, passage),
                 width: '640px'
             })
             .afterClosed(), { defaultValue: undefined });
@@ -82,7 +96,9 @@ export class ExpeditionOrderEditorService {
         }
     }
 
-    private formData(part: ExpeditionPart, cell: MapRoutePoint, existing: OwnedExpeditionOrder | null, context: ExpeditionOrderMapContext): ExpeditionOrderFormData {
+    private formData(part: ExpeditionPart, cell: MapRoutePoint, existing: OwnedExpeditionOrder | null, context: ExpeditionOrderMapContext, passage: number | null): ExpeditionOrderFormData {
+        const route_cells: readonly MapRoutePoint[] = part.map_route?.cells ?? [];
+        const crossings: number = routeIndexesOf(route_cells, cell).length;
         const map_cell: Cell | undefined = context.cells.get(cellKey(cell));
         return {
             cell,
@@ -90,7 +106,8 @@ export class ExpeditionOrderEditorService {
             can_clear: map_cell?.ruin_id === BURIED_RUIN_ID && map_cell.nb_ruin_dig > 0,
             can_explore: !!map_cell?.ruin_id && context.ruins.some((ruin: Ruin): boolean => ruin.id === map_cell.ruin_id && ruin.explorable),
             can_excavate: canExcavate(map_cell),
-            move_targets: existing ? this.moveTargets(part.map_route, cell, context) : [],
+            move_targets: this.moveTargets(route_cells, cell, existing?.order ?? null, context),
+            passage: crossings > 1 ? (existing ? resolvedPassage(existing.order, route_cells) : passage ?? 1) : null,
             members: this.members(part, context.citizens),
             items: context.items,
             expeditions: context.expeditions
@@ -176,17 +193,21 @@ export class ExpeditionOrderEditorService {
             .filter((member: ExpeditionOrderFormMember | null): member is ExpeditionOrderFormMember => member !== null);
     }
 
-    /** Cases du tracé où déplacer une consigne, dans l'ordre du tracé, sans doublon ni la case actuelle. */
-    private moveTargets(route: ExpeditionPartRoute | null, current: MapRoutePoint, context: ExpeditionOrderMapContext): ExpeditionOrderFormCell[] {
-        if (!route) return [];
+    /**
+     * Passages du tracé où déplacer une consigne, dans l'ordre du tracé, sans le passage actuel. En ajout : les seuls
+     * passages de la case, si elle en a plusieurs.
+     */
+    private moveTargets(route: readonly MapRoutePoint[], current: MapRoutePoint, existing: ExpeditionOrder | null, context: ExpeditionOrderMapContext): ExpeditionOrderFormCell[] {
         const route_context: MapRouteContext = this.routeContext(context);
-        const seen: Set<string> = new Set<string>([cellKey(current)]);
+        const current_index: number | null = existing ? resolvedRouteIndex(existing, route) : null;
         const targets: ExpeditionOrderFormCell[] = [];
-        route.cells.forEach((cell: MapRoutePoint, ap: number): void => {
-            const key: string = cellKey(cell);
-            if (seen.has(key)) return;
-            seen.add(key);
-            targets.push({ cell, label: `${cellTitle(cell, context.cells, route_context)} · ${$localize`${ap}:ap: PA`}` });
+        route.forEach((cell: MapRoutePoint, ap: number): void => {
+            if (ap === current_index) return;
+            const crossings: number[] = routeIndexesOf(route, cell);
+            if (!existing && (crossings.length < 2 || cellKey(cell) !== cellKey(current))) return;
+            const passage: number | null = crossings.length > 1 ? crossings.indexOf(ap) + 1 : null;
+            const title: string = cellTitle(cell, context.cells, route_context);
+            targets.push({ cell, passage, label: `${title} · ${passage === null ? '' : `${passageLabel(passage)} · `}${$localize`${ap}:ap: PA`}` });
         });
         return targets;
     }

@@ -6,7 +6,7 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Citizens
     {
         public CitizenStatusValueDto Content { get; set; }
         public LastUpdateInfoDto? LastUpdateInfo { get; set; }
-        public List<string> Icons { get; set; }
+        public List<string> Icons { get; set; } = null!;
 
         public LastUpdateInfoDto? GhoulStatusLastUpdateInfo { get; set; }
         public bool IsGhoul { get; set; }

@@ -372,11 +372,11 @@ namespace MyHordesOptimizerApi.DiscordBot.Modules
 
         [InputLabel("Titre de la section")]
         [ModalTextInput(customId: SectionTitleInputId, style: TextInputStyle.Short, maxLength: EmbedFieldBuilder.MaxFieldNameLength)]
-        public string SectionTitle { get; set; }
+        public string SectionTitle { get; set; } = null!;
 
         [InputLabel("Contenu de la section")]
         [ModalTextInput(customId: SectionContentInputId, style: TextInputStyle.Paragraph, maxLength: EmbedFieldBuilder.MaxFieldValueLength)]
-        public string SectionContent { get; set; }
+        public string SectionContent { get; set; } = null!;
     }
 
     public class AddTitleModal : IModal
@@ -384,7 +384,7 @@ namespace MyHordesOptimizerApi.DiscordBot.Modules
         public const string InputId = "title";
         public const int InputMaxLength = EmbedBuilder.MaxTitleLength;
 
-        public string Title { get; set; }
+        public string Title { get; set; } = null!;
 
         /// <summary>Titre saisi ; à l'ouverture, valeur pré-remplie (null : champ vide).</summary>
         [InputLabel("Titre")]
@@ -398,7 +398,7 @@ namespace MyHordesOptimizerApi.DiscordBot.Modules
         // Plafond d'un champ de formulaire Discord, sous les 4096 caractères d'une description d'embed.
         public const int InputMaxLength = TextInputBuilder.LargestMaxLength;
 
-        public string Title { get; set; }
+        public string Title { get; set; } = null!;
 
         /// <summary>Description saisie ; à l'ouverture, valeur pré-remplie (null : champ vide).</summary>
         [InputLabel("Description")]

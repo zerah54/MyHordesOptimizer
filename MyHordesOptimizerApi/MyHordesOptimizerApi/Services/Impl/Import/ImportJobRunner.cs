@@ -97,7 +97,7 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
             }
             catch (Exception e)
             {
-                string failedStep;
+                string? failedStep;
                 lock (_lock)
                 {
                     var state = _states[jobKey];

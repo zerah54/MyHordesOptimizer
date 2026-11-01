@@ -9,9 +9,9 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer
     /// </summary>
     public class ItemSummaryDto
     {
-        public string Uid { get; set; }
-        public string Img { get; set; }
-        public string ImgBroken { get; set; }
-        public IDictionary<string, string> Label { get; set; }
+        public string Uid { get; set; } = null!;
+        public string Img { get; set; } = null!;
+        public string ImgBroken { get; set; } = null!;
+        public IDictionary<string, string> Label { get; set; } = null!;
     }
 }

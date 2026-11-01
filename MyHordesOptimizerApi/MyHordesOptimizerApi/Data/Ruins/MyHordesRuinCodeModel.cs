@@ -6,10 +6,10 @@ namespace MyHordesOptimizerApi.Data.Ruins
     public class MyHordesRuinCodeModel
     {
         [JsonProperty("label")]
-        public string Label { get; set; }
+        public string Label { get; set; } = null!;
 
         [JsonProperty("icon")]
-        public string Icon { get; set; }
+        public string Icon { get; set; } = null!;
 
         [JsonProperty("camping")]
         public int Camping { get; set; }
@@ -24,15 +24,15 @@ namespace MyHordesOptimizerApi.Data.Ruins
         public int Chance { get; set; }
 
         [JsonProperty("drops")]
-        public IDictionary<string, dynamic[]> Drops { get; set; }
+        public IDictionary<string, dynamic[]> Drops { get; set; } = null!;
 
         [JsonProperty("desc")]
-        public string Desc { get; set; }
+        public string Desc { get; set; } = null!;
 
         [JsonProperty("capacity")]
         public int Capacity { get; set; }
 
         [JsonProperty("constructions")]
-        public List<int> Constructions { get; set; }
+        public List<int> Constructions { get; set; } = null!;
     }
 }

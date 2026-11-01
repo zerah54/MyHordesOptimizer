@@ -27,7 +27,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
         private readonly Dictionary<ExternalToolId, ToolProgress> _tools = new();
         private bool _isRunning = true;
         private DateTime? _finishedAt;
-        private AuthenticationResponseDto _renewedToken;
+        private AuthenticationResponseDto? _renewedToken;
 
         public ExternalToolsUpdateProgress(int userId, DateTime startedAt)
         {

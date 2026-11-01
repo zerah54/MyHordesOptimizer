@@ -40,7 +40,7 @@ namespace MyHordesOptimizerApi.Extensions
             var keyProperty = type.GetProperties().Single(prop => prop.GetCustomAttribute<KeyAttribute>() != null);
             return Create<T>(model =>
             {
-                var hashCode = keyProperty.GetValue(model, null).GetHashCode();
+                var hashCode = keyProperty.GetValue(model, null)!.GetHashCode();
                 return hashCode;
             },
             (a, b) =>
@@ -63,7 +63,7 @@ namespace MyHordesOptimizerApi.Extensions
                 _equals = equals;
             }
 
-            public bool Equals(T x, T y) => _equals(x, y);
+            public bool Equals(T? x, T? y) => _equals(x!, y!);
 
             public int GetHashCode(T obj) => _getHashCode(obj);
         }

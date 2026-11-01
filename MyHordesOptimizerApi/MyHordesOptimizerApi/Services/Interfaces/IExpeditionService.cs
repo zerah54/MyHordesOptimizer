@@ -17,6 +17,12 @@ namespace MyHordesOptimizerApi.Services.Interfaces
 
         Task<ExpeditionDto> SaveExpeditionAsync(ExpeditionRequestDto expedition, int idTown, int day);
         Task<List<ExpeditionDto>> CopyExpeditionsAsync(int townId, int fromDay, int targetDay);
+        /// <summary>
+        /// Copie une expédition dans son jour, en dernière position et à l'état « en préparation » : places, conditions et sacs
+        /// recopiés, inscrits et préinscrits vidés. Une consigne sans case suit <paramref name="keepGeneralOrders"/> ; une consigne
+        /// sur une case suit <paramref name="keepRouteOrders"/>, et disparaît avec le tracé si <paramref name="keepRoute"/> est faux.
+        /// </summary>
+        Task<ExpeditionDto> DuplicateExpeditionAsync(int expeditionId, string? label, bool keepRoute, bool keepGeneralOrders, bool keepRouteOrders);
 
         Task<ExpeditionCitizenDto> SaveExpeditionCitizenAsync(int expeditionPartId, ExpeditionCitizenRequestDto expeditionCitizen);
         void DeleteExpeditionCitizen(int expeditionCitizenId);

@@ -45,7 +45,7 @@ namespace MyHordesOptimizerApi.Controllers
         [Route("Token")]
         public Task<ActionResult<AuthenticationResponseDto>> PostToken([FromBody] TokenRequestDto request)
         {
-            return GetToken(request?.UserKey);
+            return GetToken(request?.UserKey ?? string.Empty);
         }
 
         [HttpGet]
@@ -66,7 +66,7 @@ namespace MyHordesOptimizerApi.Controllers
             //     return StatusCode((int)HttpStatusCode.TooManyRequests);
             // }
             UserInfoProvider.UserKey = userKey;
-            SimpleMeDto simpleMe;
+            SimpleMeDto? simpleMe;
             try
             {
                 simpleMe = await _myHordesFetcherService.GetSimpleMeAsync();

@@ -6,9 +6,9 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer
     {
         public const string DefaultLocale = "de";
 
-        public string Name { get; set; }
+        public string Name { get; set; } = null!;
         public Dictionary<string, string> Description { get; set; }
-        public string Icon { get; set; }
+        public string Icon { get; set; } = null!;
         public Dictionary<string, string> Label { get; set; }
         public int NbUses { get; set; }
         public int DaysNeeded { get; set; }

@@ -12,7 +12,7 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Camping
         public int BoundedProbability { get; set; }
 
         [JsonProperty("label")]
-        public IDictionary<string, string> Label { get; set; }
+        public IDictionary<string, string> Label { get; set; } = null!;
 
         /// <summary>
         /// Contribution de chaque facteur au pourcentage brut, par clé (previous, tomb, town, zone,
@@ -21,6 +21,6 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Camping
         /// en dupliquer la formule.
         /// </summary>
         [JsonProperty("details")]
-        public IDictionary<string, int> Details { get; set; }
+        public IDictionary<string, int> Details { get; set; } = null!;
     }
 }

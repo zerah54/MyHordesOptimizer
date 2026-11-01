@@ -1,0 +1,91 @@
+@let evaluation = store.evaluation();
+<div class="cards">
+    <button type="button" class="card" data-card="program" [class.selected]="selected() === 'program'" [attr.aria-pressed]="selected() === 'program'"
+            (click)="selected.set('program')">
+        <span class="title" i18n>Programme</span>
+        <span class="value">{{ step_count() }}</span>
+        <span class="caption"><ng-container i18n>{step_count(), plural, =0 {chantier} =1 {chantier} other {chantiers}}</ng-container></span>
+        @if (evaluation !== null) {
+            <span class="caption pa">{{ planned_pa() }}
+                <ng-container i18n>PA prévus</ng-container></span>
+        }
+        @if (program_alerts() > 0) {
+            <span class="alert"><mat-icon aria-hidden="true">warning</mat-icon>
+                {{ program_alerts() }}
+                <ng-container i18n>{program_alerts(), plural, =1 {alerte} other {alertes}}</ng-container></span>
+        }
+        <mat-icon class="chevron" aria-hidden="true">{{ selected() === 'program' ? 'expand_less' : 'expand_more' }}</mat-icon>
+    </button>
+
+    <button type="button" class="card" data-card="tracking" [class.selected]="selected() === 'tracking'" [attr.aria-pressed]="selected() === 'tracking'"
+            (click)="selected.set('tracking')">
+        <span class="title" i18n>Suivi des consignes individuelles</span>
+        @if (future()) {
+            <span class="value">{{ tasks().total }}</span>
+            <span class="caption"><ng-container i18n>{tasks().total, plural, =0 {consigne prévue} =1 {consigne prévue} other {consignes prévues}}</ng-container></span>
+        } @else {
+            <span class="value">{{ tasks().done }} / {{ tasks().total }}</span>
+            <span class="caption"><ng-container
+                i18n>{tasks().done, plural, =0 {consigne faite} =1 {consigne faite} other {consignes faites}}</ng-container></span>
+        }
+        <mat-icon class="chevron" aria-hidden="true">{{ selected() === 'tracking' ? 'expand_less' : 'expand_more' }}</mat-icon>
+    </button>
+
+    <button type="button" class="card" data-card="budget" [class.selected]="selected() === 'budget'" [attr.aria-pressed]="selected() === 'budget'"
+            (click)="selected.set('budget')">
+        <span class="title" i18n>Citoyens et budget</span>
+        <span class="columns">
+            <span class="column">
+                <span class="value">{{ store.citizens().length }}</span>
+                <span class="caption"><ng-container i18n>{store.citizens().length, plural, =0 {citoyen} =1 {citoyen} other {citoyens}}</ng-container></span>
+                @if (budget_alerts() > 0) {
+                    <span class="alert"><mat-icon aria-hidden="true">warning</mat-icon>
+                        {{ budget_alerts() }}
+                        <ng-container i18n>{budget_alerts(), plural, =1 {alerte} other {alertes}}</ng-container></span>
+                }
+            </span>
+            @if (evaluation !== null) {
+                <span class="column budgets">
+                    @if (store.banned_pool_shown()) {
+                        <span class="budget" data-pool="banned">
+                            <span class="caption" i18n>Bannis</span>
+                            <span><span class="value"
+                                        [class.ko]="evaluation.budgets.banned.remaining < 0">{{ evaluation.budgets.banned.remaining }}</span> <span
+                                class="caption"><ng-container i18n>PA restants sur</ng-container>
+                                {{ evaluation.budgets.banned.budget }}</span></span>
+                        </span>
+                    }
+                    <span class="budget" data-pool="regular">
+                        @if (store.banned_pool_shown()) {
+                            <span class="caption" i18n>Non-bannis</span>
+                        } @else {
+                            <span class="caption" i18n>Budget</span>
+                        }
+                        <span><span class="value" [class.ko]="evaluation.budgets.regular.remaining < 0">{{ evaluation.budgets.regular.remaining }}</span> <span
+                            class="caption"><ng-container i18n>PA restants sur</ng-container>
+                            {{ evaluation.budgets.regular.budget }}</span></span>
+                    </span>
+                </span>
+            }
+        </span>
+        <mat-icon class="chevron" aria-hidden="true">{{ selected() === 'budget' ? 'expand_less' : 'expand_more' }}</mat-icon>
+    </button>
+
+    <button type="button" class="card" data-card="resources" [class.selected]="selected() === 'resources'" [attr.aria-pressed]="selected() === 'resources'"
+            (click)="selected.set('resources')">
+        <span class="title" i18n>Ressources</span>
+        @let missing = missing_count();
+        <span class="value" [class.ko]="missing !== null && missing > 0">{{ missing ?? '—' }}</span>
+        <span class="caption"><ng-container i18n>{missing ?? 0, plural, =0 {objet manquant} =1 {objet manquant} other {objets manquants}}</ng-container></span>
+        <mat-icon class="chevron" aria-hidden="true">{{ selected() === 'resources' ? 'expand_less' : 'expand_more' }}</mat-icon>
+    </button>
+
+    <button type="button" class="card" data-card="defense" [class.selected]="selected() === 'defense'" [attr.aria-pressed]="selected() === 'defense'"
+            (click)="selected.set('defense')">
+        <span class="title" i18n>Défense hors chantiers</span>
+        <span class="value">+{{ sources_defense() }}</span>
+        <span class="caption"><ng-container
+            i18n>{sources_defense(), plural, =0 {point de défense} =1 {point de défense} other {points de défense}}</ng-container></span>
+        <mat-icon class="chevron" aria-hidden="true">{{ selected() === 'defense' ? 'expand_less' : 'expand_more' }}</mat-icon>
+    </button>
+</div>

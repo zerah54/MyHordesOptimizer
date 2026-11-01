@@ -1,11 +1,13 @@
 import { inject, Injectable } from '@angular/core';
 import * as signalR from '@microsoft/signalr';
 import { IHttpConnectionOptions } from '@microsoft/signalr';
+import { firstValueFrom } from 'rxjs';
 
 import { environment } from '../../../environments/environment';
 import { SnackbarService } from '../../_core/services/snackbar.service';
 import { getTokenWithMeWithExpirationDate } from '../../_core/utilities/localstorage.util';
 import { isValidToken } from '../../_core/utilities/token.util';
+import { AuthenticationService } from '../services/authentication.service';
 import { TokenWithMe } from '../types/token-with-me.class';
 
 @Injectable({
@@ -16,14 +18,22 @@ export abstract class RealtimeGlobalService {
 
     private readonly HUB_URL: string = environment.api_url + '/hub/';
 
+    private authentication_service: AuthenticationService = inject(AuthenticationService);
+
     private options: IHttpConnectionOptions = {
-        accessTokenFactory: () => {
+        accessTokenFactory: async (): Promise<string> => {
             const token: TokenWithMe | null = getTokenWithMeWithExpirationDate();
             if (isValidToken(token)) {
                 return token?.token.access_token ?? '';
             }
-            // TODO recharger le token si il n'est pas valide
-            return token?.token.access_token ?? '';
+            /** Jeton expiré alors que la page reste ouverte : le rafraîchir ici, sinon la reconnexion
+             * automatique boucle indéfiniment avec le même jeton périmé. */
+            try {
+                const refreshed: TokenWithMe = await firstValueFrom(this.authentication_service.getToken(true));
+                return refreshed.token.access_token ?? '';
+            } catch {
+                return '';
+            }
         },
         headers: {
             'Mho-Origin': 'website'

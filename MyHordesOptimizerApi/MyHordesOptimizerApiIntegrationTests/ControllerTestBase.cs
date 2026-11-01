@@ -18,7 +18,7 @@ namespace MyHordesOptimizerApiIntegrationTests
         {
             Factory = factory;
             Client = Factory.CreateClient();
-            Client.BaseAddress = new Uri($"{Client.BaseAddress.AbsoluteUri}");
+            Client.BaseAddress = new Uri($"{Client.BaseAddress!.AbsoluteUri}");
             Fixture = new Fixture();
         }
 

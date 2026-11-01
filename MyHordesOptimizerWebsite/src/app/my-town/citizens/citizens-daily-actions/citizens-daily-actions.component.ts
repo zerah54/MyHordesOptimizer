@@ -12,16 +12,18 @@ import {
     viewChild,
     WritableSignal
 } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatTable, MatTableDataSource, MatTableModule } from '@angular/material/table';
 import moment from 'moment';
+import { map } from 'rxjs';
 
 import { HORDES_IMG_REPO } from '../../../_abstract_model/const';
-import { DailyActionEnum } from '../../../_abstract_model/enum/daily-action.enum';
+import { DailyActionEnum, displayableDailyActions } from '../../../_abstract_model/enum/daily-action.enum';
 import { StandardColumn } from '../../../_abstract_model/interfaces';
+import { BuiltBuildingsService } from '../../../_abstract_model/services/built-buildings.service';
 import { TownService } from '../../../_abstract_model/services/town.service';
 import { Imports } from '../../../_abstract_model/types/_types';
 import { Citizen } from '../../../_abstract_model/types/citizen.class';
@@ -58,7 +60,11 @@ export class CitizensDailyActionsComponent implements OnInit {
     public readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
     public readonly locale: string = moment.locale();
     protected readonly is_readonly: Signal<boolean> = inject(TownContextService).isReadonly;
-    protected readonly daily_action_keys: DailyActionEnum[] = DailyActionEnum.getAllValues<DailyActionEnum>();
+    /** Actions affichables (chantier requis construit). */
+    protected readonly daily_action_keys: Signal<DailyActionEnum[]> = toSignal(
+        inject(BuiltBuildingsService).builtUids().pipe(map(displayableDailyActions)),
+        { initialValue: displayableDailyActions(null) }
+    );
     protected readonly columns: StandardColumn[] = [
         { id: 'avatar_name', header: $localize`Citoyen`, class: 'center', sticky: true },
         ...Array.from({ length: getTown()?.day || 1 }, (_: unknown, i: number): StandardColumn => {

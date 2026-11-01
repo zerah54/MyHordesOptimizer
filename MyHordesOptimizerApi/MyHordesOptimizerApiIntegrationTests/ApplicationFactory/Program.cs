@@ -43,7 +43,7 @@ builder.Services.AddResponseCompression(options =>
 // Valeurs codées en dur ici (pas de fichier de config dans ce projet de test) : elles n'ont besoin
 // que d'être cohérentes entre AuthenticationService.CreateToken (émission) et AddBearerAuthentication
 // (validation), les deux lisant la même section "Authentication:Jwt".
-builder.Configuration.AddInMemoryCollection(new Dictionary<string, string>
+builder.Configuration.AddInMemoryCollection(new Dictionary<string, string?>
 {
     ["Authentication:Jwt:Secret"] = "test-jwt-secret-integration-tests-32-chars-minimum",
     ["Authentication:Jwt:Issuer"] = "mho-integration-tests",
@@ -97,6 +97,9 @@ builder.Services.AddScoped<IUserAccountService, UserAccountService>();
 // Requis par NoteServiceTests (Services.Impl.NoteService).
 builder.Services.AddScoped<INoteService, NoteService>();
 
+// Requis par MapThemeServiceTests.
+builder.Services.AddScoped<IMapThemeService, MapThemeService>();
+
 // Requis par ETagCacheHttpTests / ETagVersionServiceTests (mécanisme ETag, famille 1).
 builder.Services.AddScoped<IETagVersionService, ETagVersionService>();
 // Requis par ETagCacheHttpTests (Controllers.FetcherController, exercé par HTTP pour la 1ère fois ici :
@@ -107,8 +110,10 @@ builder.Services.AddMemoryCache();
 builder.Services.AddSingleton<IGestHordesConfiguration, GestHordesConfiguration>();
 builder.Services.AddSingleton<IBigBrothHordesConfiguration, BigBrothHordesConfiguration>();
 builder.Services.AddSingleton<IFataMorganaConfiguration, FataMorganaConfiguration>();
+builder.Services.AddSingleton<IZenHordesConfiguration, ZenHordesConfiguration>();
 builder.Services.AddScoped<IBigBrothHordesRepository, BigBrothHordesRepository>();
 builder.Services.AddScoped<IFataMorganaRepository, FataMorganaRepository>();
+builder.Services.AddScoped<IZenHordesRepository, ZenHordesRepository>();
 builder.Services.AddScoped<IGestHordesRepository, GestHordesRepository>();
 builder.Services.AddSingleton<TownSyncLock>();
 builder.Services.AddSingleton<ReferentialImportLock>();
@@ -122,6 +127,7 @@ builder.Services.AddScoped<IExternalToolsService, ExternalToolsService>();
 builder.Services.AddScoped<ITownAccessService, MyHordesOptimizerApiIntegrationTests.Fakes.AllowAllTownAccessService>();
 builder.Services.AddScoped<IExpeditionService, ExpeditionService>();
 builder.Services.AddScoped<IMapRouteService, MyHordesOptimizerApi.Services.Impl.MapRoutes.MapRouteService>();
+builder.Services.AddScoped<IBuildingPlanService, MyHordesOptimizerApi.Services.Impl.BuildingPlans.BuildingPlanService>();
 
 // Requis par TownWriteAccessHttpTests (Controllers.MyHordesOptimizerMapController).
 builder.Services.AddScoped<IMyHordesOptimizerMapService, MyHordesOptimizerMapService>();

@@ -1,0 +1,52 @@
+:host {
+    display: block;
+
+    .planning-header {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.5em 1.5em;
+    }
+
+    .plans,
+    .actions {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.4em;
+    }
+
+    .actions {
+        margin-left: auto;
+    }
+
+    .plan-chip {
+        display: inline-flex;
+        align-items: center;
+        border: 1px solid var(--mho-line-strong);
+        border-radius: 999px;
+
+        &.selected {
+            border-color: var(--mho-accent);
+            background: var(--mho-accent-soft);
+            font-weight: 600;
+        }
+    }
+
+    .effective {
+        color: var(--mho-accent);
+    }
+
+    .label {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4em;
+    }
+
+    .dirty-dot {
+        width: 0.5em;
+        height: 0.5em;
+        border-radius: 50%;
+        background: currentColor;
+    }
+}

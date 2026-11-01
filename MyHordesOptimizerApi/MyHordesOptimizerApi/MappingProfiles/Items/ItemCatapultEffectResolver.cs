@@ -62,7 +62,7 @@ namespace MyHordesOptimizerApi.MappingProfiles.Items
         {
             var effect = new CatapultEffectDto();
             CatapultFate? fate = null;
-            string morphTargetUid = null;
+            string? morphTargetUid = null;
             var sawConsumeItem = false;
 
             foreach (var token in result)

@@ -79,12 +79,12 @@ namespace MyHordesOptimizerApiIntegrationTests.Services
 
             var state = sink.Snapshot();
             state.RenewedToken.Should().NotBeNull();
-            state.RenewedToken.SimpleMe.TownDetails.TownId.Should().Be(newTownId);
+            state.RenewedToken!.SimpleMe.TownDetails.TownId.Should().Be(newTownId);
             // I1 (revue finale) : un token réémis doit porter jobDetails/avatar, pas seulement la
             // ville — sinon radar fouineur/éclaireur, tooltip technicien et camping-predict s'éteignent
             // silencieusement côté addon jusqu'au prochain shouldRefreshMe().
-            state.RenewedToken.SimpleMe.JobDetails.Uid.Should().Be("dig");
-            state.RenewedToken.SimpleMe.Avatar.Should().Be("https://example.com/avatar.png");
+            state.RenewedToken!.SimpleMe.JobDetails.Uid.Should().Be("dig");
+            state.RenewedToken!.SimpleMe.Avatar.Should().Be("https://example.com/avatar.png");
         }
 
         /// <summary>

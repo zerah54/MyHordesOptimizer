@@ -6,8 +6,8 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.HeroicActio
     public class UpdateHeroicActionsDto
     {
         [JsonProperty("toolsToUpdate")]
-        public UpdateRequestToolsToUpdateDetailsDto ToolsToUpdate { get; set; }
+        public UpdateRequestToolsToUpdateDetailsDto ToolsToUpdate { get; set; } = null!;
         [JsonProperty("actions")]
-        public List<ActionHeroicDto> Actions { get; set; }
+        public List<ActionHeroicDto> Actions { get; set; } = null!;
     }
 }

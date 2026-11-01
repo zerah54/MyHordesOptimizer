@@ -10,12 +10,15 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Expeditions
         public bool? IsDone { get; set; }
         public int? Position { get; set; }
         public int? ExpeditionCitizenId { get; set; }
-        public List<int> ExpeditionPartsId { get; set; }
-        public List<int> ExpeditionsId { get; set; }
+        public List<int> ExpeditionPartsId { get; set; } = null!;
+        public List<int> ExpeditionsId { get; set; } = null!;
 
         /// <summary>Case visée, en coordonnées absolues ; null (avec Y) pour une consigne générale.</summary>
         public int? X { get; set; }
         public int? Y { get; set; }
+
+        /// <summary>Rang du passage sur la case, à partir de 1 ; null vaut le premier.</summary>
+        public int? Passage { get; set; }
 
         /// <summary>Consigne typée (cf. ExpeditionOrderKinds) ; null pour un texte libre.</summary>
         public string? Kind { get; set; }

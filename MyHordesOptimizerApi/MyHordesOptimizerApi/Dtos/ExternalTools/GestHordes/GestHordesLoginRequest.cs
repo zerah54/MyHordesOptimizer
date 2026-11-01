@@ -5,6 +5,6 @@ namespace MyHordesOptimizerApi.Dtos.ExternalTools.GestHordes
     public class GestHordesLoginRequest
     {
         [JsonProperty("key")]
-        public string Key { get; set; }
+        public string Key { get; set; } = null!;
     }
 }

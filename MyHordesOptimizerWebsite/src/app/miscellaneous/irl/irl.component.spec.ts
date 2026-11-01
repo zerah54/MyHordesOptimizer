@@ -41,6 +41,9 @@ describe('IrlComponent', (): void => {
 
     afterEach((): void => {
         fixture.destroy();
+        vi.restoreAllMocks();
+        localStorage.removeItem('theme');
+        localStorage.removeItem('theme-mode');
     });
 
     function nodesView(): DataView<IrlNodeForTest> {
@@ -76,19 +79,24 @@ describe('IrlComponent', (): void => {
         expect(edgeColor(index_of(undefined))).toBe('color(--mho-line-strong)');
     });
 
-    it('re-reads the tokens and recolours the graph when the theme changes', async (): Promise<void> => {
-        const set_options: ReturnType<typeof vi.spyOn> = vi.spyOn(Network.prototype, 'setOptions');
-        const token: ReturnType<typeof vi.spyOn> = vi.spyOn(TestBed.inject(ChartsThemingService), 'token')
-            .mockImplementation((name: string): string => `light(${name})`);
-
-        TestBed.inject(ThemeService).setMode(TestBed.inject(ThemeService).is_dark() ? 'light' : 'dark');
+    it('re-reads the tokens and recolours the graph when the theme changes', (): void => {
+        // Famille fixée : en saison, Halloween et Noël forcent le mode, qui ne changerait alors rien.
+        const theme: ThemeService = TestBed.inject(ThemeService);
+        theme.setPreference('brown');
         fixture.detectChanges();
-        await Promise.resolve();
+        const set_options: ReturnType<typeof vi.spyOn> = vi.spyOn(Network.prototype, 'setOptions');
+        vi.spyOn(TestBed.inject(ChartsThemingService), 'token').mockImplementation((name: string): string => `light(${name})`);
 
-        expect(token).toHaveBeenCalledWith('--mho-surface-2');
-        expect(set_options).toHaveBeenCalled();
+        theme.setMode(theme.is_dark() ? 'light' : 'dark');
+        fixture.detectChanges();
+
+        expect(set_options).toHaveBeenCalledWith({
+            nodes: expect.objectContaining({
+                color: expect.objectContaining({ background: 'light(--mho-surface-2)' }),
+                font: { color: 'light(--mho-text)' }
+            })
+        });
         expect(edgeColor(links.findIndex((link: IrlLink): boolean => link.type === 'couple'))).toBe('light(--mho-danger)');
-        localStorage.removeItem('theme-mode');
     });
 
     it('initializes without throwing and renders the graph canvas inside #hordiens', (): void => {

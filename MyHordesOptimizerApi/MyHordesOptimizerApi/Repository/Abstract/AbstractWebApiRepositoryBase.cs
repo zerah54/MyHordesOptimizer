@@ -30,11 +30,11 @@ namespace MyHordesOptimizerApi.Repository.Abstract
         #region Post
 
         public TResult Post<TResult>(string url,
-            object body,
+            object? body,
             bool ensureStatusCode = true,
-            Dictionary<string, string> customHeader = null,
+            Dictionary<string, string>? customHeader = null,
             string mediaTypeIn = MediaTypeNames.Application.Json,
-            string mediaTypeOut = null)
+            string? mediaTypeOut = null)
         {
             var response = Post(url: url,
                 body: body,
@@ -47,9 +47,9 @@ namespace MyHordesOptimizerApi.Repository.Abstract
         }
 
         public HttpResponseMessage Post(string url,
-            object body,
+            object? body,
             bool ensureStatusCode = true,
-            Dictionary<string, string> customHeaders = null,
+            Dictionary<string, string>? customHeaders = null,
             string mediaTypeIn = MediaTypeNames.Application.Json)
         {
             try
@@ -89,11 +89,11 @@ namespace MyHordesOptimizerApi.Repository.Abstract
         #region Patch
 
         public TResult Patch<TResult>(string url,
-            object body,
+            object? body,
             bool ensureStatusCode = true,
-            Dictionary<string, string> customHeader = null,
+            Dictionary<string, string>? customHeader = null,
             string mediaTypeIn = MediaTypeNames.Application.Json,
-            string mediaTypeOut = null)
+            string? mediaTypeOut = null)
         {
             var response = Patch(url: url,
                 body: body,
@@ -106,9 +106,9 @@ namespace MyHordesOptimizerApi.Repository.Abstract
         }
 
         public HttpResponseMessage Patch(string url,
-            object body,
+            object? body,
             bool ensureStatusCode = true,
-            Dictionary<string, string> customHeaders = null,
+            Dictionary<string, string>? customHeaders = null,
             string mediaTypeIn = MediaTypeNames.Application.Json)
         {
             try
@@ -148,11 +148,11 @@ namespace MyHordesOptimizerApi.Repository.Abstract
         #region Put
 
         public TResult Put<TResult>(string url,
-            object body,
+            object? body,
             bool ensureStatusCode = true,
-            Dictionary<string, string> customHeaders = null,
+            Dictionary<string, string>? customHeaders = null,
             string mediaTypeIn = MediaTypeNames.Application.Json,
-            string mediaTypeOut = null)
+            string? mediaTypeOut = null)
         {
             var response = Put(url: url,
                body: body,
@@ -164,9 +164,9 @@ namespace MyHordesOptimizerApi.Repository.Abstract
         }
 
         public HttpResponseMessage Put(string url,
-            object body,
+            object? body,
             bool ensureStatusCode = true,
-            Dictionary<string, string> customHeaders = null,
+            Dictionary<string, string>? customHeaders = null,
             string mediaTypeIn = MediaTypeNames.Application.Json)
         {
             try
@@ -207,10 +207,10 @@ namespace MyHordesOptimizerApi.Repository.Abstract
         #region Get
 
         public TResult Get<TResult>(string url,
-            Dictionary<string, string> parameters = null,
+            Dictionary<string, string>? parameters = null,
             bool ensureStatusCode = true,
-            Dictionary<string, string> customHeaders = null,
-            string mediaTypeOut = null)
+            Dictionary<string, string>? customHeaders = null,
+            string? mediaTypeOut = null)
         {
             var response = Get(url: url,
               ensureStatusCode: ensureStatusCode,
@@ -220,16 +220,16 @@ namespace MyHordesOptimizerApi.Repository.Abstract
         }
 
         public HttpResponseMessage Get(string url,
-            Dictionary<string, string> parameters = null,
+            Dictionary<string, string>? parameters = null,
             bool ensureStatusCode = true,
-            Dictionary<string, string> customHeaders = null)
+            Dictionary<string, string>? customHeaders = null)
         {
             try
             {
                 var client = CreateClient();
                 AddCustomHeaders(client, customHeaders);
                 Logger.LogDebug($"GET call initiated [HttpRequestUrl={url}]");
-                var query = parameters != null ? QueryHelpers.AddQueryString(url, parameters) : url;
+                var query = parameters != null ? QueryHelpers.AddQueryString(url, parameters!) : url;
                 var response = client.GetAsync(query).Result;
                 Logger.LogDebug($"Async GET call completed [HttpRequestUrl={url}] [HttpResponseStatus={response.StatusCode}]");
 
@@ -258,7 +258,7 @@ namespace MyHordesOptimizerApi.Repository.Abstract
 
         #endregion
 
-        protected virtual void AddCustomHeaders(HttpClient client, Dictionary<string, string> customHeaders = null)
+        protected virtual void AddCustomHeaders(HttpClient client, Dictionary<string, string>? customHeaders = null)
         {
             if (customHeaders != null)
             {
@@ -298,7 +298,7 @@ namespace MyHordesOptimizerApi.Repository.Abstract
         }
 
 
-        protected virtual TResult GetResult<TResult>(string mediaTypeOut, string stringResult)
+        protected virtual TResult GetResult<TResult>(string? mediaTypeOut, string stringResult)
         {
             switch (mediaTypeOut)
             {
@@ -311,7 +311,7 @@ namespace MyHordesOptimizerApi.Repository.Abstract
             }
         }
 
-        private HttpContent GenerateContent(string mediaTypeName, object body)
+        private HttpContent GenerateContent(string mediaTypeName, object? body)
         {
             switch (mediaTypeName)
             {
@@ -321,7 +321,7 @@ namespace MyHordesOptimizerApi.Repository.Abstract
                     }
                 case "application/x-www-form-urlencoded":
                     {
-                        var content = body.ToFormUrlEncodedContent();
+                        var content = body!.ToFormUrlEncodedContent();
                         Logger.LogDebug($"Request [HttpBody={content.ToString()}]");
                         return content;
                     }
@@ -343,7 +343,7 @@ namespace MyHordesOptimizerApi.Repository.Abstract
 
         }
 
-        protected virtual HttpContent GenerateJsonContent(object body)
+        protected virtual HttpContent GenerateJsonContent(object? body)
         {
             var stringBody = body?.ToJson();
             if (stringBody == null)

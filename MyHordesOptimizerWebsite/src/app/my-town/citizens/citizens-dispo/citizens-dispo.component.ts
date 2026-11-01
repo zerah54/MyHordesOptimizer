@@ -17,15 +17,14 @@ import { ColumnIdPipe } from '../../../_core/pipes/column-id.pipe';
 import { getTown } from '../../../_core/utilities/localstorage.util';
 import { AvatarComponent } from '../../../_shared/avatar/avatar.component';
 import { CitizenInfoComponent } from '../../../_shared/citizen-info/citizen-info.component';
-import {
-    HeaderWithNumberPreviousNextFilterComponent
-} from '../../../_shared/lists/header-with-number-previous-next/header-with-number-previous-next-filter.component';
+import { DaySelectorComponent } from '../../../_shared/day-selector/day-selector.component';
+import { DaysUpToPipe } from '../../../_shared/day-selector/days-up-to.pipe';
 import { HeaderWithSelectFilterComponent } from '../../../_shared/lists/header-with-select-filter/header-with-select-filter.component';
 
 const angular_common: Imports = [CommonModule];
-const components: Imports = [AvatarComponent, HeaderWithNumberPreviousNextFilterComponent, HeaderWithSelectFilterComponent, CitizenInfoComponent];
+const components: Imports = [AvatarComponent, DaySelectorComponent, HeaderWithSelectFilterComponent, CitizenInfoComponent];
 const directives: Imports = [TypedCellDefDirective];
-const pipes: Imports = [ColumnIdPipe];
+const pipes: Imports = [ColumnIdPipe, DaysUpToPipe];
 const material_modules: Imports = [MatSortModule, MatTableModule];
 
 
@@ -86,6 +85,11 @@ export class CitizensDispoComponent implements OnInit {
         this.datasource.filterPredicate = (data: DispoByCitizen, filter: string): boolean => this.customFilter(data, filter);
 
         this.getCitizens();
+    }
+
+    /** Dernier jour proposé : le lendemain du jour affiché, sans limite dans le futur. */
+    protected lastDay(): number {
+        return Math.max(this.current_day, this.filters.selected_day) + 1;
     }
 
     /** Remplace la fonction qui vérifie si un élément doit être remonté par le filtre */

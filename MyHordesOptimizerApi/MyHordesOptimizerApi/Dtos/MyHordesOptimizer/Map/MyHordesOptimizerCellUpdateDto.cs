@@ -28,10 +28,10 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Map
         public int? NbRuinDig { get; set; }
 
         [JsonProperty("items")]
-        public List<UpdateObjectDto> Items { get; set; }
+        public List<UpdateObjectDto> Items { get; set; } = null!;
 
         [JsonProperty("citizens")]
-        public List<int> Citizens { get; set; }
+        public List<int> Citizens { get; set; } = null!;
 
         [JsonProperty("note")]
         public string? Note { get; set; }

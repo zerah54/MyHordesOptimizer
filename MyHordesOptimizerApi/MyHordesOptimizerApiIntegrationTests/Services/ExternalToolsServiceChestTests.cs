@@ -60,7 +60,7 @@ namespace MyHordesOptimizerApiIntegrationTests.Services
             var reloadedContext = reloadedScope.ServiceProvider.GetRequiredService<MhoContext>();
             var citizen = reloadedContext.TownCitizens
                 .Include(c => c.IdChestNavigation)
-                .ThenInclude(c => c.ChestItems)
+                .ThenInclude(c => c!.ChestItems)
                 .Single(c => c.IdTown == townId && c.IdUser == userId);
 
             citizen.IdChestNavigation.Should().NotBeNull();
@@ -89,7 +89,7 @@ namespace MyHordesOptimizerApiIntegrationTests.Services
             var reloadedContext = reloadedScope.ServiceProvider.GetRequiredService<MhoContext>();
             var citizen = reloadedContext.TownCitizens
                 .Include(c => c.IdChestNavigation)
-                .ThenInclude(c => c.ChestItems)
+                .ThenInclude(c => c!.ChestItems)
                 .Single(c => c.IdTown == townId && c.IdUser == userId);
 
             citizen.IdChestNavigation!.ChestItems.Should().ContainSingle();
@@ -121,7 +121,7 @@ namespace MyHordesOptimizerApiIntegrationTests.Services
             var reloadedContext = reloadedScope.ServiceProvider.GetRequiredService<MhoContext>();
             var citizen = reloadedContext.TownCitizens
                 .Include(c => c.IdChestNavigation)
-                .ThenInclude(c => c.ChestItems)
+                .ThenInclude(c => c!.ChestItems)
                 .Single(c => c.IdTown == townId && c.IdUser == userId);
 
             citizen.IdChestNavigation!.ChestItems.Should().ContainSingle();
@@ -152,7 +152,7 @@ namespace MyHordesOptimizerApiIntegrationTests.Services
             var reloadedContext = reloadedScope.ServiceProvider.GetRequiredService<MhoContext>();
             var citizen = reloadedContext.TownCitizens
                 .Include(c => c.IdChestNavigation)
-                .ThenInclude(c => c.ChestItems)
+                .ThenInclude(c => c!.ChestItems)
                 .Single(c => c.IdTown == townId && c.IdUser == userId);
 
             citizen.IdChestNavigation!.ChestItems.Should().ContainSingle(ci => ci.IdItem == knownItem.IdItem && ci.Count == 3);
@@ -198,7 +198,7 @@ namespace MyHordesOptimizerApiIntegrationTests.Services
             var reloadedContext = reloadedScope.ServiceProvider.GetRequiredService<MhoContext>();
             var citizen = reloadedContext.TownCitizens
                 .Include(c => c.IdChestNavigation)
-                .ThenInclude(c => c.ChestItems)
+                .ThenInclude(c => c!.ChestItems)
                 .Single(c => c.IdTown == townId && c.IdUser == userId);
 
             citizen.IdChestNavigation.Should().NotBeNull();

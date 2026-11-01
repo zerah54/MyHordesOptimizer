@@ -9,7 +9,7 @@ namespace MyHordesOptimizerApi.MappingProfiles.Users
         public UserMappingProfiles()
         {
             CreateMap<MyHordesUserDetailsDto, User>()
-                .ForMember(user => user.IdUser, opt => opt.MapFrom(dto => dto.Id.Value))
+                .ForMember(user => user.IdUser, opt => opt.MapFrom(dto => dto.Id!.Value))
                 .ForMember(user => user.Name, opt => opt.MapFrom(dto => dto.Name))
                 .ForMember(user => user.Avatar, opt => opt.MapFrom(dto => dto.Avatar));
         }

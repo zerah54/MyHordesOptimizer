@@ -7,16 +7,16 @@ namespace MyHordesOptimizerApi.Data.Heroes
     public class MyHordesHerosCapacitiesCodeModel
     {
         [JsonProperty("name")]
-        public string Name { get; set; }
+        public string Name { get; set; } = null!;
 
         [JsonProperty("title")]
-        public string Title { get; set; }
+        public string Title { get; set; } = null!;
 
         [JsonProperty("description")]
-        public string Description { get; set; }
+        public string Description { get; set; } = null!;
 
         [JsonProperty("icon")]
-        public string Icon { get; set; }
+        public string Icon { get; set; } = null!;
 
         /// <summary>
         /// MyHordes a renommé « daysNeeded » en « unlockAt ». Le champ « action » a disparu

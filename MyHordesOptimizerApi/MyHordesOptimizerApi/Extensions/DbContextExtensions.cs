@@ -6,7 +6,7 @@ namespace MyHordesOptimizerApi.Extensions
 {
     public static class DbContextExtensions
     {
-        public static void Patch<T>(this MhoContext dbContext, ICollection<T> fromDbEntities, ICollection<T> updatedEntities, IEqualityComparer<T> comparer = null) where T : class
+        public static void Patch<T>(this MhoContext dbContext, ICollection<T> fromDbEntities, ICollection<T> updatedEntities, IEqualityComparer<T>? comparer = null) where T : class
         {
             ApplyPatch(dbContext, fromDbEntities, updatedEntities, comparer);
             dbContext.SaveChanges();
@@ -17,13 +17,13 @@ namespace MyHordesOptimizerApi.Extensions
         /// méthode async déjà entrée dans son <c>await using townLock</c>) : un <c>SaveChanges()</c>
         /// synchrone y immobiliserait un thread du pool pendant l'I/O au lieu de le libérer.
         /// </summary>
-        public static async Task PatchAsync<T>(this MhoContext dbContext, ICollection<T> fromDbEntities, ICollection<T> updatedEntities, IEqualityComparer<T> comparer = null) where T : class
+        public static async Task PatchAsync<T>(this MhoContext dbContext, ICollection<T> fromDbEntities, ICollection<T> updatedEntities, IEqualityComparer<T>? comparer = null) where T : class
         {
             ApplyPatch(dbContext, fromDbEntities, updatedEntities, comparer);
             await dbContext.SaveChangesAsync();
         }
 
-        private static void ApplyPatch<T>(MhoContext dbContext, ICollection<T> fromDbEntities, ICollection<T> updatedEntities, IEqualityComparer<T> comparer) where T : class
+        private static void ApplyPatch<T>(MhoContext dbContext, ICollection<T> fromDbEntities, ICollection<T> updatedEntities, IEqualityComparer<T>? comparer) where T : class
         {
             if (comparer == null)
             {
