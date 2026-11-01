@@ -10,13 +10,14 @@ import type { MockInstance } from 'vitest';
 import { CITIZENS_LIST_DISPLAY_MODE_KEY } from '../../../_abstract_model/const';
 import { DailyActionEnum } from '../../../_abstract_model/enum/daily-action.enum';
 import { HomeEnum } from '../../../_abstract_model/enum/home.enum';
+import { JobEnum } from '../../../_abstract_model/enum/job.enum';
 import { StatusEnum } from '../../../_abstract_model/enum/status.enum';
 import { BuiltBuildingsService } from '../../../_abstract_model/services/built-buildings.service';
 import { TownService } from '../../../_abstract_model/services/town.service';
 import { Bag } from '../../../_abstract_model/types/bag.class';
 import { ChamanicDetail } from '../../../_abstract_model/types/chamanic-detail.class';
-import { CitizenInfo } from '../../../_abstract_model/types/citizen-info.class';
 import { Citizen } from '../../../_abstract_model/types/citizen.class';
+import { CitizenInfo } from '../../../_abstract_model/types/citizen-info.class';
 import { DailyAction } from '../../../_abstract_model/types/daily-action.class';
 import { HERO_SKILL_FAMILIES, HeroSkillFamily, HeroSkillFamilyInfo } from '../../../_abstract_model/types/hero-skill-levels';
 import { HeroicActions } from '../../../_abstract_model/types/heroic-actions.class';
@@ -390,7 +391,7 @@ describe('CitizensListComponent', (): void => {
 
         it('décrit le niveau dans l\'infobulle', (): void => {
             expect(manual().heroSkillLabel(familyR(), null)).toBe('R : niveau inconnu');
-            expect(manual().heroSkillLabel(familyR(), 0)).toBe('R : aucun niveau');
+            expect(manual().heroSkillLabel(familyR(), 0)).toBe('R');
             expect(manual().heroSkillLabel(familyR(), 2)).toBe('R : Apprenti');
         });
     });
@@ -482,9 +483,10 @@ describe('CitizensListComponent — compétences S, U, P, E, R', (): void => {
 
     /**
      * Rend la liste pour un citoyen aux niveaux connus, cellules différées comprises.
+     * @param {JobEnum} job Métier du citoyen.
      * @returns {Promise<HTMLElement>} Élément racine de la liste.
      */
-    async function renderList(): Promise<HTMLElement> {
+    async function renderList(job: JobEnum = JobEnum.SCOUT): Promise<HTMLElement> {
         await TestBed.configureTestingModule({
             imports: [CitizensListComponent],
             providers: [provideHttpClient(withXhr()), provideHttpClientTesting(), provideRouter([])],
@@ -493,6 +495,7 @@ describe('CitizensListComponent — compétences S, U, P, E, R', (): void => {
         const citizen: Citizen = new Citizen();
         citizen.id = 42;
         citizen.name = 'Zoe';
+        citizen.job = job;
         citizen.daily_actions = [];
         citizen.chamanic_detail = new ChamanicDetail();
         citizen.bag = new Bag();
@@ -500,7 +503,7 @@ describe('CitizensListComponent — compétences S, U, P, E, R', (): void => {
         citizen.status = new Status();
         citizen.home = new Home();
         citizen.heroic_actions = new HeroicActions();
-        citizen.hero_skills = { s: 1, u: null, p: 0, e: 4, r: 2 };
+        citizen.hero_skills = job === JobEnum.CITIZEN ? { s: 0, u: 0, p: 0, e: 0, r: 0 } : { s: 1, u: null, p: null, e: 4, r: 2 };
         const info: CitizenInfo = new CitizenInfo();
         info.citizens = [citizen];
         vi.spyOn(TestBed.inject(TownService), 'getCitizens').mockReturnValue(of(info));
@@ -566,7 +569,7 @@ describe('CitizensListComponent — compétences S, U, P, E, R', (): void => {
         expect(levelButton(root, 'U').textContent?.replace(/\s/g, '')).toBe('U?');
     });
 
-    it('liste tous les niveaux au clic, le niveau courant désactivé', async (): Promise<void> => {
+    it('propose « ? » et les niveaux 1 à 4 à un héros, le niveau courant désactivé', async (): Promise<void> => {
         const root: HTMLElement = await renderList();
 
         levelButton(root, 'R').click();
@@ -574,9 +577,17 @@ describe('CitizensListComponent — compétences S, U, P, E, R', (): void => {
 
         const items: HTMLButtonElement[] = menuItems();
         expect(items.map((item: HTMLButtonElement): string | undefined => item.textContent?.trim()))
-            .toEqual(['? – Inconnu', '0 – Aucun', '1 – Débutant', '2 – Apprenti', '3 – Expert', '4 – Élite']);
+            .toEqual(['? – Inconnu', '1 – Débutant', '2 – Apprenti', '3 – Expert', '4 – Maître']);
         expect(items.map((item: HTMLButtonElement): boolean => item.disabled))
-            .toEqual([false, false, false, true, false, false]);
+            .toEqual([false, false, true, false, false]);
+    });
+
+    it('affiche 0 pour un habitant, sans permettre de le changer', async (): Promise<void> => {
+        const root: HTMLElement = await renderList(JobEnum.CITIZEN);
+
+        const button: HTMLButtonElement = levelButton(root, 'R');
+        expect(button.textContent?.replace(/\s/g, '')).toBe('R0');
+        expect(button.disabled).toBe(true);
     });
 
     it('enregistre le niveau choisi et met la cellule à jour', async (): Promise<void> => {
@@ -585,10 +596,10 @@ describe('CitizensListComponent — compétences S, U, P, E, R', (): void => {
 
         levelButton(root, 'R').click();
         fixture.detectChanges();
-        menuItems()[4].click();
+        menuItems()[3].click();
 
         const request: TestRequest = httpMock.expectOne((candidate: HttpRequest<unknown>): boolean => candidate.url.includes('/user/42/heroSkills'));
-        expect(JSON.parse(<string>request.request.body)).toEqual({ s: 1, u: null, p: 0, e: 4, r: 3 });
+        expect(JSON.parse(<string>request.request.body)).toEqual({ s: 1, u: null, p: null, e: 4, r: 3 });
         request.flush(null);
 
         expect(levelButton(root, 'R').textContent?.replace(/\s/g, '')).toBe('R3');

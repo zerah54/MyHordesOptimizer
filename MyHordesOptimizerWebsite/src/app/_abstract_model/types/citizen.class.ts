@@ -10,7 +10,7 @@ import { Bag } from './bag.class';
 import { Cadaver } from './cadaver.class';
 import { ChamanicDetail } from './chamanic-detail.class';
 import { DailyAction } from './daily-action.class';
-import { HeroSkillLevels, toHeroSkillLevel } from './hero-skill-levels';
+import { heroSkillLevelForJob, HeroSkillLevels, toHeroSkillLevel } from './hero-skill-levels';
 import { HeroicActions, HeroicActionsWithValue } from './heroic-actions.class';
 import { Home, HomeWithValue } from './home.class';
 import { Status } from './status.class';
@@ -161,11 +161,11 @@ export class Citizen extends CommonModel<CitizenDTO> {
             this.camping_count = typeof dto.campingCount === 'number' ? dto.campingCount : 0;
             this.shoes_equipped = dto.shoesEquipped === true;
             this.hero_skills = {
-                s: toHeroSkillLevel(dto.heroSkills?.s),
-                u: toHeroSkillLevel(dto.heroSkills?.u),
-                p: toHeroSkillLevel(dto.heroSkills?.p),
-                e: toHeroSkillLevel(dto.heroSkills?.e),
-                r: toHeroSkillLevel(dto.heroSkills?.r)
+                s: heroSkillLevelForJob(this.job, toHeroSkillLevel(dto.heroSkills?.s)),
+                u: heroSkillLevelForJob(this.job, toHeroSkillLevel(dto.heroSkills?.u)),
+                p: heroSkillLevelForJob(this.job, toHeroSkillLevel(dto.heroSkills?.p)),
+                e: heroSkillLevelForJob(this.job, toHeroSkillLevel(dto.heroSkills?.e)),
+                r: heroSkillLevelForJob(this.job, toHeroSkillLevel(dto.heroSkills?.r))
             };
         }
     }

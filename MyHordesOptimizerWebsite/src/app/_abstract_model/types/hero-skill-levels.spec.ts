@@ -1,4 +1,26 @@
-import { heroSkillGroupNames, heroSkillSummary } from './hero-skill-levels';
+import { JobEnum } from '../enum/job.enum';
+import { hasHeroSkills, heroSkillGroupNames, heroSkillLevelForJob, heroSkillSummary } from './hero-skill-levels';
+
+describe('hasHeroSkills', (): void => {
+    it('vrai pour tout métier sauf Habitant', (): void => {
+        expect(hasHeroSkills(JobEnum.CITIZEN)).toBe(false);
+        expect(hasHeroSkills(JobEnum.SCOUT)).toBe(true);
+        expect(hasHeroSkills(undefined)).toBe(true);
+    });
+});
+
+describe('heroSkillLevelForJob', (): void => {
+    it('force 0 pour un habitant, quel que soit le niveau enregistré', (): void => {
+        expect(heroSkillLevelForJob(JobEnum.CITIZEN, null)).toBe(0);
+        expect(heroSkillLevelForJob(JobEnum.CITIZEN, 3)).toBe(0);
+    });
+
+    it('un héros n\'a jamais 0 : inconnu à la place, ses niveaux 1 à 4 inchangés', (): void => {
+        expect(heroSkillLevelForJob(JobEnum.SCOUT, 0)).toBeNull();
+        expect(heroSkillLevelForJob(JobEnum.SCOUT, null)).toBeNull();
+        expect(heroSkillLevelForJob(JobEnum.SCOUT, 4)).toBe(4);
+    });
+});
 
 describe('heroSkillGroupNames', (): void => {
     it('nom de chaque groupe d\'après les compétences actuelles, repli sur l\'allemand puis sur la lettre', (): void => {

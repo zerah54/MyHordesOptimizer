@@ -39,7 +39,7 @@ import { CampingGroupResult } from '../../../../_abstract_model/types/camping-gr
 import { CampingOdds } from '../../../../_abstract_model/types/camping-odds.class';
 import { Cell } from '../../../../_abstract_model/types/cell.class';
 import { Citizen } from '../../../../_abstract_model/types/citizen.class';
-import { HeroSkillLevels, MAX_HERO_SKILL_LEVEL } from '../../../../_abstract_model/types/hero-skill-levels';
+import { hasHeroSkills, heroSkillLevelForJob, HeroSkillLevels, MAX_HERO_SKILL_LEVEL } from '../../../../_abstract_model/types/hero-skill-levels';
 import { Ruin } from '../../../../_abstract_model/types/ruin.class';
 import { Town } from '../../../../_abstract_model/types/town.class';
 import { getTown } from '../../../../_core/utilities/localstorage.util';
@@ -120,6 +120,7 @@ export class MapCellCampingComponent {
     protected readonly MAX_CAMPERS: number = MAX_CAMPERS;
     protected readonly MAX_HERO_SKILL_LEVEL: number = MAX_HERO_SKILL_LEVEL;
     protected readonly JOB_SCOUT: JobEnum = JobEnum.SCOUT;
+    protected readonly hasHeroSkills: (job: JobEnum | undefined) => boolean = hasHeroSkills;
     protected readonly locale: string = moment.locale();
     protected readonly jobs: JobEnum[] = JobEnum.getAllValues<JobEnum>();
 
@@ -130,7 +131,7 @@ export class MapCellCampingComponent {
     protected readonly vest_label: string = $localize`Tenue de camouflage`;
     protected readonly hidden_campers_label: string = $localize`Nombre de campeurs déjà cachés sur la case`;
     protected readonly zombies_label: string = $localize`Nombre de zombies sur la case`;
-    protected readonly recluse_label: string = $localize`Capacité Repos (0 : aucun niveau, 1 à 4) : Campeur pro et plafond en découlent. « ? » : à cocher à la main`;
+    protected readonly recluse_label: string = $localize`Capacité Repos (1 à 4) : Campeur pro et plafond en découlent. « ? » : à cocher à la main`;
     protected readonly r4_label: string = $localize`Plafond de 99 % (Repos niveau 4)`;
 
     /** Aménagement de la zone : repart de la case à chaque changement de case, puis suit les saisies. */
@@ -268,14 +269,23 @@ export class MapCellCampingComponent {
         if (changes.campings !== undefined) {
             this.saveCampingCount(citizen, changes.campings);
         }
-        if (changes.recluse_level !== undefined) {
+        if (changes.recluse_level !== undefined && hasHeroSkills(citizen.job)) {
             this.saveRecluseLevel(citizen, changes.recluse_level);
         }
     }
 
-    /** Stepper du niveau de Repos : -1 = inconnu. */
+    /** Stepper du niveau de Repos d'un héros : pas de niveau 0, il passe directement de « ? » à 1. */
     protected updateRecluseLevel(camper: Camper, value: number): void {
-        this.updateCamper(camper, { recluse_level: value < 0 ? null : value });
+        if (value === 0) {
+            this.updateCamper(camper, { recluse_level: camper.recluse_level === null ? 1 : null });
+            return;
+        }
+        this.updateCamper(camper, { recluse_level: value });
+    }
+
+    /** Métier simulé d'un campeur : le niveau de Repos suit la règle du métier, sans rien enregistrer pour le citoyen. */
+    protected updateCamperJob(camper: Camper, job: JobEnum): void {
+        this.store.update(camper.key, { job, recluse_level: heroSkillLevelForJob(job, camper.recluse_level) });
     }
 
     protected drop(event: CdkDragDrop<readonly Camper[]>): void {

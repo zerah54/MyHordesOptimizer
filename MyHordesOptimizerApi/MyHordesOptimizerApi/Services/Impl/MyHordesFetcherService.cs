@@ -924,7 +924,7 @@ namespace MyHordesOptimizerApi.Services.Impl
             // chargée avant lui est détachée, et la modifier ensuite ne partirait jamais en base —
             // sans la moindre erreur. Rien ne doit donc être chargé avant cet appel pour être écrit
             // après (le `user` l'était, et sa date d'import était silencieusement perdue).
-            UpsertPlayedMaps(response.PlayedMaps, userId);
+            var townIdByPlayedMap = UpsertPlayedMaps(response.PlayedMaps, userId);
 
             var lastUpdate = DateTime.UtcNow;
             var rewards = response.Rewards ?? new List<MyHordesReward>();
@@ -1022,7 +1022,11 @@ namespace MyHordesOptimizerApi.Services.Impl
             var existingTownPictos = DbContext.TownCitizenPictos.Where(picto => picto.IdUser == userId).ToList();
             foreach (var played in pictosByTown)
             {
-                var townId = DbContext.ResolveTownId(played.MapId!.Value);
+                // Une vie écartée par UpsertPlayedMaps n'a pas de ville sûre : ses pictos ne sont pas rangés.
+                if (!townIdByPlayedMap.TryGetValue(played, out var townId))
+                {
+                    continue;
+                }
                 foreach (var reward in played.Rewards!.Values.Where(reward => reward.Id.HasValue && reward.Number.HasValue))
                 {
                     if (!clesPictoParMhId.TryGetValue(reward.Id!.Value, out var clePicto))
@@ -1068,14 +1072,17 @@ namespace MyHordesOptimizerApi.Services.Impl
         // `userId` est le joueur À QUI appartient cet historique : ce n'est pas toujours le joueur
         // connecté (l'import de pictos passe l'historique d'un tiers), et s'y tromper rattacherait
         // les villes d'autrui au compte courant.
-        private void UpsertPlayedMaps(List<MyHordesCitizenRankingDto>? playedMaps, int userId)
+        private IReadOnlyDictionary<MyHordesCitizenRankingDto, int> UpsertPlayedMaps(List<MyHordesCitizenRankingDto>? playedMaps, int userId)
         {
+            // Par vie passée et non par mapId : un même mapId peut désigner une ville Twinoid et une
+            // ville MyHordes dans le même historique.
+            var townIdByPlayedMap = new Dictionary<MyHordesCitizenRankingDto, int>();
             if (playedMaps == null || playedMaps.Count == 0)
             {
                 // Rien à importer, mais l'import a bien eu lieu : sans cette marque, un joueur sans
                 // historique (premier séjour) le retenterait à chacune de ses connexions.
                 MarkPlayedMapsImported(userId);
-                return;
+                return townIdByPlayedMap;
             }
 
             // L'historique peut compter >100 villes (127 observées en réel) : on charge toutes les lignes
@@ -1085,7 +1092,7 @@ namespace MyHordesOptimizerApi.Services.Impl
             if (mapIds.Count == 0)
             {
                 MarkPlayedMapsImported(userId);
-                return;
+                return townIdByPlayedMap;
             }
             var provisionalIds = mapIds.Select(id => -id).ToList();
             var existingTowns = DbContext.Towns
@@ -1095,10 +1102,6 @@ namespace MyHordesOptimizerApi.Services.Impl
             // IdTown des villes de l'historique effectivement traitées : sert ensuite à rattacher
             // le joueur courant à ces villes via TownCitizen (le profil liste les villes par ce lien).
             var processedTownIds = new HashSet<int>();
-            // Correspondance mapId → clé de ville, établie ici parce que la résolution n'est pas
-            // triviale (clé réelle ou provisoire -mapId, avec garde-fou de saison) et qu'elle est
-            // nécessaire pour rattacher les points d'âme du joueur, plus bas.
-            var mapIdToTownId = new Dictionary<int, int>();
 
             foreach (var played in playedMaps)
             {
@@ -1129,7 +1132,7 @@ namespace MyHordesOptimizerApi.Services.Impl
                 }
 
                 processedTownIds.Add(town.IdTown);
-                mapIdToTownId[mapId] = town.IdTown;
+                townIdByPlayedMap[played] = town.IdTown;
 
                 town.IsFinished = true;
                 if (!string.IsNullOrEmpty(played.MapName))
@@ -1197,12 +1200,13 @@ namespace MyHordesOptimizerApi.Services.Impl
                 }
                 DbContext.SaveChanges();
 
-                UpsertPlayedMapsCadavers(playedMaps, userId, mapIdToTownId);
+                UpsertPlayedMapsCadavers(playedMaps, userId, townIdByPlayedMap);
                 DbContext.SaveChanges();
             }
 
             DbContext.ChangeTracker.Clear();
             MarkPlayedMapsImported(userId);
+            return townIdByPlayedMap;
         }
 
         /// <summary>
@@ -1222,7 +1226,7 @@ namespace MyHordesOptimizerApi.Services.Impl
         /// </para>
         /// </remarks>
         private void UpsertPlayedMapsCadavers(List<MyHordesCitizenRankingDto> playedMaps, int userId,
-            IReadOnlyDictionary<int, int> mapIdToTownId)
+            IReadOnlyDictionary<MyHordesCitizenRankingDto, int> townIdByPlayedMap)
         {
             var parTown = new Dictionary<int, MyHordesCitizenRankingDto>();
             foreach (var played in playedMaps)
@@ -1234,7 +1238,7 @@ namespace MyHordesOptimizerApi.Services.Impl
                 {
                     continue;
                 }
-                if (mapIdToTownId.TryGetValue(played.MapId.Value, out var townId))
+                if (townIdByPlayedMap.TryGetValue(played, out var townId))
                 {
                     parTown[townId] = played;
                 }

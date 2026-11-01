@@ -89,7 +89,7 @@ namespace MyHordesOptimizerApiIntegrationTests.Services
             context.Towns.AsNoTracking().Any(t => t.MapId == playedMapId).Should().BeTrue();
         }
 
-        private sealed class SingleUserPictosRepository : IMyHordesApiRepository
+        internal sealed class SingleUserPictosRepository : IMyHordesApiRepository
         {
             private readonly MyHordesUserDetailsDto _response;
             public SingleUserPictosRepository(MyHordesUserDetailsDto response) => _response = response;

@@ -849,7 +849,7 @@
     }
 </ng-template>
 
-<!-- Compétences héroïques : un niveau par groupe (« ? » = inconnu, 0 = aucun) -->
+<!-- Compétences héroïques : un niveau par groupe (« ? » = inconnu, 0 = habitant, non modifiable) -->
 <ng-template #heroSkillsBand let-row>
     <div class="band hero-skills-band">
         @for (family of hero_skill_families; track family.key) {
@@ -859,7 +859,7 @@
 </ng-template>
 
 <ng-template #heroSkillCell let-family="family" let-row>
-    <button [disabled]="is_readonly()"
+    <button [disabled]="is_readonly() || !hasHeroSkills(row.job)"
             [matMenuTriggerData]="{ row: row, family: family }"
             [matMenuTriggerFor]="heroSkillMenu"
             [matTooltip]="heroSkillLabel(family, row.hero_skills[family.key])"

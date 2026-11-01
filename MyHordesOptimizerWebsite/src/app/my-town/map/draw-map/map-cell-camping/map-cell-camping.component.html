@@ -75,7 +75,7 @@
                             </button>
                             <mat-menu #jobMenu="matMenu">
                                 @for (job of jobs; track job.key) {
-                                    <button mat-menu-item type="button" (click)="updateCamper(row.camper, { job })">
+                                    <button mat-menu-item type="button" (click)="updateCamperJob(row.camper, job)">
                                         <img [ngSrc]="HORDES_IMG_REPO + job.value.img" width="16" height="16" alt="">
                                         {{ job.value.label }}
                                     </button>
@@ -114,6 +114,7 @@
                             <span class="recluse">
                                 <span class="recluse-letter">R</span>
                                 <mho-compact-stepper class="recluse-level" [label]="recluse_label" [min]="-1" [max]="MAX_HERO_SKILL_LEVEL"
+                                                     [disabled]="!hasHeroSkills(row.camper.job)"
                                                      [value]="row.camper.recluse_level ?? -1"
                                                      (valueChange)="updateRecluseLevel(row.camper, $event)"></mho-compact-stepper>
                             </span>

@@ -56,10 +56,17 @@ describe('CampersStore', (): void => {
         ];
 
         store.addCitizen(scout);
-        store.addCitizen(citizen(8, 'Alice'));
+        store.addCitizen(citizen(8, 'Alice', JobEnum.GUARDIAN));
 
         expect(store.campers()[0]).toMatchObject({ campings: 2, recluse_level: 3, objects: 2, vest: true });
         expect(store.campers()[1]).toMatchObject({ campings: 0, recluse_level: null, objects: 0, vest: false });
+    });
+
+    it('a habitant, citizen or free profile, has Repos level 0', (): void => {
+        store.addCitizen(citizen(7, 'Bob', JobEnum.CITIZEN));
+        store.addProfile();
+
+        expect(store.campers().map((camper: Camper): number | null => camper.recluse_level)).toEqual([0, 0]);
     });
 
     it('updates, removes and moves campers', (): void => {

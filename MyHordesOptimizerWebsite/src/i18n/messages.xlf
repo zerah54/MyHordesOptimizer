@@ -311,12 +311,6 @@
             <trans-unit id="3165188886740707100" datatype="html">
                 <source>Appareil Photo d&apos;Avant-Guerre</source>
             </trans-unit>
-            <trans-unit id="3168608302992914019" datatype="html">
-                <source>
-                    <x id="group" equiv-text="group"/>
-                    : aucun niveau
-                </source>
-            </trans-unit>
             <trans-unit id="3396346845090842911" datatype="html">
                 <source>Uppercut Sauvage</source>
             </trans-unit>
@@ -874,7 +868,7 @@
             <trans-unit id="5127852869390190101" datatype="html">
                 <source>PA manquants pour réparer les chantiers</source>
             </trans-unit>
-            <trans-unit id="5131494773987630183" datatype="html">
+            <trans-unit id="370917987951639261" datatype="html">
                 <source>Dupliquer les consignes générales</source>
             </trans-unit>
             <trans-unit id="5132620791166897922" datatype="html">
@@ -1269,7 +1263,7 @@
             <trans-unit id="5037437391296624618" datatype="html">
                 <source>Information</source>
             </trans-unit>
-            <trans-unit id="5053934086106226974" datatype="html">
+            <trans-unit id="495015526996921327" datatype="html">
                 <source>Enregistrer les valeurs</source>
             </trans-unit>
             <trans-unit id="5939392791181422027" datatype="html">
@@ -1538,6 +1532,9 @@
             </trans-unit>
             <trans-unit id="8415875870300524706" datatype="html">
                 <source>Lien</source>
+            </trans-unit>
+            <trans-unit id="8425576653141537307" datatype="html">
+                <source>Capacité Repos (1 à 4) : Campeur pro et plafond en découlent. « ? » : à cocher à la main</source>
             </trans-unit>
             <trans-unit id="8430307096088015975" datatype="html">
                 <source>&lt;p&gt;Rendez-vous sur la
@@ -2026,9 +2023,6 @@
             </trans-unit>
             <trans-unit id="6862746102211208409" datatype="html">
                 <source>Impossible de récupérer les pictos.</source>
-            </trans-unit>
-            <trans-unit id="6862929327247209681" datatype="html">
-                <source>Capacité Repos (0 : aucun niveau, 1 à 4) : Campeur pro et plafond en découlent. « ? » : à cocher à la main</source>
             </trans-unit>
             <trans-unit id="9059155436017318544" datatype="html">
                 <source>Fermer</source>
@@ -2744,6 +2738,9 @@
             <trans-unit id="5407759070423985131" datatype="html">
                 <source>Ville</source>
             </trans-unit>
+            <trans-unit id="5408671121354947038" datatype="html">
+                <source>Ajouter</source>
+            </trans-unit>
             <trans-unit id="5413959475627776150" datatype="html">
                 <source>PA (±)</source>
             </trans-unit>
@@ -3122,7 +3119,7 @@
             <trans-unit id="577664839739965914" datatype="html">
                 <source>Exploration</source>
             </trans-unit>
-            <trans-unit id="5776891152219138313" datatype="html">
+            <trans-unit id="3556624464192130973" datatype="html">
                 <source>Gestion des bannis</source>
             </trans-unit>
             <trans-unit id="5777230578760773080" datatype="html">
@@ -3416,6 +3413,9 @@
             </trans-unit>
             <trans-unit id="4034420321472748193" datatype="html">
                 <source>Renommer et modifier les couleurs</source>
+            </trans-unit>
+            <trans-unit id="7451632765834808757" datatype="html">
+                <source>Ajouter une consigne</source>
             </trans-unit>
             <trans-unit id="7452622585349092259" datatype="html">
                 <source>Affinage annulé</source>
@@ -4757,7 +4757,7 @@
                 <source><x id="days" equiv-text="Math.floor(hours / 24)"/>j
                 </source>
             </trans-unit>
-            <trans-unit id="1632166013398751283" datatype="html">
+            <trans-unit id="2858654381448149019" datatype="html">
                 <source>Dupliquer les consignes du tracé</source>
             </trans-unit>
             <trans-unit id="1637633335638507705" datatype="html">
@@ -5047,6 +5047,9 @@
             <trans-unit id="7777838177173678850" datatype="html">
                 <source>Attaque estimée (zombies)</source>
             </trans-unit>
+            <trans-unit id="7778304983114386710" datatype="html">
+                <source>Maître</source>
+            </trans-unit>
             <trans-unit id="1382443003773586096" datatype="html">
                 <source>Profil libre</source>
             </trans-unit>
@@ -5250,6 +5253,9 @@
             </trans-unit>
             <trans-unit id="87247766251045848" datatype="html">
                 <source>Réglages mémorisés</source>
+            </trans-unit>
+            <trans-unit id="8726507972322583535" datatype="html">
+                <source>Supprimer</source>
             </trans-unit>
             <trans-unit id="8732148525847736912" datatype="html">
                 <source>Aucun débordement : les défenses et les veilleurs absorbent toute l&apos;attaque, aucune maison n&apos;est attaquée.</source>
@@ -5485,9 +5491,6 @@
             </trans-unit>
             <trans-unit id="8560642627223957960" datatype="html">
                 <source>Déposer</source>
-            </trans-unit>
-            <trans-unit id="856149838702845373" datatype="html">
-                <source>Élite</source>
             </trans-unit>
             <trans-unit id="8564269404291712463" datatype="html">
                 <source>Le texte a bien été copié</source>

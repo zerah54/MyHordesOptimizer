@@ -1,7 +1,7 @@
 namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Citizens
 {
     /// <summary>
-    /// Niveau du citoyen dans chaque groupe de capacités héroïques : 0 aucun, 1 à 4 (Débutant à Élite).
+    /// Niveau du citoyen dans chaque groupe de capacités héroïques : 0 habitant, 1 à 4 (Débutant à Maître).
     /// <c>null</c> : inconnu. MyHordes ne l'expose pas : saisi à la main.
     /// </summary>
     public class CitizenHeroSkillLevelsDto

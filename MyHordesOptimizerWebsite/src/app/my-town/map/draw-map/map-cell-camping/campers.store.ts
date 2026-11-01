@@ -3,6 +3,7 @@ import { Injectable, signal, WritableSignal } from '@angular/core';
 import { JobEnum } from '../../../../_abstract_model/enum/job.enum';
 import { Property } from '../../../../_abstract_model/enum/property.enum';
 import { Citizen } from '../../../../_abstract_model/types/citizen.class';
+import { heroSkillLevelForJob } from '../../../../_abstract_model/types/hero-skill-levels';
 import { Item } from '../../../../_abstract_model/types/item.class';
 
 /** Réglages d'un campeur, hors ce qui tient à la zone. */
@@ -17,7 +18,7 @@ export interface CamperSettings {
     readonly vest: boolean;
     readonly tomb: boolean;
     readonly r4: boolean;
-    /** Niveau de la capacité Repos (0 à 4) : l'API en déduit Campeur pro et le plafond. `null` : inconnu, cases à cocher à la main. */
+    /** Niveau de la capacité Repos (0 : habitant, 1 à 4 : héros) : l'API en déduit Campeur pro et le plafond. `null` : inconnu, cases à cocher à la main. */
     readonly recluse_level: number | null;
 }
 
@@ -46,7 +47,7 @@ const DEFAULT_SETTINGS: CamperSettings = {
     vest: false,
     tomb: false,
     r4: false,
-    recluse_level: null
+    recluse_level: 0
 };
 
 /**
@@ -56,11 +57,12 @@ const DEFAULT_SETTINGS: CamperSettings = {
  */
 export function camperSettingsOf(citizen: Citizen): CamperSettings {
     const bag: readonly Item[] = citizen.bag?.items ?? [];
+    const job: JobEnum = citizen.job ?? JobEnum.CITIZEN;
     return {
         ...DEFAULT_SETTINGS,
-        job: citizen.job ?? JobEnum.CITIZEN,
+        job,
         campings: citizen.camping_count,
-        recluse_level: citizen.hero_skills.r,
+        recluse_level: heroSkillLevelForJob(job, citizen.hero_skills.r),
         objects: bag.filter((item: Item): boolean => !item.is_broken
             && item.properties.some((property: Property | undefined): boolean => property?.key === Property.CAMP_BONUS.key)).length,
         vest: bag.some((item: Item): boolean => item.uid === SCOUT_VEST_UID)

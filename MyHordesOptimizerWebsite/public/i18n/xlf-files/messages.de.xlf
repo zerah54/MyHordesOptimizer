@@ -451,14 +451,6 @@
                 <source>Appareil Photo d&apos;Avant-Guerre</source>
                 <target state="final">Kamera aus Vorkriegs-Tagen</target>
             </trans-unit>
-            <trans-unit id="3168608302992914019" datatype="html">
-                <source>
-                    <x id="group" equiv-text="group"/>
-                    : aucun niveau
-                </source>
-                <target state="translated"><x id="group" equiv-text="group"/>: keine Stufe
-                </target>
-            </trans-unit>
             <trans-unit id="3396346845090842911" datatype="html" approved="yes">
                 <source>Uppercut Sauvage</source>
                 <target state="final">Wildstyle Uppercut</target>
@@ -1303,7 +1295,7 @@
                 <source>PA manquants pour réparer les chantiers</source>
                 <target state="final">Fehlende AP zum Reparieren der Baustellen</target>
             </trans-unit>
-            <trans-unit id="5131494773987630183" datatype="html">
+            <trans-unit id="370917987951639261" datatype="html">
                 <source>Dupliquer les consignes générales</source>
                 <target state="translated">Allgemeine Anweisungen duplizieren</target>
             </trans-unit>
@@ -1612,11 +1604,6 @@
             <trans-unit id="6862746102211208409" datatype="html" approved="yes">
                 <source>Impossible de récupérer les pictos.</source>
                 <target state="final">Die Auszeichnungen konnten nicht abgerufen werden.</target>
-            </trans-unit>
-            <trans-unit id="6862929327247209681" datatype="html">
-                <source>Capacité Repos (0 : aucun niveau, 1 à 4) : Campeur pro et plafond en découlent. « ? » : à cocher à la main</source>
-                <target state="translated">Kapazität Ruhe (0: keine Stufe, 1 bis 4): Proficamper und Obergrenze ergeben sich daraus. „?“: von Hand anzukreuzen
-                </target>
             </trans-unit>
             <trans-unit id="9059155436017318544" datatype="html" approved="yes">
                 <source>Fermer</source>
@@ -3003,8 +2990,7 @@
                     my-town/expeditions]ce lien[/link]
                 </source>
                 <target state="translated">Diese Nachricht wurde von der MyHordes-Optimizer-Website erstellt. Du findest die Expeditionen unter [link=
-                    <x id="PH"
-                       equiv-text="environment.website_url"/>
+                    <x id="PH" equiv-text="environment.website_url"/>
                     my-town/expeditions]diesem Link[/link]
                 </target>
             </trans-unit>
@@ -3023,6 +3009,10 @@
             <trans-unit id="5407759070423985131" datatype="html" approved="yes">
                 <source>Ville</source>
                 <target state="final">Stadt</target>
+            </trans-unit>
+            <trans-unit id="5408671121354947038" datatype="html">
+                <source>Ajouter</source>
+                <target state="translated">Hinzufügen</target>
             </trans-unit>
             <trans-unit id="5413959475627776150" datatype="html">
                 <source>PA (±)</source>
@@ -3588,7 +3578,7 @@
                 <source>Exploration</source>
                 <target state="final">Exploration</target>
             </trans-unit>
-            <trans-unit id="5776891152219138313" datatype="html">
+            <trans-unit id="3556624464192130973" datatype="html">
                 <source>Gestion des bannis</source>
                 <target state="translated">Verwaltung der Verbannten</target>
             </trans-unit>
@@ -4007,6 +3997,10 @@
             <trans-unit id="4034420321472748193" datatype="html">
                 <source>Renommer et modifier les couleurs</source>
                 <target state="translated">Umbenennen und Farben bearbeiten</target>
+            </trans-unit>
+            <trans-unit id="7451632765834808757" datatype="html">
+                <source>Ajouter une consigne</source>
+                <target state="translated">Anweisung hinzufügen</target>
             </trans-unit>
             <trans-unit id="7452622585349092259" datatype="html" approved="yes">
                 <source>Affinage annulé</source>
@@ -5368,8 +5362,7 @@
                     my-town/wishlist]ce lien[/link]
                 </source>
                 <target state="translated">Diese Liste wurde von der MyHordes-Optimizer-Website erstellt. Du findest sie unter [link=
-                    <x id="PH"
-                       equiv-text="environment.website_url"/>
+                    <x id="PH" equiv-text="environment.website_url"/>
                     my-town/wishlist]diesem Link[/link]
                 </target>
             </trans-unit>
@@ -6042,7 +6035,7 @@
                 <source>Information</source>
                 <target state="final">Information</target>
             </trans-unit>
-            <trans-unit id="5053934086106226974" datatype="html">
+            <trans-unit id="495015526996921327" datatype="html">
                 <source>Enregistrer les valeurs</source>
                 <target state="translated">Werte speichern</target>
             </trans-unit>
@@ -6490,6 +6483,10 @@
                 <source>Lien</source>
                 <target state="final">Link</target>
             </trans-unit>
+            <trans-unit id="8425576653141537307" datatype="html">
+                <source>Capacité Repos (1 à 4) : Campeur pro et plafond en découlent. « ? » : à cocher à la main</source>
+                <target state="translated">Fähigkeit Ruhe (1 bis 4): Profi-Camper und Obergrenze ergeben sich daraus. «?»: von Hand anzukreuzen</target>
+            </trans-unit>
             <trans-unit id="8430307096088015975" datatype="html" approved="yes">
                 <source>&lt;p&gt;Rendez-vous sur la
                     <x id="link" equiv-text="chrome_link"/>
@@ -6819,7 +6816,7 @@
                 <target state="final"><x id="days" equiv-text="Math.floor(hours / 24)"/>T
                 </target>
             </trans-unit>
-            <trans-unit id="1632166013398751283" datatype="html">
+            <trans-unit id="2858654381448149019" datatype="html">
                 <source>Dupliquer les consignes du tracé</source>
                 <target state="translated">Anweisungen der Route duplizieren</target>
             </trans-unit>
@@ -7228,6 +7225,10 @@
                 <source>Attaque estimée (zombies)</source>
                 <target state="final">Geschätzter Angriff (Zombies)</target>
             </trans-unit>
+            <trans-unit id="7778304983114386710" datatype="html">
+                <source>Maître</source>
+                <target state="translated">Meister</target>
+            </trans-unit>
             <trans-unit id="1382443003773586096" datatype="html">
                 <source>Profil libre</source>
                 <target state="translated">Freies Profil</target>
@@ -7630,10 +7631,6 @@
             <trans-unit id="8560642627223957960" datatype="html" approved="yes">
                 <source>Déposer</source>
                 <target state="final">Ablegen</target>
-            </trans-unit>
-            <trans-unit id="856149838702845373" datatype="html" approved="yes">
-                <source>Élite</source>
-                <target state="final">Elite</target>
             </trans-unit>
             <trans-unit id="8564269404291712463" datatype="html" approved="yes">
                 <source>Le texte a bien été copié</source>
@@ -8324,6 +8321,10 @@
             <trans-unit id="87247766251045848" datatype="html" approved="yes">
                 <source>Réglages mémorisés</source>
                 <target state="final">Gespeicherte Einstellungen</target>
+            </trans-unit>
+            <trans-unit id="8726507972322583535" datatype="html">
+                <source>Supprimer</source>
+                <target state="translated">Löschen</target>
             </trans-unit>
             <trans-unit id="8732148525847736912" datatype="html" approved="yes">
                 <source>Aucun débordement : les défenses et les veilleurs absorbent toute l&apos;attaque, aucune maison n&apos;est attaquée.</source>

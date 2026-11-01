@@ -152,7 +152,7 @@ describe('MapCellCampingComponent', (): void => {
         });
         expect(request.campers).toEqual([
             { job: 'scout', campings: 1, proCamper: false, objects: 0, vest: true, tomb: false, r4: false, recluseLevel: null },
-            { job: 'citizen', campings: 0, proCamper: false, objects: 0, vest: false, tomb: false, r4: false, recluseLevel: null }
+            { job: 'citizen', campings: 0, proCamper: false, objects: 0, vest: false, tomb: false, r4: false, recluseLevel: 0 }
         ]);
         // Espace insécable avant « % »
         expect(elements('.camper .chance').map((chance: HTMLElement): string => (chance.textContent ?? '').replace(/\s+/g, ' ').trim())).toEqual(['90 %', '40 %']);
@@ -234,7 +234,7 @@ describe('MapCellCampingComponent', (): void => {
     });
 
     it('a town citizen\'s campings and Repos level are saved for the citizen list too', async (): Promise<void> => {
-        const bob: Citizen = citizen(7, 'Bob');
+        const bob: Citizen = citizen(7, 'Bob', JobEnum.SCOUT);
         render(newCell(), true, [], [bob]);
         expand();
         store.addCitizen(bob);
@@ -254,10 +254,74 @@ describe('MapCellCampingComponent', (): void => {
         expect(bob.hero_skills.r).toBe(2);
     });
 
+    it('a hero\'s Repos stepper skips 0, between « ? » and 1', async (): Promise<void> => {
+        render();
+        expand();
+        store.addCitizen(citizen(7, 'Bob', JobEnum.SCOUT));
+        await settle();
+        const component: { updateRecluseLevel: (camper: Camper, value: number) => void } = <{ updateRecluseLevel: (camper: Camper, value: number) => void }><unknown>fixture.componentInstance;
+
+        component.updateRecluseLevel(store.campers()[0], 0);
+        expect(store.campers()[0].recluse_level).toBe(1);
+
+        component.updateRecluseLevel(store.campers()[0], 0);
+        expect(store.campers()[0].recluse_level).toBeNull();
+    });
+
+    it('a habitant\'s Repos level stays at 0 and cannot be changed', async (): Promise<void> => {
+        render();
+        expand();
+        store.addCitizen(citizen(7, 'Bob', JobEnum.CITIZEN));
+        await settle();
+        fixture.detectChanges();
+
+        const stepper: HTMLElement = element('.camper .recluse-level');
+        expect(stepper.textContent).toContain('0');
+        expect(Array.from(stepper.querySelectorAll('button')).every((button: HTMLButtonElement): boolean => button.disabled)).toBe(true);
+        expect(fixture.nativeElement.querySelector('.camper .pro-camper')).toBeNull();
+    });
+
+    it('changing a camper\'s job applies its Repos rule, without saving it for the citizen', async (): Promise<void> => {
+        const bob: Citizen = citizen(7, 'Bob', JobEnum.SCOUT);
+        bob.hero_skills = { s: null, u: null, p: null, e: null, r: 3 };
+        render(newCell(), true, [], [bob]);
+        expand();
+        store.addCitizen(bob);
+        await settle();
+        const component: { updateCamperJob: (camper: Camper, job: JobEnum) => void } = <{ updateCamperJob: (camper: Camper, job: JobEnum) => void }><unknown>fixture.componentInstance;
+
+        component.updateCamperJob(store.campers()[0], JobEnum.GUARDIAN);
+        expect(store.campers()[0]).toMatchObject({ job: JobEnum.GUARDIAN, recluse_level: 3 });
+
+        component.updateCamperJob(store.campers()[0], JobEnum.CITIZEN);
+        expect(store.campers()[0].recluse_level).toBe(0);
+
+        component.updateCamperJob(store.campers()[0], JobEnum.TAMER);
+        expect(store.campers()[0].recluse_level).toBeNull();
+
+        expect(update_hero_skills).not.toHaveBeenCalled();
+    });
+
+    it('a real habitant simulated with a hero job saves no Repos level', async (): Promise<void> => {
+        const bob: Citizen = citizen(7, 'Bob', JobEnum.CITIZEN);
+        render(newCell(), true, [], [bob]);
+        expand();
+        store.addCitizen(bob);
+        await settle();
+        const component: { updateCamperJob: (camper: Camper, job: JobEnum) => void; updateRecluseLevel: (camper: Camper, value: number) => void } =
+            <{ updateCamperJob: (camper: Camper, job: JobEnum) => void; updateRecluseLevel: (camper: Camper, value: number) => void }><unknown>fixture.componentInstance;
+
+        component.updateCamperJob(store.campers()[0], JobEnum.SCOUT);
+        component.updateRecluseLevel(store.campers()[0], 2);
+
+        expect(store.campers()[0].recluse_level).toBe(2);
+        expect(update_hero_skills).not.toHaveBeenCalled();
+    });
+
     it('a known Repos level replaces the Campeur pro and R4 boxes', async (): Promise<void> => {
         render();
         expand();
-        store.addProfile();
+        store.addCitizen(citizen(7, 'Bob', JobEnum.SCOUT));
         await settle();
         expect(fixture.nativeElement.querySelector('.camper .pro-camper')).not.toBeNull();
         expect(fixture.nativeElement.querySelector('.camper .r4')).not.toBeNull();

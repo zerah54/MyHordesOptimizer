@@ -1,3 +1,4 @@
+import { JobEnum } from '../enum/job.enum';
 import { I18nLabels } from './_types';
 
 /** Groupe de l'arbre des compétences héroïques, désigné par la lettre que les joueurs utilisent (S, U, P, E, R). */
@@ -22,16 +23,16 @@ export const HERO_SKILL_FAMILIES: readonly HeroSkillFamilyInfo[] = [
 /** Lettre de chaque groupe, par clé. */
 export const HERO_SKILL_LETTERS: Readonly<Record<HeroSkillFamily, string>> = { s: 'S', u: 'U', p: 'P', e: 'E', r: 'R' };
 
-/** Niveau le plus haut d'un groupe (Élite). 0 : aucun niveau. */
+/** Niveau le plus haut d'un groupe (Maître). */
 export const MAX_HERO_SKILL_LEVEL: number = 4;
 
-/** Niveau du citoyen dans chaque groupe, de 0 à {@link MAX_HERO_SKILL_LEVEL} ; `null` : inconnu. */
+/** Niveau du citoyen dans chaque groupe : 0 pour un habitant, 1 à {@link MAX_HERO_SKILL_LEVEL} pour un héros ; `null` : inconnu. */
 export type HeroSkillLevels = Readonly<Record<HeroSkillFamily, number | null>>;
 
 export const UNKNOWN_HERO_SKILL_LEVELS: HeroSkillLevels = { s: null, u: null, p: null, e: null, r: null };
 
 /** Noms des niveaux d'un groupe, du premier au quatrième : ils ne figurent pas dans les données extraites du jeu. */
-const LEVEL_NAMES: readonly string[] = [$localize`Débutant`, $localize`Apprenti`, $localize`Expert`, $localize`Élite`];
+const LEVEL_NAMES: readonly string[] = [$localize`Débutant`, $localize`Apprenti`, $localize`Expert`, $localize`Maître`];
 
 /** Nom d'un niveau, compté à partir de 0 comme dans les données du jeu (0 : Débutant). */
 export function heroSkillLevelName(level: number): string {
@@ -41,6 +42,28 @@ export function heroSkillLevelName(level: number): string {
 /** Valeur lue de l'API : un niveau entier dans les bornes, sinon inconnu. */
 export function toHeroSkillLevel(value: number | null | undefined): number | null {
     return typeof value === 'number' && Number.isInteger(value) && value >= 0 && value <= MAX_HERO_SKILL_LEVEL ? value : null;
+}
+
+/**
+ * Un métier a-t-il des niveaux de compétences ? Tous sauf Habitant (métier inconnu compris).
+ * @param {JobEnum | undefined} job Métier.
+ * @returns {boolean} Vrai si les niveaux se saisissent.
+ */
+export function hasHeroSkills(job: JobEnum | undefined): boolean {
+    return job?.key !== JobEnum.CITIZEN.key;
+}
+
+/**
+ * Niveau valable pour un métier : toujours 0 pour un habitant, jamais 0 pour un héros (inconnu à la place).
+ * @param {JobEnum | undefined} job Métier.
+ * @param {number | null} level Niveau enregistré.
+ * @returns {number | null} Niveau à retenir.
+ */
+export function heroSkillLevelForJob(job: JobEnum | undefined, level: number | null): number | null {
+    if (!hasHeroSkills(job)) {
+        return 0;
+    }
+    return level === 0 ? null : level;
 }
 
 /** Ce qu'il faut d'une compétence du référentiel pour nommer son groupe. */

@@ -48,10 +48,12 @@ import { BuiltBuildingsService } from '../../../_abstract_model/services/built-b
 import { NoteService } from '../../../_abstract_model/services/note.service';
 import { TownService } from '../../../_abstract_model/services/town.service';
 import { Dictionary, Imports, ListForAddRemove } from '../../../_abstract_model/types/_types';
-import { CitizenInfo } from '../../../_abstract_model/types/citizen-info.class';
 import { Citizen } from '../../../_abstract_model/types/citizen.class';
+import { CitizenInfo } from '../../../_abstract_model/types/citizen-info.class';
 import { DailyAction } from '../../../_abstract_model/types/daily-action.class';
+import { HeroSkill } from '../../../_abstract_model/types/hero-skill.class';
 import {
+    hasHeroSkills,
     HERO_SKILL_FAMILIES,
     HERO_SKILL_LETTERS,
     HeroSkillFamily,
@@ -61,7 +63,6 @@ import {
     HeroSkillLevels,
     MAX_HERO_SKILL_LEVEL
 } from '../../../_abstract_model/types/hero-skill-levels';
-import { HeroSkill } from '../../../_abstract_model/types/hero-skill.class';
 import { HeroicActionsWithValue } from '../../../_abstract_model/types/heroic-actions.class';
 import { HomeWithValue } from '../../../_abstract_model/types/home.class';
 import { Item } from '../../../_abstract_model/types/item.class';
@@ -211,12 +212,12 @@ export class CitizensListComponent implements OnInit {
     /** Niveaux proposés au menu d'un groupe (-1 : inconnu), précédés de la valeur affichée dans la cellule. */
     protected readonly hero_skill_levels: readonly { value: number; label: string }[] = [
         { value: -1, label: `? – ${$localize`Inconnu`}` },
-        { value: 0, label: `0 – ${$localize`Aucun`}` },
         ...Array.from({ length: MAX_HERO_SKILL_LEVEL }, (_: unknown, index: number): { value: number; label: string } => ({
             value: index + 1,
             label: `${index + 1} – ${heroSkillLevelName(index)}`
         }))
     ];
+    protected readonly hasHeroSkills: (job: JobEnum | undefined) => boolean = hasHeroSkills;
     protected readonly CAMPING_COUNT_ID: string = CAMPING_COUNT_ID;
     protected readonly HERO_SKILL_ID_PREFIX: string = HERO_SKILL_ID_PREFIX;
     /** Nom de chaque groupe dans la langue du site ; sa lettre tant que les compétences ne sont pas chargées. */
@@ -961,12 +962,12 @@ export class CitizensListComponent implements OnInit {
 
     /**
      * Libellé (infobulle) du niveau d'un citoyen dans un groupe de compétences : nom du groupe et du niveau,
-     * « aucun » pour 0, « inconnu » sans saisie.
+     * « inconnu » sans saisie, le groupe seul pour un habitant (0 n'a pas de nom).
      */
     protected heroSkillLabel(family: HeroSkillFamilyInfo, level: number | null): string {
         const group: string = this.hero_skill_group_names()[family.key];
         if (level === null) return $localize`${group}:group: : niveau inconnu`;
-        if (level === 0) return $localize`${group}:group: : aucun niveau`;
+        if (level === 0) return group;
         return `${group} : ${heroSkillLevelName(level - 1)}`;
     }
 
