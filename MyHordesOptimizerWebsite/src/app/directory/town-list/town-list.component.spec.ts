@@ -10,8 +10,10 @@ import { NoteService } from '../../_abstract_model/services/note.service';
 import { TownService } from '../../_abstract_model/services/town.service';
 import { Dictionary } from '../../_abstract_model/types/_types';
 import { Me } from '../../_abstract_model/types/me.class';
+import { TownDetails } from '../../_abstract_model/types/town-details.class';
 import { TownListItem, TownListPageResult, TownPublicCitizen } from '../../_abstract_model/types/town-list-item.model';
-import { setUser } from '../../_core/utilities/localstorage.util';
+import { RouteCommands } from '../../_core/directives/middle-click-link.directive';
+import { setTown, setUser } from '../../_core/utilities/localstorage.util';
 import { TownListComponent } from './town-list.component';
 
 interface TestableComponent {
@@ -22,6 +24,7 @@ interface TestableComponent {
         (): Dictionary<NoteDTO>;
     };
     hasParticipated(row: TownListItem): boolean;
+    getRowCommands(row: TownListItem): RouteCommands | null;
     onPageChange(event: {
         pageIndex: number;
         pageSize: number;
@@ -176,5 +179,38 @@ describe('TownListComponent tri et pagination', (): void => {
         expect(townService.getTownsPaged).toHaveBeenCalledWith(expect.objectContaining({
             page: 1, sortColumn: 'name', sortDirection: 'asc'
         } as Partial<TownListQuery>));
+    });
+});
+
+describe('TownListComponent ouverture d\'une ville', (): void => {
+    let testable: TestableComponent;
+
+    beforeEach(async (): Promise<void> => {
+        const noteService: MockedObject<NoteService> = {
+            getMyTownNotes: vi.fn().mockName('NoteService.getMyTownNotes')
+        } as unknown as MockedObject<NoteService>;
+        noteService.getMyTownNotes.mockReturnValue(of({}));
+
+        await TestBed.configureTestingModule({
+            imports: [TownListComponent],
+            providers: [provideHttpClient(withXhr()), provideHttpClientTesting(), { provide: NoteService, useValue: noteService }]
+        }).compileComponents();
+
+        testable = TestBed.createComponent(TownListComponent).componentInstance as unknown as TestableComponent;
+    });
+
+    afterEach((): void => setTown(null));
+
+    it('n\'ouvre pas une ville sans mapId', (): void => {
+        expect(testable.getRowCommands({ ...town([]), mapId: null })).toBeNull();
+    });
+
+    it('ouvre une autre ville en mode observateur', (): void => {
+        expect(testable.getRowCommands(town([]))).toEqual(['/town', 12, 'citizens', 'list']);
+    });
+
+    it('ouvre sa propre ville courante en mode normal', (): void => {
+        setTown(Object.assign(new TownDetails(), { town_id: 12 }));
+        expect(testable.getRowCommands(town([]))).toEqual(['/my-town']);
     });
 });

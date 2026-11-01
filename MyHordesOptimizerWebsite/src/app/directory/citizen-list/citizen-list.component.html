@@ -69,7 +69,7 @@
 
                 <ng-container matColumnDef="note">
                     <th *matHeaderCellDef i18n mat-header-cell>Note</th>
-                    <td (click)="$event.stopPropagation()" *matCellDef="let row; table: table" mat-cell>
+                    <td (auxclick)="$event.stopPropagation()" (click)="$event.stopPropagation()" *matCellDef="let row; table: table" mat-cell>
                         @if (row.id !== myUserId) {
                             <mho-note-icon [note]="userNotes()[row.id]?.note ?? null" (clicked)="openUserNote(row.id)"/>
                         }
@@ -78,6 +78,7 @@
 
                 <tr *matHeaderRowDef="displayedColumns(); sticky: true" mat-header-row></tr>
                 <tr (click)="onRowClick(row)" *matRowDef="let row; columns: displayedColumns()"
+                    [mhoMiddleClickLink]="getRowCommands(row)"
                     class="clickable-row"
                     mat-row></tr>
 
