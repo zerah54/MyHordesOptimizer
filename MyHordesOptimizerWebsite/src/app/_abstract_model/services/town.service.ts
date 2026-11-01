@@ -256,13 +256,13 @@ export class TownService extends GlobalService {
     }
 
     /**
-     * Récupère les informations d'un unique citoyen
+     * Récupère les informations d'un unique citoyen de la ville du joueur, même quand il en observe une autre
      *
      * @param {number} id
      */
     public getCitizen(id: number): Observable<Citizen> {
         return new Observable((sub: Subscriber<Citizen>) => {
-            super.get<CitizenDTO>(this.API_URL + `/town/${getTown()?.town_id}/user/${id}`)
+            super.get<CitizenDTO>(this.API_URL + `/town/${getOwnTown()?.town_id}/user/${id}`)
                 .subscribe({
                     next: (response: HttpResponse<CitizenDTO>) => {
                         sub.next(new Citizen(response.body || undefined));
