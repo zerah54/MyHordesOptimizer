@@ -48,7 +48,7 @@
                                       [checked]="allSelected()"
                                       [indeterminate]="someSelected()"/>
                     </th>
-                    <td (click)="$event.stopPropagation()" *matCellDef="let row; table: table" mat-cell>
+                    <td (auxclick)="$event.stopPropagation()" (click)="$event.stopPropagation()" *matCellDef="let row; table: table" mat-cell>
                         <mat-checkbox (change)="toggleSelection(row.id)"
                                       [checked]="selectedIds().has(row.id)"/>
                     </td>
@@ -208,7 +208,7 @@
                             <ng-container i18n>Note</ng-container>
                         }
                     </th>
-                    <td (click)="$event.stopPropagation()" *matCellDef="let row; table: table" mat-cell>
+                    <td (auxclick)="$event.stopPropagation()" (click)="$event.stopPropagation()" *matCellDef="let row; table: table" mat-cell>
                         <mho-deferred-cell>
                             @if (row.mapId !== null && hasParticipated(row)) {
                                 <mho-note-icon [note]="townNotes()[row.mapId]?.note ?? null" (clicked)="openTownNote(row.mapId)"/>
@@ -219,7 +219,7 @@
 
                 <ng-container matColumnDef="noteCitizen">
                     <th *matHeaderCellDef i18n mat-header-cell>Note de citoyen</th>
-                    <td (click)="$event.stopPropagation()" *matCellDef="let row; table: table" mat-cell>
+                    <td (auxclick)="$event.stopPropagation()" (click)="$event.stopPropagation()" *matCellDef="let row; table: table" mat-cell>
                         <mho-deferred-cell>
                             @if (row.mapId !== null && hasParticipated(row)) {
                                 <mho-note-icon [note]="citizenNotes()[row.mapId]?.note ?? null" (clicked)="openCitizenNote(row.mapId)"/>
@@ -230,7 +230,7 @@
 
                 <ng-container matColumnDef="actions">
                     <th *matHeaderCellDef i18n mat-header-cell>Actions</th>
-                    <td (click)="$event.stopPropagation()" *matCellDef="let row; table: table" mat-cell>
+                    <td (auxclick)="$event.stopPropagation()" (click)="$event.stopPropagation()" *matCellDef="let row; table: table" mat-cell>
                         <div class="cell--actions">
                             <button (click)="importTown(row.id)"
                                     [disabled]="importingIds().has(row.id)"
@@ -273,6 +273,7 @@
                 <tr *matHeaderRowDef="displayedColumns(); sticky: true" mat-header-row></tr>
                 <tr (click)="onRowClick(row)" *matRowDef="let row; columns: displayedColumns()"
                     [class.clickable-row]="isRowClickable(row)"
+                    [mhoMiddleClickLink]="getRowCommands(row)"
                     mat-row></tr>
 
             </table>

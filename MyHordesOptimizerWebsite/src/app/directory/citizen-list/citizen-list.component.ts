@@ -32,6 +32,7 @@ import { NoteService } from '../../_abstract_model/services/note.service';
 import { UserAccountService } from '../../_abstract_model/services/user-account.service';
 import { Dictionary, Imports } from '../../_abstract_model/types/_types';
 import { CitizenListItem, CitizenListPageResult } from '../../_abstract_model/types/citizen-list-item.model';
+import { MiddleClickLinkDirective, RouteCommands } from '../../_core/directives/middle-click-link.directive';
 import { TypedCellDefDirective } from '../../_core/directives/typed-cell-def.directive';
 import { getUserId } from '../../_core/utilities/localstorage.util';
 import { AvatarComponent } from '../../_shared/avatar/avatar.component';
@@ -40,7 +41,7 @@ import { NoteIconComponent } from '../../_shared/note-icon/note-icon.component';
 
 const angular_common: Imports = [CommonModule, ReactiveFormsModule];
 const components: Imports = [AvatarComponent, NoteIconComponent];
-const directives: Imports = [TypedCellDefDirective];
+const directives: Imports = [MiddleClickLinkDirective, TypedCellDefDirective];
 const pipes: Imports = [];
 const material_modules: Imports = [
     MatTableModule, MatSortModule, MatIconModule, MatProgressSpinnerModule,
@@ -118,9 +119,14 @@ export class CitizenListComponent implements OnInit, AfterViewInit {
         return citizen.id;
     }
 
+    /** Route du profil public du joueur, partagée par le clic simple et le clic molette (nouvel onglet). */
+    protected getRowCommands(citizen: CitizenListItem): RouteCommands {
+        return ['/profile', citizen.id];
+    }
+
     /** Ouvre le profil public du joueur. */
     protected onRowClick(citizen: CitizenListItem): void {
-        this.router.navigate(['/profile', citizen.id]);
+        this.router.navigate(this.getRowCommands(citizen));
     }
 
     /** Ouvre l'édition de la note privée globale de l'appelant sur ce joueur, puis la persiste si modifiée. */

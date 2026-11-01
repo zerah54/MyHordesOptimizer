@@ -42,6 +42,7 @@ import { NoteService } from '../../_abstract_model/services/note.service';
 import { TownService } from '../../_abstract_model/services/town.service';
 import { Dictionary, Imports, TownState, TownTypeId } from '../../_abstract_model/types/_types';
 import { TownListItem, TownListPageResult, TownPublicCitizen } from '../../_abstract_model/types/town-list-item.model';
+import { MiddleClickLinkDirective, RouteCommands } from '../../_core/directives/middle-click-link.directive';
 import { TypedCellDefDirective } from '../../_core/directives/typed-cell-def.directive';
 import { getTown, getUserId } from '../../_core/utilities/localstorage.util';
 import { DeferredCellComponent } from '../../_shared/deferred-cell/deferred-cell.component';
@@ -50,7 +51,7 @@ import { NoteIconComponent } from '../../_shared/note-icon/note-icon.component';
 
 const angular_common: Imports = [CommonModule, ReactiveFormsModule];
 const components: Imports = [DeferredCellComponent, NoteIconComponent];
-const directives: Imports = [TypedCellDefDirective];
+const directives: Imports = [MiddleClickLinkDirective, TypedCellDefDirective];
 const pipes: Imports = [];
 const material_modules: Imports = [
     MatTableModule, MatSortModule, MatIconModule, MatButtonModule, MatProgressSpinnerModule,
@@ -388,16 +389,24 @@ export class TownListComponent implements OnInit, AfterViewInit {
         return town.mapId !== null;
     }
 
-    /** Ouvre la ville : sa propre ville courante en mode normal, toute autre ville en mode observateur. */
-    protected onRowClick(town: TownListItem): void {
+    /**
+     * Route d'ouverture de la ville, partagée par le clic simple et le clic molette (nouvel onglet) :
+     * sa propre ville courante en mode normal, toute autre ville en mode observateur.
+     * `null` si la ville n'est pas ouvrable (pas de mapId).
+     */
+    protected getRowCommands(town: TownListItem): RouteCommands | null {
         if (town.mapId === null) {
-            return;
+            return null;
         }
         const currentTownId: number | undefined = getTown()?.town_id;
-        if (currentTownId !== null && town.mapId === currentTownId) {
-            this.router.navigate(['/my-town']);
-        } else {
-            this.router.navigate(['/town', town.mapId, 'citizens', 'list']);
+        return town.mapId === currentTownId ? ['/my-town'] : ['/town', town.mapId, 'citizens', 'list'];
+    }
+
+    /** Ouvre la ville (voir `getRowCommands`). */
+    protected onRowClick(town: TownListItem): void {
+        const commands: RouteCommands | null = this.getRowCommands(town);
+        if (commands !== null) {
+            this.router.navigate(commands);
         }
     }
 
